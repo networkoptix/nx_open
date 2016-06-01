@@ -35,9 +35,13 @@ using namespace style;
 
 namespace
 {
-    const char* kComboBoxDelegateClass = "_qn_comboBoxDelegateClass";
+    const char* kComboBoxDelegateClassProperty = "_qn_comboBoxDelegateClass";
+
+    const char* kHoveredChildProperty = "_qn_hoveredChild";
 
     const QSize kSwitchFocusFrameMargins = QSize(4, 4); // 2 at left, 2 at right, 2 at top, 2 at bottom
+
+    const int kCompactTabFocusMargin = 2;
 
     void drawArrow(Direction direction,
                    QPainter *painter,
@@ -154,6 +158,19 @@ namespace
     {
         return qobject_cast<const QLineEdit*>(widget) && widget->parentWidget() &&
                qobject_cast<const QAbstractItemView *>(widget->parentWidget()->parentWidget());
+    }
+
+    bool isTabHovered(const QStyleOption* option, const QWidget* widget)
+    {
+        if (!option->state.testFlag(QStyle::State_MouseOver))
+            return false;
+
+        /* QTabBar marks a tab as hovered even if a child widget is hovered above that tab.
+         * To overcome this problem we process hover events and track hovered children: */
+        if (widget && widget->property(kHoveredChildProperty).value<QWidget*>())
+            return false;
+
+        return true;
     }
 
     template <class T>
@@ -290,8 +307,13 @@ void QnNxStyle::drawPrimitive(
         {
             const QTabBar *tabBar = nullptr;
             TabShape shape = TabShape::Default;
+
+            Qt::ArrowType arrowType = Qt::NoArrow;
             if (widget)
             {
+                if (auto button = qobject_cast<const QToolButton*>(widget))
+                    arrowType = button->arrowType();
+
                 tabBar = qobject_cast<const QTabBar*>(widget->parent());
                 shape = tabShape(tabBar);
             }
@@ -308,10 +330,10 @@ void QnNxStyle::drawPrimitive(
                 {
                 case TabShape::Default:
                     mainColor = mainColor.lighter(3);
-                    rect.adjust(0, 0, 0, -1);
+                    rect.adjust(0, 2, 0, -1);
                     break;
                 case TabShape::Compact:
-                    rect.adjust(0, 0, 0, -1);
+                    rect.adjust(0, 2, 0, -2);
                     break;
                 case TabShape::Rectangular:
                     mainColor = mainColor.lighter(1);
@@ -342,6 +364,12 @@ void QnNxStyle::drawPrimitive(
 
                 QnScopedPainterPenRollback penRollback(painter, lineColor);
                 painter->drawLine(rect.topLeft(), rect.bottomLeft());
+
+                if (arrowType == Qt::LeftArrow && shape != TabShape::Rectangular)
+                {
+                    painter->setPen(mainColor.darker(2).color());
+                    painter->drawLine(rect.topRight(), rect.bottomRight());
+                }
             }
         }
         return;
@@ -553,22 +581,36 @@ void QnNxStyle::drawPrimitive(
             QnPaletteColor mainColor = findColor(option->palette.window().color()).lighter(3);
 
             QnScopedPainterPenRollback penRollback(painter);
+            QnScopedPainterAntialiasingRollback aaRollback(painter, false);
 
             if (shape == TabShape::Default)
             {
                 painter->fillRect(rect, mainColor);
 
-                painter->setPen(mainColor.darker(1));
+                painter->setPen(mainColor.darker(3));
                 painter->drawLine(rect.topLeft(), rect.topRight());
 
-                painter->setPen(mainColor.darker(3));
+                painter->setPen(option->palette.base().color());
                 painter->drawLine(rect.bottomLeft(), rect.bottomRight());
             }
             else
             {
-                painter->setPen(mainColor.lighter(2));
+                painter->setPen(mainColor);
                 painter->drawLine(rect.bottomLeft(), rect.bottomRight());
             }
+#if 0
+            /*
+            TODO: #vkutin Make entire tab bar displaying focus.
+            We need to send whole area updates when a tab loses focus.
+            */
+            if (option->state.testFlag(State_HasFocus))
+            {
+                QStyleOptionFocusRect focusOption;
+                focusOption.QStyleOption::operator=(*option);
+                focusOption.rect = rect.adjusted(1, 1, -1, -1);
+                proxy()->drawPrimitive(PE_FrameFocusRect, &focusOption, painter, widget);
+            }
+#endif
         }
         return;
 
@@ -1220,35 +1262,30 @@ void QnNxStyle::drawControl(
         break;
 
     case CE_TabBarTabShape:
-        if (const QStyleOptionTab *tab =
-                qstyleoption_cast<const QStyleOptionTab*>(option))
+        if (auto tab = qstyleoption_cast<const QStyleOptionTab*>(option))
         {
             TabShape shape = tabShape(widget);
 
             switch (shape)
             {
             case TabShape::Compact:
-                return;
+                break;
 
             case TabShape::Default:
-                if (!tab->state.testFlag(State_Selected) &&
-                    (tab->state.testFlag(State_MouseOver) || tab->state.testFlag(State_HasFocus)))
+                if (!tab->state.testFlag(State_Selected) && isTabHovered(tab, widget))
                 {
-                    QnPaletteColor mainColor = findColor(
-                            option->palette.window().color()).lighter(3);
+                    QnPaletteColor mainColor = findColor(option->palette.window().color()).lighter(4);
+                    painter->fillRect(tab->rect.adjusted(0, 1, 0, -1), mainColor);
 
-                    painter->fillRect(tab->rect.adjusted(0, 0, 0, -1), mainColor);
-
-                    QnScopedPainterPenRollback penRollback(
-                            painter, QPen(mainColor.lighter(2)));
+                    QnScopedPainterPenRollback penRollback(painter, mainColor.darker(3).color());
                     painter->drawLine(tab->rect.topLeft(), tab->rect.topRight());
                 }
-                return;
+                break;
 
             case TabShape::Rectangular:
                 {
                     QnPaletteColor mainColor = findColor(
-                            option->palette.window().color()).lighter(1);
+                            option->palette.window().color()).lighter(4);
 
                     QColor color = mainColor;
 
@@ -1256,8 +1293,7 @@ void QnNxStyle::drawControl(
                     {
                         color = option->palette.midlight().color();
                     }
-                    else if (tab->state.testFlag(State_MouseOver) ||
-                             tab->state.testFlag(State_HasFocus))
+                    else if (isTabHovered(tab, widget))
                     {
                         color = mainColor.lighter(1);
                     }
@@ -1273,8 +1309,10 @@ void QnNxStyle::drawControl(
                                           tab->rect.bottomLeft());
                     }
                 }
-                return;
+                break;
             }
+
+            return;
         }
         break;
 
@@ -1287,6 +1325,7 @@ void QnNxStyle::drawControl(
             QColor color;
 
             QRect textRect = tab->rect;
+            QRect focusRect = tab->rect;
 
             if (shape == TabShape::Rectangular)
             {
@@ -1299,6 +1338,7 @@ void QnNxStyle::drawControl(
 
                 int hspace = pixelMetric(PM_TabBarTabHSpace, option, widget);
                 textRect.adjust(hspace, 0, -hspace, 0);
+                focusRect.adjust(0, 2, 0, -2);
             }
             else
             {
@@ -1314,9 +1354,12 @@ void QnNxStyle::drawControl(
                 {
                     rect.setBottom(textRect.bottom());
                     rect.setTop(rect.bottom());
+                    focusRect.setLeft(rect.left() - kCompactTabFocusMargin);
+                    focusRect.setRight(rect.right() - kCompactTabFocusMargin);
                 }
                 else
                 {
+                    focusRect.adjust(0, 2, 0, -2);
                     rect.setBottom(textRect.bottom() - 1);
                     rect.setTop(rect.bottom() - 1);
                 }
@@ -1326,8 +1369,7 @@ void QnNxStyle::drawControl(
                     color = tab->palette.highlight().color();
                     painter->fillRect(rect, color);
                 }
-                else if (tab->state.testFlag(State_MouseOver) ||
-                         tab->state.testFlag(State_HasFocus))
+                else if (isTabHovered(tab, widget))
                 {
                     if (shape == TabShape::Compact)
                     {
@@ -1350,6 +1392,14 @@ void QnNxStyle::drawControl(
                          tab->palette,
                          tab->state.testFlag(QStyle::State_Enabled),
                          tab->text);
+
+            if (tab->state.testFlag(State_HasFocus))
+            {
+                QStyleOptionFocusRect focusOption;
+                focusOption.QStyleOption::operator=(*tab);
+                focusOption.rect = focusRect;
+                proxy()->drawPrimitive(PE_FrameFocusRect, &focusOption, painter, widget);
+            }
         }
         return;
 
@@ -2032,7 +2082,7 @@ QRect QnNxStyle::subElementRect(
             QRect rect = base_type::subElementRect(subElement, option, widget);
 
             if (tabShape(tabWidget->tabBar()) == TabShape::Compact)
-                rect.adjust(-hspace, 0, -hspace, 0);
+                rect.adjust(-hspace + kCompactTabFocusMargin, 0, -hspace + kCompactTabFocusMargin, 0);
             else
                 rect.adjust(hspace, 0, hspace, 0);
 
@@ -2201,7 +2251,7 @@ QSize QnNxStyle::sizeFromContents(
         {
             TabShape shape = tabShape(widget);
 
-            const int kRoundedSize = dp(36);
+            const int kRoundedSize = dp(36) + dp(1); /* shadow */
             const int kCompactSize = dp(32);
 
             int width = size.width();
@@ -2360,15 +2410,15 @@ int QnNxStyle::pixelMetric(
     case PM_TabBarTabVSpace:
         return tabShape(widget) == TabShape::Rectangular ? dp(8) : dp(20);
 
-    case PM_ToolBarIconSize:
-        return dp(32);
+    case PM_TabBarScrollButtonWidth:
+        return dp(24);
 
     case PM_TabCloseIndicatorWidth:
     case PM_TabCloseIndicatorHeight:
         return dp(24);
 
-    case PM_TabBarScrollButtonWidth:
-        return std::min(dp(36), widget->height() + 1);
+    case PM_ToolBarIconSize:
+        return dp(32);
 
     default:
         break;
@@ -2491,7 +2541,8 @@ void QnNxStyle::polish(QWidget *widget)
         QAbstractItemDelegate* oldDelegate = comboBox->itemDelegate();
         if (oldDelegate && oldDelegate->metaObject()->className() == kDefaultDelegateClassName)
         {
-            comboBox->setProperty(kComboBoxDelegateClass, QVariant::fromValue(const_cast<void*>(static_cast<const void*>(oldDelegate->metaObject()))));
+            comboBox->setProperty(kComboBoxDelegateClassProperty,
+                QVariant::fromValue(const_cast<void*>(static_cast<const void*>(oldDelegate->metaObject()))));
             comboBox->setItemDelegate(new QnStyledComboBoxDelegate());
         }
     }
@@ -2516,6 +2567,9 @@ void QnNxStyle::polish(QWidget *widget)
                 font.setWeight(QFont::DemiBold);
             widget->setFont(font);
         }
+
+        /* Install hover events tracking: */
+        widget->installEventFilter(this);
         widget->setAttribute(Qt::WA_Hover);
     }
 
@@ -2537,6 +2591,23 @@ void QnNxStyle::polish(QWidget *widget)
         widget->setWindowFlags(widget->windowFlags() | Qt::FramelessWindowHint);
 #endif
     }
+
+    if (auto button = qobject_cast<QToolButton*>(widget))
+    {
+        /* Left scroll button in a tab bar: add shadow effect: */
+        if (button->arrowType() == Qt::LeftArrow && isWidgetOwnedBy<QTabBar>(button))
+        {
+            auto effect = new QGraphicsDropShadowEffect(button);
+            effect->setXOffset(-dp(4.0));
+            effect->setYOffset(0);
+
+            QColor shadowColor = mainColor(Colors::kBase);
+            shadowColor.setAlphaF(0.5);
+            effect->setColor(shadowColor);
+
+            button->setGraphicsEffect(effect);
+        }
+    }
 }
 
 void QnNxStyle::unpolish(QWidget* widget)
@@ -2552,9 +2623,10 @@ void QnNxStyle::unpolish(QWidget* widget)
 
     if (auto comboBox = qobject_cast<QComboBox*>(widget))
     {
-        if (auto delegateClass = static_cast<const QMetaObject*>(comboBox->property(kComboBoxDelegateClass).value<void*>()))
+        if (auto delegateClass = static_cast<const QMetaObject*>(
+            comboBox->property(kComboBoxDelegateClassProperty).value<void*>()))
         {
-            comboBox->setProperty(kComboBoxDelegateClass, QVariant::fromValue<void*>(nullptr));
+            comboBox->setProperty(kComboBoxDelegateClassProperty, QVariant());
             comboBox->setItemDelegate(static_cast<QAbstractItemDelegate*>(delegateClass->newInstance()));
         }
     }
@@ -2566,6 +2638,20 @@ void QnNxStyle::unpolish(QWidget* widget)
             /* Reset margins for drop-down list container: */
             view->parentWidget()->setContentsMargins(0, 0, 0, 0);
         }
+    }
+
+    if (auto tabBar = qobject_cast<QTabBar*>(widget))
+    {
+        /* Remove hover events tracking: */
+        tabBar->setProperty(kHoveredChildProperty, QVariant());
+        tabBar->removeEventFilter(this);
+    }
+
+    if (auto button = qobject_cast<QToolButton*>(widget))
+    {
+        /* Left scroll button in a tab bar: remove shadow effect: */
+        if (button->arrowType() == Qt::LeftArrow && isWidgetOwnedBy<QTabBar>(button))
+            button->setGraphicsEffect(nullptr);
     }
 
     base_type::unpolish(widget);
@@ -2599,4 +2685,32 @@ QString QnNxStyle::Colors::paletteName(QnNxStyle::Colors::Palette palette)
     }
 
     return QString();
+}
+
+bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
+{
+    /* QTabBar marks a tab as hovered even if a child widget is hovered above that tab.
+     * To overcome this problem we process hover events and track hovered children: */
+    if (auto tabBar = qobject_cast<QTabBar*>(object))
+    {
+        QWidget* hoveredChild = nullptr;
+        switch (event->type())
+        {
+            case QEvent::HoverEnter:
+            case QEvent::HoverMove:
+                hoveredChild = tabBar->childAt(static_cast<QHoverEvent*>(event)->pos());
+                /* FALL THROUGH */
+            case QEvent::HoverLeave:
+            {
+                if (tabBar->property(kHoveredChildProperty).value<QWidget*>() != hoveredChild)
+                {
+                    tabBar->setProperty(kHoveredChildProperty, QVariant::fromValue(hoveredChild));
+                    tabBar->update();
+                }
+                break;
+            }
+        }
+    }
+
+    return base_type::eventFilter(object, event);
 }
