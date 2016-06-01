@@ -22,17 +22,17 @@
                 <table>
                     <tbody>
                     <tr>
-                        <td><img class="icon" src="cid:home"></td>
+                        <td><img class="icon" src="cid:systemIcon"></td>
                         <td><div class="name">{{systemName}}</div>
                             {{#systemSignature}}<div class="hint">{{systemSignature}}</div>{{/systemSignature}}</td>
                     </tr>
-                    {{#cloud}}
+                    {{#cloudOwner}}
                     <tr class="cloud-info">
-                        <td><img class="icon" src="cid:home"></td>
-                        <td><div class="name">{{cloud.ownerName}}</div>
-                            <div class="hint">{{cloud.ownerEmail}}</div></td>
+                        <td><img class="icon" src="cid:ownerIcon"></td>
+                        <td><div class="name">{{cloudOwner}}</div>
+                            {{#cloudOwnerEmail}}<div class="hint">{{cloudOwnerEmail}}</div>{{/cloudOwnerEmail}}</td>
                     </tr>
-                    {{/cloud}}
+                    {{/cloudOwner}}
                     </tbody>
                 </table>
             </div>
