@@ -41,7 +41,7 @@
 #include <client/client_connection_data.h>
 #include <client/client_resource_processor.h>
 #include <client/client_startup_parameters.h>
-#include <client/system_uri_resolver.h>
+
 
 #include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
@@ -113,6 +113,7 @@
 #include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
+#include <nx/vms/utils/system_uri.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"

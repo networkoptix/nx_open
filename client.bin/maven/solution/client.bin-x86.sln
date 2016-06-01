@@ -25,6 +25,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client.core-x86", "${basedi
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
+        ${nx_vms_utils.guid} = ${nx_vms_utils.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common-x86", "${basedir}\..\common\src\common-x86.vcxproj", "${common.guid}"
@@ -109,6 +110,10 @@ Global
 		${nx_utils.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_utils.guid}.Release|Win32.ActiveCfg = Release|Win32
 		${nx_utils.guid}.Release|Win32.Build.0 = Release|Win32
+		${nx_vms_utils.guid}.Debug|Win32.ActiveCfg = Debug|Win32
+		${nx_vms_utils.guid}.Debug|Win32.Build.0 = Debug|Win32
+		${nx_vms_utils.guid}.Release|Win32.ActiveCfg = Release|Win32
+		${nx_vms_utils.guid}.Release|Win32.Build.0 = Release|Win32
 		${cloud_db_client.guid}.Debug|Win32.ActiveCfg = Debug|Win32
 		${cloud_db_client.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${cloud_db_client.guid}.Release|Win32.ActiveCfg = Release|Win32

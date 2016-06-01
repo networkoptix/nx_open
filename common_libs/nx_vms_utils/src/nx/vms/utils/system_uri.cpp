@@ -1,4 +1,4 @@
-#include "system_uri_resolver.h"
+#include "system_uri.h"
 
 #include <nx/utils/log/log.h>
 
@@ -86,4 +86,126 @@ bool QnSystemUriResolver::parseUri()
     }
 
     return m_valid;
+}
+
+class QnSystemUriPrivate
+{
+public:
+
+    QnSystemUri::Protocol protocol;
+    QString domain;
+    QnSystemUri::ClientCommand clientCommand;
+    QString systemId;
+    QnSystemUri::SystemAction systemAction;
+    QnSystemUri::Parameters parameters;
+
+    void parse(const QString& uri)
+    {
+
+    }
+
+};
+
+QnSystemUri::QnSystemUri()
+{
+
+}
+
+QnSystemUri::QnSystemUri(const QString& uri):
+    QnSystemUri()
+{
+    Q_D(QnSystemUri);
+    d->parse(uri);
+}
+
+QnSystemUri::~QnSystemUri()
+{
+
+}
+
+QnSystemUri::Protocol QnSystemUri::protocol() const
+{
+    Q_D(const QnSystemUri);
+    return d->protocol;
+}
+
+void QnSystemUri::setProtocol(Protocol value)
+{
+    Q_D(QnSystemUri);
+    d->protocol = value;
+}
+
+QString QnSystemUri::domain() const
+{
+    Q_D(const QnSystemUri);
+    return d->domain;
+}
+
+void QnSystemUri::setDomain(const QString& value)
+{
+    Q_D(QnSystemUri);
+    d->domain = value;
+}
+
+QnSystemUri::ClientCommand QnSystemUri::clientCommand() const
+{
+    Q_D(const QnSystemUri);
+    return d->clientCommand;
+}
+
+void QnSystemUri::setClientCommand(ClientCommand value)
+{
+    Q_D(QnSystemUri);
+    d->clientCommand = value;
+}
+
+QString QnSystemUri::systemId() const
+{
+    Q_D(const QnSystemUri);
+    return d->systemId;
+}
+
+void QnSystemUri::setSystemId(const QString& value)
+{
+    Q_D(QnSystemUri);
+    d->systemId = value;
+}
+
+QnSystemUri::SystemAction QnSystemUri::systemAction() const
+{
+    Q_D(const QnSystemUri);
+    return d->systemAction;
+}
+
+void QnSystemUri::setSystemAction(SystemAction value)
+{
+    Q_D(QnSystemUri);
+    d->systemAction = value;
+}
+
+QnSystemUri::Parameters QnSystemUri::parameters() const
+{
+    Q_D(const QnSystemUri);
+    return d->parameters;
+}
+
+void QnSystemUri::setParameters(const Parameters& value)
+{
+    Q_D(QnSystemUri);
+    d->parameters = value;
+}
+
+bool QnSystemUri::isNull() const
+{
+    return true;
+}
+
+QString QnSystemUri::toString() const
+{
+    return QString();
+}
+
+QUrl QnSystemUri::toUrl() const
+{
+    return QUrl();
 }

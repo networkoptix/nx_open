@@ -25,6 +25,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client.core-x64", "${basedi
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
+        ${nx_vms_utils.guid} = ${nx_vms_utils.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common-x64", "${basedir}\..\common\src\common-x64.vcxproj", "${common.guid}"
@@ -109,6 +110,10 @@ Global
 		${nx_utils.guid}.Debug|x64.Build.0 = Debug|x64
 		${nx_utils.guid}.Release|x64.ActiveCfg = Release|x64
 		${nx_utils.guid}.Release|x64.Build.0 = Release|x64
+        ${nx_vms_utils.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_vms_utils.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_vms_utils.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_vms_utils.guid}.Release|x64.Build.0 = Release|x64
 		${cloud_db_client.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${cloud_db_client.guid}.Debug|x64.Build.0 = Debug|x64
 		${cloud_db_client.guid}.Release|x64.ActiveCfg = Release|x64
