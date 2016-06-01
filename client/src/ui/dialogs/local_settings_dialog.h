@@ -1,24 +1,26 @@
-#ifndef QN_PREFERENCES_DIALOG_H
-#define QN_PREFERENCES_DIALOG_H
+#pragma once
 
 #include <QtCore/QScopedPointer>
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/dialogs/common/generic_tabbed_dialog.h>
 
-namespace Ui {
-    class PreferencesDialog;
+namespace Ui
+{
+    class LocalSettingsDialog;
 }
 
 class QnGeneralPreferencesWidget;
 class QnLookAndFeelPreferencesWidget;
 
-class QnPreferencesDialog: public QnGenericTabbedDialog, public QnWorkbenchContextAware {
+class QnLocalSettingsDialog : public QnGenericTabbedDialog, public QnWorkbenchContextAware
+{
     Q_OBJECT
 
     typedef QnGenericTabbedDialog base_type;
 public:
-    enum DialogPage {
+    enum DialogPage
+    {
         GeneralPage,
         LookAndFeelPage,
         RecordingPage,
@@ -27,19 +29,16 @@ public:
         PageCount
     };
 
-    QnPreferencesDialog(QWidget *parent = 0);
-    ~QnPreferencesDialog();
+    QnLocalSettingsDialog(QWidget *parent = 0);
+    ~QnLocalSettingsDialog();
 
 protected:
-
     virtual void applyChanges() override;
 
 private:
-    Q_DISABLE_COPY(QnPreferencesDialog)
+    Q_DISABLE_COPY(QnLocalSettingsDialog)
 
-    QScopedPointer<Ui::PreferencesDialog> ui;
+    QScopedPointer<Ui::LocalSettingsDialog> ui;
     QnGeneralPreferencesWidget* m_generalWidget;
     QnLookAndFeelPreferencesWidget* m_lookAndFeelWidget;
 };
-
-#endif // QN_PREFERENCES_DIALOG_H

@@ -7,7 +7,6 @@
 #include <common/common_module.h>
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resources_changes_manager.h>

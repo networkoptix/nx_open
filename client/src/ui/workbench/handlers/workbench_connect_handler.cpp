@@ -79,7 +79,7 @@ namespace
 
     void storeCustomConnection(const QUrl &url
         , const QString &name
-        , bool autoLogin) 
+        , bool autoLogin)
     {
         QnConnectionDataList connections = qnSettings->customConnections();
 
@@ -94,12 +94,12 @@ namespace
         connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
 
         QnConnectionData selected = connections.getByName(name);
-        if (qnUrlEqual(selected.url, url)) 
+        if (qnUrlEqual(selected.url, url))
         {
             connections.removeOne(selected.name);
             connections.prepend(selected);    /* Reorder. */
         }
-        else 
+        else
         {
             // save "Last used connection"
             QnConnectionData last(connectionData);
@@ -130,7 +130,7 @@ namespace
 
         lastConnections.erase(newEnd, lastConnections.end());
         lastConnections.prepend(connectionInfo);
-        
+
         qnCoreSettings->setRecentUserConnections(lastConnections);
         qnSettings->setAutoLogin(autoLogin);
     }
@@ -258,23 +258,23 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     const bool autoLogin = parameters.argument(Qn::AutoLoginRole, false);
     const auto connectionAlias = parameters.argument(Qn::ConnectionAliasRole, QString());
 
-    if (url.isValid()) 
+    if (url.isValid())
     {
         /* ActiveX plugin */
-        if (qnRuntime->isActiveXMode()) 
+        if (qnRuntime->isActiveXMode())
         {
             if (connectToServer(url, connectionAlias, storePassword, autoLogin, true) != ec2::ErrorCode::ok)
             {
                 QnGraphicsMessageBox::information(tr("Could not connect to server..."), 1000 * 60 * 60 * 24);
                 menu()->trigger(QnActions::ExitAction);
             }
-        } 
+        }
         else if (qnRuntime->isVideoWallMode())  /* Videowall item */
         {
             //TODO: #GDM #High videowall should try indefinitely
-            if (connectToServer(url, connectionAlias, storePassword, autoLogin, true) != ec2::ErrorCode::ok) 
+            if (connectToServer(url, connectionAlias, storePassword, autoLogin, true) != ec2::ErrorCode::ok)
             {
-                QnGraphicsMessageBox* incompatibleMessageBox = 
+                QnGraphicsMessageBox* incompatibleMessageBox =
                     QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1...")
                         , videowallCloseTimeoutMSec);
                 connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished
@@ -284,13 +284,13 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         else
         {
             /* Login Dialog or 'Open in new window' with url */
-            
+
             //try connect; if not - show login dialog
             if (connectToServer(url, connectionAlias, storePassword, autoLogin, false) != ec2::ErrorCode::ok)
                 showWelcomeScreen();
         }
-    } 
-    else 
+    }
+    else
     {
         /* Try to load last used connection. */
         url = qnSettings->lastUsedConnection().url;
@@ -303,7 +303,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         {
             if (connectToServer(url, connectionAlias, true, true, false) != ec2::ErrorCode::ok)
                 showWelcomeScreen();
-        } 
+        }
         else
         {
             /* No saved password, just show Welcome Screen. */
@@ -354,12 +354,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     ec2::ApiClientInfoData clientData;
     {
         clientData.id = qnSettings->pcUuid();
-
-        const auto skin = qnSettings->clientSkin();
-        /**/ if (skin == Qn::DarkSkin) clientData.skin = lit("Dark");
-        else if (skin == Qn::LightSkin) clientData.skin = lit("Light");
-        else clientData.skin = lit("Unknown");
-
+        clientData.skin = lit("Dark");
         clientData.fullVersion = QnAppInfo::applicationFullVersion();
         clientData.systemInfo = QnSystemInformation::currentSystemInformation().toString();
         clientData.systemRuntime = QnSystemInformation::currentSystemRuntime();
@@ -428,7 +423,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     {
         /* Substitute value for incompatible peers. */
         const auto code = (errCode == ec2::ErrorCode::ok
-            ? ec2::ErrorCode::incompatiblePeer : errCode);  
+            ? ec2::ErrorCode::incompatiblePeer : errCode);
 
         return handleConnectionResult(code);
     }

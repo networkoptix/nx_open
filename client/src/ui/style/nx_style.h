@@ -49,9 +49,10 @@ public:
     virtual void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const override;
     virtual QRect subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const override;
     virtual QRect subElementRect(SubElement subElement, const QStyleOption *option, const QWidget *widget) const override;
-    virtual int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const override;
     virtual QSize sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const override;
+    virtual int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const override;
     virtual int styleHint(StyleHint sh, const QStyleOption *option = nullptr, const QWidget *widget = nullptr, QStyleHintReturn *shret = nullptr) const override;
+    virtual QPixmap standardPixmap(StandardPixmap iconId, const QStyleOption* option, const QWidget* widget) const override;
     virtual void polish(QWidget *widget) override;
     virtual void unpolish(QWidget *widget) override;
 

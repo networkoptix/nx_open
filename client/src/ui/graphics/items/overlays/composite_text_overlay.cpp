@@ -205,7 +205,7 @@ void QnCompositeTextOverlay::initTextMode()
         {
             const auto runtimeParams = businessAction->getRuntimeParams();
 
-            const auto caption = QnBusinessStringsHelper::eventAtResource(runtimeParams, true);
+            const auto caption = QnBusinessStringsHelper::eventAtResource(runtimeParams, Qn::RI_WithUrl);
             const auto htmlCaption = htmlFormattedParagraph(caption, kCaptionPixelFontSize, true);
 
             const auto desc = QnBusinessStringsHelper::eventDetails(runtimeParams, lit("\n"));

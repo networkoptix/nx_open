@@ -1,5 +1,4 @@
-#ifndef QN_CLIENT_SETTINGS_H
-#define QN_CLIENT_SETTINGS_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
@@ -7,6 +6,8 @@
 #include <QtGui/QColor>
 
 #include <common/common_meta_types.h>
+
+#include <core/resource/resource_display_info.h>
 
 #include <client/client_globals.h>
 #include <client/client_connection_data.h>
@@ -75,9 +76,6 @@ public:
         /** Do not show update notification for the selected version. */
         IGNORED_UPDATE_VERSION,
 
-        /** Do not show save confirmation when closing unsaved layouts. */
-        IGNORE_UNSAVED_LAYOUTS,
-
         SHOWCASE_URL,
         SHOWCASE_ENABLED,
 
@@ -86,7 +84,7 @@ public:
         TOUR_CYCLE_TIME,
 
         /** Show extra information in tree - ip addresses, user name, videowall screen layouts. */
-        EXT_INFO_IN_TREE,
+        EXTRA_INFO_IN_TREE,
 
         TIME_MODE,
 
@@ -137,8 +135,6 @@ public:
 
         /** Do not show warning when a preset is being deleted but it is used by some tours. */
         PTZ_PRESET_IN_USE_WARNING_DISABLED,
-
-        CLIENT_SKIN,
 
         /** Unique id for this PC for videowall construction. */
         PC_UUID,
@@ -216,13 +212,12 @@ private:
         QN_DECLARE_RW_PROPERTY(QnUpdateInfo,                latestUpdateInfo,       setLatestUpdateInfo,        LATEST_UPDATE_INFO,         QnUpdateInfo())
         QN_DECLARE_RW_PROPERTY(qint64,                      updateDeliveryDate,     setUpdateDeliveryDate,      UPDATE_DELIVERY_DATE,       0)
 
-        QN_DECLARE_RW_PROPERTY(bool,                        ignoreUnsavedLayouts,   setIgnoreUnsavedLayouts,    IGNORE_UNSAVED_LAYOUTS,     false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClientUpdateDisabled, setClientUpdateDisabled,    NO_CLIENT_UPDATE,           false)
         QN_DECLARE_RW_PROPERTY(QUrl,                        showcaseUrl,            setShowcaseUrl,             SHOWCASE_URL,               QUrl())
         QN_DECLARE_RW_PROPERTY(bool,                        isShowcaseEnabled,      setShowcaseEnabled,         SHOWCASE_ENABLED,           false)
         QN_DECLARE_RW_PROPERTY(QUrl,                        settingsUrl,            setSettingsUrl,             SETTINGS_URL,               QUrl())
         QN_DECLARE_RW_PROPERTY(int,                         tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
-        QN_DECLARE_RW_PROPERTY(bool,                        extraInfoInTree,        setExtraInfoInTree,         EXT_INFO_IN_TREE,           true)
+        QN_DECLARE_RW_PROPERTY(Qn::ResourceInfoLevel,       extraInfoInTree,        setExtraInfoInTree,         EXTRA_INFO_IN_TREE,         Qn::RI_FullInfo)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,                timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
         QN_DECLARE_R_PROPERTY (bool,                        createFullCrashDump,                                CREATE_FULL_CRASH_DUMP,     false)
         QN_DECLARE_RW_PROPERTY(QnPaneSettingsMap,           paneSettings,           setPaneSettings,            WORKBENCH_PANES,            Qn::defaultPaneSettings())
@@ -243,7 +238,6 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isPtzPresetInUseWarningDisabled,    setPtzPresetInUseWarningDisabled,   PTZ_PRESET_IN_USE_WARNING_DISABLED, false)
         QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0)
-        QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
         QN_DECLARE_RW_PROPERTY(QnClientBackground,          background,             setBackground,              BACKGROUND,                 QnClientBackground())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
@@ -263,5 +257,3 @@ private:
 
 
 #define qnSettings (QnClientSettings::instance())
-
-#endif // QN_CLIENT_SETTINGS_H

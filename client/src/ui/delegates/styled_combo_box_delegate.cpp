@@ -33,3 +33,9 @@ bool QnStyledComboBoxDelegate::isSeparator(const QModelIndex& index)
 {
     return index.data(Qt::AccessibleDescriptionRole).toString() == QLatin1Literal("separator");
 }
+
+void QnStyledComboBoxDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
+{
+    base_type::initStyleOption(option, index);
+    option->state &= ~QStyle::State_HasFocus;
+}

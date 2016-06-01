@@ -30,7 +30,6 @@ public:
     bool isRestartRequired() const;
 private:
     void setupLanguageUi();
-    void setupSkinUi();
     void setupTimeModeUi();
     void setupBackgroundUi();
 
@@ -40,7 +39,6 @@ private:
     bool m_updating;
 
     int m_oldLanguage;
-    int m_oldSkin;
 
     Qn::TimeMode m_oldTimeMode;
 

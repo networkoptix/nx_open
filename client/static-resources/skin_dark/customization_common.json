@@ -141,6 +141,10 @@
         }
     },
 
+    "QnCurtainItem": {
+        "color": "dark1"
+    },
+    
     "QMenu": {
         "palette": {
             "default": {
