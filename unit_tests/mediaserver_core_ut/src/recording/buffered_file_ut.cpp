@@ -16,7 +16,7 @@ void doTestInternal(int systemFlags)
     nx::ut::utils::WorkDirResource workDir;
     ASSERT_TRUE((bool)workDir.getDirName());
 
-    const QString kTestFileName = QDir(workDir.getDirName()).absoluteFilePath("test_data1.bin");
+    const QString kTestFileName = QDir(*workDir.getDirName()).absoluteFilePath("test_data1.bin");
     const QByteArray kTestPattern("1234567890");
     const int kPatternRepCnt = 2000 * 499;
 

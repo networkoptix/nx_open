@@ -12,6 +12,7 @@
 #define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 #include "media_server/serverutil.h"
+#include "../utils.h"
 
 namespace
 {
@@ -294,17 +295,18 @@ TEST(MulticastHttpTest, main)
     int argc = 2;
     char* argv[] = {"", "-e" };
 
+    nx::ut::utils::WorkDirResource workDirResource;
+    ASSERT_TRUE((bool)workDirResource.getDirName());
+
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule());
     MSSettings::roSettings()->setValue(lit("serverGuid"), QnUuid::createUuid().toString());
     MSSettings::roSettings()->setValue(lit("removeDbOnStartup"), lit("1"));
+    MSSettings::roSettings()->setValue(lit("dataDir"), *workDirResource.getDirName());
+    MSSettings::roSettings()->setValue(lit("varDir"), *workDirResource.getDirName());
+
     QString dbDir = MSSettings::roSettings()->value( "eventsDBFilePath", closeDirPath(getDataDirectory())).toString();
-    QFile::remove(dbDir + lit("mserver.sqlite"));
-    QFile::remove(dbDir + lit("ecs.sqlite"));
-    QFile::remove(dbDir + lit("ecs.sqlite-shm"));
-    QFile::remove(dbDir + lit("ecs.sqlite-wal"));
-    QFile::remove(dbDir + lit("ecs_static.sqlite"));
     MSSettings::roSettings()->setValue(lit("systemName"), QnUuid::createUuid().toString()); // random value
     MSSettings::roSettings()->setValue(lit("port"), 0);
     MediaServerProcess mserverProcessor(argc, argv);
