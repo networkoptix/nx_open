@@ -17,12 +17,49 @@
     <properties>
         <guid>${nx_vms_utils.guid}</guid>
         <template>lib</template>
-        <buildLib>staticlib</buildLib>
+        <buildLib>sharedlib</buildLib>
         <qt.libs>core</qt.libs>
-        <global.libs></global.libs>
-        <windows.oslibs>DbgHelp.lib</windows.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation</mac.oslibs>
-
+        <global.libs>-lnx_utils</global.libs>
         <windows.defines>_USING_V110_SDK71_</windows.defines>
     </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_utils</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+    
+    <profiles>
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>ios</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+    </profiles>    
 </project>

@@ -101,14 +101,6 @@ MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 
-#temporary hardcode
-CONFIG(debug, debug|release) {
-    LIBS += -L${qt.dir}-debug/lib
-}
-else {
-    LIBS += -L${qt.dir}/lib
-}
-
 LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L$$OUTPUT_PATH/bin/$$CONFIGURATION
 !win*:!mac {
     LIBS += -Wl,-rpath-link,${qt.dir}/lib
@@ -224,6 +216,16 @@ unix: {
     #QMAKE_CXXFLAGS += -std=c++1y
   }
   QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
+}
+
+!win32 {
+  ext_debug2.target  = $(DESTDIR)$(TARGET).debug
+  ext_debug2.depends = $(DESTDIR)$(TARGET)
+  ext_debug2.commands = $$QMAKE_OBJCOPY --only-keep-debug $(DESTDIR)/$(TARGET) $(DESTDIR)/$(TARGET).debug; $(STRIP) -g $(DESTDIR)/$(TARGET); $$QMAKE_OBJCOPY --add-gnu-debuglink=$(DESTDIR)/$(TARGET).debug $(DESTDIR)/$(TARGET); touch $(DESTDIR)/$(TARGET).debug
+
+  ext_debug.depends = $(DESTDIR)$(TARGET).debug
+
+  QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
 }
 
 ## LINUX
