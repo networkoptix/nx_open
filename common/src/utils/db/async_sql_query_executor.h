@@ -15,8 +15,9 @@
 #include <QtSql/QSqlError>
 
 #include <utils/common/cpp14.h>
-#include <nx/utils/thread/mutex.h>
 #include <utils/common/threadqueue.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/std/thread.h>
 
 #include "request_execution_thread.h"
 #include "request_executor.h"
@@ -138,6 +139,8 @@ private:
     CLThreadQueue<std::unique_ptr<AbstractExecutor>> m_requestQueue;
     std::vector<std::unique_ptr<DbRequestExecutionThread>> m_dbThreadPool;
     size_t m_connectionsBeingAdded;
+    nx::utils::thread m_dropConnectionThread;
+    CLThreadQueue<std::unique_ptr<DbRequestExecutionThread>> m_connectionsToDropQueue;
 
     /*!
         \return \a true if no new connection is required or new connection has been opened.
@@ -145,6 +148,7 @@ private:
     */
     bool openOneMoreConnectionIfNeeded();
     void dropClosedConnections(QnMutexLockerBase* const lk);
+    void dropExpiredConnectionsThreadFunc();
 };
 
 }   //db
