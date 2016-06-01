@@ -228,16 +228,16 @@ ErrorCode QnTransactionLog::saveToDB(
         NX_ASSERT(tran.persistentInfo.timestamp > 0);
 
     QSqlQuery query(m_dbManager->getDB());
-    //query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, db_guid, sequence, timestamp, tran_guid, tran_command, tran_param_id, tran_data) values (?, ?, ?, ?, ?)");
-    query.prepare("INSERT OR REPLACE INTO transaction_log values (?, ?, ?, ?, ?, ?, ?)");
+    //query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, db_guid, sequence, timestamp, tran_guid, tran_data, tran_command, tran_param_id) values (?, ?, ?, ?, ?)");
+    query.prepare("INSERT OR REPLACE INTO transaction_log values (?, ?, ?, ?, ?, ?, ?, ?)");
     query.addBindValue(tran.peerID.toRfc4122());
     query.addBindValue(tran.persistentInfo.dbID.toRfc4122());
     query.addBindValue(tran.persistentInfo.sequence);
     query.addBindValue(tran.persistentInfo.timestamp);
     query.addBindValue(hash.toRfc4122());
+    query.addBindValue(data);
     query.addBindValue((int)tran.command);
     query.addBindValue(paramId.toRfc4122());
-    query.addBindValue(data);
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;

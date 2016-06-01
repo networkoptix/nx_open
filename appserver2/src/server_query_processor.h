@@ -247,9 +247,10 @@ public:
     template<class InputData, class OutputData, class HandlerType>
         void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputData input, HandlerType handler )
     {
-        QnConcurrent::run( Ec2ThreadPool::instance(), [this, input, handler]() {
+        Qn::UserAccessData accessDataCopy(m_userAccessData);
+        QnConcurrent::run( Ec2ThreadPool::instance(), [accessDataCopy, input, handler]() {
             OutputData output;
-            const ErrorCode errorCode = dbManager(m_userAccessData).doQuery( input, output );
+            const ErrorCode errorCode = dbManager(accessDataCopy).doQuery( input, output );
             handler( errorCode, output );
         } );
     }
@@ -262,9 +263,10 @@ public:
     template<class OutputData, class InputParamType1, class InputParamType2, class HandlerType>
         void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputParamType1 input1, InputParamType2 input2, HandlerType handler )
     {
-        QnConcurrent::run( Ec2ThreadPool::instance(), [this, input1, input2, handler]() {
+        Qn::UserAccessData accessDataCopy(m_userAccessData);
+        QnConcurrent::run( Ec2ThreadPool::instance(), [accessDataCopy, input1, input2, handler]() {
             OutputData output;
-            const ErrorCode errorCode = dbManager(m_userAccessData).doQuery( input1, input2, output );
+            const ErrorCode errorCode = dbManager(accessDataCopy).doQuery( input1, input2, output );
             handler( errorCode, output );
         } );
     }

@@ -13,6 +13,8 @@ struct UserAccessData
     UserAccessData() {}
     explicit UserAccessData(const QnUuid &userId) : userId(userId) {}
 
+    UserAccessData(const UserAccessData &other) = default;
+
     bool isNull() const { return userId.isNull(); }
 };
 

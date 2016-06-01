@@ -154,13 +154,10 @@ inline bool hasPermission(const QnUuid &userId, const ApiDatabaseDumpData &/*dat
     return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
-inline bool hasPermission(const QnUuid &/*userId*/, const ApiVideowallControlMessageData &/*data*/, Qn::Permission /*permission*/)
+inline bool hasPermission(const QnUuid &userId, const ApiVideowallControlMessageData &/*data*/, Qn::Permission /*permission*/)
 {
-//    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-//    QnResourcePtr target = qnResPool->getResourceById(data.userId);
-
-//    return qnResourceAccessManager->hasPermission(userResource, target, permission);
-    // TODO: implement
+    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalControlVideoWallPermission);
     return true;
 }
 
