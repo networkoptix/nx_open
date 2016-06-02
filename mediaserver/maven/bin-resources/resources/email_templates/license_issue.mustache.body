@@ -14,7 +14,7 @@
             <td >
                 <b>{{source}}</b> ({{sourceIp}})
             </td>
-            <td>{{timestamp}}</td>
+            <td>{{{timestamp}}}</td>
         </tr>
 {{/aggregated}}
     </tbody>

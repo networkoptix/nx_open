@@ -11,7 +11,7 @@
             </td>
             <td>
                 {{#aggregated}}
-                    {{timestamp}}
+                    {{{timestamp}}}
                 {{/aggregated}}
             </td>
         </tr>
