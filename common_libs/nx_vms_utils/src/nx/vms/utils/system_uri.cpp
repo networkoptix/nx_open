@@ -134,6 +134,21 @@ public:
 
     bool isValid() const
     {
+        switch (scope)
+        {
+            case SystemUri::Scope::Generic:
+                return isValidGenericUri();
+            case SystemUri::Scope::Direct:
+                return isValidDirectUri();
+            default:
+                break;
+        }
+        return false;
+    }
+
+private:
+    bool isValidGenericUri() const
+    {
         bool hasDomain = !domain.isEmpty();
         bool hasAuth = !authenticator.user.isEmpty() && !authenticator.password.isEmpty();
 
@@ -155,8 +170,31 @@ public:
         return false;
     }
 
-private:
+    bool isValidDirectUri() const
+    {
+        /* Direct links are starting with systemId. */
+        if (systemId.isEmpty())
+            return false;
 
+        /* Checking http/https protocol - only direct link to connect to system is allowed. */
+        if (protocol != SystemUri::Protocol::Native)
+            return clientCommand == SystemUri::ClientCommand::ConnectToSystem;
+
+        bool hasAuth = !authenticator.user.isEmpty() && !authenticator.password.isEmpty();
+        switch (clientCommand)
+        {
+            case SystemUri::ClientCommand::Client:
+                return true;
+            case SystemUri::ClientCommand::LoginToCloud:
+                return hasAuth;
+            case SystemUri::ClientCommand::ConnectToSystem:
+                return hasAuth
+                    && systemAction != SystemUri::SystemAction::None;
+            default:
+                break;
+        }
+        return false;
+    }
 
 };
 
