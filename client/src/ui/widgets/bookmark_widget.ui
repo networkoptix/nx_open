@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="nameLabel">
      <property name="text">
-      <string>&amp;Name</string>
+      <string>Name</string>
      </property>
      <property name="buddy">
       <cstring>nameLineEdit</cstring>
@@ -30,7 +30,7 @@
    <item row="3" column="0">
     <widget class="QLabel" name="timeoutLabel">
      <property name="text">
-      <string>&amp;Timeout</string>
+      <string>Timeout</string>
      </property>
      <property name="buddy">
       <cstring>timeoutComboBox</cstring>
@@ -43,7 +43,7 @@
    <item row="4" column="0">
     <widget class="QLabel" name="tagsLabel">
      <property name="text">
-      <string>T&amp;ags</string>
+      <string>Tags</string>
      </property>
      <property name="buddy">
       <cstring>tagsLineEdit</cstring>
@@ -53,7 +53,7 @@
    <item row="1" column="0">
     <widget class="QLabel" name="descriptionLabel">
      <property name="text">
-      <string>&amp;Description</string>
+      <string>Description</string>
      </property>
      <property name="buddy">
       <cstring>descriptionTextEdit</cstring>

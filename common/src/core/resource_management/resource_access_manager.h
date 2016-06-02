@@ -85,6 +85,12 @@ public:
     bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const;
     bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const;
 
+    bool canCreateStorage(const QnUserResourcePtr& user, const QnUuid& storageParentId) const;
+    bool canCreateLayout(const QnUserResourcePtr& user, const QnUuid& layoutParentId) const;
+    bool canCreateUser(const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions, bool isOwner) const;
+    bool canCreateVideoWall(const QnUserResourcePtr& user) const;
+    bool canCreateWebPage(const QnUserResourcePtr& user) const;
+
 signals:
     void accessibleResourcesChanged(const QnUuid& userId);
 
@@ -103,13 +109,6 @@ private:
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnUserResourcePtr& targetUser)        const;
 
     bool isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
-
-    bool canCreateStorageInternal(const QnUserResourcePtr& user, const QnUuid& storageParentId) const;
-    bool canCreateLayoutInternal(const QnUserResourcePtr& user, const QnUuid& layoutParentId) const;
-    bool canCreateUserInternal(const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions, bool isOwner) const;
-    bool canCreateVideoWallInternal(const QnUserResourcePtr& user) const;
-    bool canCreateWebPageInternal(const QnUserResourcePtr& user) const;
-
 private:
     mutable QnMutex m_mutex;
 

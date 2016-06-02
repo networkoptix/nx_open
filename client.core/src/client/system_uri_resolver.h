@@ -9,6 +9,11 @@
  * * nx-vms://?auth=...
  * * nx-vms://system/?auth=...
  *
+ * Full scheme looks like:
+ * * {protocol}://{domain}/{root}/{client_command}/{system_id}{system_action}?auth={access_key}&{action_parameters}
+ *
+ * @see https://networkoptix.atlassian.net/wiki/display/PM/NX+URL+Scheme
+ *
  * Protocol part is customizable, so we don't parse it here.
  * Auth is encoded as base64(login:pass).
  * All query parameters are url-encoded.

@@ -148,8 +148,9 @@
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
 
+
             <input type="text" ng-model="settings.remoteSystem" name="remoteSystemName"
-                   typeahead="system as system.visibleName for system in discoveredUrls | filter: {visibleName: $viewValue} | limitTo:8"
+                   typeahead="system as system.visibleName for system in Config.debugEvent.events | filter: {visibleName: $viewValue} | limitTo:8"
                    typeahead-input-formatter="getSystemName($model)"
                    typeahead-focus-on-select="false"
                    typeahead-min-length="0"

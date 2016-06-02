@@ -6,10 +6,14 @@
 
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <ui/common/ui_resource_name.h>
+#include <core/resource/resource_display_info.h>
+
+#include <client/client_settings.h>
+
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -98,16 +102,14 @@ QString QnMergeSystemsDialog::password() const {
     return ui->passwordEdit->text();
 }
 
-void QnMergeSystemsDialog::updateKnownSystems() {
+void QnMergeSystemsDialog::updateKnownSystems()
+{
     ui->urlComboBox->clear();
 
-    foreach (const QnResourcePtr &resource, qnResPool->getAllIncompatibleResources()) {
-        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
+    for (const QnMediaServerResourcePtr& server: qnResPool->getAllIncompatibleResources().filtered<QnMediaServerResource>())
+    {
         QString url = server->getApiUrl();
-        QString label = getResourceName(server);
+        QString label = QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
         QString systemName = server->getSystemName();
         if (!systemName.isEmpty())
             label += lit(" (%1)").arg(systemName);

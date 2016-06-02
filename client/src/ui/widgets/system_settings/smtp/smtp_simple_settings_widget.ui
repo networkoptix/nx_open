@@ -14,7 +14,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="emailLabel">
      <property name="text">
-      <string>&amp;Email:</string>
+      <string>Email:</string>
      </property>
      <property name="buddy">
       <cstring>emailLineEdit</cstring>
@@ -27,7 +27,7 @@
    <item row="1" column="0">
     <widget class="QLabel" name="passwordLabel">
      <property name="text">
-      <string>&amp;Password:</string>
+      <string>Password:</string>
      </property>
      <property name="buddy">
       <cstring>passwordLineEdit</cstring>
@@ -44,7 +44,7 @@
    <item row="2" column="0">
     <widget class="QLabel" name="signatureLabel">
      <property name="text">
-      <string>&amp;System Signature:</string>
+      <string>System Signature:</string>
      </property>
      <property name="buddy">
       <cstring>signatureLineEdit</cstring>

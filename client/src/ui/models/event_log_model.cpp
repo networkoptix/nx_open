@@ -11,8 +11,10 @@
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_display_info.h>
 
-#include <ui/common/ui_resource_name.h>
+#include <client/client_settings.h>
+
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/business_help.h>
 #include <ui/workbench/workbench_context.h>
@@ -348,8 +350,9 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
     return qnResIconCache->icon(getResourceById(resId));
 }
 
-QString QnEventLogModel::getResourceNameString(const QnUuid &id) {
-    return getResourceName(getResourceById(id));
+QString QnEventLogModel::getResourceNameString(const QnUuid &id)
+{
+    return QnResourceDisplayInfo(getResourceById(id)).toString(qnSettings->extraInfoInTree());
 }
 
 QString QnEventLogModel::getUserGroupString(QnBusiness::UserGroup value) {

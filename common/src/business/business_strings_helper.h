@@ -1,5 +1,4 @@
-#ifndef __BUSINESS_STRINGS_HELPER_H__
-#define __BUSINESS_STRINGS_HELPER_H__
+#pragma once
 
 #include "actions/abstract_business_action.h"
 #include "events/abstract_business_event.h"
@@ -18,13 +17,13 @@ public:
      */
     static QString eventName(QnBusiness::EventType value);
 
-    /** Event <event> occured on the <resource> */
-    static QString eventAtResource(const QnBusinessEventParameters &params, bool useIp);
-    /** Multiple <event> events occured */
-    static QString eventAtResources(const QnBusinessEventParameters &params, int resourceCount);
+    /** Event <event> occurred on the <resource> */
+    static QString eventAtResource(const QnBusinessEventParameters &params, Qn::ResourceInfoLevel detailLevel);
+    /** Multiple <event> events occurred */
+    static QString eventAtResources(const QnBusinessEventParameters &params);
 
     /**
-     * @brief eventDescription      Form full event description, splitted to lines.
+     * @brief eventDescription      Form full event description, split to lines.
      * @param action                Action that describes the event.
      * @param aggregationInfo       Aggregation details if events were aggregated.
      * @param useIp                 Use resources addresses in the 'Source' field.
@@ -37,7 +36,7 @@ public:
      */
     static QString eventDescription(const QnAbstractBusinessActionPtr& action,
                                     const QnBusinessAggregationInfo& aggregationInfo,
-                                    bool useIp,
+                                    Qn::ResourceInfoLevel detailLevel,
                                     bool useHtml);
 
     static QString eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
@@ -62,9 +61,12 @@ public:
     static QString eventReason(const QnBusinessEventParameters& params);
 
     static QString eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount);
+	static QString eventTimestampTime(const QnBusinessEventParameters &params);
+	static QString eventTimestampDate(const QnBusinessEventParameters &params);
+
     static QString eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount);
 
-    static QString getResoureNameFromParams(const QnBusinessEventParameters& params, bool useIp = false);
+  
+	static QString getResoureNameFromParams(const QnBusinessEventParameters& params, Qn::ResourceInfoLevel detailLevel);
+	static QString getResoureIPFromParams(const QnBusinessEventParameters& params);
 };
-
-#endif // __BUSINESS_STRINGS_HELPER_H__

@@ -1,11 +1,12 @@
 #include "recording_stats_model.h"
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource_display_info.h>
 
-#include <ui/common/ui_resource_name.h>
+#include <client/client_settings.h>
+
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/common/string.h>
@@ -100,7 +101,9 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
             int maxLength = qMax(foreignText.length(), kMaxNameLength); /* There is no need to limit name to be shorter than predefined string. */
             return isForeign
                 ? foreignText
-                : elideString(getResourceName(qnResPool->getResourceByUniqueId(value.uniqueId)), maxLength);
+                : elideString(
+                    QnResourceDisplayInfo(qnResPool->getResourceByUniqueId(value.uniqueId)).toString(qnSettings->extraInfoInTree()),
+                    maxLength);
         }
     case BytesColumn:
         return formatBytesString(value.recordedBytes);
