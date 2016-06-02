@@ -11,6 +11,34 @@ namespace
     const SystemUri::Scope kDefaultScope = SystemUri::Scope::Generic;
     const SystemUri::Protocol kDefaultProtocol = SystemUri::Protocol::Http;
     const SystemUri::SystemAction kDefaultSystemAction = SystemUri::SystemAction::View;
+
+    const int kDefaultPort = 80;
+
+    const QMap<SystemUri::Scope, QString> scopeToString
+    {
+        {SystemUri::Scope::Generic, "generic"},
+        {SystemUri::Scope::Direct, "direct"}
+    };
+
+    const QMap<SystemUri::Protocol, QString> protocolToString
+    {
+        {SystemUri::Protocol::Http, "http"},
+        {SystemUri::Protocol::Https, "http"},
+        {SystemUri::Protocol::Native, "nx-vms"} //TODO: #GDM make customizable
+    };
+
+    const QMap<SystemUri::ClientCommand, QString> clientCommandToString
+    {
+        {SystemUri::ClientCommand::None,            "_invalid_"},
+        {SystemUri::ClientCommand::Client,          "client"},
+        {SystemUri::ClientCommand::LoginToCloud,    "cloud"},
+        {SystemUri::ClientCommand::ConnectToSystem, "system"}
+    };
+
+    const QMap<SystemUri::SystemAction, QString> systemActionToString
+    {
+        {SystemUri::SystemAction::View, "view"}
+    };
 }
 
 SystemUriResolver::SystemUriResolver():
@@ -118,8 +146,39 @@ public:
 
     void parse(const QString& uri)
     {
+        QUrl url(uri, QUrl::TolerantMode);
 
+        if (url.scheme() == "http")
+            protocol = SystemUri::Protocol::Http;
+        else if (url.scheme() == "https")
+            protocol = SystemUri::Protocol::Https;
+        else
+            protocol = SystemUri::Protocol::Native;
+
+        domain = url.host();
+        int port = url.port(kDefaultPort);
+        if (port != kDefaultPort)
+            domain += L':' + QString::number(port);
+
+        QStringList path = url.path().split('/', QString::SkipEmptyParts);
+        if (path.isEmpty())
+        {
+            clientCommand = SystemUri::ClientCommand::Client;
+            return;
+        }
+
+        QString clientCommandStr = path.takeFirst().toLower();
+        clientCommand = clientCommandToString.key(clientCommandStr, SystemUri::ClientCommand::None);
     }
+
+    QString toString() const
+    {
+        return QString("%1://%2/%3")
+            .arg(protocolToString[protocol])
+            .arg(domain)
+            .arg(clientCommandToString[clientCommand]);
+    }
+
 
     bool isNull() const
     {
@@ -148,10 +207,10 @@ public:
 
     bool operator==(const SystemUriPrivate& other) const
     {
-        return protocol == other.protocol
+       return protocol == other.protocol
             && clientCommand == other.clientCommand
             && domain == other.domain
-            && systemId == other.domain
+            && systemId == other.systemId
             && authenticator.user == other.authenticator.user
             && authenticator.password == other.authenticator.password
             && parameters == other.parameters;
@@ -342,12 +401,32 @@ bool SystemUri::isValid() const
 QString SystemUri::toString() const
 {
     Q_D(const SystemUri);
-    return d->domain;
+    return d->toString();
+}
+
+QString SystemUri::toString(SystemUri::Scope value)
+{
+    return scopeToString[value];
+}
+
+QString SystemUri::toString(SystemUri::Protocol value)
+{
+    return protocolToString[value];
+}
+
+QString SystemUri::toString(SystemUri::ClientCommand value)
+{
+    return clientCommandToString[value];
+}
+
+QString SystemUri::toString(SystemUri::SystemAction value)
+{
+    return systemActionToString[value];
 }
 
 QUrl SystemUri::toUrl() const
 {
-    return QUrl();
+    return QUrl(toString()); //TODO: #GDM vise-versa?
 }
 
 bool SystemUri::operator==(const SystemUri& other) const

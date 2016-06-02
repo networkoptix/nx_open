@@ -59,32 +59,30 @@ namespace nx
     {
         namespace utils
         {
+            void PrintTo(SystemUri::Scope val, ::std::ostream* os)
+            {
+                *os << SystemUri::toString(val).toStdString();
+            }
+
             void PrintTo(SystemUri::Protocol val, ::std::ostream* os)
             {
-                auto toString = [](SystemUri::Protocol value) -> QString
-                {
-                    switch (value)
-                    {
-                        case SystemUri::Protocol::Http:
-                            return "http";
-                        case SystemUri::Protocol::Https:
-                            return "https";
-                        case SystemUri::Protocol::Native:
-                            return "nx-vms";
-                        default:
-                            break;
-                    }
-                    return QString();
-                };
+                *os << SystemUri::toString(val).toStdString();
+            }
 
-                *os << toString(val).toStdString();
-                //*os << QnLexical::serialized(val).toStdString();
+            void PrintTo(SystemUri::ClientCommand val, ::std::ostream* os)
+            {
+                *os << SystemUri::toString(val).toStdString();
+            }
+
+
+            void PrintTo(SystemUri::SystemAction val, ::std::ostream* os)
+            {
+                *os << SystemUri::toString(val).toStdString();
             }
 
             void PrintTo(const SystemUri& val, ::std::ostream* os)
             {
                 *os << val.toString().toStdString();
-                //*os << QnLexical::serialized(val).toStdString();
             }
         }
     }
@@ -98,7 +96,19 @@ public:
     void validateLink(const QString& link)
     {
         SystemUri parsed(link);
-        ASSERT_EQ(m_uri, parsed);
+        assertEqual(m_uri, parsed);
+    }
+
+    void assertEqual(const SystemUri& l, const SystemUri& r)
+    {
+        ASSERT_EQ(l.protocol(), r.protocol());
+        ASSERT_EQ(l.clientCommand(), r.clientCommand());
+        ASSERT_EQ(l.domain(), r.domain());
+        ASSERT_EQ(l.systemId(), r.systemId());
+        ASSERT_EQ(l.authenticator().user, r.authenticator().user);
+        ASSERT_EQ(l.authenticator().password, r.authenticator().password);
+        ASSERT_EQ(l.rawParameters(), r.rawParameters());
+        ASSERT_EQ(l, r);
     }
 
 protected:
@@ -342,21 +352,19 @@ TEST_F(SystemUriTest, directCloudNativeSystem)
 }
 
 /* Testing http generic links */
-TEST_F(SystemUriTest, genericLinkClientShort)
+TEST_F(SystemUriTest, genericLinkClientShortHttp)
 {
     m_uri.setDomain(kGenericDomain);
-
-    QUrl link;
-    link.setHost(kGenericDomain);
-    validateLink(link.toString());
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    validateLink(QString("http://%1/").arg(kGenericDomain));
+    validateLink(QString("http://%1/client").arg(kGenericDomain));
+    validateLink(QString("http://%1/client/").arg(kGenericDomain));
 }
 
 
 /*
 
 Http(s) Generic Links
-http://cloud-demo.hdw.mx/
-http://cloud-demo.hdw.mx/client
 http://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh
 http://cloud-demo.hdw.mx/system/localhost:7001?auth=YWJyYTprYWRhYnJh
 http://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
@@ -369,21 +377,19 @@ nx-vms://cloud-demo.hdw.mx/
 nx-vms://cloud-demo.hdw.mx/client
 nx-vms://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh
 nx-vms://cloud-demo.hdw.mx/system/localhost:7001?auth=YWJyYTprYWRhYnJh
-nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
+nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh  - auth will be used to login to cloud
 nx-vms://cloud-demo.hdw.mx/system/localhost:7001/view?auth=YWJyYTprYWRhYnJh
-nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
+nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh  - auth will be used to login to cloud
 nx-vms://cloud-demo.hdw.mx/system/localhost%3A7001/view?auth=YWJyYTprYWRhYnJh
 
 Http(s) Direct Links
-http://localhost:7001/ - works as /system
+http://localhost:7001/
 http://localhost:7001/system?auth=YWJyYTprYWRhYnJh
 http://localhost:7001/system/view?auth=YWJyYTprYWRhYnJh
 
 Native Direct Links
-nx-vms://localhost:7001/ - works as /client
-nx-vms://localhost:7001/?auth=YWJyYTprYWRhYnJh - works as /system
 nx-vms://localhost:7001/client
 nx-vms://localhost:7001/cloud?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
-nx-vms://localhost:7001/system?auth=YWJyYTprYWRhYnJh - auth will be used to login directly
+nx-vms://localhost:7001/system?auth=YWJyYTprYWRhYnJh
 nx-vms://d0b73d03-3e2e-405d-8226-019c83b13a08/system?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
 */

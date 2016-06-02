@@ -98,6 +98,12 @@ namespace nx
                 QString toString() const;
                 QUrl toUrl() const;
 
+                //TODO: #GDM when fusion will be moved out to separate library, change to QnLexical
+                static QString toString(SystemUri::Scope value);
+                static QString toString(SystemUri::Protocol value);
+                static QString toString(SystemUri::ClientCommand value);
+                static QString toString(SystemUri::SystemAction value);
+
                 bool operator==(const SystemUri& other) const;
             private:
                 QScopedPointer<SystemUriPrivate> const d_ptr;
