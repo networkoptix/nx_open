@@ -8,8 +8,8 @@
 
 
 namespace {
-    const QString defaultPrimaryUrlsList("http://www.mypublicip.com;http://checkip.eurodyndns.org");
-    const QString defaultSecondaryUrlsList("http://networkoptix.com/myip");
+    const QString defaultPrimaryUrlsList(QLatin1String("http://www.mypublicip.com;http://checkip.eurodyndns.org"));
+    const QString defaultSecondaryUrlsList(QLatin1String("http://networkoptix.com/myip"));
     const int requestTimeoutMs = 4*1000;
     const QLatin1String iPRegExprValue("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
 }
@@ -44,8 +44,8 @@ QnPublicIPDiscovery::QnPublicIPDiscovery(QStringList primaryUrls)
     m_primaryUrls(std::move(primaryUrls))
 {
     if (m_primaryUrls.isEmpty())
-        m_primaryUrls = defaultPrimaryUrlsList.split(";", QString::SkipEmptyParts);
-    m_secondaryUrls = defaultSecondaryUrlsList.split(";", QString::SkipEmptyParts);
+        m_primaryUrls = defaultPrimaryUrlsList.split(lit(";"), QString::SkipEmptyParts);
+    m_secondaryUrls = defaultSecondaryUrlsList.split(lit(";"), QString::SkipEmptyParts);
 
     if (m_primaryUrls.isEmpty()) {
         m_primaryUrls = m_secondaryUrls;
@@ -105,7 +105,7 @@ void QnPublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpCli
     if (ipPos < 0)
         return;
 
-    QString result = response.mid(ipPos+1, iPRegExpr.matchedLength()-2);
+    QString result = QString::fromLatin1(response.mid(ipPos+1, iPRegExpr.matchedLength()-2));
     if (result.isEmpty())
         return;
 

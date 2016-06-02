@@ -87,6 +87,8 @@ int VmsGatewayProcess::executeApplication()
 int VmsGatewayProcess::exec()
 #endif
 {
+    using namespace std::placeholders;
+
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
         [this, &processStartResult]
@@ -115,6 +117,18 @@ int VmsGatewayProcess::exec()
                 SocketAddress(settings.general().mediatorEndpoint));
         nx::network::SocketGlobals::mediatorConnector().enable(true);
 
+        std::unique_ptr<QnPublicIPDiscovery> publicAddressFetcher;
+        if (settings.cloudConnect().replaceHostAddressWithPublicAddress)
+        {
+            publicAddressFetcher = std::make_unique<QnPublicIPDiscovery>(
+                QStringList() << settings.cloudConnect().fetchPublicIpUrl);
+            connect(
+                publicAddressFetcher.get(), &QnPublicIPDiscovery::found,
+                this, &VmsGatewayProcess::publicAddressFetched,
+                Qt::DirectConnection);
+            publicAddressFetcher->update();
+        }
+
         const auto& httpAddrToListenList = settings.general().endpointsToListen;
         if (httpAddrToListenList.empty())
         {
@@ -134,10 +148,6 @@ int VmsGatewayProcess::exec()
 
         //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
-        //authRestrictionList.allow(PingHandler::kHandlerPath, AuthMethod::noAuth);
-        //authRestrictionList.allow(AddAccountHttpHandler::kHandlerPath, AuthMethod::noAuth);
-        //authRestrictionList.allow(ActivateAccountHandler::kHandlerPath, AuthMethod::noAuth);
-        //authRestrictionList.allow(ReactivateAccountHttpHandler::kHandlerPath, AuthMethod::noAuth);
 
         AuthenticationManager authenticationManager(
             authRestrictionList,
@@ -262,6 +272,17 @@ void VmsGatewayProcess::registerApiHandlers(
         [&settings]() -> std::unique_ptr<ProxyHandler> {
             return std::make_unique<ProxyHandler>(settings);
         });
+}
+
+void VmsGatewayProcess::publicAddressFetched(const QHostAddress& publicAddress)
+{
+    const QString publicAddressStr = publicAddress.toString();
+
+    NX_LOGX(lm("Retrieved public address %1. This address will be used for cloud connect")
+        .arg(publicAddressStr), cl_logINFO);
+
+    nx::network::SocketGlobals::cloudConnectSettings()
+        .replaceOriginatingHostAddress(publicAddressStr);
 }
 
 }   //namespace cloud

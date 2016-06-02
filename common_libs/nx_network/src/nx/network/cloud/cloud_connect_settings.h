@@ -9,6 +9,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/utils/thread/mutex.h>
+
 
 namespace nx {
 namespace network {
@@ -26,6 +28,7 @@ public:
 
 private:
     boost::optional<QString> m_originatingHostAddressReplacement;
+    mutable QnMutex m_mutex;
 };
 
 }   // namespace cloud

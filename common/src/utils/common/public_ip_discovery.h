@@ -9,7 +9,7 @@ class QnPublicIPDiscovery: public QObject
     Q_OBJECT
 public:
     /** If \a primaryUrls is empty, default urls are used */
-    QnPublicIPDiscovery(QStringList primaryUrls);
+    QnPublicIPDiscovery(QStringList primaryUrls = QStringList());
     void waitForFinished();
     QHostAddress publicIP() const { return m_publicIP; }
 public slots:
