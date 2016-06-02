@@ -17,3 +17,11 @@
         {{/cameraConflicts}}
     </tbody>
 </table>
+
+<div class="date">
+    <p>
+     {{#aggregated}}
+        <b>{{{timestamp}}}</b>
+     {{/aggregated}}
+    </p>
+</div>
