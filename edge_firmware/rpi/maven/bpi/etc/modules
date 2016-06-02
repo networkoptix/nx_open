@@ -1,0 +1,19 @@
+# /etc/modules: kernel modules to load at boot time.
+#
+# This file contains the names of kernel modules that should be loaded
+# at boot time, one per line. Lines beginning with "#" are ignored.
+# Parameters can be specified after the module name.
+
+# VLAN support for BPI-R1
+8021q
+# HW accel modules
+ump
+drm
+mali
+mali_drm
+sunxi_cedar_mod
+# CPU modules
+cpufreq_stats
+cpufreq_userspace
+cpufreq_conservative
+cpufreq_powersave

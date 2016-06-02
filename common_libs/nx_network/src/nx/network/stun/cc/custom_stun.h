@@ -103,6 +103,7 @@ namespace attrs
         tcpHpEndpointList,
         udtHpEndpointList,
         connectionMethods,
+        ignoreSourceAddress,
 
         udpHolePunchingResultCode = stun::attrs::userDefined + 0x400,
         rendezvousConnectTimeout,
