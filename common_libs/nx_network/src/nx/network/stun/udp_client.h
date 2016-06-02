@@ -31,7 +31,8 @@ typedef nx::network::UnreliableMessagePipelineEventHandler<Message>
     \note \a UDPClient object can be safely deleted within request completion handler 
         (more generally, within internal socket's aio thread).
         To delete it in another thread, cancel I/O with \a UDPClient::pleaseStop call
-    \note Notifies all who waiting for response before destruction by reporting \a SystemError::interrupted
+    \note Notifies everyone who is waiting for response by reporting 
+        \a SystemError::interrupted before destruction
  */
 class NX_NETWORK_API UDPClient
 :

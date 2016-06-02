@@ -1651,7 +1651,8 @@ std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMappe
 
 QHostAddress MediaServerProcess::getPublicAddress()
 {
-    m_ipDiscovery.reset(new QnPublicIPDiscovery());
+    m_ipDiscovery.reset(new QnPublicIPDiscovery(
+        MSSettings::roSettings()->value(nx_ms_conf::PUBLIC_IP_SERVERS).toString().split(";", QString::SkipEmptyParts)));
 
     if (MSSettings::roSettings()->value("publicIPEnabled").isNull())
         MSSettings::roSettings()->setValue("publicIPEnabled", 1);
