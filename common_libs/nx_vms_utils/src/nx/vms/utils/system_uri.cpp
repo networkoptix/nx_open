@@ -2,7 +2,7 @@
 
 #include <nx/utils/log/log.h>
 
-using namespace nx::vms;
+using namespace nx::vms::utils;
 
 namespace
 {
@@ -90,7 +90,7 @@ bool SystemUriResolver::parseUri()
     return m_valid;
 }
 
-class nx::vms::SystemUriPrivate
+class nx::vms::utils::SystemUriPrivate
 {
 public:
     SystemUri::Protocol protocol;
