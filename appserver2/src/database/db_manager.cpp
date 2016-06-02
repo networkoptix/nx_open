@@ -1200,7 +1200,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/17_add_isd_cam.sql")) {
         updateResourceTypeGuids();
     }
-    else if (updateName == lit(":/updates/20_adding_camera_user_attributes.sql")) {
+    else if (updateName == lit(":/updates/20_adding_camera_user_attributes.sql") || updateName == lit(":/updates/65_transaction_log_add_fields.sql")) {
         if (!m_dbJustCreated)
             m_needResyncLog = true;
     }
