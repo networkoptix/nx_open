@@ -162,6 +162,22 @@
         }
     },
 
+    "QPlainTextEdit": {
+        "palette": {
+            "default": {
+                "base":             "transparent"
+            }  
+        }
+    },
+
+    "QTextEdit": {
+        "palette": {
+            "default": {
+                "base":             "transparent"
+            }  
+        }
+    },
+
     "QAbstractItemView": {
         "palette": {
             "default": {

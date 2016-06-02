@@ -411,6 +411,14 @@ void QnNxStyle::drawPrimitive(
                     else
                         valid = lineEdit->hasAcceptableInput();
                 }
+                else if (auto plainTextEdit = qobject_cast<const QPlainTextEdit*>(widget))
+                {
+                    readOnly = plainTextEdit->isReadOnly();
+                }
+                else if (auto textEdit = qobject_cast<const QTextEdit*>(widget))
+                {
+                    readOnly = textEdit->isReadOnly();
+                }
             }
 
             if (readOnly)
@@ -1176,6 +1184,12 @@ void QnNxStyle::drawControl(
     case CE_ShapedFrame:
         if (const QStyleOptionFrame* frame = qstyleoption_cast<const QStyleOptionFrame*>(option))
         {
+            if (qobject_cast<const QPlainTextEdit*>(widget) || qobject_cast<const QTextEdit*>(widget))
+            {
+                proxy()->drawPrimitive(PE_PanelLineEdit, frame, painter, widget);
+                return;
+            }
+
             switch (frame->frameShape)
             {
             case QFrame::Box:
