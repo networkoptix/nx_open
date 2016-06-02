@@ -21,7 +21,6 @@
 </table>
 
 <div class="date">
-    Conflict has been detected {{count}} times, last:<br>
     <b>{{{timestamp}}}</b>
 </div>
 {{/aggregated}}
