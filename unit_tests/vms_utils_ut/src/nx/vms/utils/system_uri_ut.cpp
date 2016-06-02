@@ -148,3 +148,55 @@ TEST_F(SystemUriTest, genericCloudValidAuth)
     m_uri.setAuthenticator(kUser, kPassword);
     ASSERT_TRUE(m_uri.isValid());
 }
+
+/** Default system command. Domain is required. */
+TEST_F(SystemUriTest, genericSystemValidDomain)
+{
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemAction(SystemUri::SystemAction::View);
+    m_uri.setSystemId(kLocalSystemId);
+    ASSERT_FALSE(m_uri.isValid());
+
+    m_uri.setDomain(kDefaultDomain);
+    ASSERT_TRUE(m_uri.isValid());
+}
+
+/** Default system command. Auth is required. */
+TEST_F(SystemUriTest, genericSystemValidAuth)
+{
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setDomain(kDefaultDomain);
+    m_uri.setSystemAction(SystemUri::SystemAction::View);
+    m_uri.setSystemId(kLocalSystemId);
+    ASSERT_FALSE(m_uri.isValid());
+
+    m_uri.setAuthenticator(kUser, kPassword);
+    ASSERT_TRUE(m_uri.isValid());
+}
+
+/** Default system command. System Action is required. */
+TEST_F(SystemUriTest, genericSystemValidSystemAction)
+{
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setDomain(kDefaultDomain);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kLocalSystemId);
+    ASSERT_FALSE(m_uri.isValid());
+
+    m_uri.setSystemAction(SystemUri::SystemAction::View);
+    ASSERT_TRUE(m_uri.isValid());
+}
+
+/** Default system command. System Id is required. */
+TEST_F(SystemUriTest, genericSystemValidSystemId)
+{
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setDomain(kDefaultDomain);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemAction(SystemUri::SystemAction::View);
+    ASSERT_FALSE(m_uri.isValid());
+
+    m_uri.setSystemId(kLocalSystemId);
+    ASSERT_TRUE(m_uri.isValid());
+}
