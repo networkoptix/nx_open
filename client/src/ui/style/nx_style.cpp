@@ -187,6 +187,24 @@ namespace
 
         return false;
     }
+
+    enum ScrollBarStyle
+    {
+        CommonScrollBar,
+        DropDownScrollBar,
+        TextAreaScrollBar
+    };
+
+    ScrollBarStyle scrollBarStyle(const QWidget* widget)
+    {
+        if (isWidgetOwnedBy<QComboBox>(widget))
+            return DropDownScrollBar;
+
+        if (isWidgetOwnedBy<QTextEdit>(widget) || isWidgetOwnedBy<QPlainTextEdit>(widget))
+            return TextAreaScrollBar;
+
+        return CommonScrollBar;
+    }
 }
 
 QnNxStylePrivate::QnNxStylePrivate() :
@@ -1112,40 +1130,86 @@ void QnNxStyle::drawComplexControl(
     case CC_ScrollBar:
         if (auto scrollBar = qstyleoption_cast<const QStyleOptionSlider*>(option))
         {
-            bool special = isWidgetOwnedBy<QComboBox>(widget);
+            ScrollBarStyle style = scrollBarStyle(widget);
 
-            if (scrollBar->subControls.testFlag(SC_ScrollBarGroove))
+            /* Paint groove only for common scroll bars: */
+            if (scrollBar->subControls.testFlag(SC_ScrollBarGroove) && style == CommonScrollBar)
             {
                 QRect grooveRect = proxy()->subControlRect(control, scrollBar, SC_ScrollBarGroove, widget);
-                painter->fillRect(grooveRect, scrollBar->palette.color(
-                    special ? QPalette::Midlight : QPalette::Dark));
+                painter->fillRect(grooveRect, scrollBar->palette.color(QPalette::Dark));
             }
 
+            /* Paint slider: */
             if (scrollBar->subControls.testFlag(SC_ScrollBarSlider))
             {
-                QRect sliderRect = proxy()->subControlRect(control, scrollBar, SC_ScrollBarSlider, widget);
+                QRect sliderRect;
+                QnPaletteColor sliderColor;
 
-                QnPaletteColor mainSliderColor = findColor(scrollBar->palette.color(
-                    special ? QPalette::WindowText : QPalette::Midlight));
+                const int kSliderMargin = 1;
+                const int kContainerFrame = 1;
 
-                int colorShift = 0;
-                if (scrollBar->state.testFlag(State_Sunken))
-                    colorShift = 1;
-                else if (scrollBar->state.testFlag(State_MouseOver))
-                    colorShift = scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1;
-
-                QColor sliderColor = mainSliderColor.lighter(colorShift);
-
-                if (special)
+                switch (style)
                 {
-                    QnScopedPainterAntialiasingRollback aaRollback(painter, true);
-                    QnScopedPainterBrushRollback brushRollback(painter, sliderColor);
-                    QnScopedPainterPenRollback penRollback(painter, sliderColor);
-                    painter->drawRoundedRect(QRectF(sliderRect).adjusted(1.5, 0.0, -1.5, 0.0), 2.0, 2.0);
+                    /* Scroll bar in multiline text edits: */
+                    case TextAreaScrollBar:
+                    {
+                        QStyleOptionSlider optionCopy(*scrollBar);
+                        if (scrollBar->orientation == Qt::Vertical)
+                        {
+                            optionCopy.rect.adjust(0, kContainerFrame, 0, -kContainerFrame);
+                            sliderRect = proxy()->subControlRect(control, &optionCopy, SC_ScrollBarSlider, widget);
+                            sliderRect.adjust(kSliderMargin, 0, -kSliderMargin, 0);
+                        }
+                        else
+                        {
+                            optionCopy.rect.adjust(kContainerFrame, 0, -kContainerFrame, 0);
+                            sliderRect = proxy()->subControlRect(control, &optionCopy, SC_ScrollBarSlider, widget);
+                            sliderRect.adjust(0, kSliderMargin, 0, -kSliderMargin);
+                        }
+
+                        sliderColor = findColor(scrollBar->palette.color(QPalette::Midlight)).darker(1);
+                        break;
+                    }
+
+                    /* Scroll bar in drop-down list of a combobox: */
+                    case DropDownScrollBar:
+                    {
+                        sliderRect = proxy()->subControlRect(control, scrollBar, SC_ScrollBarSlider, widget);
+                        if (scrollBar->orientation == Qt::Vertical)
+                            sliderRect.adjust(kSliderMargin, 0, -kSliderMargin, 0);
+                        else
+                            sliderRect.adjust(0, kSliderMargin, 0, -kSliderMargin);
+
+                        sliderColor = findColor(scrollBar->palette.color(QPalette::WindowText));
+                        break;
+                    }
+
+                    /* Common scroll bar: */
+                    case CommonScrollBar:
+                    default:
+                        sliderRect = proxy()->subControlRect(control, scrollBar, SC_ScrollBarSlider, widget);
+                        sliderColor = findColor(scrollBar->palette.color(QPalette::Midlight));
+                        break;
+                }
+
+                /* Handle hovered & pressed states: */
+                if (scrollBar->state.testFlag(State_Sunken))
+                    sliderColor = sliderColor.lighter(1);
+                else if (scrollBar->state.testFlag(State_MouseOver))
+                    sliderColor = sliderColor.lighter(scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1);
+
+                /* Paint: */
+                if (style == CommonScrollBar)
+                {
+                    QnScopedPainterAntialiasingRollback aaRollback(painter, false);
+                    painter->fillRect(sliderRect, sliderColor);
                 }
                 else
                 {
-                    painter->fillRect(sliderRect, sliderColor);
+                    QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+                    QnScopedPainterBrushRollback brushRollback(painter, sliderColor.color());
+                    QnScopedPainterPenRollback penRollback(painter, sliderColor.color());
+                    painter->drawRoundedRect(QRectF(sliderRect).adjusted(0.5, 0.5, -0.5, -0.5), 2.0, 2.0);
                 }
             }
 
@@ -1184,9 +1248,13 @@ void QnNxStyle::drawControl(
     case CE_ShapedFrame:
         if (const QStyleOptionFrame* frame = qstyleoption_cast<const QStyleOptionFrame*>(option))
         {
+            /* Special frame for multiline text edits: */
             if (qobject_cast<const QPlainTextEdit*>(widget) || qobject_cast<const QTextEdit*>(widget))
             {
-                proxy()->drawPrimitive(PE_PanelLineEdit, frame, painter, widget);
+                /* Frame entire widget rect, with scrollbars: */
+                QStyleOptionFrame frameCopy(*frame);
+                frameCopy.rect = widget->rect();
+                proxy()->drawPrimitive(PE_PanelLineEdit, &frameCopy, painter, widget);
                 return;
             }
 
@@ -1946,9 +2014,12 @@ QRect QnNxStyle::subControlRect(
         break;
 
     case CC_ScrollBar:
-        if (const QStyleOptionSlider *scrollBar =
-                qstyleoption_cast<const QStyleOptionSlider*>(option))
+        if (auto scrollBar = qstyleoption_cast<const QStyleOptionSlider*>(option))
         {
+            /* For some reason QCommonStyle returns scrollbar subcontrol rects in local coordinates.
+             * Fix that: */
+            rect.moveTopLeft(option->rect.topLeft() + rect.topLeft());
+
             const int w = pixelMetric(PM_ScrollBarExtent, option, widget);
 
             switch (subControl)
@@ -2565,9 +2636,15 @@ void QnNxStyle::polish(QWidget *widget)
         qobject_cast<QCheckBox*>(widget) ||
         qobject_cast<QGroupBox*>(widget) ||
         qobject_cast<QRadioButton*>(widget) ||
-        qobject_cast<QSlider*>(widget) ||
-        qobject_cast<QScrollBar*>(widget))
+        qobject_cast<QSlider*>(widget))
     {
+        widget->setAttribute(Qt::WA_Hover);
+    }
+
+    if (qobject_cast<QScrollBar*>(widget))
+    {
+        /* In certain containers we want scrollbars with transparent groove: */
+        widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
         widget->setAttribute(Qt::WA_Hover);
     }
 
