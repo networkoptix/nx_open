@@ -314,11 +314,11 @@ QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParame
 
     int count = qMax(aggregationCount, 1);
     if (count == 1)
-        return tr("%2 %1", "%1 means time, %2 means date")
+        return tr("%2 <b>%1</b>", "%1 means time, %2 means date")
             .arg(time.time().toString())
             .arg(time.date().toString());
     else
-        return tr("%n times, first: %2 %1", "%1 means time, %2 means date", count)
+        return tr("%n times, first: %2 <b>%1</b>", "%1 means time, %2 means date", count)
             .arg(time.time().toString())
             .arg(time.date().toString());
 }
