@@ -122,6 +122,14 @@ AbstractCommunicatingSocket* QnRtspIoDevice::getMediaSocket()
         return m_mediaSocket;
 }
 
+void QnRtspIoDevice::shutdown()
+{
+    if (m_tcpMode)
+        m_owner->shutdown();
+    else
+        m_mediaSocket->shutdown();
+}
+
 void QnRtspIoDevice::setTcpMode(bool value)
 {
     m_tcpMode = value;
@@ -738,17 +746,20 @@ QnRtspClient::TrackMap QnRtspClient::play(qint64 positionStart, qint64 positionE
 
 bool QnRtspClient::stop()
 {
+    QnMutexLocker lock(&m_socketMutex);
     m_tcpSock->close();
     return true;
 }
 
 void QnRtspClient::shutdown()
 {
+    QnMutexLocker lock(&m_socketMutex);
     m_tcpSock->shutdown();
 }
 
 bool QnRtspClient::isOpened() const
 {
+    QnMutexLocker lock(&m_socketMutex);
     return m_tcpSock->isConnected();
 }
 

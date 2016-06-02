@@ -201,6 +201,11 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
     nx_http::header::DigestAuthorization originalAuthHeader;
     if (!originalAuthHeader.parse(nx_http::getHeaderValue(d->request.headers, authHeaderName)))
         return false;
+    if (originalAuthHeader.authScheme != nx_http::header::AuthScheme::digest ||
+        originalAuthHeader.digest->params["realm"] != QnAppInfo::realm().toUtf8())
+    {
+        return true; //< no need to update, it is non server proxy request
+    }
 
     if (auto ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID()))
     {
