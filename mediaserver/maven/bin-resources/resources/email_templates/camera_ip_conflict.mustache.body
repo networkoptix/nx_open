@@ -1,5 +1,5 @@
 <h1>{{event}} on {{source}}</h1>
-<p>Conflict detected at {{timestamp}} for IP address {{cameraConflictAddress}}:</p>
+<p>Conflict detected at {{{timestamp}}} for IP address {{cameraConflictAddress}}:</p>
 
 <table class="description">
     <thead>
@@ -17,3 +17,11 @@
         {{/cameraConflicts}}
     </tbody>
 </table>
+
+<div class="date">
+    <p>
+     {{#aggregated}}
+        <b>{{{timestamp}}}</b>
+     {{/aggregated}}
+    </p>
+</div>

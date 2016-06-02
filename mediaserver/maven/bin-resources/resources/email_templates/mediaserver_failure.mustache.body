@@ -12,7 +12,7 @@
         {{#aggregated}}
             <tr>
                 <td>{{reason}}</td>
-                <td>{{timestampDate}} <b>{{timestampTime}}</b></td>
+                <td>{{{timestamp}}}</td>
             </tr>
         {{/aggregated}}
     </tbody>

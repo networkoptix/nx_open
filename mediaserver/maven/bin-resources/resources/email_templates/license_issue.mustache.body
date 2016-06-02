@@ -5,7 +5,7 @@
     <thead>
         <tr>
             <th>Cameras</th>
-            <th>Recording stopped at</th>
+            <th>Time</th>
         </tr>
     </thead>
     <tbody>
@@ -14,7 +14,7 @@
             <td >
                 <b>{{source}}</b> ({{sourceIp}})
             </td>
-            <td>{{timestamp}}</td>
+            <td>{{{timestamp}}}</td>
         </tr>
 {{/aggregated}}
     </tbody>
