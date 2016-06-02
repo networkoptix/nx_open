@@ -69,6 +69,7 @@ public:
             m_displayed = true;
             if (auto owner = m_owner.lock())
             {
+                NX_SHOW_FPS("handle");
                 owner->displayDecodedFrame(m_frameHandle);
             }
             else
@@ -89,32 +90,28 @@ int Impl::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData,
     QVideoFramePtr* outDecodedFrame)
 {
-    if (conf.enableFps)
-        debugShowFps("decode");
-    TIME_BEGIN(decode);
+    NX_TIME_BEGIN(decode);
     NX_CRITICAL(outDecodedFrame);
     outDecodedFrame->reset();
 
     auto compressedFrame = createUniqueCompressedFrame(compressedVideoData);
     void* frameHandle = nullptr;
-    int64_t outPts = 0;
+    int64_t ptsUs = 0;
     // Perform actual decoding from QnCompressedVideoData to display.
-    int result = proxyDecoder().decodeToDisplayQueue(compressedFrame.get(), &outPts, &frameHandle);
-    if (result > 0) //< Not "Buffering".
+    int result = proxyDecoder().decodeToDisplayQueue(compressedFrame.get(), &ptsUs, &frameHandle);
+    if (result > 0) //< Not "Buffering", no error.
     {
         if (frameHandle)
         {
-            QAbstractVideoBuffer* videoBuffer = new VideoBuffer(frameHandle, sharedPtrToThis());
-            outDecodedFrame->reset(
-                new QVideoFrame(videoBuffer, frameSize(), QVideoFrame::Format_BGR32));
-            (*outDecodedFrame)->setStartTime(outPts);
+            auto videoBuffer = new VideoBuffer(frameHandle, sharedPtrToThis());
+            setQVideoFrame(outDecodedFrame, videoBuffer, QVideoFrame::Format_BGR32, ptsUs);
         }
         else
         {
             result = 0;
         }
     }
-    TIME_END(decode);
+    NX_TIME_END(decode);
     return result;
 }
 
@@ -137,7 +134,8 @@ void Impl::displayDecodedFrame(void* frameHandle)
 
                     if (conf.displayAsyncSleepMs > 0)
                         usleep(conf.displayAsyncSleepMs * 1000);
-                    self->proxyDecoder().displayDecoded(frameHandle);
+                    // TODO: All-zeroes mean full-screen. Implement passing coords from QML.
+                    self->proxyDecoder().displayDecoded(frameHandle, 0, 0, 0, 0);
                 }
                 else
                 {
@@ -147,7 +145,8 @@ void Impl::displayDecodedFrame(void* frameHandle)
     }
     else
     {
-        proxyDecoder().displayDecoded(frameHandle);
+        // TODO: All-zeroes mean full-screen. Implement passing coords from QML.
+        proxyDecoder().displayDecoded(frameHandle, 0, 0, 0, 0);
     }
 }
 

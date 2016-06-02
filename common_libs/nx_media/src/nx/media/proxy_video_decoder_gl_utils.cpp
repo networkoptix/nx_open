@@ -136,23 +136,23 @@ void debugTextureTest()
         GL(tex.setMinMagFilters(QOpenGLTexture::Nearest, QOpenGLTexture::Nearest));
 
         buffer = malloc(17 + kMediaAlignment + 1920 * 1080);
-        bufferStart = debugUnalignPtr(buffer);
+        bufferStart = nx::utils::debugUnalignPtr(buffer);
 
         buffer2 = malloc(17 + kMediaAlignment + 1920 * 1080);
-        buffer2Start = debugUnalignPtr(buffer2);
+        buffer2Start = nx::utils::debugUnalignPtr(buffer2);
     }
 
     funcs->glFlush();
     funcs->glFinish();
-    TIME_BEGIN(debugTextureTest_setData_glFlush_glFinish);
+    NX_TIME_BEGIN(debugTextureTest_setData_glFlush_glFinish);
         GL(tex.setData(QOpenGLTexture::Alpha, QOpenGLTexture::UInt8, bufferStart));
     funcs->glFlush();
     funcs->glFinish();
-    TIME_END(debugTextureTest_setData_glFlush_glFinish);
+    NX_TIME_END(debugTextureTest_setData_glFlush_glFinish);
 
-    TIME_BEGIN(debugTextureTest_memcpy);
+    NX_TIME_BEGIN(debugTextureTest_memcpy);
     memcpy(buffer2Start, bufferStart, 1920 * 1080);
-    TIME_END(debugTextureTest_memcpy);
+    NX_TIME_END(debugTextureTest_memcpy);
 
     PRINT << "debugTextureTest() END";
 }

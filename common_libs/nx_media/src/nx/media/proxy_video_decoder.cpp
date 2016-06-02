@@ -1,8 +1,6 @@
 #include "proxy_video_decoder.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#include <proxy_decoder.h>
-
 #define OUTPUT_PREFIX "ProxyVideoDecoder: "
 #include "proxy_video_decoder_utils.h"
 
@@ -35,6 +33,8 @@ static ProxyVideoDecoderPrivate* createProxyVideoDecoderPrivate(
         return ProxyVideoDecoderPrivate::createImplStub(params);
     }
 
+    if (conf.implStub)
+        return ProxyVideoDecoderPrivate::createImplStub(params);
     if (conf.implDisplay)
         return ProxyVideoDecoderPrivate::createImplDisplay(params);
     if (conf.implRgb)
@@ -109,7 +109,7 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
     if (conf.largeOnly && resolution.width() <= 640)
     {
         PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: conf.largeOnly' is set";
+            << ") -> false: conf.largeOnly is set";
         return false;
     }
 

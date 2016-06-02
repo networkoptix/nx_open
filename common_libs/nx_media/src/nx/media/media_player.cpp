@@ -17,9 +17,13 @@
 #include "frame_metadata.h"
 #include "video_decoder_registry.h"
 #include "audio_output.h"
+
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <nx/utils/flag_config.h>
+
+#define OUTPUT_PREFIX "media_player: "
+#include <nx/utils/debug_utils.h>
 
 namespace nx {
 namespace media {
@@ -51,7 +55,7 @@ struct NxMediaFlagConfig: public nx::utils::FlagConfig
 
     NX_STRING_PARAM("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
     NX_FLAG(0, outputFrameDelays, "Log if frame delay is negative.");
-
+    NX_FLAG(0, enableFps, "");
 } conf("nx_media");
 
 static qint64 msecToUsec(qint64 posMs)
@@ -99,10 +103,10 @@ public:
     QElapsedTimer ptsTimer;
 
     // Last video frame PTS.
-    boost::optional<qint64> lastVideoPts;
+    boost::optional<qint64> lastVideoPtsMs;
 
     // Timestamp when the PTS timer was started.
-    qint64 ptsTimerBase;
+    qint64 ptsTimerBaseMs;
 
     // Decoded video which is awaiting to be rendered.
     QVideoFramePtr videoFrameToRender;
@@ -113,7 +117,7 @@ public:
     // Separate thread. Decodes compressed AV data.
     std::unique_ptr<PlayerDataConsumer> dataConsumer;
 
-    // Timer for delayed call to presentFrame().
+    // Timer for delayed call to presentNextFrame().
     QTimer* execTimer;
 
     // Last seek position. UTC time in msec.
@@ -180,7 +184,7 @@ PlayerPrivate::PlayerPrivate(Player *parent)
     positionMs(0),
     videoSurface(0),
     maxTextureSize(kDefaultMaxTextureSize),
-    ptsTimerBase(0),
+    ptsTimerBaseMs(0),
     execTimer(new QTimer(this)),
     lastSeekTimeMs(AV_NOPTS_VALUE),
     liveBufferMs(kInitialBufferMs),
@@ -298,9 +302,13 @@ void PlayerPrivate::presentNextFrameDelayed()
     }
 
     if (delayToRenderMs > 0)
+    {
         execTimer->start(delayToRenderMs);
+    }
     else
+    {
         presentNextFrame();
+    }
 }
 
 QVideoFramePtr PlayerPrivate::scaleFrame(const QVideoFramePtr& videoFrame)
@@ -327,6 +335,8 @@ QVideoFramePtr PlayerPrivate::scaleFrame(const QVideoFramePtr& videoFrame)
 
 void PlayerPrivate::presentNextFrame()
 {
+    NX_SHOW_FPS("presentNextFrame");
+
     if (!videoFrameToRender)
         return;
 
@@ -405,22 +415,25 @@ qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(const QVideoFramePtr& fram
 
 qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& frame)
 {
-    const qint64 pts = frame->startTime();
-    const qint64 ptsDelta = pts - ptsTimerBase;
+    const qint64 ptsMs = frame->startTime();
+    const qint64 ptsDeltaMs = ptsMs - ptsTimerBaseMs;
     FrameMetadata metadata = FrameMetadata::deserialize(frame);
 
     // Calculate time to present next frame
-    qint64 mediaQueueLen = usecToMsec(dataConsumer->queueVideoDurationUsec());
-    const auto elapsed = ptsTimer.elapsed();
-    const int frameDelayMs = ptsDelta - elapsed;
+    qint64 mediaQueueLenMs = usecToMsec(dataConsumer->queueVideoDurationUsec());
+    const qint64 elapsedMs = ptsTimer.elapsed();
+    const qint64 frameDelayMs = ptsDeltaMs - elapsedMs;
     bool liveBufferUnderflow =
-        liveMode && lastVideoPts.is_initialized() && mediaQueueLen == 0 && frameDelayMs < 0;
-    bool liveBufferOverflow = liveMode && mediaQueueLen > liveBufferMs;
+        liveMode && lastVideoPtsMs.is_initialized() && mediaQueueLenMs == 0 && frameDelayMs < 0;
+    bool liveBufferOverflow = liveMode && mediaQueueLenMs > liveBufferMs;
 
     if (conf.outputFrameDelays)
     {
         if (frameDelayMs < 0)
-            qWarning() << "pts: " << pts << ", ptsDelta: " << ptsDelta << ", frameDelayMs: " << frameDelayMs;
+        {
+            PRINT << "ptsMs: " << ptsMs << ", ptsDeltaMs: " << ptsDeltaMs
+                << ", frameDelayMs: " << frameDelayMs;
+        }
     }
 
     if (liveMode)
@@ -439,24 +452,25 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
         }
     }
 
-    if (!lastVideoPts.is_initialized() || //< first time
-        !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDurationMs) || //< pts discontinue
+    if (!lastVideoPtsMs.is_initialized() || //< first time
+        !qBetween(*lastVideoPtsMs, ptsMs, *lastVideoPtsMs + kMaxFrameDurationMs) || //< pts discontinuity
         metadata.noDelay || //< jump occurred
-        pts < lastSeekTimeMs || //< 'coarse' frame. Frame time is less than required jump pos.
+        ptsMs < lastSeekTimeMs || //< 'coarse' frame. Frame time is less than required jump pos.
         frameDelayMs < -kMaxDelayForResyncMs || //< Resync because the video frame is late for more than threshold.
         liveBufferUnderflow ||
         liveBufferOverflow //< live buffer overflow
         )
     {
         // Reset timer.
-        lastVideoPts = ptsTimerBase = pts;
+        lastVideoPtsMs = ptsMs;
+        ptsTimerBaseMs = ptsMs;
         ptsTimer.restart();
-        return 0ll;
+        return 0;
     }
     else
     {
-        lastVideoPts = pts;
-        return (pts - ptsTimerBase) - ptsTimer.elapsed();
+        lastVideoPtsMs = ptsMs;
+        return (ptsMs - ptsTimerBaseMs) - elapsedMs;
     }
 }
 
@@ -641,7 +655,7 @@ void Player::play()
     d->setState(State::Playing);
     d->setMediaStatus(MediaStatus::Loading);
 
-    d->lastVideoPts.reset();
+    d->lastVideoPtsMs.reset();
     d->at_hurryUp(); //< renew receiving frames
 }
 

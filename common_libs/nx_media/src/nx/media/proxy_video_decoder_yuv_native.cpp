@@ -33,21 +33,17 @@ int Impl::decode(
     int nativeBufferSize = 0;
 
     auto compressedFrame = createUniqueCompressedFrame(compressedVideoData);
-    int64_t outPts = 0;
-    int result = -1;
-    TIME_BEGIN(decodeToYuvNative);
-    // Perform actual decoding from QnCompressedVideoData to memory.
-    result = proxyDecoder().decodeToYuvNative(
-        compressedFrame.get(), &outPts, &nativeBuffer, &nativeBufferSize);
-    TIME_END(decodeToYuvNative);
+    int64_t ptsUs = 0;
+    NX_TIME_BEGIN(decodeToYuvNative);
+    // Perform actual decoding to video memory and retrieve the pointer to it.
+    int result = proxyDecoder().decodeToYuvNative(
+        compressedFrame.get(), &ptsUs, &nativeBuffer, &nativeBufferSize);
+    NX_TIME_END(decodeToYuvNative);
 
     if (result > 0)
     {
         NX_CRITICAL(nativeBuffer);
         NX_CRITICAL(nativeBufferSize > 0);
-
-        const QVideoFrame::PixelFormat Format_Tiled32x32NV12 =
-            QVideoFrame::PixelFormat(QVideoFrame::Format_User + 17);
 
         quint8* srcData[4];
         srcData[0] = (quint8*) nativeBuffer;
@@ -58,14 +54,18 @@ int Impl::decode(
         int srcLineSize[4];
         srcLineSize[0] = srcLineSize[1] = qPower2Ceil((unsigned int) frameSize().width(), 32);
 
-        auto buffer = new AlignedMemVideoBuffer(srcData, srcLineSize, /*planeCount */ 2);
-        outDecodedFrame->reset(new QVideoFrame(buffer, frameSize(), Format_Tiled32x32NV12));
-    }
+        auto videoBuffer = new AlignedMemVideoBuffer(srcData, srcLineSize, /*planeCount*/ 2);
 
-    if (result <= 0) //< Error or no frame (buffering).
-        outDecodedFrame->reset();
+        static const QVideoFrame::PixelFormat kFormat_Tiled32x32NV12 =
+            QVideoFrame::PixelFormat(QVideoFrame::Format_User + 17);
+
+        setQVideoFrame(outDecodedFrame, videoBuffer, kFormat_Tiled32x32NV12, ptsUs);
+    }
     else
-        (*outDecodedFrame)->setStartTime(outPts);
+    {
+        // Error or no frame (buffering).
+        outDecodedFrame->reset();
+    }
 
     return result;
 }

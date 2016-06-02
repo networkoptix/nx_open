@@ -2,13 +2,16 @@
 #if defined(ENABLE_PROXY_DECODER)
 
 #include <memory>
+#include <deque>
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QElapsedTimer>
 
 #include <proxy_decoder.h>
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/flag_config.h>
+#include <nx/utils/debug_utils.h>
 #include <nx/streaming/video_data_packet.h>
 
 #include "media_fwd.h"
@@ -30,6 +33,7 @@ public:
     NX_FLAG(0, enableFps, "");
 
     // Choosing impl.
+    NX_FLAG(0, implStub, "Checkerboard stub, do not use libproxydecoder.");
     NX_FLAG(1, implDisplay, "decodeToDisplayQueue() => displayDecoded() in frame handle().");
     NX_FLAG(0, implRgb, "decodeToRgb() -> AlignedMemVideoBuffer, without OpenGL.");
     NX_FLAG(0, implYuvPlanar, "decodeToYuvPlanar() -> AlignedMemVideoBuffer => Qt Shader.");
@@ -49,40 +53,11 @@ public:
 };
 extern ProxyVideoDecoderFlagConfig conf;
 
-void debugShowFps(const char* tag);
-
-/** Debug tool - implicitly unaligned pointer. */
-uint8_t* debugUnalignPtr(void* data);
-
 /**
  * @return Null if compressedVideoData is null.
  */
 std::unique_ptr<ProxyDecoder::CompressedFrame> createUniqueCompressedFrame(
     const QnConstCompressedVideoDataPtr& compressedVideoData);
-
-#define PRINT qWarning().nospace() << OUTPUT_PREFIX
-#define OUTPUT if (!conf.enableOutput) {} else qWarning().nospace() << OUTPUT_PREFIX
-
-long getTimeMs();
-void logTimeMs(long oldTime, const char* message);
-#define TIME_BEGIN(TAG) long TIME_##TAG = conf.enableTime ? getTimeMs() : 0
-#define TIME_END(TAG) if(conf.enableTime) logTimeMs(TIME_##TAG, #TAG)
-
-/**
- * Is a stub if !conf.enableTime.
- */
-class DebugTimer
-{
-public:
-    DebugTimer(const char* name);
-    ~DebugTimer();
-    void mark(const char* tag);
-    void finish(const char* tag);
-
-private:
-    struct Private;
-    std::unique_ptr<Private> d;
-};
 
 void debugDrawCheckerboardArgb(
     uint8_t* argbBuffer, int lineSizeBytes, int frameWidth, int frameHeight);
