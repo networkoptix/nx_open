@@ -190,15 +190,14 @@ bool QnAxisAudioTransmitter::startTransmission()
     {
         m_socket = httpClient->takeSocket();
         m_socket->setNonBlockingMode(false);
-        return true;
     }
     else
     {
         m_state = TransmitterState::Failed;
-        return false;
     }
 
     httpClient->terminate();
+    return m_socket != nullptr;
 }
 
 bool QnAxisAudioTransmitter::sendData(
