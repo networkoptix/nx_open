@@ -125,6 +125,9 @@
             <button type="submit" class="btn btn-success" ng-click="startGeneratingEvents()" ng-if="!generatingEvents"><span class="glyphicon glyphicon-play-circle"></span> random events</button>
             <button type="submit" class="btn btn-danger"  ng-click="stopGeneratingEvents()" ng-if="generatingEvents"><span class="glyphicon glyphicon-stop"></span> random events</button>
 
+            <button type="submit" class="btn btn-success" ng-click="startRepeatingEvent()" ng-if="!repeatingEvents"><span class="glyphicon glyphicon-play-circle"></span> repeat last event</button>
+            <button type="submit" class="btn btn-danger"  ng-click="stopRepeatingEvent()" ng-if="repeatingEvents"><span class="glyphicon glyphicon-stop"></span> repeat last event</button>
+
             <p>Events Log:</p>
             <pre><div ng-repeat="event in eventsLog">{{event.event}} ({{event.source}}): {{event.result}}</div></pre>
         </div>

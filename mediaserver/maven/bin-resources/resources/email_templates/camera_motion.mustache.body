@@ -9,7 +9,7 @@
 <div class="date">
     <p>
         {{#aggregated}}
-            <b>{{timestamp}}</b>
+            <b>{{{timestamp}}}</b>
         {{/aggregated}}
     </p>
 
