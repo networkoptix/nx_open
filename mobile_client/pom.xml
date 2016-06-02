@@ -50,6 +50,22 @@
             <scope>system</scope>
             <systemPath>${root.dir}/client/pom.xml</systemPath>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_audio</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
+        </dependency>   
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_media</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_media/pom.xml</systemPath>
+        </dependency>           
     </dependencies>
 
     <build>
@@ -238,7 +254,7 @@
                 </property>
             </activation>
             <properties>
-                <rdep.linux.packages>quazip opengl-es-mali openal libstdc++-6.0.20 ffmpeg-3.0.2 ldpreloadhook-1.0 libpixman-0.34.0 libump-3.0 libvdpau-sunxi-1.0 libcedrus-1.0 libvdpau-1.0.4.1</rdep.linux.packages>
+                <rdep.linux.packages>quazip opengl-es-mali openal</rdep.linux.packages>
                 <linux.oslibs>-lz</linux.oslibs>
             </properties>
         </profile>
