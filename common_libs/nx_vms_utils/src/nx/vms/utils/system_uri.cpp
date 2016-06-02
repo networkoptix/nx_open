@@ -117,6 +117,39 @@ public:
 
     }
 
+    bool isNull() const
+    {
+        return protocol == kDefaultProtocol
+            && clientCommand == SystemUri::ClientCommand::None
+            && systemAction == SystemUri::SystemAction::None
+            && domain.isEmpty()
+            && systemId.isEmpty()
+            && authenticator.user.isEmpty()
+            && authenticator.password.isEmpty()
+            && parameters.isEmpty();
+    }
+
+    bool isValid() const
+    {
+        bool hasDomain = !domain.isEmpty();
+        bool hasAuth = !authenticator.user.isEmpty() && !authenticator.password.isEmpty();
+
+        switch (clientCommand)
+        {
+            case SystemUri::ClientCommand::Client:
+                return hasDomain;
+            case SystemUri::ClientCommand::LoginToCloud:
+                return hasDomain && hasAuth;
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+private:
+
+
 };
 
 SystemUri::SystemUri() :
@@ -231,17 +264,13 @@ void SystemUri::setRawParameters(const Parameters& value)
 bool SystemUri::isNull() const
 {
     Q_D(const SystemUri);
-    return d->protocol == kDefaultProtocol
-        && d->clientCommand == ClientCommand::None
-        && d->systemAction == SystemAction::None
-        && d->domain.isEmpty()
-        && d->systemId.isEmpty()
-        && d->parameters.isEmpty();
+    return d->isNull();
 }
 
 bool SystemUri::isValid() const
 {
-    return true;
+    Q_D(const SystemUri);
+    return d->isValid();
 }
 
 QString SystemUri::toString() const
