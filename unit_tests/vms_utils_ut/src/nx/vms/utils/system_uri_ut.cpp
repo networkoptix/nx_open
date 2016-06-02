@@ -275,11 +275,10 @@ TEST_F(SystemUriTest, directSystemValidClientCommandHttp)
     /* Cannot connect to cloud with direct http link. */
     m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
     ASSERT_FALSE(m_uri.isValid());
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    ASSERT_FALSE(m_uri.isValid());
 
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    ASSERT_TRUE(m_uri.isValid());
-
-    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     ASSERT_TRUE(m_uri.isValid());
 }
 
@@ -293,11 +292,10 @@ TEST_F(SystemUriTest, directSystemValidClientCommandHttps)
     /* Cannot connect to cloud with direct http link. */
     m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
     ASSERT_FALSE(m_uri.isValid());
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    ASSERT_FALSE(m_uri.isValid());
 
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    ASSERT_TRUE(m_uri.isValid());
-
-    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     ASSERT_TRUE(m_uri.isValid());
 }
 
