@@ -308,16 +308,6 @@ bool QnAviArchiveDelegate::reopen()
     return true;
 }
 
-class InitFfmpegLib
-{
-public:
-
-    InitFfmpegLib()
-    {
-        av_register_all();
-    }
-};
-
 bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
 {
     QnMutexLocker lock( &m_openMutex ); // need refactor. Now open may be called from UI thread!!!
@@ -325,8 +315,6 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
     m_resource = resource;
     if (m_formatContext == 0)
     {
-        static InitFfmpegLib init;
-
         m_eofReached = false;
         QString url = m_resource->getUrl();
         if (m_storage == 0) {

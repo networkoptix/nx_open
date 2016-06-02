@@ -35,12 +35,6 @@
 #include <QScopedPointer>
 #include <QtSingleApplication>
 
-extern "C"
-{
-    #include <libavformat/avformat.h>
-    #include <libavformat/avio.h>
-}
-
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
@@ -150,25 +144,7 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
     cl_log.log(QLatin1String("FFMPEG "), QString::fromLocal8Bit(szMsg), cl_logERROR);
 }
 
-static int lockmgr(void **mtx, enum AVLockOp op)
-{
-    QnMutex** qMutex = (QnMutex**) mtx;
-    switch(op) {
-        case AV_LOCK_CREATE:
-            *qMutex = new QnMutex();
-            return 0;
-        case AV_LOCK_OBTAIN:
-            (*qMutex)->lock();
-            return 0;
-        case AV_LOCK_RELEASE:
-            (*qMutex)->unlock();
-            return 0;
-        case AV_LOCK_DESTROY:
-            delete *qMutex;
-            return 0;
-    }
-    return 1;
-}
+
 
 void ffmpegInit()
 {
@@ -342,12 +318,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         ? lit(":")
         : startupParams.dynamicCustomizationPath;
 
-    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin
-        ? skinRoot + lit("/skin_light")
-        : skinRoot + lit("/skin_dark");
+    QString customizationPath = skinRoot + lit("/skin_dark");
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << skinRoot + lit("/skin") << customizationPath));
 #else
-    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
+    QString customizationPath = lit(":/skin_dark");
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 #endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
@@ -656,7 +630,7 @@ int main(int argc, char **argv)
 #ifdef Q_OS_MAC
     mac_setLimits();
 #endif
-
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
 
     // this is necessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created
@@ -676,16 +650,7 @@ int main(int argc, char **argv)
     mac_restoreFileAccess();
 #endif
 
-    //avcodec_init();
-    av_register_all();
-    if (av_lockmgr_register(lockmgr) != 0)
-    {
-        qCritical() << "Failed to register ffmpeg lock manager";
-    }
-
     int result = runApplication(application.data(), argc, argv);
-
-    av_lockmgr_register(NULL);
 
 #ifdef Q_OS_MAC
     mac_stopFileAccess();

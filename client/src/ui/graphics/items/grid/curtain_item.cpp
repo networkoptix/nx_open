@@ -8,7 +8,7 @@
 #include <opengl_renderer.h>
 
 QnCurtainItem::QnCurtainItem(QGraphicsItem *parent):
-    QGraphicsObject(parent)
+    base_type(parent)
 {
     qreal d = std::numeric_limits<qreal>::max() / 4;
     m_boundingRect = QRectF(QPointF(-d, -d), QPointF(d, d));
@@ -32,15 +32,25 @@ void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->setModelViewMatrix(QMatrix4x4());
 
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(m_color);
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawColoredQuad(widget->geometry());
 
-    glDisable(GL_BLEND); 
+    glDisable(GL_BLEND);
 
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->popModelViewMatrix();
 
     QnGlNativePainting::end(painter);
 #endif //  Q_OS_WIN
+}
+
+const QColor & QnCurtainItem::color() const
+{
+    return m_color;
+}
+
+void QnCurtainItem::setColor(const QColor &color)
+{
+    m_color = color;
 }

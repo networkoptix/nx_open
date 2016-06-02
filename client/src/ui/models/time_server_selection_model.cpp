@@ -6,7 +6,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/resource_name.h>
+#include <core/resource/resource_display_info.h>
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_runtime_data.h>
@@ -201,7 +201,7 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(item.peerId);
-    QString title = server ? getFullResourceName(server, true) : tr("Server");
+    QString title = server ? QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl) : tr("Server");
 
     switch (role) {
       case Qt::DisplayRole:
@@ -299,7 +299,7 @@ void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo &info) {
     PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is added");
 #ifdef _DEBUG
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(info.uuid);
-    QString title = server ? getFullResourceName(server, true) : tr("Server");
+    QString title = server ? QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl)  : tr("Server");
     PRINT_DEBUG("peer " + info.uuid.toByteArray() + " name is " + title.toUtf8());
 #endif // DEBUG
 

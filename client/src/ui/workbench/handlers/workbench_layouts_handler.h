@@ -35,6 +35,7 @@ private slots:
     void at_closeAllButThisLayoutAction_triggered();
     void at_shareLayoutAction_triggered();
     void at_stopSharingLayoutAction_triggered();
+    void at_openNewTabAction_triggered();
 
     void at_workbench_layoutsChanged();
 
@@ -43,15 +44,6 @@ private slots:
 private:
     void saveLayout(const QnLayoutResourcePtr &layout);
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
-
-    /**
-     * @brief alreadyExistingLayouts    Check if layouts with same name already exist.
-     * @param name                      Suggested new name.
-     * @param user                      User that will own the layout.
-     * @param layout                    Layout that we want to rename (if any).
-     * @return                          List of existing layouts with same name.
-     */
-    QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout = QnLayoutResourcePtr());
 
     /**
      * @brief askOverrideLayout     Show messagebox asking user if he really wants to override existsing layout.
@@ -65,7 +57,7 @@ private:
 
     void removeLayouts(const QnLayoutResourceList &layouts);
 
-    void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *target, const char *slot);
+    void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources);
     bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false, bool force = false);
     bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false, bool force = false);
 

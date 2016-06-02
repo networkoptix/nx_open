@@ -32,6 +32,7 @@ public:
 
     QString text() const;
     void setText(const QString& value);
+    void clear();
 
     QLineEdit::EchoMode echoMode() const;
     void setEchoMode(QLineEdit::EchoMode value);
@@ -40,7 +41,6 @@ public:
     void setReadOnly(bool value);
 
     void validate();
-    void clear();
 
     bool isValid() const;
     void setValidator(Qn::TextValidateFunction validator);

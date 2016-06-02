@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
@@ -20,7 +21,6 @@
 #include <api/global_settings.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/common/ui_resource_name.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/style/resource_icon_cache.h>
@@ -142,6 +142,20 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
 {
     NX_ASSERT(nodeType == Qn::SystemNode || nodeType == Qn::RecorderNode);
     m_displayName = m_name = name;
+    if (m_displayName.isEmpty())
+    {
+        switch (nodeType)
+        {
+        case Qn::RecorderNode:
+            NX_ASSERT(false); //We should never get recorder node with empty name; groupId is used instead
+            break;
+        case Qn::SystemNode:
+            m_displayName = tr("<Unnamed system>");
+            break;
+        default:
+            break;
+        }
+    }
     m_state = Invalid;
 }
 
@@ -211,7 +225,7 @@ void QnResourceTreeModelNode::update()
             m_status = m_resource->getStatus();
             m_searchString = m_resource->toSearchString();
             m_icon = qnResIconCache->icon(m_resource);
-            m_displayName = getResourceName(m_resource);
+            m_displayName = QnResourceDisplayInfo(m_resource).toString(Qn::RI_NameOnly);
         }
     }
     else if (m_type == Qn::VideoWallItemNode)

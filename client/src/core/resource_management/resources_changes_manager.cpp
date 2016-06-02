@@ -333,7 +333,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
         emit saveChangesFailed(QnResourceList() << user);
     } );
 
-    //TODO: #GDM #access #low code duplication with saceAccessibleResources, arch change is required
+    //TODO: #GDM #access #low code duplication with saveAccessibleResources, arch change is required
     auto accessibleResources = qnResourceAccessManager->accessibleResources(userId);
     ec2::ApiAccessRightsData accessRights;
     accessRights.userId = userId;

@@ -65,7 +65,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>&amp;Alarm/Event Rules...</string>
+         <string>Alarm/Event Rules...</string>
         </property>
        </widget>
       </item>
@@ -85,7 +85,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>&amp;Event Log...</string>
+         <string>Event Log...</string>
         </property>
        </widget>
       </item>
@@ -134,7 +134,7 @@
       <item row="6" column="0">
        <widget class="QPushButton" name="healthMonitorButton">
         <property name="text">
-         <string>&amp;Health Monitoring...</string>
+         <string>Health Monitoring...</string>
         </property>
        </widget>
       </item>
@@ -154,7 +154,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>&amp;Bookmarks...</string>
+         <string>Bookmarks...</string>
         </property>
        </widget>
       </item>

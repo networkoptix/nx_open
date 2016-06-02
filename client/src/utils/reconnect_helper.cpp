@@ -12,8 +12,9 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_display_info.h>
 
-#include <ui/common/ui_resource_name.h>
+#include <client/client_settings.h>
 
 #include <utils/common/collection.h>
 #include <utils/common/string.h>
@@ -25,11 +26,12 @@ namespace {
 #define QN_RECONNECT_HELPER_LOG
 #endif
 
-    void printLog(const QByteArray &message, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) {
+    void printLog(const QByteArray &message, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr())
+    {
 #ifdef QN_RECONNECT_HELPER_LOG
         const QByteArray prefix("QnReconnectHelper::");
         if (server)
-            qDebug() << prefix << message << getResourceName(server);
+            qDebug() << prefix << message << QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl);
         else
             qDebug() << prefix << message;
 #else
@@ -59,8 +61,14 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /* = NULL*/):
     if (m_currentServer && !m_allServers.contains(m_currentServer))
         m_allServers << m_currentServer;
 
-    std::sort(m_allServers.begin(), m_allServers.end(), [](const QnMediaServerResourcePtr &left, const QnMediaServerResourcePtr &right) {
-        return naturalStringLess(getResourceName(left), getResourceName(right));
+    auto serverName = [this](const QnMediaServerResourcePtr& server)
+    {
+        return QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
+    };
+
+    std::sort(m_allServers.begin(), m_allServers.end(), [serverName](const QnMediaServerResourcePtr &left, const QnMediaServerResourcePtr &right)
+    {
+        return naturalStringLess(serverName(left), serverName(right));
     });
 
     printLog("Full server list:");
@@ -207,8 +215,8 @@ QUrl QnReconnectHelper::bestInterfaceForServer(const QnUuid &id) {
         const int onlineBase = base * 2;
         if (info.ignored)
             return -1;
-        return info.online 
-            ? onlineBase - info.count 
+        return info.online
+            ? onlineBase - info.count
             : base - info.count;
     };
 
@@ -226,7 +234,7 @@ QUrl QnReconnectHelper::bestInterfaceForServer(const QnUuid &id) {
         printLog("All server interfaces are ignored");
         return QUrl();
     }
-    
+
     (*iter).count++;
 
     QUrl urlNoPassword(iter->url);

@@ -32,6 +32,7 @@ protected:
     virtual bool event(QEvent* event) override;
 
     virtual void hoverEvent(QHoverEvent* event);
+    virtual void paintEvent(QPaintEvent* event) override;
 
 private:
     void changeHover(const QModelIndex& index);

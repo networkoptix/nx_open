@@ -173,7 +173,7 @@
                   <item row="0" column="0">
                    <widget class="QLabel" name="startIPLabel">
                     <property name="text">
-                     <string>S&amp;tart IP:</string>
+                     <string>Start IP:</string>
                     </property>
                     <property name="buddy">
                      <cstring>startIPLineEdit</cstring>
@@ -190,7 +190,7 @@
                   <item row="1" column="0">
                    <widget class="QLabel" name="endIPLabel">
                     <property name="text">
-                     <string>&amp;End IP:</string>
+                     <string>End IP:</string>
                     </property>
                     <property name="buddy">
                      <cstring>endIPLineEdit</cstring>
@@ -213,7 +213,7 @@
             <item>
              <widget class="QCheckBox" name="subnetCheckbox">
               <property name="text">
-               <string>S&amp;ubnet Scan</string>
+               <string>Subnet Scan</string>
               </property>
              </widget>
             </item>
@@ -239,7 +239,7 @@
                </size>
               </property>
               <property name="text">
-               <string>&amp;Login:</string>
+               <string>Login:</string>
               </property>
               <property name="buddy">
                <cstring>loginLineEdit</cstring>
@@ -274,7 +274,7 @@
                </size>
               </property>
               <property name="text">
-               <string>&amp;Password:</string>
+               <string>Password:</string>
               </property>
               <property name="buddy">
                <cstring>passwordLineEdit</cstring>
@@ -391,7 +391,7 @@
             <item row="2" column="0">
              <widget class="QLabel" name="portLabel">
               <property name="text">
-               <string>&amp;Discovery Port:</string>
+               <string>Discovery Port:</string>
               </property>
               <property name="buddy">
                <cstring>portSpinBox</cstring>
@@ -605,7 +605,7 @@
          <item>
           <widget class="QPushButton" name="scanButton">
            <property name="text">
-            <string>&amp;Scan</string>
+            <string>Scan</string>
            </property>
           </widget>
          </item>
@@ -647,7 +647,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>&amp;Add selected</string>
+            <string>Add selected</string>
            </property>
           </widget>
          </item>

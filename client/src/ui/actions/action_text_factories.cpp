@@ -3,30 +3,29 @@
 #include <ui/actions/action_parameter_types.h>
 #include <ui/actions/action_parameters.h>
 
-#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_item_index.h>
 
 #include <utils/common/warnings.h>
 
-QnActionTextFactory::QnActionTextFactory(QObject *parent): 
+QnActionTextFactory::QnActionTextFactory(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {}
 
-QString QnActionTextFactory::text(const QnResourceList &) const { 
-    return QString(); 
+QString QnActionTextFactory::text(const QnResourceList &) const {
+    return QString();
 }
 
-QString QnActionTextFactory::text(const QnLayoutItemIndexList &layoutItems) const { 
+QString QnActionTextFactory::text(const QnLayoutItemIndexList &layoutItems) const {
     return text(QnActionParameterTypes::resources(layoutItems));
 }
 
-QString QnActionTextFactory::text(const QnResourceWidgetList &widgets) const { 
+QString QnActionTextFactory::text(const QnResourceWidgetList &widgets) const {
     return text(QnActionParameterTypes::layoutItems(widgets));
 }
 
-QString QnActionTextFactory::text(const QnWorkbenchLayoutList &layouts) const { 
+QString QnActionTextFactory::text(const QnWorkbenchLayoutList &layouts) const {
     return text(QnActionParameterTypes::resources(layouts));
 }
 

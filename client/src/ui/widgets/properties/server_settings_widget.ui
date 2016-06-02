@@ -106,7 +106,7 @@
    <item>
     <widget class="QGroupBox" name="failoverGroupBox">
      <property name="title">
-      <string>Fai&amp;lover</string>
+      <string>Failover</string>
      </property>
      <property name="flat">
       <bool>true</bool>

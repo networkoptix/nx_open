@@ -2,7 +2,6 @@
 #include "cloud_server_socket.h"
 
 #include <nx/network/socket_global.h>
-#include <nx/network/stream_socket_wrapper.h>
 #include <nx/utils/std/future.h>
 #include <utils/serialization/lexical.h>
 

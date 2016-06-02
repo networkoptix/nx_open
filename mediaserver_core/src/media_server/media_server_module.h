@@ -17,8 +17,6 @@ public:
     using Singleton<QnMediaServerModule>::instance;
     using QnInstanceStorage::instance;
 private:
-    void initServerMetaTypes();
-private:
     QnCommonModule *m_common;
 };
 
