@@ -29,6 +29,12 @@ namespace nx
             class NX_VMS_UTILS_API SystemUri
             {
             public:
+                enum class Scope
+                {
+                    Generic,            /**< Generic url. */
+                    Direct              /**< Direct-access url. */
+                };
+
                 enum class Protocol
                 {
                     Http,
@@ -53,6 +59,9 @@ namespace nx
                 SystemUri();
                 SystemUri(const QString& uri);
                 virtual ~SystemUri();
+
+                Scope scope() const;
+                void setScope(Scope value);
 
                 Protocol protocol() const;
                 void setProtocol(Protocol value);

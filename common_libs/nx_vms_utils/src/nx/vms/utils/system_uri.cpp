@@ -8,6 +8,7 @@ namespace
 {
     const QString kAuthKey = lit("auth=");
 
+    const SystemUri::Scope kDefaultScope = SystemUri::Scope::Generic;
     const SystemUri::Protocol kDefaultProtocol = SystemUri::Protocol::Http;
 }
 
@@ -94,6 +95,7 @@ bool SystemUriResolver::parseUri()
 class nx::vms::utils::SystemUriPrivate
 {
 public:
+    SystemUri::Scope scope;
     SystemUri::Protocol protocol;
     QString domain;
     SystemUri::ClientCommand clientCommand;
@@ -103,6 +105,7 @@ public:
     SystemUri::Parameters parameters;
 
     SystemUriPrivate() :
+        scope(kDefaultScope),
         protocol(kDefaultProtocol),
         domain(),
         clientCommand(SystemUri::ClientCommand::None),
@@ -173,6 +176,18 @@ SystemUri::SystemUri(const QString& uri):
 SystemUri::~SystemUri()
 {
 
+}
+
+SystemUri::Scope SystemUri::scope() const
+{
+    Q_D(const SystemUri);
+    return d->scope;
+}
+
+void SystemUri::setScope(Scope value)
+{
+    Q_D(SystemUri);
+    d->scope = value;
 }
 
 SystemUri::Protocol SystemUri::protocol() const
