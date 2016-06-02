@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <utils/system_uri.h>
+#include <nx/vms/utils/system_uri.h>
 
 /** Initial test. Check if default list is empty. */
 TEST( QnSystemUriTest, init )

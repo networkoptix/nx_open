@@ -11,23 +11,27 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>unit_tests</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Unit Tests</name>
+    <name>Unit Tests Package</name>
 
     <properties>
         <root.dir>${basedir}/..</root.dir>
         <template>app</template>
-        <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <qt.libs></qt.libs>
     </properties>
-    
+
     <modules>
-        <module>common_ut</module>
+        <!-- NX Section -->
+        <module>utils_ut</module>
         <module>nx_network_ut</module>
+        <module>cloud_db_ut</module>
+        <module>cloud_connectivity_ut</module>
+        <module>connection_mediator_ut</module>
+
+        <!-- VMS Section -->
+        <module>vms_utils_ut</module>
+        <module>common_ut</module>
+        <module>appserver2_ut</module>
         <module>mediaserver_core_ut</module>
         <module>client_ut</module>
-        <module>cloud_db_ut</module>
-        <module>connection_mediator_ut</module>
-        <module>appserver2_ut</module>
-        <module>cloud_connectivity_ut</module>
-        <module>utils_ut</module>
-    </modules>         
+    </modules>
 </project>

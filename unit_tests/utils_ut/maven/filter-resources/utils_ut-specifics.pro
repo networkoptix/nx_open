@@ -1,2 +1,1 @@
-TEMPLATE = app
 CONFIG += console

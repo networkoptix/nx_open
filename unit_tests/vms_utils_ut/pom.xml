@@ -12,29 +12,33 @@
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>nx_network_ut</artifactId>
+    <artifactId>vms_utils_ut</artifactId>
     <packaging>pom</packaging>
-    <name>NX Network Unit Tests</name>
+    <name>VMS Utils Unit Tests</name>
 
     <properties>
-        <guid>${nx_network_ut.guid}</guid>
-        <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -ludt</global.libs>
-        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
-
-        <windows.defines>_VARIADIC_MAX=10</windows.defines>
-        <rdep.packages>gtest gmock openssl ffmpeg quazip</rdep.packages>
+        <qt.libs>core</qt.libs>
+        <global.libs>-lnx_utils -lnx_vms_utils</global.libs>
+        <rdep.packages>gtest gmock</rdep.packages>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>nx_network</artifactId>
+            <artifactId>nx_utils</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+            <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_vms_utils</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_vms_utils/pom.xml</systemPath>
+        </dependency>        
     </dependencies>
 
 </project>
