@@ -140,6 +140,11 @@ public:
                 return hasDomain;
             case SystemUri::ClientCommand::LoginToCloud:
                 return hasDomain && hasAuth;
+            case SystemUri::ClientCommand::ConnectToSystem:
+                return hasDomain
+                    && hasAuth
+                    && systemAction != SystemUri::SystemAction::None
+                    && !systemId.isEmpty();
             default:
                 break;
         }
