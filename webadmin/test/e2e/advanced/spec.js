@@ -1,6 +1,6 @@
 'use strict';
 var Page = require('./po.js');
-fdescribe('Advanced Page', function () {
+describe('Advanced Page', function () {
 
     var p = new Page();
 
@@ -15,7 +15,8 @@ fdescribe('Advanced Page', function () {
     it("should allow user to see storages: free space, limit, totalspace, enabled, some indicator",function(){
         expect(p.storagesRows.count()).toBeGreaterThan(0);
         expect(p.storageName.getText()).toMatch(/[\w\:]*([\w\s]*)+/);
-        expect(p.storagePartition.getAttribute("title")).toMatch(/Reserved\:\s\d+\.?\d*\s*\wB,\s+Free\:\s\d+\.?\d*\s*\wB,\s+Occupied\:\s\d+\.?\d*\s*\wB,\s+Total:\s\d+\.?\d*\s*\wB/);
+        expect(p.storagePartition.getAttribute("title"))
+            .toMatch(/Reserved\:\s\d+\.?\d*\s*\wB,\s+Free\:\s\d+\.?\d*\s*\wB,\s+Occupied\:\s\d+\.?\d*\s*\wB,\s+Total:\s\d+\.?\d*\s*\wB/);
         expect(p.storageInternalIcon.isDisplayed()).toBe(true);
     });
 
@@ -65,8 +66,8 @@ fdescribe('Advanced Page', function () {
                 expect(p.dialog.getText()).toContain("Set reserved space is greater than free space left. " +
                     "Possible partial remove of the video footage is expected. " +
                     "Do you want to continue?");
-                p.dialogButtonOk.click();
-                p.dialogButtonClose.click();
+                p.dialogOkButton.click();
+                p.dialogCloseButton.click();
             });
         });
     });
@@ -141,15 +142,17 @@ fdescribe('Advanced Page', function () {
         p.storageLimitInput.getAttribute("value").then(function(oldlimit){
             p.setStorageLimit(1);
             expect(p.storageLimitInput.getAttribute("value")).toBe('1');
-            p.cancelButton.click();
+            p.cancelStoragesButton.click();
             expect(p.storageLimitInput.getAttribute("value")).toBe(oldlimit);
         });
     });
 
     // Log section tests
 
-    it("Main log level select works",function(){
+    it("Main log level select works and is saved",function(){
         p.mainLogLevelOptions.each(function(elem) {
+            expect(elem.isSelected()).toBe(false);
+
             p.mainLogLevelSelect.isPresent().then( function(isPresent) {
                 if(isPresent) {
                     p.mainLogLevelSelect.click();
@@ -170,11 +173,15 @@ fdescribe('Advanced Page', function () {
                     p.dialogButtonClose.click();
                 }
             });
+
+            expect(elem.isSelected()).toBe(true);
         })
     });
 
-    it("Transaction log level select works",function(){
+    it("Transaction log level select works and is saved",function(){
         p.transLogLevelOptions.each(function(elem) {
+            expect(elem.isSelected()).toBe(false);
+
             p.transLogLevelSelect.isPresent().then( function(isPresent) {
                 if(isPresent) {
                     p.transLogLevelSelect.click();
@@ -195,6 +202,8 @@ fdescribe('Advanced Page', function () {
                     p.dialogButtonClose.click();
                 }
             });
+
+            expect(elem.isSelected()).toBe(true);
         })
     });
 
@@ -212,11 +221,91 @@ fdescribe('Advanced Page', function () {
         p.upgradeButton.sendKeys(absolutePath).then(function(){
 
             expect(p.dialog.getText()).toContain("Updating failed");
-            p.dialogButtonClose.click();
+            p.dialogCloseButton.click();
         });
     });
 
     //Advanced system settings
-    xit("All fields are changeable; after save changes are applied",function(){
+    it("All checkboxes are changeable; after save changes are applied",function(){
+        var oldSysSettings = []; // array to store initial state of checkboxes
+
+        // We do not want to toggle new system checkbox, so filtering it out
+        p.sysSettingsCheckboxes.filter( function(checkbox) {
+            return checkbox.getAttribute('id').then( function(id) {
+                return id != 'newSystem';
+            });
+        }).each( function(checkbox) {
+            checkbox.isSelected().then( function(wasSelected) {
+                checkbox.click(); // toggle checkbox state
+
+                if (wasSelected) expect(checkbox.isSelected()).toBe(false);
+                else expect(checkbox.isSelected()).toBe(true);
+
+                oldSysSettings.push(wasSelected); // filling array of initial states of checkboxes
+            });
+        });
+
+        p.saveSysSettings();
+
+        browser.refresh();
+        browser.waitForAngular();
+
+        // Grab new states of all checkboxes except newSystem, into array
+        var newSysSettings = p.sysSettingsCheckboxes.filter( function(checkbox) {
+            return checkbox.getAttribute('id').then( function(id) {
+                return id != 'newSystem';
+            });
+        }).map( function(checkbox) {
+            return checkbox.isSelected().then( function(isSelected) {
+                return isSelected;
+            });
+        });
+
+        // Check that state of all checkboxes has changed
+        // by comparing two arrays
+        for (var i=0; i < oldSysSettings.length; i++) {
+            expect(oldSysSettings[i]).toBe(!newSysSettings[i]);
+        }
+
+        // Toggling all settings back to initial state
+        // We do not want to toggle new system checkbox, so filtering it out
+        p.sysSettingsCheckboxes.filter( function(checkbox) {
+            return checkbox.getAttribute('id').then( function(id) {
+                return id != 'newSystem';
+            });
+        }).each( function(checkbox) {
+            checkbox.click(); // toggle checkbox state
+        });
+
+        p.saveSysSettings();
+    });
+
+    it("All text input fields are changeable; after save changes are applied",function(){
+        var initialSettings = p.sysSettingsTextInputs.map( function(field, index) {
+            return field.getAttribute('value').then(function(value) {
+                console.log(index, value);
+                return value;
+            })
+        });
+
+        p.sysSettingsTextInputs.each( function(field) {
+            field.sendKeys('someAddedText');
+            expect(field.getAttribute('value')).toContain('someAddedText');
+        });
+
+        p.saveSysSettings();
+        browser.pause();
+
+        browser.refresh();
+        browser.waitForAngular();
+
+        p.sysSettingsTextInputs.each( function(field, index) {
+            // Check that settings are saved after refresh
+            expect(field.getAttribute('value')).toContain('someAddedText');
+            // Restore initial settings
+            field.clear()
+                .sendKeys(initialSettings[index]);
+        });
+        p.saveSysSettings();
     });
 });
