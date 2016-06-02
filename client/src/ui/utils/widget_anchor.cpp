@@ -19,7 +19,11 @@ QnWidgetAnchor::QnWidgetAnchor(QWidget* widget) :
 
 void QnWidgetAnchor::setEdges(Qt::Edges edges)
 {
+    if (m_edges == edges)
+        return;
+
     m_edges = edges;
+    updateGeometry();
 }
 
 Qt::Edges QnWidgetAnchor::edges() const
