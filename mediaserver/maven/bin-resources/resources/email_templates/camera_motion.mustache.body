@@ -8,8 +8,9 @@
 
 <div class="date">
     <p>
-        Motion has been detected {{count}} times, last:
-        <b>{{timestamp}}</b>
+        {{#aggregated}}
+            <b>{{timestamp}}</b>
+        {{/aggregated}}
     </p>
 
     {{#urlint}}

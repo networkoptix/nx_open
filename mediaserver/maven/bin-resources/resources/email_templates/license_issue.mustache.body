@@ -2,24 +2,20 @@
 <p>Not enough licenses</p>
 <p>Camera recording was forcibly stopped on cameras:</p>
 <table class="description">
-    <tbody>
-    {{#aggregated}}
+    <thead>
         <tr>
-            <td>
-                <img src="{{sourceIcon}}">
-            </td>
+            <th>Cameras</th>
+            <th>Recording stopped at</th>
+        </tr>
+    </thead>
+    <tbody>
+{{#aggregated}}
+        <tr>
             <td >
                 <b>{{source}}</b> ({{sourceIp}})
             </td>
-            {{#reason}}
-                <td>{{reason}}</td>
-            {{/reason}}
+            <td>{{timestamp}}</td>
         </tr>
-    {{/aggregated}}
+{{/aggregated}}
     </tbody>
 </table>
-
-<div class="date">
-    Recording was stopped at<br>
-    <b>{{timestamp}}</b>
-</div>

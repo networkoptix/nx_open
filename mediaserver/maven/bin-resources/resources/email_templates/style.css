@@ -129,6 +129,11 @@ td{
     margin-top:15px;
 }
 
+.date{
+    padding-top: 15px;
+    line-height: 20px;
+    font-size: 14px;
+}
 .error{
     color: #C22626;
 }
