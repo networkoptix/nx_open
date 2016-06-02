@@ -196,7 +196,7 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
     else if(d->request.headers.find("Proxy-Authorization") != d->request.headers.end())
         authHeaderName = QByteArray("Proxy-Authorization");
     else
-        return false;
+        return true; //< not need to replace anything (proxy without authorization or auth by query items)
 
     nx_http::header::DigestAuthorization originalAuthHeader;
     if (!originalAuthHeader.parse(nx_http::getHeaderValue(d->request.headers, authHeaderName)))
