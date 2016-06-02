@@ -279,8 +279,6 @@ bool QnAxisAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data)
     if (!m_socket)
         return true;
 
-    m_socket->cancelAsyncIO();
-
     QnAbstractMediaDataPtr transcoded;
     do
     {

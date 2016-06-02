@@ -1023,6 +1023,23 @@
                 "Honeywell*|*"
             ],
             "portNamePrefixToIgnore": "AlarmOut"
+        },
+        {
+            "keys": [
+                "Pelco|NET5508*"
+            ],
+            "forcedOnvifParams": {
+                "videoEncoders": [
+                    "ve0", "ve8",
+                    "ve1", "ve9",
+                    "ve2", "ve10",
+                    "ve3", "ve11",
+                    "ve4", "ve12",
+                    "ve5", "ve13",
+                    "ve6", "ve14",
+                    "ve7", "ve15"
+                ]
+            }
         }
     ]
 }
