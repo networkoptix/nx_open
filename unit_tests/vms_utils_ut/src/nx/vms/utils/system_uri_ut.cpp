@@ -44,10 +44,13 @@ using namespace nx::vms::utils;
 
 namespace
 {
-    const QString kGenericDomain("cloud-demo.hdw.mx");
+    const QString kCloudDomain("cloud-demo.hdw.mx");
+    const QString kLocalDomain("localhost:7001");
+
+    const QString kCloudSystemId("d0b73d03-3e2e-405d-8226-019c83b13a08");
     const QString kLocalSystemId("localhost:7001");
     const QString kEncodedLocalSystemId("localhost%3A7001");
-    const QString kCloudSystemId("d0b73d03-3e2e-405d-8226-019c83b13a08");
+
     const QString kUser("user");
     const QString kPassword("password");
     const QString kEncodedAuthKey("dXNlcjpwYXNzd29yZA%3D%3D");  /**< Url-encoded key for 'user:password' string in base64 encoding. */
@@ -130,7 +133,7 @@ TEST_F(SystemUriTest, notNullCommand)
 
 TEST_F(SystemUriTest, notNullDomain)
 {
-    m_uri.setDomain(kGenericDomain);
+    m_uri.setDomain(kCloudDomain);
     ASSERT_FALSE(m_uri.isNull());
 }
 
@@ -177,7 +180,7 @@ TEST_F(SystemUriTest, GenericInvalid)
 /** Empty client command. */
 TEST_F(SystemUriTest, genericClientCommandInvalid)
 {
-    m_uri.setDomain(kGenericDomain);
+    m_uri.setDomain(kCloudDomain);
     ASSERT_FALSE(m_uri.isValid());
 }
 
@@ -187,7 +190,7 @@ TEST_F(SystemUriTest, genericClientValid)
     m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     ASSERT_FALSE(m_uri.isValid());
 
-    m_uri.setDomain(kGenericDomain);
+    m_uri.setDomain(kCloudDomain);
     ASSERT_TRUE(m_uri.isValid());
 }
 
@@ -198,7 +201,7 @@ TEST_F(SystemUriTest, genericCloudValidDomain)
     m_uri.setAuthenticator(kUser, kPassword);
     ASSERT_FALSE(m_uri.isValid());
 
-    m_uri.setDomain(kGenericDomain);
+    m_uri.setDomain(kCloudDomain);
     ASSERT_TRUE(m_uri.isValid());
 }
 
@@ -206,7 +209,7 @@ TEST_F(SystemUriTest, genericCloudValidDomain)
 TEST_F(SystemUriTest, genericCloudValidAuth)
 {
     m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
-    m_uri.setDomain(kGenericDomain);
+    m_uri.setDomain(kCloudDomain);
     ASSERT_FALSE(m_uri.isValid());
 
     m_uri.setAuthenticator(kUser, kPassword);
@@ -221,7 +224,7 @@ TEST_F(SystemUriTest, genericSystemValidDomain)
     m_uri.setSystemId(kLocalSystemId);
     ASSERT_FALSE(m_uri.isValid());
 
-    m_uri.setDomain(kGenericDomain);
+    m_uri.setDomain(kCloudDomain);
     ASSERT_TRUE(m_uri.isValid());
 }
 
@@ -229,7 +232,7 @@ TEST_F(SystemUriTest, genericSystemValidDomain)
 TEST_F(SystemUriTest, genericSystemValidAuth)
 {
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    m_uri.setDomain(kGenericDomain);
+    m_uri.setDomain(kCloudDomain);
     m_uri.setSystemId(kLocalSystemId);
     ASSERT_FALSE(m_uri.isValid());
 
@@ -241,7 +244,7 @@ TEST_F(SystemUriTest, genericSystemValidAuth)
 TEST_F(SystemUriTest, genericSystemValidSystemId)
 {
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    m_uri.setDomain(kGenericDomain);
+    m_uri.setDomain(kCloudDomain);
     m_uri.setAuthenticator(kUser, kPassword);
     ASSERT_FALSE(m_uri.isValid());
 
@@ -351,21 +354,45 @@ TEST_F(SystemUriTest, directCloudNativeSystem)
     ASSERT_TRUE(m_uri.isValid());
 }
 
-/* Testing http generic links */
-TEST_F(SystemUriTest, genericLinkClientShortHttp)
+/* Testing links */
+TEST_F(SystemUriTest, genericLinkClientShort)
 {
-    m_uri.setDomain(kGenericDomain);
     m_uri.setClientCommand(SystemUri::ClientCommand::Client);
-    validateLink(QString("http://%1/").arg(kGenericDomain));
-    validateLink(QString("http://%1/client").arg(kGenericDomain));
-    validateLink(QString("http://%1/client/").arg(kGenericDomain));
+    m_uri.setDomain(kCloudDomain);
+    validateLink(QString("http://%1/").arg(kCloudDomain));
+    validateLink(QString("http://%1/client").arg(kCloudDomain));
+    validateLink(QString("http://%1/client/").arg(kCloudDomain));
+}
+
+TEST_F(SystemUriTest, genericLinkClientProtocols)
+{
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setDomain(kCloudDomain);
+
+    ASSERT_EQ(SystemUri::Protocol::Http, m_uri.protocol());
+    validateLink(QString("http://%1/").arg(kCloudDomain));
+
+    m_uri.setProtocol(SystemUri::Protocol::Https);
+    validateLink(QString("https://%1/").arg(kCloudDomain));
+
+    //TODO: #GDM customizable
+    m_uri.setProtocol(SystemUri::Protocol::Native);
+    validateLink(QString("nx-vms://%1/").arg(kCloudDomain));
+}
+
+TEST_F(SystemUriTest, genericLinkCloud)
+{
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
+    m_uri.setAuthenticator(kUser, kPassword);
+
+    validateLink(QString("http://%1/cloud?auth=%2").arg(kCloudDomain).arg(kEncodedAuthKey));
 }
 
 
 /*
 
 Http(s) Generic Links
-http://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh
 http://cloud-demo.hdw.mx/system/localhost:7001?auth=YWJyYTprYWRhYnJh
 http://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
 http://cloud-demo.hdw.mx/system/localhost:7001/view?auth=YWJyYTprYWRhYnJh
@@ -373,9 +400,6 @@ http://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=Y
 http://cloud-demo.hdw.mx/system/localhost%3A7001/view?auth=YWJyYTprYWRhYnJh
 
 Native Generic Links
-nx-vms://cloud-demo.hdw.mx/
-nx-vms://cloud-demo.hdw.mx/client
-nx-vms://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh
 nx-vms://cloud-demo.hdw.mx/system/localhost:7001?auth=YWJyYTprYWRhYnJh
 nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh  - auth will be used to login to cloud
 nx-vms://cloud-demo.hdw.mx/system/localhost:7001/view?auth=YWJyYTprYWRhYnJh
@@ -383,13 +407,10 @@ nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth
 nx-vms://cloud-demo.hdw.mx/system/localhost%3A7001/view?auth=YWJyYTprYWRhYnJh
 
 Http(s) Direct Links
-http://localhost:7001/
 http://localhost:7001/system?auth=YWJyYTprYWRhYnJh
 http://localhost:7001/system/view?auth=YWJyYTprYWRhYnJh
 
 Native Direct Links
-nx-vms://localhost:7001/client
-nx-vms://localhost:7001/cloud?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
 nx-vms://localhost:7001/system?auth=YWJyYTprYWRhYnJh
 nx-vms://d0b73d03-3e2e-405d-8226-019c83b13a08/system?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
 */
