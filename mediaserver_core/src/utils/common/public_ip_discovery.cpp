@@ -1,18 +1,15 @@
+
 #include "public_ip_discovery.h"
 
 #include <QtCore/QCoreApplication>
 
-#include <QtNetwork/QNetworkRequest>
-#include <QtNetwork/QNetworkReply>
-
-#include <media_server/settings.h>
-
-#include <utils/common/sleep.h>
 #include <nx/network/http/httpclient.h>
+#include <utils/common/sleep.h>
+
 
 namespace {
-    const QString primaryUrlsList("http://www.mypublicip.com;http://checkip.eurodyndns.org");
-    const QString secondaryUrlsList("http://networkoptix.com/myip");
+    const QString defaultPrimaryUrlsList("http://www.mypublicip.com;http://checkip.eurodyndns.org");
+    const QString defaultSecondaryUrlsList("http://networkoptix.com/myip");
     const int requestTimeoutMs = 4*1000;
     const QLatin1String iPRegExprValue("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
 }
@@ -40,12 +37,15 @@ QString stage(int value) {
 #define PRINT_DEBUG(MSG)
 #endif
 
-QnPublicIPDiscovery::QnPublicIPDiscovery():
+QnPublicIPDiscovery::QnPublicIPDiscovery(QStringList primaryUrls)
+:
     m_stage(Stage::Idle),
-    m_replyInProgress(0)
+    m_replyInProgress(0),
+    m_primaryUrls(std::move(primaryUrls))
 {
-    m_primaryUrls = MSSettings::roSettings()->value(nx_ms_conf::PUBLIC_IP_SERVERS, primaryUrlsList).toString().split(";", QString::SkipEmptyParts);
-    m_secondaryUrls = secondaryUrlsList.split(";", QString::SkipEmptyParts);
+    if (m_primaryUrls.isEmpty())
+        m_primaryUrls = defaultPrimaryUrlsList.split(";", QString::SkipEmptyParts);
+    m_secondaryUrls = defaultSecondaryUrlsList.split(";", QString::SkipEmptyParts);
 
     if (m_primaryUrls.isEmpty()) {
         m_primaryUrls = m_secondaryUrls;
