@@ -46,27 +46,23 @@
 <p style="font-size: 15px;line-height: 20px;margin: 0;padding: 0 20px">Not enough licenses</p>
 <p style="font-size: 15px;line-height: 20px;margin: 0;padding: 0 20px">Camera recording was forcibly stopped on cameras:</p>
 <table class="description" style="color: #263137;padding: 10px 20px;width: 100%;background-color: #F8F9FA;margin-top: 15px">
-    <tbody>
-    {{#aggregated}}
+    <thead>
         <tr>
-            <td style="text-align: left">
-                <img src="{{sourceIcon}}" />
-            </td>
+            <th>Cameras</th>
+            <th>Recording stopped at</th>
+        </tr>
+    </thead>
+    <tbody>
+{{#aggregated}}
+        <tr>
             <td style="text-align: left">
                 <b>{{source}}</b> ({{sourceIp}})
             </td>
-            {{#reason}}
-                <td style="text-align: left">{{reason}}</td>
-            {{/reason}}
+            <td style="text-align: left">{{timestamp}}</td>
         </tr>
-    {{/aggregated}}
+{{/aggregated}}
     </tbody>
 </table>
-
-<div class="date" style="padding: 0 20px">
-    Recording was stopped at<br />
-    <b>{{timestamp}}</b>
-</div>
 
         </td>
         <td style="text-align: left"></td>
