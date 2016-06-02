@@ -39,7 +39,7 @@ namespace nx
                 enum class ClientCommand
                 {
                     None,
-                    Open,               /**< Just open the client */
+                    Client,             /**< Just open the client */
                     LoginToCloud,       /**< Login to cloud. Auth is required. */
                     ConnectToSystem,    /**< Login to system. System id and auth are required. */
                 };
@@ -69,12 +69,23 @@ namespace nx
                 SystemAction systemAction() const;
                 void setSystemAction(SystemAction value);
 
+                struct Auth
+                {
+                    QString user;
+                    QString password;
+                };
+                Auth authenticator() const;
+                void setAuthenticator(const Auth& value);
+                void setAuthenticator(const QString& user, const QString& password);
+
                 /** Raw parameters using is strongly discouraged. */
                 typedef QHash<QString, QString> Parameters;
                 Parameters rawParameters() const;
                 void setRawParameters(const Parameters& value);
 
                 bool isNull() const;
+
+                bool isValid() const;
 
                 QString toString() const;
                 QUrl toUrl() const;

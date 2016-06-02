@@ -8,6 +8,8 @@ namespace
 {
     const QString kDefaultDomain("cloud-demo.hdw.mx");
     const QString kLocalSystemId("localhost:7001");
+    const QString kUser("user");
+    const QString kPassword("password");
 }
 
 namespace nx
@@ -49,16 +51,16 @@ protected:
     SystemUri m_uri;
 };
 
-/** Initial test. Check if default uri is null. */
-TEST_F( SystemUriTest, init )
+/* Null and not-null tests. */
+
+TEST_F( SystemUriTest, defaultNull )
 {
     ASSERT_TRUE(m_uri.isNull());
 }
 
-/* Not-null tests. */
 TEST_F(SystemUriTest, notNullCommand)
 {
-    m_uri.setClientCommand(SystemUri::ClientCommand::Open);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     ASSERT_FALSE(m_uri.isNull());
 }
 
@@ -90,4 +92,59 @@ TEST_F(SystemUriTest, notNullParameters)
     custom["customParameter"] = "customValue";
     m_uri.setRawParameters(custom);
     ASSERT_FALSE(m_uri.isNull());
+}
+
+TEST_F(SystemUriTest, notNullAuth)
+{
+    m_uri.setAuthenticator(kUser, QString());
+    ASSERT_FALSE(m_uri.isNull());
+
+    m_uri.setAuthenticator(QString(), kPassword);
+    ASSERT_FALSE(m_uri.isNull());
+}
+
+/** Validness tests */
+
+TEST_F(SystemUriTest, defaultInvalid)
+{
+    ASSERT_FALSE(m_uri.isValid());
+}
+
+/** Empty client command. */
+TEST_F(SystemUriTest, genericClientCommandInvalid)
+{
+    m_uri.setDomain(kDefaultDomain);
+    ASSERT_FALSE(m_uri.isValid());
+}
+
+/** Default client command. Only domain is required. */
+TEST_F(SystemUriTest, genericClientValid)
+{
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    ASSERT_FALSE(m_uri.isValid());
+
+    m_uri.setDomain(kDefaultDomain);
+    ASSERT_TRUE(m_uri.isValid());
+}
+
+/** Default cloud command. Domain is required. */
+TEST_F(SystemUriTest, genericCloudValidDomain)
+{
+    m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
+    m_uri.setAuthenticator(kUser, kPassword);
+    ASSERT_FALSE(m_uri.isValid());
+
+    m_uri.setDomain(kDefaultDomain);
+    ASSERT_TRUE(m_uri.isValid());
+}
+
+/** Default cloud command. Auth is required. */
+TEST_F(SystemUriTest, genericCloudValidAuth)
+{
+    m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
+    m_uri.setDomain(kDefaultDomain);
+    ASSERT_FALSE(m_uri.isValid());
+
+    m_uri.setAuthenticator(kUser, kPassword);
+    ASSERT_TRUE(m_uri.isValid());
 }

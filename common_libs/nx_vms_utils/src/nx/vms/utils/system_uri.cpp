@@ -99,6 +99,7 @@ public:
     SystemUri::ClientCommand clientCommand;
     QString systemId;
     SystemUri::SystemAction systemAction;
+    SystemUri::Auth authenticator;
     SystemUri::Parameters parameters;
 
     SystemUriPrivate() :
@@ -107,6 +108,7 @@ public:
         clientCommand(SystemUri::ClientCommand::None),
         systemId(),
         systemAction(SystemUri::SystemAction::None),
+        authenticator(),
         parameters()
     {}
 
@@ -195,6 +197,25 @@ void SystemUri::setSystemAction(SystemAction value)
     d->systemAction = value;
 }
 
+SystemUri::Auth SystemUri::authenticator() const
+{
+    Q_D(const SystemUri);
+    return d->authenticator;
+}
+
+void SystemUri::setAuthenticator(const Auth& value)
+{
+    Q_D(SystemUri);
+    d->authenticator = value;
+}
+
+void SystemUri::setAuthenticator(const QString& user, const QString& password)
+{
+    Q_D(SystemUri);
+    d->authenticator.user = user;
+    d->authenticator.password = password;
+}
+
 SystemUri::Parameters SystemUri::rawParameters() const
 {
     Q_D(const SystemUri);
@@ -216,6 +237,11 @@ bool SystemUri::isNull() const
         && d->domain.isEmpty()
         && d->systemId.isEmpty()
         && d->parameters.isEmpty();
+}
+
+bool SystemUri::isValid() const
+{
+    return true;
 }
 
 QString SystemUri::toString() const
