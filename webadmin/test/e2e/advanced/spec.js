@@ -78,7 +78,9 @@ describe('Advanced Page', function () {
         p.saveStoragesButton.click().then(function(){
 
             expect(p.dialog.getText()).toContain("Settings saved");
-            p.dialogButtonClose.click();
+            p.dialog.isDisplayed().then(function (isDisplayed) {
+                if (isDisplayed) p.dialogCloseButton.click();
+            });
 
             p.get();
 
@@ -88,7 +90,7 @@ describe('Advanced Page', function () {
 
             p.saveStoragesButton.click().then(function(){
                 expect(p.dialog.getText()).toContain("Settings saved");
-                p.dialogButtonClose.click();
+                p.dialogCloseButton.click();
 
                 p.get();
                 expect(p.storageLimitInput.getAttribute("value")).toBe("5");
@@ -116,9 +118,9 @@ describe('Advanced Page', function () {
             if (isPresent) {
                 expect(p.dialog.getText()).toContain('No main storage drive was selected for writing -' +
                     ' video will not be recorded on this server. Do you want to continue?');
-                p.dialogButtonOk.click();
+                p.dialogOkButton.click();
                 expect(p.dialog.getText()).toContain('Settings saved');
-                p.dialogButtonClose.click();
+                p.dialogCloseButton.click();
             }
         });
 
@@ -133,7 +135,7 @@ describe('Advanced Page', function () {
         p.saveStoragesButton.click();
         p.dialog.isPresent().then( function (isPresent) {
             if (isPresent) {
-                p.dialogButtonClose.click();
+                p.dialogCloseButton.click();
             }
         });
     });
@@ -170,7 +172,7 @@ describe('Advanced Page', function () {
             // If confirmation alert appears, close it
             p.dialog.isPresent().then( function(isPresent) {
                 if(isPresent) {
-                    p.dialogButtonClose.click();
+                    p.dialogCloseButton.click();
                 }
             });
 
@@ -199,7 +201,7 @@ describe('Advanced Page', function () {
             // If confirmation alert appears, close it
             p.dialog.isPresent().then( function(isPresent) {
                 if(isPresent) {
-                    p.dialogButtonClose.click();
+                    p.dialogCloseButton.click();
                 }
             });
 
@@ -280,7 +282,33 @@ describe('Advanced Page', function () {
         p.saveSysSettings();
     });
 
-    it("All text input fields are changeable; after save changes are applied",function(){
+    it("All number input fields are changeable; after save changes are applied",function(){
+        var initialSettings = [];
+
+        p.sysSettingsNumInputs.each( function(field) {
+            field.getAttribute('value').then(function(value) {
+                initialSettings.push(value);
+            });
+            field.sendKeys('5');
+            expect(field.getAttribute('value')).toContain('5');
+        });
+
+        p.saveSysSettings();
+
+        browser.refresh();
+        browser.waitForAngular();
+
+        p.sysSettingsNumInputs.each( function(field, index) {
+            // Check that settings are saved after refresh
+            expect(field.getAttribute('value')).toContain('5');
+            // Restore initial settings
+            field.clear()
+                .sendKeys(initialSettings[index]);
+        });
+        p.saveSysSettings();
+    });
+
+    xit("All text input fields are changeable; after save changes are applied",function(){
         var initialSettings = p.sysSettingsTextInputs.map( function(field, index) {
             return field.getAttribute('value').then(function(value) {
                 console.log(index, value);
@@ -294,7 +322,7 @@ describe('Advanced Page', function () {
         });
 
         p.saveSysSettings();
-        browser.pause();
+        //browser.pause();
 
         browser.refresh();
         browser.waitForAngular();
