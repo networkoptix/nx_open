@@ -8,6 +8,7 @@
 #include "aio/aioservice.h"
 
 #include "cloud/address_resolver.h"
+#include "cloud/cloud_connect_settings.h"
 #include "cloud/mediator_address_publisher.h"
 #include "cloud/mediator_connector.h"
 #include "cloud/tunnel/outgoing_tunnel_pool.h"
@@ -38,6 +39,10 @@ public:
     inline static
     cloud::OutgoingTunnelPool& outgoingTunnelPool()
     { return s_instance->m_outgoingTunnelPool; }
+
+    inline static
+    cloud::CloudConnectSettings& cloudConnectSettings()
+    { return s_instance->m_cloudConnectSettings; }
 
     static void init(); /** Should be called before any socket use */
     static void deinit(); /** Should be called when sockets are not needed any more */
@@ -72,6 +77,7 @@ private:
     cloud::AddressResolver m_addressResolver;
     cloud::MediatorAddressPublisher m_addressPublisher;
     cloud::OutgoingTunnelPool m_outgoingTunnelPool;
+    cloud::CloudConnectSettings m_cloudConnectSettings;
 };
 
 class SocketGlobalsHolder

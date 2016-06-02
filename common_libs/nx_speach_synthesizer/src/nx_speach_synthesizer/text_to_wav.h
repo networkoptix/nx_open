@@ -1,14 +1,15 @@
-#pragma once
+#ifndef TEXT_TO_WAV_H
+#define TEXT_TO_WAV_H
 
 #include <QtCore/QIODevice>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
-
+#include <nx/utils/thread/wait_condition.h>
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
 #include <nx/utils/singleton.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
+#include <utils/media/audioformat.h>
 
 // TODO: #Elric this header does not belong in the source root.
 
@@ -29,6 +30,8 @@ public:
     virtual ~TextToWaveServer();
 
     virtual void pleaseStop() override;
+
+    QnAudioFormat getAudioFormat();
 
 public slots:
     //!Adds task to the queue
@@ -74,7 +77,9 @@ private:
     QAtomicInt m_prevTaskID;
     QnWaitCondition m_cond;
     QnMutex m_mutex;
+    QnAudioFormat m_audioFormat;
 
     QSharedPointer<SynthetiseSpeechTask> addTaskToQueue( const QString& text, QIODevice* const dest );
 };
 
+#endif  //TEXT_TO_WAV_H

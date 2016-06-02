@@ -63,8 +63,20 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
             api::ConnectionRequestedEvent connectionRequestedEvent;
             connectionRequestedEvent.connectSessionId = std::move(request.connectSessionId);
             connectionRequestedEvent.originatingPeerID = std::move(request.originatingPeerID);
-            connectionRequestedEvent.udpEndpointList.emplace_back(
-                originatingPeerConnection->getSourceAddress());
+            std::move(
+                request.udpEndpointList.begin(),
+                request.udpEndpointList.end(),
+                std::back_inserter(connectionRequestedEvent.udpEndpointList));
+            const auto originatingPeerSourceAddress = originatingPeerConnection->getSourceAddress();
+            //setting ports if needed
+            for (auto& endpoint: connectionRequestedEvent.udpEndpointList)
+            {
+                if (endpoint.port == 0)
+                    endpoint.port = originatingPeerSourceAddress.port;
+            }
+            if (!request.ignoreSourceAddress)
+                connectionRequestedEvent.udpEndpointList.emplace_back(
+                    originatingPeerSourceAddress);
             connectionRequestedEvent.connectionMethods =
                 api::ConnectionMethod::udpHolePunching;
             connectionRequestedEvent.params = m_settings.connectionParameters();

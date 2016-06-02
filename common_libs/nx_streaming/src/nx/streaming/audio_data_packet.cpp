@@ -29,7 +29,7 @@ QnCodecAudioFormat::QnCodecAudioFormat(const QnConstMediaContextPtr& c)
     if (c->getSampleRate())
         setSampleRate(c->getSampleRate());
 
-    if (c->getChannels()) 
+    if (c->getChannels())
         setChannelCount(c->getChannels());
 
     //setCodec("audio/pcm");
@@ -88,6 +88,17 @@ void QnCompressedAudioData::assign(const QnCompressedAudioData* other)
 {
     QnAbstractMediaData::assign(other);
     duration = other->duration;
+}
+
+quint64 QnCompressedAudioData::getDurationMs() const
+{
+    if (!context)
+        return 0;
+
+    if (context->getSampleRate())
+        return (quint64)((context->getFrameSize() / (double)context->getSampleRate()) * 1000);
+    else
+        return 0;
 }
 
 

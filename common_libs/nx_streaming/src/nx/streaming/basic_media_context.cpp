@@ -16,7 +16,7 @@ QnBasicMediaContext::~QnBasicMediaContext()
 QnBasicMediaContext* QnBasicMediaContext::cloneWithoutExtradata() const
 {
     QnBasicMediaContext* newContext = new QnBasicMediaContext();
-    
+
     // Copy data fields by value.
     *(newContext->m_data) = *m_data;
 
@@ -152,4 +152,9 @@ quint64 QnBasicMediaContext::getChannelLayout() const
 int QnBasicMediaContext::getBlockAlign() const
 {
     return m_data->blockAlign;
+}
+
+int QnBasicMediaContext::getFrameSize() const
+{
+    return 0;
 }
