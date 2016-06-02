@@ -6,7 +6,7 @@ using namespace nx::vms::utils;
 
 namespace
 {
-    const QString kAuthKey = lit("auth=");
+    const QString kAuthKey = "auth";
 
     const SystemUri::Scope kDefaultScope = SystemUri::Scope::Generic;
     const SystemUri::Protocol kDefaultProtocol = SystemUri::Protocol::Http;
@@ -39,86 +39,21 @@ namespace
     {
         {SystemUri::SystemAction::View, "view"}
     };
-}
 
-SystemUriResolver::SystemUriResolver():
-    m_valid(false)
-{
-
-}
-
-SystemUriResolver::SystemUriResolver(const QUrl &uri):
-    m_valid(false),
-    m_uri(uri)
-{
-    parseUri();
-}
-
-bool SystemUriResolver::isValid() const
-{
-    return m_valid;
-}
-
-SystemUriResolver::Result SystemUriResolver::result() const
-{
-    return m_result;
-}
-
-bool SystemUriResolver::parseUri()
-{
-    NX_ASSERT(!m_uri.isEmpty(), Q_FUNC_INFO, "Empty uri, invalid class usage");
-    if (m_uri.isEmpty())
-        return false;
-
-    if (!m_uri.isValid())
-        return false;
-
-    QString encodedAuth = m_uri.query(QUrl::FullyDecoded);
-    if (!encodedAuth.startsWith(kAuthKey))
-        return false;
-
-    m_result.actions.clear();
-
-    encodedAuth = encodedAuth.mid(kAuthKey.length());
-
-    QString system = m_uri.host();
-    int port = m_uri.port();
-
-    QString auth = QString::fromUtf8(QByteArray::fromBase64(encodedAuth.toUtf8()));
-
-    QStringList credentials = auth.split(L':');
-    m_result.login      = credentials.size() > 0 ? credentials[0] : QString();
-    m_result.password   = credentials.size() > 1 ? credentials[1] : QString();
-
-    /* For now all valid actions must have valid credentials. */
-    m_valid = credentials.size() == 2;
-
-    /* Check connect to cloud system */
-    if (!QnUuid::fromStringSafe(system).isNull())
+    void splitString(const QString& source, QChar separator, QString& left, QString& right)
     {
-        m_result.serverUrl.setScheme(lit("http"));
-        m_result.serverUrl.setHost(system);
-        m_result.serverUrl.setUserName(m_result.login);
-        m_result.serverUrl.setPassword(m_result.password);
-        m_result.actions << Action::LoginToCloud;
-        m_result.actions << Action::ConnectToServer;
+        int idx = source.indexOf(separator);
+        if (idx < 0)
+        {
+            left = source;
+            right = QString();
+        }
+        else
+        {
+            left = source.left(idx);
+            right = source.mid(idx + 1);
+        }
     }
-    /* Check connect to local system */
-    else if (port > 0)
-    {
-        m_result.serverUrl.setScheme(lit("http"));
-        m_result.serverUrl.setHost(system);
-        m_result.serverUrl.setPort(port);
-        m_result.serverUrl.setUserName(m_result.login);
-        m_result.serverUrl.setPassword(m_result.password);
-        m_result.actions << Action::ConnectToServer;
-    }
-    else
-    {
-        m_result.actions << Action::LoginToCloud;
-    }
-
-    return m_valid;
 }
 
 class nx::vms::utils::SystemUriPrivate
@@ -169,6 +104,24 @@ public:
 
         QString clientCommandStr = path.takeFirst().toLower();
         clientCommand = clientCommandToString.key(clientCommandStr, SystemUri::ClientCommand::None);
+
+        if (!url.hasQuery())
+            return;
+
+        QStringList query = url.query(QUrl::FullyDecoded).split('&', QString::SkipEmptyParts);
+        for (const QString& parameter : query)
+        {
+            QString key, value;
+            splitString(parameter, '=', key, value);
+            parameters.insert(key, value);
+        }
+
+        QString encodedAuth = parameters.take(kAuthKey);
+        if (!encodedAuth.isEmpty())
+        {
+            QString auth = QString::fromUtf8(QByteArray::fromBase64(encodedAuth.toUtf8()));
+            splitString(auth, ':', authenticator.user, authenticator.password);
+        }
     }
 
     QString toString() const

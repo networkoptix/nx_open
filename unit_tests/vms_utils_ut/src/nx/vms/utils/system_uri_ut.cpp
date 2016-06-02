@@ -412,5 +412,6 @@ http://localhost:7001/system/view?auth=YWJyYTprYWRhYnJh
 
 Native Direct Links
 nx-vms://localhost:7001/system?auth=YWJyYTprYWRhYnJh
+nx-vms://localhost:7001/system/view?auth=YWJyYTprYWRhYnJh
 nx-vms://d0b73d03-3e2e-405d-8226-019c83b13a08/system?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
 */
