@@ -209,7 +209,13 @@ void SystemUri::setRawParameters(const Parameters& value)
 
 bool SystemUri::isNull() const
 {
-    return true;
+    Q_D(const SystemUri);
+    return d->protocol == kDefaultProtocol
+        && d->clientCommand == ClientCommand::None
+        && d->systemAction == SystemAction::None
+        && d->domain.isEmpty()
+        && d->systemId.isEmpty()
+        && d->parameters.isEmpty();
 }
 
 QString SystemUri::toString() const
