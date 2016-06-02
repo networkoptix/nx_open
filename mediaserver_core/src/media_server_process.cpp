@@ -225,7 +225,11 @@
 #include "rest/handlers/script_list_rest_handler.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
+
+#if !defined(EDGE_SERVER)
 #include <nx_speach_synthesizer/text_to_wav.h>
+#endif
+
 #include <streaming/audio_streamer_pool.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
 
@@ -2193,8 +2197,10 @@ void MediaServerProcess::run()
 #endif //ENABLE_ONVIF
 #endif
 
+#if !defined(EDGE_SERVER)
     std::unique_ptr<TextToWaveServer> speechSynthesizer(new TextToWaveServer());
     speechSynthesizer->start();
+#endif
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
 

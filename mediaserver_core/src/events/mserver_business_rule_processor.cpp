@@ -2,6 +2,7 @@
 
 #include <QtCore/QList>
 
+#include <version.h>
 #include "api/app_server_connection.h"
 
 #include "business/actions/panic_business_action.h"
@@ -47,7 +48,11 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include "utils/common/delayed.h"
 #include <business/business_event_connector.h>
+
+#if !defined(EDGE_SERVER)
 #include <providers/speach_synthesis_data_provider.h>
+#endif
+
 #include <providers/stored_file_data_provider.h>
 #include <streaming/audio_streamer_pool.h>
 #include <plugins/resource/archive/archive_stream_reader.h>
@@ -320,6 +325,7 @@ bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusi
 
 bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusinessActionPtr& action)
 {
+#if !defined(EDGE_SERVER)
     const auto params = action->getParams();
     const auto text = params.sayText;
     const auto resources = qnResPool
@@ -349,6 +355,9 @@ bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusine
 
     speachProvider->startIfNotRunning();
     return true;
+#else
+    return true;
+#endif
 }
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessActionPtr& action)

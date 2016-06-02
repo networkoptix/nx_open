@@ -1,4 +1,7 @@
 #pragma once
+
+#if !defined(EDGE_SERVER)
+
 #include <core/dataprovider/abstract_streamdataprovider.h>
 #include <QtCore/QString>
 
@@ -29,3 +32,4 @@ private:
     QByteArray m_rawBuffer;
     size_t m_curPos;
 };
+#endif
