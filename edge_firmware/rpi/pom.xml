@@ -24,22 +24,24 @@
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/../..</root.dir>
     </properties>
-    <profile>
-        <id>linux-arm-bpi</id>
-        <activation>
-            <activeByDefault>false</activeByDefault>
-            <os>
-                <family>unix</family>
-                <name>linux</name>
-            </os>
-            <property>
-                <name>box</name>
-                <value>bpi</value>
-            </property>
-        </activation>
-        <properties>
-            <rdep.linux.packages>uboot-2014.04-10733-gbb5691c-dirty-vanilla</rdep.linux.packages>
-            <linux.oslibs>-lz</linux.oslibs>
-        </properties>
-    </profile>      
+    <profiles>
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>uboot-2014.04-10733-gbb5691c-dirty-vanilla</rdep.linux.packages>
+                <linux.oslibs>-lz</linux.oslibs>
+            </properties>
+        </profile>      
+    </profiles>      
 </project>
