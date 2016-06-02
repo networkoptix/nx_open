@@ -189,7 +189,7 @@ bool QnAxisAudioTransmitter::startTransmission()
     if (m_state == TransmitterState::ReadyForTransmission)
     {
         m_socket = httpClient->takeSocket();
-        m_socket->setNonBlockingMode(true);
+        m_socket->setNonBlockingMode(false);
         return true;
     }
     else
