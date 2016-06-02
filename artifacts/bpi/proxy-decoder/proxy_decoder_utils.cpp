@@ -1,63 +1,10 @@
 #include "proxy_decoder_utils.h"
 
-#include <chrono>
 #include <fstream>
-#include <deque>
-#include <numeric>
 
 #include "proxy_decoder.h"
 
 NX_UTILS_API ProxyDecoderFlagConfig conf("proxydecoder");
-
-bool outputVdpauCalls()
-{
-    return conf.outputVdpauCalls;
-}
-
-bool enableX11Vdpau()
-{
-    return conf.enableX11Vdpau;
-}
-
-bool suppressX11LogVdpau()
-{
-    return conf.suppressX11LogVdpau;
-}
-
-long getTimeMs()
-{
-    return std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
-}
-
-void logTimeMs(long oldTimeMs, const char* tag)
-{
-    long timeMs = getTimeMs();
-    std::cerr << "TIME ms: " << (timeMs - oldTimeMs) << " [" << tag << "]\n";
-}
-
-void debugShowFps(const char* prefix)
-{
-    static const int kFpsCount = 30;
-    static std::deque<long> deltaList;
-    static long prevT = 0;
-
-    const long t = getTimeMs();
-    if (prevT != 0)
-    {
-        const long delta = t - prevT;
-        deltaList.push_back(delta);
-        if (deltaList.size() > kFpsCount)
-            deltaList.pop_front();
-        assert(!deltaList.empty());
-        double deltaAvg = std::accumulate(deltaList.begin(), deltaList.end(), 0.0)
-            / deltaList.size();
-
-        fprintf(stderr, "%sFPS avg %4.1f, %4ld ms, avg %4.0f ms\n",
-            prefix, 1000.0 / deltaAvg, delta, deltaAvg);
-    }
-    prevT = t;
-}
 
 void debugDrawCheckerboardArgb(
     uint8_t* argbBuffer, int lineSizeBytes, int frameW, int frameH)
@@ -113,6 +60,8 @@ void debugDrawCheckerboardY(uint8_t* yBuffer, int lineLen, int frameW, int frame
         line0 = 0;
 }
 
+namespace {
+
 static void debugPutPixelNative(uint8_t* yNative, int frameW, int frameH,
     int x, int y, int color)
 {
@@ -128,6 +77,8 @@ static void debugPutPixelNative(uint8_t* yNative, int frameW, int frameH,
 {
     debugPutPixelNative(yNative, frameW, frameH, x, y, color ? 0xFE : 0);
 }
+
+} // namespace
 
 void debugDrawCheckerboardYNative(uint8_t* yNative, int frameW, int frameH)
 {
@@ -154,6 +105,7 @@ void debugDrawCheckerboardYNative(uint8_t* yNative, int frameW, int frameH)
         line0 = 0;
 }
 
+namespace {
 
 static const int kFontWidth = 4;
 static const int kFontHeight = 6;
@@ -181,6 +133,8 @@ static const char kFont[][kFontHeight * kFontWidth * kFontStride + /*'\0'*/ 1] =
 "    000 00   00  00  00  0    0 0 0 000  0  0 0 000 0 0 0 0  0  00   00 0   00    0  00  0  0 0 0 0  0  000  00  0  00          "
 "                            00          0                       0     0                                                         "
 };
+
+} // namespace
 
 void debugPrintNative(uint8_t* yNative, int frameW, int frameH,
     int x0, int y0, const char* text)

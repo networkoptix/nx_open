@@ -40,15 +40,23 @@ VdpStatus vdp_device_create_x11(Display *display,
 	if (!dev)
 		return VDP_STATUS_RESOURCES;
 
-	if (display)
+	if (screen != -1)
 	{
+		if (!display)
+			return VDP_STATUS_INVALID_POINTER;
 		dev->display = XOpenDisplay(XDisplayString(display));
 		dev->screen = screen;
+		dev->outFullScreenWidthHeight = NULL;
 	}
 	else
 	{
+		// Nx extention to VDPAU: Avoid using X11 when screen is -1; return full-screen size via
+		// *display, assuming it points to an out-parameter: uint32_t value which receives
+		// ((height << 16) | width) when VdpPresentationQueueTargetCreateX11() is called.
+		// ATTENTION: This is currently supported only in disp v1.
 		dev->display = NULL;
 		dev->screen = -1;
+		dev->outFullScreenWidthHeight = (uint32_t*) display;
 	}
 
 	dev->cedrus = cedrus_open();

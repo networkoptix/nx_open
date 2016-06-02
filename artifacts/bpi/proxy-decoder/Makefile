@@ -1,8 +1,9 @@
 TARGET = libproxydecoder.so
-SRC = flag_config.cpp vdpau_helper.cpp proxy_decoder_utils.cpp \
+SRC = nx/utils/flag_config.cpp nx/utils/debug_utils.cpp \
+    vdpau_utils.cpp vdpau_session.cpp proxy_decoder_utils.cpp \
 	proxy_decoder_impl.cpp proxy_decoder_stub.cpp
 CXXFLAGS ?= -Wall -Wno-sign-compare -Wfatal-errors -O3 -std=c++11
-LDFLAGS ?=
+LDFLAGS ?= -fvisibility=hidden
 LIBS = -L/opt/ffmpeg/lib -lavcodec -lavfilter -lavformat -lavutil -lavdevice -lswscale \
 	-lvdpau -lcedrus -lpixman-1
 CXX ?= g++
@@ -15,7 +16,7 @@ OBJ = $(addsuffix .o,$(basename $(SRC)))
 DEP = $(addsuffix .d,$(basename $(SRC)))
 
 MODULEDIR=/opt/networkoptix/lite_client/lib
-CONF_DEFINES = -DNX_UTILS_API='__attribute__ ((visibility ("hidden")))'
+CONF_DEFINES = -DNX_UTILS_API= -DPROXY_DECODER_API='__attribute__ ((visibility ("default")))' -fvisibility=hidden
 
 .PHONY: clean all build install uninstall
 

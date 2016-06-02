@@ -54,6 +54,8 @@ typedef struct
 	int g2d_fd;
 	int osd_enabled;
 	int g2d_enabled;
+	// Nx extension to VDPAU: If run without X11, receives full-screen size: (height << 16) | width
+	uint32_t* outFullScreenWidthHeight;
 } device_ctx_t;
 
 typedef struct

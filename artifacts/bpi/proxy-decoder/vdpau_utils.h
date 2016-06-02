@@ -6,6 +6,9 @@
 #include <vdpau/vdpau.h>
 #include <vdpau/vdpau_x11.h>
 
+// If run without X11, filled after calling vdp_presentation_queue_target_create_x11().
+extern uint32_t fullScreenWidthHeight; //< (height << 16) | width
+
 // VDPAU function pointers filled by createVdpDevice().
 extern VdpGetProcAddress* vdp_get_proc_address;
 extern VdpGetErrorString* vdp_get_error_string;

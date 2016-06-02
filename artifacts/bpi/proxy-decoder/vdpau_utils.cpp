@@ -1,4 +1,4 @@
-#include "vdpau_helper.h"
+#include "vdpau_utils.h"
 
 #include <stdio.h> //< For fileno
 #include <assert.h>
@@ -9,6 +9,8 @@
 #include "proxy_decoder_utils.h"
 
 //-------------------------------------------------------------------------------------------------
+
+uint32_t fullScreenWidthHeight = 0;
 
 VdpGetProcAddress* vdp_get_proc_address = nullptr;
 VdpGetErrorString* vdp_get_error_string = nullptr;
@@ -60,6 +62,8 @@ void vdpCheckHandle(uint32_t handle, const char* name)
     }
 }
 
+namespace {
+
 static Drawable createX11Window(Display* display)
 {
     const int screen = DefaultScreen(display);
@@ -78,6 +82,7 @@ static Drawable createX11Window(Display* display)
     const Window window = XCreateSimpleWindow(
         display, rootWindow, /*x*/ 0, /*y*/ 0, rootWindowAttrs.width, rootWindowAttrs.height,
         /*border_width*/ 0, black, white);
+    fullScreenWidthHeight = (rootWindowAttrs.height << 16) | rootWindowAttrs.width;
 
     if (!XMapWindow(display, window))
     {
@@ -99,7 +104,7 @@ static VdpDevice getVdpDeviceX11(Drawable* outDrawable)
     assert(outDrawable);
 
     PRINT << "Opening X11 Display...";
-    Display *display = XOpenDisplay(nullptr);
+    Display* display = XOpenDisplay(nullptr);
     if (display == nullptr)
     {
         PRINT << "ERROR: XOpenDisplay(nullptr) returned null.";
@@ -144,8 +149,9 @@ static VdpDevice getVdpDeviceWithoutX11(Drawable* outDrawable)
     assert(outDrawable);
     *outDrawable = 0;
     VdpDevice vdpDevice = VDP_INVALID_HANDLE;
-    VDP(vdp_device_create_x11(nullptr, -1, &vdpDevice, &vdp_get_proc_address));
 
+    VDP(vdp_device_create_x11(
+        (Display*) &fullScreenWidthHeight, -1, &vdpDevice, &vdp_get_proc_address));
     vdpCheckHandle(vdpDevice, "Device");
     assert(vdp_get_proc_address);
 
@@ -213,6 +219,8 @@ static void getProcAddresses(VdpDevice vdpDevice)
         (void**) &vdp_output_surface_get_parameters);
 }
 
+} // namespace
+
 VdpDevice createVdpDevice(Drawable* outDrawable)
 {
     VdpDevice vdpDevice =
@@ -241,6 +249,8 @@ void getVideoSurfaceYuvNative(VdpVideoSurface surface, YuvNative* yuvNative)
         VDP_YCBCR_FORMAT_YV12, dest, /*pitches*/ nullptr));
 }
 
+namespace {
+
 static std::string toStrOrHex(const char* valueStr, uint32_t value)
 {
     if (valueStr)
@@ -248,6 +258,8 @@ static std::string toStrOrHex(const char* valueStr, uint32_t value)
     else
         return stringFormat("0x%08X", value);
 }
+
+} // namespace
 
 uint32_t calcYuvNativeQuickHash(const YuvNative* yuvNative)
 {
@@ -296,6 +308,8 @@ const char* vdpYCbCrFormatToStr(VdpYCbCrFormat v)
     }
 }
 
+namespace {
+
 static FILE* debugCreateFrameDumpFile(
     const char *filesPath, int w, int h, int n, const char *suffix, const char *mode)
 {
@@ -321,6 +335,8 @@ static void debugDumpFrameToFile(
     }
     fclose(fp);
 }
+
+} // namespace
 
 void debugDumpYuvSurfaceToFiles(
     const char *filesPath, VdpVideoSurface surface,

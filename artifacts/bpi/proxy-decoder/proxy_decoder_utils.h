@@ -1,6 +1,6 @@
 #pragma once
 
-#include "flag_config.h"
+#include "nx/utils/flag_config.h"
 struct NX_UTILS_API ProxyDecoderFlagConfig: public nx::utils::FlagConfig
 {
     using nx::utils::FlagConfig::FlagConfig;
@@ -8,12 +8,13 @@ struct NX_UTILS_API ProxyDecoderFlagConfig: public nx::utils::FlagConfig
     NX_FLAG(0, disable, "Use stub implementation without any display.");
     NX_FLAG(0, enableStub, "Use checkerboard/surface-number stub.");
     NX_FLAG(0, enableStubSurfaceNumbers, "In 'display' mode, draw surface number instead of checkerboard.");
-    NX_FLAG(0, enableFps, "");
+    NX_FLAG(0, enableFps, "Print FPS stat in each displayDecoded().");
+    NX_FLAG(0, enableFrameHash, "Compare frame hash to the prev one when printing FPS.");
     NX_FLAG(0, disableCscMatrix, "Avoid setting VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX.");
     NX_INT_PARAM(8, videoSurfaceCount, "1..16");
     NX_INT_PARAM(0, outputSurfaceCount, "0 (alloc/dealloc for each frame), 1..255).");
 
-    // vdpau_helper
+    // vdpau_utils
     NX_FLAG(0, outputVdpauCalls, "Log each VDPAU call (errors are logged anyway).");
     NX_FLAG(0, enableX11Vdpau, "Open X11 Display for VDPAU (otherwise, use null for Display).");
     NX_FLAG(0, suppressX11LogVdpau, "If enableX11Vdpau, do not suppress X logging to stderr.");
@@ -32,53 +33,24 @@ struct NX_UTILS_API ProxyDecoderFlagConfig: public nx::utils::FlagConfig
 };
 extern NX_UTILS_API ProxyDecoderFlagConfig conf;
 
-// Configuration: should be defined before including this header.
-//#define OUTPUT_PREFIX "<ModuleName>: "
-
 #include <cassert>
 #include <iostream>
 #include <vector>
 #include <string>
 #include <memory>
+#include <cstdint>
+#include <deque>
 
 extern "C" {
 #include <libavcodec/vdpau.h>
 } // extern "C"
 
-// Log execution of a line - to use, put double-L at the beginning of the line.
-#define LL std::cerr << "####### line " << __LINE__ << " [" << __FILE__ << "]\n";
+// Configuration: should be defined before including this header.
+//#define OUTPUT_PREFIX "<ModuleName>: "
+#include "nx/utils/debug_utils.h"
 
-namespace {
-
-template<typename... Args>
-std::string stringFormat(const std::string& format, Args... args)
-{
-    size_t size = snprintf(nullptr, 0, format.c_str(), args...) + 1; // Extra space for '\0'.
-    std::unique_ptr<char[]> buf(new char[size]);
-    snprintf(buf.get(), size, format.c_str(), args...);
-    return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside.
-}
-
-struct EndWithEndl
-{
-    ~EndWithEndl()
-    {
-        std::cerr << std::endl;
-    }
-};
-
-} // namespace
-
-#define OUTPUT if (!conf.enableOutput) {} else EndWithEndl() /*operator,*/, std::cerr << OUTPUT_PREFIX
-
-#define PRINT EndWithEndl() /*operator,*/, std::cerr << OUTPUT_PREFIX
-
-long getTimeMs();
-void logTimeMs(long oldTime, const char* tag);
-#define TIME_BEGIN(TAG) long TIME_##TAG = conf.enableTime ? getTimeMs() : 0
-#define TIME_END(TAG) if(conf.enableTime) logTimeMs(TIME_##TAG, #TAG)
-
-void debugShowFps(const char* prefix);
+#include "nx/utils/string_utils.h"
+using nx::utils::stringFormat;
 
 /**
  * Draw a colored checkerboard in RGB.

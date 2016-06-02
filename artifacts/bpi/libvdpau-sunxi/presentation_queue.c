@@ -47,7 +47,7 @@ VdpStatus vdp_presentation_queue_target_create_x11(VdpDevice device,
     if (!qt)
         return VDP_STATUS_RESOURCES;
 
-    qt->drawable = 0;
+	qt->drawable = drawable;
     if (dev->display)
     {
         if (!drawable)
@@ -57,13 +57,12 @@ VdpStatus vdp_presentation_queue_target_create_x11(VdpDevice device,
 		}
 		else
 		{
-			qt->drawable = drawable;
-			XSetWindowBackground(dev->display, drawable, 0x000102);
+			XSetWindowBackground(dev->display, qt->drawable, 0x000102);
 		}
     }
 
     VDPAU_DBG("Trying to open /dev/disp v1");
-    qt->disp = sunxi_disp_open(dev->osd_enabled);
+    qt->disp = sunxi_disp_open(dev->osd_enabled, dev->outFullScreenWidthHeight);
 
     if (!qt->disp)
     {
@@ -207,17 +206,9 @@ VdpStatus vdp_presentation_queue_display(VdpPresentationQueue presentation_queue
 		if (conf.enableXClearWindow)
             XClearWindow(q->device->display, q->target->drawable);
 	}
-	else if (!q->device->display && q->target->drawable)
-	{
-		// Nx extension to Vdpau: If used without X11, drawable provides video coords:
-		// x in low 16 bits, and y in high 16 bits.
-		x = q->target->drawable & 0xFFFF;
-		y = (q->target->drawable >> 16) & 0xFFFF;
-		VDPAU_DBG_ONCE("Video coords: x: %d, y: %d; provided by Drawable", x, y);
-	}
 	else
 	{
-		VDPAU_DBG_ONCE("Video coords: x: 0, y: 0; used defaults because Drawable not supplied");
+		VDPAU_DBG_ONCE("Video coords: x: 0, y: 0; defaults because either Display or Drawable not supplied");
 	}
 
 	if (os->vs)

@@ -3,14 +3,16 @@ project(proxy_decoder)
 
 # ATTENTION: This cmake file is not intended for building but rather just for IDE convenience.
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNX_UTILS_API=")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNX_UTILS_API= -DPROXY_DECODER_API=")
 
 set(SOURCE_FILES
     proxy_decoder.h
     flag_config.h
     flag_config.cpp
-    vdpau_helper.h
-    vdpau_helper.cpp
+    vdpau_utils.h
+    vdpau_utils.cpp
+    vdpau_session.h
+    vdpau_session.cpp
     proxy_decoder_utils.h
     proxy_decoder_utils.cpp
     proxy_decoder_impl.cpp

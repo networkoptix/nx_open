@@ -37,7 +37,7 @@ struct Conf CONFIG_BODY;
 
 #if defined(__cplusplus) //< Included from conf.cpp
 
-    #include "flag_config.h"
+    #include "nx/utils/flag_config.h"
 
     extern "C" {
         NX_UTILS_API Conf conf;

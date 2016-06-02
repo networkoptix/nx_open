@@ -20,6 +20,8 @@
 #ifndef SUNXI_DISP_H_
 #define SUNXI_DISP_H_
 
+#include <stdint.h>
+
 typedef struct output_surface_ctx_struct output_surface_ctx_t;
 
 struct sunxi_disp
@@ -31,7 +33,7 @@ struct sunxi_disp
 	void (*close_osd_layer)(struct sunxi_disp *sunxi_disp);
 };
 
-struct sunxi_disp *sunxi_disp_open(int osd_enabled);
+struct sunxi_disp *sunxi_disp_open(int osd_enabled, uint32_t* outWidthHeight);
 struct sunxi_disp *sunxi_disp2_open(int osd_enabled);
 struct sunxi_disp *sunxi_disp1_5_open(int osd_enabled);
 
