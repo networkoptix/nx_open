@@ -20,7 +20,7 @@
         <template>app</template>
 
         <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
-        <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_streaming -lnx_network -lcommon -lnx_utils -ludt</global.libs>
+        <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_network -lnx_utils -ludt</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU</linux.oslibs>
         <android.oslibs>-lturbojpeg</android.oslibs>
@@ -238,7 +238,7 @@
                 </property>
             </activation>
             <properties>
-                <rdep.linux.packages>quazip opengl-es-mali openal</rdep.linux.packages>
+                <rdep.linux.packages>quazip opengl-es-mali openal libstdc++-6.0.20 ffmpeg-3.0.2 ldpreloadhook-1.0 libpixman-0.34.0 libump-3.0 libvdpau-sunxi-1.0 libcedrus-1.0 libvdpau-1.0.4.1</rdep.linux.packages>
                 <linux.oslibs>-lz</linux.oslibs>
             </properties>
         </profile>
