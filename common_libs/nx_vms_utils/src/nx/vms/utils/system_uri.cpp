@@ -10,6 +10,7 @@ namespace
 
     const SystemUri::Scope kDefaultScope = SystemUri::Scope::Generic;
     const SystemUri::Protocol kDefaultProtocol = SystemUri::Protocol::Http;
+    const SystemUri::SystemAction kDefaultSystemAction = SystemUri::SystemAction::View;
 }
 
 SystemUriResolver::SystemUriResolver():
@@ -110,7 +111,7 @@ public:
         domain(),
         clientCommand(SystemUri::ClientCommand::None),
         systemId(),
-        systemAction(SystemUri::SystemAction::None),
+        systemAction(kDefaultSystemAction),
         authenticator(),
         parameters()
     {}
@@ -124,7 +125,6 @@ public:
     {
         return protocol == kDefaultProtocol
             && clientCommand == SystemUri::ClientCommand::None
-            && systemAction == SystemUri::SystemAction::None
             && domain.isEmpty()
             && systemId.isEmpty()
             && authenticator.user.isEmpty()
@@ -146,6 +146,17 @@ public:
         return false;
     }
 
+    bool operator==(const SystemUriPrivate& other) const
+    {
+        return protocol == other.protocol
+            && clientCommand == other.clientCommand
+            && domain == other.domain
+            && systemId == other.domain
+            && authenticator.user == other.authenticator.user
+            && authenticator.password == other.authenticator.password
+            && parameters == other.parameters;
+    }
+
 private:
     bool isValidGenericUri() const
     {
@@ -161,7 +172,6 @@ private:
             case SystemUri::ClientCommand::ConnectToSystem:
                 return hasDomain
                     && hasAuth
-                    && systemAction != SystemUri::SystemAction::None
                     && !systemId.isEmpty();
             default:
                 break;
@@ -186,10 +196,8 @@ private:
             case SystemUri::ClientCommand::Client:
                 return true;
             case SystemUri::ClientCommand::LoginToCloud:
-                return hasAuth;
             case SystemUri::ClientCommand::ConnectToSystem:
-                return hasAuth
-                    && systemAction != SystemUri::SystemAction::None;
+                return hasAuth;
             default:
                 break;
         }
@@ -333,10 +341,16 @@ bool SystemUri::isValid() const
 
 QString SystemUri::toString() const
 {
-    return QString();
+    Q_D(const SystemUri);
+    return d->domain;
 }
 
 QUrl SystemUri::toUrl() const
 {
     return QUrl();
+}
+
+bool SystemUri::operator==(const SystemUri& other) const
+{
+    return *d_ptr.data() == *other.d_ptr.data();
 }

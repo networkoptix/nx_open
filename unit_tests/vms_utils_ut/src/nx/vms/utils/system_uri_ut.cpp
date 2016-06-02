@@ -33,7 +33,8 @@ using namespace nx::vms::utils;
         http://localhost:7001/system/view?auth=YWJyYTprYWRhYnJh
 
     Native Direct Links
-        nx-vms://localhost:7001/ - works as /system
+        nx-vms://localhost:7001/ - works as /client
+        nx-vms://localhost:7001/?auth=YWJyYTprYWRhYnJh - works as /system
         nx-vms://localhost:7001/client
         nx-vms://localhost:7001/cloud?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
         nx-vms://localhost:7001/system?auth=YWJyYTprYWRhYnJh - auth will be used to login directly
@@ -79,6 +80,12 @@ namespace nx
                 *os << toString(val).toStdString();
                 //*os << QnLexical::serialized(val).toStdString();
             }
+
+            void PrintTo(const SystemUri& val, ::std::ostream* os)
+            {
+                *os << val.toString().toStdString();
+                //*os << QnLexical::serialized(val).toStdString();
+            }
         }
     }
 }
@@ -87,6 +94,13 @@ namespace nx
 
 class SystemUriTest : public testing::Test
 {
+public:
+    void validateLink(const QString& link)
+    {
+        SystemUri parsed(link);
+        ASSERT_EQ(m_uri, parsed);
+    }
+
 protected:
     SystemUri m_uri;
 };
@@ -194,7 +208,6 @@ TEST_F(SystemUriTest, genericSystemValidDomain)
 {
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
     m_uri.setAuthenticator(kUser, kPassword);
-    m_uri.setSystemAction(SystemUri::SystemAction::View);
     m_uri.setSystemId(kLocalSystemId);
     ASSERT_FALSE(m_uri.isValid());
 
@@ -207,24 +220,10 @@ TEST_F(SystemUriTest, genericSystemValidAuth)
 {
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
     m_uri.setDomain(kGenericDomain);
-    m_uri.setSystemAction(SystemUri::SystemAction::View);
     m_uri.setSystemId(kLocalSystemId);
     ASSERT_FALSE(m_uri.isValid());
 
     m_uri.setAuthenticator(kUser, kPassword);
-    ASSERT_TRUE(m_uri.isValid());
-}
-
-/** Generic system command. System Action is required. */
-TEST_F(SystemUriTest, genericSystemValidSystemAction)
-{
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    m_uri.setDomain(kGenericDomain);
-    m_uri.setAuthenticator(kUser, kPassword);
-    m_uri.setSystemId(kLocalSystemId);
-    ASSERT_FALSE(m_uri.isValid());
-
-    m_uri.setSystemAction(SystemUri::SystemAction::View);
     ASSERT_TRUE(m_uri.isValid());
 }
 
@@ -234,7 +233,6 @@ TEST_F(SystemUriTest, genericSystemValidSystemId)
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
     m_uri.setDomain(kGenericDomain);
     m_uri.setAuthenticator(kUser, kPassword);
-    m_uri.setSystemAction(SystemUri::SystemAction::View);
     ASSERT_FALSE(m_uri.isValid());
 
     m_uri.setSystemId(kLocalSystemId);
@@ -245,7 +243,6 @@ TEST_F(SystemUriTest, genericSystemValidSystemId)
 TEST_F(SystemUriTest, directSystemValidSystemId)
 {
     m_uri.setScope(SystemUri::Scope::Direct);
-    m_uri.setSystemAction(SystemUri::SystemAction::View);
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
     ASSERT_FALSE(m_uri.isValid());
 
@@ -257,7 +254,6 @@ TEST_F(SystemUriTest, directSystemValidSystemId)
 TEST_F(SystemUriTest, directSystemValidClient)
 {
     m_uri.setScope(SystemUri::Scope::Direct);
-    m_uri.setSystemAction(SystemUri::SystemAction::View);
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
     ASSERT_FALSE(m_uri.isValid());
 
@@ -270,7 +266,6 @@ TEST_F(SystemUriTest, directSystemValidClientCommandHttp)
 {
     m_uri.setScope(SystemUri::Scope::Direct);
     ASSERT_EQ(SystemUri::Protocol::Http, m_uri.protocol());
-    m_uri.setSystemAction(SystemUri::SystemAction::View);
     m_uri.setSystemId(kLocalSystemId);
     /* Cannot connect to cloud with direct http link. */
     m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
@@ -287,7 +282,6 @@ TEST_F(SystemUriTest, directSystemValidClientCommandHttps)
 {
     m_uri.setScope(SystemUri::Scope::Direct);
     m_uri.setProtocol(SystemUri::Protocol::Https);
-    m_uri.setSystemAction(SystemUri::SystemAction::View);
     m_uri.setSystemId(kLocalSystemId);
     /* Cannot connect to cloud with direct http link. */
     m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
@@ -304,7 +298,6 @@ TEST_F(SystemUriTest, directSystemNativeClient)
 {
     m_uri.setScope(SystemUri::Scope::Direct);
     m_uri.setProtocol(SystemUri::Protocol::Native);
-    m_uri.setSystemAction(SystemUri::SystemAction::View);
     m_uri.setSystemId(kLocalSystemId);
     ASSERT_FALSE(m_uri.isValid());
 
@@ -317,7 +310,6 @@ TEST_F(SystemUriTest, directSystemNativeCloud)
 {
     m_uri.setScope(SystemUri::Scope::Direct);
     m_uri.setProtocol(SystemUri::Protocol::Native);
-    m_uri.setSystemAction(SystemUri::SystemAction::View);
     m_uri.setSystemId(kLocalSystemId);
     m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
     ASSERT_FALSE(m_uri.isValid());
@@ -330,7 +322,6 @@ TEST_F(SystemUriTest, directSystemNativeSystem)
 {
     m_uri.setScope(SystemUri::Scope::Direct);
     m_uri.setProtocol(SystemUri::Protocol::Native);
-    m_uri.setSystemAction(SystemUri::SystemAction::View);
     m_uri.setSystemId(kLocalSystemId);
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
     ASSERT_FALSE(m_uri.isValid());
@@ -343,10 +334,56 @@ TEST_F(SystemUriTest, directCloudNativeSystem)
 {
     m_uri.setScope(SystemUri::Scope::Direct);
     m_uri.setProtocol(SystemUri::Protocol::Native);
-    m_uri.setSystemAction(SystemUri::SystemAction::View);
     m_uri.setSystemId(kCloudSystemId);
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
     ASSERT_FALSE(m_uri.isValid());
     m_uri.setAuthenticator(kUser, kPassword);
     ASSERT_TRUE(m_uri.isValid());
 }
+
+/* Testing http generic links */
+TEST_F(SystemUriTest, genericLinkClientShort)
+{
+    m_uri.setDomain(kGenericDomain);
+
+    QUrl link;
+    link.setHost(kGenericDomain);
+    validateLink(link.toString());
+}
+
+
+/*
+
+Http(s) Generic Links
+http://cloud-demo.hdw.mx/
+http://cloud-demo.hdw.mx/client
+http://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh
+http://cloud-demo.hdw.mx/system/localhost:7001?auth=YWJyYTprYWRhYnJh
+http://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
+http://cloud-demo.hdw.mx/system/localhost:7001/view?auth=YWJyYTprYWRhYnJh
+http://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
+http://cloud-demo.hdw.mx/system/localhost%3A7001/view?auth=YWJyYTprYWRhYnJh
+
+Native Generic Links
+nx-vms://cloud-demo.hdw.mx/
+nx-vms://cloud-demo.hdw.mx/client
+nx-vms://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh
+nx-vms://cloud-demo.hdw.mx/system/localhost:7001?auth=YWJyYTprYWRhYnJh
+nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
+nx-vms://cloud-demo.hdw.mx/system/localhost:7001/view?auth=YWJyYTprYWRhYnJh
+nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
+nx-vms://cloud-demo.hdw.mx/system/localhost%3A7001/view?auth=YWJyYTprYWRhYnJh
+
+Http(s) Direct Links
+http://localhost:7001/ - works as /system
+http://localhost:7001/system?auth=YWJyYTprYWRhYnJh
+http://localhost:7001/system/view?auth=YWJyYTprYWRhYnJh
+
+Native Direct Links
+nx-vms://localhost:7001/ - works as /client
+nx-vms://localhost:7001/?auth=YWJyYTprYWRhYnJh - works as /system
+nx-vms://localhost:7001/client
+nx-vms://localhost:7001/cloud?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
+nx-vms://localhost:7001/system?auth=YWJyYTprYWRhYnJh - auth will be used to login directly
+nx-vms://d0b73d03-3e2e-405d-8226-019c83b13a08/system?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
+*/

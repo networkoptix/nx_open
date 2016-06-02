@@ -52,7 +52,6 @@ namespace nx
 
                 enum class SystemAction
                 {
-                    None,
                     View,               /**< Open some cameras. */
                 };
 
@@ -98,6 +97,8 @@ namespace nx
 
                 QString toString() const;
                 QUrl toUrl() const;
+
+                bool operator==(const SystemUri& other) const;
             private:
                 QScopedPointer<SystemUriPrivate> const d_ptr;
                 Q_DECLARE_PRIVATE(SystemUri);
