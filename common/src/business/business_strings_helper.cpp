@@ -14,6 +14,7 @@
 #include <business/events/mserver_conflict_business_event.h>
 
 #include <core/resource/resource.h>
+
 #include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/network_resource.h>
@@ -188,8 +189,13 @@ QString QnBusinessStringsHelper::getResoureNameFromParams(const QnBusinessEventP
     return result.isEmpty() ? params.resourceName : result;
 }
 
-QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo,  Qn::ResourceInfoLevel detailLevel, bool useHtml)
+QString QnBusinessStringsHelper::getResoureIPFromParams(const QnBusinessEventParameters& params)
 {
+	QString result = QnResourceDisplayInfo(eventSource(params)).toString(Qn::ResourceInfoLevel::RI_UrlOnly);
+	return result.isNull() ? params.resourceName : result;
+}
+
+QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, Qn::ResourceInfoLevel detailLevel, bool useHtml) {
 
     QString delimiter = useHtml
             ? htmlDelimiter
@@ -331,6 +337,17 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
         return tr("First occurrence: %1 on %2 (%n times total)", "%1 means time, %2 means date", count)
             .arg(time.time().toString())
             .arg(time.date().toString());
+}
+
+QString QnBusinessStringsHelper::eventTimestampDate(const QnBusinessEventParameters &params) {
+	quint64 ts = params.eventTimestampUsec;
+	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+	return time.date().toString();
+}
+QString QnBusinessStringsHelper::eventTimestampTime(const QnBusinessEventParameters &params) {
+	quint64 ts = params.eventTimestampUsec;
+	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+	return time.time().toString();
 }
 
 QnResourcePtr QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params)

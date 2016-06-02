@@ -75,6 +75,10 @@ QString QnResourceDisplayInfo::toString(Qn::ResourceInfoLevel detailLevel) const
                 return m_name;
             return kFormatTemplate.arg(m_name, m_extraInfo);
         }
+		case Qn::RI_UrlOnly: 
+		{
+			return m_url;
+		}
         default:
             break;
     }

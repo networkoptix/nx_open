@@ -1,0 +1,27 @@
+<h1>{{event}} on {{source}}</h1>
+
+{{#aggregated}}
+<table class="description">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Server IP</th>
+        <th>Camera Physical ID</th>
+    </tr>
+    </thead>
+    <tbody>
+        {{#msConflicts}}
+            <tr>
+                <td>{{number}}</td>
+                <td>{{ip}}</td>
+                <td>{{mac}}</td>
+            </tr>
+        {{/msConflicts}}
+    </tbody>
+</table>
+
+<div class="date">
+    Conflict has been detected {{count}} times, last:<br>
+    <b>{{timestamp}}</b>
+</div>
+{{/aggregated}}

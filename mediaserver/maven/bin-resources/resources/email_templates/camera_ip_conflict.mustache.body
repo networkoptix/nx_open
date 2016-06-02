@@ -1,0 +1,19 @@
+<h1>{{event}} on {{source}}</h1>
+<p>Conflict detected at {{timestamp}} for IP address {{cameraConflictAddress}}:</p>
+
+<table class="description">
+    <thead>
+        <tr>
+           <th>#</th>
+           <th>Physical ID</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#cameraConflicts}}
+            <tr>
+                <td>{{number}}</td>
+                <td>{{mac}}</td>
+            </tr>
+        {{/cameraConflicts}}
+    </tbody>
+</table>

@@ -1,0 +1,107 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="viewport" content="width=device-width" />
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>{{productName}} notification</title>
+</head>
+
+<body bgcolor="#F5F7F8" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0">
+<table class="container" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#F5F7F8" style="color: #263137"><!-- background-color -->
+    <tbody>
+    <tr>
+        <td class="side-spacer" style="text-align: left;padding: 20px"></td>
+        <td class="header" style="text-align: left;width: 800px;padding-top: 30px;padding-bottom: 10px;height: 40px">
+            {{#systemName}}
+            <div class="system-info" style="display: inline-block;border: 1px solid #E1E7EA;border-radius: 2px;padding: 10px">
+                <table style="color: #263137">
+                    <tbody>
+                    <tr>
+                        <td style="text-align: left;vertical-align: top"><img class="icon" src="cid:systemIcon" style="width: 20px;height: 20px;padding-right: 10px" /></td>
+                        <td style="text-align: left;vertical-align: top"><div class="name" style="font-size: 14px;font-weight: bold;line-height: 20px">{{systemName}}</div>
+                            {{#systemSignature}}<div class="hint" style="font-size: 12px;line-height: 20px">{{systemSignature}}</div>{{/systemSignature}}</td>
+                    </tr>
+                    {{#cloudOwner}}
+                    <tr class="cloud-info">
+                        <td style="text-align: left;vertical-align: top;padding-top: 5px"><img class="icon" src="cid:ownerIcon" style="width: 20px;height: 20px;padding-right: 10px" /></td>
+                        <td style="text-align: left;vertical-align: top;padding-top: 5px"><div class="name" style="font-size: 14px;font-weight: bold;line-height: 20px">{{cloudOwner}}</div>
+                            {{#cloudOwnerEmail}}<div class="hint" style="font-size: 12px;line-height: 20px">{{cloudOwnerEmail}}</div>{{/cloudOwnerEmail}}</td>
+                    </tr>
+                    {{/cloudOwner}}
+                    </tbody>
+                </table>
+            </div>
+            {{/systemName}}
+            {{^systemName}}
+            <a href="{{config.portal_url}}"><img class="logo" src="cid:logo" style="max-width: 100px;max-height: 40px" /></a>
+            {{/systemName}}
+        </td>
+        <td class="side-spacer" style="text-align: left;padding: 20px"></td>
+    </tr>
+
+    <tr>
+        <td style="text-align: left"></td>
+        <td class="content" bgcolor="white" width="800" style="text-align: left;width: 800px;padding: 15px 0;border: 1px solid #E1E7EA;border-radius: 2px">
+            <h1 style="font-size: 20px;font-weight: normal;line-height: 30px;margin: 0;padding: 0 20px">{{event}} on {{source}}</h1>
+<p style="font-size: 15px;line-height: 20px;margin: 0;padding: 0 20px">Not enough licenses</p>
+<p style="font-size: 15px;line-height: 20px;margin: 0;padding: 0 20px">Camera recording was forcibly stopped on cameras:</p>
+<table class="description" style="color: #263137;padding: 10px 20px;width: 100%;background-color: #F8F9FA;margin-top: 15px">
+    <thead>
+        <tr>
+            <th>Cameras</th>
+            <th>Recording stopped at</th>
+        </tr>
+    </thead>
+    <tbody>
+{{#aggregated}}
+        <tr>
+            <td style="text-align: left">
+                <b>{{source}}</b> ({{sourceIp}})
+            </td>
+            <td style="text-align: left">{{timestamp}}</td>
+        </tr>
+{{/aggregated}}
+    </tbody>
+</table>
+
+        </td>
+        <td style="text-align: left"></td>
+    </tr>
+
+    <tr>
+        <td style="text-align: left"></td>
+        <td class="footer" style="text-align: left;width: 800px;padding-top: 20px;padding-bottom: 30px">
+            <table border="0" cellspacing="0" cellpadding="0" style="color: #263137">
+                <tbody>
+                <tr>
+                    {{#systemName}}
+                    <td class="right-border" style="text-align: left;border-right: 1px solid #E1E7EA;padding-right: 20px;font-size: 12px;height: 40px;vertical-align: middle;color: #53707F">
+                        <a href="{{config.portal_url}}"><img class="logo" src="cid:logo" style="max-width: 100px;max-height: 40px" /></a>
+                    </td>
+                    <td class="left-border right-border" style="text-align: left;border-right: 1px solid #E1E7EA;padding-right: 20px;padding-left: 20px;font-size: 12px;height: 40px;vertical-align: middle;color: #53707F">
+                        <b>Website</b><br />
+                        <a href="{{companyUrl}}">{{companyUrl}}</a>
+                    </td>
+                    {{/systemName}}
+                    {{^systemName}}
+                    <td class="right-border" style="text-align: left;border-right: 1px solid #E1E7EA;padding-right: 20px;font-size: 12px;height: 40px;vertical-align: middle;color: #53707F">
+                        <b>Website</b><br />
+                        <a href="{{companyUrl}}">{{companyUrl}}</a>
+                    </td>
+                    {{/systemName}}
+                    <td class="left-border" style="text-align: left;padding-left: 20px;font-size: 12px;height: 40px;vertical-align: middle;color: #53707F">
+                        <b>Support</b><br />
+                        <a href="{{supportLink}}">{{supportLinkText}}</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+        <td style="text-align: left"></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
+

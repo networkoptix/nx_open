@@ -1,0 +1,19 @@
+<h1>{{event}}: {{source}}</h1>
+
+
+<table class="description">
+    <thead>
+        <tr>
+            <th>Reason</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#aggregated}}
+            <tr>
+                <td>{{reason}}</td>
+                <td>{{timestampDate}} <b>{{timestampTime}}</b></td>
+            </tr>
+        {{/aggregated}}
+    </tbody>
+</table>
