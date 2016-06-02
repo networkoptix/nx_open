@@ -110,6 +110,8 @@ void TunnelConnector::connect(
         return;
     }
 
+    m_localAddress = m_mediatorUdpClient->socket()->getLocalAddress();
+
     NX_LOGX(lm("cross-nat %1. connecting to %2 with timeout %3, from local port %4")
         .arg(m_connectSessionId).arg(m_targetHostAddress.host.toString())
         .arg(timeout).arg(m_mediatorUdpClient->socket()->getLocalAddress().port),
@@ -133,6 +135,12 @@ void TunnelConnector::connect(
     connectRequest.connectSessionId = m_connectSessionId;
     connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
     connectRequest.destinationHostName = m_targetHostAddress.host.toString().toUtf8();
+    if (m_originatingHostAddressReplacement)
+    {
+        connectRequest.ignoreSourceAddress = true;
+        connectRequest.udpEndpointList.emplace_back(
+            SocketAddress(*m_originatingHostAddressReplacement, 0));    //in case of zero port mediator will take request source port
+    }
     using namespace std::placeholders;
     m_mediatorUdpClient->connect(
         std::move(connectRequest),
@@ -144,9 +152,14 @@ const AddressEntry& TunnelConnector::targetPeerAddress() const
     return m_targetHostAddress;
 }
 
-void TunnelConnector::replaceOriginatingHostAddress(const nx::String& hostAddress)
+SocketAddress TunnelConnector::localAddress() const
 {
-    //TODO #ak
+    return m_localAddress;
+}
+
+void TunnelConnector::replaceOriginatingHostAddress(const QString& hostAddress)
+{
+    m_originatingHostAddressReplacement = hostAddress;
 }
 
 void TunnelConnector::messageReceived(
@@ -156,7 +169,7 @@ void TunnelConnector::messageReceived(
     //here we can receive response to connect result report. We just don't need it
 }
 
-void TunnelConnector::ioFailure(SystemError::ErrorCode errorCode)
+void TunnelConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
 {
     //if error happens when sending connect result report, 
     //  it will be reported to TunnelConnector::connectSessionReportSent too

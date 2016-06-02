@@ -14,7 +14,8 @@ namespace api {
 
 ConnectRequest::ConnectRequest()
 :
-    connectionMethods(0)
+    connectionMethods(0),
+    ignoreSourceAddress(false)
 {
 }
 
@@ -24,6 +25,8 @@ void ConnectRequest::serialize(nx::stun::Message* const message)
     message->newAttribute<stun::cc::attrs::PeerId>(std::move(originatingPeerID));
     message->newAttribute<stun::cc::attrs::ConnectionId>(connectSessionId);
     message->newAttribute<stun::cc::attrs::ConnectionMethods>(nx::String::number(connectionMethods));
+    message->newAttribute<stun::cc::attrs::UdtHpEndpointList>(std::move(udpEndpointList));
+    message->addAttribute(stun::cc::attrs::ignoreSourceAddress, ignoreSourceAddress);
 }
 
 bool ConnectRequest::parse(const nx::stun::Message& message)
@@ -32,7 +35,9 @@ bool ConnectRequest::parse(const nx::stun::Message& message)
         readStringAttributeValue<stun::cc::attrs::HostName>(message, &destinationHostName) &&
         readStringAttributeValue<stun::cc::attrs::PeerId>(message, &originatingPeerID) &&
         readStringAttributeValue<stun::cc::attrs::ConnectionId>(message, &connectSessionId) &&
-        readIntAttributeValue<stun::cc::attrs::ConnectionMethods>(message, &connectionMethods);
+        readIntAttributeValue<stun::cc::attrs::ConnectionMethods>(message, &connectionMethods) &&
+        readAttributeValue<stun::cc::attrs::UdtHpEndpointList>(message, &udpEndpointList) &&
+        readAttributeValue(message, stun::cc::attrs::ignoreSourceAddress, &ignoreSourceAddress);
 }
 
 
@@ -60,6 +65,6 @@ bool ConnectResponse::parse(const nx::stun::Message& message)
         params.parse(message);
 }
 
-}   //api
-}   //hpm
-}   //nx
+}   //namespace api
+}   //namespace hpm
+}   //namespace nx

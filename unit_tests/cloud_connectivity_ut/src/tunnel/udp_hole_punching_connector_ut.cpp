@@ -281,9 +281,8 @@ TEST_F(TunnelConnector, cancellation)
 
         connector.connect(
             std::chrono::milliseconds::zero(),
-            [](
-                SystemError::ErrorCode /*errorCode*/,
-                std::unique_ptr<AbstractOutgoingTunnelConnection> /*connection*/)
+            [](SystemError::ErrorCode /*errorCode*/,
+               std::unique_ptr<AbstractOutgoingTunnelConnection> /*connection*/)
             {
             });
         
@@ -336,10 +335,6 @@ TEST_F(TunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
             SystemError::ErrorCode errorCode,
             std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
         {
-            //ConnectResult result;
-            //result.errorCode = errorCode;
-            //result.connection = std::move(connection);
-            //connectedPromise.set_value(std::move(result));
         });
 
     auto connectionRequestedFuture = connectionRequestedPromise.get_future();
@@ -349,26 +344,14 @@ TEST_F(TunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
 
     const auto connectionRequestedEvent = connectionRequestedFuture.get();
     ASSERT_EQ(1, connectionRequestedEvent.udpEndpointList.size());
-    //ASSERT_EQ(
-    //    xxx,
-    //    connectionRequestedEvent.udpEndpointList.begin()->port);
     ASSERT_EQ(
         HostAddress("192.168.0.1"),
         connectionRequestedEvent.udpEndpointList.begin()->address);
-
-
-    //auto connectedFuture = connectedPromise.get_future();
-    //ASSERT_EQ(
-    //    std::future_status::ready,
-    //    connectedFuture.wait_for(
-    //        connectTimeout == std::chrono::milliseconds::zero()
-    //        ? kDefaultTestTimeout
-    //        : connectTimeout * 2));
-    //const auto connectResult = connectedFuture.get();
-    //ASSERT_EQ(SystemError::noError, connectResult.errorCode);
+    ASSERT_EQ(
+        connector.localAddress().port,
+        connectionRequestedEvent.udpEndpointList.begin()->port);
 
     connector.pleaseStopSync();
-    //connectResult.connection->pleaseStopSync();
 }
 
 }   //namespace test

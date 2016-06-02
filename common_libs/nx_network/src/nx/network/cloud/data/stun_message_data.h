@@ -88,6 +88,22 @@ protected:
         return true;
     }
 
+    bool readAttributeValue(
+        const nx::stun::Message& message,
+        const int type,
+        bool* const value)
+    {
+        const auto attribute = message.getAttribute< stun::attrs::IntAttribute >(type);
+        if (!attribute)
+        {
+            setErrorText(nx::String("Missing required attribute ") +
+                stun::cc::attrs::toString(static_cast<stun::cc::attrs::AttributeType>(type)));
+            return false;
+        }
+        *value = attribute->value() > 0;
+        return true;
+    }
+
     /** read attribute value as a std::chrono::duration.
         \note Currently, maximum value of period is limited to max value of int
     */
