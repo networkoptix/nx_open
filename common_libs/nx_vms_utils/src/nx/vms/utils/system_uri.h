@@ -4,108 +4,117 @@
 #include <QtCore/QUrl>
 #include <QtCore/QScopedPointer>
 
-class QnSystemUriPrivate;
-
-/**
-* Classes for handling and constructing generic URI protocol links.
-*
-* Full scheme looks like:
-* * {protocol}://{domain}/{client_command}/{system_id}{system_action}?auth={access_key}&{action_parameters}
-*
-* @see https://networkoptix.atlassian.net/wiki/display/PM/NX+URL+Scheme
-*
-* Protocol part is customizable, so we don't parse it here.
-* Auth is encoded as base64(login:pass).
-* All query parameters are url-encoded.
-*/
-class NX_VMS_UTILS_API QnSystemUri
+namespace nx
 {
-public:
-    enum class Protocol
+
+    namespace vms
     {
-        Http,
-        Https,
-        Native,
-    };
 
-    enum class ClientCommand
-    {
-        Open,               /**< Just open the client */
-        LoginToCloud,       /**< Login to cloud. Auth is required. */
-        ConnectToSystem,    /**< Login to system. System id and auth are required. */
-    };
+        /**
+        * Classes for handling and constructing generic URI protocol links.
+        *
+        * Full scheme looks like:
+        * * {protocol}://{domain}/{client_command}/{system_id}{system_action}?auth={access_key}&{action_parameters}
+        *
+        * @see https://networkoptix.atlassian.net/wiki/display/PM/NX+URL+Scheme
+        *
+        * Protocol part is customizable, so we don't parse it here.
+        * Auth is encoded as base64(login:pass).
+        * All query parameters are url-encoded.
+        */
+        class SystemUriPrivate;
 
-    enum class SystemAction
-    {
-        View,               /**< Open some cameras. */
-    };
+        class NX_VMS_UTILS_API SystemUri
+        {
+        public:
+            enum class Protocol
+            {
+                Http,
+                Https,
+                Native,
+            };
 
-    QnSystemUri();
-    QnSystemUri(const QString& uri);
-    virtual ~QnSystemUri();
+            enum class ClientCommand
+            {
+                Open,               /**< Just open the client */
+                LoginToCloud,       /**< Login to cloud. Auth is required. */
+                ConnectToSystem,    /**< Login to system. System id and auth are required. */
+            };
 
-    Protocol protocol() const;
-    void setProtocol(Protocol value);
+            enum class SystemAction
+            {
+                View,               /**< Open some cameras. */
+            };
 
-    QString domain() const;
-    void setDomain(const QString& value);
+            SystemUri();
+            SystemUri(const QString& uri);
+            virtual ~SystemUri();
 
-    ClientCommand clientCommand() const;
-    void setClientCommand(ClientCommand value);
+            Protocol protocol() const;
+            void setProtocol(Protocol value);
 
-    QString systemId() const;
-    void setSystemId(const QString& value);
+            QString domain() const;
+            void setDomain(const QString& value);
 
-    SystemAction systemAction() const;
-    void setSystemAction(SystemAction value);
+            ClientCommand clientCommand() const;
+            void setClientCommand(ClientCommand value);
 
-    typedef QHash<QString, QString> Parameters;
-    Parameters parameters() const;
-    void setParameters(const Parameters& value);
+            QString systemId() const;
+            void setSystemId(const QString& value);
 
-    bool isNull() const;
+            SystemAction systemAction() const;
+            void setSystemAction(SystemAction value);
 
-    QString toString() const;
-    QUrl toUrl() const;
-private:
-    QScopedPointer<QnSystemUriPrivate> const d_ptr;
-    Q_DECLARE_PRIVATE(QnSystemUri);
-};
+            typedef QHash<QString, QString> Parameters;
+            Parameters parameters() const;
+            void setParameters(const Parameters& value);
+
+            bool isNull() const;
+
+            QString toString() const;
+            QUrl toUrl() const;
+        private:
+            QScopedPointer<SystemUriPrivate> const d_ptr;
+            Q_DECLARE_PRIVATE(SystemUri);
+        };
 
 
-/**
-* QnSystemUriResolver is a state machine, which state is a result of uri parsing.
-* Main option is a target action list - login to cloud, connect to server, etc.
-* Additional options are action parameters.
-*/
-class NX_VMS_UTILS_API QnSystemUriResolver
-{
-public:
-    enum class Action
-    {
-        None,
-        LoginToCloud,       /*< Just login to cloud. Parameters: login, password. */
-        ConnectToServer     /*< Directly connect to server. Parameters: serverUrl. */
-    };
+        /**
+        * QnSystemUriResolver is a state machine, which state is a result of uri parsing.
+        * Main option is a target action list - login to cloud, connect to server, etc.
+        * Additional options are action parameters.
+        */
+        class NX_VMS_UTILS_API SystemUriResolver
+        {
+        public:
+            enum class Action
+            {
+                None,
+                LoginToCloud,       /*< Just login to cloud. Parameters: login, password. */
+                ConnectToServer     /*< Directly connect to server. Parameters: serverUrl. */
+            };
 
-    struct Result
-    {
-        QList<Action> actions;
-        QUrl serverUrl;
-        QString login;
-        QString password;
-    };
+            struct Result
+            {
+                QList<Action> actions;
+                QUrl serverUrl;
+                QString login;
+                QString password;
+            };
 
-    QnSystemUriResolver();
-    QnSystemUriResolver(const QUrl &uri);
+            SystemUriResolver();
+            SystemUriResolver(const QUrl &uri);
 
-    bool isValid() const;
+            bool isValid() const;
 
-    Result result() const;
+            Result result() const;
 
-    bool parseUri();
-private:
-    bool m_valid;
-    QUrl m_uri;
-    Result m_result;
-};
+            bool parseUri();
+        private:
+            bool m_valid;
+            QUrl m_uri;
+            Result m_result;
+        };
+
+    }
+}

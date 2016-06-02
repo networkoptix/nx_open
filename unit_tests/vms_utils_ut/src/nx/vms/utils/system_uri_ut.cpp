@@ -2,9 +2,11 @@
 
 #include <nx/vms/utils/system_uri.h>
 
+using namespace nx::vms;
+
 /** Initial test. Check if default list is empty. */
-TEST( QnSystemUriTest, init )
+TEST( SystemUriTest, init )
 {
-    QnSystemUri uri;
+    SystemUri uri;
     ASSERT_TRUE(uri.isNull());
 }
