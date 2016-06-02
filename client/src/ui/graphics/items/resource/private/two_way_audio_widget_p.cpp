@@ -19,6 +19,8 @@
 #include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <utils/license_usage_helper.h>
 
 namespace
@@ -307,7 +309,7 @@ void QnTwoWayAudioWidgetPrivate::startStreaming()
     if (!m_camera)
         return;
 
-    auto server = m_camera->getParentServer();
+    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
     if (!server || server->getStatus() != Qn::Online)
         return;
 
@@ -357,7 +359,7 @@ void QnTwoWayAudioWidgetPrivate::stopStreaming()
     if (!m_camera)
         return;
 
-    auto server = m_camera->getParentServer();
+    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
     if (!server || server->getStatus() != Qn::Online)
         return;
 

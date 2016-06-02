@@ -15,10 +15,12 @@
 #include <ui/widgets/dwm.h>
 #include <ui/workbench/workbench_context.h>
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
 #   include <plugins/resource/desktop_win/win_audio_device_info.h>
-#   include <ui/workbench/watchers/workbench_desktop_camera_watcher_win.h>
 #endif
+
+#include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
+
 
 
 namespace {
@@ -36,7 +38,8 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     QnWorkbenchContextAware(parent),
     ui(new Ui::RecordingSettings),
     m_settings(new QnVideoRecorderSettings(this)),
-    m_dwm(new QnDwm(this))
+    m_dwm(new QnDwm(this)),
+    m_isAudioOnly(false)
 {
     ui->setupUi(this);
 
@@ -74,9 +77,11 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     connect(ui->browseRecordingFolderButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseRecordingFolderButton_clicked()));
     connect(m_dwm,                              SIGNAL(compositionChanged()),       this,   SLOT(at_dwm_compositionChanged()));
 
-#ifdef Q_OS_WIN
-    connect(this, &QnRecordingSettingsWidget::recordingSettingsChanged, this->context()->instance<QnWorkbenchDesktopCameraWatcher>(), &QnWorkbenchDesktopCameraWatcher::forcedUpdate);
-#endif
+    connect(
+        this,
+        &QnRecordingSettingsWidget::recordingSettingsChanged,
+        this->context()->instance<QnWorkbenchDesktopCameraWatcher>(),
+        &QnWorkbenchDesktopCameraWatcher::forcedUpdate);
 
     setWarningStyle(ui->recordingWarningLabel);
     setDefaultSoundIcon(ui->primaryDeviceIconLabel);
@@ -287,6 +292,17 @@ void QnRecordingSettingsWidget::setSecondaryAudioDeviceName(const QString &name)
             return;
         }
     }
+}
+
+void QnRecordingSettingsWidget::setAudioOnlyMode(bool mode)
+{
+    m_isAudioOnly = mode;
+    bool visible = !mode;
+
+    ui->additionalGroupBox->setVisible(visible);
+    ui->recordingFolderGroupBox->setVisible(visible);
+    ui->captureModeGroupBox->setVisible(visible);
+    ui->qualityGroupBox->setVisible(visible);
 }
 
 void QnRecordingSettingsWidget::additionalAdjustSize()

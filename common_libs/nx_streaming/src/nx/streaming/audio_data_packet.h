@@ -38,7 +38,7 @@ public:
     quint64 duration;
 
     QnCompressedAudioData(const QnConstMediaContextPtr& ctx);
-
+    quint64 getDurationMs() const;
     void assign(const QnCompressedAudioData* other);
 };
 

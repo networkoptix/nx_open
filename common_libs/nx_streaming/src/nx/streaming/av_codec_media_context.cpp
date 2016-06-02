@@ -87,7 +87,7 @@ void QnAvCodecMediaContext::setExtradata(
     QnFfmpegHelper::copyAvCodecContextField(
         (void**) &m_context->extradata, extradata, extradata_size);
     m_context->extradata_size = extradata_size;
-}    
+}
 
 //------------------------------------------------------------------------------
 
@@ -189,6 +189,11 @@ quint64 QnAvCodecMediaContext::getChannelLayout() const
 int QnAvCodecMediaContext::getBlockAlign() const
 {
     return m_context->block_align;
+}
+
+int QnAvCodecMediaContext::getFrameSize() const
+{
+    return m_context->frame_size;
 }
 
 #endif // DISABLE_FFMPEG

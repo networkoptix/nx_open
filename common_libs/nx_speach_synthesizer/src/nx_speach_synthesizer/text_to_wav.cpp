@@ -5,13 +5,10 @@
 
 #include <memory>
 
-#ifndef DISABLE_FESTIVAL
-    #include <festival/festival.h>
-    #include <festival/EST_wave_aux.h>
-#endif
+#include <festival/festival.h>
+#include <festival/EST_wave_aux.h>
 
 #include <utils/common/app_info.h>
-
 
 #ifdef QN_USE_VLD
 #include <vld.h>
@@ -19,7 +16,7 @@
 
 static char festivalVoxPath[256];
 
-#ifndef DISABLE_FESTIVAL
+
 #if (_XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L) && 0
 #include <stdio.h>
 #else
@@ -97,7 +94,6 @@ namespace
     {
         //int i;
         int n;
-
         if (sample_type == st_short)
         {
             if (bo != EST_NATIVE_BO)
@@ -132,12 +128,13 @@ namespace
                          int sample_rate,
                          const enum EST_sample_type_t sample_type, int bo)
     {
+
         (void)bo;
         const char *info;
         int data_size, data_int;
         short data_short;
 
-        NX_ASSERT(sample_type != st_schar);
+        Q_ASSERT(sample_type != st_schar);
      //   if (sample_type == st_schar)
      //     {
         //EST_warning("RIFF format: Signed 8-bit not allowed by this file format");
@@ -210,12 +207,11 @@ namespace
     }
 }
 #endif
-#endif
 
 static void initFestival()
 {
-#ifndef DISABLE_FESTIVAL
     //initializing festival engine
+    //sprintf( festivalVoxPath, "%s/festival.vox/lib/", QN_BUILDENV_PATH );
 #ifndef Q_OS_MAC
     sprintf( festivalVoxPath, "%s/vox/", QCoreApplication::applicationDirPath().toLatin1().constData() );
 #else
@@ -226,7 +222,6 @@ static void initFestival()
     const int heap_size = 1510000;  // default scheme heap size
     const int load_init_files = 1; // we want the festival init files loaded
     festival_initialize( load_init_files, heap_size );
-#endif
 }
 
 class FestivalInitializer
@@ -234,36 +229,29 @@ class FestivalInitializer
 public:
     FestivalInitializer()
     {
-    #ifndef DISABLE_FESTIVAL
-        #ifdef QN_USE_VLD
-            VLDDisable();
-        #endif
-            initFestival();
-        #ifdef QN_USE_VLD
-            VLDEnable();
-        #endif
-    #endif
+#ifdef QN_USE_VLD
+        VLDDisable();
+#endif
+        initFestival();
+#ifdef QN_USE_VLD
+        VLDEnable();
+#endif
     }
 
     ~FestivalInitializer()
     {
-        #ifndef DISABLE_FESTIVAL
-            festival_wait_for_spooler();
-            festival_tidy_up();
-        #endif
+        festival_wait_for_spooler();
+        festival_tidy_up();
     }
 };
 
-#ifndef DISABLE_FESTIVAL
-    static int my_festival_text_to_wave(const EST_String &text,EST_Wave &wave)
-    {
-        return festival_text_to_wave( text, wave );
-    }
-#endif
+static int my_festival_text_to_wave(const EST_String &text,EST_Wave &wave)
+{
+    return festival_text_to_wave( text, wave );
+}
 
 static bool textToWavInternal( const QString& text, QIODevice* const dest )
 {
-#ifndef DISABLE_FESTIVAL
     // Convert to a waveform
     EST_Wave wave;
     EST_String srcText( text.toLatin1().constData() );
@@ -300,10 +288,6 @@ static bool textToWavInternal( const QString& text, QIODevice* const dest )
     }
 
     return result;
-
-#else
-    return true;
-#endif
 }
 
 
@@ -314,11 +298,23 @@ TextToWaveServer::TextToWaveServer()
 :
     m_prevTaskID( 1 )
 {
+    m_audioFormat.setSampleRate(32000);
+    m_audioFormat.setChannelCount(1);
+    m_audioFormat.setCodec(QString("PCM"));
+    m_audioFormat.setByteOrder(QnAudioFormat::LittleEndian);
+    m_audioFormat.setSampleSize(2);
+    m_audioFormat.setSampleType(QnAudioFormat::SignedInt);
+
 }
 
 TextToWaveServer::~TextToWaveServer()
 {
     stop();
+}
+
+QnAudioFormat TextToWaveServer::getAudioFormat()
+{
+    return m_audioFormat;
 }
 
 void TextToWaveServer::pleaseStop()

@@ -38,6 +38,7 @@ private:
 private:
     QnMediaServerResourcePtr m_server;
     QnDesktopResourcePtr m_desktop;
+    bool m_desktopConnected;
 };
 
 #endif // QN_WORKBENCH_DESKTOP_CAMERA_WATCHER_H

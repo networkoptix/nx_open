@@ -30,7 +30,7 @@ public:
      * @return Pointer to the internal AVCodecContext which can be altered.
      */
     AVCodecContext* getAvCodecContext() const { return m_context; }
-   
+
     /**
      * Replace existing extradata with the copy of the provided one.
      * @param extradata Can be null, in which case extradata_size is ignored.
@@ -60,6 +60,7 @@ public:
     virtual int getBitRate() const override;
     virtual quint64 getChannelLayout() const override;
     virtual int getBlockAlign() const override;
+    virtual int getFrameSize() const override;
 
 private:
     QnAvCodecMediaContext(const QnAvCodecMediaContext&) /*= delete*/;

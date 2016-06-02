@@ -101,7 +101,7 @@
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04", "*|DW-CP16",
                 "Avigilon|ENC-*",
-                "ACTI|V32",
+                "ACTI|V32", "ACTi Corporation|V32",
                 "BOSCH|VIP-X1600-XFM4"
             ],
             "analogEncoder": true

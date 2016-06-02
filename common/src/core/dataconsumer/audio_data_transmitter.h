@@ -8,6 +8,39 @@
 #include <core/dataprovider/live_stream_provider.h>
 
 
+struct QnDataProviderInfo
+{
+    QnDataProviderInfo(
+        const QnAbstractStreamDataProviderPtr& providerPtr,
+        int priorityValue = kContinuousNotificationPriority) :
+        provider(providerPtr),
+        timestamp(QDateTime::currentMSecsSinceEpoch()),
+        priority(priorityValue){}
+
+    QnAbstractStreamDataProviderPtr provider;
+    quint64 timestamp;
+    int priority;
+
+    bool operator <(const QnDataProviderInfo& other)
+    {
+        if(this->priority != other.priority)
+            return this->priority < other.priority;
+        else
+            return this->timestamp < other.timestamp;
+    }
+
+    bool operator ==(const QnDataProviderInfo& other)
+    {
+        return this->provider == other.provider;
+    }
+
+    static const int kUserPriority = 20;
+    static const int kSingleNotificationPriority = 30;
+    static const int kContinuousNotificationPriority = 10;
+};
+
+typedef std::shared_ptr<QnDataProviderInfo> QnDataProviderInfoPtr;
+
 class QnAbstractAudioTransmitter : public QnAbstractDataConsumer
 {
     Q_OBJECT
@@ -40,11 +73,29 @@ public:
      */
     virtual bool isInitialized() const = 0;
 
-    void unsubscribe(QnLiveStreamProviderPtr desktopDataProvider);
-    void subscribe(QnLiveStreamProviderPtr desktopDataProvider);
+    virtual void prepare() {}
+
+    virtual void subscribe(
+        QnAbstractStreamDataProviderPtr desktopDataProvider,
+        int priority = QnDataProviderInfo::kUserPriority);
+
+    virtual void unsubscribe(QnAbstractStreamDataProviderPtr desktopDataProvider);
+
+protected:
+    void run();
+    virtual void makeRealTimeDelay();
+
+private:
+    void enqueueProvider(const QnDataProviderInfo& info);
+    void dequeueProvider(const QnDataProviderInfo& info);
+
 private:
     QnMutex m_mutex;
-    QnLiveStreamProviderPtr m_dataProvider;
+    QnDataProviderInfo m_dataProviderInfo;
+    QList<QnDataProviderInfo> m_waitingProviders;
+    QElapsedTimer m_elapsedTimer;
+    quint64 m_transmittedPacketCount;
+    quint64 m_transmittedPacketDuration;
 };
 
 #endif // #ifdef ENABLE_DATA_PROVIDERS

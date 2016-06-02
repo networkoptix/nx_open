@@ -29,10 +29,7 @@
 #include <ui/statistics/modules/graphics_statistics_module.h>
 #include <ui/statistics/modules/durations_statistics_module.h>
 
-
-#ifdef Q_OS_WIN
-#include "watchers/workbench_desktop_camera_watcher_win.h"
-#endif
+#include "watchers/workbench_desktop_camera_watcher.h"
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
     QObject(parent),
@@ -61,9 +58,8 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 
 
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
-#ifdef Q_OS_WIN
+
     instance<QnWorkbenchDesktopCameraWatcher>();
-#endif
 
     connect(m_resourcePool, SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_resourcePool_aboutToBeDestroyed()));
     connect(m_userWatcher,  SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SIGNAL(userChanged(const QnUserResourcePtr &)));

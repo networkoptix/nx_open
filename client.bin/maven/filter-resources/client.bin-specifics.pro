@@ -10,7 +10,8 @@ TRANSLATIONS += ${basedir}/translations/client_en.ts \
 
 INCLUDEPATH +=  ${root.dir}/appserver2/src \
                 ${root.dir}/client.core/src \
-                ${root.dir}/client/src
+                ${root.dir}/client/src \
+                ${root.dir}/common_libs/nx_speach_synthesizer/src
 
 LIBS += $$FESTIVAL_LIB
 
