@@ -1,3 +1,4 @@
+#if !defined(EDGE_SERVER)
 #include "text_to_wav.h"
 
 #include <QtCore/QCoreApplication>
@@ -379,3 +380,4 @@ QSharedPointer<TextToWaveServer::SynthetiseSpeechTask> TextToWaveServer::addTask
     task->dest = dest;
     return m_textQueue.push( task ) ? task : QSharedPointer<SynthetiseSpeechTask>();
 }
+#endif
