@@ -155,11 +155,11 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         return;
     }
 
-    propertyDictionary->saveParams( cameraResource->getId() );
     QnResourcePtr existCamRes = qnResPool->getResourceById(cameraResource->getId());
     if (existCamRes && existCamRes->getTypeId() != cameraResource->getTypeId())
         qnResPool->removeResource(existCamRes);
     QnCommonMessageProcessor::instance()->updateResource(cameraResource);
+    propertyDictionary->saveParams( cameraResource->getId() );
 
     if (!existCamRes && m_defaultUserAttrs)
     {

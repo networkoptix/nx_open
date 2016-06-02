@@ -148,7 +148,7 @@ namespace detail
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
         ErrorCode doQuery(const ApiStoredFilePath& path, ApiDatabaseDumpToFileData& dumpFileSize);
 
-		// --------- misc -----------------------------
+        // --------- misc -----------------------------
         QnUuid getID() const;
 
         ApiObjectType getObjectType(const QnUuid& objectId)

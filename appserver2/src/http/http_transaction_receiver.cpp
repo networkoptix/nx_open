@@ -30,7 +30,7 @@ namespace ec2
         const QnRequestParamList& /*params*/,
         QByteArray& /*result*/,
         QByteArray&, /*contentType*/ 
-        const QnRestConnectionProcessor* owner)
+        const QnRestConnectionProcessor* /*owner*/)
     {
         return nx_http::StatusCode::badRequest;
     }

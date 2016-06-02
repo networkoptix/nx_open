@@ -2854,8 +2854,6 @@ bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
 
 ErrorCode QnDbManager::readSettings(ApiResourceParamDataList& settings)
 {
-    QnWriteLocker lock( &m_mutex );   //locking it here since this method is public
-
     ApiResourceParamWithRefDataList params;
     ErrorCode rez = doQueryNoLock(m_adminUserID, params);
     settings.reserve( params.size() );

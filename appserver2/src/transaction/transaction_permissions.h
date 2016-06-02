@@ -15,63 +15,6 @@
 namespace ec2
 {
 
-template<typename TransactionParamType>
-bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission);
-
-template<template<typename...> class Container, typename TransactionParamType, typename... Tail>
-void filterByPermission(const QnUuid &userId, Container<TransactionParamType, Tail...> &paramContainer, Qn::Permission permission)
-{
-    paramContainer.erase(std::remove_if(paramContainer.begin(), paramContainer.end(),
-                                        [permission, &userId] (const TransactionParamType &param) {
-                                            return !ec2::hasPermission(userId, param, permission);
-                                        }));
-}
-
-namespace detail
-{
-
-template<typename TransactionParamType>
-auto hasPermissionImpl(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(data.id), bool>
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-
-    /* Check if resource needs to be created. */
-    QnResourcePtr target = qnResPool->getResourceById(data.id);
-    if (!target)
-        return qnResourceAccessManager->canCreateResource(userResource, data);
-
-    return qnResourceAccessManager->hasPermission(userResource, target, permission);
-}
-
-template<template<typename...> class Container, typename TransactionParamType, typename... Tail>
-auto hasPermissionImpl(const QnUuid &userId, const Container<TransactionParamType, Tail...> &data, Qn::Permission permission, int) -> bool
-{
-    Container<TransactionParamType, Tail...> contCopy = data;
-    filterByPermission(userId, contCopy, permission);
-
-    if (permission == Qn::Permission::ReadPermission && contCopy.size() == 0 && data.size() != 0)
-        return false;
-    else if (permission == Qn::Permission::SavePermission && contCopy.size() != data.size())
-        return false;
-
-    return true;
-}
-
-template<typename TransactionParamType>
-auto hasPermissionImpl(const QnUuid &/*userId*/, const TransactionParamType &/*data*/, Qn::Permission /*permission*/, char) -> bool
-{
-    return true;
-}
-
-
-} // namespace detail
-
-template<typename TransactionParamType>
-bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission)
-{
-    return detail::hasPermissionImpl(userId, data, permission, 0);
-}
-
 inline bool hasPermission(const QnUuid &userId, const ApiServerFootageData &data, Qn::Permission permission)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
@@ -203,6 +146,63 @@ inline bool hasPermission(const QnUuid &userId, const ApiSystemStatistics &/*dat
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
     return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+}
+
+template<typename TransactionParamType>
+bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission);
+
+template<template<typename...> class Container, typename TransactionParamType, typename... Tail>
+void filterByPermission(const QnUuid &userId, Container<TransactionParamType, Tail...> &paramContainer, Qn::Permission permission)
+{
+    paramContainer.erase(std::remove_if(paramContainer.begin(), paramContainer.end(),
+                                        [permission, &userId] (const TransactionParamType &param) {
+                                            return !ec2::hasPermission(userId, param, permission);
+                                        }), paramContainer.end());
+}
+
+namespace detail
+{
+
+template<typename TransactionParamType>
+auto hasPermissionImpl(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(data.id), bool>
+{
+    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+
+    /* Check if resource needs to be created. */
+    QnResourcePtr target = qnResPool->getResourceById(data.id);
+    if (!target)
+        return qnResourceAccessManager->canCreateResource(userResource, data);
+
+    return qnResourceAccessManager->hasPermission(userResource, target, permission);
+}
+
+template<template<typename...> class Container, typename TransactionParamType, typename... Tail>
+auto hasPermissionImpl(const QnUuid &userId, const Container<TransactionParamType, Tail...> &data, Qn::Permission permission, int) -> bool
+{
+    Container<TransactionParamType, Tail...> contCopy = data;
+    filterByPermission(userId, contCopy, permission);
+
+    if (permission == Qn::Permission::ReadPermission && contCopy.size() == 0 && data.size() != 0)
+        return false;
+    else if (permission == Qn::Permission::SavePermission && contCopy.size() != data.size())
+        return false;
+
+    return true;
+}
+
+template<typename TransactionParamType>
+auto hasPermissionImpl(const QnUuid &/*userId*/, const TransactionParamType &/*data*/, Qn::Permission /*permission*/, char) -> bool
+{
+    return true;
+}
+
+
+} // namespace detail
+
+template<typename TransactionParamType>
+bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission)
+{
+    return detail::hasPermissionImpl(userId, data, permission, 0);
 }
 
 } // namespace ec2
