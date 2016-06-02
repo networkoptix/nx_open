@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/utils/async_operation_guard.h>
 #include <nx/network/stun/abstract_async_client.h>
 
 namespace nx {
@@ -39,6 +40,7 @@ protected:
 
 private:
     std::atomic<bool> m_isEnabled;
+    utils::AsyncOperationGuard m_asyncGuard;
     std::shared_ptr<AbstractAsyncClient> m_client;
 };
 

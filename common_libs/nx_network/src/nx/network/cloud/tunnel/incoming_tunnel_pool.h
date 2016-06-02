@@ -48,7 +48,7 @@ private:
     const size_t m_acceptLimit;
     mutable QnMutex m_mutex;
     TunnelPool m_pool;
-    aio::Timer m_aioThread;
+    aio::Timer m_aioTimer;
     nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> m_acceptHandler;
     std::deque<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
 };

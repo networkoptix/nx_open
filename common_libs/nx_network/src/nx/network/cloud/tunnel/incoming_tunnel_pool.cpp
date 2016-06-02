@@ -12,13 +12,13 @@ IncomingTunnelPool::IncomingTunnelPool(
 :
     m_acceptLimit(acceptLimit)
 {
-    m_aioThread.bindToAioThread(aioThread);
+    m_aioTimer.bindToAioThread(aioThread);
 }
 
 void IncomingTunnelPool::addNewTunnel(
     std::unique_ptr<AbstractIncomingTunnelConnection> connection)
 {
-    NX_CRITICAL(m_aioThread.isInSelfAioThread());
+    NX_CRITICAL(m_aioTimer.isInSelfAioThread());
     auto insert = m_pool.emplace(std::move(connection));
     NX_ASSERT(insert.second);
     acceptTunnel(insert.first);
@@ -46,13 +46,13 @@ void IncomingTunnelPool::getNextSocketAsync(
         if (!m_acceptedSockets.empty())
         {
             lock.unlock();
-            return m_aioThread.dispatch([this](){ callAcceptHandler(false); });
+            return m_aioTimer.dispatch([this](){ callAcceptHandler(false); });
         }
     }
 
     if (timeout && *timeout != 0)
     {
-        m_aioThread.start(
+        m_aioTimer.start(
             std::chrono::milliseconds(*timeout),
             [this](){ callAcceptHandler(true); });
     }
@@ -66,7 +66,7 @@ void IncomingTunnelPool::cancelAccept()
 
 void IncomingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_aioThread.cancelAsync(
+    m_aioTimer.cancelAsync(
         [this, handler = std::move(handler)]()
         {
             m_pool.clear();
@@ -118,7 +118,7 @@ void IncomingTunnelPool::acceptTunnel(TunnelIterator connection)
 void IncomingTunnelPool::callAcceptHandler(bool timeout)
 {
     // Cancel all possible posts (we are in corresponding IO thread)
-    m_aioThread.cancelSync();
+    m_aioTimer.cancelSync();
 
     QnMutexLocker lock(&m_mutex);
     if (!m_acceptHandler)
