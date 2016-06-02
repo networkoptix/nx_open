@@ -3,6 +3,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QHash>
+#include <QtCore/QString>
 
 namespace nx
 {
@@ -36,6 +38,7 @@ namespace nx
 
                 enum class ClientCommand
                 {
+                    None,
                     Open,               /**< Just open the client */
                     LoginToCloud,       /**< Login to cloud. Auth is required. */
                     ConnectToSystem,    /**< Login to system. System id and auth are required. */
@@ -43,6 +46,7 @@ namespace nx
 
                 enum class SystemAction
                 {
+                    None,
                     View,               /**< Open some cameras. */
                 };
 
@@ -65,9 +69,10 @@ namespace nx
                 SystemAction systemAction() const;
                 void setSystemAction(SystemAction value);
 
+                /** Raw parameters using is strongly discouraged. */
                 typedef QHash<QString, QString> Parameters;
-                Parameters parameters() const;
-                void setParameters(const Parameters& value);
+                Parameters rawParameters() const;
+                void setRawParameters(const Parameters& value);
 
                 bool isNull() const;
 

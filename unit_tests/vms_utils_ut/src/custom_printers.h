@@ -1,19 +1,10 @@
-/**********************************************************
-* 14 jan 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef COMMON_PRINTERS_H
-#define COMMON_PRINTERS_H
+#pragma once
 
 #include <iostream>
 
 #include <QByteArray>
 #include <QString>
 
-
 //!Used by google test to print QByteArray as text
 void PrintTo(const QByteArray& val, ::std::ostream* os);
 void PrintTo(const QString& val, ::std::ostream* os);
-
-#endif  //COMMON_PRINTERS_H

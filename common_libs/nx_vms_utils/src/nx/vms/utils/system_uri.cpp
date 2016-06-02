@@ -8,6 +8,7 @@ namespace
 {
     const QString kAuthKey = lit("auth=");
 
+    const SystemUri::Protocol kDefaultProtocol = SystemUri::Protocol::Http;
 }
 
 SystemUriResolver::SystemUriResolver():
@@ -100,6 +101,15 @@ public:
     SystemUri::SystemAction systemAction;
     SystemUri::Parameters parameters;
 
+    SystemUriPrivate() :
+        protocol(kDefaultProtocol),
+        domain(),
+        clientCommand(SystemUri::ClientCommand::None),
+        systemId(),
+        systemAction(SystemUri::SystemAction::None),
+        parameters()
+    {}
+
     void parse(const QString& uri)
     {
 
@@ -107,7 +117,8 @@ public:
 
 };
 
-SystemUri::SystemUri()
+SystemUri::SystemUri() :
+    d_ptr(new SystemUriPrivate())
 {
 
 }
@@ -184,13 +195,13 @@ void SystemUri::setSystemAction(SystemAction value)
     d->systemAction = value;
 }
 
-SystemUri::Parameters SystemUri::parameters() const
+SystemUri::Parameters SystemUri::rawParameters() const
 {
     Q_D(const SystemUri);
     return d->parameters;
 }
 
-void SystemUri::setParameters(const Parameters& value)
+void SystemUri::setRawParameters(const Parameters& value)
 {
     Q_D(SystemUri);
     d->parameters = value;
