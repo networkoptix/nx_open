@@ -35,5 +35,5 @@ private:
 private:
     Qt::Edges m_edges;
     QMargins m_margins;
-    QWidget* m_widget;
+    QPointer<QWidget> m_widget;
 };
