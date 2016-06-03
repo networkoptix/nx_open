@@ -39,14 +39,43 @@ extern nx::ut::cfg::Config config;
 namespace 
 {
 
-struct StorageTestGlobals
+class AbstractStorageResourceTest : public ::testing::Test
 {
-    void prepare(const QString &ftpStorageUrl, const QString &smbStorageUrl)
-    {
-        this->ftpStorageUrl = ftpStorageUrl;
-        this->smbStorageUrl = smbStorageUrl;
+protected:
 
-        runnablePool = std::unique_ptr<QnLongRunnablePool>(new QnLongRunnablePool);
+    virtual void SetUp() override
+    {
+        prepare();
+
+        ASSERT_TRUE((bool)workDirResource.getDirName());
+
+        QString fileStorageUrl = *workDirResource.getDirName();
+        QnStorageResourcePtr fileStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fileStorageUrl));
+        fileStorage->setUrl(fileStorageUrl);
+        ASSERT_TRUE(fileStorage && fileStorage->initOrUpdate());
+
+        storageManager->addStorage(fileStorage);
+
+        if (!config.ftpUrl.isEmpty())
+        {
+            QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(config.ftpUrl, false));
+            EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate()) << "Ftp storage is unavailable. Check if server is online and url is correct." << std::endl;
+        }
+
+        if (!config.smbUrl.isEmpty())
+        {
+            QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(config.smbUrl));
+            EXPECT_TRUE(smbStorage && smbStorage->initOrUpdate());
+            smbStorage->setUrl(smbStorageUrl);
+            storageManager->addStorage(smbStorage);
+        }
+   }
+
+    void prepare()
+    {
+        this->ftpStorageUrl = config.ftpUrl;
+        this->smbStorageUrl = config.smbUrl;
+
         resourcePool = std::unique_ptr<QnResourcePool>(new QnResourcePool);
 
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
@@ -63,10 +92,7 @@ struct StorageTestGlobals
         QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
         PluginManager::instance()->loadPlugins(MSSettings::roSettings());
 
-        for (const auto storagePlugin : 
-                PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(
-                    nx_spl::IID_StorageFactory
-                ))
+        for (const auto storagePlugin : PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
         {
             QnStoragePluginFactory::instance()->registerStoragePlugin(
                 storagePlugin->storageType(),
@@ -80,16 +106,11 @@ struct StorageTestGlobals
         }  
     }
 
-    ~StorageTestGlobals()
-    {
-    }
-
     QString                             ftpStorageUrl;
     QString                             smbStorageUrl;
     std::unique_ptr<QnFileDeletor>      fileDeletor;
     std::unique_ptr<QnStorageManager>   storageManager;
     std::unique_ptr<QnResourcePool>     resourcePool;
-    std::unique_ptr<QnLongRunnablePool> runnablePool;
     std::unique_ptr<QnCommonModule>     commonModule;
     std::unique_ptr<PluginManager>      pluginManager;
     QnResourceStatusDictionary          rdict;
@@ -102,64 +123,10 @@ struct StorageTestGlobals
 };
 } // namespace <anonymous>
 
-std::unique_ptr<StorageTestGlobals> tg;
-extern nx::ut::cfg::Config config;
 
-TEST(AbstractStorageResourceTest, Init)
+TEST_F(AbstractStorageResourceTest, Capabilities)
 {
-    tg.reset(new StorageTestGlobals());
-    tg->prepare(config.ftpUrl, config.smbUrl);
-
-    ASSERT_TRUE((bool)tg->workDirResource.getDirName());
-
-    QString fileStorageUrl = *tg->workDirResource.getDirName();
-    QnStorageResourcePtr fileStorage = QnStorageResourcePtr(
-        QnStoragePluginFactory::instance()->createStorage(
-            fileStorageUrl
-        )
-    );
-    ASSERT_TRUE(fileStorage);
-    fileStorage->setUrl(fileStorageUrl);
-
-    tg->storageManager->addStorage(fileStorage);
-
-    if (!config.ftpUrl.isEmpty())
-    {
-        QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(
-            QnStoragePluginFactory::instance()->createStorage(
-                config.ftpUrl,
-                false
-            )
-        );
-        EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate());
-        if (ftpStorage && ftpStorage->initOrUpdate())
-        {
-            ftpStorage->setUrl(tg->ftpStorageUrl);
-            tg->storageManager->addStorage(ftpStorage);
-            //tg->storages.push_back(ftpStorage);
-        }
-        else
-            std::cout
-                << "Ftp storage is unavailable. Check if server is online and url is correct."
-                << std::endl;
-    }
-
-    if (!config.smbUrl.isEmpty())
-    {
-        QnStorageResourcePtr smbStorage = QnStorageResourcePtr(
-            QnStoragePluginFactory::instance()->createStorage(
-                config.smbUrl
-            )
-        );
-        EXPECT_TRUE(smbStorage);
-        smbStorage->setUrl(tg->smbStorageUrl);
-        tg->storageManager->addStorage(smbStorage);
-    }
-}
-
-TEST(AbstractStorageResourceTest, Capabilities)
-{
-    for (auto storage : tg->storageManager->getStorages())
+    for (auto storage : storageManager->getStorages())
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
         // storage general functions
@@ -169,13 +136,12 @@ TEST(AbstractStorageResourceTest, Capabilities)
         ASSERT_TRUE(storageCapabilities | QnAbstractStorageResource::cap::ReadFile);
         ASSERT_TRUE(storageCapabilities | QnAbstractStorageResource::cap::WriteFile);
 
-        ASSERT_TRUE(storage->initOrUpdate());
         ASSERT_TRUE(storage->getFreeSpace() > 0);
         ASSERT_TRUE(storage->getTotalSpace() > 0);
     }
 }
 
-TEST(AbstractStorageResourceTest, StorageCommonOperations)
+TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
 {
     const size_t fileCount = 500;
     std::vector<QString> fileNames;
@@ -213,7 +179,7 @@ TEST(AbstractStorageResourceTest, StorageCommonOperations)
         return pathStream.str();
     };
 
-    for (auto storage : tg->storageManager->getStorages())
+    for (auto storage : storageManager->getStorages())
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
 
@@ -299,9 +265,9 @@ TEST(AbstractStorageResourceTest, StorageCommonOperations)
     }
 }
 
-TEST(AbstractStorageResourceTest, IODevice)
+TEST_F(AbstractStorageResourceTest, IODevice)
 {
-    for (auto storage : tg->storageManager->getStorages())
+    for (auto storage : storageManager->getStorages())
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
 
@@ -579,9 +545,4 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     ASSERT_TRUE(qAbs(storage1UsageCoeff - storage2UsageCoeff) < kMaxUsageDelta);
     ASSERT_TRUE(qAbs(storage1UsageCoeff - storage3UsageCoeff) < kMaxUsageDelta);
     ASSERT_TRUE(qAbs(storage3UsageCoeff - storage2UsageCoeff) < kMaxUsageDelta);
-}
-
-TEST(AbstractStorageResourceTest, fini)
-{
-    tg.reset();
 }
