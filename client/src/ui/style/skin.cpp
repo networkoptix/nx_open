@@ -104,7 +104,7 @@ QIcon QnSkin::icon(const QIcon& icon)
 }
 
 
-QPixmap QnSkin::loadAppropriatePixmap(const QString& name)
+QPixmap QnSkin::dpPixmap(const QString& name)
 {
     static const auto kHiDpiSuffix = lit("@2x");
     static const bool kIsHiDpi = (QApplication::desktop()->devicePixelRatio() > 1);

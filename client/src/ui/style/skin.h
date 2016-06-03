@@ -37,7 +37,7 @@ public:
     QIcon icon(const QIcon& icon);
 
     /// @brief Loads pixmap with appropriate size according to current hidpi settings
-    QPixmap loadAppropriatePixmap(const QString& name);
+    QPixmap dpPixmap(const QString& name);
 
     QPixmap pixmap(const QString& name, const QSize& size = QSize(), Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation);
     QPixmap pixmap(const char* name, const QSize& size = QSize(), Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation);
