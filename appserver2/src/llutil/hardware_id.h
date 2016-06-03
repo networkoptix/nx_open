@@ -7,9 +7,8 @@
 #include <vector>
 #include <QtCore/QString>
 
-#include "licensing/hardware_info.h"
-
 class QSettings;
+class QnHardwareInfo;
 
 namespace LLUtil {
 
