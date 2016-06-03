@@ -13,9 +13,9 @@ QT_BEGIN_NAMESPACE
  */
 int QAbstractVideoBufferPrivate::map(
     QAbstractVideoBuffer::MapMode mode,
-    int *numBytes,
+    int* numBytes,
     int bytesPerLine[4],
-    uchar *data[4])
+    uchar* data[4])
 {
     Q_UNUSED(mode);
     Q_UNUSED(numBytes);
@@ -32,6 +32,7 @@ namespace media {
 
 class AlignedMemVideoBufferPrivate: public QAbstractVideoBufferPrivate
 {
+    Q_DECLARE_PUBLIC(AlignedMemVideoBuffer)
 public:
     AlignedMemVideoBufferPrivate()
     :
@@ -49,19 +50,12 @@ public:
 
     virtual int map(
         QAbstractVideoBuffer::MapMode mode,
-        int *numBytes,
+        int* numBytes,
         int bytesPerLine[4],
-        uchar *data[4]) override
+        uchar* data[4]) override
     {
-        Q_UNUSED(mode);
-
-        for (int i = 0; i < 4; ++i)
-        {
-            data[i] = this->data[i];
-            bytesPerLine[i] = this->bytesPerLine[i];
-        }
-        *numBytes = dataSize;
-        return planeCount;
+        Q_Q(AlignedMemVideoBuffer);
+        return q->doMapPlanes(mode, numBytes, bytesPerLine, data);
     }
 
     uchar* data[4];
@@ -113,7 +107,7 @@ AlignedMemVideoBuffer::MapMode AlignedMemVideoBuffer::mapMode() const
     return d_func()->mapMode;
 }
 
-uchar *AlignedMemVideoBuffer::map(MapMode mode, int *numBytes, int *bytesPerLine)
+uchar* AlignedMemVideoBuffer::map(MapMode mode, int *numBytes, int *bytesPerLine)
 {
     Q_D(AlignedMemVideoBuffer);
 
@@ -135,9 +129,25 @@ uchar *AlignedMemVideoBuffer::map(MapMode mode, int *numBytes, int *bytesPerLine
     }
 }
 
+int AlignedMemVideoBuffer::doMapPlanes(
+    MapMode mode, int* numBytes, int bytesPerLine[4], uchar* data[4])
+{
+    Q_UNUSED(mode);
+    Q_D(AlignedMemVideoBuffer);
+
+    for (int i = 0; i < 4; ++i)
+    {
+        data[i] = d->data[i];
+        bytesPerLine[i] = d->bytesPerLine[i];
+    }
+    *numBytes = d->dataSize;
+    return d->planeCount;
+}
+
 void AlignedMemVideoBuffer::unmap()
 {
-    d_func()->mapMode = NotMapped;
+    Q_D(AlignedMemVideoBuffer);
+    d->mapMode = NotMapped;
 }
 
 } // namespace media
