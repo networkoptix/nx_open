@@ -6,6 +6,7 @@
 #include <random>
 
 #include <utils/common/long_runnable.h>
+#include <utils/common/writer_pool.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>
 #include <recorder/file_deletor.h>
@@ -108,6 +109,7 @@ protected:
 
     QString                             ftpStorageUrl;
     QString                             smbStorageUrl;
+    QnWriterPool writerPool;
     std::unique_ptr<QnFileDeletor>      fileDeletor;
     std::unique_ptr<QnStorageManager>   storageManager;
     std::unique_ptr<QnResourcePool>     resourcePool;
