@@ -13,6 +13,9 @@ namespace
     const SystemUri::SystemAction kDefaultSystemAction = SystemUri::SystemAction::View;
 
     const int kDefaultPort = 80;
+    const int kMaxPort = 65535;
+
+    const int kUuidLength = 36;
 
     const QMap<SystemUri::Scope, QString> scopeToString
     {
@@ -194,7 +197,7 @@ private:
             case SystemUri::ClientCommand::ConnectToSystem:
                 return hasDomain
                     && hasAuth
-                    && !systemId.isEmpty();
+                    && isValidSystemId();
             default:
                 break;
         }
@@ -208,22 +211,58 @@ private:
         if (systemId.isEmpty())
             return false;
 
-        /* Checking http/https protocol - only direct link to connect to system is allowed. */
-        if (protocol != SystemUri::Protocol::Native)
-            return clientCommand == SystemUri::ClientCommand::ConnectToSystem;
-
         bool hasAuth = !authenticator.user.isEmpty() && !authenticator.password.isEmpty();
+
+        /* Checking http/https protocol - only direct link to connect to system is allowed. */
         switch (clientCommand)
         {
             case SystemUri::ClientCommand::Client:
-                return true;
+                return protocol == SystemUri::Protocol::Native;
             case SystemUri::ClientCommand::LoginToCloud:
+                return protocol == SystemUri::Protocol::Native
+                    && hasAuth;
             case SystemUri::ClientCommand::ConnectToSystem:
-                return hasAuth;
+                return hasAuth
+                    && isValidSystemId();
             default:
                 break;
         }
         return false;
+    }
+
+    /** Check that system id is in form localhost:7001. Port is mandatory. */
+    bool isLocalSystemId() const
+    {
+        QString host, portStr;
+        splitString(systemId, ':', host, portStr);
+        bool portOk = false;
+        int port = portStr.toInt(&portOk);
+
+        return !host.isEmpty()
+            && portOk
+            && port > 0
+            && port <= kMaxPort;
+    }
+
+    bool isCloudSystemId() const
+    {
+        if (systemId.length() != kUuidLength)
+            return false;
+
+        QnUuid uuid = QnUuid::fromStringSafe(systemId);
+        return !uuid.isNull();
+    }
+
+    bool isValidSystemId() const
+    {
+        if (systemId.isEmpty())
+            return false;
+
+        bool cloudAllowed = scope == SystemUri::Scope::Generic
+            || protocol == SystemUri::Protocol::Native;
+
+        return (cloudAllowed && isCloudSystemId())
+            || isLocalSystemId();
     }
 
     void parseParameters(const QUrl& url)

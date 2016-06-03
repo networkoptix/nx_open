@@ -255,17 +255,7 @@ TEST_F(SystemUriTest, directSystemValidSystemId)
 {
     m_uri.setScope(SystemUri::Scope::Direct);
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    ASSERT_FALSE(m_uri.isValid());
-
-    m_uri.setSystemId(kLocalSystemId);
-    ASSERT_TRUE(m_uri.isValid());
-}
-
-/** Direct system command. System Id is required. */
-TEST_F(SystemUriTest, directSystemValidClient)
-{
-    m_uri.setScope(SystemUri::Scope::Direct);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setAuthenticator(kUser, kPassword);
     ASSERT_FALSE(m_uri.isValid());
 
     m_uri.setSystemId(kLocalSystemId);
@@ -278,6 +268,8 @@ TEST_F(SystemUriTest, directSystemValidClientCommandHttp)
     m_uri.setScope(SystemUri::Scope::Direct);
     ASSERT_EQ(SystemUri::Protocol::Http, m_uri.protocol());
     m_uri.setSystemId(kLocalSystemId);
+    m_uri.setAuthenticator(kUser, kPassword);
+
     /* Cannot connect to cloud with direct http link. */
     m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
     ASSERT_FALSE(m_uri.isValid());
@@ -294,6 +286,8 @@ TEST_F(SystemUriTest, directSystemValidClientCommandHttps)
     m_uri.setScope(SystemUri::Scope::Direct);
     m_uri.setProtocol(SystemUri::Protocol::Https);
     m_uri.setSystemId(kLocalSystemId);
+    m_uri.setAuthenticator(kUser, kPassword);
+
     /* Cannot connect to cloud with direct http link. */
     m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
     ASSERT_FALSE(m_uri.isValid());
