@@ -42,7 +42,7 @@ public:
         \param bindToEveryAddress If \a true, this method returns success if bind to every input address succeeded.
         if \a false - just one successful bind is required for this method to succeed
     */
-    template<template<typename, typename> typename Dictionary, typename AllocatorType>
+    template<template<typename, typename> class Dictionary, typename AllocatorType>
     bool bind(
         const Dictionary<SocketAddress, AllocatorType>& addrToListenList,
         bool bindToEveryAddress = true)
