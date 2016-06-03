@@ -544,9 +544,6 @@ TEST_F(SystemUriTest, customParametersToString)
 }
 
 /*
-Custom Parameters:
-TODO: #GDM
-
 Referral links:
 TODO: #GDM
 */
