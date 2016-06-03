@@ -420,15 +420,19 @@ TEST_F(SystemUriTest, genericLinkCloudSystem)
     validateLink(QString("http://%1/system/%2/view?auth=%3").arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
 }
 
+TEST_F(SystemUriTest, directLinkLocalSystem)
+{
+    m_uri.setScope(SystemUri::Scope::Direct);
+    m_uri.setDomain(kLocalDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kLocalSystemId);
+
+    validateLink(QString("http://%1/system?auth=%2").arg(kLocalDomain).arg(kEncodedAuthKey));
+    validateLink(QString("http://%1/system/view?auth=%2").arg(kLocalDomain).arg(kEncodedAuthKey));
+}
 
 /*
-
-Native Generic Links
-nx-vms://cloud-demo.hdw.mx/system/localhost:7001?auth=YWJyYTprYWRhYnJh
-nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh  - auth will be used to login to cloud
-nx-vms://cloud-demo.hdw.mx/system/localhost:7001/view?auth=YWJyYTprYWRhYnJh
-nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh  - auth will be used to login to cloud
-
 Http(s) Direct Links
 http://localhost:7001/system?auth=YWJyYTprYWRhYnJh
 http://localhost:7001/system/view?auth=YWJyYTprYWRhYnJh
