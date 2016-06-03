@@ -29,6 +29,8 @@ public:
 
     int exec();
 
+    const CloudDBProcess* impl() const;
+
 private:
     CloudDBProcess* m_impl;
 };
