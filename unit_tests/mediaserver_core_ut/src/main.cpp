@@ -13,7 +13,7 @@ namespace
 void fillConfig(QCoreApplication &app)
 {
     QCommandLineParser parser;
-    parser.addOptions({{{"t", "tmp"}, "Temporary working directory path.", "tmp"},
+    parser.addOptions({{{"t", "tmp"}, "Temporary working directory path. Default: 'tmp'", "tmp"},
                        {"ftp-storage-url", "Ftp storage url"},
                        {"smb-storage-url", "Smb storage url"} });
     parser.addHelpOption();
