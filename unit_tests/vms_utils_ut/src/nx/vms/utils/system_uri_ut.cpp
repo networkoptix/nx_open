@@ -100,6 +100,12 @@ public:
         assertEqual(m_uri, parsed);
     }
 
+    void validateToString(const QString& expected)
+    {
+        ASSERT_EQ(expected, m_uri.toString());
+        ASSERT_EQ(expected, m_uri.toUrl().toString());
+    }
+
     void assertEqual(const SystemUri& l, const SystemUri& r)
     {
         ASSERT_EQ(l.protocol(), r.protocol());
@@ -438,7 +444,7 @@ TEST_F(SystemUriTest, directLinkCloudSystemNative)
     validateLink(QString("nx-vms://%1/system?auth=%2").arg(kCloudSystemId).arg(kEncodedAuthKey));
 }
 
-/* Testing invalid domains */
+/* Testing invalid domains. */
 
 TEST_F(SystemUriTest, directLinkCloudSystem)
 {
@@ -451,3 +457,49 @@ TEST_F(SystemUriTest, directLinkCloudSystem)
     validateLink(QString("http://%1/system?auth=%2").arg(kCloudSystemId).arg(kEncodedAuthKey));
     ASSERT_FALSE(m_uri.isValid());
 }
+
+/* Testing toUrl() / toString methods. */
+
+TEST_F(SystemUriTest, genericClientToString)
+{
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    validateToString(QString("http://%1/client").arg(kCloudDomain));
+}
+
+TEST_F(SystemUriTest, genericClientToStringNative)
+{
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setProtocol(SystemUri::Protocol::Native);
+    //TODO: #GDM #customization
+    validateToString(QString("nx-vms://%1/client").arg(kCloudDomain));
+}
+
+
+TEST_F(SystemUriTest, genericCloudToString)
+{
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
+    m_uri.setAuthenticator(kUser, kPassword);
+    validateToString(QString("http://%1/cloud?auth=%2").arg(kCloudDomain).arg(kEncodedAuthKey));
+}
+
+/*
+Http(s) Generic Links
+http://cloud-demo.hdw.mx/system/localhost:7001/view?auth=YWJyYTprYWRhYnJh
+http://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
+
+Http(s) Direct Links
+http://localhost:7001/system/view?auth=YWJyYTprYWRhYnJh
+
+Native Direct Links
+nx-vms://localhost:7001/system?auth=YWJyYTprYWRhYnJh - auth will be used to login directly
+nx-vms://d0b73d03-3e2e-405d-8226-019c83b13a08/system?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
+
+Custom Parameters:
+TODO: #GDM
+
+Referral links:
+TODO: #GDM
+*/
