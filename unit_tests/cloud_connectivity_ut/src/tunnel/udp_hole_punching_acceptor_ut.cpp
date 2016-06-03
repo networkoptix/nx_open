@@ -69,7 +69,6 @@ protected:
 
     void createAndStartAcceptor(size_t socketsToAccept)
     {
-        NX_LOG(lm("ACCEPTOR"), cl_logERROR);
         if (mediatorConnection)
             mediatorConnection->pleaseStopSync();
 
@@ -122,7 +121,6 @@ protected:
         std::shared_ptr<stun::AbstractServerConnection> connection,
         stun::Message message)
     {
-        NX_LOG(lm("UDP_REQ"), cl_logERROR);
         if (!isUdpServerEnabled)
         {
             NX_LOGX(lm("UDT server is disabled, ignore message"), cl_logDEBUG2);
@@ -157,7 +155,6 @@ protected:
         const SocketAddress& sourceAddress,
         const SocketAddress& destinationAddress)
     {
-        NX_LOG(lm("CONNECT"), cl_logERROR);
         auto socket = std::make_unique<UdtStreamSocket>();
         ASSERT_TRUE(socket->setRendezvous(true));
         ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
