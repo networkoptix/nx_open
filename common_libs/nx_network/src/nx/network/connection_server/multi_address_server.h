@@ -38,12 +38,13 @@ public:
             std::bind(static_cast<RealFactoryFuncType>(&realFactoryFunc), args...);
     }
 
-    /*!
-    \param bindToEveryAddress If \a true, this method returns success if bind to every input address succeeded.
-    if \a false - just one successful bind is required for this method to succeed
+    /**
+        \param bindToEveryAddress If \a true, this method returns success if bind to every input address succeeded.
+        if \a false - just one successful bind is required for this method to succeed
     */
+    template<template<typename, typename> typename Dictionary, typename AllocatorType>
     bool bind(
-        const std::list<SocketAddress>& addrToListenList,
+        const Dictionary<SocketAddress, AllocatorType>& addrToListenList,
         bool bindToEveryAddress = true)
     {
         m_endpoints.reserve(addrToListenList.size());
