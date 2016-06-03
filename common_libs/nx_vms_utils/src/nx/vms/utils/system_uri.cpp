@@ -143,8 +143,23 @@ public:
     {
         QUrl result;
         result.setScheme(protocolToString[protocol]);
-        result.setHost(domain);
-        result.setPath('/' + clientCommandToString[clientCommand]);
+
+        LocalHostName hostname = parseLocalHostname(domain);
+        if (isLocalHostname(hostname))
+        {
+            result.setHost(hostname.first);
+            result.setPort(hostname.second);
+        }
+        else
+        {
+            result.setHost(domain);
+        }
+
+        QString path = '/' + clientCommandToString[clientCommand];
+        if (scope == SystemUri::Scope::Generic && !systemId.isEmpty())
+            path += '/' + systemId;
+
+        result.setPath(path);
 
         SystemUri::Parameters fullParams = parameters;
         if (!authenticator.user.isEmpty() && !authenticator.password.isEmpty())
@@ -253,26 +268,34 @@ private:
         return false;
     }
 
-    /** Check that system id is in form localhost:7001. Port is mandatory. */
-    bool isLocalSystemId() const
+    typedef QPair<QString, int> LocalHostName;
+    static LocalHostName parseLocalHostname(const QString& hostname)
     {
         QString host, portStr;
-        splitString(systemId, ':', host, portStr);
-        bool portOk = false;
-        int port = portStr.toInt(&portOk);
-
-        return !host.isEmpty()
-            && portOk
-            && port > 0
-            && port <= kMaxPort;
+        splitString(hostname, ':', host, portStr);
+        int port = portStr.toInt();
+        return LocalHostName(host, port);
     }
 
-    bool isCloudSystemId() const
+    static bool isLocalHostname(const LocalHostName& hostname)
     {
-        if (systemId.length() != kUuidLength)
+        return !hostname.first.isEmpty()
+            && hostname.second > 0
+            && hostname.second <= kMaxPort;
+    }
+
+    /** Check that system id is in form localhost:7001. Port is mandatory. */
+    static bool isLocalHostname(const QString& hostname)
+    {
+        return isLocalHostname(parseLocalHostname(hostname));
+    }
+
+    static bool isCloudHostname(const QString& hostname)
+    {
+        if (hostname.length() != kUuidLength)
             return false;
 
-        QnUuid uuid = QnUuid::fromStringSafe(systemId);
+        QnUuid uuid = QnUuid::fromStringSafe(hostname);
         return !uuid.isNull();
     }
 
@@ -284,8 +307,8 @@ private:
         bool cloudAllowed = scope == SystemUri::Scope::Generic
             || protocol == SystemUri::Protocol::Native;
 
-        return (cloudAllowed && isCloudSystemId())
-            || isLocalSystemId();
+        return (cloudAllowed && isCloudHostname(systemId))
+            || isLocalHostname(systemId);
     }
 
     void parseParameters(const QUrl& url)
