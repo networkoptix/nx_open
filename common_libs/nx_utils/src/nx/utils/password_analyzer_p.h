@@ -56,13 +56,13 @@ namespace
     {
         m_table.assign(Invalid);
 
-        for (char ch = 'a'; ch != 'z'; ++ch)
+        for (char ch = 'a'; ch <= 'z'; ++ch)
             m_table[ch] = LowercaseLetter;
 
-        for (char ch = 'A'; ch != 'Z'; ++ch)
+        for (char ch = 'A'; ch <= 'Z'; ++ch)
             m_table[ch] = UppercaseLetter;
 
-        for (char ch = '0'; ch != '9'; ++ch)
+        for (char ch = '0'; ch <= '9'; ++ch)
             m_table[ch] = Number;
 
         m_table[' '] = Space;
