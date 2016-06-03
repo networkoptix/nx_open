@@ -23,7 +23,7 @@ namespace
     const QMap<SystemUri::Protocol, QString> protocolToString
     {
         {SystemUri::Protocol::Http, "http"},
-        {SystemUri::Protocol::Https, "http"},
+        {SystemUri::Protocol::Https, "https"},
         {SystemUri::Protocol::Native, "nx-vms"} //TODO: #GDM make customizable
     };
 
@@ -82,14 +82,10 @@ public:
     void parse(const QString& uri)
     {
         QUrl url(uri, QUrl::TolerantMode);
+        if (!url.isValid())
+            return;
 
-        if (url.scheme() == "http")
-            protocol = SystemUri::Protocol::Http;
-        else if (url.scheme() == "https")
-            protocol = SystemUri::Protocol::Https;
-        else
-            protocol = SystemUri::Protocol::Native;
-
+        protocol = protocolToString.key(url.scheme().toLower(), SystemUri::Protocol::Native);
         domain = url.host();
         int port = url.port(kDefaultPort);
         if (port != kDefaultPort)
@@ -99,29 +95,28 @@ public:
         if (path.isEmpty())
         {
             clientCommand = SystemUri::ClientCommand::Client;
-            return;
         }
-
-        QString clientCommandStr = path.takeFirst().toLower();
-        clientCommand = clientCommandToString.key(clientCommandStr, SystemUri::ClientCommand::None);
-
-        if (!url.hasQuery())
-            return;
-
-        QStringList query = url.query(QUrl::FullyDecoded).split('&', QString::SkipEmptyParts);
-        for (const QString& parameter : query)
+        else
         {
-            QString key, value;
-            splitString(parameter, '=', key, value);
-            parameters.insert(key, value);
+            QString clientCommandStr = path.takeFirst().toLower();
+            clientCommand = clientCommandToString.key(clientCommandStr, SystemUri::ClientCommand::None);
         }
 
-        QString encodedAuth = parameters.take(kAuthKey);
-        if (!encodedAuth.isEmpty())
+        parseParameters(url);
+
+        switch (clientCommand)
         {
-            QString auth = QString::fromUtf8(QByteArray::fromBase64(encodedAuth.toUtf8()));
-            splitString(auth, ':', authenticator.user, authenticator.password);
+            case SystemUri::ClientCommand::Client:
+            case SystemUri::ClientCommand::LoginToCloud:
+                /* No more parameters are required for these commands */
+                return;
+            default:
+                break;
         }
+
+        if (path.isEmpty())
+            return;
+        systemId = path.takeFirst();
     }
 
     QString toString() const
@@ -214,6 +209,27 @@ private:
                 break;
         }
         return false;
+    }
+
+    void parseParameters(const QUrl& url)
+    {
+        if (!url.hasQuery())
+            return;
+
+        QStringList query = url.query(QUrl::FullyDecoded).split('&', QString::SkipEmptyParts);
+        for (const QString& parameter : query)
+        {
+            QString key, value;
+            splitString(parameter, '=', key, value);
+            parameters.insert(key, value);
+        }
+
+        QString encodedAuth = parameters.take(kAuthKey);
+        if (!encodedAuth.isEmpty())
+        {
+            QString auth = QString::fromUtf8(QByteArray::fromBase64(encodedAuth.toUtf8()));
+            splitString(auth, ':', authenticator.user, authenticator.password);
+        }
     }
 
 };

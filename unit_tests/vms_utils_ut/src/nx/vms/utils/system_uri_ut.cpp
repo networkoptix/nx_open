@@ -15,28 +15,25 @@ using namespace nx::vms::utils;
         http://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
         http://cloud-demo.hdw.mx/system/localhost:7001/view?auth=YWJyYTprYWRhYnJh
         http://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
-        http://cloud-demo.hdw.mx/system/localhost%3A7001/view?auth=YWJyYTprYWRhYnJh
 
     Native Generic Links
         nx-vms://cloud-demo.hdw.mx/
         nx-vms://cloud-demo.hdw.mx/client
         nx-vms://cloud-demo.hdw.mx/cloud?auth=YWJyYTprYWRhYnJh
         nx-vms://cloud-demo.hdw.mx/system/localhost:7001?auth=YWJyYTprYWRhYnJh
-        nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
+        nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh  - auth will be used to login to cloud
         nx-vms://cloud-demo.hdw.mx/system/localhost:7001/view?auth=YWJyYTprYWRhYnJh
-        nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
-        nx-vms://cloud-demo.hdw.mx/system/localhost%3A7001/view?auth=YWJyYTprYWRhYnJh
+        nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh  - auth will be used to login to cloud
 
     Http(s) Direct Links
-        http://localhost:7001/ - works as /system
+        http://localhost:7001/ - cannot be distinguished from generic link
         http://localhost:7001/system?auth=YWJyYTprYWRhYnJh
         http://localhost:7001/system/view?auth=YWJyYTprYWRhYnJh
 
     Native Direct Links
-        nx-vms://localhost:7001/ - works as /client
-        nx-vms://localhost:7001/?auth=YWJyYTprYWRhYnJh - works as /system
-        nx-vms://localhost:7001/client
-        nx-vms://localhost:7001/cloud?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
+        nx-vms://localhost:7001/ - cannot be distinguished from generic link
+        nx-vms://localhost:7001/client - cannot be distinguished from generic link
+        nx-vms://localhost:7001/cloud?auth=YWJyYTprYWRhYnJh - cannot be distinguished from generic link
         nx-vms://localhost:7001/system?auth=YWJyYTprYWRhYnJh - auth will be used to login directly
         nx-vms://d0b73d03-3e2e-405d-8226-019c83b13a08/system?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
 */
@@ -99,6 +96,7 @@ public:
     void validateLink(const QString& link)
     {
         SystemUri parsed(link);
+        ASSERT_FALSE(parsed.isNull());  /*< Uri will be null if url was invalid.*/
         assertEqual(m_uri, parsed);
     }
 
@@ -364,20 +362,31 @@ TEST_F(SystemUriTest, genericLinkClientShort)
     validateLink(QString("http://%1/client/").arg(kCloudDomain));
 }
 
-TEST_F(SystemUriTest, genericLinkClientProtocols)
+TEST_F(SystemUriTest, genericLinkClientProtocolHttp)
 {
     m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setDomain(kCloudDomain);
 
     ASSERT_EQ(SystemUri::Protocol::Http, m_uri.protocol());
     validateLink(QString("http://%1/").arg(kCloudDomain));
+}
 
+TEST_F(SystemUriTest, genericLinkClientProtocolHttps)
+{
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setDomain(kCloudDomain);
     m_uri.setProtocol(SystemUri::Protocol::Https);
     validateLink(QString("https://%1/").arg(kCloudDomain));
+}
 
+TEST_F(SystemUriTest, genericLinkClientProtocolNative)
+{
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setDomain(kCloudDomain);
     //TODO: #GDM customizable
     m_uri.setProtocol(SystemUri::Protocol::Native);
     validateLink(QString("nx-vms://%1/").arg(kCloudDomain));
+    validateLink(QString("customprotocol://%1/").arg(kCloudDomain));
 }
 
 TEST_F(SystemUriTest, genericLinkCloud)
@@ -400,17 +409,6 @@ TEST_F(SystemUriTest, genericLinkLocalSystem)
     validateLink(QString("http://%1/system/%2/view?auth=%3").arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
 }
 
-TEST_F(SystemUriTest, genericLinkEncodedLocalSystem)
-{
-    m_uri.setDomain(kCloudDomain);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-    m_uri.setAuthenticator(kUser, kPassword);
-    m_uri.setSystemId(kLocalSystemId);
-
-    validateLink(QString("http://%1/system/%2?auth=%3").arg(kCloudDomain).arg(kEncodedLocalSystemId).arg(kEncodedAuthKey));
-    validateLink(QString("http://%1/system/%2/view?auth=%3").arg(kCloudDomain).arg(kEncodedLocalSystemId).arg(kEncodedAuthKey));
-}
-
 TEST_F(SystemUriTest, genericLinkCloudSystem)
 {
     m_uri.setDomain(kCloudDomain);
@@ -430,7 +428,6 @@ nx-vms://cloud-demo.hdw.mx/system/localhost:7001?auth=YWJyYTprYWRhYnJh
 nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh  - auth will be used to login to cloud
 nx-vms://cloud-demo.hdw.mx/system/localhost:7001/view?auth=YWJyYTprYWRhYnJh
 nx-vms://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh  - auth will be used to login to cloud
-nx-vms://cloud-demo.hdw.mx/system/localhost%3A7001/view?auth=YWJyYTprYWRhYnJh
 
 Http(s) Direct Links
 http://localhost:7001/system?auth=YWJyYTprYWRhYnJh
