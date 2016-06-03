@@ -1,5 +1,7 @@
 #include "system_uri.h"
 
+#include <QtCore/QUrlQuery>
+
 #include <nx/utils/log/log.h>
 
 using namespace nx::vms::utils;
@@ -137,12 +139,33 @@ public:
         }
     }
 
+    QUrl toUrl() const
+    {
+        QUrl result;
+        result.setScheme(protocolToString[protocol]);
+        result.setHost(domain);
+        result.setPath('/' + clientCommandToString[clientCommand]);
+
+        SystemUri::Parameters fullParams = parameters;
+        if (!authenticator.user.isEmpty() && !authenticator.password.isEmpty())
+        {
+            QString encodedAuth = QString(authenticator.user + ':' + authenticator.password)
+                .toUtf8()
+                .toBase64();
+            fullParams.insert(kAuthKey, encodedAuth);
+        }
+
+        QUrlQuery query;
+        for (auto iter = fullParams.cbegin(); iter != fullParams.cend(); ++iter)
+            query.addQueryItem(iter.key(), iter.value());
+
+        result.setQuery(query);
+        return result;
+    }
+
     QString toString() const
     {
-        return QString("%1://%2/%3")
-            .arg(protocolToString[protocol])
-            .arg(domain)
-            .arg(clientCommandToString[clientCommand]);
+        return toUrl().toDisplayString();
     }
 
 
@@ -449,7 +472,8 @@ QString SystemUri::toString(SystemUri::SystemAction value)
 
 QUrl SystemUri::toUrl() const
 {
-    return QUrl(toString()); //TODO: #GDM vise-versa?
+    Q_D(const SystemUri);
+    return d->toUrl();
 }
 
 bool SystemUri::operator==(const SystemUri& other) const
