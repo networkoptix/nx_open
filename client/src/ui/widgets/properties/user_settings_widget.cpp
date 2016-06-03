@@ -50,13 +50,8 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     QnAligner* aligner = new QnAligner(this);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
 
-    aligner->addWidgets({
-        ui->loginInputField,
-        ui->nameInputField,
-        ui->passwordInputField,
-        ui->confirmPasswordInputField,
-        ui->emailInputField
-    });
+    for (auto field: inputFields())
+        aligner->addWidget(field);
 }
 
 QnUserSettingsWidget::~QnUserSettingsWidget()
@@ -174,13 +169,7 @@ bool QnUserSettingsWidget::canApplyChanges() const
     if (!validMode())
         return true;
 
-    for (auto field : {
-        ui->loginInputField,
-        ui->nameInputField,
-        ui->passwordInputField,
-        ui->confirmPasswordInputField,
-        ui->emailInputField
-    })
+    for (auto field : inputFields())
         if (!field->isValid())
             return false;
 
@@ -249,14 +238,19 @@ void QnUserSettingsWidget::setupInputFields()
         return Qn::kValidResult;
     });
 
-    for (auto field : {
+    for (auto field : inputFields())
+        connect(field, &QnInputField::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
+}
+
+QList<QnInputField*> QnUserSettingsWidget::inputFields() const
+{
+    return {
         ui->loginInputField,
         ui->nameInputField,
         ui->passwordInputField,
         ui->confirmPasswordInputField,
         ui->emailInputField
-    })
-        connect(field, &QnInputField::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
+    };
 }
 
 void QnUserSettingsWidget::updateControlsAccess()

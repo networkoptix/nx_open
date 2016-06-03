@@ -19,11 +19,26 @@ public:
     explicit QnWorkbenchConnectHandler(QObject *parent = 0);
     ~QnWorkbenchConnectHandler();
 
-protected:
+    struct StoreConnectionSettings;
+    typedef QSharedPointer<StoreConnectionSettings> StoreConnectionSettingsPtr;
+
+    struct StoreConnectionSettings
+    {
+        QString connectionAlias;
+        bool storePassword;
+        bool autoLogin;
+
+        static StoreConnectionSettingsPtr create(const QString &connectionAlias
+            , bool storePassword
+            , bool autoLogin);
+    };
+
+    /// @brief Connects to server and stores successful connection data 
+    /// according to specified settings. If no settings are specified no 
+    /// connection data will be stored.
+
     ec2::ErrorCode connectToServer(const QUrl &appServerUrl
-        , const QString &connectionAlias
-        , bool storePassword
-        , bool autoLogin
+        , const StoreConnectionSettingsPtr &storeSettings
         , bool silent);
 
     bool disconnectFromServer(bool force);

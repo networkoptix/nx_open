@@ -59,6 +59,8 @@ void QnCurtainAnimator::setCurtainItem(QnCurtainItem *curtain)
 
 QnCurtainItem *QnCurtainAnimator::curtainItem() const
 {
+    if (!m_curtainOpacityAnimator)
+        return nullptr;
     return checked_cast<QnCurtainItem *>(m_curtainOpacityAnimator->targetObject());
 }
 
