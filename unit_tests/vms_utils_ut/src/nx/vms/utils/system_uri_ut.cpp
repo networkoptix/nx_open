@@ -432,13 +432,14 @@ TEST_F(SystemUriTest, directLinkLocalSystem)
     validateLink(QString("http://%1/system/view?auth=%2").arg(kLocalDomain).arg(kEncodedAuthKey));
 }
 
-/*
-Http(s) Direct Links
-http://localhost:7001/system?auth=YWJyYTprYWRhYnJh
-http://localhost:7001/system/view?auth=YWJyYTprYWRhYnJh
+TEST_F(SystemUriTest, directLinkCloudSystemNative)
+{
+    m_uri.setScope(SystemUri::Scope::Direct);
+    m_uri.setProtocol(SystemUri::Protocol::Native);
+    m_uri.setDomain(kCloudSystemId);
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kCloudSystemId);
 
-Native Direct Links
-nx-vms://localhost:7001/system?auth=YWJyYTprYWRhYnJh
-nx-vms://localhost:7001/system/view?auth=YWJyYTprYWRhYnJh
-nx-vms://d0b73d03-3e2e-405d-8226-019c83b13a08/system?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
-*/
+    validateLink(QString("nx-vms://%1/system?auth=%2").arg(kCloudSystemId).arg(kEncodedAuthKey));
+}
