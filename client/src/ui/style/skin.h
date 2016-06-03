@@ -48,8 +48,6 @@ public:
     static QStyle* newStyle(const QnGenericPalette& genericPalette);
 
 private:
-
-private:
     void init(const QStringList& paths);
 
 private:
