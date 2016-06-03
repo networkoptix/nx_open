@@ -156,8 +156,13 @@ public:
         }
 
         QString path = '/' + clientCommandToString[clientCommand];
-        if (scope == SystemUri::Scope::Generic && !systemId.isEmpty())
-            path += '/' + systemId;
+        if (clientCommand == SystemUri::ClientCommand::ConnectToSystem)
+        {
+            if (scope == SystemUri::Scope::Generic)
+                path += '/' + systemId;
+
+            path += '/' + systemActionToString[systemAction];
+        }
 
         result.setPath(path);
 

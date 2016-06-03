@@ -497,7 +497,7 @@ TEST_F(SystemUriTest, genericSystemCloudSystemIdToString)
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
     m_uri.setAuthenticator(kUser, kPassword);
     m_uri.setSystemId(kCloudSystemId);
-    validateToString(QString("http://%1/system/%2?auth=%3").arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
+    validateToString(QString("http://%1/system/%2/view?auth=%3").arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
 }
 
 TEST_F(SystemUriTest, genericSystemLocalSystemIdToString)
@@ -506,7 +506,7 @@ TEST_F(SystemUriTest, genericSystemLocalSystemIdToString)
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
     m_uri.setAuthenticator(kUser, kPassword);
     m_uri.setSystemId(kLocalSystemId);
-    validateToString(QString("http://%1/system/%2?auth=%3").arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
+    validateToString(QString("http://%1/system/%2/view?auth=%3").arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
 }
 
 /*
