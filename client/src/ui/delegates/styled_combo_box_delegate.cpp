@@ -9,22 +9,32 @@ QnStyledComboBoxDelegate::QnStyledComboBoxDelegate(QObject* parent) : base_type(
 
 void QnStyledComboBoxDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
+    /* Init style option: */
+    QStyleOptionViewItem itemOption(option);
+    initStyleOption(&itemOption, index);
+
+    /* Fill background: */
+    painter->fillRect(itemOption.rect, itemOption.palette.midlight());
+
     if (isSeparator(index))
     {
-        int y = option.rect.top() + option.rect.height() / 2;
-        QnScopedPainterPenRollback penRollback(painter, option.palette.color(QPalette::Midlight));
-        painter->drawLine(0, y, option.rect.right(), y);
+        /* Draw separator line: */
+        int y = itemOption.rect.top() + itemOption.rect.height() / 2;
+        QnScopedPainterPenRollback penRollback(painter, itemOption.palette.button().color());
+        painter->drawLine(style::Metrics::kMenuItemHPadding, y, itemOption.rect.right() - style::Metrics::kMenuItemHPadding, y);
     }
     else
     {
-        base_type::paint(painter, option, index);
+        /* Standard styled painting: */
+        QStyle* style = itemOption.widget ? itemOption.widget->style() : QApplication::style();
+        style->drawControl(QStyle::CE_ItemViewItem, &itemOption, painter, itemOption.widget);
     }
 }
 
 QSize QnStyledComboBoxDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     if (isSeparator(index))
-        return style::Metrics::kSeparatorSize;
+        return style::Metrics::kSeparatorSize + QSize(style::Metrics::kMenuItemHPadding * 2, 0);
 
     return base_type::sizeHint(option, index);
 }
@@ -38,4 +48,7 @@ void QnStyledComboBoxDelegate::initStyleOption(QStyleOptionViewItem* option, con
 {
     base_type::initStyleOption(option, index);
     option->state &= ~QStyle::State_HasFocus;
+
+    if (option->widget && option->widget->parentWidget())
+        option->palette = option->widget->parentWidget()->palette();
 }

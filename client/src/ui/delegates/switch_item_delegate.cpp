@@ -15,7 +15,7 @@ void QnSwitchItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
         /* Init style option: */
         QStyleOptionViewItem opt = option;
         initStyleOption(&opt, index);
-    
+
         /* Draw background and focus marker: */
         opt.features &= ~(QStyleOptionViewItem::HasDisplay | QStyleOptionViewItem::HasDecoration | QStyleOptionViewItem::HasCheckIndicator);
         nxStyle->drawControl(QStyle::CE_ItemViewItem, &opt, painter, opt.widget);

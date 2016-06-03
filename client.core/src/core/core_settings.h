@@ -27,13 +27,13 @@ public:
 
     virtual ~QnCoreSettings();
 
-    void writeValueToSettings(QSettings *settings
+    virtual void writeValueToSettings(QSettings *settings
         , int id
-        , const QVariant &value) const;
+        , const QVariant &value) const override;
 
-    QVariant readValueFromSettings(QSettings *settings
+    virtual QVariant readValueFromSettings(QSettings *settings
         , int id
-        , const QVariant &defaultValue);
+        , const QVariant &defaultValue) override;
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(PropertiesCount)
