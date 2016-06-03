@@ -5,6 +5,7 @@
 
 #include "connector_factory.h"
 
+#include "nx/network/socket_global.h"
 #include "udp/connector.h"
 
 
@@ -21,10 +22,15 @@ ConnectorFactory::CloudConnectors
         return factoryFunc(address);
 
     CloudConnectors connectors;
+    auto udpHolePunchingConnector = std::make_unique<udp::TunnelConnector>(address);
+    const auto originatingHostAddressReplacement = 
+        SocketGlobals::cloudConnectSettings().originatingHostAddressReplacement();
+    if (originatingHostAddressReplacement)
+        udpHolePunchingConnector->replaceOriginatingHostAddress(
+            *originatingHostAddressReplacement);
     connectors.emplace(
         CloudConnectType::kUdtHp,
-        std::make_unique<udp::TunnelConnector>(
-            address));
+        std::move(udpHolePunchingConnector));
     return connectors;
 }
 

@@ -57,9 +57,12 @@ void QnDesktopCameraResourceSearcher::registerCamera(const QSharedPointer<Abstra
 
     // add camera to the pool immediately
     QnResourceList resources;
-    resources << cameraFromConnection(info);
+    auto desktopCamera = cameraFromConnection(info);
+    resources << desktopCamera;
     QnMServerResourceDiscoveryManager::instance()->addResourcesImmediatly(resources);
-
+    // discovery manager could delay init a bit but this call for Desktop Camera does nothing anyway (empty function)
+    // So, do init immediately as well
+    desktopCamera->init();
     log("register desktop camera", info);
 }
 

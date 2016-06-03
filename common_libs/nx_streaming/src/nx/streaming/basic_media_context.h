@@ -44,8 +44,9 @@ public:
     virtual int getBitRate() const override;
     virtual quint64 getChannelLayout() const override;
     virtual int getBlockAlign() const override;
+    virtual int getFrameSize() const override;
 
-private:                        
+private:
     QnBasicMediaContext();
     QnBasicMediaContext(const QnBasicMediaContext&) /*= delete*/;
     QnBasicMediaContext& operator=(const QnBasicMediaContext&) /*= delete*/;
@@ -53,4 +54,4 @@ private:
     std::unique_ptr<QnMediaContextSerializableData> m_data;
 };
 
-#endif // BASIC_MEDIA_CONTEXT      
+#endif // BASIC_MEDIA_CONTEXT

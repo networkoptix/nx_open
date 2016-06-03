@@ -97,7 +97,9 @@ public:
 
     struct in_addr inAddr(bool* ok = nullptr) const;
 
+    /** 127.0.0.1 */
     static const HostAddress localhost;
+    /** 0.0.0.0 */
     static const HostAddress anyHost;
 
 private:

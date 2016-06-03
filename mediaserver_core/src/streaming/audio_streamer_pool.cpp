@@ -1,8 +1,13 @@
 #include "audio_streamer_pool.h"
-#include "core/resource/camera_resource.h"
-#include "utils/common/unused.h"
-#include "core/resource_management/resource_pool.h"
+#include <core/resource/camera_resource.h>
+#include <utils/common/unused.h>
+#include <core/resource_management/resource_pool.h>
 #include <camera/camera_pool.h>
+#include <business/actions/abstract_business_action.h>
+#include <plugins/resource/avi/avi_resource.h>
+#include <proxy/2wayaudio/proxy_audio_transmitter.h>
+#include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
 
 namespace
 {
@@ -10,7 +15,7 @@ namespace
     {
         static QnMutex internalMutex;
         static QMap<QnUuid, std::shared_ptr<QnMutex>> locks;
-        
+
         QnMutexLocker lock(&internalMutex);
         std::shared_ptr<QnMutex>& value = locks[key];
         if (value == nullptr)
@@ -47,7 +52,7 @@ QnAudioStreamerPool::QnAudioStreamerPool()
 
 }
 
-bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, const QnUuid& resourceId, Action action, QString &error)
+bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, const QnUuid& resourceId, Action action, QString &error, const QnRequestParams &params)
 {
     auto resource = getTransmitDestination(resourceId);
     if (!resource)
@@ -73,6 +78,54 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
         return false;
     }
 
+    QnMediaServerResourcePtr mServer = resource->getParentServer();
+    if(!mServer)
+    {
+        error = lit("Internal server error: can't find camera's server");
+        return false;
+    }
+
+    QnAudioTransmitterPtr transmitter;
+    if (mServer->getId() == qnCommon->moduleGUID())
+    {
+        transmitter = resource->getAudioTransmitter();
+    }
+    else
+    {
+        QString key = clientId.toString() + resourceId.toString();
+        auto& proxyTransmitter = m_proxyTransmitters[key];
+        if (!proxyTransmitter)
+            proxyTransmitter.reset(new QnProxyAudioTransmitter(resource, params));
+        transmitter = proxyTransmitter;
+    }
+
+    if (!transmitter)
+    {
+        error = lit("Camera '%1' does not support 2-way audio.")
+            .arg(resourceId.toString());
+        return false;
+    }
+
+    // This lock avoid to start and stop same transmitter in the same time
+    QnMutexLocker lock(getLock(resourceId));
+    if (action == Action::Start)
+        transmitter->subscribe(desktopDataProvider.dynamicCast<QnAbstractStreamDataProvider>());
+    else
+        transmitter->unsubscribe(desktopDataProvider.dynamicCast<QnAbstractStreamDataProvider>());
+
+    return true;
+}
+
+bool QnAudioStreamerPool::startStopStreamToResource(QnAbstractStreamDataProviderPtr desktopDataProvider, const QnUuid& resourceId, Action action, QString &error)
+{
+    auto resource = getTransmitDestination(resourceId);
+    if (!resource)
+    {
+        error = lit("Can't find camera with id '%1'")
+            .arg(resourceId.toString());
+        return false;
+    }
+
     QnAudioTransmitterPtr transmitter = resource->getAudioTransmitter();
     if (!transmitter)
     {
@@ -87,6 +140,49 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
         transmitter->subscribe(desktopDataProvider);
     else
         transmitter->unsubscribe(desktopDataProvider);
+
+    return true;
+}
+
+QString QnAudioStreamerPool::calcActionUniqueKey(const QnAbstractBusinessActionPtr &action) const
+{
+    return action->getBusinessRuleId().toString();
+}
+
+QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const QnAbstractBusinessActionPtr &action)
+{
+    QnMutexLocker lock(&m_prolongedProvidersMutex);
+    auto type = action->actionType();
+    auto params = action->getParams();
+    auto actionKey = calcActionUniqueKey(action);
+
+    if (m_actionDataProviders.contains(actionKey))
+        return m_actionDataProviders[actionKey];
+
+    QnAbstractStreamDataProviderPtr provider;
+    if (type == QnBusiness::PlaySoundAction)
+    {
+        const auto filePath = lit("dbfile://notifications/") + params.url;
+        QnAviResourcePtr resource(new QnAviResource(filePath));
+        resource->setStatus(Qn::Online);
+        provider.reset(resource->createDataProvider(Qn::ConnectionRole::CR_Default));
+    }
+    else
+    {
+        return QnAbstractStreamDataProviderPtr();
+    }
+
+    m_actionDataProviders[actionKey] = provider;
+
+    return provider;
+}
+
+bool QnAudioStreamerPool::destroyActionDataProvider(const QnAbstractBusinessActionPtr &action)
+{
+    QnMutexLocker lock(&m_prolongedProvidersMutex);
+    auto actionKey = calcActionUniqueKey(action);
+    if(m_actionDataProviders.contains(actionKey))
+        m_actionDataProviders.remove(actionKey);
 
     return true;
 }

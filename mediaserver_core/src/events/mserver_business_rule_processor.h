@@ -35,6 +35,8 @@ private:
     bool executeBookmarkAction(const QnAbstractBusinessActionPtr &action);
     bool executeHttpRequestAction(const QnAbstractBusinessActionPtr& action);
     bool executePtzAction(const QnAbstractBusinessActionPtr& action);
+    bool executeSayTextAction(const QnAbstractBusinessActionPtr& action);
+    bool executePlaySoundAction(const QnAbstractBusinessActionPtr& action);
 
 private:
     class SendEmailAggregationKey

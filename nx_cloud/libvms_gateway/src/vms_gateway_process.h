@@ -53,7 +53,7 @@ public:
         nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
 
 #ifndef USE_QAPPLICATION
-int exec();
+    int exec();
 #endif
 
 protected:
@@ -79,6 +79,7 @@ private:
     void registerApiHandlers(
         const conf::Settings& settings,
         nx_http::MessageDispatcher* const msgDispatcher);
+    void publicAddressFetched(const QHostAddress& publicAddress);
 };
 
 }   //namespace cloud

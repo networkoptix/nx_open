@@ -370,6 +370,12 @@ namespace ec2
             return getStoredFile( filename, std::static_pointer_cast<impl::GetStoredFileHandler>(
                 std::make_shared<impl::CustomGetStoredFileHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+        ErrorCode getStoredFileSync(const QString& fileName, QByteArray* fileData) {
+            int(AbstractStoredFileManager::*fn)(const QString& fname, impl::GetStoredFileHandlerPtr) = &AbstractStoredFileManager::getStoredFile;
+            return impl::doSyncCall<impl::GetStoredFileHandler>(std::bind(fn, this, fileName, std::placeholders::_1), fileData);
+        }
+
         /*!
             If file exists, it will be overwritten
             \param handler Functor with params: (ErrorCode)

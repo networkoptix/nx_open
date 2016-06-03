@@ -18,13 +18,32 @@
 #include <utils/serialization/json_functions.h>
 #include <utils/common/app_info.h>
 #include "rest/server/rest_connection_processor.h"
-#include "llutil/hardware_id.h"
+#include <llutil/hardware_id.h>
 
 static const int TCP_TIMEOUT = 1000 * 5;
 
 #ifdef Q_OS_LINUX
 #include "nx1/info.h"
 #endif
+
+namespace
+{
+    const QString kLicenseKey = lit("license_key");
+    const QString kBox = lit("box");
+    const QString kBrand = lit("brand");
+    const QString kVersion = lit("version");
+    const QString kNx1 = lit("nx1");
+    const QString kBpi = lit("bpi");
+    const QString kMac = lit("mac");
+    const QString kSerial = lit("serial");
+    const QString kLang = lit("lang");
+    const QString kOldHwidArray = lit("oldhwid[]");
+    const QString kHwid = lit("hwid");
+    const QString kHwidArray = lit("hwid[]");
+    const QString kMode = lit("mode");
+    const QString kInfo = lit("info");
+    const QString kKey = lit("key");
+}
 
 CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey, bool infoMode, QByteArray& response)
 {
@@ -34,44 +53,46 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
 
     ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->items()->getItem(qnCommon->moduleGUID()).data;
     QUrlQuery params;
-    params.addQueryItem(QLatin1String("license_key"), licenseKey);
-    params.addQueryItem(QLatin1String("box"), runtimeData.box);
-    params.addQueryItem(QLatin1String("brand"), runtimeData.brand);
-    params.addQueryItem(QLatin1String("version"), QnAppInfo::engineVersion()); //TODO: #GDM replace with qnCommon->engineVersion()? And what if --override-version?
+    params.addQueryItem(kLicenseKey, licenseKey);
+    params.addQueryItem(kBox, runtimeData.box);
+    params.addQueryItem(kBrand, runtimeData.brand);
+    params.addQueryItem(kVersion, QnAppInfo::engineVersion()); //TODO: #GDM replace with qnCommon->engineVersion()? And what if --override-version?
 
 #ifdef Q_OS_LINUX
-    if( QnAppInfo::armBox() == "nx1" || QnAppInfo::armBox() == "bpi") {
+    if( QnAppInfo::armBox() == kNx1 || QnAppInfo::armBox() == kBpi)
+    {
         QString mac = Nx1::getMac();
         QString serial = Nx1::getSerial();
 
         if (!mac.isEmpty())
-            params.addQueryItem(QLatin1String("mac"), mac);
+            params.addQueryItem(kMac, mac);
 
         if (!serial.isEmpty())
-            params.addQueryItem(QLatin1String("serial"), serial);
+            params.addQueryItem(kSerial, serial);
     }
 #endif
 
     QLocale locale;
-    params.addQueryItem(QLatin1String("lang"), QLocale::languageToString(locale.language()));
+    params.addQueryItem(kLang, QLocale::languageToString(locale.language()));
 
     const QVector<QString> hardwareIds = qnLicensePool->hardwareIds();
-    for (const QString& hwid: hardwareIds) {
+    for (const QString& hwid: hardwareIds)
+    {
         int version = LLUtil::hardwareIdVersion(hwid);
 
         QString name;
         if (version == 0)
-            name = QLatin1String("oldhwid[]");
+            name = kOldHwidArray;
         else if (version == 1)
-            name = QLatin1String("hwid[]");
+            name = kHwidArray;
         else
-            name = QString(QLatin1String("hwid%1[]")).arg(version);
+            name = QString(QLatin1String("%1%2[]")).arg(kHwid).arg(version);
 
         params.addQueryItem(name, hwid);
     }
 
     if (infoMode)
-        params.addQueryItem(lit("mode"), lit("info"));
+        params.addQueryItem(kMode, kInfo);
 
     QByteArray request = params.query(QUrl::FullyEncoded).toUtf8();
     CLHttpStatus result = client.doPOST(url.path(), request);
@@ -84,12 +105,14 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
 {
     ec2::ApiDetailedLicenseData reply;
 
-    QString licenseKey = requestParams.value("key");
-    if (licenseKey.isEmpty()) {
+    QString licenseKey = requestParams.value(kKey);
+    if (licenseKey.isEmpty())
+    {
         result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'key' is missed"));
         return CODE_OK;
     }
-    if (licenseKey.length() != 19 || licenseKey.count("-") != 3) {
+    if (licenseKey.length() != 19 || licenseKey.count("-") != 3)
+    {
         result.setError(QnJsonRestResult::MissingParameter, lit("Invalid license serial number provided. Serial number MUST be in format AAAA-BBBB-CCCC-DDDD"));
         return CODE_OK;
     }
@@ -130,7 +153,8 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
     QnLicenseList licenses;
     licenses << license;
     const ec2::ErrorCode errorCode = connect->getLicenseManager(Qn::UserAccessData(owner->authUserId()))->addLicensesSync(licenses);
-    if( errorCode != ec2::ErrorCode::ok) {
+    if( errorCode != ec2::ErrorCode::ok)
+    {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error: %1").arg(ec2::toString(errorCode)));
         return CODE_OK;
     }

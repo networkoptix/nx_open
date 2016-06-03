@@ -24,22 +24,34 @@
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/../..</root.dir>
     </properties>
-    <profile>
-        <id>linux-arm-bpi</id>
-        <activation>
-            <activeByDefault>false</activeByDefault>
-            <os>
-                <family>unix</family>
-                <name>linux</name>
-            </os>
-            <property>
-                <name>box</name>
-                <value>bpi</value>
-            </property>
-        </activation>
-        <properties>
-            <rdep.linux.packages>uboot-2014.04-10733-gbb5691c-dirty-vanilla</rdep.linux.packages>
-            <linux.oslibs>-lz</linux.oslibs>
-        </properties>
-    </profile>      
+    <profiles>
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>uboot-2014.04-10733-gbb5691c-dirty-vanilla ffmpeg-3.0.2 ldpreloadhook-1.0 libpixman-0.34.0 libump-3.0 libvdpau-sunxi-1.0 libcedrus-1.0 libvdpau-1.0.4.1</rdep.linux.packages>
+                <linux.oslibs>-lz</linux.oslibs>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>mobile_client</artifactId>
+                    <version>${project.version}</version>
+                    <type>pom</type> 
+                    <scope>system</scope>
+                    <systemPath>${root.dir}/mobile_client/pom.xml</systemPath>
+                </dependency>			
+            </dependencies>	  	            
+        </profile>      
+    </profiles>      
 </project>

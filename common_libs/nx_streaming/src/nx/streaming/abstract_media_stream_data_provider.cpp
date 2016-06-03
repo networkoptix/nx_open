@@ -29,9 +29,6 @@ QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
     stop();
 }
 
-
-
-
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
     QnMutexLocker mtx( &m_mutex );

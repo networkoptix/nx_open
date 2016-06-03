@@ -57,6 +57,15 @@ public:
     Http();
 };
 
+class CloudConnect
+{
+public:
+    bool replaceHostAddressWithPublicAddress;
+    QString fetchPublicIpUrl;
+
+    CloudConnect();
+};
+
 
 /*!
     \note Values specified via command-line have priority over conf file (or win32 registry) values
@@ -76,6 +85,7 @@ public:
     const Auth& auth() const;
     const Tcp& tcp() const;
     const Http& http() const;
+    const CloudConnect& cloudConnect() const;
 
     //!Loads settings from both command line and conf file (or win32 registry)
     void load( int argc, char **argv );
@@ -92,6 +102,7 @@ private:
     Auth m_auth;
     Tcp m_tcp;
     Http m_http;
+    CloudConnect m_cloudConnect;
 
     void fillSupportedCmdParameters();
     void loadConfiguration();
