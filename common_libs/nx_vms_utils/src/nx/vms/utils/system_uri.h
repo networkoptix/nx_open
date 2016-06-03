@@ -91,6 +91,8 @@ namespace nx
                 Parameters rawParameters() const;
                 void setRawParameters(const Parameters& value);
 
+                void addParameter(const QString& key, const QString& value);
+
                 bool isNull() const;
 
                 bool isValid() const;

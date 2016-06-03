@@ -460,6 +460,12 @@ void SystemUri::setRawParameters(const Parameters& value)
     d->parameters = value;
 }
 
+void SystemUri::addParameter(const QString& key, const QString& value)
+{
+    Q_D(SystemUri);
+    d->parameters.insert(key, value);
+}
+
 bool SystemUri::isNull() const
 {
     Q_D(const SystemUri);

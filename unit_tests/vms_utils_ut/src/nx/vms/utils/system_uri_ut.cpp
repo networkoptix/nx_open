@@ -51,6 +51,9 @@ namespace
     const QString kUser("user");
     const QString kPassword("password");
     const QString kEncodedAuthKey("dXNlcjpwYXNzd29yZA%3D%3D");  /**< Url-encoded key for 'user:password' string in base64 encoding. */
+
+    const QString kParamKey("key");
+    const QString kParamValue("value");
 }
 
 namespace nx
@@ -102,6 +105,7 @@ public:
 
     void validateToString(const QString& expected)
     {
+        ASSERT_TRUE(m_uri.isValid());
         ASSERT_EQ(expected, m_uri.toString());
         ASSERT_EQ(expected, m_uri.toUrl().toString());
     }
@@ -509,18 +513,37 @@ TEST_F(SystemUriTest, genericSystemLocalSystemIdToString)
     validateToString(QString("http://%1/system/%2/view?auth=%3").arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
 }
 
+TEST_F(SystemUriTest,directSystemLocalSystemIdToString)
+{
+    m_uri.setScope(SystemUri::Scope::Direct);
+    m_uri.setDomain(kLocalSystemId);
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kLocalSystemId);
+    validateToString(QString("http://%1/system/view?auth=%2").arg(kLocalSystemId).arg(kEncodedAuthKey));
+}
+
+TEST_F(SystemUriTest, directSystemCloudSystemIdToString)
+{
+    m_uri.setScope(SystemUri::Scope::Direct);
+    m_uri.setProtocol(SystemUri::Protocol::Native);
+    m_uri.setDomain(kCloudSystemId);
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kCloudSystemId);
+    //TODO: #GDM #customization
+    validateToString(QString("nx-vms://%1/system/view?auth=%2").arg(kCloudSystemId).arg(kEncodedAuthKey));
+}
+
+TEST_F(SystemUriTest, customParametersToString)
+{
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.addParameter(kParamKey, kParamValue);
+    validateToString(QString("http://%1/client?%2=%3").arg(kCloudDomain).arg(kParamKey).arg(kParamValue));
+}
+
 /*
-Http(s) Generic Links
-http://cloud-demo.hdw.mx/system/localhost:7001/view?auth=YWJyYTprYWRhYnJh
-http://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
-
-Http(s) Direct Links
-http://localhost:7001/system/view?auth=YWJyYTprYWRhYnJh
-
-Native Direct Links
-nx-vms://localhost:7001/system?auth=YWJyYTprYWRhYnJh - auth will be used to login directly
-nx-vms://d0b73d03-3e2e-405d-8226-019c83b13a08/system?auth=YWJyYTprYWRhYnJh - auth will be used to login to cloud
-
 Custom Parameters:
 TODO: #GDM
 
