@@ -141,7 +141,7 @@ private:
     int m_ptsIndex = 0;
     int64_t m_ptsQueue[kPtsCount];
 
-    std::unique_ptr<VdpauHandler> m_vdpauSession;
+    std::unique_ptr<VdpauHandler> m_vdpHandler;
 
 private:
     int obtainResult(const CompressedFrame* compressedFrame, int64_t* outPtsUs);
@@ -192,16 +192,9 @@ int Stub::obtainResult(const ProxyDecoder::CompressedFrame* compressedFrame, int
 int Stub::decodeToRgb(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
     uint8_t* argbBuffer, int argbLineSize)
 {
+    OUTPUT << "decodeToRgb(argbLineSize: " << argbLineSize << ")";
     assert(argbBuffer);
     assert(argbLineSize > 0);
-
-    // Log if parameters change.
-    static int prevArgbLineSize = -1;
-    if (prevArgbLineSize != argbLineSize)
-    {
-        prevArgbLineSize = argbLineSize;
-        OUTPUT << "decodeToRgb(argbLineSize: " << argbLineSize << ")";
-    }
 
     if (!conf.disable)
     {
@@ -215,22 +208,12 @@ int Stub::decodeToRgb(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
 int Stub::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
     uint8_t* yBuffer, int yLineSize, uint8_t* uBuffer, uint8_t* vBuffer, int uVLineSize)
 {
+    OUTPUT << "decodeToYuvPlanar(yLineSize: " << yLineSize << ", uVLineSize: " << uVLineSize << ")";
     assert(yBuffer);
     assert(uBuffer);
     assert(vBuffer);
     assert(yLineSize > 0);
     assert(uVLineSize > 0);
-
-    // Log if parameters change.
-    static int prevYLineSize = -1;
-    static int prevUVLineSize = -1;
-    if (prevYLineSize != yLineSize || prevUVLineSize != uVLineSize)
-    {
-        prevYLineSize = yLineSize;
-        prevUVLineSize = uVLineSize;
-        OUTPUT << "decodeToYuvPlanar(yLineSize: " << yLineSize
-            << ", uVLineSize: " << uVLineSize << ")";
-    }
 
     if (!conf.disable)
     {
@@ -247,6 +230,7 @@ int Stub::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* out
 int Stub::decodeToYuvNative(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
     uint8_t** outBuffer, int* outBufferSize)
 {
+    OUTPUT << "decodeToYuvNative()";
     assert(outBuffer);
     assert(outBufferSize);
 
@@ -293,8 +277,8 @@ void Stub::displayDecoded(void* frameHandle, int x, int y, int width, int height
 
     if (!conf.disable)
     {
-        if (!m_vdpauSession)
-            m_vdpauSession.reset(new VdpauHandler(m_frameWidth, m_frameHeight));
+        if (!m_vdpHandler)
+            m_vdpHandler.reset(new VdpauHandler(m_frameWidth, m_frameHeight));
     }
 
     if (conf.enableFps)
@@ -308,8 +292,8 @@ void Stub::displayDecoded(void* frameHandle, int x, int y, int width, int height
         NX_SHOW_FPS("displayDecoded", ptsStr.c_str());
     }
 
-    if (m_vdpauSession)
-        m_vdpauSession->display(x, y, width, height);
+    if (m_vdpHandler)
+        m_vdpHandler->display(x, y, width, height);
 
     OUTPUT << "displayDecoded() END";
 }

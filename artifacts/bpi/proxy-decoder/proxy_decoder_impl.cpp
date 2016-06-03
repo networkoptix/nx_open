@@ -53,8 +53,6 @@ private:
     void initializeFfmpeg();
     void deinitializeFfmpeg();
 
-    vdpau_render_state* getRenderState();
-
     int doGetBuffer2(AVCodecContext* pContext, AVFrame* pFrame, int flags);
     void doDrawHorizBand(AVCodecContext* pContext, const AVFrame* pFrame,
         int offset[4], int y, int type, int height);
@@ -148,6 +146,18 @@ void Impl::initializeVdpau()
         &m_vdpDecoder));
     vdpCheckHandle(m_vdpDecoder, "Decoder");
 
+    for (int i = 0; i < conf.videoSurfaceCount; ++i)
+    {
+        vdpau_render_state* renderState = new vdpau_render_state();
+        m_renderStates.push_back(renderState);
+        memset(renderState, 0, sizeof(vdpau_render_state));
+        renderState->surface = VDP_INVALID_HANDLE;
+
+        VDP(vdp_video_surface_create(m_vdpSession->vdpDevice(),
+            VDP_CHROMA_TYPE_420, m_frameWidth, m_frameHeight, &renderState->surface));
+        vdpCheckHandle(renderState->surface, "Video Surface");
+    }
+
     PRINT << "VDPAU Initialized OK";
 }
 
@@ -155,12 +165,12 @@ void Impl::deinitializeVdpau()
 {
     OUTPUT << "Deinitializing VDPAU...";
 
-    for (auto& pRenderState: m_renderStates)
+    for (auto& renderState: m_renderStates)
     {
-        if (pRenderState->surface != VDP_INVALID_HANDLE)
-            VDP(vdp_video_surface_destroy(pRenderState->surface));
-        delete pRenderState;
-        pRenderState = nullptr;
+        if (renderState->surface != VDP_INVALID_HANDLE)
+            VDP(vdp_video_surface_destroy(renderState->surface));
+        delete renderState;
+        renderState = nullptr;
     }
 
     if (m_vdpDecoder != VDP_INVALID_HANDLE)
@@ -217,39 +227,14 @@ void Impl::deinitializeFfmpeg()
     }
 }
 
-vdpau_render_state* Impl::getRenderState()
-{
-    vdpau_render_state* renderState = nullptr;
-
-    while (m_renderStates.size() < conf.videoSurfaceCount)
-    {
-        renderState = new vdpau_render_state();
-        m_renderStates.push_back(renderState);
-        memset(renderState, 0, sizeof(vdpau_render_state));
-        renderState->surface = VDP_INVALID_HANDLE;
-
-        VDP(vdp_video_surface_create(m_vdpSession->vdpDevice(),
-            VDP_CHROMA_TYPE_420, m_frameWidth, m_frameHeight, &renderState->surface));
-        vdpCheckHandle(renderState->surface, "Video Surface");
-    }
-
-    renderState = m_renderStates[m_renderStateIndex];
-    OUTPUT << "getRenderState(): use vdpau_render_state #" << m_renderStateIndex << " {flags: "
-            << debugDumpRenderStateFlags(renderState) <<  "}";
-    m_renderStateIndex = (m_renderStateIndex + 1) % conf.videoSurfaceCount;
-
-    assert(renderState);
-    return renderState;
-}
-
 void Impl::doDrawHorizBand(AVCodecContext* pContext, const AVFrame* pFrame,
     int offset[4], int y, int type, int height)
 {
-    (void) pContext;
-    (void) offset;
-    (void) y;
-    (void) type;
-    (void) height;
+    /*unused*/ (void) pContext;
+    /*unused*/ (void) offset;
+    /*unused*/ (void) y;
+    /*unused*/ (void) type;
+    /*unused*/ (void) height;
 
     assert(pFrame);
     vdpau_render_state* renderState = reinterpret_cast<vdpau_render_state*>(pFrame->data[0]);
@@ -283,7 +268,10 @@ int Impl::doGetBuffer2(AVCodecContext* pContext, AVFrame* pFrame, int flags)
         OUTPUT << "AV_GET_BUFFER_FLAG_REF is set";
     }
 
-    vdpau_render_state* renderState = getRenderState();
+    vdpau_render_state* renderState = m_renderStates[m_renderStateIndex];
+    OUTPUT << "getRenderState(): use vdpau_render_state #" << m_renderStateIndex
+        << " {flags: " << debugDumpRenderStateFlagsToStr(renderState) <<  "}";
+    m_renderStateIndex = (m_renderStateIndex + 1) % conf.videoSurfaceCount;
     assert(renderState);
 
     pFrame->buf[0] = av_buffer_ref(m_stubAvBuffer);
@@ -627,11 +615,11 @@ void Impl::displayDecoded(void* frameHandle, int x, int y, int width, int height
             + getFrameEqualsPrevStr(renderState)).c_str());
     }
 
-    OUTPUT << "Using " << debugDumpRenderStateRef(renderState, m_renderStates);
+    OUTPUT << "Using " << debugDumpRenderStateRefToStr(renderState, m_renderStates);
 
     m_vdpSession->displayVideoSurface(renderState->surface, x, y, width, height);
 
-    OUTPUT << "displayDecoded() END: " << debugDumpRenderStateRef(renderState, m_renderStates);
+    OUTPUT << "displayDecoded() END: " << debugDumpRenderStateRefToStr(renderState, m_renderStates);
 }
 
 std::string Impl::getFrameEqualsPrevStr(const vdpau_render_state* renderState) const

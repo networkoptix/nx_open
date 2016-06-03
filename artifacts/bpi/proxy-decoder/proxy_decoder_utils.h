@@ -79,10 +79,10 @@ void debugPrintNative(uint8_t* yNative, int frameW, int frameH,
 /**
  * @return Human-readable item index or a "not found" message.
  */
-std::string debugDumpRenderStateRef(const vdpau_render_state* renderState,
+std::string debugDumpRenderStateRefToStr(const vdpau_render_state* renderState,
     const std::vector<vdpau_render_state*>& renderStates);
 
 /**
  * @return Human-readable vdpau_render_state::state.
  */
-std::string debugDumpRenderStateFlags(const vdpau_render_state* renderState);
+std::string debugDumpRenderStateFlagsToStr(const vdpau_render_state* renderState);

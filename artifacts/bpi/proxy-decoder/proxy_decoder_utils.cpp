@@ -161,7 +161,7 @@ void debugPrintNative(uint8_t* yNative, int frameW, int frameH,
     }
 }
 
-std::string debugDumpRenderStateRef(const vdpau_render_state* renderState,
+std::string debugDumpRenderStateRefToStr(const vdpau_render_state* renderState,
     const std::vector<vdpau_render_state*>& renderStates)
 {
     for (int i = 0; i < renderStates.size(); ++i)
@@ -175,7 +175,7 @@ std::string debugDumpRenderStateRef(const vdpau_render_state* renderState,
     return "vdpau_render_state NOT_FOUND";
 }
 
-std::string debugDumpRenderStateFlags(const vdpau_render_state* renderState)
+std::string debugDumpRenderStateFlagsToStr(const vdpau_render_state* renderState)
 {
     switch (renderState->state)
     {
