@@ -467,6 +467,13 @@ TEST_F(SystemUriTest, genericClientToString)
     validateToString(QString("http://%1/client").arg(kCloudDomain));
 }
 
+TEST_F(SystemUriTest, genericClientLocalDomainToString)
+{
+    m_uri.setDomain(kLocalDomain); /*Make sure port is parsed ok.*/
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    validateToString(QString("http://%1/client").arg(kLocalDomain));
+}
+
 TEST_F(SystemUriTest, genericClientToStringNative)
 {
     m_uri.setDomain(kCloudDomain);
@@ -476,13 +483,30 @@ TEST_F(SystemUriTest, genericClientToStringNative)
     validateToString(QString("nx-vms://%1/client").arg(kCloudDomain));
 }
 
-
 TEST_F(SystemUriTest, genericCloudToString)
 {
     m_uri.setDomain(kCloudDomain);
     m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
     m_uri.setAuthenticator(kUser, kPassword);
     validateToString(QString("http://%1/cloud?auth=%2").arg(kCloudDomain).arg(kEncodedAuthKey));
+}
+
+TEST_F(SystemUriTest, genericSystemCloudSystemIdToString)
+{
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kCloudSystemId);
+    validateToString(QString("http://%1/system/%2?auth=%3").arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
+}
+
+TEST_F(SystemUriTest, genericSystemLocalSystemIdToString)
+{
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kLocalSystemId);
+    validateToString(QString("http://%1/system/%2?auth=%3").arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
 }
 
 /*
