@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 //--http-client --url=http://admin:admin@47bf37a0-72a6-2890-b967-5da9c390d28a.c2cd3804-c66c-4ba4-900e-c27fd4d9180d/api/gettime
 //LA server:
 //--http-client --url=http://admin:admin@1af3ebeb-c327-3665-40f1-fa4dba0df78f.c2cd3804-c66c-4ba4-900e-c27fd4d9180d/api/gettime
-//--http-client --url=http://admin:admin@c2cd3804-c66c-4ba4-900e-c27fd4d9180d/api/gettime
+//--http-client --url=http://admin:admin@0d8dcea3-057a-4f44-81a4-d70e9127ab14/api/gettime
 //--connect --target=server1.c2cd3804-c66c-4ba4-900e-c27fd4d9180d --max-concurrent-connections=10
 //--listen --server-id=server1 --cloud-credentials=c2cd3804-c66c-4ba4-900e-c27fd4d9180d:02e780b8-2dc3-4389-9af3-8170de591835
 
