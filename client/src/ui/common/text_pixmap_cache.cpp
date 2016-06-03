@@ -10,20 +10,26 @@
 #include <utils/common/hash.h>
 
 namespace {
-    QPixmap renderText(const QString &text, const QPen &pen, const QFont &font) {
+    QPixmap renderText(const QString &text, const QPen &pen, const QFont &font) 
+    {
         QFontMetrics metrics(font);
         QSize textSize = metrics.size(Qt::TextSingleLine, text);
         if(textSize.isEmpty())
             return QPixmap();
 
-        QPixmap pixmap(textSize.width(), metrics.height());
+        static const auto ratio = qApp->desktop()->devicePixelRatio();
+
+        const auto baseSize = QSize(textSize.width(), metrics.height());
+        const auto pixmapSize = baseSize * ratio;
+        QPixmap pixmap(pixmapSize);
+        pixmap.setDevicePixelRatio(ratio);
         pixmap.fill(QColor(0, 0, 0, 0));
 
         QPainter painter(&pixmap);
         painter.setCompositionMode(QPainter::CompositionMode_Source);
         painter.setPen(pen);
         painter.setFont(font);
-        painter.drawText(pixmap.rect(), Qt::AlignCenter | Qt::TextSingleLine, text);
+        painter.drawText(QRect(QPoint(), baseSize), Qt::AlignCenter | Qt::TextSingleLine, text);
         painter.end();
 
         return pixmap;
