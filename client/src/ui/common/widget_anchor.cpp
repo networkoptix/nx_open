@@ -85,9 +85,10 @@ bool QnWidgetAnchor::eventFilter(QObject* object, QEvent* event)
     }
     else
     {
-        if (event->type() == QEvent::Resize && !m_widget.isNull())
+        if (event->type() == QEvent::Resize && 
+           !m_widget.isNull() && 
+            object == m_widget->parentWidget())
         {
-            NX_ASSERT(object == m_widget->parentWidget());
             updateGeometry();
         }
     }
