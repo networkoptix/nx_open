@@ -115,8 +115,23 @@ public:
         }
 
         if (path.isEmpty())
-            return;
-        systemId = path.takeFirst();
+        {
+            scope = SystemUri::Scope::Direct;
+            systemId = domain;
+        }
+        else
+        {
+            QString systemIdOrAction = path.takeFirst();
+            if (systemActionToString.values().contains(systemIdOrAction))
+            {
+                scope = SystemUri::Scope::Direct;
+                systemId = domain;
+            }
+            else
+            {
+                systemId = systemIdOrAction;
+            }
+        }
     }
 
     QString toString() const
