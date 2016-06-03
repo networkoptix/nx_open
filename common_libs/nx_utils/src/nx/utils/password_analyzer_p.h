@@ -54,7 +54,7 @@ namespace
 
     CharCategoryLookup::CharCategoryLookup(const std::string& specialSymbols)
     {
-        m_table.assign(Invalid);
+        m_table.fill(Invalid);
 
         for (char ch = 'a'; ch <= 'z'; ++ch)
             m_table[ch] = LowercaseLetter;

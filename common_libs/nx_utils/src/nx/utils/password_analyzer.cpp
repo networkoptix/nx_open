@@ -28,7 +28,7 @@ namespace
 PasswordStrength nx::utils::passwordStrength(const QString& password)
 {
     std::array<int, CharCategoryLookup::ValidCategoryCount> categories;
-    categories.assign(0);
+    categories.fill(0);
 
     for (QString::ConstIterator ch = password.cbegin(); ch != password.cend(); ++ch)
     {
