@@ -389,15 +389,41 @@ TEST_F(SystemUriTest, genericLinkCloud)
     validateLink(QString("http://%1/cloud?auth=%2").arg(kCloudDomain).arg(kEncodedAuthKey));
 }
 
+TEST_F(SystemUriTest, genericLinkLocalSystem)
+{
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kLocalSystemId);
+
+    validateLink(QString("http://%1/system/%2?auth=%3").arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("http://%1/system/%2/view?auth=%3").arg(kCloudDomain).arg(kLocalSystemId).arg(kEncodedAuthKey));
+}
+
+TEST_F(SystemUriTest, genericLinkEncodedLocalSystem)
+{
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kLocalSystemId);
+
+    validateLink(QString("http://%1/system/%2?auth=%3").arg(kCloudDomain).arg(kEncodedLocalSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("http://%1/system/%2/view?auth=%3").arg(kCloudDomain).arg(kEncodedLocalSystemId).arg(kEncodedAuthKey));
+}
+
+TEST_F(SystemUriTest, genericLinkCloudSystem)
+{
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kCloudSystemId);
+
+    validateLink(QString("http://%1/system/%2?auth=%3").arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("http://%1/system/%2/view?auth=%3").arg(kCloudDomain).arg(kCloudSystemId).arg(kEncodedAuthKey));
+}
+
 
 /*
-
-Http(s) Generic Links
-http://cloud-demo.hdw.mx/system/localhost:7001?auth=YWJyYTprYWRhYnJh
-http://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
-http://cloud-demo.hdw.mx/system/localhost:7001/view?auth=YWJyYTprYWRhYnJh
-http://cloud-demo.hdw.mx/system/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
-http://cloud-demo.hdw.mx/system/localhost%3A7001/view?auth=YWJyYTprYWRhYnJh
 
 Native Generic Links
 nx-vms://cloud-demo.hdw.mx/system/localhost:7001?auth=YWJyYTprYWRhYnJh
