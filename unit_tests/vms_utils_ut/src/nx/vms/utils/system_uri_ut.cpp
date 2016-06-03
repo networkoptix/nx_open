@@ -443,3 +443,17 @@ TEST_F(SystemUriTest, directLinkCloudSystemNative)
 
     validateLink(QString("nx-vms://%1/system?auth=%2").arg(kCloudSystemId).arg(kEncodedAuthKey));
 }
+
+/* Testing invalid domains */
+
+TEST_F(SystemUriTest, directLinkCloudSystem)
+{
+    m_uri.setScope(SystemUri::Scope::Direct);
+    m_uri.setDomain(kCloudSystemId);
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setSystemId(kCloudSystemId);
+
+    validateLink(QString("http://%1/system?auth=%2").arg(kCloudSystemId).arg(kEncodedAuthKey));
+    ASSERT_FALSE(m_uri.isValid());
+}
