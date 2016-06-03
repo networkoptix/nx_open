@@ -82,6 +82,11 @@ void VmsGatewayProcess::setOnStartedEventHandler(
     m_startedEventHandler = std::move(handler);
 }
 
+const std::vector<SocketAddress>& VmsGatewayProcess::httpEndpoints() const
+{
+    return m_httpEndpoints;
+}
+
 #ifdef USE_QAPPLICATION
 int VmsGatewayProcess::executeApplication()
 #else
@@ -123,9 +128,11 @@ int VmsGatewayProcess::exec()
         {
             publicAddressFetcher = std::make_unique<QnPublicIPDiscovery>(
                 QStringList() << settings.cloudConnect().fetchPublicIpUrl);
-            connect(
+            QObject::connect(
                 publicAddressFetcher.get(), &QnPublicIPDiscovery::found,
-                this, &VmsGatewayProcess::publicAddressFetched,
+                publicAddressFetcher.get(), [this](const QHostAddress& publicAddress) {
+                    publicAddressFetched(publicAddress);
+                },
                 Qt::DirectConnection);
             publicAddressFetcher->update();
         }
@@ -173,6 +180,7 @@ int VmsGatewayProcess::exec()
 
         if (!multiAddressHttpServer.listen())
             return 5;
+        m_httpEndpoints = multiAddressHttpServer.endpoints();
 
 #ifdef USE_QAPPLICATION
         application()->installEventFilter(this);
