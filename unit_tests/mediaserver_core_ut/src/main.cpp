@@ -13,24 +13,28 @@ namespace
 void fillConfig(QCoreApplication &app)
 {
     QCommandLineParser parser;
-    parser.addOptions({{{"t", "tmp"}, "Temporary working directory path. Required.", "tmp"},
+    parser.addOptions({{{"t", "tmp"}, "Temporary working directory path.", "tmp"},
                        {"ftp-storage-url", "Ftp storage url"},
                        {"smb-storage-url", "Smb storage url"} });
     parser.addHelpOption();
     parser.parse(app.arguments());
 
+    if (parser.isSet("help"))
+    {
+        parser.showHelp();
+        QCoreApplication::exit(0);
+    }
+
     if (parser.isSet("tmp") && nx::ut::utils::validateAndOrCreatePath(parser.value("tmp")))
         config.tmpDir = parser.value("tmp");
     else
-    {
-        parser.showHelp();
-        QCoreApplication::exit(-1);
-    }
+        config.tmpDir = "tmp";
 
     if (parser.isSet("ftp-storage-url"))
         config.ftpUrl = parser.value("ftp-storage-url");
     if (parser.isSet("smb-storage-url"))
         config.smbUrl = parser.value("smb-storage-url");
+
 }
 
 } // anonymous namespace
