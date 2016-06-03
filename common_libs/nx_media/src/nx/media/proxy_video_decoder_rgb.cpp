@@ -34,28 +34,27 @@ int Impl::decode(
     const int numBytes = avpicture_get_size(PIX_FMT_BGRA, alignedWidth, frameSize().height());
     const int argbLineSize = alignedWidth * 4;
 
-    auto alignedBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, argbLineSize);
-
-    outDecodedFrame->reset(new QVideoFrame(alignedBuffer, frameSize(), QVideoFrame::Format_RGB32));
-    QVideoFrame* const decodedFrame = outDecodedFrame->get();
-
-    decodedFrame->map(QAbstractVideoBuffer::WriteOnly);
-    uchar* argbBuffer = decodedFrame->bits();
+    auto videoBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, argbLineSize);
+    uchar* const argbBuffer = videoBuffer->map(QAbstractVideoBuffer::WriteOnly, nullptr, nullptr);
 
     auto compressedFrame = createUniqueCompressedFrame(compressedVideoData);
-    int64_t outPts = 0;
-    int result;
-    TIME_BEGIN(decodeToRgb);
-    // Perform actual decoding from QnCompressedVideoData to QVideoFrame.
-    result = proxyDecoder().decodeToRgb(compressedFrame.get(), &outPts, argbBuffer, argbLineSize);
-    TIME_END(decodeToRgb);
+    int64_t ptsUs = 0;
+    NX_TIME_BEGIN(decodeToRgb);
+    // Perform actual decoding to AlignedMemVideoBuffer.
+    int result = proxyDecoder().decodeToRgb(compressedFrame.get(), &ptsUs, argbBuffer, argbLineSize);
+    NX_TIME_END(decodeToRgb);
+    videoBuffer->unmap();
 
-    decodedFrame->unmap();
-
-    if (result <= 0) //< Error or no frame (buffering).
-        outDecodedFrame->reset();
+    if (result > 0)
+    {
+        setQVideoFrame(outDecodedFrame, videoBuffer, QVideoFrame::Format_ARGB32, ptsUs);
+    }
     else
-        decodedFrame->setStartTime(outPts);
+    {
+        // Error or no frame (buffering).
+        delete videoBuffer;
+        outDecodedFrame->reset();
+    }
 
     return result;
 }
