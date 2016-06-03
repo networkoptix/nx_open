@@ -109,7 +109,7 @@ void QnRestConnectionProcessor::run()
             sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
             return;
         }
-        if (qnResourceAccessManager->hasGlobalPermission(user, handler->permissions()))
+        if (!qnResourceAccessManager->hasGlobalPermission(user, handler->permissions()))
         {
             sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
             return;
