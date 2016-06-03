@@ -40,7 +40,7 @@ BETA=""
 if [[ "${beta}" == "true" ]]; then
   BETA="-beta"
 fi
-PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
+PACKAGE=$CUSTOMIZATION-mediaserver-$BOX_NAME-$VERSION
 PACKAGE_NAME=$PACKAGE$BETA.tar.gz
 UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
 
@@ -48,6 +48,7 @@ TEMP_DIR="`mktemp -d`"
 BUILD_DIR="$TEMP_DIR/hdw_"$BOX_NAME"_build_app.tmp"
 DEBUG_DIR="$TEMP_DIR/hdw_"$BOX_NAME"_build_debug.tmp"
 PREFIX_DIR=/opt/$CUSTOMIZATION
+if [[ "${box}" == "bpi" ]]; then TARGET_LIB_DIR=$PREFIX_DIR/lib; else TARGET_LIB_DIR=$PREFIX_DIR/mediaserver/lib; fi
 
 BUILD_OUTPUT_DIR=${libdir}
 BINS_DIR=$BUILD_OUTPUT_DIR/bin/${build.configuration}
@@ -68,32 +69,50 @@ do
 done
 
 LIBS_TO_COPY=\
-( libavcodec.so.54.23.100 \
-libavdevice.so.54.0.100 \
-libavfilter.so.2.77.100 \
-libavformat.so.54.6.100 \
-libavutil.so.51.54.100 \
-libudt.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libcloud_db_client.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnx_network.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnx_streaming.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnx_utils.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnx_email.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libpostproc.so.52.0.100 \
-libsigar.so \
-libsasl2.so.3.0.0 \
-liblber-2.4.so.2.10.5 \
-libldap-2.4.so.2.10.5 \
-libldap_r-2.4.so.2.10.5 \
-libswresample.so.0.15.100 \
-libswscale.so.2.1.100 \
-libquazip.so.1.0.0 )
+( libavcodec \
+libavdevice \
+libavfilter \
+libavformat \
+libavutil \
+liblber-2.4 \
+libldap-2.4 \
+libldap_r-2.4 \
+libpostproc \
+libquazip \
+libsasl2 \
+libsigar \
+libswresample \
+libswscale \
+libappserver2 \
+libcloud_db_client \
+libcommon \
+libmediaserver_core \
+libnx_email \
+libnx_network \
+libnx_streaming \
+libnx_utils \
+libudt )
+
+#additional libs for client
+if [[ "${box}" == "bpi" ]]; then
+    LIBS_TO_COPY+=( \
+    libcedrus \
+    libclient.core \
+    libnx_audio \
+    libnx_media \
+    libopenal \
+    libproxydecoder \
+    libEGL \
+    libGLESv1_CM \
+    libGLESv2 \
+    libMali \
+    libpixman-1 \
+    libUMP \
+    libvdpau_sunxi )
+fi
 
 if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
-  LIBS_TO_COPY+=( libvpx.so.1.2.0 )
+  LIBS_TO_COPY+=( libvpx.so )
 fi
 
 rm -rf $BUILD_DIR
@@ -101,66 +120,85 @@ mkdir -p $BUILD_DIR/$PREFIX_DIR
 echo "$VERSION" > $BUILD_DIR/$PREFIX_DIR/version.txt
 
 #copying libs
-mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
-mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+mkdir -p $BUILD_DIR/$TARGET_LIB_DIR/
+mkdir -p $DEBUG_DIR/$TARGET_LIB_DIR/
 for var in "${LIBS_TO_COPY[@]}"
 do
-  cp $LIBS_DIR/${var} $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+  echo "Adding lib" ${var}
+  cp $LIBS_DIR/${var}* $BUILD_DIR/$TARGET_LIB_DIR/ -av
   if [ ! -z "$STRIP" ]; then
-    $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var} $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}.debug
-    $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
-    $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
+    $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$TARGET_LIB_DIR/${var} $DEBUG_DIR/$TARGET_LIB_DIR/${var}.debug
+    $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$TARGET_LIB_DIR/${var}.debug $BUILD_DIR/$TARGET_LIB_DIR/${var}
+    $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$TARGET_LIB_DIR/${var}
   fi
 done
 
-#generating links
-pushd $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
-LIBS="`find ./ -name '*.so.*.*.*'`"
-for var in $LIBS
-do
-    LINK_TARGET="`echo $var | sed 's/\(.*so.[0-9]\+\)\(.*\)/\1/'`"
-    ln -s $var $LINK_TARGET
-done
-popd
-
 #copying qt libs
 QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql"
+if [[ "${box}" == "bpi" ]]; then
+    QTLIBS="Concurrent Core EglDeviceIntegration Gui LabsTemplates MultimediaQuick_p Multimedia Network OpenGL Qml Quick Sql Widgets Xml XmlPatterns"
+fi    
 for var in $QTLIBS
 do
     qtlib=libQt5$var.so
     echo "Adding Qt lib" $qtlib
-    cp -P ${qt.dir}/lib/$qtlib* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+    cp -P ${qt.dir}/lib/$qtlib* $BUILD_DIR/$TARGET_LIB_DIR/
 done
 
+#copying ffmpeg 3.0.2 libs
+cp -av ${env.environment}/packages/bpi/ffmpeg-3.0.2/lib/ffmpeg $BUILD_DIR/$TARGET_LIB_DIR/
+
 #copying bin
-mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
-mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
-cp $BINS_DIR/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
-cp $BINS_DIR/external.dat $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
+mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/
+mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/
+mkdir -p $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/
+mkdir -p $DEBUG_DIR/$PREFIX_DIR/mediaserver/bin/
+cp $BINS_DIR/mobile_client $BUILD_DIR/$PREFIX_DIR/lite_client/bin/
+cp $BINS_DIR/mediaserver $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/
+cp $BINS_DIR/external.dat $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/
 if [ ! -z "$STRIP" ]; then
-  $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug
-  $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver
-  $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver
+  $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/mediaserver $DEBUG_DIR/$PREFIX_DIR/mediaserver/bin/mediaserver.debug
+  $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client $DEBUG_DIR/$PREFIX_DIR/lite_client/bin/mobile_client.debug
+  $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/mediaserver/bin/mediaserver.debug $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/mediaserver
+  $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/lite_client/bin/mobile_client.debug $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
+  $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/mediaserver
+  $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
 fi
 
+if [[ "${box}" == "bpi" ]]; then
+  DIRS_TO_COPY=( \
+  egldeviceintegrations \
+  fonts \
+  imageformats \
+  mobile_client \
+  platforms \
+  qml \
+  video \
+  )
+  for d in "${DIRS_TO_COPY[@]}"; do 
+    echo Copying directory ${d}
+    cp -Rfv $BINS_DIR/${d} $BUILD_DIR/$PREFIX_DIR/lite_client/bin
+  done
+fi
+  
 #copying plugins
 if [ -e "$BINS_DIR/plugins" ]; then
-  mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins
-  mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins
-  cp $BINS_DIR/plugins/*.* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
-  for f in `ls $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/`
+  mkdir -p $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/plugins
+  mkdir -p $DEBUG_DIR/$PREFIX_DIR/mediaserver/bin/plugins
+  cp $BINS_DIR/plugins/*.* $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/plugins/
+  for f in `ls $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/plugins/`
     do
       if [ ! -z "$STRIP" ]; then
-        $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f} $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f}.debug
-        $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f}.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f}
-        $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f}
+        $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/plugins/${f} $DEBUG_DIR/$PREFIX_DIR/mediaserver/bin/plugins/${f}.debug
+        $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/mediaserver/bin/plugins/${f}.debug $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/plugins/${f}
+        $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/plugins/${f}
       fi
     done
 fi
 
 #conf
-mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
-cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc
+mkdir -p $BUILD_DIR/$PREFIX_DIR/mediaserver/etc/
+cp ./opt/networkoptix/mediaserver/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/mediaserver/etc
 
 #start script and platform specific scripts
 cp -R ./etc $BUILD_DIR
@@ -171,22 +209,21 @@ cp -R ./opt $BUILD_DIR
 if [[ "${box}" == "bpi" ]]; then
     cp -R ./root $BUILD_DIR
     mkdir -p $BUILD_DIR/root/tools/nx
-    cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
+    cp ./opt/networkoptix/mediaserver/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
 fi
 if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
-    mv -f $BUILD_DIR/etc/init.d/networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
+    mv -f $BUILD_DIR/etc/init.d/networkoptix-mediaserver $BUILD_DIR/etc/init.d/$CUSTOMIZATION-mediaserver
     cp -Rf $BUILD_DIR/opt/networkoptix/* $BUILD_DIR/opt/$CUSTOMIZATION
     rm -Rf $BUILD_DIR/opt/networkoptix/
 fi
 
 if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
-    cp -f -P $TOOLCHAIN_ROOT/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
-    cp -f -P $environment/packages/bpi/opengl-es-mali/lib/* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+    cp -f -P $TOOLCHAIN_ROOT/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$TARGET_LIB_DIR
 fi
 
 chmod -R 755 $BUILD_DIR/etc/init.d
 if [[ "${box}" == "bpi" ]]; then
-    chmod -R 755 $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/var/scripts
+    chmod -R 755 $BUILD_DIR/$PREFIX_DIR/mediaserver/var/scripts
 fi
 
 #building package
@@ -201,7 +238,7 @@ pushd $BUILD_DIR
 popd
 
 if [ ! -z "$STRIP" ]; then
-    pushd $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/
+    pushd $DEBUG_DIR/$PREFIX_DIR/mediaserver/
       tar czf $PACKAGE-debug-symbols.tar.gz ./bin ./lib
       cp $PACKAGE-debug-symbols.tar.gz ${project.build.directory}
     popd
