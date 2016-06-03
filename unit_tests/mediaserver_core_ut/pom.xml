@@ -36,7 +36,7 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
 
         <path>${env.PATH}</path>
-        <rdep.packages>gtest openssl ffmpeg onvif quazip sigar</rdep.packages>
+        <rdep.packages>gtest openssl ffmpeg onvif quazip sigar festival</rdep.packages>
         <rdep.linux.arm.packages>sasl2 openldap</rdep.linux.arm.packages>
     </properties>
     <dependencies>
