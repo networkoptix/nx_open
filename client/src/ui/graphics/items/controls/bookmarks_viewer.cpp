@@ -623,7 +623,7 @@ QnBookmarksViewer::Impl::~Impl()
 
 void QnBookmarksViewer::Impl::setColors(const QnBookmarkColors &colors)
 {
-    if (m_colors != colors)
+    if (m_colors == colors)
         return;
 
     m_colors = colors;

@@ -30,6 +30,9 @@ QnPaletteColor QnNxStylePrivate::mainColor(QnNxStyle::Colors::Palette palette) c
     case QnNxStyle::Colors::kGreen:
         index = 3;
         break;
+    case QnNxStyle::Colors::kYellow:
+        index = 0;
+        break;
     }
 
     if (index < 0)

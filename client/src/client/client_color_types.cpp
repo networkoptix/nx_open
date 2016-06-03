@@ -248,6 +248,13 @@ QnResourceItemColors::QnResourceItemColors()
     extraTextAccented = QColor(0x117297);
 }
 
+QnPasswordStrengthColors::QnPasswordStrengthColors()
+{
+    inacceptable = QColor(Qt::red);
+    acceptable = QColor(Qt::yellow);
+    good = QColor(Qt::green);
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
     (json)(eq),
