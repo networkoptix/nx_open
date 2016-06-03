@@ -25,6 +25,7 @@ namespace
     bool g_hardwareIdInitialized(false);
 
     const QString kStoredMac = lit("storedMac");
+    const QString kEmptyMac = lit("");
 }
 
 namespace LLUtil {
@@ -98,6 +99,17 @@ namespace LLUtil {
         return storedMac;
     }
 
+    QString hashedHardwareId(const QByteArray &data, int version)
+    {
+        QCryptographicHash md5Hash(QCryptographicHash::Md5);
+        md5Hash.addData(data);
+
+        if (version == 0)
+            return QString(md5Hash.result().toHex());
+        else
+            return QString(lit("0%1%2")).arg(version).arg(QString(md5Hash.result().toHex()));
+    }
+
     void initHardwareId(QSettings *settings)
     {
         if (g_hardwareIdInitialized)
@@ -105,8 +117,17 @@ namespace LLUtil {
 
         try
         {
+            // Add old hardware id first
+            QString oldHardwareId = settings->value("ecsGuid").toString();
+
+            // Add to g_hardwareId
+            QStringList oldHardwareIds(hashedHardwareId(oldHardwareId.toUtf8(), 0));
+            HardwareIdListForVersion macHardwareIds;
+            macHardwareIds << QPair<QString, QStringList>(kEmptyMac, oldHardwareIds);
+            g_hardwareId << macHardwareIds;
+
             fillHardwareIds(g_hardwareId, g_hardwareInfo);
-            NX_ASSERT(g_hardwareId.size() == LATEST_HWID_VERSION);
+            NX_ASSERT(g_hardwareId.size() == LATEST_HWID_VERSION + 1);
 
             g_hardwareInfo.date = QDateTime::currentDateTime().toString(Qt::ISODate);
             QStringList macs = getMacAddressList(g_hardwareInfo.nics);
@@ -124,36 +145,19 @@ namespace LLUtil {
         }
     }
 
-    QString hashedHardwareId(const QByteArray &data, int version)
-    {
-        QCryptographicHash md5Hash(QCryptographicHash::Md5);
-        md5Hash.addData(data);
-        return QString(lit("0%1%2")).arg(version).arg(QString(md5Hash.result().toHex()));
-    }
-
     /* Hardware IDs come in order:
         If it depends on a MAC, then saved mac first.
         First come ones with guid_compatibility=0 */
     QStringList getHardwareIds(int version)
     {
-        if (version == 0)
-        {
-            QString hardwareId = QSettings().value("ecsGuid").toString();
-            QCryptographicHash md5Hash(QCryptographicHash::Md5);
-            md5Hash.addData(hardwareId.toUtf8());
-            return QStringList() << QString(md5Hash.result().toHex());
-        }
-
         if (version < 0 || version > LATEST_HWID_VERSION)
         {
             qWarning() << QLatin1String("getHardwareId(): requested hwid of invalid version: ") << version;
             return QStringList();
         }
 
-        int index = version - 1;
-
         QStringList result;
-        for (const auto &pair : g_hardwareId[index])
+        for (const auto &pair : g_hardwareId[version])
         {
             for (const QString &hwid : pair.second)
             {
@@ -184,7 +188,7 @@ namespace LLUtil {
     {
         NX_ASSERT(g_hardwareIdInitialized);
 
-        const auto &macHwIds = g_hardwareId[LATEST_HWID_VERSION - 1];
+        const auto &macHwIds = g_hardwareId[LATEST_HWID_VERSION];
         for (const auto &macHwid : macHwIds)
         {
             if (macHwid.first == g_storedMac && !macHwid.second.isEmpty())
