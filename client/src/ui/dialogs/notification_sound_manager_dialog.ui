@@ -44,7 +44,7 @@
        <item>
         <widget class="QPushButton" name="playButton">
          <property name="text">
-          <string>&amp;Play</string>
+          <string>Play</string>
          </property>
         </widget>
        </item>
@@ -58,7 +58,7 @@
        <item>
         <widget class="QPushButton" name="addButton">
          <property name="text">
-          <string>&amp;Add...</string>
+          <string>Add...</string>
          </property>
          <property name="icon">
           <iconset resource="../../../x64/build/client.qrc">
@@ -69,14 +69,14 @@
        <item>
         <widget class="QPushButton" name="renameButton">
          <property name="text">
-          <string>&amp;Rename...</string>
+          <string>Rename...</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="deleteButton">
          <property name="text">
-          <string>&amp;Delete...</string>
+          <string>Delete...</string>
          </property>
          <property name="icon">
           <iconset resource="../../../x64/build/client.qrc">

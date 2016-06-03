@@ -20,7 +20,7 @@
         <template>app</template>
 
         <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
-        <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_streaming -lnx_network -lcommon -lnx_utils -ludt</global.libs>
+        <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_network -lnx_utils -ludt</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU</linux.oslibs>
         <android.oslibs>-lturbojpeg</android.oslibs>
@@ -50,6 +50,22 @@
             <scope>system</scope>
             <systemPath>${root.dir}/client/pom.xml</systemPath>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_audio</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
+        </dependency>   
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_media</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_media/pom.xml</systemPath>
+        </dependency>           
     </dependencies>
 
     <build>

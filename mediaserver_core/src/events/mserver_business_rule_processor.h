@@ -35,6 +35,8 @@ private:
     bool executeBookmarkAction(const QnAbstractBusinessActionPtr &action);
     bool executeHttpRequestAction(const QnAbstractBusinessActionPtr& action);
     bool executePtzAction(const QnAbstractBusinessActionPtr& action);
+    bool executeSayTextAction(const QnAbstractBusinessActionPtr& action);
+    bool executePlaySoundAction(const QnAbstractBusinessActionPtr& action);
 
 private:
     class SendEmailAggregationKey
@@ -95,22 +97,22 @@ private:
     static QVariantHash eventDescriptionMap(
         const QnAbstractBusinessActionPtr& action,
         const QnBusinessAggregationInfo &aggregationInfo,
-        QnEmailAttachmentList& attachments,
-        bool useIp);
+        QnEmailAttachmentList& attachments);
 
     static QVariantHash eventDetailsMap(
         const QnAbstractBusinessActionPtr& action,
         const QnInfoDetail& aggregationData,
-        bool useIp,
+        Qn::ResourceInfoLevel detailLevel,
         bool addSubAggregationData = true );
 
     static QVariantList aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
         const QnBusinessAggregationInfo& aggregationInfo,
-        bool useIp);
+        Qn::ResourceInfoLevel detailLevel);
+
     static QVariantList aggregatedEventDetailsMap(
         const QnAbstractBusinessActionPtr& action,
         const QList<QnInfoDetail>& aggregationDetailList,
-        bool useIp );
+        Qn::ResourceInfoLevel detailLevel);
 };
 
 #endif // __MSERVER_BUSINESS_RULE_PROCESSOR_H_

@@ -25,7 +25,6 @@
 #include "common/common_module.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-#include "core/resource/resource_name.h"
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -189,12 +188,19 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
         return true;
 
     case QnBusiness::ShowPopupAction:
-    case QnBusiness::PlaySoundOnceAction:
-    case QnBusiness::PlaySoundAction:
-    case QnBusiness::SayTextAction:
     case QnBusiness::ShowOnAlarmLayoutAction:
     case QnBusiness::ShowTextOverlayAction:
         return broadcastBusinessAction(action);
+
+    case QnBusiness::SayTextAction:
+    case QnBusiness::PlaySoundAction:
+    case QnBusiness::PlaySoundOnceAction:
+    {
+        auto params = action->getParams();
+        if(params.playToClient)
+            broadcastBusinessAction(action);
+        break;
+    }
 
     default:
         break;

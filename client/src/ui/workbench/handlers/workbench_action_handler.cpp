@@ -30,7 +30,6 @@
 #include <common/common_module.h>
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -68,7 +67,7 @@
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
-#include <ui/dialogs/preferences_dialog.h>
+#include <ui/dialogs/local_settings_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
@@ -91,8 +90,6 @@
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
-
-#include <ui/common/ui_resource_name.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -218,7 +215,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(QnActions::OpenLayoutsInNewWindowAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsInNewWindowAction_triggered()));
     connect(action(QnActions::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
-    connect(action(QnActions::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
     connect(action(QnActions::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
 
     connect(action(QnActions::MediaFileSettingsAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered);
@@ -265,8 +261,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
     connect(action(QnActions::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
 
-    /* Qt::QueuedConnection is important! See QnPreferencesDialog::canApplyChanges() for details. */
-    connect(action(QnActions::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
+    connect(action(QnActions::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()));
     connect(action(QnActions::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
 
     connect(action(QnActions::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
@@ -776,15 +771,6 @@ void QnWorkbenchActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
     menu()->trigger(QnActions::OpenLayoutsInNewWindowAction, workbench()->currentLayout()->resource());
 }
 
-void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
-    QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
-
-    layout->setName(generateUniqueLayoutName(context()->user(), tr("New Layout"), tr("New Layout %1")));
-
-    workbench()->addLayout(layout);
-    workbench()->setCurrentLayout(layout);
-}
-
 void QnWorkbenchActionHandler::at_openNewWindowAction_triggered() {
     openNewWindow(QStringList());
 }
@@ -1049,8 +1035,8 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(mainWindow()));
-    dialog->setCurrentPage(QnPreferencesDialog::GeneralPage);
+    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
+    dialog->setCurrentPage(QnLocalSettingsDialog::GeneralPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -1066,8 +1052,8 @@ void QnWorkbenchActionHandler::at_preferencesSmtpTabAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(mainWindow()));
-    dialog->setCurrentPage(QnPreferencesDialog::NotificationsPage);
+    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
+    dialog->setCurrentPage(QnLocalSettingsDialog::NotificationsPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }

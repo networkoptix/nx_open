@@ -267,6 +267,11 @@ public:
         addAttribute(std::make_shared<attrs::IntAttribute>(type, value));
     }
 
+    void addAttribute(int type, bool value)
+    {
+        addAttribute(std::make_shared<attrs::IntAttribute>(type, value ? 1 : 0));
+    }
+
     /** Add std::chrono::duration attribute.
         \warning \a value.count() MUST NOT be greater than \a std::numeric_limits<int>::max()
     */

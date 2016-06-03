@@ -39,10 +39,18 @@ public:
         QString hintText = result.errorMessage;
 
         hint->setText(hintText);
-        hint->setVisible(!hintText.isEmpty());
+
+        bool hideHint = hintText.isEmpty();
+        if (hideHint != hint->isHidden())
+        {
+            hint->setVisible(!hideHint);
+            parent->layout()->activate();
+        }
+
         QPalette palette = parent->palette();
         if (result.state == QValidator::Invalid)
             setWarningStyle(&palette);
+
         input->setPalette(palette);
         hint->setPalette(palette);
     }
@@ -52,8 +60,6 @@ public:
     QLabel* hint;
     QLineEdit* input;
     Qn::TextValidateFunction validator;
-    QMetaObject::Connection validatorConnection;
-
 };
 
 class LabelWidthAccessor : public AbstractAccessor
@@ -76,7 +82,6 @@ public:
             return;
         w->d_ptr->title->setFixedWidth(value.toInt());
     }
-
 };
 
 QnInputField::QnInputField(QWidget* parent /*= nullptr*/) :
@@ -96,13 +101,11 @@ QnInputField::QnInputField(QWidget* parent /*= nullptr*/) :
     d->hint->setVisible(false);
 
     connect(d->input, &QLineEdit::textChanged, this, &QnInputField::textChanged);
-
-
+    connect(d->input, &QLineEdit::editingFinished, d, &QnInputFieldPrivate::validate);
 }
 
 QnInputField::~QnInputField()
 {
-
 }
 
 QString QnInputField::title() const
@@ -193,9 +196,7 @@ bool QnInputField::isValid() const
 void QnInputField::setValidator(Qn::TextValidateFunction validator)
 {
     Q_D(QnInputField);
-    disconnect(d->validatorConnection);
     d->validator = validator;
-    d->validatorConnection = connect(d->input, &QLineEdit::editingFinished, d, &QnInputFieldPrivate::validate);
     d->validate();
 }
 

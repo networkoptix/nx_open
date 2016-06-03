@@ -17,6 +17,7 @@ extern "C" {
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/network_resource.h>
 #include <utils/common/util.h>
+#include <utils/media/ffmpeg_initializer.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -332,7 +333,7 @@ private:
     void loadMedia()
     {
         QnStorageManager::ArchiveCameraDataList archiveCameras;
-        for (int i = 0; i < m_storageUrls.size(); ++i) 
+        for (int i = 0; i < m_storageUrls.size(); ++i)
         {
             QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan : qnBackupStorageMan;
             manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::LowQualityCatalog);
@@ -408,36 +409,6 @@ TEST(ServerArchiveDelegate_playback_test, TestHelper)
     ASSERT_TRUE(timeLine.checkTime(28));
 }
 
-static int lockmgr(void **mtx, enum AVLockOp op)
-{
-    QnMutex** qMutex = (QnMutex**) mtx;
-    switch(op) {
-        case AV_LOCK_CREATE:
-            *qMutex = new QnMutex();
-            return 0;
-        case AV_LOCK_OBTAIN:
-            (*qMutex)->lock();
-            return 0;
-        case AV_LOCK_RELEASE:
-            (*qMutex)->unlock();
-            return 0;
-        case AV_LOCK_DESTROY:
-            delete *qMutex;
-            return 0;
-    }
-    return 1;
-}
-
-static void ffmpegInit()
-{
-    avcodec_register_all();
-
-    if(av_lockmgr_register(lockmgr) != 0)
-    {
-        qCritical() << "Failed to register ffmpeg lock manager";
-    }
-}
-
 TEST(ServerArchiveDelegate_playback_test, Main)
 {
     nx::ut::utils::WorkDirResource storageWorkDir1;
@@ -501,7 +472,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     QnNetworkResourcePtr cameraResource = QnNetworkResourcePtr(new QnNetworkResource);
     cameraResource->setPhysicalId(cameraFolder);
 
-    ffmpegInit();
+    QnFfmpegInitializer ffmpegHolder;
 
     QnServerArchiveDelegate archiveDelegate;
     archiveDelegate.open(cameraResource);

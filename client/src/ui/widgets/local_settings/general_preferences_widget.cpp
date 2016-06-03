@@ -33,9 +33,7 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->doubleBufferWarningLabel->setText(tr("Disable only if the client takes too much CPU"));
-
-    if (!this->context()->instance<QnWorkbenchAutoStarter>()->isSupported())
+    if (!context()->instance<QnWorkbenchAutoStarter>()->isSupported())
         ui->autoStartCheckBox->hide();
 
     setHelpTopic(ui->mainMediaFolderGroupBox, ui->extraMediaFoldersGroupBox,  Qn::SystemSettings_General_MediaFolders_Help);
@@ -162,8 +160,8 @@ bool QnGeneralPreferencesWidget::hasChanges() const
 bool QnGeneralPreferencesWidget::isRestartRequired() const
 {
     /* These changes can be applied only after client restart. */
-    return m_oldDownmix == ui->downmixAudioCheckBox->isChecked()
-        && m_oldDoubleBuffering == ui->doubleBufferCheckbox->isChecked();
+    return m_oldDownmix != ui->downmixAudioCheckBox->isChecked()
+        || m_oldDoubleBuffering != ui->doubleBufferCheckbox->isChecked();
 }
 
 // -------------------------------------------------------------------------- //

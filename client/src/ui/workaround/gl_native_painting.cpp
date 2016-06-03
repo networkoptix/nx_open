@@ -18,7 +18,9 @@ void QnGlNativePainting::begin(const QGLContext* context,QPainter *painter) {
          * copying code from qpaintengineex_opengl2.cpp. Executing this code
          * twice will not result in any problems, so we don't do any
          * additional checks. */
-        const QSize sz = QSize(painter->device()->width(), painter->device()->height());
+        const auto aspect = painter->device()->devicePixelRatio();
+        const QSize sz = QSize(painter->device()->width() * aspect
+            , painter->device()->height() * aspect);
         QMatrix4x4 m;
         m.ortho(0, sz.width(), sz.height(), 0, -999999, 999999);
         QnOpenGLRendererManager::instance(context)->setProjectionMatrix(m);

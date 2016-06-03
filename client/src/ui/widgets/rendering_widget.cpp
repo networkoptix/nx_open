@@ -118,7 +118,10 @@ void QnRenderingWidget::resizeGL(int width, int height) {
 
     QMatrix4x4 matrix;
     matrix.translate(-1.0, 1.0, 0.0);
-    matrix.scale(2.0 / width, -2.0 / height, 1.0);
+
+    const auto aspect = QGLContext::currentContext()->device()->devicePixelRatio();
+    const auto scaleBase = 2.0 * aspect;
+    matrix.scale(scaleBase / width, -scaleBase / height, 1.0);
     renderer->setProjectionMatrix(matrix);
 }
 

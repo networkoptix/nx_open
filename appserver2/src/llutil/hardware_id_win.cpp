@@ -38,6 +38,7 @@ namespace LLUtil {
 
     namespace {
         const int kWbemTimeoutMs = 5000;
+        const QString kEmptyMac = lit("");
     }
 
 HRESULT GetDisabledNICS(IWbemServices* pSvc, std::vector<_bstr_t>& paths)
@@ -409,7 +410,7 @@ void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareIn
         }
     } else
     {
-        hardwareIdMap[""] = hardwareId;
+        hardwareIdMap[kEmptyMac] = hardwareId;
     }
 }
 

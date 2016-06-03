@@ -5,8 +5,8 @@
 #include <client/client_runtime_settings.h>
 
 #include <core/resource/media_server_resource.h>
+#include <core/resource/resource_display_info.h>
 
-#include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/common/progress_widget.h>
 
@@ -63,11 +63,13 @@ QnMediaServerResourceList QnReconnectInfoDialog::servers() const {
     return m_servers;
 }
 
-void QnReconnectInfoDialog::setServers(const QnMediaServerResourceList &servers) {
+void QnReconnectInfoDialog::setServers(const QnMediaServerResourceList &servers)
+{
     m_servers = servers;
     int row = 0;
-    for (const QnMediaServerResourcePtr server: m_servers) {
-        QString text = getResourceName(server);
+    for (const QnMediaServerResourcePtr server: m_servers)
+    {
+        QString text = QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
 
         QLabel* nameLabel = new QLabel(this);
         nameLabel->setText(fontMetrics().elidedText(text, Qt::ElideMiddle, maxLabelWidth));

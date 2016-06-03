@@ -4,9 +4,11 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_display_info.h>
+
+#include <client/client_settings.h>
 
 #include <ui/style/resource_icon_cache.h>
-#include <ui/common/ui_resource_name.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
@@ -69,7 +71,7 @@ QString QnLicenseListModel::columnTitle(Column column) {
     case LicenseKeyColumn:      return tr("License Key");
     case ExpirationDateColumn:  return tr("Expiration Date");
     case LicenseStatusColumn:   return tr("Status");
-    case ServerColumn:          return tr("Server");        
+    case ServerColumn:          return tr("Server");
     default:
         NX_ASSERT(false);
         return QString();
@@ -97,7 +99,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
         item->setText(license->expirationTime() < 0 ? tr("Never") : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString(Qt::SystemLocaleShortDate));
         item->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
         break;
-    case LicenseStatusColumn: 
+    case LicenseStatusColumn:
         {
             QnLicense::ErrorCode errCode;
             if (qnLicensePool->isLicenseValid(license, &errCode))
@@ -110,8 +112,8 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
                 if(expirationTime > 0 && timeLeft < 0) {
                     item->setText(tr("Expired"));
                     item->setData(QBrush(colors.expired), Qt::ForegroundRole);
-                } 
-                else if(expirationTime > 0 && timeLeft < 15 * day) 
+                }
+                else if(expirationTime > 0 && timeLeft < 15 * day)
                 {
                         item->setData(QBrush(colors.warning), Qt::ForegroundRole);
                         int daysLeft = QDateTime::fromMSecsSinceEpoch(currentTime).date().daysTo(QDateTime::fromMSecsSinceEpoch(expirationTime).date());
@@ -138,12 +140,15 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
         {
             QnUuid serverId = license->serverId();
             QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(serverId);
-            if (!server) {
+            if (!server)
+            {
                 item->setText(tr("<Server not found>"));
                 item->setData(QVariant(), Qt::DecorationRole);
                 item->setData(QBrush(colors.expired), Qt::ForegroundRole);
-            } else {
-                item->setText(getResourceName(server));
+            }
+            else
+            {
+                item->setText(QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree()));
                 item->setData(qnResIconCache->icon(QnResourceIconCache::Server).pixmap(16, 16), Qt::DecorationRole);
                 item->setData(QBrush(colors.normal), Qt::ForegroundRole);
             }

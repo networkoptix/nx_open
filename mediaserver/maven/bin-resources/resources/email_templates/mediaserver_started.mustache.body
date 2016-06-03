@@ -1,0 +1,7 @@
+<h1>{{event}}: {{source}}</h1>
+
+<p>
+ {{#aggregated}}
+    <b>{{{timestamp}}}</b>
+ {{/aggregated}}
+</p>

@@ -35,9 +35,7 @@ QnAxClientModule::QnAxClientModule(QObject *parent)
     qnSettings->setLightMode(Qn::LightModeActiveX);
     qnRuntime->setActiveXMode(true);
 
-    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin
-        ? lit(":/skin_light")
-        : lit(":/skin_dark");
+    QString customizationPath = lit(":/skin_dark");
     m_skin.reset(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 
     QnCustomization customization;

@@ -19,6 +19,7 @@
 void PrintTo(const QByteArray& val, ::std::ostream* os);
 void PrintTo(const QString& val, ::std::ostream* os);
 void PrintTo(const SocketAddress& val, ::std::ostream* os);
+void PrintTo(const HostAddress& val, ::std::ostream* os);
 
 namespace std {
 namespace chrono {

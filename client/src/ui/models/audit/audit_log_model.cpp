@@ -9,13 +9,14 @@
 #include "business/business_strings_helper.h"
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include "core/resource_management/resource_pool.h"
+#include <core/resource/resource_display_info.h>
 
-#include <ui/common/ui_resource_name.h>
+#include <client/client_settings.h>
+
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
@@ -244,7 +245,7 @@ void QnAuditLogModel::clear() {
 
 QString QnAuditLogModel::getResourceNameById(const QnUuid &id)
 {
-    return getResourceName(qnResPool->getResourceById(id));
+    return QnResourceDisplayInfo(qnResPool->getResourceById(id)).toString(qnSettings->extraInfoInTree());
 }
 
 QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool showTime) const

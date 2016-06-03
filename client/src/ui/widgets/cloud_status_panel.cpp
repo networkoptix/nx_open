@@ -64,7 +64,8 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel *parent)
 
     cloudMenu->addAction(q->action(QnActions::OpenCloudMainUrl));
     cloudMenu->setWindowFlags(cloudMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-    systemsMenu = cloudMenu->addMenu(QnCloudStatusPanel::tr("Connect to System..."));
+    //TODO: #dklychkov Uncomment when cloud login is implemented
+    //systemsMenu = cloudMenu->addMenu(QnCloudStatusPanel::tr("Connect to System..."));
     cloudMenu->addSeparator();
     cloudMenu->addAction(q->action(QnActions::OpenCloudManagementUrl));
     cloudMenu->addAction(q->action(QnActions::LogoutFromCloud));

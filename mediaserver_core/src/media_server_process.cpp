@@ -97,6 +97,7 @@
 #include <plugins/resource/mdns/mdns_listener.h>
 
 #include <plugins/storage/file_storage/file_storage_resource.h>
+#include <plugins/storage/file_storage/db_storage_resource.h>
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
 
 #include <recorder/file_deletor.h>
@@ -231,6 +232,9 @@
 #include "cloud/cloud_connection_manager.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
+#include <nx_speach_synthesizer/text_to_wav.h>
+#include <streaming/audio_streamer_pool.h>
+#include <proxy/2wayaudio/proxy_audio_receiver.h>
 
 #ifdef __arm__
 #include "nx1/info.h"
@@ -405,39 +409,12 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 }
 
-
-static int lockmgr(void **mtx, enum AVLockOp op)
-{
-    QnMutex** qMutex = (QnMutex**) mtx;
-    switch(op) {
-        case AV_LOCK_CREATE:
-            *qMutex = new QnMutex();
-            return 0;
-        case AV_LOCK_OBTAIN:
-            (*qMutex)->lock();
-            return 0;
-        case AV_LOCK_RELEASE:
-            (*qMutex)->unlock();
-            return 0;
-        case AV_LOCK_DESTROY:
-            delete *qMutex;
-            return 0;
-    }
-    return 1;
-}
-
 void ffmpegInit()
 {
-    //avcodec_init();
-    av_register_all();
-
-    if(av_lockmgr_register(lockmgr) != 0)
-    {
-        qCritical() << "Failed to register ffmpeg lock manager";
-    }
-
     // TODO: #Elric we need comments about true/false at call site => bad api design, use flags instead
-    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
+    // true means use it plugin if no <protocol>:// prefix
+    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
+    QnStoragePluginFactory::instance()->registerStoragePlugin("dbfile", QnDbStorageResource::instance, false);
 }
 
 QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
@@ -1533,7 +1510,7 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/testLdapSettings", new QnTestLdapSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/recStats", new QnRecordingStatsRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
@@ -1618,6 +1595,7 @@ bool MediaServerProcess::initTcpListener(
     m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy");
     //m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
     m_universalTcpListener->addHandler<QnProxyReceiverConnection>("HTTP", "proxy-reverse");
+    m_universalTcpListener->addHandler<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
 
     if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
         m_universalTcpListener->disableAuth();
@@ -1680,7 +1658,8 @@ std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMappe
 
 QHostAddress MediaServerProcess::getPublicAddress()
 {
-    m_ipDiscovery.reset(new QnPublicIPDiscovery());
+    m_ipDiscovery.reset(new QnPublicIPDiscovery(
+        MSSettings::roSettings()->value(nx_ms_conf::PUBLIC_IP_SERVERS).toString().split(";", QString::SkipEmptyParts)));
 
     if (MSSettings::roSettings()->value("publicIPEnabled").isNull())
         MSSettings::roSettings()->setValue("publicIPEnabled", 1);
@@ -2286,6 +2265,10 @@ void MediaServerProcess::run()
     /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
     QnMediaServerResourceSearchers searchers;
 
+    std::unique_ptr<TextToWaveServer> speechSynthesizer(new TextToWaveServer());
+    speechSynthesizer->start();
+
+    std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
     loadResourcesFromECS(messageProcessor.data());
 
     if (isNewServerInstance || systemName.isDefault())
@@ -2523,8 +2506,6 @@ void MediaServerProcess::run()
     ec2ConnectionFactory.reset();
 
     mserverResourceDiscoveryManager.reset();
-
-    av_lockmgr_register(NULL);
 
     // This method will set flag on message channel to threat next connection close as normal
     //appServerConnection->disconnectSync();

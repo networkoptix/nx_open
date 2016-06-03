@@ -10,6 +10,7 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include <plugins/resource/mdns/mdns_packet.h>
 
 extern QString getValueFromString(const QString& line);
 
@@ -230,6 +231,27 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     resource->setModel(name);
     resource->setMAC(QnMacAddress(smac));
 
+    quint16 port = nx_http::DEFAULT_HTTP_PORT;
+    QnMdnsPacket packet;
+    if (packet.fromDatagram(responseData))
+    {
+        for (const auto& answer: packet.answerRRs)
+        {
+            if (answer.recordType == QnMdnsPacket::kSrvRecordType)
+            {
+                QnMdnsSrvData srv;
+                srv.decode(answer.data);
+                port = srv.port;
+            }
+        }
+    }
+
+    QUrl url;
+    url.setScheme(lit("http"));
+    url.setHost(foundHostAddress.toString());
+    url.setPort(port);
+
+    resource->setUrl(url.toString());
 
     local_results.push_back(resource);
 

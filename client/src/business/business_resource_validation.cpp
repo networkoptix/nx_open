@@ -1,14 +1,20 @@
 #include "business_resource_validation.h"
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_name.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
 #include <utils/email/email.h>
 
-namespace {
+namespace
+{
+
+    QString getShortResourceName(const QnResourcePtr& resource)
+    {
+        return QnResourceDisplayInfo(resource).toString(Qn::RI_NameOnly);
+    }
 
     class QnBusinessResourceValidationStrings {
         Q_DECLARE_TR_FUNCTIONS(QnBusinessResourceValidationStrings)
@@ -69,6 +75,7 @@ namespace {
         return QnDeviceDependentStrings::getNumericName(cameras);
     }
 
+
 }
 
 bool QnCameraInputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
@@ -117,6 +124,16 @@ QString QnCameraMotionPolicy::getText(const QnResourceList &resources, const boo
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     int invalid = invalidResourcesCount<QnCameraMotionPolicy>(cameras);
     return genericCameraText<QnCameraMotionPolicy>(cameras, detailed, tr("Recording or motion detection is disabled for %1", "", invalid), invalid);
+}
+
+bool QnCameraAudioTransmitPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+    return camera->hasCameraCapabilities(Qn::AudioTransmitCapability);
+}
+
+QString QnCameraAudioTransmitPolicy::getText(const QnResourceList &resources, const bool detailed) {
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    int invalid = invalidResourcesCount<QnCameraAudioTransmitPolicy>(cameras);
+    return genericCameraText<QnCameraAudioTransmitPolicy>(cameras, detailed, tr("%1 doesn't support two-way audio", "", invalid), invalid);
 }
 
 bool QnCameraRecordingPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
