@@ -37,10 +37,16 @@ public:
     QIcon icon(const QIcon& icon);
 
     /// @brief Loads pixmap with appropriate size according to current hidpi settings
-    QPixmap dpPixmap(const QString& name);
+    QPixmap dpPixmap(const char* name,
+        const QSize& size = QSize(),
+        Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio,
+        Qt::TransformationMode mode = Qt::FastTransformation);
 
-    QPixmap pixmap(const QString& name, const QSize& size = QSize(), Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation);
-    QPixmap pixmap(const char* name, const QSize& size = QSize(), Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation);
+    QPixmap dpPixmap(const QString& name, 
+        const QSize& size = QSize(), 
+        Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, 
+        Qt::TransformationMode mode = Qt::FastTransformation);
+
 
     QMovie* newMovie(const QString& name, QObject* parent = nullptr);
     QMovie* newMovie(const char* name, QObject* parent = nullptr);
@@ -49,6 +55,8 @@ public:
 
 private:
     void init(const QStringList& paths);
+
+    QPixmap getPixmapInternal(const QString &name, const QSize& size = QSize(), Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation);
 
 private:
     QStringList m_paths;

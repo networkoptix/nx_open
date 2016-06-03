@@ -21,7 +21,7 @@ namespace
 // -------------------------------------------------------------------------- //
 class QnIconBuilder
 {
-    typedef QMultiHash<QPair<QIcon::Mode, QIcon::State>, QPixmap> container_type;
+    typedef QHash<QPair<QIcon::Mode, QIcon::State>, QPixmap> container_type;
 
 public:
     void addPixmap(const QPixmap& pixmap, QIcon::Mode mode)
@@ -41,7 +41,7 @@ public:
 
     void addPixmap(const QPixmap& pixmap, QIcon::Mode mode, QIcon::State state)
     {
-        m_pixmaps.insert(qMakePair(mode, state), pixmap);
+        m_pixmaps[qMakePair(mode, state)] = pixmap;
     }
 
     QIcon createIcon() const

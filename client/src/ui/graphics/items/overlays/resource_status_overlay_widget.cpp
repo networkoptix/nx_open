@@ -314,7 +314,7 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         }
     case Qn::NoVideoDataOverlay:
         if (!m_ioSpeakerPixmap)
-            m_ioSpeakerPixmap.reset(new QPixmap(qnSkin->pixmap("item/io_speaker.png")));
+            m_ioSpeakerPixmap.reset(new QPixmap(qnSkin->dpPixmap("item/io_speaker.png")));
         paintPixmap(painter, *m_ioSpeakerPixmap, 0.064);
         break;
     case Qn::IoModuleDisabledOverlay:

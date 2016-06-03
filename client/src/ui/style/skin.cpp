@@ -104,7 +104,18 @@ QIcon QnSkin::icon(const QIcon& icon)
 }
 
 
-QPixmap QnSkin::dpPixmap(const QString& name)
+QPixmap QnSkin::dpPixmap(const char* name,
+    const QSize& size,
+    Qt::AspectRatioMode aspectMode,
+    Qt::TransformationMode mode)
+{
+    return dpPixmap(QString::fromLatin1(name), size, aspectMode, mode);
+}
+
+QPixmap QnSkin::dpPixmap(const QString& name, 
+    const QSize& size, 
+    Qt::AspectRatioMode aspectMode, 
+    Qt::TransformationMode mode)
 {
     static const auto kHiDpiSuffix = lit("@2x");
     static const bool kIsHiDpi = (QApplication::desktop()->devicePixelRatio() > 1);
@@ -116,14 +127,14 @@ QPixmap QnSkin::dpPixmap(const QString& name)
         const auto suffix = info.completeSuffix();
         const auto newName = info.path() + lit("/") + info.completeBaseName() + kHiDpiSuffix
             + (suffix.isEmpty() ? QString() : lit(".") + info.suffix());
-        auto result = pixmap(newName);
+        auto result = getPixmapInternal(newName, size, aspectMode, mode);
         if (!result.isNull())
             return result;
     }
-    return pixmap(name);
+    return getPixmapInternal(name, size, aspectMode, mode);
 }
 
-QPixmap QnSkin::pixmap(const QString& name, const QSize& size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
+QPixmap QnSkin::getPixmapInternal(const QString& name, const QSize& size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
 {
     QString key = name;
     if (!size.isEmpty())
@@ -147,11 +158,6 @@ QPixmap QnSkin::pixmap(const QString& name, const QSize& size, Qt::AspectRatioMo
     }
 
     return pixmap;
-}
-
-QPixmap QnSkin::pixmap(const char* name, const QSize& size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
-{
-    return pixmap(QLatin1String(name), size, aspectMode, mode);
 }
 
 QStyle* QnSkin::newStyle(const QnGenericPalette& genericPalette)

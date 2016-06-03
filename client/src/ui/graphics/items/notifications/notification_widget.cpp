@@ -89,7 +89,7 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
     if (!provider->image().isNull()) {
         m_thumbnailLabel->setPixmap(QPixmap::fromImage(provider->image()));
     } else {
-        m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
+        m_thumbnailLabel->setPixmap(qnSkin->dpPixmap("events/thumb_loading.png"));
     }
     connect(provider, &QnImageProvider::imageChanged, this, [this](const QImage &image) {
         m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));

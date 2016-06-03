@@ -25,7 +25,7 @@ namespace {
 // -------------------------------------------------------------------------- //
 // GraphicsToolTipLabel
 // -------------------------------------------------------------------------- //
-// TODO: replace QnProxyLabel with Graphics label after VMS28-05 will be done
+// TODO: #ynikitenkov. replace QnProxyLabel with GraphicsLabel. VMS-2805
 class GraphicsToolTipLabel: public QnProxyLabel {
     typedef QnProxyLabel base_type;
 
