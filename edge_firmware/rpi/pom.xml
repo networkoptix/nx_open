@@ -39,7 +39,7 @@
                 </property>
             </activation>
             <properties>
-                <rdep.linux.packages>uboot-2014.04-10733-gbb5691c-dirty-vanilla libstdc++-6.0.20 ffmpeg-3.0.2 ldpreloadhook-1.0 libpixman-0.34.0 libump-3.0 libvdpau-sunxi-1.0 libcedrus-1.0 libvdpau-1.0.4.1</rdep.linux.packages>
+                <rdep.linux.packages>uboot-2014.04-10733-gbb5691c-dirty-vanilla ffmpeg-3.0.2 ldpreloadhook-1.0 libpixman-0.34.0 libump-3.0 libvdpau-sunxi-1.0 libcedrus-1.0 libvdpau-1.0.4.1</rdep.linux.packages>
                 <linux.oslibs>-lz</linux.oslibs>
             </properties>
             <dependencies>
@@ -51,7 +51,7 @@
                     <scope>system</scope>
                     <systemPath>${root.dir}/mobile_client/pom.xml</systemPath>
                 </dependency>			
-            </dependencies>	            
+            </dependencies>	  	            
         </profile>      
     </profiles>      
 </project>
