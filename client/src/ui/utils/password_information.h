@@ -25,9 +25,9 @@ public:
     bool operator == (const QnPasswordInformation& other) const;
     bool operator != (const QnPasswordInformation& other) const;
 
-    const QString& text() const { return m_text; }
-    const QString& hint() const { return m_hint; }
-    Acceptance acceptance() const { return m_acceptance; }
+    const QString& text() const;
+    const QString& hint() const;
+    Acceptance acceptance() const;
 
 private:
     QString m_text;

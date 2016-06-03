@@ -66,3 +66,18 @@ bool QnPasswordInformation::operator != (const QnPasswordInformation& other) con
 {
     return !(*this == other);
 }
+
+const QString& QnPasswordInformation::text() const
+{
+    return m_text;
+}
+
+const QString& QnPasswordInformation::hint() const
+{
+    return m_hint;
+}
+
+QnPasswordInformation::Acceptance QnPasswordInformation::acceptance() const
+{
+    return m_acceptance;
+}
