@@ -1518,35 +1518,35 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/testLdapSettings", new QnTestLdapSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/recStats", new QnRecordingStatsRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/backupControl", new QnBackupControlRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler()); // deprecated
-    QnRestProcessorPool::instance()->registerHandler("api/businessEvents", new QnBusinessLog2RestHandler()); // new version
+    QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler(), Qn::GlobalPermission::GlobalAdvancedViewerPermissionSet); // deprecated
+    QnRestProcessorPool::instance()->registerHandler("api/businessEvents", new QnBusinessLog2RestHandler(), Qn::GlobalPermission::GlobalAdvancedViewerPermissionSet); // new version
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/getSystemName", new QnGetSystemNameRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/iflist", new QnIfListRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/aggregator", new QnJsonAggregatorRestHandler() );
-    QnRestProcessorPool::instance()->registerHandler("api/ifconfig", new QnIfConfigRestHandler(), RestPermissions::adminOnly );
-    QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler(), RestPermissions::adminOnly );
+    QnRestProcessorPool::instance()->registerHandler("api/ifconfig", new QnIfConfigRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
-    QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler(), RestPermissions::adminOnly);
-    QnRestProcessorPool::instance()->registerHandler("api/detachFromSystem", new QnDetachFromSystemRestHandler(), RestPermissions::adminOnly);
-    QnRestProcessorPool::instance()->registerHandler("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), RestPermissions::adminOnly);
-    QnRestProcessorPool::instance()->registerHandler("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(), RestPermissions::adminOnly);
-    QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/detachFromSystem", new QnDetachFromSystemRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler(), RestPermissions::adminOnly);
-    QnRestProcessorPool::instance()->registerHandler("api/execute", new QnExecScript(), RestPermissions::adminOnly);
-    QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/execute", new QnExecScript(), Qn::GlobalPermission::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler());
 
     QnRestProcessorPool::instance()->registerHandler("api/transmitAudio", new QnAudioTransmissionRestHandler());

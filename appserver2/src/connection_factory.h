@@ -91,24 +91,24 @@ namespace ec2
         ErrorCode getSettings( std::nullptr_t, ApiResourceParamDataList* const outData );
 
         template<class InputDataType>
-            void registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd );
+            void registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, Qn::GlobalPermission permission = Qn::GlobalPermission::NoGlobalPermissions);
 
         template<class InputDataType, class CustomActionType>
-            void registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, CustomActionType customAction );
+            void registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, CustomActionType customAction, Qn::GlobalPermission permission = Qn::GlobalPermission::NoGlobalPermissions);
 
         template<class InputDataType, class OutputDataType>
-            void registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd );
+            void registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, Qn::GlobalPermission permission = Qn::GlobalPermission::NoGlobalPermissions);
 
         template<class InputType, class OutputType>
             void registerFunctorHandler(
                 QnRestProcessorPool* const restProcessorPool,
                 ApiCommand::Value cmd,
-                std::function<ErrorCode(InputType, OutputType*)> handler);
+                std::function<ErrorCode(InputType, OutputType*)> handler, Qn::GlobalPermission permission = Qn::GlobalPermission::NoGlobalPermissions);
         template<class InputType, class OutputType>
             void registerFunctorWithResponseHandler(
                 QnRestProcessorPool* const restProcessorPool,
                 ApiCommand::Value cmd,
-                std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler);
+                std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler, Qn::GlobalPermission permission = Qn::GlobalPermission::NoGlobalPermissions);
 
         template<class Function>
             void statisticsCall(const Function& function);

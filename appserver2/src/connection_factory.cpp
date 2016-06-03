@@ -1415,40 +1415,38 @@ namespace ec2
     }
 
     template<class InputDataType>
-    void Ec2DirectConnectionFactory::registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd )
+    void Ec2DirectConnectionFactory::registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, Qn::GlobalPermission permission )
     {
-        restProcessorPool->registerHandler(
-            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new UpdateHttpHandler<InputDataType>(m_directConnection) );
+        restProcessorPool->registerHandler( lit("ec2/%1").arg(ApiCommand::toString(cmd)), new UpdateHttpHandler<InputDataType>(m_directConnection), permission);
     }
 
     template<class InputDataType, class CustomActionType>
-    void Ec2DirectConnectionFactory::registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, CustomActionType customAction )
+    void Ec2DirectConnectionFactory::registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, CustomActionType customAction, Qn::GlobalPermission permission )
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new UpdateHttpHandler<InputDataType>(m_directConnection, customAction) );
+            new UpdateHttpHandler<InputDataType>(m_directConnection, customAction), permission );
     }
 
     template<class InputDataType, class OutputDataType>
-    void Ec2DirectConnectionFactory::registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd )
+    void Ec2DirectConnectionFactory::registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, Qn::GlobalPermission permission )
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new QueryHttpHandler2<InputDataType, OutputDataType>(cmd, &m_serverQueryProcessor) );
+            new QueryHttpHandler2<InputDataType, OutputDataType>(cmd, &m_serverQueryProcessor), permission );
     }
 
     template<class InputType, class OutputType>
     void Ec2DirectConnectionFactory::registerFunctorHandler(
         QnRestProcessorPool* const restProcessorPool,
         ApiCommand::Value cmd,
-        std::function<ErrorCode(InputType, OutputType*)> handler )
+        std::function<ErrorCode(InputType, OutputType*)> handler, Qn::GlobalPermission permission)
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
             new FlexibleQueryHttpHandler<InputType, OutputType>(
                 cmd,
-                std::move(handler)));
+                std::move(handler)), permission);
     }
 
     //!Registers handler which is able to modify HTTP response
@@ -1456,12 +1454,12 @@ namespace ec2
     void Ec2DirectConnectionFactory::registerFunctorWithResponseHandler(
         QnRestProcessorPool* const restProcessorPool,
         ApiCommand::Value cmd,
-        std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler)
+        std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler, Qn::GlobalPermission permission)
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
             new FlexibleQueryHttpHandler<InputType, OutputType>(
                 cmd,
-                std::move(handler)));
+                std::move(handler)), permission);
     }
 }
