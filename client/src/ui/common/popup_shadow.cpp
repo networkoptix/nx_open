@@ -37,9 +37,13 @@ public:
 
     ~QnPopupShadowPrivate()
     {
+        /* Delete shadow widget explicitly, it's not our child: */
+        delete m_shadow;
+
         /* Restore popup's native shadow if needed: */
         if (m_popup && m_popupHadNativeShadow && m_popup->testAttribute(Qt::WA_WState_Created))
             m_popup->setWindowFlags(m_popup->windowFlags() & ~Qt::NoDropShadowWindowHint);
+
     }
 
     void updateGeometry()
@@ -86,8 +90,7 @@ public:
         QColor fadedColor = color;
         fadedColor.setAlpha(0);
 
-        const QPointF kSubpixelAdjustment = QPointF(-0.5, -0.5);
-        QRectF fullRect(kSubpixelAdjustment, size);
+        QRectF fullRect(QPointF(0, 0), size);
 
         /* Simple case of no blur: */
         if (blurRadius == 0)
@@ -302,23 +305,32 @@ bool QnPopupShadow::eventFilter(QObject* object, QEvent* event)
     {
         switch (event->type())
         {
-        case QEvent::Show:
-            d->updateGeometry();
-            d->m_shadow->showNormal();
-            d->m_popup->activateWindow();
-            break;
+            case QEvent::Show:
+            {
+                d->updateGeometry();
+                d->m_shadow->showNormal();
+                d->m_popup->activateWindow();
+                break;
+            }
 
-        case QEvent::Hide:
-            executeDelayed([d]() { d->m_shadow->hide(); });
-            break;
+            case QEvent::Hide:
+            {
+                QPointer<QLabel> shadow(d->m_shadow);
+                executeDelayed([shadow]()
+                {
+                    if (shadow)
+                        shadow->hide();
+                });
+                break;
+            }
 
-        case QEvent::Move:
-            d->m_shadow->move(d->m_popup->pos() + d->m_widgetOffset);
-            break;
+            case QEvent::Move:
+                d->m_shadow->move(d->m_popup->pos() + d->m_widgetOffset);
+                break;
 
-        case QEvent::Resize:
-            d->updateGeometry();
-            break;
+            case QEvent::Resize:
+                d->updateGeometry();
+                break;
         }
     }
 
