@@ -27,6 +27,7 @@ class QnPopupShadow : public QObject
 
 public:
     QnPopupShadow(QWidget* popup);
+    virtual ~QnPopupShadow();
 
     const QColor& color() const;
     void setColor(const QColor& color);

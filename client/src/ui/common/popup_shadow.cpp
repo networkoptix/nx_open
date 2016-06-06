@@ -70,7 +70,7 @@ public:
             return;
 
         m_shadow->setPixmap(createShadowPixmap(
-            m_shadow->size(), 
+            m_shadow->size(),
             m_shadow->devicePixelRatio(),
             m_blurRadius,
             m_color));
@@ -227,6 +227,10 @@ QnPopupShadow::QnPopupShadow(QWidget* popup) :
     d_ptr(new QnPopupShadowPrivate(this, popup))
 {
     popup->installEventFilter(this);
+}
+
+QnPopupShadow::~QnPopupShadow()
+{
 }
 
 const QColor& QnPopupShadow::color() const
