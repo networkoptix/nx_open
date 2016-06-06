@@ -26,9 +26,8 @@ static std::unique_ptr< AbstractStreamSocket > defaultStreamSocketFactoryFunc(
             {
                 case SocketFactory::NatTraversalType::nttAuto:
                 case SocketFactory::NatTraversalType::nttEnabled:
-                    // TODO: Restore CloudStreamSocket when slow working on Linux is fixed.
-                    return std::make_unique< TCPSocket >(false);
-                    //return std::make_unique< cloud::CloudStreamSocket >();
+                    //return std::make_unique< TCPSocket >(true);
+                    return std::make_unique< cloud::CloudStreamSocket >();
 
                 case SocketFactory::NatTraversalType::nttDisabled:
                     return std::make_unique< TCPSocket >( false );
