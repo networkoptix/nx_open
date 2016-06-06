@@ -526,6 +526,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     if (!startupParams.customUri.isEmpty())
     {
+        /*
         QnSystemUriResolver resolver(QUrl::fromUserInput(startupParams.customUri));
         if (resolver.isValid())
         {
@@ -544,7 +545,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
                 }
             }
         }
-
+        */
     }
     /* If no input files were supplied --- open connection settings dialog.
      * Do not try to connect in the following cases:
