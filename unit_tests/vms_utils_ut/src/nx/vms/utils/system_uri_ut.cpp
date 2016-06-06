@@ -587,6 +587,18 @@ TEST_F(SystemUriTest, customParametersToString)
     validateToString(QString("http://%1/client?%2=%3").arg(kCloudDomain).arg(kParamKey).arg(kParamValue));
 }
 
+TEST_F(SystemUriTest, referralLinkToString)
+{
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setReferral(SystemUri::ReferralSource::DesktopClient, SystemUri::ReferralContext::WelcomePage);
+    validateToString(QString("http://%1/client?from=%2&context=%3")
+                     .arg(kCloudDomain)
+                     .arg(SystemUri::toString(SystemUri::ReferralSource::DesktopClient))
+                     .arg(SystemUri::toString(SystemUri::ReferralContext::WelcomePage))
+                          );
+}
+
 /*
 Referral links:
 TODO: #GDM
