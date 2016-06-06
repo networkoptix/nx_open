@@ -3,6 +3,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/utils/app_info.h>
 
 using namespace nx::vms::utils;
 
@@ -29,7 +30,7 @@ namespace
     {
         {SystemUri::Protocol::Http, "http"},
         {SystemUri::Protocol::Https, "https"},
-        {SystemUri::Protocol::Native, "nx-vms"} //TODO: #GDM make customizable
+        {SystemUri::Protocol::Native, AppInfo::nativeUriProtocol()} //TODO: #GDM make customizable
     };
 
     const QMap<SystemUri::ClientCommand, QString> clientCommandToString

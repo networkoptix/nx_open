@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/vms/utils/system_uri.h>
+#include <nx/vms/utils/app_info.h>
 
 using namespace nx::vms::utils;
 
@@ -387,9 +388,8 @@ TEST_F(SystemUriTest, genericLinkClientProtocolNative)
 {
     m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setDomain(kCloudDomain);
-    //TODO: #GDM customizable
     m_uri.setProtocol(SystemUri::Protocol::Native);
-    validateLink(QString("nx-vms://%1/").arg(kCloudDomain));
+    validateLink(QString("%1://%2/").arg(AppInfo::nativeUriProtocol()).arg(kCloudDomain));
     validateLink(QString("customprotocol://%1/").arg(kCloudDomain));
 }
 
@@ -445,7 +445,7 @@ TEST_F(SystemUriTest, directLinkCloudSystemNative)
     m_uri.setAuthenticator(kUser, kPassword);
     m_uri.setSystemId(kCloudSystemId);
 
-    validateLink(QString("nx-vms://%1/system?auth=%2").arg(kCloudSystemId).arg(kEncodedAuthKey));
+    validateLink(QString("%1://%2/system?auth=%3").arg(AppInfo::nativeUriProtocol()).arg(kCloudSystemId).arg(kEncodedAuthKey));
 }
 
 /* Testing invalid domains. */
@@ -483,8 +483,7 @@ TEST_F(SystemUriTest, genericClientToStringNative)
     m_uri.setDomain(kCloudDomain);
     m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setProtocol(SystemUri::Protocol::Native);
-    //TODO: #GDM #customization
-    validateToString(QString("nx-vms://%1/client").arg(kCloudDomain));
+    validateToString(QString("%1://%2/client").arg(AppInfo::nativeUriProtocol()).arg(kCloudDomain));
 }
 
 TEST_F(SystemUriTest, genericCloudToString)
@@ -531,8 +530,7 @@ TEST_F(SystemUriTest, directSystemCloudSystemIdToString)
     m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
     m_uri.setAuthenticator(kUser, kPassword);
     m_uri.setSystemId(kCloudSystemId);
-    //TODO: #GDM #customization
-    validateToString(QString("nx-vms://%1/system/view?auth=%2").arg(kCloudSystemId).arg(kEncodedAuthKey));
+    validateToString(QString("%1://%2/system/view?auth=%3").arg(AppInfo::nativeUriProtocol()).arg(kCloudSystemId).arg(kEncodedAuthKey));
 }
 
 TEST_F(SystemUriTest, customParametersToString)
