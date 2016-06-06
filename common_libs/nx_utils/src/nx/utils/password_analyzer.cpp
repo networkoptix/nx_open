@@ -21,8 +21,8 @@ namespace
     /* Whether a space is allowed (in the middle): */
     const bool kAllowSpace = true;
 
-    /* Allowed special characters for a password: */
-    const std::string kAllowedSymbols = "~!@#$%^&*()-=_+[]{};:,.<>?`'\"|/\\";
+    /* Allowed non-unicode special characters for a password: */
+    const QByteArray kAllowedSymbols = "~!@#$%^&*()-=_+[]{};:,.<>?`'\"|/\\";
 }
 
 PasswordStrength nx::utils::passwordStrength(const QString& password)

@@ -32,6 +32,8 @@
 #include <ui/widgets/common/input_field.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+// #define CUSTOMIZE_POPUP_SHADOWS //TODO: #vkutin Fix @ Linux, then enable
+
 using namespace style;
 
 namespace
@@ -2708,6 +2710,7 @@ void QnNxStyle::polish(QWidget *widget)
         }
     }
 
+#ifdef CUSTOMIZE_POPUP_SHADOWS
     if (popupToCustomizeShadow)
     {
         /* Create customized shadow: */
@@ -2725,6 +2728,7 @@ void QnNxStyle::polish(QWidget *widget)
             popupToCustomizeShadow->setProperty(kPopupShadowProperty, QVariant::fromValue(shadow));
         }
     }
+#endif
 }
 
 void QnNxStyle::unpolish(QWidget* widget)
@@ -2764,6 +2768,7 @@ void QnNxStyle::unpolish(QWidget* widget)
         }
     }
 
+#ifdef CUSTOMIZE_POPUP_SHADOWS
     if (popupWithCustomizedShadow)
     {
         /* Remove customized shadow: */
@@ -2771,6 +2776,7 @@ void QnNxStyle::unpolish(QWidget* widget)
         if (shadow)
             popupWithCustomizedShadow->setProperty(kPopupShadowProperty, QVariant());
     }
+#endif
 
     if (auto tabBar = qobject_cast<QTabBar*>(widget))
     {
