@@ -60,7 +60,7 @@
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/common/nx_speach_synthesizer/pom.xml</systemPath>
+            <systemPath>${root.dir}/common_libs/nx_speach_synthesizer/pom.xml</systemPath>
         </dependency>
 
         <dependency>
