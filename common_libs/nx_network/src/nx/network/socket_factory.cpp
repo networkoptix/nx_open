@@ -26,8 +26,13 @@ static std::unique_ptr< AbstractStreamSocket > defaultStreamSocketFactoryFunc(
             {
                 case SocketFactory::NatTraversalType::nttAuto:
                 case SocketFactory::NatTraversalType::nttEnabled:
-                    //return std::make_unique< TCPSocket >(true);
+                #if 0
+                    // Using old simple non-Cloud sockets - can be useful for debug.
+                    return std::make_unique< TCPSocket >(false);
+                #else
+                    // Using Cloud-enabled sockets - recommended.
                     return std::make_unique< cloud::CloudStreamSocket >();
+                #endif
 
                 case SocketFactory::NatTraversalType::nttDisabled:
                     return std::make_unique< TCPSocket >( false );
