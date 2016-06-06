@@ -25,7 +25,7 @@ public:
     QString serverIdString() const;
     void setServerIdString(const QString &id);
 
-    virtual QHash<int, QByteArray> roleNames() const;
+    virtual QHash<int, QByteArray> roleNames() const override;
     virtual QVariant data(const QModelIndex &index, int role) const override;
 
     bool showOffline() const;
