@@ -153,8 +153,6 @@ describe('Advanced Page', function () {
 
     it("Main log level select works and is saved",function(){
         p.mainLogLevelOptions.each(function(elem) {
-            expect(elem.isSelected()).toBe(false);
-
             p.mainLogLevelSelect.isPresent().then( function(isPresent) {
                 if(isPresent) {
                     p.mainLogLevelSelect.click();
@@ -182,8 +180,6 @@ describe('Advanced Page', function () {
 
     it("Transaction log level select works and is saved",function(){
         p.transLogLevelOptions.each(function(elem) {
-            expect(elem.isSelected()).toBe(false);
-
             p.transLogLevelSelect.isPresent().then( function(isPresent) {
                 if(isPresent) {
                     p.transLogLevelSelect.click();
@@ -221,7 +217,9 @@ describe('Advanced Page', function () {
         var absolutePath = path.resolve(__dirname, fileToUpload);
 
         p.upgradeButton.sendKeys(absolutePath).then(function(){
-
+            p.dialog.isPresent().then(function(isPresent) {
+                if(!isPresent) browser.sleep(2000);
+            });
             expect(p.dialog.getText()).toContain("Updating failed");
             p.dialogCloseButton.click();
         });
