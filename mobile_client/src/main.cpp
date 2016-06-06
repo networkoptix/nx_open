@@ -36,7 +36,6 @@ FlagConfig conf("mobile_client");
 #include "mobile_client/mobile_client_module.h"
 
 #include "ui/camera_thumbnail_provider.h"
-#include "ui/icon_provider.h"
 #include "ui/window_utils.h"
 #include "ui/texture_size_helper.h"
 #include "camera/camera_thumbnail_cache.h"
@@ -73,8 +72,6 @@ int runUi(QGuiApplication *application) {
     QFileSelector fileSelector;
     fileSelector.setExtraSelectors(selectors);
 
-    QnIconProvider *iconProvider = new QnIconProvider(&fileSelector);
-
     QQmlEngine engine;
 #if 1
     QString basePath = lit("qrc:///");
@@ -95,7 +92,6 @@ int runUi(QGuiApplication *application) {
 
     engine.addImageProvider(lit("thumbnail"), thumbnailProvider);
     engine.addImageProvider(lit("active"), activeCameraThumbnailProvider);
-    engine.addImageProvider(lit("icon"), iconProvider);
     engine.rootContext()->setContextObject(&context);
 
     QQmlComponent mainComponent(&engine, QUrl(lit("main.qml")));
