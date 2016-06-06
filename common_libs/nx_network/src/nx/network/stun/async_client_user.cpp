@@ -33,30 +33,30 @@ void AsyncClientUser::setOnReconnectedHandler(
 
             NX_LOGX(lm("ignore reconnect handler"), cl_logDEBUG2);
         },
-        this);
+        m_asyncGuard.sharedGuard().get());
 }
 
 void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_asyncGuard.reset();
     network::aio::Timer::pleaseStop(
-        [this, handler = std::move(handler)]()
+        [this, guard = m_asyncGuard.sharedGuard(), handler = std::move(handler)]()
         {
             if (m_client)
             {
                 m_client->cancelHandlers(
-                    this,
-                    [self = shared_from_this()]() mutable
+                    guard.get(),
+                    [guard = std::move(guard)]() mutable
                     {
-                        // no need to wait finish, hevewer we have to keep object
-                        // alive until callbacks are actually canceled
-                        self.reset();
+                        // guard shell be kept here up to the end of cancelation
+                        // to prevent reuse of the same address
                     });
 
                 m_client.reset();
                 NX_LOGX("stopped", cl_logDEBUG2);
             }
 
+            // we're good to go here regardless of cancelHandlers(...) progress
             handler();
         });
 }
@@ -80,7 +80,7 @@ void AsyncClientUser::sendRequest(
             NX_LOGX(lm("ignore response %1 handler")
                 .arg(message.header.transactionId.toHex()), cl_logDEBUG2);
         },
-        this);
+        m_asyncGuard.sharedGuard().get());
 }
 
 bool AsyncClientUser::setIndicationHandler(
@@ -97,7 +97,7 @@ bool AsyncClientUser::setIndicationHandler(
             NX_LOGX(lm("ignore indication %1 handler")
                 .arg(message.header.method), cl_logDEBUG2);
         },
-        this);
+        m_asyncGuard.sharedGuard().get());
 }
 
 } // namespase stun

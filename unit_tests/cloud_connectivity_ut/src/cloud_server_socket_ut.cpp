@@ -428,6 +428,7 @@ protected:
             m_connectSockets.emplace(socket, std::move(socketPtr));
         }
 
+        NX_LOGX(lm("start %1 -> %2").arg(socket).str(peer), cl_logDEBUG1);
         connectClient(socket, peer);
     }
 
@@ -435,14 +436,16 @@ protected:
     {
         if (auto address = m_addressBinder.random(peer))
         {
+            NX_LOGX(lm("connect %1 -> %2").arg(socket).str(*address), cl_logDEBUG2);
             socket->connectAsync(
                 address.get(),
                 [=](SystemError::ErrorCode code)
                 {
                     if (code == SystemError::noError)
-                        readOnClient(socket, peer);
-                    else
-                        connectClient(socket, peer);
+                        return readOnClient(socket, peer);
+
+                    socket->registerTimer(
+                        200, [=](){ connectClient(socket, peer); });
                 });
         }
         else
@@ -454,9 +457,10 @@ protected:
                     if (auto address = m_addressBinder.random(peer))
                         return connectClient(socket, peer);
 
+                    NX_LOGX(lm("indicate %1 -> %2").arg(socket).str(peer), cl_logDEBUG2);
                     emitIndication(peer);
                     socket->registerTimer(
-                        500, [=](){ connectClient(socket, peer); });
+                        200, [=](){ connectClient(socket, peer); });
                 });
         }
     }
@@ -464,7 +468,6 @@ protected:
     void emitIndication(SocketAddress peer)
     {
         String peerId = peer.address.toString().toUtf8();
-        NX_LOGX(lm("request acceptor from %1").arg(peerId), cl_logDEBUG2);
 
         hpm::api::ConnectionRequestedEvent event;
         event.connectSessionId = String("someSessionId");
@@ -495,9 +498,11 @@ protected:
                     size != static_cast<size_t>(
                         network::test::kTestMessage.size()))
                 {
+                    NX_LOGX(lm("read %1 failed").arg(socket), cl_logDEBUG2);
                     return startClient(peer);
                 }
 
+                NX_LOGX(lm("read %1 successed").arg(socket), cl_logDEBUG2);
                 EXPECT_EQ(*buffer, network::test::kTestMessage);
                 m_connectedResults.push(code);
             });
