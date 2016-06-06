@@ -209,6 +209,7 @@ void QnUserSettingsWidget::setupInputFields()
 
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
+    ui->passwordInputField->setPasswordIndicatorEnabled(true);
     ui->passwordInputField->setValidator([this](const QString& text)
     {
         /* Show warning message if admin has renamed an existing user and has not entered new password. */

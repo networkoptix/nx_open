@@ -2,6 +2,7 @@
 #pragma once
 
 #include <nx/utils/uuid.h>
+#include <nx/vms/utils/system_uri.h>
 
 struct QnStartupParameters
 {
@@ -38,7 +39,8 @@ struct QnStartupParameters
     QString dynamicCustomizationPath;
 
     /** Uri when the client was launched as uri handler. */
-    QString customUri;
+    nx::vms::utils::SystemUri customUri;
+
     QString enforceSocketType;
     QString enforceMediatorEndpoint;
 };

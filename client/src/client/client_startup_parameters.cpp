@@ -4,6 +4,8 @@
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 
+#include <nx/vms/utils/app_info.h>
+
 namespace
 {
     const bool kDefaultNoFullScreen =
@@ -70,7 +72,8 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.ignoreVersionMismatch, "--no-version-mismatch-check");
 
     /* Custom uri handling */
-    addParserParam(commandLineParser, &result.customUri, lit("%1://").arg(QnAppInfo::applicationUriProtocol()).toUtf8().constData());
+    QString strCustomUri;
+    addParserParam(commandLineParser, &strCustomUri, lit("%1://").arg(nx::vms::utils::AppInfo::nativeUriProtocol()).toUtf8().constData());
 
     QString strVideoWallGuid;
     QString strVideoWallItemGuid;
@@ -82,6 +85,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
+    result.customUri = nx::vms::utils::SystemUri(strCustomUri);
     result.videoWallGuid = QnUuid(strVideoWallGuid);
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
 

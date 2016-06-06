@@ -101,8 +101,8 @@ void QnCameraThumbnailManager::updateStatusPixmaps()
 {
     m_statusPixmaps.clear();
 
-    m_statusPixmaps[Loading] = scaledPixmap(qnSkin->pixmap("events/thumb_loading.png"));
-    m_statusPixmaps[NoData] = scaledPixmap(qnSkin->pixmap("events/thumb_no_data.png"));
+    m_statusPixmaps[Loading] = scaledPixmap(qnSkin->dpPixmap("events/thumb_loading.png"));
+    m_statusPixmaps[NoData] = scaledPixmap(qnSkin->dpPixmap("events/thumb_no_data.png"));
 }
 
 

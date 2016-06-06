@@ -103,7 +103,38 @@ QIcon QnSkin::icon(const QIcon& icon)
     return m_iconLoader->polish(icon);
 }
 
-QPixmap QnSkin::pixmap(const QString& name, const QSize& size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
+
+QPixmap QnSkin::dpPixmap(const char* name,
+    const QSize& size,
+    Qt::AspectRatioMode aspectMode,
+    Qt::TransformationMode mode)
+{
+    return dpPixmap(QString::fromLatin1(name), size, aspectMode, mode);
+}
+
+QPixmap QnSkin::dpPixmap(const QString& name, 
+    const QSize& size, 
+    Qt::AspectRatioMode aspectMode, 
+    Qt::TransformationMode mode)
+{
+    static const auto kHiDpiSuffix = lit("@2x");
+    static const bool kIsHiDpi = (QApplication::desktop()->devicePixelRatio() > 1);
+    
+    if (kIsHiDpi)
+    {
+        // Try to load 2x icons if it is hidpi mode
+        QFileInfo info(name);
+        const auto suffix = info.completeSuffix();
+        const auto newName = info.path() + lit("/") + info.completeBaseName() + kHiDpiSuffix
+            + (suffix.isEmpty() ? QString() : lit(".") + info.suffix());
+        auto result = getPixmapInternal(newName, size, aspectMode, mode);
+        if (!result.isNull())
+            return result;
+    }
+    return getPixmapInternal(name, size, aspectMode, mode);
+}
+
+QPixmap QnSkin::getPixmapInternal(const QString& name, const QSize& size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
 {
     QString key = name;
     if (!size.isEmpty())
@@ -118,7 +149,7 @@ QPixmap QnSkin::pixmap(const QString& name, const QSize& size, Qt::AspectRatioMo
             if (!size.isEmpty() && size != pixmap.size())
                 pixmap = pixmap.scaled(size, aspectMode, mode);
         }
-        else
+        else if (!name.contains(lit("@2x")))
         {
             qnWarning("Cannot load image '%1'", name);
         }
@@ -127,11 +158,6 @@ QPixmap QnSkin::pixmap(const QString& name, const QSize& size, Qt::AspectRatioMo
     }
 
     return pixmap;
-}
-
-QPixmap QnSkin::pixmap(const char* name, const QSize& size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
-{
-    return pixmap(QLatin1String(name), size, aspectMode, mode);
 }
 
 QStyle* QnSkin::newStyle(const QnGenericPalette& genericPalette)

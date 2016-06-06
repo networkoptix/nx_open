@@ -53,6 +53,10 @@
         "green_d2":     "#2a551e",
         "green_d3":     "#22391e",
 
+        "yellow_core":  "#fbbc05",
+        "yellow_d1":    "#e0a30a",
+        "yellow_d2":    "#c68a0f",
+
         "red_l2":       "#e34545",
         "red_l1":       "#d53232",
         "red_core":     "#c22626",
@@ -247,6 +251,14 @@
             "extraText":         "dark17",
             "extraTextSelected": "light10",
             "extraTextAccented": "brand_d3"
+        }
+    },
+
+    "QnPasswordStrengthIndicator": {
+        "colors": {
+            "inacceptable":      "red_core",
+            "acceptable":        "yellow_core",
+            "good":              "green_core"
         }
     },
 

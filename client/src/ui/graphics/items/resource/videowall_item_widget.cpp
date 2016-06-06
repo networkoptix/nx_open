@@ -486,7 +486,7 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
     bool isServer = resource && resource->flags().testFlag(Qn::server);
 
     if (isServer && !m_widget->m_thumbs.contains(resource->getId())) {
-        m_widget->m_thumbs[resource->getId()] = qnSkin->pixmap("events/thumb_server.png");
+        m_widget->m_thumbs[resource->getId()] = qnSkin->dpPixmap("events/thumb_server.png");
     } //TODO: #GDM #VW local files placeholder
 
     if (resource && m_widget->m_thumbs.contains(resource->getId())) {

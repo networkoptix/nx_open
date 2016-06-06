@@ -428,7 +428,7 @@ void QnMessageBox::setIcon(QnMessageBox::Icon icon)
 
     QPixmap pixmap;
     if (!pixmapFile.isEmpty())
-        pixmap = qnSkin->pixmap(pixmapFile);
+        pixmap = qnSkin->dpPixmap(pixmapFile);
 
     ui->iconLabel->setVisible(!pixmap.isNull());
     ui->iconLabel->setPixmap(pixmap);
