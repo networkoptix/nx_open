@@ -25,6 +25,7 @@ describe('Developers Page', function () {
             browser.ignoreSynchronization = false;
 
             //Switch back
+            browser.close();
             browser.switchTo().window(oldWindowHandle);
         });
     });
@@ -41,6 +42,7 @@ describe('Developers Page', function () {
                 'related to whole system (all servers).');
 
             //Switch back
+            browser.close();
             browser.switchTo().window(oldWindowHandle);
         });
     });
