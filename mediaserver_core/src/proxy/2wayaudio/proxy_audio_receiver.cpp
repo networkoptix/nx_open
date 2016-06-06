@@ -161,7 +161,7 @@ void QnAudioProxyReceiver::run()
     }
     sendResponse(nx_http::StatusCode::ok, QByteArray());
 
-    const QnUuid clientId = params[kClientIdParamName];
+    const QnUuid clientId(params[kClientIdParamName]);
 
     auto resourceId = params[kResourceIdParamName];
     QnAudioStreamerPool::Action action = (params[kActionParamName] == kStartStreamAction)

@@ -31,6 +31,9 @@ class QnLogPrivate;
 
 class NX_UTILS_API QnLog {
 public:
+    // test only!
+    static bool s_disableLogConfiguration;
+
     static const int MAIN_LOG_ID = 0;
     static const int CUSTOM_LOG_BASE_ID = 1;
     static const int HTTP_LOG_INDEX = CUSTOM_LOG_BASE_ID + 1;
@@ -159,32 +162,5 @@ QString toDebugString(const T &value) {
     stream << value;
     return result;
 }
-
-namespace {
-
-/**
- * Debug.
- * @return Part of a source code filename which is a path relative to "nx_vms..." folder.
- */
-static inline const char* relative_src_filename(const char* s)
-{
-    static_cast<void>(&relative_src_filename);
-
-    auto pos = std::string(__FILE__).find("common_libs"); //< This file resides in "common_libs".
-    if (pos == std::string::npos || pos >= strlen(s))
-        return s;
-    else
-        return s + pos;
-}
-
-} // namespace
-
-// Log execution of a line - put double-L at the beginning of a line.
-#ifdef _DEBUG
-    #define LL qDebug().nospace() << "####### line " << __LINE__ \
-        << " [" << relative_src_filename(__FILE__) << "]";
-#else
-    #define LL
-#endif
 
 #endif // QN_LOG_H

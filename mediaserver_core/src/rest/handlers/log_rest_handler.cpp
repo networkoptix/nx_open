@@ -11,6 +11,10 @@
 
 static const int READ_BLOCK_SIZE = 1024*512;
 
+namespace {
+const QString idParam = lit("id");
+}
+
 int QnLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
@@ -25,15 +29,26 @@ int QnLogRestHandler::executeGet(const QString& path, const QnRequestParamList& 
         }
     }
 
+    int logId = 0;
+    const auto idIter = params.find(idParam);
+    if (idIter != params.end())
+        logId = idIter->second.toInt();
+
+    if (!QnLog::logs()->exists(logId))
+    {
+        result.append(QString("<root>Bad log file id</root>\n"));
+        return nx_http::StatusCode::badRequest;
+    }
+
     if (linesToRead == 0ll)
         linesToRead = 1000000ll;
 
-    QString fileName = QnLog::instance()->logFileName();
+    QString fileName = QnLog::logFileName(logId);
     QFile f(fileName);
     if (!f.open(QFile::ReadOnly))
     {
         result.append(QString("<root>Can't open log file</root>\n"));
-        return CODE_INTERNAL_ERROR;
+        return nx_http::StatusCode::internalServerError;
     }
     qint64 fileSize = f.size();
 
@@ -75,7 +90,7 @@ int QnLogRestHandler::executeGet(const QString& path, const QnRequestParamList& 
     }
     contentType = "text/plain; charset=UTF-8";
     result = solidArray;
-    return CODE_OK;
+    return nx_http::StatusCode::ok;
 }
 
 int QnLogRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 

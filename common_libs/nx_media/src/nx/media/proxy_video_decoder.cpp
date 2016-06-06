@@ -1,8 +1,6 @@
 #include "proxy_video_decoder.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#include <proxy_decoder.h>
-
 #define OUTPUT_PREFIX "ProxyVideoDecoder: "
 #include "proxy_video_decoder_utils.h"
 
@@ -35,6 +33,8 @@ static ProxyVideoDecoderPrivate* createProxyVideoDecoderPrivate(
         return ProxyVideoDecoderPrivate::createImplStub(params);
     }
 
+    if (conf.implStub)
+        return ProxyVideoDecoderPrivate::createImplStub(params);
     if (conf.implDisplay)
         return ProxyVideoDecoderPrivate::createImplDisplay(params);
     if (conf.implRgb)
@@ -58,9 +58,8 @@ ProxyVideoDecoder::ProxyVideoDecoder(
     static_assert(QN_BYTE_ARRAY_PADDING >= ProxyDecoder::CompressedFrame::kPaddingSize,
         "ProxyVideoDecoder: Insufficient padding size");
 
-    // TODO: Consider moving this check to isCompatible().
-    // Odd frame dimensions are not tested and can be unsupported due to UV having half-res.
-    NX_ASSERT(resolution.width() % 2 == 0 || resolution.height() % 2 == 0);
+    // Checked by isCompatible().
+    NX_CRITICAL(resolution.width() % 2 == 0 && resolution.height() % 2 == 0);
 
     conf.reload();
 
@@ -85,6 +84,14 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
         conf.skipNextReload();
     }
 
+    // Odd frame dimensions are not tested and can be unsupported due to UV having half-res.
+    if (resolution.width() % 2 != 0 || resolution.height() % 2 != 0)
+    {
+        OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
+                << ") -> false: only even width and height is supported";
+        return false;
+    }
+
     if (codec != CODEC_ID_H264)
     {
         OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
@@ -102,7 +109,7 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
     if (conf.largeOnly && resolution.width() <= 640)
     {
         PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: conf.largeOnly' is set";
+            << ") -> false: conf.largeOnly is set";
         return false;
     }
 

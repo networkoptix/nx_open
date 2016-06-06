@@ -1,12 +1,24 @@
 #include "login_to_cloud_dialog.h"
 #include "ui_login_to_cloud_dialog.h"
 
-#include <helpers/cloud_url_helper.h>
-#include <watchers/cloud_status_watcher.h>
-#include <utils/common/string.h>
 #include <client/client_settings.h>
+
+#include <helpers/cloud_url_helper.h>
+
+#include <ui/common/palette.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/skin.h>
+
+#include <watchers/cloud_status_watcher.h>
+
+#include <utils/common/app_info.h>
+#include <utils/common/string.h>
+
+namespace
+{
+    const int kWelcomeFontPixelSize = 24;
+}
 
 class QnLoginToCloudDialogPrivate : public QObject
 {
@@ -26,7 +38,7 @@ public:
 };
 
 QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget *parent)
-    : base_type(parent)
+    : base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint)
     , ui(new Ui::QnLoginToCloudDialog)
     , d_ptr(new QnLoginToCloudDialogPrivate(this))
 {
@@ -39,7 +51,18 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget *parent)
     connect(ui->passwordLineEdit,   &QLineEdit::textChanged,    d,  &QnLoginToCloudDialogPrivate::updateUi);
 
     ui->createAccountLabel->setText(makeHref(tr("Create account"), QnCloudUrlHelper::createAccountUrl()));
-    ui->restorePasswordLabel->setText(makeHref(tr("Restore password"), QnCloudUrlHelper::createAccountUrl()));
+    ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), QnCloudUrlHelper::createAccountUrl()));
+
+    ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), QnCloudUrlHelper::aboutUrl()));
+    ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
+    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_3.png"));
+
+    QFont welcomeFont(ui->cloudWelcomeLabel->font());
+    welcomeFont.setPixelSize(kWelcomeFontPixelSize);
+    ui->cloudWelcomeLabel->setFont(welcomeFont);
+
+    const QColor nxColor(qApp->palette().color(QPalette::Normal, QPalette::BrightText));
+    setPaletteColor(ui->cloudWelcomeLabel, QPalette::WindowText, nxColor);
 
     d->updateUi();
 }

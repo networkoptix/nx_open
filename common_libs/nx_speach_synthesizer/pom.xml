@@ -26,6 +26,7 @@
 
         <rdep.windows.packages>festival</rdep.windows.packages>
         <rdep.linux.packages>festival</rdep.linux.packages>
+        <rdep.linux.arm.packages>festival</rdep.linux.arm.packages>
         <rdep.mac.packages>festival</rdep.mac.packages>
 
     </properties>

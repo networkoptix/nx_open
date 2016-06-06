@@ -146,7 +146,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         option.icon.paint(painter, iconRect, option.decorationAlignment, iconMode, QIcon::On);
 
     /* Draw text: */
-    if (option.features.testFlag(QStyleOptionViewItem::HasDisplay) && !editing)
+    if (!editing)
     {
         QString baseName;
         QString extraInfo;
@@ -233,7 +233,6 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
     int height = option.decorationSize.height();
 
     /* Adjust size to text: */
-    if (option.features.testFlag(QStyleOptionViewItem::HasDisplay))
     {
         QString baseName;
         QString extraInfo;

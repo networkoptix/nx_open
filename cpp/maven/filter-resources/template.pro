@@ -10,7 +10,6 @@ unix {
     VERSION = ${linux.release.version}
 }
 QT = ${qt.libs}
-ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
 ## GLOBAL CONFIGURATIONS
 CONFIG += precompile_header $$BUILDLIB $$LIBTYPE

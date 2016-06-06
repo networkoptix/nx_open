@@ -81,6 +81,10 @@ public:
 
     void setUserName(const QString &userName);
 
+    /** Check if application is closing down. Replaces QApplication::closingDown(). */
+    bool closingDown() const;
+    void setClosingDown(bool value);
+
 signals:
     /**
      * This signal is emitted whenever the user that is currently logged in changes.
@@ -97,9 +101,6 @@ signals:
 
     void mainWindowChanged();
 
-protected slots:
-    void at_resourcePool_aboutToBeDestroyed();
-
 private:
     QnResourcePool *m_resourcePool;
     QScopedPointer<QnWorkbench> m_workbench;
@@ -114,6 +115,8 @@ private:
 
     QnWorkbenchUserWatcher *m_userWatcher;
     QnWorkbenchLayoutWatcher *m_layoutWatcher;
+
+    bool m_closingDown;
 };
 
 

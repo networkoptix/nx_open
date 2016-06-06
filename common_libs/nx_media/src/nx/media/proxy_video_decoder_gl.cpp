@@ -4,6 +4,9 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLShaderProgram>
 
+#define OUTPUT_PREFIX "ProxyVideoDecoder<gl>: "
+#include "proxy_video_decoder_utils.h"
+
 #include "proxy_video_decoder_gl_utils.h"
 
 namespace nx {
@@ -59,14 +62,6 @@ public:
 
 private:
     class TextureBuffer;
-
-    /**
-     * @return Value with the same semantics as AbstractVideoDecoder::decode().
-     */
-    static int decodeFrameToYuvBuffer(
-        const ProxyDecoder::CompressedFrame* compressedFrame,
-        ProxyDecoder& proxyDecoder,
-        YuvBuffer* yuvBuffer);
 
     /** Initialize OpenGL resources on first call; subsequent calls do nothing. */
     void createGlResources();
@@ -263,31 +258,11 @@ void Impl::createGlResources()
     }
 }
 
-int Impl::decodeFrameToYuvBuffer(
-    const ProxyDecoder::CompressedFrame* compressedFrame, ProxyDecoder& proxyDecoder,
-    YuvBuffer* yuvBuffer)
-{
-    int64_t outPts;
-    int result = 1;
-#if 1
-    TIME_BEGIN(decodeToYuvPlanar);
-        // Perform actual decoding from QnCompressedVideoData to QVideoFrame.
-        result = proxyDecoder.decodeToYuvPlanar(compressedFrame, &outPts,
-            yuvBuffer->y(), yuvBuffer->yLineSize(),
-            yuvBuffer->u(), yuvBuffer->v(), yuvBuffer->uVLineSize());
-    TIME_END(decodeToYuvPlanar);
-#endif // 1
-    if (result < 0)
-        PRINT << "ERROR: ProxyDecoder::decodeToYuvPlanar() -> " << result;
-
-    return result;
-}
-
 void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
 {
     createGlResources();
 
-    DebugTimer timer("renderYuvBufferToFbo");
+    NX_TIMER_CREATE("renderYuvBufferToFbo");
 
     GL_GET_FUNCS(QOpenGLContext::currentContext());
 
@@ -297,15 +272,15 @@ void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
 
     // OLD: Measured time (Full-HDs frame): YUV: 155 ms; Y-only: 120 ms; Y memcpy: 2 ms (!!!).
 #if 0
-    TIME_BEGIN(flush_finish);
+    NX_TIME_BEGIN(flush_finish);
     GL(funcs->glFlush());
     GL(funcs->glFinish());
-    TIME_END(flush_finish);
+    NX_TIME_END(flush_finish);
 #endif // 0
 
-    timer.mark("t1");
+    NX_TIMER_MARK("t1");
 
-    TIME_BEGIN(renderYuvBufferToFbo_setData);
+    NX_TIME_BEGIN(renderYuvBufferToFbo_setData);
 #if 0 // NO_QT
     GL(funcs->glBindTexture(GL_TEXTURE_2D, (*outFbo)->texture()));
     GL(funcs->glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE,
@@ -322,9 +297,9 @@ void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
     //TIME_END(renderYuvBufferToFbo_setData_Flush_Finish);
 #endif // 1
 #endif // 0 NO_QT
-    TIME_END(renderYuvBufferToFbo_setData);
+    NX_TIME_END(renderYuvBufferToFbo_setData);
 
-    timer.mark("t2");
+    NX_TIMER_MARK("t2");
 
 #if 1 // ALL
 
@@ -437,23 +412,23 @@ void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
         GL(glEnable(GL_BLEND));
 #endif // 1
 
-    timer.mark("t3");
+    NX_TIMER_MARK("t3");
 
 #if 0
     if (m_threadGlCtx)
     {
         // we used decoder thread to render. flush everything to the texture
-        TIME_BEGIN("renderYuvBufferToFbo::glFinish")
+        NX_TIME_BEGIN("renderYuvBufferToFbo::glFinish")
             funcs->glFlush();
         funcs->glFinish();
-        TIME_END
+        NX_TIME_END
             glFinish();
     }
 #endif // 0
 
 #endif // 1 // ALL
 
-    timer.finish("t4");
+    NX_TIMER_FINISH("t4");
 }
 
 int Impl::decode(
@@ -464,17 +439,25 @@ int Impl::decode(
 
     auto yuvBuffer = std::make_shared<YuvBuffer>(frameSize());
     auto compressedFrame = createUniqueCompressedFrame(compressedVideoData);
-    int result = decodeFrameToYuvBuffer(
-        compressedFrame.get(), proxyDecoder(), yuvBuffer.get());
+    int64_t ptsUs;
+#if 1
+    NX_TIME_BEGIN(decodeToYuvPlanar);
+    // Perform actual decoding from QnCompressedVideoData to QVideoFrame.
+    int result = proxyDecoder().decodeToYuvPlanar(compressedFrame.get(), &ptsUs,
+        yuvBuffer->y(), yuvBuffer->yLineSize(),
+        yuvBuffer->u(), yuvBuffer->v(), yuvBuffer->uVLineSize());
+    NX_TIME_END(decodeToYuvPlanar);
+#endif // 1
+    if (result < 0)
+        PRINT << "ERROR: ProxyDecoder::decodeToYuvPlanar() -> " << result;
+
     if (result <= 0)
         return result;
 
-    QAbstractVideoBuffer* textureBuffer;
     if (conf.useGlGuiRendering)
     {
-        textureBuffer = new TextureBuffer(FboPtr(nullptr), sharedPtrToThis(), yuvBuffer);
-        outDecodedFrame->reset(new QVideoFrame(
-            textureBuffer, frameSize(), QVideoFrame::Format_BGR32));
+        auto textureBuffer = new TextureBuffer(FboPtr(nullptr), sharedPtrToThis(), yuvBuffer);
+        setQVideoFrame(outDecodedFrame, textureBuffer, QVideoFrame::Format_BGR32, ptsUs);
     }
     else
     {
@@ -482,10 +465,9 @@ int Impl::decode(
         if (conf.useSharedGlContext)
         {
             renderYuvBufferToFbo(yuvBuffer.get(), &fboToRender);
-            textureBuffer = new TextureBuffer(
+            auto textureBuffer = new TextureBuffer(
                 fboToRender, sharedPtrToThis(), ConstYuvBufferPtr(nullptr));
-            outDecodedFrame->reset(new QVideoFrame(
-                textureBuffer, frameSize(), QVideoFrame::Format_BGR32));
+            setQVideoFrame(outDecodedFrame, textureBuffer, QVideoFrame::Format_BGR32, ptsUs);
         }
         else
         {
@@ -497,13 +479,10 @@ int Impl::decode(
             });
 #endif // 0
 
-            textureBuffer = new TextureBuffer(FboPtr(nullptr), sharedPtrToThis(), yuvBuffer);
+            auto textureBuffer = new TextureBuffer(FboPtr(nullptr), sharedPtrToThis(), yuvBuffer);
+            setQVideoFrame(outDecodedFrame, textureBuffer, QVideoFrame::Format_BGR32, ptsUs);
 
-            outDecodedFrame->reset(new QVideoFrame(
-                textureBuffer, frameSize(), QVideoFrame::Format_BGR32));
-
-            auto decodedFrame = *outDecodedFrame;
-
+            const auto decodedFrame = *outDecodedFrame;
             allocator().execAtGlThreadAsync(
                 [decodedFrame]()
                 {

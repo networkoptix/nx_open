@@ -34,35 +34,31 @@ int Impl::decode(
         PIX_FMT_YUV420P, alignedWidth, frameSize().height());
     const int lineSize = alignedWidth;
 
-    auto alignedBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, lineSize);
-
-    outDecodedFrame->reset(new QVideoFrame(
-        alignedBuffer, frameSize(), QVideoFrame::Format_YUV420P));
-    QVideoFrame* const decodedFrame = outDecodedFrame->get();
-
-    decodedFrame->map(QAbstractVideoBuffer::WriteOnly);
-    uchar* const buffer = decodedFrame->bits();
-
+    auto videoBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, lineSize);
+    uchar* const buffer = videoBuffer->map(QAbstractVideoBuffer::WriteOnly, nullptr, nullptr);
     uint8_t* const yBuffer = buffer;
     uint8_t* const uBuffer = buffer + lineSize * frameSize().height();
     uint8_t* const vBuffer = uBuffer + lineSize * frameSize().height() / 4;
 
     auto compressedFrame = createUniqueCompressedFrame(compressedVideoData);
-    int64_t outPts = 0;
-    int result = -1;
-    TIME_BEGIN(decodeToYuvPlanar);
-    // Perform actual decoding from QnCompressedVideoData to QVideoFrame.
-    result = proxyDecoder().decodeToYuvPlanar(compressedFrame.get(), &outPts,
+    int64_t ptsUs = 0;
+    NX_TIME_BEGIN(decodeToYuvPlanar);
+    // Perform actual decoding to AlignedMemVideoBuffer.
+    int result = proxyDecoder().decodeToYuvPlanar(compressedFrame.get(), &ptsUs,
         yBuffer, lineSize, uBuffer, vBuffer, lineSize / 2);
-    TIME_END(decodeToYuvPlanar);
+    NX_TIME_END(decodeToYuvPlanar);
+    videoBuffer->unmap();
 
-    decodedFrame->unmap();
-
-    if (result <= 0) //< Error or no frame (buffering).
-        outDecodedFrame->reset();
+    if (result > 0)
+    {
+        setQVideoFrame(outDecodedFrame, videoBuffer, QVideoFrame::Format_YUV420P, ptsUs);
+    }
     else
-        (*outDecodedFrame)->setStartTime(outPts);
-
+    {
+        // Error or no frame (buffering).
+        outDecodedFrame->reset();
+        delete videoBuffer;
+    }
     return result;
 }
 

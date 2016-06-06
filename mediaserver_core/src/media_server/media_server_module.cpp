@@ -14,6 +14,8 @@
 #include <nx/network/socket_global.h>
 
 #include <utils/media/ffmpeg_initializer.h>
+#include <utils/common/buffered_file.h>
+#include <utils/common/writer_pool.h>
 
 QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint, QObject *parent):
     QObject(parent)
@@ -21,6 +23,7 @@ QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
 
+    instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
     QnSoapServer *soapServer = new QnSoapServer();
     store<QnSoapServer>(soapServer);

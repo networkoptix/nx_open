@@ -68,13 +68,17 @@ static const int DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC = 5;
 
 CloudDBProcess::CloudDBProcess( int argc, char **argv )
 :
+#ifdef USE_QAPPLICATION
     QtService<QtSingleCoreApplication>(argc, argv, QnLibCloudDbAppInfo::applicationName()),
+#endif
     m_argc( argc ),
     m_argv( argv ),
     m_terminated( false ),
     m_timerID( -1 )
 {
+#ifdef USE_QAPPLICATION
     setServiceDescription(QnLibCloudDbAppInfo::applicationDisplayName());
+#endif
 
     //if call Q_INIT_RESOURCE directly, linker will search for nx::cdb::libcloud_db and fail...
     registerQtResources();
@@ -82,9 +86,13 @@ CloudDBProcess::CloudDBProcess( int argc, char **argv )
 
 void CloudDBProcess::pleaseStop()
 {
+#ifdef USE_QAPPLICATION
     m_terminated = true;
     if (application())
         application()->quit();
+#else
+    m_processTerminationEvent.set_value();
+#endif
 }
 
 void CloudDBProcess::setOnStartedEventHandler(
@@ -93,7 +101,16 @@ void CloudDBProcess::setOnStartedEventHandler(
     m_startedEventHandler = std::move(handler);
 }
 
+const std::vector<SocketAddress>& CloudDBProcess::httpEndpoints() const
+{
+    return m_httpEndpoints;
+}
+
+#ifdef USE_QAPPLICATION
 int CloudDBProcess::executeApplication()
+#else
+int CloudDBProcess::exec()
+#endif
 {
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
@@ -214,28 +231,35 @@ int CloudDBProcess::executeApplication()
 
         if( !multiAddressHttpServer.listen() )
             return 5;
+        m_httpEndpoints = multiAddressHttpServer.endpoints();
 
+#ifdef USE_QAPPLICATION
         application()->installEventFilter(this);
+#endif
         if (m_terminated)
             return 0;
 
         NX_LOG(lit("%1 has been started")
                 .arg(QnLibCloudDbAppInfo::applicationDisplayName()),
                cl_logALWAYS);
-        std::cout << QnLibCloudDbAppInfo::applicationDisplayName().toStdString()
-            << " has been started" << std::endl;
+        //std::cout << QnLibCloudDbAppInfo::applicationDisplayName().toStdString()
+        //    << " has been started" << std::endl;
 
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
 
+#ifdef USE_QAPPLICATION
         //starting timer to check for m_terminated again after event loop start
         m_timerID = application()->startTimer(0);
 
         //TODO #ak remove qt event loop
         //application's main loop
         const int result = application()->exec();
-
         return result;
+#else
+        m_processTerminationEvent.get_future().wait();
+        return 0;
+#endif
     }
     catch( const std::exception& e )
     {
@@ -244,6 +268,7 @@ int CloudDBProcess::executeApplication()
     }
 }
 
+#ifdef USE_QAPPLICATION
 void CloudDBProcess::start()
 {
     QtSingleCoreApplication* application = this->application();
@@ -274,6 +299,7 @@ bool CloudDBProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
         application()->quit();
     return false;
 }
+#endif
 
 void CloudDBProcess::initializeLogging( const conf::Settings& settings )
 {
