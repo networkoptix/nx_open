@@ -67,7 +67,7 @@ Drawer
             {
                 icon: lp("/images/plus.png")
                 text: qsTr("New connection")
-                visible: !connectionManager.online
+                visible: connectionManager.connectionState == QnConnectionManager.Disconnected
                 onClicked:
                 {
                     sideNavigation.close()
