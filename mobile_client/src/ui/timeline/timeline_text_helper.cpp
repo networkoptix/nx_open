@@ -8,27 +8,28 @@
 #include <QtGui/QScreen>
 #include <QtCore/QDebug>
 
-namespace {
-    const int minTextureSize = 256;
-    const int maxTextureSize = 8192;
+namespace
+{
+    const int kMinTextureSize = 256;
+    const int kMaxTextureSize = 8192;
 
-    class StringPacker {
-        struct StringInfo {
+    class StringPacker
+    {
+        struct StringInfo
+        {
             QString string;
             int width;
 
-            StringInfo(const QString &string, int width) : string(string), width(width) {}
-
-            bool operator <(const StringInfo &other) const {
+            bool operator <(const StringInfo& other) const
+            {
                 return width > other.width;
             }
         };
 
-        struct Line {
+        struct Line
+        {
             QStringList strings;
-            int width;
-
-            Line() : width(0) {}
+            int width = 0;
         };
 
         QStringList result;
@@ -38,13 +39,14 @@ namespace {
         int textureSize;
 
     public:
-        StringPacker(const QStringList &strings, const QFontMetrics &fm)
+        StringPacker(const QStringList& strings, const QFontMetrics& fm)
             : result(strings)
             , lineHeight(fm.height())
-            , textureSize(minTextureSize)
+            , textureSize(kMinTextureSize)
         {
-            for (const QString &string: strings) {
-                StringInfo info(string, fm.size(Qt::TextSingleLine, string).width());
+            for (const auto& string: strings)
+            {
+                const auto info = StringInfo{ string, fm.size(Qt::TextSingleLine, string).width() };
                 measuredStrings.insert(std::lower_bound(measuredStrings.begin(), measuredStrings.end(), info), info);
             }
 
@@ -63,38 +65,42 @@ namespace {
 
 }
 
-class QnTimelineTextHelperPrivate {
+class QnTimelineTextHelperPrivate
+{
 public:
     QImage texture;
     QFont font;
-    QFontMetrics fm;
     int lineHeight;
     int digitWidth;
     QHash<QString, QRect> strings;
     int maxCharWidth;
     int spaceWidth;
-    qreal pixelRatio;
+    qreal pixelRatio = 1.0;
 
     QnTimelineTextHelperPrivate(const QFont& font)
         : font(font)
-        , fm(font)
-        , lineHeight(fm.height())
-        , digitWidth(fm.size(Qt::TextSingleLine, lit("0")).width())
-        , maxCharWidth(fm.size(Qt::TextSingleLine, lit("m")).width())
-        , spaceWidth(fm.size(Qt::TextSingleLine, lit(" ")).width())
-        , pixelRatio(1.0)
     {
         const auto screens = qApp->screens();
         if (!screens.isEmpty())
             pixelRatio = screens[0]->devicePixelRatio();
+
+        this->font.setPixelSize(font.pixelSize() * pixelRatio);
+        const auto fm = QFontMetrics(this->font);
+        lineHeight = fm.height();
+        digitWidth = fm.size(Qt::TextSingleLine, lit("0")).width();
+        maxCharWidth = fm.size(Qt::TextSingleLine, lit("m")).width();
+        spaceWidth = fm.size(Qt::TextSingleLine, lit(" ")).width();
     }
 
-    void addString(const QString &string, QPainter *painter, int &x, int &y) {
+    void addString(const QString& string, QPainter* painter, int& x, int& y)
+    {
         if (strings.contains(string))
             return;
 
-        QSize size = fm.size(Qt::TextSingleLine, string);
-        if (x > 0 && x + size.width() >= texture.width()) {
+        const auto fm = QFontMetrics(this->font);
+        const auto size = fm.size(Qt::TextSingleLine, string);
+        if (x > 0 && x + size.width() >= texture.width())
+        {
             x = 0;
             y += lineHeight;
         }
@@ -111,13 +117,15 @@ QnTimelineTextHelper::QnTimelineTextHelper(
         const QFont& font,
         const QColor& color,
         const QStringList& strings)
-    : d(new QnTimelineTextHelperPrivate(font))
+    : d_ptr(new QnTimelineTextHelperPrivate(font))
 {
-    QStringList packedStrings = strings;
+    Q_D(QnTimelineTextHelper);
+
+    auto packedStrings = strings;
     for (int i = 0; i <= 9; ++i)
         packedStrings.append(QString::number(i));
 
-    StringPacker stringPacker(packedStrings, d->fm);
+    auto stringPacker = StringPacker(packedStrings, QFontMetrics(d->font));
 
     int textureSize = stringPacker.resultSize();
     packedStrings = stringPacker.resultStrings();
@@ -133,59 +141,74 @@ QnTimelineTextHelper::QnTimelineTextHelper(
 
         int x = 0;
         int y = 0;
-        for (const QString &string: packedStrings)
+        for (const auto& string: packedStrings)
             d->addString(string, &painter, x, y);
     }
 }
 
-QnTimelineTextHelper::~QnTimelineTextHelper() {
+QnTimelineTextHelper::~QnTimelineTextHelper()
+{
 }
 
-QRectF QnTimelineTextHelper::digitCoordinates(int digit) const {
+QRectF QnTimelineTextHelper::digitCoordinates(int digit) const
+{
     return stringCoordinates(QString::number(digit));
 }
 
-QRectF QnTimelineTextHelper::stringCoordinates(const QString &string) const {
-    QRect rect = d->strings.value(string);
+QRectF QnTimelineTextHelper::stringCoordinates(const QString& string) const
+{
+    Q_D(const QnTimelineTextHelper);
+
+    const auto rect = QRectF(d->strings.value(string));
     if (rect.isNull())
         return QRectF();
 
-    qreal w = d->texture.width();
-    qreal h = d->texture.height();
+    const auto w = d->texture.width();
+    const auto h = d->texture.height();
     return QRectF(rect.x() / w, rect.y() / h, rect.width() / w, rect.height() / h);
 }
 
-QSize QnTimelineTextHelper::stringSize(const QString &string) const {
-    return d->strings.value(string).size() / pixelRatio();
+QSize QnTimelineTextHelper::stringSize(const QString& string) const
+{
+    Q_D(const QnTimelineTextHelper);
+    return d->strings.value(string).size() / d->pixelRatio;
 }
 
-QSize QnTimelineTextHelper::digitSize() const {
-    return QSize(d->digitWidth, d->lineHeight) / pixelRatio();
+QSize QnTimelineTextHelper::digitSize() const
+{
+    Q_D(const QnTimelineTextHelper);
+    return QSize(d->digitWidth, d->lineHeight) / d->pixelRatio;
 }
 
-QImage QnTimelineTextHelper::texture() const {
+QImage QnTimelineTextHelper::texture() const
+{
+    Q_D(const QnTimelineTextHelper);
     return d->texture;
 }
 
-int QnTimelineTextHelper::maxCharWidth() const {
+int QnTimelineTextHelper::maxCharWidth() const
+{
+    Q_D(const QnTimelineTextHelper);
     return d->maxCharWidth / d->pixelRatio;
 }
 
-int QnTimelineTextHelper::lineHeight() const {
+int QnTimelineTextHelper::lineHeight() const
+{
+    Q_D(const QnTimelineTextHelper);
     return d->lineHeight / d->pixelRatio;
 }
 
-int QnTimelineTextHelper::spaceWidth() const {
+int QnTimelineTextHelper::spaceWidth() const
+{
+    Q_D(const QnTimelineTextHelper);
     return d->spaceWidth / d->pixelRatio;
 }
 
-qreal QnTimelineTextHelper::pixelRatio() const {
-    return d->pixelRatio;
-}
-
-void StringPacker::pack() {
-    textureSize = minTextureSize;
-    while (textureSize <= maxTextureSize) {
+void StringPacker::pack()
+{
+    textureSize = kMinTextureSize;
+    while (textureSize <= kMaxTextureSize)
+    {
         if (tryPack(textureSize))
             break;
 
@@ -193,21 +216,25 @@ void StringPacker::pack() {
     }
 }
 
-bool StringPacker::tryPack(int size) {
+bool StringPacker::tryPack(int size)
+{
     QList<Line> lines;
 
     int height = 0;
 
-    for (const StringInfo &info: measuredStrings) {
+    for (const auto& info: measuredStrings)
+    {
         if (info.width > size)
             return false;
 
         int i = 0;
-        for (i = 0; i < lines.size(); ++i) {
+        for (i = 0; i < lines.size(); ++i)
+        {
             if (lines[i].width + info.width < size)
                 break;
         }
-        if (i == lines.size()) {
+        if (i == lines.size())
+        {
             height += lineHeight;
             lines.append(Line());
         }
@@ -215,13 +242,13 @@ bool StringPacker::tryPack(int size) {
         if (height > size)
             return false;
 
-        Line &line = lines[i];
+        auto& line = lines[i];
         line.strings.append(info.string);
         line.width += info.width;
     }
 
     result.clear();
-    for (const Line &line: lines)
+    for (const auto& line: lines)
         result.append(line.strings);
 
     return true;
