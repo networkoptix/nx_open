@@ -20,7 +20,7 @@ public:
         m_popupHadNativeShadow(!popup->windowFlags().testFlag(Qt::NoDropShadowWindowHint)),
         q_ptr(q)
     {
-        m_shadow->setWindowFlags(m_shadow->windowFlags() | Qt::ToolTip | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+        m_shadow->setWindowFlags(m_shadow->windowFlags() | Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
         m_shadow->setAttribute(Qt::WA_TranslucentBackground);
         m_shadow->setAutoFillBackground(false);
 
