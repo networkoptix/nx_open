@@ -74,6 +74,7 @@ describe('Information Page', function () {
 
     it("Refresh link to update iframe works",function(){
         p.get();
+        browser.sleep(500);
         expect(p.refreshLogButton.isDisplayed()).toBe(true);
         expect(p.refreshLogButton.getText()).toEqual("Refresh");
         expect(p.refreshLogButton.getAttribute("target")).toEqual(p.logIframe.getAttribute("name"));
