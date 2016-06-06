@@ -1,17 +1,21 @@
-import QtQuick 2.2
+import QtQuick 2.6
+import QtQuick.Window 2.0
 
-Item {
+Item
+{
     id: icon
 
     property bool pauseState: true
-    property color color: "black"
+    property color color: "white"
 
-    Canvas {
+    Canvas
+    {
         id: canvas
 
         anchors.centerIn: parent
-        width: Math.min(parent.width, parent.height)
+        width: Math.min(parent.width, parent.height) * Screen.devicePixelRatio
         height: width
+        scale: 1.0 / Screen.devicePixelRatio
 
         property real animationPosition: pauseState ? 1.0 : 0.0
         Behavior on animationPosition { NumberAnimation { duration: 300; easing.type: Easing.OutQuad } }
@@ -25,7 +29,8 @@ Item {
 
         onAnimationPositionChanged: requestPaint()
 
-        onPaint: {
+        onPaint:
+        {
             var ctx = canvas.getContext('2d')
             ctx.clearRect(0, 0, canvasSize.width, canvasSize.height)
 
@@ -38,7 +43,8 @@ Item {
 
             var cw = canvasSize.height * (1.0 - animationPosition)
 
-            if (animationPosition < 0.5) {
+            if (animationPosition < 0.5)
+            {
                 var dw =dist * (1.0 - animationPosition / 0.5)
 
                 ctx.beginPath()
@@ -53,7 +59,9 @@ Item {
                 ctx.lineTo((canvasSize.width + cw) / 2, y0)
                 ctx.lineTo(canvasSize.width, y1)
                 ctx.fill()
-            } else {
+            }
+            else
+            {
                 ctx.beginPath()
                 ctx.moveTo(0, y1)
                 ctx.lineTo((canvasSize.width - cw) / 2, y0)

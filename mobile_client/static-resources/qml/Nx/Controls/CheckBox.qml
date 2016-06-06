@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import QtQuick.Window 2.0
 import Qt.labs.controls 1.0
 import Nx 1.0
 
@@ -44,8 +45,9 @@ CheckBox
             opacity: control.checked ? 1.0 : 0.0
 
             anchors.centerIn: parent
-            width: 18
-            height: 18
+            width: 18 * Screen.devicePixelRatio
+            height: 18 * Screen.devicePixelRatio
+            scale: 1.0 / Screen.devicePixelRatio
 
             renderStrategy: Canvas.Cooperative
 
@@ -53,6 +55,7 @@ CheckBox
             {
                 var ctx = getContext('2d')
                 ctx.reset()
+                ctx.scale(Screen.devicePixelRatio, Screen.devicePixelRatio)
 
                 ctx.lineWidth = 2.5
                 ctx.strokeStyle = ColorTheme.windowBackground

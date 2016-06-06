@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import QtQuick.Window 2.0
 import Qt.labs.controls 1.0
 
 BusyIndicator
@@ -34,102 +35,111 @@ BusyIndicator
         arcAnimation.restart()
     }
 
-    contentItem: Canvas
+    contentItem: Item
     {
-        id: canvas
-
         anchors.fill: parent
 
-        renderStrategy: Canvas.Cooperative
-
-        property real lineWidth: control.lineWidth
-        property real radius: Math.min(width, height) / 2 - lineWidth
-
-        property real arcStart: 0
-        property real arcEnd: 0
-
-        readonly property real longArc: Math.PI / 2 * 3
-        readonly property real shortArc: Math.PI / 8
-
-        readonly property int animationDuration: 800
-
-        onArcStartChanged: requestPaint()
-        onArcEndChanged: requestPaint()
-
-        onPaint:
+        Canvas
         {
-            var ctx = canvas.getContext('2d')
-            ctx.reset()
+            id: canvas
 
-            ctx.lineWidth = canvas.lineWidth
-            ctx.strokeStyle = color
-            ctx.lineCap = "butt"
+            anchors.centerIn: parent
 
-            ctx.arc(canvas.width / 2, canvas.height / 2, radius, arcStart, arcEnd, false)
-            ctx.stroke()
-        }
+            width: parent.width * Screen.devicePixelRatio
+            height: parent.height * Screen.devicePixelRatio
 
-        Behavior on arcStart
-        {
-            enabled: progress >= 0
-            NumberAnimation { duration: 200 }
-        }
-        Behavior on arcEnd
-        {
-            enabled: progress >= 0
-            NumberAnimation { duration: 200 }
-        }
+            renderStrategy: Canvas.Cooperative
+            scale: 1.0 / Screen.devicePixelRatio
 
-        NumberAnimation on rotation
-        {
-            id: rotationAnimation
+            property real lineWidth: control.lineWidth * Screen.devicePixelRatio
+            property real radius: Math.min(width, height) / 2 - lineWidth
 
-            duration: canvas.animationDuration * 3
-            from: -90
-            to: 270
-            running: control.visible && progress < 0
-            loops: Animation.Infinite
-        }
+            property real arcStart: 0
+            property real arcEnd: 0
 
-        SequentialAnimation
-        {
-            id: arcAnimation
+            readonly property real longArc: Math.PI / 2 * 3
+            readonly property real shortArc: Math.PI / 8
 
-            running: control.visible && progress < 0
-            loops: Animation.Infinite
+            readonly property int animationDuration: 800
 
-            ParallelAnimation
+            onArcStartChanged: requestPaint()
+            onArcEndChanged: requestPaint()
+
+            onPaint:
             {
-                NumberAnimation
-                {
-                    target: canvas
-                    properties: "arcEnd"
-                    from: canvas.shortArc
-                    to: canvas.longArc
-                    easing.type: Easing.InOutQuad
-                    duration: canvas.animationDuration
-                }
+                var ctx = canvas.getContext('2d')
+                ctx.reset()
+
+                ctx.lineWidth = canvas.lineWidth
+                ctx.strokeStyle = color
+                ctx.lineCap = "butt"
+
+                ctx.arc(canvas.width / 2, canvas.height / 2, radius, arcStart, arcEnd, false)
+                ctx.stroke()
             }
 
-            ParallelAnimation
+            Behavior on arcStart
             {
-                NumberAnimation
+                enabled: progress >= 0
+                NumberAnimation { duration: 200 }
+            }
+            Behavior on arcEnd
+            {
+                enabled: progress >= 0
+                NumberAnimation { duration: 200 }
+            }
+
+            NumberAnimation on rotation
+            {
+                id: rotationAnimation
+
+                duration: canvas.animationDuration * 3
+                from: -90
+                to: 270
+                running: control.visible && progress < 0
+                loops: Animation.Infinite
+            }
+
+            SequentialAnimation
+            {
+                id: arcAnimation
+
+                running: control.visible && progress < 0
+                loops: Animation.Infinite
+
+                ParallelAnimation
                 {
-                    target: canvas
-                    properties: "arcStart"
-                    from: 0
-                    to: Math.PI * 2
-                    easing.type: Easing.InOutQuad
-                    duration: canvas.animationDuration
+                    NumberAnimation
+                    {
+                        target: canvas
+                        properties: "arcEnd"
+                        from: canvas.shortArc
+                        to: canvas.longArc
+                        easing.type: Easing.InOutQuad
+                        duration: canvas.animationDuration
+                    }
                 }
-                NumberAnimation
+
+                ParallelAnimation
                 {
-                    target: canvas
-                    properties: "arcEnd"
-                    from: canvas.longArc
-                    to: 2 * Math.PI + canvas.shortArc
-                    easing.type: Easing.InOutQuad
-                    duration: canvas.animationDuration
+                    NumberAnimation
+                    {
+                        target: canvas
+                        properties: "arcStart"
+                        from: 0
+                        to: Math.PI * 2
+                        easing.type: Easing.InOutQuad
+                        duration: canvas.animationDuration
+                    }
+                    NumberAnimation
+                    {
+                        target: canvas
+                        properties: "arcEnd"
+                        from: canvas.longArc
+                        to: 2 * Math.PI + canvas.shortArc
+                        easing.type: Easing.InOutQuad
+                        duration: canvas.animationDuration
+                    }
                 }
             }
         }
