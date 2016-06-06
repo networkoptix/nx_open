@@ -29,13 +29,13 @@
 #include <utils/common/ldap.h>
 #include <utils/math/color_transformations.h>
 
-QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
-    : base_type(parent)
-    , QnWorkbenchContextAware(parent)
-    , ui(new Ui::QnUserManagementWidget)
-    , m_usersModel(new QnUserListModel(parent))
-    , m_sortModel(new QnSortedUserListModel(parent))
-    , m_header(new QnCheckBoxedHeaderView(QnUserListModel::CheckBoxColumn, parent))
+QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
+    ui(new Ui::QnUserManagementWidget),
+    m_usersModel(new QnUserListModel(parent)),
+    m_sortModel(new QnSortedUserListModel(parent)),
+    m_header(new QnCheckBoxedHeaderView(QnUserListModel::CheckBoxColumn, parent))
 {
     ui->setupUi(this);
 
@@ -56,7 +56,8 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    auto updateFetchButton = [this] {
+    auto updateFetchButton = [this]
+    {
         ui->fetchButton->setEnabled(QnGlobalSettings::instance()->ldapSettings().isValid());
     };
 
@@ -79,7 +80,8 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     m_sortModel->setDynamicSortFilter(true);
     m_sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     m_sortModel->setFilterKeyColumn(-1);
-    connect(ui->filterLineEdit,  &QLineEdit::textChanged, this, [this](const QString &text) {
+    connect(ui->filterLineEdit,  &QLineEdit::textChanged, this, [this](const QString &text)
+    {
         m_sortModel->setFilterWildcard(text);
     });
 
@@ -91,13 +93,14 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     setHelpTopic(ui->enableSelectedButton, ui->disableSelectedButton,   Qn::UserSettings_DisableUser_Help);
     setHelpTopic(ui->ldapSettingsButton,                                Qn::UserSettings_LdapIntegration_Help);
     setHelpTopic(ui->fetchButton,                                       Qn::UserSettings_LdapFetch_Help);
-
 }
 
-QnUserManagementWidget::~QnUserManagementWidget() {
+QnUserManagementWidget::~QnUserManagementWidget()
+{
 }
 
-void QnUserManagementWidget::loadDataToUi() {
+void QnUserManagementWidget::loadDataToUi()
+{
     bool currentUserIsLdap = context()->user() && context()->user()->isLdap();
     ui->ldapSettingsButton->setVisible(!currentUserIsLdap);
     ui->fetchButton->setVisible(!currentUserIsLdap);
@@ -107,16 +110,18 @@ void QnUserManagementWidget::loadDataToUi() {
     updateSelection();
 }
 
-void QnUserManagementWidget::applyChanges() {
+void QnUserManagementWidget::applyChanges()
+{
     /* All changes are instant. */
 }
 
-bool QnUserManagementWidget::hasChanges() const {
+bool QnUserManagementWidget::hasChanges() const
+{
     return false;
 }
 
-void QnUserManagementWidget::updateSelection() {
-
+void QnUserManagementWidget::updateSelection()
+{
     auto users = visibleSelectedUsers();
     Qt::CheckState selectionState = Qt::Unchecked;
 
@@ -135,18 +140,21 @@ void QnUserManagementWidget::updateSelection() {
 
     using boost::algorithm::any_of;
 
-    ui->enableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr &user) {
+    ui->enableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr& user)
+    {
         return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission)
             && !user->isEnabled();
     }));
 
-    ui->disableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr &user) {
+    ui->disableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr& user)
+    {
         return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission)
             && user->isEnabled()
             && !user->isOwner();
     }));
 
-    ui->deleteSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr &user) {
+    ui->deleteSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr& user)
+    {
         return accessController()->hasPermissions(user, Qn::RemovePermission)
             && !user->isOwner();
     }));
@@ -154,7 +162,8 @@ void QnUserManagementWidget::updateSelection() {
     update();
 }
 
-void QnUserManagementWidget::openLdapSettings() {
+void QnUserManagementWidget::openLdapSettings()
+{
     if (!context()->user() || context()->user()->isLdap())
         return;
 
@@ -163,11 +172,13 @@ void QnUserManagementWidget::openLdapSettings() {
     dialog->exec();
 }
 
-void QnUserManagementWidget::createUser() {
+void QnUserManagementWidget::createUser()
+{
     menu()->triggerIfPossible(QnActions::NewUserAction); //TODO: #GDM correctly set parent widget
 }
 
-void QnUserManagementWidget::fetchUsers() {
+void QnUserManagementWidget::fetchUsers()
+{
     if (!context()->user() || context()->user()->isLdap())
         return;
 
@@ -179,7 +190,8 @@ void QnUserManagementWidget::fetchUsers() {
     dialog->exec();
 }
 
-void QnUserManagementWidget::at_mergeLdapUsersAsync_finished(int status, int handle, const QString &errorString) {
+void QnUserManagementWidget::at_mergeLdapUsersAsync_finished(int status, int handle, const QString& errorString)
+{
     Q_UNUSED(handle);
 
     if (status == 0 && errorString.isEmpty())
@@ -188,13 +200,16 @@ void QnUserManagementWidget::at_mergeLdapUsersAsync_finished(int status, int han
     // TODO: dk, please show correct message here in case of error
 }
 
-void QnUserManagementWidget::at_headerCheckStateChanged(Qt::CheckState state) {
+void QnUserManagementWidget::at_headerCheckStateChanged(Qt::CheckState state)
+{
     for (const auto &user: visibleUsers())
         m_usersModel->setCheckState(state, user);
+
     updateSelection();
 }
 
-void QnUserManagementWidget::at_usersTable_activated(const QModelIndex &index) {
+void QnUserManagementWidget::at_usersTable_activated(const QModelIndex& index)
+{
     QnUserResourcePtr user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
     if (!user)
         return;
@@ -202,7 +217,8 @@ void QnUserManagementWidget::at_usersTable_activated(const QModelIndex &index) {
     menu()->trigger(QnActions::UserSettingsAction, QnActionParameters(user));
 }
 
-void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex &index) {
+void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex& index)
+{
     QnUserResourcePtr user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
     if (!user)
         return;
@@ -213,38 +229,49 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex &index) {
     }
 }
 
-void QnUserManagementWidget::clearSelection() {
+void QnUserManagementWidget::clearSelection()
+{
     m_usersModel->setCheckState(Qt::Unchecked);
 }
 
-void QnUserManagementWidget::setSelectedEnabled(bool enabled) {
-    for (QnUserResourcePtr user : visibleSelectedUsers()) {
+void QnUserManagementWidget::setSelectedEnabled(bool enabled)
+{
+    for (QnUserResourcePtr user : visibleSelectedUsers())
+    {
         if (user->isOwner())
             continue;
+
         if (!accessController()->hasPermissions(user, Qn::WritePermission))
             continue;
 
-        qnResourcesChangesManager->saveUser(user, [enabled](const QnUserResourcePtr &user) {
+        qnResourcesChangesManager->saveUser(user, [enabled](const QnUserResourcePtr &user)
+        {
             user->setEnabled(enabled);
         });
     }
 }
 
-void QnUserManagementWidget::enableSelected() {
+void QnUserManagementWidget::enableSelected()
+{
     setSelectedEnabled(true);
 }
 
-void QnUserManagementWidget::disableSelected() {
+void QnUserManagementWidget::disableSelected()
+{
     setSelectedEnabled(false);
 }
 
-void QnUserManagementWidget::deleteSelected() {
+void QnUserManagementWidget::deleteSelected()
+{
     QnUserResourceList usersToDelete;
-    for (QnUserResourcePtr user : visibleSelectedUsers()) {
+    for (QnUserResourcePtr user : visibleSelectedUsers())
+    {
         if (user->isOwner())
             continue;
+
         if (!accessController()->hasPermissions(user, Qn::RemovePermission))
             continue;
+
         usersToDelete << user;
     }
 
@@ -255,10 +282,12 @@ void QnUserManagementWidget::deleteSelected() {
 }
 
 
-QnUserResourceList QnUserManagementWidget::visibleUsers() const {
+QnUserResourceList QnUserManagementWidget::visibleUsers() const
+{
     QnUserResourceList result;
 
-    for (int row = 0; row < m_sortModel->rowCount(); ++row) {
+    for (int row = 0; row < m_sortModel->rowCount(); ++row)
+    {
         QModelIndex index = m_sortModel->index(row, QnUserListModel::CheckBoxColumn);
         auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
         if (user)
@@ -278,18 +307,22 @@ QnUserResourceList QnUserManagementWidget::visibleSelectedUsers() const
         bool checked = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         if (!checked)
             continue;
+
         auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
         if (user)
             result << user;
     }
+
     return result;
 }
 
-const QnUserManagementColors QnUserManagementWidget::colors() const {
+const QnUserManagementColors QnUserManagementWidget::colors() const
+{
     return m_colors;
 }
 
-void QnUserManagementWidget::setColors(const QnUserManagementColors &colors) {
+void QnUserManagementWidget::setColors(const QnUserManagementColors& colors)
+{
     m_colors = colors;
     updateSelection();
 }
