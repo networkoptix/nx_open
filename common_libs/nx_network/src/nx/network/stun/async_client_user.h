@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/utils/async_operation_guard.h>
 #include <nx/network/stun/abstract_async_client.h>
 
 namespace nx {
@@ -9,7 +10,8 @@ namespace stun {
  * Can be stopped (to prevent async calls) while AsyncClient still running */
 class NX_NETWORK_API AsyncClientUser
 :
-    public QnStoppableAsync
+    public std::enable_shared_from_this<AsyncClientUser>,
+    public network::aio::Timer
 {
 public:
     AsyncClientUser(const AsyncClientUser&) = delete;
@@ -27,7 +29,8 @@ public:
     void setOnReconnectedHandler(AbstractAsyncClient::ReconnectHandler handler);
 
     /** Shall be called before the last shared_pointer is gone */
-    void pleaseStop(utils::MoveOnlyFunc<void()> handler) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    void pleaseStopSync() override;
 
 protected:
     AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client);
@@ -36,6 +39,8 @@ protected:
     bool setIndicationHandler(int method, AbstractAsyncClient::IndicationHandler handler);
 
 private:
+    std::atomic<bool> m_isEnabled;
+    utils::AsyncOperationGuard m_asyncGuard;
     std::shared_ptr<AbstractAsyncClient> m_client;
 };
 

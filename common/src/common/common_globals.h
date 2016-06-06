@@ -970,9 +970,6 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
-template<typename T>
-QString toString( const T& t ) { return t.toString(); }
-
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::TimePeriodContent)(Qn::Corner),
     (metatype)

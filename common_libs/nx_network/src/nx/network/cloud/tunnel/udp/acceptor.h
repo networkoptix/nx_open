@@ -43,11 +43,9 @@ private:
     std::chrono::milliseconds m_udpRetransmissionTimeout;
     int m_udpMaxRetransmissions;
 
-    QnMutex m_mutex;
     std::unique_ptr<hpm::api::MediatorServerUdpConnection> m_udpMediatorConnection;
     std::unique_ptr<UdtStreamSocket> m_udtConnectionSocket;
 
-    nx::utils::MoveOnlyFunc<void()> m_stopHandler;
     std::function<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractIncomingTunnelConnection>)> m_acceptHandler;
