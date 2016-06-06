@@ -28,7 +28,7 @@ void fillConfig(QCoreApplication &app)
     if (parser.isSet("tmp") && nx::ut::utils::validateAndOrCreatePath(parser.value("tmp")))
         config.tmpDir = parser.value("tmp");
     else
-        config.tmpDir = "tmp";
+        config.tmpDir = QDir(QDir::tempPath()).absoluteFilePath("nx_ut");
 
     if (parser.isSet("ftp-storage-url"))
         config.ftpUrl = parser.value("ftp-storage-url");
