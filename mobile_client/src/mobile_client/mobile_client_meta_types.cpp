@@ -13,7 +13,6 @@
 #include <ui/models/recent_user_connections_model.h>
 #include <ui/models/system_hosts_model.h>
 #include <models/camera_list_model.h>
-#include <models/server_list_model.h>
 #include <models/saved_sessions_model.h>
 #include <models/discovered_sessions_model.h>
 #include <models/calendar_model.h>
@@ -47,7 +46,6 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnRecentUserConnectionsModel>("com.networkoptix.qml", 1, 0, "QnRecentUserConnectionsModel");
     qmlRegisterType<QnSystemHostsModel>("com.networkoptix.qml", 1, 0, "QnSystemHostsModel");
     qmlRegisterType<QnCameraListModel>("com.networkoptix.qml", 1, 0, "QnCameraListModel");
-    qmlRegisterType<QnServerListModel>("com.networkoptix.qml", 1, 0, "QnServerListModel");
     qmlRegisterType<QnCalendarModel>("com.networkoptix.qml", 1, 0, "QnCalendarModel");
     qmlRegisterType<QnSavedSessionsModel>("com.networkoptix.qml", 1, 0, "QnSavedSessionsModel");
     qmlRegisterType<QnDiscoveredSessionsModel>("com.networkoptix.qml", 1, 0, "QnDiscoveredSessionsModel");

@@ -65,11 +65,11 @@ QPixmap QnCameraThumbnailCache::getThumbnail(const QString &thumbnailId) const
     return m_pixmaps.value(thumbnailId);
 }
 
-QString QnCameraThumbnailCache::thumbnailId(const QnUuid &resourceId)
+QString QnCameraThumbnailCache::thumbnailId(const QnUuid &resourceId) const
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_thumbnailByResourceId.find(resourceId);
+    const auto it = m_thumbnailByResourceId.find(resourceId);
     if (it == m_thumbnailByResourceId.end())
         return QString();
 
