@@ -575,7 +575,7 @@ void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& ha
                     std::vector<_bstr_t> tmpPaths;
                     GetDisabledNICS(pSvc, tmpPaths);
 
-                    if (!tmpPaths.empty())
+                    if (tmpPaths.empty())
                     {
                         break;
                     } else
