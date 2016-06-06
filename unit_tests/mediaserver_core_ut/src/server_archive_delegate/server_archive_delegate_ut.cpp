@@ -18,6 +18,7 @@ extern "C" {
 #include <core/resource/network_resource.h>
 #include <utils/common/util.h>
 #include <utils/media/ffmpeg_initializer.h>
+#include <utils/common/writer_pool.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -413,6 +414,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
 {
     nx::ut::utils::WorkDirResource storageWorkDir1;
     nx::ut::utils::WorkDirResource storageWorkDir2;
+    QnWriterPool writerPool;
 
     ASSERT_TRUE((bool)storageWorkDir1.getDirName());
     ASSERT_TRUE((bool)storageWorkDir2.getDirName());

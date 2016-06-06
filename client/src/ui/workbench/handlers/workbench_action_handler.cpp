@@ -1875,6 +1875,7 @@ void QnWorkbenchActionHandler::closeApplication(bool force) {
         return;
 
     menu()->trigger(QnActions::BeforeExitAction);
+    context()->setClosingDown(true);
     qApp->exit(0);
     applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
@@ -2235,7 +2236,11 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     messageBox->exec();
 }
 
-void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
+void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
+{
+    if (context()->closingDown())
+        return;
+
     QnMessageBox::warning(mainWindow(),
                          tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
                          tr("This is a beta version of %1.")

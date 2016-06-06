@@ -9,6 +9,9 @@ QnDialog::QnDialog(QWidget * parent, Qt::WindowFlags flags)
     cancelDrag(this);
 }
 
+QnDialog::~QnDialog()
+{}
+
 void QnDialog::show(QDialog *dialog)
 {
     NX_ASSERT(dialog, Q_FUNC_INFO, "Dialog is null");

@@ -12,6 +12,7 @@
 #include <QtCore>
 #include <QtSql>
 
+#include <utils/common/writer_pool.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include <recorder/storage_manager.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
@@ -697,6 +698,7 @@ TEST(MediaDbTest, StorageDB)
 
     const QString workDirPath = *workDirResource.getDirName();
 
+    QnWriterPool writerPool;
     std::unique_ptr<QnCommonModule> commonModule;
     if (!qnCommon) {
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
@@ -838,6 +840,7 @@ TEST(MediaDbTest, StorageDB)
 
 TEST(MediaDbTest, Migration_from_sqlite)
 {
+    QnWriterPool writerPool;
     std::unique_ptr<QnCommonModule> commonModule;
     if (!qnCommon) {
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);

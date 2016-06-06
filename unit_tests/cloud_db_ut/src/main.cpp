@@ -21,6 +21,8 @@ void parseArgs(int argc, char **argv);
 
 int main( int argc, char **argv )
 {
+    srand(::time(NULL));
+
 	nx::network::SocketGlobals::InitGuard sgGuard;
 
     ::testing::InitGoogleMock(&argc, argv);

@@ -220,7 +220,11 @@ bool QnResourceAccessManager::hasPermission(const QnUserResourcePtr& user, const
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const
 {
+    NX_ASSERT(user);
     NX_ASSERT(target);
+
+    if (!user)
+        return false;
 
     if (qnCommon->isReadOnly())
         return false;

@@ -45,15 +45,25 @@ MediatorProcess::MediatorProcess( int argc, char **argv )
     setServiceDescription(QnLibConnectionMediatorAppInfo::applicationDisplayName());
 }
 
+void MediatorProcess::pleaseStop()
+{
+    application()->quit();
+}
+
 void MediatorProcess::setOnStartedEventHandler(
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
 {
     m_startedEventHandler = std::move(handler);
 }
 
-void MediatorProcess::pleaseStop()
+const std::vector<SocketAddress>& MediatorProcess::httpEndpoints() const
 {
-    application()->quit();
+    return m_httpEndpoints;
+}
+
+const std::vector<SocketAddress>& MediatorProcess::stunEndpoints() const
+{
+    return m_stunEndpoints;
 }
 
 int MediatorProcess::executeApplication()
@@ -123,15 +133,15 @@ int MediatorProcess::executeApplication()
             .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
         return 3;
     }
-
+    m_stunEndpoints = tcpStunServer.endpoints();
+    
     MultiAddressServer<stun::UDPServer> udpStunServer(&stunMessageDispatcher);
-    if (!udpStunServer.bind(settings.stun().addrToListenList))
+    if (!udpStunServer.bind(m_stunEndpoints /*settings.stun().addrToListenList*/))
     {
         NX_LOGX(lit("Can not bind to UDP addresses: %1")
             .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
         return 4;
     }
-
 
     std::unique_ptr<nx_http::MessageDispatcher> httpMessageDispatcher;
     std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>
@@ -259,6 +269,7 @@ bool MediatorProcess::launchHttpServerIfNeeded(
             .arg(SystemError::toString(osErrorCode)), cl_logERROR);
         return false;
     }
+    m_httpEndpoints = (*multiAddressHttpServer)->endpoints();
 
     return true;
 }

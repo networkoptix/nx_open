@@ -51,11 +51,11 @@ namespace
         {
             settings->setArrayIndex(i);
 
-            const auto encriptedPass = settings->value(kPasswordTag).toString();
+            const auto encryptedPass = settings->value(kPasswordTag).toString();
 
             QnUserRecentConnectionData data;
             data.userName = settings->value(kUserNameTag).toString();
-            data.password = xorDecrypt(encriptedPass, kXorKey);
+            data.password = xorDecrypt(encryptedPass, kXorKey);
             data.systemName = settings->value(kSystemNameTag).toString();
             data.isStoredPassword = settings->value(kStoredPassword).toBool();
             result.append(data);

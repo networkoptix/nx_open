@@ -95,7 +95,7 @@ std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(
         if (sslRequired || s_isSslEnforced)
             result.reset(new SslSocket(result.release(), false));
     #endif // ENABLE_SSL
-    
+
     return std::move(result);
 }
 
@@ -171,7 +171,7 @@ void SocketFactory::enforceSsl( bool isEnforced )
     qWarning() << ">>> SocketFactory::enforceSsl(" << isEnforced << ") <<<";
 }
 
-SocketFactory::CreateStreamSocketFuncType 
+SocketFactory::CreateStreamSocketFuncType
     SocketFactory::setCreateStreamSocketFunc(
         CreateStreamSocketFuncType newFactoryFunc)
 {

@@ -241,7 +241,6 @@ private:
     qint64 getFirstBookmarkTimeMs();
 
 private:
-    QPointer<QWidget> m_widget;
     QPointer<QMenu> m_mainMenu;
     QPointer<QMenu> m_currentUserLayoutsMenu;
 

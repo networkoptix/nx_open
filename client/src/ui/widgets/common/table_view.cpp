@@ -177,3 +177,25 @@ void QnTableView::paintEvent(QPaintEvent* event)
     /* Default table painting: */
     base_type::paintEvent(event);
 }
+
+void QnTableView::currentChanged(const QModelIndex& current, const QModelIndex& previous)
+{
+    base_type::currentChanged(current, previous);
+
+    /* Since we draw entire row focus rect if selection mode is SelectRows,
+     * we need to post update events for rows that lose and gain focus: */
+    if (selectionBehavior() == SelectRows && (hasFocus() || viewport()->hasFocus()))
+    {
+        int previousRow = previous.isValid() ? previous.row() : -1;
+        int currentRow = current.isValid() ? current.row() : -1;
+
+        if (previousRow != currentRow)
+        {
+            if (previousRow >= 0)
+                viewport()->update(rowRect(previous.row()));
+
+            if (currentRow >= 0)
+                viewport()->update(rowRect(current.row()));
+        }
+    }
+}

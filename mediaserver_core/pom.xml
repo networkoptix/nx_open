@@ -34,7 +34,7 @@
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>any/server-external-${branch}|any/server-external openssl ffmpeg onvif quazip sigar festival any/qtsinglecoreapplication any/qtservice</rdep.packages>
+        <rdep.packages>any/server-external-${branch}|any/server-external openssl ffmpeg onvif quazip sigar any/qtsinglecoreapplication any/qtservice</rdep.packages>
         <rdep.linux.arm.packages>openldap</rdep.linux.arm.packages>
     </properties>
 

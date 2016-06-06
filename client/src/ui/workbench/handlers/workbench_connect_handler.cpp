@@ -254,16 +254,18 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
 
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
-    const bool storePassword = parameters.argument(Qn::StorePasswordRole, false);
-    const bool autoLogin = parameters.argument(Qn::AutoLoginRole, false);
-    const auto connectionAlias = parameters.argument(Qn::ConnectionAliasRole, QString());
 
+    const auto connectionAlias = parameters.argument(Qn::ConnectionAliasRole, QString());
+    const auto storeSettings = StoreConnectionSettings::create(connectionAlias,        
+        parameters.argument(Qn::StorePasswordRole, false),
+        parameters.argument(Qn::AutoLoginRole, false));
+    
     if (url.isValid())
     {
         /* ActiveX plugin */
         if (qnRuntime->isActiveXMode())
         {
-            if (connectToServer(url, connectionAlias, storePassword, autoLogin, true) != ec2::ErrorCode::ok)
+            if (connectToServer(url, storeSettings, true) != ec2::ErrorCode::ok)
             {
                 QnGraphicsMessageBox::information(tr("Could not connect to server..."), 1000 * 60 * 60 * 24);
                 menu()->trigger(QnActions::ExitAction);
@@ -272,7 +274,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         else if (qnRuntime->isVideoWallMode())  /* Videowall item */
         {
             //TODO: #GDM #High videowall should try indefinitely
-            if (connectToServer(url, connectionAlias, storePassword, autoLogin, true) != ec2::ErrorCode::ok)
+            if (connectToServer(url, storeSettings, true) != ec2::ErrorCode::ok)
             {
                 QnGraphicsMessageBox* incompatibleMessageBox =
                     QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1...")
@@ -286,7 +288,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
             /* Login Dialog or 'Open in new window' with url */
 
             //try connect; if not - show login dialog
-            if (connectToServer(url, connectionAlias, storePassword, autoLogin, false) != ec2::ErrorCode::ok)
+            if (connectToServer(url, storeSettings, false) != ec2::ErrorCode::ok)
                 showWelcomeScreen();
         }
     }
@@ -301,7 +303,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         const bool autoLogin = qnSettings->autoLogin();
         if (autoLogin && url.isValid() && !url.password().isEmpty())
         {
-            if (connectToServer(url, connectionAlias, true, true, false) != ec2::ErrorCode::ok)
+            const auto storeSettings = StoreConnectionSettings::create(
+                connectionAlias, true, true);
+
+            if (connectToServer(url, storeSettings, false) != ec2::ErrorCode::ok)
                 showWelcomeScreen();
         }
         else
@@ -320,7 +325,9 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered() {
     QUrl currentUrl = QnAppServerConnectionFactory::url();
     if (connected())
         disconnectFromServer(true);
-    if (connectToServer(currentUrl, QString(), false, false, false) != ec2::ErrorCode::ok)
+
+    // Do not store connections in case of reconnection
+    if (connectToServer(currentUrl, StoreConnectionSettingsPtr(), false) != ec2::ErrorCode::ok)
         showWelcomeScreen();
 }
 
@@ -336,10 +343,21 @@ bool QnWorkbenchConnectHandler::connected() const {
     return !qnCommon->remoteGUID().isNull();
 }
 
+QnWorkbenchConnectHandler::StoreConnectionSettingsPtr
+QnWorkbenchConnectHandler::StoreConnectionSettings::create(
+    const QString &connectionAlias,
+    bool storePassword,
+    bool autoLogin)
+{
+    const StoreConnectionSettingsPtr result(new StoreConnectionSettings());
+    result->connectionAlias = connectionAlias;
+    result->storePassword = storePassword;
+    result->autoLogin = autoLogin;
+    return result;
+}
+
 ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl
-    , const QString &connectionAlias
-    , bool storePassword
-    , bool autoLogin
+    , const StoreConnectionSettingsPtr &storeSettings
     , bool silent)
 {
     if (!silent) {
@@ -393,6 +411,10 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     }
     m_connectingHandle = 0;
 
+    /* Preliminary exit if application was closed while we were in the inner loop. */
+    if (context()->closingDown())
+        return ec2::ErrorCode::ok;
+
     const QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
     // TODO: check me!
     QnConnectionDiagnosticsHelper::Result status = silent
@@ -401,13 +423,14 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
 
     const auto systemName = connectionInfo.systemName;
-    const auto handleConnectionResult = [systemName, appServerUrl, storePassword
-        , autoLogin, connectionAlias] (ec2::ErrorCode code)
+    const auto handleConnectionResult = [systemName, appServerUrl, storeSettings] (ec2::ErrorCode code)
     {
-        if (code == ec2::ErrorCode::ok)
+        if (storeSettings && (code == ec2::ErrorCode::ok))
         {
-            storeSystemConnection(systemName, appServerUrl, storePassword, autoLogin);
-            storeCustomConnection(appServerUrl, connectionAlias, autoLogin);
+            storeSystemConnection(systemName, appServerUrl,
+                storeSettings->storePassword, storeSettings->autoLogin);
+            storeCustomConnection(appServerUrl,
+                storeSettings->connectionAlias, storeSettings->autoLogin);
         }
 
         return code;
@@ -575,7 +598,8 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         reconnectInfoDialog->setCurrentServer(reconnectHelper->currentServer());
 
         /* Here inner event loop will be started. */
-        ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl(), QString(), false, false, true);
+        ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl()
+            , StoreConnectionSettingsPtr(), true);
 
         /* Main window can be closed in the event loop so the dialog will be freed. */
         if (!reconnectInfoDialog)

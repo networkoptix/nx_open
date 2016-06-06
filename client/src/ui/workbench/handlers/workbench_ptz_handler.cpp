@@ -92,7 +92,8 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
     connect(action(QnActions::DebugGetPtzPositionAction),              &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered);
 }
 
-QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler() {
+QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler()
+{
     delete QnPtzManageDialog::instance();
 }
 
@@ -240,7 +241,8 @@ void QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered() {
 }
 
 
-void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
+void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
 
@@ -248,7 +250,8 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
         return;
 
     QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
-    NX_ASSERT(dialog);
+    if (!dialog)
+        dialog = new QnPtzManageDialog(mainWindow());
 
     if (dialog->isVisible() && !dialog->tryClose(false))
         return;

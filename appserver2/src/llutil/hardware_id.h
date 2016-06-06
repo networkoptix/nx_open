@@ -8,7 +8,7 @@
 #include <QtCore/QString>
 
 class QSettings;
-class QnHardwareInfo;
+struct QnHardwareInfo;
 
 namespace LLUtil {
 

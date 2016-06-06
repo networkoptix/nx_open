@@ -5,11 +5,15 @@
 
 #pragma once
 
+//#define USE_QAPPLICATION
+
 #include <atomic>
 #include <memory>
 
+#ifdef USE_QAPPLICATION
 #include <qtsinglecoreapplication.h>
 #include <qtservice.h>
+#endif
 
 #include <utils/common/stoppable.h>
 #include <nx/network/connection_server/multi_address_server.h>
@@ -18,8 +22,6 @@
 #include <nx/utils/thread/wait_condition.h>
 
 #include "settings.h"
-
-//#define USE_QAPPLICATION
 
 
 class QnCommandLineParser;
@@ -37,8 +39,8 @@ class AuthorizationManager;
 
 class VmsGatewayProcess
 :
-    public QObject,
 #ifdef USE_QAPPLICATION
+    public QObject,
     public QtService<QtSingleCoreApplication>,
 #endif
     public QnStoppable
@@ -51,6 +53,8 @@ public:
 
     void setOnStartedEventHandler(
         nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
+
+    const std::vector<SocketAddress>& httpEndpoints() const;
 
 #ifndef USE_QAPPLICATION
     int exec();
@@ -70,6 +74,7 @@ private:
     std::atomic<bool> m_terminated;
     int m_timerID;
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
+    std::vector<SocketAddress> m_httpEndpoints;
 #ifndef USE_QAPPLICATION
     QnMutex m_mutex;
     QnWaitCondition m_cond;
