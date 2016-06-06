@@ -4,6 +4,8 @@
 
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
 #include <QtCore/QDebug>
 
 namespace {
@@ -73,15 +75,19 @@ public:
     int spaceWidth;
     qreal pixelRatio;
 
-    QnTimelineTextHelperPrivate(QFont font, qreal pixelRatio)
-        : font((font.setPixelSize(font.pixelSize() * pixelRatio), font))
-        , fm(this->font)
+    QnTimelineTextHelperPrivate(const QFont& font)
+        : font(font)
+        , fm(font)
         , lineHeight(fm.height())
         , digitWidth(fm.size(Qt::TextSingleLine, lit("0")).width())
         , maxCharWidth(fm.size(Qt::TextSingleLine, lit("m")).width())
         , spaceWidth(fm.size(Qt::TextSingleLine, lit(" ")).width())
-        , pixelRatio(pixelRatio)
-    {}
+        , pixelRatio(1.0)
+    {
+        const auto screens = qApp->screens();
+        if (!screens.isEmpty())
+            pixelRatio = screens[0]->devicePixelRatio();
+    }
 
     void addString(const QString &string, QPainter *painter, int &x, int &y) {
         if (strings.contains(string))
@@ -101,8 +107,11 @@ public:
     }
 };
 
-QnTimelineTextHelper::QnTimelineTextHelper(const QFont &font, qreal pixelRatio, const QColor &color, const QStringList &strings) :
-    d(new QnTimelineTextHelperPrivate(font, pixelRatio))
+QnTimelineTextHelper::QnTimelineTextHelper(
+        const QFont& font,
+        const QColor& color,
+        const QStringList& strings)
+    : d(new QnTimelineTextHelperPrivate(font))
 {
     QStringList packedStrings = strings;
     for (int i = 0; i <= 9; ++i)

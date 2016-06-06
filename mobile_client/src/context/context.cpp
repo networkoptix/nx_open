@@ -9,7 +9,6 @@
 #include "utils/mobile_app_info.h"
 #include <utils/common/app_info.h>
 #include "camera/camera_thumbnail_cache.h"
-#include "ui/resolution_util.h"
 #include "context_settings.h"
 #include "ui/window_utils.h"
 #include "ui/texture_size_helper.h"
@@ -17,21 +16,12 @@
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_app_info.h>
 
-namespace {
-#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
-    const int customDensityClass = QnResolutionUtil::Mdpi;
-#else
-    const int customDensityClass = -1;
-#endif
-}
-
 QnContext::QnContext(QObject *parent):
     base_type(parent),
     m_connectionManager(new QnConnectionManager(this)),
     m_colorTheme(new QnColorTheme(this)),
     m_appInfo(new QnMobileAppInfo(this)),
-    m_settings(new QnContextSettings(this)),
-    m_resolutionUtil(customDensityClass == -1 ? new QnResolutionUtil() : new QnResolutionUtil(static_cast<QnResolutionUtil::DensityClass>(customDensityClass)))
+    m_settings(new QnContextSettings(this))
 {
     connect(m_connectionManager, &QnConnectionManager::connectionStateChanged, this, [this](){
         QnCameraThumbnailCache *thumbnailCache = QnCameraThumbnailCache::instance();
@@ -46,22 +36,6 @@ QnContext::QnContext(QObject *parent):
 }
 
 QnContext::~QnContext() {}
-
-int QnContext::dp(qreal dpix) const {
-    return m_resolutionUtil->dp(dpix);
-}
-
-int QnContext::dps(qreal dpix) const {
-    return m_resolutionUtil->dp(dpix) * m_resolutionUtil->pixelRatio();
-}
-
-int QnContext::sp(qreal dpix) const {
-    return m_resolutionUtil->sp(dpix);
-}
-
-qreal QnContext::iconScale() const {
-    return 1.0 / m_resolutionUtil->pixelRatio();
-}
 
 void QnContext::exitFullscreen() {
     showSystemUi();

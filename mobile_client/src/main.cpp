@@ -36,7 +36,6 @@ FlagConfig conf("mobile_client");
 #include "mobile_client/mobile_client_module.h"
 
 #include "ui/color_theme.h"
-#include "ui/resolution_util.h"
 #include "ui/camera_thumbnail_provider.h"
 #include "ui/icon_provider.h"
 #include "ui/window_utils.h"
@@ -64,11 +63,7 @@ int runUi(QGuiApplication *application) {
 
     QnContext context;
 
-    QnResolutionUtil::DensityClass densityClass = QnResolutionUtil::instance()->densityClass();
-    qDebug() << "Starting with density class: " << QnResolutionUtil::densityName(densityClass);
-
     QStringList selectors;
-    selectors.append(QnResolutionUtil::densityName(densityClass));
 
     if (context.liteMode())
     {
@@ -110,7 +105,6 @@ int runUi(QGuiApplication *application) {
     engine.addImageProvider(lit("active"), activeCameraThumbnailProvider);
     engine.addImageProvider(lit("icon"), iconProvider);
     engine.rootContext()->setContextObject(&context);
-    engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::instance()->densityMultiplier());
 
     QQmlComponent mainComponent(&engine, QUrl(lit("main.qml")));
     QScopedPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));

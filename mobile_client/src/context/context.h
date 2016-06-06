@@ -8,7 +8,6 @@
 class QnConnectionManager;
 class QnColorTheme;
 class QnMobileAppInfo;
-class QnResolutionUtil;
 class QnContextSettings;
 
 class QnContext: public QObject, public QnInstanceStorage {
@@ -40,15 +39,6 @@ public:
     QnContextSettings *settings() const {
         return m_settings;
     }
-
-    QnResolutionUtil *resolutionUtil() const {
-        return m_resolutionUtil.data();
-    }
-
-    Q_INVOKABLE int dp(qreal dpix) const;
-    Q_INVOKABLE int dps(qreal dpix) const;
-    Q_INVOKABLE int sp(qreal dpix) const;
-    Q_INVOKABLE qreal iconScale() const;
 
     Q_INVOKABLE void enterFullscreen();
     Q_INVOKABLE void exitFullscreen();
@@ -91,7 +81,6 @@ private:
     QnContextSettings *m_settings;
 
     QString m_localPrefix;
-    QScopedPointer<QnResolutionUtil> m_resolutionUtil;
 };
 
 Q_DECLARE_METATYPE(QnContext*)

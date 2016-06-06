@@ -9,7 +9,7 @@ class QnTimelineTextHelperPrivate;
 class QnTimelineTextHelper
 {
 public:
-    QnTimelineTextHelper(const QFont &font, qreal pixelRatio, const QColor &color, const QStringList &strings);
+    QnTimelineTextHelper(const QFont &font, const QColor &color, const QStringList &strings);
     ~QnTimelineTextHelper();
 
     QRectF digitCoordinates(int digit) const;
