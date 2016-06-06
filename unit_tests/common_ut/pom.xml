@@ -12,11 +12,9 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>common_ut</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Common Library Unit Tests</name>
+    <name>VMS Common Library Unit Tests</name>
 
     <properties>
-        <guid>${common_ut.guid}</guid>
-        <product.title>HD Witness Common Library Unit Tests</product.title>
         <root.dir>${basedir}/../..</root.dir>
         <path>${env.PATH}</path>
         <!--Specify the project to test-->

@@ -14,12 +14,10 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>vms_gateway_ut</artifactId>
     <packaging>pom</packaging>
-    <name>HD Cloud VMS Gateway Unit Tests</name>
+    <name>VMS Cloud Gateway Unit Tests</name>
 
     <properties>
         <guid>${vms_gateway_ut.guid}</guid>
-        <product.title>HD Cloud VMS Gateway Unit Tests</product.title>
-
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
         <global.libs>-lcommon -lnx_utils -lnx_streaming -lnx_network -ludt -lvms_gateway -lconnection_mediator -lcloud_db_client</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib Iphlpapi.lib</windows.oslibs>
