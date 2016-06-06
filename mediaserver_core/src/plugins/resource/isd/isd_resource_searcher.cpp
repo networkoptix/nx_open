@@ -246,11 +246,20 @@ QString extractWord(int index, const QByteArray& rawData)
 }
 
 
-bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName) const
+bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName, const QString& model) const
 {
-    return vendorName.toUpper().startsWith(manufacture()) ||
-        vendorName.toLower().trimmed() == lit("digital watchdog") ||
-        vendorName.toLower().trimmed() == lit("digitalwatchdog");
+    if (vendorName.toUpper().startsWith(manufacture()))
+    {
+        return true;
+    }
+    else if(vendorName.toLower().trimmed() == lit("digital watchdog") ||
+        vendorName.toLower().trimmed() == lit("digitalwatchdog"))
+    {
+        QnResourceData resourceData = qnCommon->dataPool()->data("DW", model);
+        if (resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL))
+            return true;
+    }
+    return false;
 }
 
 
@@ -397,7 +406,7 @@ void QnPlISDResourceSearcher::processPacket(
         const QByteArray& xmlDevInfo,
         QnResourceList& result )
 {
-    if (!isDwOrIsd(devInfo.manufacturer))
+    if (!isDwOrIsd(devInfo.manufacturer, devInfo.modelName))
         return;
 
     QnMacAddress cameraMAC(devInfo.serialNumber);

@@ -20,6 +20,18 @@
 
         {
             "keys": [
+                "DW|DWCA-C128-64", 
+				"DW|DWCA-C12C-64", 
+				"DW|DWCA-VF25W28-64",
+				"DW|DWCA-VF25WIR4-64",
+				"DW|DWCA-VF25WIR8-64",
+				"DW|DWC-PZV2M72T"
+            ],
+            "isdDwCam": true
+        },
+	
+        {
+            "keys": [
                 "DW|*","ISD|*"
             ],
             "possibleDefaultCredentials": [

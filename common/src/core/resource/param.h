@@ -47,6 +47,7 @@ namespace Qn
     static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
     static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
     static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
+    static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
 
 
     // Mediaserver info for Statistics
