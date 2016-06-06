@@ -26,7 +26,7 @@ namespace
 
 class QnPasswordStrengthIndicatorPrivate
 {
-    QnPasswordStrengthIndicatorPrivate::QnPasswordStrengthIndicatorPrivate(QnPasswordStrengthIndicator* q, QLineEdit* lineEdit) :
+    QnPasswordStrengthIndicatorPrivate(QnPasswordStrengthIndicator* q, QLineEdit* lineEdit) :
         m_lineEdit(lineEdit),
         m_currentInformation(lineEdit->text()),
         m_roundingRadius(kDefaultRoundingRadius),
@@ -106,7 +106,7 @@ class QnPasswordStrengthIndicatorPrivate
         Qt::LayoutDirection dir = m_lineEdit->layoutDirection();
         const int vertical = Qt::TopEdge | Qt::BottomEdge;
         const int horizontal = (dir == Qt::RightToLeft) ? Qt::LeftEdge : Qt::RightEdge;
-        return horizontal | vertical;
+        return Qt::Edges(horizontal | vertical);
     }
 
     QPointer<QLineEdit> m_lineEdit;
@@ -142,6 +142,10 @@ QnPasswordStrengthIndicator::QnPasswordStrengthIndicator(QLineEdit* lineEdit) :
 
     setMinimumWidth(kDefaultMinimumWidth);
     setIndicatorMargins(kDefaultIndicatorMargins);
+}
+
+QnPasswordStrengthIndicator::~QnPasswordStrengthIndicator()
+{
 }
 
 const QnPasswordInformation& QnPasswordStrengthIndicator::currentInformation() const

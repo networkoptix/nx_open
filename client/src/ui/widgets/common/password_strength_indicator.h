@@ -19,6 +19,7 @@ class QnPasswordStrengthIndicator : public QWidget
 
 public:
     QnPasswordStrengthIndicator(QLineEdit* lineEdit);
+    virtual ~QnPasswordStrengthIndicator();
 
     const QnPasswordInformation& currentInformation() const;
 
