@@ -21,7 +21,12 @@ Page
         anchors.fill: parent
         spacing: 1
 
-        model: QnSystemsModel { id: systemsModel }
+        model: QnSystemsModel
+        {
+            id: systemsModel
+            minimalVersion: "2.5"
+        }
+
         delegate: SessionItem
         {
             width: sessionsList.width
@@ -31,6 +36,7 @@ Page
             ownerDescription: cloudSystem ? model.ownerDescription : ""
             online: model.isOnline
             compatible: model.isCompatible
+            invalidVersion: !compatible && !model.isCompatibleVesion ? model.wrongVersion : ""
         }
         highlight: Rectangle
         {
@@ -38,7 +44,7 @@ Page
             color: "transparent"
             border.color: ColorTheme.contrast5
             border.width: 4
-
+            visible: liteMode
         }
         highlightResizeDuration: 0
         highlightMoveDuration: 0

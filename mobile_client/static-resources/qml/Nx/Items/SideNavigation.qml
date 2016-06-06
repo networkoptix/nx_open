@@ -105,7 +105,7 @@ Drawer
 
     onOpenedChanged:
     {
-        if (opened)
+        if (opened && liteMode)
         {
             // TODO: #dklychkov Implement proper focus control
             disconnectButton.forceActiveFocus()

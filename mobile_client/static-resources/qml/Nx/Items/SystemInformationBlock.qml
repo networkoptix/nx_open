@@ -15,6 +15,7 @@ Item
     property bool online: true
     property string address
     property string user
+    property string invalidVersion
 
     implicitHeight: column.height
 
@@ -62,6 +63,7 @@ Item
         {
             address: systemInformationBlock.address
             user: systemInformationBlock.user
+            issue: compatible ? "" : (invalidVersion || qsTr("INCOMPATIBLE"))
         }
     }
 

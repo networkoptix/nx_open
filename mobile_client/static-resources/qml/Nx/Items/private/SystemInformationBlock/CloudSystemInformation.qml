@@ -2,25 +2,47 @@ import QtQuick 2.6
 import QtQuick.Layouts 1.1
 import Nx 1.0
 
-Column
+Item
 {
+    implicitWidth: column.implicitWidth
+    implicitHeight: column.implicitHeight
+
     property alias description: descriptionText.text
+    property bool online: true
 
-    spacing: 4
-
-    Text
+    Column
     {
-        id: descriptionText
 
-        width: parent.width
-        font.pixelSize: 14
-        elide: Text.ElideRight
-        color: enabled ? ColorTheme.windowText : ColorTheme.base13
+        spacing: 4
+
+        Text
+        {
+            id: descriptionText
+
+            width: parent.width
+            font.pixelSize: 14
+            elide: Text.ElideRight
+            color: enabled ? ColorTheme.windowText : ColorTheme.base13
+        }
+
+        Image
+        {
+            source: enabled ? lp("/images/cloud.png")
+                            : lp("/images/cloud_disabled.png")
+        }
     }
 
-    Image
+    IssueLabel
     {
-        source: enabled ? lp("/images/cloud.png")
-                        : lp("/images/cloud_disabled.png")
+        text: online ? "" : qsTr("OFFLINE")
+        anchors
+        {
+            bottom: parent.bottom
+            right: parent.right
+            rightMargin: -4
+        }
+        color: ColorTheme.base14
+        visible: online
     }
 }
+

@@ -15,13 +15,12 @@ Pane
     property alias online: informationBlock.online
     property alias compatible: informationBlock.compatible
     property alias ownerDescription: informationBlock.ownerDescription
+    property alias invalidVersion: informationBlock.invalidVersion
 
     padding: 0
 
     implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
     implicitWidth: 200
-
-    enabled: compatible && online
 
     QnSystemHostsModel
     {
@@ -52,7 +51,6 @@ Pane
     {
         id: mouseArea
 
-        enabled: compatible
         anchors.fill: parent
         onClicked: open()
     }
@@ -60,12 +58,17 @@ Pane
     contentItem: SystemInformationBlock
     {
         id: informationBlock
+        enabled: compatible && online
         address: hostsModel.firstHost
         user: connectionsModel.firstUser
     }
 
     IconButton
     {
+        /* It should not be parented by contentItem */
+        parent: control
+
+        y: 2
         anchors.right: parent.right
         icon: lp("/images/edit.png")
         visible: connectionsModel.hasConnections
@@ -80,6 +83,9 @@ Pane
 
     function open()
     {
+        if (!contentItem.enabled)
+            return
+
         if (connectionsModel.hasConnections)
         {
             connectionManager.connectToServer(
