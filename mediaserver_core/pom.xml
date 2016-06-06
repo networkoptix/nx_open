@@ -80,6 +80,16 @@
             <scope>system</scope>
             <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_speach_synthesizer</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/nx_speach_synthesizer/pom.xml</systemPath>
+        </dependency>
+
     </dependencies>
 
     <build>
