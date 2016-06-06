@@ -44,6 +44,7 @@ private:
 
     Q_SLOT void at_mergeLdapUsersAsync_finished(int status, int handle, const QString& errorString);
 
+    void editRoles();
     void createUser();
     void fetchUsers();
     void openLdapSettings();

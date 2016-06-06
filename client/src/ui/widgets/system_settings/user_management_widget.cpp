@@ -66,6 +66,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     connect(ui->usersTable,              &QTableView::activated, this,  &QnUserManagementWidget::at_usersTable_activated);
     connect(ui->usersTable,              &QTableView::clicked,   this,  &QnUserManagementWidget::at_usersTable_clicked);
     connect(ui->createUserButton,        &QPushButton::clicked,  this,  &QnUserManagementWidget::createUser);
+    connect(ui->rolesButton,             &QPushButton::clicked,  this,  &QnUserManagementWidget::editRoles);
     connect(ui->clearSelectionButton,    &QPushButton::clicked,  this,  &QnUserManagementWidget::clearSelection);
     connect(ui->enableSelectedButton,    &QPushButton::clicked,  this,  &QnUserManagementWidget::enableSelected);
     connect(ui->disableSelectedButton,   &QPushButton::clicked,  this,  &QnUserManagementWidget::disableSelected);
@@ -170,6 +171,11 @@ void QnUserManagementWidget::openLdapSettings()
     QScopedPointer<QnLdapSettingsDialog> dialog(new QnLdapSettingsDialog(this));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
+}
+
+void QnUserManagementWidget::editRoles()
+{
+    menu()->triggerIfPossible(QnActions::UserGroupsAction); //TODO: #vkutin #GDM correctly set parent widget
 }
 
 void QnUserManagementWidget::createUser()
