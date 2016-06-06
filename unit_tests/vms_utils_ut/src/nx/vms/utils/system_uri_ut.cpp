@@ -84,6 +84,16 @@ namespace nx
                 *os << SystemUri::toString(val).toStdString();
             }
 
+            void PrintTo(SystemUri::ReferralSource val, ::std::ostream* os)
+            {
+                *os << SystemUri::toString(val).toStdString();
+            }
+
+            void PrintTo(SystemUri::ReferralContext val, ::std::ostream* os)
+            {
+                *os << SystemUri::toString(val).toStdString();
+            }
+
             void PrintTo(const SystemUri& val, ::std::ostream* os)
             {
                 *os << val.toString().toStdString();
@@ -119,6 +129,8 @@ public:
         ASSERT_EQ(l.systemId(), r.systemId());
         ASSERT_EQ(l.authenticator().user, r.authenticator().user);
         ASSERT_EQ(l.authenticator().password, r.authenticator().password);
+        ASSERT_EQ(l.referral().source, r.referral().source);
+        ASSERT_EQ(l.referral().context, r.referral().context);
         ASSERT_EQ(l.rawParameters(), r.rawParameters());
         ASSERT_EQ(l, r);
     }
@@ -599,7 +611,34 @@ TEST_F(SystemUriTest, referralLinkToString)
                           );
 }
 
-/*
-Referral links:
-TODO: #GDM
-*/
+TEST_F(SystemUriTest, constructors)
+{
+    m_uri.setProtocol(SystemUri::Protocol::Native);
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setSystemId(kLocalSystemId);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setReferral(SystemUri::ReferralSource::DesktopClient, SystemUri::ReferralContext::WelcomePage);
+    m_uri.addParameter(kParamKey, kParamValue);
+
+    SystemUri copy(m_uri);
+    assertEqual(m_uri, copy);
+
+    SystemUri assigned = m_uri;
+    assertEqual(m_uri, assigned);
+}
+
+TEST_F(SystemUriTest, assignmentOperator)
+{
+    m_uri.setProtocol(SystemUri::Protocol::Native);
+    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setSystemId(kLocalSystemId);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setReferral(SystemUri::ReferralSource::DesktopClient, SystemUri::ReferralContext::WelcomePage);
+    m_uri.addParameter(kParamKey, kParamValue);
+
+    SystemUri copy;
+    copy = SystemUri(m_uri.toString());
+    assertEqual(m_uri, copy);
+}

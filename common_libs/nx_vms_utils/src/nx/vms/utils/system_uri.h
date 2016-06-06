@@ -77,6 +77,7 @@ namespace nx
 
                 SystemUri();
                 SystemUri(const QString& uri);
+                SystemUri(const SystemUri& other);
                 virtual ~SystemUri();
 
                 Scope scope() const;
@@ -137,6 +138,7 @@ namespace nx
                 static QString toString(SystemUri::ReferralSource value);
                 static QString toString(SystemUri::ReferralContext value);
 
+                SystemUri& operator=(const SystemUri& other);
                 bool operator==(const SystemUri& other) const;
             private:
                 QScopedPointer<SystemUriPrivate> const d_ptr;

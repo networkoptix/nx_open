@@ -107,6 +107,22 @@ public:
         parameters()
     {}
 
+    SystemUriPrivate(SystemUriPrivate* other)
+    {
+        NX_ASSERT(other);
+        if (!other)
+            return;
+        scope = other->scope;
+        protocol = other->protocol;
+        domain = other->domain;
+        clientCommand = other->clientCommand;
+        systemId = other->systemId;
+        systemAction = other->systemAction;
+        authenticator = other->authenticator;
+        referral = other->referral;
+        parameters = other->parameters;
+    }
+
     void parse(const QString& uri)
     {
         QUrl url(uri, QUrl::TolerantMode);
@@ -366,10 +382,10 @@ private:
             splitString(auth, ':', authenticator.user, authenticator.password);
         }
 
-        QString referralFrom = parameters.take(kReferralSourceKey);
+        QString referralFrom = parameters.take(kReferralSourceKey).toLower();
         referral.source = referralSourceToString.key(referralFrom);
 
-        QString referralContext = parameters.take(kReferralContextKey);
+        QString referralContext = parameters.take(kReferralContextKey).toLower();
         referral.context = referralContextToString.key(referralContext);
     }
 
@@ -381,11 +397,26 @@ SystemUri::SystemUri() :
 
 }
 
-SystemUri::SystemUri(const QString& uri):
+SystemUri::SystemUri(const QString& uri) :
     SystemUri()
 {
     Q_D(SystemUri);
     d->parse(uri);
+}
+
+nx::vms::utils::SystemUri::SystemUri(const SystemUri& other) :
+    d_ptr(new SystemUriPrivate(other.d_ptr.data()))
+{
+
+}
+
+SystemUri& SystemUri::operator=(const SystemUri& other)
+{
+    if (&other == this)
+        return *this;
+
+    (*d_ptr.data())=(other.d_ptr.data());
+    return *this;
 }
 
 SystemUri::~SystemUri()
