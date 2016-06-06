@@ -12,6 +12,8 @@ var Page = function () {
     this.get = function () {
         browser.get('/#/developers');
     };
+
+    this.body = element(by.css('body'));
 };
 
 module.exports = Page;
