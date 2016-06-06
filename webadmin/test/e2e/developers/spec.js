@@ -63,10 +63,10 @@ describe('Developers Page', function () {
     it("Sdk storage link opens /static/index.html#/sdkeula/storage_sdk, where EULA can be accepted",function(){
         expect(p.sdkLinkStorage.isDisplayed()).toBe(true);
         expect(p.sdkLinkStorage.getText()).toMatch("SDK");
-        expect(p.sdkLinkStorage.getAttribute("href")).toMatch("sdkeula/sdk");
+        expect(p.sdkLinkStorage.getAttribute("href")).toMatch("sdkeula/storage_sdk");
         p.sdkLinkStorage.click();
 
-        expect(browser.getCurrentUrl()).toContain('sdkeula/sdk'); // Check that url is correct
+        expect(browser.getCurrentUrl()).toContain('sdkeula/storage_sdk'); // Check that url is correct
         expect(p.body.getText()).toContain('Software Developer Kit End User Licence Agreement');
         expect(p.sdkDownloadButton.isEnabled()).toBe(false);
         expect(p.acceptEulaCheckbox.isSelected()).toBe(false);
