@@ -1,6 +1,8 @@
 'use strict';
 
 var Page = function () {
+    var Helper = require('../helper.js');
+    this.helper = new Helper();
 
     this.versionNode = element(by.id("software-version"));
     this.archNode = element(by.id("software-architecture"));

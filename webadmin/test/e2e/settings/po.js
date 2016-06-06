@@ -1,6 +1,9 @@
 'use strict';
 
 var SettingsPage = function () {
+    var Helper = require('../helper.js');
+    this.helper = new Helper();
+
     this.email = 'noptixqa+owner@gmail.com';
     this.password = 'qweasd123';
 

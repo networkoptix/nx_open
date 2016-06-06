@@ -27,9 +27,7 @@ describe('Information Page', function () {
     });
 
     it("health monitoring: should display legend",function() {
-        p.legendCheckboxFirst.isPresent().then( function (isPresent) {
-            if(!isPresent) browser.sleep(3000);
-        });
+        p.helper.waitIfNotPresent( p.legendCheckboxFirst, 3000);
 
         p.ignoreSyncFor( function() {
             p.legendCheckboxes.each(function(checkbox){

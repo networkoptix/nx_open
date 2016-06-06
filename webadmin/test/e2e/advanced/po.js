@@ -1,7 +1,9 @@
 'use strict';
 
 var Page = function () {
-    var self = this;
+    var Helper = require('../helper.js');
+    this.helper = new Helper();
+
     this.get = function () {
         browser.get('/#/advanced');
     };
@@ -59,9 +61,7 @@ var Page = function () {
     this.saveSysSettings = function () {
         this.sysSettingsSaveButton.click();
         // If confirmation alert appears on save, close it
-        this.dialog.isPresent().then(function (isPresent) {
-            if (isPresent) self.dialogCloseButton.click();
-        });
+        this.helper.closeDialogIfPresent(this.dialog, this.dialogCloseButton);
     }
 };
 

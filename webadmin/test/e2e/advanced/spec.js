@@ -78,9 +78,7 @@ describe('Advanced Page', function () {
         p.saveStoragesButton.click().then(function(){
 
             expect(p.dialog.getText()).toContain("Settings saved");
-            p.dialog.isDisplayed().then(function (isDisplayed) {
-                if (isDisplayed) p.dialogCloseButton.click();
-            });
+            p.helper.closeDialogIfPresent(p.dialog, p.dialogCloseButton);
 
             p.get();
 
@@ -114,15 +112,13 @@ describe('Advanced Page', function () {
 
         expect(p.selectWritableStorageAlert.isDisplayed()).toBe(true);
         p.saveStoragesButton.click();
-        p.dialog.isPresent().then( function (isPresent) {
-            if (isPresent) {
+        p.helper.checkPresent(p.dialog).then(function () {
                 expect(p.dialog.getText()).toContain('No main storage drive was selected for writing -' +
                     ' video will not be recorded on this server. Do you want to continue?');
                 p.dialogOkButton.click();
                 expect(p.dialog.getText()).toContain('Settings saved');
                 p.dialogCloseButton.click();
-            }
-        });
+            });
 
         browser.refresh();
         // Check that no storages are selected for writing after refresh
@@ -133,10 +129,8 @@ describe('Advanced Page', function () {
         // Enable first storage for writing again
         p.storageIsUsedForWriting.click();
         p.saveStoragesButton.click();
-        p.dialog.isPresent().then( function (isPresent) {
-            if (isPresent) {
-                p.dialogCloseButton.click();
-            }
+        p.helper.checkPresent(p.dialog).then(function () {
+            p.dialogCloseButton.click();
         });
     });
 
@@ -153,26 +147,20 @@ describe('Advanced Page', function () {
 
     it("Main log level select works and is saved",function(){
         p.mainLogLevelOptions.each(function(elem) {
-            p.mainLogLevelSelect.isPresent().then( function(isPresent) {
-                if(isPresent) {
-                    p.mainLogLevelSelect.click();
-                }
-                else {
-                    browser.sleep(500);
-                }
+            p.helper.checkPresent(p.mainLogLevelSelect).then( function() {
+                p.mainLogLevelSelect.click();
+            }, function(err) {
+                console.log(err);
+                browser.sleep(500);
             });
-            elem.isDisplayed().then( function(isDisplayed) { // if the dropdown has opened
-                if(isDisplayed) {
-                    elem.click();
-                    p.saveLogsButton.click();
-                }
+
+            p.helper.checkDisplayed(elem).then( function() {
+                elem.click();
+                p.saveLogsButton.click();
             });
+
             // If confirmation alert appears, close it
-            p.dialog.isPresent().then( function(isPresent) {
-                if(isPresent) {
-                    p.dialogCloseButton.click();
-                }
-            });
+            p.helper.closeDialogIfPresent(p.dialog, p.dialogCloseButton);
 
             expect(elem.isSelected()).toBe(true);
         })
@@ -180,26 +168,20 @@ describe('Advanced Page', function () {
 
     it("Transaction log level select works and is saved",function(){
         p.transLogLevelOptions.each(function(elem) {
-            p.transLogLevelSelect.isPresent().then( function(isPresent) {
-                if(isPresent) {
-                    p.transLogLevelSelect.click();
-                }
-                else {
-                    browser.sleep(500);
-                }
+            p.helper.checkPresent(p.transLogLevelSelect).then( function() {
+                p.transLogLevelSelect.click();
+            }, function(err) {
+                console.log(err);
+                browser.sleep(500);
             });
-            elem.isDisplayed().then( function(isDisplayed) { // if the dropdown has opened
-                if(isDisplayed) {
-                    elem.click();
-                    p.saveLogsButton.click();
-                }
+
+            p.helper.checkDisplayed(elem).then( function() {
+                elem.click();
+                p.saveLogsButton.click();
             });
+
             // If confirmation alert appears, close it
-            p.dialog.isPresent().then( function(isPresent) {
-                if(isPresent) {
-                    p.dialogCloseButton.click();
-                }
-            });
+            p.helper.closeDialogIfPresent(p.dialog, p.dialogCloseButton);
 
             expect(elem.isSelected()).toBe(true);
         })
@@ -217,9 +199,7 @@ describe('Advanced Page', function () {
         var absolutePath = path.resolve(__dirname, fileToUpload);
 
         p.upgradeButton.sendKeys(absolutePath).then(function(){
-            p.dialog.isPresent().then(function(isPresent) {
-                if(!isPresent) browser.sleep(2000);
-            });
+            p.helper.waitIfNotPresent( p.dialog, 2000);
             expect(p.dialog.getText()).toContain("Updating failed");
             p.dialogCloseButton.click();
         });
