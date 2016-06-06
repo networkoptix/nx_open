@@ -35,7 +35,6 @@ FlagConfig conf("mobile_client");
 #include "context/context.h"
 #include "mobile_client/mobile_client_module.h"
 
-#include "ui/color_theme.h"
 #include "ui/camera_thumbnail_provider.h"
 #include "ui/icon_provider.h"
 #include "ui/window_utils.h"
@@ -75,13 +74,6 @@ int runUi(QGuiApplication *application) {
     fileSelector.setExtraSelectors(selectors);
 
     QnIconProvider *iconProvider = new QnIconProvider(&fileSelector);
-
-    QStringList colorThemeFiles;
-    colorThemeFiles.append(fileSelector.select(lit(":/color_theme.json")));
-    if (QFile::exists(lit(":/color_theme_custom.json")))
-        colorThemeFiles.append(fileSelector.select(lit(":/color_theme_custom.json")));
-    context.colorTheme()->readFromFiles(colorThemeFiles);
-    qApp->setPalette(context.colorTheme()->palette());
 
     QQmlEngine engine;
 #if 1

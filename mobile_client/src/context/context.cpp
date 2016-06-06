@@ -5,7 +5,6 @@
 
 #include <core/core_settings.h>
 #include "connection_manager.h"
-#include "ui/color_theme.h"
 #include "utils/mobile_app_info.h"
 #include <utils/common/app_info.h>
 #include "camera/camera_thumbnail_cache.h"
@@ -19,7 +18,6 @@
 QnContext::QnContext(QObject *parent):
     base_type(parent),
     m_connectionManager(new QnConnectionManager(this)),
-    m_colorTheme(new QnColorTheme(this)),
     m_appInfo(new QnMobileAppInfo(this)),
     m_settings(new QnContextSettings(this))
 {

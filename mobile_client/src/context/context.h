@@ -6,7 +6,6 @@
 #include <utils/common/instance_storage.h>
 
 class QnConnectionManager;
-class QnColorTheme;
 class QnMobileAppInfo;
 class QnContextSettings;
 
@@ -15,7 +14,6 @@ class QnContext: public QObject, public QnInstanceStorage {
     typedef QObject base_type;
 
     Q_PROPERTY(QnConnectionManager* connectionManager READ connectionManager NOTIFY connectionManagerChanged)
-    Q_PROPERTY(QnColorTheme* colorTheme READ colorTheme NOTIFY colorThemeChanged)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo READ applicationInfo NOTIFY applicationInfoChanged)
     Q_PROPERTY(QnContextSettings* settings READ settings NOTIFY settingsChanged)
     Q_PROPERTY(bool liteMode READ liteMode NOTIFY liteModeChanged)
@@ -26,10 +24,6 @@ public:
 
     QnConnectionManager *connectionManager() const {
         return m_connectionManager;
-    }
-
-    QnColorTheme *colorTheme() const {
-        return m_colorTheme;
     }
 
     QnMobileAppInfo *applicationInfo() const {
@@ -76,7 +70,6 @@ signals:
 
 private:
     QnConnectionManager *m_connectionManager;
-    QnColorTheme *m_colorTheme;
     QnMobileAppInfo *m_appInfo;
     QnContextSettings *m_settings;
 
