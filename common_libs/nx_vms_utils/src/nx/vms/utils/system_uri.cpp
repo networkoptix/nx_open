@@ -10,7 +10,7 @@ using namespace nx::vms::utils;
 namespace
 {
     const QString kAuthKey = "auth";
-    const QString kReferralFromKey = "from";
+    const QString kReferralSourceKey = "from";
     const QString kReferralContextKey = "context";
 
     const SystemUri::Scope kDefaultScope = SystemUri::Scope::Generic;
@@ -189,17 +189,23 @@ public:
 
         result.setPath(path);
 
-        SystemUri::Parameters fullParams = parameters;
+        QUrlQuery query;
+
         if (!authenticator.user.isEmpty() && !authenticator.password.isEmpty())
         {
             QString encodedAuth = QString(authenticator.user + ':' + authenticator.password)
                 .toUtf8()
                 .toBase64();
-            fullParams.insert(kAuthKey, encodedAuth);
+            query.addQueryItem(kAuthKey, encodedAuth);
         }
 
-        QUrlQuery query;
-        for (auto iter = fullParams.cbegin(); iter != fullParams.cend(); ++iter)
+        if (referral.source != SystemUri::ReferralSource::None)
+            query.addQueryItem(kReferralSourceKey, SystemUri::toString(referral.source));
+
+        if (referral.context != SystemUri::ReferralContext::None)
+            query.addQueryItem(kReferralContextKey, SystemUri::toString(referral.context));
+
+        for (auto iter = parameters.cbegin(); iter != parameters.cend(); ++iter)
             query.addQueryItem(iter.key(), iter.value());
 
         result.setQuery(query);
@@ -360,7 +366,7 @@ private:
             splitString(auth, ':', authenticator.user, authenticator.password);
         }
 
-        QString referralFrom = parameters.take(kReferralFromKey);
+        QString referralFrom = parameters.take(kReferralSourceKey);
         referral.source = referralSourceToString.key(referralFrom);
 
         QString referralContext = parameters.take(kReferralContextKey);
