@@ -5,7 +5,6 @@
  */
 
 #include <array>
-#include <string>
 #include <nx/utils/log/assert.h>
 
 #include <QtCore/QSet>
@@ -31,7 +30,7 @@ namespace
             ValidCategoryCount
         };
 
-        CharCategoryLookup(const std::string& specialSymbols);
+        CharCategoryLookup(const QByteArray& specialSymbols);
 
         Category operator[] (short index) const;
 
@@ -52,7 +51,7 @@ namespace
 
     /* --------------------------------------------------------------------- */
 
-    CharCategoryLookup::CharCategoryLookup(const std::string& specialSymbols)
+    CharCategoryLookup::CharCategoryLookup(const QByteArray& specialSymbols)
     {
         m_table.fill(Invalid);
 
