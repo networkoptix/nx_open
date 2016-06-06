@@ -11,69 +11,69 @@ class QnPopupShadowPrivate
 {
 public:
     QnPopupShadowPrivate(QnPopupShadow* q, QWidget* popup) :
-        m_popup(popup),
-        m_shadow(new QLabel(popup->parentWidget())),
-        m_color(Qt::black),
-        m_offset(10, 10),
-        m_blurRadius(10),
-        m_spread(0),
-        m_popupHadNativeShadow(!popup->windowFlags().testFlag(Qt::NoDropShadowWindowHint)),
+        popup(popup),
+        shadow(new QLabel(popup->parentWidget())),
+        color(Qt::black),
+        offset(10, 10),
+        blurRadius(10),
+        spread(0),
+        popupHadNativeShadow(!popup->windowFlags().testFlag(Qt::NoDropShadowWindowHint)),
         q_ptr(q)
     {
-        m_shadow->setWindowFlags(m_shadow->windowFlags() | Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
-        m_shadow->setAttribute(Qt::WA_TranslucentBackground);
-        m_shadow->setAutoFillBackground(false);
+        shadow->setWindowFlags(shadow->windowFlags() | Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+        shadow->setAttribute(Qt::WA_TranslucentBackground);
+        shadow->setAutoFillBackground(false);
 
-        m_color.setAlphaF(0.75);
+        color.setAlphaF(0.75);
 
         updateGeometry();
 
-        m_shadow->setHidden(popup->isHidden());
+        shadow->setHidden(popup->isHidden());
 
         /* Turn off popup's native shadow: */
-        if (m_popupHadNativeShadow)
-            m_popup->setWindowFlags(m_popup->windowFlags() | Qt::NoDropShadowWindowHint);
+        if (popupHadNativeShadow)
+            popup->setWindowFlags(popup->windowFlags() | Qt::NoDropShadowWindowHint);
     }
 
     ~QnPopupShadowPrivate()
     {
         /* Delete shadow widget explicitly, it's not our child: */
-        delete m_shadow;
+        delete shadow;
 
         /* Restore popup's native shadow if needed: */
-        if (m_popup && m_popupHadNativeShadow && m_popup->testAttribute(Qt::WA_WState_Created))
-            m_popup->setWindowFlags(m_popup->windowFlags() & ~Qt::NoDropShadowWindowHint);
+        if (popup && popupHadNativeShadow && popup->testAttribute(Qt::WA_WState_Created))
+            popup->setWindowFlags(popup->windowFlags() & ~Qt::NoDropShadowWindowHint);
 
     }
 
     void updateGeometry()
     {
-        if (m_shadow.isNull() || m_popup.isNull())
+        if (shadow.isNull() || popup.isNull())
             return;
 
-        if (!m_popup->isVisible())
+        if (!popup->isVisible())
             return; /* will be called again from show event filter. */
 
-        int growth = m_blurRadius + m_spread;
-        QRect baseRect = m_popup->geometry().translated(m_offset);
+        int growth = blurRadius + spread;
+        QRect baseRect = popup->geometry().translated(offset);
         QRect shadowRect = baseRect.adjusted(-growth, -growth, growth, growth);
-        m_widgetOffset = m_offset - QPoint(growth, growth);
+        widgetOffset = offset - QPoint(growth, growth);
 
-        m_shadow->setGeometry(shadowRect);
+        shadow->setGeometry(shadowRect);
 
         updatePixmap();
     }
 
     void updatePixmap()
     {
-        if (m_shadow.isNull())
+        if (shadow.isNull())
             return;
 
-        m_shadow->setPixmap(createShadowPixmap(
-            m_shadow->size(),
-            m_shadow->devicePixelRatio(),
-            m_blurRadius,
-            m_color));
+        shadow->setPixmap(createShadowPixmap(
+            shadow->size(),
+            shadow->devicePixelRatio(),
+            blurRadius,
+            color));
     }
 
     static QPixmap createShadowPixmap(const QSize& size, int pixelRatio, int blurRadius, const QColor& color)
@@ -203,17 +203,17 @@ public:
         return pixmap;
     }
 
-    QPointer<QWidget> m_popup;
-    QPointer<QLabel> m_shadow;
+    QPointer<QWidget> popup;
+    QPointer<QLabel> shadow;
 
-    QColor m_color;
-    QPoint m_offset;
-    int m_blurRadius;
-    int m_spread;
+    QColor color;
+    QPoint offset;
+    int blurRadius;
+    int spread;
 
-    QPoint m_widgetOffset;
+    QPoint widgetOffset;
 
-    bool m_popupHadNativeShadow;
+    bool popupHadNativeShadow;
 
     QnPopupShadow* q_ptr;
     Q_DECLARE_PUBLIC(QnPopupShadow)
@@ -236,32 +236,32 @@ QnPopupShadow::~QnPopupShadow()
 const QColor& QnPopupShadow::color() const
 {
     Q_D(const QnPopupShadow);
-    return d->m_color;
+    return d->color;
 }
 
 void QnPopupShadow::setColor(const QColor& color)
 {
     Q_D(QnPopupShadow);
-    if (d->m_color == color)
+    if (d->color == color)
         return;
 
-    d->m_color = color;
+    d->color = color;
     d->updatePixmap();
 }
 
 QPoint QnPopupShadow::offset() const
 {
     Q_D(const QnPopupShadow);
-    return d->m_offset;
+    return d->offset;
 }
 
 void QnPopupShadow::setOffset(const QPoint& offset)
 {
     Q_D(QnPopupShadow);
-    if (d->m_offset == offset)
+    if (d->offset == offset)
         return;
 
-    d->m_offset = offset;
+    d->offset = offset;
     d->updateGeometry();
 }
 
@@ -273,53 +273,53 @@ void QnPopupShadow::setOffset(int x, int y)
 int QnPopupShadow::blurRadius() const
 {
     Q_D(const QnPopupShadow);
-    return d->m_blurRadius;
+    return d->blurRadius;
 }
 
 void QnPopupShadow::setBlurRadius(int blurRadius)
 {
     Q_D(QnPopupShadow);
-    if (d->m_blurRadius == blurRadius)
+    if (d->blurRadius == blurRadius)
         return;
 
-    d->m_blurRadius = blurRadius;
+    d->blurRadius = blurRadius;
     d->updateGeometry();
 }
 
 int QnPopupShadow::spread() const
 {
     Q_D(const QnPopupShadow);
-    return d->m_spread;
+    return d->spread;
 }
 
 void QnPopupShadow::setSpread(int spread)
 {
     Q_D(QnPopupShadow);
-    if (d->m_spread == spread)
+    if (d->spread == spread)
         return;
 
-    d->m_spread = spread;
+    d->spread = spread;
     d->updateGeometry();
 }
 
 bool QnPopupShadow::eventFilter(QObject* object, QEvent* event)
 {
     Q_D(QnPopupShadow);
-    if (object == d->m_popup && !d->m_shadow.isNull())
+    if (object == d->popup && !d->shadow.isNull())
     {
         switch (event->type())
         {
             case QEvent::Show:
             {
                 d->updateGeometry();
-                d->m_shadow->showNormal();
-                d->m_popup->activateWindow();
+                d->shadow->showNormal();
+                d->popup->activateWindow();
                 break;
             }
 
             case QEvent::Hide:
             {
-                QPointer<QLabel> shadow(d->m_shadow);
+                QPointer<QLabel> shadow(d->shadow);
                 executeDelayed([shadow]()
                 {
                     if (shadow)
@@ -329,7 +329,7 @@ bool QnPopupShadow::eventFilter(QObject* object, QEvent* event)
             }
 
             case QEvent::Move:
-                d->m_shadow->move(d->m_popup->pos() + d->m_widgetOffset);
+                d->shadow->move(d->popup->pos() + d->widgetOffset);
                 break;
 
             case QEvent::Resize:
