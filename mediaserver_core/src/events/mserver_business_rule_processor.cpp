@@ -579,8 +579,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
 {
     QnEmailAttachmentList attachments;
     QVariantHash contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
-    QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType); // TODO: We do not need event logo anymore - remove it from code and from resources, pls
-
+    QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType); 
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
 	QString cloudOwner = QnGlobalSettings::instance()->cloudAccountName();
 
@@ -699,7 +698,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType);
     contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_NameOnly);
-	contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_UrlOnly);
+	contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
 
     if (eventType == QnBusiness::CameraMotionEvent)
     {
@@ -730,8 +729,9 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
                 {
                     QVariantMap camera;
 
-					contextMap[tpCameraName] = QnResourceDisplayInfo(camRes).toString(Qn::ResourceInfoLevel::RI_NameOnly);
-					contextMap[tpCameraIP] = QnResourceDisplayInfo(camRes).toString(Qn::ResourceInfoLevel::RI_UrlOnly);
+					QnResourceDisplayInfo camInfo(camRes);
+					contextMap[tpCameraName] = camInfo.name();
+					contextMap[tpCameraIP] = camInfo.url();
 
                     qnCameraHistoryPool->updateCameraHistorySync(camRes);
                     camera[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, false);

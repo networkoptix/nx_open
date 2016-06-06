@@ -341,8 +341,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RI_Invalid,
         RI_NameOnly,       /**< Only resource name */
         RI_WithUrl,        /**< Resource name and url (if exist) */
-        RI_FullInfo,       /**< All info */
-		RI_UrlOnly         /** Only url */
+        RI_FullInfo        /**< All info */
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceInfoLevel)
 
