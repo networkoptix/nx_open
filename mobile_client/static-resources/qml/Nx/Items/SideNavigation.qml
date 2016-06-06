@@ -81,7 +81,8 @@ Drawer
 
                 icon: lp("/images/disconnect.png")
                 text: qsTr("Disconnect from server")
-                visible: connectionManager.online
+                visible: connectionManager.online ||
+                         connectionManager.connectionState == QnConnectionManager.Connecting
                 onClicked:
                 {
                     clearLastUsedConnection()
