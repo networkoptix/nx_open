@@ -75,6 +75,7 @@ describe('Settings Page', function () {
             expect(browser.getCurrentUrl()).toContain('view'); // Check that url is correct
 
             //Switch back
+            browser.close();
             browser.switchTo().window(oldWindowHandle);
         });
     });
