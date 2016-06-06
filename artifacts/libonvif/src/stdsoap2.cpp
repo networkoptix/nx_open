@@ -8240,7 +8240,11 @@ void
 SOAP_FMAC2
 soap_open_logfile(struct soap *soap, int i)
 { if (soap->logfile[i])
+#ifdef SOAP_DEBUG_LOG
     soap->fdebug[i] = fopen(soap->logfile[i], i < 2 ? "ab" : "a");
+#else
+    soap->fdebug[i] = NULL; // disabled
+#endif
 }
 #endif
 
