@@ -524,8 +524,44 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->start();
 
 
-    if (!startupParams.customUri.isEmpty())
+    if (startupParams.customUri.isValid())
     {
+        using namespace nx::vms::utils;
+        switch (startupParams.customUri.clientCommand())
+        {
+            case SystemUri::ClientCommand::LoginToCloud:
+            {
+                SystemUri::Auth auth = startupParams.customUri.authenticator();
+                qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(auth.user, auth.password, true);
+                break;
+            }
+            case SystemUri::ClientCommand::ConnectToSystem:
+            {
+                SystemUri::Auth auth = startupParams.customUri.authenticator();
+                QString systemId = startupParams.customUri.systemId();
+                QnUuid cloudSystemId = QnUuid::fromStringSafe(systemId);
+                if (!cloudSystemId.isNull())
+                {
+                    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(auth.user, auth.password, true);
+                    QUrl cloudUrl(systemId);
+                    cloudUrl.setUserName(auth.user);
+                    cloudUrl.setPassword(auth.password);
+                    context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, cloudUrl));
+                }
+                else
+                {
+                    QUrl directUrl(systemId);
+                    directUrl.setUserName(auth.user);
+                    directUrl.setPassword(auth.password);
+                    context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, directUrl));
+                }
+                break;
+            }
+            default:
+                break;
+        }
+
+
         /*
         QnSystemUriResolver resolver(QUrl::fromUserInput(startupParams.customUri));
         if (resolver.isValid())
