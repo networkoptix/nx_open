@@ -191,7 +191,6 @@ public:
         return toUrl().toDisplayString();
     }
 
-
     bool isNull() const
     {
         return protocol == kDefaultProtocol
@@ -200,6 +199,8 @@ public:
             && systemId.isEmpty()
             && authenticator.user.isEmpty()
             && authenticator.password.isEmpty()
+            && referral.source == SystemUri::ReferralSource::None
+            && referral.context == SystemUri::ReferralContext::None
             && parameters.isEmpty();
     }
 
@@ -459,12 +460,15 @@ SystemUri::Referral SystemUri::referral() const
 
 void SystemUri::setReferral(const Referral& value)
 {
-
+    Q_D(SystemUri);
+    d->referral = value;
 }
 
 void SystemUri::setReferral(ReferralSource source, ReferralContext context)
 {
-
+    Q_D(SystemUri);
+    d->referral.source = source;
+    d->referral.context = context;
 }
 
 
