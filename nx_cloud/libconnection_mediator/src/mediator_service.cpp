@@ -38,7 +38,7 @@ namespace hpm {
 
 MediatorProcess::MediatorProcess( int argc, char **argv )
 :
-    QtService<QtSingleCoreApplication>(argc, argv, QnLibConnectionMediatorAppInfo::applicationName()),
+    QtService<QCoreApplication>(argc, argv, QnLibConnectionMediatorAppInfo::applicationName()),
     m_argc( argc ),
     m_argv( argv )
 {
@@ -195,14 +195,14 @@ int MediatorProcess::executeApplication()
 
 void MediatorProcess::start()
 {
-    QtSingleCoreApplication* application = this->application();
+    //QtSingleCoreApplication* application = this->application();
 
-    if( application->isRunning() )
-    {
-        NX_LOGX( "Server already started", cl_logERROR );
-        application->quit();
-        return;
-    }
+    //if( application->isRunning() )
+    //{
+    //    NX_LOGX( "Server already started", cl_logERROR );
+    //    application->quit();
+    //    return;
+    //}
 }
 
 void MediatorProcess::stop()

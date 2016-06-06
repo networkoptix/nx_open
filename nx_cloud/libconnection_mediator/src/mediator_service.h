@@ -35,7 +35,7 @@ namespace conf {
 
 class MediatorProcess
 :
-    public QtService<QtSingleCoreApplication>,
+    public QtService<QCoreApplication>,
     public QnStoppable
 {
 public:
