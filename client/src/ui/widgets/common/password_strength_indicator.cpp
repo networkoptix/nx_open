@@ -28,22 +28,22 @@ namespace
 class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
 {
     QnPasswordStrengthIndicatorPrivate(QnPasswordStrengthIndicator* q, QLineEdit* lineEdit) :
-        m_lineEdit(lineEdit),
-        m_currentInformation(lineEdit->text()),
-        m_roundingRadius(kDefaultRoundingRadius),
-        m_textMargins(kDefaultTextMargins),
-        m_anchor(new QnWidgetAnchor(q)),
-        m_lineEditContentsMargins(lineEdit->contentsMargins()),
-        m_eventSignalizer(new QnMultiEventSignalizer(q)),
+        lineEdit(lineEdit),
+        currentInformation(lineEdit->text()),
+        roundingRadius(kDefaultRoundingRadius),
+        textMargins(kDefaultTextMargins),
+        anchor(new QnWidgetAnchor(q)),
+        lineEditContentsMargins(lineEdit->contentsMargins()),
+        eventSignalizer(new QnMultiEventSignalizer(q)),
         q_ptr(q)
     {
-        m_eventSignalizer->addEventType(QEvent::ContentsRectChange);
-        m_eventSignalizer->addEventType(QEvent::LayoutDirectionChange);
-        m_lineEdit->installEventFilter(m_eventSignalizer);
+        eventSignalizer->addEventType(QEvent::ContentsRectChange);
+        eventSignalizer->addEventType(QEvent::LayoutDirectionChange);
+        lineEdit->installEventFilter(eventSignalizer);
 
-        m_anchor->setEdges(anchorEdges());
+        anchor->setEdges(anchorEdges());
 
-        connect(m_eventSignalizer, &QnMultiEventSignalizer::activated, q,
+        connect(eventSignalizer, &QnMultiEventSignalizer::activated, q,
             [this](QObject* object, QEvent* event)
             {
                 Q_UNUSED(object);
@@ -51,13 +51,13 @@ class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
                 {
                     case QEvent::ContentsRectChange:
                     {
-                        m_lineEditContentsMargins = m_lineEdit->contentsMargins();
+                        lineEditContentsMargins = this->lineEdit->contentsMargins();
                         break;
                     }
 
                     case QEvent::LayoutDirectionChange:
                     {
-                        m_anchor->setEdges(anchorEdges());
+                        anchor->setEdges(anchorEdges());
                         updateIndicator();
                         break;
                     }
@@ -67,13 +67,13 @@ class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
                 }
             });
 
-        connect(m_lineEdit, &QLineEdit::textChanged, q,
+        connect(lineEdit, &QLineEdit::textChanged, q,
             [this](const QString& text)
             {
                 QnPasswordInformation newInformation(text);
-                if (newInformation != m_currentInformation)
+                if (newInformation != currentInformation)
                 {
-                    m_currentInformation = newInformation;
+                    currentInformation = newInformation;
                     updateIndicator();
                 }
             });
@@ -81,48 +81,48 @@ class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
 
     void updateIndicator()
     {
-        if (m_lineEdit.isNull())
+        if (lineEdit.isNull())
             return;
 
         Q_Q(QnPasswordStrengthIndicator);
-        QSize textSize = q->fontMetrics().size(Qt::TextSingleLine | Qt::TextHideMnemonic, m_currentInformation.text());
-        q->resize(qMax(textSize.width() + m_textMargins, q->minimumWidth()), q->height());
+        QSize textSize = q->fontMetrics().size(Qt::TextSingleLine | Qt::TextHideMnemonic, currentInformation.text());
+        q->resize(qMax(textSize.width() + textMargins, q->minimumWidth()), q->height());
 
         int extraContentMargin = q->width() + q->indicatorMargins().right() * 2;
-        QMargins newMargins = m_lineEditContentsMargins;
+        QMargins newMargins = lineEditContentsMargins;
 
-        if (m_lineEdit->layoutDirection() == Qt::RightToLeft)
+        if (lineEdit->layoutDirection() == Qt::RightToLeft)
             newMargins.setLeft(qMax(newMargins.left(), extraContentMargin));
         else
             newMargins.setRight(qMax(newMargins.right(), extraContentMargin));
 
-        QSignalBlocker blockEventSignals(m_eventSignalizer);
-        m_lineEdit->setContentsMargins(newMargins);
+        QSignalBlocker blockEventSignals(eventSignalizer);
+        lineEdit->setContentsMargins(newMargins);
 
-        q->setToolTip(m_currentInformation.hint());
+        q->setToolTip(currentInformation.hint());
 
         q->update();
     }
 
     Qt::Edges anchorEdges() const
     {
-        NX_ASSERT(m_lineEdit);
-        Qt::LayoutDirection dir = m_lineEdit->layoutDirection();
+        NX_ASSERT(lineEdit);
+        Qt::LayoutDirection dir = lineEdit->layoutDirection();
         const int vertical = Qt::TopEdge | Qt::BottomEdge;
         const int horizontal = (dir == Qt::RightToLeft) ? Qt::LeftEdge : Qt::RightEdge;
         return Qt::Edges(horizontal | vertical);
     }
 
-    QPointer<QLineEdit> m_lineEdit;
-    QnPasswordInformation m_currentInformation;
+    QPointer<QLineEdit> lineEdit;
+    QnPasswordInformation currentInformation;
 
-    QnPasswordStrengthColors m_colors;
-    qreal m_roundingRadius;
-    int m_textMargins;
+    QnPasswordStrengthColors colors;
+    qreal roundingRadius;
+    int textMargins;
 
-    QnWidgetAnchor* m_anchor;
-    QMargins m_lineEditContentsMargins;
-    QnMultiEventSignalizer* m_eventSignalizer;
+    QnWidgetAnchor* anchor;
+    QMargins lineEditContentsMargins;
+    QnMultiEventSignalizer* eventSignalizer;
 
     QnPasswordStrengthIndicator* q_ptr;
     Q_DECLARE_PUBLIC(QnPasswordStrengthIndicator)
@@ -155,67 +155,67 @@ QnPasswordStrengthIndicator::~QnPasswordStrengthIndicator()
 const QnPasswordInformation& QnPasswordStrengthIndicator::currentInformation() const
 {
     Q_D(const QnPasswordStrengthIndicator);
-    return d->m_currentInformation;
+    return d->currentInformation;
 }
 
 const QnPasswordStrengthColors& QnPasswordStrengthIndicator::colors() const
 {
     Q_D(const QnPasswordStrengthIndicator);
-    return d->m_colors;
+    return d->colors;
 }
 
 void QnPasswordStrengthIndicator::setColors(const QnPasswordStrengthColors& colors)
 {
     Q_D(QnPasswordStrengthIndicator);
-    if (d->m_colors == colors)
+    if (d->colors == colors)
         return;
 
-    d->m_colors = colors;
+    d->colors = colors;
     update();
 }
 
 const QMargins& QnPasswordStrengthIndicator::indicatorMargins() const
 {
     Q_D(const QnPasswordStrengthIndicator);
-    return d->m_anchor->margins();
+    return d->anchor->margins();
 }
 
 void QnPasswordStrengthIndicator::setIndicatorMargins(const QMargins& margins)
 {
     Q_D(QnPasswordStrengthIndicator);
-    d->m_anchor->setMargins(margins);
+    d->anchor->setMargins(margins);
     d->updateIndicator();
 }
 
 qreal QnPasswordStrengthIndicator::roundingRadius() const
 {
     Q_D(const QnPasswordStrengthIndicator);
-    return d->m_roundingRadius;
+    return d->roundingRadius;
 }
 
 void QnPasswordStrengthIndicator::setRoundingRadius(qreal radius)
 {
     Q_D(QnPasswordStrengthIndicator);
-    if (d->m_roundingRadius == radius)
+    if (d->roundingRadius == radius)
         return;
 
-    d->m_roundingRadius = radius;
+    d->roundingRadius = radius;
     update();
 }
 
 int QnPasswordStrengthIndicator::textMargins() const
 {
     Q_D(const QnPasswordStrengthIndicator);
-    return d->m_textMargins;
+    return d->textMargins;
 }
 
 void QnPasswordStrengthIndicator::setTextMargins(int margins)
 {
     Q_D(QnPasswordStrengthIndicator);
-    if (d->m_textMargins == margins)
+    if (d->textMargins == margins)
         return;
 
-    d->m_textMargins = margins;
+    d->textMargins = margins;
     d->updateIndicator();
 }
 
@@ -225,18 +225,18 @@ void QnPasswordStrengthIndicator::paintEvent(QPaintEvent* event)
     Q_D(const QnPasswordStrengthIndicator);
 
     QColor background;
-    switch (d->m_currentInformation.acceptance())
+    switch (d->currentInformation.acceptance())
     {
         case QnPasswordInformation::Good:
-            background = d->m_colors.good;
+            background = d->colors.good;
             break;
 
         case QnPasswordInformation::Acceptable:
-            background = d->m_colors.acceptable;
+            background = d->colors.acceptable;
             break;
 
         default:
-            background = d->m_colors.inacceptable;
+            background = d->colors.inacceptable;
             break;
     }
 
@@ -245,8 +245,8 @@ void QnPasswordStrengthIndicator::paintEvent(QPaintEvent* event)
     painter.setBrush(background);
 
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.drawRoundedRect(rect().adjusted(0.5, 0.5, -0.5, -0.5), d->m_roundingRadius, d->m_roundingRadius);
+    painter.drawRoundedRect(rect().adjusted(0.5, 0.5, -0.5, -0.5), d->roundingRadius, d->roundingRadius);
 
     painter.setPen(palette().color(QPalette::Shadow));
-    painter.drawText(rect(), Qt::TextSingleLine | Qt::TextHideMnemonic | Qt::AlignCenter, d->m_currentInformation.text());
+    painter.drawText(rect(), Qt::TextSingleLine | Qt::TextHideMnemonic | Qt::AlignCenter, d->currentInformation.text());
 }
