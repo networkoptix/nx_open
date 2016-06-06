@@ -63,7 +63,8 @@ public:
 };
 
 QnRestConnectionProcessor::QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket)
+    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket),
+    m_noAuth(false)
 {
     Q_D(QnRestConnectionProcessor);
     d->owner = _owner;
@@ -103,16 +104,19 @@ void QnRestConnectionProcessor::run()
     QnRestRequestHandlerPtr handler = QnRestProcessorPool::instance()->findHandler(url.path());
     if (handler)
     {
-        QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->authUserId);
-        if (!user)
+        if (!m_noAuth)
         {
-            sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
-            return;
-        }
-        if (!qnResourceAccessManager->hasGlobalPermission(user, handler->permissions()))
-        {
-            sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
-            return;
+            QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->authUserId);
+            if (!user)
+            {
+                sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
+                return;
+            }
+            if (!qnResourceAccessManager->hasGlobalPermission(user, handler->permissions()))
+            {
+                sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
+                return;
+            }
         }
 
         if (d->request.requestLine.method.toUpper() == "GET") {
@@ -153,6 +157,11 @@ QnUuid QnRestConnectionProcessor::authUserId() const
 {
     Q_D(const QnRestConnectionProcessor);
     return d->authUserId;
+}
+
+void QnRestConnectionProcessor::setAuthNotRequired(bool noAuth)
+{
+    m_noAuth = noAuth;
 }
 
 void QnRestConnectionProcessor::setAuthUserId(const QnUuid& authUserId)
