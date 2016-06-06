@@ -170,11 +170,6 @@ protected:
 private:
     void init()
     {
-        ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
-        auto system = m_mediator.addRandomSystem();
-        auto server = m_mediator.addRandomServerNotRegisteredOnMediator(system);
-        ASSERT_NE(nullptr, server);
-
         stun::AbstractAsyncClient::Settings stunClientSettings;
         stunClientSettings.reconnectPolicy =
             nx::network::RetryPolicy(
@@ -183,11 +178,18 @@ private:
                 nx::network::RetryPolicy::kDefaultDelayMultiplier,
                 std::chrono::minutes(1));
         SocketGlobals::mediatorConnector().reinitializeStunClient(stunClientSettings);
+
+        ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
+        auto system = m_mediator.addRandomSystem();
+        auto server = m_mediator.addRandomServerNotRegisteredOnMediator(system);
+        ASSERT_NE(nullptr, server);
+
         SocketGlobals::mediatorConnector().setSystemCredentials(
             nx::hpm::api::SystemCredentials(
                 system.id,
                 server->serverId(),
                 system.authKey));
+
         SocketGlobals::mediatorConnector().mockupAddress(m_mediator.stunEndpoint());
         SocketGlobals::mediatorConnector().enable(true);
     }
@@ -564,7 +566,7 @@ TEST_F(CloudServerSocketTest, reconnect)
     {
         CloudServerSocket cloudServerSocket(
             nx::network::SocketGlobals::mediatorConnector().systemConnection());
-        ASSERT_EQ(cloudServerSocket.registerOnMediatorSync(), hpm::api::ResultCode::ok);
+        ASSERT_EQ(hpm::api::ResultCode::ok, cloudServerSocket.registerOnMediatorSync());
         ASSERT_TRUE(cloudServerSocket.listen(128));
         cloudServerSocket.moveToListeningState();
 

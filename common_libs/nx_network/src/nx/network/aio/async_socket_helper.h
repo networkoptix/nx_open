@@ -124,13 +124,7 @@ public:
         //cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered is down the stack
         if( this->m_socket->impl()->aioThread.load() == QThread::currentThread() )
         {
-            nx::network::SocketGlobals::addressResolver().cancel( this );    //TODO #ak must not block here!
-
-            nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etWrite );
-            nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etRead );
-            nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etTimedOut );
-            //TODO #ak not sure whether this call always necessary
-            nx::network::SocketGlobals::aioService().cancelPostedCalls( this->m_socket );
+            stopPollingSocket(aio::etNone);
         }
         else
         {
@@ -748,6 +742,8 @@ private:
     //!Call this from within aio thread only
     void stopPollingSocket(const aio::EventType eventType)
     {
+        nx::network::SocketGlobals::addressResolver().cancel(this);    //TODO #ak must not block here!
+
         //TODO #ak move this method to aioservice?
         if (eventType == aio::etNone)
             nx::network::SocketGlobals::aioService().cancelPostedCalls(this->m_socket, true);

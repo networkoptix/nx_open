@@ -6,85 +6,92 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>360</width>
-    <height>165</height>
+    <width>347</width>
+    <height>238</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Login to Cloud</string>
   </property>
-  <layout class="QFormLayout" name="formLayout">
-   <property name="labelAlignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="leftMargin">
-    <number>36</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
-    <number>18</number>
+    <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>16</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>16</number>
+    <number>0</number>
    </property>
-   <item row="0" column="0">
-    <widget class="QLabel" name="loginLabel">
-     <property name="text">
-      <string>Login</string>
-     </property>
+   <item>
+    <widget class="QnPanel" name="logoPanel" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+      <property name="leftMargin">
+       <number>38</number>
+      </property>
+      <property name="topMargin">
+       <number>16</number>
+      </property>
+      <property name="rightMargin">
+       <number>16</number>
+      </property>
+      <property name="bottomMargin">
+       <number>16</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="cloudImageLabel">
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="cloudWelcomeLabel">
+        <property name="text">
+         <string notr="true">_Welcome to Nx Cloud!_</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="learnMoreLabel">
+        <property name="text">
+         <string notr="true">_Learn more about_</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="loginLineEdit"/>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="passwordLabel">
-     <property name="text">
-      <string>Password</string>
+   <item>
+    <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,1">
+     <property name="leftMargin">
+      <number>38</number>
      </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="passwordLineEdit">
-     <property name="echoMode">
-      <enum>QLineEdit::Password</enum>
+     <property name="topMargin">
+      <number>16</number>
      </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QCheckBox" name="stayLoggedInChackBox">
-     <property name="text">
-      <string>Stay logged in</string>
+     <property name="rightMargin">
+      <number>16</number>
      </property>
-     <property name="checked">
-      <bool>true</bool>
+     <property name="bottomMargin">
+      <number>16</number>
      </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QPushButton" name="loginButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Login</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
-     <property name="spacing">
-      <number>8</number>
-     </property>
-     <item>
+     <item row="4" column="1">
       <widget class="QLabel" name="restorePasswordLabel">
        <property name="text">
-        <string notr="true">Restore password</string>
+        <string notr="true">_Forgot password?_</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>
@@ -94,39 +101,84 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="passwordLabel">
+       <property name="text">
+        <string>Password</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="loginLabel">
+       <property name="text">
+        <string>Login</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2">
       <widget class="QLabel" name="createAccountLabel">
        <property name="text">
-        <string notr="true">Create account</string>
+        <string notr="true">_Create account_</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>
        </property>
        <property name="openExternalLinks">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1" colspan="2">
+      <widget class="QCheckBox" name="stayLoggedInChackBox">
+       <property name="text">
+        <string>Stay logged in</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" colspan="2">
+      <widget class="QLineEdit" name="passwordLineEdit">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1" colspan="2">
+      <widget class="QLineEdit" name="loginLineEdit"/>
+     </item>
+     <item row="3" column="1" colspan="2">
+      <widget class="QPushButton" name="loginButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Login</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
-   <item row="3" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>4</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnPanel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/panel.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

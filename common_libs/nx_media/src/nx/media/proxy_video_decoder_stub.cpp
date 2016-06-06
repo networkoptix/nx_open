@@ -38,20 +38,27 @@ int Impl::decode(
     const int numBytes = avpicture_get_size(PIX_FMT_BGRA, alignedWidth, frameSize().height());
     const int argbLineSize = alignedWidth * 4;
 
-    auto alignedBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, argbLineSize);
+    if (compressedVideoData)
+    {
+        auto videoBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, argbLineSize);
 
-    outDecodedFrame->reset(new QVideoFrame(alignedBuffer, frameSize(), QVideoFrame::Format_RGB32));
-    QVideoFrame* const decodedFrame = outDecodedFrame->get();
+        uchar* const argbBuffer =
+            videoBuffer->map(QAbstractVideoBuffer::WriteOnly, nullptr, nullptr);
 
-    decodedFrame->map(QAbstractVideoBuffer::WriteOnly);
-    uchar* argbBuffer = decodedFrame->bits();
+        debugDrawCheckerboardArgb(
+            argbBuffer, argbLineSize, frameSize().width(), frameSize().height());
 
-    debugDrawCheckerboardArgb(argbBuffer, argbLineSize, frameSize().width(), frameSize().height());
+        videoBuffer->unmap();
 
-    decodedFrame->unmap();
-    decodedFrame->setStartTime(/*outPts*/ 0);
+        setQVideoFrame(outDecodedFrame, videoBuffer, QVideoFrame::Format_RGB32,
+            compressedVideoData->timestamp);
 
-    return ++frameNumber;
+        return ++frameNumber;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 } // namespace

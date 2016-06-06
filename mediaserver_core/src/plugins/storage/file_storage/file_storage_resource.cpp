@@ -10,6 +10,7 @@
 #include "recorder/file_deletor.h"
 #include "utils/fs/file.h"
 #include <common/common_module.h>
+#include <utils/common/writer_pool.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>

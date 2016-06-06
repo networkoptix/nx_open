@@ -36,6 +36,8 @@ public:
     MediatorFunctionalTest();
     ~MediatorFunctionalTest();
 
+    virtual bool waitUntilStarted() override;
+
     SocketAddress stunEndpoint() const;
     SocketAddress httpEndpoint() const;
 

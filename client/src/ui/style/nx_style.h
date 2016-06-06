@@ -59,5 +59,8 @@ public:
     static QnNxStyle *instance();
 
 protected:
+    virtual bool eventFilter(QObject* object, QEvent* event) override;
+
+protected:
     QnNxStyle(QnNxStylePrivate &dd);
 };

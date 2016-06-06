@@ -21,6 +21,7 @@
 #include <utils/common/app_info.h>
 
 #include <libcloud_db/src/managers/email_manager.h>
+#include <libcloud_db/src/cloud_db_process.h>
 
 #include "email_manager_mocked.h"
 
@@ -94,8 +95,6 @@ CdbFunctionalTest::CdbFunctionalTest()
 
     addArg("-db/maxConnections"); addArg("3");
 
-    m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
-
     EMailManagerFactory::setFactory(
         [](const conf::Settings& /*settings*/){
             return std::make_unique<EmailManagerStub>(nullptr);
@@ -113,6 +112,13 @@ bool CdbFunctionalTest::waitUntilStarted()
 {
     if (!utils::test::ModuleLauncher<CloudDBProcessPublic>::waitUntilStarted())
         return false;
+
+    const auto& httpEndpoints = moduleInstance()->impl()->httpEndpoints();
+    if (httpEndpoints.empty())
+        return false;
+    m_port = httpEndpoints.front().port;
+
+    m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
 
     //retrieving module info
     auto connection = m_connectionFactory->createConnection("", "");

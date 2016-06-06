@@ -39,5 +39,10 @@ int MediatorProcessPublic::exec()
     return m_impl->exec();
 }
 
+const MediatorProcess* MediatorProcessPublic::impl() const
+{
+    return m_impl;
+}
+
 }   //hpm
 }   //nx

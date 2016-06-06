@@ -1,6 +1,7 @@
 #include "player_data_consumer.h"
 
 #include <nx/streaming/archive_stream_reader.h>
+#include <nx/utils/debug_utils.h>
 
 #include "seamless_video_decoder.h"
 #include "seamless_audio_decoder.h"

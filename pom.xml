@@ -161,7 +161,7 @@
         <openldap.version>2.4.42</openldap.version>
         <sasl2.version>2.1.26</sasl2.version>
         <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
-        <onvif.version>2.1.2-io</onvif.version>
+        <onvif.version>2.1.2-io2</onvif.version>
         <sigar.version>1.7</sigar.version>
         <festival.version>2.4</festival.version>
         <boost.version>1.56.0</boost.version>
@@ -352,7 +352,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
-                <executions>               
+                <executions>
                     <execution>
                         <id>get-rdep-artifacts</id>
                         <phase>generate-sources</phase>
@@ -709,7 +709,7 @@
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>media_db_util</module>
-                <module>testcamera</module>                
+                <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
                 <module>debsetup/client-deb</module>
@@ -1159,7 +1159,7 @@
             <modules>
                 <module>unit_tests</module>
                 <module>unit_tests_run</module>
-            </modules>                
+            </modules>
         </profile>
     </profiles>
 </project>

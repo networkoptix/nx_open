@@ -16,7 +16,15 @@
 namespace nx {
 namespace cdb {
 
-TEST_F(CdbFunctionalTest, system_unbind)
+namespace {
+class System
+:
+    public CdbFunctionalTest
+{
+};
+}
+
+TEST_F(System, unbind)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -200,13 +208,13 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
     }
 }
 
-TEST_F(CdbFunctionalTest, system_get)
+TEST_F(System, get)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
     cdbFunctionalTestSystemGet(this);
 }
 
-TEST_F(CdbFunctionalTest, system_activation)
+TEST_F(System, activation)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -282,7 +290,7 @@ TEST_F(CdbFunctionalTest, system_activation)
     }
 }
 
-TEST_F(CdbFunctionalTest, notification_of_system_removal)
+TEST_F(System, notification_of_system_removal)
 {
     constexpr const std::chrono::seconds kSystemGoneForeverPeriod =
         std::chrono::seconds(5);
