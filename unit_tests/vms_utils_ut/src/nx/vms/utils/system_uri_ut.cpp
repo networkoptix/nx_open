@@ -471,6 +471,43 @@ TEST_F(SystemUriTest, directLinkCloudSystem)
     ASSERT_FALSE(m_uri.isValid());
 }
 
+TEST_F(SystemUriTest, referralLinkSource)
+{
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setReferral(SystemUri::ReferralSource::DesktopClient, SystemUri::ReferralContext::None);
+    validateLink(QString("http://%1/?from=client").arg(kCloudDomain));
+    validateLink(QString("http://%1/?FrOm=ClIeNt").arg(kCloudDomain));
+
+    m_uri.setReferral(SystemUri::ReferralSource::MobileClient, SystemUri::ReferralContext::None);
+    validateLink(QString("http://%1/?from=mobile").arg(kCloudDomain));
+
+    m_uri.setReferral(SystemUri::ReferralSource::CloudPortal, SystemUri::ReferralContext::None);
+    validateLink(QString("http://%1/?from=portal").arg(kCloudDomain));
+
+    m_uri.setReferral(SystemUri::ReferralSource::WebAdmin, SystemUri::ReferralContext::None);
+    validateLink(QString("http://%1/?from=webadmin").arg(kCloudDomain));
+}
+
+TEST_F(SystemUriTest, referralLinkContext)
+{
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setReferral(SystemUri::ReferralSource::None, SystemUri::ReferralContext::SetupWizard);
+    validateLink(QString("http://%1/?context=setup").arg(kCloudDomain));
+    validateLink(QString("http://%1/?CoNtExT=SeTuP").arg(kCloudDomain));
+
+    m_uri.setReferral(SystemUri::ReferralSource::None, SystemUri::ReferralContext::SettingsDialog);
+    validateLink(QString("http://%1/?context=settings").arg(kCloudDomain));
+
+    m_uri.setReferral(SystemUri::ReferralSource::None, SystemUri::ReferralContext::WelcomePage);
+    validateLink(QString("http://%1/?context=startpage").arg(kCloudDomain));
+
+    m_uri.setReferral(SystemUri::ReferralSource::None, SystemUri::ReferralContext::CloudMenu);
+    validateLink(QString("http://%1/?context=menu").arg(kCloudDomain));
+}
+
+
 /* Testing toUrl() / toString methods. */
 
 TEST_F(SystemUriTest, genericClientToString)
