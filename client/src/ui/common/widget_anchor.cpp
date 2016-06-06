@@ -81,12 +81,15 @@ bool QnWidgetAnchor::eventFilter(QObject* object, QEvent* event)
                 }
                 break;
             }
+
+            default:
+                break;
         }
     }
     else
     {
-        if (event->type() == QEvent::Resize && 
-           !m_widget.isNull() && 
+        if (event->type() == QEvent::Resize &&
+           !m_widget.isNull() &&
             object == m_widget->parentWidget())
         {
             updateGeometry();

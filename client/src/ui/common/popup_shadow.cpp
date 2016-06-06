@@ -335,6 +335,9 @@ bool QnPopupShadow::eventFilter(QObject* object, QEvent* event)
             case QEvent::Resize:
                 d->updateGeometry();
                 break;
+
+            default:
+                break;
         }
     }
 

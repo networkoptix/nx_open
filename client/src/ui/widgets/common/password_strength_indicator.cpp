@@ -60,6 +60,9 @@ class QnPasswordStrengthIndicatorPrivate
                         updateIndicator();
                         break;
                     }
+
+                    default:
+                        break;
                 }
             });
 
