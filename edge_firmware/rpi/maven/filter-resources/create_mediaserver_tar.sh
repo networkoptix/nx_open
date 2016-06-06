@@ -20,9 +20,11 @@ set -e
 #     echo "$h"
 # }
 
+PACKAGES_ROOT=$environment/packages/${box}
 TOOLCHAIN_ROOT=$environment/packages/${box}/gcc-${gcc.version}
 #bananapi uses bpi toolchain
-if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
+if [[ "${box}" == "bananapi" ]]; then
+    PACKAGES_ROOT=$environment/packages/bpi
     TOOLCHAIN_ROOT=$environment/packages/bpi/gcc-${gcc.version}
 fi
 TOOLCHAIN_PREFIX=$TOOLCHAIN_ROOT/bin/arm-linux-gnueabihf-
@@ -53,6 +55,8 @@ if [[ "${box}" == "bpi" ]]; then TARGET_LIB_DIR=$PREFIX_DIR/lib; else TARGET_LIB
 BUILD_OUTPUT_DIR=${libdir}
 BINS_DIR=$BUILD_OUTPUT_DIR/bin/${build.configuration}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/${build.configuration}
+DEBS_DIR=$BUILD_OUTPUT_DIR/deb
+UBOOT_DIR=$BUILD_OUTPUT_DIR/root
 
 STRIP=
 
@@ -93,9 +97,10 @@ libnx_streaming \
 libnx_utils \
 libudt )
 
-#additional libs for client
+#additional libs for nx1 client
 if [[ "${box}" == "bpi" ]]; then
     LIBS_TO_COPY+=( \
+    ldpreloadhook \
     libcedrus \
     libclient.core \
     libnx_audio \
@@ -145,27 +150,39 @@ do
     cp -P ${qt.dir}/lib/$qtlib* $BUILD_DIR/$TARGET_LIB_DIR/
 done
 
-#copying ffmpeg 3.0.2 libs
-cp -av ${env.environment}/packages/bpi/ffmpeg-3.0.2/lib/ffmpeg $BUILD_DIR/$TARGET_LIB_DIR/
-
-#copying bin
-mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/
-mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/
+#copying server bin
 mkdir -p $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/
 mkdir -p $DEBUG_DIR/$PREFIX_DIR/mediaserver/bin/
-cp $BINS_DIR/mobile_client $BUILD_DIR/$PREFIX_DIR/lite_client/bin/
 cp $BINS_DIR/mediaserver $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/
 cp $BINS_DIR/external.dat $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/
 if [ ! -z "$STRIP" ]; then
   $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/mediaserver $DEBUG_DIR/$PREFIX_DIR/mediaserver/bin/mediaserver.debug
-  $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client $DEBUG_DIR/$PREFIX_DIR/lite_client/bin/mobile_client.debug
   $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/mediaserver/bin/mediaserver.debug $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/mediaserver
-  $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/lite_client/bin/mobile_client.debug $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
   $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/mediaserver
-  $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
 fi
 
+#conf
+mkdir -p $BUILD_DIR/$PREFIX_DIR/mediaserver/etc/
+cp ./opt/networkoptix/mediaserver/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/mediaserver/etc
+
+#start script and platform specific scripts
+cp -R ./etc $BUILD_DIR
+cp -R ./opt $BUILD_DIR
+
 if [[ "${box}" == "bpi" ]]; then
+  #copying ffmpeg 3.0.2 libs
+  cp -av $LIBS_DIR/ffmpeg $BUILD_DIR/$TARGET_LIB_DIR/
+  #copying lite client bin
+  mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/
+  mkdir -p $DEBUG_DIR/$PREFIX_DIR/lite_client/bin/
+  cp $BINS_DIR/mobile_client $BUILD_DIR/$PREFIX_DIR/lite_client/bin/
+    if [ ! -z "$STRIP" ]; then
+    $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client $DEBUG_DIR/$PREFIX_DIR/lite_client/bin/mobile_client.debug
+    $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/lite_client/bin/mobile_client.debug $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
+    $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
+  fi  
+  
+  #copying directories needed by lite client
   DIRS_TO_COPY=( \
   egldeviceintegrations \
   fonts \
@@ -179,6 +196,18 @@ if [[ "${box}" == "bpi" ]]; then
     echo Copying directory ${d}
     cp -Rfv $BINS_DIR/${d} $BUILD_DIR/$PREFIX_DIR/lite_client/bin
   done
+  
+  #copying debs and uboot
+  cp -Rfv $DEBS_DIR $BUILD_DIR/opt
+  cp -Rfv $UBOOT_DIR $BUILD_DIR/root  
+  
+  #additional platform specific files
+  mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
+  cp -Rf ${qt.dir}/lib/fonts $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
+  cp -R ./root $BUILD_DIR
+  mkdir -p $BUILD_DIR/root/tools/nx
+  cp ./opt/networkoptix/mediaserver/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
+  chmod -R 755 $BUILD_DIR/$PREFIX_DIR/mediaserver/var/scripts  
 fi
   
 #copying plugins
@@ -196,21 +225,6 @@ if [ -e "$BINS_DIR/plugins" ]; then
     done
 fi
 
-#conf
-mkdir -p $BUILD_DIR/$PREFIX_DIR/mediaserver/etc/
-cp ./opt/networkoptix/mediaserver/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/mediaserver/etc
-
-#start script and platform specific scripts
-cp -R ./etc $BUILD_DIR
-cp -R ./opt $BUILD_DIR
-
-
-#additional platform specific files
-if [[ "${box}" == "bpi" ]]; then
-    cp -R ./root $BUILD_DIR
-    mkdir -p $BUILD_DIR/root/tools/nx
-    cp ./opt/networkoptix/mediaserver/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
-fi
 if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
     mv -f $BUILD_DIR/etc/init.d/networkoptix-mediaserver $BUILD_DIR/etc/init.d/$CUSTOMIZATION-mediaserver
     cp -Rf $BUILD_DIR/opt/networkoptix/* $BUILD_DIR/opt/$CUSTOMIZATION
@@ -218,19 +232,16 @@ if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
 fi
 
 if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
-    cp -f -P $TOOLCHAIN_ROOT/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$TARGET_LIB_DIR
+    cp -f -P $PACKAGES_ROOT/libstdc++-6.0.20/lib/libstdc++.s* $BUILD_DIR/$TARGET_LIB_DIR
 fi
 
 chmod -R 755 $BUILD_DIR/etc/init.d
-if [[ "${box}" == "bpi" ]]; then
-    chmod -R 755 $BUILD_DIR/$PREFIX_DIR/mediaserver/var/scripts
-fi
 
 #building package
 
 pushd $BUILD_DIR
     if [[ "${box}" == "bpi" ]]; then
-        tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc ./root
+        tar czf $PACKAGE_NAME ./opt ./etc ./root
     else
         tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc
     fi
