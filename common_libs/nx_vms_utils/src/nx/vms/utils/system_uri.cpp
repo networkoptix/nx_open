@@ -10,6 +10,8 @@ using namespace nx::vms::utils;
 namespace
 {
     const QString kAuthKey = "auth";
+    const QString kReferralFromKey = "from";
+    const QString kReferralContextKey = "context";
 
     const SystemUri::Scope kDefaultScope = SystemUri::Scope::Generic;
     const SystemUri::Protocol kDefaultProtocol = SystemUri::Protocol::Http;
@@ -44,6 +46,24 @@ namespace
     const QMap<SystemUri::SystemAction, QString> systemActionToString
     {
         {SystemUri::SystemAction::View, "view"}
+    };
+
+    const QMap<SystemUri::ReferralSource, QString> referralSourceToString
+    {
+        {SystemUri::ReferralSource::None,           ""},
+        {SystemUri::ReferralSource::DesktopClient,  "client"},
+        {SystemUri::ReferralSource::MobileClient,   "mobile"},
+        {SystemUri::ReferralSource::CloudPortal,    "portal"},
+        {SystemUri::ReferralSource::WebAdmin,       "webadmin"}
+    };
+
+    const QMap<SystemUri::ReferralContext, QString> referralContextToString
+    {
+        {SystemUri::ReferralContext::None,          ""},
+        {SystemUri::ReferralContext::SetupWizard,   "setup"},
+        {SystemUri::ReferralContext::SettingsDialog,"settings"},
+        {SystemUri::ReferralContext::WelcomePage,   "startpage"},
+        {SystemUri::ReferralContext::CloudMenu,     "menu"}
     };
 
     void splitString(const QString& source, QChar separator, QString& left, QString& right)
@@ -330,7 +350,7 @@ private:
         {
             QString key, value;
             splitString(parameter, '=', key, value);
-            parameters.insert(key, value);
+            parameters.insert(key.toLower(), value);
         }
 
         QString encodedAuth = parameters.take(kAuthKey);
@@ -339,6 +359,12 @@ private:
             QString auth = QString::fromUtf8(QByteArray::fromBase64(encodedAuth.toUtf8()));
             splitString(auth, ':', authenticator.user, authenticator.password);
         }
+
+        QString referralFrom = parameters.take(kReferralFromKey);
+        referral.source = referralSourceToString.key(referralFrom);
+
+        QString referralContext = parameters.take(kReferralContextKey);
+        referral.context = referralContextToString.key(referralContext);
     }
 
 };
@@ -530,12 +556,12 @@ QString SystemUri::toString(SystemUri::SystemAction value)
 
 QString SystemUri::toString(SystemUri::ReferralSource value)
 {
-    return QString();
+    return referralSourceToString[value];
 }
 
 QString SystemUri::toString(SystemUri::ReferralContext value)
 {
-    return QString();
+    return referralContextToString[value];
 }
 
 QUrl SystemUri::toUrl() const
