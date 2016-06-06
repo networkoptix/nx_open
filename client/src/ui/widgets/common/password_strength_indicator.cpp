@@ -3,6 +3,7 @@
 #include <ui/common/widget_anchor.h>
 #include <ui/style/nx_style.h>
 
+#include <utils/common/connective.h>
 #include <utils/common/event_processors.h>
 
 namespace
@@ -24,7 +25,7 @@ namespace
  * QnPasswordStrengthIndicatorPrivate
  */
 
-class QnPasswordStrengthIndicatorPrivate
+class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
 {
     QnPasswordStrengthIndicatorPrivate(QnPasswordStrengthIndicator* q, QLineEdit* lineEdit) :
         m_lineEdit(lineEdit),
@@ -42,7 +43,7 @@ class QnPasswordStrengthIndicatorPrivate
 
         m_anchor->setEdges(anchorEdges());
 
-        QObject::connect(m_eventSignalizer, &QnMultiEventSignalizer::activated, q,
+        connect(m_eventSignalizer, &QnMultiEventSignalizer::activated, q,
             [this](QObject* object, QEvent* event)
             {
                 Q_UNUSED(object);
@@ -66,7 +67,7 @@ class QnPasswordStrengthIndicatorPrivate
                 }
             });
 
-        QObject::connect(m_lineEdit, &QLineEdit::textChanged, q,
+        connect(m_lineEdit, &QLineEdit::textChanged, q,
             [this](const QString& text)
             {
                 QnPasswordInformation newInformation(text);
