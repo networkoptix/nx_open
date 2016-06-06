@@ -120,7 +120,8 @@ void QnUserManagementWidget::updateSelection() {
     auto users = visibleSelectedUsers();
     Qt::CheckState selectionState = Qt::Unchecked;
 
-    if (!users.isEmpty()) {
+    bool hasSelection = !users.isEmpty();
+    if (hasSelection) {
 
         if (users.size() == m_sortModel->rowCount())
             selectionState = Qt::Checked;
@@ -130,12 +131,7 @@ void QnUserManagementWidget::updateSelection() {
 
     m_header->setCheckState(selectionState);
 
-    bool selectionActive = selectionState != Qt::Unchecked;
-
-    ui->actionsWidget->setCurrentWidget(selectionActive
-        ? ui->selectionPage
-        : ui->defaultPage
-        );
+    ui->clearSelectionButton->setEnabled(hasSelection);
 
     using boost::algorithm::any_of;
 
