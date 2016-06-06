@@ -112,44 +112,6 @@ namespace nx
                 Q_DECLARE_PRIVATE(SystemUri);
             };
 
-
-            /**
-            * QnSystemUriResolver is a state machine, which state is a result of uri parsing.
-            * Main option is a target action list - login to cloud, connect to server, etc.
-            * Additional options are action parameters.
-            */
-            class NX_VMS_UTILS_API SystemUriResolver
-            {
-            public:
-                enum class Action
-                {
-                    None,
-                    LoginToCloud,       /*< Just login to cloud. Parameters: login, password. */
-                    ConnectToServer     /*< Directly connect to server. Parameters: serverUrl. */
-                };
-
-                struct Result
-                {
-                    QList<Action> actions;
-                    QUrl serverUrl;
-                    QString login;
-                    QString password;
-                };
-
-                SystemUriResolver();
-                SystemUriResolver(const QUrl &uri);
-
-                bool isValid() const;
-
-                Result result() const;
-
-                bool parseUri();
-            private:
-                bool m_valid;
-                QUrl m_uri;
-                Result m_result;
-            };
-
         }
     }
 }
