@@ -55,6 +55,26 @@ namespace nx
                     View,               /**< Open some cameras. */
                 };
 
+                /** Referral links - source part. */
+                enum class ReferralSource
+                {
+                    None,
+                    DesktopClient,
+                    MobileClient,
+                    CloudPortal,
+                    WebAdmin,
+                };
+
+                /** Referral links - context part. */
+                enum class ReferralContext
+                {
+                    None,
+                    SetupWizard,
+                    SettingsDialog,     /**< System administration dialog or other internal dialogs. */
+                    WelcomePage,
+                    CloudMenu,          /**< Cloud context menu. */
+                };
+
                 SystemUri();
                 SystemUri(const QString& uri);
                 virtual ~SystemUri();
@@ -86,6 +106,15 @@ namespace nx
                 void setAuthenticator(const Auth& value);
                 void setAuthenticator(const QString& user, const QString& password);
 
+                struct Referral
+                {
+                    ReferralContext context;
+                    ReferralSource source;
+                };
+                Referral referral() const;
+                void setReferral(const Referral& value);
+                void setReferral(ReferralSource source, ReferralContext context);
+
                 /** Raw parameters using is strongly discouraged. */
                 typedef QHash<QString, QString> Parameters;
                 Parameters rawParameters() const;
@@ -105,6 +134,8 @@ namespace nx
                 static QString toString(SystemUri::Protocol value);
                 static QString toString(SystemUri::ClientCommand value);
                 static QString toString(SystemUri::SystemAction value);
+                static QString toString(SystemUri::ReferralSource value);
+                static QString toString(SystemUri::ReferralContext value);
 
                 bool operator==(const SystemUri& other) const;
             private:

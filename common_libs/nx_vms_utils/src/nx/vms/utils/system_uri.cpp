@@ -72,6 +72,7 @@ public:
     QString systemId;
     SystemUri::SystemAction systemAction;
     SystemUri::Auth authenticator;
+    SystemUri::Referral referral;
     SystemUri::Parameters parameters;
 
     SystemUriPrivate() :
@@ -82,6 +83,7 @@ public:
         systemId(),
         systemAction(kDefaultSystemAction),
         authenticator(),
+        referral(),
         parameters()
     {}
 
@@ -449,6 +451,23 @@ void SystemUri::setAuthenticator(const QString& user, const QString& password)
     d->authenticator.password = password;
 }
 
+SystemUri::Referral SystemUri::referral() const
+{
+    Q_D(const SystemUri);
+    return d->referral;
+}
+
+void SystemUri::setReferral(const Referral& value)
+{
+
+}
+
+void SystemUri::setReferral(ReferralSource source, ReferralContext context)
+{
+
+}
+
+
 SystemUri::Parameters SystemUri::rawParameters() const
 {
     Q_D(const SystemUri);
@@ -503,6 +522,16 @@ QString SystemUri::toString(SystemUri::ClientCommand value)
 QString SystemUri::toString(SystemUri::SystemAction value)
 {
     return systemActionToString[value];
+}
+
+QString SystemUri::toString(SystemUri::ReferralSource value)
+{
+    return QString();
+}
+
+QString SystemUri::toString(SystemUri::ReferralContext value)
+{
+    return QString();
 }
 
 QUrl SystemUri::toUrl() const

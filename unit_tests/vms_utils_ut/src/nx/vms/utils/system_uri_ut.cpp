@@ -179,6 +179,15 @@ TEST_F(SystemUriTest, notNullAuth)
     ASSERT_FALSE(m_uri.isNull());
 }
 
+TEST_F(SystemUriTest, notNullReferral)
+{
+    m_uri.setReferral(SystemUri::ReferralSource::DesktopClient, SystemUri::ReferralContext::None);
+    ASSERT_FALSE(m_uri.isNull());
+
+    m_uri.setReferral(SystemUri::ReferralSource::None, SystemUri::ReferralContext::SetupWizard);
+    ASSERT_FALSE(m_uri.isNull());
+}
+
 /** Validness tests */
 
 TEST_F(SystemUriTest, GenericInvalid)
