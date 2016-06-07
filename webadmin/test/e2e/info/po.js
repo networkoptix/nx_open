@@ -25,12 +25,6 @@ var Page = function () {
     this.get = function () {
         browser.get('/#/info');
     };
-
-    this.ignoreSyncFor = function(callback) {
-        browser.ignoreSynchronization = true;
-        callback();
-        browser.ignoreSynchronization = false;
-    }
 };
  
 module.exports = Page;

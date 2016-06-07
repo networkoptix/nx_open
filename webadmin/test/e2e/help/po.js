@@ -1,6 +1,8 @@
 'use strict';
 
 var Page = function () {
+    var Helper = require('../helper.js');
+    this.helper = new Helper();
 
     this.get = function () {
         browser.get('/#/help');

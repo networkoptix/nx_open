@@ -4,10 +4,6 @@ var Page = function () {
     var Helper = require('../helper.js');
     this.helper = new Helper();
 
-    this.activeSystem = 'http://10.0.3.196:7001';
-    this.incompatibleSystem = 'http://10.0.3.202:7001';
-    this.password = 'admin';
-
     this.get = function () {
         browser.get('/#/settings');
     };

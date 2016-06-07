@@ -16,6 +16,10 @@ var Helper = function () {
 
     var self = this;
 
+    this.activeSystem = 'http://10.0.3.196:7001';
+    this.incompatibleSystem = 'http://10.0.3.202:7001';
+    this.password = 'admin';
+
     //this.checkElementFocusedBy = function(element, attribute) {
     //    expect(element.getAttribute(attribute)).toEqual(browser.driver.switchTo().activeElement().getAttribute(attribute));
     //};
@@ -58,6 +62,26 @@ var Helper = function () {
         });
     };
 
+    this.performAtSecondTab = function( callback ) {
+        browser.getAllWindowHandles().then(function (handles) {
+            var oldWindowHandle = handles[0];
+            var newWindowHandle = handles[1];
+
+            // Switch to just opened new tab
+            browser.switchTo().window(newWindowHandle);
+            if (typeof callback === 'function') {
+                callback();
+            }
+            //Switch back
+            browser.switchTo().window(oldWindowHandle);
+        });
+    };
+
+    this.ignoreSyncFor = function( callback ) {
+        browser.ignoreSynchronization = true;
+        if (typeof callback === 'function') callback();
+        browser.ignoreSynchronization = false;
+    }
 };
 
 module.exports = Helper;

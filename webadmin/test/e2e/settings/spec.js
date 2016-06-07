@@ -5,9 +5,11 @@ describe('Settings Page', function () {
 
     var p = new SettingsPage();
 
-    it("Change port: should not allow to set empty or bad port",function(){
+    beforeEach(function() {
         p.get();
+    });
 
+    it("Change port: should not allow to set empty or bad port",function(){
         p.setPort(100000);
         expect(p.portInput.getAttribute('class')).toMatch('ng-invalid');
         expect(p.saveButton.isEnabled()).toBe(false);
@@ -26,7 +28,6 @@ describe('Settings Page', function () {
     });
 
     xit("Change port: should not save allocated port",function() {
-        p.get();
         p.setPort(80);
 
         p.saveButton.click().then(function() {
@@ -37,7 +38,6 @@ describe('Settings Page', function () {
     });
 
     xit("Change port: should save port and show message about restart",function(){
-        p.get();
         p.setPort(7000);
         p.saveButton.click().then(function() {
             browser.get('http://10.0.3.241:7000/#/settings');
@@ -57,7 +57,6 @@ describe('Settings Page', function () {
     });
 
     it("section All servers in system shows list of servers, including current, with the links", function () {
-        p.get();
         // There are some links, related to servers array
         expect(p.mediaServersLinks.count()).toBeGreaterThan(0);
 
@@ -66,17 +65,9 @@ describe('Settings Page', function () {
 
         // Check that current server url opens the same setting page
         p.currentMediaServerLink.click();
-
-        // Switch to just opened new tab
-        browser.getAllWindowHandles().then(function (handles) {
-            var oldWindowHandle = handles[0];
-            var newWindowHandle = handles[1];
-            browser.switchTo().window(newWindowHandle);
+        p.helper.performAtSecondTab( function() {
             expect(browser.getCurrentUrl()).toContain('view'); // Check that url is correct
-
-            //Switch back
             browser.close();
-            browser.switchTo().window(oldWindowHandle);
         });
     });
 });

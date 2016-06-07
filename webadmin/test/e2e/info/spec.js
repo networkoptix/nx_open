@@ -29,7 +29,7 @@ describe('Information Page', function () {
     it("health monitoring: should display legend",function() {
         p.helper.waitIfNotPresent( p.legendCheckboxFirst, 3000);
 
-        p.ignoreSyncFor( function() {
+        p.helper.ignoreSyncFor( function() {
             p.legendCheckboxes.each(function(checkbox){
                 expect(checkbox.isPresent()).toBe(true);
             });
@@ -38,7 +38,7 @@ describe('Information Page', function () {
     });
 
     it("Health monitoring: canvas is displayed",function(){
-        p.ignoreSyncFor( function() {
+        p.helper.ignoreSyncFor( function() {
             expect(p.graphCanvas.isDisplayed()).toBe(true);
             expect(p.graphCanvas.getAttribute('width')).toBeGreaterThan(100);
             expect(p.graphCanvas.getAttribute('height')).toBeGreaterThan(100);
@@ -46,7 +46,7 @@ describe('Information Page', function () {
     });
 
     it("Health monitoring: message when server is offline",function(){
-        p.ignoreSyncFor( function() {
+        p.helper.ignoreSyncFor( function() {
             expect(p.offlineAlert.getInnerHtml()).toContain('Server is offline now!');
         });
     });

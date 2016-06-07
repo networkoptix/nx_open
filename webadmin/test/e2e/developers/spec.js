@@ -15,35 +15,22 @@ describe('Developers Page', function () {
         expect(p.apiLink.getText()).toMatch("API");
         expect(p.apiLink.getAttribute("href")).toMatch("api.xml");
         p.apiLink.click();
-        // Switch to just opened new tab
-        browser.getAllWindowHandles().then(function (handles) {
-            var oldWindowHandle = handles[0];
-            var newWindowHandle = handles[1];
-            browser.switchTo().window(newWindowHandle);
-            browser.ignoreSynchronization = true;
-            expect(browser.getCurrentUrl()).toContain('/api.xml'); // Check that url is correct
-            browser.ignoreSynchronization = false;
 
-            //Switch back
+        p.helper.performAtSecondTab( function() {
+            p.helper.ignoreSyncFor( function() {
+                expect(browser.getCurrentUrl()).toContain('/api.xml'); // Check that url is correct
+            });
             browser.close();
-            browser.switchTo().window(oldWindowHandle);
         });
     });
 
     // Disabled because /api.xml can not be opened in local build
     xit("Link for server api documentation opens /static/api.xml",function() {
         p.apiLink.click();
-        // Switch to just opened new tab
-        browser.getAllWindowHandles().then(function (handles) {
-            var oldWindowHandle = handles[0];
-            var newWindowHandle = handles[1];
-            browser.switchTo().window(newWindowHandle);
+        p.helper.performAtSecondTab( function() {
             expect(p.body.getText()).toContain('This group contains functions ' +
                 'related to whole system (all servers).');
-
-            //Switch back
             browser.close();
-            browser.switchTo().window(oldWindowHandle);
         });
     });
 
