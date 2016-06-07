@@ -54,16 +54,6 @@ MediaServerEmulator::~MediaServerEmulator()
         m_mediatorConnector->pleaseStopSync();
         m_mediatorConnector.reset();
     }
-    if (m_serverClient)
-    {
-        m_serverClient->pleaseStopSync();
-        m_serverClient.reset();
-    }
-    if (m_mediatorUdpClient)
-    {
-        m_mediatorUdpClient->pleaseStopSync();
-        m_mediatorUdpClient.reset();
-    }
 
     pleaseStopSync();
     m_httpServer.pleaseStop();
@@ -79,6 +69,7 @@ bool MediaServerEmulator::start()
 
     using namespace std::placeholders;
     m_serverClient = m_mediatorConnector->systemConnection();
+    m_serverClient->bindToAioThread(m_timer.getAioThread());
     m_serverClient->setOnConnectionRequestedHandler(
         std::bind(&MediaServerEmulator::onConnectionRequested, this, _1));
     return true;
@@ -293,18 +284,13 @@ void MediaServerEmulator::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionH
     m_timer.pleaseStop(
         [this, completionHandler = move(completionHandler)]() mutable
         {
-            if (m_mediatorUdpClient)
-                m_mediatorUdpClient.reset();
+            m_mediatorUdpClient.reset();
+            m_serverClient.reset();
+            m_stunPipeline.reset();
+            m_udtStreamSocket.reset();
+            m_udtStreamServerSocket.reset();
 
-            nx::BarrierHandler barrier(std::move(completionHandler));
-            if (m_serverClient)
-                m_serverClient->pleaseStop(barrier.fork());
-            if (m_stunPipeline)
-                m_stunPipeline.reset();
-            if (m_udtStreamSocket)
-                m_udtStreamSocket.reset();
-            if (m_udtStreamServerSocket)
-                m_udtStreamServerSocket.reset();
+            completionHandler();
         });
 }
 
