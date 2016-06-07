@@ -27,8 +27,8 @@ ApplicationWindow
     {
         id: stackView
         anchors.fill: parent
-        anchors.rightMargin: rightPadding
-        anchors.bottomMargin: bottomPadding
+        anchors.rightMargin: mainWindow.rightPadding
+        anchors.bottomMargin: mainWindow.bottomPadding
         onCurrentItemChanged: sideNavigation.close()
     }
 

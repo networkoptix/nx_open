@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.6
 import Qt.labs.controls 1.0
 import Nx 1.0
 import com.networkoptix.qml 1.0
@@ -56,6 +56,7 @@ Drawer
             id: bottomContent
 
             width: parent.width
+            bottomPadding: mainWindow.bottomPadding
             anchors.bottom: parent.bottom
 
             BottomSeparator

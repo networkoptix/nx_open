@@ -16,7 +16,7 @@ PageBase
     header: Item
     {
         implicitWidth: parent.width
-        implicitHeight: toolBar.height + warningPanel.height
+        implicitHeight: toolBar.height + toolBar.statusBarHeight + warningPanel.height
 
         ToolBar
         {

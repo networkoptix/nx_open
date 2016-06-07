@@ -8,8 +8,7 @@ ToolBar
 
     default property alias data: contentItem.data
 
-    property real statusBarHeight:
-            (Qt.platform.os == "android" || Qt.platform.os == "ios") ? getStatusBarHeight : 0
+    property real statusBarHeight: getStatusBarHeight()
 
     implicitWidth: parent ? parent.width : 200
     implicitHeight: 56
