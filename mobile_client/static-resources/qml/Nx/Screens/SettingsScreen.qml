@@ -25,14 +25,6 @@ Page
             id: content
 
             width: flickable.width
-
-            CheckBox
-            {
-                width: parent.width
-                text: qsTr("Show offline cameras")
-                checked: settings.showOfflineCameras
-                onCheckedChanged: settings.showOfflineCameras = checked
-            }
         }
     }
 }
