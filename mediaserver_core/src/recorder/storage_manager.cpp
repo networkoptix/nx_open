@@ -2409,7 +2409,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
         return true;
     }
     else if (renameOK)
-        qnFileDeletor->deleteFile(newName);
+        qnFileDeletor->deleteFile(newName, storage->getId());
     return false;
 }
 
