@@ -3,9 +3,9 @@
     <div class="row">
         <div class="col-sm-6">
             <h1 ng-if="gettingSystem.success">{{system.info.name}}
-                <span ng-if="system.info.status!=Config.systemStatuses.onlineStatus" class="label"
-                      ng-class="Config.systemStatuses[system.info.status].style || Config.systemStatuses.default.style">
-                      {{Config.systemStatuses[system.info.status].label||system.info.status}}</span>
+                <span ng-if="system.info.stateOfHealth!=Config.systemStatuses.onlineStatus" class="label"
+                      ng-class="Config.systemStatuses[system.info.stateOfHealth].style || Config.systemStatuses.default.style">
+                      {{Config.systemStatuses[system.info.stateOfHealth].label||system.info.stateOfHealth}}</span>
             </h1>
         </div>
         <div class="col-sm-6">
@@ -14,7 +14,7 @@
                     <span class="glyphicon glyphicon-share"></span> Share</button>
                 &nbsp;
                 <button class="btn btn-default" ng-click="open(null)"
-                        ng-disabled="system.info.status!=Config.systemStatuses.onlineStatus">Open in VMS_NAME</button>
+                        ng-disabled="system.info.stateOfHealth!=Config.systemStatuses.onlineStatus">Open in VMS_NAME</button>
             </div>
         </div>
 
