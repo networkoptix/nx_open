@@ -32,7 +32,14 @@ public:
                     stun::cc::methods::resolvePeer,
                     std::move(request.header.transactionId)));
 
-                const auto it = s_endpoints.find(attr->getString());
+                const auto host = QString::fromUtf8(attr->getString());
+                const auto it = std::find_if(
+                    s_endpoints.begin(), s_endpoints.end(),
+                    [&host](const decltype(s_endpoints)::value_type& endpoint)
+                    {
+                        return endpoint.first.endsWith(host);
+                    });
+
                 if (it == s_endpoints.end())
                 {
                     response.header.messageClass = stun::MessageClass::errorResponse;
@@ -80,6 +87,7 @@ public:
         const HostAddress& address,
         utils::MoveOnlyFunc<void(HaInfoIterator it)> checker)
     {
+        NX_LOGX(lm("resolveAndCheckState %1").str(address), cl_logDEBUG1);
         nx::TestSyncQueue<bool> syncQueue;
         static const size_t kSimultaneousQueries = 100;
         for (size_t counter = kSimultaneousQueries; counter; --counter)
@@ -99,6 +107,15 @@ public:
 
         for (size_t counter = kSimultaneousQueries; counter; --counter)
             syncQueue.pop();
+    }
+
+    void resolveAndCheckStateWithSub(
+        const HostAddress& address,
+        const std::function<void(HaInfoIterator it, bool isSub)>& checker)
+    {
+        resolveAndCheckState(address, std::bind2nd(checker, false));
+        const HostAddress sub(address.toString().split('.')[1]);
+        resolveAndCheckState(sub, std::bind2nd(checker, true));
     }
 
 private:
@@ -193,12 +210,15 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
     for (const auto& host : kGoodCloudAddresses)
     {
         emulateAddress(host, {kResult});
-        resolveAndCheckState(
-            host, [&](HaInfoIterator it)
+        resolveAndCheckStateWithSub(
+            host, [&](HaInfoIterator it, bool isSub)
             {
                 const HostAddressInfo& info = it->second;
                 EXPECT_EQ(info.fixedEntries.size(), 0);
-                EXPECT_EQ(info.dnsState(), HostAddressInfo::State::unresolved);
+                if (!isSub)
+                {
+                    EXPECT_EQ(info.dnsState(), HostAddressInfo::State::unresolved);
+                }
                 EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
 
                 const auto entries = info.getAll();
@@ -213,12 +233,12 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
 
                 const AddressEntry entry2 = entries.back();
                 EXPECT_EQ(entry2.type, AddressType::cloud);
-                EXPECT_EQ(entry2.host, host);
+                EXPECT_EQ(entry2.host, it->first);
             });
 
         addFixedAddress(host, kResult);
-        resolveAndCheckState(
-            host, [&](HaInfoIterator it)
+        resolveAndCheckStateWithSub(
+            host, [&](HaInfoIterator it, bool isSub)
             {
                 const HostAddressInfo& info = it->second;
                 ASSERT_EQ(info.fixedEntries.size(), 1);
@@ -231,7 +251,8 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
                 EXPECT_EQ(entry.attributes.front().value, kResult.port);
 
                 EXPECT_EQ(info.getAll().size(), 3); // still have some from mediator
-                EXPECT_EQ(info.dnsState(), HostAddressInfo::State::unresolved);
+                if (!isSub)
+                    EXPECT_EQ(info.dnsState(), HostAddressInfo::State::unresolved);
                 EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
             });
     }
@@ -244,8 +265,8 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
 
     for (const auto& host : kBadCloudAddresses)
     {
-        resolveAndCheckState(
-            host, [&](HaInfoIterator it)
+        resolveAndCheckStateWithSub(
+            host, [&](HaInfoIterator it, bool)
             {
                 const HostAddressInfo& info = it->second;
                 EXPECT_EQ(info.fixedEntries.size(), 0);
