@@ -56,6 +56,7 @@ void QnMobileClientSettings::writeValueToSettings(
     {
     /* Temporary options. Not to be written. */
     case BasePath:
+    case LiteMode:
         break;
 
     default:

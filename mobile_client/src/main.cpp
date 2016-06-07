@@ -173,10 +173,14 @@ void parseCommandLine(const QCoreApplication& application)
     QCommandLineParser parser;
 
     const auto basePathOption = QCommandLineOption(
-                                lit("basePath"),
-                                lit("The directory which contains runtime ui resources: 'qml' and 'images'"),
+                                lit("base-path"),
+                                lit("The directory which contains runtime ui resources: 'qml' and 'images'."),
                                 lit("basePath"));
     parser.addOption(basePathOption);
+    const auto liteModeOption = QCommandLineOption(
+                                lit("lite-mode"),
+                                lit("Enable lite mode."));
+    parser.addOption(liteModeOption);
 
     parser.process(application);
 
@@ -189,6 +193,9 @@ void parseCommandLine(const QCoreApplication& application)
         else
             qWarning() << lit("File %1 doesn't exist. Loading from qrc...").arg(path);
     }
+
+    if (parser.isSet(liteModeOption))
+        qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
 }
 
 int main(int argc, char *argv[])
