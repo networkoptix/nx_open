@@ -313,7 +313,7 @@ TEST( QnCamLicenseUsageHelperTest, checkRequiredAnalogLicenses )
     ASSERT_EQ(helper.requiredLicenses(Qn::LC_AnalogEncoder), 1);
 }
 
-/** Basic test for single license type requirement. */
+/** Basic test for camera overflow. */
 TEST(QnCamLicenseUsageHelperTest, checkLicenseOverflow)
 {
     QnResourcePoolScaffold resPoolScaffold;
@@ -325,6 +325,43 @@ TEST(QnCamLicenseUsageHelperTest, checkLicenseOverflow)
     ASSERT_FALSE(helper.isValid());
     ASSERT_TRUE(helper.isOverflowForCamera(camera));
 }
+
+/** Basic test for camera overflow. */
+TEST(QnCamLicenseUsageHelperTest, checkLicenseOverflowProposeEnable)
+{
+    QnResourcePoolScaffold resPoolScaffold;
+    auto camera = resPoolScaffold.addCamera(Qn::LC_Professional, false);
+
+    QnCamLicenseUsageHelper helper;
+    QnLicensePoolScaffold licPoolScaffold;
+
+    ASSERT_TRUE(helper.isValid());
+    ASSERT_FALSE(helper.isOverflowForCamera(camera));
+
+    helper.propose(camera, true);
+
+    ASSERT_FALSE(helper.isValid());
+    ASSERT_TRUE(helper.isOverflowForCamera(camera));
+}
+
+/** Basic test for camera overflow. */
+TEST(QnCamLicenseUsageHelperTest, checkLicenseOverflowProposeDisable)
+{
+    QnResourcePoolScaffold resPoolScaffold;
+    auto camera = resPoolScaffold.addCamera(Qn::LC_Professional, true);
+
+    QnCamLicenseUsageHelper helper;
+    QnLicensePoolScaffold licPoolScaffold;
+
+    ASSERT_FALSE(helper.isValid());
+    ASSERT_TRUE(helper.isOverflowForCamera(camera));
+
+    helper.propose(camera, false);
+
+    ASSERT_TRUE(helper.isValid());
+    ASSERT_FALSE(helper.isOverflowForCamera(camera));
+}
+
 
 /**
  *  Profiling test.
