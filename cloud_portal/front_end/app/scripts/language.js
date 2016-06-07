@@ -56,6 +56,7 @@ var L = {
         emailNotFound: 'Email isn\'t registered in portal',
         emailAlreadyExists: 'Email is already registered in portal',
         oldPasswordMistmatch: 'Current password doesn\'t match',
+        passwordMismatch: 'Wrong password',
 
         systemForbidden: 'You have no access to this system',
         systemNotFound: 'This system wasn\'t found'

@@ -22,6 +22,9 @@ angular.module('cloudApp')
         $scope.disconnecting = process.init(function(){
             return cloudApi.disconnect(systemId, $scope.model.password);
         },{
+            errorCodes:{
+                notAuthorized: L.errorCodes.passwordMismatch
+            },
             successMessage: L.system.successDisconnected,
             errorPrefix:'Cannot delete the system:'
         }).then(function(){
