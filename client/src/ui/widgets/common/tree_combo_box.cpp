@@ -42,7 +42,6 @@ QnTreeComboBox::QnTreeComboBox(QWidget *parent):
 {
     m_treeView->setFrameShape(QFrame::NoFrame);
     m_treeView->setEditTriggers(QTreeView::NoEditTriggers);
-    m_treeView->setAlternatingRowColors(true);
     m_treeView->setSelectionBehavior(QTreeView::SelectRows);
     m_treeView->setRootIsDecorated(false);
     m_treeView->setWordWrap(true);
