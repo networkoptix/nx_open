@@ -15,6 +15,8 @@
 
 #include "onvif_resource.h"
 #include <utils/common/app_info.h>
+#include <utils/serialization/json.h>
+#include <core/resource_management/resource_properties.h>
 
 static const int MAX_CAHCE_URL_TIME = 1000 * 300;
 
@@ -197,7 +199,24 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bo
     result = fetchStreamUrl( soapWrapper, info.profileToken, isPrimary, streamUrl );
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
-    NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(*streamUrl).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
+
+    const auto streamRawUrl = QUrl(*streamUrl).path();
+    const auto role = QString::number(getRole());
+    QJsonObject streamUrls = QJsonDocument::fromJson(
+        m_resource->getProperty(Qn::CAMERA_STREAM_URLS_PARAM_NAME).toUtf8()).object();
+
+    if (streamUrls.value(role).toString() != streamRawUrl)
+    {
+        streamUrls[role] = streamRawUrl;
+        m_resource->setProperty(
+            Qn::CAMERA_STREAM_URLS_PARAM_NAME,
+            QString::fromUtf8(QJsonDocument(streamUrls).toJson()));
+
+        propertyDictionary->saveParamsAsync(m_resource->getId());
+    }
+
+    NX_LOG(lit("got stream URL %1 for camera %2 for role %3")
+        .arg(*streamUrl).arg(m_resource->getUrl()).arg(role), cl_logINFO);
     return result;
 }
 
