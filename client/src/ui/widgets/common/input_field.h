@@ -41,7 +41,7 @@ public:
 
     const QnPasswordStrengthIndicator* passwordIndicator() const;
     bool passwordIndicatorEnabled() const;
-    void setPasswordIndicatorEnabled(bool enabled);
+    void setPasswordIndicatorEnabled(bool enabled, bool showImmediately = false);
 
     bool isReadOnly() const;
     void setReadOnly(bool value);
@@ -49,7 +49,9 @@ public:
     void validate();
 
     bool isValid() const;
-    void setValidator(Qn::TextValidateFunction validator);
+    QValidator::State lastValidationResult() const;
+
+    void setValidator(Qn::TextValidateFunction validator, bool validateImmediately = false);
 
     static AbstractAccessor* createLabelWidthAccessor();
 

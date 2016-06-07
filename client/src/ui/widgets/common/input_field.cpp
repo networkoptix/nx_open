@@ -14,19 +14,20 @@ public:
         hint(new QLabel(parent)),
         input(new QLineEdit(parent)),
         passwordIndicator(nullptr),
-        validator()
+        validator(),
+        lastValidationResult(QValidator::Acceptable)
     {
+        hint->setWordWrap(true);
         input->installEventFilter(this);
+        connect(input, &QLineEdit::textChanged,     this, &QnInputFieldPrivate::updatePasswordIndicatorVisibility);
+        connect(input, &QLineEdit::editingFinished, this, &QnInputFieldPrivate::validate);
     }
 
     virtual bool eventFilter(QObject* watched, QEvent* event)
     {
         /* On focus make input look usual even if there is error. Hint will be visible though. */
-        if (event->type() == QEvent::FocusIn && watched == input)
-        {
-            validate();
+        if (watched == input && event->type() == QEvent::FocusIn)
             input->setPalette(parent->palette());
-        }
 
         /* Always pass event further */
         return false;
@@ -34,12 +35,32 @@ public:
 
     void validate()
     {
-        if (!validator)
+        clearValidationResult();
+
+        if (!validator && !passwordIndicator)
             return;
 
-        auto result = validator(input->text());
-        QString hintText = result.errorMessage;
+        updatePasswordIndicatorVisibility();
 
+        QString text = input->text();
+
+        if (validator)
+        {
+            lastValidationResult = validator(text);
+        }
+        else if (passwordIndicator)
+        {
+            if (text.trimmed() != text)
+                lastValidationResult = Qn::ValidationResult(tr("Avoid leading and trailing spaces."));
+            else
+            {
+                const auto& info = passwordIndicator->currentInformation();
+                if (info.acceptance() == QnPasswordInformation::Inacceptable)
+                    lastValidationResult = Qn::ValidationResult(info.hint());
+            }
+        }
+
+        QString hintText = lastValidationResult.errorMessage;
         hint->setText(hintText);
 
         bool hideHint = hintText.isEmpty();
@@ -50,11 +71,22 @@ public:
         }
 
         QPalette palette = parent->palette();
-        if (result.state == QValidator::Invalid)
+        if (lastValidationResult.state == QValidator::Invalid)
             setWarningStyle(&palette);
 
         input->setPalette(palette);
         hint->setPalette(palette);
+    }
+
+    void clearValidationResult()
+    {
+        lastValidationResult = Qn::ValidationResult(QValidator::Acceptable);
+    }
+
+    void updatePasswordIndicatorVisibility()
+    {
+        if (passwordIndicator && passwordIndicator->isHidden())
+            passwordIndicator->setVisible(true);
     }
 
     QWidget* parent;
@@ -63,6 +95,7 @@ public:
     QLineEdit* input;
     QnPasswordStrengthIndicator* passwordIndicator;
     Qn::TextValidateFunction validator;
+    Qn::ValidationResult lastValidationResult;
 };
 
 class LabelWidthAccessor : public AbstractAccessor
@@ -104,7 +137,6 @@ QnInputField::QnInputField(QWidget* parent /*= nullptr*/) :
     d->hint->setVisible(false);
 
     connect(d->input, &QLineEdit::textChanged, this, &QnInputField::textChanged);
-    connect(d->input, &QLineEdit::editingFinished, d, &QnInputFieldPrivate::validate);
 }
 
 QnInputField::~QnInputField()
@@ -173,15 +205,22 @@ bool QnInputField::passwordIndicatorEnabled() const
     return passwordIndicator() != nullptr;
 }
 
-void QnInputField::setPasswordIndicatorEnabled(bool enabled)
+void QnInputField::setPasswordIndicatorEnabled(bool enabled, bool showImmediately)
 {
-    if (enabled == passwordIndicatorEnabled())
-        return;
-
     Q_D(QnInputField);
+    if (enabled == passwordIndicatorEnabled())
+    {
+        if (enabled && showImmediately)
+            d->passwordIndicator->setVisible(true);
+
+        return;
+    }
+
     if (enabled)
     {
         d->passwordIndicator = new QnPasswordStrengthIndicator(d->input);
+        if (!showImmediately && d->input->text().isEmpty())
+            d->passwordIndicator->setVisible(false);
     }
     else
     {
@@ -218,17 +257,30 @@ void QnInputField::clear()
 bool QnInputField::isValid() const
 {
     Q_D(const QnInputField);
-    if (!d->validator)
-        return true;
+    if (d->validator)
+        return d->validator(d->input->text()).state == QValidator::Acceptable;
 
-    return d->validator(d->input->text()).state == QValidator::Acceptable;
+    if (d->passwordIndicator)
+        return d->passwordIndicator->currentInformation().acceptance() == QnPasswordInformation::Acceptable;
+
+    return true;
 }
 
-void QnInputField::setValidator(Qn::TextValidateFunction validator)
+QValidator::State QnInputField::lastValidationResult() const
+{
+    Q_D(const QnInputField);
+    return d->lastValidationResult.state;
+}
+
+void QnInputField::setValidator(Qn::TextValidateFunction validator, bool validateImmediately)
 {
     Q_D(QnInputField);
     d->validator = validator;
-    d->validate();
+
+    if (validateImmediately)
+        d->validate();
+    else
+        d->clearValidationResult();
 }
 
 AbstractAccessor* QnInputField::createLabelWidthAccessor()
