@@ -1,7 +1,7 @@
 'use strict';
 
 var SettingsPage = require('./po.js');
-describe('Cloud disconnect', function () {
+xdescribe('Cloud disconnect', function () {
 
     var p = new SettingsPage();
 
