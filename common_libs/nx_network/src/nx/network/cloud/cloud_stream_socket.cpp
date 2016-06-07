@@ -13,8 +13,6 @@
 #include "../socket_global.h"
 #include "../system_socket.h"
 
-#define DELEGATE_SYNC_CALLS
-
 
 namespace nx {
 namespace network {
@@ -179,81 +177,20 @@ bool CloudStreamSocket::connect(
 
 int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
-#ifdef DELEGATE_SYNC_CALLS
     if (m_socketDelegate)
         return m_socketDelegate->recv(buffer, bufferLen, flags);
 
     SystemError::setLastErrorCode(SystemError::notConnected);
     return -1;
-#else
-    Buffer tmpBuffer;
-    tmpBuffer.reserve(bufferLen);
-
-    int totallyRead = 0;
-    do
-    {
-        //TODO #ak (#CLOUD-209) timeout is processed incorrectly since it is applied to every recvImpl call
-
-        const auto lastRead = recvImpl(&tmpBuffer);
-        if (lastRead <= 0)
-            return totallyRead;
-
-        memcpy(static_cast<char*>(buffer) + totallyRead, tmpBuffer.data(), lastRead);
-        totallyRead += lastRead;
-    }
-    while ((flags & MSG_WAITALL) && (totallyRead < static_cast<int>(bufferLen)));
-
-    return totallyRead;
-#endif
 }
 
 int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
-#ifdef DELEGATE_SYNC_CALLS
     if (m_socketDelegate)
         return m_socketDelegate->send(buffer, bufferLen);
 
     SystemError::setLastErrorCode(SystemError::notConnected);
     return -1;
-#else
-    nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
-    {
-        QnMutexLocker lk(&m_mutex);
-        if (m_terminated)
-        {
-            SystemError::setLastErrorCode(SystemError::interrupted);
-            return -1;
-        }
-        auto oldPromisePtr = m_sendPromisePtr.exchange(&promise);
-        NX_ASSERT(oldPromisePtr == nullptr);
-    }
-
-    nx::Buffer sendBuffer = nx::Buffer::fromRawData(
-        static_cast<const char*>(buffer),
-        bufferLen);
-    sendAsync(
-        sendBuffer,
-        [&promise, this](SystemError::ErrorCode code, size_t size)
-        {
-            m_aioThreadBinder->post(
-                [this, code, size, &promise]()
-                {
-                    auto promisePtr = m_sendPromisePtr.exchange(nullptr);
-                    if (promisePtr)
-                        promisePtr->set_value(std::make_pair(code, size));
-                });
-        });
-
-    //sendAsync handles timeout properly
-    auto result = promise.get_future().get();
-    if (result.first != SystemError::noError)
-    {
-        SystemError::setLastErrorCode(result.first);
-        return -1;
-    }
-
-    return result.second;
-#endif
 }
 
 SocketAddress CloudStreamSocket::getForeignAddress() const
@@ -494,43 +431,6 @@ bool CloudStreamSocket::startAsyncConnect(
     }
 }
 
-int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
-{
-    nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
-    {
-        QnMutexLocker lk(&m_mutex);
-        if (m_terminated)
-        {
-            SystemError::setLastErrorCode(SystemError::interrupted);
-            return -1;
-        }
-        auto oldPromisePtr = m_recvPromisePtr.exchange(&promise);
-        NX_ASSERT(oldPromisePtr == nullptr);
-    }
-
-    readSomeAsync(
-        buf,
-        [this, &promise](SystemError::ErrorCode code, size_t size)
-        {
-            m_aioThreadBinder->post(
-                [this, code, size, &promise]()
-                {
-                    auto promisePtr = m_recvPromisePtr.exchange(nullptr);
-                    if (promisePtr)
-                        promisePtr->set_value(std::make_pair(code, size));
-                });
-        });
-
-    auto result = promise.get_future().get();
-    if (result.first != SystemError::noError)
-    {
-        SystemError::setLastErrorCode(result.first);
-        return -1;
-    }
-
-    return result.second;
-}
-
 SystemError::ErrorCode CloudStreamSocket::applyRealNonBlockingMode(
     AbstractStreamSocket* streamSocket)
 {
@@ -551,10 +451,8 @@ SystemError::ErrorCode CloudStreamSocket::applyRealNonBlockingMode(
 
 void CloudStreamSocket::directConnectDone(SystemError::ErrorCode errorCode)
 {
-#ifdef DELEGATE_SYNC_CALLS
     if (errorCode == SystemError::noError)
         errorCode = applyRealNonBlockingMode(m_socketDelegate.get());
-#endif
 
     auto userHandler = std::move(m_connectHandler);
     userHandler(errorCode);  //this object can be freed in handler, so using local variable for handler
@@ -564,10 +462,8 @@ void CloudStreamSocket::onCloudConnectDone(
     SystemError::ErrorCode errorCode,
     std::unique_ptr<AbstractStreamSocket> cloudConnection)
 {
-#ifdef DELEGATE_SYNC_CALLS
     if (errorCode == SystemError::noError)
         errorCode = applyRealNonBlockingMode(cloudConnection.get());
-#endif
 
     if (errorCode == SystemError::noError)
     {
