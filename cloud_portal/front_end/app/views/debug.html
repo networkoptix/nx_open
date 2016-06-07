@@ -1,4 +1,80 @@
-<form class="form-horizontal" novalidate>
+<form class="form-horizontal" novalidate ng-model-options="{ updateOn: 'default' }">
+    <h1>Debug native links</h1>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-4">
+            <label><input type="checkbox" ng-model="linkSettings.native"/> Native link</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-4">
+            <label><input type="checkbox" ng-model="linkSettings.auth"/> Include auth </label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">From</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" ng-model="linkSettings.from"/>
+        </div>
+        <div class="col-sm-4">
+            <p class="help-block">
+                portal, mobile, client, webadmin
+            </p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Context</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" ng-model="linkSettings.context"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Command</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" ng-model="linkSettings.command"/>
+        </div>
+        <div class="col-sm-4">
+            <p class="help-block">
+                client, cloud, system
+            </p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">SystemId</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" ng-model="linkSettings.systemId"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">System action</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" ng-model="linkSettings.action"/>
+        </div>
+    </div>
+
+
+
+    <div class="form-group" ng-class="{'has-error':actionParametersError}">
+        <label class="col-sm-2 control-label">Action parameters (json)</label>
+        <div class="col-sm-4">
+            <textarea class="form-control" rows="3" ng-model="actionParameters"></textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Formatted link:</label>
+        <b class="col-sm-10">
+            <b><a ng-href="{{generateLink()}}">{{generateLink()}}</a></b>
+
+            <pre>{{formatJSON(linkSettings)}}</pre>
+        </div>
+    </div>
 
     <h1>Debug processes and notifications</h1>
     <pre>{{formatJSON(debugProcess.process)}}</pre>

@@ -3,7 +3,8 @@
 var Config = {
     googleAnalyticsCode: 'UA-71145034-2',
     apiBase: '/api',
-    clientProtocol: 'nx-vms://',
+    clientProtocol: 'nx-vms:',
+    nativeDomain: 'cloud-demo.hdw.mx',
     cacheTimeout: 30*1000, // Cache lives for 30 seconds
 
     alertTimeout: 3*1000,  // Alerts are shown for 3 seconds

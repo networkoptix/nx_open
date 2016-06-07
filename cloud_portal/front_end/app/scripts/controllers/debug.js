@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('DebugCtrl', ['$scope', 'cloudApi', 'account', 'process', '$q', '$timeout','dialogs',
-        function ($scope, cloudApi, account, process, $q, $timeout,dialogs) {
+    .controller('DebugCtrl', ['$scope', 'cloudApi', 'account', 'process', '$q', '$timeout','dialogs', 'urlProtocol',
+        function ($scope, cloudApi, account, process, $q, $timeout,dialogs,urlProtocol) {
 
         account.requireLogin();
 
@@ -65,5 +65,39 @@ angular.module('cloudApp')
                 );
         }
 
+
+        $scope.linkSettings = {
+            native: true,
+            from: null,    // client, mobile, portal, webadmin
+            context: null,
+            command: null, // client, cloud, system
+            systemId: null,
+            action: null,
+            actionParameters: null, // Object with parameters
+            auth: true // true for request, null for skipping, string for specific value
+        }
+        $scope.actionParameters = '{\n	"example": true\n}';
+        $scope.actionParametersError = false;
+        function clearEmptyStrings(obj){
+            var ret = $.extend({},obj);
+            for( var key in obj){
+                if(ret[key] === '' || ret[key] === null){
+                    delete ret[key];
+                }
+            }
+            return ret;
+        }
+        $scope.generateLink = function(){
+            $scope.linkSettings.actionParameters = null;
+            try{
+                $scope.actionParametersError = false;
+                if($scope.actionParameters  && $scope.actionParameters != ''){
+                    $scope.linkSettings.actionParameters = JSON.parse($scope.actionParameters);
+                }
+            }catch (a){
+                $scope.actionParametersError = true
+            }
+            return urlProtocol.generateLink(clearEmptyStrings($scope.linkSettings));
+        }
 
     }]);
