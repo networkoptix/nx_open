@@ -6,21 +6,13 @@ ToolBar
 {
     id: toolBar
 
-    default property alias data: contentItem.data
-
     property real statusBarHeight: getStatusBarHeight()
 
     implicitWidth: parent ? parent.width : 200
     implicitHeight: 56
     anchors.top: parent ? parent.top : undefined
     anchors.topMargin: statusBarHeight
-
-    Item
-    {
-        id: contentItem
-        anchors.fill: parent
-        clip: true
-    }
+    contentItem.clip: true
 
     background: Rectangle
     {

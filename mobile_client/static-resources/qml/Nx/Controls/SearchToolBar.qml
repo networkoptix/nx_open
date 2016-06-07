@@ -8,8 +8,6 @@ ToolBarBase
 
     property alias text: searchField.text
 
-    statusBarHeight: 0
-
     opacity: 0.0
     Behavior on opacity { NumberAnimation { duration: 200 } }
     visible: opacity > 0
