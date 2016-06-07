@@ -13,7 +13,7 @@ namespace nx
          * @returns true if the handler registered successfully (or was already registered), false otherwise.
          */
         NX_UTILS_API bool registerSystemUriProtocolHandler(const QString& protocol, const QString& applicationBinaryPath, const QString& description);
-        NX_UTILS_API bool runAsAdministratorWithUAC(const QString &applicationBinaryPath, const QStringList &parameters);
+        NX_UTILS_API bool runAsAdministratorWithUAC(const QString& applicationBinaryPath, const QStringList& parameters);
 #endif
     }
 }

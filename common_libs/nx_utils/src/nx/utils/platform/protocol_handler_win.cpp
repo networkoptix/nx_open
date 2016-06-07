@@ -47,7 +47,7 @@ namespace nx
             return !registryEditor.value(kDefaultValueKey).isNull();
         }
 
-        bool runAsAdministratorWithUAC(const QString &applicationBinaryPath, const QStringList &parameters)
+        bool runAsAdministratorWithUAC(const QString& applicationBinaryPath, const QStringList& parameters)
         {
             QString applicationNativePath = QDir::toNativeSeparators(applicationBinaryPath);
 
