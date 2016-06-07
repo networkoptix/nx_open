@@ -2092,9 +2092,9 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
 
         QPixmap pixmap = m_lineData[line].commentPixmap;
 
-        const auto dpPixmapSize = pixmap.size() / pixmap.devicePixelRatio();
-        QRectF fullRect(lineBarRect.left() + kLineLabelPaddingPixels, lineTop, dpPixmapSize.width(), lineHeight);
-        QRectF centeredRect = QnGeometry::aligned(dpPixmapSize, fullRect);
+        const auto pixmapSize = pixmap.size() / pixmap.devicePixelRatio();
+        QRectF fullRect(lineBarRect.left() + kLineLabelPaddingPixels, lineTop, pixmapSize.width(), lineHeight);
+        QRectF centeredRect = QnGeometry::aligned(pixmapSize, fullRect);
 
         painter->drawPixmap(centeredRect, pixmap, pixmap.rect());
 
@@ -2381,9 +2381,9 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
         if (!qFuzzyIsNull(m_stepData[index].currentTextOpacity) && kTickmarkFontHeights[level])
         {
             QPixmap pixmap = m_pixmapCache->tickmarkTextPixmap(level, pos, kTickmarkFontHeights[level], m_steps[index]);
-            const auto dpPixmapSize = pixmap.size() / pixmap.devicePixelRatio();
-            qreal topMargin = qFloor((kTickmarkTextHeightPixels[level] - dpPixmapSize.height()) * 0.5);
-            QRectF textRect(x - dpPixmapSize.width() / 2.0, rect.top() + lineHeight + topMargin, dpPixmapSize.width(), dpPixmapSize.height());
+            const auto pixmapSize = pixmap.size() / pixmap.devicePixelRatio();
+            qreal topMargin = qFloor((kTickmarkTextHeightPixels[level] - pixmapSize.height()) * 0.5);
+            QRectF textRect(x - pixmapSize.width() / 2.0, rect.top() + lineHeight + topMargin, pixmapSize.width(), pixmapSize.height());
 
             QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_stepData[index].currentTextOpacity);
             drawCroppedPixmap(painter, textRect, rect, pixmap, pixmap.rect());
@@ -2452,9 +2452,9 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
         painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
         QPixmap pixmap = m_pixmapCache->dateTextPixmap(pos0, kDateTextFontHeight, highlightStep);
-        const auto dpPixmapSize = pixmap.size() / pixmap.devicePixelRatio();
-        QRectF textRect((x0 + x1) / 2.0 - dpPixmapSize.width() / 2.0,
-            rect.top() + topMargin, dpPixmapSize.width(), dpPixmapSize.height());
+        const auto pixmapSize = pixmap.size() / pixmap.devicePixelRatio();
+        QRectF textRect((x0 + x1) / 2.0 - pixmapSize.width() / 2.0,
+            rect.top() + topMargin, pixmapSize.width(), pixmapSize.height());
         if (textRect.left() < rect.left())
             textRect.moveRight(x1);
         if (textRect.right() > rect.right())

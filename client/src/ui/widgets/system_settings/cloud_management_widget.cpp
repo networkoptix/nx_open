@@ -33,9 +33,9 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent)
     for (auto label: { ui->accountLabel, ui->promo1TextLabel, ui->promo2TextLabel, ui->promo3TextLabel })
         setPaletteColor(label, QPalette::WindowText, nxColor);
 
-    ui->promo1Label->setPixmap(qnSkin->dpPixmap("promo/cloud_tab_promo_1.png"));
-    ui->promo2Label->setPixmap(qnSkin->dpPixmap("promo/cloud_tab_promo_2.png"));
-    ui->promo3Label->setPixmap(qnSkin->dpPixmap("promo/cloud_tab_promo_3.png"));
+    ui->promo1Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_1.png"));
+    ui->promo2Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_2.png"));
+    ui->promo3Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_3.png"));
 
     // TODO: #help Set help topic
 
