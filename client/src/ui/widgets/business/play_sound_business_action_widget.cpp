@@ -113,7 +113,7 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
     if (!soundModel->loaded())
         return;
 
-    QnBusinessActionParameters params;
+    auto params = model()->actionParams();
     params.url = soundModel->filenameByRow(ui->pathComboBox->currentIndex());
     params.playToClient = ui->playToClient->isChecked();
     model()->setActionParams(params);

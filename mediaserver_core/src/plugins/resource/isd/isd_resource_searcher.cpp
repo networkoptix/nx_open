@@ -275,7 +275,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     QString name(lit("ISDcam"));
 
     if (!responseData.contains("ISD")) {
-        // check for new ISD models. it has been rebrended
+        // check for new ISD models. it has been rebranded
         int modelPos = responseData.indexOf("DWCA-");
         if (modelPos == -1)
             modelPos = responseData.indexOf("DWCS-");
