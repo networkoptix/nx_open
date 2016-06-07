@@ -272,6 +272,10 @@ android {
   LIBS += ${android.oslibs}
 
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
+  # Android mkspec ignores CONFIG+=c++14 and forces -std=c++11.
+  # Replacing the parameter manually.
+  QMAKE_CXXFLAGS -= -std=c++11
+  QMAKE_CXXFLAGS += -std=c++1y
   DEFINES += ${android.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
   CONFIG += no_smart_library_merge
@@ -293,9 +297,4 @@ CONFIG(debug, debug|release) {
 } else {
   include(dependencies.pri)
 }
-
-
-
-
-
 
