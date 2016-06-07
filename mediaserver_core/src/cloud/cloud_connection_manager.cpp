@@ -14,6 +14,10 @@
 #include "media_server/settings.h"
 
 
+namespace {
+constexpr const auto kMaxEventConnectionStartRetryPeriod = std::chrono::minutes(1);
+}
+
 CloudConnectionManager::CloudConnectionManager()
 :
     m_cdbConnectionFactory(createConnectionFactory(), destroyConnectionFactory)
@@ -41,11 +45,7 @@ CloudConnectionManager::~CloudConnectionManager()
 {
     directDisconnectAll();
 
-    QnMutexLocker lk(&m_mutex);
-    auto eventConnection = std::move(m_eventConnection);
-    lk.unlock();
-
-    eventConnection.reset();
+    stopMonitoringCloudEvents();
 }
 
 boost::optional<nx::hpm::api::SystemCredentials>
@@ -125,12 +125,40 @@ bool CloudConnectionManager::boundToCloud(QnMutexLockerBase* const /*lk*/) const
 
 void CloudConnectionManager::monitorForCloudEvents()
 {
-    QnMutexLocker lk(&m_mutex);
-
     m_eventConnection =
         m_cdbConnectionFactory->createEventConnection(
             m_cloudSystemID.toStdString(),
             m_cloudAuthKey.toStdString());
+
+    m_eventConnectionRetryTimer = std::make_unique<nx::network::RetryTimer>(
+        nx::network::RetryPolicy(
+            nx::network::RetryPolicy::kInfiniteRetries,
+            std::chrono::seconds(1),
+            nx::network::RetryPolicy::kDefaultDelayMultiplier,
+            kMaxEventConnectionStartRetryPeriod));
+    m_eventConnectionRetryTimer->post(
+        std::bind(&CloudConnectionManager::startEventConnection, this));
+}
+
+void CloudConnectionManager::stopMonitoringCloudEvents()
+{
+    m_eventConnectionRetryTimer->pleaseStopSync();
+    m_eventConnectionRetryTimer.reset();
+
+    //closing event connection
+    NX_ASSERT(m_eventConnection);
+    m_eventConnection.reset();
+}
+
+void CloudConnectionManager::onSystemAccessListUpdated(
+    nx::cdb::api::SystemAccessListModifiedEvent event)
+{
+    m_systemAccessListUpdatedEventSubscription.notify(std::move(event));
+}
+
+void CloudConnectionManager::startEventConnection()
+{
+    NX_ASSERT(m_eventConnection);
 
     using namespace std::placeholders;
     nx::cdb::api::SystemEventHandlers systemEventHandlers;
@@ -147,31 +175,17 @@ void CloudConnectionManager::onEventConnectionEstablished(
     if (resultCode == nx::cdb::api::ResultCode::ok)
     {
         NX_LOGX(lm("Successfully opened event connection to the cloud"), cl_logDEBUG2);
+        return;
     }
-    else
+
+    NX_LOGX(lm("Error opening event connection to the cloud: %1")
+        .arg(nx::cdb::api::toString(resultCode)), cl_logDEBUG1);
+
+    if (!m_eventConnectionRetryTimer->scheduleNextTry(
+            std::bind(&CloudConnectionManager::startEventConnection, this)))
     {
-        //TODO #ak retry on failure
-        NX_LOGX(lm("Error opening event connection to the cloud: %1")
-            .arg(nx::cdb::api::toString(resultCode)), cl_logDEBUG1);
+        NX_ASSERT(false);
     }
-}
-
-void CloudConnectionManager::stopMonitoringCloudEvents()
-{
-    QnMutexLocker lk(&m_mutex);
-
-    //closing event connection
-    NX_ASSERT(m_eventConnection);
-    auto eventConnection = std::move(m_eventConnection);
-    lk.unlock();
-
-    eventConnection.reset();
-}
-
-void CloudConnectionManager::onSystemAccessListUpdated(
-    nx::cdb::api::SystemAccessListModifiedEvent event)
-{
-    m_systemAccessListUpdatedEventSubscription.notify(std::move(event));
 }
 
 void CloudConnectionManager::cloudSettingsChanged()
