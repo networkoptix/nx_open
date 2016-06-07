@@ -104,8 +104,6 @@ protected:
     int m_acceptQueueLen;
 
     std::atomic<State> m_state;
-    QnMutex m_mutex;
-    bool m_terminated;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
     std::unique_ptr<IncomingTunnelPool> m_tunnelPool;
     mutable SystemError::ErrorCode m_lastError;

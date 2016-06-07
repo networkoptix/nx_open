@@ -1,6 +1,7 @@
 #ifndef __FILE_DELETOR_H__
 #define __FILE_DELETOR_H__
 
+#include <set>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QDir>
 #include <QtCore/QQueue>
@@ -17,8 +18,7 @@ class QnFileDeletor: public QnLongRunnable
 public:
     void init(const QString& tmpRoot);
     static QnFileDeletor* instance();
-    void deleteFile(const QString& fileName);
-    void deleteDirRecursive(const QString& dirName);
+    void deleteFile(const QString& fileName, const QnUuid &storageId);
     
     QnFileDeletor();
     ~QnFileDeletor();
@@ -26,19 +26,40 @@ public:
     virtual void run() override;
 private:
     void processPostponedFiles();
-    void postponeFile(const QString& fileName);
+    void postponeFile(const QString& fileName, const QnUuid &storageId);
     bool internalDeleteFile(const QString& fileName);
 private:
+    struct PostponedFileData
+    {
+        QString fileName;
+        QnUuid storageId;
+
+        PostponedFileData(const QString &fileName, const QnUuid &storageId)
+            : fileName(fileName),
+              storageId(storageId)
+        {}
+    };
+    friend bool operator < (const PostponedFileData &lhs, const PostponedFileData &rhs);
+
+    typedef QQueue<PostponedFileData> PostponedFileDataQueue;
+    typedef std::set<PostponedFileData> PostponedFileDataSet;
 
     mutable QnMutex m_mutex;
     QString m_mediaRoot;
-    QSet<QString> m_postponedFiles;
-    QQueue<QString> m_newPostponedFiles;
+    PostponedFileDataSet m_postponedFiles;
+    PostponedFileDataQueue m_newPostponedFiles;
     QFile m_deleteCatalog;
     bool m_firstTime;
     QElapsedTimer m_postponeTimer;
     QElapsedTimer m_storagesTimer;
 };
+
+inline bool operator < (const QnFileDeletor::PostponedFileData &lhs, const QnFileDeletor::PostponedFileData &rhs)
+{
+    return lhs.fileName < rhs.fileName ? true :
+                                         rhs.fileName < lhs.fileName ? false :
+                                                                       lhs.storageId < rhs.storageId;
+}
 
 #define qnFileDeletor QnFileDeletor::instance()
 

@@ -882,7 +882,7 @@ bool QnResource::setProperty(const QString &key, const QVariant& value, Property
 
 void QnResource::emitPropertyChanged(const QString& key)
 {
-    if(key == lit("ptzCapabilities"))
+    if(key == Qn::PTZ_CAPABILITIES_PARAM_NAME)
         emit ptzCapabilitiesChanged(::toSharedPointer(this));
     else if(key == Qn::VIDEO_LAYOUT_PARAM_NAME)
         emit videoLayoutChanged(::toSharedPointer(this));
@@ -1119,7 +1119,7 @@ void QnResource::setUniqId(const QString& value)
 
 Qn::PtzCapabilities QnResource::getPtzCapabilities() const
 {
-    return Qn::PtzCapabilities(getProperty(lit("ptzCapabilities")).toInt());
+    return Qn::PtzCapabilities(getProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME).toInt());
 }
 
 bool QnResource::hasPtzCapabilities(Qn::PtzCapabilities capabilities) const
@@ -1128,8 +1128,8 @@ bool QnResource::hasPtzCapabilities(Qn::PtzCapabilities capabilities) const
 }
 
 void QnResource::setPtzCapabilities(Qn::PtzCapabilities capabilities) {
-    if (hasParam(lit("ptzCapabilities")))
-        setProperty(lit("ptzCapabilities"), static_cast<int>(capabilities));
+    if (hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
+        setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
 }
 
 void QnResource::setPtzCapability(Qn::PtzCapabilities capability, bool value) {

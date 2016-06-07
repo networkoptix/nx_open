@@ -11,7 +11,15 @@
 namespace nx {
 namespace cdb {
 
-TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
+namespace {
+class SystemSharing
+:
+    public CdbFunctionalTest
+{
+};
+}
+
+TEST_F(SystemSharing, getCloudUsers)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
@@ -196,7 +204,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
     }
 }
 
-TEST_F(CdbFunctionalTest, system_sharing_maintenance)
+TEST_F(SystemSharing, maintenance)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
@@ -513,7 +521,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 }
 
 /** only system owner and integrator can share system granting maintenance role */
-TEST_F(CdbFunctionalTest, system_sharing_maintenance2)
+TEST_F(SystemSharing, maintenance2)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
@@ -580,7 +588,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance2)
             api::SystemAccessRole::maintenance));
 }
 
-TEST_F(CdbFunctionalTest, system_sharing_owner)
+TEST_F(SystemSharing, owner)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
@@ -666,7 +674,7 @@ TEST_F(CdbFunctionalTest, system_sharing_owner)
     }
 }
 
-TEST_F(CdbFunctionalTest, system_sharing_remove_system)
+TEST_F(SystemSharing, remove_system)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
@@ -753,7 +761,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_system)
     }
 }
 
-TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
+TEST_F(SystemSharing, get_access_role_list)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
@@ -910,7 +918,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
     }
 }
 
-TEST_F(CdbFunctionalTest, system_sharing_remove_sharing_unknown_account)
+TEST_F(SystemSharing, remove_sharing_unknown_account)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
@@ -939,7 +947,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_sharing_unknown_account)
             api::SystemAccessRole::none));
 }
 
-TEST_F(CdbFunctionalTest, DISABLED_system_sharing_remove_sharing_unknown_system)
+TEST_F(SystemSharing, DISABLED_remove_sharing_unknown_system)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());

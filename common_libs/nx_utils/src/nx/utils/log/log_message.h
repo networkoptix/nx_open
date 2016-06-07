@@ -16,8 +16,23 @@
 #include <QtCore/QStringList>
 #include <nx/utils/uuid.h>
 
-inline
-QString toString( const QString& t) { return t; }
+template<typename T>
+QString toStringSfinae(const T& t, decltype(&T::toString))
+{
+    return t.toString();
+}
+
+template<typename T>
+QString toStringSfinae(const T& t, ...)
+{
+    return QString(QLatin1String("%1")).arg(t);
+}
+
+template<typename T>
+QString toString(const T&t)
+{
+    return toStringSfinae(t, 0);
+}
 
 template<typename First, typename Second>
 QString toString(
