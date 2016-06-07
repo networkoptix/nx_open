@@ -5,8 +5,6 @@
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QGuiApplication>
-#include <QtGui/QScreen>
-#include <QtCore/QDebug>
 
 namespace
 {
@@ -75,15 +73,11 @@ public:
     QHash<QString, QRect> strings;
     int maxCharWidth;
     int spaceWidth;
-    qreal pixelRatio = 1.0;
+    qreal pixelRatio = qApp->devicePixelRatio();
 
     QnTimelineTextHelperPrivate(const QFont& font)
         : font(font)
     {
-        const auto screens = qApp->screens();
-        if (!screens.isEmpty())
-            pixelRatio = screens[0]->devicePixelRatio();
-
         this->font.setPixelSize(font.pixelSize() * pixelRatio);
         const auto fm = QFontMetrics(this->font);
         lineHeight = fm.height();
