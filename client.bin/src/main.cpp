@@ -122,6 +122,8 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/platform/protocol_handler.h>
+#include <nx/vms/utils/app_info.h>
 
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
@@ -228,6 +230,37 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
+
+#ifdef Q_OS_WIN
+
+    auto registerUriHandler = []
+    {
+        return nx::utils::registerSystemUriProtocolHandler(nx::vms::utils::AppInfo::nativeUriProtocol(),
+                                                           qApp->applicationFilePath(),
+                                                           nx::vms::utils::AppInfo::nativeUriProtocolDescription());
+    };
+
+    /* Register URI handler and instantly exit. */
+    if (startupParams.hasAdminPermissions)
+    {
+        registerUriHandler();
+        return result;
+    }
+
+    /* Check if uri handler is registered already. */
+    if (!registerUriHandler())
+    {
+        /* Avoid lock-file races. */
+        startupParams.allowMultipleClientInstances = true;
+
+        /* Start another client instance with admin permissions if required. */
+        nx::utils::runAsAdministratorWithUAC(qApp->applicationFilePath(),
+                                             QStringList()
+                                             << QnStartupParameters::kHasAdminPermissionsKey
+                                             << QnStartupParameters::kAllowMultipleClientInstancesKey);
+    }
+
+#endif // Q_OS_WIN
 
     QnClientModule client(startupParams);
 

@@ -12,6 +12,9 @@ namespace nx
             {
                 /** Native protocol for URI links. */
                 static QString nativeUriProtocol();
+
+                /** Human-readable protocol description. */
+                static QString nativeUriProtocolDescription();
             };
         }
     }
