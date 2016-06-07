@@ -414,6 +414,10 @@ SystemUri& SystemUri::operator=(const SystemUri& other)
     if (&other == this)
         return *this;
 
+    NX_ASSERT(other.d_ptr);
+    if (!other.d_ptr)
+        return *this;
+
     (*d_ptr.data()) = (*other.d_ptr.data());
     return *this;
 }
