@@ -107,21 +107,17 @@ public:
         parameters()
     {}
 
-    SystemUriPrivate(SystemUriPrivate* other)
-    {
-        NX_ASSERT(other);
-        if (!other)
-            return;
-        scope = other->scope;
-        protocol = other->protocol;
-        domain = other->domain;
-        clientCommand = other->clientCommand;
-        systemId = other->systemId;
-        systemAction = other->systemAction;
-        authenticator = other->authenticator;
-        referral = other->referral;
-        parameters = other->parameters;
-    }
+    SystemUriPrivate(const SystemUriPrivate &other) :
+        scope(other.scope),
+        protocol(other.protocol),
+        domain(other.domain),
+        clientCommand(other.clientCommand),
+        systemId(other.systemId),
+        systemAction(other.systemAction),
+        authenticator(other.authenticator),
+        referral(other.referral),
+        parameters(other.parameters)
+    {}
 
     void parse(const QString& uri)
     {
@@ -405,9 +401,12 @@ SystemUri::SystemUri(const QString& uri) :
 }
 
 nx::vms::utils::SystemUri::SystemUri(const SystemUri& other) :
-    d_ptr(new SystemUriPrivate(other.d_ptr.data()))
+    d_ptr(other.d_ptr
+          ? new SystemUriPrivate(*other.d_ptr.data())
+          : new SystemUriPrivate()
+    )
 {
-
+    NX_ASSERT(other.d_ptr);
 }
 
 SystemUri& SystemUri::operator=(const SystemUri& other)
@@ -415,7 +414,7 @@ SystemUri& SystemUri::operator=(const SystemUri& other)
     if (&other == this)
         return *this;
 
-    (*d_ptr.data())=(other.d_ptr.data());
+    (*d_ptr.data()) = (*other.d_ptr.data());
     return *this;
 }
 
