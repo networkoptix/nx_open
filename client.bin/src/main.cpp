@@ -123,6 +123,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/timer_manager.h>
 
+
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
