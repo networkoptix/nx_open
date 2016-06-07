@@ -48,7 +48,15 @@ static QFileInfoList readCrashes(const QString& prefix = QString())
     NX_LOG(lit("readCrashes: scan %1 for files %2")
            .arg(crashDir.absolutePath()).arg(crashFilter), cl_logDEBUG1);
 
-    return crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files, QDir::Time);
+    auto files = crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files);
+    std::sort(
+        files.begin(), files.end(),
+        [](const QFileInfo& left, const QFileInfo& right)
+        {
+            return left.lastModified() > right.lastModified();
+        });
+
+    return std::move(files);
 }
 
 namespace ec2 {
