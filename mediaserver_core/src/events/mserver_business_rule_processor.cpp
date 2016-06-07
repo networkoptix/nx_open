@@ -579,7 +579,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
 {
     QnEmailAttachmentList attachments;
     QVariantHash contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
-    QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType); 
+    QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  //TODO: https://networkoptix.atlassian.net/browse/VMS-2831
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
 	QString cloudOwner = QnGlobalSettings::instance()->cloudAccountName();
 
