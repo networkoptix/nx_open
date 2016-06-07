@@ -557,7 +557,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->setReady(true);
     QnResourceDiscoveryManager::instance()->start();
 
-
     if (startupParams.customUri.isValid())
     {
         using namespace nx::vms::utils;
@@ -573,49 +572,21 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
             {
                 SystemUri::Auth auth = startupParams.customUri.authenticator();
                 QString systemId = startupParams.customUri.systemId();
-                QnUuid cloudSystemId = QnUuid::fromStringSafe(systemId);
-                if (!cloudSystemId.isNull())
-                {
+                bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
+
+                QUrl systemUrl = QUrl::fromUserInput(systemId);
+                systemUrl.setUserName(auth.user);
+                systemUrl.setPassword(auth.password);
+
+                if (systemIsCloud)
                     qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(auth.user, auth.password, true);
-                    QUrl cloudUrl(systemId);
-                    cloudUrl.setUserName(auth.user);
-                    cloudUrl.setPassword(auth.password);
-                    context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, cloudUrl));
-                }
-                else
-                {
-                    QUrl directUrl(systemId);
-                    directUrl.setUserName(auth.user);
-                    directUrl.setPassword(auth.password);
-                    context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, directUrl));
-                }
+
+                context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, systemUrl));
                 break;
             }
             default:
                 break;
         }
-
-
-        /*
-        QnSystemUriResolver resolver(QUrl::fromUserInput(startupParams.customUri));
-        if (resolver.isValid())
-        {
-            for (QnSystemUriResolver::Action action : resolver.result().actions)
-            {
-                switch (action)
-                {
-                case QnSystemUriResolver::Action::LoginToCloud:
-                    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(resolver.result().login, resolver.result().password, true);
-                    break;
-                case QnSystemUriResolver::Action::ConnectToServer:
-                    context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, resolver.result().serverUrl));
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-        */
     }
     /* If no input files were supplied --- open connection settings dialog.
      * Do not try to connect in the following cases:

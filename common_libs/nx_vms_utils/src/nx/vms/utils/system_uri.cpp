@@ -121,7 +121,7 @@ public:
 
     void parse(const QString& uri)
     {
-        QUrl url(uri, QUrl::TolerantMode);
+        QUrl url = QUrl::fromUserInput(uri);
         if (!url.isValid())
             return;
 
