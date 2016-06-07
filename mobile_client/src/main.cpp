@@ -1,4 +1,5 @@
 #include <QtCore/QDir>
+#include <QtCore/QCommandLineParser>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtGui/QFont>
@@ -32,17 +33,18 @@ FlagConfig conf("mobile_client");
 #include <core/resource_management/resource_pool.h>
 #include <utils/settings_migration.h>
 
-#include "context/context.h"
-#include "mobile_client/mobile_client_module.h"
+#include <context/context.h>
+#include <mobile_client/mobile_client_module.h>
+#include <mobile_client/mobile_client_settings.h>
 
-#include "ui/camera_thumbnail_provider.h"
-#include "ui/window_utils.h"
-#include "ui/texture_size_helper.h"
-#include "camera/camera_thumbnail_cache.h"
-#include "ui/helpers/font_loader.h"
+#include <ui/camera_thumbnail_provider.h>
+#include <ui/window_utils.h>
+#include <ui/texture_size_helper.h>
+#include <camera/camera_thumbnail_cache.h>
+#include <ui/helpers/font_loader.h>
 
 #include <nx/media/decoder_registrar.h>
-#include "resource_allocator.h"
+#include <resource_allocator.h>
 
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -73,13 +75,9 @@ int runUi(QGuiApplication *application) {
     fileSelector.setExtraSelectors(selectors);
 
     QQmlEngine engine;
-#if 1
-    QString basePath = lit("qrc:///");
-#else
-    QDir baseDir;
-    baseDir.cd(lit("../../../../mobile_client/static-resources"));
-    QString basePath = lit("file://") + baseDir.absolutePath() + lit("/");
-#endif
+    auto basePath = qnSettings->basePath();
+    if (!basePath.startsWith(lit("qrc:")))
+        basePath = lit("file://") + QDir(basePath).absolutePath() + lit("/");
     context.setLocalPrefix(basePath);
     engine.setBaseUrl(QUrl(basePath + lit("qml/")));
     engine.addImportPath(basePath + lit("qml"));
@@ -115,7 +113,10 @@ int runUi(QGuiApplication *application) {
 #endif
 
     if (!mainComponent.errors().isEmpty())
+    {
         qWarning() << mainComponent.errorString();
+        return 1;
+    }
 
     QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
@@ -167,6 +168,29 @@ void initLog()
     }
 }
 
+void parseCommandLine(const QCoreApplication& application)
+{
+    QCommandLineParser parser;
+
+    const auto basePathOption = QCommandLineOption(
+                                lit("basePath"),
+                                lit("The directory which contains runtime ui resources: 'qml' and 'images'"),
+                                lit("basePath"));
+    parser.addOption(basePathOption);
+
+    parser.process(application);
+
+    if (parser.isSet(basePathOption))
+    {
+        const auto basePath = parser.value(basePathOption);
+        const auto path = QDir(basePath).absoluteFilePath(lit("qml/main.qml"));
+        if (QFile::exists(path))
+            qnSettings->setBasePath(basePath);
+        else
+            qWarning() << lit("File %1 doesn't exist. Loading from qrc...").arg(path);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
@@ -176,6 +200,7 @@ int main(int argc, char *argv[])
     QnMobileClientModule mobile_client;
     Q_UNUSED(mobile_client)
 
+    parseCommandLine(application);
     migrateSettings();
 
     int result = runApplication(&application);

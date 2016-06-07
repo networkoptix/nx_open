@@ -7,7 +7,7 @@
 class QnMobileClientSettings : public QnPropertyStorage, public Singleton<QnMobileClientSettings>
 {
     Q_OBJECT
-    typedef QnPropertyStorage base_type;
+    using base_type = QnPropertyStorage;
 
 public:
     enum Variable
@@ -20,6 +20,8 @@ public:
         LastUsedQuality,
         LiteMode,
 
+        BasePath,
+
         // Depracated properties
         SavedSessions,
         IsSettingsMigrated,
@@ -28,7 +30,7 @@ public:
         VariableCount
     };
 
-    explicit QnMobileClientSettings(QObject *parent = 0);
+    explicit QnMobileClientSettings(QObject* parent = nullptr);
 
     void load();
     void save();
@@ -36,12 +38,13 @@ public:
     bool isWritable() const;
 
 protected:
-    virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids) override;
-
-    virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
-    virtual void writeValueToSettings(QSettings *settings, int id, const QVariant &value) const override;
-
-    virtual UpdateStatus updateValue(int id, const QVariant &value) override;
+    virtual void updateValuesFromSettings(
+            QSettings* settings, const QList<int>& ids) override;
+    virtual QVariant readValueFromSettings(
+            QSettings* settings, int id, const QVariant& defaultValue) override;
+    virtual void writeValueToSettings(
+            QSettings* settings, int id, const QVariant& value) const override;
+    virtual UpdateStatus updateValue(int id, const QVariant& value) override;
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VariableCount)
@@ -53,13 +56,15 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         lastUsedQuality,            setLastUsedQuality,         LastUsedQuality,            0)
         QN_DECLARE_RW_PROPERTY(int,                         liteMode,                   setLiteMode,                LiteMode,                   (int)LiteModeType::LiteModeAuto)
 
+        QN_DECLARE_RW_PROPERTY(QString,                     basePath,                   setBasePath,                BasePath,                   lit("qrc:///"))
+
         // Deprecated properties
         QN_DECLARE_RW_PROPERTY(QString,                     lastUsedSessionId,          setLastUsedSessionId,       LastUsedSessionId,          QString())
         QN_DECLARE_RW_PROPERTY(bool,                        isSettingsMigrated,         setSettingsMigrated,        IsSettingsMigrated,         false)
     QN_END_PROPERTY_STORAGE()
 
 private:
-    QSettings *m_settings;
+    QSettings* m_settings;
     bool m_loading;
 };
 
