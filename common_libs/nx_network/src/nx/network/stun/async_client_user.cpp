@@ -40,12 +40,13 @@ void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_asyncGuard.reset();
     network::aio::Timer::pleaseStop(
-        [this, guard = m_asyncGuard.sharedGuard(), handler = std::move(handler)]()
+        [this, guard = m_asyncGuard.sharedGuard(), handler = std::move(handler)]() mutable
         {
             if (m_client)
             {
+                auto guardPtr = guard.get();
                 m_client->cancelHandlers(
-                    guard.get(),
+                    guardPtr,
                     [guard = std::move(guard)]() mutable
                     {
                         // guard shell be kept here up to the end of cancelation
@@ -75,7 +76,12 @@ void AsyncClientUser::sendRequest(
             SystemError::ErrorCode code, Message message) mutable
         {
             if (auto lock = guard->lock())
-                return post(std::bind(std::move(handler), code, std::move(message)));
+                return post(
+                    [handler = std::move(handler), code,
+                        message = std::move(message)]() mutable
+                    {
+                        handler(code, std::move(message));
+                    });
 
             NX_LOGX(lm("ignore response %1 handler")
                 .arg(message.header.transactionId.toHex()), cl_logDEBUG2);
