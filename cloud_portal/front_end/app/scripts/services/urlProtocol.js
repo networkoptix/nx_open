@@ -42,7 +42,7 @@ angular.module('cloudApp')
                     settings.auth = $base64.encode(username + ':' + password);
                 }
 
-                var getParams = settings.actionParameters||{};
+                var getParams = $.extend({},settings.actionParameters);
 
                 if(settings.from){
                     getParams.from = settings.from;
