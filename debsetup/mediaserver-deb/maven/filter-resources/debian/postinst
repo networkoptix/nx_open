@@ -235,9 +235,14 @@ case "$1" in
   ;;
 esac
 
+# Dirty huck to prevent conflict with apport
+echo manual > /etc/init/apport.override
+invoke-rc.d apport stop 2>/dev/null || true
+
 if [ -e "/etc/init/$COMPANY_NAME-mediaserver.conf" ]; then
     invoke-rc.d $COMPANY_NAME-mediaserver start || exit $?
 fi
+
 update-rc.d -f $COMPANY_NAME-mediaserver remove >/dev/null || exit $?
 
 exit 0
