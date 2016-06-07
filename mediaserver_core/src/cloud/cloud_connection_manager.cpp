@@ -45,7 +45,8 @@ CloudConnectionManager::~CloudConnectionManager()
 {
     directDisconnectAll();
 
-    stopMonitoringCloudEvents();
+    if (m_eventConnection)
+        stopMonitoringCloudEvents();
 }
 
 boost::optional<nx::hpm::api::SystemCredentials>
