@@ -7,3 +7,7 @@ pushd front_end
 npm install
 bower install
 popd
+
+virtualenv env
+. env/bin/activate
+pip install --no-index -r cloud/requirements.txt -f cloud/wheelhouse

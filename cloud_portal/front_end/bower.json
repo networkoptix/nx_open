@@ -26,6 +26,6 @@
     "angular-scenario": "1.5.0"
   },
   "resolutions": {
-    "angular": "1.5.5"
+    "angular": "1.5.6"
   }
 }
