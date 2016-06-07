@@ -193,6 +193,10 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
     if (m_connectionRequestedData.udpEndpointList.empty())
         return;
 
+    //if (!m_mediatorUdpClient)
+    if (resultCode != api::ResultCode::ok)
+        return;
+
     //connecting to the originating peer
     auto udtStreamSocket = std::make_unique<nx::network::UdtStreamSocket>();
     udtStreamSocket->bindToAioThread(m_timer.getAioThread());
