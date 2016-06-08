@@ -659,7 +659,7 @@ bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, c
     if (!user || !target)
         return false;
 
-    /* Nobody can make user a new owner. */
+    /* Nobody can make user an owner (isAdmin ec2 field) unless target user is already an owner. */
     if (!target->isOwner() && update.isAdmin)
         return false;
 
