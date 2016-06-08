@@ -13,11 +13,11 @@ namespace QnBusiness {
         case SendMailAction:
         case DiagnosticsAction:
         case ShowPopupAction:
+            return false;
+
         case PlaySoundOnceAction:
         case PlaySoundAction:
         case SayTextAction:
-            return false;
-
         case CameraOutputAction:
         case CameraOutputOnceAction:
         case BookmarkAction:
