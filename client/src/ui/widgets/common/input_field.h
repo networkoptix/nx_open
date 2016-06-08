@@ -46,10 +46,10 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool value);
 
-    void validate();
+    bool validate();
 
     bool isValid() const;
-    QValidator::State lastValidationResult() const;
+    bool lastValidationResult() const;
 
     void setValidator(Qn::TextValidateFunction validator, bool validateImmediately = false);
 

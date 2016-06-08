@@ -74,7 +74,7 @@ public:
         }
 
         QPalette palette = parent->palette();
-        if (lastValidationResult.state == QValidator::Invalid)
+        if (lastValidationResult.state != QValidator::Acceptable)
             setWarningStyle(&palette);
 
         input->setPalette(palette);
@@ -245,10 +245,11 @@ void QnInputField::setReadOnly(bool value)
     d->input->setReadOnly(value);
 }
 
-void QnInputField::validate()
+bool QnInputField::validate()
 {
     Q_D(QnInputField);
     d->validate();
+    return lastValidationResult();
 }
 
 void QnInputField::clear()
@@ -270,10 +271,10 @@ bool QnInputField::isValid() const
     return true;
 }
 
-QValidator::State QnInputField::lastValidationResult() const
+bool QnInputField::lastValidationResult() const
 {
     Q_D(const QnInputField);
-    return d->lastValidationResult.state;
+    return d->lastValidationResult.state == QValidator::Acceptable;
 }
 
 void QnInputField::setValidator(Qn::TextValidateFunction validator, bool validateImmediately)
