@@ -47,7 +47,7 @@ MediatorFunctionalTest::MediatorFunctionalTest()
     addArg("-e");
     addArg("-stun/addrToListenList"); addArg("127.0.0.1:0");
     addArg("-http/addrToListenList"); addArg("127.0.0.1:0");
-    //addArg("-log/logLevel"); addArg("DEBUG2");
+    addArg("-log/logLevel"); addArg("none");
     addArg("-general/dataDir"); addArg(m_tmpDir.toLatin1().constData());
 
     registerCloudDataProvider(&m_cloudDataProvider);

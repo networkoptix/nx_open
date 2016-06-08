@@ -27,6 +27,7 @@ void PrintTo(const milliseconds& val, ::std::ostream* os);
 void PrintTo(const seconds& val, ::std::ostream* os);
 void PrintTo(const microseconds& val, ::std::ostream* os);
 void PrintTo(const nanoseconds& val, ::std::ostream* os);
+void PrintTo(const time_point<steady_clock>& val, ::std::ostream* os);
 }   //chrono
 }   //std
 

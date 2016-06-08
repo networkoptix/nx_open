@@ -101,9 +101,9 @@ protected:
                     std::unique_ptr<AbstractStreamSocket> connection,
                     bool stillValid)
             {
+                connectContext.endTime = std::chrono::steady_clock::now();
                 connectContext.connectedPromise.set_value(
                     ConnectResult{ errorCode, std::move(connection), stillValid });
-                connectContext.endTime = std::chrono::steady_clock::now();
             });
         }
         return connections;
