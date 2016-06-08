@@ -18,6 +18,8 @@
 #include <network/tcp_listener.h>
 
 #include "core/resource_management/resource_pool.h"
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_access_manager.h>
 #include "nx/streaming/abstract_data_consumer.h"
 #include "core/resource/camera_resource.h"
 
@@ -537,6 +539,13 @@ void QnProgressiveDownloadingConsumer::run()
         {
             d->response.messageBody = QByteArray("Resource with unicId ") + QByteArray(resUniqueID.toLatin1()) + QByteArray(" not found ");
             sendResponse(CODE_NOT_FOUND, "text/plain");
+            return;
+        }
+
+        auto userResource = qnResPool->getResourceById(d->authUserId).dynamicCast<QnUserResource>();
+        if (!userResource || !qnResourceAccessManager->hasPermission(userResource, resource, Qn::Permission::ReadPermission))
+        {
+            sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
             return;
         }
 
