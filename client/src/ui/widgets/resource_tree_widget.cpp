@@ -530,6 +530,9 @@ bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event)
     case QEvent::PaletteChange:
         ui->resourcesTreeView->setPalette(palette()); // override default item view palette
         break;
+
+    default:
+        break;
     }
 
     return base_type::eventFilter(obj, event);
