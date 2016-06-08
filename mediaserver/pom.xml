@@ -76,8 +76,6 @@
 				<linux.arm.oslibs>-llber -lsasl2 -lssl -lcrypto -lsigar -lldap</linux.arm.oslibs>
             </properties>
         </profile>
-    </profiles>
-	<profiles>
         <profile>
             <id>linux-isd-s2</id>
             <activation>
