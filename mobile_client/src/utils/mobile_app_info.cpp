@@ -25,6 +25,11 @@ QString QnMobileAppInfo::version() const
     return QnAppInfo::applicationVersion();
 }
 
+QString QnMobileAppInfo::cloudName() const
+{
+    return QnAppInfo::cloudName();
+}
+
 QUrl QnMobileAppInfo::oldMobileClientUrl() const
 {
 #if defined(Q_OS_ANDROID)

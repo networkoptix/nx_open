@@ -5,6 +5,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/mobile_client_camera_factory.h>
+#include <core/core_settings.h>
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
 #include <api/global_settings.h>
@@ -17,6 +18,11 @@
 #include <network/router.h>
 #include <watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
+#include <watchers/cloud_status_watcher.h>
+#include <finders/systems_finder.h>
+#include <finders/cloud_systems_finder.h>
+#include <finders/direct_systems_finder.h>
+#include <client/client_recent_connections_manager.h>
 
 #include "mobile_client_message_processor.h"
 #include "mobile_client_meta_types.h"
@@ -47,6 +53,7 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->setModuleGUID(QnUuid::createUuid());
 
     common->store<QnTranslationManager>(translationManager);
+    common->store<QnCoreSettings>(new QnCoreSettings());
     common->store<QnMobileClientSettings>(new QnMobileClientSettings);
     common->store<QnSessionManager>(new QnSessionManager());
 
@@ -55,6 +62,7 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnCameraHistoryPool>(new QnCameraHistoryPool());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
     common->store<QnMobileClientCameraFactory>(new QnMobileClientCameraFactory());
+    common->store<QnClientRecentConnectionsManager>(new QnClientRecentConnectionsManager());
 
     QnUserWatcher *userWatcher = new QnUserWatcher();
     common->store<QnUserWatcher>(userWatcher);
@@ -62,6 +70,10 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     QnAvailableCamerasWatcher *availableCamerasWatcher = new QnAvailableCamerasWatcher();
     common->store<QnAvailableCamerasWatcher>(availableCamerasWatcher);
     connect(userWatcher, &QnUserWatcher::userChanged, availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
+
+    QnCloudStatusWatcher *cloudStatusWatcher = new QnCloudStatusWatcher();
+    // TODO: #dklychkov set cloud credentials
+    common->store<QnCloudStatusWatcher>(cloudStatusWatcher);
 
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
@@ -73,6 +85,11 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     moduleFinder->start();
 
     common->store<QnRouter>(new QnRouter(moduleFinder));
+
+    QnSystemsFinder* systemsFinder(new QnSystemsFinder());
+    systemsFinder->addSystemsFinder(new QnDirectSystemsFinder(systemsFinder));
+    systemsFinder->addSystemsFinder(new QnCloudSystemsFinder(systemsFinder));
+    common->store<QnSystemsFinder>(systemsFinder);
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this, [moduleFinder](Qt::ApplicationState state) {
         switch (state) {

@@ -25,6 +25,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client.core-x64", "${basedi
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
+		${nx_vms_utils.guid} = ${nx_vms_utils.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common-x64", "${basedir}\..\common\src\common-x64.vcxproj", "${common.guid}"
@@ -51,6 +52,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_network-x64", "${basedir
 		${common.guid} = ${common.guid}
 		${nx_utils.guid} = ${nx_utils.guid}
 		${udt.guid} = ${udt.guid}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_vms_utils-x64", "${basedir}\..\common_libs\nx_vms_utils\src\nx_vms_utils-x64.vcxproj", "${nx_vms_utils.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+		${nx_utils.guid} = ${nx_utils.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_utils-x64", "${basedir}\..\common_libs\nx_utils\src\nx_utils-x64.vcxproj", "${nx_utils.guid}"
@@ -109,6 +115,10 @@ Global
 		${nx_utils.guid}.Debug|x64.Build.0 = Debug|x64
 		${nx_utils.guid}.Release|x64.ActiveCfg = Release|x64
 		${nx_utils.guid}.Release|x64.Build.0 = Release|x64
+		${nx_vms_utils.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_vms_utils.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_vms_utils.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_vms_utils.guid}.Release|x64.Build.0 = Release|x64
 		${cloud_db_client.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${cloud_db_client.guid}.Debug|x64.Build.0 = Debug|x64
 		${cloud_db_client.guid}.Release|x64.ActiveCfg = Release|x64

@@ -2,6 +2,7 @@
 #pragma once
 
 #include <nx/utils/uuid.h>
+#include <nx/vms/utils/system_uri.h>
 
 struct QnStartupParameters
 {
@@ -15,6 +16,8 @@ struct QnStartupParameters
     int screen;
 
     bool allowMultipleClientInstances;
+    const static QString kAllowMultipleClientInstancesKey;
+
     bool skipMediaFolderScan;
     bool ignoreVersionMismatch;
     bool vsyncDisabled;
@@ -23,6 +26,9 @@ struct QnStartupParameters
     bool forceLocalSettings;
     bool fullScreenDisabled;
     bool showFullInfo;
+
+    bool hasAdminPermissions;
+    const static QString kHasAdminPermissionsKey;
 
     QString devModeKey;
     QString authenticationString;
@@ -38,7 +44,8 @@ struct QnStartupParameters
     QString dynamicCustomizationPath;
 
     /** Uri when the client was launched as uri handler. */
-    QString customUri;
+    nx::vms::utils::SystemUri customUri;
+
     QString enforceSocketType;
     QString enforceMediatorEndpoint;
 };

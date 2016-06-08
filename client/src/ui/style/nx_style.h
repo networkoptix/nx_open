@@ -23,7 +23,8 @@ public:
             kBlue,
             kGreen,
             kBrand,
-            kRed
+            kRed,
+            kYellow
         };
 
         static QString paletteName(Palette palette);

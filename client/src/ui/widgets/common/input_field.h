@@ -4,6 +4,7 @@
 
 #include <ui/utils/validators.h>
 
+class QnPasswordStrengthIndicator;
 class QnInputFieldPrivate;
 class AbstractAccessor;
 
@@ -17,6 +18,7 @@ class QnInputField : public QWidget
 
     Q_PROPERTY(QLineEdit::EchoMode echoMode READ echoMode WRITE setEchoMode)
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
+    Q_PROPERTY(bool passwordIndicatorEnabled READ passwordIndicatorEnabled WRITE setPasswordIndicatorEnabled)
 
     typedef QWidget base_type;
 
@@ -36,6 +38,10 @@ public:
 
     QLineEdit::EchoMode echoMode() const;
     void setEchoMode(QLineEdit::EchoMode value);
+
+    const QnPasswordStrengthIndicator* passwordIndicator() const;
+    bool passwordIndicatorEnabled() const;
+    void setPasswordIndicatorEnabled(bool enabled);
 
     bool isReadOnly() const;
     void setReadOnly(bool value);

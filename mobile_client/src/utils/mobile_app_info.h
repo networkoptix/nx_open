@@ -12,6 +12,7 @@ public:
     Q_INVOKABLE QString productName() const;
     Q_INVOKABLE QString organizationName() const;
     Q_INVOKABLE QString version() const;
+    Q_INVOKABLE QString cloudName() const;
 
     Q_INVOKABLE QUrl oldMobileClientUrl() const;
 };
