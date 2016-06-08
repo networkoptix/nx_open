@@ -204,7 +204,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
         return QList<QnResourcePtr>();
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
-    auto isDW = resourceData.value<bool>("isDW");
+    auto isDW = resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL);
 
     vendor = isDW ? kDwFullVendorName : vendor;
     name = vendor == kIsdFullVendorName ?
@@ -462,7 +462,7 @@ void QnPlISDResourceSearcher::createResource(
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
-    auto isDW = resourceData.value<bool>("isDW");
+    auto isDW = resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL);
     auto vendor = isDW ? kDwFullVendorName :
         (devInfo.manufacturer == lit("ISD") || devInfo.manufacturer == kIsdFullVendorName) ?
             manufacture() :
