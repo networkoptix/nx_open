@@ -24,12 +24,10 @@
 #include <utils/common/app_info.h>
 #include "ui/widgets/main_window.h"
 
-
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
-#include <QtCore/QSettings>
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
@@ -40,17 +38,12 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
-#include <client/client_connection_data.h>
 #include <client/client_resource_processor.h>
 #include <client/client_startup_parameters.h>
 
 #include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
 #include "core/resource/resource_directory_browser.h"
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/client_camera_factory.h>
-
-#include "decoders/video/ipp_h264_decoder.h"
 
 #include <nx/utils/log/log.h>
 #include <utils/common/command_line_parser.h>
@@ -63,11 +56,6 @@
 #endif
 #include "utils/common/util.h"
 #include "core/resource_management/resource_discovery_manager.h"
-
-#include "api/app_server_connection.h"
-
-#include "api/session_manager.h"
-#include "ui/actions/action_manager.h"
 
 #ifdef Q_OS_LINUX
 #include "ui/workaround/x11_launcher_workaround.h"
@@ -239,18 +227,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     else
         mainWindow->updateDecorationsState();
 
-    /* Process input files. */
-    bool haveInputFiles = false;
-    {
-        bool skipArg = true;
-        for (const auto& arg : qApp->arguments())
-        {
-            if (!skipArg)
-                haveInputFiles |= mainWindow->handleMessage(arg);
-            skipArg = false;
-        }
-    }
-
     if (!allowMultipleClientInstances)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 
@@ -284,6 +260,18 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
 
     QnResourceDiscoveryManager::instance()->setReady(true);
     QnResourceDiscoveryManager::instance()->start();
+
+    /* Process input files. */
+    bool haveInputFiles = false;
+    {
+        bool skipArg = true;
+        for (const auto& arg : qApp->arguments())
+        {
+            if (!skipArg)
+                haveInputFiles |= mainWindow->handleMessage(arg);
+            skipArg = false;
+        }
+    }
 
     if (startupParams.customUri.isValid())
     {
