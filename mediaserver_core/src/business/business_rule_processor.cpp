@@ -79,9 +79,6 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
         }
         case QnBusiness::DiagnosticsAction:
         case QnBusiness::ShowPopupAction:
-        case QnBusiness::PlaySoundAction:
-        case QnBusiness::PlaySoundOnceAction:
-        case QnBusiness::SayTextAction:
         case QnBusiness::ShowTextOverlayAction:
         case QnBusiness::ShowOnAlarmLayoutAction:
         case QnBusiness::ExecHttpRequestAction:
