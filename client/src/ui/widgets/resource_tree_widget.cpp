@@ -145,6 +145,34 @@ protected:
                 return rightNodeType == Qn::VideoWallItemNode;
         }
 
+        /* Local resources should be ordered by type first */
+        if (leftNodeType == Qn::ResourceNode &&
+            rightNodeType == Qn::ResourceNode &&
+            leftResource &&
+            rightResource)
+        {
+            if (leftResource->hasFlags(Qn::local) && rightResource->hasFlags(Qn::local))
+            {
+                auto flagsOrder = [](Qn::ResourceFlags flags)
+                {
+                    if (flags.testFlag(Qn::local_image))
+                        return 2;
+
+                    if (flags.testFlag(Qn::local_video))
+                        return 1;
+
+                    /* Exported layouts. */
+                    return 0;
+                };
+
+                Qn::ResourceFlags leftFlagsOrder = flagsOrder(leftResource->flags());
+                Qn::ResourceFlags rightFlagsOrder = flagsOrder(rightResource->flags());
+                if (leftFlagsOrder != rightFlagsOrder)
+                    return leftFlagsOrder < rightFlagsOrder;
+
+            }
+        }
+
         {
             /* Sort by name. */
             QString leftDisplay = left.data(Qt::DisplayRole).toString();
@@ -155,7 +183,7 @@ protected:
         }
 
         /* We want the order to be defined even for items with the same name. */
-        if(leftResource && rightResource)
+        if (leftResource && rightResource)
             return leftResource->getUniqueId() < rightResource->getUniqueId();
 
         return leftResource < rightResource;

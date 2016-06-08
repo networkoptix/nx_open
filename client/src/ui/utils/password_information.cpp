@@ -27,26 +27,26 @@ QnPasswordInformation::QnPasswordInformation(PasswordStrength strength)
 
         case PasswordStrength::Weak:
             m_text = tr("Weak");
-            m_hint = tr("Password should contain different types of symbols");
+            m_hint = tr("Password should contain different types of symbols.");
             m_acceptance = Inacceptable;
             break;
 
         case PasswordStrength::Short:
             m_text = tr("Short");
-            m_hint = tr("Password must be at least 8 characters long");
+            m_hint = tr("Password must be at least 8 characters long.");
             m_acceptance = Inacceptable;
             break;
 
         case PasswordStrength::Common:
             m_text = tr("Common");
-            m_hint = tr("This password is in list of the most popular passwords");
+            m_hint = tr("This password is in list of the most popular passwords.");
             m_acceptance = Inacceptable;
             break;
 
         case PasswordStrength::Incorrect:
         default:
             m_text = tr("Incorrect");
-            m_hint = tr("Only latin letters, numbers and keyboard symbols are allowed");
+            m_hint = tr("Only latin letters, numbers and keyboard symbols are allowed.");
             m_acceptance = Inacceptable;
             break;
     }

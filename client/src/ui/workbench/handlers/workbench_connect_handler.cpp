@@ -545,10 +545,10 @@ void QnWorkbenchConnectHandler::clearConnection()
     action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
-    QnResourceList resourcesToRemove = resourcePool()->getResourcesWithFlag(Qn::remote);
+    QnResourceList resourcesToRemove = qnResPool->getResourcesWithFlag(Qn::remote);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
-    foreach (const QnLayoutResourcePtr& layout, resourcePool()->getResources<QnLayoutResource>())
+    foreach (const QnLayoutResourcePtr& layout, qnResPool->getResources<QnLayoutResource>())
     {
         bool isLocal = snapshotManager()->isLocal(layout);
         bool isFile = layout->isFile();
@@ -561,8 +561,8 @@ void QnWorkbenchConnectHandler::clearConnection()
     foreach(const QnResourcePtr& res, resourcesToRemove)
         idList.push_back(res->getId());
 
-    resourcePool()->removeResources(resourcesToRemove);
-    resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
+    qnResPool->removeResources(resourcesToRemove);
+    qnResPool->removeResources(qnResPool->getAllIncompatibleResources());
 
     QnCameraUserAttributePool::instance()->clear();
     QnMediaServerUserAttributesPool::instance()->clear();

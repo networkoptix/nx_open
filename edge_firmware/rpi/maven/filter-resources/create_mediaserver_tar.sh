@@ -11,14 +11,6 @@ set -e
 #     echo
 # }
 
-# function get_var()
-# {
-#     local h="`grep -R $1 $SRC_DIR/mediaserver/arm/version.h | sed 's/.*"\(.*\)".*/\1/'`"
-#     if [[ "$1" == "QN_CUSTOMIZATION_NAME" && "$h" == "default" ]]; then
-#         h=networkoptix
-#     fi
-#     echo "$h"
-# }
 
 TOOLCHAIN_ROOT=$environment/packages/${box}/gcc-${gcc.version}
 #bananapi uses bpi toolchain

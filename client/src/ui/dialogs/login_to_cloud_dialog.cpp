@@ -51,7 +51,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget *parent)
     connect(ui->passwordLineEdit,   &QLineEdit::textChanged,    d,  &QnLoginToCloudDialogPrivate::updateUi);
 
     ui->createAccountLabel->setText(makeHref(tr("Create account"), QnCloudUrlHelper::createAccountUrl()));
-    ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), QnCloudUrlHelper::createAccountUrl()));
+    ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), QnCloudUrlHelper::restorePasswordUrl()));
 
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), QnCloudUrlHelper::aboutUrl()));
     ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
