@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modules>
+  <cdb>
+    <endpoint>{{cloud_db_host}}:3346</endpoint>
+  </cdb>
+  <hpm>
+    {% for host in connection_mediator_hosts %}
+    <endpoint>{{host}}:3345</endpoint>
+    {% endfor %}
+  </hpm>
+  <notification_module>
+    <endpoint>{{cloud_portal_host}}:80</endpoint>
+  </notification_module>
+</modules>
