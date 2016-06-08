@@ -3,6 +3,7 @@
 
 #include <ui/common/accessor.h>
 #include <ui/style/custom_style.h>
+#include <utils/common/delayed.h>
 
 class QnInputFieldPrivate : public QObject
 {
@@ -20,7 +21,11 @@ public:
         hint->setWordWrap(true);
         input->installEventFilter(this);
         connect(input, &QLineEdit::textChanged,     this, &QnInputFieldPrivate::updatePasswordIndicatorVisibility);
-        connect(input, &QLineEdit::editingFinished, this, &QnInputFieldPrivate::validate);
+        connect(input, &QLineEdit::editingFinished, this, [this]()
+        {
+            const int kValidateDelayMs = 150;
+            executeDelayedParented([this]() { validate(); }, kValidateDelayMs, this);
+        });
     }
 
     virtual bool eventFilter(QObject* watched, QEvent* event)
