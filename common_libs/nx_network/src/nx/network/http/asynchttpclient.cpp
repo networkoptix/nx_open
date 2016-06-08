@@ -355,17 +355,16 @@ namespace nx_http
             m_socket->sendAsync(m_requestBuffer, std::bind(&AsyncHttpClient::asyncSendDone, this, sock, _1, _2));
             return;
         }
-        else
-        {
-            NX_LOGX(lit("Failed to establish tcp connection to %1. %2").
-                arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
-            m_lastSysErrorCode = errorCode;
-            if (reconnectIfAppropriate())
-                return;
-        }
+
+        NX_LOGX(lit("Failed to establish tcp connection to %1. %2").
+            arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+        m_lastSysErrorCode = errorCode;
+        if (reconnectIfAppropriate())
+            return;
 
         m_state = sFailed;
         emit done(sharedThis);
+        m_socket.reset();   //closing failed socket so that it is not reused
     }
 
     void AsyncHttpClient::asyncSendDone(AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten)
@@ -391,6 +390,7 @@ namespace nx_http
             m_state = sFailed;
             m_lastSysErrorCode = errorCode;
             emit done(sharedThis);
+            m_socket.reset();
             return;
         }
 
@@ -422,6 +422,7 @@ namespace nx_http
             NX_LOGX(lit("Error reading (1) http response from %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
             m_state = sFailed;
             emit done(sharedThis);
+            m_socket.reset();
             return;
         }
 
@@ -453,6 +454,7 @@ namespace nx_http
                 : sFailed;
             m_lastSysErrorCode = errorCode;
             emit done(sharedThis);
+            m_socket.reset();
             return;
         }
 

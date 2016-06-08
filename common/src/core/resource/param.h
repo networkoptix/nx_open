@@ -33,6 +33,7 @@ namespace Qn
     static const QString CAMERA_CAPABILITIES_PARAM_NAME = lit("cameraCapabilities");
     static const QString CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = lit("mediaStreams");
     static const QString CAMERA_BITRATE_INFO_LIST_PARAM_NAME = lit("bitrateInfos");
+    static const QString CAMERA_STREAM_URLS_PARAM_NAME = lit("streamUrls");
     static const QString CAMERA_AUDIO_CODEC_PARAM_NAME = lit("audioCodec");
     static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state
@@ -47,6 +48,7 @@ namespace Qn
     static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
     static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
     static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
+    static const QString PTZ_CAPABILITIES_PARAM_NAME = lit("ptzCapabilities");
 
 
     // Mediaserver info for Statistics
@@ -57,6 +59,7 @@ namespace Qn
     static const QString PUBLIC_IP = lit("publicIp");
     static const QString NETWORK_INTERFACES = lit("networkInterfaces");
     static const QString FULL_VERSION = lit("fullVersion");
+    static const QString PRODUCT_NAME_SHORT = lit("productNameShort");
     static const QString SYSTEM_RUNTIME = lit("systemRuntime");
     static const QString BOOKMARK_COUNT = lit("bookmarkCount");
     static const QString HDD_LIST = lit("hddList");

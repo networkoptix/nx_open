@@ -209,6 +209,13 @@ public:
     bool setProperty(const QString &key, const QVariant& value,
                      PropertyOptions options = DEFAULT_OPTIONS);
 
+    template<typename Update>
+    bool updateProperty(const QString &key, const Update& update)
+    {
+        QnMutexLocker lk(&m_mutex); // recursive
+        return setProperty(key, update(getProperty(key)));
+    }
+
     //!Call this with proper field names to emit corresponding *changed signals. Signal can be defined in a derived class
     void emitModificationSignals( const QSet<QByteArray>& modifiedFields );
 

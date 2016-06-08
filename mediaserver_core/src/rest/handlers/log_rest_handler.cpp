@@ -9,15 +9,20 @@
 
 #include <media_server/serverutil.h>
 
-static const int READ_BLOCK_SIZE = 1024*512;
 
 namespace {
-const QString idParam = lit("id");
+static const int kReadBlockSize = 1024 * 512;
+static const QString kIdParam = lit("id");
 }
 
-int QnLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+int QnLogRestHandler::executeGet(
+    const QString& path,
+    const QnRequestParamList& params,
+    QByteArray& result,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor*)
 {
-    Q_UNUSED(path)
+    Q_UNUSED(path);
 
     qint64 linesToRead = 100;
     for (int i = 0; i < params.size(); ++i)
@@ -30,7 +35,7 @@ int QnLogRestHandler::executeGet(const QString& path, const QnRequestParamList& 
     }
 
     int logId = 0;
-    const auto idIter = params.find(idParam);
+    const auto idIter = params.find(kIdParam);
     if (idIter != params.end())
         logId = idIter->second.toInt();
 
@@ -52,7 +57,7 @@ int QnLogRestHandler::executeGet(const QString& path, const QnRequestParamList& 
     }
     qint64 fileSize = f.size();
 
-    qint64 currentOffset = qMax(0ll, fileSize - READ_BLOCK_SIZE);
+    qint64 currentOffset = qMax(0ll, fileSize - kReadBlockSize);
     qint64 readedLines = 0;
     qint64 totalSize = 0;
     QList<QPair<char*, qint64> > buffers;
@@ -60,30 +65,32 @@ int QnLogRestHandler::executeGet(const QString& path, const QnRequestParamList& 
     while (readedLines <= linesToRead && currentOffset >= 0)
     {
         f.seek(currentOffset);
-        char* buffer = new char[READ_BLOCK_SIZE];
-        int readed = f.read(buffer, READ_BLOCK_SIZE);
-        if (readed < 1) {
-            delete [] buffer;
+        char* buffer = new char[kReadBlockSize];
+        int readed = f.read(buffer, kReadBlockSize);
+        if (readed < 1)
+        {
+            delete[] buffer;
             break;
         }
         readedLines += QByteArray::fromRawData(buffer, readed).count('\n');
         buffers << QPair<char*, qint64>(buffer, readed);
-        currentOffset -= READ_BLOCK_SIZE;
+        currentOffset -= kReadBlockSize;
         totalSize += readed;
     }
-    if (!buffers.isEmpty()) {
+    if (!buffers.isEmpty())
+    {
         QByteArray tmp = QByteArray::fromRawData(buffers.last().first, buffers.last().second);
-        for (;readedLines > linesToRead && ignoreHeaderSize < tmp.size(); readedLines--)
-            ignoreHeaderSize = tmp.indexOf('\n', ignoreHeaderSize)+1;
+        for (; readedLines > linesToRead && ignoreHeaderSize < tmp.size(); readedLines--)
+            ignoreHeaderSize = tmp.indexOf('\n', ignoreHeaderSize) + 1;
     }
     ignoreHeaderSize = qMax(0, ignoreHeaderSize);
 
     QByteArray solidArray;
     solidArray.reserve(totalSize);
-    for (int i = buffers.size()-1; i >=0; --i)
+    for (int i = buffers.size() - 1; i >= 0; --i)
     {
-        if (i == buffers.size()-1)
-            solidArray.append(buffers[i].first+ignoreHeaderSize, buffers[i].second - ignoreHeaderSize);
+        if (i == buffers.size() - 1)
+            solidArray.append(buffers[i].first + ignoreHeaderSize, buffers[i].second - ignoreHeaderSize);
         else
             solidArray.append(buffers[i].first, buffers[i].second);
         delete buffers[i].first;
@@ -93,8 +100,14 @@ int QnLogRestHandler::executeGet(const QString& path, const QnRequestParamList& 
     return nx_http::StatusCode::ok;
 }
 
-int QnLogRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
-                                  QByteArray& contentType, const QnRestConnectionProcessor* owner)
+int QnLogRestHandler::executePost(
+    const QString& path,
+    const QnRequestParamList& params,
+    const QByteArray& /*body*/,
+    const QByteArray& /*srcBodyContentType*/,
+    QByteArray& result,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
 {
     return executeGet(path, params, result, contentType, owner);
 }

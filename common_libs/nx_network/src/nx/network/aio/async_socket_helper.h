@@ -750,7 +750,10 @@ private:
         if (eventType == aio::etNone || eventType == aio::etRead)
             nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etRead, true);
         if (eventType == aio::etNone || eventType == aio::etWrite)
+        {
             nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etWrite, true);
+            m_asyncSendIssued = false;
+        }
         if (eventType == aio::etNone || eventType == aio::etTimedOut)
             nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etTimedOut, true);
     }
@@ -858,6 +861,7 @@ public:
             {
                 nx::network::SocketGlobals::aioService().removeFromWatch(
                     m_sock, aio::etRead, true);
+
                 ++m_acceptAsyncCallCount;
                 handler();
             });
@@ -869,6 +873,16 @@ public:
         nx::utils::promise< bool > promise;
         cancelIOAsync( [ & ](){ promise.set_value( true ); } );
         promise.get_future().wait();
+    }
+
+    void stopPolling()
+    {
+        nx::network::SocketGlobals::aioService().cancelPostedCalls(
+            m_sock, true);
+        nx::network::SocketGlobals::aioService().removeFromWatch(
+            m_sock, aio::etRead, true);
+        nx::network::SocketGlobals::aioService().removeFromWatch(
+            m_sock, aio::etTimedOut, true);
     }
 
 private:

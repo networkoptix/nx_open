@@ -9,3 +9,8 @@ QString AppInfo::nativeUriProtocol()
 {
     return QStringLiteral("${uri.protocol}");
 }
+
+QString AppInfo::nativeUriProtocolDescription()
+{
+    return QStringLiteral("${display.product.name} Client Protocol");
+}

@@ -27,7 +27,7 @@ namespace {
     const int ICON_SIZE = 32;
 
     void setDefaultSoundIcon(QLabel *label) {
-        label->setPixmap(qnSkin->dpPixmap("microphone.png", QSize(ICON_SIZE, ICON_SIZE), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        label->setPixmap(qnSkin->pixmap("microphone.png", QSize(ICON_SIZE, ICON_SIZE), Qt::KeepAspectRatio, Qt::SmoothTransformation));
     }
 
 } // anonymous namespace

@@ -28,6 +28,7 @@ static const uint SENDING_MIN_INTERVAL = 24 * 60 * 60; /* secs => a day */
 static const uint SENDING_MIN_SIZE = 1 * 1024; /* less then 1kb is not informative */
 static const uint SENDING_MAX_SIZE = 32 * 1024 * 1024; /* over 30mb is too big */
 static const uint SCAN_TIMER_CYCLE = 10 * 60 * 1000; /* every 10 minutes */
+static const uint KEEP_LAST_CRASHES = 10;
 
 static QFileInfoList readCrashes(const QString& prefix = QString())
 {
@@ -47,7 +48,15 @@ static QFileInfoList readCrashes(const QString& prefix = QString())
     NX_LOG(lit("readCrashes: scan %1 for files %2")
            .arg(crashDir.absolutePath()).arg(crashFilter), cl_logDEBUG1);
 
-    return crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files, QDir::Time);
+    auto files = crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files);
+    std::sort(
+        files.begin(), files.end(),
+        [](const QFileInfo& left, const QFileInfo& right)
+        {
+            return left.lastModified() > right.lastModified();
+        });
+
+    return std::move(files);
 }
 
 namespace ec2 {
@@ -83,10 +92,19 @@ CrashReporter::~CrashReporter()
 
 bool CrashReporter::scanAndReport(QSettings* settings)
 {
+    // remove old crashes
+    {
+        auto allCrashes = readCrashes(lit("*"));
+        for (uint i = 0; i < KEEP_LAST_CRASHES && !allCrashes.isEmpty(); ++i)
+            allCrashes.pop_front();
+
+        for (const auto& crash : allCrashes)
+            QFile::remove(crash.absoluteFilePath());
+    }
+
     const auto admin = qnResPool->getAdministrator();
     if (!admin)
         return false;
-
 
     if (!qnGlobalSettings->isStatisticsAllowed()
         || qnGlobalSettings->isNewSystem())
@@ -229,11 +247,6 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
                       m_crashFile.absoluteDir().absoluteFilePath(
                           SENT_PREFIX + m_crashFile.fileName()));
     }
-
-    auto allCrashes = readCrashes(lit("*"));
-    allCrashes.pop_front();
-    for (const auto& crash : allCrashes)
-        QFile::remove(crash.absoluteFilePath());
 
     QnMutexLocker lock(&m_host.m_mutex);
     NX_ASSERT(!m_host.m_activeHttpClient || m_host.m_activeHttpClient == httpClient);

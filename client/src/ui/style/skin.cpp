@@ -104,15 +104,15 @@ QIcon QnSkin::icon(const QIcon& icon)
 }
 
 
-QPixmap QnSkin::dpPixmap(const char* name,
+QPixmap QnSkin::pixmap(const char* name,
     const QSize& size,
     Qt::AspectRatioMode aspectMode,
     Qt::TransformationMode mode)
 {
-    return dpPixmap(QString::fromLatin1(name), size, aspectMode, mode);
+    return pixmap(QString::fromLatin1(name), size, aspectMode, mode);
 }
 
-QPixmap QnSkin::dpPixmap(const QString& name, 
+QPixmap QnSkin::pixmap(const QString& name, 
     const QSize& size, 
     Qt::AspectRatioMode aspectMode, 
     Qt::TransformationMode mode)
