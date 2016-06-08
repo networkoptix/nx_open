@@ -563,6 +563,13 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
+                <dependency>
+                    <groupId>org</groupId>
+                    <artifactId>festival</artifactId>
+                    <version>${festival.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-bpi</classifier>
+                </dependency>
             </dependencies>
         </profile>
 
@@ -696,6 +703,13 @@
                     <version>1.7.0-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org</groupId>
+                    <artifactId>festival</artifactId>
+                    <version>${festival.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-bpi</classifier>
                 </dependency>
             </dependencies>
         </profile>
