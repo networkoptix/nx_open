@@ -5,15 +5,23 @@
 
 #include <client/client_startup_parameters.h>
 
-class QnClientModule: public QObject 
+class QnClientModule: public QObject
 {
     Q_OBJECT
 
 public:
-    QnClientModule(const QnStartupParameters &startupParams = QnStartupParameters()
-        , QObject *parent = NULL);
-
+    QnClientModule(const QnStartupParameters &startupParams = QnStartupParameters(), QObject *parent = NULL);
     virtual ~QnClientModule();
+
+private:
+    void initThread();
+    void initApplication();
+    void initMetaInfo();
+    void initSingletons     (const QnStartupParameters& startupParams);
+    void initRuntimeParams  (const QnStartupParameters& startupParams);
+    void initLog            (const QnStartupParameters& startupParams);
+    void initNetworkSockets (const QnStartupParameters& startupParams);
+    void initSkin           (const QnStartupParameters& startupParams);
 };
 
 
