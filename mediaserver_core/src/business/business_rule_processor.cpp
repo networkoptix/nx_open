@@ -79,9 +79,6 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
         }
         case QnBusiness::DiagnosticsAction:
         case QnBusiness::ShowPopupAction:
-        case QnBusiness::PlaySoundAction:
-        case QnBusiness::PlaySoundOnceAction:
-        case QnBusiness::SayTextAction:
         case QnBusiness::ShowTextOverlayAction:
         case QnBusiness::ShowOnAlarmLayoutAction:
         case QnBusiness::ExecHttpRequestAction:
@@ -147,6 +144,17 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
         if (action->getParams().useSource)
             resources << qnResPool->getResources<QnNetworkResource>(action->getSourceResources());
         break;
+
+    case QnBusiness::SayTextAction:
+    case QnBusiness::PlaySoundAction:
+    case QnBusiness::PlaySoundOnceAction:
+        {
+            // execute say to client once and before proxy
+            if(!action->isReceivedFromRemoteHost() && action->getParams().playToClient)
+                broadcastBusinessAction(action);
+            break;
+        }
+
     default:
         break;
     }
@@ -192,16 +200,6 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
     case QnBusiness::ShowOnAlarmLayoutAction:
     case QnBusiness::ShowTextOverlayAction:
         return broadcastBusinessAction(action);
-
-    case QnBusiness::SayTextAction:
-    case QnBusiness::PlaySoundAction:
-    case QnBusiness::PlaySoundOnceAction:
-    {
-        auto params = action->getParams();
-        if(params.playToClient)
-            broadcastBusinessAction(action);
-        break;
-    }
 
     default:
         break;
