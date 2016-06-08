@@ -151,8 +151,8 @@ QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlay
     : base_type(widget)
     , q_ptr(widget)
     , connectionOpened(false)
-    , indicatorOnPixmap(qnSkin->pixmap("item/io_indicator_on.png"))
-    , indicatorOffPixmap(qnSkin->pixmap("item/io_indicator_off.png"))
+    , indicatorOnPixmap(qnSkin->dpPixmap("item/io_indicator_on.png"))
+    , indicatorOffPixmap(qnSkin->dpPixmap("item/io_indicator_off.png"))
     , timer(new QTimer(this))
 
     , controlsLayout(createGridLayout())

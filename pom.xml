@@ -37,6 +37,7 @@
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
         <nx_network.guid>{71fb3cab-00f4-41a3-af08-ae0a61b8c79e}</nx_network.guid>
         <nx_utils.guid>{81BDC343-5614-4C4D-90E8-147A024BEAF4}</nx_utils.guid>
+        <nx_vms_utils.guid>{c4174ab7-1537-498b-8c4d-091d05e4735a}</nx_vms_utils.guid>
         <udt.guid>{7f5cd83f-b59e-4020-b35b-de4edaf66233}</udt.guid>
         <cloud_db_client.guid>{0F7C2BCF-DA0B-4E2E-8F4B-564AE63FAD73}</cloud_db_client.guid>
         <nx_audio.guid>{d335c660-3c62-4048-a1eb-b1606159a2dd}</nx_audio.guid>
@@ -401,6 +402,7 @@
                 <module>common</module>
                 <module>common_libs/nx_network</module>
                 <module>common_libs/nx_utils</module>
+                <module>common_libs/nx_vms_utils</module>
                 <module>common_libs/udt</module>
                 <module>nx_cloud/cloud_db_client</module>
                 <module>common_libs/nx_streaming</module>

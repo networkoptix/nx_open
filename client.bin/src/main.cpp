@@ -41,7 +41,7 @@
 #include <client/client_connection_data.h>
 #include <client/client_resource_processor.h>
 #include <client/client_startup_parameters.h>
-#include <client/system_uri_resolver.h>
+
 
 #include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
@@ -113,6 +113,7 @@
 #include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
+#include <nx/vms/utils/system_uri.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
@@ -519,8 +520,45 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->start();
 
 
-    if (!startupParams.customUri.isEmpty())
+    if (startupParams.customUri.isValid())
     {
+        using namespace nx::vms::utils;
+        switch (startupParams.customUri.clientCommand())
+        {
+            case SystemUri::ClientCommand::LoginToCloud:
+            {
+                SystemUri::Auth auth = startupParams.customUri.authenticator();
+                qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(auth.user, auth.password, true);
+                break;
+            }
+            case SystemUri::ClientCommand::ConnectToSystem:
+            {
+                SystemUri::Auth auth = startupParams.customUri.authenticator();
+                QString systemId = startupParams.customUri.systemId();
+                QnUuid cloudSystemId = QnUuid::fromStringSafe(systemId);
+                if (!cloudSystemId.isNull())
+                {
+                    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(auth.user, auth.password, true);
+                    QUrl cloudUrl(systemId);
+                    cloudUrl.setUserName(auth.user);
+                    cloudUrl.setPassword(auth.password);
+                    context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, cloudUrl));
+                }
+                else
+                {
+                    QUrl directUrl(systemId);
+                    directUrl.setUserName(auth.user);
+                    directUrl.setPassword(auth.password);
+                    context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, directUrl));
+                }
+                break;
+            }
+            default:
+                break;
+        }
+
+
+        /*
         QnSystemUriResolver resolver(QUrl::fromUserInput(startupParams.customUri));
         if (resolver.isValid())
         {
@@ -539,7 +577,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
                 }
             }
         }
-
+        */
     }
     /* If no input files were supplied --- open connection settings dialog.
      * Do not try to connect in the following cases:
@@ -626,6 +664,7 @@ int main(int argc, char **argv)
     mac_setLimits();
 #endif
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
 
     // this is necessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created

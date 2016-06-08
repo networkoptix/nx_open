@@ -18,8 +18,6 @@ struct QnAppInfo
     static QString applicationPlatformModification();
     static QString applicationCompiler();
 
-    static QString applicationUriProtocol();
-
     static QString engineVersion();
     static QString ffmpegVersion();
     static QString sigarVersion();
@@ -70,8 +68,10 @@ struct QnAppInfo
     inline
     static QString applicationFullVersion()
     {
+        static const QString kFullVersionTemplate(QLatin1String("%1-%2-%3%4"));
+
         // TODO: static const when VS supports c++11
-        return QString(QLatin1String("%1-%2-%3%4"))
+        return kFullVersionTemplate
                 .arg(applicationVersion())
                 .arg(applicationRevision())
                 .arg(customizationName().replace(QLatin1Char(' '), QLatin1Char('_')))

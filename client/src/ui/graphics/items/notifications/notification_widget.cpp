@@ -10,6 +10,7 @@
 #include <ui/common/geometry.h>
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/generic/proxy_label.h>
+#include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -48,9 +49,9 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
 {
     setClickableButtons(Qt::RightButton);
 
-    m_textLabel = new QnProxyLabel(this);
+    m_textLabel = new GraphicsLabel(this);
     m_textLabel->setAlignment(Qt::AlignLeft);
-    m_textLabel->setWordWrap(true);
+//    m_textLabel->setWordWrap(true);   // TODO: #ynikitenkov improve GraphicsWidget VMS-2805
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget(
@@ -88,7 +89,7 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
     if (!provider->image().isNull()) {
         m_thumbnailLabel->setPixmap(QPixmap::fromImage(provider->image()));
     } else {
-        m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
+        m_thumbnailLabel->setPixmap(qnSkin->dpPixmap("events/thumb_loading.png"));
     }
     connect(provider, &QnImageProvider::imageChanged, this, [this](const QImage &image) {
         m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
@@ -176,8 +177,8 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem *parent, Qt::WindowFlag
     m_overlayWidget = new QnFramedWidget(this);
     m_overlayWidget->setFrameStyle(Qt::NoPen);
 
-    m_textLabel = new QnProxyLabel(this);
-    m_textLabel->setWordWrap(true);
+    m_textLabel = new GraphicsLabel(this);
+   // m_textLabel->setWordWrap(true); // TODO: #ynikitenkov improve GraphicsWidget VMS-2805
     m_textLabel->setAlignment(Qt::AlignCenter);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 

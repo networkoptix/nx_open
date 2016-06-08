@@ -134,13 +134,13 @@ QIcon QnNoptixIconLoader::load(const QString& name, const QString& checkedName, 
 
     /* Create normal icon. */
     QnIconBuilder builder;
-    builder.addPixmap(skin->pixmap(name), QnIcon::Normal, QnIcon::Off);
+    builder.addPixmap(skin->dpPixmap(name), QnIcon::Normal, QnIcon::Off);
 
     for (int i = 0; i < numModes; ++i)
     {
         path = prefix + lit("_") + modes[i].second + suffix;
         if (skin->hasFile(path))
-            builder.addPixmap(skin->pixmap(path), modes[i].first, QnIcon::Off);
+            builder.addPixmap(skin->dpPixmap(path), modes[i].first, QnIcon::Off);
     }
 
     decompose(checkedName.isEmpty() ? prefix + lit("_checked") + suffix : checkedName, &prefix, &suffix);
@@ -148,13 +148,13 @@ QIcon QnNoptixIconLoader::load(const QString& name, const QString& checkedName, 
     /* Create checked icon. */
     path = prefix + suffix;
     if (skin->hasFile(path))
-        builder.addPixmap(skin->pixmap(path), QnIcon::On);
+        builder.addPixmap(skin->dpPixmap(path), QnIcon::On);
 
     for (int i = 0; i < numModes; ++i)
     {
         path = prefix + lit("_") + modes[i].second + suffix;
         if (skin->hasFile(path))
-            builder.addPixmap(skin->pixmap(path), modes[i].first, QnIcon::On);
+            builder.addPixmap(skin->dpPixmap(path), modes[i].first, QnIcon::On);
     }
 
     QIcon icon = builder.createIcon();
