@@ -33,7 +33,7 @@ QnResourceDataPool::QnResourceDataPool(QObject *parent):
     m_shortVendorByName.insert(lit("panoramic"), lit("dw"));
     m_shortVendorByName.insert(lit("ipnc"), lit("dw"));
     m_shortVendorByName.insert(lit("acti corporation"), lit("acti"));
-    m_shortVendorByName.insert(lit("innovative security design"), lit("isd"));
+    m_shortVendorByName.insert(lit("innovative security designs"), lit("isd"));
     m_shortVendorByName.insert(lit("norbain_"), lit("vista"));
     m_shortVendorByName.insert(lit("norbain"), lit("vista"));
 }

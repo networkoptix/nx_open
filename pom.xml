@@ -567,6 +567,10 @@
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
+
+            <modules>
+                <module>common_libs/nx_speach_synthesizer</module>
+            </modules>
         </profile>
 
         <profile>

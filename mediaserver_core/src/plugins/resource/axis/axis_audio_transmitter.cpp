@@ -27,7 +27,6 @@ namespace
 QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res) :
     QnAbstractAudioTransmitter(),
     m_resource(res),
-    m_httpClient(nx_http::AsyncHttpClient::create()),
     m_noAuth(false),
     m_state(TransmitterState::WaitingForConnection)
 {
@@ -36,8 +35,6 @@ QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res) :
 
 QnAxisAudioTransmitter::~QnAxisAudioTransmitter()
 {
-    if (m_httpClient)
-        m_httpClient->terminate();
     stop();
 }
 
@@ -45,9 +42,7 @@ QnAxisAudioTransmitter::~QnAxisAudioTransmitter()
 void QnAxisAudioTransmitter::pleaseStop()
 {
     base_type::pleaseStop();
-
-    if (m_httpClient)
-        m_httpClient->terminate();
+    m_wait.wakeOne();
 }
 
 
@@ -104,11 +99,6 @@ void QnAxisAudioTransmitter::prepare()
     m_transcoder.reset(new QnFfmpegAudioTranscoder(toFfmpegCodec(m_outputFormat.codec())));
     m_transcoder->setSampleRate(m_outputFormat.sampleRate());
     m_state = TransmitterState::WaitingForConnection;
-    if (m_httpClient)
-    {
-        m_httpClient->terminate();
-        m_httpClient.reset();
-    }
 }
 
 void QnAxisAudioTransmitter::at_requestHeadersHasBeenSent(
@@ -128,19 +118,6 @@ void QnAxisAudioTransmitter::at_httpDone(nx_http::AsyncHttpClientPtr http)
     if (http->state() == nx_http::AsyncHttpClient::State::sFailed)
     {
         m_state = TransmitterState::Failed;
-
-        if (m_socket)
-        {
-            m_socket->cancelAsyncIO();
-            m_socket.clear();
-        }
-
-        if (m_httpClient)
-        {
-            m_httpClient->terminate();
-            m_httpClient.reset();
-        }
-
         m_wait.wakeOne();
     }
 }
@@ -157,48 +134,25 @@ bool QnAxisAudioTransmitter::startTransmission()
     if (!mServer)
         return false;
 
-    if (m_httpClient)
-        m_httpClient->terminate();
-
-    m_httpClient = nx_http::AsyncHttpClient::create();
-
-    if (m_socket)
-    {
-        m_socket->cancelAsyncIO();
-        m_socket.clear();
-    }
-
-    if (mServer->getId() != qnCommon->moduleGUID())
-    {
-        // proxy request to foreign camera
-        auto route = QnRouter::instance()->routeTo(mServer->getId());
-        if (route.addr.isNull())
-            return false;
-
-        m_httpClient->addAdditionalHeader(
-            Qn::CAMERA_GUID_HEADER_NAME,
-            m_resource->getId().toByteArray());
-
-        url.setHost(route.addr.address.toString());
-        url.setPort(route.addr.port);
-    }
+    m_socket.clear();
 
     auto auth = m_resource->getAuth();
     m_noAuth = auth.user().isEmpty() && auth.password().isEmpty();
 
-    m_httpClient->setUserName(auth.user());
-    m_httpClient->setUserPassword(auth.password());
-    m_httpClient->setDisablePrecalculatedAuthorization(true);
+    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    httpClient->setUserName(auth.user());
+    httpClient->setUserPassword(auth.password());
+    httpClient->setDisablePrecalculatedAuthorization(true);
 
     QObject::connect(
-        m_httpClient.get(),
+        httpClient.get(),
         &nx_http::AsyncHttpClient::requestHasBeenSent,
         this,
         &QnAxisAudioTransmitter::at_requestHeadersHasBeenSent,
         Qt::DirectConnection);
 
     QObject::connect(
-        m_httpClient.get(),
+        httpClient.get(),
         &nx_http::AsyncHttpClient::done,
         this,
         &QnAxisAudioTransmitter::at_httpDone,
@@ -213,7 +167,7 @@ bool QnAxisAudioTransmitter::startTransmission()
     nx_http::StringType contentType(mimeType());
     nx_http::StringType contentBody;
 
-    m_httpClient
+    httpClient
         ->doPost(
             url,
             contentType,
@@ -223,7 +177,7 @@ bool QnAxisAudioTransmitter::startTransmission()
     m_timer.restart();
     QnMutexLocker lock(&m_mutex);
     while (m_state == TransmitterState::WaitingForConnection &&
-           m_timer.elapsed() < kTransmissionTimeout )
+           m_timer.elapsed() < kTransmissionTimeout && !m_needStop)
     {
         auto waitDuration = kTransmissionTimeout - m_timer.elapsed();
         if (waitDuration <= 0)
@@ -234,14 +188,16 @@ bool QnAxisAudioTransmitter::startTransmission()
 
     if (m_state == TransmitterState::ReadyForTransmission)
     {
-        return true;
+        m_socket = httpClient->takeSocket();
+        m_socket->setNonBlockingMode(false);
     }
     else
     {
         m_state = TransmitterState::Failed;
-        return false;
     }
 
+    httpClient->terminate();
+    return m_socket != nullptr;
 }
 
 bool QnAxisAudioTransmitter::sendData(
@@ -274,13 +230,7 @@ bool QnAxisAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data)
         return true; //< always return true. It means skip input data.
 
     if (!m_socket)
-        m_socket = m_httpClient->takeSocket();
-
-    if (!m_socket)
         return true;
-
-    m_socket->cancelAsyncIO();
-
     QnAbstractMediaDataPtr transcoded;
     do
     {

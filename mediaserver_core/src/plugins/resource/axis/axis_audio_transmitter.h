@@ -54,7 +54,6 @@ private:
     QnSecurityCamResource* m_resource;
     std::unique_ptr<QnFfmpegAudioTranscoder> m_transcoder;
     QnAudioFormat m_outputFormat;
-    nx_http::AsyncHttpClientPtr m_httpClient;
     QSharedPointer<AbstractStreamSocket> m_socket;
 
     bool m_noAuth;

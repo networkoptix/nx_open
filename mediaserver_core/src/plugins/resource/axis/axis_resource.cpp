@@ -811,30 +811,19 @@ CLHttpStatus QnPlAxisResource::readAxisParameter(
     const QString& paramName,
     QVariant* paramValue )
 {
-    CLHttpStatus status = httpClient->doGET( lit("axis-cgi/param.cgi?action=list&group=%1").arg(paramName).toLatin1() );
-    if( status == CL_HTTP_SUCCESS )
+    QList<QPair<QByteArray,QByteArray>> params;
+    auto result = readAxisParameters(paramName, httpClient, params);
+    if (result != CL_HTTP_SUCCESS)
+        return result;
+    for (auto itr = params.constBegin(); itr != params.constEnd(); ++itr)
     {
-        QByteArray body;
-        httpClient->readAll( body );
-        const QStringList& paramItems = QString::fromLatin1(body.data()).split(QLatin1Char('='));
-        if( paramItems.size() == 2 && paramItems[0] == paramName )
+        if (itr->first == paramName)
         {
-            *paramValue = paramItems[1];
+            *paramValue = itr->second;
             return CL_HTTP_SUCCESS;
         }
-        else
-        {
-            NX_LOG( lit("Failed to read param %1 of camera %2. Unexpected response: %3").
-                arg(paramName).arg(getHostAddress()).arg(QLatin1String(body)), cl_logWARNING );
-            return CL_HTTP_BAD_REQUEST;
-        }
     }
-    else
-    {
-        NX_LOG( lit("Failed to param %1 of camera %2. Result: %3").
-            arg(paramName).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
-        return status;
-    }
+    return CL_HTTP_BAD_REQUEST;
 }
 
 CLHttpStatus QnPlAxisResource::readAxisParameter(

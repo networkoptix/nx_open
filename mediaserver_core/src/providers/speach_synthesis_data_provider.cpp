@@ -1,3 +1,5 @@
+#if !defined(EDGE_SERVER)
+
 #include <nx_speach_synthesizer/text_to_wav.h>
 #include "speach_synthesis_data_provider.h"
 #include <core/dataconsumer/audio_data_transmitter.h>
@@ -106,5 +108,7 @@ QByteArray QnSpeachSynthesisDataProvider::doSynthesis(const QString &text)
     ttvInstance->generateSoundSync(text, &soundBuf);
     return soundBuf.data().mid(kSynthesizerOutputHeaderSize);
 }
+
+#endif
 
 

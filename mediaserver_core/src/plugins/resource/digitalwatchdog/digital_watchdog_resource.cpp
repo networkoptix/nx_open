@@ -32,6 +32,11 @@ QnDigitalWatchdogResource::~QnDigitalWatchdogResource()
 {
 }
 
+bool QnDigitalWatchdogResource::isCproChipset() const
+{
+    return getFirmware().startsWith("A");
+}
+
 CLSimpleHTTPClient QnDigitalWatchdogResource::httpClient() const
 {
     return CLSimpleHTTPClient(getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
@@ -44,39 +49,39 @@ bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
 
     CLSimpleHTTPClient http (getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=onvif"));
-    if (status == CL_HTTP_SUCCESS) 
+    if (status == CL_HTTP_SUCCESS)
     {
         QByteArray body;
         http.readAll(body);
         QList<QByteArray> lines = body.split(',');
-        for (int i = 0; i < lines.size(); ++i) 
+        for (int i = 0; i < lines.size(); ++i)
         {
-            if (lines[i].toLower().contains("onvif_stream_number")) 
+            if (lines[i].toLower().contains("onvif_stream_number"))
             {
                 QList<QByteArray> params = lines[i].split(':');
-                if (params.size() >= 2) 
+                if (params.size() >= 2)
                 {
                     int streams = params[1].trimmed().toInt();
-                    
+
                     return streams >= 2;
                 }
             }
         }
     }
-    else if (status == CL_HTTP_AUTH_REQUIRED) 
+    else if (status == CL_HTTP_AUTH_REQUIRED)
     {
         unauth = true;
         setStatus(Qn::Unauthorized);
         return false;
     }
-    
+
     return true; // ignore other error (for cameras with non standart HTTP port)
 }
 
-CameraDiagnostics::Result QnDigitalWatchdogResource::initInternal() 
+CameraDiagnostics::Result QnDigitalWatchdogResource::initInternal()
 {
     bool unauth = false;
-    if (!isDualStreamingEnabled(unauth) && unauth==false) 
+    if (!isDualStreamingEnabled(unauth) && unauth==false)
     {
         if (m_appStopping)
             return CameraDiagnostics::UnknownErrorResult();
@@ -119,7 +124,7 @@ bool QnDigitalWatchdogResource::disableB2FramesForActiDW()
     return result == CL_HTTP_SUCCESS;
 }
 
-QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal() 
+QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal()
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     bool useHttpPtz = resourceData.value<bool>(lit("dw-http-ptz"), false);
@@ -139,18 +144,22 @@ QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal(
     return result.take();
 }
 
-bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const 
+bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-    if (resourceData.value<bool>(lit("dw-pravis-chipset")))
+    if (isCproChipset())
+        return base_type::loadAdvancedParametersTemplate(params); //< dw-cpro chipset
+    else if (resourceData.value<bool>(lit("dw-pravis-chipset")))
         return loadXmlParametersInternal(params, lit(":/camera_advanced_params/dw-pravis.xml"));
     else
         return loadXmlParametersInternal(params, lit(":/camera_advanced_params/dw.xml"));
 }
 
-void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params) 
+void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params)
 {
     base_type::initAdvancedParametersProviders(params);
+    if (isCproChipset())
+        return;
 
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     if (resourceData.value<bool>(lit("dw-pravis-chipset")))
@@ -160,7 +169,11 @@ void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvanced
     m_cameraProxy->setCameraAdvancedParams(params);
 }
 
-QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() const {
+QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() const
+{
+    if (isCproChipset())
+        return base_type::calculateSupportedAdvancedParameters();
+
     QSet<QString> result = base_type::calculateSupportedAdvancedParameters();
     for (const QnCameraAdvancedParamValue& value: m_cameraProxy->getParamsList())
         result.insert(value.id);
@@ -169,6 +182,9 @@ QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() 
 
 void QnDigitalWatchdogResource::fetchAndSetAdvancedParameters() {
     base_type::fetchAndSetAdvancedParameters();
+    if (isCproChipset())
+        return;
+
     QString cameraModel = fetchCameraModel();
     m_hasZoom = modelHasZoom(cameraModel);
 }
@@ -182,14 +198,14 @@ QString QnDigitalWatchdogResource::fetchCameraModel() {
     DeviceInfoResp response;
 
     int soapRes = soapWrapper.getDeviceInformation(request, response);
-    if (soapRes != SOAP_OK) 
+    if (soapRes != SOAP_OK)
     {
         qWarning() << "QnDigitalWatchdogResource::fetchCameraModel: GetDeviceInformation SOAP to endpoint "
             << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
             << ". " << soapWrapper.getLastError() << ". Only base (base for DW) advanced settings will be available for this camera.";
 
         return QString();
-    } 
+    }
 
     return QString::fromUtf8(response.Model.c_str());
 }
@@ -219,9 +235,12 @@ bool QnDigitalWatchdogResource::setAdvancedParameterUnderLock(const QnCameraAdva
 
 bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
 {
+    if (isCproChipset())
+        return base_type::setAdvancedParametersUnderLock(values, result);
+
     bool success = true;
     QVector<QPair<QnCameraAdvancedParameter, QString>> moreParamsToProcess;
-    for(const QnCameraAdvancedParamValue &value: values) 
+    for(const QnCameraAdvancedParamValue &value: values)
     {
         QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(value.id);
         if (parameter.isValid()) {
