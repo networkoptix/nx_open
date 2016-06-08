@@ -7,8 +7,8 @@
 
 using namespace nx::vms::utils;
 
-namespace
-{
+namespace {
+
 const QString kAuthKey = "auth";
 const QString kReferralSourceKey = "from";
 const QString kReferralContextKey = "context";

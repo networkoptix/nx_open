@@ -6,24 +6,22 @@
 #include <QtCore/QHash>
 #include <QtCore/QString>
 
-namespace nx
-{
-namespace vms
-{
-namespace utils
-{
-    /**
-     * Classes for handling and constructing generic URI protocol links.
-     *
-     * Full scheme looks like:
-     * * {protocol}://{domain}/{client_command}/{system_id}{system_action}?auth={access_key}&{action_parameters}
-     *
-     * @see https://networkoptix.atlassian.net/wiki/display/PM/NX+URL+Scheme
-     *
-     * Protocol part is customizable, so we don't parse it here.
-     * Auth is encoded as base64(login:pass).
-     * All query parameters are url-encoded.
-     */
+namespace nx {
+namespace vms {
+namespace utils {
+
+/**
+ * Classes for handling and constructing generic URI protocol links.
+ *
+ * Full scheme looks like:
+ * * {protocol}://{domain}/{client_command}/{system_id}{system_action}?auth={access_key}&{action_parameters}
+ *
+ * @see https://networkoptix.atlassian.net/wiki/display/PM/NX+URL+Scheme
+ *
+ * Protocol part is customizable, so we don't parse it here.
+ * Auth is encoded as base64(login:pass).
+ * All query parameters are url-encoded.
+ */
 class SystemUriPrivate;
 
 class NX_VMS_UTILS_API SystemUri
