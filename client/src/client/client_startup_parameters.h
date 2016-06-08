@@ -16,6 +16,8 @@ struct QnStartupParameters
     int screen;
 
     bool allowMultipleClientInstances;
+    const static QString kAllowMultipleClientInstancesKey;
+
     bool skipMediaFolderScan;
     bool ignoreVersionMismatch;
     bool vsyncDisabled;
@@ -24,6 +26,9 @@ struct QnStartupParameters
     bool forceLocalSettings;
     bool fullScreenDisabled;
     bool showFullInfo;
+
+    bool hasAdminPermissions;
+    const static QString kHasAdminPermissionsKey;
 
     QString devModeKey;
     QString authenticationString;

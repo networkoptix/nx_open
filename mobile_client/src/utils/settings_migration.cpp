@@ -17,6 +17,8 @@ QnMigratedSessionList getMigratedSessions(bool *success)
 
 void migrateSettings()
 {
+    // TODO: #dklychkov #3.0 Migrate settings from 2.6
+
     if (qnSettings->isSettingsMigrated())
         return;
 

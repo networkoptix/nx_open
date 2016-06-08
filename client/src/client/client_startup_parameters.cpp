@@ -23,6 +23,14 @@ namespace
         parser.addParameter(valuePtr, longName, nullptr, QString());
     };
 
+    template<typename ValueType>
+    void addParserParam(QnCommandLineParser &parser
+                        , ValueType *valuePtr
+                        , const QString& longName)
+    {
+        parser.addParameter(valuePtr, longName, QString(), QString());
+    };
+
     template<typename ValueType, typename DefaultParamType>
     void addParserParam(QnCommandLineParser &parser
         , ValueType *valuePtr
@@ -33,6 +41,9 @@ namespace
     };
 }
 
+const QString QnStartupParameters::kAllowMultipleClientInstancesKey(lit("--no-single-application"));
+const QString QnStartupParameters::kHasAdminPermissionsKey(lit("--has-admin-permissions"));
+
 QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     , char **argv)
 {
@@ -41,7 +52,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     QnCommandLineParser commandLineParser;
 
     /* Options used to open new client window. */
-    addParserParam(commandLineParser, &result.allowMultipleClientInstances, "--no-single-application");
+    addParserParam(commandLineParser, &result.allowMultipleClientInstances, kAllowMultipleClientInstancesKey);
     addParserParam(commandLineParser, &result.authenticationString, "--auth" );
     addParserParam(commandLineParser, &result.screen, "--screen");
     addParserParam(commandLineParser, &result.delayedDrop, "--delayed-drop");
@@ -60,6 +71,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.skipMediaFolderScan,  "--skip-media-folder-scan");
     addParserParam(commandLineParser, &result.engineVersion,        "--override-version");
     addParserParam(commandLineParser, &result.showFullInfo,         "--show-full-info");
+    addParserParam(commandLineParser, &result.hasAdminPermissions,  kHasAdminPermissionsKey);
 
     /* Persistent settings override. */
     addParserParam(commandLineParser, &result.logLevel, "--log-level");
@@ -86,6 +98,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
     result.customUri = nx::vms::utils::SystemUri(strCustomUri);
+    result.customUri.setProtocol(nx::vms::utils::SystemUri::Protocol::Native);     /*< Restore protocol part that was cut out. */
     result.videoWallGuid = QnUuid(strVideoWallGuid);
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
 
@@ -104,6 +117,7 @@ QnStartupParameters::QnStartupParameters()
     , forceLocalSettings(false)
     , fullScreenDisabled(kDefaultNoFullScreen)
     , showFullInfo(false)
+    , hasAdminPermissions(false)
 
     , devModeKey()
     , authenticationString()

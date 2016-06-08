@@ -131,7 +131,13 @@ def get_package_for_configuration(rdep, package, target_dir, debug):
         elif rdep.sync_package(package):
             location = rdep.locate_package(package)
         else:
-            return False
+            for p in [ full_name, package ]:
+                location = rdep.locate_package(package)
+                if location:
+                    print "Using local version of package {0}".format(p)
+                    break
+            if not location:
+                return False
 
         if location:
             repo_ts = rdep_config.PackageConfig(location).get_timestamp()

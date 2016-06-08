@@ -54,9 +54,6 @@
 
 #include <watchers/cloud_status_watcher.h>
 
-#include <nx/utils/platform/protocol_handler.h>
-#include <nx/vms/utils/app_info.h>
-
 namespace
 {
     typedef std::unique_ptr<QnClientTranslationManager> QnClientTranslationManagerPtr;
@@ -110,12 +107,6 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
 {
     Q_INIT_RESOURCE(client);
     Q_INIT_RESOURCE(appserver2);
-
-#ifdef Q_OS_WIN
-    /* Register our application to handle our URI Protocol links like nx-vms://... */
-    nx::utils::registerSystemUriProtocolHandler(nx::vms::utils::AppInfo::nativeUriProtocol(), qApp->applicationFilePath());
-#endif
-
     QnClientMetaTypes::initialize();
 
     /* Set up application parameters so that QSettings know where to look for settings. */

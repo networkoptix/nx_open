@@ -5,16 +5,18 @@
 #include <QtCore/QMetaEnum>
 
 #include <core/resource_management/resource_pool.h>
-#include "api/abstract_connection.h"
-#include "api/app_server_connection.h"
-#include "api/session_manager.h"
-#include "api/global_settings.h"
-#include "api/runtime_info_manager.h"
-#include "../mobile_client/mobile_client_message_processor.h"
-#include "utils/common/synctime.h"
-#include "utils/common/util.h"
+#include <core/core_settings.h>
+#include <api/abstract_connection.h>
+#include <api/app_server_connection.h>
+#include <api/session_manager.h>
+#include <api/global_settings.h>
+#include <api/runtime_info_manager.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
 #include <common/common_module.h>
-#include "../watchers/user_watcher.h"
+#include <mobile_client/mobile_client_message_processor.h>
+#include <mobile_client/mobile_client_settings.h>
+#include <watchers/user_watcher.h>
 
 namespace {
 
@@ -49,6 +51,13 @@ public:
 
     void updateConnectionState();
 
+    void setUrl(const QUrl& url);
+
+    void storeConnection(
+            const QString& systemName,
+            const QUrl& url,
+            bool storePassword);
+
 public:
     QUrl url;
     bool suspended;
@@ -71,6 +80,11 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
             d, &QnConnectionManagerPrivate::updateConnectionState);
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
             d, &QnConnectionManagerPrivate::updateConnectionState);
+
+    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentHostChanged);
+    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentLoginChanged);
+    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentPasswordChanged);
+    connect(this, &QnConnectionManager::connectionStateChanged, this, &QnConnectionManager::isOnlineChanged);
 }
 
 QnConnectionManager::~QnConnectionManager() {
@@ -86,21 +100,52 @@ QnConnectionManager::State QnConnectionManager::connectionState() const
     return d->connectionState;
 }
 
+bool QnConnectionManager::isOnline() const
+{
+    Q_D(const QnConnectionManager);
+    return d->connectionState == Connected || d->connectionState == Suspended;
+}
+
 int QnConnectionManager::defaultServerPort() const {
     return DEFAULT_APPSERVER_PORT;
 }
 
-void QnConnectionManager::connectToServer(const QUrl &url) {
-    Q_D(QnConnectionManager);
+QUrl QnConnectionManager::currentUrl() const
+{
+    Q_D(const QnConnectionManager);
+    return d->url.isValid() ? d->url : QUrl();
+}
 
-    if (!url.isValid())
-        return;
+QString QnConnectionManager::currentHost() const
+{
+    Q_D(const QnConnectionManager);
+    return d->url.isValid() ? lit("%1:%2").arg(d->url.host()).arg(d->url.port(defaultServerPort())) : QString();
+}
+
+QString QnConnectionManager::currentLogin() const
+{
+    Q_D(const QnConnectionManager);
+    return d->url.isValid() ? d->url.userName() : QString();
+}
+
+QString QnConnectionManager::currentPassword() const
+{
+    Q_D(const QnConnectionManager);
+    return d->url.isValid() ? d->url.password() : QString();
+}
+
+void QnConnectionManager::connectToServer(const QUrl &url)
+{
+    Q_D(QnConnectionManager);
 
     if (connectionState() != QnConnectionManager::Disconnected)
         disconnectFromServer(false);
 
-    d->url = url;
+    QUrl fixedUrl(url);
+    if (fixedUrl.port() == -1)
+        fixedUrl.setPort(defaultServerPort());
 
+    d->setUrl(fixedUrl);
     d->doConnect();
 }
 
@@ -110,7 +155,7 @@ void QnConnectionManager::disconnectFromServer(bool force) {
     if (d->connectionHandle != kInvalidHandle)
     {
         d->connectionHandle = kInvalidHandle;
-        d->url = QUrl();
+        d->setUrl(QUrl());
         d->updateConnectionState();
         return;
     }
@@ -120,7 +165,7 @@ void QnConnectionManager::disconnectFromServer(bool force) {
 
     d->doDisconnect(force);
 
-    d->url = QUrl();
+    d->setUrl(QUrl());
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
     qnCommon->instance<QnUserWatcher>()->setUserName(QString());
 
@@ -181,7 +226,12 @@ void QnConnectionManagerPrivate::resume() {
 
 void QnConnectionManagerPrivate::doConnect() {
     if (!url.isValid())
+    {
+        Q_Q(QnConnectionManager);
+        updateConnectionState();
+        emit q->connectionFailed(QnConnectionManager::NetworkError, QVariant());
         return;
+    }
 
     qnCommon->updateRunningInstanceGuid();
 
@@ -245,6 +295,11 @@ void QnConnectionManagerPrivate::doConnect() {
         qnCommon->instance<QnUserWatcher>()->setUserName(url.userName());
 
         updateConnectionState();
+
+        storeConnection(connectionInfo.systemName, url, true);
+        qnSettings->setLastUsedSystemId(connectionInfo.systemName);
+        url.setPassword(QString());
+        qnSettings->setLastUsedUrl(url);
     });
 }
 
@@ -299,4 +354,37 @@ void QnConnectionManagerPrivate::updateConnectionState()
 
     Q_Q(QnConnectionManager);
     emit q->connectionStateChanged();
+}
+
+void QnConnectionManagerPrivate::setUrl(const QUrl& url)
+{
+    if (this->url == url)
+        return;
+
+    Q_Q(QnConnectionManager);
+    this->url = url;
+    emit q->currentUrlChanged();
+}
+
+void QnConnectionManagerPrivate::storeConnection(
+        const QString& systemName,
+        const QUrl& url,
+        bool storePassword)
+{
+    auto lastConnections = qnCoreSettings->recentUserConnections();
+
+    const auto password = storePassword ? url.password()
+                                        : QString();
+    const QnUserRecentConnectionData connectionInfo =
+        { systemName, url.userName(), password, storePassword };
+
+    auto connectionEqual = [connectionInfo](const QnUserRecentConnectionData& connection)
+    {
+        return connection.systemName == connectionInfo.systemName;
+    };
+    lastConnections.erase(std::remove_if(lastConnections.begin(), lastConnections.end(), connectionEqual),
+                          lastConnections.end());
+    lastConnections.prepend(connectionInfo);
+
+    qnCoreSettings->setRecentUserConnections(lastConnections);
 }
