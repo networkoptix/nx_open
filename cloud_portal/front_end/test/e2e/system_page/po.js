@@ -37,7 +37,7 @@ var SystemPage = function () {
     this.ownerDeleteButton = element(by.cssContainingText('button','Disconnect from'));
     this.userDeleteButton = element(by.cssContainingText('button','Remove from my Account'));
     this.disconnectDialog = element(by.css('.modal-dialog'));
-    this.cancelDisconnectButton = this.disconnectDialog.element(by.cssContainingText('button', 'Cancel'));
+    this.cancelDisconnectButton = this.disconnectDialog.element(by.buttonText('Cancel'));
 
     this.selectRoleOption = function(role) {
         return this.roleField.element(by.css(role));
