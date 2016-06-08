@@ -5,7 +5,6 @@
 #include <QtWidgets/QGraphicsScene>
 
 #include <utils/common/warnings.h>
-#include <core/resource_management/resource_pool.h>
 
 #include "workbench_context.h"
 
@@ -108,11 +107,6 @@ QnActionManager *QnWorkbenchContextAware::menu() const {
 QnWorkbench *QnWorkbenchContextAware::workbench() const {
     NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->workbench();
-}
-
-QnWorkbenchSynchronizer *QnWorkbenchContextAware::synchronizer() const {
-    NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
-    return context()->synchronizer();
 }
 
 QnWorkbenchLayoutSnapshotManager *QnWorkbenchContextAware::snapshotManager() const {

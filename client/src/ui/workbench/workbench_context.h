@@ -1,5 +1,4 @@
-#ifndef QN_WORKBENCH_CONTEXT_H
-#define QN_WORKBENCH_CONTEXT_H
+#pragma once
 
 #include <typeinfo>
 
@@ -14,7 +13,6 @@
 
 class QAction;
 
-class QnResourcePool;
 class QnWorkbench;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
@@ -23,9 +21,6 @@ class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchUserWatcher;
 class QnWorkbenchLayoutWatcher;
-#ifdef Q_OS_WIN
-class QnWorkbenchDesktopCameraWatcher;
-#endif
 class QnActionManager;
 
 /**
@@ -43,11 +38,6 @@ public:
     QnWorkbench *workbench() const
     {
         return m_workbench.data();
-    }
-
-    QnWorkbenchSynchronizer *synchronizer() const
-    {
-        return m_synchronizer.data();
     }
 
     QnWorkbenchLayoutSnapshotManager *snapshotManager() const
@@ -124,6 +114,3 @@ private:
 
     bool m_closingDown;
 };
-
-
-#endif // QN_WORKBENCH_CONTEXT_H
