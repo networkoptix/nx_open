@@ -32,46 +32,51 @@ class QnActionManager;
  * This is a class that ties together all objects comprising the global state
  * and serves as an application context.
  */
-class QnWorkbenchContext: public QObject, public QnInstanceStorage {
+class QnWorkbenchContext: public QObject, public QnInstanceStorage
+{
     Q_OBJECT
 public:
-    QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent = NULL);
+    QnWorkbenchContext(QObject *parent = NULL);
 
     virtual ~QnWorkbenchContext();
 
-    QnResourcePool *resourcePool() const {
-        return m_resourcePool;
-    }
-
-    QnWorkbench *workbench() const {
+    QnWorkbench *workbench() const
+    {
         return m_workbench.data();
     }
 
-    QnWorkbenchSynchronizer *synchronizer() const {
+    QnWorkbenchSynchronizer *synchronizer() const
+    {
         return m_synchronizer.data();
     }
 
-    QnWorkbenchLayoutSnapshotManager *snapshotManager() const {
+    QnWorkbenchLayoutSnapshotManager *snapshotManager() const
+    {
         return m_snapshotManager.data();
     }
 
-    QnActionManager *menu() const {
+    QnActionManager *menu() const
+    {
         return m_menu.data();
     }
 
-    QnWorkbenchAccessController *accessController() const {
+    QnWorkbenchAccessController *accessController() const
+    {
         return m_accessController.data();
     }
 
-    QnWorkbenchDisplay *display() const {
+    QnWorkbenchDisplay *display() const
+    {
         return m_display.data();
     }
 
-    QnWorkbenchNavigator *navigator() const {
+    QnWorkbenchNavigator *navigator() const
+    {
         return m_navigator.data();
     }
 
-    QWidget *mainWindow() const {
+    QWidget *mainWindow() const
+    {
         return m_mainWindow.data();
     }
 
@@ -104,7 +109,6 @@ signals:
     void mainWindowChanged();
 
 private:
-    QnResourcePool *m_resourcePool;
     QScopedPointer<QnWorkbench> m_workbench;
     QScopedPointer<QnWorkbenchSynchronizer> m_synchronizer;
     QScopedPointer<QnWorkbenchLayoutSnapshotManager> m_snapshotManager;

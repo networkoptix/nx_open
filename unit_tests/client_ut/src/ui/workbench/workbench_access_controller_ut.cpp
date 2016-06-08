@@ -38,7 +38,7 @@ protected:
     {
         m_module.reset(new QnClientModule());
         m_skin.reset(new QnSkin());
-        m_context.reset(new QnWorkbenchContext(qnResPool));
+        m_context.reset(new QnWorkbenchContext());
     }
 
     // virtual void TearDown() will be called after each test is run.

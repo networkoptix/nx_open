@@ -793,7 +793,7 @@ void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QStr
     if (success) {
         QnAviResourcePtr file(new QnAviResource(fileName));
         file->setStatus(Qn::Online);
-        resourcePool()->addResource(file);
+        qnResPool->addResource(file);
 
         QnMessageBox::information(mainWindow(), tr("Export Complete"), tr("Export Successful."), QDialogButtonBox::Ok);
     } else if (tool->status() != QnClientVideoCamera::NoError) {

@@ -660,7 +660,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
 
-    resourcePool()->addResource(layout);
+    qnResPool->addResource(layout);
     menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 
 }

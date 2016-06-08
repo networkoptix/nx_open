@@ -33,7 +33,8 @@ QnWorkbenchVersionMismatchWatcher::QnWorkbenchVersionMismatchWatcher(QObject *pa
         updateMismatchData();
     });
 
-    foreach(const QnMediaServerResourcePtr &server, resourcePool()->getResources<QnMediaServerResource>()) {
+    for(const QnMediaServerResourcePtr& server: qnResPool->getAllServers(Qn::AnyStatus))
+    {
         connect(server, &QnMediaServerResource::versionChanged, this, &QnWorkbenchVersionMismatchWatcher::updateMismatchData);
     }
 
@@ -74,7 +75,7 @@ bool QnWorkbenchVersionMismatchWatcher::versionMismatches(QnSoftwareVersion left
 
 void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
     m_hasMismatches = false;
-    
+
     if(m_mismatchData.isEmpty())
         return;
 
@@ -109,8 +110,10 @@ void QnWorkbenchVersionMismatchWatcher::updateMismatchData() {
     QnAppInfoMismatchData clientData(Qn::ClientComponent, qnCommon->engineVersion());
     m_mismatchData.push_back(clientData);
 
-    if(context()->user()) {
-        foreach(const QnMediaServerResourcePtr &mediaServerResource, resourcePool()->getResources<QnMediaServerResource>()) {
+    if (context()->user())
+    {
+        for(const QnMediaServerResourcePtr& mediaServerResource: qnResPool->getAllServers(Qn::AnyStatus))
+        {
             QnAppInfoMismatchData msData(Qn::ServerComponent, mediaServerResource->getVersion());
             msData.resource = mediaServerResource;
             m_mismatchData.push_back(msData);

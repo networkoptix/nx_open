@@ -468,7 +468,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnVideoDecoderFactory::setCodecManufacture( QnVideoDecoderFactory::AUTO );
 
     /* Create workbench context. */
-    QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
+    QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext());
 
     context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 

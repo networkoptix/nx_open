@@ -75,7 +75,7 @@ void QnWorkbenchContextAware::init(QObject *parent, bool lazyInitialization) {
                 parent = parentItem->scene();
             } else if (QWidget* parentWidget = dynamic_cast<QWidget*>(parent)) {
                 parent = parentWidget->parentWidget();
-            }            
+            }
             else {
                 parent = NULL;
             }
@@ -108,11 +108,6 @@ QnActionManager *QnWorkbenchContextAware::menu() const {
 QnWorkbench *QnWorkbenchContextAware::workbench() const {
     NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->workbench();
-}
-
-QnResourcePool *QnWorkbenchContextAware::resourcePool() const {
-    NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
-    return context()->resourcePool();
 }
 
 QnWorkbenchSynchronizer *QnWorkbenchContextAware::synchronizer() const {

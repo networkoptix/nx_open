@@ -69,8 +69,6 @@ protected:
 
     QnWorkbench *workbench() const;
 
-    QnResourcePool *resourcePool() const;
-
     QnWorkbenchSynchronizer *synchronizer() const;
 
     QnWorkbenchLayoutSnapshotManager *snapshotManager() const;

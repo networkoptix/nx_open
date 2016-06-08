@@ -7,8 +7,6 @@
 
 #include <api/media_server_statistics_manager.h>
 
-#include <core/resource_management/resource_pool.h>
-
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 
@@ -34,21 +32,12 @@
 #include "watchers/workbench_desktop_camera_watcher_win.h"
 #endif
 
-QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
+QnWorkbenchContext::QnWorkbenchContext(QObject *parent):
     QObject(parent),
     m_userWatcher(NULL),
     m_layoutWatcher(NULL),
     m_closingDown(false)
 {
-    if(resourcePool == NULL)
-    {
-        qnNullWarning(resourcePool);
-        resourcePool = new QnResourcePool();
-        resourcePool->setParent(this);
-    }
-
-    m_resourcePool = resourcePool;
-
     /* Layout watcher should be instantiated before snapshot manager because it can modify layout on adding. */
     m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
     m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
@@ -113,8 +102,6 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     m_snapshotManager.reset();
     m_synchronizer.reset();
     m_workbench.reset();
-
-    m_resourcePool = NULL;
 }
 
 void QnWorkbenchContext::setMainWindow(QWidget *mainWindow)

@@ -24,7 +24,7 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
         setCurrentUser(calculateCurrentUser());
     });
 
-    connect(resourcePool(), &QnResourcePool::resourceRemoved,   this,   &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
+    connect(qnResPool, &QnResourcePool::resourceRemoved,   this,   &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
 }
 
 QnWorkbenchUserWatcher::~QnWorkbenchUserWatcher() {}
