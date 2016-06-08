@@ -108,6 +108,11 @@ public:
         data::SystemID systemID,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler);
 
+    void updateSystemName(
+        const AuthorizationInfo& authzInfo,
+        data::SystemNameUpdate data,
+        std::function<void(api::ResultCode)> completionHandler);
+
     //void addSubscription(
     //    const AuthorizationInfo& authzInfo,
     //    const std::string& systemID,
@@ -229,6 +234,15 @@ private:
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing,
+        std::function<void(api::ResultCode)> completionHandler);
+
+    nx::db::DBResult updateSystemNameInDB(
+        QSqlDatabase* const connection,
+        const data::SystemNameUpdate& data);
+    void systemNameUpdated(
+        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::db::DBResult dbResult,
+        data::SystemNameUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult activateSystem(

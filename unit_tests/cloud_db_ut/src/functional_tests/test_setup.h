@@ -114,6 +114,11 @@ public:
         const std::string& password,
         const std::string& systemID,
         std::set<api::SystemAccessRole>* const accessRoles);
+    api::ResultCode updateSystemName(
+        const std::string& login,
+        const std::string& password,
+        const std::string& systemID,
+        const std::string& newSystemName);
 
     //calls on system's regard
     api::ResultCode getCdbNonce(

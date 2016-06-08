@@ -102,8 +102,18 @@ public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
+class SystemNameUpdate
+:
+    public api::SystemNameUpdate,
+    public stree::AbstractResourceReader
+{
+public:
+    //!Implementation of \a stree::AbstractResourceReader::getAsVariant
+    virtual bool getAsVariant(int resID, QVariant* const value) const override;
+};
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),
     (sql_record));
 
 }   //data

@@ -381,6 +381,25 @@ void SystemManager::getAccessRoleList(
         std::move(resultData));
 }
 
+constexpr const std::size_t kMaxSystemNameLength = 1024;
+
+void SystemManager::updateSystemName(
+    const AuthorizationInfo& authzInfo,
+    data::SystemNameUpdate data,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    if (data.name.empty() || data.name.size() > kMaxSystemNameLength)
+        return completionHandler(api::ResultCode::badRequest);
+
+    using namespace std::placeholders;
+    m_dbManager->executeUpdate<data::SystemNameUpdate>(
+        std::bind(&SystemManager::updateSystemNameInDB, this, _1, _2),
+        std::move(data),
+        std::bind(&SystemManager::systemNameUpdated,
+            this, m_startedAsyncCallsCounter.getScopedIncrement(),
+            _1, _2, std::move(completionHandler)));
+}
+
 api::SystemAccessRole SystemManager::getAccountRightsForSystem(
     const std::string& accountEmail,
     const std::string& systemID) const
@@ -729,6 +748,54 @@ void SystemManager::sharingUpdated(
     completionHandler(
         dbResult == nx::db::DBResult::notFound
         ? api::ResultCode::notFound
+        : api::ResultCode::dbError);
+}
+
+nx::db::DBResult SystemManager::updateSystemNameInDB(
+    QSqlDatabase* const connection,
+    const data::SystemNameUpdate& data)
+{
+    QSqlQuery updateSystemNameQuery(*connection);
+    updateSystemNameQuery.prepare(
+        "UPDATE system "
+        "SET name=:name "
+        "WHERE id=:id");
+    QnSql::bind(data, &updateSystemNameQuery);
+    if (!updateSystemNameQuery.exec())
+    {
+        NX_LOGX(lm("Failed to update system %1 name in DB to %2. %3")
+            .arg(data.id).arg(data.name)
+            .arg(connection->lastError().text()), cl_logWARNING);
+        return db::DBResult::ioError;
+    }
+
+    return db::DBResult::ok;
+}
+
+void SystemManager::systemNameUpdated(
+    QnCounter::ScopedIncrement asyncCallLocker,
+    nx::db::DBResult dbResult,
+    data::SystemNameUpdate data,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    if (dbResult == nx::db::DBResult::ok)
+    {
+        //updating system name in cache
+        QnMutexLocker lk(&m_mutex);
+
+        auto& systemByIdIndex = m_systems.get<SYSTEM_BY_ID_INDEX>();
+        auto systemIter = systemByIdIndex.find(data.id);
+        if (systemIter != systemByIdIndex.end())
+        {
+            systemByIdIndex.modify(
+                systemIter,
+                [&data](data::SystemData& system) { system.name = data.name; });
+        }
+    }
+
+    completionHandler(
+        dbResult == nx::db::DBResult::ok
+        ? api::ResultCode::ok
         : api::ResultCode::dbError);
 }
 

@@ -90,8 +90,25 @@ bool SystemID::getAsVariant(int resID, QVariant* const value) const
 }
 
 
+////////////////////////////////////////////////////////////
+//// class SystemNameUpdate
+////////////////////////////////////////////////////////////
+
+bool SystemNameUpdate::getAsVariant(int resID, QVariant* const value) const
+{
+    switch (resID)
+    {
+        case attr::systemID:
+            *value = QString::fromStdString(id);
+            return true;
+        default:
+            return false;
+    }
+}
+
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemSharing)(SystemID),
+    (SystemRegistrationData)(SystemSharing)(SystemID)(SystemNameUpdate),
     (sql_record),
     _Fields);
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
