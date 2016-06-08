@@ -78,7 +78,7 @@ var PasswordFieldSuite = function () {
                 checkPasswordWarning(self.passwordIncorrect);
 
                 self.maskedInput.clear()
-                    .sendKeys('qwerty');
+                    .sendKeys('qwertyui');
                 checkPasswordWarning(self.passwordCommon);
                 self.maskedInput.clear()
                     .sendKeys('password');
@@ -88,7 +88,7 @@ var PasswordFieldSuite = function () {
                 checkPasswordWarning(self.passwordCommon);
 
                 self.maskedInput.clear()
-                    .sendKeys('asdoiu');
+                    .sendKeys('asdoiurf');
                 checkPasswordWarning(self.passwordFair);
 
                 self.maskedInput.clear()
@@ -99,7 +99,7 @@ var PasswordFieldSuite = function () {
 
         it("password field shows only 1 warning about strength at a time", function () {
             getToPassword().then(function(){
-                self.maskedInput.sendKeys('123qwe');
+                self.maskedInput.sendKeys('12345678');
                 checkPasswordWarning(self.passwordCommon);
 
                 self.maskedInput.sendKeys(protractor.Key.BACK_SPACE);
