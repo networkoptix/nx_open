@@ -6,10 +6,7 @@
 #include <utils/common/instance_storage.h>
 
 class QnConnectionManager;
-class QnLoginSessionManager;
-class QnColorTheme;
 class QnMobileAppInfo;
-class QnResolutionUtil;
 class QnContextSettings;
 
 class QnContext: public QObject, public QnInstanceStorage {
@@ -17,8 +14,6 @@ class QnContext: public QObject, public QnInstanceStorage {
     typedef QObject base_type;
 
     Q_PROPERTY(QnConnectionManager* connectionManager READ connectionManager NOTIFY connectionManagerChanged)
-    Q_PROPERTY(QnLoginSessionManager* loginSessionManager READ loginSessionManager NOTIFY loginSessionManagerChanged)
-    Q_PROPERTY(QnColorTheme* colorTheme READ colorTheme NOTIFY colorThemeChanged)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo READ applicationInfo NOTIFY applicationInfoChanged)
     Q_PROPERTY(QnContextSettings* settings READ settings NOTIFY settingsChanged)
     Q_PROPERTY(bool liteMode READ liteMode NOTIFY liteModeChanged)
@@ -31,14 +26,6 @@ public:
         return m_connectionManager;
     }
 
-    QnLoginSessionManager *loginSessionManager() const {
-        return m_loginSessionManager;
-    }
-
-    QnColorTheme *colorTheme() const {
-        return m_colorTheme;
-    }
-
     QnMobileAppInfo *applicationInfo() const {
         return m_appInfo;
     }
@@ -46,15 +33,6 @@ public:
     QnContextSettings *settings() const {
         return m_settings;
     }
-
-    QnResolutionUtil *resolutionUtil() const {
-        return m_resolutionUtil.data();
-    }
-
-    Q_INVOKABLE int dp(qreal dpix) const;
-    Q_INVOKABLE int dps(qreal dpix) const;
-    Q_INVOKABLE int sp(qreal dpix) const;
-    Q_INVOKABLE qreal iconScale() const;
 
     Q_INVOKABLE void enterFullscreen();
     Q_INVOKABLE void exitFullscreen();
@@ -72,10 +50,19 @@ public:
 
     Q_INVOKABLE bool liteMode() const;
 
+    Q_INVOKABLE void removeSavedConnection(const QString& systemName);
+
+    Q_INVOKABLE void setLastUsedConnection(const QString& systemId, const QUrl& url);
+    Q_INVOKABLE void clearLastUsedConnection();
+    Q_INVOKABLE QString getLastUsedSystemId() const;
+    Q_INVOKABLE QString getLastUsedUrl() const;
+
+    Q_INVOKABLE QString lp(const QString& path) const;
+    void setLocalPrefix(const QString& prefix);
+
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
     void connectionManagerChanged();
-    void loginSessionManagerChanged();
     void colorThemeChanged();
     void applicationInfoChanged();
     void settingsChanged();
@@ -83,12 +70,10 @@ signals:
 
 private:
     QnConnectionManager *m_connectionManager;
-    QnLoginSessionManager *m_loginSessionManager;
-    QnColorTheme *m_colorTheme;
     QnMobileAppInfo *m_appInfo;
     QnContextSettings *m_settings;
 
-    QScopedPointer<QnResolutionUtil> m_resolutionUtil;
+    QString m_localPrefix;
 };
 
 Q_DECLARE_METATYPE(QnContext*)

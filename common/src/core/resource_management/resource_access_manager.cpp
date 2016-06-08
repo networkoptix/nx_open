@@ -181,6 +181,9 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
 
 bool QnResourceAccessManager::hasGlobalPermission(const QnUserResourcePtr& user, Qn::GlobalPermission requiredPermission) const
 {
+    if (requiredPermission == Qn::NoGlobalPermissions)
+        return true;
+
     return globalPermissions(user).testFlag(requiredPermission);
 }
 
@@ -215,6 +218,9 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& us
 
 bool QnResourceAccessManager::hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permission requiredPermission) const
 {
+    if (requiredPermission == Qn::NoPermissions)
+        return true;
+
     return permissions(user, resource).testFlag(requiredPermission);
 }
 

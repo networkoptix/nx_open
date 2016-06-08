@@ -34,9 +34,10 @@ public:
     void stop();
 
     virtual QPixmap getThumbnail(const QString &thumbnailId) const override;
-    QString thumbnailId(const QnUuid &resourceId);
+    QString thumbnailId(const QnUuid &resourceId) const;
 
     void refreshThumbnails(const QList<QnUuid> &resourceIds);
+    void refreshThumbnail(const QnUuid &id);
 
 signals:
     void thumbnailUpdated(const QnUuid &resourceId, const QString &thumbnailId);
@@ -44,9 +45,6 @@ signals:
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-
-private:
-    void refreshThumbnail(const QnUuid &id);
 
 private:
     mutable QnMutex m_mutex;

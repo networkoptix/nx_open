@@ -11,11 +11,9 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>appserver2_ut</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Witness AppServer2 Unit Tests</name>
+    <name>VMS AppServer2 Unit Tests</name>
 
     <properties>
-        <guid>${appserver2_ut.guid}</guid>
-        <product.title>${appserver2.name} Unit Tests</product.title>
         <root.dir>${basedir}/../..</root.dir>
         <!--Specify the project to test-->      
         <master.project.directory>appserver2</master.project.directory>
@@ -25,7 +23,7 @@
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
 
-        <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
+        <windows.defines>_VARIADIC_MAX=10</windows.defines>
 
         <path>${env.PATH}</path>
         <rdep.packages>gtest openssl quazip</rdep.packages>

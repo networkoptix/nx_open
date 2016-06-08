@@ -13,182 +13,102 @@
 #include "mobile_client/mobile_client_settings.h"
 #include "api/network_proxy_factory.h"
 
-namespace {
+namespace
+{
 
-    const qreal defaultAspectRatio = 4.0 / 3.0;
+    class QnFilteredCameraListModel : public QnAvailableCameraListModel
+    {
+        using base_type = QnAvailableCameraListModel;
 
-    class QnFilteredCameraListModel : public QnAvailableCameraListModel {
-        typedef QnAvailableCameraListModel base_type;
     public:
-        QnFilteredCameraListModel(QObject *parent = 0) :
-            base_type(parent)
+        QnFilteredCameraListModel(QObject* parent)
+            : base_type(parent)
         {
             resetResourcesInternal();
         }
 
-        void setServerId(const QnUuid &id) {
-            m_serverId = id;
-            resetResources();
-        }
-
-        QnUuid serverId() const {
-            return m_serverId;
-        }
-
-        virtual QHash<int, QByteArray> roleNames() const override {
-            QHash<int, QByteArray> roleNames = base_type::roleNames();
+        virtual QHash<int, QByteArray> roleNames() const override
+        {
+            auto roleNames = base_type::roleNames();
             roleNames[Qn::ThumbnailRole] = Qn::roleName(Qn::ThumbnailRole);
             return roleNames;
         }
 
-        virtual QVariant data(const QModelIndex &index, int role) const override {
+        virtual QVariant data(const QModelIndex& index, int role) const override
+        {
             if (!hasIndex(index.row(), index.column(), index.parent()))
                 return QVariant();
 
-            switch (role) {
-            case Qn::ThumbnailRole:
-                if (QnCameraThumbnailCache::instance()) {
-                    QnUuid id = QnUuid::fromStringSafe(base_type::data(index, Qn::UuidRole).toString());
-                    if (id.isNull())
-                        return QUrl();
+            if (role != Qn::ThumbnailRole)
+                return base_type::data(index, role);
 
-                    QString thumbnailId = QnCameraThumbnailCache::instance()->thumbnailId(id);
-                    if (thumbnailId.isEmpty())
-                        return QUrl();
-
-                    return QUrl(lit("image://thumbnail/") + thumbnailId);
-                }
+            const auto cache = QnCameraThumbnailCache::instance();
+            NX_ASSERT(cache);
+            if (!cache)
                 return QUrl();
-            }
 
-            return base_type::data(index, role);
+            const auto id = QnUuid::fromStringSafe(base_type::data(index, Qn::UuidRole).toString());
+            if (id.isNull())
+                return QUrl();
+
+            const auto thumbnailId = cache->thumbnailId(id);
+            if (thumbnailId.isEmpty())
+                return QUrl();
+
+            return QUrl(lit("image://thumbnail/") + thumbnailId);
         }
-
-    protected:
-        virtual bool filterAcceptsResource(const QnResourcePtr &resource) const override {
-            bool accepted = base_type::filterAcceptsResource(resource);
-            if (!accepted)
-                return false;
-
-            if (m_serverId.isNull())
-                return true;
-
-            return resource->getParentId() == m_serverId;
-        }
-
-    private:
-        QnUuid m_serverId;
     };
+
 } // anonymous namespace
 
-QnCameraListModel::QnCameraListModel(QObject *parent) :
-    QSortFilterProxyModel(parent),
-    m_model(new QnFilteredCameraListModel(this)),
-    m_showOffline(true),
-    m_hiddenCamerasOnly(false)
+class QnCameraListModelPrivate: public QObject
 {
-    setSourceModel(m_model);
+public:
+    QnCameraListModelPrivate();
+
+    void at_thumbnailUpdated(const QnUuid& resourceId, const QString& thumbnailId);
+
+public:
+    QnFilteredCameraListModel* model;
+};
+
+QnCameraListModel::QnCameraListModel(QObject *parent)
+    : QSortFilterProxyModel(parent)
+    , d_ptr(new QnCameraListModelPrivate())
+{
+    Q_D(QnCameraListModel);
+
+    setSourceModel(d->model);
     setDynamicSortFilter(true);
     sort(0);
     setFilterCaseSensitivity(Qt::CaseInsensitive);
 
-    if (QnCameraThumbnailCache::instance())
-        connect(QnCameraThumbnailCache::instance(), &QnCameraThumbnailCache::thumbnailUpdated, this, &QnCameraListModel::at_thumbnailUpdated);
-}
-
-QHash<int, QByteArray> QnCameraListModel::roleNames() const {
-    QHash<int, QByteArray> roles = QSortFilterProxyModel::roleNames();
-    roles[Qn::ItemWidthRole] = "itemWidth";
-    roles[Qn::ItemHeightRole] = "itemHeight";
-    return roles;
-}
-
-QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
-    if (role == Qn::ItemWidthRole || role == Qn::ItemHeightRole) {
-        QnUuid id = QnUuid(QSortFilterProxyModel::data(index, Qn::UuidRole).toUuid());
-        QSize size = m_sizeById.value(id);
-        if (size.isEmpty())
-            size = QSize(m_width / 2, m_width / 2 / defaultAspectRatio);
-
-        if (role == Qn::ItemWidthRole)
-            return size.width();
-        else
-            return size.height();
+    NX_ASSERT(QnCameraThumbnailCache::instance());
+    if (!QnCameraThumbnailCache::instance())
+    {
+        connect(QnCameraThumbnailCache::instance(), &QnCameraThumbnailCache::thumbnailUpdated,
+                d, &QnCameraListModelPrivate::at_thumbnailUpdated);
     }
-
-    return QSortFilterProxyModel::data(index, role);
 }
 
-bool QnCameraListModel::showOffline() const {
-    return m_showOffline;
+QnCameraListModel::~QnCameraListModel()
+{
 }
 
-void QnCameraListModel::setShowOffline(bool showOffline) {
-    if (m_showOffline == showOffline)
-        return;
-
-    m_showOffline = showOffline;
-    emit showOfflineChanged();
-
-    invalidateFilter();
-}
-
-QStringList QnCameraListModel::hiddenCameras() const {
-    return m_hiddenCameras.toList();
-}
-
-void QnCameraListModel::setHiddenCameras(const QStringList &hiddenCameras) {
-    QSet<QString> hiddenCamerasSet = QSet<QString>::fromList(hiddenCameras);
-    if (m_hiddenCameras == hiddenCamerasSet)
-        return;
-
-    m_hiddenCameras = hiddenCamerasSet;
-    emit hiddenCamerasChanged();
-    invalidateFilter();
-}
-
-bool QnCameraListModel::hiddenCamerasOnly() const {
-    return m_hiddenCamerasOnly;
-}
-
-void QnCameraListModel::setHiddenCamerasOnly(bool hiddenCamerasOnly) {
-    if (m_hiddenCamerasOnly == hiddenCamerasOnly)
-        return;
-
-    m_hiddenCamerasOnly = hiddenCamerasOnly;
-    emit hiddenCamerasOnlyChanged();
-    invalidateFilter();
-}
-
-void QnCameraListModel::setServerId(const QnUuid &id) {
-    m_model->setServerId(id);
-    emit serverIdStringChanged();
-}
-
-QnUuid QnCameraListModel::serverId() const {
-    return m_model->serverId();
-}
-
-QString QnCameraListModel::serverIdString() const {
-    return serverId().toString();
-}
-
-void QnCameraListModel::setServerIdString(const QString &id) {
-    setServerId(QnUuid::fromStringSafe(id));
-}
-
-void QnCameraListModel::refreshThumbnail(int row) {
+void QnCameraListModel::refreshThumbnail(int row)
+{
     if (!QnCameraThumbnailCache::instance())
         return;
 
     if (!hasIndex(row, 0))
         return;
 
-    QnUuid id = QnUuid(data(index(row, 0), Qn::UuidRole).toUuid());
-    QnCameraThumbnailCache::instance()->refreshThumbnails(QList<QnUuid>() << id);
+    const auto id = data(index(row, 0), Qn::UuidRole).toUuid();
+    QnCameraThumbnailCache::instance()->refreshThumbnail(id);
 }
 
-void QnCameraListModel::refreshThumbnails(int from, int to) {
+void QnCameraListModel::refreshThumbnails(int from, int to)
+{
     if (!QnCameraThumbnailCache::instance())
         return;
 
@@ -205,72 +125,52 @@ void QnCameraListModel::refreshThumbnails(int from, int to) {
 
     QList<QnUuid> ids;
     for (int i = from; i <= to; i++)
-        ids.append(QnUuid(data(index(i, 0), Qn::UuidRole).toUuid()));
+        ids.append(data(index(i, 0), Qn::UuidRole).toUuid());
 
     QnCameraThumbnailCache::instance()->refreshThumbnails(ids);
 }
 
-void QnCameraListModel::updateLayout(int width, qreal desiredAspectRatio) {
-    m_width = width;
-
-    m_sizeById.clear();
-    QnAspectRatioHash aspectRatios = qnSettings->camerasAspectRatios();
-
-    int count = rowCount();
-    for (int i = 0; i < count; ++i) {
-        QnUuid id = QnUuid(index(i, 0).data(Qn::UuidRole).toUuid());
-        qreal aspectRatio = aspectRatios.value(id, defaultAspectRatio);
-        m_sizeById[id] = QSize(width / 2, width / 2 / aspectRatio);
-    }
-
-    emit dataChanged(index(0, 0), index(count - 1, 0), QVector<int>() << Qn::ItemWidthRole << Qn::ItemHeightRole);
-}
-
-bool QnCameraListModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
-    QString leftName = left.data(Qn::ResourceNameRole).toString();
-    QString rightName = right.data(Qn::ResourceNameRole).toString();
+bool QnCameraListModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
+{
+    const auto leftName = left.data(Qn::ResourceNameRole).toString();
+    const auto rightName = right.data(Qn::ResourceNameRole).toString();
 
     int res = naturalStringCompare(leftName, rightName, Qt::CaseInsensitive);
     if (res != 0)
         return res < 0;
 
-    QString leftAddress = left.data(Qn::IpAddressRole).toString();
-    QString rightAddress = right.data(Qn::IpAddressRole).toString();
+    const auto leftAddress = left.data(Qn::IpAddressRole).toString();
+    const auto rightAddress = right.data(Qn::IpAddressRole).toString();
 
     res = naturalStringCompare(leftAddress, rightAddress);
     if (res != 0)
         return res < 0;
 
-    QString leftId = left.data(Qn::UuidRole).toString();
-    QString rightId = right.data(Qn::UuidRole).toString();
+    const auto leftId = left.data(Qn::UuidRole).toString();
+    const auto rightId = right.data(Qn::UuidRole).toString();
 
     return leftId < rightId;
 }
 
-bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const {
-    QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
-
-    if (!m_showOffline) {
-        Qn::ResourceStatus status = static_cast<Qn::ResourceStatus>(index.data(Qn::ResourceStatusRole).toInt());
-        if (status == Qn::Offline || status == Qn::NotDefined)
-            return false;
-    }
-
-    QString id = index.data(Qn::UuidRole).toUuid().toString();
-    if (m_hiddenCameras.contains(id))
-        return m_hiddenCamerasOnly;
-    else if (m_hiddenCamerasOnly)
-        return false;
-
-    QString name = index.data(Qn::ResourceNameRole).toString();
+bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
+{
+    const auto index = sourceModel()->index(sourceRow, 0, sourceParent);
+    const auto name = index.data(Qn::ResourceNameRole).toString();
     return name.contains(filterRegExp());
 }
 
-void QnCameraListModel::at_thumbnailUpdated(const QnUuid &resourceId, const QString &thumbnailId) {
-    m_model->refreshResource(qnResPool->getResourceById(resourceId), Qn::ThumbnailRole);
+QnCameraListModelPrivate::QnCameraListModelPrivate()
+    : model(new QnFilteredCameraListModel(this))
+{
+}
 
-    QPixmap thumbnail = QnCameraThumbnailCache::instance()->getThumbnail(thumbnailId);
-    if (!thumbnail.isNull()) {
+void QnCameraListModelPrivate::at_thumbnailUpdated(const QnUuid& resourceId, const QString& thumbnailId)
+{
+    model->refreshResource(qnResPool->getResourceById(resourceId), Qn::ThumbnailRole);
+
+    const auto thumbnail = QnCameraThumbnailCache::instance()->getThumbnail(thumbnailId);
+    if (!thumbnail.isNull())
+    {
         QnAspectRatioHash aspectRatios = qnSettings->camerasAspectRatios();
         aspectRatios[resourceId] = static_cast<qreal>(thumbnail.width()) / thumbnail.height();
         qnSettings->setCamerasAspectRatios(aspectRatios);

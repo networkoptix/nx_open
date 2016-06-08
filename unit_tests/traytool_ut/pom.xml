@@ -1,11 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>build_ut</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -18,16 +11,15 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>traytool_ut</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Tray Utility Unit Tests</name>
+    <name>VMS TrayTool Unit Tests</name>
 
     <properties>
-        <product.title>HD Witness Image Library Plugin Unit Tests</product.title>  
         <root.dir>${basedir}/../..</root.dir>
         <master.project.directory>traytool</master.project.directory>
 
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <global.libs>-ltraytool</global.libs>
-        <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
+        <windows.defines>_VARIADIC_MAX=10</windows.defines>
 
         <path>${env.PATH}</path>
         <rdep.packages>gtest quazip</rdep.packages>

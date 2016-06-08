@@ -9,7 +9,12 @@ QnWidgetAnchor::QnWidgetAnchor(QWidget* widget) :
     m_margins(0, 0, 0, 0),
     m_widget(widget)
 {
-    NX_CRITICAL(widget);
+    if (!widget)
+    {
+        NX_ASSERT(false);
+        return;
+    }
+
     widget->installEventFilter(this);
 
     QWidget* parentWidget = widget->parentWidget();
@@ -52,9 +57,9 @@ const QMargins& QnWidgetAnchor::margins() const
 
 bool QnWidgetAnchor::eventFilter(QObject* object, QEvent* event)
 {
-    QWidget* parentWidget = m_widget->parentWidget();
     if (object == m_widget)
     {
+        QWidget* parentWidget = m_widget->parentWidget();
         switch (event->type())
         {
             case QEvent::Resize:
@@ -76,14 +81,19 @@ bool QnWidgetAnchor::eventFilter(QObject* object, QEvent* event)
                 }
                 break;
             }
+
+            default:
+                break;
         }
     }
     else
     {
-        NX_ASSERT(object == parentWidget);
-
-        if (event->type() == QEvent::Resize)
+        if (event->type() == QEvent::Resize &&
+           !m_widget.isNull() &&
+            object == m_widget->parentWidget())
+        {
             updateGeometry();
+        }
     }
 
     return base_type::eventFilter(object, event);
@@ -91,52 +101,52 @@ bool QnWidgetAnchor::eventFilter(QObject* object, QEvent* event)
 
 void QnWidgetAnchor::updateGeometry()
 {
-    if (m_edges == 0)
+    if (!m_edges || !m_widget)
         return;
 
     QWidget* parentWidget = m_widget->parentWidget();
-    if (parentWidget)
+    if (!parentWidget)
+        return;
+
+    if (parentWidget->layout())
     {
-        if (parentWidget->layout())
-        {
-            qWarning() << "QnWidgetAnchor: widget is controlled by a layout";
-            return;
-        }
-
-        QRect geometry = m_widget->geometry();
-        QSize parentSize = parentWidget->size();
-
-        if (m_edges.testFlag(Qt::LeftEdge) && m_edges.testFlag(Qt::RightEdge))
-        {
-            geometry.setLeft(m_margins.left());
-            geometry.setRight(parentSize.width() - m_margins.right() - 1);
-        }
-        else
-        {
-            if (m_edges.testFlag(Qt::LeftEdge))
-                geometry.moveLeft(m_margins.left());
-            else if (m_edges.testFlag(Qt::RightEdge))
-                geometry.moveRight(parentSize.width() - m_margins.right() - 1);
-        }
-
-        if (m_edges.testFlag(Qt::TopEdge) && m_edges.testFlag(Qt::BottomEdge))
-        {
-            geometry.setTop(m_margins.top());
-            geometry.setBottom(parentSize.height() - m_margins.bottom() - 1);
-        }
-        else
-        {
-            if (m_edges.testFlag(Qt::TopEdge))
-                geometry.moveTop(m_margins.top());
-            else if (m_edges.testFlag(Qt::BottomEdge))
-                geometry.moveBottom(parentSize.height() - m_margins.bottom() - 1);
-        }
-
-        QSize minimumSize = m_widget->minimumSize();
-        geometry.setWidth(qMax(geometry.width(), minimumSize.width()));
-        geometry.setHeight(qMax(geometry.height(), minimumSize.height()));
-
-        m_widget->setGeometry(geometry);
+        qWarning() << "QnWidgetAnchor: widget is controlled by a layout";
+        return;
     }
+
+    QRect geometry = m_widget->geometry();
+    QSize parentSize = parentWidget->size();
+
+    if (m_edges.testFlag(Qt::LeftEdge) && m_edges.testFlag(Qt::RightEdge))
+    {
+        geometry.setLeft(m_margins.left());
+        geometry.setRight(parentSize.width() - m_margins.right() - 1);
+    }
+    else
+    {
+        if (m_edges.testFlag(Qt::LeftEdge))
+            geometry.moveLeft(m_margins.left());
+        else if (m_edges.testFlag(Qt::RightEdge))
+            geometry.moveRight(parentSize.width() - m_margins.right() - 1);
+    }
+
+    if (m_edges.testFlag(Qt::TopEdge) && m_edges.testFlag(Qt::BottomEdge))
+    {
+        geometry.setTop(m_margins.top());
+        geometry.setBottom(parentSize.height() - m_margins.bottom() - 1);
+    }
+    else
+    {
+        if (m_edges.testFlag(Qt::TopEdge))
+            geometry.moveTop(m_margins.top());
+        else if (m_edges.testFlag(Qt::BottomEdge))
+            geometry.moveBottom(parentSize.height() - m_margins.bottom() - 1);
+    }
+
+    QSize minimumSize = m_widget->minimumSize();
+    geometry.setWidth(qMax(geometry.width(), minimumSize.width()));
+    geometry.setHeight(qMax(geometry.height(), minimumSize.height()));
+
+    m_widget->setGeometry(geometry);
 }
 

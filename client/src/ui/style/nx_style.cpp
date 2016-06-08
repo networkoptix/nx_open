@@ -25,11 +25,14 @@
 #include <QtWidgets/QProxyStyle>
 #include <private/qfont_p.h>
 
+#include <ui/common/popup_shadow.h>
 #include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/dialogs/common/generic_tabbed_dialog.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/common/input_field.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+// #define CUSTOMIZE_POPUP_SHADOWS //TODO: #vkutin Fix @ Linux, then enable
 
 using namespace style;
 
@@ -40,6 +43,8 @@ namespace
     const char* kHoveredChildProperty = "_qn_hoveredChild";
 
     const QSize kSwitchFocusFrameMargins = QSize(4, 4); // 2 at left, 2 at right, 2 at top, 2 at bottom
+
+    const char* kPopupShadowProperty = "_qn_popupShadowObject";
 
     const int kCompactTabFocusMargin = 2;
 
@@ -2664,25 +2669,6 @@ void QnNxStyle::polish(QWidget *widget)
         widget->setAttribute(Qt::WA_Hover);
     }
 
-    if (auto view = qobject_cast<QAbstractItemView*>(widget))
-    {
-        view->viewport()->setAttribute(Qt::WA_Hover);
-
-        if (isWidgetOwnedBy<QComboBox>(view))
-        {
-            /* Set margins for drop-down list container: */
-            view->parentWidget()->setContentsMargins(0, 2, 0, 2);
-        }
-    }
-
-    if (qobject_cast<QMenu*>(widget))
-    {
-        widget->setAttribute(Qt::WA_TranslucentBackground);
-#ifdef Q_OS_WIN
-        widget->setWindowFlags(widget->windowFlags() | Qt::FramelessWindowHint);
-#endif
-    }
-
     if (auto button = qobject_cast<QToolButton*>(widget))
     {
         /* Left scroll button in a tab bar: add shadow effect: */
@@ -2699,6 +2685,50 @@ void QnNxStyle::polish(QWidget *widget)
             button->setGraphicsEffect(effect);
         }
     }
+
+    QWidget* popupToCustomizeShadow = nullptr;
+
+    if (qobject_cast<QMenu*>(widget))
+    {
+        widget->setAttribute(Qt::WA_TranslucentBackground);
+#ifdef Q_OS_WIN
+        widget->setWindowFlags(widget->windowFlags() | Qt::FramelessWindowHint);
+#endif
+        popupToCustomizeShadow = widget;
+    }
+
+    if (auto view = qobject_cast<QAbstractItemView*>(widget))
+    {
+        view->viewport()->setAttribute(Qt::WA_Hover);
+
+        if (isWidgetOwnedBy<QComboBox>(view))
+        {
+            /* Set margins for drop-down list container: */
+            QWidget* parentWidget = view->parentWidget();
+            parentWidget->setContentsMargins(0, 2, 0, 2);
+            popupToCustomizeShadow = parentWidget;
+        }
+    }
+
+#ifdef CUSTOMIZE_POPUP_SHADOWS
+    if (popupToCustomizeShadow)
+    {
+        /* Create customized shadow: */
+        if (popupToCustomizeShadow->property(kPopupShadowProperty).value<QnPopupShadow*>() == nullptr)
+        {
+            QnPaletteColor shadowColor = mainColor(Colors::kBase).darker(3);
+            shadowColor.setAlphaF(0.5);
+
+            auto shadow = new QnPopupShadow(popupToCustomizeShadow);
+            shadow->setColor(shadowColor);
+            shadow->setOffset(0, 10);
+            shadow->setBlurRadius(20);
+            shadow->setSpread(0);
+
+            popupToCustomizeShadow->setProperty(kPopupShadowProperty, QVariant::fromValue(shadow));
+        }
+    }
+#endif
 }
 
 void QnNxStyle::unpolish(QWidget* widget)
@@ -2722,14 +2752,31 @@ void QnNxStyle::unpolish(QWidget* widget)
         }
     }
 
+    QWidget* popupWithCustomizedShadow = nullptr;
+
+    if (auto menu = qobject_cast<QMenu*>(widget))
+        popupWithCustomizedShadow = menu;
+
     if (auto view = qobject_cast<QAbstractItemView*>(widget))
     {
         if (isWidgetOwnedBy<QComboBox>(view))
         {
             /* Reset margins for drop-down list container: */
-            view->parentWidget()->setContentsMargins(0, 0, 0, 0);
+            QWidget* parentWidget = view->parentWidget();
+            parentWidget->setContentsMargins(0, 0, 0, 0);
+            popupWithCustomizedShadow = parentWidget;
         }
     }
+
+#ifdef CUSTOMIZE_POPUP_SHADOWS
+    if (popupWithCustomizedShadow)
+    {
+        /* Remove customized shadow: */
+        QScopedPointer<QnPopupShadow> shadow(popupWithCustomizedShadow->property(kPopupShadowProperty).value<QnPopupShadow*>());
+        if (shadow)
+            popupWithCustomizedShadow->setProperty(kPopupShadowProperty, QVariant());
+    }
+#endif
 
     if (auto tabBar = qobject_cast<QTabBar*>(widget))
     {
@@ -2773,6 +2820,8 @@ QString QnNxStyle::Colors::paletteName(QnNxStyle::Colors::Palette palette)
         return lit("brand");
     case kRed:
         return lit("red");
+    case kYellow:
+        return lit("yellow");
     }
 
     return QString();

@@ -1,4 +1,5 @@
 #include "input_field.h"
+#include "password_strength_indicator.h"
 
 #include <ui/common/accessor.h>
 #include <ui/style/custom_style.h>
@@ -12,6 +13,7 @@ public:
         title(new QLabel(parent)),
         hint(new QLabel(parent)),
         input(new QLineEdit(parent)),
+        passwordIndicator(nullptr),
         validator()
     {
         input->installEventFilter(this);
@@ -59,6 +61,7 @@ public:
     QLabel* title;
     QLabel* hint;
     QLineEdit* input;
+    QnPasswordStrengthIndicator* passwordIndicator;
     Qn::TextValidateFunction validator;
 };
 
@@ -157,6 +160,34 @@ void QnInputField::setEchoMode(QLineEdit::EchoMode value)
 {
     Q_D(QnInputField);
     d->input->setEchoMode(value);
+}
+
+const QnPasswordStrengthIndicator* QnInputField::passwordIndicator() const
+{
+    Q_D(const QnInputField);
+    return d->passwordIndicator;
+}
+
+bool QnInputField::passwordIndicatorEnabled() const
+{
+    return passwordIndicator() != nullptr;
+}
+
+void QnInputField::setPasswordIndicatorEnabled(bool enabled)
+{
+    if (enabled == passwordIndicatorEnabled())
+        return;
+
+    Q_D(QnInputField);
+    if (enabled)
+    {
+        d->passwordIndicator = new QnPasswordStrengthIndicator(d->input);
+    }
+    else
+    {
+        delete d->passwordIndicator;
+        d->passwordIndicator = nullptr;
+    }
 }
 
 bool QnInputField::isReadOnly() const

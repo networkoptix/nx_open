@@ -1,6 +1,7 @@
 TEMPLATE = lib
 
 INCLUDEPATH +=  ${root.dir}/appserver2/src \
+                ${root.dir}/common_libs/nx_vms_utils/src \
                 ${root.dir}/nx_cloud/cloud_db_client/src/include
 
 mac:!ios {

@@ -59,6 +59,7 @@ namespace Qn
     static const QString PUBLIC_IP = lit("publicIp");
     static const QString NETWORK_INTERFACES = lit("networkInterfaces");
     static const QString FULL_VERSION = lit("fullVersion");
+    static const QString PRODUCT_NAME_SHORT = lit("productNameShort");
     static const QString SYSTEM_RUNTIME = lit("systemRuntime");
     static const QString BOOKMARK_COUNT = lit("bookmarkCount");
     static const QString HDD_LIST = lit("hddList");

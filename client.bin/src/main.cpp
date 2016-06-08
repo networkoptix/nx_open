@@ -41,7 +41,7 @@
 #include <client/client_connection_data.h>
 #include <client/client_resource_processor.h>
 #include <client/client_startup_parameters.h>
-#include <client/system_uri_resolver.h>
+
 
 #include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
@@ -113,6 +113,7 @@
 #include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
+#include <nx/vms/utils/system_uri.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
@@ -121,6 +122,9 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/platform/protocol_handler.h>
+#include <nx/vms/utils/app_info.h>
+
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -226,6 +230,37 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
+
+#ifdef Q_OS_WIN
+
+    auto registerUriHandler = []
+    {
+        return nx::utils::registerSystemUriProtocolHandler(nx::vms::utils::AppInfo::nativeUriProtocol(),
+                                                           qApp->applicationFilePath(),
+                                                           nx::vms::utils::AppInfo::nativeUriProtocolDescription());
+    };
+
+    /* Register URI handler and instantly exit. */
+    if (startupParams.hasAdminPermissions)
+    {
+        registerUriHandler();
+        return result;
+    }
+
+    /* Check if uri handler is registered already. */
+    if (!registerUriHandler())
+    {
+        /* Avoid lock-file races. */
+        startupParams.allowMultipleClientInstances = true;
+
+        /* Start another client instance with admin permissions if required. */
+        nx::utils::runAsAdministratorWithUAC(qApp->applicationFilePath(),
+                                             QStringList()
+                                             << QnStartupParameters::kHasAdminPermissionsKey
+                                             << QnStartupParameters::kAllowMultipleClientInstancesKey);
+    }
+
+#endif // Q_OS_WIN
 
     QnClientModule client(startupParams);
 
@@ -518,28 +553,36 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->setReady(true);
     QnResourceDiscoveryManager::instance()->start();
 
-
-    if (!startupParams.customUri.isEmpty())
+    if (startupParams.customUri.isValid())
     {
-        QnSystemUriResolver resolver(QUrl::fromUserInput(startupParams.customUri));
-        if (resolver.isValid())
+        using namespace nx::vms::utils;
+        switch (startupParams.customUri.clientCommand())
         {
-            for (QnSystemUriResolver::Action action : resolver.result().actions)
+            case SystemUri::ClientCommand::LoginToCloud:
             {
-                switch (action)
-                {
-                case QnSystemUriResolver::Action::LoginToCloud:
-                    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(resolver.result().login, resolver.result().password, true);
-                    break;
-                case QnSystemUriResolver::Action::ConnectToServer:
-                    context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, resolver.result().serverUrl));
-                    break;
-                default:
-                    break;
-                }
+                SystemUri::Auth auth = startupParams.customUri.authenticator();
+                qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(auth.user, auth.password, true);
+                break;
             }
-        }
+            case SystemUri::ClientCommand::ConnectToSystem:
+            {
+                SystemUri::Auth auth = startupParams.customUri.authenticator();
+                QString systemId = startupParams.customUri.systemId();
+                bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
 
+                QUrl systemUrl = QUrl::fromUserInput(systemId);
+                systemUrl.setUserName(auth.user);
+                systemUrl.setPassword(auth.password);
+
+                if (systemIsCloud)
+                    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(auth.user, auth.password, true);
+
+                context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, systemUrl));
+                break;
+            }
+            default:
+                break;
+        }
     }
     /* If no input files were supplied --- open connection settings dialog.
      * Do not try to connect in the following cases:
@@ -626,6 +669,7 @@ int main(int argc, char **argv)
     mac_setLimits();
 #endif
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
 
     // this is necessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created

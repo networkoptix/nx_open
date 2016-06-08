@@ -14,12 +14,10 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_network_ut</artifactId>
     <packaging>pom</packaging>
-    <name>libnx_network unit tests</name>
+    <name>NX Network Unit Tests</name>
 
     <properties>
         <guid>${nx_network_ut.guid}</guid>
-        <product.title>nx_network unit tests</product.title>
-
         <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -ludt</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>

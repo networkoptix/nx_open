@@ -107,7 +107,6 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
 {
     Q_INIT_RESOURCE(client);
     Q_INIT_RESOURCE(appserver2);
-
     QnClientMetaTypes::initialize();
 
     /* Set up application parameters so that QSettings know where to look for settings. */
