@@ -15,6 +15,8 @@
 #include "utils/common/synctime.h"
 #include "utils/serialization/json.h"
 #include "core/resource/user_resource.h"
+#include <core/resource/camera_resource.h>
+#include <utils/license_usage_helper.h>
 
 #include <database/migrations/business_rules_db_migration.h>
 #include <database/migrations/user_permissions_db_migration.h>
@@ -1925,6 +1927,25 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraA
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraAttributesDataList>& tran)
 {
+    QnCamLicenseUsageHelper licenseUsageHelper;
+    QnVirtualCameraResourceList cameras;
+
+    for (const auto &param : tran.params)
+    {
+        auto camera = qnResPool->getResourceById(param.cameraID).dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            return ErrorCode::serverError;
+        cameras.push_back(camera);
+        for (const auto &task : param.scheduleTasks)
+            licenseUsageHelper.propose(camera, task.recordingType == Qn::RecordingType::RT_Never ? false : true);
+    }
+
+    for (const auto &camera : cameras)
+    {
+        if (licenseUsageHelper.isOverflowForCamera(camera))
+            return ErrorCode::forbidden;
+    }
+
     for(const ApiCameraAttributesData& attrs: tran.params)
     {
         const ErrorCode result = saveCameraUserAttributes(attrs);
