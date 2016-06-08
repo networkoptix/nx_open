@@ -10,9 +10,7 @@
 #include <QtQuick/QQuickWindow>
 #include <QtCore/qmath.h>
 #include <QtCore/QElapsedTimer>
-#include <QDebug>
 
-#include <ui/resolution_util.h>
 #include "timeline_text_helper.h"
 #include "timeline_zoom_level.h"
 #include "timeline_chunk_painter.h"
@@ -29,7 +27,7 @@ namespace {
     const int extraTickCount = 10;
     const qreal zoomAnimationSpeed = 0.004;
     const qreal textOpacityAnimationSpeed = 0.004;
-    const qreal textMarginDp = 35;
+    const qreal textMargin = 35;
     const qreal zoomMultiplier = 2.0;
     const qreal liveOpacityAnimationSpeed = 0.01;
     const qreal stripesMovingSpeed = 0.002;
@@ -233,18 +231,10 @@ public:
             delete textTexture;
     }
 
-    int dp(qreal dpix) {
-        QnResolutionUtil *resolutionUtil = QnResolutionUtil::instance();
-        if (!resolutionUtil)
-            return dpix;
-
-        return resolutionUtil->dp(dpix);
-    }
-
     void updateZoomLevel() {
         int index = (prevZoomIndex == -1) ? zoomLevels.size() - 1 : qMax(prevZoomIndex, 0);
         int tickCount = zoomLevels[index].tickCount(windowStart, windowEnd);
-        qreal width = parent->width() / dp(1.0);
+        qreal width = parent->width();
         qreal tickSize = width / tickCount;
 
         if (tickSize < minTickDps) {
@@ -321,11 +311,7 @@ public:
         if (!window)
             return;
 
-        qreal pixelRatio = 1.0;
-        if (QnResolutionUtil *resolutionUtil = QnResolutionUtil::instance())
-            pixelRatio = resolutionUtil->pixelRatio();
-
-        textHelper.reset(new QnTimelineTextHelper(textFont, pixelRatio, textColor, suffixList));
+        textHelper.reset(new QnTimelineTextHelper(textFont, textColor, suffixList));
         textTexture = window->createTextureFromImage(textHelper->texture());
     }
 
@@ -744,8 +730,8 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
     int zoomIndex = cFloor(d->zoomLevel);
     const QnTimelineZoomLevel &zoomLevel = d->zoomLevels[zoomIndex];
 
-    int lineWidth = d->dp(1);
-    int lineHeight = d->dp(3);
+    int lineWidth = 1;
+    int lineHeight = 3;
     qreal correction = lineWidth / 2.0;
 
     qint64 windowSize = windowEnd() - windowStart();
@@ -857,7 +843,7 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
         qreal preLowerTickWidth = width() * preLowerTickInterval / windowSize;
 
         qreal pix = preLowerTickWidth - lowerTextWidth * tickCount - preLowerTextWidth;
-        if (pix > d->dp(textMarginDp)) {
+        if (pix > textMargin) {
             d->targetTextLevel = textMarkLevel;
             if (qAbs(d->targetTextLevel - d->textLevel) > maxZoomLevelDiff)
                 d->textLevel = d->targetTextLevel + (d->textLevel < d->targetTextLevel ? -maxZoomLevelDiff : maxZoomLevelDiff);
@@ -1156,7 +1142,7 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         windowChanged = true;
 
         qint64 maxSize = (liveTime - startBound) * 2;
-        qint64 minSize = startBoundTime == -1 ? maxSize : parent->width() / dp(1);
+        qint64 minSize = startBoundTime == -1 ? maxSize : parent->width();
         qreal factor = startZoom / zoomKineticHelper.value();
         qreal windowSize = qBound<qreal>(minSize, startWindowSize * factor, maxSize);
 

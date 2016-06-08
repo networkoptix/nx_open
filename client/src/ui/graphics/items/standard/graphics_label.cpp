@@ -177,12 +177,16 @@ void GraphicsLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 
     base_type::paint(painter, option, widget);
 
-    if(d->performanceHint == PixmapCaching) {
+    if(d->performanceHint == PixmapCaching) 
+    {
         d->ensurePixmaps();
 
-        QPointF position = QnGeometry::aligned(d->pixmap.size(), rect(), d->alignment).topLeft();
+        const auto dpiPixmapSize = (d->pixmap.size() / d->pixmap.devicePixelRatio());
+        const QPointF position = QnGeometry::aligned(dpiPixmapSize, rect(), d->alignment).topLeft();
         paintPixmapSharp(painter, d->pixmap, position);
-    } else {
+    }
+    else 
+    {
         QnScopedPainterPenRollback penRollback(painter, d->textColor());
         QnScopedPainterFontRollback fontRollback(painter, font());
 

@@ -97,30 +97,33 @@ void QnHtmlTextItemPrivate::updatePixmap() {
     td.setHtml(html);
 
     const auto docWidth = td.documentLayout()->documentSize().width();
-
     if ((docWidth > maxTextWidth) || !options.autosize)
         td.setTextWidth(maxTextWidth);
 
     td.defaultTextOption().setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+   
+    static const auto ratio = qApp->desktop()->devicePixelRatio();
+    const auto width = td.documentLayout()->documentSize().width() + options.horPadding * 2;
+    const auto height = td.documentLayout()->documentSize().height() + options.vertPadding * 2;
+    const auto baseSize = QSize(width, height);
+    const auto pixmapSize = baseSize * ratio;
 
-    pixmap = QPixmap(td.documentLayout()->documentSize().width() + options.horPadding * 2
-        , td.documentLayout()->documentSize().height() + options.vertPadding * 2);
+    pixmap = QPixmap(pixmapSize);
+    pixmap.setDevicePixelRatio(ratio);
     pixmap.fill(Qt::transparent);
 
     QPainter painter(&pixmap);
-
     painter.setBrush(options.backgroundColor);
     painter.setPen(Qt::NoPen);
 
     {
         const QnScopedPainterAntialiasingRollback antialiasing(&painter, true);
-        painter.drawRoundedRect(pixmap.rect(), options.borderRadius, options.borderRadius);
+        painter.drawRoundedRect(QRectF(QPointF(), baseSize), options.borderRadius, options.borderRadius);
     }
 
     painter.translate(options.horPadding, options.vertPadding);
     td.drawContents(&painter);
-
-    q->resize(QSizeF(pixmap.size()));
+    q->resize(baseSize);
     q->update();
 }
 

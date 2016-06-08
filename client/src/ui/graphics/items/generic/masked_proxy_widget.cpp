@@ -43,16 +43,18 @@ QnMaskedProxyWidget::~QnMaskedProxyWidget() {
     return;
 }
 
-void QnMaskedProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    Q_UNUSED(widget);
+void QnMaskedProxyWidget::paint(QPainter *painter, 
+    const QStyleOptionGraphicsItem *option, 
+    QWidget *outputWidget) 
+{
+    Q_UNUSED(outputWidget);
 
-    if (!this->widget() || !this->widget()->isVisible())
+    if (!widget() || !widget()->isVisible())
         return;
 
     /* Filter out repaints on the window frame. */
-    QRectF renderRectF = option->exposedRect.isEmpty()
-        ? rect()
-        : option->exposedRect & rect();
+    QRectF renderRectF = (option->exposedRect.isEmpty() ?
+        rect() : option->exposedRect & rect());
 
     /* Filter out areas that are masked out. */
     if(!m_paintRect.isNull())
@@ -63,16 +65,18 @@ void QnMaskedProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
     if (renderRect.isEmpty())
         return;
 
-    if(m_pixmapDirty && m_updatesEnabled) {
-        //std::cout<<"QnMaskedProxyWidget::paint\n";
-        //m_pixmap = QPixmap::grabWidget(this->widget(), this->widget()->rect());
-        m_pixmap = this->widget()->grab(this->widget()->rect());
-//#ifndef __APPLE__
-        m_pixmapDirty = false;
-//#endif
-    }
+    if(m_pixmapDirty && m_updatesEnabled) 
+    {
+        const auto widgetRect = this->widget()->rect();
+        const int ratio = painter->device()->devicePixelRatio();
+        m_pixmap = QPixmap(widgetRect.size() * ratio);
+        m_pixmap.fill(Qt::transparent);
+        m_pixmap.setDevicePixelRatio(ratio);
+        widget()->render(&m_pixmap, QPoint(), widgetRect);
 
-    painter->drawPixmap(renderRect, m_pixmap, QRectF(renderRect.topLeft() - rect().topLeft(), renderRect.size()));
+        m_pixmapDirty = false;
+    }
+    painter->drawPixmap(renderRect, m_pixmap, m_pixmap.rect());
 }
 
 bool QnMaskedProxyWidget::eventFilter(QObject *object, QEvent *event) {

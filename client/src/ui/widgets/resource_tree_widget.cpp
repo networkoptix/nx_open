@@ -105,7 +105,7 @@ private:
         if (isLocal)
             return Qn::LocalSeparatorNode + 1;
 
-        NX_ASSERT(false, "Should never get here");
+        /* We still can get here when comparing recorders with cameras. */
         return nodeType;
     }
 

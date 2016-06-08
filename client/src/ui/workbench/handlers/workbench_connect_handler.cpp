@@ -256,10 +256,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
     const auto connectionAlias = parameters.argument(Qn::ConnectionAliasRole, QString());
-    const auto storeSettings = StoreConnectionSettings::create(connectionAlias,        
+    const auto storeSettings = StoreConnectionSettings::create(connectionAlias,
         parameters.argument(Qn::StorePasswordRole, false),
         parameters.argument(Qn::AutoLoginRole, false));
-    
+
     if (url.isValid())
     {
         /* ActiveX plugin */

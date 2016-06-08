@@ -1,7 +1,5 @@
 #include "resource_allocator.h"
 
-#include <QtCore/QMutexLocker>
-
 #include "config.h"
 using mobile_client::conf;
 

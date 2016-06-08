@@ -124,6 +124,22 @@ QString QnSavedSessionsModel::updateSession(
     return savedId;
 }
 
+QString QnSavedSessionsModel::updateSession(
+        const QString& sessionId,
+        const QUrl& url,
+        const QString& systemName,
+        bool moveTop)
+{
+    return updateSession(
+                sessionId,
+                url.host(),
+                url.port(),
+                url.userName(),
+                url.password(),
+                systemName,
+                moveTop);
+}
+
 void QnSavedSessionsModel::deleteSession(const QString &id) {
     auto it = std::find_if(m_savedSessions.begin(), m_savedSessions.end(), [&id](const QnLoginSession &session) {
         return session.id == id;

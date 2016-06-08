@@ -2150,6 +2150,7 @@ void MediaServerProcess::run()
         server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
         server->setProperty(Qn::PHISICAL_MEMORY, QString::number(hwInfo.phisicalMemory));
 
+        server->setProperty(Qn::PRODUCT_NAME_SHORT, QnAppInfo::productNameShort());
         server->setProperty(Qn::FULL_VERSION, QnAppInfo::applicationFullVersion());
         server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
         server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString());
