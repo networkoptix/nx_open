@@ -4,6 +4,10 @@ describe('System suite', function () {
 
     var p = new SystemPage();
 
+    afterEach(function() {
+        p.helper.logout()
+    });
+
     it("has system name, owner and OpenInNx button visible on every system page", function() {
         p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
 
@@ -24,7 +28,6 @@ describe('System suite', function () {
 
                     p.helper.navigateBack();
                 }
-                p.helper.logout();
             });
         });
     });
@@ -38,25 +41,31 @@ describe('System suite', function () {
                 return (p.helper.isSubstr(content, 'not activated') || p.helper.isSubstr(content, 'offline'))
             });
         });
+
         offlineSystems.count().then(function(count) {
             for (var i= 0; i < count; i++) {
                 offlineSystems.get(i).click();
+
                 expect(p.openInClientButton.isEnabled()).toBe(false);
 
                 p.helper.navigateBack();
             }
-            p.helper.logout();
         });
-    });
+    }, 120000);
 
     it("should confirm, if owner deletes system (You are going to disconnect your system from cloud)", function() {
         p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
         p.ownedSystem.click();
         p.ownerDeleteButton.click();
         expect(p.disconnectDialog.isDisplayed()).toBe(true);
-        expect(p.disconnectDialog.getText()).toContain('You are going to completely disconnect your system from the cloud. Are you sure?');
+        expect(p.disconnectDialog.getText()).toContain('You will be able to connect to your system ' +
+            'only from local network. If you don\'t have local administator account, you will have to ' +
+            'create it first time when you connect to the system.');
         p.cancelDisconnectButton.click();
-        p.helper.logout();
+        // TODO: delete condition when CLOUD-363 is fixed
+        p.disconnectDialog.isPresent().then( function(is) {
+            if (is) p.cancelDisconnectButton.click();
+        });
     });
 
     it("should confirm, if not owner deletes system (You will loose access to this system)", function() {
@@ -66,7 +75,10 @@ describe('System suite', function () {
         expect(p.disconnectDialog.isDisplayed()).toBe(true);
         expect(p.disconnectDialog.getText()).toContain('You are going to disconnect this system from your account. You will lose an access for this system. Are you sure?');
         p.cancelDisconnectButton.click();
-        p.helper.logout();
+        // TODO: delete condition when CLOUD-363 is fixed
+        p.disconnectDialog.isPresent().then( function(is) {
+            if (is) p.cancelDisconnectButton.click();
+        });
     });
 
     it("has Share button, visible for admin and owner", function() {
@@ -78,8 +90,6 @@ describe('System suite', function () {
         p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.shareButton.isDisplayed()).toBe(true);
-
-        p.helper.logout();
     });
 
     it("does not show Share button to viewer, advanced viewer, live viewer", function() {
@@ -96,8 +106,6 @@ describe('System suite', function () {
         p.helper.login(p.helper.userEmailLiveViewer, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.shareButton.isPresent()).toBe(false);
-
-        p.helper.logout();
     });
 
     it("should open System page by link to not authorized user and redirect to homepage, if he does not log in", function() {
@@ -122,8 +130,6 @@ describe('System suite', function () {
         // Fill data into login page
         p.helper.loginFromCurrPage(p.helper.userEmailOwner, p.helper.userPassword);
         expect(p.systemNameElem.getText()).toContain(p.systemName);
-
-        p.helper.logout();
     });
 
     it("should open System page by link to user without permission and show alert (System info is unavailable: You have no access to this system)", function() {
@@ -133,8 +139,6 @@ describe('System suite', function () {
         browser.get(p.url + p.systemLink);
         p.alert.catchAlert(p.alert.alertMessages.systemAccessRestricted, p.alert.alertTypes.danger);
         expect(p.systemNameElem.isPresent()).toBe(false);
-
-        p.helper.logout();
     });
 
     it("should open System page by link not authorized user, and show alert if logs in and has no permission", function() {
@@ -147,8 +151,6 @@ describe('System suite', function () {
         p.helper.loginFromCurrPage(p.helper.userEmailNoPerm, p.helper.userPassword);
         p.alert.catchAlert(p.alert.alertMessages.systemAccessRestricted, p.alert.alertTypes.danger);
         expect(p.systemNameElem.isPresent()).toBe(false);
-
-        p.helper.logout();
     });
 
     it("should display same user data as user provided during registration (stress to cyrillic)", function() {
@@ -167,10 +169,8 @@ describe('System suite', function () {
             p.helper.login(userEmail, p.helper.userPassword);
             p.helper.getSysPage(p.systemLink);
             expect(p.usrDataRow(userEmail).getText()).toContain(p.helper.userNameCyrillic + ' ' + p.helper.userNameCyrillic);
-
-            p.helper.logout();
         });
-    }, 60000);
+    }, 120000);
 
     it("should display same user data as showed in user account (stress to cyrillic)", function() {
         p.helper.login(p.helper.userEmailAdmin);
@@ -178,8 +178,6 @@ describe('System suite', function () {
 
         p.helper.changeAccountNames(p.helper.userNameCyrillic, p.helper.userNameCyrillic);
         p.helper.getSysPage(p.systemLink);
-        p.usrDataRow(p.helper.userEmailAdmin).getText().then(function(text){console.log(text)});
         expect(p.usrDataRow(p.helper.userEmailAdmin).getText()).toContain(p.helper.userNameCyrillic + ' ' + p.helper.userNameCyrillic);
-        p.helper.logout();
     });
 });
