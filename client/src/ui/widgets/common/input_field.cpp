@@ -61,12 +61,10 @@ public:
         }
 
         QString hintText = lastValidationResult.errorMessage;
-        hint->setText(hintText);
-
-        bool hideHint = hintText.isEmpty();
-        if (hideHint != hint->isHidden())
+        if (hint->text() != hintText)
         {
-            hint->setVisible(!hideHint);
+            hint->setText(hintText);
+            hint->setVisible(!hintText.isEmpty());
             parent->layout()->activate();
         }
 
@@ -125,6 +123,7 @@ QnInputField::QnInputField(QWidget* parent /*= nullptr*/) :
     d_ptr(new QnInputFieldPrivate(this))
 {
     Q_D(QnInputField);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     QGridLayout* grid = new QGridLayout(this);
     grid->addWidget(d->title, 0, 0, 1, 1, Qt::AlignRight);
