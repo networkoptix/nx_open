@@ -165,8 +165,8 @@ protected:
                     return 0;
                 };
 
-                Qn::ResourceFlags leftFlagsOrder = flagsOrder(leftResource->flags());
-                Qn::ResourceFlags rightFlagsOrder = flagsOrder(rightResource->flags());
+                int leftFlagsOrder = flagsOrder(leftResource->flags());
+                int rightFlagsOrder = flagsOrder(rightResource->flags());
                 if (leftFlagsOrder != rightFlagsOrder)
                     return leftFlagsOrder < rightFlagsOrder;
 
@@ -529,6 +529,9 @@ bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event)
 
     case QEvent::PaletteChange:
         ui->resourcesTreeView->setPalette(palette()); // override default item view palette
+        break;
+
+    default:
         break;
     }
 
