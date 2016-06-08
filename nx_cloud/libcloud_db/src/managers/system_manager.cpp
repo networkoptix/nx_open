@@ -384,7 +384,7 @@ void SystemManager::getAccessRoleList(
 constexpr const std::size_t kMaxSystemNameLength = 1024;
 
 void SystemManager::updateSystemName(
-    const AuthorizationInfo& authzInfo,
+    const AuthorizationInfo& /*authzInfo*/,
     data::SystemNameUpdate data,
     std::function<void(api::ResultCode)> completionHandler)
 {
@@ -773,7 +773,7 @@ nx::db::DBResult SystemManager::updateSystemNameInDB(
 }
 
 void SystemManager::systemNameUpdated(
-    QnCounter::ScopedIncrement asyncCallLocker,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     data::SystemNameUpdate data,
     std::function<void(api::ResultCode)> completionHandler)
