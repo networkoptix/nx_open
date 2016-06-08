@@ -73,12 +73,9 @@ QString QnChangeUserPasswordDialog::newPassword() const
 bool QnChangeUserPasswordDialog::validate()
 {
     bool result = true;
+
     for (QnInputField* field : { ui->newPasswordInputField, ui->confirmPasswordInputField, ui->currentPasswordInputField })
-    {
-        field->validate();
-        if (field->lastValidationResult() != QValidator::Acceptable)
-            result = false;
-    }
+        result = field->validate() && result;
 
     return result;
 }

@@ -9,8 +9,6 @@ namespace Ui
     class ChangeUserPasswordDialog;
 }
 
-class QnInputField;
-
 class QnChangeUserPasswordDialog: public QnButtonBoxDialog, public QnWorkbenchContextAware
 {
     Q_OBJECT
