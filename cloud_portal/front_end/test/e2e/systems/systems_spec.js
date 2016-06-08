@@ -8,6 +8,10 @@ describe('Systems list suite', function () {
         p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
     });
 
+    beforeEach(function() {
+        jasmine.addMatchers(p.customMatchers);
+    });
+
     afterAll(function() {
         p.helper.logout();
     });
@@ -27,7 +31,7 @@ describe('Systems list suite', function () {
         p.systemsList.filter(function(elem) {
             // First filter systems that are activated
             return elem.getInnerHtml().then(function(content) {
-                return !p.helper.isSubstr(content, 'not activated');
+                return !p.helper.isSubstr(content, 'offline');
             });
         }).each(function (elem) {
             // Then for every activated system, check that button is visible
@@ -39,7 +43,7 @@ describe('Systems list suite', function () {
         p.systemsList.filter(function(elem) {
             // First filter systems that are not activated or offline
             return elem.getInnerHtml().then(function(content) {
-                return (p.helper.isSubstr(content, 'not activated') || p.helper.isSubstr(content, 'offline'))
+                return (p.helper.isSubstr(content, 'offline'))
             });
         }).each(function (elem) {
             // Then for every such system, check that button is not visible
@@ -47,12 +51,16 @@ describe('Systems list suite', function () {
         });
     });
 
-    xit("should show system's state for systems (activated, online, offline)", function () {
-        expect("test").toBe("written");
+    it("should show system's state for systems (activated, online, offline)", function () {
+        p.systemsList.each(function (elem) {
+            expect(elem.getText()).toContainAnyOf(['activated','online','offline']);
+        });
     });
 
-    xit("should not show not activated systems in the list", function () {
-        expect("test").toBe("written");
+    it("should not show not activated systems in the list", function () {
+        p.systemsList.each(function (elem) {
+            expect(elem.getText()).not.toContain('not activated');
+        });
     });
 
     xit("should show system's owner for every system in the list, 'Your system' for user's systems", function () {
