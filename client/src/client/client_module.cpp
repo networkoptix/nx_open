@@ -31,17 +31,30 @@
 #include <core/core_settings.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/client_camera_factory.h>
+#include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
+
+#include <decoders/video/abstract_video_decoder.h>
+
+#include <finders/systems_finder.h>
+#include <finders/direct_systems_finder.h>
+#include <finders/cloud_systems_finder.h>
+
+#include <network/module_finder.h>
+#include <network/router.h>
 
 #include <nx/network/socket_global.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx_ec/dummy_handler.h>
+#include <nx_ec/ec2_lib.h>
 
 #include <platform/platform_abstraction.h>
 
 #include <plugins/plugin_manager.h>
+#include <plugins/storage/file_storage/qtfile_storage_resource.h>
+#include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <redass/redass_controller.h>
 
@@ -54,6 +67,7 @@
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/media/voice_spectrum_analyzer.h>
 #include <utils/performance_test.h>
+#include <utils/server_interface_watcher.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -65,6 +79,10 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
+#ifdef Q_OS_WIN
+#include <ui/workaround/iexplore_url_handler.h>
+#endif
+#include <ui/workaround/qtbug_workaround.h>
 
 #ifdef Q_OS_MAC
 #include <ui/workaround/mac_utils.h>
@@ -131,8 +149,9 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     initSingletons(startupParams);
     initRuntimeParams(startupParams);
     initLog(startupParams);
-    initNetworkSockets(startupParams);
+    initNetwork(startupParams);
     initSkin(startupParams);
+    initLocalResources();
 }
 
 QnClientModule::~QnClientModule()
@@ -239,8 +258,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     cloudStatusWatcher->setCloudCredentials(clientSettings->cloudLogin(), clientSettings->cloudPassword(), true);
     common->store<QnCloudStatusWatcher>(cloudStatusWatcher.take());
 
-    common->store<PluginManager>(new PluginManager());
-
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
     common->store<TextToWaveServer>(textToWaveServer.take());
@@ -249,6 +266,11 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
 
     QnAppServerConnectionFactory::setDefaultFactory(QnClientResourceFactory::instance());
+
+#ifdef Q_OS_WIN
+    common->store<QnIexploreUrlHandler>(new QnIexploreUrlHandler());
+    common->store<QnQtbugWorkaround>(new QnQtbugWorkaround());
+#endif
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
@@ -363,12 +385,11 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     }
 }
 
-void QnClientModule::initNetworkSockets(const QnStartupParameters& startupParams)
+void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 {
     //TODO #ak get rid of this class!
-    ec2::DummyHandler dummyEc2RequestHandler;
-
-    nx_http::HttpModManager httpModManager;
+    qnCommon->store<ec2::DummyHandler>(new ec2::DummyHandler());
+    qnCommon->store<nx_http::HttpModManager>(new nx_http::HttpModManager());
     if (!startupParams.enforceSocketType.isEmpty())
         SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 
@@ -376,9 +397,49 @@ void QnClientModule::initNetworkSockets(const QnStartupParameters& startupParams
         nx::network::SocketGlobals::mediatorConnector().mockupAddress(
             startupParams.enforceMediatorEndpoint);
 
-
     // TODO: #mu ON/OFF switch in settings?
     nx::network::SocketGlobals::mediatorConnector().enable(true);
+
+    /* Initialize connections. */
+
+    Qn::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+        ? Qn::PT_DesktopClient
+        : Qn::PT_VideowallClient;
+
+    QScopedPointer<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory(clientPeerType));
+    QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.data());
+    qnCommon->store<ec2::AbstractECConnectionFactory>(ec2ConnectionFactory.take());
+
+    if (!startupParams.videoWallGuid.isNull())
+    {
+        QnAppServerConnectionFactory::setVideowallGuid(startupParams.videoWallGuid);
+        QnAppServerConnectionFactory::setInstanceGuid(startupParams.videoWallItemGuid);
+    }
+
+    ec2::ApiRuntimeData runtimeData;
+    runtimeData.peer.id = qnCommon->moduleGUID();
+    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
+    runtimeData.peer.peerType = clientPeerType;
+    runtimeData.brand = QnAppInfo::productNameShort();
+    runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
+    QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
+
+    QnModuleFinder* moduleFinder(new QnModuleFinder(true, qnRuntime->isDevMode())); //TODO: #GDM make it common way via scoped pointer somehow
+    moduleFinder->start();
+    qnCommon->store<QnModuleFinder>(moduleFinder);
+
+    QScopedPointer<QnSystemsFinder> systemsFinder(new QnSystemsFinder());
+    QScopedPointer<QnDirectSystemsFinder> directSystemsFinder(new QnDirectSystemsFinder());
+    QScopedPointer<QnCloudSystemsFinder> cloudSystemsFinder(new QnCloudSystemsFinder());
+    systemsFinder->addSystemsFinder(directSystemsFinder.data());
+    systemsFinder->addSystemsFinder(cloudSystemsFinder.data());
+    qnCommon->store<QnSystemsFinder>(systemsFinder.take());
+    qnCommon->store<QnDirectSystemsFinder>(directSystemsFinder.take());
+    qnCommon->store<QnCloudSystemsFinder>(cloudSystemsFinder.take());
+
+    QnRouter* router = new QnRouter(moduleFinder);
+    qnCommon->store<QnRouter>(router);
+    qnCommon->store<QnServerInterfaceWatcher>(new QnServerInterfaceWatcher(router));
 }
 
 //#define ENABLE_DYNAMIC_CUSTOMIZATION
@@ -413,4 +474,21 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
 
     qnCommon->store<QnSkin>(skin.take());
     qnCommon->store<QnCustomizer>(customizer.take());
+}
+
+void QnClientModule::initLocalResources()
+{
+    qnCommon->store<PluginManager>(new PluginManager());
+    // client uses ordinary QT file to access file system
+    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
+    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
+    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
+
+    QnVideoDecoderFactory::setCodecManufacture(QnVideoDecoderFactory::AUTO);
+
+    if (!QDir(qnSettings->mediaFolder()).exists())
+        QDir().mkpath(qnSettings->mediaFolder());
+
+    cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
+    QDir::setCurrent(qnSettings->mediaFolder());
 }

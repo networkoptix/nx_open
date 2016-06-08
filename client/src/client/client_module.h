@@ -20,8 +20,9 @@ private:
     void initSingletons     (const QnStartupParameters& startupParams);
     void initRuntimeParams  (const QnStartupParameters& startupParams);
     void initLog            (const QnStartupParameters& startupParams);
-    void initNetworkSockets (const QnStartupParameters& startupParams);
+    void initNetwork        (const QnStartupParameters& startupParams);
     void initSkin           (const QnStartupParameters& startupParams);
+    void initLocalResources();
 };
 
 

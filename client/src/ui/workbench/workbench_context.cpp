@@ -27,6 +27,7 @@
 #include <ui/statistics/modules/graphics_statistics_module.h>
 #include <ui/statistics/modules/durations_statistics_module.h>
 
+#include <ui/workaround/fglrx_full_screen.h>
 
 #ifdef Q_OS_WIN
 #include "watchers/workbench_desktop_camera_watcher_win.h"
@@ -49,7 +50,6 @@ QnWorkbenchContext::QnWorkbenchContext(QObject *parent):
     m_accessController.reset(new QnWorkbenchAccessController(this));
 
     m_workbench.reset(new QnWorkbench(this));
-
 
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
 #ifdef Q_OS_WIN
@@ -82,6 +82,8 @@ QnWorkbenchContext::QnWorkbenchContext(QObject *parent):
 
     const auto durationStatModule = instance<QnDurationStatisticsModule>();
     qnStatisticsManager->registerStatisticsModule(lit("durations"), durationStatModule);
+
+    instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {

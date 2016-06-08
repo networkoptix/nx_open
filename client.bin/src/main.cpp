@@ -7,6 +7,10 @@
 
 #include <qglobal.h>
 
+#ifdef Q_OS_WIN
+#include <common/systemexcept_win32.h>
+#endif
+
 #ifdef Q_OS_LINUX
 #   include <unistd.h>
 #endif
@@ -19,7 +23,6 @@
 
 #include <utils/common/app_info.h>
 #include "ui/widgets/main_window.h"
-#include <api/global_settings.h>
 
 
 #include <QtCore/QStandardPaths>
@@ -27,12 +30,11 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
-#include <QtCore/QTranslator>
+#include <QtCore/QScopedPointer>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 #include <QtGui/QDesktopServices>
-#include <QScopedPointer>
 #include <QtSingleApplication>
 
 #include <client/client_settings.h>
@@ -42,12 +44,10 @@
 #include <client/client_resource_processor.h>
 #include <client/client_startup_parameters.h>
 
-
 #include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
 #include "core/resource/resource_directory_browser.h"
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/storage_plugin_factory.h>
 #include <core/resource/client_camera_factory.h>
 
 #include "decoders/video/ipp_h264_decoder.h"
@@ -58,56 +58,30 @@
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"
 
-#include "decoders/video/abstract_video_decoder.h"
 #ifdef Q_OS_WIN
 #include <plugins/resource/desktop_win/desktop_resource_searcher.h>
 #endif
 #include "utils/common/util.h"
-#include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
 
 #include "api/app_server_connection.h"
 
 #include "api/session_manager.h"
 #include "ui/actions/action_manager.h"
-#include <nx/network/socket.h>
-
-
-#include "plugins/storage/file_storage/qtfile_storage_resource.h"
-#include "plugins/storage/file_storage/layout_storage_resource.h"
-#include "core/resource/camera_history.h"
 
 #ifdef Q_OS_LINUX
 #include "ui/workaround/x11_launcher_workaround.h"
 #include "common/systemexcept_linux.h"
 #endif
-#include "utils/common/cryptographic_hash.h"
-#include "ui/style/globals.h"
+
 #include "openal/qtvaudiodevice.h"
-#include "ui/workaround/fglrx_full_screen.h"
-#include "ui/workaround/qtbug_workaround.h"
-
-
-#ifdef Q_OS_WIN
-#include "ui/workaround/iexplore_url_handler.h"
-#include "common/systemexcept_win32.h"
-#endif
 
 #include "ui/help/help_handler.h"
 
 #include "utils/common/long_runnable.h"
 
 #include "common/common_module.h"
-#include "ui/customization/customizer.h"
-#include <nx_ec/ec2_lib.h>
 
-#include <network/module_finder.h>
-#include <finders/systems_finder.h>
-#include <finders/direct_systems_finder.h>
-#include <finders/cloud_systems_finder.h>
-#include <network/router.h>
-#include <api/network_proxy_factory.h>
-#include <utils/server_interface_watcher.h>
 #include <nx/vms/utils/system_uri.h>
 
 #ifdef Q_OS_MAC
@@ -115,22 +89,15 @@
 #endif
 #include "api/runtime_info_manager.h"
 
-
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/platform/protocol_handler.h>
 #include <nx/vms/utils/app_info.h>
 
+#include <watchers/cloud_status_watcher.h>
+
 namespace
 {
     const int kSuccessCode = 0;
-}
-
-void ffmpegInit()
-{
-    // client uses ordinary QT file to access file system, server uses buffering access implemented inside QnFileStorageResource
-    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
-    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
-    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
 }
 
 static QtMessageHandler defaultMsgHandler = 0;
@@ -207,55 +174,14 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
         for (int i = 1; i < argc; ++i)
             argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
 
-        while (application->isRunning())
+        if (application->isRunning())
         {
             if (application->sendMessage(argsMessage))
-            {
-                cl_log.log(lit("Another instance is already running"), cl_logALWAYS);
                 return kSuccessCode;
-            }
         }
     }
 
     QnClientModule client(startupParams);
-
-
-
-
-#ifdef Q_OS_WIN
-    new QnIexploreUrlHandler(application); /* All effects are placed in the constructor. */
-    new QnQtbugWorkaround(application);
-#endif
-
-    /* Initialize connections. */
-    if (!startupParams.videoWallGuid.isNull())
-    {
-        QnAppServerConnectionFactory::setVideowallGuid(startupParams.videoWallGuid);
-        QnAppServerConnectionFactory::setInstanceGuid(startupParams.videoWallItemGuid);
-    }
-
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
-        getConnectionFactory(startupParams.videoWallGuid.isNull() ? Qn::PT_DesktopClient : Qn::PT_VideowallClient));
-    QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.get());
-
-    ec2::ApiRuntimeData runtimeData;
-    runtimeData.peer.id = qnCommon->moduleGUID();
-    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
-    runtimeData.peer.peerType = startupParams.videoWallItemGuid.isNull()
-        ? Qn::PT_DesktopClient
-        : Qn::PT_VideowallClient;
-    runtimeData.brand = QnAppInfo::productNameShort();
-    runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
-    QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
-
-    qnSettings->save();
-    if (!QDir(qnSettings->mediaFolder()).exists())
-        QDir().mkpath(qnSettings->mediaFolder());
-
-    cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
-
-    QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
-
 
     /* Initialize sound. */
     QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());
@@ -265,36 +191,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
 
     cl_log.log(qApp->applicationDisplayName(), " started", cl_logALWAYS);
     cl_log.log("Software version: ", QApplication::applicationVersion(), cl_logALWAYS);
-    cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
+    cl_log.log("binary path: ", qApp->applicationFilePath(), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
-    ffmpegInit();
-
-    QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true, qnRuntime->isDevMode()));
-    moduleFinder->start();
-
-    // TODO: #ynikitenkov: move to common module? -> dependency on moduleFinder
-
-    typedef QScopedPointer<QnAbstractSystemsFinder> SystemsFinderPtr;
-    const QScopedPointer<QnSystemsFinder> systemsFinder(new QnSystemsFinder());
-    const SystemsFinderPtr directSystemsFinder(new QnDirectSystemsFinder());
-    const SystemsFinderPtr cloudSystemsFinder(new QnCloudSystemsFinder());
-    systemsFinder->addSystemsFinder(directSystemsFinder.data());
-    systemsFinder->addSystemsFinder(cloudSystemsFinder.data());
-
-    QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data()));
-
-    QScopedPointer<QnServerInterfaceWatcher> serverInterfaceWatcher(new QnServerInterfaceWatcher(router.data()));
-
-    // ===========================================================================
-
-    QnVideoDecoderFactory::setCodecManufacture(QnVideoDecoderFactory::AUTO);
 
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext());
-
-    context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 
     QnActions::IDType effectiveMaximizeActionId = QnActions::FullscreenAction;
 #ifdef Q_OS_LINUX
@@ -469,18 +372,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
 
     QnResourceDiscoveryManager::instance()->stop();
 
-    QnAppServerConnectionFactory::setEc2Connection(NULL);
-
-    ec2ConnectionFactory.reset();
-
-    QnAppServerConnectionFactory::setUrl(QUrl());
-
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher::initStaticInstance(NULL);
 #endif
 
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
+    qnSettings->save();
 
     //restoring default message handler
     qInstallMessageHandler(defaultMsgHandler);
