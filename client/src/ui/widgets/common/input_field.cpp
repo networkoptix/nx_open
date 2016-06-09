@@ -32,7 +32,10 @@ public:
     {
         /* On focus make input look usual even if there is error. Hint will be visible though. */
         if (watched == input && event->type() == QEvent::FocusIn)
+        {
             input->setPalette(parent->palette());
+            lastValidationResult.state = QValidator::Intermediate;
+        }
 
         /* Always pass event further */
         return false;
@@ -266,7 +269,7 @@ bool QnInputField::isValid() const
         return d->validator(d->input->text()).state == QValidator::Acceptable;
 
     if (d->passwordIndicator)
-        return d->passwordIndicator->currentInformation().acceptance() == QnPasswordInformation::Acceptable;
+        return d->passwordIndicator->currentInformation().acceptance() != QnPasswordInformation::Inacceptable;
 
     return true;
 }
@@ -274,7 +277,7 @@ bool QnInputField::isValid() const
 bool QnInputField::lastValidationResult() const
 {
     Q_D(const QnInputField);
-    return d->lastValidationResult.state == QValidator::Acceptable;
+    return d->lastValidationResult.state != QValidator::Invalid;
 }
 
 void QnInputField::setValidator(Qn::TextValidateFunction validator, bool validateImmediately)
