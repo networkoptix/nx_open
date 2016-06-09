@@ -7,26 +7,22 @@
 #include <utils/common/model_functions.h>
 #include <common/common_module.h>
 
-namespace {
-    QSet<QString> getAddresses(const QnMediaServerResourcePtr &server) {
-        QSet<QString> addresses;
-        QSet<QString> ignoredHosts;
-        for (const QUrl &url: server->getIgnoredUrls())
-            ignoredHosts.insert(url.host());
+#include <nx/network/socket_common.h>
 
+namespace {
+    QSet<QString> getAddresses(const QnMediaServerResourcePtr &server)
+    {
         const auto port = server->getPort();
-        for (const auto& address: server->getNetAddrList()) {
-            if (address.port == port) {
-                QString addressString = address.address.toString();
-                if (!ignoredHosts.contains(addressString))
-                    addresses.insert(addressString);
-            }
+        QSet<QString> result;
+        for (const SocketAddress& address : server->getAllAvailableAddresses())
+        {
+            //TODO: #dklyckov why are we filtering addresses by port here?
+            if (address.port != port)
+                continue;
+
+            result << address.address.toString();
         }
-        for (const QUrl &url: server->getAdditionalUrls()) {
-            if (!ignoredHosts.contains(url.host()))
-                addresses.insert(url.host());
-        }
-        return addresses;
+        return result;
     }
 }
 
@@ -43,7 +39,7 @@ int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequ
         if (useAddresses)
         {
             QList<QnModuleInformationWithAddresses> modules;
-            for (const QnMediaServerResourcePtr &server: allServers)
+            for (const QnMediaServerResourcePtr &server : allServers)
             {
                 QnModuleInformationWithAddresses moduleInformation = server->getModuleInformation();
                 moduleInformation.remoteAddresses = getAddresses(server);
@@ -54,17 +50,21 @@ int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequ
         else
         {
             QList<QnModuleInformation> modules;
-            for (const QnMediaServerResourcePtr &server: allServers)
+            for (const QnMediaServerResourcePtr &server : allServers)
                 modules.append(server->getModuleInformation());
             result.setReply(modules);
         }
-    } else if (useAddresses) {
+    }
+    else if (useAddresses)
+    {
         QnModuleInformationWithAddresses moduleInformation(qnCommon->moduleInformation());
         QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
         if (server)
             moduleInformation.remoteAddresses = getAddresses(server);
         result.setReply(moduleInformation);
-    } else {
+    }
+    else
+    {
         result.setReply(qnCommon->moduleInformation());
     }
     return CODE_OK;
