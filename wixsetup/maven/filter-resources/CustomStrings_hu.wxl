@@ -143,7 +143,7 @@
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Korábbi verzió észlelve</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Telepítési mód</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">A rendszer frissítve lesz</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Az adatbázis sérült és nem lehet helyreállítani. Friss adatbázis lett telepítve. A rendszerve való belépéshezhasználja Belépés "admin" és jelszó "123". Kérem változtassa meg a hitelesítő adatokat az első belépés után.</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Az adatbázis sérült és nem lehet helyreállítani. Friss adatbázis lett telepítve. A rendszerve való belépéshezhasználja Belépés "admin" és jelszó "admin". Kérem változtassa meg a hitelesítő adatokat az első belépés után.</String>    
 
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Nem lehet csatlakozni a Windows Tűzfal.  ([2]   [3]   [4]   [5])</String>    
