@@ -25,7 +25,6 @@
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
         <rdep.windows.packages>festival</rdep.windows.packages>
-        <rdep.linux.packages>festival</rdep.linux.packages>
         <rdep.mac.packages>festival</rdep.mac.packages>
 
     </properties>
@@ -56,6 +55,25 @@
         </profile>  
 
         <profile>
+            <id>linux-noarm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>
+
+            <properties>
+                <rdep.linux.packages>festival</rdep.linux.packages>
+            </properties>
+        </profile>
+
+        <profile>
             <id>linux-arm-bpi</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -70,7 +88,7 @@
             </activation>
 
             <properties>
-                <rdep.linux.arm.packages>festival</rdep.linux.arm.packages>
+                <rdep.linux.packages>festival</rdep.linux.packages>
             </properties>
         </profile>  
 
@@ -89,7 +107,7 @@
             </activation>
 
             <properties>
-                <rdep.linux.arm.packages>festival</rdep.linux.arm.packages>
+                <rdep.linux.packages>festival</rdep.linux.packages>
             </properties>
         </profile>  
 
