@@ -34,6 +34,7 @@ public:
         getSystemCredentials() const override;
 
     bool boundToCloud() const;
+    /** Returns \a nullptr if not connected to the cloud */
     std::unique_ptr<nx::cdb::api::Connection> getCloudConnection();
     const nx::cdb::api::ConnectionFactory& connectionFactory() const;
 

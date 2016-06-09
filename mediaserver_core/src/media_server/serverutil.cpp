@@ -31,6 +31,8 @@
 #include <utils/common/model_functions.h>
 #include "server_connector.h"
 #include <transaction/transaction_message_bus.h>
+#include "cloud/cloud_system_name_updater.h"
+
 
 namespace
 {
@@ -280,6 +282,8 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
     QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+
+    CloudSystemNameUpdater::instance()->update();
 
     return true;
 }
