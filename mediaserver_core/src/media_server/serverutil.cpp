@@ -247,7 +247,6 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
     if (qnCommon->localSystemName() == systemName.value())
         return true;
 
-    qnCommon->setLocalSystemName(systemName.value());
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server) {
         NX_LOG("Cannot find self server resource!", cl_logERROR);
@@ -259,6 +258,7 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
         NX_LOG("Failed to save new system name to config", cl_logWARNING);
         return false;
     }
+    qnCommon->setLocalSystemName(systemName.value());
     if (resetConnections)
         resetTransactionTransportConnections();
 
