@@ -76,6 +76,8 @@ int downloadFile( const QString& url, const QString& destFilePath );
 
 int main( int argc, char* argv[] )
 {
+    nx::network::SocketGlobals::init();
+
     QnLongRunnablePool runnablePool;
 
     QString logLevel = "WARN";

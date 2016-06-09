@@ -678,10 +678,12 @@
             <properties>
                 <platform>macosx</platform>
                 <arch>x64</arch>
+                <modification>macosx</modification>
                 <quazip.version>0.7.2</quazip.version>
                 <qt.spec/>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
+                <client.binary.name>${display.product.name}</client.binary.name>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
