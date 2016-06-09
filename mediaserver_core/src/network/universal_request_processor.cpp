@@ -231,7 +231,8 @@ bool QnUniversalRequestProcessor::isProxy(const nx_http::Request& request)
     {
         // is proxy to other media server
         QnUuid desiredServerGuid(xServerGuidIter->second);
-        return desiredServerGuid != qnCommon->moduleGUID();
+        if (desiredServerGuid != qnCommon->moduleGUID())
+            return true;
     }
 
     return isProxyForCamera(request);

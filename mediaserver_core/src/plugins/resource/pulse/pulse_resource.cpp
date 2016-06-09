@@ -10,7 +10,6 @@ const QString QnPlPulseResource::MANUFACTURE(lit("Pulse"));
 QnPlPulseResource::QnPlPulseResource()
 {
     setVendor(lit("Pulse"));
-    setDefaultAuth(QLatin1String("admin"), QLatin1String("admin"));
 }
 
 QString QnPlPulseResource::getDriverName() const
@@ -33,5 +32,12 @@ void QnPlPulseResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
+
+CameraDiagnostics::Result QnPlPulseResource::initInternal()
+{
+    updateDefaultAuthIfEmpty(QLatin1String("admin"), QLatin1String("admin"));
+    return QnPhysicalCameraResource::initInternal();
+}
+
 
 #endif // #ifdef ENABLE_PULSE_CAMERA
