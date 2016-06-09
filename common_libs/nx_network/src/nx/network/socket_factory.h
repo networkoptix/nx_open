@@ -61,6 +61,7 @@ public:
     static void enforceStreamSocketType( QString type );
     static bool isStreamSocketTypeEnforced();
     static void enforceSsl( bool isEnforced );
+    static bool isSslEnforced();
 
     /** Sets new factory. Returns old one */
     static CreateStreamSocketFuncType 

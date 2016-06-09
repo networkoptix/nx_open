@@ -452,7 +452,11 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     }
     }
 
-    QnAppServerConnectionFactory::setUrl(connectionInfo.ecUrl);
+    QUrl ecUrl = connectionInfo.ecUrl;
+    if (connectionInfo.allowSslConnections)
+        ecUrl.setScheme(lit("https"));
+
+    QnAppServerConnectionFactory::setUrl(ecUrl);
     QnAppServerConnectionFactory::setEc2Connection(result.connection());
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 

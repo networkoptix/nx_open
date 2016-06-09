@@ -49,6 +49,9 @@ static QFileInfoList readCrashes(const QString& prefix = QString())
            .arg(crashDir.absolutePath()).arg(crashFilter), cl_logDEBUG1);
 
     auto files = crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files);
+    // Qt has a crossplatform bug in build in sort by QDir::Time
+    // - linux: time decrements along the list
+    // - windows: time increments along the list
     std::sort(
         files.begin(), files.end(),
         [](const QFileInfo& left, const QFileInfo& right)
