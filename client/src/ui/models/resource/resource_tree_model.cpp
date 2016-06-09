@@ -228,12 +228,11 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
     if (!m_allNodes.contains(node))
         return;
 
-    /* Make sure resources without parent will never be visible. */
-    auto bastardNode = m_rootNodes[Qn::BastardNode];
-
+    /* Remove node from all hashes where node can be the key. */
     m_allNodes.removeOne(node);
     m_recorderHashByParent.remove(node);
     m_itemNodesByParent.remove(node);
+    m_sharedLayoutNodesByParent.remove(node);
 
     /* Calculating children this way because bastard nodes are absent in node's childred() list. */
     QList<QnResourceTreeModelNodePtr> children;
@@ -244,11 +243,6 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
     /* Recursively remove all child nodes. */
     for (auto child : children)
         removeNode(child);
-
-    /* Remove node from all hashes where node can be the key. */
-    m_recorderHashByParent.remove(node);
-    m_itemNodesByParent.remove(node);
-    m_sharedLayoutNodesByParent.remove(node);
 
     switch (node->type())
     {
