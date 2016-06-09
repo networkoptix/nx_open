@@ -168,6 +168,8 @@
         <qtplugin2>platforms</qtplugin2>
 	<!-- Linux Only -->
         <qtplugin3/>
+	<!-- Unix Only -->        
+        <qtplugin4/>    
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -534,6 +536,7 @@
                 <unix>true</unix>
                 <windows>false</windows>
                 <script.extension>sh</script.extension>
+                <qtplugin4>audio</qtplugin4>
             </properties>
         </profile>
         <profile>
