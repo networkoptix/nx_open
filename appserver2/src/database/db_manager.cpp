@@ -1936,9 +1936,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraA
         if (!camera)
             return ErrorCode::serverError;
         cameras.push_back(camera);
-        bool enableProposed = std::any_of(param.scheduleTasks.cbegin(), param.scheduleTasks.cend(),
-                                          [] (const ApiScheduleTaskData &task) { return task.recordingType != Qn::RecordingType::RT_Never; });
-        licenseUsageHelper.propose(camera, enableProposed);
+        licenseUsageHelper.propose(camera, param.scheduleEnabled);
     }
 
     for (const auto &camera : cameras)
