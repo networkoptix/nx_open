@@ -1295,6 +1295,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             m_needResyncUsers = true;
         }
     }
+    else if (updateName == lit(":/updates/51_http_business_action.sql"))
+    {
+        if (!m_dbJustCreated)
+            m_needResyncbRules = true;
+    }
     else if (updateName == lit(":/updates/54_migrate_permissions.sql"))
     {
         if (!ec2::db::migrateUserPermissions(m_sdb))
@@ -1316,8 +1321,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         if (!m_dbJustCreated)
             m_needResyncLayout = true;
     }
-    else if (updateName == lit(":/updates/51_http_business_action.sql")) 
-	{
+    else if (updateName == lit(":/updates/58_migrate_camera_output_action.sql"))
+    {
+        if (!ec2::db::migrateBusinessRulesToV30(m_sdb))
+            return false;
+
         if (!m_dbJustCreated)
             m_needResyncbRules = true;
     }
@@ -1351,7 +1359,7 @@ bool QnDbManager::createDatabase()
         if (!execSQLFile(lit(":/00_update_2.2_stage0.sql"), m_sdb))
             return false;
 
-        if (!ec2::db::migrateBusinessEvents(m_sdb))
+        if (!ec2::db::migrateBusinessRulesToV23(m_sdb))
             return false;
 
         if (!m_dbJustCreated)

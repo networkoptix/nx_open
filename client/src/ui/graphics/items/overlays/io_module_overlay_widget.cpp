@@ -60,13 +60,13 @@ namespace {
         typedef QPair<int, Qt::Alignment> ColumnInfo;
         typedef QVector<ColumnInfo> ColumnInfoVector;
         static const ColumnInfoVector kColumns = []() -> ColumnInfoVector
-        { 
-            const Qt::AlignmentFlag aligns[] = 
+        {
+            const Qt::AlignmentFlag aligns[] =
             {
                 Qt::AlignRight      // Input name
                 , Qt::AlignCenter   // Input state
                 , Qt::AlignLeft     // Input caption
-                
+
                 , Qt::AlignCenter   // Spacer
 
                 , Qt::AlignRight    // Output name
@@ -161,7 +161,7 @@ QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlay
 {
     widget->setAutoFillBackground(true);
 
-    enum 
+    enum
     {
         kOuterMargin = 24
         , kTopMargin = kOuterMargin * 2
@@ -218,7 +218,7 @@ QGraphicsLayoutItem *QnIoModuleOverlayWidgetPrivate::createButton(QnIoModuleOver
     font.setPixelSize(outputFontSize);
 
     QFontMetrics metrics(font);
-    int maxWidth = metrics.width(QString(maxPortNameLength, L'w'));  
+    int maxWidth = metrics.width(QString(maxPortNameLength, L'w'));
 
     QPushButton *button = new QPushButton(metrics.elidedText(data->ioConfigData.outputName, Qt::ElideRight, maxWidth));
     button->setFont(font);
@@ -244,7 +244,7 @@ QGraphicsLayoutItem *QnIoModuleOverlayWidgetPrivate::createLabel(QnIoModuleOverl
     font.setPixelSize(inputFontSize);
 
     QFontMetrics metrics(font);
-    int maxWidth = metrics.width(QString(maxPortNameLength, L'w'));  
+    int maxWidth = metrics.width(QString(maxPortNameLength, L'w'));
 
     Q_Q(QnIoModuleOverlayWidget);
     GraphicsLabel *descriptionLabel = new GraphicsLabel(metrics.elidedText(data->ioConfigData.inputName, Qt::ElideRight, maxWidth), q);
@@ -277,7 +277,7 @@ void QnIoModuleOverlayWidgetPrivate::addIoItem(QnIoModuleOverlayWidgetPrivate::M
 
     const bool isOutput = (data->ioConfigData.portType == Qn::PT_Output);
 
-    enum 
+    enum
     {
         kInputsStartColumn = 0
         , kOutputsStartColumn = 4
@@ -298,10 +298,10 @@ void QnIoModuleOverlayWidgetPrivate::addIoItem(QnIoModuleOverlayWidgetPrivate::M
 
     ++itemsCount;
 
-    enum 
+    enum
     {
         kNoSpacing = 0
-        , kSpacingSize = 48 
+        , kSpacingSize = 48
     };
 
     controlsLayout->setColumnFixedWidth(kSpacerColumn, m_inputsCount ? kSpacingSize : kNoSpacing);
@@ -392,9 +392,8 @@ void QnIoModuleOverlayWidgetPrivate::at_buttonClicked() {
 
     QnBusinessActionParameters params;
     params.relayOutputId = it->ioConfigData.id;
-    params.relayAutoResetTimeout = it->ioConfigData.autoResetTimeoutMs;
-    bool isInstant = true; //setting.autoResetTimeoutMs != 0;
-    QnCameraOutputBusinessActionPtr action(new QnCameraOutputBusinessAction(isInstant, eventParams));
+    params.durationMs = it->ioConfigData.autoResetTimeoutMs;
+    QnCameraOutputBusinessActionPtr action(new QnCameraOutputBusinessAction(eventParams));
 
     action->setParams(params);
     action->setResources(QVector<QnUuid>() << camera->getId());

@@ -389,7 +389,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(this));
     if (actionType == QnBusiness::BookmarkAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(this));
-    else if (actionType == QnBusiness::CameraOutputAction || actionType == QnBusiness::CameraOutputOnceAction)
+    else if (actionType == QnBusiness::CameraOutputAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(this));
     else if (actionType == QnBusiness::ExecutePtzPresetAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(this));

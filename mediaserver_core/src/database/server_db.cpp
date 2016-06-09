@@ -118,10 +118,9 @@ namespace
                 result.relayOutputId = QString::fromUtf8(field.data(), field.size());
                 break;
             case RelayAutoResetTimeoutParam:
-                result.relayAutoResetTimeout = toInt(field);
+                result.durationMs = toInt(field);
                 break;
             case InputPortIdParam:
-                result.inputPortId = QString::fromUtf8(field.data(), field.size());
                 break;
             case KeyParam:
                 break;

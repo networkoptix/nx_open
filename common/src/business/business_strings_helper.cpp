@@ -39,10 +39,6 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
                                         tr("Device output"),
                                         tr("Camera output")
                                     );
-    case CameraOutputOnceAction:    return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                        tr("Device output for 30 sec"),
-                                        tr("Camera output for 30 sec")
-                                    );
     case CameraRecordingAction:     return QnDeviceDependentStrings::getDefaultNameFromSet(
                                         tr("Device recording"),
                                         tr("Camera recording")
