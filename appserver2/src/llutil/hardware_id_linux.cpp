@@ -232,7 +232,7 @@ void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareIn
     QStringList hardwareIdList = QStringList() << QString::fromUtf8(hardwareId);
 
     HardwareIdListForVersion macHardwareIds;
-    macHardwareIds << QPair<QString, QStringList>(kEmptyMac,  hardwareIdList);
+    macHardwareIds << MacAndItsHardwareIds(kEmptyMac,  hardwareIdList);
 
     for (int i = 1; i <= LATEST_HWID_VERSION; i++) {
         hardwareIds << macHardwareIds;

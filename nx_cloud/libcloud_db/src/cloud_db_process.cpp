@@ -38,6 +38,7 @@
 #include "http_handlers/get_access_role_list.h"
 #include "http_handlers/get_cloud_users_of_system.h"
 #include "http_handlers/get_systems_handler.h"
+#include "http_handlers/update_system_name_handler.h"
 #include "http_handlers/get_cdb_nonce_handler.h"
 #include "http_handlers/get_authentication_response_handler.h"
 #include "http_handlers/ping.h"
@@ -406,6 +407,12 @@ void CloudDBProcess::registerApiHandlers(
         GetAccessRoleListHandler::kHandlerPath,
         [systemManager, &authorizationManager]() -> std::unique_ptr<GetAccessRoleListHandler> {
             return std::make_unique<GetAccessRoleListHandler>(systemManager, authorizationManager);
+        });
+
+    msgDispatcher->registerRequestProcessor<UpdateSystemNameHttpHandler>(
+        UpdateSystemNameHttpHandler::kHandlerPath,
+        [systemManager, &authorizationManager]() -> std::unique_ptr<UpdateSystemNameHttpHandler> {
+            return std::make_unique<UpdateSystemNameHttpHandler>(systemManager, authorizationManager);
         });
 
     //authentication
