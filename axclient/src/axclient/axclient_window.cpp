@@ -218,7 +218,7 @@ void QnAxClientWindow::slidePanelsOut() {
 void QnAxClientWindow::createMainWindow() {
     NX_ASSERT(m_mainWindow == NULL, Q_FUNC_INFO, "Double initialization");
 
-    m_context.reset(new QnWorkbenchContext(qnResPool));
+    m_context.reset(new QnWorkbenchContext());
     m_context->instance<QnFglrxFullScreen>();
 
     //TODO: #GDM is it really needed here?

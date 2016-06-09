@@ -1218,7 +1218,7 @@ void QnResourceTreeModel::at_videoWall_itemAddedOrChanged(const QnVideoWallResou
 
     QnResourcePtr resource;
     if (!item.layout.isNull())
-        resource = resourcePool()->getResourceById(item.layout);
+        resource = qnResPool->getResourceById(item.layout);
 
     if (node->resource() != resource)
         updateNodeResource(node, resource);

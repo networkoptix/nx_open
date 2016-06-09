@@ -12,8 +12,8 @@ QnWorkbenchUserLayoutCountWatcher::QnWorkbenchUserLayoutCountWatcher(QObject *pa
     QnWorkbenchContextAware(parent),
     m_layoutCount(0)
 {
-    connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(qnResPool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
     connect(context(),      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged()));
 
     at_context_userChanged();
@@ -37,7 +37,7 @@ void QnWorkbenchUserLayoutCountWatcher::at_context_userChanged() {
     m_currentUserId = context()->user() ? context()->user()->getId() : QnUuid();
 
     m_layouts.clear();
-    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
+    foreach(const QnResourcePtr &resource, qnResPool->getResources())
         at_resourcePool_resourceAdded(resource, false);
 
     updateLayoutCount();
@@ -78,7 +78,7 @@ void QnWorkbenchUserLayoutCountWatcher::at_resource_parentIdChanged(const QnReso
     } else {
         m_layouts.remove(resource);
     }
-        
+
     if(update)
         updateLayoutCount();
 }

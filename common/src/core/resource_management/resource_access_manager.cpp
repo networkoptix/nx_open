@@ -216,12 +216,9 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& us
     return result;
 }
 
-bool QnResourceAccessManager::hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permission requiredPermission) const
+bool QnResourceAccessManager::hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permissions requiredPermissions) const
 {
-    if (requiredPermission == Qn::NoPermissions)
-        return true;
-
-    return permissions(user, resource).testFlag(requiredPermission);
+    return (permissions(user, resource) & requiredPermissions) == requiredPermissions;
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const
@@ -635,4 +632,84 @@ bool QnResourceAccessManager::canCreateWebPage(const QnUserResourcePtr& user) co
 {
     /* Only admins can add new web pages. */
     return hasGlobalPermission(user, Qn::GlobalAdminPermission);
+}
+
+bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnStorageResourcePtr& target, const ec2::ApiStorageData& update) const
+{
+    /* Storages cannot be moved from one server to another. */
+    if (target->getParentId() != update.parentId)
+        return false;
+
+    /* Otherwise - default behavior. */
+    return hasPermission(user, target, Qn::SavePermission);
+}
+
+bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnLayoutResourcePtr& target, const ec2::ApiLayoutData& update) const
+{
+    /* If we are changing layout parent, it is equal to creating new layout. */
+    if (target->getParentId() != update.parentId)
+        return canCreateLayout(user, update.parentId);
+
+    /* Otherwise - default behavior. */
+    return hasPermission(user, target, Qn::SavePermission);
+}
+
+bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnUserResourcePtr& target, const ec2::ApiUserData& update) const
+{
+    if (!user || !target)
+        return false;
+
+    /* Nobody can make user an owner (isAdmin ec2 field) unless target user is already an owner. */
+    if (!target->isOwner() && update.isAdmin)
+        return false;
+
+    /* We should have full access to user to modify him. */
+    Qn::Permissions requiredPermissions = Qn::ReadWriteSavePermission;
+
+    if (target->getName() != update.name)
+        requiredPermissions |= Qn::WriteNamePermission;
+
+    if (target->getHash() != update.hash)
+        requiredPermissions |= Qn::WritePasswordPermission;
+
+    if (target->getDigest() != update.digest)       //TODO: #rvasilenko describe somewhere password changing logic, it looks like hell to me
+        requiredPermissions |= Qn::WritePasswordPermission;
+
+    if (target->getRawPermissions() != update.permissions)
+        requiredPermissions |= Qn::WriteAccessRightsPermission;
+
+    if (target->getEmail() != update.email)
+        requiredPermissions |= Qn::WriteEmailPermission;
+
+    if (target->fullName() != update.fullName)
+        requiredPermissions |= Qn::WriteFullNamePermission;
+
+    return hasPermission(user, target, requiredPermissions);
+}
+
+bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnVideoWallResourcePtr& target, const ec2::ApiVideowallData& update) const
+{
+    auto hasItemsChange = [target, update]
+    {
+        auto items = target->items()->getItems();
+
+        /* Quick check */
+        if (items.size() != update.items.size())
+            return false;
+
+        for (auto updated : update.items)
+        {
+            if (!items.contains(updated.guid))
+                return false;
+        }
+
+        return true;
+    };
+
+    /* Only admin can add and remove videowall items. */
+    if (hasItemsChange())
+        return hasGlobalPermission(user, Qn::GlobalAdminPermission);
+
+    /* Otherwise - default behavior. */
+    return hasPermission(user, target, Qn::SavePermission);
 }

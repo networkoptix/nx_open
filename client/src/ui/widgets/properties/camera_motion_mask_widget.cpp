@@ -54,7 +54,7 @@ void QnCameraMotionMaskWidget::init() {
     m_view->setAutoFillBackground(true);
 
     /* Set up model & control machinery. */
-    m_context.reset(new QnWorkbenchContext(NULL, this));
+    m_context.reset(new QnWorkbenchContext(this));
 
     auto workbenchLayout = new QnWorkbenchLayout(this);
     workbenchLayout->setCellSpacing(QSizeF(0, 0));

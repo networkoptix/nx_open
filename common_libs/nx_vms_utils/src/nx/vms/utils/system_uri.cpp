@@ -7,80 +7,81 @@
 
 using namespace nx::vms::utils;
 
-namespace
+namespace {
+
+const QString kAuthKey = "auth";
+const QString kReferralSourceKey = "from";
+const QString kReferralContextKey = "context";
+
+const SystemUri::Scope kDefaultScope = SystemUri::Scope::Generic;
+const SystemUri::Protocol kDefaultProtocol = SystemUri::Protocol::Http;
+const SystemUri::SystemAction kDefaultSystemAction = SystemUri::SystemAction::View;
+
+const int kDefaultPort = 80;
+const int kMaxPort = 65535;
+
+const int kUuidLength = 36;
+
+const QMap<SystemUri::Scope, QString> scopeToString
 {
-    const QString kAuthKey = "auth";
-    const QString kReferralSourceKey = "from";
-    const QString kReferralContextKey = "context";
+    {SystemUri::Scope::Generic, "generic"},
+    {SystemUri::Scope::Direct, "direct"}
+};
 
-    const SystemUri::Scope kDefaultScope = SystemUri::Scope::Generic;
-    const SystemUri::Protocol kDefaultProtocol = SystemUri::Protocol::Http;
-    const SystemUri::SystemAction kDefaultSystemAction = SystemUri::SystemAction::View;
+const QMap<SystemUri::Protocol, QString> protocolToString
+{
+    {SystemUri::Protocol::Http, "http"},
+    {SystemUri::Protocol::Https, "https"},
+    {SystemUri::Protocol::Native, AppInfo::nativeUriProtocol()} //TODO: #GDM make customizable
+};
 
-    const int kDefaultPort = 80;
-    const int kMaxPort = 65535;
+const QMap<SystemUri::ClientCommand, QString> clientCommandToString
+{
+    {SystemUri::ClientCommand::None,            "_invalid_"},
+    {SystemUri::ClientCommand::Client,          "client"},
+    {SystemUri::ClientCommand::LoginToCloud,    "cloud"},
+    {SystemUri::ClientCommand::ConnectToSystem, "system"}
+};
 
-    const int kUuidLength = 36;
+const QMap<SystemUri::SystemAction, QString> systemActionToString
+{
+    {SystemUri::SystemAction::View, "view"}
+};
 
-    const QMap<SystemUri::Scope, QString> scopeToString
+const QMap<SystemUri::ReferralSource, QString> referralSourceToString
+{
+    {SystemUri::ReferralSource::None,           ""},
+    {SystemUri::ReferralSource::DesktopClient,  "client"},
+    {SystemUri::ReferralSource::MobileClient,   "mobile"},
+    {SystemUri::ReferralSource::CloudPortal,    "portal"},
+    {SystemUri::ReferralSource::WebAdmin,       "webadmin"}
+};
+
+const QMap<SystemUri::ReferralContext, QString> referralContextToString
+{
+    {SystemUri::ReferralContext::None,          ""},
+    {SystemUri::ReferralContext::SetupWizard,   "setup"},
+    {SystemUri::ReferralContext::SettingsDialog,"settings"},
+    {SystemUri::ReferralContext::WelcomePage,   "startpage"},
+    {SystemUri::ReferralContext::CloudMenu,     "menu"}
+};
+
+void splitString(const QString& source, QChar separator, QString& left, QString& right)
+{
+    int idx = source.indexOf(separator);
+    if (idx < 0)
     {
-        {SystemUri::Scope::Generic, "generic"},
-        {SystemUri::Scope::Direct, "direct"}
-    };
-
-    const QMap<SystemUri::Protocol, QString> protocolToString
+        left = source;
+        right = QString();
+    }
+    else
     {
-        {SystemUri::Protocol::Http, "http"},
-        {SystemUri::Protocol::Https, "https"},
-        {SystemUri::Protocol::Native, AppInfo::nativeUriProtocol()} //TODO: #GDM make customizable
-    };
-
-    const QMap<SystemUri::ClientCommand, QString> clientCommandToString
-    {
-        {SystemUri::ClientCommand::None,            "_invalid_"},
-        {SystemUri::ClientCommand::Client,          "client"},
-        {SystemUri::ClientCommand::LoginToCloud,    "cloud"},
-        {SystemUri::ClientCommand::ConnectToSystem, "system"}
-    };
-
-    const QMap<SystemUri::SystemAction, QString> systemActionToString
-    {
-        {SystemUri::SystemAction::View, "view"}
-    };
-
-    const QMap<SystemUri::ReferralSource, QString> referralSourceToString
-    {
-        {SystemUri::ReferralSource::None,           ""},
-        {SystemUri::ReferralSource::DesktopClient,  "client"},
-        {SystemUri::ReferralSource::MobileClient,   "mobile"},
-        {SystemUri::ReferralSource::CloudPortal,    "portal"},
-        {SystemUri::ReferralSource::WebAdmin,       "webadmin"}
-    };
-
-    const QMap<SystemUri::ReferralContext, QString> referralContextToString
-    {
-        {SystemUri::ReferralContext::None,          ""},
-        {SystemUri::ReferralContext::SetupWizard,   "setup"},
-        {SystemUri::ReferralContext::SettingsDialog,"settings"},
-        {SystemUri::ReferralContext::WelcomePage,   "startpage"},
-        {SystemUri::ReferralContext::CloudMenu,     "menu"}
-    };
-
-    void splitString(const QString& source, QChar separator, QString& left, QString& right)
-    {
-        int idx = source.indexOf(separator);
-        if (idx < 0)
-        {
-            left = source;
-            right = QString();
-        }
-        else
-        {
-            left = source.left(idx);
-            right = source.mid(idx + 1);
-        }
+        left = source.left(idx);
+        right = source.mid(idx + 1);
     }
 }
+
+} // namespace
 
 class nx::vms::utils::SystemUriPrivate
 {
@@ -258,7 +259,7 @@ public:
 
     bool operator==(const SystemUriPrivate& other) const
     {
-       return protocol == other.protocol
+        return protocol == other.protocol
             && clientCommand == other.clientCommand
             && domain == other.domain
             && systemId == other.systemId
