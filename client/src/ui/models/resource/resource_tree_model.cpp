@@ -451,7 +451,11 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     if (QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>())
     {
         if (layout->isFile())
-            return m_rootNodes[Qn::LocalResourcesNode];
+        {
+            if (isLoggedIn)
+                return m_rootNodes[Qn::LocalResourcesNode];
+            return rootNode;
+        }
 
         if (layout->isShared())
             return m_rootNodes[Qn::LayoutsNode];
