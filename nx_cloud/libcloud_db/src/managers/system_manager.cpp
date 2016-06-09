@@ -77,7 +77,7 @@ void SystemManager::authenticateByName(
 
     QnMutexLocker lk(&m_mutex);
 
-    auto& systemByIdIndex = m_systems.get<SYSTEM_BY_ID_INDEX>();
+    auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
     const auto systemIter = systemByIdIndex.find(
         std::string(username.constData(), username.size()));
     if (systemIter == systemByIdIndex.end())
@@ -197,7 +197,7 @@ void SystemManager::getSystems(
         systemID = wholeFilterMap.get<std::string>(cdb::attr::systemID);
 
     QnMutexLocker lk(&m_mutex);
-    const auto& systemByIdIndex = m_systems.get<SYSTEM_BY_ID_INDEX>();
+    const auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
     if (systemID)
     {
         //selecting system by id
@@ -212,7 +212,7 @@ void SystemManager::getSystems(
     }
     else if (accountEmail)
     {
-        const auto& accountIndex = m_accountAccessRoleForSystem.get<SHARING_BY_ACCOUNT_EMAIL>();
+        const auto& accountIndex = m_accountAccessRoleForSystem.get<kSharingByAccountEmail>();
         const auto accountSystemsRange = accountIndex.equal_range(accountEmail.get());
         for (auto it = accountSystemsRange.first; it != accountSystemsRange.second; ++it)
         {
@@ -299,7 +299,7 @@ void SystemManager::getCloudUsersOfSystem(
     if (systemID)
     {
         //selecting all sharings of system id
-        const auto& systemIndex = m_accountAccessRoleForSystem.get<SHARING_BY_SYSTEM_ID>();
+        const auto& systemIndex = m_accountAccessRoleForSystem.get<kSharingBySystemId>();
         const auto systemSharingsRange = systemIndex.equal_range(systemID.get());
         for (auto it = systemSharingsRange.first; it != systemSharingsRange.second; ++it)
         {
@@ -311,7 +311,7 @@ void SystemManager::getCloudUsersOfSystem(
     else
     {
         //selecting sharings for every system account has access to
-        const auto& accountIndex = m_accountAccessRoleForSystem.get<SHARING_BY_ACCOUNT_EMAIL>();
+        const auto& accountIndex = m_accountAccessRoleForSystem.get<kSharingByAccountEmail>();
         const auto accountsSystemsRange = accountIndex.equal_range(accountEmail);
         for (auto accountIter = accountsSystemsRange.first;
              accountIter != accountsSystemsRange.second;
@@ -325,7 +325,7 @@ void SystemManager::getCloudUsersOfSystem(
                 //no access to system's sharing list is allowed for this account
                 continue;
             }
-            const auto& systemIndex = m_accountAccessRoleForSystem.get<SHARING_BY_SYSTEM_ID>();
+            const auto& systemIndex = m_accountAccessRoleForSystem.get<kSharingBySystemId>();
             const auto systemSharingRange = systemIndex.equal_range(accountIter->systemID);
             for (auto sharingIter = systemSharingRange.first;
                  sharingIter != systemSharingRange.second;
@@ -391,6 +391,25 @@ void SystemManager::updateSystemName(
     if (data.name.empty() || data.name.size() > kMaxSystemNameLength)
         return completionHandler(api::ResultCode::badRequest);
 
+    //if system name matches current, no update is needed
+    {
+        QnMutexLocker lk(&m_mutex);
+
+        auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
+        auto systemIter = systemByIdIndex.find(data.id);
+        if (systemIter == systemByIdIndex.end())
+        {
+            NX_ASSERT(false);
+            return completionHandler(api::ResultCode::notFound);
+        }
+
+        if (systemIter->name == data.name)
+        {
+            //system name match existing
+            return completionHandler(api::ResultCode::ok);
+        }
+    }
+
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::SystemNameUpdate>(
         std::bind(&SystemManager::updateSystemNameInDB, this, _1, _2),
@@ -406,7 +425,7 @@ api::SystemAccessRole SystemManager::getAccountRightsForSystem(
 {
     QnMutexLocker lk(&m_mutex);
     const auto& accountSystemPairIndex =
-        m_accountAccessRoleForSystem.get<SHARING_UNIQUE_INDEX>();
+        m_accountAccessRoleForSystem.get<kSharingUniqueIndex>();
     api::SystemSharing toFind;
     toFind.accountEmail = accountEmail;
     toFind.systemID = systemID;
@@ -610,7 +629,7 @@ void SystemManager::systemMarkedAsDeleted(
     if (dbResult == nx::db::DBResult::ok)
     {
         QnMutexLocker lk(&m_mutex);
-        auto& systemByIdIndex = m_systems.get<SYSTEM_BY_ID_INDEX>();
+        auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
         auto systemIter = systemByIdIndex.find(systemId);
         if (systemIter != systemByIdIndex.end())
         {
@@ -627,7 +646,7 @@ void SystemManager::systemMarkedAsDeleted(
         }
 
         //removing system-to-account
-        auto& systemIndex = m_accountAccessRoleForSystem.get<SHARING_BY_SYSTEM_ID>();
+        auto& systemIndex = m_accountAccessRoleForSystem.get<kSharingBySystemId>();
         systemIndex.erase(systemId);
     }
 
@@ -675,9 +694,9 @@ void SystemManager::systemDeleted(
     if (dbResult == nx::db::DBResult::ok)
     {
         QnMutexLocker lk(&m_mutex);
-        auto& systemByIdIndex = m_systems.get<SYSTEM_BY_ID_INDEX>();
+        auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
         systemByIdIndex.erase(systemID.systemID);
-        auto& systemIndex = m_accountAccessRoleForSystem.get<SHARING_BY_SYSTEM_ID>();
+        auto& systemIndex = m_accountAccessRoleForSystem.get<kSharingBySystemId>();
         systemIndex.erase(systemID.systemID);
     }
     completionHandler(
@@ -734,7 +753,7 @@ void SystemManager::sharingUpdated(
         //updating "systems by account id" index
         QnMutexLocker lk(&m_mutex);
         auto& accountSystemPairIndex =
-            m_accountAccessRoleForSystem.get<SHARING_UNIQUE_INDEX>();
+            m_accountAccessRoleForSystem.get<kSharingUniqueIndex>();
         accountSystemPairIndex.erase(sharing);
         if (sharing.accessRole != api::SystemAccessRole::none)
         {
@@ -783,7 +802,7 @@ void SystemManager::systemNameUpdated(
         //updating system name in cache
         QnMutexLocker lk(&m_mutex);
 
-        auto& systemByIdIndex = m_systems.get<SYSTEM_BY_ID_INDEX>();
+        auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
         auto systemIter = systemByIdIndex.find(data.id);
         if (systemIter != systemByIdIndex.end())
         {
@@ -837,7 +856,7 @@ void SystemManager::systemActivated(
     {
         QnMutexLocker lk(&m_mutex);
 
-        auto& systemByIdIndex = m_systems.get<SYSTEM_BY_ID_INDEX>();
+        auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
         auto systemIter = systemByIdIndex.find(systemId);
         if (systemIter != systemByIdIndex.end())
         {
@@ -1042,14 +1061,14 @@ void SystemManager::expiredSystemsDeletedFromDb(
     {
         //cleaning up systems cache
         QnMutexLocker lk(&m_mutex);
-        auto& systemsByExpirationTime = m_systems.get<SYSTEM_BY_EXPIRATION_TIME_INDEX>();
+        auto& systemsByExpirationTime = m_systems.get<kSystemByExpirationTimeIndex>();
         for (auto systemIter = systemsByExpirationTime.lower_bound(::time(NULL));
              systemIter != systemsByExpirationTime.end();
              )
         {
             NX_ASSERT(systemIter->status != api::SystemStatus::ssActivated);
 
-            auto& sharingBySystemId = m_accountAccessRoleForSystem.get<SHARING_BY_SYSTEM_ID>();
+            auto& sharingBySystemId = m_accountAccessRoleForSystem.get<kSharingBySystemId>();
             sharingBySystemId.erase(systemIter->id);
 
             systemIter = systemsByExpirationTime.erase(systemIter);
