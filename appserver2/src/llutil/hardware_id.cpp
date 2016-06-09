@@ -20,7 +20,7 @@
 namespace
 {
     QnHardwareInfo g_hardwareInfo;
-    HardwareIdListType g_hardwareId;
+    LLUtil::HardwareIdListType g_hardwareId;
     QString g_storedMac;
     bool g_hardwareIdInitialized(false);
 
@@ -30,9 +30,9 @@ namespace
 
 namespace LLUtil {
 
-    void fillHardwareIds(HardwareIdListType &hardwareIds, QnHardwareInfo &hardwareInfo);
+    void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
 
-    void calcHardwareIds(HardwareIdListForVersion &macHardwareIds, const QnHardwareInfo &hardwareInfo, int version)
+    void calcHardwareIds(HardwareIdListForVersion& macHardwareIds, const QnHardwareInfo& hardwareInfo, int version)
     {
         macHardwareIds.clear();
 
@@ -49,41 +49,42 @@ namespace LLUtil {
                 hardwareIds << hardwareIdMap[mac];
             }
 
-            macHardwareIds << QPair<QString, QStringList>(mac, hardwareIds);
+            macHardwareIds << MacAndItsHardwareIds(mac, hardwareIds);
         }
 
-        for (auto &item : macHardwareIds)
+        for (auto& item : macHardwareIds)
         {
-            item.second.removeDuplicates();
+            item.hwids.removeDuplicates();
         }
     }
 
 
-    QStringList getMacAddressList(const QnMacAndDeviceClassList &devices)
+    QStringList getMacAddressList(const QnMacAndDeviceClassList& devices)
     {
         if (devices.empty())
             return QStringList();
 
         QnMacAndDeviceClassList devicesCopy(devices);
-        std::sort(devicesCopy.begin(), devicesCopy.end(), [](const QnMacAndDeviceClass &device1, const QnMacAndDeviceClass &device2)
+        std::sort(devicesCopy.begin(), devicesCopy.end(), [](const QnMacAndDeviceClass& device1, const QnMacAndDeviceClass& device2)
         {
             if (device1.xclass < device2.xclass)
                 return true;
-            else if (device1.xclass > device2.xclass)
+
+            if (device1.xclass > device2.xclass)
                 return false;
-            else
-                return device1.mac < device2.mac;
+
+            return device1.mac < device2.mac;
         });
 
         QStringList result;
 
-        for (const QnMacAndDeviceClass &device: devicesCopy)
+        for (const QnMacAndDeviceClass& device: devicesCopy)
             result.append(device.mac);
 
         return result;
     }
 
-    QString saveMac(const QStringList &macs, QSettings *settings)
+    QString saveMac(const QStringList& macs, QSettings* settings)
     {
         if (macs.isEmpty())
             return QString();
@@ -99,18 +100,18 @@ namespace LLUtil {
         return storedMac;
     }
 
-    QString hashedHardwareId(const QByteArray &data, int version)
+    QString hashedHardwareId(const QByteArray& data, int version)
     {
         QCryptographicHash md5Hash(QCryptographicHash::Md5);
         md5Hash.addData(data);
 
         if (version == 0)
             return QString(md5Hash.result().toHex());
-        else
-            return QString(lit("0%1%2")).arg(version).arg(QString(md5Hash.result().toHex()));
+
+        return QString(lit("0%1%2")).arg(version).arg(QString(md5Hash.result().toHex()));
     }
 
-    void initHardwareId(QSettings *settings)
+    void initHardwareId(QSettings* settings)
     {
         if (g_hardwareIdInitialized)
             return;
@@ -123,7 +124,7 @@ namespace LLUtil {
             // Add to g_hardwareId
             QStringList oldHardwareIds(hashedHardwareId(oldHardwareId.toUtf8(), 0));
             HardwareIdListForVersion macHardwareIds;
-            macHardwareIds << QPair<QString, QStringList>(kEmptyMac, oldHardwareIds);
+            macHardwareIds << MacAndItsHardwareIds(kEmptyMac, oldHardwareIds);
             g_hardwareId << macHardwareIds;
 
             fillHardwareIds(g_hardwareId, g_hardwareInfo);
@@ -139,7 +140,7 @@ namespace LLUtil {
             NX_LOG(QnLog::HWID_LOG, QString::fromUtf8(QJson::serialized(g_hardwareInfo)).trimmed(), cl_logINFO);
             NX_LOG(QnLog::HWID_LOG, QString("Hardware IDs: [\"%1\"]").arg(getAllHardwareIds().join("\", \"")), cl_logINFO);
         }
-        catch (const LLUtil::HardwareIdError &err)
+        catch (const LLUtil::HardwareIdError& err)
         {
             qWarning() << QLatin1String("getHardwareId()") << err.what();
         }
@@ -157,12 +158,12 @@ namespace LLUtil {
         }
 
         QStringList result;
-        for (const auto &pair : g_hardwareId[version])
+        for (const auto& pair : g_hardwareId[version])
         {
-            for (const QString &hwid : pair.second)
+            for (const QString& hwid : pair.hwids)
             {
                 QString hwidHash = hashedHardwareId(hwid.toUtf8(), version);
-                if (pair.first == g_storedMac)
+                if (pair.mac == g_storedMac)
                     result.insert(0, hwidHash);
                 else
                     result << hwidHash;
@@ -188,30 +189,31 @@ namespace LLUtil {
     {
         NX_ASSERT(g_hardwareIdInitialized);
 
-        const auto &macHwIds = g_hardwareId[LATEST_HWID_VERSION];
-        for (const auto &macHwid : macHwIds)
+        const auto& macHwidsList = g_hardwareId[LATEST_HWID_VERSION];
+        for (const auto& macHwids : macHwidsList)
         {
-            if (macHwid.first == g_storedMac && !macHwid.second.isEmpty())
+            if (macHwids.mac == g_storedMac && !macHwids.hwids.isEmpty())
             {
-                return hashedHardwareId(macHwid.second.front().toUtf8(), LATEST_HWID_VERSION);
+                return hashedHardwareId(macHwids.hwids.front().toUtf8(), LATEST_HWID_VERSION);
             }
         }
 
         return QString();
     }
 
-    const QnHardwareInfo &getHardwareInfo()
+    const QnHardwareInfo& getHardwareInfo()
     {
         return g_hardwareInfo;
     }
 
-    int hardwareIdVersion(const QString &hardwareId)
+    int hardwareIdVersion(const QString& hardwareId)
     {
         if (hardwareId.length() == 32)
             return 0;
-        else if (hardwareId.length() == 34)
+
+        if (hardwareId.length() == 34)
             return hardwareId.mid(0, 2).toInt();
-        else
-            return -1;
+        
+        return -1;
     }
 } // namespace LLUtil {}
