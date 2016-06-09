@@ -403,6 +403,7 @@
             </activation>
             <properties>
                 <qtlib19>DBus</qtlib19>
+                <qtplugin4>audio</qtplugin4>
             </properties>
             <modules>
                 <module>applauncher</module>
@@ -536,7 +537,6 @@
                 <unix>true</unix>
                 <windows>false</windows>
                 <script.extension>sh</script.extension>
-                <qtplugin4>audio</qtplugin4>
             </properties>
         </profile>
         <profile>
