@@ -738,6 +738,10 @@
                     <value>arm</value>
                 </property>
             </activation>
+            <modules>
+                <module>nx_cloud/libconnection_mediator</module>
+                <module>nx_cloud/cloud_connect_test_util</module>
+            </modules>
             <properties>
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>

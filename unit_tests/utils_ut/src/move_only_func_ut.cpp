@@ -18,7 +18,6 @@ TEST(MoveOnlyFunc, common)
         {
             promise = std::promise< bool >();
             handler = [&, y]() { promise->set_value(true); };
-            int x = 0;
         }
 
         handler();

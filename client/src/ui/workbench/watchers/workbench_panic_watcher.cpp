@@ -10,18 +10,18 @@ QnWorkbenchPanicWatcher::QnWorkbenchPanicWatcher(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_panicMode(false)
 {
-    connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(qnResPool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
 
-    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
+    foreach(const QnResourcePtr &resource, qnResPool->getResources())
         at_resourcePool_resourceAdded(resource);
 }
 
 QnWorkbenchPanicWatcher::~QnWorkbenchPanicWatcher() {
-    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
+    foreach(const QnResourcePtr &resource, qnResPool->getResources())
         at_resourcePool_resourceRemoved(resource);
 
-    disconnect(resourcePool(), NULL, this, NULL);
+    disconnect(qnResPool, NULL, this, NULL);
 }
 
 void QnWorkbenchPanicWatcher::updatePanicMode() {

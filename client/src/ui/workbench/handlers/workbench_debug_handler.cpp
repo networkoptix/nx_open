@@ -81,6 +81,6 @@ void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered()
 
 void QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered() {
     QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(mainWindow()));
-    dialog->setResources(resourcePool()->getResources());
+    dialog->setResources(qnResPool->getResources());
     dialog->exec();
 }

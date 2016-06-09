@@ -1,5 +1,4 @@
-#ifndef QN_WORKBENCH_CONTEXT_AWARE_H
-#define QN_WORKBENCH_CONTEXT_AWARE_H
+#pragma once
 
 #include <ui/actions/actions.h>
 
@@ -9,8 +8,6 @@ class QObject;
 class QnWorkbenchContext;
 class QnActionManager;
 class QnWorkbench;
-class QnResourcePool;
-class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
@@ -69,10 +66,6 @@ protected:
 
     QnWorkbench *workbench() const;
 
-    QnResourcePool *resourcePool() const;
-
-    QnWorkbenchSynchronizer *synchronizer() const;
-
     QnWorkbenchLayoutSnapshotManager *snapshotManager() const;
 
     QnWorkbenchAccessController *accessController() const;
@@ -91,7 +84,3 @@ private:
     QnWorkbenchContext *m_context;
     bool m_initialized;
 };
-
-
-#endif // QN_WORKBENCH_CONTEXT_AWARE_H
-

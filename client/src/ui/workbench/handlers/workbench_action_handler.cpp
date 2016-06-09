@@ -545,9 +545,9 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         workbench()->update(state);
 
         /* Delete orphaned layouts. */
-        foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>())
+        foreach(const QnLayoutResourcePtr &layout, qnResPool->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>())
             if(snapshotManager()->isLocal(layout) && !layout->isFile())
-                resourcePool()->removeResource(layout);
+                qnResPool->removeResource(layout);
     }
 
     /* Sometimes we get here when 'New Layout' has already been added. But all user's layouts must be created AFTER this method.
@@ -555,9 +555,9 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     * As temporary workaround we can just remove that layouts. */
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
     if (user && !qnRuntime->isActiveXMode()) {
-        foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
+        foreach(const QnLayoutResourcePtr &layout, qnResPool->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
             if(snapshotManager()->isLocal(layout) && !layout->isFile())
-                resourcePool()->removeResource(layout);
+                qnResPool->removeResource(layout);
         }
     }
 
@@ -1379,7 +1379,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
 
-    resourcePool()->addResource(layout);
+    qnResPool->addResource(layout);
     menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 }
 
@@ -2067,7 +2067,7 @@ void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
-    QnMediaServerResourceList resources = resourcePool()->getResources<QnMediaServerResource>();
+    QnMediaServerResourceList resources = qnResPool->getAllServers(Qn::AnyStatus);
 
     foreach(QnMediaServerResourcePtr resource, resources)
     {

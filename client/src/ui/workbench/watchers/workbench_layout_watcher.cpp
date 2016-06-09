@@ -11,8 +11,8 @@ QnWorkbenchLayoutWatcher::QnWorkbenchLayoutWatcher(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
+    connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    foreach(const QnResourcePtr &resource, qnResPool->getResources())
         at_resourcePool_resourceAdded(resource);
 }
 

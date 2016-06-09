@@ -155,8 +155,8 @@ private:
         >
     > SystemsDict;
 
-    constexpr static const int SYSTEM_BY_ID_INDEX = 0;
-    constexpr static const int SYSTEM_BY_EXPIRATION_TIME_INDEX = 1;
+    constexpr static const int kSystemByIdIndex = 0;
+    constexpr static const int kSystemByExpirationTimeIndex = 1;
 
     typedef boost::multi_index::multi_index_container<
         api::SystemSharing,
@@ -172,9 +172,9 @@ private:
         >
     > AccountSystemAccessRoleDict;
 
-    constexpr static const int SHARING_UNIQUE_INDEX = 0;
-    constexpr static const int SHARING_BY_ACCOUNT_EMAIL = 1;
-    constexpr static const int SHARING_BY_SYSTEM_ID = 2;
+    constexpr static const int kSharingUniqueIndex = 0;
+    constexpr static const int kSharingByAccountEmail = 1;
+    constexpr static const int kSharingBySystemId = 2;
 
     const conf::Settings& m_settings;
     nx::utils::TimerManager* const m_timerManager;

@@ -26,9 +26,9 @@ namespace Qn
         BastardNode,            /**< Root node for hidden resources. */
 
         SharedLayoutNode,       /**< Node that represents shared layout link, displayed under user. Has only resource - shared layout. */
+        RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
         ResourceNode,           /**< Node that represents a resource. Has only resource. */
         LayoutItemNode,         /**< Node that represents a layout item. Has both guid and resource. */
-        RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
         EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
 
         VideoWallItemNode,      /**< Node that represents a videowall item. Has a guid and can have resource. */

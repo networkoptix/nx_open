@@ -62,12 +62,18 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
         transmissionMode = nx::network::test::TestTransmissionMode::ping;
 
     if (args.find("udt") != args.end())
-    {
         SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::udt);
-    }
 
     if (args.find("ssl") != args.end())
+    {
+        if (transmissionMode == nx::network::test::TestTransmissionMode::spam)
+        {
+            std::cerr << "error. Spam mode does not support SSL, use --ping" << std::endl;
+            return 2;
+        }
+
         SocketFactory::enforceSsl(true);
+    }
 
     SocketAddress targetAddress(target);
     std::vector<SocketAddress> targetList;

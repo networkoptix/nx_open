@@ -284,7 +284,7 @@ void QnWorkbench::update(const QnWorkbenchState &state) {
     clear();
 
     for(int i = 0; i < state.layoutUuids.size(); i++) {
-        QnLayoutResourcePtr resource = resourcePool()->getResourceById<QnLayoutResource>(state.layoutUuids[i]);
+        QnLayoutResourcePtr resource = qnResPool->getResourceById<QnLayoutResource>(state.layoutUuids[i]);
         if(!resource)
             continue;
 
