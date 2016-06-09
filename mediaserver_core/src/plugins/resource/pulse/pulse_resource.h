@@ -19,13 +19,15 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    
+
 
 protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setCroppingPhysical(QRect cropping);
+
+    virtual CameraDiagnostics::Result initInternal() override;
 };
 
 #endif // #ifdef ENABLE_PULSE_CAMERA

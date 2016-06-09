@@ -111,7 +111,6 @@ QnPlAxisResource::QnPlAxisResource() :
     m_audioTransmitter(new QnAxisAudioTransmitter(this))
 {
     setVendor(lit("Axis"));
-    setDefaultAuth(QLatin1String("root"), QLatin1String("root"));
     connect( this, &QnResource::propertyChanged, this, &QnPlAxisResource::at_propertyChanged, Qt::DirectConnection );
 }
 
@@ -404,6 +403,8 @@ bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnP
 CameraDiagnostics::Result QnPlAxisResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
+
+    updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("root"));
 
     //TODO #ak check firmware version. it must be >= 5.0.0 to support I/O ports
     {
