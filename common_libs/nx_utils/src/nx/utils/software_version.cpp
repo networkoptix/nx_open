@@ -15,11 +15,6 @@ SoftwareVersion::SoftwareVersion()
 SoftwareVersion::SoftwareVersion(int major, int minor, int bugfix /* = 0*/, int build /* = 0*/) :
     m_data({major, minor, bugfix, build })
 {
-    /*
-    m_data[0] = major;
-    m_data[1] = minor;
-    m_data[2] = bugfix;
-    m_data[3] = build;*/
 }
 
 SoftwareVersion::SoftwareVersion(const QString &versionString) :
