@@ -168,6 +168,8 @@
         <qtplugin2>platforms</qtplugin2>
 	<!-- Linux Only -->
         <qtplugin3/>
+	<!-- Unix Only -->        
+        <qtplugin4/>    
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -401,6 +403,7 @@
             </activation>
             <properties>
                 <qtlib19>DBus</qtlib19>
+                <qtplugin4>audio</qtplugin4>
             </properties>
             <modules>
                 <module>applauncher</module>

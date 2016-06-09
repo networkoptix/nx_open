@@ -440,6 +440,15 @@ void QnVirtualCameraResource::saveParamsAsync()
     propertyDictionary->saveParamsAsync(getId());
 }
 
+void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, const QString& password)
+{
+    if (getAuth().isNull())
+    {
+        setDefaultAuth(login, password);
+        saveParams();
+    }
+}
+
 int QnVirtualCameraResource::saveAsync()
 {
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
