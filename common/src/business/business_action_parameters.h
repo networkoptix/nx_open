@@ -7,7 +7,8 @@
 #include <nx/utils/uuid.h>
 
 
-struct QnBusinessActionParameters {
+struct QnBusinessActionParameters
+{
     QnBusinessActionParameters();
 
     /** Additional parameter for event log convenience. Does not filled when the action really occurs. */
