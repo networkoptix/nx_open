@@ -1257,6 +1257,13 @@ TCPServerSocket::TCPServerSocket()
 
 TCPServerSocket::~TCPServerSocket()
 {
+    if (isInSelfAioThread())
+    {
+        TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
+        d->asyncServerSocketHelper.stopPolling();
+        return;
+    }
+
     NX_CRITICAL(
         !nx::network::SocketGlobals::aioService()
             .isSocketBeingWatched(static_cast<Pollable*>(this)),
@@ -1302,15 +1309,8 @@ void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandl
     dispatch(
         [this, completionHandler = std::move(completionHandler)]()
         {
-            //impl()->terminated.store(true, std::memory_order_relaxed);
-
-            nx::network::SocketGlobals::aioService().cancelPostedCalls(
-                static_cast<Pollable*>(this), true);
-            nx::network::SocketGlobals::aioService().removeFromWatch(
-                static_cast<Pollable*>(this), aio::etRead, true);
-            nx::network::SocketGlobals::aioService().removeFromWatch(
-                static_cast<Pollable*>(this), aio::etTimedOut, true);
-
+            TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
+            d->asyncServerSocketHelper.stopPolling();
             completionHandler();
         });
 }

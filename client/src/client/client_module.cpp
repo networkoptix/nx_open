@@ -47,6 +47,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/utils/log/log.h>
+#include <nx_speach_synthesizer/text_to_wav.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
 
@@ -90,7 +91,6 @@
 
 #include <watchers/cloud_status_watcher.h>
 
-#include "text_to_wav.h" //TODO: #GDM move to subdir
 
 namespace
 {

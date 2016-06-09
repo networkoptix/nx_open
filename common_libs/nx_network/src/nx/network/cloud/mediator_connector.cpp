@@ -73,6 +73,9 @@ void MediatorConnector::mockupAddress( SocketAddress address, bool suppressWarni
 {
     {
         QnMutexLocker lk( &m_mutex );
+        if (m_promise && (address == m_mediatorAddress))
+            return;
+
         NX_ASSERT( !m_promise, Q_FUNC_INFO,
                     "Address resolving is already in progress!" );
 

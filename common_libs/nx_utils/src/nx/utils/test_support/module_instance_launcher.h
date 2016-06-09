@@ -99,6 +99,12 @@ public:
         *b = strdup(arg);
     }
 
+protected:
+    const std::unique_ptr<ModuleProcessType>& moduleInstance()
+    {
+        return m_moduleInstance;
+    }
+
 private:
     std::vector<char*> m_args;
     std::unique_ptr<ModuleProcessType> m_moduleInstance;

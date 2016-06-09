@@ -861,6 +861,90 @@ void ConnectionsGenerator::addNewConnections(
     }
 }
 
+AddressBinder::AddressBinder()
+:
+    m_currentNumber(0)
+{
+}
+
+SocketAddress AddressBinder::bind()
+{
+    QnMutexLocker lock(&m_mutex);
+    SocketAddress key(QString(QLatin1String("a%1")).arg(m_currentNumber++));
+    NX_CRITICAL(m_map.emplace(key, std::set<SocketAddress>()).second);
+    return key;
+}
+
+void AddressBinder::add(const SocketAddress& key, SocketAddress address)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_map.find(key);
+    NX_CRITICAL(it != m_map.end());
+    NX_CRITICAL(it->second.insert(std::move(address)).second);
+}
+
+void AddressBinder::remove(const SocketAddress& key, const SocketAddress& address)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_map.find(key);
+    NX_CRITICAL(it != m_map.end());
+    NX_CRITICAL(it->second.erase(std::move(address)));
+}
+
+std::set<SocketAddress> AddressBinder::get(const SocketAddress& key) const
+{
+    QnMutexLocker lock(&m_mutex);
+    const auto it = m_map.find(key);
+    NX_CRITICAL(it != m_map.end());
+    return it->second;
+}
+
+boost::optional<SocketAddress> AddressBinder::random(const SocketAddress& key) const
+{
+    QnMutexLocker lock(&m_mutex);
+    const auto it = m_map.find(key);
+    if (it == m_map.end() || it->second.size() == 0)
+        return boost::none;
+
+    return *std::next(it->second.begin(), rand() % it->second.size());
+}
+
+MultipleClientSocketTester::MultipleClientSocketTester(AddressBinder* addressBinder)
+:
+    TCPSocket(),
+    m_addressBinder(addressBinder)
+{
+}
+
+bool MultipleClientSocketTester::connect(
+    const SocketAddress& address, unsigned int timeout)
+{
+    return TCPSocket::connect(modifyAddress(address), timeout);
+}
+
+void MultipleClientSocketTester::connectAsync(
+    const SocketAddress& address,
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    TCPSocket::connectAsync(modifyAddress(address), std::move(handler));
+}
+
+SocketAddress MultipleClientSocketTester::modifyAddress(const SocketAddress& address)
+{
+    static std::atomic<size_t> enumirator(0);
+    if (m_address == SocketAddress())
+    {
+        auto addressOpt = m_addressBinder->random(address);
+        NX_CRITICAL(addressOpt);
+
+        m_address = std::move(*addressOpt);
+        NX_LOGX(lm("using %2 instead of '%1'").arg(address.toString())
+            .arg(m_address.toString()), cl_logDEBUG2);
+    }
+
+    return m_address;
+}
+
 }   //test
 }   //network
 }   //nx

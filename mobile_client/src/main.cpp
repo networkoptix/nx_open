@@ -12,20 +12,6 @@
 #include <time.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/flag_config.h>
-
-namespace mobile_client {
-
-class FlagConfig: public nx::utils::FlagConfig
-{
-public:
-    using nx::utils::FlagConfig::FlagConfig;
-    NX_FLAG(0, enableEc2TranLog, "");
-};
-FlagConfig conf("mobile_client");
-
-} // namespace mobile_client
-
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
 #include <nx_ec/ec2_lib.h>
@@ -45,6 +31,8 @@ FlagConfig conf("mobile_client");
 
 #include <nx/media/decoder_registrar.h>
 #include <resource_allocator.h>
+#include "config.h"
+using mobile_client::conf;
 
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -158,10 +146,10 @@ void initLog()
 {
     QnLog::initLog(lit("INFO"));
 
-    if (mobile_client::conf.enableEc2TranLog)
+    if (conf.enableEc2TranLog)
     {
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-            QLatin1String(mobile_client::conf.tempPath()) + QLatin1String("ec2_tran"),
+            QLatin1String(conf.tempPath()) + QLatin1String("ec2_tran"),
             /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
             /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
             cl_logDEBUG2);
@@ -202,6 +190,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QGuiApplication application(argc, argv);
+
+    conf.reload();
     initLog();
 
     QnMobileClientModule mobile_client;

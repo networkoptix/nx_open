@@ -51,9 +51,8 @@
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"
 
-#ifdef Q_OS_WIN
-#include <plugins/resource/desktop_win/desktop_resource_searcher.h>
-#endif
+#include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
+
 #include "utils/common/util.h"
 #include "core/resource_management/resource_discovery_manager.h"
 
@@ -68,6 +67,7 @@
 
 #include "utils/common/long_runnable.h"
 
+#include <nx_speach_synthesizer/text_to_wav.h>
 #include "common/common_module.h"
 
 #include <nx/vms/utils/system_uri.h>
@@ -251,12 +251,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     }
 
     /* Initialize desktop camera searcher. */
-#ifdef Q_OS_WIN
-    QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
-    QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
-    QnDesktopResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopResourceSearcher::instance());
-#endif
+    std::unique_ptr<QnDesktopResourceSearcher> desktopSearcher(new QnDesktopResourceSearcher(dynamic_cast<QGLWidget*>(mainWindow->viewport())));
+    QnResourceDiscoveryManager::instance()->addDeviceServer(desktopSearcher.get());
 
     QnResourceDiscoveryManager::instance()->setReady(true);
     QnResourceDiscoveryManager::instance()->start();
@@ -361,7 +357,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     QnResourceDiscoveryManager::instance()->stop();
 
 #ifdef Q_OS_WIN
-    QnDesktopResourceSearcher::initStaticInstance(NULL);
+    desktopSearcher.reset();
 #endif
 
     /* Write out settings. */

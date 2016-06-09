@@ -12,8 +12,11 @@
 #include "api/model/audit/audit_record.h"
 #include "api/model/audit/auth_session.h"
 #include "recording/time_period.h"
+#include <nx/utils/singleton.h>
 
-class QnAuditManager: public QObject
+class QnAuditManager:
+    public QObject,
+    public Singleton<QnAuditManager>
 {
     Q_OBJECT
 public:
@@ -24,7 +27,6 @@ public:
 
     QnAuditManager();
 
-    static QnAuditManager* instance();
 public:
     static QnAuditRecord prepareRecord(const QnAuthSession& authInfo, Qn::AuditRecordType recordType);
 

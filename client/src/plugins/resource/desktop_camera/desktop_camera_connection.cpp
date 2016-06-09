@@ -7,8 +7,9 @@
 #include "api/app_server_connection.h"
 #include "rtsp/rtsp_ffmpeg_encoder.h"
 
-#include <plugins/resource/desktop_win/desktop_resource.h>
+#include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <http/custom_headers.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 
 
 static const int CONNECT_TIMEOUT = 1000 * 5;
@@ -18,7 +19,7 @@ class QnDesktopCameraDataConsumer: public QnAbstractDataConsumer
 {
 public:
     QnDesktopCameraDataConsumer(QnDesktopCameraConnectionProcessor* owner):
-        QnAbstractDataConsumer(20),
+        QnAbstractDataConsumer(50),
         m_sequence(0),
         m_owner(owner),
         m_needVideoData(false)
@@ -38,7 +39,7 @@ public:
     {
         m_needVideoData = value;
     }
-	
+
 protected:
 
     virtual bool processData(const QnAbstractDataPacketPtr& packet) override
@@ -79,12 +80,12 @@ protected:
         m_owner->sendUnlock();
         return true;
     }
-	
+
     virtual bool needConfigureProvider() const override
     {
         return m_needVideoData;
     }
-	
+
 private:
     quint32 m_sequence;
     QnRtspFfmpegEncoder m_serializers[2]; // video + audio
@@ -101,7 +102,10 @@ public:
     QnMutex sendMutex;
 };
 
-QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, void* sslContext, QnDesktopResource* desktop):
+QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(
+    QSharedPointer<AbstractStreamSocket> socket,
+    void* sslContext,
+    QnDesktopResource* desktop):
   QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket)
 {
     Q_UNUSED(sslContext)
@@ -127,7 +131,7 @@ void QnDesktopCameraConnectionProcessor::processRequest()
     QByteArray method = d->request.requestLine.method;
     if (method == "PLAY")
     {
-        if (d->dataProvider == 0) 
+        if (d->dataProvider == 0)
         {
             d->dataProvider = d->desktop->createDataProvider(Qn::CR_Default);
             d->dataConsumer = new QnDesktopCameraDataConsumer(this);

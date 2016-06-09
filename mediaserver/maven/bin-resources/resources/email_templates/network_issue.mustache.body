@@ -1,0 +1,20 @@
+<h1>{{event}}</h1>
+<table class="description">
+<tbody>
+{{#aggregated}}
+		<tr>
+			<td>
+				<img src="{{sourceIcon}}">
+			</td>
+			<td>
+				<b>{{source}}</b><br>
+				({{sourceIp}})
+			</td>
+			{{#aggregated}}
+				<td>{{reason}}</td>
+				<td>{{timestampDate}}<br><b>{{timestampTime}}</b></td>
+			{{/aggregated}}
+		</tr>
+{{/aggregated}}
+</tbody>
+</table>

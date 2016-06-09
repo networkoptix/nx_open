@@ -12,10 +12,12 @@ update () {
   cp /opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf /tmp/mediaserver.conf
   cp $DISTRIB.tar.gz /tmp
   tar xfv $DISTRIB.tar.gz -C /
-  if [[ "${box}" == "bpi" ]]; then /etc/init.d/nx1upgrade; fi
+  if [[ "${box}" == "bpi" ]]; then 
+    /etc/init.d/nx1upgrade; 
+    /etc/init.d/nx1boot upgrade
+  fi
   # TODO: add errorlevel handling
   cat /tmp/mediaserver.conf >> /opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf  
-  /etc/init.d/nx1boot upgrade  
   rm /tmp/$DISTRIB.tar.gz
 }
 

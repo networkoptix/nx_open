@@ -26,6 +26,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/guard.h>
+#include <utils/common/public_ip_discovery.h>
 #include <utils/common/systemerror.h>
 
 #include "access_control/authentication_manager.h"
@@ -81,12 +82,19 @@ void VmsGatewayProcess::setOnStartedEventHandler(
     m_startedEventHandler = std::move(handler);
 }
 
+const std::vector<SocketAddress>& VmsGatewayProcess::httpEndpoints() const
+{
+    return m_httpEndpoints;
+}
+
 #ifdef USE_QAPPLICATION
 int VmsGatewayProcess::executeApplication()
 #else
 int VmsGatewayProcess::exec()
 #endif
 {
+    using namespace std::placeholders;
+
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
         [this, &processStartResult]
@@ -115,6 +123,20 @@ int VmsGatewayProcess::exec()
                 SocketAddress(settings.general().mediatorEndpoint));
         nx::network::SocketGlobals::mediatorConnector().enable(true);
 
+        std::unique_ptr<QnPublicIPDiscovery> publicAddressFetcher;
+        if (settings.cloudConnect().replaceHostAddressWithPublicAddress)
+        {
+            publicAddressFetcher = std::make_unique<QnPublicIPDiscovery>(
+                QStringList() << settings.cloudConnect().fetchPublicIpUrl);
+            QObject::connect(
+                publicAddressFetcher.get(), &QnPublicIPDiscovery::found,
+                publicAddressFetcher.get(), [this](const QHostAddress& publicAddress) {
+                    publicAddressFetched(publicAddress);
+                },
+                Qt::DirectConnection);
+            publicAddressFetcher->update();
+        }
+
         const auto& httpAddrToListenList = settings.general().endpointsToListen;
         if (httpAddrToListenList.empty())
         {
@@ -134,10 +156,6 @@ int VmsGatewayProcess::exec()
 
         //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
-        //authRestrictionList.allow(PingHandler::kHandlerPath, AuthMethod::noAuth);
-        //authRestrictionList.allow(AddAccountHttpHandler::kHandlerPath, AuthMethod::noAuth);
-        //authRestrictionList.allow(ActivateAccountHandler::kHandlerPath, AuthMethod::noAuth);
-        //authRestrictionList.allow(ReactivateAccountHttpHandler::kHandlerPath, AuthMethod::noAuth);
 
         AuthenticationManager authenticationManager(
             authRestrictionList,
@@ -162,6 +180,7 @@ int VmsGatewayProcess::exec()
 
         if (!multiAddressHttpServer.listen())
             return 5;
+        m_httpEndpoints = multiAddressHttpServer.endpoints();
 
 #ifdef USE_QAPPLICATION
         application()->installEventFilter(this);
@@ -262,6 +281,17 @@ void VmsGatewayProcess::registerApiHandlers(
         [&settings]() -> std::unique_ptr<ProxyHandler> {
             return std::make_unique<ProxyHandler>(settings);
         });
+}
+
+void VmsGatewayProcess::publicAddressFetched(const QHostAddress& publicAddress)
+{
+    const QString publicAddressStr = publicAddress.toString();
+
+    NX_LOGX(lm("Retrieved public address %1. This address will be used for cloud connect")
+        .arg(publicAddressStr), cl_logINFO);
+
+    nx::network::SocketGlobals::cloudConnectSettings()
+        .replaceOriginatingHostAddress(publicAddressStr);
 }
 
 }   //namespace cloud

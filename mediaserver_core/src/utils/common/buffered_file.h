@@ -12,6 +12,7 @@
 #include "utils/common/long_runnable.h"
 #include "utils/common/byte_array.h"
 #include "utils/memory/cycle_buffer.h"
+#include <utils/common/connective.h>
 
 class QBufferedFile;
 
@@ -62,23 +63,6 @@ private:
 private:
     void putData(FileBlockInfo* fb);
     FileBlockInfo* popData();
-};
-
-class QnWriterPool
-{
-public:
-    typedef QMap<QnUuid, QueueFileWriter*> WritersMap;
-
-    QnWriterPool();
-    ~QnWriterPool();
-
-    static QnWriterPool* instance();
-
-    QueueFileWriter* getWriter(const QnUuid& writePoolId);
-    WritersMap getAllWriters();
-private:
-    QnMutex m_mutex;
-    WritersMap m_writers;
 };
 
 class QN_EXPORT QBufferedFile: public QIODevice

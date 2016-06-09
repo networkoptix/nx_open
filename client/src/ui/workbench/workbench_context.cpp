@@ -26,12 +26,9 @@
 #include <ui/statistics/modules/users_statistics_module.h>
 #include <ui/statistics/modules/graphics_statistics_module.h>
 #include <ui/statistics/modules/durations_statistics_module.h>
-
 #include <ui/workaround/fglrx_full_screen.h>
 
-#ifdef Q_OS_WIN
-#include "watchers/workbench_desktop_camera_watcher_win.h"
-#endif
+#include "watchers/workbench_desktop_camera_watcher.h"
 
 QnWorkbenchContext::QnWorkbenchContext(QObject *parent):
     QObject(parent),
@@ -52,9 +49,8 @@ QnWorkbenchContext::QnWorkbenchContext(QObject *parent):
     m_workbench.reset(new QnWorkbench(this));
 
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
-#ifdef Q_OS_WIN
+
     instance<QnWorkbenchDesktopCameraWatcher>();
-#endif
 
     connect(m_userWatcher,  SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SIGNAL(userChanged(const QnUserResourcePtr &)));
 

@@ -11,6 +11,7 @@
 
 namespace nx_http
 {
+
     HttpClient::HttpClient()
     :
         m_done( false ),
@@ -44,12 +45,15 @@ namespace nx_http
         nx_http::StringType messageBody )
     {
         using namespace std::placeholders;
+
+
         return doRequest(std::bind(
             &nx_http::AsyncHttpClient::doPost,
             _1,
             url,
             contentType,
-            std::move(messageBody)));
+            std::move(messageBody),
+            true));
     }
 
     const Response* HttpClient::response() const
@@ -245,4 +249,5 @@ namespace nx_http
     {
         //TODO/IMPL
     }
+
 }

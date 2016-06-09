@@ -884,7 +884,8 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     TRACE("RESIZING FINISHED");
 
     opacityAnimator(display()->gridItem())->animateTo(0.0);
-    opacityAnimator(m_resizedWidget)->animateTo(1.0);
+    if (m_resizedWidget)
+        opacityAnimator(m_resizedWidget)->animateTo(1.0);
 
     if(m_resizedWidget == item && item != NULL) {
         QnResourceWidget *widget = m_resizedWidget;

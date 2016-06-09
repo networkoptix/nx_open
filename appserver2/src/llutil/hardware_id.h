@@ -7,17 +7,19 @@
 #include <vector>
 #include <QtCore/QString>
 
-#include "licensing/hardware_info.h"
-
 class QSettings;
+struct QnHardwareInfo;
 
 namespace LLUtil {
 
 const int LATEST_HWID_VERSION = 5;
 
-const QnHardwareInfo &getHardwareInfo();
-
+// This function should be called once before
+// any other calls to the hardware id library
+// It uses settings to store/retrive MAC addess hardware id is bound to.
 void initHardwareId(QSettings *settings);
+
+const QnHardwareInfo &getHardwareInfo();
 QString getLatestHardwareId();
 QStringList getAllHardwareIds();
 int hardwareIdVersion(const QString& hardwareId);

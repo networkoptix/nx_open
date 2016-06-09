@@ -4,6 +4,7 @@
 #include <proxy_decoder.h>
 
 #include "proxy_video_decoder.h"
+#include "aligned_mem_video_buffer.h"
 
 namespace nx {
 namespace media {
@@ -64,6 +65,19 @@ protected:
     ProxyDecoder& proxyDecoder() const
     {
         return *m_proxyDecoder.get();
+    }
+
+    void setQVideoFrame(
+        QVideoFramePtr* outDecodedFrame,
+        QAbstractVideoBuffer* videoBuffer,
+        QVideoFrame::PixelFormat format,
+        int64_t ptsUs)
+    {
+        outDecodedFrame->reset(new QVideoFrame(videoBuffer, frameSize(), format));
+
+        // TODO: QVideoFrame doc states that PTS should be in microseconds, but everywhere in
+        // nx_media it is treated as if it were milliseconds. Fix with reviewing all usages.
+        (*outDecodedFrame)->setStartTime(ptsUs / 1000);
     }
 
 private:

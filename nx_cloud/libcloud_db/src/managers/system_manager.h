@@ -108,6 +108,11 @@ public:
         data::SystemID systemID,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler);
 
+    void updateSystemName(
+        const AuthorizationInfo& authzInfo,
+        data::SystemNameUpdate data,
+        std::function<void(api::ResultCode)> completionHandler);
+
     //void addSubscription(
     //    const AuthorizationInfo& authzInfo,
     //    const std::string& systemID,
@@ -150,8 +155,8 @@ private:
         >
     > SystemsDict;
 
-    constexpr static const int SYSTEM_BY_ID_INDEX = 0;
-    constexpr static const int SYSTEM_BY_EXPIRATION_TIME_INDEX = 1;
+    constexpr static const int kSystemByIdIndex = 0;
+    constexpr static const int kSystemByExpirationTimeIndex = 1;
 
     typedef boost::multi_index::multi_index_container<
         api::SystemSharing,
@@ -167,9 +172,9 @@ private:
         >
     > AccountSystemAccessRoleDict;
 
-    constexpr static const int SHARING_UNIQUE_INDEX = 0;
-    constexpr static const int SHARING_BY_ACCOUNT_EMAIL = 1;
-    constexpr static const int SHARING_BY_SYSTEM_ID = 2;
+    constexpr static const int kSharingUniqueIndex = 0;
+    constexpr static const int kSharingByAccountEmail = 1;
+    constexpr static const int kSharingBySystemId = 2;
 
     const conf::Settings& m_settings;
     nx::utils::TimerManager* const m_timerManager;
@@ -229,6 +234,15 @@ private:
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing,
+        std::function<void(api::ResultCode)> completionHandler);
+
+    nx::db::DBResult updateSystemNameInDB(
+        QSqlDatabase* const connection,
+        const data::SystemNameUpdate& data);
+    void systemNameUpdated(
+        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::db::DBResult dbResult,
+        data::SystemNameUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult activateSystem(

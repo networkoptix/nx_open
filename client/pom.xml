@@ -77,7 +77,7 @@
         <template>lib</template>
 
         <qt.libs>core core-private gui widgets-private network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
-        <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -ludt -lcloud_db_client -lnx_vms_utils</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lnx_speach_synthesizer -ludt -lcloud_db_client -lnx_vms_utils</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>

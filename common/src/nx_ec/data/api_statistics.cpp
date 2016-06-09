@@ -5,18 +5,26 @@
 
 #include <utils/common/model_functions.h>
 
-const static QString __CAMERA_EXCEPT_PARAMS[] = {
+const static QString __CAMERA_EXCEPT_PARAMS[] =
+{
 	Qn::CAMERA_CREDENTIALS_PARAM_NAME,
     Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
-//     Qn::CAMERA_SETTINGS_ID_PARAM_NAME,
-//     Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME,
 	Qn::CAMERA_ADVANCED_PARAMETERS,
     QLatin1String("DeviceID"), QLatin1String("DeviceUrl"), // from plugin onvif
     QLatin1String("MediaUrl"),
 };
 
-const static QString __CAMERA_RESOURCE_PARAMS[] = {
+const static QString __CAMERA_RESOURCE_PARAMS[] =
+{
+    Qn::ANALOG_PARAM_NAME,
+    Qn::CAMERA_CAPABILITIES_PARAM_NAME,
+    Qn::HAS_DUAL_STREAMING_PARAM_NAME,
+    Qn::IS_AUDIO_FORCED_PARAM_NAME,
+    Qn::IS_AUDIO_SUPPORTED_PARAM_NAME,
     Qn::MAX_FPS_PARAM_NAME,
+    Qn::PTZ_CAPABILITIES_PARAM_NAME,
+    Qn::STREAM_FPS_SHARING_PARAM_NAME,
+    Qn::SUPPORTED_MOTION_PARAM_NAME,
 };
 
 // TODO: remove this hack when VISUAL STUDIO supports initializer lists

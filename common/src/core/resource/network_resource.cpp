@@ -15,7 +15,6 @@
 #include <nx/network/rtsp/rtsp_types.h>
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
-#include <nx/network/http/httptypes.h>
 
 #include <recording/time_period_list.h>
 

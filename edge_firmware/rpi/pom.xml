@@ -1,27 +1,57 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<!--
+    <!--
     Example pom for delegating maven goals to msbuild so it builds the "solution"
  
     A solution can be a group of projects, but here we only have one.
     It should also be possible to have one maven project per solution project, 
     and have a parent pom to deletegate the build.
   -->
-	<parent>
-		<artifactId>edge_firmware</artifactId>
-		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>3.0.0-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
+    <parent>
+        <artifactId>edge_firmware</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.0.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
 
-	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>3.0.0-SNAPSHOT</version>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>isd</artifactId>
-	<packaging>pom</packaging>
-	<name>Raspberry Pi Installer</name>
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.0.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>isd</artifactId>
+    <packaging>pom</packaging>
+    <name>Raspberry Pi Installer</name>
 
     <properties>
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/../..</root.dir>
     </properties>
+    <profiles>
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>uboot-2014.04-10733-gbb5691c-dirty-vanilla ffmpeg_runtime-3.0.2 ldpreloadhook-1.0 libpixman-0.34.0 libump-3.0 libvdpau-sunxi-1.0 libcedrus-1.0 libvdpau-1.0.4.1 libc6-2.23</rdep.linux.packages>
+                <linux.oslibs>-lz</linux.oslibs>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>mobile_client</artifactId>
+                    <version>${project.version}</version>
+                    <type>pom</type> 
+                    <scope>system</scope>
+                    <systemPath>${root.dir}/mobile_client/pom.xml</systemPath>
+                </dependency>			
+            </dependencies>	  	            
+        </profile>      
+    </profiles>      
 </project>

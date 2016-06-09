@@ -239,6 +239,7 @@ private:
 
 Q_GLOBAL_STATIC(QnLogs, qn_logsInstance);
 
+bool QnLog::s_disableLogConfiguration(false);
 
 QnLog::QnLog()
 :
@@ -265,6 +266,9 @@ const std::unique_ptr< QnLog >& QnLog::instance( int logID )
 bool QnLog::create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) {
     if(!d)
         return false;
+
+    if(s_disableLogConfiguration)
+        return true;
 
     return d->create(baseName, maxFileSize, maxBackupFiles, logLevel);
 }
@@ -338,11 +342,17 @@ void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& /*ctx*/, const QS
 
 void QnLog::initLog(const QString &logLevelStr, int logID )
 {
+    if (s_disableLogConfiguration)
+        return;
+
     logs()->init( logID, logLevelStr );
 }
 
 bool QnLog::initLog(QnLog *externalInstance, int logID )
 {
+    if (s_disableLogConfiguration)
+        return true;
+
     return logs()->init( logID, std::unique_ptr< QnLog >( externalInstance ) );
 }
 
