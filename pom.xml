@@ -403,7 +403,6 @@
             </activation>
             <properties>
                 <qtlib19>DBus</qtlib19>
-                <qtplugin4>audio</qtplugin4>
             </properties>
             <modules>
                 <module>applauncher</module>
@@ -593,6 +592,7 @@
                 <qt.spec>macx-clang-libc++</qt.spec>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
+                <qtplugin4>audio</qtplugin4>
             </properties>
             <modules>
                 <module>macsetup/client-dmg</module>
@@ -618,6 +618,7 @@
             </modules>
             <properties>
                 <qtplugin3>platforminputcontexts</qtplugin3>
+                <qtplugin4>audio</qtplugin4>
                 <modification>ubuntu</modification>
             </properties>
         </profile>
