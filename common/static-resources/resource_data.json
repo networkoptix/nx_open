@@ -1052,7 +1052,15 @@
                     "ve7", "ve15"
                 ]
             }
-        }
+        },
+		{
+			"keys": [
+				"Pelco|IMM12018",
+				"Pelco|IMM12027",
+				"Pelco|IMM12036"
+			],
+			"onvifVendorSubtype": "PelcoOptera"
+		}
     ]
 }
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <oem name="OnvifDevice">
+		<resource name = "Pelco" public="OnvifDevice Camera"/>
+		<resource name = "PelcoOptera" public = "Pelco"/>
+        <resource name = "IMM12018" public="PelcoOptera"/>
+        <resource name = "IMM12027" public="PelcoOptera"/>
+        <resource name = "IMM12036" public="PelcoOptera"/>
+    </oem>
+</resources>

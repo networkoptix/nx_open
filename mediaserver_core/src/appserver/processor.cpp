@@ -61,9 +61,16 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
+        
+        auto secResource = resource.dynamicCast<QnSecurityCamResource>();
 
-        if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUrl()))
+        QString urlStr = cameraResource->getUrl();
+        if (secResource && !secResource->getGroupId().isEmpty())
+            urlStr = urlStr.left(urlStr.indexOf('?'));
+
+        if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(urlStr))
             continue; //race condition. manual camera just deleted
+        
         if( cameraResource->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceById(cameraResource->getId()))
             continue;   //ignoring newly discovered camera
 

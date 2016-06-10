@@ -116,7 +116,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     resource->setDeviceOnvifUrl(deviceUrl);
 
     // optimization. do not pull resource every time if resource already in pool
-    if (rpResource)
+    if (rpResource && !rpResource->hasFlags(Qn::need_reinit_channels))
     {
         int channel = QUrlQuery(url.query()).queryItemValue(QLatin1String("channel")).toInt();
         
@@ -182,6 +182,11 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         }
 
         OnvifResourceInformationFetcher fetcher;
+        auto resData = qnCommon->dataPool()->data(manufacturer, modelName);
+        auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
+
+        manufacturer = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
+
         QnUuid rt = fetcher.getOnvifResourceType(manufacturer, modelName);
         resource->setVendor( manufacturer );
         resource->setName( modelName );
@@ -199,13 +204,16 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 
         if(!resource->getUniqueId().isEmpty())
         {
+            auto maxChannels = resource->getMaxChannels();
             resource->detectVideoSourceCount();
             //if (channel > 0)
             //    resource->updateToChannel(channel-1);
             resList << resource;
             
             // checking for multichannel encoders
-            if (doMultichannelCheck)
+            if (doMultichannelCheck 
+                || resource->hasFlags(Qn::need_reinit_channels) 
+                || maxChannels != resource->getMaxChannels())
             {
                 if (resource->getMaxChannels() > 1)
                 {
@@ -216,12 +224,18 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
                 for (int i = 1; i < resource->getMaxChannels(); ++i) 
                 {
                     QnPlOnvifResourcePtr res = createResource(resource->getTypeId(), QnResourceParams()).dynamicCast<QnPlOnvifResource>();
+                    res->setGroupId(resource->getPhysicalId());
+                    res->setGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
                     res->setVendor( manufacturer );
                     res->setPhysicalId(resource->getPhysicalId());
                     res->update(resource, true);
                     res->updateToChannel(i);
+
+                    res->setFlags(res->flags() & ~Qn::need_reinit_channels);
                     resList << res;
                 }
+
+                resource->setFlags(resource->flags() & ~Qn::need_reinit_channels);
             }
         }
     }
@@ -270,7 +284,6 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
         return result;
     }
     */
-    
     result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(
         resourceType->getName() == lit("ONVIF") && !params.vendor.isEmpty()
         ? params.vendor
