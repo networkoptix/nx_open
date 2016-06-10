@@ -51,6 +51,7 @@ private:
     void updateSelection();
 
     void clearSelection();
+    bool enableUser(const QnUserResourcePtr& user, bool enabled);
     void setSelectedEnabled(bool enabled);
     void enableSelected();
     void disableSelected();

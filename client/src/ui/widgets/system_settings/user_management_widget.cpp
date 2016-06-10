@@ -47,11 +47,11 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
 
     m_header->setVisible(true);
     m_header->setSectionResizeMode(QHeaderView::ResizeToContents);
-    m_header->setSectionResizeMode(QnUserListModel::PermissionsColumn, QHeaderView::Stretch);
+    m_header->setSectionResizeMode(QnUserListModel::UserRoleColumn, QHeaderView::Stretch);
     m_header->setSectionsClickable(true);
     connect(m_header, &QnCheckBoxedHeaderView::checkStateChanged, this, &QnUserManagementWidget::at_headerCheckStateChanged);
 
-    ui->usersTable->sortByColumn(QnUserListModel::NameColumn, Qt::AscendingOrder);
+    ui->usersTable->sortByColumn(QnUserListModel::LoginColumn, Qt::AscendingOrder);
 
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -77,6 +77,9 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     connect(qnCommon, &QnCommonModule::readOnlyChanged, this, &QnUserManagementWidget::loadDataToUi);
 
     updateFetchButton();
+
+    //TODO: #vkutin Add dynamic update to this column hidden state:
+    ui->usersTable->setColumnHidden(QnUserListModel::UserTypeColumn, true);
 
     m_sortModel->setDynamicSortFilter(true);
     m_sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -229,9 +232,19 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex& index)
     if (!user)
         return;
 
-    if (index.column() == QnUserListModel::CheckBoxColumn) /* Invert current state */
+    switch (index.column())
     {
-        m_usersModel->setCheckState(index.data(Qt::CheckStateRole).toInt() == Qt::Checked ? Qt::Unchecked : Qt::Checked, user);
+        case QnUserListModel::CheckBoxColumn: /* Invert current state */
+            m_usersModel->setCheckState(index.data(Qt::CheckStateRole).toInt() == Qt::Checked ?
+                Qt::Unchecked : Qt::Checked, user);
+            break;
+
+        case QnUserListModel::EnabledColumn:
+            enableUser(user, !user->isEnabled());
+            break;
+
+        default:
+            break;
     }
 }
 
@@ -240,21 +253,26 @@ void QnUserManagementWidget::clearSelection()
     m_usersModel->setCheckState(Qt::Unchecked);
 }
 
+bool QnUserManagementWidget::enableUser(const QnUserResourcePtr& user, bool enabled)
+{
+    if (user->isOwner())
+        return false;
+
+    if (!accessController()->hasPermissions(user, Qn::WritePermission))
+        return false;
+
+    qnResourcesChangesManager->saveUser(user, [enabled](const QnUserResourcePtr &user)
+    {
+        user->setEnabled(enabled);
+    });
+
+    return true;
+}
+
 void QnUserManagementWidget::setSelectedEnabled(bool enabled)
 {
     for (QnUserResourcePtr user : visibleSelectedUsers())
-    {
-        if (user->isOwner())
-            continue;
-
-        if (!accessController()->hasPermissions(user, Qn::WritePermission))
-            continue;
-
-        qnResourcesChangesManager->saveUser(user, [enabled](const QnUserResourcePtr &user)
-        {
-            user->setEnabled(enabled);
-        });
-    }
+        enableUser(user, enabled);
 }
 
 void QnUserManagementWidget::enableSelected()
