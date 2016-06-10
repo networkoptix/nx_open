@@ -37,11 +37,11 @@ QString getServerUrl(const QnResourcePtr& resource)
         if (host == lit("localhost") || host == lit("127.0.0.1"))
             return false;
 
-        /* Check cloud host - short notation. */
+        /* Check cloud host - short notation (looks just like <uuid>). */
         if (!QnUuid::fromStringSafe(host).isNull())
             return false;
 
-        /* Check cloud host - long notation. */
+        /* Check cloud host - long notation (looks like <uuid>.<uuid>). */
         int splitterIdx = host.indexOf(L'.');
         if (splitterIdx > 0)
         {
