@@ -1,6 +1,7 @@
-#include <QtCore/QMutexLocker>
-
 #include "resource_allocator.h"
+
+#include "config.h"
+using mobile_client::conf;
 
 ResourceAllocator::ResourceAllocator(QQuickWindow *window):
     nx::media::AbstractResourceAllocator(),
@@ -34,7 +35,6 @@ void ResourceAllocator::at_execLambdaAsync()
     }
 }
 
-
 void ResourceAllocator::execAtGlThread(std::function<void (void*)> lambda, void* opaque)
 {
     if (!m_connected)
@@ -53,11 +53,13 @@ void ResourceAllocator::execAtGlThread(std::function<void (void*)> lambda, void*
 
 void ResourceAllocator::execAtGlThreadAsync(std::function<void()> lambda)
 {
-    if (!m_connected)
+    if (!m_connectedAsync)
     {
-        m_connected = true;
-        connect(m_window, &QQuickWindow::beforeSynchronizing, this, &ResourceAllocator::at_execLambdaAsync, Qt::DirectConnection);
-        connect(m_window, &QQuickWindow::frameSwapped, this, &ResourceAllocator::at_execLambdaAsync, Qt::DirectConnection);
+        m_connectedAsync = true;
+        if (conf.execAtGlThreadOnBeforeSynchronizing)
+            connect(m_window, &QQuickWindow::beforeSynchronizing, this, &ResourceAllocator::at_execLambdaAsync, Qt::DirectConnection);
+        if (conf.execAtGlThreadOnFrameSwapped)
+            connect(m_window, &QQuickWindow::frameSwapped, this, &ResourceAllocator::at_execLambdaAsync, Qt::DirectConnection);
     }
 
     QMutexLocker lock(&m_mutex);

@@ -29,5 +29,6 @@ private:
     std::deque<std::function<void()>> m_lambdasAsync;
     void* m_opaque;
     bool m_connected;
+    bool m_connectedAsync;
 };
 

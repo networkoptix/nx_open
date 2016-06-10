@@ -27,14 +27,18 @@
 namespace nx {
 namespace cdb {
 
+namespace {
 class Account
 :
     public CdbFunctionalTest
 {
 };
+}
 
 TEST_F(Account, activation)
 {
+    addArg("--db/inactivityTimeout=5s");
+
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
@@ -64,6 +68,9 @@ TEST_F(Account, activation)
     api::SystemData system1;
     result = bindRandomSystem(account1.email, account1Password, &system1);
     ASSERT_EQ(api::ResultCode::accountNotActivated, result);
+
+    //waiting for DB connection to timeout
+    std::this_thread::sleep_for(std::chrono::seconds(10));
 
     api::AccountData account1Tmp;
     result = getAccount(account1.email, account1Password, &account1Tmp);

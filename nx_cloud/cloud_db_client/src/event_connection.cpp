@@ -7,8 +7,10 @@
 
 #include <nx/network/cloud/cdb_endpoint_fetcher.h>
 #include <nx/utils/log/log.h>
+#include <http/custom_headers.h>
 #include <utils/math/math.h>
 #include <utils/media/custom_output_stream.h>
+#include <utils/serialization/lexical.h>
 
 #include "cdb_request_path.h"
 #include "data/types.h"
@@ -26,7 +28,6 @@ EventConnection::EventConnection(
     m_cdbEndPointFetcher(endPointFetcher),
     m_login(std::move(login)),
     m_password(std::move(password)),
-    m_httpClient(nx_http::AsyncHttpClient::create()),
     m_reconnectTimer(network::RetryPolicy(
         network::RetryPolicy::kInfiniteRetries,
         std::chrono::milliseconds::zero(),
@@ -34,28 +35,18 @@ EventConnection::EventConnection(
         std::chrono::minutes(1))),
     m_state(State::init)
 {
-    m_httpClient->bindToAioThread(m_reconnectTimer.getAioThread());
-
-    connect(
-        m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
-        this, &EventConnection::onHttpResponseReceived,
-        Qt::DirectConnection);
-    connect(
-        m_httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
-        this, &EventConnection::onSomeMessageBodyAvailable,
-        Qt::DirectConnection);
-    connect(
-        m_httpClient.get(), &nx_http::AsyncHttpClient::done,
-        this, &EventConnection::onHttpClientDone,
-        Qt::DirectConnection);
 }
 
 EventConnection::~EventConnection()
 {
     //TODO #ak cancel m_cdbEndPointFetcher->get
 
-    m_httpClient->pleaseStopSync();
-    m_httpClient.reset();
+    if (m_httpClient)
+    {
+        m_httpClient->pleaseStopSync();
+        m_httpClient.reset();
+    }
+    m_reconnectTimer.pleaseStopSync();
 }
 
 void EventConnection::start(
@@ -87,6 +78,25 @@ void EventConnection::cdbEndpointResolved(
 
 void EventConnection::initiateConnection()
 {
+    if (!m_httpClient)
+    {
+        m_httpClient = nx_http::AsyncHttpClient::create();
+        m_httpClient->bindToAioThread(m_reconnectTimer.getAioThread());
+
+        connect(
+            m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+            this, &EventConnection::onHttpResponseReceived,
+            Qt::DirectConnection);
+        connect(
+            m_httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
+            this, &EventConnection::onSomeMessageBodyAvailable,
+            Qt::DirectConnection);
+        connect(
+            m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+            this, &EventConnection::onHttpClientDone,
+            Qt::DirectConnection);
+    }
+
     //connecting with Http client to cloud_db
     QUrl url;
     url.setScheme("http");
@@ -104,6 +114,12 @@ void EventConnection::connectionAttemptHasFailed(api::ResultCode result)
     {
         case State::connecting:
         {
+            if (m_httpClient)
+            {
+                //we are in m_httpClient's aio thread
+                m_httpClient->pleaseStopSync();
+                m_httpClient.reset();
+            }
             auto handler = std::move(m_connectCompletionHandler);
             return handler(result);
         }
@@ -113,7 +129,7 @@ void EventConnection::connectionAttemptHasFailed(api::ResultCode result)
 
         case State::reconnecting:
         {
-            //retrying 
+            //retrying
             const bool nextTryScheduled = m_reconnectTimer.scheduleNextTry(
                 [this]
                 {
@@ -139,7 +155,7 @@ void EventConnection::connectionAttemptHasFailed(api::ResultCode result)
 
 void EventConnection::onHttpResponseReceived(nx_http::AsyncHttpClientPtr httpClient)
 {
-    const nx_http::StatusCode::Value responseStatusCode = 
+    const nx_http::StatusCode::Value responseStatusCode =
         static_cast<nx_http::StatusCode::Value>(
             httpClient->response()->statusLine.statusCode);
     if (!nx_http::StatusCode::isSuccessCode(responseStatusCode))
@@ -150,6 +166,25 @@ void EventConnection::onHttpResponseReceived(nx_http::AsyncHttpClientPtr httpCli
             cl_logDEBUG1);
         return connectionAttemptHasFailed(
             api::httpStatusCodeToResultCode(responseStatusCode));
+    }
+
+    //checking cdb result code
+    auto cdbResultCodeIter =
+        httpClient->response()->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
+    if (cdbResultCodeIter == httpClient->response()->headers.end())
+    {
+        NX_LOGX(lm("Error. Received response without %1 header")
+            .arg(Qn::API_RESULT_CODE_HEADER_NAME), cl_logDEBUG1);
+        return connectionAttemptHasFailed(
+            api::ResultCode::invalidFormat);
+    }
+    const auto cdbResultCode =
+        QnLexical::deserialized<api::ResultCode>(cdbResultCodeIter->second);
+    if (cdbResultCode != api::ResultCode::ok)
+    {
+        NX_LOGX(lm("Error. Received result code %1")
+            .arg(cdbResultCodeIter->second), cl_logDEBUG1);
+        return connectionAttemptHasFailed(cdbResultCode);
     }
 
     const auto contentType = nx_http::getHeaderValue(

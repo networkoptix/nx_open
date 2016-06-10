@@ -1,17 +1,16 @@
 #include "desktop_resource.h"
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
 
 #include "plugins/resource/desktop_win/desktop_data_provider.h"
 #include "ui/screen_recording/video_recorder_settings.h"
 #include "core/resource/media_server_resource.h"
 #include "plugins/resource/desktop_camera/desktop_camera_connection.h"
 
-namespace {
-    const QnUuid desktopResourceUuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}"));
-}
+//static QnWinDesktopResource* instance = 0;
 
-QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource()
+QnWinDesktopResource::QnWinDesktopResource(QGLWidget* mainWindow):
+    QnDesktopResource()
 {
     m_mainWidget = mainWindow;
     addFlags(Qn::local_live_cam | Qn::desktop_camera);
@@ -20,19 +19,18 @@ QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveRe
     setName(name);
     setUrl(name);
     m_desktopDataProvider = 0;
-    setId(desktopResourceUuid); // only one desktop resource is allowed)
+    setId(QnDesktopResource::getDesktopResourceUuid()); // only one desktop resource is allowed)
+  //  setDisabled(true);
+    //Q_ASSERT_X(instance == 0, "Only one instance of desktop camera now allowed!", Q_FUNC_INFO);
+    //instance = this;
 }
 
-QnDesktopResource::~QnDesktopResource()
+QnWinDesktopResource::~QnWinDesktopResource()
 {
     delete m_desktopDataProvider;
 }
 
-QString QnDesktopResource::toString() const {
-    return getUniqueId();
-}
-
-QnAbstractStreamDataProvider* QnDesktopResource::createDataProviderInternal(Qn::ConnectionRole /*role*/)
+QnAbstractStreamDataProvider* QnWinDesktopResource::createDataProviderInternal(Qn::ConnectionRole /*role*/)
 {
     QnMutexLocker lock( &m_dpMutex );
 
@@ -45,7 +43,7 @@ QnAbstractStreamDataProvider* QnDesktopResource::createDataProviderInternal(Qn::
     return p;
 }
 
-void QnDesktopResource::createSharedDataProvider()
+void QnWinDesktopResource::createSharedDataProvider()
 {
     if (m_desktopDataProvider)
     {
@@ -54,8 +52,6 @@ void QnDesktopResource::createSharedDataProvider()
         else
             return; // already exists
     }
-
-#ifdef Q_OS_WIN
 
     QnVideoRecorderSettings recorderSettings;
 
@@ -83,49 +79,22 @@ void QnDesktopResource::createSharedDataProvider()
         encodingQuality,
         m_mainWidget,
         QPixmap());
-#else
-#endif
 }
 
-bool QnDesktopResource::isRendererSlow() const
+bool QnWinDesktopResource::isRendererSlow() const
 {
     QnVideoRecorderSettings recorderSettings;
     Qn::CaptureMode captureMode = recorderSettings.captureMode();
     return captureMode == Qn::FullScreenMode;
 }
 
-void QnDesktopResource::addConnection(const QnMediaServerResourcePtr &server)
-{
-    if (m_connectionPool.contains(server->getId()))
-        return;
-    QnDesktopCameraConnectionPtr connection = QnDesktopCameraConnectionPtr(new QnDesktopCameraConnection(this, server));
-    m_connectionPool[server->getId()] = connection;
-    connection->start();
-}
+static QSharedPointer<QnEmptyResourceAudioLayout> emptyAudioLayout(
+    new QnEmptyResourceAudioLayout());
 
-void QnDesktopResource::removeConnection(const QnMediaServerResourcePtr &server)
-{
-    m_connectionPool.remove(server->getId());
-}
-
-bool QnDesktopResource::isConnectedTo(const QnMediaServerResourcePtr &server) const
-{
-    if (!server)
-        return false;
-    return m_connectionPool.contains(server->getId());
-}
-
-static QSharedPointer<QnEmptyResourceAudioLayout> emptyAudioLayout( new QnEmptyResourceAudioLayout() );
-QnConstResourceAudioLayoutPtr QnDesktopResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const
+QnConstResourceAudioLayoutPtr QnWinDesktopResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
     if (!m_desktopDataProvider)
         return emptyAudioLayout;
     return m_desktopDataProvider->getAudioLayout();
 }
-
-QnUuid QnDesktopResource::getDesktopResourceUuid() {
-    return desktopResourceUuid;
-}
-
-
 #endif

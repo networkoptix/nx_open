@@ -7,8 +7,6 @@
 
 #include <api/media_server_statistics_manager.h>
 
-#include <core/resource_management/resource_pool.h>
-
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 
@@ -28,25 +26,16 @@
 #include <ui/statistics/modules/users_statistics_module.h>
 #include <ui/statistics/modules/graphics_statistics_module.h>
 #include <ui/statistics/modules/durations_statistics_module.h>
+#include <ui/workaround/fglrx_full_screen.h>
 
+#include "watchers/workbench_desktop_camera_watcher.h"
 
-#ifdef Q_OS_WIN
-#include "watchers/workbench_desktop_camera_watcher_win.h"
-#endif
-
-QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
+QnWorkbenchContext::QnWorkbenchContext(QObject *parent):
     QObject(parent),
     m_userWatcher(NULL),
-    m_layoutWatcher(NULL)
+    m_layoutWatcher(NULL),
+    m_closingDown(false)
 {
-    if(resourcePool == NULL) {
-        qnNullWarning(resourcePool);
-        resourcePool = new QnResourcePool();
-        resourcePool->setParent(this);
-    }
-
-    m_resourcePool = resourcePool;
-
     /* Layout watcher should be instantiated before snapshot manager because it can modify layout on adding. */
     m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
     m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
@@ -59,13 +48,10 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 
     m_workbench.reset(new QnWorkbench(this));
 
-
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
-#ifdef Q_OS_WIN
-    instance<QnWorkbenchDesktopCameraWatcher>();
-#endif
 
-    connect(m_resourcePool, SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_resourcePool_aboutToBeDestroyed()));
+    instance<QnWorkbenchDesktopCameraWatcher>();
+
     connect(m_userWatcher,  SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SIGNAL(userChanged(const QnUserResourcePtr &)));
 
     /* Create dependent objects. */
@@ -92,6 +78,8 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 
     const auto durationStatModule = instance<QnDurationStatisticsModule>();
     qnStatisticsManager->registerStatisticsModule(lit("durations"), durationStatModule);
+
+    instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {
@@ -112,8 +100,6 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     m_snapshotManager.reset();
     m_synchronizer.reset();
     m_workbench.reset();
-
-    m_resourcePool = NULL;
 }
 
 void QnWorkbenchContext::setMainWindow(QWidget *mainWindow)
@@ -144,10 +130,13 @@ void QnWorkbenchContext::setUserName(const QString &userName) {
 }
 
 
-// -------------------------------------------------------------------------- //
-// Handlers
-// -------------------------------------------------------------------------- //
-void QnWorkbenchContext::at_resourcePool_aboutToBeDestroyed() {
-    delete this;
+bool QnWorkbenchContext::closingDown() const
+{
+    return m_closingDown;
+}
+
+void QnWorkbenchContext::setClosingDown(bool value)
+{
+    m_closingDown = value;
 }
 

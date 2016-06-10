@@ -10,7 +10,7 @@ namespace
 
 QnBusinessActionParameters::QnBusinessActionParameters()
     : actionResourceId()
-    , soundUrl()
+    , url()
     , emailAddress()
     , userGroup(QnBusiness::EveryOne)
     , fps(10)
@@ -29,6 +29,7 @@ QnBusinessActionParameters::QnBusinessActionParameters()
     , presetId()
     , useSource(false)
     , recordBeforeMs(kDefaultRecordBeforeMs)
+    , playToClient(true)
 {}
 
 

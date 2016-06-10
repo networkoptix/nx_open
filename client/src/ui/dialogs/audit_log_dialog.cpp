@@ -13,7 +13,6 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -661,7 +660,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
 
-    resourcePool()->addResource(layout);
+    qnResPool->addResource(layout);
     menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 
 }

@@ -4,12 +4,14 @@
 #include <QtWidgets/QStyledItemDelegate>
 
 #include <client/client_color_types.h>
+#include <ui/customization/customized.h>
 
 class QnWorkbench;
 
-class QnResourceItemDelegate : public QStyledItemDelegate
+class QnResourceItemDelegate : public Customized<QStyledItemDelegate>
 {
-    typedef QStyledItemDelegate base_type;
+    Q_OBJECT
+    typedef Customized<QStyledItemDelegate> base_type;
 
     Q_PROPERTY(QnResourceItemColors colors READ colors WRITE setColors)
 

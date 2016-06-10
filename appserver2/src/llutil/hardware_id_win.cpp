@@ -38,6 +38,9 @@ namespace LLUtil {
 
     namespace {
         const int kWbemTimeoutMs = 5000;
+        const int kInterfaceWaitingTries = 10;
+        const int kInterfaceWaitingTime = 500;
+        const QString kEmptyMac = lit("");
     }
 
 HRESULT GetDisabledNICS(IWbemServices* pSvc, std::vector<_bstr_t>& paths)
@@ -409,7 +412,7 @@ void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareIn
         }
     } else
     {
-        hardwareIdMap[""] = hardwareId;
+        hardwareIdMap[kEmptyMac] = hardwareId;
     }
 }
 
@@ -569,17 +572,17 @@ void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& ha
             if (EnableNICSAtPaths(pSvc, paths) == S_OK)
             {
                 // Wait up to 10 seconds for all interfaces to be enabled
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < kInterfaceWaitingTries; i++)
                 {
                     std::vector<_bstr_t> tmpPaths;
                     GetDisabledNICS(pSvc, tmpPaths);
 
-                    if (!tmpPaths.empty())
+                    if (tmpPaths.empty())
                     {
                         break;
                     } else
                     {
-                        Sleep(1000);
+                        Sleep(kInterfaceWaitingTime);
                     }
                 }
             }

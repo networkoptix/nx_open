@@ -30,6 +30,9 @@ QnPaletteColor QnNxStylePrivate::mainColor(QnNxStyle::Colors::Palette palette) c
     case QnNxStyle::Colors::kGreen:
         index = 3;
         break;
+    case QnNxStyle::Colors::kYellow:
+        index = 0;
+        break;
     }
 
     if (index < 0)
@@ -45,8 +48,7 @@ QColor QnNxStylePrivate::checkBoxColor(const QStyleOption *option, bool radio) c
 
     if (option->state.testFlag(QStyle::State_Off))
     {
-        if (option->state.testFlag(QStyle::State_MouseOver) ||
-            option->state.testFlag(QStyle::State_HasFocus))
+        if (option->state.testFlag(QStyle::State_MouseOver))
         {
             color = mainColor.darker(4);
         }
@@ -54,8 +56,7 @@ QColor QnNxStylePrivate::checkBoxColor(const QStyleOption *option, bool radio) c
     else if (option->state.testFlag(QStyle::State_On) ||
              option->state.testFlag(QStyle::State_NoChange))
     {
-        if (!radio && (option->state.testFlag(QStyle::State_MouseOver) ||
-                       option->state.testFlag(QStyle::State_HasFocus)))
+        if (!radio && (option->state.testFlag(QStyle::State_MouseOver)))
         {
             color = mainColor.lighter(3);
         }
@@ -69,11 +70,11 @@ QColor QnNxStylePrivate::checkBoxColor(const QStyleOption *option, bool radio) c
 }
 
 void QnNxStylePrivate::drawSwitch(
-        QPainter *painter,
-        const QStyleOption *option,
-        const QWidget *widget) const
+    QPainter *painter,
+    const QStyleOption *option,
+    const QWidget *widget) const
 {
-    Q_UNUSED(widget)
+    Q_UNUSED(widget);
 
     const bool checked = option->state.testFlag(QStyle::State_On);
     const bool standalone = !qstyleoption_cast<const QStyleOptionButton*>(option);
@@ -86,28 +87,27 @@ void QnNxStylePrivate::drawSwitch(
     QColor signColorOff;    // Off: "0" indicator
 
     QnPaletteColor mainGreen = mainColor(QnNxStyle::Colors::kGreen);
-    QnPaletteColor mainDark  = mainColor(QnNxStyle::Colors::kBase);
+    QnPaletteColor mainDark = mainColor(QnNxStyle::Colors::kBase);
 
     if (standalone)
     {
-        bool hovered = option->state.testFlag(QStyle::State_MouseOver) ||
-                       option->state.testFlag(QStyle::State_HasFocus);
+        bool hovered = option->state.testFlag(QStyle::State_MouseOver);
 
-        fillColorOff  = mainDark .lighter(hovered ?  7 :  6);
-        fillColorOn   = mainGreen.lighter(hovered ?  1 :  0);
+        fillColorOff = mainDark.lighter(hovered ? 7 : 6);
+        fillColorOn = mainGreen.lighter(hovered ? 1 : 0);
         frameColorOff = fillColorOff;
-        frameColorOn  = fillColorOn;
-        signColorOff  = mainDark.lighter(10);
-        signColorOn   = mainGreen.lighter(hovered ? 3 : 2);
+        frameColorOn = fillColorOn;
+        signColorOff = mainDark.lighter(10);
+        signColorOn = mainGreen.lighter(hovered ? 3 : 2);
     }
     else
     {
-        fillColorOff  = mainDark .lighter(1);
-        fillColorOn   = mainGreen;
+        fillColorOff = mainDark.lighter(1);
+        fillColorOn = mainGreen;
         frameColorOff = mainDark;
-        frameColorOn  = fillColorOn;
-        signColorOff  = mainDark .lighter(3);
-        signColorOn   = mainGreen.lighter(2);
+        frameColorOn = fillColorOn;
+        signColorOff = mainDark.lighter(3);
+        signColorOn = mainGreen.lighter(2);
     }
 
     bool drawTop = true;
@@ -169,6 +169,14 @@ void QnNxStylePrivate::drawSwitch(
         int h = indicatorsRect.height() - dp(3);
         int y = rect.center().y() - h / 2;
         painter->drawLine(x, y, x, y + h + 1);
+    }
+
+    if (standalone && option->state.testFlag(QStyle::State_HasFocus))
+    {
+        Q_Q(const QnNxStyle);
+        QStyleOptionFocusRect focusOption;
+        focusOption.QStyleOption::operator=(*option);
+        q->proxy()->drawPrimitive(QStyle::PE_FrameFocusRect, &focusOption, painter, widget);
     }
 }
 

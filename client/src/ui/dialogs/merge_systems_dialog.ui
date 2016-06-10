@@ -154,7 +154,7 @@
             <item>
              <widget class="QRadioButton" name="remoteSystemRadioButton">
               <property name="text">
-               <string notr="true">re&amp;mote</string>
+               <string notr="true">remote</string>
               </property>
              </widget>
             </item>

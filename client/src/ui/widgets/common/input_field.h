@@ -4,6 +4,7 @@
 
 #include <ui/utils/validators.h>
 
+class QnPasswordStrengthIndicator;
 class QnInputFieldPrivate;
 class AbstractAccessor;
 
@@ -17,6 +18,7 @@ class QnInputField : public QWidget
 
     Q_PROPERTY(QLineEdit::EchoMode echoMode READ echoMode WRITE setEchoMode)
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
+    Q_PROPERTY(bool passwordIndicatorEnabled READ passwordIndicatorEnabled WRITE setPasswordIndicatorEnabled)
 
     typedef QWidget base_type;
 
@@ -32,18 +34,24 @@ public:
 
     QString text() const;
     void setText(const QString& value);
+    void clear();
 
     QLineEdit::EchoMode echoMode() const;
     void setEchoMode(QLineEdit::EchoMode value);
 
+    const QnPasswordStrengthIndicator* passwordIndicator() const;
+    bool passwordIndicatorEnabled() const;
+    void setPasswordIndicatorEnabled(bool enabled, bool showImmediately = false);
+
     bool isReadOnly() const;
     void setReadOnly(bool value);
 
-    void validate();
-    void clear();
+    bool validate();
 
     bool isValid() const;
-    void setValidator(Qn::TextValidateFunction validator);
+    bool lastValidationResult() const;
+
+    void setValidator(Qn::TextValidateFunction validator, bool validateImmediately = false);
 
     static AbstractAccessor* createLabelWidthAccessor();
 

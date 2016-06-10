@@ -10,23 +10,22 @@ export MNTDATAPART=/mnt/data
 export BOOTPART=/dev/mmcblk0p1
 export MNTBOOTPART=/mnt/boot
 
-mkdir -p $MNTDATAPART
-mount -t ext4 $DATAPART $MNTDATAPART
-cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite /root/tools/nx/ecs_static.sqlite
-rm -Rf $MNTDATAPART/opt/$CUSTOMIZATION
-tar xfv /tmp/$DISTRIB.tar.gz -C $MNTDATAPART
-mkdir -p $MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/var
-cp -f /root/tools/nx/ecs_static.sqlite $MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/var
-echo "statisticsReportAllowed=true" >> $MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf
-umount $DATAPART
-
 mkdir -p $MNTBOOTPART
 mount -t vfat $BOOTPART $MNTBOOTPART
-cp -f /root/tools/uboot/*.txt $MNTBOOTPART
+cp -f /root/tools/uboot/* $MNTBOOTPART
 umount $BOOTPART
 rm -Rf $MNTBOOTPART
-
 apt-get update
-apt-get install sudo nginx nginx-common nginx-full unzip --fix-missing -y
+export DEBIAN_FRONTEND=noninteractive
+dpkg -i /opt/deb/libvdpau/*.deb
+cp -f /opt/deb/libc6/*.deb /var/cache/apt/archives
+apt-get -d -t experimental install libc-l10n libc6-armhf-cross libc-bin libc-dev-bin libc6 libc6-dbg libc6-dev locales
+apt-get -t experimental install libc-l10n libc6-armhf-cross libc-bin libc-dev-bin libc6 libc6-dbg libc6-dev locales -y -qq
+touch /dev/cedar_dev
+chmod 777 /dev/disp
+chmod 777 /dev/cedar_dev
+usermod -aG video root
+rm -Rf /opt/networkoptix/mediaserver/lib
+sync
 
 exit 0

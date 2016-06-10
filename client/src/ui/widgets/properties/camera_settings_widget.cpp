@@ -4,7 +4,6 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QVBoxLayout>
 
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_criterion.h>
@@ -15,7 +14,7 @@
 #include "multiple_camera_settings_widget.h"
 #include "single_camera_settings_widget.h"
 
-QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent): 
+QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
     QnWorkbenchContextAware(parent),
     m_emptyTab(Qn::GeneralSettingsTab)
@@ -66,14 +65,14 @@ void QnCameraSettingsWidget::setCameras(const QnVirtualCameraResourceList &camer
     m_cameras = cameras;
 
     switch(m_cameras.size()) {
-    case 0: 
+    case 0:
         setMode(EmptyMode);
         break;
-    case 1: 
+    case 1:
         m_singleWidget->setCamera(m_cameras.front());
         setMode(SingleMode);
         break;
-    default: 
+    default:
         m_multiWidget->setCameras(m_cameras);
         setMode(MultiMode);
         break;
@@ -92,7 +91,7 @@ Qn::CameraSettingsTab QnCameraSettingsWidget::currentTab() const {
 
 void QnCameraSettingsWidget::setCurrentTab(Mode mode, Qn::CameraSettingsTab tab) {
     switch(mode) {
-    case SingleMode: 
+    case SingleMode:
         m_singleWidget->setCurrentTab(tab);
         break;
     case MultiMode:

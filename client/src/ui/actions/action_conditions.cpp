@@ -723,6 +723,31 @@ Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &pa
     return Qn::EnabledAction;
 }
 
+
+Qn::ActionVisibility QnNewUserLayoutActionCondition::check(const QnActionParameters &parameters)
+{
+    if (!parameters.hasArgument(Qn::NodeTypeRole))
+        return Qn::InvisibleAction;
+
+    Qn::NodeType nodeType = parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>();
+
+    /* Create layout for self. */
+    if (nodeType == Qn::LayoutsNode)
+        return Qn::EnabledAction;
+
+    /* Create layout for other user. */
+    if (nodeType != Qn::ResourceNode)
+        return Qn::InvisibleAction;
+    QnUserResourcePtr user = parameters.resource().dynamicCast<QnUserResource>();
+    if (!user || user == context()->user())
+        return Qn::InvisibleAction;
+
+    return accessController()->canCreateLayout(user->getId())
+        ? Qn::EnabledAction
+        : Qn::InvisibleAction;
+}
+
+
 Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
     bool isExportedLayout = layout->isFile();

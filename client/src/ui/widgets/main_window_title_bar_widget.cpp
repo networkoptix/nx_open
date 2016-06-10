@@ -15,6 +15,7 @@ namespace
     const int kTitleBarHeight = 24;
     const int kVLineWidth = 1;
     const QSize kControlButtonSize(40 - kVLineWidth, kTitleBarHeight);
+    const auto kTabBarButtonSize = QSize(kTitleBarHeight, kTitleBarHeight);
 
     QToolButton* newActionButton(
             QAction *action,
@@ -136,9 +137,9 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     layout->addWidget(d->tabBar);
     layout->addWidget(newVLine());
     layout->addWidget(newActionButton(action(QnActions::OpenNewTabAction),
-                                      Qn::MainWindow_TitleBar_NewLayout_Help));
+        Qn::MainWindow_TitleBar_NewLayout_Help, false, kTabBarButtonSize));
     layout->addWidget(newActionButton(action(QnActions::OpenCurrentUserLayoutMenu),
-                                      true));
+        true, kTabBarButtonSize));
     layout->addStretch(1);
     layout->addSpacing(80);
     layout->addWidget(newVLine());

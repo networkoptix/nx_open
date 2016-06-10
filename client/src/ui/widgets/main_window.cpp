@@ -35,8 +35,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <ui/dialogs/ptz_manage_dialog.h>
-
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
@@ -350,9 +348,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
      */
     QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
     Q_UNUSED(vsyncWorkaround);
-
-    QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
-    Q_UNUSED(manageDialog)
 }
 
 QnMainWindow::~QnMainWindow() {

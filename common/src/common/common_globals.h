@@ -1,5 +1,4 @@
-#ifndef QN_COMMON_GLOBALS_H
-#define QN_COMMON_GLOBALS_H
+#pragma once
 
 #define BOOST_BIND_NO_PLACEHOLDERS
 #include <cassert>
@@ -335,6 +334,16 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AnyStatus
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
+
+    /** Level of detail for displaying resource info. */
+    enum ResourceInfoLevel
+    {
+        RI_Invalid,
+        RI_NameOnly,       /**< Only resource name */
+        RI_WithUrl,        /**< Resource name and url (if exist) */
+        RI_FullInfo        /**< All info */
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceInfoLevel)
 
     enum BitratePerGopType {
         BPG_None,
@@ -960,9 +969,6 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
-template<typename T>
-QString toString( const T& t ) { return t.toString(); }
-
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::TimePeriodContent)(Qn::Corner),
     (metatype)
@@ -985,25 +991,13 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
-    (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)
+    (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)(Qn::IOPortTypes)
     ,
     (metatype)(numeric)(lexical)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzDataFields),
+    (Qn::PtzDataFields)(Qn::TTHeaderFlags)(Qn::ResourceInfoLevel),
     (metatype)(numeric)
 )
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TTHeaderFlags),
-    (metatype)(numeric)
-)
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::IOPortTypes),
-    (metatype)(numeric)(lexical)
-
-)
-
-#endif // QN_COMMON_GLOBALS_H

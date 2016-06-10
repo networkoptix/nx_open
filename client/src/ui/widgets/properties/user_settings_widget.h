@@ -15,6 +15,7 @@ namespace Ui
 }
 
 class QnUserSettingsModel;
+class QnInputField;
 
 class QnUserSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
@@ -36,6 +37,7 @@ public:
     void updateAccessRightsPresets();
 private:
     void setupInputFields();
+    QList<QnInputField*> inputFields() const;
 
     void updateControlsAccess();
     bool validMode() const;

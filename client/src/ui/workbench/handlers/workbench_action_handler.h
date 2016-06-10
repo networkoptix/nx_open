@@ -129,7 +129,6 @@ protected slots:
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
     void at_openLayoutsAction_triggered();
-    void at_openNewTabAction_triggered();
 
     void at_openInLayoutAction_triggered();
 
@@ -242,7 +241,6 @@ private:
     qint64 getFirstBookmarkTimeMs();
 
 private:
-    QPointer<QWidget> m_widget;
     QPointer<QMenu> m_mainMenu;
     QPointer<QMenu> m_currentUserLayoutsMenu;
 

@@ -29,7 +29,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>&amp;Output ID:</string>
+      <string>Output ID:</string>
      </property>
      <property name="buddy">
       <cstring>relayComboBox</cstring>
@@ -57,7 +57,7 @@
       <item>
        <widget class="QCheckBox" name="autoResetCheckBox">
         <property name="text">
-         <string>&amp;Auto-reset in (sec):</string>
+         <string>Auto-reset in (sec):</string>
         </property>
        </widget>
       </item>

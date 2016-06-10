@@ -13,6 +13,7 @@
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/std/future.h>
+#include <utils/common/guard.h>
 
 
 namespace nx {
@@ -552,9 +553,6 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
     for (int i = 0; i < 5; ++i)
         for (const bool connectionWillSucceed : connectionWillSucceedValues)
         {
-            AddressEntry addressEntry("nx_test.com:12345");
-            OutgoingTunnel tunnel(std::move(addressEntry));
-
             nx::utils::promise<void> doConnectEvent;
 
             setConnectorFactoryFunc(
@@ -580,6 +578,11 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
 
             std::vector<ConnectionContext> connectedPromises;
             connectedPromises.resize(connectionsToCreate);
+
+            AddressEntry addressEntry("nx_test.com:12345");
+            OutgoingTunnel tunnel(std::move(addressEntry));
+            auto tunnelGuard = makeScopedGuard([&tunnel] { tunnel.pleaseStopSync(); });
+
             for (auto& connectionContext: connectedPromises)
             {
                 std::this_thread::sleep_for(std::chrono::microseconds(rand() & 0xffff));
@@ -607,12 +610,11 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
 
                 ASSERT_EQ(SystemError::timedOut, result.first);
                 ASSERT_EQ(nullptr, result.second);
-                ASSERT_TRUE(
-                    (actualTimeout > (timeout - timeoutCorrection)) &&
-                    (actualTimeout < (timeout + timeoutCorrection)));
+#ifdef _DEBUG
+                EXPECT_GT(actualTimeout, timeout - timeoutCorrection);
+                EXPECT_LT(actualTimeout, timeout + timeoutCorrection);
+#endif
             }
-
-            tunnel.pleaseStopSync();
         }
 }
 

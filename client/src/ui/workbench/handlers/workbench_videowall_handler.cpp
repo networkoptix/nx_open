@@ -21,7 +21,6 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_type.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -52,7 +51,6 @@
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
-#include <ui/common/ui_resource_name.h>
 #include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM #VW refactor
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
@@ -299,9 +297,9 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     m_controlMode.pcUuid = pcUuid.toString();
 
     /* Common connections */
-    connect(resourcePool(), &QnResourcePool::resourceAdded,     this,   &QnWorkbenchVideoWallHandler::at_resPool_resourceAdded);
-    connect(resourcePool(), &QnResourcePool::resourceRemoved,   this,   &QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved);
-    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
+    connect(qnResPool, &QnResourcePool::resourceAdded,     this,   &QnWorkbenchVideoWallHandler::at_resPool_resourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved,   this,   &QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved);
+    foreach(const QnResourcePtr &resource, qnResPool->getResources())
         at_resPool_resourceAdded(resource);
 
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, [this](const QnPeerRuntimeInfo &info) {
@@ -1130,12 +1128,10 @@ QnVideoWallItemIndexList QnWorkbenchVideoWallHandler::targetList() const {
 
     QnVideoWallItemIndexList indices;
 
-    foreach (const QnResourcePtr &resource, resourcePool()->getResources()) {
-        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
-        if (!videoWall)
-            continue;
-
-        foreach(const QnVideoWallItem &item, videoWall->items()->getItems()) {
+    for (const QnVideoWallResourcePtr& videoWall: qnResPool->getResources<QnVideoWallResource>())
+    {
+        for(const QnVideoWallItem &item: videoWall->items()->getItems())
+        {
             if (item.layout == currentId && item.runtimeStatus.online)
                 indices << QnVideoWallItemIndex(videoWall, item.uuid);
         }
@@ -1232,7 +1228,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
         i++;
     }
 
-    resourcePool()->addResource(layout);
+    qnResPool->addResource(layout);
     return layout;
 }
 
@@ -1589,7 +1585,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         foreach (const QnVideoWallItemIndexList &indices, itemGroups)
             addItemToLayout(layout, indices);
 
-        resourcePool()->addResource(layout);
+        qnResPool->addResource(layout);
 
         menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 

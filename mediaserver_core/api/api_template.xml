@@ -681,6 +681,25 @@
                             <description>Display last N log lines.</description>
                             <optional>true</optional>
                         </param>
+                        <param>
+                            <name>id</name>
+                            <description>Id of log file. By default main log is returned</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>0</name>
+                                    <description>Main server log</description>
+                                </value>
+                                <value>
+                                    <name>2</name>
+                                    <description>Http log</description>
+                                </value>
+                                <value>
+                                    <name>3</name>
+                                    <description>Transaction log</description>
+                                </value>
+                            </values>
+                        </param>
                     </params>
                     <result>
                         <caption>Tail of the server log file in text format</caption>
@@ -1780,26 +1799,26 @@
                         It works mostly like sessions, but a bit more secure because it doesn't send user's password over HTTP.<br/>
                         <ul>
                         <li>To check authentication:
-                        	<ol>
-                        		<li>Request <code>/api/getCurrentUser</code>(GET)</li>
-                        		<li>You will get 401 (Unauthorised) in case if you need to authorise</li>
-                        		<li>You will get user object otherwise</li>
-                        	</ol>
+                            <ol>
+                                <li>Request <code>/api/getCurrentUser</code>(GET)</li>
+                                <li>You will get 401 (Unauthorised) in case if you need to authorise</li>
+                                <li>You will get user object otherwise</li>
+                            </ol>
                         </li>
                         <li>To log in:
-                        	<ol>
- 		                       	<li>Request <code>/api/getNonce</code></li>
-            	                <li>In response you'll get a JSON object with <i>realm</i> and <i>nonce</i> (nonce is a session key for this user)</li>
-                	            <li>Calculate authentification hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
-                    	        <li>Request <code>/api/cookieLogin</code>(POST) pass auth parameter there</li>
-                        	    <li>Server will check authentification and will set session cookies</li>
-                        	</ol>
+                            <ol>
+                                <li>Request <code>/api/getNonce</code></li>
+                                <li>In response you'll get a JSON object with <i>realm</i> and <i>nonce</i> (nonce is a session key for this user)</li>
+                                <li>Calculate authentification hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
+                                <li>Request <code>/api/cookieLogin</code>(POST) pass auth parameter there</li>
+                                <li>Server will check authentification and will set session cookies</li>
+                            </ol>
                         </li>
                         <li>To log out:
-                        	<ol>
-                            	<li>Request <code>/api/cookieLogout</code> (POST)</li>
-                            	<li>Server will clear session cookies</li>
-                            </ol>	
+                            <ol>
+                                <li>Request <code>/api/cookieLogout</code> (POST)</li>
+                                <li>Server will clear session cookies</li>
+                            </ol>   
                         </li>
                         </ul>
                     </description>

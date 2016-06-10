@@ -26,33 +26,33 @@ public:
         ColumnCount
     };
 
-    QnUserListModel(QObject *parent = 0);
-    ~QnUserListModel();
+    QnUserListModel(QObject* parent = nullptr);
+    virtual ~QnUserListModel();
 
-    virtual int rowCount(const QModelIndex &parent) const override;
-    virtual int columnCount(const QModelIndex &parent) const override;
-    virtual QVariant data(const QModelIndex &index, int role) const override;
+    virtual int rowCount(const QModelIndex& parent) const override;
+    virtual int columnCount(const QModelIndex& parent) const override;
+    virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     Qt::CheckState checkState() const;
-    void setCheckState(Qt::CheckState state, const QnUserResourcePtr &user = QnUserResourcePtr());
+    void setCheckState(Qt::CheckState state, const QnUserResourcePtr& user = QnUserResourcePtr());
 
     const QnUserManagementColors colors() const;
-    void setColors(const QnUserManagementColors &colors);
+    void setColors(const QnUserManagementColors& colors);
+
 private:
-    QnUserListModelPrivate *d;
+    QnUserListModelPrivate* d;
     friend class QnUserListModelPrivate;
 };
-
 
 class QnSortedUserListModel : public QSortFilterProxyModel
 {
     typedef QSortFilterProxyModel base_type;
 
 public:
-    QnSortedUserListModel(QObject *parent);
+    QnSortedUserListModel(QObject* parent);
 
 protected:
-    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+    virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
 };

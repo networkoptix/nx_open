@@ -219,7 +219,7 @@ void QnAccessibleResourcesWidget::initControlsModel()
         return;
 
     QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(qnResTypePool->getFixedResourceTypeId(kDummyResourceId)));
-    dummy->setName(tr("All Cameras"));
+    dummy->setName(tr("All Media Resources"));
     /* Create separate dummy resource id for each filter, but once per application run. */
     dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
     m_controlsModel->setResources(QnResourceList() << dummy);

@@ -1,7 +1,5 @@
 #include "desktop_data_provider.h"
-
-#ifdef Q_OS_WIN
-
+#if defined(Q_OS_WIN)
 #include <intrin.h>
 #include <windows.h>
 #include <mmsystem.h>
@@ -31,54 +29,8 @@ extern "C"
 #include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
 #include <utils/media/ffmpeg_helper.h>
-
 namespace {
 
-    // mux audio 1 and audio 2 to audio1 buffer
-    // I have used intrinsics for SSE. It is portable for MSVC, GCC (mac, linux), Intel compiler
-    static void stereoAudioMux(qint16* a1, qint16* a2, int lenInShort)
-    {
-        __m128i* audio1 = (__m128i*) a1;
-        __m128i* audio2 = (__m128i*) a2;
-        for (int i = 0; i < lenInShort / 8; ++i)
-        {
-            //*audio1 = _mm_avg_epu16(*audio1, *audio2);
-            *audio1 = _mm_add_epi16(*audio1, *audio2); /* SSE2. */
-            audio1++;
-            audio2++;
-        }
-        int rest = lenInShort % 8;
-        if (rest > 0)
-        {
-            a1 += lenInShort - rest;
-            a2 += lenInShort - rest;
-            for (int i = 0; i < rest; ++i)
-            {
-                //*a1 = ((int)*a1 + (int)*a2) >> 1;
-                *a1 = qMax(SHRT_MIN, qMin(SHRT_MAX, ((int)*a1 + (int)*a2)));
-                a1++;
-                a2++;
-            }
-        }
-    }
-
-    static void monoToStereo(qint16* dst, qint16* src, int lenInShort)
-    {
-        for (int i = 0; i < lenInShort; ++i)
-        {
-            *dst++ = *src;
-            *dst++ = *src++;
-        }
-    }
-
-    static void monoToStereo(qint16* dst, qint16* src1, qint16* src2, int lenInShort)
-    {
-        for (int i = 0; i < lenInShort; ++i)
-        {
-            *dst++ = *src1++;
-            *dst++ = *src2++;
-        }
-    }
 
     struct FffmpegLog
     {
@@ -99,17 +51,6 @@ namespace {
         }
     };
 
-    QnAudioFormat createAudioFormat(const QAudioFormat &source)
-    {
-        QnAudioFormat result;
-        result.setSampleType(static_cast<QnAudioFormat::SampleType>(source.sampleType()));
-        result.setSampleRate(source.sampleRate());
-        result.setSampleSize(source.sampleSize());
-        result.setChannelCount(source.channelCount());
-        result.setCodec(source.codec());
-        result.setByteOrder(static_cast<QnAudioFormat::Endian>(source.byteOrder()));
-        return result;
-    }
 }
 
 QnDesktopDataProvider::EncodedAudioInfo::EncodedAudioInfo(QnDesktopDataProvider* owner):
@@ -248,27 +189,24 @@ int QnDesktopDataProvider::EncodedAudioInfo::audioPacketSize()
 
 bool QnDesktopDataProvider::EncodedAudioInfo::setupFormat(QString& errMessage)
 {
-    QAudioFormat audioFormat = m_audioDevice.preferredFormat();
+    m_audioFormat = m_audioDevice.preferredFormat();
+    m_audioFormat.setSampleRate(AUDIO_CAUPTURE_FREQUENCY);
+    m_audioFormat.setSampleSize(16);
+    m_audioFormat.setChannelCount(2);
+    m_audioFormat.setSampleType(QAudioFormat::SignedInt);
 
-    audioFormat.setSampleRate(AUDIO_CAUPTURE_FREQUENCY);
-    audioFormat.setSampleSize(16);
-    audioFormat.setChannelCount(2);
-    audioFormat.setSampleType(QAudioFormat::SignedInt);
-
-    if (!m_audioDevice.isFormatSupported(audioFormat))
+    if (!m_audioDevice.isFormatSupported(m_audioFormat))
     {
-        audioFormat.setChannelCount(1);
-        if (!m_audioDevice.isFormatSupported(audioFormat))
+        m_audioFormat.setChannelCount(1);
+        if (!m_audioDevice.isFormatSupported(m_audioFormat))
         {
             m_audioFormat.setSampleRate(AUDIO_CAUPTURE_ALT_FREQUENCY);
-            if (!m_audioDevice.isFormatSupported(audioFormat)) {
+            if (!m_audioDevice.isFormatSupported(m_audioFormat)) {
                 errMessage = tr("44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings");
                 return false;
             }
         }
     }
-
-    m_audioFormat = createAudioFormat(audioFormat);
     m_audioQueue.setMaxSize(AUDIO_QUEUE_MAX_SIZE);
     return true;
 }
@@ -325,7 +263,7 @@ QnDesktopDataProvider::QnDesktopDataProvider (
                    QWidget* glWidget,
                    const QPixmap& logo
                    ):
-    QnAbstractMediaStreamDataProvider(res),
+    QnDesktopDataProviderBase(res),
     m_videoBuf(0),
     m_videoBufSize(0),
     m_videoCodecCtx(0),
@@ -796,6 +734,8 @@ void QnDesktopDataProvider::run()
             m_grabber->pleaseStop();
             putAudioData();
         }
+        if (needToStop())
+            break;
     }
     if (!m_capturingStopped)
         stopCapturing();
@@ -845,18 +785,6 @@ void QnDesktopDataProvider::closeStream()
         delete audioChannel;
     m_audioInfo.clear();
 }
-
-class QnDesktopDataProvider::QnDesktopAudioLayout: public QnResourceAudioLayout
-{
-public:
-    QnDesktopAudioLayout(): QnResourceAudioLayout(), m_channels(0) {}
-    virtual int channelCount() const override { return m_channels; }
-    virtual AudioTrack getAudioTrackInfo(int /*index*/) const override { return m_audioTrack; }
-    void setAudioTrackInfo(const AudioTrack& info) { m_audioTrack = info; m_channels = 1;}
-private:
-    AudioTrack m_audioTrack;
-    int m_channels;
-};
 
 QnConstResourceAudioLayoutPtr QnDesktopDataProvider::getAudioLayout()
 {

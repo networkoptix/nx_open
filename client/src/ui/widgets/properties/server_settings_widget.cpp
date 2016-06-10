@@ -14,7 +14,6 @@
 
 #include <api/app_server_connection.h>
 
-#include <core/resource/resource_name.h>
 #include <camera/camera_data_manager.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>

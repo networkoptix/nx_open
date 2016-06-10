@@ -1,12 +1,14 @@
 #include "business_rule_view_model.h"
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_display_info.h>
+
+#include <client/client_settings.h>
 
 #include <business/business_action_parameters.h>
 #include <business/business_strings_helper.h>
@@ -20,7 +22,6 @@
 
 #include <ui/help/help_topics.h>
 #include <ui/help/business_help.h>
-#include <ui/common/ui_resource_name.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -184,7 +185,7 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 return (int)m_actionParams.userGroup;
             case QnBusiness::PlaySoundAction:
             case QnBusiness::PlaySoundOnceAction:
-                return m_actionParams.soundUrl;
+                return m_actionParams.url;
             case QnBusiness::SayTextAction:
                 return m_actionParams.sayText;
             default:
@@ -274,14 +275,14 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
         case QnBusiness::PlaySoundAction:
         case QnBusiness::PlaySoundOnceAction:
         {
-            QnBusinessActionParameters params;
-            params.soundUrl = value.toString();
+            QnBusinessActionParameters params = m_actionParams;
+            params.url = value.toString();
             setActionParams(params);
             break;
         }
         case QnBusiness::SayTextAction:
         {
-            QnBusinessActionParameters params;
+            QnBusinessActionParameters params = m_actionParams;
             params.sayText = value.toString();
             setActionParams(params);
             break;
@@ -811,7 +812,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return isResourcesListValid<QnCameraOutputPolicy>(QnBusiness::filteredResources<QnCameraOutputPolicy::resource_type>(m_actionResources));
         case QnBusiness::PlaySoundAction:
         case QnBusiness::PlaySoundOnceAction:
-            return !m_actionParams.soundUrl.isEmpty();
+            return !m_actionParams.url.isEmpty();
         case QnBusiness::SayTextAction:
             return !m_actionParams.sayText.isEmpty();
         case QnBusiness::ExecutePtzPresetAction:
@@ -825,6 +826,13 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             if (canUseSource)
                 return true;
             break;
+        }
+        case QnBusiness::ExecHttpRequestAction:
+        {
+            QUrl url(m_actionParams.url);
+            return url.isValid() && !url.isEmpty() &&
+                   (url.scheme().isEmpty() || url.scheme().toLower() == lit("http")) &&
+                   !url.host().isEmpty();
         }
         default:
             break;
@@ -877,7 +885,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
     if (!QnBusiness::isResourceRequired(m_eventType)) {
         return tr("<System>");
     } else if (resources.size() == 1) {
-        return getResourceName(resources.first());
+        return QnResourceDisplayInfo(resources.first()).toString(qnSettings->extraInfoInTree());
     } else if (QnBusiness::requiresServerResource(m_eventType)){
         if (resources.isEmpty())
             return tr("<Any Server>");
@@ -931,7 +939,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     case QnBusiness::PlaySoundAction:
     case QnBusiness::PlaySoundOnceAction:
     {
-        QString filename = m_actionParams.soundUrl;
+        QString filename = m_actionParams.url;
         if (filename.isEmpty())
             return tr("Select Sound");
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
@@ -962,6 +970,8 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         }
         break;
     }
+    case QnBusiness::ExecHttpRequestAction:
+        return QUrl(m_actionParams.url).toString(QUrl::RemoveUserInfo);
     default:
         break;
     }
@@ -972,7 +982,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
 
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     if (cameras.size() == 1)
-        return getResourceName(cameras.first());
+        return QnResourceDisplayInfo(cameras.first()).toString(qnSettings->extraInfoInTree());
 
     if (cameras.isEmpty())
         return QnDeviceDependentStrings::getDefaultNameFromSet(

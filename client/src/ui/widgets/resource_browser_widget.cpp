@@ -20,7 +20,6 @@
 #include <common/common_meta_types.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -176,9 +175,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
         tr("Live Cameras")
         ), static_cast<int>(Qn::live));
 
-    ui->clearFilterButton->setIcon(qnSkin->icon("tree/clear.png"));
-    ui->clearFilterButton->setIconSize(QSize(16, 16));
-
     m_resourceModel = new QnResourceTreeModel(QnResourceTreeModel::FullScope, this);
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
@@ -200,7 +196,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(editingFinished()),          this,               SLOT(forceUpdateFilter()));
-    connect(ui->clearFilterButton,  SIGNAL(clicked()),                  ui->filterLineEdit, SLOT(clear()));
 
     connect(ui->resourceTreeWidget, SIGNAL(activated(const QnResourcePtr&)),  this,        SIGNAL(activated(const QnResourcePtr&)));
     connect(ui->searchTreeWidget,   SIGNAL(activated(const QnResourcePtr&)),  this,        SIGNAL(activated(const QnResourcePtr&)));
@@ -571,7 +566,6 @@ void QnResourceBrowserWidget::updateFilter(bool force) {
         return;
     }
 
-    ui->clearFilterButton->setVisible(!filter.isEmpty());
     killSearchTimer();
 
     if(!workbench())

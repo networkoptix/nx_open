@@ -10,6 +10,7 @@
 #include "recorder/file_deletor.h"
 #include "utils/fs/file.h"
 #include <common/common_module.h>
+#include <utils/common/writer_pool.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -487,7 +488,7 @@ bool QnFileStorageResource::removeFile(const QString& url)
     if (!m_valid)
         return false;
 
-    qnFileDeletor->deleteFile(removeProtocolPrefix(translateUrlToLocal(url)));
+    qnFileDeletor->deleteFile(removeProtocolPrefix(translateUrlToLocal(url)), getId());
     return true;
 }
 

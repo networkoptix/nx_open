@@ -62,7 +62,7 @@ static void printHelp()
         "\n";
 }
 
-int syncDir( const QString& localDir, const QString& remoteUrl );
+int syncDir( const QString& localDir, QString remoteUrl );
 int doInstallation(
     const InstallationManager& installationManager,
     const QString& mirrorListUrl,
@@ -202,7 +202,7 @@ int main( int argc, char* argv[] )
 //--rsync --url=http://downloads.hdwitness.com/test/x64/ --dir=c:/tmp/appl/
 //--install --customization=digitalwatchdog --version=1.5
 
-int syncDir( const QString& localDir, const QString& remoteUrl )
+int syncDir( const QString& localDir, QString remoteUrl )
 {
     if( localDir.isEmpty() )
     {
@@ -214,6 +214,7 @@ int syncDir( const QString& localDir, const QString& remoteUrl )
         std::cerr<<"Error: No remote url specified"<<std::endl;
         return 1;
     }
+    remoteUrl = lit("http://") + remoteUrl;
 
     RDirSyncher::EventReceiver dummyEventReceiver;
     auto syncher = std::make_shared<RDirSyncher>( QUrl(remoteUrl), localDir, &dummyEventReceiver );
@@ -308,8 +309,8 @@ int doInstallation(
 
 #include <nx/network/http/httpclient.h>
 
-//--rsync --dir=c:/temp/1 --url=http://enk.me/clients/2.1/default/windows/x64/
-//--rsync --dir=c:/tmp/1/ --url=http://downloads.hdwitness.com/clients/2.1/default/windows/x64/
+//--rsync --dir=c:/temp/1 --url=enk.me/clients/2.1/default/windows/x64/
+//--rsync --dir=c:/tmp/1/ --url=downloads.hdwitness.com/clients/2.1/default/windows/x64/
 
 int downloadFile( const QString& url, const QString& destFilePath )
 {

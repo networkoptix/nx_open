@@ -8,20 +8,18 @@
 #include <ui/common/recording_status_helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
-#include <core/resource/resource_name.h>
+#include <core/resource/resource_display_info.h>
 
 QnCameraListModel::QnCameraListModel(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
     /* Connect to context. */
-    connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(addCamera(QnResourcePtr)), Qt::QueuedConnection);
-    connect(resourcePool(),     SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(removeCamera(QnResourcePtr)), Qt::QueuedConnection);
-
-    QnResourceList resources = resourcePool()->getResources(); 
+    connect(qnResPool,     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(addCamera(QnResourcePtr)), Qt::QueuedConnection);
+    connect(qnResPool,     SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(removeCamera(QnResourcePtr)), Qt::QueuedConnection);
 
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
-    foreach(const QnResourcePtr &resource, resources)
+    for (const QnResourcePtr &resource: qnResPool->getAllCameras(QnResourcePtr(), true))
         addCamera(resource);
 }
 
@@ -50,9 +48,9 @@ int QnCameraListModel::columnCount(const QModelIndex &parent) const {
 }
 
 QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
-    if (!index.isValid() 
-        || index.model() != this 
-        || index.row() < 0 
+    if (!index.isValid()
+        || index.model() != this
+        || index.row() < 0
         || index.row() >= m_cameras.size())
         return QVariant();
 
@@ -62,9 +60,9 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
     switch(role) {
     case Qt::DecorationRole:
         switch(index.column()) {
-        case RecordingColumn: 
+        case RecordingColumn:
             return QnRecordingStatusHelper::icon(QnRecordingStatusHelper::currentRecordingMode(camera));
-        case NameColumn: 
+        case NameColumn:
             return qnResIconCache->icon(camera);
         case ServerColumn:
             return qnResIconCache->icon(server);
@@ -75,7 +73,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
     case Qn::DisplayHtmlRole:
     case Qt::DisplayRole:
         switch (index.column()) {
-        case RecordingColumn: 
+        case RecordingColumn:
             return QnRecordingStatusHelper::shortTooltip(QnRecordingStatusHelper::currentRecordingMode(camera));
         case NameColumn:
             return camera->getName();
@@ -89,8 +87,8 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
             return camera->getHostAddress();
         case MacColumn:
             return camera->getMAC().toString();
-        case ServerColumn: 
-            return server ? getFullResourceName(server, true) : QVariant();
+        case ServerColumn:
+            return server ? QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl) : QVariant();
         default:
             break;
         }
@@ -145,8 +143,8 @@ void QnCameraListModel::setServer(const QnMediaServerResourcePtr & server) {
 
     while (!m_cameras.isEmpty())
         removeCamera(m_cameras.first());
-    
-    QnResourceList resources = resourcePool()->getAllCameras(m_server, true); 
+
+    QnResourceList resources = qnResPool->getAllCameras(m_server, true);
     foreach(const QnResourcePtr &resource, resources)
         addCamera(resource);
 
@@ -224,7 +222,7 @@ void QnCameraListModel::at_resource_resourceChanged(const QnResourcePtr &resourc
 }
 
 bool QnCameraListModel::cameraFits(const QnVirtualCameraResourcePtr &camera) const {
-    return camera 
+    return camera
         && !camera->hasFlags(Qn::foreigner)
         && (!m_server  || camera->getParentId() == m_server->getId());
 }

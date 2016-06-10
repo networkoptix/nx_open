@@ -59,7 +59,7 @@
             <!-- Background running -->
 
             <!-- auto screen scale factor -->
-            <meta-data android:name="android.app.auto_screen_scale_factor" android:value="false"/>
+            <meta-data android:name="android.app.auto_screen_scale_factor" android:value="true"/>
             <!-- auto screen scale factor -->
         </activity>
     </application>

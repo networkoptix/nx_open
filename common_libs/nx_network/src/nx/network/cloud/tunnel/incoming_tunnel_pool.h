@@ -4,6 +4,7 @@
 #include <set>
 
 #include <nx/network/abstract_socket.h>
+#include <nx/network/aio/timer.h>
 #include "abstract_tunnel_acceptor.h"
 
 namespace nx {
@@ -17,8 +18,7 @@ class NX_NETWORK_API IncomingTunnelPool
     : public QnStoppableAsync
 {
 public:
-    IncomingTunnelPool(aio::AbstractAioThread* ioThread, size_t acceptLimit);
-    ~IncomingTunnelPool();
+    IncomingTunnelPool(aio::AbstractAioThread* aioThread, size_t acceptLimit);
 
     /** Saves and accepts \param connection until it's exhausted */
     void addNewTunnel(std::unique_ptr<AbstractIncomingTunnelConnection> connection);
@@ -39,15 +39,16 @@ public:
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
-    void acceptTunnel(std::shared_ptr<AbstractIncomingTunnelConnection> connection);
+    using TunnelPool = std::set<std::unique_ptr<AbstractIncomingTunnelConnection>>;
+    using TunnelIterator = TunnelPool::iterator;
+
+    void acceptTunnel(TunnelIterator connection);
     void callAcceptHandler(bool timeout);
 
     const size_t m_acceptLimit;
     mutable QnMutex m_mutex;
-
-    bool m_terminated;
-    std::set<std::shared_ptr<AbstractIncomingTunnelConnection>> m_pool;
-    std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
+    TunnelPool m_pool;
+    aio::Timer m_aioTimer;
     nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> m_acceptHandler;
     std::deque<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
 };

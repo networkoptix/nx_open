@@ -112,6 +112,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnBackupScheduleColors>();
     qRegisterMetaType<QnFailoverPriorityColors>();
     qRegisterMetaType<QnGraphicsMessageBoxColors>();
+    qRegisterMetaType<QnResourceItemColors>();
+    qRegisterMetaType<QnPasswordStrengthColors>();
 
     qRegisterMetaType<QnAbstractCameraDataPtr>();
 
@@ -144,6 +146,8 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnBackupScheduleColors>();
     QnJsonSerializer::registerSerializer<QnFailoverPriorityColors>();
     QnJsonSerializer::registerSerializer<QnGraphicsMessageBoxColors>();
+    QnJsonSerializer::registerSerializer<QnResourceItemColors>();
+    QnJsonSerializer::registerSerializer<QnPasswordStrengthColors>();
 
     QnJsonSerializer::registerSerializer<Qn::ClientSkin>();
     QnJsonSerializer::registerSerializer<Qn::BackgroundAnimationMode>();

@@ -6,16 +6,21 @@
 #ifndef CLOUD_DB_PROCESS_H
 #define CLOUD_DB_PROCESS_H
 
+//#define USE_QAPPLICATION
+
 #include <atomic>
 #include <memory>
 
+#ifdef USE_QAPPLICATION
 #include <qtsinglecoreapplication.h>
 #include <qtservice.h>
+#endif
 
 #include <utils/common/stoppable.h>
 #include <utils/db/async_sql_query_executor.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
+#include <nx/utils/std/future.h>
 
 #include "settings.h"
 
@@ -37,8 +42,10 @@ class AuthenticationProvider;
 
 class CloudDBProcess
 :
+#ifdef USE_QAPPLICATION
     public QObject,
     public QtService<QtSingleCoreApplication>,
+#endif
     public QnStoppable
 {
 public:
@@ -50,12 +57,20 @@ public:
     void setOnStartedEventHandler(
         nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
 
+    const std::vector<SocketAddress>& httpEndpoints() const;
+
+#ifndef USE_QAPPLICATION
+    int exec();
+#endif
+
 protected:
+#ifdef USE_QAPPLICATION
     virtual int executeApplication() override;
     virtual void start() override;
     virtual void stop() override;
 
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
+#endif
 
 private:
     int m_argc;
@@ -63,6 +78,10 @@ private:
     std::atomic<bool> m_terminated;
     int m_timerID;
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
+    std::vector<SocketAddress> m_httpEndpoints;
+#ifndef USE_QAPPLICATION
+    nx::utils::promise<void> m_processTerminationEvent;
+#endif
 
     void initializeLogging( const conf::Settings& settings );
     void registerApiHandlers(

@@ -12,12 +12,12 @@
 #include <camera/camera_thumbnail_manager.h>
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_display_info.h>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -26,7 +26,6 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/geometry.h>
-#include <ui/common/ui_resource_name.h>
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/generic/particle_item.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
@@ -347,7 +346,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     setHelpTopic(item, QnBusiness::eventHelpId(eventType));
 
     if (businessAction->actionType() == QnBusiness::PlaySoundAction) {
-        QString soundUrl = businessAction->getParams().soundUrl;
+        QString soundUrl = businessAction->getParams().url;
         m_itemsByLoadingSound.insert(soundUrl, item);
         context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
     }
@@ -688,7 +687,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
         break;
     }
 
-    QString resourceName = getResourceName(resource);
+    QString resourceName = QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
     item->setText(QnSystemHealthStringsHelper::messageName(message, resourceName));
     item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, resourceName));
     item->setNotificationLevel(QnNotificationLevel::valueOf(message));

@@ -21,7 +21,6 @@
 #include <server/server_storage_manager.h>
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
-#include <ui/common/ui_resource_name.h>
 #include <ui/dialogs/storage_url_dialog.h>
 #include <ui/dialogs/backup_schedule_dialog.h>
 #include <ui/dialogs/backup_cameras_dialog.h>

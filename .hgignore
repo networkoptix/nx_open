@@ -103,7 +103,6 @@ applauncher/build
 applauncher/src/Info.plist
 applauncher/src/client.pro
 applauncher/src/common.pro
-applauncher/src/version.h
 applauncher/src/ipch
 applauncher/src/client.vcproj
 applauncher/client.mak*
@@ -141,7 +140,6 @@ common/src/Makefile
 common/src/common.vcproj
 common/src/common.pri
 common/common.mak*
-common/src/version.h
 
 nx_cloud/cloud_
 
@@ -152,28 +150,18 @@ debsetup/repo
 mediaserver/bin
 mediaserver/build
 mediaserver/src/server.pro
-mediaserver/src/version.h
 mediaserver/src/*.vsp
 mediaserver/src/server.vcproj
 mediaserver/mediaserver.mak*
 
-mediaproxy/bin
-mediaproxy/build
-mediaproxy/src/version.h
-mediaproxy/src/mediaproxy.vcproj
-mediaproxy/src/mediaproxy.pro
-mediaproxy/mediaproxy.mak*
-
 vmaxproxy/bin
 vmaxproxy/build
-vmaxproxy/src/version.h
 vmaxproxy/src/mediaproxy.vcproj
 vmaxproxy/src/mediaproxy.pro
 vmaxproxy/mediaproxy.mak*
 
 testcamera/bin
 testcamera/build
-testcamera/src/version.h
 testcamera/src/testCamera.pro
 testcamera/src/testCamera.vcproj
 testcamera/testcamera.mak*
@@ -182,7 +170,6 @@ testcamera/build
 help/target
 
 traytool/src/traytool.pro
-traytool/src/version.h
 traytool/src/traytool.vcproj
 traytool/traytool.mak*
 
@@ -263,6 +250,8 @@ statserver/.venv
 statserver/build
 statserver/dist
 statserver/statserver.egg-info
+
+common/src/plugins/resource/avi/filetypes.h
 
 syntax: regexp
 ^core$

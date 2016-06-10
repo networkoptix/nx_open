@@ -434,7 +434,6 @@ void QnWorkbenchDisplay::initSceneView() {
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
     setLayer(m_curtainItem.data(), Qn::BackLayer);
-    m_curtainItem.data()->setColor(Qt::green);
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
     /* Set up grid. */
@@ -1694,7 +1693,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             m_loader->pleaseStop();
         }
 
-        if(QnMediaResourcePtr resource = resourcePool()->getResourceByUniqueId((**layout->items().begin()).resourceUid()).dynamicCast<QnMediaResource>()) {
+        if(QnMediaResourcePtr resource = qnResPool->getResourceByUniqueId((**layout->items().begin()).resourceUid()).dynamicCast<QnMediaResource>()) {
             m_loader = new QnThumbnailsLoader(resource, QnThumbnailsLoader::Mode::Strict);
 
             connect(m_loader, &QnThumbnailsLoader::thumbnailLoaded, this,       &QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded);

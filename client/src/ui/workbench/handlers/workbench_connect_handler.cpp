@@ -79,7 +79,7 @@ namespace
 
     void storeCustomConnection(const QUrl &url
         , const QString &name
-        , bool autoLogin) 
+        , bool autoLogin)
     {
         QnConnectionDataList connections = qnSettings->customConnections();
 
@@ -94,12 +94,12 @@ namespace
         connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
 
         QnConnectionData selected = connections.getByName(name);
-        if (qnUrlEqual(selected.url, url)) 
+        if (qnUrlEqual(selected.url, url))
         {
             connections.removeOne(selected.name);
             connections.prepend(selected);    /* Reorder. */
         }
-        else 
+        else
         {
             // save "Last used connection"
             QnConnectionData last(connectionData);
@@ -130,7 +130,7 @@ namespace
 
         lastConnections.erase(newEnd, lastConnections.end());
         lastConnections.prepend(connectionInfo);
-        
+
         qnCoreSettings->setRecentUserConnections(lastConnections);
         qnSettings->setAutoLogin(autoLogin);
     }
@@ -254,27 +254,29 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
 
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
-    const bool storePassword = parameters.argument(Qn::StorePasswordRole, false);
-    const bool autoLogin = parameters.argument(Qn::AutoLoginRole, false);
-    const auto connectionAlias = parameters.argument(Qn::ConnectionAliasRole, QString());
 
-    if (url.isValid()) 
+    const auto connectionAlias = parameters.argument(Qn::ConnectionAliasRole, QString());
+    const auto storeSettings = StoreConnectionSettings::create(connectionAlias,
+        parameters.argument(Qn::StorePasswordRole, false),
+        parameters.argument(Qn::AutoLoginRole, false));
+
+    if (url.isValid())
     {
         /* ActiveX plugin */
-        if (qnRuntime->isActiveXMode()) 
+        if (qnRuntime->isActiveXMode())
         {
-            if (connectToServer(url, connectionAlias, storePassword, autoLogin, true) != ec2::ErrorCode::ok)
+            if (connectToServer(url, storeSettings, true) != ec2::ErrorCode::ok)
             {
                 QnGraphicsMessageBox::information(tr("Could not connect to server..."), 1000 * 60 * 60 * 24);
                 menu()->trigger(QnActions::ExitAction);
             }
-        } 
+        }
         else if (qnRuntime->isVideoWallMode())  /* Videowall item */
         {
             //TODO: #GDM #High videowall should try indefinitely
-            if (connectToServer(url, connectionAlias, storePassword, autoLogin, true) != ec2::ErrorCode::ok) 
+            if (connectToServer(url, storeSettings, true) != ec2::ErrorCode::ok)
             {
-                QnGraphicsMessageBox* incompatibleMessageBox = 
+                QnGraphicsMessageBox* incompatibleMessageBox =
                     QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1...")
                         , videowallCloseTimeoutMSec);
                 connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished
@@ -284,13 +286,13 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         else
         {
             /* Login Dialog or 'Open in new window' with url */
-            
+
             //try connect; if not - show login dialog
-            if (connectToServer(url, connectionAlias, storePassword, autoLogin, false) != ec2::ErrorCode::ok)
+            if (connectToServer(url, storeSettings, false) != ec2::ErrorCode::ok)
                 showWelcomeScreen();
         }
-    } 
-    else 
+    }
+    else
     {
         /* Try to load last used connection. */
         url = qnSettings->lastUsedConnection().url;
@@ -301,9 +303,12 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         const bool autoLogin = qnSettings->autoLogin();
         if (autoLogin && url.isValid() && !url.password().isEmpty())
         {
-            if (connectToServer(url, connectionAlias, true, true, false) != ec2::ErrorCode::ok)
+            const auto storeSettings = StoreConnectionSettings::create(
+                connectionAlias, true, true);
+
+            if (connectToServer(url, storeSettings, false) != ec2::ErrorCode::ok)
                 showWelcomeScreen();
-        } 
+        }
         else
         {
             /* No saved password, just show Welcome Screen. */
@@ -320,7 +325,9 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered() {
     QUrl currentUrl = QnAppServerConnectionFactory::url();
     if (connected())
         disconnectFromServer(true);
-    if (connectToServer(currentUrl, QString(), false, false, false) != ec2::ErrorCode::ok)
+
+    // Do not store connections in case of reconnection
+    if (connectToServer(currentUrl, StoreConnectionSettingsPtr(), false) != ec2::ErrorCode::ok)
         showWelcomeScreen();
 }
 
@@ -336,10 +343,21 @@ bool QnWorkbenchConnectHandler::connected() const {
     return !qnCommon->remoteGUID().isNull();
 }
 
+QnWorkbenchConnectHandler::StoreConnectionSettingsPtr
+QnWorkbenchConnectHandler::StoreConnectionSettings::create(
+    const QString &connectionAlias,
+    bool storePassword,
+    bool autoLogin)
+{
+    const StoreConnectionSettingsPtr result(new StoreConnectionSettings());
+    result->connectionAlias = connectionAlias;
+    result->storePassword = storePassword;
+    result->autoLogin = autoLogin;
+    return result;
+}
+
 ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl
-    , const QString &connectionAlias
-    , bool storePassword
-    , bool autoLogin
+    , const StoreConnectionSettingsPtr &storeSettings
     , bool silent)
 {
     if (!silent) {
@@ -354,12 +372,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     ec2::ApiClientInfoData clientData;
     {
         clientData.id = qnSettings->pcUuid();
-
-        const auto skin = qnSettings->clientSkin();
-        /**/ if (skin == Qn::DarkSkin) clientData.skin = lit("Dark");
-        else if (skin == Qn::LightSkin) clientData.skin = lit("Light");
-        else clientData.skin = lit("Unknown");
-
+        clientData.skin = lit("Dark");
         clientData.fullVersion = QnAppInfo::applicationFullVersion();
         clientData.systemInfo = QnSystemInformation::currentSystemInformation().toString();
         clientData.systemRuntime = QnSystemInformation::currentSystemRuntime();
@@ -398,6 +411,10 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     }
     m_connectingHandle = 0;
 
+    /* Preliminary exit if application was closed while we were in the inner loop. */
+    if (context()->closingDown())
+        return ec2::ErrorCode::ok;
+
     const QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
     // TODO: check me!
     QnConnectionDiagnosticsHelper::Result status = silent
@@ -406,13 +423,14 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
 
     const auto systemName = connectionInfo.systemName;
-    const auto handleConnectionResult = [systemName, appServerUrl, storePassword
-        , autoLogin, connectionAlias] (ec2::ErrorCode code)
+    const auto handleConnectionResult = [systemName, appServerUrl, storeSettings] (ec2::ErrorCode code)
     {
-        if (code == ec2::ErrorCode::ok)
+        if (storeSettings && (code == ec2::ErrorCode::ok))
         {
-            storeSystemConnection(systemName, appServerUrl, storePassword, autoLogin);
-            storeCustomConnection(appServerUrl, connectionAlias, autoLogin);
+            storeSystemConnection(systemName, appServerUrl,
+                storeSettings->storePassword, storeSettings->autoLogin);
+            storeCustomConnection(appServerUrl,
+                storeSettings->connectionAlias, storeSettings->autoLogin);
         }
 
         return code;
@@ -428,13 +446,17 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     {
         /* Substitute value for incompatible peers. */
         const auto code = (errCode == ec2::ErrorCode::ok
-            ? ec2::ErrorCode::incompatiblePeer : errCode);  
+            ? ec2::ErrorCode::incompatiblePeer : errCode);
 
         return handleConnectionResult(code);
     }
     }
 
-    QnAppServerConnectionFactory::setUrl(connectionInfo.ecUrl);
+    QUrl ecUrl = connectionInfo.ecUrl;
+    if (connectionInfo.allowSslConnections)
+        ecUrl.setScheme(lit("https"));
+
+    QnAppServerConnectionFactory::setUrl(ecUrl);
     QnAppServerConnectionFactory::setEc2Connection(result.connection());
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 
@@ -527,10 +549,10 @@ void QnWorkbenchConnectHandler::clearConnection()
     action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
-    QnResourceList resourcesToRemove = resourcePool()->getResourcesWithFlag(Qn::remote);
+    QnResourceList resourcesToRemove = qnResPool->getResourcesWithFlag(Qn::remote);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
-    foreach (const QnLayoutResourcePtr& layout, resourcePool()->getResources<QnLayoutResource>())
+    foreach (const QnLayoutResourcePtr& layout, qnResPool->getResources<QnLayoutResource>())
     {
         bool isLocal = snapshotManager()->isLocal(layout);
         bool isFile = layout->isFile();
@@ -543,8 +565,8 @@ void QnWorkbenchConnectHandler::clearConnection()
     foreach(const QnResourcePtr& res, resourcesToRemove)
         idList.push_back(res->getId());
 
-    resourcePool()->removeResources(resourcesToRemove);
-    resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
+    qnResPool->removeResources(resourcesToRemove);
+    qnResPool->removeResources(qnResPool->getAllIncompatibleResources());
 
     QnCameraUserAttributePool::instance()->clear();
     QnMediaServerUserAttributesPool::instance()->clear();
@@ -580,7 +602,8 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         reconnectInfoDialog->setCurrentServer(reconnectHelper->currentServer());
 
         /* Here inner event loop will be started. */
-        ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl(), QString(), false, false, true);
+        ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl()
+            , StoreConnectionSettingsPtr(), true);
 
         /* Main window can be closed in the event loop so the dialog will be freed. */
         if (!reconnectInfoDialog)

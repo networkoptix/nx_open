@@ -2,6 +2,8 @@
 
 #include <rest/server/json_rest_handler.h>
 
+class QnProxyDesktopDataProvider;
+
 class QnAudioTransmissionRestHandler : public QnJsonRestHandler
 {
 
@@ -12,9 +14,7 @@ public:
         QnJsonRestResult& result,
         const QnRestConnectionProcessor*) override;
 
-
+    static bool validateParams(const QnRequestParams& params, QString& error);
 private:
-    bool validateParams(const QnRequestParams& params, QString& error) const;
-
 };
 

@@ -82,9 +82,8 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
 private:
-    typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>* SocketResultPrimisePtr;
-
-    int recvImpl(nx::Buffer* const buf);
+    typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>*
+        SocketResultPrimisePtr;
 
     void onAddressResolved(
         std::shared_ptr<nx::utils::AsyncOperationGuard::SharedGuard> sharedOperationGuard,

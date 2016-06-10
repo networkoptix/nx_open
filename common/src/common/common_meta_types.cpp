@@ -95,12 +95,14 @@
 #include "api/model/recording_stats_reply.h"
 #include "api/model/audit/audit_record.h"
 #include "health/system_health.h"
+#include <utils/common/credentials.h>
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
 }
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::Corner)
+QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ResourceInfoLevel);
 
 void QnCommonMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK,
@@ -247,6 +249,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::PanicMode>();
     qRegisterMetaType<Qn::RebuildState>();
 
+    qRegisterMetaType<Qn::ResourceInfoLevel>();
+    qRegisterMetaTypeStreamOperators<Qn::ResourceInfoLevel>();
+
     qRegisterMetaType<QnModuleInformation>();
     qRegisterMetaType<QnModuleInformationWithAddresses>();
     qRegisterMetaType<QList<QnModuleInformation>>();
@@ -330,6 +335,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnAuditRecordList>();
 
     qRegisterMetaType<QnOptionalBool>();
+    qRegisterMetaType<QList<QMap<QString, QString>>>();
+
+    qRegisterMetaType<QList<QnCredentials>>();
 
     qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 
@@ -338,8 +346,10 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();
     QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();
+    QnJsonSerializer::registerSerializer<QList<QMap<QString, QString>>>();
 
     QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();
+    QnJsonSerializer::registerSerializer<QList<QnCredentials>>();
 
     qn_commonMetaTypes_initialized = true;
 }

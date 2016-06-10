@@ -83,7 +83,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
         return QnThirdPartyResourcePtr();
 
     NX_ASSERT( discoveryManager->getRef() );
-    //NOTE not calling discoveryManager->createCameraManager here because we do not know camera parameters (model, firmware, even uid), 
+    //NOTE not calling discoveryManager->createCameraManager here because we do not know camera parameters (model, firmware, even uid),
         //so just instanciating QnThirdPartyResource
     result = QnThirdPartyResourcePtr( new QnThirdPartyResource( cameraInfo, nullptr, *discoveryManager ) );
     result->setTypeId(resourceTypeId);
@@ -301,6 +301,11 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setDefaultAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setVendor( vendor );
+
+    // fill id before setting properties to avoid conflict with flags properties
+    // 	setCameraCapability() call merge existing flags with new one
+    resource->setId(resource->uniqueIdToId(resource->getPhysicalId()));
+
     if( strlen(cameraInfo.auxiliaryData) > 0 )
         resource->setProperty( QnThirdPartyResource::AUX_DATA_PARAM_NAME, QString::fromLatin1(cameraInfo.auxiliaryData) );
     if( strlen(cameraInfo.firmware) > 0 )
@@ -309,16 +314,16 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     if( !qnResPool->getNetResourceByPhysicalId( resource->getPhysicalId() ) )
     {
         //new resource
-        //TODO #ak reading MaxFPS here is a workaround of camera integration API defect: 
+        //TODO #ak reading MaxFPS here is a workaround of camera integration API defect:
             //it does not not allow plugin to return hard-coded max fps, it can only be read in initInternal
         const QnResourceData& resourceData = qnCommon->dataPool()->data(resource);
         const float maxFps = resourceData.value<float>( Qn::MAX_FPS_PARAM_NAME, 0.0 );
         if( maxFps > 0.0 )
             resource->setProperty( Qn::MAX_FPS_PARAM_NAME, maxFps);
     }
-    
+
     unsigned int caps;
-    if (camManager->getCameraCapabilities(&caps) == 0) 
+    if (camManager->getCameraCapabilities(&caps) == 0)
     {
         if( caps & nxcip::BaseCameraManager::shareIpCapability )
             resource->setCameraCapability( Qn::ShareIpCapability, true );

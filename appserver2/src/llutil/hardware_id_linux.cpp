@@ -28,6 +28,8 @@
 
 namespace {
 
+const QString kEmptyMac = lit("");
+
 QByteArray fromString(const std::string& s) {
     return QByteArray(s.data(), s.size());
 }
@@ -163,7 +165,7 @@ void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareIn
         }
     } else
     {
-        hardwareIdMap[""] = hardwareId;
+        hardwareIdMap[kEmptyMac] = hardwareId;
     }
 }
 
@@ -185,6 +187,7 @@ void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareIn
 
     HardwareIdListForVersion macHardwareIds;
 
+    // We start from 1 here because hwid[0] is not based on hardware
     for (int i = 1; i <= LATEST_HWID_VERSION; i++) {
         calcHardwareIds(macHardwareIds, hardwareInfo, i);
         hardwareIds << macHardwareIds;
@@ -222,17 +225,16 @@ void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareIn
 
     // Historycally hardware id is mac + '\0'
     QByteArray hardwareId = QByteArray( MAC_str, sizeof(MAC_str) );
-    hardwareIds.clear();
 
     // when copying bytearray to string, trailing '\0' is removed
     hardwareInfo.mac = hardwareId;
 
-    QStringList hardwareIdList = QStringList() << QString::fromLatin1(hardwareId.constData(), hardwareId.size());
+    QStringList hardwareIdList = QStringList() << QString::fromUtf8(hardwareId);
 
     HardwareIdListForVersion macHardwareIds;
-    macHardwareIds << QPair<QString, QStringList>("",  hardwareIdList);
+    macHardwareIds << MacAndItsHardwareIds(kEmptyMac,  hardwareIdList);
 
-    for (int i = 0; i < LATEST_HWID_VERSION; i++) {
+    for (int i = 1; i <= LATEST_HWID_VERSION; i++) {
         hardwareIds << macHardwareIds;
     }
 }

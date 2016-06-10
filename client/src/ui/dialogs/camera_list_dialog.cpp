@@ -5,7 +5,7 @@
 #include <QtWidgets/QMenu>
 #include <QtCore/QMimeData>
 
-#include <core/resource/resource_name.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -105,7 +105,7 @@ void QnCameraListDialog::updateWindowTitle() {
 
                 //: Cameras List for Server (192.168.0.1)
                 tr("Cameras List for %1")
-            ).arg(getFullResourceName(m_model->server(), true))
+            ).arg(QnResourceDisplayInfo(m_model->server()).toString(Qn::RI_WithUrl))
         : QnDeviceDependentStrings::getDefaultNameFromSet(
             tr("Devices List"),
             tr("Cameras List")

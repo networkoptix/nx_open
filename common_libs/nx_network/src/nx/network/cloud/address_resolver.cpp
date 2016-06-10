@@ -101,7 +101,7 @@ QString AddressEntry::toString() const
 }
 
 const QRegExp AddressResolver::kCloudAddressRegExp(QLatin1String(
-    ".+[0-9a-f]{8}\\-[0-9a-f]{4}\\-[0-9a-f]{4}\\-[0-9a-f]{4}\\-[0-9a-f]{12}"));
+    "(.+\\.)?[0-9a-f]{8}\\-[0-9a-f]{4}\\-[0-9a-f]{4}\\-[0-9a-f]{4}\\-[0-9a-f]{12}"));
 
 AddressResolver::AddressResolver(
     std::shared_ptr<hpm::api::MediatorClientTcpConnection> mediatorConnection)
@@ -298,13 +298,7 @@ void AddressResolver::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     // TODO: make DnsResolver QnStoppableAsync
     m_dnsResolver.stop();
-
-    QnMutexLocker lk(&m_mutex);
-    if (m_mediatorConnection)
-    {
-        lk.unlock();
-        m_mediatorConnection->pleaseStop(std::move(handler));
-    }
+    m_mediatorConnection->pleaseStop(std::move(handler));
 }
 
 AddressResolver::HostAddressInfo::HostAddressInfo(const HostAddress& hostAddress)

@@ -1,11 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
-
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project,
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>build_ut</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -18,17 +11,15 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mediaserver_core_ut</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Mediaserver Core Unit Tests</name>
+    <name>VMS Mediaserver Core Unit Tests</name>
 
     <properties>
-        <guid>${mediaserver.guid}</guid>
-        <product.title>HD Witness Mediaserver Core Unit Tests</product.title>
         <root.dir>${basedir}/../..</root.dir>
         <!--Specify the project to test-->
         <master.project.directory>mediaserver_core</master.project.directory>
 
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lmediaserver_core -lcommon -lnx_network -lnx_utils -lnx_streaming -lappserver2 -lnx_email -ludt -lcloud_db_client</global.libs>
+        <global.libs>-lmediaserver_core -lcommon -lnx_network -lnx_utils -lnx_streaming -lappserver2 -lnx_email -ludt -lcloud_db_client -lnx_speach_synthesizer</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
         <linux.oslibs>-ldl -lldap</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
@@ -36,7 +27,7 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
 
         <path>${env.PATH}</path>
-        <rdep.packages>gtest openssl ffmpeg onvif quazip sigar</rdep.packages>
+        <rdep.packages>gtest openssl ffmpeg onvif quazip sigar festival</rdep.packages>
         <rdep.linux.arm.packages>sasl2 openldap</rdep.linux.arm.packages>
     </properties>
     <dependencies>

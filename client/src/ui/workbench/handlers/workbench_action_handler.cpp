@@ -30,7 +30,6 @@
 #include <common/common_module.h>
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -68,7 +67,7 @@
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
-#include <ui/dialogs/preferences_dialog.h>
+#include <ui/dialogs/local_settings_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
@@ -91,8 +90,6 @@
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
-
-#include <ui/common/ui_resource_name.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -218,7 +215,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(QnActions::OpenLayoutsInNewWindowAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsInNewWindowAction_triggered()));
     connect(action(QnActions::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
-    connect(action(QnActions::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
     connect(action(QnActions::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
 
     connect(action(QnActions::MediaFileSettingsAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered);
@@ -265,8 +261,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
     connect(action(QnActions::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
 
-    /* Qt::QueuedConnection is important! See QnPreferencesDialog::canApplyChanges() for details. */
-    connect(action(QnActions::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
+    connect(action(QnActions::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()));
     connect(action(QnActions::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
 
     connect(action(QnActions::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
@@ -550,9 +545,9 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         workbench()->update(state);
 
         /* Delete orphaned layouts. */
-        foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>())
+        foreach(const QnLayoutResourcePtr &layout, qnResPool->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>())
             if(snapshotManager()->isLocal(layout) && !layout->isFile())
-                resourcePool()->removeResource(layout);
+                qnResPool->removeResource(layout);
     }
 
     /* Sometimes we get here when 'New Layout' has already been added. But all user's layouts must be created AFTER this method.
@@ -560,9 +555,9 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     * As temporary workaround we can just remove that layouts. */
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
     if (user && !qnRuntime->isActiveXMode()) {
-        foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
+        foreach(const QnLayoutResourcePtr &layout, qnResPool->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
             if(snapshotManager()->isLocal(layout) && !layout->isFile())
-                resourcePool()->removeResource(layout);
+                qnResPool->removeResource(layout);
         }
     }
 
@@ -774,15 +769,6 @@ void QnWorkbenchActionHandler::at_openLayoutsInNewWindowAction_triggered() {
 
 void QnWorkbenchActionHandler::at_openCurrentLayoutInNewWindowAction_triggered() {
     menu()->trigger(QnActions::OpenLayoutsInNewWindowAction, workbench()->currentLayout()->resource());
-}
-
-void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
-    QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
-
-    layout->setName(generateUniqueLayoutName(context()->user(), tr("New Layout"), tr("New Layout %1")));
-
-    workbench()->addLayout(layout);
-    workbench()->setCurrentLayout(layout);
 }
 
 void QnWorkbenchActionHandler::at_openNewWindowAction_triggered() {
@@ -1049,8 +1035,8 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(mainWindow()));
-    dialog->setCurrentPage(QnPreferencesDialog::GeneralPage);
+    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
+    dialog->setCurrentPage(QnLocalSettingsDialog::GeneralPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -1066,8 +1052,8 @@ void QnWorkbenchActionHandler::at_preferencesSmtpTabAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(mainWindow()));
-    dialog->setCurrentPage(QnPreferencesDialog::NotificationsPage);
+    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
+    dialog->setCurrentPage(QnLocalSettingsDialog::NotificationsPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -1393,7 +1379,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
 
-    resourcePool()->addResource(layout);
+    qnResPool->addResource(layout);
     menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 }
 
@@ -1889,6 +1875,7 @@ void QnWorkbenchActionHandler::closeApplication(bool force) {
         return;
 
     menu()->trigger(QnActions::BeforeExitAction);
+    context()->setClosingDown(true);
     qApp->exit(0);
     applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
@@ -2080,7 +2067,7 @@ void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
-    QnMediaServerResourceList resources = resourcePool()->getResources<QnMediaServerResource>();
+    QnMediaServerResourceList resources = qnResPool->getAllServers(Qn::AnyStatus);
 
     foreach(QnMediaServerResourcePtr resource, resources)
     {
@@ -2249,7 +2236,11 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     messageBox->exec();
 }
 
-void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
+void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
+{
+    if (context()->closingDown())
+        return;
+
     QnMessageBox::warning(mainWindow(),
                          tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
                          tr("This is a beta version of %1.")

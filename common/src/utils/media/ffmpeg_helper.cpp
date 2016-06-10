@@ -74,11 +74,11 @@ void QnFfmpegHelper::copyMediaContextFieldsToAvCodecContext(
     av->extradata_size = media->getExtradataSize();
 
     copyAvCodecContextField((void**) &av->intra_matrix, media->getIntraMatrix(),
-        media->getIntraMatrix() == nullptr? 0 : 
+        media->getIntraMatrix() == nullptr? 0 :
         sizeof(av->intra_matrix[0]) * QnAvCodecHelper::kMatrixLength);
 
     copyAvCodecContextField((void**) &av->inter_matrix, media->getInterMatrix(),
-        media->getInterMatrix() == nullptr? 0 : 
+        media->getInterMatrix() == nullptr? 0 :
         sizeof(av->inter_matrix[0]) * QnAvCodecHelper::kMatrixLength);
 
     copyAvCodecContextField((void**) &av->rc_override, media->getRcOverride(),
@@ -96,6 +96,7 @@ void QnFfmpegHelper::copyMediaContextFieldsToAvCodecContext(
     av->bit_rate = media->getBitRate();
     av->channel_layout = media->getChannelLayout();
     av->block_align = media->getBlockAlign();
+    av->frame_size = media->getFrameSize();
 }
 
 AVCodec* QnFfmpegHelper::findAvCodec(CodecID codecId)
@@ -166,12 +167,12 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
     qint64 absolutePos = pos;
     switch (whence)
     {
-    case SEEK_SET: 
+    case SEEK_SET:
         break;
-    case SEEK_CUR: 
+    case SEEK_CUR:
         absolutePos = reader->pos() + pos;
         break;
-    case SEEK_END: 
+    case SEEK_END:
         absolutePos = reader->size() + pos;
         break;
     case 65536:

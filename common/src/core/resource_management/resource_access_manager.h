@@ -63,7 +63,7 @@ public:
     * \param requiredPermission        Permission to check.
     * \returns                         Whether actual permissions include required permission.
     */
-    bool hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permission requiredPermission) const;
+    bool hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permissions requiredPermissions) const;
 
     /**
     * \param user                      User that should have permissions for resource creating.
@@ -79,11 +79,30 @@ public:
         return false;
     }
 
-    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const;
-    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const;
-    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiUserData& data) const;
-    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const;
-    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const;
+    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const;
+    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const;
+    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiUserData& data) const;
+    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const;
+    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const;
+
+    bool canCreateStorage   (const QnUserResourcePtr& user, const QnUuid& storageParentId) const;
+    bool canCreateLayout    (const QnUserResourcePtr& user, const QnUuid& layoutParentId) const;
+    bool canCreateUser      (const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions, bool isOwner) const;
+    bool canCreateVideoWall (const QnUserResourcePtr& user) const;
+    bool canCreateWebPage   (const QnUserResourcePtr& user) const;
+
+    template <typename ResourceSharedPointer, typename ApiDataType>
+    bool canModifyResource(const QnUserResourcePtr& user, const ResourceSharedPointer& target, const ApiDataType& update) const
+    {
+        /* By default we require only generic permissions to modify resource. */
+        Q_UNUSED(update);
+        return hasPermission(user, target, Qn::ReadWriteSavePermission);
+    }
+
+    bool canModifyResource  (const QnUserResourcePtr& user, const QnStorageResourcePtr& target,     const ec2::ApiStorageData& update) const;
+    bool canModifyResource  (const QnUserResourcePtr& user, const QnLayoutResourcePtr& target,      const ec2::ApiLayoutData& update) const;
+    bool canModifyResource  (const QnUserResourcePtr& user, const QnUserResourcePtr& target,        const ec2::ApiUserData& update) const;
+    bool canModifyResource  (const QnUserResourcePtr& user, const QnVideoWallResourcePtr& target,   const ec2::ApiVideowallData& update) const;
 
 signals:
     void accessibleResourcesChanged(const QnUuid& userId);
@@ -103,13 +122,6 @@ private:
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnUserResourcePtr& targetUser)        const;
 
     bool isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
-
-    bool canCreateStorageInternal(const QnUserResourcePtr& user, const QnUuid& storageParentId) const;
-    bool canCreateLayoutInternal(const QnUserResourcePtr& user, const QnUuid& layoutParentId) const;
-    bool canCreateUserInternal(const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions, bool isOwner) const;
-    bool canCreateVideoWallInternal(const QnUserResourcePtr& user) const;
-    bool canCreateWebPageInternal(const QnUserResourcePtr& user) const;
-
 private:
     mutable QnMutex m_mutex;
 

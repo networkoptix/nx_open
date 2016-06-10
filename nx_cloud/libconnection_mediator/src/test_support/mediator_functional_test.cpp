@@ -26,6 +26,7 @@
 
 #include "http/get_listening_peer_list_handler.h"
 #include "local_cloud_data_provider.h"
+#include "mediator_service.h"
 
 
 namespace nx {
@@ -39,19 +40,16 @@ MediatorFunctionalTest::MediatorFunctionalTest()
     //starting clean test
     nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
-    m_stunPort = (std::rand() % 10000) + 50000;
-    m_httpPort = m_stunPort+1;
     m_tmpDir = QDir::homePath() + "/hpm_ut.data";
     QDir(m_tmpDir).removeRecursively();
 
     addArg("/path/to/bin");
     addArg("-e");
-    addArg("-stun/addrToListenList"); addArg(lit("127.0.0.1:%1").arg(m_stunPort).toLatin1().constData());
-    addArg("-http/addrToListenList"); addArg(lit("127.0.0.1:%1").arg(m_httpPort).toLatin1().constData());
-    //addArg("-log/logLevel"); addArg("DEBUG2");
-    addArg("-dataDir"); addArg(m_tmpDir.toLatin1().constData());
+    addArg("-stun/addrToListenList"); addArg("127.0.0.1:0");
+    addArg("-http/addrToListenList"); addArg("127.0.0.1:0");
+    addArg("-log/logLevel"); addArg("none");
+    addArg("-general/dataDir"); addArg(m_tmpDir.toLatin1().constData());
 
-    network::SocketGlobals::mediatorConnector().mockupAddress(stunEndpoint());
     registerCloudDataProvider(&m_cloudDataProvider);
 }
 
@@ -60,6 +58,27 @@ MediatorFunctionalTest::~MediatorFunctionalTest()
     stop();
 
     QDir(m_tmpDir).removeRecursively();
+}
+
+bool MediatorFunctionalTest::waitUntilStarted()
+{
+    if (!utils::test::ModuleLauncher<MediatorProcessPublic>::waitUntilStarted())
+        return false;
+
+    const auto& stunEndpoints = moduleInstance()->impl()->stunEndpoints();
+    if (stunEndpoints.empty())
+        return false;
+    m_stunPort = stunEndpoints.front().port;
+
+    const auto& httpEndpoints = moduleInstance()->impl()->httpEndpoints();
+    if (httpEndpoints.empty())
+        return false;
+    m_httpPort = httpEndpoints.front().port;
+
+    network::SocketGlobals::mediatorConnector().mockupAddress(stunEndpoint());
+    network::SocketGlobals::mediatorConnector().enable(true);
+
+    return true;
 }
 
 SocketAddress MediatorFunctionalTest::stunEndpoint() const

@@ -1,5 +1,7 @@
 #include "flag_config.h"
 
+#if !(defined(ANDROID) || defined(__ANDROID__))
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -20,9 +22,16 @@ static bool fileExists(const char* filename)
     return static_cast<bool>(std::ifstream(filename));
 }
 
-static void skipSpaces(const char** const pp)
+static bool isWhitespace(char c)
 {
-    while (**pp != '\0' && (isspace(**pp) || !isprint(**pp)))
+    // NOTE: Chars 128..255 should be treated as non-whitespace, thus, isprint() will not do:
+    //return isspace(c) || !isprint(c);
+    return (((unsigned char) c) <= 32) || (c == 127);
+}
+
+static void skipWhitespace(const char** const pp)
+{
+    while (**pp != '\0' && isWhitespace(**pp))
         ++(*pp);
 }
 
@@ -34,17 +43,17 @@ static bool parseNameValue(const char* const s, std::string* outName, std::strin
 {
     const char* p = s;
 
-    skipSpaces(&p);
+    skipWhitespace(&p);
     *outName = "";
-    while (*p != '\0' && *p != '=' && *p != '#' && !isspace(*p) && isprint(*p))
+    while (*p != '\0' && *p != '=' && *p != '#' && !isWhitespace(*p))
         *outName += *(p++);
     if (*p == '\0' || *p == '#') //< Empty or comment line.
         return true;
-    skipSpaces(&p);
+    skipWhitespace(&p);
 
     if (*(p++) != '=')
         return false;
-    skipSpaces(&p);
+    skipWhitespace(&p);
 
     *outValue = "";
     while (*p != '\0')
@@ -52,7 +61,7 @@ static bool parseNameValue(const char* const s, std::string* outName, std::strin
 
     // Trim trailing spaces in value.
     int i = outValue->size() - 1;
-    while (i >= 0 && (isspace((*outValue)[i]) || !isprint((*outValue)[i])))
+    while (i >= 0 && isWhitespace((*outValue)[i]))
         --i;
     *outValue = outValue->substr(0, i + 1);
 
@@ -427,8 +436,10 @@ bool FlagConfig::Impl::parseIniFile()
         {
             for (const auto& param: m_params)
             {
-                if (strlen(param->descr) > 0)
-                    file << "# " << param->descr << "\n";
+                std::string descr = param->descr;
+                if (descr.size() > 0)
+                    descr += " ";
+                file << "# " << descr << "Default: " << param->defaultValueStr() << "\n";
                 file << param->name << "=" << param->defaultValueStr() << "\n";
                 file << "\n";
             }
@@ -551,3 +562,70 @@ void FlagConfig::skipNextReload()
 
 } // namespace utils
 } // namespace nx
+
+//-------------------------------------------------------------------------------------------------
+#else // ANDROID || __ANDROID__
+
+// Stub implementation which never changes hard-coded defaults.
+// NOTE: Android NDK does not support std::to_string
+
+namespace nx {
+namespace utils {
+
+struct FlagConfig::Impl
+{
+    const char* moduleName;
+};
+
+FlagConfig::FlagConfig(const char* moduleName)
+:
+    d(new Impl())
+{
+    d->moduleName = moduleName;
+}
+
+FlagConfig::~FlagConfig()
+{
+    delete d;
+}
+
+const char* FlagConfig::tempPath() const
+{
+    return "/tmp";
+}
+
+const char* FlagConfig::moduleName() const
+{
+    return d->moduleName;
+}
+
+bool FlagConfig::regFlagParam(
+    bool* pValue, bool defaultValue, const char* paramName, const char* descr)
+{
+    return defaultValue;
+}
+
+int FlagConfig::regIntParam(
+    int* pValue, int defaultValue, const char* paramName, const char* descr)
+{
+    return defaultValue;
+}
+
+const char* FlagConfig::regStringParam(
+    const char** pValue, const char* defaultValue, const char* paramName, const char* descr)
+{
+    return defaultValue;
+}
+
+void FlagConfig::reload()
+{
+}
+
+void FlagConfig::skipNextReload()
+{
+}
+
+} // namespace utils
+} // namespace nx
+
+#endif // ANDROID || __ANDROID__

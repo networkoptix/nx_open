@@ -298,8 +298,6 @@ void QnWorkbenchExportHandler::exportTimeSelection(
         allowedFormatFilter += filterSeparator + binaryFilterName();
 
     QString fileName;
-    QString selectedExtension;
-    QString selectedFilter;
     bool binaryExport = false;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
     QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
@@ -373,23 +371,25 @@ void QnWorkbenchExportHandler::exportTimeSelection(
             return;
 
         fileName = dialog->selectedFile();
-        selectedFilter = dialog->selectedNameFilter();
         if (fileName.isEmpty())
             return;
 
+        QString selectedExtension = dialog->selectedExtension();
         binaryExport = isBinaryExportSupported()
-            ? selectedFilter.contains(binaryFilterName())
+            ? selectedExtension.contains(lit(".exe"))
             : false;
 
         if (comboBox)
             timestampPos = (Qn::Corner) comboBox->itemData(comboBox->currentIndex()).toInt();
 
-        if (binaryExport) {
+        if (binaryExport)
+        {
             transcodeCheckbox = false;
             timestampPos = Qn::NoCorner;
         }
 
-        if (!transcodeCheckbox) {
+        if (!transcodeCheckbox)
+        {
             contrastParams.enabled = false;
             dewarpingParams.enabled = false;
             rotation = 0;
@@ -397,7 +397,8 @@ void QnWorkbenchExportHandler::exportTimeSelection(
             customAr = 0.0;
         }
 
-        if (dialog->selectedNameFilter().contains(aviFileFilter)) {
+        if (selectedExtension.contains(lit(".avi")))
+        {
             QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
             if (loader && archive) {
@@ -480,7 +481,7 @@ void QnWorkbenchExportHandler::exportTimeSelection(
         if (wasLoggedIn && !context()->user())
             return;
 
-        selectedExtension = dialog->selectedExtension();
+
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 
@@ -792,7 +793,7 @@ void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QStr
     if (success) {
         QnAviResourcePtr file(new QnAviResource(fileName));
         file->setStatus(Qn::Online);
-        resourcePool()->addResource(file);
+        qnResPool->addResource(file);
 
         QnMessageBox::information(mainWindow(), tr("Export Complete"), tr("Export Successful."), QDialogButtonBox::Ok);
     } else if (tool->status() != QnClientVideoCamera::NoError) {

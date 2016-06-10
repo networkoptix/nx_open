@@ -77,7 +77,7 @@ namespace nx_api
                 {
                     case ParserState::init:
                     case ParserState::inProgress:
-                        NX_ASSERT( bytesProcessed == buf.size() );
+                        NX_ASSERT( pos+bytesProcessed == (size_t)buf.size() );
                         return;
 
                     case ParserState::done:

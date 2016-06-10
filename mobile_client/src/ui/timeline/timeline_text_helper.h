@@ -1,5 +1,4 @@
-#ifndef QNTIMELINETEXTHELPER_H
-#define QNTIMELINETEXTHELPER_H
+#pragma once
 
 #include <QtGui/QImage>
 #include <QtGui/QFont>
@@ -9,21 +8,21 @@ class QnTimelineTextHelperPrivate;
 class QnTimelineTextHelper
 {
 public:
-    QnTimelineTextHelper(const QFont &font, qreal pixelRatio, const QColor &color, const QStringList &strings);
+    QnTimelineTextHelper(const QFont& font,
+                         const QColor& color,
+                         const QStringList& strings);
     ~QnTimelineTextHelper();
 
     QRectF digitCoordinates(int digit) const;
-    QRectF stringCoordinates(const QString &string) const;
-    QSize stringSize(const QString &string) const;
+    QRectF stringCoordinates(const QString& string) const;
+    QSize stringSize(const QString& string) const;
     QSize digitSize() const;
     QImage texture() const;
     int maxCharWidth() const;
     int lineHeight() const;
     int spaceWidth() const;
-    qreal pixelRatio() const;
 
 private:
-    QScopedPointer<QnTimelineTextHelperPrivate> d;
+    QScopedPointer<QnTimelineTextHelperPrivate> d_ptr;
+    Q_DECLARE_PRIVATE(QnTimelineTextHelper)
 };
-
-#endif // QNTIMELINETEXTHELPER_H

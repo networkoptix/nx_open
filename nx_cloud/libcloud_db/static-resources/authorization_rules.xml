@@ -172,6 +172,17 @@
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
+                    <!-- only systems can receive events at the moment -->
+                    <condition value="/cdb/event/subscribe" resName="auth.systemID" matchType="presence">
+                        <set value="false" resName="authorized" resValue="false"/>
+                    </condition>
+                    <!-- only system can update self system name -->
+                    <sequence value="/cdb/system/update_system_name">
+                        <set resName="authorized" resValue="false"/>
+                        <condition value="/cdb/system/update_system_name" resName="auth.selfSystemAccessRequested">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
                 </condition>
             </condition>
         </sequence>

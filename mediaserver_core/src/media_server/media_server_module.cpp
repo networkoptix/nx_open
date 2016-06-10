@@ -13,12 +13,17 @@
 
 #include <nx/network/socket_global.h>
 
+#include <utils/media/ffmpeg_initializer.h>
+#include <utils/common/buffered_file.h>
+#include <utils/common/writer_pool.h>
+
 QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint, QObject *parent):
     QObject(parent)
 {
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
 
+    instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
     QnSoapServer *soapServer = new QnSoapServer();
     store<QnSoapServer>(soapServer);
@@ -26,9 +31,8 @@ QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint
     soapServer->start();     //starting soap server to accept event notifications from onvif cameras
 #endif //ENABLE_ONVIF
 
-
     m_common = new QnCommonModule(this);
-    initServerMetaTypes();
+    m_common->store<QnFfmpegInitializer>(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
         nx::network::SocketGlobals::mediatorConnector().mockupAddress(enforcedMediatorEndpoint);
@@ -38,8 +42,4 @@ QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint
 }
 
 QnMediaServerModule::~QnMediaServerModule() {
-}
-
-void QnMediaServerModule::initServerMetaTypes()
-{
 }

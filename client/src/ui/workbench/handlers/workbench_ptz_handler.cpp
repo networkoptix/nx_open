@@ -14,12 +14,14 @@
 #include <core/ptz/ptz_preset.h>
 #include <core/ptz/ptz_tour.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource_display_info.h>
+
+#include <client/client_settings.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_target_provider.h>
-#include <ui/common/ui_resource_name.h>
 #include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
 
@@ -90,7 +92,8 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
     connect(action(QnActions::DebugGetPtzPositionAction),              &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered);
 }
 
-QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler() {
+QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler()
+{
     delete QnPtzManageDialog::instance();
 }
 
@@ -105,7 +108,8 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
         QnMessageBox::critical(
             mainWindow(),
             tr("Unable to get position from camera."),
-            tr("An error has occurred while trying to get the current position from camera %1.").arg(getResourceName(resource))
+            tr("An error has occurred while trying to get the current position from camera %1.")
+            .arg(QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()))
           + L'\n'
           + tr("Please wait for the camera to go online.")
         );
@@ -148,8 +152,10 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
             QnMessageBox::critical(
                 mainWindow(),
                 tr("Unable to set position on camera."),
-                tr("An error has occurred while trying to set the current position for camera %1.").arg(getResourceName(resource)) + L'\n'
-              + tr("Please wait for the camera to go online.")
+                tr("An error has occurred while trying to set the current position for camera %1.")
+                .arg(QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()))
+                + L'\n'
+                + tr("Please wait for the camera to go online.")
             );
             return;
         }
@@ -201,8 +207,10 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
             QnMessageBox::critical(
                 mainWindow(),
                 tr("Unable to set position on camera."),
-                tr("An error has occurred while trying to set the current position for camera %1.").arg(getResourceName(resource)) + L'\n'
-              + tr("Please wait for the camera to go online.")
+                tr("An error has occurred while trying to set the current position for camera %1.")
+                .arg(QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()))
+                + L'\n'
+                + tr("Please wait for the camera to go online.")
             );
             return;
         }
@@ -233,7 +241,8 @@ void QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered() {
 }
 
 
-void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
+void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
 
@@ -241,7 +250,8 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
         return;
 
     QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
-    NX_ASSERT(dialog);
+    if (!dialog)
+        dialog = new QnPtzManageDialog(mainWindow());
 
     if (dialog->isVisible() && !dialog->tryClose(false))
         return;

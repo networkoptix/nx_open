@@ -1,29 +1,17 @@
-#include <time.h>
-
+#include <QtCore/QDir>
+#include <QtCore/QCommandLineParser>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtGui/QFont>
 #include <QtGui/QOpenGLContext>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
+#include <QtQml/QQmlFileSelector>
 #include <QtQuick/QQuickWindow>
 
+#include <time.h>
+
 #include <nx/utils/log/log.h>
-
-#include <nx/utils/flag_config.h>
-
-namespace mobile_client {
-
-class FlagConfig: public nx::utils::FlagConfig
-{
-public:
-    using nx::utils::FlagConfig::FlagConfig;
-    NX_FLAG(0, enableEc2TranLog, "");
-};
-FlagConfig conf("mobile_client");
-
-} // namespace mobile_client
-
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
 #include <nx_ec/ec2_lib.h>
@@ -31,20 +19,20 @@ FlagConfig conf("mobile_client");
 #include <core/resource_management/resource_pool.h>
 #include <utils/settings_migration.h>
 
-#include "context/context.h"
-#include "mobile_client/mobile_client_module.h"
+#include <context/context.h>
+#include <mobile_client/mobile_client_module.h>
+#include <mobile_client/mobile_client_settings.h>
 
-#include "ui/color_theme.h"
-#include "ui/resolution_util.h"
-#include "ui/camera_thumbnail_provider.h"
-#include "ui/icon_provider.h"
-#include "ui/window_utils.h"
-#include "ui/texture_size_helper.h"
-#include "camera/camera_thumbnail_cache.h"
-#include "ui/helpers/font_loader.h"
+#include <ui/camera_thumbnail_provider.h>
+#include <ui/window_utils.h>
+#include <ui/texture_size_helper.h>
+#include <camera/camera_thumbnail_cache.h>
+#include <ui/helpers/font_loader.h>
 
 #include <nx/media/decoder_registrar.h>
-#include "resource_allocator.h"
+#include <resource_allocator.h>
+#include "config.h"
+using mobile_client::conf;
 
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -63,11 +51,7 @@ int runUi(QGuiApplication *application) {
 
     QnContext context;
 
-    QnResolutionUtil::DensityClass densityClass = QnResolutionUtil::instance()->densityClass();
-    qDebug() << "Starting with density class: " << QnResolutionUtil::densityName(densityClass);
-
     QStringList selectors;
-    selectors.append(QnResolutionUtil::densityName(densityClass));
 
     if (context.liteMode())
     {
@@ -78,17 +62,13 @@ int runUi(QGuiApplication *application) {
     QFileSelector fileSelector;
     fileSelector.setExtraSelectors(selectors);
 
-    QnIconProvider *iconProvider = new QnIconProvider(&fileSelector);
-
-    QStringList colorThemeFiles;
-    colorThemeFiles.append(fileSelector.select(lit(":/color_theme.json")));
-    if (QFile::exists(lit(":/color_theme_custom.json")))
-        colorThemeFiles.append(fileSelector.select(lit(":/color_theme_custom.json")));
-    context.colorTheme()->readFromFiles(colorThemeFiles);
-    qApp->setPalette(context.colorTheme()->palette());
-
     QQmlEngine engine;
-    engine.addImportPath(lit("qrc:///qml"));
+    auto basePath = qnSettings->basePath();
+    if (!basePath.startsWith(lit("qrc:")))
+        basePath = lit("file://") + QDir(basePath).absolutePath() + lit("/");
+    context.setLocalPrefix(basePath);
+    engine.setBaseUrl(QUrl(basePath + lit("qml/")));
+    engine.addImportPath(basePath + lit("qml"));
     QQmlFileSelector qmlFileSelector(&engine);
     qmlFileSelector.setSelector(&fileSelector);
 
@@ -98,11 +78,9 @@ int runUi(QGuiApplication *application) {
 
     engine.addImageProvider(lit("thumbnail"), thumbnailProvider);
     engine.addImageProvider(lit("active"), activeCameraThumbnailProvider);
-    engine.addImageProvider(lit("icon"), iconProvider);
     engine.rootContext()->setContextObject(&context);
-    engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::instance()->densityMultiplier());
 
-    QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
+    QQmlComponent mainComponent(&engine, QUrl(lit("main.qml")));
     QScopedPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
 
     QScopedPointer<QnTextureSizeHelper> textureSizeHelper(new QnTextureSizeHelper(mainWindow.data()));
@@ -123,7 +101,10 @@ int runUi(QGuiApplication *application) {
 #endif
 
     if (!mainComponent.errors().isEmpty())
+    {
         qWarning() << mainComponent.errorString();
+        return 1;
+    }
 
     QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
@@ -165,25 +146,58 @@ void initLog()
 {
     QnLog::initLog(lit("INFO"));
 
-    if (mobile_client::conf.enableEc2TranLog)
+    if (conf.enableEc2TranLog)
     {
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-            QLatin1String(mobile_client::conf.tempPath()) + QLatin1String("ec2_tran"),
+            QLatin1String(conf.tempPath()) + QLatin1String("ec2_tran"),
             /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
             /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
             cl_logDEBUG2);
     }
 }
 
+void parseCommandLine(const QCoreApplication& application)
+{
+    QCommandLineParser parser;
+
+    const auto basePathOption = QCommandLineOption(
+                                lit("base-path"),
+                                lit("The directory which contains runtime ui resources: 'qml' and 'images'."),
+                                lit("basePath"));
+    parser.addOption(basePathOption);
+    const auto liteModeOption = QCommandLineOption(
+                                lit("lite-mode"),
+                                lit("Enable lite mode."));
+    parser.addOption(liteModeOption);
+
+    parser.process(application);
+
+    if (parser.isSet(basePathOption))
+    {
+        const auto basePath = parser.value(basePathOption);
+        const auto path = QDir(basePath).absoluteFilePath(lit("qml/main.qml"));
+        if (QFile::exists(path))
+            qnSettings->setBasePath(basePath);
+        else
+            qWarning() << lit("File %1 doesn't exist. Loading from qrc...").arg(path);
+    }
+
+    if (parser.isSet(liteModeOption))
+        qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QGuiApplication application(argc, argv);
+
+    conf.reload();
     initLog();
 
     QnMobileClientModule mobile_client;
     Q_UNUSED(mobile_client)
 
+    parseCommandLine(application);
     migrateSettings();
 
     int result = runApplication(&application);

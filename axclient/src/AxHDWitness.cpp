@@ -26,34 +26,6 @@
 
 static QtMessageHandler defaultMsgHandler = 0;
 
-
-static int lockmgr(void **mtx, enum AVLockOp op)
-{
-    QMutex** qMutex = (QMutex**) mtx;
-    switch(op) {
-        case AV_LOCK_CREATE:
-            *qMutex = new QMutex();
-            return 0;
-        case AV_LOCK_OBTAIN:
-            (*qMutex)->lock();
-            return 0;
-        case AV_LOCK_RELEASE:
-            (*qMutex)->unlock();
-            return 0;
-        case AV_LOCK_DESTROY:
-            delete *qMutex;
-            return 0;
-    }
-    return 1;
-}
-
-void ffmpegInit() {
-    av_register_all();
-
-    if(av_lockmgr_register(lockmgr) != 0)
-        qCritical() << "Failed to register ffmpeg lock manager";
-}
-
 extern HHOOK qax_hhook;
 
 extern LRESULT QT_WIN_CALLBACK axs_FilterProc(int nCode, WPARAM wParam, LPARAM lParam);
@@ -268,6 +240,7 @@ bool AxHDWitness::doInitialize() {
     win32_exception::installGlobalUnhandledExceptionHandler();
     AllowSetForegroundWindow(ASFW_ANY);
 
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QStringList pluginDirs = QCoreApplication::libraryPaths();
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths( pluginDirs );

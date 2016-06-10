@@ -35,17 +35,19 @@ namespace conf {
 
 class MediatorProcess
 :
-    public QtService<QtSingleCoreApplication>,
+    public QtService<QCoreApplication>,
     public QnStoppable
 {
 public:
     MediatorProcess(int argc, char **argv);
 
-    void setOnStartedEventHandler(
-        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
-
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop() override;
+
+    void setOnStartedEventHandler(
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
+    const std::vector<SocketAddress>& httpEndpoints() const;
+    const std::vector<SocketAddress>& stunEndpoints() const;
 
 protected:
     virtual int executeApplication() override;
@@ -57,6 +59,8 @@ private:
     int m_argc;
     char** m_argv;
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
+    std::vector<SocketAddress> m_httpEndpoints;
+    std::vector<SocketAddress> m_stunEndpoints;
 
     QString getDataDirectory();
     int printHelp();

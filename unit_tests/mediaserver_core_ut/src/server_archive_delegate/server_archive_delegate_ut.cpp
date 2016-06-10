@@ -17,6 +17,8 @@ extern "C" {
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/network_resource.h>
 #include <utils/common/util.h>
+#include <utils/media/ffmpeg_initializer.h>
+#include <utils/common/writer_pool.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -32,38 +34,11 @@ extern "C" {
 #include <cmath>
 #include <stdio.h>
 
+#include "../utils.h"
+
 const QString cameraFolder("camera");
 const QString lqFolder("low_quality");
 const QString hqFolder("hi_quality");
-
-bool recursiveClean(const QString &path)
-{
-    QDir dir(path);
-    QFileInfoList entryList = dir.entryInfoList(
-            QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
-            QDir::DirsFirst);
-
-    for (auto &entry : entryList) {
-        auto tmp = entry.absoluteFilePath();
-        if (entry.isDir()) {
-             if (!recursiveClean(entry.absoluteFilePath()))
-                return false;
-        }
-        else if (entry.isFile()) {
-            QFile f(entry.absoluteFilePath());
-            f.setPermissions(QFile::ReadOther | QFile::WriteOther);
-            auto result = f.remove();
-            if (!result)
-            {
-                printf("Cleanup failed. Couldn't remove %1\n", 
-                        f.fileName().toLatin1().constData());
-                return false;
-            }
-        }
-    }
-    dir.rmpath(path);
-    return true;
-};
 
 class TestHelper
 {
@@ -272,10 +247,8 @@ private:
         std::uniform_int_distribution<int> durationDist(0, 1);
 
         for (int i = 0; i < m_storageUrls.size(); ++i) {
-            QDir(closeDirPath(m_storageUrls[i]))
-                    .mkpath(lit("%2/%1").arg(cameraFolder).arg(lqFolder));
-            QDir(closeDirPath(m_storageUrls[i]))
-                    .mkpath(lit("%2/%1").arg(cameraFolder).arg(hqFolder));
+            QDir().mkpath(QDir(m_storageUrls[i]).absoluteFilePath(lit("%2/%1").arg(cameraFolder).arg(lqFolder)));
+            QDir().mkpath(QDir(m_storageUrls[i]).absoluteFilePath(lit("%2/%1").arg(cameraFolder).arg(hqFolder)));
         }
 
         QFile testFile_1("://1445529661948_77158.mkv");
@@ -288,16 +261,17 @@ private:
         auto writeHeaderTimestamp = [](const QString &fileName, int64_t timestamp)
         {
             QFile file(fileName);
-            file.setPermissions(QFile::ReadOther | QFile::WriteOther);
+            if (!file.setPermissions(QFile::ReadOther | QFile::WriteOther | QFile::ReadOwner | QFile::WriteOwner | QFile::ReadGroup | QFile::WriteGroup))
+                qDebug() << lit("Set permissions failed for %1").arg(fileName);
             file.open(QIODevice::ReadWrite);
             if (!file.isOpen()) {
-                qDebug() << "Write header %1 failed";
+                qDebug() << lit("Write header %1 failed").arg(fileName);
                 return;
             }
             file.seek(0x219);
             auto buf = file.read(11);
             if (memcmp(buf.constData(), "START_TIMED", 11) != 0) {
-                qDebug() << "Write header wrong offset %1";
+                qDebug() << lit("Write header wrong offset %1").arg(fileName);
                 return;
             }
             file.seek(0x219 + 0xd);
@@ -316,7 +290,7 @@ private:
                                                                currentTimeZone()/60,
                                                                lit("/"));
             pathString = lit("%2/%1/%3").arg(cameraFolder).arg(quality).arg(pathString);
-            QDir(root).mkpath(pathString);
+            QDir().mkpath(QDir(root).absoluteFilePath(pathString));
             QString fullFileName = closeDirPath(root) + closeDirPath(pathString)
                                                       + fileName;
             if (curDuration == duration_1)
@@ -347,6 +321,7 @@ private:
             storage->setUrl(m_storageUrls[i]);
             storage->setId(QnUuid::createUuid());
             storage->setUsedForWriting(true);
+            ASSERT_TRUE(storage->initOrUpdate());
             if (i % 2 == 0)
                 qnNormalStorageMan->addStorage(storage);
             else
@@ -359,7 +334,7 @@ private:
     void loadMedia()
     {
         QnStorageManager::ArchiveCameraDataList archiveCameras;
-        for (int i = 0; i < m_storageUrls.size(); ++i) 
+        for (int i = 0; i < m_storageUrls.size(); ++i)
         {
             QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan : qnBackupStorageMan;
             manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::LowQualityCatalog);
@@ -377,11 +352,6 @@ private:
     int m_fileCount;
     std::vector<QnStorageResourcePtr> m_storages;
 };
-
-TEST(ServerArchiveDelegate_playback_test, Clean_before)
-{
-    recursiveClean(qApp->applicationDirPath() + lit("/tmp"));
-}
 
 TEST(ServerArchiveDelegate_playback_test, TestHelper)
 {
@@ -440,40 +410,17 @@ TEST(ServerArchiveDelegate_playback_test, TestHelper)
     ASSERT_TRUE(timeLine.checkTime(28));
 }
 
-static int lockmgr(void **mtx, enum AVLockOp op)
-{
-    QnMutex** qMutex = (QnMutex**) mtx;
-    switch(op) {
-        case AV_LOCK_CREATE:
-            *qMutex = new QnMutex();
-            return 0;
-        case AV_LOCK_OBTAIN:
-            (*qMutex)->lock();
-            return 0;
-        case AV_LOCK_RELEASE:
-            (*qMutex)->unlock();
-            return 0;
-        case AV_LOCK_DESTROY:
-            delete *qMutex;
-            return 0;
-    }
-    return 1;
-}
-
-static void ffmpegInit()
-{
-    avcodec_register_all();
-
-    if(av_lockmgr_register(lockmgr) != 0)
-    {
-        qCritical() << "Failed to register ffmpeg lock manager";
-    }
-}
-
 TEST(ServerArchiveDelegate_playback_test, Main)
 {
-    const QString storageUrl_1 = qApp->applicationDirPath() + lit("/tmp/path1");
-    const QString storageUrl_2 = qApp->applicationDirPath() + lit("/tmp/path2");
+    nx::ut::utils::WorkDirResource storageWorkDir1;
+    nx::ut::utils::WorkDirResource storageWorkDir2;
+    QnWriterPool writerPool;
+
+    ASSERT_TRUE((bool)storageWorkDir1.getDirName());
+    ASSERT_TRUE((bool)storageWorkDir2.getDirName());
+
+    auto storageUrl_1 = *storageWorkDir1.getDirName();
+    auto storageUrl_2 = *storageWorkDir2.getDirName();
 
     std::unique_ptr<QnCommonModule> commonModule;
     if (!qnCommon) {
@@ -527,7 +474,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     QnNetworkResourcePtr cameraResource = QnNetworkResourcePtr(new QnNetworkResource);
     cameraResource->setPhysicalId(cameraFolder);
 
-    ffmpegInit();
+    QnFfmpegInitializer ffmpegHolder;
 
     QnServerArchiveDelegate archiveDelegate;
     archiveDelegate.open(cameraResource);
@@ -557,7 +504,3 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     }
 }
 
-TEST(ServerArchiveDelegate_playback_test, Clean_after)
-{
-    recursiveClean(qApp->applicationDirPath() + lit("/tmp"));
-}

@@ -27,7 +27,6 @@
 #include <api/global_settings.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/common/ui_resource_name.h>
 #include <ui/delegates/resource_tree_model_custom_column_delegate.h>
 #include <ui/models/resource/resource_tree_model_node.h>
 #include <ui/style/resource_icon_cache.h>
@@ -99,7 +98,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourceTreeModel::at_commonModule_systemNameChanged);
     connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnResourceTreeModel::rebuildTree,                      Qt::QueuedConnection);
     connect(qnGlobalSettings,   &QnGlobalSettings::serverAutoDiscoveryChanged,      this,   &QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged);
-    connect(qnSettings->notifier(QnClientSettings::EXT_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, this, [this](int value)
+    connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, this, [this](int value)
     {
         Q_UNUSED(value);
         m_rootNodes[rootNodeTypeForScope()]->updateRecursive();
@@ -437,7 +436,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         if (systemName == qnCommon->localSystemName())
             return m_rootNodes[Qn::ServersNode];
 
-        return systemName.isEmpty() ? m_rootNodes[Qn::OtherSystemsNode] : ensureSystemNode(systemName);
+        return ensureSystemNode(systemName);
 
     }
 
@@ -1068,11 +1067,13 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
                 medias.push_back(res);
         }
         if (!medias.isEmpty())
+        {
             menu()->trigger(
                 QnActions::OpenInLayoutAction,
                 QnActionParameters(medias).
                 withArgument(Qn::LayoutResourceRole, layout)
             );
+        }
     }
 
     /* Drop layout on user means sharing this layout. */
@@ -1217,7 +1218,7 @@ void QnResourceTreeModel::at_videoWall_itemAddedOrChanged(const QnVideoWallResou
 
     QnResourcePtr resource;
     if (!item.layout.isNull())
-        resource = resourcePool()->getResourceById(item.layout);
+        resource = qnResPool->getResourceById(item.layout);
 
     if (node->resource() != resource)
         updateNodeResource(node, resource);

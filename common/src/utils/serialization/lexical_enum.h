@@ -8,6 +8,7 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QString>
+#include <QtCore/QMutex>
 
 #include <utils/common/type_traits.h>
 
@@ -258,7 +259,15 @@ __VA_ARGS__ QnEnumLexicalSerializerData create_enum_lexical_serializer_data(cons
 template<class T> void this_macro_cannot_be_used_in_header_files();             \
 template<> void this_macro_cannot_be_used_in_header_files<TYPE>() {};           \
                                                                                 \
-Q_GLOBAL_STATIC_WITH_ARGS(QnEnumLexicalSerializerData, STATIC_NAME, (create_enum_lexical_serializer_data(static_cast<const TYPE *>(NULL)))) \
+static QnEnumLexicalSerializerData* STATIC_NAME()                               \
+{                                                                               \
+    static QnEnumLexicalSerializerData* instance = nullptr;                     \
+    static QMutex mutex;                                                        \
+    QMutexLocker lock(&mutex);                                                  \
+    if (!instance)                                                              \
+        instance = new QnEnumLexicalSerializerData(create_enum_lexical_serializer_data(static_cast<const TYPE*>(nullptr))); \
+    return instance;                                                            \
+}                                                                               \
                                                                                 \
 __VA_ARGS__ void serialize(const TYPE &value, QString *target) {                \
     STATIC_NAME()->serialize(value, target);                                    \

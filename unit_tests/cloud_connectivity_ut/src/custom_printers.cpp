@@ -24,6 +24,10 @@ void PrintTo(const SocketAddress& val, ::std::ostream* os) {
     *os << val.toString().toStdString();
 }
 
+void PrintTo(const HostAddress& val, ::std::ostream* os) {
+    *os << val.toString().toStdString();
+}
+
 namespace std {
 namespace chrono {
 
@@ -45,6 +49,11 @@ void PrintTo(const microseconds& val, ::std::ostream* os)
 void PrintTo(const nanoseconds& val, ::std::ostream* os)
 {
     *os << val.count() << "nanosec";
+}
+
+void PrintTo(const time_point<steady_clock>& val, ::std::ostream* os)
+{
+    *os << val.time_since_epoch().count() << "ns (utc)";
 }
 
 }   //chrono

@@ -38,11 +38,16 @@ namespace hpm {
 
 MediatorProcess::MediatorProcess( int argc, char **argv )
 :
-    QtService<QtSingleCoreApplication>(argc, argv, QnLibConnectionMediatorAppInfo::applicationName()),
+    QtService<QCoreApplication>(argc, argv, QnLibConnectionMediatorAppInfo::applicationName()),
     m_argc( argc ),
     m_argv( argv )
 {
     setServiceDescription(QnLibConnectionMediatorAppInfo::applicationDisplayName());
+}
+
+void MediatorProcess::pleaseStop()
+{
+    application()->quit();
 }
 
 void MediatorProcess::setOnStartedEventHandler(
@@ -51,9 +56,14 @@ void MediatorProcess::setOnStartedEventHandler(
     m_startedEventHandler = std::move(handler);
 }
 
-void MediatorProcess::pleaseStop()
+const std::vector<SocketAddress>& MediatorProcess::httpEndpoints() const
 {
-    application()->quit();
+    return m_httpEndpoints;
+}
+
+const std::vector<SocketAddress>& MediatorProcess::stunEndpoints() const
+{
+    return m_stunEndpoints;
 }
 
 int MediatorProcess::executeApplication()
@@ -88,7 +98,7 @@ int MediatorProcess::executeApplication()
     if (settings.cloudDB().runWithCloud)
     {
         cloudDataProvider = AbstractCloudDataProviderFactory::create(
-            settings.cloudDB().address.toStdString(),
+            settings.cloudDB().endpoint.toStdString(),
             settings.cloudDB().user.toStdString(),
             settings.cloudDB().password.toStdString(),
             settings.cloudDB().updateInterval);
@@ -123,15 +133,15 @@ int MediatorProcess::executeApplication()
             .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
         return 3;
     }
-
+    m_stunEndpoints = tcpStunServer.endpoints();
+    
     MultiAddressServer<stun::UDPServer> udpStunServer(&stunMessageDispatcher);
-    if (!udpStunServer.bind(settings.stun().addrToListenList))
+    if (!udpStunServer.bind(m_stunEndpoints /*settings.stun().addrToListenList*/))
     {
         NX_LOGX(lit("Can not bind to UDP addresses: %1")
             .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
         return 4;
     }
-
 
     std::unique_ptr<nx_http::MessageDispatcher> httpMessageDispatcher;
     std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>
@@ -185,14 +195,14 @@ int MediatorProcess::executeApplication()
 
 void MediatorProcess::start()
 {
-    QtSingleCoreApplication* application = this->application();
+    //QtSingleCoreApplication* application = this->application();
 
-    if( application->isRunning() )
-    {
-        NX_LOGX( "Server already started", cl_logERROR );
-        application->quit();
-        return;
-    }
+    //if( application->isRunning() )
+    //{
+    //    NX_LOGX( "Server already started", cl_logERROR );
+    //    application->quit();
+    //    return;
+    //}
 }
 
 void MediatorProcess::stop()
@@ -259,6 +269,7 @@ bool MediatorProcess::launchHttpServerIfNeeded(
             .arg(SystemError::toString(osErrorCode)), cl_logERROR);
         return false;
     }
+    m_httpEndpoints = (*multiAddressHttpServer)->endpoints();
 
     return true;
 }

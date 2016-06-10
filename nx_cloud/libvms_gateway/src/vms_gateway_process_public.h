@@ -29,6 +29,8 @@ public:
 
     int exec();
 
+    const VmsGatewayProcess* impl() const;
+
 private:
     VmsGatewayProcess* m_impl;
 };

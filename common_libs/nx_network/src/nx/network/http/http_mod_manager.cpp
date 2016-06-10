@@ -8,7 +8,15 @@
 
 namespace nx_http
 {
-    void HttpModManager::apply( Request* const request )
+
+HttpModManager::HttpModManager(QObject* parent /*= nullptr*/) :
+    base_type(parent)
+{}
+
+HttpModManager::~HttpModManager()
+{}
+
+void HttpModManager::apply(Request* const request)
     {
         //applying m_urlRewriteExact
         auto it = m_urlRewriteExact.find( request->requestLine.url.path() );

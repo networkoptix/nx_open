@@ -482,3 +482,36 @@ span.danger{
 .modal-dialog.modal-sm{
   width:450px;
 }
+
+
+
+.form-group.CameraMotionEvent,
+.form-group.CameraInputEvent,
+.form-group.CameraDisconnectEvent,
+.form-group.StorageFailureEvent,
+.form-group.NetworkIssueEvent,
+.form-group.CameraIpConflictEvent,
+.form-group.ServerFailureEvent,
+.form-group.ServerConflictEvent,
+.form-group.ServerStartEvent,
+.form-group.LicenseIssueEvent,
+.form-group.BackupFinishedEvent,
+.form-group.UserDefinedEvent{
+  display:none;
+}
+
+.AnyEvent,
+.CameraMotionEvent .CameraMotionEvent,
+.CameraInputEvent .CameraInputEvent,
+.CameraDisconnectEvent .CameraDisconnectEvent,
+.StorageFailureEvent .StorageFailureEvent,
+.NetworkIssueEvent .NetworkIssueEvent,
+.CameraIpConflictEvent .CameraIpConflictEvent,
+.ServerFailureEvent .ServerFailureEvent,
+.ServerConflictEvent .ServerConflictEvent,
+.ServerStartEvent .ServerStartEvent,
+.LicenseIssueEvent .LicenseIssueEvent,
+.BackupFinishedEvent .BackupFinishedEvent,
+.UserDefinedEvent .UserDefinedEvent{
+  display:block;
+}
