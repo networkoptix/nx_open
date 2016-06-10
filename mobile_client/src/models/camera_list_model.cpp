@@ -83,10 +83,11 @@ QnCameraListModel::QnCameraListModel(QObject *parent)
     sort(0);
     setFilterCaseSensitivity(Qt::CaseInsensitive);
 
-    NX_ASSERT(QnCameraThumbnailCache::instance());
-    if (!QnCameraThumbnailCache::instance())
+    auto cache = QnCameraThumbnailCache::instance();
+    NX_ASSERT(cache);
+    if (cache)
     {
-        connect(QnCameraThumbnailCache::instance(), &QnCameraThumbnailCache::thumbnailUpdated,
+        connect(cache, &QnCameraThumbnailCache::thumbnailUpdated,
                 d, &QnCameraListModelPrivate::at_thumbnailUpdated);
     }
 }
