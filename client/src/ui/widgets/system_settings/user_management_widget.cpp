@@ -124,7 +124,7 @@ bool QnUserManagementWidget::hasChanges() const
 void QnUserManagementWidget::modelUpdated()
 {
     ui->usersTable->setColumnHidden(QnUserListModel::UserTypeColumn,
-        boost::algorithm::any_of(visibleUsers(),
+        !boost::algorithm::any_of(visibleUsers(),
             [this](const QnUserResourcePtr& user)
             {
                 return !user->isLocal();
