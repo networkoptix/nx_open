@@ -9,7 +9,7 @@
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 
 #include <utils/common/delayed.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QnOverlayTextItemData::QnOverlayTextItemData(const QnUuid &initId
     , const QString &initText

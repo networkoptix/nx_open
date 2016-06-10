@@ -28,7 +28,7 @@
 #include <server/host_system_password_synchronizer.h>
 #include <core/resource_management/resource_properties.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include "server_connector.h"
 #include <transaction/transaction_message_bus.h>
 #include "cloud/cloud_system_name_updater.h"

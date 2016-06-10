@@ -20,7 +20,7 @@
 #include <update/update_info.h>
 
 #include <utils/color_space/image_correction.h>
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <utils/ping_utility.h>
 #include <utils/app_server_file_cache.h>
 

@@ -16,7 +16,6 @@
 QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(QnBusiness::ActionType actionType, QWidget *parent) {
     switch (actionType) {
     case QnBusiness::CameraOutputAction:
-    case QnBusiness::CameraOutputOnceAction:
         return new QnCameraOutputBusinessActionWidget(parent);
     case QnBusiness::CameraRecordingAction:
         return new QnRecordingBusinessActionWidget(parent);

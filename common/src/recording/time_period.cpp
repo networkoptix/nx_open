@@ -3,12 +3,12 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDateTime>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include <utils/math/math.h>
 #include <utils/common/util.h>
-#include <utils/serialization/json_functions.h>
-#include <utils/fusion/fusion_adaptor.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/fusion/fusion_adaptor.h>
 #include "time_period_list.h"
 
 QN_FUSION_ADAPT_STRUCT(QnTimePeriod, (startTimeMs)(durationMs))

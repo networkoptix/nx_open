@@ -1,7 +1,7 @@
 #include "platform_monitor.h"
 
-#include <utils/serialization/json_functions.h>
-#include <utils/serialization/lexical_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/serialization/lexical_functions.h>
 
 QList<QnPlatformMonitor::NetworkLoad> QnPlatformMonitor::totalNetworkLoad(NetworkInterfaceTypes types) {
     QList<NetworkLoad> result;

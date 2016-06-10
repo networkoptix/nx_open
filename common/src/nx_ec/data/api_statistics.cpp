@@ -3,7 +3,7 @@
 #include <core/resource/param.h>
 #include <core/resource/resource_type.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 const static QString __CAMERA_EXCEPT_PARAMS[] =
 {

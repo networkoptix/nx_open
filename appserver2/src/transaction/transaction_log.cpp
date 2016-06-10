@@ -9,7 +9,7 @@
 #include "transaction.h"
 #include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
-#include "utils/common/model_functions.h"
+#include "nx/fusion/model_functions.h"
 #include "nx_ec/data/api_discovery_data.h"
 
 namespace ec2

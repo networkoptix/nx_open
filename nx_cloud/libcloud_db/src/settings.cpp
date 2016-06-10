@@ -13,7 +13,7 @@
 
 #include <nx/utils/timer_manager.h>
 #include <libcloud_db_app_info.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <utils/common/app_info.h>
 
 

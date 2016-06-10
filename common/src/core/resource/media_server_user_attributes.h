@@ -8,7 +8,7 @@
 
 #include <nx/utils/singleton.h>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 #include <core/resource/general_attribute_pool.h>
 #include <core/resource/resource_fwd.h>

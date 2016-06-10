@@ -1,6 +1,6 @@
 #include "layout_proto.h"
 
-#include <utils/serialization/proto_message.h>
+#include <nx/fusion/serialization/proto_message.h>
 
 #include <nx_ec/data/api_layout_data.h>
 

@@ -3,7 +3,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QLinkedList>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/camera/camera_names_watcher.h>
 
 namespace

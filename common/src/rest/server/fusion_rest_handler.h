@@ -3,9 +3,9 @@
 
 #include "request_handler.h"
 
-#include <utils/serialization/lexical_functions.h>
+#include <nx/fusion/serialization/lexical_functions.h>
 #include <nx/network/http/httptypes.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include "utils/common/util.h"
 #include "json_rest_result.h"
 

@@ -3,8 +3,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
-#include <utils/common/model_functions_fwd.h>
-#include <utils/fusion/fusion_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
+#include <nx/fusion/fusion/fusion_fwd.h>
 
 // TODO: #Elric this belongs together with server_settings
 

@@ -13,7 +13,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_value_rollback.h>
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 
 #include "drag_process_handler.h"
 

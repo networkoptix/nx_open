@@ -16,8 +16,8 @@
 #include "utils/common/util.h"
 #include <utils/fs/file.h>
 #include "network/tcp_connection_priv.h"
-#include <utils/serialization/json.h>
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/json_functions.h>
 
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {

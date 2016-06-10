@@ -9,7 +9,7 @@
 #include <QtCore/QDateTime>
 #include <array>
 
-#include <utils/serialization/json.h>
+#include <nx/fusion/serialization/json.h>
 
 #include "hardware_id.h"
 #include "hardware_id_p.h"

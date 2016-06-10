@@ -1,6 +1,6 @@
 #include "api_conversion_functions.h"
 
-#include <utils/serialization/json.h>
+#include <nx/fusion/serialization/json.h>
 
 #include <business/business_event_parameters.h>
 #include <business/business_action_parameters.h>

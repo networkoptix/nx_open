@@ -1,7 +1,7 @@
 #include "nx_style_p.h"
 
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 
 using namespace style;
 

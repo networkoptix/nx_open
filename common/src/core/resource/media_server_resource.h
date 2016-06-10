@@ -38,7 +38,7 @@ public:
     void setApiUrl(const QString& apiUrl);
     QString getApiUrl() const;
 
-    void setNetAddrList(const QList<SocketAddress>&);
+    void setNetAddrList(const QList<SocketAddress>& value);
     QList<SocketAddress> getNetAddrList() const;
 
     // TODO: #dklychkov Use QSet instead of QList
@@ -49,6 +49,9 @@ public:
     QList<QUrl> getIgnoredUrls() const;
 
     quint16 getPort() const;
+
+    /** Get list of all available server addresses. */
+    QList<SocketAddress> getAllAvailableAddresses() const;
 
     /*
     * Deprecated server rest connection

@@ -2,7 +2,7 @@
 #include "cloud_credentials_data.h"
 
 #include <common/common_globals.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 CloudCredentialsData::CloudCredentialsData(const QnRequestParams& params):
     reset(params.contains(lit("reset"))),

@@ -191,7 +191,7 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
     case Qt::AccessibleTextRole:
     case Qt::AccessibleDescriptionRole:
         if (column == NameColumn)
-            return QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
+            return QnResourceDisplayInfo(resource).toString(Qn::RI_NameOnly);
         break;
 
     case Qt::EditRole:

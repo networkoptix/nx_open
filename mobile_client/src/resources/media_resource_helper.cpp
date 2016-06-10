@@ -15,7 +15,7 @@
 #include "common/common_module.h"
 #include "network/authutil.h"
 #include "http/custom_headers.h"
-#include "utils/common/model_functions.h"
+#include "nx/fusion/model_functions.h"
 #include "utils/common/synctime.h"
 #include <nx/network/http/httptypes.h>
 #include "watchers/user_watcher.h"

@@ -3,7 +3,7 @@
 
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 #include <utils/common/forward.h>
 
 /**

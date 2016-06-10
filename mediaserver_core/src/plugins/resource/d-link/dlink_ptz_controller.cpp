@@ -1,7 +1,7 @@
 #ifdef ENABLE_ONVIF
 
 #include "dlink_ptz_controller.h"
-#include "utils/math/fuzzy.h"
+#include "nx/utils/math/fuzzy.h"
 #include "plugins/resource/onvif/onvif_resource.h"
 #include "utils/common/long_runnable.h"
 

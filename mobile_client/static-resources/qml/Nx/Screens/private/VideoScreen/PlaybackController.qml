@@ -8,7 +8,6 @@ AbstractButton
     id: control
 
     checkable: true
-    checked: true
 
     property bool loading: false
     property color color: ColorTheme.windowText

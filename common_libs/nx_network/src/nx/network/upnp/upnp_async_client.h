@@ -1,7 +1,7 @@
 #ifndef UPNP_ASYNC_CLIENT_H
 #define UPNP_ASYNC_CLIENT_H
 
-#include "utils/common/model_functions_fwd.h"
+#include "nx/fusion/model_functions_fwd.h"
 #include <nx/network/http/asynchttpclient.h>
 
 #include <set>

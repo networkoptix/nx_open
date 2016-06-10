@@ -5,7 +5,7 @@
 
 #include <api/app_server_connection.h>
 
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
 #include <utils/resource_property_adaptors.h>
 
 #include <common/common_globals.h>

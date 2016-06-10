@@ -3,7 +3,7 @@
 #include <memory>
 
 #include <utils/math/math.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ImageCorrectionParams, (json), (blackLevel)(whiteLevel)(gamma)(enabled))
 

@@ -1,11 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project,
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -22,13 +16,13 @@
 
     <properties>
         <guid>${common.guid}</guid>
-        <!--Global libs-->
+
         <qt.libs>core core-private gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <!--Specific os libs used-->
+        <global.libs>-lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lSecur32</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
-        <!--Specific os defines-->
+
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <rdep.packages>openssl ffmpeg</rdep.packages>
         <rdep.windows.packages>quazip</rdep.windows.packages>
@@ -44,6 +38,24 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/build_variables/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_fusion</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_utils</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

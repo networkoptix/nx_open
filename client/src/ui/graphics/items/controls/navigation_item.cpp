@@ -36,7 +36,7 @@
 
 #include <core/resource/resource.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 #include "time_slider.h"

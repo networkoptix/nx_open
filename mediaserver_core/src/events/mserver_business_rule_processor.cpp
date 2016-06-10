@@ -227,7 +227,6 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
             result = executeBookmarkAction(action);
             break;
         case QnBusiness::CameraOutputAction:
-        case QnBusiness::CameraOutputOnceAction:
             result = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>());
             break;
         case QnBusiness::CameraRecordingAction:
@@ -525,17 +524,6 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
         return false;
     }
     QString relayOutputId = action->getRelayOutputId();
-    //if( relayOutputId.isEmpty() )
-    //{
-    //    NX_LOG( lit("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
-    //    return false;
-    //}
-
-    //bool instant = action->actionType() == QnBusiness::CameraOutputOnceAction;
-
-    //int autoResetTimeout = instant
-    //        ? ( action->getRelayAutoResetTimeout() ? action->getRelayAutoResetTimeout() : 30*1000)
-    //        : qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
     int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
     bool on = action->getToggleState() != QnBusiness::InactiveState;
 

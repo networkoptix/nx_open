@@ -7,7 +7,7 @@
 #include <transaction/transaction_transport_header.h>
 
 #include <nx/utils/singleton.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace ec2
 {

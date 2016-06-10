@@ -3,7 +3,7 @@
 
 #include "api_globals.h"
 #include "api_data.h"
-#include "utils/common/latin1_array.h"
+#include "nx/utils/latin1_array.h"
 
 namespace ec2
 {

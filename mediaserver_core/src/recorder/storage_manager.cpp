@@ -36,7 +36,7 @@
 #include "motion/motion_helper.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
-#include "utils/serialization/lexical_enum.h"
+#include "nx/fusion/serialization/lexical_enum.h"
 
 #include <memory>
 #include <thread>

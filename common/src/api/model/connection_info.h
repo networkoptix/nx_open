@@ -9,7 +9,7 @@
 
 #ifndef QN_NO_BASE
 #include <utils/common/software_version.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 #include "compatibility_item.h"
 

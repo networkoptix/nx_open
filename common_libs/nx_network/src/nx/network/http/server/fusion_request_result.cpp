@@ -5,7 +5,7 @@
 
 #include "fusion_request_result.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 
 namespace nx_http {

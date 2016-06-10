@@ -20,7 +20,7 @@
 #include <utils/media/audio_player.h>
 #include <utils/image_provider.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace
 {

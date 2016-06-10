@@ -11,9 +11,9 @@
 #include <string>
 #include <vector>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
-#include <utils/fusion/fusion_fwd.h>
+#include <nx/fusion/fusion/fusion_fwd.h>
 
 #include <cdb/system_data.h>
 

@@ -4,7 +4,7 @@
 #include <nx_ec/ec_api.h>
 
 #include <common/common_globals.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace ec2 {
 

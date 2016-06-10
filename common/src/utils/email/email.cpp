@@ -8,7 +8,7 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace {
     typedef QHash<QString, QnEmailSmtpServerPreset> QnSmtpPresets;

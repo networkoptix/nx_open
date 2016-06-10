@@ -46,6 +46,7 @@
 #include "core/resource/resource_directory_browser.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/software_version.h>
 #include <utils/common/command_line_parser.h>
 
 #include "ui/workbench/workbench_context.h"
@@ -117,11 +118,16 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
 
 #ifdef Q_OS_WIN
 
-    auto registerUriHandler = []
+    nx::utils::SoftwareVersion engineVersion(QnAppInfo::applicationVersion());
+    if (!startupParams.engineVersion.isEmpty())
+        engineVersion = nx::utils::SoftwareVersion(startupParams.engineVersion);
+
+    auto registerUriHandler = [engineVersion]
     {
         return nx::utils::registerSystemUriProtocolHandler(nx::vms::utils::AppInfo::nativeUriProtocol(),
                                                            qApp->applicationFilePath(),
-                                                           nx::vms::utils::AppInfo::nativeUriProtocolDescription());
+                                                           nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
+                                                           engineVersion);
     };
 
     /* Register URI handler and instantly exit. */

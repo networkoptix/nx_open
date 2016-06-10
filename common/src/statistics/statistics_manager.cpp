@@ -3,7 +3,7 @@
 
 #include <QtCore/QTimer>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <common/common_module.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>

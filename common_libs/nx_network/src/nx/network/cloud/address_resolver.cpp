@@ -7,7 +7,7 @@
 #include <nx/utils/thread/barrier_handler.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/cc/custom_stun.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 static const auto kDnsCacheTimeout = std::chrono::seconds(10);
 static const auto kMediatorCacheTimeout = std::chrono::seconds(10);

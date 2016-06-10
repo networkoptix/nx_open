@@ -2,7 +2,7 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <utils/serialization/binary.h>
+#include <nx/fusion/serialization/binary.h>
 
 #include <nx_ec/data/api_business_rule_data.h>
 #include <nx_ec/data/api_conversion_functions.h>

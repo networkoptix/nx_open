@@ -16,7 +16,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/server/fusion_request_result.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"

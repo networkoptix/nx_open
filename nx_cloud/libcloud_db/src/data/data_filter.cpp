@@ -5,7 +5,7 @@
 
 #include "data_filter.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include "stree/stree_manager.h"
 
