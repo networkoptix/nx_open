@@ -17,7 +17,7 @@
     <properties>
         <guid>${nx_fusion.guid}</guid>
         <template>lib</template>
-        <buildLib>staticlib</buildLib>
+        <buildLib>sharedLib</buildLib>
         <qt.libs>core gui</qt.libs>
         <global.libs>-lnx_utils</global.libs>
         <windows.defines>_USING_V110_SDK71_</windows.defines>
@@ -35,6 +35,18 @@
     </dependencies>    
     
     <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>            
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+    
         <profile>
             <id>mobile-android</id>
             <activation>

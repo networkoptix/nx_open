@@ -20,7 +20,7 @@
         <template>lib</template>
 
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lnx_utils -lnx_streaming -ludt -lnx_fusion</global.libs>
+        <global.libs>-lnx_streaming -ludt -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>-lcommon -lws2_32 DbgHelp.lib -lIphlpapi -lOle32  -lSecur32 -lwinmm</windows.oslibs>
         <linux.oslibs>-lswscale</linux.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation  -lz -framework QtConcurrent</mac.oslibs>
