@@ -27,7 +27,7 @@
         <template>app</template>
 
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lmediaserver_core -lcommon -lnx_utils -lnx_network -lnx_streaming -lappserver2 -ludt -lcloud_db_client -lnx_email</global.libs>
+        <global.libs>-lmediaserver_core -lcommon -lnx_utils -lnx_network -lnx_streaming -lappserver2 -ludt -lcloud_db_client -lnx_email -lnx_fusion</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
         <linux.oslibs>-lldap -ldl</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
@@ -45,6 +45,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/mediaserver_core/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_fusion</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

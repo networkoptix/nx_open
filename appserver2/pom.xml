@@ -21,7 +21,7 @@
         <buildLib>sharedlib</buildLib>
 
         <qt.libs>core core-private gui network xml sql concurrent</qt.libs>
-        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils -lnx_fusion</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
 
@@ -56,7 +56,16 @@
             <type>pom</type> 
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>           
+        </dependency>  
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_fusion</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
+        </dependency>         
     </dependencies>    
 
     <profiles>

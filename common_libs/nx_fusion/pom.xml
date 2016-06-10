@@ -17,7 +17,7 @@
     <properties>
         <guid>${nx_fusion.guid}</guid>
         <template>lib</template>
-        <buildLib>sharedLib</buildLib>
+        <buildLib>staticlib</buildLib>
         <qt.libs>core gui</qt.libs>
         <global.libs>-lnx_utils</global.libs>
         <windows.defines>_USING_V110_SDK71_</windows.defines>

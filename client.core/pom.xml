@@ -58,6 +58,15 @@
             <scope>system</scope>
             <systemPath>${root.dir}/nx_cloud/cloud_db_client/pom.xml</systemPath>
         </dependency>
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_fusion</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
+        </dependency>         
     </dependencies>
 
     <properties>
@@ -66,7 +75,7 @@
         <product.display.title>${client.display.name} Core</product.display.title>
         <template>lib</template>
         <qt.libs>core gui network multimedia concurrent sql</qt.libs>
-        <global.libs>-lcommon -lnx_streaming -lappserver2 -lnx_vms_utils</global.libs>
+        <global.libs>-lcommon -lnx_streaming -lappserver2 -lnx_vms_utils -ln_fusion</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>

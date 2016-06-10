@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-#include <QtCore/QtNumeric>
-
 #if QT_VERSION == 0x050201
 static inline quint32 f2i(float f)
 {
@@ -23,15 +21,17 @@ quint32 qFloatDistance(float a, float b)
     NX_ASSERT(qIsFinite(a) && qIsFinite(b));
     if (a == b)
         return 0;
-    if ((a < 0) != (b < 0)) {
-        // if they have different signs
+    if ((a < 0) != (b < 0))
+    {
+// if they have different signs
         if (a < 0)
             a = -a;
         else /*if (b < 0)*/
             b = -b;
         return qFloatDistance(0.0F, a) + qFloatDistance(0.0F, b);
     }
-    if (a < 0) {
+    if (a < 0)
+    {
         a = -a;
         b = -b;
     }
@@ -65,15 +65,17 @@ quint64 qFloatDistance(double a, double b)
     NX_ASSERT(qIsFinite(a) && qIsFinite(b));
     if (a == b)
         return 0;
-    if ((a < 0) != (b < 0)) {
-        // if they have different signs
+    if ((a < 0) != (b < 0))
+    {
+// if they have different signs
         if (a < 0)
             a = -a;
         else /*if (b < 0)*/
             b = -b;
         return qFloatDistance(0.0, a) + qFloatDistance(0.0, b);
     }
-    if (a < 0) {
+    if (a < 0)
+    {
         a = -a;
         b = -b;
     }
@@ -90,47 +92,64 @@ quint64 qFloatDistance(double a, double b)
 }
 #endif
 
-float qFuzzyFloor(float value) {
+float qFuzzyFloor(float value)
+{
     float result = std::floor(value);
 
-    if(qFuzzyIsNull(value - result - 1.0f)) {
+    if (qFuzzyIsNull(value - result - 1.0f))
+    {
         return result + 1.0f;
-    } else {
+    }
+    else
+    {
         return result;
     }
 }
 
-double qFuzzyFloor(double value) {
+double qFuzzyFloor(double value)
+{
     double result = std::floor(value);
 
-    if(qFuzzyIsNull(value - result - 1.0)) {
+    if (qFuzzyIsNull(value - result - 1.0))
+    {
         return result + 1.0;
-    } else {
+    }
+    else
+    {
         return result;
     }
 }
 
-float qFuzzyCeil(float value) {
+float qFuzzyCeil(float value)
+{
     float result = std::ceil(value);
 
-    if(qFuzzyIsNull(result - value - 1.0f)) {
+    if (qFuzzyIsNull(result - value - 1.0f))
+    {
         return result - 1.0f;
-    } else {
+    }
+    else
+    {
         return result;
     }
 }
 
-double qFuzzyCeil(double value) {
+double qFuzzyCeil(double value)
+{
     double result = std::ceil(value);
 
-    if(qFuzzyIsNull(result - value - 1.0)) {
+    if (qFuzzyIsNull(result - value - 1.0))
+    {
         return result - 1.0;
-    } else {
+    }
+    else
+    {
         return result;
     }
 }
 
-bool qFuzzyContains(const QRectF &rect, const QPointF &point) {
+bool qFuzzyContains(const QRectF &rect, const QPointF &point)
+{
     return
         qFuzzyBetween(rect.left(), point.x(), rect.right()) &&
         qFuzzyBetween(rect.top(), point.y(), rect.bottom());

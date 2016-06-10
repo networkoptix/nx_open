@@ -140,7 +140,7 @@ namespace QJson {
 
             bool ok = QJson::deserialize(ctx, *pos, target);
             if (!ok && !optional)
-                qCritical() << QString("Can't deserialize field \"%1\" from value \"%2\"").arg(key).arg(pos.value().toString());
+                qCritical() << QString(QLatin1String("Can't deserialize field \"%1\" from value \"%2\"")).arg(key).arg(pos.value().toString());
 
             return ok || optional;
         }
