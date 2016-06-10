@@ -358,8 +358,30 @@ upgrade() {
     chmod 600 /etc/crontab
 }
 
+#only if boot from SD Card for the first time after upgrading 2.5 to 3.0
+upgrade_sd() {
+    apt-get update
+    export DEBIAN_FRONTEND=noninteractive
+    dpkg -i /opt/deb/libvdpau/*.deb
+    cp -f /opt/deb/libc6/*.deb /var/cache/apt/archives
+    apt-get -d -t experimental install libc-l10n libc6-armhf-cross libc-bin libc-dev-bin libc6 libc6-dbg libc6-dev locales
+    apt-get -t experimental install libc-l10n libc6-armhf-cross libc-bin libc-dev-bin libc6 libc6-dbg libc6-dev locales -y -qq
+    touch /dev/cedar_dev
+    chmod 777 /dev/disp
+    chmod 777 /dev/cedar_dev
+    usermod -aG video root
+    sync
+    reboot_from_sd
+    exit 0
+}    
+
 default_sequence () {
     get_serial_number
+    #upgrading from 2.x to 3.x on first boot
+    if [ "$BOOTDEVICE" = "mmc" ]; then
+        LIBC_NEW=$(dpkg -l | grep libc-bin | grep 2.23)
+        if [ -z $LIBC_NEW ]; then upgrade_sd; fi
+    fi
     if [ "$RESET" = "true" ]; then /etc/init.d/nx1button start; fi    
     stop_server
     setup_hdd_environment

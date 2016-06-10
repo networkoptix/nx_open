@@ -82,6 +82,8 @@ TEST(RetryTimer, delayCalculation)
                 ASSERT_EQ(expectedDelay, delay);
                 prevDelay = delay;
             }
+
+            retryTimer.pleaseStopSync();
         }
     }
 }
