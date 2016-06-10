@@ -59,8 +59,8 @@ void serialize(QnJsonContext *ctx, const QBrush &value, QJsonValue *target) {
         QJson::serialize(ctx, value.color(), target);
     } else {
         QJsonObject map;
-        QJson::serialize(ctx, value.color(), lit("color"), &map);
-        QJson::serialize(ctx, value.style(), lit("style"), &map);
+        QJson::serialize(ctx, value.color(), QLatin1String("color"), &map);
+        QJson::serialize(ctx, value.style(), QLatin1String("style"), &map);
         *target = map;
     }
 }
@@ -78,8 +78,8 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QBrush *target) {
         QColor color;
         Qt::BrushStyle style = Qt::SolidPattern;
         if(
-            !QJson::deserialize(ctx, map, lit("color"), &color) ||
-            !QJson::deserialize(ctx, map, lit("style"), &style)
+            !QJson::deserialize(ctx, map, QLatin1String("color"), &color) ||
+            !QJson::deserialize(ctx, map, QLatin1String("style"), &style)
         ) {
             return false;
         }

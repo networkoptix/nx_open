@@ -99,8 +99,8 @@ namespace QJsonDetail {
     template<class Element>
     void serialize_collection_element(QnJsonContext *ctx, const Element &element, QJsonValue *target, const QnCollection::map_tag &) {
         QJsonObject map;
-        QJson::serialize(ctx, element.first, lit("key"), &map);
-        QJson::serialize(ctx, element.second, lit("value"), &map);
+        QJson::serialize(ctx, element.first, QLatin1String("key"), &map);
+        QJson::serialize(ctx, element.second, QLatin1String("value"), &map);
         *target = map;
     }
 
@@ -139,10 +139,10 @@ namespace QJsonDetail {
         QJsonObject element = value.toObject();
 
         typename Collection::key_type key;
-        if(!QJson::deserialize(ctx, element, lit("key"), &key))
+        if(!QJson::deserialize(ctx, element, QLatin1String("key"), &key))
             return false;
 
-        if(!QJson::deserialize(ctx, element, lit("value"), &(*target)[key]))
+        if(!QJson::deserialize(ctx, element, QLatin1String("value"), &(*target)[key]))
             return false;
 
         return true;

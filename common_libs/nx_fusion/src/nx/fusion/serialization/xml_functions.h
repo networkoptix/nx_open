@@ -28,20 +28,20 @@ namespace QnXmlDetail {
 
     template<class Element, class Tag>
     void serialize_collection_element(const Element &element, QXmlStreamWriter *stream, const Tag &) {
-        stream->writeStartElement(lit("element"));
+        stream->writeStartElement(QLatin1String("element"));
         QnXml::serialize(element, stream);
         stream->writeEndElement();
     }
 
     template<class Element>
     void serialize_collection_element(const Element &element, QXmlStreamWriter *stream, const QnCollection::map_tag &) {
-        stream->writeStartElement(lit("element"));
+        stream->writeStartElement(QLatin1String("element"));
 
-        stream->writeStartElement(lit("key"));
+        stream->writeStartElement(QLatin1String("key"));
         QnXml::serialize(element.first, stream);
         stream->writeEndElement();
 
-        stream->writeStartElement(lit("value"));
+        stream->writeStartElement(QLatin1String("value"));
         QnXml::serialize(element.second, stream);
         stream->writeEndElement();
 

@@ -1,11 +1,12 @@
 #include "lexical_functions.h"
 
-void serialize(const bool &value, QString *target) {
-    *target = value ? lit("true") : lit("false");
+void serialize(const bool &value, QString *target)
+{
+    *target = value ? QLatin1String("true") : QLatin1String("false");
 }
 
 bool deserialize(const QString &value, bool *target) {
-    /* We also support upper/lower case combinations and "0" & "1" 
+    /* We also support upper/lower case combinations and "0" & "1"
      * during deserialization. */
 
     if(value.isEmpty())
