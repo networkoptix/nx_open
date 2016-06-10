@@ -78,9 +78,6 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
 
     updateFetchButton();
 
-    //TODO: #vkutin Add dynamic update to this column hidden state:
-    ui->usersTable->setColumnHidden(QnUserListModel::UserTypeColumn, true);
-
     m_sortModel->setDynamicSortFilter(true);
     m_sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     m_sortModel->setFilterKeyColumn(-1);
@@ -89,9 +86,9 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
         m_sortModel->setFilterWildcard(text);
     });
 
-    connect(m_sortModel, &QAbstractItemModel::rowsInserted, this,   &QnUserManagementWidget::updateSelection);
-    connect(m_sortModel, &QAbstractItemModel::rowsRemoved,  this,   &QnUserManagementWidget::updateSelection);
-    connect(m_sortModel, &QAbstractItemModel::dataChanged,  this,   &QnUserManagementWidget::updateSelection);
+    connect(m_sortModel, &QAbstractItemModel::rowsInserted, this,   &QnUserManagementWidget::modelUpdated);
+    connect(m_sortModel, &QAbstractItemModel::rowsRemoved,  this,   &QnUserManagementWidget::modelUpdated);
+    connect(m_sortModel, &QAbstractItemModel::dataChanged,  this,   &QnUserManagementWidget::modelUpdated);
 
     setHelpTopic(this,                                                  Qn::SystemSettings_UserManagement_Help);
     setHelpTopic(ui->enableSelectedButton, ui->disableSelectedButton,   Qn::UserSettings_DisableUser_Help);
@@ -111,7 +108,7 @@ void QnUserManagementWidget::loadDataToUi()
     ui->ldapSettingsButton->setEnabled(!qnCommon->isReadOnly());
     ui->createUserButton->setEnabled(!qnCommon->isReadOnly());
     ui->fetchButton->setEnabled(!qnCommon->isReadOnly());
-    updateSelection();
+    modelUpdated();
 }
 
 void QnUserManagementWidget::applyChanges()
@@ -122,6 +119,18 @@ void QnUserManagementWidget::applyChanges()
 bool QnUserManagementWidget::hasChanges() const
 {
     return false;
+}
+
+void QnUserManagementWidget::modelUpdated()
+{
+    ui->usersTable->setColumnHidden(QnUserListModel::UserTypeColumn,
+        !boost::algorithm::any_of(visibleUsers(),
+            [this](const QnUserResourcePtr& user)
+            {
+                return !user->isLocal();
+            }));
+
+    updateSelection();
 }
 
 void QnUserManagementWidget::updateSelection()

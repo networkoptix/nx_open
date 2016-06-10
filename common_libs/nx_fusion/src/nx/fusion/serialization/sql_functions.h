@@ -75,7 +75,7 @@ inline void deserialize_field(const QVariant &value, signed char *target) {
 
 
 inline void serialize_field(const QString &value, QVariant *target) {
-    *target = QVariant::fromValue<QString>(value.isNull() ? QString() : value);
+    *target = QVariant::fromValue<QString>(value.isEmpty() ? QLatin1String("") : value);
 }
 
 inline void serialize_field(const std::string &value, QVariant *target) {

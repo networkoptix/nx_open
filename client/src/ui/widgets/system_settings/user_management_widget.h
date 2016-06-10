@@ -48,6 +48,8 @@ private:
     void createUser();
     void fetchUsers();
     void openLdapSettings();
+
+    void modelUpdated();
     void updateSelection();
 
     void clearSelection();
