@@ -87,6 +87,7 @@ public:
 
     virtual bool setNonBlockingMode(bool val) override;
     virtual bool getNonBlockingMode(bool* val) const override;
+    virtual bool shutdown() override;
 
 protected:
     enum IOMode { ASYNC, SYNC };
