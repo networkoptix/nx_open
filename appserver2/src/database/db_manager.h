@@ -698,9 +698,7 @@ public:
         if (!hasPermission(tran.params, Qn::Permission::SavePermission))
             return ErrorCode::forbidden;
 
-        return detail::QnDbManager::instance()->executeTransactionNoLock(
-                    tran,
-                    std::forward<SerializedTransaction>(serializedTran));
+        return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
     template <template<typename> class Container, typename Param, typename SerializedTransaction>
@@ -750,7 +748,14 @@ private:
     {
         if (m_userAccessData == Qn::kDefaultUserAccess)
             return true;
-        return ec2::hasPermission(m_userAccessData.userId, param, permission);
+        switch (permission)
+        {
+        case Qn::Permission::SavePermission:
+            return ec2::hasModifyPermission(m_userAccessData.userId, param);
+        default:
+            return ec2::hasPermission(m_userAccessData.userId, param, permission);
+        }
+        return false;
     }
 
 private:

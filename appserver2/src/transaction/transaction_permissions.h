@@ -196,6 +196,25 @@ auto hasPermissionImpl(const QnUuid &/*userId*/, const TransactionParamType &/*d
     return true;
 }
 
+template<typename TransactionParamType>
+auto hasModifyPermissionImpl(const QnUuid &userId, const TransactionParamType &data, int) -> nx::utils::SfinaeCheck<decltype(data.id), bool>
+{
+    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+
+    /* Check if resource needs to be created. */
+    QnResourcePtr target = qnResPool->getResourceById(data.id);
+    if (!target)
+        return qnResourceAccessManager->canCreateResource(userResource, data);
+
+    return qnResourceAccessManager->canModifyResource(userResource, target, data);
+}
+
+
+template<typename TransactionParamType>
+auto hasModifyPermissionImpl(const QnUuid &userId, const TransactionParamType &data, char) -> bool
+{
+    return hasPermission(userId, data, Qn::Permission::SavePermission);
+}
 
 } // namespace detail
 
@@ -203,6 +222,12 @@ template<typename TransactionParamType>
 bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission)
 {
     return detail::hasPermissionImpl(userId, data, permission, 0);
+}
+
+template<typename TransactionParamType>
+bool hasModifyPermission(const QnUuid &userId, const TransactionParamType &data)
+{
+    return detail::hasModifyPermissionImpl(userId, data, 0);
 }
 
 } // namespace ec2
