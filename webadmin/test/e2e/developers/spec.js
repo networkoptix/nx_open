@@ -3,30 +3,45 @@ var Page = require('./po.js');
 
 var protractor = require('protractor');
 describe('Developers Page', function () {
-    //it("should stop test",function(){expect("other test").toBe("uncommented");});return;
 
     var p = new Page();
 
-    it("Should show link for api documentation",function(){
+    beforeEach(function() {
         p.get();
+    });
+
+    it("Link for server api documentation is displayed",function() {
         expect(p.apiLink.isDisplayed()).toBe(true);
         expect(p.apiLink.getText()).toMatch("API");
         expect(p.apiLink.getAttribute("href")).toMatch("api.xml");
+        p.apiLink.click();
+
+        p.helper.performAtSecondTab( function() {
+            p.helper.ignoreSyncFor( function() {
+                expect(browser.getCurrentUrl()).toContain('/api.xml'); // Check that url is correct
+            });
+            browser.close();
+        });
     });
 
-    it("Should show sdk video link",function(){
+    // Disabled because /api.xml can not be opened in local build
+    xit("Link for server api documentation opens /static/api.xml",function() {
+        p.apiLink.click();
+        p.helper.performAtSecondTab( function() {
+            expect(p.body.getText()).toContain('This group contains functions ' +
+                'related to whole system (all servers).');
+            browser.close();
+        });
+    });
+
+    it("Sdk video link opens /static/index.html#/sdkeula/sdk, where EULA can be accepted",function(){
         expect(p.sdkLinkVideo.isDisplayed()).toBe(true);
         expect(p.sdkLinkVideo.getText()).toMatch("SDK");
-    });
-
-    it("Should show sdk storage link",function(){
-        expect(p.sdkLinkStorage.isDisplayed()).toBe(true);
-        expect(p.sdkLinkStorage.getText()).toMatch("SDK");
-    });
-
-    it("Should show require sdk eula to be accepted",function(){
-
+        expect(p.sdkLinkVideo.getAttribute("href")).toMatch("sdkeula/sdk");
         p.sdkLinkVideo.click();
+
+        expect(browser.getCurrentUrl()).toContain('sdkeula/sdk'); // Check that url is correct
+        expect(p.body.getText()).toContain('Software Developer Kit End User Licence Agreement');
         expect(p.sdkDownloadButton.isEnabled()).toBe(false);
         expect(p.acceptEulaCheckbox.isSelected()).toBe(false);
         p.acceptEulaCheckbox.click();
@@ -34,4 +49,18 @@ describe('Developers Page', function () {
         expect(p.sdkDownloadButton.isEnabled()).toBe(true);
     });
 
+    it("Sdk storage link opens /static/index.html#/sdkeula/storage_sdk, where EULA can be accepted",function(){
+        expect(p.sdkLinkStorage.isDisplayed()).toBe(true);
+        expect(p.sdkLinkStorage.getText()).toMatch("SDK");
+        expect(p.sdkLinkStorage.getAttribute("href")).toMatch("sdkeula/storage_sdk");
+        p.sdkLinkStorage.click();
+
+        expect(browser.getCurrentUrl()).toContain('sdkeula/storage_sdk'); // Check that url is correct
+        expect(p.body.getText()).toContain('Software Developer Kit End User Licence Agreement');
+        expect(p.sdkDownloadButton.isEnabled()).toBe(false);
+        expect(p.acceptEulaCheckbox.isSelected()).toBe(false);
+        p.acceptEulaCheckbox.click();
+        expect(p.acceptEulaCheckbox.isSelected()).toBe(true);
+        expect(p.sdkDownloadButton.isEnabled()).toBe(true);
+    });
 });
