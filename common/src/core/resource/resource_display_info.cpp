@@ -54,8 +54,6 @@ QString getServerUrl(const QnResourcePtr& resource)
     };
 
     QString baseUrl = extractHost(resource->getUrl());
-    qDebug() << "Main host" << baseUrl;
-
     if (hostIsValid(baseUrl))
         return baseUrl;
 
@@ -68,7 +66,6 @@ QString getServerUrl(const QnResourcePtr& resource)
     for (auto address : allAddresses)
     {
         QString host = address.address.toString();
-        qDebug() << "Checking host" << host;
         if (hostIsValid(host))
             return host;
     }
