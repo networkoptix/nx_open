@@ -2188,37 +2188,37 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     messageParts << tr("Some components of the system are not updated");
     messageParts << QString();
 
-    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData())
+    for(const QnAppInfoMismatchData &data: watcher->mismatchData())
     {
-        QString component;
+        QString componentName;
         switch (data.component)
         {
             case Qn::ClientComponent:
-                component = tr("Client v%1").arg(data.version.toString());
+                componentName = tr("Client");
                 break;
             case Qn::ServerComponent:
             {
                 QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
-                if (resource)
-                {
-                    /* Consistency with 'About' dialog. */
-                    component = tr("%1: v%2").arg(QnResourceDisplayInfo(resource).toString(Qn::RI_WithUrl), data.version.toString());
-                }
-                else
-                {
-                    component = tr("Server v%1").arg(data.version.toString());
-                }
+                componentName = resource ? QnResourceDisplayInfo(resource).toString(Qn::RI_WithUrl) : tr("Server");
+                break;
             }
             default:
                 break;
         }
+        NX_ASSERT(!componentName.isEmpty());
+        if (componentName.isEmpty())
+            continue;
+
+        QString version = data.version.toString();
 
         bool updateRequested = (data.component == Qn::ServerComponent) &&
             QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
         if (updateRequested)
-            component = setWarningStyleHtml(component);
+            version = setWarningStyleHtml(version);
 
+        /* Consistency with 'About' dialog. */
+        QString component = lit("%1: v%2").arg(componentName, version);
         messageParts << component;
     }
 
