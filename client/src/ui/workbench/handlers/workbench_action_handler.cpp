@@ -2165,7 +2165,8 @@ void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
     QDesktopServices::openUrl(QUrl::fromUserInput(url));
 }
 
-void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
+void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
+{
     if (qnCommon->isReadOnly())
         return;
 
@@ -2173,7 +2174,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         return;
 
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
-    if(!watcher->hasMismatches())
+    if (!watcher->hasMismatches())
         return;
 
     QnSoftwareVersion latestVersion = watcher->latestVersion();
@@ -2187,22 +2188,29 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     messageParts << tr("Some components of the system are not updated");
     messageParts << QString();
 
-    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData()) {
+    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData())
+    {
         QString component;
-        switch(data.component) {
-        case Qn::ClientComponent:
-            component = tr("Client v%1").arg(data.version.toString());
-            break;
-        case Qn::ServerComponent: {
-            QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
-            if(resource) {
-                component = tr("Server v%1 at %2").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
-            } else {
-                component = tr("Server v%1").arg(data.version.toString());
+        switch (data.component)
+        {
+            case Qn::ClientComponent:
+                component = tr("Client v%1").arg(data.version.toString());
+                break;
+            case Qn::ServerComponent:
+            {
+                QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
+                if (resource)
+                {
+                    /* Consistency with 'About' dialog. */
+                    component = tr("%1: v%2").arg(QnResourceDisplayInfo(resource).toString(Qn::RI_WithUrl), data.version.toString());
+                }
+                else
+                {
+                    component = tr("Server v%1").arg(data.version.toString());
+                }
             }
-        }
-        default:
-            break;
+            default:
+                break;
         }
 
         bool updateRequested = (data.component == Qn::ServerComponent) &&
@@ -2229,7 +2237,8 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 
     QPushButton *updateButton = messageBox->addButton(tr("Update..."), QDialogButtonBox::HelpRole);
-    connect(updateButton, &QPushButton::clicked, this, [this] {
+    connect(updateButton, &QPushButton::clicked, this, [this]
+    {
         menu()->trigger(QnActions::SystemUpdateAction);
     }, Qt::QueuedConnection);
 
