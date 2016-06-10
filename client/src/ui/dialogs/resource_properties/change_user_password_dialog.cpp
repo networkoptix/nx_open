@@ -4,6 +4,7 @@
 #include <core/resource/user_resource.h>
 
 #include <ui/common/aligner.h>
+#include <ui/widgets/common/password_strength_indicator.h>
 #include <ui/workbench/workbench_context.h>
 
 
@@ -16,13 +17,7 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
 
     ui->newPasswordInputField->setTitle(tr("New Password"));
     ui->newPasswordInputField->setEchoMode(QLineEdit::Password);
-    ui->newPasswordInputField->setValidator([](const QString& text)
-    {
-        if (text.trimmed() != text)
-            return Qn::ValidationResult(tr("Avoid leading and trailing spaces."));
-
-        return Qn::kValidResult;
-    });
+    ui->newPasswordInputField->setPasswordIndicatorEnabled(true);
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
@@ -41,9 +36,6 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
     ui->currentPasswordInputField->setEchoMode(QLineEdit::Password);
     ui->currentPasswordInputField->setValidator([this](const QString& text)
     {
-        if (ui->newPasswordInputField->text().isEmpty())
-            return Qn::kValidResult;
-
         if (text.isEmpty())
             return Qn::ValidationResult(tr("To modify your password, please enter the existing one."));
 
@@ -64,13 +56,34 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
 }
 
 QnChangeUserPasswordDialog::~QnChangeUserPasswordDialog()
-{}
+{
+}
 
 QString QnChangeUserPasswordDialog::newPassword() const
 {
     for (QnInputField* field : { ui->newPasswordInputField, ui->confirmPasswordInputField, ui->currentPasswordInputField })
+    {
         if (!field->isValid())
             return QString();
+    }
+
     return ui->newPasswordInputField->text();
 }
 
+bool QnChangeUserPasswordDialog::validate()
+{
+    bool result = true;
+
+    for (QnInputField* field : { ui->newPasswordInputField, ui->confirmPasswordInputField, ui->currentPasswordInputField })
+        result = field->validate() && result;
+
+    return result;
+}
+
+void QnChangeUserPasswordDialog::done(int r)
+{
+    if (r == Accepted && !validate())
+        return;
+
+    base_type::done(r);
+}

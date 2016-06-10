@@ -230,6 +230,7 @@
 #include "rest/handlers/exec_script_rest_handler.h"
 #include "rest/handlers/script_list_rest_handler.h"
 #include "cloud/cloud_connection_manager.h"
+#include "cloud/cloud_system_name_updater.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <nx_speach_synthesizer/text_to_wav.h>
@@ -624,13 +625,16 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
     return result.values();
 }
 
-void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddress, int port)
+void setServerNameAndUrls(
+    QnMediaServerResourcePtr server,
+    const QString& myAddress, int port, bool isSslAllowed)
 {
     if (server->getName().isEmpty())
         server->setName(QString("Server ") + getMacFromPrimaryIF());
 
+    const auto apiSheme = isSslAllowed ? QString("https") : QString("https");
     server->setUrl(QString("rtsp://%1:%2").arg(myAddress).arg(port));
-    server->setApiUrl(QString("http://%1:%2").arg(myAddress).arg(port));
+    server->setApiUrl(QString("%1://%2:%3").arg(apiSheme).arg(myAddress).arg(port));
 }
 
 QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectionPtr ec2Connection)
@@ -1009,8 +1013,9 @@ void MediaServerProcess::updateAddressesList()
         if (!serverAddresses.isEmpty())
             newAddress = serverAddresses.front();
 
-        setServerNameAndUrls(m_mediaServer,
-                             newAddress.address.toString(), newAddress.port);
+        setServerNameAndUrls(
+            m_mediaServer, newAddress.address.toString(), newAddress.port,
+            qnCommon->moduleInformation().sslAllowed);
     }
 
     ec2::ApiMediaServerData server;
@@ -1110,7 +1115,6 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             messageProcessor->updateResource( storage );
 
             // initialize storage immediately in sync mode
-            // todo: remove this call. Need refactor
             if (QnStorageResourcePtr qnStorage = qnResPool->getResourceById(storage.id).dynamicCast<QnStorageResource>())
             {
                 if (qnStorage->getParentId() == qnCommon->moduleGUID())
@@ -1764,6 +1768,7 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
     CloudConnectionManager cloudConnectionManager;
+    CloudSystemNameUpdater cloudSystemNameUpdater(&cloudConnectionManager);
     auto authHelper = std::make_unique<QnAuthHelper>(&cloudConnectionManager);
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
@@ -1974,6 +1979,10 @@ void MediaServerProcess::run()
         QFile::remove(closeDirPath(getDataDirectory()) + "/ecs.sqlite");
 
         // kill itself to restart
+#ifdef Q_OS_WIN
+        HANDLE hProcess = GetCurrentProcess();
+        TerminateProcess(hProcess, ERROR_SERVICE_SPECIFIC_ERROR);
+#endif
         abort();
         return;
     }
@@ -2097,7 +2106,10 @@ void MediaServerProcess::run()
         if (m_universalTcpListener->getPort() != server->getPort())
             isModified = true;
 
-        setServerNameAndUrls(server, defaultLocalAddress(appserverHost), m_universalTcpListener->getPort());
+        setServerNameAndUrls(
+            server, defaultLocalAddress(appserverHost),
+            m_universalTcpListener->getPort(),
+            qnCommon->moduleInformation().sslAllowed);
 
         QList<SocketAddress> serverAddresses;
         const auto port = server->getPort();

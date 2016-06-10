@@ -36,7 +36,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
 
     ui->loginInputField->setTitle(tr("Login"));
     ui->nameInputField->setTitle(tr("Name"));
-    ui->groupInputField->setTitle(tr("Group"));
+    ui->groupInputField->setTitle(tr("Role"));
 
     ui->emailInputField->setTitle(tr("Email"));
     ui->emailInputField->setValidator(Qn::defaultEmailValidator());
@@ -74,7 +74,8 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
 }
 
 QnUserProfileWidget::~QnUserProfileWidget()
-{}
+{
+}
 
 bool QnUserProfileWidget::hasChanges() const
 {

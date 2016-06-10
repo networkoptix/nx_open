@@ -176,6 +176,11 @@ void SocketFactory::enforceSsl( bool isEnforced )
     qWarning() << ">>> SocketFactory::enforceSsl(" << isEnforced << ") <<<";
 }
 
+bool SocketFactory::isSslEnforced()
+{
+    return s_isSslEnforced;
+}
+
 SocketFactory::CreateStreamSocketFuncType
     SocketFactory::setCreateStreamSocketFunc(
         CreateStreamSocketFuncType newFactoryFunc)

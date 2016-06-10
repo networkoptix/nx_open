@@ -149,7 +149,7 @@
                 <File Id="nx_utils.dll" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="4" />
             </Component>
             <Component>
-                <File Id="nx_vms_utils.dll" Name="nx_vms_utils.dll" Source="$(var.SourceDir)/nx_vms_utils.dll" DiskId="4" />
+                <File Id="nx_vms_utils.dll" Name="nx_vms_utils.dll" Source="$(var.SourceDir)/nx_vms_utils.dll" DiskId="13" />
             </Component>            
             <Component>
                 <File Id="nx_network.dll" Name="nx_network.dll" Source="$(var.SourceDir)/nx_network.dll" DiskId="4" />

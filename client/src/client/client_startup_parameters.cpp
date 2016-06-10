@@ -97,8 +97,11 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
-    result.customUri = nx::vms::utils::SystemUri(strCustomUri);
-    result.customUri.setProtocol(nx::vms::utils::SystemUri::Protocol::Native);     /*< Restore protocol part that was cut out. */
+    if (!strCustomUri.isEmpty())
+    {
+        result.customUri = nx::vms::utils::SystemUri(strCustomUri);
+        result.customUri.setProtocol(nx::vms::utils::SystemUri::Protocol::Native);     /*< Restore protocol part that was cut out. */
+    }
     result.videoWallGuid = QnUuid(strVideoWallGuid);
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
 

@@ -11,9 +11,9 @@ QnWorkbenchUserEmailWatcher::QnWorkbenchUserEmailWatcher(QObject *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
-    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
+    connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(qnResPool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    foreach(const QnResourcePtr &resource, qnResPool->getResources())
         at_resourcePool_resourceAdded(resource);
 
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchUserEmailWatcher::forceCheckAll);

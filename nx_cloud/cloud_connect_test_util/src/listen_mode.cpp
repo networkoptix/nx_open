@@ -221,6 +221,12 @@ int runInListenMode(const std::multimap<QString, QString>& args)
 
     if (args.find("ssl") != args.end())
     {
+        if (transmissionMode == test::TestTransmissionMode::spam)
+        {
+            std::cerr << "error. Spam mode does not support SSL, use --ping" << std::endl;
+            return 7;
+        }
+
         const auto certificate = network::SslEngine::makeCertificateAndKey(
             "cloud_connect_test_util", "US", "NX");
 

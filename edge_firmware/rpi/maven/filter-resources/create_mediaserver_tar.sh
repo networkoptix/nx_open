@@ -11,14 +11,6 @@ set -e
 #     echo
 # }
 
-# function get_var()
-# {
-#     local h="`grep -R $1 $SRC_DIR/mediaserver/arm/version.h | sed 's/.*"\(.*\)".*/\1/'`"
-#     if [[ "$1" == "QN_CUSTOMIZATION_NAME" && "$h" == "default" ]]; then
-#         h=networkoptix
-#     fi
-#     echo "$h"
-# }
 
 PACKAGES_ROOT=$environment/packages/${box}
 TOOLCHAIN_ROOT=$environment/packages/${box}/gcc-${gcc.version}
@@ -95,6 +87,7 @@ libnx_email \
 libnx_network \
 libnx_streaming \
 libnx_utils \
+libnx_vms_utils \
 libudt )
 
 #additional libs for nx1 client
