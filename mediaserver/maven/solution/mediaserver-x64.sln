@@ -54,6 +54,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_utils-x64", "..\common_l
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_speach_synthesizer-x64", "${basedir}\..\common_libs\nx_speach_synthesizer\src\nx_speach_synthesizer-x64.vcxproj", "${nx_speach_synthesizer.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+		${common.guid} = ${common.guid}
+		${nx_utils.guid} = ${nx_utils.guid}
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cloud_db_client-x64", "..\nx_cloud\cloud_db_client\src\cloud_db_client-x64.vcxproj", "${cloud_db_client.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${nx_utils.guid} = ${nx_utils.guid}
@@ -102,6 +108,10 @@ Global
 		${nx_fusion.guid}.Debug|x64.Build.0 = Debug|x64
 		${nx_fusion.guid}.Release|x64.ActiveCfg = Release|x64
 		${nx_fusion.guid}.Release|x64.Build.0 = Release|x64
+		${nx_speach_synthesizer.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_speach_synthesizer.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_speach_synthesizer.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_speach_synthesizer.guid}.Release|x64.Build.0 = Release|x64
 		${nx_utils.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${nx_utils.guid}.Debug|x64.Build.0 = Debug|x64
 		${nx_utils.guid}.Release|x64.ActiveCfg = Release|x64

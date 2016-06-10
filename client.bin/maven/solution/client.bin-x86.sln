@@ -47,6 +47,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_audio-x86", "${basedir}\
 		${nx_utils.guid} = ${nx_utils.guid}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_speach_synthesizer-x86", "${basedir}\..\common_libs\nx_speach_synthesizer\src\nx_speach_synthesizer-x86.vcxproj", "${nx_speach_synthesizer.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+		${common.guid} = ${common.guid}
+		${nx_utils.guid} = ${nx_utils.guid}
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_network-x86", "${basedir}\..\common_libs\nx_network\src\nx_network-x86.vcxproj", "${nx_network.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${common.guid} = ${common.guid}
@@ -107,7 +113,7 @@ Global
 		${nx_audio.guid}.Debug|Win32.ActiveCfg = Debug|Win32
 		${nx_audio.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_audio.guid}.Release|Win32.ActiveCfg = Release|Win32
-		${nx_audio.guid}.Release|Win32.Build.0 = Release|Win32		
+		${nx_audio.guid}.Release|Win32.Build.0 = Release|Win32
 		${nx_network.guid}.Debug|Win32.ActiveCfg = Debug|Win32
 		${nx_network.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_network.guid}.Release|Win32.ActiveCfg = Release|Win32
@@ -115,7 +121,7 @@ Global
 		${udt.guid}.Debug|Win32.ActiveCfg = Debug|Win32
 		${udt.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${udt.guid}.Release|Win32.ActiveCfg = Release|Win32
-		${udt.guid}.Release|Win32.Build.0 = Release|Win32		
+		${udt.guid}.Release|Win32.Build.0 = Release|Win32
 		${nx_utils.guid}.Debug|Win32.ActiveCfg = Debug|Win32
 		${nx_utils.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_utils.guid}.Release|Win32.ActiveCfg = Release|Win32
@@ -124,6 +130,10 @@ Global
 		${nx_fusion.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_fusion.guid}.Release|Win32.ActiveCfg = Release|Win32
 		${nx_fusion.guid}.Release|Win32.Build.0 = Release|Win32
+		${nx_speach_synthesizer.guid}.Debug|Win32.ActiveCfg = Debug|Win32
+		${nx_speach_synthesizer.guid}.Debug|Win32.Build.0 = Debug|Win32
+		${nx_speach_synthesizer.guid}.Release|Win32.ActiveCfg = Release|Win32
+		${nx_speach_synthesizer.guid}.Release|Win32.Build.0 = Release|Win32
 		${nx_vms_utils.guid}.Debug|Win32.ActiveCfg = Debug|Win32
 		${nx_vms_utils.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_vms_utils.guid}.Release|Win32.ActiveCfg = Release|Win32
