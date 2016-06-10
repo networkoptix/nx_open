@@ -41,7 +41,7 @@ public:
 
     const QnPasswordStrengthIndicator* passwordIndicator() const;
     bool passwordIndicatorEnabled() const;
-    void setPasswordIndicatorEnabled(bool enabled, bool showImmediately = false);
+    void setPasswordIndicatorEnabled(bool enabled, bool hideForEmptyInput = true, bool showImmediately = false);
 
     bool isReadOnly() const;
     void setReadOnly(bool value);
@@ -52,6 +52,23 @@ public:
     bool lastValidationResult() const;
 
     void setValidator(Qn::TextValidateFunction validator, bool validateImmediately = false);
+
+    bool emptyInputAllowed() const;
+    const QString& emptyInputHint() const;
+    void setEmptyInputAllowed(bool enabled, const QString& hint = QString());
+
+    bool terminalSpacesAllowed() const;
+    const QString& terminalSpacesHint() const;
+    void setTerminalSpacesAllowed(bool allow, const QString& hint = QString());
+
+    void setPasswordMode(QLineEdit::EchoMode echoMode, bool allowEmptyPassword, bool showStrengthIndicator);
+
+    bool confirmationMode() const;
+    const QnInputField* confirmationPrimaryField() const;
+    const QString& confirmationFailureHint() const;
+    void setConfirmationMode(const QnInputField* primaryField, const QString& hint = QString());
+
+    void reset();
 
     static AbstractAccessor* createLabelWidthAccessor();
 
