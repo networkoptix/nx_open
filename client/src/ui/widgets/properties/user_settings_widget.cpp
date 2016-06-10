@@ -124,6 +124,9 @@ void QnUserSettingsWidget::loadDataToUi()
     ui->confirmPasswordInputField->clear();
     ui->enabledButton->setChecked(m_model->user()->isEnabled());
     ui->permissionsLabel->setText(m_model->permissionsDescription());
+
+    for (auto field : inputFields())
+        field->reset();
 }
 
 void QnUserSettingsWidget::applyChanges()
@@ -212,36 +215,24 @@ void QnUserSettingsWidget::setupInputFields()
     ui->emailInputField->setValidator(Qn::defaultEmailValidator());
 
     ui->passwordInputField->setTitle(tr("Password"));
-    ui->passwordInputField->setEchoMode(QLineEdit::Password);
-    ui->passwordInputField->setPasswordIndicatorEnabled(true);
+    ui->passwordInputField->setPasswordMode(QLineEdit::Password, m_model->mode() != QnUserSettingsModel::NewUser, true);
     ui->passwordInputField->setValidator([this](const QString& text)
     {
         /* Show warning message if admin has renamed an existing user and has not entered new password. */
-        if (m_model->mode() == QnUserSettingsModel::OtherSettings
-            && ui->loginInputField->text().trimmed() != m_model->user()->getName()
-            && text.isEmpty()
-            )
+        if (m_model->mode() == QnUserSettingsModel::OtherSettings &&
+            ui->loginInputField->text() != m_model->user()->getName() &&
+            text.isEmpty())
+        {
             return Qn::ValidationResult(tr("User has been renamed. Password must be updated."));
+        }
 
-        /* Show warning if have not entered password for the new user. */
-        if (m_model->mode() == QnUserSettingsModel::NewUser && text.isEmpty())
-            return Qn::ValidationResult(tr("Password cannot be empty."));
-
+        /* Further validation will be done by password strength indicator. */
         return Qn::kValidResult;
     });
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
-    ui->confirmPasswordInputField->setValidator([this](const QString& text)
-    {
-        if (ui->passwordInputField->text().isEmpty())
-            return Qn::kValidResult;
-
-        if (ui->passwordInputField->text() != text)
-            return Qn::ValidationResult(tr("Passwords do not match."));
-
-        return Qn::kValidResult;
-    });
+    ui->confirmPasswordInputField->setConfirmationMode(ui->passwordInputField, tr("Passwords do not match."));
 
     for (auto field : inputFields())
         connect(field, &QnInputField::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
@@ -318,7 +309,7 @@ void QnUserSettingsWidget::updateAccessRightsPresets()
             addCustomGroup(group);
     }
 
-    addBuiltInGroup(tr("Custom..."), Qn::NoGlobalPermissions);
+    addBuiltInGroup(tr("Custom"), Qn::NoGlobalPermissions);
 
     /* If there is only one entry in permissions combobox, this check doesn't matter. */
     int customPermissionsIndex = ui->roleComboBox->count() - 1;
