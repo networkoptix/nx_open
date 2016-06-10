@@ -22,9 +22,17 @@ QIODevice *QnDbStorageResource::open(const QString &fileName, QIODevice::OpenMod
 {
     m_filePath = removeProtocolPrefix(fileName);
 
-    QnAppServerConnectionFactory::getConnection2()
-        ->getStoredFileManager()
-        ->getStoredFileSync(m_filePath, &m_fileData);
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+
+    if (!connection)
+        return nullptr;
+
+    auto fileManager = connection->getStoredFileManager();
+
+    if (!fileManager)
+        return nullptr;
+
+    fileManager->getStoredFileSync(m_filePath, &m_fileData);
 
     QBuffer* buffer = new QBuffer();
     buffer->setBuffer(&m_fileData);
