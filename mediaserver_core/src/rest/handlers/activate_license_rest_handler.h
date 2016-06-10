@@ -2,7 +2,7 @@
 #define QN_ACTIVATE_LICENSE_REST_HANDLER_H
 
 #include <rest/server/json_rest_handler.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/simple_http_client.h>
 
 class QnActivateLicenseRestHandler: public QnJsonRestHandler {

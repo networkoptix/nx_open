@@ -15,7 +15,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
 #include <utils/common/qtimespan.h>
 #include <utils/common/synctime.h>
 #include <utils/tz/tz.h>

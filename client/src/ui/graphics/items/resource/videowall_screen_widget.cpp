@@ -28,7 +28,7 @@
 #include <ui/style/skin.h>
 
 #include <utils/common/warnings.h>
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
 
 QnVideowallScreenWidget::QnVideowallScreenWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     base_type(context, item, parent),

@@ -13,7 +13,7 @@
 
 #include <libvms_gateway_app_info.h>
 #include <nx/utils/timer_manager.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <utils/common/app_info.h>
 
 

@@ -7,8 +7,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include "motion/motion_helper.h"
-#include <utils/serialization/json.h>
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include "core/resource_management/resource_pool.h"
 
 #include <vector>

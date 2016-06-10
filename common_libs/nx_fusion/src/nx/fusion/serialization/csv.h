@@ -1,7 +1,7 @@
 #ifndef QN_SERIALIZATION_CSV_H
 #define QN_SERIALIZATION_CSV_H
 
-#include <utils/serialization/serialization.h>
+#include <nx/fusion/serialization/serialization.h>
 
 #include "csv_fwd.h"
 #include "csv_stream.h"

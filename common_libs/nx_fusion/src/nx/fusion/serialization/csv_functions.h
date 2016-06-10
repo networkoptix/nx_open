@@ -15,7 +15,7 @@
 #include <nx/utils/uuid.h>
 #include <QtCore/QUrl>
 
-#include <utils/common/latin1_array.h>
+#include <nx/utils/latin1_array.h>
 
 #include "collection_fwd.h"
 #include "csv.h"

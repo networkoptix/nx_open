@@ -8,7 +8,7 @@
 #include <boost/mpl/has_xxx.hpp>
 #endif 
 
-#include <utils/common/type_traits.h>
+#include <nx/utils/type_traits.h>
 
 #include "fusion_fwd.h"
 #include "fusion_keys.h"

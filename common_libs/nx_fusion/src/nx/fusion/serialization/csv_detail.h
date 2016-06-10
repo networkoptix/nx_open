@@ -10,7 +10,7 @@
 #include <boost/mpl/or.hpp>
 #endif // Q_MOC_RUN
 
-#include <utils/common/type_traits.h>
+#include <nx/utils/type_traits.h>
 
 #include "csv_fwd.h"
 

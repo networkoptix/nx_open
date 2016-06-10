@@ -13,7 +13,7 @@
 
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/from_this_to_shared.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <utils/common/id.h>
 
 #include <core/ptz/ptz_fwd.h>

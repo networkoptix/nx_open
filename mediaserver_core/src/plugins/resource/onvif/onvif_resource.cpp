@@ -45,7 +45,7 @@
 #include <plugins/resource/onvif/imaging/onvif_imaging_proxy.h>
 #include <plugins/resource/onvif/onvif_maintenance_proxy.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)

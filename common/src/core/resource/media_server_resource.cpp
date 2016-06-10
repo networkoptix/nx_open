@@ -27,7 +27,7 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/socket_global.h>
 #include "network/networkoptixmodulerevealcommon.h"
-#include "utils/serialization/lexical.h"
+#include "nx/fusion/serialization/lexical.h"
 #include "api/server_rest_connection.h"
 
 namespace {

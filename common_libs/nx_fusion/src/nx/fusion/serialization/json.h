@@ -9,7 +9,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
-#include <utils/serialization/serialization.h>
+#include <nx/fusion/serialization/serialization.h>
 
 #include "json_fwd.h"
 
@@ -19,7 +19,7 @@ namespace QJsonDetail {
     void serialize_json(const QJsonValue &value, QByteArray *target, QJsonDocument::JsonFormat format = QJsonDocument::Compact);
     bool deserialize_json(const QByteArray &value, QJsonValue *target);
 
-    struct StorageInstance { 
+    struct StorageInstance {
         QnSerializerStorage<QnJsonSerializer> *operator()() const;
     };
 } // namespace QJsonDetail
@@ -40,7 +40,7 @@ class QnDefaultJsonSerializer: public QnDefaultContextSerializer<T, QnJsonSerial
 namespace QJson {
     /**
      * Serializes the given value into intermediate JSON representation.
-     * 
+     *
      * \param ctx                       JSON context to use.
      * \param value                     Value to serialize.
      * \param[out] target               Target JSON value, must not be NULL.
@@ -69,7 +69,7 @@ namespace QJson {
 
     /**
      * Serializes the given value into a JSON string.
-     * 
+     *
      * \param ctx                       JSON context to use.
      * \param value                     Value to serialize.
      * \param[out] target               Target JSON string, must not be NULL.
@@ -111,7 +111,7 @@ namespace QJson {
      * Deserializes the given intermediate representation of a JSON object.
      * Note that <tt>std::enable_if</tt> is used to prevent implicit conversions
      * in the first argument.
-     * 
+     *
      * \param ctx                       JSON context to use.
      * \param value                     Intermediate JSON representation to deserialize.
      * \param[out] target               Deserialization target, must not be NULL.
@@ -140,7 +140,7 @@ namespace QJson {
 
             bool ok = QJson::deserialize(ctx, *pos, target);
             if (!ok && !optional)
-                qCritical() << lit("Can't deserialize field \"%1\" from value \"%2\"").arg(key).arg(pos.value().toString());
+                qCritical() << QString("Can't deserialize field \"%1\" from value \"%2\"").arg(key).arg(pos.value().toString());
 
             return ok || optional;
         }
@@ -148,7 +148,7 @@ namespace QJson {
 
     /**
      * Deserializes a value from a JSON string.
-     * 
+     *
      * \param ctx                       JSON context to use.
      * \param value                     JSON string to deserialize.
      * \param[out] target               Deserialization target, must not be NULL.

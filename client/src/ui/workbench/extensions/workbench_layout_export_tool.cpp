@@ -28,7 +28,7 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/local_file_cache.h>
 

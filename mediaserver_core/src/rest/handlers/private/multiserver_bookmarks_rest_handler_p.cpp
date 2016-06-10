@@ -14,7 +14,7 @@
 #include <rest/helpers/request_helpers.h>
 #include <rest/server/rest_connection_processor.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>

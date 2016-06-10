@@ -13,7 +13,7 @@
 #endif // Q_MOC_RUN
 
 #include <utils/preprocessor/variadic_seq_for_each.h>
-#include <utils/common/type_traits.h>
+#include <nx/utils/type_traits.h>
 
 #include "fusion_fwd.h"
 #include "fusion_detail.h"

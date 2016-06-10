@@ -4,7 +4,7 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 
 QnParticleItem::QnParticleItem(QGraphicsItem *parent):
     base_type(parent)

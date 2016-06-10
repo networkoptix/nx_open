@@ -1,7 +1,7 @@
 
 #include "users_statistics_module.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include <core/resource/user_resource.h>
 #include <ui/workbench/workbench_context.h>

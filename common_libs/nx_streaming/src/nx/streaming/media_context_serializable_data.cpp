@@ -2,7 +2,7 @@
 
 #include <nx/utils/log/assert.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/media/av_codec_helper.h>
 
 #define QnMediaContextSerializableData_Fields \

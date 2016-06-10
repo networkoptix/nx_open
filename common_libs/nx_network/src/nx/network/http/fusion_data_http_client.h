@@ -14,8 +14,8 @@
 #include <common/common_globals.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <utils/serialization/json.h>
-#include <utils/serialization/lexical_functions.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/lexical_functions.h>
 
 
 namespace nx_http {

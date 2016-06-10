@@ -10,7 +10,7 @@
 #include <onvif/soapImagingBindingProxy.h>
 #include <onvif/soapPTZBindingProxy.h>
 #include <plugins/resource/onvif/onvif_resource.h>
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 
 #include "soap_wrapper.h"
 

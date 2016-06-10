@@ -13,9 +13,9 @@
 #include <vector>
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
-#include <utils/fusion/fusion_fwd.h>
+#include <nx/fusion/fusion/fusion_fwd.h>
 
 #include <cloud_db_client/src/data/system_data.h>
 

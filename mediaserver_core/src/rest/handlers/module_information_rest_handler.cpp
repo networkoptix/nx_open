@@ -4,7 +4,7 @@
 #include <core/resource/media_server_resource.h>
 #include <network/tcp_connection_priv.h>
 #include <network/module_information.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <common/common_module.h>
 
 #include <nx/network/socket_common.h>

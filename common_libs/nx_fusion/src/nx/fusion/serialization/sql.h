@@ -6,7 +6,7 @@
 #include <QtSql/QSqlRecord>
 #include <QtSql/QSqlQuery>
 
-#include <utils/common/conversion_wrapper.h>
+#include <nx/utils/conversion_wrapper.h>
 #include <nx/utils/log/assert.h>
 
 #include "sql_fwd.h"

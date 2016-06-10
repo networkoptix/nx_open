@@ -2,7 +2,7 @@
 #define BUSINESS_ACTION_PARAMETERS_H
 
 #include <business/business_fwd.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 #include <nx/utils/uuid.h>
 

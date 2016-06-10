@@ -5,7 +5,7 @@
 
 #include "ubjson.h"
 
-#include <utils/fusion/fusion_serialization.h>
+#include <nx/fusion/fusion/fusion_serialization.h>
 
 namespace QnUbjsonDetail {
     template<class Output>

@@ -8,7 +8,7 @@
 
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
 

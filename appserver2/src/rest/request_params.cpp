@@ -9,7 +9,7 @@
 
 #include <nx_ec/data/api_connection_data.h>
 #include <nx_ec/data/api_stored_file_data.h>
-#include <utils/serialization/lexical_functions.h>
+#include <nx/fusion/serialization/lexical_functions.h>
 
 
 namespace ec2

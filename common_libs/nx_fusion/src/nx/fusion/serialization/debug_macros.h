@@ -1,7 +1,7 @@
 #ifndef QN_SERIALIZATION_DEBUG_MACROS_H
 #define QN_SERIALIZATION_DEBUG_MACROS_H
 
-#include <utils/fusion/fusion.h>
+#include <nx/fusion/fusion/fusion.h>
 
 namespace QnDebugSerialization {
     class SerializationVisitor {

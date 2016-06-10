@@ -3,7 +3,7 @@
 
 #include <QtCore/QXmlStreamWriter>
 
-#include <utils/serialization/serialization.h>
+#include <nx/fusion/serialization/serialization.h>
 
 #include "xml_fwd.h"
 

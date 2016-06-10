@@ -14,7 +14,7 @@
 #include <nx/network/http/server/http_server_connection.h>
 
 #include <cloud_db_client/src/data/types.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include "access_control/authorization_manager.h"
 #include "access_control/auth_types.h"

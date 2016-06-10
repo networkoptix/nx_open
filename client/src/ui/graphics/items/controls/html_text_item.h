@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QGraphicsWidget>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 class QnHtmlTextItemPrivate;
 

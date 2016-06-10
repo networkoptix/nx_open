@@ -10,9 +10,9 @@
 #endif
 
 #include <nx/utils/log/assert.h>
-#include <utils/common/conversion_wrapper.h>
-#include <utils/common/flat_map.h>
-#include <utils/common/synchronized_flat_storage.h>
+#include <nx/utils/conversion_wrapper.h>
+#include <nx/utils/flat_map.h>
+#include <nx/utils/synchronized_flat_storage.h>
 
 
 namespace QnSerializationDetail {

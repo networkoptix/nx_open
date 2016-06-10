@@ -1,7 +1,7 @@
 #ifndef QN_SERIALIZATION_BINARY_MACROS_H
 #define QN_SERIALIZATION_BINARY_MACROS_H
 
-#include <utils/fusion/fusion_serialization.h>
+#include <nx/fusion/fusion/fusion_serialization.h>
 
 #include "binary.h"
 

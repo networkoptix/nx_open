@@ -2,7 +2,7 @@
 #define __QN_AUTH_SESSION_H__
 
 #include <nx/utils/uuid.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 struct QnAuthSession
 {

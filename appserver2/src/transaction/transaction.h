@@ -8,11 +8,11 @@
 #include "nx_ec/ec_api.h"
 #endif
 
-#include "utils/serialization/binary.h"
-#include "utils/serialization/json.h"
-#include "utils/serialization/xml.h"
-#include "utils/serialization/csv.h"
-#include "utils/serialization/ubjson.h"
+#include "nx/fusion/serialization/binary.h"
+#include "nx/fusion/serialization/json.h"
+#include "nx/fusion/serialization/xml.h"
+#include "nx/fusion/serialization/csv.h"
+#include "nx/fusion/serialization/ubjson.h"
 #include "common/common_module.h"
 
 namespace ec2

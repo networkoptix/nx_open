@@ -1,6 +1,6 @@
 ﻿#include "action_parameter_types.h"
 
-#include <utils/common/flat_map.h>
+#include <nx/utils/flat_map.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_resource.h>

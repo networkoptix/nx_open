@@ -21,8 +21,8 @@
 #include <utils/common/string.h>
 #include <utils/common/sync_call.h>
 #include <utils/crypt/linux_passwd_crypt.h>
-#include <utils/serialization/json.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/lexical.h>
 
 
 namespace nx {

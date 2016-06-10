@@ -14,7 +14,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx_ec/data/api_data.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <network/router.h>
 #include <http/custom_headers.h>
 #include <nx/network/http/httptypes.h>

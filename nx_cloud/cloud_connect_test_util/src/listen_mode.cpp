@@ -9,7 +9,7 @@
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/string.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
 namespace cctu {

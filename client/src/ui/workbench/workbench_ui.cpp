@@ -89,7 +89,7 @@
 #include "workbench_access_controller.h"
 #include "workbench_pane_settings.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #ifdef _DEBUG
 //#define QN_DEBUG_WIDGET

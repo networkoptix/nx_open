@@ -15,7 +15,7 @@
 #include "api/app_server_connection.h"
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/app_info.h>
 #include "llutil/hardware_id.h"
 

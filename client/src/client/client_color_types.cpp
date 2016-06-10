@@ -3,10 +3,10 @@
 #include <ui/style/globals.h>
 
 #include <utils/math/color_transformations.h>
-#include <utils/serialization/json_functions.h>
-#include <utils/fusion/fusion_adaptor.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/fusion/fusion_adaptor.h>
 #include <utils/math/math.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QnTimeSliderColors::QnTimeSliderColors() {
     positionMarker = QColor(255, 255, 255, 196);

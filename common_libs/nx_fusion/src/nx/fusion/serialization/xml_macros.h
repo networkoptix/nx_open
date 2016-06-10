@@ -3,7 +3,7 @@
 
 #include "xml.h"
 
-#include <utils/fusion/fusion.h>
+#include <nx/fusion/fusion/fusion.h>
 
 
 namespace QnXmlDetail {

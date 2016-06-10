@@ -27,7 +27,7 @@
 #include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <utils/license_usage_helper.h>
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/product_features.h>
 #include "api/runtime_info_manager.h"
 #include "llutil/hardware_id.h"

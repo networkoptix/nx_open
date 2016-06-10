@@ -9,11 +9,11 @@
 #include "managers/time_manager.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_discovery_data.h"
-#include "utils/serialization/binary_stream.h"
-#include "utils/serialization/sql_functions.h"
+#include "nx/fusion/serialization/binary_stream.h"
+#include "nx/fusion/serialization/sql_functions.h"
 #include "business/business_fwd.h"
 #include "utils/common/synctime.h"
-#include "utils/serialization/json.h"
+#include "nx/fusion/serialization/json.h"
 #include "core/resource/user_resource.h"
 
 #include <database/migrations/business_rules_db_migration.h>

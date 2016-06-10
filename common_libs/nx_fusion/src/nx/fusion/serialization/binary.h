@@ -1,7 +1,7 @@
 #ifndef QN_SERIALIZATION_BINARY_H
 #define QN_SERIALIZATION_BINARY_H
 
-#include <utils/serialization/serialization.h>
+#include <nx/fusion/serialization/serialization.h>
 
 #include "binary_fwd.h"
 #include "binary_stream.h"

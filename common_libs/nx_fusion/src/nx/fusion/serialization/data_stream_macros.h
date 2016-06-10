@@ -3,7 +3,7 @@
 
 #include <QtCore/QDataStream>
 
-#include <utils/fusion/fusion.h>
+#include <nx/fusion/fusion/fusion.h>
 
 namespace QnDataStreamSerialization {
 

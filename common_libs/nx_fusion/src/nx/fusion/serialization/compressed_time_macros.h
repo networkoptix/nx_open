@@ -5,7 +5,7 @@
 
 #include "compressed_time.h"
 
-#include <utils/fusion/fusion_serialization.h>
+#include <nx/fusion/fusion/fusion_serialization.h>
 
 namespace QnCompressedTimeDetail {
     template<class Output>

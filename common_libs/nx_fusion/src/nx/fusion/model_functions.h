@@ -2,18 +2,18 @@
 #define QN_FUSION_AUTOMATION_H
 
 #include <nx/utils/uuid.h>
-#include <utils/fusion/fusion_adaptor.h>
-#include <utils/serialization/binary_functions.h>
-#include <utils/serialization/data_stream_macros.h>
-#include <utils/serialization/debug_macros.h>
-#include <utils/serialization/csv_functions.h>
-#include <utils/serialization/json_functions.h>
-#include <utils/serialization/lexical_functions.h>
-#include <utils/serialization/sql_functions.h>
-#include <utils/serialization/ubjson_functions.h>
-#include <utils/serialization/xml_functions.h>
-#include <utils/serialization/compressed_time_functions.h>
-#include <utils/math/fuzzy.h>
+#include <nx/fusion/fusion/fusion_adaptor.h>
+#include <nx/fusion/serialization/binary_functions.h>
+#include <nx/fusion/serialization/data_stream_macros.h>
+#include <nx/fusion/serialization/debug_macros.h>
+#include <nx/fusion/serialization/csv_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/serialization/lexical_functions.h>
+#include <nx/fusion/serialization/sql_functions.h>
+#include <nx/fusion/serialization/ubjson_functions.h>
+#include <nx/fusion/serialization/xml_functions.h>
+#include <nx/fusion/serialization/compressed_time_functions.h>
+#include <nx/utils/math/fuzzy.h>
 
 namespace QnHashAutomation {
     struct Visitor {
@@ -65,7 +65,7 @@ namespace QnEqualityAutomation {
 
 /**
  * This macro generates <tt>qHash</tt> function for the given fusion-adapted type.
- * 
+ *
  * \param TYPE                          Fusion-adapted type to define hash function for.
  * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
  */
@@ -80,7 +80,7 @@ __VA_ARGS__ uint qHash(const TYPE &value, uint seed) {                          
 /**
  * This macro generates <tt>operator==</tt> and <tt>operator!=</tt> functions for
  * the given fusion-adapted type.
- * 
+ *
  * \param TYPE                          Fusion-adapted type to define comparison operators for.
  * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
  */

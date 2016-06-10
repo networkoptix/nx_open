@@ -8,7 +8,7 @@
 #include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
 #include <utils/common/optional.h>
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <utils/math/space_mapper.h>
 
 #include <api/model/storage_space_reply.h>

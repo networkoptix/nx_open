@@ -1,6 +1,6 @@
 #include "customization.h"
 
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/warnings.h>
 
 namespace {

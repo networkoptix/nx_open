@@ -1,6 +1,4 @@
 #include "sql_functions.h"
-#include "api/model/audit/auth_session.h"
-#include <nx/network/http/qnbytearrayref.h>
 
 void serialize_field(const std::vector<QnUuid>&value, QVariant *target)
 {
@@ -19,16 +17,4 @@ void deserialize_field(const QVariant &value, std::vector<QnUuid> *target)
     const char* dataEnd = data + tmp.size();
     for(; data < dataEnd; data += 16)
         target->push_back(QnUuid::fromRfc4122(QByteArray::fromRawData(data, 16)));
-}
-
-void serialize_field(const QnAuthSession&authData, QVariant *target)
-{
-    serialize_field(authData.toByteArray(), target);
-}
-
-void deserialize_field(const QVariant &value, QnAuthSession *target)
-{
-    QByteArray tmp;
-    deserialize_field(value, &tmp);
-    target->fromByteArray(tmp);
 }

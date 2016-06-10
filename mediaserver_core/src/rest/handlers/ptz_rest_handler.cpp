@@ -1,7 +1,7 @@
 #include "ptz_rest_handler.h"
 
-#include <utils/serialization/json_functions.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <network/tcp_connection_priv.h>
 
 #include <core/resource_management/resource_pool.h>

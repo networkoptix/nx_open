@@ -3,7 +3,7 @@
 #include <nx_ec/data/api_license_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/simple_http_client.h>
 
 namespace {

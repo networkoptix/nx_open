@@ -7,8 +7,8 @@
 
 #include <QtGui/QBrush>
 
-#include <utils/serialization/lexical_functions.h>
-#include <utils/fusion/fusion_adaptors.h>
+#include <nx/fusion/serialization/lexical_functions.h>
+#include <nx/fusion/fusion/fusion_adaptors.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, BrushStyle, static)
 

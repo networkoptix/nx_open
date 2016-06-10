@@ -5,7 +5,7 @@
 #include "events/abstract_business_event.h"
 
 #include <utils/common/id.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QnBusinessEventParameters::QnBusinessEventParameters():
     eventType(QnBusiness::UndefinedEvent),

@@ -7,7 +7,7 @@
 #include <statistics/base/metrics_container.h>
 #include <statistics/base/time_duration_metric.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace
 {

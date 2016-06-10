@@ -13,7 +13,7 @@
 
 #include <utils/camera/camera_names_watcher.h>
 #include <utils/common/qtimespan.h>
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
 
 namespace
 {

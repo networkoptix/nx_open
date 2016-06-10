@@ -51,7 +51,7 @@ inline void serialize_field(const bool &value, QVariant *target) {
     *target = QVariant::fromValue<int>(value ? 1 : 0);
 }
 
-inline void deserialize_field(const QVariant &value, bool *target) { 
+inline void deserialize_field(const QVariant &value, bool *target) {
     *target = value.toBool();
 }
 
@@ -60,7 +60,7 @@ inline void serialize_field(const unsigned char &value, QVariant *target) {
     *target = QVariant::fromValue<unsigned int>(value);
 }
 
-inline void deserialize_field(const QVariant &value, unsigned char *target) { 
+inline void deserialize_field(const QVariant &value, unsigned char *target) {
     *target = value.value<unsigned int>();
 }
 
@@ -69,24 +69,24 @@ inline void serialize_field(const signed char &value, QVariant *target) {
     *target = QVariant::fromValue<int>(value);
 }
 
-inline void deserialize_field(const QVariant &value, signed char *target) { 
+inline void deserialize_field(const QVariant &value, signed char *target) {
     *target = value.value<int>();
 }
 
 
 inline void serialize_field(const QString &value, QVariant *target) {
-    *target = QVariant::fromValue<QString>(value.isNull() ? lit("") : value);
+    *target = QVariant::fromValue<QString>(value.isNull() ? QString() : value);
 }
 
 inline void serialize_field(const std::string &value, QVariant *target) {
     *target = QVariant::fromValue<QString>(QString::fromStdString(value));
 }
 
-inline void deserialize_field(const QVariant &value, QString *target) { 
+inline void deserialize_field(const QVariant &value, QString *target) {
     *target = value.value<QString>();
 }
 
-inline void deserialize_field(const QVariant &value, std::string *target) { 
+inline void deserialize_field(const QVariant &value, std::string *target) {
     *target = value.value<QString>().toStdString();
 }
 
@@ -95,8 +95,8 @@ inline void serialize_field(const QnUuid &value, QVariant *target) {
     *target = QVariant::fromValue<QByteArray>(value.toRfc4122());
 }
 
-inline void deserialize_field(const QVariant &value, QnUuid *target) { 
-    *target = QnUuid::fromRfc4122(value.value<QByteArray>()); 
+inline void deserialize_field(const QVariant &value, QnUuid *target) {
+    *target = QnUuid::fromRfc4122(value.value<QByteArray>());
 }
 
 
@@ -130,7 +130,7 @@ inline void deserialize_field(const QVariant &value, QFlags<T> *target) {
 
     qint32 tmp;
     QnSql::deserialize_field(value, &tmp);
-    *target = static_cast<QFlags<T> >(tmp); 
+    *target = static_cast<QFlags<T> >(tmp);
 }
 
 struct QnAuthSession;

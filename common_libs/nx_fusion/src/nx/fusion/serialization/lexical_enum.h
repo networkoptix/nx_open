@@ -10,7 +10,7 @@
 #include <QtCore/QString>
 #include <QtCore/QMutex>
 
-#include <utils/common/type_traits.h>
+#include <nx/utils/type_traits.h>
 
 #include "lexical.h"
 #include "enum.h"
@@ -104,11 +104,11 @@ class QnEnumLexicalSerializer: public QnLexicalSerializer {
     typedef QnLexicalSerializer base_type;
 
 public:
-    QnEnumLexicalSerializer(): 
+    QnEnumLexicalSerializer():
         base_type(qMetaTypeId<T>())
     {}
 
-    QnEnumLexicalSerializer(const QnEnumLexicalSerializerData &data): 
+    QnEnumLexicalSerializer(const QnEnumLexicalSerializerData &data):
         base_type(qMetaTypeId<T>()),
         m_data(data)
     {}
@@ -151,7 +151,7 @@ namespace QnLexical {
     template<class T>
     struct is_numerically_serializable_enum_or_flags:
         std::integral_constant<
-            bool, 
+            bool,
             is_numerically_serializable<T>::value && QnSerialization::is_enum_or_flags<T>::value
         >
     {};
@@ -171,12 +171,12 @@ __VA_ARGS__ bool lexical_numeric_check(const TYPE *);
 /**
  * This macro generates both an enum definition and lexical serialization
  * functions for that enum.
- * 
+ *
  * Example usage:
  * \code
  * QN_DEFINE_LEXICAL_ENUM(Token, (IdToken, "ID")(ClassToken, "CLASS")(TokenCount, NULL))
  * \endcode
- * 
+ *
  * \param ENUM                          Name of the enumeration.
  * \param ELEMENTS                      Sequence of enumeration's elements with
  *                                      their string representation.
@@ -203,7 +203,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ENUM, ELEMENTS, ##__VA_ARGS__)
 
 /**
  * This macro generates lexical serialization functions for the given enum
- * that has an associated metaobject (e.g. an enum inside a QObject or a 
+ * that has an associated metaobject (e.g. an enum inside a QObject or a
  * class declared with Q_GADGET).
  *
  * Example usage:

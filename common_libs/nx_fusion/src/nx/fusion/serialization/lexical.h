@@ -5,7 +5,7 @@
 
 #include <QtCore/QString>
 
-#include <utils/serialization/serialization.h>
+#include <nx/fusion/serialization/serialization.h>
 
 #include "lexical_fwd.h"
 

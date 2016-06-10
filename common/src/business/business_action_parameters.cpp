@@ -1,6 +1,6 @@
 #include "business_action_parameters.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace
 {

@@ -23,7 +23,7 @@
 
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (started)(time)(speed))
 

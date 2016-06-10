@@ -4,13 +4,13 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
-#include <utils/common/model_functions.h>
-#include <utils/serialization/proto_message.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/proto_message.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
 #include <utils/local_file_cache.h>
 
-#include "utils/serialization/binary_functions.h"
+#include "nx/fusion/serialization/binary_functions.h"
 
 #include "plugins/resource/avi/avi_dvd_resource.h"
 #include "plugins/resource/avi/avi_bluray_resource.h"

@@ -3,7 +3,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <business/business_strings_helper.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace QnBusiness {
 bool requiresCameraResource(ActionType actionType)

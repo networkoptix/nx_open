@@ -3,7 +3,7 @@
 
 #include <type_traits> /* For std::is_same. */
 
-#include <utils/fusion/fusion.h>
+#include <nx/fusion/fusion/fusion.h>
 
 #include "csv.h"
 

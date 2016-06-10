@@ -2,7 +2,7 @@
 
 #include <QtCore/QRegExp>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include <utils/common/app_info.h>
 

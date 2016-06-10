@@ -59,7 +59,7 @@
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/app_info.h>
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
 #include <utils/common/synctime.h>
 #include <utils/common/system_information.h>
 #include <utils/common/url.h>

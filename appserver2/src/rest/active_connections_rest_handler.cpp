@@ -1,7 +1,7 @@
 #include "active_connections_rest_handler.h"
 
 #include "transaction/transaction_message_bus.h"
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 int QnActiveConnectionsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *) {
     Q_UNUSED(path)

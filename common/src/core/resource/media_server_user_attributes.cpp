@@ -4,7 +4,7 @@
 ***********************************************************/
 
 #include "media_server_user_attributes.h"
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QnMediaServerUserAttributes::QnMediaServerUserAttributes()
     : serverID()

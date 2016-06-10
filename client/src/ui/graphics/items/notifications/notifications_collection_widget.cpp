@@ -46,7 +46,7 @@
 #include <utils/app_server_notification_cache.h>
 #include <utils/multi_image_provider.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace
 {

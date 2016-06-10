@@ -8,7 +8,7 @@
 #include <business/business_fwd.h>
 
 #include <utils/db/db_helper.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace ec2 {
 namespace db {

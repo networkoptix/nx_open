@@ -13,9 +13,9 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/guard.h>
 #include <utils/common/sync_call.h>
-#include <utils/serialization/lexical.h>
-#include <utils/serialization/sql.h>
-#include <utils/serialization/sql_functions.h>
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/fusion/serialization/sql.h>
+#include <nx/fusion/serialization/sql_functions.h>
 
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"

@@ -1,6 +1,8 @@
 #include "auth_session.h"
 #include <nx/network/http/qnbytearrayref.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace {
     char DELIMITER = '$';
 }
@@ -8,8 +10,8 @@ namespace {
 
 QByteArray QnAuthSession::toByteArray() const
 {
-    auto encoded = [](QByteArray value) { 
-        return value.replace(DELIMITER, char('_')); 
+    auto encoded = [](QByteArray value) {
+        return value.replace(DELIMITER, char('_'));
     };
 
     QByteArray result;
@@ -20,7 +22,7 @@ QByteArray QnAuthSession::toByteArray() const
     result.append(encoded(userHost.toUtf8()));
     result.append(DELIMITER);
     result.append(encoded(userAgent.toUtf8()));
-    
+
     return result;
 }
 
@@ -37,3 +39,16 @@ void QnAuthSession::fromByteArray(const QByteArray& data)
     if (params.size() > 3)
         userAgent = QString::fromUtf8(params[3]);
 }
+
+void serialize_field(const QnAuthSession&authData, QVariant *target)
+{
+    serialize_field(authData.toByteArray(), target);
+}
+
+void deserialize_field(const QVariant &value, QnAuthSession *target)
+{
+    QByteArray tmp;
+    deserialize_field(value, &tmp);
+    target->fromByteArray(tmp);
+}
+

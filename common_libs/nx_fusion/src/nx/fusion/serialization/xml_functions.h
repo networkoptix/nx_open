@@ -13,9 +13,9 @@
 #include <nx/utils/uuid.h>
 #include <QtCore/QUrl>
 
-#include <utils/fusion/fusion.h>
-#include <utils/common/latin1_array.h>
-#include <utils/common/collection.h>
+#include <nx/fusion/fusion/fusion.h>
+#include <nx/utils/latin1_array.h>
+#include <nx/utils/collection.h>
 
 #include "collection_fwd.h"
 #include "xml.h"

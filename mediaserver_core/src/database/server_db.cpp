@@ -21,7 +21,7 @@
 
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace
 {

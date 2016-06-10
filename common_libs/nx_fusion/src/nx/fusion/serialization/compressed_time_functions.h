@@ -19,8 +19,8 @@
 #   include <nx/utils/uuid.h>
 #endif
 
-#include <utils/common/collection.h>
-#include <utils/common/latin1_array.h>
+#include <nx/utils/collection.h>
+#include <nx/utils/latin1_array.h>
 
 #include "collection_fwd.h"
 #include "compressed_time.h"

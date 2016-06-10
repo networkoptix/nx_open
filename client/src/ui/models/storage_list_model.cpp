@@ -4,7 +4,7 @@
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
 
 namespace {
     const qreal BYTES_IN_GB = 1000000000.0;
