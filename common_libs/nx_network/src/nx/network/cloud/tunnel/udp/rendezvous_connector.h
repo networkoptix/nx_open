@@ -39,6 +39,10 @@ public:
         nx::String connectSessionId,
         SocketAddress remotePeerAddress,
         std::unique_ptr<nx::network::UDPSocket> udpSocket);
+    RendezvousConnector(
+        nx::String connectSessionId,
+        SocketAddress remotePeerAddress,
+        SocketAddress localAddressToBindTo);
     virtual ~RendezvousConnector();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
@@ -64,6 +68,7 @@ private:
     std::unique_ptr<nx::network::UDPSocket> m_udpSocket;
     std::unique_ptr<nx::network::UdtStreamSocket> m_udtConnection;
     ConnectCompletionHandler m_completionHandler;
+    boost::optional<SocketAddress> m_localAddressToBindTo;
 
     void onUdtConnectFinished(SystemError::ErrorCode errorCode);
 };

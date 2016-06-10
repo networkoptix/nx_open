@@ -29,6 +29,18 @@ RendezvousConnectorWithVerification::RendezvousConnectorWithVerification(
 {
 }
 
+RendezvousConnectorWithVerification::RendezvousConnectorWithVerification(
+    nx::String connectSessionId,
+    SocketAddress remotePeerAddress,
+    SocketAddress localAddressToBindTo)
+:
+    RendezvousConnector(
+        std::move(connectSessionId),
+        std::move(remotePeerAddress),
+        std::move(localAddressToBindTo))
+{
+}
+
 RendezvousConnectorWithVerification::~RendezvousConnectorWithVerification()
 {
 }

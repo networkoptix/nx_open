@@ -26,6 +26,17 @@ RendezvousConnector::RendezvousConnector(
 {
 }
 
+RendezvousConnector::RendezvousConnector(
+    nx::String connectSessionId,
+    SocketAddress remotePeerAddress,
+    SocketAddress localAddressToBindTo)
+:
+    m_connectSessionId(std::move(connectSessionId)),
+    m_remotePeerAddress(std::move(remotePeerAddress)),
+    m_localAddressToBindTo(std::move(localAddressToBindTo))
+{
+}
+
 RendezvousConnector::~RendezvousConnector()
 {
     m_udtConnection.reset();
@@ -78,6 +89,8 @@ void RendezvousConnector::connect(
                 result = udtConnection->bindToUdpSocket(std::move(*m_udpSocket));
                 m_udpSocket.reset();
             }
+            if (m_localAddressToBindTo && result)
+                result = udtConnection->bind(*m_localAddressToBindTo);
             if (!result ||
                 !udtConnection->setRendezvous(true) ||
                 !udtConnection->setNonBlockingMode(true) ||
