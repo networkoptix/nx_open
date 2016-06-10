@@ -45,6 +45,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_network-x86", "..\common
 		${udt.guid} = ${udt.guid}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_fusion-x86", "${basedir}\..\common_libs\nx_fusion\src\nx_fusion-x86.vcxproj", "${nx_fusion.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+		${nx_utils.guid} = ${nx_utils.guid}
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_utils-x86", "..\common_libs\nx_utils\src\nx_utils-x86.vcxproj", "${nx_utils.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
@@ -89,6 +94,10 @@ Global
 		${nx_network.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_network.guid}.Release|Win32.ActiveCfg = Release|Win32
 		${nx_network.guid}.Release|Win32.Build.0 = Release|Win32
+		${nx_fusion.guid}.Debug|Win32.ActiveCfg = Debug|Win32
+		${nx_fusion.guid}.Debug|Win32.Build.0 = Debug|Win32
+		${nx_fusion.guid}.Release|Win32.ActiveCfg = Release|Win32
+		${nx_fusion.guid}.Release|Win32.Build.0 = Release|Win32
 		${udt.guid}.Debug|Win32.ActiveCfg = Debug|Win32
 		${udt.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${udt.guid}.Release|Win32.ActiveCfg = Release|Win32
