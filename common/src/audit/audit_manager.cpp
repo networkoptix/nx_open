@@ -4,8 +4,6 @@
 #include "api/global_settings.h"
 #include <nx/utils/log/assert.h>
 
-static QnAuditManager* m_globalInstance = 0;
-
 namespace
 {
     const qint64 GROUP_TIME_THRESHOLD = 1000ll * 30;
@@ -42,11 +40,6 @@ QnAuditRecord QnAuditManager::ChangedSettingInfo::toAuditRecord() const
     return QnAuditManager::prepareRecord(session, eventType);
 }
 
-QnAuditManager* QnAuditManager::instance()
-{
-    return m_globalInstance;
-}
-
 QnAuditManager::QnAuditManager()
 {
     m_sessionCleanupTimer.restart();
@@ -57,8 +50,6 @@ QnAuditManager::QnAuditManager()
         }
     );
 
-    NX_ASSERT( m_globalInstance == nullptr );
-    m_globalInstance = this;
     connect(&m_timer, &QTimer::timeout, this, &QnAuditManager::at_timer);
     m_timer.start(1000 * 5);
 }

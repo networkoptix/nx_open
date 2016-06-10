@@ -24,6 +24,8 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 
+#include "vms_gateway_process.h"
+
 
 namespace nx {
 namespace cloud {
@@ -41,7 +43,6 @@ VmsGatewayFunctionalTest::VmsGatewayFunctionalTest()
     //starting clean test
     nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
-    m_httpPort = (std::rand() % 10000) + 50000;
     m_tmpDir = 
         (sTemporaryDirectoryPath.isEmpty() ? QDir::homePath(): sTemporaryDirectoryPath) +
         "/vms_gateway_ut.data";
@@ -49,7 +50,7 @@ VmsGatewayFunctionalTest::VmsGatewayFunctionalTest()
 
     addArg("/path/to/bin");
     addArg("-e");
-    addArg("-general/listenOn"); addArg(lit("127.0.0.1:%1").arg(m_httpPort).toLatin1().constData());
+    addArg("-general/listenOn"); addArg("127.0.0.1:0");
     addArg("-general/dataDir"); addArg(m_tmpDir.toLatin1().constData());
     addArg("-log/logLevel"); addArg("DEBUG2");
 }
@@ -69,7 +70,14 @@ bool VmsGatewayFunctionalTest::startAndWaitUntilStarted()
     addArg("-http/proxyTargetPort");
     addArg(QByteArray::number(m_testHttpServer->serverAddress().port).constData());
 
-    return utils::test::ModuleLauncher<VmsGatewayProcessPublic>::startAndWaitUntilStarted();
+    if (!utils::test::ModuleLauncher<VmsGatewayProcessPublic>::startAndWaitUntilStarted())
+        return false;
+
+    const auto& httpEndpoints = moduleInstance()->impl()->httpEndpoints();
+    if (httpEndpoints.empty())
+        return false;
+    m_httpPort = httpEndpoints.front().port;
+    return true;
 }
 
 SocketAddress VmsGatewayFunctionalTest::endpoint() const

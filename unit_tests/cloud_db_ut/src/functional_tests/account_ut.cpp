@@ -27,11 +27,13 @@
 namespace nx {
 namespace cdb {
 
+namespace {
 class Account
 :
     public CdbFunctionalTest
 {
 };
+}
 
 TEST_F(Account, activation)
 {

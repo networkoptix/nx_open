@@ -9,11 +9,13 @@
 #include <nx/utils/uuid.h>
 #include <utils/fs/file.h>
 #include <utils/common/buffered_file.h>
+#include <utils/common/writer_pool.h>
 #include "../utils.h"
 
 void doTestInternal(int systemFlags)
 {
     nx::ut::utils::WorkDirResource workDir;
+    QnWriterPool writerPool;
     ASSERT_TRUE((bool)workDir.getDirName());
 
     const QString kTestFileName = QDir(*workDir.getDirName()).absoluteFilePath("test_data1.bin");

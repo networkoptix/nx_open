@@ -251,6 +251,8 @@ statserver/build
 statserver/dist
 statserver/statserver.egg-info
 
+common/src/plugins/resource/avi/filetypes.h
+
 syntax: regexp
 ^core$
 ^Makefile$

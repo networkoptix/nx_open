@@ -4,7 +4,6 @@
 #include <nx/network/http/httptypes.h>
 #include <streaming/audio_streamer_pool.h>
 
-
 namespace
 {
     const QString kClientIdParamName("clientId");
@@ -31,23 +30,24 @@ int QnAudioTransmissionRestHandler::executeGet(
 
     auto clientId = params[kClientIdParamName];
     auto resourceId = params[kResourceIdParamName];
-    QnAudioStreamerPool::Action action = (params[kActionParamName] == kStartStreamAction) 
-        ? QnAudioStreamerPool::Action::Start 
+    QnAudioStreamerPool::Action action = (params[kActionParamName] == kStartStreamAction)
+        ? QnAudioStreamerPool::Action::Start
         : QnAudioStreamerPool::Action::Stop;
 
     if (!QnAudioStreamerPool::instance()->startStopStreamToResource(
             QnUuid::fromStringSafe(clientId),
             QnUuid::fromStringSafe(resourceId),
             action,
-            errorStr))
+            errorStr,
+			params))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errorStr);
     }
     return nx_http::StatusCode::ok;
 }
 
-bool QnAudioTransmissionRestHandler::validateParams(const QnRequestParams &params, QString& error) const
-{    
+bool QnAudioTransmissionRestHandler::validateParams(const QnRequestParams &params, QString& error)
+{
     bool ok = true;
     if (!params.contains(kClientIdParamName))
     {

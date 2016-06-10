@@ -43,15 +43,15 @@ QnMdnsListener::~QnMdnsListener()
     deleteSocketList();
 }
 
-void QnMdnsListener::registerConsumer(long handle)
+void QnMdnsListener::registerConsumer(std::uintptr_t handle)
 {
     m_data.push_back( std::make_pair( handle, ConsumerDataList() ) );
 }
 
-QnMdnsListener::ConsumerDataList QnMdnsListener::getData(long handle)
+QnMdnsListener::ConsumerDataList QnMdnsListener::getData(std::uintptr_t handle)
 {
-    std::list<std::pair<long, ConsumerDataList> >::iterator itr;
-    const std::list<std::pair<long, ConsumerDataList> >::iterator itEnd = m_data.end();
+    std::list<std::pair<std::uintptr_t, ConsumerDataList> >::iterator itr;
+    const std::list<std::pair<std::uintptr_t, ConsumerDataList> >::iterator itEnd = m_data.end();
     for( itr = m_data.begin();
         itr != itEnd;
         ++itr )
@@ -124,8 +124,8 @@ void QnMdnsListener::readSocketInternal(AbstractDatagramSocket* socket, QString 
             if (localAddress.isEmpty())
                 localAddress = getBestLocalAddress(remoteEndpoint.address.toString());
 
-            const std::list<std::pair<long, ConsumerDataList> >::iterator itEnd = m_data.end();
-            for( std::list<std::pair<long, ConsumerDataList> >::iterator
+            const std::list<std::pair<std::uintptr_t, ConsumerDataList> >::iterator itEnd = m_data.end();
+            for( std::list<std::pair<std::uintptr_t, ConsumerDataList> >::iterator
                 it = m_data.begin();
                 it != itEnd;
                 ++it )

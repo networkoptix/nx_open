@@ -149,7 +149,7 @@
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Önceki bir sürüm yüklü</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Yükleme tipi</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Sistem güncelleniyor</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Veritabanı bozuk yada kurtarılamadı. Yeni veritabanı oluşturuldu. Sisteme erişmek için kullanıcı adı admin şifre 123 tür.Lütfen ilk oturumda bilgileri güncelleyin.</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Veritabanı bozuk yada kurtarılamadı. Yeni veritabanı oluşturuldu. Sisteme erişmek için kullanıcı adı admin şifre admin tür.Lütfen ilk oturumda bilgileri güncelleyin.</String>    
 
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Windows güvenlik duvarına bağlanılamadı.  ([2]   [3]   [4]   [5])</String>    

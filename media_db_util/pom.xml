@@ -27,7 +27,7 @@
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <rdep.packages>openssl ffmpeg onvif quazip sigar</rdep.packages>
+        <rdep.packages>openssl ffmpeg onvif quazip sigar festival</rdep.packages>
         <rdep.linux.arm.packages>sasl2 openldap</rdep.linux.arm.packages>
     </properties>
 

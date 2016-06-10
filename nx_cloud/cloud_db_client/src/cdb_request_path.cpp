@@ -22,6 +22,7 @@ const char* kSystemGetPath = "/cdb/system/get";
 const char* kSystemSharePath = "/cdb/system/share";
 const char* kSystemGetCloudUsersPath = "/cdb/system/get_cloud_users";
 const char* kSystemGetAccessRoleListPath = "/cdb/system/get_access_role_list";
+const char* kSystemUpdateSystemNamePath = "/cdb/system/update_system_name";
 
 const char* kAuthGetNoncePath = "/cdb/auth/get_nonce";
 const char* kAuthGetAuthenticationPath = "/cdb/auth/get_authentication";

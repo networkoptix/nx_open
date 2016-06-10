@@ -1,10 +1,8 @@
 'use strict';
 
 var Page = function () {
-
-    this.activeSystem = 'http://10.0.3.161:7001';
-    this.incompatibleSystem = 'http://10.0.3.160:7001';
-    this.password = 'admin';
+    var Helper = require('../helper.js');
+    this.helper = new Helper();
 
     this.get = function () {
         browser.get('/#/settings');
@@ -24,7 +22,6 @@ var Page = function () {
 
     this.currentSystemCheckbox = element(by.id("checkbox-current-system"));
     this.extarnalSystemCheckbox = element(by.id("checkbox-external-system"));
-
 };
 
 module.exports = Page;

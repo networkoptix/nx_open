@@ -12,6 +12,7 @@
 #include <cdb/connection.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
+#include <nx/network/retry_timer.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/safe_direct_connection.h>
 #include <utils/common/subscription.h>
@@ -33,6 +34,7 @@ public:
         getSystemCredentials() const override;
 
     bool boundToCloud() const;
+    /** Returns \a nullptr if not connected to the cloud */
     std::unique_ptr<nx::cdb::api::Connection> getCloudConnection();
     const nx::cdb::api::ConnectionFactory& connectionFactory() const;
 
@@ -58,11 +60,13 @@ private:
     std::unique_ptr<nx::cdb::api::EventConnection> m_eventConnection;
     nx::utils::Subscription<nx::cdb::api::SystemAccessListModifiedEvent>
         m_systemAccessListUpdatedEventSubscription;
+    std::unique_ptr<nx::network::RetryTimer> m_eventConnectionRetryTimer;
 
     bool boundToCloud(QnMutexLockerBase* const lk) const;
     void monitorForCloudEvents();
     void stopMonitoringCloudEvents();
     void onSystemAccessListUpdated(nx::cdb::api::SystemAccessListModifiedEvent);
+    void startEventConnection();
     void onEventConnectionEstablished(nx::cdb::api::ResultCode resultCode);
 
 private slots:

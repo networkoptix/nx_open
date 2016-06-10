@@ -39,5 +39,10 @@ int CloudDBProcessPublic::exec()
     return m_impl->exec();
 }
 
+const CloudDBProcess* CloudDBProcessPublic::impl() const
+{
+    return m_impl;
+}
+
 }   //cdb
 }   //nx

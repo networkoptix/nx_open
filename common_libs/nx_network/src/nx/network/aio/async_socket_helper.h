@@ -124,13 +124,7 @@ public:
         //cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered is down the stack
         if( this->m_socket->impl()->aioThread.load() == QThread::currentThread() )
         {
-            nx::network::SocketGlobals::addressResolver().cancel( this );    //TODO #ak must not block here!
-
-            nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etWrite );
-            nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etRead );
-            nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etTimedOut );
-            //TODO #ak not sure whether this call always necessary
-            nx::network::SocketGlobals::aioService().cancelPostedCalls( this->m_socket );
+            stopPollingSocket(aio::etNone);
         }
         else
         {
@@ -748,13 +742,18 @@ private:
     //!Call this from within aio thread only
     void stopPollingSocket(const aio::EventType eventType)
     {
+        nx::network::SocketGlobals::addressResolver().cancel(this);    //TODO #ak must not block here!
+
         //TODO #ak move this method to aioservice?
         if (eventType == aio::etNone)
             nx::network::SocketGlobals::aioService().cancelPostedCalls(this->m_socket, true);
         if (eventType == aio::etNone || eventType == aio::etRead)
             nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etRead, true);
         if (eventType == aio::etNone || eventType == aio::etWrite)
+        {
             nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etWrite, true);
+            m_asyncSendIssued = false;
+        }
         if (eventType == aio::etNone || eventType == aio::etTimedOut)
             nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etTimedOut, true);
     }
@@ -862,6 +861,7 @@ public:
             {
                 nx::network::SocketGlobals::aioService().removeFromWatch(
                     m_sock, aio::etRead, true);
+
                 ++m_acceptAsyncCallCount;
                 handler();
             });
@@ -873,6 +873,16 @@ public:
         nx::utils::promise< bool > promise;
         cancelIOAsync( [ & ](){ promise.set_value( true ); } );
         promise.get_future().wait();
+    }
+
+    void stopPolling()
+    {
+        nx::network::SocketGlobals::aioService().cancelPostedCalls(
+            m_sock, true);
+        nx::network::SocketGlobals::aioService().removeFromWatch(
+            m_sock, aio::etRead, true);
+        nx::network::SocketGlobals::aioService().removeFromWatch(
+            m_sock, aio::etTimedOut, true);
     }
 
 private:

@@ -126,6 +126,16 @@ QString QnCameraMotionPolicy::getText(const QnResourceList &resources, const boo
     return genericCameraText<QnCameraMotionPolicy>(cameras, detailed, tr("Recording or motion detection is disabled for %1", "", invalid), invalid);
 }
 
+bool QnCameraAudioTransmitPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+    return camera->hasCameraCapabilities(Qn::AudioTransmitCapability);
+}
+
+QString QnCameraAudioTransmitPolicy::getText(const QnResourceList &resources, const bool detailed) {
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    int invalid = invalidResourcesCount<QnCameraAudioTransmitPolicy>(cameras);
+    return genericCameraText<QnCameraAudioTransmitPolicy>(cameras, detailed, tr("%1 doesn't support two-way audio", "", invalid), invalid);
+}
+
 bool QnCameraRecordingPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
     return !camera->isScheduleDisabled();
 }

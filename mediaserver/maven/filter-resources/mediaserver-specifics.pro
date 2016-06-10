@@ -4,6 +4,8 @@ CONFIG += console
 INCLUDEPATH += ${root.dir}/appserver2/src/
 INCLUDEPATH += ${root.dir}/mediaserver_core/src/
 
+LIBS += $$FESTIVAL_LIB
+
 !win32 {
   ext_debug2.target  = $(TARGET).debug
   ext_debug2.depends = $(TARGET)

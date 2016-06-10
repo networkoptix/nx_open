@@ -201,7 +201,13 @@ AbstractStreamSocket* MultipleServerSocket::accept()
 
 void MultipleServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    nx::BarrierHandler barrier(std::move(handler));
+    nx::BarrierHandler barrier(
+        [this, handler = std::move(handler)]()
+        {
+            m_acceptHandler = nullptr;
+            handler();
+        });
+
     m_timerSocket.pleaseStop(barrier.fork());
     for (auto& socket : m_serverSockets)
         socket->pleaseStop(barrier.fork());

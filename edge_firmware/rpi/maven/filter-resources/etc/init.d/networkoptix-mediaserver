@@ -19,9 +19,9 @@ BIN_NAME=mediaserver
 BIN_PATH=$PREFIX/bin/$BIN_NAME
 RUN_ARGS="-e --disable-crash-handler"
 
-export LD_LIBRARY_PATH=$PREFIX/lib
+export LD_LIBRARY_PATH=$PREFIX/lib:/opt/$CUSTOMIZATION/lib
 export VMS_PLUGIN_DIR=$PREFIX/plugins
-export SASL_PATH=$LD_LIBRARY_PATH/sasl2
+export SASL_PATH=$/opt/$CUSTOMIZATION/lib/sasl2
 
 ulimit -n 8192
 ulimit -c unlimited

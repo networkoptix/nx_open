@@ -78,7 +78,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
         return;
 
     Qn::PtzCapabilities overridedCaps;
-    if(data.value(lit("ptzCapabilities"), &overridedCaps))
+    if(data.value(Qn::PTZ_CAPABILITIES_PARAM_NAME, &overridedCaps))
         m_capabilities = overridedCaps;
 
 

@@ -272,46 +272,52 @@ private:
     void addNewConnections(std::unique_lock<std::mutex>* const /*lock*/);
 };
 
+class NX_NETWORK_API AddressBinder
+{
+public:
+    AddressBinder();
+    SocketAddress bind();
+    void add(const SocketAddress& key, SocketAddress address);
+    void remove(const SocketAddress& key, const SocketAddress& address);
+    std::set<SocketAddress> get(const SocketAddress& key) const;
+    boost::optional<SocketAddress> random(const SocketAddress& key) const;
+
+    struct Manager
+    {
+        AddressBinder* const binder;
+        const SocketAddress key;
+
+        explicit Manager(AddressBinder* b) : binder(b), key(b->bind()) {}
+        Manager(AddressBinder* b, SocketAddress k) : binder(b), key(std::move(k)) {}
+
+        void add(SocketAddress a) { binder->add(key, std::move(a)); }
+        void remove(const SocketAddress& a) { binder->remove(key, a); }
+    };
+
+private:
+    mutable QnMutex m_mutex;
+    size_t m_currentNumber;
+    std::map<SocketAddress, std::set<SocketAddress>> m_map;
+};
+
 /**
  * A TCPSocket modification which randomly connects to different ports according to @p kShift.
  */
-template<quint16 kShift>
-class MultipleClientSocketTester
+class NX_NETWORK_API MultipleClientSocketTester
 :
     public TCPSocket
 {
 public:
-    MultipleClientSocketTester()
-    :
-        TCPSocket()
-    {
-    }
-
-    bool connect(const SocketAddress& address, unsigned int timeout) override
-    {
-        return TCPSocket::connect(modifyAddress(address), timeout);
-    }
-
+    MultipleClientSocketTester(AddressBinder* addressBinder);
+    bool connect(const SocketAddress& address, unsigned int timeout) override;
     void connectAsync(
         const SocketAddress& address,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
-    {
-        TCPSocket::connectAsync(modifyAddress(address), std::move(handler));
-    }
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
 private:
-    SocketAddress modifyAddress(const SocketAddress& address)
-    {
-        static quint16 modifier = 0;
-        if (m_address == SocketAddress())
-        {
-            m_address = SocketAddress(
-                address.address, address.port + (modifier++ % kShift));
-        }
+    SocketAddress modifyAddress(const SocketAddress& address);
 
-        return m_address;
-    }
-
+    AddressBinder* const m_addressBinder;
     SocketAddress m_address;
 };
 

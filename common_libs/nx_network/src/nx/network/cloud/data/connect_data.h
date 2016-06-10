@@ -31,6 +31,12 @@ public:
     nx::String originatingPeerID;
     nx::String connectSessionId;
     ConnectionMethods connectionMethods;
+    /** If port is zero then mediator uses source port */
+    std::list<SocketAddress> udpEndpointList;
+    /** if \a true, mediator does not report Connect request source address to the server peer.
+        Only addresses found in \a udpEndpointList are reported
+    */
+    bool ignoreSourceAddress;
 
     ConnectRequest();
 
@@ -56,8 +62,8 @@ public:
     bool parse(const nx::stun::Message& message);
 };
 
-}   //api
-}   //hpm
-}   //nx
+}   //namespace api
+}   //namespace hpm
+}   //namespace nx
 
 #endif   //NX_MEDIATOR_API_CONNECT_DATA_H

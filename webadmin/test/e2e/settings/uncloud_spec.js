@@ -1,7 +1,7 @@
 'use strict';
 
 var SettingsPage = require('./po.js');
-describe('Cloud disconnect', function () {
+xdescribe('Cloud disconnect', function () {
 
     var p = new SettingsPage();
 
@@ -9,10 +9,9 @@ describe('Cloud disconnect', function () {
         p.get();
         // if button Disconnect from Cloud is not present (system is not in Cloud),
         // then connect to Cloud
-        p.disconnectFromCloudButton.isPresent().then( function(isPresent) {
-            if( !isPresent ) {
-                p.connectToCloud();
-            }
+        p.helper.checkPresent(p.disconnectFromCloudButton).then( null, function(err) {
+            console.log(err);
+            p.connectToCloud();
         });
     });
 

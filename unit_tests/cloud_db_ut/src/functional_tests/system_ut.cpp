@@ -16,7 +16,15 @@
 namespace nx {
 namespace cdb {
 
-TEST_F(CdbFunctionalTest, system_unbind)
+namespace {
+class System
+:
+    public CdbFunctionalTest
+{
+};
+}
+
+TEST_F(System, unbind)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -200,13 +208,13 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
     }
 }
 
-TEST_F(CdbFunctionalTest, system_get)
+TEST_F(System, get)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
     cdbFunctionalTestSystemGet(this);
 }
 
-TEST_F(CdbFunctionalTest, system_activation)
+TEST_F(System, activation)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -282,7 +290,7 @@ TEST_F(CdbFunctionalTest, system_activation)
     }
 }
 
-TEST_F(CdbFunctionalTest, notification_of_system_removal)
+TEST_F(System, notification_of_system_removal)
 {
     constexpr const std::chrono::seconds kSystemGoneForeverPeriod =
         std::chrono::seconds(5);
@@ -367,6 +375,55 @@ TEST_F(CdbFunctionalTest, notification_of_system_removal)
             }
         }
     }
+}
+
+TEST_F(System, updateSystemName)
+{
+    constexpr const char newSystemName[] = "new_name";
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    api::AccountData account1;
+    std::string account1Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account1, &account1Password));
+
+    //adding system1 to account1
+    api::SystemData system1;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.email, account1Password, &system1));
+
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        updateSystemName(system1.id, system1.authKey, system1.id, newSystemName));
+
+    for (int i = 0; i < 2; ++i)
+    {
+        if (i == 1)
+            restart();
+
+        //checking account1 system list
+        std::vector<api::SystemDataEx> systems;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystems(account1.email, account1Password, &systems));
+        ASSERT_EQ(1, systems.size());
+        ASSERT_EQ(newSystemName, systems[0].name);
+    }
+
+    ASSERT_EQ(
+        api::ResultCode::forbidden,
+        updateSystemName(account1.email, account1Password, system1.id, "some system name"));
+
+    //trying bad system names
+    ASSERT_EQ(
+        api::ResultCode::badRequest,
+        updateSystemName(system1.id, system1.authKey, system1.id, std::string()));
+    ASSERT_EQ(
+        api::ResultCode::badRequest,
+        updateSystemName(system1.id, system1.authKey, system1.id, std::string(4096, 'z')));
 }
 
 }   //cdb

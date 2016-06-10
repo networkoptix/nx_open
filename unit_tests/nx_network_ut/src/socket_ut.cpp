@@ -125,7 +125,9 @@ TEST( Socket, AsyncOperationCancellation )
                     RandomDataTcpServer server(
                         TestTrafficLimitType::none,
                         BYTES_TO_SEND_THROUGH_CONNECTION,
-                        TestTransmissionMode::spam);
+                        SocketFactory::isSslEnforced()
+                            ? TestTransmissionMode::pong
+                            : TestTransmissionMode::spam);
                     ASSERT_TRUE(server.start());
 
                     ConnectionsGenerator connectionsGenerator(

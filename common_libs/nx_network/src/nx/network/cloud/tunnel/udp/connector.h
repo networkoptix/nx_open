@@ -64,6 +64,10 @@ public:
             std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler) override;
     virtual const AddressEntry& targetPeerAddress() const override;
 
+    SocketAddress localAddress() const;
+    /** \a hostAddress will be used by mediator instead of request source address */
+    void replaceOriginatingHostAddress(const QString& hostAddress);
+
 protected:
     virtual void messageReceived(
         SocketAddress sourceAddress,
@@ -84,6 +88,8 @@ private:
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
     std::deque<std::unique_ptr<RendezvousConnector>> m_rendezvousConnectors;
     std::unique_ptr<stun::UnreliableMessagePipeline> m_connectResultReportSender;
+    SocketAddress m_localAddress;
+    boost::optional<QString> m_originatingHostAddressReplacement;
 
     void onConnectResponse(
         nx::hpm::api::ResultCode resultCode,

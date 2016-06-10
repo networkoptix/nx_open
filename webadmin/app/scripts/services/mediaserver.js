@@ -460,6 +460,9 @@ angular.module('webadminApp')
                     deferred.resolve(false);
                 });
                 return deferred.promise;
+            },
+            createEvent:function(params){
+                return wrapGet(proxy + '/web/api/createEvent?' +  $.param(params));
             }
         };
     });

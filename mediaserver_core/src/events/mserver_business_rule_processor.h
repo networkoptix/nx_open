@@ -35,6 +35,8 @@ private:
     bool executeBookmarkAction(const QnAbstractBusinessActionPtr &action);
     bool executeHttpRequestAction(const QnAbstractBusinessActionPtr& action);
     bool executePtzAction(const QnAbstractBusinessActionPtr& action);
+    bool executeSayTextAction(const QnAbstractBusinessActionPtr& action);
+    bool executePlaySoundAction(const QnAbstractBusinessActionPtr& action);
 
 private:
     class SendEmailAggregationKey
@@ -95,8 +97,7 @@ private:
     static QVariantHash eventDescriptionMap(
         const QnAbstractBusinessActionPtr& action,
         const QnBusinessAggregationInfo &aggregationInfo,
-        QnEmailAttachmentList& attachments,
-        Qn::ResourceInfoLevel detailLevel);
+        QnEmailAttachmentList& attachments);
 
     static QVariantHash eventDetailsMap(
         const QnAbstractBusinessActionPtr& action,

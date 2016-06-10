@@ -70,6 +70,13 @@ public:
     virtual void getAccessRoleList(
         const std::string& systemID,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler) = 0;
+    /**
+        \note Currently, request can be performed by system only, not by account
+    */
+    virtual void updateSystemName(
+        const std::string& systemID,
+        const std::string& systemName,
+        std::function<void(api::ResultCode)> completionHandler) = 0;
 };
 
 }   //api
