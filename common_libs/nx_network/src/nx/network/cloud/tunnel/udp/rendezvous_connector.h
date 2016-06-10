@@ -28,9 +28,8 @@ class RendezvousConnector
     public aio::AbstractPollable
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        std::unique_ptr<UdtStreamSocket>)> ConnectCompletionHandler;
+    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>
+        ConnectCompletionHandler;
 
     /**
         @param udpSocket If not empty, this socket is passed to udt socket
@@ -55,6 +54,8 @@ public:
     virtual void connect(
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler completionHandler);
+    /** moves connection out of this */
+    virtual std::unique_ptr<nx::network::UdtStreamSocket> takeConnection();
 
     const nx::String& connectSessionId() const;
     const SocketAddress& remoteAddress() const;

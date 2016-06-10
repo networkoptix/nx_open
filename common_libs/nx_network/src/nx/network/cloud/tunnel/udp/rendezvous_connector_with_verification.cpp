@@ -52,6 +52,7 @@ void RendezvousConnectorWithVerification::pleaseStop(
         [this, completionHandler = std::move(completionHandler)]() mutable
         {
             m_requestPipeline.reset();
+            m_udtConnection.reset();
             completionHandler();
         });
 }
@@ -66,7 +67,13 @@ void RendezvousConnectorWithVerification::connect(
     m_connectCompletionHandler = std::move(completionHandler);
     RendezvousConnector::connect(
         timeout,
-        std::bind(&RendezvousConnectorWithVerification::onConnectCompleted, this, _1, _2));
+        std::bind(&RendezvousConnectorWithVerification::onConnectCompleted, this, _1));
+}
+
+std::unique_ptr<nx::network::UdtStreamSocket>
+    RendezvousConnectorWithVerification::takeConnection()
+{
+    return std::move(m_udtConnection);
 }
 
 void RendezvousConnectorWithVerification::closeConnection(
@@ -82,9 +89,10 @@ void RendezvousConnectorWithVerification::closeConnection(
 }
 
 void RendezvousConnectorWithVerification::onConnectCompleted(
-    SystemError::ErrorCode errorCode,
-    std::unique_ptr<UdtStreamSocket> connection)
+    SystemError::ErrorCode errorCode)
 {
+    std::unique_ptr<UdtStreamSocket> connection = RendezvousConnector::takeConnection();
+
     NX_LOGX(lm("cross-nat %1 completed. result: %2")
         .arg(connectSessionId()).arg(SystemError::toString(errorCode)),
         cl_logDEBUG2);
@@ -92,7 +100,7 @@ void RendezvousConnectorWithVerification::onConnectCompleted(
     if (errorCode != SystemError::noError)
     {
         auto connectCompletionHandler = std::move(m_connectCompletionHandler);
-        connectCompletionHandler(errorCode, std::move(connection));
+        connectCompletionHandler(errorCode);
         return;
     }
 
@@ -156,12 +164,12 @@ void RendezvousConnectorWithVerification::onMessageReceived(
         cl_logDEBUG2);
 
     //success!
-    auto udtConnection = 
+    m_udtConnection = 
         nx::utils::static_unique_ptr_cast<UdtStreamSocket>(
             m_requestPipeline->takeSocket());
     m_requestPipeline.reset();
     auto connectCompletionHandler = std::move(m_connectCompletionHandler);
-    connectCompletionHandler(SystemError::noError, std::move(udtConnection));
+    connectCompletionHandler(SystemError::noError);
 }
 
 void RendezvousConnectorWithVerification::onTimeout()
@@ -177,9 +185,11 @@ void RendezvousConnectorWithVerification::onTimeout()
 void RendezvousConnectorWithVerification::processError(
     SystemError::ErrorCode errorCode)
 {
+    NX_ASSERT(errorCode != SystemError::noError);
+
     m_requestPipeline.reset();
     auto connectCompletionHandler = std::move(m_connectCompletionHandler);
-    connectCompletionHandler(errorCode, nullptr);
+    connectCompletionHandler(errorCode);
 }
 
 } // namespace udp

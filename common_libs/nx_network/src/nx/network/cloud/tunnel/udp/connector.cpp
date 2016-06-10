@@ -289,12 +289,10 @@ void TunnelConnector::onConnectResponse(
         rendezvousConnector->connect(
             effectiveConnectTimeout,
             [this, rendezvousConnectorPtr = rendezvousConnector.get()](
-                SystemError::ErrorCode errorCode,
-                std::unique_ptr<UdtStreamSocket> udtConnection)
+                SystemError::ErrorCode errorCode)
             {
                 onUdtConnectionEstablished(
                     rendezvousConnectorPtr,
-                    std::move(udtConnection),
                     errorCode);
             });
         m_rendezvousConnectors.emplace_back(std::move(rendezvousConnector));
@@ -303,7 +301,6 @@ void TunnelConnector::onConnectResponse(
 
 void TunnelConnector::onUdtConnectionEstablished(
     RendezvousConnector* rendezvousConnectorPtr,
-    std::unique_ptr<UdtStreamSocket> udtConnection,
     SystemError::ErrorCode errorCode)
 {
     //we are in m_timer's aio thread
@@ -343,11 +340,13 @@ void TunnelConnector::onUdtConnectionEstablished(
         .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
         cl_logDEBUG2);
 
+    //TODO #ak informing remote side that this very connection has been selected
+
     //stopping other rendezvous connectors
     m_rendezvousConnectors.clear(); //can do since we are in aio thread
 
-    NX_CRITICAL(udtConnection);
-    m_udtConnection = std::move(udtConnection);
+    m_udtConnection = rendezvousConnector->takeConnection();
+    NX_CRITICAL(m_udtConnection);
     rendezvousConnector.reset();
 
     //introducing delay to give server some time to call accept (work around udt bug)

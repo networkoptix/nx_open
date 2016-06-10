@@ -100,9 +100,7 @@ void RendezvousConnector::connect(
                 NX_LOGX(lm("session %1. Failed to create UDT socket. %2")
                     .arg(m_connectSessionId).arg(SystemError::toString(errorCode)),
                     cl_logDEBUG1);
-                completionHandler(
-                    errorCode,
-                    nullptr);
+                completionHandler(errorCode);
                 return;
             }
 
@@ -120,6 +118,11 @@ void RendezvousConnector::connect(
                             errorCode));
                 });
         });
+}
+
+std::unique_ptr<nx::network::UdtStreamSocket> RendezvousConnector::takeConnection()
+{
+    return std::move(m_udtConnection);
 }
 
 const nx::String& RendezvousConnector::connectSessionId() const
@@ -142,7 +145,7 @@ void RendezvousConnector::onUdtConnectFinished(
             .arg(SystemError::toString(errorCode)),
             cl_logDEBUG2);
         auto completionHandler = std::move(m_completionHandler);
-        completionHandler(errorCode, nullptr);
+        completionHandler(errorCode);
         return;
     }
 
@@ -152,9 +155,8 @@ void RendezvousConnector::onUdtConnectFinished(
         .arg(m_connectSessionId).arg(m_remotePeerAddress.toString()),
         cl_logDEBUG2);
 
-    auto udtConnection = std::move(m_udtConnection);
     auto completionHandler = std::move(m_completionHandler);
-    completionHandler(SystemError::noError, std::move(udtConnection));
+    completionHandler(SystemError::noError);
 }
 
 } // namespace udp

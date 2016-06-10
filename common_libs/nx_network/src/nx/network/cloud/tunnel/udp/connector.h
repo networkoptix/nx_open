@@ -96,7 +96,6 @@ private:
         nx::hpm::api::ConnectResponse response);
     void onUdtConnectionEstablished(
         RendezvousConnector* rendezvousConnectorPtr,
-        std::unique_ptr<UdtStreamSocket> udtConnection,
         SystemError::ErrorCode errorCode);
     void onTimeout();
     /** always called within aio thread */

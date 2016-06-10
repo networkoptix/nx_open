@@ -41,19 +41,19 @@ public:
     virtual void connect(
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler completionHandler) override;
+    virtual std::unique_ptr<nx::network::UdtStreamSocket> takeConnection() override;
 
 private:
     std::chrono::milliseconds m_timeout;
     ConnectCompletionHandler m_connectCompletionHandler;
     std::unique_ptr<stun::MessagePipeline> m_requestPipeline;
+    std::unique_ptr<nx::network::UdtStreamSocket> m_udtConnection;
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
         stun::MessagePipeline* connection) override;
 
-    void onConnectCompleted(
-        SystemError::ErrorCode errorCode,
-        std::unique_ptr<UdtStreamSocket> connection);
+    void onConnectCompleted(SystemError::ErrorCode errorCode);
     void onMessageReceived(nx::stun::Message message);
     void onTimeout();
     void processError(SystemError::ErrorCode errorCode);
