@@ -72,7 +72,7 @@ void serialize(const QnUuid &value, QString *target) {
 
 bool deserialize(const QString &value, QnUuid *target) {
     QnUuid result(value);
-    if(result.isNull() && value != lit("00000000-0000-0000-0000-000000000000") && value != lit("{00000000-0000-0000-0000-000000000000}"))
+    if(result.isNull() && value != QLatin1String("00000000-0000-0000-0000-000000000000") && value != QLatin1String("{00000000-0000-0000-0000-000000000000}"))
         return false;
 
     *target = result;
@@ -94,7 +94,7 @@ void serialize(const QColor &value, QString *target) {
 
 bool deserialize(const QString &value, QColor *target) {
     QString trimmedName = value.trimmed();
-    if(trimmedName.startsWith(lit("QColor"))) {
+    if(trimmedName.startsWith(QLatin1String("QColor"))) {
         /* QColor(R, G, B, A) format. */
         trimmedName = trimmedName.mid(trimmedName.indexOf(L'(') + 1);
         trimmedName = trimmedName.left(trimmedName.lastIndexOf(L')'));

@@ -124,8 +124,8 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QFont *target) {
         QString family;
         int pointSize = -1;
         if(
-            !QJson::deserialize(ctx, map, lit("family"), &family) ||
-            !QJson::deserialize(ctx, map, lit("pointSize"), &pointSize, true)
+            !QJson::deserialize(ctx, map, QLatin1String("family"), &family) ||
+            !QJson::deserialize(ctx, map, QLatin1String("pointSize"), &pointSize, true)
         ) {
             return false;
         }
