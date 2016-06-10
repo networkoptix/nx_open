@@ -1647,7 +1647,7 @@ bool SslSocket::setNonBlockingMode(bool val)
         return d->wrappedSocket->setNonBlockingMode(val);
 
     // the mode could be switched to non blocking, but SSL engine is
-    // too haivy to switch
+    // too heavy to switch
     d->emulateBlockingMode = !val;
     return true;
 }
