@@ -189,7 +189,7 @@ TEST_F(CloudStreamSocketTest, simple_socket_test)
         serverAddress);
 }
 
-TEST_F(CloudStreamSocketTest, shutdown)
+TEST_F(CloudStreamSocketTest, Shutdown)
 {
     const char* tempHostName = "bla.bla";
     SocketAddress serverAddress(HostAddress::localhost, 20000 + (rand() % 32000));
@@ -198,9 +198,31 @@ TEST_F(CloudStreamSocketTest, shutdown)
         tempHostName,
         serverAddress);
 
-    test::shutdownSocket(
+    test::socketShutdown(
         createServerSocketFunc,
         createClientSocketFunc,
+        false,
+        serverAddress,
+        SocketAddress(tempHostName));
+
+    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
+        tempHostName,
+        serverAddress);
+}
+
+TEST_F(CloudStreamSocketTest, ShutdownAfterAsync)
+{
+    const char* tempHostName = "bla.bla";
+    SocketAddress serverAddress(HostAddress::localhost, 20000 + (rand() % 32000));
+
+    nx::network::SocketGlobals::addressResolver().addFixedAddress(
+        tempHostName,
+        serverAddress);
+
+    test::socketShutdown(
+        createServerSocketFunc,
+        createClientSocketFunc,
+        true,
         serverAddress,
         SocketAddress(tempHostName));
 

@@ -30,7 +30,7 @@ static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers
                     return std::unique_ptr<AbstractTunnelAcceptor>();
 
                 auto acceptor = std::make_unique<udp::TunnelAcceptor>(
-                    std::move(event.udpEndpointList.front()),
+                    std::move(event.udpEndpointList.back()),
                     event.params);
 
                 return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
