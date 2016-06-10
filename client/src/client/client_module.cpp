@@ -303,12 +303,9 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
     // TODO: #Elric why QString???
     if (!startupParams.lightMode.isEmpty())
     {
-        bool ok;
+        bool ok = false;
         Qn::LightModeFlags lightModeOverride(startupParams.lightMode.toInt(&ok));
-        if (ok)
-            qnRuntime->setLightModeOverride(lightModeOverride);
-        else
-            qnRuntime->setLightModeOverride(Qn::LightModeFull);
+        qnRuntime->setLightModeOverride(ok ? lightModeOverride : Qn::LightModeFull);
     }
 
     if (!startupParams.videoWallGuid.isNull())

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>528</width>
-    <height>370</height>
+    <height>360</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -31,20 +31,39 @@
     </widget>
    </item>
    <item>
-    <widget class="Line" name="line_3">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QnInputField" name="loginInputField" native="true"/>
-   </item>
-   <item>
-    <widget class="QnInputField" name="nameInputField" native="true"/>
-   </item>
-   <item>
-    <widget class="QnInputField" name="emailInputField" native="true"/>
+     <property name="topMargin">
+      <number>8</number>
+     </property>
+     <property name="bottomMargin">
+      <number>8</number>
+     </property>
+     <item>
+      <widget class="Line" name="line_3">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QnInputField" name="loginInputField" native="true"/>
+     </item>
+     <item>
+      <widget class="QnInputField" name="nameInputField" native="true"/>
+     </item>
+     <item>
+      <widget class="QnInputField" name="emailInputField" native="true"/>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QnInputField" name="passwordInputField" native="true"/>
