@@ -25,8 +25,7 @@ namespace
 
 
 QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res) :
-    QnAbstractAudioTransmitter(),
-    m_resource(res),
+    QnAbstractAudioTransmitter(res),
     m_noAuth(false),
     m_state(TransmitterState::WaitingForConnection)
 {
@@ -129,14 +128,18 @@ bool QnAxisAudioTransmitter::startTransmission()
 
     QUrl url(m_resource->getUrl());
 
-    QnResourcePtr mServer = m_resource->getParentServer();
+    auto camRes = dynamic_cast<QnSecurityCamResource*> (m_resource);
+    if (!camRes)
+        return false;
+
+    QnResourcePtr mServer = camRes->getParentServer();
 
     if (!mServer)
         return false;
 
     m_socket.clear();
 
-    auto auth = m_resource->getAuth();
+    auto auth = camRes->getAuth();
     m_noAuth = auth.user().isEmpty() && auth.password().isEmpty();
 
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
@@ -160,7 +163,7 @@ bool QnAxisAudioTransmitter::startTransmission()
 
     url.setScheme(lit("http"));
     if (url.host().isEmpty())
-        url.setHost(m_resource->getHostAddress());
+        url.setHost(camRes->getHostAddress());
 
     url.setPath(kAxisAudioTransmitUrl);
 
@@ -221,17 +224,18 @@ bool QnAxisAudioTransmitter::sendData(
     return true;
 }
 
-bool QnAxisAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data)
+bool QnAxisAudioTransmitter::processAudioData(const QnConstCompressedAudioDataPtr& audioData)
 {
     if (m_state != TransmitterState::ReadyForTransmission && !startTransmission())
         return true;
 
-    if (!m_transcoder->isOpened() && !m_transcoder->open(data->context))
+    if (!m_transcoder->isOpened() && !m_transcoder->open(audioData->context))
         return true; //< always return true. It means skip input data.
 
     if (!m_socket)
         return true;
     QnAbstractMediaDataPtr transcoded;
+    auto data = audioData;
     do
     {
         m_transcoder->transcodePacket(data, &transcoded);
