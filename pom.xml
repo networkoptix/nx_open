@@ -593,6 +593,7 @@
                 <qt.spec>macx-clang-libc++</qt.spec>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
+                <qtplugin4>audio</qtplugin4>
             </properties>
             <modules>
                 <module>macsetup/client-dmg</module>

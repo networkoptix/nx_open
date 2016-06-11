@@ -281,7 +281,7 @@ bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusi
 
         provider.dynamicCast<QnAbstractArchiveReader>()->setCycleMode(false);
 
-        transmitter->subscribe(provider, QnDataProviderInfo::kSingleNotificationPriority);
+        transmitter->subscribe(provider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
 
         provider->startIfNotRunning();
     }
@@ -292,13 +292,13 @@ bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusi
         if (action->getToggleState() == QnBusiness::ActiveState)
         {
             provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
-            transmitter->subscribe(provider, QnDataProviderInfo::kContinuousNotificationPriority);
+            transmitter->subscribe(provider, QnAbstractAudioTransmitter::kContinuousNotificationPriority);
             provider->startIfNotRunning();
         }
         else if (action->getToggleState() == QnBusiness::InactiveState)
         {
             provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
-            transmitter->unsubscribe(provider);
+            transmitter->unsubscribe(provider.data());
             QnAudioStreamerPool::instance()->destroyActionDataProvider(action);
         }
     }
@@ -324,7 +324,7 @@ bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusine
         return false;
 
     QnAbstractStreamDataProviderPtr speachProvider(new QnSpeachSynthesisDataProvider(text));
-    transmitter->subscribe(speachProvider, QnDataProviderInfo::kSingleNotificationPriority);
+    transmitter->subscribe(speachProvider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
     speachProvider->startIfNotRunning();
     return true;
 #else
