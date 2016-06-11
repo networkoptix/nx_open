@@ -61,6 +61,8 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
             return false;
 
         auto route = QnRouter::instance()->routeTo(mServer->getId());
+        if (route.addr.isNull())
+            return false; //< can't find route
         if (!route.gatewayId.isNull())
             mServer = qnResPool->getResourceById<QnMediaServerResource>(route.gatewayId);
         if (!mServer)
