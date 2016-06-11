@@ -51,10 +51,10 @@ private:
 
 private:
     mutable QnMutex m_mutex;
+    QnSecurityCamResource* m_resource;
     std::unique_ptr<QnFfmpegAudioTranscoder> m_transcoder;
     QnAudioFormat m_outputFormat;
     QSharedPointer<AbstractStreamSocket> m_socket;
-
     bool m_noAuth;
 
     TransmitterState m_state;

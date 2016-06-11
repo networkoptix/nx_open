@@ -24,17 +24,19 @@ namespace
 }
 
 
-QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res) :
-    QnAbstractAudioTransmitter(res),
+QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res):
+    QnAbstractAudioTransmitter(),
+    m_resource(res),
     m_noAuth(false),
     m_state(TransmitterState::WaitingForConnection)
 {
-
+    connect(m_resource, &QnResource::parentIdChanged, this, [this]() { pleaseStop(); });
 }
 
 QnAxisAudioTransmitter::~QnAxisAudioTransmitter()
 {
     stop();
+    disconnect(m_resource, nullptr, this, nullptr);
 }
 
 
@@ -128,18 +130,14 @@ bool QnAxisAudioTransmitter::startTransmission()
 
     QUrl url(m_resource->getUrl());
 
-    auto camRes = dynamic_cast<QnSecurityCamResource*> (m_resource);
-    if (!camRes)
-        return false;
-
-    QnResourcePtr mServer = camRes->getParentServer();
+    QnResourcePtr mServer = m_resource->getParentServer();
 
     if (!mServer)
         return false;
 
     m_socket.clear();
 
-    auto auth = camRes->getAuth();
+    auto auth = m_resource->getAuth();
     m_noAuth = auth.user().isEmpty() && auth.password().isEmpty();
 
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
@@ -163,7 +161,7 @@ bool QnAxisAudioTransmitter::startTransmission()
 
     url.setScheme(lit("http"));
     if (url.host().isEmpty())
-        url.setHost(camRes->getHostAddress());
+        url.setHost(m_resource->getHostAddress());
 
     url.setPath(kAxisAudioTransmitUrl);
 

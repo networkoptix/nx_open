@@ -16,7 +16,7 @@ public:
     static const int kUserPriority = 20;
     static const int kSingleNotificationPriority = 30;
 
-    QnAbstractAudioTransmitter(QnResource* res);
+    QnAbstractAudioTransmitter();
 
     virtual bool processData(const QnAbstractDataPacketPtr &data) override;
     virtual bool processAudioData(const QnConstCompressedAudioDataPtr& data) = 0;

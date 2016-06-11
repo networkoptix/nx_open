@@ -5,10 +5,9 @@
 #include <core/resource/resource.h>
 #include <QFile>
 
-QnAbstractAudioTransmitter::QnAbstractAudioTransmitter(QnResource* res):
+QnAbstractAudioTransmitter::QnAbstractAudioTransmitter():
     QnAbstractDataConsumer(1000),
     m_transmittedPacketDuration(0),
-    m_resource(res),
     m_prevUsedProvider(nullptr)
 {
 
@@ -32,12 +31,6 @@ void QnAbstractAudioTransmitter::makeRealTimeDelay(const QnConstCompressedAudioD
 
 bool QnAbstractAudioTransmitter::processData(const QnAbstractDataPacketPtr &data)
 {
-    if (m_resource->hasFlags(Qn::foreigner))
-    {
-        pleaseStop();
-        return true;
-    }
-
     QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
     if (!media)
         return true;

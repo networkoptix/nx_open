@@ -28,7 +28,6 @@ const QByteArray QnProxyAudioTransmitter::kFixedPostRequest(
 
 
 QnProxyAudioTransmitter::QnProxyAudioTransmitter(const QnResourcePtr& camera, const QnRequestParams &params):
-    QnAbstractAudioTransmitter(camera.data()),
     m_camera(camera),
     m_initialized(false),
     m_params(params),
