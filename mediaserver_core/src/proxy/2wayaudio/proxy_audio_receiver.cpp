@@ -133,6 +133,9 @@ private:
     QnUuid m_cameraId;
 };
 
+typedef QnSharedResourcePointer<QnProxyDesktopDataProvider> QnProxyDesktopDataProviderPtr;
+
+
 QnAudioProxyReceiver::QnAudioProxyReceiver(QSharedPointer<AbstractStreamSocket> socket,
                                                      QnHttpConnectionListener* owner):
     QnTCPConnectionProcessor(new QnAudioProxyReceiverPrivate, socket)
@@ -173,13 +176,13 @@ void QnAudioProxyReceiver::run()
     if (!readHttpHeaders(d->socket))
         return;
 
-    QSharedPointer<QnProxyDesktopDataProvider> desktopDataProvider;
+    QnProxyDesktopDataProviderPtr desktopDataProvider;
     {
         QnMutexLocker lock(&m_mutex);
         QString key = clientId.toString() + resourceId;
         auto itr = m_proxyProviders.find(key);
         if (itr == m_proxyProviders.end())
-            itr = m_proxyProviders.insert(key, QSharedPointer<QnProxyDesktopDataProvider>(new QnProxyDesktopDataProvider(resourceId)));
+            itr = m_proxyProviders.insert(key, QnProxyDesktopDataProviderPtr(new QnProxyDesktopDataProvider(resourceId)));
         desktopDataProvider = itr.value();
         desktopDataProvider->setSocket(d->socket);
     }
