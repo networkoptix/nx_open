@@ -85,7 +85,7 @@ private slots:
 
 private:
     QGraphicsLinearLayout *m_layout;
-    QnProxyLabel* m_textLabel;
+    GraphicsLabel* m_textLabel;
     QnClickableProxyLabel* m_thumbnailLabel;
     QRectF m_enclosingRect;
     QPointF m_pointTo;
@@ -165,7 +165,7 @@ private:
     QString m_soundPath;
 
     QGraphicsLinearLayout *m_layout;
-    QnProxyLabel *m_textLabel;
+    GraphicsLabel *m_textLabel;
     QnImageButtonWidget *m_closeButton;
     QColor m_color;
     QnNotificationLevel::Value m_notificationLevel;

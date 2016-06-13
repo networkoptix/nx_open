@@ -31,6 +31,8 @@
 #include <utils/common/model_functions.h>
 #include "server_connector.h"
 #include <transaction/transaction_message_bus.h>
+#include "cloud/cloud_system_name_updater.h"
+
 
 namespace
 {
@@ -247,7 +249,6 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
     if (qnCommon->localSystemName() == systemName.value())
         return true;
 
-    qnCommon->setLocalSystemName(systemName.value());
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server) {
         NX_LOG("Cannot find self server resource!", cl_logERROR);
@@ -259,6 +260,7 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
         NX_LOG("Failed to save new system name to config", cl_logWARNING);
         return false;
     }
+    qnCommon->setLocalSystemName(systemName.value());
     if (resetConnections)
         resetTransactionTransportConnections();
 
@@ -280,6 +282,8 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
     QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+
+    CloudSystemNameUpdater::instance()->update();
 
     return true;
 }

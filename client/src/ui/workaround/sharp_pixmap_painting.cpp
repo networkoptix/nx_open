@@ -38,16 +38,17 @@ void paintPixmapSharp( QPainter *painter, const QPixmap &pixmap, const QPointF &
         return;
 
     bool corrected = false;
-    QTransform roundedTransform = sharpTransform(painter->transform(), &corrected);
-    QPointF roundedPosition(qRound(position.x()), qRound(position.y()));
-
+    const QTransform roundedTransform = sharpTransform(painter->transform(), &corrected);
+    const QPointF roundedPosition(qRound(position.x()), qRound(position.y()));
+    const int ratio = pixmap.devicePixelRatio();
+    const auto targetRect = QRectF(roundedPosition, pixmap.size() / ratio);
     if (corrected)
     {
-        QnScopedPainterTransformRollback rollback(painter, roundedTransform);
-        painter->drawPixmap(roundedPosition, pixmap);
+        const QnScopedPainterTransformRollback rollback(painter, roundedTransform);
+        painter->drawPixmap(targetRect, pixmap, pixmap.rect());
     }
     else
     {
-        painter->drawPixmap(roundedPosition, pixmap);
+        painter->drawPixmap(targetRect, pixmap, pixmap.rect());
     }
 }

@@ -105,7 +105,7 @@ private:
         if (isLocal)
             return Qn::LocalSeparatorNode + 1;
 
-        NX_ASSERT(false, "Should never get here");
+        /* We still can get here when comparing recorders with cameras. */
         return nodeType;
     }
 
@@ -145,6 +145,34 @@ protected:
                 return rightNodeType == Qn::VideoWallItemNode;
         }
 
+        /* Local resources should be ordered by type first */
+        if (leftNodeType == Qn::ResourceNode &&
+            rightNodeType == Qn::ResourceNode &&
+            leftResource &&
+            rightResource)
+        {
+            if (leftResource->hasFlags(Qn::local) && rightResource->hasFlags(Qn::local))
+            {
+                auto flagsOrder = [](Qn::ResourceFlags flags)
+                {
+                    if (flags.testFlag(Qn::local_image))
+                        return 2;
+
+                    if (flags.testFlag(Qn::local_video))
+                        return 1;
+
+                    /* Exported layouts. */
+                    return 0;
+                };
+
+                int leftFlagsOrder = flagsOrder(leftResource->flags());
+                int rightFlagsOrder = flagsOrder(rightResource->flags());
+                if (leftFlagsOrder != rightFlagsOrder)
+                    return leftFlagsOrder < rightFlagsOrder;
+
+            }
+        }
+
         {
             /* Sort by name. */
             QString leftDisplay = left.data(Qt::DisplayRole).toString();
@@ -155,7 +183,7 @@ protected:
         }
 
         /* We want the order to be defined even for items with the same name. */
-        if(leftResource && rightResource)
+        if (leftResource && rightResource)
             return leftResource->getUniqueId() < rightResource->getUniqueId();
 
         return leftResource < rightResource;
@@ -501,6 +529,9 @@ bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event)
 
     case QEvent::PaletteChange:
         ui->resourcesTreeView->setPalette(palette()); // override default item view palette
+        break;
+
+    default:
         break;
     }
 

@@ -11,7 +11,8 @@
 
 #include <utils/common/connective.h>
 
-namespace Ui {
+namespace Ui
+{
     class QnUserManagementWidget;
 }
 
@@ -19,28 +20,31 @@ class QnUserListModel;
 class QnSortedUserListModel;
 class QnCheckBoxedHeaderView;
 
-class QnUserManagementWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware {
+class QnUserManagementWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
+{
     Q_OBJECT
     Q_PROPERTY(QnUserManagementColors colors READ colors WRITE setColors)
     typedef Connective<QnAbstractPreferencesWidget> base_type;
 
 public:
-    explicit QnUserManagementWidget(QWidget *parent = 0);
-    ~QnUserManagementWidget();
+    explicit QnUserManagementWidget(QWidget* parent = nullptr);
+    virtual ~QnUserManagementWidget();
 
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
     virtual bool hasChanges() const override;
 
     const QnUserManagementColors colors() const;
-    void setColors(const QnUserManagementColors &colors);
+    void setColors(const QnUserManagementColors& colors);
+
 private:
-    void at_usersTable_activated(const QModelIndex &index);
-    void at_usersTable_clicked(const QModelIndex &index);
+    void at_usersTable_activated(const QModelIndex& index);
+    void at_usersTable_clicked(const QModelIndex& index);
     void at_headerCheckStateChanged(Qt::CheckState state);
 
-    Q_SLOT void at_mergeLdapUsersAsync_finished(int status, int handle, const QString &errorString);
+    Q_SLOT void at_mergeLdapUsersAsync_finished(int status, int handle, const QString& errorString);
 
+    void editRoles();
     void createUser();
     void fetchUsers();
     void openLdapSettings();
@@ -57,8 +61,8 @@ private:
 
 private:
     QScopedPointer<Ui::QnUserManagementWidget> ui;
-    QnUserListModel *m_usersModel;
-    QnSortedUserListModel *m_sortModel;
+    QnUserListModel* m_usersModel;
+    QnSortedUserListModel* m_sortModel;
     QnCheckBoxedHeaderView* m_header;
     QnUserManagementColors m_colors;
 };

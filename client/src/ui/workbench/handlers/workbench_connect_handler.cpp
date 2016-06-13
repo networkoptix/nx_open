@@ -256,10 +256,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
     const auto connectionAlias = parameters.argument(Qn::ConnectionAliasRole, QString());
-    const auto storeSettings = StoreConnectionSettings::create(connectionAlias,        
+    const auto storeSettings = StoreConnectionSettings::create(connectionAlias,
         parameters.argument(Qn::StorePasswordRole, false),
         parameters.argument(Qn::AutoLoginRole, false));
-    
+
     if (url.isValid())
     {
         /* ActiveX plugin */
@@ -452,7 +452,11 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     }
     }
 
-    QnAppServerConnectionFactory::setUrl(connectionInfo.ecUrl);
+    QUrl ecUrl = connectionInfo.ecUrl;
+    if (connectionInfo.allowSslConnections)
+        ecUrl.setScheme(lit("https"));
+
+    QnAppServerConnectionFactory::setUrl(ecUrl);
     QnAppServerConnectionFactory::setEc2Connection(result.connection());
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 
@@ -545,10 +549,10 @@ void QnWorkbenchConnectHandler::clearConnection()
     action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
-    QnResourceList resourcesToRemove = resourcePool()->getResourcesWithFlag(Qn::remote);
+    QnResourceList resourcesToRemove = qnResPool->getResourcesWithFlag(Qn::remote);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
-    foreach (const QnLayoutResourcePtr& layout, resourcePool()->getResources<QnLayoutResource>())
+    foreach (const QnLayoutResourcePtr& layout, qnResPool->getResources<QnLayoutResource>())
     {
         bool isLocal = snapshotManager()->isLocal(layout);
         bool isFile = layout->isFile();
@@ -561,8 +565,8 @@ void QnWorkbenchConnectHandler::clearConnection()
     foreach(const QnResourcePtr& res, resourcesToRemove)
         idList.push_back(res->getId());
 
-    resourcePool()->removeResources(resourcesToRemove);
-    resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
+    qnResPool->removeResources(resourcesToRemove);
+    qnResPool->removeResources(qnResPool->getAllIncompatibleResources());
 
     QnCameraUserAttributePool::instance()->clear();
     QnMediaServerUserAttributesPool::instance()->clear();

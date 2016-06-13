@@ -3,8 +3,8 @@
 #include <QtWidgets/QWidget>
 
 /**
-* Common class to anchor a widget to edges of its parent.
-*/
+ * Common class to anchor a widget to edges of its parent.
+ */
 class QnWidgetAnchor : public QObject
 {
     Q_OBJECT
@@ -35,5 +35,5 @@ private:
 private:
     Qt::Edges m_edges;
     QMargins m_margins;
-    QWidget* m_widget;
+    QPointer<QWidget> m_widget;
 };

@@ -33,7 +33,7 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
 
     m_overrideContinuousMove = m_flip != 0 || (m_traits & (Qn::FourWayPtzTrait | Qn::EightWayPtzTrait));
 
-    if(resourceData.value(lit("ptzCapabilities"), &m_capabilities))
+    if(resourceData.value(Qn::PTZ_CAPABILITIES_PARAM_NAME, &m_capabilities))
         m_overrideCapabilities = true;
 }
 

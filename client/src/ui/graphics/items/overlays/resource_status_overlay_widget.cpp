@@ -337,8 +337,9 @@ void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, OverlayText tex
         palette().color(QPalette::WindowText));
 
     qreal scaleFactor = textSize * unit / kStaticFontSize;
-    if (text.width() * scaleFactor > rect.width())
-        scaleFactor = rect.width() / text.width();
+    const auto dpTextSize = text.size() / text.devicePixelRatio();
+    if (dpTextSize.width() * scaleFactor > rect.width())
+        scaleFactor = rect.width() / dpTextSize.width();
 
     QnScopedPainterTransformRollback transformRollback(painter);
 
@@ -346,7 +347,7 @@ void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, OverlayText tex
     painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(kFlashingPeriodMs * 2) * M_PI)));
     painter->translate(rect.center() + offset * unit);
     painter->scale(scaleFactor, scaleFactor);
-    paintPixmapSharp(painter, text, -toPoint(text.size() / 2));
+    paintPixmapSharp(painter, text, -toPoint(dpTextSize / 2));
     painter->setOpacity(opacity);
 }
 
@@ -358,13 +359,14 @@ void QnStatusOverlayWidget::paintPixmap(QPainter *painter, const QPixmap &pictur
     QnScopedPainterTransformRollback transformRollback(painter);
 
     qreal scaleFactor = imageSize * unit / kStaticFontSize;
-    if (picture.size().width() * scaleFactor > rect.width())
-        scaleFactor = rect.width() / picture.size().width();
+    const auto dpPictureSize = picture.size() / picture.devicePixelRatio();
+    if (dpPictureSize.width() * scaleFactor > rect.width())
+        scaleFactor = rect.width() / dpPictureSize.width();
 
     qreal opacity = painter->opacity();
     painter->translate(rect.center());
     painter->scale(scaleFactor, scaleFactor);
 
-    painter->drawPixmap(-toPoint(picture.size() / 2), picture);
+    painter->drawPixmap(-toPoint(dpPictureSize / 2), picture);
     painter->setOpacity(opacity);
 }

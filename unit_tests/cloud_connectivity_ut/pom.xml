@@ -14,15 +14,13 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud_connectivity_ut</artifactId>
     <packaging>pom</packaging>
-    <name>cloud_connectivity unit tests</name>
+    <name>NX Cloud Connectivity Unit Tests</name>
 
     <properties>
-        <guid>${cloud_connectivity_ut.guid}</guid>
-        <product.title>cloud_connectivity unit tests</product.title>
-
         <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -ludt -lcloud_db_client -lconnection_mediator</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
+        <guid>${cloud_connectivity_ut.guid}</guid>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
 

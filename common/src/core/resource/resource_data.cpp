@@ -14,7 +14,7 @@ public:
     {
         registerKey<QnPtzMapperPtr>(lit("ptzMapper"));
         registerKey<QnOnvifConfigDataPtr>(lit("forcedOnvifParams"));
-        registerKey<Qn::PtzCapabilities>(lit("ptzCapabilities"));
+        registerKey<Qn::PtzCapabilities>(Qn::PTZ_CAPABILITIES_PARAM_NAME);
         registerKey<Qn::PtzTraits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
         registerKey<QList<QnCredentials>>(Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);

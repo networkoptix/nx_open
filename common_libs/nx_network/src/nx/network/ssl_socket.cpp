@@ -15,6 +15,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/type_utils.h>
+#include <nx/utils/std/future.h>
 #include <utils/common/systemerror.h>
 
 #ifdef max
@@ -849,6 +850,9 @@ bool SslAsyncBioHelper::asyncSend(
     const nx::Buffer& buffer,
     std::function<void(SystemError::ErrorCode,std::size_t)>&& handler)
 {
+    NX_ASSERT(m_handshakeStage == HANDSHAKE_DONE || !m_isServer,
+        "SSL server is not supposed to send before recv");
+
     m_write->reset(&buffer,std::move(handler));
     asyncPerform(m_write.get());
     return true;
@@ -1178,7 +1182,12 @@ public:
     // the call for sync is undefined. This is for purpose since it heavily reduce
     // the pain of
     std::atomic<SslSocket::IOMode> ioMode;
+    std::atomic<bool> emulateBlockingMode;
     std::unique_ptr<SslAsyncBioHelper> asyncSslHelper;
+
+    typedef utils::promise<std::pair<SystemError::ErrorCode, size_t>> AsyncPromise;
+    std::unique_ptr<AsyncPromise> sendPromise;
+    std::unique_ptr<AsyncPromise> recvPromise;
 
     SslSocketPrivate()
     :
@@ -1187,7 +1196,8 @@ public:
         isServerSide(false),
         extraBufferLen(0),
         ecnryptionEnabled(false),
-        ioMode(SslSocket::SYNC)
+        ioMode(SslSocket::SYNC),
+        emulateBlockingMode(false)
     {
     }
 };
@@ -1457,8 +1467,30 @@ int SslSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*/)
 int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(SslSocket);
-    NX_ASSERT(d->ioMode == SslSocket::SYNC);
+    if (d->emulateBlockingMode)
+    {
+        // the mode could be switched to non blocking, but SSL engine is
+        // still non-blocking
+        d->recvPromise.reset(new SslSocketPrivate::AsyncPromise);
+        nx::Buffer localBuffer(bufferLen, '\0');
+        readSomeAsync(
+            &localBuffer,
+            [&](SystemError::ErrorCode code, size_t size)
+            {
+                d->recvPromise->set_value(std::make_pair(code, size));
+                d->recvPromise.reset();
+            });
 
+        const auto result = d->recvPromise->get_future().get();
+        if (result.first == SystemError::noError)
+            std::memcpy(localBuffer.data(), buffer, result.second);
+        else
+            SystemError::setLastErrorCode(result.first);
+
+        return result.second;
+    }
+
+    NX_ASSERT(d->ioMode == SslSocket::SYNC);
     if (!d->ecnryptionEnabled)
         return d->wrappedSocket->recv(buffer, bufferLen, flags);
 
@@ -1477,8 +1509,28 @@ int SslSocket::sendInternal(const void* buffer, unsigned int bufferLen)
 int SslSocket::send(const void* buffer, unsigned int bufferLen)
 {
     Q_D(SslSocket);
-    NX_ASSERT(d->ioMode == SslSocket::SYNC);
+    if (d->emulateBlockingMode)
+    {
+        // the mode could be switched to non blocking, but SSL engine is
+        // still non-blocking
+        d->sendPromise.reset(new SslSocketPrivate::AsyncPromise);
+        nx::Buffer localBuffer(static_cast<const char*>(buffer), bufferLen);
+        sendAsync(
+            localBuffer,
+            [&](SystemError::ErrorCode code, size_t size)
+            {
+                d->sendPromise->set_value(std::make_pair(code, size));
+                d->sendPromise.reset();
+            });
 
+        const auto result = d->sendPromise->get_future().get();
+        if (result.first != SystemError::noError)
+            SystemError::setLastErrorCode(result.first);
+
+        return result.second;
+    }
+
+    NX_ASSERT(d->ioMode == SslSocket::SYNC);
     if (!d->ecnryptionEnabled)
         return d->wrappedSocket->send(buffer, bufferLen);
 
@@ -1586,6 +1638,51 @@ void SslSocket::cancelIOSync(nx::network::aio::EventType eventType)
 {
     Q_D(const SslSocket);
     d->wrappedSocket->cancelIOSync(eventType);
+}
+
+bool SslSocket::setNonBlockingMode(bool val)
+{
+    Q_D(SslSocket);
+    if (d->ioMode == SslSocket::SYNC)
+        return d->wrappedSocket->setNonBlockingMode(val);
+
+    // the mode could be switched to non blocking, but SSL engine is
+    // too heavy to switch
+    d->emulateBlockingMode = !val;
+    return true;
+}
+
+bool SslSocket::getNonBlockingMode(bool* val) const
+{
+    Q_D(const SslSocket);
+    if (d->ioMode == SslSocket::SYNC)
+        return d->wrappedSocket->getNonBlockingMode(val);
+
+    *val = !d->emulateBlockingMode;
+    return true;
+}
+
+bool SslSocket::shutdown()
+{
+    Q_D(const SslSocket);
+    if (!d->emulateBlockingMode)
+        return d->wrappedSocket->shutdown();
+
+    utils::promise<void> promise;
+    d->wrappedSocket->post([&]()
+    {
+        if (d->sendPromise)
+            d->sendPromise->set_value({0, SystemError::interrupted});
+
+        if (d->recvPromise)
+            d->recvPromise->set_value({0, SystemError::interrupted});
+
+        d->wrappedSocket->pleaseStopSync();
+        promise.set_value();
+    });
+
+    promise.get_future().wait();
+    return d->wrappedSocket->shutdown();
 }
 
 void SslSocket::connectAsync(

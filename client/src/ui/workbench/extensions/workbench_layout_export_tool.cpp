@@ -318,7 +318,7 @@ void QnLayoutExportTool::finishExport(bool success) {
         {
             m_storage->renameFile(m_storage->getUrl(), QnLayoutFileStorageResource::layoutPrefix() + m_targetFilename);
             if (m_mode == Qn::LayoutLocalSave) {
-                QnLayoutResourcePtr layout = resourcePool()->getResourceByUniqueId<QnLayoutResource>(m_layout->getUniqueId());
+                QnLayoutResourcePtr layout = qnResPool->getResourceByUniqueId<QnLayoutResource>(m_layout->getUniqueId());
                 if (layout) {
                     layout->update(m_layout);
                     snapshotManager()->store(layout);
@@ -356,9 +356,10 @@ void QnLayoutExportTool::finishExport(bool success) {
                 return;
             }
 
-            if (!resourcePool()->getResourceById(layout->getId())) {
+            if (!qnResPool->getResourceById(layout->getId()))
+            {
                 layout->setStatus(Qn::Online);
-                resourcePool()->addResource(layout);
+                qnResPool->addResource(layout);
             }
         }
     } else {

@@ -1,6 +1,6 @@
 #include "cloud_url_helper.h"
 
-#include "api/global_settings.h"
+#include <api/global_settings.h>
 
 QUrl QnCloudUrlHelper::mainUrl()
 {

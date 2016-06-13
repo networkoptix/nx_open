@@ -407,12 +407,14 @@ void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &propose
     invalidate();
 }
 
-bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera) {
+bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera)
+{
     return isOverflowForCamera(camera, camera->isLicenseUsed());
 }
 
-bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenceUsed) {
-    bool requiresLicense = false;
+bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenceUsed)
+{
+    bool requiresLicense = cachedLicenceUsed;
     requiresLicense &= !m_proposedToDisable.contains(camera);
     requiresLicense |= m_proposedToEnable.contains(camera);
     return requiresLicense && !isValid(camera->licenseType());
