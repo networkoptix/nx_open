@@ -26,13 +26,13 @@
                         <td><div class="name">{{systemName}}</div>
                             {{#systemSignature}}<div class="hint">{{systemSignature}}</div>{{/systemSignature}}</td>
                     </tr>
-                    {{#cloudOwner}}
+                    {{#cloudOwnerEmail}}
                     <tr class="cloud-info">
                         <td><img class="icon" src="cid:ownerIcon"></td>
                         <td>{{#cloudOwner}}<div class="name">{{cloudOwner}}</div>{{/cloudOwner}}
-                            {{#cloudOwnerEmail}}<div class="hint"><a rel="nofollow" href="" class="nolink">{{cloudOwnerEmail}}</a></div>{{/cloudOwnerEmail}}</td>
+                            {{#cloudOwnerEmail}}<div class="hint"><a rel="nofollow" class="nolink">{{cloudOwnerEmail}}</a></div>{{/cloudOwnerEmail}}</td>
                     </tr>
-                    {{/cloudOwner}}
+                    {{/cloudOwnerEmail}}
                     </tbody>
                 </table>
             </div>
