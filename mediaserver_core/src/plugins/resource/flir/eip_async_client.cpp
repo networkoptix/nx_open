@@ -192,6 +192,7 @@ void EIPAsyncClient::processState()
             m_inProcess = false;
             m_mutex.unlock();
             emit done();
+            m_mutex.lock();
         }
 
     }
@@ -208,6 +209,7 @@ void EIPAsyncClient::processState()
         m_inProcess = false;
         m_mutex.unlock();
         emit done();
+        m_mutex.lock();
     }
     else if(m_currentState == EIPClientState::Error)
     {
@@ -216,6 +218,7 @@ void EIPAsyncClient::processState()
         m_inProcess = false;
         m_mutex.unlock();
         emit done();
+        m_mutex.lock();
     }
     else
     {
