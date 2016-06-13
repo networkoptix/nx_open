@@ -11,11 +11,11 @@
     <tbody>
 {{#aggregated}}
         <tr>
-            <td >
-                <b>{{source}}</b> ({{sourceIp}})
-            </td>
+            <td><b>{{reason}}</b></td>
             <td>{{{timestamp}}}</td>
         </tr>
 {{/aggregated}}
     </tbody>
 </table>
+
+
