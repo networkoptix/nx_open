@@ -1,4 +1,9 @@
 /* Warning! Keep this file and other templates consistent between cloud_portal/cloud/notifications and nx_vms */
+
+.header,.container,table {
+    color: #263137;
+}
+
 h1{
     font-size:20px;
     font-weight:normal;
@@ -16,8 +21,22 @@ p{
     line-height:20px;
     margin:0px;
 }
+table{
+    border:none;
+    border-spacing: 0px;
+    width:100%;
+}
 td{
+    vertical-align: top;
     text-align: left;
+    padding-right:5px;
+}
+th{
+    line-height: 30px;
+}
+.nolink{
+    text-decoration: none;
+    color: #263137;
 }
 
 .logo{
@@ -47,11 +66,8 @@ td{
 }
 .footer td{
     font-size:12px;
-    height:40px;
+    line-height: 20px;
     vertical-align:middle;
-}
-.container,table{
-    color:#263137;
 }
 
 .content{
@@ -123,10 +139,12 @@ td{
 }
 
 .description{
-    width:100%;
     background-color: #F8F9FA;
     padding: 10px 20px ;
     margin-top:15px;
+}
+.description img{
+    max-width:100%;
 }
 
 .date{
@@ -136,4 +154,20 @@ td{
 }
 .error{
     color: #C22626;
+}
+
+a{
+    color: #2FA2DB;
+}
+
+a:hover{
+    color: #43C2FF;
+}
+
+.number-iterator{
+
+}
+
+th:last-child{
+    width: 100%;
 }
