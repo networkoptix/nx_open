@@ -12,14 +12,14 @@
 {{>style_css}}
 </style>
 
-<table class="container" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#F5F7F8"><!-- background-color -->
+<table class="container" border="0" cellspacing="0" cellpadding="0" bgcolor="#F5F7F8"><!-- background-color -->
     <tbody>
     <tr>
         <td class="side-spacer"></td>
         <td class="header">
             {{#systemName}}
             <div class="system-info">
-                <table>
+                <table border="0" cellspacing="0" cellpadding="0" >
                     <tbody>
                     <tr>
                         <td><img class="icon" src="cid:systemIcon"></td>
@@ -29,8 +29,8 @@
                     {{#cloudOwner}}
                     <tr class="cloud-info">
                         <td><img class="icon" src="cid:ownerIcon"></td>
-                        <td><div class="name">{{cloudOwner}}</div>
-                            {{#cloudOwnerEmail}}<div class="hint">{{cloudOwnerEmail}}</div>{{/cloudOwnerEmail}}</td>
+                        <td>{{#cloudOwner}}<div class="name">{{cloudOwner}}</div>{{/cloudOwner}}
+                            {{#cloudOwnerEmail}}<div class="hint"><a rel="nofollow" href="" class="nolink">{{cloudOwnerEmail}}</a></div>{{/cloudOwnerEmail}}</td>
                     </tr>
                     {{/cloudOwner}}
                     </tbody>
@@ -46,7 +46,7 @@
 
     <tr>
         <td></td>
-        <td class="content" bgcolor="white" width="800">
+        <td class="content" bgcolor="white">
             {{>body}}
         </td>
         <td></td>
