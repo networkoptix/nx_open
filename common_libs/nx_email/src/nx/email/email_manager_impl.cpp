@@ -35,9 +35,12 @@ bool EmailManagerImpl::testConnection(const QnEmailSettings &settings) const
     SmtpClient::ConnectionType connectionType = smtpConnectionType(settings.connectionType);
     SmtpClient smtp(settings.server, port, connectionType);
 
-    if (!smtp.connectToHost()) return false;
-    bool result = smtp.login(settings.user, settings.password);
+    if (!smtp.connectToHost())
+        return false;
+
+    bool result = settings.user.isEmpty() || smtp.login(settings.user, settings.password);
     smtp.quit();
+
     return result;
 }
 
@@ -83,12 +86,14 @@ bool EmailManagerImpl::sendEmail(
             .arg(SmtpClient::toString(connectionType)).arg(SystemError::toString(errorCode)), cl_logWARNING );
         return false;
     }
-    if( !smtp.login(settings.user, settings.password) )
+
+    if (!settings.user.isEmpty() && !smtp.login(settings.user, settings.password) )
     {
         NX_LOG( lit("SMTP. Failed to login to %1:%2").arg(settings.server).arg(port), cl_logWARNING );
         smtp.quit();
         return false;
     }
+
     if( !smtp.sendMail(message) )
     {
         const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();

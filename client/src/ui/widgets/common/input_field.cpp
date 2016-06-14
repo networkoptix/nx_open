@@ -222,6 +222,18 @@ void QnInputField::setText(const QString& value)
     d->validate();
 }
 
+QString QnInputField::placeholderText() const
+{
+    Q_D(const QnInputField);
+    return d->input->placeholderText();
+}
+
+void QnInputField::setPlaceholderText(const QString& value)
+{
+    Q_D(QnInputField);
+    d->input->setPlaceholderText(value);
+}
+
 QLineEdit::EchoMode QnInputField::echoMode() const
 {
     Q_D(const QnInputField);

@@ -16,6 +16,9 @@ class QnInputField : public QWidget
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged USER true)
+    Q_PROPERTY(QString hint READ hint WRITE setHint)
+    Q_PROPERTY(QString placeholderText READ placeholderText WRITE setPlaceholderText)
     Q_PROPERTY(QLineEdit::EchoMode echoMode READ echoMode WRITE setEchoMode)
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
     Q_PROPERTY(bool passwordIndicatorEnabled READ passwordIndicatorEnabled WRITE setPasswordIndicatorEnabled)
@@ -35,6 +38,9 @@ public:
     QString text() const;
     void setText(const QString& value);
     void clear();
+
+    QString placeholderText() const;
+    void setPlaceholderText(const QString& value);
 
     QLineEdit::EchoMode echoMode() const;
     void setEchoMode(QLineEdit::EchoMode value);

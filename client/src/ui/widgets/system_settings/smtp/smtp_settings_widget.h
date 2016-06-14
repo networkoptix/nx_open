@@ -33,13 +33,13 @@ protected:
 private:
     QnEmailSettings settings() const;
     void finishTesting();
-   
+
     void at_testButton_clicked();
     void at_advancedCheckBox_toggled(bool toggled);
-    
+
 private:
     QScopedPointer<Ui::SmtpSettingsWidget> ui;
-    
+
     QnSmtpSimpleSettingsWidget* m_simpleSettingsWidget;
     QnSmtpAdvancedSettingsWidget* m_advancedSettingsWidget;
     QnSmtpTestConnectionWidget* m_testSettingsWidget;
