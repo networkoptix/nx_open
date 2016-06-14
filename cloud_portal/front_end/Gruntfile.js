@@ -19,6 +19,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-protractor-webdriver');
     grunt.loadNpmTasks('grunt-protractor-runner');
     grunt.loadNpmTasks('grunt-wiredep');
+    grunt.loadNpmTasks('grunt-backstop');
 
 
     // Define the configuration for all the tasks
@@ -510,6 +511,35 @@ module.exports = function (grunt) {
 
             }
         },
+
+        // Screenshot-based testing
+        backstop: {
+            setup: {
+                options : {
+                    backstop_path: './node_modules/backstopjs',
+                    test_path: './test/visual',
+                    setup: false,
+                    configure: true
+                }
+            },
+            test: {
+                options : {
+                    backstop_path: './node_modules/backstopjs',
+                    test_path: './test/visual',
+                    create_references: false,
+                    run_tests: true
+                    }
+                },
+            reference: {
+                options : {
+                    backstop_path: './node_modules/backstopjs',
+                    test_path: './test/visual',
+                    create_references: true,
+                    run_tests: false
+                }
+            }
+        },
+
         shell:{
             version: {
                 command: 'hg parent > dist/version.txt'
@@ -572,6 +602,30 @@ module.exports = function (grunt) {
         //'newer:jshint'
         //'karma'
     ]);
+
+    // Perform backstop:test to compare screenshots for locations specified at backstop.json with latest ones
+    grunt.registerTask('testshots', [
+        'clean:server',
+        'copy:custom_css',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'shell:print_version',
+        'backstop:test'
+    ]);
+    // Perform backstop:reference to create screenshots for locations specified at backstop.json
+    grunt.registerTask('refshots', [
+        'clean:server',
+        'copy:custom_css',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'shell:print_version',
+        'backstop:reference'
+    ]);
+
     grunt.registerTask('code', [
         'newer:jshint'
     ]);
