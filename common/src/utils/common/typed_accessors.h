@@ -245,6 +245,30 @@ namespace nx_private
             type;
     };
 
+    template<class T, class Object, class GetMember>
+    struct QnExternalMemberGetterTypeSelector
+    {
+        typedef typename std::conditional<std::is_member_object_pointer<GetMember>::value,   /* ? */
+                    QnExternalFieldGetter<T, Object>,  /* : */
+                typename std::conditional<std::is_member_function_pointer<GetMember>::value, /* ? */
+                    QnExternalMethodGetter<T, Object, GetMember>, /* : */
+             /* default (error): */
+                    void>::type>::type
+            type;
+    };
+
+    template<class T, class Object, class SetMember>
+    struct QnExternalMemberSetterTypeSelector
+    {
+        typedef typename std::conditional<std::is_member_object_pointer<SetMember>::value,   /* ? */
+                    QnExternalFieldSetter<T, Object>,  /* : */
+                typename std::conditional<std::is_member_function_pointer<SetMember>::value, /* ? */
+                    QnExternalMethodSetter<T, Object, SetMember>, /* : */
+             /* default (error): */
+                    void>::type>::type
+            type;
+    };
+
 } // namespace nx_private
 
 template<class T, class Object, class GetMember>
@@ -252,6 +276,12 @@ using QnMemberGetter = typename nx_private::QnMemberGetterTypeSelector<T, Object
 
 template<class T, class Object, class SetMember>
 using QnMemberSetter = typename nx_private::QnMemberSetterTypeSelector<T, Object, SetMember>::type;
+
+template<class T, class Object, class GetMember>
+using QnExternalMemberGetter = typename nx_private::QnExternalMemberGetterTypeSelector<T, Object, GetMember>::type;
+
+template<class T, class Object, class SetMember>
+using QnExternalMemberSetter = typename nx_private::QnExternalMemberSetterTypeSelector<T, Object, SetMember>::type;
 
 
 /* Access via functor */
@@ -290,6 +320,7 @@ class QnVariableGetter : public QnAbstractGetter<T>
 {
 public:
     explicit QnVariableGetter(const T& reference) : m_reference(reference) {}
+    explicit QnVariableGetter(const T* pointer) : m_reference(*pointer) {}
 
     virtual T operator () () const override { return m_reference; }
 
@@ -302,6 +333,7 @@ class QnVariableSetter : public QnAbstractSetter<T>
 {
 public:
     explicit QnVariableSetter(T& reference) : m_reference(reference) {}
+    explicit QnVariableSetter(T* pointer) : m_reference(*pointer) {}
 
     virtual void operator () (const T& value) const override { m_reference = value; }
 
