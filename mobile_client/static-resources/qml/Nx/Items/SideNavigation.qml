@@ -13,6 +13,7 @@ Drawer
     enabled: stackView.depth == 1
 
     readonly property bool opened: position > 0
+    property string activeLayout
 
     Rectangle
     {
@@ -23,7 +24,7 @@ Drawer
 
         ListView
         {
-            id: savedSessionsList
+            id: layoutsList
 
             anchors.fill: parent
             anchors.topMargin: getStatusBarHeight()
@@ -33,7 +34,8 @@ Drawer
 
             header: Column
             {
-                width: savedSessionsList.width
+                width: layoutsList.width
+                bottomPadding: 8
 
                 CloudPanel {}
 
@@ -42,11 +44,23 @@ Drawer
                     visible: connectionManager.online
                 }
             }
+
+            model: QnLayoutsModel {}
+
+            delegate: LayoutItem
+            {
+                text: resourceName
+                resourceId: uuid
+                shared: shared
+                active: activeLayout == resourceId
+                count: itemsCount
+                onClicked: activeLayout = resourceId
+            }
         }
 
         OfflineDummy
         {
-            anchors.fill: savedSessionsList
+            anchors.fill: layoutsList
             anchors.margins: 16
             visible: !connectionManager.online
         }
