@@ -52,6 +52,8 @@ namespace methods
 
         udpHolePunchingSyn,
         udpHolePunchingSynAck,
+
+        tunnelConnectionChosen,
     };
 
     NX_NETWORK_API nx::String toString(Value val);
@@ -96,6 +98,7 @@ namespace attrs
         serverId,
         peerId,
         connectionId,
+        cloudConnectVersion,
 
         hostName = stun::attrs::userDefined + 0x200,
         hostNameList,
