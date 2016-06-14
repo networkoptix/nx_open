@@ -168,11 +168,9 @@ a:hover{
 
 }
 
-th:not(:last-child),
-td:not(:last-child){
-    white-space:nowrap
-}
-
-th:last-child{
-    width: 99%;
+th.number,
+td.number{
+    white-space:nowrap;
+    padding-right:5px;
+    width:0;
 }

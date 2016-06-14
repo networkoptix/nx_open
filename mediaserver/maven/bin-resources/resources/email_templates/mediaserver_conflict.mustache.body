@@ -4,7 +4,7 @@
 <table class="description">
     <thead>
     <tr>
-        <th>#</th>
+        <th class="number">#</th>
         <th>Server IP</th>
         <th>Camera Physical ID</th>
     </tr>
@@ -12,7 +12,7 @@
     <tbody>
         {{#msConflicts}}
             <tr>
-                <td>{{number}}</td>
+                <td class="number">{{number}}</td>
                 <td>{{ip}}</td>
                 <td>{{mac}}</td>
             </tr>
