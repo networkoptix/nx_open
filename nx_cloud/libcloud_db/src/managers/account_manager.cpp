@@ -23,7 +23,6 @@
 
 #include "access_control/authentication_manager.h"
 #include "email_manager.h"
-#include "http_handlers/activate_account_handler.h"
 #include "notification.h"
 #include "settings.h"
 #include "stree/cdb_ns.h"
