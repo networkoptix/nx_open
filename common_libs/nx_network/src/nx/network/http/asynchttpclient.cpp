@@ -309,6 +309,11 @@ namespace nx_http
         m_proxyUserPassword = userPassword;
     }
 
+    void AsyncHttpClient::setEffectiveUserName(const QString& effectiveUserName)
+    {
+        m_effectiveUserName = effectiveUserName;
+    }
+
     void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
     {
         m_precalculatedAuthorizationDisabled = val;
@@ -805,12 +810,21 @@ namespace nx_http
         if (!m_url.password().isEmpty())
             m_userPassword = m_url.password();
 
+        if (!m_effectiveUserName.isEmpty())
+        {
+            nx_http::insertOrReplaceHeader(
+                &m_request.headers,
+                HttpHeader(Qn::EFFECTIVE_USER_NAME_HEADER_NAME, m_effectiveUserName.toUtf8()));
+        }
+
         //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
         //TODO #ak remove it after 2.3 support is over
         if (!m_userName.isEmpty())
+        {
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()));
+        }
 
         if (m_precalculatedAuthorizationDisabled)
             return;

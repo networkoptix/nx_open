@@ -364,6 +364,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SF_ArmServer        = 0x040,
         SF_Has_HDD          = 0x080,
         SF_NewSystem        = 0x100,        /**< System is just installed, it has default admin password and is not linked to the cloud. */
+        SF_HasLiteClient    = 0x200,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 

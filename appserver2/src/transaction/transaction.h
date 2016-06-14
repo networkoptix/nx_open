@@ -334,8 +334,8 @@ APPLY(702, removeVideowall, ApiIdData, \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper) \
 APPLY(703, videowallControl, ApiVideowallControlMessageData, \
-                       false, \
-                       false, \
+                       false, /* persistent*/\
+                       false, /* system*/ \
                        InvalidGetHashHelper(), \
                        VideowallNotificationManagerHelper()) \
 APPLY(800, getBusinessRules, ApiBusinessRuleDataList, \

@@ -34,6 +34,13 @@
 #include "config.h"
 using mobile_client::conf;
 
+// TODO mike: Remove if replacement URL does not require it.
+#include "context/connection_manager.h"
+
+// TODO mike: REMOVE
+#define OUTPUT_PREFIX "mobile_client[main]: "
+#include <nx/utils/debug_utils.h>
+
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
     QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
@@ -123,7 +130,7 @@ int runUi(QGuiApplication *application) {
     return application->exec();
 }
 
-int runApplication(QGuiApplication *application) {
+int runApplication(QGuiApplication *application, const QnUuid& videowallInstanceGuid) {
     // these functions should be called in every thread that wants to use rand() and qrand()
     srand(time(NULL));
     qsrand(time(NULL));
@@ -138,6 +145,8 @@ int runApplication(QGuiApplication *application) {
     runtimeData.peer.peerType = Qn::PT_MobileClient; // TODO: #dklychkov check connection type
     runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = QnAppInfo::productNameShort();
+    if (!videowallInstanceGuid.isNull())
+        runtimeData.videoWallInstanceGuid = videowallInstanceGuid;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
 
     int result = runUi(application);
@@ -171,12 +180,25 @@ int main(int argc, char *argv[])
     conf.reload();
     initLog();
 
+    if (argc > 1 && argv[1][0] != '\0')
+    {
+        PRINT << "Setting replacement url from argv[1]: \"" << argv[1] << "\"";
+        connectToServerReplacementUrl = QUrl(QString::fromLatin1(argv[1]));
+    }
+
+    QnUuid videowallInstanceGuid;
+    if (argc > 2 && argv[2][0] != '\0')
+    {
+        PRINT << "Using videowallInstanceGuid from argv[2]: \"" << argv[2] << "\"";
+        videowallInstanceGuid = QnUuid::fromStringSafe(QString::fromLatin1(argv[2]));
+    }
+
     QnMobileClientModule mobile_client;
     Q_UNUSED(mobile_client)
 
     migrateSettings();
 
-    int result = runApplication(&application);
+    int result = runApplication(&application, videowallInstanceGuid);
 
     return result;
 }

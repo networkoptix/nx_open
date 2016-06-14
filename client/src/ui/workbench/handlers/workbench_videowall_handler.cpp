@@ -1266,7 +1266,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
         return;
     } //TODO: #GDM add "Licenses" button
 
-	QStringList usedNames;
+    QStringList usedNames;
     foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::videowall))
         usedNames << resource->getName().trimmed().toLower();
 

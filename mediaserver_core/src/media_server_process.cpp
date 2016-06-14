@@ -162,6 +162,7 @@
 #include <rest/handlers/get_hardware_info_rest_handler.h>
 #include <rest/handlers/system_settings_handler.h>
 #include <rest/handlers/audio_transmission_rest_handler.h>
+#include <rest/handlers/start_lite_client_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -1604,6 +1605,8 @@ bool MediaServerProcess::initTcpListener(
     m_universalTcpListener->addHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
 #endif   //ENABLE_DESKTOP_CAMERA
 
+    QnRestProcessorPool::instance()->registerHandler("api/startLiteClient", new QnStartLiteClientRestHandler());
+
     return true;
 }
 
@@ -1839,7 +1842,11 @@ void MediaServerProcess::run()
     serverFlags |= Qn::SF_Edge;
 #endif
     if (QnAppInfo::armBox() == "bpi" || compatibilityMode) // check compatibilityMode here for testing purpose
+    {
         serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
+        serverFlags |= Qn::SF_HasLiteClient;
+        // TODO mike: Consider creating LiteClientLayout here (if not yet exists).
+    }
 #ifdef __arm__
     serverFlags |= Qn::SF_ArmServer;
 

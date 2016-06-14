@@ -4,6 +4,9 @@
 
 #include "context_aware.h"
 
+// TODO mike: Properly pass replacement URL.
+extern QUrl connectToServerReplacementUrl;
+
 class QnConnectionManagerPrivate;
 class QnConnectionManager : public QObject, public QnContextAware {
     Q_OBJECT

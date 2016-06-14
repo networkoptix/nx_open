@@ -70,7 +70,7 @@ void serialize(const QnUuid &value, QString *target) {
 }
 
 bool deserialize(const QString &value, QnUuid *target) {
-    QnUuid result(value);
+    QnUuid result = QnUuid::fromStringSafe(value);
     if(result.isNull() && value != lit("00000000-0000-0000-0000-000000000000") && value != lit("{00000000-0000-0000-0000-000000000000}"))
         return false;
 

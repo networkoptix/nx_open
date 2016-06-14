@@ -37,6 +37,9 @@
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
 
+// TODO mike: REMOVE
+#define OUTPUT_PREFIX "[mike] connection_factory: "
+#include <nx/utils/debug_utils.h>
 
 static const char INCOMING_TRANSACTIONS_PATH[] = "ec2/forward_events";
 
@@ -116,6 +119,7 @@ namespace ec2
                                                   impl::ConnectHandlerPtr handler )
     {
         QUrl url = addr;
+PRINT << "connectAsync(): Input url: " << url;
         url.setUserName(url.userName().toLower());
 
         if (m_transactionMessageBus->localPeer().isMobileClient()) {
@@ -125,6 +129,7 @@ namespace ec2
             url.setQuery(query);
         }
 
+PRINT << "connectAsync(): Output url: " << url;
         if (url.scheme() == "file")
             return establishDirectConnection(url, handler);
         else
@@ -820,7 +825,7 @@ namespace ec2
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeVideowall);
         registerUpdateFuncHandler<ApiVideowallControlMessageData>(p, ApiCommand::videowallControl);
 
-		registerGetFuncHandler<std::nullptr_t, ApiWebPageDataList>( p, ApiCommand::getWebPages );
+        registerGetFuncHandler<std::nullptr_t, ApiWebPageDataList>( p, ApiCommand::getWebPages );
         registerUpdateFuncHandler<ApiWebPageData>( p, ApiCommand::saveWebPage );
         //AbstractWebPageManager::remove
         registerUpdateFuncHandler<ApiIdData>( p, ApiCommand::removeWebPage );
@@ -1131,7 +1136,8 @@ namespace ec2
         return reqID;
     }
 
-    int Ec2DirectConnectionFactory::establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo )
+    int Ec2DirectConnectionFactory::establishConnectionToRemoteServer(
+        const QUrl& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo)
     {
         const int reqID = generateRequestID();
 
@@ -1146,7 +1152,7 @@ namespace ec2
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
         loginInfo.passwordHash = nx_http::calcHa1(
-            loginInfo.login.toLower(), QnAppInfo::realm(), addr.password() );
+            loginInfo.login.toLower(), QnAppInfo::realm(), addr.password());
         loginInfo.clientInfo = clientInfo;
 
         {
@@ -1157,15 +1163,19 @@ namespace ec2
         }
 
         const auto info = QString::fromUtf8( QJson::serialized( clientInfo )  );
+PRINT << "establishConnectionToRemoteServer(): url: " << addr << ", login: " << loginInfo.login
+<< ", passwordHash: " << loginInfo.passwordHash << ", clientInfo: " << info;
         NX_LOG( lit("%1 to %2 with %3").arg( Q_FUNC_INFO ).arg( addr.toString() ).arg( info ),
                 cl_logDEBUG1 );
 
-        auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo )
-        {
-            remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler);
-        };
+        auto func =
+            [this, reqID, addr, handler](
+                ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
+            {
+                remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler);
+            };
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
-            addr, ApiCommand::connect, loginInfo, func );
+            addr, ApiCommand::connect, loginInfo, func);
         return reqID;
     }
 
@@ -1342,35 +1352,35 @@ namespace ec2
             connectionInfo->effectiveUserName =
                 nx_http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
 
-		if (!loginInfo.clientInfo.id.isNull())
+        if (!loginInfo.clientInfo.id.isNull())
         {
-			auto clientInfo = loginInfo.clientInfo;
-			clientInfo.parentId = qnCommon->moduleGUID();
+            auto clientInfo = loginInfo.clientInfo;
+            clientInfo.parentId = qnCommon->moduleGUID();
 
-			ApiClientInfoDataList infos;
-			auto result = dbManager->doQuery(clientInfo.id, infos);
-			if (result != ErrorCode::ok)
-				return result;
+            ApiClientInfoDataList infos;
+            auto result = dbManager->doQuery(clientInfo.id, infos);
+            if (result != ErrorCode::ok)
+                return result;
 
             if (infos.size() && QJson::serialized(clientInfo) == QJson::serialized(infos.front()))
-			{
-				NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
-					cl_logDEBUG2);
-				return ErrorCode::ok;
-			}
+            {
+                NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
+                    cl_logDEBUG2);
+                return ErrorCode::ok;
+            }
 
             QnTransaction<ApiClientInfoData> transaction(ApiCommand::saveClientInfo, clientInfo);
             m_serverQueryProcessor.processUpdateAsync(transaction,
                 [&](ErrorCode result) {
-					if (result == ErrorCode::ok) {
-						NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
-							cl_logINFO);
-					}
-					else {
-						NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
-							.arg(toString(result)), cl_logERROR);
-					}
-				});
+                    if (result == ErrorCode::ok) {
+                        NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
+                            cl_logINFO);
+                    }
+                    else {
+                        NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
+                            .arg(toString(result)), cl_logERROR);
+                    }
+                });
         }
 
         return ErrorCode::ok;

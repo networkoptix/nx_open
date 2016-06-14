@@ -15,6 +15,14 @@
 #include "utils/common/util.h"
 #include <common/common_module.h>
 #include "../watchers/user_watcher.h"
+#include <nx_ec/data/api_videowall_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
+
+#define OUTPUT_PREFIX "mobile_client[connection_manager]: "
+#include <nx/utils/debug_utils.h>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QWidget>
+#include <QtGui/QKeyEvent>
 
 namespace {
 
@@ -28,6 +36,20 @@ namespace {
                 product1.left(product1.indexOf(lit("_"))) == product2.left(product2.indexOf(lit("_")));
     }
 
+    #define PARAM_KEY(KEY) const QLatin1String KEY##Key(BOOST_PP_STRINGIZE(KEY));
+    PARAM_KEY(sequence)
+    PARAM_KEY(pcUuid)
+    PARAM_KEY(uuid)
+    PARAM_KEY(zoomUuid)
+    PARAM_KEY(resource)
+    PARAM_KEY(value)
+    PARAM_KEY(role)
+    PARAM_KEY(position)
+    PARAM_KEY(rotation)
+    PARAM_KEY(speed)
+    PARAM_KEY(geometry)
+    PARAM_KEY(zoomRect)
+    PARAM_KEY(checkedButtons)
 }
 
 class QnConnectionManagerPrivate : public Connective<QObject> {
@@ -36,10 +58,17 @@ class QnConnectionManagerPrivate : public Connective<QObject> {
 
     typedef Connective<QObject> base_type;
 
+private:
+    void handleVideowallMessage(
+        const QnVideoWallControlMessage& message,
+        const QnUuid& controllerUuid = QnUuid(),
+        qint64 sequence = -1);
+
 public:
     QnConnectionManagerPrivate(QnConnectionManager *parent);
 
     void at_applicationStateChanged(Qt::ApplicationState state);
+    void at_videowallControlMessageReceived(const ec2::ApiVideowallControlMessageData& apiMessage);
 
     void suspend();
     void resume();
@@ -48,6 +77,7 @@ public:
     void doDisconnect(bool force = false);
 
     void updateConnectionState();
+
 
 public:
     QUrl url;
@@ -71,6 +101,9 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
             d, &QnConnectionManagerPrivate::updateConnectionState);
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
             d, &QnConnectionManagerPrivate::updateConnectionState);
+
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::videowallControlMessageReceived,
+            d, &QnConnectionManagerPrivate::at_videowallControlMessageReceived);
 }
 
 QnConnectionManager::~QnConnectionManager() {
@@ -90,16 +123,34 @@ int QnConnectionManager::defaultServerPort() const {
     return DEFAULT_APPSERVER_PORT;
 }
 
+QUrl connectToServerReplacementUrl;
+
 void QnConnectionManager::connectToServer(const QUrl &url) {
     Q_D(QnConnectionManager);
 
-    if (!url.isValid())
+    QUrl actualUrl = url;
+    if (!connectToServerReplacementUrl.isEmpty())
+    {
+        actualUrl = connectToServerReplacementUrl;
+        connectToServerReplacementUrl.clear();
+        PRINT << "QnConnectionManager::connectToServer(): Using replacement url: "
+            << actualUrl.toString();
+    }
+    else
+    {
+        PRINT << "QnConnectionManager::connectToServer(url: " << url.toString() << ")";
+    }
+
+    if (!actualUrl.isValid())
+    {
+        PRINT << "ERROR: connectToServer() cancelled because url is not valid: " << url.toString();
         return;
+    }
 
     if (connectionState() != QnConnectionManager::Disconnected)
         disconnectFromServer(false);
 
-    d->url = url;
+    d->url = actualUrl;
 
     d->doConnect();
 }
@@ -156,6 +207,63 @@ void QnConnectionManagerPrivate::at_applicationStateChanged(Qt::ApplicationState
         break;
     default:
         break;
+    }
+}
+
+void QnConnectionManagerPrivate::at_videowallControlMessageReceived(
+    const ec2::ApiVideowallControlMessageData& apiMessage)
+{
+    if (apiMessage.instanceGuid !=
+        QnRuntimeInfoManager::instance()->localInfo().data.videoWallInstanceGuid)
+    {
+        PRINT << "RECEIVED VideowallControlMessage for guid " << apiMessage.instanceGuid.toString()
+            << "; ignored";
+        return;
+    }
+    PRINT << "RECEIVED VideowallControlMessage, guid " << apiMessage.instanceGuid.toString();
+
+    QnVideoWallControlMessage message;
+    fromApiToResource(apiMessage, message);
+
+    QnUuid controllerUuid = QnUuid(message[pcUuidKey]);
+    qint64 sequence = message[sequenceKey].toULongLong();
+
+    handleVideowallMessage(message, controllerUuid, sequence);
+}
+
+void QnConnectionManagerPrivate::handleVideowallMessage(
+    const QnVideoWallControlMessage& message,
+    const QnUuid& controllerUuid,
+    qint64 sequence)
+{
+    Q_UNUSED(controllerUuid);
+    Q_UNUSED(sequence);
+
+    switch (static_cast<QnVideoWallControlMessage::Operation>(message.operation))
+    {
+        case QnVideoWallControlMessage::Exit:
+        {
+            PRINT << "RECEIVED VideowallControlMessage::Exit";
+            QCoreApplication::exit();
+            break;
+        }
+
+        case QnVideoWallControlMessage::EnterFullscreen:
+        {
+            PRINT << "RECEIVED VideowallControlMessage::EnterFullscreen";
+            // TODO mike: Enter fullscreen.
+            break;
+        }
+
+        case QnVideoWallControlMessage::ExitFullscreen:
+        {
+            PRINT << "RECEIVED VideowallControlMessage::ExitFullscreen";
+            // TODO mike: Exit fullscreen.
+            break;
+        }
+
+        default:
+            break;
     }
 }
 
