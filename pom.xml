@@ -523,10 +523,6 @@
                 <machine.type>X64</machine.type>
             </properties>
 
-            <modules>
-                <module>common_libs/nx_bpi_videonode_plugin</module>
-            </modules>
-
         </profile>
         <profile>
             <id>windows-x86</id>
