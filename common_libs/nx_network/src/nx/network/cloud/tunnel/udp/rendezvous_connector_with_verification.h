@@ -57,6 +57,8 @@ private:
 
     void onConnectCompleted(SystemError::ErrorCode errorCode);
     void onMessageReceived(nx::stun::Message message);
+    void processUdpHolePunchingSynAck(nx::stun::Message message);
+    void processTunnelConnectionChosen(nx::stun::Message message);
     void onTimeout();
     void processError(SystemError::ErrorCode errorCode);
 };

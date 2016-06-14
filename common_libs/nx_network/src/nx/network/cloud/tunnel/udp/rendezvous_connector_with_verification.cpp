@@ -10,6 +10,7 @@
 #include <utils/common/cpp14.h>
 
 #include "nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h"
+#include "nx/network/cloud/data/tunnel_connection_chosen_data.h"
 
 
 namespace nx {
@@ -52,7 +53,6 @@ void RendezvousConnectorWithVerification::pleaseStop(
         [this, completionHandler = std::move(completionHandler)]() mutable
         {
             m_requestPipeline.reset();
-            m_udtConnection.reset();
             completionHandler();
         });
 }
@@ -73,17 +73,34 @@ void RendezvousConnectorWithVerification::connect(
 void RendezvousConnectorWithVerification::notifyAboutChoosingConnection(
     ConnectCompletionHandler completionHandler)
 {
-    post(
-        [completionHandler = std::move(completionHandler)]
-        {
-            completionHandler(SystemError::noError);
-        });
+    NX_ASSERT(m_requestPipeline);
+    NX_LOGX(lm("cross-nat %1. Notifying host %2 on connection choice")
+        .arg(connectSessionId())
+        .arg(m_requestPipeline->socket()->getForeignAddress().toString()),
+        cl_logDEBUG2);
+
+    m_connectCompletionHandler = std::move(completionHandler);
+
+    hpm::api::TunnelConnectionChosenRequest tunnelConnectionChosenRequest;
+    stun::Message tunnelConnectionChosenMessage;
+    tunnelConnectionChosenRequest.serialize(&tunnelConnectionChosenMessage);
+    m_requestPipeline->sendMessage(std::move(tunnelConnectionChosenMessage));
+
+    if (m_timeout > std::chrono::milliseconds::zero())
+        m_aioThreadBinder.start(
+            m_timeout,
+            std::bind(&RendezvousConnectorWithVerification::onTimeout, this));
 }
 
 std::unique_ptr<nx::network::UdtStreamSocket>
     RendezvousConnectorWithVerification::takeConnection()
 {
-    return std::move(m_udtConnection);
+    auto udtConnection =
+        nx::utils::static_unique_ptr_cast<UdtStreamSocket>(
+            m_requestPipeline->takeSocket());
+    m_requestPipeline.reset();
+
+    return udtConnection;
 }
 
 void RendezvousConnectorWithVerification::closeConnection(
@@ -150,6 +167,26 @@ void RendezvousConnectorWithVerification::onMessageReceived(
         return processError(SystemError::connectionReset);
     }
 
+    switch (message.header.method)
+    {
+        case hpm::api::UdpHolePunchingSynAck::kMethod:
+            return processUdpHolePunchingSynAck(std::move(message));
+
+        case hpm::api::TunnelConnectionChosenRequest::kMethod:
+            return processTunnelConnectionChosen(std::move(message));
+
+        default:
+            NX_LOGX(lm("cross-nat %1. Received unexpected message %2 from %3. Ignoring...")
+                .arg(connectSessionId()).arg(message.header.method)
+                .arg(remoteAddress().toString()),
+                cl_logDEBUG2);
+            return;
+    }
+}
+
+void RendezvousConnectorWithVerification::processUdpHolePunchingSynAck(
+    nx::stun::Message message)
+{
     hpm::api::UdpHolePunchingSynAck synResponse;
     if (!synResponse.parse(message))
     {
@@ -174,10 +211,28 @@ void RendezvousConnectorWithVerification::onMessageReceived(
         cl_logDEBUG2);
 
     //success!
-    m_udtConnection = 
-        nx::utils::static_unique_ptr_cast<UdtStreamSocket>(
-            m_requestPipeline->takeSocket());
-    m_requestPipeline.reset();
+    auto connectCompletionHandler = std::move(m_connectCompletionHandler);
+    connectCompletionHandler(SystemError::noError);
+}
+
+void RendezvousConnectorWithVerification::processTunnelConnectionChosen(
+    nx::stun::Message message)
+{
+    hpm::api::TunnelConnectionChosenResponse responseData;
+    if (!responseData.parse(message))
+    {
+        NX_LOGX(lm("cross-nat %1. Error parsing TunnelConnectionChosenResponse from %2: %3")
+            .arg(connectSessionId()).arg(remoteAddress().toString())
+            .arg(responseData.errorText()),
+            cl_logDEBUG1);
+        return processError(SystemError::connectionReset);
+    }
+
+    NX_LOGX(lm("cross-nat %1. Successfully notified host %2 about udp tunnel choice")
+        .arg(connectSessionId()).arg(remoteAddress().toString()),
+        cl_logDEBUG2);
+
+    //success!
     auto connectCompletionHandler = std::move(m_connectCompletionHandler);
     connectCompletionHandler(SystemError::noError);
 }

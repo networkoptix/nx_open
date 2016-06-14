@@ -10,15 +10,25 @@ namespace nx {
 namespace hpm {
 namespace api {
 
+ListenRequest::ListenRequest()
+:
+    cloudConnectVersion(kCurrentCloudConnectVersion)
+{
+}
+
 void ListenRequest::serialize(nx::stun::Message* const message)
 {
     message->newAttribute<stun::cc::attrs::SystemId>(systemId);
     message->newAttribute<stun::cc::attrs::ServerId>(serverId);
+    message->addAttribute(stun::cc::attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
 bool ListenRequest::parse(const nx::stun::Message& message)
 {
-    return 
+    if (!readEnumAttributeValue(message, stun::cc::attrs::cloudConnectVersion, &cloudConnectVersion))
+        cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
+
+    return
         readStringAttributeValue<stun::cc::attrs::SystemId>(message, &systemId) &&
         readStringAttributeValue<stun::cc::attrs::ServerId>(message, &serverId);
 }

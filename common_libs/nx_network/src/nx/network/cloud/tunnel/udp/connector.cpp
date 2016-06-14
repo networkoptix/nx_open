@@ -35,7 +35,8 @@ TunnelConnector::TunnelConnector(
             mediatorAddress
             ? mediatorAddress.get()
             : *nx::network::SocketGlobals::mediatorConnector().mediatorAddress())),   //TunnelConnector MUST not be created if mediator address is unknown
-    m_done(false)
+    m_done(false),
+    m_remotePeerCloudConnectVersion(hpm::api::kDefaultCloudConnectVersion)
 {
     NX_ASSERT(nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
 
@@ -241,6 +242,8 @@ void TunnelConnector::onConnectResponse(
     m_connectResultReport.resultCode =
         api::UdpHolePunchingResultCode::targetPeerHasNoUdpAddress;
 
+    m_remotePeerCloudConnectVersion = response.cloudConnectVersion;
+
     //extracting target address from response
     if (response.udpEndpointList.empty())
     {
@@ -341,13 +344,21 @@ void TunnelConnector::onUdtConnectionEstablished(
         .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
         cl_logDEBUG2);
 
-    //notifying remote side: "this very connection has been selected"
-    m_chosenRendezvousConnector = std::move(rendezvousConnector);
-    m_chosenRendezvousConnector->notifyAboutChoosingConnection(
-        std::bind(&TunnelConnector::onHandshakeComplete, this, std::placeholders::_1));
-
     //stopping other rendezvous connectors
     m_rendezvousConnectors.clear(); //can do since we are in aio thread
+
+    m_chosenRendezvousConnector = std::move(rendezvousConnector);
+
+    if (m_remotePeerCloudConnectVersion <
+        hpm::api::CloudConnectVersion::tryingEveryAddressOfPeer)
+    {
+        return onHandshakeComplete(SystemError::noError);
+    }
+
+    //notifying remote side: "this very connection has been selected"
+
+    m_chosenRendezvousConnector->notifyAboutChoosingConnection(
+        std::bind(&TunnelConnector::onHandshakeComplete, this, std::placeholders::_1));
 }
 
 void TunnelConnector::onHandshakeComplete(SystemError::ErrorCode errorCode)

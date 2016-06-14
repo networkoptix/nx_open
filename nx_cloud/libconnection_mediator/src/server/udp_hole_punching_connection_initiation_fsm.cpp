@@ -85,6 +85,7 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
                     stun::MessageClass::indication,
                     stun::cc::indications::connectionRequested));
             connectionRequestedEvent.serialize(&indication);
+            connectionRequestedEvent.cloudConnectVersion = request.cloudConnectVersion;
 
             NX_ASSERT(connectResponseSender);
             m_connectResponseSender = std::move(connectResponseSender);
@@ -147,6 +148,7 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
             api::ConnectResponse connectResponse;
             connectResponse.params = m_settings.connectionParameters();
             connectResponse.udpEndpointList = std::move(request.udpEndpointList);
+            connectResponse.cloudConnectVersion = request.cloudConnectVersion;
 
             m_state = State::waitingConnectionResult;
             connectResponseSender(

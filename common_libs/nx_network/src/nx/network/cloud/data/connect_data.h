@@ -14,6 +14,7 @@
 #include "connection_method.h"
 #include "connection_parameters.h"
 #include "stun_message_data.h"
+#include "nx/network/cloud/cloud_connect_version.h"
 
 
 namespace nx {
@@ -37,8 +38,14 @@ public:
         Only addresses found in \a udpEndpointList are reported
     */
     bool ignoreSourceAddress;
+    CloudConnectVersion cloudConnectVersion;
 
     ConnectRequest();
+
+    ConnectRequest(const ConnectRequest&) = default;
+    ConnectRequest& operator=(const ConnectRequest&) = default;
+    ConnectRequest(ConnectRequest&&) = default;
+    ConnectRequest& operator=(ConnectRequest&&) = default;
 
     void serialize(nx::stun::Message* const message);
     bool parse(const nx::stun::Message& message);
@@ -52,8 +59,14 @@ public:
     std::list<SocketAddress> publicTcpEndpointList;
     std::list<SocketAddress> udpEndpointList;
     ConnectionParameters params;
+    CloudConnectVersion cloudConnectVersion;
 
     ConnectResponse();
+
+    ConnectResponse(const ConnectResponse&) = default;
+    ConnectResponse& operator=(const ConnectResponse&) = default;
+    ConnectResponse(ConnectResponse&&) = default;
+    ConnectResponse& operator=(ConnectResponse&&) = default;
 
     /**
         \note after this method call object contents are undefined

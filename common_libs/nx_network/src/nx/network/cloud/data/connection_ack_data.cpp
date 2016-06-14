@@ -14,7 +14,8 @@ namespace api {
 
 ConnectionAckRequest::ConnectionAckRequest()
 :
-    connectionMethods(0)
+    connectionMethods(0),
+    cloudConnectVersion(kCurrentCloudConnectVersion)
 {
 }
 
@@ -25,10 +26,14 @@ void ConnectionAckRequest::serialize(nx::stun::Message* const message)
         nx::String::number(connectionMethods));
     message->newAttribute< stun::cc::attrs::UdtHpEndpointList >(
         std::move(udpEndpointList));
+    message->addAttribute(stun::cc::attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
 bool ConnectionAckRequest::parse(const nx::stun::Message& message)
 {
+    if (!readEnumAttributeValue(message, stun::cc::attrs::cloudConnectVersion, &cloudConnectVersion))
+        cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
+
     return
         readStringAttributeValue<stun::cc::attrs::ConnectionId>(message, &connectSessionId) &&
         readIntAttributeValue<stun::cc::attrs::ConnectionMethods>(message, &connectionMethods) &&

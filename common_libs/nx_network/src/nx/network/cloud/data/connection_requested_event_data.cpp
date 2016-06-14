@@ -12,7 +12,8 @@ namespace api {
 
 ConnectionRequestedEvent::ConnectionRequestedEvent()
 :
-    connectionMethods(0)
+    connectionMethods(0),
+    cloudConnectVersion(kCurrentCloudConnectVersion)
 {
 }
 
@@ -23,10 +24,14 @@ void ConnectionRequestedEvent::serialize(nx::stun::Message* const message)
     message->newAttribute<stun::cc::attrs::UdtHpEndpointList>(std::move(udpEndpointList));
     message->newAttribute<stun::cc::attrs::ConnectionMethods>(nx::String::number(connectionMethods));
     params.serialize(message);
+    message->addAttribute(stun::cc::attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
 bool ConnectionRequestedEvent::parse(const nx::stun::Message& message)
 {
+    if (!readEnumAttributeValue(message, stun::cc::attrs::cloudConnectVersion, &cloudConnectVersion))
+        cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
+
     return
         readStringAttributeValue<stun::cc::attrs::ConnectionId>(message, &connectSessionId) &&
         readStringAttributeValue<stun::cc::attrs::PeerId>(message, &originatingPeerID) &&

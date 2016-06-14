@@ -7,6 +7,7 @@
 
 #include "connection_method.h"
 #include "stun_message_data.h"
+#include "nx/network/cloud/cloud_connect_version.h"
 
 
 namespace nx {
@@ -22,8 +23,14 @@ public:
     nx::String connectSessionId;
     ConnectionMethods connectionMethods;
     std::list<SocketAddress> udpEndpointList;
+    CloudConnectVersion cloudConnectVersion;
 
     ConnectionAckRequest();
+
+    ConnectionAckRequest(const ConnectionAckRequest&) = default;
+    ConnectionAckRequest& operator=(const ConnectionAckRequest&) = default;
+    ConnectionAckRequest(ConnectionAckRequest&&) = default;
+    ConnectionAckRequest& operator=(ConnectionAckRequest&&) = default;
 
     void serialize(nx::stun::Message* const message);
     bool parse(const nx::stun::Message& message);

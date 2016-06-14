@@ -15,7 +15,8 @@ namespace api {
 ConnectRequest::ConnectRequest()
 :
     connectionMethods(0),
-    ignoreSourceAddress(false)
+    ignoreSourceAddress(false),
+    cloudConnectVersion(kCurrentCloudConnectVersion)
 {
 }
 
@@ -27,10 +28,14 @@ void ConnectRequest::serialize(nx::stun::Message* const message)
     message->newAttribute<stun::cc::attrs::ConnectionMethods>(nx::String::number(connectionMethods));
     message->newAttribute<stun::cc::attrs::UdtHpEndpointList>(std::move(udpEndpointList));
     message->addAttribute(stun::cc::attrs::ignoreSourceAddress, ignoreSourceAddress);
+    message->addAttribute(stun::cc::attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
 bool ConnectRequest::parse(const nx::stun::Message& message)
 {
+    if (!readEnumAttributeValue(message, stun::cc::attrs::cloudConnectVersion, &cloudConnectVersion))
+        cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
+    
     return
         readStringAttributeValue<stun::cc::attrs::HostName>(message, &destinationHostName) &&
         readStringAttributeValue<stun::cc::attrs::PeerId>(message, &originatingPeerID) &&
@@ -43,6 +48,8 @@ bool ConnectRequest::parse(const nx::stun::Message& message)
 
 
 ConnectResponse::ConnectResponse()
+:
+    cloudConnectVersion(kCurrentCloudConnectVersion)
 {
 }
 
@@ -53,10 +60,14 @@ void ConnectResponse::serialize(nx::stun::Message* const message)
     message->newAttribute< stun::cc::attrs::UdtHpEndpointList >(
         std::move(udpEndpointList));
     params.serialize(message);
+    message->addAttribute(stun::cc::attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
 bool ConnectResponse::parse(const nx::stun::Message& message)
 {
+    if (!readEnumAttributeValue(message, stun::cc::attrs::cloudConnectVersion, &cloudConnectVersion))
+        cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
+
     return 
         readAttributeValue<stun::cc::attrs::PublicEndpointList>(
             message, &publicTcpEndpointList) &&

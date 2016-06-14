@@ -8,6 +8,7 @@
 #include <nx/network/stun/message.h>
 
 #include "stun_message_data.h"
+#include "nx/network/cloud/cloud_connect_version.h"
 
 
 namespace nx {
@@ -21,6 +22,14 @@ class NX_NETWORK_API ListenRequest
 public:
     nx::String systemId;
     nx::String serverId;
+    CloudConnectVersion cloudConnectVersion;
+
+    ListenRequest();
+
+    ListenRequest(const ListenRequest&) = default;
+    ListenRequest& operator=(const ListenRequest&) = default;
+    ListenRequest(ListenRequest&&) = default;
+    ListenRequest& operator=(ListenRequest&&) = default;
 
     void serialize(nx::stun::Message* const message);
     bool parse(const nx::stun::Message& message);

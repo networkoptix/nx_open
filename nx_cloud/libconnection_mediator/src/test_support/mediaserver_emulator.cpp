@@ -7,6 +7,7 @@
 
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
+#include <nx/network/cloud/data/tunnel_connection_chosen_data.h>
 #include <nx/utils/thread/barrier_handler.h>
 
 #include <utils/crypt/linux_passwd_crypt.h>
@@ -259,21 +260,35 @@ void MediaServerEmulator::onMessageReceived(
 
     if (message.header.messageClass != stun::MessageClass::request)
         return;
-    if (message.header.method != stun::cc::methods::udpHolePunchingSyn)
-        return;
 
-    hpm::api::UdpHolePunchingSynAck synAckResponse;
-    if (m_action <= ActionToTake::sendBadSynAck)
-        synAckResponse.connectSessionId = "hren";
+    if (message.header.method == stun::cc::methods::udpHolePunchingSyn)
+    {
+        hpm::api::UdpHolePunchingSynAck synAckResponse;
+        if (m_action <= ActionToTake::sendBadSynAck)
+            synAckResponse.connectSessionId = "hren";
+        else
+            synAckResponse.connectSessionId = m_connectionRequestedData.connectSessionId;
+        stun::Message synAckMessage(
+            nx::stun::Header(
+                nx::stun::MessageClass::successResponse,
+                stun::cc::methods::udpHolePunchingSynAck,
+                message.header.transactionId));
+        synAckResponse.serialize(&synAckMessage);
+        m_stunPipeline->sendMessage(std::move(synAckMessage));
+    }
+    else if (message.header.method == stun::cc::methods::tunnelConnectionChosen)
+    {
+        if (m_action <= ActionToTake::doNotAnswerTunnelChoiceNotification)
+            return;
+        hpm::api::TunnelConnectionChosenResponse responseData;
+        stun::Message tunnelConnectionChosenResponseMessage;
+        responseData.serialize(&tunnelConnectionChosenResponseMessage);
+        m_stunPipeline->sendMessage(std::move(tunnelConnectionChosenResponseMessage));
+    }
     else
-        synAckResponse.connectSessionId = m_connectionRequestedData.connectSessionId;
-    stun::Message synAckMessage(
-        nx::stun::Header(
-            nx::stun::MessageClass::successResponse,
-            stun::cc::methods::udpHolePunchingSynAck,
-            message.header.transactionId));
-    synAckResponse.serialize(&synAckMessage);
-    m_stunPipeline->sendMessage(std::move(synAckMessage));
+    {
+        return;
+    }
 }
 
 void MediaServerEmulator::closeConnection(

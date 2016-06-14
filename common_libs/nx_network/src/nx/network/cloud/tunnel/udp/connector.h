@@ -91,6 +91,7 @@ private:
     SocketAddress m_localAddress;
     boost::optional<QString> m_originatingHostAddressReplacement;
     std::unique_ptr<RendezvousConnectorWithVerification> m_chosenRendezvousConnector;
+    hpm::api::CloudConnectVersion m_remotePeerCloudConnectVersion;
 
     void onConnectResponse(
         nx::hpm::api::ResultCode resultCode,

@@ -8,6 +8,7 @@
 #include "connection_method.h"
 #include "connection_parameters.h"
 #include "stun_message_data.h"
+#include "nx/network/cloud/cloud_connect_version.h"
 
 
 namespace nx {
@@ -24,6 +25,7 @@ public:
     std::list<SocketAddress> udpEndpointList;   ///< Peer UDP addresses
     ConnectionMethods connectionMethods;        ///< All requestd connection types
     ConnectionParameters params;
+    CloudConnectVersion cloudConnectVersion;
 
     ConnectionRequestedEvent();
 
