@@ -169,7 +169,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     setHelpTopic(ui->ldapSettingsButton,                                Qn::UserSettings_LdapIntegration_Help);
     setHelpTopic(ui->fetchButton,                                       Qn::UserSettings_LdapFetch_Help);
 
-    /* Link visibility and cursor changes with hover: */
+    /* Cursor changes with hover: */
     connect(hoverTracker, &QnItemViewHoverTracker::itemEnter, this,
         [this](const QModelIndex& index)
         {
