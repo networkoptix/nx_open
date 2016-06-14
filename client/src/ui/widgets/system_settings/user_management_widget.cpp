@@ -112,9 +112,12 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
 
     auto hoverTracker = new QnItemViewHoverTracker(ui->usersTable);
 
+    auto switchItemDelegate = new QnSwitchItemDelegate(this);
+    switchItemDelegate->setHideDisabledItems(true);
+
     ui->usersTable->setModel(m_sortModel);
     ui->usersTable->setHeader(m_header);
-    ui->usersTable->setItemDelegateForColumn(QnUserListModel::EnabledColumn,  new QnSwitchItemDelegate(this));
+    ui->usersTable->setItemDelegateForColumn(QnUserListModel::EnabledColumn,  switchItemDelegate);
     ui->usersTable->setItemDelegateForColumn(QnUserListModel::UserRoleColumn, new QnDrawEditLinkDelegate(hoverTracker, this));
 
     m_header->setVisible(true);
