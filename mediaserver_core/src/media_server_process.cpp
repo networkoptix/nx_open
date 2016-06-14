@@ -1836,6 +1836,7 @@ void MediaServerProcess::run()
 #ifdef Q_OS_WIN
         HANDLE hProcess = GetCurrentProcess();
         TerminateProcess(hProcess, ERROR_SERVICE_SPECIFIC_ERROR);
+        WaitForSingleObject(hProcess, 10*1000);
 #endif
         abort();
         return;
