@@ -77,6 +77,7 @@ void QnNxStylePrivate::drawSwitch(
     Q_UNUSED(widget);
 
     const bool checked = option->state.testFlag(QStyle::State_On);
+    const bool enabled = option->state.testFlag(QStyle::State_Enabled);
     const bool standalone = !qstyleoption_cast<const QStyleOptionButton*>(option);
 
     QColor fillColorOn;     // On: background
@@ -91,7 +92,7 @@ void QnNxStylePrivate::drawSwitch(
 
     if (standalone)
     {
-        bool hovered = option->state.testFlag(QStyle::State_MouseOver);
+        bool hovered = enabled && option->state.testFlag(QStyle::State_MouseOver);
 
         fillColorOff = mainDark.lighter(hovered ? 7 : 6);
         fillColorOn = mainGreen.lighter(hovered ? 1 : 0);
@@ -126,6 +127,10 @@ void QnNxStylePrivate::drawSwitch(
     QnScopedPainterBrushRollback brushRollback(painter);
     QnScopedPainterClipPathRollback clipRollback(painter);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+    QnScopedPainterOpacityRollback opacityRollback(painter);
+
+    if (!enabled)
+        painter->setOpacity(0.3);
 
     QSize switchSize = standalone ? Metrics::kStandaloneSwitchSize : Metrics::kButtonSwitchSize;
 
