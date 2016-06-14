@@ -62,8 +62,6 @@ private:
     QElapsedTimer m_elapsedTimer;
     quint64 m_transmittedPacketDuration;
     QnAbstractStreamDataProvider* m_prevUsedProvider;
-protected:
-    QnResource* m_resource;
 };
 
 #endif // #ifdef ENABLE_DATA_PROVIDERS
