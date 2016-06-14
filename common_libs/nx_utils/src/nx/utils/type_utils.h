@@ -77,6 +77,9 @@ static_unique_ptr_cast(
         static_cast<ResultType*>(sourcePtr.release()));
 }
 
+template<typename T, typename Type = void>
+using SfinaeCheck = Type;
+
 template<typename Object, typename Deleter>
 std::unique_ptr<Object, Deleter> wrapUnique(Object* ptr, Deleter deleter)
 {

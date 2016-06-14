@@ -8,9 +8,7 @@
 
 namespace ec2 {
 
-    class QnUpdatesNotificationManager
-    :
-        public AbstractUpdatesManager
+    class QnUpdatesNotificationManager : public AbstractUpdatesNotificationManager
     {
     public:
         QnUpdatesNotificationManager();
@@ -23,14 +21,17 @@ namespace ec2 {
         void at_transactionProcessed(const QnAbstractTransaction &transaction);
     };
 
+    typedef std::shared_ptr<QnUpdatesNotificationManager> QnUpdatesNotificationManagerPtr;
+    typedef QnUpdatesNotificationManager *QnUpdatesNotificationManagerRawPtr;
+
 
     template<class QueryProcessorType>
     class QnUpdatesManager
     :
-        public QnUpdatesNotificationManager
+        public AbstractUpdatesManager
     {
     public:
-        QnUpdatesManager(QueryProcessorType * const queryProcessor);
+        QnUpdatesManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData);
         virtual ~QnUpdatesManager();
 
     protected:
@@ -40,6 +41,7 @@ namespace ec2 {
 
     private:
         QueryProcessorType* const m_queryProcessor;
+        Qn::UserAccessData m_userAccessData;
 
         QnTransaction<ApiUpdateUploadData> prepareTransaction(const QString &updateId, const QByteArray &data, qint64 offset) const;
         QnTransaction<ApiUpdateUploadResponceData> prepareTransaction(const QString &updateId, const QnUuid &peerId, int chunks) const;

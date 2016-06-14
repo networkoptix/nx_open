@@ -49,11 +49,15 @@ Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutRe
     }
 
     QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags>::const_iterator pos = m_flagsByLayout.find(resource);
-    if(pos == m_flagsByLayout.end()) {
-        if(resource->resourcePool() == resourcePool()) {
+    if (pos == m_flagsByLayout.end())
+    {
+        if (resource->resourcePool())
+        {
             /* We didn't get the notification from resource pool yet. */
             return defaultFlags(resource);
-        } else {
+        }
+        else
+        {
             qnWarning("Layout '%1' is not managed by this layout snapshot manager.", resource ? resource->getName() : QLatin1String("null"));
             return 0;
         }
@@ -105,7 +109,7 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
     ec2::fromResourceToApi(layout, apiLayout);
 
 
-    int reqID = QnAppServerConnectionFactory::getConnection2()->getLayoutManager()->save(
+    int reqID = QnAppServerConnectionFactory::getConnection2()->getLayoutManager(Qn::kDefaultUserAccess)->save(
         apiLayout, this, [this, layout, callback](int reqID, ec2::ErrorCode errorCode)
     {
         Q_UNUSED(reqID);

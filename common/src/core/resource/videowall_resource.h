@@ -10,7 +10,7 @@
 #include <core/resource/videowall_matrix.h>
 #include <utils/common/threadsafe_item_storage.h>
 
-class QnVideoWallResource : public QnResource, 
+class QnVideoWallResource : public QnResource,
     private QnThreadsafeItemStorageNotifier<QnVideoWallItem>,
     private QnThreadsafeItemStorageNotifier<QnVideoWallPcData>,
     private QnThreadsafeItemStorageNotifier<QnVideoWallMatrix>

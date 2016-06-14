@@ -795,7 +795,7 @@ void QnAuthHelper::applyClientCalculatedPasswordHashToResource(
     fromResourceToApi(userResource, userData);
 
 
-    QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(
+    QnAppServerConnectionFactory::getConnection2()->getUserManager(Qn::kDefaultUserAccess)->save(
         userData,
         QString(),
         ec2::DummyHandler::instance(),

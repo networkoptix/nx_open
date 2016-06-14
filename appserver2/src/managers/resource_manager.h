@@ -11,9 +11,7 @@
 
 namespace ec2
 {
-    class QnResourceNotificationManager
-    :
-        public AbstractResourceManager
+    class QnResourceNotificationManager : public AbstractResourceNotificationManager
     {
     public:
         QnResourceNotificationManager() {}
@@ -45,16 +43,14 @@ namespace ec2
         }
     };
 
-
+    typedef std::shared_ptr<QnResourceNotificationManager> QnResourceNotificationManagerPtr;
 
 
     template<class QueryProcessorType>
-    class QnResourceManager
-    :
-        public QnResourceNotificationManager
+    class QnResourceManager : public AbstractResourceManager
     {
     public:
-        QnResourceManager( QueryProcessorType* const queryProcessor);
+        QnResourceManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
         //!Implementation of AbstractResourceManager::getResourceTypes
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) override;
@@ -78,6 +74,7 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
+        Qn::UserAccessData m_userAccessData;
 
         QnTransaction<ApiResourceStatusData> prepareTransaction( ApiCommand::Value cmd, const QnUuid& id, Qn::ResourceStatus status);
         QnTransaction<ApiResourceParamWithRefDataList> prepareTransaction(ApiCommand::Value cmd, const ec2::ApiResourceParamWithRefDataList& kvPairs);

@@ -104,7 +104,14 @@ public:
     void addParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue());
 
     template<class T>
-    void addParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
+    void addParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue())
+    {
+        addParameter(QnCommandLineParameter(target, longName, shortName, description, impliedValue));
+    }
+
+    template<class T>
+    void addParameter(T *target, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue())
+    {
         addParameter(QnCommandLineParameter(target, longName, shortName, description, impliedValue));
     }
 

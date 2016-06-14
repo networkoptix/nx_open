@@ -93,7 +93,7 @@ void QnTimeServerSelectionWidget::applyChanges() {
         return;
 
     PRINT_DEBUG("forcing selected server to " + m_model->selectedServer().toByteArray());
-    auto timeManager = connection->getTimeManager();
+    auto timeManager = connection->getTimeManager(Qn::kDefaultUserAccess);
     timeManager->forcePrimaryTimeServer(m_model->selectedServer(), this, [this](int handle, ec2::ErrorCode errCode){
         Q_UNUSED(handle);
         Q_UNUSED(errCode);  //suppress warning in the release code

@@ -37,6 +37,7 @@
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
         <nx_network.guid>{71fb3cab-00f4-41a3-af08-ae0a61b8c79e}</nx_network.guid>
         <nx_utils.guid>{81BDC343-5614-4C4D-90E8-147A024BEAF4}</nx_utils.guid>
+        <nx_vms_utils.guid>{c4174ab7-1537-498b-8c4d-091d05e4735a}</nx_vms_utils.guid>
         <udt.guid>{7f5cd83f-b59e-4020-b35b-de4edaf66233}</udt.guid>
         <cloud_db_client.guid>{0F7C2BCF-DA0B-4E2E-8F4B-564AE63FAD73}</cloud_db_client.guid>
         <nx_audio.guid>{d335c660-3c62-4048-a1eb-b1606159a2dd}</nx_audio.guid>
@@ -401,6 +402,7 @@
                 <module>common</module>
                 <module>common_libs/nx_network</module>
                 <module>common_libs/nx_utils</module>
+                <module>common_libs/nx_vms_utils</module>
                 <module>common_libs/udt</module>
                 <module>nx_cloud/cloud_db_client</module>
                 <module>common_libs/nx_streaming</module>
@@ -736,6 +738,10 @@
                     <value>arm</value>
                 </property>
             </activation>
+            <modules>
+                <module>nx_cloud/libconnection_mediator</module>
+                <module>nx_cloud/cloud_connect_test_util</module>
+            </modules>
             <properties>
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
@@ -1060,21 +1066,15 @@
             </build>
             <properties>
                 <platform>android</platform>
-                <toolchain.version>android</toolchain.version>
-                <qt.spec>android-g++</qt.spec>
                 <libdir>${root.dir}/build_environment/target</libdir>
-                <compiler>gcc</compiler>
-                <additional.compiler>gcc</additional.compiler>
-                <profile.classifier>${platform}-${arch}</profile.classifier>
-                <android.sdk>${environment.dir}/android/android-sdk</android.sdk>
-                <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
-                <android.ndk.host>linux-x86_64</android.ndk.host>
-                <android.toolchain.version>4.8</android.toolchain.version>
-                <qt.version>5.5.1</qt.version>
+                <android.sdk>${packages.dir}/android/android-sdk</android.sdk>
+                <android.ndk>${packages.dir}/android/android-ndk</android.ndk>
+                <android.toolchain.version>4.9</android.toolchain.version>
+                <android.platform>android-16</android.platform>
+                <qt.spec/>
                 <openal.version>1.17.2</openal.version>
                 <openssl.version>1.0.2d</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
-                <compile.option1/>
                 <rdep.target>android-${arch}</rdep.target>
             </properties>
         </profile>

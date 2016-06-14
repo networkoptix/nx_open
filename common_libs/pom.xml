@@ -13,12 +13,8 @@
     <packaging>pom</packaging>
     <name>Network Optix Common Libraries</name>
 
-
-    
     <properties>
         <root.dir>${basedir}/../..</root.dir>
-        <!-- <libtype>plugin</libtype>
-        <buildLib>sharedlib</buildLib> -->
     </properties>
     <dependencies>
         <dependency>

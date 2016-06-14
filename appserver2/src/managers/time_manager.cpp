@@ -28,6 +28,7 @@
 #include <transaction/transaction_message_bus.h>
 
 #include <nx_ec/data/api_runtime_data.h>
+#include <nx_ec/data/api_misc_data.h>
 
 #include <utils/common/joinable.h>
 #include <nx/utils/log/log.h>
@@ -81,41 +82,52 @@ namespace ec2
         \param syncTimeToLocalDelta local_time - sync_time
     */
     bool saveSyncTime(
-        QnDbManager* const dbManagerPtr,
         qint64 syncTimeToLocalDelta,
         const TimePriorityKey& syncTimeKey)
     {
+        QnTransaction<ApiMiscData> deltaTran(ApiCommand::NotDefined,
+            ApiMiscData(TIME_DELTA_PARAM_NAME,
+                QByteArray::number(syncTimeToLocalDelta)));
+
+        QnTransaction<ApiMiscData> priorityTran(ApiCommand::NotDefined,
+            ApiMiscData(USED_TIME_PRIORITY_KEY_PARAM_NAME,
+                QByteArray::number(syncTimeKey.toUInt64())));
+
+        deltaTran.isLocal = true;
+        priorityTran.isLocal = true;
+
+        transactionLog->fillPersistentInfo(deltaTran);
+        transactionLog->fillPersistentInfo(priorityTran);
+
         return
-            dbManagerPtr->saveMiscParam(
-                TIME_DELTA_PARAM_NAME,
-                QByteArray::number(syncTimeToLocalDelta)) &&
-            dbManagerPtr->saveMiscParam(
-                USED_TIME_PRIORITY_KEY_PARAM_NAME,
-                QByteArray::number(syncTimeKey.toUInt64()));
+            dbManager(Qn::kDefaultUserAccess)
+                .executeTransaction(deltaTran, QByteArray()) == ErrorCode::ok &&
+            dbManager(Qn::kDefaultUserAccess)
+                .executeTransaction(priorityTran, QByteArray()) == ErrorCode::ok;
     }
 
     /*!
         \param syncTimeToLocalDelta local_time - sync_time
     */
     bool loadSyncTime(
-        QnDbManager* const dbManagerPtr,
         qint64* const syncTimeToLocalDelta,
         TimePriorityKey* const syncTimeKey)
     {
-        QByteArray syncTimeToLocalDeltaStr;
-        if (!dbManagerPtr->readMiscParam(
+        ApiMiscData syncTimeToLocalDeltaData;
+
+        if (dbManager(Qn::kDefaultUserAccess).doQuery(
                 TIME_DELTA_PARAM_NAME,
-                &syncTimeToLocalDeltaStr))
+                syncTimeToLocalDeltaData) != ErrorCode::ok)
             return false;
 
-        QByteArray syncTimeKeyStr;
-        if (!dbManagerPtr->readMiscParam(
+        ApiMiscData syncTimeKeyData;
+        if (dbManager(Qn::kDefaultUserAccess).doQuery(
                 USED_TIME_PRIORITY_KEY_PARAM_NAME,
-                &syncTimeKeyStr))
+                syncTimeKeyData) != ErrorCode::ok)
             return false;
 
-        *syncTimeToLocalDelta = syncTimeToLocalDeltaStr.toLongLong();
-        syncTimeKey->fromUInt64(syncTimeKeyStr.toULongLong());
+        *syncTimeToLocalDelta = syncTimeToLocalDeltaData.value.toLongLong();
+        syncTimeKey->fromUInt64(syncTimeKeyData.value.toULongLong());
         return true;
     }
 
@@ -382,8 +394,8 @@ namespace ec2
             currentMSecsSinceEpoch(),
             m_localTimePriorityKey );
 
-        if (QnDbManager::instance())
-            connect( QnDbManager::instance(), &QnDbManager::initialized,
+        if (detail::QnDbManager::instance())
+            connect( detail::QnDbManager::instance(), &detail::QnDbManager::initialized,
                  this, &TimeSynchronizationManager::onDbManagerInitialized,
                  Qt::DirectConnection );
         connect( QnTransactionMessageBus::instance(), &QnTransactionMessageBus::newDirectConnectionEstablished,
@@ -492,10 +504,9 @@ namespace ec2
                         arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logINFO );
                     m_timeSynchronized = true;
                     //saving synchronized time to DB
-                    if( QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
+                    if( detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized() )
                         Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
                             &saveSyncTime,
-                            QnDbManager::instance(),
                             0,
                             m_usedTimeSyncInfo.timePriorityKey) ) );
 
@@ -715,10 +726,9 @@ namespace ec2
         const qint64 curSyncTime = m_usedTimeSyncInfo.syncTime + m_monotonicClock.elapsed() - m_usedTimeSyncInfo.monotonicClockValue;
         //saving synchronized time to DB
         m_timeSynchronized = true;
-        if( QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
+        if( detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized() )
             Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
                 &saveSyncTime,
-                QnDbManager::instance(),
                 QDateTime::currentMSecsSinceEpoch() - curSyncTime,
                 m_usedTimeSyncInfo.timePriorityKey) ) );
         lock->unlock();
@@ -1122,17 +1132,16 @@ namespace ec2
 
     void TimeSynchronizationManager::onDbManagerInitialized()
     {
-        QByteArray timePriorityStr;
+        ApiMiscData timePriorityData;
         const bool timePriorityStrLoadResult =
-            QnDbManager::instance()->readMiscParam(
+            dbManager(Qn::kDefaultUserAccess).doQuery(
                 LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
-                &timePriorityStr);
+                timePriorityData) == ErrorCode::ok;
 
         qint64 restoredTimeDelta = 0;
         TimePriorityKey restoredPriorityKey;
         const bool loadSyncTimeResult =
             loadSyncTime(
-                QnDbManager::instance(),
                 &restoredTimeDelta,
                 &restoredPriorityKey);
 
@@ -1141,7 +1150,7 @@ namespace ec2
         //restoring local time priority from DB
         if (timePriorityStrLoadResult)
         {
-            const quint64 restoredPriorityKeyVal = timePriorityStr.toULongLong();
+            const quint64 restoredPriorityKeyVal = timePriorityData.value.toULongLong();
             TimePriorityKey restoredPriorityKey;
             restoredPriorityKey.fromUInt64( restoredPriorityKeyVal );
             //considering time, restored from DB, to be unreliable
@@ -1191,7 +1200,6 @@ namespace ec2
 
         if (syncTimeDataToSave)
             saveSyncTime(
-                QnDbManager::instance(),
                 syncTimeDataToSave->first,
                 syncTimeDataToSave->second);
 
@@ -1294,10 +1302,9 @@ namespace ec2
                 forceTimeResync();
             }
 
-            if (QnDbManager::instance() && QnDbManager::instance()->isInitialized())
+            if (detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized())
                 Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
                     &saveSyncTime,
-                    QnDbManager::instance(),
                     QDateTime::currentMSecsSinceEpoch() - getSyncTime(),
                     m_usedTimeSyncInfo.timePriorityKey)));
         }
@@ -1312,11 +1319,16 @@ namespace ec2
 
     void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(QnMutexLockerBase* const /*lk*/)
     {
-        if (QnDbManager::instance() && QnDbManager::instance()->isInitialized())
-            Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
-                &QnDbManager::saveMiscParam,
-                QnDbManager::instance(),
-                LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
-                QByteArray::number(m_localTimePriorityKey.toUInt64()))));
+        if (detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized())
+            Ec2ThreadPool::instance()->start(make_custom_runnable([this]
+            {
+                QnTransaction<ApiMiscData> localTimeTran(ApiCommand::NotDefined,
+                    ec2::ApiMiscData(LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
+                        QByteArray::number(m_localTimePriorityKey.toUInt64())));
+
+                localTimeTran.isLocal = true;
+                transactionLog->fillPersistentInfo(localTimeTran);
+                dbManager(Qn::kDefaultUserAccess).executeTransaction(localTimeTran, QByteArray());
+            }));
     }
 }

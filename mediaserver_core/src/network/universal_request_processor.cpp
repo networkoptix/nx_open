@@ -14,6 +14,7 @@
 #include "utils/common/synctime.h"
 #include "utils/gzip/gzip_compressor.h"
 #include <nx/network/flash_socket/types.h>
+#include <rest/server/rest_connection_processor.h>
 
 static const int AUTH_TIMEOUT = 60 * 1000;
 //static const int AUTHORIZED_TIMEOUT = 60 * 1000;
@@ -63,7 +64,7 @@ QByteArray QnUniversalRequestProcessor::unauthorizedPageBody()
     return m_unauthorizedPageBody;
 }
 
-bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
+bool QnUniversalRequestProcessor::authenticate(QnUuid* userId, bool *noAuth)
 {
     Q_D(QnUniversalRequestProcessor);
 
@@ -135,6 +136,8 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             if (t.elapsed() >= AUTH_TIMEOUT || !d->socket->isConnected())
                 return false; // close connection
         }
+        if (qnAuthHelper->restrictionList()->getAllowedAuthMethods(d->request) & AuthMethod::noAuth)
+            *noAuth = true;
         if (usedMethod != AuthMethod::noAuth)
             d->authenticatedOnce = true;
     }
@@ -171,7 +174,8 @@ void QnUniversalRequestProcessor::run()
             parseRequest();
 
             auto handler = d->owner->findHandler(d->protocol, d->request);
-            if (handler && !authenticate(&d->authUserId))
+            bool noAuth;
+            if (handler && !authenticate(&d->authUserId, &noAuth))
                 return;
 
             isKeepAlive = isConnectionCanBePersistent();
@@ -179,7 +183,7 @@ void QnUniversalRequestProcessor::run()
 
             // getting a new handler inside is necessary due to possibility of
             // changing request during authentication
-            if (!processRequest())
+            if (!processRequest(noAuth))
             {
                 QByteArray contentType;
                 int rez = redirectTo(QnTcpListener::defaultPage(), contentType);
@@ -199,7 +203,7 @@ void QnUniversalRequestProcessor::run()
         d->socket->close();
 }
 
-bool QnUniversalRequestProcessor::processRequest()
+bool QnUniversalRequestProcessor::processRequest(bool noAuth)
 {
     Q_D(QnUniversalRequestProcessor);
 
@@ -209,6 +213,9 @@ bool QnUniversalRequestProcessor::processRequest()
     else
         return false;
 
+    auto restProcessor = dynamic_cast<QnRestConnectionProcessor*>(d->processor);
+    if (restProcessor)
+        restProcessor->setAuthNotRequired(noAuth);
     if ( !needToStop() )
     {
         copyClientRequestTo(*d->processor);

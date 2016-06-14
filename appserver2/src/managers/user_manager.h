@@ -5,7 +5,7 @@
 
 namespace ec2
 {
-    class QnUserNotificationManager: public AbstractUserManager
+    class QnUserNotificationManager: public AbstractUserNotificationManager
     {
     public:
         QnUserNotificationManager( );
@@ -16,12 +16,14 @@ namespace ec2
         void triggerNotification(const QnTransaction<ApiUserGroupData>& tran);
     };
 
+    typedef std::shared_ptr<QnUserNotificationManager> QnUserNotificationManagerPtr;
 
     template<class QueryProcessorType>
-    class QnUserManager: public QnUserNotificationManager
+    class QnUserManager: public AbstractUserManager
     {
     public:
-        QnUserManager( QueryProcessorType* const queryProcessor);
+        QnUserManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
+
 
         virtual int getUsers(impl::GetUsersHandlerPtr handler ) override;
         virtual int save( const ec2::ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler ) override;
@@ -35,6 +37,7 @@ namespace ec2
         virtual int setAccessRights(const ec2::ApiAccessRightsData& data, impl::SimpleHandlerPtr handler) override;
     private:
         QueryProcessorType* const m_queryProcessor;
+        Qn::UserAccessData m_userAccessData;
     };
 
 }

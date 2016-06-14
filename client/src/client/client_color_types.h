@@ -333,6 +333,16 @@ struct QnResourceItemColors
 #define QnResourceItemColors_Fields (mainText)(mainTextSelected)(mainTextAccented) \
                                 (extraText)(extraTextSelected)(extraTextAccented)
 
+struct QnPasswordStrengthColors
+{
+    QnPasswordStrengthColors();
+
+    QColor inacceptable;
+    QColor acceptable;
+    QColor good;
+};
+#define QnPasswordStrengthColors_Fields (inacceptable)(acceptable)(good)
+
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
@@ -347,6 +357,7 @@ struct QnResourceItemColors
     (QnCompositeTextOverlayColors) \
     (QnGraphicsMessageBoxColors) \
     (QnResourceItemColors) \
+    (QnPasswordStrengthColors)
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

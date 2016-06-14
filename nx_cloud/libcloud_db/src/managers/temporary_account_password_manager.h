@@ -68,6 +68,7 @@ public:
         stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
+    std::string generateRandomPassword();
     void createTemporaryPassword(
         const AuthorizationInfo& authzInfo,
         data::TemporaryAccountPassword tmpPasswordData,

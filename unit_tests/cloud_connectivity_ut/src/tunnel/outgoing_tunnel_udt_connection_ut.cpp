@@ -5,6 +5,7 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/std/future.h>
 #include <utils/common/cpp14.h>
+#include <utils/common/guard.h>
 
 
 namespace nx {
@@ -312,20 +313,38 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
             controlConnectionClosedPromise.set_value();
         });
 
+    auto tunnelConnectionGuard = makeScopedGuard(
+        [&tunnelConnection]{ tunnelConnection.pleaseStopSync(); });
+    auto controlConnectionGuard = makeScopedGuard(
+        [this]
+        {
+            if (!m_controlConnection)
+                return;
+            m_controlConnection->pleaseStopSync();
+            m_controlConnection.reset();
+        });
+
     ASSERT_EQ(
         std::future_status::ready,
         controlConnectionEstablishedPromise.get_future().wait_for(
             controlConnectionEstablishedTimeout));
 
     ASSERT_NE(nullptr, m_controlConnection);
-    m_controlConnection->pleaseStopSync();
-    m_controlConnection.reset();
+    controlConnectionGuard.fire();
 
     //waiting for control connection to close
+    const auto t1 = std::chrono::steady_clock::now();
     ASSERT_EQ(
         std::future_status::ready,
         controlConnectionClosedPromise.get_future().wait_for(
-            udpTunnelKeepAlive.maxConnectionInactivityPeriod()*15/10));
+            udpTunnelKeepAlive.maxConnectionInactivityPeriod() * 10));
+    const auto actualTimeout = std::chrono::steady_clock::now() - t1;
+
+#ifdef _DEBUG
+    EXPECT_LT(
+        actualTimeout,
+        udpTunnelKeepAlive.maxConnectionInactivityPeriod() * 15 / 10);
+#endif
 
     auto connectContexts = startConnections(&tunnelConnection, 1);
     auto future = connectContexts[0].connectedPromise.get_future();
@@ -333,8 +352,6 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
     ASSERT_FALSE(result.stillValid);    //tunnel is invalid since control connection has timed out
     ASSERT_NE(nullptr, result.connection);  //but connection still succeeded
     ASSERT_EQ(SystemError::noError, result.errorCode);
-
-    tunnelConnection.pleaseStopSync();
 }
 
 }   //namespace udp

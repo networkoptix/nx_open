@@ -9,9 +9,7 @@
 
 namespace ec2
 {
-    class QnBusinessEventNotificationManager
-    :
-        public AbstractBusinessEventManager
+    class QnBusinessEventNotificationManager : public AbstractBusinessEventNotificationManager
     {
     public:
         QnBusinessEventNotificationManager() {}
@@ -49,16 +47,13 @@ namespace ec2
         }
     };
 
-
-
+    typedef std::shared_ptr<QnBusinessEventNotificationManager> QnBusinessEventNotificationManagerPtr;
 
     template<class QueryProcessorType>
-    class QnBusinessEventManager
-    :
-        public QnBusinessEventNotificationManager
+    class QnBusinessEventManager : public AbstractBusinessEventManager
     {
     public:
-        QnBusinessEventManager( QueryProcessorType* const queryProcessor );
+        QnBusinessEventManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) override;
 
@@ -71,6 +66,7 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
+        Qn::UserAccessData m_userAccessData;
 
         QnTransaction<ApiBusinessRuleData> prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnUuid& id );

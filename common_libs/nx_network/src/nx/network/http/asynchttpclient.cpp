@@ -706,7 +706,7 @@ namespace nx_http
 
         m_state = sInit;
 
-        m_socket = SocketFactory::createStreamSocket(m_url.scheme() == lit("https"));
+        m_socket = SocketFactory::createStreamSocket(/*m_url.scheme() == lit("https")*/);
         m_socket->bindToAioThread(m_aioThreadBinder.getAioThread());
         m_connectionClosed = false;
         if (!m_socket->setNonBlockingMode(true) ||

@@ -8,6 +8,7 @@ CONFIG += console
   QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
 }
 
+INCLUDEPATH += ${root.dir}/common_libs/nx_vms_utils/src \
 INCLUDEPATH += ${root.dir}/client/src
 
 LIBS += $$FESTIVAL_LIB

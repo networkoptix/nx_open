@@ -297,9 +297,9 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     m_controlMode.pcUuid = pcUuid.toString();
 
     /* Common connections */
-    connect(resourcePool(), &QnResourcePool::resourceAdded,     this,   &QnWorkbenchVideoWallHandler::at_resPool_resourceAdded);
-    connect(resourcePool(), &QnResourcePool::resourceRemoved,   this,   &QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved);
-    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
+    connect(qnResPool, &QnResourcePool::resourceAdded,     this,   &QnWorkbenchVideoWallHandler::at_resPool_resourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved,   this,   &QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved);
+    foreach(const QnResourcePtr &resource, qnResPool->getResources())
         at_resPool_resourceAdded(resource);
 
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, [this](const QnPeerRuntimeInfo &info) {
@@ -651,7 +651,7 @@ void QnWorkbenchVideoWallHandler::sendMessage(const QnVideoWallControlMessage& m
     {
         apiMessage.videowallGuid = index.videowall()->getId();
         apiMessage.instanceGuid = index.uuid();
-        connection2()->getVideowallManager()->sendControlMessage(apiMessage, this, []{});
+        connection2()->getVideowallManager(Qn::kDefaultUserAccess)->sendControlMessage(apiMessage, this, []{});
     }
 }
 
@@ -1128,12 +1128,10 @@ QnVideoWallItemIndexList QnWorkbenchVideoWallHandler::targetList() const {
 
     QnVideoWallItemIndexList indices;
 
-    foreach (const QnResourcePtr &resource, resourcePool()->getResources()) {
-        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
-        if (!videoWall)
-            continue;
-
-        foreach(const QnVideoWallItem &item, videoWall->items()->getItems()) {
+    for (const QnVideoWallResourcePtr& videoWall: qnResPool->getResources<QnVideoWallResource>())
+    {
+        for(const QnVideoWallItem &item: videoWall->items()->getItems())
+        {
             if (item.layout == currentId && item.runtimeStatus.online)
                 indices << QnVideoWallItemIndex(videoWall, item.uuid);
         }
@@ -1230,7 +1228,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
         i++;
     }
 
-    resourcePool()->addResource(layout);
+    qnResPool->addResource(layout);
     return layout;
 }
 
@@ -1420,7 +1418,7 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered() {
     for (const QnVideoWallItem &item: videoWall->items()->getItems())
     {
         message.instanceGuid = item.uuid;
-        connection2()->getVideowallManager()->sendControlMessage(message, this, []{});
+        connection2()->getVideowallManager(Qn::kDefaultUserAccess)->sendControlMessage(message, this, []{});
     }
 }
 
@@ -1521,7 +1519,7 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered() {
 
         message.videowallGuid = item.videowall()->getId();
         message.instanceGuid = item.uuid();
-        connection2()->getVideowallManager()->sendControlMessage(message, this, []{});
+        connection2()->getVideowallManager(Qn::kDefaultUserAccess)->sendControlMessage(message, this, []{});
     }
 }
 
@@ -1587,7 +1585,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         foreach (const QnVideoWallItemIndexList &indices, itemGroups)
             addItemToLayout(layout, indices);
 
-        resourcePool()->addResource(layout);
+        qnResPool->addResource(layout);
 
         menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 
@@ -2414,7 +2412,7 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout( QnWorkbenchLayout *layout, s
     {
         ec2::ApiVideowallData apiVideowall;
         fromResourceToApi(videowall, apiVideowall);
-        connection2()->getVideowallManager()->save(apiVideowall, this,
+        connection2()->getVideowallManager(Qn::kDefaultUserAccess)->save(apiVideowall, this,
             [this, callback]( int reqID, ec2::ErrorCode errorCode ) {
                 callback(reqID, errorCode);
         } );
@@ -2686,6 +2684,6 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWall
         //TODO: #GDM SafeMode
         ec2::ApiVideowallData apiVideowall;
         fromResourceToApi(videowall, apiVideowall);
-        connection2()->getVideowallManager()->save(apiVideowall, this, callback);
+        connection2()->getVideowallManager(Qn::kDefaultUserAccess)->save(apiVideowall, this, callback);
     }
 }

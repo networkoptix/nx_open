@@ -70,6 +70,15 @@ public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
+class TemporaryCredentialsParams
+:
+    public api::TemporaryCredentialsParams,
+    public stree::AbstractResourceReader
+{
+public:
+    virtual bool getAsVariant(int resID, QVariant* const value) const override;
+};
+
 class AccessRestrictions
 {
 public:
@@ -104,6 +113,7 @@ public:
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (TemporaryAccountPassword),
     (sql_record))
+
 
 //#define AccountUpdateDataWithEmail_Fields (passwordHa1)(fullName)(customization)(email)
 //

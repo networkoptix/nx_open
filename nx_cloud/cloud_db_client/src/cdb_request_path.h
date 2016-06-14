@@ -16,6 +16,7 @@ extern const char* kAccountGetPath;
 extern const char* kAccountUpdatePath;
 extern const char* kAccountPasswordResetPath;
 extern const char* kAccountReactivatePath;
+extern const char* kAccountCreateTemporaryCredentialsPath;
 
 extern const char* kSystemBindPath;
 extern const char* kSystemUnbindPath;
@@ -23,6 +24,7 @@ extern const char* kSystemGetPath;
 extern const char* kSystemSharePath;
 extern const char* kSystemGetCloudUsersPath;
 extern const char* kSystemGetAccessRoleListPath;
+extern const char* kSystemUpdateSystemNamePath;
 
 extern const char* kAuthGetNoncePath;
 extern const char* kAuthGetAuthenticationPath;

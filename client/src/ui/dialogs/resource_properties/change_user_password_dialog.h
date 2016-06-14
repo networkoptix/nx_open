@@ -16,10 +16,16 @@ class QnChangeUserPasswordDialog: public QnButtonBoxDialog, public QnWorkbenchCo
     typedef QnButtonBoxDialog base_type;
 
 public:
-    QnChangeUserPasswordDialog(QWidget* parent = NULL);
+    QnChangeUserPasswordDialog(QWidget* parent = nullptr);
     virtual ~QnChangeUserPasswordDialog();
 
+    virtual void done(int r) override;
+
     QString newPassword() const;
+
+private:
+    bool validate();
+
 private:
     Q_DISABLE_COPY(QnChangeUserPasswordDialog)
     QScopedPointer<Ui::ChangeUserPasswordDialog> ui;

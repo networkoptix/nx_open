@@ -6,6 +6,7 @@
 #include <utils/common/software_version.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/disconnect_helper.h>
+#include <network/system_description.h>
 #include <core/core_settings.h>
 #include <finders/systems_finder.h>
 #include <watchers/cloud_status_watcher.h>
@@ -66,150 +67,91 @@ namespace
 
         return result;
     }();
-
-    QString getIncompatibleCustomization(const QnSystemDescriptionPtr &systemDescription)
-    {
-        const auto servers = systemDescription->servers();
-        if (servers.isEmpty())
-            return QString();
-
-        const auto customization = QnAppInfo::customizationName();
-        const auto predicate = [customization](const QnModuleInformation &serverInfo)
-        {
-            // TODO: improve me https://networkoptix.atlassian.net/browse/VMS-2163
-            return (customization != serverInfo.customization);
-        };
-
-        const auto incompatibleIt =
-            std::find_if(servers.begin(), servers.end(), predicate);
-        return (incompatibleIt == servers.end() ? QString()
-            : incompatibleIt->customization);
-    }
-
-    bool isCorrectCustomization(const QnSystemDescriptionPtr &systemDescription)
-    {
-        return getIncompatibleCustomization(systemDescription).isEmpty();
-    }
-
-    QString getIncompatibleVersion(const QnSystemDescriptionPtr &systemDescription)
-    {
-        const auto servers = systemDescription->servers();
-        if (servers.isEmpty())
-            return QString();
-
-        const QnSoftwareVersion appVersion(QnAppInfo::applicationVersion());
-        const auto predicate = [appVersion](const QnModuleInformation &serverInfo)
-        {
-            // TODO: improve me https://networkoptix.atlassian.net/browse/VMS-2166
-            return !serverInfo.hasCompatibleVersion();
-        };
-
-        const auto incompatibleIt =
-            std::find_if(servers.begin(), servers.end(), predicate);
-        return (incompatibleIt == servers.end() ? QString()
-            : incompatibleIt->version.toString(QnSoftwareVersion::BugfixFormat));
-    }
-
-    bool isCompatibleVersion(const QnSystemDescriptionPtr &systemDescription)
-    {
-        return getIncompatibleVersion(systemDescription).isEmpty();
-    }
-
-    bool isCompatibleSystem(const QnSystemDescriptionPtr &sysemDescription)
-    {
-        return (isCompatibleVersion(sysemDescription)
-            && isCorrectCustomization(sysemDescription)
-            // TODO: add more checks
-            );
-    }
-
-    bool isFactorySystem(const QnSystemDescriptionPtr &systemDescription)
-    {
-        if (systemDescription->isCloudSystem())
-            return false;
-
-        const auto servers = systemDescription->servers();
-        if (servers.isEmpty())
-            return false;
-
-        const auto predicate = [](const QnModuleInformation &serverInfo)
-        {
-            return serverInfo.serverFlags.testFlag(Qn::SF_NewSystem);
-        };
-
-        const bool isFactory =
-            std::any_of(servers.begin(), servers.end(), predicate);
-        return isFactory;
-    }
-
-    template<typename DataType, typename ResultType>
-    ResultType getLessSystemPred()
-    {
-        const auto lessPredicate = [](const DataType &firstData
-            , const DataType &secondData)
-        {
-            const auto first = firstData->system;
-            const auto second = secondData->system;
-
-            const bool firstIsFactorySystem = isFactorySystem(first);
-            const bool sameFactoryStatus = (firstIsFactorySystem
-                == isFactorySystem(second));
-            if (!sameFactoryStatus)
-                return firstIsFactorySystem;
-
-            const bool firstIsCloudSystem = first->isCloudSystem();
-            const bool sameType =
-                (firstIsCloudSystem == second->isCloudSystem());
-            if (!sameType)
-                return firstIsCloudSystem;
-
-            const bool firstCompatible = isCompatibleSystem(first);
-            const bool sameCompatible =
-                (firstCompatible == isCompatibleSystem(second));
-            if (!sameCompatible)
-                return firstCompatible;
-
-            return (first->name() < second->name());
-        };
-        return lessPredicate;
-    }
 }
 
-///
-struct QnSystemsModel::InternalSystemData
+class QnSystemsModelPrivate: public Connective<QObject>
 {
-    QnSystemDescriptionPtr system;
-    QnDisconnectHelper connections;
-};
+    QnSystemsModel* q_ptr;
+    Q_DECLARE_PUBLIC(QnSystemsModel)
 
-///
+    using base_type = Connective<QObject>;
+
+public:
+    QnSystemsModelPrivate(QnSystemsModel* parent);
+
+    void updateOwnerDescription();
+
+    void addSystem(const QnSystemDescriptionPtr& systemDescription);
+
+    void removeSystem(const QString& systemId);
+
+    struct InternalSystemData
+    {
+        QnSystemDescriptionPtr system;
+        QnDisconnectHelper connections;
+    };
+    using InternalSystemDataPtr = QSharedPointer<InternalSystemData>;
+    using InternalList = QVector<InternalSystemDataPtr>;
+
+    InternalList::iterator getInternalDataIt(
+            const QnSystemDescriptionPtr& systemDescription);
+
+    void at_serverChanged(
+            const QnSystemDescriptionPtr& systemDescription,
+            const QnUuid &serverId,
+            QnServerFields fields);
+
+    QStringListModel* createStringListModel(const QStringList& data) const;
+
+    void resetModel();
+
+    bool systemLess(const InternalSystemDataPtr& firstData,
+                    const InternalSystemDataPtr& secondData) const;
+
+    auto getSystemLessPred() const
+    {
+        return [this](const InternalSystemDataPtr& firstData,
+                      const InternalSystemDataPtr& secondData)
+        {
+            return systemLess(firstData, secondData);
+        };
+    }
+
+    QString getIncompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
+    bool isCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
+    bool isCompatibleSystem(const QnSystemDescriptionPtr& sysemDescription) const;
+    QString getIncompatibleCustomization(const QnSystemDescriptionPtr& systemDescription) const;
+    bool isCorrectCustomization(const QnSystemDescriptionPtr& systemDescription) const;
+    bool isFactorySystem(const QnSystemDescriptionPtr& systemDescription) const;
+
+    const int maxCount;
+    QnDisconnectHelper disconnectHelper;
+    InternalList internalData;
+    QnSoftwareVersion minimalVersion;
+};
 
 QnSystemsModel::QnSystemsModel(QObject *parent)
     : base_type(parent)
-    , m_maxCount(kMaxTilesCount)    // TODO: do we need to change it dynamically or from outside? Think about it.
-    , m_lessPred(getLessSystemPred<InternalSystemDataPtr, LessPred>())
-    , m_connections()
-    , m_internalData()
+    , d_ptr(new QnSystemsModelPrivate(this))
 {
     NX_ASSERT(qnSystemsFinder, Q_FUNC_INFO, "Systems finder is null!");
 
-    const auto discoveredConnection =
-        connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered
-        , this, &QnSystemsModel::addSystem);
+    Q_D(QnSystemsModel);
 
-    const auto lostConnection =
-        connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost
-        , this, &QnSystemsModel::removeSystem);
+    d->disconnectHelper <<
+        connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered,
+                d, &QnSystemsModelPrivate::addSystem);
 
-    m_connections << discoveredConnection << lostConnection;
+    d->disconnectHelper <<
+        connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost,
+                d, &QnSystemsModelPrivate::removeSystem);
 
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged
-        , this, &QnSystemsModel::updateOwnerDescription);
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged
-        , this, &QnSystemsModel::updateOwnerDescription);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
+            d, &QnSystemsModelPrivate::updateOwnerDescription);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
+            d, &QnSystemsModelPrivate::updateOwnerDescription);
 
-    for (const auto system : qnSystemsFinder->systems())
-        addSystem(system);
+    d->resetModel();
 }
 
 QnSystemsModel::~QnSystemsModel()
@@ -217,14 +159,18 @@ QnSystemsModel::~QnSystemsModel()
 
 int QnSystemsModel::rowCount(const QModelIndex &parent) const
 {
+    Q_D(const QnSystemsModel);
+
     if (parent.isValid())
         return 0;
 
-    return std::min(m_internalData.count(), m_maxCount);
+    return std::min(d->internalData.count(), d->maxCount);
 }
 
 QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
 {
+    Q_D(const QnSystemsModel);
+
     if (!index.isValid() || !qBetween<int>(FirstRoleId, role, RolesCount))
         return QVariant();
 
@@ -232,7 +178,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
     if (!qBetween(0, row, rowCount()))
         return QVariant();
 
-    const auto systemDescription = m_internalData[row]->system;
+    const auto systemDescription = d->internalData[row]->system;
     switch(role)
     {
     case SystemNameRoleId:
@@ -260,25 +206,47 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
     case LastPasswordsModelRoleId:
         return QVariant();  // TODO
     case IsFactorySystemRoleId:
-        return isFactorySystem(systemDescription);
+        return d->isFactorySystem(systemDescription);
     case IsCloudSystemRoleId:
         return systemDescription->isCloudSystem();
     case IsOnlineRoleId:
         return !systemDescription->servers().isEmpty();
     case IsCompatibleRoleId:
-        return isCompatibleSystem(systemDescription);
+        return d->isCompatibleSystem(systemDescription);
     case IsCorrectCustomizationRoleId:
-        return isCorrectCustomization(systemDescription);
+        return d->isCorrectCustomization(systemDescription);
     case IsCompatibleVersionRoleId:
-        return isCompatibleVersion(systemDescription);
+        return d->isCompatibleVersion(systemDescription);
     case WrongVersionRoleId:
-        return getIncompatibleVersion(systemDescription);
+        return d->getIncompatibleVersion(systemDescription);
     case WrongCustomizationRoleId:
-        return getIncompatibleCustomization(systemDescription);
+        return d->getIncompatibleCustomization(systemDescription);
 
     default:
         return QVariant();
     }
+}
+
+QString QnSystemsModel::minimalVersion() const
+{
+    Q_D(const QnSystemsModel);
+    return d->minimalVersion.toString();
+}
+
+void QnSystemsModel::setMinimalVersion(const QString& minimalVersion)
+{
+    Q_D(QnSystemsModel);
+
+    const auto version = QnSoftwareVersion(minimalVersion);
+
+    if (d->minimalVersion == version)
+        return;
+
+    d->minimalVersion = version;
+
+    d->resetModel();
+
+    emit minimalVersionChanged();
 }
 
 RoleNames QnSystemsModel::roleNames() const
@@ -286,117 +254,144 @@ RoleNames QnSystemsModel::roleNames() const
     return kRoleNames;
 }
 
-void QnSystemsModel::updateOwnerDescription()
+QnSystemsModelPrivate::QnSystemsModelPrivate(QnSystemsModel* parent)
+    : base_type(parent)
+    , q_ptr(parent)
+    , maxCount(kMaxTilesCount)    // TODO: do we need to change it dynamically or from outside? Think about it.
+    , disconnectHelper()
+    , internalData()
+    , minimalVersion()
 {
-    const auto count = rowCount();
+}
+
+void QnSystemsModelPrivate::updateOwnerDescription()
+{
+    Q_Q(QnSystemsModel);
+
+    const auto count = q->rowCount();
     if (!count)
         return;
 
-    dataChanged(index(0), index(count - 1)
-        , QVector<int>() << OwnerDescriptionRoleId);
+    emit q->dataChanged(q->index(0), q->index(count - 1), QVector<int>{ OwnerDescriptionRoleId });
 }
 
-void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)
+void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescription)
 {
+    Q_Q(QnSystemsModel);
+
     const auto data = InternalSystemDataPtr(new InternalSystemData(
         { systemDescription, QnDisconnectHelper() }));
 
-    const auto insertPos = std::upper_bound(m_internalData.begin()
-        , m_internalData.end(), data, m_lessPred);
+    const auto insertPos = std::upper_bound(internalData.begin()
+        , internalData.end(), data, getSystemLessPred());
 
-    const int position = (insertPos == m_internalData.end()
-        ? m_internalData.size() : insertPos - m_internalData.begin());
+    const int position = (insertPos == internalData.end()
+        ? internalData.size() : insertPos - internalData.begin());
 
     const auto serverChangedHandler = [this, systemDescription]
         (const QnUuid &serverId, QnServerFields fields)
     {
-        serverChanged(systemDescription, serverId, fields);
+        at_serverChanged(systemDescription, serverId, fields);
     };
 
-    const auto serverChangedConnection =
-        connect(systemDescription, &QnSystemDescription::serverChanged
-            , this, serverChangedHandler);
+    data->connections <<
+        connect(systemDescription, &QnSystemDescription::serverChanged,
+                this, serverChangedHandler);
 
-    data->connections.add(serverChangedConnection);
-
-    const bool isMaximumNumber = (m_internalData.size() >= m_maxCount);
-    const bool emitInsertSignal = (position < m_maxCount);
+    const bool isMaximumNumber = (internalData.size() >= maxCount);
+    const bool emitInsertSignal = (position < maxCount);
 
     {
         const auto beginInsertRowsCallback = [this, position]()
         {
-            beginInsertRows(QModelIndex(), position, position);
+            Q_Q(QnSystemsModel);
+            q->beginInsertRows(QModelIndex(), position, position);
         };
         const auto endInserRowsCallback = [this]()
-            { endInsertRows(); };
+        {
+            Q_Q(QnSystemsModel);
+            q->endInsertRows();
+        };
 
         const auto insertionGuard = (emitInsertSignal ?
             QnRaiiGuard::create(beginInsertRowsCallback, endInserRowsCallback)
             : QnRaiiGuard::createEmpty());
 
-        m_internalData.insert(insertPos, data);
+        internalData.insert(insertPos, data);
     }
 
     if (emitInsertSignal && isMaximumNumber)
     {
-        beginRemoveRows(QModelIndex(), m_maxCount, m_maxCount);
-        endRemoveRows();
+        q->beginRemoveRows(QModelIndex(), maxCount, maxCount);
+        q->endRemoveRows();
     }
 }
 
-void QnSystemsModel::removeSystem(const QString &systemId)
+void QnSystemsModelPrivate::removeSystem(const QString &systemId)
 {
-    const auto removeIt = std::find_if(m_internalData.begin()
-        , m_internalData.end(), [systemId](const InternalSystemDataPtr &value)
+    Q_Q(QnSystemsModel);
+
+    const auto removeIt = std::find_if(internalData.begin()
+        , internalData.end(), [systemId](const InternalSystemDataPtr &value)
     {
         return (value->system->id() == systemId);
     });
 
-    if (removeIt == m_internalData.end())
+    if (removeIt == internalData.end())
         return;
 
-    const int position = (removeIt - m_internalData.begin());
-    const bool moreThanMaximum = (m_internalData.size() > m_maxCount);
-    const bool emitRemoveSignal = (position <= m_maxCount);
+    const int position = (removeIt - internalData.begin());
+    const bool moreThanMaximum = (internalData.size() > maxCount);
+    const bool emitRemoveSignal = (position <= maxCount);
 
     {
-        const auto beginRemoveRowsHandler = [this, position]()
-            { beginRemoveRows(QModelIndex(), position, position); };
-        const auto endRemoveRowsHandler = [this]()
-            { endRemoveRows(); };
+        internalData.erase(removeIt);
+
+        const auto beginRemoveRowsHandler = [q, position]()
+        {
+            q->beginRemoveRows(QModelIndex(), position, position);
+        };
+        const auto endRemoveRowsHandler = [q]()
+        {
+            q->endRemoveRows();
+        };
 
         const auto removeGuard = (emitRemoveSignal
             ? QnRaiiGuard::create(beginRemoveRowsHandler, endRemoveRowsHandler)
             : QnRaiiGuard::createEmpty());
-        m_internalData.erase(removeIt);
     }
 
     if (emitRemoveSignal && moreThanMaximum)
     {
-        beginInsertRows(QModelIndex(), m_maxCount - 1, m_maxCount - 1);
-        endInsertRows();
+        q->beginInsertRows(QModelIndex(), maxCount - 1, maxCount - 1);
+        q->endInsertRows();
     }
 }
 
-QnSystemsModel::InternalList::iterator QnSystemsModel::getInternalDataIt(
-    const QnSystemDescriptionPtr &systemDescription)
+QnSystemsModelPrivate::InternalList::iterator QnSystemsModelPrivate::getInternalDataIt(
+    const QnSystemDescriptionPtr& systemDescription)
 {
     const auto data = InternalSystemDataPtr(new InternalSystemData(
         { systemDescription, QnDisconnectHelper() }));
-    const auto it = std::lower_bound(m_internalData.begin()
-        , m_internalData.end(), data, m_lessPred);
+    const auto it = std::lower_bound(internalData.begin()
+        , internalData.end(), data, getSystemLessPred());
 
-    if (it == m_internalData.end())
-        return m_internalData.end();
+    if (it == internalData.end())
+        return internalData.end();
 
     const auto foundId = (*it)->system->id();
-    return (foundId == systemDescription->id() ? it : m_internalData.end());
+    return (foundId == systemDescription->id() ? it : internalData.end());
 }
 
-void QnSystemsModel::serverChanged(const QnSystemDescriptionPtr &systemDescription
-    , const QnUuid &serverId
-    , QnServerFields fields)
+void QnSystemsModelPrivate::at_serverChanged(
+        const QnSystemDescriptionPtr& systemDescription,
+        const QnUuid& serverId,
+        QnServerFields fields)
 {
+    Q_UNUSED(serverId)
+
+    Q_Q(QnSystemsModel);
+
     if (fields.testFlag(QnServerField::FlagsField))
     {
         // If NEW_SYSTEM state flag is changed we have to resort systems.
@@ -406,17 +401,136 @@ void QnSystemsModel::serverChanged(const QnSystemDescriptionPtr &systemDescripti
     }
     
     const auto dataIt = getInternalDataIt(systemDescription);
-    if (dataIt == m_internalData.end())
+    if (dataIt == internalData.end())
         return;
 
-    const int row = (dataIt - m_internalData.begin());
+    const int row = (dataIt - internalData.begin());
 
-    const auto modelIndex = index(row);
-    const auto testFlag = [this, modelIndex, fields](QnServerField field, int role)
+    const auto modelIndex = q->index(row);
+    const auto testFlag = [this, q, modelIndex, fields](QnServerField field, int role)
     {
         if (fields.testFlag(field))
-            emit dataChanged(modelIndex, modelIndex, QVector<int>(1, role));
+            emit q->dataChanged(modelIndex, modelIndex, QVector<int>(1, role));
     };
 
     testFlag(QnServerField::HostField, IsOnlineRoleId);
+}
+
+void QnSystemsModelPrivate::resetModel()
+{
+    internalData.clear();
+
+    for (const auto system : qnSystemsFinder->systems())
+        addSystem(system);
+}
+
+bool QnSystemsModelPrivate::systemLess(
+        const QnSystemsModelPrivate::InternalSystemDataPtr& firstData,
+        const QnSystemsModelPrivate::InternalSystemDataPtr& secondData) const
+{
+    const auto first = firstData->system;
+    const auto second = secondData->system;
+
+    const bool firstIsFactorySystem = isFactorySystem(first);
+    const bool sameFactoryStatus =
+        (firstIsFactorySystem == isFactorySystem(second));
+    if (!sameFactoryStatus)
+        return firstIsFactorySystem;
+
+    const bool firstIsCloudSystem = first->isCloudSystem();
+    const bool sameType =
+        (firstIsCloudSystem == second->isCloudSystem());
+    if (!sameType)
+        return firstIsCloudSystem;
+
+    const bool firstCompatible = isCompatibleSystem(first);
+    const bool sameCompatible =
+        (firstCompatible == isCompatibleSystem(second));
+    if (!sameCompatible)
+        return firstCompatible;
+
+    return (first->name() < second->name());
+}
+
+QString QnSystemsModelPrivate::getIncompatibleVersion(
+        const QnSystemDescriptionPtr& systemDescription) const
+{
+    const auto servers = systemDescription->servers();
+    if (servers.isEmpty())
+        return QString();
+
+    const auto predicate = [this](const QnModuleInformation& serverInfo)
+    {
+        if (minimalVersion.isNull())
+            return !serverInfo.hasCompatibleVersion();
+        else
+            return serverInfo.version < minimalVersion;
+    };
+
+    const auto incompatibleIt =
+        std::find_if(servers.begin(), servers.end(), predicate);
+    return incompatibleIt == servers.end()
+            ? QString()
+            : incompatibleIt->version.toString(QnSoftwareVersion::BugfixFormat);
+}
+
+bool QnSystemsModelPrivate::isCompatibleVersion(
+        const QnSystemDescriptionPtr& systemDescription) const
+{
+    return getIncompatibleVersion(systemDescription).isEmpty();
+}
+
+bool QnSystemsModelPrivate::isCompatibleSystem(
+        const QnSystemDescriptionPtr& sysemDescription) const
+{
+    return isCompatibleVersion(sysemDescription)
+        && isCorrectCustomization(sysemDescription)
+           // TODO: add more checks
+        ;
+}
+
+QString QnSystemsModelPrivate::getIncompatibleCustomization(
+        const QnSystemDescriptionPtr& systemDescription) const
+{
+    const auto servers = systemDescription->servers();
+    if (servers.isEmpty())
+        return QString();
+
+    const auto customization = QnAppInfo::customizationName();
+    const auto predicate = [customization](const QnModuleInformation& serverInfo)
+    {
+        // TODO: improve me https://networkoptix.atlassian.net/browse/VMS-2163
+        return (customization != serverInfo.customization);
+    };
+
+    const auto incompatibleIt =
+        std::find_if(servers.begin(), servers.end(), predicate);
+    return (incompatibleIt == servers.end() ? QString()
+        : incompatibleIt->customization);
+}
+
+bool QnSystemsModelPrivate::isCorrectCustomization(
+        const QnSystemDescriptionPtr& systemDescription) const
+{
+    return getIncompatibleCustomization(systemDescription).isEmpty();
+}
+
+bool QnSystemsModelPrivate::isFactorySystem(
+        const QnSystemDescriptionPtr& systemDescription) const
+{
+    if (systemDescription->isCloudSystem())
+        return false;
+
+    const auto servers = systemDescription->servers();
+    if (servers.isEmpty())
+        return false;
+
+    const auto predicate = [](const QnModuleInformation &serverInfo)
+    {
+        return serverInfo.serverFlags.testFlag(Qn::SF_NewSystem);
+    };
+
+    const bool isFactory =
+        std::any_of(servers.begin(), servers.end(), predicate);
+    return isFactory;
 }

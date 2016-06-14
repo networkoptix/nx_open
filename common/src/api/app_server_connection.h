@@ -57,6 +57,4 @@ private:
     QnResourceFactory *m_resourceFactory;
 };
 
-bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection);
-
 #endif // QN_APP_SERVER_CONNECTION_H

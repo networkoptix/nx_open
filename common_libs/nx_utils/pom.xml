@@ -16,12 +16,9 @@
 
     <properties>
         <guid>${nx_utils.guid}</guid>
-        <!--Global libs-->
         <template>lib</template>
         <buildLib>sharedLib</buildLib>
-
         <qt.libs>core</qt.libs>
-        <template>lib</template>
         <global.libs></global.libs>
         <windows.oslibs>DbgHelp.lib -lIphlpapi -lOle32 -lSecur32 -lwinmm</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation</mac.oslibs>

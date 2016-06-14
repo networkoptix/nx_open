@@ -57,6 +57,19 @@ void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery);
 #define SystemID_Fields (systemID)
 
 
+class SystemNameUpdate
+{
+public:
+    std::string id;
+    std::string name;
+};
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemNameUpdate* const data);
+void serializeToUrlQuery(const SystemNameUpdate& data, QUrlQuery* const urlQuery);
+
+#define SystemNameUpdate_Fields (id)(name)
+
+
 ////////////////////////////////////////////////////////////
 //// system sharing data
 ////////////////////////////////////////////////////////////
@@ -80,7 +93,7 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 #define SystemDataExList_Fields (systems)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),
     (json));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

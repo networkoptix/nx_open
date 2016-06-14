@@ -143,8 +143,39 @@ void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery)
 }
 
 
+////////////////////////////////////////////////////////////
+//// class SystemNameUpdate
+////////////////////////////////////////////////////////////
+
+MAKE_FIELD_NAME_STR_CONST(SystemNameUpdate, id)
+MAKE_FIELD_NAME_STR_CONST(SystemNameUpdate, name)
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemNameUpdate* const data)
+{
+    if (!urlQuery.hasQueryItem(SystemNameUpdate_id_field) ||
+        !urlQuery.hasQueryItem(SystemNameUpdate_name_field))
+    {
+        return false;
+    }
+    data->id = urlQuery.queryItemValue(SystemNameUpdate_id_field).toStdString();
+    data->name = urlQuery.queryItemValue(SystemNameUpdate_name_field).toStdString();
+    return true;
+}
+
+void serializeToUrlQuery(const SystemNameUpdate& data, QUrlQuery* const urlQuery)
+{
+    urlQuery->addQueryItem(
+        SystemNameUpdate_id_field,
+        QString::fromStdString(data.id));
+    urlQuery->addQueryItem(
+        SystemNameUpdate_name_field,
+        QString::fromStdString(data.name));
+}
+
+
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),
     (json),
     _Fields);
 

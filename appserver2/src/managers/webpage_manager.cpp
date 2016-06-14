@@ -21,11 +21,10 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    QnWebPageManager<QueryProcessorType>::QnWebPageManager(QueryProcessorType* const queryProcessor)
-        : QnWebPageNotificationManager()
-        , m_queryProcessor(queryProcessor)
+    QnWebPageManager<QueryProcessorType>::QnWebPageManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData)
+        : m_queryProcessor(queryProcessor),
+          m_userAccessData(userAccessData)
     {}
-
 
     template<class QueryProcessorType>
     int QnWebPageManager<QueryProcessorType>::getWebPages( impl::GetWebPagesHandlerPtr handler )
@@ -35,7 +34,7 @@ namespace ec2
         {
             handler->done(reqID, errorCode, webpages);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiWebPageDataList, decltype(queryDoneHandler)> ( ApiCommand::getWebPages, nullptr, queryDoneHandler);
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiWebPageDataList, decltype(queryDoneHandler)> ( ApiCommand::getWebPages, nullptr, queryDoneHandler);
         return reqID;
     }
 
@@ -44,7 +43,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiWebPageData> tran(ApiCommand::saveWebPage, webpage);
-        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -56,14 +55,14 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiIdData> tran(ApiCommand::removeWebPage, id);
-        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
         return reqID;
     }
 
-    template class QnWebPageManager<ServerQueryProcessor>;
+    template class QnWebPageManager<ServerQueryProcessorAccess>;
     template class QnWebPageManager<FixedUrlClientQueryProcessor>;
 }
 

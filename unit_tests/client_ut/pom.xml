@@ -11,25 +11,21 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client_ut</artifactId>
     <packaging>pom</packaging>
-    <name>NX Witness Client Unit Tests</name>
+    <name>VMS Client Unit Tests</name>
 
     <properties>
-        <guid>{842d800f-9e19-4b8f-89ec-f9779a434aa1}</guid>
-        <product.title>NX Witness Client Unit Tests</product.title>
         <root.dir>${basedir}/../..</root.dir>
         <!--Specify the project to test-->      
         <master.project.directory>client</master.project.directory>
 
         <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick</qt.libs>       
-        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client</global.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_vms_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
 
-        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-
         <path>${env.PATH}</path>
-        <rdep.packages>gtest openssl ffmpeg quazip festival any/festival-vox</rdep.packages>
+        <rdep.packages>gtest openssl ffmpeg quazip festival</rdep.packages>
         <rdep.windows.packages>openal</rdep.windows.packages>
     </properties>
     <dependencies>

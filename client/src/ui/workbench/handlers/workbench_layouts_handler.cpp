@@ -304,7 +304,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     newLayout->setBackgroundImageFilename(layout->backgroundImageFilename());
     newLayout->setBackgroundOpacity(layout->backgroundOpacity());
     newLayout->setBackgroundSize(layout->backgroundSize());
-    context()->resourcePool()->addResource(newLayout);
+    qnResPool->addResource(newLayout);
 
     QnLayoutItemDataList items = layout->getItems().values();
     QHash<QnUuid, QnUuid> newUuidByOldUuid;
@@ -375,9 +375,9 @@ void QnWorkbenchLayoutsHandler::removeLayouts(const QnLayoutResourceList &layout
     foreach(const QnLayoutResourcePtr &layout, layouts)
     {
         if (snapshotManager()->isLocal(layout))
-            resourcePool()->removeResource(layout); /* This one can be simply deleted from resource pool. */
+            qnResPool->removeResource(layout); /* This one can be simply deleted from resource pool. */
         else
-            connection2()->getLayoutManager()->remove(layout->getId(), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            connection2()->getLayoutManager(Qn::kDefaultUserAccess)->remove( layout->getId(), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
     }
 }
 
@@ -505,13 +505,13 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
         Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
         if ((flags & (Qn::ResourceIsLocal | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsLocal) /* Local, not being saved. */
             if (!resource->isFile()) /* Not a file. */
-                resourcePool()->removeResource(resource);
+                qnResPool->removeResource(resource);
     }
 }
 
 bool QnWorkbenchLayoutsHandler::closeAllLayouts(bool waitForReply, bool force)
 {
-    return closeLayouts(resourcePool()->getResources<QnLayoutResource>(), waitForReply, force);
+    return closeLayouts(qnResPool->getResources<QnLayoutResource>(), waitForReply, force);
 }
 
 // -------------------------------------------------------------------------- //
@@ -577,7 +577,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
     layout->setId(QnUuid::createUuid());
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
-    resourcePool()->addResource(layout);
+    qnResPool->addResource(layout);
 
     snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
 
@@ -728,7 +728,7 @@ void QnWorkbenchLayoutsHandler::at_layout_saved(bool success, const QnLayoutReso
     }
     else
     {
-        resourcePool()->removeResource(layout);
+        qnResPool->removeResource(layout);
     }
 
 }

@@ -238,14 +238,21 @@ QnGraphicsMessageBoxColors::QnGraphicsMessageBoxColors()
     window  = QColor(0x00, 0x4b, 0x80, 0xcc);
 }
 
-QnResourceItemColors::QnResourceItemColors()
+QnResourceItemColors::QnResourceItemColors() :
+    mainText(0x91a7b2),
+    mainTextSelected(0xe1e7ea),
+    mainTextAccented(0x2fa2db),
+    extraText(0x53707f),
+    extraTextSelected(0xa5b7c0),
+    extraTextAccented(0x117297)
 {
-    mainText = QColor(0x91a7b2);
-    mainTextSelected = QColor(0xe1e7eA);
-    mainTextAccented = QColor(0x2fa2db);
-    extraText = QColor(0x53707f);
-    extraTextSelected = QColor(0xa5b7c0);
-    extraTextAccented = QColor(0x117297);
+}
+
+QnPasswordStrengthColors::QnPasswordStrengthColors() :
+    inacceptable(Qt::red),
+    acceptable(Qt::yellow),
+    good(Qt::green)
+{
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

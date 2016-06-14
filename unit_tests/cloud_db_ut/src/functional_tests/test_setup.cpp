@@ -523,6 +523,26 @@ api::ResultCode CdbFunctionalTest::getAccessRoleList(
     return resCode;
 }
 
+api::ResultCode CdbFunctionalTest::updateSystemName(
+    const std::string& login,
+    const std::string& password,
+    const std::string& systemID,
+    const std::string& newSystemName)
+{
+    auto connection = connectionFactory()->createConnection(login, password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) =
+        makeSyncCall<api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::SystemManager::updateSystemName,
+                connection->systemManager(),
+                systemID,
+                newSystemName,
+                std::placeholders::_1));
+    return resCode;
+}
+
 api::ResultCode CdbFunctionalTest::getSystemSharings(
     const std::string& email,
     const std::string& password,
