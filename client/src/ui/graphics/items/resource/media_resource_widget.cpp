@@ -51,6 +51,7 @@
 #include <ui/graphics/items/overlays/buttons_overlay.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/gl_native_painting.h>
@@ -272,6 +273,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         auto twoWayAudioItem = new QnTwoWayAudioWidget();
         twoWayAudioItem->setCamera(m_camera);
         twoWayAudioItem->setFixedHeight(kTwoWayAudioButtonSize);
+        this->context()->statisticsModule()->registerButton(lit("two_way_audio"), twoWayAudioItem);
 
         /* Items are ordered left-to-right and top-to bottom, so we are inserting two-way audio item on top. */
         overlayWidgets()->positionOverlay->insertItem(0, twoWayAudioItem);
@@ -338,9 +340,10 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
     m_binaryMotionMask.clear();
 }
 
-void QnMediaResourceWidget::createButtons() {
+void QnMediaResourceWidget::createButtons()
+{
     {
-        QnImageButtonWidget *screenshotButton = new QnImageButtonWidget(lit("media_widget_screenshot"));
+        QnImageButtonWidget *screenshotButton = createStatisticAwareButton(lit("media_widget_screenshot"));
         screenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
         screenshotButton->setCheckable(false);
         screenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -351,7 +354,7 @@ void QnMediaResourceWidget::createButtons() {
     }
 
     {
-        QnImageButtonWidget *searchButton = new QnImageButtonWidget(lit("media_widget_msearch"));
+        QnImageButtonWidget *searchButton = createStatisticAwareButton(lit("media_widget_msearch"));
         searchButton->setIcon(qnSkin->icon("item/search.png"));
         searchButton->setCheckable(true);
         searchButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -362,7 +365,7 @@ void QnMediaResourceWidget::createButtons() {
     }
 
     {
-        QnImageButtonWidget *ptzButton = new QnImageButtonWidget(lit("media_widget_ptz"));
+        QnImageButtonWidget *ptzButton = createStatisticAwareButton(lit("media_widget_ptz"));
         ptzButton->setIcon(qnSkin->icon("item/ptz.png"));
         ptzButton->setCheckable(true);
         ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -373,7 +376,7 @@ void QnMediaResourceWidget::createButtons() {
     }
 
     {
-        QnImageButtonWidget *fishEyeButton = new QnImageButtonWidget(lit("media_widget_fisheye"));
+        QnImageButtonWidget *fishEyeButton = createStatisticAwareButton(lit("media_widget_fisheye"));
         fishEyeButton->setIcon(qnSkin->icon("item/fisheye.png"));
         fishEyeButton->setCheckable(true);
         fishEyeButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -385,7 +388,7 @@ void QnMediaResourceWidget::createButtons() {
     }
 
     {
-        QnImageButtonWidget *zoomWindowButton = new QnImageButtonWidget(lit("media_widget_zoom"));
+        QnImageButtonWidget *zoomWindowButton = createStatisticAwareButton(lit("media_widget_zoom"));
         zoomWindowButton->setIcon(qnSkin->icon("item/zoom_window.png"));
         zoomWindowButton->setCheckable(true);
         zoomWindowButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -396,7 +399,7 @@ void QnMediaResourceWidget::createButtons() {
     }
 
     {
-        QnImageButtonWidget *enhancementButton = new QnImageButtonWidget(lit("media_widget_enchancement"));
+        QnImageButtonWidget *enhancementButton = createStatisticAwareButton(lit("media_widget_enchancement"));
         enhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
         enhancementButton->setCheckable(true);
         enhancementButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -408,7 +411,7 @@ void QnMediaResourceWidget::createButtons() {
     }
 
     {
-        QnImageButtonWidget *ioModuleButton = new QnImageButtonWidget(lit("media_widget_io_module"));
+        QnImageButtonWidget *ioModuleButton = createStatisticAwareButton(lit("media_widget_io_module"));
         ioModuleButton->setIcon(qnSkin->icon("item/io.png"));
         ioModuleButton->setCheckable(true);
         ioModuleButton->setChecked(false);
@@ -418,13 +421,15 @@ void QnMediaResourceWidget::createButtons() {
         buttonsOverlay()->rightButtonsBar()->addButton(Qn::IoModuleButton, ioModuleButton);
     }
 
-    if (qnRuntime->isDevMode()) {
-        QnImageButtonWidget *debugScreenshotButton = new QnImageButtonWidget(lit("media_widget_debug_screenshot"));
+    if (qnRuntime->isDevMode())
+    {
+        QnImageButtonWidget *debugScreenshotButton = createStatisticAwareButton(lit("media_widget_debug_screenshot"));
         debugScreenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
         debugScreenshotButton->setCheckable(false);
         debugScreenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
         debugScreenshotButton->setToolTip(lit("Debug set of screenshots"));
-        connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this, [this] {
+        connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this, [this]
+        {
             menu()->trigger(QnActions::TakeScreenshotAction, QnActionParameters(this).withArgument<QString>(Qn::FileNameRole, lit("_DEBUG_SCREENSHOT_KEY_")));
         });
         buttonsOverlay()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
@@ -1600,12 +1605,18 @@ void QnMediaResourceWidget::updateOverlayButton() {
     statusOverlayWidget()->setButtonType(QnStatusOverlayWidget::NoButton);
 }
 
-void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
+void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested()
+{
+    context()->statisticsModule()->registerClick(lit("resource_status_overlay_diagnostics"));
+
     if (m_camera)
         menu()->trigger(QnActions::CameraDiagnosticsAction, m_camera);
 }
 
-void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
+void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested()
+{
+    context()->statisticsModule()->registerClick(lit("resource_status_overlay_io_enable"));
+
     NX_ASSERT(m_ioLicenceStatusHelper, Q_FUNC_INFO
         , "at_statusOverlayWidget_ioEnableRequested could not be processed for non-I/O modules");
 
@@ -1623,7 +1634,10 @@ void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
     updateIoModuleVisibility(true);
 }
 
-void QnMediaResourceWidget::at_statusOverlayWidget_moreLicensesRequested() {
+void QnMediaResourceWidget::at_statusOverlayWidget_moreLicensesRequested()
+{
+    context()->statisticsModule()->registerClick(lit("resource_status_overlay_more_licenses"));
+
     menu()->trigger(QnActions::PreferencesLicensesTabAction);
 }
 

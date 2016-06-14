@@ -58,7 +58,7 @@ void QnWebResourceWidget::setupOverlays()
         // Left buttons bar setup
         auto buttonsBar = buttonsOverlay()->leftButtonsBar();
 
-        auto backButton = new QnImageButtonWidget(lit("web_widget_back"), this);
+        auto backButton = createStatisticAwareButton(lit("web_widget_back"));
         backButton->setIcon(qnSkin->icon("item/back.png"));
         connect(backButton, &QnImageButtonWidget::clicked, m_webView, &QnWebView::back);
         buttonsBar->addButton(Qn::BackButton, backButton);
@@ -69,7 +69,7 @@ void QnWebResourceWidget::setupOverlays()
             buttonsBar->setButtonsEnabled(Qn::BackButton, m_webView->canGoBack());
         });
 
-        auto reloadButton = new QnImageButtonWidget(lit("web_widget_reload"), this);
+        auto reloadButton = createStatisticAwareButton(lit("web_widget_reload"));
         reloadButton->setIcon(qnSkin->icon("item/refresh.png"));
         connect(reloadButton, &QnImageButtonWidget::clicked, this, [this]()
         {
@@ -83,7 +83,7 @@ void QnWebResourceWidget::setupOverlays()
 
     {
         // Right buttons bar setup
-        QnImageButtonWidget *fullscreenButton= new QnImageButtonWidget(lit("web_widget_fullscreen"));
+        auto fullscreenButton= createStatisticAwareButton(lit("web_widget_fullscreen"));
         fullscreenButton->setIcon(qnSkin->icon("item/fullscreen.png"));
         fullscreenButton->setProperty(Qn::NoBlockMotionSelection, true);
         fullscreenButton->setToolTip(tr("Fullscreen mode"));

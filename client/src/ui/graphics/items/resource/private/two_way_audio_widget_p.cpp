@@ -1,5 +1,8 @@
 #include "two_way_audio_widget_p.h"
 
+#include <common/common_module.h>
+
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -19,8 +22,6 @@
 #include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <utils/license_usage_helper.h>
 
 namespace
@@ -175,7 +176,7 @@ namespace
 
 QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owner) :
     base_type(),
-    button(new QnImageButtonWidget(lit("two_way_audio"), owner)),
+    button(new QnImageButtonWidget(owner)),
     hint(new GraphicsLabel(owner)),
     colors(),
 
@@ -206,6 +207,7 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
     button->setCheckable(false);
 
     connect(button, &QnImageButtonWidget::pressed,  this, &QnTwoWayAudioWidgetPrivate::startStreaming);
+    connect(button, &QnImageButtonWidget::pressed,  owner, &QnTwoWayAudioWidget::pressed);
     connect(button, &QnImageButtonWidget::released, this, &QnTwoWayAudioWidgetPrivate::stopStreaming);
 
     m_hintTimer->setInterval(100);

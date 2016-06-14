@@ -26,6 +26,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench.h>
@@ -120,6 +121,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_speedSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_speedSlider->installEventFilter(this);
     m_speedSlider->setPreferredHeight(28.0);
+    context()->statisticsModule()->registerSlider(lit("speed_slider"), m_speedSlider);
 
     m_volumeSlider = new QnVolumeSlider(this);
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
@@ -651,9 +653,10 @@ void QnNavigationItem::at_stepForwardButton_clicked()
 QnImageButtonWidget *QnNavigationItem::newActionButton(QnActions::IDType id)
 {
     const auto statAlias = lit("%1_%2").arg(lit("navigation_item"), QnLexical::serialized(id));
-    QnImageButtonWidget *button = new QnImageButtonWidget(statAlias);
+    QnImageButtonWidget *button = new QnImageButtonWidget();
     button->setDefaultAction(action(id));
     button->setCached(true);
+    context()->statisticsModule()->registerButton(statAlias, button);
     return button;
 }
 

@@ -1,11 +1,11 @@
-#ifndef QN_WORKBENCH_USER_WATCHER_H
-#define QN_WORKBENCH_USER_WATCHER_H
+#pragma once
 
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 #include <utils/common/connective.h>
 
@@ -19,7 +19,8 @@ class QnWorkbenchPermissionsNotifier;
  * is emitted. If its name changes, or if it is deleted from the pool,
  * <tt>userChanged</tt> signal will be emitted again, passing a null resource.
  */
-class QnWorkbenchUserWatcher: public Connective<QObject>, public QnWorkbenchContextAware {
+class QnWorkbenchUserWatcher: public Connective<QObject>, public QnWorkbenchStateDelegate
+{
     Q_OBJECT
 
     typedef Connective<QObject> base_type;
@@ -28,19 +29,18 @@ public:
 
     virtual ~QnWorkbenchUserWatcher();
 
+    /** Handle disconnect from server. */
+    virtual bool tryClose(bool force) override;
+
+    virtual void forcedUpdate() override;
+
     void setUserName(const QString &name);
-    const QString &userName() const {
-        return m_userName;
-    }
+    const QString &userName() const;
 
     void setUserPassword(const QString &password);
-    const QString &userPassword() const {
-        return m_userPassword;
-    }
+    const QString &userPassword() const;
 
-    const QnUserResourcePtr &user() const {
-        return m_user;
-    }
+    const QnUserResourcePtr &user() const;
 
     void setReconnectOnPasswordChange(bool reconnect);
 
@@ -48,7 +48,7 @@ signals:
     void userChanged(const QnUserResourcePtr &user);
     void reconnectRequired();
 
-private slots:
+private:
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
     void at_user_resourceChanged(const QnResourcePtr &resource);
@@ -69,4 +69,3 @@ private:
     bool m_reconnectOnPasswordChange;
 };
 
-#endif // QN_WORKBENCH_USER_WATCHER_H

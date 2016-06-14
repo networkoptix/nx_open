@@ -79,7 +79,6 @@
 #include <ui/customization/customizer.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
-#include <ui/statistics/modules/controls_statistics_module.h>
 #ifdef Q_OS_WIN
 #include <ui/workaround/iexplore_url_handler.h>
 #endif
@@ -123,19 +122,6 @@ namespace
         statManager->setClientId(qnSettings->pcUuid());
         statManager->setStorage(QnStatisticsStoragePtr(new QnStatisticsFileStorage()));
         statManager->setSettings(QnStatisticsSettingsPtr(new QnStatisticsSettingsWatcher()));
-
-        static const QScopedPointer<QnControlsStatisticsModule> controlsStatisticsModule(
-            new QnControlsStatisticsModule());
-
-        statManager->registerStatisticsModule(lit("controls"), controlsStatisticsModule.data());
-
-        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionClosed
-                         , statManager, &QnStatisticsManager::saveCurrentStatistics);
-        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened
-                         , statManager, &QnStatisticsManager::resetStatistics);
-        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
-                         , statManager, &QnStatisticsManager::sendStatistics);
-
     }
 }
 

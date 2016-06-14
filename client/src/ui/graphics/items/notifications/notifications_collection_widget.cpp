@@ -36,6 +36,7 @@
 #include <ui/help/business_help.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <health/system_health_helper.h>
@@ -64,9 +65,8 @@ namespace
 
 } //anonymous namespace
 
-QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(const QString &statisticsAlias
-    , QGraphicsItem *parent):
-    base_type(statisticsAlias, parent),
+QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem *parent):
+    base_type(parent),
     m_time(0),
     m_count(0)
 {
@@ -166,9 +166,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
     auto newButton = [this, maxIconSize](QnActions::IDType actionId, int helpTopicId)
     {
-        const auto statAlias = lit("%1_%2").arg(lit("notifications_collection_widget")
-            , QnLexical::serialized(actionId));
-        QnImageButtonWidget *button = new QnImageButtonWidget(statAlias, m_headerWidget);
+        QnImageButtonWidget *button = new QnImageButtonWidget(m_headerWidget);
         button->setDefaultAction(action(actionId));
         button->setFixedSize(button->defaultAction()->icon().actualSize(QSize(maxIconSize, maxIconSize)));
         button->setCached(true);
@@ -178,6 +176,10 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
             button->setVisible(this->menu()->canTrigger(actionId));
         });
         button->setVisible(this->menu()->canTrigger(actionId));
+
+        const auto statAlias = lit("%1_%2").arg(lit("notifications_collection_widget"), QnLexical::serialized(actionId));
+        this->context()->statisticsModule()->registerButton(statAlias, button);
+
         return button;
     };
 
@@ -487,9 +489,13 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     m_itemsByBusinessRuleId.insert(ruleId, item);
 
+    connect(item, &QnNotificationWidget::buttonClicked, this, [this](const QString& alias)
+    {
+        context()->statisticsModule()->registerClick(alias);
+    });
+
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
     connect(item, &QnNotificationWidget::actionTriggered, this, &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
-
     m_list->addItem(item, businessAction->actionType() == QnBusiness::PlaySoundAction);
 }
 
