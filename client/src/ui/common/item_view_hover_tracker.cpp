@@ -5,9 +5,9 @@
 #include <utils/common/event_processors.h>
 
 
-QnItemViewHoverTracker::QnItemViewHoverTracker(QAbstractItemView* itemView) :
-    QObject(itemView),
-    m_itemView(itemView),
+QnItemViewHoverTracker::QnItemViewHoverTracker(QAbstractItemView* parent) :
+    QObject(parent),
+    m_itemView(parent),
     m_hoveredIndex()
 {
     NX_ASSERT(m_itemView);
