@@ -6,7 +6,6 @@
 #include "network/universal_tcp_listener.h"
 #include <network/ffmpeg_rtp_parser.h>
 #include <streaming/audio_streamer_pool.h>
-#include <utils/common/from_this_to_shared.h>
 #include <rest/handlers/audio_transmission_rest_handler.h>
 
 namespace
@@ -37,9 +36,6 @@ namespace
         buffer.resize(toRead);
         return readBytes(socket, (quint8*) buffer.data(), toRead);
     }
-
-    static QnMutex m_mutex;
-    static QMap<QString, QSharedPointer<QnProxyDesktopDataProvider>> m_proxyProviders;
 }
 
 struct QnAudioProxyReceiverPrivate: public QnTCPConnectionProcessorPrivate
@@ -54,8 +50,7 @@ struct QnAudioProxyReceiverPrivate: public QnTCPConnectionProcessorPrivate
 };
 
 class QnProxyDesktopDataProvider:
-    public QnAbstractStreamDataProvider,
-    public QnFromThisToShared<QnProxyDesktopDataProvider>
+    public QnAbstractStreamDataProvider
 {
 private:
     quint8* m_recvBuffer;
@@ -64,7 +59,6 @@ private:
 public:
     QnProxyDesktopDataProvider(const QnUuid& cameraId):
         QnAbstractStreamDataProvider(QnResourcePtr()),
-        QnFromThisToShared<QnProxyDesktopDataProvider>(),
         m_cameraId(cameraId)
     {
         m_recvBuffer = new quint8[65536];
@@ -123,8 +117,10 @@ protected:
                 putData(std::move(data));
         }
         m_socket->close();
-        QString errString;
-        QnAudioStreamerPool::instance()->startStopStreamToResource(toSharedPointer(), m_cameraId, QnAudioStreamerPool::Action::Stop, errString);
+
+        QnAbstractMediaDataPtr eofData(new QnEmptyMediaData());
+        eofData->dataProvider = this;
+        putData(eofData);
     }
 
 private:
@@ -133,7 +129,7 @@ private:
     QnUuid m_cameraId;
 };
 
-typedef QnSharedResourcePointer<QnProxyDesktopDataProvider> QnProxyDesktopDataProviderPtr;
+typedef QSharedPointer<QnProxyDesktopDataProvider> QnProxyDesktopDataProviderPtr;
 
 
 QnAudioProxyReceiver::QnAudioProxyReceiver(QSharedPointer<AbstractStreamSocket> socket,
@@ -176,16 +172,8 @@ void QnAudioProxyReceiver::run()
     if (!readHttpHeaders(d->socket))
         return;
 
-    QnProxyDesktopDataProviderPtr desktopDataProvider;
-    {
-        QnMutexLocker lock(&m_mutex);
-        QString key = clientId.toString() + resourceId;
-        auto itr = m_proxyProviders.find(key);
-        if (itr == m_proxyProviders.end())
-            itr = m_proxyProviders.insert(key, QnProxyDesktopDataProviderPtr(new QnProxyDesktopDataProvider(resourceId)));
-        desktopDataProvider = itr.value();
-        desktopDataProvider->setSocket(d->socket);
-    }
+    QnProxyDesktopDataProviderPtr desktopDataProvider(new QnProxyDesktopDataProvider(resourceId));
+    desktopDataProvider->setSocket(d->socket);
 
     QString errString;
     if (!QnAudioStreamerPool::instance()->startStopStreamToResource(desktopDataProvider, resourceId, action, errString))

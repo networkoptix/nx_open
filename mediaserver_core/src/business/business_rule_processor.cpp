@@ -92,8 +92,20 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
 
 bool QnBusinessRuleProcessor::needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
+    if (action->isReceivedFromRemoteHost())
+        return false;
+
+    if (action->isProlonged())
+    {
+        QString actionKey = action->getExternalUniqKey();
+        if (res)
+            actionKey += QString(L'_') + res->getUniqueId();
+        if (m_actionInProgress.contains(actionKey))
+            return false; //< do not proxy until finish locally started action
+    }
+
     const QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
-    return routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getId() != getGuid();
+    return routeToServer && routeToServer->getId() != getGuid();
 }
 
 void QnBusinessRuleProcessor::doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
@@ -184,6 +196,7 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
 bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action)
 {
+    auto bRuleId = action->getBusinessRuleId();
     QnResourcePtr res = qnResPool->getResourceById(action->getParams().actionResourceId);
     if (action->isProlonged()) {
         // check for duplicate actions. For example: camera start recording by 2 different events e.t.c
@@ -191,11 +204,17 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
         if (res)
             actionKey += QString(L'_') + res->getUniqueId();
 
-        if (action->getToggleState() == QnBusiness::ActiveState) {
-            if (++m_actionInProgress[actionKey] > 1)
+        if (action->getToggleState() == QnBusiness::ActiveState)
+        {
+            QSet<QnUuid>& runningRules = m_actionInProgress[actionKey];
+            runningRules.insert(bRuleId);
+            if (runningRules.size() > 2)
                 return true; // ignore duplicated start
-        } else if (action->getToggleState() == QnBusiness::InactiveState) {
-            if (--m_actionInProgress[actionKey] > 0)
+        } else if (action->getToggleState() == QnBusiness::InactiveState)
+        {
+            QSet<QnUuid>& runningRules = m_actionInProgress[actionKey];
+            runningRules.remove(bRuleId);
+            if (!runningRules.isEmpty())
                 return true; // ignore duplicated stop
             m_actionInProgress.remove(actionKey);
         }

@@ -35,6 +35,7 @@ protected:
 
 private:
     int processTextResponse();
+    QnAbstractMediaDataPtr createEmptyPacket();
 private:
     static const int MEDIA_STREAM_COUNT = 2;
 

@@ -101,6 +101,11 @@ void QnAbstractAudioTransmitter::subscribe(
     qint64 priority = ((qint64)priorityClass << 48) + QDateTime::currentMSecsSinceEpoch();
 
     QnMutexLocker lock(&m_mutex);
+    for (auto itr = m_providers.begin(); itr != m_providers.end(); ++itr)
+    {
+        if (itr->second == dataProvider)
+            return; // already exists
+    }
 
     m_providers.emplace(priority, dataProvider);
 
