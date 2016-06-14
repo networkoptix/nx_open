@@ -30,13 +30,11 @@ QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
     addPage(LookAndFeelPage, new QnLookAndFeelPreferencesWidget(this), tr("Look and Feel"));
 
     auto recordingSettingsWidget = new QnRecordingSettingsWidget(this);
-    bool audioOnlyMode = !QnScreenRecorder::isSupported();
-    recordingSettingsWidget->setAudioOnlyMode(audioOnlyMode);
 
     addPage(
         RecordingPage,
         recordingSettingsWidget,
-        audioOnlyMode ? tr("Audio Settings") : tr("Screen Recording"));
+        QnScreenRecorder::isSupported() ? tr("Screen Recording") : tr("Audio Settings") );
 
 
     addPage(NotificationsPage, new QnPopupSettingsWidget(this), tr("Notifications"));

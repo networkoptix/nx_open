@@ -98,6 +98,15 @@ bool QnBusinessRuleProcessor::needProxyAction(const QnAbstractBusinessActionPtr&
 
 void QnBusinessRuleProcessor::doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
+    if (action->isProlonged())
+    {
+        // remove started actions because it actions for other server
+        QString actionKey = action->getExternalUniqKey();
+        if (res)
+            actionKey += QString(L'_') + res->getUniqueId();
+        m_actionInProgress.remove(actionKey);
+    }
+
     const QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
     if (routeToServer)
     {
