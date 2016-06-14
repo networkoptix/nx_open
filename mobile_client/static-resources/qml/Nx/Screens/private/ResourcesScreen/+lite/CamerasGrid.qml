@@ -44,7 +44,7 @@ GridView
         height: cellHeight
         z: 2.0
         color: "transparent"
-        border.color: ColorTheme.contrast5
+        border.color: ColorTheme.contrast9
         border.width: 4
     }
 
