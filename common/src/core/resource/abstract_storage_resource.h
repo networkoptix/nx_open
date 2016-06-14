@@ -132,7 +132,7 @@ public:
     static const qint64 kUnknownSize = -1;                  /**< Size of the storage cannot be calculated. */
     static const qint64 kSizeDetectionOmitted = -2;         /**< Size calculating was skipped. */
 
-    virtual QIODevice *open(const QString &fileName, QIODevice::OpenMode openMode) = 0;
+    virtual QIODevice *open(const QString &fileName, QIODevice::OpenMode openMode, bool noBuffering = false) = 0;
 
     /**
     *   \return storage capabilities ('cap' flag(s))

@@ -45,7 +45,8 @@ public: //ctors, dtor
 public: // inherited interface overrides
     virtual QIODevice *open(
         const QString       &fileName, 
-        QIODevice::OpenMode  openMode
+        QIODevice::OpenMode  openMode,
+        bool 				noBuffering = false
     ) override;
 
     virtual int     getCapabilities() const override;    
