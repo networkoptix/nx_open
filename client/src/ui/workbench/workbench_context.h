@@ -22,10 +22,10 @@ class QnWorkbenchNavigator;
 class QnWorkbenchUserWatcher;
 class QnWorkbenchLayoutWatcher;
 class QnActionManager;
+class QnControlsStatisticsModule;
 
 /**
- * This is a class that ties together all objects comprising the global state
- * and serves as an application context.
+ * This is a class that ties together all objects comprising the global visual scene state
  */
 class QnWorkbenchContext: public QObject, public QnInstanceStorage
 {
@@ -35,47 +35,24 @@ public:
 
     virtual ~QnWorkbenchContext();
 
-    QnWorkbench *workbench() const
-    {
-        return m_workbench.data();
-    }
-
-    QnWorkbenchLayoutSnapshotManager *snapshotManager() const
-    {
-        return m_snapshotManager.data();
-    }
-
-    QnActionManager *menu() const
+    QnWorkbench* workbench() const;
+    QnWorkbenchLayoutSnapshotManager* snapshotManager() const;
+    QnActionManager* menu() const
     {
         return m_menu.data();
     }
 
-    QnWorkbenchAccessController *accessController() const
-    {
-        return m_accessController.data();
-    }
+    QnWorkbenchAccessController* accessController() const;
+    QnWorkbenchDisplay* display() const;
+    QnWorkbenchNavigator* navigator() const;
+    QnControlsStatisticsModule* statisticsModule() const;
 
-    QnWorkbenchDisplay *display() const
-    {
-        return m_display.data();
-    }
-
-    QnWorkbenchNavigator *navigator() const
-    {
-        return m_navigator.data();
-    }
-
-    QWidget *mainWindow() const
-    {
-        return m_mainWindow.data();
-    }
-
-    void setMainWindow(QWidget *mainWindow);
+    QWidget* mainWindow() const;
+    void setMainWindow(QWidget* mainWindow);
 
     QAction *action(const QnActions::IDType id) const;
 
     QnUserResourcePtr user() const;
-
     void setUserName(const QString &userName);
 
     /** Check if application is closing down. Replaces QApplication::closingDown(). */
@@ -106,6 +83,7 @@ private:
     QScopedPointer<QnActionManager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
+    QScopedPointer<QnControlsStatisticsModule> m_statisticsModule;
 
     QPointer<QWidget> m_mainWindow;
 

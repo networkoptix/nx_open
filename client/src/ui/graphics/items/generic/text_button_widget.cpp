@@ -7,9 +7,8 @@
 
 #include <utils/math/linear_combination.h>
 
-QnTextButtonWidget::QnTextButtonWidget(const QString &statisticsAlias
-    , QGraphicsItem *parent, Qt::WindowFlags windowFlags):
-    base_type(statisticsAlias, parent, windowFlags),
+QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+    base_type(parent, windowFlags),
     m_alignment(Qt::AlignCenter),
     m_pixmapValid(false),
     m_relativeFrameWidth(-1.0)

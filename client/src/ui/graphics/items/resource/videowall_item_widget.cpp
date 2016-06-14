@@ -29,8 +29,10 @@
 #include <ui/graphics/instruments/drop_instrument.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/processors/hover_processor.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 
 #include <utils/common/scoped_painter_rollback.h>
@@ -115,7 +117,8 @@ void QnVideowallItemWidget::initInfoOverlay() {
     m_headerLabel->setAcceptedMouseButtons(0);
     m_headerLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
-    m_infoButton = new QnImageButtonWidget(lit("videowall_info"));
+    m_infoButton = new QnImageButtonWidget();
+    context()->statisticsModule()->registerButton(lit("videowall_info"), m_infoButton);
     m_infoButton->setIcon(qnSkin->icon("item/info.png"));
     m_infoButton->setCheckable(true);
     m_infoButton->setToolTip(tr("Information"));

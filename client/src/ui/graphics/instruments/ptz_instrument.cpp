@@ -22,6 +22,7 @@
 #include <ui/animation/animation_event.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
@@ -700,7 +701,10 @@ void PtzInstrument::at_splashItem_destroyed() {
     m_activeAnimations.removeAll(item);
 }
 
-void PtzInstrument::at_modeButton_clicked() {
+void PtzInstrument::at_modeButton_clicked()
+{
+    context()->statisticsModule()->registerClick(lit("ptz_overlay_mode"));
+
     PtzImageButtonWidget *button = checked_cast<PtzImageButtonWidget *>(sender());
 
     if(QnMediaResourceWidget *widget = button->target()) {
@@ -719,42 +723,55 @@ void PtzInstrument::at_modeButton_clicked() {
     }
 }
 
-void PtzInstrument::at_zoomInButton_pressed() {
+void PtzInstrument::at_zoomInButton_pressed()
+{
+    context()->statisticsModule()->registerClick(lit("ptz_overlay_zoom_in"));
     at_zoomButton_activated(1.0);
 }
 
-void PtzInstrument::at_zoomInButton_released() {
+void PtzInstrument::at_zoomInButton_released()
+{
     at_zoomButton_activated(0.0);
 }
 
-void PtzInstrument::at_zoomOutButton_pressed() {
+void PtzInstrument::at_zoomOutButton_pressed()
+{
+    context()->statisticsModule()->registerClick(lit("ptz_overlay_zoom_out"));
     at_zoomButton_activated(-1.0);
 }
 
-void PtzInstrument::at_zoomOutButton_released() {
+void PtzInstrument::at_zoomOutButton_released()
+{
     at_zoomButton_activated(0.0);
 }
 
-void PtzInstrument::at_zoomButton_activated(qreal speed) {
+void PtzInstrument::at_zoomButton_activated(qreal speed)
+{
     PtzImageButtonWidget *button = checked_cast<PtzImageButtonWidget *>(sender());
 
-    if(QnMediaResourceWidget *widget = button->target())
+    if (QnMediaResourceWidget *widget = button->target())
         ptzMove(widget, QVector3D(0.0, 0.0, speed), true);
 }
 
-void PtzInstrument::at_focusInButton_pressed() {
+void PtzInstrument::at_focusInButton_pressed()
+{
+    context()->statisticsModule()->registerClick(lit("ptz_overlay_focus_in"));
     at_focusButton_activated(1.0);
 }
 
-void PtzInstrument::at_focusInButton_released() {
+void PtzInstrument::at_focusInButton_released()
+{
     at_focusButton_activated(0.0);
 }
 
-void PtzInstrument::at_focusOutButton_pressed() {
+void PtzInstrument::at_focusOutButton_pressed()
+{
+    context()->statisticsModule()->registerClick(lit("ptz_overlay_focus_out"));
     at_focusButton_activated(-1.0);
 }
 
-void PtzInstrument::at_focusOutButton_released() {
+void PtzInstrument::at_focusOutButton_released()
+{
     at_focusButton_activated(0.0);
 }
 
@@ -766,6 +783,8 @@ void PtzInstrument::at_focusButton_activated(qreal speed) {
 }
 
 void PtzInstrument::at_focusAutoButton_clicked() {
+    context()->statisticsModule()->registerClick(lit("ptz_overlay_focus_auto"));
+
     PtzImageButtonWidget *button = checked_cast<PtzImageButtonWidget *>(sender());
 
     if(QnMediaResourceWidget *widget = button->target())

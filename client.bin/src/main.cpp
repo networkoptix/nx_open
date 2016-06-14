@@ -45,6 +45,7 @@
 #include "core/resource/storage_resource.h"
 #include "core/resource/resource_directory_browser.h"
 
+#include <nx_speach_synthesizer/text_to_wav.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/software_version.h>
 #include <utils/common/command_line_parser.h>
@@ -68,7 +69,6 @@
 
 #include "utils/common/long_runnable.h"
 
-#include <nx_speach_synthesizer/text_to_wav.h>
 #include "common/common_module.h"
 
 #include <nx/vms/utils/system_uri.h>
@@ -176,6 +176,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     }
 
     QnClientModule client(startupParams);
+
+    /* This class should not be initialized in client module as it does not support deinitialization. */
+    QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
+    textToWaveServer->start();
 
     /* Initialize sound. */
     QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());
