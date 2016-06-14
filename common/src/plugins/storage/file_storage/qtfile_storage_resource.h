@@ -22,7 +22,7 @@ public:
 
     static QnStorageResource* instance(const QString&);
 
-    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode, bool noBuffering = false) override;
+    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
     virtual int getCapabilities() const override;
     virtual bool initOrUpdate() const override;

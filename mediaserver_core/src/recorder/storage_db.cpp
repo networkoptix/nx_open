@@ -239,7 +239,7 @@ bool QnStorageDb::open(const QString& fileName)
 
 bool QnStorageDb::resetIoDevice()
 {
-    m_ioDevice.reset(m_storage->open(m_dbFileName, QIODevice::ReadWrite, true));
+    m_ioDevice.reset(m_storage->open(m_dbFileName, QIODevice::ReadWrite));
     if (!m_ioDevice)
     {
         return false;
@@ -391,7 +391,7 @@ bool QnStorageDb::vacuumInternal()
 {
     QString tmpDbFileName = m_dbFileName + ".tmp";
     std::unique_ptr<QIODevice> tmpFile(m_storage->open(tmpDbFileName,
-                                                       QIODevice::ReadWrite, true));
+                                                       QIODevice::ReadWrite));
     if (!tmpFile)
     {
         NX_LOG(lit("%1 temporary DB file open error").arg(Q_FUNC_INFO), cl_logWARNING);

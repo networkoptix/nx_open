@@ -7,7 +7,7 @@
 #include "utils/common/util.h"
 
 
-QIODevice* QnQtFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode, bool /*noBuffering*/)
+QIODevice* QnQtFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
     QString fileName = removeProtocolPrefix(url);
 

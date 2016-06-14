@@ -28,7 +28,7 @@ public:
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
-    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode, bool noBuffering = false) override;
+    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
     virtual bool initOrUpdate() const override;
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;

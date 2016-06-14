@@ -152,7 +152,7 @@ private:
 QnMutex QnLayoutFileStorageResource::m_storageSync;
 QSet<QnLayoutFileStorageResource*> QnLayoutFileStorageResource::m_allStorages;
 
-QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode, bool /*noBuffering*/)
+QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
     if (getUrl().isEmpty()) {
         int postfixPos = url.indexOf(QLatin1Char('?'));
