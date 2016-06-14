@@ -112,6 +112,13 @@ namespace ec2
         std::vector<ApiResourceParamData> addParams;
         ApiStorageDataList storages;
 
+        ApiMediaServerDataEx( const ApiMediaServerDataEx& mediaServerData )
+        :
+            ApiMediaServerData(mediaServerData),
+            status( Qn::Offline )
+        {
+        }
+
         ApiMediaServerDataEx( ApiMediaServerData&& mediaServerData )
         :   
             ApiMediaServerData( std::move( mediaServerData ) ),

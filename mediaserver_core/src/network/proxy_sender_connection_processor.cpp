@@ -194,6 +194,6 @@ void QnProxySenderConnection::run()
     if (!m_needStop && gotRequest)
     {
         parseRequest();
-        processRequest();
+        processRequest(false);
     }
 }

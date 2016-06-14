@@ -210,7 +210,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
     });
 
 
-    connect( QnAppServerConnectionFactory::getConnection2()->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged,
+    connect( QnAppServerConnectionFactory::getConnection2()->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
         QnSyncTime::instance(), static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime) );
 
     //connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);

@@ -6,7 +6,7 @@
 
 namespace ec2
 {
-    class QnMediaServerNotificationManager: public AbstractMediaServerManager
+    class QnMediaServerNotificationManager: public AbstractMediaServerNotificationManager
     {
     public:
         QnMediaServerNotificationManager();
@@ -26,13 +26,13 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran );
     };
 
-
+    typedef std::shared_ptr<QnMediaServerNotificationManager> QnMediaServerNotificationManagerPtr;
 
     template<class QueryProcessorType>
-    class QnMediaServerManager: public QnMediaServerNotificationManager
+    class QnMediaServerManager: public AbstractMediaServerManager
     {
     public:
-        QnMediaServerManager( QueryProcessorType* const queryProcessor);
+        QnMediaServerManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
         //!Implementation of QnMediaServerManager::getServers
         virtual int getServers(impl::GetServersHandlerPtr handler) override;
@@ -53,5 +53,6 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
+        Qn::UserAccessData m_userAccessData;
     };
 }

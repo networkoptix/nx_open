@@ -49,11 +49,11 @@ namespace ec2
         virtual void setConfParams( std::map<QString, QVariant> confParams ) override;
 
     private:
-        ServerQueryProcessor m_serverQueryProcessor;
+        ServerQueryProcessorAccess m_serverQueryProcessor;
         ClientQueryProcessor m_remoteQueryProcessor;
         QnMutex m_mutex;
         Settings m_settingsInstance;
-        std::unique_ptr<QnDbManager> m_dbManager;
+        std::unique_ptr<detail::QnDbManager> m_dbManager;
         std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
         std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;
         Ec2DirectConnectionPtr m_directConnection;
@@ -91,24 +91,24 @@ namespace ec2
         ErrorCode getSettings( std::nullptr_t, ApiResourceParamDataList* const outData );
 
         template<class InputDataType>
-            void registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd );
+            void registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, Qn::GlobalPermission permission = Qn::GlobalPermission::NoGlobalPermissions);
 
         template<class InputDataType, class CustomActionType>
-            void registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, CustomActionType customAction );
+            void registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, CustomActionType customAction, Qn::GlobalPermission permission = Qn::GlobalPermission::NoGlobalPermissions);
 
         template<class InputDataType, class OutputDataType>
-            void registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd );
+            void registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, Qn::GlobalPermission permission = Qn::GlobalPermission::NoGlobalPermissions);
 
         template<class InputType, class OutputType>
             void registerFunctorHandler(
                 QnRestProcessorPool* const restProcessorPool,
                 ApiCommand::Value cmd,
-                std::function<ErrorCode(InputType, OutputType*)> handler);
+                std::function<ErrorCode(InputType, OutputType*)> handler, Qn::GlobalPermission permission = Qn::GlobalPermission::NoGlobalPermissions);
         template<class InputType, class OutputType>
             void registerFunctorWithResponseHandler(
                 QnRestProcessorPool* const restProcessorPool,
                 ApiCommand::Value cmd,
-                std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler);
+                std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler, Qn::GlobalPermission permission = Qn::GlobalPermission::NoGlobalPermissions);
 
         template<class Function>
             void statisticsCall(const Function& function);

@@ -17,6 +17,7 @@
 
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/videowall_control_message.h>
+#include <core/resource_management/user_access_data.h>
 
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>
@@ -33,6 +34,12 @@
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/data/api_user_group_data.h>
+#include "nx_ec/managers/abstract_server_manager.h"
+#include "nx_ec/managers/abstract_camera_manager.h"
+#include "nx_ec/managers/abstract_user_manager.h"
+#include "nx_ec/managers/abstract_layout_manager.h"
+#include "nx_ec/managers/abstract_webpage_manager.h"
+#include "nx_ec/managers/abstract_videowall_manager.h"
 
 #include "ec_api_fwd.h"
 
@@ -60,15 +67,23 @@ namespace ec2
         qint64 time;
     };
 
+    class AbstractResourceNotificationManager : public QObject
+    {
+        Q_OBJECT
+    public:
+    signals:
+        void statusChanged( const QnUuid& resourceId, Qn::ResourceStatus status );
+        void resourceParamChanged( const ApiResourceParamWithRefData& param );
+        void resourceRemoved( const QnUuid& resourceId );
+    };
+
+    typedef std::shared_ptr<AbstractResourceNotificationManager> AbstractResourceNotificationManagerPtr;
+
     /*!
         \note All methods are asynchronous if other not specified
     */
     class AbstractResourceManager
-    :
-        public QObject
     {
-        Q_OBJECT
-
     public:
         virtual ~AbstractResourceManager() {}
 
@@ -177,11 +192,6 @@ namespace ec2
             return remove( idList, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-    signals:
-        void statusChanged( const QnUuid& resourceId, Qn::ResourceStatus status );
-        void resourceParamChanged( const ApiResourceParamWithRefData& param );
-        void resourceRemoved( const QnUuid& resourceId );
-
     protected:
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
         virtual int setResourceStatus( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) = 0;
@@ -194,19 +204,24 @@ namespace ec2
         virtual int remove( const QVector<QnUuid>& resourceList, impl::SimpleHandlerPtr handler ) = 0;
     };
 
+    class AbstractLicenseNotificationManager : public QObject
+    {
+        Q_OBJECT
+    public:
+    signals:
+        void licenseChanged(QnLicensePtr license);
+        void licenseRemoved(QnLicensePtr license);
+    };
+
+    typedef std::shared_ptr<AbstractLicenseNotificationManager> AbstractLicenseNotificationManagerPtr;
 
     /*!
         \note All methods are asynchronous if other not specified
     */
     class AbstractLicenseManager
-    :
-        public QObject
     {
-        Q_OBJECT
-
     public:
         virtual ~AbstractLicenseManager() {}
-
         /*!
             \param handler Functor with params: (ErrorCode, const QnLicenseList&)
         */
@@ -241,10 +256,6 @@ namespace ec2
         }
 
 
-    signals:
-        void licenseChanged(QnLicensePtr license);
-        void licenseRemoved(QnLicensePtr license);
-
     protected:
         virtual int getLicenses( impl::GetLicensesHandlerPtr handler ) = 0;
         virtual int addLicenses( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler ) = 0;
@@ -252,15 +263,26 @@ namespace ec2
     };
 
 
+    class AbstractBusinessEventNotificationManager : public QObject
+    {
+        Q_OBJECT
+    public:
+    signals:
+        void addedOrUpdated( QnBusinessEventRulePtr businessRule );
+        void removed( QnUuid id );
+        void businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
+        void businessRuleReset( const ec2::ApiBusinessRuleDataList& rules );
+        void gotBroadcastAction(const QnAbstractBusinessActionPtr& action);
+        void execBusinessAction(const QnAbstractBusinessActionPtr& action);
+    };
+
+    typedef std::shared_ptr<AbstractBusinessEventNotificationManager> AbstractBusinessEventNotificationManagerPtr;
+
     /*!
         \note All methods are asynchronous if other not specified
     */
     class AbstractBusinessEventManager
-    :
-        public QObject
     {
-        Q_OBJECT
-
     public:
         virtual ~AbstractBusinessEventManager() {}
 
@@ -312,14 +334,6 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-    signals:
-        void addedOrUpdated( QnBusinessEventRulePtr businessRule );
-        void removed( QnUuid id );
-        void businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
-        void businessRuleReset( const ec2::ApiBusinessRuleDataList& rules );
-        void gotBroadcastAction(const QnAbstractBusinessActionPtr& action);
-        void execBusinessAction(const QnAbstractBusinessActionPtr& action);
-
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
         virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) = 0;
@@ -329,15 +343,23 @@ namespace ec2
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) = 0;
     };
 
+    class AbstractStoredFileNotificationManager: public QObject
+    {
+        Q_OBJECT
+    public:
+    signals:
+        void added( QString filename );
+        void updated( QString filename );
+        void removed( QString filename );
+    };
+
+    typedef std::shared_ptr<AbstractStoredFileNotificationManager> AbstractStoredFileNotificationManagerPtr;
+
     /*!
         \note All methods are asynchronous if other not specified
     */
     class AbstractStoredFileManager
-    :
-        public QObject
     {
-        Q_OBJECT
-
     public:
         virtual ~AbstractStoredFileManager() {}
 
@@ -378,11 +400,6 @@ namespace ec2
                 std::make_shared<impl::CustomListDirectoryHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-    signals:
-        void added( QString filename );
-        void updated( QString filename );
-        void removed( QString filename );
-
     protected:
         virtual int getStoredFile( const QString& filename, impl::GetStoredFileHandlerPtr handler ) = 0;
         virtual int addStoredFile( const QString& filename, const QByteArray& data, impl::SimpleHandlerPtr handler ) = 0;
@@ -391,8 +408,19 @@ namespace ec2
     };
 
 
-    class AbstractUpdatesManager : public QObject {
+    class AbstractUpdatesNotificationManager: public QObject
+    {
         Q_OBJECT
+    public:
+    signals:
+        void updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
+        void updateUploadProgress(const QString &updateId, const QnUuid &peerId, int chunks);
+        void updateInstallationRequested(const QString &updateId);
+    };
+
+    typedef std::shared_ptr<AbstractUpdatesNotificationManager> AbstractUpdatesNotificationManagerPtr;
+
+    class AbstractUpdatesManager {
     public:
         enum ReplyCode {
             NoError = -1,
@@ -417,11 +445,6 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-    signals:
-        void updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
-        void updateUploadProgress(const QString &updateId, const QnUuid &peerId, int chunks);
-        void updateInstallationRequested(const QString &updateId);
-
     protected:
         virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) = 0;
         virtual int sendUpdateUploadResponce(const QString &updateId, const QnUuid &peerId, int chunks, impl::SimpleHandlerPtr handler) = 0;
@@ -429,8 +452,20 @@ namespace ec2
     };
 
 
-    class AbstractDiscoveryManager : public QObject {
+    class AbstractDiscoveryNotificationManager : public QObject
+    {
         Q_OBJECT
+    public:
+    signals:
+        void peerDiscoveryRequested(const QUrl &url);
+        void discoveryInformationChanged(const ApiDiscoveryData &data, bool addInformation);
+        void discoveredServerChanged(const ApiDiscoveredServerData &discoveredServer);
+        void gotInitialDiscoveredServers(const ApiDiscoveredServerDataList &discoveredServers);
+    };
+
+    typedef std::shared_ptr<AbstractDiscoveryNotificationManager> AbstractDiscoveryNotificationManagerPtr;
+
+    class AbstractDiscoveryManager {
     public:
         template<class TargetType, class HandlerType> int discoverPeer(const QUrl &url, TargetType *target, HandlerType handler) {
             return discoverPeer(url, std::static_pointer_cast<impl::SimpleHandler>(
@@ -467,12 +502,6 @@ namespace ec2
                  std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-    signals:
-        void peerDiscoveryRequested(const QUrl &url);
-        void discoveryInformationChanged(const ApiDiscoveryData &data, bool addInformation);
-        void discoveredServerChanged(const ApiDiscoveredServerData &discoveredServer);
-        void gotInitialDiscoveredServers(const ApiDiscoveredServerDataList &discoveredServers);
-
     protected:
         virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
@@ -483,8 +512,34 @@ namespace ec2
     };
     typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
 
-    class AbstractTimeManager : public QObject {
+
+    class AbstractTimeNotificationManager : public QObject
+    {
         Q_OBJECT
+    public:
+        virtual ~AbstractTimeNotificationManager() {}
+    signals:
+        //!Emitted when there is ambiguity while choosing primary time server automatically
+        /*!
+            User SHOULD call \a AbstractTimeManager::forcePrimaryTimeServer to set primary time server manually.
+            This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
+        */
+        void timeServerSelectionRequired();
+        //!Emitted when synchronized time has been changed
+        void timeChanged( qint64 syncTime );
+        //!Emitted when peer \a peerId local time has changed
+        /*!
+            \param peerId
+            \param syncTime Synchronized time (UTC, millis from epoch) corresponding to \a peerLocalTime
+            \param peerLocalTime Peer local time (UTC, millis from epoch)
+        */
+        void peerTimeChanged(const QnUuid &peerId, qint64 syncTime, qint64 peerLocalTime);
+    };
+
+    typedef std::shared_ptr<AbstractTimeNotificationManager> AbstractTimeNotificationManagerPtr;
+
+    class AbstractTimeManager
+    {
     public:
         virtual ~AbstractTimeManager() {}
 
@@ -515,31 +570,23 @@ namespace ec2
         virtual QnPeerTimeInfoList getPeerTimeInfoList() const = 0;
         virtual void forceTimeResync() = 0;
 
-    signals:
-        //!Emitted when there is ambiguity while choosing primary time server automatically
-        /*!
-            User SHOULD call \a AbstractTimeManager::forcePrimaryTimeServer to set primary time server manually.
-            This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
-        */
-        void timeServerSelectionRequired();
-        //!Emitted when synchronized time has been changed
-        void timeChanged( qint64 syncTime );
-        //!Emitted when peer \a peerId local time has changed
-        /*!
-            \param peerId
-            \param syncTime Synchronized time (UTC, millis from epoch) corresponding to \a peerLocalTime
-            \param peerLocalTime Peer local time (UTC, millis from epoch)
-        */
-        void peerTimeChanged(const QnUuid &peerId, qint64 syncTime, qint64 peerLocalTime);
-
     protected:
         virtual int getCurrentTimeImpl( impl::CurrentTimeHandlerPtr handler ) = 0;
         virtual int forcePrimaryTimeServerImpl( const QnUuid& serverGuid, impl::SimpleHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractTimeManager> AbstractTimeManagerPtr;
 
-    class AbstractMiscManager : public QObject {
+    class AbstractMiscNotificationManager : public QObject
+    {
         Q_OBJECT
+    public:
+    signals:
+        void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime);
+    };
+
+    typedef std::shared_ptr<AbstractMiscNotificationManager> AbstractMiscNotificationManagerPtr;
+
+    class AbstractMiscManager {
     public:
         template<class TargetType, class HandlerType> int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, TargetType *target, HandlerType handler) {
             return changeSystemName(systemName, sysIdTime, tranLogTime, std::static_pointer_cast<impl::SimpleHandler>(
@@ -564,9 +611,6 @@ namespace ec2
             return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, value, time, std::placeholders::_1));
         }
 
-
-    signals:
-        void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime);
 
     protected:
         virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) = 0;
@@ -603,20 +647,35 @@ namespace ec2
         virtual qint64 getTransactionLogTime() const = 0;
         virtual void setTransactionLogTime(qint64 value) = 0;
 
-        virtual AbstractResourceManagerPtr getResourceManager() = 0;
-        virtual AbstractMediaServerManagerPtr getMediaServerManager() = 0;
-        virtual AbstractCameraManagerPtr getCameraManager() = 0;
-        virtual AbstractLicenseManagerPtr getLicenseManager() = 0;
-        virtual AbstractBusinessEventManagerPtr getBusinessEventManager() = 0;
-        virtual AbstractUserManagerPtr getUserManager() = 0;
-        virtual AbstractLayoutManagerPtr getLayoutManager() = 0;
-        virtual AbstractVideowallManagerPtr getVideowallManager() = 0;
-        virtual AbstractStoredFileManagerPtr getStoredFileManager() = 0;
-        virtual AbstractUpdatesManagerPtr getUpdatesManager() = 0;
-        virtual AbstractMiscManagerPtr getMiscManager() = 0;
-        virtual AbstractDiscoveryManagerPtr getDiscoveryManager() = 0;
-        virtual AbstractTimeManagerPtr getTimeManager() = 0;
-        virtual AbstractWebPageManagerPtr getWebPageManager() = 0;
+        virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractCameraManagerPtr getCameraManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractLicenseManagerPtr getLicenseManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractBusinessEventManagerPtr getBusinessEventManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractTimeManagerPtr getTimeManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &userAccessData) = 0;
+
+        virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() = 0;
+        virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() = 0;
+        virtual AbstractResourceNotificationManagerPtr getResourceNotificationManager() = 0;
+        virtual AbstractMediaServerNotificationManagerPtr getMediaServerNotificationManager() = 0;
+        virtual AbstractCameraNotificationManagerPtr getCameraNotificationManager() = 0;
+        virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() = 0;
+        virtual AbstractUserNotificationManagerPtr getUserNotificationManager() = 0;
+        virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() = 0;
+        virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() = 0;
+        virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() = 0;
+        virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() = 0;
+        virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() = 0;
+        virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() = 0;
+        virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() = 0;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
 

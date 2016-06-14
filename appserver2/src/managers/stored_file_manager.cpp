@@ -8,10 +8,10 @@
 namespace ec2
 {
     template<class QueryProcessorType>
-    QnStoredFileManager<QueryProcessorType>::QnStoredFileManager( QueryProcessorType* const queryProcessor)
+    QnStoredFileManager<QueryProcessorType>::QnStoredFileManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData)
     :
-        QnStoredFileNotificationManager(),
-        m_queryProcessor( queryProcessor )
+      m_queryProcessor( queryProcessor ),
+      m_userAccessData(userAccessData)
     {
     }
 
@@ -23,7 +23,7 @@ namespace ec2
         auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiStoredFileData& fileData) {
             handler->done( reqID, errorCode, fileData.data );
         };
-        m_queryProcessor->template processQueryAsync<ApiStoredFilePath, ApiStoredFileData, decltype(queryDoneHandler)> ( ApiCommand::getStoredFile, filename, queryDoneHandler);
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<ApiStoredFilePath, ApiStoredFileData, decltype(queryDoneHandler)> ( ApiCommand::getStoredFile, filename, queryDoneHandler);
         return reqID;
     }
 
@@ -34,7 +34,7 @@ namespace ec2
         auto tran = prepareTransaction( filename, data );
 
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
 
         return reqID;
     }
@@ -46,7 +46,7 @@ namespace ec2
         auto tran = prepareTransaction( filename );
 
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
 
         return reqID;
     }
@@ -61,7 +61,7 @@ namespace ec2
             std::transform(folderContents.cbegin(), folderContents.cend(), std::back_inserter(outputFolderContents), [](const ApiStoredFilePath &path) {return path.path; } );
             handler->done( reqID, errorCode, outputFolderContents );
         };
-        m_queryProcessor->template processQueryAsync<ApiStoredFilePath, ApiStoredDirContents, decltype(queryDoneHandler)>( ApiCommand::listDirectory, ApiStoredFilePath(folderName), queryDoneHandler );
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<ApiStoredFilePath, ApiStoredDirContents, decltype(queryDoneHandler)>( ApiCommand::listDirectory, ApiStoredFilePath(folderName), queryDoneHandler );
         return reqID;
     }
 
@@ -82,6 +82,6 @@ namespace ec2
     }
 
 
-    template class QnStoredFileManager<ServerQueryProcessor>;
+    template class QnStoredFileManager<ServerQueryProcessorAccess>;
     template class QnStoredFileManager<FixedUrlClientQueryProcessor>;
 }

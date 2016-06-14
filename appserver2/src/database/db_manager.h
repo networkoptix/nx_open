@@ -1,57 +1,69 @@
 #ifndef __DB_MANAGER_H_
 #define __DB_MANAGER_H_
 
+#include <memory>
 #include <QtSql/QSqlError>
 
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 #include <nx_ec/data/api_lock_data.h>
 #include "nx_ec/data/api_fwd.h"
+#include "nx_ec/data/api_misc_data.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_runtime_data.h"
 #include <nx/utils/log/log.h>
 #include <utils/common/unused.h>
 #include <nx/utils/singleton.h>
+#include "nx/utils/type_utils.h"
+#include "core/resource_management/user_access_data.h"
+#include "core/resource_management/resource_access_manager.h"
+#include "core/resource/user_resource.h"
+#include "transaction/transaction_permissions.h"
 
 
 namespace ec2
 {
-    class LicenseManagerImpl;
 
-    enum ApiObjectType
-    {
-        ApiObject_NotDefined,
-        ApiObject_Server,
-        ApiObject_Camera,
-        ApiObject_User,
-        ApiObject_Layout,
-        ApiObject_Videowall,
-        ApiObject_BusinessRule,
-        ApiObject_Storage,
-        ApiObject_WebPage,
-    };
-    struct ApiObjectInfo
-    {
-        ApiObjectInfo() {}
-        ApiObjectInfo(const ApiObjectType& type, const QnUuid& id): type(type), id(id) {}
+class LicenseManagerImpl;
 
-        ApiObjectType type;
-        QnUuid id;
-    };
-    class ApiObjectInfoList: public std::vector<ApiObjectInfo>
-    {
-    public:
-        std::vector<ApiIdData> toIdList() const
-        {
-            std::vector<ApiIdData> result;
-            result.reserve(size());
-            for (size_t i = 0; i < size(); ++i)
-                result.push_back(ApiIdData(at(i).id));
-            return result;
-        }
-    };
+enum ApiObjectType
+{
+    ApiObject_NotDefined,
+    ApiObject_Server,
+    ApiObject_Camera,
+    ApiObject_User,
+    ApiObject_Layout,
+    ApiObject_Videowall,
+    ApiObject_BusinessRule,
+    ApiObject_Storage,
+    ApiObject_WebPage,
+};
+struct ApiObjectInfo
+{
+    ApiObjectInfo() {}
+    ApiObjectInfo(const ApiObjectType& type, const QnUuid& id): type(type), id(id) {}
 
+    ApiObjectType type;
+    QnUuid id;
+};
+class ApiObjectInfoList: public std::vector<ApiObjectInfo>
+{
+public:
+    std::vector<ApiIdData> toIdList() const
+    {
+        std::vector<ApiIdData> result;
+        result.reserve(size());
+        for (size_t i = 0; i < size(); ++i)
+            result.push_back(ApiIdData(at(i).id));
+        return result;
+    }
+};
+
+class QnDbManagerAccess;
+
+namespace detail
+{
     class QnDbManager
     :
         public QObject,
@@ -60,6 +72,7 @@ namespace ec2
     {
         Q_OBJECT
 
+        friend class ec2::QnDbManagerAccess;
     public:
         QnDbManager();
         virtual ~QnDbManager();
@@ -135,7 +148,7 @@ namespace ec2
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
         ErrorCode doQuery(const ApiStoredFilePath& path, ApiDatabaseDumpToFileData& dumpFileSize);
 
-		// --------- misc -----------------------------
+        // --------- misc -----------------------------
         QnUuid getID() const;
 
         ApiObjectType getObjectType(const QnUuid& objectId)
@@ -150,11 +163,9 @@ namespace ec2
         ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
         ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
 
-        bool saveMiscParam( const QByteArray& name, const QByteArray& value );
         bool readMiscParam( const QByteArray& name, QByteArray* value );
 
         //!Reads settings (properties of user 'admin')
-        ErrorCode readSettings(ApiResourceParamDataList& settings);
 
         virtual QnDbTransaction* getTransaction() override;
 
@@ -179,11 +190,12 @@ namespace ec2
         };
 
 
-        friend class QnTransactionLog;
+        friend class ec2::QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
         QnReadWriteLock& getMutex() { return m_mutex; }
 
         // ------------ data retrieval --------------------------------------
+        ErrorCode doQueryNoLock(std::nullptr_t /*dummy*/, ApiResourceParamDataList& data);
 
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -194,6 +206,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileDataList& data);
         ErrorCode doQueryNoLock(const std::nullptr_t&, ApiStoredFileDataList& data) { return doQueryNoLock(ApiStoredFilePath(), data); }
 
+        ErrorCode doQueryNoLock(const QByteArray &paramName, ApiMiscData& miscData);
         //getResourceTypes
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
@@ -303,6 +316,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryData> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiMiscData>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionInternal(const QnTransaction<ApiIdData>& tran);
@@ -458,6 +472,9 @@ namespace ec2
         ErrorCode deleteTableRecord(const QnUuid& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
+        ErrorCode saveMiscParam(const ApiMiscData &params);
+        ErrorCode readSettings(ApiResourceParamDataList& settings);
+
         ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
         ErrorCode deleteRecordFromResourceTable(const qint32 id);
         ErrorCode removeObject(const ApiObjectInfo& apiObject);
@@ -607,8 +624,146 @@ namespace ec2
         bool m_needResyncClientInfoData;
         bool m_dbReadOnly;
     };
+} // namespace detail
+
+class QnDbManagerAccess
+{
+public:
+    QnDbManagerAccess(const Qn::UserAccessData &userAccessData);
+    ApiObjectType getObjectType(const QnUuid& objectId);
+
+    template <typename T1, typename T2>
+    ErrorCode doQuery(const T1 &t1, T2 &t2)
+    {
+        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, t2);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+        if (!hasPermission(t2, Qn::Permission::ReadPermission))
+        {
+            errorCode = ErrorCode::forbidden;
+            t2 = T2();
+        }
+        return errorCode;
+    }
+
+    template <typename T1>
+    ErrorCode doQuery(const T1 &t1, ApiFullInfoData &data)
+    {
+        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, data);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+
+        filterByPermission(m_userAccessData.userId, data.accessRights, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.allProperties, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.cameraHistory, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.cameras, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.cameraUserAttributesList, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.discoveryData, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.layouts, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.licenses, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.resourceTypes, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.resStatusList, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.rules, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.servers, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.serversUserAttributesList, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.storages, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.userGroups, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.users, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.videowalls, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.webPages, Qn::Permission::ReadPermission);
+
+        return errorCode;
+    }
+
+    template<typename T1, template<typename> class Container, typename Param>
+    ErrorCode doQuery(const T1 &inParam, Container<Param> &outParamContainer)
+    {
+        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(inParam, outParamContainer);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+        ec2::filterByPermission(m_userAccessData.userId, outParamContainer, Qn::Permission::ReadPermission);
+        if (outParamContainer.size() == 0)
+            return ErrorCode::forbidden;
+        return errorCode;
+    }
+
+    QnDbHelper::QnDbTransaction* getTransaction();
+    ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);
+    ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
+    ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
+
+    template <typename Param, typename SerializedTransaction>
+    ErrorCode executeTransactionNoLock(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
+    {
+        if (!hasPermission(tran.params, Qn::Permission::SavePermission))
+            return ErrorCode::forbidden;
+
+        return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
+    }
+
+    template <template<typename> class Container, typename Param, typename SerializedTransaction>
+    ErrorCode executeTransactionNoLock(const QnTransaction<Container<Param>> &tran, SerializedTransaction &&serializedTran)
+    {
+        bool userHasNotPermissionForAllResources = std::any_of(tran.params.cbegin(), tran.params.cend(),
+                                                               [](const Param &param) {
+                                                                   return !hasPermission(param, Qn::Permission::SavePermission);
+                                                               });
+        if (userHasNotPermissionForAllResources)
+            return ErrorCode::forbidden;
+
+        return detail::QnDbManager::instance()->executeTransactionNoLock(
+                    tran,
+                    std::forward<SerializedTransaction>(serializedTran));
+    }
+
+    template <class Param, class SerializedTransaction>
+    ErrorCode executeTransaction(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
+    {
+        if (!hasPermission(tran.params, Qn::Permission::SavePermission))
+            return ErrorCode::forbidden;
+
+        return detail::QnDbManager::instance()->executeTransaction(
+                    tran,
+                    std::forward<SerializedTransaction>(serializedTran));
+    }
+
+    template <template<typename> class Container, typename Param, typename SerializedTransaction>
+    ErrorCode executeTransaction(const QnTransaction<Container<Param>> &tran, SerializedTransaction &&serializedTran)
+    {
+        bool userHasNotPermissionForAllResources = std::any_of(tran.params.cbegin(), tran.params.cend(),
+                                                               [](const Param &param) {
+                                                                   return !hasPermission(param, Qn::Permission::SavePermission);
+                                                               });
+        if (userHasNotPermissionForAllResources)
+            return ErrorCode::forbidden;
+
+        return detail::QnDbManager::instance()->executeTransaction(
+                    tran,
+                    std::forward<SerializedTransaction>(serializedTran));
+    }
+
+private:
+    template<typename Param>
+    bool hasPermission(const Param &param, Qn::Permission permission)
+    {
+        if (m_userAccessData == Qn::kDefaultUserAccess)
+            return true;
+        switch (permission)
+        {
+        case Qn::Permission::SavePermission:
+            return ec2::hasModifyPermission(m_userAccessData.userId, param);
+        default:
+            return ec2::hasPermission(m_userAccessData.userId, param, permission);
+        }
+        return false;
+    }
+
+private:
+    Qn::UserAccessData m_userAccessData;
 };
 
-#define dbManager QnDbManager::instance()
+} // namespace ec2
+
+#define dbManager(userAccessData) QnDbManagerAccess(userAccessData)
 
 #endif // __DB_MANAGER_H_

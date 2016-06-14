@@ -9,13 +9,27 @@
 
 namespace ec2
 {
+
+class AbstractCameraNotificationManager : public QObject
+{
+    Q_OBJECT
+public:
+signals:
+    void addedOrUpdated(const ec2::ApiCameraData& camera);
+    void cameraHistoryChanged(const ec2::ApiServerFootageData& cameraHistory);
+    void removed(const QnUuid& id);
+
+    void userAttributesChanged(const ec2::ApiCameraAttributesData& attributes);
+    void userAttributesRemoved(const QnUuid& id);
+};
+
+typedef std::shared_ptr<AbstractCameraNotificationManager> AbstractCameraNotificationManagerPtr;
+
     /*!
     \note All methods are asynchronous if other not specified
     */
-    class AbstractCameraManager : public QObject
+    class AbstractCameraManager
     {
-        Q_OBJECT
-
     public:
         virtual ~AbstractCameraManager() {}
 
@@ -147,14 +161,6 @@ namespace ec2
             });
         }
 
-
-    signals:
-        void addedOrUpdated(const ec2::ApiCameraData& camera);
-        void cameraHistoryChanged(const ec2::ApiServerFootageData& cameraHistory);
-        void removed(const QnUuid& id);
-
-        void userAttributesChanged(const ec2::ApiCameraAttributesData& attributes);
-        void userAttributesRemoved(const QnUuid& id);
 
     protected:
         virtual int getCameras(impl::GetCamerasHandlerPtr handler) = 0;

@@ -43,8 +43,9 @@ namespace ec2 {
 
 
     template<class QueryProcessorType>
-    QnUpdatesManager<QueryProcessorType>::QnUpdatesManager(QueryProcessorType * const queryProcessor) :
-        m_queryProcessor(queryProcessor)
+    QnUpdatesManager<QueryProcessorType>::QnUpdatesManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData) :
+        m_queryProcessor(queryProcessor),
+        m_userAccessData(userAccessData)
     {
     }
 
@@ -68,7 +69,7 @@ namespace ec2 {
         auto transaction = prepareTransaction(updateId, peerId, chunks);
 
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
 
         return reqId;
     }
@@ -109,7 +110,7 @@ namespace ec2 {
         return transaction;
     }
 
-    template class QnUpdatesManager<ServerQueryProcessor>;
+    template class QnUpdatesManager<ServerQueryProcessorAccess>;
     template class QnUpdatesManager<FixedUrlClientQueryProcessor>;
 
 } // namespace ec2

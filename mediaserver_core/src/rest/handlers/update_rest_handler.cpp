@@ -10,15 +10,38 @@
 #include <nx/utils/log/log.h>
 #include <common/common_module.h>
 #include <api/model/upload_update_reply.h>
+#include "core/resource_management/resource_access_manager.h"
+#include "rest/server/rest_connection_processor.h"
+#include "core/resource_management/resource_pool.h"
+#include "core/resource/user_resource.h"
 
 int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *processor)
 {
     return executePost(path, params, QByteArray(), result, processor);
 }
 
-int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* processor)
 {
     Q_UNUSED(path)
+
+    bool remotePeerHasAdminRights = false;
+    auto resource = qnResPool->getResourceById(processor->authUserId());
+    if (resource)
+    {
+        auto userResource = resource.dynamicCast<QnUserResource>();
+        if (userResource)
+            remotePeerHasAdminRights = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+    }
+
+    if (!remotePeerHasAdminRights)
+    {
+        QnUploadUpdateReply reply;
+        reply.offset = ec2::AbstractUpdatesManager::UnknownError;
+        result.setError(QnJsonRestResult::Error::Forbidden);
+        result.setReply(reply);
+        return nx_http::StatusCode::forbidden;
+    }
+
 
     qint64 offset = params.value(lit("offset")).toLongLong();
     QString updateId = params.value(lit("updateId"));

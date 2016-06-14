@@ -72,13 +72,14 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
             return CODE_OK;
         }
 
-        if (!changeSystemName(systemName, sysIdTime, tranLogTime, !wholeSystem))
+        if (!changeSystemName(systemName, sysIdTime, tranLogTime, !wholeSystem, Qn::UserAccessData(owner->authUserId())))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             return CODE_OK;
         }
         if (wholeSystem)
-            QnAppServerConnectionFactory::getConnection2()->getMiscManager()->changeSystemName(systemName, sysIdTime, tranLogTime, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            QnAppServerConnectionFactory::getConnection2()->getMiscManager(Qn::UserAccessData(owner->authUserId()))
+                                                          ->changeSystemName(systemName, sysIdTime, tranLogTime, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
         /* reset connections if systemName is changed */
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemNameChanged);
@@ -88,7 +89,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     }
 
     /* set port */
-    int changePortResult = changePort(port);
+    int changePortResult = changePort(owner->authUserId(), port);
     if (changePortResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Port is busy"));
         port = 0;   //not switching port
@@ -97,7 +98,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     /* set password */
     if (passwordData.hasPassword())
     {
-        if (!changeAdminPassword(passwordData)) {
+        if (!changeAdminPassword(passwordData, owner->authUserId())) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
         }
         else {
@@ -136,7 +137,7 @@ void QnConfigureRestHandler::afterExecute(const QString& /*path*/, const QnReque
     */
 }
 
-int QnConfigureRestHandler::changePort(int port)
+int QnConfigureRestHandler::changePort(const QnUuid &userId, int port)
 {
     if (port == 0 || port == MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt())
         return ResultSkip;
@@ -167,7 +168,7 @@ int QnConfigureRestHandler::changePort(int port)
 
     ec2::ApiMediaServerData apiServer;
     ec2::fromResourceToApi(server, apiServer);
-    if (QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(apiServer) != ec2::ErrorCode::ok)
+    if (QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::UserAccessData(userId))->saveSync(apiServer) != ec2::ErrorCode::ok)
         return ResultFail;
 
 
