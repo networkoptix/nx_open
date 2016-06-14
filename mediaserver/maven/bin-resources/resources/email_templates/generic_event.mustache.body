@@ -1,4 +1,4 @@
-<h1>{{event}} from {{source}}</h1>
+<h1>{{event}} from <b>{{source}}</b></h1>
 
 <div class="description">
     {{#caption}}
