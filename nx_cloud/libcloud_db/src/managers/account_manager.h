@@ -86,6 +86,11 @@ public:
         data::AccountEmail accountEmail,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
 
+    void createTemporaryCredentials(
+        const AuthorizationInfo& authzInfo,
+        data::TemporaryCredentialsParams params,
+        std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler);
+
     boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const;
     

@@ -90,6 +90,16 @@ void TemporaryAccountPasswordManager::authenticateByName(
     }
 }
 
+std::string TemporaryAccountPasswordManager::generateRandomPassword()
+{
+    std::string tempPassword(10 + (rand() % 10), 'c');
+    std::generate(
+        tempPassword.begin(),
+        tempPassword.end(),
+        []() {return 'a' + (rand() % ('z' - 'a')); });
+    return tempPassword;
+}
+
 void TemporaryAccountPasswordManager::createTemporaryPassword(
     const AuthorizationInfo& /*authzInfo*/,
     data::TemporaryAccountPassword tmpPasswordData,

@@ -227,16 +227,11 @@ void AccountManager::resetPassword(
     data::TemporaryAccountPassword tempPasswordData;
     tempPasswordData.accountEmail = accountEmail.email;
     tempPasswordData.realm = AuthenticationManager::realm().constData();
-    std::string tempPassword(10 + (rand() % 10), 'c');
-    std::generate(
-        tempPassword.begin(),
-        tempPassword.end(),
-        []() {return 'a' + (rand() % ('z' - 'a')); });
-    tempPasswordData.password = tempPassword;
+    tempPasswordData.password = m_tempPasswordManager->generateRandomPassword();
     tempPasswordData.passwordHa1 = nx_http::calcHa1(
         accountEmail.email.c_str(),
         tempPasswordData.realm.c_str(),
-        tempPassword.c_str()).constData();
+        tempPasswordData.password.c_str()).constData();
     tempPasswordData.expirationTimestampUtc =
         ::time(NULL) +
         m_settings.accountManager().passwordResetCodeExpirationTimeout.count();
@@ -296,6 +291,14 @@ void AccountManager::reactivateAccount(
             m_startedAsyncCallsCounter.getScopedIncrement(),
             requestSourceSecured,
             _1, _2, _3, std::move(completionHandler)));
+}
+
+void AccountManager::createTemporaryCredentials(
+    const AuthorizationInfo& authzInfo,
+    data::TemporaryCredentialsParams params,
+    std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler)
+{
+    completionHandler(api::ResultCode::notImplemented, api::TemporaryCredentials());
 }
 
 boost::optional<data::AccountData> AccountManager::findAccountByUserName(

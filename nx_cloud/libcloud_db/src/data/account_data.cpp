@@ -70,6 +70,12 @@ bool AccountEmail::getAsVariant(int resID, QVariant* const value) const
 }
 
 
+bool TemporaryCredentialsParams::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
+{
+    return false;
+}
+
+
 std::string AccessRestrictions::toString() const
 {
     return boost::algorithm::join(requestsAllowed, ",");

@@ -16,6 +16,7 @@ extern const char* kAccountGetPath;
 extern const char* kAccountUpdatePath;
 extern const char* kAccountPasswordResetPath;
 extern const char* kAccountReactivatePath;
+extern const char* kAccountCreateTemporaryCredentialsPath;
 
 extern const char* kSystemBindPath;
 extern const char* kSystemUnbindPath;

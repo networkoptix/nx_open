@@ -58,6 +58,9 @@ public:
         std::function<void(
             api::ResultCode,
             api::AccountConfirmationCode)> completionHandler) override;
+    virtual void createTemporaryCredentials(
+        api::TemporaryCredentialsParams params,
+        std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler) override;
 };
 
 }   //cl

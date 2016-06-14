@@ -26,6 +26,8 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 
+#include <cloud_db_client/src/cdb_request_path.h>
+
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
 #include "http_handlers/activate_account_handler.h"
@@ -75,7 +77,9 @@ CloudDBProcess::CloudDBProcess( int argc, char **argv )
     m_argc( argc ),
     m_argv( argv ),
     m_terminated( false ),
-    m_timerID( -1 )
+    m_timerID( -1 ),
+    m_httpMessageDispatcher( nullptr ),
+    m_authorizationManager( nullptr )
 {
 #ifdef USE_QAPPLICATION
     setServiceDescription(QnLibCloudDbAppInfo::applicationDisplayName());
@@ -161,6 +165,7 @@ int CloudDBProcess::exec()
             settings.auth().rulesXmlPath);
 
         nx_http::MessageDispatcher httpMessageDispatcher;
+        m_httpMessageDispatcher = &httpMessageDispatcher;
 
         //creating data managers
         TemporaryAccountPasswordManager tempPasswordManager(
@@ -201,6 +206,7 @@ int CloudDBProcess::exec()
             streeManager,
             accountManager,
             systemManager);
+        m_authorizationManager = &authorizationManager;
 
         AuthenticationProvider authProvider(
             settings,
@@ -372,6 +378,11 @@ void CloudDBProcess::registerApiHandlers(
             return std::make_unique<ReactivateAccountHttpHandler>( accountManager, authorizationManager );
         } );
 
+    registerHttpHandler(
+        kAccountCreateTemporaryCredentialsPath,
+        &AccountManager::createTemporaryCredentials, accountManager,
+        EntityType::account, DataActionType::update);
+
     //systems
     msgDispatcher->registerRequestProcessor<BindSystemHandler>(
         BindSystemHandler::kHandlerPath,
@@ -524,6 +535,33 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kSystemExpirationTime);
     dbStructureUpdater.addUpdateScript(db::kReplaceBlobWithVarchar);
     return dbStructureUpdater.updateStructSync();
+}
+
+template<typename InputData, typename OutputData, typename ManagerType>
+void CloudDBProcess::registerHttpHandler(
+    const char* handlerPath,
+    void (ManagerType::*managerFunc)(
+        const AuthorizationInfo& authzInfo,
+        InputData inputData,
+        std::function<void(api::ResultCode, OutputData)> completionHandler),
+    ManagerType* manager,
+    EntityType entityType,
+    DataActionType dataActionType)
+{
+    typedef AbstractFiniteMsgBodyHttpHandler<InputData, OutputData> HttpHandlerType;
+
+    m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
+        handlerPath,
+        [this, managerFunc, manager, entityType, dataActionType]()
+            -> std::unique_ptr<HttpHandlerType>
+        {
+            using namespace std::placeholders;
+            return std::make_unique<HttpHandlerType>(
+                entityType,
+                dataActionType,
+                *m_authorizationManager,
+                std::bind(managerFunc, manager, _1, _2, _3));
+        });
 }
 
 }   //cdb
