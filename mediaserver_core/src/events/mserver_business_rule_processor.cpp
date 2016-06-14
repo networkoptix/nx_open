@@ -62,6 +62,7 @@ namespace {
 	const QString tpSystemIcon(lit("systemIcon"));
 	const QString tpOwnerIcon(lit("ownerIcon"));
 	const QString tpCloudOwner(lit("cloudOwner"));
+	const QString tpCloudOwnerEmail(lit("cloudOwnerEmail"));
     const QString tpCompanyName(lit("companyName"));
     const QString tpCompanyUrl(lit("companyUrl"));
     const QString tpSupportLink(lit("supportLink"));
@@ -581,18 +582,19 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
     QVariantHash contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
     QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  //TODO: https://networkoptix.atlassian.net/browse/VMS-2831
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
-	QString cloudOwner = QnGlobalSettings::instance()->cloudAccountName();
+	QString cloudOwnerAccount = QnGlobalSettings::instance()->cloudAccountName();
 
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
 	attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
 //    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
     contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
 	contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
-	if (!cloudOwner.isEmpty()) 
+	if (!cloudOwnerAccount.isEmpty()) 
 	{
 		attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
 		contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
-		contextMap[tpCloudOwner] = cloudOwner;
+		// contextMap[tpCloudOwner] = cloudOwner; // TODO: VMS-2880	Add cloud owner's name
+		contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
 	}
 	
 //    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
