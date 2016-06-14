@@ -346,6 +346,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
             break;
         }
 
+        //TODO: #vkutin #common Refactor this role
         case Qn::DisabledRole:
         {
             if (index.column() == EnabledColumn)
