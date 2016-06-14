@@ -29,7 +29,7 @@ public:
 
     QnProtoValue(): m_type(Variant), m_variant(0) {}
     QnProtoValue(quint64 variant, VariantType type): m_type(Variant), m_variant((type & SignedMask) ? toZigzag64(variant) : variant) {}
-    
+
     QnProtoValue(quint64 fixed64): m_type(Fixed64), m_uint64(fixed64) {}
     QnProtoValue(qint64 fixed64): m_type(Fixed64), m_int64(fixed64) {}
     QnProtoValue(double fixed64): m_type(Fixed64), m_double(fixed64) {}

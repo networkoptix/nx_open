@@ -24,8 +24,8 @@ namespace QnUbjson {
         ObjectStartMarker   = '{',
         ObjectEndMarker     = '}',
 
-        /* The following markers are abstracted away by the reader. They can be 
-         * found in the stream, but they will never be returned by the reader 
+        /* The following markers are abstracted away by the reader. They can be
+         * found in the stream, but they will never be returned by the reader
          * when processing a valid ubjson stream. */
 
         NoopMarker          = 'N',
@@ -59,7 +59,7 @@ namespace QnUbjson {
         case ContainerTypeMarker:
         case ContainerSizeMarker:
             return static_cast<Marker>(c);
-        default:    
+        default:
             return InvalidMarker;
         }
     }

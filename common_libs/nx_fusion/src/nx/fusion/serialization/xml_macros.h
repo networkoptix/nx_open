@@ -10,7 +10,7 @@ namespace QnXmlDetail {
 
     class SerializationVisitor {
     public:
-        SerializationVisitor(QXmlStreamWriter *stream): 
+        SerializationVisitor(QXmlStreamWriter *stream):
             m_stream(stream)
         {}
 

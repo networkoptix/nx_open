@@ -14,6 +14,7 @@
 
 #include <ui/common/palette.h>
 #include <ui/actions/action_manager.h>
+#include <ui/common/item_view_hover_tracker.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
@@ -28,6 +29,7 @@
 
 #include <utils/common/ldap.h>
 #include <utils/math/color_transformations.h>
+
 
 QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     base_type(parent),
@@ -94,6 +96,24 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     setHelpTopic(ui->enableSelectedButton, ui->disableSelectedButton,   Qn::UserSettings_DisableUser_Help);
     setHelpTopic(ui->ldapSettingsButton,                                Qn::UserSettings_LdapIntegration_Help);
     setHelpTopic(ui->fetchButton,                                       Qn::UserSettings_LdapFetch_Help);
+
+    auto hoverTracker = new QnItemViewHoverTracker(ui->usersTable);
+
+    /* Cursor changes with hover: */
+    connect(hoverTracker, &QnItemViewHoverTracker::itemEnter, this,
+        [this](const QModelIndex& index)
+        {
+            if (index.column() > QnUserListModel::CheckBoxColumn && index.column() < QnUserListModel::EnabledColumn)
+                ui->usersTable->setCursor(Qt::PointingHandCursor);
+            else
+                ui->usersTable->unsetCursor();
+        });
+
+    connect(hoverTracker, &QnItemViewHoverTracker::itemLeave, this,
+        [this]()
+        {
+            ui->usersTable->unsetCursor();
+        });
 }
 
 QnUserManagementWidget::~QnUserManagementWidget()

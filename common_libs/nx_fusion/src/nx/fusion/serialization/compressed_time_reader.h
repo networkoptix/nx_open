@@ -18,7 +18,7 @@
 template<class Input>
 class QnCompressedTimeReader {
 public:
-    QnCompressedTimeReader(const Input *data): 
+    QnCompressedTimeReader(const Input *data):
         m_stream(data),
         m_lastValue(0)
     {
@@ -96,7 +96,7 @@ private:
         for (int i = 1; i < fieldSize; ++i)
             value = (value << 8) + tmp[i];
 
-        if (value == 0x3fffffffffll) 
+        if (value == 0x3fffffffffll)
         {
             if (m_stream.read(&tmp, 6) != 6)
                 return -1;
@@ -117,7 +117,7 @@ private:
         return true;
     }
 public:
-    bool readSizeFromStream(int *target) 
+    bool readSizeFromStream(int *target)
     {
         return readNumber(target);
     }

@@ -13,7 +13,7 @@
 class QnLexicalSerializer;
 
 namespace QnLexicalDetail {
-    struct StorageInstance { 
+    struct StorageInstance {
         QnSerializerStorage<QnLexicalSerializer> *operator()() const;
     };
 } // namespace QJsonDetail

@@ -3,7 +3,7 @@
 
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/tuple/enum.hpp>
-#endif 
+#endif
 
 #include "fusion.h"
 #include "fusion_detail.h"
@@ -26,7 +26,7 @@ namespace QnFusion {
      */
     template<class D>
     struct deserialization_visitor_type {};
-    
+
     template<class D>
     struct has_serialization_visitor_type:
         QnFusionDetail::has_type<serialization_visitor_type<D> >
@@ -85,12 +85,12 @@ namespace QnFusion {
 
 /**
  * This macro registers fusion visitors that are to be used when serializing
- * and deserializing to/from the given data class. This macro must be used 
+ * and deserializing to/from the given data class. This macro must be used
  * in global namespace.
- * 
+ *
  * Defining the visitors makes all fusion adapted classes instantly (de)serializable
  * to/from the given data class.
- * 
+ *
  * \param DATA_CLASS                    Data class to define visitors for.
  * \param SERIALIZATION_VISITOR         Serialization visitor class.
  * \param DESERIALIZATION_VISITOR       Deserialization visitor class.

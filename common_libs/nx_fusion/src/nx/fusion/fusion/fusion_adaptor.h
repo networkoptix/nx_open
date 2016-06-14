@@ -28,19 +28,19 @@
  * Registers a fusion adaptor for the given class. This macro is supposed to
  * be used from the same namespace where the class was defined, as the
  * generated code must be accessible via ADL.
- * 
+ *
  * Member sequence is of the form:
- * 
+ *
  * \code
  * ((KEY0, VALUE0)(KEY1, VALUE1)...)
  * ((KEY0, VALUE0)(KEY1, VALUE1)...)
  * ...
  * \endcode
- * 
- * Here <tt>KEY*</tt> are fusion keys previously defined with 
+ *
+ * Here <tt>KEY*</tt> are fusion keys previously defined with
  * <tt>QN_FUSION_DEFINE_KEY</tt>, and <tt>VALUE*</tt> are associated values.
  * A working example might look like this:
- * 
+ *
  * \code
  * QN_FUSION_ADAPT_CLASS(
  *      QSize,
@@ -49,18 +49,18 @@
  *      (optional, true)
  * )
  * \endcode
- * 
+ *
  * This code defines two members for <tt>QSize</tt>, and the last parameter
  * marks them as optional.
- * 
- * 
+ *
+ *
  * \param CLASS                         Class to register fusion adaptor for.
  * \param MEMBER_SEQ                    Preprocessor sequence of member parameter
  *                                      sequences for the given class.
  * \param GLOBAL_SEQ                    Global parameters sequence that will
  *                                      be appended to each one of individual
  *                                      member parameter sequences.
- *                                      
+ *
  * \see QN_FUSION_DEFINE_KEY
  */
 #define QN_FUSION_ADAPT_CLASS(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)          \
@@ -155,10 +155,10 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     };
 
 
-// TODO: 
+// TODO:
 // #Elric instead of having visit_members function, expose only a function
 // that returns fusion adaptor for a type. Then implement a processor that
-// uses this adaptor. Then implement visit_members via that processor 
+// uses this adaptor. Then implement visit_members via that processor
 // (and without macros).
 #define QN_FUSION_ADAPT_CLASS_FUNCTION_STEP_I(Z, INDEX, DATA)                   \
     if(!QnFusionDetail::dispatch_visit(std::forward<Visitor>(visitor), std::forward<T>(value), QnFusion::AccessAdaptor<at_c<INDEX>::type>())) \
@@ -176,11 +176,11 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * A shortcut for <tt>QN_FUSION_ADAPT_CLASS</tt>. Each property sequence of the
  * proveded member sequence is expected to start with a tuple of size 3 consisting
  * of values for fusion keys <tt>getter</tt>, <tt>setter</tt> and <tt>name</tt>.
- * 
+ *
  * Note that <tt>GSN</tt> in the macro name stands for GetterSetterName.
- * 
+ *
  * Example usage:
- * 
+ *
  * \code
  * QN_FUSION_ADAPT_CLASS_GSN(
  *      QSize,
@@ -209,21 +209,21 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 /**
  * A shortcut for <tt>QN_FUSION_ADAPT_CLASS</tt>. Can be used for simple struct
  * types where field names to be used are the same as the field names in C++ code.
- * 
+ *
  * Example usage:
- * 
+ *
  * \code
  * struct Point { int x, y, z; }
- * 
+ *
  * QN_FUSION_ADAPT_STRUCT(Point, (x)(y)(z), (optinal, true))
  * \endcode
- * 
+ *
  * This code defines three members for class <tt>Point</tt>, all of them optional.
- * 
+ *
  * \param STRUCT                        Struct to register fusion adaptor for.
  * \param FIELD_SEQ                     Preprocessor sequence of the struct's
  *                                      field names.
- * \param GLOBAL_SEQ                    Preprocessor sequence of global parameters 
+ * \param GLOBAL_SEQ                    Preprocessor sequence of global parameters
  *                                      that will be applied to each of the
  *                                      struct's fields.
  * \see QN_FUSION_ADAPT_CLASS
@@ -261,26 +261,26 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 /**
  * Same as QN_FUSION_ADAPT_STRUCT_FUNCTIONS, but for several types. Field
- * sequences are expected to be defined elsewhere as 
+ * sequences are expected to be defined elsewhere as
  * <tt>[TYPE_NAME][FIELD_SUFFIX]</tt> tokens, with <tt>FIELD_SUFFIX</tt> then
  * passed to this macro.
- * 
+ *
  * Example usage:
- * 
+ *
  * \code
  * struct Point { int x, y, z; }
  * #define Point_Fields (x)(y)(z)
- * 
+ *
  * struct Segment { Point a, b; }
  * #define Segment_Fields (a)(b)
- * 
+ *
  * QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((Point)(Segment), (json)(eq)(hash), _Fields,, inline)
  * \endcode
- * 
- * Note that this obviously won't work for type names consisting of several 
+ *
+ * Note that this obviously won't work for type names consisting of several
  * preprocessing tokens, e.g. for templates and type names with specified
  * scope such as <tt>std::size_t</tt>.
- * 
+ *
  * \param STRUCT_SEQ
  * \param FUNCTION_SEQ
  * \param FIELD_SUFFIX
@@ -308,9 +308,9 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 /**
  * \internal
- * 
+ *
  * Converts a field sequence into a standard member sequence.
- * 
+ *
  * \param STRUCT                        Name of the struct.
  * \param FIELD_SEQ                     Preprocessor sequence of field names.
  */
@@ -323,11 +323,11 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 /**
  * \internal
- * 
+ *
  * Unrolls a member sequence that uses key shortcuts into its standard form.
- * 
+ *
  * For example, the following invocation:
- * 
+ *
  * \code
  * QN_FUSION_UNROLL_SHORTCUT_SEQ(
  *     (getter, setter, name),
@@ -335,7 +335,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  *     ((&QSize::height, &QSize::setHeight, "height")(optional, true))
  * )
  * \endcode
- * 
+ *
  * Will expand into:
  *
  * \code
@@ -361,10 +361,10 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 /**
  * \internal
- * 
+ *
  * Applies property extensions to the given member sequence, returning a new
  * member sequence.
- * 
+ *
  * \param MEMBER_SEQ
  */
 #define QN_FUSION_EXTEND_MEMBER_SEQ(MEMBER_SEQ)                                 \
@@ -376,10 +376,10 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 /**
  * \internal
- * 
+ *
  * Applies property extensions to the given property sequence, returning a new
  * property sequence.
- * 
+ *
  * \param PROPERTY_SEQ
  */
 #define QN_FUSION_EXTEND_PROPERTY_SEQ(PROPERTY_SEQ)                             \
@@ -393,18 +393,18 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * \internal
  *
  * This macro returns a type expression that should be used in return type of a
- * property getter function for the specified key. By default it simply 
+ * property getter function for the specified key. By default it simply
  * returns <tt>decltype(VALUE)</tt>.
- * 
+ *
  * To override the default return value for some key <tt>some_key</tt>, use
  * the following code:
  * \code
  * #define QN_FUSION_PROPERTY_IS_TYPED_FOR_some_key true
  * #define QN_FUSION_PROPERTY_TYPE_FOR_some_key QString // Or your custom type
  * \endcode
- * 
+ *
  * This might be useful when <tt>decltype</tt> cannot be used because
- * <tt>VALUE</tt> might be a lambda. This is also a way of saving on 
+ * <tt>VALUE</tt> might be a lambda. This is also a way of saving on
  * <tt>decltype</tt> calls when property type is known at key definition time.
  *
  * \param KEY                           Fusion key.
@@ -417,7 +417,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
         QN_FUSION_PROPERTY_TYPE_I_,                                             \
         ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_TYPED_CHECK_, BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_TYPED_FOR_, KEY)) ~ \
     )(KEY, VALUE)
- 
+
 #define QN_FUSION_PROPERTY_IS_TYPED_CHECK_true ,
 
 #define QN_FUSION_PROPERTY_TYPE_I_1(KEY, VALUE) decltype(VALUE)
@@ -426,18 +426,18 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 /**
  * \internal
- * 
- * This macro returns property extension for the provided property pair, 
+ *
+ * This macro returns property extension for the provided property pair,
  * which essentially is a sequence of property pairs that should be used instead
  * of the original one. By default it simply returns <tt>(KEY, VALUE)</tt>.
- * 
+ *
  * To specify a property extension for some key <tt>some_key</tt>, use
  * the following code:
  * \code
  * #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_some_key true
  * #define QN_FUSION_PROPERTY_EXTENSION_FOR_some_key(KEY, VALUE) (KEY, VALUE)(BOOST_PP_CAT(qt_, KEY), QLatin1Literal(VALUE)) // Or your custom extension
  * \endcode
- * 
+ *
  * \param KEY                           Fusion key.
  * \param VALUE                         Value specified by the user for this key.
  * \returns                             Property extension.

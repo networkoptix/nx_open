@@ -18,10 +18,10 @@
 template<class Input>
 class QnUbjsonReader: private QnUbjsonDetail::ReaderWriterBase {
 public:
-    QnUbjsonReader(const Input *data): 
+    QnUbjsonReader(const Input *data):
         m_stream(data),
-        m_peeked(false), 
-        m_peekedMarker(QnUbjson::InvalidMarker) 
+        m_peeked(false),
+        m_peekedMarker(QnUbjson::InvalidMarker)
     {
         m_stateStack.push_back(State(AtArrayElement));
     }
@@ -38,9 +38,9 @@ public:
 
     bool readNull() {
         peekMarker();
-        if(m_peekedMarker != QnUbjson::NullMarker) 
+        if(m_peekedMarker != QnUbjson::NullMarker)
             return false;
-        
+
         m_peeked = false;
         return true;
     }
@@ -147,7 +147,7 @@ public:
     template <class T, std::size_t N>
     bool readBinaryData(std::array<T, N> *target) {
         NX_ASSERT(target);
-        
+
         if(!readArrayStart())
             return false;
 
@@ -190,7 +190,7 @@ public:
 
         switch (marker) {
         case QnUbjson::NullMarker:
-        case QnUbjson::TrueMarker: 
+        case QnUbjson::TrueMarker:
         case QnUbjson::FalseMarker:
             return true;
         case QnUbjson::UInt8Marker:
@@ -264,7 +264,7 @@ private:
         NX_ASSERT(target);
 
         peekMarker();
-        if(m_peekedMarker != expectedMarker) 
+        if(m_peekedMarker != expectedMarker)
             return false;
         m_peeked = false;
 

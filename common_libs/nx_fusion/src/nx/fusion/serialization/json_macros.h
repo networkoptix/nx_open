@@ -14,9 +14,9 @@ namespace QJsonDetail {
 
     class SerializationVisitor {
     public:
-        SerializationVisitor(QnJsonContext *ctx, QJsonValue &target): 
-            m_ctx(ctx), 
-            m_target(target) 
+        SerializationVisitor(QnJsonContext *ctx, QJsonValue &target):
+            m_ctx(ctx),
+            m_target(target)
         {}
 
         template<class T, class Access>
@@ -112,5 +112,5 @@ __VA_ARGS__ void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *ta
 __VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target) { \
     return QnFusion::deserialize(ctx, value, target);                           \
 }
-    
+
 #endif // QN_SERIALIZATION_JSON_MACROS_H

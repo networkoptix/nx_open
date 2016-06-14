@@ -16,7 +16,7 @@ namespace QnFusion {
 
 
 /**
- * Place this macro inside the class's body to allow access to the class's 
+ * Place this macro inside the class's body to allow access to the class's
  * private fields from the fusion binding.
  */
 #define QN_FUSION_ENABLE_PRIVATE()                                              \
@@ -31,9 +31,9 @@ namespace QnFusion {
 
 /**
  * This macro generates several function definitions for the provided type.
- * Tokens for the functions to generate are passed in FUNCTION_SEQ parameter. 
- * See QN_FUSION_DEFINE_FUNCTIONS for a list of tokens. 
- * 
+ * Tokens for the functions to generate are passed in FUNCTION_SEQ parameter.
+ * See QN_FUSION_DEFINE_FUNCTIONS for a list of tokens.
+ *
  * \param CLASS                         Type to declare functions for.
  * \param FUNCTION_SEQ                  Preprocessor sequence of functions to define.
  * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
@@ -47,7 +47,7 @@ namespace QnFusion {
 
 /**
  * Same as QN_FUSION_DECLARE_FUNCTIONS, but for several types.
- * 
+ *
  * \param FUNCTION_SEQ                  Preprocessor sequence of types to define functions for.
  * \param FUNCTION_SEQ                  Preprocessor sequence of functions to define.
  * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.

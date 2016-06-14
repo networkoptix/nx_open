@@ -1,7 +1,10 @@
 #include "switch_item_delegate.h"
 
+#include <common/common_globals.h>
+
 #include <ui/style/helper.h>
 #include <ui/style/nx_style.h>
+
 
 QnSwitchItemDelegate::QnSwitchItemDelegate(QObject* parent)
     : base_type(parent)
@@ -40,6 +43,9 @@ QSize QnSwitchItemDelegate::sizeHint(const QStyleOptionViewItem& option, const Q
 void QnSwitchItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
 {
     base_type::initStyleOption(option, index);
+
+    if (index.data(Qn::DisabledRole).toBool())
+        option->state &= ~QStyle::State_Enabled;
 
     if (!QnNxStyle::instance())
         return;

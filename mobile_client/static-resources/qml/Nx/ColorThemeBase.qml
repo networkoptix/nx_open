@@ -20,19 +20,23 @@ QtObject
     property color base16:      "#4e6977"
     property color base17:      "#53707f"
 
-    property color contrast1:   "#698796"
-    property color contrast2:   "#91a7b2"
-    property color contrast3:   "#9bafb9"
-    property color contrast4:   "#a5b7c0"
-    property color contrast5:   "#afbfc7"
-    property color contrast6:   "#b9c7ce"
+    property color contrast1:   "#ffffff"
+    property color contrast2:   "#f5f7f8"
+    property color contrast3:   "#ebeff1"
+    property color contrast4:   "#e1e7ea"
+    property color contrast5:   "#d7dfe3"
+    property color contrast6:   "#cdd7dc"
     property color contrast7:   "#c3cfd5"
-    property color contrast8:   "#cdd7dc"
-    property color contrast9:   "#d7dfe3"
-    property color contrast10:  "#e1e7ea"
-    property color contrast11:  "#ebeff1"
-    property color contrast12:  "#f5f7f8"
-    property color contrast13:  "#ffffff"
+    property color contrast8:   "#b9c7ce"
+    property color contrast9:   "#afbfc7"
+    property color contrast10:  "#a5b7c0"
+    property color contrast11:  "#9bafb9"
+    property color contrast12:  "#91a7b2"
+    property color contrast13:  "#879fab"
+    property color contrast14:  "#7d97a4"
+    property color contrast15:  "#738f9d"
+    property color contrast16:  "#698796"
+    property color contrast17:  "#5f7f8f"
 
     property color blue_l2:     "#43c2ff"
     property color blue_l1:     "#39b2ef"
@@ -83,7 +87,7 @@ QtObject
 
 
     property color windowBackground: base5
-    property color windowText: contrast13
+    property color windowText: contrast1
 
     function transparent(color, alpha)
     {

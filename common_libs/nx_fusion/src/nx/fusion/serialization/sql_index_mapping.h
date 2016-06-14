@@ -27,7 +27,7 @@ public:
 
     void setIndex(int field, int index) {
         NX_ASSERT(field >= 0);
-        
+
         if(field >= indices.size()) {
             indices.reserve(field + 1);
             for(int i = indices.size(); i <= field; i++)

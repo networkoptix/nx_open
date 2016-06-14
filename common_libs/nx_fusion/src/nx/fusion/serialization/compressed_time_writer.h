@@ -30,33 +30,33 @@ public:
     }
 
     /*
-    void writeInt64(qint64 value) 
+    void writeInt64(qint64 value)
     {
         m_signed ? encodeSignedNumber(value - m_lastValue) : encodeUnsignedNumber(value - m_lastValue);
         m_lastValue = value;
     }
     */
 
-    void writeQnTimePeriod(const QnTimePeriod& value) 
+    void writeQnTimePeriod(const QnTimePeriod& value)
     {
         m_signed ? encodeSignedNumber(value.startTimeMs - m_lastValue) : encodeUnsignedNumber(value.startTimeMs - m_lastValue);
         encodeUnsignedNumber(value.durationMs + 1); // avoid -1 value
         m_lastValue = value.startTimeMs + value.durationMs;
     }
 
-    void writeQnUuid(const QnUuid& value) 
+    void writeQnUuid(const QnUuid& value)
     {
         const QByteArray tmp(value.toRfc4122());
         m_stream.write(tmp.data(), tmp.size());
     }
 
-    void writeSizeToStream(int value) 
+    void writeSizeToStream(int value)
     {
         writeNumber(value);
     }
 
     template <class T>
-    void writeNumber(const T& value) 
+    void writeNumber(const T& value)
     {
         const T& tmp = qToBigEndian(value);
         m_stream.write(&tmp, sizeof(tmp));
@@ -69,7 +69,7 @@ private:
     // 10 - 30 bit to data
     // 11 - 38 bit to data
     // 11 and 0xffffffffff data - 48 bit data
-    
+
     void encodeUnsignedNumber(qint64 value)
     {
         NX_ASSERT(value >= 0 && value < 0x1000000000000ll);
@@ -87,7 +87,7 @@ private:
             m_stream.write((&data), 6);
         }
     }
-         
+
     void encodeSignedNumber(qint64 value)
     {
         NX_ASSERT(value >= -800000000000ll && value < 0x800000000000ll);

@@ -26,13 +26,13 @@ namespace QnXml {
     QByteArray serialized(const T &value, const QString &rootElement) {
         QByteArray result;
         QXmlStreamWriter stream(&result);
-        
+
         stream.writeStartDocument();
         stream.writeStartElement(rootElement);
         QnXml::serialize(value, &stream);
         stream.writeEndElement();
         stream.writeEndDocument();
-        
+
         return result;
     }
 

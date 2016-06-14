@@ -12,7 +12,7 @@
 template<>
 class QnInputBinaryStream<QByteArray> {
 public:
-    QnInputBinaryStream(const QByteArray *data): 
+    QnInputBinaryStream(const QByteArray *data):
         m_data(data),
         m_pos(0)
     {}
@@ -47,7 +47,7 @@ private:
 template<>
 class QnOutputBinaryStream<QByteArray> {
 public:
-    QnOutputBinaryStream(QByteArray *data): 
+    QnOutputBinaryStream(QByteArray *data):
         m_data(data)
     {}
 

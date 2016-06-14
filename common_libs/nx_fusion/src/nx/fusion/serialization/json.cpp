@@ -135,7 +135,7 @@ bool QJsonDetail::deserialize_json(const QByteArray &value, QJsonValue *target) 
         QJsonArray array = document.array();
         if(array.size() != 1)
             return false;
-        
+
         *target = array[0];
         return true;
     }
@@ -183,7 +183,7 @@ public:
 
         registerSerializer<QString>();
         registerSerializer<QByteArray>();
-        
+
         registerSerializer<QStringList>();
         registerSerializer<QList<QString>>();
         registerSerializer<QList<QByteArray>>();

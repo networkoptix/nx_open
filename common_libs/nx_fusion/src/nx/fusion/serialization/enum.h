@@ -57,7 +57,7 @@ namespace QnSerialization {
     template<class T>
     struct is_enum_or_flags:
         std::integral_constant<
-            bool, 
+            bool,
             is_flags<T>::value || is_enum<T>::value
         >
     {};

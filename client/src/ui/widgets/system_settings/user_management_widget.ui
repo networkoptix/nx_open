@@ -41,13 +41,13 @@
         <enum>QAbstractItemView::NoSelection</enum>
        </property>
        <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectItems</enum>
+        <enum>QAbstractItemView::SelectRows</enum>
        </property>
        <property name="rootIsDecorated">
         <bool>false</bool>
        </property>
        <property name="allColumnsShowFocus">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <attribute name="headerStretchLastSection">
         <bool>false</bool>

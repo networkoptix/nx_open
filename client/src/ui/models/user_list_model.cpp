@@ -346,6 +346,13 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
             break;
         }
 
+        case Qn::DisabledRole:
+        {
+            if (index.column() == EnabledColumn)
+                return user->isOwner();
+            break;
+        }
+
         case Qt::CheckStateRole:
         {
             if (index.column() == CheckBoxColumn)

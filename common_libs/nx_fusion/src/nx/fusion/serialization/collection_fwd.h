@@ -3,13 +3,13 @@
 
 /**
  * \file
- * 
+ *
  * This file contains forward-declarations for common collection types that are
  * handled by the serialization framework.
- * 
+ *
  * They are here so that there is no need to explicitly enumerate them every
  * time a new format is added.
- * 
+ *
  * Note that STL containers cannot be safely forward-declared (standard says
  * it's undefined behavior to define anything in STL namespace), so these
  * will still have to be included manually.

@@ -20,19 +20,19 @@ namespace QnUbjsonDetail {
     }
 
     inline float fromBigEndian(float value) {
-        /* Avoid breaking strict aliasing rules by using a union. */ 
+        /* Avoid breaking strict aliasing rules by using a union. */
         union {
             quint32 i;
             float f;
         } tmp;
-        
+
         tmp.f = value;
         tmp.i = qFromBigEndian(tmp.i);
         return tmp.f;
     }
 
     inline float fromBigEndian(double value) {
-        /* Avoid breaking strict aliasing rules by using a union. */ 
+        /* Avoid breaking strict aliasing rules by using a union. */
         union {
             quint64 i;
             double f;
@@ -53,7 +53,7 @@ namespace QnUbjsonDetail {
     }
 
     inline float toBigEndian(float value) {
-        /* Avoid breaking strict aliasing rules by using a union. */ 
+        /* Avoid breaking strict aliasing rules by using a union. */
         union {
             quint32 i;
             float f;
@@ -65,7 +65,7 @@ namespace QnUbjsonDetail {
     }
 
     inline double toBigEndian(double value) {
-        /* Avoid breaking strict aliasing rules by using a union. */ 
+        /* Avoid breaking strict aliasing rules by using a union. */
         union {
             quint64 i;
             double f;
@@ -149,7 +149,7 @@ namespace QnUbjsonDetail {
                 target->resize(size);
                 return m_stream.read(target->data(), size) == size;
             } else {
-                /* Otherwise there is a high probability that the stream is corrupted, 
+                /* Otherwise there is a high probability that the stream is corrupted,
                  * but we cannot be 100% sure. Read it chunk-by-chunk, then assemble. */
                 QVector<QByteArray> chunks;
 
@@ -184,7 +184,7 @@ namespace QnUbjsonDetail {
         QnInputBinaryStream<Input> m_stream;
     };
 
-    
+
     template<class Output>
     class OutputStreamWrapper {
     public:

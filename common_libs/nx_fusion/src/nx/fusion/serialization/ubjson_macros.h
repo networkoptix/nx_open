@@ -11,8 +11,8 @@ namespace QnUbjsonDetail {
     template<class Output>
     class SerializationVisitor {
     public:
-        SerializationVisitor(QnUbjsonWriter<Output> *stream): 
-            m_stream(stream) 
+        SerializationVisitor(QnUbjsonWriter<Output> *stream):
+            m_stream(stream)
         {}
 
         template<class T, class Access>
@@ -63,7 +63,7 @@ namespace QnUbjsonDetail {
 
             /* Packet from previous version? Just skip the new fields. */
             if(m_stream->peekMarker() == QnUbjson::ArrayEndMarker)
-                return true; 
+                return true;
 
             return operator()(target, access, access(setter_tag));
         }
@@ -75,7 +75,7 @@ namespace QnUbjsonDetail {
             /* Packet from next version? Skip additional values. */
             while(m_stream->peekMarker() != QnUbjson::ArrayEndMarker)
                 if(!m_stream->skipValue())
-                    return false; 
+                    return false;
 
             return m_stream->readArrayEnd();
         }

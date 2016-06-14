@@ -37,6 +37,7 @@ namespace style
     {
     public:
         static const char *kHoveredRowProperty;
+        static const char *kHoveredIndexProperty;
         static const char *kAccentStyleProperty;
         static const char *kSliderLength;           /**< Name of a property to change default width of the slider handle. */
         static const char *kSliderFeatures;         /**< Name of a property to add extra slider features. */
