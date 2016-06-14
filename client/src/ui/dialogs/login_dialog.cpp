@@ -168,7 +168,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 
     /* Should be done after model resetting to avoid state loss. */
     ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
-    
+
     connect(QnModuleFinder::instance(), &QnModuleFinder::moduleChanged,         this, &QnLoginDialog::at_moduleFinder_moduleChanged);
     connect(QnModuleFinder::instance(), &QnModuleFinder::moduleAddressFound,    this, &QnLoginDialog::at_moduleFinder_moduleChanged);
     connect(QnModuleFinder::instance(), &QnModuleFinder::moduleLost,            this, &QnLoginDialog::at_moduleFinder_moduleLost);
@@ -499,16 +499,20 @@ void QnLoginDialog::at_saveButton_clicked() {
 
 }
 
-void QnLoginDialog::at_deleteButton_clicked() {
+void QnLoginDialog::at_deleteButton_clicked()
+{
     QnConnectionDataList connections = qnSettings->customConnections();
 
     QString name = ui->connectionsComboBox->currentText();
     if (!connections.contains(name))
         return;
 
-    if (QnMessageBox::warning(this, tr("Delete Connections"),
-                                   tr("Are you sure you want to delete this connection: %1?").arg(L'\n' + name),
-                             QDialogButtonBox::Yes, QDialogButtonBox::No) == QDialogButtonBox::No)
+    if (QnMessageBox::warning(this,
+                              tr("Delete Connections"),
+                              tr("Are you sure you want to delete this connection: %1?").arg(L'\n' + name),
+                              QDialogButtonBox::Yes | QDialogButtonBox::No,
+                              QDialogButtonBox::No)
+        != QDialogButtonBox::Yes)
         return;
 
 
