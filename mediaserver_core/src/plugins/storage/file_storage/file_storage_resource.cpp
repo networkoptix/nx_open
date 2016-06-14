@@ -109,7 +109,7 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
         dir.mkpath(QnFile::absolutePath(fileName));
     }
     */
-    if ((openMode & QIODevice::Unbuffered) == QIODevice::Unbuffered)
+    if (openMode.testFlag(QIODevice::Unbuffered))
         ioBlockSize = ffmpegBufferSize = 0;
 
     std::unique_ptr<QBufferedFile> rez(
