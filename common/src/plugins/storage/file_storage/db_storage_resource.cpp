@@ -18,7 +18,7 @@ QnStorageResource* QnDbStorageResource::instance(const QString& )
     return new QnDbStorageResource();
 }
 
-QIODevice *QnDbStorageResource::open(const QString &fileName, QIODevice::OpenMode openMode, bool /*noBuffering*/)
+QIODevice *QnDbStorageResource::open(const QString &fileName, QIODevice::OpenMode openMode)
 {
     m_filePath = removeProtocolPrefix(fileName);
 

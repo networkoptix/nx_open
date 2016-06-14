@@ -239,9 +239,9 @@ void QnThirdPartyStorageResource::openStorage(
 }
 
 QIODevice *QnThirdPartyStorageResource::open(
-    const QString       &fileName,
-    QIODevice::OpenMode  openMode,
-    bool /*noBuffering*/)
+    const QString       &fileName, 
+    QIODevice::OpenMode  openMode
+)
 {
     if (!m_valid)
         return nullptr;

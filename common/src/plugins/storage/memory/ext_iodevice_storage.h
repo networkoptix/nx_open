@@ -32,7 +32,7 @@ public:
         \note Ownership of returned object is passed to the caller
         \note Returned object is no longer accessible via this storage
     */
-    virtual QIODevice* open( const QString& fileName, QIODevice::OpenMode openMode, bool noBuffering = false ) override;
+    virtual QIODevice* open( const QString& fileName, QIODevice::OpenMode openMode ) override;
 
     //!Implementation of QnStorageResource::getFreeSpace
     virtual qint64 getFreeSpace() override { return 0; }

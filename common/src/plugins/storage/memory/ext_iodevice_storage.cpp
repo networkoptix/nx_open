@@ -32,7 +32,7 @@ int QnExtIODeviceStorageResource::getCapabilities() const
     return m_capabilities;
 }
 
-QIODevice* QnExtIODeviceStorageResource::open( const QString& filePath, QIODevice::OpenMode openMode, bool /*noBuffering */)
+QIODevice* QnExtIODeviceStorageResource::open( const QString& filePath, QIODevice::OpenMode openMode )
 {
     Q_UNUSED(openMode)
     QnMutexLocker lk( &m_mutex );
