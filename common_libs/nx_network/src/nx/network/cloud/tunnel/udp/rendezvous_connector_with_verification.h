@@ -43,6 +43,8 @@ public:
         ConnectCompletionHandler completionHandler) override;
     virtual std::unique_ptr<nx::network::UdtStreamSocket> takeConnection() override;
 
+    void notifyAboutChoosingConnection(ConnectCompletionHandler completionHandler);
+
 private:
     std::chrono::milliseconds m_timeout;
     ConnectCompletionHandler m_connectCompletionHandler;

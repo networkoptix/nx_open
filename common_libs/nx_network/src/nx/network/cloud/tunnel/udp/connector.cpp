@@ -58,6 +58,7 @@ void TunnelConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
             m_rendezvousConnectors.clear();
             m_udtConnection.reset();    //we do not use this connection so can just remove it here
             m_connectResultReportSender.reset();
+            m_chosenRendezvousConnector.reset();
             handler();
         });
 }
@@ -300,7 +301,7 @@ void TunnelConnector::onConnectResponse(
 }
 
 void TunnelConnector::onUdtConnectionEstablished(
-    RendezvousConnector* rendezvousConnectorPtr,
+    RendezvousConnectorWithVerification* rendezvousConnectorPtr,
     SystemError::ErrorCode errorCode)
 {
     //we are in m_timer's aio thread
@@ -311,10 +312,10 @@ void TunnelConnector::onUdtConnectionEstablished(
         m_rendezvousConnectors.begin(),
         m_rendezvousConnectors.end(),
         [rendezvousConnectorPtr](
-            const std::unique_ptr<RendezvousConnector>& val)
-        {
-            return val.get() == rendezvousConnectorPtr;
-        });
+            const std::unique_ptr<RendezvousConnectorWithVerification>& val)
+            {
+                return val.get() == rendezvousConnectorPtr;
+            });
     NX_ASSERT(rendezvousConnectorIter != m_rendezvousConnectors.end());
     auto rendezvousConnector = std::move(*rendezvousConnectorIter);
     m_rendezvousConnectors.erase(rendezvousConnectorIter);
@@ -340,10 +341,33 @@ void TunnelConnector::onUdtConnectionEstablished(
         .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
         cl_logDEBUG2);
 
-    //TODO #ak informing remote side that this very connection has been selected
+    //notifying remote side: "this very connection has been selected"
+    m_chosenRendezvousConnector = std::move(rendezvousConnector);
+    m_chosenRendezvousConnector->notifyAboutChoosingConnection(
+        std::bind(&TunnelConnector::onHandshakeComplete, this, std::placeholders::_1));
 
     //stopping other rendezvous connectors
     m_rendezvousConnectors.clear(); //can do since we are in aio thread
+}
+
+void TunnelConnector::onHandshakeComplete(SystemError::ErrorCode errorCode)
+{
+    auto rendezvousConnector = std::move(m_chosenRendezvousConnector);
+    m_chosenRendezvousConnector.reset();
+
+    if (errorCode != SystemError::noError)
+    {
+        NX_LOGX(lm("cross-nat %1. Failed to notify remote side (%2) about connection choice. %3")
+            .arg(m_connectSessionId)
+            .arg(rendezvousConnector->remoteAddress().toString())
+            .arg(SystemError::toString(errorCode)),
+            cl_logDEBUG1);
+
+        holePunchingDone(
+            api::UdpHolePunchingResultCode::udtConnectFailed,
+            errorCode);
+        return;
+    }
 
     m_udtConnection = rendezvousConnector->takeConnection();
     NX_CRITICAL(m_udtConnection);

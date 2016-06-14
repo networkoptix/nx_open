@@ -70,6 +70,16 @@ void RendezvousConnectorWithVerification::connect(
         std::bind(&RendezvousConnectorWithVerification::onConnectCompleted, this, _1));
 }
 
+void RendezvousConnectorWithVerification::notifyAboutChoosingConnection(
+    ConnectCompletionHandler completionHandler)
+{
+    post(
+        [completionHandler = std::move(completionHandler)]
+        {
+            completionHandler(SystemError::noError);
+        });
+}
+
 std::unique_ptr<nx::network::UdtStreamSocket>
     RendezvousConnectorWithVerification::takeConnection()
 {
