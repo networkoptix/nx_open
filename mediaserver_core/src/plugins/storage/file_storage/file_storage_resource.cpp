@@ -71,7 +71,7 @@ namespace aux
     }
 }
 
-QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
+QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode, bool noBuffering)
 {
     if (!m_valid)
         return nullptr;
@@ -109,6 +109,9 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
         dir.mkpath(QnFile::absolutePath(fileName));
     }
     */
+
+    if (noBuffering)
+        ioBlockSize = ffmpegBufferSize = 0;
 
     std::unique_ptr<QBufferedFile> rez(
         new QBufferedFile(
