@@ -97,7 +97,7 @@ Drawer
             {
                 icon: lp("/images/settings.png")
                 text: qsTr("Settings")
-                visible: !liteMode
+                visible: false//!liteMode
                 onClicked: Workflow.openSettingsScreen()
             }
 
