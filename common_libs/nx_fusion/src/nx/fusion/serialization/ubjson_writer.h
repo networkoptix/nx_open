@@ -13,7 +13,7 @@
 template<class Output>
 class QnUbjsonWriter: private QnUbjsonDetail::ReaderWriterBase {
 public:
-    QnUbjsonWriter(Output *data): 
+    QnUbjsonWriter(Output *data):
         m_stream(data)
     {
         m_stateStack.push_back(State(AtArrayElement));

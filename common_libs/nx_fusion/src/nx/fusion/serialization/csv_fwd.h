@@ -8,7 +8,7 @@ class QnCsvStreamWriter;
 
 namespace QnCsv {
     /**
-     * Tag for types that are CSV fields. 
+     * Tag for types that are CSV fields.
      */
     struct field_tag {};
 
@@ -19,7 +19,7 @@ namespace QnCsv {
     struct record_tag {};
 
     /**
-     * Tag for types that are CSV documents. 
+     * Tag for types that are CSV documents.
      */
     struct document_tag {};
 

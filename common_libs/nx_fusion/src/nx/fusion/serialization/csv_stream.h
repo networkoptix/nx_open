@@ -19,9 +19,9 @@ public:
     /**
      * Writes out the given utf-8 encoded field. Escaping is done as described here:
      * http://www.csvreader.com/csv/docs/DataStreams.Csv.CsvReader.UserSettings.EscapeMode.html
-     * 
+     *
      * \param field
-     */ 
+     */
     void writeUtf8Field(const QByteArray &field) {
         bool needEscaping = false;
         unsigned char ch;

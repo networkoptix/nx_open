@@ -14,7 +14,7 @@ namespace QnCsvDetail {
     template<class Output>
     class SerializationVisitor {
     public:
-        SerializationVisitor(QnCsvStreamWriter<Output> *stream): 
+        SerializationVisitor(QnCsvStreamWriter<Output> *stream):
             m_stream(stream),
             m_needComma(false)
         {}
@@ -49,7 +49,7 @@ namespace QnCsvDetail {
 
             return true;
         }
-        
+
         template<class T, class Access, class Member>
         bool visit(const T &, const Access &, const Member *, const QnCsv::document_tag &) {
             return true; /* Just skip it. */
@@ -64,7 +64,7 @@ namespace QnCsvDetail {
     template<class Output>
     class HeaderVisitor {
     public:
-        HeaderVisitor(const QString &prefix, QnCsvStreamWriter<Output> *stream): 
+        HeaderVisitor(const QString &prefix, QnCsvStreamWriter<Output> *stream):
             m_prefix(prefix),
             m_stream(stream),
             m_needComma(false)
@@ -120,13 +120,13 @@ namespace QnCsvDetail {
 
 
 /**
- * This macro explicitly defines the csv category of the given type. This may 
+ * This macro explicitly defines the csv category of the given type. This may
  * come handy when the automatic category assignment machinery doesn't work as
  * expected, e.g. for string types which are containers and thus are
  * classified as csv documents.
- * 
+ *
  * \param TYPE                          Type to explicitly specify csv category for.
- * \param CATEGORY                      Csv category, one of <tt>QnCsv::field_tag</tt>, 
+ * \param CATEGORY                      Csv category, one of <tt>QnCsv::field_tag</tt>,
  *                                      <tt>QnCsv::record_tag</tt> and <tt>QnCsv::document_tag</tt>.
  * \param PREFIX                        Optional function definition prefix.
  */

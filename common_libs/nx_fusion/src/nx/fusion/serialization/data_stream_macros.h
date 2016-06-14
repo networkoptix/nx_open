@@ -9,8 +9,8 @@ namespace QnDataStreamSerialization {
 
     class SerializationVisitor {
     public:
-        SerializationVisitor(QDataStream &stream): 
-            m_stream(stream) 
+        SerializationVisitor(QDataStream &stream):
+            m_stream(stream)
         {}
 
         template<class T, class Access>
@@ -67,7 +67,7 @@ namespace QnDataStreamSerialization {
 /**
  * This macro generates <tt>QDataStream</tt> (de)serialization functions for
  * the given struct type.
- * 
+ *
  * \param TYPE                          Struct type to define (de)serialization functions for.
  * \param FIELD_SEQ                     Preprocessor sequence of all fields of the
  *                                      given type that are to be (de)serialized.

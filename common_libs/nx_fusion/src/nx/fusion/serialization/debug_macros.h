@@ -6,8 +6,8 @@
 namespace QnDebugSerialization {
     class SerializationVisitor {
     public:
-        SerializationVisitor(QDebug &stream): 
-            m_stream(stream) 
+        SerializationVisitor(QDebug &stream):
+            m_stream(stream)
         {}
 
         template<class T, class Access>

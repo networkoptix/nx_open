@@ -6,7 +6,7 @@
 
 #ifndef Q_MOC_RUN
 #include <boost/mpl/has_xxx.hpp>
-#endif 
+#endif
 
 #include <nx/utils/type_traits.h>
 
@@ -35,7 +35,7 @@ namespace QnFusionDetail {
     no_type has_visit_members_test(...);
 
     template<class T>
-    struct is_adapted: 
+    struct is_adapted:
         std::integral_constant<bool, sizeof(yes_type) == sizeof(has_visit_members_test(std::declval<T>()))>
     {};
 
@@ -52,22 +52,22 @@ namespace QnFusionDetail {
     no_type has_operator_call_test(...);
 
     template<class T, class Arg0, class Arg1, class Arg2>
-    struct sizeof_has_operator_call_test: 
+    struct sizeof_has_operator_call_test:
         std::integral_constant<std::size_t, sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>(), std::declval<Arg1>(), std::declval<Arg2>()))>
     {};
 
     template<class T, class Arg0, class Arg1>
-    struct sizeof_has_operator_call_test<T, Arg0, Arg1, na>: 
+    struct sizeof_has_operator_call_test<T, Arg0, Arg1, na>:
         std::integral_constant<std::size_t, sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>(), std::declval<Arg1>()))>
     {};
 
     template<class T, class Arg0>
-    struct sizeof_has_operator_call_test<T, Arg0, na, na>: 
+    struct sizeof_has_operator_call_test<T, Arg0, na, na>:
         std::integral_constant<std::size_t, sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>()))>
     {};
 
     template<class T>
-    struct sizeof_has_operator_call_test<T, na, na, na>: 
+    struct sizeof_has_operator_call_test<T, na, na, na>:
         std::integral_constant<std::size_t, sizeof(has_operator_call_test(std::declval<T>()))>
     {};
 

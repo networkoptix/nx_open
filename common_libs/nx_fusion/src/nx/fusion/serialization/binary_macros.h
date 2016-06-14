@@ -9,8 +9,8 @@ namespace QnBinaryDetail {
     template<class Output>
     class SerializationVisitor {
     public:
-        SerializationVisitor(QnOutputBinaryStream<Output> *stream): 
-            m_stream(stream) 
+        SerializationVisitor(QnOutputBinaryStream<Output> *stream):
+            m_stream(stream)
         {}
 
         template<class T, class Access>
@@ -21,7 +21,7 @@ namespace QnBinaryDetail {
             static_assert(member_count_type::value < 32, "Only structures with up to 32 members are supported.");
 
             /* Write out 1-byte header:
-             * 
+             *
              * 0 .... 2  3 ........ 7
              * Reserved  Member Count */
             QnBinary::serialize(static_cast<unsigned char>(access(member_count)), m_stream);
@@ -60,7 +60,7 @@ namespace QnBinaryDetail {
             m_count = header;
             if(access(member_count) < m_count)
                 return false; /* Looks like a packet from the next version. */
-            
+
             return true;
         }
 
@@ -68,7 +68,7 @@ namespace QnBinaryDetail {
         bool operator()(T &target, const Access &access) {
             using namespace QnFusion;
 
-            // TODO: #Elric 
+            // TODO: #Elric
             // we need a global "walker" abstraction to implement this more efficiently.
             if(access(member_index) >= m_count)
                 return true;

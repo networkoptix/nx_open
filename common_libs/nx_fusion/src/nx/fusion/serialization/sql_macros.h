@@ -8,8 +8,8 @@
 namespace QnSqlDetail {
     class BindVisitor {
     public:
-        BindVisitor(QSqlQuery *target): 
-            m_target(target) 
+        BindVisitor(QSqlQuery *target):
+            m_target(target)
         {}
 
         template<class T, class Access>
@@ -58,7 +58,7 @@ namespace QnSqlDetail {
 
     class FetchVisitor {
     public:
-        FetchVisitor(const QnSqlIndexMapping &mapping, const QSqlRecord &value): 
+        FetchVisitor(const QnSqlIndexMapping &mapping, const QSqlRecord &value):
             m_mapping(mapping),
             m_value(value)
         {}

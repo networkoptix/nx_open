@@ -43,12 +43,12 @@ namespace QnCsvDetail {
     no_type has_csv_type_category_test(...);
 
     template<class T, class Output>
-    struct has_serialize: 
+    struct has_serialize:
         std::integral_constant<bool, sizeof(yes_type) == sizeof(has_serialize_test(std::declval<T>(), std::declval<QnCsvStreamWriter<Output> *>()))>
     {};
 
     template<class T, class Output>
-    struct has_serialize_header: 
+    struct has_serialize_header:
         std::integral_constant<bool, sizeof(yes_type) == sizeof(has_serialize_header_test(std::declval<T>(), std::declval<QnCsvStreamWriter<Output> *>()))>
     {};
 

@@ -32,14 +32,14 @@ public:
     iterator begin() { return m_records.begin(); }
     const_iterator begin() const { return m_records.begin(); }
     const_iterator constBegin() const { return m_records.constBegin(); }
-    
+
     iterator end() { return m_records.end(); }
     const_iterator end() const { return m_records.end(); }
     const_iterator constEnd() const { return m_records.constEnd(); }
 
     iterator erase(iterator pos) { return m_records.erase(pos); }
     iterator insert(iterator before, const QnProtoRecord &value) { return m_records.insert(before, value); }
-    
+
     void push_back(const QnProtoRecord &value) { m_records.push_back(value); }
     void pop_back() { m_records.pop_back(); }
 

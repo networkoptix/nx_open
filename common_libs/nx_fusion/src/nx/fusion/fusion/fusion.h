@@ -22,24 +22,24 @@
 namespace QnFusion {
 
     /**
-     * Main API entry point. Iterates through the members of a previously 
+     * Main API entry point. Iterates through the members of a previously
      * registered type.
-     * 
+     *
      * Visitor is expected to define <tt>operator()</tt> of the following form:
      * \code
      * template<class T, class Access>
      * bool operator()(const T &, const Access &);
      * \endcode
      *
-     * Here <tt>Access</tt> template parameter presents an access interface, 
-     * defined by <tt>AccessAdaptor</tt> class. Return value of false indicates 
+     * Here <tt>Access</tt> template parameter presents an access interface,
+     * defined by <tt>AccessAdaptor</tt> class. Return value of false indicates
      * that iteration should be stopped, and in this case this function will
      * return false.
      *
      * Visitor can also optionally define <tt>operator()</tt> with additinal
      * parameter <tt>QnFusion::start_tag</tt> (or <tt>QnFusion::end_tag</tt>).
-     * This operator will then be invoked before (or after) the iteration takes place. 
-     * If this operator returns false, then iteration will stop and this 
+     * This operator will then be invoked before (or after) the iteration takes place.
+     * If this operator returns false, then iteration will stop and this
      * function will also return false.
      *
      * \param value                     Value to iterate through.
@@ -54,8 +54,8 @@ namespace QnFusion {
 
     /**
      * \fn invoke
-     * 
-     * This set of overloaded functions presents an interface for invoking 
+     *
+     * This set of overloaded functions presents an interface for invoking
      * setters and getters returned by member adaptors.
      */
 
@@ -98,13 +98,13 @@ namespace QnFusion {
     struct typed_setter_tag {};
 
     template<class T>
-    struct typed_member_setter_tag: 
+    struct typed_member_setter_tag:
         member_setter_tag,
         typed_setter_tag<T>
     {};
 
     template<class T>
-    struct typed_function_setter_tag: 
+    struct typed_function_setter_tag:
         function_setter_tag,
         typed_setter_tag<T>
     {};
@@ -116,7 +116,7 @@ namespace QnFusion {
      * \tparam T                        Setter parameter type.
      */
     template<class Setter, class T>
-    struct setter_category: 
+    struct setter_category:
         boost::mpl::if_<
             std::is_member_object_pointer<Setter>,
             typed_member_setter_tag<T>,
@@ -129,13 +129,13 @@ namespace QnFusion {
     /**
      * This metafuction returns the type of the field specified by the given
      * access type.
-     * 
+     *
      * \param Access                    Access type.
      */
     template<class Access>
     struct access_member_type:
         QnTypeTraits::remove_cvr<decltype(invoke(
-            std::declval<typename Access::template at<getter_type, void>::type::result_type>(), 
+            std::declval<typename Access::template at<getter_type, void>::type::result_type>(),
             std::declval<typename Access::template at<object_declval_type, void>::type::result_type>()
         ))>
     {}; // TODO: #Elric can be simplified with std::declval<Access>
@@ -143,7 +143,7 @@ namespace QnFusion {
     /**
      * This metafunction returns a category of the setter specified by the
      * given access type.
-     * 
+     *
      * \tparam Access                   Access type.
      * \see QnFusion::AccessAdaptor
      */
@@ -157,14 +157,14 @@ namespace QnFusion {
 
 
     /**
-     * This class defines the access interface, which is an external interface 
+     * This class defines the access interface, which is an external interface
      * that is to be used by visitor classes.
      */
     template<class Base>
     struct AccessAdaptor {
     public:
-        template<class Key, class Default> 
-        struct at: 
+        template<class Key, class Default>
+        struct at:
             Base::template at<Key, Default>
         {};
 
@@ -192,11 +192,11 @@ namespace QnFusion {
 
     /**
      * This metafunction returns whether the given type is fusion-adapted.
-     * 
+     *
      * \tparam T                        Type to check.
      */
     template<class T>
-    struct is_adapted: 
+    struct is_adapted:
         QnFusionDetail::is_adapted<T>
     {};
 
@@ -215,8 +215,8 @@ namespace QnFusionDetail {
 
 
 /**
- * This macro generates several functions for the given fusion-adapted type. 
- * Tokens for the functions to generate are passed in FUNCTION_SEQ parameter. 
+ * This macro generates several functions for the given fusion-adapted type.
+ * Tokens for the functions to generate are passed in FUNCTION_SEQ parameter.
  * Accepted tokens are:
  * <ul>
  * <li> <tt>binary</tt>         --- bns (de)serialization functions. </li>
@@ -228,7 +228,7 @@ namespace QnFusionDetail {
  * <li> <tt>hash</tt>           --- <tt>qHash</tt> function. </li>
  * <li> <tt>sql_record</tt>     --- sql record bind/fetch functions. </li>
  * </ul>
- * 
+ *
  * \param TYPE                          Fusion-adapted type to define functions for.
  * \param FUNCTION_SEQ                  Preprocessor sequence of functions to define.
  * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
@@ -242,12 +242,12 @@ namespace QnFusionDetail {
 
 /**
  * Same as QN_FUSION_DEFINE_FUNCTIONS, but for several types.
- * 
+ *
  * \param CLASS_SEQ                     Preprocessor sequence of fusion-adapted types
  *                                      to define functions for.
  * \param FUNCTION_SEQ                  Preprocessor sequence of functions to define.
  * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
- * 
+ *
  * \see QN_FUSION_DEFINE_FUNCTIONS
  */
 #define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(CLASS_SEQ, FUNCTION_SEQ, ... /* PREFIX */) \

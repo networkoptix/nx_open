@@ -11,8 +11,8 @@ namespace QnCompressedTimeDetail {
     template<class Output>
     class SerializationVisitor {
     public:
-        SerializationVisitor(QnCompressedTimeWriter<Output> *stream): 
-            m_stream(stream) 
+        SerializationVisitor(QnCompressedTimeWriter<Output> *stream):
+            m_stream(stream)
         {}
 
 
