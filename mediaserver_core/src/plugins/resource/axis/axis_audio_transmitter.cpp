@@ -30,7 +30,10 @@ QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res):
     m_noAuth(false),
     m_state(TransmitterState::WaitingForConnection)
 {
-    connect(m_resource, &QnResource::parentIdChanged, this, [this]() { pleaseStop(); });
+    connect(m_resource, &QnResource::parentIdChanged, this, [this]()
+    {
+        pleaseStop();
+    }, Qt::DirectConnection);
 }
 
 QnAxisAudioTransmitter::~QnAxisAudioTransmitter()
