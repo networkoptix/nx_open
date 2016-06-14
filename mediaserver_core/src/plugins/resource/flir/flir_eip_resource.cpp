@@ -567,6 +567,15 @@ QnIOPortDataList QnFlirEIPResource::getInputPortList() const
 void QnFlirEIPResource::stopInputPortMonitoringAsync()
 {
     QnMutexLocker lock(&m_ioMutex);
+
+    QObject::disconnect(
+        m_eipAsyncClient.get(), &EIPAsyncClient::done,
+        this, &QnFlirEIPResource::checkInputPortStatusDone);
+
+    QObject::disconnect(
+        m_alarmsEipAsyncClient.get(), &EIPAsyncClient::done,
+        this, &QnFlirEIPResource::routeAlarmMonitoringFlow);
+
     m_inputPortMonitored = false;
 }
 
