@@ -100,6 +100,7 @@ private:
     bool configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
     bool updateDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
 
+    /** input & output */
     template<typename InputData, typename OutputData, typename ManagerType>
     void registerHttpHandler(
         const char* handlerPath,
@@ -107,6 +108,40 @@ private:
             const AuthorizationInfo& authzInfo,
             InputData inputData,
             std::function<void(api::ResultCode, OutputData)> completionHandler),
+        ManagerType* manager,
+        EntityType entityType,
+        DataActionType dataActionType);
+
+    /** input, no output */
+    template<typename InputData, typename ManagerType>
+    void registerHttpHandler(
+        const char* handlerPath,
+        void (ManagerType::*managerFunc)(
+            const AuthorizationInfo& authzInfo,
+            InputData inputData,
+            std::function<void(api::ResultCode)> completionHandler),
+        ManagerType* manager,
+        EntityType entityType,
+        DataActionType dataActionType);
+
+    /** no input, output */
+    template<typename OutputData, typename ManagerType>
+    void registerHttpHandler(
+        const char* handlerPath,
+        void (ManagerType::*managerFunc)(
+            const AuthorizationInfo& authzInfo,
+            std::function<void(api::ResultCode, OutputData)> completionHandler),
+        ManagerType* manager,
+        EntityType entityType,
+        DataActionType dataActionType);
+
+    /** no input, no output */
+    template<typename ManagerType>
+    void registerHttpHandler(
+        const char* handlerPath,
+        void (ManagerType::*managerFunc)(
+            const AuthorizationInfo& authzInfo,
+            std::function<void(api::ResultCode)> completionHandler),
         ManagerType* manager,
         EntityType entityType,
         DataActionType dataActionType);

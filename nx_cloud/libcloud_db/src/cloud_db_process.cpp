@@ -30,13 +30,7 @@
 
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
-#include "http_handlers/activate_account_handler.h"
-#include "http_handlers/add_account_handler.h"
 #include "http_handlers/bind_system_handler.h"
-#include "http_handlers/get_account_handler.h"
-#include "http_handlers/update_account_handler.h"
-#include "http_handlers/reset_password_handler.h"
-#include "http_handlers/reactivate_account_handler.h"
 #include "http_handlers/get_access_role_list.h"
 #include "http_handlers/get_cloud_users_of_system.h"
 #include "http_handlers/get_systems_handler.h"
@@ -190,9 +184,9 @@ int CloudDBProcess::exec()
         //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
         authRestrictionList.allow(PingHandler::kHandlerPath, AuthMethod::noAuth);
-        authRestrictionList.allow(AddAccountHttpHandler::kHandlerPath, AuthMethod::noAuth);
-        authRestrictionList.allow(ActivateAccountHandler::kHandlerPath, AuthMethod::noAuth);
-        authRestrictionList.allow(ReactivateAccountHttpHandler::kHandlerPath, AuthMethod::noAuth);
+        authRestrictionList.allow(kAccountRegisterPath, AuthMethod::noAuth);
+        authRestrictionList.allow(kAccountActivatePath, AuthMethod::noAuth);
+        authRestrictionList.allow(kAccountReactivatePath, AuthMethod::noAuth);
 
         std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
         authDataProviders.push_back(&accountManager);
@@ -337,46 +331,41 @@ void CloudDBProcess::registerApiHandlers(
 {
     msgDispatcher->registerRequestProcessor<PingHandler>(
         PingHandler::kHandlerPath,
-        [&authorizationManager]() -> std::unique_ptr<PingHandler> {
-            return std::make_unique<PingHandler>( authorizationManager );
-        } );
+        [&authorizationManager]() -> std::unique_ptr<PingHandler>
+        {
+            return std::make_unique<PingHandler>(authorizationManager);
+        });
 
     //accounts
-    msgDispatcher->registerRequestProcessor<AddAccountHttpHandler>(
-        AddAccountHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<AddAccountHttpHandler> {
-            return std::make_unique<AddAccountHttpHandler>( accountManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAccountRegisterPath,
+        &AccountManager::addAccount, accountManager,
+        EntityType::account, DataActionType::insert);
 
-    msgDispatcher->registerRequestProcessor<ActivateAccountHandler>(
-        ActivateAccountHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<ActivateAccountHandler> {
-            return std::make_unique<ActivateAccountHandler>( accountManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAccountActivatePath,
+        &AccountManager::activate, accountManager,
+        EntityType::account, DataActionType::update);
 
-    msgDispatcher->registerRequestProcessor<GetAccountHttpHandler>(
-        GetAccountHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<GetAccountHttpHandler> {
-            return std::make_unique<GetAccountHttpHandler>( accountManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAccountGetPath,
+        &AccountManager::getAccount, accountManager,
+        EntityType::account, DataActionType::fetch);
 
-    msgDispatcher->registerRequestProcessor<UpdateAccountHttpHandler>(
-        UpdateAccountHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<UpdateAccountHttpHandler> {
-            return std::make_unique<UpdateAccountHttpHandler>( accountManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAccountUpdatePath,
+        &AccountManager::updateAccount, accountManager,
+        EntityType::account, DataActionType::update);
 
-    msgDispatcher->registerRequestProcessor<ResetPasswordHttpHandler>(
-        ResetPasswordHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<ResetPasswordHttpHandler> {
-            return std::make_unique<ResetPasswordHttpHandler>( accountManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAccountPasswordResetPath,
+        &AccountManager::resetPassword, accountManager,
+        EntityType::account, DataActionType::update);
 
-    msgDispatcher->registerRequestProcessor<ReactivateAccountHttpHandler>(
-        ReactivateAccountHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<ReactivateAccountHttpHandler> {
-            return std::make_unique<ReactivateAccountHttpHandler>( accountManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAccountReactivatePath,
+        &AccountManager::reactivateAccount, accountManager,
+        EntityType::account, DataActionType::update);
 
     registerHttpHandler(
         kAccountCreateTemporaryCredentialsPath,
@@ -561,6 +550,85 @@ void CloudDBProcess::registerHttpHandler(
                 dataActionType,
                 *m_authorizationManager,
                 std::bind(managerFunc, manager, _1, _2, _3));
+        });
+}
+
+template<typename InputData, typename ManagerType>
+void CloudDBProcess::registerHttpHandler(
+    const char* handlerPath,
+    void (ManagerType::*managerFunc)(
+        const AuthorizationInfo& authzInfo,
+        InputData inputData,
+        std::function<void(api::ResultCode)> completionHandler),
+    ManagerType* manager,
+    EntityType entityType,
+    DataActionType dataActionType)
+{
+    typedef AbstractFiniteMsgBodyHttpHandler<InputData> HttpHandlerType;
+
+    m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
+        handlerPath,
+        [this, managerFunc, manager, entityType, dataActionType]()
+            -> std::unique_ptr<HttpHandlerType>
+        {
+            using namespace std::placeholders;
+            return std::make_unique<HttpHandlerType>(
+                entityType,
+                dataActionType,
+                *m_authorizationManager,
+                std::bind(managerFunc, manager, _1, _2, _3));
+        });
+}
+
+template<typename OutputData, typename ManagerType>
+void CloudDBProcess::registerHttpHandler(
+    const char* handlerPath,
+    void (ManagerType::*managerFunc)(
+        const AuthorizationInfo& authzInfo,
+        std::function<void(api::ResultCode, OutputData)> completionHandler),
+    ManagerType* manager,
+    EntityType entityType,
+    DataActionType dataActionType)
+{
+    typedef AbstractFiniteMsgBodyHttpHandler<void, OutputData> HttpHandlerType;
+
+    m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
+        handlerPath,
+        [this, managerFunc, manager, entityType, dataActionType]()
+            -> std::unique_ptr<HttpHandlerType>
+        {
+            using namespace std::placeholders;
+            return std::make_unique<HttpHandlerType>(
+                entityType,
+                dataActionType,
+                *m_authorizationManager,
+                std::bind(managerFunc, manager, _1, _2));
+        });
+}
+
+template<typename ManagerType>
+void CloudDBProcess::registerHttpHandler(
+    const char* handlerPath,
+    void (ManagerType::*managerFunc)(
+        const AuthorizationInfo& authzInfo,
+        std::function<void(api::ResultCode)> completionHandler),
+    ManagerType* manager,
+    EntityType entityType,
+    DataActionType dataActionType)
+{
+    typedef AbstractFiniteMsgBodyHttpHandler<void, void> HttpHandlerType;
+
+    m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
+        handlerPath,
+        [this, managerFunc, manager, entityType, dataActionType]()
+            -> std::unique_ptr<HttpHandlerType>
+        {
+            using namespace std::placeholders;
+            return std::make_unique<HttpHandlerType>(
+                entityType,
+                dataActionType,
+                *m_authorizationManager,
+                std::bind(managerFunc, manager, _1, _2));
         });
 }
 
