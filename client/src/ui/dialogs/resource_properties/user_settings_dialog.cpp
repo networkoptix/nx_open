@@ -206,6 +206,8 @@ void QnUserSettingsDialog::applyChanges()
                 page.widget->applyChanges();
         }
     });
+    /* We may fill password field to change current user password. */
+    m_user->setPassword(QString());
 
     if (m_model->mode() == QnUserSettingsModel::NewUser)
     {
