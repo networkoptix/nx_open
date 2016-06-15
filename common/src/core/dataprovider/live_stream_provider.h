@@ -50,15 +50,15 @@ public:
     virtual void setQuality(Qn::StreamQuality q);
     virtual void setCameraControlDisabled(bool value);
 
-    // for live providers only 
+    // for live providers only
     virtual void setFps(float f);
     bool isMaxFps() const;
 
     void onPrimaryFpsUpdated(int newFps);
     QnLiveStreamParams getLiveParams();
 
-    // I assume this function is called once per video frame 
-    bool needMetaData(); 
+    // I assume this function is called once per video frame
+    bool needMetaData();
 
     void onStreamReopen();
 
@@ -87,8 +87,8 @@ public:
     void filterMotionByMask(const QnMetaDataV1Ptr& motion);
     void updateSoftwareMotionStreamNum();
 
-    void setOwner(QnAbstractVideoCamera* owner);
-    virtual QnAbstractVideoCamera* getOwner() const;
+    void setOwner(QnSharedResourcePointer<QnAbstractVideoCamera> owner);
+    virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
     virtual void pleaseReopenStream() = 0;
 protected:
     /*! Called when @param currentStreamParams are updated */
@@ -142,7 +142,7 @@ private:
                               bool isCameraConfigured );
 
 private:
-    QnAbstractVideoCamera* m_owner;
+    QWeakPointer<QnAbstractVideoCamera> m_owner;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;
