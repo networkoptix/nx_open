@@ -496,6 +496,13 @@ public:
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
+class QnTimelineVisibleActionCondition : public QnActionCondition
+{
+public:
+    QnTimelineVisibleActionCondition(QObject* parent) : QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 class QnToggleTitleBarActionCondition: public QnActionCondition
 {
 public:

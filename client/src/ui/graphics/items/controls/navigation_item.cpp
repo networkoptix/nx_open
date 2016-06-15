@@ -662,16 +662,5 @@ QnImageButtonWidget *QnNavigationItem::newActionButton(QnActions::IDType id)
 
 bool QnNavigationItem::isTimelineRelevant() const
 {
-    auto navigator = this->navigator();
-
-    if (!navigator || !navigator->currentWidget())
-        return false;
-
-    if (!navigator->isPlayingSupported())
-        return false;
-
-    if (navigator->hasArchive())
-        return true;
-
-    return navigator->currentWidget()->resource()->flags().testFlag(Qn::local);
+    return this->navigator() && this->navigator()->isTimelineRelevant();
 }

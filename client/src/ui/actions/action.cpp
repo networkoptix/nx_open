@@ -290,59 +290,55 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
     return Qn::EnabledAction;
 }
 
-bool QnAction::event(QEvent *event) {
-    if (event->type() == QEvent::Shortcut) {
-        // Shortcuts
-        QShortcutEvent *e = static_cast<QShortcutEvent *>(event);
-        if (e->isAmbiguous()) {
-            if(m_flags & Qn::IntentionallyAmbiguous) {
-                QSet<QAction *> actions;
+bool QnAction::event(QEvent *event)
+{
+    if (event->type() != QEvent::Shortcut)
+        return QObject::event(event);
 
-                foreach(QWidget *widget, associatedWidgets())
-                    foreach(QAction *action, widget->actions())
-                        if(action->shortcuts().contains(e->key()))
-                            actions.insert(action);
+    // Shortcuts
+    QShortcutEvent *e = static_cast<QShortcutEvent *>(event);
 
-                foreach(QGraphicsWidget *widget, associatedGraphicsWidgets())
-                    foreach(QAction *action, widget->actions())
-                        if(action->shortcuts().contains(e->key()))
-                            actions.insert(action);
+    if (e->isAmbiguous())
+    {
+        NX_ASSERT(m_flags.testFlag(Qn::IntentionallyAmbiguous), lit("Ambiguous shortcut overload: %1.").arg(e->key().toString()));
 
-                actions.remove(this);
+        QSet<QAction *> actions;
+        for (QWidget *widget : associatedWidgets())
+            for (QAction *action : widget->actions())
+                if (action->shortcuts().contains(e->key()))
+                    actions.insert(action);
 
-                foreach(QAction *action, actions) {
-                    QShortcutEvent se(e->key(), e->shortcutId(), false);
-                    QCoreApplication::sendEvent(action, &se);
-                }
-            } else {
-                qnWarning("Ambiguous shortcut overload: %1.", e->key().toString());
-                return true;
-            }
+        for (QGraphicsWidget *widget : associatedGraphicsWidgets())
+            for (QAction *action : widget->actions())
+                if (action->shortcuts().contains(e->key()))
+                    actions.insert(action);
+
+        /* Just processing current action further. */
+        actions.remove(this);
+
+        for (QAction *action : actions)
+        {
+            QShortcutEvent se(e->key(), e->shortcutId(), false);
+            QCoreApplication::sendEvent(action, &se);
         }
-
-        Qn::ActionScope scope = Qn::InvalidScope;
-        QnActionParameters parameters;
-        QnActionTargetProvider *targetProvider = QnWorkbenchContextAware::menu()->targetProvider();
-        if(targetProvider != NULL) {
-            if(flags() & Qn::ScopelessHotkey) {
-                scope = static_cast<Qn::ActionScope>(static_cast<int>(this->scope()));
-            } else {
-                scope = targetProvider->currentScope();
-            }
-
-            if(flags() & Qn::TargetlessHotkey) {
-                /* Parameters are empty. */
-            } else {
-                parameters = targetProvider->currentParameters(scope);
-            }
-        }
-
-        if(checkCondition(scope, parameters) == Qn::EnabledAction)
-            QnWorkbenchContextAware::menu()->trigger(id(), parameters);
-        return true;
     }
 
-    return QObject::event(event);
+    QnActionParameters parameters;
+    Qn::ActionScope scope = static_cast<Qn::ActionScope>(static_cast<int>(this->scope()));
+
+    if (QnActionTargetProvider *targetProvider = QnWorkbenchContextAware::menu()->targetProvider())
+    {
+         if (!flags().testFlag(Qn::ScopelessHotkey))
+            scope = targetProvider->currentScope();
+
+        if (!flags().testFlag(Qn::TargetlessHotkey))
+            parameters = targetProvider->currentParameters(scope);
+    }
+
+    if (checkCondition(scope, parameters) == Qn::EnabledAction)
+        QnWorkbenchContextAware::menu()->trigger(id(), parameters);
+
+    return true;
 }
 
 void QnAction::updateText() {

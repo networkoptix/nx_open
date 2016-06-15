@@ -41,6 +41,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -638,14 +639,24 @@ Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters
     return context()->workbench()->currentLayout()->items().size() <= 1 ? Qn::DisabledAction : Qn::EnabledAction;
 }
 
-Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources) {
-    if(resources.size() != 1)
+//TODO: #GDM refactor this condition, this will fail in a lot of cases.
+Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources)
+{
+    if (!context()->navigator()->isTimelineRelevant())
         return Qn::InvisibleAction;
 
-    bool watchable = !(resources[0]->flags() & Qn::live) || accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission);
-    return watchable ? Qn::EnabledAction : Qn::InvisibleAction;
+    if (resources.size() != 1)
+        return Qn::InvisibleAction;
 
-    // TODO: #Elric this will fail (?) if we have sync with some UTC resource on the scene.
+    bool watchable = !resources[0]->flags().testFlag(Qn::live);
+    return watchable ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnTimelineVisibleActionCondition::check(const QnActionParameters &parameters)
+{
+    return context()->navigator()->isPlayingSupported()
+        ? Qn::EnabledAction
+        : Qn::InvisibleAction;
 }
 
 Qn::ActionVisibility QnToggleTitleBarActionCondition::check(const QnActionParameters &) {
