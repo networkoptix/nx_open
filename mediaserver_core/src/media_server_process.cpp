@@ -19,6 +19,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
+#include <QtConcurrent>
 #include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
 #include <utils/call_counter/call_counter.h>
@@ -626,6 +627,56 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
     return result.values();
 }
 
+void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProcessor)
+{
+    QtConcurrent::run([messageProcessor, this]
+    {
+        //read server's storages
+        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        ec2::ErrorCode rez;
+        ec2::ApiStorageDataList storages;
+
+        while ((rez = ec2Connection->getMediaServerManager(Qn::kDefaultUserAccess)->getStoragesSync(QnUuid(), &storages)) != ec2::ErrorCode::ok)
+        {
+            NX_LOG( lit("QnMain::run(): Can't get storage list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+        for(const auto& storage: storages)
+        {
+            messageProcessor->updateResource( storage );
+
+            // initialize storage immediately in sync mode
+            if (QnStorageResourcePtr qnStorage =
+                qnResPool->getResourceById(storage.id).dynamicCast<QnStorageResource>())
+            {
+                if (qnStorage->getParentId() == qnCommon->moduleGUID())
+                    qnStorage->initOrUpdate();
+            }
+        }
+        QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
+        if (!storagesToRemove.isEmpty()) {
+            ec2::ApiIdDataList idList;
+            for (const auto& value: storagesToRemove)
+                idList.push_back(value->getId());
+            if (ec2Connection->getMediaServerManager(Qn::kDefaultUserAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)
+                qWarning() << "Failed to remove deprecated storage on startup. Postpone removing to the next start...";
+            qnResPool->removeResources(storagesToRemove);
+        }
+
+        QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);
+        modifiedStorages.append(updateStorages(m_mediaServer));
+        saveStorages(ec2Connection, modifiedStorages);
+        for(const QnStorageResourcePtr &storage: modifiedStorages)
+            messageProcessor->updateResource(storage);
+
+        qnNormalStorageMan->initDone();
+        qnBackupStorageMan->initDone();
+    });
+}
+
+
 void setServerNameAndUrls(
     QnMediaServerResourcePtr server,
     const QString& myAddress, int port, bool isSslAllowed)
@@ -1102,26 +1153,6 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
         messageProcessor->resetServerUserAttributesList( mediaServerUserAttributesList );
 
-        //read server's storages
-        ec2::ApiStorageDataList storages;
-        while ((rez = ec2Connection->getMediaServerManager(Qn::kDefaultUserAccess)->getStoragesSync(QnUuid(), &storages)) != ec2::ErrorCode::ok)
-        {
-            NX_LOG( lit("QnMain::run(): Can't get storage list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        for(const auto& storage: storages)
-        {
-            messageProcessor->updateResource( storage );
-
-            // initialize storage immediately in sync mode
-            if (QnStorageResourcePtr qnStorage = qnResPool->getResourceById(storage.id).dynamicCast<QnStorageResource>())
-            {
-                if (qnStorage->getParentId() == qnCommon->moduleGUID())
-                    qnStorage->initOrUpdate();
-            }
-        }
     }
 
 
@@ -2305,6 +2336,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
     loadResourcesFromECS(messageProcessor.data());
+    initStoragesAsync(messageProcessor.data());
 
     if (isNewServerInstance || systemName.isDefault())
     {
@@ -2382,24 +2414,6 @@ void MediaServerProcess::run()
     }
     MSSettings::roSettings()->sync();
 
-    QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
-    if (!storagesToRemove.isEmpty()) {
-        ec2::ApiIdDataList idList;
-        for (const auto& value: storagesToRemove)
-            idList.push_back(value->getId());
-        if (ec2Connection->getMediaServerManager(Qn::kDefaultUserAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)
-            qWarning() << "Failed to remove deprecated storage on startup. Postpone removing to the next start...";
-        qnResPool->removeResources(storagesToRemove);
-    }
-
-    QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);
-    modifiedStorages.append(updateStorages(m_mediaServer));
-    saveStorages(ec2Connection, modifiedStorages);
-    for(const QnStorageResourcePtr &storage: modifiedStorages)
-        messageProcessor->updateResource(storage);
-
-    qnNormalStorageMan->initDone();
-    qnBackupStorageMan->initDone();
 #ifndef EDGE_SERVER
     //TODO: #GDM make this the common way with other settings
     updateDisabledVendorsIfNeeded();

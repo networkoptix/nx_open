@@ -10,6 +10,7 @@
 #include <iostream>
 #include <list>
 #include <thread>
+#include <type_traits>
 
 #include <QtCore/QDir>
 #include <QtSql/QSqlQuery>
@@ -20,6 +21,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <utils/common/cpp14.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/type_utils.h>
 #include <utils/common/systemerror.h>
 #include <utils/db/db_structure_updater.h>
 #include <utils/common/guard.h>
@@ -30,16 +32,7 @@
 
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
-#include "http_handlers/bind_system_handler.h"
-#include "http_handlers/get_access_role_list.h"
-#include "http_handlers/get_cloud_users_of_system.h"
-#include "http_handlers/get_systems_handler.h"
-#include "http_handlers/update_system_name_handler.h"
-#include "http_handlers/get_cdb_nonce_handler.h"
-#include "http_handlers/get_authentication_response_handler.h"
 #include "http_handlers/ping.h"
-#include "http_handlers/unbind_system_handler.h"
-#include "http_handlers/share_system_handler.h"
 #include "managers/account_manager.h"
 #include "managers/auth_provider.h"
 #include "managers/email_manager.h"
@@ -373,60 +366,51 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::account, DataActionType::update);
 
     //systems
-    msgDispatcher->registerRequestProcessor<BindSystemHandler>(
-        BindSystemHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<BindSystemHandler> {
-            return std::make_unique<BindSystemHandler>( systemManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kSystemBindPath,
+        &SystemManager::bindSystemToAccount, systemManager,
+        EntityType::system, DataActionType::insert);
 
-    msgDispatcher->registerRequestProcessor<GetSystemsHandler>(
-        GetSystemsHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<GetSystemsHandler> {
-            return std::make_unique<GetSystemsHandler>( systemManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kSystemGetPath,
+        &SystemManager::getSystems, systemManager,
+        EntityType::system, DataActionType::fetch);
 
-    msgDispatcher->registerRequestProcessor<UnbindSystemHandler>(
-        UnbindSystemHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<UnbindSystemHandler> {
-            return std::make_unique<UnbindSystemHandler>( systemManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kSystemUnbindPath,
+        &SystemManager::unbindSystem, systemManager,
+        EntityType::system, DataActionType::_delete);
 
-    msgDispatcher->registerRequestProcessor<ShareSystemHttpHandler>(
-        ShareSystemHttpHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<ShareSystemHttpHandler> {
-            return std::make_unique<ShareSystemHttpHandler>(systemManager, authorizationManager);
-        } );
+    registerHttpHandler(
+        kSystemSharePath,
+        &SystemManager::shareSystem, systemManager,
+        EntityType::system, DataActionType::update);
 
-    msgDispatcher->registerRequestProcessor<GetCloudUsersOfSystemHandler>(
-        GetCloudUsersOfSystemHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<GetCloudUsersOfSystemHandler> {
-            return std::make_unique<GetCloudUsersOfSystemHandler>(systemManager, authorizationManager);
-        } );
+    registerHttpHandler(
+        kSystemGetCloudUsersPath,
+        &SystemManager::getCloudUsersOfSystem, systemManager,
+        EntityType::system, DataActionType::fetch);
 
-    msgDispatcher->registerRequestProcessor<GetAccessRoleListHandler>(
-        GetAccessRoleListHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<GetAccessRoleListHandler> {
-            return std::make_unique<GetAccessRoleListHandler>(systemManager, authorizationManager);
-        });
+    registerHttpHandler(
+        kSystemGetAccessRoleListPath,
+        &SystemManager::getAccessRoleList, systemManager,
+        EntityType::system, DataActionType::fetch);
 
-    msgDispatcher->registerRequestProcessor<UpdateSystemNameHttpHandler>(
-        UpdateSystemNameHttpHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<UpdateSystemNameHttpHandler> {
-            return std::make_unique<UpdateSystemNameHttpHandler>(systemManager, authorizationManager);
-        });
+    registerHttpHandler(
+        kSystemUpdateSystemNamePath,
+        &SystemManager::updateSystemName, systemManager,
+        EntityType::system, DataActionType::update);
 
     //authentication
-    msgDispatcher->registerRequestProcessor<GetCdbNonceHandler>(
-        GetCdbNonceHandler::kHandlerPath,
-        [authProvider, &authorizationManager]() -> std::unique_ptr<GetCdbNonceHandler> {
-            return std::make_unique<GetCdbNonceHandler>( authProvider, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAuthGetNoncePath,
+        &AuthenticationProvider::getCdbNonce, authProvider,
+        EntityType::account, DataActionType::fetch);
 
-    msgDispatcher->registerRequestProcessor<GetAuthenticationResponseHandler>(
-        GetAuthenticationResponseHandler::kHandlerPath,
-        [authProvider, &authorizationManager]() -> std::unique_ptr<GetAuthenticationResponseHandler> {
-            return std::make_unique<GetAuthenticationResponseHandler>( authProvider, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAuthGetAuthenticationPath,
+        &AuthenticationProvider::getAuthenticationResponse, authProvider,
+        EntityType::account, DataActionType::fetch);
 }
 
 bool CloudDBProcess::initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManager )
@@ -526,18 +510,24 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     return dbStructureUpdater.updateStructSync();
 }
 
-template<typename InputData, typename OutputData, typename ManagerType>
+template<typename ManagerType, typename InputData, typename... OutputData>
 void CloudDBProcess::registerHttpHandler(
     const char* handlerPath,
     void (ManagerType::*managerFunc)(
         const AuthorizationInfo& authzInfo,
         InputData inputData,
-        std::function<void(api::ResultCode, OutputData)> completionHandler),
+        std::function<void(api::ResultCode, OutputData...)> completionHandler),
     ManagerType* manager,
     EntityType entityType,
     DataActionType dataActionType)
 {
-    typedef AbstractFiniteMsgBodyHttpHandler<InputData, OutputData> HttpHandlerType;
+    typedef typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type
+        ActualOutputDataType;
+
+    typedef AbstractFiniteMsgBodyHttpHandler<
+        typename std::remove_const<typename std::remove_reference<InputData>::type>::type,
+        typename std::remove_const<typename std::remove_reference<ActualOutputDataType>::type>::type
+    > HttpHandlerType;
 
     m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
         handlerPath,
@@ -553,70 +543,22 @@ void CloudDBProcess::registerHttpHandler(
         });
 }
 
-template<typename InputData, typename ManagerType>
+template<typename ManagerType, typename... OutputData>
 void CloudDBProcess::registerHttpHandler(
     const char* handlerPath,
     void (ManagerType::*managerFunc)(
         const AuthorizationInfo& authzInfo,
-        InputData inputData,
-        std::function<void(api::ResultCode)> completionHandler),
+        std::function<void(api::ResultCode, OutputData...)> completionHandler),
     ManagerType* manager,
     EntityType entityType,
     DataActionType dataActionType)
 {
-    typedef AbstractFiniteMsgBodyHttpHandler<InputData> HttpHandlerType;
-
-    m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
-        handlerPath,
-        [this, managerFunc, manager, entityType, dataActionType]()
-            -> std::unique_ptr<HttpHandlerType>
-        {
-            using namespace std::placeholders;
-            return std::make_unique<HttpHandlerType>(
-                entityType,
-                dataActionType,
-                *m_authorizationManager,
-                std::bind(managerFunc, manager, _1, _2, _3));
-        });
-}
-
-template<typename OutputData, typename ManagerType>
-void CloudDBProcess::registerHttpHandler(
-    const char* handlerPath,
-    void (ManagerType::*managerFunc)(
-        const AuthorizationInfo& authzInfo,
-        std::function<void(api::ResultCode, OutputData)> completionHandler),
-    ManagerType* manager,
-    EntityType entityType,
-    DataActionType dataActionType)
-{
-    typedef AbstractFiniteMsgBodyHttpHandler<void, OutputData> HttpHandlerType;
-
-    m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
-        handlerPath,
-        [this, managerFunc, manager, entityType, dataActionType]()
-            -> std::unique_ptr<HttpHandlerType>
-        {
-            using namespace std::placeholders;
-            return std::make_unique<HttpHandlerType>(
-                entityType,
-                dataActionType,
-                *m_authorizationManager,
-                std::bind(managerFunc, manager, _1, _2));
-        });
-}
-
-template<typename ManagerType>
-void CloudDBProcess::registerHttpHandler(
-    const char* handlerPath,
-    void (ManagerType::*managerFunc)(
-        const AuthorizationInfo& authzInfo,
-        std::function<void(api::ResultCode)> completionHandler),
-    ManagerType* manager,
-    EntityType entityType,
-    DataActionType dataActionType)
-{
-    typedef AbstractFiniteMsgBodyHttpHandler<void, void> HttpHandlerType;
+    typedef typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type
+        ActualOutputDataType;
+    typedef AbstractFiniteMsgBodyHttpHandler<
+        void,
+        typename std::remove_const<typename std::remove_reference<ActualOutputDataType>::type>::type
+    > HttpHandlerType;
 
     m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
         handlerPath,

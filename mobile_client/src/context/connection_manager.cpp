@@ -391,7 +391,11 @@ void QnConnectionManagerPrivate::doConnect() {
                 ec2Connection->sendRuntimeData(info.data);
         });
 
-        connect(ec2Connection->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged, QnSyncTime::instance(), static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
+        connect(
+            ec2Connection->getTimeNotificationManager().get(),
+            &ec2::AbstractTimeNotificationManager::timeChanged,
+            QnSyncTime::instance(),
+            static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
 
         qnCommon->setLocalSystemName(connectionInfo.systemName);
         qnCommon->instance<QnUserWatcher>()->setUserName(url.userName());
