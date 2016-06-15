@@ -90,6 +90,7 @@ void QnSpeachSynthesisDataProvider::run()
 void QnSpeachSynthesisDataProvider::afterRun()
 {
     QnAbstractMediaDataPtr endOfStream(new QnEmptyMediaData());
+    endOfStream->dataProvider = this;
     putData(endOfStream);
 }
 
