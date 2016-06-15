@@ -60,7 +60,7 @@ QnVideoCameraPtr QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res)
     QnMutexLocker lock(&m_staticMtx);
     CameraMap::iterator itr = m_cameras.find(res);
     if (itr == m_cameras.end()) {
-        QnVideoCameraPtr result = std::make_shared<QnVideoCamera>(res);
+        QnVideoCameraPtr result(new QnVideoCamera(res));
         m_cameras.insert(res, result);
         return result;
     }
