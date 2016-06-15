@@ -13,6 +13,17 @@ class QnRecentUserConnectionsModel : public QAbstractListModel
     Q_PROPERTY(QString firstUser READ firstUser NOTIFY firstUserChanged)
 
 public:
+    enum Roles
+    {
+        FirstRole = Qt::UserRole + 1,
+
+        UserNameRole = FirstRole,
+        PasswordRole,
+        HasStoredPasswordRole,
+
+        RolesCount
+    };
+
     QnRecentUserConnectionsModel(QObject *parent = nullptr);
 
     virtual ~QnRecentUserConnectionsModel();

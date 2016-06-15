@@ -24,9 +24,9 @@ public:
 };
 
 
-QnContextSettingsPrivate::QnContextSettingsPrivate(QnContextSettings* parent)
-    : q_ptr(parent)
-    , sessionSettings(nullptr)
+QnContextSettingsPrivate::QnContextSettingsPrivate(QnContextSettings* parent) :
+    q_ptr(parent),
+    sessionSettings(nullptr)
 {
     connect(qnSettings, &QnMobileClientSettings::valueChanged, this, &QnContextSettingsPrivate::at_valueChanged);
 }
@@ -67,9 +67,9 @@ void QnContextSettingsPrivate::setSystemId(const QString &id)
 }
 
 
-QnContextSettings::QnContextSettings(QObject* parent)
-    : QObject(parent)
-    , d_ptr(new QnContextSettingsPrivate(this))
+QnContextSettings::QnContextSettings(QObject* parent) :
+    QObject(parent),
+    d_ptr(new QnContextSettingsPrivate(this))
 {
 }
 

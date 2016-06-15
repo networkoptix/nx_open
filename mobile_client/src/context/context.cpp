@@ -132,7 +132,8 @@ QString QnContext::getLastUsedUrl() const
     if (!connectionsModel.hasConnections())
         return QString();
 
-    QString password = connectionsModel.getData(lit("password"), 0).toString();
+    const auto firstIndex = connectionsModel.index(0);
+    QString password = connectionsModel.data(firstIndex, QnRecentUserConnectionsModel::PasswordRole).toString();
     if (password.isEmpty())
         return QString();
 
