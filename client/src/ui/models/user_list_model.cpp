@@ -471,39 +471,45 @@ bool QnSortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex&
 
     switch (sortColumn())
     {
-        case QnUserListModel::UserRoleColumn:
-        {
-            //TODO: #vkutin Implement correct sorting
-
-            qint64 leftPermissions = qnResourceAccessManager->globalPermissions(leftUser);
-            qint64 rightPermissions = qnResourceAccessManager->globalPermissions(rightUser);
-            if (leftPermissions == rightPermissions)
-                break;
-            return leftPermissions > rightPermissions; // Use ">" to make the owner higher than others
-        }
-
         case QnUserListModel::EnabledColumn:
         {
+            if (leftUser->isOwner())
+                return true;
+
             bool leftEnabled = leftUser->isEnabled();
             bool rightEnabled = rightUser->isEnabled();
-            if (leftEnabled == rightEnabled)
-                break;
-            return leftEnabled;
+            if (leftEnabled != rightEnabled)
+                return leftEnabled;
+
+            break;
         }
 
         case QnUserListModel::UserTypeColumn:
         {
             QnUserType leftType = leftUser->userType();
             QnUserType rightType = rightUser->userType();
-            if (leftType == rightType)
-                break;
-            return leftType < rightType;
+            if (leftType != rightType)
+                return leftType < rightType;
+
+            break;
+        }
+
+        case QnUserListModel::FullNameColumn:
+        case QnUserListModel::UserRoleColumn:
+        {
+            QString leftText = left.data(Qt::DisplayRole).toString();
+            QString rightText = right.data(Qt::DisplayRole).toString();
+
+            if (leftText != rightText)
+                return leftText < rightText;
+
+            break;
         }
 
         default:
-            /* We should never sort by CheckBoxColumn. */
             break;
     }
 
+    /* Otherwise sort by login (which is unique): */
     return naturalStringLess(leftUser->getName(), rightUser->getName());
 }
