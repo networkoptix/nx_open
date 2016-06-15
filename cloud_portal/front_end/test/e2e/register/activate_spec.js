@@ -147,7 +147,7 @@ describe('User activation', function () {
         });
     });
 
-    it("link works and does not log out user, if he was logged in", function () {
+    it("link works and logs out user, if he was logged in", function () {
         var userEmail = p.helper.getRandomEmail();
 
         p.helper.register(null, null, userEmail);
@@ -155,8 +155,9 @@ describe('User activation', function () {
         p.getActivationLink(userEmail).then( function(url) {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
-            expect(p.helper.forms.logout.dropdownToggle.isPresent()).toBe(true);
-            expect(p.helper.forms.logout.dropdownToggle.getText()).toContain(p.helper.userEmail);
+            expect(p.helper.forms.logout.dropdownToggle.isDisplayed()).toBe(false);
+            expect(p.messageLoginLink.isDisplayed()).toBe(true);
+            expect(p.helper.forms.login.openLink.isDisplayed()).toBe(true);
         });
     });
 

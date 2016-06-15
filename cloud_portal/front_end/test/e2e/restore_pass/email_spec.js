@@ -7,13 +7,15 @@ describe('Confirmation email', function () {
         p.helper.get(p.helper.urls.restore_password);
     });
 
-    it("link works and does not log out user, if he was logged in", function () {
+    it("link works and logs user out, if he was logged in", function () {
         p.getRestorePassLink(p.helper.userEmail).then(function(url) {
             p.helper.login(p.helper.userEmail2);
             p.helper.get(url);
             p.setNewPassword(p.helper.userPassword);
-            expect(p.helper.forms.logout.dropdownToggle.isPresent()).toBe(true);
-            expect(p.helper.forms.logout.dropdownToggle.getText()).toContain(p.helper.userEmail);
+            p.helper.waitIfNotPresent(p.messageLoginLink, 500);
+            expect(p.helper.forms.logout.dropdownToggle.isDisplayed()).toBe(false);
+            expect(p.messageLoginLink.isDisplayed()).toBe(true);
+            expect(p.helper.forms.login.openLink.isDisplayed()).toBe(true);
         });
     });
 

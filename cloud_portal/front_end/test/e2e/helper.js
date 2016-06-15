@@ -348,6 +348,15 @@ var Helper = function () {
         expect(h.alert.successMessageElem.getText()).toContain(h.alert.alertMessages.restorePassSuccess);
     };
 
+    this.waitIfNotPresent = function(element, timeout) {
+        var timeoutUsed = timeout || 1000;
+        element.isPresent().then( function(isPresent) {
+            if(!isPresent) {
+                browser.sleep(timeoutUsed);
+            }
+        })
+    };
+
     this.isSubstr = function(string, substring) {
         if (string.indexOf(substring) > -1) return true;
     };
