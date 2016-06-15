@@ -24,7 +24,7 @@ struct ModelItem
 
     QnLayoutResourcePtr layoutResource() const { return layout; }
     QString name() const { return layout ? layout->getName() : QString(); }
-    bool isShared() const { return layout ? layout->isShared() : false; }
+    bool isShared() const { return layout && layout->isShared(); }
 };
 
 } // anonymous namespace

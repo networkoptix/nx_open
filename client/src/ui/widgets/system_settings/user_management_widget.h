@@ -38,7 +38,6 @@ public:
     void setColors(const QnUserManagementColors& colors);
 
 private:
-    void at_usersTable_activated(const QModelIndex& index);
     void at_usersTable_clicked(const QModelIndex& index);
     void at_headerCheckStateChanged(Qt::CheckState state);
 
@@ -51,6 +50,7 @@ private:
 
     void modelUpdated();
     void updateSelection();
+    void updateLdapState();
 
     void clearSelection();
     bool enableUser(const QnUserResourcePtr& user, bool enabled);

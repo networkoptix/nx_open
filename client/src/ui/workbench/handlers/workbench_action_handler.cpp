@@ -107,6 +107,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_welcome_screen.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
 
@@ -215,7 +216,12 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(QnActions::OpenLayoutsInNewWindowAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsInNewWindowAction_triggered()));
     connect(action(QnActions::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
-    connect(action(QnActions::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
+    connect(action(QnActions::OpenNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openNewWindowAction_triggered()));
+    
+    connect(action(QnActions::BrowseLocalFilesAction), &QAction::triggered, this, [this]()
+        { setWelcomeScreenVisible(false); });
+    connect(action(QnActions::ShowWelcomeScreenAction), &QAction::triggered, this, [this]()
+        { setWelcomeScreenVisible(true); });
 
     connect(action(QnActions::MediaFileSettingsAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(QnActions::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
@@ -842,6 +848,16 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     qnResourcesChangesManager->saveCamerasCore(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera) {
         camera->setParentId(serverId);
     });
+}
+
+void QnWorkbenchActionHandler::setWelcomeScreenVisible(bool visible)
+{
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    NX_ASSERT(welcomeScreen, "Welcome screen has not been created yet");
+    if (!welcomeScreen)
+        return;
+
+    welcomeScreen->setVisible(visible);
 }
 
 void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {

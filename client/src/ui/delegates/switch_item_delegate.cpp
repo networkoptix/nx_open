@@ -6,9 +6,20 @@
 #include <ui/style/nx_style.h>
 
 
-QnSwitchItemDelegate::QnSwitchItemDelegate(QObject* parent)
-    : base_type(parent)
+QnSwitchItemDelegate::QnSwitchItemDelegate(QObject* parent) :
+    base_type(parent),
+    m_hideDisabledItems(false)
 {
+}
+
+bool QnSwitchItemDelegate::hideDisabledItems() const
+{
+    return m_hideDisabledItems;
+}
+
+void QnSwitchItemDelegate::setHideDisabledItems(bool hide)
+{
+    m_hideDisabledItems = hide;
 }
 
 void QnSwitchItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
@@ -18,6 +29,10 @@ void QnSwitchItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
         /* Init style option: */
         QStyleOptionViewItem opt = option;
         initStyleOption(&opt, index);
+
+        /* Hide disabled, if needed: */
+        if (m_hideDisabledItems && !opt.state.testFlag(QStyle::State_Enabled))
+            return;
 
         /* Draw background and focus marker: */
         opt.features &= ~(QStyleOptionViewItem::HasDisplay | QStyleOptionViewItem::HasDecoration | QStyleOptionViewItem::HasCheckIndicator);
@@ -44,6 +59,7 @@ void QnSwitchItemDelegate::initStyleOption(QStyleOptionViewItem* option, const Q
 {
     base_type::initStyleOption(option, index);
 
+    //TODO: #vkutin #common Refactor this role
     if (index.data(Qn::DisabledRole).toBool())
         option->state &= ~QStyle::State_Enabled;
 
