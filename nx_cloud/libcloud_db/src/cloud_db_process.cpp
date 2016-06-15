@@ -21,6 +21,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <utils/common/cpp14.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/type_utils.h>
 #include <utils/common/systemerror.h>
 #include <utils/db/db_structure_updater.h>
 #include <utils/common/guard.h>
@@ -509,20 +510,23 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     return dbStructureUpdater.updateStructSync();
 }
 
-template<typename InputData, typename OutputData, typename ManagerType>
+template<typename ManagerType, typename InputData, typename... OutputData>
 void CloudDBProcess::registerHttpHandler(
     const char* handlerPath,
     void (ManagerType::*managerFunc)(
         const AuthorizationInfo& authzInfo,
         InputData inputData,
-        std::function<void(api::ResultCode, OutputData)> completionHandler),
+        std::function<void(api::ResultCode, OutputData...)> completionHandler),
     ManagerType* manager,
     EntityType entityType,
     DataActionType dataActionType)
 {
+    typedef typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type
+        ActualOutputDataType;
+
     typedef AbstractFiniteMsgBodyHttpHandler<
         typename std::remove_const<typename std::remove_reference<InputData>::type>::type,
-        typename std::remove_const<typename std::remove_reference<OutputData>::type>::type
+        typename std::remove_const<typename std::remove_reference<ActualOutputDataType>::type>::type
     > HttpHandlerType;
 
     m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
@@ -539,75 +543,22 @@ void CloudDBProcess::registerHttpHandler(
         });
 }
 
-template<typename InputData, typename ManagerType>
+template<typename ManagerType, typename... OutputData>
 void CloudDBProcess::registerHttpHandler(
     const char* handlerPath,
     void (ManagerType::*managerFunc)(
         const AuthorizationInfo& authzInfo,
-        InputData inputData,
-        std::function<void(api::ResultCode)> completionHandler),
+        std::function<void(api::ResultCode, OutputData...)> completionHandler),
     ManagerType* manager,
     EntityType entityType,
     DataActionType dataActionType)
 {
-    typedef AbstractFiniteMsgBodyHttpHandler<
-        typename std::remove_const<typename std::remove_reference<InputData>::type>::type
-    > HttpHandlerType;
-
-    m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
-        handlerPath,
-        [this, managerFunc, manager, entityType, dataActionType]()
-            -> std::unique_ptr<HttpHandlerType>
-        {
-            using namespace std::placeholders;
-            return std::make_unique<HttpHandlerType>(
-                entityType,
-                dataActionType,
-                *m_authorizationManager,
-                std::bind(managerFunc, manager, _1, _2, _3));
-        });
-}
-
-template<typename OutputData, typename ManagerType>
-void CloudDBProcess::registerHttpHandler(
-    const char* handlerPath,
-    void (ManagerType::*managerFunc)(
-        const AuthorizationInfo& authzInfo,
-        std::function<void(api::ResultCode, OutputData)> completionHandler),
-    ManagerType* manager,
-    EntityType entityType,
-    DataActionType dataActionType)
-{
+    typedef typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type
+        ActualOutputDataType;
     typedef AbstractFiniteMsgBodyHttpHandler<
         void,
-        typename std::remove_const<typename std::remove_reference<OutputData>::type>::type
+        typename std::remove_const<typename std::remove_reference<ActualOutputDataType>::type>::type
     > HttpHandlerType;
-
-    m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
-        handlerPath,
-        [this, managerFunc, manager, entityType, dataActionType]()
-            -> std::unique_ptr<HttpHandlerType>
-        {
-            using namespace std::placeholders;
-            return std::make_unique<HttpHandlerType>(
-                entityType,
-                dataActionType,
-                *m_authorizationManager,
-                std::bind(managerFunc, manager, _1, _2));
-        });
-}
-
-template<typename ManagerType>
-void CloudDBProcess::registerHttpHandler(
-    const char* handlerPath,
-    void (ManagerType::*managerFunc)(
-        const AuthorizationInfo& authzInfo,
-        std::function<void(api::ResultCode)> completionHandler),
-    ManagerType* manager,
-    EntityType entityType,
-    DataActionType dataActionType)
-{
-    typedef AbstractFiniteMsgBodyHttpHandler<void, void> HttpHandlerType;
 
     m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
         handlerPath,
