@@ -263,7 +263,7 @@ void MediaServerEmulator::onMessageReceived(
 
     if (message.header.method == stun::cc::methods::udpHolePunchingSyn)
     {
-        hpm::api::UdpHolePunchingSynAck synAckResponse;
+        hpm::api::UdpHolePunchingSynResponse synAckResponse;
         if (m_action <= ActionToTake::sendBadSynAck)
             synAckResponse.connectSessionId = "hren";
         else
@@ -271,7 +271,7 @@ void MediaServerEmulator::onMessageReceived(
         stun::Message synAckMessage(
             nx::stun::Header(
                 nx::stun::MessageClass::successResponse,
-                stun::cc::methods::udpHolePunchingSynAck,
+                hpm::api::UdpHolePunchingSynResponse::kMethod,
                 message.header.transactionId));
         synAckResponse.serialize(&synAckMessage);
         m_stunPipeline->sendMessage(std::move(synAckMessage));
@@ -281,7 +281,10 @@ void MediaServerEmulator::onMessageReceived(
         if (m_action <= ActionToTake::doNotAnswerTunnelChoiceNotification)
             return;
         hpm::api::TunnelConnectionChosenResponse responseData;
-        stun::Message tunnelConnectionChosenResponseMessage;
+        stun::Message tunnelConnectionChosenResponseMessage(
+            stun::Header(
+                stun::MessageClass::request,
+                hpm::api::TunnelConnectionChosenResponse::kMethod));
         responseData.serialize(&tunnelConnectionChosenResponseMessage);
         m_stunPipeline->sendMessage(std::move(tunnelConnectionChosenResponseMessage));
     }

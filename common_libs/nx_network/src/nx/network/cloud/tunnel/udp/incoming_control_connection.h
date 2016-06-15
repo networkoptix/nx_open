@@ -9,8 +9,8 @@
 namespace nx {
 namespace hpm {
 namespace api {
-class UdpHolePunchingSyn;
-class UdpHolePunchingSynAck;
+class UdpHolePunchingSynRequest;
+class UdpHolePunchingSynResponse;
 class TunnelConnectionChosenRequest;
 class TunnelConnectionChosenResponse;
 } // namespace api
@@ -23,7 +23,7 @@ namespace network {
 namespace cloud {
 namespace udp {
 
-class IncommingControlConnection
+class NX_NETWORK_API IncommingControlConnection
 {
 public:
     IncommingControlConnection(
@@ -51,7 +51,7 @@ private:
     template<typename In, typename Out>
     bool tryProcess(stun::Message* response);
 
-    hpm::api::UdpHolePunchingSynAck process(hpm::api::UdpHolePunchingSyn syn);
+    hpm::api::UdpHolePunchingSynResponse process(hpm::api::UdpHolePunchingSynRequest syn);
     hpm::api::TunnelConnectionChosenResponse process(
         hpm::api::TunnelConnectionChosenRequest reqest);
 

@@ -160,7 +160,7 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
     ASSERT_EQ(acceptResults.pop(), SystemError::noError);
 
     {
-        hpm::api::UdpHolePunchingSyn syn;
+        hpm::api::UdpHolePunchingSynRequest syn;
         stun::Message request(stun::Header(
             stun::MessageClass::request, stun::cc::methods::udpHolePunchingSyn));
         syn.serialize(&request);
@@ -197,9 +197,9 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
                         ASSERT_EQ(response.header.messageClass,
                                   stun::MessageClass::successResponse);
                         ASSERT_EQ(response.header.method,
-                                  stun::cc::methods::udpHolePunchingSynAck);
+                                  hpm::api::UdpHolePunchingSynResponse::kMethod);
 
-                        hpm::api::UdpHolePunchingSynAck synAck;
+                        hpm::api::UdpHolePunchingSynResponse synAck;
                         ASSERT_TRUE(synAck.parse(response));
                         ASSERT_EQ(synAck.connectSessionId, kConnectionId.toUtf8());
 

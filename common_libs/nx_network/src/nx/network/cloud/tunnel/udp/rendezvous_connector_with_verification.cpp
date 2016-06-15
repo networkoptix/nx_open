@@ -143,7 +143,7 @@ void RendezvousConnectorWithVerification::onConnectCompleted(
         std::bind(&RendezvousConnectorWithVerification::onMessageReceived, this, _1));
     m_requestPipeline->startReadingConnection();
 
-    hpm::api::UdpHolePunchingSyn synRequest;
+    hpm::api::UdpHolePunchingSynRequest synRequest;
     stun::Message synRequestMessage(
         nx::stun::Header(
             nx::stun::MessageClass::request,
@@ -170,7 +170,7 @@ void RendezvousConnectorWithVerification::onMessageReceived(
 
     switch (message.header.method)
     {
-        case hpm::api::UdpHolePunchingSynAck::kMethod:
+        case hpm::api::UdpHolePunchingSynResponse::kMethod:
             return processUdpHolePunchingSynAck(std::move(message));
 
         case hpm::api::TunnelConnectionChosenRequest::kMethod:
@@ -188,7 +188,7 @@ void RendezvousConnectorWithVerification::onMessageReceived(
 void RendezvousConnectorWithVerification::processUdpHolePunchingSynAck(
     nx::stun::Message message)
 {
-    hpm::api::UdpHolePunchingSynAck synResponse;
+    hpm::api::UdpHolePunchingSynResponse synResponse;
     if (!synResponse.parse(message))
     {
         NX_LOGX(lm("cross-nat %1. Error parsing syn-ack from %2: %3")
@@ -241,7 +241,7 @@ void RendezvousConnectorWithVerification::processTunnelConnectionChosen(
 void RendezvousConnectorWithVerification::onTimeout()
 {
     NX_LOGX(lm("cross-nat %1. Error. %2 timeout has expired "
-               "while waiting for UdpHolePunchingSynAck")
+               "while waiting for UdpHolePunchingSynResponse")
             .arg(connectSessionId()).arg(m_timeout),
         cl_logDEBUG1);
 

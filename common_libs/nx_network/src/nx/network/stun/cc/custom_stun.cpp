@@ -28,8 +28,6 @@ namespace methods {
                 return "connectionResult";
             case udpHolePunchingSyn:
                 return "udpHolePunchingSyn";
-            case udpHolePunchingSynAck:
-                return "udpHolePunchingSynAck";
             case tunnelConnectionChosen:
                 return "tunnelConnectionChosen";
             default:

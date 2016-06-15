@@ -47,12 +47,8 @@ namespace methods
          *            \class UdtHpEndpointList (opt)
          */
         connect,
-
         connectionResult,
-
         udpHolePunchingSyn,
-        udpHolePunchingSynAck,
-
         tunnelConnectionChosen,
     };
 

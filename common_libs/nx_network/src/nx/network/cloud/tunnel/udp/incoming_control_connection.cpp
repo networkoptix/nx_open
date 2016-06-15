@@ -107,9 +107,11 @@ void IncommingControlConnection::processRequest()
         stun::MessageClass::successResponse, 0,
         std::move(m_message.header.transactionId)));
 
+    NX_ASSERT(!response.header.transactionId.isEmpty());
+
     if (!tryProcess<
-            hpm::api::UdpHolePunchingSyn,
-            hpm::api::UdpHolePunchingSynAck>(&response) &&
+            hpm::api::UdpHolePunchingSynRequest,
+            hpm::api::UdpHolePunchingSynResponse>(&response) &&
         !tryProcess<
             hpm::api::TunnelConnectionChosenRequest,
             hpm::api::TunnelConnectionChosenResponse>(&response))
@@ -147,14 +149,14 @@ void IncommingControlConnection::handleError(SystemError::ErrorCode code)
         handler(code);
 }
 
-hpm::api::UdpHolePunchingSynAck IncommingControlConnection::process(
-    hpm::api::UdpHolePunchingSyn syn)
+hpm::api::UdpHolePunchingSynResponse IncommingControlConnection::process(
+    hpm::api::UdpHolePunchingSynRequest syn)
 {
     static_cast<void>(syn);
     NX_LOGX(lm("Send SYN+ACK for connection %1")
         .arg(m_connectionId), cl_logDEBUG1);
 
-    hpm::api::UdpHolePunchingSynAck synAck;
+    hpm::api::UdpHolePunchingSynResponse synAck;
     synAck.connectSessionId = m_connectionId;
     return synAck;
 }
