@@ -499,8 +499,40 @@ module.exports = function (grunt) {
                     args: {} // Target-specific arguments
                 }
             },
-            server:{
-
+            restore_all_pass: {
+                options: {
+                    args: {specs: ['test/e2e/_restore-all-passwords/*spec.js']} // Target-specific arguments
+                }
+            },
+            account: {
+                options: {
+                    args: {specs: ['test/e2e/account/*spec.js']} // Target-specific arguments
+                }
+            },
+            login: {
+                options: {
+                    args: {specs: ['test/e2e/login/*spec.js']} // Target-specific arguments
+                }
+            },
+            register: {
+                options: {
+                    args: {specs: ['test/e2e/register/*spec.js']} // Target-specific arguments
+                }
+            },
+            restore_pass: {
+                options: {
+                    args: {specs: ['test/e2e/restore_pass/*spec.js']} // Target-specific arguments
+                }
+            },
+            system_page: {
+                options: {
+                    args: {specs: ['test/e2e/system_page/*spec.js']} // Target-specific arguments
+                }
+            },
+            systems: {
+                options: {
+                    args: {specs: ['test/e2e/systems/*spec.js']} // Target-specific arguments
+                }
             }
         },
         protractor_webdriver: {
@@ -589,6 +621,9 @@ module.exports = function (grunt) {
         grunt.task.run(['serve']);
     });
 
+    /* Instead of grunt test use following command to run suits separately
+    grunt test-restore-all-pass; grunt test-account; grunt test-login; grunt test-register; grunt test-restore-pass; grunt test-syspage; grunt test-systems
+    */
     grunt.registerTask('test', [
         'clean:server',
         'copy:custom_css',
@@ -601,6 +636,83 @@ module.exports = function (grunt) {
         'protractor:all'
         //'newer:jshint'
         //'karma'
+    ]);
+    grunt.registerTask('test-restore-all-pass', [
+        'clean:server',
+        'copy:custom_css',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:restore_all_pass'
+    ]);
+    grunt.registerTask('test-account', [
+        'clean:server',
+        'copy:custom_css',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:account'
+    ]);
+    grunt.registerTask('test-login', [
+        'clean:server',
+        'copy:custom_css',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:login'
+    ]);
+    grunt.registerTask('test-register', [
+        'clean:server',
+        'copy:custom_css',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:register'
+    ]);
+    grunt.registerTask('test-restore-pass', [
+        'clean:server',
+        'copy:custom_css',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:restore_pass'
+    ]);
+    grunt.registerTask('test-syspage', [
+        'clean:server',
+        'copy:custom_css',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:system_page'
+    ]);
+    grunt.registerTask('test-systems', [
+        'clean:server',
+        'copy:custom_css',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:systems'
     ]);
 
     // Perform backstop:test to compare screenshots for locations specified at backstop.json with latest ones
