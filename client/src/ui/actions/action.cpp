@@ -338,7 +338,8 @@ bool QnAction::event(QEvent *event)
     if (checkCondition(scope, parameters) == Qn::EnabledAction)
         QnWorkbenchContextAware::menu()->trigger(id(), parameters);
 
-    return true;
+    /* Skip shortcut to be handled as usual key event. */
+    return false;
 }
 
 void QnAction::updateText() {
