@@ -71,6 +71,18 @@ void QnAbstractAudioTransmitter::unsubscribe(QnAbstractStreamDataProvider* dataP
     unsubscribeUnsafe(dataProvider);
 }
 
+void QnAbstractAudioTransmitter::removePacketsByProvider(QnAbstractStreamDataProvider* dataProvider)
+{
+    m_dataQueue.lock();
+    for (int i = m_dataQueue.size() - 1; i >= 0; --i)
+    {
+        auto packet = m_dataQueue.atUnsafe(i);
+        if (packet && packet->dataProvider == dataProvider)
+            m_dataQueue.remoteAtUnsafe(i);
+    }
+    m_dataQueue.unlock();
+}
+
 void QnAbstractAudioTransmitter::unsubscribeUnsafe(QnAbstractStreamDataProvider* dataProvider)
 {
     for (auto itr = m_providers.begin(); itr != m_providers.end(); ++itr)
@@ -81,6 +93,7 @@ void QnAbstractAudioTransmitter::unsubscribeUnsafe(QnAbstractStreamDataProvider*
             if (auto owner = provider->getOwner())
                 owner->notInUse(this);
             provider->removeDataProcessor(this);
+            removePacketsByProvider(dataProvider);
             m_providers.erase(itr);
             break;
         }
