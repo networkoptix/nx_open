@@ -127,8 +127,17 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+     <property name="spacing">
+      <number>24</number>
+     </property>
+     <property name="topMargin">
+      <number>8</number>
+     </property>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_8">
+       <property name="spacing">
+        <number>16</number>
+       </property>
        <item>
         <widget class="QGroupBox" name="settingsGroupBox">
          <property name="title">

@@ -33,9 +33,6 @@
        <string>General</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="spacing">
-        <number>16</number>
-       </property>
        <property name="leftMargin">
         <number>16</number>
        </property>
@@ -116,202 +113,195 @@
        <item>
         <layout class="QGridLayout" name="gridLayout_2">
          <property name="topMargin">
-          <number>8</number>
+          <number>12</number>
          </property>
-         <property name="spacing">
-          <number>16</number>
+         <property name="horizontalSpacing">
+          <number>24</number>
          </property>
-         <item row="0" column="0">
-          <widget class="QGroupBox" name="addressGroupBox">
-           <property name="title">
-            <string>Address</string>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-           <layout class="QFormLayout" name="formLayout_5">
-            <property name="horizontalSpacing">
-             <number>8</number>
-            </property>
-            <property name="verticalSpacing">
-             <number>8</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>8</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item row="0" column="1">
-             <layout class="QHBoxLayout" name="horizontalLayout_5">
-              <item>
-               <widget class="QLineEdit" name="ipAddressEdit">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="frame">
-                 <bool>true</bool>
-                </property>
-                <property name="readOnly">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pingButton">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Ping</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Web Page</string>
+         <property name="verticalSpacing">
+          <number>20</number>
+         </property>
+         <item row="0" column="1">
+          <widget class="QnImageControlWidget" name="imageControlWidget" native="true"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QWidget" name="widget_4" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_11">
+            <item>
+             <widget class="QGroupBox" name="audioGroupBox">
+              <property name="title">
+               <string>Audio</string>
               </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="webPageLabel">
-              <property name="text">
-               <string notr="true">&lt;camera url&gt;</string>
-              </property>
-              <property name="openExternalLinks">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="ipAddressLabel">
-              <property name="text">
-               <string>IP Address</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="macAddressLabel">
-              <property name="text">
-               <string>MAC Address</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLineEdit" name="macAddressEdit">
-              <property name="readOnly">
+              <property name="flat">
                <bool>true</bool>
               </property>
+              <layout class="QVBoxLayout" name="verticalLayout">
+               <item>
+                <widget class="QCheckBox" name="enableAudioCheckBox">
+                 <property name="text">
+                  <string>Enable Audio</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QGroupBox" name="authenticationGroupBox">
-           <property name="title">
-            <string>Authentication</string>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-           <layout class="QFormLayout" name="formLayout_4">
-            <property name="fieldGrowthPolicy">
-             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-            </property>
-            <property name="horizontalSpacing">
-             <number>8</number>
-            </property>
-            <property name="verticalSpacing">
-             <number>8</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>8</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QLabel" name="loginLabel">
-              <property name="text">
-               <string>Login</string>
+          <widget class="QWidget" name="widget_3" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <item>
+             <widget class="QGroupBox" name="authenticationGroupBox">
+              <property name="title">
+               <string>Authentication</string>
               </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+              <layout class="QFormLayout" name="formLayout_4">
+               <item row="0" column="0">
+                <widget class="QLabel" name="loginLabel">
+                 <property name="text">
+                  <string>Login</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="loginEdit"/>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="passwordLabel">
+                 <property name="text">
+                  <string>Password</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="passwordEdit">
+                 <property name="echoMode">
+                  <enum>QLineEdit::PasswordEchoOnEdit</enum>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="loginEdit"/>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="passwordLabel">
-              <property name="text">
-               <string>Password</string>
+            <item>
+             <spacer name="verticalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
               </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLineEdit" name="passwordEdit">
-              <property name="echoMode">
-               <enum>QLineEdit::PasswordEchoOnEdit</enum>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
               </property>
-             </widget>
+             </spacer>
             </item>
            </layout>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QnImageControlWidget" name="imageControlWidget" native="true"/>
-         </item>
-         <item row="1" column="1">
-          <widget class="QGroupBox" name="audioGroupBox">
-           <property name="title">
-            <string>Audio</string>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <property name="spacing">
-             <number>8</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>8</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
+         <item row="0" column="0">
+          <widget class="QWidget" name="widget_2" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
-             <widget class="QCheckBox" name="enableAudioCheckBox">
-              <property name="text">
-               <string>Enable Audio</string>
+             <widget class="QGroupBox" name="addressGroupBox">
+              <property name="title">
+               <string>Address</string>
               </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+              <layout class="QFormLayout" name="formLayout_5">
+               <item row="0" column="0">
+                <widget class="QLabel" name="ipAddressLabel">
+                 <property name="text">
+                  <string>IP Address</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <item>
+                  <widget class="QLineEdit" name="ipAddressEdit">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="frame">
+                    <bool>true</bool>
+                   </property>
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pingButton">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>Ping</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Web Page</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="webPageLabel">
+                 <property name="text">
+                  <string notr="true">&lt;camera url&gt;</string>
+                 </property>
+                 <property name="openExternalLinks">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="macAddressLabel">
+                 <property name="text">
+                  <string>MAC Address</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="macAddressEdit">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </item>
             <item>
-             <spacer name="verticalSpacer_2">
+             <spacer name="verticalSpacer_3">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
@@ -352,16 +342,16 @@
       </attribute>
       <layout class="QVBoxLayout" name="recordingLayout">
        <property name="leftMargin">
-        <number>0</number>
+        <number>16</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>16</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>16</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>16</number>
        </property>
        <item>
         <widget class="QnCameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
@@ -372,7 +362,19 @@
       <attribute name="title">
        <string>I/O ports</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_28" stretch="0">
+      <layout class="QVBoxLayout" name="verticalLayout_28">
+       <property name="leftMargin">
+        <number>16</number>
+       </property>
+       <property name="topMargin">
+        <number>16</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
+        <number>16</number>
+       </property>
        <item>
         <widget class="QnIOPortSettingsWidget" name="ioPortSettingsWidget" native="true"/>
        </item>
@@ -383,6 +385,18 @@
        <string>Motion</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,1,0,0,0">
+       <property name="leftMargin">
+        <number>16</number>
+       </property>
+       <property name="topMargin">
+        <number>16</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
+        <number>16</number>
+       </property>
        <item>
         <widget class="QLabel" name="motionAvailableLabel">
          <property name="font">
@@ -593,16 +607,16 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_10">
        <property name="leftMargin">
-        <number>0</number>
+        <number>16</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>16</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>16</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>16</number>
        </property>
        <item>
         <widget class="QnFisheyeSettingsWidget" name="fisheyeSettingsWidget" native="true"/>
@@ -614,6 +628,18 @@
        <string>Advanced</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="leftMargin">
+        <number>16</number>
+       </property>
+       <property name="topMargin">
+        <number>16</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
+        <number>16</number>
+       </property>
        <item>
         <widget class="QnCameraAdvancedSettingsWidget" name="advancedSettingsWidget" native="true"/>
        </item>
@@ -625,16 +651,16 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <property name="leftMargin">
-        <number>0</number>
+        <number>16</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>16</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>16</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>16</number>
        </property>
        <item>
         <widget class="QnCameraExpertSettingsWidget" name="expertSettingsWidget" native="true"/>
@@ -646,6 +672,12 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QnFisheyeSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>ui/widgets/properties/fisheye_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>QnCameraExpertSettingsWidget</class>
    <extends>QWidget</extends>
@@ -668,12 +700,6 @@
    <class>QnTextTickSlider</class>
    <extends>QSlider</extends>
    <header>ui/widgets/properties/text_tick_slider.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QnFisheyeSettingsWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/fisheye_settings_widget.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnCameraAdvancedSettingsWidget</class>
