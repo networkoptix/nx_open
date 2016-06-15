@@ -299,7 +299,8 @@ bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusi
         {
             provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
             transmitter->unsubscribe(provider.data());
-            QnAudioStreamerPool::instance()->destroyActionDataProvider(action);
+            if (provider->processorsCount() == 0)
+                QnAudioStreamerPool::instance()->destroyActionDataProvider(action);
         }
     }
 
