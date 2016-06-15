@@ -56,6 +56,7 @@ protected:
 private:
     virtual void makeRealTimeDelay(const QnConstCompressedAudioDataPtr& audioData);
     void unsubscribeUnsafe(QnAbstractStreamDataProvider* dataProvider);
+    void removePacketsByProvider(QnAbstractStreamDataProvider* dataProvider);
 private:
     QnMutex m_mutex;
     std::map<qint64, QnAbstractStreamDataProviderPtr, std::greater<qint64>> m_providers;
