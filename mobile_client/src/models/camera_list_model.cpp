@@ -2,16 +2,14 @@
 
 #include <QtCore/QUrlQuery>
 
-#include "core/resource/camera_resource.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource_management/resource_pool.h"
-#include "utils/common/id.h"
-#include "utils/common/string.h"
-#include "models/available_camera_list_model.h"
-#include "camera/camera_thumbnail_cache.h"
-#include "mobile_client/mobile_client_roles.h"
-#include "mobile_client/mobile_client_settings.h"
-#include "api/network_proxy_factory.h"
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <utils/common/string.h>
+#include <models/available_camera_list_model.h>
+#include <camera/camera_thumbnail_cache.h>
+#include <mobile_client/mobile_client_roles.h>
+#include <mobile_client/mobile_client_settings.h>
 
 namespace
 {
@@ -24,7 +22,6 @@ namespace
         QnFilteredCameraListModel(QObject* parent)
             : base_type(parent)
         {
-            resetResourcesInternal();
         }
 
         virtual QHash<int, QByteArray> roleNames() const override
@@ -94,6 +91,30 @@ QnCameraListModel::QnCameraListModel(QObject *parent)
 
 QnCameraListModel::~QnCameraListModel()
 {
+}
+
+QString QnCameraListModel::layoutId() const
+{
+    Q_D(const QnCameraListModel);
+    const auto layout = d->model->layout();
+    return layout ? layout->getId().toString() : QString();
+}
+
+void QnCameraListModel::setLayoutId(const QString& layoutId)
+{
+    Q_D(QnCameraListModel);
+
+    QnLayoutResourcePtr layout;
+
+    const auto id = QnUuid::fromStringSafe(layoutId);
+    if (!id.isNull())
+        layout = qnResPool->getResourceById<QnLayoutResource>(id);
+
+    if (d->model->layout() == layout)
+        return;
+
+    d->model->setLayout(layout);
+    emit layoutIdChanged();
 }
 
 void QnCameraListModel::refreshThumbnail(int row)
