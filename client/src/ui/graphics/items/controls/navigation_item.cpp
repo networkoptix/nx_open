@@ -276,6 +276,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(navigator(), &QnWorkbenchNavigator::liveChanged,                this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
     connect(navigator(), &QnWorkbenchNavigator::liveSupportedChanged,       this,   &QnNavigationItem::updateLiveButtonEnabled);
     connect(navigator(), &QnWorkbenchNavigator::playingSupportedChanged,    this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::playingSupportedChanged,    this,   &QnNavigationItem::updateVolumeButtonsEnabled);
     connect(navigator(), &QnWorkbenchNavigator::speedChanged,               this,   &QnNavigationItem::updateSpeedSliderSpeedFromNavigator);
     connect(navigator(), &QnWorkbenchNavigator::speedRangeChanged,          this,   &QnNavigationItem::updateSpeedSliderParametersFromNavigator);
     connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged,          this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
@@ -323,6 +324,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     updateLiveButtonChecked();
     updateLiveButtonEnabled();
     updatePlaybackButtonsEnabled();
+    updateVolumeButtonsEnabled();
 
     updatePlaybackButtonsIcons();
     updateSpeedSliderParametersFromNavigator();
@@ -511,6 +513,12 @@ void QnNavigationItem::updatePlaybackButtonsEnabled()
      * So we making the slider enabled for I/O module to do not make the situation even stranger.
      */
     m_speedSlider->setEnabled(playable);
+}
+
+void QnNavigationItem::updateVolumeButtonsEnabled()
+{
+    bool isTimelineVisible = navigator()->isPlayingSupported();
+    m_muteButton->setEnabled(isTimelineVisible);
 }
 
 void QnNavigationItem::updateMuteButtonChecked()
