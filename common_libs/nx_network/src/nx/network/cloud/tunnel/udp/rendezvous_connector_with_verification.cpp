@@ -82,7 +82,8 @@ void RendezvousConnectorWithVerification::notifyAboutChoosingConnection(
     m_connectCompletionHandler = std::move(completionHandler);
 
     hpm::api::TunnelConnectionChosenRequest tunnelConnectionChosenRequest;
-    stun::Message tunnelConnectionChosenMessage;
+    stun::Message tunnelConnectionChosenMessage(stun::Header(
+        stun::MessageClass::request, hpm::api::TunnelConnectionChosenRequest::kMethod));
     tunnelConnectionChosenRequest.serialize(&tunnelConnectionChosenMessage);
     m_requestPipeline->sendMessage(std::move(tunnelConnectionChosenMessage));
 

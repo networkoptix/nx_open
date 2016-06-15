@@ -134,6 +134,7 @@ public:
     bool operator<(const SocketAddress& rhs) const;
     bool isNull() const;
 
+    static const SocketAddress anyAddress;
 private:
     void initializeFromString(const QString& str);
 };
