@@ -316,12 +316,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
 
             /* Gray out disabled users. */
             if (!user->isEnabled())
-            {
-                /* Highlighted users are brighter. */
-                if (d->checkedUsers.contains(user))
-                    return d->colors.disabledSelectedText;
                 return qApp->palette().color(QPalette::Disabled, QPalette::Text);
-            }
 
             /* Highlight conflicting users. */
             if (user->isLdap() && !d->isUnique(user))

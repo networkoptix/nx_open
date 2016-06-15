@@ -435,6 +435,7 @@ const QnUserManagementColors QnUserManagementWidget::colors() const
 
 void QnUserManagementWidget::setColors(const QnUserManagementColors& colors)
 {
+    //TODO: #vkutin #common Currently these colors are unused, as well as the same color set in QnUserListModelPrivate
     m_colors = colors;
     updateSelection();
 }
