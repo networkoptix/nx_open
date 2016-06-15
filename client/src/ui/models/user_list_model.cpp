@@ -123,6 +123,7 @@ QnUserResourcePtr QnUserListModelPrivate::user(const QModelIndex& index) const
     return userList[index.row()];
 }
 
+//TODO: #vkutin #common Move this function to more suitable place. Rewrite it if needed.
 QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr& user) const
 {
     QStringList permissionStrings;
