@@ -11,53 +11,6 @@
 #include <mobile_client/mobile_client_roles.h>
 #include <mobile_client/mobile_client_settings.h>
 
-namespace
-{
-
-    class QnFilteredCameraListModel : public QnAvailableCameraListModel
-    {
-        using base_type = QnAvailableCameraListModel;
-
-    public:
-        QnFilteredCameraListModel(QObject* parent)
-            : base_type(parent)
-        {
-        }
-
-        virtual QHash<int, QByteArray> roleNames() const override
-        {
-            auto roleNames = base_type::roleNames();
-            roleNames[Qn::ThumbnailRole] = Qn::roleName(Qn::ThumbnailRole);
-            return roleNames;
-        }
-
-        virtual QVariant data(const QModelIndex& index, int role) const override
-        {
-            if (!hasIndex(index.row(), index.column(), index.parent()))
-                return QVariant();
-
-            if (role != Qn::ThumbnailRole)
-                return base_type::data(index, role);
-
-            const auto cache = QnCameraThumbnailCache::instance();
-            NX_ASSERT(cache);
-            if (!cache)
-                return QUrl();
-
-            const auto id = QnUuid::fromStringSafe(base_type::data(index, Qn::UuidRole).toString());
-            if (id.isNull())
-                return QUrl();
-
-            const auto thumbnailId = cache->thumbnailId(id);
-            if (thumbnailId.isEmpty())
-                return QUrl();
-
-            return QUrl(lit("image://thumbnail/") + thumbnailId);
-        }
-    };
-
-} // anonymous namespace
-
 class QnCameraListModelPrivate: public QObject
 {
 public:
@@ -66,12 +19,12 @@ public:
     void at_thumbnailUpdated(const QnUuid& resourceId, const QString& thumbnailId);
 
 public:
-    QnFilteredCameraListModel* model;
+    QnAvailableCameraListModel* model;
 };
 
-QnCameraListModel::QnCameraListModel(QObject *parent)
-    : QSortFilterProxyModel(parent)
-    , d_ptr(new QnCameraListModelPrivate())
+QnCameraListModel::QnCameraListModel(QObject* parent) :
+    base_type(parent),
+    d_ptr(new QnCameraListModelPrivate())
 {
     Q_D(QnCameraListModel);
 
@@ -91,6 +44,37 @@ QnCameraListModel::QnCameraListModel(QObject *parent)
 
 QnCameraListModel::~QnCameraListModel()
 {
+}
+
+QHash<int, QByteArray> QnCameraListModel::roleNames() const
+{
+    auto roleNames = base_type::roleNames();
+    roleNames[Qn::ThumbnailRole] = Qn::roleName(Qn::ThumbnailRole);
+    return roleNames;
+}
+
+QVariant QnCameraListModel::data(const QModelIndex& index, int role) const
+{
+    if (!hasIndex(index.row(), index.column(), index.parent()))
+        return QVariant();
+
+    if (role != Qn::ThumbnailRole)
+        return base_type::data(index, role);
+
+    const auto cache = QnCameraThumbnailCache::instance();
+    NX_ASSERT(cache);
+    if (!cache)
+        return QUrl();
+
+    const auto id = QnUuid::fromStringSafe(base_type::data(index, Qn::UuidRole).toString());
+    if (id.isNull())
+        return QUrl();
+
+    const auto thumbnailId = cache->thumbnailId(id);
+    if (thumbnailId.isEmpty())
+        return QUrl();
+
+    return QUrl(lit("image://thumbnail/") + thumbnailId);
 }
 
 QString QnCameraListModel::layoutId() const
@@ -181,8 +165,8 @@ bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourc
     return name.contains(filterRegExp());
 }
 
-QnCameraListModelPrivate::QnCameraListModelPrivate()
-    : model(new QnFilteredCameraListModel(this))
+QnCameraListModelPrivate::QnCameraListModelPrivate() :
+    model(new QnAvailableCameraListModel(this))
 {
 }
 

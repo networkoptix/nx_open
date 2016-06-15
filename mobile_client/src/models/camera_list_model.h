@@ -12,9 +12,14 @@ class QnCameraListModel : public QSortFilterProxyModel
 
     Q_ENUMS(Qn::ResourceStatus)
 
+    using base_type = QSortFilterProxyModel;
+
 public:
     QnCameraListModel(QObject* parent = nullptr);
     ~QnCameraListModel();
+
+    virtual QHash<int, QByteArray> roleNames() const override;
+    virtual QVariant data(const QModelIndex& index, int role) const override;
 
     QString layoutId() const;
     void setLayoutId(const QString& layoutId);
