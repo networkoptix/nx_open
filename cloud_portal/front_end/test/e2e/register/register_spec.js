@@ -253,9 +253,9 @@ describe('Registration suite', function () {
     });
 
     it("should not allow to access #/register/success #/activate/success by direct input", function () {
-        p.helper.get('#/register/success');
-        expect(browser.getCurrentUrl()).not.toContain("/register/success");
         p.helper.get('#/activate/success');
         expect(browser.getCurrentUrl()).not.toContain("/activate/success");
+        p.helper.get('#/register/success');
+        expect(browser.getCurrentUrl()).not.toContain("/register/success");
     });
 });
