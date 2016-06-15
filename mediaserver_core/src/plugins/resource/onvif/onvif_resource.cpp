@@ -69,6 +69,7 @@ static const unsigned int DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT = 6
 static const unsigned int RENEW_NOTIFICATION_FORWARDING_SECS = 5;
 static const unsigned int MS_PER_SECOND = 1000;
 static const unsigned int PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC = 1;
+static const unsigned int MAX_IO_PORTS_PER_DEVICE = 200;
 
 //Forth times greater than default = 320 x 240
 
@@ -592,9 +593,16 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         capabilitiesResponse.Capabilities->Device->IO->InputConnectors &&
         *capabilitiesResponse.Capabilities->Device->IO->InputConnectors > 0)
     {
+
+        const auto portsCount = *capabilitiesResponse.Capabilities->Device->IO->InputConnectors;
+
+        if (portsCount > MAX_IO_PORTS_PER_DEVICE)
+            return CameraDiagnostics::CameraInvalidParams(
+                QString("Device has too many input ports %1").arg(portsCount));
+
         for (
             int i = 1;
-            i <= *capabilitiesResponse.Capabilities->Device->IO->InputConnectors;
+            i <= portsCount;
             ++i)
         {
             QnIOPortData inputPort;
@@ -3317,6 +3325,13 @@ bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const r
     }
 
     m_relayOutputInfo.clear();
+    if (response.RelayOutputs.size() > MAX_IO_PORTS_PER_DEVICE)
+    {
+        NX_LOG( lit("Device has too many relay outputs. endpoint %1")
+            .arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
+        return false;
+    }
+
     for( size_t i = 0; i < response.RelayOutputs.size(); ++i )
     {
         m_relayOutputInfo.push_back( RelayOutputInfo(
