@@ -101,7 +101,7 @@ QString QnSavedSessionsModel::updateSession(
             emit dataChanged(index, index);
         }
 
-        m_sessionIdByAddress.insert(SocketAddress(address, port), it->id);
+        m_sessionIdByAddress.insert(SocketAddress(address, port), savedId);
     } else {
         QnLoginSession session;
         session.systemName = systemName;
