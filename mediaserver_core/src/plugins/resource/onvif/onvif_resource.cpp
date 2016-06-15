@@ -594,23 +594,29 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         *capabilitiesResponse.Capabilities->Device->IO->InputConnectors > 0)
     {
 
-        const auto portsCount = *capabilitiesResponse.Capabilities->Device->IO->InputConnectors;
+        const auto portsCount = *capabilitiesResponse.Capabilities
+            ->Device
+            ->IO
+            ->InputConnectors;
 
-        if (portsCount > MAX_IO_PORTS_PER_DEVICE)
-            return CameraDiagnostics::CameraInvalidParams(
-                QString("Device has too many input ports %1").arg(portsCount));
-
-        for (
-            int i = 1;
-            i <= portsCount;
-            ++i)
+        if (portsCount <= MAX_IO_PORTS_PER_DEVICE)
         {
-            QnIOPortData inputPort;
-            inputPort.portType = Qn::PT_Input;
-            inputPort.id = lit("%1").arg(i);
-            inputPort.inputName = tr("Input %1").arg(i);
-            allPorts.emplace_back(std::move(inputPort));
+            for (int i = 1; i <= portsCount; ++i)
+            {
+                QnIOPortData inputPort;
+                inputPort.portType = Qn::PT_Input;
+                inputPort.id = lit("%1").arg(i);
+                inputPort.inputName = tr("Input %1").arg(i);
+                allPorts.emplace_back(std::move(inputPort));
+            }
         }
+        else
+        {
+            NX_LOG( lit("Device has too many input ports. Url: %1")
+                .arg(getUrl()), cl_logDEBUG1 );
+        }
+
+            
     }
 
     setIOPorts(std::move(allPorts));
@@ -1410,7 +1416,8 @@ bool QnPlOnvifResource::fetchRelayInputInfo( const CapabilitiesResp& capabilitie
         capabilitiesResponse.Capabilities->Device &&
         capabilitiesResponse.Capabilities->Device->IO &&
         capabilitiesResponse.Capabilities->Device->IO->InputConnectors &&
-        *capabilitiesResponse.Capabilities->Device->IO->InputConnectors > 0 )
+        *capabilitiesResponse.Capabilities->Device->IO->InputConnectors > 0  && 
+        *capabilitiesResponse.Capabilities->Device->IO->InputConnectors < MAX_IO_PORTS_PER_DEVICE)
     {
         //camera has input port
         setCameraCapability( Qn::RelayInputCapability, true );
