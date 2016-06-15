@@ -50,6 +50,7 @@ private:
 
     void modelUpdated();
     void updateSelection();
+    void updateLdapState();
 
     void clearSelection();
     bool enableUser(const QnUserResourcePtr& user, bool enabled);

@@ -131,12 +131,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    auto updateFetchButton = [this]
-    {
-        ui->fetchButton->setEnabled(QnGlobalSettings::instance()->ldapSettings().isValid());
-    };
-
-    connect(QnGlobalSettings::instance(), &QnGlobalSettings::ldapSettingsChanged, this, updateFetchButton);
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::ldapSettingsChanged, this, &QnUserManagementWidget::updateLdapState);
 
     connect(ui->usersTable,              &QTableView::clicked,   this,  &QnUserManagementWidget::at_usersTable_clicked);
     connect(ui->createUserButton,        &QPushButton::clicked,  this,  &QnUserManagementWidget::createUser);
@@ -149,8 +144,6 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     connect(ui->fetchButton,             &QPushButton::clicked,  this,  &QnUserManagementWidget::fetchUsers);
 
     connect(qnCommon, &QnCommonModule::readOnlyChanged, this, &QnUserManagementWidget::loadDataToUi);
-
-    updateFetchButton();
 
     m_sortModel->setDynamicSortFilter(true);
     m_sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -192,13 +185,18 @@ QnUserManagementWidget::~QnUserManagementWidget()
 
 void QnUserManagementWidget::loadDataToUi()
 {
+    ui->createUserButton->setEnabled(!qnCommon->isReadOnly());
+    updateLdapState();
+    modelUpdated();
+}
+
+void QnUserManagementWidget::updateLdapState()
+{
     bool currentUserIsLdap = context()->user() && context()->user()->isLdap();
     ui->ldapSettingsButton->setVisible(!currentUserIsLdap);
-    ui->fetchButton->setVisible(!currentUserIsLdap);
     ui->ldapSettingsButton->setEnabled(!qnCommon->isReadOnly());
-    ui->createUserButton->setEnabled(!qnCommon->isReadOnly());
-    ui->fetchButton->setEnabled(!qnCommon->isReadOnly());
-    modelUpdated();
+    ui->fetchButton->setVisible(!currentUserIsLdap);
+    ui->fetchButton->setEnabled(!qnCommon->isReadOnly() && QnGlobalSettings::instance()->ldapSettings().isValid());
 }
 
 void QnUserManagementWidget::applyChanges()
