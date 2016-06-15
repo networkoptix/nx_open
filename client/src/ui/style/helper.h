@@ -31,6 +31,11 @@ namespace style
         static const int kDefaultTopLevelMargin;        /**< Default layout margin for top-level widgets */
         static const int kDefaultChildMargin;           /**< Default layout margin for child widgets */
         static const QSize kDefaultLayoutSpacing;       /**< Default layout horizontal and vertical spacing */
+        static const int kPanelHeaderHeight;            /**< Height of a panel header, underline excluded */
+        static const QMargins kPanelContentMargins;     /**< Panel content margins, underline included, header excluded */
+        static const int kGroupBoxTopMargin;            /**< Group box top margin, frame excluded */
+        static const QMargins kGroupBoxContentMargins;  /**< Group box content margins, frame width included */
+        static const qreal kGroupBoxCornerRadius;       /**< Group box corner rounding radius */
     };
 
     class Properties

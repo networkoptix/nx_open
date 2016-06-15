@@ -612,26 +612,27 @@ void QnNxStyle::drawPrimitive(
         }
 
         case PE_FrameGroupBox:
-            return;
-
-        case PE_IndicatorViewItemCheck:
         {
-            QStyleOptionViewItem adjustedOption;
-            if (viewItemHoverAdjusted(widget, option, adjustedOption))
-                d->drawCheckBox(painter, &adjustedOption, widget);
-            else
-                d->drawCheckBox(painter, option, widget);
+            if (auto frame = qstyleoption_cast<const QStyleOptionFrame*>(option))
+            {
+                const bool panel = frame->features.testFlag(QStyleOptionFrame::Flat);
+                QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Mid));
 
+                if (panel)
+                {
+                    QnScopedPainterAntialiasingRollback aaRollback(painter, false);
+                    QnScopedPainterPenRollback penRollback(painter, QPen(mainColor.lighter(2).color(), frame->lineWidth));
+                    painter->drawLine(frame->rect.topLeft(), frame->rect.topRight());
+                }
+                else
+                {
+                    QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+                    QnScopedPainterPenRollback penRollback(painter, QPen(mainColor.color(), frame->lineWidth));
+                    painter->drawRoundedRect(QnGeometry::eroded(QRectF(frame->rect), 0.5), Metrics::kGroupBoxCornerRadius, Metrics::kGroupBoxCornerRadius);
+                }
+            }
             return;
         }
-
-        case PE_IndicatorCheckBox:
-            d->drawCheckBox(painter, option, widget);
-            return;
-
-        case PE_IndicatorRadioButton:
-            d->drawRadioButton(painter, option, widget);
-            return;
 
         case PE_FrameTabBarBase:
         case PE_FrameTabWidget:
@@ -688,6 +689,25 @@ void QnNxStyle::drawPrimitive(
 #endif
             return;
         }
+
+        case PE_IndicatorViewItemCheck:
+        {
+            QStyleOptionViewItem adjustedOption;
+            if (viewItemHoverAdjusted(widget, option, adjustedOption))
+                d->drawCheckBox(painter, &adjustedOption, widget);
+            else
+                d->drawCheckBox(painter, option, widget);
+
+            return;
+        }
+
+        case PE_IndicatorCheckBox:
+            d->drawCheckBox(painter, option, widget);
+            return;
+
+        case PE_IndicatorRadioButton:
+            d->drawRadioButton(painter, option, widget);
+            return;
 
         case PE_PanelMenu:
         {
@@ -1032,56 +1052,31 @@ void QnNxStyle::drawComplexControl(
         {
             if (auto groupBox = qstyleoption_cast<const QStyleOptionGroupBox*>(option))
             {
-                painter->save();
-
-                const bool flat = groupBox->features.testFlag(QStyleOptionFrame::Flat);
-
+                const bool panel = groupBox->features.testFlag(QStyleOptionFrame::Flat);
                 QRect labelRect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxLabel, widget);
 
                 if (groupBox->subControls.testFlag(SC_GroupBoxFrame))
                 {
-                    QRect rect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxFrame, widget).adjusted(0, 0, -1, -1);
+                    QStyleOptionFrame frame;
+                    frame.QStyleOption::operator=(*groupBox);
+                    frame.features = groupBox->features;
+                    frame.lineWidth = groupBox->lineWidth;
+                    frame.midLineWidth = 0;
+                    frame.rect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxFrame, widget);
 
-                    QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Dark));
+                    QnScopedPainterClipRegionRollback clipRollback(painter);
+                    if (!panel && labelRect.isValid())
+                        painter->setClipRegion(QRegion(option->rect).subtracted(labelRect));
 
-                    if (flat)
-                    {
-                        painter->setPen(mainColor.lighter(2));
-                        painter->drawLine(rect.topLeft(), rect.topRight());
-                    }
-                    else
-                    {
-                        const int radius = dp(2);
-                        const int spacing = dp(8);
-                        const qreal penWidth = 1.0;
-
-                        QPainterPath path;
-                        path.moveTo(labelRect.left() - spacing, rect.top());
-                        path.lineTo(rect.left() + radius, rect.top());
-                        path.quadTo(rect.left(), rect.top(), rect.left(), rect.top() + radius);
-                        path.lineTo(rect.left(), rect.bottom() - radius);
-                        path.quadTo(rect.left(), rect.bottom(), rect.left() + radius, rect.bottom());
-                        path.lineTo(rect.right() - radius, rect.bottom());
-                        path.quadTo(rect.right(), rect.bottom(), rect.right(), rect.bottom() - radius);
-                        path.lineTo(rect.right(), rect.top() + radius);
-                        path.quadTo(rect.right(), rect.top(), rect.right() - radius, rect.top());
-                        path.lineTo(labelRect.right() + spacing, rect.top());
-
-                        painter->save();
-                        painter->translate(penWidth / 2, penWidth / 2);
-                        painter->setPen(mainColor);
-                        painter->setRenderHint(QPainter::Antialiasing);
-                        painter->drawPath(path);
-                        painter->restore();
-                    }
+                    drawPrimitive(PE_FrameGroupBox, &frame, painter, widget);
                 }
 
                 if (groupBox->subControls.testFlag(SC_GroupBoxLabel))
                 {
-                    int flags = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextHideMnemonic;
-
-                    if (flat)
+                    if (panel)
                     {
+                        const int kTextFlags = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextHideMnemonic;
+
                         QString text = groupBox->text;
                         QString detailText;
 
@@ -1093,7 +1088,6 @@ void QnNxStyle::drawComplexControl(
                         }
 
                         QRect rect = labelRect;
-
                         if (!text.isEmpty())
                         {
                             QFont font = painter->font();
@@ -1102,24 +1096,25 @@ void QnNxStyle::drawComplexControl(
 
                             QnScopedPainterFontRollback fontRollback(painter, font);
 
-                            drawItemText(painter, rect, flags,
-                                groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
+                            drawItemText(painter, rect, kTextFlags, groupBox->palette,
+                                groupBox->state.testFlag(QStyle::State_Enabled),
                                 text, QPalette::Text);
 
-                            rect.setLeft(rect.left() + QFontMetrics(font).size(flags, text).width());
+                            rect.setLeft(rect.left() + QFontMetrics(font).width(text, -1, kTextFlags) + Metrics::kStandardPadding);
                         }
 
                         if (!detailText.isEmpty())
                         {
-                            drawItemText(painter, rect, Qt::AlignCenter | Qt::TextHideMnemonic,
-                                groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
+                            drawItemText(painter, rect, kTextFlags, groupBox->palette,
+                                groupBox->state.testFlag(QStyle::State_Enabled),
                                 detailText, QPalette::WindowText);
                         }
                     }
                     else
                     {
-                        drawItemText(painter, labelRect, flags,
-                            groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
+                        const int kTextFlags = Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextHideMnemonic;
+                        drawItemText(painter, labelRect, kTextFlags, groupBox->palette,
+                            groupBox->state.testFlag(QStyle::State_Enabled),
                             groupBox->text, QPalette::WindowText);
                     }
                 }
@@ -1130,8 +1125,6 @@ void QnNxStyle::drawComplexControl(
                     opt.rect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxCheckBox, widget);
                     drawSwitch(painter, &opt, widget);
                 }
-
-                painter->restore();
 
                 return;
             }
@@ -2023,68 +2016,65 @@ QRect QnNxStyle::subControlRect(
         {
             if (auto groupBox = qstyleoption_cast<const QStyleOptionGroupBox*>(option))
             {
+                bool panel = groupBox->features.testFlag(QStyleOptionFrame::Flat);
                 switch (subControl)
                 {
                     case SC_GroupBoxFrame:
                     {
-                        if (groupBox->features.testFlag(QStyleOptionFrame::Flat))
-                        {
-                            QRect labelRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
-                            rect.setTop(labelRect.bottom() + dp(6));
-                        }
-                        break;
+                        int topMargin = panel ? Metrics::kPanelHeaderHeight : Metrics::kGroupBoxTopMargin;
+                        return option->rect.adjusted(0, topMargin - groupBox->lineWidth, 0, 0);
                     }
 
                     case SC_GroupBoxLabel:
                     {
-                        if (groupBox->features.testFlag(QStyleOptionFrame::Flat))
+                        if (groupBox->text.isEmpty() || !groupBox->subControls.testFlag(SC_GroupBoxLabel))
+                            return QRect();
+
+                        const int kTextFlags = Qt::AlignLeft | Qt::TextHideMnemonic;
+
+                        if (panel)
                         {
-                            if (widget)
+                            QString text = groupBox->text;
+                            QString detailText;
+
+                            int splitPos = text.indexOf(QLatin1Char('\t'));
+                            if (splitPos >= 0)
                             {
-                                QString text = groupBox->text;
-                                QString detailText;
-
-                                int splitPos = text.indexOf(QLatin1Char('\t'));
-                                if (splitPos >= 0)
-                                {
-                                    detailText = text.mid(splitPos + 1);
-                                    text = text.left(splitPos);
-                                }
-
-                                QFont font = widget->font();
-                                font.setPixelSize(font.pixelSize() + 2);
-                                font.setWeight(QFont::DemiBold);
-
-                                int flags = Qt::AlignTop |
-                                            Qt::AlignLeft |
-                                            Qt::TextHideMnemonic;
-
-                                QSize size = QFontMetrics(font).size(flags, text);
-
-                                if (!detailText.isEmpty())
-                                {
-                                    QSize detailSize = QFontMetrics(widget->font())
-                                                       .size(flags, detailText);
-                                    size.rwidth() += detailSize.width();
-                                }
-
-                                rect = QRect(QPoint(), size);
+                                detailText = text.mid(splitPos + 1);
+                                text = text.left(splitPos);
                             }
 
-                            rect.moveLeft(0);
-                            rect.setHeight(dp(18));
+                            QFont font = widget ? widget->font() : QApplication::font();
+                            font.setPixelSize(font.pixelSize() + 2);
+                            font.setWeight(QFont::DemiBold);
+
+                            int textWidth = QFontMetrics(font).width(text, -1, kTextFlags);
+
+                            if (!detailText.isEmpty())
+                            {
+                                int detailWidth = groupBox->fontMetrics.width(detailText, -1, kTextFlags);
+                                textWidth += Metrics::kStandardPadding + detailWidth;
+                            }
+
+                            return QRect(
+                                option->rect.left(),
+                                option->rect.top(),
+                                textWidth,
+                                Metrics::kPanelHeaderHeight);
                         }
-                        else
-                        {
-                            rect.moveLeft(dp(16));
-                        }
-                        break;
+
+                        return QRect(
+                            option->rect.left() + Metrics::kGroupBoxContentMargins.left() - Metrics::kStandardPadding,
+                            option->rect.top(),
+                            groupBox->fontMetrics.width(groupBox->text, -1, kTextFlags) + Metrics::kStandardPadding * 2,
+                            Metrics::kGroupBoxTopMargin * 2);
                     }
 
                     case SC_GroupBoxCheckBox:
                     {
-                        if (groupBox->features.testFlag(QStyleOptionFrame::Flat))
+                        if (panel)
                         {
+                            //TODO: #vkutin Rewrite calculation without calling subControlRect(SC_GroupBoxLabel)
                             QRect boundRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
                             boundRect.setRight(option->rect.right());
                             rect = alignedRect(Qt::LeftToRight, Qt::AlignRight | Qt::AlignVCenter,
@@ -2095,12 +2085,20 @@ QRect QnNxStyle::subControlRect(
 
                     case SC_GroupBoxContents:
                     {
-                        if (groupBox->features.testFlag(QStyleOptionFrame::Flat))
+                        if (panel)
                         {
-                            QRect labelRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
-                            rect.setTop(labelRect.bottom() + dp(10));
+                            return option->rect.adjusted(
+                                Metrics::kPanelContentMargins.left(),
+                                Metrics::kPanelContentMargins.top() + Metrics::kPanelHeaderHeight,
+                               -Metrics::kPanelContentMargins.right(),
+                               -Metrics::kPanelContentMargins.bottom());
                         }
-                        break;
+
+                        return option->rect.adjusted(
+                            Metrics::kGroupBoxContentMargins.left(),
+                            Metrics::kGroupBoxContentMargins.top() + Metrics::kGroupBoxTopMargin,
+                           -Metrics::kGroupBoxContentMargins.right(),
+                           -Metrics::kGroupBoxContentMargins.bottom());
                     }
 
                     default:
@@ -2437,7 +2435,7 @@ QSize QnNxStyle::sizeFromContents(
         case CT_ComboBox:
         {
             bool hasArrow = false;
-            if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
+            if (auto comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
                 hasArrow = comboBox->subControls.testFlag(SC_ComboBoxArrow);
 
             int height = qMax(size.height(), Metrics::kButtonHeight);
@@ -2447,6 +2445,28 @@ QSize QnNxStyle::sizeFromContents(
                              size.width() + hMargin + (hasArrow ? height : hMargin));
 
             return QSize(width, height);
+        }
+
+        case CT_GroupBox:
+        {
+            if (auto groupBox = qstyleoption_cast<const QStyleOptionGroupBox*>(option))
+            {
+                const bool panel = groupBox->features.testFlag(QStyleOptionFrame::Flat);
+                if (panel)
+                {
+                    return size + QSize(
+                        Metrics::kPanelContentMargins.left() + Metrics::kPanelContentMargins.right(),
+                        Metrics::kPanelContentMargins.top() + Metrics::kPanelContentMargins.bottom() + Metrics::kPanelHeaderHeight);
+                }
+                else
+                {
+                    return size + QSize(
+                        Metrics::kGroupBoxContentMargins.left() + Metrics::kGroupBoxContentMargins.right(),
+                        Metrics::kGroupBoxContentMargins.top() + Metrics::kGroupBoxContentMargins.bottom() + Metrics::kGroupBoxTopMargin);
+                }
+            }
+
+            break;
         }
 
         case CT_TabBarTab:
