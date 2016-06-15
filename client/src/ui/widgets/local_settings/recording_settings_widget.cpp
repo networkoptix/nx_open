@@ -102,15 +102,15 @@ void QnRecordingSettingsWidget::loadDataToUi() {
     setScreen(m_settings->screen());
     setPrimaryAudioDeviceName(m_settings->primaryAudioDevice().fullName());
     setSecondaryAudioDeviceName(m_settings->secondaryAudioDevice().fullName());
-    
+
     ui->captureCursorCheckBox->setChecked(m_settings->captureCursor());
     ui->recordingFolderLabel->setText(m_settings->recordingFolder());
 }
 
-void QnRecordingSettingsWidget::applyChanges() 
+void QnRecordingSettingsWidget::applyChanges()
 {
     bool isChanged = false;
-    
+
     if (m_settings->captureMode() != captureMode()) {
         m_settings->setCaptureMode(captureMode());
         isChanged = true;
@@ -161,25 +161,25 @@ bool QnRecordingSettingsWidget::hasChanges() const {
     if (m_settings->captureMode() != captureMode())
         return true;
 
-    if (m_settings->decoderQuality() != decoderQuality()) 
+    if (m_settings->decoderQuality() != decoderQuality())
         return true;
 
-    if (m_settings->resolution() != resolution()) 
+    if (m_settings->resolution() != resolution())
         return true;
 
-    if (m_settings->screen() != screen()) 
+    if (m_settings->screen() != screen())
         return true;
 
-    if (m_settings->primaryAudioDeviceName() != primaryAudioDeviceName()) 
+    if (m_settings->primaryAudioDeviceName() != primaryAudioDeviceName())
         return true;
 
-    if (m_settings->secondaryAudioDeviceName() != secondaryAudioDeviceName()) 
+    if (m_settings->secondaryAudioDeviceName() != secondaryAudioDeviceName())
         return true;
 
-    if (m_settings->captureCursor() != ui->captureCursorCheckBox->isChecked()) 
+    if (m_settings->captureCursor() != ui->captureCursorCheckBox->isChecked())
         return true;
 
-    if (m_settings->recordingFolder() != ui->recordingFolderLabel->text()) 
+    if (m_settings->recordingFolder() != ui->recordingFolderLabel->text())
         return true;
 
     return false;
@@ -224,9 +224,9 @@ void QnRecordingSettingsWidget::setCaptureMode(Qn::CaptureMode c)
 
 Qn::DecoderQuality QnRecordingSettingsWidget::decoderQuality() const
 {
-    // TODO: #Elric. Very bad. Text is set in Designer, enum values in C++ code. 
+    // TODO: #Elric. Very bad. Text is set in Designer, enum values in C++ code.
     // Text should be filled in code, and no assumptions should be made about enum values.
-    return (Qn::DecoderQuality)ui->qualityComboBox->currentIndex(); 
+    return (Qn::DecoderQuality)ui->qualityComboBox->currentIndex();
 }
 
 void QnRecordingSettingsWidget::setDecoderQuality(Qn::DecoderQuality q)
@@ -320,9 +320,16 @@ void QnRecordingSettingsWidget::additionalAdjustSize()
     ui->secondaryDeviceTextLabel->adjustSize();
 }
 
-void QnRecordingSettingsWidget::updateRecordingWarning() {
-    ui->recordingWarningLabel->setVisible(decoderQuality() == Qn::BestQuality &&
-                                          (resolution() == Qn::Exact1920x1080Resolution || resolution() == Qn::NativeResolution ));
+void QnRecordingSettingsWidget::updateRecordingWarning()
+{
+    bool visible = decoderQuality() == Qn::BestQuality &&
+        (resolution() == Qn::Exact1920x1080Resolution || resolution() == Qn::NativeResolution);
+
+    if (ui->recordingWarningLabel->isHidden() != visible)
+        return;
+
+    ui->recordingWarningLabel->setVisible(visible);
+    ui->qualityGroupBox->layout()->activate();
 }
 
 void QnRecordingSettingsWidget::updateDisableAeroCheckbox() {
