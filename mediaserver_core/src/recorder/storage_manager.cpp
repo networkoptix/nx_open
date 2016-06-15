@@ -1425,8 +1425,9 @@ void QnStorageManager::clearSpace(bool forced)
     if (backupOnAndTimerTriggered)
         return;
 
+    if (m_firstStoragesTestDone)
+        testOfflineStorages();
     writeCameraInfoFiles();
-    testOfflineStorages();
 
     // 1. delete old data if cameras have max duration limit
     clearMaxDaysData();
