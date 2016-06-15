@@ -1,0 +1,561 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Duration</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building prosodic models"
+HREF="c1637.html"><LINK
+REL="PREVIOUS"
+TITLE="F0 Generation"
+HREF="x1803.html"><LINK
+REL="NEXT"
+TITLE="Prosody Research"
+HREF="x1973.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1803.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Building prosodic models</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1973.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1900"
+>Duration</A
+></H1
+><P
+>&#13;Like the above prosody phenomena, very simple solutions to predicting 
+durations work surprisingly well, though very good solutions are 
+extremely difficult to achieve. </P
+><P
+>Again the basic strategy is assigning fixed models, simple rules models, 
+complex rule modules, and trained models using the features in the 
+complex rule models. The choice of where to stop depends on the 
+resources available to you and time you wish to spend on the problem. 
+Given a reasonably sized database training a simple CART tree for 
+durations achieves quite acceptable results. This is currently what we 
+do for our English voices in Festival. There are better models out 
+there but we have not fully investigated them or included easy scripts 
+to customize them. </P
+><P
+>The simplest model for duration is a fixed duration for each phone. A 
+value of 100 milliseconds is a reasonable start. This type of model is 
+only of use at initial testing of a diphone database beyond that it 
+sounds too artificial. The Festival function <CODE
+CLASS="VARNAME"
+>SayPhones</CODE
+> uses a 
+fixed duration model, controlled by the value (in ms) in the variable 
+<CODE
+CLASS="VARNAME"
+>FP_duration</CODE
+>. Although there is a fixed duration module in 
+Festival (see the manual) its worthwhile starting off with something 
+a little more interesting. </P
+><P
+>The next level for duration models is to use average durations for the 
+phones. Even when real data isn't available to calculate averages, 
+writing values by hand can be acceptable, basically vowels are longer 
+than consonants, and stops are the shortest. Estimating values for a 
+set of phones can be done by looking at data from another language, (if 
+you are really stuck, see <TT
+CLASS="FILENAME"
+>festival/lib/mrpa_durs.scm}</TT
+>, to get the 
+basic idea of average phone lengths. </P
+><P
+>&#13;In most languages phones are longer at the phrase final and to a lesser 
+extent phrase initial positions. A simple multiplicative factor can be 
+defined for these positions. The next stage from this is a set of rules 
+that modify the basic average based on the context they occur in. For 
+English the best definition of such rules is the duration rules given in 
+chapter 9, [<SPAN
+CLASS="CITATION"
+>allen87</SPAN
+>] (often referred to as the Klatt duration 
+model). The factors used in this may also apply to other languages. A 
+simplified form of this, that we have successfully used for a number of 
+languages, and is often used as our first approximation for a duration 
+rule set is as follows. </P
+><P
+>Here we define a simple decision tree that returns a multiplication 
+factor for a segment 
+<A
+NAME="AEN1916"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;simple_dur_tree<br>
+&nbsp;'<br>
+&nbsp;&nbsp;&nbsp;((R:SylStructure.parent.R:Syllable.p.syl_break&nbsp;&#62;&nbsp;1&nbsp;)&nbsp;;;&nbsp;clause&nbsp;initial<br>
+&nbsp;&nbsp;&nbsp;&nbsp;((R:SylStructure.parent.stress&nbsp;is&nbsp;1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((1.5))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((1.2)))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;((R:SylStructure.parent.syl_break&nbsp;&#62;&nbsp;1)&nbsp;&nbsp;&nbsp;;;&nbsp;clause&nbsp;final<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((R:SylStructure.parent.stress&nbsp;is&nbsp;1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((1.5))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((1.2)))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((R:SylStructure.parent.stress&nbsp;is&nbsp;1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((ph_vc&nbsp;is&nbsp;+)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((1.2))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((1.0)))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((1.0))))))</P
+></BLOCKQUOTE
+>
+You may modify this adding more conditions as much as you want. In 
+addition to the tree you need to define the averages for each phone in 
+your phone set. For reasons we will explain below the format of this 
+information is <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>segname 0.0 average</I
+>"</SPAN
+> as in 
+<A
+NAME="AEN1920"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;simple_phone_data<br>
+'(<br>
+&nbsp;&nbsp;&nbsp;(#&nbsp;0.0&nbsp;0.250)<br>
+&nbsp;&nbsp;&nbsp;(a&nbsp;0.0&nbsp;0.080)<br>
+&nbsp;&nbsp;&nbsp;(e&nbsp;0.0&nbsp;0.080)<br>
+&nbsp;&nbsp;&nbsp;(i&nbsp;0.0&nbsp;0.070)<br>
+&nbsp;&nbsp;&nbsp;(o&nbsp;0.0&nbsp;0.080)<br>
+&nbsp;&nbsp;&nbsp;(u&nbsp;0.0&nbsp;0.070)<br>
+&nbsp;&nbsp;&nbsp;(i0&nbsp;0.0&nbsp;0.040)<br>
+&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;))</P
+></BLOCKQUOTE
+>
+With both these expressions loaded in your voice you 
+may set the following in your voice definition function. 
+setting up this tree and data as the standard and the appropriate 
+duration module. 
+<A
+NAME="AEN1922"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;;;&nbsp;Duration&nbsp;prediction<br>
+&nbsp;&nbsp;(set!&nbsp;duration_cart_tree&nbsp;simple_dur_tree)<br>
+&nbsp;&nbsp;(set!&nbsp;duration_ph_info&nbsp;simple_phone_data)<br>
+&nbsp;&nbsp;(Parameter.set&nbsp;'Duration_Method&nbsp;'Tree_ZScores)</P
+></BLOCKQUOTE
+>
+Though in your voice use voice specific names for the <CODE
+CLASS="VARNAME"
+>simple_</CODE
+> 
+variables otherwise you may class with other voices. </P
+><P
+>&#13;It has been shown [<SPAN
+CLASS="CITATION"
+>campbell91</SPAN
+>] that a better representation for 
+duration for modeling is <I
+CLASS="EMPHASIS"
+>zscores</I
+>, that is number of standard 
+deviations from the mean. The duration module used in the above is 
+actually designed to take a CART tree that returns zscores and uses the 
+information in <CODE
+CLASS="VARNAME"
+>duration_ph_info</CODE
+> to change that into an absolute 
+duration. The two fields after the phone name are mean and standard 
+deviation. The interpretation of this tree and this phone info happens 
+to give the right result when we use the tree to predict factors and 
+have the stddev field contain the average duration, as we did above. </P
+><P
+>However no matter if we use zscores or absolutes, a better way to 
+build a duration model is to train from data rather than arbitrarily 
+selecting modification factors. </P
+><P
+>Given a reasonable sized database we can dump durations and features for 
+each segment in the database. Then we can train a model using those 
+samples. For our English voices we have trained regression models using 
+<TT
+CLASS="FILENAME"
+>wagon</TT
+>, though we include the tools for linear regression models 
+too. </P
+><P
+>An initial set of features to dump might be 
+<A
+NAME="AEN1935"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>segment_duration<br>
+name<br>
+p.name<br>
+n.name<br>
+R:SylStructure.parent.syl_onsetsize<br>
+R:SylStructure.parent.syl_codasize<br>
+R:SylStructure.parent.R:Syllable.n.syl_onsetsize<br>
+R:SylStructure.parent.R:Syllable.p.syl_codasize<br>
+R:SylStructure.parent.position_type<br>
+R:SylStructure.parent.parent.word_numsyls<br>
+pos_in_syl<br>
+syl_initial<br>
+syl_final<br>
+R:SylStructure.parent.pos_in_word<br>
+p.seg_onsetcoda<br>
+seg_onsetcoda<br>
+n.seg_onsetcoda<br>
+pp.ph_vc&nbsp;<br>
+p.ph_vc&nbsp;<br>
+ph_vc&nbsp;<br>
+n.ph_vc&nbsp;<br>
+nn.ph_vc<br>
+pp.ph_vlng&nbsp;<br>
+p.ph_vlng&nbsp;<br>
+ph_vlng&nbsp;<br>
+n.ph_vlng&nbsp;<br>
+nn.ph_vlng<br>
+pp.ph_vheight<br>
+p.ph_vheight<br>
+ph_vheight<br>
+n.ph_vheight<br>
+nn.ph_vheight<br>
+pp.ph_vfront<br>
+p.ph_vfront<br>
+ph_vfront<br>
+n.ph_vfront<br>
+nn.ph_vfront<br>
+pp.ph_vrnd<br>
+p.ph_vrnd<br>
+ph_vrnd<br>
+n.ph_vrnd<br>
+nn.ph_vrnd<br>
+pp.ph_ctype&nbsp;<br>
+p.ph_ctype&nbsp;<br>
+ph_ctype&nbsp;<br>
+n.ph_ctype&nbsp;<br>
+nn.ph_ctype<br>
+pp.ph_cplace<br>
+p.ph_cplace<br>
+ph_cplace<br>
+n.ph_cplace<br>
+nn.ph_cplace<br>
+pp.ph_cvox&nbsp;<br>
+p.ph_cvox&nbsp;<br>
+ph_cvox&nbsp;<br>
+n.ph_cvox&nbsp;<br>
+nn.ph_cvox<br>
+R:SylStructure.parent.R:Syllable.pp.syl_break<br>
+R:SylStructure.parent.R:Syllable.p.syl_break<br>
+R:SylStructure.parent.syl_break<br>
+R:SylStructure.parent.R:Syllable.n.syl_break<br>
+R:SylStructure.parent.R:Syllable.nn.syl_break<br>
+R:SylStructure.parent.R:Syllable.pp.stress&nbsp;<br>
+R:SylStructure.parent.R:Syllable.p.stress&nbsp;<br>
+R:SylStructure.parent.stress&nbsp;<br>
+R:SylStructure.parent.R:Syllable.n.stress&nbsp;<br>
+R:SylStructure.parent.R:Syllable.nn.stress&nbsp;<br>
+R:SylStructure.parent.syl_in<br>
+R:SylStructure.parent.syl_out<br>
+R:SylStructure.parent.ssyl_in<br>
+R:SylStructure.parent.ssyl_out<br>
+R:SylStructure.parent.parent.gpos</P
+></BLOCKQUOTE
+>
+By convention we build duration models in <TT
+CLASS="FILENAME"
+>festival/dur/</TT
+>. 
+We will save the above feature names in <TT
+CLASS="FILENAME"
+>dur.featnames</TT
+>. 
+We can dump the features with the command 
+<A
+NAME="AEN1939"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>dumpfeats&nbsp;-relation&nbsp;Segment&nbsp;-feats&nbsp;dur.featnames&nbsp;-output&nbsp;dur.feats&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;../utts/*.utt</P
+></BLOCKQUOTE
+>
+This will put all the features in the file <TT
+CLASS="FILENAME"
+>dur.feats</TT
+>. For 
+<CODE
+CLASS="VARNAME"
+>wagon</CODE
+> we need to build a feature description file, we can 
+build a first approximation with the <TT
+CLASS="FILENAME"
+>make_wagon_desc</TT
+> 
+script available with the speech tools 
+<A
+NAME="AEN1944"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>make_wagon_desc&nbsp;dur.feats&nbsp;dur.featnames&nbsp;dur.desc</P
+></BLOCKQUOTE
+>
+You will then need to edit <TT
+CLASS="FILENAME"
+>dur.desc</TT
+> to change a number of 
+features from their categorical list (lots of numbers) into type 
+<CODE
+CLASS="VARNAME"
+>float</CODE
+>. Specifically for the above list the features 
+<CODE
+CLASS="VARNAME"
+>segment_duration</CODE
+>, 
+<CODE
+CLASS="VARNAME"
+>R:SylStructure.parent.parent.word_numsyls</CODE
+>, <CODE
+CLASS="VARNAME"
+>pos_in_syl</CODE
+>, 
+<CODE
+CLASS="VARNAME"
+>R:SylStructure.parent.pos_in_word</CODE
+>, 
+<CODE
+CLASS="VARNAME"
+>R:SylStructure.parent.syl_in</CODE
+>, 
+<CODE
+CLASS="VARNAME"
+>R:SylStructure.parent.syl_out</CODE
+>, 
+<CODE
+CLASS="VARNAME"
+>R:SylStructure.parent.ssyl_in</CODE
+> and 
+<CODE
+CLASS="VARNAME"
+>R:SylStructure.parent.ssyl_out</CODE
+> should be declared as floats. </P
+><P
+>We then need to split the data into training and test sets (and further 
+split the train set if we are going to use stepwise CART building. 
+<A
+NAME="AEN1957"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>traintest&nbsp;dur.feats<br>
+traintest&nbsp;dur.feats.train</P
+></BLOCKQUOTE
+>
+We can no build a model using wagon 
+<A
+NAME="AEN1959"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>wagon&nbsp;-data&nbsp;dur.feat.train.train&nbsp;-desc&nbsp;dur.desc&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-test&nbsp;dur.feats.train.test&nbsp;-stop&nbsp;10&nbsp;-stepwise&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-output&nbsp;dur.10.tree&nbsp;<br>
+wagon_test&nbsp;-data&nbsp;dur.feats.test&nbsp;-tree&nbsp;dur.10.tree&nbsp;-desc&nbsp;dur.desc</P
+></BLOCKQUOTE
+>
+You may wish to remove all examples of silence from the data as silence 
+durations typically has quite a different distribution from other 
+phones. In fact it is common that databases include many examples of 
+silence which are not of natural length as they are arbitrary parts of 
+the initial and following silence around the spoken utterances. Their 
+durations are not something that should be trained for. </P
+><P
+>These instructions above will build a tree that predicts absolute 
+values. To get such a tree to work with the zscore module simply make 
+the stddev field above 1. As stated above using zscores typically give 
+better results. Although the correlation of these duration models in 
+the zscore domain may not be as good as training models predicting 
+absolute scores when those predicted scores are convert back into the 
+absolute domain we have found (for English) that the correlations are 
+better, and RMSE smaller. </P
+><P
+>In order to train a zscore model you need to convert the absolute 
+segment durations, to do that you need the means and standard 
+deviations for each segment in your phoneset. </P
+><P
+>There is a whole branch of possible mappings for the distribution of 
+durations: zscores, logs, logs-zscores, etc or even more complex 
+functions [<SPAN
+CLASS="CITATION"
+>bellegarda98</SPAN
+>]. These variations do give some 
+improvements. The intention is to map the distribution to a normal 
+distribution which makes it easier to learn. </P
+><P
+>&#13;Other learning techniques, particularly Sums of Products model 
+([<SPAN
+CLASS="CITATION"
+>sproat98</SPAN
+>] chapter 5), which has been shown to training 
+better even on small amounts of data. </P
+><P
+>&#13;Another technique, which although shouldn't work is to borrow 
+a models trained for another language for which data is available. 
+Actually the duration model used in Festival for the US and UK 
+voices is the same, it was in fact trained from the f2b database, 
+a US English database. As the phone sets are different for 
+US and UK English we trained the models using phonetic 
+features rather than phone names, and trained them in the zscore 
+domain keeping the actual phone names and means and standard 
+deviations separate. Although the models were slightly better 
+if we included the phone names themselves, it was only slightly 
+better and the models were also substantially larger (and took 
+longer to train). Using the phonetic feature offers a more 
+general model (it works for UK English), more compact, quicker 
+learning time and with only a small cost in performance. </P
+><P
+>Also in the German voice developed at OGI, the same English duration 
+model was used. The results are acceptable and are at least better than 
+any hand written rule system that could be written. Improvements in 
+that model are probably only possible by training on real German data. 
+Note however such cross language borrowing of models is unlikely to work 
+in general but there may be cases where it is a reasonable fall back 
+position. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1803.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1973.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>F0 Generation</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c1637.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Prosody Research</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

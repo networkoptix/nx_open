@@ -1,0 +1,238 @@
+
+<appendix id=javaappendix>
+
+	<title>Shared Libraries and GCC</title>
+
+<toc depth=1></toc>
+
+<sect1>
+    <title>Whys and Wherefores</title>
+
+<para>
+On Solaris, and perhaps some other systems, the GCC distribution does
+not build or install shared libraries for some C and C++ support code
+by default. This doesn't cause problems building the speech tools with
+shared libraries for normal use as the system is capable of running
+programs built with a combination of shared and non-shared libraries.
+</para>
+
+<para>
+However, when loading code into Java, all the support needed must be
+in shared libraries. For our purposes, what is needed is shared
+versions of libgcc, which is part of the normal gcc distribution, and
+libstdc++, which is part of the libg++ distribution.
+</para>
+
+<para>
+You may have a shared version of libstdc++ (called libstdc++.so.SOMETHING) 
+if so ignore the related instructions below.
+</para>
+
+<para>
+The following steps are those I followed to build these libraries on
+Solaris 2.5 for use with gcc 2.7.2.1. These instructions should work
+for other GCC versions, replace 2.7.2 in all cases with the version
+number for your GCC - you can find this by running
+<screen width=40>
+	&shellprompt; <userinput>gcc -v</userinput>
+</screen>
+and ignoring the last digit of the version.
+</para>
+
+<para>
+You should probably do the following tasks on the oldest operating
+system version you want to use. For instance we have Solaris 5.5 and
+5.6 machines, so I built my libraries on a 5.5 one.
+</para>
+
+<sect1>
+      <title>What You Need</title>
+
+<para>
+      <itemizedlist>
+	<listitem><para>The gcc distribution.</para> </listitem>
+	<listitem><para>The libg++ distribution</para> </listitem>
+      </itemizedlist>
+I used the GCC distribution version 2.7.2.3 and the libg++ version
+2.7.2, these being the most up to date distributions related to gcc
+2.7.2 available at the time. 
+</para>
+
+
+<sect1>
+      <title>Building libgcc.so</title>
+
+<para>
+If you don't already have GCC installed, it's probably best to do a
+normal GCC compilation and installation before messing about. When you
+have done this do
+<screen width=40>	
+	&shellprompt; <userinput>make clean</userinput>
+</screen>
+in the gcc compilation directory to make sure there are no hang-overs.
+</para>
+
+<para>
+If you have GCC around already, you need to either find the directory
+where it was built or unpack the distribution to get a build
+directory. 
+</para>
+
+<para>
+Configure GCC by typing
+
+	./configure
+
+then compile with
+<screen width=40>	
+	&shellprompt; <userinput>make CC=gcc CFLAGS='-fPIC -O2' libgcc.a</userinput>
+</screen>
+This will build far more than you need, but it's more trouble than
+it's worth to fiddle about to build just what you want.
+</para>
+
+<para>
+You now have all the code you need compiled, all that remains is to
+assemble it into a shared library, the gcc makefile doesn't know how
+to do this.
+</para>
+
+<para>
+We do it by unpacking the normal, unshared library into a
+temporary directory and linking the bits together as follows:
+<screen width=40>	
+	&shellprompt; <userinput>mkdir tmpdir</userinput>
+	&shellprompt; <userinput>cd tmpdir</userinput>
+	&shellprompt; <userinput>ar x ../libgcc.a</userinput>
+	&shellprompt; <userinput>cd ..</userinput>
+	&shellprompt; <userinput>gcc -shared -fno-shared-data -o libgcc.so.2.7.2 tmpdir/*.o</userinput>
+</screen>
+</para>
+</sect1>
+
+<sect1>
+      <title>Building libstdc++.so</title>
+
+<para>
+You can ignore this section if you have a sharable version of
+libstdc++ available. 
+</para>
+
+<para>
+Unpack the libg++ distribution. in the directory this creates run
+<screen width=40>	
+	&shellprompt; <userinput>./configure --enable-shared</userinput>
+</screen>
+The, to build just:
+
+<screen width=40>	
+	&shellprompt; <userinput>make</userinput>
+</screen>
+Again this will build more than you need.
+</para>
+</sect1>
+
+
+<sect1>
+    <title>Where to Put Them</title>
+
+<para>
+If you are brave you could install the shared libraries in a public
+place, for instance /usr/local/lib, however this might cause problems
+with other gcc-compiled programs. A more conservative approach is to
+put it in a dedicated directory and configure speech_tools to look
+there. 
+</para>
+
+<para>
+In either case got to your desired installation directory and do
+<screen width=40>
+	&shellprompt; <userinput>cp GCC_BUILD_DIR/libgcc.so.2.7.2 .</userinput>
+	&shellprompt; <userinput>ln -s libgcc.so.2.7.2 libgcc.so</userinput>
+	&shellprompt; <userinput>cp LIBG++BUILD_DIR/libstdc++/libstdc++.so.2.7.2 .</userinput>
+	&shellprompt; <userinput>ln -s libstdc++.so.2.7.2 libstdc++.so</userinput>
+</screen>
+Where GCC_BUILD_DIR is the directory where you built the gcc library
+and LIBG++BUILD_DIR is where you built the g++ library.
+</para>
+
+<para>
+If you have chosen to put those libraries in a dedicated directory,
+say `/foo/bar/gcc_shared_libs', you should add the following line to
+`speech_tools/config/config'
+<screen width=40>
+	&shellprompt; <userinput>CONFIG_LIBS=-L/foo/bar/gcc_shared_libs</userinput>
+</screen>
+You will have to include that directory in your LD_LIBRARY_PATH when
+running any speech tools program.
+</para>
+</sect1>
+
+<sect1>
+      <title>Checking it's all OK</title>
+
+<para>
+When you have compiled speech_tools, you can check how the libraries
+have been used by going into `speech_tools/main' and doing something
+like...
+</para>
+
+<formalpara>
+	<title>(sh, ksh and bash users)</title>
+<para>
+<screen width=40>
+	&shellprompt; <userinput>LD_LIBRARY_PATH=../lib:/foo/bar/gcc_shared_libs ldd bcat</userinput>
+</screen>
+</para>
+</formalpara>
+
+
+<formalpara>
+	<title>(csh users)</title>
+<para>
+<screen width=40>
+	&shellprompt; <userinput>setenv LD_LIBRARY_PATH ../lib:/foo/bar/gcc_shared_libs</userinput>
+	&shellprompt; <userinput>ldd bcat</userinput>
+</screen>
+</para>
+</formalpara>
+
+<para>
+The result should be something like:
+<screen width=40>
+        libestjava.so.1.1.0.1 =>         ../lib/libestjava.so.1.1.0.1
+        libestbase.so.1.1.0.1 =>         ../lib/libestbase.so.1.1.0.1
+        libeststring.so.1.2 =>   ../lib/libeststring.so.1.2
+        libsocket.so.1 =>        /usr/lib/libsocket.so.1
+        libnsl.so.1 =>   /usr/lib/libnsl.so.1
+        libm.so.1 =>     /usr/lib/libm.so.1
+        libstdc++.so.2.7.2 =>    /foo/bar/gcc_shared_libs/libstdc++.so.2.7.2
+        libgcc.so.2.7.2 =>       /foo/bar/gcc_shared_libs/libgcc.so.2.7.2
+        libc.so.1 =>     /usr/lib/libc.so.1
+        libdl.so.1 =>    /usr/lib/libdl.so.1
+        libmp.so.2 =>    /usr/lib/libmp.so.2
+</screen>
+</para>
+</sect1>
+
+</appendix>
+
+
+
+<!--
+Local Variables:
+mode: sgml
+sgml-doctype:"speechtools.sgml"
+sgml-parent-document:("speechtools.sgml" "chapter" "book")
+sgml-omittag:nil
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
+

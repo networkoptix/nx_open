@@ -1,0 +1,276 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Diphone databases</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building Synthetic Voices"
+HREF="p710.html"><LINK
+REL="PREVIOUS"
+TITLE="Waveform Synthesis"
+HREF="c2236.html"><LINK
+REL="NEXT"
+TITLE="Defining a diphone list"
+HREF="x2304.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c2236.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x2304.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BSV-DIPHONE-CH"
+></A
+>Diphone databases</H1
+><P
+>This chapter describes the processes involved in designing, listing 
+recording, and using a diphone database for a language. </P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN2264"
+>Diphone introduction</A
+></H1
+><P
+>&#13;The basic idea behind building diphone databases is to explicitly list 
+all possible phone-phone transitions in a language. This makes the 
+incorrect but practical and simplifying assumption that co-articulatory 
+effects never go over more than two phones. The exact definition of 
+<I
+CLASS="EMPHASIS"
+>phone</I
+> here is in general nontrivial, and what a "standard" phone 
+set should be is not uncontroversial -- various allophonic variations, 
+such as light and dark /l/, may also be included. Unlike generalized 
+unit selection where multiple occurrences of phones may exists with 
+various distinguishing features, in a diphone database only one 
+occurrence of each diphone is recorded. This makes selection much 
+easier but also makes for a large laborious collection task. </P
+><P
+>&#13;
+In general, the number of diphones in a language is the square of the 
+number of phones. However, in natural human languages, there are 
+phonotactic constraints -- some phone-phone pairs, even whole classes of 
+phones-phone combinations, may not occur at all. These gaps are common 
+in the world's languages. The exact definition of <I
+CLASS="EMPHASIS"
+>never exist</I
+> is 
+also problematic. Humans can often generate those so-called 
+non-existent diphones if they try, and one must always think about phone 
+pairs that cross over word boundaries as well, but even then, certain 
+combinations cannot exist; for example, /hh/ /ng/ in English is probably 
+impossible (we would probably insert a schwa). /ng/ may really only 
+appears after the vowel in a syllable (in coda position); however, in 
+other languages it can appear in syllable-initial position. /hh/ cannot 
+appear at the end of a syllable, though sometimes it may be pronounced 
+when trying to add aspiration to open vowels. </P
+><P
+>Diphone synthesis, and more generally any concatenative synthesis 
+method, makes an absolutely fixed choice about which units exist, and in 
+circumstances where something else is required, a mapping is necessary. 
+When humans are given a context where an unusual phone is desired, for 
+example in a foreign word, they will (often) attempt to produce it even 
+though it falls outside their basic phonetic vocabulary. The 
+articulatory system is flexible enough to produce (or attempt to 
+produce) unfamiliar phones, as we all share the same underlying physical 
+structures. Concatenative synthesizers, however, have a fixed 
+inventory, and cannot reasonably be made to produce anything outside 
+their pre-defined vocabulary. Formant and articulatory synthesizers 
+have the advantage here. This is a basic trade off, concatenative 
+synthesizers typically produce much more natural synthesis than formants 
+synthesizer but at the cost of being only able to produce those phones 
+defined within their inventory. </P
+><P
+>&#13;Since we wish to build voices for arbitrary text-to-speech systems which 
+may include unusual phones, some mapping, typically at the lexical 
+level, can be used to ensure all the required diphones lie within the 
+recorded inventory. The resulting voice will therefore be limited, and 
+unusual phones will lie outside its range. This in many cases is 
+acceptable though if the voice is specifically to be used for 
+pronouncing Scottish place names it would be advisable to include the 
+/X/ phone as in "loch". </P
+><P
+>&#13;In addition to the base phones, various allophonic variations may also 
+be considered. Flapping, as when the /t/ becoming a /dx/ in the word 
+"butter" is an example of an allophonic variation reduction which 
+occurs naturally in American English, and including flaps in the phone 
+set makes the synthetic speech more natural. Stressed and unstressed 
+vowels in Spanish, consonant cluster /r/ verses lone /r/ in English, 
+inter-syllabic diphones verses intra-syllabic ones -- variations like 
+these are well worth considering. Ideally, all such possible variations 
+should be included in a diphone list, but the more variations you 
+include, the larger the diphone set will be -- remember the general rule 
+that the number of diphones is nearly the square of the number of 
+phones. This affects recording time, labeling time and ultimately the 
+database size. Duplicating all the vowels (e.g. stressed/unstressed 
+versions) will significantly increase the database size. </P
+><P
+>&#13;
+
+
+
+
+These inventory questions are open, and depending on the resources you 
+are willing or able to devote, can be extended considerably. It should 
+be clear, however, that such a list is simply a basic set. Alternative 
+synthesis methods and inventories of different unit sizes may produce 
+better results for the amount of work (or data collected). 
+Demi-syllable databases and mixed inventory methods such as Hadifix 
+[<SPAN
+CLASS="CITATION"
+>portele96</SPAN
+>] may give better results under some conditions. Still, 
+controlling the inventory and using acoustic measures rather than 
+linguistic knowledge to define the space of possible units in your 
+inventory has also been attempted as in work like Whistler 
+[<SPAN
+CLASS="CITATION"
+>huang97</SPAN
+>]. The most extreme view where the unit inventory is not 
+predefined at all but based solely on what is available in general 
+speech databases is CHATR [<SPAN
+CLASS="CITATION"
+>campbell96</SPAN
+>]. </P
+><P
+>&#13;Although generalized unit selection can produce <I
+CLASS="EMPHASIS"
+>much</I
+> better 
+synthesis than diphone techniques, using more units makes selecting 
+appropriate ones more difficult. In the basic strategy presented in 
+this section, selection of the appropriate unit from the diphone 
+inventory is trivial, while in a system like CHATR, selection of the 
+appropriate unit is a significantly difficult problem. (See <A
+HREF="c2641.html"
+>the Chapter called <I
+>Unit selection databases</I
+></A
+> on unit 
+selection for more discussion of such techniques). With a 
+harder selection task, it is more likely that mistakes will be made, 
+which in unit selection can give some selections which are much worse 
+worse that diphones, even though other examples may be better. </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c2236.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x2304.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Waveform Synthesis</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p710.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Defining a diphone list</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

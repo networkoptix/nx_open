@@ -1,0 +1,153 @@
+
+ch_track htk to esps to nist: pass
+ch_track htk to ascii to htk: pass
+ch_track htk to htk_user to htk: pass
+../lib/example_data/ch_track.htk
+Number of frames: 200
+Number of channels: 13
+File type: htk
+Frame shift: 0.01
+Channel: 0: c1
+Channel: 1: c2
+Channel: 2: c3
+Channel: 3: c4
+Channel: 4: c5
+Channel: 5: c6
+Channel: 6: c7
+Channel: 7: c8
+Channel: 8: c9
+Channel: 9: c10
+Channel: 10: c11
+Channel: 11: c12
+Channel: 12: E
+Usage: ch_track [input file] -o [output file] [options]
+Summary: change/copy track files
+use "-" to make input and output files stdin/out
+-h               Options help
+-itype <string>  Input file type (optional).  If no type is
+                 specified type is automatically derived from
+                 file's header. Supported types
+                 are: none, esps, est, est_binary, htk, htk_fbank, htk_mfcc, htk_mfcc_e, htk_user, htk_discrete, ssff, xmg, xgraph, ema, ema_swapped, ascii
+
+-ctype <string>  Contour type: F0, track
+
+-s <float>       Frame spacing of input in seconds, for unheadered input file
+
+-startt <float>  Time of first frame, for formats which don't provide this
+
+-c <string>      Select a subset of channels (starts from 0). 
+                 Tracks can have multiple channels. This option 
+                 specifies a list of numbers, refering to the channel 
+                 numbers which are to be used for for processing. 
+
+-start <float>   Extract track starting at this time, 
+                 specified in seconds
+
+-end   <float>   Extract track ending at this time, 
+                 specified in seconds
+
+-from  <int>     Extract track starting at this frame position
+
+-to    <int>     Extract track ending at this frame position
+
+
+-otype <string> {ascii}
+    Output file type, if unspecified ascii is
+    assumed, types are: none, esps, est, est_binary, htk, htk_fbank, htk_mfcc, htk_mfcc_e, htk_user, htk_discrete, ssff, xmg, xgraph, ema, ema_swapped, ascii, label
+
+-S <float>       Frame spacing of output in seconds. If this is 
+    different from the internal spacing, the contour is 
+    resampled at this spacing 
+
+-o <ofile>       Output filename, defaults to stdout
+
+
+-info  Print information about file and header. 
+    This option gives useful information such as file 
+    length, file type, channel names. No output is produced
+
+-track_names <string> 
+    File containing new names for output channels
+
+-diff Differentiate contour. This performs simple 
+    numerical differentiation on the contour by 
+    subtracting the amplitude of the current frame 
+    from the amplitude of the next. Although quick, 
+    this technique is crude and not recommende as the 
+    estimation of the derivate is done on only one point
+
+-delta <int> Make delta coefficients (better form of differentiate).
+    The argument to this option is the regression length of 
+    of the delta calculation and can be between 2 and 4 
+
+-sm <float> Length of smoothing window in seconds. Various types of 
+    smoothing are available for tracks. This options specifies 
+    length of the smooting window which effects the degree of 
+    smoothing, i.e. a longer value means more smoothing 
+
+-smtype <string>  Smooth type, median or mean
+-style <string>  Convert track to other form.  Currently only one form 
+   "label" is supported. This uses a specified cut off to 
+    make a label file, with two labels, one for above the 
+    cut off (-pos) and one for below (-neg)
+
+-t <float> threshold for track to label conversion 
+-neg <string> Name of negative label in track to label conversion 
+-pos <string> Name of positive label in track to label conversion 
+-pc <string>  Combine given tracks in parallel.  If option 
+     is longest, pad shorter tracks to longest, else if 
+     first pad/cut to match first input track 
+AvailablE track file formats:
+        none         unknown track file type
+        esps         entropic sps file
+        est          Edinburgh Speech Tools track file
+        est_binary   Edinburgh Speech Tools track file
+        htk          htk file
+        htk_fbank    htk file (as FBANK)
+        htk_mfcc     htk file (as MFCC)
+        htk_mfcc_e   htk file (as MFCC_E)
+        htk_user     htk file (as USER)
+        htk_discrete htk file (as DISCRETE)
+        ssff         Macquarie University's Simple Signal File Format
+        xmg          xmg file viewer
+        xgraph       xgraph display program format
+        ema          ema
+        ema_swapped  ema, swapped
+        ascii        ascii decimal numbers
+
+../lib/example_data/ch_track.htk
+Number of frames: 200
+Number of channels: 13
+File type: htk
+Frame shift: 0.01
+Channel: 0: c1
+Channel: 1: c2
+Channel: 2: c3
+Channel: 3: c4
+Channel: 4: c5
+Channel: 5: c6
+Channel: 6: c7
+Channel: 7: c8
+Channel: 8: c9
+Channel: 9: c10
+Channel: 10: c11
+Channel: 11: c12
+Channel: 12: E
+tmp/ch_track.esps
+Number of frames: 200
+Number of channels: 13
+File type: esps
+Frame shift: 0.01
+Channel: 0: c1
+Channel: 1: c2
+Channel: 2: c3
+Channel: 3: c4
+Channel: 4: c5
+Channel: 5: c6
+Channel: 6: c7
+Channel: 7: c8
+Channel: 8: c9
+Channel: 9: c10
+Channel: 10: c11
+Channel: 11: c12
+Channel: 12: E

@@ -1,0 +1,467 @@
+<chapter>
+    <title>Basic Classes</title>
+
+<sect1><title>Classes</title>
+<toc depth=2></toc>
+
+
+<sect2><title>Container Classes</title>
+&docpp-HashTables-3;
+&docpp-EST-IMatrix-3;
+&docpp-EST-TMatrix-3;
+&docpp-EST-FMatrix-3;
+&docpp-EST-TList-3;
+&docpp-EST-DVector-3;
+&docpp-EST-FVector-3;
+&docpp-EST-TSimpleVector-3;
+&docpp-EST-TVector-3;
+&docpp-EST-TrieNode-3;
+&docpp-EST-TDeque-3;
+&docpp-EST-TKVI-3;
+&docpp-EST-TKVL-3;
+&docpp-EST-TList-3;
+&docpp-EST-TMatrix-3;
+&docpp-EST-TSimpleVector-3;
+&docpp-EST-StringTrie-3;
+</sect2>
+<sect2><title>String Classes</title>
+&docpp-EST-String-3;
+&docpp-EST-Token-3;
+&docpp-EST-Regex-3;
+</sect2>
+<sect2><title>Support Classes</title>
+&docpp-EST-TStructIterator-3;
+&docpp-EST-TTI-Entry-3;
+&docpp-EST-THandle-3;	
+&docpp-EST-Handleable-3;
+</sect2>
+</sect1>
+
+<sect1><title>Example Code</title>
+<toc depth=2></toc>
+&listexamplesection;
+&matrixexamplesection;
+&kvlexamplesection;
+</sect1>
+</chapter>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-doctype:"speechtools.sgml"
+sgml-parent-document:("speechtools.sgml" "chapter" "book")
+sgml-omittag:nil
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
+
+<![ IGNORE [
+    <sect1>
+	<title>Tlist C++ Class</title>
+
+      <para>
+	TList is a generic template doubly-linked list class. See
+	<filename>include/EST_TList.h </filename>.
+      </para>
+	
+      <para>
+	The list is made up of a a series of "items" of class
+	Titem. Each of these has a value, <function>val</function> and
+	a next and previous pointer.  At present, the list uses a
+	pointer to TBI to interate through the list class. The best
+	way to iterate through the list is to use <tt>for</tt> loop
+	style syntax.
+      </para>
+
+      &docpp-EST-TList-2;
+
+      <sect2>
+	<title>Instansiation of <function>EST_TList</function></title>
+
+
+C++ does not have a standard for template instansiation which makes it
+difficult to arbitrarily define new template types.   Within the 
+speech_tools library new <function>EST_TList</function> template classes should be
+defined as follows.  Suppose you have a class called <function>Thing</function>
+and you wish to make a <function>EST_TList</function> of it.  Add to your file
+the following
+<screen>
+#if defined(INSTANTIATE_TEMPLATES)
+#include "../base_class/EST_TList.cc"
+template class EST_TList<Thing>;
+#endif
+</screen>And add the name of that file to the <function>make</function> variable <function>TSRCS</function>
+in your <filename>Makeilfe</function>
+
+</sect2>
+
+<sect2>
+	<title>Future Changes</title>
+
+
+We hope this class has become stable though some more member
+functions may be added (e.g. <function>sort</function> etc.).
+
+</sect2>
+</sect1>
+
+<sect1>
+	<title>KVL C++ Class</title>
+
+
+KVL (short for Key/Value List) is a template class of a list of
+key/value pairs. There are two specifiable types for the KVL class,
+the <emphasis>key</emphasis> and the <emphasis>value</emphasis>, e.g. <function>KVL<EST_String,EST_String></function>
+produces a list of string pairs. KVL uses the TList class to actually
+store its data.
+
+<function>KVL</function> has much the same functionality as <function>EST_TList</function>, but
+has some additional features which make use easier.  A crucial
+difference between a <function>KVL</function> and a normal list is that each key
+in the <function>KVL</function> is unique.
+
+<filename>include/KVL.h</function>
+
+</sect2>
+
+<sect2>
+	<title>Member functions of <function>KVL</function></title>
+
+
+<itemizedlist bullet='@bullet'>
+
+<listitem><para><function>val (K key)</function> This is the basic way of reading from the</para><para>
+KVL. You give this function a key of type K and its returns a value.
+<listitem><para><function>val (EST_TBI *p)</function> You can iterate through the <function>KVL</function></para><para>
+in the same way as you do for TList. This function returns a value given
+the iteration pointer.
+
+<listitem><para><function>val_def (K key, V def)</function> Return "def" if "key" is not found.</para><para>
+
+<listitem><para><function>key (EST_TBI *p)</function> </para><para>
+returns the key for a given <function>EST_TBI</function> pointer.
+
+<listitem><para><function>present (K k)</function> returns 1 if key "k" is in the </para><para>
+<function>KVL</function>, 0 otherwise. Useful for seeing whether a key has been
+defined.
+
+<listitem><para><function>add_item (K k, V v, int ns).</function> </para><para>
+Add KV pair k,v to <function>KVL</function>. By default, the list is searched
+every time for an occurance of k and if k is already defined, its value
+is overwritten. However, if "ns" is set to 1, no searching of the list
+is performed, and the key value pair is merely appended.
+
+<listitem><para><function>change_item (K k, V v, int ns)</function> Overwrites existing value of</para><para>
+k in <function>KVL</function> with v. If k isn't in the list, 
+
+<listitem><para><function>change_item (EST_TBI *p, V v)</function> Overwrites existing value in </para><para>
+<function>KVL</function>, accessed by pointer.
+
+</itemizedlist>
+
+In addition, the following overloaded operators are provided:
+<itemizedlist bullet='@bullet'>
+<listitem><para><function> = </function>. Makes a full copy of the <function>KVL</function> and all its members.</para><para>
+<listitem><para><function> += </function>. Adds a KVL to the end of an existing <function>KVL</function>.</para><para>
+<listitem><para><function> << </function>. Print list.</para><para>
+</itemizedlist>
+
+Examples of usage:
+<screen>
+KVL<int, int> x; // declare key value list.
+EST_TBI *p;          // declare iteration pointer.
+
+// read some values from standard input.
+while(cin)
+{
+    cout << "type key then val\n";
+    cin >> k;
+    cin >> v;
+    x.add_item(k, v);
+}
+
+// is vkey "9" in list?
+cout << (x.present(9) ? "true" : "false") << endl;
+
+for (p = x.list.head(); p != 0; p = next(p)) // iterate through list.
+   cout << x.key(p) << " " << x.val(p); 
+//print out all keys and values in list.
+</screen>
+</sect2>
+</sect1>
+
+<sect1>
+	<title>Option  C++ Class</title>
+
+
+The <emphasis>EST_Option</emphasis> class provides a uniform way to access options in
+a program.  The most obvious source of options are from the command
+line.  The function <function>parse_command_line2(...)</function> takes the C command
+line variables (<function>argc</function>,<function>argv</function>) and produces an
+<function>EST_Option</function> class.  Specifically it allows options names value
+tpyes, defaults and documentation for opntions in a program.
+
+The <function>EST_Options</function> class is derived from @code{KVL<EST_String,
+EST_String>}, so all the <function>KVL</function> member functions also work with
+<function>EST_Option</function>. It provides some useful extra functionality.
+
+</sect2>
+
+<sect2>
+	<title>Member functions of <function>EST_Option</function></title>
+
+
+All the options are stored as key value pairs of
+<function>EST_String</function>s. However, it if often useful to have other types,
+e.g. integers. This is possible, but it is the <function>EST_String</function> of the
+integer that is actually stored. Additional member functions,
+e.g. <function>add_item()</function> do the conversion automatically.
+
+The member functions <function>ival(const EST_String &key)</function> will
+return the value as an ineger and <function>fval(const EST_String &key)</function>
+as a float.
+
+
+<sect3>
+	<title>File i/o</title>
+
+
+It is sometimes convenient to store options in files, and the options
+class supports a system where there is one.
+
+There is one key/value pair per line. Lines can be commented by starting
+them with the comment character (by default this is ";", but this can be
+set using the <function>load()</function> function).  Each line must start with the
+key. The remainder, which may appear as a list in the file, is taken as
+the value.  Option files can be included in other option files by using
+the <function>#include filename</function> directive.
+
+If a particular key appears more than once when loading, the value of
+the last occurance is used.  Files are loaded using the <function>load(...)</function>
+function. The first argument to this is the file name, and the second
+(optional) argument is the comment character. The load function merely
+<emphasis>appends</emphasis> to the existing options (while overriding the values of
+duplicate keys) - if an entirely new set of options are to be loadedcall
+the <function>clear()</function> member function first.
+
+The <function>EST_Option</function> class inherits the member functions of the
+<function>KVL</function> class. In addition, the following exist:
+
+<itemizedlist bullet='@bullet'>
+
+<listitem><para><function>add_prefix(EST_String p)</function> Adds a prefix "p" to all keys in the</para><para>
+list.  <listitem><para><function>remove_prefix(EST_String p)</function> removes a prefix "p" from all</para><para>
+keys in the list.
+
+<listitem><para><function>override_val(EST_String key, EST_String val).</function> If val is not empty, add</para><para>
+keyval pair to option list.
+<listitem><para><function>override_ival (EST_String key, int val)</function></para><para>
+If val is not 0, add keyval pair to option list.
+<listitem><para><function>override_fval (EST_String key, float val)</function></para><para>
+If val is not 0.0, add keyval pair to option list.
+
+<listitem><para><function>ival(EST_String rkey)</function></para><para>
+return value of key, cast to an integer.
+<listitem><para><function>fval(EST_String rkey)</function></para><para>
+return value of key, cast to an float.
+<listitem><para><function>dval(EST_String rkey)</function></para><para>
+return value of key, cast to an double.
+<listitem><para><function>add_iitem(EST_String key, int val)</function></para><para>
+add integer value to list.
+<listitem><para><function>add_fitem(EST_String key, float val)</function></para><para>
+add float value to list.
+</itemizedlist>
+
+</sect3>
+</sect2>
+</sect1>
+
+<sect1>
+	<title>EST_TVector</title>
+
+
+A simple vector class is provided for.  Member functions are 
+given in <filename>include/EST_TVector.h</function>.
+
+</sect3>
+</sect2>
+</sect1>
+
+<sect1>
+	<title>EST_TMatrix</title>
+
+
+The <function>EST_TMatrix</function> class allows the creation of standard matrices.
+
+See <filename>include/EST_TMatrix.h</function> for member functions.
+
+There is a derive class <function>EST_FMatrix</function> for floats, the derivation
+is used rather than a simple template to allow loading and saving to
+files.
+
+</sect3>
+</sect2>
+</sect1>
+
+<sect1>
+	<title>EST_Chunk</title>
+
+
+The <function>EST_Chunk</function> classes offers a reference counting system
+for arbitrary segments of memory.  This is primarily used by
+the <function>EST_String</function> class.
+
+</sect3>
+</sect2>
+</sect1>
+
+<sect1>
+	<title>EST_String</title>
+
+
+This class was written for a number of reasons.  It offers a string
+class functionally identical to the GNU libg++ String class.  We choose
+to write our own string class rather than use the one provided with GNU
+G++ for the following reasons.  The <function>String</function> class in libg++ is
+different in different versions and causes lots of confusion when
+compiling the system with different versions of <filename>libg++</function>.  If we
+depended of the GNU <function>String</function> class we must provide <filename>libg++</function> on
+all platforms we compile the system on.  This and the <function>Regex</function> class
+are the only classes we relied on, by writing our one we all much
+greater portability.  The GNU <function>String</function> class typcially copies
+string values around while our replacement uses reference counts.
+Because of the way we use strings in the speech tools and Festival
+keeping track of reference counting allows a much more efficient
+implementation of strings.  Thus our replacement string class is faster
+for substantial benchmarks of Festival than the GNU equivalent.
+
+The member functions of <function>EST_String</function> follow that of the GNU
+<filename>libg++</function> <function>String</function> class as closely as possible (we designed it
+for a drop in replacement of our current use of <function>String</function>).
+
+</sect3>
+</sect2>
+</sect1>
+
+<sect1>
+	<title>EST_Regex</title>
+
+
+As we wished to remove our dependence on GNU libg++ as described in the
+previosu section we have provided a regular expression class which for
+the most part follows that of the GNU libg++ Regex class.  This
+implementation uses the regex functions from BSD4.4-lite (and earlier)
+written by Henry Spencer.
+
+</sect3>
+</sect2>
+</sect1>
+
+<sect1>
+	<title>EST_TNamedEnum</title>
+
+
+A class which relates names (EST_String) to enums.
+
+</sect3>
+</sect2>
+</sect1>
+
+<sect1>
+	<title>EST_StringTrie</title>
+
+
+<function>EST_StringTrie</function> builds a tree index from string keys to arbiitrary
+objects.  Thus objects may be index effciently from strings.  The
+strings must be ascii (the eighth bit is ignored).
+
+For example the following builds an index of regular expressions
+based on their character form so that they need not be recompiled.
+<screen>
+EST_StringTrie regexes;
+
+EST_Regex *make_regex(const char *r)
+{
+    // Access previously generated Regex or make new one
+    // and add to index
+    EST_Regex *rx;
+
+    if ((rx = (EST_Regex *)regexes.lookup(r)) == 0)
+    {
+        EST_Regex *nr = new EST_Regex(r);
+        regexes.add(r,(void *)nr);
+        rx = nr;
+    }
+
+    return rx;
+}
+</screen>A StringTrie may be explicited clear with the function <function>clear()</function>.
+The contents of the string tree make cleared by passing a
+garabage collection function with <function>clear()</function> which will be
+poassed each item in the trie as a <function>void *</function>.  The type
+of the user provided garbage collection function is
+<screen>
+    void (*deletecontents)(void *n);
+</screen>
+</sect3>
+</sect2>
+</sect1>
+
+<sect1>
+	<title>EST_Token and EST_TokenStream</title>
+
+
+<function>EST_Token</function> with <function>EST_TokenStream</function> provides a method for
+reading files as whitespace separated tokens.  A token consists of four
+parts, some of which may be empty: a name, the actual token, preceding
+whitespace, preceding punctuation, the name and succeeding punctuation.
+The definitions of whitespace and punctuation are user definable.  There
+is also support for single character symbols and quoted tokens.
+
+A token stream from which tokens may be gotten, may be a file or a
+string.
+
+For example the follow reads a file and output each toke on a new line
+<screen>
+   EST_TokenStream ts;
+   EST_Token;
+
+   ts.open("myfile");
+   while (!ts.eof())
+        cout << ts.get() << endl;
+</screen>Although token streams support on symbol look ahead via <function>peek()</function>
+they do support unget.
+
+Punctuation (pre and post) may be set after opening a stream.  The
+defaults are empty.  Any characters defined as punctuation found around
+a token are striped and saved in the punctuation fields.  Single
+character symbols will cause a token break when ever they occur
+(i.e. separating whitespace is not required), again by default these are
+empty.  Whitespace by default is defined as space, horizontal tab,
+carriage return and line feed.
+
+Quoting mode is off by default but may be started by calling
+<function>set_quotes</function> with a quote character and an escape character
+(typically <keysym>"</keysym> and <keysym>\</keysym>).  When in quote mode, a token starting
+with the quote character will continue until next unescaped quote
+character, including whitespace and punctuation.
+
+Although a whole file's contents including all its whitespace may be
+recorded by tokens from a token stream, any final whitespace after the
+last real token may be mistakenly omitted unless care is taken.  In many
+cases you'll just require the final whitespace before end of file to set
+end of file which is the default.  In quotes mode <emphasis>all</emphasis> tokens
+include this last token with an empty name will be returned before eof
+is set.
+
+    </sect1>
+]]>
+
+

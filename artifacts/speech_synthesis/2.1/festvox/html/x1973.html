@@ -1,0 +1,292 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Prosody Research</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building prosodic models"
+HREF="c1637.html"><LINK
+REL="PREVIOUS"
+TITLE="Duration"
+HREF="x1900.html"><LINK
+REL="NEXT"
+TITLE="Prosody Walkthrough"
+HREF="x1991.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1900.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Building prosodic models</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1991.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1973"
+>Prosody Research</A
+></H1
+><P
+>Note that the above descriptions are for the easy implementation of 
+prosody models which unfortunately means that the models will not 
+be perfect. Of course no models will be perfect but with some 
+work it is often possible to improve the basic models or at 
+least make them more appropriate to the synthesis task. For example 
+if your intend use of your synthesis voice is primarily for 
+dialog systems training one news caster speech will not give 
+the best effect. Festival is designed as a research system as 
+well as tool to build languages so it is well adapted to 
+prosody research. </P
+><P
+>&#13;One thing which clearly shows off how imporoverished our prosodic models 
+are is the comparing of predicted prosody with natural prosody. Given 
+a label file and an F0 Target file the following code will generate\ 
+that utterance using the current voice 
+<A
+NAME="AEN1979"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(resynth&nbsp;labfile&nbsp;f0file)<br>
+&nbsp;&nbsp;(let&nbsp;((utt&nbsp;(Utterance&nbsp;SegF0)))&nbsp;;&nbsp;need&nbsp;some&nbsp;u&nbsp;to&nbsp;start&nbsp;with<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(utt.relation.load&nbsp;utt&nbsp;'Segment&nbsp;labfile)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(utt.relation.load&nbsp;utt&nbsp;'Target&nbsp;f0file)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(Wave_Synth&nbsp;utt))<br>
+)</P
+></BLOCKQUOTE
+>
+The format of the label file should be one that can be read into 
+Festival (e.g. the XLabel format) For example 
+<A
+NAME="AEN1981"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>#<br>
+	&nbsp;0.02000&nbsp;26&nbsp;	pau&nbsp;;&nbsp;<br>
+	&nbsp;0.09000&nbsp;26&nbsp;	ih&nbsp;;&nbsp;<br>
+	&nbsp;0.17500&nbsp;26&nbsp;	z&nbsp;;&nbsp;<br>
+	&nbsp;0.22500&nbsp;26&nbsp;	dh&nbsp;;&nbsp;<br>
+	&nbsp;0.32500&nbsp;26&nbsp;	ae&nbsp;;&nbsp;<br>
+	&nbsp;0.35000&nbsp;26&nbsp;	t&nbsp;;&nbsp;<br>
+	&nbsp;0.44500&nbsp;26&nbsp;	ow&nbsp;;&nbsp;<br>
+	&nbsp;0.54000&nbsp;26&nbsp;	k&nbsp;;&nbsp;<br>
+	&nbsp;0.75500&nbsp;26&nbsp;	ey&nbsp;;&nbsp;<br>
+	&nbsp;0.79000&nbsp;26&nbsp;	pau&nbsp;;&nbsp;</P
+></BLOCKQUOTE
+>
+The target file is a little more complex again it is 
+a label file but with features "pos" and "F0" at each stage. Thus 
+the format for a naturally rendered version of the above would 
+be. 
+<A
+NAME="AEN1983"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>#<br>
+0.070000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.070000&nbsp;;&nbsp;f0&nbsp;133.045230&nbsp;;&nbsp;<br>
+0.080000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.080000&nbsp;;&nbsp;f0&nbsp;129.067890&nbsp;;&nbsp;<br>
+0.090000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.090000&nbsp;;&nbsp;f0&nbsp;125.364600&nbsp;;&nbsp;<br>
+0.100000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.100000&nbsp;;&nbsp;f0&nbsp;121.554800&nbsp;;&nbsp;<br>
+0.110000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.110000&nbsp;;&nbsp;f0&nbsp;117.248260&nbsp;;&nbsp;<br>
+0.120000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.120000&nbsp;;&nbsp;f0&nbsp;115.534490&nbsp;;&nbsp;<br>
+0.130000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.130000&nbsp;;&nbsp;f0&nbsp;113.769620&nbsp;;&nbsp;<br>
+0.140000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.140000&nbsp;;&nbsp;f0&nbsp;111.513180&nbsp;;&nbsp;<br>
+0.240000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.240000&nbsp;;&nbsp;f0&nbsp;108.386380&nbsp;;&nbsp;<br>
+0.250000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.250000&nbsp;;&nbsp;f0&nbsp;102.564100&nbsp;;&nbsp;<br>
+0.260000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.260000&nbsp;;&nbsp;f0&nbsp;97.383600&nbsp;;&nbsp;<br>
+0.270000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.270000&nbsp;;&nbsp;f0&nbsp;97.199710&nbsp;;&nbsp;<br>
+0.280000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.280000&nbsp;;&nbsp;f0&nbsp;96.537280&nbsp;;&nbsp;<br>
+0.290000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.290000&nbsp;;&nbsp;f0&nbsp;96.784970&nbsp;;&nbsp;<br>
+0.300000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.300000&nbsp;;&nbsp;f0&nbsp;98.328150&nbsp;;&nbsp;<br>
+0.310000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.310000&nbsp;;&nbsp;f0&nbsp;100.950830&nbsp;;&nbsp;<br>
+0.320000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.320000&nbsp;;&nbsp;f0&nbsp;102.853580&nbsp;;&nbsp;<br>
+0.370000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.370000&nbsp;;&nbsp;f0&nbsp;117.105770&nbsp;;&nbsp;<br>
+0.380000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.380000&nbsp;;&nbsp;f0&nbsp;116.747730&nbsp;;&nbsp;<br>
+0.390000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.390000&nbsp;;&nbsp;f0&nbsp;119.252310&nbsp;;&nbsp;<br>
+0.400000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.400000&nbsp;;&nbsp;f0&nbsp;120.735070&nbsp;;&nbsp;<br>
+0.410000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.410000&nbsp;;&nbsp;f0&nbsp;122.259190&nbsp;;&nbsp;<br>
+0.420000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.420000&nbsp;;&nbsp;f0&nbsp;124.512020&nbsp;;&nbsp;<br>
+0.430000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.430000&nbsp;;&nbsp;f0&nbsp;126.476430&nbsp;;&nbsp;<br>
+0.440000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.440000&nbsp;;&nbsp;f0&nbsp;121.600880&nbsp;;&nbsp;<br>
+0.450000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.450000&nbsp;;&nbsp;f0&nbsp;109.589040&nbsp;;&nbsp;<br>
+0.560000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.560000&nbsp;;&nbsp;f0&nbsp;148.519490&nbsp;;&nbsp;<br>
+0.570000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.570000&nbsp;;&nbsp;f0&nbsp;147.093260&nbsp;;&nbsp;<br>
+0.580000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.580000&nbsp;;&nbsp;f0&nbsp;149.393750&nbsp;;&nbsp;<br>
+0.590000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.590000&nbsp;;&nbsp;f0&nbsp;152.566530&nbsp;;&nbsp;<br>
+0.670000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.670000&nbsp;;&nbsp;f0&nbsp;114.544910&nbsp;;&nbsp;<br>
+0.680000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.680000&nbsp;;&nbsp;f0&nbsp;119.156750&nbsp;;&nbsp;<br>
+0.690000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.690000&nbsp;;&nbsp;f0&nbsp;120.519990&nbsp;;&nbsp;<br>
+0.700000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.700000&nbsp;;&nbsp;f0&nbsp;121.357320&nbsp;;&nbsp;<br>
+0.710000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.710000&nbsp;;&nbsp;f0&nbsp;121.615970&nbsp;;&nbsp;<br>
+0.720000&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;0.720000&nbsp;;&nbsp;f0&nbsp;120.752700&nbsp;;&nbsp;</P
+></BLOCKQUOTE
+>
+This file was generated from a waveform using the folloing 
+command 
+<A
+NAME="AEN1985"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>pda&nbsp;-s&nbsp;0.01&nbsp;-otype&nbsp;ascii&nbsp;-fmax&nbsp;160&nbsp;-fmin&nbsp;70&nbsp;wav/utt003.wav&nbsp;|&nbsp;<br>
+awk&nbsp;'BEGIN&nbsp;@{&nbsp;printf("#\n")&nbsp;@}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@{&nbsp;if&nbsp;($1&nbsp;&#62;&nbsp;0)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("%f&nbsp;124&nbsp;0&nbsp;;&nbsp;pos&nbsp;%f&nbsp;;&nbsp;f0&nbsp;%f&nbsp;;&nbsp;\n",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NR*0.010,NR*0.010,$1)&nbsp;@}'&nbsp;&#62;Targets/utt003.Target</P
+></BLOCKQUOTE
+>
+The utetrance may then be rendered as 
+<A
+NAME="AEN1987"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&#62;&nbsp;(set!&nbsp;utt1&nbsp;(resynth&nbsp;"lab/utt003.lab"&nbsp;"Targets/utt003.utt"))</P
+></BLOCKQUOTE
+></P
+><P
+>Note that this method will loose a little in diphone selection. If your 
+diphone database uses consonant cluster allophones it wont be possible 
+to properly detect these as there is no syllabic structure in this. 
+That may or may not be important to you. Even this simple 
+method however clearly shows how important the right prosody is 
+to the understandability of a string of phones. </P
+><P
+>We have successfully done this on a number of natural utterances. We 
+extracted the labels automatically by using the aligner discussed in the 
+diphone chapter. As we were using diphones from the same speaker as the 
+natural utterances (KAL) the alignment is surprisingly good and trivial 
+to do. You must however synthesis the utterance first and save the 
+waveform and labels. Note you should listen to ensure that the 
+synthesizer has generated the right labels (as much as that is 
+possible), including breaks in the same places. Comparing synthesized 
+utterances with natural ones quickly shows up many problems in 
+synthesis. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1900.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1991.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Duration</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c1637.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Prosody Walkthrough</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

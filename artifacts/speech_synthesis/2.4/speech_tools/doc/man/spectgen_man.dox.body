@@ -1,0 +1,26 @@
+/**
+
+@page spectgen_manual spectgen
+@brief *Make spectrograms*
+@tableofcontents
+
+@section synopsis Synopsis
+
+@SYNOPSIS@
+
+spectgen is used to create spectrograms, which are 3d plots of
+amplitude against time and frequency. Spectgen takes a waveform and
+produces a track, where each channel represents one frequency bin. 
+
+By default spectgen produces a "wide-band" spectrogram, that is one
+with high time resolution and low frequency resolution. "Narrow-band"
+spectrograms can be produced by using the -shift and -length options.
+
+Typical values for -shift and -length are:
+
+@section options Options
+
+@OPTIONS@
+
+*/
+

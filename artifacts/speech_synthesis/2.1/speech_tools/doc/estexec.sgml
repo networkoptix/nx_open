@@ -1,0 +1,183 @@
+<chapter>
+	<title>Executable Programs</title>
+
+<sect1><title>General Information</title>
+<para>
+Edinburgh Speech Tools provides a set of exectutables, which
+    offer access to speech tools functionality in the form of a stand
+    alone program. As far as possible, the  programs follow a common
+    format in terms of assumptions, defaults and processing paradigms.
+    </para>
+
+<para> The following are generally true of most speech tools programs. </para>
+
+
+    <itemizedlist>
+      <listitem><para>Arguments to functions can be specified in any
+	      order on the command line. Most programs can take multiple input
+	  files, which by default have no preceding argument.</para></listitem>
+      <listitem><para>Output by defgault is to standard out. The
+	      <command>-o</command> flag can be used to specify an output file.</para></listitem>
+      <listitem><para>Often programs can read many formats of input
+		  file. Wherever possible, this is done
+		  automatically. If this can't be done, the
+		  <command>-itype</command> flag can be used to specify the
+		  input file format.</para></listitem>
+      <listitem><para>The output file format is specified by <command>-otype</command>
+</para></listitem>
+    </itemizedlist>
+
+</sect1>
+<sect1><title>Building your own executable programs</title>
+<para>
+A simple mechanism is provided for doing all the configuration needed
+	to build a executable program which uses the speech tools
+	library.
+</para>
+
+      First, make a directory which will hold your program. To make a
+      program called "do_stuff", type
+<para>
+<screen>
+est_program do_stuff
+</screen>
+</para>
+if you haven't got the EST bin directory in your path you will have
+      to add the path explicitly, e.g.
+
+<para>
+<screen>
+/speech_tools/bin/est_program do_stuff
+</screen>
+</para>
+
+This will create a Makefile and a .cc file called
+<filename>do_stuff_main.cc</filename>, which will look something like
+      this:
+</para>
+<programlisting arch='c'>  
+  
+#include "EST.h"
+#include "EST_types.h"
+#include "EST_error.h"
+
+int main(int argc, char *argv[]) 
+{ 
+    EST_StrList files; // the list of input files will go here
+    EST_Option cmd_line; // the parsed list of command line arguments
+	                 // will go here.
+
+	  // This bit parses the command line args and puts them into
+	  // files and cmd_line
+    parse_command_line
+        (argc, argv, 
+         EST_String("[OPTIONS] [files...]\n")+
+         "Summary; DO SOMETHING\n"+
+         "-o [ofile]       Ouptut file\n",
+         files, cmd_line);
+
+    EST_String out_file; // the name of the output file
+
+    // If a output file has been specified using -o, put it in out_file
+    if (cmd_line.present("-o"))
+      out_file = cmd_line.val("-o");
+    else
+      EST_error("No output file specified");
+
+   // declare EST_StrList iterator
+    EST_StrList::Entries fs;
+
+    // iterate through files and do something.
+    for(fs.begin(files); fs; ++fs)
+      {
+        EST_String file = *fs;
+
+        // Process file
+      }
+
+    return 0;
+}
+</programlisting>
+<para>
+You can now add any C++ code to this, and compile by typing
+<command>make<command>.
+</para>
+If you want to create a second program in the same directory, type the
+same again:
+<para>
+<screen>
+/speech_tools/bin/est_program do_more_stuff
+</screen>
+</para>
+<para>This time, do_more_stuff_main.cc will be created and the
+appropriate build commands added to the extisting Makefile. If you
+wish to add an extra .cc file to particular program, simply edit the
+Makefile and add it on the line:
+<para>
+<screen>
+do_stuff_CXXSRC= do_stuff.cc extra.cc
+</screen>
+</para>
+
+</sect1>
+
+&chwavemanualsection;
+&chtrackmanualsection;
+&chlabmanualsection;
+
+&tiltanalysismanualsection;
+&tiltsynthesismanualsection;
+
+&sigfvmanualsection;
+&spectgenmanualsection;
+&sigfiltermanualsection;
+&designfiltermanualsection;
+&pdamanualsection;
+&pitchmarkmanualsection;
+
+&dpmanualsection;
+&ngrambuildmanualsection;
+&ngramtestmanualsection;
+&viterbimanualsection;
+
+&naplaymanualsection;
+&narecordmanualsection;
+
+&wagonmanualsection;
+&olsmanualsection;
+&olstestmanualsection;
+
+&wfstbuildmanualsection;
+&wfstbuildmanualsection; 
+&wfstrunmanualsection;
+
+&scfgmakemanualsection;
+&scfgtrainmanualsection;
+&scfgparsemanualsection;
+&scfgtestmanualsection;
+
+&siodmanualsection;
+&fringe_clientmanualsection;
+&bcatmanualsection;
+&xmlparsermanualsection;
+
+
+
+
+<!--
+Local Variables:
+mode: sgml
+sgml-doctype:"speechtools.sgml"
+sgml-parent-document:("speechtools.sgml" "chapter" "book")
+sgml-omittag:nil
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
+

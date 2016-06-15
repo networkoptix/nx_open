@@ -1,0 +1,392 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Utterance building</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="A Practical Speech Synthesis System"
+HREF="c180.html"><LINK
+REL="PREVIOUS"
+TITLE="Utterance access"
+HREF="x492.html"><LINK
+REL="NEXT"
+TITLE="Extracting features from utterances"
+HREF="x688.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x492.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>A Practical Speech Synthesis System</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x688.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="BSV-UTTBUILD-SECT"
+>Utterance building</A
+></H1
+><P
+>&#13;
+
+As well as using Utterance structures in the actual runtime 
+process of converting text-to-speech we also use them in 
+database representation. Basically we wish to build utterance 
+structures for each utterance in a speech database. Once they 
+are in that structure, as if they had been (correctly) synthesized, 
+we can use these structures for training various models. For example 
+given the actually durations for the segments in a speech database 
+and utterance structures for these we can dump the actual durations 
+and features (phonetic, prosodic context etc.) which we feel influence 
+the durations and train models on that data. </P
+><P
+>Obviously real speech isn't as clean as synthesized speech so its not 
+always easy to build (reasonably) accurate utterances for the real 
+utterances. However here we will itemize a number of functions that 
+will make the building of utterance from real speech easier. Building 
+utterance structures is probably worth the effort considering how 
+easy it is to build various models from them. Thus we recommend 
+this even though at first the work may not immediately seem 
+worthwhile. </P
+><P
+>In order to build an utterance of the type used for our English voices 
+(and which is suitable for most of the other languages we have done), 
+you will need label files for the following relations. Below 
+we will discuss how to get these labels, automatically, by 
+hand or derived from other label files in this list and the relative 
+merits of such derivations. </P
+><P
+>&#13;The basic label types required are 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>Segment</CODE
+></DT
+><DD
+><P
+>segment labels with (near) correct boundaries, in the phone set 
+of your language. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>Syllable</CODE
+></DT
+><DD
+><P
+>Syllables, with stress marking (if appropriate) whose boundaries 
+are closely aligned with the segment boundaries. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>Word</CODE
+></DT
+><DD
+><P
+>Words with boundaries aligned (close) to the syllables and segments. 
+By <I
+CLASS="EMPHASIS"
+>words</I
+> we mean the things which can be looked up in a lexicon 
+thus <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>1986</I
+>"</SPAN
+> would not be considered a word and should be 
+rendered as three words <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>nineteen eighty six</I
+>"</SPAN
+>. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>IntEvent</CODE
+></DT
+><DD
+><P
+>Intonation labels aligned to a syllable (either within the syllable 
+boundary or explicitly naming the syllable they should align to. If 
+using ToBI (or some derivative) these would be standard ToBI labels, 
+while in something like Tilt these would be <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>a</I
+>"</SPAN
+> and <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>b</I
+>"</SPAN
+> 
+marking accents and labels. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>Phrase</CODE
+></DT
+><DD
+><P
+>A name and marking for the end of each prosodic phrase. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>Target</CODE
+></DT
+><DD
+><P
+>The mean F0 value in Hertz at the mid-point of each segment 
+in the utterance. </P
+></DD
+></DL
+></DIV
+></P
+><P
+>&#13;
+
+Segment labels are probably the hardest to generate. Knowing what 
+phones are there can only really be done by actually listening to the 
+examples and labeling them. Any automatic method will have to make low 
+level phonetic classifications which machines are not particularly good 
+at (nor are humans for that matter). Some discussion of autoaligning 
+phones is given in the diphone chapter where an aligner distributed with 
+this document is described. This may help but as much depends on the 
+segmental accuracy getting it right ultimately hand correction at least 
+is required. We have used that aligner on a speech database though we 
+already knew from another (not so accurate) aligner what the phone 
+sequences probably were. Our aligner improved the quality of exist 
+labels and the synthesizer (phonebox) that used it, but there are 
+external conditions that made this a reasonably thing to do. </P
+><P
+>&#13;Word labeling can most easily be done by hand, it is much 
+easier than to do than segment labeling. In the continuing process 
+of trying to build automatic labelers for databases we currently 
+reckon that word labeling could be the last to be done automatically. 
+Basically because with word labeling, segment, syllable and intonation 
+labeling becomes a much more constrained task. However it is 
+important that word labels properly align with segment labels even 
+when spectrally there may not be any real boundary between 
+words in continuous speech. </P
+><P
+>&#13;Syllable labeling can probably best be done automatically given segment 
+(and word) labeling. The actual algorithm for syllabification may 
+change but whatever is chosen (or defined from a lexicon) it is 
+important that that syllabification is consistently used throughout the 
+rest of the system (e.g. in duration modeling). Note that automatic 
+techniques in aligning lexical specifications of syllabification are in 
+their nature inexact. There are multiple acceptable ways to say words 
+and it is relatively important to ensure that the labeling reflects 
+what is actually there. That is simply looking up a word in a lexicon 
+and aligning those phones to the signal is not necessarily correct. 
+Ultimately this is what we would like to do but so far we have 
+discovered our unit selection algorithms are nowhere near robust enough 
+to do this. </P
+><P
+>&#13;The Target labeling required here is a single average F0 value for each 
+segment. This currently is done fully automatically from the signal. 
+This is naive and a better representation of F0 could be more 
+appropriate, it is used only in some of the model building described 
+below. Ultimately it would be good if the F0 need not be explicitly 
+used at all but just use the factors that determine the F0 value, but 
+this is still a research topic. </P
+><P
+>&#13;Phrases could potentially be determined by a combination of F0 power and 
+silence detection but the relationship is not obvious. In general we 
+hand label phrases as part of the intonation labeling process. 
+Realistically only two levels of phrasing can reliably be labeled, even 
+though there are probably more. That is, roughly, sentence internal and 
+sentence final, what ToBI would label as (2 or 3) and 4. More exact 
+labelings would be useful. </P
+><P
+>&#13;
+
+For intonation events we have more recently been using Tilt accent 
+labeling. This is simpler than ToBI and we feel more reliable. The 
+hand labeling part marks <CODE
+CLASS="VARNAME"
+>a</CODE
+> (for accent) and <CODE
+CLASS="VARNAME"
+>b</CODE
+> for 
+boundary. We have also split boundaries into <CODE
+CLASS="VARNAME"
+>rb</CODE
+> (rising 
+boundary) and <CODE
+CLASS="VARNAME"
+>fb</CODE
+> (falling boundary). We have been experimenting 
+with autolabeling these and have had some success but that's still a 
+research issue. Because there is a well defined and fully automatic 
+method of going from a/b labeled waveforms to a parameterization of the 
+F0 contour we've found Tilt the most useful Intonation labeling. Tilt 
+is described in [<SPAN
+CLASS="CITATION"
+>taylor00a</SPAN
+>]. </P
+><P
+>ToBI accent/tone labeling [<SPAN
+CLASS="CITATION"
+>silverman92</SPAN
+>] is useful too but time 
+consuming to label. If it exists for the database then its usually 
+worth using. </P
+><P
+>&#13;In the standard Festival distribution there is a festival 
+script <TT
+CLASS="FILENAME"
+>festival/examples/make_utts</TT
+> which will build 
+utterance structures from the labels for the six basic relations. </P
+><P
+>This function can most easily be used given the following 
+directory/file structure in the database directory. <TT
+CLASS="FILENAME"
+>festival/relations/</TT
+> 
+should contain a directory for each set of labels named for the 
+utterance relation it is to be part of (e.g. <TT
+CLASS="FILENAME"
+>Segment/</TT
+>, 
+<TT
+CLASS="FILENAME"
+>Word/</TT
+>, etc. </P
+><P
+>The constructed utterances will be saved in <TT
+CLASS="FILENAME"
+>festival/utts/</TT
+>. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x492.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x688.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Utterance access</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c180.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Extracting features from utterances</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

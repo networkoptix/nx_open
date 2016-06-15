@@ -1,0 +1,62 @@
+
+LPC params
+tmp/kdt_001.lpc
+Number of frames: 391
+Number of channels: 17
+File type: est
+Frame shift: varied
+Channel: 0: lpc_0
+Channel: 1: lpc_1
+Channel: 2: lpc_2
+Channel: 3: lpc_3
+Channel: 4: lpc_4
+Channel: 5: lpc_5
+Channel: 6: lpc_6
+Channel: 7: lpc_7
+Channel: 8: lpc_8
+Channel: 9: lpc_9
+Channel: 10: lpc_10
+Channel: 11: lpc_11
+Channel: 12: lpc_12
+Channel: 13: lpc_13
+Channel: 14: lpc_14
+Channel: 15: lpc_15
+Channel: 16: lpc_N
+Duration: 3.5171
+Sample rate: 16000
+Number of samples: 56273
+Number of channels: 1
+Header type: nist
+Data type: short
+MFCC params
+tmp/kdt_001.mfcc
+Number of frames: 704
+Number of channels: 24
+File type: est
+Frame shift: varied
+Channel: 0: melcep_1
+Channel: 1: melcep_2
+Channel: 2: melcep_3
+Channel: 3: melcep_4
+Channel: 4: melcep_5
+Channel: 5: melcep_6
+Channel: 6: melcep_7
+Channel: 7: melcep_8
+Channel: 8: melcep_9
+Channel: 9: melcep_10
+Channel: 10: melcep_11
+Channel: 11: melcep_N
+Channel: 12: melcep_d_1
+Channel: 13: melcep_d_2
+Channel: 14: melcep_d_3
+Channel: 15: melcep_d_4
+Channel: 16: melcep_d_5
+Channel: 17: melcep_d_6
+Channel: 18: melcep_d_7
+Channel: 19: melcep_d_8
+Channel: 20: melcep_d_9
+Channel: 21: melcep_d_10
+Channel: 22: melcep_d_11
+Channel: 23: melcep_d_N
+expect one line containing 0s (first delta params)
+Number of vectors with 0s is  1

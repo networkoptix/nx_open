@@ -1,0 +1,195 @@
+#!/bin/sh
+#####################################################-*-mode:shell-script-*-
+##                                                                       ##
+##                     Carnegie Mellon University                        ##
+##                         Copyright (c) 2005                            ##
+##                        All Rights Reserved.                           ##
+##                                                                       ##
+##  Permission is hereby granted, free of charge, to use and distribute  ##
+##  this software and its documentation without restriction, including   ##
+##  without limitation the rights to use, copy, modify, merge, publish,  ##
+##  distribute, sublicense, and/or sell copies of this work, and to      ##
+##  permit persons to whom this work is furnished to do so, subject to   ##
+##  the following conditions:                                            ##
+##   1. The code must retain the above copyright notice, this list of    ##
+##      conditions and the following disclaimer.                         ##
+##   2. Any modifications must be clearly marked as such.                ##
+##   3. Original authors' names are not deleted.                         ##
+##   4. The authors' names are not used to endorse or promote products   ##
+##      derived from this software without specific prior written        ##
+##      permission.                                                      ##
+##                                                                       ##
+##  CARNEGIE MELLON UNIVERSITY AND THE CONTRIBUTORS TO THIS WORK         ##
+##  DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING      ##
+##  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   ##
+##  SHALL CARNEGIE MELLON UNIVERSITY NOR THE CONTRIBUTORS BE LIABLE      ##
+##  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    ##
+##  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN   ##
+##  AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,          ##
+##  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF       ##
+##  THIS SOFTWARE.                                                       ##
+##                                                                       ##
+###########################################################################
+##                                                                       ##
+##  Author: Alan W Black (awb@cs.cmu.edu) Dec 2005                       ##
+##                                                                       ##
+###########################################################################
+##                                                                       ##
+##  Objective distance tests for clustergen voice                        ##
+##                                                                       ##
+###########################################################################
+
+if [ ! "$ESTDIR" ]
+then
+   echo "environment variable ESTDIR is unset"
+   echo "set it to your local speech tools directory e.g."
+   echo '   bash$ export ESTDIR=/home/awb/projects/speech_tools/'
+   echo or
+   echo '   csh% setenv ESTDIR /home/awb/projects/speech_tools/'
+   exit 1
+fi
+
+if [ ! "$FESTVOXDIR" ]
+then
+   echo "environment variable FESTVOXDIR is unset"
+   echo "set it to your local festvox directory e.g."
+   echo '   bash$ export FESTVOXDIR=/home/awb/projects/festvox/'
+   echo or
+   echo '   csh% setenv FESTVOXDIR /home/awb/projects/festvox/'
+   exit 1
+fi
+
+if [ "$CLUSTERGENDIR" = "" ]
+then
+    CLUSTERGENDIR=$FESTVOXDIR/src/clustergen
+fi
+
+if [ "$PROMPTFILE" = "" ]
+then
+   PROMPTFILE=etc/txt.done.data
+fi
+
+if [ ! -d test ]
+then
+   mkdir test
+fi
+
+EXPERIMENT=$2
+
+if [ ! -d test/$EXPERIMENT ]
+then
+   mkdir test/$EXPERIMENT
+fi
+
+. ./etc/voice.defs
+
+if [ $1 = resynth ]
+then
+   $0 test_resynth $EXPERIMENT
+   $0 test_resynth_costs $EXPERIMENT
+   $0 test_resynth_costs_f0 $EXPERIMENT
+   $0 test_resynth_costs_nof0 $EXPERIMENT
+   $0 test_resynth_costs_mcd $EXPERIMENT
+   exit 0
+fi
+
+if [ $1 = synth ]
+then
+   $0 test_synth $EXPERIMENT
+   $0 test_synth_costs $EXPERIMENT
+   exit 0
+fi
+
+if [ $1 = "test_synth" ]
+then
+   $ESTDIR/../festival/bin/festival --heap 10000000  -b festvox/$FV_VOICENAME"_cg.scm" $CLUSTERGENDIR/clustergen_build.scm '(begin (voice_'$FV_VOICENAME'_cg) (ClusterGen_test_set "'$PROMPTFILE'.test" "'test/$EXPERIMENT'"))'
+   exit 0
+fi
+
+if [ $1 = "test_synth_costs" ]
+then
+   for i in `cat $PROMPTFILE.test | awk '{print $2}'`
+   do
+      fname=$i
+      echo Aligning $i >/dev/tty
+      $FESTVOXDIR/src/general/phonealign -otrack test/$EXPERMIENT/$i.mcep -itrack ccoefs/$fname.mcep -ilabel lab/$fname.lab -olabel test/$EXPERIMENT/$fname.lab -verbose -withcosts
+   done 2>&1 | 
+   tee ttt.costs |
+   grep "^cost" | awk '{print $3}' |
+   awk '{ count += 1; sum += $1; sumsq += $1*$1 }
+     function std (sum, sumx, n)
+     {
+	if (n==1) n=2;
+        return sqrt(((n*sumx)-(sum*sum)) / (n*(n-1)))
+     }
+     function mean (sum,n) { return sum/n; }
+     END {
+        printf "mean %3.3f std %3.3f var %3.3f rms %3.3f n %d\n",mean(sum,count),std(sum,sumsq,count),std(sum,sumsq,count)*std(sum,sumsq,count),sqrt(sumsq/count),count
+     }'
+   exit 0
+fi
+
+if [ $1 = "test_resynth" ]
+then
+   $ESTDIR/../festival/bin/festival --heap 10000000  -b festvox/$FV_VOICENAME"_cg.scm" $CLUSTERGENDIR/clustergen_build.scm '(begin (voice_'$FV_VOICENAME'_cg) (ClusterGen_test_resynth "'$PROMPTFILE'.test" "'test/$EXPERIMENT'"))'
+   exit 0
+fi
+
+if [ $1 = "test_resynth_costs" ]
+then
+   for i in `cat $PROMPTFILE.test | awk '{print $2}'`
+   do
+      fname=$i
+      $CLUSTERGENDIR/track_diff ccoefs/$i.mcep test/$EXPERIMENT/$i.mcep |
+      awk '{print $2,$6,$NF}'
+   done |
+   awk '{ n=1.0*$NF; sum+=$1*n; var+=$2*n; samples+=n}
+        END {printf("all  mean %f std %f var %f n %d\n",sum/samples,sqrt(var/samples),var/samples,samples)}'
+  exit 0
+fi
+
+if [ $1 = "test_resynth_costs_nof0" ]
+then
+   for i in `cat $PROMPTFILE.test | awk '{print $2}'`
+   do
+      fname=$i
+#      echo $fname >/dev/tty
+      $CLUSTERGENDIR/track_diff_nof0 ccoefs/$i.mcep test/$EXPERIMENT/$i.mcep |
+      awk '{print $2,$6,$NF}'
+   done |
+   awk '{ n=1.0*$NF; sum+=$1*n; var+=$2*n; samples+=n}
+        END {printf("noF0 mean %f std %f var %f n %d\n",sum/samples,sqrt(var/samples),var/samples,samples)}'
+  exit 0
+fi
+
+if [ $1 = "test_resynth_costs_mcd" ]
+then
+   for i in `cat $PROMPTFILE.test | awk '{print $2}'`
+   do
+      fname=$i
+#      echo $fname >/dev/tty
+      $CLUSTERGENDIR/track_diff_mcd ccoefs/$i.mcep test/$EXPERIMENT/$i.mcep |
+      awk '{print $2,$6,$NF}'
+   done |
+   awk '{ n=1.0*$NF; sum+=$1*n; var+=$2*n; samples+=n}
+        END {printf("MCD  mean %f std %f var %f n %d\n",sum/samples,sqrt(var/samples),var/samples,samples)}'
+  exit 0
+fi
+
+if [ $1 = "test_resynth_costs_f0" ]
+then
+   for i in `cat $PROMPTFILE.test | awk '{print $2}'`
+   do
+      fname=$i
+#      echo $fname >/dev/tty
+      $CLUSTERGENDIR/track_diff_f0 ccoefs/$i.mcep test/$EXPERIMENT/$i.mcep |
+      awk '{print $2,$6,$NF}'
+   done |
+   awk '{ n=1.0*$NF; sum+=$1*n; var+=$2*n; samples+=n}
+        END {printf("F0   mean %f std %f var %f n %d\n",sum/samples,sqrt(var/samples),var/samples,samples)}'
+  exit 0
+fi
+
+echo cg_test: unknown options $*
+exit 1
+

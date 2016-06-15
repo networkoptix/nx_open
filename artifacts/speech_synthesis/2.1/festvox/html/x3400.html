@@ -1,0 +1,235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Formal Evaluation Tests</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Evaluation and Improvements"
+HREF="c3364.html"><LINK
+REL="PREVIOUS"
+TITLE="Does it work at all?"
+HREF="x3374.html"><LINK
+REL="NEXT"
+TITLE="Debugging voices"
+HREF="x3427.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x3374.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Evaluation and Improvements</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x3427.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN3400"
+>Formal Evaluation Tests</A
+></H1
+><P
+>&#13;Once you yourself and your immediate colleages have tests the voice
+you will want more formal evaluation metrics.  Again we are looking at
+diagnositic evluation, comparative eveluation between different
+commercial synthesizers is quite a different task.&#13;</P
+><P
+>&#13;In our English checks we used Wall Street Journal and Time magazine 
+articles (around 10 millions words in total). Many unusual 
+words apear only in one article (e.g proper names) which are less 
+important to add to the lexicon, but unusual words that appear 
+across articales are more likely to appear again so should 
+be added. &#13;</P
+><P
+>&#13;Be aware that using data will cause your coverage to be biased towards 
+that type of data. Our databases are mostly collected in the early 90s 
+and hence have good coverage for the Gulf War, and the changes in 
+Eastern Europe but our ten million words have no occurences of the words 
+<SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>Sojourner</I
+>"</SPAN
+> or <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>Lewinski</I
+>"</SPAN
+> whcih only appear in stories later 
+in the decade. &#13;</P
+><P
+>&#13;A script is provided in <TT
+CLASS="FILENAME"
+>src/general/find_unknowns</TT
+> which will 
+analyze given text to find which words do not appear in the current 
+lexicon. You should use the <CODE
+CLASS="VARNAME"
+>-eval</CODE
+> option to specify the 
+selection of your voice. Note this checks to see which words are not in 
+the lexicon itself, it replaces what ever letter-to-sound/ unknown word 
+function you specified and saves any words for which that function is 
+called in the given output file. For example 
+
+<A
+NAME="AEN3414"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>find_unknowns&nbsp;-eval&nbsp;'(voice_ked_diphone)'&nbsp;-output&nbsp;cmudict.unknown&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wsj/wsj-raw/00/*</P
+></BLOCKQUOTE
+>
+
+Normally you would run this over your database then cummulate the 
+unknown words, then rerun the unknown words synthesizing each and 
+listening to them to evaluate if your LTS system produces reasonable 
+results. Fur those words which do have acceptable pronunciations add 
+them to your lexicon. &#13;</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN3416"
+>Sematically unpredictable sentences</A
+></H2
+><P
+>&#13;
+One technique that has been used to evaluation speech synthesis 
+quality is testing against semantically unpredictable sentences. </P
+><A
+NAME="AEN3423"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>%%%%%%%%%%%%%%%%%%%%%%<br>
+Discussion&nbsp;to&nbsp;be&nbsp;added&nbsp;<br>
+%%%%%%%%%%%%%%%%%%%%%%</P
+></BLOCKQUOTE
+><P
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x3374.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x3427.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Does it work at all?</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c3364.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Debugging voices</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

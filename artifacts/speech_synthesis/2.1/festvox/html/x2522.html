@@ -1,0 +1,279 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Extracting the pitchmarks</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Diphone databases"
+HREF="c2261.html"><LINK
+REL="PREVIOUS"
+TITLE="Labeling the diphones"
+HREF="x2413.html"><LINK
+REL="NEXT"
+TITLE="Building LPC parameters"
+HREF="x2557.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x2413.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Diphone databases</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x2557.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN2522"
+>Extracting the pitchmarks</A
+></H1
+><P
+>&#13;
+
+Festival, in its publically distributed form, currently only supports 
+residual excited Linear-Predictive Coding (LPC) resynthesis 
+[<SPAN
+CLASS="CITATION"
+>hunt89</SPAN
+>]. It does support PSOLA [<SPAN
+CLASS="CITATION"
+>moulines90</SPAN
+>], though this is 
+not distributed in the public version. Both of these techniques are 
+<I
+CLASS="EMPHASIS"
+>pitch synchronous</I
+>, that is there require information about where 
+pitch periods occur in the acoustic signal. Where possible, it is 
+better to record with an electroglottograph (EGG, also known as a 
+laryngograph) at the same time as the voice signal. The EGG records 
+electrical activity in the glottis during speech, which makes it easier 
+to get the pitch moments, and so they can be more precisely found. </P
+><P
+>Although extracting pitch periods from the EGG signal is not trivial, it 
+is fairly straightforward in practice, as The Edinburgh Speech Tools 
+include a program <TT
+CLASS="FILENAME"
+>pitchmark</TT
+> which will process the EGG signal 
+giving a set of pitchmarks. However it is not fully automatic and 
+requires someone to look at the result and make some decisions to change 
+parameters that may improve the result. </P
+><P
+>The first major issue in processing the signal is deciding which way is 
+up. From our experience, we have seen the signal inverted in some cases 
+and it is necessary to identify the direction in order for the rest of 
+the processing to work properly. In general we've found the CSTR's LAR 
+output is upside down while OGI's and CMU's output is the right way up, 
+though this can even flip from file to file. If you find inverted 
+signals, you should add <CODE
+CLASS="VARNAME"
+>-inv</CODE
+> to the arguments to 
+<TT
+CLASS="FILENAME"
+>pitchmark</TT
+>. </P
+><P
+>The object is to produce a single mark at the peak of each pitch period and 
+"fake" or "phantom" periods during unvoiced regions. The basic command 
+we have found that works for us is 
+<A
+NAME="AEN2540"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>pitchmark&nbsp;lar/file001.lar&nbsp;-o&nbsp;pm/file001.pm&nbsp;-otype&nbsp;est&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-min&nbsp;0.005&nbsp;-max&nbsp;0.012&nbsp;-fill&nbsp;-def&nbsp;0.01&nbsp;-wave_end</P
+></BLOCKQUOTE
+>
+It is worth doing one or two by hand and confirming that a reasonable 
+pitch periods are found. Note that the <CODE
+CLASS="VARNAME"
+>-min</CODE
+> and <CODE
+CLASS="VARNAME"
+>-max</CODE
+> 
+arguments are speaker-dependent. This can be moved towards the fixed F0 
+point used in the prompts, though remember the speaker will not have 
+been exactly constant. The script <TT
+CLASS="FILENAME"
+>festvox/src/general/make_pm</TT
+> 
+can be copied and modified (for the particular pitch range) and run to 
+generate the pitchmarks 
+<A
+NAME="AEN2545"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_pm&nbsp;lar/*.lar</P
+></BLOCKQUOTE
+></P
+><P
+>&#13;
+If you don't have an EGG signal for your diphones, the alternative is to 
+extract the pitch periods using some other signal processing function. 
+Finding the pitch periods is similar to finding the F0 contour and, 
+although harder than finding it from the EGG signal, with clean 
+laboratory-recorded speech, such as diphones, it is possible. The 
+following script is a modification of the <TT
+CLASS="FILENAME"
+>make_pm</TT
+> script above 
+for extracting pitchmarks from a raw waveform signal. It is not as good 
+as extracting from the EGG file, but it works. It is more 
+computationally intensive, as it requires rather high order filters. 
+The value should change depending on the speaker's pitch range. 
+<A
+NAME="AEN2553"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>for&nbsp;i&nbsp;in&nbsp;$*<br>
+do<br>
+&nbsp;&nbsp;&nbsp;fname=`basename&nbsp;$i&nbsp;.wav`<br>
+&nbsp;&nbsp;&nbsp;echo&nbsp;$i<br>
+&nbsp;&nbsp;&nbsp;$ESTDIR/bin/ch_wave&nbsp;-scaleN&nbsp;0.9&nbsp;$i&nbsp;-F&nbsp;16000&nbsp;-o&nbsp;/tmp/tmp$$.wav<br>
+&nbsp;&nbsp;&nbsp;$ESTDIR/bin/pitchmark&nbsp;/tmp/tmp$$.wav&nbsp;-o&nbsp;pm/$fname.pm&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-otype&nbsp;est&nbsp;-min&nbsp;0.005&nbsp;-max&nbsp;0.012&nbsp;-fill&nbsp;-def&nbsp;0.01&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-wave_end&nbsp;-lx_lf&nbsp;200&nbsp;-lx_lo&nbsp;71&nbsp;-lx_hf&nbsp;80&nbsp;-lx_ho&nbsp;71&nbsp;-med_o&nbsp;0<br>
+done</P
+></BLOCKQUOTE
+>
+If you are extracting pitch periods automatically, it is worth taking 
+more care to check the signal. We have found that recording consistency 
+and bad pitch extraction the two most common causes of poor quality 
+synthesis. </P
+><P
+>See <A
+HREF="x862.html"
+>the Section called <I
+>Extracting pitchmarks from waveforms</I
+> in the Chapter called <I
+>Basic Requirements</I
+></A
+> for a more detailed 
+discussion on how to do this. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x2413.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x2557.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Labeling the diphones</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c2261.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Building LPC parameters</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

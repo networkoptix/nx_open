@@ -1,0 +1,31 @@
+/**
+
+@page pda_manual pda
+@brief *Pitch Detection Algorithm*
+@tableofcontents
+
+@section synopsis Synopsis
+
+@SYNOPSIS@
+
+pda is a pitch detection algorithm that produces a fundamental frequency
+contour from a speech waveform file. At present only the
+super resolution pitch determination algorithm is implemented.
+See (Medan, Yair, and Chazan, 1991) and (Bagshaw et al., 1993) for a detailed
+description of the algorithm.
+
+The default values given below were found to optimise the performance
+of the pitch determination algorithm for speech data sampled at 20kHz
+using a 16-bit waveform and low pass filter with a 600Hz cut-off
+frequency and more than -85dB rejection above 700Hz. The best
+performances occur if the [-p] flag is passed.
+
+@section options Options
+
+@OPTIONS@
+
+@section pda-examples Examples
+
+Pitch detection on typical male voice, using low pass filtering:
+
+    $ pda kdt_010.wav -o kdt_010.f0 -fmin 80 -fmax 200 -L

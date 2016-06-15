@@ -1,0 +1,831 @@
+<!DOCTYPE style-sheet PUBLIC "-//James Clark//DTD DSSSL Style Sheet//EN" [
+<!ENTITY dbstyle SYSTEM "/usr/local/share/sgml/stylesheets/docbook/html/docbook.dsl" CDATA DSSSL>
+]>
+
+<style-sheet>
+<style-specification use="docbook">
+<style-specification-body>
+
+ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ ;;                                                                       ;;
+ ;; CSTR modifications to modular docbook stylesheets. me of this could   ;;
+ ;; perhaps be split into parameters and more parametarisable             ;;
+ ;; definitions replaceing ones from the standard style sheets.           ;;
+ ;;                                                                       ;;
+ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define html-index #t )
+
+(define %shade-verbatim% #t)
+
+(define %missing-link-error% #f)
+
+(define image-directory "images_gen")
+
+(define $generate-chapter-toc$ (lambda () #t))
+(define %generate-book-toc% #f)
+
+(define ($shade-verbatim-attr$)
+  ;; Attributes used to create a shaded verbatim environment.
+  (list
+   (list "BORDER" "0")
+   (list "WIDTH" "80%")))
+
+(define ($shade-verbatim-cell-attr$)
+  ;; Attributes used to create a shaded verbatim environment.
+  (list
+   ))
+
+(define ($shade-verbatim-text-attr$)
+  ;; Attributes used to create a shaded verbatim environment.
+  (list
+   (list "style" "white-space:pre; display:block;")
+   (list "face" "monospace")
+   (list "color" "#000000")
+   ))
+
+(define %body-attr% 
+  ;; What attributes should be hung off of BODY?
+  (list
+   (list "BGCOLOR" "#FFFFFF")
+   (list "BACKGROUND" "../cstr_background.jpg")
+   (list "TEXT" "#0000AA")
+	)
+   )
+
+(define $line-annotation-attr$
+  ;; font attributes for line annotation
+  (list
+   (list "color" "#A00080")
+   (list "size" "-1")
+   (list "face" "sans")
+   (list "weight" "bold")
+   )
+  )
+
+(element lineannotation
+	 (make element gi: "font"
+	       attributes: $line-annotation-attr$
+	       (process-children))
+	 )
+
+(element screen 
+	(make element gi: "DIV" attributes: '(("ALIGN" "CENTER"))
+		($verbatim-display$ %number-screen-lines%)
+		)
+	)
+
+(element programlisting
+	(make element gi: "DIV" attributes: '(("ALIGN" "CENTER"))
+		($verbatim-display$ %number-programlisting-lines%)
+		)
+	)
+
+(element sidebar 
+	 (make element gi: "div"
+	       (make empty-element gi: "br"
+		     attributes: (list
+				  (list "clear" "right")
+				  )
+		     )
+	       (make element gi: "TABLE"
+		     attributes: (list
+				  (list "CLASS" (gi))
+				  (list "BORDER" "1")
+				  (list "CELLPADDING" "5"))
+		     (make element gi: "TR"
+			   (make element gi: "TD"
+				 ($semiformal-object$))))
+	       )
+	 )
+
+(define (default-header-nav-tbl-ff elemnode prev next prevsib nextsib)
+  (let* ((r1? (nav-banner? elemnode))
+	 (r1-sosofo (make element gi: "TR"
+			  (make element gi: "TH"
+				attributes: (list
+					     (list "COLSPAN" "5")
+					     (list "ALIGN" "center")
+					     (list "VALIGN" "bottom"))
+				(nav-banner elemnode))))
+	 (r2? (or (not (node-list-empty? prev))
+		  (not (node-list-empty? next))
+		  (not (node-list-empty? prevsib))
+		  (not (node-list-empty? nextsib))
+		  (nav-context? elemnode)))
+	 (r2-sosofo (make element gi: "TR"
+			  (make element gi: "TD"
+				attributes: (list
+					     (list "WIDTH" "10%")
+					     (list "ALIGN" "left")
+					     (list "VALIGN" "top"))
+				(if (node-list-empty? prev)
+				    (make entity-ref name: "nbsp")
+				    (make element gi: "A"
+					  attributes: (list
+						       (list "HREF" 
+							     (href-to 
+							      prev)))
+					  (gentext-nav-prev prev))))
+			  (make element gi: "TD"
+				attributes: (list
+					     (list "WIDTH" "10%")
+					     (list "ALIGN" "left")
+					     (list "VALIGN" "top"))
+				(if (node-list-empty? prevsib)
+				    (make entity-ref name: "nbsp")
+				    (make element gi: "A"
+					  attributes: (list
+						       (list "HREF" 
+							     (href-to 
+							      prevsib)))
+					  (gentext-nav-prevsib prevsib))))
+			  (make element gi: "TD"
+				attributes: (list
+					     (list "WIDTH" "60%")
+					     (list "ALIGN" "center")
+					     (list "VALIGN" "bottom"))
+				(nav-context elemnode))
+			  (make element gi: "TD"
+				attributes: (list
+					     (list "WIDTH" "10%")
+					     (list "ALIGN" "right")
+					     (list "VALIGN" "top"))
+				(if (node-list-empty? nextsib)
+				    (make entity-ref name: "nbsp")
+				    (make element gi: "A"
+					  attributes: (list
+						       (list "HREF" 
+							     (href-to
+							      nextsib)))
+					  (gentext-nav-nextsib nextsib))))
+			  (make element gi: "TD"
+				attributes: (list
+					     (list "WIDTH" "10%")
+					     (list "ALIGN" "right")
+					     (list "VALIGN" "top"))
+				(if (node-list-empty? next)
+				    (make entity-ref name: "nbsp")
+				    (make element gi: "A"
+					  attributes: (list
+						       (list "HREF" 
+							     (href-to
+							      next)))
+					  (gentext-nav-next next)))))))
+    (if (or r1? r2?)
+	(make element gi: "DIV"
+	      attributes: '(("CLASS" "NAVHEADER"))
+	  (make element gi: "TABLE"
+		attributes: (list
+			     (list "WIDTH" %gentext-nav-tblwidth%)
+			     (list "BORDER" "0")
+			     (list "CELLPADDING" "0")
+			     (list "CELLSPACING" "0"))
+		(if r1? r1-sosofo (empty-sosofo))
+		(if r2? r2-sosofo (empty-sosofo)))
+	  (make empty-element gi: "HR"
+		attributes: (list
+			     (list "ALIGN" "LEFT")
+			     (list "WIDTH" %gentext-nav-tblwidth%)))
+	  (make empty-element gi: "HR"
+		attributes: (list
+			     (list "ALIGN" "LEFT")
+			     (list "WIDTH" %gentext-nav-tblwidth%))))
+	(empty-sosofo))))
+
+(define (default-header-nav-tbl-noff elemnode prev next prevsib nextsib)
+  (let* ((r1? (nav-banner? elemnode))
+	 (limg (entity-text "title-left-image"))
+	 (rimg (entity-text "title-right-image"))
+	 (r1-sosofo (make element gi: "TR"
+			  (if limg 
+			      (make element gi: "TH"
+				    attributes: (list
+						 (list "ROWSPAN" "2")
+						 (list "ALIGN" "left"))
+				    (make empty-element gi: "IMG"
+					  attributes: (list
+						       (list "SRC" limg)
+						       )
+					))
+			      (empty-sosofo)
+			      )
+			  (make element gi: "TH"
+				attributes: (list
+					     (list "COLSPAN" "3")
+					     (list "ALIGN" "center"))
+				(nav-banner elemnode))
+			  (if rimg 
+			      (make element gi: "TH"
+				    attributes: (list
+						 (list "ROWSPAN" "2")
+						 (list "ALIGN" "right"))
+				    (make empty-element gi: "IMG"
+					  attributes: (list
+						       (list "SRC" rimg)
+						       )
+					))
+			      (empty-sosofo)
+			      )
+			))
+	 (r2? (or (not (node-list-empty? prev))
+		  (not (node-list-empty? next))
+		  (nav-context? elemnode)))
+	 (r2-sosofo (make element gi: "TR"
+			  (make element gi: "TD"
+				attributes: (list
+					     (list "WIDTH" "10%")
+					     (list "ALIGN" "left")
+					     (list "VALIGN" "bottom"))
+				(if (node-list-empty? prev)
+				    (make entity-ref name: "nbsp")
+				    (make element gi: "A"
+					  attributes: (list
+						       (list "HREF" 
+							     (href-to 
+							      prev)))
+					  (gentext-nav-prev prev))))
+			  (make element gi: "TD"
+				attributes: (list
+					     (list "WIDTH" "80%")
+					     (list "ALIGN" "center")
+					     (list "VALIGN" "bottom"))
+				(nav-context elemnode))
+			  (make element gi: "TD"
+				attributes: (list
+					     (list "WIDTH" "10%")
+					     (list "ALIGN" "right")
+					     (list "VALIGN" "bottom"))
+				(if (node-list-empty? next)
+				    (make entity-ref name: "nbsp")
+				    (make element gi: "A"
+					  attributes: (list
+						       (list "HREF" 
+							     (href-to
+							      next)))
+					  (gentext-nav-next next)))))))
+    (if (or r1? r2?)
+	(make element gi: "DIV"
+	      attributes: '(("CLASS" "NAVHEADER"))
+	  (make element gi: "TABLE"
+		attributes: (list
+			     (list "WIDTH" %gentext-nav-tblwidth%)
+			     (list "BORDER" "0")
+			     (list "CELLPADDING" "0")
+			     (list "CELLSPACING" "0"))
+		(if r1? r1-sosofo (empty-sosofo))
+		(if r2? r2-sosofo (empty-sosofo)))
+	  (make empty-element gi: "HR"
+		attributes: (list
+			     (list "ALIGN" "LEFT")
+			     (list "WIDTH" %gentext-nav-tblwidth%))))
+	(empty-sosofo))))
+
+
+(define ($verbatim-display$ line-numbers?)
+  (let ((content (make element gi: "font"
+				attributes: ($shade-verbatim-text-attr$)
+		       (if line-numbers?
+			   ($verbatim-content-with-linenumbers$)
+			   ($verbatim-content$)))))
+    (if %shade-verbatim%
+	(make element gi: "TABLE"
+	      attributes: ($shade-verbatim-attr$)
+	      (make element gi: "TR"
+		    (make element gi: "TD"
+			  attributes: ($shade-verbatim-cell-attr$)
+			  content
+				)))
+	content)))
+
+
+(define ($sect-toc$)
+  (let ((depth	(attribute-string "depth")))
+    ;; Called by the TITLE element so that it can come after the TITLE
+    (build-toc (ancestor-member (current-node) (section-element-list))
+	       (if depth
+		   (string->number depth)
+		   (toc-depth (ancestor-member (current-node) (section-element-list)))
+		   )
+	       #t))
+  )
+
+(define ($chapter-toc$)
+  (let ((depth	(attribute-string "depth")))
+  ;; Called by the TITLE element so that it can come after the TITLE
+  (build-toc (ancestor-member (current-node) (component-element-list))
+	       (if depth
+		   (string->number depth)
+		   (toc-depth (ancestor-member (current-node) (component-element-list)))
+		   )
+	     #t)))
+
+(element (SECT1 TOC)
+	 (make element gi: "DIV"
+	       (process-children)
+	       ($sect-toc$)
+	       )
+	 )
+
+(element (SECT2 TOC)
+	 (make element gi: "DIV"
+	       (process-children)
+	       ($sect-toc$)
+	       )
+	 )
+
+(element (SECT3 TOC)
+	 (make element gi: "DIV"
+	       (process-children)
+	       ($sect-toc$)
+	       )
+	 )
+
+(element (CHAPTER TOC)
+	 (make element gi: "DIV"
+	       (process-children)
+	       ($chapter-toc$)
+	       )
+	 )
+
+(element (BOOK TOC)
+	 (make element gi: "DIV"
+	       (process-children)
+	       ($chapter-toc$)
+	       )
+	 )
+
+;; Variable list
+
+(element variablelist
+  (make sequence
+	(make element gi: "blockquote"
+	      (make element gi: "table"
+		    attributes: '(("class" "parameters"))
+		    (process-children)))
+	(para-check 'restart)))
+
+(element (variablelist title)
+	 (make element gi: "tr"
+	       (make element gi: "th"
+		     attributes: '(("colspan" "2") ("align" "left"))
+		     (process-children))
+	       )
+	 )
+
+(element varlistentry
+  (let ((terms    (select-elements (children (current-node)) (normalize "term")))
+	(listitem (select-elements (children (current-node)) (normalize "listitem"))))
+    (make element gi: "tr"
+	  attributes: '(("valign" "top"))
+	  (make sequence
+		(make element gi: "th"
+		      attributes: '(("align" "right"))
+		      (if (attribute-string (normalize "id"))
+			  (make element gi: "A"
+				attributes: (list (list "NAME" (attribute-string (normalize "id"))))
+				(process-node-list terms))
+			  (process-node-list terms)))
+		(make element gi: "td"
+		      (process-node-list listitem)
+		      )
+		)
+	  )
+    )
+  )
+  
+(element (varlistentry term)
+  (make sequence
+    (process-children-trim)
+    (if (not (last-sibling?))
+	(literal ", ")
+	(literal ""))))
+
+(element (varlistentry listitem)
+	(process-children))
+
+
+;; by copy of the index building stuff.
+
+(define (htmlindexattr-inherited attr)
+  (if (inherited-attribute-string (normalize attr))
+      (make sequence
+	(make formatting-instruction data: attr)
+	(make formatting-instruction data: " ")
+	(make formatting-instruction data: (inherited-attribute-string 
+					    (normalize attr)))
+	(htmlnewline))
+      (empty-sosofo)))
+
+(mode htmlindex
+  ;; this mode is really just a hack to get at the root element
+  (root (process-children))
+
+  (default 
+    (if (node-list=? (current-node) (sgml-root-element))
+	(make entity
+	  system-id: (html-entity-file html-index-filename)
+	  (process-node-list (select-elements 
+			      (descendants (current-node))
+			      (normalize "indexterm"))))
+	(empty-sosofo)))
+
+  (element indexterm
+    (let* ((target (ancestor-member (current-node)
+				    (append (book-element-list)
+					    (division-element-list)
+					    (component-element-list)
+					    (section-element-list))))
+	   (title  (string-replace (element-title-string target) "&#13;" " ")))
+      (make sequence
+	(make formatting-instruction data: "INDEXTERM ")
+	(make formatting-instruction data: (href-to target))
+	(htmlnewline)
+
+	(make formatting-instruction data: "INDEXPOINT ")
+	(make formatting-instruction data: (href-to (current-node)))
+	(htmlnewline)
+
+	(make formatting-instruction data: "TITLE ")
+	(make formatting-instruction data: title)
+	(htmlnewline)
+
+	(htmlindexattr "scope")
+	(htmlindexattr "significance")
+	(htmlindexattr "class")
+	(htmlindexattr-inherited "id")
+	(htmlindexattr "startref")
+	
+	(if (attribute-string (normalize "zone"))
+	    (htmlindexzone (attribute-string (normalize "zone")))
+	    (empty-sosofo))
+
+	(process-children)
+
+	(make formatting-instruction data: "/INDEXTERM")
+	(htmlnewline))))
+		    
+  (element primary
+    (htmlindexterm))
+
+  (element secondary
+    (htmlindexterm))
+
+  (element tertiary
+    (htmlindexterm))
+
+  (element see
+    (htmlindexterm))
+
+  (element seealso
+    (htmlindexterm))
+)
+
+;; TeX processing support
+(define html-tex-filename
+	"TeX.formulae"
+	)
+
+(define (tex-graphic #!optional (nd (current-node)))
+  (let* ((format (attribute-string "format" nd))
+	 (fileref (attribute-string "fileref" nd))
+	 )
+    (if (equal? format (normalize "tex"))
+	(make sequence
+	      (make formatting-instruction data: "@Name ")
+	      (make formatting-instruction data: (string-append image-directory "/" fileref))
+	      (htmlnewline)
+	      (make formatting-instruction data: "@Start")
+	      (htmlnewline)
+	      (make formatting-instruction data: (data nd))
+	      (htmlnewline)
+	      (make formatting-instruction data: "@End")
+	      (htmlnewline)
+	      )
+	(empty-sosofo)
+	)
+    )
+  )
+
+(define ($img$ #!optional (nd (current-node)) (alt #f))
+  ;; This function now supports an extension to DocBook.  It's
+  ;; either a clever trick or an ugly hack, depending on your
+  ;; point of view, but it'll hold us until XLink is finalized
+  ;; and we can extend DocBook the "right" way.
+  ;;
+  ;; If the entity passed to GRAPHIC has the FORMAT
+  ;; "LINESPECIFIC", either because that's what's specified or
+  ;; because it's the notation of the supplied ENTITYREF, then
+  ;; the text of the entity is inserted literally (via Jade's
+  ;; read-entity external procedure).
+  ;;
+  (let* ((fileref   (attribute-string (normalize "fileref") nd))
+         (entityref (attribute-string (normalize "entityref") nd))
+         (format    (if (attribute-string (normalize "format") nd)
+                        (attribute-string (normalize "format") nd)
+                        (if entityref
+                            (entity-notation entityref)
+                            #f)))
+         (align     (attribute-string (normalize "align") nd)))
+    (if (or fileref entityref)
+        (if (equal? format (normalize "linespecific"))
+            (if fileref 
+                (include-file fileref)
+                (include-file (entity-generated-system-id entityref)))
+	    (if (equal? format (normalize "tex"))
+		(if fileref 
+		    ($graphic$ (string-append image-directory "/" fileref) format alt align)
+		    ($graphic$ (string-append image-directory "/" (system-id-filename entityref))
+			       format alt align))
+		(if fileref
+		    ($graphic$ fileref format alt align)
+		    ($graphic$ (system-id-filename entityref)
+			       format alt align)))
+	    )
+	(empty-sosofo)
+	)))
+
+(mode tex-graphics
+      ;; this mode is really just a hack to get at the root element
+      (root (process-children))
+      
+      (default 
+	(if (node-list=? (current-node) (sgml-root-element))
+	    (make entity
+		  system-id: (html-entity-file html-tex-filename)
+		  (process-node-list (select-elements 
+				      (descendants (current-node))
+				      (normalize "graphic")))
+		  (process-node-list (select-elements 
+				      (descendants (current-node))
+				      (normalize "inlinegraphic")))
+		  )
+	    (empty-sosofo)))
+      
+      (element graphic
+	       (tex-graphic)
+	       )
+
+      (element inlinegraphic
+	       (tex-graphic)
+	       )
+
+      )
+
+(root
+ (make sequence
+;   (literal
+;    (debug (node-property 'gi
+;                         (node-property 'document-element (current-node)))))
+;(define (docelem node)
+;  (node-propety 'document-element 
+;    (node-property 'grove-root node)))
+   (process-children)
+   (with-mode manifest
+     (process-children))
+   (if html-index
+       (with-mode htmlindex
+         (process-children))
+       (empty-sosofo))
+   (with-mode tex-graphics
+	      (process-children)
+	      )
+   )
+ )
+
+;; Sections can pass on role information
+
+(define ($section-body$)
+  (let* ((sect (current-node))
+	 (class (or (attribute-string "ROLE" sect)
+		    (gi sect)
+		    )
+		  )
+	 )
+    (make element gi: "DIV"
+	  attributes: (list (list "CLASS" class))
+	  ($section-separator$)
+	  ($section-title$)
+	  (if (equal? class "entry") 
+	      (make element gi: "blockquote"
+		    (process-children)
+		    )
+	      (process-children)
+	      )
+	  )
+    )
+  )
+
+(define ($section-title$)
+  (let* ((sect (current-node))
+	 (info (info-element))
+	 (subtitles (select-elements (children info) (normalize "subtitle")))
+	 (renderas (inherited-attribute-string (normalize "renderas") sect))
+	 (hlevel                          ;; the apparent section level;
+	  (if renderas                    ;; if not real section level,
+	      (string->number             ;;   then get the apparent level
+	       (substring renderas 4 5))  ;;   from "renderas",
+	      (SECTLEVEL)))               ;; else use the real level
+	 (h1elem
+	  (string-append "H" (number->string hlevel)))
+	 (h2elem
+	  (string-append "H" (number->string (+ hlevel 1))))
+	 (name (element-id))
+	 (isep (gentext-intra-label-sep (gi sect)))
+	 (nsep (gentext-label-title-sep (gi sect)))
+	 (role (attribute-string "ROLE" sect))
+	 (h1class (if role (string-append (gi sect) "" role) (gi sect)))
+	 )
+    (make sequence
+	      (make element gi: h1elem
+		    attributes: (list (list "CLASS" h1class))
+		    (make element gi: "A"
+			  attributes: (list (list "NAME" name))
+			  (if (string=? (element-label (current-node)) "")
+			      (empty-sosofo)
+			      (literal (element-label (current-node)) nsep))
+			  (element-title-sosofo sect)
+			  ))
+	  (if (node-list-empty? subtitles) 
+	      (empty-sosofo)
+	      (with-mode subtitle-mode
+			 (make element gi: h2elem
+			       attributes: (list (list "CLASS" (string-append h1class "-subtitle")))
+						 (process-node-list subtitles))))
+	      ($proc-section-info$ info))))
+
+
+(define %html-header-tags%
+  '(
+    ("link" ("rel" "stylesheet") ("type" "text/css") ("href" "cstrdoc.css"))
+    )
+  )
+
+
+(element synopsis
+	 (make element gi: "table"
+	       attributes: '(("cellspacing" "0")("cellpadding" "0") ("class" "synopsys"))
+	       (make element gi: "tr"
+		     (make sequence
+			   (make element gi: "td"
+				 attributes: '(("valign" "top"))
+				 (with-mode synopsis-table (process-matching-children '("synopsis" ("role" "type"))))
+				 )
+			   (make element gi: "td"
+				 attributes: '(("valign" "top"))
+				 (with-mode synopsis-table (process-matching-children '("synopsis" ("role" "name"))))
+				 )
+
+			   (with-mode synopsis-table-args (process-matching-children '("synopsis" ("role" "args"))))
+			   )
+		     )
+	       )
+	 )
+
+(mode synopsis-table-args
+      
+      (element synopsis 
+	       (let* ((role (attribute-string "role"))
+		      (children (children (current-node)))
+		      (start (if (node-list-empty? children)
+				 ""
+				 (data (node-list-first children))))
+		      )
+		 (if (and (string? start) (not (string=? start "")))
+		     (make sequence
+			   (make element gi: "td"
+				 attributes: '(("valign" "top"))
+				 (make element gi: "tt"
+				       (literal "(")
+				       )
+				 )
+			   (make element gi: "td"
+				 attributes: '(("valign" "top"))
+				 (make element gi: "tt"
+				       (if (and (equal? role "args") 
+						(string? start) 
+						(not (string=? start "")) 
+						(equal? (substring start 0 1) "(")
+						)
+					   (make sequence
+						 (literal (substring start 1 (string-length start)))
+						 (process-node-list (node-list-rest children))
+						 )
+					   (process-children)
+					   )
+				       )
+				 )
+			   )
+		     (empty-sosofo)
+		     )
+		 )
+	       )
+      )
+
+(mode synopsis-table
+      
+      (element synopsis 
+	       (make element gi: "tt"
+		     (let* ((role (attribute-string "role"))
+			    (children (children (current-node)))
+			    (start (if (node-list-empty? children)
+				       ""
+				       (data (node-list-first children))))
+			    )
+		       (if (and (equal? role "args") 
+				(string? start) 
+				(not (string=? start "")) 
+				(equal? (substring start 0 1) "(")
+				)
+			   (make sequence
+				 (literal (substring start 1 (string-length start)))
+				 (process-node-list (node-list-rest children))
+				 )
+			   (process-children)
+			   )
+		       )
+		 )
+	       )
+      )
+
+(element link
+  (let* ((endterm (attribute-string (normalize "endterm")))
+	 (linkend (attribute-string (normalize "linkend")))
+	 (target  (element-with-id linkend))
+	 (etarget (if endterm 
+		      (element-with-id endterm)
+		      (empty-node-list))))
+    (if (node-list-empty? target) 
+	(if %missing-link-error%
+	    (error (string-append "Link to missing ID '" linkend "'"))
+	    (make element gi: "font"
+		  attributes: '(("color" "green"))
+		  (process-children)
+		  )
+	    )
+	(make sequence
+	      (if (and endterm (node-list-empty? etarget))
+		  (error (string-append "EndTerm to missing ID '" endterm "' on Link"))
+		  (empty-sosofo))
+	      (make element gi: "A"
+		    attributes: (list (list "HREF" (href-to target)))
+		    (if endterm
+			(with-mode xref-endterm-mode (process-node-list etarget))
+			(process-children)))))))
+
+
+(element formalpara
+  (make element gi: "DL"
+	attributes: (list
+		     (list "CLASS" (gi)))
+	(make element gi: "dt"
+	      (process-children))))
+
+(element (formalpara title) 
+	 (make element gi: "DT"
+	       (make element gi: "strong"
+		     (process-children)))
+	 )
+
+(element (formalpara para)
+	 (make element gi: "DD"
+	       (process-children)))
+
+(element filename
+	 (make element gi: "TT"
+	       	attributes: '(("CLASS" "filename"))
+	       (process-children))
+	 )
+
+(define (chunk? #!optional (nd (current-node)))
+  ;; 1. The (sgml-root-element) is always a chunk.
+  ;; 2. If nochunks is #t or the dbhtml PI on the root element 
+  ;;    specifies chunk='no', then the root element is the only
+  ;;    chunk.
+  ;; 3. Otherwise, elements in the chunk-element-list are chunks
+  ;;    unless they're combined with their parent.
+  ;; 3a. Things tagged with `newpage' are chunks.
+  ;; 4. Except for bibliographys, which are only chunks if they
+  ;;    occur in book.
+  ;;    
+  (let ((maybechunk (or (not (equal? (gi nd) (normalize "bibliography")))
+			(equal? (gi (parent nd)) (normalize "book")))))
+    (if (node-list=? nd (sgml-root-element))
+	#t
+	(if (or nochunks
+		(equal? (dbhtml-value (sgml-root-element) "chunk") "no"))
+	    #f
+	    (if (member (gi nd) (chunk-element-list))
+		(if (combined-chunk? nd)
+		    #f
+		    maybechunk)
+		(if (attribute-string "newpage" nd) 
+		    maybechunk
+		    #f))))))
+
+
+</style-specification-body>
+</style-specification>
+<external-specification id="docbook" document="dbstyle">
+</style-sheet>
+

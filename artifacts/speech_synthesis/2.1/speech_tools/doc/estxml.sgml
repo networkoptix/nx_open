@@ -1,0 +1,346 @@
+
+<chapter>
+    <title>&xml; Support</title>
+
+    <para>
+      There are three levels of support for &xml; with &est;.
+    </para>
+
+    <formalpara>
+      <title>Loading as an Utterance</title>
+      <para>
+	A built in &xml; parser allows text marked up according to an
+	&xml; DTD to be read into an
+	<classname>EST_Utterance</classname> (see <xref
+	linkend="xmltoutterance" endterm="xmltoutterancetitle">).
+      </para>
+    </formalpara>
+
+    <formalpara>
+      <title>XML_Parser_Class</title>
+      <para>
+	A &cpp; class <classname>XML_Parser_Class</classname> (see
+	<link linkend="xmlparserclass">The documentation for that
+	class</link>) which makes it relatively simple to write
+	specialised &xml; processing code.
+      </para>
+    </formalpara>
+
+    <formalpara>
+      <title>RXP</title>
+      <para>
+	The
+	<productname>RXP</productname> XML parser is included and can be
+	used directly(<xref linkend="rxpparser">). 
+      </para>
+    </formalpara>
+
+    <sect1 ID="xmltoutterance">
+      <title ID="xmltoutterancetitle">Reading &xml; Text As An <classname>EST_Utterance</classname></title>
+      <para>
+	In order to read &xml; marked up text, the &est; code must be
+	told how the &xml; markup should relate to the utterance
+	structure. This is done by annotating the DTD using which the
+	text is processed. 
+      </para>
+      <para>
+	There are two possible ways to anotate the DTD. Either a new
+	DTD can be created with the anotations added, or the
+	anotations can be included in the &xml; file.
+      </para>
+
+       <formalpara>
+	  <title>A new DTD</title>
+
+	<para>
+	  To write a new DTD based on an existing one, you should include
+	  the existing one as follows:
+	  <programlisting arch='xml'>
+	    &lt;!-- Extended FooBar DTD for speech tools --&gt;
+
+	    &lt;!-- Include original FooBar DTD --&gt;
+	    &lt;!ENTITY % OldFooBarDTD PUBLIC "//Foo//DTD Bar"
+					      "http://www.foo.org/dtds/org.dtd"&gt;
+	    %OldFooBarDTD;
+
+	    &lt;!-- Your extensions, for instance... --&gt;
+
+	    &lt;!-- syn-node elements are nodes in the Syntax relation  --&gt;
+	    &lt;!ATTLIST syn-node relationNode CDATA #FIXED "Syntax" &gt;</programlisting>
+	</para>
+      </formalpara>
+
+      <formalpara>
+	  <title>In the &xml; file</title>
+
+	  <para>
+	  Extensions to the DTD can be included in the 
+	  <sgmltag>!DOCTYPE</sgmltag> declaration in the marked up
+	  text. For instance:
+	  <programlisting arch='xml'>
+	    &lt;?xml version='1.0'?&gt;
+	    &lt;!DOCTYPE utterance PUBLIC "//Foo//DTD Bar"
+					  "http://www.foo.org/dtds/org.dtd"
+		[
+		&lt;!-- Item elements are nodes in the Syntax relation  --&gt;
+		&lt;!ATTLIST item relationNode CDATA #FIXED "Syntax" &gt;
+		]&gt;
+
+	    &lt;utterance&gt;
+	    &lt;!-- Actual markup starts here --&gt;</programlisting>
+	</para>
+      </formalpara>
+
+      <sect2>
+	<title>Summary of DTD Anotations</title>
+	
+	<para>
+	  The following attributes may be added to elements in your
+	  DTD to describe it's relation to <link
+	  linkend='est-utterance-class'>EST_Utterance</link>
+	  structures.
+	</para>
+	<variablelist>
+	  <varlistentry><term><sgmltag>estUttFeats</sgmltag></term>
+	    <listitem>
+	      <para>
+		The value should be a comma separated list of
+		attributes which should be set as features on the
+		utterance. Each attribute can be either a simple
+		identifier, or two identifiers separated by
+		<token>:</token>.
+	      </para>
+	      <para>
+		A value <literal>foo:bar</literal> causes the value of
+		the <literal>foo</literal> attribute of the element to be
+		set as the value of the Utterance feature
+		<literal>bar</literal>.
+	      </para>
+	      <para>
+		A simple identifier <literal>foo</literal> causes the
+		<literal>foo</literal> attribute of the element to be
+		set as the value of the Utterance feature
+		<literal>X_foo</literal> where <token>X</token> is the
+		name of the element.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry><term><sgmltag>estRelationFeat</sgmltag></term>
+	    <listitem>
+	      <para>
+		The value should be a comma separated list of
+		attributes which should be set as features on the
+		relation related to this element. It's format and
+		meaning is the same as for
+		<sgmltag>estUttFeats</sgmltag>. 
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry><term><sgmltag>estRelationElementAttr</sgmltag></term>
+	    <listitem>
+	      <para>
+		Indicates that this element defines a relation. All
+		elements inside this one will be made nodes in the
+		relation, unless they are explicitly marked to be
+		ignored by <sgmltag>estRelationIgnore</sgmltag>. The
+		value of the <sgmltag>estRelationElementAttr</sgmltag>
+		attribute is the name of an attribute which gives the
+		name of the relation. 
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry><term><sgmltag>estRelationTypeAttr</sgmltag></term>
+	    <listitem>
+	      <para>
+		When an element has a
+		<sgmltag>estRelationElementAttr</sgmltag> tag to indicate it's
+		content defines a relaion, it may also have the
+		<sgmltag>estRelationTypeAttr</sgmltag> tag. This gives
+		the name of an attribute which gives the type of
+		relation. Currently only a type of `list' or `linear'
+		gives a lienar relation, anything else gives a tree.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry><term><sgmltag>estRelationIgnore</sgmltag></term>
+	    <listitem>
+	      <para>
+		If this is set to any value on an element which would
+		otherwise be interpreted as an
+		<classname>EST_Item</classname> in the current
+		relation, the element is passed over. The contents
+		will be processed as if they had been directly inside
+		this element's parent.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry><term><sgmltag>estRelationNode</sgmltag></term>
+	    <listitem>
+	      <para>
+		When placed on an element, indicates that this element
+		is to be interpreted as an item in the relation named
+		in the value of the attribute.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry><term><sgmltag>estExpansion</sgmltag></term>
+	    <listitem>
+	      <para>
+		The value of this attribute defines how ranges in
+		<sgmltag>href</sgmltag> attributes are expanded for
+		this element. If the value is <token>replace</token>
+		the nodes created during expansion are placed at the
+		same level in the hierachy as the original element. If
+		the value is <token>embed</token> they are created as
+		children of a new node.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry><term><sgmltag>estContentFeature</sgmltag></term>
+	    <listitem>
+	      <para>
+		The value of this attribute is the featre which is set
+		to the contents of the current element.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	</variablelist>
+
+      </sect2>
+      
+    </sect1>
+
+    <sect1 id='xmlparserclass'>
+      <title>The <classname>XML_Parser_Class</classname> &cpp; Class </title>
+
+      <para>
+	The &cpp; class  <classname>XML_Parser_Class</classname>
+	(declared in <filename>rxp/XML_Parser.h</filename>) defines an
+	abstract interface to the &xml; parsing process. By
+	breating a cub-class of
+	<classname>XML_Parser_Class</classname> you can create code to
+	read &xml; marked up text quite simply.
+      </para>
+
+      <sect2>
+	<title>Some Definitions</title>
+
+	<itemizedlist>
+	  <listitem><para>An &xml; parser is an object which can
+	      analyse a piece of text marked up according to an &xml;
+	      doctype and perform actions based on the markup. One
+	      &xml; parser deals with one text.
+	    </para>
+	    <para>
+	      An &xml; parser is represented by an instance of the
+	      class <classname>XML_Parser</classname>.
+	    </para></listitem>
+	    
+	  <listitem><para>An &xml parser class is an object from which
+	      &xml parses can be created. It defines the behaviour of
+	      the parsers when they process their assigned text, and
+	      also a mapping from &xml; entity IDs to places to look
+	      for them.
+	    </para>
+	    <para>
+	      An &xml; parser class is represented by an instance of
+	      <classname>XML_Parser_Class</classname> or a subclass of
+	      <classname>XML_Parser_Class</classname>.
+	    </para></listitem>
+	    
+	</itemizedlist>
+      </sect2>
+
+      <sect2>
+	<title>Creating An &xml; Processing Procedure</title>
+	<para>
+	  In order to create a procedure which will process &xml;
+	  marked up text in the manner of your choice you need to do 4
+	  things. Simple examples can be found in
+	  <filename>testsuite/xml_example.cc</filename> and
+	  <filename>main/xml_parser_main.cc</filename> 
+	</para>
+	
+	<sect3>
+	  <title>Create a Sub-Class of <classname>XML_Parser_Class</classname></title>
+	  <para>
+	  </para>
+	</sect3>
+
+	<sect3>
+	  <title>Create a Structure Holding the State of the Parse</title>
+	  <para>
+	  </para>
+	</sect3>
+
+	<sect3>
+	  <title>Decide How Entity IDs Should Be Converted To Filenames</title>
+	  <para>
+	  </para>
+	</sect3>
+
+	<sect3>
+	  <title>Write A Procedure To Start The Parser</title>
+	  <para>
+	  </para>
+	</sect3>
+
+      </sect2>
+
+      <sect2>
+	<title>The <classname>XML_Parser_Class</classname> in Detail</classname></title>
+
+	<para>
+	  
+	</para>
+
+	&docpp-XMLParser-3;
+
+      </sect2>
+
+    </sect1>
+
+    <sect1 ID='rxpparser' XRefLabel='The RXP Parser'>
+      <title>The <productname>RXP</productname> &xml; Parser</title>
+
+      <para>
+	Included in the &est; library is a version of the
+	<productname>RXP</productname> &xml; parser. This version is
+	limited to 8-bit characters for consistency with the rest of
+	&est;. For more details, see the
+	<productname>RXP</productname> documentation. 
+		<footnote><para>Insert reference to
+		      <productname>RXP</productname> documentation
+		    here.</para></footnote>
+      </para>
+
+    </sect1>
+
+</chapter>
+
+
+<!--
+Local Variables:
+mode: sgml
+sgml-doctype:"speechtools.sgml"
+sgml-parent-document:("speechtools.sgml" "chapter" "book")
+sgml-omittag:nil
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
+

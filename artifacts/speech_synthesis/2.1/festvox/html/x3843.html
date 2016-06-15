@@ -1,0 +1,439 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Data Types</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Festival's Scheme Programming Language"
+HREF="c3791.html"><LINK
+REL="PREVIOUS"
+TITLE="Festival's Scheme Programming Language"
+HREF="c3791.html"><LINK
+REL="NEXT"
+TITLE="Functions"
+HREF="x3925.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c3791.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Festival's Scheme Programming Language</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x3925.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN3843"
+>Data Types</A
+></H1
+><P
+>There a number of basic data types in this Scheme, new ones may also be 
+added but only through C++ functions. This basic types are 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><I
+CLASS="EMPHASIS"
+>Symbols:</I
+></DT
+><DD
+><P
+>symbols atoms starting with an alphabetic character. Unlike 
+numbers and strings, they may be used as variables. Examples 
+are 
+<A
+NAME="AEN3852"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>a&nbsp;bcd&nbsp;f6&nbsp;myfunc&nbsp;<br>
+plus&nbsp;cond</P
+></BLOCKQUOTE
+>
+Symbols may be created from strings by using the function <CODE
+CLASS="VARNAME"
+>intern</CODE
+> </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>Numbers:</I
+></DT
+><DD
+><P
+>In this version of scheme all numbers are doubles, there is no 
+distinction between floats, doubles and ints. Examples are 
+<A
+NAME="AEN3860"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>1<br>
+1.4<br>
+3.14<br>
+345<br>
+3456756.4345476</P
+></BLOCKQUOTE
+>
+Numbers evaluate to themselves, that is the value of the atom 2 
+is the number 2. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>Strings:</I
+></DT
+><DD
+><P
+>Strings are bounded by the double quote characters <CODE
+CLASS="VARNAME"
+>"</CODE
+>. 
+For example 
+<A
+NAME="AEN3868"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>"a"<br>
+"abc"<br>
+"This&nbsp;is&nbsp;a&nbsp;string"</P
+></BLOCKQUOTE
+>
+Strings evaluate to themselves. They may be converted to symbols 
+with the function <CODE
+CLASS="VARNAME"
+>intern</CODE
+>. If they are strings of characaters 
+that represent numbers you can convert a string to a number with 
+the function <CODE
+CLASS="VARNAME"
+>parse-number</CODE
+>. For example 
+<A
+NAME="AEN3872"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(intern&nbsp;"abc")&nbsp;=&#62;&nbsp;abc<br>
+(parse-number&nbsp;"3.14")&nbsp;=&#62;&nbsp;3.14</P
+></BLOCKQUOTE
+>
+Although you can make symbols from numbers you should not do that. </P
+><P
+>Double quotes may be specified within a string by escaping it with a 
+backslash. Backslashes therefore also require an escape backslash. 
+That is, <CODE
+CLASS="VARNAME"
+>"ab\"c"</CODE
+> contains four characters, <CODE
+CLASS="VARNAME"
+>a</CODE
+>, <CODE
+CLASS="VARNAME"
+>b</CODE
+>, 
+<CODE
+CLASS="VARNAME"
+>"</CODE
+> and <CODE
+CLASS="VARNAME"
+>c</CODE
+>. <CODE
+CLASS="VARNAME"
+>"ab\\c"</CODE
+> also contains four characters, 
+<CODE
+CLASS="VARNAME"
+>a</CODE
+>, <CODE
+CLASS="VARNAME"
+>b</CODE
+>, <CODE
+CLASS="VARNAME"
+>\</CODE
+> and <CODE
+CLASS="VARNAME"
+>c</CODE
+>. And <CODE
+CLASS="VARNAME"
+>"ab\\\"c"</CODE
+> 
+contains five characters <CODE
+CLASS="VARNAME"
+>a</CODE
+>, <CODE
+CLASS="VARNAME"
+>b</CODE
+>, <CODE
+CLASS="VARNAME"
+>\</CODE
+>, <CODE
+CLASS="VARNAME"
+>"</CODE
+> and 
+<CODE
+CLASS="VARNAME"
+>c</CODE
+>. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>Lists or Cons</I
+></DT
+><DD
+><P
+>Lists start with a left parenthesis and end with a right parenthesis 
+with zero or more s-expression between them. For example 
+<A
+NAME="AEN3896"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(a&nbsp;b&nbsp;c)<br>
+()<br>
+(b&nbsp;(b&nbsp;d)&nbsp;e)<br>
+((the&nbsp;boy)&nbsp;saw&nbsp;(the&nbsp;girl&nbsp;(in&nbsp;(the&nbsp;park))))</P
+></BLOCKQUOTE
+>
+Lists can be made by various functions most notably <CODE
+CLASS="VARNAME"
+>cons</CODE
+> and 
+<CODE
+CLASS="VARNAME"
+>list</CODE
+>. <CODE
+CLASS="VARNAME"
+>cons</CODE
+> returns a list whose first item is the first 
+item in the list, standardly called its <CODE
+CLASS="VARNAME"
+>car</CODE
+>, and whose remainder, 
+standardly called its <CODE
+CLASS="VARNAME"
+>cdr</CODE
+>, is the second argument of <CODE
+CLASS="VARNAME"
+>cons</CODE
+>. 
+<A
+NAME="AEN3904"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(cons&nbsp;'a&nbsp;'(b&nbsp;c))&nbsp;=&#62;&nbsp;(a&nbsp;b&nbsp;c)<br>
+(cons&nbsp;'(a&nbsp;b)&nbsp;'(c&nbsp;d))&nbsp;=&#62;&nbsp;((a&nbsp;b)&nbsp;c&nbsp;d)</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>Functions:</I
+></DT
+><DD
+><P
+>Functions may be applied explicity bu the function <CODE
+CLASS="VARNAME"
+>apply</CODE
+> 
+or more normally as when the appear as the first item in a list 
+to be evaluated. The normal way to define function is using 
+the <CODE
+CLASS="VARNAME"
+>define</CODE
+> function. For example 
+<A
+NAME="AEN3913"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(ftoc&nbsp;temp)<br>
+&nbsp;&nbsp;&nbsp;(/&nbsp;(*&nbsp;(-&nbsp;temp&nbsp;32)&nbsp;5)&nbsp;9))</P
+></BLOCKQUOTE
+>
+This binds the function to the variable <CODE
+CLASS="VARNAME"
+>ftoc</CODE
+>. Functions 
+can also be defined anonymously which sometimes is convinient. 
+<A
+NAME="AEN3916"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(lambda&nbsp;(temp)<br>
+&nbsp;&nbsp;&nbsp;(/&nbsp;(*&nbsp;(-&nbsp;temp&nbsp;32)&nbsp;5)&nbsp;9))</P
+></BLOCKQUOTE
+>
+returns a function. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>Others:</I
+></DT
+><DD
+><P
+>other internal types are support by Festival's scheme including some 
+inportant object types use for synthesis such as utterances, waveforms, 
+items etc. The are normally printed as in the form 
+<A
+NAME="AEN3923"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>#&#60;Utterance&nbsp;6234&#62;<br>
+#%lt;Wave&nbsp;1294&#62;</P
+></BLOCKQUOTE
+>
+The rpint form is a convinience form only. Enter that string of 
+characters will not allow a reference to that object. The number is 
+unique to that object instance (it is actually the internal address of 
+the object), and can be used visually to note if objects are the same or 
+not. </P
+></DD
+></DL
+></DIV
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c3791.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x3925.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Festival's Scheme Programming Language</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c3791.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

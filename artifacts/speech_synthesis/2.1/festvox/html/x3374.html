@@ -1,0 +1,269 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Does it work at all?</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Evaluation and Improvements"
+HREF="c3364.html"><LINK
+REL="PREVIOUS"
+TITLE="Evaluation and Improvements"
+HREF="c3364.html"><LINK
+REL="NEXT"
+TITLE="Formal Evaluation Tests"
+HREF="x3400.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c3364.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Evaluation and Improvements</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x3400.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN3374"
+>Does it work at all?</A
+></H1
+><P
+>&#13;It is very easy to build a voice and get it to say a few phrases and
+think that the job is done. As you build the voice it is worth testing
+each part as you built it to ensure it basically performs as expected.
+But once its all together more general tests are needed.  Before you
+submit it to any formal tests that you will use for benchmarking and
+grading progrees in the voice, more basic tests should
+be carried out.&#13;</P
+><P
+>&#13;In fact it is stating such initial tests more concretely. <I
+CLASS="EMPHASIS"
+>Every</I
+> we have ever built has always had a number mistakes
+in it that can be trivially fixed.  Such as the mfccs were not
+generated after fixing the pitchmarks.  Therefore you syould go
+through each stage of the build procedure and ensure it really did do
+what you though it should do, especially if you are totally convinced
+that section worked perfectly.&#13;</P
+><P
+>&#13;Try to find around 100-500 sentences to play through it. It is amazing
+home many general problems are thrown up when you extend your test
+set.  The next stage is to play so <I
+CLASS="EMPHASIS"
+>real</I
+>
+text. That may be news text from the web, output from your speech
+translation system, or some email.  Initially it is worth just
+synthesizing the whole set without even listening to it. Problems in
+analysis and missing diphones etc may be shown up just in the
+processing of the text. Then you want to listen to the output and
+identify problems. This make take some amount of investigation. What
+you want to do is identify <I
+CLASS="EMPHASIS"
+>where</I
+> the problem is,
+is it bad tex analysis, bad lexical entry, a prosody problem, or a
+waveform synthesis problem. You may need to synthesizes parts of the
+text in isolation (e.g. using the Festival function
+<CODE
+CLASS="VARNAME"
+>SayText</CODE
+> and look at the structure of the utterance
+generated, e.g. using the function
+<CODE
+CLASS="VARNAME"
+>utt.features</CODE
+>. For example to see what words have
+been identified from the text analysis
+
+<A
+NAME="AEN3384"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(utt.features&nbsp;utt1&nbsp;'Word&nbsp;'(name))</P
+></BLOCKQUOTE
+>
+Or to see the phones generated 
+<A
+NAME="AEN3386"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(utt.features&nbsp;utt1&nbsp;'Segment&nbsp;'(name))</P
+></BLOCKQUOTE
+>
+Thus you can view selected parts of an utterance and find out 
+if it is being created as you intended. For some things 
+a graphical display of the utterance may help.&#13;</P
+><P
+>&#13;Once you identify <I
+CLASS="EMPHASIS"
+>where</I
+> the problem is you need
+to decide how to fix it (or if it is worth fixing).  The problem may
+be a number of different places:&#13;</P
+><P
+></P
+><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Phonetic error: the acoustics of a unit doesn't match the label.  This
+may be because the speaker said the wrong word/phoneme or the labeller
+had the wrong.  Or possible some other acoustic variant that has
+not been considered&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Lexical error: the word is pronounced with the wrong string of
+phonemes/stress/tone.  Either the lexical entry is wrong or the letter
+to sound rules are not doing ht right thing.  Or there are multiple
+valid pronunciations for that word (homographs) and the wrong
+one is selectec because the homograph disambiguation is wrong,
+or there is not a disambiguator.&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Text error: the text analysis doesn't deal properly with the word.
+It may be that a punctuation system is spoken (or not spoken) as
+expected, titles, symbols, compounds etc aren't dealt with properly&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Some other error: some error that is not one of the above.  As you
+progress in correction and tuningm errors in the category will grow
+and you must find some way to avoid such errors.&#13;</P
+></LI
+></UL
+><P
+>&#13;Before rushing out and getting one hundred people to listen to your
+new synthetic voice, it is worth doing significant internal testing
+and evaluation, informally to find errors and test them.  Remember the
+purpose of evaluation in this case is to find errors and fix them.  We
+are not, at least not at this stage, evaluating the voices on an
+abstract scale, where unseen test data, and blind testing is
+important.&#13;</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c3364.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x3400.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Evaluation and Improvements</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c3364.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Formal Evaluation Tests</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

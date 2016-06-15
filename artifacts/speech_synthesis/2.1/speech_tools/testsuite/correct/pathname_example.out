@@ -1,0 +1,33 @@
+file f = baz/ptooie
+dir f  = baz/ptooie/
+combine = /foo/bar/baz/ptooie
+combine = baz/ptooie/baz/ptooie
+    build = /foo/bar/baz/ptooie.test
+ filename = ptooie.test
+extension = test
+ basename = ptooie.test
+basename1 = ptooie
+listing example_data:
+    Makefile
+    alice
+    ch_track.htk
+    ch_wave.wav
+    channel_names.map
+    colours.map
+    colours_translation.map
+    eg.dtd
+    eg.xml
+    kdt_001.il
+    kdt_001.pm
+    kdt_001.tilt
+    kdt_001.wav
+    ked_wr1_012.utt
+    key.lab
+    options.file
+    vit.B.ngram
+    vit.observes
+    vit.vocab
+    wagon.data
+    wagon.desc
+    wagon.tree
+done.

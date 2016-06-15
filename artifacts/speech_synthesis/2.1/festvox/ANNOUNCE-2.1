@@ -1,0 +1,139 @@
+
+                  Building Voices in Festival
+       Processes and issues in building speech synthesis voices
+                      festvox-2.1-release
+                 Alan W Black and Kevin A. Lenzo
+                         awb@cs.cmu.edu
+                     http://www.festvox.org
+
+This is to announce a new release of the festvox project.  The festvox
+project, based at Carnegie Mellon University, distributes
+documentation, scripts and examples that should be sufficient for an
+interested person to build their own synthetic voices in currently
+supported languages or new languages in the University of Edinburgh's
+Festival Speech Synthesis System.  The quality of the result depends
+much on the time and skill of the builder.  For English it may be
+possible to build a new voice in a couple of days work, a new language
+may take months or years to build.
+
+The release includes:
+ o Support for designing, recording and autolabelling diphone databases
+ o Support for designing, recording and autolabelling unit selection databases
+ o Support for designing, recording and autolabelling clustergen parametric
+     voices.
+ o Support for Nagoya Institute of Technologies HTS synthesis system.
+ o Building simple limited domain synthesis engines
+ o Support for building rule driven and data driven prosody models
+ o Lexicon and building letter to sound rule support
+ o Predefined scripts for building new US (and UK) English voices
+ o Example diphone and limited domain synthesis databases
+
+Since the last full release (Jan 2003) apart from general bug
+fixes and improvements this release includes
+ o Better clunits general voice support
+ o Clustergen Statistica Parametric Synthesis (HTS like) that is
+     easier to use and relaible on multiple voices and languages
+ o A new autoamtic phoneme label EHMM, which is easier to use and
+   give better results that our previous methods.
+ o VC voice conversion module (as standalone and integrated into Festival)
+ o Full support under Cygwin under windows for voice building
+ o Support for finding "nice" prompts in large databases of texts in
+   new languages.
+
+The complete documentation in html, and in downloadable format including
+the scripts and programs necessary to build new voices and example
+databases is available from
+
+        http://www.festvox.org/bsv/
+
+The full distribution is packaged, including postscript and the
+generated html, and is available from
+
+        http://www.festvox.org/festvox/festvox-2.1-release.tar.gz
+
+LICENCE
+
+This documentation and related scripts is free software, distributed
+under an X11-type licence (like Festival itself).  No claims are made
+by the authors of this work, Carnegie Mellon University (or the
+University of Edinburgh), on the voices that you generate with the
+scripts and techniques described within this distribution.
+
+REQUIREMENTS
+
+A Unix Machine (Linux. FreeBSD, Solaris etc) with working audio i/o:
+    although there is nothing inheritantly Unix about the scripts.
+Or a Windows machine running the cygwin environment.
+Edinburgh University's Festival Speech Synthesis System and 
+The Edinburgh Speech Tools
+    This uses speech tools programs and festival itself at various
+    stages in builidng voices as well as (of course) for the final
+    voices.  Festival and the Edinburgh Speech Tools are available from
+       http://www.cstr.ed.ac.uk/projects/festival/
+    or
+       http://www.festvox.org/festival
+       http://www.festvox.org/festival/latest/
+
+    Note you must use Speech Tools 1.2.96 and Festival 1.96 or later.
+
+    It is recommended that you compile your own versions of these
+    as you will need the libraries and include files to build some
+    programs in festvox.
+EMU Labeller
+    The University of Macquarie's Speech Hearing and Language Research
+    Centre distribute labelling tools for speech databases.  We use it
+    here for viewing speech, as spectrograms, F0 contours, phone labels etc.
+    It is available from 
+           http://www.shlrc.mq.edu.au/emu/
+    Other waveform labeller/viewers exist and you find them more convinient
+    to use but we include support for emulabel as it meets our requirements
+    and is freely available.
+Patience and understanding
+    Building a new voice is a lot of work, and something will probably
+    go wrong which may require the repetition of some long boring and
+    tedious process.  Even with lots of care a new voice still might 
+    just not work.  In distributing this document we hope to increase the
+    basic knowledge of synthesis out there and hopefully find people 
+    who can improve on this making the processing easier and more reliable
+    in the future.
+
+WARNING
+
+This is not a plug and play program to build new voices.  It is
+instructions with discussion on the problems and an attempt to
+document the expertise we have gained in building other voices.
+Although we have tried to automate the task as much as possible this
+is no substitute for careful correction and understanding of the
+processes involved.  There are significant pointers into the
+literature throughout the document that allow for more detailed study
+and further reading.
+
+However, this release does include complete simple walkthroughs of
+scripts that can build voices in English with little more than
+recording time, by people without knowledge of scheme programming or
+speech technology, but the results will be better if you take time
+to understand the underlying processes.
+
+Also note there are still unwritten parts of the documentation,
+new releases in the future with reduce such parts.
+
+INSTALL
+
+    download http://www.festvox.org/festvox/festvox-2.1-release.tar.gz
+    unpack its and see festvox/README for instructions for installation
+    and use.
+
+-------
+Alan and Kevin
+Pittsburgh, PA
+21st January 2007
+
+
+
+
+
+    
+
+
+
+

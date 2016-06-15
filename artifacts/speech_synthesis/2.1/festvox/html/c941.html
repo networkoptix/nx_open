@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Limited domain synthesis</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building Synthetic Voices"
+HREF="p710.html"><LINK
+REL="PREVIOUS"
+TITLE="Extracting pitchmarks from waveforms"
+HREF="x862.html"><LINK
+REL="NEXT"
+TITLE="customizing the synthesizer front end"
+HREF="x969.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x862.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x969.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BSV-LDOM-CH"
+></A
+>Limited domain synthesis</H1
+><P
+>&#13;
+This chapter discusses and gives examples of building synthesis systems 
+for limited domains. By limited domain, we mean applications where the 
+speech output is constrained. Such domains may still be infinite but 
+they may be target to specific vocabulary and phrases. In fact with 
+today's current speech system such limited domain applications are in 
+fact the most common. Some typical examples are telling the time, 
+reading telephone numbers. However from experience we can see that this 
+technique can be extended to include more general information giving 
+systems and dialog systems, such as reading the weather, or even the 
+DARPA Communicator domain (flight information dialog system). </P
+><P
+>Limited domains are discussed here as it is felt that it should be easier 
+to build unit selection type synthesizers for domains where there are a 
+much smaller and controlled number of units. The second reason is that 
+general TTS systems (e.g. diphone systems) still sound synthetic. 
+General unit selection when its good, offers near human 
+quality, but when its bad it is usually much worse than a diphone 
+synthesizer. Hybrid systems look interesting but as we cannot yet 
+automatically detect when general unit selection systems go bad, its not 
+clear when a diphone system should be swapped in. But as unit selection 
+offers so much promise, it is hoped that in a limited domain we can get 
+the unit selection good quality, and avoid the bad quality. Finally, 
+although full TTS systems may be our ultimate goal actually for many 
+existing systems a limited domain synthesizer is adequate. </P
+><P
+>There is a stage beyond limited domain, but falling short of general 
+one synthesis, where the most common phrases are the best synthesized 
+and the quality gracefully degrades as the phrases become less common. 
+Some hybrid recorded prompts/unit selection/diphone systems have been 
+proposed and should be able to deliver and answer but we will not deal 
+directly with those here. </P
+><P
+>However one point you quickly find is that although most speech dialog 
+systems are very constrained in their vocabulary many require the 
+hardest class of words: proper names. </P
+><P
+>In continuing in mode of tutorial this chapter first gives a complete 
+walkthrough of a talking clock. This is a small example which will 
+probably work. Following through this example will give you a good idea 
+of what is involved in building a limited domain synthesizer. Also 
+in the following section problems and modifications can be better 
+discussed with respect to this complete example. </P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN952"
+>designing the prompts</A
+></H1
+><P
+>To get a good limited domain synthesizer, it is important to understand 
+what is going on so you can properly tailor your application to take 
+proper advantage of what can be good, and to avoid the limitations these 
+methods impose. </P
+><P
+>Note that you may wish to change your application to take better 
+advantage of this by making its output forms more regular, or at least 
+use a smaller vocabulary. As a first basic approximation the techniques 
+here require that the training contain all words which are to be 
+actually synthesized. Therefore if a word does not appear in the 
+training data it <I
+CLASS="EMPHASIS"
+>cannot</I
+> be synthesized. We do provide fall back 
+positions, using a diphone voice, but that will always be worse than the 
+more natural unit selection synthesis. Often this isn't much of a 
+restriction, or you can tailor your application to avoid having a large 
+vocabulary. For example if you are going to build a system for reading 
+weather reports you can make the weather reports not actually name the 
+city/town they refer to and just use phrases like "This city ..." and 
+depend of context for the user to know which actually city is being 
+talked about. </P
+><P
+>Of course many speech applications have limited vocabularies in all but 
+a very few places. Proper names such as places, people, movie names, 
+etc are in general complete open classes. Building a speech application 
+around those aspects isn't easy and may make a limit domain synthesizer 
+just impractical. But it should be noted that those open classes are 
+also the classes that more general synthesizers will often fail on too. 
+Some hybrid system may better solve that, which we will not really deal 
+with here. </P
+><P
+>For almost closed class, recording and modify the data may be a solution 
+but we have not yet got enough experience to comment on this yet but we 
+feel that may be a reasonable compromise. </P
+><P
+>The most difficult part of building a limited domain synthesizer is 
+designed the database to record that best covers what you wish the 
+synthesizer to say. Sometimes this is fairly easy in that you 
+wish the synthesizer to simple read utterances in a very standard 
+form where slot will be filled with varying values (such as, dates 
+numbers etc.) Such as 
+<A
+NAME="AEN960"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>The&nbsp;area&nbsp;code&nbsp;you&nbsp;require&nbsp;is&nbsp;NUMBER&nbsp;NUMBER&nbsp;NUMBER.</P
+></BLOCKQUOTE
+>
+The prompts can be devised to fill in values for each of the NUMBER 
+variables. </P
+><P
+>More complex utterance can still be viewed in this way 
+<A
+NAME="AEN963"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>The&nbsp;weather&nbsp;at&nbsp;TIME&nbsp;on&nbsp;DATE:&nbsp;outlook&nbsp;OUTLOOK,&nbsp;NUMBER&nbsp;degrees.</P
+></BLOCKQUOTE
+>
+But once we move into more general dialog its appears initially harder to 
+properly find the utterances that cover the domain. </P
+><P
+>The first important observation to make is that in such systems where 
+limited domain synthesis is practical the phrases to be spoken are 
+almost certainly generated by a computer. That is there exists an 
+explicit function which the language generated by the applications. In 
+some case this will take the form of an explicit grammar. In this case 
+we can use that grammar to generate phrase language and then select from 
+them utterance that adequately cover the domain. However even when 
+there is an explicit grammar it usually will not allow explicitly encode 
+the frequency of each generated utterance. As we wish to ensure that 
+the most common phrases are synthesized best we ideally need to know 
+which utterances are to be synthesized most often to properly select 
+which utterance to record. </P
+><P
+>Where a system is already running with a standard synthesizer it is 
+possible to record what is currently being said and how often. We can 
+then use such logs of current system usage to select which utterance 
+should be in our set of prompts to record. </P
+><P
+>In practice you will be design the system's output at the same time as 
+the limited domain synthesizer so some combination, and guessing of the 
+frequency and cover will be necessary. </P
+><P
+>In general you should design your databases to have at least 2 (and 
+probably 5) examples of each word in you vocabulary. Secondly you 
+should select utterances that maximise bi-gram coverage. That is try to 
+ensure as many different word-word pairings over your corpus. We have 
+used techniques based on these recommendations to greedily select 
+utterances from larger corpora to record. </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x862.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x969.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Extracting pitchmarks from waveforms</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p710.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>customizing the synthesizer front end</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

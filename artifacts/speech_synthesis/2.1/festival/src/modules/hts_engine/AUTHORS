@@ -1,0 +1,13 @@
+The festopt_hts_engine is HMM-based speech synthesis module. This software is
+released under the New and Simplified BSD license. See the COPYING file in the
+same directory as this file for the license.
+
+The festopt_hts_engine has been developed by several members of HTS Working
+Group and some graduate students in Nagoya Institute of Technology:
+
+ Keiichi Tokuda      http://www.sp.nitech.ac.jp/~tokuda/
+ (Produce and Design)
+ Keiichiro Oura      http://www.sp.nitech.ac.jp/~uratec/
+ (Design and Development, Main Maintainer)
+ Junichi Yamagishi   http://homepages.inf.ed.ac.uk/jyamagis/
+ Alan W. Black       http://www.cs.cmu.edu/~awb/

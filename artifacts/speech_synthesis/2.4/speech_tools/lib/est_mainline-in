@@ -1,0 +1,37 @@
+
+#include <stdio.h>
+
+#include "EST.h"
+#include "EST_types.h"
+#include "EST_error.h"
+
+int main(int argc, char *argv[]) 
+{ 
+    EST_StrList files;
+    EST_Option cmd_line;
+
+    parse_command_line
+	(argc, argv, 
+	 EST_String("[OPTIONS] [files...]\n")+
+	 "Summary; <<DO SOMETHING>>\n"+
+	 "-o <ofile>       Ouptut file\n",
+	 files, cmd_line);
+
+    EST_String out_file;
+
+    if (cmd_line.present("-o"))
+      out_file = cmd_line.val("-o");
+    else
+      EST_error("No output file specified");
+
+    EST_StrList::Entries fs;
+
+    for(fs.begin(files); fs; ++fs)
+      {
+	EST_String file = *fs;
+
+	// Process file
+      }
+
+    return 0;
+}

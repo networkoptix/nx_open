@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Labeling Speech</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building Synthetic Voices"
+HREF="p710.html"><LINK
+REL="PREVIOUS"
+TITLE="Statistical Parametric Synthesis"
+HREF="c3170.html"><LINK
+REL="NEXT"
+TITLE="Labeling with Full Acoustic Models"
+HREF="x3272.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c3170.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x3272.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BSV-LABEL-CH"
+></A
+>Labeling Speech</H1
+><P
+>In the early days of concatenative speech synthesis every recorded
+prompt had to be hand labeled.  Although a significant task, very
+skilled and mind bogglingly tedious it was a feasible task to attempt
+when databases were relatively and the time to build a voice was
+measure in years.  With the increase in size of database and the
+demand for much faster turnaround we have moved away from hand
+labeling to automatic labeling.</P
+><P
+>In this section we will only touch the the aspects of
+<I
+CLASS="EMPHASIS"
+>what</I
+> we need labeled in recorded data but discuss what
+techniques are available for <I
+CLASS="EMPHASIS"
+>how</I
+> to label it.  As
+discussed before phonemes are a useful but incomplete inventory of
+units that should be identified but other aspects of lexical stress,
+prosody, allophonic variations etc are certainly worthy of
+consideration.</P
+><P
+>In labeling recorded prompts for synthesis we rely heavily on the work
+that has been done in the speech recognition community.  For synthesis
+we do, however, have different goals. In ASR (automatic speech
+recognition) we are trying to find the most likely set of phones that
+are in a given acoustic observation.  In synthesis labeling, however
+we know the sequence of phones spoken, assuming the voice talent spoke
+the prompt properly, and wish to find out where those phones are in
+the signal.  We care, very deeply, about the boundaries of segments,
+while ASR can be achieve adequately performance by only concerning
+itself with the centers, and hence has rightly been optimized for
+that. <SPAN
+CLASS="COMMENT"
+>AWB: that point deserves more discussion, though maybe not
+here</SPAN
+>.</P
+><P
+>There are other distinctions from the ASR task, in synthesis labeled
+we are concerned with a singled speaker, that is, if the synthesizer
+is going to work well, very carefully performed and consistently
+recorded.  This does make things easier for the labeling task.
+However in synthesize labeling we are also concerned about prosody,
+and spectral variation, much more than in ASR.</P
+><P
+>We discuss two specific techniques for labeling record prompts here,
+which each have their advantages and limitations.  Procedures running
+these are discussed at the end of each section.</P
+><P
+>The first technique uses <I
+CLASS="FIRSTTERM"
+>dynamic time warping</I
+>
+alignment techniques to find the phone boundaries in a recorded prompt
+by align it against a synthesized utterance where the phone boundary
+are know.  This is computationally easier than second technique and
+works well for small databases which do not have full phonetic
+coverage.</P
+><P
+>The second technique uses <I
+CLASS="FIRSTTERM"
+>Baum-Welch training</I
+>
+to build complete ASR acoustic models from the the database.  This
+takes sometime, but if the database is phonetically balanced, as
+should be the case in databases designed for speech synthesis voices,
+can work well.  Also this technique can work well on databases in
+languages that do not yet have a synthesizer, hence making the dynamic
+time warping technique hard without cross-language phone mapping
+techniques.</P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN3259"
+>Labeling with Dynamic Time Warping</A
+></H1
+><P
+>DTW (dynamic time warping) is a technique for aligning some new
+recording with some known one.  This technique was used in early
+speech recognition systems which had limit vocabularies as it requires
+a acoustic signal for each word/phrase to be recognized.  This
+technique is sometime still used in matching two audio signal in
+command and control situations, for example in some cell-phone for
+voice dialing.</P
+><P
+>What is important in DTW alignment is that it can deal with signals
+that have varying durations.  The idea has been around for many
+years, though its application to labeling in synthesis is relative
+new.  The work here is based on the detail published in
+[<SPAN
+CLASS="CITATION"
+>malfrere</SPAN
+>].</P
+><P
+>Comparing raw acoustic score is unlikely to given god results so
+comparisons are done in then spectral domain.  Following ASR
+techniques we will use Mel Frequency Cepstral Coefficients to
+represent the signal, and also following ASR we will include delta
+MFCCs (the different between the current MFCC vector and the previous
+MFCC vector).  However for the DTW algorithm the content of the
+vectors is somewhat irrelevant, and are merely treated as vectors.</P
+><P
+>The next stage is define a distance function between two vectors,
+conventionally we use Euclidean Distance defined as
+<A
+NAME="AEN3266"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;root&nbsp;(sumof(i-n)&nbsp;(v0i&nbsp;-&nbsp;v1i)^2</P
+></BLOCKQUOTE
+>
+Weights could be considered too.</P
+><P
+>The search itself is best picture as a large matrix.  The algorithm
+then searches for the best path through the matrix.  At each node it
+finds the distance between the two current vectors and sums it with the
+smallest of three potential previous states.  That is one of i-1,j,
+i,j-1, or i-1,j-1.  If two signals were identical the best path would
+be the diagonal through the matrix, if one part of the signal is
+shorter or longer than the corresponding one horizontal or vertical
+parts will have less cost. 
+<A
+NAME="AEN3269"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;matrix&nbsp;diagram&nbsp;(more&nbsp;than&nbsp;one)</P
+></BLOCKQUOTE
+>
+
+<SPAN
+CLASS="COMMENT"
+>AWB: describe the make_labs stuff and cross-language
+phone mapping</SPAN
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c3170.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x3272.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Statistical Parametric Synthesis</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p710.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Labeling with Full Acoustic Models</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

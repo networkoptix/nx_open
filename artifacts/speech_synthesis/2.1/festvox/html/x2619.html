@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Diphone check list</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Diphone databases"
+HREF="c2261.html"><LINK
+REL="PREVIOUS"
+TITLE="Checking and correcting diphones"
+HREF="x2599.html"><LINK
+REL="NEXT"
+TITLE="Unit selection databases"
+HREF="c2641.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x2599.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Diphone databases</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c2641.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN2619"
+>Diphone check list</A
+></H1
+><P
+>The section contains a quick check list of the processes required to 
+constructing a working diphone database. Each part is discussed in 
+detail above. 
+<P
+></P
+><UL
+><LI
+STYLE="list-style-type: disc"
+><P
+>Choose phoneset:
+Find an appropriate phoneset for the language, if possible using an 
+existing standard. If you already have a good lexicon in the desired 
+language, we recommend that you use that phone set. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Construct diphone list:
+Construct the diphone list with appropriate carrier words. Either 
+using an existing list or generating one from the examples. Consider 
+what allophones, consonant clusters, etc., you also wish to record. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Synthesize prompts:
+Synthesize prompts from an existing voice, if possible. Even when a few 
+phones are missing from that voice it can still be useful to 
+have the speaker listen to prompts as it keeps then focussed on 
+minimal prosody and normalized vocal effort as well as reminding them 
+what they need to say. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Record words:
+Record the words in the best possible conditions you can. Bad 
+recordings can never be corrected later. Ideally, you would use an 
+anechoic chamber with voice from close talking mike and larynograph 
+channels. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Hand label/align phones:
+If you used prompts you can probably use the provided aligner to 
+get a reasonable first pass at the phone labels. Alternatively, 
+find a different aligner, or do it by hand. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Extract pitchmarks:
+Extract the pitchmarks from the recorded signal, either from 
+the EGG signal, or by the more complicated approach of extracting 
+them from the speech signal itself. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Build parameter files:
+If you don't have PSOLA, extract the LPC parameters and residuals 
+from the speech signal, with power normalization if you feel its 
+necessary. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Build database itself:
+Build the diphone index, correcting any obvious labeling errors 
+then test the database itself. Running significant tests to 
+correct any further labeling errors. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Test and check database:
+Systematically check the database by synthesizing the prompts 
+again and synthesizing general text. </P
+></LI
+></UL
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x2599.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c2641.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Checking and correcting diphones</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c2261.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Unit selection databases</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

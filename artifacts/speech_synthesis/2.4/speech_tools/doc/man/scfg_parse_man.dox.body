@@ -1,0 +1,24 @@
+/**
+
+@page scfg_parse_manual scfg_parse
+@brief *Parse text using a pre-trained stochastic context free grammar*
+@tableofcontents
+
+@section synopsis Synopsis
+
+@SYNOPSIS@
+
+This parses given text with a given stochastic context free grammar.
+Note this program is not designed as an arbitrary parser for
+unrestricted English.  It simply parses the input non-terminals
+with the given grammar.  If you want to English (or other language)
+parses consider using the festival script `scfg_parse`
+which does proper tokenization and part of speech tagging, before
+passing it to a SCFG.
+
+@section options Options
+
+@OPTIONS@
+
+*/
+

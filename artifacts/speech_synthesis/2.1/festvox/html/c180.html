@@ -1,0 +1,575 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>A Practical Speech Synthesis System</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Speech Synthesis"
+HREF="p20.html"><LINK
+REL="PREVIOUS"
+TITLE="Speech Science"
+HREF="c176.html"><LINK
+REL="NEXT"
+TITLE="Utterance structure"
+HREF="x261.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c176.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x261.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BSV-FESTIVAL-CH"
+></A
+>A Practical Speech Synthesis System</H1
+><P
+>The <A
+HREF="http://www.cstr.ed.ac.uk/projects/festival/"
+TARGET="_top"
+>Festival Speech Synthesis Systems</A
+> was developed at the <A
+HREF="http://www.cstr.ed.ac.uk"
+TARGET="_top"
+>Centre for Speech Technology
+Reseach</A
+> at the <A
+HREF="http://www.ed.ac.uk/"
+TARGET="_top"
+>University of
+Edinburgh</A
+> in the late 90's.  It offers a free, portable,
+language independent, run-time speech synthesis engine for verious
+platforms under various APIs.  This book is not about the Festival
+system itself, Festival is just the engine that we will use in the
+process of building voices, both as a run-time engine for the voices
+we build and as a tool in the building process itself.  This chapter
+gives a background on the philosophy of the system, its basic use, and
+some lower level details on its internals that will make the
+understanding of the whole synthesis task easier.</P
+><P
+>The Festival Speech Synthesis System was designed to target three
+particular classes of speech synthesis user.
+<P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>Speech synthesis researchers: where they may use Festival as a vehicle
+for developmeent and testing of new research in synthesis technology.</P
+></LI
+><LI
+><P
+>Speech application developers: where synthesis is not the primary
+interest, but Festival will be a substantial sub-component which may
+require significant integration and hence the system must be open and
+easily configurable.</P
+></LI
+><LI
+><P
+>End user: where the system simple takes text and generates speech,
+requiring no or very little configuration from the user.</P
+></LI
+></OL
+></P
+><P
+>In the design of Festival it was important that all three classes of
+user were served as there needs to be a clear route from research work
+to practial usable systems as this not only encourages research to be
+focussed but also, as has been shown by the large uptake of the
+system, ensures there is a large user community interested in
+seeing improvements to the system.</P
+><P
+>The Festival Speech Synthesis System was built based on the experience
+of previous synthesis engines.  Design of a key architecture is
+important as what may seem general to begin with can quickly become a
+limiting factor, as new and more ambitious techniques are attempted
+within it.  The basic architecture of Festival benefited mainly from
+previous synthesis engines developed at Edinburgh University,
+specifically Osprey [<SPAN
+CLASS="CITATION"
+>taylor91</SPAN
+>].  ATR's CHATR
+system, [<SPAN
+CLASS="CITATION"
+>black94</SPAN
+>] was also a major influence on
+Festival, CHATR's original core architecture was also developed by the
+same authors as Festival.  In designing Festival, the intention was to
+avoid the previous limitations in the utterance
+representation and module specification, specifically in avoiding
+constraints on the types of modules and dependencies between them.
+However even with this intent, Festival went through a number of core
+changes before it settled.</P
+><P
+>The Festival system consists of a set of C++ objects and core methods
+suitable for doing synthesis tasks.  These objects include synthesis
+specific objects like, waveforms, tracks and utterances as well as
+more general objects like feature sets, n-grams, and decision trees.</P
+><P
+>In order to give parameters and specify flow of control Festival
+offers a scripting language based on the Scheme programming language
+[<SPAN
+CLASS="CITATION"
+>Scheme96</SPAN
+>].  Having a scripting language is one of
+the key factors that makes Festival a useful system.  Most of the
+techniques in this book for building new voices within Festival can be
+done without any changes to the core C++ objects.  This makes
+development of new voices not only more accessible to a larger
+population or users, as C++ knowledge nor a C++ compiler is necessary,
+it also makes the distribution of voices built by these techniques
+easy as users do not require any recompilation to use newly created
+voices.</P
+><P
+>Scheme offers a very simple syntax but powerful language for
+specifying parameters and simple functions.  Scheme was chosen as its
+implementation is small and would not increase the size of the
+Festival system unnecessarily.  Also, using an embedded Scheme
+component does not increase the requirements for installation as would
+the use of say Java, Perl or Python as the scripting language.  Scheme
+frightens some people as Lisp based languages have an unfair
+reputation for being slow.  Festival's use of Scheme is (in general)
+limited to simple functions and very little time is spent in the
+Scheme interpreter itself.  Automatic garbage collection also has a
+reputation for slowing systems down.  In Festival, garbage collection
+happens after each utterance is synthesized and again takes up only a
+small amount of time but allows the programmer nor to have to worry
+about explicitly freeing memory.</P
+><P
+>For the most part the third type of user, defined above, will never
+need to change any part of the systems (though they usually find
+something they want to change, like adding new entries to the
+lexicon).  The second level of user typically does most of their
+customizing in Scheme, though this is usually just modifying existing
+pieces of Scheme in the way that people may add simple lines of Lisp
+to their <TT
+CLASS="FILENAME"
+>.emacs</TT
+> file.  It is primarily only the
+synthesis research community that has to deal with the C++ end of the
+system, though C/C++ interfaces to the systems as a library are also
+provided (see <A
+HREF="c3788.html"
+>the Chapter called <I
+>Festival Details</I
+></A
+> for more discussions
+on APIs).</P
+><P
+>This chapter covers the basic use of the system and is followed by
+more details of the internal structures, particularly the utterance
+sturcture, accessing methods and modules.  These later sections are
+probabaly more detail than one needs for building standard voices
+described in the book, but the is information is necessary when more
+ambituous voice building tasks are attempted.</P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN206"
+>Basic Use</A
+></H1
+><P
+>The examples here are given based on a standard installation on a Unix
+system as described in <A
+HREF="c4569.html"
+>the Chapter called <I
+>Tools Installation</I
+></A
+>, however the
+examples are likely to work under any platform Festival supports.</P
+><P
+>The most simple way to use Festival to speak a file from
+the command line, is by the command
+<A
+NAME="AEN211"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;--tts&nbsp;example.txt</P
+></BLOCKQUOTE
+>
+This will speak the text in <TT
+CLASS="FILENAME"
+>example.txt</TT
+>
+using the default voice.</P
+><P
+>Festival can also read text from <TT
+CLASS="FILENAME"
+>stdin</TT
+> using
+a command like
+<A
+NAME="AEN216"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>echo&nbsp;"Hello&nbsp;world"&nbsp;|&nbsp;festival&nbsp;--tts</P
+></BLOCKQUOTE
+></P
+><P
+>Festival actually offers two modes, a <I
+CLASS="FIRSTTERM"
+>text mode</I
+>
+and a <I
+CLASS="FIRSTTERM"
+>command mode</I
+>.  In text mode everything
+given to Festival is treated as text to be spoken.  In comamnd mode
+everything is treated as Scheme commands and interpreted.</P
+><P
+>When festival is started with no arguments if goes into interactive
+command mode.  There you may type Scheme command and have Festival
+interpret them.  For example
+<A
+NAME="AEN222"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>$&nbsp;festival<br>
+....<br>
+festival&#62;</P
+></BLOCKQUOTE
+>
+One simple command is <SAMP
+CLASS="COMPUTEROUTPUT"
+>SayText</SAMP
+> takes
+a single string argument and says its contents.
+<A
+NAME="AEN225"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&#62;&nbsp;(SayText&nbsp;"Hello&nbsp;world.")<br>
+#&#60;Utterance&nbsp;0x402a9ce8&#62;<br>
+festival&#62;</P
+></BLOCKQUOTE
+>
+You may select other voices for synthesis by calling the appropriate
+function.  For example
+<A
+NAME="AEN227"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&#62;&nbsp;(voice_cmu_sls_diphone)<br>
+cmu_us_sls_diphone<br>
+festival&#62;&nbsp;(SayText&nbsp;"Hello&nbsp;world.")<br>
+#&#60;Utterance&nbsp;0x402f0648&#62;<br>
+festival&#62;&nbsp;</P
+></BLOCKQUOTE
+>
+Will use a female US English voice (if installed).</P
+><P
+>The command line interface offers comand line history though the up
+and down arrows (ctrl-P and ctrl-N) and editing through standard
+<B
+CLASS="COMMAND"
+>emacs</B
+>-like commands.  Importantly the interface does
+function and filename completion too, using the <B
+CLASS="KEYCAP"
+>TAB</B
+>
+key.</P
+><P
+>Any Scheme command may be typed at the command line for example
+<A
+NAME="AEN233"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&#62;&nbsp;(Parameter.set&nbsp;'Duration_Stretch&nbsp;1.5)<br>
+1.5<br>
+festival&#62;&nbsp;</P
+></BLOCKQUOTE
+>
+Will make all durations longer for the current voice (making the voice 
+speak slower.
+<A
+NAME="AEN235"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&#62;&nbsp;(SayText&nbsp;"a&nbsp;very&nbsp;slow&nbsp;example.")<br>
+#&#60;Utterance&nbsp;0x402f564376&#62;<br>
+festival&#62;&nbsp;</P
+></BLOCKQUOTE
+>
+Calling any specific voice will reset this value (or you
+may do it by hand).
+<A
+NAME="AEN237"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&#62;&nbsp;(voice_cmu_us_kal_diphone)<br>
+cmu_us_kal_diphone<br>
+festival&#62;&nbsp;(SayText&nbsp;"a&nbsp;normal&nbsp;example.")<br>
+#&#60;Utterance&nbsp;0x402e3348&#62;<br>
+festival&#62;&nbsp;</P
+></BLOCKQUOTE
+></P
+><P
+>The <SAMP
+CLASS="COMPUTEROUTPUT"
+>SayText</SAMP
+> is just a simple function
+that takes the given string, constructs an utterance object from is,
+synthesizes it and sends the resulting waveform to the audio device.
+This isn't really suitable for synthesizing anythign but very short
+utterances. The TTS process involves the more complex task of
+splitting text streams into utterance synthesizing them and sendthem
+to the audio device to they may play as the same time working on the
+next utterance to that the audio output is continuous.  Festival does
+this through the <SAMP
+CLASS="COMPUTEROUTPUT"
+>tts</SAMP
+> function (which
+is what is actually called when Festival is given the <SAMP
+CLASS="COMPUTEROUTPUT"
+>--tts</SAMP
+> argument on the command line.  In Scheme the
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>tts</SAMP
+> funciton takes two arguments, a
+filename and a mode.  Modes are described in more detail in <A
+HREF="x1361.html"
+>the Section called <I
+>TTS modes</I
+> in the Chapter called <I
+>Text analysis</I
+></A
+>, and can be used to allow special
+processing of text, such as respecting markup or particular styles of
+text like email etc.  In simple case the mode will be
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>nil</SAMP
+> which denotes the basic raw
+or fundamental mode.
+<A
+NAME="AEN246"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&#62;&nbsp;(tts&nbsp;"WarandPeace.txt"&nbsp;nil)<br>
+t<br>
+festival&#62;&nbsp;</P
+></BLOCKQUOTE
+></P
+><P
+>Commands can also be stored in files, which is normal when a number
+of function definitions and parameter settings are required.  These
+scheme files can be loaded by the function
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>SayText</SAMP
+> as in
+<A
+NAME="AEN250"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&#62;&nbsp;(load&nbsp;"commands.scm")<br>
+t<br>
+festival&#62;&nbsp;</P
+></BLOCKQUOTE
+>
+Arguments to Festival at startup time will normally
+be treated as command files and loaded.  
+<A
+NAME="AEN252"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>$&nbsp;festival&nbsp;commands.scm<br>
+...<br>
+festival&#62;</P
+></BLOCKQUOTE
+>
+However if the argument starts with a left parenthesis
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>(</SAMP
+> the argument is interpreted directly 
+as a Scheme command.
+<A
+NAME="AEN255"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>$&nbsp;festival&nbsp;'(SayText&nbsp;"a&nbsp;short&nbsp;example.")'<br>
+...<br>
+festival&#62;</P
+></BLOCKQUOTE
+>
+If the <SAMP
+CLASS="COMPUTEROUTPUT"
+>-b</SAMP
+> (batch) option is
+specified Festival does not go into interactive mode and exits after
+processing all of the given arguments.</P
+><A
+NAME="AEN258"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>$&nbsp;festival&nbsp;-b&nbsp;mynewvoicedefs.scm&nbsp;'(SayText&nbsp;"a&nbsp;short&nbsp;example.")'</P
+></BLOCKQUOTE
+><P
+>Thus we can use Festival interactively or simple as a batch scripting
+language.  The batch format will be used often in the voice building
+process though the intereactive mode is useful for testing new voices.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c176.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x261.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Speech Science</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p20.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Utterance structure</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

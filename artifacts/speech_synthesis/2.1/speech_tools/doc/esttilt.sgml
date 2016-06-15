@@ -1,0 +1,448 @@
+<chapter>
+    <title>The Tilt Intonation Model</title>
+<toc depth=3></toc>
+<para>
+
+<emphasis>Tilt</emphasis> is a phonetic model of intonation that
+represents intonation as a sequence of continuously parameterised
+events.
+
+The tilt library is a set of functions which analyses, synthesizes and
+manipulates tilt representations.
+
+</para>
+</sect1>
+
+<sect1><title id="tilt-overiew">Theoretical Overview</title>
+<para>
+The basic unit in the tilt model is the <emphasis>intonational
+event</emphasis>. Events occur as instants with nothing between them,
+as opposed to segmental based phenomena where units occur in a
+contiguous sequence. The basic types of intonational event are
+<emphasis>pitch accents</emphasis> and (following the popular
+terminology) <emphasis>boundary tones</emphasis>. Pitch accents
+(denoted by the letter a) are F0 excursions associated with
+syllables which are used by the speaker to give some degree of
+emphasis to a particular word or syllable. In the tilt model, boundary
+tones (b) are rising F0 excursions which occur at the edges of
+intonational phrases and as well as giving the hearer a cue as to the
+end of the phrase, can also signal effects such as continuation and
+questioning. A combination event ab occurs when a pitch accent
+and boundary tone occur so close to one another that only a single
+pitch movement is observed. There are different kinds of pitch accents
+and boundary tones: the choice of pitch accent and boundary tone
+allows the speaker to produce different global intonational tunes
+which can indicate questions, statements, moods etc to the hearer.
+</para><para>
+
+<FIGURE ID="tiltfig03" FLOAT="0">
+<TITLE>
+</TITLE>
+<GRAPHIC FILEREF="../arch_doc/tilt_fig03.gif" FORMAT="GIF"></GRAPHIC>
+</FIGURE>
+
+
+<xref linkend="tiltfig03"> shows a Schematic representation of F0,
+intonational event relation and segment relation in the Tilt
+model. The linguistically relevant parts of the F0 contour, which
+correspond to intonational events, are circled. The events, labelled a
+for pitch accent and b for boundary are linked to the syllable nuclei
+of the syllable relation. Note that every event is linked to a
+syllable, but some syllables do not have events.  </para><para>
+
+Unlike traditional intonational phonology schemes \cite{ph:thesis},
+\cite{tobi} which impose a categorical classification on events, Tilt
+uses a set of continuous parameters. These parameters, collectively
+known as <emphasis>tilt parameters</emphasis>, are determined from
+examination of the local shape of the event's F0 contour.
+</para><para>
+The tilt model is built on a simpler model, the rise/fall/connection (RFC) model.
+</para><para>
+In the RFC model, each event is modelled by a rise part followed by a
+fall part. Each part has an amplitude and duration, and two parameters
+are used to give the time position of the event in the utterance and
+the F0 height of the event. <xref linkend="tiltfig01"> shows a typical
+pitch accent with these parameters marked.
+</para><para>
+<FIGURE ID="tiltfig01" FLOAT="0">
+<TITLE>
+</TITLE>
+<GRAPHIC FILEREF="../arch_doc/tilt_fig01.gif" FORMAT="GIF"></GRAPHIC>
+</FIGURE>
+
+The RFC parameters for an utterance are therefore:
+
+<itemizedlist>
+<listitem><para>rise amplitude (Hz)</para></listitem>
+<listitem><para>rise duration (seconds)</para></listitem>
+<listitem><para>fall amplitude (Hz)</para></listitem>
+<listitem><para>fall duration (seconds)</para></listitem>
+<listitem><para>position (seconds)</para></listitem>
+<listitem><para>F0 height (Hz)</para></listitem>
+</itemizedlist>
+</para><para>
+Sometimes events don't have rise or fall parts, and in these cases the
+amplitude and duration of the missing part is set to 0. The position
+parameter can be specified in two ways: either as the distance from
+the start of the utterance, or the distance from the start of the
+vowel of the associated syllable. The latter is more linguistically
+meangingful, but as vowel boundaries are not always available, the
+former is often used.</para><para>
+</para><para>
+While the RFC model can accurately describe F0 contours, the mechanism
+is not ideal in that the RFC parameters for each contour are not as
+easy to interpret and manipulate as one might like. For instance there
+are two amplitude parameters for each event, when it would make sense
+to have only one. </para><para>
+</para><para>
+The <emphasis>Tilt</emphasis> representation helps solve these
+problems by transforming the four amplitude and duration RFC
+parameters into three Tilt parameters:
+
+<itemizedlist>
+<listitem><para>amplitude (Hz): the sum of the magnitudes of the rise and fall amplitudes. </para></listitem>
+<listitem><para>duration (seconds): the sum of the rise and fall durations.  </para></listitem>
+<listitem><para>tilt: a dimensionless number which expresses the overall
+<emphasis>shape</emphasis> of the event, independent of its amplitude or
+duration. </para></listitem>
+</itemizedlist>
+
+The position and F0 height parameters are the same as before.
+</para><para>
+The tilt representation is superior to the RFC representation in that
+it has fewer parameters without significant loss of
+accuracy. Importantly, it can be argued that the tilt parameters are
+more linguistically meaningful.
+</para>
+<para>
+In describing the tilt model, we use the term
+<emphasis>analysis</emphasis> to describe the process of producing a
+tilt representation from an F0 contour, and <emphasis>synthesis
+</emphasis> to describe the process of prodcing a F0 contour from a
+tilt representation.
+</para>
+</sect2>
+<sect2><title>RFC Analysis</title>
+
+<sect3><title>Locating Events in the F0 contour</title>
+<para>
+The first stage in analysis is to find the intonational events in an
+F0 contour. EST does not directly provide a means for doing this. In
+practice this is either done by hand by a human labeller, or
+automatically by the HMM auto event labeller. The current HMM event
+labeller is based on the HTK system and hence can't be part of EST,
+but an outline of the system follows:
+</para><para>
+The automatic event detector uses continuous density hidden Markov
+models to perform a segmentation of the input utterance.  A number of
+units are defined and a HMM is trained on examples of that kind from a
+pre-labelled training corpus using the Baum-Welch algorithm
+\cite{baum:72}. Each utterance in the corpus is acoustically processed
+so that it can be represented by sequence of evenly spaced
+frames. Each frame is a multi-component vector representing the
+acoustic information for the time interval centred around the frame.
+</para><para>
+Recognition is performed by forming a network comprising the HMMs for
+each unit in conjunction with an n-gram language model which gives the
+prior probability of a sequence of n units occurring.  To perform
+recognition on an utterance, the network is searched using the
+standard Viterbi algorithm to find the most likely path through the
+network given the input sequence of acoustic vectors.
+</para><para>
+It is our intention to put a complete event labeller in EST in the future.
+</para>
+</sect3><sect3 id="ov-rfc-analysis"><title>Producing an RFC representation from an utterance's
+events and F0 contour</title>
+<para>
+An utterance's events are represented in a relation. Initially, events
+are stored as regions with start and stop times as this is the most
+common output format of labellers (both human and automatic).
+</para><para>
+For example, for utterance kdt_016, a set of basic event labels is as 
+follows (in xlabel format):
+
+<screen>
+    0.290  146 sil
+    0.480  146 c
+    0.620  146 a
+    0.760  146 c
+    0.960  146 a
+    1.480  146 c
+    1.680  146 a
+    1.790  146 sil
+</screen>
+</para><para>
+Events are labelled "a", and silences "sil". The use of the "c" label
+is to allow start times which differ from the end of the previous
+event. Conceptually, this can alsow be represented as follows:
+
+<screen>
+name:sil  start:0.0     end:0.290
+name:a    start:0.290   end:0.620
+name:a    start:0.760   end:0.960
+name:a    start:1.480   end:1.680
+name:sil  start:1.790   end:1.790
+</screen>
+</para><para>
+The other component for analysis is the utterance's F0 contour, which
+is stored in a track. The contour must be continuous (i.e. have no
+breaks), and its frames must be specified at fixed intervals. For best
+performance the contour should have been smoothed.
+</para><para>
+The RFC analysis component takes the approximate labels and the
+smoothed F0 contour, fits rise and fall shapes, and hence determines
+an optimal set of RFC parameters for the utterance.
+</para><para>
+For each event, a peak picking algorithm decides if the event has a
+rise part only, a fall part only or a rise part followed by a fall
+part. 
+</para><para>
+<FIGURE ID="tiltfig02" FLOAT="0">
+<TITLE>
+</TITLE>
+<GRAPHIC FILEREF="arch_doc/tilt_fig02.gif" FORMAT="GIF"></GRAPHIC>
+</FIGURE>
+
+For each part, a search region, shown in <xref linkend="tiltfig02">,
+is defined around the approximate start and end boundaries as defined
+in the input label file. The search region is controlled by a number
+of parameters:
+</para>
+
+<itemizedlist>
+<listitem><para>start_limit: the distance in seconds before each input start
+boundary that the start search region should begin.</para></listitem>
+<listitem><para>end_limit: the distance in seconds after each input end
+boundary that the end search region should begin.</para></listitem>
+<listitem><para>range: the end and beginnings of the start and end regions
+respectively, specified as a fraction of the overall label duration.
+</para></listitem>
+</itemizedlist>
+
+<para>
+For example, a pitch accent starts at 1.45 seconds and ends at 1.75
+seconds. If the start and end limit are both defined to be 0.1 seconds
+and the range is 0.4 (40%), then the start region starts at 1.35
+seconds and ends at 1.55, and the end region starts at 1.65 and ends
+at 1.85. The matching algroithm will synthesize every possible shape
+lying within this region, measure the distance between each and the
+actual contour, and pick the one with the lowest distance.
+</para><para>
+The final results of the matching process is a relation of events,
+each with the 6 RFC parameters are descibed above.
+</para>
+<para>
+The program <ulink linkend="progtiltanalysis"><command>tilt_analysis</command></ulink> will perform RFC matching
+given a label file and F0 contour. The function
+<function>rfc_analysis</function> takes a F0 contour, a relation and a
+set of options and returns the RFC parameters in the features of each
+item in the relation.
+</para>
+</sect3>
+</sect2><sect2 id="rfc2tilt"><title>RFC to Tilt Conversion</title>
+<para>
+
+The rise and fall RFC parameters can be converted to Tilt parameters
+using the following equations.
+
+<emphasis>Amplitude</emphasis> is the sum of te magnitudes of the rise
+and fall amplitudes:
+
+</para>
+<EQUATION ID="tilt_eq01" FLOAT="0">
+<TITLE>
+</TITLE>
+<GRAPHIC FILEREF="arch_doc/tilt_eq01.gif" FORMAT="gif"></GRAPHIC>
+</EQUATION>
+<para>
+
+<emphasis>Duration</emphasis> is the sum of the of the rise and fall durations:
+
+</para>
+<EQUATION ID="tilt_eq02" FLOAT="0">
+<TITLE>
+</TITLE>
+<GRAPHIC FILEREF="arch_doc/tilt_eq02.gif" FORMAT="gif"></GRAPHIC>
+</EQUATION>
+<para>
+
+<emphasis>Tilt</emphasis> can be measured with respect to amplitude:
+
+</para>
+<EQUATION ID="tilt_eq03" FLOAT="0">
+<TITLE>
+</TITLE>
+<GRAPHIC FILEREF="arch_doc/tilt_eq03.gif" FORMAT="gif"></GRAPHIC>
+</EQUATION>
+<para>
+
+or duration:
+
+</para>
+<EQUATION ID="tilt_eq04" FLOAT="0">
+<TITLE>
+</TITLE>
+<GRAPHIC FILEREF="arch_doc/tilt_eq04.gif" FORMAT="gif"></GRAPHIC>
+</EQUATION>
+<para>
+
+The tilt  model assumes that these are strongly correlated so that an
+average of the two is representative of the shape of the event:
+
+</para>
+<EQUATION ID="tilt_eq05" FLOAT="0">
+<TITLE>
+</TITLE>
+<GRAPHIC FILEREF="arch_doc/tilt_eq05.gif" FORMAT="gif"></GRAPHIC>
+</EQUATION>
+<para>
+
+
+</para><para>
+The is no stand alone program to do this conversion, but the
+<command>tilt_analysis</command> can do this conversion in addition to
+performing the RFC matching as described above.
+</para><para>
+
+The function <function>rfc_to_tilt</function> takes a relation
+containing RFC parameterised items and converts it to a relation
+containing Tilt paramterised items.
+</para><para>
+
+Another function, also called <function>rfc_to_tilt</function> takes a
+Features object containing the 4 rise fall parameters and writes the 3
+tilt parameters into another features object. This function can be
+used to do rfc_to_tilt conversion for a single event.
+
+</para>
+
+</sect2><sect2 id="tilt2rfc"><title>Tilt to RFC Conversion</title>
+<para>
+
+The Tilt parameters can be converted to RFC parameters using the
+follwing equations, which are rearranged from <xref
+linkend="tilt_eq01"> to <xref linkend="tilt_eq05">:
+
+<EQUATION ID="tilt_eq06" FLOAT="0">
+<TITLE>Rise amplitude
+</TITLE>
+<GRAPHIC FILEREF="arch_doc/tilt_eq06.gif" FORMAT="gif"></GRAPHIC>
+</EQUATION>
+
+<EQUATION ID="tilt_eq07" FLOAT="0">
+<TITLE>Fall amplitude
+</TITLE>
+<GRAPHIC FILEREF="arch_doc/tilt_eq07.gif" FORMAT="gif"></GRAPHIC>
+</EQUATION>
+
+<EQUATION ID="tilt_eq08" FLOAT="0">
+<TITLE>Rise duration
+</TITLE>
+<GRAPHIC FILEREF="arch_doc/tilt_eq08.gif" FORMAT="gif"></GRAPHIC>
+</EQUATION>
+
+<EQUATION ID="tilt_eq09" FLOAT="0">
+<TITLE>Fall duration
+</TITLE>
+<GRAPHIC FILEREF="arch_doc/tilt_eq09.gif" FORMAT="gif"></GRAPHIC>
+</EQUATION>
+
+</para><para>
+
+
+
+The is no stand alone program to do this conversion, but the
+<command>tilt_synthesis</command> can do this conversion in addition to
+generating a F0 contour.
+</para><para>
+
+The function <function>tilt_to_rfc</function> takes a relation
+containing Tilt parameterised items and converts it to a relation
+containing RFC paramterised items.
+</para><para>
+
+Another function, also called <function>tilt_to_rfc</function> takes a
+Features object containing the 3 Tilt parameters and writes the 4 rise
+fall RFC parameters into another features object. This function can be
+used to do tilt_to_rfc conversion for a single event.
+</para>
+
+</para>
+
+</sect2><sect2 id="ov-rfc-to-tilt"><title>RFC to F0 Synthesis</title>
+<para>
+
+An F0 contour can be generated from a set of RFC parameters using the
+follwing equations.
+
+
+Events are generated as piecewise combinations of quadratic functions:
+
+<EQUATION ID="tilt_eq10" FLOAT="0">
+<TITLE>
+</TITLE>
+<GRAPHIC FILEREF="arch_doc/tilt_eq10.gif" FORMAT="gif"></GRAPHIC>
+</EQUATION>
+</para><para>
+Between events, straight lines are used:
+
+<EQUATION ID="tilt_eq11" FLOAT="0">
+<TITLE>
+</TITLE>
+<GRAPHIC FILEREF="arch_doc/tilt_eq11.gif" FORMAT="gif"></GRAPHIC>
+</EQUATION>
+
+</para><para> The stand alone program
+<command>tilt_synthesis</command> can do this conversion.  It takes a
+RFC label file as input and produces a F0 file. This program can also
+generate a F0 file directly from a Tilt label file</para><para>
+
+The function <function>rfc_synthesis</function> takes a relation
+containing RFC parameterised items and produces a F0 contour in a
+Track.  </para><para>
+
+The function <function>synthesize_rf_event</function> takes a Features
+object containing the 4 rise fall RFC parameters and generates the F0
+contour for a single event.
+</para>
+
+
+</para>
+</sect2>
+</sect1>
+<sect1><title>Exectuable Programs</title>
+
+<simplesect><title><link
+linkend="tilt-analysis-manual">tilt_analysis</link></title><para>
+Produces a Tilt or RFC analysis of a F0 contour, given a set label
+file containing a set of approximateintonational event boundaries.
+</para></simplesect>
+
+<simplesect><title><link
+linkend="tilt-synthesis-manual">tilt_synthesis</link></title><para>
+tilt_synthesis generates a F0 contour, given a label file containing
+parameterised Tilt or RFC events.  </para></simplesect>
+
+Generation of F0 contours can be done with:
+
+<simplesect><title><link
+linkend="pda-manual">pda</link></title><para>
+</para></simplesect>
+
+
+</sect1>
+
+&docpp-Tiltfunctions;
+</chapter>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-doctype: "speechtools.sgml"
+sgml-parent-document: ("speechtools.sgml" "chapter" "book")
+End:
+-->
+
+
+
+

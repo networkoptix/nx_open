@@ -1,0 +1,28 @@
+
+ ######################################################################
+ #                                                                    #
+ # Configuration variable make settings for MicroCruft Visual C++     #
+ #                                                                    #
+ ######################################################################
+
+MODULEFLAGS=/DSUPPORT_EDITLINE=1
+AUDIOFLAGS=/DSUPPORT_MPLAYER=1 /DSUPPORT_WIN32AUDIO=1
+
+DEBUGFLAGS= /Zi
+LINKDEBUGFLAGS = /debug
+
+OPTFLAGS= /EHsc /wd4675
+
+INCLUDEFLAGS= /I$(TOP)/include $(LOCAL_INCLUDES)
+
+LINKFLAGS=$(LINKDEBUGFLAGS)
+
+LIB_DIR=lib
+
+ESTLIBS = $(TOP)\lib\libestools.lib $(TOP)\lib\libestbase.lib $(TOP)\lib\libeststring.lib
+
+WINLIBS = wsock32.lib winmm.lib
+
+!ifndef VCLIBS
+VCLIBS = $(ESTLIBS)
+!endif

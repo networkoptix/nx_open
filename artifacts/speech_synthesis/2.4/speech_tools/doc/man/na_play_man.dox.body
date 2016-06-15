@@ -1,0 +1,52 @@
+/**
+
+@page na_play_manual na_play
+@brief *Audio Playback*
+@tableofcontents
+
+@section synopsis Synopsis
+
+@SYNOPSIS@
+
+na_play is a general playback program for playing sound files on a variety
+of platforms and sound cards.
+
+Currently, the following audio devices are supported:
+
+
+  - sunaudio: 8k ulaw direct to `/dev/audio` found on most Sun machines.  This
+    is also found under Linux and FreeBSD, and possibly others.  This
+    is the default if `netaudio` is not supported.
+  - netaudio: NCD's network transparent audio system (NAS).  This allows
+    use of audio devices across a network.  NAS has support for, Suns,
+    Linux, FreeBSD, HPs and probably other machines by now.
+  - sun16audio: This is only available on newer Sun workstations and has been
+    enabled at compile time.  This provides 16bit linear PCM at various sample rates.
+  - linux16audio: This is only available on Linux workstations and has been enabled
+    at compile time.  This provides 16bit linear PCM at various sample rates.
+  - freebsd16audio: This is only available on workstations running FreeBSD and has
+    been enabled at compile time.  This provides 16bit linear PCM at various sample rates.
+  - mplayeraudio: This is only available under Windows NT 4.0 and Windows 95 and
+    has been enabled at compile time.  This provides 
+    16bit linear PCM at various sample rates.
+  - win32audio : This is only available under Windows NT 4.0 and
+    Windows 95 and has been enabled at compile time.  This provides 
+    16bit linear PCM at various sample rates, playing the audio directly
+    rather than saving to a file as with mplayeraudio.
+  - irixaudio: Audio support for SGI's IRIX 6.2.
+  - Audio_Command: Allows the specification of an arbitrary UNIX command to play
+    the waveform.  This won't normally be used with `na_play` as
+    you could just use the command directly but is necessary with some
+    systems using the speech tools.
+
+
+The default audio is netaudio if it is supported.  If not the platform
+specific auido mode is the default (e.g. sun16audio, linux16audio,
+freebsd16audio or mplayeraudio).  If none of these is supported,
+sunaudio is the default. 
+
+@section options Options
+
+@OPTIONS@
+
+*/

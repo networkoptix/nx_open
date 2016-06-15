@@ -1,0 +1,411 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Accent/Boundary Assignment</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building prosodic models"
+HREF="c1637.html"><LINK
+REL="PREVIOUS"
+TITLE="Building prosodic models"
+HREF="c1637.html"><LINK
+REL="NEXT"
+TITLE="F0 Generation"
+HREF="x1803.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c1637.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Building prosodic models</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1803.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1748"
+>Accent/Boundary Assignment</A
+></H1
+><P
+>&#13;
+Accent and boundary tones are what we will use, hopefully in a theory 
+independent way, to refer to the two main types of intonation event. 
+For English, and for many other languages the prediction of position of 
+the accents and boundaries can be done as an independent process from F0 
+contour generation itself. This is definite true from the major theories 
+we will be considering. </P
+><P
+>As with phrase break prediction there are some simple rules that will go 
+a surprisingly long way. And as with most of the other statistical 
+learning techniques simple rules cover most of the work, more complex 
+rules work better, but the best results are from using the sorts of 
+information you were using in rules but statistically training them from 
+a appropriate data. </P
+><P
+>&#13;For English the placement of accents on stressed syllables in 
+all content words is a quite reasonable approximation achieving 
+about 80% accuracy on typical databases. [<SPAN
+CLASS="CITATION"
+>hirschberg90</SPAN
+>] 
+is probably the best example of a detailed rule driven approach 
+(for English). CART trees based on the sorts of features Hirschberg 
+uses are quite reasonable. Though eventual these rules become 
+limiting and a richer knowledge source is required to assign 
+accent patterns to complex nominals (see [<SPAN
+CLASS="CITATION"
+>sproat90}</SPAN
+>]. </P
+><P
+>However all these techniques quickly come to the stumbling block 
+that although simple so-called discourse neutral intonation is 
+relatively easy achieve, achieving realistic, natural accent 
+placement is still beyond our synthesis systems (though perhaps 
+not for much longer). </P
+><P
+>The simplest rule for English may be reasonable for other 
+languages. There are even simpler solutions to this, such 
+as fixed prosody, or fixed declination, but apart from 
+debugging a voice these are simpler than is required even 
+for the most basic voices. </P
+><P
+>For English, adding a simple hat accent on lexically stressed syllables 
+in all content words works surprisingly well. To do this in Festival you 
+need a CART tree to predict accentedness, and rules to add the hat 
+accent (though we will leave out F0 generation until the next section). </P
+><P
+>A basic tree that predicts accents of stressed syllables 
+in content words is 
+<A
+NAME="AEN1765"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;simple_accent_cart_tree<br>
+&nbsp;&nbsp;'<br>
+&nbsp;&nbsp;(<br>
+&nbsp;&nbsp;&nbsp;(R:SylStructure.parent.gpos&nbsp;is&nbsp;content)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(&nbsp;(stress&nbsp;is&nbsp;1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((Accented))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((NONE))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;)<br>
+&nbsp;&nbsp;)<br>
+)</P
+></BLOCKQUOTE
+>
+The above tree simply distinguishes accented syllables from 
+non-accented. In theories like ToBI [<SPAN
+CLASS="CITATION"
+>silverman92</SPAN
+>], a number of 
+different types of accent are supported. ToBI, with variations, has been 
+applied to a number of languages and may be suitable for yours. 
+However, although accent and boundary types have been identified for 
+various languages and dialects, a computational mechanism for generating 
+and F0 contour from an accent specification often has not yet been 
+specified (we will discuss this more fully below). </P
+><P
+>If the above is considered too naive a more elaborate hand specified 
+tree can also be written, using relevant factors, probably similar to 
+those used in [<SPAN
+CLASS="CITATION"
+>hirschberg90</SPAN
+>]. Following that, training from 
+data is the next option. Assuming a database exists and has been 
+labeled with discrete accent classifications, we can extract 
+data from it for training a CART tree with <TT
+CLASS="FILENAME"
+>wagon</TT
+>. We will 
+build the tree in <TT
+CLASS="FILENAME"
+>festival/accents/</TT
+>. First we need 
+a file listing the features that are felt to affect accenting. 
+For this we will predict accents on syllables as that has been 
+used for the English voices created so far, but there is an 
+argument for predict accent placement on a word basis as although 
+accents will need to be syllable aligned, which syllable in a 
+word gets the accent is reasonably well defined (at least compared 
+with predicting accent placement). </P
+><P
+>A possible list of features for accent prediction is 
+put in the file <TT
+CLASS="FILENAME"
+>accent.feats</TT
+>. 
+<A
+NAME="AEN1774"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>R:Intonation.daughter1.name<br>
+R:SylStructure.parent.R:Word.p.gpos<br>
+R:SylStructure.parent.gpos<br>
+R:SylStructure.parent.R:Word.n.gpos<br>
+ssyl_in<br>
+syl_in<br>
+ssyl_out<br>
+syl_out<br>
+p.stress<br>
+stress<br>
+n.stress<br>
+pp.syl_break<br>
+p.syl_break<br>
+syl_break<br>
+n.syl_break<br>
+nn.syl_break<br>
+pos_in_word<br>
+position_type</P
+></BLOCKQUOTE
+>
+We can extract these features from the utterances using the 
+Festival script <TT
+CLASS="FILENAME"
+>dumpfeats</TT
+> 
+<A
+NAME="AEN1777"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>dumpfeats&nbsp;-feats&nbsp;accent.feats&nbsp;-relation&nbsp;Syllable&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-output&nbsp;accent.data&nbsp;../utts/*.utts</P
+></BLOCKQUOTE
+>
+We now need a description file for the features which can be 
+approximated by the speech tools script <TT
+CLASS="FILENAME"
+>make_wagon_desc</TT
+> 
+<A
+NAME="AEN1780"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>make_wagon_desc&nbsp;accent.data&nbsp;accent.feat&nbsp;accent.desc</P
+></BLOCKQUOTE
+>
+Because this script cannot determine if a feature is categorical, 
+if takes an range of values you must hand edit the output 
+file and change any feature to <CODE
+CLASS="VARNAME"
+>float</CODE
+> or <CODE
+CLASS="VARNAME"
+>int</CODE
+> if that is what 
+it is. </P
+><P
+>The next stage is to split the data into training and test sets. If 
+stepwise training is to be used for building the CART tree (which is 
+recommended) then the training data should be further split 
+<A
+NAME="AEN1785"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>traintest&nbsp;accent.data<br>
+traintest&nbsp;accent.data.train</P
+></BLOCKQUOTE
+>
+Deciding on a stop value for training depends on the number of 
+examples, though this can be tuned to ensure over-training isn't 
+happening. 
+<A
+NAME="AEN1787"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>wagon&nbsp;-data&nbsp;accent.data.train.train&nbsp;-desc&nbsp;accent.desc&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;-test&nbsp;accent.data.train.test&nbsp;-stop&nbsp;10&nbsp;-stepwise&nbsp;-output&nbsp;accent.tree<br>
+wagon_test&nbsp;-data&nbsp;accent.data.test&nbsp;-desc&nbsp;&nbsp;accent.desc&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;-tree&nbsp;accent.tree</P
+></BLOCKQUOTE
+></P
+><P
+>This above is designed to predict accents, and similar tree should be 
+used to predict boundary tones as well. For the most part intonation 
+boundaries are defined to occur at prosodic phrase boundaries so that 
+task is somewhat easier, though if you have a number of boundary tone 
+types in your inventory then the prediction is not so straightforward. </P
+><P
+>&#13;
+When training ToBI type accent types it is not easy to get the right 
+type of variation in the accent types. Although some ToBI labels have 
+been associated with semantic intentions and including discourse 
+information has been shown help prediction (e.g. [<SPAN
+CLASS="CITATION"
+>black97a}</SPAN
+>], 
+getting this acceptably correct is not easy. Various techniques 
+in modifying the training data do seem to help. Because of the 
+low incidence of <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>L*</I
+>"</SPAN
+> labels in at least the f2b data, 
+duplicating all sample points in the training data with L's 
+does increase the likelihood of prediction and does seem to give 
+a more varied distribution. Alternatively wagon returns a 
+probability distribution for the accents, normally the most 
+probable is selected, this could be modified to select from 
+the distribution randomly based on their probabilities. </P
+><P
+>Once trees have been built they can be used in a voices 
+as follows. Within the voice definition function 
+<A
+NAME="AEN1799"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;(set!&nbsp;int_accent_cart_tree&nbsp;simple_accent_cart_tree)<br>
+&nbsp;&nbsp;&nbsp;(set!&nbsp;int_tone_cart_tree&nbsp;simple_tone_cart_tree)<br>
+&nbsp;&nbsp;&nbsp;(Parameter.set&nbsp;'Int_Method&nbsp;Intonation_Tree)</P
+></BLOCKQUOTE
+>
+or if only one tree is required you can use the simpler 
+intonation method 
+<A
+NAME="AEN1801"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;(set!&nbsp;int_accent_cart_tree&nbsp;simple_accent_cart_tree)<br>
+&nbsp;&nbsp;&nbsp;(Parameter.set&nbsp;'Int_Method&nbsp;Intonation_Simple)</P
+></BLOCKQUOTE
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c1637.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1803.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Building prosodic models</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c1637.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>F0 Generation</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

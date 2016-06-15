@@ -1,0 +1,781 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>US/UK English Diphone Synthesizer</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Recipes"
+HREF="p3443.html"><LINK
+REL="PREVIOUS"
+TITLE="A Japanese Diphone Voice"
+HREF="c3447.html"><LINK
+REL="NEXT"
+TITLE="ldom full example"
+HREF="c3775.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c3447.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c3775.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BSV-USUKDIPHONE-CH"
+></A
+>US/UK English Diphone Synthesizer</H1
+><P
+>&#13;
+When building a new diphone based voice for a supported language, such 
+as English, the upper parts of the systems can mostly be taken from 
+existing voices, thus making the building task simpler. Of course, 
+things can still go wrong, and its worth checking everything at each 
+stage. This section gives the basic walkthrough for building a new US 
+English voice. Support for building UK (southern, RP dialect) is also 
+provided this way. For building non-US/UK synthesizers see 
+<A
+HREF="c3447.html"
+>the Chapter called <I
+>A Japanese Diphone Voice</I
+></A
+>
+for a similar walkthrough but also covering the full text, lexicona
+nd prosody issues which we can subsume in this example. </P
+><P
+>Recording a whole diphone set usually takes a number of hours, <I
+CLASS="EMPHASIS"
+>if</I
+> 
+everything goes to plan. Construction of the voice after recording may 
+take another couple of hours, though much of this is CPU bound. Then 
+hand-correction may take at least another few hours (depending on the 
+quality). Thus if all goes well it is possible to construct a new voice 
+in a day's work though usually something goes wrong and it takes longer. 
+The more time you spend making sure the data is correctly aligned and 
+labeled, the better the results will be. While something can be made 
+quickly, it can take much longer to do it very well. </P
+><P
+>For those of you who have ignored the rest of this document and are just 
+hoping to get by by reading this, good luck. It may be possible to do 
+that, but considering the time you'll need to invest to build a voice, 
+being familar with the comments, at least in the rest of this chapter, 
+may be well worth the time invested. </P
+><P
+>The tasks you will need to do are: 
+<P
+></P
+><UL
+><LI
+STYLE="list-style-type: disc"
+><P
+>construct basic template files</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>generate prompts</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>record nonsense words</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>autolabel nonsense words</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>generate diphone index</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>generate pitchmarks and LPC coefficients</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Test, and hand fix diphones</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Build diphone group files and distribution</P
+></LI
+></UL
+></P
+><P
+>As with all parts of <TT
+CLASS="FILENAME"
+>festvox</TT
+>, you must set the following 
+environment variables to where you have installed versions of 
+the Edinburgh Speech Tools and the festvox distribution 
+<A
+NAME="AEN3641"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>export&nbsp;ESTDIR=/home/awb/projects/1.4.1/speech_tools<br>
+export&nbsp;FESTVOXDIR=/home/awb/projects/festvox</P
+></BLOCKQUOTE
+>
+The next stage is to select a directory to build the voice. You will 
+need in the order of 500M of diskspace to do this, it could 
+be done in less, but its better to have enough to start with. Make a 
+new directory and cd into it 
+<A
+NAME="AEN3643"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>mkdir&nbsp;~/data/cmu_us_awb_diphone<br>
+cd&nbsp;~/data/cmu_us_awb_diphone</P
+></BLOCKQUOTE
+>
+By convention, the directory is named for the institution, the language 
+(here, <TT
+CLASS="FILENAME"
+>us</TT
+> English) and the speaker 
+(<TT
+CLASS="FILENAME"
+>awb</TT
+>, who actually 
+speaks with a Scottish accent). Although it can be fixed later, the 
+directory name is used when festival searches for available voices, so 
+it is good to follow this convention. </P
+><P
+>&#13;
+
+Build the basic directory structure 
+<A
+NAME="AEN3654"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>$FESTVOXDIR/src/diphones/setup_diphone&nbsp;cmu&nbsp;us&nbsp;awb</P
+></BLOCKQUOTE
+>
+the arguments to <TT
+CLASS="FILENAME"
+>setup_diphone</TT
+> are, the institution building the 
+voice, the language, and the name of the speaker. If you don't have a 
+institution we recommend you use <TT
+CLASS="FILENAME"
+>net</TT
+>. There is an ISO standard 
+for language names, though unfortunately it doesn't allow distinction 
+between US and UK English, so in general we recommend you use the two 
+letter form, though for US English use <TT
+CLASS="FILENAME"
+>us</TT
+> and UK English use 
+<TT
+CLASS="FILENAME"
+>uk</TT
+>. The speaker name may or may nor be there actual name. </P
+><P
+>The setup script builds the basic directory structure and copies in various 
+skeleton files. For languages <TT
+CLASS="FILENAME"
+>us</TT
+> and <TT
+CLASS="FILENAME"
+>uk</TT
+> it copies in 
+files with much of the details filled in for those languages, for other 
+languages the skeleton files are much more skeletal. </P
+><P
+>&#13;For constructing a <TT
+CLASS="FILENAME"
+>us</TT
+> voice you must have the following installed 
+in your version of festival 
+<A
+NAME="AEN3667"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festvox_kallpc16k<br>
+festlex_POSLEX<br>
+festlex_CMU</P
+></BLOCKQUOTE
+>
+And for a UK voice you need 
+<A
+NAME="AEN3669"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festvox_rablpc16k<br>
+festlex_POSLEX<br>
+festlex_OALD</P
+></BLOCKQUOTE
+>
+At run-time the two appropriate festlex packages (POSLEX + dialect 
+specific lexicon) will be required but not the existing kal/rab voices. </P
+><P
+>&#13;
+To generate the nonsense word list 
+<A
+NAME="AEN3676"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;-b&nbsp;festvox/diphlist.scm&nbsp;festvox/us_schema.scm&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(diphone-gen-schema&nbsp;"us"&nbsp;"etc/usdiph.list")'</P
+></BLOCKQUOTE
+>
+
+We use a synthesized voice to build waveforms of the prompts, both for 
+actual prompting and for alignment. If you want to 
+change the prompt voice (e.g. to a female) edit <TT
+CLASS="FILENAME"
+>festvox/us_schema.scm</TT
+>. 
+Near the end of the file is the function <CODE
+CLASS="VARNAME"
+>Diphone_Prompt_Setup</CODE
+>. 
+By default (for US English) the voice <CODE
+CLASS="VARNAME"
+>(voice_kal_diphone)</CODE
+> is 
+called. Change that, and the F0 value in the following line, if appropriate, 
+to the voice use wish to follow. </P
+><P
+>Then to synthesize the prompts 
+<A
+NAME="AEN3684"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;-b&nbsp;festvox/diphlist.scm&nbsp;festvox/us_schema.scm&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(diphone-gen-waves&nbsp;"prompt-wav"&nbsp;"prompt-lab"&nbsp;"etc/usdiph.list")'</P
+></BLOCKQUOTE
+></P
+><P
+>&#13;Now record the prompts. Care should be taken to set up the recording 
+environment so it is best. Note all power levels so that if more than 
+one session is required you can continue and still get the same 
+recording quality. Given the length of the US English list, its 
+unlikely a person can say allow of these in one sitting without taking 
+breaks at least, so ensuring the environment can be duplicated is 
+important, even if it's only after a good stretch and a drink of water. 
+<A
+NAME="AEN3689"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/prompt_them&nbsp;etc/usdiph.list</P
+></BLOCKQUOTE
+>
+Note a third argument can be given to state which nonse word to begin 
+prompting from. This if you have already recorded the first 100 you 
+can continue with 
+<A
+NAME="AEN3691"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/prompt_them&nbsp;etc/usdiph.list&nbsp;101</P
+></BLOCKQUOTE
+>
+See <A
+HREF="c4575.html#BSV-USPHONESET-SECT"
+>the Section called <I
+>US phoneset</I
+> in the Chapter called <I
+>English phone lists</I
+></A
+> for notes on pronunciation (or 
+<A
+HREF="x4816.html"
+>the Section called <I
+>UK phoneset</I
+> in the Chapter called <I
+>English phone lists</I
+></A
+> for the UK version). </P
+><P
+>&#13;The recorded prompts can the be labeled by 
+<A
+NAME="AEN3698"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_labs&nbsp;prompt-wav/*.wav</P
+></BLOCKQUOTE
+>
+Its is always worthwhile correcting the autolabeling. Use 
+<A
+NAME="AEN3700"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>emulabel&nbsp;etc/emu_lab</P
+></BLOCKQUOTE
+>
+and select <CODE
+CLASS="VARNAME"
+>FILE OPEN</CODE
+> from the top menu bar and the place the 
+other dialog box and clink inside it and hit return. A list of all 
+label files will be given. Double-click on each of these to see the 
+labels, spectragram and waveform. (** reference to "How to correct 
+labels" required **). </P
+><P
+>Once the diphone labels have been corrected, the diphone index may be 
+built by 
+<A
+NAME="AEN3704"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_diph_index&nbsp;etc/usdiph.list&nbsp;dic/awbdiph.est</P
+></BLOCKQUOTE
+></P
+><P
+>&#13;If no EGG signal has been collected you can extract the 
+pitchmarks by (though read <A
+HREF="x862.html"
+>the Section called <I
+>Extracting pitchmarks from waveforms</I
+> in the Chapter called <I
+>Basic Requirements</I
+></A
+>
+to ensure you are getting the best exteraction). 
+<A
+NAME="AEN3710"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_pm_wave&nbsp;wav/*.wav</P
+></BLOCKQUOTE
+>
+If you do have an EGG signal then use the following instead 
+<A
+NAME="AEN3712"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_pm&nbsp;lar/*.lar</P
+></BLOCKQUOTE
+>
+A program to move the predicted pitchmarks to the nearest 
+peak in the waveform is also provided. This is almost always 
+a good idea, even for EGG extracted pitch marks 
+<A
+NAME="AEN3714"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_pm_fix&nbsp;pm/*.pm</P
+></BLOCKQUOTE
+>
+Getting good pitchmarks is important to the quality of the synthesis, 
+see <A
+HREF="x862.html"
+>the Section called <I
+>Extracting pitchmarks from waveforms</I
+> in the Chapter called <I
+>Basic Requirements</I
+></A
+> for more discussion. </P
+><P
+>Because there is often a power mismatch through a set of diphone 
+we provided a simple method for finding what general power difference 
+exist between files. This finds the mean power for each vowel in 
+each file and calculates a factor with respect to the overall mean 
+vowel power. A table of power modifiers for each file can 
+be calculated by 
+<A
+NAME="AEN3718"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/find_powerfactors&nbsp;lab/*.lab</P
+></BLOCKQUOTE
+>
+The factors calculated by this are saved in <TT
+CLASS="FILENAME"
+>etc/powfacts</TT
+>. </P
+><P
+>Then build the pitch-synchronous LPC coefficients, which use 
+the power factors if they've been calculated. 
+<A
+NAME="AEN3722"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_lpc&nbsp;wav/*.wav</P
+></BLOCKQUOTE
+></P
+><P
+>&#13;Now the database is ready for its initial tests. 
+<A
+NAME="AEN3727"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;festvox/cmu_us_awb_diphone.scm&nbsp;'(voice_cmu_us_awb_diphone)'</P
+></BLOCKQUOTE
+>
+When there has been no hand correction of the labels this stage may fail 
+with diphones not having proper start, mid and end values. This happens 
+when the automatic labeled has position two labels at the same point. 
+For each diphone that has a problem find out which file it comes from 
+(grep for it in <TT
+CLASS="FILENAME"
+>dic/awbdiph.est</TT
+> and use <TT
+CLASS="FILENAME"
+>emulabel</TT
+> to change 
+the labeling to as its correct. For example suppose "ah-m" is wrong 
+you'll find is comes from <TT
+CLASS="FILENAME"
+>us_0314</TT
+>. Thus type 
+<A
+NAME="AEN3732"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>emulabel&nbsp;etc/emu_lab&nbsp;us_0314</P
+></BLOCKQUOTE
+>
+After correcting labels you must re-run the <TT
+CLASS="FILENAME"
+>make_diph_index</TT
+> 
+command. You should also re-run the <TT
+CLASS="FILENAME"
+>find_powerfacts</TT
+> stage 
+and <TT
+CLASS="FILENAME"
+>make_lpc</TT
+> stages as these too depend on the labels, but 
+this takes longer to run and perhaps that need only be done when 
+you've corrected many labels. </P
+><P
+>To test the voice's basic functionality with 
+<A
+NAME="AEN3738"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&#62;&nbsp;(SayPhones&nbsp;'(pau&nbsp;hh&nbsp;ax&nbsp;l&nbsp;ow&nbsp;pau))<br>
+<br>
+festival&#62;&nbsp;(intro)</P
+></BLOCKQUOTE
+>
+As the autolabeling is unlikely to work completely you should 
+listen to a number of examples to find out what diphones have 
+gone wrong. </P
+><P
+>&#13;
+Finally, once you have corrected the errors (did we mention you need to 
+check and correct the errors?), you can build a final voice suitable for 
+distribution. First you need to create a group file which contains only 
+the subparts of spoken words which contain the diphones. 
+<A
+NAME="AEN3745"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;festvox/cmu_us_awb_diphone.scm&nbsp;'(voice_cmu_us_awb_diphone)'<br>
+...<br>
+festival&nbsp;(us_make_group_file&nbsp;"group/awblpc.group"&nbsp;nil)<br>
+...</P
+></BLOCKQUOTE
+>
+The <CODE
+CLASS="VARNAME"
+>us_</CODE
+> in this function name confusingly stands for 
+<CODE
+CLASS="VARNAME"
+>UniSyn</CODE
+> (the unit concatenation subsystem in Festival) and nothing 
+to do with US English. </P
+><P
+>To test this edit <TT
+CLASS="FILENAME"
+>festvox/cmu_us_awb_diphone.scm</TT
+> and 
+change the choice of databases used from separate to grouped. This is 
+done by commenting out the line (around line 81) 
+<A
+NAME="AEN3751"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;cmu_us_awb_db_name&nbsp;(us_diphone_init&nbsp;cmu_us_awb_lpc_sep))</P
+></BLOCKQUOTE
+>
+and uncommented the line (around line 84) 
+<A
+NAME="AEN3753"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;cmu_us_awb_db_name&nbsp;(us_diphone_init&nbsp;cmu_us_awb_lpc_group))</P
+></BLOCKQUOTE
+>
+
+The next stage is to integrate this new voice so that festival can find 
+it automatically. To do this, you should add a symbolic link from the 
+voice directory of Festival's English voices to the directory containing 
+the new voice. First cd to festival's voice directory (this will vary 
+depending on where you installed festival) 
+<A
+NAME="AEN3757"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>cd&nbsp;/home/awb/projects/1.4.1/festival/lib/voices/english/</P
+></BLOCKQUOTE
+>
+add a symbolic link back to where your voice was built 
+<A
+NAME="AEN3759"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>ln&nbsp;-s&nbsp;/home/awb/data/cmu_us_awb_diphone</P
+></BLOCKQUOTE
+>
+Now this new voice will be available for anyone runing that version festival 
+(started from any directory) 
+<A
+NAME="AEN3761"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival<br>
+...<br>
+festival&#62;&nbsp;(voice_cmu_us_awb_diphone)<br>
+...<br>
+festival&#62;&nbsp;(intro)<br>
+...</P
+></BLOCKQUOTE
+>
+
+The final stage is to generate a distribution file so the voice may 
+be installed on other's festival installations. Before you do 
+this you must add a file <TT
+CLASS="FILENAME"
+>COPYING</TT
+> to the directory you 
+built the diphone database in. This should state the terms and conditions 
+in which people may use, distribute and modify the voice. </P
+><P
+>Generate the distribution tarfile in the directory above the festival 
+installation (the one where <TT
+CLASS="FILENAME"
+>festival/</TT
+> and <TT
+CLASS="FILENAME"
+>speech_tools/</TT
+> 
+directory is). 
+<A
+NAME="AEN3769"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>cd&nbsp;/home/awb/projects/1.4.1/<br>
+tar&nbsp;zcvf&nbsp;festvox_cmu_us_awb_lpc.tar.gz&nbsp;\<br>
+&nbsp;&nbsp;festival/lib/voices/english/cmu_us_awb_diphone/festvox/*.scm&nbsp;\<br>
+&nbsp;&nbsp;festival/lib/voices/english/cmu_us_awb_diphone/COPYING&nbsp;\<br>
+&nbsp;&nbsp;festival/lib/voices/english/cmu_us_awb_diphone/group/awblpc.group</P
+></BLOCKQUOTE
+></P
+><P
+> The
+complete files from building an example US voice based on the KAL
+recordings is available at <A
+HREF="http://festvox.org/examples/cmu_us_kal_diphone/"
+TARGET="_top"
+>http://festvox.org/examples/cmu_us_kal_diphone/</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c3447.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c3775.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>A Japanese Diphone Voice</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p3443.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ldom full example</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

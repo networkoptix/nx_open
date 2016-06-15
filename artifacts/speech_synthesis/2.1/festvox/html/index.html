@@ -1,0 +1,807 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Building Synthetic Voices</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="NEXT"
+TITLE="Speech Synthesis"
+HREF="p20.html"></HEAD
+><BODY
+CLASS="BOOK"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="BOOK"
+><A
+NAME="AEN1"
+></A
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="TITLE"
+><A
+NAME="AEN2"
+>Building Synthetic Voices</A
+></H1
+><H3
+CLASS="AUTHOR"
+HREF="ln18.html"
+><A
+NAME="AEN5" HREF="http://www.cs.cmu.edu/~awb/"
+>Alan W Black</A
+>
+and
+<A
+NAME="AEN8" HREF="http://www.cs.cmu.edu/~lenzo/"
+>Kevin A. Lenzo</A
+></H3>
+<a href="http://www.speech.cs.cmu.edu/">
+Language Technologies Institute, Carnegie Mellon University
+</a> and
+<a href="http://www.cepstral.com">
+Cepstral, LLC
+</a>
+<hr>
+Tuesday, 12th September, 2006<br>
+<br>
+Full distribution:
+<A HREF="http://festvox.org/festvox//festvox-2.1-release.tar.gz">
+festvox-2.1-release.tar.gz</A>
+document alone:
+<A HREF="bsv.ps.gz">bsv.ps.gz</A>
+<A HREF="bsv.pdf">bsv.pdf</A>
+<br>
+Updates and news on FestVox will be posted on 
+<A HREF="http://festvox.org">http://festvox.org</A>
+</P>
+<P>
+NOTE: this document is incomplete
+</P>
+<HR>
+<br
+><A
+>Copyright</A
+> &copy; 1999-2006 Alan W Black &#38; Kevin A. Lenzo</P
+><HR></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+>I. <A
+HREF="p20.html"
+>Speech Synthesis</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c59.html"
+>Overview of Speech Synthesis</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c59.html#AEN61"
+>History</A
+></DT
+><DT
+><A
+HREF="x94.html"
+>Uses of Speech Synthesis</A
+></DT
+><DT
+><A
+HREF="x98.html"
+>General Anatomy of a Synthesizer</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c176.html"
+>Speech Science</A
+></DT
+><DT
+><A
+HREF="c180.html"
+>A Practical Speech Synthesis System</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c180.html#AEN206"
+>Basic Use</A
+></DT
+><DT
+><A
+HREF="x261.html"
+>Utterance structure</A
+></DT
+><DT
+><A
+HREF="x380.html"
+>Modules</A
+></DT
+><DT
+><A
+HREF="x492.html"
+>Utterance access</A
+></DT
+><DT
+><A
+HREF="x591.html"
+>Utterance building</A
+></DT
+><DT
+><A
+HREF="x688.html"
+>Extracting features from utterances</A
+></DT
+></DL
+></DD
+></DL
+></DD
+><DT
+>II. <A
+HREF="p710.html"
+>Building Synthetic Voices</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c714.html"
+>Basic Requirements</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c714.html#AEN719"
+>Hardware/software requirements</A
+></DT
+><DT
+><A
+HREF="x740.html"
+>Voice in a new language</A
+></DT
+><DT
+><A
+HREF="x759.html"
+>Voice in an existing language</A
+></DT
+><DT
+><A
+HREF="x781.html"
+>Selecting a speaker</A
+></DT
+><DT
+><A
+HREF="x793.html"
+>Who owns a voice</A
+></DT
+><DT
+><A
+HREF="x817.html"
+>Recording under Unix</A
+></DT
+><DT
+><A
+HREF="x862.html"
+>Extracting pitchmarks from waveforms</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c941.html"
+>Limited domain synthesis</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c941.html#AEN952"
+>designing the prompts</A
+></DT
+><DT
+><A
+HREF="x969.html"
+>customizing the synthesizer front end</A
+></DT
+><DT
+><A
+HREF="x973.html"
+>autolabeling issues</A
+></DT
+><DT
+><A
+HREF="x982.html"
+>unit size and type</A
+></DT
+><DT
+><A
+HREF="x997.html"
+>using limited domain synthesizers</A
+></DT
+><DT
+><A
+HREF="x1003.html"
+>Telling the time</A
+></DT
+><DT
+><A
+HREF="x1170.html"
+>Making it better</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c1189.html"
+>Text analysis</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c1189.html#AEN1203"
+>Non-standard words analysis</A
+></DT
+><DT
+><A
+HREF="x1207.html"
+>Token to word rules</A
+></DT
+><DT
+><A
+HREF="x1339.html"
+>Number pronunciation</A
+></DT
+><DT
+><A
+HREF="x1357.html"
+>Homograph disambiguation</A
+></DT
+><DT
+><A
+HREF="x1361.html"
+>TTS modes</A
+></DT
+><DT
+><A
+HREF="x1366.html"
+>Mark-up modes</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c1379.html"
+>Lexicons</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c1379.html#AEN1382"
+>Word pronunciations</A
+></DT
+><DT
+><A
+HREF="x1396.html"
+>Lexicons and addenda</A
+></DT
+><DT
+><A
+HREF="x1405.html"
+>Out of vocabulary words</A
+></DT
+><DT
+><A
+HREF="x1429.html"
+>Building letter-to-sound rules by hand</A
+></DT
+><DT
+><A
+HREF="x1469.html"
+>Building letter-to-sound rules automatically</A
+></DT
+><DT
+><A
+HREF="x1615.html"
+>Post-lexical rules</A
+></DT
+><DT
+><A
+HREF="x1630.html"
+>Building lexicons for new languages</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c1637.html"
+>Building prosodic models</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c1637.html#AEN1639"
+>Phrasing</A
+></DT
+><DT
+><A
+HREF="x1748.html"
+>Accent/Boundary Assignment</A
+></DT
+><DT
+><A
+HREF="x1803.html"
+>F0 Generation</A
+></DT
+><DT
+><A
+HREF="x1900.html"
+>Duration</A
+></DT
+><DT
+><A
+HREF="x1973.html"
+>Prosody Research</A
+></DT
+><DT
+><A
+HREF="x1991.html"
+>Prosody Walkthrough</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c2174.html"
+>Corpus development</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c2174.html#AEN2228"
+>Non-Latin-script languages</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c2236.html"
+>Waveform Synthesis</A
+></DT
+><DT
+><A
+HREF="c2261.html"
+>Diphone databases</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c2261.html#AEN2264"
+>Diphone introduction</A
+></DT
+><DT
+><A
+HREF="x2304.html"
+>Defining a diphone list</A
+></DT
+><DT
+><A
+HREF="x2397.html"
+>Recording the diphones</A
+></DT
+><DT
+><A
+HREF="x2413.html"
+>Labeling the diphones</A
+></DT
+><DT
+><A
+HREF="x2522.html"
+>Extracting the pitchmarks</A
+></DT
+><DT
+><A
+HREF="x2557.html"
+>Building LPC parameters</A
+></DT
+><DT
+><A
+HREF="x2593.html"
+>Defining a diphone voice</A
+></DT
+><DT
+><A
+HREF="x2599.html"
+>Checking and correcting diphones</A
+></DT
+><DT
+><A
+HREF="x2619.html"
+>Diphone check list</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c2641.html"
+>Unit selection databases</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c2641.html#AEN2661"
+>Cluster unit selection</A
+></DT
+><DT
+><A
+HREF="x3082.html"
+>Building a Unit Selection Cluster Voice</A
+></DT
+><DT
+><A
+HREF="x3144.html"
+>Diphones from general databases</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c3170.html"
+>Statistical Parametric Synthesis</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c3170.html#AEN3172"
+>Building a CLUSTERGEN Statistical Parametric Synthesizer</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c3245.html"
+>Labeling Speech</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c3245.html#AEN3259"
+>Labeling with Dynamic Time Warping</A
+></DT
+><DT
+><A
+HREF="x3272.html"
+>Labeling with Full Acoustic Models</A
+></DT
+><DT
+><A
+HREF="x3361.html"
+>Prosodic Labeling</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c3364.html"
+>Evaluation and Improvements</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c3364.html#AEN3367"
+>Evaluation</A
+></DT
+><DT
+><A
+HREF="x3374.html"
+>Does it work at all?</A
+></DT
+><DT
+><A
+HREF="x3400.html"
+>Formal Evaluation Tests</A
+></DT
+><DT
+><A
+HREF="x3427.html"
+>Debugging voices</A
+></DT
+></DL
+></DD
+></DL
+></DD
+><DT
+>III. <A
+HREF="p3430.html"
+>Interfacing and Integration</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c3434.html"
+>Markup</A
+></DT
+><DT
+><A
+HREF="c3437.html"
+>Concept-to-speech</A
+></DT
+><DT
+><A
+HREF="c3440.html"
+>Deployment</A
+></DT
+></DL
+></DD
+><DT
+>IV. <A
+HREF="p3443.html"
+>Recipes</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c3447.html"
+>A Japanese Diphone Voice</A
+></DT
+><DT
+><A
+HREF="c3610.html"
+>US/UK English Diphone Synthesizer</A
+></DT
+><DT
+><A
+HREF="c3775.html"
+>ldom full example</A
+></DT
+><DT
+><A
+HREF="c3778.html"
+>Non-english ldom example</A
+></DT
+></DL
+></DD
+><DT
+>V. <A
+HREF="p3781.html"
+>Concluding Remarks</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c3785.html"
+>Concluding remarks and future</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c3788.html"
+>Festival Details</A
+></DT
+><DT
+><A
+HREF="c3791.html"
+>Festival's Scheme Programming Language</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c3791.html#AEN3809"
+>Overview</A
+></DT
+><DT
+><A
+HREF="x3843.html"
+>Data Types</A
+></DT
+><DT
+><A
+HREF="x3925.html"
+>Functions</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="x3925.html#AEN3928"
+>Core functions</A
+></DT
+><DT
+><A
+HREF="x3925.html#AEN3994"
+>List functions</A
+></DT
+><DT
+><A
+HREF="x3925.html#AEN4091"
+>Arithmetic functions</A
+></DT
+><DT
+><A
+HREF="x3925.html#AEN4094"
+>I/O functions</A
+></DT
+><DT
+><A
+HREF="x3925.html#AEN4227"
+>String functions</A
+></DT
+><DT
+><A
+HREF="x3925.html#AEN4328"
+>System functions</A
+></DT
+><DT
+><A
+HREF="x3925.html#AEN4387"
+>Utterance Functions</A
+></DT
+><DT
+><A
+HREF="x3925.html#AEN4390"
+>Synthesis Functions</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="x4393.html"
+>Debugging and Help</A
+></DT
+><DT
+><A
+HREF="x4396.html"
+>Adding new C++ functions to Scheme</A
+></DT
+><DT
+><A
+HREF="x4399.html"
+>Regular Expressions</A
+></DT
+><DT
+><A
+HREF="x4465.html"
+>Some Examples</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c4468.html"
+>Edinburgh Speech Tools</A
+></DT
+><DT
+><A
+HREF="c4473.html"
+>Machine Learning</A
+></DT
+><DT
+><A
+HREF="c4476.html"
+>Resources</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c4476.html#AEN4504"
+>Festival resources</A
+></DT
+><DT
+><A
+HREF="x4539.html"
+>General speech resources</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="c4569.html"
+>Tools Installation</A
+></DT
+><DT
+><A
+HREF="c4575.html"
+>English phone lists</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c4575.html#BSV-USPHONESET-SECT"
+>US phoneset</A
+></DT
+><DT
+><A
+HREF="x4816.html"
+>UK phoneset</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="p20.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Speech Synthesis</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,215 @@
+########################################################-*-mode:Makefile-*-
+##                                                                       ##
+##  Edinburgh Speech Tools: local configuration file                     ##
+##                                                                       ##
+###########################################################################
+##
+##  Specific config file for local installation
+##
+
+###########################################################################
+## Where the speech_tools tree will be installed.
+## 
+## The default is that the speech_tools will remain where it is compiled.
+##
+## You may need to set this explicitly if automounter or NFS
+## side effects cause problems
+
+EST_HOME := $(shell (cd $(EST); pwd))
+
+###########################################################################
+## System type. 
+##
+## The system will attempt to determine this, but if it is wrong you may
+## need to set it explicitly. The definitions are in 
+## systems/$(SYSTEM_TYPE).mak
+##
+## Format: machine _ os osrev
+## 
+## Examples: sparc_SunOS5 intel_Linux2.0
+
+SYSTEM_TYPE=$(MACHINETYPE)_$(OSTYPE)$(OSREV)
+
+###########################################################################
+## Compiler.
+## The definitions are in compilers/$(COMPILER).mak
+## Examples: gcc suncc egcs gcc28
+
+COMPILER=@COMPILERTYPE@
+
+###########################################################################
+## Java system to use if you include the Java interface.
+## Examples jdk
+
+JAVA_COMPILER=jdk
+
+###########################################################################
+## Pre defined configurations (for directory locations, setup peculiarities
+## etc.)
+##
+## Examples: default cstr rjc
+
+CONFIGURATION = 
+
+###########################################################################
+## Compilation options.
+##
+## OPTIMISE=4 will turn off DEBUG
+
+OPTIMISE=3
+WARN=1
+# VERBOSE=1
+#DEBUG=1
+# PROFILE=gprof
+#SHARED=2
+
+## Directory specific selections which override the above
+
+OPTIMISE_sigpr = 3
+
+###########################################################################
+## Feature selection.
+##
+## Select modules to include.
+
+## AUDIO
+## various audio devices are supported directly but you can always
+## specify a program to play files in a desired format.
+
+## NCD's network audio system.
+# INCLUDE_MODULES += NAS_AUDIO
+
+## Elightenment Sound Demon, for KDE etc.
+# INCLUDE_MODULES += ESD_AUDIO
+
+## Native audio for your platform (sun, linux, freebsd, irix, macosx, windows)
+INCLUDE_MODULES += NATIVE_AUDIO
+
+## Special code to run Windows MPLAYER
+# INCLUDE_MODULES += MPLAYER_AUDIO
+
+## Under Linux there may be a choice of audio support
+## This is only used if we are under Linux (or a linux like system)
+LINUXAUDIO = @LINUXAUDIO@
+
+## USER INTERFACE
+
+## Command-line editing. This option gives command line editing and history.
+## It may not work under all systems, so may be optionally omitted.
+INCLUDE_MODULES += EDITLINE
+
+TERMCAPLIB = @TERMCAPLIB@
+# speech recognition
+#INCLUDE_MODULES += ASR
+
+
+## Scheme
+
+## Scheme In One Defun interpreter and data structures
+INCLUDE_MODULES += SIOD
+
+## Enable Python Support in SIOD Interpreter.
+## Enables the (call_python module func arg) command.
+#INCLUDE_MODULES += SIOD_PYTHON
+
+## The following subsystems depend on the Scheme subsystem and so
+## must be removed if Scheme is not included
+
+INCLUDE_MODULES += WAGON
+INCLUDE_MODULES += SCFG
+INCLUDE_MODULES += WFST
+INCLUDE_MODULES += OLS
+
+## Java
+
+
+## Define this to include the pure Java code
+# INCLUDE_MODULES += JAVA
+# JAVA_HOME = PUT_SOMETHING_HERE
+
+## Define this to compile the Java interface to the EST classes. You
+## need to compile with the SHARED option above. This is required for
+## fringe.
+# INCLUDE_MODULES += JAVA_CPP
+
+## Define this to have the Java code use the Java Media API to
+## play sounds etc.
+# INCLUDE_MODULES += JAVA_MEDIA
+# JMF_HOME = PUT_SOMETHING_HERE
+
+## Richard Tobin's RXP XML parser.
+INCLUDE_MODULES += RXP
+
+## Debugging, You should probably only do one or the other of these.
+
+## Efence protected malloc library to catch memory errors
+# INCLUDE_MODULES += EFENCE
+
+## Dmalloc, another chekcing malloc library
+# INCLUDE_MODULES += DMALLOC
+
+###################################################################
+## Wrappers for selected EST Classes and functionality for
+## various high level scripted languages, Only python is currently
+## supported
+
+## Uncomment following to enable building of wrappers
+#INCLUDE_MODULES += WRAPPERS
+
+## Path to Swig.
+##
+## If you can't or don't need to run swig yourself (you probably
+## don't), then leaving this variable commented out will use the
+## default pre-generated code.
+##
+## Only set this if you *DO* want to run swig (for example to modify
+## the wrappers yourself).  If so, the safest bet is to use the same
+## version of swig as speech tools developers (download from
+## http://www.swig.org/ (SWIG-3.02 last tested))
+##
+#CONFIG_SWIG_COMPILER = /usr/bin/swig
+
+
+# Languages to generate wrappers for. Currently: PYTHON
+# PERL5 is no longer supported
+CONFIG_WRAPPER_LANGUAGES = PYTHON 
+
+# Language specific includes should be set to correct site paths
+CONFIG_PYTHON_INCLUDES= -I/usr/include/python2.2/
+##
+###################################################################
+
+
+
+## Additional subsystems to include should be listed here.
+
+ALSO_INCLUDE=
+
+## Turn this on to compile all known modules. This is intended for
+## portability testing.
+
+# INCLUDE_EVERYTHING=1
+
+
+###########################################################################
+## Now include the settings
+
+include $(EST)/config/systems/$(SYSTEM_TYPE).mak
+
+include $(EST)/config/compilers/$(COMPILER).mak
+
+ifneq ($(JAVA_COMPILER),none)
+    include $(EST)/config/compilers/$(JAVA_COMPILER).mak
+endif
+
+ifneq ($(CONFIGURATION),)
+    include $(CONFIGURATION:%=$(EST)/config/configs/%.mak)
+endif
+
+###########################################################################
+##
+## Any settings you need to describe how your system differs from the
+## assumed defaults should go below. See config/ReadMe for a description
+## of the most common things you might need.
+
+# COMPILERLIBS = 

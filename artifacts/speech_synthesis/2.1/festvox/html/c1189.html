@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Text analysis</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building Synthetic Voices"
+HREF="p710.html"><LINK
+REL="PREVIOUS"
+TITLE="Making it better"
+HREF="x1170.html"><LINK
+REL="NEXT"
+TITLE="Token to word rules"
+HREF="x1207.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1170.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1207.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BSV-TEXT-CH"
+></A
+>Text analysis</H1
+><P
+>This chapter discusses some of the basic problems in analyzing text
+when trying to convert it to speech.  Although it is oftain considered
+a trival problem, not worthy of specnding time one, to anyone who has
+to actually listen to general text-to-speech systems quickly realises
+it is not as easy to pronounce text as it first appears.  Numbers,
+symbols, acronyms, abbreviations apear to various degrees in different
+types of text, even the most general types, like news stoires and
+novels still have tokens which do not have a simple pronunciaiton that
+can be found merely by looking up the token in a lexicon, or using
+letter to sound rules.</P
+><P
+>In any new language, or any new domain that you wish to tranfer text
+to speech building an apporpriate text analysis module is necessary.
+As an attempt to define what we mean by text analysis more
+specifically we will consider this module as taking in strings of
+characters and producing strings of <I
+CLASS="FIRSTTERM"
+>words</I
+> where
+we defined words to be items for which a lexicon can provide
+pronucniations either by direct lookup or by some form of letter to
+sound rules.</P
+><P
+>The degree of difficult of this convertion task depends on the text
+type and language.  For example in lanmguages like Chinese, Japanese
+etc., there is, conventionally, no use of whitespace characaters
+between words as found in most Western language, thus even identfying
+the token boundaries is an interesting task.  Even in English text the
+proportion of simple pronouncable words to what we will term
+<I
+CLASS="FIRSTTERM"
+>non-standard words</I
+> can vary greatly.  We define
+non-standard words (NSWs) to be those tokens which do not apear
+directly in the lexicon (at least as a first simplication).  Thus
+tokens contains digits, abbreviations, and out of vocabulary words are
+all considered to be NSWs that require some form of identification
+before their pronunciation can be specified.  Sometimes NSWs are
+ambiguous and some (often shallow) level of analysis is necessary
+to identfiy them.  For example in English the string of
+digits <SAMP
+CLASS="COMPUTEROUTPUT"
+>1996</SAMP
+> can have several
+different pronunciations depending on its use.  If it is used
+as a year it is pronunciation as <SAMP
+CLASS="COMPUTEROUTPUT"
+>nineteen ninety-six</SAMP
+>, if it is a quantity it is more likely pronuounced
+as <SAMP
+CLASS="COMPUTEROUTPUT"
+>one thousand nine hundred (and) ninety-six</SAMP
+> while if it is used as a telephone extention it
+can be pronounced simpelas a string of digits <SAMP
+CLASS="COMPUTEROUTPUT"
+>one nine nine six </SAMP
+>.  Deterimining the appropriate
+type of expansion is the job of the text analysis module.</P
+><P
+>Much of this chapter is based on a project that was carried out at a
+summer workshop at Johns Hopkins University in 1999
+[<SPAN
+CLASS="CITATION"
+>JHU-NSW-99</SPAN
+>] and later published in
+[<SPAN
+CLASS="CITATION"
+>Sproat00</SPAN
+>], the tools and techniques developed at
+that workshop were further developed and documented and now
+distributed as part of the FestVox project.  After a discussion of the
+problem in more detail, concentrating on English examples, a full
+presentation of NSW text analysis technique will be given with a
+simple example. After that we will address different appropaches that
+can be taken in Festival to build general and customized text analysis
+models.  Then we will address a number of specifc problems that
+appear in text analysis in various languages including homogra[h
+disambiguation, number pronunciation in Slavic languages, and 
+segmentation in Chinese.</P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1203"
+>Non-standard words analysis</A
+></H1
+><P
+>In an attempt to avoid relying solely on a bunch of "hacky" rules, we
+can better define the task of analyzing text using a number of
+statistical trained models using either labeled or unlabeled text
+from the desired domain.  At first approximation it may seem to be a
+trival problem, but the number of non-standard words is enough even in
+what is considered clean text such as press wire news articales to
+make their synthesis sound bad without it.</P
+><P
+>Full NSW model description and justification to be added,
+doan play the following (older) parts.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1170.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1207.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Making it better</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p710.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Token to word rules</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

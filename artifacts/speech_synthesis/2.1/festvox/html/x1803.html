@@ -1,0 +1,553 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>F0 Generation</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building prosodic models"
+HREF="c1637.html"><LINK
+REL="PREVIOUS"
+TITLE="Accent/Boundary Assignment"
+HREF="x1748.html"><LINK
+REL="NEXT"
+TITLE="Duration"
+HREF="x1900.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1748.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Building prosodic models</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1900.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1803"
+>F0 Generation</A
+></H1
+><P
+>&#13;Predicting where accents go (and their types) is only half of the 
+problem. We also have build an F0 contour based on these. Note 
+intonation is split between accent placement and F0 generation as it is 
+obvious that accent position influences durations and an F0 contour 
+cannot be generated without knowing the durations of the segments the 
+contour is to be generated over. </P
+><P
+>There are three basic F0 generation modules available in Festival, 
+though others could be added, by general rule, by linear 
+regression/CART, and by Tilt. </P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1809"
+>F0 by rule</A
+></H2
+><P
+>&#13;
+The first is designed to be the most general and will always allow some 
+form of F0 generation. This method allows target points to be 
+programmatically created for each syllable in an utterance. The idea 
+follows closely a generalization of the implementation of ToBI type 
+accents in [<SPAN
+CLASS="CITATION"
+>anderson84</SPAN
+>], where n-points are predicted for each 
+accent. They (and others in intonation) appeal to the notion of 
+baseline and place target F0 points above and below that line based on 
+accent type, position in phrase. The baseline itself is often defined 
+to decline over the phrase reflecting the general declination of F0 over 
+type. </P
+><P
+>The simple idea behind this general method is that a Lisp function is 
+called for each syllable in the utterance. That Lisp function returns a 
+list of target F0 points that lie within that syllable. Thus the 
+generality of this methods actual lies in the fact that it simply allows 
+the user to program anything they want. For example our simple hat 
+accent can be generated using this technique as follows. </P
+><P
+>This fixes the F0 range of the speaker so would need to 
+be changed for different speakers. 
+<A
+NAME="AEN1819"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(targ_func1&nbsp;utt&nbsp;syl)<br>
+&nbsp;&nbsp;"(targ_func1&nbsp;UTT&nbsp;STREAMITEM)<br>
+Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;targets&nbsp;for&nbsp;the&nbsp;given&nbsp;syllable."<br>
+&nbsp;&nbsp;(let&nbsp;((start&nbsp;(item.feat&nbsp;syl&nbsp;'syllable_start))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(end&nbsp;(item.feat&nbsp;syl&nbsp;'syllable_end)))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(equal?&nbsp;(item.feat&nbsp;syl&nbsp;"R:Intonation.daughter1.name")&nbsp;"Accented")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;start&nbsp;110)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;(/&nbsp;(+&nbsp;start&nbsp;end)&nbsp;2.0)&nbsp;140)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;end&nbsp;100)))))</P
+></BLOCKQUOTE
+>
+It simply checks if the current syllable is accented and if so returns 
+a list of position/target pairs. A value at the start of the 
+syllable or 110Hz, a value at 140Hz at the mid-point of the syllable 
+and a value of 100 at the end. </P
+><P
+>This general technique can be expanded with other rules as necessary. 
+Festival includes an implementation of ToBI using exactly this 
+technique, it is based on the rules described in [<SPAN
+CLASS="CITATION"
+>jilka96</SPAN
+>] and in 
+the file <TT
+CLASS="FILENAME"
+>festival/lib/tobi_f0.scm</TT
+>. </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1824"
+>F0 by linear regression</A
+></H2
+><P
+>&#13;This technique was developed specifically to avoid the difficult 
+decisions of exactly what parameters with what value should be used in 
+rules like those of [<SPAN
+CLASS="CITATION"
+>anderson84</SPAN
+>]. The first implementation of this 
+work is presented [<SPAN
+CLASS="CITATION"
+>black96</SPAN
+>]. The idea is to find the appropriate F0 
+target value for each syllable based on available features by training 
+from data. A set of features are collected for each syllable and a 
+linear regression model is used to model three points on each syllable. 
+The technique produces reasonable synthesis and requires less analysis 
+of the intonation models that would be required to write a rule system 
+using the general F0 target method described in the previous section. </P
+><P
+>However to be fair, this technique is also much simpler and there are 
+are obviously a number of intonational phenomena which this cannot 
+capture (e.g. multiple accents on syllables and it will never really 
+capture accent placement with respect to the vowel). The previous 
+technique allows specification of structure but without explicit 
+training from data (though doesn't exclude that) while this technique 
+imposes almost no structure but depends solely on data. The Tilt 
+modeling discussed in the following section tries to balance these two 
+extremes. </P
+><P
+>The advantage of the linear regression method is very little 
+knowledge about the intonation the language under study needs to be 
+known. Of course if there is knowledge and theories it is usually 
+better to follow them (or at least find the features which influence 
+the F0 in that language). Extracting features for F0 modeling 
+is similar to extracting features for the other models. This 
+time we want the means F0 at the start middle and end of 
+each utterance. The Festival features <CODE
+CLASS="VARNAME"
+>syl_startpitch</CODE
+>, 
+<CODE
+CLASS="VARNAME"
+>syl_midpitch</CODE
+> and <CODE
+CLASS="VARNAME"
+>syl_endpitch</CODE
+> proved this. Note 
+that <CODE
+CLASS="VARNAME"
+>syl_midpitch</CODE
+> returns the pitch at the mid of the 
+vowel in the syllable rather than the middle of the syllable. </P
+><P
+>For a linear regression model all features <I
+CLASS="EMPHASIS"
+>must</I
+> be continuous. 
+Thus features which are categorical that influence F0 need to be 
+converted. The standard technique for this is to introduce new features, 
+one for each possible value in the class and output values of 0 or 1 
+for these modified features depending on the value of the base features. 
+For example in a ToBI environment the output of the feature 
+<CODE
+CLASS="VARNAME"
+>tobi_accent</CODE
+> will include <CODE
+CLASS="VARNAME"
+>H*</CODE
+>, <CODE
+CLASS="VARNAME"
+>L*</CODE
+>, <CODE
+CLASS="VARNAME"
+>L+H*</CODE
+> etc. 
+In the modified form you would have features of the form 
+<CODE
+CLASS="VARNAME"
+>tobi_accent_H*</CODE
+>, <CODE
+CLASS="VARNAME"
+>tobi_accent_L*</CODE
+>, <CODE
+CLASS="VARNAME"
+>tobi_accent_L_H*</CODE
+>, 
+etc. </P
+><P
+>&#13;
+
+The program <TT
+CLASS="FILENAME"
+>ols</TT
+> in the speech tools takes feature files and 
+description files in exactly the same format as <TT
+CLASS="FILENAME"
+>wagon</TT
+>, except 
+that all feature must be declared as type <TT
+CLASS="FILENAME"
+>float</TT
+>. The standard 
+ordinary least squares algorithm used to find the coefficients 
+cannot, in general, deal with features that are directly correlated 
+with others as this causes a singularity when inverting the 
+matrix. The solution to this is to exclude such features. The 
+option <CODE
+CLASS="VARNAME"
+>-robust</CODE
+> enables that though at the expense of a longer 
+compute time. Again like <TT
+CLASS="FILENAME"
+>file</TT
+> a stepwise option is included 
+so that the best subset of features may be found. </P
+><P
+>The resulting models may be used by the <CODE
+CLASS="VARNAME"
+>Int_Targets_LR</CODE
+> module 
+which takes its LR models from the variables <CODE
+CLASS="VARNAME"
+>f0_lr_start</CODE
+>, 
+<CODE
+CLASS="VARNAME"
+>f0_lr_mid</CODE
+> and <CODE
+CLASS="VARNAME"
+>f0_lr_end</CODE
+>. The output of <CODE
+CLASS="VARNAME"
+>ols</CODE
+> is a 
+list of coefficients (with the Intercept first). These need to be 
+converted to the appropriate bracket form including their feature names. 
+An example of which is in <TT
+CLASS="FILENAME"
+>festival/lib/f2bf0lr.scm</TT
+>. </P
+><P
+>&#13;If the conversion of categoricals to floats seems to much work 
+or would prohibitively increase the number of features you 
+could use <TT
+CLASS="FILENAME"
+>wagon</TT
+> to generate trees to predict F0 values. 
+The advantage is that of a decision tree over the LR model is that 
+it can deal with data in a non-linear fashion, But this is 
+also the disadvantage. Also the decision tree technique may 
+split the data sub-optimally. The LR model is probably more 
+theoretically appropriate but ultimately the results depend on 
+how goods the models sound. </P
+><P
+>Dump features as with the LR models, but this time there is 
+no need convert categorical features to floats. A potential 
+set of features to do this from (substitute <CODE
+CLASS="VARNAME"
+>syl_midpitch</CODE
+> 
+and <CODE
+CLASS="VARNAME"
+>syl_endpitch</CODE
+> for the other two models is 
+<A
+NAME="AEN1872"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>syl_endpitch<br>
+pp.tobi_accent<br>
+p.tobi_accent<br>
+tobi_accent<br>
+n.tobi_accent<br>
+nn.tobi_accent<br>
+pp.tobi_endtone<br>
+R:Syllable.p.tobi_endtone<br>
+tobi_endtone<br>
+n.tobi_endtone<br>
+nn.tobi_endtone<br>
+pp.syl_break<br>
+p.syl_break<br>
+syl_break<br>
+n.syl_break<br>
+nn.syl_break<br>
+pp.stress<br>
+p.stress<br>
+stress<br>
+n.stress<br>
+nn.stress<br>
+syl_in<br>
+syl_out<br>
+ssyl_in<br>
+ssyl_out<br>
+asyl_in<br>
+asyl_out<br>
+last_accent<br>
+next_accent<br>
+sub_phrases</P
+></BLOCKQUOTE
+>
+The above, of course assumes a ToBI accent labeling, modify that 
+as appropriate for you actually labeling. </P
+><P
+>Once you have generated three trees predicting values for start, mid and 
+end points in each syllable you will need to add some Scheme code to use 
+these appropriately. Suitable code is provided in 
+<TT
+CLASS="FILENAME"
+>src/intonation/tree_f0.scm</TT
+> you will need to include that in your 
+voice. To use it as the intonation target module you will need to add 
+something like the following to your voice function 
+<A
+NAME="AEN1876"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;F0start_tree&nbsp;f2b_F0start_tree)<br>
+(set!&nbsp;F0mid_tree&nbsp;f2b_F0mid_tree)<br>
+(set!&nbsp;F0end_tree&nbsp;f2b_F0end_tree)<br>
+(set!&nbsp;int_params<br>
+	'((target_f0_mean&nbsp;110)&nbsp;(target_f0_std&nbsp;10)<br>
+	&nbsp;&nbsp;(model_f0_mean&nbsp;170)&nbsp;(model_f0_std&nbsp;40)))<br>
+(Parameter.set&nbsp;'Int_Target_Method&nbsp;Int_Targets_Tree)</P
+></BLOCKQUOTE
+>
+The <CODE
+CLASS="VARNAME"
+>int_params</CODE
+> values allow you to use the model with 
+a speaker of a different pitch range. That is all predicted 
+values are converted using the formula 
+<A
+NAME="AEN1879"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;(+&nbsp;(*&nbsp;(/&nbsp;(-&nbsp;value&nbsp;model_f0_mean)&nbsp;model_f0_stddev)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target_f0_stddev)&nbsp;target_f0_mean)))</P
+></BLOCKQUOTE
+>
+Or for those of you who can't real Lisp expressions 
+<A
+NAME="AEN1881"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;((value&nbsp;-&nbsp;model_f0_mean)&nbsp;/&nbsp;model_f0_stddev)&nbsp;*&nbsp;target_f0_stddev)+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target_f0_mean</P
+></BLOCKQUOTE
+>
+The values in the example above are for converting a female speaker 
+(used for training) to a male pitch range. </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1883"
+>Tilt modeling</A
+></H2
+><P
+>&#13;Tilt modeling is still under development and not as mature as the other 
+methods as described above, but it potentially offers a more consistent 
+solution to the problem. A tilt parameterization of a natural F0 
+contour can be automatically derived from a waveform and a labeling of 
+accent placements (a simple <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>a</I
+>"</SPAN
+> for accents and <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>b</I
+>"</SPAN
+> of 
+boundaries) [<SPAN
+CLASS="CITATION"
+>taylor99</SPAN
+>]. Further work is being done on trying to 
+automatically find the accents placements too. </P
+><P
+>For each <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>a</I
+>"</SPAN
+> in an labeling four continuous parameters are found: 
+height, duration, peak position with respect to vowel start, and tilt. 
+Prediction models may then be generate to predict these parameters which 
+we feel better capture the dimensions of F0 contour itself. We have had 
+success in building models for these parameters, [<SPAN
+CLASS="CITATION"
+>dusterhoff97a</SPAN
+>], 
+with better results than the linear regression model on comparable data. 
+However so far we have not done any tests with Tilt on languages other 
+than English. </P
+><P
+>The speech tools include the programs <TT
+CLASS="FILENAME"
+>tilt_analyse</TT
+> and 
+<TT
+CLASS="FILENAME"
+>tilt_synthesize</TT
+> to aid model building but we do not yet include 
+fill Festival end support for using the generated models. </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1748.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1900.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Accent/Boundary Assignment</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c1637.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Duration</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

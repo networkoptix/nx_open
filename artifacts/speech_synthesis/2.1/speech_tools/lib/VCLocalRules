@@ -1,0 +1,5 @@
+est_program_makefile:
+	@echo no template makefile built for VC++
+
+est_mainline:
+	@echo no template main built for VC++
