@@ -344,7 +344,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
                              QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
         return;
 
-    QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->resetBusinessRules(
+    QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kDefaultUserAccess)->resetBusinessRules(
         ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
 }
 
@@ -470,7 +470,7 @@ bool QnBusinessRulesDialog::saveAll() {
 
     //TODO: #GDM #Business replace with QnAppServerReplyProcessor
     foreach (const QnUuid& id, m_pendingDeleteRules) {
-        int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->deleteRule(
+        int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kDefaultUserAccess)->deleteRule(
             id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;
     }

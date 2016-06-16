@@ -11,7 +11,7 @@ namespace ec2
 {
     static const char ADD_HASH_DATA[] = "$$_HASH_$$";
 
-    class QnDbManager;
+    namespace detail { class QnDbManager; }
 
 
     class QnTransactionLog
@@ -24,12 +24,28 @@ namespace ec2
             Reason_Timestamp
         };
 
-        QnTransactionLog(QnDbManager* db);
+        QnTransactionLog(detail::QnDbManager* db);
         virtual ~QnTransactionLog();
 
         static QnTransactionLog* instance();
 
-        ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
+        struct TranMiscData
+        {
+            QnUuid paramsId;
+            ApiCommand::Value value;
+            QByteArray data;
+
+            TranMiscData(const QnUuid &paramsId, ApiCommand::Value value, const QByteArray &data)
+            :
+                paramsId(paramsId),
+                value(value),
+                data(data)
+            {}
+        };
+
+        typedef QList<TranMiscData> TranMiscDataListType;
+
+        ErrorCode getTransactionsAfter(const QnTranState& state, TranMiscDataListType &result);
         QnTranState getTransactionsState();
 
         bool contains(const QnTranState& state) const;
@@ -74,8 +90,7 @@ namespace ec2
         template<typename Param>
         QnUuid transactionHash(const Param &param)
         {
-            for (auto it = detail::transactionDescriptors.get<0>().begin();
-                 it != detail::transactionDescriptors.get<0>().end(); ++it)
+            for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
             {
                 auto tdBase = (*it).get();
                 auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
@@ -95,9 +110,13 @@ namespace ec2
 
         qint64 getTransactionLogTime() const;
         void setTransactionLogTime(qint64 value);
-        ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QnUuid& hash, const QByteArray& data);
+        ErrorCode saveToDB(
+            const QnAbstractTransaction &tranID,
+            const QnUuid &paramId,
+            const QnUuid &hash,
+            const QByteArray &data);
     private:
-        friend class QnDbManager;
+        friend class detail::QnDbManager;
 
         template <class T>
         ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.params)); }
@@ -123,7 +142,7 @@ namespace ec2
             QMap<QnUuid, UpdateHistoryData> updateHistory;
         };
     private:
-        QnDbManager* m_dbManager;
+        detail::QnDbManager* m_dbManager;
         QnTranState m_state;
         QMap<QnUuid, UpdateHistoryData> m_updateHistory;
 

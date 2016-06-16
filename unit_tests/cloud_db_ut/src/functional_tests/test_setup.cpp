@@ -317,6 +317,24 @@ api::ResultCode CdbFunctionalTest::resetAccountPassword(
     return resCode;
 }
 
+api::ResultCode CdbFunctionalTest::createTemporaryCredentials(
+    const std::string& email,
+    const std::string& password,
+    const api::TemporaryCredentialsParams& params,
+    api::TemporaryCredentials* const temporaryCredentials)
+{
+    auto connection = connectionFactory()->createConnection(email, password);
+    api::ResultCode resultCode = api::ResultCode::ok;
+    std::tie(resultCode, *temporaryCredentials) = 
+        makeSyncCall<api::ResultCode, api::TemporaryCredentials>(
+            std::bind(
+                &nx::cdb::api::AccountManager::createTemporaryCredentials,
+                connection->accountManager(),
+                params,
+                std::placeholders::_1));
+    return resultCode;
+}
+
 api::ResultCode CdbFunctionalTest::bindRandomNotActivatedSystem(
     const std::string& email,
     const std::string& password,

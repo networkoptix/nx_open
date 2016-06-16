@@ -5,7 +5,7 @@
 #include "utils/common/util.h"
 
 QnRestRequestHandler::QnRestRequestHandler():
-    m_permissions(RestPermissions::anyUser)
+    m_permissions(Qn::GlobalPermission::NoGlobalPermissions)
 {
 
 }

@@ -402,7 +402,7 @@ void QnIoModuleOverlayWidgetPrivate::at_buttonClicked() {
     ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
     // we are not interested in client->server transport error code because of real port checking by timer
     if (connection)
-        connection->getBusinessEventManager()->sendBusinessAction(action, camera->getParentId(), this, []{});
+        connection->getBusinessEventManager(Qn::kDefaultUserAccess)->sendBusinessAction(action, camera->getParentId(), this, []{});
 
     if (it->indicator)
         it->indicator->setOn(!it->ioState.isActive);

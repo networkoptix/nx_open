@@ -6,9 +6,6 @@
 namespace ec2
 {
 
-    QnLayoutNotificationManager::QnLayoutNotificationManager()
-    {}
-
     void QnLayoutNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran)
     {
         NX_ASSERT(tran.command == ApiCommand::removeLayout);
@@ -29,13 +26,12 @@ namespace ec2
     }
 
 
-    template<class QueryProcessorType>
-    QnLayoutManager<QueryProcessorType>::QnLayoutManager( QueryProcessorType* const queryProcessor )
-    :
-        QnLayoutNotificationManager( ),
-        m_queryProcessor( queryProcessor )
-    {
-    }
+    template<typename QueryProcessorType>
+    QnLayoutManager<QueryProcessorType>::QnLayoutManager(QueryProcessorType* const queryProcessor,
+                                                         const Qn::UserAccessData &userAccessData)
+        : m_queryProcessor(queryProcessor),
+          m_userAccessData(userAccessData)
+    {}
 
     template<class QueryProcessorType>
     int QnLayoutManager<QueryProcessorType>::getLayouts( impl::GetLayoutsHandlerPtr handler )
@@ -45,7 +41,7 @@ namespace ec2
         {
             handler->done( reqID, errorCode, layouts);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getLayouts, nullptr, queryDoneHandler );
         return reqID;
     }
@@ -55,7 +51,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiLayoutData> tran(ApiCommand::saveLayout, layout );
-        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -67,7 +63,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiIdData> tran( ApiCommand::removeLayout, id );
-        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -75,5 +71,5 @@ namespace ec2
     }
 
     template class QnLayoutManager<FixedUrlClientQueryProcessor>;
-    template class QnLayoutManager<ServerQueryProcessor>;
+    template class QnLayoutManager<ServerQueryProcessorAccess>;
 }

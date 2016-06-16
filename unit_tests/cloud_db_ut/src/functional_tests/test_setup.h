@@ -66,6 +66,11 @@ public:
     api::ResultCode resetAccountPassword(
         const std::string& email,
         std::string* const confirmationCode);
+    api::ResultCode createTemporaryCredentials(
+        const std::string& email,
+        const std::string& password,
+        const api::TemporaryCredentialsParams& params,
+        api::TemporaryCredentials* const temporaryCredentials);
 
     api::ResultCode bindRandomNotActivatedSystem(
         const std::string& email,

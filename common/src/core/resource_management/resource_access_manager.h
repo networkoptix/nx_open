@@ -73,7 +73,7 @@ public:
     bool canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
 
     template <typename ApiDataType>
-    bool canCreateResource(const QnUserResourcePtr& user, const ApiDataType& data) const
+    bool canCreateResource(const QnUserResourcePtr& /*user*/, const ApiDataType& /*data*/) const
     {
         /* By default we cannot create resources manually. */
         return false;

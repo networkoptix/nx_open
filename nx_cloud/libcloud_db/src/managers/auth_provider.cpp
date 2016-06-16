@@ -77,7 +77,7 @@ void AuthenticationProvider::getCdbNonce(
 
 void AuthenticationProvider::getAuthenticationResponse(
     const AuthorizationInfo& authzInfo,
-    const api::AuthRequest& authRequest,
+    const data::AuthRequest& authRequest,
     std::function<void(api::ResultCode, api::AuthResponse)> completionHandler)
 {
     //{random_3_bytes}base64({ timestamp }MD5(systemID:timestamp:secret_key))

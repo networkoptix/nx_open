@@ -121,16 +121,17 @@ void QnTransactionTransport::default_initializer()
     m_tcpKeepAliveTimeout = QnGlobalSettings::instance()->connectionKeepAliveTimeout();
     m_keepAliveProbeCount = QnGlobalSettings::instance()->keepAliveProbeCount();
     m_idleConnectionTimeout = m_tcpKeepAliveTimeout * m_keepAliveProbeCount;
+    m_userAccessData = Qn::kDefaultUserAccess;
 }
 
-QnTransactionTransport::QnTransactionTransport(
-    const QnUuid& connectionGuid,
+QnTransactionTransport::QnTransactionTransport(const QnUuid& connectionGuid,
     const ApiPeerData& localPeer,
     const ApiPeerData& remotePeer,
     QSharedPointer<AbstractStreamSocket> socket,
     ConnectionType::Type connectionType,
     const nx_http::Request& request,
-    const QByteArray& contentEncoding )
+    const QByteArray& contentEncoding,
+    const Qn::UserAccessData &userAccessData)
 {
     default_initializer();
 
@@ -141,6 +142,7 @@ QnTransactionTransport::QnTransactionTransport(
     m_peerRole = prAccepting;
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
+    m_userAccessData = userAccessData;
 
     using namespace std::chrono;
     if (!m_outgoingDataSocket->setSendTimeout(
@@ -482,7 +484,7 @@ void QnTransactionTransport::fillAuthInfo( const nx_http::AsyncHttpClientPtr& ht
     else {
         QUrl url = QnAppServerConnectionFactory::url();
         httpClient->setUserName(url.userName().toLower());
-        if (dbManager) {
+        if (detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized()) {
             QnUserResourcePtr adminUser = qnResPool->getAdministrator();
             if (adminUser) {
                 httpClient->setUserPassword(adminUser->getDigest());
@@ -1440,9 +1442,17 @@ void QnTransactionTransport::setExtraDataBuffer(const QByteArray& data)
     m_extraData = data;
 }
 
-bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, const QnTransactionTransportHeader& _header)
+bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran,
+                                                       const QnTransactionTransportHeader& _header, const QnUuid &tranParamsId,
+                                                       ApiCommand::Value value)
 {
     if (srcFormat != m_remotePeer.dataFormat)
+        return false;
+
+    /* Check if remote peer has rights to receive transaction */
+    auto td = getTransactionDescriptorByValue(value);
+    bool remoteHasRights = td->checkPermissions(m_userAccessData.userId, tranParamsId, Qn::Permission::ReadPermission);
+    if (!remoteHasRights)
         return false;
 
     QnTransactionTransportHeader header(_header);

@@ -63,6 +63,7 @@ public:
 
     int redirectTo(const QByteArray& page, QByteArray& contentType);
     QnAuthSession authSession() const;
+
 protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);

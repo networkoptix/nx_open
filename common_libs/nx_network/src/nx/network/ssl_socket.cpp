@@ -1185,6 +1185,10 @@ public:
     std::atomic<bool> emulateBlockingMode;
     std::unique_ptr<SslAsyncBioHelper> asyncSslHelper;
 
+    typedef utils::promise<std::pair<SystemError::ErrorCode, size_t>> AsyncPromise;
+    std::unique_ptr<AsyncPromise> sendPromise;
+    std::unique_ptr<AsyncPromise> recvPromise;
+
     SslSocketPrivate()
     :
         wrappedSocket(nullptr),
@@ -1467,16 +1471,17 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     {
         // the mode could be switched to non blocking, but SSL engine is
         // still non-blocking
-        nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
+        d->recvPromise.reset(new SslSocketPrivate::AsyncPromise);
         nx::Buffer localBuffer(bufferLen, '\0');
         readSomeAsync(
             &localBuffer,
             [&](SystemError::ErrorCode code, size_t size)
             {
-                promise.set_value(std::make_pair(code, size));
+                d->recvPromise->set_value(std::make_pair(code, size));
+                d->recvPromise.reset();
             });
 
-        const auto result = promise.get_future().get();
+        const auto result = d->recvPromise->get_future().get();
         if (result.first == SystemError::noError)
             std::memcpy(localBuffer.data(), buffer, result.second);
         else
@@ -1508,16 +1513,17 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
     {
         // the mode could be switched to non blocking, but SSL engine is
         // still non-blocking
-        nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
+        d->sendPromise.reset(new SslSocketPrivate::AsyncPromise);
         nx::Buffer localBuffer(static_cast<const char*>(buffer), bufferLen);
         sendAsync(
             localBuffer,
             [&](SystemError::ErrorCode code, size_t size)
             {
-                promise.set_value(std::make_pair(code, size));
+                d->sendPromise->set_value(std::make_pair(code, size));
+                d->sendPromise.reset();
             });
 
-        const auto result = promise.get_future().get();
+        const auto result = d->sendPromise->get_future().get();
         if (result.first != SystemError::noError)
             SystemError::setLastErrorCode(result.first);
 
@@ -1641,7 +1647,7 @@ bool SslSocket::setNonBlockingMode(bool val)
         return d->wrappedSocket->setNonBlockingMode(val);
 
     // the mode could be switched to non blocking, but SSL engine is
-    // too haivy to switch
+    // too heavy to switch
     d->emulateBlockingMode = !val;
     return true;
 }
@@ -1654,6 +1660,29 @@ bool SslSocket::getNonBlockingMode(bool* val) const
 
     *val = !d->emulateBlockingMode;
     return true;
+}
+
+bool SslSocket::shutdown()
+{
+    Q_D(const SslSocket);
+    if (!d->emulateBlockingMode)
+        return d->wrappedSocket->shutdown();
+
+    utils::promise<void> promise;
+    d->wrappedSocket->dispatch([&]()
+    {
+        if (d->sendPromise)
+            d->sendPromise->set_value({0, SystemError::interrupted});
+
+        if (d->recvPromise)
+            d->recvPromise->set_value({0, SystemError::interrupted});
+
+        d->wrappedSocket->pleaseStopSync();
+        promise.set_value();
+    });
+
+    promise.get_future().wait();
+    return d->wrappedSocket->shutdown();
 }
 
 void SslSocket::connectAsync(

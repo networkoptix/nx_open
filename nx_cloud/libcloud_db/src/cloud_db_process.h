@@ -22,6 +22,10 @@
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/utils/std/future.h>
 
+#include <cdb/result_code.h>
+
+#include "access_control/auth_types.h"
+#include "managers/managers_types.h"
 #include "settings.h"
 
 
@@ -82,6 +86,8 @@ private:
 #ifndef USE_QAPPLICATION
     nx::utils::promise<void> m_processTerminationEvent;
 #endif
+    nx_http::MessageDispatcher* m_httpMessageDispatcher;
+    AuthorizationManager* m_authorizationManager;
 
     void initializeLogging( const conf::Settings& settings );
     void registerApiHandlers(
@@ -93,6 +99,29 @@ private:
     bool initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
     bool configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
     bool updateDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
+
+    /** input & output */
+    template<typename ManagerType, typename InputData, typename... OutputData>
+    void registerHttpHandler(
+        const char* handlerPath,
+        void (ManagerType::*managerFunc)(
+            const AuthorizationInfo& authzInfo,
+            InputData inputData,
+            std::function<void(api::ResultCode, OutputData...)> completionHandler),
+        ManagerType* manager,
+        EntityType entityType,
+        DataActionType dataActionType);
+
+    /** no input, output */
+    template<typename ManagerType, typename... OutputData>
+    void registerHttpHandler(
+        const char* handlerPath,
+        void (ManagerType::*managerFunc)(
+            const AuthorizationInfo& authzInfo,
+            std::function<void(api::ResultCode, OutputData...)> completionHandler),
+        ManagerType* manager,
+        EntityType entityType,
+        DataActionType dataActionType);
 };
 
 }   //cdb
