@@ -12,6 +12,7 @@
 #include <core/resource/user_resource.h>
 
 #include <ui/common/palette.h>
+#include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
@@ -114,6 +115,7 @@ void QnResourceSelectionDialog::initModel()
     ui->resourcesWidget->setEditingEnabled(false);
     ui->resourcesWidget->setSimpleSelectionEnabled(true);
     ui->resourcesWidget->treeView()->setMouseTracking(true);
+    ui->resourcesWidget->itemDelegate()->setCustomInfoLevel(Qn::RI_FullInfo);
 
     connect(ui->resourcesWidget, &QnResourceTreeWidget::beforeRecursiveOperation,   this, [this]{ m_updating = true;});
     connect(ui->resourcesWidget, &QnResourceTreeWidget::afterRecursiveOperation,   this, [this]{
