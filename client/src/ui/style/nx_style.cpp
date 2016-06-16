@@ -580,17 +580,23 @@ void QnNxStyle::drawPrimitive(
                 bool hasSelection = item->state.testFlag(State_Selected);
                 bool selectionOpaque = hasSelection && isColorOpaque(selectionBrush.color());
 
-                /* Obtain Nx hovered row information: */
-                int hoveredRow = -1;
-                if (!qobject_cast<const QTreeView*>(widget))
+                bool hasHover = item->state.testFlag(State_MouseOver);
+                if (qobject_cast<const QTreeView*>(widget))
                 {
-                    QVariant value = widget->property(Properties::kHoveredRowProperty);
-                    if (value.isValid())
-                        hoveredRow = value.toInt();
+                    /* Enabled items of treeview already have hover painted in PE_PanelItemViewRow. */
+                    if (item->state.testFlag(State_Enabled))
+                        hasHover = false;
                 }
-
-                bool hasHover = item->index.row() == hoveredRow ||
-                    item->state.testFlag(State_MouseOver) && !qobject_cast<const QTreeView*>(widget);
+                else
+                {
+                    if (!hasHover)
+                    {
+                        /* Obtain Nx hovered row information: */
+                        QVariant value = widget->property(Properties::kHoveredRowProperty);
+                        if (value.isValid())
+                            hasHover = value.toInt() == item->index.row();
+                    }
+                }
 
                 /* Draw hover marker if needed: */
                 if (hasHover && !selectionOpaque)
