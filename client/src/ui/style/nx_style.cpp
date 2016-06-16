@@ -1655,7 +1655,7 @@ void QnNxStyle::drawControl(
                     painter->drawText(textRect, textFlags | Qt::AlignLeft, text);
                 }
 
-                if (menuItem->checked)
+                if (menuItem->checked && menuItem->checkType != QStyleOptionMenuItem::NotCheckable)
                 {
                     drawMenuCheckMark(
                             painter,
