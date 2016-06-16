@@ -78,7 +78,7 @@ void QnAbstractAudioTransmitter::removePacketsByProvider(QnAbstractStreamDataPro
     {
         auto packet = m_dataQueue.atUnsafe(i);
         if (packet && packet->dataProvider == dataProvider)
-            m_dataQueue.remoteAtUnsafe(i);
+            m_dataQueue.removeAtUnsafe(i);
     }
     m_dataQueue.unlock();
 }
