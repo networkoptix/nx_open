@@ -43,7 +43,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
 
