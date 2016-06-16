@@ -111,7 +111,7 @@ void QnNewSystemServerFlagWatcher::update()
 
         ec2::ApiMediaServerData apiServer;
         fromResourceToApi(m_server, apiServer);
-        ec2Connection->getMediaServerManager()->save(apiServer, this, [] {});
+        ec2Connection->getMediaServerManager(Qn::kDefaultUserAccess)->save(apiServer, this, [] {});
     }
 
 }

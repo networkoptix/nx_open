@@ -75,7 +75,7 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
                     endpoint.port = originatingPeerSourceAddress.port;
             }
             if (!request.ignoreSourceAddress)
-                connectionRequestedEvent.udpEndpointList.emplace_back(
+                connectionRequestedEvent.udpEndpointList.emplace_front(
                     originatingPeerSourceAddress);
             connectionRequestedEvent.connectionMethods =
                 api::ConnectionMethod::udpHolePunching;

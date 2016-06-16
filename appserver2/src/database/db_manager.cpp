@@ -15,6 +15,8 @@
 #include "utils/common/synctime.h"
 #include "nx/fusion/serialization/json.h"
 #include "core/resource/user_resource.h"
+#include <core/resource/camera_resource.h>
+#include <utils/license_usage_helper.h>
 
 #include <database/migrations/business_rules_db_migration.h>
 #include <database/migrations/user_permissions_db_migration.h>
@@ -54,6 +56,9 @@ static const QString RES_TYPE_STORAGE = "storage";
 namespace ec2
 {
 
+namespace detail
+{
+
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
@@ -76,6 +81,15 @@ static bool removeDirRecursive(const QString & dirName)
         result = dir.rmdir(dirName);
     }
     return result;
+}
+
+template <class T>
+void assertSorted(std::vector<T> &data) {
+#ifdef _DEBUG
+    assertSorted(data, &T::id);
+#else
+    Q_UNUSED(data);
+#endif // DEBUG
 }
 
 
@@ -1188,7 +1202,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/17_add_isd_cam.sql")) {
         updateResourceTypeGuids();
     }
-    else if (updateName == lit(":/updates/20_adding_camera_user_attributes.sql")) {
+    else if (updateName == lit(":/updates/20_adding_camera_user_attributes.sql") || updateName == lit(":/updates/65_transaction_log_add_fields.sql")) {
         if (!m_dbJustCreated)
             m_needResyncLog = true;
     }
@@ -1921,6 +1935,24 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraA
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraAttributesDataList>& tran)
 {
+    QnCamLicenseUsageHelper licenseUsageHelper;
+    QnVirtualCameraResourceList cameras;
+
+    for (const auto &param : tran.params)
+    {
+        auto camera = qnResPool->getResourceById(param.cameraID).dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            return ErrorCode::serverError;
+        cameras.push_back(camera);
+        licenseUsageHelper.propose(camera, param.scheduleEnabled);
+    }
+
+    for (const auto &camera : cameras)
+    {
+        if (licenseUsageHelper.isOverflowForCamera(camera))
+            return ErrorCode::forbidden;
+    }
+
     for(const ApiCameraAttributesData& attrs: tran.params)
     {
         const ErrorCode result = saveCameraUserAttributes(attrs);
@@ -2824,24 +2856,19 @@ ApiObjectInfoList QnDbManager::getObjectsNoLock(const ApiObjectType& objectType)
     return result;
 }
 
-bool QnDbManager::saveMiscParam( const QByteArray& name, const QByteArray& value )
+ErrorCode QnDbManager::saveMiscParam(const ApiMiscData &params)
 {
-    QnDbManager::QnDbTransactionLocker locker( getTransaction() );
-
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
-    insQuery.addBindValue( name );
-    insQuery.addBindValue( value );
+    insQuery.addBindValue( params.name );
+    insQuery.addBindValue( params.value );
     if( !insQuery.exec() )
-        return false;
-    locker.commit();
-    return true;
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
 }
 
 bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
 {
-    QnWriteLocker lock( &m_mutex );   //locking it here since this method is public
-
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare("SELECT data from misc_data where key = ?");
@@ -2855,8 +2882,6 @@ bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
 
 ErrorCode QnDbManager::readSettings(ApiResourceParamDataList& settings)
 {
-    QnWriteLocker lock( &m_mutex );   //locking it here since this method is public
-
     ApiResourceParamWithRefDataList params;
     ErrorCode rez = doQueryNoLock(m_adminUserID, params);
     settings.reserve( params.size() );
@@ -2967,6 +2992,19 @@ void QnDbManager::addResourceTypesFromXML(ApiResourceTypeDataList& data)
     QDir dir2(QCoreApplication::applicationDirPath() + QString(lit("/resources")));
     for(const QFileInfo& fi: dir2.entryInfoList(QDir::Files))
         loadResourceTypeXML(fi.absoluteFilePath(), data);
+}
+
+ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscData)
+{
+    if (!readMiscParam(name, &miscData.value))
+        return ErrorCode::dbError;
+    miscData.name = name;
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::doQueryNoLock(std::nullptr_t /*dummy*/, ApiResourceParamDataList& data)
+{
+    return readSettings(data);
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& data)
@@ -3968,6 +4006,11 @@ ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license, QSqlDatabase
     }
 }
 
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMiscData>& tran)
+{
+    return saveMiscParam(tran.params);
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran)
 {
     if (tran.command == ApiCommand::addLicense)
@@ -4383,5 +4426,34 @@ QnDbManager::QnDbTransaction* QnDbManager::getTransaction()
 {
     return &m_tran;
 }
+} // namespace detail
 
+QnDbManagerAccess::QnDbManagerAccess(const Qn::UserAccessData &userAccessData)
+    : m_userAccessData(userAccessData)
+{}
+
+ApiObjectType QnDbManagerAccess::getObjectType(const QnUuid& objectId)
+{
+    return detail::QnDbManager::instance()->getObjectType(objectId);
 }
+
+QnDbHelper::QnDbTransaction* QnDbManagerAccess::getTransaction()
+{
+    return detail::QnDbManager::instance()->getTransaction();
+}
+
+ApiObjectType QnDbManagerAccess::getObjectTypeNoLock(const QnUuid& objectId)
+{
+    return detail::QnDbManager::instance()->getObjectTypeNoLock(objectId);
+}
+
+ApiObjectInfoList QnDbManagerAccess::getNestedObjectsNoLock(const ApiObjectInfo& parentObject)
+{
+    return detail::QnDbManager::instance()->getNestedObjectsNoLock(parentObject);
+}
+
+ApiObjectInfoList QnDbManagerAccess::getObjectsNoLock(const ApiObjectType& objectType)
+{
+    return detail::QnDbManager::instance()->getObjectsNoLock(objectType);
+}
+} // namespace ec2

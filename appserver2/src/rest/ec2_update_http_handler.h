@@ -127,7 +127,7 @@ namespace ec2
                 finished = true;
                 m_cond.wakeAll();
             };
-            m_connection->queryProcessor()->processUpdateAsync( tran, queryDoneHandler );
+            m_connection->queryProcessor()->getAccess(Qn::UserAccessData(owner->authUserId())).processUpdateAsync( tran, queryDoneHandler );
 
             {
                 QnMutexLocker lk( &m_mutex );

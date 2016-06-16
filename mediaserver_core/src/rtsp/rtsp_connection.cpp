@@ -20,7 +20,10 @@ extern "C"
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_media_layout.h>
+#include <core/resource_management/resource_access_manager.h>
+#include <core/resource/user_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <nx/network/http/httptypes.h>
 #include <utils/common/string.h>
 
 #include <network/tcp_connection_priv.h>
@@ -141,7 +144,8 @@ public:
         wasDualStreaming(false),
         wasCameraControlDisabled(false),
         tcpMode(true),
-        transcodedVideoSize(640, 480)
+        transcodedVideoSize(640, 480),
+        peerHasAccess(true)
     {
     }
 
@@ -223,6 +227,7 @@ public:
     bool wasCameraControlDisabled;
     bool tcpMode;
     QSize transcodedVideoSize;
+    bool peerHasAccess;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
@@ -281,6 +286,12 @@ void QnRtspConnectionProcessor::parseRequest()
                 resource = qnResPool->getResourceByMacAddress(resId);
         }
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
+        auto userResource = qnResPool->getResourceById(d->authUserId).dynamicCast<QnUserResource>();
+        if (!userResource || !qnResourceAccessManager->hasPermission(userResource, resource, Qn::Permission::ReadPermission))
+        {
+            d->peerHasAccess = false;
+            return;
+        }
     }
 
     if (!nx_http::getHeaderValue(d->request.headers, Qn::EC2_INTERNAL_RTP_FORMAT).isNull())
@@ -1523,6 +1534,12 @@ void QnRtspConnectionProcessor::run()
         authOK = true;
     }
 
+    if (!d->peerHasAccess)
+    {
+        sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+        return;
+    }
+
     processRequest();
 
     QElapsedTimer t;
@@ -1551,6 +1568,11 @@ void QnRtspConnectionProcessor::run()
                     d->clientRequest = d->receiveBuffer.left(msgLen);
                     d->receiveBuffer.remove(0, msgLen);
                     parseRequest();
+                    if (!d->peerHasAccess)
+                    {
+                        sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+                        return;
+                    }
                     processRequest();
                 }
             }

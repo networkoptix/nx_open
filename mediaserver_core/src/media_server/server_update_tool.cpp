@@ -118,7 +118,7 @@ QnServerUpdateTool::ReplyCode QnServerUpdateTool::processUpdate(const QString &u
 void QnServerUpdateTool::sendReply(int code) {
     NX_LOG(lit("QnServerUpdateTool: Update chunk reply [id = %1, code = %2].").arg(m_updateId).arg(code), cl_logDEBUG2);
 
-    connection2()->getUpdatesManager()->sendUpdateUploadResponce(
+    connection2()->getUpdatesManager(Qn::kDefaultUserAccess)->sendUpdateUploadResponce(
                 m_updateId, qnCommon->moduleGUID(), code, this, [this](int, ec2::ErrorCode) {});
 }
 

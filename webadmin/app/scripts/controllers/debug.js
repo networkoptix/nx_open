@@ -146,13 +146,14 @@ angular.module('webadminApp')
             $scope.session.event.caption = "Caption " + rand(1000);
             $scope.session.event.description = "Description " + rand(1000);
         }
-        function eventGenerator(randomEvent){
+        var doRandomEvent = false;
+        function eventGenerator(){
             $timeout(function(){
-                if(randomEvent && !$scope.generatingEvents ||
-                    !randomEvent && !$scope.repeatingEvents){
+                if(doRandomEvent && !$scope.generatingEvents ||
+                    !doRandomEvent && !$scope.repeatingEvents){
                     return;
                 }
-                if(randomEvent) {
+                if(doRandomEvent) {
                     randomEvent();
                 }
                 $scope.generateEvent().then(eventGenerator,eventGenerator);
@@ -162,10 +163,12 @@ angular.module('webadminApp')
         $scope.generatingEvents = false;
         $scope.startGeneratingEvents = function(){
             $scope.generatingEvents = true;
+            doRandomEvent = true;
             eventGenerator(true);
         };
         $scope.stopGeneratingEvents = function(){
             $scope.generatingEvents = false;
+            doRandomEvent = false;
         };
 
         $scope.repeatingEvents = false;

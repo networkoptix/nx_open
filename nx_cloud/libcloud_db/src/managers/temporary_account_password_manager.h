@@ -26,30 +26,30 @@ namespace conf
 class Settings;
 }
 
-class TemporaryAccountPasswordEx
+class TemporaryAccountCredentialsEx
 :
-    public data::TemporaryAccountPassword
+    public data::TemporaryAccountCredentials
 {
 public:
     std::string id;
     std::string accessRightsStr;
 
-    TemporaryAccountPasswordEx() {}
-    TemporaryAccountPasswordEx(const TemporaryAccountPasswordEx& right)
+    TemporaryAccountCredentialsEx() {}
+    TemporaryAccountCredentialsEx(const TemporaryAccountCredentialsEx& right)
     :
-        data::TemporaryAccountPassword(right),
+        data::TemporaryAccountCredentials(right),
         id(right.id),
         accessRightsStr(right.accessRightsStr)
     {
     }
-    TemporaryAccountPasswordEx(data::TemporaryAccountPassword&& right)
+    TemporaryAccountCredentialsEx(data::TemporaryAccountCredentials&& right)
     :
-        data::TemporaryAccountPassword(std::move(right))
+        data::TemporaryAccountCredentials(std::move(right))
     {
     }
 };
 
-#define TemporaryAccountPasswordEx_Fields TemporaryAccountPassword_Fields (id)(accessRightsStr)
+#define TemporaryAccountCredentialsEx_Fields TemporaryAccountCredentials_Fields (id)(accessRightsStr)
 
 class TemporaryAccountPasswordManager
 :
@@ -70,20 +70,26 @@ public:
 
     void createTemporaryPassword(
         const AuthorizationInfo& authzInfo,
-        data::TemporaryAccountPassword tmpPasswordData,
+        data::TemporaryAccountCredentials tmpPasswordData,
         std::function<void(api::ResultCode)> completionHandler);
+
+    std::string generateRandomPassword();
+    /** Adds password and password digest.
+        If \a data->login is empty, random login is generated
+    */
+    void addRandomCredentials(data::TemporaryAccountCredentials* const data);
 
 private:
     const conf::Settings& m_settings;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     QnCounter m_startedAsyncCallsCounter;
-    //!map<account email, password data>
-    std::multimap<std::string, TemporaryAccountPasswordEx> m_accountPassword;
+    //!map<login, password data>
+    std::multimap<std::string, TemporaryAccountCredentialsEx> m_accountPassword;
     mutable QnMutex m_mutex;
 
     bool checkTemporaryPasswordForExpiration(
         QnMutexLockerBase* const lk,
-        std::multimap<std::string, TemporaryAccountPasswordEx>::iterator passwordIter);
+        std::multimap<std::string, TemporaryAccountCredentialsEx>::iterator passwordIter);
 
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchTemporaryPasswords(
@@ -92,11 +98,11 @@ private:
 
     nx::db::DBResult insertTempPassword(
         QSqlDatabase* const connection,
-        TemporaryAccountPasswordEx tempPasswordData);
+        TemporaryAccountCredentialsEx tempPasswordData);
     void tempPasswordAddedToDb(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult resultCode,
-        TemporaryAccountPasswordEx tempPasswordData,
+        TemporaryAccountCredentialsEx tempPasswordData,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult deleteTempPassword(

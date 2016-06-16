@@ -7,13 +7,23 @@
 
 namespace ec2
 {
+    class AbstractVideowallNotificationManager : public QObject
+    {
+        Q_OBJECT
+    public:
+    signals:
+        void addedOrUpdated(const ec2::ApiVideowallData& videowall);
+        void removed(const QnUuid &id);
+        void controlMessage(const ec2::ApiVideowallControlMessageData& message);
+    };
+
+    typedef std::shared_ptr<AbstractVideowallNotificationManager> AbstractVideowallNotificationManagerPtr;
+
     /*!
     \note All methods are asynchronous if other not specified
     */
-    class AbstractVideowallManager: public QObject
+    class AbstractVideowallManager
     {
-        Q_OBJECT
-
     public:
         virtual ~AbstractVideowallManager() {}
 
@@ -64,11 +74,6 @@ namespace ec2
             return sendControlMessage(message, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
-
-    signals:
-        void addedOrUpdated(const ec2::ApiVideowallData& videowall);
-        void removed(const QnUuid &id);
-        void controlMessage(const ec2::ApiVideowallControlMessageData& message);
 
     protected:
         virtual int getVideowalls(impl::GetVideowallsHandlerPtr handler) = 0;

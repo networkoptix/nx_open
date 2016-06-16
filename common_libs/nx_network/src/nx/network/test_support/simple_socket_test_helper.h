@@ -56,7 +56,7 @@ QByteArray readNBytes(SocketType* clientSocket, int count)
 template<typename ServerSocketType>
 void syncSocketServerMainFunc(
     const SocketAddress& endpointToBindTo,
-    const boost::optional<QByteArray> testMessage,
+    Buffer testMessage,
     int clientCount,
     ServerSocketType server,
     nx::utils::promise<SocketAddress>* startedPromise)
@@ -67,7 +67,7 @@ void syncSocketServerMainFunc(
         << SystemError::getLastOSErrorText().toStdString();
     ASSERT_TRUE(server->listen(clientCount))
         << SystemError::getLastOSErrorText().toStdString();
-    ASSERT_TRUE(server->setRecvTimeout(60*1000))
+    ASSERT_TRUE(server->setRecvTimeout(60 * 1000))
         << SystemError::getLastOSErrorText().toStdString();
 
     for (int i = clientCount; i > 0; --i)
@@ -122,16 +122,16 @@ void syncSocketServerMainFunc(
         ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
         ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
 
-        if (!testMessage)
+        if (testMessage.isEmpty())
             continue;
 
-        const auto incomingMessage = readNBytes(client.get(), testMessage->size());
+        const auto incomingMessage = readNBytes(client.get(), testMessage.size());
         ASSERT_TRUE(!incomingMessage.isEmpty())
             << SystemError::getLastOSErrorText().toStdString();
 
-        ASSERT_EQ(*testMessage, incomingMessage);
+        ASSERT_EQ(testMessage, incomingMessage);
 
-        const int bytesSent = client->send(*testMessage);
+        const int bytesSent = client->send(testMessage);
         ASSERT_NE(-1, bytesSent) << SystemError::getLastOSErrorText().toStdString();
 
         //waiting for connection to be closed by client
@@ -379,20 +379,23 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
-void shutdownSocket(
+void socketShutdown(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
+    bool useAsyncPriorSync,
     SocketAddress endpointToBindTo = kAnyPrivateAddress,
     SocketAddress endpointToConnectTo = kAnyPrivateAddress)
 {
-    for (int i = 0; i < 14; ++i)
+    // Taks amazingly long with UdtSocket
+    const auto repeatCount = useAsyncPriorSync ? 5 : 14;
+    for (int i = 0; i < repeatCount; ++i)
     {
         auto server = serverMaker();
         nx::utils::promise<SocketAddress> promise;
         nx::utils::thread serverThread(
             &syncSocketServerMainFunc<decltype(server)>,
             endpointToBindTo,
-            boost::none,
+            useAsyncPriorSync ? kTestMessage : Buffer(),
             1,
             serverMaker(),
             &promise);
@@ -409,22 +412,53 @@ void shutdownSocket(
         auto client = clientMaker();
         ASSERT_TRUE(client->setRecvTimeout(10 * 1000));   //10 seconds
 
+        nx::utils::promise<void> testReadyPromise;
         nx::utils::promise<void> recvExitedPromise;
         nx::utils::thread clientThread(
-            [&client, &recvExitedPromise, endpointToConnectTo]()
+            [&]()
             {
+                if (useAsyncPriorSync)
+                {
+                    nx::utils::promise<void> asyncDone;
+                    ASSERT_TRUE(client->setNonBlockingMode(true));
+                    client->connectAsync(
+                        endpointToConnectTo,
+                        [&](SystemError::ErrorCode code)
+                        {
+                            ASSERT_EQ(code, SystemError::noError);
+                            client->sendAsync(
+                                kTestMessage,
+                                [&](SystemError::ErrorCode code, size_t /*size*/)
+                                {
+                                    ASSERT_EQ(code, SystemError::noError);
+                                    client->post(
+                                        [&]() { asyncDone.set_value(); });
+                                });
+                        });
+
+                    asyncDone.get_future().wait();
+                    ASSERT_TRUE(client->setNonBlockingMode(false));
+                    testReadyPromise.set_value();
+                }
+                else
+                {
+                    client->connect(endpointToConnectTo, kTestTimeout.count());
+                }
+
                 nx::Buffer readBuffer;
                 readBuffer.resize(4096);
-                client->connect(endpointToConnectTo, kTestTimeout.count());
-                client->recv(readBuffer.data(), readBuffer.size(), 0);
+                while (client->recv(readBuffer.data(), readBuffer.size(), 0) > 0);
                 recvExitedPromise.set_value();
             });
+
+        if (useAsyncPriorSync)
+            testReadyPromise.get_future().wait();
 
         //shutting down socket
         //if (i == 0)
         {
             //giving client thread some time to call client->recv
-            std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 500));
             //testing that shutdown interrupts recv call
             client->shutdown();
         }
@@ -718,7 +752,9 @@ typedef nx::network::test::StopType StopType;
     Type(Name, SingleAioThread) \
         { nx::network::test::socketSingleAioThread(mkClient); } \
     Type(Name, Shutdown) \
-        { nx::network::test::shutdownSocket(mkServer, mkClient); } \
+        { nx::network::test::socketShutdown(mkServer, mkClient, false); } \
+    Type(Name, ShutdownAfterAsync) \
+        { nx::network::test::socketShutdown(mkServer, mkClient, true); } \
     Type(Name, ConnectToBadAddress) \
         { nx::network::test::socketConnectToBadAddress(mkClient, false); } \
     Type(Name, ConnectToBadAddressIoDelete) \

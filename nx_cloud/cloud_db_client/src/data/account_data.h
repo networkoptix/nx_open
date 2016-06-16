@@ -74,6 +74,22 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json))
 
 
+////////////////////////////////////////////////////////////
+//// class TemporaryCredentials
+////////////////////////////////////////////////////////////
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, TemporaryCredentialsParams* const data);
+void serializeToUrlQuery(const TemporaryCredentialsParams&, QUrlQuery* const urlQuery);
+
+#define TemporaryCredentialsParams_Fields (expirationPeriod)(autoProlongationEnabled)(prolongationPeriod)
+
+#define TemporaryCredentials_Fields (login)(password)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (TemporaryCredentialsParams)(TemporaryCredentials),
+    (json))
+
+
 }   //api
 }   //cdb
 }   //nx

@@ -5,6 +5,7 @@
 #include <api/global_settings.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
 
@@ -51,12 +52,13 @@ namespace ec2
 
     ErrorCode Ec2StaticticsReporter::collectReportData(std::nullptr_t, ApiSystemStatistics* const outData)
     {
-        if(!dbManager) return ErrorCode::ioError;
+        if(!detail::QnDbManager::instance() || !detail::QnDbManager::instance()->isInitialized())
+            return ErrorCode::ioError;
 
         ErrorCode res;
         #define dbManager_queryOrReturn(ApiType, name) \
             ApiType name; \
-            if ((res = dbManager->doQuery(nullptr, name)) != ErrorCode::ok) \
+            if ((res = dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, name)) != ErrorCode::ok) \
                 return res;
 
         dbManager_queryOrReturn(ApiMediaServerDataExList, mediaservers);
@@ -67,7 +69,7 @@ namespace ec2
             if (cam.typeId != m_desktopCameraTypeId)
                 outData->cameras.push_back(std::move(cam));
 
-        if ((res = dbManager->doQuery(nullptr, outData->clients)) != ErrorCode::ok)
+        if ((res = dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, outData->clients)) != ErrorCode::ok)
             return res;
 
         dbManager_queryOrReturn(ApiLicenseDataList, licenses);
@@ -82,7 +84,7 @@ namespace ec2
         dbManager_queryOrReturn(ApiBusinessRuleDataList, bRules);
         for (auto& br : bRules) outData->businessRules.push_back(std::move(br));
 
-        if ((res = dbManager->doQuery(nullptr, outData->layouts)) != ErrorCode::ok)
+        if ((res = dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, outData->layouts)) != ErrorCode::ok)
             return res;
 
         dbManager_queryOrReturn(ApiUserDataList, users);

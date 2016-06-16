@@ -9,6 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
+#include "rest/server/rest_connection_processor.h"
 #include <api/resource_property_adaptor.h>
 
 namespace
@@ -38,20 +39,20 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields,
     (optional, true));
 
-int QnSetupCloudSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnSetupCloudSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
-    return execute(std::move(SetupRemoveSystemData(params)), result);
+    return execute(std::move(SetupRemoveSystemData(params)), owner->authUserId(), result);
 }
 
-int QnSetupCloudSystemRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnSetupCloudSystemRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     QN_UNUSED(path, params);
     const SetupRemoveSystemData data = QJson::deserialized<SetupRemoveSystemData>(body);
-    return execute(std::move(data), result);
+    return execute(std::move(data), owner->authUserId(), result);
 }
 
-int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, QnJsonRestResult &result)
+int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnUuid &userId, QnJsonRestResult &result)
 {
     if (!qnGlobalSettings->isNewSystem())
     {
@@ -76,8 +77,7 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, QnJsonRes
     int httpResult = subHandler.execute(data, result);
     if (result.error != QnJsonRestResult::NoError)
         return httpResult;
-
-    changeSystemName(newSystemName, 0, 0, true);
+    changeSystemName(newSystemName, 0, 0, true, Qn::UserAccessData(userId));
     qnGlobalSettings->setNewSystem(false);
     if (qnGlobalSettings->synchronizeNowSync())
         qnCommon->updateModuleInformation();

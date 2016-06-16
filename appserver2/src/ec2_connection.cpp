@@ -14,24 +14,23 @@
 
 namespace ec2
 {
-    Ec2DirectConnection::Ec2DirectConnection(
-        ServerQueryProcessor* queryProcessor,
+    Ec2DirectConnection::Ec2DirectConnection(ServerQueryProcessorAccess *queryProcessor,
         const QnConnectionInfo& connectionInfo,
         const QUrl& dbUrl)
     :
-        BaseEc2Connection<ServerQueryProcessor>( queryProcessor ),
-        m_transactionLog( new QnTransactionLog(QnDbManager::instance()) ),
+        BaseEc2Connection<ServerQueryProcessorAccess>( queryProcessor ),
+        m_transactionLog( new QnTransactionLog(detail::QnDbManager::instance()) ),
         m_connectionInfo( connectionInfo ),
         m_isInitialized( false )
     {
-        m_isInitialized = QnDbManager::instance()->init(dbUrl);
+        m_isInitialized = detail::QnDbManager::instance()->init(dbUrl);
 
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
 
         // NOTE: Ec2StaticticsReporter can only be created after connection is established
         if (m_isInitialized)
             m_staticticsReporter.reset(new Ec2StaticticsReporter(
-                getResourceManager(), getMediaServerManager()));
+                getResourceManager(Qn::kDefaultUserAccess), getMediaServerManager(Qn::kDefaultUserAccess)));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()

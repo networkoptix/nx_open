@@ -44,7 +44,7 @@ namespace ec2
 {
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory( Qn::PeerType peerType )
     :
-        m_dbManager( peerType == Qn::PT_Server ? new QnDbManager() : nullptr ),   //dbmanager is initialized by direct connection
+        m_dbManager( peerType == Qn::PT_Server ? new detail::QnDbManager() : nullptr ),   //dbmanager is initialized by direct connection
         m_timeSynchronizationManager( new TimeSynchronizationManager(peerType) ),
         m_transactionMessageBus( new ec2::QnTransactionMessageBus(peerType) ),
         m_terminated( false ),
@@ -1348,7 +1348,7 @@ namespace ec2
 			clientInfo.parentId = qnCommon->moduleGUID();
 
 			ApiClientInfoDataList infos;
-			auto result = dbManager->doQuery(clientInfo.id, infos);
+            auto result = dbManager(Qn::kDefaultUserAccess).doQuery(clientInfo.id, infos);
 			if (result != ErrorCode::ok)
 				return result;
 
@@ -1360,7 +1360,7 @@ namespace ec2
 			}
 
             QnTransaction<ApiClientInfoData> transaction(ApiCommand::saveClientInfo, clientInfo);
-            m_serverQueryProcessor.processUpdateAsync(transaction,
+            m_serverQueryProcessor.getAccess(Qn::kDefaultUserAccess).processUpdateAsync(transaction,
                 [&](ErrorCode result) {
 					if (result == ErrorCode::ok) {
 						NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
@@ -1369,8 +1369,8 @@ namespace ec2
 					else {
 						NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
 							.arg(toString(result)), cl_logERROR);
-					}
-				});
+                    }
+                });
         }
 
         return ErrorCode::ok;
@@ -1409,46 +1409,44 @@ namespace ec2
 
     ErrorCode Ec2DirectConnectionFactory::getSettings( std::nullptr_t, ApiResourceParamDataList* const outData )
     {
-        if( !QnDbManager::instance() )
+        if( !detail::QnDbManager::instance() )
             return ErrorCode::ioError;
-        return QnDbManager::instance()->readSettings( *outData );
+        return dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, *outData );
     }
 
     template<class InputDataType>
-    void Ec2DirectConnectionFactory::registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd )
+    void Ec2DirectConnectionFactory::registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, Qn::GlobalPermission permission )
     {
-        restProcessorPool->registerHandler(
-            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new UpdateHttpHandler<InputDataType>(m_directConnection) );
+        restProcessorPool->registerHandler( lit("ec2/%1").arg(ApiCommand::toString(cmd)), new UpdateHttpHandler<InputDataType>(m_directConnection), permission);
     }
 
     template<class InputDataType, class CustomActionType>
-    void Ec2DirectConnectionFactory::registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, CustomActionType customAction )
+    void Ec2DirectConnectionFactory::registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, CustomActionType customAction, Qn::GlobalPermission permission )
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new UpdateHttpHandler<InputDataType>(m_directConnection, customAction) );
+            new UpdateHttpHandler<InputDataType>(m_directConnection, customAction), permission );
     }
 
     template<class InputDataType, class OutputDataType>
-    void Ec2DirectConnectionFactory::registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd )
+    void Ec2DirectConnectionFactory::registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, Qn::GlobalPermission permission )
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new QueryHttpHandler2<InputDataType, OutputDataType>(cmd, &m_serverQueryProcessor) );
+            new QueryHttpHandler2<InputDataType, OutputDataType>(cmd, &m_serverQueryProcessor), permission );
     }
 
     template<class InputType, class OutputType>
     void Ec2DirectConnectionFactory::registerFunctorHandler(
         QnRestProcessorPool* const restProcessorPool,
         ApiCommand::Value cmd,
-        std::function<ErrorCode(InputType, OutputType*)> handler )
+        std::function<ErrorCode(InputType, OutputType*)> handler, Qn::GlobalPermission permission)
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
             new FlexibleQueryHttpHandler<InputType, OutputType>(
                 cmd,
-                std::move(handler)));
+                std::move(handler)), permission);
     }
 
     //!Registers handler which is able to modify HTTP response
@@ -1456,12 +1454,12 @@ namespace ec2
     void Ec2DirectConnectionFactory::registerFunctorWithResponseHandler(
         QnRestProcessorPool* const restProcessorPool,
         ApiCommand::Value cmd,
-        std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler)
+        std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler, Qn::GlobalPermission permission)
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
             new FlexibleQueryHttpHandler<InputType, OutputType>(
                 cmd,
-                std::move(handler)));
+                std::move(handler)), permission);
     }
 }

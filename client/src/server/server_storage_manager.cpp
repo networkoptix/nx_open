@@ -232,7 +232,7 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
     ec2::ApiStorageDataList apiStorages;
     ec2::fromResourceListToApi(storages, apiStorages);
 
-    conn->getMediaServerManager()->saveStorages(apiStorages, this, [storages](int reqID, ec2::ErrorCode error)
+    conn->getMediaServerManager(Qn::kDefaultUserAccess)->saveStorages(apiStorages, this, [storages](int reqID, ec2::ErrorCode error)
     {
         Q_UNUSED(reqID);
         if (error != ec2::ErrorCode::ok)
@@ -252,7 +252,7 @@ void QnServerStorageManager::deleteStorages(const ec2::ApiIdDataList &ids )
     if (!conn)
         return;
 
-    conn->getMediaServerManager()->removeStorages(ids, this, [] {});
+    conn->getMediaServerManager(Qn::kDefaultUserAccess)->removeStorages(ids, this, [] {});
     invalidateRequests();
 }
 

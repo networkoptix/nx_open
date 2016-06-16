@@ -13,28 +13,39 @@
 
 namespace ec2
 {
-    template<class QueryProcessorType>
-    QnTimeManager<QueryProcessorType>::QnTimeManager( QueryProcessorType* queryProcessor )
-    :
-        m_queryProcessor( queryProcessor )
+    template<typename QueryProcessorType>
+    QnTimeNotificationManager<QueryProcessorType>::QnTimeNotificationManager()
     {
         connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::primaryTimeServerSelectionRequired,
-                 this, &QnTimeManager<QueryProcessorType>::timeServerSelectionRequired,
+                 this, &QnTimeNotificationManager<QueryProcessorType>::timeServerSelectionRequired,
                  Qt::DirectConnection );
         connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::timeChanged,
-                 this, &QnTimeManager<QueryProcessorType>::timeChanged,
+                 this, &QnTimeNotificationManager<QueryProcessorType>::timeChanged,
                  Qt::DirectConnection );
         connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::peerTimeChanged,
-                 this, &QnTimeManager<QueryProcessorType>::peerTimeChanged,
+                 this, &QnTimeNotificationManager<QueryProcessorType>::peerTimeChanged,
                  Qt::DirectConnection );
+    }
+
+    template<typename QueryProcessorType>
+    QnTimeNotificationManager<QueryProcessorType>::~QnTimeNotificationManager()
+    {
+        //safely disconnecting from TimeSynchronizationManager
+        if (TimeSynchronizationManager::instance())
+            TimeSynchronizationManager::instance()->disconnectAndJoin( this );
+    }
+
+    template<class QueryProcessorType>
+    QnTimeManager<QueryProcessorType>::QnTimeManager(QueryProcessorType* queryProcessor, const Qn::UserAccessData &userAccessData)
+    :
+        m_queryProcessor( queryProcessor ),
+        m_userAccessData(userAccessData)
+    {
     }
 
     template<class QueryProcessorType>
     QnTimeManager<QueryProcessorType>::~QnTimeManager()
     {
-        //safely disconnecting from TimeSynchronizationManager
-        if (TimeSynchronizationManager::instance())
-            TimeSynchronizationManager::instance()->disconnectAndJoin( this );
     }
 
     template<class QueryProcessorType>
@@ -62,7 +73,7 @@ namespace ec2
         tran.params.id = serverGuid;
 
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
 
         return reqID;
     }
@@ -75,5 +86,8 @@ namespace ec2
 
 
     template class QnTimeManager<FixedUrlClientQueryProcessor>;
-    template class QnTimeManager<ServerQueryProcessor>;
+    template class QnTimeManager<ServerQueryProcessorAccess>;
+
+    template class QnTimeNotificationManager<FixedUrlClientQueryProcessor>;
+    template class QnTimeNotificationManager<ServerQueryProcessorAccess>;
 }

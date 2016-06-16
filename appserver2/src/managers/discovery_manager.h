@@ -7,7 +7,7 @@
 namespace ec2
 {
 
-    class QnDiscoveryNotificationManager : public AbstractDiscoveryManager
+    class QnDiscoveryNotificationManager : public AbstractDiscoveryNotificationManager
     {
     public:
         void triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction);
@@ -18,11 +18,13 @@ namespace ec2
         void triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran);
     };
 
+    typedef std::shared_ptr<QnDiscoveryNotificationManager> QnDiscoveryNotificationManagerPtr;
+
     template<class QueryProcessorType>
-    class QnDiscoveryManager : public QnDiscoveryNotificationManager
+    class QnDiscoveryManager : public AbstractDiscoveryManager
     {
     public:
-        QnDiscoveryManager(QueryProcessorType * const queryProcessor);
+        QnDiscoveryManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData);
         virtual ~QnDiscoveryManager();
 
     protected:
@@ -35,6 +37,7 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
+        Qn::UserAccessData m_userAccessData;
 
         QnTransaction<ApiDiscoveryData> prepareTransaction(ApiCommand::Value command, const QnUuid &id, const QUrl &url, bool ignore) const;
         QnTransaction<ApiDiscoverPeerData> prepareTransaction(const QUrl &url) const;
