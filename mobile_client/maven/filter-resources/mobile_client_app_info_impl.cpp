@@ -17,3 +17,8 @@ bool QnMobileClientAppInfo::defaultLiteMode()
 {
     return ${liteMode};
 }
+
+QString QnMobileClientAppInfo::oldAndroidAppId()
+{
+    return QStringLiteral("${old.android.packagename}");
+}
