@@ -172,7 +172,7 @@ void QnAudioProxyReceiver::run()
     if (!readHttpHeaders(d->socket))
         return;
 
-    QnProxyDesktopDataProviderPtr desktopDataProvider(new QnProxyDesktopDataProvider(resourceId));
+    QnProxyDesktopDataProviderPtr desktopDataProvider(new QnProxyDesktopDataProvider(QnUuid::fromStringSafe(resourceId)));
     desktopDataProvider->setSocket(d->socket);
 
     QString errString;
