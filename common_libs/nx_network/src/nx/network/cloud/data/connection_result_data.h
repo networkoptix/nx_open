@@ -33,17 +33,20 @@ void NX_NETWORK_API serialize(const UdpHolePunchingResultCode&, QString*);
 
 class NX_NETWORK_API ConnectionResultRequest
 :
-    public StunMessageData
+    public StunRequestData
 {
 public:
+    constexpr static const stun::cc::methods::Value kMethod =
+        stun::cc::methods::connectionResult;
+
     nx::String connectSessionId;
     UdpHolePunchingResultCode resultCode;
     SystemError::ErrorCode sysErrorCode;
 
     ConnectionResultRequest();
 
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
 }   //api

@@ -17,9 +17,12 @@ namespace api {
 
 class NX_NETWORK_API ListenRequest
 :
-    public StunMessageData
+    public StunRequestData
 {
 public:
+    constexpr static const stun::cc::methods::Value kMethod =
+        stun::cc::methods::listen;
+
     nx::String systemId;
     nx::String serverId;
     CloudConnectVersion cloudConnectVersion;
@@ -31,8 +34,8 @@ public:
     ListenRequest(ListenRequest&&) = default;
     ListenRequest& operator=(ListenRequest&&) = default;
 
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    void serializeAttributes(nx::stun::Message* const message);
+    bool parseAttributes(const nx::stun::Message& message);
 };
 
 } // namespace api

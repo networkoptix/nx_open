@@ -24,9 +24,12 @@ namespace api {
 /** [connection_mediator, 4.3.5] */
 class NX_NETWORK_API ConnectRequest
 :
-    public StunMessageData
+    public StunRequestData
 {
 public:
+    constexpr static const stun::cc::methods::Value kMethod =
+        stun::cc::methods::connect;
+
     //TODO #ak destinationHostName MUST be unicode string (e.g., QString)
     nx::String destinationHostName;
     nx::String originatingPeerID;
@@ -47,15 +50,18 @@ public:
     ConnectRequest(ConnectRequest&&) = default;
     ConnectRequest& operator=(ConnectRequest&&) = default;
 
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
 class NX_NETWORK_API ConnectResponse
 :
-    public StunMessageData
+    public StunResponseData
 {
 public:
+    constexpr static const stun::cc::methods::Value kMethod =
+        stun::cc::methods::connect;
+
     std::list<SocketAddress> publicTcpEndpointList;
     std::list<SocketAddress> udpEndpointList;
     ConnectionParameters params;
@@ -71,8 +77,8 @@ public:
     /**
         \note after this method call object contents are undefined
     */
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
 }   //namespace api

@@ -17,9 +17,12 @@ namespace api {
 
 class NX_NETWORK_API ConnectionRequestedEvent
 :
-    public StunMessageData
+    public StunIndicationData
 {
 public:
+    constexpr static const stun::cc::indications::Value kMethod =
+        stun::cc::indications::connectionRequested;
+
     nx::String connectSessionId;
     nx::String originatingPeerID;
     std::list<SocketAddress> udpEndpointList;   ///< Peer UDP addresses
@@ -29,8 +32,8 @@ public:
 
     ConnectionRequestedEvent();
 
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
 }   //api

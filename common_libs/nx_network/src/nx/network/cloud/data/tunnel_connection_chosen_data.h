@@ -16,24 +16,28 @@ namespace api {
 
 class NX_NETWORK_API TunnelConnectionChosenRequest
 :
-    public StunMessageData
+    public StunRequestData
 {
 public:
     constexpr static const auto kMethod = stun::cc::methods::tunnelConnectionChosen;
 
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    TunnelConnectionChosenRequest();
+
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
 class NX_NETWORK_API TunnelConnectionChosenResponse
 :
-    public StunMessageData
+    public StunResponseData
 {
 public:
     constexpr static const auto kMethod = stun::cc::methods::tunnelConnectionChosen;
 
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    TunnelConnectionChosenResponse();
+
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
 }   //namespace api

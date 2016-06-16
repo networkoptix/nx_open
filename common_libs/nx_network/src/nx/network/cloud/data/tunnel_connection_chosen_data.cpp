@@ -10,24 +10,33 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-void TunnelConnectionChosenRequest::serialize(nx::stun::Message* const message)
+TunnelConnectionChosenRequest::TunnelConnectionChosenRequest()
+:
+    StunRequestData(kMethod)
 {
-    message->header.messageClass = stun::MessageClass::request;
-    message->header.method = kMethod;
 }
 
-bool TunnelConnectionChosenRequest::parse(const nx::stun::Message& /*message*/)
+void TunnelConnectionChosenRequest::serializeAttributes(nx::stun::Message* const /*message*/)
+{
+}
+
+bool TunnelConnectionChosenRequest::parseAttributes(const nx::stun::Message& /*message*/)
 {
     return true;
 }
 
-void TunnelConnectionChosenResponse::serialize(nx::stun::Message* const message)
+
+TunnelConnectionChosenResponse::TunnelConnectionChosenResponse()
+:
+    StunResponseData(kMethod)
 {
-    message->header.messageClass = stun::MessageClass::successResponse;
-    message->header.method = kMethod;
 }
 
-bool TunnelConnectionChosenResponse::parse(const nx::stun::Message& /*message*/)
+void TunnelConnectionChosenResponse::serializeAttributes(nx::stun::Message* const /*message*/)
+{
+}
+
+bool TunnelConnectionChosenResponse::parseAttributes(const nx::stun::Message& /*message*/)
 {
     return true;
 }
