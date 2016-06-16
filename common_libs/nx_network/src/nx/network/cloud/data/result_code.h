@@ -7,7 +7,7 @@
 #define NX_MEDIATOR_API_RESULT_CODE_H
 
 #include <nx/network/stun/message.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 
 namespace nx {

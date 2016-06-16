@@ -4,7 +4,7 @@
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 
 #include <utils/common/scoped_value_rollback.h>
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 #include <utils/math/math.h>
 
 namespace {

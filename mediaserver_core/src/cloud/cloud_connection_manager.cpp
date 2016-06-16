@@ -7,7 +7,7 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include <nx/network/socket_global.h>
 

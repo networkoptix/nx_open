@@ -2,7 +2,7 @@
 
 #include "network/tcp_connection_priv.h"
 #include "network/module_finder.h"
-#include "utils/common/model_functions.h"
+#include "nx/fusion/model_functions.h"
 
 int QnDiscoveredPeersRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
 {

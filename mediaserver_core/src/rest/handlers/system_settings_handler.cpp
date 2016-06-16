@@ -7,7 +7,7 @@
 
 #include <api/global_settings.h>
 #include <api/resource_property_adaptor.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/httptypes.h>
 
 

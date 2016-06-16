@@ -5,7 +5,9 @@
 
 #include <utils/common/connective.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/watchers/workbench_items_watcher.h>
 #include <ui/style/generic_palette.h>
+
 class QnCloudStatusWatcher;
 
 class QnWorkbenchWelcomeScreen : public Connective<QObject>
@@ -113,6 +115,8 @@ private: // overrides
 private:
     typedef QPointer<QWidget> WidgetPtr;
     typedef QPointer<QnCloudStatusWatcher> CloudStatusWatcherPtr;
+
+    QnWorkbenchLayoutItemsWatcher m_itemsWatcher;
 
     bool m_visibleControls;
     bool m_visible;

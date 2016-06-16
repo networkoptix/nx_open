@@ -1,5 +1,5 @@
-#include <utils/common/model_functions.h>
-#include <utils/fusion/fusion_adaptor.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/fusion/fusion/fusion_adaptor.h>
 
 #include "camera_diagnostics_reply.h"
 #include "manual_camera_seach_reply.h"

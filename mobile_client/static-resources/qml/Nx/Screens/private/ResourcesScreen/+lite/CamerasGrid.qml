@@ -7,6 +7,7 @@ GridView
     id: camerasGrid
 
     property real spacing: 8
+    property alias layoutId: camerasModel.layoutId
 
     cellWidth: width / 2
     cellHeight: height / 2
@@ -44,7 +45,7 @@ GridView
         height: cellHeight
         z: 2.0
         color: "transparent"
-        border.color: ColorTheme.contrast5
+        border.color: ColorTheme.contrast9
         border.width: 4
     }
 

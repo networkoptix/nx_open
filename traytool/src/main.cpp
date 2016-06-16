@@ -11,7 +11,7 @@
 
 #include <translation/translation_manager.h>
 
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 
 void initTranslations()
 {

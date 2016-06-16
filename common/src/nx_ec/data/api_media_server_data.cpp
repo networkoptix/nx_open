@@ -2,7 +2,7 @@
 
 #include <core/resource/server_backup_schedule.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace ec2 {
 

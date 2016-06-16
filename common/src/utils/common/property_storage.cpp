@@ -7,7 +7,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <QtGui/QColor>
 
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 
 #include "warnings.h"
 #include "command_line_parser.h"

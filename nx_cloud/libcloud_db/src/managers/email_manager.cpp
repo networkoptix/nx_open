@@ -10,7 +10,7 @@
 #include <api/global_settings.h>
 #include <common/common_globals.h>
 #include <utils/common/cpp14.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include <nx/email/mustache/mustache_helper.h>
 #include <nx/email/email_manager_impl.h>

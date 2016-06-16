@@ -6,7 +6,7 @@
 
 #include <api/network_proxy_factory.h>
 #include <core/resource/resource.h>
-#include <utils/serialization/lexical_enum.h>
+#include <nx/fusion/serialization/lexical_enum.h>
 
 #include "session_manager.h"
 #include "abstract_reply_processor.h"

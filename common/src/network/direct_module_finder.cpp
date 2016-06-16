@@ -14,7 +14,7 @@
 #include <utils/common/app_info.h>
 #include <nx/utils/log/log.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/async_http_client_reply.h>
 

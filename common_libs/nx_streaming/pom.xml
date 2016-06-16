@@ -1,12 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-        Example pom for delegating maven goals to msbuild so it builds the "solution"
-
-        A solution can be a group of projects, but here we only have one.
-        It should also be possible to have one maven project per solution project,
-        and have a parent pom to deletegate the build.
-    -->
-
     <parent>
         <artifactId>common_libs</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -27,7 +19,7 @@
 
         <template>lib</template>
         <qt.libs>core network concurrent</qt.libs>
-        <global.libs>-lcommon -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
@@ -52,8 +44,17 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
         </dependency>
-    </dependencies>    
-    
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_fusion</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
     <profiles>
         <profile>
             <id>windows</id>
@@ -61,7 +62,7 @@
                 <os>
                     <family>Windows</family>
                 </os>
-            </activation>            
+            </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
             </properties>
@@ -72,12 +73,12 @@
             <activation>
                 <os>
                     <family>unix</family>
-                </os> 
-            </activation>            
+                </os>
+            </activation>
             <properties>
                 <buildLib>sharedlib</buildLib>
             </properties>
-        </profile>  
+        </profile>
 
         <profile>
             <id>mobile-android</id>
@@ -106,6 +107,6 @@
                 <ios.defines>DISABLE_FFMPEG</ios.defines>
             </properties>
         </profile>
-    </profiles> 
+    </profiles>
 
 </project>

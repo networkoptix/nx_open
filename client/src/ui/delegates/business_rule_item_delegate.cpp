@@ -97,10 +97,10 @@ QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate() {
 
 }
 
-int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &metrics) {   
+int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &metrics) {
     const int dropDownSpacer = 40;  /* Leave some space for the drop-down indicator. */
     switch (column) {
-    case QnBusiness::EventColumn: 
+    case QnBusiness::EventColumn:
         {
             auto eventWidth = [metrics] (QnBusiness::EventType eventType){
                 return metrics.width(QnBusinessStringsHelper::eventName(eventType));
@@ -110,7 +110,7 @@ int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &met
                 result = qMax(result, eventWidth(eventType));
             return dropDownSpacer + result;
         }
-    case QnBusiness::ActionColumn: 
+    case QnBusiness::ActionColumn:
         {
             auto actionWidth = [metrics](QnBusiness::ActionType actionType){
                 return metrics.width(QnBusinessStringsHelper::actionName(actionType));
@@ -186,19 +186,24 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
         connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-        if (actionType == QnBusiness::CameraRecordingAction) {
+        if (actionType == QnBusiness::CameraRecordingAction)
+        {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(btn));
         }
-        else if (actionType == QnBusiness::BookmarkAction) {
+        else if (actionType == QnBusiness::BookmarkAction)
+        {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(btn));
         }
-        else if (actionType == QnBusiness::CameraOutputAction || actionType == QnBusiness::CameraOutputOnceAction) {
+        else if (actionType == QnBusiness::CameraOutputAction)
+        {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(btn));
         }
-        else if (actionType == QnBusiness::ExecutePtzPresetAction) {
+        else if (actionType == QnBusiness::ExecutePtzPresetAction)
+        {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(btn));
         }
-        else if (actionType == QnBusiness::SendMailAction) {
+        else if (actionType == QnBusiness::SendMailAction)
+        {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailPolicy>(btn));
             btn->setSelectionTarget(QnResourceSelectionDialog::UserResourceTarget);
         }

@@ -15,8 +15,7 @@
 
 #include <common/config.h>
 #include <nx/utils/log/assert.h>
-
-#include "fuzzy.h"
+#include <nx/utils/math/fuzzy.h>
 
 namespace QnMathDetail {
     using ::qFuzzyIsNull;
@@ -50,7 +49,7 @@ inline bool qIsNaN(const QVector4D &vector) {
 template<class T> inline T qQNaN();
 template<class T> inline T qSNaN();
 
-#define QN_DEFINE_NAN_FUNCTION(TYPE, NAME, VALUE) template<> inline TYPE NAME<TYPE>() { return VALUE; }                           
+#define QN_DEFINE_NAN_FUNCTION(TYPE, NAME, VALUE) template<> inline TYPE NAME<TYPE>() { return VALUE; }
 QN_DEFINE_NAN_FUNCTION(float, qQNaN, std::numeric_limits<float>::quiet_NaN())
 QN_DEFINE_NAN_FUNCTION(float, qSNaN, std::numeric_limits<float>::signaling_NaN())
 QN_DEFINE_NAN_FUNCTION(double, qQNaN, std::numeric_limits<double>::quiet_NaN())
@@ -127,7 +126,7 @@ inline unsigned int qPower2Floor(unsigned int value, int step) {
 
 /**
  * Modulo function that never returns negative values.
- * 
+ *
  * \param l                             The dividend.
  * \param r                             The divisor.
  * \returns                             Non-negative modulo.
@@ -187,7 +186,7 @@ T qRound(T value, Step step) {
 }
 
 /**
- * \returns                             Index of the leading 1 bit, counting the least significant bit at index 0.  
+ * \returns                             Index of the leading 1 bit, counting the least significant bit at index 0.
  *                                      (1 << IntegerLog2(x)) is a mask for the most significant bit of x.
  *                                      Result is undefined if input is zero.
  */

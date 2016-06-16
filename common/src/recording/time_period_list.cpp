@@ -2,8 +2,8 @@
 
 #include <utils/common/util.h>
 #include <utils/math/math.h>
-#include <utils/common/model_functions.h>
-#include <utils/serialization/compressed_time_functions.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/compressed_time_functions.h>
 
 
 QN_FUSION_ADAPT_STRUCT(MultiServerPeriodData, (guid)(periods))

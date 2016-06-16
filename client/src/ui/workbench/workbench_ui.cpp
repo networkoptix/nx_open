@@ -26,9 +26,15 @@
 
 #include <camera/resource_display.h>
 
+#include <ui/actions/action_manager.h>
+#include <ui/actions/action.h>
+#include <ui/actions/action_parameter_types.h>
+
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
+
+#include <ui/common/palette.h>
 
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/animation_instrument.h>
@@ -57,23 +63,26 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/notifications/notifications_collection_widget.h>
-#include <ui/common/palette.h>
-#include <ui/processors/hover_processor.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action.h>
-#include <ui/actions/action_parameter_types.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+
+#include <ui/processors/hover_processor.h>
+
+#include <ui/screen_recording/screen_recorder.h>
+
+#include <ui/statistics/modules/controls_statistics_module.h>
+
+#include <ui/style/skin.h>
+
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
-#include <ui/style/skin.h>
+
 #include <ui/workaround/qtbug_workaround.h>
-#include <ui/screen_recording/screen_recorder.h>
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -89,7 +98,7 @@
 #include "workbench_access_controller.h"
 #include "workbench_pane_settings.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #ifdef _DEBUG
 //#define QN_DEBUG_WIDGET
@@ -108,61 +117,6 @@ namespace
         if (!ourAction)
             return kUndefinedAlias;
         return QnLexical::serialized(ourAction->id());
-    }
-
-    QnImageButtonWidget* newActionButton(QAction* action, int helpTopicId = kDefaultHelpTopicId, QGraphicsItem *parent = nullptr)
-    {
-        QnImageButtonWidget* button = new QnImageButtonWidget(aliasFromAction(action), parent);
-        button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
-        button->setDefaultAction(action);
-        button->setCached(true);
-
-        int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
-        button->setFixedSize(action->icon().actualSize(QSize(maxIconSize, maxIconSize)));
-
-        if (helpTopicId != Qn::Empty_Help)
-            setHelpTopic(button, helpTopicId);
-
-        return button;
-    }
-
-    QnImageButtonWidget* newShowHideButton(QGraphicsItem* parent, QAction* action)
-    {
-        QnImageButtonWidget* button = new QnImageButtonWidget(aliasFromAction(action), parent);
-        if (action)
-            button->setDefaultAction(action);
-        else
-            button->setCheckable(true);
-
-        button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
-
-        int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
-        button->setFixedSize(button->icon().actualSize(QSize(maxIconSize, maxIconSize)));
-
-        button->setProperty(Qn::NoHandScrollOver, true);
-        button->setCached(true);
-
-        setHelpTopic(button, Qn::MainWindow_Pin_Help);
-        return button;
-    }
-
-    QnImageButtonWidget* newPinButton(QGraphicsItem* parent, QAction* action)
-    {
-        QnImageButtonWidget* button = new QnImageButtonWidget(aliasFromAction(action), parent);
-
-        if (action)
-            button->setDefaultAction(action);
-        else
-            button->setCheckable(true);
-
-        button->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
-        button->setCached(true);
-
-        int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
-        button->setFixedSize(button->icon().actualSize(QSize(maxIconSize, maxIconSize)));
-
-        setHelpTopic(button, Qn::MainWindow_Pin_Help);
-        return button;
     }
 
     Qn::PaneState makePaneState(bool opened, bool pinned = true)
@@ -480,6 +434,66 @@ void QnWorkbenchUi::storeSettings()
     thumbnails.span = m_lastThumbnailsHeight;
 
     qnSettings->setPaneSettings(settings);
+}
+
+QnImageButtonWidget* QnWorkbenchUi::newActionButton(QGraphicsItem *parent, QAction* action, int helpTopicId)
+{
+    QnImageButtonWidget* button = new QnImageButtonWidget(parent);
+    context()->statisticsModule()->registerButton(aliasFromAction(action), button);
+
+    button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
+    button->setDefaultAction(action);
+    button->setCached(true);
+
+    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
+    button->setFixedSize(action->icon().actualSize(QSize(maxIconSize, maxIconSize)));
+
+    if (helpTopicId != Qn::Empty_Help)
+        setHelpTopic(button, helpTopicId);
+
+    return button;
+}
+
+QnImageButtonWidget* QnWorkbenchUi::newShowHideButton(QGraphicsItem* parent, QAction* action)
+{
+    QnImageButtonWidget* button = new QnImageButtonWidget(parent);
+    context()->statisticsModule()->registerButton(aliasFromAction(action), button);
+
+    if (action)
+        button->setDefaultAction(action);
+    else
+        button->setCheckable(true);
+
+    button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
+
+    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
+    button->setFixedSize(button->icon().actualSize(QSize(maxIconSize, maxIconSize)));
+
+    button->setProperty(Qn::NoHandScrollOver, true);
+    button->setCached(true);
+
+    setHelpTopic(button, Qn::MainWindow_Pin_Help);
+    return button;
+}
+
+QnImageButtonWidget* QnWorkbenchUi::newPinButton(QGraphicsItem* parent, QAction* action)
+{
+    QnImageButtonWidget* button = new QnImageButtonWidget(parent);
+    context()->statisticsModule()->registerButton(aliasFromAction(action), button);
+
+    if (action)
+        button->setDefaultAction(action);
+    else
+        button->setCheckable(true);
+
+    button->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
+    button->setCached(true);
+
+    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
+    button->setFixedSize(button->icon().actualSize(QSize(maxIconSize, maxIconSize)));
+
+    setHelpTopic(button, Qn::MainWindow_Pin_Help);
+    return button;
 }
 
 Qn::ActionScope QnWorkbenchUi::currentScope() const
@@ -1717,8 +1731,8 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
     m_notificationsPinButton = newPinButton(m_controlsWidget, pinNotificationsAction);
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
 
-    QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(
-        lit("notifications_collection_widget_toggle"), m_controlsWidget);
+    QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(m_controlsWidget);
+    context()->statisticsModule()->registerButton(lit("notifications_collection_widget_toggle"), blinker);
 
     m_notificationsShowButton = blinker;
     m_notificationsShowButton->setCached(true);
@@ -2022,7 +2036,7 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
     m_dayTimeItem->setProperty(Qn::NoHandScrollOver, true);
     m_dayTimeItem->stackBefore(m_calendarItem);
 
-    m_dayTimeMinimizeButton = newActionButton(action(QnActions::MinimizeDayTimeViewAction), kDefaultHelpTopicId, m_controlsWidget);
+    m_dayTimeMinimizeButton = newActionButton(m_controlsWidget, action(QnActions::MinimizeDayTimeViewAction), kDefaultHelpTopicId);
     m_dayTimeMinimizeButton->setFocusProxy(m_dayTimeItem);
 
     m_calendarOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
@@ -2354,13 +2368,15 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
         connect(m_sliderAutoHideTimer, &QTimer::timeout, this, [this](){setSliderVisible(false, true);});
     }
 
-    QnImageButtonWidget *sliderZoomOutButton = new QnImageButtonWidget(lit("slider_zoom_in"));
+    QnImageButtonWidget *sliderZoomOutButton = new QnImageButtonWidget();
     sliderZoomOutButton->setIcon(qnSkin->icon("slider/buttons/zoom_out.png"));
     sliderZoomOutButton->setPreferredSize(19, 16);
+    context()->statisticsModule()->registerButton(lit("slider_zoom_out"), sliderZoomOutButton);
 
-    QnImageButtonWidget *sliderZoomInButton = new QnImageButtonWidget(lit("slider_zoom_out"));
+    QnImageButtonWidget *sliderZoomInButton = new QnImageButtonWidget();
     sliderZoomInButton->setIcon(qnSkin->icon("slider/buttons/zoom_in.png"));
     sliderZoomInButton->setPreferredSize(19, 16);
+    context()->statisticsModule()->registerButton(lit("slider_zoom_in"), sliderZoomInButton);
 
     QGraphicsLinearLayout *sliderZoomButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     sliderZoomButtonsLayout->setSpacing(0.0);
@@ -2498,18 +2514,24 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this
         , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
     {
+        context()->statisticsModule()->registerClick(lit("bookmark_tooltip_edit"));
+
         menu()->triggerIfPossible(QnActions::EditCameraBookmarkAction, getActionParamsFunc(bookmark));
     });
 
     connect(bookmarksViewer, &QnBookmarksViewer::removeBookmarkClicked, this
         , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
     {
+        context()->statisticsModule()->registerClick(lit("bookmark_tooltip_delete"));
+
         menu()->triggerIfPossible(QnActions::RemoveCameraBookmarkAction, getActionParamsFunc(bookmark));
     });
 
     connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this
         , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
     {
+        context()->statisticsModule()->registerClick(lit("bookmark_tooltip_play"));
+
         enum { kMicrosecondsFactor = 1000};
         navigator()->setPosition(bookmark.startTimeMs * kMicrosecondsFactor);
         navigator()->setPlaying(true);
@@ -2518,6 +2540,8 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     connect(bookmarksViewer, &QnBookmarksViewer::tagClicked, this
         , [this, bookmarksViewer](const QString &tag)
     {
+        context()->statisticsModule()->registerClick(lit("bookmark_tooltip_tag"));
+
         QnActionParameters params;
         params.setArgument(Qn::BookmarkTagRole, tag);
         menu()->triggerIfPossible(QnActions::OpenBookmarksSearchAction, params);

@@ -1,6 +1,6 @@
 #include "transaction_transport_header.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include "common/common_module.h"
 
 namespace ec2

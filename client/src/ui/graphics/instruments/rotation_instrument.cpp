@@ -11,7 +11,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/warnings.h>
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 
 #include <utils/math/coordinate_transformations.h>
 

@@ -4,7 +4,7 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 // TODO: #MSAPI rename module to rest_result
 // Add format field (Qn::SerializationFormat) that will be set in QnJsonRestHandler (to be renamed).

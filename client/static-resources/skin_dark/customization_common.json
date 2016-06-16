@@ -447,7 +447,7 @@
         },
         "colors": {
             "background": "dark7",
-            "visualizer": "red_main"
+            "visualizer": "red_core"
         }
     },
 

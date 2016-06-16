@@ -35,6 +35,7 @@ public:
     Qn::GlobalPermissions selectedPermissions() const;
 
     void updateAccessRightsPresets();
+
 private:
     void setupInputFields();
     QList<QnInputField*> inputFields() const;

@@ -1,6 +1,6 @@
 #include "multiserver_request_data.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace
 {

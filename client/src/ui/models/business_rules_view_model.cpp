@@ -131,7 +131,7 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
         case QnBusiness::AggregationColumn:
             {
                 QnBusiness::ActionType actionType = m_rules[index.row()]->actionType();
-                if (!QnBusiness::hasToggleState(actionType))
+                if (QnBusiness::allowsAggregation(actionType))
                     flags |= Qt::ItemIsEditable;
             }
         default:
@@ -141,24 +141,26 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
     return flags;
 }
 
-QString QnBusinessRulesViewModel::columnTitle(QnBusiness::Columns column) const {
-    switch (column) {
-    case QnBusiness::ModifiedColumn:
-        return tr("#");
-    case QnBusiness::DisabledColumn:
-        return tr("On");
-    case QnBusiness::EventColumn:
-        return tr("Event");
-    case QnBusiness::SourceColumn:
-        return tr("Source");
-    case QnBusiness::SpacerColumn:
-        return tr("->");
-    case QnBusiness::ActionColumn:
-        return tr("Action");
-    case QnBusiness::TargetColumn:
-        return tr("Target");
-    case QnBusiness::AggregationColumn:
-        return tr("Interval of Action");
+QString QnBusinessRulesViewModel::columnTitle(QnBusiness::Columns column) const
+{
+    switch (column)
+    {
+        case QnBusiness::ModifiedColumn:
+            return tr("#");
+        case QnBusiness::DisabledColumn:
+            return tr("On");
+        case QnBusiness::EventColumn:
+            return tr("Event");
+        case QnBusiness::SourceColumn:
+            return tr("Source");
+        case QnBusiness::SpacerColumn:
+            return tr("->");
+        case QnBusiness::ActionColumn:
+            return tr("Action");
+        case QnBusiness::TargetColumn:
+            return tr("Target");
+        case QnBusiness::AggregationColumn:
+            return tr("Interval of Action");
     }
     return QString();
 }

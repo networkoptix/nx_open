@@ -6,7 +6,7 @@
 #include <core/resource_management/resource_pool.h>
 
 
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <utils/common/util.h>
 #include <utils/common/string.h>
 

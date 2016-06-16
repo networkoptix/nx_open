@@ -6,15 +6,13 @@ namespace
     const auto kMetricPrefix = lit("clck_cnt");
 }
 
-QnControlsStatisticsModule::QnControlsStatisticsModule()
-    : QnAbstractStatisticsModule()
-    , m_clicksCount()
-{
-}
+QnControlsStatisticsModule::QnControlsStatisticsModule(QObject* parent) :
+    QnAbstractStatisticsModule(parent),
+    m_clicksCount()
+{}
 
 QnControlsStatisticsModule::~QnControlsStatisticsModule()
-{
-}
+{}
 
 QnStatisticValuesHash QnControlsStatisticsModule::values() const
 {
@@ -34,7 +32,7 @@ void QnControlsStatisticsModule::reset()
     m_clicksCount.clear();
 }
 
-void QnControlsStatisticsModule::registerPressEvent(const QString &alias)
+void QnControlsStatisticsModule::registerClick(const QString& alias)
 {
     ++m_clicksCount[alias];
 }

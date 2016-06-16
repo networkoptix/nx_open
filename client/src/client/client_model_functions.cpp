@@ -1,5 +1,5 @@
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include <client/client_globals.h>
 #include <client/client_meta_types.h>

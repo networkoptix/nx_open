@@ -609,6 +609,16 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnLoggedInCondition(this));
 
+    factory(QnActions::BrowseLocalFilesAction).
+        flags(Qn::Main).
+        text(tr("Browse Local Files")).
+        condition(new QnBrowseLocalFilesCondition(this));
+
+    factory(QnActions::ShowWelcomeScreenAction).
+        flags(Qn::Main).
+        text(tr("Show Welcome Screen")).
+        condition(new QnShowWelcomeScreenCondition(this));
+
     factory().
         flags(Qn::Main).
         separator();
@@ -626,7 +636,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory().
         flags(Qn::Main | Qn::Tree).
         separator();
-
+    
     factory().
         flags(Qn::Main | Qn::TitleBar | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("New..."));

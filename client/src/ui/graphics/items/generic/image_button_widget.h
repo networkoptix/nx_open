@@ -36,7 +36,8 @@ class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> > {
     typedef Animated<Clickable<GraphicsWidget> > base_type;
 
 public:
-    enum StateFlag {
+    enum StateFlag
+    {
         Default = 0,        /**< Default button state. */
         Checked = 0x1,      /**< Button is checkable and is checked. */
         Pressed = 0x2,      /**< Button is pressed. This is the state that the button enters when a mouse button is pressed over it, and leaves when the mouse button is released. */
@@ -46,9 +47,7 @@ public:
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
-    QnImageButtonWidget(const QString &statisticsAlias
-        , QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
-
+    QnImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnImageButtonWidget();
 
     QIcon icon() const;
@@ -183,20 +182,13 @@ class QnRotatingImageButtonWidget: public QnImageButtonWidget, public AnimationT
     Q_OBJECT
     typedef QnImageButtonWidget base_type;
 public:
-    QnRotatingImageButtonWidget(const QString &statisticsAlias
-        , QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnRotatingImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
 
-    qreal rotationSpeed() const {
-        return m_rotationSpeed;
-    }
-
-    void setRotationSpeed(qreal rotationSpeed) {
-        m_rotationSpeed = rotationSpeed;
-    }
+    qreal rotationSpeed() const;
+    void setRotationSpeed(qreal rotationSpeed);
 
 protected:
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
-
     virtual void tick(int deltaMSecs) override;
 
 private:

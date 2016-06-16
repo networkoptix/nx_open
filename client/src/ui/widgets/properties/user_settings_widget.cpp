@@ -33,13 +33,13 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 {
     ui->setupUi(this);
 
-    setHelpTopic(ui->groupLabel, ui->groupComboBox, Qn::UserSettings_UserRoles_Help);
-    setHelpTopic(ui->groupComboBox, Qn::UserSettings_UserRoles_Help);
+    setHelpTopic(ui->roleLabel, ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
+    setHelpTopic(ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->enabledButton, Qn::UserSettings_DisableUser_Help);
 
     connect(ui->enabledButton,          &QPushButton::clicked,          this,   &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,  this,   &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,  this,   [this]()
+    connect(ui->roleComboBox,           QnComboboxCurrentIndexChanged,  this,   &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->roleComboBox,           QnComboboxCurrentIndexChanged,  this,   [this]()
     {
         //ui->permissionsLabel->setText(m_model->permissionsDescription(selectedPermissions(), selectedUserGroup()));
         ui->permissionsLabel->setText(tr("TODO: #GDM #FIXME"));
@@ -52,10 +52,14 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     for (auto field: inputFields())
         aligner->addWidget(field);
+
+    aligner->addWidget(ui->roleLabel);
+    layout()->activate();
 }
 
 QnUserSettingsWidget::~QnUserSettingsWidget()
-{}
+{
+}
 
 bool QnUserSettingsWidget::hasChanges() const
 {
@@ -120,6 +124,9 @@ void QnUserSettingsWidget::loadDataToUi()
     ui->confirmPasswordInputField->clear();
     ui->enabledButton->setChecked(m_model->user()->isEnabled());
     ui->permissionsLabel->setText(m_model->permissionsDescription());
+
+    for (auto field : inputFields())
+        field->reset();
 }
 
 void QnUserSettingsWidget::applyChanges()
@@ -208,36 +215,24 @@ void QnUserSettingsWidget::setupInputFields()
     ui->emailInputField->setValidator(Qn::defaultEmailValidator());
 
     ui->passwordInputField->setTitle(tr("Password"));
-    ui->passwordInputField->setEchoMode(QLineEdit::Password);
-    ui->passwordInputField->setPasswordIndicatorEnabled(true);
+    ui->passwordInputField->setPasswordMode(QLineEdit::Password, m_model->mode() != QnUserSettingsModel::NewUser, true);
     ui->passwordInputField->setValidator([this](const QString& text)
     {
         /* Show warning message if admin has renamed an existing user and has not entered new password. */
-        if (m_model->mode() == QnUserSettingsModel::OtherSettings
-            && ui->loginInputField->text().trimmed() != m_model->user()->getName()
-            && text.isEmpty()
-            )
+        if (m_model->mode() == QnUserSettingsModel::OtherSettings &&
+            ui->loginInputField->text() != m_model->user()->getName() &&
+            text.isEmpty())
+        {
             return Qn::ValidationResult(tr("User has been renamed. Password must be updated."));
+        }
 
-        /* Show warning if have not entered password for the new user. */
-        if (m_model->mode() == QnUserSettingsModel::NewUser && text.isEmpty())
-            return Qn::ValidationResult(tr("Password cannot be empty."));
-
+        /* Further validation will be done by password strength indicator. */
         return Qn::kValidResult;
     });
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
-    ui->confirmPasswordInputField->setValidator([this](const QString& text)
-    {
-        if (ui->passwordInputField->text().isEmpty())
-            return Qn::kValidResult;
-
-        if (ui->passwordInputField->text() != text)
-            return Qn::ValidationResult(tr("Passwords do not match."));
-
-        return Qn::kValidResult;
-    });
+    ui->confirmPasswordInputField->setConfirmationMode(ui->passwordInputField, tr("Passwords do not match."));
 
     for (auto field : inputFields())
         connect(field, &QnInputField::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
@@ -270,24 +265,24 @@ void QnUserSettingsWidget::updateControlsAccess()
 
 void QnUserSettingsWidget::updateAccessRightsPresets()
 {
-    ui->groupComboBox->clear();
+    ui->roleComboBox->clear();
 
     if (!m_model->user())
         return;
 
     auto addBuiltInGroup = [this](const QString &name, Qn::GlobalPermissions permissions)
     {
-        int index = ui->groupComboBox->count();
-        ui->groupComboBox->insertItem(index, name);
-        ui->groupComboBox->setItemData(index,   qVariantFromValue(QnUuid()),    kUserGroupIdRole);
-        ui->groupComboBox->setItemData(index,   qVariantFromValue(permissions), kPermissionsRole);
+        int index = ui->roleComboBox->count();
+        ui->roleComboBox->insertItem(index, name);
+        ui->roleComboBox->setItemData(index,   qVariantFromValue(QnUuid()),    kUserGroupIdRole);
+        ui->roleComboBox->setItemData(index,   qVariantFromValue(permissions), kPermissionsRole);
     };
 
     auto addCustomGroup = [this](const ec2::ApiUserGroupData &group)
     {
-        int index = ui->groupComboBox->count();
-        ui->groupComboBox->insertItem(index, group.name);
-        ui->groupComboBox->setItemData(index, qVariantFromValue(group.id),      kUserGroupIdRole);
+        int index = ui->roleComboBox->count();
+        ui->roleComboBox->insertItem(index, group.name);
+        ui->roleComboBox->setItemData(index, qVariantFromValue(group.id),      kUserGroupIdRole);
     };
 
     Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_model->user());
@@ -314,38 +309,38 @@ void QnUserSettingsWidget::updateAccessRightsPresets()
             addCustomGroup(group);
     }
 
-    addBuiltInGroup(tr("Custom..."), Qn::NoGlobalPermissions);
+    addBuiltInGroup(tr("Custom"), Qn::NoGlobalPermissions);
 
     /* If there is only one entry in permissions combobox, this check doesn't matter. */
-    int customPermissionsIndex = ui->groupComboBox->count() - 1;
+    int customPermissionsIndex = ui->roleComboBox->count() - 1;
     NX_ASSERT(customPermissionsIndex == 0 ||
-        ui->groupComboBox->itemData(customPermissionsIndex, kPermissionsRole).value<Qn::GlobalPermissions>() == Qn::NoGlobalPermissions);
+        ui->roleComboBox->itemData(customPermissionsIndex, kPermissionsRole).value<Qn::GlobalPermissions>() == Qn::NoGlobalPermissions);
     NX_ASSERT(customPermissionsIndex == 0 ||
-        ui->groupComboBox->itemData(customPermissionsIndex, kUserGroupIdRole).value<QnUuid>().isNull());
+        ui->roleComboBox->itemData(customPermissionsIndex, kUserGroupIdRole).value<QnUuid>().isNull());
 
     int permissionsIndex = customPermissionsIndex;
     if (!m_model->user()->userGroup().isNull())
     {
-        permissionsIndex = ui->groupComboBox->findData(qVariantFromValue(m_model->user()->userGroup()), kUserGroupIdRole, Qt::MatchExactly);
+        permissionsIndex = ui->roleComboBox->findData(qVariantFromValue(m_model->user()->userGroup()), kUserGroupIdRole, Qt::MatchExactly);
     }
     else if (permissions != Qn::NoGlobalPermissions)
     {
-        permissionsIndex = ui->groupComboBox->findData(qVariantFromValue(permissions), kPermissionsRole, Qt::MatchExactly);
+        permissionsIndex = ui->roleComboBox->findData(qVariantFromValue(permissions), kPermissionsRole, Qt::MatchExactly);
     }
 
     if (permissionsIndex < 0)
         permissionsIndex = customPermissionsIndex;
-    ui->groupComboBox->setCurrentIndex(permissionsIndex);
+    ui->roleComboBox->setCurrentIndex(permissionsIndex);
 }
 
 Qn::GlobalPermissions QnUserSettingsWidget::selectedPermissions() const
 {
-    return ui->groupComboBox->itemData(ui->groupComboBox->currentIndex(), kPermissionsRole).value<Qn::GlobalPermissions>();
+    return ui->roleComboBox->itemData(ui->roleComboBox->currentIndex(), kPermissionsRole).value<Qn::GlobalPermissions>();
 }
 
 QnUuid QnUserSettingsWidget::selectedUserGroup() const
 {
-    return ui->groupComboBox->itemData(ui->groupComboBox->currentIndex(), kUserGroupIdRole).value<QnUuid>();
+    return ui->roleComboBox->itemData(ui->roleComboBox->currentIndex(), kUserGroupIdRole).value<QnUuid>();
 }
 
 bool QnUserSettingsWidget::validMode() const

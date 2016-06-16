@@ -3,7 +3,7 @@
 #include <cassert>
 #include <cmath> /* For std::sqrt, std::atan2. */
 
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 #include <utils/common/warnings.h>
 
 QPointF QnGeometry::cwiseMul(const QPointF &l, const QPointF &r) {

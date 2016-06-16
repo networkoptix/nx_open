@@ -121,6 +121,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     ui->line->setVisible(m_controlsVisible);
 
     auto itemDelegate = new QnResourceItemDelegate(this);
+    itemDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
 
     auto setupTreeView = [itemDelegate](QnTreeView* treeView)
     {

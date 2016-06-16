@@ -18,55 +18,57 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *
 {
     ui->setupUi(this);
 
-    connect(ui->autoResetCheckBox, &QCheckBox::toggled,                 ui->autoResetSpinBox, &QWidget::setEnabled);
+    connect(ui->autoResetCheckBox, &QCheckBox::toggled, ui->autoResetSpinBox, &QWidget::setEnabled);
 
-    connect(ui->relayComboBox,      QnComboboxCurrentIndexChanged,      this,   &QnCameraOutputBusinessActionWidget::paramsChanged);
-    connect(ui->autoResetCheckBox,  &QCheckBox::toggled,                this,   &QnCameraOutputBusinessActionWidget::paramsChanged);
-    connect(ui->autoResetSpinBox,   QnSpinboxIntValueChanged,           this,   &QnCameraOutputBusinessActionWidget::paramsChanged);
+    connect(ui->relayComboBox, QnComboboxCurrentIndexChanged, this, &QnCameraOutputBusinessActionWidget::paramsChanged);
+    connect(ui->autoResetCheckBox, &QCheckBox::toggled, this, &QnCameraOutputBusinessActionWidget::paramsChanged);
+    connect(ui->autoResetSpinBox, QnSpinboxIntValueChanged, this, &QnCameraOutputBusinessActionWidget::paramsChanged);
 
     setHelpTopic(this, Qn::EventsActions_CameraOutput_Help);
 }
 
 QnCameraOutputBusinessActionWidget::~QnCameraOutputBusinessActionWidget()
-{
-}
+{}
 
-void QnCameraOutputBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
+void QnCameraOutputBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after)
+{
     setTabOrder(before, ui->relayComboBox);
     setTabOrder(ui->relayComboBox, ui->autoResetCheckBox);
     setTabOrder(ui->autoResetCheckBox, ui->autoResetSpinBox);
     setTabOrder(ui->autoResetSpinBox, after);
 }
 
-void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
+{
     if (!model())
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> rollback(m_updating, true);
 
-    if (fields & QnBusiness::ActionTypeField)
+    if (fields & QnBusiness::ActionResourcesField)
     {
-        bool instant = (model()->actionType() == QnBusiness::CameraOutputOnceAction);
-        ui->autoResetWidget->setVisible(!instant);
-    }
-
-    if (fields & QnBusiness::ActionResourcesField) {
         QnIOPortDataList outputPorts;
         bool inited = false;
 
         QnVirtualCameraResourceList cameras = model()->actionResources().filtered<QnVirtualCameraResource>();
-        foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
+        foreach(const QnVirtualCameraResourcePtr &camera, cameras)
+        {
             QnIOPortDataList cameraOutputs = camera->getRelayOutputList();
-            if (!inited) {
+            if (!inited)
+            {
                 outputPorts = cameraOutputs;
                 inited = true;
-            } else {
+            }
+            else
+            {
                 for (auto itr = outputPorts.begin(); itr != outputPorts.end();)
                 {
                     const QnIOPortData& value = *itr;
                     bool found = false;
-                    for (const auto& other: cameraOutputs) {
-                        if (other.id == value.id && other.getName() == value.getName()) {
+                    for (const auto& other : cameraOutputs)
+                    {
+                        if (other.id == value.id && other.getName() == value.getName())
+                        {
                             found = true;
                             break;
                         }
@@ -81,43 +83,36 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields
 
         ui->relayComboBox->clear();
         ui->relayComboBox->addItem(tr("<automatic>"), QString());
-        for (const auto& relayOutput: outputPorts)
+        for (const auto& relayOutput : outputPorts)
             ui->relayComboBox->addItem(relayOutput.getName(), relayOutput.id);
     }
 
-    if (fields & QnBusiness::ActionParamsField) {
+    if (fields & QnBusiness::ActionParamsField)
+    {
         QnBusinessActionParameters params = model()->actionParams();
 
         QString text = params.relayOutputId;
         if (ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString() != text)
             ui->relayComboBox->setCurrentIndex(ui->relayComboBox->findData(text));
 
-        bool instant = (model()->actionType() == QnBusiness::CameraOutputOnceAction);
-        if (!instant) {
-            int autoReset = params.relayAutoResetTimeout / 1000;
-            ui->autoResetCheckBox->setChecked(autoReset > 0);
-            if (autoReset > 0)
-                ui->autoResetSpinBox->setValue(autoReset);
+        int autoReset = params.durationMs / 1000;
+        ui->autoResetCheckBox->setChecked(autoReset > 0);
+        if (autoReset > 0)
+        {
+            ui->autoResetSpinBox->setValue(autoReset);
         }
     }
 }
 
-void QnCameraOutputBusinessActionWidget::paramsChanged() {
+void QnCameraOutputBusinessActionWidget::paramsChanged()
+{
     if (!model() || m_updating)
         return;
 
     QnBusinessActionParameters params = model()->actionParams();
     params.relayOutputId = ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString();
-
-    int timeout = QnCameraOutputBusinessAction::kInstantActionAutoResetTimeoutMs;
-    bool instant = (model()->actionType() == QnBusiness::CameraOutputOnceAction);
-    if (!instant)
-    {
-        timeout = ui->autoResetCheckBox->isChecked()
-            ? ui->autoResetSpinBox->value() * 1000
-            : 0;
-    }
-    params.relayAutoResetTimeout = timeout;
+    params.durationMs = ui->autoResetCheckBox->isChecked()
+        ? ui->autoResetSpinBox->value() * 1000
+        : 0;
     model()->setActionParams(params);
-
 }

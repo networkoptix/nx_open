@@ -3,7 +3,7 @@
 #include <QtCore/QMetaObject>
 #include <nx/utils/thread/mutex.h>
 
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/long_runnable.h>
 
 #include <api/resource_property_adaptor.h>

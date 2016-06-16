@@ -98,9 +98,8 @@ class PtzImageButtonWidget: public QnTextButtonWidget {
     typedef QnTextButtonWidget base_type;
 
 public:
-    PtzImageButtonWidget(const QString &statisticsAlias
-        , QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0)
-        : base_type(statisticsAlias, parent, windowFlags)
+    PtzImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0)
+        : base_type(parent, windowFlags)
     {
         setFrameShape(Qn::EllipticalFrame);
         setRelativeFrameWidth(1.0 / 16.0);
@@ -206,32 +205,32 @@ public:
         /* Note that construction order is important as it defines which items are on top. */
         m_manipulatorWidget = new PtzManipulatorWidget(this);
 
-        m_zoomInButton = new PtzImageButtonWidget(lit("ptz_overlay_zoom_in"), this);
+        m_zoomInButton = new PtzImageButtonWidget(this);
         m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
         m_zoomInButton->setToolTip(tr("Zoom In"));
 
-        m_zoomOutButton = new PtzImageButtonWidget(lit("ptz_overlay_zoom_out"), this);
+        m_zoomOutButton = new PtzImageButtonWidget(this);
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
         m_zoomOutButton->setToolTip(tr("Zoom Out"));
 
-        m_focusInButton = new PtzImageButtonWidget(lit("ptz_overlay_focus_in"), this);
+        m_focusInButton = new PtzImageButtonWidget(this);
         m_focusInButton->setIcon(qnSkin->icon("item/ptz_focus_in.png"));
         m_focusInButton->setToolTip(tr("Focus Far"));
         m_focusInButton->setFrameShape(Qn::CustomFrame);
         m_focusInButton->setCustomFramePath(upRoundPath);
 
-        m_focusOutButton = new PtzImageButtonWidget(lit("ptz_overlay_focus_out"), this);
+        m_focusOutButton = new PtzImageButtonWidget(this);
         m_focusOutButton->setIcon(qnSkin->icon("item/ptz_focus_out.png"));
         m_focusOutButton->setToolTip(tr("Focus Near"));
         m_focusOutButton->setFrameShape(Qn::CustomFrame);
         m_focusOutButton->setCustomFramePath(downRoundPath);
 
-        m_focusAutoButton = new PtzImageButtonWidget(lit("ptz_overlay_focus_auto"), this);
+        m_focusAutoButton = new PtzImageButtonWidget(this);
         m_focusAutoButton->setIcon(qnSkin->icon("item/ptz_focus_auto.png"));
         m_focusAutoButton->setToolTip(tr("Auto Focus"));
         m_focusAutoButton->setFrameShape(Qn::RectangularFrame);
 
-        m_modeButton = new PtzImageButtonWidget(lit("ptz_overlay_mode"), this);
+        m_modeButton = new PtzImageButtonWidget(this);
         m_modeButton->setToolTip(tr("Change Dewarping Mode"));
 
         connect(m_focusAutoButton, &QGraphicsObject::visibleChanged, this, &PtzOverlayWidget::updateLayout);

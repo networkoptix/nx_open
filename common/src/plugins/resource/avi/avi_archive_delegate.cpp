@@ -15,7 +15,7 @@ extern "C"
 #include <utils/media/av_codec_helper.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include <core/resource/storage_plugin_factory.h>
 

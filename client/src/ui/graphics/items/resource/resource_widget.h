@@ -319,9 +319,7 @@ protected:
     virtual QCursor calculateCursor() const;
     Q_SLOT void updateCursor();
 
-    QnStatusOverlayWidget *statusOverlayWidget() const {
-        return m_statusOverlayWidget;
-    }
+    QnStatusOverlayWidget *statusOverlayWidget() const;
 
     virtual int calculateButtonsVisibility() const;
     Q_SLOT void updateButtonsVisibility();
@@ -334,6 +332,9 @@ protected:
     int channelCount() const;
     QRectF channelRect(int channel) const;
     QRectF exposedRect(int channel, bool accountForViewport = true, bool accountForVisibility = true, bool useRelativeCoordinates = false);
+
+    void registerButtonStatisticsAlias(QnImageButtonWidget* button, const QString& alias);
+    QnImageButtonWidget* createStatisticAwareButton(const QString& alias);
 
     void ensureAboutToBeDestroyedEmitted();
 

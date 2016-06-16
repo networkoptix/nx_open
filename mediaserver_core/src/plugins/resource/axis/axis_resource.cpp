@@ -16,8 +16,8 @@
 #include "axis_stream_reader.h"
 #include "axis_ptz_controller.h"
 #include "api/model/api_ioport_data.h"
-#include "utils/serialization/json.h"
-#include <utils/common/model_functions.h>
+#include "nx/fusion/serialization/json.h"
+#include <nx/fusion/model_functions.h>
 #include "utils/common/concurrent.h"
 #include "common/common_module.h"
 #include "axis_audio_transmitter.h"

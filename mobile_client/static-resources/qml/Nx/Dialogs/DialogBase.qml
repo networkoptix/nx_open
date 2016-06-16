@@ -15,7 +15,7 @@ Popup
     padding: 0
     modal: true
 
-    background: Rectangle { color: ColorTheme.contrast11 }
+    background: Rectangle { color: ColorTheme.contrast3 }
 
     readonly property int _animationDuration: 200
 

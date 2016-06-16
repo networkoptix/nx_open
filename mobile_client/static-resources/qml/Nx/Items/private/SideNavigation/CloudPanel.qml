@@ -43,7 +43,7 @@ Pane
             font.pixelSize: 14
             font.weight: Font.DemiBold
             elide: Text.ElideRight
-            color: ColorTheme.contrast4
+            color: ColorTheme.contrast10
         }
     }
 }

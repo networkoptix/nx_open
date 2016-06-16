@@ -47,7 +47,7 @@ extern "C"
 #include <network/tcp_listener.h>
 #include <network/authenticate_helper.h>
 #include <media_server/settings.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <http/custom_headers.h>
 #include <audit/audit_manager.h>
 #include <media_server/settings.h>

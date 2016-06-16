@@ -16,6 +16,6 @@ DayOfWeekRow
         font.pixelSize: 13
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
-        color: locale.weekDays.indexOf(model.day) == -1 ? ColorTheme.red_d1 : ColorTheme.contrast1
+        color: locale.weekDays.indexOf(model.day) == -1 ? ColorTheme.red_d1 : ColorTheme.contrast16
     }
 }

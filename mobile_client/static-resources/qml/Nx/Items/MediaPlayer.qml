@@ -15,12 +15,7 @@ QnPlayer
 
     function playLive()
     {
-        seek(-1)
+        position = -1
         play()
-    }
-
-    function seek(pos)
-    {
-        position = pos
     }
 }

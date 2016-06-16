@@ -8,7 +8,7 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 #include <cdb/auth_provider.h>
 

@@ -45,7 +45,9 @@
 #include "core/resource/storage_resource.h"
 #include "core/resource/resource_directory_browser.h"
 
+#include <nx_speach_synthesizer/text_to_wav.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/software_version.h>
 #include <utils/common/command_line_parser.h>
 
 #include "ui/workbench/workbench_context.h"
@@ -67,7 +69,6 @@
 
 #include "utils/common/long_runnable.h"
 
-#include <nx_speach_synthesizer/text_to_wav.h>
 #include "common/common_module.h"
 
 #include <nx/vms/utils/system_uri.h>
@@ -117,11 +118,16 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
 
 #ifdef Q_OS_WIN
 
-    auto registerUriHandler = []
+    nx::utils::SoftwareVersion engineVersion(QnAppInfo::applicationVersion());
+    if (!startupParams.engineVersion.isEmpty())
+        engineVersion = nx::utils::SoftwareVersion(startupParams.engineVersion);
+
+    auto registerUriHandler = [engineVersion]
     {
         return nx::utils::registerSystemUriProtocolHandler(nx::vms::utils::AppInfo::nativeUriProtocol(),
                                                            qApp->applicationFilePath(),
-                                                           nx::vms::utils::AppInfo::nativeUriProtocolDescription());
+                                                           nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
+                                                           engineVersion);
     };
 
     /* Register URI handler and instantly exit. */
@@ -171,6 +177,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
 
     QnClientModule client(startupParams);
 
+    /* This class should not be initialized in client module as it does not support deinitialization. */
+    QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
+    textToWaveServer->start();
+
     /* Initialize sound. */
     QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());
 
@@ -211,21 +221,30 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
 
-    if (startupParams.screen != QnStartupParameters::kInvalidScreen)
+    bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen;
+    if (customScreen)
     {
         QDesktopWidget *desktop = qApp->desktop();
         if (startupParams.screen >= 0 && startupParams.screen < desktop->screenCount())
         {
             QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
-            mainWindow->move(desktop->screenGeometry(startupParams.screen).topLeft() + screenDelta);
+            QPoint targetPosition = desktop->screenGeometry(startupParams.screen).topLeft() + screenDelta;
+            mainWindow->move(targetPosition);
         }
     }
 
     mainWindow->show();
+    if (customScreen)
+        qApp->processEvents(); /* We must handle 'move' event _before_ we activate fullscreen. */
+
     if (!fullScreenDisabled)
+    {
         context->action(QnActions::EffectiveMaximizeAction)->trigger();
+    }
     else
+    {
         mainWindow->updateDecorationsState();
+    }
 
     if (!allowMultipleClientInstances)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));

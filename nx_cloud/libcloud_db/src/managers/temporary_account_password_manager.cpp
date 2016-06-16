@@ -11,9 +11,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 #include <utils/common/guard.h>
-#include <utils/common/model_functions.h>
-#include <utils/serialization/sql.h>
-#include <utils/serialization/sql_functions.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/sql.h>
+#include <nx/fusion/serialization/sql_functions.h>
 
 #include "stree/cdb_ns.h"
 

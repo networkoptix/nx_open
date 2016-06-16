@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>463</width>
-    <height>370</height>
+    <width>528</width>
+    <height>360</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -31,20 +31,39 @@
     </widget>
    </item>
    <item>
-    <widget class="Line" name="line_3">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QnInputField" name="loginInputField" native="true"/>
-   </item>
-   <item>
-    <widget class="QnInputField" name="nameInputField" native="true"/>
-   </item>
-   <item>
-    <widget class="QnInputField" name="emailInputField" native="true"/>
+     <property name="topMargin">
+      <number>8</number>
+     </property>
+     <property name="bottomMargin">
+      <number>8</number>
+     </property>
+     <item>
+      <widget class="Line" name="line_3">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QnInputField" name="loginInputField" native="true"/>
+     </item>
+     <item>
+      <widget class="QnInputField" name="nameInputField" native="true"/>
+     </item>
+     <item>
+      <widget class="QnInputField" name="emailInputField" native="true"/>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QnInputField" name="passwordInputField" native="true"/>
@@ -53,32 +72,31 @@
     <widget class="QnInputField" name="confirmPasswordInputField" native="true"/>
    </item>
    <item>
-    <widget class="Line" name="line_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+    <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0">
+     <property name="topMargin">
+      <number>8</number>
      </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,1">
-     <item row="0" column="0">
-      <widget class="QLabel" name="groupLabel">
-       <property name="text">
-        <string>Group</string>
+     <item row="0" column="2">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
-       <property name="buddy">
-        <cstring>groupComboBox</cstring>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
        </property>
-      </widget>
+      </spacer>
      </item>
-     <item row="1" column="0" alignment="Qt::AlignTop">
-      <widget class="QComboBox" name="groupComboBox">
+     <item row="0" column="1">
+      <widget class="QComboBox" name="roleComboBox">
        <property name="sizeAdjustPolicy">
         <enum>QComboBox::AdjustToContents</enum>
        </property>
       </widget>
      </item>
-     <item row="1" column="2">
+     <item row="1" column="1" colspan="2">
       <widget class="QLabel" name="permissionsLabel">
        <property name="text">
         <string notr="true">&lt;table&gt;
@@ -93,10 +111,16 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="Line" name="line">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+     <item row="0" column="0">
+      <widget class="QLabel" name="roleLabel">
+       <property name="text">
+        <string>Role</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="buddy">
+        <cstring>roleComboBox</cstring>
        </property>
       </widget>
      </item>

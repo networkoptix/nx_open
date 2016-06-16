@@ -17,6 +17,7 @@
 #include <ui/models/system_hosts_model.h>
 #include <ui/models/recent_user_connections_model.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/handlers/workbench_connect_handler.h>
 #include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
@@ -52,16 +53,17 @@ namespace
     }
 }
 
-QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
-    : base_type(parent)
-    , QnWorkbenchContextAware(parent)
+QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent) :
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
 
-    , m_visibleControls(true)
-    , m_visible(false)
-    , m_connectingNow(false)
-    , m_palette(extractPalette())
-    , m_widget(createMainView(this))
-    , m_pageSize(m_widget->size())
+    m_itemsWatcher(parent),
+    m_visibleControls(true),
+    m_visible(false),
+    m_connectingNow(false),
+    m_palette(extractPalette()),
+    m_widget(createMainView(this)),
+    m_pageSize(m_widget->size())
 {
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged
@@ -71,19 +73,27 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
 
     //
     m_widget->installEventFilter(this);
-    const auto idChangedHandler = [this](const QnUuid & /* id */)
-    {
-        // We could be just reconnecting if remoteGuid is null.
-        // So, just hide screen when it is not
-        if (!qnCommon->remoteGUID().isNull())
-            setVisible(false);
-    };
 
-    connect(qnCommon, &QnCommonModule::remoteIdChanged
-        , this, idChangedHandler);
     connect(action(QnActions::DisconnectAction), &QAction::triggered
         , this, &QnWorkbenchWelcomeScreen::showScreen);
 
+    const auto connectHandler = context()->instance<QnWorkbenchConnectHandler>();
+    connect(connectHandler, &QnWorkbenchConnectHandler::connectedChanged, this,
+        [this, connectHandler]() 
+    {
+        // If handler shows that we are not connected it can mean reconnection process too.
+        // So, just hide screen when it is definitely connected
+        if (connectHandler->connected())
+            setVisible(false);
+    });
+
+    connect(&m_itemsWatcher, &QnWorkbenchLayoutItemsWatcher::itemsCountChanged, this, [this]()
+    {
+        // Close welcome screen if any layout item is shown
+        if (m_itemsWatcher.itemsCount())
+            setVisible(false);
+    });
+        
     connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this, [this]()
     {
         context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
