@@ -38,8 +38,9 @@ namespace
     }
 }
 
-struct QnAudioProxyReceiverPrivate: public QnTCPConnectionProcessorPrivate
+class QnAudioProxyReceiverPrivate: public QnTCPConnectionProcessorPrivate
 {
+public:
     QnAudioProxyReceiverPrivate():
         QnTCPConnectionProcessorPrivate(),
         takeSocketOwnership(false)
