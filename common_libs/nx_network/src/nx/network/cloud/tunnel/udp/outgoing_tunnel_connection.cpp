@@ -43,10 +43,7 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     //    std::bind(&OutgoingTunnelConnection::onKeepAliveTimeout, this));
 
     hpm::api::UdpHolePunchingSynRequest syn;
-    stun::Message message(
-        stun::Header(
-            nx::stun::MessageClass::request,
-            hpm::api::UdpHolePunchingSynRequest::kMethod));
+    stun::Message message;
     syn.serialize(&message);
     m_controlConnection->sendMessage(std::move(message));
 }

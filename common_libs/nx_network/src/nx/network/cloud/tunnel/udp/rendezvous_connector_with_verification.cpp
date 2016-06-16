@@ -143,10 +143,7 @@ void RendezvousConnectorWithVerification::onConnectCompleted(
     m_requestPipeline->startReadingConnection();
 
     hpm::api::UdpHolePunchingSynRequest synRequest;
-    stun::Message synRequestMessage(
-        nx::stun::Header(
-            nx::stun::MessageClass::request,
-            stun::cc::methods::udpHolePunchingSyn));
+    stun::Message synRequestMessage;
     synRequest.serialize(&synRequestMessage);
     m_requestPipeline->sendMessage(std::move(synRequestMessage));
 

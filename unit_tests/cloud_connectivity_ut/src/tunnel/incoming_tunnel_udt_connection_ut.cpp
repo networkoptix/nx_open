@@ -161,8 +161,7 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
 
     {
         hpm::api::UdpHolePunchingSynRequest syn;
-        stun::Message request(stun::Header(
-            stun::MessageClass::request, stun::cc::methods::udpHolePunchingSyn));
+        stun::Message request;
         syn.serialize(&request);
 
         Buffer buffer;
