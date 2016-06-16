@@ -70,24 +70,29 @@ void TemporaryAccountPasswordManager::authenticateByName(
         if (!checkTemporaryPasswordForExpiration(&lk, curIt))
             continue;
 
+        if (!validateHa1Func(curIt->second.passwordHa1.c_str()))
+            continue;
+
         //currently, checking password permissions here, but should move it to authorization phase
-        if (validateHa1Func(curIt->second.passwordHa1.c_str()) &&
-            curIt->second.accessRights.authorize(authSearchInputData))
+        if (!curIt->second.accessRights.authorize(authSearchInputData))
         {
-            authProperties->put(
-                cdb::attr::authAccountEmail,
-                QString::fromStdString(curIt->second.accountEmail));
-            if (curIt->second.isEmailCode)
-                authProperties->put(
-                    cdb::attr::authenticatedByEmailCode,
-                    true);
-
-            result = api::ResultCode::ok;
-
-            ++curIt->second.useCount;
-            checkTemporaryPasswordForExpiration(&lk, curIt);
+            result = api::ResultCode::forbidden;
             return;
         }
+
+        authProperties->put(
+            cdb::attr::authAccountEmail,
+            QString::fromStdString(curIt->second.accountEmail));
+        if (curIt->second.isEmailCode)
+            authProperties->put(
+                cdb::attr::authenticatedByEmailCode,
+                true);
+
+        result = api::ResultCode::ok;
+
+        ++curIt->second.useCount;
+        checkTemporaryPasswordForExpiration(&lk, curIt);
+        return;
     }
 }
 
