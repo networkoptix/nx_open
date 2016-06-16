@@ -2,7 +2,6 @@
 
 #include <QtCore/QList>
 
-#include <version.h>
 #include "api/app_server_connection.h"
 
 #include "business/actions/panic_business_action.h"
