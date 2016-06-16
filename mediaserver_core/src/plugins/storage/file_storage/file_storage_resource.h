@@ -49,6 +49,8 @@ public:
         return m_localPath.isEmpty() ? getPath() : m_localPath;
     }
 
+    qint64 getTotalSpaceWithoutInit();
+
     // true if storage is located on local disks
     static bool isLocal(const QString &url);
     // calculate space limit judging by storage URL
