@@ -46,14 +46,14 @@ namespace
             return QnAuditItemDelegate::tr("Play");
 
         case Qn::AR_UserUpdate:
-            return QnAuditItemDelegate::tr("User settings");
+            return QnAuditItemDelegate::tr("User settings...");
 
         case Qn::AR_ServerUpdate:
-            return QnAuditItemDelegate::tr("Server settings");
+            return QnAuditItemDelegate::tr("Server settings...");
 
         case Qn::AR_CameraUpdate:
         case Qn::AR_CameraInsert:
-            return QnAuditItemDelegate::tr("Camera settings");
+            return QnAuditItemDelegate::tr("Camera settings...");
 
         default:
             return QString();
