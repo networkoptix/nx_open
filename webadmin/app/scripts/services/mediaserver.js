@@ -275,22 +275,23 @@ angular.module('webadminApp')
 
 
             changeSystemName:function(systemName){
-                return wrapPost(proxy + '/web/api/configure?' + $.param({
+                return wrapPost(proxy + '/web/api/configure', {
                     systemName:systemName
-                }));
+                });
             },
+
             changeSystem:function(systemName,login,password){
-                return wrapPost(proxy + '/web/api/configure?' + $.param({
+                return wrapPost(proxy + '/web/api/configure', {
                     systemName: systemName,
                     login: login,
                     password: password
-                }));
+                });
             },
 
             changePort: function(port) {
-                return wrapPost(proxy + '/web/api/configure?' + $.param({
+                return wrapPost(proxy + '/web/api/configure', {
                     port:port
-                }));
+                });
             },
 
 
