@@ -2754,6 +2754,14 @@ void QnNxStyle::polish(QWidget *widget)
 {
     base_type::polish(widget);
 
+    if (qobject_cast<QAbstractSpinBox*>(widget) ||
+        qobject_cast<QAbstractButton*>(widget) ||
+        qobject_cast<QAbstractSlider*>(widget) ||
+        qobject_cast<QGroupBox*>(widget))
+    {
+        widget->setAttribute(Qt::WA_Hover);
+    }
+
     if (qobject_cast<QPushButton*>(widget) ||
         qobject_cast<QToolButton*>(widget))
     {
@@ -2763,7 +2771,6 @@ void QnNxStyle::polish(QWidget *widget)
             font.setWeight(QFont::DemiBold);
             widget->setFont(font);
         }
-        widget->setAttribute(Qt::WA_Hover);
     }
 
     if (qobject_cast<QHeaderView*>(widget))
@@ -2801,15 +2808,6 @@ void QnNxStyle::polish(QWidget *widget)
                 QVariant::fromValue(const_cast<void*>(static_cast<const void*>(oldDelegate->metaObject()))));
             comboBox->setItemDelegate(new QnStyledComboBoxDelegate());
         }
-    }
-
-    if (qobject_cast<QSpinBox*>(widget) ||
-        qobject_cast<QCheckBox*>(widget) ||
-        qobject_cast<QGroupBox*>(widget) ||
-        qobject_cast<QRadioButton*>(widget) ||
-        qobject_cast<QSlider*>(widget))
-    {
-        widget->setAttribute(Qt::WA_Hover);
     }
 
     if (qobject_cast<QScrollBar*>(widget))
