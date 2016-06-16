@@ -56,9 +56,6 @@ public:
     /** Clear all local data structures. */
     void clearConnection();
 
-signals:
-    void connectedChanged();
-
 private:
     void at_messageProcessor_connectionOpened();
     void at_messageProcessor_connectionClosed();
