@@ -157,7 +157,7 @@ void QnIOMonitorConnectionProcessor::pleaseStop()
 {
     Q_D(QnIOMonitorConnectionProcessor);
     if (d->socket)
-        d->socket->cancelAsyncIO();
+        d->socket->pleaseStopSync();
     QnTCPConnectionProcessor::pleaseStop();
     d->waitCond.wakeAll();
 }
