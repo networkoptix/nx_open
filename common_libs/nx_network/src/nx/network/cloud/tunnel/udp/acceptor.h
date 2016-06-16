@@ -49,7 +49,7 @@ private:
 
     std::unique_ptr<hpm::api::MediatorServerUdpConnection> m_udpMediatorConnection;
     std::list<std::unique_ptr<UdtStreamSocket>> m_sockets;
-    std::list<std::unique_ptr<IncommingControlConnection>> m_connections;
+    std::list<std::unique_ptr<IncomingControlConnection>> m_connections;
 
     std::function<void(
         SystemError::ErrorCode,

@@ -13,7 +13,7 @@ namespace udp {
 
 static const int kBufferSize(4 * 1024);
 
-IncommingControlConnection::IncommingControlConnection(
+IncomingControlConnection::IncomingControlConnection(
     String connectionId,
     std::unique_ptr<UdtStreamSocket> socket,
     const nx::hpm::api::ConnectionParameters& connectionParameters)
@@ -29,13 +29,13 @@ IncommingControlConnection::IncommingControlConnection(
     m_parser.setMessage(&m_message);
 }
 
-void IncommingControlConnection::setErrorHandler(
+void IncomingControlConnection::setErrorHandler(
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_errorHandler = std::move(handler);
 }
 
-void IncommingControlConnection::start(
+void IncomingControlConnection::start(
     utils::MoveOnlyFunc<void()> selectedHandler)
 {
     m_selectedHandler = std::move(selectedHandler);
@@ -43,17 +43,17 @@ void IncommingControlConnection::start(
     readConnectionRequest();
 }
 
-void IncommingControlConnection::resetLastKeepAlive()
+void IncomingControlConnection::resetLastKeepAlive()
 {
     m_lastKeepAlive = std::chrono::steady_clock::now();
 }
 
-const AbstractStreamSocket* IncommingControlConnection::socket()
+const AbstractStreamSocket* IncomingControlConnection::socket()
 {
     return m_socket.get();
 }
 
-void IncommingControlConnection::monitorKeepAlive()
+void IncomingControlConnection::monitorKeepAlive()
 {
     using namespace std::chrono;
     auto timePassed = steady_clock::now() - m_lastKeepAlive;
@@ -64,13 +64,13 @@ void IncommingControlConnection::monitorKeepAlive()
     m_socket->registerTimer(next, [this](){ monitorKeepAlive(); });
 }
 
-void IncommingControlConnection::readConnectionRequest()
+void IncomingControlConnection::readConnectionRequest()
 {
     m_parser.reset();
     continueReadRequest();
 }
 
-void IncommingControlConnection::continueReadRequest()
+void IncomingControlConnection::continueReadRequest()
 {
     m_buffer.resize(0);
     m_socket->readSomeAsync(
@@ -101,7 +101,7 @@ void IncommingControlConnection::continueReadRequest()
         });
 }
 
-void IncommingControlConnection::processRequest()
+void IncomingControlConnection::processRequest()
 {
     stun::Message response(stun::Header(
         stun::MessageClass::successResponse, 0,
@@ -117,7 +117,7 @@ void IncommingControlConnection::processRequest()
             hpm::api::TunnelConnectionChosenResponse>(&response))
     {
         // TODO: #mux Provide better error handling
-        response.header.messageClass = stun::MessageClass::successResponse;
+        response.header.messageClass = stun::MessageClass::errorResponse;
         response.header.method = m_message.header.method;
         response.newAttribute<stun::attrs::ErrorDescription>(
             stun::error::badRequest, String("Unsupported"));
@@ -142,14 +142,14 @@ void IncommingControlConnection::processRequest()
         });
 }
 
-void IncommingControlConnection::handleError(SystemError::ErrorCode code)
+void IncomingControlConnection::handleError(SystemError::ErrorCode code)
 {
     const auto handler = std::move(m_errorHandler);
     if (handler)
         handler(code);
 }
 
-hpm::api::UdpHolePunchingSynResponse IncommingControlConnection::process(
+hpm::api::UdpHolePunchingSynResponse IncomingControlConnection::process(
     hpm::api::UdpHolePunchingSynRequest syn)
 {
     static_cast<void>(syn);
@@ -161,7 +161,7 @@ hpm::api::UdpHolePunchingSynResponse IncommingControlConnection::process(
     return synAck;
 }
 
-hpm::api::TunnelConnectionChosenResponse IncommingControlConnection::process(
+hpm::api::TunnelConnectionChosenResponse IncomingControlConnection::process(
     hpm::api::TunnelConnectionChosenRequest reqest)
 {
     static_cast<void>(reqest);

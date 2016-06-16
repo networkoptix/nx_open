@@ -23,10 +23,10 @@ namespace network {
 namespace cloud {
 namespace udp {
 
-class NX_NETWORK_API IncommingControlConnection
+class NX_NETWORK_API IncomingControlConnection
 {
 public:
-    IncommingControlConnection(
+    IncomingControlConnection(
         String connectionId,
         std::unique_ptr<UdtStreamSocket> socket,
         const nx::hpm::api::ConnectionParameters& connectionParameters);
@@ -69,7 +69,7 @@ private:
 };
 
 template<typename In, typename Out>
-bool IncommingControlConnection::tryProcess(stun::Message* response)
+bool IncomingControlConnection::tryProcess(stun::Message* response)
 {
     if (m_message.header.method != In::kMethod)
         return false;

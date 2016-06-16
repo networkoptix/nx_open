@@ -9,7 +9,7 @@ namespace cloud {
 namespace udp {
 
 IncomingTunnelConnection::IncomingTunnelConnection(
-    std::unique_ptr<IncommingControlConnection> controlConnection)
+    std::unique_ptr<IncomingControlConnection> controlConnection)
 :
     m_state(SystemError::noError),
     m_controlConnection(std::move(controlConnection)),

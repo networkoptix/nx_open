@@ -46,7 +46,7 @@ protected:
         connectionParameters.udpTunnelKeepAliveInterval = kMaxKeepAliveInterval;
         connectionParameters.udpTunnelKeepAliveRetries = 1;
 
-        auto cc = std::make_unique<IncommingControlConnection>(
+        auto cc = std::make_unique<IncomingControlConnection>(
             kConnectionId.toUtf8(), std::move(tmpSocket), connectionParameters);
 
         cc->start(nullptr /* do not wait for select in test */);

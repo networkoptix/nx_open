@@ -16,7 +16,7 @@ class NX_NETWORK_API IncomingTunnelConnection
 {
 public:
     IncomingTunnelConnection(
-        std::unique_ptr<IncommingControlConnection> controlConnection);
+        std::unique_ptr<IncomingControlConnection> controlConnection);
 
     void accept(std::function<void(
         SystemError::ErrorCode,
@@ -26,7 +26,7 @@ public:
 
 private:
     SystemError::ErrorCode m_state;
-    std::unique_ptr<IncommingControlConnection> m_controlConnection;
+    std::unique_ptr<IncomingControlConnection> m_controlConnection;
     std::unique_ptr<UdtStreamServerSocket> m_serverSocket;
     std::function<void(
         SystemError::ErrorCode,

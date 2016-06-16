@@ -50,7 +50,8 @@ void TunnelAcceptor::accept(std::function<void(
 
             m_udpMediatorConnection->socket()->bindToAioThread(
                 m_mediatorConnection->getAioThread());
-            m_udpMediatorConnection->socket()->bind(SocketAddress::anyAddress);
+            if (!m_udpMediatorConnection->socket()->bind(SocketAddress::anyAddress))
+                return executeAcceptHandler(SystemError::getLastOSErrorCode());
 
             hpm::api::ConnectionAckRequest ackRequest;
             ackRequest.connectSessionId = m_connectionId;
@@ -120,7 +121,7 @@ void TunnelAcceptor::connectionAckResult(
         }
         else
         {
-            return executeAcceptHandler( SystemError::getLastOSErrorCode());
+            return executeAcceptHandler(SystemError::getLastOSErrorCode());
         }
     }
 }
@@ -152,7 +153,7 @@ void TunnelAcceptor::startUdtConnection(
 
             auto connectionIt = m_connections.emplace(
                 m_connections.end(),
-                std::make_unique<IncommingControlConnection>(
+                std::make_unique<IncomingControlConnection>(
                     m_connectionId, std::move(socket), m_connectionParameters));
 
             (*connectionIt)->setErrorHandler(
