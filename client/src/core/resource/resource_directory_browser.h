@@ -1,14 +1,13 @@
-#ifndef QN_RESOURCE_DIRECTORY_BROWSER_H
-#define QN_RESOURCE_DIRECTORY_BROWSER_H
+#pragma once
 
 #include "core/resource_management/resource_searcher.h"
 
 class QnResourceDirectoryBrowser : public QnAbstractFileResourceSearcher
 {
 public:
-    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
+    QnResourceDirectoryBrowser();
 
-    static QnResourceDirectoryBrowser &instance();
+    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
     virtual QString manufacture() const override;
     virtual QnResourceList findResources() override;
@@ -19,15 +18,13 @@ public:
     void cleanup();
 
     static QnLayoutResourcePtr layoutFromFile(const QString& xfile);
+    static QnResourcePtr resourceFromFile(const QString &filename);
 
 protected:
     bool m_resourceReady;
-
-    QnResourceDirectoryBrowser();
 
     static QnResourcePtr createArchiveResource(const QString& xfile);
 
     void findResources(const QString &directory, QnResourceList *result);
 };
 
-#endif //QN_RESOURCE_DIRECTORY_BROWSER_H

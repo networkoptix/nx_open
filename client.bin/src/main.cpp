@@ -42,23 +42,16 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
-#include <client/client_resource_processor.h>
-#include <client/client_startup_parameters.h>
 
-#include <core/resource/resource_directory_browser.h>
-#include <core/resource_management/resource_discovery_manager.h>
+#include <client/client_startup_parameters.h>
 
 #include <nx_speach_synthesizer/text_to_wav.h>
 
 #include <nx/vms/utils/system_uri.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/software_version.h>
 #include <nx/utils/timer_manager.h>
-#include <nx/utils/platform/protocol_handler.h>
 
 #include <openal/qtvaudiodevice.h>
-
-#include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_handler.h>
@@ -214,34 +207,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     }
 
     if (!allowMultipleClientInstances)
-        QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
+        QObject::connect(application, &QtSingleApplication::messageReceived, mainWindow.data(), &QnMainWindow::handleMessage);
 
-    /************************************************************************/
-    /* Initializing resource searchers                                      */
-    /************************************************************************/
-    QnClientResourceProcessor resourceProcessor;
-    std::unique_ptr<QnResourceDiscoveryManager> resourceDiscoveryManager(new QnResourceDiscoveryManager());
-    resourceProcessor.moveToThread(QnResourceDiscoveryManager::instance());
-    QnResourceDiscoveryManager::instance()->setResourceProcessor(&resourceProcessor);
-
-    // ============================
-    //QnResourceDirectoryBrowser
-    if (!startupParams.skipMediaFolderScan)
-    {
-        QnResourceDirectoryBrowser::instance().setLocal(true);
-        QStringList dirs;
-        dirs << qnSettings->mediaFolder();
-        dirs << qnSettings->extraMediaFolders();
-        QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnResourceDirectoryBrowser::instance());
-    }
-
-    /* Initialize desktop camera searcher. */
-    std::unique_ptr<QnDesktopResourceSearcher> desktopSearcher(new QnDesktopResourceSearcher(dynamic_cast<QGLWidget*>(mainWindow->viewport())));
-    QnResourceDiscoveryManager::instance()->addDeviceServer(desktopSearcher.get());
-
-    QnResourceDiscoveryManager::instance()->setReady(true);
-    QnResourceDiscoveryManager::instance()->start();
+    client.initDesktopCamera(dynamic_cast<QGLWidget*>(mainWindow->viewport()));
 
     /* Process input files. */
     bool haveInputFiles = false;
@@ -339,12 +307,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
 #endif
 
     int result = application->exec();
-
-    QnResourceDiscoveryManager::instance()->stop();
-
-#ifdef Q_OS_WIN
-    desktopSearcher.reset();
-#endif
 
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());

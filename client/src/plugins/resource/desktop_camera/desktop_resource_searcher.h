@@ -8,9 +8,11 @@ class QnDesktopResourceSearcherImpl;
 class QnDesktopResourceSearcher :
     public QnAbstractResourceSearcher
 {
+    Q_OBJECT
 
+   using base_type = QnAbstractResourceSearcher;
 public:
-    QnDesktopResourceSearcher(QGLWidget* mainWidget);
+    QnDesktopResourceSearcher(QGLWidget* mainWidget, QObject* parent = nullptr);
     ~QnDesktopResourceSearcher();
 
     virtual QString manufacture() const override;

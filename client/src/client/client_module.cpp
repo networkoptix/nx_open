@@ -25,6 +25,7 @@
 #include <client/client_meta_types.h>
 #include <client/client_translation_manager.h>
 #include <client/client_instance_manager.h>
+#include <client/client_resource_processor.h>
 #include <client/desktop_client_message_processor.h>
 #include <client/client_recent_connections_manager.h>
 
@@ -32,6 +33,8 @@
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/client_camera_factory.h>
 #include <core/resource/storage_plugin_factory.h>
+#include <core/resource/resource_directory_browser.h>
+#include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 
@@ -53,6 +56,7 @@
 #include <platform/platform_abstraction.h>
 
 #include <plugins/plugin_manager.h>
+#include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
 #include <plugins/storage/file_storage/qtfile_storage_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
@@ -136,11 +140,13 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     initLog(startupParams);
     initNetwork(startupParams);
     initSkin(startupParams);
-    initLocalResources();
+    initLocalResources(startupParams);
 }
 
 QnClientModule::~QnClientModule()
 {
+    QnResourceDiscoveryManager::instance()->stop();
+
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
 
     QApplication::setOrganizationName(QString());
@@ -174,6 +180,14 @@ void QnClientModule::initApplication()
 #ifdef Q_OS_MACX
     QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
+}
+
+void QnClientModule::initDesktopCamera(QGLWidget* window)
+{
+    /* Initialize desktop camera searcher. */
+    QnDesktopResourceSearcher* desktopSearcher(new QnDesktopResourceSearcher(window));
+    QnResourceDiscoveryManager::instance()->addDeviceServer(desktopSearcher);
+    qnCommon->store<QnDesktopResourceSearcher>(desktopSearcher);
 }
 
 void QnClientModule::initMetaInfo()
@@ -457,7 +471,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     qnCommon->store<QnCustomizer>(customizer.take());
 }
 
-void QnClientModule::initLocalResources()
+void QnClientModule::initLocalResources(const QnStartupParameters& startupParams)
 {
     qnCommon->store<PluginManager>(new PluginManager());
     // client uses ordinary QT file to access file system
@@ -472,4 +486,29 @@ void QnClientModule::initLocalResources()
 
     cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
     QDir::setCurrent(qnSettings->mediaFolder());
+
+    QnClientResourceProcessor* resourceProcessor(new QnClientResourceProcessor());
+    QnResourceDiscoveryManager* resourceDiscoveryManager(new QnResourceDiscoveryManager());
+    resourceProcessor->moveToThread(QnResourceDiscoveryManager::instance());
+    resourceDiscoveryManager->setResourceProcessor(resourceProcessor);
+
+    if (!startupParams.skipMediaFolderScan)
+    {
+        QnResourceDirectoryBrowser* localFilesSearcher(new QnResourceDirectoryBrowser());
+        qnCommon->store<QnResourceDirectoryBrowser>(localFilesSearcher);
+
+        localFilesSearcher->setLocal(true);
+        QStringList dirs;
+        dirs << qnSettings->mediaFolder();
+        dirs << qnSettings->extraMediaFolders();
+        localFilesSearcher->setPathCheckList(dirs);
+        resourceDiscoveryManager->addDeviceServer(localFilesSearcher);
+    }
+
+
+    QnResourceDiscoveryManager::instance()->setReady(true);
+    QnResourceDiscoveryManager::instance()->start();
+
+    qnCommon->store<QnResourceDiscoveryManager>(resourceDiscoveryManager);
+    qnCommon->store<QnClientResourceProcessor>(resourceProcessor);
 }

@@ -72,7 +72,7 @@ QnResourcePtr QnFileProcessor::createResourcesForFile(const QString &file)
             fileName = fileName.remove(n, fileName.length());
     }
 
-    QnResourcePtr result = QnResourceDirectoryBrowser::instance().checkFile(fileName);
+    QnResourcePtr result = QnResourceDirectoryBrowser::resourceFromFile(fileName);
 
     if(result)
         qnResPool->addResource(result);
@@ -82,8 +82,13 @@ QnResourcePtr QnFileProcessor::createResourcesForFile(const QString &file)
 
 QnResourceList QnFileProcessor::createResourcesForFiles(const QStringList &files)
 {
-    QnResourceList result = QnResourceDirectoryBrowser::instance().checkFiles(files);
-
+    QnResourceList result;
+    for (const QString& fileName : files)
+    {
+        QnResourcePtr resource = QnResourceDirectoryBrowser::resourceFromFile(fileName);
+        if (resource)
+            result << resource;
+    }
     qnResPool->addResources(result);
 
     return result;

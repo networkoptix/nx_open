@@ -5,6 +5,8 @@
 
 #include <client/client_startup_parameters.h>
 
+class QGLWidget;
+
 class QnClientModule: public QObject
 {
     Q_OBJECT
@@ -14,6 +16,8 @@ public:
     virtual ~QnClientModule();
 
     static void initApplication();
+
+    void initDesktopCamera(QGLWidget* window);
 private:
     void initThread();
     void initMetaInfo();
@@ -22,7 +26,7 @@ private:
     void initLog            (const QnStartupParameters& startupParams);
     void initNetwork        (const QnStartupParameters& startupParams);
     void initSkin           (const QnStartupParameters& startupParams);
-    void initLocalResources();
+    void initLocalResources (const QnStartupParameters& startupParams);
 };
 
 
