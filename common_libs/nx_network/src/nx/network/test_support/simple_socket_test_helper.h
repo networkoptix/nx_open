@@ -428,7 +428,7 @@ void socketShutdown(
                             ASSERT_EQ(code, SystemError::noError);
                             client->sendAsync(
                                 kTestMessage,
-                                [&](SystemError::ErrorCode code, size_t size)
+                                [&](SystemError::ErrorCode code, size_t /*size*/)
                                 {
                                     ASSERT_EQ(code, SystemError::noError);
                                     client->post(
