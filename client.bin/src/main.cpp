@@ -10,6 +10,9 @@
 #ifdef Q_OS_WIN
 #include <common/systemexcept_win32.h>
 #endif
+#ifdef Q_OS_LINUX
+#include <common/systemexcept_linux.h>
+#endif
 
 #ifdef Q_OS_LINUX
 #   include <unistd.h>
@@ -21,8 +24,7 @@
 
 #include <iostream>
 
-#include <utils/common/app_info.h>
-#include "ui/widgets/main_window.h"
+#include "self_updater.h"
 
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
@@ -35,52 +37,44 @@
 #include <QtGui/QDesktopServices>
 #include <QtSingleApplication>
 
+#include <common/common_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
 #include <client/client_resource_processor.h>
 #include <client/client_startup_parameters.h>
 
-#include "core/resource/media_server_resource.h"
-#include "core/resource/storage_resource.h"
-#include "core/resource/resource_directory_browser.h"
+#include <core/resource/resource_directory_browser.h>
+#include <core/resource_management/resource_discovery_manager.h>
 
 #include <nx_speach_synthesizer/text_to_wav.h>
+
+#include <nx/vms/utils/system_uri.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/software_version.h>
-#include <utils/common/command_line_parser.h>
+#include <nx/utils/timer_manager.h>
+#include <nx/utils/platform/protocol_handler.h>
 
-#include "ui/workbench/workbench_context.h"
-#include "ui/actions/action_manager.h"
+#include <openal/qtvaudiodevice.h>
 
 #include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
 
-#include "utils/common/util.h"
-#include "core/resource_management/resource_discovery_manager.h"
-
-#ifdef Q_OS_LINUX
-#include "ui/workaround/x11_launcher_workaround.h"
-#include "common/systemexcept_linux.h"
-#endif
-
-#include "openal/qtvaudiodevice.h"
-
-#include "ui/help/help_handler.h"
-
-#include "utils/common/long_runnable.h"
-
-#include "common/common_module.h"
-
-#include <nx/vms/utils/system_uri.h>
+#include <ui/actions/action_manager.h>
+#include <ui/help/help_handler.h>
+#include <ui/widgets/main_window.h>
+#include <ui/workbench/workbench_context.h>
 
 #ifdef Q_OS_MAC
-#include "ui/workaround/mac_utils.h"
+#include <ui/workaround/mac_utils.h>
 #endif
-#include "api/runtime_info_manager.h"
+#ifdef Q_OS_LINUX
+#include <ui/workaround/x11_launcher_workaround.h>
+#endif
 
-#include <nx/utils/timer_manager.h>
-#include <nx/utils/platform/protocol_handler.h>
-#include <nx/vms/utils/app_info.h>
+#include <utils/common/app_info.h>
+#include <utils/common/util.h>
+#include <utils/common/command_line_parser.h>
 
 #include <watchers/cloud_status_watcher.h>
 
@@ -117,38 +111,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     bool fullScreenDisabled = startupParams.fullScreenDisabled;
 
 #ifdef Q_OS_WIN
+    nx::vms::client::SelfUpdater updater(startupParams);
 
-    nx::utils::SoftwareVersion engineVersion(QnAppInfo::applicationVersion());
-    if (!startupParams.engineVersion.isEmpty())
-        engineVersion = nx::utils::SoftwareVersion(startupParams.engineVersion);
-
-    auto registerUriHandler = [engineVersion]
-    {
-        return nx::utils::registerSystemUriProtocolHandler(nx::vms::utils::AppInfo::nativeUriProtocol(),
-                                                           qApp->applicationFilePath(),
-                                                           nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
-                                                           engineVersion);
-    };
-
-    /* Register URI handler and instantly exit. */
+    /* Immediately exit if run under administrator. */
     if (startupParams.hasAdminPermissions)
-    {
-        registerUriHandler();
         return kSuccessCode;
-    }
-
-    /* Check if uri handler is registered already. */
-    if (!registerUriHandler())
-    {
-        /* Avoid lock-file races. */
-        allowMultipleClientInstances = true;
-
-        /* Start another client instance with admin permissions if required. */
-        nx::utils::runAsAdministratorWithUAC(qApp->applicationFilePath(),
-                                             QStringList()
-                                             << QnStartupParameters::kHasAdminPermissionsKey
-                                             << QnStartupParameters::kAllowMultipleClientInstancesKey);
-    }
 
 #endif // Q_OS_WIN
 

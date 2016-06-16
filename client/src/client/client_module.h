@@ -13,9 +13,9 @@ public:
     QnClientModule(const QnStartupParameters &startupParams = QnStartupParameters(), QObject *parent = NULL);
     virtual ~QnClientModule();
 
+    static void initApplication();
 private:
     void initThread();
-    void initApplication();
     void initMetaInfo();
     void initSingletons     (const QnStartupParameters& startupParams);
     void initRuntimeParams  (const QnStartupParameters& startupParams);
