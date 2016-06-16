@@ -78,39 +78,72 @@ bool TemporaryCredentialsParams::getAsVariant(int /*resID*/, QVariant* const /*v
 
 std::string AccessRestrictions::toString() const
 {
-    return boost::algorithm::join(requestsAllowed, ",");
+    std::string result;
+    if (!requestsAllowed.empty())
+        result += "+" + boost::algorithm::join(requestsAllowed, ":+");
+    if (!requestsDenied.empty())
+        result += "-" + boost::algorithm::join(requestsDenied, ":-");
+    return result;
 }
 
 bool AccessRestrictions::parse(const std::string& str)
 {
     using namespace boost::algorithm;
 
+    //TODO #ak use spirit?
+
+    std::vector<std::string> allRequestsWithModifiers;
     boost::algorithm::split(
-        requestsAllowed,
+        allRequestsWithModifiers,
         str,
-        is_any_of(","),
+        is_any_of(":"),
         token_compress_on);
+    for (std::string& requestWithModifier: allRequestsWithModifiers)
+    {
+        if (requestWithModifier.empty())
+        {
+            NX_ASSERT(false);
+            continue;
+        }
+
+        if (requestWithModifier[0] == '+')
+        {
+            requestsAllowed.push_back(requestWithModifier.substr(1));
+        }
+        else if (requestWithModifier[0] == '-')
+        {
+            requestsDenied.push_back(requestWithModifier.substr(1));
+        }
+        else
+        {
+            NX_ASSERT(false, requestWithModifier.c_str());
+            continue;
+        }
+    }
+    
     return true;
 }
 
 bool AccessRestrictions::authorize(const stree::AbstractResourceReader& requestAttributes) const
 {
-    if (requestsAllowed.empty())
-        return true;    //no restrictions
+    std::string requestPath;
+    if (!requestAttributes.get(attr::requestPath, &requestPath))
+        return true;    //assert?
 
-    if (auto requestPath = requestAttributes.get(attr::requestPath))
-    {
+    if (!requestsAllowed.empty())
         return std::find(
             requestsAllowed.begin(),
             requestsAllowed.end(),
-            requestPath->toString().toStdString()) != requestsAllowed.end();
-    }
+            requestPath) != requestsAllowed.end();
 
-    return true;
+    return std::find(
+        requestsDenied.begin(),
+        requestsDenied.end(),
+        requestPath) == requestsDenied.end();
 }
 
 
-TemporaryAccountPassword::TemporaryAccountPassword()
+TemporaryAccountCredentials::TemporaryAccountCredentials()
 :
     expirationTimestampUtc(0),
     maxUseCount(0),
@@ -121,15 +154,9 @@ TemporaryAccountPassword::TemporaryAccountPassword()
 
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (TemporaryAccountPassword),
+    (TemporaryAccountCredentials),
     (sql_record),
     _Fields)
-
-
-//QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-//    (AccountUpdateDataWithEmail),
-//    (sql_record),
-//    _Fields)
 
 }   //data
 }   //cdb

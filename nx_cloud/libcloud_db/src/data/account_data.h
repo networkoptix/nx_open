@@ -82,18 +82,30 @@ public:
 class AccessRestrictions
 {
 public:
+    /** exact names of allowed requests. if empty, \a requestsDenied is analyzed */
     std::vector<std::string> requestsAllowed;
+    std::vector<std::string> requestsDenied;
 
+    /** ABNF syntax for serialized format:
+        auth_rights = *(api_method_rule ":")
+        api_method_rule = control_modifier api_method_name
+        control_modifier = "+" | "-"
+        api_method_name = uri_abs_path
+    */
     std::string toString() const;
     bool parse(const std::string& str);
 
     bool authorize(const stree::AbstractResourceReader& requestAttributes) const;
 };
 
-class TemporaryAccountPassword
+class TemporaryAccountCredentials
 {
 public:
+    /** used to find account */
     std::string accountEmail;
+    /** this is actual login */
+    std::string login;
+    /** password to be used with \a login, not \a accountEmail! */
     std::string password;
     std::string passwordHa1;
     std::string realm;
@@ -104,14 +116,14 @@ public:
     bool isEmailCode;
     AccessRestrictions accessRights;
 
-    TemporaryAccountPassword();
+    TemporaryAccountCredentials();
 };
 
-#define TemporaryAccountPassword_Fields (accountEmail)(passwordHa1)(realm) \
+#define TemporaryAccountCredentials_Fields (accountEmail)(login)(passwordHa1)(realm) \
     (expirationTimestampUtc)(maxUseCount)(useCount)(isEmailCode)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (TemporaryAccountPassword),
+    (TemporaryAccountCredentials),
     (sql_record))
 
 

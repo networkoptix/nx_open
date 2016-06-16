@@ -103,7 +103,7 @@ private:
     Cache<std::string, data::AccountData> m_cache;
     mutable QnMutex m_mutex;
     //map<email, temporary password>
-    std::multimap<std::string, data::TemporaryAccountPassword> m_accountPassword;
+    std::multimap<std::string, data::TemporaryAccountCredentials> m_accountPassword;
     QnCounter m_startedAsyncCallsCounter;
 
     nx::db::DBResult fillCache();
@@ -163,6 +163,12 @@ private:
         data::AccountEmail accountEmail,
         data::AccountConfirmationCode confirmationCode,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
+    void temporaryCredentialsSaved(
+        QnCounter::ScopedIncrement asyncCallLocker,
+        api::ResultCode resultCode,
+        const std::string& accountEmail,
+        api::TemporaryCredentials temporaryCredentials,
+        std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler);
 };
 
 }   //cdb
