@@ -204,7 +204,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
         return QList<QnResourcePtr>();
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
-    auto isDW = resourceData.value<bool>("isDW");
+    auto isDW = resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL);
 
     vendor = isDW ? kDwFullVendorName : vendor;
     name = vendor == kIsdFullVendorName ?
@@ -246,11 +246,20 @@ QString extractWord(int index, const QByteArray& rawData)
 }
 
 
-bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName) const
+bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName, const QString& model) const
 {
-    return vendorName.toUpper().startsWith(manufacture()) ||
-        vendorName.toLower().trimmed() == lit("digital watchdog") ||
-        vendorName.toLower().trimmed() == lit("digitalwatchdog");
+    if (vendorName.toUpper().startsWith(manufacture()))
+    {
+        return true;
+    }
+    else if(vendorName.toLower().trimmed() == lit("digital watchdog") ||
+        vendorName.toLower().trimmed() == lit("digitalwatchdog"))
+    {
+        QnResourceData resourceData = qnCommon->dataPool()->data("DW", model);
+        if (resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL))
+            return true;
+    }
+    return false;
 }
 
 
@@ -266,7 +275,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     QString name(lit("ISDcam"));
 
     if (!responseData.contains("ISD")) {
-        // check for new ISD models. it has been rebrended
+        // check for new ISD models. it has been rebranded
         int modelPos = responseData.indexOf("DWCA-");
         if (modelPos == -1)
             modelPos = responseData.indexOf("DWCS-");
@@ -397,7 +406,7 @@ void QnPlISDResourceSearcher::processPacket(
     const QByteArray& /*xmlDevInfo*/,
     QnResourceList& result )
 {
-    if (!isDwOrIsd(devInfo.manufacturer))
+    if (!isDwOrIsd(devInfo.manufacturer, devInfo.modelName))
         return;
 
     QnMacAddress cameraMAC(devInfo.serialNumber);
@@ -455,7 +464,7 @@ void QnPlISDResourceSearcher::createResource(
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
-    auto isDW = resourceData.value<bool>("isDW");
+    auto isDW = resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL);
     auto vendor = isDW ? kDwFullVendorName :
         (devInfo.manufacturer == lit("ISD") || devInfo.manufacturer == kIsdFullVendorName) ?
             manufacture() :

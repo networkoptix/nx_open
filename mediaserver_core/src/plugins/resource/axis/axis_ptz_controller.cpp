@@ -385,6 +385,7 @@ bool QnAxisPtzController::getPresets(QnPtzPresetList *presets)
         m_cacheUpdateTimer.restart();
     }
 
+    QnMutexLocker lock(&m_mutex);
     for (auto itr = m_cachedData.begin(); itr != m_cachedData.end(); ++itr)
         presets->push_back(QnPtzPreset(itr.key(), itr.value()));
     return true;

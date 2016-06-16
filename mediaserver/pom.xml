@@ -1,11 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
-
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project,
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -29,15 +22,15 @@
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <global.libs>-lmediaserver_core -lcommon -lnx_network -lnx_streaming -lappserver2 -ludt -lcloud_db_client -lnx_email -lnx_speach_synthesizer -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
-        <linux.oslibs>-lldap -ldl</linux.oslibs>
+        <linux.oslibs>-lldap -ldl -ltermcap</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <rdep.packages>openssl ffmpeg onvif quazip sigar</rdep.packages>
         <rdep.linux.arm.packages>sasl2 openldap</rdep.linux.arm.packages>
 
-        <rdep.windows.packages>festival</rdep.windows.packages>
-        <rdep.mac.packages>festival</rdep.mac.packages>
+        <rdep.windows.packages>festival any/festival-vox</rdep.windows.packages>
+        <rdep.mac.packages>festival any/festival-vox</rdep.mac.packages>
     </properties>
 
     <dependencies>
@@ -94,7 +87,7 @@
             </activation>
 
             <properties>
-                <rdep.linux.packages>festival</rdep.linux.packages>
+                <rdep.linux.packages>festival any/festival-vox</rdep.linux.packages>
             </properties>
         </profile>
 
@@ -113,7 +106,7 @@
             </activation>
 
             <properties>
-                <rdep.linux.packages>festival</rdep.linux.packages>
+                <rdep.linux.packages>festival any/festival-vox</rdep.linux.packages>
             </properties>
         </profile>  
 
@@ -132,7 +125,7 @@
             </activation>
 
             <properties>
-                <rdep.linux.packages>festival</rdep.linux.packages>
+                <rdep.linux.packages>festival any/festival-vox</rdep.linux.packages>
             </properties>
         </profile>  
 

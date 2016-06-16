@@ -70,7 +70,7 @@ private:
     qint64 m_nextMinTryTime;
 };
 
-QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnVideoCamera* camera, const QnResourcePtr &resource, QnServer::ChunksCatalog catalog): 
+QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnVideoCamera* camera, const QnResourcePtr &resource, QnServer::ChunksCatalog catalog):
     QnResourceConsumer(resource),
     QnAbstractDataConsumer(100),
     m_lastKeyFrameChannel(0),
@@ -102,7 +102,7 @@ bool QnVideoCameraGopKeeper::canAcceptData() const
 }
 
 /*!
-    using different allocator for stored ket frames, since these key frames can be kept in QnVideoCameraGopKeeper::m_lastKeyFrames 
+    using different allocator for stored ket frames, since these key frames can be kept in QnVideoCameraGopKeeper::m_lastKeyFrames
     for 80 seconds and that can cause huge memory consumption if CyclicAllocator has been used to alloc original frames
 */
 static CyclicAllocator gopKeeperKeyFramesAllocator;
@@ -125,7 +125,7 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
             const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
             if (m_lastKeyFrames[ch].empty() || m_lastKeyFrames[ch].back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
                 m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(video->clone(&gopKeeperKeyFramesAllocator)));
-            while ((!m_lastKeyFrames[ch].empty() && m_lastKeyFrames[ch].front()->timestamp < removeThreshold) || 
+            while ((!m_lastKeyFrames[ch].empty() && m_lastKeyFrames[ch].front()->timestamp < removeThreshold) ||
                     (m_lastKeyFrames[ch].size() > KEEP_IFRAMES_INTERVAL/KEEP_IFRAMES_DISTANCE))
                 m_lastKeyFrames[ch].pop_front();
         }
@@ -163,7 +163,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQ
             newData->opaque = cseq;
             dstQueue.push(QnAbstractMediaDataPtr(newData));
         }
-        else { 
+        else {
             dstQueue.push(std::const_pointer_cast<QnAbstractDataPacket>(data));    //TODO: #ak remove const_cast
         }
         rez++;
@@ -239,7 +239,7 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
             m_camera->notInUse(this);
         }
     }
-    
+
 }
 
 void QnVideoCameraGopKeeper::clearVideoData()
@@ -271,7 +271,7 @@ QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
     //ensuring that vectors will not take much memory
     static_assert(
         ((MEDIA_Quality_High > MEDIA_Quality_Low ? MEDIA_Quality_High : MEDIA_Quality_Low) + 1) < 16,
-        "MediaQuality enum suddenly contains too large values: consider changing QnVideoCamera::m_liveCache, QnVideoCamera::m_hlsLivePlaylistManager type" );  
+        "MediaQuality enum suddenly contains too large values: consider changing QnVideoCamera::m_liveCache, QnVideoCamera::m_hlsLivePlaylistManager type" );
 
     m_liveCache.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     m_hlsLivePlaylistManager.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
@@ -348,7 +348,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
     const Qn::ConnectionRole role = primaryLiveStream ? Qn::CR_LiveVideo : Qn::CR_SecondaryLiveVideo;
 
 	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
-	
+
     QnLiveStreamProviderPtr &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
     if (reader == 0)
     {
@@ -364,10 +364,10 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 				delete dataProvider;
 			} else
 			{
-                reader->setOwner(this);
+                reader->setOwner(toSharedPointer());
 				if ( role ==  Qn::CR_LiveVideo )
 					connect(reader->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
-					
+
 				QnVideoCameraGopKeeper* gopKeeper = new QnVideoCameraGopKeeper(this, m_resource, catalog);
 				if (primaryLiveStream)
 					m_primaryGopKeeper = gopKeeper;
@@ -603,7 +603,7 @@ nx_hls::HLSLivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQu
 bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 targetDurationUSec )
 {
     QnMutexLocker lock( &m_getReaderMutex );
- 
+
     NX_ASSERT( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Low );
 
     if( streamQuality == MEDIA_Quality_High )
@@ -668,7 +668,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(
         m_liveCache[streamQuality].reset( new MediaStreamCache(
             MEDIA_CACHE_SIZE_MILLIS,
             MEDIA_CACHE_SIZE_MILLIS*10) );  //hls spec requires 7 last chunks to be in memory, adding extra 3 just for case
-        m_hlsLivePlaylistManager[streamQuality] = 
+        m_hlsLivePlaylistManager[streamQuality] =
             std::make_shared<nx_hls::HLSLivePlaylistManager>(
                 m_liveCache[streamQuality].get(),
                 targetDurationUSec );

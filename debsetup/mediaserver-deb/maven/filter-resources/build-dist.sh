@@ -36,6 +36,7 @@ INITDSTAGE=$STAGE$INITDTARGET
 SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
 SERVER_SHARE_PATH=${libdir}/share
 #SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
+SERVER_VOX_PATH=$SERVER_BIN_PATH/vox
 SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
 SERVER_LIB_PLUGIN_PATH=$SERVER_BIN_PATH/plugins
 SCRIPTS_PATH=${basedir}/../scripts
@@ -57,6 +58,7 @@ cp ${libdir}/version.py $SHARESTAGE/dbsync-2.2/bin
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
 cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
+cp -r $SERVER_VOX_PATH $BINSTAGE
 #'libstdc++.so.6 is needed on some machines
 cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
 cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE

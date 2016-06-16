@@ -56,7 +56,7 @@ private:
 
     void cleanupSpaces(QString& rowWithSpaces) const;
 
-    bool isDwOrIsd(const QString& vendorName) const;
+    bool isDwOrIsd(const QString& vendorName, const QString& model) const;
 
     QnResourcePtr processMdnsResponse (
         const QnMdnsListener::ConsumerData& mdnsResponse,

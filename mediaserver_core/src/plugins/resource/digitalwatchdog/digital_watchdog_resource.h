@@ -42,6 +42,7 @@ private:
     void enableOnvifSecondStream();
     QString fetchCameraModel();
     bool disableB2FramesForActiDW();
+    bool isCproChipset() const;
 private:
     bool m_hasZoom;
 

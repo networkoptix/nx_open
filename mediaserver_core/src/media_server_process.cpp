@@ -234,7 +234,11 @@
 #include "cloud/cloud_system_name_updater.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
+
+#if !defined(EDGE_SERVER)
 #include <nx_speach_synthesizer/text_to_wav.h>
+#endif
+
 #include <streaming/audio_streamer_pool.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
 
@@ -2324,8 +2328,10 @@ void MediaServerProcess::run()
     /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
     QnMediaServerResourceSearchers searchers;
 
+#if !defined(EDGE_SERVER)
     std::unique_ptr<TextToWaveServer> speechSynthesizer(new TextToWaveServer());
     speechSynthesizer->start();
+#endif
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
     loadResourcesFromECS(messageProcessor.data());
