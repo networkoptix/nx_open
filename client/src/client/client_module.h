@@ -1,5 +1,4 @@
-#ifndef QN_CLIENT_MODULE_H
-#define QN_CLIENT_MODULE_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -28,6 +27,3 @@ private:
     void initSkin           (const QnStartupParameters& startupParams);
     void initLocalResources (const QnStartupParameters& startupParams);
 };
-
-
-#endif // QN_CLIENT_MODULE_H

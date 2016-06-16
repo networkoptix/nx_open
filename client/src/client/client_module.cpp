@@ -19,7 +19,6 @@
 #include <camera/camera_bookmarks_manager.h>
 
 #include <client/client_app_info.h>
-#include <client/client_startup_parameters.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
@@ -93,6 +92,25 @@
 
 #include <watchers/cloud_status_watcher.h>
 
+static QtMessageHandler defaultMsgHandler = 0;
+
+static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
+{
+    if (defaultMsgHandler)
+    {
+        defaultMsgHandler(type, ctx, msg);
+    }
+    else
+    { /* Default message handler. */
+#ifndef QN_NO_STDERR_MESSAGE_OUTPUT
+        QTextStream err(stderr);
+        err << msg << endl << flush;
+#endif
+    }
+
+    qnLogMsgHandler(type, ctx, msg);
+}
+
 
 namespace
 {
@@ -153,6 +171,9 @@ QnClientModule::~QnClientModule()
     QApplication::setApplicationName(QString());
     QApplication::setApplicationDisplayName(QString());
     QApplication::setApplicationVersion(QString());
+
+    //restoring default message handler
+    qInstallMessageHandler(defaultMsgHandler);
 }
 
 void QnClientModule::initThread()
@@ -375,6 +396,13 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
     }
+
+    defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
+
+    //TODO: #GDM Standartize log header and calling conventions
+    cl_log.log(qApp->applicationDisplayName(), " started", cl_logALWAYS);
+    cl_log.log("Software version: ", QApplication::applicationVersion(), cl_logALWAYS);
+    cl_log.log("binary path: ", qApp->applicationFilePath(), cl_logALWAYS);
 }
 
 void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
