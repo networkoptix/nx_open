@@ -89,7 +89,9 @@ void RendezvousConnectorWithVerification::notifyAboutChoosingConnection(
     if (m_timeout > std::chrono::milliseconds::zero())
         m_aioThreadBinder.start(
             m_timeout,
-            std::bind(&RendezvousConnectorWithVerification::onTimeout, this));
+            std::bind(
+                &RendezvousConnectorWithVerification::onTimeout, this,
+                "tunnelConnectionChosenResponse"));
 }
 
 std::unique_ptr<nx::network::UdtStreamSocket>
@@ -150,7 +152,9 @@ void RendezvousConnectorWithVerification::onConnectCompleted(
     if (m_timeout > std::chrono::milliseconds::zero())
         m_aioThreadBinder.start(
             m_timeout,
-            std::bind(&RendezvousConnectorWithVerification::onTimeout, this));
+            std::bind(
+                &RendezvousConnectorWithVerification::onTimeout, this,
+                "UdpHolePunchingSynResponse"));
 }
 
 void RendezvousConnectorWithVerification::onMessageReceived(
@@ -234,12 +238,10 @@ void RendezvousConnectorWithVerification::processTunnelConnectionChosen(
     connectCompletionHandler(SystemError::noError);
 }
 
-void RendezvousConnectorWithVerification::onTimeout()
+void RendezvousConnectorWithVerification::onTimeout(nx::String requestName)
 {
-    NX_LOGX(lm("cross-nat %1. Error. %2 timeout has expired "
-               "while waiting for UdpHolePunchingSynResponse")
-            .arg(connectSessionId()).arg(m_timeout),
-        cl_logDEBUG1);
+    NX_LOGX(lm("cross-nat %1. Error. %2 timeout has expired while waiting for %3")
+        .arg(connectSessionId()).arg(m_timeout).arg(requestName), cl_logDEBUG1);
 
     processError(SystemError::timedOut);
 }

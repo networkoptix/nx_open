@@ -59,7 +59,7 @@ private:
     void onMessageReceived(nx::stun::Message message);
     void processUdpHolePunchingSynAck(nx::stun::Message message);
     void processTunnelConnectionChosen(nx::stun::Message message);
-    void onTimeout();
+    void onTimeout(nx::String requestName);
     void processError(SystemError::ErrorCode errorCode);
 };
 
