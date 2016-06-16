@@ -10,6 +10,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/mutex.h>
+#include <core/resource_management/user_access_data.h>
 
 #include "client_query_processor.h"
 
@@ -23,6 +24,8 @@ namespace ec2
     class FixedUrlClientQueryProcessor
     {
     public:
+        FixedUrlClientQueryProcessor &getAccess(const Qn::UserAccessData &) { return *this; }
+
         FixedUrlClientQueryProcessor( ClientQueryProcessor* clientProcessor, const QUrl& ecURL )
         :
             m_clientProcessor( clientProcessor ),

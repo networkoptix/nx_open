@@ -36,10 +36,10 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    QnUserManager<QueryProcessorType>::QnUserManager( QueryProcessorType* const queryProcessor)
+    QnUserManager<QueryProcessorType>::QnUserManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData)
     :
-        QnUserNotificationManager(),
-        m_queryProcessor( queryProcessor )
+      m_queryProcessor( queryProcessor ),
+      m_userAccessData(userAccessData)
     {
     }
 
@@ -52,7 +52,7 @@ namespace ec2
         {
             handler->done( reqID, errorCode, users);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiUserDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiUserDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getUsers, nullptr, queryDoneHandler);
         return reqID;
     }
@@ -60,6 +60,7 @@ namespace ec2
     template<class QueryProcessorType>
     void callSaveUserAsync(
         QueryProcessorType* const queryProcessor,
+        const Qn::UserAccessData &userAccessData,
         QnTransaction<ApiUserData>& tran,
         impl::SimpleHandlerPtr handler,
         const int reqID,
@@ -67,7 +68,7 @@ namespace ec2
         const QString& newPassword)
     {
         QN_UNUSED(user, newPassword); /* Actual only for FixedUrlClientQueryProcessor implementation */
-        queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        queryProcessor->getAccess(userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -76,6 +77,7 @@ namespace ec2
     template<>
     void callSaveUserAsync<FixedUrlClientQueryProcessor>(
         FixedUrlClientQueryProcessor* const queryProcessor,
+        const Qn::UserAccessData &userAccessData,
         QnTransaction<ApiUserData>& tran,
         impl::SimpleHandlerPtr handler,
         const int reqID,
@@ -83,7 +85,7 @@ namespace ec2
         const QString& newPassword)
     {
         //after successfull call completion users.front()->getPassword() is empty, so saving it here
-        queryProcessor->processUpdateAsync( tran,
+        queryProcessor->getAccess(userAccessData).processUpdateAsync( tran,
             [queryProcessor, handler, reqID, user, newPassword]( ec2::ErrorCode errorCode )
         {
                 if( errorCode == ec2::ErrorCode::ok
@@ -102,7 +104,7 @@ namespace ec2
 
         const int reqID = generateRequestID();
         QnTransaction<ApiUserData> tran(ApiCommand::saveUser, user);
-        callSaveUserAsync( m_queryProcessor, tran, handler, reqID, user, newPassword);
+        callSaveUserAsync( m_queryProcessor, m_userAccessData, tran, handler, reqID, user, newPassword);
         return reqID;
     }
 
@@ -111,7 +113,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiIdData> tran(ApiCommand::removeUser, id);
-        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -126,7 +128,7 @@ namespace ec2
         {
             handler->done(reqID, errorCode, result);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiUserGroupDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiUserGroupDataList, decltype(queryDoneHandler)>
             (ApiCommand::getUserGroups, nullptr, queryDoneHandler);
         return reqID;
     }
@@ -136,7 +138,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiUserGroupData> tran(ApiCommand::saveUserGroup, group);
-        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -148,7 +150,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiIdData> tran(ApiCommand::removeUserGroup, id);
-        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -164,7 +166,7 @@ namespace ec2
         {
             handler->done(reqID, errorCode, result);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiAccessRightsDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiAccessRightsDataList, decltype(queryDoneHandler)>
             (ApiCommand::getAccessRights, nullptr, queryDoneHandler);
         return reqID;
     }
@@ -174,13 +176,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiAccessRightsData> tran(ApiCommand::setAccessRights, data);
-        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
         return reqID;
     }
 
-    template class QnUserManager<ServerQueryProcessor>;
+    template class QnUserManager<ServerQueryProcessorAccess>;
     template class QnUserManager<FixedUrlClientQueryProcessor>;
 }

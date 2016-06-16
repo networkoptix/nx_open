@@ -2,10 +2,11 @@
 
 #include <transaction/transaction.h>
 #include <nx_ec/managers/abstract_webpage_manager.h>
+#include <core/resource_management/user_access_data.h>
 
 namespace ec2
 {
-    class QnWebPageNotificationManager: public AbstractWebPageManager
+    class QnWebPageNotificationManager: public AbstractWebPageNotificationManager
     {
     public:
         QnWebPageNotificationManager();
@@ -14,12 +15,13 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiIdData>& tran );
     };
 
+    typedef std::shared_ptr<QnWebPageNotificationManager> QnWebPageNotificationManagerPtr;
 
     template<class QueryProcessorType>
-    class QnWebPageManager: public QnWebPageNotificationManager
+    class QnWebPageManager: public AbstractWebPageManager
     {
     public:
-        QnWebPageManager( QueryProcessorType* const queryProcessor);
+        QnWebPageManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
     protected:
         virtual int getWebPages( impl::GetWebPagesHandlerPtr handler ) override;
@@ -28,5 +30,6 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
+        Qn::UserAccessData m_userAccessData;
     };
 }

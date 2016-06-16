@@ -8,8 +8,8 @@ class QnSetupCloudSystemRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
 public:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
-    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*owner) override;
+    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*owner) override;
 private:
-    int execute(SetupRemoveSystemData data, QnJsonRestResult &result);
+    int execute(SetupRemoveSystemData data, const QnUuid &userId, QnJsonRestResult &result);
 };

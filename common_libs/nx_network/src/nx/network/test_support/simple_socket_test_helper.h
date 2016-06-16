@@ -119,8 +119,8 @@ void syncSocketServerMainFunc(
         
         ASSERT_TRUE(client.get())
             << SystemError::getLastOSErrorText().toStdString() << " on " << i;
-        ASSERT_TRUE(client->setRecvTimeout(2 * 1000));
-        ASSERT_TRUE(client->setSendTimeout(2 * 1000));
+        ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
+        ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
 
         if (testMessage.isEmpty())
             continue;

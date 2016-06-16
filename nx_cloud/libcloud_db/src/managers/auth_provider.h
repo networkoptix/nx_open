@@ -13,6 +13,7 @@
 #include <cdb/auth_provider.h>
 
 #include "access_control/auth_types.h"
+#include "data/auth_data.h"
 
 
 namespace nx {
@@ -47,7 +48,7 @@ public:
     */
     void getAuthenticationResponse(
         const AuthorizationInfo& authzInfo,
-        const api::AuthRequest& authRequest,
+        const data::AuthRequest& authRequest,
         std::function<void(api::ResultCode, api::AuthResponse)> completionHandler);
 
 private:

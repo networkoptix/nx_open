@@ -77,6 +77,9 @@ static_unique_ptr_cast(
         static_cast<ResultType*>(sourcePtr.release()));
 }
 
+template<typename T, typename Type = void>
+using SfinaeCheck = Type;
+
 template<typename Object, typename Deleter>
 std::unique_ptr<Object, Deleter> wrapUnique(Object* ptr, Deleter deleter)
 {
@@ -88,6 +91,25 @@ std::shared_ptr<Object> wrapShared(Object* ptr, Deleter deleter)
 {
     return std::shared_ptr<Object>(ptr, std::move(deleter));
 }
+
+
+/** tuple_first_element<default_type, tuple_type>.
+    \a tuple_first_element::type is typedefed to default_type if tuple_type is empty. 
+    Otherwise, to the type of tuple's first element
+*/
+template<typename DefaultType, typename T> struct tuple_first_element;
+
+template<typename DefaultType, typename Head, typename... Args>
+struct tuple_first_element<DefaultType, std::tuple<Head, Args...>>
+{
+    typedef Head type;
+};
+
+template<typename DefaultType>
+struct tuple_first_element<DefaultType, std::tuple<>>
+{
+    typedef DefaultType type;
+};
 
 }   //namespace utils
 }   //namespace nx

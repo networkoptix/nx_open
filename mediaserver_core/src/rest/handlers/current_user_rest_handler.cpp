@@ -22,7 +22,7 @@ int QnCurrentUserRestHandler::executeGet(const QString &, const QnRequestParams&
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     ec2::ApiUserDataList users;
-    if (ec2Connection->getUserManager()->getUsersSync(&users) !=  ec2::ErrorCode::ok)
+    if (ec2Connection->getUserManager(Qn::UserAccessData(owner->authUserId()))->getUsersSync(&users) !=  ec2::ErrorCode::ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error. Can't execute query 'getUsers'"));
         return nx_http::StatusCode::internalServerError;

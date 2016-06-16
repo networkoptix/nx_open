@@ -149,17 +149,17 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     ec2::ApiCameraData apiCamera;
     fromResourceToApi(cameraResource, apiCamera);
 
-    ec2::ErrorCode errorCode = connection->getCameraManager()->addCameraSync(apiCamera);
+    ec2::ErrorCode errorCode = connection->getCameraManager(Qn::kDefaultUserAccess)->addCameraSync(apiCamera);
     if( errorCode != ec2::ErrorCode::ok ) {
         NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
         return;
     }
 
-    propertyDictionary->saveParams( cameraResource->getId() );
     QnResourcePtr existCamRes = qnResPool->getResourceById(cameraResource->getId());
     if (existCamRes && existCamRes->getTypeId() != cameraResource->getTypeId())
         qnResPool->removeResource(existCamRes);
     QnCommonMessageProcessor::instance()->updateResource(cameraResource);
+    propertyDictionary->saveParams( cameraResource->getId() );
 
     if (!existCamRes && m_defaultUserAttrs)
     {
@@ -175,7 +175,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         ec2::ApiCameraAttributesDataList attrsList;
         fromResourceListToApi(QnCameraUserAttributesList() << userAttrCopy, attrsList);
 
-        ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(attrsList);
+        ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager(Qn::kDefaultUserAccess)->saveUserAttributesSync(attrsList);
         if (errCode != ec2::ErrorCode::ok)
         {
             NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );

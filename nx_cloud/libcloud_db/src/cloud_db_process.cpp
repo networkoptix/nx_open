@@ -10,6 +10,7 @@
 #include <iostream>
 #include <list>
 #include <thread>
+#include <type_traits>
 
 #include <QtCore/QDir>
 #include <QtSql/QSqlQuery>
@@ -20,30 +21,18 @@
 #include <nx/network/http/auth_tools.h>
 #include <utils/common/cpp14.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/type_utils.h>
 #include <utils/common/systemerror.h>
 #include <utils/db/db_structure_updater.h>
 #include <utils/common/guard.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 
+#include <cloud_db_client/src/cdb_request_path.h>
+
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
-#include "http_handlers/activate_account_handler.h"
-#include "http_handlers/add_account_handler.h"
-#include "http_handlers/bind_system_handler.h"
-#include "http_handlers/get_account_handler.h"
-#include "http_handlers/update_account_handler.h"
-#include "http_handlers/reset_password_handler.h"
-#include "http_handlers/reactivate_account_handler.h"
-#include "http_handlers/get_access_role_list.h"
-#include "http_handlers/get_cloud_users_of_system.h"
-#include "http_handlers/get_systems_handler.h"
-#include "http_handlers/update_system_name_handler.h"
-#include "http_handlers/get_cdb_nonce_handler.h"
-#include "http_handlers/get_authentication_response_handler.h"
 #include "http_handlers/ping.h"
-#include "http_handlers/unbind_system_handler.h"
-#include "http_handlers/share_system_handler.h"
 #include "managers/account_manager.h"
 #include "managers/auth_provider.h"
 #include "managers/email_manager.h"
@@ -75,7 +64,9 @@ CloudDBProcess::CloudDBProcess( int argc, char **argv )
     m_argc( argc ),
     m_argv( argv ),
     m_terminated( false ),
-    m_timerID( -1 )
+    m_timerID( -1 ),
+    m_httpMessageDispatcher( nullptr ),
+    m_authorizationManager( nullptr )
 {
 #ifdef USE_QAPPLICATION
     setServiceDescription(QnLibCloudDbAppInfo::applicationDisplayName());
@@ -161,6 +152,7 @@ int CloudDBProcess::exec()
             settings.auth().rulesXmlPath);
 
         nx_http::MessageDispatcher httpMessageDispatcher;
+        m_httpMessageDispatcher = &httpMessageDispatcher;
 
         //creating data managers
         TemporaryAccountPasswordManager tempPasswordManager(
@@ -185,9 +177,9 @@ int CloudDBProcess::exec()
         //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
         authRestrictionList.allow(PingHandler::kHandlerPath, AuthMethod::noAuth);
-        authRestrictionList.allow(AddAccountHttpHandler::kHandlerPath, AuthMethod::noAuth);
-        authRestrictionList.allow(ActivateAccountHandler::kHandlerPath, AuthMethod::noAuth);
-        authRestrictionList.allow(ReactivateAccountHttpHandler::kHandlerPath, AuthMethod::noAuth);
+        authRestrictionList.allow(kAccountRegisterPath, AuthMethod::noAuth);
+        authRestrictionList.allow(kAccountActivatePath, AuthMethod::noAuth);
+        authRestrictionList.allow(kAccountReactivatePath, AuthMethod::noAuth);
 
         std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
         authDataProviders.push_back(&accountManager);
@@ -201,6 +193,7 @@ int CloudDBProcess::exec()
             streeManager,
             accountManager,
             systemManager);
+        m_authorizationManager = &authorizationManager;
 
         AuthenticationProvider authProvider(
             settings,
@@ -331,102 +324,93 @@ void CloudDBProcess::registerApiHandlers(
 {
     msgDispatcher->registerRequestProcessor<PingHandler>(
         PingHandler::kHandlerPath,
-        [&authorizationManager]() -> std::unique_ptr<PingHandler> {
-            return std::make_unique<PingHandler>( authorizationManager );
-        } );
+        [&authorizationManager]() -> std::unique_ptr<PingHandler>
+        {
+            return std::make_unique<PingHandler>(authorizationManager);
+        });
 
     //accounts
-    msgDispatcher->registerRequestProcessor<AddAccountHttpHandler>(
-        AddAccountHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<AddAccountHttpHandler> {
-            return std::make_unique<AddAccountHttpHandler>( accountManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAccountRegisterPath,
+        &AccountManager::addAccount, accountManager,
+        EntityType::account, DataActionType::insert);
 
-    msgDispatcher->registerRequestProcessor<ActivateAccountHandler>(
-        ActivateAccountHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<ActivateAccountHandler> {
-            return std::make_unique<ActivateAccountHandler>( accountManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAccountActivatePath,
+        &AccountManager::activate, accountManager,
+        EntityType::account, DataActionType::update);
 
-    msgDispatcher->registerRequestProcessor<GetAccountHttpHandler>(
-        GetAccountHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<GetAccountHttpHandler> {
-            return std::make_unique<GetAccountHttpHandler>( accountManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAccountGetPath,
+        &AccountManager::getAccount, accountManager,
+        EntityType::account, DataActionType::fetch);
 
-    msgDispatcher->registerRequestProcessor<UpdateAccountHttpHandler>(
-        UpdateAccountHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<UpdateAccountHttpHandler> {
-            return std::make_unique<UpdateAccountHttpHandler>( accountManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAccountUpdatePath,
+        &AccountManager::updateAccount, accountManager,
+        EntityType::account, DataActionType::update);
 
-    msgDispatcher->registerRequestProcessor<ResetPasswordHttpHandler>(
-        ResetPasswordHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<ResetPasswordHttpHandler> {
-            return std::make_unique<ResetPasswordHttpHandler>( accountManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAccountPasswordResetPath,
+        &AccountManager::resetPassword, accountManager,
+        EntityType::account, DataActionType::update);
 
-    msgDispatcher->registerRequestProcessor<ReactivateAccountHttpHandler>(
-        ReactivateAccountHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<ReactivateAccountHttpHandler> {
-            return std::make_unique<ReactivateAccountHttpHandler>( accountManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAccountReactivatePath,
+        &AccountManager::reactivateAccount, accountManager,
+        EntityType::account, DataActionType::update);
+
+    registerHttpHandler(
+        kAccountCreateTemporaryCredentialsPath,
+        &AccountManager::createTemporaryCredentials, accountManager,
+        EntityType::account, DataActionType::update);
 
     //systems
-    msgDispatcher->registerRequestProcessor<BindSystemHandler>(
-        BindSystemHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<BindSystemHandler> {
-            return std::make_unique<BindSystemHandler>( systemManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kSystemBindPath,
+        &SystemManager::bindSystemToAccount, systemManager,
+        EntityType::system, DataActionType::insert);
 
-    msgDispatcher->registerRequestProcessor<GetSystemsHandler>(
-        GetSystemsHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<GetSystemsHandler> {
-            return std::make_unique<GetSystemsHandler>( systemManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kSystemGetPath,
+        &SystemManager::getSystems, systemManager,
+        EntityType::system, DataActionType::fetch);
 
-    msgDispatcher->registerRequestProcessor<UnbindSystemHandler>(
-        UnbindSystemHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<UnbindSystemHandler> {
-            return std::make_unique<UnbindSystemHandler>( systemManager, authorizationManager );
-        } );
+    registerHttpHandler(
+        kSystemUnbindPath,
+        &SystemManager::unbindSystem, systemManager,
+        EntityType::system, DataActionType::_delete);
 
-    msgDispatcher->registerRequestProcessor<ShareSystemHttpHandler>(
-        ShareSystemHttpHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<ShareSystemHttpHandler> {
-            return std::make_unique<ShareSystemHttpHandler>(systemManager, authorizationManager);
-        } );
+    registerHttpHandler(
+        kSystemSharePath,
+        &SystemManager::shareSystem, systemManager,
+        EntityType::system, DataActionType::update);
 
-    msgDispatcher->registerRequestProcessor<GetCloudUsersOfSystemHandler>(
-        GetCloudUsersOfSystemHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<GetCloudUsersOfSystemHandler> {
-            return std::make_unique<GetCloudUsersOfSystemHandler>(systemManager, authorizationManager);
-        } );
+    registerHttpHandler(
+        kSystemGetCloudUsersPath,
+        &SystemManager::getCloudUsersOfSystem, systemManager,
+        EntityType::system, DataActionType::fetch);
 
-    msgDispatcher->registerRequestProcessor<GetAccessRoleListHandler>(
-        GetAccessRoleListHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<GetAccessRoleListHandler> {
-            return std::make_unique<GetAccessRoleListHandler>(systemManager, authorizationManager);
-        });
+    registerHttpHandler(
+        kSystemGetAccessRoleListPath,
+        &SystemManager::getAccessRoleList, systemManager,
+        EntityType::system, DataActionType::fetch);
 
-    msgDispatcher->registerRequestProcessor<UpdateSystemNameHttpHandler>(
-        UpdateSystemNameHttpHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<UpdateSystemNameHttpHandler> {
-            return std::make_unique<UpdateSystemNameHttpHandler>(systemManager, authorizationManager);
-        });
+    registerHttpHandler(
+        kSystemUpdateSystemNamePath,
+        &SystemManager::updateSystemName, systemManager,
+        EntityType::system, DataActionType::update);
 
     //authentication
-    msgDispatcher->registerRequestProcessor<GetCdbNonceHandler>(
-        GetCdbNonceHandler::kHandlerPath,
-        [authProvider, &authorizationManager]() -> std::unique_ptr<GetCdbNonceHandler> {
-            return std::make_unique<GetCdbNonceHandler>( authProvider, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAuthGetNoncePath,
+        &AuthenticationProvider::getCdbNonce, authProvider,
+        EntityType::account, DataActionType::fetch);
 
-    msgDispatcher->registerRequestProcessor<GetAuthenticationResponseHandler>(
-        GetAuthenticationResponseHandler::kHandlerPath,
-        [authProvider, &authorizationManager]() -> std::unique_ptr<GetAuthenticationResponseHandler> {
-            return std::make_unique<GetAuthenticationResponseHandler>( authProvider, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAuthGetAuthenticationPath,
+        &AuthenticationProvider::getAuthenticationResponse, authProvider,
+        EntityType::account, DataActionType::fetch);
 }
 
 bool CloudDBProcess::initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManager )
@@ -523,7 +507,72 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddDeletedSystemState);
     dbStructureUpdater.addUpdateScript(db::kSystemExpirationTime);
     dbStructureUpdater.addUpdateScript(db::kReplaceBlobWithVarchar);
+    dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentials);
     return dbStructureUpdater.updateStructSync();
+}
+
+template<typename ManagerType, typename InputData, typename... OutputData>
+void CloudDBProcess::registerHttpHandler(
+    const char* handlerPath,
+    void (ManagerType::*managerFunc)(
+        const AuthorizationInfo& authzInfo,
+        InputData inputData,
+        std::function<void(api::ResultCode, OutputData...)> completionHandler),
+    ManagerType* manager,
+    EntityType entityType,
+    DataActionType dataActionType)
+{
+    typedef typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type
+        ActualOutputDataType;
+
+    typedef AbstractFiniteMsgBodyHttpHandler<
+        typename std::remove_const<typename std::remove_reference<InputData>::type>::type,
+        typename std::remove_const<typename std::remove_reference<ActualOutputDataType>::type>::type
+    > HttpHandlerType;
+
+    m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
+        handlerPath,
+        [this, managerFunc, manager, entityType, dataActionType]()
+            -> std::unique_ptr<HttpHandlerType>
+        {
+            using namespace std::placeholders;
+            return std::make_unique<HttpHandlerType>(
+                entityType,
+                dataActionType,
+                *m_authorizationManager,
+                std::bind(managerFunc, manager, _1, _2, _3));
+        });
+}
+
+template<typename ManagerType, typename... OutputData>
+void CloudDBProcess::registerHttpHandler(
+    const char* handlerPath,
+    void (ManagerType::*managerFunc)(
+        const AuthorizationInfo& authzInfo,
+        std::function<void(api::ResultCode, OutputData...)> completionHandler),
+    ManagerType* manager,
+    EntityType entityType,
+    DataActionType dataActionType)
+{
+    typedef typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type
+        ActualOutputDataType;
+    typedef AbstractFiniteMsgBodyHttpHandler<
+        void,
+        typename std::remove_const<typename std::remove_reference<ActualOutputDataType>::type>::type
+    > HttpHandlerType;
+
+    m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
+        handlerPath,
+        [this, managerFunc, manager, entityType, dataActionType]()
+            -> std::unique_ptr<HttpHandlerType>
+        {
+            using namespace std::placeholders;
+            return std::make_unique<HttpHandlerType>(
+                entityType,
+                dataActionType,
+                *m_authorizationManager,
+                std::bind(managerFunc, manager, _1, _2));
+        });
 }
 
 }   //cdb

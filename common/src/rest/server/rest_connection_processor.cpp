@@ -12,19 +12,19 @@
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 
-static const QByteArray NOT_ADMIN_UNAUTHORIZED_HTML("\
+static const QByteArray NOT_AUTHORIZED_HTML("\
     <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
     <HTML>\
     <HEAD>\
     <TITLE>Error</TITLE>\
     <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=utf-8\">\
     </HEAD>\
-    <BODY><H1>401 Unauthorized. <br> Administrator permissions are required.</H1></BODY>\
+    <BODY><H1>401 Unauthorized. <br> You don't have required permissions.</H1></BODY>\
     </HTML>"
 );
 
 
-void QnRestProcessorPool::registerHandler( const QString& path, QnRestRequestHandler* handler, RestPermissions permissions )
+void QnRestProcessorPool::registerHandler(const QString& path, QnRestRequestHandler* handler, Qn::GlobalPermission permissions )
 {
     m_handlers.insert(path, QnRestRequestHandlerPtr(handler));
     handler->setPath(path);
@@ -63,7 +63,8 @@ public:
 };
 
 QnRestConnectionProcessor::QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket)
+    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket),
+    m_noAuth(false)
 {
     Q_D(QnRestConnectionProcessor);
     d->owner = _owner;
@@ -103,19 +104,17 @@ void QnRestConnectionProcessor::run()
     QnRestRequestHandlerPtr handler = QnRestProcessorPool::instance()->findHandler(url.path());
     if (handler)
     {
-        if (handler->permissions() == RestPermissions::adminOnly)
+        if (!m_noAuth)
         {
             QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->authUserId);
             if (!user)
             {
-                sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_ADMIN_UNAUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
                 return;
             }
-
-            bool isAdmin = qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
-            if (!isAdmin)
+            if (!qnResourceAccessManager->hasGlobalPermission(user, handler->permissions()))
             {
-                sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_ADMIN_UNAUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
                 return;
             }
         }
@@ -158,6 +157,11 @@ QnUuid QnRestConnectionProcessor::authUserId() const
 {
     Q_D(const QnRestConnectionProcessor);
     return d->authUserId;
+}
+
+void QnRestConnectionProcessor::setAuthNotRequired(bool noAuth)
+{
+    m_noAuth = noAuth;
 }
 
 void QnRestConnectionProcessor::setAuthUserId(const QnUuid& authUserId)

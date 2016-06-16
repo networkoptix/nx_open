@@ -7,7 +7,8 @@
 #ifndef NX_CDB_ACCOUNT_DATA_H
 #define NX_CDB_ACCOUNT_DATA_H
 
-#include <stdint.h>
+#include <cstdint>
+#include <chrono>
 #include <string>
 
 #include <boost/optional.hpp>
@@ -65,6 +66,30 @@ public:
     std::string email;
 };
 
+
+class TemporaryCredentialsParams
+{
+public:
+    std::chrono::seconds expirationPeriod;
+    /** if \a true, each request, authorized with these credentials, 
+        increases credentials life time by \a prolongationPeriod.
+    */
+    bool autoProlongationEnabled;
+    std::chrono::seconds prolongationPeriod;
+
+    TemporaryCredentialsParams()
+    :
+        autoProlongationEnabled(false)
+    {
+    }
+};
+
+class TemporaryCredentials
+{
+public:
+    std::string login;
+    std::string password;
+};
 
 }   //api
 }   //cdb

@@ -18,7 +18,7 @@ public:
     /*!
         Takes ownership of \a handler
     */
-    void registerHandler( const QString& path, QnRestRequestHandler* handler, RestPermissions permissions = RestPermissions::anyUser);
+    void registerHandler( const QString& path, QnRestRequestHandler* handler, Qn::GlobalPermission permissions = Qn::GlobalPermission::NoGlobalPermissions);
     QnRestRequestHandlerPtr findHandler( QString path ) const;
     const Handlers& handlers() const;
 
@@ -34,6 +34,7 @@ class QnRestConnectionProcessor: public QnTCPConnectionProcessor {
 public:
     QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRestConnectionProcessor();
+    void setAuthNotRequired(bool noAuth);
 
     QnUuid authUserId() const;
     void setAuthUserId(const QnUuid& authUserId);
@@ -46,6 +47,7 @@ protected:
     virtual void run() override;
 
 private:
+    bool m_noAuth;
     Q_DECLARE_PRIVATE(QnRestConnectionProcessor);
 };
 

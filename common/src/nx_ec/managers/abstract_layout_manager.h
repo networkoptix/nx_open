@@ -7,13 +7,24 @@
 
 namespace ec2
 {
+
+class AbstractLayoutNotificationManager : public QObject
+{
+    Q_OBJECT
+public:
+
+signals:
+    void addedOrUpdated(const ec2::ApiLayoutData& layout);
+    void removed(const QnUuid& id);
+};
+
+typedef std::shared_ptr<AbstractLayoutNotificationManager> AbstractLayoutNotificationManagerPtr;
+
     /*!
     \note All methods are asynchronous if other not specified
     */
-    class AbstractLayoutManager: public QObject
+    class AbstractLayoutManager
     {
-        Q_OBJECT
-
     public:
         virtual ~AbstractLayoutManager() {}
 
@@ -54,10 +65,6 @@ namespace ec2
             return remove(layoutId, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
-
-    signals:
-        void addedOrUpdated(const ec2::ApiLayoutData& layout);
-        void removed(const QnUuid& id);
 
     protected:
         virtual int getLayouts(impl::GetLayoutsHandlerPtr handler) = 0;

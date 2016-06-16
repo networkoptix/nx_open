@@ -1669,7 +1669,7 @@ bool SslSocket::shutdown()
         return d->wrappedSocket->shutdown();
 
     utils::promise<void> promise;
-    d->wrappedSocket->post([&]()
+    d->wrappedSocket->dispatch([&]()
     {
         if (d->sendPromise)
             d->sendPromise->set_value({0, SystemError::interrupted});

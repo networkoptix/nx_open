@@ -15,6 +15,7 @@ const char* kAccountGetPath = "/cdb/account/get";
 const char* kAccountUpdatePath = "/cdb/account/update";
 const char* kAccountPasswordResetPath = "/cdb/account/reset_password";
 const char* kAccountReactivatePath = "/cdb/account/reactivate";
+const char* kAccountCreateTemporaryCredentialsPath = "/cdb/account/createTemporaryCredentials";
 
 const char* kSystemBindPath = "/cdb/system/bind";
 const char* kSystemUnbindPath = "/cdb/system/unbind";
