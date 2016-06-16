@@ -155,6 +155,14 @@ namespace
                  item.features.testFlag(QStyleOptionViewItem::HasCheckIndicator);
     }
 
+    /* Checks whether view item contains an icon without text or checkbox: */
+    bool isIconOnlyItem(const QStyleOptionViewItem& item)
+    {
+        return !item.features.testFlag(QStyleOptionViewItem::HasDisplay) &&
+               !item.features.testFlag(QStyleOptionViewItem::HasCheckIndicator) &&
+                item.features.testFlag(QStyleOptionViewItem::HasDecoration) && !item.icon.isNull();
+    }
+
     /* Checks whether specified color is opaque: */
     bool isColorOpaque(const QColor& color)
     {
@@ -2321,15 +2329,25 @@ QRect QnNxStyle::subElementRect(
             }
             /* FALL THROUGH */
         }
+
         case SE_ItemViewItemText:
         case SE_ItemViewItemDecoration:
         {
             if (auto item = qstyleoption_cast<const QStyleOptionViewItem*>(option))
             {
-                QStyleOptionViewItem newOpt(*item);
                 int defaultMargin = pixelMetric(PM_FocusFrameHMargin, option, widget) + 1;
                 int marginAddition = qMax(Metrics::kStandardPadding - defaultMargin, 0);
-                newOpt.rect.adjust(marginAddition, 0, -marginAddition, 0);
+                QRect rect = item->rect.adjusted(marginAddition, 0, -marginAddition, 0);
+
+                /* Workaround to be able to align icon in an icon-only viewitem by model / Qt::TextAlignmentRole: */
+                if (isIconOnlyItem(*item))
+                {
+                    QSize iconSize = item->icon.actualSize(item->decorationSize);
+                    return alignedRect(item->direction, item->displayAlignment, iconSize, rect);
+                }
+
+                QStyleOptionViewItem newOpt(*item);
+                newOpt.rect = rect;
                 return base_type::subElementRect(subElement, &newOpt, widget);
             }
             break;
