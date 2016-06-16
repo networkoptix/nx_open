@@ -148,6 +148,31 @@ QString QnFileStorageResource::getPath() const
         return QUrl(url).path();
 }
 
+qint64 QnFileStorageResource::getTotalSpaceWithoutInit()
+{
+    bool valid = false;
+    QString url = getUrl();
+    if (url.isNull() || url.isEmpty())
+        return -1;
+    {
+        QnMutexLocker lock(&m_mutexCheckStorage);
+        valid = m_valid;
+    }
+    if (valid == true)
+        return getTotalSpace();
+    else if (url.contains("://"))
+    {
+        valid = mountTmpDrive() == 0;
+        {
+            QnMutexLocker lock(&m_mutexCheckStorage);
+            m_valid = valid;
+        }
+        return getTotalSpace();
+    }
+    // local storage
+    return getDiskTotalSpace(getPath());
+}
+
 bool QnFileStorageResource::initOrUpdateInternal() const
 {
     QString url;

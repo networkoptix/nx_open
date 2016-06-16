@@ -542,7 +542,15 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
     QnStorageResourceList result;
     for (const auto& storage: storages)
     {
-        const qint64 totalSpace = storage->getTotalSpace();
+        qint64 totalSpace = -1;
+        auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+        if (fileStorage)
+            totalSpace = fileStorage->getTotalSpaceWithoutInit();
+        else
+        {
+            storage->initOrUpdate();
+            totalSpace = storage->getTotalSpace();
+        }
         if (totalSpace != QnStorageResource::kUnknownSize && totalSpace < storage->getSpaceLimit())
             result << storage; // if storage size isn't known do not delete it
     }
@@ -647,19 +655,11 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
                 return;
         }
         for(const auto& storage: storages)
-        {
             messageProcessor->updateResource( storage );
 
-            // initialize storage immediately in sync mode
-            if (QnStorageResourcePtr qnStorage =
-                qnResPool->getResourceById(storage.id).dynamicCast<QnStorageResource>())
-            {
-                if (qnStorage->getParentId() == qnCommon->moduleGUID())
-                    qnStorage->initOrUpdate();
-            }
-        }
         QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
-        if (!storagesToRemove.isEmpty()) {
+        if (!storagesToRemove.isEmpty())
+        {
             ec2::ApiIdDataList idList;
             for (const auto& value: storagesToRemove)
                 idList.push_back(value->getId());
