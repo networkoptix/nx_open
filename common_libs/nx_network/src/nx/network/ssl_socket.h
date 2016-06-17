@@ -89,9 +89,9 @@ public:
     virtual bool getNonBlockingMode(bool* val) const override;
     virtual bool shutdown() override;
 
-protected:
     enum IOMode { ASYNC, SYNC };
 
+protected:
     Q_DECLARE_PRIVATE(SslSocket);
     SslSocketPrivate *d_ptr;
 

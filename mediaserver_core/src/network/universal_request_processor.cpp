@@ -237,9 +237,9 @@ void QnUniversalRequestProcessor::pleaseStop()
 {
     Q_D(QnUniversalRequestProcessor);
     QnMutexLocker lock( &d->mutex );
-    QnTCPConnectionProcessor::pleaseStop();
     if (d->processor)
         d->processor->pleaseStop();
+    QnTCPConnectionProcessor::pleaseStop();
 }
 
 bool QnUniversalRequestProcessor::isProxy(const nx_http::Request& request)

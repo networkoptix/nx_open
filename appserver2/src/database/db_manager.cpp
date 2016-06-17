@@ -1114,7 +1114,7 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
             qWarning() << Q_FUNC_INFO << "Can' deserialize transaction from transaction log";
             return false;
         }
-        if (data.name == lit("supportedMotion") && data.value.isEmpty())
+        if (data.name == lit("supportedMotion") && (data.value.isEmpty() || data.value.toInt() == 1))
         {
             updQuery.addBindValue(QnSql::serialized_field(tranGuid));
             if (!updQuery.exec()) {
@@ -1342,6 +1342,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
         if (!m_dbJustCreated)
             m_needResyncbRules = true;
+    }
+    else if (updateName == lit(":/updates/52_fix_onvif_mt.sql"))
+	{
+        return removeWrongSupportedMotionTypeForONVIF(); //TODO: #rvasilenko consistency break
     }
 
     return true;
