@@ -1,5 +1,7 @@
 #include "layouts_model.h"
 
+#include <QtCore/QCoreApplication>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -31,6 +33,8 @@ struct ModelItem
 
 class QnLayoutsModelUnsorted : public Connective<QAbstractListModel>
 {
+    Q_DECLARE_TR_FUNCTIONS(QnLayoutsModelUnsorted)
+
     using base_type = Connective<QAbstractListModel>;
 
 public:
