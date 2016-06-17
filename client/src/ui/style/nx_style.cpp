@@ -2834,6 +2834,12 @@ void QnNxStyle::polish(QWidget *widget)
         widget->setAttribute(Qt::WA_Hover);
     }
 
+    if (qobject_cast<QAbstractButton*>(widget))
+    {
+        /* Install event filter to process wheel events: */
+        widget->installEventFilter(this);
+    }
+
     if (auto button = qobject_cast<QToolButton*>(widget))
     {
         /* Left scroll button in a tab bar: add shadow effect: */
@@ -2950,6 +2956,9 @@ void QnNxStyle::unpolish(QWidget* widget)
         tabBar->removeEventFilter(this);
     }
 
+    if (qobject_cast<QAbstractButton*>(widget))
+        widget->removeEventFilter(this);
+
     if (auto button = qobject_cast<QToolButton*>(widget))
     {
         /* Left scroll button in a tab bar: remove shadow effect: */
@@ -3014,6 +3023,16 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
                 }
                 break;
             }
+        }
+    }
+    /* Disabled QAbstractButton eats mouse wheel events.
+     * Here we correct this: */
+    else if (auto button = qobject_cast<QAbstractButton*>(object))
+    {
+        if (!button->isEnabled() && event->type() == QEvent::Wheel)
+        {
+            event->ignore();
+            return true;
         }
     }
 
