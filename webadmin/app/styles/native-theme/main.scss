@@ -3,8 +3,12 @@
 @import '_theme_variables';
 
 @import '../../bower_components/sass-bootstrap/lib/bootstrap';
-
 @import '_theme_override';
+
+* {
+  @import '_theme_hint';
+  @import '../../bower_components/hint.css/src/hint';
+}
 
 html {
   position: relative;

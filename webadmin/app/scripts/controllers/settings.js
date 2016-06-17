@@ -43,12 +43,10 @@ angular.module('webadminApp')
         };
 
 
-        $scope.openDisconnectDialog = function () {
+        $scope.openRestoreDefaultsDialog = function () {
             //1. confirm detach
-            var confirmation = $scope.singleServer?
-                'This server will be disconnected from old server and turned into a new one':
-                'Reset system: clear system name, administrator account and cloud settings';
-            dialogs.confirmWithPassword(null, confirmation, 'Create New System').then(function(oldPassword){
+            var confirmation = 'Do you want to clear database and settings?';
+            dialogs.confirmWithPassword(null, confirmation, 'Restore factory defaults').then(function(oldPassword){
                 mediaserver.detachFromSystem(oldPassword).then(function(data){
                     if(data.data.error !== '0' && data.data.error !== 0){
                         // Some Error has happened
@@ -135,6 +133,10 @@ angular.module('webadminApp')
             }
         });
 
+        $scope.renameSystem = function(){
+            mediaserver.changeSystemName($scope.settings.systemName).then(resultHandler, errorHandler);
+        };
+
         $scope.hardwareRestart = function(){
             dialogs.confirm('Do you want to restart server\'s operation system?').then(function(){
                 mediaserver.execute('reboot').then(resultHandler, errorHandler);
@@ -181,13 +183,8 @@ angular.module('webadminApp')
                 return false;
             });
         }
-        $scope.singleServer = true;
-
+        
         mediaserver.getMediaServers().then(function(data){
-
-            $scope.singleServer = data.data.length==1;
-            $scope.disconnectCaption = $scope.singleServer? 'Reset System': 'Disconnect Server And Create New System';
-
             $scope.mediaServers = _.sortBy(data.data,function(server){
                 // Set active state for server
                 server.active = $scope.settings.id.replace('{','').replace('}','') === server.id.replace('{','').replace('}','');
