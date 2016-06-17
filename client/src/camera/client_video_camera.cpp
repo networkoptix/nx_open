@@ -184,10 +184,10 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     QnMutexLocker lock( &m_exportMutex );
     if (!m_exportRecorder)
     {
-        if (m_resource->toResource()->hasFlags(Qn::local) && mediaStepUs > 0)
+        if (m_resource->toResource()->hasFlags(Qn::local) && timelapseFrameStepUs > 0)
         {
             auto thumbnailsReader = new QnThumbnailsStreamReader(m_resource->toResourcePtr(), new QnAviArchiveDelegate());
-            thumbnailsReader->setRange(startTimeUs, endTimeUs, mediaStepUs, 0);
+            thumbnailsReader->setRange(startTimeUs, endTimeUs, timelapseFrameStepUs, 0);
             m_exportReader = thumbnailsReader;
         }
         else
@@ -216,8 +216,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
                 rtspClient->setCamera(camera);
                 rtspClient->setPlayNowModeAllowed(false);
                 rtspClient->setAdditionalAttribute(Qn::EC2_MEDIA_ROLE, "export");
-                if (mediaStepUs > 0)
-                    rtspClient->setRange(startTimeUs, endTimeUs, mediaStepUs);
+                if (timelapseFrameStepUs > 0)
+                    rtspClient->setRange(startTimeUs, endTimeUs, timelapseFrameStepUs);
             }
 
             if (role == QnStreamRecorder::Role_FileExport)
@@ -238,8 +238,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             sender()->deleteLater();
         });
 
-        if (mediaStepUs > 0)
-            m_exportRecorder = new QnTimeLapseRecorder(m_resource->toResourcePtr(), mediaStepUs);
+        if (timelapseFrameStepUs > 0)
+            m_exportRecorder = new QnTimeLapseRecorder(m_resource->toResourcePtr(), timelapseFrameStepUs);
         else
             m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
 
