@@ -17,6 +17,7 @@
         <root.dir>${basedir}/../..</root.dir>
         <!--Specify the project to test-->      
         <master.project.directory>appserver2</master.project.directory>
+        <guid>{a1071d46-9ff2-48d3-affd-2ab7e1d70255}</guid>
 
         <qt.libs>core gui network xml sql concurrent</qt.libs>
         <global.libs>-lcommon -lnx_streaming -lnx_network -lappserver2 -lnx_utils</global.libs>
