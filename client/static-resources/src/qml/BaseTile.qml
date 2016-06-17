@@ -180,7 +180,7 @@ Item
 
             NumberAnimation
             {
-                target: expandedAreaLoader, shadow;
+                targets: [expandedAreaLoader, shadow];
                 properties: "opacity";
                 easing.type: Easing.OutCubic;
                 duration: 400;
