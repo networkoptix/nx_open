@@ -1,0 +1,64 @@
+/**********************************************************
+* Jul 17, 2016
+* akolesnikov
+***********************************************************/
+
+#include <gtest/gtest.h>
+
+#include <QtCore/QDir>
+
+#include "functional_tests/test_setup.h"
+
+
+namespace nx {
+namespace cdb {
+namespace test {
+
+class DbRegress
+:
+    public CdbFunctionalTest
+{
+public:
+    DbRegress()
+    {
+        QDir().mkpath(testDataDir());
+    }
+};
+
+TEST_F(DbRegress, general)
+{
+    //starting with old db
+    const nx::db::ConnectionOptions connectionOptions = dbConnectionOptions();
+    if (!connectionOptions.dbName.isEmpty())
+        return; //test is started with external DB: ignoring
+
+    const QString dbPath = QDir::cleanPath(testDataDir() + "/cdb_ut.sqlite");
+    QDir().remove(dbPath);
+    ASSERT_TRUE(QFile::copy(":/cdb.sqlite", dbPath));
+#ifdef _WIN32
+    ASSERT_TRUE(SetFileAttributes((LPCWSTR)dbPath.utf16(), FILE_ATTRIBUTE_NORMAL) != 0);
+#endif
+    
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    //checking that cdb has started
+    api::ResultCode result = api::ResultCode::ok;
+
+    api::AccountData account1;
+    std::string account1Password;
+    result = addActivatedAccount(&account1, &account1Password);
+    ASSERT_EQ(api::ResultCode::ok, result);
+    
+    //adding system1 to account1
+    api::SystemData system1;
+    result = bindRandomSystem(account1.email, account1Password, &system1);
+    ASSERT_EQ(api::ResultCode::ok, result);
+
+    api::AccountData account1Tmp;
+    result = getAccount(account1.email, account1Password, &account1Tmp);
+    ASSERT_EQ(api::ResultCode::ok, result);
+}
+
+}   //test
+}   //cdb
+}   //nx
