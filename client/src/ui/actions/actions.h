@@ -35,6 +35,11 @@ QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
         DisconnectAction,
 
         /**
+        * Switchs mode to browse local files/show welcome screen
+        */
+        BrowseLocalFilesModeAction,
+
+        /**
          * Forcefully disconnects from the current server (if any).
          * Connects to the server using the last used URL set in <tt>QnSettings</tt>.
          */

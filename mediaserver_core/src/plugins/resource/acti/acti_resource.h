@@ -41,7 +41,7 @@ public:
 
     //!Implementation of QnNetworkResource::checkIfOnlineAsync
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;
-    
+
     virtual QString getDriverName() const override;
 
     virtual bool getParamPhysical(const QString &id, QString &value) override;
@@ -50,8 +50,6 @@ public:
     virtual bool setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result) override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
-
-    bool isInitialized() const;
 
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
     virtual bool hasDualStreaming() const override;

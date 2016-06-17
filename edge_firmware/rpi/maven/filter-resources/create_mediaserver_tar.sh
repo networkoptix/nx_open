@@ -49,6 +49,7 @@ BINS_DIR=$BUILD_OUTPUT_DIR/bin/${build.configuration}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/${build.configuration}
 DEBS_DIR=$BUILD_OUTPUT_DIR/deb
 UBOOT_DIR=$BUILD_OUTPUT_DIR/root
+VOX_SOURCE_DIR=${ClientVoxSourceDir}
 
 STRIP=
 
@@ -218,6 +219,11 @@ if [ -e "$BINS_DIR/plugins" ]; then
     done
 fi
 
+#copying vox
+VOX_TARGET_DIR=$BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/vox
+mkdir -p $VOX_TARGET_DIR
+cp -Rf $VOX_SOURCE_DIR/* $VOX_TARGET_DIR
+
 if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
     mv -f $BUILD_DIR/etc/init.d/networkoptix-mediaserver $BUILD_DIR/etc/init.d/$CUSTOMIZATION-mediaserver
     cp -Rf $BUILD_DIR/opt/networkoptix/* $BUILD_DIR/opt/$CUSTOMIZATION
@@ -261,4 +267,4 @@ zip ./$UPDATE_NAME.zip ./*
 mv ./* ../
 cd ..
 rm -Rf zip
-rm -Rf $TEMP_DIR
+#rm -Rf $TEMP_DIR

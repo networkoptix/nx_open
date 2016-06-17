@@ -107,6 +107,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_welcome_screen.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
 
@@ -215,7 +216,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(QnActions::OpenLayoutsInNewWindowAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsInNewWindowAction_triggered()));
     connect(action(QnActions::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
-    connect(action(QnActions::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
+    connect(action(QnActions::OpenNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openNewWindowAction_triggered()));
 
     connect(action(QnActions::MediaFileSettingsAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(QnActions::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
@@ -273,6 +274,30 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::DelayedForcedExitAction),                &QAction::triggered,    this,   [this] {  closeApplication(true);    }, Qt::QueuedConnection);
 
     connect(action(QnActions::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
+
+    const auto browseAction = action(QnActions::BrowseLocalFilesModeAction);
+    const auto setWelcomeScreenVisible = [this](bool visible)
+    {
+        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->setVisible(visible);
+    };
+
+    const auto idChangedHandler = [setWelcomeScreenVisible, browseAction](const QnUuid & /* id */)
+    {
+        const bool connected = !qnCommon->remoteGUID().isNull();
+        browseAction->setChecked(connected);
+    };
+
+    connect(qnCommon, &QnCommonModule::remoteIdChanged, this, idChangedHandler);
+    connect(browseAction, &QAction::toggled, this, [setWelcomeScreenVisible](bool checked)
+    {
+        setWelcomeScreenVisible(!checked);
+    });
+
+    connect(display(), &QnWorkbenchDisplay::widgetAdded, this, [browseAction]()
+    {
+        browseAction->setChecked(true);
+    });
 
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
@@ -2165,7 +2190,8 @@ void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
     QDesktopServices::openUrl(QUrl::fromUserInput(url));
 }
 
-void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
+void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
+{
     if (qnCommon->isReadOnly())
         return;
 
@@ -2173,7 +2199,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         return;
 
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
-    if(!watcher->hasMismatches())
+    if (!watcher->hasMismatches())
         return;
 
     QnSoftwareVersion latestVersion = watcher->latestVersion();
@@ -2187,30 +2213,37 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     messageParts << tr("Some components of the system are not updated");
     messageParts << QString();
 
-    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData()) {
-        QString component;
-        switch(data.component) {
-        case Qn::ClientComponent:
-            component = tr("Client v%1").arg(data.version.toString());
-            break;
-        case Qn::ServerComponent: {
-            QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
-            if(resource) {
-                component = tr("Server v%1 at %2").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
-            } else {
-                component = tr("Server v%1").arg(data.version.toString());
+    for(const QnAppInfoMismatchData &data: watcher->mismatchData())
+    {
+        QString componentName;
+        switch (data.component)
+        {
+            case Qn::ClientComponent:
+                componentName = tr("Client");
+                break;
+            case Qn::ServerComponent:
+            {
+                QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
+                componentName = resource ? QnResourceDisplayInfo(resource).toString(Qn::RI_WithUrl) : tr("Server");
+                break;
             }
+            default:
+                break;
         }
-        default:
-            break;
-        }
+        NX_ASSERT(!componentName.isEmpty());
+        if (componentName.isEmpty())
+            continue;
+
+        QString version = data.version.toString();
 
         bool updateRequested = (data.component == Qn::ServerComponent) &&
             QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
         if (updateRequested)
-            component = setWarningStyleHtml(component);
+            version = setWarningStyleHtml(version);
 
+        /* Consistency with 'About' dialog. */
+        QString component = lit("%1: v%2").arg(componentName, version);
         messageParts << component;
     }
 
@@ -2229,7 +2262,8 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 
     QPushButton *updateButton = messageBox->addButton(tr("Update..."), QDialogButtonBox::HelpRole);
-    connect(updateButton, &QPushButton::clicked, this, [this] {
+    connect(updateButton, &QPushButton::clicked, this, [this]
+    {
         menu()->trigger(QnActions::SystemUpdateAction);
     }, Qt::QueuedConnection);
 

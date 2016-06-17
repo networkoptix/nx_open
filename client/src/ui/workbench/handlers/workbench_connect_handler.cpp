@@ -59,7 +59,7 @@
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/app_info.h>
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
 #include <utils/common/synctime.h>
 #include <utils/common/system_information.h>
 #include <utils/common/url.h>
@@ -182,7 +182,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
 
     connect(action(QnActions::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showLoginDialog);
     connect(action(QnActions::BeforeExitAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
-
+    
     context()->instance<QnAppServerNotificationCache>();
 }
 

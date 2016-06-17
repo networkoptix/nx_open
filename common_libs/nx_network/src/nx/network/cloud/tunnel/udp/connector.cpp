@@ -10,7 +10,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "outgoing_tunnel_connection.h"
 #include "rendezvous_connector_with_verification.h"

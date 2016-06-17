@@ -78,9 +78,9 @@
 
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
-#include <utils/common/collection.h>
-#include <utils/serialization/json.h>
-#include <utils/serialization/json_functions.h>
+#include <nx/utils/collection.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/string.h>
 #include <utils/license_usage_helper.h>
 #include <utils/common/uuid_pool.h>

@@ -43,7 +43,6 @@ QnThirdPartyResource::QnThirdPartyResource(
     m_cameraManager3( nullptr )
 {
     setVendor( discoveryManager.getVendorName() );
-    setDefaultAuth(QString::fromUtf8(camInfo.defaultLogin), QString::fromUtf8(camInfo.defaultPassword));
 
     if( m_camManager )
         m_cameraManager3 = (nxcip::BaseCameraManager3*)m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager3 );
@@ -426,6 +425,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
 
+    updateDefaultAuthIfEmpty(QString::fromUtf8(m_camInfo.defaultLogin), QString::fromUtf8(m_camInfo.defaultPassword));
     QAuthenticator auth = getAuth();
 
     if( !m_camManager )

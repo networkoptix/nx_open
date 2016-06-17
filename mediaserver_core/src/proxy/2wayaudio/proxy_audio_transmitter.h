@@ -18,7 +18,7 @@ public:
     QnProxyAudioTransmitter(const QnResourcePtr& camera, const QnRequestParams &params);
     virtual ~QnProxyAudioTransmitter();
 
-    virtual bool processAudioData(QnConstAbstractMediaDataPtr &data);
+    virtual bool processAudioData(const QnConstCompressedAudioDataPtr& data) override;
 
     virtual bool isCompatible(const QnAudioFormat& format) const { return true; }
     virtual void setOutputFormat(const QnAudioFormat& /* format */) override {}

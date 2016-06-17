@@ -23,8 +23,7 @@ signals:
     void settingsChanged();
 
 private:
-    void loadSettings(const QString &server, QnEmail::ConnectionType connectionType, int port = 0);
-    void validateEmail();
+    void setConnectionType(QnEmail::ConnectionType connectionType, int port = 0);
 
     void at_portComboBox_currentIndexChanged(int index);
 

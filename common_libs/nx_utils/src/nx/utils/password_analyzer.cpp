@@ -5,6 +5,10 @@
 #include <string>
 #include <array>
 
+#ifdef _DEBUG
+//#define ALLOW_ANY_PASSWORD
+#endif
+
 using namespace nx::utils;
 
 namespace
@@ -27,6 +31,10 @@ namespace
 
 PasswordStrength nx::utils::passwordStrength(const QString& password)
 {
+#ifdef ALLOW_ANY_PASSWORD
+    return PasswordStrength::Good;
+#endif
+
     std::array<int, CharCategoryLookup::ValidCategoryCount> categories;
     categories.fill(0);
 

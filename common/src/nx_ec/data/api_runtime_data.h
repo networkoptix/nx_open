@@ -5,7 +5,7 @@
 #include "api_data.h"
 #include "api_peer_data.h"
 #include "api_routing_data.h"
-#include "utils/common/latin1_array.h"
+#include "nx/utils/latin1_array.h"
 
 namespace ec2
 {

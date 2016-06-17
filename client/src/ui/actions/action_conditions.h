@@ -496,6 +496,13 @@ public:
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
+class QnTimelineVisibleActionCondition : public QnActionCondition
+{
+public:
+    QnTimelineVisibleActionCondition(QObject* parent) : QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 class QnToggleTitleBarActionCondition: public QnActionCondition
 {
 public:
@@ -610,6 +617,14 @@ class QnLoggedInCondition: public QnActionCondition
 public:
     QnLoggedInCondition(QObject* parent): QnActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnBrowseLocalFilesCondition : public QnActionCondition
+{
+public:
+    QnBrowseLocalFilesCondition(QObject* parent);
+
+    virtual Qn::ActionVisibility check(const QnActionParameters& parameters) override;
 };
 
 class QnShowcaseActionCondition: public QnActionCondition

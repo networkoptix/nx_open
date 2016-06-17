@@ -92,7 +92,7 @@ QString QnAboutDialog::connectedServers() const
     if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
         latestMsVersion = latestVersion;
 
-    QString servers;
+    QStringList servers;
     for (const QnAppInfoMismatchData &data: watcher->mismatchData())
     {
         if (data.component != Qn::ServerComponent)
@@ -102,17 +102,17 @@ QString QnAboutDialog::connectedServers() const
         if (!server)
             continue;
 
-        QString serverText = lit("%1: v%2<br/>").arg(QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl)).arg(data.version.toString());
+        QString serverText = lit("%1: v%2").arg(QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl), data.version.toString());
 
         bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
         if (updateRequested)
             serverText = setWarningStyleHtml(serverText);
 
-        servers += serverText;
+        servers << serverText;
     }
 
-    return servers;
+    return servers.join(lit("<br/>"));
 }
 
 void QnAboutDialog::retranslateUi()

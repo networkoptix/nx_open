@@ -4,7 +4,7 @@
 
 #include <utils/math/math.h>
 #include <utils/math/coordinate_transformations.h>
-#include <utils/serialization/lexical_functions.h>
+#include <nx/fusion/serialization/lexical_functions.h>
 
 #include <core/resource/resource_data.h>
 #include <core/resource/camera_resource.h>

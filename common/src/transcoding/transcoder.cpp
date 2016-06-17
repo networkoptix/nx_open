@@ -17,7 +17,7 @@
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <core/resource/camera_resource.h>
-#include <utils/serialization/json.h>
+#include <nx/fusion/serialization/json.h>
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(CodecID codecId)

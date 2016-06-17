@@ -6,80 +6,46 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>262</width>
-    <height>135</height>
+    <width>276</width>
+    <height>209</height>
    </rect>
   </property>
-  <layout class="QFormLayout" name="formLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="emailLabel">
-     <property name="text">
-      <string>Email:</string>
-     </property>
-     <property name="buddy">
-      <cstring>emailLineEdit</cstring>
-     </property>
-    </widget>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QnInputField" name="emailInputField" native="true"/>
    </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="emailLineEdit"/>
+   <item>
+    <widget class="QnInputField" name="passwordInputField" native="true"/>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="passwordLabel">
-     <property name="text">
-      <string>Password:</string>
-     </property>
-     <property name="buddy">
-      <cstring>passwordLineEdit</cstring>
-     </property>
-    </widget>
+   <item>
+    <widget class="QnInputField" name="signatureInputField" native="true"/>
    </item>
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="passwordLineEdit">
-     <property name="echoMode">
-      <enum>QLineEdit::Password</enum>
-     </property>
-    </widget>
+   <item>
+    <widget class="QnInputField" name="supportInputField" native="true"/>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="signatureLabel">
-     <property name="text">
-      <string>System Signature:</string>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-     <property name="buddy">
-      <cstring>signatureLineEdit</cstring>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
      </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QLineEdit" name="signatureLineEdit">
-     <property name="placeholderText">
-      <string>Enter a short system description here.</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="supportEmailLabel">
-     <property name="text">
-      <string>Support Signature:</string>
-     </property>
-     <property name="buddy">
-      <cstring>supportLinkLineEdit</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QLineEdit" name="supportLinkLineEdit"/>
-   </item>
-   <item row="4" column="0" colspan="2">
-    <widget class="QLabel" name="detectErrorLabel">
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
+    </spacer>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnInputField</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/input_field.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

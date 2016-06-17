@@ -2,12 +2,13 @@
 #define BUSINESS_ACTION_PARAMETERS_H
 
 #include <business/business_fwd.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 #include <nx/utils/uuid.h>
 
 
-struct QnBusinessActionParameters {
+struct QnBusinessActionParameters
+{
     QnBusinessActionParameters();
 
     /** Additional parameter for event log convenience. Does not filled when the action really occurs. */
@@ -31,8 +32,6 @@ struct QnBusinessActionParameters {
 
     // Camera Output
     QString relayOutputId;
-    int relayAutoResetTimeout;
-    QString inputPortId;
 
     // Say Text
     QString sayText;
@@ -71,9 +70,9 @@ struct QnBusinessActionParameters {
 };
 
 #define QnBusinessActionParameters_Fields (actionResourceId)(url)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)\
-    (forced)(presetId)(useSource)(recordBeforeMs)(playToClient)
+    (relayOutputId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)(recordBeforeMs)(playToClient)
 
+/* Backward compatibility is not really important here as this class is not stored in the DB. */
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
 #endif // BUSINESS_ACTION_PARAMETERS_H

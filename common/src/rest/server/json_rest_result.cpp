@@ -1,6 +1,6 @@
 #include "json_rest_result.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnRestResult::Error,
                                           (QnRestResult::NoError,               "OK")

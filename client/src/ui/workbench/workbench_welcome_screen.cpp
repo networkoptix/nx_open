@@ -52,16 +52,16 @@ namespace
     }
 }
 
-QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
-    : base_type(parent)
-    , QnWorkbenchContextAware(parent)
+QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent) :
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
 
-    , m_visibleControls(true)
-    , m_visible(false)
-    , m_connectingNow(false)
-    , m_palette(extractPalette())
-    , m_widget(createMainView(this))
-    , m_pageSize(m_widget->size())
+    m_visibleControls(true),
+    m_visible(false),
+    m_connectingNow(false),
+    m_palette(extractPalette()),
+    m_widget(createMainView(this)),
+    m_pageSize(m_widget->size())
 {
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged
@@ -71,19 +71,10 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
 
     //
     m_widget->installEventFilter(this);
-    const auto idChangedHandler = [this](const QnUuid & /* id */)
-    {
-        // We could be just reconnecting if remoteGuid is null.
-        // So, just hide screen when it is not
-        if (!qnCommon->remoteGUID().isNull())
-            setVisible(false);
-    };
 
-    connect(qnCommon, &QnCommonModule::remoteIdChanged
-        , this, idChangedHandler);
     connect(action(QnActions::DisconnectAction), &QAction::triggered
         , this, &QnWorkbenchWelcomeScreen::showScreen);
-
+        
     connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this, [this]()
     {
         context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);

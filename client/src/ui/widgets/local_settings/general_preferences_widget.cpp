@@ -114,9 +114,9 @@ void QnGeneralPreferencesWidget::applyChanges()
         extraMediaFolders.push_back(ui->extraMediaFoldersList->item(i)->text());
     qnSettings->setExtraMediaFolders(extraMediaFolders);
 
-    QStringList checkLst(qnSettings->extraMediaFolders());
-    checkLst.push_back(QDir::toNativeSeparators(qnSettings->mediaFolder()));
-    QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: #Elric re-check if it is needed here.
+//     QStringList checkLst(qnSettings->extraMediaFolders());
+//     checkLst.push_back(QDir::toNativeSeparators(qnSettings->mediaFolder()));
+//     QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: #Elric re-check if it is needed here.
 
     qnSettings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
     qnSettings->setUserIdleTimeoutMSecs(ui->pauseOnInactivityCheckBox->isChecked() ? ui->idleTimeoutSpinBox->value() * 60 * 1000 : 0);

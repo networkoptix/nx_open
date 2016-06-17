@@ -16,7 +16,7 @@
 #include "rest/server/rest_connection_processor.h"
 
 #include <utils/common/scoped_thread_rollback.h>
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 
 class ManualSearchThreadPoolHolder
 {

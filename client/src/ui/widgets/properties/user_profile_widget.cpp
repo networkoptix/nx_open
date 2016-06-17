@@ -18,6 +18,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/watchers/workbench_user_watcher.h>
 
 #include <utils/email/email.h>
 #include <utils/common/url.h>
@@ -128,10 +129,10 @@ void QnUserProfileWidget::applyChanges()
     {
         m_model->user()->setPassword(m_newPassword);
         m_model->user()->generateHash();
-        m_model->user()->setPassword(QString());
         if (m_model->mode() == QnUserSettingsModel::OwnProfile)
         {
             /* Password was changed. Change it in global settings and hope for the best. */
+            context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_newPassword);
             QUrl url = QnAppServerConnectionFactory::url();
             url.setPassword(m_newPassword);
             QnAppServerConnectionFactory::setUrl(url);

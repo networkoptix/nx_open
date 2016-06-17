@@ -5,7 +5,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 /** Struct for adding custom fields to an exported video file. */
 struct QnAviArchiveCustomData {

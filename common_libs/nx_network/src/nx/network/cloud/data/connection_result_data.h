@@ -8,7 +8,7 @@
 
 #include "stun_message_data.h"
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <utils/common/systemerror.h>
 
 

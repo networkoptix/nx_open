@@ -32,7 +32,17 @@ namespace Qn
         return [](const QString& text)
         {
             if (!text.trimmed().isEmpty() && !QnEmailAddress::isValid(text))
-                return Qn::ValidationResult(QnValidatorStrings::tr("Invalid email address."));
+                return Qn::ValidationResult(QnValidatorStrings::tr("E-Mail is not valid."));
+            return kValidResult;
+        };
+    }
+
+    TextValidateFunction defaultNonEmptyValidator(const QString& errorMessage)
+    {
+        return [errorMessage](const QString& text)
+        {
+            if (text.trimmed().isEmpty())
+                return Qn::ValidationResult(errorMessage);
             return kValidResult;
         };
     }

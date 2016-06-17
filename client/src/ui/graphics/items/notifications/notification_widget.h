@@ -19,37 +19,6 @@ class QGraphicsLinearLayout;
 class HoverFocusProcessor;
 class QnImageProvider;
 
-/**
- * An image button widget that displays thumbnail behind the button.
- */
-class QnThumbnailImageButtonWidget: public QnImageButtonWidget {
-    Q_OBJECT
-
-    typedef QnImageButtonWidget base_type;
-
-public:
-    QnThumbnailImageButtonWidget(QGraphicsItem *parent = NULL):
-        base_type(lit("thumbnails_image"), parent) {}
-
-    const QImage& thumbnail() const {
-        return m_thumbnail;
-    }
-
-    Q_SLOT void setThumbnail(const QImage &image) {
-        m_thumbnail = image;
-    }
-
-protected:
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override {
-        if (!m_thumbnail.isNull())
-            painter->drawImage(rect, m_thumbnail);
-        base_type::paint(painter, startState, endState, progress, widget, rect);
-    }
-private:
-    QImage m_thumbnail;
-};
-
-
 class QnNotificationToolTipWidget: public Clickable<QnStyledTooltipWidget> {
     Q_OBJECT
     typedef Clickable<QnStyledTooltipWidget> base_type;
@@ -76,6 +45,7 @@ public:
 signals:
     void thumbnailClicked();
     void closeTriggered();
+    void buttonClicked(const QString& alias);
 
 protected:
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
@@ -130,6 +100,7 @@ signals:
     void notificationLevelChanged();
     void closeTriggered();
     void actionTriggered(QnActions::IDType actionId, const QnActionParameters &parameters);
+    void buttonClicked(const QString& alias);
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -146,7 +117,6 @@ private slots:
     void updateOverlayGeometry();
     void updateOverlayColor();
 
-    void at_button_clicked();
     void at_thumbnail_clicked();
     void at_loop_sound();
 

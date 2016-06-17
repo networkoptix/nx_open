@@ -10,7 +10,7 @@
 #include <QtCore/QDebug>
 
 #include <utils/common/scoped_thread_rollback.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/common/concurrent.h>
 
 #include "ec2_thread_pool.h"

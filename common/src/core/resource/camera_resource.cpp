@@ -10,7 +10,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/common/util.h>
 #include <utils/math/math.h>
 
@@ -432,6 +432,15 @@ void QnVirtualCameraResource::saveParams()
 void QnVirtualCameraResource::saveParamsAsync()
 {
     propertyDictionary->saveParamsAsync(getId());
+}
+
+void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, const QString& password)
+{
+    if (getAuth().isNull())
+    {
+        setDefaultAuth(login, password);
+        saveParams();
+    }
 }
 
 int QnVirtualCameraResource::saveAsync()

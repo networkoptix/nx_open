@@ -43,6 +43,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent)
                                          QnCloudUrlHelper::aboutUrl()));
 
     connect(ui->goToCloudButton,    &QPushButton::clicked,  action(QnActions::OpenCloudMainUrl),   &QAction::trigger);
+    connect(ui->createAccountButton, &QPushButton::clicked, action(QnActions::OpenCloudRegisterUrl),   &QAction::trigger);
 
     connect(ui->linkButton, &QPushButton::clicked, this, [this]()
     {

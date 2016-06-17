@@ -34,7 +34,8 @@ QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
     m_buggyIcon(qnSkin->icon("tree/buggy.png")),
     m_colors(),
     m_fixedHeight(style::Metrics::kViewRowHeight),
-    m_rowSpacing(0)
+    m_rowSpacing(0),
+    m_customInfoLevel(Qn::ResourceInfoLevel::RI_Invalid)
 {
 }
 
@@ -68,6 +69,16 @@ void QnResourceItemDelegate::setRowSpacing(int value)
     m_rowSpacing = qMax(value, 0);
 }
 
+Qn::ResourceInfoLevel QnResourceItemDelegate::customInfoLevel() const
+{
+    return m_customInfoLevel;
+}
+
+void QnResourceItemDelegate::setCustomInfoLevel(Qn::ResourceInfoLevel value)
+{
+    m_customInfoLevel = value;
+}
+
 int QnResourceItemDelegate::fixedHeight() const
 {
     return m_fixedHeight;
@@ -98,12 +109,13 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
     QStyle* style = option.widget ? option.widget->style() : QApplication::style();
 
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if (Qn::isSeparatorNode(nodeType))
+    /* If item is separator, draw it: */
+    if (option.features == QStyleOptionViewItem::None)
     {
         int y = option.rect.top() + option.rect.height() / 2;
         QnScopedPainterPenRollback penRollback(painter, option.palette.color(QPalette::Midlight));
         painter->drawLine(0, y, option.rect.right(), y);
+        return;
     }
 
     /* Select icon and text color by item state: */
@@ -210,13 +222,13 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
 QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
 {
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if (Qn::isSeparatorNode(nodeType))
-        return style::Metrics::kSeparatorSize + QSize(0, m_rowSpacing);
-
     /* Initialize style option: */
     QStyleOptionViewItem option(styleOption);
     initStyleOption(&option, index);
+
+    /* If item is separator, return separator size: */
+    if (option.features == QStyleOptionViewItem::None)
+        return style::Metrics::kSeparatorSize + QSize(0, m_rowSpacing);
 
     // TODO #vkutin Keep this while checkboxed items are painted by default implementation:
     if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
@@ -282,8 +294,9 @@ void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const
     auto view = qobject_cast<const QAbstractItemView*>(option->widget);
     if (!view || !view->iconSize().isValid())
     {
-        enum { kMaxIconSize = 20 };
-        option->decorationSize = QSize(kMaxIconSize, m_fixedHeight > 0 ? m_fixedHeight : kMaxIconSize);
+        enum { kMaxIconSize = 32 };
+        int maxSize = m_fixedHeight > 0 ? m_fixedHeight : kMaxIconSize;
+        option->decorationSize = QSize(maxSize, maxSize);
     }
 
     /* Call inherited implementation.
@@ -293,6 +306,12 @@ void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const
     /* But if the item has no icon, restore decoration size to saved default: */
     if (option->icon.isNull())
         option->decorationSize = defaultDecorationSize;
+
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    if (Qn::isSeparatorNode(nodeType))
+        option->features = QStyleOptionViewItem::None;
+    else
+        option->features |= QStyleOptionViewItem::HasDisplay;
 }
 
 QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
@@ -397,8 +416,10 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     baseName = index.data(Qt::DisplayRole).toString();
 
     /* Two-component text from resource information: */
-    auto showExtraInfo = qnSettings->extraInfoInTree();
-    if (showExtraInfo == Qn::RI_NameOnly)
+    auto infoLevel = m_customInfoLevel;
+    if (infoLevel == Qn::RI_Invalid)
+        infoLevel = qnSettings->extraInfoInTree();
+    if (infoLevel == Qn::RI_NameOnly)
         return;
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();

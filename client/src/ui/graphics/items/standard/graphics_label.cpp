@@ -3,7 +3,7 @@
 
 #include <QtGui/QFontMetricsF>
 
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/common/text_pixmap_cache.h>

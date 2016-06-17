@@ -1,7 +1,7 @@
 
 #include "acceptor.h"
 
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "incoming_tunnel_connection.h"
 

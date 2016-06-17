@@ -55,6 +55,7 @@ public:
 
     /** Clear all local data structures. */
     void clearConnection();
+
 private:
     void at_messageProcessor_connectionOpened();
     void at_messageProcessor_connectionClosed();

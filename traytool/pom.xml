@@ -38,7 +38,7 @@
         <product.display.title>${traytool.display.name}</product.display.title>
         <template>app</template>
         <qt.libs>core gui widgets</qt.libs>
-        <global.libs>-lcommon -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>DbgHelp.lib</windows.oslibs>
 
         <rdep.packages>any/qtsingleapplication</rdep.packages>

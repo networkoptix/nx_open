@@ -9,7 +9,7 @@
 #include <core/resource/param.h>
 
 #include <nx/utils/log/log.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace {
     const QUrl validatorSchemaUrl = lit("qrc:/camera_advanced_params/schema.xsd");

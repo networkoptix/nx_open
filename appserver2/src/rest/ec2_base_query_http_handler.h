@@ -14,7 +14,7 @@
 #include <rest/server/request_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/concurrent.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/httptypes.h>
 
 #include "ec2_thread_pool.h"

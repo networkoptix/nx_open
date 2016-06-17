@@ -461,7 +461,13 @@ QAbstractItemView* QnResourceTreeWidget::treeView() const {
     return ui->resourcesTreeView;
 }
 
-void QnResourceTreeWidget::updateColumns() {
+QnResourceItemDelegate* QnResourceTreeWidget::itemDelegate() const
+{
+    return m_itemDelegate;
+}
+
+void QnResourceTreeWidget::updateColumns()
+{
     if (!model())
         return;
 

@@ -11,7 +11,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 #include <utils/common/string.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/common/adaptive_sleep.h>
 #include <utils/fs/file.h>
 #include <network/tcp_connection_priv.h>

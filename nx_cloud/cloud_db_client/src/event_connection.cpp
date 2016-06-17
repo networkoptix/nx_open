@@ -10,7 +10,7 @@
 #include <http/custom_headers.h>
 #include <utils/math/math.h>
 #include <utils/media/custom_output_stream.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "cdb_request_path.h"
 #include "data/types.h"

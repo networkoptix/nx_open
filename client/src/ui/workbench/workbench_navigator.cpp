@@ -56,6 +56,7 @@ extern "C"
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 
 #include <utils/common/checked_cast.h>
@@ -489,7 +490,22 @@ bool QnWorkbenchNavigator::isPlayingSupported() const {
     return false;
 }
 
-bool QnWorkbenchNavigator::isPlaying() const {
+bool QnWorkbenchNavigator::isTimelineRelevant() const
+{
+    if (!currentWidget())
+        return false;
+
+    if (!isPlayingSupported())
+        return false;
+
+    if (hasArchive())
+        return true;
+
+    return currentWidget()->resource()->flags().testFlag(Qn::local);
+}
+
+bool QnWorkbenchNavigator::isPlaying() const
+{
     if(!isPlayingSupported())
         return false;
     if (!m_currentMediaWidget)
@@ -573,7 +589,8 @@ bool QnWorkbenchNavigator::hasArchive() const
 
 void QnWorkbenchNavigator::updateHasArchiveState()
 {
-    const bool newValue = boost::algorithm::any_of(m_syncedWidgets, [](QnMediaResourceWidget* widget)
+    const bool newValue = accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
+        && boost::algorithm::any_of(m_syncedWidgets, [](QnMediaResourceWidget* widget)
     {
         auto camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
         return camera && !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();

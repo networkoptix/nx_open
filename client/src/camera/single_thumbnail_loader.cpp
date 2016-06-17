@@ -9,7 +9,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePtr &camera,
                                                  qint64 msecSinceEpoch,

@@ -1,5 +1,5 @@
 #include "custom_business_event.h"
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include "network/authutil.h"
 #include <business/actions/abstract_business_action.h>
 

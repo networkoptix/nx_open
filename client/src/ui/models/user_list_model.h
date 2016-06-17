@@ -9,18 +9,18 @@
 #include <ui/customization/customized.h>
 
 class QnUserListModelPrivate;
-class QnUserListModel : public Customized<QAbstractListModel>
+class QnUserListModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QnUserManagementColors colors READ colors WRITE setColors)
-    typedef Customized<QAbstractListModel> base_type;
+    typedef QAbstractListModel base_type;
 
 public:
     enum Columns {
         CheckBoxColumn,
-        NameColumn,
-        PermissionsColumn,
-        LdapColumn,
+        UserTypeColumn,
+        LoginColumn,
+        FullNameColumn,
+        UserRoleColumn,
         EnabledColumn,
 
         ColumnCount
@@ -38,8 +38,7 @@ public:
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState state, const QnUserResourcePtr& user = QnUserResourcePtr());
 
-    const QnUserManagementColors colors() const;
-    void setColors(const QnUserManagementColors& colors);
+    static bool isInteractiveColumn(int column);
 
 private:
     QnUserListModelPrivate* d;

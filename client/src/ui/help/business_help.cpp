@@ -37,7 +37,6 @@ int QnBusiness::eventHelpId(QnBusiness::EventType type) {
 int QnBusiness::actionHelpId(QnBusiness::ActionType type) {
     switch (type) {
     case QnBusiness::CameraOutputAction:
-    case QnBusiness::CameraOutputOnceAction:
         return Qn::EventsActions_CameraOutput_Help;
     case QnBusiness::CameraRecordingAction:
         return Qn::EventsActions_StartRecording_Help;

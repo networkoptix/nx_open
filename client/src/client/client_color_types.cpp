@@ -3,10 +3,10 @@
 #include <ui/style/globals.h>
 
 #include <utils/math/color_transformations.h>
-#include <utils/serialization/json_functions.h>
-#include <utils/fusion/fusion_adaptor.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/fusion/fusion_adaptor.h>
 #include <utils/math/math.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QnTimeSliderColors::QnTimeSliderColors() {
     positionMarker = QColor(255, 255, 255, 196);
@@ -197,14 +197,6 @@ QnRecordingStatsColors::QnRecordingStatsColors()
     chartForecastColor = QColor(0x0c, 0x51, 0x69);
 }
 
-
-QnUserManagementColors::QnUserManagementColors()
-{
-    disabledSelectedText = QColor(0xb5, 0xd7, 0xee);
-    disabledButtonsText = QColor(0xff, 0xff, 0xff);
-    selectionBackground = QColor(0x22, 0x53, 0x77);
-}
-
 QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {
     desktop = Qt::darkGray;
     freeSpace = Qt::lightGray;
@@ -212,7 +204,6 @@ QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {
     text = Qt::white;
     error = Qt::red;
 }
-
 
 QnServerUpdatesColors::QnServerUpdatesColors() {
     latest = Qt::green;

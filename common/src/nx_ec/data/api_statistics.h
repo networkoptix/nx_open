@@ -13,7 +13,7 @@
 #include "api_layout_data.h"
 #include "api_user_data.h"
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 // NOTE: structs with suffix 'Statistics' are only used to tell fusion which
 //       fields should be serialized for statistics (to cut out private data

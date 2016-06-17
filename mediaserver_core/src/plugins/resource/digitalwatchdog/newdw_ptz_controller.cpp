@@ -2,7 +2,7 @@
 
 #include "newdw_ptz_controller.h"
 #include "plugins/resource/digitalwatchdog/digital_watchdog_resource.h"
-#include "utils/math/fuzzy.h"
+#include "nx/utils/math/fuzzy.h"
 
 static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
 

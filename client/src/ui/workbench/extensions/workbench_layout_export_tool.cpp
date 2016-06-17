@@ -28,7 +28,7 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/local_file_cache.h>
 
@@ -79,14 +79,21 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
 }
 
 
-bool QnLayoutExportTool::prepareStorage() {
-    if (m_realFilename == QnLayoutFileStorageResource::removeProtocolPrefix(m_layout->getUrl())) {
+bool QnLayoutExportTool::prepareStorage()
+{
+    const bool isExeFile =
+#ifdef Q_OS_WIN
+        m_targetFilename.endsWith(lit(".exe"));
+#else
+        false;
+#endif
+    if (isExeFile || m_realFilename == QnLayoutFileStorageResource::removeProtocolPrefix(m_layout->getUrl())) {
         // can not override opened layout. save to tmp file, then rename
         m_realFilename += lit(".tmp");
     }
 
 #ifdef Q_OS_WIN
-    if (m_targetFilename.endsWith(lit(".exe")))
+    if (isExeFile)
     {
         if (QnNovLauncher::createLaunchingFile(m_realFilename) != 0)
         {

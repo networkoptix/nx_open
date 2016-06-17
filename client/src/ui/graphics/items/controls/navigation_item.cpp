@@ -26,6 +26,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench.h>
@@ -36,7 +37,7 @@
 
 #include <core/resource/resource.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 #include "time_slider.h"
@@ -120,6 +121,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_speedSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_speedSlider->installEventFilter(this);
     m_speedSlider->setPreferredHeight(28.0);
+    context()->statisticsModule()->registerSlider(lit("speed_slider"), m_speedSlider);
 
     m_volumeSlider = new QnVolumeSlider(this);
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
@@ -274,6 +276,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(navigator(), &QnWorkbenchNavigator::liveChanged,                this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
     connect(navigator(), &QnWorkbenchNavigator::liveSupportedChanged,       this,   &QnNavigationItem::updateLiveButtonEnabled);
     connect(navigator(), &QnWorkbenchNavigator::playingSupportedChanged,    this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::playingSupportedChanged,    this,   &QnNavigationItem::updateVolumeButtonsEnabled);
     connect(navigator(), &QnWorkbenchNavigator::speedChanged,               this,   &QnNavigationItem::updateSpeedSliderSpeedFromNavigator);
     connect(navigator(), &QnWorkbenchNavigator::speedRangeChanged,          this,   &QnNavigationItem::updateSpeedSliderParametersFromNavigator);
     connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged,          this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
@@ -321,6 +324,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     updateLiveButtonChecked();
     updateLiveButtonEnabled();
     updatePlaybackButtonsEnabled();
+    updateVolumeButtonsEnabled();
 
     updatePlaybackButtonsIcons();
     updateSpeedSliderParametersFromNavigator();
@@ -511,6 +515,12 @@ void QnNavigationItem::updatePlaybackButtonsEnabled()
     m_speedSlider->setEnabled(playable);
 }
 
+void QnNavigationItem::updateVolumeButtonsEnabled()
+{
+    bool isTimelineVisible = navigator()->isPlayingSupported();
+    m_muteButton->setEnabled(isTimelineVisible);
+}
+
 void QnNavigationItem::updateMuteButtonChecked()
 {
     m_muteButton->setChecked(m_volumeSlider->isMute());
@@ -651,24 +661,14 @@ void QnNavigationItem::at_stepForwardButton_clicked()
 QnImageButtonWidget *QnNavigationItem::newActionButton(QnActions::IDType id)
 {
     const auto statAlias = lit("%1_%2").arg(lit("navigation_item"), QnLexical::serialized(id));
-    QnImageButtonWidget *button = new QnImageButtonWidget(statAlias);
+    QnImageButtonWidget *button = new QnImageButtonWidget();
     button->setDefaultAction(action(id));
     button->setCached(true);
+    context()->statisticsModule()->registerButton(statAlias, button);
     return button;
 }
 
 bool QnNavigationItem::isTimelineRelevant() const
 {
-    auto navigator = this->navigator();
-
-    if (!navigator || !navigator->currentWidget())
-        return false;
-
-    if (!navigator->isPlayingSupported())
-        return false;
-
-    if (navigator->hasArchive())
-        return true;
-
-    return navigator->currentWidget()->resource()->flags().testFlag(Qn::local);
+    return this->navigator() && this->navigator()->isTimelineRelevant();
 }

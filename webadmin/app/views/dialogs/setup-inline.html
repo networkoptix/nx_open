@@ -133,9 +133,7 @@
             <input ng-model="settings.localLogin" name="localLogin" class="form-control"
                    type="text" placeholder="Login" required readonly>
         </div>
-        <div class="form-group" validate-field>
-            <input ng-model="settings.localPassword" name="localPassword" class="form-control"
-                   type="password" autocomplete="new-password" placeholder="Password" required autofocus></div>
+        <password-input ng-model="settings.localPassword"></password-input>
         <div class="form-group" validate-field>
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
                    type="password" autocomplete="new-password" placeholder="Repeat password" required>

@@ -5,7 +5,7 @@
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGraphicsScale>
 
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/warnings.h>
 

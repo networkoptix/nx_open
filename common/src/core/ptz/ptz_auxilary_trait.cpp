@@ -1,6 +1,6 @@
 #include "ptz_auxilary_trait.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QnPtzAuxilaryTrait::QnPtzAuxilaryTrait(const QString &name):
     m_standardTrait(QnLexical::deserialized<Qn::PtzTrait>(name, Qn::NoPtzTraits)),

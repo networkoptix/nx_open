@@ -5,13 +5,11 @@
 #include <statistics/abstract_statistics_module.h>
 
 class QnControlsStatisticsModule : public QnAbstractStatisticsModule
-    , public Singleton<QnControlsStatisticsModule>
 {
     Q_OBJECT
 
 public:
-    QnControlsStatisticsModule();
-
+    explicit QnControlsStatisticsModule(QObject* parent = nullptr);
     virtual ~QnControlsStatisticsModule();
 
     QnStatisticValuesHash values() const override;
@@ -19,15 +17,12 @@ public:
     virtual void reset() override;
 
     template<typename ButtonType>
-    void registerButton(const QString &alias
-        , ButtonType *button);
+    void registerButton(const QString& alias, ButtonType* button);
 
     template<typename SliderType>
-    void registerSlider(const QString &alias
-        , SliderType *slider);
+    void registerSlider(const QString& alias, SliderType* slider);
 
-private:
-    void registerPressEvent(const QString &alias);
+    void registerClick(const QString& alias);
 
 private:
     typedef QHash<QString, int> ClicksCountHash;
@@ -45,7 +40,7 @@ void QnControlsStatisticsModule::registerButton(const QString &alias
     const auto handler = [this, guard, nonEmptyAlias]()
     {
         if (guard)
-            registerPressEvent(nonEmptyAlias);
+            registerClick(nonEmptyAlias);
     };
 
     connect(button, &ButtonType::pressed, this, handler);
@@ -61,10 +56,8 @@ void QnControlsStatisticsModule::registerSlider(const QString &alias
     const auto handler = [this, guard, nonEmptyAlias]()
     {
         if (guard)
-            registerPressEvent(nonEmptyAlias);
+            registerClick(nonEmptyAlias);
     };
 
     connect(slider, &SliderType::sliderPressed, this, handler);
 }
-
-#define qnControlsStatisticsModule QnControlsStatisticsModule::instance()

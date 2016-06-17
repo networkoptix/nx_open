@@ -97,10 +97,10 @@ QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate() {
 
 }
 
-int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &metrics) {   
+int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &metrics) {
     const int dropDownSpacer = 40;  /* Leave some space for the drop-down indicator. */
     switch (column) {
-    case QnBusiness::EventColumn: 
+    case QnBusiness::EventColumn:
         {
             auto eventWidth = [metrics] (QnBusiness::EventType eventType){
                 return metrics.width(QnBusinessStringsHelper::eventName(eventType));
@@ -110,7 +110,7 @@ int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &met
                 result = qMax(result, eventWidth(eventType));
             return dropDownSpacer + result;
         }
-    case QnBusiness::ActionColumn: 
+    case QnBusiness::ActionColumn:
         {
             auto actionWidth = [metrics](QnBusiness::ActionType actionType){
                 return metrics.width(QnBusinessStringsHelper::actionName(actionType));
@@ -170,15 +170,6 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             comboBox->addItem(tr("For Administrators Only"), QnBusiness::AdminOnly);
             return comboBox;
         }
-        case QnBusiness::PlaySoundAction:
-        case QnBusiness::PlaySoundOnceAction:
-        {
-            QComboBox* comboBox = new QComboBox(parent);
-            comboBox->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
-            return comboBox;
-        }
-        case QnBusiness::SayTextAction:
-            return base_type::createEditor(parent, option, index);
         default:
             break;
         }
@@ -186,21 +177,32 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
         connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-        if (actionType == QnBusiness::CameraRecordingAction) {
+        if (actionType == QnBusiness::CameraRecordingAction)
+        {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(btn));
         }
-        else if (actionType == QnBusiness::BookmarkAction) {
+        else if (actionType == QnBusiness::BookmarkAction)
+        {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(btn));
         }
-        else if (actionType == QnBusiness::CameraOutputAction || actionType == QnBusiness::CameraOutputOnceAction) {
+        else if (actionType == QnBusiness::CameraOutputAction)
+        {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(btn));
         }
-        else if (actionType == QnBusiness::ExecutePtzPresetAction) {
+        else if (actionType == QnBusiness::ExecutePtzPresetAction)
+        {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(btn));
         }
-        else if (actionType == QnBusiness::SendMailAction) {
+        else if (actionType == QnBusiness::SendMailAction)
+        {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailPolicy>(btn));
             btn->setSelectionTarget(QnResourceSelectionDialog::UserResourceTarget);
+        }
+        else if (actionType == QnBusiness::PlaySoundAction ||
+            actionType == QnBusiness::PlaySoundOnceAction |
+            actionType == QnBusiness::SayTextAction)
+        {
+            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(btn));
         }
         return btn;
     }
@@ -263,21 +265,6 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
             }
             return;
         }
-        case QnBusiness::PlaySoundAction:
-        case QnBusiness::PlaySoundOnceAction:
-        {
-            if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
-                QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
-                comboBox->setCurrentIndex(soundModel->rowByFilename(index.data(Qt::EditRole).toString()));
-                connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
-            }
-            return;
-        }
-        case QnBusiness::SayTextAction:
-        {
-           base_type::setEditorData(editor, index);
-           return;
-        }
         default:
             break;
         }
@@ -335,23 +322,6 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                 model->setData(index, comboBox->itemData(comboBox->currentIndex()));
             }
-            return;
-        }
-        case QnBusiness::PlaySoundAction:
-        case QnBusiness::PlaySoundOnceAction:
-        {
-            if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
-                QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
-                if (!soundModel->loaded())
-                    return;
-                QString filename = soundModel->filenameByRow(comboBox->currentIndex());
-                model->setData(index, filename);
-            }
-            return;
-        }
-        case QnBusiness::SayTextAction:
-        {
-            base_type::setModelData(editor, model, index);
             return;
         }
         default:

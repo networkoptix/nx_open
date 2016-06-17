@@ -17,8 +17,8 @@
 #include <nx/email/mustache/mustache_helper.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/guard.h>
-#include <utils/serialization/sql.h>
-#include <utils/serialization/sql_functions.h>
+#include <nx/fusion/serialization/sql.h>
+#include <nx/fusion/serialization/sql_functions.h>
 
 #include "access_control/authentication_manager.h"
 #include "email_manager.h"

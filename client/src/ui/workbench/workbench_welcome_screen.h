@@ -6,6 +6,7 @@
 #include <utils/common/connective.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/style/generic_palette.h>
+
 class QnCloudStatusWatcher;
 
 class QnWorkbenchWelcomeScreen : public Connective<QObject>

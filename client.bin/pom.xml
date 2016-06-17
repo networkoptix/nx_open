@@ -21,7 +21,7 @@
         <template>app</template>
 
         <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_vms_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lnx_speach_synthesizer -lcloud_db_client</global.libs>
+        <global.libs>-lcommon -lnx_vms_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lnx_speach_synthesizer -lcloud_db_client -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
@@ -62,6 +62,15 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>nx_speach_synthesizer</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_speach_synthesizer/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>appserver2</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
@@ -78,6 +87,15 @@
             <systemPath>${root.dir}/client.core/pom.xml</systemPath>
         </dependency>
 
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_fusion</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
+        </dependency>         
+        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>client</artifactId>

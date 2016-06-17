@@ -36,7 +36,7 @@ public:
         \note If \a Output is \a void, then \a requestCompleted(FusionRequestResult)
     */
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         stree::ResourceContainer authInfo,
         Input inputData ) = 0;
@@ -64,14 +64,14 @@ public:
         On request processing completion \a requestCompleted(FusionRequestResult) MUST be invoked
     */
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         stree::ResourceContainer authInfo ) = 0;
 
 private:
     //!Implementation of \a AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const /*response*/,

@@ -20,15 +20,14 @@ public:
 
     QnUserResourceList userList;
     QSet<QnUserResourcePtr> checkedUsers;
-    QnUserManagementColors colors;
 
-    QnUserListModelPrivate(QnUserListModel *parent) :
+    QnUserListModelPrivate(QnUserListModel* parent) :
         base_type(parent),
         model(parent)
     {
         userList = qnResPool->getResources<QnUserResource>();
 
-        connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnUserListModelPrivate::at_resourcePool_resourceAdded);
+        connect(qnResPool, &QnResourcePool::resourceAdded,   this, &QnUserListModelPrivate::at_resourcePool_resourceAdded);
         connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnUserListModelPrivate::at_resourcePool_resourceRemoved);
         connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
 
@@ -57,6 +56,7 @@ void QnUserListModelPrivate::at_resourcePool_resourceAdded(const QnResourcePtr& 
         return;
 
     connect(user,   &QnUserResource::nameChanged,           this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+    connect(user,   &QnUserResource::fullNameChanged,       this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
     connect(user,   &QnUserResource::permissionsChanged,    this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
     connect(user,   &QnUserResource::enabledChanged,        this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
 
@@ -122,6 +122,7 @@ QnUserResourcePtr QnUserListModelPrivate::user(const QModelIndex& index) const
     return userList[index.row()];
 }
 
+//TODO: #vkutin #common Move this function to more suitable place. Rewrite it if needed.
 QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr& user) const
 {
     QStringList permissionStrings;
@@ -239,8 +240,9 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
         {
             switch (index.column())
             {
-                case NameColumn         : return user->getName();
-                case PermissionsColumn  : return d->permissionsString(user);
+                case LoginColumn        : return user->getName();
+                case FullNameColumn     : return user->fullName();
+                case UserRoleColumn     : return qnResourceAccessManager->userRoleName(user);
                 default                 : break;
 
             } // switch (column)
@@ -251,25 +253,33 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
         {
             switch (index.column())
             {
-                case NameColumn:
-                    return user->getName();
-
-                case PermissionsColumn:
-                    return d->permissionsString(user);
-
-                case LdapColumn:
+                case UserTypeColumn:
+                {
                     switch (user->userType())
                     {
                         case QnUserType::Local  : return tr("Local user");
                         case QnUserType::Cloud  : return tr("Cloud user");
                         case QnUserType::Ldap   : return tr("LDAP user");
+                        default                 : break;
                     }
+
+                    break;
+                }
+
+                case LoginColumn:
+                    return user->getName();
+
+                case FullNameColumn:
+                    return user->fullName();
+
+                case UserRoleColumn:
+                    return d->permissionsString(user);
 
                 case EnabledColumn:
                     return user->isEnabled() ? tr("Enabled") : tr("Disabled");
 
                 default:
-                    break;
+                    return QString(); // not QVariant() because we want to hide a tooltip if one is shown
 
             } // switch (column)
             break;
@@ -277,15 +287,16 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
 
         case Qt::DecorationRole:
         {
-            switch (index.column())
+            if (index.column() == UserTypeColumn)
             {
-                case LdapColumn:
-                    if (user->isLdap())
-                        return qnSkin->icon("done.png");
-                    break;
-                default:
-                    break;
+                switch (user->userType())
+                {
+                    case QnUserType::Cloud  : return qnSkin->icon("misc/user_type_cloud.png");
+                    case QnUserType::Ldap   : return qnSkin->icon("misc/user_type_ldap.png");
+                    default                 : break;
+                }
             }
+
             break;
         }
 
@@ -295,26 +306,10 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
             if (index.column() == CheckBoxColumn)
                 return QVariant();
 
-            /* Gray out disabled users. */
-            if (!user->isEnabled())
-            {
-                /* Highlighted users are brighter. */
-                if (d->checkedUsers.contains(user))
-                    return d->colors.disabledSelectedText;
-                return qApp->palette().color(QPalette::Disabled, QPalette::Text);
-            }
-
             /* Highlight conflicting users. */
             if (user->isLdap() && !d->isUnique(user))
                 return qnGlobals->errorTextColor();
 
-            break;
-        }
-
-        case Qt::BackgroundRole:
-        {
-            if (d->checkedUsers.contains(user))
-                return qApp->palette().color(QPalette::Highlight);
             break;
         }
 
@@ -323,8 +318,16 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
 
         case Qt::TextAlignmentRole:
         {
-            if (index.column() == LdapColumn)
+            if (index.column() == UserTypeColumn)
                 return Qt::AlignCenter;
+            break;
+        }
+
+        //TODO: #vkutin #common Refactor this role
+        case Qn::DisabledRole:
+        {
+            if (index.column() == EnabledColumn)
+                return user->isOwner();
             break;
         }
 
@@ -360,11 +363,14 @@ QVariant QnUserListModel::headerData(int section, Qt::Orientation orientation, i
 
     switch (section)
     {
-        case NameColumn         : return tr("Name");
-        case PermissionsColumn  : return tr("Permissions");
-        case LdapColumn         : return tr("LDAP");
-        case EnabledColumn      : return QString();
-        default                 : return QString();
+        case LoginColumn        : return tr("Login");
+        case FullNameColumn     : return tr("Name");
+        case UserRoleColumn     : return tr("Role");
+
+        case UserTypeColumn:
+        case EnabledColumn:
+        default:
+            return QString();
     }
 }
 
@@ -376,7 +382,10 @@ Qt::ItemFlags QnUserListModel::flags(const QModelIndex& index) const
     if (!user)
         return flags;
 
-    flags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    flags |= Qt::ItemIsSelectable;
+
+    if (isInteractiveColumn(index.column()) || user->isEnabled())
+        flags |= Qt::ItemIsEnabled;
 
     if (index.column() == CheckBoxColumn)
         flags |= Qt::ItemIsUserCheckable;
@@ -407,25 +416,16 @@ void QnUserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePt
         if (row >= 0)
             emit dataChanged(index(row, CheckBoxColumn), index(row, ColumnCount - 1), roles);
     }
-
 }
 
-const QnUserManagementColors QnUserListModel::colors() const
+bool QnUserListModel::isInteractiveColumn(int column)
 {
-    return d->colors;
-}
-
-void QnUserListModel::setColors(const QnUserManagementColors& colors)
-{
-    beginResetModel();
-    d->colors = colors;
-    endResetModel();
+    return column == CheckBoxColumn || column == EnabledColumn;
 }
 
 QnSortedUserListModel::QnSortedUserListModel(QObject *parent) : base_type(parent)
 {
 }
-
 
 bool QnSortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
@@ -442,37 +442,45 @@ bool QnSortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex&
 
     switch (sortColumn())
     {
-        case QnUserListModel::PermissionsColumn:
-        {
-            qint64 leftPermissions = qnResourceAccessManager->globalPermissions(leftUser);
-            qint64 rightPermissions = qnResourceAccessManager->globalPermissions(rightUser);
-            if (leftPermissions == rightPermissions)
-                break;
-            return leftPermissions > rightPermissions; // Use ">" to make the owner higher than others
-        }
-
         case QnUserListModel::EnabledColumn:
         {
+            if (leftUser->isOwner())
+                return true;
+
             bool leftEnabled = leftUser->isEnabled();
             bool rightEnabled = rightUser->isEnabled();
-            if (leftEnabled == rightEnabled)
-                break;
-            return leftEnabled;
+            if (leftEnabled != rightEnabled)
+                return leftEnabled;
+
+            break;
         }
 
-        case QnUserListModel::LdapColumn:
+        case QnUserListModel::UserTypeColumn:
         {
-            bool leftLdap = leftUser->isLdap();
-            bool rightLdap = rightUser->isLdap();
-            if (leftLdap == rightLdap)
-                break;
-            return leftLdap;
+            QnUserType leftType = leftUser->userType();
+            QnUserType rightType = rightUser->userType();
+            if (leftType != rightType)
+                return leftType < rightType;
+
+            break;
+        }
+
+        case QnUserListModel::FullNameColumn:
+        case QnUserListModel::UserRoleColumn:
+        {
+            QString leftText = left.data(Qt::DisplayRole).toString();
+            QString rightText = right.data(Qt::DisplayRole).toString();
+
+            if (leftText != rightText)
+                return leftText < rightText;
+
+            break;
         }
 
         default:
-            /* We should never sort by CheckBoxColumn. */
             break;
     }
 
+    /* Otherwise sort by login (which is unique): */
     return naturalStringLess(leftUser->getName(), rightUser->getName());
 }

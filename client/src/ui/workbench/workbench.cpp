@@ -233,25 +233,35 @@ QnWorkbenchItem *QnWorkbench::item(Qn::ItemRole role) {
     return m_itemByRole[role];
 }
 
-void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item) {
+void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item)
+{
     NX_ASSERT(role >= 0 && role < Qn::ItemRoleCount);
-
-    if(m_itemByRole[role] == item)
+    if (m_itemByRole[role] == item)
         return;
 
-    if(item != NULL && item->layout() != m_currentLayout) {
-        qnWarning("Cannot set a role for an item from another layout.");
+    bool validLayout = !item || item->layout() == m_currentLayout;
+    NX_ASSERT(validLayout, "Cannot set a role for an item from another layout.");
+    if (!validLayout)
         return;
-    }
 
     m_itemByRole[role] = item;
-
     emit itemChanged(role);
 
+    /* If we are changing focus, make sure raised item will be un-raised. */
+    if (role > Qn::RaisedRole
+        && m_itemByRole[Qn::RaisedRole]
+        && m_itemByRole[Qn::RaisedRole] != item
+        )
+    {
+        setItem(Qn::RaisedRole, nullptr);
+        return; /* Active and central roles will be updated in the recursive call */
+    }
+
     /* Update items for derived roles. */
-    if(role < Qn::ActiveRole)
+    if (role < Qn::ActiveRole)
         updateActiveRoleItem();
-    if(role < Qn::CentralRole)
+
+    if (role < Qn::CentralRole)
         updateCentralRoleItem();
 }
 
@@ -348,6 +358,7 @@ void QnWorkbench::at_layout_cellSpacingChanged() {
     emit cellSpacingChanged();
 }
 
-bool QnWorkbench::isInLayoutChangeProcess() const {
+bool QnWorkbench::isInLayoutChangeProcess() const
+{
     return m_inLayoutChangeProcess;
 }

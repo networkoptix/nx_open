@@ -74,7 +74,6 @@ protected:
     virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
 
 protected slots:
-    void setWelcomeScreenVisible(bool visible);
     void setTitleVisible(bool visible);
     void setMaximized(bool maximized);
     void setFullScreen(bool fullScreen);
@@ -85,6 +84,8 @@ protected slots:
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
 
 private:
+    bool isWelcomeScreenVisible() const;
+
     void updateWidgetsVisibility();
 
     void showFullScreen();
@@ -109,7 +110,6 @@ private:
     QBoxLayout *m_viewLayout;
     QBoxLayout *m_globalLayout;
 
-    bool m_welcomeScreenVisible;
     bool m_titleVisible;
 
     QnResourceList m_dropResources;

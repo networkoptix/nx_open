@@ -11,9 +11,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 #include <utils/common/guard.h>
-#include <utils/common/model_functions.h>
-#include <utils/serialization/sql.h>
-#include <utils/serialization/sql_functions.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/sql.h>
+#include <nx/fusion/serialization/sql_functions.h>
 
 #include "stree/cdb_ns.h"
 
@@ -70,24 +70,29 @@ void TemporaryAccountPasswordManager::authenticateByName(
         if (!checkTemporaryPasswordForExpiration(&lk, curIt))
             continue;
 
+        if (!validateHa1Func(curIt->second.passwordHa1.c_str()))
+            continue;
+
         //currently, checking password permissions here, but should move it to authorization phase
-        if (validateHa1Func(curIt->second.passwordHa1.c_str()) &&
-            curIt->second.accessRights.authorize(authSearchInputData))
+        if (!curIt->second.accessRights.authorize(authSearchInputData))
         {
-            authProperties->put(
-                cdb::attr::authAccountEmail,
-                QString::fromStdString(curIt->second.accountEmail));
-            if (curIt->second.isEmailCode)
-                authProperties->put(
-                    cdb::attr::authenticatedByEmailCode,
-                    true);
-
-            result = api::ResultCode::ok;
-
-            ++curIt->second.useCount;
-            checkTemporaryPasswordForExpiration(&lk, curIt);
+            result = api::ResultCode::forbidden;
             return;
         }
+
+        authProperties->put(
+            cdb::attr::authAccountEmail,
+            QString::fromStdString(curIt->second.accountEmail));
+        if (curIt->second.isEmailCode)
+            authProperties->put(
+                cdb::attr::authenticatedByEmailCode,
+                true);
+
+        result = api::ResultCode::ok;
+
+        ++curIt->second.useCount;
+        checkTemporaryPasswordForExpiration(&lk, curIt);
+        return;
     }
 }
 

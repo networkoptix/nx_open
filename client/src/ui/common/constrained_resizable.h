@@ -1,7 +1,7 @@
 #ifndef QN_CONSTRAINED_RESIZABLE
 #define QN_CONSTRAINED_RESIZABLE
 
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 
 #include "constrained_geometrically.h"
 #include "geometry.h"

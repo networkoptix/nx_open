@@ -48,7 +48,7 @@ void QnProxyAudioTransmitter::endOfRun()
     m_socket.reset();
 }
 
-bool QnProxyAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data)
+bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataPtr& data)
 {
     if (!m_socket)
     {
@@ -62,6 +62,8 @@ bool QnProxyAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data
             return false;
 
         auto route = QnRouter::instance()->routeTo(mServer->getId());
+        if (route.addr.isNull())
+            return false; //< can't find route
         if (!route.gatewayId.isNull())
             mServer = qnResPool->getResourceById<QnMediaServerResource>(route.gatewayId);
         if (!mServer)

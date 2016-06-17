@@ -7,7 +7,7 @@
 #endif
 
 #include <nx/network/socket.h>
-#include <utils/serialization/binary_stream.h>
+#include <nx/fusion/serialization/binary_stream.h>
 
 
 namespace ec2 {

@@ -2,21 +2,21 @@
 
 #include <business/business_action_parameters.h>
 
-QnCameraOutputBusinessAction::QnCameraOutputBusinessAction(bool instant, const QnBusinessEventParameters &runtimeParams):
-    base_type(instant
-              ? QnBusiness::CameraOutputOnceAction
-              : QnBusiness::CameraOutputAction, runtimeParams)
+QnCameraOutputBusinessAction::QnCameraOutputBusinessAction(const QnBusinessEventParameters &runtimeParams) :
+    base_type(QnBusiness::CameraOutputAction, runtimeParams)
 {
-    if (instant)
-        m_params.relayAutoResetTimeout = QnCameraOutputBusinessAction::kInstantActionAutoResetTimeoutMs; // default value for instant action
+//     if (instant)
+//         m_params.relayAutoResetTimeout = QnCameraOutputBusinessAction::kInstantActionAutoResetTimeoutMs; // default value for instant action
 }
 
-QString QnCameraOutputBusinessAction::getRelayOutputId() const {
+QString QnCameraOutputBusinessAction::getRelayOutputId() const
+{
     return m_params.relayOutputId;
 }
 
-int QnCameraOutputBusinessAction::getRelayAutoResetTimeout() const {
-    return m_params.relayAutoResetTimeout;
+int QnCameraOutputBusinessAction::getRelayAutoResetTimeout() const
+{
+    return m_params.durationMs;
 }
 
 QString QnCameraOutputBusinessAction::getExternalUniqKey() const

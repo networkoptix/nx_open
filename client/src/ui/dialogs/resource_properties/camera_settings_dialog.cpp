@@ -45,10 +45,18 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     m_rulesButton = new QPushButton();
     m_buttonBox->addButton(m_rulesButton, QDialogButtonBox::HelpRole);
 
+    auto separator = new QFrame(this);
+    separator->setFrameStyle(QFrame::HLine | QFrame::Sunken);
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(m_settingsWidget);
+    layout->addWidget(separator);
     layout->addWidget(m_buttonBox);
     layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    int margin = style()->pixelMetric(QStyle::PM_DefaultTopLevelMargin);
+    m_buttonBox->layout()->setContentsMargins(margin, margin, margin, margin);
 
     //connect(m_buttonBox,        &QDialogButtonBox::accepted,        this,   &QnCameraSettingsDialog::acceptIfSafe);
 

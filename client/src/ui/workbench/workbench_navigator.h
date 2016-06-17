@@ -85,6 +85,9 @@ public:
     Q_SLOT bool setPlaying(bool playing);
     bool isPlayingSupported() const;
 
+    /** Timeline can be used to navigate through video.  */
+    bool isTimelineRelevant() const;
+
     bool currentWidgetHasVideo() const;
 
     /** Any of the syncable widgets on the layout has archive. */

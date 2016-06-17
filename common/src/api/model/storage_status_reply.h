@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <utils/common/id.h>
 
 struct QnStorageSpaceData {

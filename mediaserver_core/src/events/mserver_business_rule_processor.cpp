@@ -47,7 +47,11 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include "utils/common/delayed.h"
 #include <business/business_event_connector.h>
+
+#if !defined(EDGE_SERVER)
 #include <providers/speach_synthesis_data_provider.h>
+#endif
+
 #include <providers/stored_file_data_provider.h>
 #include <streaming/audio_streamer_pool.h>
 #include <utils/common/systemerror.h>
@@ -228,7 +232,6 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
             result = executeBookmarkAction(action);
             break;
         case QnBusiness::CameraOutputAction:
-        case QnBusiness::CameraOutputOnceAction:
             result = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>());
             break;
         case QnBusiness::CameraRecordingAction:
@@ -264,26 +267,17 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
 bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusinessActionPtr &action)
 {
     const auto params = action->getParams();
-    const auto resources = qnResPool
-        ->getResources<QnSecurityCamResource>(params.additionalResources);
+    const auto resource = qnResPool->getResourceById<QnSecurityCamResource>(params.actionResourceId);
 
-    QList<QnAudioTransmitterPtr> transmitters;
+    if (!resource)
+        return false;
 
-    if (resources.empty())
-        return true;
+    QnAudioTransmitterPtr transmitter;
+    if (resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
+        transmitter = resource->getAudioTransmitter();
 
-    for (const auto& res: resources)
-    {
-        if (res->hasCameraCapabilities(Qn::AudioTransmitCapability))
-        {
-            auto transmitter = res->getAudioTransmitter();
-            if (transmitter)
-                transmitters << transmitter;
-        }
-    }
-
-    if (transmitters.isEmpty())
-        return true;
+    if (!transmitter)
+        return false;
 
 
     if (action->actionType() == QnBusiness::PlaySoundOnceAction)
@@ -297,8 +291,7 @@ bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusi
 
         provider.dynamicCast<QnAbstractArchiveStreamReader>()->setCycleMode(false);
 
-        for (const auto& t: transmitters)
-            t->subscribe(provider, QnDataProviderInfo::kSingleNotificationPriority);
+        transmitter->subscribe(provider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
 
         provider->startIfNotRunning();
     }
@@ -309,20 +302,15 @@ bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusi
         if (action->getToggleState() == QnBusiness::ActiveState)
         {
             provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
-
-            for (const auto& t: transmitters)
-                t->subscribe(provider, QnDataProviderInfo::kContinuousNotificationPriority);
-
+            transmitter->subscribe(provider, QnAbstractAudioTransmitter::kContinuousNotificationPriority);
             provider->startIfNotRunning();
         }
         else if (action->getToggleState() == QnBusiness::InactiveState)
         {
             provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
-
-            for (const auto& t: transmitters)
-                t->unsubscribe(provider);
-
-            QnAudioStreamerPool::instance()->destroyActionDataProvider(action);
+            transmitter->unsubscribe(provider.data());
+            if (provider->processorsCount() == 0)
+                QnAudioStreamerPool::instance()->destroyActionDataProvider(action);
         }
     }
 
@@ -332,35 +320,27 @@ bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusi
 
 bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusinessActionPtr& action)
 {
+#if !defined(EDGE_SERVER)
     const auto params = action->getParams();
     const auto text = params.sayText;
-    const auto resources = qnResPool
-        ->getResources<QnSecurityCamResource>(params.additionalResources);
+    const auto resource = qnResPool->getResourceById<QnSecurityCamResource>(params.actionResourceId);
+    if (!resource)
+        return false;
 
-    QList<QnAudioTransmitterPtr> transmitters;
+    QnAudioTransmitterPtr transmitter;
+    if (resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
+        transmitter = resource->getAudioTransmitter();
 
-    if (resources.empty())
-        return true;
-
-    for (const auto& res: resources)
-    {
-        if (res->hasCameraCapabilities(Qn::AudioTransmitCapability))
-        {
-            auto transmitter = res->getAudioTransmitter();
-            if (transmitter)
-                transmitters << transmitter;
-        }
-    }
-
-    if (transmitters.isEmpty())
-        return true;
+    if (!transmitter)
+        return false;
 
     QnAbstractStreamDataProviderPtr speachProvider(new QnSpeachSynthesisDataProvider(text));
-    for(const auto& transmitter: transmitters)
-        transmitter->subscribe(speachProvider, QnDataProviderInfo::kSingleNotificationPriority);
-
+    transmitter->subscribe(speachProvider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
     speachProvider->startIfNotRunning();
     return true;
+#else
+    return true;
+#endif
 }
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessActionPtr& action)
@@ -526,17 +506,6 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
         return false;
     }
     QString relayOutputId = action->getRelayOutputId();
-    //if( relayOutputId.isEmpty() )
-    //{
-    //    NX_LOG( lit("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
-    //    return false;
-    //}
-
-    //bool instant = action->actionType() == QnBusiness::CameraOutputOnceAction;
-
-    //int autoResetTimeout = instant
-    //        ? ( action->getRelayAutoResetTimeout() ? action->getRelayAutoResetTimeout() : 30*1000)
-    //        : qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
     int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
     bool on = action->getToggleState() != QnBusiness::InactiveState;
 
