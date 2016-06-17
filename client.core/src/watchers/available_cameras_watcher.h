@@ -9,21 +9,24 @@ class QnAvailableCamerasWatcher : public Connective<QObject>
 {
     Q_OBJECT
 
-    typedef Connective<QObject> base_type;
+    using base_type = Connective<QObject>;
 
 public:
-    QnAvailableCamerasWatcher(QObject *parent = nullptr);
+    QnAvailableCamerasWatcher(QObject* parent = nullptr);
     ~QnAvailableCamerasWatcher();
 
     QnUserResourcePtr user() const;
-    void setUser(const QnUserResourcePtr &user);
+    void setUser(const QnUserResourcePtr& user);
 
-    bool isCameraAvailable(const QnUuid &cameraId) const;
+    bool isCameraAvailable(const QnUuid& cameraId) const;
     QnVirtualCameraResourceList availableCameras() const;
 
+    bool useLayouts() const;
+    void setUseLayouts(bool useLayouts);
+
 signals:
-    void cameraAdded(const QnResourcePtr &resource);
-    void cameraRemoved(const QnResourcePtr &resource);
+    void cameraAdded(const QnResourcePtr& resource);
+    void cameraRemoved(const QnResourcePtr& resource);
 
 private:
     QScopedPointer<QnAvailableCamerasWatcherPrivate> const d_ptr;

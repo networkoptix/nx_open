@@ -2740,14 +2740,15 @@ QPixmap QnNxStyle::standardPixmap(StandardPixmap iconId, const QStyleOption* opt
 {
     switch (iconId)
     {
-    case SP_LineEditClearButton:
-        return qnSkin->icon("tree/clear.png").pixmap(
-            option ? option->rect.height() :
-            widget ? widget->height() :
-            Metrics::kButtonHeight);
-    }
+        case SP_LineEditClearButton:
+        {
+            const int kQLineEditButtonSize = 16;
+            return qnSkin->icon("theme/input_clear.png").pixmap(kQLineEditButtonSize, kQLineEditButtonSize);
+        }
 
-    return base_type::standardPixmap(iconId, option, widget);
+        default:
+            return base_type::standardPixmap(iconId, option, widget);
+    }
 }
 
 void QnNxStyle::polish(QWidget *widget)

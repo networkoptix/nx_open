@@ -5,6 +5,7 @@
 
 #include <common/common_module.h>
 
+#include <client/client_startup_parameters.h>
 
 #include <api/applauncher_api.h>
 #include <api/ipc_pipe_names.h>
@@ -85,7 +86,7 @@ namespace applauncher
             arguments << QLatin1String("--auth");
             arguments << QLatin1String(auth);
         }
-        arguments << QLatin1String("--screen");
+        arguments << QnStartupParameters::kScreenKey;
         arguments << QString::number(qApp->desktop()->screenNumber(qApp->activeWindow()));
 
         api::Response response;

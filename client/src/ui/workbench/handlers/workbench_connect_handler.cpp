@@ -25,8 +25,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
-#include <core/core_settings.h>
 #include <core/resource/media_server_resource.h>
+
+#include <client_core/client_core_settings.h>
 
 #include <nx_ec/ec_proto_version.h>
 #include <llutil/hardware_id.h>
@@ -114,7 +115,7 @@ namespace
         , bool storePassword
         , bool autoLogin)
     {
-        auto lastConnections = qnCoreSettings->recentUserConnections();
+        auto lastConnections = qnClientCoreSettings->recentUserConnections();
         // TODO: #ynikitenkov remove outdated connection data
 
         const auto password = (storePassword ? url.password() : QString());
@@ -131,7 +132,7 @@ namespace
         lastConnections.erase(newEnd, lastConnections.end());
         lastConnections.prepend(connectionInfo);
 
-        qnCoreSettings->setRecentUserConnections(lastConnections);
+        qnClientCoreSettings->setRecentUserConnections(lastConnections);
         qnSettings->setAutoLogin(autoLogin);
     }
 }
