@@ -21,11 +21,10 @@ enum class DiscoveryMode
 /**
  * Interface for resource searcher plugins.
  */
-class QnAbstractResourceSearcher : public QObject, public QnResourceFactory
+class QnAbstractResourceSearcher : public QnResourceFactory
 {
-    Q_OBJECT
 protected:
-    QnAbstractResourceSearcher(QObject* parent = nullptr);
+    QnAbstractResourceSearcher();
 
 public:
     virtual ~QnAbstractResourceSearcher();
@@ -106,7 +105,7 @@ public:
 
 // =====================================================================
 
-class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance?
+class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance? -- because of rombic ThirdPartyResourceSearcher
 {
 protected:
     QnAbstractFileResourceSearcher() {}

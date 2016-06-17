@@ -2,10 +2,15 @@
 
 #include "core/resource_management/resource_searcher.h"
 
-class QnResourceDirectoryBrowser : public QnAbstractFileResourceSearcher
+class QnResourceDirectoryBrowser :
+    public QObject,
+    public QnAbstractFileResourceSearcher
 {
+    Q_OBJECT
+
+    using base_type = QObject;
 public:
-    QnResourceDirectoryBrowser();
+    QnResourceDirectoryBrowser(QObject* parent = nullptr);
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
@@ -14,7 +19,7 @@ public:
 
     virtual QnResourcePtr checkFile(const QString &filename) const override;
 
-    // Lical files search only once. Use cleanup before search to re-search files again
+    // Local files search only once. Use cleanup before search to re-search files again
     void cleanup();
 
     static QnLayoutResourcePtr layoutFromFile(const QString& xfile);

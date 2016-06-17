@@ -34,7 +34,8 @@ namespace {
 
 }
 
-QnResourceDirectoryBrowser::QnResourceDirectoryBrowser() :
+QnResourceDirectoryBrowser::QnResourceDirectoryBrowser(QObject* parent) :
+    base_type(parent),
     m_resourceReady(false)
 {}
 
