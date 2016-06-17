@@ -18,6 +18,16 @@ bool QnMobileClientAppInfo::defaultLiteMode()
     return ${liteMode};
 }
 
+QString QnMobileClientAppInfo::oldAndroidClientLink()
+{
+    return QStringLiteral("https://play.google.com/store/apps/details?id=${namespace.major}.${namespace.minor}.${namespace.additional}");
+}
+
+QString QnMobileClientAppInfo::oldIosClientLink()
+{
+    return QStringLiteral("https://itunes.apple.com/app/${ios.old_app_appstore_id}");
+}
+
 QString QnMobileClientAppInfo::oldAndroidAppId()
 {
     return QStringLiteral("${old.android.packagename}");

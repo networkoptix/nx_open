@@ -11,5 +11,8 @@ struct QnMobileClientAppInfo
     /** Is lite mode enabled by default. */
     static bool defaultLiteMode();
 
+    static QString oldAndroidClientLink();
+    static QString oldIosClientLink();
+
     static QString oldAndroidAppId();
 };
