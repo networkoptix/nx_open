@@ -41,8 +41,6 @@
 
 #include <client/client_startup_parameters.h>
 
-#include <nx_speach_synthesizer/text_to_wav.h>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
 
@@ -97,10 +95,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     }
 
     QnClientModule client(startupParams);
-
-    /* This class should not be initialized in client module as it does not support deinitialization. */
-    QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
-    textToWaveServer->start();
 
     /* Initialize sound. */
     QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());

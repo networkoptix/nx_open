@@ -51,6 +51,7 @@
 #include <nx/utils/log/log.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
+#include <nx_speach_synthesizer/text_to_wav.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -287,6 +288,10 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->store<QnIexploreUrlHandler>(new QnIexploreUrlHandler());
     common->store<QnQtbugWorkaround>(new QnQtbugWorkaround());
 #endif
+
+    QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
+    textToWaveServer->start();
+    common->store<TextToWaveServer>(textToWaveServer.take());
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
