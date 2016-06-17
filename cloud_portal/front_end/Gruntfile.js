@@ -86,8 +86,7 @@ module.exports = function (grunt) {
                 livereload: 35729
             },
             rules: [
-
-                {from: '^/demo$', to: '/index.html'},
+                {from: '^((?!\\.).)*$', to: '/index.html'},
                 {from: '^/static/(.*)$', to: '/$1'}
             ],
             proxies: [
@@ -112,8 +111,8 @@ module.exports = function (grunt) {
 
                         // Setup the proxy
                         var middlewares = [
-                            require('grunt-connect-rewrite/lib/utils').rewriteRequest,
-                            require('grunt-connect-proxy/lib/utils').proxyRequest
+                            require('grunt-connect-proxy/lib/utils').proxyRequest,
+                            require('grunt-connect-rewrite/lib/utils').rewriteRequest
                             ];
 
                         // Serve static files.

@@ -19,7 +19,9 @@ angular.module('cloudApp', [
         combineDuplications: true,
         newestOnTop: false
     });
-}]).config(['$routeProvider',function ($routeProvider) {
+}]).config(['$routeProvider', '$locationProvider',function ($routeProvider, $locationProvider) {
+    $locationProvider.html5Mode(true); //Get rid of hash in urls
+
     $routeProvider
         .when('/register/success', {
             templateUrl: 'views/register.html',
