@@ -63,6 +63,8 @@ void QnUserSettingsModel::setUser(const QnUserResourcePtr& value)
     };
 
     m_mode = calculateMode();
+
+    emit userChanged(m_user);
 }
 
 Qn::GlobalPermissions QnUserSettingsModel::rawPermissions() const

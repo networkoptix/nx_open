@@ -44,6 +44,9 @@ public:
     /** Return human-readable permissions description for the selected permissions set. */
     QString permissionsDescription(const QnUserResourcePtr& user, const QnUuid& groupId) const;
 
+signals:
+    void userChanged(const QnUserResourcePtr& newUser);
+
 private:
     QString getCustomPermissionsDescription(const QnUuid& id, Qn::GlobalPermissions permissions) const;
 
