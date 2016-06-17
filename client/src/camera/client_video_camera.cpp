@@ -184,7 +184,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
                                             QnStorageResourcePtr storage,
                                             QnStreamRecorder::Role role,
                                             qint64 serverTimeZoneMs,
-                                            qint64 mediaStepUs,
+                                            qint64 timelapseFrameStepMs,
                                             QnImageFilterHelper transcodeParams)
 {
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
@@ -222,6 +222,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             sender()->deleteLater();
         });
 
+        qint64 timelapseFrameStepUs = timelapseFrameStepMs * 1000;
+
         m_exportReader->setCycleMode(false);
         QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (m_exportReader->getArchiveDelegate());
         if (rtspClient) {
@@ -232,14 +234,14 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             rtspClient->setPlayNowModeAllowed(false);
             rtspClient->setAdditionalAttribute(Qn::EC2_MEDIA_ROLE, "export");
 
-            if (rtspClient && mediaStepUs > 0)
-                rtspClient->setRange(startTimeUs, endTimeUs, mediaStepUs);
+            if (rtspClient && timelapseFrameStepUs > 0)
+                rtspClient->setRange(startTimeUs, endTimeUs, timelapseFrameStepUs);
         }
         if (role == QnStreamRecorder::Role_FileExport)
             m_exportReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
 
-        if (mediaStepUs > 0)
-            m_exportRecorder = new QnTimeLapseRecorder(m_resource->toResourcePtr(), mediaStepUs);
+        if (timelapseFrameStepUs > 0)
+            m_exportRecorder = new QnTimeLapseRecorder(m_resource->toResourcePtr(), timelapseFrameStepUs);
         else
             m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
 

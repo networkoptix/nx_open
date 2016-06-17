@@ -21,6 +21,8 @@ const qint64 kMinimalLengthMs = 1000;
 
 const qint64 kDefaultLengthMs = 5 * 60 * 1000;
 
+const int kResultFps = 30;
+
 int toSliderScale(int absoluteSpeedValue)
 {
     return static_cast<int>(log(absoluteSpeedValue));
@@ -39,12 +41,11 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
     base_type(parent, windowFlags),
     ui(new Ui::ExportTimelapseDialog),
     m_updating(false),
-    m_sourcePeriodLengthMs(kMinimalLengthMs * kMinimalSpeed)
+    m_expectedLengthMs(kDefaultLengthMs),
+    m_sourcePeriodLengthMs(kMinimalLengthMs * kMinimalSpeed),
+    m_frameStepMs(0)
 {
     ui->setupUi(this);
-
-    ui->speedSpinBox->setRange(kMinimalSpeed, kMaximalSpeed);
-    ui->speedSlider->setRange(kMinimalSpeed, toSliderScale(kMaximalSpeed));
 
     QFont infoFont(this->font());
     infoFont.setPixelSize(kInfoFontSize);
@@ -81,7 +82,7 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
         setExpectedLength(m_sourcePeriodLengthMs / absoluteValue);
     });
 
-    updateControls();
+    initControls();
 }
 
 QnExportTimelapseDialog::~QnExportTimelapseDialog()
@@ -97,15 +98,32 @@ void QnExportTimelapseDialog::setSourcePeriodLengthMs(qint64 lengthMs)
     if (m_sourcePeriodLengthMs == lengthMs)
         return;
     m_sourcePeriodLengthMs = lengthMs;
-    updateControls();
+    initControls();
 }
 
-void QnExportTimelapseDialog::updateControls()
+qint64 QnExportTimelapseDialog::frameStepMs() const
+{
+    return m_frameStepMs;
+}
+
+void QnExportTimelapseDialog::initControls()
 {
     if (m_updating)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
+    int maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
+    ui->speedSpinBox->setRange(kMinimalSpeed, maxSpeed);
+    {
+        int maxRange = toSliderScale(maxSpeed);
+        qDebug() << "maximum range" << maxRange;
+        qDebug() << "back check" << fromSliderScale(maxRange) << " diff to" << maxSpeed;
+    }
+    ui->speedSlider->setRange(kMinimalSpeed, toSliderScale(maxSpeed));
+
+    qint64 maxExpectedLengthMs = m_sourcePeriodLengthMs / kMinimalSpeed;
+    ui->resultLengthSpinBox->setMaximum(static_cast<int>(maxExpectedLengthMs / 1000));
 
     qint64 expectedLengthMs = kDefaultLengthMs;
     int speed = m_sourcePeriodLengthMs / expectedLengthMs;
@@ -117,9 +135,15 @@ void QnExportTimelapseDialog::updateControls()
     ui->speedSpinBox->setValue(speed);
     ui->speedSlider->setValue(toSliderScale(speed));
     setExpectedLength(expectedLengthMs);
+
 }
 
-void QnExportTimelapseDialog::setExpectedLength(qint64 lengthMs)
+void QnExportTimelapseDialog::setExpectedLength(qint64 value)
 {
-    qDebug() << "expected length" << lengthMs / 1000 << "seconds";
+    m_expectedLengthMs = value;
+    qDebug() << "expected length" << value / 1000 << "seconds";
+    qint64 framesCount = m_sourcePeriodLengthMs / value;
+    m_frameStepMs = framesCount * 1000 / kResultFps;
+    ui->framesLabel->setText(QString::number(m_frameStepMs));
+    ui->resultLengthSpinBox->setValue(static_cast<int>(value / 1000));
 }

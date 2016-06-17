@@ -19,14 +19,18 @@ public:
     qint64 sourcePeriodLengthMs() const;
     void setSourcePeriodLengthMs(qint64 lengthMs);
 
-private:
-    void updateControls();
+    qint64 frameStepMs() const;
 
-    void setExpectedLength(qint64 lengthMs);
+private:
+    void initControls();
+
+    void setExpectedLength(qint64 value);
 
 private:
      QScopedPointer<Ui::ExportTimelapseDialog> ui;
      bool m_updating;
 
+     qint64 m_expectedLengthMs;
      qint64 m_sourcePeriodLengthMs;
+     qint64 m_frameStepMs;
 };

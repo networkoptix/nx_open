@@ -68,7 +68,7 @@ public:
 								 const QString& fileName, const QString& format,
                                  QnStorageResourcePtr storage, QnStreamRecorder::Role role,
                                  qint64 serverTimeZoneMs,
-                                 qint64 mediaStepUs,
+                                 qint64 timelapseFrameStepMs, /* Default value is 0 (timelapse disabled) */
                                  QnImageFilterHelper transcodeParams);
 
     void setResource(QnMediaResourcePtr resource);

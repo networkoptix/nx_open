@@ -24,7 +24,7 @@ public:
             const QString &fileName,
             const QnImageFilterHelper &imageParameters,
             qint64 serverTimeZoneMs,
-            qint64 mediaStepUs,
+            qint64 timelapseFrameStepMs = 0, /* 0 means disabled timelapse */
             QObject *parent = 0);
     virtual ~QnClientVideoCameraExportTool();
 
@@ -81,6 +81,6 @@ private:
     QString m_fileName;
     QnImageFilterHelper m_parameters;
     qint64 m_serverTimeZoneMs;
-    qint64 m_mediaStepUs;
+    qint64 m_timelapseFrameStepMs;
     int m_status;
 };
