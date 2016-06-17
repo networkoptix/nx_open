@@ -29,6 +29,7 @@
         <path>${env.PATH}</path>
         <rdep.packages>gtest openssl ffmpeg onvif quazip sigar festival</rdep.packages>
         <rdep.linux.arm.packages>sasl2 openldap</rdep.linux.arm.packages>
+        <guid>{ae551dde-06e7-4153-8871-f9ffabcf230e}</guid>
     </properties>
     <dependencies>
         <dependency>
