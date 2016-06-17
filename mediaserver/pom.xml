@@ -136,6 +136,24 @@
             </properties>
         </profile>  
 
+        <profile>
+            <id>linux-arm-rpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>rpi</value>
+                </property>
+            </activation>
+
+            <properties>
+                <rdep.linux.packages>festival</rdep.linux.packages>
+            </properties>
+        </profile>
     </profiles>
 
 </project>
