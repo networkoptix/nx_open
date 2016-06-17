@@ -40,14 +40,43 @@ var Config = {
          target: '' // new|frame
          }*/
     ],
+    passwordRequirements: {
+        minLength: 8,
+        minLengthMessage:L.passwordRequirements.minLengthMessage,
+        maxLength: 255,
+        requiredRegex: '[\x21-\x7E]|[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]',
+        requiredMessage: L.passwordRequirements.requiredMessage,
+        strongPasswordCheck: function(password){
+
+            var classes = [
+                '[0-9]+',
+                '[a-z]+',
+                '[A-Z]+',
+                '[\\W_]+'
+            ];
+
+            var classesCount = 0;
+
+            for (var i = 0; i < classes.length; i++) {
+                var classRegex = classes[i];
+                if(new RegExp(classRegex).test(password)){
+                    classesCount ++;
+                }
+            }
+            return classesCount >= 3;
+        },
+        weakMessage: L.passwordRequirements.weakMessage,
+        strongMessage: L.passwordRequirements.strongMessage,
+        commonMessage: L.passwordRequirements.commonMessage
+    },
 
     settingsConfig: {
         auditTrailEnabled: {label: 'Audit trail enabled', type: 'checkbox'},
         cameraSettingsOptimization: {label: 'Allow device setting optimization', type: 'checkbox', setupWizard: true},
         disabledVendors: {label: 'Disabled vendors', type: 'text'},
-        ec2AliveUpdateIntervalSec: {label: 'System alive update interval', type: 'number'},
-        ec2ConnectionKeepAliveTimeoutSec: {label: 'Connection keep alive timeout', type: 'number'},
-        ec2KeepAliveProbeCount: {label: 'Connection keep alive probes', type: 'number'},
+        ec2AliveUpdateIntervalSec: {label: 'System alive update interval (seconds)', type: 'number', alert: 'Warning! It is highly recommended to keep this value at least 10% greater than "Connection keep alive timeout" x "Connection keep probes"'},
+        ec2ConnectionKeepAliveTimeoutSec: {label: 'Connection keep alive timeout (seconds)', type: 'number'},
+        ec2KeepAliveProbeCount: {label: 'Connection keep alive probes (seconds)', type: 'number'},
         emailFrom: {label: 'Email from', type: 'text'},
         emailSignature: {label: 'Email signature', type: 'text'},
         emailSupportEmail: {label: 'Support Email', type: 'text'},
@@ -73,7 +102,27 @@ var Config = {
             setupWizard: true
         },
         backupQualities: {label: 'Backup qualities', type: 'text'},
-        serverDiscoveryPingTimeoutSec: {label: 'Server discovery timeout', type: 'number'}
+        serverDiscoveryPingTimeoutSec: {label: 'Server discovery timeout', type: 'number'},
+
+
+        cloudAccountName: {label: 'Cloud owner account', type: 'static'},
+        cloudAuthKey: {label: 'Cloud auth key', type: 'static'},
+        cloudPortalUrl: {label: 'Cloud portal url', type: 'text'},
+        cloudSystemID: {label: 'Cloud portal url', type: 'static'},
+
+        newSystem: {label: 'Server is "New"', type: 'static'},
+        proxyConnectTimeoutSec: {label: 'Proxy connection timeout (seconds)', type: 'number'},
+        crossdomainEnabled: {label: 'Enable web client', type: 'checkbox'},
+
+        statisticsReportLastNumber: {label: 'Statistics report - last number', type: 'static'},
+        statisticsReportLastTime: {label: 'Statistics report - last time', type: 'static'},
+        statisticsReportServerApi: {label: 'Statistics server api', type: 'text'},
+        statisticsReportTimeCycle: {label: 'Statistics report interval', type: 'number'},
+        systemId: {label: 'System ID', type: 'text'},
+        systemNameForId: {label: 'System name', type: 'text'},
+        takeCameraOwnershipWithoutLock: {label: 'Take cameras ownership without lock', type: 'checkbox'},
+        timeSynchronizationEnabled: {label: 'Time synchronization enabled', type: 'checkbox'},
+        upnpPortMappingEnabled: {label: 'UPNP port mapping enabled', type: 'checkbox'}
     },
     debugEvents: {
         events: [

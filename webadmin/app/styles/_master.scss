@@ -130,3 +130,50 @@
   }
 }
 
+.password-input {
+  position:relative;
+  .help-block {
+    position: absolute;
+    right:0;
+  }
+  .label-container {
+    position: absolute;
+    right: 0;
+    top:0;
+    height: 100%;
+    line-height: 1;
+    padding: 6px;
+    .label {
+      height: 100%;
+      line-height: 100%;
+      display: table;
+      padding: 0 8px;
+
+      .message {
+        display: table-cell;
+        vertical-align: middle;
+        background: transparent;
+        text-transform: uppercase;
+
+        &:after{
+          white-space: pre;
+          text-transform: none;
+          border-radius: 2px;
+          line-height: 1.5;
+        }
+      }
+
+      .hint{
+
+        display: block;
+        /*display: none;*/
+        position:absolute;
+        border-radius: 2px;
+        padding:6px;
+      }
+      :hover .hint{
+        display: block;
+      }
+    }
+  }
+}
