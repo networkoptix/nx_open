@@ -34,6 +34,7 @@ namespace
         , IsCorrectCustomizationRoleId
 
         , WrongVersionRoleId
+        , CompatibleVersionRoleId
         , WrongCustomizationRoleId
 
         // For local systems
@@ -61,6 +62,7 @@ namespace
         result.insert(IsCorrectCustomizationRoleId, "isCorrectCustomization");
 
         result.insert(WrongVersionRoleId, "wrongVersion");
+        result.insert(CompatibleVersionRoleId, "compatibleVersion");
         result.insert(WrongCustomizationRoleId, "wrongCustomization");
 
         result.insert(LastPasswordsModelRoleId, "lastPasswordsModel");
@@ -118,6 +120,7 @@ public:
     }
 
     QString getIncompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
+    QString getCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleSystem(const QnSystemDescriptionPtr& sysemDescription) const;
     QString getIncompatibleCustomization(const QnSystemDescriptionPtr& systemDescription) const;
@@ -219,6 +222,8 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         return d->isCompatibleVersion(systemDescription);
     case WrongVersionRoleId:
         return d->getIncompatibleVersion(systemDescription);
+    case CompatibleVersionRoleId:
+        return d->getCompatibleVersion(systemDescription);
     case WrongCustomizationRoleId:
         return d->getIncompatibleCustomization(systemDescription);
 
@@ -260,7 +265,7 @@ QnSystemsModelPrivate::QnSystemsModelPrivate(QnSystemsModel* parent)
     , maxCount(kMaxTilesCount)    // TODO: do we need to change it dynamically or from outside? Think about it.
     , disconnectHelper()
     , internalData()
-    , minimalVersion()
+    , minimalVersion(1, 0)
 {
 }
 
@@ -449,7 +454,30 @@ bool QnSystemsModelPrivate::systemLess(
     if (!sameCompatible)
         return firstCompatible;
 
+    const bool firstFullCompatible = getCompatibleVersion(first).isEmpty();
+    const bool sameFullComaptible =
+        (firstFullCompatible == getCompatibleVersion(second).isEmpty());
+    if (!sameFullComaptible)
+        return firstFullCompatible;
+
     return (first->name() < second->name());
+}
+
+QString QnSystemsModelPrivate::getCompatibleVersion(
+    const QnSystemDescriptionPtr& systemDescription) const
+{
+    const auto servers = systemDescription->servers();
+    if (servers.isEmpty())
+        return QString();
+
+    const auto predicate = [this](const QnModuleInformation& serverInfo)
+    {
+        return !serverInfo.hasCompatibleVersion();
+    };
+
+    const auto compatibleIt = std::find_if(servers.begin(), servers.end(), predicate);
+    return (compatibleIt == servers.end() ? QString() :
+        compatibleIt->version.toString(QnSoftwareVersion::BugfixFormat));
 }
 
 QString QnSystemsModelPrivate::getIncompatibleVersion(
@@ -461,17 +489,13 @@ QString QnSystemsModelPrivate::getIncompatibleVersion(
 
     const auto predicate = [this](const QnModuleInformation& serverInfo)
     {
-        if (minimalVersion.isNull())
-            return !serverInfo.hasCompatibleVersion();
-        else
-            return serverInfo.version < minimalVersion;
+        return serverInfo.version < minimalVersion;
     };
 
     const auto incompatibleIt =
         std::find_if(servers.begin(), servers.end(), predicate);
-    return incompatibleIt == servers.end()
-            ? QString()
-            : incompatibleIt->version.toString(QnSoftwareVersion::BugfixFormat);
+    return (incompatibleIt == servers.end() ? QString() : 
+        incompatibleIt->version.toString(QnSoftwareVersion::BugfixFormat));
 }
 
 bool QnSystemsModelPrivate::isCompatibleVersion(

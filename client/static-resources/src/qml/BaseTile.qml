@@ -23,6 +23,7 @@ Item
     property bool isOnline: false;
     property bool isValidVersion: true;
     property bool isValidCustomization: true;
+    property bool isCompatibilityMode: false;
 
     property bool isExpanded;
 
@@ -101,6 +102,12 @@ Item
                     target: expandedAreaLoader;
                     opacity: 0;
                 }
+
+                PropertyChanges
+                {
+                    target: indicator;
+                    opacity: 1;
+                }
             },
 
             State
@@ -133,6 +140,12 @@ Item
                     target: expandedAreaLoader;
                     opacity: 1;
                 }
+
+                PropertyChanges
+                {
+                    target: indicator;
+                    opacity: 0;
+                }
             }
         ]
 
@@ -156,6 +169,7 @@ Item
                     duration: 400;
                 }
             }
+
             NumberAnimation
             {
                 target: collapseTileButton;
@@ -166,7 +180,7 @@ Item
 
             NumberAnimation
             {
-                target: shadow;
+                target: expandedAreaLoader, shadow;
                 properties: "opacity";
                 easing.type: Easing.OutCubic;
                 duration: 400;
@@ -174,10 +188,11 @@ Item
 
             NumberAnimation
             {
-                target: expandedAreaLoader;
+                target: indicator;
                 properties: "opacity";
-                easing.type: Easing.OutCubic;
-                duration: 400;
+                easing.type: (tileHolder.state == "collapsed" ?
+                      Easing.InCubic : Easing.OutCubic);
+                duration: 200;
             }
         }
 
@@ -320,23 +335,37 @@ Item
 
             Indicator
             {
-                id: errorLabel;
+                id: indicator;
 
                 property bool isErrorIndicator: (!thisComponent.isValidCustomization
                     || !thisComponent.isValidVersion);
+                property bool isWarningIndicator: (!isErrorIndicator && isCompatibilityMode);
 
                 anchors.right: parent.right;
-                anchors.bottom: parent.bottom;
+                anchors.top: parent.top;
                 anchors.rightMargin: 14;
-                anchors.bottomMargin: anchors.rightMargin;
+                anchors.topMargin: 66;
 
-                visible: (!thisComponent.isAvailable
-                    && thisComponent.notAvailableLabelText.length);
+                visible: thisComponent.notAvailableLabelText.length;
 
                 text: thisComponent.notAvailableLabelText;
-                textColor: (isErrorIndicator ? Style.colors.shadow : Style.colors.windowText);
-                color: (isErrorIndicator ? Style.colors.red_main
-                    : Style.colors.custom.systemTile.offlineIndicatorBkg);
+                textColor:
+                {
+                    if (isWarningIndicator || isErrorIndicator)
+                        return Style.colors.shadow;
+                    else
+                        return Style.colors.windowText;
+                }
+
+                color:
+                {
+                    if (isWarningIndicator)
+                        return Style.colors.yellow_main;
+                    else if (isErrorIndicator)
+                        return Style.colors.red_main;
+                    else
+                        return Style.colors.custom.systemTile.offlineIndicatorBkg;
+                }
             }
         }
     }
