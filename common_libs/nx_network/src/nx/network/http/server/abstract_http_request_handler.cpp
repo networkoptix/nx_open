@@ -20,7 +20,7 @@ namespace nx_http
     }
 
     bool AbstractHttpRequestHandler::processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         nx_http::Message&& requestMsg,
         stree::ResourceContainer&& authInfo,
         std::function<
