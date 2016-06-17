@@ -546,6 +546,7 @@ void QnWorkbenchExportHandler::exportTimeSelection(
             fileName,
             imageParameters,
             serverTimeZone,
+            1000 * 1000 * 15, // ggg media step
             this);
 
         connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);

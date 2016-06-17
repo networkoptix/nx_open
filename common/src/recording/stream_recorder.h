@@ -190,6 +190,7 @@ protected:
     void markNeedKeyData();
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex);
+    virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
 private:
     void updateSignatureAttr(size_t i);
     qint64 findNextIFrame(qint64 baseTime);

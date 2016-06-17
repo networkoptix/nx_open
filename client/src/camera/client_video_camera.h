@@ -39,7 +39,7 @@ public:
 
     QnMediaResourcePtr resource();
 
-    // this function must be called if stream was interupted or so; to synch audio and video again 
+    // this function must be called if stream was interupted or so; to synch audio and video again
     //void streamJump(qint64 time);
 
     void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
@@ -64,10 +64,11 @@ public:
     QSharedPointer<QBuffer> motionIODevice(int channel);
 
     //TODO: #GDM Refactor parameter set to the structure
-    void exportMediaPeriodToFile(const QnTimePeriod &timePeriod, 
-								 const QString& fileName, const QString& format, 
+    void exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
+								 const QString& fileName, const QString& format,
                                  QnStorageResourcePtr storage, QnStreamRecorder::Role role,
                                  qint64 serverTimeZoneMs,
+                                 qint64 mediaStepUs,
                                  QnImageFilterHelper transcodeParams);
 
     void setResource(QnMediaResourcePtr resource);

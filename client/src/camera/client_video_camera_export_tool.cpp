@@ -12,6 +12,7 @@ QnClientVideoCameraExportTool::QnClientVideoCameraExportTool(
         const QString &fileName,
         const QnImageFilterHelper &imageParameters,
         qint64 serverTimeZoneMs,
+        qint64 mediaStepUs,
         QObject *parent)
 
     : base_type(parent)
@@ -20,6 +21,7 @@ QnClientVideoCameraExportTool::QnClientVideoCameraExportTool(
     , m_fileName(fileName)
     , m_parameters(imageParameters)
     , m_serverTimeZoneMs(serverTimeZoneMs)
+    , m_mediaStepUs(mediaStepUs)
     , m_status(QnClientVideoCamera::NoError)
 {
     connect(m_camera,     &QnClientVideoCamera::exportProgress,   this,   &QnClientVideoCameraExportTool::valueChanged);
@@ -42,6 +44,7 @@ void QnClientVideoCameraExportTool::start() {
                 QnStorageResourcePtr(),
                 QnStreamRecorder::Role_FileExport,
                 m_serverTimeZoneMs,
+                m_mediaStepUs,
                 m_parameters
                 );
 }
@@ -57,7 +60,7 @@ void QnClientVideoCameraExportTool::stop() {
 void QnClientVideoCameraExportTool::at_camera_exportFinished(
     const QnStreamRecorder::ErrorStruct &status,
     const QString                       &filename
-) 
+)
 {
     Q_UNUSED(filename)
     m_status = status.lastError;

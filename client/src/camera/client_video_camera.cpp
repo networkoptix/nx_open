@@ -13,6 +13,52 @@
 
 #include <recording/time_period.h>
 
+// input video with steps between frames in timeStepUsec translated to output videi with 30 fps (kOutputDeltaUsec between frames)
+
+class QnTimeLapseRecorder: public QnStreamRecorder
+{
+    static const qint64 kOutputDeltaUsec = 1000000ll / 30; //< 30 fps
+
+public:
+    QnTimeLapseRecorder(const QnResourcePtr& resource, qint64 timeStepUsec):
+        QnStreamRecorder(resource),
+        m_timeStepUsec(timeStepUsec),
+        m_currentTimeUsec(0),
+        m_lastInputTimeUsec(-1)
+    {
+
+    }
+
+    virtual ~QnTimeLapseRecorder()
+    {
+        stop();
+    }
+
+protected:
+    virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md) override
+    {
+        qint64 inputDelta = md->timestamp - m_lastInputTimeUsec;
+        /*
+        qint64 outputDelta = kOutputDeltaUsec;
+        if (m_lastInputTimeUsec >= 0)
+        {
+            int steps
+        }
+        */
+        m_lastInputTimeUsec = md->timestamp;
+
+        qint64 result = m_currentTimeUsec;
+        //m_currentTimeUsec += m_timeStepUsec;
+        m_currentTimeUsec += kOutputDeltaUsec;
+        return result;
+    }
+private:
+    qint64 m_timeStepUsec;
+    qint64 m_currentTimeUsec;
+    qint64 m_lastInputTimeUsec;
+};
+
+
 QString QnClientVideoCamera::errorString(int errCode) {
     switch (errCode) {
     case NoError:
@@ -138,6 +184,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
                                             QnStorageResourcePtr storage,
                                             QnStreamRecorder::Role role,
                                             qint64 serverTimeZoneMs,
+                                            qint64 mediaStepUs,
                                             QnImageFilterHelper transcodeParams)
 {
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
@@ -184,11 +231,17 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             rtspClient->setCamera(camera);
             rtspClient->setPlayNowModeAllowed(false);
             rtspClient->setAdditionalAttribute(Qn::EC2_MEDIA_ROLE, "export");
+
+            if (rtspClient && mediaStepUs > 0)
+                rtspClient->setRange(startTimeUs, endTimeUs, mediaStepUs);
         }
         if (role == QnStreamRecorder::Role_FileExport)
             m_exportReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
 
-        m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
+        if (mediaStepUs > 0)
+            m_exportRecorder = new QnTimeLapseRecorder(m_resource->toResourcePtr(), mediaStepUs);
+        else
+            m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
 
 
         connect(m_exportRecorder, &QnStreamRecorder::finished, this, [this]()
@@ -239,6 +292,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
 
     m_exportReader->addDataProcessor(m_exportRecorder);
     m_exportReader->jumpTo(startTimeUs, startTimeUs);
+
     m_exportReader->start();
     m_exportRecorder->start();
 }
