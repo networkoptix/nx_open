@@ -32,6 +32,7 @@
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/message_box.h>
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/export_timelapse_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
@@ -87,6 +88,7 @@ QnWorkbenchExportHandler::QnWorkbenchExportHandler(QObject *parent):
 {
     connect(action(QnActions::ExportTimeSelectionAction), &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
     connect(action(QnActions::ExportLayoutAction),        &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
+    connect(action(QnActions::ExportTimelapseAction),     &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportTimelapseAction_triggered);
 }
 
 QString QnWorkbenchExportHandler::binaryFilterName() const {
@@ -780,6 +782,25 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
     doAskNameAndExportLocalLayout(exportPeriod, layout, Qn::LayoutExport);
 }
 
+
+void QnWorkbenchExportHandler::at_exportTimelapseAction_triggered()
+{
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+    if (period.durationMs < QnExportTimelapseDialog::kMinimalSourcePeriodLength)
+    {
+        QMessageBox::warning(mainWindow(),
+            tr("Warning!"),
+            tr("Selected period is too short and cannot be exported as timelapse."));
+        return;
+    }
+
+    QScopedPointer<QnExportTimelapseDialog> dialog(new QnExportTimelapseDialog(mainWindow()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->setSourcePeriodLengthMs(period.durationMs);
+
+    dialog->exec();
+}
 
 void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QString &fileName) {
     unlockFile(fileName);
