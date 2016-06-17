@@ -2,19 +2,20 @@
 
 #include <cstdint>
 
-#if !defined(PROXY_DECODER_API)
+#if !defined(PROXY_DECODER_API) //< Linking attributes
     #define PROXY_DECODER_API
 #endif // !PROXY_DECODER_API
 
 /**
  * Interface to an external lib 'libproxydecoder', which performs actual decoding of video frames.
+ * ATTENTION: This interface is intentionally kept pure C++ and does not depend on other libs.
  *
  * For each decodeTo...() method:
  * @param compressedFrame If null, the frame is considered absent.
  * @param outPtsUs Receives Pts of the produced frame (microseconds), which may be different to the
  * compressed frame due to buffering.
- * @return Negative value on error, 0 on buffering (when there is no output frame), positive
- * value (frame number) on producing a frame.
+ * @return Negative value on error, 0 on buffering (when there is no output frame), positive value
+ * (frame number) on producing a frame.
  *
  * For each create...() static method:
  * If initialization fails, fail with assert().
@@ -22,9 +23,12 @@
 class PROXY_DECODER_API ProxyDecoder // interface
 {
 public:
-    static ProxyDecoder* create(int frameWidth, int frameHeight);
-    static ProxyDecoder* createImpl(int frameWidth, int frameHeight);
-    static ProxyDecoder* createStub(int frameWidth, int frameHeight);
+    /** @return (0, 0) if there is no limit. */
+    static void getMaxResolution(int* outFrameW, int* outFrameH);
+
+    static ProxyDecoder* create(int frameW, int frameH);
+    static ProxyDecoder* createImpl(int frameW, int frameH);
+    static ProxyDecoder* createStub(int frameW, int frameH);
 
     virtual ~ProxyDecoder() = default;
 

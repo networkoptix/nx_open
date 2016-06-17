@@ -1,6 +1,6 @@
 TARGET = libproxydecoder.so
 SRC = nx/utils/flag_config.cpp nx/utils/debug_utils.cpp \
-    vdpau_utils.cpp vdpau_session.cpp proxy_decoder_utils.cpp \
+    vdpau_utils.cpp vdpau_session.cpp proxy_decoder.cpp proxy_decoder_utils.cpp \
 	proxy_decoder_impl.cpp proxy_decoder_stub.cpp
 CXXFLAGS ?= -Wall -Wno-sign-compare -Wfatal-errors -O3 -std=c++11
 LDFLAGS ?= -fvisibility=hidden
