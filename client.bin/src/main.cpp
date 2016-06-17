@@ -117,18 +117,16 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen;
     if (customScreen)
     {
-        QDesktopWidget *desktop = qApp->desktop();
-        if (startupParams.screen >= 0 && startupParams.screen < desktop->screenCount())
-        {
-            QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
-            QPoint targetPosition = desktop->screenGeometry(startupParams.screen).topLeft() + screenDelta;
-            mainWindow->move(targetPosition);
-        }
+        /* We must handle all 'WindowScreenChange' events _before_ we changing screen. */
+        qApp->processEvents();
+        mainWindow->windowHandle()->setScreen(QGuiApplication::screens().value(startupParams.screen, 0));
     }
-
     mainWindow->show();
     if (customScreen)
-        qApp->processEvents(); /* We must handle 'move' event _before_ we activate fullscreen. */
+    {
+        /* We must handle 'move' event _before_ we activate fullscreen. */
+        qApp->processEvents();
+    }
 
     const bool instantlyMaximize = !startupParams.fullScreenDisabled
         && startupParams.videoWallGuid.isNull();
