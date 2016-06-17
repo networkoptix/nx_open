@@ -1,5 +1,7 @@
 #include "self_updater.h"
 
+#ifdef Q_OS_WIN
+
 #include <client/client_module.h>
 #include <client/client_startup_parameters.h>
 
@@ -60,3 +62,5 @@ bool nx::vms::client::SelfUpdater::updateClientInstallation()
 
     return true;
 }
+
+#endif //Q_OS_WIN

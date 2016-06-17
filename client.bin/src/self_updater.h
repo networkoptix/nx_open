@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef Q_OS_WIN
+
 #include <nx/utils/software_version.h>
 
 struct QnStartupParameters;
@@ -26,3 +28,5 @@ private:
 }
 }
 }
+
+#endif //Q_OS_WIN
