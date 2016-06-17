@@ -44,7 +44,7 @@ var Config = {
         minLength: 8,
         minLengthMessage:L.passwordRequirements.minLengthMessage,
         maxLength: 255,
-        requiredRegex: '[\x21-\x7E][\x20-\x7E]+[\x21-\x7E]',
+        requiredRegex: '[\x21-\x7E]|[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]',
         requiredMessage: L.passwordRequirements.requiredMessage,
         strongPasswordCheck: function(password){
 

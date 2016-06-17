@@ -464,6 +464,9 @@ angular.module('webadminApp')
             },
             createEvent:function(params){
                 return wrapGet(proxy + '/web/api/createEvent?' +  $.param(params));
+            },
+            getCommonPasswords:function(){
+                return wrapGet('commonPasswordsList.json');
             }
         };
     });
