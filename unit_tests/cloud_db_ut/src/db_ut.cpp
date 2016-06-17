@@ -35,9 +35,9 @@ TEST_F(DbRegress, general)
     const QString dbPath = QDir::cleanPath(testDataDir() + "/cdb_ut.sqlite");
     QDir().remove(dbPath);
     ASSERT_TRUE(QFile::copy(":/cdb.sqlite", dbPath));
-#ifdef _WIN32
-    ASSERT_TRUE(SetFileAttributes((LPCWSTR)dbPath.utf16(), FILE_ATTRIBUTE_NORMAL) != 0);
-#endif
+    ASSERT_TRUE(QFile(dbPath).setPermissions(
+        QFileDevice::ReadOwner | QFileDevice::WriteOwner |
+        QFileDevice::ReadUser | QFileDevice::WriteUser));
     
     ASSERT_TRUE(startAndWaitUntilStarted());
 
