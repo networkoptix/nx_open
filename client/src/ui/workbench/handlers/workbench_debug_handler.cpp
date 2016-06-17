@@ -72,127 +72,14 @@ void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered() {
     Q_UNUSED(showPalette);
 }
 
-#include <common/common_module.h>
-#include <camera/camera_bookmarks_manager.h>
-#include <camera/camera_data_manager.h>
-#include <camera/loaders/caching_camera_data_loader.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/camera_resource.h>
-#include <ui/workbench/workbench_context.h>
-#include <utils/common/util.h>
-
-
-QStringList getRandomStrings(const QStringList &dict, int len, int multiplier) {
-
-    QStringList result;
-    int min = 1;
-    int max = dict.size() / multiplier;
-
-    for (int i = 0; i < len; ++i) {
-        int j = random(min, max);
-        result << dict[j * multiplier];
-    }
-
-    return result;
-}
-
-
-QString getRandomName(const QStringList &dict) {
-    return getRandomStrings(dict, 2, 109).join(L' ');
-}
-
-QString getRandomDescription(const QStringList &dict) {
-    return getRandomStrings(dict, 20, 7).join(L' ');
-}
-
-QnCameraBookmarkTags getRandomTags(const QStringList &dict) {
-    return getRandomStrings(dict, 6, 113).toSet();
-}
-
-qint64 move() {
-    return random(100000, 300000);
-}
+#include <ui/dialogs/export_timelapse_dialog.h>
 
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered()
 {
 #ifdef _DEBUG
-    qnRuntime->setDebugCounter(qnRuntime->debugCounter() - 1);
-    qDebug() << qnRuntime->debugCounter();
-
-    QList<qint64> steps;
-    steps << 1000 << 4000 << 16000 << 64000 << 256000;
-
-    QStringList dict;
-    QFile dictFile(lit("c:/sandbox/5000.dic"));
-    dictFile.open(QFile::ReadOnly);
-    QTextStream stream(&dictFile);
-    while (!stream.atEnd()) {
-        dict << stream.readLine();
-    }
-
-    int skip = 10;
-    int limit = 16000;
-    int counter = 0;
-
-    auto server = qnCommon->currentServer();
-    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getAllCameras(server, true)) {
-        qDebug() << "Camera" << camera->getName();
-
-        QnCachingCameraDataLoader *loader = context()->instance<QnCameraDataManager>()->loader(camera, false);
-        if (!loader)
-            continue;
-
-        auto periods = loader->periods(Qn::RecordingContent);
-        for (const QnTimePeriod &period: periods) {
-            qDebug() << "period" << period;
-
-            qint64 start = period.startTimeMs;
-            qint64 end = period.isInfinite()
-                ? QDateTime::currentMSecsSinceEpoch()
-                : period.endTimeMs();
-
-            while (start < end) {
-                for (qint64 step: steps) {
-                    if (start + step > end)
-                        break;
-
-                    ++counter;
-                    if (counter < skip) {
-                        if (counter % 500 == 0)
-                            qDebug() << "skipping counter" << counter;
-                        continue;
-                    }
-                    if (counter > limit)
-                        return;
-
-                    QnCameraBookmark bookmark;
-                    bookmark.guid = QnUuid::createUuid();
-                    bookmark.startTimeMs = start;
-                    bookmark.durationMs = step;
-                    bookmark.name = getRandomName(dict);
-                    bookmark.description = getRandomDescription(dict);
-                    bookmark.tags = getRandomTags(dict);
-                    bookmark.cameraId = camera->getUniqueId();
-
-                    QDateTime startDt = QDateTime::fromMSecsSinceEpoch(start);
-                    bookmark.timeout = startDt.addMonths(6).toMSecsSinceEpoch() - start;
-                    qDebug() << "adding bookmark " << counter << QDateTime::fromMSecsSinceEpoch(start);
-
-                    qnCameraBookmarksManager->addCameraBookmark(bookmark, [this, start](bool success) {
-                        qDebug() << "bookmark added " << success << QDateTime::fromMSecsSinceEpoch(start);
-                    });
-
-                    if (counter % 10 == 0)
-                        qApp->processEvents();
-                }
-
-                start += move();
-            }
-
-        }
-
-
-    }
+    QScopedPointer<QnExportTimelapseDialog> dialog(new QnExportTimelapseDialog(mainWindow()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
 #endif //_DEBUG
 }
 

@@ -32,6 +32,7 @@
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/message_box.h>
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/export_timelapse_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
@@ -87,6 +88,7 @@ QnWorkbenchExportHandler::QnWorkbenchExportHandler(QObject *parent):
 {
     connect(action(QnActions::ExportTimeSelectionAction), &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
     connect(action(QnActions::ExportLayoutAction),        &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
+    connect(action(QnActions::ExportTimelapseAction),     &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportTimelapseAction_triggered);
 }
 
 QString QnWorkbenchExportHandler::binaryFilterName() const {
@@ -196,71 +198,18 @@ QnMediaResourceWidget *QnWorkbenchExportHandler::extractMediaWidget(const QnActi
 
 void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = extractMediaWidget(parameters);
-    QnMediaResourcePtr mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
-
-    /* Either resource or widget must be provided */
-    if (!mediaResource && !widget)
-    {
-        QMessageBox::critical(
-              mainWindow()
-            , tr("Unable to export file.")
-            , tr("Exactly one item must be selected for export, but %n item(s) are currently selected." , "", parameters.size())
-            );
-        return;
-    }
-
-    if (!mediaResource)
-        mediaResource = widget->resource();
-
-    QnVirtualCameraResourcePtr camera = mediaResource.dynamicCast<QnVirtualCameraResource>();
-    auto dataProvider = camera
-        ? camera->createDataProvider(Qn::CR_Default)
-        : widget
-        ? widget->display()->dataProvider()
-        : nullptr;
-
-    if (!mediaResource || !dataProvider)
-        return;
-
-    // Creates default layout item data (if there is no widget
-    // selected - bookmarks export, for example). Media resource
-    // is used because it should be presented to export data
-    const auto createDefaultLayoutItemData =
-        [](const QnMediaResourcePtr &mediaResource) -> QnLayoutItemData
-    {
-        const auto resource = mediaResource->toResourcePtr();
-
-        QnLayoutItemData result;
-        result.uuid = QnUuid::createUuid();
-        result.resource.path = resource->getUniqueId();
-        result.resource.id = resource->getId();
-        result.flags = (Qn::SingleSelectedRole | Qn::SingleRole);
-        result.combinedGeometry = QRect(0, 0, 1, 1);
-        result.rotation = resource->hasProperty(QnMediaResource::rotationKey())
-            ? resource->getProperty(QnMediaResource::rotationKey()).toInt()
-            : 0;
-        return result;
-    };
-
-    QnLayoutItemData itemData = widget
-        ? widget->item()->data()
-        : createDefaultLayoutItemData(mediaResource);
-
-    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-
-    exportTimeSelection(mediaResource, dataProvider, itemData, period);
+    exportTimeSelection(menu()->currentParameters(sender()));
 }
 
 
 //TODO: #GDM Monstrous function, refactor required
 //TODO: #ynikitenkov refactor to use QnResourcePtr
-void QnWorkbenchExportHandler::exportTimeSelection(
-      const QnMediaResourcePtr &mediaResource
-    , const QnAbstractStreamDataProvider *dataProvider
-    , const QnLayoutItemData &itemData
-    , const QnTimePeriod &period
+void QnWorkbenchExportHandler::exportTimeSelectionInternal(
+    const QnMediaResourcePtr &mediaResource,
+    const QnAbstractStreamDataProvider *dataProvider,
+    const QnLayoutItemData &itemData,
+    const QnTimePeriod &period,
+    qint64 timelapseFrameStepMs
     )
 {
     bool wasLoggedIn = !context()->user().isNull();
@@ -546,7 +495,7 @@ void QnWorkbenchExportHandler::exportTimeSelection(
             fileName,
             imageParameters,
             serverTimeZone,
-            500 * 1000 * 100, // ggg media step (0.5s)
+            timelapseFrameStepMs,
             this);
 
         connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);
@@ -559,6 +508,64 @@ void QnWorkbenchExportHandler::exportTimeSelection(
         tool->start();
         exportProgressDialog->show();
     }
+}
+
+void QnWorkbenchExportHandler::exportTimeSelection(const QnActionParameters& parameters, qint64 timelapseFrameStepMs)
+{
+    QnMediaResourceWidget *widget = extractMediaWidget(parameters);
+    QnMediaResourcePtr mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
+
+    /* Either resource or widget must be provided */
+    if (!mediaResource && !widget)
+    {
+        QMessageBox::critical(
+            mainWindow()
+            , tr("Unable to export file.")
+            , tr("Exactly one item must be selected for export, but %n item(s) are currently selected." , "", parameters.size())
+            );
+        return;
+    }
+
+    if (!mediaResource)
+        mediaResource = widget->resource();
+
+    QnVirtualCameraResourcePtr camera = mediaResource.dynamicCast<QnVirtualCameraResource>();
+    auto dataProvider = camera
+        ? camera->createDataProvider(Qn::CR_Default)
+        : widget
+        ? widget->display()->dataProvider()
+        : nullptr;
+
+    if (!mediaResource || !dataProvider)
+        return;
+
+    // Creates default layout item data (if there is no widget
+    // selected - bookmarks export, for example). Media resource
+    // is used because it should be presented to export data
+    const auto createDefaultLayoutItemData =
+        [](const QnMediaResourcePtr &mediaResource) -> QnLayoutItemData
+    {
+        const auto resource = mediaResource->toResourcePtr();
+
+        QnLayoutItemData result;
+        result.uuid = QnUuid::createUuid();
+        result.resource.path = resource->getUniqueId();
+        result.resource.id = resource->getId();
+        result.flags = (Qn::SingleSelectedRole | Qn::SingleRole);
+        result.combinedGeometry = QRect(0, 0, 1, 1);
+        result.rotation = resource->hasProperty(QnMediaResource::rotationKey())
+            ? resource->getProperty(QnMediaResource::rotationKey()).toInt()
+            : 0;
+        return result;
+    };
+
+    QnLayoutItemData itemData = widget
+        ? widget->item()->data()
+        : createDefaultLayoutItemData(mediaResource);
+
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+
+    exportTimeSelectionInternal(mediaResource, dataProvider, itemData, period, timelapseFrameStepMs);
 }
 
 void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QString &filename) {
@@ -780,6 +787,28 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
     doAskNameAndExportLocalLayout(exportPeriod, layout, Qn::LayoutExport);
 }
 
+
+void QnWorkbenchExportHandler::at_exportTimelapseAction_triggered()
+{
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+    if (period.durationMs < QnExportTimelapseDialog::kMinimalSourcePeriodLength)
+    {
+        QMessageBox::warning(mainWindow(),
+            tr("Warning!"),
+            tr("Selected period is too short and cannot be exported as timelapse."));
+        return;
+    }
+
+    QScopedPointer<QnExportTimelapseDialog> dialog(new QnExportTimelapseDialog(mainWindow()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->setSourcePeriodLengthMs(period.durationMs);
+
+    if (!dialog->exec())
+        return;
+
+    exportTimeSelection(parameters, dialog->frameStepMs());
+}
 
 void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QString &fileName) {
     unlockFile(fileName);

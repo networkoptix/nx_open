@@ -171,9 +171,10 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
                                             QnStorageResourcePtr storage,
                                             QnStreamRecorder::Role role,
                                             qint64 serverTimeZoneMs,
-                                            qint64 mediaStepUs,
+                                            qint64 timelapseFrameStepMs,
                                             QnImageFilterHelper transcodeParams)
 {
+    qint64 timelapseFrameStepUs = timelapseFrameStepMs * 1000;
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
     Q_ASSERT_X(timePeriod.durationMs > 0, Q_FUNC_INFO, "Invalid time period, possibly LIVE is exported");
     qint64 endTimeUs = timePeriod.durationMs > 0
