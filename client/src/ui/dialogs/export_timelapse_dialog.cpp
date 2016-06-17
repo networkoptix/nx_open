@@ -19,19 +19,14 @@ const int kMaximalSpeed = 365 * 24 * 60;
 /* Minimal result length. */
 const qint64 kMinimalLengthMs = 1000;
 
+/* Sane default value for timelapse video: 5 minutes */
 const qint64 kDefaultLengthMs = 5 * 60 * 1000;
 
+/* Magic knowledge. We know that the result will be generated with 30 fps. --rvasilenko */
 const int kResultFps = 30;
 
-int toSliderScale(int absoluteSpeedValue)
-{
-    return static_cast<int>(log(absoluteSpeedValue));
-}
-
-int fromSliderScale(int sliderValue)
-{
-    return static_cast<int>(exp(sliderValue));
-}
+/* Default value for slider steps number. */
+const int kSliderSteps = 20;
 
 }
 
@@ -120,7 +115,8 @@ void QnExportTimelapseDialog::initControls()
         qDebug() << "maximum range" << maxRange;
         qDebug() << "back check" << fromSliderScale(maxRange) << " diff to" << maxSpeed;
     }
-    ui->speedSlider->setRange(kMinimalSpeed, toSliderScale(maxSpeed));
+    ui->speedSlider->setRange(0, toSliderScale(maxSpeed));
+    Q_ASSERT(toSliderScale(kMinimalSpeed) == 0);
 
     qint64 maxExpectedLengthMs = m_sourcePeriodLengthMs / kMinimalSpeed;
     ui->resultLengthSpinBox->setMaximum(static_cast<int>(maxExpectedLengthMs / 1000));
@@ -141,9 +137,32 @@ void QnExportTimelapseDialog::initControls()
 void QnExportTimelapseDialog::setExpectedLength(qint64 value)
 {
     m_expectedLengthMs = value;
-    qDebug() << "expected length" << value / 1000 << "seconds";
     qint64 framesCount = m_sourcePeriodLengthMs / value;
     m_frameStepMs = framesCount * 1000 / kResultFps;
     ui->framesLabel->setText(QString::number(m_frameStepMs));
     ui->resultLengthSpinBox->setValue(static_cast<int>(value / 1000));
+}
+
+int QnExportTimelapseDialog::toSliderScale(int absoluteSpeedValue)
+{
+    /* If we have less steps than recommended value, just use direct scale */
+    int maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
+    if (maxSpeed - kMinimalSpeed <= kSliderSteps)
+        return absoluteSpeedValue - kMinimalSpeed;
+
+    /*TODO: #GDM Function is: kMinimalSpeed * e ^ (k * kSliderSteps) == maxSpeed. From here getting k. */
+
+    return static_cast<int>(log(absoluteSpeedValue));
+}
+
+int QnExportTimelapseDialog::fromSliderScale(int sliderValue)
+{
+    /* If we have less steps than recommended value, just use direct scale */
+    int maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
+    if (maxSpeed - kMinimalSpeed <= kSliderSteps)
+        return kMinimalSpeed + sliderValue;
+
+    /*TODO: #GDM Function is: kMinimalSpeed * e ^ (k * kSliderSteps) == maxSpeed. From here getting k. */
+
+    return static_cast<int>(exp(sliderValue));
 }
