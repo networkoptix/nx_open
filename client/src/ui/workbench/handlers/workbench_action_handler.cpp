@@ -217,11 +217,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::OpenLayoutsInNewWindowAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsInNewWindowAction_triggered()));
     connect(action(QnActions::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
     connect(action(QnActions::OpenNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openNewWindowAction_triggered()));
-    
-    connect(action(QnActions::BrowseLocalFilesAction), &QAction::triggered, this, [this]()
-        { setWelcomeScreenVisible(false); });
-    connect(action(QnActions::ShowWelcomeScreenAction), &QAction::triggered, this, [this]()
-        { setWelcomeScreenVisible(true); });
 
     connect(action(QnActions::MediaFileSettingsAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(QnActions::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
@@ -279,6 +274,30 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::DelayedForcedExitAction),                &QAction::triggered,    this,   [this] {  closeApplication(true);    }, Qt::QueuedConnection);
 
     connect(action(QnActions::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
+
+    const auto browseAction = action(QnActions::BrowseLocalFilesModeAction);
+    const auto setWelcomeScreenVisible = [this](bool visible)
+    {
+        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->setVisible(visible);
+    };
+
+    const auto idChangedHandler = [setWelcomeScreenVisible, browseAction](const QnUuid & /* id */)
+    {
+        const bool connected = !qnCommon->remoteGUID().isNull();
+        browseAction->setChecked(connected);
+    };
+
+    connect(qnCommon, &QnCommonModule::remoteIdChanged, this, idChangedHandler);
+    connect(browseAction, &QAction::toggled, this, [setWelcomeScreenVisible](bool checked)
+    {
+        setWelcomeScreenVisible(!checked);
+    });
+
+    connect(display(), &QnWorkbenchDisplay::widgetAdded, this, [browseAction]()
+    {
+        browseAction->setChecked(true);
+    });
 
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
@@ -848,16 +867,6 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     qnResourcesChangesManager->saveCamerasCore(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera) {
         camera->setParentId(serverId);
     });
-}
-
-void QnWorkbenchActionHandler::setWelcomeScreenVisible(bool visible)
-{
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    NX_ASSERT(welcomeScreen, "Welcome screen has not been created yet");
-    if (!welcomeScreen)
-        return;
-
-    welcomeScreen->setVisible(visible);
 }
 
 void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {

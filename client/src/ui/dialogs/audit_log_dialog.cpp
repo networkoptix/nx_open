@@ -58,11 +58,19 @@ namespace
     const char* checkBoxFilterProperty("checkboxFilter");
 }
 
-QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
+QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     base_type(parent),
     ui(new Ui::AuditLogDialog),
+    m_sessionModel(nullptr),
+    m_camerasModel(nullptr),
+    m_detailModel(nullptr),
     m_updateDisabled(false),
     m_dirty(false),
+    m_selectAllAction(new QAction(tr("Select All"), this)),
+    m_exportAction(new QAction(tr("Export Selection to File..."), this)),
+    m_clipboardAction(new QAction(tr("Copy Selection to Clipboard"), this)),
+    m_detailsLabel(nullptr),
+    m_itemDelegate(new QnAuditItemDelegate(this)),
     m_descriptionColumnIndex(-1)
 {
     ui->setupUi(this);
@@ -91,13 +99,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
                 (ui->detailsTabWidget->tabBar()->height() - m_detailsLabel->height()) / 2);
         });
 
-    m_clipboardAction = new QAction(tr("Copy Selection to Clipboard"), this);
-    m_exportAction = new QAction(tr("Export Selection to File..."), this);
-    m_selectAllAction = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(QKeySequence::SelectAll);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
-
-    m_itemDelegate = new QnAuditItemDelegate(this);
 
     setupSessionsGrid();
     setupCamerasGrid();

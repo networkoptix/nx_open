@@ -34,9 +34,10 @@ namespace {
 
 }
 
-QnResourceDirectoryBrowser::QnResourceDirectoryBrowser() {
-    m_resourceReady = false;
-}
+QnResourceDirectoryBrowser::QnResourceDirectoryBrowser(QObject* parent) :
+    base_type(parent),
+    m_resourceReady(false)
+{}
 
 QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) {
     QnResourcePtr result;
@@ -53,11 +54,6 @@ QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid &resourceT
 
 QString QnResourceDirectoryBrowser::manufacture() const {
     return lit("DirectoryBrowser");
-}
-
-QnResourceDirectoryBrowser &QnResourceDirectoryBrowser::instance() {
-    static QnResourceDirectoryBrowser inst;
-    return inst;
 }
 
 void QnResourceDirectoryBrowser::cleanup() {
@@ -101,12 +97,9 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
     return result;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString &filename) const {
-    QFile file(filename);
-    if (!file.exists())
-        return QnResourcePtr(0);
-
-    return createArchiveResource(filename);
+QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString &filename) const
+{
+    return resourceFromFile(filename);
 }
 
 // =============================================================================================
@@ -302,7 +295,17 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     return layout;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& xfile) {
+QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString &filename)
+{
+    QFile file(filename);
+    if (!file.exists())
+        return QnResourcePtr();
+
+    return createArchiveResource(filename);
+}
+
+QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& xfile)
+{
     //if (FileTypeSupport::isImageFileExt(xfile))
     //    return QnResourcePtr(new QnLocalFileResource(xfile));
 

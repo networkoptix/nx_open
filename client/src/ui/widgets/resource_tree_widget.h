@@ -116,6 +116,7 @@ public:
     void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate);
 
     QAbstractItemView* treeView() const;
+    QnResourceItemDelegate* itemDelegate() const;
 
 protected:
     virtual bool eventFilter(QObject *obj, QEvent *event) override;

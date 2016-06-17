@@ -20,15 +20,14 @@ public:
 
     QnUserResourceList userList;
     QSet<QnUserResourcePtr> checkedUsers;
-    QnUserManagementColors colors;
 
-    QnUserListModelPrivate(QnUserListModel *parent) :
+    QnUserListModelPrivate(QnUserListModel* parent) :
         base_type(parent),
         model(parent)
     {
         userList = qnResPool->getResources<QnUserResource>();
 
-        connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnUserListModelPrivate::at_resourcePool_resourceAdded);
+        connect(qnResPool, &QnResourcePool::resourceAdded,   this, &QnUserListModelPrivate::at_resourcePool_resourceAdded);
         connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnUserListModelPrivate::at_resourcePool_resourceRemoved);
         connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
 
@@ -288,23 +287,16 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
 
         case Qt::DecorationRole:
         {
-            switch (index.column())
+            if (index.column() == UserTypeColumn)
             {
-                case UserTypeColumn:
+                switch (user->userType())
                 {
-                    switch (user->userType())
-                    {
-                        case QnUserType::Cloud  : return qnSkin->icon("titlebar/cloud_not_logged.png");
-                        case QnUserType::Ldap   : return qnSkin->icon("done.png"); //TODO: #vkutin Replace by LDAP icon
-                        default: break;
-                    }
-
-                    break;
+                    case QnUserType::Cloud  : return qnSkin->icon("misc/user_type_cloud.png");
+                    case QnUserType::Ldap   : return qnSkin->icon("misc/user_type_ldap.png");
+                    default                 : break;
                 }
-
-                default:
-                    break;
             }
+
             break;
         }
 
@@ -314,21 +306,10 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
             if (index.column() == CheckBoxColumn)
                 return QVariant();
 
-            /* Gray out disabled users. */
-            if (!user->isEnabled())
-                return qApp->palette().color(QPalette::Disabled, QPalette::Text);
-
             /* Highlight conflicting users. */
             if (user->isLdap() && !d->isUnique(user))
                 return qnGlobals->errorTextColor();
 
-            break;
-        }
-
-        case Qt::BackgroundRole:
-        {
-            if (d->checkedUsers.contains(user))
-                return qApp->palette().color(QPalette::Highlight);
             break;
         }
 
@@ -401,7 +382,10 @@ Qt::ItemFlags QnUserListModel::flags(const QModelIndex& index) const
     if (!user)
         return flags;
 
-    flags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled; //TODO: #vkutin Disable switch if we cannot turn it
+    flags |= Qt::ItemIsSelectable;
+
+    if (isInteractiveColumn(index.column()) || user->isEnabled())
+        flags |= Qt::ItemIsEnabled;
 
     if (index.column() == CheckBoxColumn)
         flags |= Qt::ItemIsUserCheckable;
@@ -432,25 +416,16 @@ void QnUserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePt
         if (row >= 0)
             emit dataChanged(index(row, CheckBoxColumn), index(row, ColumnCount - 1), roles);
     }
-
 }
 
-const QnUserManagementColors QnUserListModel::colors() const
+bool QnUserListModel::isInteractiveColumn(int column)
 {
-    return d->colors;
-}
-
-void QnUserListModel::setColors(const QnUserManagementColors& colors)
-{
-    beginResetModel();
-    d->colors = colors;
-    endResetModel();
+    return column == CheckBoxColumn || column == EnabledColumn;
 }
 
 QnSortedUserListModel::QnSortedUserListModel(QObject *parent) : base_type(parent)
 {
 }
-
 
 bool QnSortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {

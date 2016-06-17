@@ -75,12 +75,13 @@
 #include <ui/graphics/instruments/grid_adjustment_instrument.h>
 #include <ui/graphics/instruments/ptz_instrument.h>
 #include <ui/graphics/instruments/zoom_window_instrument.h>
-#include <ui/graphics/items/resource/button_ids.h>
 
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
+#include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/resource/web_view.h>
 
 #include <ui/help/help_handler.h>
 
@@ -1310,7 +1311,11 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
     m_widgetByRole[role] = newWidget;
 
     QGraphicsItem *focusItem = display()->scene()->focusItem();
-    if(newWidget && (!focusItem || dynamic_cast<QnResourceWidget *>(focusItem)))
+    bool canMoveFocus = !focusItem
+        || dynamic_cast<QnResourceWidget *>(focusItem)
+        || dynamic_cast<QnWebView*>(focusItem);
+
+    if (newWidget && canMoveFocus)
         newWidget->setFocus(); /* Move focus only if it's not already grabbed by some control element. */
 
     switch(role) {

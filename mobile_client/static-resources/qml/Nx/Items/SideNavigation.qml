@@ -45,7 +45,7 @@ Drawer
                 }
             }
 
-            model: QnLayoutsModel {}
+            model: connectionManager.online ? layoutsModel : undefined
 
             delegate: LayoutItem
             {
@@ -57,6 +57,8 @@ Drawer
                 onClicked: activeLayout = resourceId
             }
         }
+
+        QnLayoutsModel { id: layoutsModel }
 
         OfflineDummy
         {

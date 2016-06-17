@@ -183,8 +183,6 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
     connect(action(QnActions::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showLoginDialog);
     connect(action(QnActions::BeforeExitAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
     
-    connect(qnCommon, &QnCommonModule::remoteIdChanged, this, &QnWorkbenchConnectHandler::connectedChanged);
-
     context()->instance<QnAppServerNotificationCache>();
 }
 

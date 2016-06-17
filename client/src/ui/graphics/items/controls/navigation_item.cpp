@@ -276,6 +276,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(navigator(), &QnWorkbenchNavigator::liveChanged,                this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
     connect(navigator(), &QnWorkbenchNavigator::liveSupportedChanged,       this,   &QnNavigationItem::updateLiveButtonEnabled);
     connect(navigator(), &QnWorkbenchNavigator::playingSupportedChanged,    this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::playingSupportedChanged,    this,   &QnNavigationItem::updateVolumeButtonsEnabled);
     connect(navigator(), &QnWorkbenchNavigator::speedChanged,               this,   &QnNavigationItem::updateSpeedSliderSpeedFromNavigator);
     connect(navigator(), &QnWorkbenchNavigator::speedRangeChanged,          this,   &QnNavigationItem::updateSpeedSliderParametersFromNavigator);
     connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged,          this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
@@ -323,6 +324,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     updateLiveButtonChecked();
     updateLiveButtonEnabled();
     updatePlaybackButtonsEnabled();
+    updateVolumeButtonsEnabled();
 
     updatePlaybackButtonsIcons();
     updateSpeedSliderParametersFromNavigator();
@@ -513,6 +515,12 @@ void QnNavigationItem::updatePlaybackButtonsEnabled()
     m_speedSlider->setEnabled(playable);
 }
 
+void QnNavigationItem::updateVolumeButtonsEnabled()
+{
+    bool isTimelineVisible = navigator()->isPlayingSupported();
+    m_muteButton->setEnabled(isTimelineVisible);
+}
+
 void QnNavigationItem::updateMuteButtonChecked()
 {
     m_muteButton->setChecked(m_volumeSlider->isMute());
@@ -662,16 +670,5 @@ QnImageButtonWidget *QnNavigationItem::newActionButton(QnActions::IDType id)
 
 bool QnNavigationItem::isTimelineRelevant() const
 {
-    auto navigator = this->navigator();
-
-    if (!navigator || !navigator->currentWidget())
-        return false;
-
-    if (!navigator->isPlayingSupported())
-        return false;
-
-    if (navigator->hasArchive())
-        return true;
-
-    return navigator->currentWidget()->resource()->flags().testFlag(Qn::local);
+    return this->navigator() && this->navigator()->isTimelineRelevant();
 }

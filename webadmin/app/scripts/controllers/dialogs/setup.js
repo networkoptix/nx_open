@@ -127,7 +127,13 @@ angular.module('webadminApp')
 
             if(debugMode) {
                 checkInternet(false);
-                $scope.next('start');// go to start
+
+                var search = $location.search();
+                if(search.debug !== true){ // fast redirect to desired step
+                    $scope.next(search.debug);
+                }else {
+                    $scope.next('start');// go to start
+                }
                 return;
             }
             mediaserver.systemCloudInfo().then(function(data){

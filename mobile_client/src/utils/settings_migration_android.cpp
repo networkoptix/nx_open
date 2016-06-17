@@ -4,7 +4,7 @@
 
 #include <QtAndroidExtras/QAndroidJniObject>
 
-#include <utils/common/app_info.h>
+#include <mobile_client/mobile_client_app_info.h>
 #include <mobile_client/mobile_client_settings.h>
 
 QnMigratedSessionList getMigratedSessions(bool *success)
@@ -15,7 +15,7 @@ QnMigratedSessionList getMigratedSessions(bool *success)
         *success = false;
 
     QString uriString = lit("content://") +
-                        QnAppInfo::oldAndroidAppId() +
+        QnMobileClientAppInfo::oldAndroidAppId() +
                         lit(".LogonEntries/#HereWillBeDragonsRazRazRaz111!!!");
 
     QAndroidJniObject uri = QAndroidJniObject::callStaticObjectMethod(

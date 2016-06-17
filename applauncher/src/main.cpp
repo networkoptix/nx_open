@@ -132,7 +132,7 @@ int main( int argc, char* argv[] )
     QSettings userSettings( QSettings::UserScope, QnAppInfo::organizationName(), appName );
 
     if( mirrorListUrl.isEmpty() )
-        mirrorListUrl = globalSettings.value( "mirrorListUrl", QnAppInfo::mirrorListUrl() ).toString();
+        mirrorListUrl = globalSettings.value( "mirrorListUrl", QnApplauncherAppInfo::mirrorListUrl() ).toString();
 
     if (mirrorListUrl.isEmpty())
         NX_LOG( "MirrorListUrl is empty", cl_logWARNING );

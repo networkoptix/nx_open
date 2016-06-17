@@ -127,8 +127,17 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+     <property name="spacing">
+      <number>24</number>
+     </property>
+     <property name="topMargin">
+      <number>8</number>
+     </property>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_8">
+       <property name="spacing">
+        <number>16</number>
+       </property>
        <item>
         <widget class="QGroupBox" name="settingsGroupBox">
          <property name="title">
@@ -151,18 +160,15 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QDoubleSpinBox" name="fpsSpinBox">
-              <property name="decimals">
-               <number>0</number>
-              </property>
+             <widget class="QSpinBox" name="fpsSpinBox">
               <property name="minimum">
-               <double>1.000000000000000</double>
+               <number>1</number>
               </property>
               <property name="maximum">
-               <double>30.000000000000000</double>
+               <number>30</number>
               </property>
               <property name="value">
-               <double>10.000000000000000</double>
+               <number>10</number>
               </property>
              </widget>
             </item>
