@@ -194,7 +194,7 @@ void QnLayoutsModelUnsorted::at_resourceRemoved(const QnResourcePtr& resource)
     disconnect(layout, nullptr, this, nullptr);
 
     auto it = std::find_if(m_layoutsList.begin(), m_layoutsList.end(),
-                           [id = layout->getId()](const auto& item)
+                           [id = layout->getId()](const ModelItem& item)
                            {
                                return id == item.id;
                            }
@@ -217,7 +217,7 @@ void QnLayoutsModelUnsorted::at_resourceParentIdChanged(const QnResourcePtr& res
     bool suitable = isLayoutSuitable(layout);
 
     auto it = std::find_if(m_layoutsList.begin(), m_layoutsList.end(),
-                           [id = layout->getId()](const auto& item)
+                           [id = layout->getId()](const ModelItem& item)
                            {
                                return id == item.id;
                            }

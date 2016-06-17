@@ -64,6 +64,7 @@ public:
     QTimer *suspendTimer;
     int connectionHandle;
     QnConnectionManager::State connectionState;
+    QnSoftwareVersion connectionVersion;
 };
 
 QnConnectionManager::QnConnectionManager(QObject *parent) :
@@ -132,6 +133,12 @@ QString QnConnectionManager::currentPassword() const
 {
     Q_D(const QnConnectionManager);
     return d->url.isValid() ? d->url.password() : QString();
+}
+
+QnSoftwareVersion QnConnectionManager::connectionVersion() const
+{
+    Q_D(const QnConnectionManager);
+    return d->connectionVersion;
 }
 
 void QnConnectionManager::connectToServer(const QUrl &url)
@@ -304,10 +311,15 @@ void QnConnectionManagerPrivate::doConnect() {
         qnSettings->setLastUsedSystemId(connectionInfo.systemName);
         url.setPassword(QString());
         qnSettings->setLastUsedUrl(url);
+
+        connectionVersion = connectionInfo.version;
+        emit q->connectionVersionChanged();
     });
 }
 
 void QnConnectionManagerPrivate::doDisconnect(bool force) {
+    Q_Q(QnConnectionManager);
+
     if (!force)
         qnGlobalSettings->synchronizeNow();
 
@@ -317,6 +329,9 @@ void QnConnectionManagerPrivate::doDisconnect(bool force) {
     QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnSessionManager::instance()->stop();
+
+    connectionVersion = QnSoftwareVersion();
+    emit q->connectionVersionChanged();
 
     updateConnectionState();
 }

@@ -4,25 +4,35 @@
 #include <QtGui/QClipboard>
 
 #include <core/core_settings.h>
-#include "connection_manager.h"
-#include "utils/mobile_app_info.h"
+#include <camera/camera_thumbnail_cache.h>
+#include <utils/mobile_app_info.h>
 #include <utils/common/app_info.h>
-#include "camera/camera_thumbnail_cache.h"
-#include "context_settings.h"
-#include "ui/window_utils.h"
-#include "ui/texture_size_helper.h"
+#include <common/common_module.h>
+#include <context/connection_manager.h>
+#include <context/context_settings.h>
+#include <ui/window_utils.h>
+#include <ui/texture_size_helper.h>
 #include <ui/models/recent_user_connections_model.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_app_info.h>
+#include <watchers/available_cameras_watcher.h>
 
-QnContext::QnContext(QObject *parent):
+namespace {
+
+const auto kUserRightsRefactoredVersion = QnSoftwareVersion(3, 0);
+
+} // anonymous namespace
+
+QnContext::QnContext(QObject* parent) :
     base_type(parent),
     m_connectionManager(new QnConnectionManager(this)),
     m_appInfo(new QnMobileAppInfo(this)),
     m_settings(new QnContextSettings(this))
 {
-    connect(m_connectionManager, &QnConnectionManager::connectionStateChanged, this, [this](){
-        QnCameraThumbnailCache *thumbnailCache = QnCameraThumbnailCache::instance();
+    connect(m_connectionManager, &QnConnectionManager::connectionStateChanged,
+            this, [this]()
+    {
+        auto thumbnailCache = QnCameraThumbnailCache::instance();
         if (!thumbnailCache)
             return;
 
@@ -30,6 +40,14 @@ QnContext::QnContext(QObject *parent):
             thumbnailCache->start();
         else
             thumbnailCache->stop();
+    });
+
+    connect(m_connectionManager, &QnConnectionManager::connectionVersionChanged,
+            this, [this]()
+    {
+        const bool useLayouts = m_connectionManager->connectionVersion() < kUserRightsRefactoredVersion;
+        auto camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+        camerasWatcher->setUseLayouts(useLayouts);
     });
 }
 
