@@ -24,8 +24,7 @@ class QnTextButtonWidget: public Framed<QnImageButtonWidget> {
     typedef Framed<QnImageButtonWidget> base_type;
 
 public:
-    QnTextButtonWidget(const QString &statisticsAlias
-        , QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnTextButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
 
     const QString &text() const;
     void setText(const QString &text);

@@ -16,21 +16,11 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
     ui->setupUi(this);
 
     ui->newPasswordInputField->setTitle(tr("New Password"));
-    ui->newPasswordInputField->setEchoMode(QLineEdit::Password);
-    ui->newPasswordInputField->setPasswordIndicatorEnabled(true);
+    ui->newPasswordInputField->setPasswordMode(QLineEdit::Password, false, true);
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
-    ui->confirmPasswordInputField->setValidator([this](const QString& text)
-    {
-        if (ui->newPasswordInputField->text().isEmpty())
-            return Qn::kValidResult;
-
-        if (ui->newPasswordInputField->text() != text)
-            return Qn::ValidationResult(tr("Passwords do not match."));
-
-        return Qn::kValidResult;
-    });
+    ui->confirmPasswordInputField->setConfirmationMode(ui->newPasswordInputField, tr("Passwords do not match."));
 
     ui->currentPasswordInputField->setTitle(tr("Current Password"));
     ui->currentPasswordInputField->setEchoMode(QLineEdit::Password);

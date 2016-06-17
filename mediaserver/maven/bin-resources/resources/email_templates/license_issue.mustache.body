@@ -1,4 +1,4 @@
-<h1>{{event}} on {{source}}</h1>
+<h1>{{event}} on <b>{{source}}</b></h1>
 <p>Not enough licenses</p>
 <p>Camera recording was forcibly stopped on cameras:</p>
 <table class="description">
@@ -11,11 +11,11 @@
     <tbody>
 {{#aggregated}}
         <tr>
-            <td >
-                <b>{{source}}</b> ({{sourceIp}})
-            </td>
+            <td><b>{{reason}}</b></td>
             <td>{{{timestamp}}}</td>
         </tr>
 {{/aggregated}}
     </tbody>
 </table>
+
+

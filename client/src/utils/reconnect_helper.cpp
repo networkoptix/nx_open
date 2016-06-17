@@ -16,7 +16,7 @@
 
 #include <client/client_settings.h>
 
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
 #include <utils/common/string.h>
 #include <network/module_finder.h>
 

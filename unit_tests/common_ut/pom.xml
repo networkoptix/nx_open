@@ -21,7 +21,7 @@
         <master.project.directory>common</master.project.directory>
 
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -ludt</global.libs>
+        <global.libs>-lcommon -lnx_fusion -lnx_network -lnx_streaming -ludt -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 

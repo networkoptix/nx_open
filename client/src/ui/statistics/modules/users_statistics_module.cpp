@@ -1,7 +1,7 @@
 
 #include "users_statistics_module.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include <core/resource/user_resource.h>
 #include <ui/workbench/workbench_context.h>
@@ -41,9 +41,9 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
     {
         const auto permissions = qnResourceAccessManager->globalPermissions(userResource);
 
-        static const auto kDelimieter = L'|';
+        static const auto kDelimiter = L'|';
         const auto permissionsList = QnLexical::serialized(permissions)
-            .split(kDelimieter, QString::SkipEmptyParts);
+            .split(kDelimiter, QString::SkipEmptyParts);
         for (auto permissionStr: permissionsList)
             ++permissionsCount[permissionStr];
     }
@@ -57,7 +57,6 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
 
     // Adds current user permissions metric
     const auto currentUser = context()->user();
-    NX_ASSERT(currentUser, Q_FUNC_INFO, "There is no current user!");
     if (!currentUser)
         return result;
 

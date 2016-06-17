@@ -15,7 +15,7 @@
 
 #include <rest/server/request_handler.h>
 #include <nx/network/http/httptypes.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <transaction/transaction.h>
 
 #include "server_query_processor.h"
@@ -127,7 +127,7 @@ namespace ec2
                 finished = true;
                 m_cond.wakeAll();
             };
-            m_connection->queryProcessor()->processUpdateAsync( tran, queryDoneHandler );
+            m_connection->queryProcessor()->getAccess(Qn::UserAccessData(owner->authUserId())).processUpdateAsync( tran, queryDoneHandler );
 
             {
                 QnMutexLocker lk( &m_mutex );

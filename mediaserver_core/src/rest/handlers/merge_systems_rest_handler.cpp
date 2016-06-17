@@ -23,7 +23,7 @@
 #include "network/module_finder.h"
 #include "network/direct_module_finder.h"
 #include "utils/common/app_info.h"
-#include "utils/common/model_functions.h"
+#include "nx/fusion/model_functions.h"
 #include <nx/utils/log/log.h>
 #include "api/model/ping_reply.h"
 #include "audit/audit_manager.h"
@@ -226,7 +226,10 @@ int QnMergeSystemsRestHandler::executeGet(
         simpleUrl.setHost(url.host());
         if (url.port() != remoteModuleInformation.port)
             simpleUrl.setPort(url.port());
-        ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(remoteModuleInformation.id, simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        ec2Connection()->getDiscoveryManager(Qn::UserAccessData(owner->authUserId()))->addDiscoveryInformation(remoteModuleInformation.id,
+                                                                                                               simpleUrl, false,
+                                                                                                               ec2::DummyHandler::instance(),
+                                                                                                               &ec2::DummyHandler::onRequestDone);
     }
     QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
 
@@ -384,7 +387,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
 
     ec2::ApiUserData userData;
     fromResourceToApi(admin, userData);
-    errorCode = ec2Connection()->getUserManager()->saveSync(userData);
+    errorCode = ec2Connection()->getUserManager(Qn::UserAccessData(owner->authUserId()))->saveSync(userData);
     if (errorCode != ec2::ErrorCode::ok)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save admin user: %1")
@@ -392,13 +395,13 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
     }
 
-    if (!changeSystemName(systemName, remoteSysTime, remoteTranLogTime, false))
+    if (!changeSystemName(systemName, remoteSysTime, remoteTranLogTime, false, Qn::UserAccessData(owner->authUserId())))
     {
         NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to change system name"), cl_logDEBUG1);
         return false;
     }
 
-    errorCode = ec2Connection()->getMiscManager()->changeSystemNameSync(systemName, remoteSysTime, remoteTranLogTime);
+    errorCode = ec2Connection()->getMiscManager(Qn::UserAccessData(owner->authUserId()))->changeSystemNameSync(systemName, remoteSysTime, remoteTranLogTime);
     if (errorCode != ec2::ErrorCode::ok)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save new system name: %1")

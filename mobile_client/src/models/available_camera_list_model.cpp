@@ -2,52 +2,79 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <mobile_client/mobile_client_roles.h>
 #include <common/common_module.h>
 #include <watchers/available_cameras_watcher.h>
 
-QnAvailableCameraListModel::QnAvailableCameraListModel(QObject *parent) :
-    base_type(parent)
+class QnAvailableCameraListModelPrivate : public Connective<QObject>
+{
+    QnAvailableCameraListModel* q_ptr;
+    Q_DECLARE_PUBLIC(QnAvailableCameraListModel)
+
+public:
+    QList<QnResourcePtr> resources;
+    QnLayoutResourcePtr layout;
+
+public:
+    QnAvailableCameraListModelPrivate(QnAvailableCameraListModel* parent);
+
+    void setLayout(const QnLayoutResourcePtr& newLayout);
+    void resetResources();
+
+    void addCamera(const QnResourcePtr& resource, bool silent = false);
+    void removeCamera(const QnResourcePtr& resource, bool silent = false);
+
+    void at_watcher_cameraAdded(const QnResourcePtr& resource);
+    void at_watcher_cameraRemoved(const QnResourcePtr& resource);
+    void at_layout_itemAdded(const QnLayoutResourcePtr& resource, const QnLayoutItemData& item);
+    void at_layout_itemRemoved(const QnLayoutResourcePtr& resource, const QnLayoutItemData& item);
+    void at_resourceChanged(const QnResourcePtr& resource);
+};
+
+QnAvailableCameraListModel::QnAvailableCameraListModel(QObject* parent) :
+    base_type(parent),
+    d_ptr(new QnAvailableCameraListModelPrivate(this))
 {
 }
 
-QnAvailableCameraListModel::~QnAvailableCameraListModel() {
-
+QnAvailableCameraListModel::~QnAvailableCameraListModel()
+{
 }
 
-void QnAvailableCameraListModel::resetResources() {
-    beginResetModel();
-    resetResourcesInternal();
-    endResetModel();
-}
-
-int QnAvailableCameraListModel::rowCount(const QModelIndex &parent) const {
+int QnAvailableCameraListModel::rowCount(const QModelIndex& parent) const
+{
     Q_UNUSED(parent)
-
-    return m_resources.size();
+    Q_D(const QnAvailableCameraListModel);
+    return d->resources.size();
 }
 
-QVariant QnAvailableCameraListModel::data(const QModelIndex &index, int role) const {
-    if (!hasIndex(index.row(), index.column()))
+QVariant QnAvailableCameraListModel::data(const QModelIndex& index, int role) const
+{
+    Q_D(const QnAvailableCameraListModel);
+
+    if (index.row() > d->resources.size())
         return QVariant();
 
-    QnResourcePtr resource = m_resources[index.row()];
+    const auto& resource = d->resources[index.row()];
 
-    switch (role) {
-    case Qn::ResourceNameRole:
-        return resource->getName();
-    case Qn::ResourceStatusRole:
-        return resource->getStatus();
-    case Qn::UuidRole:
-        return resource->getId().toString();
-    case Qn::IpAddressRole:
-        return QUrl(resource->getUrl()).host();
+    switch (role)
+    {
+        case Qn::ResourceNameRole:
+            return resource->getName();
+        case Qn::ResourceStatusRole:
+            return resource->getStatus();
+        case Qn::UuidRole:
+            return resource->getId().toString();
+        case Qn::IpAddressRole:
+            return QUrl(resource->getUrl()).host();
     }
     return QVariant();
 }
 
-QHash<int, QByteArray> QnAvailableCameraListModel::roleNames() const {
-    QHash<int, QByteArray> roleNames = QAbstractListModel::roleNames();
+QHash<int, QByteArray> QnAvailableCameraListModel::roleNames() const
+{
+    auto roleNames = QAbstractListModel::roleNames();
     roleNames[Qn::ResourceNameRole] = Qn::roleName(Qn::ResourceNameRole);
     roleNames[Qn::UuidRole] = Qn::roleName(Qn::UuidRole);
     roleNames[Qn::IpAddressRole] = Qn::roleName(Qn::IpAddressRole);
@@ -55,19 +82,37 @@ QHash<int, QByteArray> QnAvailableCameraListModel::roleNames() const {
     return roleNames;
 }
 
-void QnAvailableCameraListModel::refreshResource(const QnResourcePtr &resource, int role) {
-    int row = m_resources.indexOf(resource);
+void QnAvailableCameraListModel::refreshResource(const QnResourcePtr& resource, int role)
+{
+    Q_D(QnAvailableCameraListModel);
+
+    const auto row = d->resources.indexOf(resource);
     if (row == -1)
         return;
+
+    const auto idx = index(row);
 
     QVector<int> roles;
     if (role != -1)
         roles.append(role);
-    QModelIndex index = this->index(row);
-    emit dataChanged(index, index, roles);
+
+    emit dataChanged(idx, idx, roles);
 }
 
-bool QnAvailableCameraListModel::filterAcceptsResource(const QnResourcePtr &resource) const {
+QnLayoutResourcePtr QnAvailableCameraListModel::layout() const
+{
+    Q_D(const QnAvailableCameraListModel);
+    return d->layout;
+}
+
+void QnAvailableCameraListModel::setLayout(const QnLayoutResourcePtr& layout)
+{
+    Q_D(QnAvailableCameraListModel);
+    d->setLayout(layout);
+}
+
+bool QnAvailableCameraListModel::filterAcceptsResource(const QnResourcePtr& resource) const
+{
     if (!resource->hasFlags(Qn::live_cam))
         return false;
 
@@ -77,60 +122,152 @@ bool QnAvailableCameraListModel::filterAcceptsResource(const QnResourcePtr &reso
     return true;
 }
 
-void QnAvailableCameraListModel::at_watcher_cameraAdded(const QnResourcePtr &resource) {
-    if (!filterAcceptsResource(resource))
-        return;
 
-    connect(resource,   &QnResource::nameChanged,       this,   &QnAvailableCameraListModel::at_resourcePool_resourceChanged);
-    connect(resource,   &QnResource::statusChanged,     this,   &QnAvailableCameraListModel::at_resourcePool_resourceChanged);
+QnAvailableCameraListModelPrivate::QnAvailableCameraListModelPrivate(QnAvailableCameraListModel* parent) :
+    q_ptr(parent)
+{
+    connect(qnResPool, &QnResourcePool::resourceChanged,
+            this, &QnAvailableCameraListModelPrivate::at_resourceChanged);
 
-    beginInsertRows(QModelIndex(), m_resources.size(), m_resources.size());
-    m_resources.append(resource);
-    endInsertRows();
+    resetResources();
 }
 
-void QnAvailableCameraListModel::at_watcher_cameraRemoved(const QnResourcePtr &resource) {
-    int row = m_resources.indexOf(resource);
-    if (row == -1)
+void QnAvailableCameraListModelPrivate::setLayout(const QnLayoutResourcePtr& newLayout)
+{
+    if (layout == newLayout)
         return;
 
-    beginRemoveRows(QModelIndex(), row, row);
-    m_resources.removeAt(row);
-    endRemoveRows();
+    if (layout)
+        disconnect(layout, nullptr, this, nullptr);
 
-    disconnect(resource, nullptr, this, nullptr);
+    layout = newLayout;
+
+    resetResources();
 }
 
-void QnAvailableCameraListModel::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
-    QnAvailableCamerasWatcher *watcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+void QnAvailableCameraListModelPrivate::resetResources()
+{
+    const auto* camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
 
-    int row = m_resources.indexOf(resource);
-    bool accept = filterAcceptsResource(resource) && watcher->isCameraAvailable(resource->getId());
+    Q_Q(QnAvailableCameraListModel);
 
-    if (row == -1) {
-        if (accept)
-            at_watcher_cameraAdded(resource);
-    } else {
-        if (!accept) {
-            at_watcher_cameraRemoved(resource);
-        } else {
-            QModelIndex index = this->index(row);
-            emit dataChanged(index, index);
+    q->beginResetModel();
+
+    for (const auto& resource: resources)
+        disconnect(resource, nullptr, this, nullptr);
+    resources.clear();
+
+    if (layout)
+    {
+        for (const auto& item: layout->getItems())
+        {
+            const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
+            if (camera)
+                addCamera(camera, true);
         }
+    }
+    else
+    {
+        const auto* camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+        const auto cameras = camerasWatcher->availableCameras();
+        for (const auto& camera: cameras)
+            addCamera(camera, true);
+    }
+
+    q->endResetModel();
+
+    if (layout)
+    {
+        disconnect(camerasWatcher, nullptr, this, nullptr);
+
+        connect(layout, &QnLayoutResource::itemAdded,
+                this, &QnAvailableCameraListModelPrivate::at_layout_itemAdded);
+        connect(layout, &QnLayoutResource::itemRemoved,
+                this, &QnAvailableCameraListModelPrivate::at_layout_itemRemoved);
+    }
+    else
+    {
+        connect(camerasWatcher, &QnAvailableCamerasWatcher::cameraAdded,
+                this, &QnAvailableCameraListModelPrivate::at_watcher_cameraAdded);
+        connect(camerasWatcher, &QnAvailableCamerasWatcher::cameraRemoved,
+                this, &QnAvailableCameraListModelPrivate::at_watcher_cameraRemoved);
     }
 }
 
-void QnAvailableCameraListModel::resetResourcesInternal() {
-    QnAvailableCamerasWatcher *watcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+void QnAvailableCameraListModelPrivate::addCamera(const QnResourcePtr& resource, bool silent)
+{
+    Q_Q(QnAvailableCameraListModel);
 
-    disconnect(watcher, nullptr, this, nullptr);
-    disconnect(qnResPool, nullptr, this, nullptr);
+    if (!q->filterAcceptsResource(resource))
+        return;
 
-    m_resources.clear();
-    for (const QnVirtualCameraResourcePtr &camera: watcher->availableCameras())
-        at_watcher_cameraAdded(camera);
+    connect(resource, &QnResource::nameChanged,
+            this, &QnAvailableCameraListModelPrivate::at_resourceChanged);
+    connect(resource, &QnResource::statusChanged,
+            this, &QnAvailableCameraListModelPrivate::at_resourceChanged);
 
-    connect(watcher,    &QnAvailableCamerasWatcher::cameraAdded,    this,   &QnAvailableCameraListModel::at_watcher_cameraAdded);
-    connect(watcher,    &QnAvailableCamerasWatcher::cameraRemoved,  this,   &QnAvailableCameraListModel::at_watcher_cameraRemoved);
-    connect(qnResPool,  &QnResourcePool::resourceChanged,           this,   &QnAvailableCameraListModel::at_resourcePool_resourceChanged);
+    const auto row = resources.size();
+
+    if (!silent)
+        q->beginInsertRows(QModelIndex(), row, row);
+
+    resources.append(resource);
+
+    if (!silent)
+        q->endInsertRows();
+}
+
+void QnAvailableCameraListModelPrivate::removeCamera(const QnResourcePtr& resource, bool silent)
+{
+    Q_Q(QnAvailableCameraListModel);
+
+    const auto row = resources.indexOf(resource);
+    if (row == -1)
+        return;
+
+    disconnect(resource, nullptr, this, nullptr);
+
+    if (!silent)
+        q->beginRemoveRows(QModelIndex(), row, row);
+
+    resources.removeAt(row);
+
+    if (!silent)
+        q->endRemoveRows();
+}
+
+void QnAvailableCameraListModelPrivate::at_watcher_cameraAdded(const QnResourcePtr& resource)
+{
+    addCamera(resource);
+}
+
+void QnAvailableCameraListModelPrivate::at_watcher_cameraRemoved(const QnResourcePtr& resource)
+{
+    removeCamera(resource);
+}
+
+void QnAvailableCameraListModelPrivate::at_layout_itemAdded(
+        const QnLayoutResourcePtr& resource, const QnLayoutItemData& item)
+{
+    NX_ASSERT(resource == layout);
+
+    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
+    if (camera)
+        addCamera(camera);
+}
+
+void QnAvailableCameraListModelPrivate::at_layout_itemRemoved(
+        const QnLayoutResourcePtr& resource, const QnLayoutItemData& item)
+{
+    NX_ASSERT(resource == layout);
+
+    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
+    if (camera)
+        removeCamera(camera);
+}
+
+void QnAvailableCameraListModelPrivate::at_resourceChanged(const QnResourcePtr& resource)
+{
+    Q_Q(QnAvailableCameraListModel);
+    q->refreshResource(resource);
 }

@@ -47,7 +47,6 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/utils/log/log.h>
-#include <nx_speach_synthesizer/text_to_wav.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
 
@@ -79,7 +78,6 @@
 #include <ui/customization/customizer.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
-#include <ui/statistics/modules/controls_statistics_module.h>
 #ifdef Q_OS_WIN
 #include <ui/workaround/iexplore_url_handler.h>
 #endif
@@ -123,19 +121,6 @@ namespace
         statManager->setClientId(qnSettings->pcUuid());
         statManager->setStorage(QnStatisticsStoragePtr(new QnStatisticsFileStorage()));
         statManager->setSettings(QnStatisticsSettingsPtr(new QnStatisticsSettingsWatcher()));
-
-        static const QScopedPointer<QnControlsStatisticsModule> controlsStatisticsModule(
-            new QnControlsStatisticsModule());
-
-        statManager->registerStatisticsModule(lit("controls"), controlsStatisticsModule.data());
-
-        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionClosed
-                         , statManager, &QnStatisticsManager::saveCurrentStatistics);
-        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened
-                         , statManager, &QnStatisticsManager::resetStatistics);
-        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
-                         , statManager, &QnStatisticsManager::sendStatistics);
-
     }
 }
 
@@ -258,10 +243,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     cloudStatusWatcher->setCloudCredentials(clientSettings->cloudLogin(), clientSettings->cloudPassword(), true);
     common->store<QnCloudStatusWatcher>(cloudStatusWatcher.take());
 
-    QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
-    textToWaveServer->start();
-    common->store<TextToWaveServer>(textToWaveServer.take());
-
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
 
@@ -303,12 +284,9 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
     // TODO: #Elric why QString???
     if (!startupParams.lightMode.isEmpty())
     {
-        bool ok;
+        bool ok = false;
         Qn::LightModeFlags lightModeOverride(startupParams.lightMode.toInt(&ok));
-        if (ok)
-            qnRuntime->setLightModeOverride(lightModeOverride);
-        else
-            qnRuntime->setLightModeOverride(Qn::LightModeFull);
+        qnRuntime->setLightModeOverride(ok ? lightModeOverride : Qn::LightModeFull);
     }
 
     if (!startupParams.videoWallGuid.isNull())
@@ -458,8 +436,6 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 #endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
-    QnFontLoader::loadFonts(QDir(qApp->applicationDirPath()).absoluteFilePath(lit("fonts")));
-
     QnCustomization customization;
     customization.add(QnCustomization(skin->path("customization_common.json")));
     customization.add(QnCustomization(skin->path("customization_base.json")));
@@ -468,9 +444,14 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     QScopedPointer<QnCustomizer> customizer(new QnCustomizer(customization));
     customizer->customize(qnGlobals);
 
-    /* Initialize application instance. */
-    QApplication::setWindowIcon(qnSkin->icon("window_icon.png"));
-    QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
+    /* Initialize application UI. Skip if run in console (e.g. unit-tests). */
+    QGuiApplication* ui = qobject_cast<QGuiApplication*>(qApp);
+    if (ui)
+    {
+        QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
+        QApplication::setWindowIcon(qnSkin->icon("window_icon.png"));
+        QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
+    }
 
     qnCommon->store<QnSkin>(skin.take());
     qnCommon->store<QnCustomizer>(customizer.take());

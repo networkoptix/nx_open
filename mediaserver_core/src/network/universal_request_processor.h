@@ -26,8 +26,8 @@ public:
 protected:
     virtual void run() override;
     virtual void pleaseStop() override;
-    bool processRequest();
-    bool authenticate(QnUuid* userId);
+    bool processRequest(bool noAuth);
+    bool authenticate(QnUuid* userId, bool *noAuth);
 
 private:
     bool prcessRequestLockless();

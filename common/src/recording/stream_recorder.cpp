@@ -4,7 +4,7 @@
 
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include <core/resource/resource_consumer.h>
 #include <core/resource/resource.h>

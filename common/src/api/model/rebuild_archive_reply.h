@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 /** Info about storage rebuild process (if running). */
 struct QnStorageScanData

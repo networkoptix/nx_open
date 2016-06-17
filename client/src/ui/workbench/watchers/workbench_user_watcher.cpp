@@ -17,19 +17,30 @@
 
 QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    QnWorkbenchStateDelegate(parent),
     m_reconnectOnPasswordChange(true)
 {
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {
-        setCurrentUser(calculateCurrentUser());
-    });
+    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived, this,  &QnWorkbenchUserWatcher::forcedUpdate);
 
     connect(qnResPool, &QnResourcePool::resourceRemoved,   this,   &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
 }
 
 QnWorkbenchUserWatcher::~QnWorkbenchUserWatcher() {}
 
-void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
+bool QnWorkbenchUserWatcher::tryClose(bool force)
+{
+    if (force)
+        setUserName(QString());
+    return true;
+}
+
+void QnWorkbenchUserWatcher::forcedUpdate()
+{
+    setCurrentUser(calculateCurrentUser());
+}
+
+void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
+{
     if(m_user == user)
         return;
 
@@ -59,7 +70,13 @@ void QnWorkbenchUserWatcher::setUserName(const QString &name) {
     setCurrentUser(calculateCurrentUser());
 }
 
-void QnWorkbenchUserWatcher::setUserPassword(const QString &password) {
+const QString & QnWorkbenchUserWatcher::userName() const
+{
+    return m_userName;
+}
+
+void QnWorkbenchUserWatcher::setUserPassword(const QString &password)
+{
     if (m_userPassword == password)
         return;
 
@@ -67,7 +84,18 @@ void QnWorkbenchUserWatcher::setUserPassword(const QString &password) {
     m_userDigest = QByteArray(); //hash will be recalculated
 }
 
-void QnWorkbenchUserWatcher::setReconnectOnPasswordChange(bool reconnect) {
+const QString & QnWorkbenchUserWatcher::userPassword() const
+{
+    return m_userPassword;
+}
+
+const QnUserResourcePtr & QnWorkbenchUserWatcher::user() const
+{
+    return m_user;
+}
+
+void QnWorkbenchUserWatcher::setReconnectOnPasswordChange(bool reconnect)
+{
     m_reconnectOnPasswordChange = reconnect;
     if (reconnect && m_user && isReconnectRequired(m_user))
         emit reconnectRequired();

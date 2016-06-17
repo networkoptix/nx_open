@@ -4,7 +4,7 @@
 
 #include <core/ptz/ptz_mapper.h>
 #include <core/onvif/onvif_config_data.h>
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/credentials.h>
 
 class QnResourceDataJsonSerializer: public QnJsonSerializer {

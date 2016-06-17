@@ -36,7 +36,7 @@
 #include "motion/motion_helper.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
-#include "utils/serialization/lexical_enum.h"
+#include "nx/fusion/serialization/lexical_enum.h"
 
 #include <memory>
 #include <thread>
@@ -51,7 +51,7 @@
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 //static const int DB_UPDATE_PER_RECORDS = 128;
-namespace 
+namespace
 {
 static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
 static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
@@ -504,7 +504,7 @@ void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archive
     for (const auto &camera : camerasToAdd)
     {
         bool result = QnAppServerConnectionFactory::getConnection2()
-            ->getCameraManager()
+            ->getCameraManager(Qn::kDefaultUserAccess)
             ->addCamera(
                 camera.coreData,
                 ec2::DummyHandler::instance(),
@@ -696,7 +696,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
         auto newCatalogIt = std::find_if(newCatalogs.begin(), newCatalogs.end(),
                                          [&c](const DeviceFileCatalogPtr &catalog)
                                          {
-                                             return c->cameraUniqueId() == catalog->cameraUniqueId() && 
+                                             return c->cameraUniqueId() == catalog->cameraUniqueId() &&
                                                     c->getCatalog() == catalog->getCatalog();
                                          });
         if (newCatalogIt == newCatalogs.end())
@@ -1399,11 +1399,9 @@ void QnStorageManager::updateCameraHistory()
     if (archivedListOld == archivedListNew)
         return;
 
-    const ec2::AbstractECConnectionPtr& appServerConnection =
-        QnAppServerConnectionFactory::getConnection2();
+    const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
 
-    ec2::ErrorCode errCode =
-        appServerConnection->getCameraManager()->setServerFootageDataSync(qnCommon->moduleGUID(), archivedListNew);
+    ec2::ErrorCode errCode = appServerConnection->getCameraManager(Qn::kDefaultUserAccess)->setServerFootageDataSync(qnCommon->moduleGUID(), archivedListNew);
 
     if (errCode != ec2::ErrorCode::ok) {
         qCritical() << "ECS server error during execute method addCameraHistoryItem: "
@@ -1427,8 +1425,9 @@ void QnStorageManager::clearSpace(bool forced)
     if (backupOnAndTimerTriggered)
         return;
 
+    if (m_firstStoragesTestDone)
+        testOfflineStorages();
     writeCameraInfoFiles();
-    testOfflineStorages();
 
     // 1. delete old data if cameras have max duration limit
     clearMaxDaysData();
@@ -1892,7 +1891,7 @@ void QnStorageManager::resetCameraInfoSavedFlagsForStorage(const QnStorageResour
         for (auto it = m_devFileCatalog[i].cbegin(); it != m_devFileCatalog[i].cend(); ++it)
             cameraUniqueIds[i].push_back(it.key());
     }
-    
+
     for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
     {
         for (const QString &cameraUniqueId : cameraUniqueIds[i])
@@ -1954,7 +1953,7 @@ void QnStorageManager::writeCameraInfoFiles()
                 }
             }
         }
-        
+
         for (const auto &uidToPath: uniqueIdToPathExistense)
         {
             QString cameraUniqueId = uidToPath.first;

@@ -25,6 +25,11 @@ public:
 
     QnTwoWayAudioWidgetColors colors() const;
     void setColors(const QnTwoWayAudioWidgetColors& value);
+
+signals:
+    /* Emitted when internal button is pressed. Mostly for statistics usage. */
+    void pressed();
+
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 

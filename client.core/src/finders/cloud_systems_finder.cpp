@@ -4,7 +4,7 @@
 #include <QtCore/QTimer>
 
 #include <utils/common/delayed.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/http/asynchttpclient.h>

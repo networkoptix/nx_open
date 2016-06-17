@@ -20,6 +20,7 @@
 #include <ui/actions/actions.h>
 
 #include <ui/common/grid_widget_helper.h>
+#include <ui/common/item_view_hover_tracker.h>
 #include <ui/delegates/audit_item_delegate.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -132,7 +133,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
     ui->gridCameras->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
 
     /* Cursor changes when description is hovered: */
-    connect(ui->gridDetails, &QnTableView::hoverEnter, this,
+    connect(ui->gridDetails->hoverTracker(), &QnItemViewHoverTracker::itemEnter, this,
         [this](const QModelIndex& index)
         {
             if (index.column() == m_descriptionColumnIndex)
@@ -143,10 +144,10 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
             }
         });
 
-    connect(ui->gridDetails, &QnTableView::hoverLeave, this,
+    connect(ui->gridDetails->hoverTracker(), &QnItemViewHoverTracker::itemLeave, this,
         [this]()
         {
-            ui->gridDetails->setCursor(Qt::ArrowCursor);
+            ui->gridDetails->unsetCursor();
         });
 }
 

@@ -131,26 +131,10 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         return Result::IncompatibleVersion;
     }
 
-#ifdef Q_OS_MACX
-    if (connectionInfo.version > QnSoftwareVersion(qnCommon->engineVersion().toString())) {
-        QnMessageBox::warning(
-            parentWidget,
-            Qn::VersionMismatch_Help,
-            strings(ErrorStrings::UnableConnect),
-            tr("Selected Server has a different version:") + L'\n'
-            + versionDetails
-            + tr("The other version of the Client is needed in order to establish the connection to this Server."),
-            QDialogButtonBox::Ok
-            );
-        return Result::IncompatibleVersion;
-    }
-#endif
-
     while (true) {
         bool isInstalled = false;
         if (applauncher::isVersionInstalled(connectionInfo.version, &isInstalled) != applauncher::api::ResultType::ok)
         {
-#ifndef Q_OS_MACX
             QnMessageBox::warning(
                 parentWidget,
                 Qn::VersionMismatch_Help,
@@ -160,17 +144,6 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 + tr("An error has occurred while trying to restart in compatibility mode."),
                 QDialogButtonBox::Ok
                 );
-#else
-            QnMessageBox::warning(
-                parentWidget,
-                Qn::VersionMismatch_Help,
-                strings(ErrorStrings::UnableConnect),
-                tr("Selected Server has a different version:") + L'\n'
-                + versionDetails
-                + tr("The other version of the Client is needed in order to establish the connection to this Server."),
-                QDialogButtonBox::Ok
-                );
-#endif
             return Result::IncompatibleVersion;
         }
 

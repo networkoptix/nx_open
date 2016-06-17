@@ -30,6 +30,7 @@ namespace style
     const QSize Metrics::kDefaultLayoutSpacing(dp(8), dp(8));
 
     const char *Properties::kHoveredRowProperty = "_qn_hoveredRow";
+    const char *Properties::kHoveredIndexProperty = "_qn_hoveredIndex";
     const char *Properties::kAccentStyleProperty = "_qn_accentStyle";
     const char *Properties::kSliderLength = "_qn_sliderLength";
     const char *Properties::kSliderFeatures = "_qn_sliderFeatures";

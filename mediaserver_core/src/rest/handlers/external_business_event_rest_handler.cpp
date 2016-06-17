@@ -10,7 +10,7 @@
 #include "utils/common/synctime.h"
 #include <business/business_event_connector.h>
 #include <business/business_event_parameters.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include "common/common_module.h"
 
 QnExternalBusinessEventRestHandler::QnExternalBusinessEventRestHandler()

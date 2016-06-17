@@ -6,7 +6,7 @@
 #ifndef NX_CDB_CLIENT_DATA_TYPES_H
 #define NX_CDB_CLIENT_DATA_TYPES_H
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/server/fusion_request_result.h>
 

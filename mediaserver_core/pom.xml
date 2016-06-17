@@ -1,11 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
-
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project,
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -27,7 +20,7 @@
         <template>app</template>
 
         <qt.libs>core core-private network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lcommon -lappserver2 -ludt -lnx_email -lnx_streaming -lnx_network -lnx_speach_synthesizer</global.libs>
+        <global.libs>-lcommon -lappserver2 -ludt -lnx_email -lnx_streaming -lnx_network -lnx_speach_synthesizer -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <linux.oslibs>-ldl</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
@@ -100,6 +93,24 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
+        </dependency>
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_fusion</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
+        </dependency>         
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_speach_synthesizer</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_speach_synthesizer/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

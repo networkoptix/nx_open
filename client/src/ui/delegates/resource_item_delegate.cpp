@@ -34,7 +34,8 @@ QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
     m_buggyIcon(qnSkin->icon("tree/buggy.png")),
     m_colors(),
     m_fixedHeight(style::Metrics::kViewRowHeight),
-    m_rowSpacing(0)
+    m_rowSpacing(0),
+    m_customInfoLevel(Qn::ResourceInfoLevel::RI_Invalid)
 {
 }
 
@@ -66,6 +67,16 @@ int QnResourceItemDelegate::rowSpacing() const
 void QnResourceItemDelegate::setRowSpacing(int value)
 {
     m_rowSpacing = qMax(value, 0);
+}
+
+Qn::ResourceInfoLevel QnResourceItemDelegate::customInfoLevel() const
+{
+    return m_customInfoLevel;
+}
+
+void QnResourceItemDelegate::setCustomInfoLevel(Qn::ResourceInfoLevel value)
+{
+    m_customInfoLevel = value;
 }
 
 int QnResourceItemDelegate::fixedHeight() const
@@ -397,8 +408,10 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     baseName = index.data(Qt::DisplayRole).toString();
 
     /* Two-component text from resource information: */
-    auto showExtraInfo = qnSettings->extraInfoInTree();
-    if (showExtraInfo == Qn::RI_NameOnly)
+    auto infoLevel = m_customInfoLevel;
+    if (infoLevel == Qn::RI_Invalid)
+        infoLevel = qnSettings->extraInfoInTree();
+    if (infoLevel == Qn::RI_NameOnly)
         return;
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();

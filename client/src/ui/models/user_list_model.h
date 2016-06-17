@@ -18,9 +18,10 @@ class QnUserListModel : public Customized<QAbstractListModel>
 public:
     enum Columns {
         CheckBoxColumn,
-        NameColumn,
-        PermissionsColumn,
-        LdapColumn,
+        UserTypeColumn,
+        LoginColumn,
+        FullNameColumn,
+        UserRoleColumn,
         EnabledColumn,
 
         ColumnCount

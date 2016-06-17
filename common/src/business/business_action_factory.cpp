@@ -67,8 +67,7 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
         case QnBusiness::SayTextAction:
             break;
 
-        case QnBusiness::CameraOutputAction:        return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(false, runtimeParams));
-        case QnBusiness::CameraOutputOnceAction:    return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(true, runtimeParams));
+        case QnBusiness::CameraOutputAction:        return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(runtimeParams));
         case QnBusiness::CameraRecordingAction:     return QnAbstractBusinessActionPtr(new QnRecordingBusinessAction(runtimeParams));
         case QnBusiness::PanicRecordingAction:      return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));
         case QnBusiness::SendMailAction:            return QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(runtimeParams));

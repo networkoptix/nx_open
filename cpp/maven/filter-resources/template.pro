@@ -112,6 +112,7 @@ INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
                 ${root.dir}/common_libs/nx_network/src \
+                ${root.dir}/common_libs/nx_fusion/src \
                 ${root.dir}/common_libs/nx_utils/src \
                 ${root.dir}/common_libs/nx_streaming/src \
                 ${root.dir}/common_libs/nx_media/src \
@@ -123,6 +124,7 @@ win* {
     DEFINES += \
         NX_NETWORK_API=__declspec(dllimport) \
         NX_UTILS_API=__declspec(dllimport) \
+        NX_FUSION_API=__declspec(dllimport) \
         NX_VMS_UTILS_API=__declspec(dllimport) \
         UDT_API=__declspec(dllimport) \
 
@@ -130,6 +132,7 @@ win* {
     DEFINES += \
         NX_NETWORK_API= \
         NX_UTILS_API= \
+        NX_FUSION_API= \
         NX_VMS_UTILS_API= \
         UDT_API= \
 

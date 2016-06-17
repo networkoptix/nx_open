@@ -59,7 +59,7 @@
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/app_info.h>
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
 #include <utils/common/synctime.h>
 #include <utils/common/system_information.h>
 #include <utils/common/url.h>
@@ -182,6 +182,8 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
 
     connect(action(QnActions::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showLoginDialog);
     connect(action(QnActions::BeforeExitAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
+    
+    connect(qnCommon, &QnCommonModule::remoteIdChanged, this, &QnWorkbenchConnectHandler::connectedChanged);
 
     context()->instance<QnAppServerNotificationCache>();
 }
@@ -210,7 +212,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
     });
 
 
-    connect( QnAppServerConnectionFactory::getConnection2()->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged,
+    connect( QnAppServerConnectionFactory::getConnection2()->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
         QnSyncTime::instance(), static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime) );
 
     //connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);

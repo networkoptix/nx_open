@@ -13,6 +13,7 @@
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
+#include <transaction/transaction_permissions.h>
 
 #include "utils/common/id.h"
 #include <nx/utils/log/log.h>
@@ -107,7 +108,8 @@ public:
         QSharedPointer<AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
         const nx_http::Request& request,
-        const QByteArray& contentEncoding );
+        const QByteArray& contentEncoding,
+        const Qn::UserAccessData &userAccessData);
     //!Initializer for outgoing connection
     QnTransactionTransport( const ApiPeerData& localPeer );
     ~QnTransactionTransport();
@@ -130,6 +132,11 @@ public:
     template<class T> 
     void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header) 
     {
+        /* Check if peer has enough rights to receive transaction */
+        bool peerHasEnoughRights = ec2::hasPermission(m_userAccessData.userId, transaction.params, Qn::Permission::ReadPermission);
+        if (!peerHasEnoughRights)
+            return;
+
         QnTransactionTransportHeader header(_header);
         NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
         header.fillSequence();
@@ -166,7 +173,9 @@ public:
         }
     }
 
-    bool sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, const QnTransactionTransportHeader& _header);
+    bool sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran,
+                                   const QnTransactionTransportHeader& _header, const QnUuid &tranParamsId,
+                                   ApiCommand::Value value);
 
     void doOutgoingConnect(const QUrl& remotePeerUrl);
     void close();
@@ -240,6 +249,7 @@ public:
         const QByteArray& requestBuf );
     //!Transport level logic should use this method to report connection problem
     void connectionFailure();
+    Qn::UserAccessData getUserAccessData() const { return m_userAccessData; }
 
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
     static void fillAuthInfo( const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey );
@@ -324,6 +334,7 @@ private:
     std::chrono::milliseconds m_tcpKeepAliveTimeout;
     int m_keepAliveProbeCount;
     std::chrono::milliseconds m_idleConnectionTimeout;
+    Qn::UserAccessData m_userAccessData;
 
 private:
     void default_initializer();

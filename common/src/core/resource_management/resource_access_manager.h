@@ -73,7 +73,7 @@ public:
     bool canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
 
     template <typename ApiDataType>
-    bool canCreateResource(const QnUserResourcePtr& user, const ApiDataType& data) const
+    bool canCreateResource(const QnUserResourcePtr& /*user*/, const ApiDataType& /*data*/) const
     {
         /* By default we cannot create resources manually. */
         return false;
@@ -103,6 +103,12 @@ public:
     bool canModifyResource  (const QnUserResourcePtr& user, const QnLayoutResourcePtr& target,      const ec2::ApiLayoutData& update) const;
     bool canModifyResource  (const QnUserResourcePtr& user, const QnUserResourcePtr& target,        const ec2::ApiUserData& update) const;
     bool canModifyResource  (const QnUserResourcePtr& user, const QnVideoWallResourcePtr& target,   const ec2::ApiVideowallData& update) const;
+
+    /**
+    * \param user                      User resource to get role name for.
+    * \returns                         Name of user's role.
+    */
+    QString userRoleName(const QnUserResourcePtr& user) const;
 
 signals:
     void accessibleResourcesChanged(const QnUuid& userId);

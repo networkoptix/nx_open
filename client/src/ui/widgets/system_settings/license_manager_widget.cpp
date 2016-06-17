@@ -27,7 +27,7 @@
 #include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <utils/license_usage_helper.h>
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/product_features.h>
 #include "api/runtime_info_manager.h"
 #include "llutil/hardware_id.h"
@@ -293,7 +293,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
         auto addLisencesHandler = [this, licensesToUpdate]( int reqID, ec2::ErrorCode errorCode ){
             at_licensesReceived( reqID, errorCode, licensesToUpdate );
         };
-        int handle = QnAppServerConnectionFactory::getConnection2()->getLicenseManager()->addLicenses(
+        int handle = QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kDefaultUserAccess)->addLicenses(
             licensesToUpdate, this, addLisencesHandler );
         m_handleKeyMap[handle] = licenseKey;
     }
@@ -458,7 +458,7 @@ void QnLicenseManagerWidget::at_removeButton_clicked()
         at_licenseRemoved( reqID, errorCode, license );
     };
 
-    QnAppServerConnectionFactory::getConnection2()->getLicenseManager()->removeLicense(license, this,  removeLisencesHandler);
+    QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kDefaultUserAccess)->removeLicense(license, this,  removeLisencesHandler);
 }
 
 void QnLicenseManagerWidget::at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license)

@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 class QString;
 class QnUuid;
@@ -80,6 +80,7 @@ namespace ec2 {
     struct ApiDiscoveredServerData;
 
     struct ApiTimeData;
+    struct ApiMiscData;
     struct ApiPeerSystemTimeData;
     typedef std::vector<ApiPeerSystemTimeData> ApiPeerSystemTimeDataList;
 
@@ -191,6 +192,7 @@ namespace ec2 {
     (ApiConnectionData)\
     (ApiSystemNameData)\
     (ApiTimeData)\
+    (ApiMiscData)\
     (ApiPeerData)\
     (ApiRuntimeData)\
     (ApiDatabaseDumpData)\

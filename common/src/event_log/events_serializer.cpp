@@ -6,7 +6,7 @@
 #include <business/business_action_parameters.h>
 #include <business/business_event_parameters.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 
 inline int readInt(quint8* &curPtr)

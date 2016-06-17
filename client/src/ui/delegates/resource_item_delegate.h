@@ -33,6 +33,9 @@ public:
     int rowSpacing() const;
     void setRowSpacing(int value);
 
+    Qn::ResourceInfoLevel customInfoLevel() const;
+    void setCustomInfoLevel(Qn::ResourceInfoLevel value);
+
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const override;
@@ -63,4 +66,5 @@ private:
     QnResourceItemColors m_colors;
     int m_fixedHeight;
     int m_rowSpacing;
+    Qn::ResourceInfoLevel m_customInfoLevel;
 };

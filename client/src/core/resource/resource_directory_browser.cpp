@@ -4,13 +4,13 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
-#include <utils/common/model_functions.h>
-#include <utils/serialization/proto_message.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/proto_message.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
 #include <utils/local_file_cache.h>
 
-#include "utils/serialization/binary_functions.h"
+#include "nx/fusion/serialization/binary_functions.h"
 
 #include "plugins/resource/avi/avi_dvd_resource.h"
 #include "plugins/resource/avi/avi_bluray_resource.h"
@@ -136,22 +136,27 @@ void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResou
     }
 }
 
-QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xfile) {
+QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xfile)
+{
     QnLayoutFileStorageResource layoutStorage;
     layoutStorage.setUrl(xfile);
     QScopedPointer<QIODevice> layoutFile(layoutStorage.open(lit("layout.pb"), QIODevice::ReadOnly));
-    if(!layoutFile)
+    if (!layoutFile)
         return QnLayoutResourcePtr();
     QByteArray layoutData = layoutFile->readAll();
     layoutFile.reset();
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
     ec2::ApiLayoutData apiLayout;
-    if (!QJson::deserialize(layoutData, &apiLayout)) {
+    if (!QJson::deserialize(layoutData, &apiLayout))
+    {
         QnProto::Message<ec2::ApiLayoutData> apiLayoutMessage;
-        if(!QnProto::deserialize(layoutData, &apiLayoutMessage)) {
+        if (!QnProto::deserialize(layoutData, &apiLayoutMessage))
+        {
             return QnLayoutResourcePtr();
-        } else {
+        }
+        else
+        {
             apiLayout = apiLayoutMessage.data;
         }
     }
@@ -159,26 +164,21 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     fromApiToResource(apiLayout, layout);
 
     QnLayoutItemDataList orderedItems;
-    foreach(const ec2::ApiLayoutItemData& item, apiLayout.items) {
+    foreach(const ec2::ApiLayoutItemData& item, apiLayout.items)
+    {
         orderedItems << QnLayoutItemData();
         fromApiToResource(item, orderedItems.last());
     }
 
-    QScopedPointer<QIODevice> uuidFile(layoutStorage.open(lit("uuid.bin"), QIODevice::ReadOnly));
-    if (uuidFile) {
-        QByteArray data = uuidFile->readAll();
-        layout->setId(QnUuid(data.data()));
-        QnLayoutResourcePtr existingLayout = qnResPool->getResourceById<QnLayoutResource>(layout->getId());
-        if (existingLayout)
-            return existingLayout;
-
-        uuidFile.reset();
-    } else {
-        layout->setId(QnUuid::createUuid());
-    }
+    QnUuid layoutId = guidFromArbitraryData(xfile);
+    QnLayoutResourcePtr existingLayout = qnResPool->getResourceById<QnLayoutResource>(layoutId);
+    if (existingLayout)
+        return existingLayout;
+    layout->setId(layoutId);
 
     QScopedPointer<QIODevice> rangeFile(layoutStorage.open(lit("range.bin"), QIODevice::ReadOnly));
-    if (rangeFile) {
+    if (rangeFile)
+    {
         QByteArray data = rangeFile->readAll();
         layout->setLocalRange(QnTimePeriod().deserialize(data));
         rangeFile.reset();
@@ -186,13 +186,16 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
 
     QScopedPointer<QIODevice> miscFile(layoutStorage.open(lit("misc.bin"), QIODevice::ReadOnly));
     bool layoutWithCameras = false;
-    if (miscFile) {
+    if (miscFile)
+    {
         QByteArray data = miscFile->readAll();
-        if (data.size() >= (int)sizeof(quint32)) {
-            quint32 flags = *((quint32*) data.data());
-            if (flags & QnLayoutFileStorageResource::ReadOnly) {
+        if (data.size() >= (int)sizeof(quint32))
+        {
+            quint32 flags = *((quint32*)data.data());
+            if (flags & QnLayoutFileStorageResource::ReadOnly)
+            {
                 Qn::Permissions permissions = Qn::ReadPermission | Qn::RemovePermission;
-                layout->setData(Qn::LayoutPermissionsRole, (int) permissions);
+                layout->setData(Qn::LayoutPermissionsRole, (int)permissions);
             }
             if (flags & QnLayoutFileStorageResource::ContainsCameras)
                 layoutWithCameras = true;
@@ -201,9 +204,11 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         miscFile.reset();
     }
 
-    if (!layout->backgroundImageFilename().isEmpty()) {
+    if (!layout->backgroundImageFilename().isEmpty())
+    {
         QScopedPointer<QIODevice> backgroundFile(layoutStorage.open(layout->backgroundImageFilename(), QIODevice::ReadOnly));
-        if (backgroundFile) {
+        if (backgroundFile)
+        {
             QByteArray data = backgroundFile->readAll();
             QnLocalFileCache cache;
             cache.storeImageData(layout->backgroundImageFilename(), data);
@@ -228,7 +233,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
 
     // TODO: #Elric here is bad place to add resources to pool. need refactor
     QnLayoutItemDataList& items = orderedItems;
-    for (int i = 0; i < items.size(); ++i) {
+    for (int i = 0; i < items.size(); ++i)
+    {
         QnLayoutItemData& item = items[i];
         QString path = item.resource.uniqueId;
         NX_ASSERT(!path.isEmpty(), Q_FUNC_INFO, "Resource path should not be empty. Exported file is not valid.");
@@ -253,22 +259,26 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
 
         qnResPool->addResource(aviResource);
         aviResource = qnResPool->getResourceByUniqueId<QnAviResource>(aviResource->getUniqueId()); // It may have already been in the pool!
-        if(!aviResource) {
+        if (!aviResource)
+        {
             qnWarning("ACHTUNG! Total mess up in exported layout loading!");
             continue;
         }
         item.resource.id = aviResource->getId();
 
-        for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel) {
-            QString normMotionName = path.mid(path.lastIndexOf(L'?')+1);
+        for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel)
+        {
+            QString normMotionName = path.mid(path.lastIndexOf(L'?') + 1);
             QScopedPointer<QIODevice> motionIO(layoutStorage.open(lit("motion%1_%2.bin").arg(channel).arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly));
-            if (motionIO) {
+            if (motionIO)
+            {
                 NX_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
                 QnMetaDataLightVector motionData;
                 int motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
-                if (motionDataSize > 0) {
+                if (motionDataSize > 0)
+                {
                     motionData.resize(motionDataSize);
-                    motionIO->read((char*) &motionData[0], motionIO->size());
+                    motionIO->read((char*)&motionData[0], motionIO->size());
                 }
                 for (uint i = 0; i < motionData.size(); ++i)
                     motionData[i].doMarshalling();
@@ -276,7 +286,9 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
                     aviResource->setMotionBuffer(motionData, channel);
 
                 motionIO.reset();
-            } else {
+            }
+            else
+            {
                 break;
             }
         }

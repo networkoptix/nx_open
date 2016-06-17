@@ -24,7 +24,7 @@
         <template>lib</template>
 
         <qt.libs>core core-private gui network opengl xml xmlpatterns sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client -lnx_vms_utils -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -ld3d9</windows.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
@@ -51,6 +51,24 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
         </dependency>
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_vms_utils</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_vms_utils/pom.xml</systemPath>
+        </dependency> 
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_fusion</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
+        </dependency>         
 
         <dependency>
             <groupId>${project.groupId}</groupId>

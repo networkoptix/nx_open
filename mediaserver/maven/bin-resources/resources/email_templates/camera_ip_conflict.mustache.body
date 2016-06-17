@@ -1,17 +1,17 @@
-<h1>{{event}} on {{source}}</h1>
+<h1>{{event}} on <b>{{source}}</b></h1>
 <p>Conflict detected at {{{timestamp}}} for IP address {{cameraConflictAddress}}:</p>
 
 <table class="description">
     <thead>
         <tr>
-           <th>#</th>
+           <th class="number">#</th>
            <th>Physical ID</th>
         </tr>
     </thead>
     <tbody>
         {{#cameraConflicts}}
             <tr>
-                <td>{{number}}</td>
+                <td class="number">{{number}}</td>
                 <td>{{mac}}</td>
             </tr>
         {{/cameraConflicts}}

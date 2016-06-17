@@ -14,7 +14,7 @@
 #include <rest/server/request_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/concurrent.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/httptypes.h>
 
 #include "ec2_thread_pool.h"
@@ -141,7 +141,7 @@ namespace ec2
     public:
         QueryHttpHandler2(
             ApiCommand::Value cmdCode,
-            ServerQueryProcessor* const queryProcessor )
+            ServerQueryProcessorAccess* const queryProcessor )
         :
             base_type( cmdCode ),
             m_cmdCode( cmdCode ),
@@ -153,9 +153,9 @@ namespace ec2
         void processQueryAsync(
             const InputData& inputData,
             HandlerType handler,
-            const QnRestConnectionProcessor* /*connection*/)
+            const QnRestConnectionProcessor* owner)
         {
-            m_queryProcessor->template processQueryAsync<InputData, OutputData, HandlerType>(
+            m_queryProcessor->getAccess(Qn::UserAccessData(owner->authUserId())).template processQueryAsync<InputData, OutputData, HandlerType>(
                 m_cmdCode,
                 inputData,
                 handler );
@@ -163,7 +163,7 @@ namespace ec2
 
     private:
         ApiCommand::Value m_cmdCode;
-        ServerQueryProcessor* const m_queryProcessor;
+        ServerQueryProcessorAccess* const m_queryProcessor;
     };
 
 

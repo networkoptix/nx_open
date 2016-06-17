@@ -12,7 +12,7 @@
 #include <QString>
 
 #include <cloud_db_client/src/data/types.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 
 void PrintTo(const QByteArray& val, ::std::ostream* os) {

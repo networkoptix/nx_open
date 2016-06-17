@@ -25,12 +25,21 @@
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
         <rdep.windows.packages>festival</rdep.windows.packages>
-        <rdep.linux.packages>festival</rdep.linux.packages>
-        <rdep.linux.arm.packages>festival</rdep.linux.arm.packages>
         <rdep.mac.packages>festival</rdep.mac.packages>
 
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>    
+    </dependencies>       
+    
     <profiles>
         <profile>
             <id>windows</id>
@@ -53,6 +62,63 @@
             </activation>            
             <properties>
                 <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>  
+
+        <profile>
+            <id>linux-noarm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>
+
+            <properties>
+                <rdep.linux.packages>festival</rdep.linux.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+
+            <properties>
+                <rdep.linux.packages>festival</rdep.linux.packages>
+            </properties>
+        </profile>  
+
+        <profile>
+            <id>linux-arm-bananapi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bananapi</value>
+                </property>
+            </activation>
+
+            <properties>
+                <rdep.linux.packages>festival</rdep.linux.packages>
             </properties>
         </profile>  
 

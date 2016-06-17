@@ -86,6 +86,8 @@ Page
         displayMarginEnd: anchors.bottomMargin
         enabled: d.enabled
 
+        layoutId: sideNavigation.activeLayout
+
         ScrollIndicator.vertical: ScrollIndicator
         {
             leftPadding: 6

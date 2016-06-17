@@ -6,7 +6,7 @@
 #include "system_data.h"
 
 #include <common/common_globals.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/preprocessor/field_name.h>
 
 

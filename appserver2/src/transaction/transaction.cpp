@@ -6,7 +6,7 @@
 #include "database/db_manager.h"
 #include "utils/common/synctime.h"
 
-#include "utils/common/model_functions.h"
+#include "nx/fusion/model_functions.h"
 #include "transaction_descriptor.h"
 
 namespace ec2

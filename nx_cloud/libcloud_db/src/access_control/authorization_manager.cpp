@@ -5,7 +5,7 @@
 
 #include "authorization_manager.h"
 
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "managers/account_manager.h"
 #include "managers/system_manager.h"

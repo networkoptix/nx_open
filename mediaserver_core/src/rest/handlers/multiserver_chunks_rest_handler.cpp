@@ -12,9 +12,9 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <utils/serialization/compressed_time.h>
+#include <nx/fusion/serialization/compressed_time.h>
 
 #include <server/server_globals.h>
 #include <recorder/storage_manager.h>

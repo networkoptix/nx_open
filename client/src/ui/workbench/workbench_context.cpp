@@ -4,6 +4,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_message_processor.h>
 
 #include <api/media_server_statistics_manager.h>
 
@@ -26,6 +27,7 @@
 #include <ui/statistics/modules/users_statistics_module.h>
 #include <ui/statistics/modules/graphics_statistics_module.h>
 #include <ui/statistics/modules/durations_statistics_module.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workaround/fglrx_full_screen.h>
 
 #include "watchers/workbench_desktop_camera_watcher.h"
@@ -79,6 +81,14 @@ QnWorkbenchContext::QnWorkbenchContext(QObject *parent):
     const auto durationStatModule = instance<QnDurationStatisticsModule>();
     qnStatisticsManager->registerStatisticsModule(lit("durations"), durationStatModule);
 
+    m_statisticsModule.reset(new QnControlsStatisticsModule());
+    qnStatisticsManager->registerStatisticsModule(lit("controls"), m_statisticsModule.data());
+
+    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened
+                     , qnStatisticsManager, &QnStatisticsManager::resetStatistics);
+    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
+                     , qnStatisticsManager, &QnStatisticsManager::sendStatistics);
+
     instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 }
 
@@ -93,6 +103,7 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     m_layoutWatcher = NULL;
 
     /* Destruction order of these objects is important. */
+    m_statisticsModule.reset();
     m_navigator.reset();
     m_display.reset();
     m_menu.reset();
@@ -100,6 +111,41 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     m_snapshotManager.reset();
     m_synchronizer.reset();
     m_workbench.reset();
+}
+
+QnWorkbench* QnWorkbenchContext::workbench() const
+{
+    return m_workbench.data();
+}
+
+QnWorkbenchLayoutSnapshotManager* QnWorkbenchContext::snapshotManager() const
+{
+    return m_snapshotManager.data();
+}
+
+QnWorkbenchAccessController* QnWorkbenchContext::accessController() const
+{
+    return m_accessController.data();
+}
+
+QnWorkbenchDisplay* QnWorkbenchContext::display() const
+{
+    return m_display.data();
+}
+
+QnWorkbenchNavigator* QnWorkbenchContext::navigator() const
+{
+    return m_navigator.data();
+}
+
+QnControlsStatisticsModule* QnWorkbenchContext::statisticsModule() const
+{
+    return m_statisticsModule.data();
+}
+
+QWidget* QnWorkbenchContext::mainWindow() const
+{
+    return m_mainWindow.data();
 }
 
 void QnWorkbenchContext::setMainWindow(QWidget *mainWindow)

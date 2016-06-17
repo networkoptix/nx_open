@@ -16,6 +16,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_access_manager.h>
 
 #include <network/authenticate_helper.h>
 #include <nx/utils/log/log.h>
@@ -167,6 +169,12 @@ namespace nx_hls
         response.statusLine.version = request.requestLine.version;
 
         response.statusLine.statusCode = getRequestedFile( request, &response );
+        if (response.statusLine.statusCode == nx_http::StatusCode::forbidden)
+        {
+            sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+            m_state = sDone;
+            return;
+        }
         if( response.statusLine.reasonPhrase.isEmpty() )
             response.statusLine.reasonPhrase = StatusCode::toString( response.statusLine.statusCode );
 
@@ -233,6 +241,10 @@ namespace nx_hls
                 arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())), cl_logDEBUG1 );
             return nx_http::StatusCode::notFound;
         }
+
+        auto userResource = qnResPool->getResourceById(d_ptr->authUserId).dynamicCast<QnUserResource>();
+        if (!userResource || !qnResourceAccessManager->hasPermission(userResource, resource, Qn::Permission::ReadPermission))
+            return nx_http::StatusCode::forbidden;
 
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if( !camResource )

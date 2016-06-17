@@ -4,7 +4,7 @@
 
 #include <api/global_settings.h>
 
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
@@ -19,8 +19,8 @@
 #include "core/resource/media_server_resource.h"
 #include "resource_data.h"
 #include "api/model/api_ioport_data.h"
-#include "utils/serialization/json.h"
-#include <utils/common/model_functions.h>
+#include "nx/fusion/serialization/json.h"
+#include <nx/fusion/model_functions.h>
 #include "media_server_user_attributes.h"
 
 #define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}

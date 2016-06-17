@@ -1,12 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-        Example pom for delegating maven goals to msbuild so it builds the "solution"
-
-        A solution can be a group of projects, but here we only have one.
-        It should also be possible to have one maven project per solution project,
-        and have a parent pom to deletegate the build.
-    -->
-
     <parent>
         <artifactId>common_libs</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -40,7 +32,7 @@
                 <os>
                     <family>Windows</family>
                 </os>
-            </activation>            
+            </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
             </properties>
@@ -51,12 +43,12 @@
             <activation>
                 <os>
                     <family>unix</family>
-                </os> 
-            </activation>            
+                </os>
+            </activation>
             <properties>
                 <buildLib>sharedlib</buildLib>
             </properties>
-        </profile>  
+        </profile>
 
         <profile>
             <id>mobile-android</id>
@@ -102,6 +94,6 @@
                 <rdep.linux.packages>quazip opengl-es-mali proxy-decoder</rdep.linux.packages>
             </properties>
         </profile>
-    </profiles> 
+    </profiles>
 
 </project>

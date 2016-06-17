@@ -21,11 +21,7 @@
 
 namespace {
 
-    #ifdef Q_OS_MACX
-    const bool defaultEnableClientUpdates = false;
-    #else
     const bool defaultEnableClientUpdates = true;
-    #endif
 
     QnSoftwareVersion getCurrentVersion()
     {

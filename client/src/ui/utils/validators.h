@@ -18,5 +18,6 @@ namespace Qn
 
     typedef std::function<ValidationResult (const QString&)> TextValidateFunction;
     TextValidateFunction defaultEmailValidator();
+    TextValidateFunction defaultNonEmptyValidator(const QString& errorMessage);
 
 }

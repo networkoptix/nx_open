@@ -9,7 +9,7 @@
 
 #include <common/common_globals.h>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 class QnAbstractBusinessEvent;
 typedef QSharedPointer<QnAbstractBusinessEvent> QnAbstractBusinessEventPtr;
@@ -40,7 +40,8 @@ Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType ActionType UserGroup, )
 
-    enum EventReason {
+    enum EventReason
+    {
         NoReason = 0,
         NetworkNoFrameReason,
         NetworkConnectionClosedReason,
@@ -63,7 +64,8 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
 
-    enum EventState {
+    enum EventState
+    {
         InactiveState = 0,
         ActiveState = 1,
 
@@ -72,7 +74,8 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventState)
 
-    enum EventType {
+    enum EventType
+    {
         /** Event type is not defined. Used in rules. */
         UndefinedEvent = 0,
 
@@ -123,7 +126,8 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventType)
 
-    enum ActionType {
+    enum ActionType
+    {
         UndefinedAction         = 0,
 
         /**
@@ -131,10 +135,9 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
          *
          * Parameters:
          * - relayOutputID (string, required)          - id of output to trigger.
-         * - relayAutoResetTimeout (uint, optional)    - timeout (in milliseconds) to reset camera state back.
+         * - durationMs (uint, optional)               - timeout (in milliseconds) to reset camera state back.
          */
         CameraOutputAction      = 1,
-        CameraOutputOnceAction  = 2,
 
         BookmarkAction          = 3,
 
@@ -202,7 +205,8 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 
-    enum UserGroup {
+    enum UserGroup
+    {
         EveryOne  = 0,
         AdminOnly = 1,
     };

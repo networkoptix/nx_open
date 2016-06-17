@@ -11,7 +11,7 @@
 #include <nx/network/cloud/data/resolve_domain_data.h>
 #include <nx/network/cloud/data/resolve_peer_data.h>
 #include <nx/network/cloud/data/result_code.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "request_processor.h"
 

@@ -11,9 +11,9 @@
 #include <stdint.h>
 #include <string>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
-#include <utils/fusion/fusion_fwd.h>
+#include <nx/fusion/fusion/fusion_fwd.h>
 
 #include <cdb/account_data.h>
 
@@ -71,6 +71,22 @@ void serializeToUrlQuery(const AccountEmail&, QUrlQuery* const urlQuery);
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (AccountEmail),
+    (json))
+
+
+////////////////////////////////////////////////////////////
+//// class TemporaryCredentials
+////////////////////////////////////////////////////////////
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, TemporaryCredentialsParams* const data);
+void serializeToUrlQuery(const TemporaryCredentialsParams&, QUrlQuery* const urlQuery);
+
+#define TemporaryCredentialsParams_Fields (expirationPeriod)(autoProlongationEnabled)(prolongationPeriod)
+
+#define TemporaryCredentials_Fields (login)(password)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (TemporaryCredentialsParams)(TemporaryCredentials),
     (json))
 
 

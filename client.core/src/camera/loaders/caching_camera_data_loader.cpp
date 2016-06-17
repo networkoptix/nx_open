@@ -8,13 +8,13 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include <camera/loaders/flat_camera_data_loader.h>
 #include <camera/loaders/layout_file_camera_data_loader.h>
 
-#include <utils/serialization/json.h>
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/json_functions.h>
 
 namespace {
     const qint64 requestIntervalMs = 30 * 1000;

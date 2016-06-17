@@ -7,7 +7,7 @@
 
 #include <utils/common/delete_later.h>
 #include <utils/math/color_transformations.h>
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 #include <utils/math/linear_combination.h>
 
 QnSplashItem::QnSplashItem(QGraphicsItem *parent):

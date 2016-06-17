@@ -13,7 +13,7 @@
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
-#include <utils/serialization/json.h>
+#include <nx/fusion/serialization/json.h>
 
 #include "recorder/storage_manager.h"
 #include "media_server/settings.h"

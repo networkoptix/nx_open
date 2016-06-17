@@ -13,12 +13,7 @@ Item
     property string resourceId
     property var mediaPlayer
 
-    readonly property bool timelineDragging: timeline.dragging
-    readonly property bool timelineMoving: timeline.moving
-    readonly property real timelinePosition: timeline.position
-    readonly property bool timelineAtLive: timeline.stickToEnd
-
-    property alias paused: playbackController.checked
+    property bool paused: mediaPlayer.playbackState != QnPlayer.Playing
 
     implicitWidth: parent ? parent.width : 0
     implicitHeight: navigator.height + navigationPanel.height
@@ -137,13 +132,15 @@ Item
             {
                 id: timeline
 
+                property bool resumeWhenDragFinished: false
+
                 enabled: startBound > 0
 
                 anchors.bottom: parent.bottom
                 width: parent.width
                 height: 104
 
-                stickToEnd: mediaPlayer.liveMode && !playbackController.checked
+                stickToEnd: mediaPlayer.liveMode && !paused
 
                 chunkBarHeight: 32
                 textY: height - chunkBarHeight - 16 - 24
@@ -153,42 +150,34 @@ Item
 
                 onMoveFinished:
                 {
-                    mediaPlayer.seek(position)
-                    if (!playbackController.checked)
+                    mediaPlayer.position = position
+                    if (resumeWhenDragFinished)
                         mediaPlayer.play()
                 }
-
-                onPositionTapped: mediaPlayer.seek(position)
-
+                onPositionTapped: mediaPlayer.position = position
                 onPositionChanged:
                 {
                     if (!dragging)
                         return
 
-                    mediaPlayer.seek(position)
+                    mediaPlayer.position = position
                 }
 
-                Connections
+                onDraggingChanged:
                 {
-                    target: mediaPlayer
-                    onPositionChanged:
+                    if (dragging)
                     {
-                        if (timeline.moving)
-                            return
-
-                        if (mediaPlayer.liveMode)
-                            return
-
-                        timeline.position = mediaPlayer.position
+                        resumeWhenDragFinished = !videoNavigation.paused
+                        mediaPlayer.pause()
                     }
-                    onPlayingChanged:
-                    {
-                        if (timeline.moving)
-                            return
+                }
 
-                        if (!mediaPlayer.playing)
-                            timeline.clearCorrection()
-                    }
+                Binding
+                {
+                    target: timeline
+                    property: "position"
+                    value: mediaPlayer.position
+                    when: !timeline.moving && !mediaPlayer.liveMode
                 }
             }
 
@@ -310,7 +299,7 @@ Item
                         playbackController.checked = false
                         mediaPlayer.playLive()
                     }
-                    opacity: timeline.stickToEnd ? 0.0 : 1.0
+                    opacity: mediaPlayer.liveMode ? 0.0 : 1.0
                     Behavior on opacity { NumberAnimation { duration: 200 } }
                 }
 
@@ -354,7 +343,7 @@ Item
                     text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy", "DO NOT TRANSLATE THIS STRING!"))
                     color: ColorTheme.windowText
 
-                    opacity: timeline.stickToEnd ? 0.0 : 1.0
+                    opacity: mediaPlayer.liveMode ? 0.0 : 1.0
                     Behavior on opacity { NumberAnimation { duration: 200 } }
                 }
 
@@ -364,7 +353,7 @@ Item
 
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    y: timeline.stickToEnd ? (parent.height - height) / 2 : parent.height - height
+                    y: mediaPlayer.liveMode ? (parent.height - height) / 2 : parent.height - height
                     Behavior on y { NumberAnimation { duration: 200 } }
 
                     width: timeLabel.visible ? timeLabel.width : liveLabel.width
@@ -374,7 +363,7 @@ Item
                     {
                         id: timeLabel
                         dateTime: timeline.positionDate
-                        visible: !timeline.stickToEnd
+                        visible: !mediaPlayer.liveMode
                     }
 
                     Text
@@ -385,7 +374,7 @@ Item
                         font.weight: Font.Normal
                         color: ColorTheme.windowText
                         text: qsTr("LIVE")
-                        visible: timeline.stickToEnd
+                        visible: mediaPlayer.liveMode
                     }
                 }
             }
@@ -399,6 +388,14 @@ Item
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 loading: !paused && (mediaPlayer.loading || timeline.dragging)
+                paused: videoNavigation.paused
+                onClicked:
+                {
+                    if (paused)
+                        mediaPlayer.play()
+                    else
+                        mediaPlayer.pause()
+                }
             }
 
             Rectangle
@@ -440,7 +437,7 @@ Item
         onDatePicked:
         {
             close()
-            mediaPlayer.seek(date.getTime())
+            mediaPlayer.position = date.getTime()
         }
     }
 

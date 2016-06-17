@@ -2,7 +2,7 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <utils/serialization/binary.h>
+#include <nx/fusion/serialization/binary.h>
 
 #include <nx_ec/data/api_business_rule_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -38,7 +38,7 @@ int QnBusinessMessageBus::deliveryBusinessEvent(QnAbstractBusinessEventPtr bEven
 int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QnUuid& dstPeer)
 {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    int handle = ec2Connection->getBusinessEventManager()->sendBusinessAction(bAction, dstPeer, this, &QnBusinessMessageBus::at_DeliveryBusinessActionFinished);
+    int handle = ec2Connection->getBusinessEventManager(Qn::kDefaultUserAccess)->sendBusinessAction(bAction, dstPeer, this, &QnBusinessMessageBus::at_DeliveryBusinessActionFinished);
 
     QnMutexLocker lock(&m_mutex);
     m_sendingActions.insert(handle, bAction);

@@ -1,7 +1,7 @@
 #ifndef QN_LDAP_H
 #define QN_LDAP_H
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <utils/common/ldap_fwd.h>
 
 struct QnLdapSettings {

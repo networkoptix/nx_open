@@ -26,6 +26,16 @@ chmod 777 /dev/disp
 chmod 777 /dev/cedar_dev
 usermod -aG video root
 rm -Rf /opt/networkoptix/mediaserver/lib
+
+mkdir -p $MNTDATAPART
+mount -t ext4 $DATAPART $MNTDATAPART
+cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite /root/tools/nx/ecs_static.sqlite
+rm -Rf $MNTDATAPART/opt/$CUSTOMIZATION
+tar xfv /tmp/$DISTRIB.tar.gz -C $MNTDATAPART
+mkdir -p $MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/var
+cp -f /root/tools/nx/ecs_static.sqlite $MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/var
+echo "statisticsReportAllowed=true" >> $MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf
+umount $DATAPART
 sync
 
 exit 0

@@ -2,7 +2,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace Qn
 {

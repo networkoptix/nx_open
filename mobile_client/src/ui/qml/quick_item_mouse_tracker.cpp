@@ -1,8 +1,8 @@
 #include "quick_item_mouse_tracker.h"
 
-QnQuickItemMouseTracker::QnQuickItemMouseTracker(QQuickItem* parent)
-    : QQuickItem(parent)
-    , m_item(nullptr)
+QnQuickItemMouseTracker::QnQuickItemMouseTracker(QQuickItem* parent) :
+    QQuickItem(parent),
+    m_item(nullptr)
 {
 }
 

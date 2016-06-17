@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 
 QnWorkbenchGridMapper::QnWorkbenchGridMapper(QObject *parent):
     QObject(parent),

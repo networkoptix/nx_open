@@ -8,7 +8,7 @@
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 #include <utils/common/id.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 
 struct QnModuleInformation {

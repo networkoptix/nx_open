@@ -15,7 +15,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
 #include <utils/common/qtimespan.h>
 #include <utils/common/synctime.h>
 #include <utils/tz/tz.h>
@@ -408,7 +408,7 @@ void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
 {
     if (auto connection = QnAppServerConnectionFactory::getConnection2())
     {
-        auto timeManager = connection->getTimeManager();
+        auto timeManager = connection->getTimeManager(Qn::kDefaultUserAccess);
         foreach(const ec2::QnPeerTimeInfo &info, timeManager->getPeerTimeInfoList())
             m_serverOffsetCache[info.peerId] = info.time - currentSyncTime;
     }

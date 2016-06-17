@@ -20,7 +20,7 @@ void QnDesktopClientMessageProcessor::connectToConnection(const ec2::AbstractECC
 {
     base_type::connectToConnection(connection);
 
-    connect(connection->getDiscoveryManager(), &ec2::AbstractDiscoveryManager::gotInitialDiscoveredServers,
+    connect(connection->getDiscoveryNotificationManager(), &ec2::AbstractDiscoveryNotificationManager::gotInitialDiscoveredServers,
             this, &QnDesktopClientMessageProcessor::at_gotInitialDiscoveredServers);
 }
 
@@ -28,7 +28,7 @@ void QnDesktopClientMessageProcessor::disconnectFromConnection(const ec2::Abstra
 {
     base_type::disconnectFromConnection(connection);
 
-    disconnect(connection->getDiscoveryManager(), nullptr, this, nullptr);
+    disconnect(connection->getDiscoveryNotificationManager(), nullptr, this, nullptr);
 }
 
 QnResourceFactory* QnDesktopClientMessageProcessor::getResourceFactory() const

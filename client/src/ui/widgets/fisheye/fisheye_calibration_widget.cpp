@@ -8,7 +8,7 @@
 #include <ui/widgets/fisheye/fisheye_calibration_image_widget.h>
 
 #include <utils/image_provider.h>
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {

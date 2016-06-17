@@ -8,7 +8,7 @@
 #include <QtCore/QDateTime>
 #include <QtGui/QMatrix4x4>
 
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 #include <utils/common/warnings.h>
 #include <ui/animation/animation_event.h>
 

@@ -14,7 +14,7 @@
 #include <client/client_globals.h>
 
 #include <utils/common/id.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <recording/time_period.h>
 
 

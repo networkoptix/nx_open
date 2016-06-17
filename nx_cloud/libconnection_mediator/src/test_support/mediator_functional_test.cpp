@@ -21,8 +21,8 @@
 #include <utils/common/string.h>
 #include <utils/common/sync_call.h>
 #include <utils/crypt/linux_passwd_crypt.h>
-#include <utils/serialization/json.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "http/get_listening_peer_list_handler.h"
 #include "local_cloud_data_provider.h"

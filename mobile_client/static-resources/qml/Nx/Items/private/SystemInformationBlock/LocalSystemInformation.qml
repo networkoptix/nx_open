@@ -38,7 +38,7 @@ Item
                 Layout.fillWidth: true
                 font.pixelSize: 14
                 elide: Text.ElideRight
-                color: enabled ? ColorTheme.contrast4 : ColorTheme.base13
+                color: enabled ? ColorTheme.contrast10 : ColorTheme.base13
             }
         }
 
@@ -60,7 +60,7 @@ Item
                 Layout.fillWidth: true
                 font.pixelSize: 14
                 elide: Text.ElideRight
-                color: enabled ? ColorTheme.contrast4 : ColorTheme.base13
+                color: enabled ? ColorTheme.contrast10 : ColorTheme.base13
             }
 
             visible: user

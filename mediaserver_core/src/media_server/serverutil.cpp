@@ -28,7 +28,7 @@
 #include <server/host_system_password_synchronizer.h>
 #include <core/resource_management/resource_properties.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include "server_connector.h"
 #include <transaction/transaction_message_bus.h>
 #include "cloud/cloud_system_name_updater.h"
@@ -101,7 +101,7 @@ bool PasswordData::hasPassword() const
         !passwordDigest.isEmpty();
 }
 
-bool changeAdminPassword(PasswordData data, QString* errString)
+bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errString)
 {
     //genereating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
@@ -144,7 +144,7 @@ bool changeAdminPassword(PasswordData data, QString* errString)
 
         ec2::ApiUserData apiUser;
         fromResourceToApi(updatedAdmin, apiUser);
-        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password);
+        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager(Qn::UserAccessData(userId))->saveSync(apiUser, data.password);
         if (errCode != ec2::ErrorCode::ok)
         {
             if (errString)
@@ -163,7 +163,7 @@ bool changeAdminPassword(PasswordData data, QString* errString)
 
         ec2::ApiUserData apiUser;
         fromResourceToApi(updatedAdmin, apiUser);
-        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password);
+        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager(Qn::UserAccessData(userId))->saveSync(apiUser, data.password);
         if (errCode != ec2::ErrorCode::ok)
         {
             if (errString)
@@ -244,7 +244,7 @@ void resetTransactionTransportConnections()
 }
 
 
-bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, bool resetConnections)
+bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, bool resetConnections, const Qn::UserAccessData &userAccessData)
 {
     if (qnCommon->localSystemName() == systemName.value())
         return true;
@@ -281,7 +281,7 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
 
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
-    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(userAccessData)->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     CloudSystemNameUpdater::instance()->update();
 

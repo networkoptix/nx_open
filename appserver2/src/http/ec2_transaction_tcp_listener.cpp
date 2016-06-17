@@ -261,8 +261,8 @@ void QnTransactionTcpProcessor::run()
             remoteSystemIdentityTime,
             d->request,
             contentEncoding,
-            ttFinishCallback
-            );
+            ttFinishCallback,
+            Qn::UserAccessData(d->authUserId));
 
         if (!QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid ))
             QnTransactionTransport::connectDone(remoteGuid); //< session killed. Cleanup Guid from a connected list manually

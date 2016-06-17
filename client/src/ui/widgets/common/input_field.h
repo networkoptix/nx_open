@@ -16,6 +16,9 @@ class QnInputField : public QWidget
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged USER true)
+    Q_PROPERTY(QString hint READ hint WRITE setHint)
+    Q_PROPERTY(QString placeholderText READ placeholderText WRITE setPlaceholderText)
     Q_PROPERTY(QLineEdit::EchoMode echoMode READ echoMode WRITE setEchoMode)
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
     Q_PROPERTY(bool passwordIndicatorEnabled READ passwordIndicatorEnabled WRITE setPasswordIndicatorEnabled)
@@ -36,12 +39,15 @@ public:
     void setText(const QString& value);
     void clear();
 
+    QString placeholderText() const;
+    void setPlaceholderText(const QString& value);
+
     QLineEdit::EchoMode echoMode() const;
     void setEchoMode(QLineEdit::EchoMode value);
 
     const QnPasswordStrengthIndicator* passwordIndicator() const;
     bool passwordIndicatorEnabled() const;
-    void setPasswordIndicatorEnabled(bool enabled, bool showImmediately = false);
+    void setPasswordIndicatorEnabled(bool enabled, bool hideForEmptyInput = true, bool showImmediately = false);
 
     bool isReadOnly() const;
     void setReadOnly(bool value);
@@ -52,6 +58,23 @@ public:
     bool lastValidationResult() const;
 
     void setValidator(Qn::TextValidateFunction validator, bool validateImmediately = false);
+
+    bool emptyInputAllowed() const;
+    const QString& emptyInputHint() const;
+    void setEmptyInputAllowed(bool enabled, const QString& hint = QString());
+
+    bool terminalSpacesAllowed() const;
+    const QString& terminalSpacesHint() const;
+    void setTerminalSpacesAllowed(bool allow, const QString& hint = QString());
+
+    void setPasswordMode(QLineEdit::EchoMode echoMode, bool allowEmptyPassword, bool showStrengthIndicator);
+
+    bool confirmationMode() const;
+    const QnInputField* confirmationPrimaryField() const;
+    const QString& confirmationFailureHint() const;
+    void setConfirmationMode(const QnInputField* primaryField, const QString& hint = QString());
+
+    void reset();
 
     static AbstractAccessor* createLabelWidthAccessor();
 

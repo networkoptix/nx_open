@@ -8,7 +8,7 @@
 #include <ui/graphics/items/controls/html_text_item.h>
 #include <ui/graphics/items/overlays/scrollable_overlay_widget.h>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 struct QnOverlayTextItemData
 {
