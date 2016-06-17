@@ -20,7 +20,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-protractor-runner');
     grunt.loadNpmTasks('grunt-wiredep');
     grunt.loadNpmTasks('grunt-backstop');
-
+    grunt.loadNpmTasks('grunt-connect-rewrite');
 
     // Define the configuration for all the tasks
     grunt.initConfig({
@@ -76,6 +76,7 @@ module.exports = function (grunt) {
             }
         },
 
+
         // The actual grunt server settings
         connect: {
             options: {
@@ -84,6 +85,11 @@ module.exports = function (grunt) {
                 hostname: '0.0.0.0',
                 livereload: 35729
             },
+            rules: [
+
+                {from: '^/demo$', to: '/index.html'},
+                {from: '^/static/(.*)$', to: '/$1'}
+            ],
             proxies: [
                 // Local pyhton manage.py runserver
                 /*{context: '/api/',    host: '127.0.0.1', port: 8000},
@@ -91,6 +97,8 @@ module.exports = function (grunt) {
 
 
                 // cloud-demo.hdw.mx
+
+                //{context: '/static/',    host: 'localhost', port: 9000},
                 {context: '/api/',    host: 'cloud-demo.hdw.mx', port: 80},
                 {context: '/notifications/',    host: 'cloud-demo.hdw.mx', port: 80}/**/
             ],
@@ -99,16 +107,20 @@ module.exports = function (grunt) {
                     middleware: function (connect, options) {
                         var serveStatic = require('serve-static');
                         if (!Array.isArray(options.base)) {
-                            options.base = [options.base];
+                              options.base = [options.base];
                         }
 
                         // Setup the proxy
-                        var middlewares = [require('grunt-connect-proxy/lib/utils').proxyRequest];
+                        var middlewares = [
+                            require('grunt-connect-rewrite/lib/utils').rewriteRequest,
+                            require('grunt-connect-proxy/lib/utils').proxyRequest
+                            ];
 
                         // Serve static files.
                         options.base.forEach(function (base) {
                             middlewares.push(serveStatic(base));
                         });
+
 
                         // Make directory browse-able.
                         //var directory = options.directory || options.base[options.base.length - 1];
@@ -170,6 +182,11 @@ module.exports = function (grunt) {
                         options.base.forEach(function (base) {
                             middlewares.push(connect.static(base));
                         });
+
+
+
+                        var rewriteRulesSnippet = require('grunt-connect-rewrite/lib/utils').rewriteRequest;
+                        middlewares.push(rewriteRulesSnippet);
 
                         // Make directory browse-able.
                         var directory = options.directory || options.base[options.base.length - 1];
@@ -610,6 +627,7 @@ module.exports = function (grunt) {
             'copy:custom_css',
             'concurrent:server',
             'autoprefixer',
+            'configureRewriteRules',
             'configureProxies:server',
             'connect:livereload',
             'watch'

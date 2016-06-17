@@ -16,13 +16,14 @@ Including another URLconf
 
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.views.generic.base import RedirectView
-
+from django.views.generic.base import TemplateView
+# from django.views.generic.base import RedirectView
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
     url(r'^notifications/', include('notifications.urls')),
-    url(r'^$', RedirectView.as_view(url='/static/index.html'), name='index')
+    url(r'.*', TemplateView.as_view(template_name="/static/index.html"))
+    # url(r'^$', RedirectView.as_view(url='/static/index.html'), name='index')
 ]
 
