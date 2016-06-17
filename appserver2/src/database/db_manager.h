@@ -705,7 +705,8 @@ public:
     ErrorCode executeTransactionNoLock(const QnTransaction<Container<Param>> &tran, SerializedTransaction &&serializedTran)
     {
         bool userHasNotPermissionForAllResources = std::any_of(tran.params.cbegin(), tran.params.cend(),
-                                                               [](const Param &param) {
+                                                               [this](const Param& param)
+                                                               {
                                                                    return !hasPermission(param, Qn::Permission::SavePermission);
                                                                });
         if (userHasNotPermissionForAllResources)
@@ -731,7 +732,8 @@ public:
     ErrorCode executeTransaction(const QnTransaction<Container<Param>> &tran, SerializedTransaction &&serializedTran)
     {
         bool userHasNotPermissionForAllResources = std::any_of(tran.params.cbegin(), tran.params.cend(),
-                                                               [](const Param &param) {
+                                                               [this](const Param& param) 
+                                                               {
                                                                    return !hasPermission(param, Qn::Permission::SavePermission);
                                                                });
         if (userHasNotPermissionForAllResources)
