@@ -57,6 +57,26 @@ TEST_F(DbRegress, general)
     api::AccountData account1Tmp;
     result = getAccount(account1.email, account1Password, &account1Tmp);
     ASSERT_EQ(api::ResultCode::ok, result);
+
+    //checking that data is there
+    api::AccountData testAccount;
+    result = getAccount("akolesnikov@networkoptix.com", "123", &testAccount);
+    ASSERT_EQ(api::ResultCode::ok, result);
+    ASSERT_EQ("Andrey Kolesnikov", testAccount.fullName);
+
+    std::vector<api::SystemDataEx> systems;
+    result = getSystems("akolesnikov@networkoptix.com", "123", &systems);
+    ASSERT_EQ(api::ResultCode::ok, result);
+    ASSERT_EQ(6, systems.size());
+
+    const auto laOfficeTestSystemIter = std::find_if(
+        systems.begin(), systems.end(),
+        [](api::SystemDataEx& systemData)
+        {
+            return systemData.name == "la_office_test";
+        });
+    ASSERT_NE(systems.end(), laOfficeTestSystemIter);
+    ASSERT_EQ(api::SystemStatus::ssActivated, laOfficeTestSystemIter->status);
 }
 
 }   //test
