@@ -94,7 +94,7 @@ private:
 
     QnlTimeSource* m_extTimeSrc;    //TODO: #GDM refactor to weak pointer
     QPointer<QnStreamRecorder> m_exportRecorder;
-    QPointer<QnAbstractArchiveReader> m_exportReader;
+    QPointer<QnAbstractMediaStreamDataProvider> m_exportReader;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
     bool m_displayStarted;
 };
