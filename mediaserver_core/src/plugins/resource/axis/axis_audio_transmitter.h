@@ -23,7 +23,7 @@ public:
     QnAxisAudioTransmitter(QnSecurityCamResource* res);
     virtual ~QnAxisAudioTransmitter();
 
-    virtual bool processAudioData(QnConstAbstractMediaDataPtr &data) override;
+    virtual bool processAudioData(const QnConstCompressedAudioDataPtr& data) override;
 
     virtual bool isCompatible(const QnAudioFormat& format) const override;
     virtual void setOutputFormat(const QnAudioFormat& format) override;
@@ -54,9 +54,7 @@ private:
     QnSecurityCamResource* m_resource;
     std::unique_ptr<QnFfmpegAudioTranscoder> m_transcoder;
     QnAudioFormat m_outputFormat;
-    nx_http::AsyncHttpClientPtr m_httpClient;
     std::unique_ptr<AbstractStreamSocket> m_socket;
-
     bool m_noAuth;
 
     TransmitterState m_state;

@@ -42,6 +42,8 @@ public:
     void saveParams();
     void saveParamsAsync();
     int saveAsync();
+    void updateDefaultAuthIfEmpty(const QString& login, const QString& password);
+
 
     static int issuesTimeoutMs();
 

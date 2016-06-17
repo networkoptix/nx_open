@@ -18,6 +18,7 @@
     "version": "1.0",
     "data": [
 
+
         {
             "keys": [
                 "DW|*","ISD|*"
@@ -136,10 +137,23 @@
                 "DW|DWC-PZV2M72T",
                 "DigitalWatchdog|DWC-PZV2M72T"
             ],
-            "isDW": true,
+            "isdDwCam": true,
             "showUrl": true,
             "urlLocalePath": "priv/cam.html"
         },
+		
+        {
+            "keys": [
+                "DW|DWCA-C128-64", 
+                "DW|DWCA-C12C-64", 
+                "DW|DWCA-VF25W28-64",
+                "DW|DWCA-VF25WIR4-64",
+                "DW|DWCA-VF25WIR8-64",
+                "DW|DWC-PZV2M72T"
+            ],
+            "isdDwCam": true
+        },
+		
         {
             "keys": [
                 "vista|*"
@@ -1028,6 +1042,23 @@
                 "Honeywell*|*"
             ],
             "portNamePrefixToIgnore": "AlarmOut"
+        },
+        {
+            "keys": [
+                "Pelco|NET5508*"
+            ],
+            "forcedOnvifParams": {
+                "videoEncoders": [
+                    "ve0", "ve8",
+                    "ve1", "ve9",
+                    "ve2", "ve10",
+                    "ve3", "ve11",
+                    "ve4", "ve12",
+                    "ve5", "ve13",
+                    "ve6", "ve14",
+                    "ve7", "ve15"
+                ]
+            }
         }
     ]
 }

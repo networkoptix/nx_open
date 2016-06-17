@@ -170,7 +170,7 @@ public:
     bool hasUnprocessedCommands() const;
 #endif
 
-    bool isInitialized() const;
+    virtual bool isInitialized() const;
 
     static void stopAsyncTasks();
     static void pleaseStopAsyncTasks();

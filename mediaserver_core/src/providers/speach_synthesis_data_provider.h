@@ -1,5 +1,7 @@
 #pragma once
 
+#if !defined(EDGE_SERVER)
+
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/audio_data_packet.h>
 
@@ -30,3 +32,4 @@ private:
     QByteArray m_rawBuffer;
     size_t m_curPos;
 };
+#endif

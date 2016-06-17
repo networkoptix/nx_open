@@ -366,8 +366,9 @@ void QnTwoWayAudioWidgetPrivate::stopStreaming()
         return;
 
     //TODO: #GDM What should we do if we cannot stop streaming?
-    if (m_state != Error)
-        server->restConnection()->twoWayAudioCommand(m_camera->getId(), false, rest::ServerConnection::GetCallback());
+
+    /* Sending stop anyway, because we can get here in 'Streaming is not ready' error state. */
+    server->restConnection()->twoWayAudioCommand(m_camera->getId(), false, rest::ServerConnection::GetCallback());
 }
 
 void QnTwoWayAudioWidgetPrivate::setFixedHeight(qreal height)

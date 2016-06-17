@@ -1,3 +1,5 @@
+#if !defined(EDGE_SERVER)
+
 #ifndef TEXT_TO_WAV_H
 #define TEXT_TO_WAV_H
 
@@ -83,3 +85,5 @@ private:
 };
 
 #endif  //TEXT_TO_WAV_H
+
+#endif

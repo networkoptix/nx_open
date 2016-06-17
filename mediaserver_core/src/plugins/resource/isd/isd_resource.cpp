@@ -35,7 +35,6 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 QnPlIsdResource::QnPlIsdResource()
 {
     setVendor(lit("ISD"));
-    setDefaultAuth(QLatin1String("root"), QLatin1String("admin"));
 }
 
 void QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
@@ -87,6 +86,9 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 CameraDiagnostics::Result QnPlIsdResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
+
+    updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("admin"));
+
 
     QUrl apiRequestUrl;
     apiRequestUrl.setScheme( lit("http") );
