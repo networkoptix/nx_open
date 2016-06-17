@@ -1,5 +1,4 @@
-
-#include "core_settings.h"
+#include "client_core_settings.h"
 
 #include <QtCore/QLatin1String>
 #include <QtCore/QSettings>
@@ -19,8 +18,9 @@ namespace
     const auto kSystemNameTag = lit("systemName");
     const auto kStoredPassword = lit("storedPassword");
 
-    void writeRecentUserConnections(QSettings *settings
-        , const QnUserRecentConnectionDataList &connections)
+    void writeRecentUserConnections(
+            QSettings*settings,
+            const QnUserRecentConnectionDataList& connections)
     {
         settings->beginWriteArray(kUserConnectionsSectionTag);
         const auto arrayWriteGuard = QnRaiiGuard::createDestructable(
@@ -31,7 +31,7 @@ namespace
         for (int i = 0; i != connCount; ++i)
         {
             settings->setArrayIndex(i);
-            const auto &connection = connections.at(i);
+            const auto& connection = connections.at(i);
             const auto encryptedPass = xorEncrypt(connection.password, kXorKey);
             settings->setValue(kUserNameTag, connection.userName);
             settings->setValue(kPasswordTag, encryptedPass);
@@ -40,7 +40,7 @@ namespace
         }
     }
 
-    QnUserRecentConnectionDataList readRecentUserConnections(QSettings *settings)
+    QnUserRecentConnectionDataList readRecentUserConnections(QSettings* settings)
     {
         QnUserRecentConnectionDataList result;
         const int count = settings->beginReadArray(kUserConnectionsSectionTag);
@@ -65,7 +65,7 @@ namespace
 
 }
 
-QnCoreSettings::QnCoreSettings(QObject* parent) :
+QnClientCoreSettings::QnClientCoreSettings(QObject* parent) :
     base_type(parent),
     m_settings(new QSettings(this))
 {
@@ -75,36 +75,36 @@ QnCoreSettings::QnCoreSettings(QObject* parent) :
     updateFromSettings(m_settings);
 }
 
-QnCoreSettings::~QnCoreSettings()
+QnClientCoreSettings::~QnClientCoreSettings()
 {
     submitToSettings(m_settings);
 }
 
-void QnCoreSettings::writeValueToSettings(QSettings *settings
-    , int id
-    , const QVariant &value) const
+void QnClientCoreSettings::writeValueToSettings(
+        QSettings* settings, int id, const QVariant& value) const
 {
     switch (id)
     {
-    case RecentUserConnections:
-        writeRecentUserConnections(settings
-            , value.value<QnUserRecentConnectionDataList>());
-        break;
-    default:
-        base_type::writeValueToSettings(settings, id, value);
+        case RecentUserConnections:
+            writeRecentUserConnections(
+                        settings, value.value<QnUserRecentConnectionDataList>());
+            break;
+        default:
+            base_type::writeValueToSettings(settings, id, value);
     }
 }
 
-QVariant QnCoreSettings::readValueFromSettings(QSettings *settings
-    , int id
-    , const QVariant &defaultValue)
+QVariant QnClientCoreSettings::readValueFromSettings(
+        QSettings* settings,
+        int id,
+        const QVariant& defaultValue)
 {
     switch (id)
     {
-    case RecentUserConnections:
-        return QVariant::fromValue<QnUserRecentConnectionDataList>(
-            readRecentUserConnections(settings));
-    default:
-        return base_type::readValueFromSettings(settings, id, defaultValue);
+        case RecentUserConnections:
+            return QVariant::fromValue<QnUserRecentConnectionDataList>(
+                readRecentUserConnections(settings));
+        default:
+            return base_type::readValueFromSettings(settings, id, defaultValue);
     }
 }

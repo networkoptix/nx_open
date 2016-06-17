@@ -3,7 +3,6 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QClipboard>
 
-#include <core/core_settings.h>
 #include <camera/camera_thumbnail_cache.h>
 #include <utils/mobile_app_info.h>
 #include <utils/common/app_info.h>
@@ -13,6 +12,7 @@
 #include <ui/window_utils.h>
 #include <ui/texture_size_helper.h>
 #include <ui/models/recent_user_connections_model.h>
+#include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_app_info.h>
 #include <watchers/available_cameras_watcher.h>
@@ -108,7 +108,7 @@ bool QnContext::liteMode() const
 
 void QnContext::removeSavedConnection(const QString& systemName)
 {
-    auto lastConnections = qnCoreSettings->recentUserConnections();
+    auto lastConnections = qnClientCoreSettings->recentUserConnections();
 
     auto connectionEqual = [systemName](const QnUserRecentConnectionData& connection)
     {
@@ -117,7 +117,7 @@ void QnContext::removeSavedConnection(const QString& systemName)
     lastConnections.erase(std::remove_if(lastConnections.begin(), lastConnections.end(), connectionEqual),
                           lastConnections.end());
 
-    qnCoreSettings->setRecentUserConnections(lastConnections);
+    qnClientCoreSettings->setRecentUserConnections(lastConnections);
 }
 
 void QnContext::setLastUsedConnection(const QString& systemId, const QUrl& url)

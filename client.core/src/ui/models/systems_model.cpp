@@ -7,7 +7,7 @@
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/disconnect_helper.h>
 #include <network/system_description.h>
-#include <core/core_settings.h>
+#include <client_core/client_core_settings.h>
 #include <finders/systems_finder.h>
 #include <watchers/cloud_status_watcher.h>
 

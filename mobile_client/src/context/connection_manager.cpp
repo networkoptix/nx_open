@@ -5,7 +5,6 @@
 #include <QtCore/QMetaEnum>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/core_settings.h>
 #include <api/abstract_connection.h>
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
@@ -14,6 +13,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <common/common_module.h>
+#include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_message_processor.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <watchers/user_watcher.h>
@@ -390,7 +390,7 @@ void QnConnectionManagerPrivate::storeConnection(
         const QUrl& url,
         bool storePassword)
 {
-    auto lastConnections = qnCoreSettings->recentUserConnections();
+    auto lastConnections = qnClientCoreSettings->recentUserConnections();
 
     const auto password = storePassword ? url.password()
                                         : QString();
@@ -405,5 +405,5 @@ void QnConnectionManagerPrivate::storeConnection(
                           lastConnections.end());
     lastConnections.prepend(connectionInfo);
 
-    qnCoreSettings->setRecentUserConnections(lastConnections);
+    qnClientCoreSettings->setRecentUserConnections(lastConnections);
 }
