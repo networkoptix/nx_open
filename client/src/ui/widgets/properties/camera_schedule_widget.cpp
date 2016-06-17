@@ -777,11 +777,15 @@ void QnCameraScheduleWidget::updateMotionButtons() {
     }
 }
 
-void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled) {
-    if (motionPlusLqToggled)
-        ui->fpsSpinBox->setMaximum(m_maxDualStreamingFps);
-    else
-        ui->fpsSpinBox->setMaximum(m_maxFps);
+void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled)
+{
+    int maximum = motionPlusLqToggled ? m_maxDualStreamingFps : m_maxFps;
+
+    /* This check is necessary because Qt doesn't do it and resets spinbox state: */
+    if (maximum == ui->fpsSpinBox->maximum())
+        return;
+
+    ui->fpsSpinBox->setMaximum(maximum);
 }
 
 void QnCameraScheduleWidget::updateColors() {

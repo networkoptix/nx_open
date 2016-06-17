@@ -3,7 +3,7 @@
 #include <core/resource/resource_type.h>
 #include <api/global_settings.h>
 
-QnAbstractResourceSearcher::QnAbstractResourceSearcher():
+QnAbstractResourceSearcher::QnAbstractResourceSearcher() :
     m_discoveryMode(DiscoveryMode::fullyEnabled),
     m_localResources(false),
     m_shouldStop(false)

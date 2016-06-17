@@ -23,7 +23,6 @@ class QnCheckBoxedHeaderView;
 class QnUserManagementWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    Q_PROPERTY(QnUserManagementColors colors READ colors WRITE setColors)
     typedef Connective<QnAbstractPreferencesWidget> base_type;
 
 public:
@@ -33,9 +32,6 @@ public:
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
     virtual bool hasChanges() const override;
-
-    const QnUserManagementColors colors() const;
-    void setColors(const QnUserManagementColors& colors);
 
 private:
     void at_usersTable_clicked(const QModelIndex& index);
@@ -67,5 +63,4 @@ private:
     QnUserListModel* m_usersModel;
     QnSortedUserListModel* m_sortModel;
     QnCheckBoxedHeaderView* m_header;
-    QnUserManagementColors m_colors;
 };

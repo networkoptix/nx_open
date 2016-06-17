@@ -61,6 +61,7 @@
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/web_view.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/notifications/notifications_collection_widget.h>
 
@@ -505,8 +506,12 @@ Qn::ActionScope QnWorkbenchUi::currentScope() const
     if (focusItem == m_sliderItem)
         return Qn::SliderScope;
 
-    if (!focusItem || dynamic_cast<QnResourceWidget *>(focusItem))
+    if (!focusItem || dynamic_cast<QnResourceWidget*>(focusItem))
         return Qn::SceneScope;
+
+    /* We should not handle any button as an action while the item was focused. */
+    if (dynamic_cast<QnWebView*>(focusItem))
+        return Qn::InvalidScope;
 
     return Qn::MainScope;
 }

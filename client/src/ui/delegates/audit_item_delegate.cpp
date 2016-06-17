@@ -46,14 +46,14 @@ namespace
             return QnAuditItemDelegate::tr("Play");
 
         case Qn::AR_UserUpdate:
-            return QnAuditItemDelegate::tr("User settings");
+            return QnAuditItemDelegate::tr("User settings...");
 
         case Qn::AR_ServerUpdate:
-            return QnAuditItemDelegate::tr("Server settings");
+            return QnAuditItemDelegate::tr("Server settings...");
 
         case Qn::AR_CameraUpdate:
         case Qn::AR_CameraInsert:
-            return QnAuditItemDelegate::tr("Camera settings");
+            return QnAuditItemDelegate::tr("Camera settings...");
 
         default:
             return QString();
@@ -505,10 +505,11 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
 
         QString elidedLinkText = option.fontMetrics.elidedText(linkText, option.textElideMode, linkRect.width(), kTextFlags);
 
+        QPalette::ColorGroup group = option.state.testFlag(QStyle::State_MouseOver) ? QPalette::Normal : QPalette::Inactive;
+
         QFont font(option.font);
-        font.setUnderline(true);
         painter->setFont(font);
-        painter->setPen(option.palette.color(QPalette::Link));
+        painter->setPen(option.palette.color(group, QPalette::Link));
         painter->drawText(linkRect, kTextFlags, elidedLinkText);
     }
 

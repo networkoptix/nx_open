@@ -130,6 +130,7 @@
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
         <client.binary.name>client-bin</client.binary.name>
+        <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
         <!-- compile.option2. See profile angle  -->
@@ -512,6 +513,7 @@
                 <VCVars>VS140COMNTOOLS</VCVars>
                 <modification>winxp</modification>
                 <client.binary.name>${product.name}.exe</client.binary.name>
+                <applauncher.binary.name>${product.name} Launcher.exe</applauncher.binary.name>
                 <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
                 <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
 
@@ -521,6 +523,7 @@
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
                 <machine.type>X64</machine.type>
+                <installation.root>C:/Program Files/${company.name}/${display.product.name}/</installation.root>
             </properties>
 
         </profile>
@@ -538,6 +541,7 @@
             </activation>
             <properties>
                 <machine.type>X86</machine.type>
+                <installation.root>C:/Program Files (x86)/${company.name}/${display.product.name}/</installation.root>
             </properties>
         </profile>
         <profile>
@@ -685,6 +689,7 @@
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
                 <client.binary.name>${display.product.name}</client.binary.name>
+                <applauncher.binary.name>${display.product.name} Launcher</applauncher.binary.name>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
@@ -1115,12 +1120,11 @@
             <properties>
                 <platform>ios</platform>
                 <toolchain.version>ios</toolchain.version>
-                <qt.spec>macx-ios-clang</qt.spec>
+                <qt.spec/>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <compiler>clang</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
-                <qt.version>5.5.1</qt.version>
                 <openssl.version>1.0.1i</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>

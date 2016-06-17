@@ -15,6 +15,7 @@
 #include <ui/common/palette.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/item_view_hover_tracker.h>
+#include <ui/delegates/switch_item_delegate.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
@@ -23,10 +24,10 @@
 #include <ui/models/user_list_model.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
+#include <ui/style/skin.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/delegates/switch_item_delegate.h>
 
 #include <utils/common/ldap.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -39,11 +40,13 @@ namespace {
 class QnDrawEditLinkDelegate : public QStyledItemDelegate
 {
     typedef QStyledItemDelegate base_type;
+    Q_DECLARE_TR_FUNCTIONS(QnUserManagementWidget)
 
 public:
     explicit QnDrawEditLinkDelegate(QnItemViewHoverTracker* hoverTracker, QObject* parent = nullptr) :
         base_type(parent),
-        m_hoverTracker(hoverTracker)
+        m_hoverTracker(hoverTracker),
+        m_editIcon(qnSkin->icon("misc/user_edit.png"))
     {
         NX_ASSERT(m_hoverTracker);
     }
@@ -53,7 +56,7 @@ public:
         /* Determine if link should be drawn: */
         bool drawLink = option.state.testFlag(QStyle::State_MouseOver) &&
                         m_hoverTracker &&
-                        isLinkArea(m_hoverTracker->hoveredIndex());
+                        !QnUserListModel::isInteractiveColumn(m_hoverTracker->hoveredIndex().column());
 
         /* If not, call standard paint: */
         if (!drawLink)
@@ -62,38 +65,41 @@ public:
             return;
         }
 
-        QString linkText = tr("Edit User");
-
-        /* Measure link width: */
-        const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | Qt::AlignVCenter;
-        int linkWidth = option.fontMetrics.width(linkText, -1, kTextFlags) + style::Metrics::kStandardPadding;
-
-        //TODO: #vkutin Add icon
-
         /* Obtain text area rect: */
         QStyleOptionViewItem newOption(option);
         initStyleOption(&newOption, index);
         QStyle* style = newOption.widget ? newOption.widget->style() : QApplication::style();
         QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &newOption, newOption.widget);
 
+        /* Link text: */
+        QString linkText = tr("Edit");
+
+        /* Measure link width: */
+        const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | Qt::AlignVCenter;
+        int linkWidth = option.fontMetrics.width(linkText, -1, kTextFlags);
+
+        int lineHeight = option.rect.height();
+        QSize iconSize = m_editIcon.actualSize(QSize(lineHeight, lineHeight));
+        const int kIconPadding = 0;
+        linkWidth += iconSize.width() + kIconPadding;
+
         /* Draw original text elided: */
-        int newTextWidth = textRect.width() - linkWidth;
+        int newTextWidth = textRect.width() - linkWidth - style::Metrics::kStandardPadding;
         newOption.text = newOption.fontMetrics.elidedText(newOption.text, newOption.textElideMode, newTextWidth, kTextFlags);
         style->drawControl(QStyle::CE_ItemViewItem, &newOption, painter, newOption.widget);
 
-        /* Draw link: */
-        QnScopedPainterPenRollback penRollback(painter, newOption.palette.color(QPalette::Link));
-        painter->drawText(textRect, kTextFlags | Qt::AlignRight, linkText);
-    }
+        /* Draw link icon: */
+        QRect iconRect(textRect.right() - linkWidth + 1, option.rect.top(), iconSize.width(), lineHeight);
+        m_editIcon.paint(painter, iconRect, Qt::AlignCenter, QIcon::Active);
 
-    static bool isLinkArea(const QModelIndex& index)
-    {
-        return index.column() > QnUserListModel::CheckBoxColumn &&
-               index.column() < QnUserListModel::EnabledColumn;
+        /* Draw link text: */
+        QnScopedPainterPenRollback penRollback(painter, newOption.palette.color(QPalette::Normal, QPalette::Link));
+        painter->drawText(textRect, kTextFlags | Qt::AlignRight, linkText);
     }
 
 private:
     QPointer<QnItemViewHoverTracker> m_hoverTracker;
+    QIcon m_editIcon;
 };
 
 } // unnamed namespace
@@ -117,6 +123,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
 
     ui->usersTable->setModel(m_sortModel);
     ui->usersTable->setHeader(m_header);
+    ui->usersTable->setIconSize(QSize(36, 24));
     ui->usersTable->setItemDelegateForColumn(QnUserListModel::EnabledColumn,  switchItemDelegate);
     ui->usersTable->setItemDelegateForColumn(QnUserListModel::UserRoleColumn, new QnDrawEditLinkDelegate(hoverTracker, this));
 
@@ -131,7 +138,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    connect(QnGlobalSettings::instance(), &QnGlobalSettings::ldapSettingsChanged, this, &QnUserManagementWidget::updateLdapState);
+    connect(qnGlobalSettings, &QnGlobalSettings::ldapSettingsChanged, this, &QnUserManagementWidget::updateLdapState);
 
     connect(ui->usersTable,              &QTableView::clicked,   this,  &QnUserManagementWidget::at_usersTable_clicked);
     connect(ui->createUserButton,        &QPushButton::clicked,  this,  &QnUserManagementWidget::createUser);
@@ -166,7 +173,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     connect(hoverTracker, &QnItemViewHoverTracker::itemEnter, this,
         [this](const QModelIndex& index)
         {
-            if (QnDrawEditLinkDelegate::isLinkArea(index))
+            if (!QnUserListModel::isInteractiveColumn(index.column()))
                 ui->usersTable->setCursor(Qt::PointingHandCursor);
             else
                 ui->usersTable->unsetCursor();
@@ -196,7 +203,7 @@ void QnUserManagementWidget::updateLdapState()
     ui->ldapSettingsButton->setVisible(!currentUserIsLdap);
     ui->ldapSettingsButton->setEnabled(!qnCommon->isReadOnly());
     ui->fetchButton->setVisible(!currentUserIsLdap);
-    ui->fetchButton->setEnabled(!qnCommon->isReadOnly() && QnGlobalSettings::instance()->ldapSettings().isValid());
+    ui->fetchButton->setEnabled(!qnCommon->isReadOnly() && qnGlobalSettings->ldapSettings().isValid());
 }
 
 void QnUserManagementWidget::applyChanges()
@@ -227,8 +234,8 @@ void QnUserManagementWidget::updateSelection()
     Qt::CheckState selectionState = Qt::Unchecked;
 
     bool hasSelection = !users.isEmpty();
-    if (hasSelection) {
-
+    if (hasSelection)
+    {
         if (users.size() == m_sortModel->rowCount())
             selectionState = Qt::Checked;
         else
@@ -288,7 +295,7 @@ void QnUserManagementWidget::fetchUsers()
     if (!context()->user() || context()->user()->isLdap())
         return;
 
-    if (!QnGlobalSettings::instance()->ldapSettings().isValid())
+    if (!qnGlobalSettings->ldapSettings().isValid())
         return;
 
     QScopedPointer<QnLdapUsersDialog> dialog(new QnLdapUsersDialog(this));
@@ -426,16 +433,4 @@ QnUserResourceList QnUserManagementWidget::visibleSelectedUsers() const
     }
 
     return result;
-}
-
-const QnUserManagementColors QnUserManagementWidget::colors() const
-{
-    return m_colors;
-}
-
-void QnUserManagementWidget::setColors(const QnUserManagementColors& colors)
-{
-    //TODO: #vkutin #common Currently these colors are unused, as well as the same color set in QnUserListModelPrivate
-    m_colors = colors;
-    updateSelection();
 }

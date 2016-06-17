@@ -1,6 +1,7 @@
 #include "mobile_app_info.h"
 
-#include "utils/common/app_info.h"
+#include <utils/common/app_info.h>
+#include <mobile_client/mobile_client_app_info.h>
 
 QnMobileAppInfo::QnMobileAppInfo(QObject* parent)
     : QObject(parent)
@@ -33,9 +34,9 @@ QString QnMobileAppInfo::cloudName() const
 QUrl QnMobileAppInfo::oldMobileClientUrl() const
 {
 #if defined(Q_OS_ANDROID)
-    return QnAppInfo::oldAndroidClientLink();
+    return QnMobileClientAppInfo::oldAndroidClientLink();
 #elif defined(Q_OS_IOS)
-    return QnAppInfo::oldIosClientLink();
+    return QnMobileClientAppInfo::oldIosClientLink();
 #else
     return QUrl();
 #endif

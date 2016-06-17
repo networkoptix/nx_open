@@ -1,12 +1,11 @@
 #include "workbench_context.h"
 
-#include <utils/common/warnings.h>
+#include <common/common_module.h>
 
 #include <client/client_settings.h>
+#include <client/client_startup_parameters.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_message_processor.h>
-
-#include <api/media_server_statistics_manager.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -17,10 +16,11 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_license_notifier.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_watcher.h>
-#include "workbench_license_notifier.h"
+#include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
 
 #include <statistics/statistics_manager.h>
 #include <ui/statistics/modules/actions_statistics_module.h>
@@ -28,9 +28,16 @@
 #include <ui/statistics/modules/graphics_statistics_module.h>
 #include <ui/statistics/modules/durations_statistics_module.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
-#include <ui/workaround/fglrx_full_screen.h>
 
-#include "watchers/workbench_desktop_camera_watcher.h"
+#include <ui/widgets/main_window.h>
+#include <ui/workaround/fglrx_full_screen.h>
+#ifdef Q_OS_LINUX
+#include <ui/workaround/x11_launcher_workaround.h>
+#endif
+
+#include <nx/vms/utils/system_uri.h>
+
+#include <watchers/cloud_status_watcher.h>
 
 QnWorkbenchContext::QnWorkbenchContext(QObject *parent):
     QObject(parent),
@@ -89,7 +96,7 @@ QnWorkbenchContext::QnWorkbenchContext(QObject *parent):
     connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
                      , qnStatisticsManager, &QnStatisticsManager::sendStatistics);
 
-    instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
+    initWorkarounds();
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {
@@ -184,5 +191,132 @@ bool QnWorkbenchContext::closingDown() const
 void QnWorkbenchContext::setClosingDown(bool value)
 {
     m_closingDown = value;
+}
+
+bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& startupParams)
+{
+    /* Process input files. */
+    bool haveInputFiles = false;
+    {
+        QnMainWindow* window = qobject_cast<QnMainWindow*>(mainWindow());
+        NX_ASSERT(window);
+
+        bool skipArg = true;
+        for (const auto& arg : qApp->arguments())
+        {
+            if (!skipArg)
+                haveInputFiles |= window && window->handleMessage(arg);
+            skipArg = false;
+        }
+    }
+
+    if (startupParams.customUri.isValid())
+    {
+        using namespace nx::vms::utils;
+        switch (startupParams.customUri.clientCommand())
+        {
+            case SystemUri::ClientCommand::LoginToCloud:
+            {
+                SystemUri::Auth auth = startupParams.customUri.authenticator();
+                qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(auth.user, auth.password, true);
+                break;
+            }
+            case SystemUri::ClientCommand::ConnectToSystem:
+            {
+                SystemUri::Auth auth = startupParams.customUri.authenticator();
+                QString systemId = startupParams.customUri.systemId();
+                bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
+
+                QUrl systemUrl = QUrl::fromUserInput(systemId);
+                systemUrl.setUserName(auth.user);
+                systemUrl.setPassword(auth.password);
+
+                if (systemIsCloud)
+                    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(auth.user, auth.password, true);
+
+                menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, systemUrl));
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    /* If no input files were supplied --- open connection settings dialog.
+    * Do not try to connect in the following cases:
+    * * we were not connected and clicked "Open in new window"
+    * * we have opened exported exe-file
+    * Otherwise we should try to connect or show Login Dialog.
+    */
+    else if (startupParams.instantDrop.isEmpty() && !haveInputFiles)
+    {
+        /* Set authentication parameters from command line. */
+        QUrl appServerUrl = QUrl::fromUserInput(startupParams.authenticationString); //TODO: #refactor System URI to support videowall
+        if (!startupParams.videoWallGuid.isNull())
+        {
+            NX_ASSERT(appServerUrl.isValid());
+            if (!appServerUrl.isValid())
+            {
+                return false;
+            }
+            appServerUrl.setUserName(startupParams.videoWallGuid.toString());
+        }
+        menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
+    }
+
+    if (!startupParams.videoWallGuid.isNull())
+    {
+        menu()->trigger(QnActions::DelayedOpenVideoWallItemAction, QnActionParameters()
+                                 .withArgument(Qn::VideoWallGuidRole, startupParams.videoWallGuid)
+                                 .withArgument(Qn::VideoWallItemGuidRole, startupParams.videoWallItemGuid));
+    }
+    else if (!startupParams.delayedDrop.isEmpty())
+    { /* Drop resources if needed. */
+        NX_ASSERT(startupParams.instantDrop.isEmpty());
+
+        QByteArray data = QByteArray::fromBase64(startupParams.delayedDrop.toLatin1());
+        menu()->trigger(QnActions::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+    }
+    else if (!startupParams.instantDrop.isEmpty())
+    {
+        QByteArray data = QByteArray::fromBase64(startupParams.instantDrop.toLatin1());
+        menu()->trigger(QnActions::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+    }
+
+    /* Show beta version warning message for the main instance only */
+    bool showBetaWarning = QnAppInfo::beta()
+        && !startupParams.allowMultipleClientInstances
+        && qnRuntime->isDesktopMode()
+        && !qnRuntime->isDevMode()
+        && startupParams.customUri.isNull();
+
+    if (showBetaWarning)
+        action(QnActions::BetaVersionMessageAction)->trigger();
+
+#ifdef _DEBUG
+    /* Show FPS in debug. */
+    menu()->trigger(QnActions::ShowFpsAction);
+#endif
+
+    return true;
+}
+
+void QnWorkbenchContext::initWorkarounds()
+{
+    instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
+
+    QnActions::IDType effectiveMaximizeActionId = QnActions::FullscreenAction;
+#ifdef Q_OS_LINUX
+    /* In Ubuntu its launcher is configured to be shown when a non-fullscreen window has appeared.
+    * In our case it means that launcher overlaps our fullscreen window when the user opens any dialogs.
+    * To prevent such overlapping there was an attempt to hide unity launcher when the main window
+    * has been activated. But now we can't hide launcher window because there is no any visible window for it.
+    * Unity-3D launcher is like a 3D-effect activated by compiz window manager.
+    * We can investigate possibilities of changing the behavior of unity compiz plugin but now
+    * we just disable fullscreen for unity-3d desktop session.
+    */
+    if (QnX11LauncherWorkaround::isUnity3DSession())
+        effectiveMaximizeActionId = QnActions::MaximizeAction;
+#endif
+    menu()->registerAlias(QnActions::EffectiveMaximizeAction, effectiveMaximizeActionId);
 }
 

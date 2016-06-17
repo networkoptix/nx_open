@@ -35,14 +35,14 @@ public:
 
     /**
      * Searches for resources.
-     * 
+     *
      * \returns                         List of resources found.
      */
     QnResourceList search();
 
     /**
      * Search for resources may take time. This function can be used to
-     * stop resource search prematurely. 
+     * stop resource search prematurely.
      */
     virtual void pleaseStop();
 
@@ -57,9 +57,9 @@ public:
     virtual bool isResourceTypeSupported(QnUuid resourceTypeId) const;
 
     /**
-     * \returns                         Name of the manufacturer for the resources this searcher adds. 
+     * \returns                         Name of the manufacturer for the resources this searcher adds.
      *                                  For example, 'AreconVision' or 'IQInVision'.
-     */ 
+     */
     virtual QString manufacture() const = 0;
 
 
@@ -67,7 +67,7 @@ public:
     virtual bool isVirtualResource() const { return false; }
 protected:
     /**
-     * This is the actual function that searches for resources. 
+     * This is the actual function that searches for resources.
      * To be implemented in derived classes.
      *
      * \returns                         List of resources found.
@@ -105,7 +105,7 @@ public:
 
 // =====================================================================
 
-class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance?
+class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance? -- because of rombic ThirdPartyResourceSearcher
 {
 protected:
     QnAbstractFileResourceSearcher() {}

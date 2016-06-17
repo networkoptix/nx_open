@@ -11,6 +11,8 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
 
+struct QnStartupParameters;
+
 class QAction;
 
 class QnWorkbench;
@@ -59,6 +61,9 @@ public:
     bool closingDown() const;
     void setClosingDown(bool value);
 
+    /** Process startup parameters and call related actions. Returns false if something goes critically wrong. */
+    bool handleStartupParameters(const QnStartupParameters& startupParams);
+
 signals:
     /**
      * This signal is emitted whenever the user that is currently logged in changes.
@@ -74,6 +79,9 @@ signals:
     void aboutToBeDestroyed();
 
     void mainWindowChanged();
+
+private:
+    void initWorkarounds();
 
 private:
     QScopedPointer<QnWorkbench> m_workbench;
