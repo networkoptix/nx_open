@@ -131,6 +131,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     ui->mainGridLayout->activate();
 
     ui->filterLineEdit->setPlaceholderText(tr("Search"));
+    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
 
     ui->gridMaster->horizontalHeader()->setSortIndicator(1, Qt::DescendingOrder);
     ui->gridCameras->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
