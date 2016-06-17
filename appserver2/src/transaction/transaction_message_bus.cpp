@@ -549,7 +549,7 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAl
     Q_ASSERT(!modifiedTran.params.peer.instanceId.isNull());
     modifiedTran.params.persistentState.values.clear(); // do not proxy persistent state to other peers. this checking required for directly connected peers only
     modifiedTran.params.runtimeState.values.clear();
-    proxyTransaction(tran, ttHeader);
+    proxyTransaction(modifiedTran, ttHeader);
 }
 
 bool QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader)
