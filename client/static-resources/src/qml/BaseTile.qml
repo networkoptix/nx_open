@@ -265,13 +265,14 @@ Item
 
                 disableable: false;
                 anchors.left: parent.left;
-                anchors.right: parent.left;
+                anchors.right: (collapseTileButton.visible ? collapseTileButton.left : parent.right);
                 anchors.top: parent.top;
 
                 anchors.leftMargin: 16;
-                anchors.rightMargin: anchors.leftMargin;
+                anchors.rightMargin: (collapseTileButton.visible ? 0 : anchors.leftMargin);
                 anchors.topMargin: 12;
 
+                elide: Text.ElideRight;
                 text: systemName;
 
                 height: Style.custom.systemTile.systemNameLabelHeight;
