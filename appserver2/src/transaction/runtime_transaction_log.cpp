@@ -1,6 +1,6 @@
 #include "runtime_transaction_log.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 
 namespace ec2
@@ -8,7 +8,7 @@ namespace ec2
 
 QnRuntimeTransactionLog::QnRuntimeTransactionLog(QObject* parent):
     QObject(parent)
-{ 
+{
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
 }
@@ -41,7 +41,7 @@ void QnRuntimeTransactionLog::clearOldRuntimeDataUnsafe(QnMutexLockerBase& lock,
     auto itr = m_state.values.lowerBound(QnTranStateKey(key.peerID, QnUuid()));
     bool newPeerFound = false;
     bool oldPeerFound = false;
-    while (itr != m_state.values.end() && itr.key().peerID == key.peerID) 
+    while (itr != m_state.values.end() && itr.key().peerID == key.peerID)
     {
         if (itr.key().dbID == key.dbID) {
             newPeerFound = true;
@@ -76,7 +76,7 @@ void QnRuntimeTransactionLog::clearRuntimeData()
     QnMutexLocker lock( &m_mutex );
     m_state.values.clear();
     m_data.clear();
-    
+
 }
 
 bool QnRuntimeTransactionLog::contains(const QnTranState& state) const
