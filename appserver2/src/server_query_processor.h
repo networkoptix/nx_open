@@ -26,7 +26,7 @@ namespace ec2
 {
     struct SendTransactionFunction
     {
-        template<class T> 
+        template<class T>
         void operator()(const QnTransaction<T> &tran) const {
             /* Local transactions (such as setStatus for servers) should only be sent to clients. */
             if (tran.isLocal) {
@@ -75,7 +75,7 @@ namespace ec2
             if (tran.command == ApiCommand::removeStorages)             {
                 return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(tran, handler, ApiCommand::removeStorage);
             }
-            else if (tran.command == ApiCommand::removeResources) 
+            else if (tran.command == ApiCommand::removeResources)
             {
                 return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(tran, handler, ApiCommand::removeResource);
             }
@@ -288,7 +288,7 @@ namespace ec2
                     return;
                 }
             }
-            else 
+            else
             {
                 transactionsToSend.push_back( std::bind(SendTransactionFunction(), tran ) );
             }
@@ -296,7 +296,7 @@ namespace ec2
             //sending transactions
             for( auto& sendCommand: transactionsToSend )
                 sendCommand();
-                
+
             //handler is invoked asynchronously
         }
 
@@ -312,7 +312,7 @@ namespace ec2
                 handler,
                 std::bind( &ServerQueryProcessor::removeResourceSync, this, _1, resourceType, _2 ) );
         }
-            
+
         ErrorCode removeResourceSync(
             QnTransaction<ApiIdData>& tran,
             ApiOjectType resourceType,

@@ -5,8 +5,6 @@
 #include "core/resource/resource_media_layout.h"
 #include <libavformat/avformat.h>
 #include "plugins/resource/archive/abstract_archive_delegate.h"
-#include "recorder/device_file_catalog.h"
-#include "plugins/resource/server_archive/server_archive_delegate.h"
 
 /*
 * QnThumbnailsStreamReader gets frame sequence in the selected range with defined step.
@@ -17,7 +15,7 @@ class QnThumbnailsStreamReader : public QnAbstractMediaStreamDataProvider
     Q_OBJECT;
 
 public:
-    QnThumbnailsStreamReader(const QnResourcePtr& dev);
+    QnThumbnailsStreamReader(const QnResourcePtr& dev, QnAbstractArchiveDelegate* archiveDelegate);
     virtual ~QnThumbnailsStreamReader();
 
     /*
@@ -34,10 +32,9 @@ protected:
 private:
     QnAbstractMediaDataPtr createEmptyPacket();
 private:
-    QnAbstractArchiveDelegate* m_delegate;
-    qint64 m_currentPos;
-    int m_cseq;
     QnAbstractArchiveDelegate* m_archiveDelegate;
+    QnAbstractArchiveDelegate* m_delegate;
+    int m_cseq;
 };
 
 #endif //THUMBNAILS_STREAM_READER_H__
