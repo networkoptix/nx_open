@@ -9,7 +9,7 @@
 
 namespace
 {
-    const auto kCoreSettingsFile = lit("core_client_settings");
+    const auto kCoreSettingsGroup = lit("client_core");
     
     const auto kUserConnectionsSectionTag = lit("UserRecentConnections");
     const auto kXorKey = lit("thereIsSomeKeyForXorOperation");
@@ -65,16 +65,19 @@ namespace
 
 }
 
-QnCoreSettings::QnCoreSettings(QObject *parent)
-    : m_settings(new QSettings(kCoreSettingsFile))
+QnCoreSettings::QnCoreSettings(QObject* parent) :
+    base_type(parent),
+    m_settings(new QSettings(this))
 {
+    m_settings->beginGroup(kCoreSettingsGroup);
+
     init();
-    updateFromSettings(m_settings.data());
+    updateFromSettings(m_settings);
 }
 
 QnCoreSettings::~QnCoreSettings()
 {
-    submitToSettings(m_settings.data());
+    submitToSettings(m_settings);
 }
 
 void QnCoreSettings::writeValueToSettings(QSettings *settings

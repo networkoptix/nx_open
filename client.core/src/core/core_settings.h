@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <utils/common/property_storage.h>
@@ -8,22 +7,23 @@
 class QSettings;
 
 //TODO: #ynikitenkov move to client_core subdirectory and rename to QnClientCoreSettings
-class QnCoreSettings : public QnPropertyStorage
-    , public Singleton<QnCoreSettings>
+class QnCoreSettings :
+    public QnPropertyStorage,
+    public Singleton<QnCoreSettings>
 {
     Q_OBJECT
-    typedef QnPropertyStorage base_type;
+    using base_type = QnPropertyStorage;
 
 public:
     enum PropertyIdentifier
     {
-        RecentUserConnections
+        RecentUserConnections,
 
-        , PropertiesCount
+        PropertiesCount
     };
 
 public:
-    QnCoreSettings(QObject *parent = nullptr);
+    QnCoreSettings(QObject* parent = nullptr);
 
     virtual ~QnCoreSettings();
 
@@ -43,8 +43,7 @@ private:
 
 
 private:
-    typedef QScopedPointer<QSettings> SettingsPtr;
-    const SettingsPtr m_settings;
+    QSettings* m_settings;
 };
 
 #define qnCoreSettings QnCoreSettings::instance()
