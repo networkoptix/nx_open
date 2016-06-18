@@ -43,7 +43,7 @@ var L = {
         wrongCode: 'Wrong confirmation code',
 
         forbidden: 'You are not authorised for this action',
-        accountNotActivated: 'Your account wasn\'t confirmed yet. <a href="#/activate">Send confirmation link again</a>',
+        accountNotActivated: 'Your account wasn\'t confirmed yet. <a href="/activate">Send confirmation link again</a>',
         accountBlocked: 'Your account was blocked',
 
         notFound: 'Not found', // Account not found, activation code not found and so on,

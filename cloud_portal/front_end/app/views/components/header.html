@@ -5,28 +5,29 @@
                     ng-click="isMenuExpanded = !isMenuExpanded">
                 <span class="glyphicon glyphicon-menu-hamburger"></span>
             </button>
-            <a class="navbar-brand product-name add-version" href="#/"><img src="images/logo.png"></a>&nbsp;
+            <a class="navbar-brand product-name add-version" href="/"><img src="images/logo.png"></a>&nbsp;
         </div>
 
         <div class="navbar-collapse" uib-collapse="!isMenuExpanded">
             <ul class="nav navbar-nav">
                 <li class="vertical-bar"></li>
-                <li class="auth-hidden" ng-class="{active:isActive('/static/about')}"><a href="#/static/about">About</a></li>
-                <li class="auth-visible" ng-class="{active:isActive('/systems')}"><a href="#/systems">Systems</a></li>
+                <li class="auth-hidden" ng-class="{active:isActive('/content/about')}"><a href="/content/about">About</a></li>
+                <li class="auth-visible" ng-class="{active:isActive('/systems')}"><a href="/systems">Systems</a></li>
 
 
             </ul>
             <ul class="nav navbar-nav navbar-right auth-hidden">
-                <li><span class="btn-wrapper"><a href="#/login" class="btn btn-default" ng-click="login();$event.preventDefault();">Login</a></span></li>
-                <li><span class="btn-wrapper"><a href="#/register" class="btn btn-primary" >Register</a></span></li>
+                <li><span class="btn-wrapper"><a href="/login" class="btn btn-default"
+                                                 ng-click="login();$event.preventDefault();">Login</a></span></li>
+                <li><span class="btn-wrapper"><a href="/register" class="btn btn-primary" >Register</a></span></li>
             </ul>
             <ul class="nav navbar-nav navbar-right auth-visible">
                 <li class="vertical-bar"></li>
                 <li uib-dropdown>
-                    <a uib-dropdown-toggle href="#">{{account.email}} <span class="caret"></span></a>
+                    <a uib-dropdown-toggle href="">{{account.email}} <span class="caret"></span></a>
                     <ul uib-dropdown-menu>
-                        <li><a href="#/account/">Account Settings</a></li>
-                        <li><a href="#/account/password/">Change Password</a></li>
+                        <li><a href="/account/">Account Settings</a></li>
+                        <li><a href="/account/password/">Change Password</a></li>
                         <li><a href="" ng-click="logout()">Logout</a></li>
                     </ul>
                 </li>

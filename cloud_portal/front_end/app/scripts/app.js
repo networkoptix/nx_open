@@ -21,6 +21,7 @@ angular.module('cloudApp', [
     });
 }]).config(['$routeProvider', '$locationProvider',function ($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true); //Get rid of hash in urls
+    $locationProvider.hashPrefix('!');
 
     $routeProvider
         .when('/register/success', {
@@ -128,7 +129,7 @@ angular.module('cloudApp', [
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl'
         })
-        .when('/static/:page', {
+        .when('/content/:page', {
             templateUrl: 'views/static.html',
             controller: 'StaticCtrl'
         })
