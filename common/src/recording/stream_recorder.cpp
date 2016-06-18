@@ -625,16 +625,19 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     0
                 );
 
-            qint64 startTime = m_startOffset+mediaData->timestamp/1000;
-            av_dict_set(
-                &m_recordingContextVector[i].formatCtx->metadata,
-                QnAviArchiveDelegate::getTagName(
-                    QnAviArchiveDelegate::StartTimeTag,
-                    fileExt
-                ),
-                QString::number(startTime).toLatin1().data(),
-                0
-            );
+            if (isUtcOffsetAllowed())
+            {
+                qint64 startTime = m_startOffset+mediaData->timestamp/1000;
+                av_dict_set(
+                    &m_recordingContextVector[i].formatCtx->metadata,
+                    QnAviArchiveDelegate::getTagName(
+                        QnAviArchiveDelegate::StartTimeTag,
+                        fileExt
+                    ),
+                    QString::number(startTime).toLatin1().data(),
+                    0
+                );
+            }
 
             av_dict_set(
                 &m_recordingContextVector[i].formatCtx->metadata,

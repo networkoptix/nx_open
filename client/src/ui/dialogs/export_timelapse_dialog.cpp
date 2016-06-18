@@ -116,7 +116,7 @@ void QnExportTimelapseDialog::initControls()
         qDebug() << "back check" << fromSliderScale(maxRange) << " diff to" << maxSpeed;
     }
     ui->speedSlider->setRange(0, toSliderScale(maxSpeed));
-    Q_ASSERT(toSliderScale(kMinimalSpeed) == 0);
+    //Q_ASSERT(toSliderScale(kMinimalSpeed) == 0);
 
     qint64 maxExpectedLengthMs = m_sourcePeriodLengthMs / kMinimalSpeed;
     ui->resultLengthSpinBox->setMaximum(static_cast<int>(maxExpectedLengthMs / 1000));

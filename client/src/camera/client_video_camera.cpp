@@ -41,6 +41,8 @@ protected:
         m_currentTimeUsec += kOutputDeltaUsec;
         return result;
     }
+
+    virtual bool isUtcOffsetAllowed() const override { return false; }
 private:
     qint64 m_currentTimeUsec;
 };
