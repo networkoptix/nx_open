@@ -35,8 +35,7 @@ def login(request):
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
 
-    remember = request.data['remember']
-    if not remember:
+    if 'remember' not in request.data or not request.data['remember']:
         request.session.set_expiry(0)
 
     django.contrib.auth.login(request, user)
