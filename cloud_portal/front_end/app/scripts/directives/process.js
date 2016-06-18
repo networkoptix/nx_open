@@ -11,9 +11,7 @@ angular.module('cloudApp').directive('processButton', ['$timeout',function ($tim
                 actionType:'=',
                 form:'='
             },
-            link:function(scope,element,attrs){
-
-                console.log("link",scope);
+            link:function(scope, element, attrs){
                 scope.buttonClass = 'btn-primary';
                 if(scope.actionType){
                     scope.buttonClass = 'btn-' + scope.actionType;
