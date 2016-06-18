@@ -76,7 +76,7 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
 
     bool delegateForMediaStep = m_baseDelegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessMediaStep;
     bool holeDetected = false;
-    if (!delegateForMediaStep) 
+    if (!delegateForMediaStep)
     {
         qint64 startTime = m_baseDelegate->startTime();
         if (startTime != qint64(AV_NOPTS_VALUE)) {
@@ -94,9 +94,10 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
             return QnAbstractMediaDataPtr();
 
         holeDetected = seekRez > m_currentPos;
-        m_currentPos = seekRez - (seekRez-m_currentPos)%m_frameStep;
+        if (holeDetected)
+            m_currentPos = seekRez - (seekRez-m_currentPos)%m_frameStep; //< align to grid
     }
-    
+
     QnAbstractMediaDataPtr result;
     do {
         result = m_baseDelegate->getNextData();

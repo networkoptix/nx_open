@@ -209,6 +209,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
                 return;
             }
             archiveReader->setCycleMode(false);
+            if (role == QnStreamRecorder::Role_FileExport)
+                archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
 
             QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());
             if (rtspClient) {
@@ -221,10 +223,6 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
                 if (timelapseFrameStepUs > 0)
                     rtspClient->setRange(startTimeUs, endTimeUs, timelapseFrameStepUs);
             }
-
-            if (role == QnStreamRecorder::Role_FileExport)
-                archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
-
 
             m_exportReader = archiveReader;
         }
