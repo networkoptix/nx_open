@@ -4,6 +4,7 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/scoped_value_rollback.h>
+#include <array>
 
 namespace {
 
@@ -28,6 +29,38 @@ const int kResultFps = 30;
 /* Default value for slider steps number. */
 const int kSliderSteps = 20;
 
+QString durationMsToString(qint64 durationMs, const QStandardItemModel* unitsModel)
+{
+    quint64 duration = durationMs;
+    qint64 prevDelimiter = 1;
+    QStringList result;
+
+    for (int i = 0; i < unitsModel->rowCount(); ++i)
+    {
+        QStandardItem* item = unitsModel->item(i);
+        qint64 measureUnit = item->data().toLongLong();
+        duration /= (measureUnit / prevDelimiter);
+        prevDelimiter = measureUnit;
+
+        qint64 value = duration;
+        if (i < unitsModel->rowCount() - 1)
+        {
+            QStandardItem* nextItem = unitsModel->item(i+1);
+            qint64 nextMeasureUnit = nextItem->data().toLongLong();
+            int upperLimit = nextMeasureUnit / measureUnit;
+            value %= upperLimit;
+        }
+        duration -= value;
+        if (value > 0 || !result.isEmpty())
+            result.insert(0, QString(lit("%1%2").arg(value).arg(item->text())));
+        if (duration == 0)
+            break;
+    }
+    // keep 2 most significant parts only to make string shorter
+    result = result.mid(0, 2);
+    return result.join(lit(" "));
+}
+
 }
 
 qint64 QnExportTimelapseDialog::kMinimalSourcePeriodLength = kMinimalLengthMs * kMinimalSpeed;
@@ -49,12 +82,26 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
     ui->initialLengthLabel->setFont(infoFont);
     ui->framesLabel->setFont(infoFont);
 
-    QStandardItemModel* unitsModel = new QStandardItemModel(this);
-    unitsModel->appendRow(new QStandardItem(tr("sec")));
-    unitsModel->appendRow(new QStandardItem(tr("min")));
-    unitsModel->appendRow(new QStandardItem(tr("hrs")));
+    m_unitsModel = new QStandardItemModel(this);
 
-    ui->resultLengthUnitsComboBox->setModel(unitsModel);
+    auto item = new QStandardItem(tr("sec"));
+    item->setData(1000);
+    m_unitsModel->appendRow(item);
+
+    item = new QStandardItem(tr("min"));
+    item->setData(1000 * 60);
+    m_unitsModel->appendRow(item);
+
+    item = new QStandardItem(tr("hrs"));
+    item->setData(1000 * 60 * 60);
+    m_unitsModel->appendRow(item);
+
+    item = new QStandardItem(tr("day"));
+    item->setData(1000 * 60 * 60 * 24);
+    m_unitsModel->appendRow(item);
+
+
+    ui->resultLengthUnitsComboBox->setModel(m_unitsModel);
 
     connect(ui->speedSpinBox, QnSpinboxIntValueChanged, this, [this](int value)
     {
@@ -62,8 +109,8 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
             return;
 
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
-        ui->speedSlider->setValue(toSliderScale(value));
-        setExpectedLength(m_sourcePeriodLengthMs / value);
+        ui->speedSlider->setValue(value);
+        setExpectedLengthMs(m_sourcePeriodLengthMs / value);
     });
 
     connect(ui->speedSlider, &QSlider::valueChanged, this, [this](int value)
@@ -72,10 +119,23 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
             return;
 
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
-        int absoluteValue = fromSliderScale(value);
-        ui->speedSpinBox->setValue(absoluteValue);
-        setExpectedLength(m_sourcePeriodLengthMs / absoluteValue);
+        ui->speedSpinBox->setValue(value);
+        setExpectedLengthMs(m_sourcePeriodLengthMs / value);
     });
+
+    connect(ui->resultLengthSpinBox, QnSpinboxIntValueChanged, this, [this](int value)
+    {
+        if (m_updating)
+            return;
+
+        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
+        /*
+        ui->speedSlider->setValue(m_sourcePeriodLengthMs / value);
+        setExpectedLength(m_sourcePeriodLengthMs / value);
+        */
+    });
+
 
     initControls();
 }
@@ -110,12 +170,7 @@ void QnExportTimelapseDialog::initControls()
 
     int maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
     ui->speedSpinBox->setRange(kMinimalSpeed, maxSpeed);
-    {
-        int maxRange = toSliderScale(maxSpeed);
-        qDebug() << "maximum range" << maxRange;
-        qDebug() << "back check" << fromSliderScale(maxRange) << " diff to" << maxSpeed;
-    }
-    ui->speedSlider->setRange(0, toSliderScale(maxSpeed));
+    ui->speedSlider->setRange(kMinimalSpeed, maxSpeed);
     //Q_ASSERT(toSliderScale(kMinimalSpeed) == 0);
 
     qint64 maxExpectedLengthMs = m_sourcePeriodLengthMs / kMinimalSpeed;
@@ -129,40 +184,19 @@ void QnExportTimelapseDialog::initControls()
         expectedLengthMs = m_sourcePeriodLengthMs / speed;
     }
     ui->speedSpinBox->setValue(speed);
-    ui->speedSlider->setValue(toSliderScale(speed));
-    setExpectedLength(expectedLengthMs);
-
+    ui->speedSlider->setValue(speed);
+    setExpectedLengthMs(expectedLengthMs);
+    ui->initialLengthLabel->setText(durationMsToString(m_sourcePeriodLengthMs, m_unitsModel));
 }
 
-void QnExportTimelapseDialog::setExpectedLength(qint64 value)
+void QnExportTimelapseDialog::setExpectedLengthMs(qint64 value)
 {
+    int speed = m_sourcePeriodLengthMs / value;
+
     m_expectedLengthMs = value;
-    qint64 framesCount = m_sourcePeriodLengthMs / value;
-    m_frameStepMs = framesCount * 1000 / kResultFps;
+    m_frameStepMs = speed *  ( 1000 / kResultFps);
     ui->framesLabel->setText(QString::number(m_frameStepMs));
-    ui->resultLengthSpinBox->setValue(static_cast<int>(value / 1000));
-}
-
-int QnExportTimelapseDialog::toSliderScale(int absoluteSpeedValue)
-{
-    /* If we have less steps than recommended value, just use direct scale */
-    int maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
-    if (maxSpeed - kMinimalSpeed <= kSliderSteps)
-        return absoluteSpeedValue - kMinimalSpeed;
-
-    /*TODO: #GDM Function is: kMinimalSpeed * e ^ (k * kSliderSteps) == maxSpeed. From here getting k. */
-
-    return static_cast<int>(log(absoluteSpeedValue));
-}
-
-int QnExportTimelapseDialog::fromSliderScale(int sliderValue)
-{
-    /* If we have less steps than recommended value, just use direct scale */
-    int maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
-    if (maxSpeed - kMinimalSpeed <= kSliderSteps)
-        return kMinimalSpeed + sliderValue;
-
-    /*TODO: #GDM Function is: kMinimalSpeed * e ^ (k * kSliderSteps) == maxSpeed. From here getting k. */
-
-    return static_cast<int>(exp(sliderValue));
+    int index = ui->resultLengthUnitsComboBox->currentIndex();
+    qint64 measureUnit = m_unitsModel->item(index)->data().toLongLong();
+    ui->resultLengthSpinBox->setValue(static_cast<int>(value / measureUnit));
 }

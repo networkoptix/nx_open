@@ -24,10 +24,7 @@ public:
 private:
     void initControls();
 
-    void setExpectedLength(qint64 value);
-
-    int toSliderScale(int absoluteSpeedValue);
-    int fromSliderScale(int sliderValue);
+    void setExpectedLengthMs(qint64 value);
 
 private:
      QScopedPointer<Ui::ExportTimelapseDialog> ui;
@@ -36,4 +33,5 @@ private:
      qint64 m_expectedLengthMs;
      qint64 m_sourcePeriodLengthMs;
      qint64 m_frameStepMs;
+     QStandardItemModel* m_unitsModel;
 };
