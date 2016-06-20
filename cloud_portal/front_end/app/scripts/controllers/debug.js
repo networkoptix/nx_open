@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('DebugCtrl', ['$scope', 'cloudApi', 'account', 'process', '$q', '$timeout','dialogs', 'urlProtocol',
-        function ($scope, cloudApi, account, process, $q, $timeout,dialogs,urlProtocol) {
+    .controller('DebugCtrl', ['$scope', 'cloudApi', 'account', 'process', '$q', '$timeout','dialogs', 'urlProtocol', '$base64',
+        function ($scope, cloudApi, account, process, $q, $timeout, dialogs, urlProtocol, $base64) {
 
         account.requireLogin();
 
@@ -74,7 +74,7 @@ angular.module('cloudApp')
             systemId: null,
             action: null,
             actionParameters: null, // Object with parameters
-            auth: true // true for request, null for skipping, string for specific value
+            auth: null // true for request, null for skipping, string for specific value
         }
         $scope.actionParameters = '{\n	"example": true\n}';
         $scope.actionParametersError = false;
@@ -99,5 +99,19 @@ angular.module('cloudApp')
             }
             return urlProtocol.generateLink(clearEmptyStrings($scope.linkSettings));
         }
+
+         $scope.getTempKey = function(){
+            account.authKey().then(function(authKey){
+                $scope.linkSettings.auth = authKey;
+            },function(no_account){
+                console.error("couldn't retrieve temporary auth_key from cloud_portal",no_account);
+                $scope.linkSettings.auth = "couldn't retrieve temporary auth_key from cloud_portal";
+            });
+         }
+         $scope.usePermCreds = function(){
+            var username = account.getEmail();
+            var password = account.getPassword();
+            $scope.linkSettings.auth = $base64.encode(username + ':' + password);
+         }
 
     }]);
