@@ -269,7 +269,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             m_exportRecorder->setAudioCodec(CODEC_ID_MP3); // transcode audio to MP3
         }
     }
-    QnAbstractArchiveReader* archiveReader = dynamic_cast<QnAbstractArchiveReader*> (m_exportRecorder.data());
+    QnAbstractArchiveReader* archiveReader = dynamic_cast<QnAbstractArchiveReader*> (m_exportReader.data());
 
     if (m_motionFileList[0] && archiveReader)
     {

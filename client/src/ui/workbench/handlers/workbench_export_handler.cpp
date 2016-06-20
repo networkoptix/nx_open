@@ -257,7 +257,8 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
             + filterSeparator
             + mkvFileFilter;
 
-    if (isBinaryExportSupported())
+    bool canUseBinaryExport = isBinaryExportSupported() && timelapseFrameStepMs == 0;
+    if (canUseBinaryExport)
         allowedFormatFilter += filterSeparator + binaryFilterName();
 
     QString fileName;
@@ -298,7 +299,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
         setHelpTopic(dialog.data(), Qn::Exporting_Help);
 
-        QnAbstractWidgetControlDelegate* delegate = isBinaryExportSupported()
+        QnAbstractWidgetControlDelegate* delegate = canUseBinaryExport
             ? new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this)
             : nullptr;
 
@@ -338,7 +339,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
             return;
 
         QString selectedExtension = dialog->selectedExtension();
-        binaryExport = isBinaryExportSupported()
+        binaryExport = canUseBinaryExport
             ? selectedExtension.contains(lit(".exe"))
             : false;
 

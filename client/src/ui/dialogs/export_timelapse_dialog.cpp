@@ -135,7 +135,9 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
 
         int index = ui->resultLengthUnitsComboBox->currentIndex();
         qint64 measureUnit = m_unitsModelSec->item(index)->data().toLongLong();
-        qint64 speedValue = m_sourcePeriodLengthMs / (ui->resultLengthSpinBox->value() * measureUnit);
+        qint64 speedValue = kMaximalSpeed;
+        if (ui->resultLengthSpinBox->value() > 0)
+            speedValue = m_sourcePeriodLengthMs / (ui->resultLengthSpinBox->value() * measureUnit);
         ui->speedSlider->setValue(speedValue);
         ui->speedSpinBox->setValue(speedValue);
 
