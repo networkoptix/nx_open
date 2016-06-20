@@ -31,6 +31,7 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/common/input_field.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/property_backup.h>
 
 #define CUSTOMIZE_POPUP_SHADOWS
 
@@ -38,7 +39,7 @@ using namespace style;
 
 namespace
 {
-    const char* kComboBoxDelegateClassProperty = "_qn_comboBoxDelegateClass";
+    const char* kDelegateClassBackupId = "delegateClass";
 
     const char* kHoveredChildProperty = "_qn_hoveredChild";
 
@@ -2801,12 +2802,19 @@ void QnNxStyle::polish(QWidget *widget)
         comboBox->setAttribute(Qt::WA_Hover);
 
         static const QByteArray kDefaultDelegateClassName("QComboBoxDelegate");
-
-        QAbstractItemDelegate* oldDelegate = comboBox->itemDelegate();
-        if (oldDelegate && oldDelegate->metaObject()->className() == kDefaultDelegateClassName)
+        if (comboBox->itemDelegate()->metaObject()->className() == kDefaultDelegateClassName)
         {
-            comboBox->setProperty(kComboBoxDelegateClassProperty,
-                QVariant::fromValue(const_cast<void*>(static_cast<const void*>(oldDelegate->metaObject()))));
+            auto getDelegateClass = [](const QComboBox* comboBox)
+            {
+                return comboBox->itemDelegate()->metaObject();
+            };
+
+            auto setDelegateClass = [](QComboBox* comboBox, const QMetaObject* delegateClass)
+            {
+                comboBox->setItemDelegate(static_cast<QAbstractItemDelegate*>(delegateClass->newInstance()));
+            };
+
+            QnTypedPropertyBackup<const QMetaObject*, QComboBox>::backup(comboBox, getDelegateClass, setDelegateClass, kDelegateClassBackupId);
             comboBox->setItemDelegate(new QnStyledComboBoxDelegate());
         }
     }
@@ -2914,14 +2922,7 @@ void QnNxStyle::unpolish(QWidget* widget)
     }
 
     if (auto comboBox = qobject_cast<QComboBox*>(widget))
-    {
-        if (auto delegateClass = static_cast<const QMetaObject*>(
-            comboBox->property(kComboBoxDelegateClassProperty).value<void*>()))
-        {
-            comboBox->setProperty(kComboBoxDelegateClassProperty, QVariant());
-            comboBox->setItemDelegate(static_cast<QAbstractItemDelegate*>(delegateClass->newInstance()));
-        }
-    }
+        QnAbstractPropertyBackup::restore(comboBox, kDelegateClassBackupId);
 
     QWidget* popupWithCustomizedShadow = nullptr;
 
