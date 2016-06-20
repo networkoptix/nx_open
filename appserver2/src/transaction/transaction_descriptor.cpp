@@ -159,6 +159,8 @@ namespace detail
             return notificationParams.videowallNotificationManager->triggerNotification( tran );
         case ApiCommand::removeWebPage:
             return notificationParams.webPageNotificationManager->triggerNotification( tran );
+        case ApiCommand::removeCameraUserAttributes:
+            return notificationParams.cameraNotificationManager->triggerNotification(tran);
         case ApiCommand::forcePrimaryTimeServer:
             //#ak no notification needed
             break;
