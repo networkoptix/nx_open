@@ -83,10 +83,10 @@ def index(request):
 @permission_classes((IsAuthenticated,))
 @handle_exceptions
 def auth_key(request):
-    data = Account.create_temporary_credentials('short')
+    data = Account.create_temporary_credentials(request.user.email, request.session['password'], 'short')
 
     key = base64.b64encode(data['login'] + ':' + data['password'])
-    return api_success(request.user.email, request.session['password'], {'auth_key': key})
+    return api_success({'auth_key': key})
 
 
 @api_view(['POST'])
