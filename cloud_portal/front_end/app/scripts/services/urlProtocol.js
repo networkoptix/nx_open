@@ -36,12 +36,6 @@ angular.module('cloudApp')
                 var protocol = settings.native?Config.clientProtocol:location.protocol;
                 var host = settings.native?Config.nativeDomain:location.host;
 
-                if(settings.auth === true){ // TODO: remove for cloud request later
-                    var username = account.getEmail();
-                    var password = account.getPassword();
-                    settings.auth = $base64.encode(username + ':' + password);
-                }
-
                 var getParams = $.extend({},settings.actionParameters);
 
                 if(settings.from){
@@ -66,10 +60,31 @@ angular.module('cloudApp')
                 return url;
 
             },
-            open:function(systemId){
-                window.location.href = this.generateLink({
-                    systemId: systemId
+            getLink:function(linkSettings){
+                var defer = $q.defer();
+                var self = this;
+                account.authKey().then(function(authKey){
+                    linkSettings.auth = authKey;
+                    defer.resolve(self.generateLink(linkSettings));
+                },function(no_account){
+                    console.error("couldn't retrieve temporary auth_key from cloud_portal",no_account);
+                    console.warn("fallback to permanent credentials");
+
+                    var username = account.getEmail();
+                    var password = account.getPassword();
+                    linkSettings.auth = $base64.encode(username + ':' + password);
+
+                    defer.resolve(self.generateLink(linkSettings));
+                    // defer.reject(null);
                 });
+                return defer.promise;
+            },
+            open:function(systemId){
+                this.getLink({
+                    systemId: systemId
+                }).then(function(link){
+                    window.location.href = link;
+                })
             },
             getSource: parseSource,
             source: parseSource()

@@ -22,6 +22,15 @@ angular.module('cloudApp')
                 });
                 return defer.promise;
             },
+            authKey:function(){
+                var defer = $q.defer();
+                cloudApi.authKey().then(function(result){
+                    defer.resolve(result.data.auth_key);
+                },function(no_account){
+                    defer.reject(null);
+                });
+                return defer.promise;
+            },
             requireLogin:function(){
                 var res = this.get();
                 res.catch(function(){

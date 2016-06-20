@@ -79,7 +79,7 @@ def index(request):
         return api_success(serializer.data)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 @handle_exceptions
 def auth_key(request):
