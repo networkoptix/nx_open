@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>444</width>
-    <height>177</height>
+    <height>178</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,7 +39,11 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QSpinBox" name="resultLengthSpinBox"/>
+    <widget class="QSpinBox" name="resultLengthSpinBox">
+     <property name="minimum">
+      <number>1</number>
+     </property>
+    </widget>
    </item>
    <item row="2" column="1" colspan="3">
     <widget class="QLabel" name="speedTitleLabel">
@@ -111,6 +115,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>resultLengthSpinBox</tabstop>
+  <tabstop>resultLengthUnitsComboBox</tabstop>
+  <tabstop>speedSpinBox</tabstop>
+  <tabstop>speedSlider</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
