@@ -570,10 +570,6 @@
                 <python.virtualenv>virtualenv</python.virtualenv>
                 <qtplugin4>audio</qtplugin4>
             </properties>
-
-            <modules>
-                <module>common_libs/nx_speach_synthesizer</module>
-            </modules>
         </profile>
 
         <profile>
@@ -596,6 +592,7 @@
                 <qtplugin4>audio</qtplugin4>
             </properties>
             <modules>
+                <module>common_libs/nx_speach_synthesizer</module>
                 <module>macsetup/client-dmg</module>
             </modules>
         </profile>
