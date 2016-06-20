@@ -570,10 +570,6 @@
                 <python.virtualenv>virtualenv</python.virtualenv>
                 <qtplugin4>audio</qtplugin4>
             </properties>
-
-            <modules>
-                <module>common_libs/nx_speach_synthesizer</module>
-            </modules>
         </profile>
 
         <profile>
@@ -596,6 +592,7 @@
                 <qtplugin4>audio</qtplugin4>
             </properties>
             <modules>
+                <module>common_libs/nx_speach_synthesizer</module>
                 <module>macsetup/client-dmg</module>
             </modules>
         </profile>
@@ -930,7 +927,7 @@
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <android.sdk>${environment.dir}/android/android-sdk</android.sdk>
                 <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
-                <android.ndk.host>linux-x86_64</android.ndk.host>
+                <android.ndk.host>linux-x86</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
                 <openssl.version>1.0.2g-SNAPSHOT</openssl.version>
                 <compile.option1/>
