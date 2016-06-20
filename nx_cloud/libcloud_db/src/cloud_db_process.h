@@ -37,11 +37,27 @@ namespace nx_http
 }
 
 namespace nx {
+
+namespace db {
+class AsyncSqlQueryExecutor;
+}   //db
+namespace utils {
+class TimerManager;
+}   //utils
+
 namespace cdb {
 
-class AuthorizationManager;
+namespace conf {
+class Settings;
+}   //conf
+class AbstractEmailManager;
+class StreeManager;
+class TemporaryAccountPasswordManager;
 class AccountManager;
+class EventManager;
 class SystemManager;
+class AuthenticationManager;
+class AuthorizationManager;
 class AuthenticationProvider;
 
 class CloudDBProcess
@@ -86,8 +102,21 @@ private:
 #ifndef USE_QAPPLICATION
     nx::utils::promise<void> m_processTerminationEvent;
 #endif
+
+    //following pointers are here for debugging convenience
+    conf::Settings* m_settings;
+    nx::db::AsyncSqlQueryExecutor* m_dbManager;
+    nx::utils::TimerManager* m_timerManager;
+    AbstractEmailManager* m_emailManager;
+    StreeManager* m_streeManager;
     nx_http::MessageDispatcher* m_httpMessageDispatcher;
+    TemporaryAccountPasswordManager* m_tempPasswordManager;
+    AccountManager* m_accountManager;
+    EventManager* m_eventManager;
+    SystemManager* m_systemManager;
+    AuthenticationManager* m_authenticationManager;
     AuthorizationManager* m_authorizationManager;
+    AuthenticationProvider* m_authProvider;
 
     void initializeLogging( const conf::Settings& settings );
     void registerApiHandlers(
@@ -95,7 +124,8 @@ private:
         const AuthorizationManager& authorizationManager,
         AccountManager* const accountManager,
         SystemManager* const systemManager,
-        AuthenticationProvider* const authProvider);
+        AuthenticationProvider* const authProvider,
+        EventManager* const eventManager);
     bool initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
     bool configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
     bool updateDB( nx::db::AsyncSqlQueryExecutor* const dbManager );

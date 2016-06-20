@@ -674,25 +674,28 @@ namespace nx_http
 
         dispatch(
             [this, canUseExistingConnection]()
-        {
-            if (canUseExistingConnection)
             {
-                NX_ASSERT(m_socket);
-                ++m_awaitedMessageNumber;   //current message will be skipped
+                if (canUseExistingConnection)
+                {
+                    NX_ASSERT(m_socket);
+                    m_socket->cancelIOSync(nx::network::aio::etNone);
+                    ++m_awaitedMessageNumber;   //current message will be skipped
 
-                serializeRequest();
-                m_state = sSendingRequest;
+                    serializeRequest();
+                    m_state = sSendingRequest;
 
-                m_socket->sendAsync(
-                    m_requestBuffer,
-                    std::bind(&AsyncHttpClient::asyncSendDone, this, m_socket.get(), _1, _2));
-                return;
-            }
+                    m_socket->sendAsync(
+                        m_requestBuffer,
+                        std::bind(
+                            &AsyncHttpClient::asyncSendDone, this,
+                            m_socket.get(), _1, _2));
+                    return;
+                }
 
-            m_socket.reset();
+                m_socket.reset();
 
-            initiateTcpConnection();
-        });
+                initiateTcpConnection();
+            });
     }
 
     void AsyncHttpClient::initiateTcpConnection()
@@ -804,6 +807,8 @@ namespace nx_http
             m_userName = m_url.userName();
         if (!m_url.password().isEmpty())
             m_userPassword = m_url.password();
+        m_url.setUserName(m_userName);
+        m_url.setPassword(m_userPassword);
 
         //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
         //TODO #ak remove it after 2.3 support is over
@@ -904,17 +909,17 @@ namespace nx_http
         {
             header::DigestAuthorization digestAuthorizationHeader;
             if (!calcDigestResponse(
-                m_request.requestLine.method,
-                m_userName.toUtf8(),
-                m_authType != authDigestWithPasswordHash
-                ? m_userPassword.toUtf8()
-                : boost::optional<nx_http::BufferType>(),
-                m_authType == authDigestWithPasswordHash
-                ? m_userPassword.toLatin1()
-                : boost::optional<nx_http::BufferType>(),
-                m_url.path().toUtf8(),
-                wwwAuthenticateHeader,
-                &digestAuthorizationHeader))
+                    m_request.requestLine.method,
+                    m_userName.toUtf8(),
+                    m_authType != authDigestWithPasswordHash
+                        ? m_userPassword.toUtf8()
+                        : boost::optional<nx_http::BufferType>(),
+                    m_authType == authDigestWithPasswordHash
+                        ? m_userPassword.toLatin1()
+                        : boost::optional<nx_http::BufferType>(),
+                    m_url.path().toUtf8(),
+                    wwwAuthenticateHeader,
+                    &digestAuthorizationHeader))
             {
                 return false;
             }
@@ -930,11 +935,11 @@ namespace nx_http
                 m_request.requestLine.method,
                 userName.toLatin1(),
                 m_authType == authDigestWithPasswordHash
-                ? boost::optional<BufferType>()
-                : boost::optional<BufferType>(userPassword.toLatin1()),
+                    ? boost::optional<BufferType>()
+                    : boost::optional<BufferType>(userPassword.toLatin1()),
                 m_authType == authDigestWithPasswordHash
-                ? boost::optional<BufferType>(userPassword.toLatin1())
-                : boost::optional<BufferType>(),
+                    ? boost::optional<BufferType>(userPassword.toLatin1())
+                    : boost::optional<BufferType>(),
                 std::move(wwwAuthenticateHeader),
                 std::move(digestAuthorizationHeader));
             AuthInfoCache::instance()->cacheAuthorization(m_authCacheItem);

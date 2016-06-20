@@ -73,10 +73,12 @@ public:
 class TemporaryCredentialsParams
 :
     public api::TemporaryCredentialsParams,
-    public stree::AbstractResourceReader
+    public stree::AbstractResourceReader,
+    public stree::AbstractResourceWriter
 {
 public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
+    virtual void put(int resID, const QVariant& value) override;
 };
 
 class AccessRestrictions

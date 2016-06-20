@@ -35,7 +35,7 @@ namespace nx_http
             \param completionHandler Functor to be invoked to send response
         */
         bool processRequest(
-            const nx_http::HttpServerConnection& connection,
+            nx_http::HttpServerConnection* const connection,
             nx_http::Message&& request,
             stree::ResourceContainer&& authInfo,
             std::function<void(
@@ -49,7 +49,7 @@ namespace nx_http
             \warning This object can be removed in \a completionHandler 
         */
         virtual void processRequest(
-            const nx_http::HttpServerConnection& connection,
+            nx_http::HttpServerConnection* const connection,
             stree::ResourceContainer authInfo,
             nx_http::Request request,
             nx_http::Response* const response,

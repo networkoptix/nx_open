@@ -118,14 +118,18 @@ TEST_F(HealthMonitoring, reconnect)
             std::placeholders::_1));
     ASSERT_EQ(api::ResultCode::ok, result);
 
-    std::this_thread::sleep_for(std::chrono::seconds(8 + (rand() % 3)));
+    const auto t1 = std::chrono::steady_clock::now();
+    while (std::chrono::steady_clock::now() - t1 < std::chrono::seconds(8 + (rand() % 3)))
+    {
+        //checking that cdb considers system as online
+        api::SystemDataEx systemData;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            fetchSystemData(account1.email, account1Password, system1.id, &systemData));
+        ASSERT_EQ(api::SystemHealth::online, systemData.stateOfHealth);
 
-    //checking that cdb considers system as online
-    api::SystemDataEx systemData;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        fetchSystemData(account1.email, account1Password, system1.id, &systemData));
-    ASSERT_EQ(api::SystemHealth::online, systemData.stateOfHealth);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
 
     eventConnection.reset();
 }
