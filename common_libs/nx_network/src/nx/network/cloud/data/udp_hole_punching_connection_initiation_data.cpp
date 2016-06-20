@@ -10,7 +10,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-const stun::cc::methods::Value UdpHolePunchingSynRequest::kMethod;
+constexpr const stun::cc::methods::Value UdpHolePunchingSynRequest::kMethod;
 
 UdpHolePunchingSynRequest::UdpHolePunchingSynRequest()
 :
@@ -28,7 +28,7 @@ bool UdpHolePunchingSynRequest::parseAttributes(const nx::stun::Message& /*messa
 }
 
 
-const stun::cc::methods::Value UdpHolePunchingSynResponse::kMethod;
+constexpr const stun::cc::methods::Value UdpHolePunchingSynResponse::kMethod;
 
 UdpHolePunchingSynResponse::UdpHolePunchingSynResponse()
 :
