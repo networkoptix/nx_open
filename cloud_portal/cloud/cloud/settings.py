@@ -194,7 +194,7 @@ IP_WHITELISTS = {
     'local': (
         '127.0.0.1',  # localhost
         '74.7.76.98',  # LA office
-        '95.31.136.2',  # moscow office
+        '95.31.136.2',  # Moscow office
         '172.17.0.0/16',    # Docker
         '10.0.0.0/16' # Aws VPC
         )
