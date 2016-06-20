@@ -178,6 +178,7 @@ int CloudDBProcess::exec()
 
         AccountManager accountManager(
             settings,
+            streeManager,
             &tempPasswordManager,
             &dbManager,
             emailManager.get());
