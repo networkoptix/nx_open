@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Export Timelapse</string>
+   <string>Export Rapid Review</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="horizontalSpacing">
@@ -44,7 +44,7 @@
    <item row="2" column="1" colspan="3">
     <widget class="QLabel" name="speedTitleLabel">
      <property name="text">
-      <string>Timelapse speed</string>
+      <string>Rapid Review speed</string>
      </property>
     </widget>
    </item>

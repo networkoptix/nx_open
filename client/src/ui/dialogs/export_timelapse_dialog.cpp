@@ -23,8 +23,6 @@ const qint64 kMinimalLengthMs = 1000;
 /* Sane default value for timelapse video: 5 minutes */
 const qint64 kDefaultLengthMs = 5 * 60 * 1000;
 
-/* Magic knowledge. We know that the result will be generated with 30 fps. --rvasilenko */
-const int kResultFps = 30;
 
 /* Default value for slider steps number. */
 const int kSliderSteps = 20;
@@ -61,6 +59,21 @@ QString durationMsToString(qint64 durationMs, const QStandardItemModel* unitsMod
     return result.join(lit(" "));
 }
 
+void addModelItem(const QString& text, qint64 measureUnit, QStandardItemModel* model)
+{
+    QStandardItem* item = new QStandardItem(text);
+    item->setData(measureUnit);
+    model->appendRow(item);
+}
+
+void addModelItem(const QString& text, qint64 measureUnit, QStandardItemModel* model1, QStandardItemModel* model2)
+{
+    if (model1)
+        addModelItem(text, measureUnit, model1);
+    if (model2)
+        addModelItem(text, measureUnit, model2);
+}
+
 }
 
 qint64 QnExportTimelapseDialog::kMinimalSourcePeriodLength = kMinimalLengthMs * kMinimalSpeed;
@@ -82,26 +95,16 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
     ui->initialLengthLabel->setFont(infoFont);
     ui->framesLabel->setFont(infoFont);
 
-    m_unitsModel = new QStandardItemModel(this);
+    m_unitsModelMs = new QStandardItemModel(this);
+    m_unitsModelSec = new QStandardItemModel(this);
 
-    auto item = new QStandardItem(tr("sec"));
-    item->setData(1000);
-    m_unitsModel->appendRow(item);
+    addModelItem(tr("ms"), 1, m_unitsModelMs);
+    addModelItem(tr("sec"), 1000, m_unitsModelMs, m_unitsModelSec);
+    addModelItem(tr("min"), 1000 * 60, m_unitsModelMs, m_unitsModelSec);
+    addModelItem(tr("hrs"), 1000 * 60 * 60, m_unitsModelMs, m_unitsModelSec);
+    addModelItem(tr("day"), 1000 * 60 * 60 * 24, m_unitsModelMs, m_unitsModelSec);
 
-    item = new QStandardItem(tr("min"));
-    item->setData(1000 * 60);
-    m_unitsModel->appendRow(item);
-
-    item = new QStandardItem(tr("hrs"));
-    item->setData(1000 * 60 * 60);
-    m_unitsModel->appendRow(item);
-
-    item = new QStandardItem(tr("day"));
-    item->setData(1000 * 60 * 60 * 24);
-    m_unitsModel->appendRow(item);
-
-
-    ui->resultLengthUnitsComboBox->setModel(m_unitsModel);
+    ui->resultLengthUnitsComboBox->setModel(m_unitsModelSec);
 
     connect(ui->speedSpinBox, QnSpinboxIntValueChanged, this, [this](int value)
     {
@@ -123,21 +126,39 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
         setExpectedLengthMs(m_sourcePeriodLengthMs / value);
     });
 
-    connect(ui->resultLengthSpinBox, QnSpinboxIntValueChanged, this, [this](int value)
+    auto expectedLengthChanged = [this]()
     {
         if (m_updating)
             return;
 
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-        /*
-        ui->speedSlider->setValue(m_sourcePeriodLengthMs / value);
-        setExpectedLength(m_sourcePeriodLengthMs / value);
-        */
-    });
+        int index = ui->resultLengthUnitsComboBox->currentIndex();
+        qint64 measureUnit = m_unitsModelSec->item(index)->data().toLongLong();
+        qint64 speedValue = m_sourcePeriodLengthMs / (ui->resultLengthSpinBox->value() * measureUnit);
+        ui->speedSlider->setValue(speedValue);
+        ui->speedSpinBox->setValue(speedValue);
+
+        updateFrameStep(speedValue);
+    };
+
+    connect(ui->resultLengthSpinBox, QnSpinboxIntValueChanged, this, expectedLengthChanged);
+    connect(ui->resultLengthUnitsComboBox, QnComboboxCurrentIndexChanged, this, expectedLengthChanged);
 
 
     initControls();
+}
+
+void QnExportTimelapseDialog::setSpeed(qint64 value)
+{
+    ui->speedSpinBox->setValue(value);
+    ui->speedSlider->setValue(value);
+    setExpectedLengthMs(m_sourcePeriodLengthMs / value);
+}
+
+qint64 QnExportTimelapseDialog::speed() const
+{
+    return ui->speedSpinBox->value();
 }
 
 QnExportTimelapseDialog::~QnExportTimelapseDialog()
@@ -186,17 +207,21 @@ void QnExportTimelapseDialog::initControls()
     ui->speedSpinBox->setValue(speed);
     ui->speedSlider->setValue(speed);
     setExpectedLengthMs(expectedLengthMs);
-    ui->initialLengthLabel->setText(durationMsToString(m_sourcePeriodLengthMs, m_unitsModel));
+    ui->initialLengthLabel->setText(durationMsToString(m_sourcePeriodLengthMs, m_unitsModelSec));
 }
 
 void QnExportTimelapseDialog::setExpectedLengthMs(qint64 value)
 {
     int speed = m_sourcePeriodLengthMs / value;
-
-    m_expectedLengthMs = value;
-    m_frameStepMs = speed *  ( 1000 / kResultFps);
-    ui->framesLabel->setText(QString::number(m_frameStepMs));
+    updateFrameStep(speed);
     int index = ui->resultLengthUnitsComboBox->currentIndex();
-    qint64 measureUnit = m_unitsModel->item(index)->data().toLongLong();
+    qint64 measureUnit = m_unitsModelSec->item(index)->data().toLongLong();
     ui->resultLengthSpinBox->setValue(static_cast<int>(value / measureUnit));
+}
+
+void QnExportTimelapseDialog::updateFrameStep(int speed)
+{
+    m_expectedLengthMs = speed;
+    m_frameStepMs = speed *  ( 1000 / kResultFps);
+    ui->framesLabel->setText(durationMsToString(m_frameStepMs, m_unitsModelMs));
 }

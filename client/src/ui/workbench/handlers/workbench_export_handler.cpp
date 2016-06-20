@@ -212,10 +212,23 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
     qint64 timelapseFrameStepMs
     )
 {
-    bool wasLoggedIn = !context()->user().isNull();
 
+    qint64 durationMs = period.durationMs;
+    QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
+    if (loader)
+    {
+        durationMs = 0;
+        for (auto period: loader->periods(Qn::RecordingContent).intersected(period))
+            durationMs += period.durationMs;
+    }
+
+
+    bool wasLoggedIn = !context()->user().isNull();
+    static const qint64 kTimelapseBaseFrameStepMs = 1000 / QnExportTimelapseDialog::kResultFps;
+    qint64 exportSpeed = qMax(1ll, timelapseFrameStepMs / kTimelapseBaseFrameStepMs);
     // TODO: #Elric implement more precise estimation
-    if(period.durationMs > maxRecordingDurationMsec &&
+    if(durationMs / exportSpeed > maxRecordingDurationMsec &&
+       timelapseFrameStepMs == 0 &&
             QnMessageBox::warning(
                 mainWindow(),
                 tr("Warning!"),
@@ -792,21 +805,37 @@ void QnWorkbenchExportHandler::at_exportTimelapseAction_triggered()
 {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-    if (period.durationMs < QnExportTimelapseDialog::kMinimalSourcePeriodLength)
+
+    qint64 durationMs = period.durationMs;
+    QnMediaResourcePtr mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
+    QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
+    if (loader)
+    {
+        durationMs = 0;
+        for (auto period: loader->periods(Qn::RecordingContent).intersected(period))
+            durationMs += period.durationMs;
+    }
+
+    if (durationMs < QnExportTimelapseDialog::kMinimalSourcePeriodLength)
     {
         QMessageBox::warning(mainWindow(),
             tr("Warning!"),
-            tr("Selected period is too short and cannot be exported as timelapse."));
+            tr("Selected period is too short and cannot be exported as Rapid Review."));
         return;
     }
 
     QScopedPointer<QnExportTimelapseDialog> dialog(new QnExportTimelapseDialog(mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->setSourcePeriodLengthMs(period.durationMs);
+
+    dialog->setSourcePeriodLengthMs(durationMs);
+    int speed = qnSettings->timelapseSpeed();
+    if (speed > 0)
+        dialog->setSpeed(speed);
 
     if (!dialog->exec())
         return;
 
+    qnSettings->setTimelapseSpeed(dialog->speed());
     exportTimeSelection(parameters, dialog->frameStepMs());
 }
 

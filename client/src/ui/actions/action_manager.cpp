@@ -1725,7 +1725,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::ExportTimelapseAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget).
-        text(tr("Export Timelapse...")).
+        text(tr("Export Rapid Review...")).
         requiredPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission).
         condition(new QnExportActionCondition(true, this));
 
