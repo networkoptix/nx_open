@@ -58,10 +58,6 @@ def logout(request):
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def index(request):
-
-    """
-    List all snippets, or create a new snippet.
-    """
     if request.method == 'GET':
         # get authorized user here
         serializer = AccountSerializer(request.user, many=False)
@@ -81,6 +77,16 @@ def index(request):
         #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
         return api_success(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+@handle_exceptions
+def auth_key(request):
+    data = Account.create_temporary_credentials('short')
+
+    key = base64.b64encode(data['login'] + ':' + data['password'])
+    return api_success(request.user.email, request.session['password'], {'auth_key': key})
 
 
 @api_view(['POST'])

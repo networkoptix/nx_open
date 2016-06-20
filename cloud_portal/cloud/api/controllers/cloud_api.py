@@ -122,6 +122,15 @@ class Account(object):
 
     @staticmethod
     @validate_response
+    def create_temporary_credentials(email, password, type):
+        params = {
+            'type': type
+        }
+        request = settings.CLOUD_CONNECT['url'] + '/account/create_temporary_credentials'
+        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+
+    @staticmethod
+    @validate_response
     def reset_password(user_email):
         params = {
             'email': user_email

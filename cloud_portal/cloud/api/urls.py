@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^account/register',           account.register),
     url(r'^account/restorePassword',    account.restore_password),
     url(r'^account/changePassword',     account.change_password),
+    url(r'^account/authKey',            account.auth_key),
     url(r'^account',                    account.index),
 
 
