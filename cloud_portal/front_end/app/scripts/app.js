@@ -25,29 +25,29 @@ angular.module('cloudApp', [
 
     $routeProvider
         .when('/register/success', {
-            templateUrl: 'views/register.html',
+            templateUrl: 'static/views/register.html',
             controller: 'RegisterCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.registerSuccess = true; }]
             }
         })
         .when('/register/:email', {
-            templateUrl: 'views/register.html',
+            templateUrl: 'static/views/register.html',
             controller: 'RegisterCtrl'
         })
         .when('/register', {
-            templateUrl: 'views/register.html',
+            templateUrl: 'static/views/register.html',
             controller: 'RegisterCtrl'
         })
         .when('/account/password', {
-            templateUrl: 'views/account.html',
+            templateUrl: 'static/views/account.html',
             controller: 'AccountCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.passwordMode = true; }]
             }
         })
         .when('/account', {
-            templateUrl: 'views/account.html',
+            templateUrl: 'static/views/account.html',
             controller: 'AccountCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.accountMode = true; }]
@@ -56,22 +56,22 @@ angular.module('cloudApp', [
 
 
         .when('/systems', {
-            templateUrl: 'views/systems.html',
+            templateUrl: 'static/views/systems.html',
             controller: 'SystemsCtrl'
         })
         .when('/systems/:systemId', {
-            templateUrl: 'views/system.html',
+            templateUrl: 'static/views/system.html',
             controller: 'SystemCtrl'
         })
         .when('/systems/:systemId/share', {
-            templateUrl: 'views/system.html',
+            templateUrl: 'static/views/system.html',
             controller: 'SystemCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.callShare = true; }]
             }
         })
         .when('/systems/:systemId/share/:shareEmail', {
-            templateUrl: 'views/system.html',
+            templateUrl: 'static/views/system.html',
             controller: 'SystemCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.callShare = true; }]
@@ -80,74 +80,74 @@ angular.module('cloudApp', [
 
 
         .when('/activate', {
-            templateUrl: 'views/activate_restore.html',
+            templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.reactivating = true; }]
             }
         })
         .when('/activate/sent', {
-            templateUrl: 'views/activate_restore.html',
+            templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.reactivatingSuccess = true; }]
             }
         })
         .when('/activate/success',{
-            templateUrl: 'views/activate_restore.html',
+            templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.activationSuccess = true; }]
             }
         })
         .when('/activate/:activateCode', {
-            templateUrl: 'views/activate_restore.html',
+            templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl'
         })
         .when('/restore_password', {
-            templateUrl: 'views/activate_restore.html',
+            templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.restoring = true; }]
             }
         })
         .when('/restore_password/sent', {
-            templateUrl: 'views/activate_restore.html',
+            templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.restoringSuccess = true; }]
             }
         })
         .when('/restore_password/success', {
-            templateUrl: 'views/activate_restore.html',
+            templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.changeSuccess = true; }]
             }
         })
         .when('/restore_password/:restoreCode', {
-            templateUrl: 'views/activate_restore.html',
+            templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl'
         })
         .when('/content/:page', {
-            templateUrl: 'views/static.html',
+            templateUrl: 'static/views/static.html',
             controller: 'StaticCtrl'
         })
 
         .when('/debug', {
-            templateUrl: 'views/debug.html',
+            templateUrl: 'static/views/debug.html',
             controller: 'DebugCtrl'
         })
 
         .when('/login', {
-            templateUrl: 'views/startPage.html',
+            templateUrl: 'static/views/startPage.html',
             controller: 'StartPageCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.callLogin = true; }]
             }
         })
         .otherwise({
-            templateUrl: 'views/startPage.html',
+            templateUrl: 'static/views/startPage.html',
             controller: 'StartPageCtrl'
         });
 }]).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {

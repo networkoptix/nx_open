@@ -4,7 +4,7 @@ angular.module('cloudApp')
     .directive('header',['dialogs', 'cloudApi', 'account', '$location',function (dialogs, cloudApi, account, $location) {
         return {
             restrict: 'E',
-            templateUrl: 'views/components/header.html',
+            templateUrl: 'static/views/components/header.html',
             link:function(scope/*,element,attrs*/){
                 scope.inline = typeof($location.search().inline) != 'undefined';
 

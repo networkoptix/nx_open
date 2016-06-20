@@ -10,7 +10,6 @@
     <meta name="description" content="">
 
     <base href="/" />
-    <base href="/static/" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
@@ -22,7 +21,7 @@
     <link rel="stylesheet" href="fonts/roboto/roboto_regular/stylesheet.css" />
     <link rel="stylesheet" href="fonts/roboto/roboto_medium/stylesheet.css" />
 
-    <!-- build:css({.tmp,app}) styles/index.css -->
+    <!-- build:css({.tmp,app}) static/styles/index.css -->
 
     <link rel="stylesheet" href="bower_components/ngToast/dist/ngToast.css">
     <link rel="stylesheet" href="bower_components/ngToast/dist/ngToast-animations.css">
@@ -49,11 +48,13 @@
 <footer></footer>
 
 <!--[if lt IE 9]>
+<!-- build:js static/scripts/ie-downgrade.js -->
 <script src="bower_components/es5-shim/es5-shim.js"></script>
 <script src="bower_components/json3/lib/json3.min.js"></script>
-<![endif]-->
+<!-- endbuild -->
+<!--[endif]-->
 
-<!-- build:js scripts/vendor.js -->
+<!-- build:js static/scripts/vendor.js -->
 <!-- bower:js -->
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/json3/lib/json3.js"></script>
@@ -73,13 +74,11 @@
 <script src="bower_components/angular-base64/angular-base64.js"></script>
 <script src="bower_components/ngToast/dist/ngToast.js"></script>
 <!-- endbower -->
-
 <!-- endbuild -->
 
+<script src="static/scripts/language.js"></script>
 
-<script src="scripts/language.js"></script>
-
-<!-- build:js({.tmp,app}) scripts/scripts.js -->
+<!-- build:js({.tmp,app}) static/scripts/scripts.js -->
 
 <script src="scripts/config.js"></script>
 <script src="scripts/app.js"></script>

@@ -3,7 +3,7 @@
 angular.module('cloudApp').directive('processButton', ['$timeout',function ($timeout) {
         return {
             restrict: 'E',
-            templateUrl: 'views/components/process-button.html',
+            templateUrl: 'static/views/components/process-button.html',
             scope:{
                 process:'=',
                 buttonDisabled:'=',
@@ -68,7 +68,7 @@ angular.module('cloudApp').directive('processButton', ['$timeout',function ($tim
                             element.removeClass('hidden');
                             element.addClass('process-loading');
                             if(!element.children('.preloader').get(0)) {
-                                element.prepend('<div class="preloader"><img src="images/preloader.gif"></div>');
+                                element.prepend('<div class="preloader"><img src="static/images/preloader.gif"></div>');
                             }
                             return;
                         }

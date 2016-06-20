@@ -219,6 +219,16 @@ module.exports = function (grunt) {
 
         // Empties folders to start fresh
         clean: {
+            compiled:{
+                files: [
+                    {
+                        dot: true,
+                        src: [
+                            '<%= yeoman.dist %>/static'
+                        ]
+                    }
+                ]
+            },
             dist: {
                 files: [
                     {
@@ -310,6 +320,9 @@ module.exports = function (grunt) {
             dist: {
                 files: {
                     src: [
+                        '<%= yeoman.dist %>/static/scripts/{,*/}*.js',
+                        '<%= yeoman.dist %>/static/styles/{,*/}*.css',
+
                         '<%= yeoman.dist %>/scripts/{,*/}*.js',
                         '!<%= yeoman.dist %>/scripts/{,*/}language.js',
                         '<%= yeoman.dist %>/styles/{,*/}*.css'//,
@@ -418,6 +431,12 @@ module.exports = function (grunt) {
                 dest: '<%= yeoman.app %>/styles/custom/',
                 src: '**'
             },
+            compiled:{
+                expand: true,
+                cwd: '<%= yeoman.dist %>/static',
+                dest: '<%= yeoman.dist %>',
+                src: ['**']
+            },
             dist: {
                 files: [
                     {
@@ -472,7 +491,7 @@ module.exports = function (grunt) {
             publish:{
                 expand: true,
                 nonull:true,
-                cwd: '<%= yeoman.app %>/../dist',
+                cwd: '<%= yeoman.dist %>',
                 dest: '../cloud/static/',
                 src: '**'
             }
@@ -774,6 +793,8 @@ module.exports = function (grunt) {
         'uglify',
         'rev',
         'usemin',
+        'copy:compiled',
+        'clean:compiled',
         'htmlmin',
         'shell:version'
     ]);

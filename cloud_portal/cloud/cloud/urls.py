@@ -23,7 +23,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
     url(r'^notifications/', include('notifications.urls')),
-    url(r'.*', TemplateView.as_view(template_name="/static/index.html"))
+    url(r'.*', TemplateView.as_view(template_name="static/index.html"))
     # url(r'^$', RedirectView.as_view(url='/static/index.html'), name='index')
 ]
 

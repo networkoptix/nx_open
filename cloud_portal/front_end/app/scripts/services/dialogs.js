@@ -2,9 +2,9 @@
 
 
 angular.module('cloudApp').run(['$http','$templateCache', function($http,$templateCache) {
-        $http.get('views/dialogs/login.html', {cache: $templateCache});
-        $http.get('views/dialogs/share.html', {cache: $templateCache});
-        $http.get('views/components/dialog.html', {cache: $templateCache});
+        $http.get('static/views/dialogs/login.html', {cache: $templateCache});
+        $http.get('static/views/dialogs/share.html', {cache: $templateCache});
+        $http.get('static/views/components/dialog.html', {cache: $templateCache});
     }])
     .factory('dialogs', ['$http', '$uibModal', '$q', '$location', 'ngToast', function ($http, $uibModal, $q, $location, ngToast) {
 
@@ -21,7 +21,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
             modalInstance = $uibModal.open({
                 size: settings.size || 'sm',
                 controller: 'DialogCtrl',
-                templateUrl: 'views/components/dialog.html',
+                templateUrl: 'static/views/components/dialog.html',
                 animation: !isInline(),
                 keyboard:settings.cancellable,
                 backdrop:settings.cancellable?true:'static',
@@ -111,7 +111,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
             login:function(keepPage){
                 return openDialog({
                     title: L.dialogs.loginTitle,
-                    template: 'views/dialogs/login.html',
+                    template: 'static/views/dialogs/login.html',
                     url: 'login',
                     hasFooter: false,
                     cancellable: !keepPage,
@@ -129,7 +129,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                 }
                 return openDialog({
                     title:title,
-                    template: 'views/dialogs/share.html',
+                    template: 'static/views/dialogs/share.html',
                     url: url,
                     hasFooter: false,
                     cancellable:true,
@@ -145,7 +145,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
 
                 return openDialog({
                     title:title,
-                    template: 'views/dialogs/disconnect.html',
+                    template: 'static/views/dialogs/disconnect.html',
                     hasFooter: false,
                     cancellable:true,
                     params: {

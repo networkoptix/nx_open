@@ -4,7 +4,7 @@ angular.module('cloudApp')
     .directive('footer', function () {
         return {
             restrict: 'E',
-            templateUrl: 'views/components/footer.html',
+            templateUrl: 'static/views/components/footer.html',
             link: function (scope, element, attrs) {
 
             }

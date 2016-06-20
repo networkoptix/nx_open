@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-  .filter('highlight', function($sce) {
+  .filter('highlight', ['$sce',function($sce) {
     return function(text, phrase) {
       if (phrase && phrase!==''){
         text = text.replace(new RegExp('('+phrase+')', 'gi'), '<b>$1</b>')
@@ -9,4 +9,4 @@ angular.module('cloudApp')
 
       return $sce.trustAsHtml(text)
     }
-  })
+  }]);
