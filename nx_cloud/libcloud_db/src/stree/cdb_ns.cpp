@@ -43,6 +43,10 @@ CdbAttrNameSet::CdbAttrNameSet()
     registerResource(attr::socketRemoteIP, "socket.remoteIP", QVariant::String);
 
     registerResource(attr::requestPath, "request.path", QVariant::String);
+
+    registerResource(attr::credentialsType, "credentials.type", QVariant::String);
+    registerResource(attr::credentialsExpirationPeriod, "credentials.expirationPeriod", QVariant::String);
+    registerResource(attr::credentialsProlongationPeriod, "credentials.prolongationPeriod", QVariant::String);
 }
 
 }   //namespace cdb

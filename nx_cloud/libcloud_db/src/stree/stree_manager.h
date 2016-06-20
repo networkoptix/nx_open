@@ -23,7 +23,8 @@ namespace cdb {
 enum class StreeOperation
 {
     authentication,
-    authorization
+    authorization,
+    getTemporaryCredentialsParameters
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreeOperation)

@@ -42,6 +42,8 @@ public:
     nx::cdb::api::ConnectionFactory* connectionFactory();
     api::ModuleInfo moduleInfo() const;
 
+    QString testDataDir() const;
+
     api::ResultCode addAccount(
         api::AccountData* const accountData,
         std::string* const password,
@@ -153,8 +155,10 @@ public:
         api::SystemDataEx* const systemData);
 
     static void setTemporaryDirectoryPath(const QString& path);
+    static QString temporaryDirectoryPath();
     static void setDbConnectionOptions(
         const nx::db::ConnectionOptions& connectionOptions);
+    static nx::db::ConnectionOptions dbConnectionOptions();
 
 private:
     QString m_tmpDir;
