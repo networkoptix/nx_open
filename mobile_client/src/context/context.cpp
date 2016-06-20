@@ -16,6 +16,7 @@
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_app_info.h>
 #include <watchers/available_cameras_watcher.h>
+#include <watchers/cloud_status_watcher.h>
 
 namespace {
 
@@ -52,6 +53,11 @@ QnContext::QnContext(QObject* parent) :
 }
 
 QnContext::~QnContext() {}
+
+QnCloudStatusWatcher* QnContext::cloudStatusWatcher() const
+{
+    return qnCommon->instance<QnCloudStatusWatcher>();
+}
 
 void QnContext::exitFullscreen() {
     showSystemUi();
@@ -157,6 +163,13 @@ QString QnContext::getLastUsedUrl() const
 
     url.setPassword(password);
     return url.toString();
+}
+
+void QnContext::setCloudCredentials(const QString& login, const QString& password)
+{
+    qnClientCoreSettings->setCloudLogin(login);
+    qnClientCoreSettings->setCloudPassword(password);
+    cloudStatusWatcher()->setCloudCredentials(login, password);
 }
 
 QString QnContext::lp(const QString& path) const

@@ -120,10 +120,11 @@ void QnCloudStatusWatcher::setCloudCredentials(const QString &login, const QStri
     if (d->cloudLogin == login && d->cloudPassword == password)
         return;
 
-    setCloudLogin(login);
+    d->cloudLogin = login;
     d->cloudPassword = password;
 
     d->updateConnection(initial);
+    emit loginChanged();
 }
 
 QString QnCloudStatusWatcher::cloudEndpoint() const
@@ -270,7 +271,7 @@ void QnCloudStatusWatcherPrivate::setCloudSystems(const QnCloudSystemList &newCl
 
 void QnCloudStatusWatcherPrivate::checkAndSetStatus(QnCloudStatusWatcher::Status newStatus)
 {
-    switch (newStatus)
+    switch (status)
     {
     case QnCloudStatusWatcher::Online:
     case QnCloudStatusWatcher::LoggedOut:

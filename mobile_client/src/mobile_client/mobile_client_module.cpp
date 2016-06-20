@@ -28,7 +28,7 @@
 #include "mobile_client_meta_types.h"
 #include "mobile_client_settings.h"
 #include "mobile_client_translation_manager.h"
-#include <mobile_client/mobile_client_app_info.h>
+#include "mobile_client_app_info.h"
 
 QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     QObject(parent)
@@ -71,8 +71,11 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnAvailableCamerasWatcher>(availableCamerasWatcher);
     connect(userWatcher, &QnUserWatcher::userChanged, availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
 
-    QnCloudStatusWatcher *cloudStatusWatcher = new QnCloudStatusWatcher();
-    // TODO: #dklychkov set cloud credentials
+    auto cloudStatusWatcher = new QnCloudStatusWatcher();
+    cloudStatusWatcher->setCloudEndpoint(qnClientCoreSettings->cdbEndpoint());
+    cloudStatusWatcher->setCloudCredentials(qnClientCoreSettings->cloudLogin(),
+                                            qnClientCoreSettings->cloudPassword(),
+                                            true);
     common->store<QnCloudStatusWatcher>(cloudStatusWatcher);
 
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());

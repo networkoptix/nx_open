@@ -17,6 +17,9 @@ public:
     enum PropertyIdentifier
     {
         RecentUserConnections,
+        CdbEndpoint,
+        CloudLogin,
+        CloudPassword,
 
         PropertiesCount
     };
@@ -41,6 +44,15 @@ private:
         QN_DECLARE_RW_PROPERTY(QnUserRecentConnectionDataList,
                                recentUserConnections, setRecentUserConnections,
                                RecentUserConnections, QnUserRecentConnectionDataList())
+        QN_DECLARE_RW_PROPERTY(QString,
+                               cdbEndpoint, setCdbEndpoint,
+                               CdbEndpoint, QString())
+        QN_DECLARE_RW_PROPERTY(QString,
+                               cloudLogin, setCloudLogin,
+                               CloudLogin, QString())
+        QN_DECLARE_RW_PROPERTY(QString,
+                               cloudPassword, setCloudPassword,
+                               CloudPassword, QString())
     QN_END_PROPERTY_STORAGE()
 
 private:
