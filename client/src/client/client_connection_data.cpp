@@ -36,7 +36,3 @@ QString QnConnectionDataList::generateUniqueName(const QString &base){
     while (contains(uniqueName));
     return uniqueName;
 }
-
-QString QnConnectionDataList::defaultLastUsedNameKey(){
-    return lit("* Last used connection *");
-}

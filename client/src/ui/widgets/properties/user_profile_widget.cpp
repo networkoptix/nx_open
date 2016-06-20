@@ -4,6 +4,7 @@
 #include <api/app_server_connection.h>
 
 #include <client/client_settings.h>
+#include <client_core/client_core_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
@@ -137,18 +138,18 @@ void QnUserProfileWidget::applyChanges()
             url.setPassword(m_newPassword);
             QnAppServerConnectionFactory::setUrl(url);
 
-            QnConnectionDataList savedConnections = qnSettings->customConnections();
-            if (!savedConnections.isEmpty()
-                && !savedConnections.first().url.password().isEmpty()
-                && qnUrlEqual(savedConnections.first().url, url))
+            auto connections = qnClientCoreSettings->recentUserConnections();
+            if (!connections.isEmpty() && 
+                !connections.first().url.password().isEmpty() &&
+                qnUrlEqual(connections.first().url, url))
             {
-                QnConnectionData current = savedConnections.takeFirst();
+                auto current = connections.takeFirst();
                 current.url = url;
-                savedConnections.prepend(current);
-                qnSettings->setCustomConnections(savedConnections);
+                connections.prepend(current);
+                qnClientCoreSettings->setRecentUserConnections(connections);
             }
 
-            QnConnectionData lastUsed = qnSettings->lastUsedConnection();
+            auto lastUsed = qnSettings->lastUsedConnection();
             if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url))
             {
                 lastUsed.url = url;

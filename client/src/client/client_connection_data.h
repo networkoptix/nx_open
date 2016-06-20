@@ -65,12 +65,6 @@ public:
      * @return                                  Unique name, that is not exists in the list.
      */
     QString generateUniqueName(const QString &base);
-
-    /**
-     * @brief defaultLastUsedNameKey            Get the name for the default connection as it stored in settings.
-     * @return                                  Constant "Last used connection" string.
-     */
-    static QString defaultLastUsedNameKey();
 };
 
 Q_DECLARE_METATYPE(QnConnectionData)

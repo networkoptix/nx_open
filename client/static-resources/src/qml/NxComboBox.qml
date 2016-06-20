@@ -26,6 +26,7 @@ ComboBox
 
     opacity: (enabled ? 1.0 : 0.3);
 
+
     onActiveFocusChanged:
     {
         if (activeFocus)

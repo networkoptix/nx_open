@@ -11,12 +11,6 @@ namespace
     const auto kCoreSettingsGroup = lit("client_core");
     
     const auto kUserConnectionsSectionTag = lit("UserRecentConnections");
-    const auto kXorKey = lit("thereIsSomeKeyForXorOperation");
-
-    const auto kUserNameTag = lit("userName");
-    const auto kPasswordTag = lit("password");
-    const auto kSystemNameTag = lit("systemName");
-    const auto kStoredPassword = lit("storedPassword");
 
     void writeRecentUserConnections(
             QSettings*settings,
@@ -31,12 +25,8 @@ namespace
         for (int i = 0; i != connCount; ++i)
         {
             settings->setArrayIndex(i);
-            const auto& connection = connections.at(i);
-            const auto encryptedPass = xorEncrypt(connection.password, kXorKey);
-            settings->setValue(kUserNameTag, connection.userName);
-            settings->setValue(kPasswordTag, encryptedPass);
-            settings->setValue(kSystemNameTag, connection.systemName);
-            settings->setValue(kStoredPassword, connection.isStoredPassword);
+            QnUserRecentConnectionData::writeToSettings(settings
+                , connections.at(i));
         }
     }
 
@@ -50,15 +40,7 @@ namespace
         for (int i = 0; i != count; ++i)
         {
             settings->setArrayIndex(i);
-
-            const auto encryptedPass = settings->value(kPasswordTag).toString();
-
-            QnUserRecentConnectionData data;
-            data.userName = settings->value(kUserNameTag).toString();
-            data.password = xorDecrypt(encryptedPass, kXorKey);
-            data.systemName = settings->value(kSystemNameTag).toString();
-            data.isStoredPassword = settings->value(kStoredPassword).toBool();
-            result.append(data);
+            result.append(QnUserRecentConnectionData::fromSettings(settings));
         }
         return result;
     }

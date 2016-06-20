@@ -78,61 +78,55 @@ namespace
     const int maxReconnectTimeout = 10*1000;                // 10 seconds
     const int maxVideowallReconnectTimeout = 96*60*60*1000; // 4 days
 
-    void storeCustomConnection(const QUrl &url
-        , const QString &name
-        , bool autoLogin)
+    void storeSystemConnection(const QString &systemName, QUrl url, 
+        bool storePassword, bool autoLogin, bool forceRemoveOldConnection)
     {
-        QnConnectionDataList connections = qnSettings->customConnections();
-
-        QUrl urlToSave(url);
-        if (!autoLogin)
-            urlToSave.setPassword(QString());
-
-        QnConnectionData connectionData(name, urlToSave);
-        qnSettings->setLastUsedConnection(connectionData);
-
-        // remove previous "Last used connection"
-        connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
-
-        QnConnectionData selected = connections.getByName(name);
-        if (qnUrlEqual(selected.url, url))
-        {
-            connections.removeOne(selected.name);
-            connections.prepend(selected);    /* Reorder. */
-        }
-        else
-        {
-            // save "Last used connection"
-            QnConnectionData last(connectionData);
-            last.name = QnConnectionDataList::defaultLastUsedNameKey();
-            connections.prepend(last);
-        }
-        qnSettings->setCustomConnections(connections);
-    }
-
-    void storeSystemConnection(const QString &systemName
-        , const QUrl &url
-        , bool storePassword
-        , bool autoLogin)
-    {
-        auto lastConnections = qnClientCoreSettings->recentUserConnections();
+        auto recentConnections = qnClientCoreSettings->recentUserConnections();
         // TODO: #ynikitenkov remove outdated connection data
 
-        const auto password = (storePassword ? url.password() : QString());
-        const QnUserRecentConnectionData connectionInfo =
-            { systemName, url.userName(), password, storePassword };
+        if (autoLogin)
+            storePassword = true;
 
-        const auto newEnd = std::remove_if(lastConnections.begin(), lastConnections.end()
-            , [connectionInfo](const QnUserRecentConnectionData &connection)
+        if (!storePassword)
+            url.setPassword(QString());
+
+        const auto itFoundConnection = std::find_if(recentConnections.begin(), recentConnections.end()
+            , [systemName, userName = url.userName()](const QnUserRecentConnectionData& connection)
         {
-            return ((connection.systemName == connectionInfo.systemName)
-                && (connection.userName == connectionInfo.userName));
+            return ((connection.systemName == systemName) && 
+                (connection.url.userName() == userName));
         });
 
-        lastConnections.erase(newEnd, lastConnections.end());
-        lastConnections.prepend(connectionInfo);
+        QnUserRecentConnectionData targetConnection(QString(), systemName, url, storePassword);
 
-        qnClientCoreSettings->setRecentUserConnections(lastConnections);
+        if (itFoundConnection != recentConnections.end())
+        {
+            if (forceRemoveOldConnection)
+            {
+                if (!itFoundConnection->name.isEmpty())
+                {
+                    // If it is connection stored from Login dialog - we just clean its password
+                    targetConnection.name = itFoundConnection->name;
+                    targetConnection.isStoredPassword = false;
+                }
+            }
+            else if (storePassword)
+            {
+                if (itFoundConnection->isStoredPassword || !itFoundConnection->name.isEmpty())  // if it is saved connection
+                    targetConnection.name = itFoundConnection->name;
+            }
+            else
+            {
+                targetConnection.name = itFoundConnection->name;
+                targetConnection.isStoredPassword = itFoundConnection->isStoredPassword;
+                targetConnection.url.setPassword(itFoundConnection->url.password());
+            }
+            recentConnections.erase(itFoundConnection);
+        }
+        recentConnections.prepend(targetConnection);
+
+        qnSettings->setLastUsedConnection(targetConnection);
+        qnClientCoreSettings->setRecentUserConnections(recentConnections);
         qnSettings->setAutoLogin(autoLogin);
     }
 }
@@ -256,10 +250,11 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
-    const auto connectionAlias = parameters.argument(Qn::ConnectionAliasRole, QString());
-    const auto storeSettings = StoreConnectionSettings::create(connectionAlias,
+
+    const auto storeSettings = StoreConnectionSettings::create(
         parameters.argument(Qn::StorePasswordRole, false),
-        parameters.argument(Qn::AutoLoginRole, false));
+        parameters.argument(Qn::AutoLoginRole, false),
+        parameters.argument(Qn::ForceRemoveOldConnectionRole, false));
 
     if (url.isValid())
     {
@@ -304,8 +299,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         const bool autoLogin = qnSettings->autoLogin();
         if (autoLogin && url.isValid() && !url.password().isEmpty())
         {
-            const auto storeSettings = StoreConnectionSettings::create(
-                connectionAlias, true, true);
+            const auto storeSettings = StoreConnectionSettings::create(false, true, false);
 
             if (connectToServer(url, storeSettings, false) != ec2::ErrorCode::ok)
                 showWelcomeScreen();
@@ -338,6 +332,7 @@ void QnWorkbenchConnectHandler::at_disconnectAction_triggered() {
         ? parameters.argument(Qn::ForceRole).toBool()
         : false;
     disconnectFromServer(force);
+    qnSettings->setAutoLogin(false);
 }
 
 bool QnWorkbenchConnectHandler::connected() const {
@@ -346,14 +341,14 @@ bool QnWorkbenchConnectHandler::connected() const {
 
 QnWorkbenchConnectHandler::StoreConnectionSettingsPtr
 QnWorkbenchConnectHandler::StoreConnectionSettings::create(
-    const QString &connectionAlias,
     bool storePassword,
-    bool autoLogin)
+    bool autoLogin,
+    bool forceRemoveOldConnection)
 {
     const StoreConnectionSettingsPtr result(new StoreConnectionSettings());
-    result->connectionAlias = connectionAlias;
     result->storePassword = storePassword;
     result->autoLogin = autoLogin;
+    result->forceRemoveOldConnection = forceRemoveOldConnection;
     return result;
 }
 
@@ -428,10 +423,8 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     {
         if (storeSettings && (code == ec2::ErrorCode::ok))
         {
-            storeSystemConnection(systemName, appServerUrl,
-                storeSettings->storePassword, storeSettings->autoLogin);
-            storeCustomConnection(appServerUrl,
-                storeSettings->connectionAlias, storeSettings->autoLogin);
+            storeSystemConnection(systemName, appServerUrl,storeSettings->storePassword, 
+                storeSettings->autoLogin, storeSettings->forceRemoveOldConnection);
         }
 
         return code;
@@ -483,7 +476,7 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
     if (!force)
     {
         QnGlobalSettings::instance()->synchronizeNow();
-        qnSettings->setLastUsedConnection(QnConnectionData());
+        qnSettings->setLastUsedConnection(QnUserRecentConnectionData());
     }
 
     if (context()->user())
