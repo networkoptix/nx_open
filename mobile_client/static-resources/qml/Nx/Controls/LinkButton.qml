@@ -24,4 +24,11 @@ Button
         font.pixelSize: 15
         font.underline: true
     }
+
+    MouseArea
+    {
+        anchors.fill: parent
+        cursorShape: Qt.PointingHandCursor
+        onClicked: control.clicked()
+    }
 }
