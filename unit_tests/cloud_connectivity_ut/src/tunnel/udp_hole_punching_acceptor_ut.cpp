@@ -77,7 +77,7 @@ protected:
 
         nx::hpm::api::ConnectionParameters connectionParameters;
         connectionParameters.rendezvousConnectTimeout = kSocketTimeout;
-        tunnelAcceptor.reset(new TunnelAcceptor(get2ndPeerAddress(), connectionParameters));
+        tunnelAcceptor.reset(new TunnelAcceptor({get2ndPeerAddress()}, connectionParameters));
         tunnelAcceptor->setConnectionInfo(kConnectionSessionId, kRemotePeerId);
         tunnelAcceptor->setMediatorConnection(mediatorConnection);
         tunnelAcceptor->setUdpRetransmissionTimeout(kUdpRetryTimeout);
@@ -160,6 +160,7 @@ protected:
         ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
         ASSERT_TRUE(socket->setNonBlockingMode(true));
         ASSERT_TRUE(socket->bind(sourceAddress));
+        auto socketPtr = socket.get();
         socket->connectAsync(
             destinationAddress,
             [=](SystemError::ErrorCode code)
@@ -169,10 +170,55 @@ protected:
                     .arg(SystemError::toString(code)), cl_logDEBUG1);
 
                 ASSERT_EQ(code, SystemError::noError);
-                connectClientSocket(destinationAddress);
+                selectControlSocket(socketPtr, destinationAddress);
             });
 
         connectSockets.push_back(std::move(socket));
+    }
+
+    void selectControlSocket(
+        UdtStreamSocket* socket,
+        const SocketAddress& destinationAddress)
+    {
+        stun::Message request(stun::Header(
+            stun::MessageClass::request,
+            stun::cc::methods::tunnelConnectionChosen));
+
+        auto buffer = std::make_shared<Buffer>();
+        buffer->reserve(1000);
+        stun::MessageSerializer serializer;
+        size_t processed;
+        serializer.setMessage(&request);
+        serializer.serialize(buffer.get(), &processed);
+
+        socket->sendAsync(
+            *buffer,
+            [=](SystemError::ErrorCode code, size_t size)
+        {
+            ASSERT_EQ(code, SystemError::noError);
+            ASSERT_EQ(buffer->size(), size);
+            buffer->resize(0);
+            socket->readSomeAsync(
+                buffer.get(),
+                [=](SystemError::ErrorCode code, size_t size)
+                {
+                    ASSERT_EQ(code, SystemError::noError);
+
+                    stun::Message response;
+                    stun::MessageParser parser;
+                    parser.setMessage(&response);
+
+                    size_t processed;
+                    ASSERT_EQ(parser.parse(*buffer, &processed),
+                              nx_api::ParserState::done);
+                    ASSERT_EQ(response.header.messageClass,
+                              stun::MessageClass::successResponse);
+                    ASSERT_EQ(response.header.method,
+                              stun::cc::methods::tunnelConnectionChosen);
+
+                    connectClientSocket(destinationAddress);
+                });
+        });
     }
 
     void connectClientSocket(const SocketAddress& address)

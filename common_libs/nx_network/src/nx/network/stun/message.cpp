@@ -22,9 +22,9 @@ namespace nx {
 namespace stun {
 
 Header::Header()
-    : messageClass( MessageClass::request )
-    , method( 0 )
-    , transactionId( TRANSACTION_ID_SIZE, 0 )
+    : messageClass(MessageClass::unknown)
+    , method(MethodType::invalid)
+    , transactionId(nullTransactionId)
 {
 }
 
@@ -72,8 +72,10 @@ Header& Header::operator=(Header&& rhs)
 
 Buffer Header::makeTransactionId()
 {
-    return nx::utils::generateRandomData( TRANSACTION_ID_SIZE );
+    return nx::utils::generateRandomData(TRANSACTION_ID_SIZE);
 }
+
+Buffer Header::nullTransactionId(TRANSACTION_ID_SIZE, 0);
 
 namespace attrs
 {

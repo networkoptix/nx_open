@@ -1,8 +1,5 @@
-
 #include "incoming_tunnel_connection.h"
 
-#include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
-#include <nx/network/stun/message_serializer.h>
 #include <nx/utils/log/log.h>
 
 
@@ -12,22 +9,34 @@ namespace cloud {
 namespace udp {
 
 IncomingTunnelConnection::IncomingTunnelConnection(
-    String connectionId,
-    std::unique_ptr<UdtStreamSocket> connectionSocket,
-    const nx::hpm::api::ConnectionParameters& connectionParameters)
+    std::unique_ptr<IncomingControlConnection> controlConnection)
 :
-    AbstractIncomingTunnelConnection(std::move(connectionId)),
-    m_maxKeepAliveInterval(
-        connectionParameters.udpTunnelKeepAliveInterval *
-        connectionParameters.udpTunnelKeepAliveRetries),
-    m_lastKeepAlive(std::chrono::steady_clock::now()),
     m_state(SystemError::noError),
-    m_connectionSocket(std::move(connectionSocket)),
+    m_controlConnection(std::move(controlConnection)),
     m_serverSocket(new UdtStreamServerSocket)
 {
-    m_serverSocket->bindToAioThread(m_connectionSocket->getAioThread());
+    m_controlConnection->setErrorHandler(
+        [this](SystemError::ErrorCode code)
+    {
+        m_controlConnection.reset();
+        NX_LOGX(lm("Control connection error (%1), closing tunnel...")
+            .arg(SystemError::toString(code)), cl_logWARNING);
+
+        m_state = code;
+        if (m_serverSocket)
+            m_serverSocket->pleaseStopSync(); // we are in IO thread
+
+        if (m_acceptHandler)
+        {
+            const auto handler = std::move(m_acceptHandler);
+            m_acceptHandler = nullptr;
+            return handler(code, nullptr);
+        }
+    });
+
+    m_serverSocket->bindToAioThread(m_controlConnection->socket()->getAioThread());
     if (!m_serverSocket->setNonBlockingMode(true) ||
-        !m_serverSocket->bind(m_connectionSocket->getLocalAddress()) ||
+        !m_serverSocket->bind(m_controlConnection->socket()->getLocalAddress()) ||
         !m_serverSocket->listen())
     {
         NX_LOGX(lm("Can not listen on server socket: ")
@@ -39,11 +48,6 @@ IncomingTunnelConnection::IncomingTunnelConnection(
     {
         NX_LOGX(lm("Listening for new connections on %1")
             .arg(m_serverSocket->getLocalAddress().toString()), cl_logDEBUG1);
-
-        m_connectionBuffer.reserve(1024);
-        m_connectionParser.setMessage(&m_connectionMessage);
-        monitorKeepAlive();
-        readConnectionRequest();
     }
 }
 
@@ -52,7 +56,7 @@ void IncomingTunnelConnection::accept(std::function<void(
     std::unique_ptr<AbstractStreamSocket>)> handler)
 {
     NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Concurrent accept");
-    m_connectionSocket->post(
+    m_serverSocket->post(
         [this, handler = std::move(handler)]()
         {
             if (m_state != SystemError::noError)
@@ -60,18 +64,15 @@ void IncomingTunnelConnection::accept(std::function<void(
 
             m_acceptHandler = std::move(handler);
             m_serverSocket->acceptAsync(
-                [this](SystemError::ErrorCode code,
-                       AbstractStreamSocket* socket)
+                [this](SystemError::ErrorCode code, AbstractStreamSocket* socket)
             {
-                m_lastKeepAlive = std::chrono::steady_clock::now();
                 NX_LOGX(lm("Accepted %1 (%2)")
                     .arg(socket).arg(SystemError::toString(code)), cl_logDEBUG2);
 
                 if (code != SystemError::noError)
-                {
                     m_state = code;
-                    m_serverSocket.reset();
-                }
+                else
+                    m_controlConnection->resetLastKeepAlive();
 
                 const auto handler = std::move(m_acceptHandler);
                 m_acceptHandler = nullptr;
@@ -85,125 +86,12 @@ void IncomingTunnelConnection::accept(std::function<void(
 void IncomingTunnelConnection::pleaseStop(
     nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_connectionSocket->pleaseStop(
+    m_serverSocket->pleaseStop(
         [this, handler = std::move(handler)]()
         {
-            if (m_serverSocket)
-                m_serverSocket->pleaseStopSync(); // we are in IO thread
-
+            m_controlConnection.reset();
             handler();
         });
-}
-
-void IncomingTunnelConnection::monitorKeepAlive()
-{
-    using namespace std::chrono;
-    auto timePassed = steady_clock::now() - m_lastKeepAlive;
-    if (timePassed >= m_maxKeepAliveInterval)
-        return connectionSocketError(SystemError::timedOut);
-
-    auto next = duration_cast<milliseconds>(m_maxKeepAliveInterval - timePassed);
-    m_connectionSocket->registerTimer(next, [this](){ monitorKeepAlive(); });
-}
-
-void IncomingTunnelConnection::readConnectionRequest()
-{
-    m_connectionParser.reset();
-    readRequest();
-}
-
-void IncomingTunnelConnection::readRequest()
-{
-    m_connectionBuffer.resize(0);
-    m_connectionSocket->readSomeAsync(
-        &m_connectionBuffer,
-        [this](SystemError::ErrorCode code, size_t bytesRead)
-        {
-            NX_ASSERT(code != SystemError::timedOut);
-            if (code != SystemError::noError)
-                return connectionSocketError(code);
-
-            if (bytesRead == 0)
-                return connectionSocketError(SystemError::connectionReset);
-
-            m_lastKeepAlive = std::chrono::steady_clock::now();
-            size_t processed = 0;
-            switch(m_connectionParser.parse(
-                m_connectionBuffer, &processed))
-            {
-                case nx_api::ParserState::init:
-                case nx_api::ParserState::inProgress:
-                    return readRequest();
-
-                case nx_api::ParserState::done:
-                {
-                    hpm::api::UdpHolePunchingSyn syn;
-                    if (!syn.parse(m_connectionMessage))
-                        return connectionSocketError(SystemError::invalidData);
-
-                    return writeResponse();
-                }
-
-                case nx_api::ParserState::failed:
-                    return connectionSocketError(SystemError::invalidData);
-            };
-        });
-}
-
-
-void IncomingTunnelConnection::writeResponse()
-{
-    NX_LOGX(lm("Send SYN+ACK for connection %1")
-        .arg(m_connectionId), cl_logDEBUG1);
-
-    hpm::api::UdpHolePunchingSynAck synAck;
-    synAck.connectSessionId = m_connectionId;
-
-    stun::Message message(
-        stun::Header(
-            stun::MessageClass::successResponse,
-            stun::cc::methods::udpHolePunchingSynAck,
-            m_connectionMessage.header.transactionId));
-    synAck.serialize(&message);
-
-    stun::MessageSerializer serializer;
-    serializer.setMessage(&message);
-
-    size_t written;
-    m_connectionBuffer.resize(0);
-    serializer.serialize(&m_connectionBuffer, &written);
-
-    m_connectionSocket->sendAsync(
-        m_connectionBuffer,
-        [this]( SystemError::ErrorCode code, size_t)
-        {
-            if (code != SystemError::noError)
-                return connectionSocketError(code);
-
-            m_lastKeepAlive = std::chrono::steady_clock::now();
-            readConnectionRequest();
-        });
-}
-
-void IncomingTunnelConnection::connectionSocketError(
-    SystemError::ErrorCode code)
-{
-    NX_LOGX(lm("Connection socket error (%1), closing tunnel...")
-        .arg(SystemError::toString(code)), cl_logWARNING);
-
-    m_state = code;
-    if (m_serverSocket)
-    {
-        m_serverSocket->pleaseStopSync(); // we are in IO thread
-        m_serverSocket.reset();
-    }
-
-    if (m_acceptHandler)
-    {
-        const auto handler = std::move(m_acceptHandler);
-        m_acceptHandler = nullptr;
-        return handler(code, nullptr);
-    }
 }
 
 } // namespace udp

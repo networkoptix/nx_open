@@ -27,6 +27,10 @@ public:
         nx::String connectSessionId,
         SocketAddress remotePeerAddress,
         std::unique_ptr<nx::network::UDPSocket> udpSocket);
+    RendezvousConnectorWithVerification(
+        nx::String connectSessionId,
+        SocketAddress remotePeerAddress,
+        SocketAddress localAddressToBindTo);
     virtual ~RendezvousConnectorWithVerification();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
@@ -37,21 +41,25 @@ public:
     virtual void connect(
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler completionHandler) override;
+    virtual std::unique_ptr<nx::network::UdtStreamSocket> takeConnection() override;
+
+    void notifyAboutChoosingConnection(ConnectCompletionHandler completionHandler);
 
 private:
     std::chrono::milliseconds m_timeout;
     ConnectCompletionHandler m_connectCompletionHandler;
     std::unique_ptr<stun::MessagePipeline> m_requestPipeline;
+    std::unique_ptr<nx::network::UdtStreamSocket> m_udtConnection;
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
         stun::MessagePipeline* connection) override;
 
-    void onConnectCompleted(
-        SystemError::ErrorCode errorCode,
-        std::unique_ptr<UdtStreamSocket> connection);
+    void onConnectCompleted(SystemError::ErrorCode errorCode);
     void onMessageReceived(nx::stun::Message message);
-    void onTimeout();
+    void processUdpHolePunchingSynAck(nx::stun::Message message);
+    void processTunnelConnectionChosen(nx::stun::Message message);
+    void onTimeout(nx::String requestName);
     void processError(SystemError::ErrorCode errorCode);
 };
 

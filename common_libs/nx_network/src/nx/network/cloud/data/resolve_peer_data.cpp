@@ -8,21 +8,24 @@ namespace hpm {
 namespace api {
 
 ResolvePeerRequest::ResolvePeerRequest()
+:
+    ResolvePeerRequest(nx::String())
 {
 }
 
 ResolvePeerRequest::ResolvePeerRequest(nx::String _hostName)
 :
+    StunRequestData(kMethod),
     hostName(std::move(_hostName))
 {
 }
 
-void ResolvePeerRequest::serialize(nx::stun::Message* const message)
+void ResolvePeerRequest::serializeAttributes(nx::stun::Message* const message)
 {
     message->newAttribute<stun::cc::attrs::HostName>(hostName);
 }
 
-bool ResolvePeerRequest::parse(const nx::stun::Message& message)
+bool ResolvePeerRequest::parseAttributes(const nx::stun::Message& message)
 {
     return readStringAttributeValue<stun::cc::attrs::HostName>(message, &hostName);
 }
@@ -30,18 +33,19 @@ bool ResolvePeerRequest::parse(const nx::stun::Message& message)
 
 ResolvePeerResponse::ResolvePeerResponse()
 :
+    StunResponseData(kMethod),
     connectionMethods(0)
 {
 }
 
-void ResolvePeerResponse::serialize(nx::stun::Message* const message)
+void ResolvePeerResponse::serializeAttributes(nx::stun::Message* const message)
 {
     message->newAttribute< stun::cc::attrs::PublicEndpointList >(std::move(endpoints));
     message->newAttribute< stun::cc::attrs::ConnectionMethods >(
         nx::String::number(static_cast<qulonglong>(connectionMethods)));
 }
 
-bool ResolvePeerResponse::parse(const nx::stun::Message& message)
+bool ResolvePeerResponse::parseAttributes(const nx::stun::Message& message)
 {
     if (!readAttributeValue<stun::cc::attrs::PublicEndpointList>(message, &endpoints))
         return false;

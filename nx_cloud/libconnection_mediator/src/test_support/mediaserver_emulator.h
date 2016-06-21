@@ -35,6 +35,7 @@ public:
         establishUdtConnection,
         ignoreSyn,
         sendBadSynAck,
+        doNotAnswerTunnelChoiceNotification,
         proceedWithConnection,
     };
 

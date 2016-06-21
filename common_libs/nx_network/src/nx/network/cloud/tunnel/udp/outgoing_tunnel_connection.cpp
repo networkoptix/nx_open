@@ -42,7 +42,7 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     //    m_timeouts.maxConnectionInactivityPeriod(),
     //    std::bind(&OutgoingTunnelConnection::onKeepAliveTimeout, this));
 
-    hpm::api::UdpHolePunchingSyn syn;
+    hpm::api::UdpHolePunchingSynRequest syn;
     stun::Message message;
     syn.serialize(&message);
     m_controlConnection->sendMessage(std::move(message));
@@ -282,7 +282,7 @@ void OutgoingTunnelConnection::closeConnection(
 void OutgoingTunnelConnection::onStunMessageReceived(
     nx::stun::Message message)
 {
-    hpm::api::UdpHolePunchingSynAck synAck;
+    hpm::api::UdpHolePunchingSynResponse synAck;
     bool parsed = synAck.parse(message);
 
     //TODO: #ak Replase asserts with actual error handling

@@ -28,9 +28,8 @@ class RendezvousConnector
     public aio::AbstractPollable
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        std::unique_ptr<UdtStreamSocket>)> ConnectCompletionHandler;
+    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>
+        ConnectCompletionHandler;
 
     /**
         @param udpSocket If not empty, this socket is passed to udt socket
@@ -39,6 +38,10 @@ public:
         nx::String connectSessionId,
         SocketAddress remotePeerAddress,
         std::unique_ptr<nx::network::UDPSocket> udpSocket);
+    RendezvousConnector(
+        nx::String connectSessionId,
+        SocketAddress remotePeerAddress,
+        SocketAddress localAddressToBindTo);
     virtual ~RendezvousConnector();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
@@ -51,6 +54,8 @@ public:
     virtual void connect(
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler completionHandler);
+    /** moves connection out of this */
+    virtual std::unique_ptr<nx::network::UdtStreamSocket> takeConnection();
 
     const nx::String& connectSessionId() const;
     const SocketAddress& remoteAddress() const;
@@ -64,6 +69,7 @@ private:
     std::unique_ptr<nx::network::UDPSocket> m_udpSocket;
     std::unique_ptr<nx::network::UdtStreamSocket> m_udtConnection;
     ConnectCompletionHandler m_completionHandler;
+    boost::optional<SocketAddress> m_localAddressToBindTo;
 
     void onUdtConnectFinished(SystemError::ErrorCode errorCode);
 };
