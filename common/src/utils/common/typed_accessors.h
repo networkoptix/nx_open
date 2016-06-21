@@ -542,7 +542,7 @@ Get getter_helper(Get get)
 template <class Set>
 Set setter_helper(Set set)
 {
-    return get;
+    return set;
 }
 
 template<class T>
