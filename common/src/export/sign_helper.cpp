@@ -345,7 +345,7 @@ void QnSignHelper::drawOnSignFrame(AVFrame* frame)
     QImage img(imgBuffer, frame->width, frame->height, frame->linesize[0]*4, QImage::Format_ARGB32);
     draw(img, true);
 
-    SwsContext* scaleContext = sws_getContext(frame->width, frame->height, PIX_FMT_BGRA, frame->width, frame->height, (PixelFormat) frame->format, SWS_POINT, NULL, NULL, NULL);
+    SwsContext* scaleContext = sws_getContext(frame->width, frame->height, AV_PIX_FMT_BGRA, frame->width, frame->height, (PixelFormat) frame->format, SWS_POINT, NULL, NULL, NULL);
     if (scaleContext)
     {
         quint8* srcData[4];

@@ -335,9 +335,9 @@ QuickSyncVideoDecoder::~QuickSyncVideoDecoder()
 PixelFormat QuickSyncVideoDecoder::GetPixelFormat() const
 {
 #ifndef CONVERT_NV12_TO_YV12
-    return PIX_FMT_NV12;
+    return AV_PIX_FMT_NV12;
 #else
-    return PIX_FMT_YUV420P;
+    return AV_PIX_FMT_YUV420P;
 #endif
 }
 
@@ -2167,7 +2167,7 @@ void QuickSyncVideoDecoder::saveToAVFrame(
             outFrame->reallocate(
                 decodedFrame->Data.Pitch,
                 decodedFrame->Info.Height - (m_frameCropTopActual + m_frameCropBottomActual),
-                !convertNV12ToYV12 ? PIX_FMT_NV12 : PIX_FMT_YUV420P,
+                !convertNV12ToYV12 ? AV_PIX_FMT_NV12 : AV_PIX_FMT_YUV420P,
                 decodedFrame->Data.Pitch );
 
     #ifdef USE_SYSMEM_SURFACE
@@ -2222,7 +2222,7 @@ void QuickSyncVideoDecoder::saveToAVFrame(
     const QSize& originalPictureSize = getOriginalPictureSize();
     outFrame->width = originalPictureSize.width();
     outFrame->height = originalPictureSize.height();
-    outFrame->format = !convertNV12ToYV12 ? PIX_FMT_NV12 : PIX_FMT_YUV420P;
+    outFrame->format = !convertNV12ToYV12 ? AV_PIX_FMT_NV12 : AV_PIX_FMT_YUV420P;
     //outFrame->key_frame = decodedFrame->Data.
     //outFrame->pts = av_rescale_q( decodedFrame->Data.TimeStamp, INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION, SRC_DATA_TIMESTAMP_RESOLUTION );
     outFrame->pts = decodedFrame->Data.TimeStamp;

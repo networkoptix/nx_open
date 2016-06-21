@@ -106,7 +106,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     if( !camManager2 )
         return;
 
-    MotionDataPicture* motionMask = new MotionDataPicture( nxcip::PIX_FMT_GRAY8 );
+    MotionDataPicture* motionMask = new MotionDataPicture( nxcip::AV_PIX_FMT_GRAY8 );
     const QnMotionRegion& region = m_thirdPartyRes->getMotionRegion(0);
     //converting region
     for( int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens )
@@ -534,13 +534,13 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
                 {
                     static const int DEFAULT_MOTION_DURATION = 1000*1000;
 
-                    if( srcMotionData->pixelFormat() == nxcip::PIX_FMT_MONOBLACK )
+                    if( srcMotionData->pixelFormat() == nxcip::AV_PIX_FMT_MONOBLACK )
                     {
                         //adding motion data
                         QnMetaDataV1Ptr motion( new QnMetaDataV1() );
                         const nxcip::Picture& motionPicture = *srcMotionData;
 
-                        if( motionPicture.pixelFormat() == nxcip::PIX_FMT_MONOBLACK )
+                        if( motionPicture.pixelFormat() == nxcip::AV_PIX_FMT_MONOBLACK )
                         {
                             NX_ASSERT( motionPicture.width() == MD_HEIGHT && motionPicture.height() == MD_WIDTH );
                             NX_ASSERT( motionPicture.xStride(0) * CHAR_BIT == motionPicture.width() );

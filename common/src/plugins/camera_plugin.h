@@ -605,7 +605,7 @@ namespace nxcip
     {
     public:
         /*!
-            monochrome (format \a nxcip::PIX_FMT_MONOBLACK) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+            monochrome (format \a nxcip::AV_PIX_FMT_MONOBLACK) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
                 1-bit designates that pixel MUST take part in motion search. Dimensions of this data are not
                 the same as those of video picture. Motion data just designates video frame regions that are of interest.
                 If \a motionMask is NULL, then whole picture is of interest
@@ -674,7 +674,7 @@ namespace nxcip
         virtual int find( ArchiveSearchOptions* searchOptions, TimePeriods** timePeriods ) const = 0;
         //!If camera plugin implements this method, it MUST report motion only on for region specified (\a motionMask)
         /*!
-            \param motionMask 8bpp (format \a nxcip::PIX_FMT_GRAY8) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+            \param motionMask 8bpp (format \a nxcip::AV_PIX_FMT_GRAY8) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
                 pixel value designates motion sensitivity for pixel position.
                 255 - no motion for pixel coordinates(aka motion mask), 0 - maximum possible motion sensitivity. 
                 For instance: motion detection algorithm may use this value to compare absolute difference between pixels of Y plane in subsequent frames. 
@@ -990,7 +990,7 @@ namespace nxcip
     public:
         //!Returns motion data. Can be NULL, if no motion
         /*!
-            Motion data is a monochrome (format \a nxcip::PIX_FMT_MONOBLACK) picture of size (\a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+            Motion data is a monochrome (format \a nxcip::AV_PIX_FMT_MONOBLACK) picture of size (\a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
                 '1' bit designates motion presence in that pixel. It is not required that motion data dimensions same as 
                 those of video picture. Motion data just designates regions of video picture where motion has been detected.
             \warning motion data MUST be rotated by 90 degrees clock-wise! That means, picture returned here is \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT pixels wide and

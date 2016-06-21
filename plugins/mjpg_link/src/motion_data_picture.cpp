@@ -60,7 +60,7 @@ unsigned int MotionDataPicture::releaseRef()
 //!Returns pixel format
 nxcip::PixelFormat MotionDataPicture::pixelFormat() const
 {
-    return nxcip::PIX_FMT_MONOBLACK;
+    return nxcip::AV_PIX_FMT_MONOBLACK;
 }
 
 int MotionDataPicture::planeCount() const

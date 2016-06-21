@@ -588,9 +588,9 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
         m_scaleSourceLine = lineSize;
         m_scaleTargetSize = m_targetSize;
 
-        int numBytes = avpicture_get_size(PIX_FMT_RGBA, qPower2Ceil(static_cast<quint32>(m_scaleTargetSize.width()), 8), m_scaleTargetSize.height());
+        int numBytes = avpicture_get_size(AV_PIX_FMT_RGBA, qPower2Ceil(static_cast<quint32>(m_scaleTargetSize.width()), 8), m_scaleTargetSize.height());
         m_scaleBuffer = static_cast<quint8 *>(qMallocAligned(numBytes, 32));
-        m_scaleContext = sws_getContext(m_scaleSourceSize.width(), m_scaleSourceSize.height(), static_cast<PixelFormat>(m_scaleSourceFormat), m_scaleTargetSize.width(), m_scaleTargetSize.height(), PIX_FMT_BGRA, SWS_BICUBIC, NULL, NULL, NULL);
+        m_scaleContext = sws_getContext(m_scaleSourceSize.width(), m_scaleSourceSize.height(), static_cast<PixelFormat>(m_scaleSourceFormat), m_scaleTargetSize.width(), m_scaleTargetSize.height(), AV_PIX_FMT_BGRA, SWS_BICUBIC, NULL, NULL, NULL);
         // TODO: #Elric sws_getContext may fail and return NULL.
     }
 }

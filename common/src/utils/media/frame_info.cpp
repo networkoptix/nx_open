@@ -105,7 +105,7 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
 /*
 int CLVideoDecoderOutput::getCapacity()
 {
-    int yu_h = format == PIX_FMT_YUV420P ? height/2 : height;
+    int yu_h = format == AV_PIX_FMT_YUV420P ? height/2 : height;
     return linesize[0]*height + (linesize[1] + linesize[2])*yu_h;
 }
 */
@@ -176,7 +176,7 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     height = newHeight;
     format = newFormat;
 
-    int rc = 32 >> (newFormat == PIX_FMT_RGBA || newFormat == PIX_FMT_ABGR || newFormat == PIX_FMT_BGRA ? 2 : 0);
+    int rc = 32 >> (newFormat == AV_PIX_FMT_RGBA || newFormat == AV_PIX_FMT_ABGR || newFormat == AV_PIX_FMT_BGRA ? 2 : 0);
     int roundWidth = qPower2Ceil((unsigned) width, rc);
     int numBytes = avpicture_get_size((PixelFormat) format, roundWidth, height);
     if (numBytes > 0) {
@@ -210,7 +210,7 @@ bool CLVideoDecoderOutput::imagesAreEqual(const CLVideoDecoderOutput* img1, cons
     if (!equalPlanes(img1->data[0], img2->data[0], img1->width, img1->linesize[0], img2->linesize[0], img1->height, max_diff))
         return false;
 
-    int uv_h = img1->format == PIX_FMT_YUV420P ? img1->height/2 : img1->height;
+    int uv_h = img1->format == AV_PIX_FMT_YUV420P ? img1->height/2 : img1->height;
 
     if (!equalPlanes(img1->data[1], img2->data[1], img1->width/2, img1->linesize[1], img2->linesize[1], uv_h, max_diff))
         return false;
@@ -302,7 +302,7 @@ void CLVideoDecoderOutput::saveToFile(const char* filename)
 
 bool CLVideoDecoderOutput::isPixelFormatSupported(PixelFormat format)
 {
-    return format == PIX_FMT_YUV422P || format == PIX_FMT_YUV420P || format == PIX_FMT_YUV444P;
+    return format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUV444P;
 }
 
 void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
@@ -329,15 +329,15 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 {
     memset( this, 0, sizeof(*this) );
 
-    reallocate(image.width(), image.height(), PIX_FMT_YUV420P);
+    reallocate(image.width(), image.height(), AV_PIX_FMT_YUV420P);
     CLVideoDecoderOutput src;
 
-    src.reallocate(width, height, PIX_FMT_BGRA);
+    src.reallocate(width, height, AV_PIX_FMT_BGRA);
     for (int y = 0; y < height; ++y)
         memcpy(src.data[0] + src.linesize[0]*y, image.scanLine(y), width * 4);
 
-    SwsContext* scaleContext = sws_getContext(width, height, PIX_FMT_BGRA,
-                                              width, height, PIX_FMT_YUV420P,
+    SwsContext* scaleContext = sws_getContext(width, height, AV_PIX_FMT_BGRA,
+                                              width, height, AV_PIX_FMT_YUV420P,
                                               SWS_BICUBIC, NULL, NULL, NULL);
     sws_scale(scaleContext, src.data, src.linesize, 0, height, data, linesize);
     sws_freeContext(scaleContext);
@@ -346,10 +346,10 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 QImage CLVideoDecoderOutput::toImage() const
 {
     CLVideoDecoderOutput dst;
-    dst.reallocate(width, height, PIX_FMT_BGRA);
+    dst.reallocate(width, height, AV_PIX_FMT_BGRA);
 
     SwsContext* scaleContext = sws_getContext(width, height, (PixelFormat) format,
-                                              width, height, PIX_FMT_BGRA,
+                                              width, height, AV_PIX_FMT_BGRA,
                                               SWS_BICUBIC, NULL, NULL, NULL);
     sws_scale(scaleContext, data, linesize, 0, height, dst.data, dst.linesize);
     sws_freeContext(scaleContext);
@@ -373,7 +373,7 @@ void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)
 
 CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, PixelFormat newFormat)
 {
-    if (newFormat == PIX_FMT_NONE)
+    if (newFormat == AV_PIX_FMT_NONE)
         newFormat = (PixelFormat) format;
     CLVideoDecoderOutput* dst(new CLVideoDecoderOutput);
     dst->reallocate(newSize.width(), newSize.height(), newFormat);
@@ -406,7 +406,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
 
     bool transposeChroma = false;
     if (angle == 90 || angle == 270) {
-        if (format == PIX_FMT_YUV422P || format == PIX_FMT_YUVJ422P)
+        if (format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUVJ422P)
             transposeChroma = true;
     }
 

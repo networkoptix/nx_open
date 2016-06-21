@@ -719,9 +719,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 videoCodecCtx->codec_id = mediaData->compressionType;
                 videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
                 if (mediaData->compressionType == CODEC_ID_MJPEG)
-                    videoCodecCtx->pix_fmt = PIX_FMT_YUVJ420P;
+                    videoCodecCtx->pix_fmt = AV_PIX_FMT_YUVJ420P;
                 else
-                    videoCodecCtx->pix_fmt = PIX_FMT_YUV420P;
+                    videoCodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;
 
                 if (isTranscode)
                 {

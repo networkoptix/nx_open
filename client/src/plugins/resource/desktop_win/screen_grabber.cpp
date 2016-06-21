@@ -591,7 +591,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int dataStride, int width, int h
     if (m_needRescale)
     {
         if (roundWidth != m_tmpFrameWidth || height != m_tmpFrameHeight)
-            allocateTmpFrame(roundWidth, height, PIX_FMT_YUV420P);
+            allocateTmpFrame(roundWidth, height, AV_PIX_FMT_YUV420P);
 #if 0   
         // perfomance test
         QTime t1, t2;

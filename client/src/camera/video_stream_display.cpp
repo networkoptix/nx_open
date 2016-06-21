@@ -118,7 +118,7 @@ bool QnVideoStreamDisplay::allocScaleContext( const CLVideoDecoderOutput& outFra
     m_outputWidth = newWidth;
     m_outputHeight = newHeight;
     m_scaleContext = sws_getContext(outFrame.width, outFrame.height, (PixelFormat) outFrame.format,
-                                    m_outputWidth, m_outputHeight, PIX_FMT_RGBA,
+                                    m_outputWidth, m_outputHeight, AV_PIX_FMT_RGBA,
                                     SWS_POINT, NULL, NULL, NULL);
     if (!m_scaleContext)
         cl_log.log(QLatin1String("Can't get swscale context"), cl_logERROR);
@@ -831,8 +831,8 @@ bool QnVideoStreamDisplay::rescaleFrame(const CLVideoDecoderOutput& srcFrame, CL
             return false;
     }
 
-    if (outFrame.isExternalData() || outFrame.width != newWidth || outFrame.height != newHeight || outFrame.format != PIX_FMT_RGBA)
-        outFrame.reallocate(newWidth, newHeight, PIX_FMT_RGBA);
+    if (outFrame.isExternalData() || outFrame.width != newWidth || outFrame.height != newHeight || outFrame.format != AV_PIX_FMT_RGBA)
+        outFrame.reallocate(newWidth, newHeight, AV_PIX_FMT_RGBA);
 
     sws_scale(m_scaleContext,srcFrame.data, srcFrame.linesize, 0,
         srcFrame.height, outFrame.data, outFrame.linesize);
@@ -1083,7 +1083,7 @@ bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSh
     }
     else
     {
-        if( (*outFrame)->format == PIX_FMT_YUV420P )
+        if( (*outFrame)->format == AV_PIX_FMT_YUV420P )
         {
             // optimization
             for (int i = 0; i < 3; ++ i) 

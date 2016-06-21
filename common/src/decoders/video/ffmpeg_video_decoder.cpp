@@ -241,7 +241,7 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
     }
     //NX_ASSERT(m_context->codec);
 
-//    avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
+//    avpicture_fill((AVPicture *)picture, m_buffer, AV_PIX_FMT_YUV420P, c->width, c->height);
 }
 
 void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& data)
@@ -520,7 +520,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
                 got_picture = 1;
                 m_tmpQtFrame.setUseExternalData(true);
-                m_tmpQtFrame.format = PIX_FMT_RGBA;
+                m_tmpQtFrame.format = AV_PIX_FMT_RGBA;
                 m_tmpQtFrame.data[0] = (quint8*) m_tmpImg.constBits();
                 m_tmpQtFrame.data[1] = m_tmpQtFrame.data[2] = m_tmpQtFrame.data[3] = 0;
                 m_tmpQtFrame.linesize[0] = m_tmpImg.bytesPerLine();
@@ -580,7 +580,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         else {
             if (!outFrame->isExternalData())
             {
-                if (outFrame->format == PIX_FMT_YUV420P)
+                if (outFrame->format == AV_PIX_FMT_YUV420P)
                 {
                     // optimization
                     for (int i = 0; i < 3; ++ i)
@@ -627,7 +627,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         }
         outFrame->format = correctedPixelFormat;
         outFrame->sample_aspect_ratio = getSampleAspectRatio();
-        return m_context->pix_fmt != PIX_FMT_NONE;
+        return m_context->pix_fmt != AV_PIX_FMT_NONE;
     }
     return false; // no picture decoded at current step
 }
@@ -667,16 +667,16 @@ double QnFfmpegVideoDecoder::getSampleAspectRatio() const
 PixelFormat QnFfmpegVideoDecoder::GetPixelFormat() const
 {
     if (m_usedQtImage)
-        return PIX_FMT_RGBA;
+        return AV_PIX_FMT_RGBA;
     // Filter deprecated pixel formats
     switch(m_context->pix_fmt)
     {
-    case PIX_FMT_YUVJ420P:
-        return PIX_FMT_YUV420P;
-    case PIX_FMT_YUVJ422P:
-        return PIX_FMT_YUV422P;
-    case PIX_FMT_YUVJ444P:
-        return PIX_FMT_YUV444P;
+    case AV_PIX_FMT_YUVJ420P:
+        return AV_PIX_FMT_YUV420P;
+    case AV_PIX_FMT_YUVJ422P:
+        return AV_PIX_FMT_YUV422P;
+    case AV_PIX_FMT_YUVJ444P:
+        return AV_PIX_FMT_YUV444P;
     default:
         return m_context->pix_fmt;
     }

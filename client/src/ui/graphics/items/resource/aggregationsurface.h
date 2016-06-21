@@ -33,7 +33,7 @@ class AggregationSurface
 public:
     /*!
         Required opengl textures are created here, so appropriate opengl context MUST be current
-        \param format Format is stored data. Supported formats are \a PIX_FMT_YUV420P and \a PIX_FMT_NV12 
+        \param format Format is stored data. Supported formats are \a AV_PIX_FMT_YUV420P and \a AV_PIX_FMT_NV12 
         \param size Surface size in pixels
     */
     AggregationSurface( PixelFormat format, const QSize& size );

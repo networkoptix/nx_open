@@ -13,7 +13,7 @@
 
 
 /*!
-    Supports only \a nxcip::PIX_FMT_MONOBLACK and \a nxcip::PIX_FMT_GRAY8
+    Supports only \a nxcip::AV_PIX_FMT_MONOBLACK and \a nxcip::AV_PIX_FMT_GRAY8
 */
 class MotionDataPicture
 :
@@ -21,7 +21,7 @@ class MotionDataPicture
 {
 public:
     /*!
-        Supports only \a nxcip::PIX_FMT_MONOBLACK and \a nxcip::PIX_FMT_GRAY8
+        Supports only \a nxcip::AV_PIX_FMT_MONOBLACK and \a nxcip::AV_PIX_FMT_GRAY8
     */
     MotionDataPicture( nxcip::PixelFormat _pixelFormat );
     virtual ~MotionDataPicture();

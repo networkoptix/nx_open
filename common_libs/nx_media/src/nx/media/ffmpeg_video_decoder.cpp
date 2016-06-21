@@ -241,7 +241,7 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
 
 #else
     const int alignedWidth = qPower2Ceil((unsigned)d->frame->width, (unsigned)kMediaAlignment);
-    const int numBytes = avpicture_get_size(PIX_FMT_YUV420P, alignedWidth, d->frame->height);
+    const int numBytes = avpicture_get_size(AV_PIX_FMT_YUV420P, alignedWidth, d->frame->height);
     const int lineSize = alignedWidth;
 
     auto alignedBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, lineSize);

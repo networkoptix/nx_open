@@ -43,7 +43,7 @@ namespace
 
 static bool isYuvFormat( PixelFormat format )
 {
-    return format == PIX_FMT_YUV422P || format == PIX_FMT_YUV420P || format == PIX_FMT_YUV444P;
+    return format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUV444P;
 }
 
 static int glRGBFormat( PixelFormat format )
@@ -52,13 +52,13 @@ static int glRGBFormat( PixelFormat format )
     {
         switch( format )
         {
-            case PIX_FMT_RGBA:
+            case AV_PIX_FMT_RGBA:
                 return GL_RGBA;
-            case PIX_FMT_BGRA:
+            case AV_PIX_FMT_BGRA:
                 return GL_BGRA_EXT;
-            case PIX_FMT_RGB24:
+            case AV_PIX_FMT_RGB24:
                 return GL_RGB;
-            case PIX_FMT_BGR24:
+            case AV_PIX_FMT_BGR24:
                 return GL_BGRA_EXT;
             default:
                 break;
@@ -175,7 +175,7 @@ static QAtomicInt totalLockedRectCount = 0;
 AggregationSurface::AggregationSurface( PixelFormat format, const QSize& size )
 :
     m_format( format ),
-    m_textureFormat( PIX_FMT_NONE ),
+    m_textureFormat( AV_PIX_FMT_NONE ),
     m_convertToRgb( false ),
     m_yuv2rgbBuffer( NULL ),
     m_yuv2rgbBufferLen( 0 ),
@@ -196,7 +196,7 @@ AggregationSurface::AggregationSurface( PixelFormat format, const QSize& size )
 
     switch( m_format )
     {
-        case PIX_FMT_YUV420P:
+        case AV_PIX_FMT_YUV420P:
             //Y
             pitch[0] = qPower2Ceil( (unsigned int)m_fullRect.width(), ROUND_COEFF );
             height[0] = size.height();
@@ -209,7 +209,7 @@ AggregationSurface::AggregationSurface( PixelFormat format, const QSize& size )
             m_planeCount = 3;
             break;
 
-        case PIX_FMT_NV12:
+        case AV_PIX_FMT_NV12:
             //Y
             pitch[0] = qPower2Ceil( (unsigned int)m_fullRect.width(), ROUND_COEFF );
             height[0] = size.height();
@@ -219,7 +219,7 @@ AggregationSurface::AggregationSurface( PixelFormat format, const QSize& size )
             m_planeCount = 2;
             break;
 
-        case PIX_FMT_RGBA:
+        case AV_PIX_FMT_RGBA:
             //TODO/IMPL
             pitch[0] = qPower2Ceil( (unsigned int)m_fullRect.width(), ROUND_COEFF );
             height[0] = size.height();
@@ -282,17 +282,17 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
 
     switch( m_format )
     {
-        case PIX_FMT_YUV444P:
+        case AV_PIX_FMT_YUV444P:
             r_w[1] = r_w[2] = m_fullRect.width();
         // fall through
-        case PIX_FMT_YUV422P:
+        case AV_PIX_FMT_YUV422P:
             h[1] = h[2] = m_fullRect.height();
             break;
         default:
             break;
     }
 
-    if( (m_format == PIX_FMT_YUV420P || m_format == PIX_FMT_YUV422P || m_format == PIX_FMT_YUV444P) && !m_convertToRgb )
+    if( (m_format == AV_PIX_FMT_YUV420P || m_format == AV_PIX_FMT_YUV422P || m_format == AV_PIX_FMT_YUV444P) && !m_convertToRgb )
     {
         //using pixel shader for yuv->rgb conversion
         for( int i = 0; i < 3; ++i )
@@ -329,9 +329,9 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
             d->glBindBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
 #endif
         }
-        m_textureFormat = PIX_FMT_YUV420P;
+        m_textureFormat = AV_PIX_FMT_YUV420P;
     }
-    else if( m_format == PIX_FMT_NV12 && !m_convertToRgb )
+    else if( m_format == AV_PIX_FMT_NV12 && !m_convertToRgb )
     {
         for( int i = 0; i < 2; ++i )
         {
@@ -350,7 +350,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
                             i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,
                             m_buffers[i].buffer.data() );
         }
-        m_textureFormat = PIX_FMT_NV12;
+        m_textureFormat = AV_PIX_FMT_NV12;
     }
     else
     {
@@ -360,7 +360,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
         int bytesPerPixel = 1;
         if( !isYuvFormat(m_format) )
         {
-            if( m_format == PIX_FMT_RGB24 || m_format == PIX_FMT_BGR24 )
+            if( m_format == AV_PIX_FMT_RGB24 || m_format == AV_PIX_FMT_BGR24 )
                 bytesPerPixel = 3;
             else
                 bytesPerPixel = 4;
@@ -385,7 +385,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
         int lineInPixelsSize = m_buffers[0].pitch;
         switch (m_format)
         {
-            case PIX_FMT_YUV420P:
+            case AV_PIX_FMT_YUV420P:
                 if (useSSE2())
                 {
                     yuv420_argb32_simd_intr(pixels, m_buffers[0].buffer.data(), m_buffers[2].buffer.data(), m_buffers[1].buffer.data(),
@@ -399,7 +399,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
                 }
                 break;
 
-            case PIX_FMT_YUV422P:
+            case AV_PIX_FMT_YUV422P:
                 if (useSSE2())
                 {
                     yuv422_argb32_simd_intr(pixels, m_buffers[0].buffer.data(), m_buffers[2].buffer.data(), m_buffers[1].buffer.data(),
@@ -413,7 +413,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
                 }
                 break;
 
-            case PIX_FMT_YUV444P:
+            case AV_PIX_FMT_YUV444P:
                 if (useSSE2())
                 {
                     yuv444_argb32_simd_intr(pixels, m_buffers[0].buffer.data(), m_buffers[2].buffer.data(), m_buffers[1].buffer.data(),
@@ -427,8 +427,8 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
                 }
                 break;
 
-            case PIX_FMT_RGB24:
-            case PIX_FMT_BGR24:
+            case AV_PIX_FMT_RGB24:
+            case AV_PIX_FMT_BGR24:
                 lineInPixelsSize /= 3;
                 break;
 
@@ -438,7 +438,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
         }
 
         loadImageData(texture->textureSize().width(),texture->textureSize().height(),lineInPixelsSize,h[0],bytesPerPixel,glRGBFormat(m_format),pixels);
-        m_textureFormat = PIX_FMT_RGBA;
+        m_textureFormat = AV_PIX_FMT_RGBA;
 
         // TODO: #Elric free memory immediately for still images
     }
@@ -474,7 +474,7 @@ void AggregationSurface::uploadData( const QRect& destRect, uint8_t* planes[], i
 
     for( size_t i = 0; i < m_planeCount; ++i )
     {
-        int horizontalResolution = i == 0 ? 1 : (m_format == PIX_FMT_YUV420P ? 2 : 1);
+        int horizontalResolution = i == 0 ? 1 : (m_format == AV_PIX_FMT_YUV420P ? 2 : 1);
         int verticalResolution = i == 0 ? 1 : 2;
 
         const int startLine = destRect.y() / verticalResolution;

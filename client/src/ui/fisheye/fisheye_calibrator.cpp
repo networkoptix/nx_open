@@ -402,15 +402,15 @@ void QnFisheyeCalibrator::analyseFrame(QImage frame)
         memcpy(inputData[0], frame.bits(), inputNumBytes);
 
         int roundWidth = qPower2Ceil((unsigned)frame.width(),32);
-        int numBytes = avpicture_get_size(PIX_FMT_GRAY8, roundWidth, frame.height());
+        int numBytes = avpicture_get_size(AV_PIX_FMT_GRAY8, roundWidth, frame.height());
         qFreeAligned(m_grayImageBuffer);
         m_grayImageBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
 
-        SwsContext* scaleContext = sws_getContext(frame.width(), frame.height(), PIX_FMT_RGBA, 
-            frame.width(), frame.height(), PIX_FMT_GRAY8, SWS_BICUBIC, NULL, NULL, NULL);
+        SwsContext* scaleContext = sws_getContext(frame.width(), frame.height(), AV_PIX_FMT_RGBA, 
+            frame.width(), frame.height(), AV_PIX_FMT_GRAY8, SWS_BICUBIC, NULL, NULL, NULL);
 
         AVPicture dstPict;
-        avpicture_fill(&dstPict, m_grayImageBuffer, PIX_FMT_GRAY8, roundWidth, frame.height());
+        avpicture_fill(&dstPict, m_grayImageBuffer, AV_PIX_FMT_GRAY8, roundWidth, frame.height());
 
         int inputLinesize[4];
         inputLinesize[0] = frame.bytesPerLine();

@@ -335,9 +335,9 @@ QnXVBADecoder::~QnXVBADecoder()
 PixelFormat QnXVBADecoder::GetPixelFormat() const
 {
 #ifdef USE_OPENGL_SURFACE
-    return PIX_FMT_RGBA;
+    return AV_PIX_FMT_RGBA;
 #else
-    return PIX_FMT_NV12;
+    return AV_PIX_FMT_NV12;
 #endif
 }
 
@@ -1513,7 +1513,7 @@ void QnXVBADecoder::fillOutputFrame( CLVideoDecoderOutput* const outFrame, QShar
 	//    if( !outFrame->isExternalData() )
 //    {
 //        //copying frame data if needed
-//        outFrame->reallocate( m_sps.pic_width_in_mbs*16, m_sps.getHeight(), PIX_FMT_NV12 );
+//        outFrame->reallocate( m_sps.pic_width_in_mbs*16, m_sps.getHeight(), AV_PIX_FMT_NV12 );
 //        memcpy( outFrame->data[0], decodedFrame->Data.Y, decodedFrame->Data.Pitch * m_sps.getHeight() );
 //        memcpy( outFrame->data[1], decodedFrame->Data.U, decodedFrame->Data.Pitch / 2 * m_sps.getHeight() / 2 );
 //        memcpy( outFrame->data[2], decodedFrame->Data.V, decodedFrame->Data.Pitch / 2 * m_sps.getHeight() / 2 );
@@ -1524,7 +1524,7 @@ void QnXVBADecoder::fillOutputFrame( CLVideoDecoderOutput* const outFrame, QShar
 //        outFrame->data[1] = decodedFrame->Data.U;
 //        outFrame->data[2] = decodedFrame->Data.V;
 //    }
-//    if( pixelFormat == PIX_FMT_NV12 )
+//    if( pixelFormat == AV_PIX_FMT_NV12 )
 //    {
 //        outFrame->linesize[0] = decodedFrame->Data.Pitch;       //y_stride
 //        //outFrame->linesize[1] = decodedFrame->Data.Pitch;   //uv_stride
@@ -1535,9 +1535,9 @@ void QnXVBADecoder::fillOutputFrame( CLVideoDecoderOutput* const outFrame, QShar
 #endif
 
 #ifdef USE_OPENGL_SURFACE
-    outFrame->format = PIX_FMT_RGBA;
+    outFrame->format = AV_PIX_FMT_RGBA;
 #else
-    outFrame->format = PIX_FMT_NV12;
+    outFrame->format = AV_PIX_FMT_NV12;
 #endif
     //outFrame->format = pixelFormat;
     //outFrame->key_frame = decodedFrame->Data.

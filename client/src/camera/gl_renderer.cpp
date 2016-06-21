@@ -88,13 +88,13 @@ bool QnGLRenderer::isPixelFormatSupported( PixelFormat pixfmt )
 {
     switch( pixfmt )
     {
-        case PIX_FMT_YUV422P:
-        case PIX_FMT_YUV420P:
-        case PIX_FMT_YUV444P:
-        case PIX_FMT_RGBA:
-        case PIX_FMT_BGRA:
-        case PIX_FMT_RGB24:
-        case PIX_FMT_BGR24:
+        case AV_PIX_FMT_YUV422P:
+        case AV_PIX_FMT_YUV420P:
+        case AV_PIX_FMT_YUV444P:
+        case AV_PIX_FMT_RGBA:
+        case AV_PIX_FMT_BGRA:
+        case AV_PIX_FMT_RGB24:
+        case AV_PIX_FMT_BGR24:
             return true;
 
         default:
@@ -192,7 +192,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
         };
         switch( picLock->colorFormat() )
         {
-            case PIX_FMT_RGBA:
+            case AV_PIX_FMT_RGBA:
                 if (m_fisheyeController && m_fisheyeController->mediaDewarpingParams().enabled && m_fisheyeController->itemDewarpingParams().enabled)
                     drawFisheyeRGBVideoTexture(
                         picLock,
@@ -206,7 +206,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                         v_array );
                 break;
 
-            case PIX_FMT_YUVA420P:
+            case AV_PIX_FMT_YUVA420P:
                 NX_ASSERT( isYV12ToRgbaShaderUsed() );
                 drawYVA12VideoTexture(
                     picLock,
@@ -218,7 +218,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                     v_array );
                 break;
 
-            case PIX_FMT_YUV420P:              
+            case AV_PIX_FMT_YUV420P:              
                 NX_ASSERT( isYV12ToRgbShaderUsed() );
                 drawYV12VideoTexture(
                     picLock,
@@ -230,7 +230,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                     picLock->flags() & QnAbstractMediaData::MediaFlags_StillImage);
                 break;
 
-            case PIX_FMT_NV12:
+            case AV_PIX_FMT_NV12:
                 NX_ASSERT( isNV12ToRgbShaderUsed() );
                 drawNV12VideoTexture(
                     QnGeometry::subRect(picLock->textureRect(), sourceRect),
@@ -240,7 +240,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                 break;
 
             default:
-                //other formats must be converted to PIX_FMT_YUV420P or PIX_FMT_NV12 before picture uploading
+                //other formats must be converted to AV_PIX_FMT_YUV420P or AV_PIX_FMT_NV12 before picture uploading
                 NX_ASSERT( false );
         }
 

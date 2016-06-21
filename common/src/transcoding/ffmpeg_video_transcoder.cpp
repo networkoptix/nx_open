@@ -94,7 +94,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx->codec_id = m_codecId;
     m_encoderCtx->width = m_resolution.width();
     m_encoderCtx->height = m_resolution.height();
-    m_encoderCtx->pix_fmt = m_codecId == CODEC_ID_MJPEG ? PIX_FMT_YUVJ420P : PIX_FMT_YUV420P;
+    m_encoderCtx->pix_fmt = m_codecId == CODEC_ID_MJPEG ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P;
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     if (m_bitrate == -1)
         m_bitrate = QnTranscoder::suggestMediaStreamParams( m_codecId, QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality );
@@ -188,8 +188,8 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
     decodedFrame = processFilterChain(decodedFrame);
 
-    if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != PIX_FMT_YUV420P)
-        decodedFrame = CLVideoDecoderOutputPtr(decodedFrame->scaled(m_resolution, PIX_FMT_YUV420P));
+    if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != AV_PIX_FMT_YUV420P)
+        decodedFrame = CLVideoDecoderOutputPtr(decodedFrame->scaled(m_resolution, AV_PIX_FMT_YUV420P));
 
     static AVRational r = {1, 1000000};
     decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);

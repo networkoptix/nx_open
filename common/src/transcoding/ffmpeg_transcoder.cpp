@@ -218,7 +218,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         m_videoEncoderCodecCtx = videoStream->codec;
         m_videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         m_videoEncoderCodecCtx->codec_id = m_videoCodec;
-        m_videoEncoderCodecCtx->pix_fmt = m_videoCodec == CODEC_ID_MJPEG ? PIX_FMT_YUVJ420P : PIX_FMT_YUV420P;
+        m_videoEncoderCodecCtx->pix_fmt = m_videoCodec == CODEC_ID_MJPEG ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P;
 
         if (m_vTranscoder)
         {

@@ -190,12 +190,12 @@ PixelFormat updatePixelFormat(PixelFormat fmt)
 {
     switch(fmt)
     {
-    case PIX_FMT_YUV420P:
-        return PIX_FMT_YUVJ420P;
-    case PIX_FMT_YUV422P:
-        return PIX_FMT_YUVJ422P;
-    case PIX_FMT_YUV444P:
-        return PIX_FMT_YUVJ444P;
+    case AV_PIX_FMT_YUV420P:
+        return AV_PIX_FMT_YUVJ420P;
+    case AV_PIX_FMT_YUV422P:
+        return AV_PIX_FMT_YUVJ422P;
+    case AV_PIX_FMT_YUV444P:
+        return AV_PIX_FMT_YUVJ444P;
     default:
         return fmt;
     }

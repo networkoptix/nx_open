@@ -50,8 +50,8 @@ public:
     CaptureInfoPtr captureFrame();
     bool capturedDataToFrame(CaptureInfoPtr captureInfo, AVFrame* frame);
 
-    PixelFormat format() const { return PIX_FMT_YUV420P; }
-    //PixelFormat format() const { return PIX_FMT_BGRA; }
+    PixelFormat format() const { return AV_PIX_FMT_YUV420P; }
+    //PixelFormat format() const { return AV_PIX_FMT_BGRA; }
     int width() const;
     int height() const;
     qint64 currentTime() const;
