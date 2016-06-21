@@ -44,6 +44,8 @@ private:
      qint64 m_expectedLengthMs;
      qint64 m_sourcePeriodLengthMs;
      qint64 m_frameStepMs;
+     int m_maxSpeed;
+
      QStandardItemModel* m_fullUnitsModel;
      QStandardItemModel* m_filteredUnitsModel;
 };
