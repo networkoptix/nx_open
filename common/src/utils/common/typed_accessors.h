@@ -101,7 +101,7 @@ class QnFieldGetter : public QnAbstractMemberGetter<T, Object>
 
 public:
     QnFieldGetter(const Object* object, ExternalGetter field) : base_type(object), m_fieldGetter(field) {}
-    virtual T operator () () const override { return m_fieldGetter(object()); }
+    virtual T operator () () const override { return m_fieldGetter(this->object()); }
 
 private:
     ExternalGetter m_fieldGetter;
@@ -115,7 +115,7 @@ class QnFieldSetter : public QnAbstractMemberSetter<T, Object>
 
 public:
     QnFieldSetter(Object* object, ExternalSetter field) : base_type(object), m_fieldSetter(field) {}
-    virtual void operator () (const T& value) const override { m_fieldSetter(object(), value); }
+    virtual void operator () (const T& value) const override { m_fieldSetter(this->object(), value); }
 
 private:
     ExternalSetter m_fieldSetter;
@@ -157,7 +157,7 @@ class QnMethodGetter : public QnAbstractMemberGetter<T, Object>
 
 public:
     QnMethodGetter(const Object* object, ExternalGetter method) : base_type(object), m_methodGetter(method) {}
-    virtual T operator () () const override { return m_methodGetter(object()); }
+    virtual T operator () () const override { return m_methodGetter(this->object()); }
 
 private:
     ExternalGetter m_methodGetter;
@@ -171,7 +171,7 @@ class QnMethodSetter : public QnAbstractMemberSetter<T, Object>
 
 public:
     QnMethodSetter(Object* object, ExternalSetter method) : base_type(object), m_methodSetter(method) {}
-    virtual void operator () (const T& value) const override { m_methodSetter(object(), value); }
+    virtual void operator () (const T& value) const override { m_methodSetter(this->object(), value); }
 
 private:
     ExternalSetter m_methodSetter;
@@ -476,7 +476,7 @@ class QnCascadeGetterAggregator : public QnAbstractMemberGetter<T, Object>
 
 public:
     QnCascadeGetterAggregator(const Object* object, const ExternalGetter* getter) : base_type(object), m_getter(getter) {}
-    virtual T operator () () const override { return (*m_getter)(object()); }
+    virtual T operator () () const override { return (*m_getter)(this->object()); }
 
 private:
     std::unique_ptr<const ExternalGetter> m_getter;
@@ -490,7 +490,7 @@ class QnCascadeSetterAggregator : public QnAbstractMemberSetter<T, Object>
 
 public:
     QnCascadeSetterAggregator(Object* object, const ExternalSetter* setter) : base_type(object), m_setter(setter) {}
-    virtual void operator () (const T& value) const override { return (*m_setter)(object(), value); }
+    virtual void operator () (const T& value) const override { return (*m_setter)(this->object(), value); }
 
 private:
     std::unique_ptr<const ExternalSetter> m_setter;
