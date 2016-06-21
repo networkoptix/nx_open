@@ -6,7 +6,7 @@
 #include "log_message.h"
 
 // Uncomment to assert condition enable time measurements
-#define NX_ASSERT_MEASURE_TIME
+//#define NX_ASSERT_MEASURE_TIME
 
 #ifdef NX_ASSERT_MEASURE_TIME
     #include <string>
