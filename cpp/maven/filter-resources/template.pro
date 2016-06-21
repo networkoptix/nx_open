@@ -220,7 +220,7 @@ unix: {
   } else {
     #QMAKE_CXXFLAGS += -std=c++1y
   }
-  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
+  QMAKE_CXXFLAGS += -w -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
 }
 
 !win32 {

@@ -1131,7 +1131,7 @@
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
+                <ffmpeg.version>3.0.0</ffmpeg.version>
                 <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>
                 <compile.option1/>
                 <rdep.target>ios</rdep.target>

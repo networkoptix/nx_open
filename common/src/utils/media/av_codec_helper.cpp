@@ -148,7 +148,7 @@ static const char* codecIdToLiteral(AVCodecID codecId)
         case AV_CODEC_ID_ANM: return "ANM";
         case AV_CODEC_ID_BINKVIDEO: return "BINKVIDEO";
         case AV_CODEC_ID_IFF_ILBM: return "IFF_ILBM";
-        case AV_CODEC_ID_IFF_BYTERUN1: return "BYTERUN1";
+        // case AV_CODEC_ID_IFF_BYTERUN1: return "BYTERUN1";
         case AV_CODEC_ID_KGV1: return "KGV1";
         case AV_CODEC_ID_YOP: return "YOP";
         case AV_CODEC_ID_VP8: return "VP8";
@@ -162,7 +162,7 @@ static const char* codecIdToLiteral(AVCodecID codecId)
         case AV_CODEC_ID_PRORES: return "PRORES";
         case AV_CODEC_ID_JV: return "JV";
         case AV_CODEC_ID_DFA: return "DFA";
-        case AV_CODEC_ID_8SVX_RAW: return "8SVX_RAW";
+        // case AV_CODEC_ID_8SVX_RAW: return "8SVX_RAW";
 
         /* various PCM "codecs" */
         case AV_CODEC_ID_PCM_S16LE:

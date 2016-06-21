@@ -250,7 +250,6 @@ void QnFfmpegHelper::closeFfmpegIOContext(AVIOContext* ioContext)
 
 QString QnFfmpegHelper::getErrorStr(int errnum)
 {
-    static const int AV_ERROR_MAX_STRING_SIZE = 64; //< Taken from newer Ffmpeg impl.
     QByteArray result(AV_ERROR_MAX_STRING_SIZE, '\0');
     if (av_strerror(errnum, result.data(), result.size()) != 0)
         return QString(QString::fromLatin1("Unknown FFMPEG error with code %d")).arg(errnum);

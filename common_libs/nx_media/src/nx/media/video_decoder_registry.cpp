@@ -1,4 +1,3 @@
-#include <elf.h>
 #include "video_decoder_registry.h"
 
 #include <QtCore/QMutexLocker>
