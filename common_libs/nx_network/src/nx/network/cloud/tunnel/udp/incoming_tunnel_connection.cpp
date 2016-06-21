@@ -56,7 +56,7 @@ void IncomingTunnelConnection::accept(std::function<void(
     std::unique_ptr<AbstractStreamSocket>)> handler)
 {
     NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Concurrent accept");
-    m_serverSocket->post(
+    m_serverSocket->dispatch(
         [this, handler = std::move(handler)]()
         {
             if (m_state != SystemError::noError)

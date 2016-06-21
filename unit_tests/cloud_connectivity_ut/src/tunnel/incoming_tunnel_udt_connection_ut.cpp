@@ -46,12 +46,21 @@ protected:
         connectionParameters.udpTunnelKeepAliveInterval = kMaxKeepAliveInterval;
         connectionParameters.udpTunnelKeepAliveRetries = 1;
 
-        auto cc = std::make_unique<IncomingControlConnection>(
-            kConnectionId.toUtf8(), std::move(tmpSocket), connectionParameters);
+        utils::promise<void> startedPromise;
+        tmpSocket->dispatch(
+            [&]()
+            {
+                auto cc = std::make_unique<IncomingControlConnection>(
+                    kConnectionId.toUtf8(), std::move(tmpSocket), connectionParameters);
 
-        cc->start(nullptr /* do not wait for select in test */);
-        connection = std::make_unique<IncomingTunnelConnection>(std::move(cc));
-        acceptForever();
+                cc->start(nullptr /* do not wait for select in test */);
+                connection = std::make_unique<IncomingTunnelConnection>(std::move(cc));
+                
+                acceptForever();
+                startedPromise.set_value();
+            });
+            
+        startedPromise.get_future().wait();
     }
 
     std::unique_ptr<UdtStreamSocket> makeSocket(bool randevous = false)

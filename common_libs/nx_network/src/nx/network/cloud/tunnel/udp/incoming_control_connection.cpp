@@ -23,21 +23,29 @@ IncomingControlConnection::IncomingControlConnection(
     m_maxKeepAliveInterval(
         connectionParameters.udpTunnelKeepAliveInterval *
         connectionParameters.udpTunnelKeepAliveRetries),
-    m_lastKeepAlive(std::chrono::steady_clock::now())
+    m_lastKeepAlive(std::chrono::system_clock::now())
 {
     m_buffer.reserve(kBufferSize);
     m_parser.setMessage(&m_message);
 }
 
+IncomingControlConnection::~IncomingControlConnection()
+{
+	NX_ASSERT(m_socket->isInSelfAioThread());
+	NX_LOG(lm("Removed"), cl_logDEBUG1);
+}
+
 void IncomingControlConnection::setErrorHandler(
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
+	NX_ASSERT(m_socket->isInSelfAioThread());
     m_errorHandler = std::move(handler);
 }
 
 void IncomingControlConnection::start(
     utils::MoveOnlyFunc<void()> selectedHandler)
 {
+	NX_ASSERT(m_socket->isInSelfAioThread());
     m_selectedHandler = std::move(selectedHandler);
     monitorKeepAlive();
     readConnectionRequest();
@@ -45,7 +53,8 @@ void IncomingControlConnection::start(
 
 void IncomingControlConnection::resetLastKeepAlive()
 {
-    m_lastKeepAlive = std::chrono::steady_clock::now();
+    m_lastKeepAlive = std::chrono::system_clock::now();
+	NX_LOG(lm("Update last keep alive"), cl_logDEBUG2);
 }
 
 const AbstractStreamSocket* IncomingControlConnection::socket()
@@ -56,11 +65,12 @@ const AbstractStreamSocket* IncomingControlConnection::socket()
 void IncomingControlConnection::monitorKeepAlive()
 {
     using namespace std::chrono;
-    auto timePassed = steady_clock::now() - m_lastKeepAlive;
+    auto timePassed = system_clock::now() - m_lastKeepAlive;
     if (timePassed >= m_maxKeepAliveInterval)
         return handleError(SystemError::timedOut);
 
     auto next = duration_cast<milliseconds>(m_maxKeepAliveInterval - timePassed);
+	NX_LOGX(lm("Set keep alive timer for %1 ms").arg(next.count()), cl_logDEBUG2);
     m_socket->registerTimer(next, [this](){ monitorKeepAlive(); });
 }
 
@@ -77,7 +87,7 @@ void IncomingControlConnection::continueReadRequest()
         &m_buffer,
         [this](SystemError::ErrorCode code, size_t bytesRead)
         {
-            NX_ASSERT(code != SystemError::timedOut);
+            NX_EXPECT(code != SystemError::timedOut);
             if (code != SystemError::noError)
                 return handleError(code);
 
@@ -107,8 +117,6 @@ void IncomingControlConnection::processRequest()
         stun::MessageClass::successResponse, 0,
         std::move(m_message.header.transactionId)));
 
-    NX_ASSERT(!response.header.transactionId.isEmpty());
-
     if (!tryProcess<
             hpm::api::UdpHolePunchingSynRequest,
             hpm::api::UdpHolePunchingSynResponse>(&response) &&
@@ -134,6 +142,7 @@ void IncomingControlConnection::processRequest()
         m_buffer,
         [this]( SystemError::ErrorCode code, size_t)
         {
+            NX_EXPECT(code != SystemError::timedOut);
             if (code != SystemError::noError)
                 return handleError(code);
 
