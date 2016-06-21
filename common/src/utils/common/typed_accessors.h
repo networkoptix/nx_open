@@ -36,14 +36,14 @@ struct QnAbstractExternalSetter
 };
 
 
-/* Abstract member access interfaces */
-/* --------------------------------- */
+/* Abstract member access bases */
+/* ---------------------------- */
 
 template<class T, class Object>
 class QnAbstractMemberGetter : public QnAbstractGetter<T>
 {
-public:
-    explicit QnAbstractMemberGetter(const Object* object) : m_object(object) {}
+protected:
+    QnAbstractMemberGetter(const Object* object) : m_object(object) {}
     const Object* object() const { return m_object; }
 
 private:
@@ -53,8 +53,8 @@ private:
 template<class T, class Object>
 class QnAbstractMemberSetter : public QnAbstractSetter<T>
 {
-public:
-    explicit QnAbstractMemberSetter(Object* object) : m_object(object) {}
+protected:
+    QnAbstractMemberSetter(Object* object) : m_object(object) {}
     Object* object() const { return m_object; }
 
 private:
@@ -62,52 +62,16 @@ private:
 };
 
 
-/* Cascade member access */
-/* --------------------- */
-
-template<class T, class Object>
-class QnCascadeMemberGetter : public QnAbstractMemberGetter<T, Object>
-{
-    typedef QnAbstractMemberGetter<T, Object> base_type;
-    typedef QnAbstractExternalGetter<T, Object> ExternalGetter;
-
-public:
-    explicit QnCascadeMemberGetter(const Object* object, const ExternalGetter* getter) : base_type(object), m_getter(getter) {}
-    QnCascadeMemberGetter(const QnCascadeMemberGetter& other) : base_type(other), m_getter(new Getter(*other.getter)) {}
-
-    virtual T operator () () const override { return (*m_getter)(object()); }
-
-private:
-    std::unique_ptr<const ExternalGetter> m_getter;
-};
-
-template<class T, class Object>
-class QnCascadeMemberSetter : public QnAbstractMemberSetter<T, Object>
-{
-    typedef QnAbstractMemberSetter<T, Object> base_type;
-    typedef QnAbstractExternalSetter<T, Object> ExternalSetter;
-
-public:
-    explicit QnCascadeMemberSetter(Object* object, const ExternalSetter* setter) : base_type(object), m_setter(setter) {}
-    QnCascadeMemberSetter(const QnCascadeMemberSetter& other) : base_type(other), m_setter(new Setter(*other.setter)) {}
-
-    virtual void operator () (const T& value) const override { return (*m_setter)(object(), value); }
-
-private:
-    std::unique_ptr<const ExternalSetter> m_setter;
-};
-
-
 /* Field access */
 /* ------------ */
 
 template<class T, class Object>
-class QnExternalFieldGetter : public QnAbstractExternalGetter<T, Object>
+class QnFieldExternalGetter : public QnAbstractExternalGetter<T, Object>
 {
     typedef T Object::* FieldPointer;
 
 public:
-    QnExternalFieldGetter(const FieldPointer field) : m_field(field) {}
+    QnFieldExternalGetter(const FieldPointer field) : m_field(field) {}
 
     virtual T operator () (const Object* object) const override { return object->*m_field; }
 
@@ -116,12 +80,12 @@ private:
 };
 
 template<class T, class Object>
-class QnExternalFieldSetter : public QnAbstractExternalSetter<T, Object>
+class QnFieldExternalSetter : public QnAbstractExternalSetter<T, Object>
 {
     typedef T Object::* FieldPointer;
 
 public:
-    QnExternalFieldSetter(FieldPointer field) : m_field(field) {}
+    QnFieldExternalSetter(FieldPointer field) : m_field(field) {}
 
     virtual void operator () (Object* object, const T& value) const override { object->*m_field = value; }
 
@@ -133,28 +97,28 @@ template<class T, class Object>
 class QnFieldGetter : public QnAbstractMemberGetter<T, Object>
 {
     typedef QnAbstractMemberGetter<T, Object> base_type;
+    typedef QnFieldExternalGetter<T, Object> ExternalGetter;
 
 public:
-    explicit QnFieldGetter(const Object* object, QnExternalFieldGetter field) : base_type(object), m_fieldGetter(field) {}
-
-    virtual T operator () () const override { return m_fieldGetter(object); }
+    QnFieldGetter(const Object* object, ExternalGetter field) : base_type(object), m_fieldGetter(field) {}
+    virtual T operator () () const override { return m_fieldGetter(object()); }
 
 private:
-    QnExternalFieldGetter m_fieldGetter;
+    ExternalGetter m_fieldGetter;
 };
 
 template<class T, class Object>
 class QnFieldSetter : public QnAbstractMemberSetter<T, Object>
 {
     typedef QnAbstractMemberSetter<T, Object> base_type;
+    typedef QnFieldExternalSetter<T, Object> ExternalSetter;
 
 public:
-    explicit QnFieldSetter(Object* object, QnExternalFieldSetter field) : base_type(object), m_fieldSetter(field) {}
-
-    virtual void operator () (const T& value) const override { m_fieldSetter(object, value); }
+    QnFieldSetter(Object* object, ExternalSetter field) : base_type(object), m_fieldSetter(field) {}
+    virtual void operator () (const T& value) const override { m_fieldSetter(object(), value); }
 
 private:
-    QnExternalFieldSetter m_fieldSetter;
+    ExternalSetter m_fieldSetter;
 };
 
 
@@ -162,10 +126,10 @@ private:
 /* ---------------------- */
 
 template<class T, class Object, class MemberFunction>
-class QnExternalMethodGetter : public QnAbstractExternalGetter<T, Object>
+class QnMethodExternalGetter : public QnAbstractExternalGetter<T, Object>
 {
 public:
-    QnExternalMethodGetter(MemberFunction method) : m_method(method) {}
+    QnMethodExternalGetter(MemberFunction method) : m_method(method) {}
 
     virtual T operator () (const Object* object) const override { return (object->*m_method)(); }
 
@@ -174,10 +138,10 @@ private:
 };
 
 template<class T, class Object, class MemberFunction>
-class QnExternalMethodSetter : public QnAbstractExternalSetter<T, Object>
+class QnMethodExternalSetter : public QnAbstractExternalSetter<T, Object>
 {
 public:
-    QnExternalMethodSetter(MemberFunction method) : m_method(method) {}
+    QnMethodExternalSetter(MemberFunction method) : m_method(method) {}
 
     virtual void operator () (Object* object, const T& value) const override { (object->*m_method)(value); }
 
@@ -189,11 +153,10 @@ template<class T, class Object, class MemberFunction>
 class QnMethodGetter : public QnAbstractMemberGetter<T, Object>
 {
     typedef QnAbstractMemberGetter<T, Object> base_type;
-    typedef QnExternalMethodGetter<T, Object, MemberFunction> ExternalGetter;
+    typedef QnMethodExternalGetter<T, Object, MemberFunction> ExternalGetter;
 
 public:
-    explicit QnMethodGetter(const Object* object, ExternalGetter method) : base_type(object), m_methodGetter(method) {}
-
+    QnMethodGetter(const Object* object, ExternalGetter method) : base_type(object), m_methodGetter(method) {}
     virtual T operator () () const override { return m_methodGetter(object()); }
 
 private:
@@ -204,11 +167,10 @@ template<class T, class Object, class MemberFunction>
 class QnMethodSetter : public QnAbstractMemberSetter<T, Object>
 {
     typedef QnAbstractMemberSetter<T, Object> base_type;
-    typedef QnExternalMethodSetter<T, Object, MemberFunction> ExternalSetter;
+    typedef QnMethodExternalSetter<T, Object, MemberFunction> ExternalSetter;
 
 public:
-    explicit QnMethodSetter(Object* object, ExternalSetter method) : base_type(object), m_methodSetter(method) {}
-
+    QnMethodSetter(Object* object, ExternalSetter method) : base_type(object), m_methodSetter(method) {}
     virtual void operator () (const T& value) const override { m_methodSetter(object(), value); }
 
 private:
@@ -219,7 +181,7 @@ private:
 /* Automatically selected member access */
 /* ------------------------------------ */
 
-namespace nx_private
+namespace detail
 {
     template<class T, class Object, class GetMember>
     struct QnMemberGetterTypeSelector
@@ -246,42 +208,42 @@ namespace nx_private
     };
 
     template<class T, class Object, class GetMember>
-    struct QnExternalMemberGetterTypeSelector
+    struct QnMemberExternalGetterTypeSelector
     {
         typedef typename std::conditional<std::is_member_object_pointer<GetMember>::value,   /* ? */
-                    QnExternalFieldGetter<T, Object>,  /* : */
+                    QnFieldExternalGetter<T, Object>,  /* : */
                 typename std::conditional<std::is_member_function_pointer<GetMember>::value, /* ? */
-                    QnExternalMethodGetter<T, Object, GetMember>, /* : */
+                    QnMethodExternalGetter<T, Object, GetMember>, /* : */
              /* default (error): */
                     void>::type>::type
             type;
     };
 
     template<class T, class Object, class SetMember>
-    struct QnExternalMemberSetterTypeSelector
+    struct QnMemberExternalSetterTypeSelector
     {
         typedef typename std::conditional<std::is_member_object_pointer<SetMember>::value,   /* ? */
-                    QnExternalFieldSetter<T, Object>,  /* : */
+                    QnFieldExternalSetter<T, Object>,  /* : */
                 typename std::conditional<std::is_member_function_pointer<SetMember>::value, /* ? */
-                    QnExternalMethodSetter<T, Object, SetMember>, /* : */
+                    QnMethodExternalSetter<T, Object, SetMember>, /* : */
              /* default (error): */
                     void>::type>::type
             type;
     };
 
-} // namespace nx_private
+} // namespace detail
 
 template<class T, class Object, class GetMember>
-using QnMemberGetter = typename nx_private::QnMemberGetterTypeSelector<T, Object, GetMember>::type;
+using QnMemberGetter = typename detail::QnMemberGetterTypeSelector<T, Object, GetMember>::type;
 
 template<class T, class Object, class SetMember>
-using QnMemberSetter = typename nx_private::QnMemberSetterTypeSelector<T, Object, SetMember>::type;
+using QnMemberSetter = typename detail::QnMemberSetterTypeSelector<T, Object, SetMember>::type;
 
 template<class T, class Object, class GetMember>
-using QnExternalMemberGetter = typename nx_private::QnExternalMemberGetterTypeSelector<T, Object, GetMember>::type;
+using QnMemberExternalGetter = typename detail::QnMemberExternalGetterTypeSelector<T, Object, GetMember>::type;
 
 template<class T, class Object, class SetMember>
-using QnExternalMemberSetter = typename nx_private::QnExternalMemberSetterTypeSelector<T, Object, SetMember>::type;
+using QnMemberExternalSetter = typename detail::QnMemberExternalSetterTypeSelector<T, Object, SetMember>::type;
 
 
 /* Access via functor */
@@ -291,8 +253,7 @@ template<class T, class Functor>
 class QnFunctorGetter : public QnAbstractGetter<T>
 {
 public:
-    explicit QnFunctorGetter(Functor functor) : m_functor(functor) {}
-
+    QnFunctorGetter(Functor functor) : m_functor(functor) {}
     virtual T operator () () const override { return m_functor(); }
 
 private:
@@ -303,9 +264,30 @@ template<class T, class Functor>
 class QnFunctorSetter : public QnAbstractSetter<T>
 {
 public:
-    explicit QnFunctorSetter(Functor functor) : m_functor(functor) {}
-
+    QnFunctorSetter(Functor functor) : m_functor(functor) {}
     virtual void operator () (const T& value) const override { m_functor(value); }
+
+private:
+    Functor m_functor;
+};
+
+template<class T, class Object, class Functor>
+class QnFunctorExternalGetter : public QnAbstractExternalGetter<T, Object>
+{
+public:
+    QnFunctorExternalGetter(Functor functor) : m_functor(functor) {}
+    virtual T operator () (const Object* object) const override { return m_functor(object); }
+
+private:
+    Functor m_functor;
+};
+
+template<class T, class Object, class Functor>
+class QnFunctorExternalSetter : public QnAbstractExternalSetter<T, Object>
+{
+public:
+    QnFunctorExternalSetter(Functor functor) : m_functor(functor) {}
+    virtual void operator () (Object* object, const T& value) const override { m_functor(object, value); }
 
 private:
     Functor m_functor;
@@ -319,8 +301,8 @@ template<class T>
 class QnVariableGetter : public QnAbstractGetter<T>
 {
 public:
-    explicit QnVariableGetter(const T& reference) : m_reference(reference) {}
-    explicit QnVariableGetter(const T* pointer) : m_reference(*pointer) {}
+    QnVariableGetter(const T& reference) : m_reference(reference) {}
+    QnVariableGetter(const T* pointer) : m_reference(*pointer) {}
 
     virtual T operator () () const override { return m_reference; }
 
@@ -332,8 +314,8 @@ template<class T>
 class QnVariableSetter : public QnAbstractSetter<T>
 {
 public:
-    explicit QnVariableSetter(T& reference) : m_reference(reference) {}
-    explicit QnVariableSetter(T* pointer) : m_reference(*pointer) {}
+    QnVariableSetter(T& reference) : m_reference(reference) {}
+    QnVariableSetter(T* pointer) : m_reference(*pointer) {}
 
     virtual void operator () (const T& value) const override { m_reference = value; }
 
@@ -344,7 +326,7 @@ private:
 /* Automatically selected non-object access */
 /* ---------------------------------------- */
 
-namespace nx_private
+namespace detail
 {
     template<class T, class Get>
     struct QnGlobalScopeGetterTypeSelector
@@ -364,19 +346,19 @@ namespace nx_private
             type;
     };
 
-} // namespace nx_private
+} // namespace detail
 
 template<class T, class Get>
-using QnGlobalScopeGetter = typename nx_private::QnGlobalScopeGetterTypeSelector<T, Get>::type;
+using QnGlobalScopeGetter = typename detail::QnGlobalScopeGetterTypeSelector<T, Get>::type;
 
 template<class T, class Set>
-using QnGlobalScopeSetter = typename nx_private::QnGlobalScopeSetterTypeSelector<T, Set>::type;
+using QnGlobalScopeSetter = typename detail::QnGlobalScopeSetterTypeSelector<T, Set>::type;
 
 
 /* Automatically selected access */
 /* ----------------------------- */
 
-namespace nx_private
+namespace detail
 {
     template<class T, class Object, class Get>
     struct QnGetterTypeSelector
@@ -406,13 +388,113 @@ namespace nx_private
             type;
     };
 
-} // namespace nx_private
+    template<class T, class Object, class Get>
+    struct QnExternalGetterTypeSelector
+    {
+        typedef typename std::conditional<std::is_member_pointer<Get>::value, /* ? */
+                    QnMemberExternalGetter<T, Object, Get>, /* : */
+                    QnFunctorExternalGetter<T, Object, Get>>::type
+            type;
+    };
+
+    template<class T, class Object, class Set>
+    struct QnExternalSetterTypeSelector
+    {
+        typedef typename std::conditional<std::is_member_pointer<Set>::value, /* ? */
+                    QnMemberExternalSetter<T, Object, Set>, /* : */
+                    QnFunctorExternalSetter<T, Object, Set>>::type
+            type;
+    };
+
+} // namespace detail
 
 template<class T, class Object, class Get>
-using QnGetter = typename nx_private::QnGetterTypeSelector<T, Object, Get>::type;
+using QnGetter = typename detail::QnGetterTypeSelector<T, Object, Get>::type;
 
 template<class T, class Object, class Set>
-using QnSetter = typename nx_private::QnSetterTypeSelector<T, Object, Set>::type;
+using QnSetter = typename detail::QnSetterTypeSelector<T, Object, Set>::type;
+
+template<class T, class Object, class Get>
+using QnExternalGetter = typename detail::QnExternalGetterTypeSelector<T, Object, Get>::type;
+
+template<class T, class Object, class Set>
+using QnExternalSetter = typename detail::QnExternalSetterTypeSelector<T, Object, Set>::type;
+
+
+/* Getter/setter utility aggregators with move semantics: */
+/* ------------------------------------------------------ */
+
+template<class T>
+class QnGetterAggregator : public QnAbstractGetter<T>
+{
+public:
+    QnGetterAggregator(const QnAbstractGetter<T>* getter) : m_getter(getter) {}
+    virtual T operator () () const override { return (*m_getter)(); }
+
+private:
+    std::unique_ptr<const QnAbstractGetter<T>> m_getter;
+};
+
+template<class T>
+class QnSetterAggregator
+{
+public:
+    QnSetterAggregator(const QnAbstractSetter<T>* setter) : m_setter(setter) {}
+    virtual void operator () (const T& value) const { (*m_setter)(value); }
+
+private:
+    std::unique_ptr<const QnAbstractSetter<T>> m_setter;
+};
+
+template<class T, class Object>
+class QnExternalGetterAggregator
+{
+public:
+    QnExternalGetterAggregator(const QnAbstractExternalGetter<T, Object>* getter) : m_getter(getter) {}
+    virtual T operator () (const Object* object) const { return (*m_getter)(object); }
+
+private:
+    std::unique_ptr<const QnAbstractExternalGetter<T, Object>> m_getter;
+};
+
+template<class T, class Object>
+class QnExternalSetterAggregator
+{
+public:
+    QnExternalSetterAggregator(const QnAbstractExternalSetter<T, Object>* setter) : m_setter(setter) {}
+    virtual void operator () (Object* object, const T& value) const { (*m_setter)(object, value); }
+
+private:
+    std::unique_ptr<const QnAbstractExternalSetter<T, Object>> m_setter;
+};
+
+template<class T, class Object>
+class QnCascadeGetterAggregator : public QnAbstractMemberGetter<T, Object>
+{
+    typedef QnAbstractMemberGetter<T, Object> base_type;
+    typedef QnAbstractExternalGetter<T, Object> ExternalGetter;
+
+public:
+    QnCascadeGetterAggregator(const Object* object, const ExternalGetter* getter) : base_type(object), m_getter(getter) {}
+    virtual T operator () () const override { return (*m_getter)(object()); }
+
+private:
+    std::unique_ptr<const ExternalGetter> m_getter;
+};
+
+template<class T, class Object>
+class QnCascadeSetterAggregator : public QnAbstractMemberSetter<T, Object>
+{
+    typedef QnAbstractMemberSetter<T, Object> base_type;
+    typedef QnAbstractExternalSetter<T, Object> ExternalSetter;
+
+public:
+    QnCascadeSetterAggregator(Object* object, const ExternalSetter* setter) : base_type(object), m_setter(setter) {}
+    virtual void operator () (const T& value) const override { return (*m_setter)(object(), value); }
+
+private:
+    std::unique_ptr<const ExternalSetter> m_setter;
+};
 
 
 /* Typed accessor template */
@@ -422,8 +504,11 @@ template<class T, class Object>
 class QnTypedAccessor
 {
 public:
+    QnTypedAccessor() = delete;
+    QnTypedAccessor(const QnTypedAccessor&) = delete;
+
     template<class Get, class Set>
-    explicit QnTypedAccessor(Object* object, Get get, Set set) :
+    QnTypedAccessor(Object* object, Get get, Set set) :
         m_getter(new QnGetter<T, Object, Get>(object, get)),
         m_setter(new QnSetter<T, Object, Set>(object, set))
     {
@@ -436,14 +521,11 @@ public:
     {
     }
 
-    const T& get() const { return (*m_getter)(); }
-    void set(const T& value) const { (*m_setter)(value); }
+    const T& get() const { return m_getter(); }
+    void set(const T& value) const { m_setter(value); }
 
-private:
-    QnTypedAccessor() {}
-
-    std::unique_ptr<const QnAbstractGetter<T>> m_getter;
-    std::unique_ptr<const QnAbstractSetter<T>> m_setter;
+    QnGetterAggregator<T> m_getter;
+    QnSetterAggregator<T> m_setter;
 };
 
 namespace Qn {

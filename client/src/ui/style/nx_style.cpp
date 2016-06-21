@@ -31,14 +31,15 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/common/input_field.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/property_backup.h>
 
-// #define CUSTOMIZE_POPUP_SHADOWS //TODO: #vkutin Fix @ Linux, then enable
+#define CUSTOMIZE_POPUP_SHADOWS
 
 using namespace style;
 
 namespace
 {
-    const char* kComboBoxDelegateClassProperty = "_qn_comboBoxDelegateClass";
+    const char* kDelegateClassBackupId = "delegateClass";
 
     const char* kHoveredChildProperty = "_qn_hoveredChild";
 
@@ -2801,12 +2802,19 @@ void QnNxStyle::polish(QWidget *widget)
         comboBox->setAttribute(Qt::WA_Hover);
 
         static const QByteArray kDefaultDelegateClassName("QComboBoxDelegate");
-
-        QAbstractItemDelegate* oldDelegate = comboBox->itemDelegate();
-        if (oldDelegate && oldDelegate->metaObject()->className() == kDefaultDelegateClassName)
+        if (comboBox->itemDelegate()->metaObject()->className() == kDefaultDelegateClassName)
         {
-            comboBox->setProperty(kComboBoxDelegateClassProperty,
-                QVariant::fromValue(const_cast<void*>(static_cast<const void*>(oldDelegate->metaObject()))));
+            auto getDelegateClass = [](const QComboBox* comboBox)
+            {
+                return comboBox->itemDelegate()->metaObject();
+            };
+
+            auto setDelegateClass = [](QComboBox* comboBox, const QMetaObject* delegateClass)
+            {
+                comboBox->setItemDelegate(static_cast<QAbstractItemDelegate*>(delegateClass->newInstance()));
+            };
+
+            QnTypedPropertyBackup<const QMetaObject*, QComboBox>::backup(comboBox, getDelegateClass, setDelegateClass, kDelegateClassBackupId);
             comboBox->setItemDelegate(new QnStyledComboBoxDelegate());
         }
     }
@@ -2832,6 +2840,12 @@ void QnNxStyle::polish(QWidget *widget)
         /* Install hover events tracking: */
         widget->installEventFilter(this);
         widget->setAttribute(Qt::WA_Hover);
+    }
+
+    if (qobject_cast<QAbstractButton*>(widget))
+    {
+        /* Install event filter to process wheel events: */
+        widget->installEventFilter(this);
     }
 
     if (auto button = qobject_cast<QToolButton*>(widget))
@@ -2908,14 +2922,7 @@ void QnNxStyle::unpolish(QWidget* widget)
     }
 
     if (auto comboBox = qobject_cast<QComboBox*>(widget))
-    {
-        if (auto delegateClass = static_cast<const QMetaObject*>(
-            comboBox->property(kComboBoxDelegateClassProperty).value<void*>()))
-        {
-            comboBox->setProperty(kComboBoxDelegateClassProperty, QVariant());
-            comboBox->setItemDelegate(static_cast<QAbstractItemDelegate*>(delegateClass->newInstance()));
-        }
-    }
+        QnAbstractPropertyBackup::restore(comboBox, kDelegateClassBackupId);
 
     QWidget* popupWithCustomizedShadow = nullptr;
 
@@ -2949,6 +2956,9 @@ void QnNxStyle::unpolish(QWidget* widget)
         tabBar->setProperty(kHoveredChildProperty, QVariant());
         tabBar->removeEventFilter(this);
     }
+
+    if (qobject_cast<QAbstractButton*>(widget))
+        widget->removeEventFilter(this);
 
     if (auto button = qobject_cast<QToolButton*>(widget))
     {
@@ -3014,6 +3024,16 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
                 }
                 break;
             }
+        }
+    }
+    /* Disabled QAbstractButton eats mouse wheel events.
+     * Here we correct this: */
+    else if (auto button = qobject_cast<QAbstractButton*>(object))
+    {
+        if (!button->isEnabled() && event->type() == QEvent::Wheel)
+        {
+            event->ignore();
+            return true;
         }
     }
 

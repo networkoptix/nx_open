@@ -12,7 +12,9 @@ Item
 
     Column
     {
+        id: column
 
+        width: parent.width
         spacing: 4
 
         Text
@@ -42,7 +44,6 @@ Item
             rightMargin: -4
         }
         color: ColorTheme.base14
-        visible: online
+        visible: !online
     }
 }
-
