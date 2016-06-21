@@ -95,34 +95,27 @@ def get_iss_command():
     return command
     
 def execute_command(command):
-    print 'Executing command:\n{0}\n'.format(command)
+    print 'Executing command:\n{0}\n'.format(' '.join(command))
     retcode = subprocess.call(command)
     print "finished with return code {0}".format(retcode)
     if retcode != 0 and retcode != 204:
         sys.exit(1)
     
-def main():
-    commands = [
-        get_candle_command('client-only'),
-        get_light_command(client_msi_folder, client_msi_name, 'client-only'),
-        get_fix_dialog_command(client_msi_folder, client_msi_name),
-
-        get_candle_command('server-only'),
-        get_light_command(server_msi_folder, server_msi_name, 'server-only'),
-        get_fix_dialog_command(server_msi_folder, server_msi_name),
-
-        get_candle_command('client-strip'),
-        get_light_command(client_msi_strip_folder, client_msi_name, 'client-strip'),
-        get_fix_dialog_command(client_msi_strip_folder, client_msi_name),
-
-        get_candle_command('server-strip'),
-        get_light_command(server_msi_strip_folder, server_msi_name, 'server-strip'),
-        get_fix_dialog_command(server_msi_strip_folder, server_msi_name)
+def create_commands_set(project, folder, msi):
+    return [
+        get_candle_command(project),
+        get_light_command(folder, msi, project),
+        get_fix_dialog_command(folder, msi),
     ]
+    
+def main():
+    commands = []
+    commands += create_commands_set('client-only', client_msi_folder, client_msi_name)
+    commands += create_commands_set('server-only', server_msi_folder, server_msi_name)
+    commands += create_commands_set('client-strip', client_msi_strip_folder, client_msi_name)
+    commands += create_commands_set('server-strip', server_msi_strip_folder, server_msi_name)   
     if '${nxtool}' == 'true':
-        commands.append(get_candle_command('nxtool'))
-        commands.append(get_light_command(nxtool_msi_folder, nxtool_msi_name, 'nxtool'))
-        commands.append(get_fix_dialog_command(nxtool_msi_folder, nxtool_msi_name))
+        commands += create_commands_set('nxtool', nxtool_msi_folder, nxtool_msi_name)
 
     for command in commands:
         execute_command(command)
