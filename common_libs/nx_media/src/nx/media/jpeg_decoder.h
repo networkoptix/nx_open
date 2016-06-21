@@ -21,6 +21,9 @@ public:
     JpegDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
 
     static bool isCompatible(const CodecID codec, const QSize& resolution);
+
+    static QSize maxResolution(const CodecID codec);
+
     virtual int decode(
         const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 

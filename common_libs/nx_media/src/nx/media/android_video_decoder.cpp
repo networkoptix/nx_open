@@ -50,7 +50,7 @@ static const GLfloat g_texture_data[] = {
     0.f, 1.f
 };
 
-QString codecToString(CodecID codecId)
+static QString codecToString(CodecID codecId)
 {
     switch(codecId)
     {
@@ -69,7 +69,7 @@ QString codecToString(CodecID codecId)
     }
 }
 
-void fillInputBuffer(
+static void fillInputBuffer(
     JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
 {
     Q_UNUSED(thiz);
@@ -216,7 +216,12 @@ public:
     FboPtr renderFrameToFbo();
     void createGlResources();
 
+    static void addMaxResolutionIfNeeded(const CodecID codec);
+
 private:
+    static QMap<CodecID, QSize> maxResolutions;
+    static QMutex maxResolutionsMutex;
+
     qint64 frameNumber;
     bool initialized;
     QAndroidJniObject javaDecoder;
@@ -424,29 +429,41 @@ AndroidVideoDecoder::~AndroidVideoDecoder()
 {
 }
 
-bool AndroidVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
+void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const CodecID codec)
 {
-    static QMap<CodecID, QSize> maxDecoderSize;
-    static QMutex mutex;
-
-    QMutexLocker lock(&mutex);
+    QMutexLocker lock(&maxResolutionsMutex);
 
     const QString codecMimeType = codecToString(codec);
     if (codecMimeType.isEmpty())
-        return false;
+        return;
 
-    if (!maxDecoderSize.contains(codec))
+    if (!maxResolutions.contains(codec))
     {
         QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecMimeType);
         QAndroidJniObject javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder");
         jint maxWidth = javaDecoder.callMethod<jint>("maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
         jint maxHeight = javaDecoder.callMethod<jint>("maxDecoderHeight", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
         QSize size(maxWidth, maxHeight);
-        maxDecoderSize[codec] = size;
+        maxResolutions[codec] = size;
         qDebug() << "Maximum hardware decoder resolution:" << size << "for codec" << codecMimeType;
     }
-    const QSize maxSize = maxDecoderSize[codec];
+}
+
+bool AndroidVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
+{
+    AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(codec);
+
+    QMutexLocker lock(&AndroidVideoDecoderPrivate::maxResolutionsMutex);
+    const QSize maxSize = AndroidVideoDecoderPrivate::maxResolutions[codec];
     return resolution.width() <= maxSize.width() && resolution.height() <= maxSize.height();
+}
+
+static QSize AndroidVideoDecoder::maxResolution(const CodecID codec)
+{
+    AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(codec);
+
+    QMutexLocker lock(&AndroidVideoDecoderPrivate::maxResolutionsMutex);
+    return AndroidVideoDecoderPrivate::maxResolutions[codec]; //< Return empty QSize if not found.
 }
 
 int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
@@ -513,7 +530,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
         {
             fboToRender = d->renderFrameToFbo();
         }, nullptr);
-#endif
+#endif // USE_GUI_RENDERING
 
     //NX_LOG(lit("--got frame num %1 decode time1=%2 time2=%3").arg(outFrameNum).arg(time1).arg(tm.elapsed()), cl_logINFO);
 
@@ -530,7 +547,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
     }
 
     result->reset(videoFrame);
-    return (int)outFrameNum - 1; //< convert range [1..N] to [0..N]
+    return (int) outFrameNum - 1; //< convert range [1..N] to [0..N]
 }
 
 QVariant TextureBuffer::handle() const

@@ -29,6 +29,8 @@ public:
 
     static bool isCompatible(const CodecID codec, const QSize& resolution);
 
+    static QSize maxResolution(const CodecID codec);
+
     virtual int decode(
         const QnConstCompressedVideoDataPtr& compressedVideoData,
         QVideoFramePtr* outDecodedFrame) override;

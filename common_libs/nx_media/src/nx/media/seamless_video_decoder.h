@@ -46,6 +46,12 @@ public:
      */
     int currentFrameNumber() const;
 
+    /** Can be empty if not available. */
+    QSize currentResolution() const;
+
+    /** Can be CODEC_ID_NONE if not available. */
+    CodecID currentCodec() const;
+
     void pleaseStop();
 
 private:
