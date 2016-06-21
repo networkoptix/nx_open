@@ -4,6 +4,7 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/qtimespan.h>
 #include <array>
 
 namespace {
@@ -26,53 +27,12 @@ const qint64 kDefaultLengthMs = 5 * 60 * 1000;
 /* Default value for slider steps number. */
 const int kSliderSteps = 20;
 
-QString durationMsToString(qint64 durationMs, const QStandardItemModel* unitsModel)
-{
-    quint64 duration = durationMs;
-    qint64 prevDelimiter = 1;
-    QStringList result;
-
-    for (int i = 0; i < unitsModel->rowCount(); ++i)
-    {
-        QStandardItem* item = unitsModel->item(i);
-        qint64 measureUnit = item->data().toLongLong();
-        duration /= (measureUnit / prevDelimiter);
-        prevDelimiter = measureUnit;
-
-        qint64 value = duration;
-        if (i < unitsModel->rowCount() - 1)
-        {
-            QStandardItem* nextItem = unitsModel->item(i+1);
-            qint64 nextMeasureUnit = nextItem->data().toLongLong();
-            qint64 upperLimit = nextMeasureUnit / measureUnit;
-            value %= upperLimit;
-        }
-        duration -= value;
-        if (value > 0 || !result.isEmpty())
-            result.insert(0, QString(lit("%1%2").arg(value).arg(item->text())));
-        if (duration == 0)
-            break;
-    }
-    // keep 2 most significant parts only to make string shorter
-    result = result.mid(0, 2);
-    return result.join(L' ');
-}
-
 void addModelItem(const QString& text, qint64 measureUnit, QStandardItemModel* model)
 {
     QStandardItem* item = new QStandardItem(text);
     item->setData(measureUnit);
     model->appendRow(item);
 }
-
-void addModelItem(const QString& text, qint64 measureUnit, QStandardItemModel* model1, QStandardItemModel* model2)
-{
-    if (model1)
-        addModelItem(text, measureUnit, model1);
-    if (model2)
-        addModelItem(text, measureUnit, model2);
-}
-
 
 /*
  * Function is: kMinimalSpeed * e ^ (k * kSliderSteps) == maxSpeed.
@@ -96,19 +56,16 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
     m_expectedLengthMs(kDefaultLengthMs),
     m_sourcePeriodLengthMs(kMinimalLengthMs * kMinimalSpeed),
     m_frameStepMs(0),
-    m_maxSpeed(m_sourcePeriodLengthMs / kMinimalLengthMs)
+    m_maxSpeed(m_sourcePeriodLengthMs / kMinimalLengthMs),
+    m_filteredUnitsModel(new QStandardItemModel(this))
 {
     ui->setupUi(this);
 
     QFont infoFont(this->font());
     infoFont.setPixelSize(kInfoFontSize);
-    //infoFont.setBold(true);
 
     ui->initialLengthLabel->setFont(infoFont);
     ui->framesLabel->setFont(infoFont);
-
-    m_fullUnitsModel = new QStandardItemModel(this);
-    m_filteredUnitsModel = new QStandardItemModel(this);
 
     ui->resultLengthUnitsComboBox->setModel(m_filteredUnitsModel);
 
@@ -199,7 +156,6 @@ void QnExportTimelapseDialog::initControls()
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    m_fullUnitsModel->clear();
     m_filteredUnitsModel->clear();
 
     static const qint64 msInSec = 1000;
@@ -208,13 +164,14 @@ void QnExportTimelapseDialog::initControls()
     static const qint64 msInDay = 1000 * 60 * 60 * 24;
 
     qint64 maxExpectedLengthMs = m_sourcePeriodLengthMs / kMinimalSpeed;
-
-    addModelItem(tr("ms"), 1, m_fullUnitsModel);
-    addModelItem(tr("sec"), msInSec,  m_fullUnitsModel, maxExpectedLengthMs >= msInSec ? m_filteredUnitsModel : nullptr);
-    addModelItem(tr("min"), msInMin,  m_fullUnitsModel, maxExpectedLengthMs >= msInMin ? m_filteredUnitsModel : nullptr);
-    addModelItem(tr("hrs"), msInHour, m_fullUnitsModel, maxExpectedLengthMs >= msInHour ? m_filteredUnitsModel : nullptr);
-    addModelItem(tr("day"), msInDay,  m_fullUnitsModel, maxExpectedLengthMs >= msInDay ? m_filteredUnitsModel : nullptr);
-
+    if (maxExpectedLengthMs >= msInSec)
+        addModelItem(tr("sec"), msInSec,  m_filteredUnitsModel);
+    if (maxExpectedLengthMs >= msInMin)
+        addModelItem(tr("min"), msInMin,  m_filteredUnitsModel);
+    if (maxExpectedLengthMs >= msInHour)
+        addModelItem(tr("hrs"), msInHour, m_filteredUnitsModel);
+    if (maxExpectedLengthMs >= msInDay)
+        addModelItem(tr("days"), msInDay,  m_filteredUnitsModel);
 
     m_maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
     ui->speedSpinBox->setRange(kMinimalSpeed, m_maxSpeed);
@@ -233,7 +190,7 @@ void QnExportTimelapseDialog::initControls()
     ui->speedSpinBox->setValue(speed);
     ui->speedSlider->setValue(toSliderScale(speed));
     setExpectedLengthMs(expectedLengthMs);
-    ui->initialLengthLabel->setText(durationMsToString(m_sourcePeriodLengthMs, m_fullUnitsModel));
+    ui->initialLengthLabel->setText(durationMsToString(m_sourcePeriodLengthMs));
 }
 
 void QnExportTimelapseDialog::setExpectedLengthMs(qint64 value)
@@ -249,7 +206,7 @@ void QnExportTimelapseDialog::updateFrameStep(int speed)
 {
     m_expectedLengthMs = speed;
     m_frameStepMs = 1000ll * speed / kResultFps;
-    ui->framesLabel->setText(durationMsToString(m_frameStepMs, m_fullUnitsModel));
+    ui->framesLabel->setText(durationMsToString(m_frameStepMs));
 }
 
 /* kMinimalSpeed * e ^ (sliderExpCoeff * sliderValue) == absoluteSpeedValue. */
@@ -282,4 +239,28 @@ int QnExportTimelapseDialog::fromSliderScale(int sliderValue)
 
     qreal absoluteSpeed = 1.0 * kMinimalSpeed * exp(k * sliderValue);
     return static_cast<int>(absoluteSpeed);
+}
+
+QString QnExportTimelapseDialog::durationMsToString(qint64 durationMs)
+{
+    auto unitStringsConverter = [](Qt::TimeSpanUnit unit, int num)
+    {
+        switch (unit) {
+        case::Qt::Milliseconds:
+            return tr("%nms", "", num);
+        case::Qt::Seconds:
+            return tr("%ns", "", num);
+        case::Qt::Minutes:
+            return tr("%nm", "", num);
+        case::Qt::Hours:
+            return tr("%nh", "", num);
+        case::Qt::Days:
+            return tr("%nd", "", num);
+        default:
+            return QString();
+        }
+    };
+
+    /* Make sure passed format is fully covered by converter. */
+    return QTimeSpan(durationMs).toApproximateString(3, Qt::DaysAndTime | Qt::Milliseconds, unitStringsConverter, lit(" "));
 }

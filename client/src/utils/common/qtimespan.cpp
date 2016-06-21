@@ -2031,12 +2031,12 @@ QDebug operator<<(QDebug debug, const QTimeSpan &ts)
   If you set suppressSecondUnitLimit to a negative number, the second unit will
   always be displayed, unless no valid unit for it could be found.
 */
-QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanFormat format)
+QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanFormat format, unitStringFunction unitStringConverter, QString unitsSeparator)
 {
     if (format==Qt::NoUnit)
         return QString();
 
-    //retreive the time unit to use as the primairy unit
+    //retrieve the time unit to use as the primairy unit
     int primairy = -1;
     int secondairy = -1;
 
@@ -2049,7 +2049,7 @@ QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanF
     if (primairyUnit > 1) {
         secondairyUnit = Qt::TimeSpanUnit(primairyUnit / 2);
     } else {
-        primairy = 0;
+       // primairy = 0; --I don't understand how was it supposed to work for milliseconds --gdm
     }
     while (!format.testFlag(secondairyUnit) && secondairyUnit > Qt::NoUnit) {
         secondairyUnit = Qt::TimeSpanUnit(secondairyUnit / 2);
@@ -2073,6 +2073,13 @@ QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanF
         }
     }
 
+    auto toUnitString = [this, unitStringConverter](Qt::TimeSpanUnit unit, int num)
+    {
+        if (unitStringConverter)
+            return unitStringConverter(unit, num);
+        return d->unitString(unit, num);
+    };
+
     if ((primairy > 0
          && secondairy > 0
          && primairy < suppresSecondUnitLimit)
@@ -2080,11 +2087,11 @@ QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanF
          && secondairyUnit > Qt::NoUnit) )
     {
         //we will display with two units
-        return d->unitString(primairyUnit, primairy) + QLatin1String(", ") + d->unitString(secondairyUnit, secondairy);
+        return toUnitString(primairyUnit, primairy) + unitsSeparator + toUnitString(secondairyUnit, secondairy);
     }
 
     //we will display with only the primairy unit
-    return d->unitString(primairyUnit, primairy);
+    return toUnitString(primairyUnit, primairy);
 }
 
 /*!

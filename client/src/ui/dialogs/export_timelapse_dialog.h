@@ -37,6 +37,8 @@ private:
 
     int toSliderScale(int absoluteSpeedValue);
     int fromSliderScale(int sliderValue);
+
+    QString durationMsToString(qint64 durationMs);
 private:
      QScopedPointer<Ui::ExportTimelapseDialog> ui;
      bool m_updating;
@@ -46,6 +48,5 @@ private:
      qint64 m_frameStepMs;
      int m_maxSpeed;
 
-     QStandardItemModel* m_fullUnitsModel;
      QStandardItemModel* m_filteredUnitsModel;
 };
