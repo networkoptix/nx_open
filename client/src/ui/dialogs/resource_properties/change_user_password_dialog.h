@@ -19,7 +19,7 @@ public:
     QnChangeUserPasswordDialog(QWidget* parent = nullptr);
     virtual ~QnChangeUserPasswordDialog();
 
-    virtual void done(int r) override;
+    virtual void accept() override;
 
     QString newPassword() const;
 
