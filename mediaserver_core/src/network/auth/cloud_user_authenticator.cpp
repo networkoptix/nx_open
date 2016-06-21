@@ -389,7 +389,8 @@ QnUserResourcePtr CloudUserAuthenticator::createCloudUser(
     userData.id = QnUuid::createUuid();
     userData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
     userData.name = userName;
-    userData.isAdmin = cloudAccessRole == nx::cdb::api::SystemAccessRole::owner;
+    //TODO #ak isAdmin is used to find resource to fetch system settings from, so let there be only one...
+    userData.isAdmin = false;   //cloudAccessRole == nx::cdb::api::SystemAccessRole::owner;
     switch (cloudAccessRole)
     {
         case nx::cdb::api::SystemAccessRole::liveViewer:
