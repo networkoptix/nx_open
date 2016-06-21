@@ -1,5 +1,4 @@
 import os, sys, subprocess, shutil
-from subprocess import Popen, PIPE
 from os.path import dirname, join, exists, isfile
 
 bin_source_dir = '${libdir}/${arch}/bin/${build.configuration}'
@@ -8,7 +7,7 @@ client_msi_folder = 'bin/msi'
 nxtool_msi_folder = 'bin/msi'
 server_msi_strip_folder = 'bin/strip'
 client_msi_strip_folder = 'bin/strip'
-wix_pdb = 'EVEMediaPlayerSetup.wixpdb'
+wix_pdb = 'wixsetup.wixpdb'
 
 server_msi_name = '${finalName}-server-only.msi'
 client_msi_name = '${finalName}-client-only.msi'
