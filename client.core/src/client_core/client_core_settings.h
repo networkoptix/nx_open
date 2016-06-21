@@ -39,6 +39,8 @@ public:
             int id,
             const QVariant& defaultValue) override;
 
+    void save();
+
 private:
     QN_BEGIN_PROPERTY_STORAGE(PropertiesCount)
         QN_DECLARE_RW_PROPERTY(QnUserRecentConnectionDataList,

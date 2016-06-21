@@ -8,14 +8,22 @@ import "private"
 
 PageBase
 {
+    id: welcomeScreen
+
     padding: 16
     topPadding: 24
+
+    header: WarningPanel
+    {
+        id: warningPanel
+    }
 
     Flickable
     {
         id: flickable
 
         anchors.fill: parent
+        anchors.topMargin: header.height
 
         contentWidth: content.width
         contentHeight: content.height
@@ -37,6 +45,7 @@ PageBase
 
                 CredentialsEditor
                 {
+                    warningPanel: warningPanel
                     onLoggedIn: Workflow.openSessionsScreen()
                 }
             }

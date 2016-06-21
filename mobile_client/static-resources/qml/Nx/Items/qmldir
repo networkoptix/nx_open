@@ -7,3 +7,4 @@ SystemInformationBlock 1.0 SystemInformationBlock.qml
 StatusIndicator 1.0 StatusIndicator.qml
 ArchiveCalendar 1.0 ArchiveCalendar.qml
 MediaPlayer 1.0 MediaPlayer.qml
+LoginButton 1.0 LoginButton.qml

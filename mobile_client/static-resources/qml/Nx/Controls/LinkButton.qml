@@ -31,4 +31,6 @@ Button
         cursorShape: Qt.PointingHandCursor
         onClicked: control.clicked()
     }
+
+    Component.onCompleted: control["activeFocusOnTab"] = false
 }
