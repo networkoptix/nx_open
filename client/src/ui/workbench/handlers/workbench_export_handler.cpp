@@ -813,10 +813,10 @@ void QnWorkbenchExportHandler::at_exportTimelapseAction_triggered()
     QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
     if (loader)
     {
-        durationMs = 0;
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
-        for (const auto& period: periods)
-            durationMs += period.durationMs;
+        if (!periods.isEmpty())
+            durationMs = periods.duration();
+        Q_ASSERT_X(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
     }
 
     if (durationMs < QnExportTimelapseDialog::kMinimalSourcePeriodLength)

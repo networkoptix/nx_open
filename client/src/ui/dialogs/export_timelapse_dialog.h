@@ -34,6 +34,9 @@ private:
 
     void setExpectedLengthMs(qint64 value);
     void updateFrameStep(int speed);
+
+    int toSliderScale(int absoluteSpeedValue);
+    int fromSliderScale(int sliderValue);
 private:
      QScopedPointer<Ui::ExportTimelapseDialog> ui;
      bool m_updating;

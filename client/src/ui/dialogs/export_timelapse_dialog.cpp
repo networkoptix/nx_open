@@ -45,7 +45,7 @@ QString durationMsToString(qint64 durationMs, const QStandardItemModel* unitsMod
         {
             QStandardItem* nextItem = unitsModel->item(i+1);
             qint64 nextMeasureUnit = nextItem->data().toLongLong();
-            int upperLimit = nextMeasureUnit / measureUnit;
+            qint64 upperLimit = nextMeasureUnit / measureUnit;
             value %= upperLimit;
         }
         duration -= value;
@@ -56,7 +56,7 @@ QString durationMsToString(qint64 durationMs, const QStandardItemModel* unitsMod
     }
     // keep 2 most significant parts only to make string shorter
     result = result.mid(0, 2);
-    return result.join(lit(" "));
+    return result.join(L' ');
 }
 
 void addModelItem(const QString& text, qint64 measureUnit, QStandardItemModel* model)
@@ -74,7 +74,7 @@ void addModelItem(const QString& text, qint64 measureUnit, QStandardItemModel* m
         addModelItem(text, measureUnit, model2);
 }
 
-}
+} //anonymous namespace
 
 qint64 QnExportTimelapseDialog::kMinimalSourcePeriodLength = kMinimalLengthMs * kMinimalSpeed;
 
@@ -100,14 +100,14 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
 
     ui->resultLengthUnitsComboBox->setModel(m_filteredUnitsModel);
 
-    connect(ui->speedSpinBox, QnSpinboxIntValueChanged, this, [this](int value)
+    connect(ui->speedSpinBox, QnSpinboxIntValueChanged, this, [this](int absoluteValue)
     {
         if (m_updating)
             return;
 
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
-        ui->speedSlider->setValue(value);
-        setExpectedLengthMs(m_sourcePeriodLengthMs / value);
+        ui->speedSlider->setValue(toSliderScale(absoluteValue));
+        setExpectedLengthMs(m_sourcePeriodLengthMs / absoluteValue);
     });
 
     connect(ui->speedSlider, &QSlider::valueChanged, this, [this](int value)
@@ -116,8 +116,9 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
             return;
 
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
-        ui->speedSpinBox->setValue(value);
-        setExpectedLengthMs(m_sourcePeriodLengthMs / value);
+        int absoluteValue = fromSliderScale(value);
+        ui->speedSpinBox->setValue(absoluteValue);
+        setExpectedLengthMs(m_sourcePeriodLengthMs / absoluteValue);
     });
 
     auto expectedLengthChanged = [this]()
@@ -129,13 +130,13 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
 
         int index = ui->resultLengthUnitsComboBox->currentIndex();
         qint64 measureUnit = m_filteredUnitsModel->item(index)->data().toLongLong();
-        qint64 speedValue = kMaximalSpeed;
+        qint64 absoluteValue = kMaximalSpeed;
         if (ui->resultLengthSpinBox->value() > 0)
-            speedValue = m_sourcePeriodLengthMs / (ui->resultLengthSpinBox->value() * measureUnit);
-        ui->speedSlider->setValue(speedValue);
-        ui->speedSpinBox->setValue(speedValue);
+            absoluteValue = m_sourcePeriodLengthMs / (ui->resultLengthSpinBox->value() * measureUnit);
+        ui->speedSlider->setValue(toSliderScale(absoluteValue));
+        ui->speedSpinBox->setValue(absoluteValue);
 
-        updateFrameStep(speedValue);
+        updateFrameStep(absoluteValue);
     };
 
     connect(ui->resultLengthSpinBox, QnSpinboxIntValueChanged, this, expectedLengthChanged);
@@ -145,11 +146,11 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
     initControls();
 }
 
-void QnExportTimelapseDialog::setSpeed(qint64 value)
+void QnExportTimelapseDialog::setSpeed(qint64 absoluteValue)
 {
-    ui->speedSpinBox->setValue(value);
-    ui->speedSlider->setValue(value);
-    setExpectedLengthMs(m_sourcePeriodLengthMs / value);
+    ui->speedSpinBox->setValue(absoluteValue);
+    ui->speedSlider->setValue(toSliderScale(absoluteValue));
+    setExpectedLengthMs(m_sourcePeriodLengthMs / absoluteValue);
 }
 
 qint64 QnExportTimelapseDialog::speed() const
@@ -205,7 +206,7 @@ void QnExportTimelapseDialog::initControls()
 
     int maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
     ui->speedSpinBox->setRange(kMinimalSpeed, maxSpeed);
-    ui->speedSlider->setRange(kMinimalSpeed, maxSpeed);
+    ui->speedSlider->setRange(toSliderScale(kMinimalSpeed), toSliderScale(maxSpeed));
     //Q_ASSERT(toSliderScale(kMinimalSpeed) == 0);
 
 
@@ -219,7 +220,7 @@ void QnExportTimelapseDialog::initControls()
         expectedLengthMs = m_sourcePeriodLengthMs / speed;
     }
     ui->speedSpinBox->setValue(speed);
-    ui->speedSlider->setValue(speed);
+    ui->speedSlider->setValue(toSliderScale(speed));
     setExpectedLengthMs(expectedLengthMs);
     ui->initialLengthLabel->setText(durationMsToString(m_sourcePeriodLengthMs, m_fullUnitsModel));
 }
@@ -236,6 +237,34 @@ void QnExportTimelapseDialog::setExpectedLengthMs(qint64 value)
 void QnExportTimelapseDialog::updateFrameStep(int speed)
 {
     m_expectedLengthMs = speed;
-    m_frameStepMs = speed *  ( 1000 / kResultFps);
+    m_frameStepMs = 1000ll * speed / kResultFps;
     ui->framesLabel->setText(durationMsToString(m_frameStepMs, m_fullUnitsModel));
+}
+
+int QnExportTimelapseDialog::toSliderScale(int absoluteSpeedValue)
+{
+    return absoluteSpeedValue;
+
+    /* If we have less steps than recommended value, just use direct scale */
+    int maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
+    if (maxSpeed - kMinimalSpeed <= kSliderSteps)
+        return absoluteSpeedValue - kMinimalSpeed;
+
+    /*TODO: #GDM Function is: kMinimalSpeed * e ^ (k * kSliderSteps) == maxSpeed. From here getting k. */
+
+    return static_cast<int>(log(absoluteSpeedValue));
+}
+
+int QnExportTimelapseDialog::fromSliderScale(int sliderValue)
+{
+    return sliderValue;
+
+    /* If we have less steps than recommended value, just use direct scale */
+    int maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
+    if (maxSpeed - kMinimalSpeed <= kSliderSteps)
+        return kMinimalSpeed + sliderValue;
+
+    /*TODO: #GDM Function is: kMinimalSpeed * e ^ (k * kSliderSteps) == maxSpeed. From here getting k. */
+
+    return static_cast<int>(exp(sliderValue));
 }
