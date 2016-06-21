@@ -20,8 +20,16 @@ public:
         popupHadNativeShadow(!popup->windowFlags().testFlag(Qt::NoDropShadowWindowHint)),
         q_ptr(q)
     {
-        shadow->setWindowFlags(shadow->windowFlags() | Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+        const Qt::WindowFlags kExtraFlags(
+            Qt::Popup |
+            Qt::FramelessWindowHint |
+            Qt::NoDropShadowWindowHint |
+            Qt::WindowTransparentForInput |
+            Qt::WindowDoesNotAcceptFocus);
+
+        shadow->setWindowFlags(shadow->windowFlags() | kExtraFlags);
         shadow->setAttribute(Qt::WA_TranslucentBackground);
+        shadow->setAttribute(Qt::WA_ShowWithoutActivating);
         shadow->setAutoFillBackground(false);
 
         color.setAlphaF(0.75);
@@ -313,18 +321,15 @@ bool QnPopupShadow::eventFilter(QObject* object, QEvent* event)
             {
                 d->updateGeometry();
                 d->shadow->showNormal();
-                d->popup->activateWindow();
+                if (d->shadow->isActiveWindow())
+                    d->popup->activateWindow();
+                d->popup->raise();
                 break;
             }
 
             case QEvent::Hide:
             {
-                QPointer<QLabel> shadow(d->shadow);
-                executeDelayed([shadow]()
-                {
-                    if (shadow)
-                        shadow->hide();
-                });
+                executeDelayedParented([d]() { d->shadow->hide(); }, 1, d->shadow);
                 break;
             }
 

@@ -32,7 +32,7 @@
 #include <ui/widgets/common/input_field.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-// #define CUSTOMIZE_POPUP_SHADOWS //TODO: #vkutin Fix @ Linux, then enable
+#define CUSTOMIZE_POPUP_SHADOWS
 
 using namespace style;
 
