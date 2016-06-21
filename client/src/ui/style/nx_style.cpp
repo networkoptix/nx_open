@@ -242,7 +242,15 @@ namespace
 
         return CommonScrollBar;
     }
-}
+
+    class ViewportMarginsAccessHack : public QAbstractScrollArea
+    {
+    public:
+        QMargins viewportMargins() const { return QAbstractScrollArea::viewportMargins(); }
+        void setViewportMargins(const QMargins& margins) { QAbstractScrollArea::setViewportMargins(margins); }
+    };
+
+} // unnamed namespace
 
 QnNxStylePrivate::QnNxStylePrivate() :
     QCommonStylePrivate(),
@@ -2806,17 +2814,10 @@ void QnNxStyle::polish(QWidget *widget)
          *  - use Qt stylesheets, but they're slow and it's not a good idea to change stylesheet in polish()
          *  - hack access to protected method QAbstractScrollArea::setViewportMargins()
          */
-        class ScrollAreaAccessHack : public QAbstractScrollArea
-        {
-        public:
-            QMargins viewportMargins() const { return QAbstractScrollArea::viewportMargins(); }
-            void setViewportMargins(const QMargins& margins) { QAbstractScrollArea::setViewportMargins(margins); }
-        };
+        ViewportMarginsAccessHack* area = static_cast<ViewportMarginsAccessHack*>(static_cast<QAbstractScrollArea*>(widget));
 
-        ScrollAreaAccessHack* area = static_cast<ScrollAreaAccessHack*>(static_cast<QAbstractScrollArea*>(widget));
-
-        QnTypedPropertyBackup<QMargins, ScrollAreaAccessHack>::backup(area, &ScrollAreaAccessHack::viewportMargins,
-            QN_SETTER(ScrollAreaAccessHack::setViewportMargins), kViewportMarginsBackupId);
+        QnTypedPropertyBackup<QMargins, ViewportMarginsAccessHack>::backup(area, &ViewportMarginsAccessHack::viewportMargins,
+            QN_SETTER(ViewportMarginsAccessHack::setViewportMargins), kViewportMarginsBackupId);
 
         const int kTextDocumentDefaultMargin = 4; // in Qt
         int h = style::Metrics::kStandardPadding - kTextDocumentDefaultMargin;
