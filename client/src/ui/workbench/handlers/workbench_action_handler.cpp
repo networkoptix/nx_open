@@ -26,6 +26,7 @@
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_startup_parameters.h>
 
 #include <common/common_module.h>
 
@@ -441,15 +442,14 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
         arguments << QString::fromUtf8(QnAppServerConnectionFactory::url().toEncoded());
     }
 
-    if(mainWindow()) {
+    if(mainWindow())
+    {
         int screen = context()->instance<QnScreenManager>()->nextFreeScreen();
-        arguments << QLatin1String("--screen") << QString::number(screen);
+        arguments << QnStartupParameters::kScreenKey << QString::number(screen);
     }
 
     if (qnRuntime->isDevMode())
         arguments << lit("--dev-mode-key=razrazraz");
-
-    qDebug() << "Starting new instance with args" << arguments;
 
 #ifdef Q_OS_MACX
     mac_startDetached(qApp->applicationFilePath(), arguments);

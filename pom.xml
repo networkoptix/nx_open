@@ -697,6 +697,7 @@
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
+                <module>common_libs/nx_speach_synthesizer</module>
                 <module>macsetup/client-dmg</module>
             </modules>
         </profile>
@@ -749,7 +750,7 @@
             </activation>
             <modules>
                 <module>nx_cloud/libconnection_mediator</module>
-                <module>nx_cloud/cloud_connect_test_util</module>
+                <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
             <properties>
                 <build.suffix>${box}-${arch}</build.suffix>

@@ -1,6 +1,6 @@
 #include "client_recent_connections_manager.h"
 
-#include <core/core_settings.h>
+#include <client_core/client_core_settings.h>
 
 #include <ui/models/recent_user_connections_model.h>
 
@@ -10,15 +10,15 @@ QnClientRecentConnectionsManager::QnClientRecentConnectionsManager()
     , m_bound()
     , m_dataCache()
 {
-    NX_ASSERT(qnCoreSettings, Q_FUNC_INFO, "Core settings are empty");
+    NX_ASSERT(qnClientCoreSettings, Q_FUNC_INFO, "Core settings are empty");
 
     const auto coreSettingsHandler = [this](int id)
     {
-        if (id == QnCoreSettings::RecentUserConnections)
+        if (id == QnClientCoreSettings::RecentUserConnections)
             updateModelsData();
     };
 
-    connect(qnCoreSettings, &QnCoreSettings::valueChanged, this, coreSettingsHandler);
+    connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this, coreSettingsHandler);
 
     updateModelsData();
 }
@@ -95,7 +95,7 @@ void QnClientRecentConnectionsManager::updateModelBinding(QnRecentUserConnection
 void QnClientRecentConnectionsManager::updateModelsData()
 {
     m_dataCache.clear();
-    const auto lastConnectionsData = qnCoreSettings->recentUserConnections();
+    const auto lastConnectionsData = qnClientCoreSettings->recentUserConnections();
     for (const auto connectionDesc : lastConnectionsData)
     {
         m_dataCache[connectionDesc.systemName].append(connectionDesc);
