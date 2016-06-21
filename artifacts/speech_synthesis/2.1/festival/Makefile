@@ -35,11 +35,11 @@
 ##                                                                       ##
 ##       Authors:  Alan W Black, Paul Taylor, Richard Caley and others   ##
 ##          Date:  January 2003                                          ##
-##                                                                       ## 
+##                                                                       ##
 ###########################################################################
 TOP=.
 DIRNAME=.
-BUILD_DIRS = src lib examples bin doc
+BUILD_DIRS = src lib examples bin
 ALL_DIRS=config $(BUILD_DIRS) testsuite
 CONFIG=configure configure.in config.sub config.guess \
        missing install-sh mkinstalldirs

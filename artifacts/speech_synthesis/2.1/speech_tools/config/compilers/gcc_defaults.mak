@@ -38,10 +38,15 @@
  ##                                                                       ##
  ###########################################################################
 
-CC=gcc
-CXX=gcc
+ifndef CC
+    CC=gcc
+endif
+ifndef CXX
+    CXX=gcc
+endif
+
 ifeq ($(OSTYPE),Darwin)
-CXX=g++
+    CXX=g++
 endif
 
 COMPILER_DESC=FSF gcc
@@ -59,7 +64,7 @@ WARN_CXXFLAGS  = -Wall
 WARN_LINKFLAGS = -Wall
 
 VERBOSE_CCFLAGS   =
-VERBOSE_CXXFLAGS  = 
+VERBOSE_CXXFLAGS  =
 VERBOSE_LINKFLAGS =
 
 OPTIMISE_CCFLAGS   = -O$(OPTIMISE)
@@ -76,9 +81,9 @@ PROFILE_gprof_CCFLAGS   = -pg
 PROFILE_gprof_CXXFLAGS  = -pg
 PROFILE_gprof_LINKFLAGS = -pg
 
-SHARED_CCFLAGS  = -fPIC 
-SHARED_CXXFLAGS  = -fPIC 
-SHARED_LINKFLAGS = 
+SHARED_CCFLAGS  = -fPIC
+SHARED_CXXFLAGS  = -fPIC
+SHARED_LINKFLAGS =
 
 ifndef GCC_MAKE_SHARED_LIB
     MAKE_SHARED_LIB = $(CXX) -shared -fno-shared-data -o XXX
@@ -88,12 +93,12 @@ endif
 
 #-shared -R$(MAIN_LIBRARY_DIR)
 
-STATIC_CCFLAGS   = 
-STATIC_CXXFLAGS  = 
+STATIC_CCFLAGS   =
+STATIC_CXXFLAGS  =
 STATIC_LINKFLAGS = -static
 
 TEMPLATE_SPECIFIC = -DINSTANTIATE_TEMPLATES
-TEMPLATE_ARGS = 
+TEMPLATE_ARGS =
 
 ## The -lgcc here is redundant - gcc does this anyway - but it
 ## helps java know what needs to be loaded.

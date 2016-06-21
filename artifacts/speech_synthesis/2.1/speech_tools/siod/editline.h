@@ -52,7 +52,7 @@
 #define USE_DIRENT
 #define SYS_UNIX
 /* will all work without this except long lines */
-#define USE_TERMCAP
+// #define USE_TERMCAP
 
 /*
 **  Command status codes (moved from editline.h).

@@ -3902,7 +3902,7 @@ echo "${ECHO_T}$ac_cv_lib_ncurses_tputs" >&6; }
 if test $ac_cv_lib_ncurses_tputs = yes; then
   TERMCAPLIB=-lncurses
 else
-  TERMCAPLIB=-lcurses
+  TERMCAPLIB= #-lcurses
 fi
 
 

@@ -98,7 +98,7 @@ trap 'rm -f $dummy.c $dummy.o $dummy.rel $dummy; exit 1' 1 2 15
 
 set_cc_for_build='case $CC_FOR_BUILD,$HOST_CC,$CC in
  ,,)    echo "int dummy(){}" > $dummy.c ;
-	for c in cc gcc c89 ; do
+	for c in $CC cc gcc c89 ; do
 	  ($c $dummy.c -c -o $dummy.o) >/dev/null 2>&1 ;
 	  if test $? = 0 ; then
 	     CC_FOR_BUILD="$c"; break ;
@@ -776,15 +776,15 @@ EOF
 	#undef CPU
 	#undef mips
 	#undef mipsel
-	#if defined(__MIPSEL__) || defined(__MIPSEL) || defined(_MIPSEL) || defined(MIPSEL) 
-	CPU=mipsel 
+	#if defined(__MIPSEL__) || defined(__MIPSEL) || defined(_MIPSEL) || defined(MIPSEL)
+	CPU=mipsel
 	#else
-	#if defined(__MIPSEB__) || defined(__MIPSEB) || defined(_MIPSEB) || defined(MIPSEB) 
+	#if defined(__MIPSEB__) || defined(__MIPSEB) || defined(_MIPSEB) || defined(MIPSEB)
 	CPU=mips
 	#else
 	CPU=
 	#endif
-	#endif 
+	#endif
 EOF
 	eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^CPU=`
 	rm -f $dummy.c
@@ -851,7 +851,7 @@ EOF
 		;;
 	  a.out-i386-linux)
 		echo "${UNAME_MACHINE}-pc-linux-gnuaout"
-		exit 0 ;;		
+		exit 0 ;;
 	  coff-i386)
 		echo "${UNAME_MACHINE}-pc-linux-gnucoff"
 		exit 0 ;;
