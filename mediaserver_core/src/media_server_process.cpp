@@ -689,7 +689,6 @@ void setServerNameAndUrls(
 
     const auto apiSheme = isSslAllowed ? QString("https") : QString("https");
     server->setUrl(QString("rtsp://%1:%2").arg(myAddress).arg(port));
-    server->setApiUrl(QString("%1://%2:%3").arg(apiSheme).arg(myAddress).arg(port));
 }
 
 QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectionPtr ec2Connection)
@@ -2115,6 +2114,8 @@ void MediaServerProcess::run()
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
     bool isNewServerInstance = false;
     bool noSetupWizardFlag = MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0;
+    m_moduleFinder = new QnModuleFinder(false, compatibilityMode);
+    std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
     while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection);
@@ -2280,8 +2281,6 @@ void MediaServerProcess::run()
     qnCommon->setModuleInformation(selfInformation);
     qnCommon->bindModuleinformation(m_mediaServer);
 
-    m_moduleFinder = new QnModuleFinder(false, compatibilityMode);
-    std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
     ec2ConnectionFactory->setCompatibilityMode(compatibilityMode);
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
         QSet<QnUuid> allowedPeers;

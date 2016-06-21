@@ -20,7 +20,6 @@ class SocketAddress;
 class QnMediaServerResource : public QnResource
 {
     Q_OBJECT
-    Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
 
     typedef QnResource base_type;
 public:
@@ -34,9 +33,6 @@ public:
 
     //!Overrides \a QnResource::setName. Writes name to \a QnMediaServerUserAttributes
     virtual void setName( const QString& name ) override;
-
-    void setApiUrl(const QString& apiUrl);
-    QString getApiUrl() const;
 
     void setNetAddrList(const QList<SocketAddress>& value);
     QList<SocketAddress> getNetAddrList() const;
@@ -100,6 +96,8 @@ public:
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
 
+    QString getApiUrl() const;
+
     //!Returns realm to use in HTTP authentication
     QString realm() const;
 
@@ -124,10 +122,10 @@ private slots:
     void onRemoveResource(const QnResourcePtr &resource);
     void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
+    void onPrimaryAddressChanged(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
 signals:
     void portChanged(const QnResourcePtr &resource);
-    void apiUrlChanged(const QnResourcePtr &resource);
     void serverFlagsChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
     void auxUrlsChanged(const QnResourcePtr &resource);
@@ -135,10 +133,11 @@ signals:
     void systemNameChanged(const QnResourcePtr &resource);
     void redundancyChanged(const QnResourcePtr &resource);
     void backupScheduleChanged(const QnResourcePtr &resource);
+    void apiUrlChanged(const QnResourcePtr& resource);
+    
 private:
     QnMediaServerConnectionPtr m_apiConnection; // deprecated
     rest::QnConnectionPtr m_restConnection; // new one
-    QString m_apiUrl;
     QList<SocketAddress> m_netAddrList;
     QList<QUrl> m_additionalUrls;
     QList<QUrl> m_ignoredUrls;
