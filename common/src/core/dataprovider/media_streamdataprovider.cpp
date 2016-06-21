@@ -31,6 +31,20 @@ QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
     stop();
 }
 
+void QnAbstractMediaStreamDataProvider::setNeedKeyData(int channel)
+{
+    QnMutexLocker mtx( &m_mutex );
+
+    if (m_numberOfchannels == 0)
+    {
+        m_numberOfchannels = dynamic_cast<QnMediaResource*>(
+            m_mediaResource.data())->getVideoLayout(this)->channelCount();
+    }
+
+    if (m_numberOfchannels < CL_MAX_CHANNEL_NUMBER && channel < m_numberOfchannels)
+        m_gotKeyFrame[channel] = 0;
+}
+
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
     QnMutexLocker mtx( &m_mutex );

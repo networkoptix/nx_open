@@ -83,6 +83,7 @@
 #include "api/model/audit/audit_record.h"
 #include "health/system_health.h"
 #include <utils/common/credentials.h>
+#include <core/dataprovider/stream_mixer.h>
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -242,6 +243,11 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnLdapUser>();
     qRegisterMetaType<QnLdapUsers>();
+    qRegisterMetaType<QnChannelMapping>();
+    qRegisterMetaType<QList<QnChannelMapping>>();
+    qRegisterMetaType<QnResourceChannelMapping>();
+    qRegisterMetaType<QList<QnResourceChannelMapping>>();
+
 
     /*
      * Following code requires full-scale refactor in the classes that uses signals with such parameters.
@@ -312,6 +318,8 @@ void QnCommonMetaTypes::initialize() {
 
     QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();
     QnJsonSerializer::registerSerializer<QList<QnCredentials>>();
+    QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
+    QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
 
     qn_commonMetaTypes_initialized = true;
 }

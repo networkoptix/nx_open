@@ -184,7 +184,7 @@ void CLServerPushStreamReader::run()
             mFramesLost = 0;
         }
 
-        if (videoData && needKeyData())
+        if (videoData && needKeyData(videoData->channelNumber))
         {
             // I do not like; need to do smth with it
             if (videoData->flags & AV_PKT_FLAG_KEY)
@@ -233,7 +233,7 @@ void CLServerPushStreamReader::run()
         if (dataCanBeAccepted())
             putData(std::move(data));
         else
-            setNeedKeyData();
+            setNeedKeyData(data->channelNumber);
     }
 
     if (isStreamOpened())

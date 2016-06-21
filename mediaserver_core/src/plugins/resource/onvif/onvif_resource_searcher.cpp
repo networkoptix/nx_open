@@ -116,7 +116,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     resource->setDeviceOnvifUrl(deviceUrl);
 
     // optimization. do not pull resource every time if resource already in pool
-    if (rpResource && !rpResource->hasFlags(Qn::need_reinit_channels))
+    if (rpResource)
     {
         int channel = QUrlQuery(url.query()).queryItemValue(QLatin1String("channel")).toInt();
         
@@ -133,7 +133,14 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         if (channel > 0)
             resource->updateToChannel(channel-1);
 
-        if (rpResource->getMaxChannels() > 1 ) {
+        auto resData = qnCommon
+            ->dataPool()
+            ->data(rpResource->getVendor(), rpResource->getModel());
+
+        bool shouldAppearAsSingleChannel = resData.value<bool>(
+            Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+
+        if (rpResource->getMaxChannels() > 1  && !shouldAppearAsSingleChannel) {
             resource->setGroupId(rpResource->getPhysicalId());
             resource->setGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
         }
@@ -210,10 +217,11 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             //    resource->updateToChannel(channel-1);
             resList << resource;
             
+            bool shouldAppearAsSingleChannel = resData
+                .value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+
             // checking for multichannel encoders
-            if (doMultichannelCheck 
-                || resource->hasFlags(Qn::need_reinit_channels) 
-                || maxChannels != resource->getMaxChannels())
+            if (doMultichannelCheck && !shouldAppearAsSingleChannel)
             {
                 if (resource->getMaxChannels() > 1)
                 {
@@ -230,12 +238,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
                     res->setPhysicalId(resource->getPhysicalId());
                     res->update(resource, true);
                     res->updateToChannel(i);
-
-                    res->setFlags(res->flags() & ~Qn::need_reinit_channels);
                     resList << res;
                 }
-
-                resource->setFlags(resource->flags() & ~Qn::need_reinit_channels);
             }
         }
     }

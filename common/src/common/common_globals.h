@@ -315,7 +315,6 @@ public:
         read_only                   = 0x8000000,    /**< Resource is read-only by design, e.g. server in safe mode. */
 
         storage_fastscan            = 0x10000000,   /**< Fast scan for storage in progress */
-        need_reinit_channels        = 0x20000000,
 
         local_media = local | media,
         local_layout = local | layout,

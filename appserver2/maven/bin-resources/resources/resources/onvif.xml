@@ -3,8 +3,20 @@
     <oem name="OnvifDevice">
 		<resource name = "Pelco" public="OnvifDevice Camera"/>
 		<resource name = "PelcoOptera" public = "Pelco"/>
-        <resource name = "IMM12018" public="PelcoOptera"/>
-        <resource name = "IMM12027" public="PelcoOptera"/>
-        <resource name = "IMM12036" public="PelcoOptera"/>
+        <resource name = "IMM12018" public="PelcoOptera">
+			<params>
+				<param name="VideoLayout" default_value="width=3;height=1;sensors=0,1,2"/>
+			</params>
+		</resource>
+        <resource name = "IMM12027" public="PelcoOptera">
+			<params>
+				<param name="VideoLayout" default_value="width=4;height=1;sensors=0,1,2,3"/>
+			</params>
+		</resource>
+        <resource name = "IMM12036" public="PelcoOptera">
+			<params>
+				<param name="VideoLayout" default_value="width=5;height=1;sensors=0,1,2,3,4"/>
+			</params>
+		</resource>
     </oem>
 </resources>

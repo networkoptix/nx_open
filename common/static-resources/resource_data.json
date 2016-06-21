@@ -1060,6 +1060,136 @@
 				"Pelco|IMM12036"
 			],
 			"onvifVendorSubtype": "PelcoOptera"
+		},
+		{
+			"keys": [
+				"PelcoOptera|IMM12018","Pelco|IMM12018"
+			],
+			"multiresourceVideoChannelMapping": [
+				{
+					"resourceChannel": 2,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [2]
+						}
+					]
+				},
+				{
+					"resourceChannel": 3,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [1]
+						}
+					]
+				},
+				{
+					"resourceChannel": 4,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [0]
+						}
+					]
+				}
+			],
+			"shouldAppearAsSingleChannel": true,
+			"doNotAddVendorToDeviceName": true,
+			"videoLayout": "width=3;height=1;sensors=0,1,2"
+		},
+		{
+			"keys": [
+				"PelcoOptera|IMM12027","Pelco|IMM12027"
+			],
+			"multiresourceVideoChannelMapping": [
+				{
+					"resourceChannel": 2,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [2]
+						}
+					]
+				},
+				{
+					"resourceChannel": 3,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [1]
+						}
+					]
+				},
+				{
+					"resourceChannel": 4,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [0]
+						}
+					]
+				},
+				{
+					"resourceChannel": 5,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [3]
+						}
+					]
+				}
+			],
+			"shouldAppearAsSingleChannel": true,
+			"doNotAddVendorToDeviceName": true,
+			"videoLayout": "width=3;height=2;sensors=0,1,2,4,5,3",
+			"defaultAR":"4x3"
+		},
+		{
+			"keys": [
+				"PelcoOptera|IMM12036","Pelco|IMM12036"
+			],
+			"multiresourceVideoChannelMapping": [
+				{
+					"resourceChannel": 2,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [3]
+						}
+					]
+				},
+				{
+					"resourceChannel": 3,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [2]
+						}
+					]
+				},
+				{
+					"resourceChannel": 4,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [1]
+						}
+					]
+				},
+				{
+					"resourceChannel": 6,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [0]
+						}
+					]
+				}
+			],
+			"shouldAppearAsSingleChannel": true,
+			"doNotAddVendorToDeviceName": true,
+			"videoLayout": "width=4;height=1;sensors=0,1,2,3"
 		}
     ]
 }

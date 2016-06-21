@@ -1,8 +1,16 @@
 #include "optera_resource.h"
+#include "optera_data_provider.h"
+#include <plugins/resource/onvif/onvif_resource_information_fetcher.h>
 #include <utils/network/http/httpclient.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/resource_properties.h>
 
 namespace 
 {
+    const QString kOnvifResourceTypeName("ONVIF");
+
+    const QString kManufacture("PelcoOptera");
     const QString kOpteraDefaultLogin("admin");
     const QString kOpteraDefaultPassword("admin");
 
@@ -24,7 +32,7 @@ namespace
 
 QnOpteraResource::QnOpteraResource()
 {
-
+    qDebug() << "Creating Optera resource";
 }
 
 QnOpteraResource::~QnOpteraResource()
@@ -32,9 +40,44 @@ QnOpteraResource::~QnOpteraResource()
 
 }
 
+QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const 
+{
+    QN_UNUSED(dataProvider);
+
+    if (m_videoLayout)
+        ;//return m_videoLayout;
+
+    auto resData = qnCommon->dataPool()->data(getVendor(), getModel());
+    auto layoutStr = resData.value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
+
+    if (!layoutStr.isEmpty())
+    {
+        m_videoLayout = QnResourceVideoLayoutPtr(
+            QnCustomResourceVideoLayout::fromString(layoutStr));
+
+        qDebug() << "Optera's video layout" << m_videoLayout->toString();
+    }
+    else
+    {
+        m_videoLayout = QnResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout());
+    }
+
+    auto resourceId = getId();
+
+    propertyDictionary->setValue(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
+    propertyDictionary->saveParams(resourceId);
+
+    return m_videoLayout;
+}
+
 CameraDiagnostics::Result QnOpteraResource::initInternal()
 {
-    QUrl url = getUrl();
+    QString urlStr = getUrl();
+
+    if (!urlStr.startsWith("http://"))
+        urlStr = lit("http://") + urlStr;
+    
+    QUrl url = urlStr;
     auto auth = getAuth();
     auto firmware = getFirmware();
 
@@ -68,17 +111,23 @@ CameraDiagnostics::Result QnOpteraResource::initInternal()
 
     currentStitchingMode = getCurrentStitchingMode(response);
 
-    if (currentStitchingMode == kTiledMode)
+    if (currentStitchingMode == kTiledMode)    
         return base_type::initInternal();
-
-    setFlags(flags() | Qn::need_reinit_channels);
 
     status = makeSetStitchingModeRequest(http, kTiledMode);
 
     if (status != CL_HTTP_SUCCESS)
-        qDebug() << "Set stitching mode request failed";
+        qDebug() << "Set stitching mode request failed (it's normal)";
 
     return CameraDiagnostics::InitializationInProgress();
+}
+
+QnAbstractStreamDataProvider* QnOpteraResource::createLiveDataProvider()
+{
+    if (!isInitialized())
+        return nullptr;
+
+    return new QnOpteraDataProvider(toSharedPointer());
 }
 
 
@@ -109,7 +158,6 @@ CLHttpStatus QnOpteraResource::makeSetStitchingModeRequest(CLSimpleHTTPClient& h
         qWarning() << "Optera resource, can't open query file (set)";
         return CL_HTTP_BAD_REQUEST;
     }
-
 
     auto query = QString::fromLatin1(tpl.readAll());
     query = query.replace(kStitchingModeTplParam, mode);

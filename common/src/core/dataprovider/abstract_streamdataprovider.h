@@ -58,7 +58,7 @@ public:
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const { return QnConstResourceVideoLayoutPtr(); }
     virtual bool hasVideo() const { return true; }
-    bool needConfigureProvider() const;
+    virtual bool needConfigureProvider() const;
     virtual void startIfNotRunning(){ start(); }
     virtual QnAbstractVideoCamera* getOwner() const { return nullptr;}
 

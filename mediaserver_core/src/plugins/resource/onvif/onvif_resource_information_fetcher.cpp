@@ -254,9 +254,15 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     else
         return;
 
-    // checking for multichannel encoders
+
+    resourceData = qnCommon->dataPool()->data(res->getVendor(), res->getModel());
+    bool shouldAppearAsSingleChannel = 
+        resourceData.value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+
     QnPlOnvifResourcePtr onvifRes = existResource.dynamicCast<QnPlOnvifResource>();
-    if (onvifRes && onvifRes->getMaxChannels() > 1) 
+    
+    // checking for multichannel encoders
+    if(onvifRes && onvifRes->getMaxChannels() > 1 && !shouldAppearAsSingleChannel) 
     {
         QString groupName;
         QString groupId;
@@ -285,17 +291,17 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
                 subres->setName(res->getName() + QString(QLatin1String("-channel %1")).arg(i+1));
                 subres->setGroupId(groupId);
                 subres->setGroupName(groupName);
-                subres->setFlags(subres->flags() & ~Qn::need_reinit_channels);
                 result << subres;
             }
         }
-        res->setFlags(res->flags() & ~Qn::need_reinit_channels);
     }
 }
 
 QnUuid OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manufacturer, const QString&  model) const
 {
-    QnUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
+    const QString kOnvifManufacture("OnvifDevice");
+
+    QnUuid rt = qnResTypePool->getResourceTypeId(kOnvifManufacture, manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
     if (!rt.isNull())
         return rt;
     else if (isAnalogOnvifResource(manufacturer, model) && !onvifAnalogTypeId.isNull())
@@ -316,6 +322,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
 
     manufacturerAlias = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
 
+    bool doNotAddVendorToDeviceName = resData.value<bool>(Qn::DO_NOT_ADD_VENDOR_TO_DEVICE_NAME);
+
     QnPlOnvifResourcePtr resource = createOnvifResourceByManufacture(manufacturerAlias);
     if (!resource)
         return resource;
@@ -324,7 +332,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
 
     resource->setHostAddress(QHostAddress(sender).toString());
     resource->setModel(model);
-    if (isModelContainVendor(manufacturerAlias, model))
+    if ( isModelContainVendor(manufacturerAlias, model) 
+         || doNotAddVendorToDeviceName)
         resource->setName(model); 
     else
         resource->setName(manufacturer + model); 
@@ -333,6 +342,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
     resource->setFirmware(firmware);
 
     resource->setPhysicalId(uniqId);
+    resource->setUrl(deviceUrl);
     resource->setDeviceOnvifUrl(deviceUrl);
 
     if (!login.isEmpty())
