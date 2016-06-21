@@ -2,7 +2,6 @@ import os, sys, subprocess, shutil
 from subprocess import Popen, PIPE
 from os.path import dirname, join, exists, isfile
 
-
 bin_source_dir = '${libdir}/${arch}/bin/${build.configuration}'
 server_msi_folder = 'bin/msi'
 client_msi_folder = 'bin/msi'
@@ -14,9 +13,6 @@ wix_pdb = 'EVEMediaPlayerSetup.wixpdb'
 server_msi_name = '${finalName}-server-only.msi'
 client_msi_name = '${finalName}-client-only.msi'
 nxtool_msi_name = '${finalName}-servertool.msi'
-
-client_only_type = 'client-only'
-server_only_type = 'server_only'
 
 wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtension', 'wixext\WixSystemToolsExtension']
 common_components = ['MyExitDialog', 'UpgradeDlg', 'SelectionWarning', 'vs2015crt']
@@ -33,7 +29,11 @@ def add_components(command, components):
     for component in components:
         command.append('{0}.wxs'.format(component))
 
-def get_candle_command(install_type, suffix):
+def get_candle_command(suffix):
+    install_type = 'client-only'
+    if suffix.startswith('server'):
+        install_type = 'server-only'
+
     command = ['candle']
     command.append('-dinstalltype="{0}"'.format(install_type))
     command.append('-dVs2015crtDir=${Vs2015crtDir}')   
@@ -43,23 +43,24 @@ def get_candle_command(install_type, suffix):
     command.append('-out')
     command.append('obj\\${build.configuration}-{0}\\'.format(suffix))
 
-    if install_type == client_only_type:
+    if suffix.startswith('client'):
         command.append('-dClientQmlDir=${ClientQmlDir}')
         command.append('-dClientHelpSourceDir=${ClientHelpSourceDir}')
         command.append('-dClientFontsDir=${ClientFontsDir}')
         command.append('-dClientBgSourceDir=${ClientBgSourceDir}')
-
-    if install_type == server_only_type:
-        command.append('-dDbSync22SourceDir=${DbSync22Dir}')
-
-    add_wix_extensions(command)
-    add_components(command, common_components)
-    if install_type == client_only_type:
         add_components(command, client_components)
 
-    if install_type == server_only_type:
+    if suffix.startswith('server'):
+        command.append('-dDbSync22SourceDir=${DbSync22Dir}')
         add_components(command, server_components)
 
+    if suffix.startswith('nxtool'):
+        command.append('-dNxtoolQuickControlsDir=${NxtoolQuickControlsDir}')
+        command.append('-dNxtoolQmlDir=${project.build.directory}\\nxtoolqml')
+        add_components(command, nxtool_components)
+        
+    add_wix_extensions(command)
+    add_components(command, common_components)
     command.append('Product-{0}.wxs'.format(suffix))
 
     return command
@@ -92,6 +93,7 @@ def get_iss_command():
     command.append('/obin')
     command.append('/f${finalName}')
     command.append('Product-full.iss')
+    return command
     
 def execute_command(command):
     print 'Executing command:\n{0}\n'.format(command)
@@ -100,58 +102,57 @@ def execute_command(command):
     if retcode != 0 and retcode != 204:
         sys.exit(1)
     
-commands = [
-    get_candle_command(client_only_type, 'client-only'),
-    get_light_command(client_msi_folder, client_msi_name, 'client-only'),
-    get_fix_dialog_command(client_msi_folder, client_msi_name),
+def main():
+    commands = [
+        get_candle_command('client-only'),
+        get_light_command(client_msi_folder, client_msi_name, 'client-only'),
+        get_fix_dialog_command(client_msi_folder, client_msi_name),
 
-    get_candle_command(server_only_type, 'server-only'),
-    get_light_command(client_msi_folder, client_msi_name, 'server-only'),
-    get_fix_dialog_command(server_msi_folder, server_msi_name),
+        get_candle_command('server-only'),
+        get_light_command(server_msi_folder, server_msi_name, 'server-only'),
+        get_fix_dialog_command(server_msi_folder, server_msi_name),
 
-    get_candle_command(client_only_type, 'client-strip'),
-    get_light_command(client_msi_strip_folder, client_msi_name, 'client-strip'),
-    get_fix_dialog_command(client_msi_strip_folder, client_msi_name),
+        get_candle_command('client-strip'),
+        get_light_command(client_msi_strip_folder, client_msi_name, 'client-strip'),
+        get_fix_dialog_command(client_msi_strip_folder, client_msi_name),
 
-    get_candle_command(server_only_type, 'server-strip'),
-    get_light_command(server_msi_strip_folder, server_msi_name, 'server-strip'),
-    get_fix_dialog_command(server_msi_strip_folder, server_msi_name)
-]
-if '${nxtool}' == 'true':
-    candle_command = get_candle_command(client_only_type, 'nxtool')
-    candle_command.append('-dNxtoolQuickControlsDir=${NxtoolQuickControlsDir}')
-    candle_command.append('-dNxtoolQmlDir=${project.build.directory}\\nxtoolqml')
-    add_components(candle_command, nxtool_components)
-    commands.append(candle_command)
+        get_candle_command('server-strip'),
+        get_light_command(server_msi_strip_folder, server_msi_name, 'server-strip'),
+        get_fix_dialog_command(server_msi_strip_folder, server_msi_name)
+    ]
+    if '${nxtool}' == 'true':
+        commands.append(get_candle_command('nxtool'))
+        commands.append(get_light_command(nxtool_msi_folder, nxtool_msi_name, 'nxtool'))
+        commands.append(get_fix_dialog_command(nxtool_msi_folder, nxtool_msi_name))
 
-    commands.append(get_light_command(nxtool_msi_folder, nxtool_msi_name, 'nxtool'))
-    commands.append(get_fix_dialog_command(nxtool_msi_folder, nxtool_msi_name))
+    for command in commands:
+        execute_command(command)
 
-for command in commands:
-    execute_command(command)
+    client_msi_product_code = subprocess.check_output('cscript //NoLogo productcode.js %s\\%s' % (client_msi_strip_folder, client_msi_name)).strip()
+    server_msi_product_code = subprocess.check_output('cscript //NoLogo productcode.js %s\\%s' % (server_msi_strip_folder, server_msi_name)).strip()
 
-client_msi_product_code = subprocess.check_output('cscript //NoLogo productcode.js %s\\%s' % (client_msi_strip_folder, client_msi_name)).strip()
-server_msi_product_code = subprocess.check_output('cscript //NoLogo productcode.js %s\\%s' % (server_msi_strip_folder, server_msi_name)).strip()
+    assert(len(client_msi_product_code) > 0)
+    assert(len(server_msi_product_code) > 0)
 
-assert(len(client_msi_product_code) > 0)
-assert(len(server_msi_product_code) > 0)
+    with open('generated_variables.iss', 'w') as f:
+        print >> f, '#define ServerMsiFolder "%s"' % server_msi_strip_folder
+        print >> f, '#define ClientMsiFolder "%s"' % client_msi_strip_folder
+        print >> f, '#define ServerMsiName "%s"' % server_msi_name
+        print >> f, '#define ClientMsiName "%s"' % client_msi_name
+        print >> f, '#define ServerMsiProductCode "%s"' % server_msi_product_code
+        print >> f, '#define ClientMsiProductCode "%s"' % client_msi_product_code
 
-with open('generated_variables.iss', 'w') as f:
-    print >> f, '#define ServerMsiFolder "%s"' % server_msi_strip_folder
-    print >> f, '#define ClientMsiFolder "%s"' % client_msi_strip_folder
-    print >> f, '#define ServerMsiName "%s"' % server_msi_name
-    print >> f, '#define ClientMsiName "%s"' % client_msi_name
-    print >> f, '#define ServerMsiProductCode "%s"' % server_msi_product_code
-    print >> f, '#define ClientMsiProductCode "%s"' % client_msi_product_code
+    execute_command(get_iss_command())
 
-execute_command(get_iss_command())
+    if os.path.exists(join(bin_source_dir, '${product.name} Launcher.exe')):
+        os.unlink(join(bin_source_dir, '${product.name} Launcher.exe'))
+    if os.path.exists(join(bin_source_dir, 'applauncher.exe')):
+        shutil.copy2(join(bin_source_dir, 'applauncher.exe'), join(bin_source_dir, '${product.name} Launcher.exe'))
 
-if os.path.exists(join(bin_source_dir, '${product.name} Launcher.exe')):
-    os.unlink(join(bin_source_dir, '${product.name} Launcher.exe'))
-if os.path.exists(join(bin_source_dir, 'applauncher.exe')):
-    shutil.copy2(join(bin_source_dir, 'applauncher.exe'), join(bin_source_dir, '${product.name} Launcher.exe'))
+    if os.path.exists(join(bin_source_dir, '${product.name}.exe')):
+        os.unlink(join(bin_source_dir, '${product.name}.exe'))
+    if os.path.exists(join(bin_source_dir, 'client.bin.exe')):
+        shutil.copy2(join(bin_source_dir, 'client.bin.exe'), join(bin_source_dir, '${product.name}.exe'))
 
-if os.path.exists(join(bin_source_dir, '${product.name}.exe')):
-    os.unlink(join(bin_source_dir, '${product.name}.exe'))
-if os.path.exists(join(bin_source_dir, 'client.bin.exe')):
-    shutil.copy2(join(bin_source_dir, 'client.bin.exe'), join(bin_source_dir, '${product.name}.exe'))
+if __name__ == '__main__':
+    main()
