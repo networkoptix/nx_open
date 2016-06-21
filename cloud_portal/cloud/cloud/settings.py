@@ -196,11 +196,12 @@ CLOUD_CONNECT = {
 # read more: https://docs.python.org/3/library/ipaddress.html
 IP_WHITELISTS = {
     'local': (
-        '127.0.0.1',  # localhost
-        '74.7.76.98',  # LA office
-        '95.31.136.2',  # Moscow office
+        '127.0.0.1',        # localhost
+        '74.7.76.98',       # LA office
+        '95.31.136.2',      # Moscow office
         '172.17.0.0/16',    # Docker
-        '10.0.0.0/16' # Aws VPC
+        '192.168.0.0/16',   # local network
+        '10.0.0.0/16'       # Aws VPC
         )
 }
 
@@ -229,7 +230,7 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 PASSWORD_REQUIREMENTS = {
     'minLength': 8,
-    'requiredRegex': re.compile("^[\x21-\x7E][\x20-\x7E]+[\x21-\x7E]$"),
+    'requiredRegex': re.compile("^[\x21-\x7E]|[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$"),
     'commonList': 'static/scripts/commonPasswordsList.json'
 }
 
