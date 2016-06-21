@@ -22,7 +22,7 @@ GetListeningPeerListHandler::GetListeningPeerListHandler(
 }
 
 void GetListeningPeerListHandler::processRequest(
-    const nx_http::HttpServerConnection& /*connection*/,
+    nx_http::HttpServerConnection* const /*connection*/,
     const nx_http::Request& /*request*/,
     stree::ResourceContainer /*authInfo*/)
 {

@@ -7,13 +7,17 @@
 
 #include <chrono>
 
+#include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <http/custom_headers.h>
-#include <nx/utils/log/log.h>
-#include <nx/network/http/auth_tools.h>
+#include <nx_ec/dummy_handler.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/app_info.h>
 #include <utils/common/sync_call.h>
+
+#include <nx/network/http/auth_tools.h>
+#include <nx/utils/log/log.h>
 
 #include "cdb_nonce_fetcher.h"
 #include "cloud/cloud_connection_manager.h"
@@ -112,10 +116,17 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
                 .arg(nx_http::header::AuthScheme::toString(authorizationHeader.authScheme)),
                 cl_logDEBUG2);
         }
-        return m_defaultAuthenticator->authorize(
-            method,
-            authorizationHeader,
-            responseHeaders);
+        const std::tuple<Qn::AuthResult, QnResourcePtr> authResult =
+            m_defaultAuthenticator->authorize(
+                method,
+                authorizationHeader,
+                responseHeaders);
+        if (std::get<0>(authResult) == Qn::Auth_OK)
+        {
+            const auto authResource = std::get<1>(authResult).dynamicCast<QnUserResource>();
+            if (authResource && !authResource->isCloud())
+                return authResult;
+        }
     }
 
     const auto nonce = authorizationHeader.digest->params["nonce"];
@@ -173,6 +184,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     }
 
     return authorizeWithCacheItem(
+        &lk,
         cachedIter->second,
         cloudNonce,
         nonceTrailer,
@@ -218,21 +230,11 @@ QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
             return (res.dynamicCast<QnUserResource>() != nullptr) &&
                    (res->getName() == userNameQString);
         });
+
     if (res)
         return res.staticCast<QnUserResource>();
 
-    switch (cloudAccessRole)
-    {
-        case nx::cdb::api::SystemAccessRole::owner:
-        case nx::cdb::api::SystemAccessRole::cloudAdmin:
-        case nx::cdb::api::SystemAccessRole::localAdmin:
-            return qnResPool->getAdministrator();
-
-        //TODO #ak resolve maintenance and viewer roles
-
-        default:
-            return QnUserResourcePtr();
-    }
+    return createCloudUser(userNameQString, cloudAccessRole);
 }
 
 void CloudUserAuthenticator::fetchAuthorizationFromCloud(
@@ -317,6 +319,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
 }
 
 std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithCacheItem(
+    QnMutexLockerBase* const /*lock*/,
     const CloudAuthenticationData& cacheItem,
     const nx_http::StringType& cloudNonce,
     const nx_http::StringType& nonceTrailer,
@@ -373,6 +376,55 @@ void CloudUserAuthenticator::onSystemAccessListUpdated(
 {
     NX_LOGX(lm("Received SystemAccessListModified event"), cl_logDEBUG1);
     //TODO #ak
+}
+
+QnUserResourcePtr CloudUserAuthenticator::createCloudUser(
+    const QString& userName,
+    nx::cdb::api::SystemAccessRole cloudAccessRole) const
+{
+    NX_LOGX(lit("Adding cloud user %1 to DB, accessRole %2")
+        .arg(userName).arg((int)cloudAccessRole), cl_logDEBUG1);
+
+    ec2::ApiUserData userData;
+    userData.id = QnUuid::createUuid();
+    userData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
+    userData.name = userName;
+    //TODO #ak isAdmin is used to find resource to fetch system settings from, so let there be only one...
+    userData.isAdmin = false;   //cloudAccessRole == nx::cdb::api::SystemAccessRole::owner;
+    switch (cloudAccessRole)
+    {
+        case nx::cdb::api::SystemAccessRole::liveViewer:
+            userData.permissions = Qn::GlobalLiveViewerPermissionSet;
+            break;
+        case nx::cdb::api::SystemAccessRole::viewer:
+            userData.permissions = Qn::GlobalViewerPermissionSet;
+            break;
+        case nx::cdb::api::SystemAccessRole::advancedViewer:
+            userData.permissions = Qn::GlobalAdvancedViewerPermissionSet;
+            break;
+        case nx::cdb::api::SystemAccessRole::cloudAdmin:
+        case nx::cdb::api::SystemAccessRole::maintenance:   //TODO #ak need a separate role for integrator
+        case nx::cdb::api::SystemAccessRole::owner:
+        case nx::cdb::api::SystemAccessRole::localAdmin:
+            userData.permissions = Qn::GlobalAdminPermissionsSet;
+            break;
+    }
+
+    //userData.groupId = ;
+    userData.email = userName;
+    userData.realm = QnAppInfo::realm();
+    userData.isEnabled = true;
+    userData.isCloud = true;
+    userData.fullName = userName;
+    userData.digest = "invalid_digest";
+    userData.hash = "invalid_hash";
+    bool result = QnAppServerConnectionFactory::getConnection2()
+        ->getUserManager(Qn::kDefaultUserAccess)->save(
+            userData, QnUuid::createUuid().toString(),  //using random password because cloud account password is used to authenticate request
+            ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    auto resource = ec2::fromApiToResource(userData);
+    qnResPool->addResource(resource);
+    return resource;
 }
 
 void CloudUserAuthenticator::cloudBindingStatusChanged(bool /*boundToCloud*/)

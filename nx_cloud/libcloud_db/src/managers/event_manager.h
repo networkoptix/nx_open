@@ -8,6 +8,11 @@
 #include <map>
 #include <memory>
 
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/identity.hpp>
+#include <boost/multi_index/member.hpp>
+
 #include <cdb/result_code.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/http/abstract_msg_body_source.h>
@@ -46,7 +51,7 @@ public:
         nx_http::MessageDispatcher* const httpMessageDispatcher);
 
     void subscribeToEvents(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* connection,
         const AuthorizationInfo& authzInfo,
         nx::utils::MoveOnlyFunc<
             void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
@@ -58,29 +63,54 @@ private:
     class ServerConnectionContext
     {
     public:
+        const nx_http::HttpServerConnection* httpConnection;
         nx_http::MultipartMessageBodySource* msgBody;
-        nx::network::aio::Timer timer;
+        std::unique_ptr<nx::network::aio::Timer> timer;
+        const std::string systemId;
 
-        ServerConnectionContext()
+        ServerConnectionContext(
+            const nx_http::HttpServerConnection* _httpConnection,
+            const std::string& _systemId)
         :
-            msgBody(nullptr)
+            httpConnection(_httpConnection),
+            msgBody(nullptr),
+            systemId(_systemId)
         {
         }
     };
 
-    typedef std::multimap<std::string, std::unique_ptr<ServerConnectionContext>> 
-        MediaServerConnectionContainer;
+    typedef boost::multi_index::multi_index_container<
+        ServerConnectionContext,
+        boost::multi_index::indexed_by<
+            //indexing by http connection
+            boost::multi_index::ordered_unique<
+                boost::multi_index::member<
+                    ServerConnectionContext,
+                    const nx_http::HttpServerConnection*,
+                    &ServerConnectionContext::httpConnection >>,
+            //indexing by system id
+            boost::multi_index::ordered_non_unique<
+                boost::multi_index::member<
+                    ServerConnectionContext,
+                    const std::string,
+                    &ServerConnectionContext::systemId >>
+        >
+    > MediaServerConnectionContainer;
+
+    constexpr static const int kServerContextByConnectionIndex = 0;
+    constexpr static const int kServerContextBySystemIdIndex = 1;
 
     const conf::Settings& m_settings;
     QnCounter m_startedAsyncCallsCounter;
-    //map<systemId, context>
     MediaServerConnectionContainer m_activeMediaServerConnections;
     mutable QnMutex m_mutex;
 
     void beforeMsgBodySourceDestruction(
         MediaServerConnectionContainer::iterator serverConnectionIter);
+    void onConnectionToPeerLost(
+        MediaServerConnectionContainer::iterator serverConnectionIter);
     void onMediaServerIdlePeriodExpired(
-        EventManager::MediaServerConnectionContainer::iterator serverConnectionIter);
+        MediaServerConnectionContainer::iterator serverConnectionIter);
 };
 
 }   //namespace cdb

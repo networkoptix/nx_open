@@ -16,7 +16,7 @@ namespace media {
 
 namespace {
 
-QSize mediaSizeFromRawData(const QnConstCompressedVideoDataPtr& frame)
+static QSize mediaSizeFromRawData(const QnConstCompressedVideoDataPtr& frame)
 {
     switch (frame->context->getCodecId())
     {
@@ -218,6 +218,18 @@ int SeamlessVideoDecoder::currentFrameNumber() const
 {
     Q_D(const SeamlessVideoDecoder);
     return d->frameNumber;
+}
+
+QSize SeamlessVideoDecoder::currentResolution() const
+{
+    Q_D(const SeamlessVideoDecoder);
+    return d->prevFrameInfo.size;
+}
+
+CodecID SeamlessVideoDecoder::currentCodec() const
+{
+    Q_D(const SeamlessVideoDecoder);
+    return d->prevFrameInfo.codec;
 }
 
 } // namespace media

@@ -23,12 +23,12 @@ using nx::hpm::MediaServerEmulator;
 
 constexpr const std::chrono::seconds kDefaultTestTimeout = std::chrono::seconds(15);
 
-class TunnelConnector
+class UdpTunnelConnector
 :
     public ::testing::Test
 {
 public:
-    ~TunnelConnector()
+    ~UdpTunnelConnector()
     {
         if (m_oldFactoryFunc)
             ConnectorFactory::setFactoryFunc(std::move(*m_oldFactoryFunc));
@@ -150,7 +150,7 @@ private:
     }
 };
 
-TEST_F(TunnelConnector, general)
+TEST_F(UdpTunnelConnector, general)
 {
     //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
@@ -165,7 +165,7 @@ TEST_F(TunnelConnector, general)
     connectResult.connection->pleaseStopSync();
 }
 
-TEST_F(TunnelConnector, noSynAck)
+TEST_F(UdpTunnelConnector, noSynAck)
 {
     //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
@@ -178,7 +178,7 @@ TEST_F(TunnelConnector, noSynAck)
     ASSERT_EQ(nullptr, connectResult.connection);
 }
 
-TEST_F(TunnelConnector, badSynAck)
+TEST_F(UdpTunnelConnector, badSynAck)
 {
     //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
@@ -193,7 +193,7 @@ TEST_F(TunnelConnector, badSynAck)
 
 //currently, this test requires hack in UnreliableMessagePipeline::messageSent:
 //  errorCode have to be set to SystemError::connectionReset
-//TEST_F(TunnelConnector, remotePeerUdpPortNotAccessible)
+//TEST_F(UdpTunnelConnector, remotePeerUdpPortNotAccessible)
 //{
 //    //starting mediator
 //    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
@@ -206,7 +206,7 @@ TEST_F(TunnelConnector, badSynAck)
 //    ASSERT_EQ(nullptr, connectResult.connection);
 //}
 
-TEST_F(TunnelConnector, timeout)
+TEST_F(UdpTunnelConnector, timeout)
 {
     //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
@@ -242,7 +242,7 @@ TEST_F(TunnelConnector, timeout)
     }
 }
 
-TEST_F(TunnelConnector, target_host_not_found)
+TEST_F(UdpTunnelConnector, target_host_not_found)
 {
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
@@ -262,7 +262,7 @@ TEST_F(TunnelConnector, target_host_not_found)
     ASSERT_EQ(nullptr, connectResult.connection);
 }
 
-TEST_F(TunnelConnector, cancellation)
+TEST_F(UdpTunnelConnector, cancellation)
 {
     const std::chrono::seconds totalTestTime(10);
 
@@ -296,7 +296,7 @@ TEST_F(TunnelConnector, cancellation)
 /** problem: server peer does not see connecting peer 
     on the same address that mediator sees connecting peer
 */
-TEST_F(TunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
+TEST_F(UdpTunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
 {
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
@@ -343,13 +343,12 @@ TEST_F(TunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
         connectionRequestedFuture.wait_for(std::chrono::seconds(7)));
 
     const auto connectionRequestedEvent = connectionRequestedFuture.get();
-    ASSERT_EQ(1, connectionRequestedEvent.udpEndpointList.size());
-    ASSERT_EQ(
-        HostAddress("192.168.0.1"),
-        connectionRequestedEvent.udpEndpointList.begin()->address);
-    ASSERT_EQ(
-        connector.localAddress().port,
-        connectionRequestedEvent.udpEndpointList.begin()->port);
+    ASSERT_TRUE(
+        std::find(
+            connectionRequestedEvent.udpEndpointList.begin(),
+            connectionRequestedEvent.udpEndpointList.end(),
+            SocketAddress(HostAddress("192.168.0.1"), connector.localAddress().port)) !=
+        connectionRequestedEvent.udpEndpointList.end());
 
     connector.pleaseStopSync();
 }

@@ -75,6 +75,7 @@ public:
 
     virtual void setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution = QSize()) = 0;
     virtual MediaQuality getQuality() const = 0;
+    virtual CodecID getTranscodingCodec() const = 0;
 
     virtual void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate) = 0;
 

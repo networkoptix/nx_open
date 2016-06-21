@@ -16,28 +16,34 @@ namespace api {
 
 class NX_NETWORK_API ResolveDomainRequest
 :
-    public StunMessageData
+    public StunRequestData
 {
 public:
+    constexpr static const stun::cc::methods::Value kMethod =
+        stun::cc::methods::resolveDomain;
+
     nx::String domainName;
 
     ResolveDomainRequest(nx::String domainName_ = {});
 
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
  
 class NX_NETWORK_API ResolveDomainResponse
 :
-    public StunMessageData
+    public StunResponseData
 {
 public:
+    constexpr static const stun::cc::methods::Value kMethod =
+        stun::cc::methods::resolveDomain;
+
     std::vector<nx::String> hostNames;
 
     ResolveDomainResponse(std::vector<nx::String> hostNames_ = {});
 
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
 } // namespace api

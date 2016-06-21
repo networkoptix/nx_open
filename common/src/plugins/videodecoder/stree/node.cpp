@@ -47,11 +47,11 @@ namespace stree
         const int intVal = resPresentInInputData ? 1 : 0;
         if (!m_children[intVal])
         {
-            NX_LOG(lit("Stree. Presence Condition. Could not find child by value %1").arg(value.toString()), cl_logDEBUG2);
+            NX_LOG(lit("Stree. Presence Condition. Could not find child by value %1").arg(intVal), cl_logDEBUG2);
             return;
         }
 
-        NX_LOG(lit("Stree. Presence Condition. Found child by search value %1").arg(value.toString()), cl_logDEBUG2);
+        NX_LOG(lit("Stree. Presence Condition. Found child by search value %1").arg(intVal), cl_logDEBUG2);
         m_children[intVal]->get(in, out);
     }
 

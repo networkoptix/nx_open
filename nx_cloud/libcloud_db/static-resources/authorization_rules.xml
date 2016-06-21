@@ -160,13 +160,13 @@
                             <set value="owner" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
-                    <sequence value="/auth/get_authentication">
+                    <sequence value="/cdb/auth/get_authentication">
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.systemID" matchType="presence">
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
-                    <sequence value="/auth/get_nonce">
+                    <sequence value="/cdb/auth/get_nonce">
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.systemID" matchType="presence">
                             <set value="true" resName="authorized" resValue="true"/>
@@ -183,8 +183,23 @@
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
+                    <condition value="/cdb/account/create_temporary_credentials" resName="auth.accountEmail" matchType="presence">
+                        <set value="false" resName="authorized" resValue="false"/>
+                    </condition>
                 </condition>
             </condition>
-        </sequence>
-    </condition>
+        </sequence>     <!-- authorization -->
+
+        <condition value="getTemporaryCredentialsParameters" resName="credentials.type">
+            <sequence value="short">
+                <set resName="credentials.expirationPeriod" resValue="60m"/>
+                <set resName="credentials.prolongationPeriod" resValue="10m"/>
+            </sequence>
+
+            <sequence value="long">
+                <set resName="credentials.expirationPeriod" resValue="30d"/>
+            </sequence>
+        </condition>
+
+    </condition>        <!-- operation -->
 </sequence>

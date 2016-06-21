@@ -29,7 +29,7 @@ ProxyHandler::~ProxyHandler()
 }
 
 void ProxyHandler::processRequest(
-    const nx_http::HttpServerConnection& connection,
+    nx_http::HttpServerConnection* const connection,
     stree::ResourceContainer authInfo,
     nx_http::Request request,
     nx_http::Response* const response,
@@ -47,7 +47,7 @@ void ProxyHandler::processRequest(
     if (pathItems.isEmpty())
     {
         NX_LOGX(lm("Failed to find address string in request path %1 received from %2")
-            .arg(path).arg(connection.socket()->getForeignAddress().toString()),
+            .arg(path).arg(connection->socket()->getForeignAddress().toString()),
             cl_logDEBUG1);
         completionHandler(nx_http::StatusCode::forbidden, nullptr);
         return;
@@ -67,7 +67,7 @@ void ProxyHandler::processRequest(
 
     //connecting to the target host
     m_targetPeerSocket = SocketFactory::createStreamSocket();
-    m_targetPeerSocket->bindToAioThread(connection.getAioThread());
+    m_targetPeerSocket->bindToAioThread(connection->getAioThread());
     if (!m_targetPeerSocket->setNonBlockingMode(true) ||
         !m_targetPeerSocket->setRecvTimeout(m_settings.tcp().recvTimeout) ||
         !m_targetPeerSocket->setSendTimeout(m_settings.tcp().sendTimeout))

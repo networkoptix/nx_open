@@ -15,6 +15,7 @@
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/move_only_func.h>
 #include <utils/common/stoppable.h>
+#include <nx/utils/log/log.h>
 
 #include "stream_socket_server.h"
 

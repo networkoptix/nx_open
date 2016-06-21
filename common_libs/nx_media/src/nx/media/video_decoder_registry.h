@@ -16,10 +16,10 @@ class AbstractVideoDecoder;
 typedef std::unique_ptr<AbstractVideoDecoder, void(*)(AbstractVideoDecoder*)> VideoDecoderPtr;
 
 /**
- * This class allows to register various implementations for video decoders. Exact list of decoders
- * can be registered in runtime mode.
+ * Allows to register various implementations for video decoders. The exact list of decoders can be
+ * registered in runtime.
  */
-class VideoDecoderRegistry
+class VideoDecoderRegistry // singleton
 {
 public:
     static VideoDecoderRegistry* instance();
@@ -34,6 +34,15 @@ public:
      * @return True if compatible video decoder found.
      */
     bool hasCompatibleDecoder(const CodecID codec, const QSize& resolution);
+
+    /**
+     * @return Some sort of a maximum for all resolutions returned for the codec by
+     * AbstractVideoDecoder::maxResolution(), or (0, 0) if it cannot be determined.
+     */
+    QSize maxResolution(const CodecID codec);
+
+    bool isLiteClientMode() const;
+    void setLiteClientMode(bool liteMode);
 
     /**
      * Register video decoder plugin.
@@ -59,6 +68,7 @@ private:
         std::function<AbstractVideoDecoder* (
             const ResourceAllocatorPtr& allocator, const QSize& resolution)> createVideoDecoder;
         std::function<bool (const CodecID codec, const QSize& resolution)> isCompatible;
+        std::function<QSize (const CodecID codec)> maxResolution;
         ResourceAllocatorPtr allocator;
         int useCount;
         int maxUseCount;
@@ -75,12 +85,15 @@ private:
                     return new Decoder(allocator, resolution);
                 };
             isCompatible = &Decoder::isCompatible;
+            maxResolution = &Decoder::maxResolution;
             this->allocator = std::move(allocator);
             this->maxUseCount = maxUseCount;
         }
     };
 
     std::vector<Metadata> m_plugins;
+
+    bool m_isLiteClientMode;
 };
 
 } // namespace media

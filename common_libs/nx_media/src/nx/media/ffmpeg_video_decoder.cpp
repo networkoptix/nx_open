@@ -152,6 +152,13 @@ bool FfmpegVideoDecoder::isCompatible(const CodecID codec, const QSize& resoluti
     return true;
 }
 
+QSize FfmpegVideoDecoder::maxResolution(const CodecID codec)
+{
+    QN_UNUSED(codec);
+
+    return s_maxResolution;
+}
+
 int FfmpegVideoDecoder::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* outDecodedFrame)
 {
@@ -267,6 +274,11 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
 #endif
 
     result->reset(videoFrame);
+}
+
+void FfmpegVideoDecoder::setMaxResolution(const QSize& maxResolution)
+{
+    s_maxResolution = maxResolution;
 }
 
 } // namespace media

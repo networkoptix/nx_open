@@ -76,7 +76,8 @@ public:
     /**
      * \return                      Server where camera was recorded on specified time.
      * \param camera                Camera to find
-     * \param timestamp             Timestamp in milliseconds to find
+     * \param timestampMs           Timestamp in milliseconds to find
+     * TODO: Fix params doc: foundPeriod and allowOfflineServers.
      * \param allowOfflineServers   Drop out offline media servers if parameter is false
      */
     QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0) const;
