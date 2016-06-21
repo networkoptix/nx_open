@@ -140,7 +140,7 @@ void QnResourceAccessManager::setAccessibleResources(const QnUuid& userId, const
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr& user) const
 {
-    NX_ASSERT(user, Q_FUNC_INFO, "We must not request permissions for absent user.");
+    //NX_ASSERT(user, Q_FUNC_INFO, "We must not request permissions for absent user.");
     if (!user)
         return Qn::NoGlobalPermissions;
 
@@ -189,7 +189,7 @@ bool QnResourceAccessManager::hasGlobalPermission(const QnUserResourcePtr& user,
 
 Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& user, const QnResourcePtr& resource) const
 {
-    NX_ASSERT(user && resource, Q_FUNC_INFO, "We must not request permissions for absent resources.");
+    //NX_ASSERT(user && resource, Q_FUNC_INFO, "We must not request permissions for absent resources.");
     if (!user || !resource)
         return Qn::NoPermissions;
 
