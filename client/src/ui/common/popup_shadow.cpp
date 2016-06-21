@@ -329,6 +329,7 @@ bool QnPopupShadow::eventFilter(QObject* object, QEvent* event)
 
             case QEvent::Hide:
             {
+                d->shadow->setGeometry(0, 0, 1, 1); // for immediate hide
                 executeDelayedParented([d]() { d->shadow->hide(); }, 1, d->shadow);
                 break;
             }
