@@ -6,7 +6,7 @@
 
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="$(var.customization)NxtoolDir" Name="Nxtool">
-                <Component Id="DefaultLanguage">
+                <Component Id="NxtoolDefaultLanguage">
                     <RegistryKey Root="HKCU"
                              Key="Software\[Manufacturer]\$(var.nxtoolName)">
                         <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_$(var.translation1).qm"/>
@@ -23,21 +23,21 @@
                     </Shortcut>                
                 </Component>                            
 
-                <Directory Id="Platforms" Name="platforms">
+                <Directory Id="NxtoolPlatforms" Name="platforms">
                 </Directory>                    
 
-                <Directory Id="Qml" Name="qml">
-                    <Directory Id="QtQuick" Name="QtQuick">
-                        <Directory Id="QtQuickControls" Name="Controls">                        
+                <Directory Id="NxtoolQml" Name="qml">
+                    <Directory Id="NxtoolQtQuick" Name="QtQuick">
+                        <Directory Id="NxtoolQtQuickControls" Name="Controls">                        
                         </Directory> 
-                        <Directory Id="QtQuickDialogs" Name="Dialogs">                        
+                        <Directory Id="NxtoolQtQuickDialogs" Name="Dialogs">                        
                         </Directory> 
-                        <Directory Id="QtQuickLayouts" Name="Layouts">                        
+                        <Directory Id="NxtoolQtQuickLayouts" Name="Layouts">                        
                         </Directory>  
-                        <Directory Id="QtQuickWindow2" Name="Window.2">                        
+                        <Directory Id="NxtoolQtQuickWindow2" Name="Window.2">                        
                         </Directory> 
                     </Directory>   
-                    <Directory Id="QtQuick2" Name="QtQuick.2">
+                    <Directory Id="NxtoolQtQuick2" Name="QtQuick.2">
                     </Directory>                      
                 </Directory>    
                 
@@ -94,7 +94,7 @@
         </ComponentGroup>
         
         <!-- BEGIN May be deleted when windeployqt works -->
-        <ComponentGroup Id="QtQuickDialogsFiles" Directory="QtQuickDialogs">
+        <ComponentGroup Id="NxtoolQtQuickDialogsFiles" Directory="QtQuickDialogs">
             <Component>
                 <File Id="dialogplugin.dll" Name="dialogplugin.dll" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Dialogs\dialogplugin.dll" DiskId="1"/>
             </Component>  
@@ -103,7 +103,7 @@
             </Component>          
         </ComponentGroup>  
 
-        <ComponentGroup Id="QtQuickLayoutsFiles" Directory="QtQuickLayouts">
+        <ComponentGroup Id="NxtoolQtQuickLayoutsFiles" Directory="QtQuickLayouts">
             <Component>
                 <File Id="qquicklayoutsplugin.dll" Name="qquicklayoutsplugin.dll" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Layouts\qquicklayoutsplugin.dll" DiskId="1"/>
             </Component>  
@@ -112,7 +112,7 @@
             </Component>          
         </ComponentGroup>  
 
-        <ComponentGroup Id="QtQuickWindow2Files" Directory="QtQuickWindow2">
+        <ComponentGroup Id="NxtoolQtQuickWindow2Files" Directory="QtQuickWindow2">
             <Component>
                 <File Id="windowplugin.dll" Name="windowplugin.dll" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Window.2\windowplugin.dll" DiskId="1"/>
             </Component>  
@@ -121,7 +121,7 @@
             </Component>          
         </ComponentGroup>   
 
-        <ComponentGroup Id="QtQuick2Files" Directory="QtQuick2">
+        <ComponentGroup Id="NxtoolQtQuick2Files" Directory="QtQuick2">
             <Component>
                 <File Id="qtquick2plugin.dll" Name="qtquick2plugin.dll" Source="$(var.NxtoolSourceDir)\qml\QtQuick.2\qtquick2plugin.dll" DiskId="1"/>
             </Component>  
@@ -134,7 +134,7 @@
         <!-- Add this when windeployqt works -->
         <!-- <Directory Id="NxtoolQml" Name="qml" /> -->
                 
-        <ComponentGroup Id="Platforms" Directory="Platforms">
+        <ComponentGroup Id="NxtoolPlatforms" Directory="Platforms">
             <Component>
                 <File Id="qwindows.dll" Name="qwindows.dll" Source="$(var.QtPluginsDir)\platforms\qwindows.dll" DiskId="1" />
             </Component>
@@ -143,18 +143,18 @@
         <Feature Id="NxtoolFeature" Title="$(var.productName) Server Configuration Utility" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
 
-            <ComponentRef Id="DefaultLanguage" />                                         
+            <ComponentRef Id="NxtoolDefaultLanguage" />                                         
             <ComponentRef Id="NxtoolExecutable" />
             <ComponentRef Id="nxtoolShortcutDesktop"/>
             <ComponentRef Id="NxtoolConfiguration" />
             <ComponentGroupRef Id="Vs2015crtComponent"/>
             <ComponentGroupRef Id="NxtoolQTLibraries" />
             <ComponentGroupRef Id="NxtoolQuickControlsComponent"/>
-            <ComponentGroupRef Id="QtQuickDialogsFiles" />
-            <ComponentGroupRef Id="QtQuickLayoutsFiles" />
-            <ComponentGroupRef Id="QtQuickWindow2Files" />
-            <ComponentGroupRef Id="QtQuick2Files" />
-            <ComponentGroupRef Id="Platforms" />
+            <ComponentGroupRef Id="NxtoolQtQuickDialogsFiles" />
+            <ComponentGroupRef Id="NxtoolQtQuickLayoutsFiles" />
+            <ComponentGroupRef Id="NxtoolQtQuickWindow2Files" />
+            <ComponentGroupRef Id="NxtoolQtQuick2Files" />
+            <ComponentGroupRef Id="NxtoolPlatforms" />
         </Feature>
     </Fragment>
 </Wix>
