@@ -40,6 +40,7 @@ using namespace style;
 namespace
 {
     const char* kDelegateClassBackupId = "delegateClass";
+    const char* kViewportMarginsBackupId = "viewportMargins";
 
     const char* kHoveredChildProperty = "_qn_hoveredChild";
 
@@ -2797,6 +2798,37 @@ void QnNxStyle::polish(QWidget *widget)
         }
     }
 
+    if (qobject_cast<QPlainTextEdit*>(widget) || qobject_cast<QTextEdit*>(widget))
+    {
+        /*
+         * There are only three ways to change content margins of QPlainTextEdit or QTextEdit without subclassing:
+         *  - use QTextDocument::setDocumentMargin(), but that margin is uniform
+         *  - use Qt stylesheets, but they're slow and it's not a good idea to change stylesheet in polish()
+         *  - hack access to protected method QAbstractScrollArea::setViewportMargins()
+         */
+        class ScrollAreaAccessHack : public QAbstractScrollArea
+        {
+            friend class QnNxStyle;
+        };
+
+        ScrollAreaAccessHack* area = static_cast<ScrollAreaAccessHack*>(static_cast<QAbstractScrollArea*>(widget));
+
+        QnTypedPropertyBackup<QMargins, ScrollAreaAccessHack>::backup(area, &ScrollAreaAccessHack::viewportMargins,
+            QN_SETTER(ScrollAreaAccessHack::setViewportMargins), kViewportMarginsBackupId);
+
+        const int kTextDocumentDefaultMargin = 4; // in Qt
+        int h = style::Metrics::kStandardPadding - kTextDocumentDefaultMargin;
+        int v = dp(6) - kTextDocumentDefaultMargin;
+        area->setViewportMargins(QMargins(h, v, h, v));
+
+        if (!widget->property(Properties::kDontPolishFontProperty).toBool())
+        {
+            QFont font = widget->font();
+            font.setPixelSize(dp(14));
+            widget->setFont(font);
+        }
+    }
+
     if (auto comboBox = qobject_cast<QComboBox*>(widget))
     {
         comboBox->setAttribute(Qt::WA_Hover);
@@ -2923,6 +2955,9 @@ void QnNxStyle::unpolish(QWidget* widget)
 
     if (auto comboBox = qobject_cast<QComboBox*>(widget))
         QnAbstractPropertyBackup::restore(comboBox, kDelegateClassBackupId);
+
+    if (qobject_cast<QPlainTextEdit*>(widget) || qobject_cast<QTextEdit*>(widget))
+        QnAbstractPropertyBackup::restore(widget, kViewportMarginsBackupId);
 
     QWidget* popupWithCustomizedShadow = nullptr;
 
