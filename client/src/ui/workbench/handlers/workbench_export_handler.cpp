@@ -218,7 +218,8 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
     if (loader)
     {
         durationMs = 0;
-        for (auto period: loader->periods(Qn::RecordingContent).intersected(period))
+        QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
+        for (const auto& period: periods)
             durationMs += period.durationMs;
     }
 
