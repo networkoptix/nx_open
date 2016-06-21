@@ -30,7 +30,7 @@ QnConstMediaContextPtr QnSpeachSynthesisDataProvider::initializeAudioContext()
 {
     auto synthesizer = TextToWaveServer::instance();
     auto format = synthesizer->getAudioFormat();
-    auto codecId = CODEC_ID_PCM_S16LE; // synthesizer->getCodecId();
+    auto codecId = AV_CODEC_ID_PCM_S16LE; // synthesizer->getCodecId();
     auto codec = avcodec_find_decoder(codecId);
 
     if (!codec)
@@ -67,7 +67,7 @@ QnAbstractMediaDataPtr QnSpeachSynthesisDataProvider::getNextData()
     packet->m_data.write(
         m_rawBuffer.constData() + m_curPos,
         bytesRest < kDefaultDataChunkSize ? bytesRest : kDefaultDataChunkSize);
-    packet->compressionType = AVCodecID::CODEC_ID_PCM_S16LE;
+    packet->compressionType = AVCodecID::AV_CODEC_ID_PCM_S16LE;
     packet->dataType = QnAbstractMediaData::DataType::AUDIO;
     packet->dataProvider = this;
     m_curPos += kDefaultDataChunkSize;

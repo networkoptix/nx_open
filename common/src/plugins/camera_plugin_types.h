@@ -7,25 +7,25 @@ namespace nxcip
 {
     enum CompressionType
     {
-        CODEC_ID_NONE,
-        CODEC_ID_MPEG2VIDEO,
-        CODEC_ID_H263,
-        CODEC_ID_MJPEG,
-        CODEC_ID_MPEG4,
-        CODEC_ID_H264,
-        CODEC_ID_THEORA,
-        CODEC_ID_PNG,
-        CODEC_ID_GIF,
+        AV_CODEC_ID_NONE,
+        AV_CODEC_ID_MPEG2VIDEO,
+        AV_CODEC_ID_H263,
+        AV_CODEC_ID_MJPEG,
+        AV_CODEC_ID_MPEG4,
+        AV_CODEC_ID_H264,
+        AV_CODEC_ID_THEORA,
+        AV_CODEC_ID_PNG,
+        AV_CODEC_ID_GIF,
 
-        CODEC_ID_MP2 = 0x15000,
-        CODEC_ID_MP3,
-        CODEC_ID_AAC,
-        CODEC_ID_AC3,
-        CODEC_ID_DTS,
+        AV_CODEC_ID_MP2 = 0x15000,
+        AV_CODEC_ID_MP3,
+        AV_CODEC_ID_AAC,
+        AV_CODEC_ID_AC3,
+        AV_CODEC_ID_DTS,
         //raw 16-bit little-endian PCM
-        CODEC_ID_PCM_S16LE,
-        CODEC_ID_PCM_MULAW,
-        CODEC_ID_VORBIS
+        AV_CODEC_ID_PCM_S16LE,
+        AV_CODEC_ID_PCM_MULAW,
+        AV_CODEC_ID_VORBIS
     };
 
     enum PixelFormat

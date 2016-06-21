@@ -232,7 +232,7 @@ private:
         //Preparing output packet. Have to do everything right here to avoid additional frame copying
         //TODO shared chunked buffer and socket::writev is wanted very much here
         QByteArray outPacket;
-        if (m_owner->getTranscoder()->getVideoCodecContext()->codec_id == CODEC_ID_MJPEG)
+        if (m_owner->getTranscoder()->getVideoCodecContext()->codec_id == AV_CODEC_ID_MJPEG)
         {
             //preparing timestamp header
             QByteArray timestampHeader;
@@ -355,7 +355,7 @@ public:
 
     QnProgressiveDownloadingConsumerPrivate()
     :
-        videoCodec( CODEC_ID_NONE ),
+        videoCodec( AV_CODEC_ID_NONE ),
         foreignPort( 0 ),
         terminated( false ),
         killTimerID( 0 )
@@ -377,7 +377,7 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointe
     Q_D(QnProgressiveDownloadingConsumer);
     d->socketTimeout = CONNECTION_TIMEOUT;
     d->streamingFormat = "webm";
-    d->videoCodec = CODEC_ID_VP8;
+    d->videoCodec = AV_CODEC_ID_VP8;
 
     d->foreignAddress = socket->getForeignAddress().address.toString();
     d->foreignPort = socket->getForeignAddress().port;
@@ -444,21 +444,21 @@ void QnProgressiveDownloadingConsumer::updateCodecByFormat(const QByteArray& str
     Q_D(QnProgressiveDownloadingConsumer);
 
     if (streamingFormat == "webm")
-        d->videoCodec = CODEC_ID_VP8;
+        d->videoCodec = AV_CODEC_ID_VP8;
     else if (streamingFormat == "mpegts")
-        d->videoCodec = CODEC_ID_MPEG2VIDEO;
+        d->videoCodec = AV_CODEC_ID_MPEG2VIDEO;
     else if (streamingFormat == "mp4")
-        d->videoCodec = CODEC_ID_MPEG4;
+        d->videoCodec = AV_CODEC_ID_MPEG4;
     else if (streamingFormat == "3gp")
-        d->videoCodec = CODEC_ID_MPEG4;
+        d->videoCodec = AV_CODEC_ID_MPEG4;
     else if (streamingFormat == "rtp")
-        d->videoCodec = CODEC_ID_MPEG4;
+        d->videoCodec = AV_CODEC_ID_MPEG4;
     else if (streamingFormat == "mpjpeg")
-        d->videoCodec = CODEC_ID_MJPEG;
+        d->videoCodec = AV_CODEC_ID_MJPEG;
     else if (streamingFormat == "flv")
-        d->videoCodec = CODEC_ID_H264;  //TODO #ak need to use "copy"
+        d->videoCodec = AV_CODEC_ID_H264;  //TODO #ak need to use "copy"
     else if (streamingFormat == "f4v")
-        d->videoCodec = CODEC_ID_H264;  //TODO #ak need to use "copy"
+        d->videoCodec = AV_CODEC_ID_H264;  //TODO #ak need to use "copy"
 }
 
 void QnProgressiveDownloadingConsumer::run()
@@ -572,7 +572,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         QnServer::ChunksCatalog qualityToUse = QnServer::HiQualityCatalog;
         QnTranscoder::TranscodeMethod transcodeMethod =
-            d->videoCodec == CODEC_ID_H264
+            d->videoCodec == AV_CODEC_ID_H264
                 ? QnTranscoder::TM_DirectStreamCopy
                 : QnTranscoder::TM_FfmpegTranscode;
         if (static_cast<bool>(mediaStreams) &&
@@ -755,8 +755,8 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
-        if (camRes && camRes->isAudioEnabled() && d->transcoder.isCodecSupported(CODEC_ID_VORBIS))
-            d->transcoder.setAudioCodec(CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
+        if (camRes && camRes->isAudioEnabled() && d->transcoder.isCodecSupported(AV_CODEC_ID_VORBIS))
+            d->transcoder.setAudioCodec(AV_CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
 
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;

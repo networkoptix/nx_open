@@ -61,7 +61,7 @@ bool QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
     transcoder->setSourceFile(filePath);
     transcoder->setDestFile(getFullPath(newFilename));
     transcoder->setContainer(targetContainter);
-    transcoder->setAudioCodec(CODEC_ID_MP3);
+    transcoder->setAudioCodec(AV_CODEC_ID_MP3);
     transcoder->addTag(titleTag, title);
 
     if (maxLengthMSecs > 0)

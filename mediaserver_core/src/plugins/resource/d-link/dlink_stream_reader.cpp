@@ -180,7 +180,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
     else if (m_profile.codec == "MJPEG")
         return getNextDataMJPEG();
     else
-        return getNextDataMPEG(CODEC_ID_MPEG4);
+        return getNextDataMPEG(AV_CODEC_ID_MPEG4);
 }
 
 // =====================================================================================
@@ -406,7 +406,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
     if (contentLen > 2 && !(curPtr[-2] == (char)0xff && curPtr[-1] == (char)0xd9))
         videoData->m_data.finishWriting(-1);
 
-    videoData->compressionType = CODEC_ID_MJPEG;
+    videoData->compressionType = AV_CODEC_ID_MJPEG;
     videoData->width = m_resolution.width();
     videoData->height = m_resolution.height();
     videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;

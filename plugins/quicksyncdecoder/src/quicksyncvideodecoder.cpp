@@ -365,7 +365,7 @@ bool QuickSyncVideoDecoder::decode( const QnConstCompressedVideoDataPtr data, QS
     memset( &inputStream, 0, sizeof(inputStream) );
     if( data && data->data.size() > 0 )
     {
-        NX_ASSERT( data->compressionType == CODEC_ID_H264 );
+        NX_ASSERT( data->compressionType == AV_CODEC_ID_H264 );
 
         const DWORD millisSincePrevInputFrame = (m_prevInputFrameMs != (DWORD)-1) ? (GetTickCount() - m_prevInputFrameMs) : 0;
         const bool delayedInputFrame = millisSincePrevInputFrame > (m_sourceStreamFps > 0 ? 1000 / m_sourceStreamFps : 50)*3;

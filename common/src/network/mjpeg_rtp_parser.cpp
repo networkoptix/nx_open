@@ -505,7 +505,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     /*
     if (!m_context) 
     {
-        m_context = QnMediaContextPtr(new QnAvCodecMediaContext(CODEC_ID_MJPEG));
+        m_context = QnMediaContextPtr(new QnAvCodecMediaContext(AV_CODEC_ID_MJPEG));
         m_context->ctx()->pix_fmt = (jpegType & 1) == 1 ? AV_PIX_FMT_YUV420P : AV_PIX_FMT_YUV422P;
         //m_jpegHeader.Initialize(qApp->organizationName().toLatin1().constData(), qApp->applicationName().toLatin1().constData(), "");
     }
@@ -538,7 +538,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
 
         videoData->channelNumber = 0;
         videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
-        videoData->compressionType = CODEC_ID_MJPEG;
+        videoData->compressionType = AV_CODEC_ID_MJPEG;
         //m_videoData->context = m_context;
         videoData->width = width*8;
         videoData->height = height*8;

@@ -203,7 +203,7 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
 
 int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio)
 {
-    if (video && m_videoCodec != CODEC_ID_NONE)
+    if (video && m_videoCodec != AV_CODEC_ID_NONE)
     {
         AVStream* videoStream = avformat_new_stream(m_formatCtx, nullptr);
         if (videoStream == 0)
@@ -218,7 +218,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         m_videoEncoderCodecCtx = videoStream->codec;
         m_videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         m_videoEncoderCodecCtx->codec_id = m_videoCodec;
-        m_videoEncoderCodecCtx->pix_fmt = m_videoCodec == CODEC_ID_MJPEG ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P;
+        m_videoEncoderCodecCtx->pix_fmt = m_videoCodec == AV_CODEC_ID_MJPEG ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P;
 
         if (m_vTranscoder)
         {
@@ -279,10 +279,10 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
 
     if (audio && m_aTranscoder && !m_aTranscoder->open(audio))
     {
-        m_audioCodec = CODEC_ID_NONE; // can't open transcoder. disable audio
+        m_audioCodec = AV_CODEC_ID_NONE; // can't open transcoder. disable audio
     }
 
-    if (audio && m_audioCodec != CODEC_ID_NONE)
+    if (audio && m_audioCodec != AV_CODEC_ID_NONE)
     {
         //NX_ASSERT(false, Q_FUNC_INFO, "Not implemented! Under construction!!!");
 
@@ -368,9 +368,9 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
     if ((quint64)m_baseTime == AV_NOPTS_VALUE)
         m_baseTime = media->timestamp - m_startTimeOffset;
 
-    if (m_audioCodec == CODEC_ID_NONE && media->dataType == QnAbstractMediaData::AUDIO)
+    if (m_audioCodec == AV_CODEC_ID_NONE && media->dataType == QnAbstractMediaData::AUDIO)
         return 0;
-    else if (m_videoCodec == CODEC_ID_NONE && media->dataType == QnAbstractMediaData::VIDEO)
+    else if (m_videoCodec == AV_CODEC_ID_NONE && media->dataType == QnAbstractMediaData::VIDEO)
         return 0;
 
     AVRational srcRate = {1, 1000000};

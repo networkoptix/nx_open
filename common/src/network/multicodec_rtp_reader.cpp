@@ -353,12 +353,12 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         result = new QnAacRtpParser;
     else if (codecName == QLatin1String("PCMU")) {
         QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
-        audioParser->setCodecId(CODEC_ID_PCM_MULAW);
+        audioParser->setCodecId(AV_CODEC_ID_PCM_MULAW);
         result = audioParser;
     }
     else if (codecName == QLatin1String("PCMA")) {
         QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
-        audioParser->setCodecId(CODEC_ID_PCM_ALAW);
+        audioParser->setCodecId(AV_CODEC_ID_PCM_ALAW);
         result = audioParser;
     }
     else if (codecName.startsWith(QLatin1String("G726"))) // g726-24, g726-32 e.t.c
@@ -368,14 +368,14 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
             return 0;
         QString bitsPerSample = codecName.mid(bitRatePos+1);
         QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
-        audioParser->setCodecId(CODEC_ID_ADPCM_G726);
+        audioParser->setCodecId(AV_CODEC_ID_ADPCM_G726);
         audioParser->setBitsPerSample(bitsPerSample.toInt()/8);
         audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
         result = audioParser;
     }
     else if (codecName == QLatin1String("L16")) {
         QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
-        audioParser->setCodecId(CODEC_ID_PCM_S16BE);
+        audioParser->setCodecId(AV_CODEC_ID_PCM_S16BE);
         audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
         result = audioParser;
     }

@@ -20,13 +20,13 @@ static QSize mediaSizeFromRawData(const QnConstCompressedVideoDataPtr& frame)
 {
     switch (frame->context->getCodecId())
     {
-        case CODEC_ID_H264:
+        case AV_CODEC_ID_H264:
         {
             QSize result;
             extractSpsPps(frame, &result, nullptr);
             return result;
         }
-        case CODEC_ID_MJPEG:
+        case AV_CODEC_ID_MJPEG:
         {
             nx_jpg::ImageInfo imgInfo;
             nx_jpg::readJpegImageInfo((const quint8*) frame->data(), frame->dataSize(), &imgInfo);
@@ -44,13 +44,13 @@ struct FrameBasicInfo
 {
     FrameBasicInfo()
     :
-        codec(CODEC_ID_NONE)
+        codec(AV_CODEC_ID_NONE)
     {
     }
 
     FrameBasicInfo(const QnConstCompressedVideoDataPtr& frame)
     :
-        codec(CODEC_ID_NONE)
+        codec(AV_CODEC_ID_NONE)
     {
         codec = frame->compressionType;
         size = QSize(frame->width, frame->height);

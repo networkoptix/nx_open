@@ -343,9 +343,9 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
             arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
         return nullptr;
     }
-    AVCodecID codecID = CODEC_ID_NONE;
+    AVCodecID codecID = AV_CODEC_ID_NONE;
     QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
-    const AVCodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO #ak: get codec of resource video stream. Currently (only HLS uses this class), it is always h.264
+    const AVCodecID resourceVideoStreamCodecID = AV_CODEC_ID_H264;   //TODO #ak: get codec of resource video stream. Currently (only HLS uses this class), it is always h.264
     QSize videoResolution;
     if( transcodeParams.videoCodec().isEmpty() && !transcodeParams.pictureSizePixels().isValid() )
     {
@@ -359,7 +359,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
             transcodeParams.videoCodec().isEmpty()
             ? resourceVideoStreamCodecID
             : av_guess_codec( NULL, transcodeParams.videoCodec().toLatin1().data(), NULL, NULL, AVMEDIA_TYPE_VIDEO );
-        if( codecID == CODEC_ID_NONE )
+        if( codecID == AV_CODEC_ID_NONE )
         {
             NX_LOG( QString::fromLatin1("Cannot start transcoding of streaming chunk of resource %1. No codec %2 found in FFMPEG library").
                 arg(mediaResource->toResource()->getUniqueId()).arg(transcodeParams.videoCodec()), cl_logWARNING );
@@ -389,7 +389,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
     //TODO/HLS #ak audio
     if( !transcodeParams.audioCodec().isEmpty() )
     {
-        //if( transcoder->setAudioCodec( CODEC_ID_AAC, QnTranscoder::TM_FfmpegTranscode ) != 0 )
+        //if( transcoder->setAudioCodec( AV_CODEC_ID_AAC, QnTranscoder::TM_FfmpegTranscode ) != 0 )
         //{
         //    NX_LOG( QString::fromLatin1("Failed to create transcoder with audio codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
         //        arg(transcodeParams.audioCodec()).arg(transcodeParams.startTimestamp()).

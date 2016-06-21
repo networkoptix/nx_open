@@ -234,7 +234,7 @@ void QnVMax480ConnectionProcessor::run()
         quint8 internalCodecID = vMaxHeader[2];
         quint32 dataSize = *(quint32*)(vMaxHeader+4);
         quint64 timestamp = *(quint64*)(vMaxHeader+8);
-        AVCodecID codecID = CODEC_ID_NONE;
+        AVCodecID codecID = AV_CODEC_ID_NONE;
 
         if (dataType == VMAXDT_GotArchiveRange)
         {
@@ -275,13 +275,13 @@ void QnVMax480ConnectionProcessor::run()
             mediaBuffer = &video->m_data;
             switch (internalCodecID) {
                 case CODEC_VSTREAM_H264:
-                    codecID = CODEC_ID_H264;
+                    codecID = AV_CODEC_ID_H264;
                     break;
                 case CODEC_VSTREAM_JPEG:
-                    codecID = CODEC_ID_MJPEG;
+                    codecID = AV_CODEC_ID_MJPEG;
                     break;
                 case CODEC_VSTREAM_MPEG4:
-                    codecID = CODEC_ID_MPEG4;
+                    codecID = AV_CODEC_ID_MPEG4;
                     break;
             }
         }
@@ -295,29 +295,29 @@ void QnVMax480ConnectionProcessor::run()
 
             switch (internalCodecID) {
                 case CODEC_ASTREAM_MULAW:
-                    codecID = CODEC_ID_PCM_MULAW;
+                    codecID = AV_CODEC_ID_PCM_MULAW;
                     break;
                 case CODEC_ASTREAM_G723:
-                    codecID = CODEC_ID_G723_1;
+                    codecID = AV_CODEC_ID_G723_1;
                     break;
                 case CODEC_ASTREAM_IMAACPCM:
-                    codecID = CODEC_ID_ADPCM_IMA_WAV;
+                    codecID = AV_CODEC_ID_ADPCM_IMA_WAV;
                     break;
                 case CODEC_ASTREAM_MSADPCM:
-                    codecID = CODEC_ID_ADPCM_MS;
+                    codecID = AV_CODEC_ID_ADPCM_MS;
                     break;
                 case CODEC_ASTREAM_PCM:
-                    codecID = CODEC_ID_PCM_S8;
+                    codecID = AV_CODEC_ID_PCM_S8;
                     break;
                 case CODEC_ASTREAM_CG726:
                     sampleFormat = AV_SAMPLE_FMT_S16;
-                    codecID = CODEC_ID_ADPCM_G726;
+                    codecID = AV_CODEC_ID_ADPCM_G726;
                     break;
                 case CODEC_ASTREAM_CG711A:
-                    codecID = CODEC_ID_PCM_ALAW;
+                    codecID = AV_CODEC_ID_PCM_ALAW;
                     break;
                 case CODEC_ASTREAM_CG711U:
-                    codecID = CODEC_ID_PCM_MULAW;
+                    codecID = AV_CODEC_ID_PCM_MULAW;
                     break;
             }
 

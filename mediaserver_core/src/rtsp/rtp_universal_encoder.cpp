@@ -28,35 +28,35 @@ static const struct
     int audio_channels;
 } AVRtpPayloadTypes[]=
 {
-  {0, "PCMU",        AVMEDIA_TYPE_AUDIO,   CODEC_ID_PCM_MULAW, 8000, 1},
-  {3, "GSM",         AVMEDIA_TYPE_AUDIO,   CODEC_ID_NONE, 8000, 1},
-  {4, "G723",        AVMEDIA_TYPE_AUDIO,   CODEC_ID_G723_1, 8000, 1},
-  {5, "DVI4",        AVMEDIA_TYPE_AUDIO,   CODEC_ID_NONE, 8000, 1},
-  {6, "DVI4",        AVMEDIA_TYPE_AUDIO,   CODEC_ID_NONE, 16000, 1},
-  {7, "LPC",         AVMEDIA_TYPE_AUDIO,   CODEC_ID_NONE, 8000, 1},
-  {8, "PCMA",        AVMEDIA_TYPE_AUDIO,   CODEC_ID_PCM_ALAW, 8000, 1},
-  {9, "G722",        AVMEDIA_TYPE_AUDIO,   CODEC_ID_ADPCM_G722, 8000, 1},
-  {10, "L16",        AVMEDIA_TYPE_AUDIO,   CODEC_ID_PCM_S16BE, 44100, 2},
-  {11, "L16",        AVMEDIA_TYPE_AUDIO,   CODEC_ID_PCM_S16BE, 44100, 1},
-  {12, "QCELP",      AVMEDIA_TYPE_AUDIO,   CODEC_ID_QCELP, 8000, 1},
-  {13, "CN",         AVMEDIA_TYPE_AUDIO,   CODEC_ID_NONE, 8000, 1},
-  {14, "MPA",        AVMEDIA_TYPE_AUDIO,   CODEC_ID_MP2, -1, -1},
-  {97, "mpa-robust",        AVMEDIA_TYPE_AUDIO,   CODEC_ID_MP3, -1, -1},
-  {15, "G728",       AVMEDIA_TYPE_AUDIO,   CODEC_ID_NONE, 8000, 1},
-  {16, "DVI4",       AVMEDIA_TYPE_AUDIO,   CODEC_ID_NONE, 11025, 1},
-  {17, "DVI4",       AVMEDIA_TYPE_AUDIO,   CODEC_ID_NONE, 22050, 1},
-  {18, "G729",       AVMEDIA_TYPE_AUDIO,   CODEC_ID_NONE, 8000, 1},
-  {25, "CelB",       AVMEDIA_TYPE_VIDEO,   CODEC_ID_NONE, 90000, -1},
-  {26, "JPEG",       AVMEDIA_TYPE_VIDEO,   CODEC_ID_MJPEG, 90000, -1},
-  {28, "nv",         AVMEDIA_TYPE_VIDEO,   CODEC_ID_NONE, 90000, -1},
-  {31, "H261",       AVMEDIA_TYPE_VIDEO,   CODEC_ID_H261, 90000, -1},
-  {32, "MPV",        AVMEDIA_TYPE_VIDEO,   CODEC_ID_MPEG1VIDEO, 90000, -1},
-  {32, "MPV",        AVMEDIA_TYPE_VIDEO,   CODEC_ID_MPEG2VIDEO, 90000, -1},
-  {33, "MP2T",       AVMEDIA_TYPE_DATA,    CODEC_ID_MPEG2TS, 90000, -1},
-  {34, "H263",       AVMEDIA_TYPE_VIDEO,   CODEC_ID_H263, 90000, -1},
-  {96, "H264",       AVMEDIA_TYPE_VIDEO,   CODEC_ID_H264, 90000, -1},
-  {96, "MPEG4-GENERIC",  AVMEDIA_TYPE_VIDEO,   CODEC_ID_MPEG4, 90000, -1},
-  {-1, "",           AVMEDIA_TYPE_UNKNOWN, CODEC_ID_NONE, -1, -1}
+  {0, "PCMU",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_PCM_MULAW, 8000, 1},
+  {3, "GSM",         AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 8000, 1},
+  {4, "G723",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_G723_1, 8000, 1},
+  {5, "DVI4",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 8000, 1},
+  {6, "DVI4",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 16000, 1},
+  {7, "LPC",         AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 8000, 1},
+  {8, "PCMA",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_PCM_ALAW, 8000, 1},
+  {9, "G722",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_ADPCM_G722, 8000, 1},
+  {10, "L16",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_PCM_S16BE, 44100, 2},
+  {11, "L16",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_PCM_S16BE, 44100, 1},
+  {12, "QCELP",      AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_QCELP, 8000, 1},
+  {13, "CN",         AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 8000, 1},
+  {14, "MPA",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_MP2, -1, -1},
+  {97, "mpa-robust",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_MP3, -1, -1},
+  {15, "G728",       AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 8000, 1},
+  {16, "DVI4",       AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 11025, 1},
+  {17, "DVI4",       AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 22050, 1},
+  {18, "G729",       AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 8000, 1},
+  {25, "CelB",       AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_NONE, 90000, -1},
+  {26, "JPEG",       AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_MJPEG, 90000, -1},
+  {28, "nv",         AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_NONE, 90000, -1},
+  {31, "H261",       AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_H261, 90000, -1},
+  {32, "MPV",        AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_MPEG1VIDEO, 90000, -1},
+  {32, "MPV",        AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_MPEG2VIDEO, 90000, -1},
+  {33, "MP2T",       AVMEDIA_TYPE_DATA,    AV_CODEC_ID_MPEG2TS, 90000, -1},
+  {34, "H263",       AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_H263, 90000, -1},
+  {96, "H264",       AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_H264, 90000, -1},
+  {96, "MPEG4-GENERIC",  AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_MPEG4, 90000, -1},
+  {-1, "",           AVMEDIA_TYPE_UNKNOWN, AV_CODEC_ID_NONE, -1, -1}
 };
 
 #define MAX_PSET_SIZE 1024
@@ -349,10 +349,10 @@ static char *xiph_extradata2config(AVCodecContext *c)
     int first_header_size;
 
     switch (c->codec_id) {
-    case CODEC_ID_THEORA:
+    case AV_CODEC_ID_THEORA:
         first_header_size = 42;
         break;
-    case CODEC_ID_VORBIS:
+    case AV_CODEC_ID_VORBIS:
         first_header_size = 30;
         break;
     default:
@@ -419,7 +419,7 @@ static char *sdp_write_media_attributes(
     char* config = NULL;
 
     switch (c->codec_id) {
-        case CODEC_ID_H264: {
+        case AV_CODEC_ID_H264: {
             int mode = 1;
             if (fmt && fmt->oformat->priv_class &&
                 av_opt_flag_is_set(fmt->priv_data, "rtpflags", "h264_mode0"))
@@ -448,21 +448,21 @@ static char *sdp_write_media_attributes(
             av_strlcatf( buff, size, "\r\n" );
             break;
         }
-        case CODEC_ID_H263:
-        case CODEC_ID_H263P:
+        case AV_CODEC_ID_H263:
+        case AV_CODEC_ID_H263P:
             /* a=framesize is required by 3GPP TS 26.234 (PSS). It
              * actually specifies the maximum video size, but we only know
              * the current size. This is required for playback on Android
              * stagefright and on Samsung bada. */
             if (!fmt || !fmt->oformat->priv_class ||
                 !av_opt_flag_is_set(fmt->priv_data, "rtpflags", "rfc2190") ||
-                c->codec_id == CODEC_ID_H263P)
+                c->codec_id == AV_CODEC_ID_H263P)
             av_strlcatf(buff, size, "a=rtpmap:%d H263-2000/90000\r\n"
                                     "a=framesize:%d %d-%d\r\n",
                                     payload_type,
                                     payload_type, c->width, c->height);
             break;
-        case CODEC_ID_MPEG4:
+        case AV_CODEC_ID_MPEG4:
             if (c->extradata_size) {
                 config = extradata2config(c);
             }
@@ -471,7 +471,7 @@ static char *sdp_write_media_attributes(
                                      payload_type,
                                      payload_type, config ? config : "");
             break;
-        case CODEC_ID_AAC:
+        case AV_CODEC_ID_AAC:
             if (fmt && fmt->oformat && fmt->oformat->priv_class &&
                 av_opt_flag_is_set(fmt->priv_data, "rtpflags", "latm")) {
                 config = latm_context2config(c);
@@ -502,37 +502,37 @@ static char *sdp_write_media_attributes(
                                          payload_type, config);
             }
             break;
-        case CODEC_ID_PCM_S16BE:
+        case AV_CODEC_ID_PCM_S16BE:
             if (payload_type >= RTP_PT_PRIVATE)
                 av_strlcatf(buff, size, "a=rtpmap:%d L16/%d/%d\r\n",
                                          payload_type,
                                          c->sample_rate, c->channels);
             break;
-        case CODEC_ID_PCM_MULAW:
+        case AV_CODEC_ID_PCM_MULAW:
             if (payload_type >= RTP_PT_PRIVATE)
                 av_strlcatf(buff, size, "a=rtpmap:%d PCMU/%d/%d\r\n",
                                          payload_type,
                                          c->sample_rate, c->channels);
             break;
-        case CODEC_ID_PCM_ALAW:
+        case AV_CODEC_ID_PCM_ALAW:
             if (payload_type >= RTP_PT_PRIVATE)
                 av_strlcatf(buff, size, "a=rtpmap:%d PCMA/%d/%d\r\n",
                                          payload_type,
                                          c->sample_rate, c->channels);
             break;
-        case CODEC_ID_AMR_NB:
+        case AV_CODEC_ID_AMR_NB:
             av_strlcatf(buff, size, "a=rtpmap:%d AMR/%d/%d\r\n"
                                     "a=fmtp:%d octet-align=1\r\n",
                                      payload_type, c->sample_rate, c->channels,
                                      payload_type);
             break;
-        case CODEC_ID_AMR_WB:
+        case AV_CODEC_ID_AMR_WB:
             av_strlcatf(buff, size, "a=rtpmap:%d AMR-WB/%d/%d\r\n"
                                     "a=fmtp:%d octet-align=1\r\n",
                                      payload_type, c->sample_rate, c->channels,
                                      payload_type);
             break;
-        case CODEC_ID_VORBIS:
+        case AV_CODEC_ID_VORBIS:
             if (c->extradata_size)
                 config = xiph_extradata2config(c);
             else
@@ -545,7 +545,7 @@ static char *sdp_write_media_attributes(
                                     payload_type, c->sample_rate, c->channels,
                                     payload_type, config);
             break;
-        case CODEC_ID_THEORA: {
+        case AV_CODEC_ID_THEORA: {
             const char *pix_fmt;
             if (c->extradata_size)
                 config = xiph_extradata2config(c);
@@ -577,17 +577,17 @@ static char *sdp_write_media_attributes(
                                     c->width, c->height, pix_fmt, config);
             break;
         }
-        case CODEC_ID_VP8:
+        case AV_CODEC_ID_VP8:
             av_strlcatf(buff, size, "a=rtpmap:%d VP8/90000\r\n",
                                      payload_type);
             break;
-        case CODEC_ID_ADPCM_G722:
+        case AV_CODEC_ID_ADPCM_G722:
             if (payload_type >= RTP_PT_PRIVATE)
                 av_strlcatf(buff, size, "a=rtpmap:%d G722/%d/%d\r\n",
                                          payload_type,
                                          8000, c->channels);
             break;
-        case CODEC_ID_ADPCM_G726: {
+        case AV_CODEC_ID_ADPCM_G726: {
             if (payload_type >= RTP_PT_PRIVATE)
                 av_strlcatf(buff, size, "a=rtpmap:%d G726-%d/%d\r\n",
                                          payload_type,
@@ -596,7 +596,7 @@ static char *sdp_write_media_attributes(
             break;
         }
         /*
-        case CODEC_ID_ILBC:
+        case AV_CODEC_ID_ILBC:
             av_strlcatf(buff, size, "a=rtpmap:%d iLBC/%d\r\n"
                                     "a=fmtp:%d mode=%d\r\n",
                                      payload_type, c->sample_rate,
@@ -629,11 +629,11 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media,
     if( m_transcoder.setContainer("rtp") != 0 )
         return; //m_isOpened = false
     m_transcoder.setPacketizedMode(true);
-    m_codec = transcodeToCodec != CODEC_ID_NONE ? transcodeToCodec : media->compressionType;
+    m_codec = transcodeToCodec != AV_CODEC_ID_NONE ? transcodeToCodec : media->compressionType;
     QnTranscoder::TranscodeMethod method;
     m_isVideo = media->dataType == QnAbstractMediaData::VIDEO;
     if (m_isVideo)
-        method = transcodeToCodec != CODEC_ID_NONE ? QnTranscoder::TM_FfmpegTranscode : QnTranscoder::TM_DirectStreamCopy;
+        method = transcodeToCodec != AV_CODEC_ID_NONE ? QnTranscoder::TM_FfmpegTranscode : QnTranscoder::TM_DirectStreamCopy;
     else
         method = media->compressionType == transcodeToCodec ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode;
 

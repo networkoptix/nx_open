@@ -320,7 +320,7 @@ namespace nxcip
 
         AudioFormat()
         :
-            compressionType(CODEC_ID_NONE),
+            compressionType(AV_CODEC_ID_NONE),
             sampleRate(0),
             bitrate(0),
             byteOrder(boLittleEndian),
@@ -941,10 +941,10 @@ namespace nxcip
         //!Coded media stream data
         /*!
             Data format for different codecs:\n
-                - h.264 (\a nxcip::CODEC_ID_H264): [iso-14496-10, AnnexB] byte stream. SPS and PPS MUST be available in the stream. 
+                - h.264 (\a nxcip::AV_CODEC_ID_H264): [iso-14496-10, AnnexB] byte stream. SPS and PPS MUST be available in the stream. 
                     It is recommended that SPS and PPS are repeated before each group of pictures
-                - motion jpeg (\a nxcip::CODEC_ID_MJPEG): Each packet is a complete jpeg picture
-                - aac (\a nxcip::CODEC_ID_AAC): ADTS stream
+                - motion jpeg (\a nxcip::AV_CODEC_ID_MJPEG): Each packet is a complete jpeg picture
+                - aac (\a nxcip::AV_CODEC_ID_AAC): ADTS stream
             \return Media data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
                 \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
             \warning Actual buffer size MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than \a MediaDataPacket::dataSize() returns 

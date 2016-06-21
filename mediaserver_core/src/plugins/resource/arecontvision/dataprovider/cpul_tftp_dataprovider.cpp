@@ -315,7 +315,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     if (iFrame)
         videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
 
-    videoData->compressionType = h264 ? CODEC_ID_H264 : CODEC_ID_MJPEG;
+    videoData->compressionType = h264 ? AV_CODEC_ID_H264 : AV_CODEC_ID_MJPEG;
     videoData->width = size.width;
     videoData->height = size.height;
 

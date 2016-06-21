@@ -449,7 +449,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     QSharedPointer<CLVideoDecoderOutput> m_tmpFrame( new CLVideoDecoderOutput() );
     m_tmpFrame->setUseExternalData(true);   //temp frame will take internal ffmpeg buffer for optimization
 
-    if (data->compressionType == CODEC_ID_NONE)
+    if (data->compressionType == AV_CODEC_ID_NONE)
     {
         cl_log.log(QLatin1String("QnVideoStreamDisplay::display: unknown codec type..."), cl_logERROR);
         return Status_Displayed; // true to prevent 100% cpu usage on unknown codec

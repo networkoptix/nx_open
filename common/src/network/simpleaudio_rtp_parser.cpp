@@ -15,7 +15,7 @@ QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():
 {
     m_frequency = 8000;
     m_channels = 1;
-    m_codecId = CODEC_ID_PCM_MULAW;
+    m_codecId = AV_CODEC_ID_PCM_MULAW;
     m_sampleFormat = AV_SAMPLE_FMT_S16;
     m_bits_per_coded_sample = 16;
 }
@@ -96,7 +96,7 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset
 
 
     QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, end - curPtr));
-    audioData->compressionType = !m_context? CODEC_ID_NONE : m_context->getCodecId();
+    audioData->compressionType = !m_context? AV_CODEC_ID_NONE : m_context->getCodecId();
     audioData->context = m_context;
     if (m_timeHelper) {
         audioData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);

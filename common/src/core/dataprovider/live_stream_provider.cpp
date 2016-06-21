@@ -496,7 +496,7 @@ void QnLiveStreamProvider::extractMediaStreamParams(
 {
     switch( videoData->compressionType )
     {
-        case CODEC_ID_H264:
+        case AV_CODEC_ID_H264:
             extractSpsPps(
                 videoData,
                 (videoData->width > 0 && videoData->height > 0)
@@ -504,13 +504,13 @@ void QnLiveStreamProvider::extractMediaStreamParams(
                     : newResolution,
                 customStreamParams );
 
-        case CODEC_ID_MPEG2VIDEO:
+        case AV_CODEC_ID_MPEG2VIDEO:
             if( videoData->width > 0 && videoData->height > 0 )
                 *newResolution = QSize( videoData->width, videoData->height );
             //TODO #ak it is very possible that videoData->width and videoData->height do not change when stream resolution changes and there is no SPS also
             break;
 
-        case CODEC_ID_MJPEG:
+        case AV_CODEC_ID_MJPEG:
         {
             nx_jpg::ImageInfo imgInfo;
             if( !nx_jpg::readJpegImageInfo( (const quint8*)videoData->data(), videoData->dataSize(), &imgInfo ) )

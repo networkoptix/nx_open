@@ -54,15 +54,15 @@ static QString codecToString(AVCodecID codecId)
 {
     switch(codecId)
     {
-        case CODEC_ID_H264:
+        case AV_CODEC_ID_H264:
             return lit("video/avc");
-        case CODEC_ID_H263:
+        case AV_CODEC_ID_H263:
             return lit("video/3gpp");
-        case CODEC_ID_MPEG4:
+        case AV_CODEC_ID_MPEG4:
             return lit("video/mp4v-es");
-        case CODEC_ID_MPEG2VIDEO:
+        case AV_CODEC_ID_MPEG2VIDEO:
             return lit("video/mpeg2");
-        case CODEC_ID_VP8:
+        case AV_CODEC_ID_VP8:
             return lit("video/x-vnd.on2.vp8");
         default:
             return QString();

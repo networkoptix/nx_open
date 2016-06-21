@@ -12,7 +12,7 @@
 QnAbstractMediaData::QnAbstractMediaData( DataType _dataType )
 : 
     dataType(_dataType),
-    compressionType(CODEC_ID_NONE),
+    compressionType(AV_CODEC_ID_NONE),
     flags(MediaFlags_None),
     channelNumber(0),
     context(0),

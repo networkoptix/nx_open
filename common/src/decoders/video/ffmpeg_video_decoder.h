@@ -39,7 +39,7 @@ public:
 
     static bool isHardwareAccellerationPossible(AVCodecID codecId, int width, int height)
     {
-        return codecId == CODEC_ID_H264 && width <= 1920 && height <= 1088;
+        return codecId == AV_CODEC_ID_H264 && width <= 1920 && height <= 1088;
     }
 
     AVCodecContext* getContext() const;

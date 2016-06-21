@@ -56,7 +56,7 @@ void QnXVBADecoderPlugin::initializeLog( QnLog* externalLog )
 QList<AVCodecID> QnXVBADecoderPlugin::supportedCodecTypes() const
 {
     QList<AVCodecID> codecList;
-    codecList.push_back( CODEC_ID_H264 );
+    codecList.push_back( AV_CODEC_ID_H264 );
     return codecList;
 }
 
@@ -70,7 +70,7 @@ QnAbstractVideoDecoder* QnXVBADecoderPlugin::create(
     const QnCompressedVideoDataPtr& data,
     const QGLContext* const glContext ) const
 {
-    if( codecID != CODEC_ID_H264 )
+    if( codecID != AV_CODEC_ID_H264 )
         return NULL;
 
     cl_log.log( QString::fromAscii("XVBADecoderPlugin. Creating decoder..."), cl_logINFO );

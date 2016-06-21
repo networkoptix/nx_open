@@ -28,9 +28,9 @@ namespace
     {
         AVCodecID codecId = packet->compressionType;
 
-        NX_ASSERT( codecId == CODEC_ID_H264, "IFrame detection", "only CODEC_ID_H264 is supported" );
+        NX_ASSERT( codecId == AV_CODEC_ID_H264, "IFrame detection", "only AV_CODEC_ID_H264 is supported" );
 
-        if( !packet || codecId != CODEC_ID_H264 )
+        if( !packet || codecId != AV_CODEC_ID_H264 )
             return false;
 
         const void * data = packet->data();
@@ -462,40 +462,40 @@ AVCodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compre
 {
     switch( compressionType )
     {
-        case nxcip::CODEC_ID_MPEG2VIDEO:
-            return CODEC_ID_MPEG2VIDEO;
-        case nxcip::CODEC_ID_H263:
-            return CODEC_ID_H263;
-        case nxcip::CODEC_ID_MJPEG:
-            return CODEC_ID_MJPEG;
-        case nxcip::CODEC_ID_MPEG4:
-            return CODEC_ID_MPEG4;
-        case nxcip::CODEC_ID_H264:
-            return CODEC_ID_H264;
-        case nxcip::CODEC_ID_THEORA:
-            return CODEC_ID_THEORA;
-        case nxcip::CODEC_ID_PNG:
-            return CODEC_ID_PNG;
-        case nxcip::CODEC_ID_GIF:
-            return CODEC_ID_GIF;
-        case nxcip::CODEC_ID_MP2:
-            return CODEC_ID_MP2;
-        case nxcip::CODEC_ID_MP3:
-            return CODEC_ID_MP3;
-        case nxcip::CODEC_ID_AAC:
-            return CODEC_ID_AAC;
-        case nxcip::CODEC_ID_PCM_S16LE:
-            return CODEC_ID_PCM_S16LE;
-        case nxcip::CODEC_ID_PCM_MULAW:
-            return CODEC_ID_PCM_MULAW;
-        case nxcip::CODEC_ID_AC3:
-            return CODEC_ID_AC3;
-        case nxcip::CODEC_ID_DTS:
-            return CODEC_ID_DTS;
-        case nxcip::CODEC_ID_VORBIS:
-            return CODEC_ID_VORBIS;
+        case nxcip::AV_CODEC_ID_MPEG2VIDEO:
+            return AV_CODEC_ID_MPEG2VIDEO;
+        case nxcip::AV_CODEC_ID_H263:
+            return AV_CODEC_ID_H263;
+        case nxcip::AV_CODEC_ID_MJPEG:
+            return AV_CODEC_ID_MJPEG;
+        case nxcip::AV_CODEC_ID_MPEG4:
+            return AV_CODEC_ID_MPEG4;
+        case nxcip::AV_CODEC_ID_H264:
+            return AV_CODEC_ID_H264;
+        case nxcip::AV_CODEC_ID_THEORA:
+            return AV_CODEC_ID_THEORA;
+        case nxcip::AV_CODEC_ID_PNG:
+            return AV_CODEC_ID_PNG;
+        case nxcip::AV_CODEC_ID_GIF:
+            return AV_CODEC_ID_GIF;
+        case nxcip::AV_CODEC_ID_MP2:
+            return AV_CODEC_ID_MP2;
+        case nxcip::AV_CODEC_ID_MP3:
+            return AV_CODEC_ID_MP3;
+        case nxcip::AV_CODEC_ID_AAC:
+            return AV_CODEC_ID_AAC;
+        case nxcip::AV_CODEC_ID_PCM_S16LE:
+            return AV_CODEC_ID_PCM_S16LE;
+        case nxcip::AV_CODEC_ID_PCM_MULAW:
+            return AV_CODEC_ID_PCM_MULAW;
+        case nxcip::AV_CODEC_ID_AC3:
+            return AV_CODEC_ID_AC3;
+        case nxcip::AV_CODEC_ID_DTS:
+            return AV_CODEC_ID_DTS;
+        case nxcip::AV_CODEC_ID_VORBIS:
+            return AV_CODEC_ID_VORBIS;
         default:
-            return CODEC_ID_NONE;
+            return AV_CODEC_ID_NONE;
     }
 }
 

@@ -49,7 +49,7 @@ public:
     /** Can be empty if not available. */
     QSize currentResolution() const;
 
-    /** Can be CODEC_ID_NONE if not available. */
+    /** Can be AV_CODEC_ID_NONE if not available. */
     AVCodecID currentCodec() const;
 
     void pleaseStop();

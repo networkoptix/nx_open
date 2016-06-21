@@ -30,16 +30,16 @@ namespace {
     {
         switch(codecId)
         {
-            case CODEC_ID_AAC:
+            case AV_CODEC_ID_AAC:
                 return lit("audio/mp4a-latm");
-            case CODEC_ID_PCM_ALAW:
+            case AV_CODEC_ID_PCM_ALAW:
                 return lit("audio/g711-alaw");
-            case CODEC_ID_PCM_MULAW:
+            case AV_CODEC_ID_PCM_MULAW:
                 return lit("audio/g711-mlaw");
-            case CODEC_ID_MP2:
-            case CODEC_ID_MP3:
+            case AV_CODEC_ID_MP2:
+            case AV_CODEC_ID_MP3:
                 return lit("audio/mpeg");
-            case CODEC_ID_VORBIS:
+            case AV_CODEC_ID_VORBIS:
                 return lit("audio/vorbis");
             default:
                 return QString();

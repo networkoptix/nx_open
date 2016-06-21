@@ -122,7 +122,7 @@ AVCodec* QnFfmpegVideoDecoder::findCodec(AVCodecID codecId)
 {
     AVCodec* codec = 0;
 
-    if (codecId != CODEC_ID_NONE)
+    if (codecId != AV_CODEC_ID_NONE)
         codec = avcodec_find_decoder(codecId);
 
     return codec;
@@ -155,7 +155,7 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
     if (!m_mtDecoding && !m_forcedMtDecoding)
         m_context->thread_count = 1;
 
-    if (m_forceSliceDecoding == -1 && data && data->data() && m_context->codec_id == CODEC_ID_H264)
+    if (m_forceSliceDecoding == -1 && data && data->data() && m_context->codec_id == AV_CODEC_ID_H264)
     {
         m_forceSliceDecoding = 0;
         int nextSliceCnt = 0;
@@ -187,7 +187,7 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
 
     m_context->thread_type = m_context->thread_count > 1 && (m_forceSliceDecoding != 1) ? FF_THREAD_FRAME : FF_THREAD_SLICE;
 
-    if (m_context->codec_id == CODEC_ID_H264 && m_context->thread_type == FF_THREAD_SLICE)
+    if (m_context->codec_id == AV_CODEC_ID_H264 && m_context->thread_type == FF_THREAD_SLICE)
     {
         // ignoring deblocking filter type 1 for better perfomace between H264 slices.
         m_context->flags2 |= CODEC_FLAG2_FAST;
@@ -208,7 +208,7 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
     m_frameTypeExtractor = new FrameTypeExtractor(QnConstMediaContextPtr(new QnAvCodecMediaContext(m_context)));
 
 #ifdef _USE_DXVA
-    if (m_codecId == CODEC_ID_H264)
+    if (m_codecId == AV_CODEC_ID_H264)
     {
         m_context->get_format = FFMpegCallbacks::ffmpeg_GetFormat;
         m_context->get_buffer = FFMpegCallbacks::ffmpeg_GetFrameBuf;
@@ -229,7 +229,7 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
 
     determineOptimalThreadType(data);
 
-    m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
+    m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == AV_CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
 
     NX_LOG(QLatin1String("Creating ") + QLatin1String(m_context->thread_count > 1 ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
@@ -279,7 +279,7 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     //m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
     //m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
     // ensure that it is H.264 with nal prefixes
-    m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
+    m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == AV_CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
     avcodec_open2(m_context, m_codec, NULL);
 
@@ -361,7 +361,7 @@ void QnFfmpegVideoDecoder::forceMtDecoding(bool value)
 bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
 {
     if (data && m_codecId!= data->compressionType) {
-        if (m_codecId != CODEC_ID_NONE && data->context)
+        if (m_codecId != AV_CODEC_ID_NONE && data->context)
             resetDecoder(data);
         m_codecId = data->compressionType;
     }
@@ -391,7 +391,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         if ((m_decodeMode > DecodeMode_Full || (data->flags & QnAbstractMediaData::MediaFlags_Ignore)) && data->data())
         {
 
-            if (data->compressionType == CODEC_ID_MJPEG)
+            if (data->compressionType == AV_CODEC_ID_MJPEG)
             {
                 uint period = m_decodeMode == DecodeMode_Fast ? LIGHT_CPU_MODE_FRAME_PERIOD : LIGHT_CPU_MODE_FRAME_PERIOD*2;
                 if (m_lightModeFrameCounter < period)

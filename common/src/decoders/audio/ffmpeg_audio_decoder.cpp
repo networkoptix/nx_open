@@ -41,7 +41,7 @@ QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(QnCompressedAudioDataPtr data):
 
 //    AVCodecID codecId = internalCodecIdToFfmpeg(m_codec);
 
-    if (m_codec != CODEC_ID_NONE)
+    if (m_codec != AV_CODEC_ID_NONE)
     {
         codec = avcodec_find_decoder(m_codec);
     }

@@ -144,7 +144,7 @@ namespace ite
 
         nxcip::LiveStreamConfig curConfig;
         memset(&curConfig, 0, sizeof(nxcip::LiveStreamConfig));
-        //curConfig.codec = nxcip::CODEC_ID_H264;
+        //curConfig.codec = nxcip::AV_CODEC_ID_H264;
 
         if (! rxDev->getEncoderParams(m_encoderNumber, curConfig))
             return nxcip::NX_TRY_AGAIN;

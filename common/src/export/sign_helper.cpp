@@ -104,7 +104,7 @@ void QnSignHelper::doUpdateDigestNoCodec(QnCryptographicHash &ctx, const quint8*
 
 void QnSignHelper::doUpdateDigest(AVCodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size)
 {
-    if (codecId != CODEC_ID_H264)
+    if (codecId != AV_CODEC_ID_H264)
     {
         doUpdateDigestNoCodec(ctx, data, size);
         return;
@@ -655,7 +655,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcC
     drawOnSignFrame(frame);
 
     int out_size = 0;
-    if (videoCodecCtx->codec_id == CODEC_ID_H264)
+    if (videoCodecCtx->codec_id == AV_CODEC_ID_H264)
     {
         // To avoid X.264 GPL restriction run x264 as separate process
         QString optionStr = fillH264EncoderParams(srcCodecExtraData, iFrame, videoCodecCtx); // make X264 frame compatible with existing stream
@@ -676,7 +676,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcC
             out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, 0); // flush encoder buffer
     }
 
-    if (videoCodecCtx->codec_id == CODEC_ID_H264) 
+    if (videoCodecCtx->codec_id == AV_CODEC_ID_H264) 
     {
         // skip x264 SEI message
         out_size = removeH264SeiMessage(videoBuf, out_size);

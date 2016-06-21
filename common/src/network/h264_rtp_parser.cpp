@@ -176,7 +176,7 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
             totalSize
         )
     );
-    result->compressionType = CODEC_ID_H264;
+    result->compressionType = AV_CODEC_ID_H264;
     result->width = m_spsInitialized ? m_sps.getWidth() : -1;
     result->height = m_spsInitialized ? m_sps.getHeight() : -1;
     if (m_keyDataExists) {

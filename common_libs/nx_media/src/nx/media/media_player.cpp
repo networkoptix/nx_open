@@ -499,9 +499,9 @@ void PlayerPrivate::applyVideoQuality()
 
     // Obtain Low and High stream codec and resolution.
     QSize highResolution;
-    AVCodecID highCodec = CODEC_ID_NONE;
+    AVCodecID highCodec = AV_CODEC_ID_NONE;
     QSize lowResolution;
-    AVCodecID lowCodec = CODEC_ID_NONE;
+    AVCodecID lowCodec = AV_CODEC_ID_NONE;
     for (const auto& stream: camera->mediaStreams().streams)
     {
         if (stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX) //< High
@@ -570,9 +570,9 @@ void PlayerPrivate::applyTranscodingIfPossible(
 
 /**
  * @param highResolution Can be empty.
- * @param highCodec Can be CODEC_ID_NONE.
+ * @param highCodec Can be AV_CODEC_ID_NONE.
  * @param lowResolution Can be empty.
- * @param lowCodec Can be CODEC_ID_NONE.
+ * @param lowCodec Can be AV_CODEC_ID_NONE.
  */
 void PlayerPrivate::doApplyVideoQuality(
     const QnVirtualCameraResourcePtr& camera,
@@ -591,7 +591,7 @@ void PlayerPrivate::doApplyVideoQuality(
 
     if (highStreamRequested)
     {
-        if (highCodec != CODEC_ID_NONE && !highResolution.isEmpty()) //< High stream exists.
+        if (highCodec != AV_CODEC_ID_NONE && !highResolution.isEmpty()) //< High stream exists.
         {
             if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(highCodec, highResolution))
                 archiveReader->setQuality(MEDIA_Quality_High, /*fastSwitch*/ true);

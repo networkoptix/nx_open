@@ -28,7 +28,7 @@ JpegDecoder::JpegDecoder(const ResourceAllocatorPtr& allocator, const QSize& res
 bool JpegDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
 {
     Q_UNUSED(resolution);
-    return codec == CODEC_ID_MJPEG;
+    return codec == AV_CODEC_ID_MJPEG;
 }
 
 QSize JpegDecoder::maxResolution(const AVCodecID codec)

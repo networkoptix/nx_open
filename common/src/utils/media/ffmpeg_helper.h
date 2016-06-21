@@ -83,7 +83,7 @@ private:
         StaticHolder()
         {
             memset(&avCodec, 0, sizeof(avCodec));
-            avCodec.id = CODEC_ID_NONE;
+            avCodec.id = AV_CODEC_ID_NONE;
             avCodec.type = AVMEDIA_TYPE_VIDEO;
         }
 

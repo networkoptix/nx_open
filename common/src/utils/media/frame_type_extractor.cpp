@@ -28,7 +28,7 @@ FrameTypeExtractor::FrameTypeExtractor(const QnConstMediaContextPtr& context):
     {
         const quint8* data = context->getExtradata();
         int size = context->getExtradataSize();
-        if (m_codecId == CODEC_ID_VC1) 
+        if (m_codecId == AV_CODEC_ID_VC1) 
         {
             for (int i = 0; i < size - 4; ++i)
             {
@@ -42,11 +42,11 @@ FrameTypeExtractor::FrameTypeExtractor(const QnConstMediaContextPtr& context):
                 }
             }
         }
-        else if (m_codecId == CODEC_ID_WMV1 || m_codecId == CODEC_ID_WMV2 || m_codecId == CODEC_ID_WMV3) 
+        else if (m_codecId == AV_CODEC_ID_WMV1 || m_codecId == AV_CODEC_ID_WMV2 || m_codecId == AV_CODEC_ID_WMV3) 
         {
             decodeWMVSequence(data, size);
         }
-        else if (m_codecId == CODEC_ID_H264)
+        else if (m_codecId == AV_CODEC_ID_H264)
         {
             m_dataWithNalPrefixes = data[0] == 0;
         }
@@ -237,18 +237,18 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getFrameType(
     //quint32 size = ntohl( *((quint32*) data));
     switch (m_codecId)
     {
-        case CODEC_ID_H264:
+        case AV_CODEC_ID_H264:
             return getH264FrameType(data, dataLen);
-        case CODEC_ID_MPEG1VIDEO:
-        case CODEC_ID_MPEG2VIDEO:
+        case AV_CODEC_ID_MPEG1VIDEO:
+        case AV_CODEC_ID_MPEG2VIDEO:
             return getMpegVideoFrameType(data, dataLen);
-        case CODEC_ID_WMV1:
-        case CODEC_ID_WMV2:
-        case CODEC_ID_WMV3:
+        case AV_CODEC_ID_WMV1:
+        case AV_CODEC_ID_WMV2:
+        case AV_CODEC_ID_WMV3:
             return getWMVFrameType(data, dataLen);
-        case CODEC_ID_VC1:
+        case AV_CODEC_ID_VC1:
             return getVCFrameType(data, dataLen);
-        case CODEC_ID_MPEG4:
+        case AV_CODEC_ID_MPEG4:
             return getMpeg4FrameType(data, dataLen);
         default:
             return UnknownFrameType;

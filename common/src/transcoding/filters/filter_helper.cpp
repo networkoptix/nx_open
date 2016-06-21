@@ -14,7 +14,7 @@ QnImageFilterHelper::QnImageFilterHelper():
     m_customAR(0.0),
     m_rotAngle(0),
     m_timestampCorner(Qn::NoCorner),
-    m_codecID(CODEC_ID_NONE),
+    m_codecID(AV_CODEC_ID_NONE),
     m_onscreenDateOffset(0),
     m_timeMs(0)
 {

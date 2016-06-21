@@ -14,7 +14,7 @@ struct FrameBasicInfo
 {
     FrameBasicInfo()
     :
-        codec(CODEC_ID_NONE)
+        codec(AV_CODEC_ID_NONE)
     {
     }
 

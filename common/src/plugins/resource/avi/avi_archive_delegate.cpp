@@ -163,7 +163,7 @@ qint64 QnAviArchiveDelegate::endTime() const
 
 QnConstMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
 {
-    //if (stream->codec->codec_id == CODEC_ID_MJPEG)
+    //if (stream->codec->codec_id == AV_CODEC_ID_MJPEG)
     //    return QnConstMediaContextPtr(nullptr);
 
     while (m_contexts.size() <= stream->index)
@@ -193,7 +193,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
         if (av_read_frame(m_formatContext, &packet) < 0)
             return QnAbstractMediaDataPtr();
         stream= m_formatContext->streams[packet.stream_index];
-        if (stream->codec->codec_id == CODEC_ID_H264 && packet.size == 6)
+        if (stream->codec->codec_id == AV_CODEC_ID_H264 && packet.size == 6)
         {
             // may be H264 delimiter as separate packet. remove it
             if (packet.data[0] == 0x00 && packet.data[1] == 0x00 && packet.data[2] == 0x00 && packet.data[3] == 0x01 && packet.data[4] == nuDelimiter)

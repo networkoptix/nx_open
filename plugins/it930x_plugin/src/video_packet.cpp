@@ -91,7 +91,7 @@ namespace ite
 
     nxcip::CompressionType VideoPacket::codecType() const
     {
-        return nxcip::CODEC_ID_H264;
+        return nxcip::AV_CODEC_ID_H264;
     }
 
     unsigned int VideoPacket::flags() const

@@ -213,7 +213,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
 
         if (fileName.toLower().endsWith(QLatin1String(".avi")))
         {
-            m_exportRecorder->setAudioCodec(CODEC_ID_MP3); // transcode audio to MP3
+            m_exportRecorder->setAudioCodec(AV_CODEC_ID_MP3); // transcode audio to MP3
         }
     }
     if (m_motionFileList[0]) {

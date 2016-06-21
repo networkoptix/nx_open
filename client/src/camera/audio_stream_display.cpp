@@ -261,7 +261,7 @@ void QnAudioStreamDisplay::playCurrentBuffer()
         audio.format = data->format;
         */
 
-        if (data->compressionType == CODEC_ID_NONE)
+        if (data->compressionType == AV_CODEC_ID_NONE)
         {
             cl_log.log(QLatin1String("QnAudioStreamDisplay::putdata: unknown codec type..."), cl_logERROR);
             return;

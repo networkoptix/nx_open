@@ -37,9 +37,9 @@ namespace
     int getDefaultDstSampleRate(int srcSampleRate, AVCodec* avCodec)
     {
         int result = srcSampleRate;
-        if (avCodec->id == CODEC_ID_ADPCM_G726 ||
-            avCodec->id == CODEC_ID_PCM_MULAW ||
-            avCodec->id == CODEC_ID_PCM_ALAW)
+        if (avCodec->id == AV_CODEC_ID_ADPCM_G726 ||
+            avCodec->id == AV_CODEC_ID_PCM_MULAW ||
+            avCodec->id == AV_CODEC_ID_PCM_ALAW)
         {
             result = 8000;
         }

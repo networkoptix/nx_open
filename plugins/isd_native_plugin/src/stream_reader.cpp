@@ -69,7 +69,7 @@ StreamReader::StreamReader(
 :
     m_refManager( parentRefManager ),
     m_encoderNum( encoderNum ),
-    m_videoCodec(nxcip::CODEC_ID_NONE),
+    m_videoCodec(nxcip::AV_CODEC_ID_NONE),
     m_lastVideoTime(0),
     m_lastMotionTime(0),
 #ifndef NO_ISD_AUDIO
@@ -325,9 +325,9 @@ int StreamReader::initializeVMux()
         return nxcip::NX_INVALID_ENCODER_NUMBER; // error
     }
     if (stream_info.enc_type == VMUX_ENC_TYPE_H264)
-        m_videoCodec = nxcip::CODEC_ID_H264;
+        m_videoCodec = nxcip::AV_CODEC_ID_H264;
     else if (stream_info.enc_type == VMUX_ENC_TYPE_MJPG)
-        m_videoCodec = nxcip::CODEC_ID_MJPEG;
+        m_videoCodec = nxcip::AV_CODEC_ID_MJPEG;
     else
     {
         std::cerr<<"ISD plugin: unsupported video format "<<stream_info.enc_type << " for encoder " << m_encoderNum << "\n";

@@ -100,10 +100,10 @@ bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolut
         return false;
     }
 
-    if (codec != CODEC_ID_H264)
+    if (codec != AV_CODEC_ID_H264)
     {
         OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: codec != CODEC_ID_H264";
+            << ") -> false: codec != AV_CODEC_ID_H264";
         return false;
     }
 

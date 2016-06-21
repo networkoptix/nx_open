@@ -13,13 +13,13 @@ namespace
     AVCodecID toFfmpegCodec(const QString& codec)
     {
         if (codec == "AAC")
-            return CODEC_ID_AAC;
+            return AV_CODEC_ID_AAC;
         else if (codec == "G726")
-            return CODEC_ID_ADPCM_G726;
+            return AV_CODEC_ID_ADPCM_G726;
         else if (codec == "MULAW")
-            return CODEC_ID_PCM_MULAW;
+            return AV_CODEC_ID_PCM_MULAW;
         else
-            return CODEC_ID_NONE;
+            return AV_CODEC_ID_NONE;
     }
 }
 
