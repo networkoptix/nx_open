@@ -57,7 +57,7 @@ bool QnDesktopStreamreader::init()
     m_videoBufSize = avpicture_get_size((PixelFormat) m_grabber->format(), m_grabber->width(), m_grabber->height());
     m_videoBuf = (quint8*) av_malloc(m_videoBufSize);
 
-    m_frame = avcodec_alloc_frame();
+    m_frame = av_frame_alloc();
     avpicture_alloc((AVPicture*) m_frame, m_grabber->format(), m_grabber->width(), m_grabber->height() );
 
     AVCodec* codec = avcodec_find_encoder_by_name(m_encoderCodecName);

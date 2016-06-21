@@ -218,8 +218,8 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
     }
 #endif
 
-    m_frame = avcodec_alloc_frame();
-    m_deinterlacedFrame = avcodec_alloc_frame();
+    m_frame = av_frame_alloc();
+    m_deinterlacedFrame = av_frame_alloc();
 
     //if(m_codec->capabilities&CODEC_CAP_TRUNCATED)    c->flags|= CODEC_FLAG_TRUNCATED;
 

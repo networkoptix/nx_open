@@ -236,7 +236,7 @@ void QnScreenGrabber::allocateTmpFrame(int width, int height, PixelFormat format
         m_tmpFrame = 0;
     }
 
-    m_tmpFrame = avcodec_alloc_frame();
+    m_tmpFrame = av_frame_alloc();
     m_tmpFrame->format = format;
     int numBytes = avpicture_get_size(format, m_tmpFrameWidth, m_tmpFrameHeight);
     m_tmpFrameBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));

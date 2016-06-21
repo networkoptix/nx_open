@@ -24,7 +24,7 @@ class FfmpegAudioDecoderPrivate: public QObject
 public:
     FfmpegAudioDecoderPrivate()
     :
-        frame(avcodec_alloc_frame()),
+        frame(av_frame_alloc()),
         codecContext(nullptr),
         lastPts(AV_NOPTS_VALUE)
     {

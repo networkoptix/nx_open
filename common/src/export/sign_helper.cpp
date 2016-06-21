@@ -638,7 +638,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcC
     videoCodecCtx->time_base.den = 30;
 
 
-    AVFrame* frame = avcodec_alloc_frame();
+    AVFrame* frame = av_frame_alloc();
     frame->width = videoCodecCtx->width;
     frame->height = videoCodecCtx->height;
     frame->format = videoCodecCtx->pix_fmt;

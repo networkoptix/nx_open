@@ -82,7 +82,7 @@ public:
     FfmpegVideoDecoderPrivate()
     :
         codecContext(nullptr),
-        frame(avcodec_alloc_frame()),
+        frame(av_frame_alloc()),
         lastPts(AV_NOPTS_VALUE)
     {
     }
