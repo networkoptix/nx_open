@@ -670,7 +670,6 @@
             </properties>
 
             <modules>
-                <module>common_libs/nx_speach_synthesizer</module>
             </modules>
         </profile>
 
