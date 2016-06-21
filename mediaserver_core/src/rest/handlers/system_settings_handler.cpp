@@ -44,7 +44,7 @@ int QnSystemSettingsHandler::executeGet(
                 continue;
             setting->setValue(paramIter.value());
         }
-        reply.settings.emplace(setting->key(), setting->value().toString());
+        reply.settings.emplace(setting->key(), setting->serializedValue());
     }
 
     result.setReply(std::move(reply));
