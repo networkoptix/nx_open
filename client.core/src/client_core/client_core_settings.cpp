@@ -108,3 +108,9 @@ QVariant QnClientCoreSettings::readValueFromSettings(
             return base_type::readValueFromSettings(settings, id, defaultValue);
     }
 }
+
+void QnClientCoreSettings::save()
+{
+    submitToSettings(m_settings);
+    m_settings->sync();
+}

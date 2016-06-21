@@ -8,13 +8,37 @@ import "private"
 
 Page
 {
+    id: cloudScreen
+
     padding: 16
     topPadding: 0
 
     title: qsTr("Cloud Account")
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
-    property bool loggedIn: cloudStatusWatcher.status != QnCloudStatusWatcher.LoggedOut
+    Object
+    {
+        id: d
+
+        property bool dynamicUpdate: true
+        property bool loggedIn: false
+
+        Binding
+        {
+            target: d
+            property: "loggedIn"
+            value: d.isLoggedIn()
+            when: d.dynamicUpdate
+        }
+
+        function isLoggedIn()
+        {
+            return cloudStatusWatcher.status == QnCloudStatusWatcher.Online ||
+                   cloudStatusWatcher.status == QnCloudStatusWatcher.Offline
+        }
+    }
+
+    property bool loggedIn: false
 
     Flickable
     {
@@ -30,8 +54,8 @@ Page
             id: content
 
             width: flickable.width
-            sourceComponent: loggedIn ? summaryComponent
-                                      : credentialsComponent
+            sourceComponent: d.loggedIn ? summaryComponent
+                                        : credentialsComponent
         }
     }
 
@@ -41,7 +65,22 @@ Page
 
         CredentialsEditor
         {
+            id: credentialsEditor
+
             learnMoreLinkVisible: false
+            warningPanel: cloudScreen.warningPanel
+
+            onLoggedIn:
+            {
+                d.loggedIn = true
+            }
+
+            Binding
+            {
+                target: d
+                property: "dynamicUpdate"
+                value: !credentialsEditor.connecting
+            }
         }
     }
 

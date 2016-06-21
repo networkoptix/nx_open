@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import Nx 1.0
 import Nx.Controls 1.0
+import Nx.Items 1.0
 import com.networkoptix.qml 1.0
 
 Item
@@ -8,13 +9,22 @@ Item
     property alias email: emailField.text
     property alias password: passwordField.text
     property alias learnMoreLinkVisible: learnMoreLink.visible
+    readonly property bool connecting: d.connecting
+    property WarningPanel warningPanel: null
 
     signal loggedIn()
 
     implicitWidth: parent ? parent.width : 0
     implicitHeight: content.height
 
-    property bool _invalidCredentials: false
+    QtObject
+    {
+        id: d
+
+        property bool invalidCredentials: false
+        property bool connecting: false
+        property string initialLogin
+    }
 
     Column
     {
@@ -32,24 +42,28 @@ Item
                 id: emailField
                 placeholderText: qsTr("E-mail")
                 width: parent.width
-                showError: _invalidCredentials
+                showError: d.invalidCredentials
+                activeFocusOnTab: true
             }
             TextField
             {
                 id: passwordField
-                echoMode: TextInput.PasswordEchoOnEdit
+                echoMode: TextInput.Password
+                passwordMaskDelay: 1500
                 placeholderText: qsTr("Password")
                 width: parent.width
-                showError: _invalidCredentials
+                showError: d.invalidCredentials
+                activeFocusOnTab: true
+                onAccepted: login()
             }
         }
 
-        Button
+        LoginButton
         {
             id: loginButton
             text: "Login"
             width: parent.width
-            color: ColorTheme.brand_main
+            showProgress: d.connecting
             onClicked: login()
         }
 
@@ -85,13 +99,16 @@ Item
 
         onError:
         {
+            setCloudCredentials(d.initialLogin, "")
+            d.connecting = false
             if (errorCode == QnCloudStatusWatcher.InvalidCredentials)
             {
-                _invalidCredentials = true
+                d.invalidCredentials = true
+                showWarning(qsTr("Invalid e-mail or password"))
             }
             else
             {
-                // TODO
+                showWarning(qsTr("Cannot connect to %1").arg(applicationInfo.cloudName()))
             }
         }
 
@@ -100,6 +117,7 @@ Item
             if (status == QnCloudStatusWatcher.Online)
             {
                 loggedIn()
+                d.connecting = false
                 return
             }
         }
@@ -107,6 +125,41 @@ Item
 
     function login()
     {
+        loginButton.forceActiveFocus()
+
+        if (!emailField.text || !passwordField.text)
+        {
+            d.invalidCredentials = true
+            showWarning(qsTr("Invalid e-mail or password"))
+            return
+        }
+
+        hideWarning()
+        d.invalidCredentials = false
+        d.connecting = true
         setCloudCredentials(email, password)
+    }
+
+    function showWarning(text)
+    {
+        if (!warningPanel)
+            return
+
+        warningPanel.text = text
+        warningPanel.opened = true
+    }
+
+    function hideWarning()
+    {
+        if (!warningPanel)
+            return
+
+        warningPanel.opened = false
+    }
+
+    Component.onCompleted:
+    {
+        d.initialLogin = cloudStatusWatcher.cloudLogin
+        emailField.text = d.initialLogin
     }
 }

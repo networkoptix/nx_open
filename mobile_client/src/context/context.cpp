@@ -170,6 +170,7 @@ void QnContext::setCloudCredentials(const QString& login, const QString& passwor
     qnClientCoreSettings->setCloudLogin(login);
     qnClientCoreSettings->setCloudPassword(password);
     cloudStatusWatcher()->setCloudCredentials(login, password);
+    qnClientCoreSettings->save();
 }
 
 QString QnContext::lp(const QString& path) const

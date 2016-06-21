@@ -6,7 +6,7 @@ FocusScope
 {
     id: loginButton
 
-    property alias text: connectButton
+    property alias text: connectButton.text
     property bool showProgress: false
 
     signal clicked()
