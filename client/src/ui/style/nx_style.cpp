@@ -2808,7 +2808,9 @@ void QnNxStyle::polish(QWidget *widget)
          */
         class ScrollAreaAccessHack : public QAbstractScrollArea
         {
-            friend class QnNxStyle;
+        public:
+            QMargins viewportMargins() const { return QAbstractScrollArea::viewportMargins(); }
+            void setViewportMargins(const QMargins& margins) { QAbstractScrollArea::setViewportMargins(margins); }
         };
 
         ScrollAreaAccessHack* area = static_cast<ScrollAreaAccessHack*>(static_cast<QAbstractScrollArea*>(widget));
