@@ -6,7 +6,7 @@
 #include "log_message.h"
 
 // Uncomment to assert condition enable time measurements
-// #define NX_ASSERT_MEASURE_TIME 30
+#define NX_ASSERT_MEASURE_TIME
 
 #ifdef NX_ASSERT_MEASURE_TIME
     #include <string>
@@ -109,6 +109,7 @@ void assertCrash(Arguments&& ... args)
 #define NX_CRITICAL3(condition, where, message) \
     NX_CRITICAL_IMPL(condition, lm("[%1] %2").arg(where).arg(message))
 
+/** debug & release: Leads to segfault in case of failure */
 #define NX_CRITICAL(...) NX_MSVC_EXPAND( \
     NX_GET_4TH_ARG(__VA_ARGS__, NX_CRITICAL3, NX_CRITICAL2, NX_CRITICAL1, args_reqired)(__VA_ARGS__))
 
@@ -122,6 +123,8 @@ void assertCrash(Arguments&& ... args)
 #define NX_ASSERT3(condition, where, message) \
     NX_ASSERT_IMPL(condition, lm("[%1] %2").arg(where).arg(message))
 
+/** debug: Leads to segfault in case of failure
+ *  release: Writes NX_LOG in case of failure */
 #define NX_ASSERT(...) NX_MSVC_EXPAND( \
     NX_GET_4TH_ARG(__VA_ARGS__, NX_ASSERT3, NX_ASSERT2, NX_ASSERT1, args_reqired)(__VA_ARGS__))
 
@@ -135,5 +138,7 @@ void assertCrash(Arguments&& ... args)
 #define NX_EXPECT3(condition, where, message) \
     NX_EXPECT_IMPL(condition, lm("[%1] %2").arg(where).arg(message))
 
+/** debug: Leads to segfault in case of failure
+ *  release: Does nothing (condition is not even evaluates) */
 #define NX_EXPECT(...) NX_MSVC_EXPAND( \
     NX_GET_4TH_ARG(__VA_ARGS__, NX_EXPECT3, NX_EXPECT2, NX_EXPECT1, args_reqired)(__VA_ARGS__))
