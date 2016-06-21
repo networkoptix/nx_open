@@ -2,7 +2,7 @@
 
 #include <nx/utils/log/assert.h>
 
-static const char* codecIdToLiteral(CodecID codecId)
+static const char* codecIdToLiteral(AVCodecID codecId)
 {
     switch (codecId)
     {
@@ -326,12 +326,12 @@ static const char* codecIdToLiteral(CodecID codecId)
         case CODEC_ID_NONE: return "";
 
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "Unregistered enum CodecID value.");
+            NX_ASSERT(false, Q_FUNC_INFO, "Unregistered enum AVCodecID value.");
             return "";
     }
 }
 
-QString QnAvCodecHelper::codecIdToString(CodecID codecId)
+QString QnAvCodecHelper::codecIdToString(AVCodecID codecId)
 {
     return QString::fromLatin1(codecIdToLiteral(codecId));
 }

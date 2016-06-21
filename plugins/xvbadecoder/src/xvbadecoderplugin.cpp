@@ -53,9 +53,9 @@ void QnXVBADecoderPlugin::initializeLog( QnLog* externalLog )
     QnLog::initLog( externalLog );
 }
 
-QList<CodecID> QnXVBADecoderPlugin::supportedCodecTypes() const
+QList<AVCodecID> QnXVBADecoderPlugin::supportedCodecTypes() const
 {
-    QList<CodecID> codecList;
+    QList<AVCodecID> codecList;
     codecList.push_back( CODEC_ID_H264 );
     return codecList;
 }
@@ -66,7 +66,7 @@ bool QnXVBADecoderPlugin::isHardwareAccelerated() const
 }
 
 QnAbstractVideoDecoder* QnXVBADecoderPlugin::create(
-    CodecID codecID,
+    AVCodecID codecID,
     const QnCompressedVideoDataPtr& data,
     const QGLContext* const glContext ) const
 {

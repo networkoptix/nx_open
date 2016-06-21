@@ -39,7 +39,7 @@ QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(QnCompressedAudioDataPtr data):
         m_first_instance = false;
     }
 
-//    CodecID codecId = internalCodecIdToFfmpeg(m_codec);
+//    AVCodecID codecId = internalCodecIdToFfmpeg(m_codec);
 
     if (m_codec != CODEC_ID_NONE)
     {

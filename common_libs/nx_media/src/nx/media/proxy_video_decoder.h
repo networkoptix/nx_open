@@ -27,9 +27,9 @@ public:
 
     virtual ~ProxyVideoDecoder();
 
-    static bool isCompatible(const CodecID codec, const QSize& resolution);
+    static bool isCompatible(const AVCodecID codec, const QSize& resolution);
 
-    static QSize maxResolution(const CodecID codec);
+    static QSize maxResolution(const AVCodecID codec);
 
     virtual int decode(
         const QnConstCompressedVideoDataPtr& compressedVideoData,

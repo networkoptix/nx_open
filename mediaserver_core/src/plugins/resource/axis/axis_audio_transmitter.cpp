@@ -10,7 +10,7 @@ namespace
     static const uint64_t kAxisBodySourceContentLength = 999999999;
     static const quint64 kTransmissionTimeout = 3000;
 
-    CodecID toFfmpegCodec(const QString& codec)
+    AVCodecID toFfmpegCodec(const QString& codec)
     {
         if (codec == "AAC")
             return CODEC_ID_AAC;

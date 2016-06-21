@@ -304,7 +304,7 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, c
     return result;
 }
 
-QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
+QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(AVCodecID ci)
 {
     char headerBuffer[sizeof(ACS_VideoHeader)];
     uint gotInBuffer = 0;

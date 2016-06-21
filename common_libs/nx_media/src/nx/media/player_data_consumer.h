@@ -39,7 +39,7 @@ public:
     QSize currentResolution() const;
 
     /** Can be CODEC_ID_NONE if not available. */
-    CodecID currentCodec() const;
+    AVCodecID currentCodec() const;
 
 signals:
     /** Hint to render to display current data with no delay due to seek operation in progress. */

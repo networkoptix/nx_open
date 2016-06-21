@@ -343,9 +343,9 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
             arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
         return nullptr;
     }
-    CodecID codecID = CODEC_ID_NONE;
+    AVCodecID codecID = CODEC_ID_NONE;
     QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
-    const CodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO #ak: get codec of resource video stream. Currently (only HLS uses this class), it is always h.264
+    const AVCodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO #ak: get codec of resource video stream. Currently (only HLS uses this class), it is always h.264
     QSize videoResolution;
     if( transcodeParams.videoCodec().isEmpty() && !transcodeParams.pictureSizePixels().isValid() )
     {

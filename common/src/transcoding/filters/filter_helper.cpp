@@ -58,7 +58,7 @@ void QnImageFilterHelper::setTimeCorner(Qn::Corner corner, qint64 onscreenDateOf
     m_timeMs = timeMsec;
 }
 
-void QnImageFilterHelper::setCodec( CodecID codecID )
+void QnImageFilterHelper::setCodec( AVCodecID codecID )
 {
     m_codecID = codecID;
 }

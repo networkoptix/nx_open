@@ -37,12 +37,12 @@ public:
      * @return Either a codec found in ffmpeg registry, or a static instance of a stub AVCodec in case
      * the proper codec is not available in ffmpeg; never null.
      */
-    static AVCodec* findAvCodec(CodecID codecId);
+    static AVCodec* findAvCodec(AVCodecID codecId);
 
     /**
      * @return Newly allocated AVCodecContext with a proper codec, codec_id and coded_type; never null.
      */
-    static AVCodecContext* createAvCodecContext(CodecID codecId);
+    static AVCodecContext* createAvCodecContext(AVCodecID codecId);
 
     /**
      * @return Newly allocated AVCodecContext with data deep-copied via avcodec_copy_context(); never null.

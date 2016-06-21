@@ -213,7 +213,7 @@ public:
     ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
     QByteArray clientGuid;
-    enum CodecID codecId;
+    enum AVCodecID codecId;
     qint64 startTime; // time from last range header
     qint64 endTime;   // time from last range header
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
@@ -232,7 +232,7 @@ public:
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
-static const CodecID DEFAULT_VIDEO_CODEC = CODEC_ID_H263P; 
+static const AVCodecID DEFAULT_VIDEO_CODEC = CODEC_ID_H263P; 
 
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket)
@@ -592,14 +592,14 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
 QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QnConstResourceVideoLayoutPtr vLayout)
 {
     Q_D(QnRtspConnectionProcessor);
-    CodecID dstCodec;
+    AVCodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
         dstCodec = d->codecId;
     else
         dstCodec = media && media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
         //dstCodec = media && media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_VORBIS; // keep aac without transcoding for audio
         //dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
-    //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
+    //AVCodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
     QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
     
     QnResourcePtr res = getResource()->toResourcePtr();

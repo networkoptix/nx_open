@@ -74,7 +74,7 @@ ProxyVideoDecoder::~ProxyVideoDecoder()
 {
 }
 
-bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
+bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
 {
     static bool calledOnce = false;
     if (!calledOnce)
@@ -125,7 +125,7 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
     return true;
 }
 
-QSize ProxyVideoDecoder::maxResolution(const CodecID codec)
+QSize ProxyVideoDecoder::maxResolution(const AVCodecID codec)
 {
     QN_UNUSED(codec);
 

@@ -37,7 +37,7 @@ public:
     * \returns true if decoder is compatible with provided context.
     * This function should be overridden despite static keyword. Otherwise it'll be compile error.
     */
-    static bool isCompatible(const CodecID /*codec */) { return false; }
+    static bool isCompatible(const AVCodecID /*codec */) { return false; }
 
     /*
     * Decode a audio frame. This is a sync function and it could take a lot of CPU.

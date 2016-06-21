@@ -84,7 +84,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     virtual size_t dataSize() const = 0;
 
     DataType dataType;
-    CodecID compressionType;
+    AVCodecID compressionType;
     MediaFlags flags;
     quint32 channelNumber;     // video or audio channel number; some devices might have more than one sensor
     QnConstMediaContextPtr context;

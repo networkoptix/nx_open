@@ -794,7 +794,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 }
 
                 audioStream->id = DEFAULT_AUDIO_STREAM_ID + j;
-                CodecID srcAudioCodec = CODEC_ID_NONE;
+                AVCodecID srcAudioCodec = CODEC_ID_NONE;
                 QnConstMediaContextPtr mediaContext = audioLayout->getAudioTrackInfo(j).codecContext;
                 if (!mediaContext) {
                     m_lastError = ErrorStruct(
@@ -1057,7 +1057,7 @@ bool QnStreamRecorder::isAudioPresent() const
     return m_isAudioPresent;
 }
 
-void QnStreamRecorder::setAudioCodec(CodecID codec)
+void QnStreamRecorder::setAudioCodec(AVCodecID codec)
 {
     m_dstAudioCodec = codec;
 }

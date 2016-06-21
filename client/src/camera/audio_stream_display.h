@@ -65,7 +65,7 @@ private:
     enum SampleConvertMethod {SampleConvert_None, SampleConvert_Float2Int32, SampleConvert_Float2Int16, SampleConvert_Int32ToInt16};
 
     QnMutex m_guiSync;
-    QMap<CodecID, QnAbstractAudioDecoder*> m_decoder;
+    QMap<AVCodecID, QnAbstractAudioDecoder*> m_decoder;
 
     int m_bufferMs;
     int m_prebufferMs;

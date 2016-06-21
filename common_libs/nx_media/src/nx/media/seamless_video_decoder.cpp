@@ -59,7 +59,7 @@ struct FrameBasicInfo
     }
 
     QSize size;
-    CodecID codec;
+    AVCodecID codec;
 };
 
 } // namespace
@@ -226,7 +226,7 @@ QSize SeamlessVideoDecoder::currentResolution() const
     return d->prevFrameInfo.size;
 }
 
-CodecID SeamlessVideoDecoder::currentCodec() const
+AVCodecID SeamlessVideoDecoder::currentCodec() const
 {
     Q_D(const SeamlessVideoDecoder);
     return d->prevFrameInfo.codec;

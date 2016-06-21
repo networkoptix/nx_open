@@ -316,9 +316,9 @@ void QnRtspDataConsumer::setLiveQuality(MediaQuality liveQuality)
 }
 
 /*
-QnMediaContextPtr QnRtspDataConsumer::getGeneratedContext(CodecID compressionType)
+QnMediaContextPtr QnRtspDataConsumer::getGeneratedContext(AVCodecID compressionType)
 {
-    QMap<CodecID, QnMediaContextPtr>::iterator itr = m_generatedContext.find(compressionType);
+    QMap<AVCodecID, QnMediaContextPtr>::iterator itr = m_generatedContext.find(compressionType);
     if (itr != m_generatedContext.end())
         return itr.value();
     QnMediaContextPtr result(new QnMediaContext(compressionType));

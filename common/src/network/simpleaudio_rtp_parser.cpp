@@ -24,7 +24,7 @@ QnSimpleAudioRtpParser::~QnSimpleAudioRtpParser()
 {
 }
 
-void QnSimpleAudioRtpParser::setCodecId(CodecID codecId)
+void QnSimpleAudioRtpParser::setCodecId(AVCodecID codecId)
 {   
     m_codecId = codecId;
 }

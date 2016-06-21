@@ -81,9 +81,9 @@ bool QuicksyncDecoderPlugin::initialized() const
 }
 
 //!Implementation of QnAbstractVideoDecoderPlugin::supportedCodecTypes
-QList<CodecID> QuicksyncDecoderPlugin::supportedCodecTypes() const
+QList<AVCodecID> QuicksyncDecoderPlugin::supportedCodecTypes() const
 {
-    QList<CodecID> codecList;
+    QList<AVCodecID> codecList;
     codecList.push_back( CODEC_ID_H264 );
     return codecList;
 }
@@ -102,7 +102,7 @@ bool QuicksyncDecoderPlugin::isHardwareAccelerated() const
 
 //!Implementation of QnAbstractVideoDecoderPlugin::create
 QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
-    CodecID codecID,
+    AVCodecID codecID,
     const QnCompressedVideoDataPtr& data,
     const QGLContext* const /*glContext*/,
     int currentSWDecoderCount ) const

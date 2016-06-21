@@ -29,7 +29,7 @@ public:
     /*!
         \param swDecoderCount Atomically incremented in constructor and atomically decremented in destructor
     */
-    QnFfmpegVideoDecoder(CodecID codec, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount = NULL);
+    QnFfmpegVideoDecoder(AVCodecID codec, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount = NULL);
     ~QnFfmpegVideoDecoder();
     bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
@@ -37,7 +37,7 @@ public:
 
     virtual void setLightCpuMode(DecodeMode val);
 
-    static bool isHardwareAccellerationPossible(CodecID codecId, int width, int height)
+    static bool isHardwareAccellerationPossible(AVCodecID codecId, int width, int height)
     {
         return codecId == CODEC_ID_H264 && width <= 1920 && height <= 1088;
     }
@@ -66,7 +66,7 @@ public:
     virtual void setSpeed( float newValue ) override;
     void forceMtDecoding(bool value);
 private:
-    static AVCodec* findCodec(CodecID codecId);
+    static AVCodec* findCodec(AVCodecID codecId);
 
     void openDecoder(const QnConstCompressedVideoDataPtr& data);
     void closeDecoder();
@@ -95,7 +95,7 @@ private:
     //int m_height;
 
     static bool m_first_instance;
-    CodecID m_codecId;
+    AVCodecID m_codecId;
     bool m_showmotion;
     QnAbstractVideoDecoder::DecodeMode m_decodeMode;
     QnAbstractVideoDecoder::DecodeMode m_newDecodeMode;

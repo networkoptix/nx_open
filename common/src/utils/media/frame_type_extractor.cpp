@@ -53,7 +53,7 @@ FrameTypeExtractor::FrameTypeExtractor(const QnConstMediaContextPtr& context):
     }
 }
 
-FrameTypeExtractor::FrameTypeExtractor(CodecID codecId, bool nalPrefixes):
+FrameTypeExtractor::FrameTypeExtractor(AVCodecID codecId, bool nalPrefixes):
     m_context(nullptr),
     m_codecId(codecId),
     m_vcSequence(nullptr),

@@ -27,7 +27,7 @@ namespace {
         return accumulator = accumulator * movingAvg + value * (1.0 - movingAvg);
     }
 
-    CodecID updateCodec(CodecID codec)
+    AVCodecID updateCodec(AVCodecID codec)
     {
         if (codec == CODEC_ID_H263P)
             return CODEC_ID_H263;
@@ -36,7 +36,7 @@ namespace {
     }
 }
 
-QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
+QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(AVCodecID codecId):
     QnVideoTranscoder(codecId),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_encoderCtx(0),

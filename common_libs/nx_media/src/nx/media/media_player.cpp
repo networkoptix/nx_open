@@ -184,7 +184,7 @@ private:
         const QnVirtualCameraResourcePtr& camera, const QSize& resolution);
 
     void doApplyVideoQuality(const QnVirtualCameraResourcePtr& camera,
-        QSize highResolution, CodecID highCodec, QSize lowResolution, CodecID lowCodec);
+        QSize highResolution, AVCodecID highCodec, QSize lowResolution, AVCodecID lowCodec);
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent)
@@ -499,19 +499,19 @@ void PlayerPrivate::applyVideoQuality()
 
     // Obtain Low and High stream codec and resolution.
     QSize highResolution;
-    CodecID highCodec = CODEC_ID_NONE;
+    AVCodecID highCodec = CODEC_ID_NONE;
     QSize lowResolution;
-    CodecID lowCodec = CODEC_ID_NONE;
+    AVCodecID lowCodec = CODEC_ID_NONE;
     for (const auto& stream: camera->mediaStreams().streams)
     {
         if (stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX) //< High
         {
-            highCodec = (CodecID) stream.codec;
+            highCodec = (AVCodecID) stream.codec;
             highResolution = stream.getResolution();
         }
         else if (stream.encoderIndex == CameraMediaStreamInfo::SECONDARY_STREAM_INDEX) //< Low
         {
-            lowCodec = (CodecID) stream.codec;
+            lowCodec = (AVCodecID) stream.codec;
             lowResolution = stream.getResolution();
         }
     }
@@ -576,7 +576,7 @@ void PlayerPrivate::applyTranscodingIfPossible(
  */
 void PlayerPrivate::doApplyVideoQuality(
     const QnVirtualCameraResourcePtr& camera,
-    QSize highResolution, CodecID highCodec, QSize lowResolution, CodecID lowCodec)
+    QSize highResolution, AVCodecID highCodec, QSize lowResolution, AVCodecID lowCodec)
 {
     Q_UNUSED(lowCodec);
 

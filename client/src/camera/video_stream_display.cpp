@@ -876,7 +876,7 @@ void QnVideoStreamDisplay::setSpeed(float value)
         m_enableFrameQueue = true;
 
     QnMutexLocker lock( &m_mtx );
-    for( QMap<CodecID, QnAbstractVideoDecoder*>::const_iterator
+    for( QMap<AVCodecID, QnAbstractVideoDecoder*>::const_iterator
         it = m_decoder.begin();
         it != m_decoder.end();
         ++it )
@@ -979,7 +979,7 @@ void QnVideoStreamDisplay::afterJump()
     m_needResetDecoder = true;
     //qDebug() << "after jump, clear all frames";
 
-    //for (QMap<CodecID, CLAbstractVideoDecoder*>::iterator itr = m_decoder.begin(); itr != m_decoder.end(); ++itr)
+    //for (QMap<AVCodecID, CLAbstractVideoDecoder*>::iterator itr = m_decoder.begin(); itr != m_decoder.end(); ++itr)
     //    (*itr)->resetDecoder();
     m_queueWasFilled = false;
     m_lastIgnoreTime = AV_NOPTS_VALUE;

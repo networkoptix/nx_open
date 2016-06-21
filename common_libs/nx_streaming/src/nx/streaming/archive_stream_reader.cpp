@@ -1195,7 +1195,7 @@ MediaQuality QnArchiveStreamReader::getQuality() const
     return m_quality;
 }
 
-CodecID QnArchiveStreamReader::getTranscodingCodec() const
+AVCodecID QnArchiveStreamReader::getTranscodingCodec() const
 {
     // TODO: Pass from server. See DEFAULT_VIDEO_CODEC = CODEC_ID_H263P in rtsp_connection.cpp
     return CODEC_ID_H263P;

@@ -102,7 +102,7 @@ void QnSignHelper::doUpdateDigestNoCodec(QnCryptographicHash &ctx, const quint8*
     ctx.addData((const char*) data, size);
 }
 
-void QnSignHelper::doUpdateDigest(CodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size)
+void QnSignHelper::doUpdateDigest(AVCodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size)
 {
     if (codecId != CODEC_ID_H264)
     {

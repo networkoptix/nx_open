@@ -21,7 +21,7 @@ VideoDecoderRegistry* VideoDecoderRegistry::instance()
 }
 
 VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
-    const CodecID codec, const QSize& resolution)
+    const AVCodecID codec, const QSize& resolution)
 {
     QMutexLocker lock(&mutex);
 
@@ -51,7 +51,7 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
     return VideoDecoderPtr(nullptr, nullptr); //< no compatible decoder found
 }
 
-bool VideoDecoderRegistry::hasCompatibleDecoder(const CodecID codec, const QSize& resolution)
+bool VideoDecoderRegistry::hasCompatibleDecoder(const AVCodecID codec, const QSize& resolution)
 {
     QMutexLocker lock(&mutex);
     for (const auto& plugin: m_plugins)
@@ -71,7 +71,7 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(const CodecID codec, const QSize
     return false;
 }
 
-QSize VideoDecoderRegistry::maxResolution(const CodecID codec)
+QSize VideoDecoderRegistry::maxResolution(const AVCodecID codec)
 {
     // Currently here we compare resolutions by height (number of lines).
     QMutexLocker lock(&mutex);

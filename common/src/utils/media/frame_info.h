@@ -255,7 +255,7 @@ private:
 
 struct CLVideoData
 {
-    CodecID codec;
+    AVCodecID codec;
 
     //out frame info;
     //client needs only define ColorSpace out_type; decoder will setup ather variables

@@ -50,7 +50,7 @@ public:
     QSize currentResolution() const;
 
     /** Can be CODEC_ID_NONE if not available. */
-    CodecID currentCodec() const;
+    AVCodecID currentCodec() const;
 
     void pleaseStop();
 

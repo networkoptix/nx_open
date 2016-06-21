@@ -99,7 +99,7 @@ void QnFfmpegHelper::copyMediaContextFieldsToAvCodecContext(
     av->frame_size = media->getFrameSize();
 }
 
-AVCodec* QnFfmpegHelper::findAvCodec(CodecID codecId)
+AVCodec* QnFfmpegHelper::findAvCodec(AVCodecID codecId)
 {
     AVCodec* codec = avcodec_find_decoder(codecId);
 
@@ -109,7 +109,7 @@ AVCodec* QnFfmpegHelper::findAvCodec(CodecID codecId)
     return codec;
 }
 
-AVCodecContext* QnFfmpegHelper::createAvCodecContext(CodecID codecId)
+AVCodecContext* QnFfmpegHelper::createAvCodecContext(AVCodecID codecId)
 {
     AVCodec* codec = findAvCodec(codecId);
     NX_ASSERT(codec);

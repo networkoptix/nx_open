@@ -25,7 +25,7 @@ protected:
 
 private:
 
-    QnAbstractMediaDataPtr getNextDataMPEG(CodecID ci);
+    QnAbstractMediaDataPtr getNextDataMPEG(AVCodecID ci);
     QnAbstractMediaDataPtr getNextDataMJPEG();
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 

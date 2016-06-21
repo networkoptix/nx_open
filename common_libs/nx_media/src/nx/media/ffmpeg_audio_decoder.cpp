@@ -84,7 +84,7 @@ FfmpegAudioDecoder::~FfmpegAudioDecoder()
 {
 }
 
-bool FfmpegAudioDecoder::isCompatible(const CodecID codec)
+bool FfmpegAudioDecoder::isCompatible(const AVCodecID codec)
 {
     Q_UNUSED(codec);
     return true;

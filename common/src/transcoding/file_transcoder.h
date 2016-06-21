@@ -74,7 +74,7 @@ public:
         \return Returns \a true on success
     */
     bool setVideoCodec(
-        CodecID codec,
+        AVCodecID codec,
         QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_FfmpegTranscode,
         Qn::StreamQuality quality = Qn::QualityHighest,
         const QSize& resolution = QSize(0,0),
@@ -87,7 +87,7 @@ public:
         \return Returns \a true on success
     */
     bool setAudioCodec(
-        CodecID codec,
+        AVCodecID codec,
         QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_FfmpegTranscode );
     //!Set source data duration (in millis) to read. By default, whole source data is read
     void setTranscodeDurationLimit( unsigned int lengthToReadMS );

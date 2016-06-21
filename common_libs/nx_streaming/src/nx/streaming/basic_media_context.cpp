@@ -43,7 +43,7 @@ QnBasicMediaContext* QnBasicMediaContext::deserialize(const QByteArray& data)
 
 //-------------------------------------------------------------------------
 
-CodecID QnBasicMediaContext::getCodecId() const
+AVCodecID QnBasicMediaContext::getCodecId() const
 {
     return m_data->codecId;
 }

@@ -28,18 +28,18 @@ public:
      * @return Optimal video decoder (in case of any) compatible with such frame. Return null
      * pointer if no compatible decoder is found.
      */
-    VideoDecoderPtr createCompatibleDecoder(const CodecID codec, const QSize& resolution);
+    VideoDecoderPtr createCompatibleDecoder(const AVCodecID codec, const QSize& resolution);
 
     /**
      * @return True if compatible video decoder found.
      */
-    bool hasCompatibleDecoder(const CodecID codec, const QSize& resolution);
+    bool hasCompatibleDecoder(const AVCodecID codec, const QSize& resolution);
 
     /**
      * @return Some sort of a maximum for all resolutions returned for the codec by
      * AbstractVideoDecoder::maxResolution(), or (0, 0) if it cannot be determined.
      */
-    QSize maxResolution(const CodecID codec);
+    QSize maxResolution(const AVCodecID codec);
 
     bool isLiteClientMode() const;
     void setLiteClientMode(bool liteMode);
@@ -67,8 +67,8 @@ private:
 
         std::function<AbstractVideoDecoder* (
             const ResourceAllocatorPtr& allocator, const QSize& resolution)> createVideoDecoder;
-        std::function<bool (const CodecID codec, const QSize& resolution)> isCompatible;
-        std::function<QSize (const CodecID codec)> maxResolution;
+        std::function<bool (const AVCodecID codec, const QSize& resolution)> isCompatible;
+        std::function<QSize (const AVCodecID codec)> maxResolution;
         ResourceAllocatorPtr allocator;
         int useCount;
         int maxUseCount;

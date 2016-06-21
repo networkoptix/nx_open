@@ -47,12 +47,12 @@ public:
     virtual bool initialized() const;
 
     //!Implementation of QnAbstractVideoDecoderPlugin::supportedCodecTypes
-    virtual QList<CodecID> supportedCodecTypes() const;
+    virtual QList<AVCodecID> supportedCodecTypes() const;
     //!Implementation of QnAbstractVideoDecoderPlugin::isHardwareAccelerated
     virtual bool isHardwareAccelerated() const;
     //!Implementation of QnAbstractVideoDecoderPlugin::create
     virtual QnAbstractVideoDecoder* create(
-        CodecID codecID,
+        AVCodecID codecID,
         const QnCompressedVideoDataPtr& data,
         const QGLContext* const glContext,
         int currentSWDecoderCount ) const;

@@ -67,7 +67,7 @@ QnAbstractMediaDataPtr QnSpeachSynthesisDataProvider::getNextData()
     packet->m_data.write(
         m_rawBuffer.constData() + m_curPos,
         bytesRest < kDefaultDataChunkSize ? bytesRest : kDefaultDataChunkSize);
-    packet->compressionType = CodecID::CODEC_ID_PCM_S16LE;
+    packet->compressionType = AVCodecID::CODEC_ID_PCM_S16LE;
     packet->dataType = QnAbstractMediaData::DataType::AUDIO;
     packet->dataProvider = this;
     m_curPos += kDefaultDataChunkSize;

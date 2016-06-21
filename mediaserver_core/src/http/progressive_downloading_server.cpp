@@ -344,7 +344,7 @@ class QnProgressiveDownloadingConsumerPrivate: public QnTCPConnectionProcessorPr
 public:
     QnFfmpegTranscoder transcoder;
     QByteArray streamingFormat;
-    CodecID videoCodec;
+    AVCodecID videoCodec;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
     //saving address and port in case socket will not make it to the destructor
     QString foreignAddress;

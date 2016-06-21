@@ -64,7 +64,7 @@ public:
     void setAllowAdaptiveStreaming(bool value);
     void setResource(const QnResourcePtr& resource);
 protected:
-    //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
+    //QnMediaContextPtr getGeneratedContext(AVCodecID compressionType);
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     void createDataPacketTCP(QnByteArray& sendBuffer, const QnAbstractMediaDataPtr& media, int rtpTcpChannel);
@@ -81,7 +81,7 @@ protected:
     void cleanupQueueToPos(int lastIndex, int ch);
     void setNeedKeyData();
 private:
-    //QMap<CodecID, QnMediaContextPtr> m_generatedContext;
+    //QMap<AVCodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;
     //QMap<int, QList<int> > m_ctxSended;

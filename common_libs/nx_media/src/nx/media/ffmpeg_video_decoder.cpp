@@ -145,14 +145,14 @@ FfmpegVideoDecoder::~FfmpegVideoDecoder()
 {
 }
 
-bool FfmpegVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
+bool FfmpegVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
 {
     Q_UNUSED(codec);
     Q_UNUSED(resolution)
     return true;
 }
 
-QSize FfmpegVideoDecoder::maxResolution(const CodecID codec)
+QSize FfmpegVideoDecoder::maxResolution(const AVCodecID codec)
 {
     QN_UNUSED(codec);
 

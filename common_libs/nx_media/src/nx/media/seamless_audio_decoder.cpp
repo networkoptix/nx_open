@@ -24,7 +24,7 @@ struct FrameBasicInfo
     {
     }
 
-    CodecID codec;
+    AVCodecID codec;
 };
 
 } // namespace

@@ -51,7 +51,7 @@ namespace
     }
 }
 
-QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(CodecID codecId):
+QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(AVCodecID codecId):
     QnAudioTranscoder(codecId),
     m_audioEncodingBuffer(0),
     m_encoderCtx(0),

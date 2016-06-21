@@ -12,7 +12,7 @@ class QnFfmpegAudioTranscoder: public QnAudioTranscoder
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegAudioTranscoder)
 public:
-    QnFfmpegAudioTranscoder(CodecID codecId);
+    QnFfmpegAudioTranscoder(AVCodecID codecId);
     ~QnFfmpegAudioTranscoder();
 
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;

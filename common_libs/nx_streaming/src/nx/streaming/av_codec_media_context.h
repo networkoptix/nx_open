@@ -19,7 +19,7 @@ public:
     /**
      * Allocate internal AVCodecContext with ffmpeg's defaults for the codec.
      */
-    QnAvCodecMediaContext(CodecID codecId);
+    QnAvCodecMediaContext(AVCodecID codecId);
 
     /**
      * Copy the specified AVCodecContext into the internal one.
@@ -40,7 +40,7 @@ public:
 
     //--------------------------------------------------------------------------
 
-    virtual CodecID getCodecId() const override;
+    virtual AVCodecID getCodecId() const override;
     virtual AVMediaType getCodecType() const override;
     virtual const char* getRcEq() const override;
     virtual const quint8* getExtradata() const override;

@@ -31,7 +31,7 @@ public:
      * This function should be overridden despite static keyword. Otherwise it is a compile error.
      * @return True if the decoder is compatible with the provided parameters.
      */
-    static bool isCompatible(const CodecID codec, const QSize& resolution)
+    static bool isCompatible(const AVCodecID codec, const QSize& resolution)
     {
         QN_UNUSED(codec, resolution);
         return false;
@@ -45,7 +45,7 @@ public:
      * @return Max supported resolution for the specified codec, or (0, 0) if there is no limit or
      * the codec is not supported.
      */
-    static QSize maxResolution(const CodecID codec)
+    static QSize maxResolution(const AVCodecID codec)
     {
         QN_UNUSED(codec);
         return QSize();

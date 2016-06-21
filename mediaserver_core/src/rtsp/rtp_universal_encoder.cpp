@@ -23,7 +23,7 @@ static const struct
     int pt;
     const char enc_name[14];
     enum AVMediaType codec_type;
-    enum CodecID codec_id;
+    enum AVCodecID codec_id;
     int clock_rate;
     int audio_channels;
 } AVRtpPayloadTypes[]=
@@ -615,7 +615,7 @@ static char *sdp_write_media_attributes(
 
 
 QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, 
-                                             CodecID transcodeToCodec, 
+                                             AVCodecID transcodeToCodec, 
                                              const QSize& videoSize, 
                                              const QnImageFilterHelper& extraTranscodeParams)
 :

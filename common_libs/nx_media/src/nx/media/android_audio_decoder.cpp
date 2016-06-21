@@ -26,7 +26,7 @@ namespace media {
 
 namespace {
 
-    QString codecToString(CodecID codecId)
+    QString codecToString(AVCodecID codecId)
     {
         switch(codecId)
         {
@@ -137,9 +137,9 @@ AndroidAudioDecoder::~AndroidAudioDecoder()
 {
 }
 
-bool AndroidAudioDecoder::isCompatible(const CodecID codec)
+bool AndroidAudioDecoder::isCompatible(const AVCodecID codec)
 {
-    static QMap<CodecID, QSize> maxDecoderSize;
+    static QMap<AVCodecID, QSize> maxDecoderSize;
     static QMutex mutex;
 
     QMutexLocker lock(&mutex);

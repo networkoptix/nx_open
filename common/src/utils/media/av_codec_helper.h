@@ -18,7 +18,7 @@ public:
     /**
      * @return Codec name. Can be empty, but never null.
      */
-    static QString codecIdToString(CodecID codecId);
+    static QString codecIdToString(AVCodecID codecId);
 
     /**
      * Length of AVCodecContext's intra_matrix and inter_matrix; defined by

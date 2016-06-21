@@ -50,7 +50,7 @@ static const GLfloat g_texture_data[] = {
     0.f, 1.f
 };
 
-static QString codecToString(CodecID codecId)
+static QString codecToString(AVCodecID codecId)
 {
     switch(codecId)
     {
@@ -216,10 +216,10 @@ public:
     FboPtr renderFrameToFbo();
     void createGlResources();
 
-    static void addMaxResolutionIfNeeded(const CodecID codec);
+    static void addMaxResolutionIfNeeded(const AVCodecID codec);
 
 private:
-    static QMap<CodecID, QSize> maxResolutions;
+    static QMap<AVCodecID, QSize> maxResolutions;
     static QMutex maxResolutionsMutex;
 
     qint64 frameNumber;
@@ -429,7 +429,7 @@ AndroidVideoDecoder::~AndroidVideoDecoder()
 {
 }
 
-void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const CodecID codec)
+void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
 {
     QMutexLocker lock(&maxResolutionsMutex);
 
@@ -449,7 +449,7 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const CodecID codec)
     }
 }
 
-bool AndroidVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
+bool AndroidVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
 {
     AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(codec);
 
@@ -458,7 +458,7 @@ bool AndroidVideoDecoder::isCompatible(const CodecID codec, const QSize& resolut
     return resolution.width() <= maxSize.width() && resolution.height() <= maxSize.height();
 }
 
-static QSize AndroidVideoDecoder::maxResolution(const CodecID codec)
+static QSize AndroidVideoDecoder::maxResolution(const AVCodecID codec)
 {
     AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(codec);
 

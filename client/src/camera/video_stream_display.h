@@ -93,7 +93,7 @@ private:
     }
 private:
     mutable QnMutex m_mtx;
-    QMap<CodecID, QnAbstractVideoDecoder*> m_decoder;
+    QMap<AVCodecID, QnAbstractVideoDecoder*> m_decoder;
 
     QSet<QnAbstractRenderer*> m_newList;
     QSet<QnAbstractRenderer*> m_renderList;

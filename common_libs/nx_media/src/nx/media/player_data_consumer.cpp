@@ -301,7 +301,7 @@ QSize PlayerDataConsumer::currentResolution() const
         return QSize();
 }
 
-CodecID PlayerDataConsumer::currentCodec() const
+AVCodecID PlayerDataConsumer::currentCodec() const
 {
     if (m_videoDecoder)
         return m_videoDecoder->currentCodec();

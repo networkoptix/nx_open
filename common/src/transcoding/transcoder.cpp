@@ -20,7 +20,7 @@
 #include <nx/fusion/serialization/json.h>
 
 // ---------------------------- QnCodecTranscoder ------------------
-QnCodecTranscoder::QnCodecTranscoder(CodecID codecId)
+QnCodecTranscoder::QnCodecTranscoder(AVCodecID codecId)
 :
     m_bitrate(-1),
     m_quality(Qn::QualityNormal)
@@ -82,7 +82,7 @@ QSize QnCodecTranscoder::roundSize(const QSize& size)
 
 // --------------------------- QnVideoTranscoder -----------------
 
-QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):
+QnVideoTranscoder::QnVideoTranscoder(AVCodecID codecId):
     QnCodecTranscoder(codecId)
 {
 
@@ -195,7 +195,7 @@ QnTranscoder::~QnTranscoder()
 }
 
 int QnTranscoder::suggestMediaStreamParams(
-    CodecID codec,
+    AVCodecID codec,
     QSize resolution,
     Qn::StreamQuality quality,
     QnCodecParams::Value* const params )
@@ -268,7 +268,7 @@ int QnTranscoder::suggestMediaStreamParams(
 }
 
 int QnTranscoder::setVideoCodec(
-    CodecID codec,
+    AVCodecID codec,
     TranscodeMethod method,
     Qn::StreamQuality quality,
     const QSize& resolution,
@@ -330,7 +330,7 @@ void QnTranscoder::setUseRealTimeOptimization(bool value)
         m_vTranscoder->setUseRealTimeOptimization(value);
 }
 
-QnTranscoder::OperationResult QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
+QnTranscoder::OperationResult QnTranscoder::setAudioCodec(AVCodecID codec, TranscodeMethod method)
 {
     m_audioCodec = codec;
     switch (method)

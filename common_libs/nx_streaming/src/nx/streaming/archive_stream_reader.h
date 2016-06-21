@@ -63,7 +63,7 @@ public:
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) override;
     virtual void setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution = QSize()) override;
     virtual MediaQuality getQuality() const override;
-    virtual CodecID getTranscodingCodec() const override;
+    virtual AVCodecID getTranscodingCodec() const override;
 
     virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) override;
     virtual double getSpeed() const override;
@@ -114,8 +114,8 @@ protected:
     int m_primaryVideoIdx;
     int m_audioStreamIndex;
 
-    CodecID m_videoCodecId;
-    CodecID m_audioCodecId;
+    AVCodecID m_videoCodecId;
+    AVCodecID m_audioCodecId;
 
     int m_freq;
     int m_channels;
