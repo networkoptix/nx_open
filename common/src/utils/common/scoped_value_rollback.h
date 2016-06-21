@@ -142,9 +142,11 @@ public:
 template<class T, class Object>
 class QnScopedTypedPropertyRollback : public QnGenericScopedValueRollback<T, Object, QnExternalSetterAggregator<T, Object>, QnExternalGetterAggregator<T, Object>>
 {
+    typedef QnGenericScopedValueRollback<T, Object, QnExternalSetterAggregator<T, Object>, QnExternalGetterAggregator<T, Object>> base_type;
+
 public:
     template<class Get, class Set>
-    QnScopedTypedPropertyRollback(Object* object, Set set, Get get) : QnGenericScopedValueRollback(
+    QnScopedTypedPropertyRollback(Object* object, Set set, Get get) : base_type(
         object,
         new QnExternalSetter<T, Object, Set>(set),
         new QnExternalGetter<T, Object, Get>(get))
@@ -152,7 +154,7 @@ public:
     }
 
     template<class Get, class Set>
-    QnScopedTypedPropertyRollback(Object* object, Set set, Get get, const T& newValue) : QnGenericScopedValueRollback(
+    QnScopedTypedPropertyRollback(Object* object, Set set, Get get, const T& newValue) : base_type(
         object,
         new QnExternalSetter<T, Object, Set>(set),
         new QnExternalGetter<T, Object, Get>(get),
