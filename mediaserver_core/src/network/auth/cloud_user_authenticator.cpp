@@ -387,6 +387,7 @@ QnUserResourcePtr CloudUserAuthenticator::createCloudUser(
 
     ec2::ApiUserData userData;
     userData.id = QnUuid::createUuid();
+    userData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
     userData.name = userName;
     userData.isAdmin = cloudAccessRole == nx::cdb::api::SystemAccessRole::owner;
     switch (cloudAccessRole)
