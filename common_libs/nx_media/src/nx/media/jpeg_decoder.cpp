@@ -25,9 +25,16 @@ JpegDecoder::JpegDecoder(const ResourceAllocatorPtr& allocator, const QSize& res
     QN_UNUSED(allocator, resolution);
 }
 
-bool JpegDecoder::isCompatible(const CodecID codec, const QSize& /*resolution*/)
+bool JpegDecoder::isCompatible(const CodecID codec, const QSize& resolution)
 {
+    Q_UNUSED(resolution);
     return codec == CODEC_ID_MJPEG;
+}
+
+QSize JpegDecoder::maxResolution(const CodecID codec)
+{
+    QN_UNUSED(codec);
+    return QSize();
 }
 
 int JpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)

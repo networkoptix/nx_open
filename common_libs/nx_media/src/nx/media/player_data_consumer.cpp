@@ -293,5 +293,21 @@ void PlayerDataConsumer::endOfRun()
     m_audioDecoder.reset();
 }
 
+QSize PlayerDataConsumer::currentResolution() const
+{
+    if (m_videoDecoder)
+        return m_videoDecoder->currentResolution();
+    else
+        return QSize();
+}
+
+CodecID PlayerDataConsumer::currentCodec() const
+{
+    if (m_videoDecoder)
+        return m_videoDecoder->currentCodec();
+    else
+        return CODEC_ID_NONE;
+}
+
 } // namespace media
 } // namespace nx

@@ -176,6 +176,9 @@ nx_api::SerializerState::Type MessageSerializer::serializeMagicCookieAndTransact
 }
 
 nx_api::SerializerState::Type MessageSerializer::serializeHeader( MessageSerializerBuffer* buffer ) {
+    NX_ASSERT( m_message->header.messageClass != MessageClass::unknown );
+    NX_ASSERT( m_message->header.method != MethodType::invalid );
+    NX_ASSERT( m_message->header.transactionId != Header::nullTransactionId );
     if( serializeHeaderInitial(buffer) == nx_api::SerializerState::needMoreBufferSpace )
         return nx_api::SerializerState::needMoreBufferSpace;
     if( serializeHeaderLengthStart(buffer) == nx_api::SerializerState::needMoreBufferSpace )

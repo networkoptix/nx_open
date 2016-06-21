@@ -9,6 +9,8 @@
 #include <utils/common/delayed.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/media_server_resource.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
@@ -56,7 +58,8 @@ struct NxMediaFlagConfig: public nx::utils::FlagConfig
     NX_STRING_PARAM("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
     NX_FLAG(0, outputFrameDelays, "Log if frame delay is negative.");
     NX_FLAG(0, enableFps, "");
-} conf("nx_media");
+};
+NxMediaFlagConfig conf("nx_media");
 
 static qint64 msecToUsec(qint64 posMs)
 {
@@ -96,6 +99,12 @@ public:
 
     // Media URL to play. Holds QT property value.
     QUrl url;
+
+    // Whether the current Media URL refers to a local file.
+    bool isLocalFile;
+
+    // Resource obtained for the current Media URL.
+    QnResourcePtr resource;
 
     int maxTextureSize;
 
@@ -142,13 +151,11 @@ public:
     // Live buffer overflow counter.
     int overflowCounter;
 
-    // Video quality
-    Player::VideoQuality videoQuality;
+    // See property comment.
+    int videoQuality;
 
-    // User-defined video resolution for custom quality
-    QSize videoResolution;
+    void applyVideoQuality();
 
-    void updateVideoQuality();
 private:
     PlayerPrivate(Player* parent);
 
@@ -171,6 +178,13 @@ private:
     void updateLiveBufferState(BufferState value);
 
     QVideoFramePtr scaleFrame(const QVideoFramePtr& videoFrame);
+
+    bool isTranscodingSupported(const QnVirtualCameraResourcePtr& camera);
+    void applyTranscodingIfPossible(
+        const QnVirtualCameraResourcePtr& camera, const QSize& resolution);
+
+    void doApplyVideoQuality(const QnVirtualCameraResourcePtr& camera,
+        QSize highResolution, CodecID highCodec, QSize lowResolution, CodecID lowCodec);
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent)
@@ -191,7 +205,7 @@ PlayerPrivate::PlayerPrivate(Player *parent)
     liveBufferState(BufferState::NoIssue),
     underflowCounter(0),
     overflowCounter(0),
-    videoQuality(Player::VideoQuality::Auto)
+    videoQuality(Player::VideoQuality::High)
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
     execTimer->setSingleShot(true);
@@ -474,40 +488,135 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
     }
 }
 
-void PlayerPrivate::updateVideoQuality()
+void PlayerPrivate::applyVideoQuality()
 {
     if (!archiveReader)
         return;
 
-    if (videoQuality == Player::VideoQuality::Auto)
-        archiveReader->setQuality(MEDIA_Quality_High, true); // MEDIA_Quality_Auto
-    else if (videoQuality == Player::VideoQuality::High)
-        archiveReader->setQuality(MEDIA_Quality_High, true);
-    else if (videoQuality == Player::VideoQuality::Low)
-        archiveReader->setQuality(MEDIA_Quality_Low, true);
-    else if (videoQuality == Player::VideoQuality::Custom)
-        archiveReader->setQuality(MEDIA_Quality_CustomResolution, true, videoResolution);
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return; //< Setting videoQuality for files is not supported.
+
+    // Obtain Low and High stream codec and resolution.
+    QSize highResolution;
+    CodecID highCodec = CODEC_ID_NONE;
+    QSize lowResolution;
+    CodecID lowCodec = CODEC_ID_NONE;
+    for (const auto& stream: camera->mediaStreams().streams)
+    {
+        if (stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX) //< High
+        {
+            highCodec = (CodecID) stream.codec;
+            highResolution = stream.getResolution();
+        }
+        else if (stream.encoderIndex == CameraMediaStreamInfo::SECONDARY_STREAM_INDEX) //< Low
+        {
+            lowCodec = (CodecID) stream.codec;
+            lowResolution = stream.getResolution();
+        }
+    }
+
+    doApplyVideoQuality(camera, highResolution, highCodec, lowResolution, lowCodec);
+}
+
+namespace {
+
+static const QSize kMaxTranscodingResolution(1920, 1080);
+
+static QSize limitResolution(const QSize& desiredResolution, const QSize& limit)
+{
+    QSize result = desiredResolution;
+
+    if (result.width() > limit.width())
+    {
+        result.setHeight((result.height() * limit.width()) / result.width());
+        result.setWidth(limit.width());
+    }
+
+    if (result.height() > limit.height())
+    {
+        result.setWidth((result.width() * limit.height()) / result.height());
+        result.setHeight(limit.height());
+    }
+
+    NX_ASSERT(result.width() <= limit.width());
+    NX_ASSERT(result.height() <= limit.height());
+
+    return result;
+}
+
+static QSize resolutionWithHeightAndAspect(int height, const QSize& aspect)
+{
+    return QSize((height * aspect.width()) / aspect.height(), height);
+}
+
+} // namespace
+
+void PlayerPrivate::applyTranscodingIfPossible(
+    const QnVirtualCameraResourcePtr& camera, const QSize& resolution)
+{
+    if (isTranscodingSupported(camera))
+    {
+        QSize transcodingResolution = limitResolution(resolution, kMaxTranscodingResolution);
+
+        if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(
+            archiveReader->getTranscodingCodec(), transcodingResolution))
+        {
+            archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
+                transcodingResolution);
+        }
+    }
+}
+
+/**
+ * @param highResolution Can be empty.
+ * @param highCodec Can be CODEC_ID_NONE.
+ * @param lowResolution Can be empty.
+ * @param lowCodec Can be CODEC_ID_NONE.
+ */
+void PlayerPrivate::doApplyVideoQuality(
+    const QnVirtualCameraResourcePtr& camera,
+    QSize highResolution, CodecID highCodec, QSize lowResolution, CodecID lowCodec)
+{
+    Q_UNUSED(lowCodec);
+
+    // Set Low stream as a default, and attempt to override it below if needed.
+    archiveReader->setQuality(MEDIA_Quality_Low, /*fastSwitch*/ true);
+
+    const bool highStreamRequested = videoQuality == Player::VideoQuality::High ||
+        (!highResolution.isEmpty() && videoQuality == highResolution.height());
+
+    const bool lowStreamRequested = videoQuality == Player::VideoQuality::Low ||
+        (!lowResolution.isEmpty() && videoQuality == lowResolution.height());
+
+    if (highStreamRequested)
+    {
+        if (highCodec != CODEC_ID_NONE && !highResolution.isEmpty()) //< High stream exists.
+        {
+            if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(highCodec, highResolution))
+                archiveReader->setQuality(MEDIA_Quality_High, /*fastSwitch*/ true);
+            else
+                applyTranscodingIfPossible(camera, highResolution);
+        }
+    }
+    else if (!lowStreamRequested) //< Custom resolution requested; videoQuality is lines count.
+    {
+        QSize aspect = highResolution;
+        if (aspect.isEmpty()) //< High stream resolution is unknown.
+            aspect = lowResolution;
+        if (aspect.isEmpty()) //< Both Low and High stream resolutions are unknown.
+            aspect = QSize(16, 9);
+
+        const QSize& desiredResolution = resolutionWithHeightAndAspect(videoQuality, aspect);
+        const QSize& maxResolution =
+            VideoDecoderRegistry::instance()->maxResolution(archiveReader->getTranscodingCodec());
+
+        applyTranscodingIfPossible(camera, limitResolution(desiredResolution, maxResolution));
+    }
 }
 
 bool PlayerPrivate::createArchiveReader()
 {
-    QString path(url.path().mid(1));
-    bool isLocalFile = url.scheme() == lit("file");
-    QnResourcePtr resource;
-    if (isLocalFile)
-    {
-#ifdef ENABLE_ARCHIVE
-        resource = QnAviResourcePtr(new QnAviResource(path));
-        resource->setStatus(Qn::Online);
-#else
-        return false;
-#endif
-    }
-    else
-    {
-        resource = qnResPool->getResourceById(QnUuid(path));
-    }
-
     if (!resource)
         return false;
 
@@ -536,7 +645,7 @@ bool PlayerPrivate::initDataProvider()
         return false;
     }
 
-    updateVideoQuality();
+    applyVideoQuality();
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
 
     archiveReader->addDataProcessor(dataConsumer.get());
@@ -550,24 +659,6 @@ bool PlayerPrivate::initDataProvider()
             setPosition(kLivePosition);
         });
 
-    auto resource = archiveReader->getResource();
-    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (camera)
-    {
-        for (const auto& stream: camera->mediaStreams().streams)
-        {
-            if (stream.encoderIndex != CameraMediaStreamInfo::PRIMARY_STREAM_INDEX)
-                continue;
-            CodecID codec = (CodecID)stream.codec;
-            if (!VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-                codec, stream.getResolution()))
-            {
-                // No compatible decoder for High quality. Force low quality.
-                archiveReader->setQuality(MEDIA_Quality_Low, true);
-            }
-        }
-    }
-
     if (!liveMode)
     {
         // Second arg means precise seek.
@@ -578,6 +669,17 @@ bool PlayerPrivate::initDataProvider()
     archiveReader->start();
 
     return true;
+}
+
+bool PlayerPrivate::isTranscodingSupported(const QnVirtualCameraResourcePtr& camera)
+{
+    if (VideoDecoderRegistry::instance()->isLiteClientMode())
+        return false;
+
+    QnMediaServerResourcePtr server = liveMode ? camera->getParentServer()
+        : qnCameraHistoryPool->getMediaServerOnTime(camera, positionMs);
+
+    return server->getServerFlags() & Qn::SF_SupportsTranscoding;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -691,19 +793,29 @@ void Player::setSource(const QUrl& url)
 {
     Q_D(Player);
 
-    if (*conf.substitutePlayerUrl)
+    const QUrl& newUrl = *conf.substitutePlayerUrl ? QUrl(conf.substitutePlayerUrl) : url;
+
+    if (newUrl != d->url)
     {
-        QUrl url(conf.substitutePlayerUrl);
         stop();
-        d->url = url;
-        return;
+        d->url = newUrl;
+
+        const QString path(d->url.path().mid(1));
+        d->isLocalFile = d->url.scheme() == lit("file");
+        if (d->isLocalFile)
+        {
+#ifdef ENABLE_ARCHIVE
+            d->resource.reset(new QnAviResource(path));
+            d->resource->setStatus(Qn::Online);
+#else
+            d->resource.reset();
+#endif
+        }
+        else
+        {
+            d->resource = qnResPool->getResourceById(QnUuid(path));
+        }
     }
-
-    if (url == d->url)
-        return;
-
-    stop();
-    d->url = url;
 }
 
 void Player::setVideoSurface(QAbstractVideoSurface* videoSurface)
@@ -736,36 +848,27 @@ void Player::setReconnectOnPlay(bool reconnectOnPlay)
     d->reconnectOnPlay = reconnectOnPlay;
 }
 
-Player::VideoQuality Player::videoQuality() const
+int Player::videoQuality() const
 {
     Q_D(const Player);
     return d->videoQuality;
 }
 
-void Player::setVideoQuality(const VideoQuality& value)
+void Player::setVideoQuality(int videoQuality)
 {
     Q_D(Player);
-
-    if (d->videoQuality == value)
-        return;
-
-    d->videoQuality = value;
-    d->updateVideoQuality();
+    d->videoQuality = videoQuality;
+    d->applyVideoQuality();
 }
 
-QSize Player::videoResolution() const
+QSize Player::currentResolution() const
 {
     Q_D(const Player);
-    return d->videoResolution;
+    if (d->dataConsumer)
+        return d->dataConsumer->currentResolution();
+    else
+        return QSize();
 }
-
-void Player::setVideoResolution(const QSize& value)
-{
-    Q_D(Player);
-    d->videoResolution = value;;
-    d->updateVideoQuality();
-}
-
 
 } // namespace media
 } // namespace nx

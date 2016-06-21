@@ -1,5 +1,5 @@
 /**********************************************************
-* Feb 11, 2016
+* Jun 14, 2016
 * akolesnikov
 ***********************************************************/
 
@@ -14,36 +14,32 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-class NX_NETWORK_API UdpHolePunchingSynRequest
+class NX_NETWORK_API TunnelConnectionChosenRequest
 :
     public StunRequestData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod = 
-        stun::cc::methods::udpHolePunchingSyn;
+    constexpr static const auto kMethod = stun::cc::methods::tunnelConnectionChosen;
 
-    UdpHolePunchingSynRequest();
+    TunnelConnectionChosenRequest();
 
     virtual void serializeAttributes(nx::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-class NX_NETWORK_API UdpHolePunchingSynResponse
+class NX_NETWORK_API TunnelConnectionChosenResponse
 :
     public StunResponseData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod = 
-        stun::cc::methods::udpHolePunchingSyn;
+    constexpr static const auto kMethod = stun::cc::methods::tunnelConnectionChosen;
 
-    UdpHolePunchingSynResponse();
-
-    nx::String connectSessionId;
+    TunnelConnectionChosenResponse();
 
     virtual void serializeAttributes(nx::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-}   //api
-}   //hpm
-}   //nx
+}   //namespace api
+}   //namespace hpm
+}   //namespace nx

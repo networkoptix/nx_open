@@ -188,7 +188,7 @@ TEST( StunMessageSerialization, CustomIndication )
 
 TEST(StunMessageSerialization, serialization2)
 {
-    stun::Message message;
+    Message message(Header(MessageClass::request, MethodType::bindingMethod));
 
     const nx::String userName("sdfno234sdf");
     const nx::String nonce("kdfgjn234df");
