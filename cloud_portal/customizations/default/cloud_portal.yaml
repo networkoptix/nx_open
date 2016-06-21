@@ -11,7 +11,10 @@ cloud_db:
     url: 'http://$CLOUD_DB_HOST:3346/cdb'
 
 cloud_portal:
-    url: 'http://$CLOUD_PORTAL_HOST/static/index.html#'
+    url: 'http://$CLOUD_PORTAL_HOST'
+
+cloud_gateway:
+    url: 'http://$CLOUD_DB_HOST:3347'
 
 mail_from: 'service@networkoptix.com'
 

@@ -185,6 +185,7 @@ CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
 CLOUD_CONNECT = {
     'url': conf['cloud_db']['url'],
+    'gateway': conf['cloud_gateway']['url'],
     # 'url': 'http://localhost:3346',
     # 'url': 'http://10.0.3.41:3346',
     'customization': conf['customization'],

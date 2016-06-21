@@ -8,10 +8,14 @@ cloud_database:
     database: nx_cloud
 
 cloud_db:
-    url: 'http://cloud-demo.hdw.mx:3346/cdb'
+    url: 'http://$CLOUD_DB_HOST:3346/cdb'
 
 cloud_portal:
-    url: 'http://cloud-demo.hdw.mx/static/dw/index.html#'
+    url: 'http://$CLOUD_PORTAL_HOST'
+
+cloud_gateway:
+    url: 'http://$CLOUD_DB_HOST:3347'
+
 
 mail_from: 'service@networkoptix.com'
 

@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from api.controllers import cloud_api
+from api.controllers import cloud_api, cloud_gateway
 
 from api.helpers.exceptions import handle_exceptions, api_success, require_params
 
@@ -75,3 +75,24 @@ def connect(request):
     require_params(request, ('email', 'password'))
     data = cloud_api.System.bind(request.data['email'], request.data['password'], request.data['name'])
     return api_success(data)
+
+
+@api_view(['GET','POST'])
+@permission_classes((AllowAny, ))
+@handle_exceptions
+def proxy(request, system_id, system_url):
+    email = None
+    password = None
+
+    if request.user.is_authenticated():
+        email = request.user.email
+        password = request.session['password']
+
+    if request.method == 'GET':
+        data = cloud_gateway.get(system_id, system_url, email=email, password=password)
+        return api_success(data)
+    elif request.method == 'POST':
+        data = cloud_gateway.post(system_id, system_url, request.data, email=email, password=password)
+        return api_success(data)
+
+    return None
