@@ -67,8 +67,7 @@ QnMediaServerResource::QnMediaServerResource():
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
     connect(this, &QnResource::resourceChanged, this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
     connect(this, &QnResource::propertyChanged, this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
-    connect(QnModuleFinder::instance(), &QnModuleFinder::modulePrimaryAddressChanged, 
-            [this](const QnModuleInformation&, const SocketAddress&) { emit apiUrlChanged(toSharedPointer(this)); });
+    connect(QnModuleFinder::instance(), &QnModuleFinder::modulePrimaryAddressChanged, this, &QnMediaServerResource::at_apiUrlChanged, Qt::DirectConnection);
 }
 
 QnMediaServerResource::~QnMediaServerResource()
@@ -76,6 +75,13 @@ QnMediaServerResource::~QnMediaServerResource()
     QnMutexLocker lock( &m_mutex );
     m_runningIfRequests.clear();
 }
+
+void QnMediaServerResource::at_apiUrlChanged(const QnModuleInformation& module, const SocketAddress&)
+{
+    if (module.id == getId())
+        emit apiUrlChanged(toSharedPointer(this));
+}
+
 
 void QnMediaServerResource::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
 {

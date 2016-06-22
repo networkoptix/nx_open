@@ -122,7 +122,7 @@ private slots:
     void onRemoveResource(const QnResourcePtr &resource);
     void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
-
+    void at_apiUrlChanged(const QnModuleInformation& module, const SocketAddress&);
 signals:
     void portChanged(const QnResourcePtr &resource);
     void serverFlagsChanged(const QnResourcePtr &resource);
@@ -133,7 +133,7 @@ signals:
     void redundancyChanged(const QnResourcePtr &resource);
     void backupScheduleChanged(const QnResourcePtr &resource);
     void apiUrlChanged(const QnResourcePtr& resource);
-    
+
 private:
     QnMediaServerConnectionPtr m_apiConnection; // deprecated
     rest::QnConnectionPtr m_restConnection; // new one
