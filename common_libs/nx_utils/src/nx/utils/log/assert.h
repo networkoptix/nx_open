@@ -85,7 +85,7 @@ private:
                 nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
         } while (false)
 #else
-    #define NX_CHECK(condition, message, failureAction) \
+    #define NX_CHECK(condition, message, action) \
         do { \
             if (!(condition)) \
                 nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
