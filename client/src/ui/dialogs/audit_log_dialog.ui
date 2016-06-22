@@ -83,7 +83,11 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QLineEdit" name="filterLineEdit"/>
+        <widget class="QLineEdit" name="filterLineEdit">
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item row="0" column="1">
         <widget class="Line" name="verticalLine_3">

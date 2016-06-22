@@ -3,8 +3,6 @@
 * akolesnikov
 ***********************************************************/
 
-#pragma once
-
 #include "random.h"
 
 #include <algorithm>

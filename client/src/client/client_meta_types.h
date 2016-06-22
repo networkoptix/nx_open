@@ -7,7 +7,7 @@
 #include <QtGui/QColor>
 
 #include <common/common_meta_types.h>
-#include <core/core_meta_types.h>
+#include <client_core/client_core_meta_types.h>
 
 /**
  * Convenience class for uniform initialization of metatypes in client module.

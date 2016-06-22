@@ -51,12 +51,15 @@ public:
         updatePasswordIndicatorVisibility();
 
         QString text = input->text();
+        QString trimmed = text.trimmed();
 
-        if (!emptyInputAllowed && text.isEmpty())
+        if (trimmed.isEmpty())
         {
-            lastValidationResult = Qn::ValidationResult(emptyInputHint);
+            lastValidationResult = emptyInputAllowed ?
+                Qn::ValidationResult(QValidator::Acceptable) :
+                Qn::ValidationResult(emptyInputHint);
         }
-        else if (!terminalSpacesAllowed && text.trimmed() != text)
+        else if (!terminalSpacesAllowed && trimmed != text)
         {
             lastValidationResult = Qn::ValidationResult(terminalSpacesHint);
         }
@@ -103,7 +106,7 @@ public:
     {
         if (passwordIndicator)
         {
-            if (input->text().isEmpty())
+            if (input->text().trimmed().isEmpty())
             {
                 if (hidePasswordIndicatorWhenEmpty)
                     passwordIndicator->setVisible(false);
@@ -428,8 +431,17 @@ void QnInputField::setConfirmationMode(const QnInputField* primaryField, const Q
 void QnInputField::setPasswordMode(QLineEdit::EchoMode echoMode, bool allowEmptyPassword, bool showStrengthIndicator)
 {
     setEchoMode(echoMode);
-    setEmptyInputAllowed(allowEmptyPassword, tr("Password cannot be empty."));
-    setTerminalSpacesAllowed(false, tr("Avoid leading and trailing spaces."));
+    setEmptyInputAllowed(allowEmptyPassword);
+    setTerminalSpacesAllowed(false);
     setPasswordIndicatorEnabled(showStrengthIndicator, true, false);
 }
 
+QString QnInputField::defaultEmptyInputHint()
+{
+    return tr("Password cannot be empty.");
+}
+
+QString QnInputField::defaultTerminalSpacesHint()
+{
+    return tr("Avoid leading and trailing spaces.");
+}

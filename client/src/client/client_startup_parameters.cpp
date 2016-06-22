@@ -41,6 +41,7 @@ namespace
     };
 }
 
+const QString QnStartupParameters::kScreenKey(lit("--screen"));
 const QString QnStartupParameters::kAllowMultipleClientInstancesKey(lit("--no-single-application"));
 const QString QnStartupParameters::kHasAdminPermissionsKey(lit("--has-admin-permissions"));
 
@@ -54,7 +55,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     /* Options used to open new client window. */
     addParserParam(commandLineParser, &result.allowMultipleClientInstances, kAllowMultipleClientInstancesKey);
     addParserParam(commandLineParser, &result.authenticationString, "--auth" );
-    addParserParam(commandLineParser, &result.screen, "--screen");
+    addParserParam(commandLineParser, &result.screen, kScreenKey);
     addParserParam(commandLineParser, &result.delayedDrop, "--delayed-drop");
     addParserParam(commandLineParser, &result.instantDrop, "--instant-drop");
 

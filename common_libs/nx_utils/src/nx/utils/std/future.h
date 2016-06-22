@@ -95,17 +95,18 @@ public:
         const std::chrono::duration<Rep, Period>& timeout_duration) const
     {
         std::unique_lock<std::mutex> lk(m_mutex);
-        if (m_cond.wait_for(
-                lk,
-                timeout_duration,
-                [this] { return m_satisfied; }))
+
+        const auto t0 = std::chrono::steady_clock::now();
+        while (!m_satisfied)
         {
-            return std::future_status::ready;
+            const auto timePassed = std::chrono::steady_clock::now() - t0;
+            if (timePassed >= timeout_duration)
+                return std::future_status::timeout;
+            const auto timeLeftToWait = timeout_duration - timePassed;
+            if (m_cond.wait_for(lk, timeLeftToWait, [this]{ return m_satisfied; }))
+                break;
         }
-        else
-        {
-            return std::future_status::timeout;
-        }
+        return std::future_status::ready;
     }
 
     template<class Clock, class Duration>
@@ -113,17 +114,12 @@ public:
         const std::chrono::time_point<Clock, Duration>& timeout_time) const
     {
         std::unique_lock<std::mutex> lk(m_mutex);
-        if (m_cond.wait_until(
-                lk,
-                timeout_time,
-                [this] { return m_satisfied; }))
+        while (!m_satisfied)
         {
-            return std::future_status::ready;
+            if (m_cond.wait_until(lk, timeout_time) == std::cv_status::timeout)
+                return std::future_status::timeout;
         }
-        else
-        {
-            return std::future_status::timeout;
-        }
+        return std::future_status::ready;
     }
 
 protected:

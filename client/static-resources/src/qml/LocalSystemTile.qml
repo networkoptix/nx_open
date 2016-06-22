@@ -99,7 +99,11 @@ BaseTile
             KeyNavigation.tab: expandedArea.loginTextItem;
             KeyNavigation.backtab: hostChooseItem;
 
-            onCurrentItemIndexChanged: { updatePasswordData(currentItemIndex); }
+            onCurrentItemIndexChanged:
+            {
+                expandedArea.password = ""; // Force clear password field on user change
+                updatePasswordData(currentItemIndex);
+            }
         }
     }
 

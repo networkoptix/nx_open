@@ -124,12 +124,15 @@ Rectangle
 
                             isValidVersion: model.isCompatibleVersion;
                             isValidCustomization: model.isCorrectCustomization;
+                            isCompatibilityMode: model.compatibleVersion;
                             notAvailableLabelText:
                             {
                                 if (!isValidVersion)
                                     return model.wrongVersion;
                                 else if (!isValidCustomization)
                                     return model.wrongCustomization;
+                                else if (isCompatibilityMode)
+                                    return model.compatibleVersion;
 
                                 return "";
                             }
@@ -167,6 +170,7 @@ Rectangle
 
                             isValidVersion: model.isCompatibleVersion;
                             isValidCustomization: model.isCorrectCustomization;
+                            isCompatibilityMode: model.compatibleVersion;
 
                             notAvailableLabelText:
                             {
@@ -174,6 +178,8 @@ Rectangle
                                     return model.wrongVersion;
                                 else if (!isValidCustomization)
                                     return model.wrongCustomization;
+                                else if (isCompatibilityMode)
+                                    return model.compatibleVersion;
                                 else if (!isOnline)
                                     return "OFFLINE";
 

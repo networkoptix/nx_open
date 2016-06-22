@@ -193,10 +193,17 @@
             },
             "disabled": {
                 "base":             "transparent",
+                "midlight":         "dark12.setAlpha(102)",
+                "highlight":        "brand_core.setAlpha(102)",
                 "text":             "light10.setAlpha(75)",
                 "highlightedText":  "light4.setAlpha(75)"
             },
             "inactive": {
+                "base":             "transparent",
+                "midlight":         "dark12.setAlpha(102)",
+                "highlight":        "brand_core.setAlpha(102)",
+                "text":             "light10",
+                "highlightedText":  "light4",
                 "link":             "blue12"
             }
         }

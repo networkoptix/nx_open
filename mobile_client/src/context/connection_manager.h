@@ -2,6 +2,8 @@
 
 #include <QtCore/QObject>
 
+#include <utils/common/software_version.h>
+
 #include "context_aware.h"
 
 class QnConnectionManagerPrivate;
@@ -34,7 +36,7 @@ public:
         Suspended
     };
 
-    explicit QnConnectionManager(QObject *parent = 0);
+    explicit QnConnectionManager(QObject* parent = nullptr);
     ~QnConnectionManager();
 
     QString systemName() const;
@@ -49,6 +51,8 @@ public:
     QString currentLogin() const;
     QString currentPassword() const;
 
+    QnSoftwareVersion connectionVersion() const;
+
 signals:
     void connectionFailed(ConnectionStatus status, const QVariant &infoParameter);
     void systemNameChanged(const QString &systemName);
@@ -60,6 +64,8 @@ signals:
     void currentHostChanged();
     void currentLoginChanged();
     void currentPasswordChanged();
+
+    void connectionVersionChanged();
 
 public slots:
     void connectToServer(const QUrl &url);

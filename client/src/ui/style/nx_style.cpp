@@ -31,14 +31,16 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/common/input_field.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/property_backup.h>
 
-// #define CUSTOMIZE_POPUP_SHADOWS //TODO: #vkutin Fix @ Linux, then enable
+#define CUSTOMIZE_POPUP_SHADOWS
 
 using namespace style;
 
 namespace
 {
-    const char* kComboBoxDelegateClassProperty = "_qn_comboBoxDelegateClass";
+    const char* kDelegateClassBackupId = "delegateClass";
+    const char* kViewportMarginsBackupId = "viewportMargins";
 
     const char* kHoveredChildProperty = "_qn_hoveredChild";
 
@@ -240,7 +242,15 @@ namespace
 
         return CommonScrollBar;
     }
-}
+
+    class ViewportMarginsAccessHack : public QAbstractScrollArea
+    {
+    public:
+        QMargins viewportMargins() const { return QAbstractScrollArea::viewportMargins(); }
+        void setViewportMargins(const QMargins& margins) { QAbstractScrollArea::setViewportMargins(margins); }
+    };
+
+} // unnamed namespace
 
 QnNxStylePrivate::QnNxStylePrivate() :
     QCommonStylePrivate(),
@@ -2740,14 +2750,15 @@ QPixmap QnNxStyle::standardPixmap(StandardPixmap iconId, const QStyleOption* opt
 {
     switch (iconId)
     {
-    case SP_LineEditClearButton:
-        return qnSkin->icon("tree/clear.png").pixmap(
-            option ? option->rect.height() :
-            widget ? widget->height() :
-            Metrics::kButtonHeight);
-    }
+        case SP_LineEditClearButton:
+        {
+            const int kQLineEditButtonSize = 16;
+            return qnSkin->icon("theme/input_clear.png").pixmap(kQLineEditButtonSize, kQLineEditButtonSize);
+        }
 
-    return base_type::standardPixmap(iconId, option, widget);
+        default:
+            return base_type::standardPixmap(iconId, option, widget);
+    }
 }
 
 void QnNxStyle::polish(QWidget *widget)
@@ -2795,17 +2806,50 @@ void QnNxStyle::polish(QWidget *widget)
         }
     }
 
+    if (qobject_cast<QPlainTextEdit*>(widget) || qobject_cast<QTextEdit*>(widget))
+    {
+        /*
+         * There are only three ways to change content margins of QPlainTextEdit or QTextEdit without subclassing:
+         *  - use QTextDocument::setDocumentMargin(), but that margin is uniform
+         *  - use Qt stylesheets, but they're slow and it's not a good idea to change stylesheet in polish()
+         *  - hack access to protected method QAbstractScrollArea::setViewportMargins()
+         */
+        ViewportMarginsAccessHack* area = static_cast<ViewportMarginsAccessHack*>(static_cast<QAbstractScrollArea*>(widget));
+
+        QnTypedPropertyBackup<QMargins, ViewportMarginsAccessHack>::backup(area, &ViewportMarginsAccessHack::viewportMargins,
+            QN_SETTER(ViewportMarginsAccessHack::setViewportMargins), kViewportMarginsBackupId);
+
+        const int kTextDocumentDefaultMargin = 4; // in Qt
+        int h = style::Metrics::kStandardPadding - kTextDocumentDefaultMargin;
+        int v = dp(6) - kTextDocumentDefaultMargin;
+        area->setViewportMargins(QMargins(h, v, h, v));
+
+        if (!widget->property(Properties::kDontPolishFontProperty).toBool())
+        {
+            QFont font = widget->font();
+            font.setPixelSize(dp(14));
+            widget->setFont(font);
+        }
+    }
+
     if (auto comboBox = qobject_cast<QComboBox*>(widget))
     {
         comboBox->setAttribute(Qt::WA_Hover);
 
         static const QByteArray kDefaultDelegateClassName("QComboBoxDelegate");
-
-        QAbstractItemDelegate* oldDelegate = comboBox->itemDelegate();
-        if (oldDelegate && oldDelegate->metaObject()->className() == kDefaultDelegateClassName)
+        if (comboBox->itemDelegate()->metaObject()->className() == kDefaultDelegateClassName)
         {
-            comboBox->setProperty(kComboBoxDelegateClassProperty,
-                QVariant::fromValue(const_cast<void*>(static_cast<const void*>(oldDelegate->metaObject()))));
+            auto getDelegateClass = [](const QComboBox* comboBox)
+            {
+                return comboBox->itemDelegate()->metaObject();
+            };
+
+            auto setDelegateClass = [](QComboBox* comboBox, const QMetaObject* delegateClass)
+            {
+                comboBox->setItemDelegate(static_cast<QAbstractItemDelegate*>(delegateClass->newInstance()));
+            };
+
+            QnTypedPropertyBackup<const QMetaObject*, QComboBox>::backup(comboBox, getDelegateClass, setDelegateClass, kDelegateClassBackupId);
             comboBox->setItemDelegate(new QnStyledComboBoxDelegate());
         }
     }
@@ -2831,6 +2875,12 @@ void QnNxStyle::polish(QWidget *widget)
         /* Install hover events tracking: */
         widget->installEventFilter(this);
         widget->setAttribute(Qt::WA_Hover);
+    }
+
+    if (qobject_cast<QAbstractButton*>(widget))
+    {
+        /* Install event filter to process wheel events: */
+        widget->installEventFilter(this);
     }
 
     if (auto button = qobject_cast<QToolButton*>(widget))
@@ -2907,14 +2957,10 @@ void QnNxStyle::unpolish(QWidget* widget)
     }
 
     if (auto comboBox = qobject_cast<QComboBox*>(widget))
-    {
-        if (auto delegateClass = static_cast<const QMetaObject*>(
-            comboBox->property(kComboBoxDelegateClassProperty).value<void*>()))
-        {
-            comboBox->setProperty(kComboBoxDelegateClassProperty, QVariant());
-            comboBox->setItemDelegate(static_cast<QAbstractItemDelegate*>(delegateClass->newInstance()));
-        }
-    }
+        QnAbstractPropertyBackup::restore(comboBox, kDelegateClassBackupId);
+
+    if (qobject_cast<QPlainTextEdit*>(widget) || qobject_cast<QTextEdit*>(widget))
+        QnAbstractPropertyBackup::restore(widget, kViewportMarginsBackupId);
 
     QWidget* popupWithCustomizedShadow = nullptr;
 
@@ -2948,6 +2994,9 @@ void QnNxStyle::unpolish(QWidget* widget)
         tabBar->setProperty(kHoveredChildProperty, QVariant());
         tabBar->removeEventFilter(this);
     }
+
+    if (qobject_cast<QAbstractButton*>(widget))
+        widget->removeEventFilter(this);
 
     if (auto button = qobject_cast<QToolButton*>(widget))
     {
@@ -3013,6 +3062,16 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
                 }
                 break;
             }
+        }
+    }
+    /* Disabled QAbstractButton eats mouse wheel events.
+     * Here we correct this: */
+    else if (auto button = qobject_cast<QAbstractButton*>(object))
+    {
+        if (!button->isEnabled() && event->type() == QEvent::Wheel)
+        {
+            event->ignore();
+            return true;
         }
     }
 

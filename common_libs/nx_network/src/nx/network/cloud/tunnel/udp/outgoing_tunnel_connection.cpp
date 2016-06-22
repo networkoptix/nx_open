@@ -283,14 +283,23 @@ void OutgoingTunnelConnection::onStunMessageReceived(
     nx::stun::Message message)
 {
     hpm::api::UdpHolePunchingSynResponse synAck;
-    bool parsed = synAck.parse(message);
-
-    //TODO: #ak Replase asserts with actual error handling
-    NX_ASSERT(parsed);
-    NX_ASSERT(synAck.connectSessionId == m_connectionId);
+    if (synAck.parse(message))
+    {
+        if (synAck.connectSessionId != m_connectionId)
+        {
+            NX_LOGX(lm("cross-nat %1. Received SYN response with unexpected "
+                       "connection id: %2 vs %1")
+                .arg(m_connectionId).arg(synAck.connectSessionId), cl_logDEBUG1);
+        }
+    }
+    else
+    {
+        NX_LOGX(lm("cross-nat %1. Failed to parse SYN response")
+            .arg(m_connectionId), cl_logDEBUG1);
+    }
 
     NX_LOGX(lm("cross-nat %1. Control connection has been verified")
-        .arg(m_connectionId), cl_logDEBUG1);
+        .arg(m_connectionId), cl_logDEBUG2);
 }
 
 void OutgoingTunnelConnection::onKeepAliveTimeout()

@@ -28,7 +28,8 @@
 #include <client/desktop_client_message_processor.h>
 #include <client/client_recent_connections_manager.h>
 
-#include <core/core_settings.h>
+#include <client_core/client_core_settings.h>
+
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/client_camera_factory.h>
 #include <core/resource/storage_plugin_factory.h>
@@ -240,7 +241,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     common->store<QnFfmpegInitializer>(new QnFfmpegInitializer());
     common->store<QnTranslationManager>(translationManager.release());
-    common->store<QnCoreSettings>(new QnCoreSettings());
+    common->store<QnClientCoreSettings>(new QnClientCoreSettings());
     common->store<QnClientRuntimeSettings>(new QnClientRuntimeSettings());
     common->store<QnClientSettings>(clientSettingsPtr.take()); /* Now common owns the link. */
 

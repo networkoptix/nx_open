@@ -1,9 +1,8 @@
-
 #pragma once
 
 #include <QtCore/QMetaType>
 
-class QnCoreMetaTypes
+class QnClientCoreMetaTypes
 {
 public:
     static void initialize();
