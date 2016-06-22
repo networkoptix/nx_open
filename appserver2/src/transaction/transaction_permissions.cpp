@@ -62,6 +62,18 @@ bool ec2::hasPermission(const QnUuid &userId, const ApiLicenseData &/*data*/, Qn
     return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
+bool ec2::hasPermission(const QnUuid &userId, const ApiUserGroupData&/*data*/, Qn::Permission permission)
+{
+    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+    if (permission == Qn::Permission::SavePermission)
+        return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+    else if (permission == Qn::Permission::ReadPermission)
+        return true;
+    else
+        NX_ASSERT(0);
+    return false;
+}
+
 bool ec2::hasPermission(const QnUuid &userId, const ApiServerFootageData &data, Qn::Permission permission)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
@@ -111,12 +123,16 @@ bool ec2::hasPermission(const QnUuid &userId, const ApiMediaServerUserAttributes
     return qnResourceAccessManager->hasPermission(userResource, target, permission);
 }
 
-bool ec2::hasPermission(const QnUuid &userId, const ApiAccessRightsData &data, Qn::Permission permission)
+bool ec2::hasPermission(const QnUuid &userId, const ApiAccessRightsData &/*data*/, Qn::Permission permission)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    QnResourcePtr target = qnResPool->getResourceById(data.userId);
-
-    return qnResourceAccessManager->hasPermission(userResource, target, permission);
+    if (permission == Qn::Permission::SavePermission)
+        return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+    else if (permission == Qn::Permission::ReadPermission)
+        return true;
+    else
+        NX_ASSERT(0);
+    return false;
 }
 
 bool ec2::hasPermission(const QnUuid &userId, const ApiLicenseOverflowData &/*data*/, Qn::Permission /*permission*/)
