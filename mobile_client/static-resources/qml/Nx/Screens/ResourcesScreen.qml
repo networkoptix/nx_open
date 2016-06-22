@@ -86,7 +86,7 @@ Page
         displayMarginEnd: anchors.bottomMargin
         enabled: d.enabled
 
-        layoutId: sideNavigation.activeLayout
+        layoutId: uiController.layoutId
 
         ScrollIndicator.vertical: ScrollIndicator
         {
@@ -204,13 +204,23 @@ Page
         onConnectionFailed:
         {
             var lastUsedSystemId = getLastUsedSystemId()
-            Workflow.openFailedSessionScreen(
-                        lastUsedSystemId,
-                        connectionManager.currentHost,
-                        connectionManager.currentLogin,
-                        connectionManager.currentPassword,
-                        status,
-                        infoParameter)
+            if (connectionManager.cloudSystem)
+            {
+                Workflow.openFailedCloudSessionScreen(
+                            lastUsedSystemId,
+                            status,
+                            infoParameter)
+            }
+            else
+            {
+                Workflow.openFailedSessionScreen(
+                            lastUsedSystemId,
+                            connectionManager.currentHost,
+                            connectionManager.currentLogin,
+                            connectionManager.currentPassword,
+                            status,
+                            infoParameter)
+            }
         }
 
         onInitialResourcesReceived:

@@ -2,6 +2,7 @@ module Nx
 
 Object 1.0 Object.qml
 singleton ColorTheme 1.0 ColorTheme.qml
+UiController 1.0 UiController.qml
 
 Utils 1.0 Utils.js
 LoginUtils 1.0 LoginUtils.js
