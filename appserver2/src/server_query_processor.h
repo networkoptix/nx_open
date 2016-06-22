@@ -305,16 +305,15 @@ private:
             if (errorCode != ErrorCode::ok)
                 return errorCode;
             
-            ApiResourceParamWithRefData cameraProperty;
-            cameraProperty.resourceId = tran.params.id;
+            ApiResourceParamWithRefDataList resourceParams;
+            dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
 
-            QnTransaction<ApiResourceParamWithRefData> removeCameraPropsTran(
-                ApiCommand::removeResourceParam, 
-                cameraProperty);
-
-            errorCode = processUpdateSync(removeCameraPropsTran, transactionsToSend, 0);
-            if (errorCode != ErrorCode::ok)
-                return errorCode;
+            errorCode = processMultiUpdateSync(
+                ApiCommand::removeResourceParam,
+                tran.isLocal,
+                tran.deliveryInfo,
+                resourceParams,
+                transactionsToSend);
 
             break;
         }
@@ -328,16 +327,15 @@ private:
             if (errorCode != ErrorCode::ok)
                 return errorCode;
             
-            ApiResourceParamWithRefData serverProperty;
-            serverProperty.resourceId = tran.params.id;
+            ApiResourceParamWithRefDataList resourceParams;
+            dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
 
-            QnTransaction<ApiResourceParamWithRefData> removeServerPropsTran(
-                ApiCommand::removeResourceParam, 
-                serverProperty);
-
-            errorCode = processUpdateSync(removeServerPropsTran, transactionsToSend, 0);
-            if (errorCode != ErrorCode::ok)
-                return errorCode;
+            errorCode = processMultiUpdateSync(
+                ApiCommand::removeResourceParam,
+                tran.isLocal,
+                tran.deliveryInfo,
+                resourceParams,
+                transactionsToSend);
 
             errorCode = processMultiUpdateSync(
                 ApiCommand::removeResource,
@@ -350,16 +348,15 @@ private:
         }
         case ApiObject_User: 
         {
-            ApiResourceParamWithRefData userProperty;
-            userProperty.resourceId = tran.params.id;
+            ApiResourceParamWithRefDataList resourceParams;
+            dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
 
-            QnTransaction<ApiResourceParamWithRefData> removeUserPropsTran(
-                ApiCommand::removeResourceParam, 
-                userProperty);
-
-            errorCode = processUpdateSync(removeUserPropsTran, transactionsToSend, 0);
-            if (errorCode != ErrorCode::ok)
-                return errorCode;
+            errorCode = processMultiUpdateSync(
+                ApiCommand::removeResourceParam,
+                tran.isLocal,
+                tran.deliveryInfo,
+                resourceParams,
+                transactionsToSend);
 
             errorCode = processMultiUpdateSync(
                 ApiCommand::removeResource,

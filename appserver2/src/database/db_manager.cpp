@@ -2369,9 +2369,23 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourc
     if (tran.command == ApiCommand::setResourceParam)
         return insertAddParam(tran.params);
     else if (tran.command == ApiCommand::removeResourceParam)
-        return deleteTableRecord(tran.params.resourceId, "vms_kvpair", "resource_guid");
+        return removeParam(tran.params);
     else
         return ErrorCode::notImplemented;
+}
+
+ErrorCode QnDbManager::removeParam(const ApiResourceParamWithRefData& data)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare("DELETE FROM vms_kvpair WHERE resource_guid = :id AND name = :name");
+    query.bindValue(lit(":id"), data.resourceId.toRfc4122());
+    query.bindValue(lit(":name"), data.name);
+    if (!query.exec()) 
+    {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::addCameraHistory(const ApiServerFootageData& params)
@@ -4473,5 +4487,10 @@ ApiObjectInfoList QnDbManagerAccess::getNestedObjectsNoLock(const ApiObjectInfo&
 ApiObjectInfoList QnDbManagerAccess::getObjectsNoLock(const ApiObjectType& objectType)
 {
     return detail::QnDbManager::instance()->getObjectsNoLock(objectType);
+}
+
+void QnDbManagerAccess::getResourceParamsNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& resourceParams)
+{
+    detail::QnDbManager::instance()->doQueryNoLock(resourceId, resourceParams);
 }
 } // namespace ec2
