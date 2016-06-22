@@ -637,17 +637,15 @@ Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters
     return context()->workbench()->currentLayout()->items().size() <= 1 ? Qn::DisabledAction : Qn::EnabledAction;
 }
 
-//TODO: #GDM refactor this condition, this will fail in a lot of cases.
 Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources)
 {
-    if (!context()->navigator()->isTimelineRelevant())
-        return Qn::InvisibleAction;
-
     if (resources.size() != 1)
         return Qn::InvisibleAction;
 
-    bool watchable = !resources[0]->flags().testFlag(Qn::live);
-    return watchable ? Qn::EnabledAction : Qn::InvisibleAction;
+    bool hasFootage = resources[0]->flags().testFlag(Qn::video);
+    return hasFootage
+        ? Qn::EnabledAction
+        : Qn::InvisibleAction;
 }
 
 Qn::ActionVisibility QnTimelineVisibleActionCondition::check(const QnActionParameters &parameters)

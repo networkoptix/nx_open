@@ -431,14 +431,14 @@ void QnInputField::setConfirmationMode(const QnInputField* primaryField, const Q
 void QnInputField::setPasswordMode(QLineEdit::EchoMode echoMode, bool allowEmptyPassword, bool showStrengthIndicator)
 {
     setEchoMode(echoMode);
-    setEmptyInputAllowed(allowEmptyPassword);
+    setEmptyInputAllowed(allowEmptyPassword, tr("Password cannot be empty."));
     setTerminalSpacesAllowed(false);
     setPasswordIndicatorEnabled(showStrengthIndicator, true, false);
 }
 
 QString QnInputField::defaultEmptyInputHint()
 {
-    return tr("Password cannot be empty.");
+    return tr("Value cannot be empty.");
 }
 
 QString QnInputField::defaultTerminalSpacesHint()

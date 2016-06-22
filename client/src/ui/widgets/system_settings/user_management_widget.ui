@@ -141,7 +141,7 @@
      <item>
       <widget class="QPushButton" name="rolesButton">
        <property name="text">
-        <string>Roles...</string>
+        <string>Edit Roles...</string>
        </property>
       </widget>
      </item>

@@ -47,7 +47,9 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     connect(m_model, &QnUserSettingsModel::userChanged, this, [this]()
     {
-        ui->passwordInputField->setEmptyInputAllowed(m_model->mode() != QnUserSettingsModel::NewUser);
+        ui->passwordInputField->setEmptyInputAllowed(
+            m_model->mode() != QnUserSettingsModel::NewUser,
+            ui->passwordInputField->emptyInputHint());
         ui->passwordInputField->reset();
     });
 

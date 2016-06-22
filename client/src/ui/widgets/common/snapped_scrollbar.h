@@ -24,6 +24,9 @@ public:
     bool useItemViewPaddingWhenVisible() const;
     void setUseItemViewPaddingWhenVisible(bool useItemViewPaddingWhenVisible);
 
+    bool useMaximumSpace() const;
+    void setUseMaximumSpace(bool useMaximumSpace);
+
     QnScrollBarProxy *proxyScrollBar() const;
 
 private:
