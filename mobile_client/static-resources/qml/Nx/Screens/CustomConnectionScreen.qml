@@ -46,29 +46,13 @@ Page
             height: 8
         }
 
-        Item
+        LoginButton
         {
+            id: connectButton
+
             width: parent.availableWidth
-            height: connectButton.height
-
-            Button
-            {
-                id: connectButton
-
-                width: parent.width
-                text: qsTr("Connect")
-                color: ColorTheme.brand_main
-                textColor: ColorTheme.brand_contrast
-                onClicked: customConnectionScreen.connect()
-                opacity: d.connecting ? 0.0 : 1.0
-                Behavior on opacity { NumberAnimation { duration: 200 } }
-            }
-
-            ThreeDotBusyIndicator
-            {
-                anchors.centerIn: parent
-                opacity: 1.0 - connectButton.opacity
-            }
+            showProgress: d.connecting
+            onClicked: customConnectionScreen.connect()
         }
 
         Button

@@ -239,6 +239,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
         action(QnActions::ToggleSyncAction)->setEnabled(!isWebView);    // S
         action(QnActions::JumpToEndAction)->setEnabled(!isWebView);     // X
         action(QnActions::JumpToStartAction)->setEnabled(!isWebView);   // Z
+        action(QnActions::PlayPauseAction)->setEnabled(!isWebView);     // Space
 
         /* "Delete" button */
         action(QnActions::DeleteVideowallMatrixAction)->setEnabled(!isWebView);

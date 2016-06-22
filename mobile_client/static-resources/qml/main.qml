@@ -44,6 +44,10 @@ ApplicationWindow
             Workflow.openResourcesScreen(getLastUsedSystemId())
             connectionManager.connectToServer(lastUsedUrl)
         }
+        else if (!cloudStatusWatcher.cloudLogin)
+        {
+            Workflow.openCloudWelcomeScreen()
+        }
         else
         {
             Workflow.openSessionsScreen()

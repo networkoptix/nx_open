@@ -1,9 +1,8 @@
+#include "client_core_meta_types.h"
 
-#include "core_meta_types.h"
+#include <client_core/user_recent_connection_data.h>
 
-#include <core/user_recent_connection_data.h>
-
-void QnCoreMetaTypes::initialize()
+void QnClientCoreMetaTypes::initialize()
 {
     qRegisterMetaType<QnUserRecentConnectionData>();
     qRegisterMetaTypeStreamOperators<QnUserRecentConnectionData>();

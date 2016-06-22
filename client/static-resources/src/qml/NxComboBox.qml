@@ -189,6 +189,8 @@ ComboBox
 
                     onClicked:
                     {
+                        thisComponent.currentIndex = -1;    // Ugly workaround: combobox does not update
+                                                            // its current index if model is updated outside
                         thisComponent.currentIndex = index;
                         thisComponent.popup.visible = false;
                         thisComponent.updateText();

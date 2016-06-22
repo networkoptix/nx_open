@@ -121,6 +121,18 @@ function openSettingsScreen(systemName)
     item.forceActiveFocus()
 }
 
+function openCloudWelcomeScreen()
+{
+    var item = stackView.replace(null, Qt.resolvedUrl("Screens/Cloud/WelcomeScreen.qml"))
+    item.forceActiveFocus()
+}
+
+function openCloudScreen()
+{
+    var item = stackView.push(Qt.resolvedUrl("Screens/Cloud/CloudScreen.qml"))
+    item.forceActiveFocus()
+}
+
 function openOldClientDownloadSuggestion()
 {
     var component = Qt.createComponent("Dialogs/DownloadOldClientDialog.qml")

@@ -5,7 +5,6 @@
 #include <QtCore/QMetaEnum>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/core_settings.h>
 #include <api/abstract_connection.h>
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
@@ -14,6 +13,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <common/common_module.h>
+#include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_message_processor.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <watchers/user_watcher.h>
@@ -64,6 +64,7 @@ public:
     QTimer *suspendTimer;
     int connectionHandle;
     QnConnectionManager::State connectionState;
+    QnSoftwareVersion connectionVersion;
 };
 
 QnConnectionManager::QnConnectionManager(QObject *parent) :
@@ -132,6 +133,12 @@ QString QnConnectionManager::currentPassword() const
 {
     Q_D(const QnConnectionManager);
     return d->url.isValid() ? d->url.password() : QString();
+}
+
+QnSoftwareVersion QnConnectionManager::connectionVersion() const
+{
+    Q_D(const QnConnectionManager);
+    return d->connectionVersion;
 }
 
 void QnConnectionManager::connectToServer(const QUrl &url)
@@ -304,10 +311,15 @@ void QnConnectionManagerPrivate::doConnect() {
         qnSettings->setLastUsedSystemId(connectionInfo.systemName);
         url.setPassword(QString());
         qnSettings->setLastUsedUrl(url);
+
+        connectionVersion = connectionInfo.version;
+        emit q->connectionVersionChanged();
     });
 }
 
 void QnConnectionManagerPrivate::doDisconnect(bool force) {
+    Q_Q(QnConnectionManager);
+
     if (!force)
         qnGlobalSettings->synchronizeNow();
 
@@ -317,6 +329,9 @@ void QnConnectionManagerPrivate::doDisconnect(bool force) {
     QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnSessionManager::instance()->stop();
+
+    connectionVersion = QnSoftwareVersion();
+    emit q->connectionVersionChanged();
 
     updateConnectionState();
 }
@@ -375,7 +390,7 @@ void QnConnectionManagerPrivate::storeConnection(
         const QUrl& url,
         bool storePassword)
 {
-    auto lastConnections = qnCoreSettings->recentUserConnections();
+    auto lastConnections = qnClientCoreSettings->recentUserConnections();
 
     const auto password = storePassword ? url.password()
                                         : QString();
@@ -390,5 +405,5 @@ void QnConnectionManagerPrivate::storeConnection(
                           lastConnections.end());
     lastConnections.prepend(connectionInfo);
 
-    qnCoreSettings->setRecentUserConnections(lastConnections);
+    qnClientCoreSettings->setRecentUserConnections(lastConnections);
 }

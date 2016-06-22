@@ -23,11 +23,13 @@ typedef QList<QnCloudSystem> QnCloudSystemList;
 
 class QnCloudStatusWatcherPrivate;
 
-class QnCloudStatusWatcher : public QObject
-    , public Singleton<QnCloudStatusWatcher>
+class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatcher>
 {
     Q_OBJECT
-    typedef QObject base_type;
+    Q_PROPERTY(QString cloudLogin READ cloudLogin WRITE setCloudLogin NOTIFY loginChanged)
+    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
+
+    using base_type = QObject;
 
 public:
 
@@ -36,6 +38,7 @@ public:
         InvalidCredentials,
         UnknownError
     };
+    Q_ENUM(ErrorCode)
 
     enum Status
     {
@@ -44,6 +47,7 @@ public:
         Offline,
         Unauthorized
     };
+    Q_ENUM(Status)
 
     explicit QnCloudStatusWatcher(QObject *parent = nullptr);
     ~QnCloudStatusWatcher();

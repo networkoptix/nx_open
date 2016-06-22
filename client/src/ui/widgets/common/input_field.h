@@ -61,11 +61,11 @@ public:
 
     bool emptyInputAllowed() const;
     const QString& emptyInputHint() const;
-    void setEmptyInputAllowed(bool enabled, const QString& hint = QString());
+    void setEmptyInputAllowed(bool enabled, const QString& hint = defaultEmptyInputHint());
 
     bool terminalSpacesAllowed() const;
     const QString& terminalSpacesHint() const;
-    void setTerminalSpacesAllowed(bool allow, const QString& hint = QString());
+    void setTerminalSpacesAllowed(bool allow, const QString& hint = defaultTerminalSpacesHint());
 
     void setPasswordMode(QLineEdit::EchoMode echoMode, bool allowEmptyPassword, bool showStrengthIndicator);
 
@@ -80,6 +80,10 @@ public:
 
 signals:
     void textChanged(const QString& text);
+
+private:
+    static QString defaultEmptyInputHint();
+    static QString defaultTerminalSpacesHint();
 
 private:
     friend class LabelWidthAccessor;

@@ -19,6 +19,54 @@ class Player: public QObject
 {
     Q_OBJECT
 
+    Q_ENUMS(State)
+    Q_ENUMS(MediaStatus)
+    Q_ENUMS(VideoQuality)
+
+    /**
+     * Source url to open. In order to support multiserver archive, media player supports
+     * non-standard URL scheme 'camera'. Example to open: "camera://media/<camera_id>".
+     */
+    Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
+
+    /**
+     * Video source to render decoded data
+     */
+    Q_PROPERTY(QAbstractVideoSurface* videoSurface READ videoSurface WRITE setVideoSurface NOTIFY videoSurfaceChanged)
+
+    /**
+     * Current playback UTC position at msec.
+     */
+    Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
+
+    /**
+     * State defined by user action
+     */
+    Q_PROPERTY(State playbackState READ playbackState NOTIFY playbackStateChanged)
+
+    /**
+     * Current state defined by the internal implementation. For example, if the player has got the
+     * 'play' command, 'mediaStatus' will be changed through 'buffering' to 'playing' state.
+     */
+    Q_PROPERTY(MediaStatus mediaStatus READ mediaStatus NOTIFY mediaStatusChanged)
+
+    /**
+     * The player is either on an archive or a live position.
+     */
+    Q_PROPERTY(bool liveMode READ liveMode NOTIFY liveModeChanged)
+
+    Q_PROPERTY(int maxTextureSize READ maxTextureSize WRITE setMaxTextureSize)
+
+    /**
+     * Either one of enum VideoQuality values, or approximate vertical resolution.
+     */
+    Q_PROPERTY(int videoQuality READ videoQuality WRITE setVideoQuality)
+
+    /**
+     * Is (0, 0) if no video is playing or the resolution is not available.
+     */
+    Q_PROPERTY(QSize currentResolution READ currentResolution)
+
 public:
     enum class State
     {
@@ -41,62 +89,12 @@ public:
         InvalidMedia,
     };
 
-    enum class VideoQuality
+    enum VideoQuality
     {
-        Auto, //< Auto qualit
-        Low,  //< Native stream, low quality
-        High, //< Native stream, high quality
-        Custom //< Custom resolution (transcoding required)
+        High = 0, //< Native stream, high quality.
+        Low = 1, //< Native stream, low quality.
     };
 
-    Q_ENUMS(State)
-    Q_ENUMS(MediaStatus)
-    Q_ENUMS(VideoQuality)
-
-    /**
-     * Source url to open. In order to support multiserver archive, media player supports
-     * non-standard URL scheme 'camera'. Example to open: "camera://media/<camera_id>".
-     */
-    Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
-            
-    /**
-     * Video source to render decoded data
-     */
-    Q_PROPERTY(QAbstractVideoSurface* videoSurface READ videoSurface WRITE setVideoSurface NOTIFY videoSurfaceChanged)
-
-    /**
-     * Current playback UTC position at msec.
-     */
-    Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
-
-    /**
-     * State defined by user action
-     */
-    Q_PROPERTY(State playbackState READ playbackState NOTIFY playbackStateChanged)
-
-    /*
-     * Current state defined by the internal implementation. For example, if the player has got the
-     * 'play' command, 'mediaStatus' will be changed through 'buffering' to 'playing' state.
-     */
-    Q_PROPERTY(MediaStatus mediaStatus READ mediaStatus NOTIFY mediaStatusChanged)
-
-    /**
-     * The player is either on an archive or a live position.
-     */
-    Q_PROPERTY(bool liveMode READ liveMode NOTIFY liveModeChanged)
-
-
-    Q_PROPERTY(int maxTextureSize READ maxTextureSize WRITE setMaxTextureSize)
-
-    /**
-    * Video quality
-    */
-    Q_PROPERTY(VideoQuality videoQuality READ videoQuality WRITE setVideoQuality)
-
-    /**
-    * User defined resolution for custom video quality
-    */
-    Q_PROPERTY(QSize videoResolution READ videoResolution WRITE setVideoResolution)
 public:
     Player(QObject *parent = nullptr);
     ~Player();
@@ -106,8 +104,10 @@ public:
     MediaStatus mediaStatus() const;
 
     QUrl source() const;
+    void setSource(const QUrl &source);
 
     QAbstractVideoSurface *videoSurface() const;
+    void setVideoSurface(QAbstractVideoSurface *videoSurface);
 
     qint64 position() const;
     void setPosition(qint64 value);
@@ -120,19 +120,15 @@ public:
 
     bool liveMode() const;
 
-    VideoQuality videoQuality() const;
-    void setVideoQuality(const VideoQuality& value);
+    int videoQuality() const;
+    void setVideoQuality(int videoQuality);
 
-    QSize videoResolution() const;
-    void setVideoResolution(const QSize& value);
+    QSize currentResolution() const;
 
 public slots:
     void play();
     void pause();
     void stop();
-
-    void setSource(const QUrl &source);
-    void setVideoSurface(QAbstractVideoSurface *videoSurface);
 
 signals:
     void playbackStateChanged();

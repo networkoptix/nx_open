@@ -354,16 +354,17 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     // TODO: #Elric #EC2 talk to Roma, write comments
     enum ServerFlag {
-        SF_None             = 0x000,
-        SF_Edge             = 0x001,
-        SF_RemoteEC         = 0x002,
-        SF_HasPublicIP      = 0x004,
-        SF_IfListCtrl       = 0x008,
-        SF_timeCtrl         = 0x010,
-        //SF_AutoSystemName   = 0x020,        /**< System name is default, so it will be displayed as "Unassigned System' in NxTool. */
-        SF_ArmServer        = 0x040,
-        SF_Has_HDD          = 0x080,
-        SF_NewSystem        = 0x100,        /**< System is just installed, it has default admin password and is not linked to the cloud. */
+        SF_None = 0x000,
+        SF_Edge = 0x001,
+        SF_RemoteEC = 0x002,
+        SF_HasPublicIP = 0x004,
+        SF_IfListCtrl = 0x008,
+        SF_timeCtrl = 0x010,
+        //SF_AutoSystemName = 0x020, /**< System name is default, so it will be displayed as "Unassigned System' in NxTool. */
+        SF_ArmServer = 0x040,
+        SF_Has_HDD = 0x080,
+        SF_NewSystem = 0x100, /**< System is just installed, it has default admin password and is not linked to the cloud. */
+        SF_SupportsTranscoding = 0x200,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 

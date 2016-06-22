@@ -1,3 +1,4 @@
+#include <elf.h>
 #include "video_decoder_registry.h"
 
 #include <QtCore/QMutexLocker>
@@ -55,10 +56,43 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(const CodecID codec, const QSize
     QMutexLocker lock(&mutex);
     for (const auto& plugin: m_plugins)
     {
+        QSize maxResolution = plugin.maxResolution(codec);
+        if (!maxResolution.isEmpty())
+        {
+            if (resolution.width() > maxResolution.width() ||
+                resolution.height() > maxResolution.height())
+            {
+                return false;
+            }
+        }
         if (plugin.isCompatible(codec, resolution) && plugin.useCount < plugin.maxUseCount)
             return true;
     }
     return false;
+}
+
+QSize VideoDecoderRegistry::maxResolution(const CodecID codec)
+{
+    // Currently here we compare resolutions by height (number of lines).
+    QMutexLocker lock(&mutex);
+    QSize result;
+    for (const auto& plugin: m_plugins)
+    {
+        const QSize resolution = plugin.maxResolution(codec);
+        if (!resolution.isEmpty() && resolution.height() > result.height())
+            result = resolution;
+    }
+    return result;
+}
+
+bool VideoDecoderRegistry::isLiteClientMode() const
+{
+    return m_isLiteClientMode;
+}
+
+void VideoDecoderRegistry::setLiteClientMode(bool liteMode)
+{
+    m_isLiteClientMode = liteMode;
 }
 
 } // namespace media

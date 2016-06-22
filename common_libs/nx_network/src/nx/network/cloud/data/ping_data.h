@@ -11,27 +11,35 @@ namespace api {
 /** [connection_mediator, 4.3.1] */
 class NX_NETWORK_API PingRequest
 :
-    public StunMessageData
+    public StunRequestData
 {
 public:
+    constexpr static const stun::cc::methods::Value kMethod =
+        stun::cc::methods::ping;
+
     std::list<SocketAddress> endpoints;
 
     PingRequest();
     PingRequest(std::list<SocketAddress> _endpoints);
 
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
 class NX_NETWORK_API PingResponse
 :
-    public StunMessageData
+    public StunResponseData
 {
 public:
+    constexpr static const stun::cc::methods::Value kMethod =
+        stun::cc::methods::ping;
+
     std::list<SocketAddress> endpoints;
 
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    PingResponse();
+
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
 }   //api

@@ -25,7 +25,7 @@ namespace network {
 namespace cloud {
 namespace udp {
 
-class RendezvousConnector;
+class RendezvousConnectorWithVerification;
 
 /** Establishes cross-nat connection to the specified host using UDP hole punching technique.
     \note One instance can keep only one session
@@ -86,18 +86,20 @@ private:
     nx::network::aio::Timer m_timer;
     bool m_done;
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
-    std::deque<std::unique_ptr<RendezvousConnector>> m_rendezvousConnectors;
+    std::deque<std::unique_ptr<RendezvousConnectorWithVerification>> m_rendezvousConnectors;
     std::unique_ptr<stun::UnreliableMessagePipeline> m_connectResultReportSender;
     SocketAddress m_localAddress;
     boost::optional<QString> m_originatingHostAddressReplacement;
+    std::unique_ptr<RendezvousConnectorWithVerification> m_chosenRendezvousConnector;
+    hpm::api::CloudConnectVersion m_remotePeerCloudConnectVersion;
 
     void onConnectResponse(
         nx::hpm::api::ResultCode resultCode,
         nx::hpm::api::ConnectResponse response);
     void onUdtConnectionEstablished(
-        RendezvousConnector* rendezvousConnectorPtr,
-        std::unique_ptr<UdtStreamSocket> udtConnection,
+        RendezvousConnectorWithVerification* rendezvousConnectorPtr,
         SystemError::ErrorCode errorCode);
+    void onHandshakeComplete(SystemError::ErrorCode errorCode);
     void onTimeout();
     /** always called within aio thread */
     void holePunchingDone(

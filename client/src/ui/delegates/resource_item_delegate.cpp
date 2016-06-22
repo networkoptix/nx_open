@@ -153,6 +153,11 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     /* Paint background: */
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
 
+    /* Set opacity if disabled: */
+    QnScopedPainterOpacityRollback opacityRollback(painter);
+    if (!option.state.testFlag(QStyle::State_Enabled))
+        painter->setOpacity(painter->opacity() * 0.3);
+
     /* Draw icon: */
     if (option.features.testFlag(QStyleOptionViewItem::HasDecoration))
         option.icon.paint(painter, iconRect, option.decorationAlignment, iconMode, QIcon::On);
@@ -312,6 +317,9 @@ void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const
         option->features = QStyleOptionViewItem::None;
     else
         option->features |= QStyleOptionViewItem::HasDisplay;
+
+    if (!option->state.testFlag(QStyle::State_Enabled))
+        option->state &= ~(QStyle::State_Selected | QStyle::State_MouseOver);
 }
 
 QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const

@@ -10,6 +10,8 @@ PageBase
     property alias titleControls: toolBar.controls
     property alias warningText: warningPanel.text
     property alias warningVisible: warningPanel.opened
+    property alias toolBar: toolBar
+    property alias warningPanel: warningPanel
 
     signal leftButtonClicked()
 

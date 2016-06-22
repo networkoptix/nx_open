@@ -24,6 +24,7 @@
 #include <camera/camera_chunk_provider.h>
 #include <camera/active_camera_thumbnail_loader.h>
 #include <nx/media/media_player.h>
+#include <watchers/cloud_status_watcher.h>
 
 void QnMobileClientMetaTypes::initialize() {
     registerMetaTypes();
@@ -54,6 +55,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnTimeline>("com.networkoptix.qml", 1, 0, "QnTimelineView");
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
     qmlRegisterType<QnMjpegPlayer>("com.networkoptix.qml", 1, 0, "QnMjpegPlayer");
+    qmlRegisterType<QnCloudStatusWatcher>("com.networkoptix.qml", 1, 0, "QnCloudStatusWatcher");
     qmlRegisterType<nx::media::Player>("com.networkoptix.qml", 1, 0, "QnPlayer");
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnQuickItemMouseTracker>("com.networkoptix.qml", 1, 0, "ItemMouseTracker");

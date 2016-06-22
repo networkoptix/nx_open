@@ -17,16 +17,17 @@
         <root.dir>${basedir}/../..</root.dir>
         <!--Specify the project to test-->      
         <master.project.directory>appserver2</master.project.directory>
+        <guid>{a1071d46-9ff2-48d3-affd-2ab7e1d70255}</guid>
 
         <qt.libs>core gui network xml sql concurrent</qt.libs>
-        <global.libs>-lcommon -lnx_streaming -lnx_network -lappserver2 -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_streaming -lnx_network -lappserver2 -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
 
         <path>${env.PATH}</path>
-        <rdep.packages>gtest openssl quazip</rdep.packages>
+        <rdep.packages>gtest openssl ffmpeg</rdep.packages>
     </properties>
     <dependencies>
         <dependency>
