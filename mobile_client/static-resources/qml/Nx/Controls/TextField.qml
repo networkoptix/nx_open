@@ -10,12 +10,12 @@ QnTextInput
 
     property bool showError: false
 
-    property color inactiveColor: showError ? ColorTheme.orange_d1 : ColorTheme.base10
-    property color activeColor: showError ? ColorTheme.orange_main : ColorTheme.brand_main
+    property color inactiveColor: showError ? ColorTheme.red_d1 : ColorTheme.base10
+    property color activeColor: showError ? ColorTheme.red_main : ColorTheme.brand_main
     property color placeholderColor: ColorTheme.base10
     property color cursorColor: activeColor
     property bool selectionAllowed: true
-    color: showError ? ColorTheme.orange_main : ColorTheme.windowText
+    color: showError ? ColorTheme.red_main : ColorTheme.windowText
 
     leftPadding: 8
     rightPadding: 8

@@ -56,6 +56,8 @@ bool hasPermission(const QnUuid &userId, const ApiPeerSystemTimeData &/*data*/, 
 
 bool hasPermission(const QnUuid &userId, const ApiSystemStatistics &/*data*/, Qn::Permission /*permission*/);
 
+bool hasPermission(const QnUuid &userId, const ApiUserGroupData&/*data*/, Qn::Permission /*permission*/);
+
 template<typename TransactionParamType>
 bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission);
 
@@ -109,12 +111,11 @@ auto hasModifyPermissionImpl(const QnUuid &userId, const TransactionParamType &d
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
 
-    /* Check if resource needs to be created. */
     QnResourcePtr target = qnResPool->getResourceById(data.id);
     if (!target)
-        return qnResourceAccessManager->canCreateResource(userResource, data);
-
-    return qnResourceAccessManager->canModifyResource(userResource, target, data);
+        return qnResourceAccessManager->canCreateResource(userResource, data) || hasPermission(userId, data, Qn::Permission::SavePermission);
+    else
+        return qnResourceAccessManager->canModifyResource(userResource, target, data);
 }
 
 

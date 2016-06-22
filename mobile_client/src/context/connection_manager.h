@@ -15,6 +15,7 @@ class QnConnectionManager : public QObject, public QnContextAware {
     Q_PROPERTY(QString systemName READ systemName NOTIFY systemNameChanged)
     Q_PROPERTY(State connectionState READ connectionState NOTIFY connectionStateChanged)
     Q_PROPERTY(bool online READ isOnline NOTIFY isOnlineChanged)
+    Q_PROPERTY(bool cloudSystem READ isCloudSystem NOTIFY isCloudSystemChanged)
     Q_PROPERTY(QUrl currentUrl READ currentUrl NOTIFY currentUrlChanged)
     Q_PROPERTY(QString currentHost READ currentHost NOTIFY currentHostChanged)
     Q_PROPERTY(QString currentLogin READ currentLogin NOTIFY currentLoginChanged)
@@ -50,6 +51,7 @@ public:
     QString currentHost() const;
     QString currentLogin() const;
     QString currentPassword() const;
+    bool isCloudSystem() const;
 
     QnSoftwareVersion connectionVersion() const;
 
@@ -64,6 +66,7 @@ signals:
     void currentHostChanged();
     void currentLoginChanged();
     void currentPasswordChanged();
+    void isCloudSystemChanged();
 
     void connectionVersionChanged();
 

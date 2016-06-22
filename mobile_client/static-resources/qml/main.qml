@@ -32,6 +32,8 @@ ApplicationWindow
         onCurrentItemChanged: sideNavigation.close()
     }
 
+    UiController {}
+
     Component.onCompleted:
     {
         updateNavigationBarPadding()

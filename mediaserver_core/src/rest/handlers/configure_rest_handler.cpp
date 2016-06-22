@@ -164,7 +164,6 @@ int QnConfigureRestHandler::changePort(const QnUuid &userId, int port)
     server->setUrl(url.toString());
     url = server->getApiUrl();
     url.setPort(port);
-    server->setApiUrl(url.toString());
 
     ec2::ApiMediaServerData apiServer;
     ec2::fromResourceToApi(server, apiServer);

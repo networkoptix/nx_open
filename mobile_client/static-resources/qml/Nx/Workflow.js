@@ -59,6 +59,36 @@ function openFailedSessionScreen(systemName, address, login, password, connectio
     item.forceActiveFocus()
 }
 
+function openFailedCloudSessionScreen(systemName, systemId, connectionStatus, info)
+{
+    //TODO #dklychkov #3.0 Discuss with Alexander Pats and implement
+
+    var item = null
+    if (stackView.get(0, Controls.StackView.ForceLoad).objectName == "sessionsScreen")
+    {
+        item = stackView.push(
+                Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
+                {
+                    "systemName": systemName
+                }
+        )
+    }
+    else
+    {
+        item = stackView.replace(
+                null,
+                Qt.resolvedUrl("Screens/SessionsScreen.qml"),
+                {},
+                Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
+                {
+                    "systemName": systemName
+                }
+        )
+    }
+    item.showWarning(connectionStatus, info)
+    item.forceActiveFocus()
+}
+
 function openDiscoveredSession(systemName, address)
 {
     var item = stackView.push(
@@ -90,15 +120,20 @@ function openResourcesScreen(systemName)
 {
     var item = stackView.get(0, Controls.StackView.ForceLoad)
     if (item && item.objectName == "resourcesScreen")
-        return
-
-    item = stackView.replace(
-            null,
-            Qt.resolvedUrl("Screens/ResourcesScreen.qml"),
-            {
-                "title": systemName
-            }
-    )
+    {
+        if (stackView.depth > 1)
+            stackView.pop(item)
+    }
+    else
+    {
+        item = stackView.replace(
+                null,
+                Qt.resolvedUrl("Screens/ResourcesScreen.qml"),
+                {
+                    "title": systemName
+                }
+        )
+    }
     item.forceActiveFocus()
 }
 

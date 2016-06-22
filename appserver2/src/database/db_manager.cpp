@@ -1718,8 +1718,8 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_server (api_url, auth_key, version, net_addr_list, system_info, flags, system_name, resource_ptr_id, panic_mode) \
-        VALUES (:apiUrl, :authKey, :version, :networkAddresses, :systemInfo, :flags, :systemName, :internalId, 0)\
+        INSERT OR REPLACE INTO vms_server (auth_key, version, net_addr_list, system_info, flags, system_name, resource_ptr_id, panic_mode) \
+        VALUES (:authKey, :version, :networkAddresses, :systemInfo, :flags, :systemName, :internalId, 0)\
     ");
     QnSql::bind(data, &insQuery);
 
@@ -3401,7 +3401,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
 
     query.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        s.api_url as apiUrl, s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
+        s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
         s.flags, s.system_name as systemName \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \

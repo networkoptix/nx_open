@@ -71,7 +71,7 @@ Pane
         y: 2
         anchors.right: parent.right
         icon: lp("/images/edit.png")
-        visible: connectionsModel.hasConnections
+        visible: connectionsModel.hasConnections && !cloudSystem
         onClicked:
         {
             Workflow.openSavedSession(systemName,
@@ -86,17 +86,32 @@ Pane
         if (!contentItem.enabled)
             return
 
-        if (connectionsModel.hasConnections)
+        if (cloudSystem)
         {
-            connectionManager.connectToServer(
-                        LoginUtils.makeUrl(informationBlock.address,
-                                           informationBlock.user,
-                                           connectionsModel.getData("password", 0)))
-            Workflow.openResourcesScreen(systemName)
+            if (!hostsModel.isEmpty)
+            {
+                connectionManager.connectToServer(
+                            LoginUtils.makeUrl(hostsModel.firstHost,
+                                               cloudStatusWatcher.cloudLogin,
+                                               cloudStatusWatcher.cloudPassword,
+                                               true))
+                Workflow.openResourcesScreen(systemName)
+            }
         }
         else
         {
-            Workflow.openDiscoveredSession(systemName, informationBlock.address)
+            if (connectionsModel.hasConnections)
+            {
+                connectionManager.connectToServer(
+                            LoginUtils.makeUrl(informationBlock.address,
+                                               informationBlock.user,
+                                               connectionsModel.getData("password", 0)))
+                Workflow.openResourcesScreen(systemName)
+            }
+            else
+            {
+                Workflow.openDiscoveredSession(systemName, informationBlock.address)
+            }
         }
     }
 
