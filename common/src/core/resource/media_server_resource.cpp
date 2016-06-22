@@ -67,11 +67,12 @@ QnMediaServerResource::QnMediaServerResource():
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
     connect(this, &QnResource::resourceChanged, this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
     connect(this, &QnResource::propertyChanged, this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
-    connect(QnModuleFinder::instance(), &QnModuleFinder::modulePrimaryAddressChanged, this, &QnMediaServerResource::at_apiUrlChanged, Qt::DirectConnection);
+    Qn::directConnect(QnModuleFinder::instance(), &QnModuleFinder::modulePrimaryAddressChanged, this, &QnMediaServerResource::at_apiUrlChanged);
 }
 
 QnMediaServerResource::~QnMediaServerResource()
 {
+    directDisconnectAll();
     QnMutexLocker lock( &m_mutex );
     m_runningIfRequests.clear();
 }

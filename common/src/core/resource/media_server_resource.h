@@ -17,7 +17,9 @@ namespace nx_http {
 }
 class SocketAddress;
 
-class QnMediaServerResource : public QnResource
+class QnMediaServerResource:
+    public QnResource,
+    public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 
