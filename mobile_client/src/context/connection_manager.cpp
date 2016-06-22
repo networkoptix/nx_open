@@ -21,6 +21,7 @@
 namespace {
 
     const QnSoftwareVersion minimalSupportedVersion(2, 5, 0, 0);
+    const QString kCloudSystemScheme = lit("cloud");
 
     enum { kInvalidHandle = -1 };
 
@@ -85,6 +86,7 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentHostChanged);
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentLoginChanged);
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentPasswordChanged);
+    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::isCloudSystemChanged);
     connect(this, &QnConnectionManager::connectionStateChanged, this, &QnConnectionManager::isOnlineChanged);
 }
 
@@ -133,6 +135,12 @@ QString QnConnectionManager::currentPassword() const
 {
     Q_D(const QnConnectionManager);
     return d->url.isValid() ? d->url.password() : QString();
+}
+
+bool QnConnectionManager::isCloudSystem() const
+{
+    Q_D(const QnConnectionManager);
+    return d->url.scheme() == kCloudSystemScheme;
 }
 
 QnSoftwareVersion QnConnectionManager::connectionVersion() const
@@ -242,13 +250,18 @@ void QnConnectionManagerPrivate::doConnect() {
 
     qnCommon->updateRunningInstanceGuid();
 
+    auto connectUrl = url;
+    connectUrl.setScheme(lit("http"));
+
     QnEc2ConnectionRequestResult *result = new QnEc2ConnectionRequestResult(this);
     connectionHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
-        url, ec2::ApiClientInfoData(), result, &QnEc2ConnectionRequestResult::processEc2Reply);
+        connectUrl, ec2::ApiClientInfoData(), result, &QnEc2ConnectionRequestResult::processEc2Reply);
 
     updateConnectionState();
 
-    connect(result, &QnEc2ConnectionRequestResult::replyProcessed, this, [this, result]() {
+    connect(result, &QnEc2ConnectionRequestResult::replyProcessed,
+            this, [this, result, connectUrl]()
+    {
         result->deleteLater();
 
         if (connectionHandle != result->handle())
@@ -283,7 +296,7 @@ void QnConnectionManagerPrivate::doConnect() {
 
         ec2::AbstractECConnectionPtr ec2Connection = result->connection();
 
-        QnAppServerConnectionFactory::setUrl(url);
+        QnAppServerConnectionFactory::setUrl(connectUrl);
         QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
         QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 

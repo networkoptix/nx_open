@@ -71,10 +71,10 @@ bool QnChangeUserPasswordDialog::validate()
     return result;
 }
 
-void QnChangeUserPasswordDialog::done(int r)
+void QnChangeUserPasswordDialog::accept()
 {
-    if (r == Accepted && !validate())
+    if (!validate())
         return;
 
-    base_type::done(r);
+    base_type::accept();
 }

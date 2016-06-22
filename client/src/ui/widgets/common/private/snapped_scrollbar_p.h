@@ -22,4 +22,5 @@ public:
     Qt::Alignment alignment;
     bool useHeaderShift;
     bool useItemViewPaddingWhenVisible;
+    bool useMaximumSpace;
 };

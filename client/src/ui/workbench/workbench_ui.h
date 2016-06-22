@@ -200,7 +200,8 @@ private:
 
     QnImageButtonWidget* newActionButton(QGraphicsItem *parent, QAction* action, int helpTopicId);
     QnImageButtonWidget* newShowHideButton(QGraphicsItem* parent, QAction* action);
-    QnImageButtonWidget* newPinButton(QGraphicsItem* parent, QAction* action);
+    QnImageButtonWidget* newPinButton(QGraphicsItem* parent, QAction* action, bool smallIcon = false);
+
 private slots:
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);

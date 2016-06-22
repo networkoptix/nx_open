@@ -102,17 +102,34 @@ void QnSnappedScrollBar::setUseItemViewPaddingWhenVisible(bool useItemViewPaddin
     d->updateProxyScrollBarSize();
 }
 
+bool QnSnappedScrollBar::useMaximumSpace() const
+{
+    Q_D(const QnSnappedScrollBar);
+    return d->useMaximumSpace;
+}
+
+void QnSnappedScrollBar::setUseMaximumSpace(bool useMaximumSpace)
+{
+    Q_D(QnSnappedScrollBar);
+    if (d->useMaximumSpace == useMaximumSpace)
+        return;
+
+    d->useMaximumSpace = useMaximumSpace;
+    d->updateGeometry();
+}
+
 QnScrollBarProxy *QnSnappedScrollBar::proxyScrollBar() const
 {
     Q_D(const QnSnappedScrollBar);
     return d->proxyScrollbar;
 }
 
-QnSnappedScrollBarPrivate::QnSnappedScrollBarPrivate(QnSnappedScrollBar *parent)
-    : q_ptr(parent),
-      alignment(Qt::AlignRight | Qt::AlignBottom),
-      useHeaderShift(true),
-      useItemViewPaddingWhenVisible(false)
+QnSnappedScrollBarPrivate::QnSnappedScrollBarPrivate(QnSnappedScrollBar *parent) :
+    q_ptr(parent),
+    alignment(Qt::AlignRight | Qt::AlignBottom),
+    useHeaderShift(true),
+    useItemViewPaddingWhenVisible(false),
+    useMaximumSpace(false)
 {
     Q_Q(QnSnappedScrollBar);
 
@@ -139,12 +156,15 @@ void QnSnappedScrollBarPrivate::updateGeometry()
 
     QRect parentRect = parent->rect();
 
-    QPoint pos = proxyScrollbar->mapTo(parent, proxyScrollbar->rect().topLeft());
+    QPoint pos = useMaximumSpace ? parentRect.topLeft() : proxyScrollbar->mapTo(parent, proxyScrollbar->rect().topLeft());
     QRect geometry = QRect(pos, q->sizeHint());
 
     if (q->orientation() == Qt::Vertical)
     {
-        geometry.setHeight(proxyScrollbar->height());
+        if (useMaximumSpace)
+            geometry.setHeight(parentRect.height());
+        else
+            geometry.setHeight(proxyScrollbar->height());
 
         if (alignment.testFlag(Qt::AlignRight))
             geometry.moveRight(parentRect.right());
@@ -156,7 +176,10 @@ void QnSnappedScrollBarPrivate::updateGeometry()
     }
     else
     {
-        geometry.setWidth(proxyScrollbar->width());
+        if (useMaximumSpace)
+            geometry.setWidth(parentRect.width());
+        else
+            geometry.setWidth(proxyScrollbar->width());
 
         if (alignment.testFlag(Qt::AlignBottom))
             geometry.moveBottom(parentRect.bottom());
@@ -202,7 +225,7 @@ bool QnSnappedScrollBarPrivate::eventFilter(QObject *object, QEvent *event)
         if (event->type() == QEvent::Resize)
             updateGeometry();
     }
-    else if (object == proxyScrollbar->parentWidget())
+    else if (object == proxyScrollbar->parentWidget() && !useMaximumSpace)
     {
         if (event->type() == QEvent::Resize || event->type() == QEvent::Move)
             updateGeometry();

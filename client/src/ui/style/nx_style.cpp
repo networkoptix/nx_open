@@ -2914,13 +2914,13 @@ void QnNxStyle::polish(QWidget *widget)
     if (auto view = qobject_cast<QAbstractItemView*>(widget))
     {
         view->viewport()->setAttribute(Qt::WA_Hover);
+        QWidget* topLevel = view->window();
 
-        if (isWidgetOwnedBy<QComboBox>(view))
+        if (isWidgetOwnedBy<QComboBox>(topLevel))
         {
             /* Set margins for drop-down list container: */
-            QWidget* parentWidget = view->parentWidget();
-            parentWidget->setContentsMargins(0, 2, 0, 2);
-            popupToCustomizeShadow = parentWidget;
+            topLevel->setContentsMargins(0, 2, 0, 2);
+            popupToCustomizeShadow = topLevel;
         }
     }
 

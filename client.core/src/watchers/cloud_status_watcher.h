@@ -17,6 +17,8 @@ struct QnCloudSystem
 
     bool operator <(const QnCloudSystem &other) const;
     bool operator ==(const QnCloudSystem &other) const;
+
+    bool fullEqual(const QnCloudSystem& other) const;
 };
 
 typedef QList<QnCloudSystem> QnCloudSystemList;
@@ -27,6 +29,7 @@ class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatch
 {
     Q_OBJECT
     Q_PROPERTY(QString cloudLogin READ cloudLogin WRITE setCloudLogin NOTIFY loginChanged)
+    Q_PROPERTY(QString cloudPassword READ cloudPassword WRITE setCloudPassword NOTIFY passwordChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
 
     using base_type = QObject;
@@ -69,10 +72,14 @@ public:
 
     QnCloudSystemList cloudSystems() const;
 
+    QnCloudSystem currentSystem() const;
+
 signals:
     void loginChanged();
+    void passwordChanged();
     void statusChanged(Status status);
     void cloudSystemsChanged(const QnCloudSystemList &cloudSystems);
+    void currentSystemChanged(const QnCloudSystem& system);
     void error(ErrorCode errorCode);
 
 private:
