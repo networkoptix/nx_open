@@ -21,6 +21,8 @@ void parseArgs(int argc, char **argv);
 
 int main( int argc, char **argv )
 {
+    Q_INIT_RESOURCE(cloud_db_ut);
+
     srand(::time(NULL));
 
 	nx::network::SocketGlobals::InitGuard sgGuard;

@@ -28,8 +28,8 @@ namespace methods {
                 return "connectionResult";
             case udpHolePunchingSyn:
                 return "udpHolePunchingSyn";
-            case udpHolePunchingSynAck:
-                return "udpHolePunchingSynAck";
+            case tunnelConnectionChosen:
+                return "tunnelConnectionChosen";
             default:
                 return "unknown";
         };
@@ -43,6 +43,8 @@ const char* toString(AttributeType val)
 {
     switch (val)
     {
+        case resultCode:
+            return "resultCode";
         case systemId:
             return "systemId";
         case serverId:
@@ -51,8 +53,13 @@ const char* toString(AttributeType val)
             return "peerId";
         case connectionId:
             return "connectionId";
+        case cloudConnectVersion:
+            return "cloudConnectVersion";
+
         case hostName:
             return "hostName";
+        case hostNameList:
+            return "hostNameList";
         case publicEndpointList:
             return "publicEndpointList";
         case tcpHpEndpointList:
@@ -61,6 +68,21 @@ const char* toString(AttributeType val)
             return "udtHpEndpointList";
         case connectionMethods:
             return "connectionMethods";
+        case ignoreSourceAddress:
+            return "ignoreSourceAddress";
+
+        case udpHolePunchingResultCode:
+            return "udpHolePunchingResultCode";
+        case rendezvousConnectTimeout:
+            return "rendezvousConnectTimeout";
+        case udpTunnelKeepAliveInterval:
+            return "udpTunnelKeepAliveInterval";
+        case udpTunnelKeepAliveRetries:
+            return "udpTunnelKeepAliveRetries";
+
+        case systemErrorCode:
+            return "systemErrorCode";
+
         default:
             return "unknown";
     }

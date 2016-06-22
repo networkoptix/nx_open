@@ -146,6 +146,11 @@ api::ModuleInfo CdbFunctionalTest::moduleInfo() const
     return m_moduleInfo;
 }
 
+QString CdbFunctionalTest::testDataDir() const
+{
+    return m_tmpDir;
+}
+
 api::ResultCode CdbFunctionalTest::addAccount(
     api::AccountData* const accountData,
     std::string* const password,
@@ -671,10 +676,20 @@ void CdbFunctionalTest::setTemporaryDirectoryPath(const QString& path)
     sTemporaryDirectoryPath = path;
 }
 
+QString CdbFunctionalTest::temporaryDirectoryPath()
+{
+    return sTemporaryDirectoryPath;
+}
+
 void CdbFunctionalTest::setDbConnectionOptions(
     const nx::db::ConnectionOptions& connectionOptions)
 {
     sConnectionOptions = connectionOptions;
+}
+
+nx::db::ConnectionOptions CdbFunctionalTest::dbConnectionOptions()
+{
+    return sConnectionOptions;
 }
 
 namespace api {

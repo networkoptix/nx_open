@@ -1910,6 +1910,9 @@ void MediaServerProcess::run()
     serverFlags |= Qn::SF_Has_HDD;
 #endif
 
+    if (!(serverFlags & (Qn::SF_ArmServer | Qn::SF_Edge)))
+        serverFlags |= Qn::SF_SupportsTranscoding;
+
     if (!isLocal)
         serverFlags |= Qn::SF_RemoteEC;
     m_publicAddress = getPublicAddress();

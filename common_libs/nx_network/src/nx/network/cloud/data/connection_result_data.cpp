@@ -27,12 +27,13 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(UdpHolePunchingResultCode,
 
 ConnectionResultRequest::ConnectionResultRequest()
 :
+    StunRequestData(kMethod),
     resultCode(UdpHolePunchingResultCode::ok),
     sysErrorCode(SystemError::noError)
 {
 }
 
-void ConnectionResultRequest::serialize(nx::stun::Message* const message)
+void ConnectionResultRequest::serializeAttributes(nx::stun::Message* const message)
 {
     message->newAttribute<attrs::ConnectionId>(connectSessionId);
     message->newAttribute<attrs::UdpHolePunchingResultCodeAttr>(
@@ -40,7 +41,7 @@ void ConnectionResultRequest::serialize(nx::stun::Message* const message)
     message->newAttribute<attrs::SystemErrorCodeAttr>(sysErrorCode);
 }
 
-bool ConnectionResultRequest::parse(const nx::stun::Message& message)
+bool ConnectionResultRequest::parseAttributes(const nx::stun::Message& message)
 {
     return
         readEnumAttributeValue<attrs::UdpHolePunchingResultCodeAttr>(

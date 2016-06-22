@@ -91,11 +91,11 @@ void CloudSystemNameUpdater::systemNameUpdated(
 {
     NX_LOGX(lm("Cloud system name update finished with result %1")
         .arg(nx::cdb::api::toString(resultCode)),
-        cl_logDEBUG1);
+        resultCode == nx::cdb::api::ResultCode::ok ? cl_logDEBUG2 : cl_logDEBUG1);
 
     m_cloudConnection.reset();
     scheduleNextUpdate(
-        resultCode == nx::cdb::api::ResultCode::networkError
+        resultCode != nx::cdb::api::ResultCode::ok
         ? kRetrySystemNameUpdatePeriod
         : kSystemNameUpdatePeriod);
 }

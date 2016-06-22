@@ -29,8 +29,6 @@ public:
         network::test::AddressBinder::Manager addressManager,
         size_t clientsLimit)
     :
-        AbstractIncomingTunnelConnection(
-            addressManager.key.address.toString().toUtf8()),
         m_clientsLimit(clientsLimit),
         m_server(new TCPServerSocket),
         m_addressManager(std::move(addressManager))

@@ -53,7 +53,11 @@ enum Value
     socketIntfIP,
     socketRemoteIP,
 
-    requestPath
+    requestPath,
+
+    credentialsType = 100,
+    credentialsExpirationPeriod,
+    credentialsProlongationPeriod
 };
 }   //namespace attr
 

@@ -23,18 +23,32 @@ class AbstractVideoDecoder
     public QObject
 {
     Q_OBJECT
+
 public:
     virtual ~AbstractVideoDecoder() = default;
 
     /**
      * This function should be overridden despite static keyword. Otherwise it is a compile error.
-     * @param context Codec context.
      * @return True if the decoder is compatible with the provided parameters.
      */
     static bool isCompatible(const CodecID codec, const QSize& resolution)
     {
         QN_UNUSED(codec, resolution);
         return false;
+    }
+
+    /**
+     * This function should be overridden despite static keyword. Otherwise it is a compile error.
+     * ATTENTION: The definition of maximum for resolution is left somewhat fuzzy: complete
+     * implementation would probably require to define the maximum as a set of resolutions with
+     * either maximum width or maximum height (similar to how Android does it).
+     * @return Max supported resolution for the specified codec, or (0, 0) if there is no limit or
+     * the codec is not supported.
+     */
+    static QSize maxResolution(const CodecID codec)
+    {
+        QN_UNUSED(codec);
+        return QSize();
     }
 
     /**

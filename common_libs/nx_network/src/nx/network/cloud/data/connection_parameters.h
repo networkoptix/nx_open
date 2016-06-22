@@ -25,7 +25,7 @@ constexpr static const size_t kUdpTunnelKeepAliveRetriesDefault = 3;
 */
 class NX_NETWORK_API ConnectionParameters
 :
-    public StunMessageData
+    public StunMessageAttributesData
 {
 public:
     std::chrono::milliseconds rendezvousConnectTimeout;
@@ -37,8 +37,8 @@ public:
 
     ConnectionParameters();
 
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
 }   //api

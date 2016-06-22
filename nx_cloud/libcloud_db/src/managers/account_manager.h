@@ -32,6 +32,7 @@ namespace conf
 {
     class Settings;
 }
+class StreeManager;
 
 /*!
     \note Methods of this class are re-enterable
@@ -46,6 +47,7 @@ public:
     */
     AccountManager(
         const conf::Settings& settings,
+        const StreeManager& streeManager,
         TemporaryAccountPasswordManager* const tempPasswordManager,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager) throw(std::runtime_error);
@@ -96,6 +98,7 @@ public:
     
 private:
     const conf::Settings& m_settings;
+    const StreeManager& m_streeManager;
     TemporaryAccountPasswordManager* const m_tempPasswordManager;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;

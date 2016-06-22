@@ -92,6 +92,14 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
         return false;
     }
 
+    QSize maxRes = maxResolution(codec);
+    if (resolution.width() > maxRes.width() || resolution.height() > maxRes.height())
+    {
+        OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
+               << ") -> false: only even width and height is supported";
+        return false;
+    }
+
     if (codec != CODEC_ID_H264)
     {
         OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
@@ -115,6 +123,15 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
 
     OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution << ") -> true";
     return true;
+}
+
+QSize ProxyVideoDecoder::maxResolution(const CodecID codec)
+{
+    QN_UNUSED(codec);
+
+    int w, h;
+    ProxyDecoder::getMaxResolution(&w, &h);
+    return QSize(w, h);
 }
 
 int ProxyVideoDecoder::decode(

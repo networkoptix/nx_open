@@ -11,6 +11,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/buffer.h>
+#include <nx/utils/timer_manager.h>
 
 #include "stree/cdb_ns.h"
 
@@ -70,9 +71,42 @@ bool AccountEmail::getAsVariant(int resID, QVariant* const value) const
 }
 
 
-bool TemporaryCredentialsParams::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
+bool TemporaryCredentialsParams::getAsVariant(
+    int resID, QVariant* const value) const
 {
+    switch (resID)
+    {
+        case attr::credentialsExpirationPeriod:
+            *value = QString::number(timeouts.expirationPeriod.count()) + "s";
+            return true;
+
+        case attr::credentialsProlongationPeriod:
+            if (!timeouts.autoProlongationEnabled)
+                return false;
+            *value = QString::number(timeouts.prolongationPeriod.count())+"s";
+            return true;
+    }
+
     return false;
+}
+
+void TemporaryCredentialsParams::put(int resID, const QVariant& value)
+{
+    using namespace std::chrono;
+
+    switch(resID)
+    {
+        case attr::credentialsExpirationPeriod:
+            timeouts.expirationPeriod = 
+                duration_cast<seconds>(nx::utils::parseTimerDuration(value.toString()));
+            return;
+
+        case attr::credentialsProlongationPeriod:
+            timeouts.autoProlongationEnabled = true;
+            timeouts.prolongationPeriod =
+                duration_cast<seconds>(nx::utils::parseTimerDuration(value.toString()));
+            return;
+    }
 }
 
 

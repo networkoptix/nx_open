@@ -50,14 +50,16 @@ enum class MessageClass
     request = 0,
     indication,
     successResponse,
-    errorResponse
+    errorResponse,
+    unknown = -1,
 };
 
 //!Contains STUN method types defined in RFC
 enum MethodType
 {
     bindingMethod = 1,
-    userMethod //!< Starting value for custom STUN methods
+    userMethod, //!< Starting value for custom STUN methods
+    invalid = -1,
 };
 
 class NX_NETWORK_API Header
@@ -75,7 +77,7 @@ public:
     Header& operator=(Header&& rhs);    //TODO #ak #msvc2015 =default
 
     static Buffer makeTransactionId();
-
+    static Buffer nullTransactionId;
     static const int TRANSACTION_ID_SIZE = 12;
 
 public:

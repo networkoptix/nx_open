@@ -72,7 +72,7 @@ namespace nx_http
         */
         template<class CompletionFuncRefType>
         bool dispatchRequest(
-            const HttpServerConnection& conn,
+            HttpServerConnection* const conn,
             nx_http::Message&& message,
             stree::ResourceContainer&& authInfo,
             CompletionFuncRefType&& completionFunc )

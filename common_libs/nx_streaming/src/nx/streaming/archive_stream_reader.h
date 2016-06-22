@@ -29,7 +29,7 @@ public:
     virtual bool isReverseMode() const { return m_reverseMode;}
 
     /** Is not used and not implemented. */
-    virtual bool isNegativeSpeedSupported() const; 
+    virtual bool isNegativeSpeedSupported() const;
 
     virtual bool isSingleShotMode() const;
 
@@ -63,6 +63,7 @@ public:
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) override;
     virtual void setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution = QSize()) override;
     virtual MediaQuality getQuality() const override;
+    virtual CodecID getTranscodingCodec() const override;
 
     virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) override;
     virtual double getSpeed() const override;
@@ -80,7 +81,7 @@ public:
 
     virtual qint64 startTime() const override;
     virtual qint64 endTime() const override;
-    
+
     /* Return true if archive range is accessible immediately without opening an archive */
     bool offlineRangeSupported() const;
 
@@ -180,7 +181,7 @@ private:
     bool m_prevSendMotion;
     bool m_outOfPlaybackMask;
     qint64 m_latPacketTime;
-    
+
     bool m_stopCond;
     mutable QnMutex m_stopMutex;
     QnWaitCondition m_stopWaitCond;

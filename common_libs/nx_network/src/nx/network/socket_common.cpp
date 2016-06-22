@@ -302,6 +302,8 @@ bool SocketAddress::isNull() const
     return address == HostAddress() && port == 0;
 }
 
+const SocketAddress SocketAddress::anyAddress(HostAddress::anyHost, 0);
+
 void SocketAddress::initializeFromString( const QString& str )
 {
     int sepPos = str.indexOf(L':');

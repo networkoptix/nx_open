@@ -85,7 +85,7 @@ namespace nx_http
 
         if( !m_httpMessageDispatcher ||
             !m_httpMessageDispatcher->dispatchRequest(
-                *this,
+                this,
                 std::move(request),
                 std::move(authInfo),
                 std::move(sendResponseFunc) ) )

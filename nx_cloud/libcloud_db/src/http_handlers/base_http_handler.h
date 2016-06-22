@@ -51,13 +51,13 @@ protected:
     const AuthorizationManager& m_authorizationManager;
 
     bool authorize(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         const stree::AbstractResourceReader& authenticationData,
         const stree::AbstractResourceReader& dataToAuthorize,
         stree::ResourceContainer* const authzInfo )
     {
-        SocketResourceReader socketResources(*connection.socket());
+        SocketResourceReader socketResources(*connection->socket());
         HttpRequestResourceReader httpRequestResources(request);
 
         //performing authorization
@@ -125,7 +125,7 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         stree::ResourceContainer authInfo,
         Input inputData ) override
@@ -186,7 +186,7 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         stree::ResourceContainer authInfo,
         Input inputData ) override
@@ -247,7 +247,7 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         stree::ResourceContainer authInfo ) override
     {
@@ -305,7 +305,7 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         stree::ResourceContainer authInfo ) override
     {
@@ -340,7 +340,7 @@ class AbstractFreeMsgBodyHttpHandler
 {
 public:
     typedef nx::utils::MoveOnlyFunc<void(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const AuthorizationInfo& authzInfo,
         InputData inputData,
         nx::utils::MoveOnlyFunc<
@@ -363,7 +363,7 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         stree::ResourceContainer authInfo,
         InputData inputData) override
@@ -409,7 +409,7 @@ class AbstractFreeMsgBodyHttpHandler<void>
 {
 public:
     typedef nx::utils::MoveOnlyFunc<void(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* connection,
         const AuthorizationInfo& authzInfo,
         nx::utils::MoveOnlyFunc<
             void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
@@ -432,7 +432,7 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         stree::ResourceContainer authInfo) override
     {

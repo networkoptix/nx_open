@@ -669,44 +669,75 @@ TEST_F(Account, temporary_credentials)
     api::ResultCode result = addActivatedAccount(&account1, &account1Password);
     ASSERT_EQ(result, api::ResultCode::ok);
 
-    api::TemporaryCredentialsParams params;
-    params.expirationPeriod = std::chrono::hours(1);
-    api::TemporaryCredentials temporaryCredentials;
-    result = createTemporaryCredentials(
-        account1.email,
-        account1Password,
-        params,
-        &temporaryCredentials);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 3; ++i)
     {
-        if (i == 1)
-            restart();
+        api::TemporaryCredentialsParams params;
+        if (i == 0)
+            params.timeouts.expirationPeriod = std::chrono::hours(1);
+        else if (i == 1)
+            params.type = "long";
+        else if (i == 2)
+            params.type = "short";
+        api::TemporaryCredentials temporaryCredentials;
+        result = createTemporaryCredentials(
+            account1.email,
+            account1Password,
+            params,
+            &temporaryCredentials);
+        ASSERT_EQ(api::ResultCode::ok, result);
+        if (i == 0)
+        {
+            ASSERT_EQ(
+                params.timeouts.expirationPeriod,
+                temporaryCredentials.timeouts.expirationPeriod);
+        }
+        else if (i == 1)
+        {
+            ASSERT_EQ(
+                std::chrono::hours(24)*30,
+                temporaryCredentials.timeouts.expirationPeriod);
+            ASSERT_FALSE(temporaryCredentials.timeouts.autoProlongationEnabled);
+        }
+        else if (i == 2)
+        {
+            ASSERT_EQ(
+                std::chrono::minutes(60),
+                temporaryCredentials.timeouts.expirationPeriod);
+            ASSERT_TRUE(temporaryCredentials.timeouts.autoProlongationEnabled);
+            ASSERT_EQ(
+                std::chrono::minutes(10),
+                temporaryCredentials.timeouts.prolongationPeriod);
+        }
 
-        result = getAccount(
+        for (int j = 0; j < 2; ++j)
+        {
+            if (j == 1)
+                restart();
+
+            result = getAccount(
+                temporaryCredentials.login,
+                temporaryCredentials.password,
+                &account1);
+            ASSERT_EQ(api::ResultCode::ok, result);
+            ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
+        }
+
+        //checking that account update is forbidden
+        std::string account1NewPassword = account1Password + "new";
+        api::AccountUpdateData update;
+        update.passwordHa1 = nx_http::calcHa1(
+            account1.email.c_str(),
+            moduleInfo().realm.c_str(),
+            account1NewPassword.c_str()).constData();
+        update.fullName = account1.fullName + "new";
+        update.customization = account1.customization + "new";
+
+        result = updateAccount(
             temporaryCredentials.login,
             temporaryCredentials.password,
-            &account1);
-        ASSERT_EQ(api::ResultCode::ok, result);
-        ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
+            update);
+        ASSERT_EQ(result, api::ResultCode::forbidden);
     }
-
-    //checking that account update is forbidden
-    std::string account1NewPassword = account1Password + "new";
-    api::AccountUpdateData update;
-    update.passwordHa1 = nx_http::calcHa1(
-        account1.email.c_str(),
-        moduleInfo().realm.c_str(),
-        account1NewPassword.c_str()).constData();
-    update.fullName = account1.fullName + "new";
-    update.customization = account1.customization + "new";
-
-    result = updateAccount(
-        temporaryCredentials.login,
-        temporaryCredentials.password,
-        update);
-    ASSERT_EQ(result, api::ResultCode::forbidden);
 }
 
 TEST_F(Account, temporary_credentials_expiration)
@@ -721,7 +752,7 @@ TEST_F(Account, temporary_credentials_expiration)
     ASSERT_EQ(result, api::ResultCode::ok);
 
     api::TemporaryCredentialsParams params;
-    params.expirationPeriod = expirationPeriod;
+    params.timeouts.expirationPeriod = expirationPeriod;
     api::TemporaryCredentials temporaryCredentials;
     result = createTemporaryCredentials(
         account1.email,
@@ -729,6 +760,9 @@ TEST_F(Account, temporary_credentials_expiration)
         params,
         &temporaryCredentials);
     ASSERT_EQ(api::ResultCode::ok, result);
+    ASSERT_EQ(
+        expirationPeriod,
+        temporaryCredentials.timeouts.expirationPeriod);
 
     result = getAccount(
         temporaryCredentials.login,
