@@ -67,12 +67,8 @@ QnMediaServerResource::QnMediaServerResource():
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
     connect(this, &QnResource::resourceChanged, this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
     connect(this, &QnResource::propertyChanged, this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
-    connect(QnModuleFinder::instance(), &QnModuleFinder::modulePrimaryAddressChanged, this, &QnMediaServerResource::onPrimaryAddressChanged, Qt::DirectConnection);
-}
-
-void QnMediaServerResource::onPrimaryAddressChanged(const QnModuleInformation &/*moduleInformation*/, const SocketAddress &/*address*/)
-{
-    emit apiUrlChanged(toSharedPointer(this));
+    connect(QnModuleFinder::instance(), &QnModuleFinder::modulePrimaryAddressChanged, 
+            [this](const QnModuleInformation&, const SocketAddress&) { emit apiUrlChanged(toSharedPointer(this)); });
 }
 
 QnMediaServerResource::~QnMediaServerResource()
@@ -592,9 +588,11 @@ void QnMediaServerResource::setAuthKey(const QString& authKey)
 QString QnMediaServerResource::getApiUrl() const
 {
     QUrl url;
-    SocketAddress address = QnModuleFinder::instance()->primaryAddress(
-        qnCommon->moduleGUID());
-    url.setHost(address.address.toString());
+    SocketAddress address = QnModuleFinder::instance()->primaryAddress(getId());
+    QString hostString = address.address.toString();
+    if (hostString.isNull() || hostString.isEmpty())
+        hostString = lit("localhost");
+    url.setHost(hostString);
     url.setPort(address.port);
     url.setScheme(lit("http"));
 

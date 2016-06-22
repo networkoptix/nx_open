@@ -122,7 +122,6 @@ private slots:
     void onRemoveResource(const QnResourcePtr &resource);
     void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
-    void onPrimaryAddressChanged(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
 signals:
     void portChanged(const QnResourcePtr &resource);
