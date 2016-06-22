@@ -117,12 +117,10 @@ bool ec2::hasPermission(const QnUuid &userId, const ApiMediaServerUserAttributes
     return qnResourceAccessManager->hasPermission(userResource, target, permission);
 }
 
-bool ec2::hasPermission(const QnUuid &userId, const ApiAccessRightsData &data, Qn::Permission permission)
+bool ec2::hasPermission(const QnUuid &userId, const ApiAccessRightsData &/*data*/, Qn::Permission /*permission*/)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    QnResourcePtr target = qnResPool->getResourceById(data.userId);
-
-    return qnResourceAccessManager->hasPermission(userResource, target, permission);
+    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
 bool ec2::hasPermission(const QnUuid &userId, const ApiLicenseOverflowData &/*data*/, Qn::Permission /*permission*/)
