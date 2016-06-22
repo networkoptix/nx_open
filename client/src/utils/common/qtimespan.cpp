@@ -2041,9 +2041,13 @@ QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanF
     int secondairy = -1;
 
     Qt::TimeSpanUnit primairyUnit = magnitude();
-    while (!format.testFlag(primairyUnit ) && primairyUnit > Qt::NoUnit) {
-        primairyUnit = Qt::TimeSpanUnit(primairyUnit / 2);
+    while (!format.testFlag(primairyUnit ) && primairyUnit > 1)
+    {
+        primairyUnit = static_cast<Qt::TimeSpanUnit>(primairyUnit - 1);
     }
+    Q_ASSERT_X(primairyUnit > 0, Q_FUNC_INFO, "Semantically incorrect behavior");
+    if (primairyUnit <= Qt::NoUnit)
+        primairyUnit = Qt::Milliseconds;
 
     Qt::TimeSpanUnit secondairyUnit = Qt::NoUnit;
     if (primairyUnit > 1) {
