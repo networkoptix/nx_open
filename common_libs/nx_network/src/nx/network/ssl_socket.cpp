@@ -1666,7 +1666,10 @@ bool SslSocket::shutdown()
 {
     Q_D(const SslSocket);
     if (!d->emulateBlockingMode)
+    {
+        d->wrappedSocket->pleaseStopSync();
         return d->wrappedSocket->shutdown();
+    }
 
     utils::promise<void> promise;
     d->wrappedSocket->dispatch([&]()
@@ -1874,7 +1877,7 @@ void MixedSslSocket::readSomeAsync(
         if (ssl_ptr->is_initialized() && !ssl_ptr->is_ssl())
             return d->wrappedSocket->readSomeAsync(buffer,std::move(handler));
 
-        d->wrappedSocket->post(
+        d->wrappedSocket->dispatch(
             [this,buffer,handler]() mutable {
                 Q_D(MixedSslSocket);
                 MixedSslAsyncBioHelper* ssl_ptr =
@@ -1884,7 +1887,8 @@ void MixedSslSocket::readSomeAsync(
                 if (ssl_ptr->is_initialized() && !ssl_ptr->is_ssl()) {
                     d->wrappedSocket->readSomeAsync(buffer, std::move(handler));
                 } else {
-                    ssl_ptr->asyncRecv(buffer, std::move(handler));
+                    d->wrappedSocket->post(
+                        [&](){ ssl_ptr->asyncRecv(buffer, std::move(handler)); });
                 }
         });
     }
@@ -1904,7 +1908,7 @@ void MixedSslSocket::sendAsync(
         if (ssl_ptr->is_initialized() && !ssl_ptr->is_ssl())
             return d->wrappedSocket->sendAsync(buffer,std::move(handler));
 
-        d->wrappedSocket->post(
+        d->wrappedSocket->dispatch(
             [this,&buffer,handler]() mutable {
                 Q_D(MixedSslSocket);
                 MixedSslAsyncBioHelper* ssl_ptr =
@@ -1914,7 +1918,8 @@ void MixedSslSocket::sendAsync(
                 if (ssl_ptr->is_initialized() && !ssl_ptr->is_ssl()) {
                     d->wrappedSocket->sendAsync(buffer, std::move(handler));
                 } else {
-                    ssl_ptr->asyncSend(buffer, std::move(handler));
+                    d->wrappedSocket->post(
+                        [&](){ ssl_ptr->asyncSend(buffer, std::move(handler)); });
                 }
         });
     }
