@@ -15,7 +15,7 @@
 #include <plugins/resource/avi/thumbnails_stream_reader.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 
-// input video with steps between frames in timeStepUsec translated to output videi with 30 fps (kOutputDeltaUsec between frames)
+// input video with steps between frames in timeStepUsec translated to output video with 30 fps (kOutputDeltaUsec between frames)
 
 class QnTimeLapseRecorder: public QnStreamRecorder
 {
