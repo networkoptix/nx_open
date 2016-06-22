@@ -90,27 +90,42 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
         setExpectedLengthMs(m_sourcePeriodLengthMs / absoluteValue);
     });
 
-    auto expectedLengthChanged = [this]()
+    auto resultLengthChangedInternal = [this](int value)
+    {
+        qint64 absoluteValue = kMaximalSpeed;
+        if (value > 0)
+            absoluteValue = m_sourcePeriodLengthMs / (value * expectedLengthMeasureUnit());
+
+        ui->speedSlider->setValue(toSliderScale(absoluteValue));
+        ui->speedSpinBox->setValue(absoluteValue);
+
+        updateFrameStep(absoluteValue);
+
+    };
+
+    connect(ui->resultLengthSpinBox, QnSpinboxIntValueChanged, this, [this, resultLengthChangedInternal](int value)
     {
         if (m_updating)
             return;
 
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+        resultLengthChangedInternal(value);
+    });
 
-        int index = ui->resultLengthUnitsComboBox->currentIndex();
-        qint64 measureUnit = m_filteredUnitsModel->item(index)->data().toLongLong();
-        qint64 absoluteValue = kMaximalSpeed;
-        if (ui->resultLengthSpinBox->value() > 0)
-            absoluteValue = m_sourcePeriodLengthMs / (ui->resultLengthSpinBox->value() * measureUnit);
-        ui->speedSlider->setValue(toSliderScale(absoluteValue));
-        ui->speedSpinBox->setValue(absoluteValue);
+    connect(ui->resultLengthUnitsComboBox, QnComboboxCurrentIndexChanged, this, [this, resultLengthChangedInternal](int value)
+    {
+        if (m_updating)
+            return;
 
-        updateFrameStep(absoluteValue);
-    };
+        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+        qint64 unit = std::max(m_filteredUnitsModel->item(value)->data().toLongLong(), 1ll);
 
-    connect(ui->resultLengthSpinBox, QnSpinboxIntValueChanged, this, expectedLengthChanged);
-    connect(ui->resultLengthUnitsComboBox, QnComboboxCurrentIndexChanged, this, expectedLengthChanged);
+        int minExpectedLengthInUnits = static_cast<int>(std::max(kMinimalLengthMs / (unit * kMinimalSpeed), 1ll));
+        int maxExpectedLengthInUnits = static_cast<int>(std::max(m_sourcePeriodLengthMs / (unit * kMinimalSpeed), 1ll));
 
+        ui->resultLengthSpinBox->setRange(minExpectedLengthInUnits, maxExpectedLengthInUnits);
+        resultLengthChangedInternal(ui->resultLengthSpinBox->value());
+    });
 
     initControls();
 }
@@ -165,13 +180,13 @@ void QnExportTimelapseDialog::initControls()
 
     qint64 maxExpectedLengthMs = m_sourcePeriodLengthMs / kMinimalSpeed;
     if (maxExpectedLengthMs >= msInSec)
-        addModelItem(tr("sec"), msInSec,  m_filteredUnitsModel);
+        addModelItem(tr("sec"), msInSec, m_filteredUnitsModel);
     if (maxExpectedLengthMs >= msInMin)
-        addModelItem(tr("min"), msInMin,  m_filteredUnitsModel);
+        addModelItem(tr("min"), msInMin, m_filteredUnitsModel);
     if (maxExpectedLengthMs >= msInHour)
         addModelItem(tr("hrs"), msInHour, m_filteredUnitsModel);
     if (maxExpectedLengthMs >= msInDay)
-        addModelItem(tr("days"), msInDay,  m_filteredUnitsModel);
+        addModelItem(tr("days"), msInDay, m_filteredUnitsModel);
 
     m_maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
     ui->speedSpinBox->setRange(kMinimalSpeed, m_maxSpeed);
@@ -197,9 +212,8 @@ void QnExportTimelapseDialog::setExpectedLengthMs(qint64 value)
 {
     int speed = m_sourcePeriodLengthMs / value;
     updateFrameStep(speed);
-    int index = ui->resultLengthUnitsComboBox->currentIndex();
-    qint64 measureUnit = m_filteredUnitsModel->item(index)->data().toLongLong();
-    ui->resultLengthSpinBox->setValue(static_cast<int>(value / measureUnit));
+
+    ui->resultLengthSpinBox->setValue(static_cast<int>(value / expectedLengthMeasureUnit()));
 }
 
 void QnExportTimelapseDialog::updateFrameStep(int speed)
@@ -245,22 +259,30 @@ QString QnExportTimelapseDialog::durationMsToString(qint64 durationMs)
 {
     auto unitStringsConverter = [](Qt::TimeSpanUnit unit, int num)
     {
-        switch (unit) {
-        case::Qt::Milliseconds:
-            return tr("%nms", "", num);
-        case::Qt::Seconds:
-            return tr("%ns", "", num);
-        case::Qt::Minutes:
-            return tr("%nm", "", num);
-        case::Qt::Hours:
-            return tr("%nh", "", num);
-        case::Qt::Days:
-            return tr("%nd", "", num);
-        default:
-            return QString();
+        switch (unit)
+        {
+            case::Qt::Milliseconds:
+                return tr("%nms", "", num);
+            case::Qt::Seconds:
+                return tr("%ns", "", num);
+            case::Qt::Minutes:
+                return tr("%nm", "", num);
+            case::Qt::Hours:
+                return tr("%nh", "", num);
+            case::Qt::Days:
+                return tr("%nd", "", num);
+            default:
+                return QString();
         }
     };
 
     /* Make sure passed format is fully covered by converter. */
     return QTimeSpan(durationMs).toApproximateString(3, Qt::DaysAndTime | Qt::Milliseconds, unitStringsConverter, lit(" "));
+}
+
+qint64 QnExportTimelapseDialog::expectedLengthMeasureUnit() const
+{
+    int index = ui->resultLengthUnitsComboBox->currentIndex();
+    qint64 measureUnit = m_filteredUnitsModel->item(index)->data().toLongLong();
+    return std::max(measureUnit, 1ll);
 }

@@ -39,6 +39,8 @@ private:
     int fromSliderScale(int sliderValue);
 
     QString durationMsToString(qint64 durationMs);
+
+    qint64 expectedLengthMeasureUnit() const;
 private:
      QScopedPointer<Ui::ExportTimelapseDialog> ui;
      bool m_updating;
