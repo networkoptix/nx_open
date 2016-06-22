@@ -42,7 +42,7 @@ QnResourcePtr GenericUserDataProvider::findResByName(const QByteArray& nxUserNam
 
     for (const QnMediaServerResourcePtr& server : m_servers)
     {
-        if (server->getId().toString().toUtf8().toLower() == nxUserName)
+        if (server->getId() == QnUuid::fromStringSafe(nxUserName))
             return server;
     }
 
