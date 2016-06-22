@@ -71,7 +71,7 @@ Pane
         y: 2
         anchors.right: parent.right
         icon: lp("/images/edit.png")
-        visible: connectionsModel.hasConnections
+        visible: connectionsModel.hasConnections && !cloudSystem
         onClicked:
         {
             Workflow.openSavedSession(systemName,
