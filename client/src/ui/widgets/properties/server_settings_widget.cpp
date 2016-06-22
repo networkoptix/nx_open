@@ -63,7 +63,6 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
 {
     ui->setupUi(this);
 
-
     setWarningStyle(ui->failoverWarningLabel);
 
     /* Set up context help. */
@@ -162,6 +161,9 @@ void QnServerSettingsWidget::updateReadOnly()
 
 bool QnServerSettingsWidget::hasChanges() const
 {
+    if (!m_server)
+        return false;
+
     if (isReadOnly())
         return false;
 
@@ -226,6 +228,9 @@ void QnServerSettingsWidget::loadDataToUi()
 
 void QnServerSettingsWidget::applyChanges()
 {
+    if (!m_server)
+        return;
+
     if (isReadOnly())
         return;
 
@@ -286,5 +291,8 @@ void QnServerSettingsWidget::updateFailoverLabel()
 
 void QnServerSettingsWidget::at_pingButton_clicked()
 {
+    if (!m_server)
+        return;
+
     menu()->trigger(QnActions::PingAction, QnActionParameters(m_server));
 }
