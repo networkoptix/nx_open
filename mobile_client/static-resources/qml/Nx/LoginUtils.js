@@ -1,8 +1,15 @@
 .import com.networkoptix.qml 1.0 as Nx
 
-function makeUrl(address, login, password)
+function makeUrl(address, login, password, cloud)
 {
-    var result = "http://" + login + ":" + password + "@" + address
+    var result =
+            (cloud ? "cloud" : "http") +
+            "://" +
+            encodeURIComponent(login) +
+            ":" +
+            encodeURIComponent(password) +
+            "@" +
+            address
     return result
 }
 
