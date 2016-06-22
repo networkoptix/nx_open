@@ -442,7 +442,7 @@ void QnVirtualCameraResource::saveParamsAsync()
 
 void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, const QString& password)
 {
-    if (getAuth().isNull())
+    if (getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME).isNull())
     {
         setDefaultAuth(login, password);
         saveParams();
