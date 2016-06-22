@@ -2262,10 +2262,11 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 
     QPushButton *updateButton = messageBox->addButton(tr("Update..."), QDialogButtonBox::HelpRole);
-    connect(updateButton, &QPushButton::clicked, this, [this]
+    connect(updateButton, &QPushButton::clicked, this, [this, dialog = messageBox.data()]
     {
+        dialog->accept();
         menu()->trigger(QnActions::SystemUpdateAction);
-    }, Qt::QueuedConnection);
+    });
 
     messageBox->exec();
 }
