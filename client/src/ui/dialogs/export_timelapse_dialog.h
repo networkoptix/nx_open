@@ -32,15 +32,16 @@ public:
 private:
     void initControls();
 
-    void setExpectedLengthMs(qint64 value);
-    void updateFrameStep(int speed);
+    void setExpectedLengthMsInternal(qint64 value);
+    void updateFrameStepInternal(int speed);
+    void updateExpectedLengthRangeInternal(int index);
 
-    int toSliderScale(int absoluteSpeedValue);
-    int fromSliderScale(int sliderValue);
+    int toSliderScale(int absoluteSpeedValue) const;
+    int fromSliderScale(int sliderValue) const;
 
     QString durationMsToString(qint64 durationMs);
 
-    qint64 expectedLengthMeasureUnit() const;
+    qint64 expectedLengthMeasureUnit(int index = -1) const;
 private:
      QScopedPointer<Ui::ExportTimelapseDialog> ui;
      bool m_updating;

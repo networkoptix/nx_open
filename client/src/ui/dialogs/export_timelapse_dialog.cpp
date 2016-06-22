@@ -10,7 +10,7 @@
 namespace {
 
 /* Font size for info labels. */
-const int kInfoFontSize = 16;
+const int kInfoFontPixelSize = 16;
 
 /* Minimal timelapse speed. Limited by keyframes count. */
 const int kMinimalSpeed = 10;
@@ -62,7 +62,7 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
     ui->setupUi(this);
 
     QFont infoFont(this->font());
-    infoFont.setPixelSize(kInfoFontSize);
+    infoFont.setPixelSize(kInfoFontPixelSize);
 
     ui->initialLengthLabel->setFont(infoFont);
     ui->framesLabel->setFont(infoFont);
@@ -76,7 +76,7 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
 
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
         ui->speedSlider->setValue(toSliderScale(absoluteValue));
-        setExpectedLengthMs(m_sourcePeriodLengthMs / absoluteValue);
+        setExpectedLengthMsInternal(m_sourcePeriodLengthMs / absoluteValue);
     });
 
     connect(ui->speedSlider, &QSlider::valueChanged, this, [this](int value)
@@ -87,7 +87,7 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
         int absoluteValue = fromSliderScale(value);
         ui->speedSpinBox->setValue(absoluteValue);
-        setExpectedLengthMs(m_sourcePeriodLengthMs / absoluteValue);
+        setExpectedLengthMsInternal(m_sourcePeriodLengthMs / absoluteValue);
     });
 
     auto resultLengthChangedInternal = [this](int value)
@@ -99,8 +99,7 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
         ui->speedSlider->setValue(toSliderScale(absoluteValue));
         ui->speedSpinBox->setValue(absoluteValue);
 
-        updateFrameStep(absoluteValue);
-
+        updateFrameStepInternal(absoluteValue);
     };
 
     connect(ui->resultLengthSpinBox, QnSpinboxIntValueChanged, this, [this, resultLengthChangedInternal](int value)
@@ -118,12 +117,7 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
             return;
 
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
-        qint64 unit = std::max(m_filteredUnitsModel->item(value)->data().toLongLong(), 1ll);
-
-        int minExpectedLengthInUnits = static_cast<int>(std::max(kMinimalLengthMs / (unit * kMinimalSpeed), 1ll));
-        int maxExpectedLengthInUnits = static_cast<int>(std::max(m_sourcePeriodLengthMs / (unit * kMinimalSpeed), 1ll));
-
-        ui->resultLengthSpinBox->setRange(minExpectedLengthInUnits, maxExpectedLengthInUnits);
+        updateExpectedLengthRangeInternal(value);
         resultLengthChangedInternal(ui->resultLengthSpinBox->value());
     });
 
@@ -132,9 +126,15 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
 
 void QnExportTimelapseDialog::setSpeed(qint64 absoluteValue)
 {
+    Q_ASSERT_X(!m_updating, Q_FUNC_INFO, "Function belongs to outer interface, must not be called internally.");
+    if (m_updating)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     ui->speedSpinBox->setValue(absoluteValue);
     ui->speedSlider->setValue(toSliderScale(absoluteValue));
-    setExpectedLengthMs(m_sourcePeriodLengthMs / absoluteValue);
+    setExpectedLengthMsInternal(m_sourcePeriodLengthMs / absoluteValue);
 }
 
 qint64 QnExportTimelapseDialog::speed() const
@@ -204,42 +204,67 @@ void QnExportTimelapseDialog::initControls()
     }
     ui->speedSpinBox->setValue(speed);
     ui->speedSlider->setValue(toSliderScale(speed));
-    setExpectedLengthMs(expectedLengthMs);
+    setExpectedLengthMsInternal(expectedLengthMs);
     ui->initialLengthLabel->setText(durationMsToString(m_sourcePeriodLengthMs));
 }
 
-void QnExportTimelapseDialog::setExpectedLengthMs(qint64 value)
+void QnExportTimelapseDialog::setExpectedLengthMsInternal(qint64 value)
 {
-    int speed = m_sourcePeriodLengthMs / value;
-    updateFrameStep(speed);
+    Q_ASSERT_X(m_updating, Q_FUNC_INFO, "Internal functions are to be called under guard.");
 
-    ui->resultLengthSpinBox->setValue(static_cast<int>(value / expectedLengthMeasureUnit()));
+    int speed = m_sourcePeriodLengthMs / value;
+    updateFrameStepInternal(speed);
+
+    int index = ui->resultLengthUnitsComboBox->currentIndex();
+    qreal valueInUnits = value * 1.0 / expectedLengthMeasureUnit(index);
+    while (valueInUnits < 1.0 && index > 0)
+    {
+        --index;
+        valueInUnits = value * 1.0 / expectedLengthMeasureUnit(index);
+    }
+    ui->resultLengthUnitsComboBox->setCurrentIndex(index);
+    updateExpectedLengthRangeInternal(index);
+
+    ui->resultLengthSpinBox->setValue(static_cast<int>(valueInUnits));
 }
 
-void QnExportTimelapseDialog::updateFrameStep(int speed)
+void QnExportTimelapseDialog::updateFrameStepInternal(int speed)
 {
+    Q_ASSERT_X(m_updating, Q_FUNC_INFO, "Internal functions are to be called under guard.");
+
     m_expectedLengthMs = speed;
     m_frameStepMs = 1000ll * speed / kResultFps;
     ui->framesLabel->setText(durationMsToString(m_frameStepMs));
 }
 
+void QnExportTimelapseDialog::updateExpectedLengthRangeInternal(int index)
+{
+    Q_ASSERT_X(m_updating, Q_FUNC_INFO, "Internal functions are to be called under guard.");
+
+    qint64 unit = expectedLengthMeasureUnit(index);
+
+    int minExpectedLengthInUnits = static_cast<int>(std::max(kMinimalLengthMs / (unit * kMinimalSpeed), 1ll));
+    int maxExpectedLengthInUnits = static_cast<int>(std::max(m_sourcePeriodLengthMs / (unit * kMinimalSpeed), 1ll));
+
+    ui->resultLengthSpinBox->setRange(minExpectedLengthInUnits, maxExpectedLengthInUnits);
+}
+
 /* kMinimalSpeed * e ^ (sliderExpCoeff * sliderValue) == absoluteSpeedValue. */
-int QnExportTimelapseDialog::toSliderScale(int absoluteSpeedValue)
+int QnExportTimelapseDialog::toSliderScale(int absoluteSpeedValue) const
 {
     /* If we have less steps than recommended value, just use direct scale */
-    int m_maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
     if (m_maxSpeed - kMinimalSpeed <= kSliderSteps)
         return absoluteSpeedValue - kMinimalSpeed;
 
-    qreal k = sliderExpCoeff(m_maxSpeed);
+    const qreal k = sliderExpCoeff(m_maxSpeed);
 
-    qreal targetSpeedUp = 1.0 * absoluteSpeedValue / kMinimalSpeed;
-    qreal sliderValue = log(targetSpeedUp) / k;
+    const qreal targetSpeedUp = 1.0 * absoluteSpeedValue / kMinimalSpeed;
+    const qreal sliderValue = log(targetSpeedUp) / k;
     return static_cast<int>(sliderValue);
 }
 
 /* kMinimalSpeed * e ^ (sliderExpCoeff * sliderValue) == absoluteSpeedValue. */
-int QnExportTimelapseDialog::fromSliderScale(int sliderValue)
+int QnExportTimelapseDialog::fromSliderScale(int sliderValue) const
 {
     /* If we have less steps than recommended value, just use direct scale */
     if (m_maxSpeed - kMinimalSpeed <= kSliderSteps)
@@ -249,9 +274,9 @@ int QnExportTimelapseDialog::fromSliderScale(int sliderValue)
     if (sliderValue == kSliderSteps)
         return m_maxSpeed;
 
-    qreal k = sliderExpCoeff(m_maxSpeed);
+    const qreal k = sliderExpCoeff(m_maxSpeed);
 
-    qreal absoluteSpeed = 1.0 * kMinimalSpeed * exp(k * sliderValue);
+    const qreal absoluteSpeed = 1.0 * kMinimalSpeed * exp(k * sliderValue);
     return static_cast<int>(absoluteSpeed);
 }
 
@@ -280,9 +305,15 @@ QString QnExportTimelapseDialog::durationMsToString(qint64 durationMs)
     return QTimeSpan(durationMs).toApproximateString(3, Qt::DaysAndTime | Qt::Milliseconds, unitStringsConverter, lit(" "));
 }
 
-qint64 QnExportTimelapseDialog::expectedLengthMeasureUnit() const
+qint64 QnExportTimelapseDialog::expectedLengthMeasureUnit(int index) const
 {
-    int index = ui->resultLengthUnitsComboBox->currentIndex();
+    if (index < 0)
+        index = std::max(ui->resultLengthUnitsComboBox->currentIndex(), 0);
+
+    Q_ASSERT_X(m_filteredUnitsModel->rowCount() > index, Q_FUNC_INFO, "Make sure model is valid");
+    if (index >= m_filteredUnitsModel->rowCount())
+        return 1;
+
     qint64 measureUnit = m_filteredUnitsModel->item(index)->data().toLongLong();
     return std::max(measureUnit, 1ll);
 }
