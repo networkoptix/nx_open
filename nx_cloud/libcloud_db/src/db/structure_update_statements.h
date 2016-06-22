@@ -416,6 +416,13 @@ UPDATE account_password SET login=(select email from account where id=account_pa
 UPDATE account_password SET access_rights='+/cdb/account/update';                               \
 ";                                                                                              
 
+
+//#CLOUD-186
+static const char kTemporaryAccountCredentialsProlongationPeriod[] =
+"                                                                                               \
+ALTER TABLE account_password ADD COLUMN prolongation_period_sec INTEGER DEFAULT 0;              \
+";                                                                                              
+
 }   //db
 }   //cdb
 }   //nx

@@ -244,7 +244,7 @@ void AccountManager::resetPassword(
         resetCodeStr.data(), resetCodeStr.size()).toBase64().constData();
 
     //adding temporary password
-    m_tempPasswordManager->createTemporaryPassword(
+    m_tempPasswordManager->registerTemporaryCredentials(
         authzInfo,
         std::move(tempPasswordData),
         std::bind(&AccountManager::passwordResetCodeGenerated, this,
@@ -339,6 +339,10 @@ void AccountManager::createTemporaryCredentials(
     tempPasswordData.expirationTimestampUtc =
         ::time(NULL) +
         params.timeouts.expirationPeriod.count();
+    if (params.timeouts.autoProlongationEnabled)
+        tempPasswordData.prolongationPeriodSec = 
+            std::chrono::duration_cast<std::chrono::seconds>(
+                params.timeouts.prolongationPeriod).count();
     tempPasswordData.maxUseCount = std::numeric_limits<int>::max();
     //filling in access rights
     tempPasswordData.accessRights.requestsDenied.push_back(kAccountUpdatePath);
@@ -351,7 +355,7 @@ void AccountManager::createTemporaryCredentials(
     temporaryCredentials.timeouts = params.timeouts;
 
     //adding temporary password
-    m_tempPasswordManager->createTemporaryPassword(
+    m_tempPasswordManager->registerTemporaryCredentials(
         authzInfo,
         std::move(tempPasswordData),
         std::bind(&AccountManager::temporaryCredentialsSaved, this,
