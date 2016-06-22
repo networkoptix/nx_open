@@ -253,7 +253,11 @@ void QnServerSettingsWidget::updateUrl()
 void QnServerSettingsWidget::updateFailoverLabel()
 {
 
-    auto getErrorText = [this] {
+    auto getErrorText = [this]
+    {
+        if (!m_server)
+            return QString();
+
         if (qnResPool->getResources<QnMediaServerResource>().size() < 2)
             return tr("At least two servers are required for this feature.");
 
