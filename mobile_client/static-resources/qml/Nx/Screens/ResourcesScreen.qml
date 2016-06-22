@@ -204,13 +204,23 @@ Page
         onConnectionFailed:
         {
             var lastUsedSystemId = getLastUsedSystemId()
-            Workflow.openFailedSessionScreen(
-                        lastUsedSystemId,
-                        connectionManager.currentHost,
-                        connectionManager.currentLogin,
-                        connectionManager.currentPassword,
-                        status,
-                        infoParameter)
+            if (connectionManager.cloudSystem)
+            {
+                Workflow.openFailedCloudSessionScreen(
+                            lastUsedSystemId,
+                            status,
+                            infoParameter)
+            }
+            else
+            {
+                Workflow.openFailedSessionScreen(
+                            lastUsedSystemId,
+                            connectionManager.currentHost,
+                            connectionManager.currentLogin,
+                            connectionManager.currentPassword,
+                            status,
+                            infoParameter)
+            }
         }
 
         onInitialResourcesReceived:
