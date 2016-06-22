@@ -41,7 +41,7 @@ namespace nx_http
             });
     }
 
-    void HttpServerConnection::processMessage( nx_http::Message&& request )
+    void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
     {
         //TODO incoming message body
         //    should use AbstractMsgBodySource also
@@ -50,77 +50,128 @@ namespace nx_http
         //    can add sequence to sendResponseFunc and use it to queue responses
 
         //checking if connection is persistent
-        checkForConnectionPersistency( request );
+        checkForConnectionPersistency(requestMessage);
 
         //TODO #ak performing authentication
         //    authentication manager should be able to return some custom data
         //    which will be forwarded to the request handler.
         //    Should this data be template parameter?
-        stree::ResourceContainer authInfo;
-        if (!authenticateRequest(*request.request, &authInfo))
+        if (!m_authenticationManager)
+        {
+            onAuthenticationDone(
+                true,
+                stree::ResourceContainer(),
+                std::move(requestMessage),
+                boost::none,
+                nx_http::HttpHeaders(),
+                nullptr);
             return;
+        }
+
+        const nx_http::Request& request = *requestMessage.request;
+        auto strongRef = shared_from_this();
+        std::weak_ptr<HttpServerConnection> weakThis = strongRef;
+        m_authenticationManager->authenticate(
+            *this,
+            request,
+            [this, weakThis = std::move(weakThis), 
+                requestMessage = std::move(requestMessage)]
+            (
+                bool authenticationResult,
+                stree::ResourceContainer authInfo,
+                boost::optional<header::WWWAuthenticate> wwwAuthenticate,
+                nx_http::HttpHeaders responseHeaders,
+                std::unique_ptr<AbstractMsgBodySource> msgBody) mutable
+            {
+                auto strongThis = weakThis.lock();
+                if (!strongThis)
+                    return; //connection has been removed while request authentication in progress
+
+                strongThis->post(
+                    [this,
+                        authenticationResult,
+                        authInfo = std::move(authInfo),
+                        requestMessage = std::move(requestMessage),
+                        wwwAuthenticate = std::move(wwwAuthenticate),
+                        responseHeaders = std::move(responseHeaders),
+                        msgBody = std::move(msgBody)]() mutable
+                    {
+                        onAuthenticationDone(
+                            authenticationResult,
+                            std::move(authInfo),
+                            std::move(requestMessage),
+                            std::move(wwwAuthenticate),
+                            std::move(responseHeaders),
+                            std::move(msgBody));
+                    });
+            });
+    }
+
+    void HttpServerConnection::onAuthenticationDone(
+        bool authenticationResult,
+        stree::ResourceContainer authInfo,
+        nx_http::Message requestMessage,
+        boost::optional<header::WWWAuthenticate> wwwAuthenticate,
+        nx_http::HttpHeaders responseHeaders,
+        std::unique_ptr<AbstractMsgBodySource> msgBody)
+    {
+        if (!authenticationResult)
+        {
+            sendUnauthorizedResponse(
+                requestMessage.request->requestLine.version,
+                std::move(wwwAuthenticate),
+                std::move(responseHeaders),
+                std::move(msgBody));
+            return;
+        }
 
         auto strongRef = shared_from_this();
         std::weak_ptr<HttpServerConnection> weakThis = strongRef;
 
-        const nx_http::MimeProtoVersion version = request.request->requestLine.version;
-        auto sendResponseFunc = [this, weakThis, version](
+        auto protoVersion = requestMessage.request->requestLine.version;
+        auto sendResponseFunc = [this, weakThis, protoVersion](
             nx_http::Message&& response,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
+            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody) mutable
         {
             auto strongThis = weakThis.lock();
-            if( !strongThis )
+            if (!strongThis)
                 return; //connection has been removed while request has been processed
             strongThis->post(
-                [this, strongThis = std::move(strongThis), version, 
-                    response = std::move(response), 
-                    responseMsgBody = std::move(responseMsgBody)]() mutable
-                {
-                    prepareAndSendResponse(
-                        version,
-                        std::move(response),
-                        std::move(responseMsgBody));
-                });
+                [this, strongThis = std::move(strongThis),
+                protoVersion = std::move(protoVersion),
+                response = std::move(response),
+                responseMsgBody = std::move(responseMsgBody)]() mutable
+            {
+                prepareAndSendResponse(
+                    std::move(protoVersion),
+                    std::move(response),
+                    std::move(responseMsgBody));
+            });
         };
 
-        if( !m_httpMessageDispatcher ||
+        if (!m_httpMessageDispatcher ||
             !m_httpMessageDispatcher->dispatchRequest(
                 this,
-                std::move(request),
+                std::move(requestMessage),
                 std::move(authInfo),
-                std::move(sendResponseFunc) ) )
+                std::move(sendResponseFunc)))
         {
             //creating and sending error response
-            nx_http::Message response( nx_http::MessageType::response );
+            nx_http::Message response(nx_http::MessageType::response);
             response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
             return prepareAndSendResponse(
-                version,
-                std::move( response ),
-                nullptr );
+                std::move(protoVersion),
+                std::move(response),
+                nullptr);
         }
     }
 
-    bool HttpServerConnection::authenticateRequest(
-        const nx_http::Request& request,
-        stree::ResourceContainer* const authInfo)
+    void HttpServerConnection::sendUnauthorizedResponse(
+        const nx_http::MimeProtoVersion& protoVersion,
+        boost::optional<header::WWWAuthenticate> wwwAuthenticate,
+        nx_http::HttpHeaders responseHeaders,
+        std::unique_ptr<AbstractMsgBodySource> msgBody)
     {
-        if (!m_authenticationManager)
-            return true;    //no authentication manager -> every request is allowed
-
-        boost::optional<header::WWWAuthenticate> wwwAuthenticate;
-        std::unique_ptr<AbstractMsgBodySource> msgBody;
-        nx_http::HttpHeaders responseHeaders;
-        if (m_authenticationManager->authenticate(
-                *this,
-                request,
-                &wwwAuthenticate,
-                authInfo,
-                &responseHeaders,
-                &msgBody))
-        {
-            return true;
-        }
-
         nx_http::Message response(nx_http::MessageType::response);
         std::move(
             responseHeaders.begin(),
@@ -134,10 +185,9 @@ namespace nx_http
                 wwwAuthenticate.get().serialized());
         }
         prepareAndSendResponse(
-            request.requestLine.version,
+            protoVersion,
             std::move(response),
             std::move(msgBody));
-        return false;
     }
 
     void HttpServerConnection::prepareAndSendResponse(

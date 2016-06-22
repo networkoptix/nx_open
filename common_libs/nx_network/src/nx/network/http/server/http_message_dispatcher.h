@@ -96,7 +96,7 @@ namespace nx_http
                 std::move( authInfo ),
                 [completionFunc, requestProcessorPtr](
                     nx_http::Message&& responseMsg,
-                    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
+                    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody ) mutable
                 {
                     completionFunc( std::move(responseMsg), std::move(responseMsgBody) );
                     delete requestProcessorPtr;

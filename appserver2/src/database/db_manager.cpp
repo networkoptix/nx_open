@@ -437,7 +437,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
 
     if( m_needResyncLog ) {
         if (!resyncTransactionLog())
-		    return false;
+            return false;
     }
     else
     {
@@ -1344,7 +1344,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             m_needResyncbRules = true;
     }
     else if (updateName == lit(":/updates/52_fix_onvif_mt.sql"))
-	{
+    {
         return removeWrongSupportedMotionTypeForONVIF(); //TODO: #rvasilenko consistency break
     }
 
@@ -1372,7 +1372,7 @@ bool QnDbManager::createDatabase()
 
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))
     {
-		NX_LOG(QString("Update database to v 2.3"), cl_logINFO);
+        NX_LOG(QString("Update database to v 2.3"), cl_logINFO);
 
         if (!execSQLFile(lit(":/00_update_2.2_stage0.sql"), m_sdb))
             return false;
@@ -1637,6 +1637,18 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 i
     }
 }
 
+ErrorCode QnDbManager::removeCameraAttributes(const QnUuid& id)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_camera_user_attributes where camera_guid = ?");
+    delQuery.addBindValue(id.toRfc4122());
+    if (!delQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::dbError;
+    }
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId)
 {
     //TODO #ak if record already exists have to find id first?
@@ -1706,8 +1718,8 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_server (api_url, auth_key, version, net_addr_list, system_info, flags, system_name, resource_ptr_id, panic_mode) \
-        VALUES (:apiUrl, :authKey, :version, :networkAddresses, :systemInfo, :flags, :systemName, :internalId, 0)\
+        INSERT OR REPLACE INTO vms_server (auth_key, version, net_addr_list, system_info, flags, system_name, resource_ptr_id, panic_mode) \
+        VALUES (:authKey, :version, :networkAddresses, :systemInfo, :flags, :systemName, :internalId, 0)\
     ");
     QnSql::bind(data, &insQuery);
 
@@ -2357,9 +2369,23 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourc
     if (tran.command == ApiCommand::setResourceParam)
         return insertAddParam(tran.params);
     else if (tran.command == ApiCommand::removeResourceParam)
-        return deleteTableRecord(tran.params.resourceId, "vms_kvpair", "resource_guid");
+        return removeParam(tran.params);
     else
         return ErrorCode::notImplemented;
+}
+
+ErrorCode QnDbManager::removeParam(const ApiResourceParamWithRefData& data)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare("DELETE FROM vms_kvpair WHERE resource_guid = :id AND name = :name");
+    query.bindValue(lit(":id"), data.resourceId.toRfc4122());
+    query.bindValue(lit(":name"), data.name);
+    if (!query.exec()) 
+    {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::addCameraHistory(const ApiServerFootageData& params)
@@ -2920,6 +2946,8 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>
         return removeVideowall(tran.params.id);
     case ApiCommand::removeWebPage:
         return removeWebPage(tran.params.id);
+    case ApiCommand::removeCameraUserAttributes:
+        return removeCameraAttributes(tran.params.id);
     default:
         return removeObject(ApiObjectInfo(getObjectTypeNoLock(tran.params.id), tran.params.id));
     }
@@ -3042,7 +3070,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
         JOIN vms_resourcetype t2 on t2.id = p.to_resourcetype_id \
         ORDER BY t1.guid, p.to_resourcetype_id desc\
     ");
-	if (!queryParents.exec()) {
+    if (!queryParents.exec()) {
         qWarning() << Q_FUNC_INFO << queryParents.lastError().text();
         return ErrorCode::dbError;
     }
@@ -3129,7 +3157,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataLi
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
         c.vendor, c.manually_added as manuallyAdded, \
         c.group_name as groupName, c.group_id as groupId, c.mac, c.model, \
-		c.status_flags as statusFlags, c.physical_id as physicalId \
+        c.status_flags as statusFlags, c.physical_id as physicalId \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
         JOIN vms_camera c on c.resource_ptr_id = r.id ORDER BY r.guid\
@@ -3373,7 +3401,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
 
     query.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        s.api_url as apiUrl, s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
+        s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
         s.flags, s.system_name as systemName \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
@@ -3631,12 +3659,12 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiTransactionDataLi
 // getClientInfos
 ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiClientInfoDataList& data)
 {
-	return doQueryNoLock(QnUuid(), data);
+    return doQueryNoLock(QnUuid(), data);
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data)
 {
-	QString filterStr;
+    QString filterStr;
     if (!clientId.isNull())
         filterStr = QString("WHERE guid = %1").arg(guidToSqlString(clientId));
 
@@ -4459,5 +4487,10 @@ ApiObjectInfoList QnDbManagerAccess::getNestedObjectsNoLock(const ApiObjectInfo&
 ApiObjectInfoList QnDbManagerAccess::getObjectsNoLock(const ApiObjectType& objectType)
 {
     return detail::QnDbManager::instance()->getObjectsNoLock(objectType);
+}
+
+void QnDbManagerAccess::getResourceParamsNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& resourceParams)
+{
+    detail::QnDbManager::instance()->doQueryNoLock(resourceId, resourceParams);
 }
 } // namespace ec2

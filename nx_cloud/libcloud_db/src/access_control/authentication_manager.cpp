@@ -50,31 +50,47 @@ AuthenticationManager::AuthenticationManager(
 {
 }
 
-bool AuthenticationManager::authenticate(
+void AuthenticationManager::authenticate(
     const nx_http::HttpServerConnection& connection,
     const nx_http::Request& request,
-    boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
-    stree::ResourceContainer* authProperties,
-    nx_http::HttpHeaders* const responseHeaders,
-    std::unique_ptr<nx_http::AbstractMsgBodySource>* const msgBody)
+    nx::utils::MoveOnlyFunc<void(
+        bool authenticationResult,
+        stree::ResourceContainer authInfo,
+        boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate,
+        nx_http::HttpHeaders responseHeaders,
+        std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody)> completionHandler)
 {
+    boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate;
+    stree::ResourceContainer authProperties;
+    nx_http::HttpHeaders responseHeaders;
+    std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
+
     api::ResultCode authResult = api::ResultCode::notAuthorized;
     auto guard = makeScopedGuard(
-        [&msgBody, &authResult, responseHeaders]()
+        [&authResult, &wwwAuthenticate, &authProperties, 
+        &responseHeaders, &msgBody, &completionHandler]()
         {
-            if (authResult == api::ResultCode::ok)
-                return;
-            nx_http::FusionRequestResult result(
-                nx_http::FusionRequestErrorClass::unauthorized,
-                QnLexical::serialized(authResult),
-                static_cast<int>(authResult),
-                "unauthorized");
-            responseHeaders->emplace(
-                Qn::API_RESULT_CODE_HEADER_NAME,
-                QnLexical::serialized(authResult).toLatin1());
-            *msgBody = std::make_unique<nx_http::BufferSource>(
-                Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-                QJson::serialized(result));
+            if (authResult != api::ResultCode::ok)
+            {
+                nx_http::FusionRequestResult result(
+                    nx_http::FusionRequestErrorClass::unauthorized,
+                    QnLexical::serialized(authResult),
+                    static_cast<int>(authResult),
+                    "unauthorized");
+                responseHeaders.emplace(
+                    Qn::API_RESULT_CODE_HEADER_NAME,
+                    QnLexical::serialized(authResult).toLatin1());
+                msgBody = std::make_unique<nx_http::BufferSource>(
+                    Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+                    QJson::serialized(result));
+            }
+
+            completionHandler(
+                authResult == api::ResultCode::ok,
+                std::move(authProperties),
+                std::move(wwwAuthenticate),
+                std::move(responseHeaders),
+                std::move(msgBody));
         });
 
     //TODO #ak use QnAuthHelper class to enable all that authentication types
@@ -83,12 +99,12 @@ bool AuthenticationManager::authenticate(
     if (allowedAuthMethods & AuthMethod::noAuth)
     {
         authResult = api::ResultCode::ok;
-        return true;
+        return;
     }
     if (!(allowedAuthMethods & AuthMethod::httpDigest))
     {
         authResult = api::ResultCode::notAuthorized;
-        return false;
+        return;
     }
 
     const auto authHeaderIter = request.headers.find(header::Authorization::NAME);
@@ -122,7 +138,7 @@ bool AuthenticationManager::authenticate(
         if (authenticated.get().toBool())
         {
             authResult = api::ResultCode::ok;
-            return true;
+            return;
         }
     }
 
@@ -130,16 +146,16 @@ bool AuthenticationManager::authenticate(
         (authzHeader->authScheme != header::AuthScheme::digest) ||
         (authzHeader->userid().isEmpty()))
     {
-        addWWWAuthenticateHeader(wwwAuthenticate);
+        addWWWAuthenticateHeader(&wwwAuthenticate);
         authResult = api::ResultCode::notAuthorized;
-        return false;
+        return;
     }
 
     if (!validateNonce(authzHeader->digest->params["nonce"]))
     {
-        addWWWAuthenticateHeader(wwwAuthenticate);
+        addWWWAuthenticateHeader(&wwwAuthenticate);
         authResult = api::ResultCode::notAuthorized;
-        return false;
+        return;
     }
 
     const auto userID = authzHeader->userid();
@@ -157,7 +173,7 @@ bool AuthenticationManager::authenticate(
         if (validateHa1Func(foundHa1.get().toString().toLatin1()))
         {
             authResult = api::ResultCode::ok;
-            return true;
+            return;
         }
     }
     if (auto password = authTraversalResult.get(attr::userPassword))
@@ -168,7 +184,7 @@ bool AuthenticationManager::authenticate(
                 password.get().toString())))
         {
             authResult = api::ResultCode::ok;
-            return true;
+            return;
         }
     }
 
@@ -176,8 +192,7 @@ bool AuthenticationManager::authenticate(
         userID,
         std::move(validateHa1Func),
         authSearchInputData,
-        authProperties);
-    return authResult == api::ResultCode::ok;
+        &authProperties);
 }
 
 nx::String AuthenticationManager::realm()

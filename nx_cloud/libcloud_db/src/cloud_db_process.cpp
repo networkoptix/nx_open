@@ -534,6 +534,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kSystemExpirationTime);
     dbStructureUpdater.addUpdateScript(db::kReplaceBlobWithVarchar);
     dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentials);
+    dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentialsProlongationPeriod);
     return dbStructureUpdater.updateStructSync();
 }
 

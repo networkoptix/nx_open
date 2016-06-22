@@ -209,6 +209,8 @@ public:
     bool setProperty(const QString &key, const QVariant& value,
                      PropertyOptions options = DEFAULT_OPTIONS);
 
+    bool removeProperty(const QString& key);
+
     template<typename Update>
     bool updateProperty(const QString &key, const Update& update)
     {

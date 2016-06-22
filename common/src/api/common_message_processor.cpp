@@ -86,6 +86,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     auto resourceManager = connection->getResourceNotificationManager();
     connect(resourceManager, &ec2::AbstractResourceNotificationManager::statusChanged,          this, &QnCommonMessageProcessor::on_resourceStatusChanged );
     connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamChanged,   this, &QnCommonMessageProcessor::on_resourceParamChanged );
+    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamRemoved,   this, &QnCommonMessageProcessor::on_resourceParamRemoved);
     connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceRemoved,        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto mediaServerManager = connection->getMediaServerNotificationManager();
@@ -241,6 +242,15 @@ void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourcePar
         resource->setProperty(param.name, param.value, QnResource::NO_MARK_DIRTY);
     else
         propertyDictionary->setValue(param.resourceId, param.name, param.value, false);
+}
+
+void QnCommonMessageProcessor::on_resourceParamRemoved(const ec2::ApiResourceParamWithRefData& param )
+{
+    QnResourcePtr resource = qnResPool->getResourceById(param.resourceId);
+    if (resource)
+        resource->removeProperty(param.name);
+    else
+        propertyDictionary->removeProperty(param.resourceId, param.name);
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
