@@ -234,12 +234,20 @@ void QnUserSettingsWidget::setupInputFields()
             return Qn::ValidationResult(tr("User has been renamed. Password must be updated."));
         }
 
+        if (m_model->mode() == QnUserSettingsModel::NewUser &&
+            text.isEmpty())
+        {
+            return Qn::ValidationResult(tr("Password cannot be empty.")); //TODO: #vkutin text string duplication
+        }
+
         /* Further validation will be done by password strength indicator. */
         return Qn::kValidResult;
     });
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
+
+    //TODO: #vkutin really not sure this logic must be implemented inside the generic class
     ui->confirmPasswordInputField->setConfirmationMode(ui->passwordInputField, tr("Passwords do not match."));
 
     for (auto field : inputFields())
