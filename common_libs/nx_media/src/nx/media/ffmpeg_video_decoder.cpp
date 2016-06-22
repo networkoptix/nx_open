@@ -4,6 +4,7 @@
 
 extern "C" {
 #include <libavformat/avformat.h>
+#include <libavcodec/videotoolbox.h>
 } // extern "C"
 
 #include <utils/media/ffmpeg_helper.h>
@@ -18,6 +19,8 @@ extern "C" {
 namespace nx {
 namespace media {
 
+QSize FfmpegVideoDecoder::s_maxResolution;    
+
 namespace {
 
     void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height)
@@ -31,7 +34,6 @@ namespace {
     }
 
 }
-
 
 class InitFfmpegLib
 {
@@ -108,10 +110,13 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
     if (!frame)
         return;
 
+    // auto codec = avcodec_find_decoder_by_name("h264_videotoolbox");
     auto codec = avcodec_find_decoder(frame->compressionType);
     codecContext = avcodec_alloc_context3(codec);
     if (frame->context)
         QnFfmpegHelper::mediaContextToAvCodecContext(codecContext, frame->context);
+    
+    int status = av_videotoolbox_default_init(codecContext);
     //codecContext->thread_count = 4; //< Uncomment this line if decoder with internal buffer is required
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {

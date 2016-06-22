@@ -73,7 +73,7 @@
                 </property>
             </activation>
             <properties>
-                <ios.defines>DISABLE_FFMPEG</ios.defines>
+                <!-- <ios.defines>DISABLE_FFMPEG</ios.defines> -->
             </properties>
         </profile>
         <profile>
