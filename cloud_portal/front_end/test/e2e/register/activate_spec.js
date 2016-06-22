@@ -64,7 +64,7 @@ describe('User activation', function () {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
             p.helper.login(userEmail, p.helper.userPassword);
-            p.helper.get('/#/account');
+            p.helper.get('/account');
             expect(p.accountFirstNameInput.getAttribute('value')).toMatch(p.helper.userFirstName);
             expect(p.accountLastNameInput.getAttribute('value')).toMatch(p.helper.userLastName);
             p.helper.logout();
@@ -85,7 +85,7 @@ describe('User activation', function () {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
             p.helper.login(userEmail, p.helper.userPassword);
-            p.helper.get('/#/account');
+            p.helper.get('/account');
             expect(p.accountFirstNameInput.getAttribute('value')).toMatch(p.helper.inputLongCut);
             expect(p.accountLastNameInput.getAttribute('value')).toMatch(p.helper.inputLongCut);
             p.helper.logout();
@@ -106,14 +106,14 @@ describe('User activation', function () {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
             p.helper.login(userEmail, p.helper.userPassword);
-            p.helper.get('/#/account');
+            p.helper.get('/account');
             expect(p.accountFirstNameInput.getAttribute('value')).toMatch(p.helper.userFirstName);
             expect(p.accountLastNameInput.getAttribute('value')).toMatch(p.helper.userLastName);
             p.helper.logout();
         });
     });
 
-    it("should display Open Nx Witness button after activation, if user is registered by link #/register/?from=client", function () {
+    it("should display Open Nx Witness button after activation, if user is registered by link /register/?from=client", function () {
         var userEmail = p.helper.getRandomEmail();
 
         p.helper.get(p.url + '?from=client');
@@ -130,7 +130,7 @@ describe('User activation', function () {
         });
     });
 
-    it("should display Open Nx Witness button after activation, if user is registered by link #/register/?from=mobile", function () {
+    it("should display Open Nx Witness button after activation, if user is registered by link /register/?from=mobile", function () {
         var userEmail = p.helper.getRandomEmail();
 
         p.helper.get(p.url + '?from=mobile');

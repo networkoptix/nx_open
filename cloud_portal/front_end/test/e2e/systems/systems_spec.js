@@ -81,7 +81,7 @@ describe('Systems list suite', function () {
             for (var i= 0; i < count; i++) {
                 p.systemsList.get(i).click();
                 // TODO: Write appropriate checks that system page is opened
-                expect(browser.getCurrentUrl()).toContain('#/systems/');
+                expect(browser.getCurrentUrl()).toContain('/systems/');
                 p.helper.navigateBack();
             }
         });

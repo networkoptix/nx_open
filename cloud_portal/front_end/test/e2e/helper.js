@@ -27,11 +27,11 @@ var Helper = function () {
     };
     this.urls = {
         homepage: '/',
-        account: '/#/account',
-        password_change: '/#/account/password',
-        systems: '/#/systems',
-        register: '/#/register',
-        restore_password: '/#/restore_password'
+        account: '/account',
+        password_change: '/account/password',
+        systems: '/systems',
+        register: '/register',
+        restore_password: '/restore_password'
     };
     this.navigateBack = function (){
         browser.navigate().back();
@@ -225,11 +225,10 @@ var Helper = function () {
         expect(email.headers.to).toEqual(userEmail);
 
         // extract registration token from the link in the email message
-        var pathToIndex = '/static/index.html#/';
-        var pattern = new RegExp(pathToIndex + where + '/([\\w=]+)', 'g');
+        var pattern = new RegExp(where + '/([\\w=]+)', 'g');
         var regCode = pattern.exec(email.html)[1];
         console.log(regCode);
-        return ('/#/' + where + '/' + regCode); // url
+        return ('/' + where + '/' + regCode); // url
     };
 
     this.getEmailedLink = function(userEmail, subject, where) {

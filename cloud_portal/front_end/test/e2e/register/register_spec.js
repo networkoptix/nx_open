@@ -193,7 +193,7 @@ describe('Registration suite', function () {
         browser.getAllWindowHandles().then(function (handles) {
             var newWindowHandle = handles[1];
             browser.switchTo().window(newWindowHandle).then(function () {
-                expect(browser.getCurrentUrl()).toContain('static/eula'); // Check that url is correct
+                expect(browser.getCurrentUrl()).toContain('content/eula'); // Check that url is correct
                 expect(p.helper.htmlBody.getText()).toContain('Terms and conditions'); // Check that it is Terms and conditions page
             });
         });
@@ -252,10 +252,10 @@ describe('Registration suite', function () {
         expect(p.helper.htmlBody.$('.promo-block').isPresent()).toBe(false);
     });
 
-    it("should not allow to access #/register/success #/activate/success by direct input", function () {
-        p.helper.get('#/activate/success');
+    it("should not allow to access /register/success /activate/success by direct input", function () {
+        p.helper.get('/activate/success');
         expect(browser.getCurrentUrl()).not.toContain("/activate/success");
-        p.helper.get('#/register/success');
+        p.helper.get('/register/success');
         expect(browser.getCurrentUrl()).not.toContain("/register/success");
     });
 });

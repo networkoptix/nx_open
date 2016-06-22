@@ -1,5 +1,5 @@
 'use strict';
-xdescribe('Restore all passwords', function () { // to enable suit, replace xdescribe with describe
+describe('Restore all passwords', function () { // to enable suit, replace xdescribe with describe
     var Helper = require('../helper.js');
     this.helper = new Helper();
     var self = this;

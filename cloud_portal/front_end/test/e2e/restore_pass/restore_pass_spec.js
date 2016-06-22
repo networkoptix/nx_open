@@ -59,10 +59,10 @@ describe('Restore password page', function () {
         }));
     });
 
-    it("should not allow to access #/restore_password/sent #/restore_password/success by direct input", function () {
-        p.helper.get('#/restore_password/sent');
+    it("should not allow to access /restore_password/sent /restore_password/success by direct input", function () {
+        p.helper.get('/restore_password/sent');
         expect(browser.getCurrentUrl()).not.toContain("/restore_password/sent");
-        p.helper.get('#/restore_password/success');
+        p.helper.get('/restore_password/success');
         expect(browser.getCurrentUrl()).not.toContain("/restore_password/success");
     });
 

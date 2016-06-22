@@ -11,7 +11,7 @@ var RegisterPage = function () {
     var AlertSuite = require('../alerts_check.js');
     this.alert = new AlertSuite();
 
-    this.url = '/#/register';
+    this.url = '/register';
 
     this.openRegisterButton = element(by.linkText('Register'));
     this.openRegisterButtonAdv = element(by.linkText('Register now')); // Register button on home page
@@ -77,12 +77,11 @@ var RegisterPage = function () {
 
         browser.controlFlow().wait(this.helper.getEmailTo(userEmail, this.helper.emailSubjects.register).then(function (email) {
             // extract registration token from the link in the email message
-            var pathToIndex = '/static/index.html#/';
-            var pattern = new RegExp(pathToIndex + "activate/(\\w+)", "g");
+            var pattern = new RegExp("activate/(\\w+)", "g");
             var regCode = pattern.exec(email.html)[1];
             console.log(regCode);
 
-            deferred.fulfill('/#/activate/' + regCode);
+            deferred.fulfill('/activate/' + regCode);
         }));
 
         return deferred.promise;

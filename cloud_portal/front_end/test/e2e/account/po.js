@@ -11,8 +11,7 @@ var AccountPage = function () {
     var AlertSuite = require('../alerts_check.js');
     this.alert = new AlertSuite();
 
-    this.accountUrl = '/#/account';
-    this.passwordUrl = '/#/account/password';
+    this.passwordUrl = '/account/password';
     this.homePageUrl = '/';
 
     this.get = function (url) {

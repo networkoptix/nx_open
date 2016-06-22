@@ -6,7 +6,7 @@ var SystemsListPage = function () {
 
     var self = this;
 
-    this.url = '/#/systems';
+    this.url = '/systems';
 
     this.activeMenuItem = element(by.css('.navbar-nav')).element(by.css('.active'));
     this.systemsList = element.all(by.repeater('system in systems'));

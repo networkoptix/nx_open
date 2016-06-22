@@ -6,7 +6,7 @@ var SystemPage = function () {
     var AlertSuite = require('../alerts_check.js');
     this.alert = new AlertSuite();
 
-    this.url = '/#/systems';
+    this.url = '/systems';
     this.systemLink = '/a74840da-f135-4522-abd9-5a8c6fb8591f';
     this.systemName = 'test-korneeva';
 

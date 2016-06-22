@@ -16,7 +16,7 @@ describe('On change password page,', function () {
         p.get(p.passwordUrl);
     });
 
-    it("url should be #/account/password", function () {
+    it("url should be /account/password", function () {
         p.get(p.homePageUrl);
 
         expect(p.userAccountDropdownToggle.isDisplayed()).toBe(true);
@@ -24,7 +24,7 @@ describe('On change password page,', function () {
         p.userAccountDropdownToggle.click();
         p.changePasswordLink.click();
 
-        expect(browser.getCurrentUrl()).toContain('#/account/password');
+        expect(browser.getCurrentUrl()).toContain('/account/password');
         expect(p.htmlBody.getText()).toContain('Current password');
     });
 

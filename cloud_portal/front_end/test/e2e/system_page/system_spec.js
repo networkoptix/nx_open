@@ -21,7 +21,7 @@ describe('System suite', function () {
             p.systemsList.count().then(function(count) {
                 for (var i= 0; i < count; i++) {
                     p.systemsList.get(i).click();
-                    expect(browser.getCurrentUrl()).toContain('#/systems/');
+                    expect(browser.getCurrentUrl()).toContain('/systems/');
                     expect(p.systemNameElem.getText()).toContain(systemsAttr[i].sysName);
                     expect(p.systemOwnElem.getText()).toContain(systemsAttr[i].sysOwner);
                     expect(p.openInClientButton.isDisplayed()).toBe(true);
