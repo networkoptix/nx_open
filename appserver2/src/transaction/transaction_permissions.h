@@ -56,6 +56,8 @@ bool hasPermission(const QnUuid &userId, const ApiPeerSystemTimeData &/*data*/, 
 
 bool hasPermission(const QnUuid &userId, const ApiSystemStatistics &/*data*/, Qn::Permission /*permission*/);
 
+bool hasPermission(const QnUuid &userId, const ApiUserGroupData&/*data*/, Qn::Permission /*permission*/);
+
 template<typename TransactionParamType>
 bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission);
 
