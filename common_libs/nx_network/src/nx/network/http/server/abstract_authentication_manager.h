@@ -12,6 +12,7 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/utils/move_only_func.h>
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 
 #include "../abstract_msg_body_source.h"
@@ -26,15 +27,16 @@ namespace nx_http
 
         /*!
             \param authProperties Properties found during authentication should be placed here (e.g., some entity ID)
-            \return \a false if could not authenticate \a request
         */
-        virtual bool authenticate(
+        virtual void authenticate(
             const HttpServerConnection& connection,
             const nx_http::Request& request,
-            boost::optional<header::WWWAuthenticate>* const wwwAuthenticate,
-            stree::ResourceContainer* authProperties,
-            nx_http::HttpHeaders* const responseHeaders,
-            std::unique_ptr<AbstractMsgBodySource>* const msgBody) = 0;
+            nx::utils::MoveOnlyFunc<void(
+                bool authenticationResult,
+                stree::ResourceContainer authInfo,
+                boost::optional<header::WWWAuthenticate> wwwAuthenticate,
+                nx_http::HttpHeaders responseHeaders,
+                std::unique_ptr<AbstractMsgBodySource> msgBody)> completionHandler) = 0;
     };
 }
 
