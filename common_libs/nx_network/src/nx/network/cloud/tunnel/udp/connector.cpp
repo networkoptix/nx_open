@@ -10,10 +10,11 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "outgoing_tunnel_connection.h"
 #include "rendezvous_connector_with_verification.h"
+#include "nx/network/nettools.h"
 
 
 namespace nx {
@@ -34,7 +35,8 @@ TunnelConnector::TunnelConnector(
             mediatorAddress
             ? mediatorAddress.get()
             : *nx::network::SocketGlobals::mediatorConnector().mediatorAddress())),   //TunnelConnector MUST not be created if mediator address is unknown
-    m_done(false)
+    m_done(false),
+    m_remotePeerCloudConnectVersion(hpm::api::kDefaultCloudConnectVersion)
 {
     NX_ASSERT(nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
 
@@ -57,6 +59,7 @@ void TunnelConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
             m_rendezvousConnectors.clear();
             m_udtConnection.reset();    //we do not use this connection so can just remove it here
             m_connectResultReportSender.reset();
+            m_chosenRendezvousConnector.reset();
             handler();
         });
 }
@@ -141,6 +144,15 @@ void TunnelConnector::connect(
         connectRequest.udpEndpointList.emplace_back(
             SocketAddress(*m_originatingHostAddressReplacement, 0));    //in case of zero port mediator will take request source port
     }
+
+    //adding local interfaces IP
+    const auto localInterfaceList = getAllIPv4Interfaces();
+    for (const auto& addr: localInterfaceList)
+    {
+        connectRequest.udpEndpointList.push_back(
+            SocketAddress(addr.address.toString(), m_localAddress.port));
+    }
+
     using namespace std::placeholders;
     m_mediatorUdpClient->connect(
         std::move(connectRequest),
@@ -230,6 +242,8 @@ void TunnelConnector::onConnectResponse(
     m_connectResultReport.resultCode =
         api::UdpHolePunchingResultCode::targetPeerHasNoUdpAddress;
 
+    m_remotePeerCloudConnectVersion = response.cloudConnectVersion;
+
     //extracting target address from response
     if (response.udpEndpointList.empty())
     {
@@ -240,7 +254,6 @@ void TunnelConnector::onConnectResponse(
             api::UdpHolePunchingResultCode::targetPeerHasNoUdpAddress,
             SystemError::connectionReset);
     }
-    //TODO #ak what if there are several addresses in udpEndpointList?
 
     m_connectResultReport.resultCode =
         api::UdpHolePunchingResultCode::noSynFromTargetPeer;
@@ -257,34 +270,41 @@ void TunnelConnector::onConnectResponse(
             effectiveConnectTimeout = milliseconds(1);   //zero timeout is infinity
     }
 
-    auto rendezvousConnector = std::make_unique</*RendezvousConnector*/RendezvousConnectorWithVerification>(
-        m_connectSessionId,
-        std::move(response.udpEndpointList.front()),
-        std::move(m_mediatorUdpClient->takeSocket())); //moving system socket handler from m_mediatorUdpClient to udt connection
-    rendezvousConnector->bindToAioThread(m_timer.getAioThread());
+    for (SocketAddress& endpoint: response.udpEndpointList)
+    {
+        std::unique_ptr<RendezvousConnectorWithVerification> rendezvousConnector;
+        if (m_mediatorUdpClient)
+            rendezvousConnector = std::make_unique<RendezvousConnectorWithVerification>(
+                m_connectSessionId,
+                std::move(endpoint),
+                std::move(m_mediatorUdpClient->takeSocket()));  //moving system socket handler from m_mediatorUdpClient to udt connection
+        else
+            rendezvousConnector = std::make_unique<RendezvousConnectorWithVerification>(
+                m_connectSessionId,
+                std::move(endpoint),
+                SocketAddress(HostAddress::anyHost, m_localAddress.port));
+        rendezvousConnector->bindToAioThread(m_timer.getAioThread());
 
-    m_mediatorUdpClient.reset();
-    NX_LOGX(lm("cross-nat %1. Udt rendezvous connect to %2")
-        .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
-        cl_logDEBUG1);
+        m_mediatorUdpClient.reset();
+        NX_LOGX(lm("cross-nat %1. Udt rendezvous connect to %2")
+            .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
+            cl_logDEBUG1);
 
-    rendezvousConnector->connect(
-        effectiveConnectTimeout,
-        [this, rendezvousConnectorPtr = rendezvousConnector.get()](
-            SystemError::ErrorCode errorCode,
-            std::unique_ptr<UdtStreamSocket> udtConnection)
-        {
-            onUdtConnectionEstablished(
-                rendezvousConnectorPtr,
-                std::move(udtConnection),
-                errorCode);
-        });
-    m_rendezvousConnectors.emplace_back(std::move(rendezvousConnector));
+        rendezvousConnector->connect(
+            effectiveConnectTimeout,
+            [this, rendezvousConnectorPtr = rendezvousConnector.get()](
+                SystemError::ErrorCode errorCode)
+            {
+                onUdtConnectionEstablished(
+                    rendezvousConnectorPtr,
+                    errorCode);
+            });
+        m_rendezvousConnectors.emplace_back(std::move(rendezvousConnector));
+    }
 }
 
 void TunnelConnector::onUdtConnectionEstablished(
-    RendezvousConnector* rendezvousConnectorPtr,
-    std::unique_ptr<UdtStreamSocket> udtConnection,
+    RendezvousConnectorWithVerification* rendezvousConnectorPtr,
     SystemError::ErrorCode errorCode)
 {
     //we are in m_timer's aio thread
@@ -295,10 +315,10 @@ void TunnelConnector::onUdtConnectionEstablished(
         m_rendezvousConnectors.begin(),
         m_rendezvousConnectors.end(),
         [rendezvousConnectorPtr](
-            const std::unique_ptr<RendezvousConnector>& val)
-        {
-            return val.get() == rendezvousConnectorPtr;
-        });
+            const std::unique_ptr<RendezvousConnectorWithVerification>& val)
+            {
+                return val.get() == rendezvousConnectorPtr;
+            });
     NX_ASSERT(rendezvousConnectorIter != m_rendezvousConnectors.end());
     auto rendezvousConnector = std::move(*rendezvousConnectorIter);
     m_rendezvousConnectors.erase(rendezvousConnectorIter);
@@ -327,8 +347,41 @@ void TunnelConnector::onUdtConnectionEstablished(
     //stopping other rendezvous connectors
     m_rendezvousConnectors.clear(); //can do since we are in aio thread
 
-    NX_CRITICAL(udtConnection);
-    m_udtConnection = std::move(udtConnection);
+    m_chosenRendezvousConnector = std::move(rendezvousConnector);
+
+    if (m_remotePeerCloudConnectVersion <
+        hpm::api::CloudConnectVersion::tryingEveryAddressOfPeer)
+    {
+        return onHandshakeComplete(SystemError::noError);
+    }
+
+    //notifying remote side: "this very connection has been selected"
+
+    m_chosenRendezvousConnector->notifyAboutChoosingConnection(
+        std::bind(&TunnelConnector::onHandshakeComplete, this, std::placeholders::_1));
+}
+
+void TunnelConnector::onHandshakeComplete(SystemError::ErrorCode errorCode)
+{
+    auto rendezvousConnector = std::move(m_chosenRendezvousConnector);
+    m_chosenRendezvousConnector.reset();
+
+    if (errorCode != SystemError::noError)
+    {
+        NX_LOGX(lm("cross-nat %1. Failed to notify remote side (%2) about connection choice. %3")
+            .arg(m_connectSessionId)
+            .arg(rendezvousConnector->remoteAddress().toString())
+            .arg(SystemError::toString(errorCode)),
+            cl_logDEBUG1);
+
+        holePunchingDone(
+            api::UdpHolePunchingResultCode::udtConnectFailed,
+            errorCode);
+        return;
+    }
+
+    m_udtConnection = rendezvousConnector->takeConnection();
+    NX_CRITICAL(m_udtConnection);
     rendezvousConnector.reset();
 
     //introducing delay to give server some time to call accept (work around udt bug)

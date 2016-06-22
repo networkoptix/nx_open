@@ -41,7 +41,9 @@
 #include <ui/graphics/items/overlays/buttons_overlay.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/scrollable_overlay_widget.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
@@ -241,14 +243,15 @@ void QnResourceWidget::addMainOverlay()
     setOverlayWidgetVisible(m_overlayWidgets->buttonsOverlay, false, false);
 }
 
-void QnResourceWidget::createButtons() {
-    QnImageButtonWidget *closeButton = new QnImageButtonWidget(lit("res_widget_close"));
+void QnResourceWidget::createButtons()
+{
+    QnImageButtonWidget *closeButton = createStatisticAwareButton(lit("res_widget_close"));
     closeButton->setIcon(qnSkin->icon("item/close.png"));
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     closeButton->setToolTip(tr("Close"));
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
 
-    QnImageButtonWidget *infoButton = new QnImageButtonWidget(lit("res_widget_info"));
+    QnImageButtonWidget *infoButton = createStatisticAwareButton(lit("res_widget_info"));
     infoButton->setIcon(qnSkin->icon("item/info.png"));
     infoButton->setCheckable(true);
     infoButton->setChecked(item()->displayInfo());
@@ -256,7 +259,7 @@ void QnResourceWidget::createButtons() {
     infoButton->setToolTip(tr("Information"));
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
 
-    QnImageButtonWidget *rotateButton = new QnImageButtonWidget(lit("res_widget_rotate"));
+    QnImageButtonWidget *rotateButton = createStatisticAwareButton(lit("res_widget_rotate"));
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
     rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
     rotateButton->setToolTip(tr("Rotate"));
@@ -272,7 +275,7 @@ void QnResourceWidget::createButtons() {
 
     connect(buttonsBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_buttonBar_checkedButtonsChanged()));
 
-    auto iconButton = new QnImageButtonWidget(QString()); // It is non-clickable icon only, we don't need statistics alias here
+    auto iconButton = new QnImageButtonWidget();
     iconButton->setParent(this);
     iconButton->setPreferredSize(kButtonsSize, kButtonsSize);
     iconButton->setVisible(false);
@@ -479,7 +482,13 @@ void QnResourceWidget::updateCursor() {
         setCursor(newCursor);
 }
 
-QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const {
+QnStatusOverlayWidget * QnResourceWidget::statusOverlayWidget() const
+{
+    return m_statusOverlayWidget;
+}
+
+QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const
+{
     if (!hasAspectRatio())
         return constraint;
 
@@ -567,7 +576,20 @@ QRectF QnResourceWidget::exposedRect(int channel, bool accountForViewport, bool 
     }
 }
 
-Qn::RenderStatus QnResourceWidget::renderStatus() const {
+void QnResourceWidget::registerButtonStatisticsAlias(QnImageButtonWidget* button, const QString& alias)
+{
+    context()->statisticsModule()->registerButton(alias, button);
+}
+
+QnImageButtonWidget* QnResourceWidget::createStatisticAwareButton(const QString& alias)
+{
+    QnImageButtonWidget* result = new QnImageButtonWidget();
+    registerButtonStatisticsAlias(result, alias);
+    return result;
+}
+
+Qn::RenderStatus QnResourceWidget::renderStatus() const
+{
     return m_renderStatus;
 }
 

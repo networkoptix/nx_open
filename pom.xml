@@ -37,6 +37,7 @@
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
         <nx_network.guid>{71fb3cab-00f4-41a3-af08-ae0a61b8c79e}</nx_network.guid>
         <nx_utils.guid>{81BDC343-5614-4C4D-90E8-147A024BEAF4}</nx_utils.guid>
+        <nx_fusion.guid>{0ac7e9d9-df58-456f-a568-0bd7ca5eacda}</nx_fusion.guid>
         <nx_vms_utils.guid>{c4174ab7-1537-498b-8c4d-091d05e4735a}</nx_vms_utils.guid>
         <udt.guid>{7f5cd83f-b59e-4020-b35b-de4edaf66233}</udt.guid>
         <cloud_db_client.guid>{0F7C2BCF-DA0B-4E2E-8F4B-564AE63FAD73}</cloud_db_client.guid>
@@ -129,6 +130,7 @@
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
         <client.binary.name>client-bin</client.binary.name>
+        <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
         <!-- compile.option2. See profile angle  -->
@@ -192,6 +194,7 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
+        <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
         <toolchain.version>none</toolchain.version>
@@ -400,6 +403,7 @@
             <modules>
                 <module>build_variables</module>
                 <module>common</module>
+                <module>common_libs/nx_fusion</module>
                 <module>common_libs/nx_network</module>
                 <module>common_libs/nx_utils</module>
                 <module>common_libs/nx_vms_utils</module>
@@ -510,6 +514,7 @@
                 <VCVars>VS140COMNTOOLS</VCVars>
                 <modification>winxp</modification>
                 <client.binary.name>${product.name}.exe</client.binary.name>
+                <applauncher.binary.name>${product.name} Launcher.exe</applauncher.binary.name>
                 <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
                 <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
 
@@ -519,11 +524,8 @@
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
                 <machine.type>X64</machine.type>
+                <installation.root>C:/Program Files/${company.name}/${display.product.name}/</installation.root>
             </properties>
-
-            <modules>
-                <module>common_libs/nx_bpi_videonode_plugin</module>
-            </modules>
 
         </profile>
         <profile>
@@ -540,6 +542,7 @@
             </activation>
             <properties>
                 <machine.type>X86</machine.type>
+                <installation.root>C:/Program Files (x86)/${company.name}/${display.product.name}/</installation.root>
             </properties>
         </profile>
         <profile>
@@ -665,6 +668,10 @@
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
+
+            <modules>
+                <module>common_libs/nx_speach_synthesizer</module>
+            </modules>
         </profile>
 
         <profile>
@@ -681,13 +688,17 @@
             <properties>
                 <platform>macosx</platform>
                 <arch>x64</arch>
+                <modification>macosx</modification>
                 <quazip.version>0.7.2</quazip.version>
                 <qt.spec/>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
+                <client.binary.name>${display.product.name}</client.binary.name>
+                <applauncher.binary.name>${display.product.name} Launcher</applauncher.binary.name>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
+                <module>common_libs/nx_speach_synthesizer</module>
                 <module>macsetup/client-dmg</module>
             </modules>
         </profile>
@@ -740,7 +751,7 @@
             </activation>
             <modules>
                 <module>nx_cloud/libconnection_mediator</module>
-                <module>nx_cloud/cloud_connect_test_util</module>
+                <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
             <properties>
                 <build.suffix>${box}-${arch}</build.suffix>
@@ -1115,12 +1126,11 @@
             <properties>
                 <platform>ios</platform>
                 <toolchain.version>ios</toolchain.version>
-                <qt.spec>macx-ios-clang</qt.spec>
+                <qt.spec/>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <compiler>clang</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
-                <qt.version>5.5.1</qt.version>
                 <openssl.version>1.0.1i</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>

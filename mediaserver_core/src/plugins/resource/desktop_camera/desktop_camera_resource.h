@@ -38,6 +38,8 @@ public:
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
     virtual bool isReadyToDetach() const override;
+
+    virtual bool isInitialized() const override { return true; }
 };
 
 #endif //ENABLE_DESKTOP_CAMERA

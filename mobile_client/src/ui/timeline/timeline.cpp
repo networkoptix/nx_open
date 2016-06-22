@@ -1123,10 +1123,11 @@ void QnTimelinePrivate::updateStripesTextures() {
 }
 
 void QnTimelinePrivate::animateProperties(qint64 dt) {
-    bool windowChanged = false;
+    const auto originalWindowStart = windowStart;
+    const auto originalWindowEnd = windowEnd;
+    const auto originalWindowPosition = originalWindowStart + (originalWindowEnd - originalWindowStart) / 2;
 
     if (!stickToEnd && autoPlay) {
-        windowChanged = true;
         qint64 shift = dt * autoPlaySpeed * playSpeedCorrection;
         windowStart += shift;
         windowEnd += shift;
@@ -1139,8 +1140,6 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
 
     zoomKineticHelper.update();
     if (!zoomKineticHelper.isStopped()) {
-        windowChanged = true;
-
         qint64 maxSize = (liveTime - startBound) * 2;
         qint64 minSize = startBoundTime == -1 ? maxSize : parent->width();
         qreal factor = startZoom / zoomKineticHelper.value();
@@ -1185,12 +1184,10 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
 
         delta = time - parent->position();
         if (delta != 0) {
-            windowChanged = true;
             windowStart += delta;
             windowEnd += delta;
         }
     } else {
-        windowChanged = true;
         qint64 time = pixelPosToTime(stickyPointKineticHelper.value());
         qint64 delta = stickyTime - time;
         windowStart += delta;
@@ -1236,11 +1233,12 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         }
     }
 
-    if (windowChanged) {
-        parent->windowStartChanged();
-        parent->windowEndChanged();
-        parent->positionChanged();
-    }
+    if (originalWindowStart != windowStart)
+        emit parent->windowStartChanged();
+    if (originalWindowEnd != windowEnd)
+        emit parent->windowEndChanged();
+    if (originalWindowPosition != parent->position())
+        emit parent->positionChanged();
 
     qreal targetTextOpacity = hasArchive() ? 1.0 : 0.0;
     if (!qFuzzyCompare(textOpacity, targetTextOpacity)) {

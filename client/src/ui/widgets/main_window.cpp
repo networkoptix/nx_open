@@ -139,7 +139,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_dwm(nullptr),
     m_currentPageHolder(new QStackedWidget()),
     m_titleBar(new QnMainWindowTitleBarWidget(this)),
-    m_welcomeScreenVisible(true),
     m_titleVisible(true),
     m_drawCustomFrame(false),
     m_inFullscreenTransition(false)
@@ -249,7 +248,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnTimelineBookmarksWatcher>();
     context->instance<QnWorkbenchServerPortWatcher>();
     context->instance<QnCurrentUserAvailableCamerasWatcher>();
-    auto welcomeScreen = context->instance<QnWorkbenchWelcomeScreen>();
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
@@ -300,11 +298,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     menu()->setTargetProvider(m_ui.data());
 
-    connect(welcomeScreen, &QnWorkbenchWelcomeScreen::visibleChanged, this
-        , [this, welcomeScreen]()
-    {
-        setWelcomeScreenVisible(welcomeScreen->isVisible());
-    });
+    const auto welcomeScreen = context->instance<QnWorkbenchWelcomeScreen>();
+    connect(welcomeScreen, &QnWorkbenchWelcomeScreen::visibleChanged,
+        this, &QnMainWindow::updateWidgetsVisibility);
 
     /* Layouts. */
 
@@ -360,7 +356,13 @@ QWidget *QnMainWindow::viewport() const {
 
 bool QnMainWindow::isTitleVisible() const
 {
-    return m_titleVisible || m_welcomeScreenVisible;
+    return m_titleVisible || isWelcomeScreenVisible();
+}
+
+bool QnMainWindow::isWelcomeScreenVisible() const
+{
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    return (welcomeScreen && welcomeScreen->isVisible());
 }
 
 void QnMainWindow::updateWidgetsVisibility()
@@ -400,17 +402,8 @@ void QnMainWindow::updateWidgetsVisibility()
     // Always show title bar for welcome screen (it does not matter if it is fullscreen)
 
     m_titleBar->setVisible(isTitleVisible());
-    updateWelcomeScreenVisibility(m_welcomeScreenVisible);
+    updateWelcomeScreenVisibility(isWelcomeScreenVisible());
     updateDwmState();
-}
-
-void QnMainWindow::setWelcomeScreenVisible(bool visible)
-{
-    if (m_welcomeScreenVisible == visible)
-        return;
-
-    m_welcomeScreenVisible = visible;
-    updateWidgetsVisibility();
 }
 
 void QnMainWindow::setTitleVisible(bool visible)

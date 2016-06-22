@@ -7,6 +7,7 @@ GridView
     id: camerasGrid
 
     property real spacing: 8
+    property alias layoutId: camerasModel.layoutId
 
     cellWidth: (width - leftMargin - rightMargin) / d.thumbnailsInRow
     cellHeight: cellWidth * 3 / 4 + 24 + 16

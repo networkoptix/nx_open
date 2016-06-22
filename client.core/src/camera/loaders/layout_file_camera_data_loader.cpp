@@ -10,8 +10,8 @@
 
 #include <recording/time_period_list.h>
 
-#include <utils/serialization/json.h>
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/json_functions.h>
 
 namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);

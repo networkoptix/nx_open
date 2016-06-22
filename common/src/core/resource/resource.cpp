@@ -11,7 +11,7 @@
 
 #include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include <core/resource/camera_advanced_param.h>
 #include "nx/streaming/abstract_stream_data_provider.h"

@@ -360,11 +360,11 @@ namespace
         buttonsLayout->setSpacing(0);
 
         const auto createButton =
-            [this, bookmark](const QString &statisticsAlias, const char *iconName , int eventId)
+            [this, bookmark](const char *iconName , int eventId)
         {
             enum { kSize = 30 };
 
-            auto button = new QnImageButtonWidget(statisticsAlias, this);
+            auto button = new QnImageButtonWidget(this);
             button->setIcon(qnSkin->icon(iconName));
             button->setClickableButtons(Qt::LeftButton);
             button->setMaximumSize(kSize, kSize);
@@ -378,21 +378,15 @@ namespace
             return button;
         };
 
-        buttonsLayout->addItem(createButton(lit("bookmark_tooltip_play")
-            , "bookmark/tooltip/play.png"
-            , kBookmarkPlayActionEventId));
+        buttonsLayout->addItem(createButton("bookmark/tooltip/play.png", kBookmarkPlayActionEventId));
 
         if (!m_viewer->readOnly())
         {
-            buttonsLayout->addItem(createButton(lit("bookmark_tooltip_edit")
-                , "bookmark/tooltip/edit.png"
-                , kBookmarkEditActionEventId));
+            buttonsLayout->addItem(createButton("bookmark/tooltip/edit.png", kBookmarkEditActionEventId));
 
             enum { kSpacerStretch = 1000 };
             buttonsLayout->addStretch(kSpacerStretch);
-            buttonsLayout->addItem(createButton(lit("bookmark_tooltip_delete")
-                , "bookmark/tooltip/delete.png"
-                , kBookmarkRemoveActionEventId));
+            buttonsLayout->addItem(createButton("bookmark/tooltip/delete.png", kBookmarkRemoveActionEventId));
         }
         return buttonsLayout;
     }

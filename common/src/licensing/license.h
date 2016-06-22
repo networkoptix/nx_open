@@ -14,7 +14,7 @@
 #include <QTimer>
 
 #include "core/resource/resource_fwd.h"
-#include "utils/common/latin1_array.h"
+#include "nx/utils/latin1_array.h"
 #include "utils/common/id.h"
 #include "nx_ec/data/api_fwd.h"
 

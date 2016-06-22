@@ -15,7 +15,7 @@
 
 #include <api/app_server_connection.h>
 #include <utils/common/concurrent.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/common/scoped_thread_rollback.h>
 #include <nx/network/http/asynchttpclient.h>
 
@@ -24,7 +24,7 @@
 #include "transaction/binary_transaction_serializer.h"
 #include "transaction/json_transaction_serializer.h"
 #include "transaction/transaction.h"
-#include "utils/serialization/ubjson.h"
+#include "nx/fusion/serialization/ubjson.h"
 #include "http/custom_headers.h"
 #include "api/model/audit/auth_session.h"
 

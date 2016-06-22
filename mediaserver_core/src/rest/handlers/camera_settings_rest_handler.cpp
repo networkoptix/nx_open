@@ -16,7 +16,7 @@
 #include <core/resource/camera_advanced_param.h>
 
 #include <nx/utils/log/log.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <network/tcp_connection_priv.h>
 
 #include <utils/xml/camera_advanced_param_reader.h>

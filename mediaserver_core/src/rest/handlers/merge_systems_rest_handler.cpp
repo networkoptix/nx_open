@@ -23,7 +23,7 @@
 #include "network/module_finder.h"
 #include "network/direct_module_finder.h"
 #include "utils/common/app_info.h"
-#include "utils/common/model_functions.h"
+#include "nx/fusion/model_functions.h"
 #include <nx/utils/log/log.h>
 #include "api/model/ping_reply.h"
 #include "audit/audit_manager.h"

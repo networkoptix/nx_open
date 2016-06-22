@@ -14,6 +14,43 @@ Page
 
     onLeftButtonClicked: sideNavigation.open()
 
+    titleControls:
+    [
+        Button
+        {
+            text: qsTr("Login to %1").arg(applicationInfo.cloudName())
+            textColor: ColorTheme.base16
+            flat: true
+            leftPadding: 0
+            rightPadding: 0
+            visible: cloudStatusWatcher.status == QnCloudStatusWatcher.LoggedOut
+            onClicked: Workflow.openCloudScreen()
+        }
+    ]
+
+    warningText: qsTr("Cannot connect to %1").arg(applicationInfo.cloudName())
+
+    Object
+    {
+        id: d
+
+        property bool cloudOffline: cloudStatusWatcher.status == QnCloudStatusWatcher.Offline
+
+        onCloudOfflineChanged:
+        {
+            if (!cloudOffline)
+                warningVisible = false
+        }
+
+        Timer
+        {
+            id: cloudWarningDelay
+            interval: 5000
+            running: d.cloudOffline
+            onTriggered: warningVisible = true
+        }
+    }
+
     ListView
     {
         id: sessionsList
@@ -42,7 +79,7 @@ Page
         {
             z: 2.0
             color: "transparent"
-            border.color: ColorTheme.contrast5
+            border.color: ColorTheme.contrast9
             border.width: 4
             visible: liteMode
         }

@@ -120,20 +120,12 @@ QString QnAppInfo::defaultLanguage()
 
 QString QnAppInfo::clientExecutableName()
 {
-#ifdef _WIN32
-    return QStringLiteral("${product.name}.exe"); // TODO: #Boris probably there exists a variable for this?
-#else
-    return QStringLiteral("client-bin");
-#endif
+    return QStringLiteral("${client.binary.name}");
 }
 
 QString QnAppInfo::applauncherExecutableName()
 {
-#ifdef _WIN32
-    return QStringLiteral("${product.name} Launcher.exe");
-#else
-    return QStringLiteral("applauncher-bin");
-#endif
+    return QStringLiteral("${applauncher.binary.name}");
 }
 
 QString QnAppInfo::mediaFolderName()
@@ -169,11 +161,6 @@ QString QnAppInfo::showcaseUrl()
 QString QnAppInfo::settingsUrl()
 {
     return QStringLiteral("${settings.url}/${customization}.json");
-}
-
-QString QnAppInfo::mirrorListUrl()
-{
-    return QStringLiteral("${mirrorListUrl}");
 }
 
 QString QnAppInfo::helpUrl()
@@ -216,22 +203,8 @@ bool QnAppInfo::freeLicenseIsTrial()
     return ${freeLicenseIsTrial};
 }
 
-QString QnAppInfo::iosPlayButtonTint()
+QString QnAppInfo::installationRoot()
 {
-    return QStringLiteral("${ios.playButton.tint}");
+    return QStringLiteral("${installation.root}");
 }
 
-QString QnAppInfo::oldAndroidClientLink()
-{
-    return QStringLiteral("https://play.google.com/store/apps/details?id=${namespace.major}.${namespace.minor}.${namespace.additional}");
-}
-
-QString QnAppInfo::oldIosClientLink()
-{
-    return QStringLiteral("https://itunes.apple.com/app/${ios.old_app_appstore_id}");
-}
-
-QString QnAppInfo::oldAndroidAppId()
-{
-    return QStringLiteral("${old.android.packagename}");
-}

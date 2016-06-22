@@ -29,7 +29,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
     m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::CamerasFilter, this)),
     m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this)),
-    m_editGroupsButton(new QPushButton(tr("Edit User Groups..."), this))
+    m_editGroupsButton(new QPushButton(tr("Edit Roles..."), this))
 {
     ui->setupUi(this);
 
@@ -206,6 +206,8 @@ void QnUserSettingsDialog::applyChanges()
                 page.widget->applyChanges();
         }
     });
+    /* We may fill password field to change current user password. */
+    m_user->setPassword(QString());
 
     if (m_model->mode() == QnUserSettingsModel::NewUser)
     {

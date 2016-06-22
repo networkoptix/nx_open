@@ -31,6 +31,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::TabFocus</enum>
+       </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
        </property>
@@ -41,13 +44,16 @@
         <enum>QAbstractItemView::NoSelection</enum>
        </property>
        <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectItems</enum>
+        <enum>QAbstractItemView::SelectRows</enum>
        </property>
        <property name="rootIsDecorated">
         <bool>false</bool>
        </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
        <property name="allColumnsShowFocus">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <attribute name="headerStretchLastSection">
         <bool>false</bool>
@@ -135,7 +141,7 @@
      <item>
       <widget class="QPushButton" name="rolesButton">
        <property name="text">
-        <string>Roles...</string>
+        <string>Edit Roles...</string>
        </property>
       </widget>
      </item>

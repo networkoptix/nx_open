@@ -4,28 +4,77 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/device_dependent_strings.h>
 
-namespace
+#include <nx/network/socket_common.h>
+
+namespace {
+
+QString extractHost(const QString& url)
 {
-    QString extractHost(const QString& url)
+    /* Don't go through QHostAddress/QUrl constructors as it is SLOW.
+    * Speed is important for event log. */
+    int startPos = url.indexOf(lit("://"));
+    startPos = startPos == -1 ? 0 : startPos + 3;
+
+    int endPos = url.indexOf(L':', startPos);
+    if (endPos == -1)
+        endPos = url.indexOf(L'/', startPos); /* No port, but we may still get '/' after address. */
+
+    endPos = endPos == -1 ? url.size() : endPos;
+
+    return url.mid(startPos, endPos - startPos);
+}
+
+QString getServerUrl(const QnResourcePtr& resource)
+{
+    /* We should not display localhost or cloud addresses to user. */
+    auto hostIsValid = [](const QString& host)
     {
-        /* Don't go through QHostAddress/QUrl constructors as it is SLOW.
-        * Speed is important for event log. */
-        int startPos = url.indexOf(lit("://"));
-        startPos = startPos == -1 ? 0 : startPos + 3;
+        /* Check local host. */
+        if (host == lit("localhost") || host == lit("127.0.0.1"))
+            return false;
 
-        int endPos = url.indexOf(L':', startPos);
-        if (endPos == -1)
-            endPos = url.indexOf(L'/', startPos); /* No port, but we may still get '/' after address. */
+        /* Check cloud host - short notation (looks just like <uuid>). */
+        if (!QnUuid::fromStringSafe(host).isNull())
+            return false;
 
-        endPos = endPos == -1 ? url.size() : endPos;
+        /* Check cloud host - long notation (looks like <uuid>.<uuid>). */
+        int splitterIdx = host.indexOf(L'.');
+        if (splitterIdx > 0)
+        {
+            /* Will not check right part. */
+            if (!QnUuid::fromStringSafe(host.left(splitterIdx)).isNull())
+                return false;
+        }
 
-        return url.mid(startPos, endPos - startPos);
+        return true;
+    };
+
+    QString baseUrl = extractHost(resource->getUrl());
+    if (hostIsValid(baseUrl))
+        return baseUrl;
+
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    NX_ASSERT(server);
+    if (!server)
+        return baseUrl;
+
+    auto allAddresses = server->getAllAvailableAddresses();
+    for (auto address : allAddresses)
+    {
+        QString host = address.address.toString();
+        if (hostIsValid(host))
+            return host;
     }
 
-    const QString kFormatTemplate = lit("%1 (%2)");
+    return QString();
+}
+
+const QString kFormatTemplate = lit("%1 (%2)");
+
 };
 
 
@@ -109,7 +158,9 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
 
     if (m_url.isEmpty())
     {
-        if ((flags.testFlag(Qn::network) || flags.testFlag(Qn::remote_server)))
+        if (flags.testFlag(Qn::remote_server))
+            m_url = getServerUrl(m_resource);
+        else if (flags.testFlag(Qn::network))
             m_url = extractHost(m_resource->getUrl());
     }
 

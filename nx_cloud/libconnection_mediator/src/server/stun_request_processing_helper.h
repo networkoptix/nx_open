@@ -10,7 +10,7 @@
 
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/stun/server_connection.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 
 namespace nx {

@@ -1,21 +1,24 @@
 #include "smtp_simple_settings_widget.h"
 #include "ui_smtp_simple_settings_widget.h"
 
-#include <ui/common/mandatory.h>
 #include <ui/common/read_only.h>
-#include <ui/style/custom_style.h>
+#include <ui/common/aligner.h>
+#include <ui/utils/validators.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/email/email.h>
 
-QnEmailSettings QnSimpleSmtpSettings::toSettings( const QnEmailSettings &base ) const {
+QnEmailSettings QnSimpleSmtpSettings::toSettings(const QnEmailSettings &base) const
+{
     QnEmailSettings result;
     QnEmailAddress address(email);
-    if (address.smtpServer().isNull()) {
+    if (address.smtpServer().isNull())
+    {
         /* Current simple settings are not valid. */
         result = base;
-    } else {
+    }
+    else
+    {
         result = address.settings();
         result.user = email;
     }
@@ -26,7 +29,8 @@ QnEmailSettings QnSimpleSmtpSettings::toSettings( const QnEmailSettings &base ) 
     return result;
 }
 
-QnSimpleSmtpSettings QnSimpleSmtpSettings::fromSettings( const QnEmailSettings &source ) {
+QnSimpleSmtpSettings QnSimpleSmtpSettings::fromSettings(const QnEmailSettings &source)
+{
     QnSimpleSmtpSettings result;
     result.email = source.email;
     result.password = source.password;
@@ -35,81 +39,82 @@ QnSimpleSmtpSettings QnSimpleSmtpSettings::fromSettings( const QnEmailSettings &
     return result;
 }
 
-QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget( QWidget* parent /*= nullptr*/ )
-    : QWidget(parent)
-    , ui(new Ui::SmtpSimpleSettingsWidget)
-    , m_updating(false)
-    , m_readOnly(false)
+QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullptr*/) :
+    QWidget(parent),
+    ui(new Ui::SmtpSimpleSettingsWidget),
+    m_updating(false),
+    m_readOnly(false)
 {
     ui->setupUi(this);
 
-    connect(ui->emailLineEdit,        &QLineEdit::textChanged,            this,   &QnSmtpSimpleSettingsWidget::validateEmail);
+    ui->emailInputField->setTitle(tr("Email:"));
+    ui->emailInputField->setValidator([](const QString& text)
+    {
+        if (text.trimmed().isEmpty() || !QnEmailAddress::isValid(text))
+            return Qn::ValidationResult(tr("E-Mail is not valid."));
 
-    setWarningStyle(ui->detectErrorLabel);
+        QnEmailAddress email(text);
+        if (email.smtpServer().isNull())
+            return Qn::ValidationResult(tr("No preset found. Use 'Advanced' option."));
 
-    /* Mark simple view mandatory fields. */
-    declareMandatoryField(ui->emailLabel);
-    declareMandatoryField(ui->passwordLabel);
+        return Qn::kValidResult;
+    });
+    ui->passwordInputField->setTitle(tr("Password:"));
+    ui->passwordInputField->setValidator(Qn::defaultNonEmptyValidator(tr("Password cannot be empty.")));
+    ui->passwordInputField->setEchoMode(QLineEdit::Password);
+    ui->signatureInputField->setTitle(tr("System Signature:"));
+    ui->signatureInputField->setPlaceholderText(tr("Enter a short system description here."));
+    ui->supportInputField->setTitle(tr("Support Signature:"));
+    ui->supportInputField->setPlaceholderText(QnAppInfo::supportLink());
 
-    auto listenTo = [this](QLineEdit *lineEdit) {
-        connect(lineEdit, &QLineEdit::textChanged, this, &QnSmtpSimpleSettingsWidget::settingsChanged);
-    };
+    QnAligner* aligner = new QnAligner(this);
+    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
 
-    listenTo(ui->emailLineEdit);
-    listenTo(ui->passwordLineEdit);
-    listenTo(ui->signatureLineEdit);
-    listenTo(ui->supportLinkLineEdit);
-
-    ui->supportLinkLineEdit->setPlaceholderText(QnAppInfo::supportLink());
+    for (auto field : {
+        ui->emailInputField,
+        ui->passwordInputField,
+        ui->signatureInputField,
+        ui->supportInputField })
+    {
+        connect(field, &QnInputField::textChanged, this, &QnSmtpSimpleSettingsWidget::settingsChanged);
+        aligner->addWidget(field);
+    }
 }
 
 QnSmtpSimpleSettingsWidget::~QnSmtpSimpleSettingsWidget()
 {}
 
-QnSimpleSmtpSettings QnSmtpSimpleSettingsWidget::settings() const {
+QnSimpleSmtpSettings QnSmtpSimpleSettingsWidget::settings() const
+{
     QnSimpleSmtpSettings result;
-    result.email = ui->emailLineEdit->text(); 
-    result.password = ui->passwordLineEdit->text();
-    result.signature = ui->signatureLineEdit->text();
-    result.supportEmail = ui->supportLinkLineEdit->text();
+    result.email = ui->emailInputField->text();
+    result.password = ui->passwordInputField->text();
+    result.signature = ui->signatureInputField->text();
+    result.supportEmail = ui->supportInputField->text();
     return result;
 }
 
-void QnSmtpSimpleSettingsWidget::setSettings( const QnSimpleSmtpSettings &value ) {
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+void QnSmtpSimpleSettingsWidget::setSettings(const QnSimpleSmtpSettings &value)
+{
+    QScopedValueRollback<bool> guard(m_updating, true);
 
-    ui->emailLineEdit->setText(value.email);
-    ui->passwordLineEdit->setText(value.password);
-    ui->signatureLineEdit->setText(value.signature);
-    ui->supportLinkLineEdit->setText(value.supportEmail);
+    ui->emailInputField->setText(value.email);
+    ui->passwordInputField->setText(value.password);
+    ui->signatureInputField->setText(value.signature);
+    ui->supportInputField->setText(value.supportEmail);
 }
 
-bool QnSmtpSimpleSettingsWidget::isReadOnly() const {
+bool QnSmtpSimpleSettingsWidget::isReadOnly() const
+{
     return m_readOnly;
 }
 
-void QnSmtpSimpleSettingsWidget::setReadOnly( bool readOnly ) {
+void QnSmtpSimpleSettingsWidget::setReadOnly(bool readOnly)
+{
     using ::setReadOnly;
 
-    setReadOnly(ui->emailLineEdit, readOnly);
-    setReadOnly(ui->passwordLineEdit, readOnly);
-    setReadOnly(ui->signatureLineEdit, readOnly);
-    setReadOnly(ui->supportLinkLineEdit, readOnly);
+    setReadOnly(ui->emailInputField, readOnly);
+    setReadOnly(ui->passwordInputField, readOnly);
+    setReadOnly(ui->signatureInputField, readOnly);
+    setReadOnly(ui->supportInputField, readOnly);
 }
-
-void QnSmtpSimpleSettingsWidget::validateEmail() {
-    QString errorText;
-
-    const QString targetEmail = ui->emailLineEdit->text();
-
-    if (!targetEmail.isEmpty()) {
-        QnEmailAddress email(targetEmail); 
-        if (!email.isValid())
-            errorText = tr("E-Mail is not valid");
-        else if (email.smtpServer().isNull())
-            errorText = tr("No preset found. Use 'Advanced' option.");
-    }
-
-    ui->detectErrorLabel->setText(errorText);
-}
-

@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/fusion_request_result.h>

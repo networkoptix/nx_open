@@ -27,7 +27,7 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/socket_global.h>
 #include "network/networkoptixmodulerevealcommon.h"
-#include "utils/serialization/lexical.h"
+#include "nx/fusion/serialization/lexical.h"
 #include "api/server_rest_connection.h"
 
 namespace {
@@ -215,6 +215,34 @@ QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
 
 quint16 QnMediaServerResource::getPort() const {
     return portFromUrl(getApiUrl());
+}
+
+QList<SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
+{
+    auto toAddress = [](const QUrl& url) { return SocketAddress(url.host(), url.port(0)); };
+
+    QSet<SocketAddress> result;
+    QSet<SocketAddress> ignored;
+    for (const QUrl &url : getIgnoredUrls())
+        ignored.insert(toAddress(url));
+
+    const auto port = getPort();
+    for (const auto& address : getNetAddrList())
+    {
+        if (ignored.contains(address))
+            continue;
+        result.insert(address);
+    }
+
+    for (const QUrl &url : getAdditionalUrls())
+    {
+        SocketAddress address = toAddress(url);
+        if (ignored.contains(address))
+            continue;
+        result.insert(address);
+    }
+
+    return result.toList();
 }
 
 QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()

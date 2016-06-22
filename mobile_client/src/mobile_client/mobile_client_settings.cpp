@@ -4,10 +4,10 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
-QnMobileClientSettings::QnMobileClientSettings(QObject *parent)
-    : base_type(parent)
-    , m_settings(new QSettings(this))
-    , m_loading(true)
+QnMobileClientSettings::QnMobileClientSettings(QObject* parent) :
+    base_type(parent),
+    m_settings(new QSettings(this)),
+    m_loading(true)
 {
     init();
     load();

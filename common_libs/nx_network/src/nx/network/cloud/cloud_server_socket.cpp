@@ -3,7 +3,7 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/future.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "tunnel/udp/acceptor.h"
 
@@ -30,7 +30,7 @@ static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers
                     return std::unique_ptr<AbstractTunnelAcceptor>();
 
                 auto acceptor = std::make_unique<udp::TunnelAcceptor>(
-                    std::move(event.udpEndpointList.back()),
+                    std::move(event.udpEndpointList),
                     event.params);
 
                 return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));

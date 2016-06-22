@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>955</width>
-    <height>280</height>
+    <width>896</width>
+    <height>313</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -24,7 +24,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0,1">
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
      <item>
       <widget class="QGroupBox" name="eventDefinitionGroupBox">
        <property name="acceptDrops">
@@ -34,8 +34,17 @@
         <string>Event</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="spacing">
-         <number>0</number>
+        <property name="leftMargin">
+         <number>16</number>
+        </property>
+        <property name="topMargin">
+         <number>16</number>
+        </property>
+        <property name="rightMargin">
+         <number>16</number>
+        </property>
+        <property name="bottomMargin">
+         <number>16</number>
         </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1,0">
@@ -195,8 +204,17 @@
         <string>Action</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
-        <property name="spacing">
-         <number>0</number>
+        <property name="leftMargin">
+         <number>16</number>
+        </property>
+        <property name="topMargin">
+         <number>16</number>
+        </property>
+        <property name="rightMargin">
+         <number>16</number>
+        </property>
+        <property name="bottomMargin">
+         <number>16</number>
         </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
@@ -319,13 +337,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
-     <property name="leftMargin">
-      <number>9</number>
-     </property>
-     <property name="rightMargin">
-      <number>9</number>
-     </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="commentLabel">
        <property name="text">

@@ -9,8 +9,8 @@
 #include "common/common_module.h"
 #include <http/custom_headers.h>
 #include "network/tcp_connection_priv.h"
-#include "utils/serialization/json.h"
-#include <utils/common/model_functions.h>
+#include "nx/fusion/serialization/json.h"
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
@@ -77,7 +77,7 @@ void QnIOMonitorConnectionProcessor::run()
 
         setData(camera->ioStates());
         QnMutexLocker lock(&d->waitMutex);
-        while (d->socket->isConnected() && camera->getStatus() >= Qn::Online && camera->getParentId() == qnCommon->moduleGUID()) 
+        while (d->socket->isConnected() && camera->getStatus() >= Qn::Online && camera->getParentId() == qnCommon->moduleGUID())
         {
             sendMultipartData();
             d->waitCond.wait(&d->waitMutex);
@@ -156,6 +156,8 @@ void QnIOMonitorConnectionProcessor::addData(QnIOStateData&& value)
 void QnIOMonitorConnectionProcessor::pleaseStop()
 {
     Q_D(QnIOMonitorConnectionProcessor);
+    if (d->socket)
+        d->socket->pleaseStopSync();
     QnTCPConnectionProcessor::pleaseStop();
     d->waitCond.wakeAll();
 }

@@ -12,9 +12,9 @@
 #include <QtCore/QVariant>  //TODO #ak maybe boost::variant?
 #include <QtCore/QUrlQuery>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <utils/db/types.h>
-#include <utils/fusion/fusion_fwd.h>
+#include <nx/fusion/fusion/fusion_fwd.h>
 
 #include <cdb/result_code.h>
 

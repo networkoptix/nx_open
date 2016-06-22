@@ -2,31 +2,20 @@
 
 #include <client/client_recent_connections_manager.h>
 
-#include <core/core_settings.h>
-#include <core/user_recent_connection_data.h>
+#include <client_core/client_core_settings.h>
 
 #include <nx/utils/raii_guard.h>
 #include <utils/math/math.h>
 
 namespace
 {
-    enum RoleId
-    {
-        FirstRoleId = Qt::UserRole + 1
-
-        , UserNameRoleId = FirstRoleId
-        , PasswordRoleId
-        , HasStoredPasswordRoleId
-        , RolesCount
-    };
-
     typedef QHash<int, QByteArray> RoleNameHash;
     const auto kRoleNames = []()-> RoleNameHash
     {
         RoleNameHash result;
-        result.insert(UserNameRoleId, "userName");
-        result.insert(PasswordRoleId, "password");
-        result.insert(HasStoredPasswordRoleId, "hasStoredPassword");
+        result.insert(QnRecentUserConnectionsModel::UserNameRole, "userName");
+        result.insert(QnRecentUserConnectionsModel::PasswordRole, "password");
+        result.insert(QnRecentUserConnectionsModel::HasStoredPasswordRole, "hasStoredPassword");
         return result;
     }();
 
@@ -146,7 +135,7 @@ QVariant QnRecentUserConnectionsModel::data(const QModelIndex &index, int role) 
 {
     const int row = index.row();
     if (!qBetween(0, row, rowCount())
-        || !qBetween<int>(FirstRoleId, role, RolesCount))
+        || !qBetween<int>(FirstRole, role, RolesCount))
     {
         return QVariant();
     }
@@ -154,14 +143,14 @@ QVariant QnRecentUserConnectionsModel::data(const QModelIndex &index, int role) 
     const auto userPasswordData = m_data.at(row);
     switch (role)
     {
-    case UserNameRoleId:
-        return userPasswordData.userName;
-    case PasswordRoleId:
-        return userPasswordData.password;
-    case HasStoredPasswordRoleId:
-        return userPasswordData.isStoredPassword;
-    default:
-        return QVariant();
+        case UserNameRole:
+            return userPasswordData.userName;
+        case PasswordRole:
+            return userPasswordData.password;
+        case HasStoredPasswordRole:
+            return userPasswordData.isStoredPassword;
+        default:
+            return QVariant();
     }
 }
 

@@ -7,7 +7,7 @@
 #include <nx/network/http/httptypes.h>
 #include <media_server/serverutil.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include "rest/server/rest_connection_processor.h"
 #include <api/resource_property_adaptor.h>
 

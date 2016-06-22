@@ -7,8 +7,6 @@
 
 #include <ui/animation/variant_animator.h>
 
-#include <ui/statistics/modules/controls_statistics_module.h>
-
 namespace
 {
     inline qint64 speedToPosition(qreal speed, qreal minimalStep)
@@ -62,8 +60,6 @@ QnSpeedSlider::QnSpeedSlider(QGraphicsItem *parent):
 
     /* Make sure that tooltip text is updated. */
     sliderChange(SliderValueChange);
-
-    qnControlsStatisticsModule->registerSlider(lit("speed_slider"), this);
 }
 
 QnSpeedSlider::~QnSpeedSlider()

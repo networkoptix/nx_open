@@ -7,7 +7,7 @@
 
 #include <api/global_settings.h>
 #include <api/resource_property_adaptor.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/httptypes.h>
 
 
@@ -34,6 +34,7 @@ int QnSystemSettingsHandler::executeGet(
 {
     QnSystemSettingsReply reply;
 
+    bool dirty = false;
     const auto& settings = QnGlobalSettings::instance()->allSettings();
     for (QnAbstractResourcePropertyAdaptor* setting: settings)
     {
@@ -43,9 +44,12 @@ int QnSystemSettingsHandler::executeGet(
             if (paramIter == params.end())
                 continue;
             setting->setValue(paramIter.value());
+            dirty = true;
         }
-        reply.settings.emplace(setting->key(), setting->value().toString());
+        reply.settings.emplace(setting->key(), setting->serializedValue());
     }
+    if (dirty)
+        QnGlobalSettings::instance()->synchronizeNow();
 
     result.setReply(std::move(reply));
     return nx_http::StatusCode::ok;

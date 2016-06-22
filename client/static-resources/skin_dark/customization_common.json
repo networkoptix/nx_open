@@ -190,6 +190,21 @@
                 "highlight":        "brand_core.setAlpha(102)",
                 "text":             "light10",
                 "highlightedText":  "light4"
+            },
+            "disabled": {
+                "base":             "transparent",
+                "midlight":         "dark12.setAlpha(102)",
+                "highlight":        "brand_core.setAlpha(102)",
+                "text":             "light10.setAlpha(75)",
+                "highlightedText":  "light4.setAlpha(75)"
+            },
+            "inactive": {
+                "base":             "transparent",
+                "midlight":         "dark12.setAlpha(102)",
+                "highlight":        "brand_core.setAlpha(102)",
+                "text":             "light10",
+                "highlightedText":  "light4",
+                "link":             "blue12"
             }
         }
     },
@@ -447,7 +462,7 @@
         },
         "colors": {
             "background": "dark7",
-            "visualizer": "red_main"
+            "visualizer": "red_core"
         }
     },
 
@@ -581,22 +596,6 @@
         "color": "dark1.setAlpha(38)"
     },
 
-    "QnUserManagementWidget": {
-        "colors": {
-            "disabledSelectedText": "#b5d7ee",
-            "disabledButtonsText":  "#FFFFFF",
-            "selectionBackground": "#225377"
-        }
-    },
-    
-    "QnUserListModel": {
-        "colors": {
-            "disabledSelectedText": "#b5d7ee",
-            "disabledButtonsText":  "#FFFFFF",
-            "selectionBackground": "#225377"
-        }
-    },
- 
     "QnBackupCamerasDialog": {
         "colors": {
             "disabled": "#808080",

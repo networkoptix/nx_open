@@ -74,6 +74,7 @@ Item
         CloudSystemInformation
         {
             description: systemInformationBlock.ownerDescription
+            online: systemInformationBlock.online
         }
     }
 }

@@ -16,11 +16,12 @@
 
 
 namespace {
-    enum WidgetPages {
-        SimplePage,
-        AdvancedPage,
-        TestingPage
-    };
+enum WidgetPages
+{
+    SimplePage,
+    AdvancedPage,
+    TestingPage
+};
 
 }
 

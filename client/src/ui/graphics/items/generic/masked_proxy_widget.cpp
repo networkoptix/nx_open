@@ -7,7 +7,7 @@
 #include <QtGui/QPaintEngine>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 
 #include <ui/common/geometry.h>
 
@@ -76,7 +76,10 @@ void QnMaskedProxyWidget::paint(QPainter *painter,
 
         m_pixmapDirty = false;
     }
-    painter->drawPixmap(renderRect, m_pixmap, m_pixmap.rect());
+    const auto aspect = m_pixmap.devicePixelRatio();
+    const auto size = renderRect.size() * aspect;
+    const auto topLeft = (renderRect.topLeft() - rect().topLeft()) * aspect;
+    painter->drawPixmap(renderRect, m_pixmap, QRectF(topLeft, size));
 }
 
 bool QnMaskedProxyWidget::eventFilter(QObject *object, QEvent *event) {

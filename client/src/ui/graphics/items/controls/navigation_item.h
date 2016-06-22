@@ -38,6 +38,7 @@ private slots:
     void updateLiveButtonEnabled();
     void updatePlaybackButtonsIcons();
     void updatePlaybackButtonsEnabled();
+    void updateVolumeButtonsEnabled();
     void updateMuteButtonChecked();
     void updateNavigatorSpeedFromSpeedSlider();
     void updateSpeedSliderSpeedFromNavigator();

@@ -11,9 +11,9 @@
 #include <stdint.h>
 #include <string>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
-#include <utils/fusion/fusion_fwd.h>
+#include <nx/fusion/fusion/fusion_fwd.h>
 
 #include <cdb/account_data.h>
 
@@ -78,15 +78,20 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 //// class TemporaryCredentials
 ////////////////////////////////////////////////////////////
 
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, TemporaryCredentialsTimeouts* const data);
+void serializeToUrlQuery(const TemporaryCredentialsTimeouts&, QUrlQuery* const urlQuery);
+
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, TemporaryCredentialsParams* const data);
 void serializeToUrlQuery(const TemporaryCredentialsParams&, QUrlQuery* const urlQuery);
 
-#define TemporaryCredentialsParams_Fields (expirationPeriod)(autoProlongationEnabled)(prolongationPeriod)
+#define TemporaryCredentialsTimeouts_Fields (expirationPeriod)(autoProlongationEnabled)(prolongationPeriod)
 
-#define TemporaryCredentials_Fields (login)(password)
+#define TemporaryCredentialsParams_Fields (type)(timeouts)
+
+#define TemporaryCredentials_Fields (login)(password)(timeouts)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (TemporaryCredentialsParams)(TemporaryCredentials),
+    (TemporaryCredentialsTimeouts)(TemporaryCredentialsParams)(TemporaryCredentials),
     (json))
 
 

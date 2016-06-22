@@ -10,7 +10,7 @@
 #include "http/custom_headers.h"
 #include "network/tcp_connection_priv.h"
 #include "universal_request_processor_p.h"
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include "utils/common/synctime.h"
 #include "utils/gzip/gzip_compressor.h"
 #include <nx/network/flash_socket/types.h>
@@ -237,9 +237,9 @@ void QnUniversalRequestProcessor::pleaseStop()
 {
     Q_D(QnUniversalRequestProcessor);
     QnMutexLocker lock( &d->mutex );
-    QnTCPConnectionProcessor::pleaseStop();
     if (d->processor)
         d->processor->pleaseStop();
+    QnTCPConnectionProcessor::pleaseStop();
 }
 
 bool QnUniversalRequestProcessor::isProxy(const nx_http::Request& request)

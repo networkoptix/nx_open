@@ -43,10 +43,10 @@ struct QnAppInfo
     static QString supportEmailAddress();
     static QString supportLink();
 
-    static QString showcaseUrl();
-    static QString settingsUrl();
-    static QString mirrorListUrl();
-    static QString helpUrl();
+    static QString showcaseUrl();               //#GDM #FIXME will not work in 3.0
+    static QString settingsUrl();               //#GDM #FIXME will not work in 3.0
+    static QString helpUrl();                   //#GDM #FIXME will not work in 3.0
+
     static QString updateGeneratorUrl();
     static QString defaultCloudPortalUrl();
     static QString defaultCloudModulesXmlUrl();
@@ -56,12 +56,8 @@ struct QnAppInfo
     static QString freeLicenseKey();
     static bool    freeLicenseIsTrial();
 
-    static QString iosPlayButtonTint();
-
-    static QString oldAndroidClientLink();
-    static QString oldIosClientLink();
-
-    static QString oldAndroidAppId();
+    /** Folder where application is installed normally. */
+    static QString installationRoot();
 
     // helpers:
 

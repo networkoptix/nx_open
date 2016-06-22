@@ -11,6 +11,8 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
 
+struct QnStartupParameters;
+
 class QAction;
 
 class QnWorkbench;
@@ -22,10 +24,10 @@ class QnWorkbenchNavigator;
 class QnWorkbenchUserWatcher;
 class QnWorkbenchLayoutWatcher;
 class QnActionManager;
+class QnControlsStatisticsModule;
 
 /**
- * This is a class that ties together all objects comprising the global state
- * and serves as an application context.
+ * This is a class that ties together all objects comprising the global visual scene state
  */
 class QnWorkbenchContext: public QObject, public QnInstanceStorage
 {
@@ -35,52 +37,32 @@ public:
 
     virtual ~QnWorkbenchContext();
 
-    QnWorkbench *workbench() const
-    {
-        return m_workbench.data();
-    }
-
-    QnWorkbenchLayoutSnapshotManager *snapshotManager() const
-    {
-        return m_snapshotManager.data();
-    }
-
-    QnActionManager *menu() const
+    QnWorkbench* workbench() const;
+    QnWorkbenchLayoutSnapshotManager* snapshotManager() const;
+    QnActionManager* menu() const
     {
         return m_menu.data();
     }
 
-    QnWorkbenchAccessController *accessController() const
-    {
-        return m_accessController.data();
-    }
+    QnWorkbenchAccessController* accessController() const;
+    QnWorkbenchDisplay* display() const;
+    QnWorkbenchNavigator* navigator() const;
+    QnControlsStatisticsModule* statisticsModule() const;
 
-    QnWorkbenchDisplay *display() const
-    {
-        return m_display.data();
-    }
-
-    QnWorkbenchNavigator *navigator() const
-    {
-        return m_navigator.data();
-    }
-
-    QWidget *mainWindow() const
-    {
-        return m_mainWindow.data();
-    }
-
-    void setMainWindow(QWidget *mainWindow);
+    QWidget* mainWindow() const;
+    void setMainWindow(QWidget* mainWindow);
 
     QAction *action(const QnActions::IDType id) const;
 
     QnUserResourcePtr user() const;
-
     void setUserName(const QString &userName);
 
     /** Check if application is closing down. Replaces QApplication::closingDown(). */
     bool closingDown() const;
     void setClosingDown(bool value);
+
+    /** Process startup parameters and call related actions. Returns false if something goes critically wrong. */
+    bool handleStartupParameters(const QnStartupParameters& startupParams);
 
 signals:
     /**
@@ -99,6 +81,9 @@ signals:
     void mainWindowChanged();
 
 private:
+    void initWorkarounds();
+
+private:
     QScopedPointer<QnWorkbench> m_workbench;
     QScopedPointer<QnWorkbenchSynchronizer> m_synchronizer;
     QScopedPointer<QnWorkbenchLayoutSnapshotManager> m_snapshotManager;
@@ -106,6 +91,7 @@ private:
     QScopedPointer<QnActionManager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
+    QScopedPointer<QnControlsStatisticsModule> m_statisticsModule;
 
     QPointer<QWidget> m_mainWindow;
 

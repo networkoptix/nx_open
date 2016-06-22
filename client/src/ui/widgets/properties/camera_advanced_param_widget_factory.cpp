@@ -6,7 +6,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 
 QnAbstractCameraAdvancedParamWidget::QnAbstractCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
 	QWidget(parent),

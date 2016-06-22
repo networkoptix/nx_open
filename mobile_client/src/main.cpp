@@ -118,7 +118,28 @@ int runUi(QGuiApplication *application) {
     prepareWindow();
     std::shared_ptr<nx::media::AbstractResourceAllocator> allocator(new ResourceAllocator(
         mainWindow.data()));
-    nx::media::DecoderRegistrar::registerDecoders(allocator);
+
+    QSize maxFfmpegResolution = qnSettings->maxFfmpegResolution();
+    if (maxFfmpegResolution.isEmpty())
+    {
+        // Use platform-dependent defaults.
+
+#if defined(__arm__)
+
+        if (QnAppInfo::armBox() == QString::fromLatin1("bpi"))
+            maxFfmpegResolution = QSize(1280, 720);
+        else
+            maxFfmpegResolution = QSize(1920, 1080);
+
+#elif defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+
+        maxFfmpegResolution = QSize(1920, 1080);
+
+#endif
+    }
+
+    nx::media::DecoderRegistrar::registerDecoders(
+        allocator, maxFfmpegResolution, context.liteMode());
 
     return application->exec();
 }

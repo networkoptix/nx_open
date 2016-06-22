@@ -41,7 +41,7 @@
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/unit_tests/appserver2_ut/pom.xml</systemPath>
+            <systemPath>${root.dir}/unit_tests/common_ut/pom.xml</systemPath>
         </dependency>	
 	    <dependency>
             <groupId>${project.groupId}</groupId>
@@ -49,7 +49,7 @@
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/unit_tests/appserver2_ut/pom.xml</systemPath>
+            <systemPath>${root.dir}/unit_tests/nx_network_ut/pom.xml</systemPath>
         </dependency>	
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -57,7 +57,7 @@
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/unit_tests/appserver2_ut/pom.xml</systemPath>
+            <systemPath>${root.dir}/unit_tests/mediaserver_core_ut/pom.xml</systemPath>
         </dependency>	
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -65,7 +65,7 @@
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/unit_tests/appserver2_ut/pom.xml</systemPath>
+            <systemPath>${root.dir}/unit_tests/cloud_db_ut/pom.xml</systemPath>
         </dependency>	
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -73,7 +73,7 @@
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/unit_tests/appserver2_ut/pom.xml</systemPath>
+            <systemPath>${root.dir}/unit_tests/connection_mediator_ut/pom.xml</systemPath>
         </dependency>	
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -89,7 +89,7 @@
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/unit_tests/appserver2_ut/pom.xml</systemPath>
+            <systemPath>${root.dir}/unit_tests/cloud_connectivity_ut/pom.xml</systemPath>
         </dependency>	
 	    <dependency>
             <groupId>${project.groupId}</groupId>
@@ -97,7 +97,7 @@
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/unit_tests/appserver2_ut/pom.xml</systemPath>		
+            <systemPath>${root.dir}/unit_tests/utils_ut/pom.xml</systemPath>		
         </dependency>	            
     </dependencies>		    
     

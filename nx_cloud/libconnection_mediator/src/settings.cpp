@@ -12,7 +12,7 @@
 #include <QtCore/QString>
 
 #include <nx/utils/timer_manager.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include <libconnection_mediator_app_info.h>
 #include <nx/network/cloud/data/connection_parameters.h>

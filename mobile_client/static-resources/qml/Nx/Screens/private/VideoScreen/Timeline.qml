@@ -52,7 +52,7 @@ Item
         property bool moving: false
         property bool dragging: false
 
-        textColor: ColorTheme.transparent(ColorTheme.contrast2, 0.7)
+        textColor: ColorTheme.transparent(ColorTheme.contrast16, 0.7)
         chunkColor: ColorTheme.green_main
 
         timeZoneShift: -(new Date()).getTimezoneOffset() * 60 * 1000

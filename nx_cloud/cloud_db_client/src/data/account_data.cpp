@@ -6,7 +6,7 @@
 #include "account_data.h"
 
 #include <common/common_globals.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/buffer.h>
 #include <utils/preprocessor/field_name.h>
 
@@ -196,51 +196,82 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 //// class TemporaryCredentials
 ////////////////////////////////////////////////////////////
 
-MAKE_FIELD_NAME_STR_CONST(TemporaryCredentialsParams, expirationPeriod)
-MAKE_FIELD_NAME_STR_CONST(TemporaryCredentialsParams, autoProlongationEnabled)
-MAKE_FIELD_NAME_STR_CONST(TemporaryCredentialsParams, prolongationPeriod)
+MAKE_FIELD_NAME_STR_CONST(TemporaryCredentialsTimeouts, expirationPeriod)
+MAKE_FIELD_NAME_STR_CONST(TemporaryCredentialsTimeouts, autoProlongationEnabled)
+MAKE_FIELD_NAME_STR_CONST(TemporaryCredentialsTimeouts, prolongationPeriod)
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, TemporaryCredentialsParams* const data)
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, TemporaryCredentialsTimeouts* const data)
 {
-    if (!urlQuery.hasQueryItem(TemporaryCredentialsParams_expirationPeriod_field))
+    if (!urlQuery.hasQueryItem(TemporaryCredentialsTimeouts_expirationPeriod_field))
         return false;
     data->expirationPeriod = std::chrono::seconds(
-        urlQuery.queryItemValue(TemporaryCredentialsParams_expirationPeriod_field).toLongLong());
+        urlQuery.queryItemValue(TemporaryCredentialsTimeouts_expirationPeriod_field).toLongLong());
 
-    if (!urlQuery.hasQueryItem(TemporaryCredentialsParams_autoProlongationEnabled_field))
+    if (!urlQuery.hasQueryItem(TemporaryCredentialsTimeouts_autoProlongationEnabled_field))
         return true;
     data->autoProlongationEnabled = urlQuery.queryItemValue(
-        TemporaryCredentialsParams_autoProlongationEnabled_field) == "true";
+        TemporaryCredentialsTimeouts_autoProlongationEnabled_field) == "true";
     if (!data->autoProlongationEnabled)
         return true;
 
     //when autoProlongationEnabled is true, prolongationPeriod MUST be present
-    if (!urlQuery.hasQueryItem(TemporaryCredentialsParams_prolongationPeriod_field))
+    if (!urlQuery.hasQueryItem(TemporaryCredentialsTimeouts_prolongationPeriod_field))
         return false;
     data->prolongationPeriod = std::chrono::seconds(
-        urlQuery.queryItemValue(TemporaryCredentialsParams_prolongationPeriod_field).toLongLong());
+        urlQuery.queryItemValue(TemporaryCredentialsTimeouts_prolongationPeriod_field).toLongLong());
 
     return true;
 }
 
-void serializeToUrlQuery(const TemporaryCredentialsParams& data, QUrlQuery* const urlQuery)
+void serializeToUrlQuery(
+    const TemporaryCredentialsTimeouts& data,
+    QUrlQuery* const urlQuery)
 {
     urlQuery->addQueryItem(
-        TemporaryCredentialsParams_expirationPeriod_field,
+        TemporaryCredentialsTimeouts_expirationPeriod_field,
         QString::number(data.expirationPeriod.count()));
     urlQuery->addQueryItem(
-        TemporaryCredentialsParams_autoProlongationEnabled_field,
+        TemporaryCredentialsTimeouts_autoProlongationEnabled_field,
         data.autoProlongationEnabled ? "true" : "false");
     urlQuery->addQueryItem(
-        TemporaryCredentialsParams_prolongationPeriod_field,
+        TemporaryCredentialsTimeouts_prolongationPeriod_field,
         QString::number(data.prolongationPeriod.count()));
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (TemporaryCredentialsParams)(TemporaryCredentials),
-    (json),
-    _Fields)
+MAKE_FIELD_NAME_STR_CONST(TemporaryCredentialsParams, type)
+MAKE_FIELD_NAME_STR_CONST(TemporaryCredentialsParams, timeouts)
 
+bool loadFromUrlQuery(
+    const QUrlQuery& urlQuery,
+    TemporaryCredentialsParams* const data)
+{
+    data->type = urlQuery.queryItemValue(TemporaryCredentialsParams_type_field).toStdString();
+    if (!data->type.empty())
+        return true;    //ignoring other parameters
+    return loadFromUrlQuery(urlQuery, &data->timeouts);
+}
+
+void serializeToUrlQuery(
+    const TemporaryCredentialsParams& data,
+    QUrlQuery* const urlQuery)
+{
+    if (!data.type.empty())
+    {
+        urlQuery->addQueryItem(
+            TemporaryCredentialsParams_type_field,
+            QString::fromStdString(data.type));
+    }
+    else
+    {
+        serializeToUrlQuery(data.timeouts, urlQuery);
+    }
+}
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (TemporaryCredentialsTimeouts)(TemporaryCredentialsParams)(TemporaryCredentials),
+    (json),
+    _Fields,
+    (optional, true))
 
 }   //api
 }   //cdb

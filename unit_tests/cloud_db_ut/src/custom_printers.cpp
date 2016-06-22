@@ -12,7 +12,7 @@
 #include <QString>
 
 #include <cloud_db_client/src/data/types.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 
 void PrintTo(const QByteArray& val, ::std::ostream* os) {
@@ -38,3 +38,35 @@ void PrintTo(ResultCode val, ::std::ostream* os) {
 }   //namespace api
 }   //namespace cdb
 }   //namespace nx
+
+
+namespace std {
+namespace chrono {
+
+void PrintTo(const milliseconds& val, ::std::ostream* os)
+{
+    *os << val.count() << "ms";
+}
+
+void PrintTo(const seconds& val, ::std::ostream* os)
+{
+    *os << val.count() << "s";
+}
+
+void PrintTo(const microseconds& val, ::std::ostream* os)
+{
+    *os << val.count() << "usec";
+}
+
+void PrintTo(const nanoseconds& val, ::std::ostream* os)
+{
+    *os << val.count() << "nanosec";
+}
+
+void PrintTo(const time_point<steady_clock>& val, ::std::ostream* os)
+{
+    *os << val.time_since_epoch().count() << "ns (utc)";
+}
+
+}   //chrono
+}   //std

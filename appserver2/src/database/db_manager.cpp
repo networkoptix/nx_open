@@ -9,11 +9,11 @@
 #include "managers/time_manager.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_discovery_data.h"
-#include "utils/serialization/binary_stream.h"
-#include "utils/serialization/sql_functions.h"
+#include "nx/fusion/serialization/binary_stream.h"
+#include "nx/fusion/serialization/sql_functions.h"
 #include "business/business_fwd.h"
 #include "utils/common/synctime.h"
-#include "utils/serialization/json.h"
+#include "nx/fusion/serialization/json.h"
 #include "core/resource/user_resource.h"
 #include <core/resource/camera_resource.h>
 #include <utils/license_usage_helper.h>
@@ -1114,7 +1114,7 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
             qWarning() << Q_FUNC_INFO << "Can' deserialize transaction from transaction log";
             return false;
         }
-        if (data.name == lit("supportedMotion") && data.value.isEmpty())
+        if (data.name == lit("supportedMotion") && (data.value.isEmpty() || data.value.toInt() == 1))
         {
             updQuery.addBindValue(QnSql::serialized_field(tranGuid));
             if (!updQuery.exec()) {
@@ -1309,6 +1309,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             m_needResyncUsers = true;
         }
     }
+    else if (updateName == lit(":/updates/51_http_business_action.sql"))
+    {
+        if (!m_dbJustCreated)
+            m_needResyncbRules = true;
+    }
     else if (updateName == lit(":/updates/54_migrate_permissions.sql"))
     {
         if (!ec2::db::migrateUserPermissions(m_sdb))
@@ -1330,10 +1335,17 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         if (!m_dbJustCreated)
             m_needResyncLayout = true;
     }
-    else if (updateName == lit(":/updates/51_http_business_action.sql")) 
-	{
+    else if (updateName == lit(":/updates/58_migrate_camera_output_action.sql"))
+    {
+        if (!ec2::db::migrateBusinessRulesToV30(m_sdb))
+            return false;
+
         if (!m_dbJustCreated)
             m_needResyncbRules = true;
+    }
+    else if (updateName == lit(":/updates/52_fix_onvif_mt.sql"))
+	{
+        return removeWrongSupportedMotionTypeForONVIF(); //TODO: #rvasilenko consistency break
     }
 
     return true;
@@ -1365,7 +1377,7 @@ bool QnDbManager::createDatabase()
         if (!execSQLFile(lit(":/00_update_2.2_stage0.sql"), m_sdb))
             return false;
 
-        if (!ec2::db::migrateBusinessEvents(m_sdb))
+        if (!ec2::db::migrateBusinessRulesToV23(m_sdb))
             return false;
 
         if (!m_dbJustCreated)

@@ -1,5 +1,5 @@
 #include "credentials.h"
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QAuthenticator QnCredentials::toAuthenticator() const
 {

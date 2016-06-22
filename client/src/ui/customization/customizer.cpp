@@ -8,8 +8,8 @@
 #include <ui/style/skin.h>
 
 #include <utils/common/warnings.h>
-#include <utils/serialization/json_functions.h>
-#include <utils/common/flat_map.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/utils/flat_map.h>
 #include <utils/common/property_storage.h>
 #include <utils/common/evaluator.h>
 #include <utils/common/string.h>

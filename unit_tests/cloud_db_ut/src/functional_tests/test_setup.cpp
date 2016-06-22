@@ -146,6 +146,11 @@ api::ModuleInfo CdbFunctionalTest::moduleInfo() const
     return m_moduleInfo;
 }
 
+QString CdbFunctionalTest::testDataDir() const
+{
+    return m_tmpDir;
+}
+
 api::ResultCode CdbFunctionalTest::addAccount(
     api::AccountData* const accountData,
     std::string* const password,
@@ -315,6 +320,24 @@ api::ResultCode CdbFunctionalTest::resetAccountPassword(
     *confirmationCode = accountConfirmationCode.code;
 
     return resCode;
+}
+
+api::ResultCode CdbFunctionalTest::createTemporaryCredentials(
+    const std::string& email,
+    const std::string& password,
+    const api::TemporaryCredentialsParams& params,
+    api::TemporaryCredentials* const temporaryCredentials)
+{
+    auto connection = connectionFactory()->createConnection(email, password);
+    api::ResultCode resultCode = api::ResultCode::ok;
+    std::tie(resultCode, *temporaryCredentials) = 
+        makeSyncCall<api::ResultCode, api::TemporaryCredentials>(
+            std::bind(
+                &nx::cdb::api::AccountManager::createTemporaryCredentials,
+                connection->accountManager(),
+                params,
+                std::placeholders::_1));
+    return resultCode;
 }
 
 api::ResultCode CdbFunctionalTest::bindRandomNotActivatedSystem(
@@ -653,10 +676,20 @@ void CdbFunctionalTest::setTemporaryDirectoryPath(const QString& path)
     sTemporaryDirectoryPath = path;
 }
 
+QString CdbFunctionalTest::temporaryDirectoryPath()
+{
+    return sTemporaryDirectoryPath;
+}
+
 void CdbFunctionalTest::setDbConnectionOptions(
     const nx::db::ConnectionOptions& connectionOptions)
 {
     sConnectionOptions = connectionOptions;
+}
+
+nx::db::ConnectionOptions CdbFunctionalTest::dbConnectionOptions()
+{
+    return sConnectionOptions;
 }
 
 namespace api {

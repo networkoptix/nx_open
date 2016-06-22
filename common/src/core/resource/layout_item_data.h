@@ -8,7 +8,7 @@
 
 #include <core/ptz/item_dewarping_params.h>
 
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 #include <utils/common/id.h>
 #include <utils/color_space/image_correction.h>
 

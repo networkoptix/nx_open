@@ -26,11 +26,11 @@ public:
     void resizeBackground();
 };
 
-QnQuickTextInputPrivate::QnQuickTextInputPrivate()
-    : scrollByMouse(true)
-    , hscrollWhenPressed(0)
-    , background(nullptr)
-    , dragStarted(false)
+QnQuickTextInputPrivate::QnQuickTextInputPrivate() :
+    scrollByMouse(true),
+    hscrollWhenPressed(0),
+    background(nullptr),
+    dragStarted(false)
 {
 }
 
@@ -54,8 +54,8 @@ void QnQuickTextInputPrivate::resizeBackground()
     }
 }
 
-QnQuickTextInput::QnQuickTextInput(QQuickItem* parent)
-    : base_type(*(new QnQuickTextInputPrivate), parent)
+QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
+    base_type(*(new QnQuickTextInputPrivate), parent)
 {
 }
 

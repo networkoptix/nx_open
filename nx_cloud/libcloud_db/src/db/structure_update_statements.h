@@ -407,6 +407,15 @@ DROP TABLE system_old;                                                          
 DROP TABLE account_old;                                                                         \
 ";
 
+
+//#CLOUD-185
+static const char kTemporaryAccountCredentials[] =
+"                                                                                               \
+ALTER TABLE account_password ADD COLUMN login VARCHAR(255);                                     \
+UPDATE account_password SET login=(select email from account where id=account_password.account_id);     \
+UPDATE account_password SET access_rights='+/cdb/account/update';                               \
+";                                                                                              
+
 }   //db
 }   //cdb
 }   //nx

@@ -8,7 +8,7 @@
 #include <boost/operators.hpp>
 #endif
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 // TODO: #Elric doesn't really belong in this folder
 struct QnItemDewarpingParams: public boost::equality_comparable1<QnItemDewarpingParams> {

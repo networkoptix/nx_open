@@ -5,7 +5,7 @@
 
 #include "auth_data.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/preprocessor/field_name.h>
 
 #include "system_data.h"

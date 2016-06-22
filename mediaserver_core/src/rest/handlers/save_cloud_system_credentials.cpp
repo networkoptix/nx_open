@@ -10,7 +10,7 @@
 #include <api/global_settings.h>
 #include <media_server/serverutil.h>
 #include <utils/common/sync_call.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>

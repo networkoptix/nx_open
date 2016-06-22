@@ -32,6 +32,7 @@ namespace conf
 {
     class Settings;
 }
+class StreeManager;
 
 /*!
     \note Methods of this class are re-enterable
@@ -46,6 +47,7 @@ public:
     */
     AccountManager(
         const conf::Settings& settings,
+        const StreeManager& streeManager,
         TemporaryAccountPasswordManager* const tempPasswordManager,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager) throw(std::runtime_error);
@@ -96,6 +98,7 @@ public:
     
 private:
     const conf::Settings& m_settings;
+    const StreeManager& m_streeManager;
     TemporaryAccountPasswordManager* const m_tempPasswordManager;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
@@ -103,7 +106,7 @@ private:
     Cache<std::string, data::AccountData> m_cache;
     mutable QnMutex m_mutex;
     //map<email, temporary password>
-    std::multimap<std::string, data::TemporaryAccountPassword> m_accountPassword;
+    std::multimap<std::string, data::TemporaryAccountCredentials> m_accountPassword;
     QnCounter m_startedAsyncCallsCounter;
 
     nx::db::DBResult fillCache();
@@ -163,6 +166,12 @@ private:
         data::AccountEmail accountEmail,
         data::AccountConfirmationCode confirmationCode,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
+    void temporaryCredentialsSaved(
+        QnCounter::ScopedIncrement asyncCallLocker,
+        api::ResultCode resultCode,
+        const std::string& accountEmail,
+        api::TemporaryCredentials temporaryCredentials,
+        std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler);
 };
 
 }   //cdb

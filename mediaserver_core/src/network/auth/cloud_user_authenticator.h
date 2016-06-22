@@ -95,6 +95,7 @@ private:
         const nx_http::StringType& userid,
         const nx_http::StringType& cloudNonce);
     std::tuple<Qn::AuthResult, QnResourcePtr> authorizeWithCacheItem(
+        QnMutexLockerBase* const lock,
         const CloudAuthenticationData& cacheItem,
         const nx_http::StringType& cloudNonce,
         const nx_http::StringType& nonceTrailer,
@@ -102,6 +103,9 @@ private:
         const nx_http::Method::ValueType& method,
         const nx_http::header::Authorization& authorizationHeader) const;
     void onSystemAccessListUpdated(nx::cdb::api::SystemAccessListModifiedEvent);
+    QnUserResourcePtr createCloudUser(
+        const QString& userName,
+        nx::cdb::api::SystemAccessRole cloudAccessRole) const;
 
 private slots:
     void cloudBindingStatusChanged(bool boundToCloud);

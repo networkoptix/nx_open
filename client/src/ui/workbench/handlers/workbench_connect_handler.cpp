@@ -25,8 +25,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
-#include <core/core_settings.h>
 #include <core/resource/media_server_resource.h>
+
+#include <client_core/client_core_settings.h>
 
 #include <nx_ec/ec_proto_version.h>
 #include <llutil/hardware_id.h>
@@ -59,7 +60,7 @@
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/app_info.h>
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
 #include <utils/common/synctime.h>
 #include <utils/common/system_information.h>
 #include <utils/common/url.h>
@@ -114,7 +115,7 @@ namespace
         , bool storePassword
         , bool autoLogin)
     {
-        auto lastConnections = qnCoreSettings->recentUserConnections();
+        auto lastConnections = qnClientCoreSettings->recentUserConnections();
         // TODO: #ynikitenkov remove outdated connection data
 
         const auto password = (storePassword ? url.password() : QString());
@@ -131,7 +132,7 @@ namespace
         lastConnections.erase(newEnd, lastConnections.end());
         lastConnections.prepend(connectionInfo);
 
-        qnCoreSettings->setRecentUserConnections(lastConnections);
+        qnClientCoreSettings->setRecentUserConnections(lastConnections);
         qnSettings->setAutoLogin(autoLogin);
     }
 }
@@ -182,7 +183,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
 
     connect(action(QnActions::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showLoginDialog);
     connect(action(QnActions::BeforeExitAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
-
+    
     context()->instance<QnAppServerNotificationCache>();
 }
 

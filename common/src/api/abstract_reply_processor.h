@@ -10,8 +10,8 @@
 #include <rest/server/json_rest_result.h>
 #include <utils/common/warnings.h>
 
-#include <utils/serialization/json.h>
-#include <utils/serialization/compressed_time.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/compressed_time.h>
 
 #include "abstract_connection.h"
 

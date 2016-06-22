@@ -20,6 +20,7 @@
 #include <ui/actions/actions.h>
 
 #include <ui/common/grid_widget_helper.h>
+#include <ui/common/item_view_hover_tracker.h>
 #include <ui/delegates/audit_item_delegate.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -57,11 +58,19 @@ namespace
     const char* checkBoxFilterProperty("checkboxFilter");
 }
 
-QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
+QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     base_type(parent),
     ui(new Ui::AuditLogDialog),
+    m_sessionModel(nullptr),
+    m_camerasModel(nullptr),
+    m_detailModel(nullptr),
     m_updateDisabled(false),
     m_dirty(false),
+    m_selectAllAction(new QAction(tr("Select All"), this)),
+    m_exportAction(new QAction(tr("Export Selection to File..."), this)),
+    m_clipboardAction(new QAction(tr("Copy Selection to Clipboard"), this)),
+    m_detailsLabel(nullptr),
+    m_itemDelegate(new QnAuditItemDelegate(this)),
     m_descriptionColumnIndex(-1)
 {
     ui->setupUi(this);
@@ -90,13 +99,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
                 (ui->detailsTabWidget->tabBar()->height() - m_detailsLabel->height()) / 2);
         });
 
-    m_clipboardAction = new QAction(tr("Copy Selection to Clipboard"), this);
-    m_exportAction = new QAction(tr("Export Selection to File..."), this);
-    m_selectAllAction = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(QKeySequence::SelectAll);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
-
-    m_itemDelegate = new QnAuditItemDelegate(this);
 
     setupSessionsGrid();
     setupCamerasGrid();
@@ -127,12 +131,13 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
     ui->mainGridLayout->activate();
 
     ui->filterLineEdit->setPlaceholderText(tr("Search"));
+    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
 
     ui->gridMaster->horizontalHeader()->setSortIndicator(1, Qt::DescendingOrder);
     ui->gridCameras->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
 
     /* Cursor changes when description is hovered: */
-    connect(ui->gridDetails, &QnTableView::hoverEnter, this,
+    connect(ui->gridDetails->hoverTracker(), &QnItemViewHoverTracker::itemEnter, this,
         [this](const QModelIndex& index)
         {
             if (index.column() == m_descriptionColumnIndex)
@@ -143,10 +148,10 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
             }
         });
 
-    connect(ui->gridDetails, &QnTableView::hoverLeave, this,
+    connect(ui->gridDetails->hoverTracker(), &QnItemViewHoverTracker::itemLeave, this,
         [this]()
         {
-            ui->gridDetails->setCursor(Qt::ArrowCursor);
+            ui->gridDetails->unsetCursor();
         });
 }
 

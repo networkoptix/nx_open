@@ -4,7 +4,7 @@
 
 #include <core/resource/resource.h>
 
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
 
 QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),

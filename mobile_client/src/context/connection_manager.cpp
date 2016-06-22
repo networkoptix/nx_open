@@ -5,7 +5,6 @@
 #include <QtCore/QMetaEnum>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/core_settings.h>
 #include <api/abstract_connection.h>
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
@@ -14,6 +13,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <common/common_module.h>
+#include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_message_processor.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <watchers/user_watcher.h>
@@ -29,6 +29,7 @@
 namespace {
 
     const QnSoftwareVersion minimalSupportedVersion(2, 5, 0, 0);
+    const QString kCloudSystemScheme = lit("cloud");
 
     enum { kInvalidHandle = -1 };
 
@@ -80,7 +81,6 @@ public:
 
     void updateConnectionState();
 
-
     void setUrl(const QUrl& url);
 
     void storeConnection(
@@ -94,6 +94,7 @@ public:
     QTimer *suspendTimer;
     int connectionHandle;
     QnConnectionManager::State connectionState;
+    QnSoftwareVersion connectionVersion;
 };
 
 QnConnectionManager::QnConnectionManager(QObject *parent) :
@@ -111,7 +112,10 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
             d, &QnConnectionManagerPrivate::updateConnectionState);
 
+    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentHostChanged);
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentLoginChanged);
+    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentPasswordChanged);
+    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::isCloudSystemChanged);
     connect(this, &QnConnectionManager::connectionStateChanged, this, &QnConnectionManager::isOnlineChanged);
 }
 
@@ -162,6 +166,18 @@ QString QnConnectionManager::currentPassword() const
 {
     Q_D(const QnConnectionManager);
     return d->url.isValid() ? d->url.password() : QString();
+}
+
+bool QnConnectionManager::isCloudSystem() const
+{
+    Q_D(const QnConnectionManager);
+    return d->url.scheme() == kCloudSystemScheme;
+}
+
+QnSoftwareVersion QnConnectionManager::connectionVersion() const
+{
+    Q_D(const QnConnectionManager);
+    return d->connectionVersion;
 }
 
 void QnConnectionManager::connectToServer(const QUrl &url)
@@ -337,13 +353,18 @@ void QnConnectionManagerPrivate::doConnect() {
 
     qnCommon->updateRunningInstanceGuid();
 
+    auto connectUrl = url;
+    connectUrl.setScheme(lit("http"));
+
     QnEc2ConnectionRequestResult *result = new QnEc2ConnectionRequestResult(this);
     connectionHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
-        url, ec2::ApiClientInfoData(), result, &QnEc2ConnectionRequestResult::processEc2Reply);
+        connectUrl, ec2::ApiClientInfoData(), result, &QnEc2ConnectionRequestResult::processEc2Reply);
 
     updateConnectionState();
 
-    connect(result, &QnEc2ConnectionRequestResult::replyProcessed, this, [this, result]() {
+    connect(result, &QnEc2ConnectionRequestResult::replyProcessed,
+            this, [this, result, connectUrl]()
+    {
         result->deleteLater();
 
         if (connectionHandle != result->handle())
@@ -378,7 +399,7 @@ void QnConnectionManagerPrivate::doConnect() {
 
         ec2::AbstractECConnectionPtr ec2Connection = result->connection();
 
-        QnAppServerConnectionFactory::setUrl(url);
+        QnAppServerConnectionFactory::setUrl(connectUrl);
         QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
         QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 
@@ -406,10 +427,15 @@ void QnConnectionManagerPrivate::doConnect() {
         qnSettings->setLastUsedSystemId(connectionInfo.systemName);
         url.setPassword(QString());
         qnSettings->setLastUsedUrl(url);
+
+        connectionVersion = connectionInfo.version;
+        emit q->connectionVersionChanged();
     });
 }
 
 void QnConnectionManagerPrivate::doDisconnect(bool force) {
+    Q_Q(QnConnectionManager);
+
     if (!force)
         qnGlobalSettings->synchronizeNow();
 
@@ -419,6 +445,9 @@ void QnConnectionManagerPrivate::doDisconnect(bool force) {
     QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnSessionManager::instance()->stop();
+
+    connectionVersion = QnSoftwareVersion();
+    emit q->connectionVersionChanged();
 
     updateConnectionState();
 }
@@ -477,7 +506,7 @@ void QnConnectionManagerPrivate::storeConnection(
         const QUrl& url,
         bool storePassword)
 {
-    auto lastConnections = qnCoreSettings->recentUserConnections();
+    auto lastConnections = qnClientCoreSettings->recentUserConnections();
 
     const auto password = storePassword ? url.password()
                                         : QString();
@@ -492,5 +521,5 @@ void QnConnectionManagerPrivate::storeConnection(
                           lastConnections.end());
     lastConnections.prepend(connectionInfo);
 
-    qnCoreSettings->setRecentUserConnections(lastConnections);
+    qnClientCoreSettings->setRecentUserConnections(lastConnections);
 }

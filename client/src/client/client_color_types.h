@@ -4,7 +4,7 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QColor>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 #include <vector>
 
@@ -275,15 +275,6 @@ struct QnRecordingStatsColors {
 };
 #define QnRecordingStatsColors_Fields (chartMainColor)(chartForecastColor)
 
-struct QnUserManagementColors {
-    QnUserManagementColors();
-
-    QColor disabledSelectedText;
-    QColor disabledButtonsText;
-    QColor selectionBackground;
-};
-#define QnUserManagementColors_Fields (disabledSelectedText)(disabledButtonsText)(selectionBackground)
-
 struct QnServerUpdatesColors {
     QnServerUpdatesColors();
 
@@ -349,7 +340,6 @@ struct QnPasswordStrengthColors
     (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
     (QnTwoWayAudioWidgetColors) \
     (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
-    (QnUserManagementColors) \
     (QnServerUpdatesColors)(QnIoModuleColors) \
     (QnBackupScheduleColors) \
     (QnFailoverPriorityColors) \

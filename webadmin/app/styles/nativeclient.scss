@@ -2,9 +2,7 @@ $icon-font-path: "../fonts/";
 
 @import 'native-theme/main';
 
-
 @import 'master';
-
 
 
 body.inline-webadmin{
@@ -30,4 +28,10 @@ body.inline-webadmin{
   position:absolute;
   bottom:0;
   width:100%;
+}
+
+.hint{
+  border: 1px solid $dark5;
+  color: $light5;
+  background-color: $dark10;
 }

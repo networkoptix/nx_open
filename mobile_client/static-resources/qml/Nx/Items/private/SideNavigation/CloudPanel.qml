@@ -2,10 +2,15 @@ import QtQuick 2.6
 import Qt.labs.controls 1.0
 import QtQuick.Layouts 1.1
 import Nx 1.0
+import Nx.Controls 1.0
 
 Pane
 {
     id: cloudPanel
+
+    clip: true
+
+    readonly property string login: cloudStatusWatcher.cloudLogin
 
     background: Rectangle
     {
@@ -18,6 +23,13 @@ Pane
             anchors.bottom: parent.bottom
             color: ColorTheme.base7
         }
+
+        MaterialEffect
+        {
+            anchors.fill: parent
+            mouseArea: mouseArea
+            rippleSize: 160
+        }
     }
 
     implicitWidth: parent ? parent.width : contentItem.implicitWidth
@@ -25,25 +37,34 @@ Pane
     leftPadding: 12
     rightPadding: 12
 
+    MouseArea
+    {
+        id: mouseArea
+        anchors.fill: parent
+        onClicked: Workflow.openCloudScreen()
+    }
+
     contentItem: RowLayout
     {
         spacing: 12
 
         Image
         {
-            source: lp("/images/cloud_not_logged_in.png")
+            source: login ? lp("/images/cloud_logged_in.png")
+                          : lp("/images/cloud_not_logged_in.png")
             anchors.verticalCenter: parent.verticalCenter
         }
 
         Text
         {
             Layout.fillWidth: true
-            text: qsTr("Login to %1").arg(applicationInfo.cloudName())
+            text: login ? login
+                        : qsTr("Login to %1").arg(applicationInfo.cloudName())
             anchors.verticalCenter: parent.verticalCenter
             font.pixelSize: 14
             font.weight: Font.DemiBold
             elide: Text.ElideRight
-            color: ColorTheme.contrast4
+            color: ColorTheme.contrast10
         }
     }
 }

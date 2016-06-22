@@ -64,13 +64,13 @@ class QnWorkbenchController: public Connective<QObject>, public QnWorkbenchConte
 public:
     /**
      * Constructor.
-     * 
+     *
      * \param parent                    Parent for this object.
      */
     QnWorkbenchController(QObject *parent = NULL);
 
     /**
-     * Virtual destructor. 
+     * Virtual destructor.
      */
     virtual ~QnWorkbenchController();
 

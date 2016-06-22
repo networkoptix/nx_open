@@ -7,11 +7,9 @@ AbstractButton
 {
     id: control
 
-    checkable: true
-    checked: true
-
     property bool loading: false
     property color color: ColorTheme.windowText
+    property bool paused: false
 
     implicitWidth: background.implicitWidth
     implicitHeight: background.implicitHeight
@@ -60,7 +58,7 @@ AbstractButton
             width: 18
             height: 18
             anchors.centerIn: parent
-            pauseState: control.checked
+            pauseState: control.paused
             color: control.color
             opacity: control.loading ? 0.5 : 1.0
             Behavior on opacity { NumberAnimation { duration: 250 } }

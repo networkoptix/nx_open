@@ -3,7 +3,7 @@
 #include "ifconfig_rest_handler.h"
 #include <nx/network/http/linesplitter.h>
 #include <network/tcp_connection_priv.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"

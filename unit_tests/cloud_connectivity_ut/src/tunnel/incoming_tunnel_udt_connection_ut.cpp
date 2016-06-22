@@ -1,9 +1,10 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/udp/incoming_tunnel_connection.h>
-#include <nx/network/cloud/tunnel/udp/acceptor.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
+#include <nx/network/cloud/tunnel/udp/acceptor.h>
+#include <nx/network/cloud/tunnel/udp/incoming_tunnel_connection.h>
+#include <nx/network/stun/message.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
 #include <utils/thread/sync_queue.h>
@@ -44,11 +45,22 @@ protected:
         nx::hpm::api::ConnectionParameters connectionParameters;
         connectionParameters.udpTunnelKeepAliveInterval = kMaxKeepAliveInterval;
         connectionParameters.udpTunnelKeepAliveRetries = 1;
-        connection = std::make_unique<IncomingTunnelConnection>(
-            kConnectionId.toUtf8(),
-            std::move(tmpSocket),
-            std::move(connectionParameters));
-        acceptForever();
+
+        utils::promise<void> startedPromise;
+        tmpSocket->dispatch(
+            [&]()
+            {
+                auto cc = std::make_unique<IncomingControlConnection>(
+                    kConnectionId.toUtf8(), std::move(tmpSocket), connectionParameters);
+
+                cc->start(nullptr /* do not wait for select in test */);
+                connection = std::make_unique<IncomingTunnelConnection>(std::move(cc));
+                
+                acceptForever();
+                startedPromise.set_value();
+            });
+            
+        startedPromise.get_future().wait();
     }
 
     std::unique_ptr<UdtStreamSocket> makeSocket(bool randevous = false)
@@ -77,6 +89,8 @@ protected:
                 acceptResults.push(code);
                 if (code == SystemError::noError)
                     acceptForever();
+                else
+                    connection.reset();
             });
     }
 
@@ -155,7 +169,7 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
     ASSERT_EQ(acceptResults.pop(), SystemError::noError);
 
     {
-        hpm::api::UdpHolePunchingSyn syn;
+        hpm::api::UdpHolePunchingSynRequest syn;
         stun::Message request;
         syn.serialize(&request);
 
@@ -188,8 +202,12 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
                         size_t processed;
                         ASSERT_EQ(parser.parse(buffer, &processed),
                                   nx_api::ParserState::done);
+                        ASSERT_EQ(response.header.messageClass,
+                                  stun::MessageClass::successResponse);
+                        ASSERT_EQ(response.header.method,
+                                  hpm::api::UdpHolePunchingSynResponse::kMethod);
 
-                        hpm::api::UdpHolePunchingSynAck synAck;
+                        hpm::api::UdpHolePunchingSynResponse synAck;
                         ASSERT_TRUE(synAck.parse(response));
                         ASSERT_EQ(synAck.connectSessionId, kConnectionId.toUtf8());
 
@@ -219,9 +237,9 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
                 buffer.reserve(1);
                 freeSocket->readSomeAsync(
                     &buffer,
-                    [&buffer, &promise](SystemError::ErrorCode code, size_t)
+                    [&buffer, &promise](SystemError::ErrorCode code, size_t size)
                     {
-                        ASSERT_NE(code, SystemError::noError);
+                        ASSERT_TRUE(code != SystemError::noError || size == 0);
                         promise.set_value();
                     });
             });

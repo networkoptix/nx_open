@@ -609,6 +609,12 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnLoggedInCondition(this));
 
+    factory(QnActions::BrowseLocalFilesModeAction).
+        flags(Qn::Main).
+        text(tr("Browse Local Files")).
+        toggledText(tr("Show Welcome Screen")).
+        condition(new QnBrowseLocalFilesCondition(this));
+
     factory().
         flags(Qn::Main).
         separator();
@@ -1831,18 +1837,21 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::VolumeUpAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(lit("Ctrl+Up")).
-        text(tr("Volume Down"));
+        text(tr("Volume Down")).
+        condition(new QnTimelineVisibleActionCondition(this));
 
     factory(QnActions::VolumeDownAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(lit("Ctrl+Down")).
-        text(tr("Volume Up"));
+        text(tr("Volume Up")).
+        condition(new QnTimelineVisibleActionCondition(this));
 
     factory(QnActions::ToggleMuteAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(lit("M")).
         text(tr("Toggle Mute")).
-        checkable();
+        checkable().
+        condition(new QnTimelineVisibleActionCondition(this));
 
     factory(QnActions::JumpToLiveAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).

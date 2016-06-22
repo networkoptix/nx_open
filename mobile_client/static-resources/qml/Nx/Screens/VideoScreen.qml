@@ -35,6 +35,8 @@ PageBase
         {
             if (playing)
                 video.screenshotSource = ""
+
+            setKeepScreenOn(playing)
         }
 
         maxTextureSize: getMaxTextureSize()
@@ -87,7 +89,7 @@ PageBase
         onFailedChanged:
         {
             if (failed)
-                videoNavigation.paused = true
+                player.stop()
         }
 
         function updateOfflineDisplay()
@@ -123,24 +125,14 @@ PageBase
 
                 if (Qt.application.state != Qt.ApplicationActive)
                 {
-                    if (!d.videoNavigation.paused)
-                    {
-                        d.resumeAtLive = player.liveMode
-                        d.resumeOnActivate = true
-                        d.videoNavigation.paused = true
-                    }
+                    d.resumeOnActivate = player.playing
+                    player.pause()
                     showUi()
                 }
                 else if (Qt.application.state == Qt.ApplicationActive)
                 {
                     if (d.resumeOnActivate)
-                    {
-                        if (d.resumeAtLive)
-                            resourceHelper.updateUrl()
-                        d.videoNavigation.paused = false
-                        d.resumeOnActivate = false
-                        d.resumeAtLive = false
-                    }
+                        player.play()
                 }
             }
         }
@@ -302,10 +294,7 @@ PageBase
                 sourceComponent = accessRightsHelper.canViewArchive
                     ? navigationComponent : liveNavigationComponent
             }
-            setKeepScreenOn(true)
         }
-
-        Component.onDestruction: setKeepScreenOn(false)
     }
 
     Component
@@ -314,23 +303,7 @@ PageBase
 
         VideoNavigation
         {
-            id: videoNavigation
             mediaPlayer: player
-
-            onPausedChanged:
-            {
-                setKeepScreenOn(!paused)
-
-                if (paused) {
-                    mediaPlayer.pause()
-                    return
-                }
-
-                if (d.resumeAtLive)
-                    mediaPlayer.playLive()
-                else
-                    mediaPlayer.play()
-            }
         }
     }
 
@@ -340,21 +313,7 @@ PageBase
 
         LiveVideoNavigation
         {
-            id: liveVideoNavigation
             mediaPlayer: player
-
-            property bool paused: false
-
-            readonly property real timelinePosition: -1
-            readonly property bool timelineDragging: false
-
-            onPausedChanged:
-            {
-                if (paused)
-                    mediaPlayer.pause()
-                else
-                    mediaPlayer.playLive()
-            }
         }
     }
 
@@ -406,14 +365,15 @@ PageBase
             showUi()
     }
 
-    onActivePageChanged:
+    Component.onCompleted:
     {
-        if (activePage)
-        {
-            player.playLive()
+        player.playLive()
+        if (liteMode)
+            hideUi()
+    }
 
-            if (liteMode)
-                hideUi()
-        }
+    Component.onDestruction:
+    {
+        setKeepScreenOn(false)
     }
 }

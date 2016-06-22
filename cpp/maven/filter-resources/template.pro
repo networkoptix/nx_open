@@ -112,6 +112,7 @@ INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
                 ${root.dir}/common_libs/nx_network/src \
+                ${root.dir}/common_libs/nx_fusion/src \
                 ${root.dir}/common_libs/nx_utils/src \
                 ${root.dir}/common_libs/nx_streaming/src \
                 ${root.dir}/common_libs/nx_media/src \
@@ -123,6 +124,7 @@ win* {
     DEFINES += \
         NX_NETWORK_API=__declspec(dllimport) \
         NX_UTILS_API=__declspec(dllimport) \
+        NX_FUSION_API=__declspec(dllimport) \
         NX_VMS_UTILS_API=__declspec(dllimport) \
         UDT_API=__declspec(dllimport) \
 
@@ -130,6 +132,7 @@ win* {
     DEFINES += \
         NX_NETWORK_API= \
         NX_UTILS_API= \
+        NX_FUSION_API= \
         NX_VMS_UTILS_API= \
         UDT_API= \
 
@@ -213,7 +216,7 @@ win* {
 unix: {
   DEFINES += QN_EXPORT=
   clang {
-    QMAKE_CXXFLAGS += -std=c++14 -Wno-c++14-extensions
+    QMAKE_CXXFLAGS += -Wno-c++14-extensions -Wno-inconsistent-missing-override
   } else {
     #QMAKE_CXXFLAGS += -std=c++1y
   }
@@ -291,6 +294,7 @@ ios {
     QMAKE_MOC_OPTIONS += -DQ_OS_IOS
     QMAKE_IOS_DEPLOYMENT_TARGET = 8.0
     XCODEBUILD_FLAGS += -jobs 4
+    QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedef
 }
 
 

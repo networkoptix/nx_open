@@ -21,7 +21,7 @@
 
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace
 {
@@ -118,10 +118,9 @@ namespace
                 result.relayOutputId = QString::fromUtf8(field.data(), field.size());
                 break;
             case RelayAutoResetTimeoutParam:
-                result.relayAutoResetTimeout = toInt(field);
+                result.durationMs = toInt(field);
                 break;
             case InputPortIdParam:
-                result.inputPortId = QString::fromUtf8(field.data(), field.size());
                 break;
             case KeyParam:
                 break;

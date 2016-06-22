@@ -31,7 +31,7 @@ Pane
     {
         implicitWidth: 200
         implicitHeight: 40
-        color: ColorTheme.orange_main
+        color: ColorTheme.red_main
     }
 
     contentItem: Text

@@ -49,6 +49,7 @@ BINS_DIR=$BUILD_OUTPUT_DIR/bin/${build.configuration}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/${build.configuration}
 DEBS_DIR=$BUILD_OUTPUT_DIR/deb
 UBOOT_DIR=$BUILD_OUTPUT_DIR/root
+VOX_SOURCE_DIR=${ClientVoxSourceDir}
 
 STRIP=
 
@@ -84,6 +85,7 @@ libcloud_db_client \
 libcommon \
 libmediaserver_core \
 libnx_email \
+libnx_fusion \
 libnx_network \
 libnx_streaming \
 libnx_utils \
@@ -135,7 +137,7 @@ done
 QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql"
 if [[ "${box}" == "bpi" ]]; then
     QTLIBS="Concurrent Core EglDeviceIntegration Gui LabsTemplates MultimediaQuick_p Multimedia Network OpenGL Qml Quick Sql Widgets Xml XmlPatterns"
-fi    
+fi
 for var in $QTLIBS
 do
     qtlib=libQt5$var.so
@@ -173,8 +175,8 @@ if [[ "${box}" == "bpi" ]]; then
     $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client $DEBUG_DIR/$PREFIX_DIR/lite_client/bin/mobile_client.debug
     $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/lite_client/bin/mobile_client.debug $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
     $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
-  fi  
-  
+  fi
+
   #copying directories needed by lite client
   DIRS_TO_COPY=( \
   egldeviceintegrations \
@@ -185,24 +187,24 @@ if [[ "${box}" == "bpi" ]]; then
   qml \
   video \
   )
-  for d in "${DIRS_TO_COPY[@]}"; do 
+  for d in "${DIRS_TO_COPY[@]}"; do
     echo Copying directory ${d}
     cp -Rfv $BINS_DIR/${d} $BUILD_DIR/$PREFIX_DIR/lite_client/bin
   done
-  
+
   #copying debs and uboot
   cp -Rfv $DEBS_DIR $BUILD_DIR/opt
-  cp -Rfv $UBOOT_DIR $BUILD_DIR/root  
-  
+  cp -Rfv $UBOOT_DIR $BUILD_DIR/root
+
   #additional platform specific files
   mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
   cp -Rf ${qt.dir}/lib/fonts $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
   cp -R ./root $BUILD_DIR
   mkdir -p $BUILD_DIR/root/tools/nx
   cp ./opt/networkoptix/mediaserver/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
-  chmod -R 755 $BUILD_DIR/$PREFIX_DIR/mediaserver/var/scripts  
+  chmod -R 755 $BUILD_DIR/$PREFIX_DIR/mediaserver/var/scripts
 fi
-  
+
 #copying plugins
 if [ -e "$BINS_DIR/plugins" ]; then
   mkdir -p $BUILD_DIR/$PREFIX_DIR/mediaserver/bin/plugins
@@ -217,6 +219,11 @@ if [ -e "$BINS_DIR/plugins" ]; then
       fi
     done
 fi
+
+#copying vox
+VOX_TARGET_DIR=$BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/vox
+mkdir -p $VOX_TARGET_DIR
+cp -Rf $VOX_SOURCE_DIR/* $VOX_TARGET_DIR
 
 if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
     mv -f $BUILD_DIR/etc/init.d/networkoptix-mediaserver $BUILD_DIR/etc/init.d/$CUSTOMIZATION-mediaserver
@@ -261,4 +268,4 @@ zip ./$UPDATE_NAME.zip ./*
 mv ./* ../
 cd ..
 rm -Rf zip
-rm -Rf $TEMP_DIR
+#rm -Rf $TEMP_DIR

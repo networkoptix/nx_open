@@ -6,7 +6,7 @@
 #include "stree_manager.h"
 
 #include <nx/utils/log/log.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 
 namespace nx {
@@ -15,6 +15,7 @@ namespace cdb {
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(StreeOperation,
     (StreeOperation::authentication, "authentication")
     (StreeOperation::authorization, "authorization")
+    (StreeOperation::getTemporaryCredentialsParameters, "getTemporaryCredentialsParameters")
 )
 
 

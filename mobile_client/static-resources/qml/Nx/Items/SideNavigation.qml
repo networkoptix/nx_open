@@ -23,7 +23,7 @@ Drawer
 
         ListView
         {
-            id: savedSessionsList
+            id: layoutsList
 
             anchors.fill: parent
             anchors.topMargin: getStatusBarHeight()
@@ -33,7 +33,8 @@ Drawer
 
             header: Column
             {
-                width: savedSessionsList.width
+                width: layoutsList.width
+                bottomPadding: 8
 
                 CloudPanel {}
 
@@ -42,11 +43,25 @@ Drawer
                     visible: connectionManager.online
                 }
             }
+
+            model: connectionManager.online ? layoutsModel : undefined
+
+            delegate: LayoutItem
+            {
+                text: resourceName
+                resourceId: uuid
+                shared: shared
+                active: uiController.layoutId == resourceId
+                count: itemsCount
+                onClicked: uiController.layoutId = resourceId
+            }
         }
+
+        QnLayoutsModel { id: layoutsModel }
 
         OfflineDummy
         {
-            anchors.fill: savedSessionsList
+            anchors.fill: layoutsList
             anchors.margins: 16
             visible: !connectionManager.online
         }
@@ -97,7 +112,7 @@ Drawer
             {
                 icon: lp("/images/settings.png")
                 text: qsTr("Settings")
-                visible: !liteMode
+                visible: false//!liteMode
                 onClicked: Workflow.openSettingsScreen()
             }
 

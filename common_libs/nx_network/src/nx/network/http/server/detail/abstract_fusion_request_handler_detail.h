@@ -14,8 +14,8 @@
 
 #include <common/common_globals.h>
 #include <utils/common/cpp14.h>
-#include <utils/serialization/json.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "../fusion_request_result.h"
 #include "../../buffer_source.h"
@@ -255,7 +255,7 @@ private:
 
     //!Implementation of \a AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const /*response*/,

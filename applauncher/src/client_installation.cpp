@@ -87,22 +87,29 @@ bool QnClientInstallation::verify() const {
     return true;
 }
 
+QString targetBinaryPath(QString binaryPath)
+{
+#ifdef Q_OS_LINUX
+    static const auto kPrefix = "bin/";
+#elif defined Q_OS_MAC
+    static const auto kPrefix = "Contents/MacOS/";
+#else
+    static const auto kPrefix = "";
+#endif
+    return binaryPath.prepend(kPrefix);
+}
+
 QnClientInstallationPtr QnClientInstallation::installationForPath(const QString &rootPath) {
     QDir rootDir(rootPath);
 
     QnClientInstallationPtr installation(new QnClientInstallation());
     installation->m_rootPath = rootPath;
 
-    QString binary = QnApplauncherAppInfo::clientBinaryName();
-    if (rootDir.exists(binary)) {
+    const QString binary = targetBinaryPath(QnApplauncherAppInfo::clientBinaryName());
+    if (rootDir.exists(binary))
         installation->m_binaryPath = binary;
-    } else {
-        binary.prepend("bin/");
-        if (rootDir.exists(binary))
-            installation->m_binaryPath = binary;
-        else
-            return QnClientInstallationPtr();
-    }
+    else
+        return QnClientInstallationPtr();
 
     QString lib = "lib";
     if (rootDir.exists(lib)) {

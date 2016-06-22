@@ -14,6 +14,7 @@ struct QnStartupParameters
         , char **argv);
 
     int screen;
+    const static QString kScreenKey;
 
     bool allowMultipleClientInstances;
     const static QString kAllowMultipleClientInstancesKey;

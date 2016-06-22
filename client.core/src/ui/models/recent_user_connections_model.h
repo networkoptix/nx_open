@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtCore/QAbstractListModel>
-#include <core/user_recent_connection_data.h>
+#include <client_core/user_recent_connection_data.h>
 
 class QnRecentUserConnectionsModel : public QAbstractListModel
 {
@@ -13,6 +13,17 @@ class QnRecentUserConnectionsModel : public QAbstractListModel
     Q_PROPERTY(QString firstUser READ firstUser NOTIFY firstUserChanged)
 
 public:
+    enum Roles
+    {
+        FirstRole = Qt::UserRole + 1,
+
+        UserNameRole = FirstRole,
+        PasswordRole,
+        HasStoredPasswordRole,
+
+        RolesCount
+    };
+
     QnRecentUserConnectionsModel(QObject *parent = nullptr);
 
     virtual ~QnRecentUserConnectionsModel();

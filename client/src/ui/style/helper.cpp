@@ -28,8 +28,14 @@ namespace style
     const int Metrics::kDefaultTopLevelMargin = dp(16);
     const int Metrics::kDefaultChildMargin = 0;
     const QSize Metrics::kDefaultLayoutSpacing(dp(8), dp(8));
+    const int Metrics::kPanelHeaderHeight = dp(24);
+    const QMargins Metrics::kPanelContentMargins(0, dp(12), 0, 0);
+    const int Metrics::kGroupBoxTopMargin = dp(8);
+    const QMargins Metrics::kGroupBoxContentMargins(dp(16), dp(16), dp(16), dp(16));
+    const qreal Metrics::kGroupBoxCornerRadius = dp(2.0);
 
     const char *Properties::kHoveredRowProperty = "_qn_hoveredRow";
+    const char *Properties::kHoveredIndexProperty = "_qn_hoveredIndex";
     const char *Properties::kAccentStyleProperty = "_qn_accentStyle";
     const char *Properties::kSliderLength = "_qn_sliderLength";
     const char *Properties::kSliderFeatures = "_qn_sliderFeatures";

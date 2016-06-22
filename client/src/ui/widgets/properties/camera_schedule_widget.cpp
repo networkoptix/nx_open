@@ -185,32 +185,11 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QnCheckbox::autoCleanTristate(ui->checkBoxMinArchive);
     QnCheckbox::autoCleanTristate(ui->checkBoxMaxArchive);
 
-    connect(ui->recordAlwaysButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
-    connect(ui->recordMotionButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
-    connect(ui->recordMotionPlusLQButton,SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
-    connect(ui->recordMotionPlusLQButton,SIGNAL(toggled(bool)),             this,   SLOT(updateMaxFpsValue(bool)));
-    connect(ui->noRecordButton,          SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
-    connect(ui->qualityComboBox,         SIGNAL(currentIndexChanged(int)),  this,   SLOT(updateGridParams()));
-    connect(ui->fpsSpinBox,              SIGNAL(valueChanged(double)),      this,   SLOT(updateGridParams()));
-    connect(this,                        SIGNAL(scheduleTasksChanged()),    this, SLOT(updateRecordSpinboxes()));
-
-    connect(ui->recordBeforeSpinBox,    SIGNAL(valueChanged(int)),          this,   SIGNAL(recordingSettingsChanged()));
-    connect(ui->recordAfterSpinBox,     SIGNAL(valueChanged(int)),          this,   SIGNAL(recordingSettingsChanged()));
-
-    connect(ui->licensesButton,         SIGNAL(clicked()),                  this,   SLOT(at_licensesButton_clicked()));
-    connect(ui->displayQualityCheckBox, SIGNAL(stateChanged(int)),          this,   SLOT(at_displayQualiteCheckBox_stateChanged(int)));
-    connect(ui->displayFpsCheckBox,     SIGNAL(stateChanged(int)),          this,   SLOT(at_displayFpsCheckBox_stateChanged(int)));
-
-    connect(ui->enableRecordingCheckBox, SIGNAL(stateChanged(int)),          this,   SLOT(updateGridEnabledState()));
-    connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(updateLicensesLabelText()));
-    connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged,          this,   [this](int state)
+    auto notifyAboutScheduleEnabledChanged = [this](int state)
     {
         if (!isUpdating())
             emit scheduleEnabledChanged(state);
-    });
-
-
-    connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
+    };
 
     auto notifyAboutArchiveRangeChanged = [this]
     {
@@ -218,31 +197,54 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
             emit archiveRangeChanged();
     };
 
+    connect(ui->recordAlwaysButton,         &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->recordMotionButton,         &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->recordMotionPlusLQButton,   &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->recordMotionPlusLQButton,   &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateMaxFpsValue);
+    connect(ui->noRecordButton,             &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->qualityComboBox,            QnComboboxCurrentIndexChanged,                  this, &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->fpsSpinBox,                 QnSpinboxIntValueChanged,                       this, &QnCameraScheduleWidget::updateGridParams);
+    connect(this,                           &QnCameraScheduleWidget::scheduleTasksChanged,  this, &QnCameraScheduleWidget::updateRecordSpinboxes);
 
-    connect(ui->checkBoxMinArchive,      &QCheckBox::stateChanged,          this,   &QnCameraScheduleWidget::updateArchiveRangeEnabledState);
-    connect(ui->checkBoxMinArchive,      &QCheckBox::stateChanged,          this,   notifyAboutArchiveRangeChanged);
+    connect(ui->recordBeforeSpinBox,        QnSpinboxIntValueChanged,                       this, &QnCameraScheduleWidget::recordingSettingsChanged);
+    connect(ui->recordAfterSpinBox,         QnSpinboxIntValueChanged,                       this, &QnCameraScheduleWidget::recordingSettingsChanged);
 
-    connect(ui->checkBoxMaxArchive,      &QCheckBox::stateChanged,          this,   &QnCameraScheduleWidget::updateArchiveRangeEnabledState);
-    connect(ui->checkBoxMaxArchive,      &QCheckBox::stateChanged,          this,   notifyAboutArchiveRangeChanged);
+    connect(ui->licensesButton,             &QPushButton::clicked,                          this, &QnCameraScheduleWidget::at_licensesButton_clicked);
+    connect(ui->displayQualityCheckBox,     &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::at_displayQualiteCheckBox_stateChanged);
+    connect(ui->displayFpsCheckBox,         &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::at_displayFpsCheckBox_stateChanged);
 
-    connect(ui->spinBoxMinDays,          SIGNAL(valueChanged(int)),         this,   SLOT(validateArchiveLength()));
-    connect(ui->spinBoxMinDays,          QnSpinboxIntValueChanged,          this,   notifyAboutArchiveRangeChanged);
+    connect(ui->enableRecordingCheckBox,    &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::updateGridEnabledState);
+    connect(ui->enableRecordingCheckBox,    &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::updateLicensesLabelText);
 
-    connect(ui->spinBoxMaxDays,          SIGNAL(valueChanged(int)),         this,   SLOT(validateArchiveLength()));
-    connect(ui->spinBoxMaxDays,          QnSpinboxIntValueChanged,          this,   notifyAboutArchiveRangeChanged);
+    connect(ui->enableRecordingCheckBox,    &QCheckBox::stateChanged,                       this, notifyAboutScheduleEnabledChanged);
 
-    connect(ui->exportScheduleButton,   SIGNAL(clicked()),                  this,   SLOT(at_exportScheduleButton_clicked()));
+    connect(ui->gridWidget,                 &QnScheduleGridWidget::cellActivated,           this, &QnCameraScheduleWidget::at_gridWidget_cellActivated);
+
+    connect(ui->checkBoxMinArchive,         &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::updateArchiveRangeEnabledState);
+    connect(ui->checkBoxMinArchive,         &QCheckBox::stateChanged,                       this, notifyAboutArchiveRangeChanged);
+
+    connect(ui->checkBoxMaxArchive,         &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::updateArchiveRangeEnabledState);
+    connect(ui->checkBoxMaxArchive,         &QCheckBox::stateChanged,                       this, notifyAboutArchiveRangeChanged);
+
+    connect(ui->spinBoxMinDays,             QnSpinboxIntValueChanged,                       this, &QnCameraScheduleWidget::validateArchiveLength);
+    connect(ui->spinBoxMinDays,             QnSpinboxIntValueChanged,                       this, notifyAboutArchiveRangeChanged);
+
+    connect(ui->spinBoxMaxDays,             QnSpinboxIntValueChanged,                       this, &QnCameraScheduleWidget::validateArchiveLength);
+    connect(ui->spinBoxMaxDays,             QnSpinboxIntValueChanged,                       this, notifyAboutArchiveRangeChanged);
+
+    connect(ui->exportScheduleButton,       &QPushButton::clicked,                          this, &QnCameraScheduleWidget::at_exportScheduleButton_clicked);
+
     ui->exportWarningLabel->setVisible(false);
 
     QnSingleEventSignalizer *releaseSignalizer = new QnSingleEventSignalizer(this);
     releaseSignalizer->setEventType(QEvent::MouseButtonRelease);
-    connect(releaseSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_releaseSignalizer_activated(QObject *)));
+    connect(releaseSignalizer, &QnSingleEventSignalizer::activated, this, &QnCameraScheduleWidget::at_releaseSignalizer_activated);
     ui->recordMotionButton->installEventFilter(releaseSignalizer);
     ui->recordMotionPlusLQButton->installEventFilter(releaseSignalizer);
 
     QnSingleEventSignalizer* gridMouseReleaseSignalizer = new QnSingleEventSignalizer(this);
     gridMouseReleaseSignalizer->setEventType(QEvent::MouseButtonRelease);
-    connect(gridMouseReleaseSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SIGNAL(controlsChangesApplied()));
+    connect(gridMouseReleaseSignalizer, &QnSingleEventSignalizer::activated, this, &QnCameraScheduleWidget::controlsChangesApplied);
     ui->gridWidget->installEventFilter(gridMouseReleaseSignalizer);
 
     setWarningStyle(ui->minArchiveDaysWarningLabel);
@@ -292,13 +294,12 @@ bool QnCameraScheduleWidget::hasHeightForWidth() const {
 
 void QnCameraScheduleWidget::connectToGridWidget()
 {
-    connect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
-
+    connect(ui->gridWidget, &QnScheduleGridWidget::cellValueChanged, this, &QnCameraScheduleWidget::scheduleTasksChanged);
 }
 
 void QnCameraScheduleWidget::disconnectFromGridWidget()
 {
-    disconnect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
+    disconnect(ui->gridWidget, &QnScheduleGridWidget::cellValueChanged, this, &QnCameraScheduleWidget::scheduleTasksChanged);
 }
 
 void QnCameraScheduleWidget::beforeUpdate() {
@@ -777,11 +778,15 @@ void QnCameraScheduleWidget::updateMotionButtons() {
     }
 }
 
-void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled) {
-    if (motionPlusLqToggled)
-        ui->fpsSpinBox->setMaximum(m_maxDualStreamingFps);
-    else
-        ui->fpsSpinBox->setMaximum(m_maxFps);
+void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled)
+{
+    int maximum = motionPlusLqToggled ? m_maxDualStreamingFps : m_maxFps;
+
+    /* This check is necessary because Qt doesn't do it and resets spinbox state: */
+    if (maximum == ui->fpsSpinBox->maximum())
+        return;
+
+    ui->fpsSpinBox->setMaximum(maximum);
 }
 
 void QnCameraScheduleWidget::updateColors() {

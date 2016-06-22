@@ -20,8 +20,8 @@
 #include <http/custom_headers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/guard.h>
-#include <utils/serialization/json.h>
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "abstract_authentication_data_provider.h"
 #include "stree/cdb_ns.h"

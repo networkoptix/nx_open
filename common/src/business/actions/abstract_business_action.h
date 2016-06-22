@@ -10,7 +10,7 @@
 #include <business/business_fwd.h>
 #include <business/business_action_parameters.h>
 #include <business/business_event_parameters.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace QnBusiness
 {

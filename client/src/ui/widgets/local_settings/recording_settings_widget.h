@@ -54,7 +54,7 @@ private:
 
 private slots:
     void onComboboxChanged(int index);
-    
+
     void updateRecordingWarning();
     void updateDisableAeroCheckbox();
 
@@ -65,7 +65,7 @@ private:
     QScopedPointer<Ui::RecordingSettings> ui;
     QnVideoRecorderSettings *m_settings;
     QnDwm* m_dwm;
-    bool m_isAudioOnly;
+    const bool m_screenRecordingSupported;
 };
 
 #endif // VIDEORECORDINGDIALOG_H

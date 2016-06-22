@@ -2,11 +2,13 @@
 
 #include <utils/email/email_fwd.h>
 
-namespace Ui {
+namespace Ui
+{
     class SmtpSimpleSettingsWidget;
 }
 
-struct QnSimpleSmtpSettings {
+struct QnSimpleSmtpSettings
+{
     QString email;
     QString password;
     QString signature;
@@ -17,7 +19,8 @@ struct QnSimpleSmtpSettings {
     static QnSimpleSmtpSettings fromSettings(const QnEmailSettings &source);
 };
 
-class QnSmtpSimpleSettingsWidget: public QWidget{
+class QnSmtpSimpleSettingsWidget: public QWidget
+{
     Q_OBJECT
 
 public:
@@ -32,9 +35,6 @@ public:
 
 signals:
     void settingsChanged();
-
-private:
-    void validateEmail();
 
 private:
     QScopedPointer<Ui::SmtpSimpleSettingsWidget> ui;

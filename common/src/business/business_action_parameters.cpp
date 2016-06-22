@@ -1,6 +1,6 @@
 #include "business_action_parameters.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace
 {
@@ -18,8 +18,6 @@ QnBusinessActionParameters::QnBusinessActionParameters()
     , recordingDuration(0)
     , recordAfter(0)
     , relayOutputId()
-    , relayAutoResetTimeout(0)
-    , inputPortId()
     , sayText()
     , tags()
     , text()

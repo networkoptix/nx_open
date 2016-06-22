@@ -16,7 +16,7 @@
 #include <ui/common/weak_graphics_item_pointer.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 
-#include <utils/math/fuzzy.h>
+#include <nx/utils/math/fuzzy.h>
 
 namespace {
     const qreal toolTipMargin = 5.0;

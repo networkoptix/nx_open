@@ -15,6 +15,7 @@
 #include <models/saved_sessions_model.h>
 #include <models/discovered_sessions_model.h>
 #include <models/calendar_model.h>
+#include <models/layouts_model.h>
 #include <resources/media_resource_helper.h>
 #include <resources/camera_access_rights_helper.h>
 #include <utils/mobile_app_info.h>
@@ -23,6 +24,9 @@
 #include <camera/camera_chunk_provider.h>
 #include <camera/active_camera_thumbnail_loader.h>
 #include <nx/media/media_player.h>
+#include <watchers/cloud_status_watcher.h>
+#include <watchers/cloud_system_information_watcher.h>
+#include <mobile_client/mobile_client_ui_controller.h>
 
 void QnMobileClientMetaTypes::initialize() {
     registerMetaTypes();
@@ -45,6 +49,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnSystemHostsModel>("com.networkoptix.qml", 1, 0, "QnSystemHostsModel");
     qmlRegisterType<QnCameraListModel>("com.networkoptix.qml", 1, 0, "QnCameraListModel");
     qmlRegisterType<QnCalendarModel>("com.networkoptix.qml", 1, 0, "QnCalendarModel");
+    qmlRegisterType<QnLayoutsModel>("com.networkoptix.qml", 1, 0, "QnLayoutsModel");
     qmlRegisterType<QnSavedSessionsModel>("com.networkoptix.qml", 1, 0, "QnSavedSessionsModel");
     qmlRegisterType<QnDiscoveredSessionsModel>("com.networkoptix.qml", 1, 0, "QnDiscoveredSessionsModel");
     qmlRegisterType<QnMediaResourceHelper>("com.networkoptix.qml", 1, 0, "QnMediaResourceHelper");
@@ -52,10 +57,13 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnTimeline>("com.networkoptix.qml", 1, 0, "QnTimelineView");
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
     qmlRegisterType<QnMjpegPlayer>("com.networkoptix.qml", 1, 0, "QnMjpegPlayer");
+    qmlRegisterType<QnCloudStatusWatcher>("com.networkoptix.qml", 1, 0, "QnCloudStatusWatcher");
+    qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
     qmlRegisterType<nx::media::Player>("com.networkoptix.qml", 1, 0, "QnPlayer");
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnQuickItemMouseTracker>("com.networkoptix.qml", 1, 0, "ItemMouseTracker");
     qmlRegisterType<QnQuickTextInput>("com.networkoptix.qml", 1, 0, "QnTextInput");
+    qmlRegisterType<QnMobileClientUiController>("com.networkoptix.qml", 1, 0, "QnMobileClientUiController");
 
     qmlRegisterRevision<QQuickTextInput, 6>("com.networkoptix.qml", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("com.networkoptix.qml", 1, 0);

@@ -74,11 +74,12 @@ QtObject
         readonly property color brightText: context.getPaletteColor("light", 16);
         readonly property color midlight: context.getPaletteColor("dark", 12);
         readonly property color button: context.getPaletteColor("dark", 10);
-
         readonly property color brand: context.getPaletteColor("brand", 4);
-        readonly property color brandContrast: "white"; //TODO: how to access brand_contrast color?
 
-        readonly property color red_main: "#CF2727"; //TODO: how to access red_main color?
+        // TODO: #ynikitenkov add following block to json
+        readonly property color brandContrast: "white";
+        readonly property color red_main: "#CF2727";
+        readonly property color yellow_main: "#FBBC05";
 
         property QtObject custom: QtObject
         {

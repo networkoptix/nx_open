@@ -10,7 +10,7 @@
 #include <stdexcept>
 
 #include <plugins/videodecoder/stree/stree_manager.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/singleton.h>
 
 #include "cdb_ns.h"
@@ -23,7 +23,8 @@ namespace cdb {
 enum class StreeOperation
 {
     authentication,
-    authorization
+    authorization,
+    getTemporaryCredentialsParameters
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreeOperation)

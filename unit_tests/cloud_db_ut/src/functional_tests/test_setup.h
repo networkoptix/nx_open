@@ -42,6 +42,8 @@ public:
     nx::cdb::api::ConnectionFactory* connectionFactory();
     api::ModuleInfo moduleInfo() const;
 
+    QString testDataDir() const;
+
     api::ResultCode addAccount(
         api::AccountData* const accountData,
         std::string* const password,
@@ -66,6 +68,11 @@ public:
     api::ResultCode resetAccountPassword(
         const std::string& email,
         std::string* const confirmationCode);
+    api::ResultCode createTemporaryCredentials(
+        const std::string& email,
+        const std::string& password,
+        const api::TemporaryCredentialsParams& params,
+        api::TemporaryCredentials* const temporaryCredentials);
 
     api::ResultCode bindRandomNotActivatedSystem(
         const std::string& email,
@@ -148,8 +155,10 @@ public:
         api::SystemDataEx* const systemData);
 
     static void setTemporaryDirectoryPath(const QString& path);
+    static QString temporaryDirectoryPath();
     static void setDbConnectionOptions(
         const nx::db::ConnectionOptions& connectionOptions);
+    static nx::db::ConnectionOptions dbConnectionOptions();
 
 private:
     QString m_tmpDir;
