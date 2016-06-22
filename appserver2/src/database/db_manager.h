@@ -486,10 +486,12 @@ namespace detail
         ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
         ErrorCode saveCameraUserAttributes( const ApiCameraAttributesData& attrs );
         ErrorCode insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId);
+        ErrorCode removeCameraAttributes(const QnUuid& id);
         ErrorCode updateCameraSchedule(const std::vector<ApiScheduleTaskData>& scheduleTasks, qint32 internalId);
         ErrorCode removeCameraSchedule(qint32 internalId);
         ErrorCode removeCamera(const QnUuid& guid);
         ErrorCode removeStorage(const QnUuid& guid);
+        ErrorCode removeParam(const ApiResourceParamWithRefData& data);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
@@ -691,6 +693,7 @@ public:
     ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);
     ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
     ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
+    void getResourceParamsNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& resourceParams);
 
     template <typename Param, typename SerializedTransaction>
     ErrorCode executeTransactionNoLock(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
