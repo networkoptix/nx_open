@@ -13,7 +13,6 @@ Drawer
     enabled: stackView.depth == 1
 
     readonly property bool opened: position > 0
-    property string activeLayout
 
     Rectangle
     {
@@ -52,9 +51,9 @@ Drawer
                 text: resourceName
                 resourceId: uuid
                 shared: shared
-                active: activeLayout == resourceId
+                active: uiController.layoutId == resourceId
                 count: itemsCount
-                onClicked: activeLayout = resourceId
+                onClicked: uiController.layoutId = resourceId
             }
         }
 

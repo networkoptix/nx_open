@@ -86,7 +86,7 @@ Page
         displayMarginEnd: anchors.bottomMargin
         enabled: d.enabled
 
-        layoutId: sideNavigation.activeLayout
+        layoutId: uiController.layoutId
 
         ScrollIndicator.vertical: ScrollIndicator
         {

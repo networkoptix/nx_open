@@ -120,15 +120,20 @@ function openResourcesScreen(systemName)
 {
     var item = stackView.get(0, Controls.StackView.ForceLoad)
     if (item && item.objectName == "resourcesScreen")
-        return
-
-    item = stackView.replace(
-            null,
-            Qt.resolvedUrl("Screens/ResourcesScreen.qml"),
-            {
-                "title": systemName
-            }
-    )
+    {
+        if (stackView.depth > 1)
+            stackView.pop(item)
+    }
+    else
+    {
+        item = stackView.replace(
+                null,
+                Qt.resolvedUrl("Screens/ResourcesScreen.qml"),
+                {
+                    "title": systemName
+                }
+        )
+    }
     item.forceActiveFocus()
 }
 

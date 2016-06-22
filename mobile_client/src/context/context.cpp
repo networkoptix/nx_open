@@ -15,6 +15,7 @@
 #include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_app_info.h>
+#include <mobile_client/mobile_client_ui_controller.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
 
@@ -28,7 +29,8 @@ QnContext::QnContext(QObject* parent) :
     base_type(parent),
     m_connectionManager(new QnConnectionManager(this)),
     m_appInfo(new QnMobileAppInfo(this)),
-    m_settings(new QnContextSettings(this))
+    m_settings(new QnContextSettings(this)),
+    m_uiController(new QnMobileClientUiController(this))
 {
     connect(m_connectionManager, &QnConnectionManager::connectionStateChanged,
             this, [this]()

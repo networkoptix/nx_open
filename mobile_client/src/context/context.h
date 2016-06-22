@@ -9,6 +9,7 @@ class QnConnectionManager;
 class QnMobileAppInfo;
 class QnContextSettings;
 class QnCloudStatusWatcher;
+class QnMobileClientUiController;
 
 class QnContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
@@ -18,6 +19,7 @@ class QnContext: public QObject, public QnInstanceStorage {
     Q_PROPERTY(QnMobileAppInfo* applicationInfo READ applicationInfo NOTIFY applicationInfoChanged)
     Q_PROPERTY(QnContextSettings* settings READ settings NOTIFY settingsChanged)
     Q_PROPERTY(QnCloudStatusWatcher* cloudStatusWatcher READ cloudStatusWatcher NOTIFY cloudStatusWatcherChanged)
+    Q_PROPERTY(QnMobileClientUiController* uiController READ uiController NOTIFY nothingChanged)
     Q_PROPERTY(bool liteMode READ liteMode NOTIFY liteModeChanged)
 
 public:
@@ -34,6 +36,11 @@ public:
 
     QnContextSettings *settings() const {
         return m_settings;
+    }
+
+    QnMobileClientUiController* uiController() const
+    {
+        return m_uiController;
     }
 
     QnCloudStatusWatcher* cloudStatusWatcher() const;
@@ -68,6 +75,7 @@ public:
 
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
+    void nothingChanged();
     void connectionManagerChanged();
     void colorThemeChanged();
     void applicationInfoChanged();
@@ -79,6 +87,7 @@ private:
     QnConnectionManager *m_connectionManager;
     QnMobileAppInfo *m_appInfo;
     QnContextSettings *m_settings;
+    QnMobileClientUiController* m_uiController;
 
     QString m_localPrefix;
 };
