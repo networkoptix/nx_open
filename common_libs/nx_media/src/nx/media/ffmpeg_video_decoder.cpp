@@ -130,6 +130,8 @@ void FfmpegVideoDecoderPrivate::closeCodecContext()
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoder
 
+QSize FfmpegVideoDecoder::s_maxResolution;
+
 FfmpegVideoDecoder::FfmpegVideoDecoder(
     const ResourceAllocatorPtr& allocator, const QSize& resolution)
 :
