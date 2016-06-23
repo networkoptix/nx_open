@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_access_data.h>
 
 #include <nx/utils/uuid.h>
 #include "nx/utils/type_utils.h"
