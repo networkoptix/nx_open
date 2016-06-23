@@ -10,7 +10,6 @@
 #include <core/resource/resource_display_info.h>
 
 #include <client/client_globals.h>
-#include <client/client_connection_data.h>
 #include <client/client_model_types.h>
 #include <client_core/user_recent_connection_data.h>
 
