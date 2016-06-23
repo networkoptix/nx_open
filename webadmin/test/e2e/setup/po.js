@@ -20,13 +20,34 @@ var Page = function () {
 
     this.setupDialog = element(by.css('.modal')).element(by.css('.panel'));
     this.nextButton = this.setupDialog.element(by.cssContainingText('button', 'Next'));
+    this.backButton = this.setupDialog.element(by.css('.glyphicon-arrow-left'));
     this.systemNameInput = this.setupDialog.element(by.model('settings.systemName'));
     this.skipCloud = this.setupDialog.element(by.linkText('Skip this step for now'));
     this.learnMore = this.setupDialog.element(by.linkText('Learn more'));
-    this.localPasswordInput = this.setupDialog.element(by.css('input[name=password]'));
+    this.localPasswordInput = this.setupDialog.element(by.model('ngModel'));
     //this.localPasswordInput = this.setupDialog.element(by.model('settings.localPassword'));
     this.localPasswordConfInput = this.setupDialog.element(by.model('settings.localPasswordConfirmation'));
     this.finishButton = this.setupDialog.element(by.buttonText('Finish'));
+    this.advancedSysSett = this.setupDialog.element(by.linkText('Advanced system settings'));
+    this.camOptimCheckbox = this.setupDialog.element(by.id('cameraSettingsOptimization'));
+    this.autoDiscovCheckbox = this.setupDialog.element(by.id('serverAutoDiscoveryEnabled'));
+    this.statisticsCheckbox = this.setupDialog.element(by.id('statisticsAllowed'));
+
+    this.mergeWithExisting = this.setupDialog.element(by.linkText('Merge server with existing system'));
+    this.remoteSystemInput = this.setupDialog.element(by.model('settings.remoteSystem'));
+    this.remotePasswordInput = this.setupDialog.element(by.model('settings.remotePassword'));
+
+    this.getCheckboxState = function(checkbox) {
+        checkbox.isSelected().then( function(isSelected) {
+            return isSelected;
+        });
+    };
+    this.toggleCheckbox = function(checkbox) {
+        var isSelected = this.getCheckboxState(checkbox);
+        checkbox.click();
+        if(isSelected) expect(checkbox.isSelected()).toBe(false);
+        else expect(checkbox.isSelected()).toBe(true);
+    };
 
     this.get = function () {
         browser.get('/#/settings');
