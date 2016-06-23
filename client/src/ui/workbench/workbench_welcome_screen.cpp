@@ -81,6 +81,12 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent) :
     });
 
     setVisible(true);
+
+    connect(qnSettings, &QnClientSettings::valueChanged, this, [this](int valueId)
+    {
+        if (valueId == QnClientSettings::AUTO_LOGIN)
+            emit resetAutoLogin();
+    });
 }
 
 QnWorkbenchWelcomeScreen::~QnWorkbenchWelcomeScreen()
