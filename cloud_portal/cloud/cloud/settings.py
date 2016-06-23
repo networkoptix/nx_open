@@ -151,11 +151,21 @@ LOGGING = {
         },
     },
     'loggers': {
+        'default': {
+            'level': 'DEBUG',
+            'propagate': True,
+            'handlers': ['console', 'mail_admins']
+        },
         'api.helpers.exceptions': {
             'level': 'DEBUG',
             'propagate': True,
             'handlers': ['console', 'mail_admins']
         },
+        'api.controllers.cloud_gateway': {
+            'level': 'DEBUG',
+            'propagate': True,
+            'handlers': ['console', 'mail_admins']
+        }
     }
 }
 

@@ -77,7 +77,7 @@ def connect(request):
     return api_success(data)
 
 
-@api_view(['GET','POST'])
+@api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def proxy(request, system_id, system_url):
