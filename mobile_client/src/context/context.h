@@ -10,6 +10,7 @@ class QnMobileAppInfo;
 class QnContextSettings;
 class QnCloudStatusWatcher;
 class QnMobileClientUiController;
+class QnUserWatcher;
 
 class QnContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
@@ -20,6 +21,7 @@ class QnContext: public QObject, public QnInstanceStorage {
     Q_PROPERTY(QnContextSettings* settings READ settings NOTIFY settingsChanged)
     Q_PROPERTY(QnCloudStatusWatcher* cloudStatusWatcher READ cloudStatusWatcher NOTIFY cloudStatusWatcherChanged)
     Q_PROPERTY(QnMobileClientUiController* uiController READ uiController NOTIFY nothingChanged)
+    Q_PROPERTY(QnUserWatcher* userWatcher READ userWatcher NOTIFY nothingChanged)
     Q_PROPERTY(bool liteMode READ liteMode NOTIFY liteModeChanged)
 
 public:
@@ -44,6 +46,7 @@ public:
     }
 
     QnCloudStatusWatcher* cloudStatusWatcher() const;
+    QnUserWatcher* userWatcher() const;
 
     Q_INVOKABLE void enterFullscreen();
     Q_INVOKABLE void exitFullscreen();

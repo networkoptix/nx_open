@@ -36,7 +36,7 @@ Pane
         bottomPadding: 16
         systemName: connectionManager.systemName
         address: connectionManager.currentHost
-        user: connectionManager.currentLogin
+        user: userWatcher.userName
         ownerDescription: cloudInformationWatcher.ownerDescription
         cloud: connectionManager.connectionType == QnConnectionManager.CloudConnection
     }

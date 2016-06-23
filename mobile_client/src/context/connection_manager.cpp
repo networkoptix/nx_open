@@ -326,7 +326,8 @@ void QnConnectionManagerPrivate::doConnect() {
             static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
 
         qnCommon->setLocalSystemName(connectionInfo.systemName);
-        qnCommon->instance<QnUserWatcher>()->setUserName(url.userName());
+        qnCommon->instance<QnUserWatcher>()->setUserName(
+            connectionInfo.effectiveUserName.isEmpty() ? url.userName() : connectionInfo.effectiveUserName);
 
         updateConnectionState();
 
@@ -422,10 +423,7 @@ void QnConnectionManagerPrivate::storeConnection(
 {
     auto lastConnections = qnClientCoreSettings->recentUserConnections();
 
-    const auto password = storePassword ? url.password()
-                                        : QString();
-    const QnUserRecentConnectionData connectionInfo =
-        { systemName, url.userName(), password, storePassword };
+    const QnUserRecentConnectionData connectionInfo(QString(), systemName, url, storePassword);
 
     auto connectionEqual = [connectionInfo](const QnUserRecentConnectionData& connection)
     {
