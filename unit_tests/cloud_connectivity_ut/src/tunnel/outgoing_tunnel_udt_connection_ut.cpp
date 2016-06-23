@@ -310,7 +310,7 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
 
     nx::utils::promise<void> controlConnectionClosedPromise;
     tunnelConnection.setControlConnectionClosedHandler(
-        [&controlConnectionClosedPromise]
+        [&controlConnectionClosedPromise](SystemError::ErrorCode /*errorCode*/)
         {
             controlConnectionClosedPromise.set_value();
         });

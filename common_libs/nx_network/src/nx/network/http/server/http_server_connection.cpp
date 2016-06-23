@@ -75,13 +75,12 @@ namespace nx_http
             *this,
             request,
             [this, weakThis = std::move(weakThis), 
-                requestMessage = std::move(requestMessage)]
-            (
-                bool authenticationResult,
-                stree::ResourceContainer authInfo,
-                boost::optional<header::WWWAuthenticate> wwwAuthenticate,
-                nx_http::HttpHeaders responseHeaders,
-                std::unique_ptr<AbstractMsgBodySource> msgBody) mutable
+                requestMessage = std::move(requestMessage)](
+                    bool authenticationResult,
+                    stree::ResourceContainer authInfo,
+                    boost::optional<header::WWWAuthenticate> wwwAuthenticate,
+                    nx_http::HttpHeaders responseHeaders,
+                    std::unique_ptr<AbstractMsgBodySource> msgBody) mutable
             {
                 auto strongThis = weakThis.lock();
                 if (!strongThis)

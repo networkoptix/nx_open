@@ -39,12 +39,7 @@ public:
     virtual void authenticate(
         const nx_http::HttpServerConnection& connection,
         const nx_http::Request& request,
-        nx::utils::MoveOnlyFunc<void(
-            bool authenticationResult,
-            stree::ResourceContainer authInfo,
-            boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate,
-            nx_http::HttpHeaders responseHeaders,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody)> completionHandler) override;
+        nx_http::AuthenticationCompletionHandler completionHandler) override;
 
     static nx::String realm(); 
 
