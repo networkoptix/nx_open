@@ -147,7 +147,6 @@ void IncomingControlConnection::processRequest()
         m_buffer,
         [this]( SystemError::ErrorCode code, size_t)
         {
-            NX_EXPECT(code != SystemError::timedOut);
             if (code != SystemError::noError)
                 return handleError(code);
 
