@@ -480,7 +480,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.version = m_version;
     moduleInformation.systemInformation = m_systemInfo;
     moduleInformation.systemName = m_systemName;
-    moduleInformation.port = QUrl(getApiUrl()).port();
+    moduleInformation.port = getPort();
     moduleInformation.id = getId();
     moduleInformation.serverFlags = getServerFlags();
 
@@ -600,7 +600,7 @@ QString QnMediaServerResource::getApiUrl() const
     if (!address.isNull())
     {
         hostString = address.address.toString();
-        url.setPort(address.port);
+        url.setPort(address.port > 0 ? address.port : -1);
     }
     else
         hostString = lit("localhost");
