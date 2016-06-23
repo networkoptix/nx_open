@@ -29,14 +29,15 @@ namespace nx_http
             \param authProperties Properties found during authentication should be placed here (e.g., some entity ID)
         */
         virtual void authenticate(
-            const HttpServerConnection& connection,
+            const nx_http::HttpServerConnection& connection,
             const nx_http::Request& request,
             nx::utils::MoveOnlyFunc<void(
                 bool authenticationResult,
                 stree::ResourceContainer authInfo,
-                boost::optional<header::WWWAuthenticate> wwwAuthenticate,
+                boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate,
                 nx_http::HttpHeaders responseHeaders,
-                std::unique_ptr<AbstractMsgBodySource> msgBody)> completionHandler) = 0;
+                std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody)
+            > completionHandler) = 0;
     };
 }
 
