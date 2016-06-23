@@ -18,7 +18,6 @@
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/common/event_processors.h>
 #include <utils/common/string.h>
 
 
