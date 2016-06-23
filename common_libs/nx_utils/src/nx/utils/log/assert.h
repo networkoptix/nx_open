@@ -146,6 +146,6 @@ private:
     NX_EXPECT_IMPL(condition, lm("[%1] %2").arg(where).arg(message))
 
 /** debug: Leads to segfault in case of failure
- *  release: Does nothing (condition does not even evaluate) */
+ *  release: Does nothing (condition is not even evaluated) */
 #define NX_EXPECT(...) NX_MSVC_EXPAND( \
     NX_GET_4TH_ARG(__VA_ARGS__, NX_EXPECT3, NX_EXPECT2, NX_EXPECT1, args_reqired)(__VA_ARGS__))
