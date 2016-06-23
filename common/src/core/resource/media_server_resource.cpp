@@ -265,10 +265,11 @@ rest::QnConnectionPtr QnMediaServerResource::restConnection()
 void QnMediaServerResource::setUrl(const QString& url) 
 {
     QnResource::setUrl(url);
+    QString apiUrl = getApiUrl();
     {
         QnMutexLocker lock(&m_mutex);
         if (m_apiConnection)
-            m_apiConnection->setUrl(getApiUrl());
+            m_apiConnection->setUrl(apiUrl);
     }
     emit apiUrlChanged(toSharedPointer(this));
 }
