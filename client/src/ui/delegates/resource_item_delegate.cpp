@@ -142,6 +142,13 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         extraColor = m_colors.extraText;
     }
 
+    if (index.column() == Qn::CustomColumn)
+    {
+        QVariant customColor = index.data(Qt::ForegroundRole);
+        if (!customColor.isNull() && customColor.canConvert<QColor>())
+            mainColor = customColor.value<QColor>();
+    };
+
     /* Due to Qt bug, State_Editing is not set in option.state, so detect editing differently: */
     const QAbstractItemView* view = qobject_cast<const QAbstractItemView*>(option.widget);
     bool editing = view && view->indexWidget(option.index);
@@ -419,9 +426,11 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
 
 void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const
 {
-    const QString customExtInfoTemplate = lit(" - %1");
-
     baseName = index.data(Qt::DisplayRole).toString();
+    if (index.column() > Qn::NameColumn)
+        return;
+
+    static const QString kCustomExtInfoTemplate = lit(" - %1");
 
     /* Two-component text from resource information: */
     auto infoLevel = m_customInfoLevel;
@@ -438,7 +447,7 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
 
     if (nodeType == Qn::VideoWallItemNode)
     {
-        extInfo = customExtInfoTemplate.arg(resource->getName());
+        extInfo = kCustomExtInfoTemplate.arg(resource->getName());
     }
     else
     {
@@ -446,6 +455,6 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
         extInfo = info.extraInfo();
 
         if (resource->hasFlags(Qn::user) && !extInfo.isEmpty())
-            extInfo = customExtInfoTemplate.arg(extInfo);
+            extInfo = kCustomExtInfoTemplate.arg(extInfo);
     }
 }

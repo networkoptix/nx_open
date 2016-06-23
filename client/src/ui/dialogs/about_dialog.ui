@@ -31,6 +31,9 @@
      <property name="title">
       <string>Information</string>
      </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
        <number>8</number>
@@ -76,6 +79,9 @@
      </property>
      <property name="title">
       <string>Credits</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <property name="spacing">
@@ -123,6 +129,9 @@
      <property name="title">
       <string>GPU Information</string>
      </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <property name="spacing">
        <number>8</number>
@@ -168,6 +177,9 @@
      </property>
      <property name="title">
       <string>Connected servers</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <property name="spacing">
@@ -215,22 +227,10 @@
      <property name="title">
       <string>Support</string>
      </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_6">
-      <property name="spacing">
-       <number>8</number>
-      </property>
-      <property name="leftMargin">
-       <number>16</number>
-      </property>
-      <property name="topMargin">
-       <number>16</number>
-      </property>
-      <property name="rightMargin">
-       <number>16</number>
-      </property>
-      <property name="bottomMargin">
-       <number>16</number>
-      </property>
       <item>
        <widget class="QLabel" name="supportEmailLabel">
         <property name="text">
@@ -242,6 +242,13 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
     </widget>
    </item>
    <item>

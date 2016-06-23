@@ -315,8 +315,13 @@ bool QnInputField::isValid() const
 {
     Q_D(const QnInputField);
     if (d->validator)
-        return d->validator(d->input->text()).state == QValidator::Acceptable;
+    {
+        auto validatorResult = d->validator(d->input->text()).state;
+        if (validatorResult != QValidator::Acceptable)
+            return validatorResult;
+    }
 
+    /* We should anyway check password indicator (if present) */
     if (d->passwordIndicator)
         return d->passwordIndicator->currentInformation().acceptance() != QnPasswordInformation::Inacceptable;
 

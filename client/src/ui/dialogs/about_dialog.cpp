@@ -102,13 +102,13 @@ QString QnAboutDialog::connectedServers() const
         if (!server)
             continue;
 
-        QString serverText = lit("%1: v%2").arg(QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl), data.version.toString());
-
+        /* Consistency with QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered */
+        QString version = L'v' + data.version.toString();
         bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
-
         if (updateRequested)
-            serverText = setWarningStyleHtml(serverText);
+            version = setWarningStyleHtml(version);
 
+        QString serverText = lit("%1: %2").arg(QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl), version);
         servers << serverText;
     }
 

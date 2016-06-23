@@ -2234,7 +2234,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
         if (componentName.isEmpty())
             continue;
 
-        QString version = data.version.toString();
+        QString version = L'v' + data.version.toString();
 
         bool updateRequested = (data.component == Qn::ServerComponent) &&
             QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
@@ -2243,7 +2243,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
             version = setWarningStyleHtml(version);
 
         /* Consistency with 'About' dialog. */
-        QString component = lit("%1: v%2").arg(componentName, version);
+        QString component = lit("%1: %2").arg(componentName, version);
         messageParts << component;
     }
 
@@ -2262,10 +2262,11 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 
     QPushButton *updateButton = messageBox->addButton(tr("Update..."), QDialogButtonBox::HelpRole);
-    connect(updateButton, &QPushButton::clicked, this, [this]
+    connect(updateButton, &QPushButton::clicked, this, [this, dialog = messageBox.data()]
     {
+        dialog->accept();
         menu()->trigger(QnActions::SystemUpdateAction);
-    }, Qt::QueuedConnection);
+    });
 
     messageBox->exec();
 }

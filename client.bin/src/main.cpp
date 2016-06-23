@@ -114,12 +114,20 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
 
-    bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen;
+    QDesktopWidget *desktop = qApp->desktop();
+    bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen && startupParams.screen < desktop->screenCount();
     if (customScreen)
     {
         /* We must handle all 'WindowScreenChange' events _before_ we changing screen. */
         qApp->processEvents();
+
+        /* Set target screen for fullscreen mode. */
         mainWindow->windowHandle()->setScreen(QGuiApplication::screens().value(startupParams.screen, 0));
+
+        /* Set target position for the window when we set fullscreen off. */
+        QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
+        QPoint targetPosition = desktop->screenGeometry(startupParams.screen).topLeft() + screenDelta;
+        mainWindow->move(targetPosition);
     }
     mainWindow->show();
     if (customScreen)
