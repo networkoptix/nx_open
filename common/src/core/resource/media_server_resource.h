@@ -7,6 +7,7 @@
 #include <utils/common/value_cache.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
+#include <utils/common/safe_direct_connection.h>
 
 #include <core/resource/resource.h>
 
