@@ -74,6 +74,18 @@ bool ec2::hasPermission(const QnUuid &userId, const ApiUserGroupData&/*data*/, Q
     return false;
 }
 
+bool ec2::hasPermission(const QnUuid &userId, const ApiDiscoveredServerData&/*data*/, Qn::Permission permission)
+{
+    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+    if (permission == Qn::Permission::SavePermission)
+        return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+    else if (permission == Qn::Permission::ReadPermission)
+        return true;
+    else
+        NX_ASSERT(0);
+    return false;
+}
+
 bool ec2::hasPermission(const QnUuid &userId, const ApiServerFootageData &data, Qn::Permission permission)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
