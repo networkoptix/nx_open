@@ -38,6 +38,6 @@ Pane
         address: connectionManager.currentHost
         user: connectionManager.currentLogin
         ownerDescription: cloudInformationWatcher.ownerDescription
-        cloud: connectionManager.cloudSystem
+        cloud: connectionManager.connectionType == QnConnectionManager.CloudConnection
     }
 }
