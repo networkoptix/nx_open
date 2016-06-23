@@ -648,8 +648,8 @@ void QnLicensePool::addLicense(const QnLicensePtr &license)
 {
     QnMutexLocker locker( &m_mutex );
 
-    if (addLicense_i(license))
-        emit licensesChanged();
+    addLicense_i(license);
+    emit licensesChanged();
 }
 
 void QnLicensePool::removeLicense(const QnLicensePtr &license)
@@ -675,8 +675,8 @@ void QnLicensePool::addLicenses(const QnLicenseList &licenses)
 {
     QnMutexLocker locker( &m_mutex );
 
-    if (addLicenses_i(licenses))
-        emit licensesChanged();
+    addLicenses_i(licenses);
+    emit licensesChanged();
 }
 
 void QnLicensePool::replaceLicenses(const ec2::ApiLicenseDataList& licenses)

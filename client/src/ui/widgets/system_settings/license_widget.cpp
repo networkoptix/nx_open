@@ -124,6 +124,9 @@ bool QnLicenseWidget::isFreeLicenseAvailable() const
 
 void QnLicenseWidget::setFreeLicenseAvailable(bool available)
 {
+    if (m_freeLicenseAvailable == available)
+        return;
+
     m_freeLicenseAvailable = available;
     ui->activateFreeLicenseButton->setVisible(m_freeLicenseAvailable && isOnline());
 }

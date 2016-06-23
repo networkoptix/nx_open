@@ -34,6 +34,9 @@
      <property name="title">
       <string>Generic</string>
      </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
@@ -84,6 +87,9 @@
     <widget class="QGroupBox" name="featuresGroupBox">
      <property name="title">
       <string>Features</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
      </property>
      <layout class="QFormLayout" name="featuresLayout">
       <property name="fieldGrowthPolicy">

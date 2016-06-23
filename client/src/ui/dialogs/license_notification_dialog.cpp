@@ -15,32 +15,20 @@ QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget *parent, Qt::Wi
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     ui->treeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    QList<QnLicenseListModel::Column> columns;
-    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn  << QnLicenseListModel::LicenseStatusColumn;
-
     m_model = new QnLicenseListModel(this);
-    m_model->setColumns(columns);
+    ui->treeView->setColumnHidden(QnLicenseListModel::ExpirationDateColumn, true);
+    ui->treeView->setColumnHidden(QnLicenseListModel::ServerColumn, true);
     ui->treeView->setModel(m_model);
 }
 
-QnLicenseNotificationDialog::~QnLicenseNotificationDialog() {
-    return;
-}
+QnLicenseNotificationDialog::~QnLicenseNotificationDialog()
+{}
 
-const QList<QnLicensePtr> &QnLicenseNotificationDialog::licenses() const {
-    return m_model->licenses();
-}
+void QnLicenseNotificationDialog::setLicenses(const QnLicenseList& licenses)
+{
+    m_model->updateLicenses(licenses);
 
-void QnLicenseNotificationDialog::setLicenses(const QList<QnLicensePtr> &licenses) {
-    m_model->setLicenses(licenses);
-
-    // TODO: #Elric this code does not belong here.
-    int invalidCount = 0;
-    foreach(const QnLicensePtr &license, licenses)
-        if (!qnLicensePool->isLicenseValid(license))
-            invalidCount++;
-
-    if(invalidCount > 0)
+    if (std::any_of(licenses.cbegin(), licenses.cend(), [](const QnLicensePtr& license) { return !license->isValid(); }))
         ui->label->setText(tr("Some of your licenses are unavailable."));
     else
         ui->label->setText(tr("Some of your licenses will soon expire."));

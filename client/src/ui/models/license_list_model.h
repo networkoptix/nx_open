@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtGui/QStandardItemModel>
+#include <QtCore/QAbstractListModel>
 
 #include <client/client_color_types.h>
 
@@ -8,12 +8,12 @@
 
 #include <ui/customization/customized.h>
 
-class QnLicenseListModel : public Customized<QStandardItemModel>
+class QnLicenseListModel : public Customized<QAbstractListModel>
 {
     Q_OBJECT
     Q_PROPERTY(QnLicensesListModelColors colors READ colors WRITE setColors)
-    using base_type = Customized<QStandardItemModel>;
 
+    using base_type = Customized<QAbstractListModel>;
 public:
     enum Column
     {
@@ -23,30 +23,38 @@ public:
         ExpirationDateColumn,
         LicenseStatusColumn,
         ServerColumn,
+
         ColumnCount
     };
 
-    QnLicenseListModel(QObject *parent = NULL);
+    enum DataRole
+    {
+        LicenseRole = Qt::UserRole + 1
+    };
+
+    QnLicenseListModel(QObject* parent = nullptr);
     virtual ~QnLicenseListModel();
 
-    const QList<QnLicensePtr> &licenses() const;
-    void setLicenses(const QList<QnLicensePtr> &licenses);
+    virtual int rowCount(const QModelIndex& parent) const override;
+    virtual int columnCount(const QModelIndex& parent) const override;
+    virtual QVariant data(const QModelIndex& index, int role) const override;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    //virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-    QList<Column> columns() const;
-    void setColumns(const QList<Column> &columns);
+
+    void updateLicenses(const QnLicenseList& licenses);
 
     QnLicensePtr license(const QModelIndex &index) const;
+    void addLicense(const QnLicensePtr& license);
+    void removeLicense(const QnLicensePtr& license);
 
     const QnLicensesListModelColors colors() const;
     void setColors(const QnLicensesListModelColors &colors);
-private:
-    void rebuild();
 
-    static QString columnTitle(Column column);
-    static QStandardItem *createItem(Column column, const QnLicensePtr &license, const QnLicensesListModelColors &colors);
+private:
+    QString getLicenseStatus(const QnLicensePtr& license) const;
 
 private:
     QnLicensesListModelColors m_colors;
-    QList<Column> m_columns;
-    QList<QnLicensePtr> m_licenses;
+    QnLicenseList m_licenses;
 };
