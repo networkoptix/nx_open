@@ -477,7 +477,7 @@ void QnNxStyle::drawPrimitive(
                     readOnly = lineEdit->isReadOnly();
 
                     if (auto inputField = qobject_cast<const QnInputField*>(lineEdit->parent()))
-                        valid = inputField->lastValidationResult();
+                        valid = inputField->lastValidationResult() != QValidator::Invalid;
                     else
                         valid = lineEdit->hasAcceptableInput();
                 }
