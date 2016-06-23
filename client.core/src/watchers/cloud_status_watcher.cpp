@@ -301,17 +301,18 @@ void QnCloudStatusWatcherPrivate::updateCurrentSystem()
     Q_Q(QnCloudStatusWatcher);
 
     const auto systemId = qnGlobalSettings->cloudSystemID();
-    for (const auto& system: cloudSystems)
+
+    const auto it = std::find_if(
+        cloudSystems.begin(), cloudSystems.end(),
+        [systemId](const QnCloudSystem& system) { return systemId == system.id; });
+
+    if (it == cloudSystems.end())
+        return;
+
+    if (!it->fullEqual(currentSystem))
     {
-        if (system.id == systemId)
-        {
-            if (!system.fullEqual(currentSystem))
-            {
-                currentSystem = system;
-                emit q->currentSystemChanged(currentSystem);
-            }
-            return;
-        }
+        currentSystem = *it;
+        emit q->currentSystemChanged(currentSystem);
     }
 }
 

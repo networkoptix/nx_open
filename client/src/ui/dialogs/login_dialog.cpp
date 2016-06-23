@@ -20,6 +20,7 @@
 #include <common/common_module.h>
 
 #include <core/resource/resource.h>
+#include <client_core/client_core_settings.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/connection_name_dialog.h>
@@ -57,11 +58,26 @@ namespace {
                     widget->setEnabled(enabled);
     }
 
-    QStandardItem *newConnectionItem(QnConnectionData connection) {
-        if (connection == QnConnectionData())
-            return NULL;
-        QStandardItem *result = new QStandardItem(connection.name);
-        result->setData(connection.url, Qn::UrlRole);
+    QStandardItem* newConnectionItem(const QString& text, const QUrl& url)
+    {
+        if (url.isEmpty())
+            return nullptr;
+
+        auto result = new QStandardItem(text);
+        result->setData(url, Qn::UrlRole);
+        return result;
+    }
+
+    QStandardItem* newConnectionItem(const QnUserRecentConnectionData& connection) 
+    {
+        if (connection == QnUserRecentConnectionData())
+            return nullptr;
+
+        const auto text = (!connection.name.isEmpty() ? connection.name
+            : QObject::tr("%1 at %2").arg(connection.url.userName(), connection.systemName));
+
+        auto result = newConnectionItem(text, connection.url);
+        result->setData(QVariant::fromValue(connection), Qn::ConnectionInfoRole);
         return result;
     }
 
@@ -201,12 +217,8 @@ void QnLoginDialog::accept() {
         return;
     }
 
-    QString name = ui->connectionsComboBox->currentText();
-
-    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
-        url,
-        this,
-        [this, url, name](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
+    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(url,this, 
+        [this, url](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
     {
         if (m_requestHandle != handle)
             return; //connect was cancelled
@@ -217,12 +229,12 @@ void QnLoginDialog::accept() {
         QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
         switch (status) {
         case QnConnectionDiagnosticsHelper::Result::Success:
-        {
+        {   
+            const bool autoLogin = ui->autoLoginCheckBox->isChecked();
             QnActionParameters params;
             params.setArgument(Qn::UrlRole, url);
-            params.setArgument(Qn::AutoLoginRole, ui->autoLoginCheckBox->isChecked());
-            params.setArgument(Qn::StorePasswordRole, true);
-            params.setArgument(Qn::ConnectionAliasRole, name);
+            params.setArgument(Qn::AutoLoginRole, autoLogin);
+            params.setArgument(Qn::StorePasswordRole, autoLogin);
             menu()->trigger(QnActions::ConnectAction, params);
             break;
         }
@@ -279,16 +291,21 @@ void QnLoginDialog::hideEvent(QHideEvent *event)
     m_renderingWidget->stopPlayback();
 }
 
-void QnLoginDialog::resetConnectionsModel() {
-    QnConnectionDataList connections = qnSettings->customConnections();
+void QnLoginDialog::resetConnectionsModel() 
+{
 
     if (m_lastUsedItem != NULL)
         m_connectionsModel->removeRow(0); //last-used-connection row
 
     QModelIndex selectedIndex;
-    m_lastUsedItem = newConnectionItem(connections.getByName(QnConnectionDataList::defaultLastUsedNameKey()));
-    if (m_lastUsedItem != NULL) {
-        m_lastUsedItem->setText(tr("* Last used connection *"));
+    auto connections = qnClientCoreSettings->recentUserConnections();
+    const auto lastConnection = (connections.empty() ? 
+        QnUserRecentConnectionData() : connections.first());
+
+    m_lastUsedItem = newConnectionItem(tr("* Last used connection *"), lastConnection.url);
+
+    if (m_lastUsedItem != NULL) 
+    {
         m_connectionsModel->insertRow(0, m_lastUsedItem);
         selectedIndex = m_connectionsModel->index(0, 0);
     }
@@ -303,15 +320,19 @@ void QnLoginDialog::resetConnectionsModel() {
     at_connectionsComboBox_currentIndexChanged(selectedIndex);
 }
 
-void QnLoginDialog::resetSavedSessionsModel() {
-    QnConnectionDataList connections = qnSettings->customConnections();
-    if (connections.isEmpty())
-        connections.append(qnSettings->defaultConnection());
+void QnLoginDialog::resetSavedSessionsModel() 
+{
+    auto recentConnections = qnClientCoreSettings->recentUserConnections();
+
+    if (recentConnections.isEmpty())
+        recentConnections.append(qnSettings->defaultConnection());
 
     m_savedSessionsItem->removeRows(0, m_savedSessionsItem->rowCount());
-    foreach (const QnConnectionData &connection, connections) {
-        if (connection.name == QnConnectionDataList::defaultLastUsedNameKey())
+    for (const auto& connection: recentConnections) 
+    {
+        if (!connection.isStoredPassword && connection.name.isEmpty())
             continue;
+
         m_savedSessionsItem->appendRow(newConnectionItem(connection));
     }
 }
@@ -399,7 +420,10 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
         ? lit("admin")  // 99% of users have only one login - admin
         : url.userName());
     ui->passwordLineEdit->setText(url.password());
-    ui->deleteButton->setEnabled(qnSettings->customConnections().contains(ui->connectionsComboBox->currentText()));
+
+    const auto currentConnection = ui->connectionsComboBox->currentData(
+        Qn::ConnectionInfoRole).value<QnUserRecentConnectionData>();
+    ui->deleteButton->setEnabled(currentConnection != QnUserRecentConnectionData());
     ui->autoLoginCheckBox->setChecked(false);
     updateFocus();
 }
@@ -427,8 +451,28 @@ void QnLoginDialog::at_testButton_clicked() {
         accept();
 }
 
+QString QnLoginDialog::gatherSystemName(const QUrl& url)
+{
+    QEventLoop loop;
+    QString systemName;
+    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(url, this,
+        [this, &loop, &systemName, url]
+    (int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
+    {
+        systemName = connectionInfo.systemName;
+        if (m_requestHandle == handle)
+            m_requestHandle = -1;
+
+        loop.quit();
+    });
+
+    loop.exec();
+
+    return systemName;
+}
+
 void QnLoginDialog::at_saveButton_clicked() {
-    QUrl url = currentUrl();
+    const QUrl url = currentUrl();
 
     if (!url.isValid()) {
         QnMessageBox::warning(this, tr("Invalid Paramaters"), tr("Entered hostname is not valid."));
@@ -441,8 +485,6 @@ void QnLoginDialog::at_saveButton_clicked() {
         ui->hostnameLineEdit->setFocus();
         return;
     }
-
-    QnConnectionDataList connections = qnSettings->customConnections();
 
     QString name = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
     bool savePassword = !ui->passwordLineEdit->text().isEmpty();
@@ -464,30 +506,72 @@ void QnLoginDialog::at_saveButton_clicked() {
     QString password = ui->passwordLineEdit->text();
     bool autoLogin = qnSettings->autoLogin();
 
-    if (connections.contains(name)){
-        QDialogButtonBox::StandardButton button = QnMessageBox::warning(this, tr("Connection already exists."),
-                                                                  tr("A connection with this name already exists. Do you want to overwrite it?"),
-                                                                  QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-                                                                  QDialogButtonBox::Yes);
-        switch(button) {
-        case QDialogButtonBox::Cancel:
-            return;
-        case QDialogButtonBox::No:
-            name = connections.generateUniqueName(name);
-            break;
-        case QDialogButtonBox::Yes:
-            connections.removeOne(name);
-            break;
-        default:
-            break;
+    auto connections = qnClientCoreSettings->recentUserConnections();
+    const auto connectionIndex = connections.getIndexByName(name);
+    if ((connectionIndex != QnUserRecentConnectionDataList::kNotFoundIndex) &&
+        connections.at(connectionIndex).isStoredPassword)
+    {
+        const auto button = QnMessageBox::warning(this, tr("Connection already exists."),
+            tr("A connection with this name already exists. Do you want to overwrite it?"),
+            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, 
+            QDialogButtonBox::Yes);
+
+        switch(button) 
+        {
+            case QDialogButtonBox::Cancel:
+                return;
+            case QDialogButtonBox::No:
+                name = connections.generateUniqueName(name);
+                break;
+            case QDialogButtonBox::Yes:
+                connections.remove(name);
+                break;
+            default:
+                break;
         }
     }
 
-    QnConnectionData connectionData(name, currentUrl());
+    const auto systemName = gatherSystemName(url);
+    if (systemName.isEmpty())
+    {
+        const auto button = QnMessageBox::warning(this, tr("Can not connect to the server"),
+            tr("Can not connect to server with specified credentials. Do you want to save this connection?"),
+            QDialogButtonBox::Yes | QDialogButtonBox::No, QDialogButtonBox::No);
+        
+        if (button == QDialogButtonBox::No)
+            return;
+    }
+
+    bool rejected = false;
+    const auto itNewEnd = std::remove_if(connections.begin(), connections.end(),
+        [this, &rejected, systemName, userName = url.userName()] 
+        (const QnUserRecentConnectionData& connection)
+    {
+        if (rejected || (connection.systemName != systemName) || (connection.url.userName() != userName))
+            return false;
+
+        if (!connection.isStoredPassword)   // remove all recent connections, if any
+            return true;
+
+        static const auto kMessageTemplate = tr("A connection to the system \"%1\" with user \"%2\" already exists. Do you want to overwrite it?");
+        const auto message = kMessageTemplate.arg(systemName, userName);
+        const QDialogButtonBox::StandardButton button =
+            QnMessageBox::warning(this, tr("Connection already exists."), message,
+                QDialogButtonBox::Yes | QDialogButtonBox::Cancel, QDialogButtonBox::Yes);
+
+        rejected |= (button != QDialogButtonBox::Yes);
+        return !rejected;
+    });
+
+    if (rejected)
+        return;
+
+    connections.erase(itNewEnd, connections.end());
+    QnUserRecentConnectionData connectionData(name, systemName, url, savePassword);
     if (!savePassword)
         connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
-    qnSettings->setCustomConnections(connections);
+    qnClientCoreSettings->setRecentUserConnections(connections);
 
     resetSavedSessionsModel();
 
@@ -501,23 +585,29 @@ void QnLoginDialog::at_saveButton_clicked() {
 
 void QnLoginDialog::at_deleteButton_clicked()
 {
-    QnConnectionDataList connections = qnSettings->customConnections();
+    auto connections = qnClientCoreSettings->recentUserConnections();
 
-    QString name = ui->connectionsComboBox->currentText();
-    if (!connections.contains(name))
+    auto connection = ui->connectionsComboBox->currentData(
+        Qn::ConnectionInfoRole).value<QnUserRecentConnectionData>();
+    if (!connections.contains(connection))
         return;
 
     if (QnMessageBox::warning(this,
-                              tr("Delete Connections"),
-                              tr("Are you sure you want to delete this connection: %1?").arg(L'\n' + name),
-                              QDialogButtonBox::Yes | QDialogButtonBox::No,
-                              QDialogButtonBox::No)
+        tr("Delete Connections"),
+        tr("Are you sure you want to delete this connection: %1?").arg(L'\n' + connection.name),
+        QDialogButtonBox::Yes | QDialogButtonBox::No,
+        QDialogButtonBox::No)
         != QDialogButtonBox::Yes)
+    {
         return;
+    }
 
+    connections.removeAll(connection);
+    connection.isStoredPassword = false;
+    connection.name = QString();
+    connections.prepend(connection);
 
-    connections.removeOne(name);
-    qnSettings->setCustomConnections(connections);
+    qnClientCoreSettings->setRecentUserConnections(connections);
     resetConnectionsModel();
 }
 

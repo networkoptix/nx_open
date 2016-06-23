@@ -77,6 +77,8 @@ private:
     QUrl currentUrl() const;
     QString currentName() const;
 
+    QString gatherSystemName(const QUrl& url);
+
 private:
     QScopedPointer<Ui::LoginDialog> ui;
     QStandardItemModel *m_connectionsModel;

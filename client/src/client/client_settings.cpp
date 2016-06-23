@@ -23,39 +23,8 @@
 #include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
 
-
 namespace {
     const QString xorKey = lit("ItIsAGoodDayToDie");
-
-    QnConnectionData readConnectionData(QSettings *settings)
-    {
-        QnConnectionData connection;
-        connection.name = settings->value(lit("name")).toString();
-        connection.url = settings->value(lit("url")).toString();
-        connection.url.setScheme(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http"));
-        connection.readOnly = (settings->value(lit("readOnly")).toString() == lit("true"));
-
-        QString password = settings->value(lit("pwd")).toString();
-        if (!password.isEmpty())
-            connection.url.setPassword(xorDecrypt(password, xorKey));
-
-        return connection;
-    }
-
-    void writeConnectionData(QSettings *settings, const QnConnectionData &connection)
-    {
-        QUrl url = connection.url;
-        QString password = url.password().isEmpty()
-            ? QString()
-            : xorEncrypt(url.password(), xorKey);
-
-        url.setPassword(QString()); /* Don't store password in plain text. */
-
-        settings->setValue(lit("name"), connection.name);
-        settings->setValue(lit("pwd"), password);
-        settings->setValue(lit("url"), url.toString());
-        settings->setValue(lit("readOnly"), connection.readOnly);
-    }
 
 } // anonymous namespace
 
@@ -118,43 +87,28 @@ QnClientSettings::~QnClientSettings() {
 QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
     switch(id) {
     case DEFAULT_CONNECTION: {
-        QnConnectionData result;
+        QnUserRecentConnectionData result;
         result.url.setScheme(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http"));
         result.url.setHost(settings->value(QLatin1String("appserverHost"), QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
         result.url.setPort(settings->value(QLatin1String("appserverPort"), DEFAULT_APPSERVER_PORT).toInt());
         result.url.setUserName(settings->value(QLatin1String("appserverLogin"), QLatin1String("admin")).toString());
         result.name = QLatin1String("default");
-        result.readOnly = true;
 
-        if(!result.isValid())
+        if(!result.url.isValid() || result.url.isRelative() || result.url.host().isEmpty())
             result.url = QUrl(QString(QLatin1String("%1://admin@%2:%3")).
                 arg(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http")).
                 arg(QLatin1String(DEFAULT_APPSERVER_HOST)).
                 arg(DEFAULT_APPSERVER_PORT));
 
-        return QVariant::fromValue<QnConnectionData>(result);
+        return QVariant::fromValue<QnUserRecentConnectionData>(result);
     }
     case LAST_USED_CONNECTION: {
         settings->beginGroup(QLatin1String("AppServerConnections"));
         settings->beginGroup(QLatin1String("lastUsed"));
-        QnConnectionData result = readConnectionData(settings);
+        auto result = QnUserRecentConnectionData::fromSettings(settings);
         settings->endGroup();
         settings->endGroup();
-        return QVariant::fromValue<QnConnectionData>(result);
-    }
-    case CUSTOM_CONNECTIONS: {
-        QnConnectionDataList result;
-
-        const int size = settings->beginReadArray(QLatin1String("AppServerConnections"));
-        for (int i = 0; i < size; ++i) {
-            settings->setArrayIndex(i);
-            QnConnectionData connection = readConnectionData(settings);
-            if (connection.isValid())
-                result.append(connection);
-        }
-        settings->endArray();
-
-        return QVariant::fromValue<QnConnectionDataList>(result);
+        return QVariant::fromValue<QnUserRecentConnectionData>(result);
     }
     case AUDIO_VOLUME: {
         settings->beginGroup(QLatin1String("audioControl"));
@@ -200,31 +154,10 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case LAST_USED_CONNECTION:
         settings->beginGroup(QLatin1String("AppServerConnections"));
         settings->beginGroup(QLatin1String("lastUsed"));
-        writeConnectionData(settings, value.value<QnConnectionData>());
+        QnUserRecentConnectionData::writeToSettings(settings, value.value<QnUserRecentConnectionData>());
         settings->endGroup();
         settings->endGroup();
         break;
-    case CUSTOM_CONNECTIONS:
-    {
-        settings->beginWriteArray(QLatin1String("AppServerConnections"));
-        settings->remove(QLatin1String("")); /* Clear children. */
-        int i = 0;
-        foreach (const QnConnectionData &connection, value.value<QnConnectionDataList>()) {
-            if (!connection.isValid())
-                continue;
-
-            if (connection.name.trimmed().isEmpty())
-                continue; /* Last used one. */
-
-            settings->setArrayIndex(i++);
-            writeConnectionData(settings, connection);
-        }
-        settings->endArray();
-
-        /* Write out last used connection as it has been cleared. */
-        writeValueToSettings(settings, LAST_USED_CONNECTION, QVariant::fromValue<QnConnectionData>(lastUsedConnection()));
-        break;
-    }
     case AUDIO_VOLUME:
     {
         settings->beginGroup(QLatin1String("audioControl"));

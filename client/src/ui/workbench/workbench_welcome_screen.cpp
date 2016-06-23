@@ -183,6 +183,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
         QnActionParameters params;
         params.setArgument(Qn::UrlRole, url);
         params.setArgument(Qn::StorePasswordRole, storePassword);
+        params.setArgument(Qn::ForceRemoveOldConnectionRole, !storePassword);
         params.setArgument(Qn::AutoLoginRole, autoLogin);
         menu()->trigger(QnActions::ConnectAction, params);
     };
