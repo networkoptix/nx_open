@@ -31,7 +31,7 @@ public:
      * Returns true if transmitter is compatible with AudioFormat
      * Otherwise (default) video + audio is opened
      */
-    virtual bool isCompatible(const QnAudioFormat& format) const { return false; }
+    virtual bool isCompatible(const QnAudioFormat& /*format*/) const { return false; }
 
     /**
      * Set output format for transmitter
