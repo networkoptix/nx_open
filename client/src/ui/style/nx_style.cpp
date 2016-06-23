@@ -478,8 +478,6 @@ void QnNxStyle::drawPrimitive(
 
                     if (auto inputField = qobject_cast<const QnInputField*>(lineEdit->parent()))
                         valid = inputField->lastValidationResult() != QValidator::Invalid;
-                    else
-                        valid = lineEdit->hasAcceptableInput();
                 }
                 else if (auto plainTextEdit = qobject_cast<const QPlainTextEdit*>(widget))
                 {
