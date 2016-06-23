@@ -21,6 +21,8 @@ public:
 
     int rowHeight(const QModelIndex &index) const;
 
+    virtual QSize viewportSizeHint() const override;
+
 signals:
     /**
      * This signal is emitted whenever the user presses enter on one of the

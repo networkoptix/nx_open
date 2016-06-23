@@ -55,7 +55,7 @@ public:
     bool validate();
 
     bool isValid() const;
-    bool lastValidationResult() const;
+    QValidator::State lastValidationResult() const;
 
     void setValidator(Qn::TextValidateFunction validator, bool validateImmediately = false);
 

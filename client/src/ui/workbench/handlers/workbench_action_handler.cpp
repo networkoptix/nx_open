@@ -23,7 +23,6 @@
 #include <camera/cam_display.h>
 #include <camera/camera_data_manager.h>
 
-#include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>

@@ -21,7 +21,8 @@
 namespace {
 
     const QnSoftwareVersion minimalSupportedVersion(2, 5, 0, 0);
-    const QString kCloudSystemScheme = lit("cloud");
+    const QString kCloudConnectionScheme = lit("cloud");
+    const QString kLiteClientConntectionScheme = lit("liteclient");
 
     enum { kInvalidHandle = -1 };
 
@@ -31,6 +32,15 @@ namespace {
                 product1.left(product1.indexOf(lit("_"))) == product2.left(product2.indexOf(lit("_")));
     }
 
+    QnConnectionManager::ConnectionType connectionTypeByScheme(const QString& scheme)
+    {
+        if (scheme == kCloudConnectionScheme)
+            return QnConnectionManager::CloudConnection;
+        else if (scheme == kLiteClientConntectionScheme)
+            return QnConnectionManager::LiteClientConnection;
+        else
+            return QnConnectionManager::NormalConnection;
+    }
 }
 
 class QnConnectionManagerPrivate : public Connective<QObject> {
@@ -66,6 +76,7 @@ public:
     int connectionHandle;
     QnConnectionManager::State connectionState;
     QnSoftwareVersion connectionVersion;
+    QnConnectionManager::ConnectionType connectionType;
 };
 
 QnConnectionManager::QnConnectionManager(QObject *parent) :
@@ -86,7 +97,6 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentHostChanged);
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentLoginChanged);
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentPasswordChanged);
-    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::isCloudSystemChanged);
     connect(this, &QnConnectionManager::connectionStateChanged, this, &QnConnectionManager::isOnlineChanged);
 }
 
@@ -107,6 +117,12 @@ bool QnConnectionManager::isOnline() const
 {
     Q_D(const QnConnectionManager);
     return d->connectionState == Connected || d->connectionState == Suspended;
+}
+
+QnConnectionManager::ConnectionType QnConnectionManager::connectionType() const
+{
+    Q_D(const QnConnectionManager);
+    return d->connectionType;
 }
 
 int QnConnectionManager::defaultServerPort() const {
@@ -135,12 +151,6 @@ QString QnConnectionManager::currentPassword() const
 {
     Q_D(const QnConnectionManager);
     return d->url.isValid() ? d->url.password() : QString();
-}
-
-bool QnConnectionManager::isCloudSystem() const
-{
-    Q_D(const QnConnectionManager);
-    return d->url.scheme() == kCloudSystemScheme;
 }
 
 QnSoftwareVersion QnConnectionManager::connectionVersion() const
@@ -316,7 +326,8 @@ void QnConnectionManagerPrivate::doConnect() {
             static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
 
         qnCommon->setLocalSystemName(connectionInfo.systemName);
-        qnCommon->instance<QnUserWatcher>()->setUserName(url.userName());
+        qnCommon->instance<QnUserWatcher>()->setUserName(
+            connectionInfo.effectiveUserName.isEmpty() ? url.userName() : connectionInfo.effectiveUserName);
 
         updateConnectionState();
 
@@ -396,6 +407,13 @@ void QnConnectionManagerPrivate::setUrl(const QUrl& url)
     Q_Q(QnConnectionManager);
     this->url = url;
     emit q->currentUrlChanged();
+
+    const auto connectionType = connectionTypeByScheme(url.scheme());
+    if (this->connectionType != connectionType)
+    {
+        this->connectionType = connectionType;
+        emit q->connectionTypeChanged();
+    }
 }
 
 void QnConnectionManagerPrivate::storeConnection(
@@ -405,10 +423,7 @@ void QnConnectionManagerPrivate::storeConnection(
 {
     auto lastConnections = qnClientCoreSettings->recentUserConnections();
 
-    const auto password = storePassword ? url.password()
-                                        : QString();
-    const QnUserRecentConnectionData connectionInfo =
-        { systemName, url.userName(), password, storePassword };
+    const QnUserRecentConnectionData connectionInfo(QString(), systemName, url, storePassword);
 
     auto connectionEqual = [connectionInfo](const QnUserRecentConnectionData& connection)
     {
