@@ -334,6 +334,8 @@ void OutgoingTunnel::onConnectorFinished(
             return; //tunnel has already been connected, just ignoring this connection
 
         m_connection = std::move(connection);
+        m_connection->setControlConnectionClosedHandler(
+            std::bind(&OutgoingTunnel::onTunnelClosed, this, std::placeholders::_1));
         m_state = State::kConnected;
         //we've connected to the host. Requesting client connections
         for (auto& connectRequest: m_connectHandlers)
