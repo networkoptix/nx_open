@@ -751,8 +751,6 @@ private:
     template<typename Param>
     bool hasPermission(const Param &param, Qn::Permission permission)
     {
-        if (m_userAccessData == Qn::kDefaultUserAccess)
-            return true;
         switch (permission)
         {
         case Qn::Permission::SavePermission:
