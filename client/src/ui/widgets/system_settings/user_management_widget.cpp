@@ -29,6 +29,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <utils/common/event_processors.h>
 #include <utils/common/ldap.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
@@ -114,6 +115,8 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
 {
     ui->setupUi(this);
 
+    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
+
     m_sortModel->setSourceModel(m_usersModel);
 
     auto hoverTracker = new QnItemViewHoverTracker(ui->usersTable);
@@ -139,8 +142,8 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     connect(qnGlobalSettings, &QnGlobalSettings::ldapSettingsChanged, this, &QnUserManagementWidget::updateLdapState);
+    connect(ui->usersTable,   &QAbstractItemView::clicked,            this, &QnUserManagementWidget::at_usersTable_clicked);
 
-    connect(ui->usersTable,              &QTableView::clicked,   this,  &QnUserManagementWidget::at_usersTable_clicked);
     connect(ui->createUserButton,        &QPushButton::clicked,  this,  &QnUserManagementWidget::createUser);
     connect(ui->rolesButton,             &QPushButton::clicked,  this,  &QnUserManagementWidget::editRoles);
     connect(ui->clearSelectionButton,    &QPushButton::clicked,  this,  &QnUserManagementWidget::clearSelection);
@@ -163,6 +166,37 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     connect(m_sortModel, &QAbstractItemModel::rowsInserted, this,   &QnUserManagementWidget::modelUpdated);
     connect(m_sortModel, &QAbstractItemModel::rowsRemoved,  this,   &QnUserManagementWidget::modelUpdated);
     connect(m_sortModel, &QAbstractItemModel::dataChanged,  this,   &QnUserManagementWidget::modelUpdated);
+
+    /* By [Space] toggle checkbox: */
+    connect(ui->usersTable, &QnTreeView::spacePressed, this, [this](const QModelIndex& index)
+    {
+        at_usersTable_clicked(index.sibling(index.row(), QnUserListModel::CheckBoxColumn));
+    });
+
+    /* By [Left] disable user, by [Right] enable user: */
+    auto keySignalizer = new QnSingleEventSignalizer(this);
+    keySignalizer->setEventType(QEvent::KeyPress);
+    ui->usersTable->installEventFilter(keySignalizer);
+    connect(keySignalizer, &QnSingleEventSignalizer::activated, this, [this](QObject* object, QEvent* event)
+    {
+        Q_UNUSED(object);
+        int key = static_cast<QKeyEvent*>(event)->key();
+        switch (key)
+        {
+            case Qt::Key_Left:
+            case Qt::Key_Right:
+            {
+                if (!ui->usersTable->currentIndex().isValid())
+                    return;
+                QnUserResourcePtr user = ui->usersTable->currentIndex().data(Qn::UserResourceRole).value<QnUserResourcePtr>();
+                if (!user)
+                    return;
+                enableUser(user, key == Qt::Key_Right);
+            }
+            default:
+                return;
+        }
+    });
 
     setHelpTopic(this,                                                  Qn::SystemSettings_UserManagement_Help);
     setHelpTopic(ui->enableSelectedButton, ui->disableSelectedButton,   Qn::UserSettings_DisableUser_Help);
