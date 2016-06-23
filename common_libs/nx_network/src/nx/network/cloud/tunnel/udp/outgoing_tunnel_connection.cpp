@@ -114,7 +114,7 @@ void OutgoingTunnelConnection::establishNewConnection(
 
     auto newConnection = std::make_unique<UdtStreamSocket>();
     if (!socketAttributes.applyTo(newConnection.get()) ||
-        !newConnection->bind(m_localPunchedAddress) ||
+        !newConnection->bind(SocketAddress(HostAddress::anyHost, m_localPunchedAddress.port)) ||
         !newConnection->setNonBlockingMode(true))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
