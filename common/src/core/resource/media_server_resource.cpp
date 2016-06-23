@@ -262,6 +262,17 @@ rest::QnConnectionPtr QnMediaServerResource::restConnection()
     return m_restConnection;
 }
 
+void QnMediaServerResource::setUrl(const QString& url) 
+{
+    QnResource::setUrl(url);
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_apiConnection)
+            m_apiConnection->setUrl(getApiUrl());
+    }
+    emit apiUrlChanged(toSharedPointer(this));
+}
+
 QnStorageResourceList QnMediaServerResource::getStorages() const
 {
     return qnResPool->getResourcesByParentId(getId()).filtered<QnStorageResource>();
@@ -269,7 +280,6 @@ QnStorageResourceList QnMediaServerResource::getStorages() const
 
 void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddress)
 {
-    QString apiScheme = QUrl(getApiUrl()).scheme();
     QString urlScheme = QUrl(getUrl()).scheme();
     setUrl(lit("%1://%2").arg(urlScheme).arg(primaryAddress.toString()));
 }
@@ -596,16 +606,22 @@ QString QnMediaServerResource::getApiUrl() const
 {
     QUrl url;
     SocketAddress address = QnModuleFinder::instance()->primaryAddress(getId());
-    QString hostString;
+    QString hostString = lit("localhost");
+    int port = -1;
     if (!address.isNull())
     {
         hostString = address.address.toString();
-        url.setPort(address.port > 0 ? address.port : -1);
+        port = address.port > 0 ? address.port : -1;
     }
-    else
-        hostString = lit("localhost");
+    else if (!getUrl().isEmpty())
+    {
+        QUrl url(getUrl());
+        hostString = url.host();
+        port = url.port();
+    }
     url.setHost(hostString);
-    url.setScheme(lit("http"));
+    url.setPort(port);
+    url.setScheme(lit("https"));
 
     return url.toString();
 }
