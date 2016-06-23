@@ -34,12 +34,10 @@
 #include "config.h"
 using mobile_client::conf;
 
-// TODO mike: Remove if replacement URL does not require it.
-#include "context/connection_manager.h"
-
 // TODO mike: REMOVE
 #define OUTPUT_PREFIX "mobile_client[main]: "
 #include <nx/utils/debug_utils.h>
+#include <ui/videowall_handler.h>
 
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -57,6 +55,8 @@ int runUi(QGuiApplication *application) {
     QGuiApplication::setFont(font);
 
     QnContext context;
+
+    qnCommon->instance<QnVideowallHandler>()->setUiController(context.uiController());
 
     QStringList selectors;
 
@@ -224,10 +224,19 @@ int main(int argc, char *argv[])
     conf.reload();
     initLog();
 
+    QnMobileClientModule mobile_client;
+    Q_UNUSED(mobile_client);
+
+    parseCommandLine(application);
+
+    // TODO #mike: Detect existing app instance: consider doing it in the script.
+
+    // TODO #mike: Use parseCommandLine() instead.
+
     if (argc > 1 && argv[1][0] != '\0')
     {
         PRINT << "Setting replacement url from argv[1]: \"" << argv[1] << "\"";
-        connectToServerReplacementUrl = QUrl(QString::fromLatin1(argv[1]));
+        qnSettings->setLastUsedUrl(QString::fromLatin1(argv[1]));
     }
 
     QnUuid videowallInstanceGuid;
@@ -237,10 +246,6 @@ int main(int argc, char *argv[])
         videowallInstanceGuid = QnUuid::fromStringSafe(QString::fromLatin1(argv[2]));
     }
 
-    QnMobileClientModule mobile_client;
-    Q_UNUSED(mobile_client)
-
-    parseCommandLine(application);
     migrateSettings();
 
     int result = runApplication(&application, videowallInstanceGuid);

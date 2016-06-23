@@ -60,7 +60,7 @@ int QnStartLiteClientRestHandler::executeGet(
     const QString password = server->getAuthKey();
     const QString effectiveUserName = user->getName();
 
-    const QUrl url(lit("http://%1:%2@127.0.0.1:%3?effectiveUserName=%4")
+    const QUrl url(lit("liteclient://%1:%2@127.0.0.1:%3?effectiveUserName=%4")
        .arg(userName).arg(password).arg(port).arg(effectiveUserName));
 
     const QnUuid videowallInstanceGuid = server->getId();

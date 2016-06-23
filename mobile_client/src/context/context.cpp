@@ -150,20 +150,25 @@ QString QnContext::getLastUsedSystemId() const
 QString QnContext::getLastUsedUrl() const
 {
     QUrl url = qnSettings->lastUsedUrl();
+    qDebug() << "=============>" << url << url.isValid();
     if (!url.isValid() || url.userName().isEmpty())
         return QString();
 
-    QnRecentUserConnectionsModel connectionsModel;
-    connectionsModel.setSystemName(getLastUsedSystemId());
-    if (!connectionsModel.hasConnections())
-        return QString();
+    if (url.password().isEmpty())
+    {
+        QnRecentUserConnectionsModel connectionsModel;
+        connectionsModel.setSystemName(getLastUsedSystemId());
+        if (!connectionsModel.hasConnections())
+            return QString();
 
-    const auto firstIndex = connectionsModel.index(0);
-    QString password = connectionsModel.data(firstIndex, QnRecentUserConnectionsModel::PasswordRole).toString();
-    if (password.isEmpty())
-        return QString();
+        const auto firstIndex = connectionsModel.index(0);
+        QString password = connectionsModel.data(firstIndex, QnRecentUserConnectionsModel::PasswordRole).toString();
+        if (password.isEmpty())
+            return QString();
 
-    url.setPassword(password);
+        url.setPassword(password);
+    }
+
     return url.toString();
 }
 
