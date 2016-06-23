@@ -20,6 +20,15 @@
 
 namespace nx_http
 {
+    typedef
+        nx::utils::MoveOnlyFunc<void(
+            bool authenticationResult,
+            stree::ResourceContainer authInfo,
+            boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate,
+            nx_http::HttpHeaders responseHeaders,
+            std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody)
+        > AuthenticationCompletionHandler;
+
     class NX_NETWORK_API AbstractAuthenticationManager
     {
     public:
@@ -31,13 +40,7 @@ namespace nx_http
         virtual void authenticate(
             const nx_http::HttpServerConnection& connection,
             const nx_http::Request& request,
-            nx::utils::MoveOnlyFunc<void(
-                bool authenticationResult,
-                stree::ResourceContainer authInfo,
-                boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate,
-                nx_http::HttpHeaders responseHeaders,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody)
-            > completionHandler) = 0;
+            AuthenticationCompletionHandler completionHandler) = 0;
     };
 }
 
