@@ -234,7 +234,6 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
                 m_exportReader.clear();
             }
 
-            /* There is a possibility we have already cleared the smart pointer, e.g. in stopExport() method. */
             sender()->deleteLater();
         });
 
