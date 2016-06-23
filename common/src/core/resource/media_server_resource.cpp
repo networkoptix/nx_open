@@ -596,11 +596,15 @@ QString QnMediaServerResource::getApiUrl() const
 {
     QUrl url;
     SocketAddress address = QnModuleFinder::instance()->primaryAddress(getId());
-    QString hostString = address.address.toString();
-    if (hostString.isNull() || hostString.isEmpty())
+    QString hostString;
+    if (!address.isNull())
+    {
+        hostString = address.address.toString();
+        url.setPort(address.port);
+    }
+    else
         hostString = lit("localhost");
     url.setHost(hostString);
-    url.setPort(address.port);
     url.setScheme(lit("http"));
 
     return url.toString();
