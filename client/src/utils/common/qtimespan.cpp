@@ -70,6 +70,38 @@
 #endif
 
 
+namespace {
+
+    /* Return previous (smaller) unit. */
+    Qt::TimeSpanUnit prevUnit(Qt::TimeSpanUnit value)
+    {
+        Q_ASSERT_X(value > Qt::Milliseconds, Q_FUNC_INFO, "Mimimal unit already");
+        return static_cast<Qt::TimeSpanUnit>(value >> 1);
+    }
+
+    /* Return next (bigger) unit. */
+    Qt::TimeSpanUnit nextUnit(Qt::TimeSpanUnit value)
+    {
+        Q_ASSERT_X(value < Qt::Years, Q_FUNC_INFO, "Maximal unit already");
+        return static_cast<Qt::TimeSpanUnit>(value << 1);
+    }
+
+    Qt::TimeSpanUnit smallestUnit(Qt::TimeSpanFormat format)
+    {
+        if (format == Qt::NoUnit)
+            return Qt::NoUnit;
+
+        Qt::TimeSpanUnit result = Qt::Milliseconds;
+        while (result < Qt::Years && !format.testFlag(result))
+            result = nextUnit(result);
+
+        Q_ASSERT_X(format.testFlag(result), Q_FUNC_INFO, "Invalid format");
+        return result;
+    };
+
+
+}
+
 
 /*!
     \class QTimeSpan
@@ -2025,7 +2057,7 @@ QDebug operator<<(QDebug debug, const QTimeSpan &ts)
   The suppressSecondUnitLimit argument can be used to suppres, for instance,
   the number of seconds when the operation will run for more than five minutes
   more. The idea is that for an approximate representation of the time length,
-  it is no longer relevant to display the second unit if the first respresents
+  it is no longer relevant to display the second unit if the first represents
   a time span that is perhaps an order of magnitude larger already.
 
   If you set suppressSecondUnitLimit to a negative number, the second unit will
@@ -2033,49 +2065,64 @@ QDebug operator<<(QDebug debug, const QTimeSpan &ts)
 */
 QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanFormat format, unitStringFunction unitStringConverter, QString unitsSeparator)
 {
-    if (format==Qt::NoUnit)
+    if (format == Qt::NoUnit)
         return QString();
 
-    //retrieve the time unit to use as the primairy unit
-    int primairy = -1;
-    int secondairy = -1;
-
     Qt::TimeSpanUnit primairyUnit = magnitude();
-    while (!format.testFlag(primairyUnit ) && primairyUnit > 1)
+    Qt::TimeSpanUnit smallest = smallestUnit(format);
+
+    if (primairyUnit < smallest)
     {
-        primairyUnit = static_cast<Qt::TimeSpanUnit>(primairyUnit - 1);
+        /* Check scenario where magnitude in milliseconds, and format in seconds. */
+        primairyUnit = smallest;
     }
-    Q_ASSERT_X(primairyUnit > 0, Q_FUNC_INFO, "Semantically incorrect behavior");
-    if (primairyUnit <= Qt::NoUnit)
-        primairyUnit = Qt::Milliseconds;
+    else
+    {
+        /* Check scenario where magnitude in seconds, and format in milliseconds. */
+        while (!format.testFlag(primairyUnit ) && primairyUnit > Qt::Milliseconds)
+            primairyUnit = prevUnit(primairyUnit);
+    }
+    Q_ASSERT_X(format.testFlag(primairyUnit), Q_FUNC_INFO, "Invalid format");
+    if (!format.testFlag(primairyUnit))
+        return QString();
 
     Qt::TimeSpanUnit secondairyUnit = Qt::NoUnit;
-    if (primairyUnit > 1) {
-        secondairyUnit = Qt::TimeSpanUnit(primairyUnit / 2);
-    } else {
-       // primairy = 0; --I don't understand how was it supposed to work for milliseconds --gdm
+    if (primairyUnit > smallest)
+    {
+        secondairyUnit = prevUnit(primairyUnit);
+        while (!format.testFlag(secondairyUnit) && secondairyUnit > Qt::Milliseconds)
+            secondairyUnit = prevUnit(secondairyUnit);
+
+        Q_ASSERT_X(format.testFlag(secondairyUnit), Q_FUNC_INFO, "Invalid format");
+        if (!format.testFlag(secondairyUnit))
+            secondairyUnit = Qt::NoUnit;
     }
-    while (!format.testFlag(secondairyUnit) && secondairyUnit > Qt::NoUnit) {
-        secondairyUnit = Qt::TimeSpanUnit(secondairyUnit / 2);
-    }
+
 
     //build up hash with pointers to ints for the units that are set in format, and 0's for those that are not.
-    if (primairy < 0) {
-        QTimeSpanPrivate::TimePartHash partsHash(format);
-        bool result = partsHash.fill(*this);
-
-        if (!result) {
-            qDebug() << "false result from parts function";
-            return QString();
-        }
-
-        primairy = *(partsHash.value(primairyUnit));
-        if (secondairyUnit > 0) {
-            secondairy = *(partsHash.value(secondairyUnit));
-        } else {
-            secondairy = 0;
-        }
+    QTimeSpanPrivate::TimePartHash partsHash(format);
+    if (!partsHash.fill(*this))
+    {
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Date format in unreferenced timespan");
+        return QString();
     }
+
+    auto safeValue = [this, format, &partsHash](Qt::TimeSpanUnit unit)
+    {
+        if (unit == Qt::NoUnit)
+            return 0;
+
+        Q_ASSERT_X(format.testFlag(unit), Q_FUNC_INFO, "Requesting invalid unit");
+        int* ptr = partsHash.value(unit);
+        Q_ASSERT_X(ptr, Q_FUNC_INFO, "Invalid hash");
+        if (ptr)
+            return *ptr;
+        return 0;
+    };
+
+    int primairy = safeValue(primairyUnit);
+    int secondairy = safeValue(secondairyUnit);
+    Q_ASSERT_X(primairy > 0 || secondairy == 0, Q_FUNC_INFO, "Secondary without primary is an error");
 
     auto toUnitString = [this, unitStringConverter](Qt::TimeSpanUnit unit, int num)
     {
@@ -2084,15 +2131,22 @@ QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanF
         return d->unitString(unit, num);
     };
 
-    if ((primairy > 0
-         && secondairy > 0
-         && primairy < suppresSecondUnitLimit)
-        || (suppresSecondUnitLimit < 0
-         && secondairyUnit > Qt::NoUnit) )
+    bool showSecondary = [=]()
     {
-        //we will display with two units
+        /* Do not show secondary if only one number is present */
+        if (primairy <= 0 || secondairy <= 0)
+            return false;
+
+        /* Do not suppress second unit */
+        if (suppresSecondUnitLimit < 0 && secondairyUnit > Qt::NoUnit)
+            return true;
+
+        return primairy < suppresSecondUnitLimit;
+    }();
+
+    //we will display with two units
+    if (showSecondary)
         return toUnitString(primairyUnit, primairy) + unitsSeparator + toUnitString(secondairyUnit, secondairy);
-    }
 
     //we will display with only the primairy unit
     return toUnitString(primairyUnit, primairy);
