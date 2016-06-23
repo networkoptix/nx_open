@@ -58,6 +58,8 @@ bool hasPermission(const QnUuid &userId, const ApiSystemStatistics &/*data*/, Qn
 
 bool hasPermission(const QnUuid &userId, const ApiUserGroupData&/*data*/, Qn::Permission /*permission*/);
 
+bool hasPermission(const QnUuid &userId, const ApiDiscoveredServerData&/*data*/, Qn::Permission permission);
+
 template<typename TransactionParamType>
 bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission);
 
@@ -130,12 +132,16 @@ auto hasModifyPermissionImpl(const QnUuid &userId, const TransactionParamType &d
 template<typename TransactionParamType>
 bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission)
 {
+    if (Qn::UserAccessData(userId) == Qn::kDefaultUserAccess)
+        return true;
     return detail::hasPermissionImpl(userId, data, permission, 0);
 }
 
 template<typename TransactionParamType>
 bool hasModifyPermission(const QnUuid &userId, const TransactionParamType &data)
 {
+    if (Qn::UserAccessData(userId) == Qn::kDefaultUserAccess)
+        return true;
     return detail::hasModifyPermissionImpl(userId, data, 0);
 }
 
