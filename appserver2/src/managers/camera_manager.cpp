@@ -36,8 +36,19 @@ namespace ec2
 
     void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran)
     {
-        NX_ASSERT(tran.command == ApiCommand::removeCamera);
-        emit removed(tran.params.id);
+        NX_ASSERT(tran.command == ApiCommand::removeCamera || 
+                  tran.command == ApiCommand::removeCameraUserAttributes);
+        switch (tran.command)
+        {
+        case ApiCommand::removeCamera:
+            emit removed(tran.params.id);
+            break;
+        case ApiCommand::removeCameraUserAttributes:
+            emit userAttributesRemoved(tran.params.id);
+            break;
+        default:
+            NX_ASSERT(0);
+        }
     }
 
     void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiServerFootageData>& tran)

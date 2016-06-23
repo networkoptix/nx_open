@@ -1,19 +1,18 @@
 #pragma once
 
+#include <atomic>
+#include <chrono>
 #include <iostream>
+#include <map>
+#include <mutex>
 #include <sstream>
+#include <string>
 
 #include "log_message.h"
 
-// Uncomment to assert condition enable time measurements
-//#define NX_ASSERT_MEASURE_TIME
+// Uncomment enable NX_CHECK condition time measurements
+//#define NX_CHECK_MEASURE_TIME
 
-#ifdef NX_ASSERT_MEASURE_TIME
-    #include <string>
-    #include <mutex>
-    #include <map>
-    #include <chrono>
-#endif
 
 namespace nx {
 namespace utils {
@@ -23,7 +22,7 @@ NX_UTILS_API void logError(const lm& message);
 template<typename Reason>
 lm assertLog(const char* file, int line, const char* condition, const Reason& message)
 {
-    const auto out = lm("FAILURE %1:%2 NX_ASSERT(%3) %4")
+    const auto out = lm("FAILURE %1:%2 NX_CHECK(%3) %4")
         .arg(file).arg(line).arg(condition).arg(message);
 
     logError(out);
@@ -38,63 +37,71 @@ void assertCrash(Arguments&& ... args)
     *reinterpret_cast<volatile int*>(0) = 7;
 }
 
-#ifdef NX_ASSERT_MEASURE_TIME
-    class NX_UTILS_API AssertTimer
+class NX_UTILS_API AssertTimer
+{
+public:
+    struct NX_UTILS_API TimeInfo
     {
-    public:
-        void add(const char* file, int line, std::chrono::microseconds time);
-        ~AssertTimer();
+        TimeInfo();
+        TimeInfo(const TimeInfo& info);
+        TimeInfo& operator =(const TimeInfo& info);
 
-        static AssertTimer instance;
+        bool operator <(const TimeInfo& other) const;
+        void add(std::chrono::microseconds duration);
+
+        size_t count() const;
+        std::chrono::microseconds time() const;
 
     private:
-        std::mutex m_mutex;
-        std::map<std::string, std::pair<size_t, std::chrono::microseconds>> m_times;
+        std::atomic<size_t> m_count;
+        std::atomic<size_t> m_time;
     };
-#endif
+
+    TimeInfo* info(const char* file, int line);
+    ~AssertTimer();
+
+    #ifdef NX_CHECK_MEASURE_TIME
+        static AssertTimer instance;
+    #endif
+
+private:
+    std::mutex m_mutex;
+    std::map<std::string, TimeInfo> m_times;
+};
 
 } // namespace utils
 } // namespace nx
 
-#ifndef NX_ASSERT_MEASURE_TIME
-    // Causes segfault in debug and release
-    #define NX_CRITICAL_IMPL(condition, message) \
-        if (!(condition)) \
-            nx::utils::assertCrash(__FILE__, __LINE__, #condition, message)
+#ifdef NX_CHECK_MEASURE_TIME
+    #define NX_CHECK(condition, message, action) \
+        do { \
+            auto begin = std::chrono::system_clock::now(); \
+            auto isOk = static_cast<bool>(condition); \
+            auto time = std::chrono::system_clock::now() - begin; \
+            \
+            static const auto info = nx::utils::AssertTimer::instance.info(__FILE__, __LINE__); \
+            info->add(std::chrono::duration_cast<std::chrono::microseconds>(time)); \
+            \
+            if (!isOk) \
+                nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
+        } while (false)
 #else
-    template<typename ConditionFunction, typename Reason>
-    void nxCriticalImpl(
-        const ConditionFunction& conditionFunction,
-        const char* file, int line, const char* condition, const Reason& message)
-    {
-        auto begin = std::chrono::system_clock::now();
-        bool isOk = conditionFunction();
-        auto total = std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now() - begin);
-
-        nx::utils::AssertTimer::instance.add(file, line, total);
-        if (!isOk)
-            nx::utils::assertCrash(file, line, condition, message);
-    }
-
-    #define NX_CRITICAL_IMPL(condition, message) \
-        nxCriticalImpl( \
-            [&](){ return static_cast<bool>(condition); }, \
-            __FILE__, __LINE__, #condition, message)
+    #define NX_CHECK(condition, message, action) \
+        do { \
+            if (!(condition)) \
+                nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
+        } while (false)
 #endif
+
+#define NX_CRITICAL_IMPL(condition, message) NX_CHECK(condition, message, Crash)
 
 #ifdef _DEBUG
-    // Every expectation is critical in debug
-    #define NX_ASSERT_IMPL(condition, message) NX_CRITICAL_IMPL(condition, message)
-    #define NX_EXPECT_IMPL(condition, message) NX_CRITICAL_IMPL(condition, message)
+    #define NX_ASSERT_IMPL(condition, message) NX_CHECK(condition, message, Crash)
+    #define NX_EXPECT_IMPL(condition, message) NX_CHECK(condition, message, Crash)
 #else
-    #define NX_ASSERT_IMPL(condition, message) \
-        if (!(condition)) \
-            nx::utils::assertLog(__FILE__, __LINE__, #condition, message)
-
+    #define NX_ASSERT_IMPL(condition, message) NX_CHECK(condition, message, Log)
     #define NX_EXPECT_IMPL(condition, message)
 #endif
-
 
 #define NX_MSVC_EXPAND(x) x
 #define NX_GET_4TH_ARG(a1, a2, a3, a4, ...) a4
@@ -139,6 +146,6 @@ void assertCrash(Arguments&& ... args)
     NX_EXPECT_IMPL(condition, lm("[%1] %2").arg(where).arg(message))
 
 /** debug: Leads to segfault in case of failure
- *  release: Does nothing (condition is not even evaluates) */
+ *  release: Does nothing (condition does not even evaluate) */
 #define NX_EXPECT(...) NX_MSVC_EXPAND( \
     NX_GET_4TH_ARG(__VA_ARGS__, NX_EXPECT3, NX_EXPECT2, NX_EXPECT1, args_reqired)(__VA_ARGS__))

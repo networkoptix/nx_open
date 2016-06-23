@@ -352,7 +352,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, TranM
         const QnTranStateKey& key = itr.key();
         QSqlQuery query(m_dbManager->getDB());
         query.setForwardOnly(true);
-        query.prepare("SELECT tran_data, sequence, tran_api_command, tran_param_id FROM transaction_log WHERE peer_guid = ? and db_guid = ? and sequence > ?  order by sequence");
+        query.prepare("SELECT tran_data, sequence, tran_command, tran_param_id FROM transaction_log WHERE peer_guid = ? and db_guid = ? and sequence > ?  order by sequence");
         query.addBindValue(key.peerID.toRfc4122());
         query.addBindValue(key.dbID.toRfc4122());
         query.addBindValue(state.values.value(key));
