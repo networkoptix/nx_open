@@ -1,5 +1,4 @@
-#ifndef QN_LICENSE_LIST_MODEL_H
-#define QN_LICENSE_LIST_MODEL_H
+#pragma once
 
 #include <QtGui/QStandardItemModel>
 
@@ -9,13 +8,15 @@
 
 #include <ui/customization/customized.h>
 
-class QnLicenseListModel: public Customized<QStandardItemModel> {
+class QnLicenseListModel : public Customized<QStandardItemModel>
+{
     Q_OBJECT
     Q_PROPERTY(QnLicensesListModelColors colors READ colors WRITE setColors)
-    typedef Customized<QStandardItemModel> base_type;
+    using base_type = Customized<QStandardItemModel>;
 
 public:
-    enum Column {
+    enum Column
+    {
         TypeColumn,
         CameraCountColumn,
         LicenseKeyColumn,
@@ -49,5 +50,3 @@ private:
     QList<Column> m_columns;
     QList<QnLicensePtr> m_licenses;
 };
-
-#endif // QN_LICENSE_LIST_MODEL_H

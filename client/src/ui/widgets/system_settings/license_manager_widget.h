@@ -1,5 +1,4 @@
-#ifndef QN_LICENSE_MANAGER_WIDGET_H
-#define QN_LICENSE_MANAGER_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
@@ -18,10 +17,11 @@ class QNetworkReply;
 class QnLicenseListModel;
 
 namespace Ui {
-    class LicenseManagerWidget;
+class LicenseManagerWidget;
 }
 
-class QnLicenseManagerWidget : public Connective<QnAbstractPreferencesWidget> {
+class QnLicenseManagerWidget : public Connective<QnAbstractPreferencesWidget>
+{
     Q_OBJECT
     typedef Connective<QnAbstractPreferencesWidget> base_type;
 
@@ -33,7 +33,7 @@ public:
     virtual bool hasChanges() const override;
     virtual void applyChanges() override;
 
-private slots:
+    private slots:
     void updateLicenses();
     void updateDetailsButtonEnabled();
 
@@ -65,5 +65,3 @@ private:
     QnLicenseList m_licenses;
     QMap<int, QByteArray> m_handleKeyMap;
 };
-
-#endif // QN_LICENSE_MANAGER_WIDGET_H
