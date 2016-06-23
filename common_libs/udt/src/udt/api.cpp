@@ -867,12 +867,7 @@ int CUDTUnited::getsockname(const UDTSOCKET u, sockaddr* name, int* namelen)
       *namelen = sizeof(sockaddr_in6);
 
    // copy address information of local node
-   if (s->m_pUDT && s->m_pUDT->m_pRcvQueue && s->m_pUDT->m_pRcvQueue->m_pChannel)
-      s->m_pUDT->m_pRcvQueue->m_pChannel->getSockAddr(name);
-   else if (s->m_pUDT && s->m_pUDT->m_pSndQueue && s->m_pUDT->m_pSndQueue->m_pChannel)
-      s->m_pUDT->m_pSndQueue->m_pChannel->getSockAddr(name);
-   else
-      memcpy(name, s->m_pSelfAddr, *namelen);
+   memcpy(name, s->m_pSelfAddr, *namelen);
 
    return 0;
 }
