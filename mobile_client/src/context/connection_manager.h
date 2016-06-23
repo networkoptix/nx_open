@@ -9,13 +9,11 @@
 class QnConnectionManagerPrivate;
 class QnConnectionManager : public QObject, public QnContextAware {
     Q_OBJECT
-    Q_ENUMS(ConnectionStatus)
-    Q_ENUMS(State)
 
     Q_PROPERTY(QString systemName READ systemName NOTIFY systemNameChanged)
     Q_PROPERTY(State connectionState READ connectionState NOTIFY connectionStateChanged)
     Q_PROPERTY(bool online READ isOnline NOTIFY isOnlineChanged)
-    Q_PROPERTY(bool cloudSystem READ isCloudSystem NOTIFY isCloudSystemChanged)
+    Q_PROPERTY(ConnectionType connectionType READ connectionType NOTIFY connectionTypeChanged)
     Q_PROPERTY(QUrl currentUrl READ currentUrl NOTIFY currentUrlChanged)
     Q_PROPERTY(QString currentHost READ currentHost NOTIFY currentHostChanged)
     Q_PROPERTY(QString currentLogin READ currentLogin NOTIFY currentLoginChanged)
@@ -29,6 +27,7 @@ public:
         Unauthorized,
         NetworkError
     };
+    Q_ENUMS(ConnectionStatus)
 
     enum State {
         Disconnected,
@@ -36,6 +35,15 @@ public:
         Connected,
         Suspended
     };
+    Q_ENUMS(State)
+
+    enum ConnectionType
+    {
+        NormalConnection,
+        CloudConnection,
+        LiteClientConnection
+    };
+    Q_ENUM(ConnectionType)
 
     explicit QnConnectionManager(QObject* parent = nullptr);
     ~QnConnectionManager();
@@ -44,6 +52,7 @@ public:
 
     State connectionState() const;
     bool isOnline() const;
+    ConnectionType connectionType() const;
 
     Q_INVOKABLE int defaultServerPort() const;
 
@@ -51,7 +60,6 @@ public:
     QString currentHost() const;
     QString currentLogin() const;
     QString currentPassword() const;
-    bool isCloudSystem() const;
 
     QnSoftwareVersion connectionVersion() const;
 
@@ -66,7 +74,7 @@ signals:
     void currentHostChanged();
     void currentLoginChanged();
     void currentPasswordChanged();
-    void isCloudSystemChanged();
+    void connectionTypeChanged();
 
     void connectionVersionChanged();
 

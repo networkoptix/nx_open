@@ -18,6 +18,7 @@
 #include <mobile_client/mobile_client_ui_controller.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
+#include <watchers/user_watcher.h>
 
 namespace {
 
@@ -59,6 +60,11 @@ QnContext::~QnContext() {}
 QnCloudStatusWatcher* QnContext::cloudStatusWatcher() const
 {
     return qnCommon->instance<QnCloudStatusWatcher>();
+}
+
+QnUserWatcher* QnContext::userWatcher() const
+{
+    return qnCommon->instance<QnUserWatcher>();
 }
 
 void QnContext::exitFullscreen() {

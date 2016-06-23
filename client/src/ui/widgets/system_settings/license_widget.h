@@ -1,5 +1,4 @@
-#ifndef QN_LICENSE_WIDGET_H
-#define QN_LICENSE_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
@@ -8,15 +7,17 @@
 #include <utils/common/connective.h>
 
 namespace Ui {
-    class LicenseWidget;
+class LicenseWidget;
 }
 
-class QnLicenseWidget : public Connective<QWidget> {
+class QnLicenseWidget : public Connective<QWidget>
+{
     Q_OBJECT
 
-    typedef Connective<QWidget> base_type;
+    using base_type = Connective<QWidget>;
 public:
-    enum State {
+    enum State
+    {
         Normal,     /**< Operational state. */
         Waiting,    /**< Waiting for activation. */
     };
@@ -46,11 +47,12 @@ signals:
 protected:
     virtual void changeEvent(QEvent *event) override;
 
-private slots:
+    private slots:
     void updateControls();
 
     void at_browseLicenseFileButton_clicked();
     void at_tabWidget_currentChanged();
+
 private:
     Q_DISABLE_COPY(QnLicenseWidget)
 
@@ -61,4 +63,3 @@ private:
     QnMediaServerResourcePtr m_currentServer;
 };
 
-#endif // QN_LICENSE_WIDGET_H

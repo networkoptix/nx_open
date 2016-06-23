@@ -14,7 +14,6 @@
 #include <api/session_manager.h>
 #include <api/model/connection_info.h>
 
-#include <client/client_connection_data.h>
 #include <client/client_settings.h>
 
 #include <common/common_module.h>
@@ -65,19 +64,6 @@ namespace {
 
         auto result = new QStandardItem(text);
         result->setData(url, Qn::UrlRole);
-        return result;
-    }
-
-    QStandardItem* newConnectionItem(const QnUserRecentConnectionData& connection) 
-    {
-        if (connection == QnUserRecentConnectionData())
-            return nullptr;
-
-        const auto text = (!connection.name.isEmpty() ? connection.name
-            : QObject::tr("%1 at %2").arg(connection.url.userName(), connection.systemName));
-
-        auto result = newConnectionItem(text, connection.url);
-        result->setData(QVariant::fromValue(connection), Qn::ConnectionInfoRole);
         return result;
     }
 
@@ -302,7 +288,7 @@ void QnLoginDialog::resetConnectionsModel()
     const auto lastConnection = (connections.empty() ? 
         QnUserRecentConnectionData() : connections.first());
 
-    m_lastUsedItem = newConnectionItem(tr("* Last used connection *"), lastConnection.url);
+    m_lastUsedItem = ::newConnectionItem(tr("* Last used connection *"), lastConnection.url);
 
     if (m_lastUsedItem != NULL) 
     {
@@ -469,6 +455,20 @@ QString QnLoginDialog::gatherSystemName(const QUrl& url)
     loop.exec();
 
     return systemName;
+}
+
+
+QStandardItem* QnLoginDialog::newConnectionItem(const QnUserRecentConnectionData& connection)
+{
+    if (connection == QnUserRecentConnectionData())
+        return nullptr;
+
+    const auto text = (!connection.name.isEmpty() ? connection.name
+        : tr("%1 at %2").arg(connection.url.userName(), connection.systemName));
+
+    auto result = ::newConnectionItem(text, connection.url);
+    result->setData(QVariant::fromValue(connection), Qn::ConnectionInfoRole);
+    return result;
 }
 
 void QnLoginDialog::at_saveButton_clicked() {

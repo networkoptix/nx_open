@@ -79,6 +79,8 @@ private:
 
     QString gatherSystemName(const QUrl& url);
 
+    QStandardItem* newConnectionItem(const QnUserRecentConnectionData& connection);
+
 private:
     QScopedPointer<Ui::LoginDialog> ui;
     QStandardItemModel *m_connectionsModel;

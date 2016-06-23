@@ -5,32 +5,28 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 
-class QnUserWatcher: public Connective<QObject> {
+class QnUserWatcher: public Connective<QObject>
+{
     Q_OBJECT
+    /* This property should remain read-only for QML! */
+    Q_PROPERTY(QString userName READ userName NOTIFY userNameChanged)
 
-    typedef Connective<QObject> base_type;
+    using base_type = Connective<QObject>;
+
 public:
-    QnUserWatcher(QObject *parent = NULL);
+    QnUserWatcher(QObject* parent = nullptr);
 
-    virtual ~QnUserWatcher();
+    void setUserName(const QString& name);
+    const QString& userName() const;
 
-    void setUserName(const QString &name);
-    const QString &userName() const {
-        return m_userName;
-    }
-
-    const QnUserResourcePtr &user() const {
-        return m_user;
-    }
+    const QnUserResourcePtr& user() const;
 
 signals:
-    void userChanged(const QnUserResourcePtr &user);
-
-private slots:
-    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
+    void userChanged(const QnUserResourcePtr& user);
+    void userNameChanged();
 
 private:
-    void setCurrentUser(const QnUserResourcePtr &currentUser);
+    void setCurrentUser(const QnUserResourcePtr& currentUser);
 
 private:
     QString m_userName;

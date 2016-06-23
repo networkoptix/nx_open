@@ -11,7 +11,6 @@
 
 #include <common/common_module.h>
 
-#include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>

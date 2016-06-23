@@ -11,27 +11,43 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 
-QnUserWatcher::QnUserWatcher(QObject *parent):
+QnUserWatcher::QnUserWatcher(QObject* parent) :
     base_type(parent)
 {
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived, this, [this] {
-        for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>()) {
-            if (user->getName().toLower() != m_userName.toLower())
-                continue;
-
-            setCurrentUser(user);
-            return;
+    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived,
+        this, [this]
+        {
+            const auto users = qnResPool->getResources<QnUserResource>();
+            const auto it = std::find_if(users.cbegin(), users.cend(),
+                [this](const QnUserResourcePtr& user)
+                {
+                    return m_userName.compare(user->getName(), Qt::CaseInsensitive) == 0;
+                }
+            );
+            setCurrentUser(it != users.cend() ? *it : QnUserResourcePtr());
         }
-        setCurrentUser(QnUserResourcePtr());
-    });
+    );
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved,   this,   &QnUserWatcher::at_resourcePool_resourceRemoved);
+    connect(qnResPool, &QnResourcePool::resourceRemoved,
+        this, [this](const QnResourcePtr& resource)
+        {
+            const auto user = resource.dynamicCast<QnUserResource>();
+            if (!user || user != m_user)
+                return;
+
+            setCurrentUser(QnUserResourcePtr());
+        }
+    );
 }
 
-QnUserWatcher::~QnUserWatcher() {}
+const QnUserResourcePtr& QnUserWatcher::user() const
+{
+    return m_user;
+}
 
-void QnUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
-    if(m_user == user)
+void QnUserWatcher::setCurrentUser(const QnUserResourcePtr& user)
+{
+    if (m_user == user)
         return;
 
     m_user = user;
@@ -39,17 +55,16 @@ void QnUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
     emit userChanged(user);
 }
 
-void QnUserWatcher::setUserName(const QString &name) {
-    if(m_userName == name)
+const QString& QnUserWatcher::userName() const
+{
+    return m_userName;
+}
+
+void QnUserWatcher::setUserName(const QString& name)
+{
+    if (m_userName == name)
         return;
 
     m_userName = name;
-}
-
-void QnUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
-    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if (!user || user != m_user)
-        return;
-
-    setCurrentUser(QnUserResourcePtr());
+    emit userNameChanged();
 }

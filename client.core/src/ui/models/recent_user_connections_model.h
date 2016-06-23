@@ -10,6 +10,7 @@ class QnRecentUserConnectionsModel : public QAbstractListModel
 
     Q_PROPERTY(QString systemName READ systemName WRITE setSystemName NOTIFY systemNameChanged)
     Q_PROPERTY(bool hasConnections READ hasConnections NOTIFY hasConnectionsChanged)
+    Q_PROPERTY(QString firstUser READ firstUser NOTIFY firstUserChanged)
 
 public:
     enum Roles
@@ -34,6 +35,8 @@ public: // properties
 
     bool hasConnections() const;
 
+    QString firstUser() const;
+
 public: // overrides
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
@@ -50,6 +53,7 @@ signals:
     void systemNameChanged();
     void hasConnectionsChanged();
     void connectionDataChanged(int index);
+    void firstUserChanged();
 
 private:
     QString m_systemName;
