@@ -50,8 +50,7 @@ public:
 protected:
     virtual bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const
     {
-        if (source_left.column() != QnLicenseListModel::ExpirationDateColumn
-            || source_right.column() != QnLicenseListModel::ExpirationDateColumn)
+        if (source_left.column() != source_right.column())
             return base_type::lessThan(source_left, source_right);
 
         QnLicensePtr left = source_left.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
@@ -60,11 +59,23 @@ protected:
         if (!left || !right)
             return (left < right);
 
-        /* Permanent licenses should be the last. */
-        if (left->neverExpire() != right->neverExpire())
-            return right->neverExpire();
+        switch (source_left.column())
+        {
+            case QnLicenseListModel::ExpirationDateColumn:
+                /* Permanent licenses should be the last. */
+                if (left->neverExpire() != right->neverExpire())
+                    return right->neverExpire();
 
-        return left->expirationTime() < right->expirationTime();
+                return left->expirationTime() < right->expirationTime();
+
+            case QnLicenseListModel::CameraCountColumn:
+                return left->cameraCount() < right->cameraCount();
+
+            default:
+                break;
+        }
+
+        return base_type::lessThan(source_left, source_right);
     }
 
 };
