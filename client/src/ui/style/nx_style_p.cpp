@@ -333,7 +333,7 @@ bool QnNxStylePrivate::polishInputDialog(QInputDialog* inputDialog) const
         return false;
 
     QDialogButtonBox* buttonBox = inputDialog->findChild<QDialogButtonBox*>(QString(), Qt::FindDirectChildrenOnly);
-    if (buttonBox || !buttonBox->isHidden())
+    if (!buttonBox || buttonBox->isHidden())
         return false;
 
     auto container = new QWidget(inputDialog);
