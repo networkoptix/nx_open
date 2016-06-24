@@ -18,7 +18,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>client-deb</artifactId>
 	<packaging>pom</packaging>
-	<name>Client Deb Package</name>	
+	<name>HD Witness Client Deb Package</name>	
 	
     <properties>
         <!-- Change it to point relatively to the root-->

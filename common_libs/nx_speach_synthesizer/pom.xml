@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_speach_synthesizer</artifactId>
     <packaging>pom</packaging>
-    <name>Nx speach synthesizer</name>
+    <name>NX Speach Synthesizer Library</name>
 
     <properties>
         <guid>${nx_speach_synthesizer.guid}</guid>

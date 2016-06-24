@@ -18,7 +18,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>mediaserver-deb</artifactId>
 	<packaging>pom</packaging>
-	<name>Media Server Deb Package</name>
+	<name>HD Witness Media Server Deb Package</name>
 
     <properties>
         <!-- Change it to point relatively to the root-->
