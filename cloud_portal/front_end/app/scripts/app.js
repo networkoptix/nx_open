@@ -70,15 +70,6 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.callShare = true; }]
             }
         })
-        .when('/systems/:systemId/share/:shareEmail', {
-            templateUrl: 'static/views/system.html',
-            controller: 'SystemCtrl',
-            resolve: {
-                test: ['$route',function ($route) { $route.current.params.callShare = true; }]
-            }
-        })
-
-
         .when('/activate', {
             templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',

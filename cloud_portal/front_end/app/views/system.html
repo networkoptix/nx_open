@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-sm-6">
             <h1 ng-if="gettingSystem.success">{{system.info.name}}
-                <span ng-if="system.info.stateOfHealth!=Config.systemStatuses.onlineStatus" class="label"
+                <span ng-if="!system.isOnline" class="label"
                       ng-class="Config.systemStatuses[system.info.stateOfHealth].style || Config.systemStatuses.default.style">
                       {{Config.systemStatuses[system.info.stateOfHealth].label||system.info.stateOfHealth}}</span>
             </h1>
@@ -14,7 +14,7 @@
                     <span class="glyphicon glyphicon-share"></span> Share</button>
                 &nbsp;
                 <button class="btn btn-default" ng-click="open(null)"
-                        ng-disabled="system.info.stateOfHealth!=Config.systemStatuses.onlineStatus">Open in VMS_NAME</button>
+                        ng-disabled="!system.isOnline">Open in VMS_NAME</button>
             </div>
         </div>
 
@@ -76,11 +76,22 @@
                         <tr ng-repeat="user in system.users" class="hoverable">
                             <td class="user-name">{{user.fullName}}</td>
                             <td>{{user.accountEmail}}</td>
-                            <td>{{L.accessRoles[user.accessRole].label || user.accessRole}}</td>
-                            <td><a href='' class="hover-visible image-link" ng-if="user.accountEmail != account.email && user.accessRole!=Config.accessRoles.owner"
+                            <td>
+                                <span class="inactive" ng-if="!system.isAvailable"
+                                    title="System is unavailable">{{L.accessRoles[user.accessRole].label || user.accessRole}}</span>
+                                <span ng-if="system.isAvailable">{{user.group.name || L.accessRoles[user.accessRole].label || user.accessRole}}</span>
+                            </td>
+                            <td>
+                                <span class="hover-visible image-link inactive"
+                                   ng-if="!system.isAvailable && user.accountEmail != account.email && user.accessRole!=Config.accessRoles.owner"
+                                   title="System is unavailable"><span class="glyphicon glyphicon-pencil"></span><span class="hidden-sm">&nbsp;&nbsp;Edit</span></span>
+                                <a href=''
+                                   class="hover-visible image-link"
+                                   ng-if="system.isAvailable && user.accountEmail != account.email && user.accessRole!=Config.accessRoles.owner"
                                    title="Edit permissions"
                                    ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span><span class="hidden-sm">&nbsp;&nbsp;Edit</span></span></a></td>
-                            <td><a href='' class="hover-visible image-link" ng-if="user.accessRole!=Config.accessRoles.owner"
+                            <td><a href=''
+                                   class="hover-visible image-link" ng-if="user.accessRole!=Config.accessRoles.owner"
                                    title="Delete"
                                    ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span><span class="hidden-sm">&nbsp;&nbsp;Delete</span></a></td>
                         </tr>

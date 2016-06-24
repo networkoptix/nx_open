@@ -5,17 +5,17 @@ var Config = {
     apiBase: '/api',
     clientProtocol: 'nx-vms:',
     nativeDomain: 'cloud-demo.hdw.mx',
-    cacheTimeout: 30*1000, // Cache lives for 30 seconds
+    cacheTimeout: 30 * 1000, // Cache lives for 30 seconds
 
-    alertTimeout: 3*1000,  // Alerts are shown for 3 seconds
+    alertTimeout: 3 * 1000,  // Alerts are shown for 3 seconds
     alertsMaxCount: 5,
 
     redirectAuthorised:'/systems', // Page for redirecting all authorised users
     redirectUnauthorised:'/', // Page for redirecting all unauthorised users by default
 
-    systemStatuses:{
+    systemStatuses: {
         onlineStatus: 'online',
-        sortOrder:[
+        sortOrder: [
             'online',
             'offline',
             'activated',
@@ -29,57 +29,62 @@ var Config = {
             label: L.systemStatuses.notActivated,
             style: 'label-danger'
         },
-        activated:{
+        activated: {
             label: L.systemStatuses.activated,
             style: 'label-info'
         },
-        online:{
+        online: {
             label: L.systemStatuses.online,
             style: 'label-success'
         },
-        offline:{
+        offline: {
             label: L.systemStatuses.offline,
             style: 'label-default'
         },
-        unavailable:{
+        unavailable: {
             label: L.systemStatuses.unavailable,
             style: 'label-default'
         }
     },
-    accessRoles:{
+    accessRoles: {
         unshare: 'none',
         default: 'viewer',
+        custom:     'custom',
         owner:   'owner',
-        order:[
+        order: [
             'liveViewer',
             'viewer',
             'advancedViewer',
             'cloudAdmin',
             'owner'
         ],
-        options:[
+        options: [
             {
-                accessRole: 'owner'
+                accessRole: 'owner',
+                isAdmin: true
             },
             {
-                accessRole: 'viewer'
+                accessRole: 'viewer',
+                permissions: 'GlobalAccessAllCamerasPermission'
             },
             {
-                accessRole: 'liveViewer'
+                accessRole: 'liveViewer',
+                permissions:'GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalAccessAllCamerasPermission'
             },
             {
-                accessRole: 'advancedViewer'
+                accessRole: 'advancedViewer',
+                permissions: 'GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllCamerasPermission'
             },
             {
-                accessRole: 'cloudAdmin'
+                accessRole: 'cloudAdmin',
+                permissions: 'GlobalAdminPermission|GlobalEditCamerasPermission|GlobalControlVideoWallPermission|GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllCamerasPermission'
             }
         ]
     },
 
     emailRegex:"^[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+(\\.[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}\\.?$", // Check only @ and . in the email
 
-    passwordRequirements:
-    {
+    passwordRequirements: {
         minLength: 8,
         minLengthMessage:L.passwordRequirements.minLengthMessage,
         maxLength: 255,
@@ -98,7 +103,7 @@ var Config = {
 
             for (var i = 0; i < classes.length; i++) {
                 var classRegex = classes[i];
-                if(new RegExp(classRegex).test(password)){
+                if(new RegExp(classRegex).test(password)) {
                     classesCount ++;
                 }
             }
@@ -108,5 +113,4 @@ var Config = {
         strongMessage: L.passwordRequirements.strongMessage,
         commonMessage: L.passwordRequirements.commonMessage
     }
-
 };

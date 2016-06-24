@@ -120,11 +120,10 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                         redirect: !keepPage
                     }}).result;
             },
-            share:function(systemId, isOwner, share){
+            share:function(isOwner, system, user){
                 var url = 'share';
                 var title = L.sharing.shareTitle;
-                if(share){
-                    url += '/' + share.accountEmail;
+                if(user){
                     title = L.sharing.editShareTitle;
                 }
                 return openDialog({
@@ -134,8 +133,8 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                     hasFooter: false,
                     cancellable:true,
                     params: {
-                        systemId: systemId,
-                        share: share,
+                        system: system,
+                        user: user,
                         isOwner: isOwner
                     }
                 }).result;

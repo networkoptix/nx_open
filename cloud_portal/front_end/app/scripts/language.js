@@ -32,6 +32,10 @@ var L = {
         cloudAdmin: {
             label: 'admin',
             description: 'Can configure system and share it'
+        },
+        custom:{
+            label: 'custom',
+            description: 'Access to specified resources with specified rights'
         }
     },
     errorCodes:{

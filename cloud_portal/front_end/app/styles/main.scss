@@ -407,3 +407,7 @@ h1.process-success{
     border-bottom:1px solid $common-border-color;*/
     margin-bottom: 10px;
 }
+.inactive{
+    opacity:0.7;
+    cursor: pointer;
+}

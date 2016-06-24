@@ -1,7 +1,9 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('SystemCtrl', ['$scope', 'cloudApi', '$routeParams', '$location', 'urlProtocol', 'dialogs', 'process', 'account', function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process, account) {
+    .controller('SystemCtrl', ['$scope', 'cloudApi', '$routeParams', '$location', 'urlProtocol', 'dialogs', 'process',
+    'account', 'mediaserver',
+    function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process, account, mediaserver) {
 
 
         $scope.Config = Config;
@@ -9,6 +11,7 @@ angular.module('cloudApp')
         var systemId = $routeParams.systemId;
 
         $scope.system = {
+            id: systemId,
             users:[],
             info:{name:''}
         };
@@ -20,6 +23,7 @@ angular.module('cloudApp')
         }
         account.requireLogin().then(function(account){
             $scope.account = account;
+            $scope.gettingSystem.run();
         });
 
         // Retrieve system info
@@ -33,11 +37,11 @@ angular.module('cloudApp')
             errorPrefix:'System info is unavailable:'
         }).then(function(result){
             $scope.system.info = result.data[0];
+            $scope.system.isOnline =  $scope.system.info.stateOfHealth == Config.systemStatuses.onlineStatus;
             $scope.isOwner = $scope.system.info.ownerAccountEmail == $scope.account.email;
-
             loadUsers();
         });
-        $scope.gettingSystem.run();
+
 
         function cleanUrl(){
             $location.path('/systems/' + systemId, false);
@@ -54,28 +58,15 @@ angular.module('cloudApp')
                 return - Config.accessRoles.order.indexOf(user.accessRole);
             });
 
-            if($routeParams.callShare){
+            // If system is reported to be online - try to get actual users list
+            if($scope.system.isOnline){
+                getUsersDataFromTheSystem(systemId);
+            }
 
-                var emailWith = $routeParams.shareEmail;
-                if(emailWith){
-                    var user = _.find($scope.system.users, function(user){
-                       return user.accountEmail == emailWith;
-                    });
-                    if(user) {
-                        $scope.editShare(user).finally(cleanUrl);
-                    }else{
-                        $scope.editShare({
-                            accountEmail:emailWith,
-                            accessRole: Config.accessRoles.default
-                        }).finally(cleanUrl);
-                    }
-                }else {
-                    $scope.share().finally(cleanUrl);
-                }
+            if($routeParams.callShare){
+                $scope.share().finally(cleanUrl);
             }
         });
-
-
 
         $scope.open = function(){
             urlProtocol.open(systemId);
@@ -113,12 +104,12 @@ angular.module('cloudApp')
 
         $scope.share = function(){
             // Call share dialog, run process inside
-            return dialogs.share(systemId, $scope.isOwner).then(loadUsers);
+            return dialogs.share($scope.isOwner, $scope.system).then(loadUsers);
         };
 
         $scope.editShare = function(user){
             //Pass user inside
-            return dialogs.share(systemId, $scope.isOwner, user).then(loadUsers);
+            return dialogs.share($scope.isOwner, $scope.system, user).then(loadUsers);
         };
 
         $scope.unshare = function(user){
@@ -140,5 +131,116 @@ angular.module('cloudApp')
                     $scope.unsharing.run();
                 });
         };
+
+
+
+        function normalizePermissionString(permissions){
+            return permissions.split('|').sort().join('|');
+        }
+        _.each(Config.accessRoles.options,function(option){
+            if(option.permissions){
+                option.permissions = normalizePermissionString(option.permissions);
+            }
+        });
+
+        function getUsersDataFromTheSystem(systemId){
+            function errorHandler(error){
+                console.error(error);
+            }
+
+            function processUsers(users,groups,accessRights){
+                function findAccessRole(isAdmin, permissions){
+                    permissions = normalizePermissionString(permissions);
+
+                    var role = _.find(Config.accessRoles.options,function(option){
+                        //console.log("check permission:", option, isAdmin, permissions, option.permissions == permissions);
+
+                        return isAdmin && option.isAdmin || !isAdmin && option.permissions == permissions;
+                    })
+
+                    if(!role){
+                        return 'custom';
+                    }
+                    return role.accessRole;
+                }
+                function isEmptyGuid(guid){
+                    if(!guid){
+                        return true;
+                    }
+                    guid = guid.replace(/[{}0\-]/gi,'');
+                    return guid == '';
+                }
+                var targetUsers =  $scope.system.users;
+
+                var groupAssoc = _.indexBy(groups,'id');
+                var accessRightsAssoc = _.indexBy(accessRights,'userId');
+                var cloudUsersByEmail = _.indexBy(_.filter(users,function(user){ return user.isCloud; }),'email');
+                // var nonCloudUsers = _.filter(users,function(user){ return !user.isCloud; });
+
+                _.each(targetUsers,function(user){
+                    user.localData = cloudUsersByEmail[user.accountEmail];
+                    if(!user.localData){
+                        return;
+                    }
+
+                    if(!isEmptyGuid(user.localData.groupId)){
+                        user.group = groupAssoc[user.localData.groupId];
+                        user.accessRights = accessRightsAssoc[user.localData.groupId];
+                        user.accessRole = user.group.name;
+                    }else{
+                        user.accessRights = accessRightsAssoc[user.localData.id];
+                        user.accessRole = findAccessRole(user.localData.isAdmin, user.localData.permissions);
+                    }
+                });
+
+                $scope.system.cacheData = {
+                    combinedUsers: targetUsers,
+                    users: users,
+                    groups: _.sortBy(groups,function(group){return group.name}),
+                    groupAssoc: groupAssoc,
+                    accessRights: accessRights,
+                    accessRightsAssoc: accessRightsAssoc
+                }
+                /**
+                    users = [
+                    {
+                        "email": "ebalashov+portal@networkoptix.com",
+                        "fullName": "...",
+                        "isCloud": true,
+                        "id": "{10844574-7de9-44ea-bc36-9d6eb5afbb85}",
+                        "isAdmin": false,
+                        "isEnabled": true,
+                        "name": "demo",
+                        "permissions": "GlobalEditCamerasPermission|GlobalControlVideoWallPermission|GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllCamerasPermission"
+                    }]
+
+                    groups= [
+                    {
+                        "id": "{10844574-7de9-44ea-bc36-9d6eb5afbb85}",
+                        "name": "demo",
+                        "permissions": "GlobalEditCamerasPermission|GlobalControlVideoWallPermission|GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllCamerasPermission"
+                    }]
+
+                    accessRights= [{
+                        userId: "{10844574-7de9-44ea-bc36-9d6eb5afbb85}",
+                        resourceIds: ["{10844574-7de9-44ea-bc36-9d6eb5afbb85}"]
+                    }]
+                */
+            }
+
+            mediaserver.getUsers(systemId).then(function(result){
+                var usersList = result.data;
+                mediaserver.getUserGroups(systemId).then(function(result){
+                    var userGroups = result.data;
+                    mediaserver.getAccessRight(systemId).then(function(result){
+                        var accessRights = result.data;
+
+                        $scope.system.isAvailable = true;
+                        processUsers(usersList,userGroups,accessRights);
+                    },errorHandler);
+                },errorHandler);
+            },errorHandler);
+
+        }
 
     }]);
