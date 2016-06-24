@@ -28,6 +28,7 @@
 #include <ui/texture_size_helper.h>
 #include <camera/camera_thumbnail_cache.h>
 #include <ui/helpers/font_loader.h>
+#include <utils/intent_listener_android.h>
 
 #include <nx/media/decoder_registrar.h>
 #include <resource_allocator.h>
@@ -220,6 +221,10 @@ int main(int argc, char *argv[])
 
     parseCommandLine(application);
     migrateSettings();
+
+#ifdef Q_OS_ANDROID
+    registerIntentListener();
+#endif
 
     int result = runApplication(&application);
 

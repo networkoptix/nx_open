@@ -18,7 +18,7 @@
         <product.display.title>${mobile_client.display.name}</product.display.title>
         <template>app</template>
 
-        <qt.libs>core qml quick quick-private concurrent network sql multimedia xml</qt.libs>
+        <qt.libs>core core-private qml quick quick-private concurrent network sql multimedia xml</qt.libs>
         <!-- !!! DO NOT REMOVE DUPLICATES FROM global.libs UNLESS YOU KNOW WHAT YOU'RE DOING !!! -->
         <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_streaming -lnx_network -lnx_fusion -lnx_utils -ludt</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
