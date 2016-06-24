@@ -3,7 +3,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/ldap.h>
 
 QnLdapUserListModel::QnLdapUserListModel(QObject *parent)

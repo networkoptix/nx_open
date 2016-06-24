@@ -3,14 +3,14 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 #include <gtest/gtest.h>
 
 #include <QtCore/QDateTime>
 
 
-TEST( parseDateTime, general )
+TEST( nx::utils::parseDateTime, general )
 {
     const QString testDateStr( "2015-01-01T12:00:01" );
     static const qint64 USEC_PER_MS = 1000;
@@ -19,7 +19,7 @@ TEST( parseDateTime, general )
     const qint64 testTimestamp = testDate.toMSecsSinceEpoch();
     const qint64 testTimestampUSec = testTimestamp * USEC_PER_MS;
 
-    ASSERT_EQ( parseDateTime( testDateStr ), testTimestampUSec );
-    ASSERT_EQ( parseDateTime( QString::number(testTimestamp) ), testTimestampUSec );
-    ASSERT_EQ( parseDateTime( QString::number(testTimestampUSec) ), testTimestampUSec );
+    ASSERT_EQ( nx::utils::parseDateTime( testDateStr ), testTimestampUSec );
+    ASSERT_EQ( nx::utils::parseDateTime( QString::number(testTimestamp) ), testTimestampUSec );
+    ASSERT_EQ( nx::utils::parseDateTime( QString::number(testTimestampUSec) ), testTimestampUSec );
 }

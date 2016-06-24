@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <deque>
 
-#include <nx/utils/string_utils.h>
+#include <nx/utils/string.h>
 
 namespace nx {
 namespace media {

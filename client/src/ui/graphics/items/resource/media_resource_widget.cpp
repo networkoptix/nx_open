@@ -70,7 +70,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/collection.h>
-#include <utils/common/string.h>
+#include <utils/common/html.h>
 #include <utils/common/delayed.h>
 #include <utils/license_usage_helper.h>
 #include <utils/math/color_transformations.h>

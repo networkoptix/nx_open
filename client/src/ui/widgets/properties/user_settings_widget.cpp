@@ -16,7 +16,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/email/email.h>
 
 namespace
@@ -308,7 +308,7 @@ void QnUserSettingsWidget::updateAccessRightsPresets()
     std::sort(groups.begin(), groups.end(), [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
     {
         /* Case Sensitive sort. */
-        return naturalStringCompare(l.name, r.name) < 0;
+        return nx::utils::naturalStringCompare(l.name, r.name) < 0;
     });
 
     for (const ec2::ApiUserGroupData& group : groups)

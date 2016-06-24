@@ -10,7 +10,7 @@
 
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/adaptive_sleep.h>
 #include <utils/fs/file.h>
@@ -671,7 +671,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
         else {
             bool utcFormatOK = false;
-            timeUSec = parseDateTime( position );
+            timeUSec = nx::utils::parseDateTime( position );
 
             if (isUTCRequest)
             {
@@ -731,7 +731,7 @@ void QnProgressiveDownloadingConsumer::run()
             d->archiveDP->jumpTo( timeUSec, timeUSec );
 
             if (!endPosition.isEmpty())
-                dataConsumer.setEndTimeUsec(parseDateTime(endPosition));
+                dataConsumer.setEndTimeUsec(nx::utils::parseDateTime(endPosition));
 
             d->archiveDP->start();
             dataProvider = d->archiveDP;

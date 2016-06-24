@@ -14,7 +14,7 @@
 #include <core/resource/media_server_resource.h>
 #include <http/custom_headers.h>
 #include <nx/utils/log/log.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/fs/file.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/streaming/rtsp_client.h>
@@ -180,14 +180,14 @@ qint64 QnAutoRequestForwarder::fetchTimestamp(
         if( timeStr.toLower().trimmed() == "latest" )
             return -1;
         else
-            return parseDateTime( timeStr.toLatin1() ) / USEC_PER_MS;
+            return nx::utils::parseDateTime( timeStr.toLatin1() ) / USEC_PER_MS;
     }
 
     if( urlQuery.hasQueryItem( StreamingParams::START_POS_PARAM_NAME ) )
     {
         //in rtsp "pos" is usec only, no date! In http "pos" is in millis or iso date
         const auto posStr = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME );
-        const auto ts = parseDateTime( posStr );
+        const auto ts = nx::utils::parseDateTime( posStr );
         if( ts == DATETIME_NOW )
             return -1;
         return ts / USEC_PER_MS;

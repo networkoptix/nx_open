@@ -3,7 +3,7 @@
 
 #include <api/common_message_processor.h>
 
-#include <utils/common/string.h>
+#include <utils/common/html.h>
 
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>

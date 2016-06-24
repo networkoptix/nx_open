@@ -6,7 +6,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <nx/utils/collection.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 QnPtzManageModel::QnPtzManageModel(QObject *parent) :
     base_type(parent),
@@ -50,7 +50,7 @@ void QnPtzManageModel::addTour() {
     if (m_tours.isEmpty())
         lastRow++;
 
-    QString name = generateUniqueString(collectTourNames(), QString(), tr("New Tour %1"));
+    QString name = nx::utils::generateUniqueString(collectTourNames(), QString(), tr("New Tour %1"));
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
     m_tours << name;
@@ -114,7 +114,7 @@ void QnPtzManageModel::addPreset() {
     if (m_presets.isEmpty())
         lastRow++;
 
-    QString name = generateUniqueString(collectPresetNames(), QString(), tr("Saved Position %1"));
+    QString name = nx::utils::generateUniqueString(collectPresetNames(), QString(), tr("Saved Position %1"));
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
     m_presets << name;

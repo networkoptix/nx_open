@@ -14,7 +14,8 @@
 
 #include <helpers/cloud_url_helper.h>
 #include <utils/common/delayed.h>
-#include <utils/common/string.h>
+
+#include <utils/common/html.h>
 
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>

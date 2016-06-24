@@ -32,6 +32,7 @@
 #include <ui/models/license_list_model.h>
 #include <ui/dialogs/license_details_dialog.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
+#include <ui/utils/table_export_helper.h>
 
 #include <utils/license_usage_helper.h>
 #include <utils/common/product_features.h>
@@ -94,6 +95,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 
     connect(ui->detailsButton,  &QPushButton::clicked, this, &QnLicenseManagerWidget::at_licenseDetailsButton_clicked);
     connect(ui->removeButton,   &QPushButton::clicked, this, &QnLicenseManagerWidget::at_removeButton_clicked);
+    connect(ui->exportLicensesButton, &QPushButton::clicked, this, &QnLicenseManagerWidget::exportLicenses);
 
     connect(ui->gridLicenses->selectionModel(), &QItemSelectionModel::currentChanged,   this, &QnLicenseManagerWidget::updateButtons);
     connect(ui->gridLicenses->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QnLicenseManagerWidget::updateButtons);
@@ -414,8 +416,15 @@ bool QnLicenseManagerWidget::canRemoveLicense(const QnLicensePtr &license) const
     return !license->isValid(&errCode) && errCode != QnLicense::FutureLicense;
 }
 
+void QnLicenseManagerWidget::exportLicenses()
+{
+    QnTableExportHelper::exportToFile(ui->gridLicenses, false, this, tr("Export licenses to a file"));
+}
+
 void QnLicenseManagerWidget::updateButtons()
 {
+    ui->exportLicensesButton->setEnabled(!m_licenses.isEmpty());
+
     QModelIndex idx = ui->gridLicenses->selectionModel()->currentIndex();
     QnLicensePtr license = m_model->license(idx);
 

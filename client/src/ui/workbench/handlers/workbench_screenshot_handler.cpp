@@ -38,7 +38,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/warnings.h>
 #include <utils/aspect_ratio.h>
 
@@ -74,7 +74,7 @@ QString QnScreenshotParameters::timeString() const {
 
     qint64 timeMSecs = displayTimeMsec;
     if (isUtc)
-        return datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
+        return nx::utils::datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
     return QTime(0, 0, 0, 0).addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
 }
 
@@ -363,7 +363,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     QString previousDir = qnSettings->lastScreenshotDir();
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
-    QString suggestion = replaceNonFileNameCharacters(parameters.filename, QLatin1Char('_'))
+    QString suggestion = nx::utils::replaceNonFileNameCharacters(parameters.filename, QLatin1Char('_'))
         + QLatin1Char('_') + parameters.timeString();
     suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
 

@@ -19,7 +19,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/actions.h>
-#include <ui/common/grid_widget_helper.h>
+#include <ui/utils/table_export_helper.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -537,12 +537,12 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
 
 void QnEventLogDialog::at_exportAction_triggered()
 {
-    QnGridWidgetHelper::exportToFile(ui->gridEvents, this, tr("Export selected events to file"));
+    QnTableExportHelper::exportToFile(ui->gridEvents, true, this, tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_clipboardAction_triggered()
 {
-    QnGridWidgetHelper::copyToClipboard(ui->gridEvents);
+    QnTableExportHelper::copyToClipboard(ui->gridEvents);
 }
 
 void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)

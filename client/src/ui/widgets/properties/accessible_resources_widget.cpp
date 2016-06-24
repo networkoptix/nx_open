@@ -18,7 +18,7 @@
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 
 namespace
@@ -102,7 +102,7 @@ namespace
                 /* Sort by name. */
                 QString leftDisplay = left.data(Qt::DisplayRole).toString();
                 QString rightDisplay = right.data(Qt::DisplayRole).toString();
-                int result = naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
+                int result = nx::utils::naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
                 if (result != 0)
                     return result < 0;
             }

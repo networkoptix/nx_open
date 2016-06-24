@@ -7,7 +7,7 @@
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 class QnUserListModelPrivate : public Connective<QObject>
 {
@@ -482,5 +482,5 @@ bool QnSortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex&
     }
 
     /* Otherwise sort by login (which is unique): */
-    return naturalStringLess(leftUser->getName(), rightUser->getName());
+    return nx::utils::naturalStringLess(leftUser->getName(), rightUser->getName());
 }

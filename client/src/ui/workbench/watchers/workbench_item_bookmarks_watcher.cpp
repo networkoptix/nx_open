@@ -1,7 +1,8 @@
 
 #include "workbench_item_bookmarks_watcher.h"
 
-#include <utils/common/string.h>
+#include <utils/common/html.h>
+
 #include <utils/camera/bookmark_helpers.h>
 #include <camera/camera_bookmark_aggregation.h>
 #include <camera/camera_bookmarks_query.h>

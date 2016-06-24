@@ -8,7 +8,7 @@
 #include <nx/network/ssl_socket.h>
 
 #include <utils/common/command_line_parser.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
@@ -181,7 +181,7 @@ int runInListenMode(const std::multimap<QString, QString>& args)
 
         std::vector<String> serverIds;
         {
-            QString serverId = generateRandomName(7);
+            QString serverId = nx::utils::generateRandomName(7);
             readArg(args, "server-id", &serverId);
             serverIds.push_back(serverId.toUtf8());
 
