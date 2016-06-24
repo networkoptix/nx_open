@@ -37,6 +37,10 @@ var Page = function () {
     this.remoteSystemInput = this.setupDialog.element(by.model('settings.remoteSystem'));
     this.remotePasswordInput = this.setupDialog.element(by.model('settings.remotePassword'));
 
+    this.useCloudAccButton = this.setupDialog.element(by.buttonText('Use existing'));
+    this.cloudEmailInput = this.setupDialog.element(by.model('settings.cloudEmail'));
+    this.cloudPassInput = this.setupDialog.element(by.model('settings.cloudPassword'));
+
     this.getCheckboxState = function(checkbox) {
         checkbox.isSelected().then( function(isSelected) {
             return isSelected;

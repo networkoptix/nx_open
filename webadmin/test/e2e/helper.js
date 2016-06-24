@@ -19,6 +19,7 @@ var Helper = function () {
     this.activeSystem = 'http://10.0.3.196:7001';
     this.incompatibleSystem = 'http://10.0.3.202:7001';
     this.password = 'qweasd123';
+    this.cloudEmail = 'noptixqa+owner@gmail.com';
 
     this.checkElementFocusedBy = function(element, attribute) {
         expect(element.getAttribute(attribute)).toEqual(browser.driver.switchTo().activeElement().getAttribute(attribute));

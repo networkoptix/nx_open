@@ -62,42 +62,93 @@ describe('Setup Wizard', function () {
     it("Start but not complete setup - wizard should appear automatically",function(){
         p.triggerSetupWizard();
         browser.refresh();
-        browser.sleep(2000);
+        browser.sleep(3000);
         p.helper.checkPresent(element(by.model('user.username'))).then( function() {
             browser.refresh();
             browser.sleep(1000);
         });
-        this.helper.waitIfNotDisplayed(this.setupDialog, 1000);
+        p.helper.waitIfNotDisplayed(p.setupDialog, 1000);
         expect(p.setupDialog.isPresent()).toBe(true);
         p.helper.completeSetup();
     });
 
-    // needs to be extended to all branches of setup
     it("Next button is disabled until every input is filled",function(){
         p.triggerSetupWizard();
         browser.sleep(2000);
         p.nextButton.click();
+
+        // System name screen
         p.systemNameInput.clear();
         expect(p.nextButton.isEnabled()).toBe(false);
         p.systemNameInput.sendKeys('autotest-system');
-        p.nextButton.click();
-        p.skipCloud.click();
+
+        // Merge with existing screen
+        p.mergeWithExisting.click();
+
+        p.remoteSystemInput.clear();
+        p.remotePasswordInput.clear();
         expect(p.nextButton.isEnabled()).toBe(false);
+
+        p.remoteSystemInput.sendKeys(p.helper.activeSystem);
+        expect(p.nextButton.isEnabled()).toBe(false);
+
+        p.remotePasswordInput.sendKeys('password');
+        expect(p.nextButton.isEnabled()).toBe(true);
+        p.backButton.click();
+
+        // Connect to cloud screen
+        p.nextButton.click();
+
+        // cloud login screen
+        p.useCloudAccButton.click();
+        p.cloudEmailInput.clear();
+        p.cloudPassInput.clear();
+        expect(p.nextButton.isEnabled()).toBe(false);
+
+        p.cloudEmailInput.sendKeys(p.helper.cloudEmail);
+        expect(p.nextButton.isEnabled()).toBe(false);
+
+        p.cloudPassInput.sendKeys('password');
+        expect(p.nextButton.isEnabled()).toBe(true);
+        p.backButton.click();
+
+        // Local login screen
+        p.skipCloud.click();
+        p.localPasswordInput.clear();
+        p.localPasswordConfInput.clear();
+        expect(p.nextButton.isEnabled()).toBe(false);
+
         p.localPasswordInput.sendKeys(p.helper.password);
         expect(p.nextButton.isEnabled()).toBe(false);
+
         p.localPasswordConfInput.sendKeys(p.helper.password);
         expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
         p.nextButton.click();
         p.finishButton.click();
     });
 
-    // needs to be extended to all branches of setup
     it("First field on every step is auto-focused",function(){
         p.triggerSetupWizard();
         p.nextButton.click();
+
+        // System name screen
         p.helper.checkElementFocusedBy(p.systemNameInput, 'model');
         p.systemNameInput.sendKeys('autotest-system');
+
+        // Merge with existing screen
+        p.mergeWithExisting.click();
+        p.helper.checkElementFocusedBy(p.remoteSystemInput, 'model');
+        p.backButton.click();
+
+        // Connect to cloud screen
         p.nextButton.click();
+
+        // cloud login screen
+        p.useCloudAccButton.click();
+        p.helper.checkElementFocusedBy(p.cloudEmailInput, 'model');
+        p.backButton.click();
+
+        // Local login screen
         p.skipCloud.click();
         p.helper.checkElementFocusedBy(p.localPasswordInput, 'model');
         p.localPasswordInput.sendKeys(p.helper.password);
@@ -107,13 +158,21 @@ describe('Setup Wizard', function () {
         p.finishButton.click();
     });
 
-    // needs to be extended to all branches of setup
     it("Back buttons work",function(){
         p.triggerSetupWizard();
         p.nextButton.click();
         p.backButton.click();
         expect(p.setupDialog.getText()).toContain('Get Started with Nx Witness');
         p.nextButton.click();
+
+        p.advancedSysSett.click();
+        p.backButton.click();
+        expect(p.setupDialog.getText()).toContain('Give your System a name');
+
+        p.mergeWithExisting.click();
+        p.backButton.click();
+        expect(p.setupDialog.getText()).toContain('Give your System a name');
+
         p.systemNameInput.sendKeys('autotest-system');
         p.backButton.click();
         expect(p.setupDialog.getText()).toContain('Get Started with Nx Witness');
@@ -125,12 +184,19 @@ describe('Setup Wizard', function () {
         expect(p.setupDialog.getText()).toContain('Give your System a name');
         p.nextButton.click();
 
-        // On Cloud screen
+        // On Cloud screen - skip cloud
         p.skipCloud.click();
         p.backButton.click();
         expect(p.setupDialog.getText()).toContain('Connect your System to Nx Cloud');
+
+        // On Cloud login screen
+        p.useCloudAccButton.click();
+        p.backButton.click();
+        expect(p.setupDialog.getText()).toContain('Connect your System to Nx Cloud');
+
         p.skipCloud.click();
 
+        // On local login screen
         p.localPasswordInput.sendKeys(p.helper.password);
         p.localPasswordConfInput.sendKeys(p.helper.password);
         expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
@@ -138,13 +204,18 @@ describe('Setup Wizard', function () {
         p.finishButton.click();
     });
 
-    // needs to be extended to all branches of setup
-    it("Enter works for next button in every place next is available",function(){
+    it("Enter works for next button in every place next is available: advanced settings",function(){
         p.triggerSetupWizard();
         browser.sleep(2000);
         browser.actions().
             sendKeys(protractor.Key.ENTER).
             perform();
+
+        p.advancedSysSett.click();
+        browser.actions().
+            sendKeys(protractor.Key.ENTER).
+            perform();
+
         p.systemNameInput.sendKeys('autotest-system');
         browser.actions().
             sendKeys(protractor.Key.ENTER).
@@ -158,6 +229,47 @@ describe('Setup Wizard', function () {
             perform();
         p.finishButton.click();
     });
+
+    it("Enter works for next button in every place next is available: cloud connect",function(){
+        p.triggerSetupWizard();
+        browser.sleep(2000);
+        browser.actions().
+            sendKeys(protractor.Key.ENTER).
+            perform();
+        p.systemNameInput.sendKeys('autotest-system');
+        browser.actions().
+            sendKeys(protractor.Key.ENTER).
+            perform();
+
+        p.useCloudAccButton.click();
+        p.cloudEmailInput.sendKeys(p.helper.cloudEmail);
+        p.cloudPassInput.sendKeys(p.helper.password);
+        expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
+
+        browser.actions().
+            sendKeys(protractor.Key.ENTER).
+            perform();
+
+        p.finishButton.click();
+    });
+
+    it("Enter works for next button in every place next is available: merge with another",function(){
+        p.triggerSetupWizard();
+        browser.sleep(2000);
+        browser.actions().
+            sendKeys(protractor.Key.ENTER).
+            perform();
+
+        p.mergeWithExisting.click();
+        p.remoteSystemInput.sendKeys(p.helper.activeSystem);
+        p.remotePasswordInput.sendKeys(p.helper.password);
+        browser.actions().
+            sendKeys(protractor.Key.ENTER).
+            perform();
+
+        p.finishButton.click();
+    });
+
 
     it("Link Learn more visible and works",function(){
         p.triggerSetupWizard();
@@ -249,7 +361,7 @@ describe('Setup Wizard', function () {
         p.helper.completeSetup();
     });
 
-    fit("Merge: remote system is not accessible",function(){
+    it("Merge: remote system is not accessible, or wrong url was entered",function(){
         p.triggerSetupWizard();
         expect(p.setupDialog.isDisplayed()).toBe(true);
         browser.sleep(2000);
@@ -279,4 +391,9 @@ describe('Setup Wizard', function () {
         p.finishButton.click();
     });
 
+    it("After finishing - you are still logged in into wedamin under new credentials",function(){
+        p.triggerSetupWizard();
+        browser.sleep(2000);
+        p.helper.completeSetup();
+    });
 });
