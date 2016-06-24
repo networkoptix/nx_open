@@ -291,6 +291,11 @@ QString QnLicense::expiration() const
     return m_expiration;
 }
 
+bool QnLicense::neverExpire() const
+{
+    return m_expiration.isEmpty();
+}
+
 QByteArray QnLicense::rawLicense() const
 {
     return m_rawLicense;
@@ -404,12 +409,9 @@ QByteArray QnLicense::toString() const
     return m_rawLicense;
 }
 
-qint64 QnLicense::expirationTime() const {
-
-    //return QDateTime::currentMSecsSinceEpoch() + 1000 * 1000;
-
-
-    if(m_expiration.isEmpty())
+qint64 QnLicense::expirationTime() const
+{
+    if (neverExpire())
         return -1;
 
     QDateTime result = QDateTime::fromString(m_expiration, QLatin1String("yyyy-MM-dd hh:mm:ss"));

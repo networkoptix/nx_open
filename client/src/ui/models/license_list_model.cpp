@@ -74,7 +74,7 @@ QVariant QnLicenseListModel::data(const QModelIndex& index, int role) const
                     return QString::fromLatin1(license->key());
 
                 case ExpirationDateColumn:
-                    return license->expirationTime() < 0
+                    return license->neverExpire()
                         ? tr("Never")
                         : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString(Qt::SystemLocaleShortDate);
 

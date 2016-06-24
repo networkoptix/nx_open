@@ -36,6 +36,40 @@
 #include <utils/license_usage_helper.h>
 #include <utils/common/product_features.h>
 
+namespace {
+
+class QnLicenseListSortProxyModel : public QSortFilterProxyModel
+{
+    using base_type = QSortFilterProxyModel;
+public:
+    QnLicenseListSortProxyModel(QObject* parent = nullptr) :
+        base_type(parent)
+    {}
+
+protected:
+    virtual bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const
+    {
+        if (source_left.column() != QnLicenseListModel::ExpirationDateColumn
+            || source_right.column() != QnLicenseListModel::ExpirationDateColumn)
+            return base_type::lessThan(source_left, source_right);
+
+        QnLicensePtr left = source_left.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
+        QnLicensePtr right = source_right.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
+
+        if (!left || !right)
+            return (left < right);
+
+        /* Permanent licenses should be the last. */
+        if (left->neverExpire() != right->neverExpire())
+            return right->neverExpire();
+
+        return left->expirationTime() < right->expirationTime();
+    }
+
+};
+
+}
+
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::LicenseManagerWidget),
@@ -48,7 +82,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     QnSnappedScrollBar *tableScrollBar = new QnSnappedScrollBar(this);
     ui->gridLicenses->setVerticalScrollBar(tableScrollBar->proxyScrollBar());
 
-    QSortFilterProxyModel* sortModel = new QSortFilterProxyModel(this);
+    QSortFilterProxyModel* sortModel = new QnLicenseListSortProxyModel(this);
     sortModel->setSourceModel(m_model);
 
     ui->gridLicenses->setIconSize(QSize(20, 20));
