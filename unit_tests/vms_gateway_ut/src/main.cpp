@@ -19,10 +19,10 @@ int main(int argc, char **argv)
 
     nx::utils::ArgumentParser args(argc, argv);
     QnLog::applyArguments(args);
-    if (const auto value = args->get("tmp"))
+    if (const auto value = args.get("tmp"))
     {
         nx::cloud::gateway::VmsGatewayFunctionalTest::
-            setTemporaryDirectoryPath(value);
+            setTemporaryDirectoryPath(*value);
     }
 
     const int result = RUN_ALL_TESTS();

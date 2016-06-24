@@ -68,5 +68,15 @@ bool ArgumentParser::read(const QString& name, int* const value) const
     return true;
 }
 
+bool ArgumentParser::read(const QString& name, size_t* const value) const
+{
+    QString strValue;
+    if (!read(name, &strValue))
+        return false;
+
+    *value = strValue.toUInt();
+    return true;
+}
+
 } // namespace utils
 } // namespace nx
