@@ -104,57 +104,60 @@ void QnTableExportHelper::getGridData(QAbstractItemView* grid, bool onlySelected
 
     QString textResult;
     QString htmlResult;
-
-    htmlResult.append(lit("<html>\n"));
-    htmlResult.append(lit("<body>\n"));
-    htmlResult.append(lit("<table>\n"));
-
-    htmlResult.append(lit("<tr>"));
-    for (int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
     {
-        QString header = model->headerData(list[i].column(), Qt::Horizontal).toString();
-        htmlResult.append(lit("<th>"));
-        htmlResult.append(header);
-        htmlResult.append(lit("</th>"));
+        QnHtmlTag htmlTag("html", &htmlResult, QnHtmlTag::BothBreaks);
+        QnHtmlTag bodyTag("body", &htmlResult, QnHtmlTag::BothBreaks);
+        QnHtmlTag tableTag("table", &htmlResult, QnHtmlTag::BothBreaks);
 
-        if (i > 0)
-            textResult.append(textDelimiter);
-        textResult.append(header);
-    }
-    htmlResult.append(lit("</tr>"));
+        { /* Creating header. */
+            QnHtmlTag rowGuard("tr", &htmlResult);
+            for (int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
+            {
+                int column = list[i].column();
 
-    int prevRow = -1;
-    for (int i = 0; i < list.size(); ++i)
-    {
-        if (list[i].row() != prevRow)
-        {
-            prevRow = list[i].row();
-            textResult.append(lit("\n"));
-            if (i > 0)
-                htmlResult.append(lit("</tr>"));
-            htmlResult.append(lit("<tr>"));
-        }
-        else
-        {
-            textResult.append(textDelimiter);
+                QString header = model->headerData(column, Qt::Horizontal).toString();
+                QnHtmlTag thTag("th", &htmlResult, QnHtmlTag::NoBreaks);
+                htmlResult.append(header);
+
+                if (i > 0)
+                    textResult.append(textDelimiter);
+                textResult.append(header);
+            }
         }
 
-        QString textData = model->data(list[i], Qt::DisplayRole).toString();
-        QString htmlData = model->data(list[i], Qn::DisplayHtmlRole).toString();
-        if (htmlData.isEmpty())
-            htmlData = escapeHtml(textData);
+        { /* Fill table with data */
 
-        htmlResult.append(lit("<td>"));
-        htmlResult.append(htmlData);
-        htmlResult.append(lit("</td>"));
+            QScopedPointer<QnHtmlTag> rowTag;
 
-        textResult.append(textData);
+            int prevRow = -1;
+            for (int i = 0; i < list.size(); ++i)
+            {
+                if (list[i].row() != prevRow)
+                {
+                    prevRow = list[i].row();
+                    textResult.append(lit("\n"));
+                    rowTag.reset();   /*< close tag before opening new. */
+                    rowTag.reset(new QnHtmlTag("tr", &htmlResult));
+                }
+                else
+                {
+                    textResult.append(textDelimiter);
+                }
+
+                QString textData = model->data(list[i], Qt::DisplayRole).toString();
+                textResult.append(textData);
+
+                QString htmlData = model->data(list[i], Qn::DisplayHtmlRole).toString();
+                if (htmlData.isEmpty())
+                    htmlData = escapeHtml(textData);
+
+                QnHtmlTag cellTag("td", &htmlResult, QnHtmlTag::NoBreaks);
+                htmlResult.append(htmlData);
+            }
+        }
+
+        textResult.append(lit("\n"));
     }
-    htmlResult.append(lit("</tr>\n"));
-    htmlResult.append(lit("</table>\n"));
-    htmlResult.append(lit("</body>\n"));
-    htmlResult.append(lit("</html>\n"));
-    textResult.append(lit("\n"));
 
     *textData = textResult;
     *htmlData = htmlResult;
