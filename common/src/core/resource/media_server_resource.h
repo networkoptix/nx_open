@@ -47,6 +47,7 @@ public:
     void setIgnoredUrls(const QList<QUrl> &urls);
     QList<QUrl> getIgnoredUrls() const;
 
+    virtual void setUrl(const QString& url) override;
     quint16 getPort() const;
 
     /** Get list of all available server addresses. */

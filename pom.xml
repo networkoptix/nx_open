@@ -749,10 +749,6 @@
                     <value>arm</value>
                 </property>
             </activation>
-            <modules>
-                <module>nx_cloud/libconnection_mediator</module>
-                <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
-            </modules>
             <properties>
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
@@ -890,6 +886,8 @@
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
                 <module>mobile_client</module>
+                <module>nx_cloud/libconnection_mediator</module>
+                <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
         </profile>
         <profile>
@@ -919,6 +917,8 @@
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
                 <module>edge_firmware/rpi</module>
+                <module>nx_cloud/libconnection_mediator</module>
+                <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
         </profile>
         <profile>
