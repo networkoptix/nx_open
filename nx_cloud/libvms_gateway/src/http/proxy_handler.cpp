@@ -52,8 +52,11 @@ void ProxyHandler::processRequest(
         completionHandler(nx_http::StatusCode::forbidden, nullptr);
         return;
     }
-    const auto systemAddressString = pathItems[0];
+
+    SocketAddress systemAddress(pathItems[0].toString());
     pathItems.removeAt(0);
+    if (systemAddress.port == 0)
+        systemAddress.port = m_settings.http().proxyTargetPort;
 
     if (pathItems.isEmpty())
     {
@@ -83,7 +86,7 @@ void ProxyHandler::processRequest(
     m_request = std::move(request);
     //TODO #ak updating request (e.g., Host header)
     m_targetPeerSocket->connectAsync(
-        SocketAddress(systemAddressString.toString(), m_settings.http().proxyTargetPort),
+        systemAddress,
         std::bind(&ProxyHandler::onConnected, this, std::placeholders::_1));
 }
 

@@ -16,27 +16,21 @@ namespace cloud {
 namespace gateway {
 namespace test {
 
-TEST_F(VmsGatewayFunctionalTest, simple)
+const nx_http::BufferType testPath("/test");
+const nx_http::BufferType testMsgBody("bla-bla-bla");
+const nx_http::BufferType contentType("text/plain");
+
+void testProxyUrl(
+    const QUrl& url,
+    nx_http::StatusCode::Value status = nx_http::StatusCode::ok)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    const nx_http::BufferType testPath("/test");
-    const nx_http::BufferType testMsgBody("bla-bla-bla");
-    const nx_http::BufferType contentType("text/plain");
-
-    testHttpServer()->registerStaticProcessor(
-        testPath,
-        testMsgBody,
-        contentType);
-
-    //testing proxy
     nx_http::HttpClient httpClient;
-    const QUrl proxyUrl(lit("http://%1/127.0.0.1%2").arg(endpoint().toString()).arg(QLatin1String(testPath)));
-    
-    ASSERT_TRUE(httpClient.doGet(proxyUrl));
-    ASSERT_EQ(
-        nx_http::StatusCode::ok,
-        httpClient.response()->statusLine.statusCode);
+    ASSERT_TRUE(httpClient.doGet(url));
+    ASSERT_EQ(status, httpClient.response()->statusLine.statusCode);
+
+    if (status != nx_http::StatusCode::ok)
+        return;
+
     ASSERT_EQ(
         contentType,
         nx_http::getHeaderValue(httpClient.response()->headers, "Content-Type"));
@@ -44,9 +38,43 @@ TEST_F(VmsGatewayFunctionalTest, simple)
     nx_http::BufferType msgBody;
     while (!httpClient.eof())
         msgBody += httpClient.fetchMessageBodyBuffer();
-    ASSERT_EQ(
+
+    ASSERT_EQ(testMsgBody, msgBody);
+}
+
+TEST_F(VmsGatewayFunctionalTest, simple)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    testHttpServer()->registerStaticProcessor(
+        testPath,
         testMsgBody,
-        msgBody);
+        contentType);
+
+    // Default port
+    testProxyUrl(QUrl(lit("http://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().address.toString())
+        .arg(QLatin1String(testPath))));
+
+    // Specified
+    testProxyUrl(QUrl(lit("http://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(QLatin1String(testPath))));
+
+    // Wrong port
+    testProxyUrl(QUrl(lit("http://%1/%2:777%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().address.toString())
+        .arg(QLatin1String(testPath))),
+        nx_http::StatusCode::serviceUnavailable);
+
+    // Wrong path
+    testProxyUrl(QUrl(lit("http://%1/%2")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())),
+        nx_http::StatusCode::notFound);
 }
 
 }   // namespace test
