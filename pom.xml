@@ -938,6 +938,7 @@
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>tx1</modification>
                 <rdep.target>tx1</rdep.target>
+                <gcc.version>4.8.4</gcc.version>
                 <qt.spec/>
                 <linux.defines>DISABLE_FESTIVAL</linux.defines>
             </properties>
