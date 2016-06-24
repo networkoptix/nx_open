@@ -6,7 +6,12 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/httpclient.h>
+#include <nx/network/test_support/socket_test_helper.h>
+#include <nx/utils/random.cpp>
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
+
+#include <QTcpSocket>
+#include <QNetworkProxy>
 
 #include "test_setup.h"
 
@@ -112,6 +117,36 @@ TEST_F(VmsGatewayFunctionalTest, IpForbidden)
         .arg(testHttpServer()->serverAddress().address.toString())
         .arg(QLatin1String(testPath))),
         nx_http::StatusCode::forbidden);
+}
+
+TEST_F(VmsGatewayFunctionalTest, HttpConnect)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted(true, false));
+
+    network::test::RandomDataTcpServer server(
+        network::test::TestTrafficLimitType::outgoing,
+        network::test::TestConnection::kReadBufferSize,
+        network::test::TestTransmissionMode::pong);
+    ASSERT_TRUE(server.start());
+    const auto addr = server.addressBeingListened();
+
+    QTcpSocket tcpSocket;
+    tcpSocket.setProxy(QNetworkProxy(
+        QNetworkProxy::HttpProxy, endpoint().address.toString(), endpoint().port));
+
+    tcpSocket.connectToHost(addr.address.toString(), addr.port);
+    ASSERT_TRUE(tcpSocket.waitForConnected());
+
+    QByteArray writeData(utils::generateRandomData(
+        network::test::TestConnection::kReadBufferSize));
+    ASSERT_EQ(tcpSocket.write(writeData), writeData.size());
+
+    ASSERT_TRUE(tcpSocket.waitForReadyRead());
+    server.pleaseStopSync();
+
+    const auto readData = tcpSocket.readAll();
+    ASSERT_GT(readData.size(), 0);
+    ASSERT_TRUE(writeData.startsWith(readData));
 }
 
 }   // namespace test
