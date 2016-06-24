@@ -15,52 +15,6 @@
 
 namespace ec2
 {
-
-bool hasPermission(const QnUuid &userId, const ApiServerFootageData &data, Qn::Permission permission);
-
-bool hasPermission(const QnUuid &userId, const ApiCameraAttributesData &data, Qn::Permission permission);
-
-bool hasPermission(const QnUuid &userId, const ApiMediaServerUserAttributesData &data, Qn::Permission permission);
-
-bool hasPermission(const QnUuid &userId, const ApiAccessRightsData &data, Qn::Permission permission);
-
-bool hasPermission(const QnUuid &userId, const ApiResourceParamWithRefData &data, Qn::Permission permission);
-
-bool hasPermission(const QnUuid &/*userId*/, const ApiStoredFilePath &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &/*userId*/, const ApiStoredFileData &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &/*userId*/, const ApiClientInfoData &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &/*userId*/, const ApiResourceTypeData &/*data*/, Qn::Permission /*permission*/);
-bool hasPermission(const QnUuid &/*userId*/, const ApiTransactionData &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &userId, const ApiLicenseData &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &userId, const ApiLicenseOverflowData &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &userId, const ApiDatabaseDumpData &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &userId, const ApiVideowallControlMessageData &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &userId, const ApiBusinessRuleData &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &userId, const ApiBusinessActionData &/*data*/, Qn::Permission permission);
-
-bool hasPermission(const QnUuid &userId, const ApiUpdateUploadData &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &userId, const ApiUpdateInstallData &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &userId, const ApiUpdateUploadResponceData &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &userId, const ApiPeerSystemTimeData &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &userId, const ApiSystemStatistics &/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &userId, const ApiUserGroupData&/*data*/, Qn::Permission /*permission*/);
-
-bool hasPermission(const QnUuid &userId, const ApiDiscoveredServerData&/*data*/, Qn::Permission permission);
-
 template<typename TransactionParamType>
 bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission);
 
@@ -75,6 +29,50 @@ void filterByPermission(const QnUuid &userId, Container<TransactionParamType, Ta
 
 namespace detail
 {
+bool hasPermissionImpl(const QnUuid &userId, const ApiServerFootageData &data, Qn::Permission permission);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiCameraAttributesData &data, Qn::Permission permission);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiMediaServerUserAttributesData &data, Qn::Permission permission);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiAccessRightsData &data, Qn::Permission permission);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiResourceParamWithRefData &data, Qn::Permission permission);
+
+bool hasPermissionImpl(const QnUuid &/*userId*/, const ApiStoredFilePath &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &/*userId*/, const ApiStoredFileData &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &/*userId*/, const ApiClientInfoData &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &/*userId*/, const ApiResourceTypeData &/*data*/, Qn::Permission /*permission*/);
+bool hasPermissionImpl(const QnUuid &/*userId*/, const ApiTransactionData &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiLicenseData &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiLicenseOverflowData &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiDatabaseDumpData &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiVideowallControlMessageData &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiBusinessRuleData &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiBusinessActionData &/*data*/, Qn::Permission permission);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiUpdateUploadData &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiUpdateInstallData &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiUpdateUploadResponceData &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiPeerSystemTimeData &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiSystemStatistics &/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiUserGroupData&/*data*/, Qn::Permission /*permission*/);
+
+bool hasPermissionImpl(const QnUuid &userId, const ApiDiscoveredServerData&/*data*/, Qn::Permission permission);
 
 template<typename TransactionParamType>
 auto hasPermissionImpl(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(data.id), bool>
@@ -128,6 +126,12 @@ auto hasModifyPermissionImpl(const QnUuid &userId, const TransactionParamType &d
     return hasPermission(userId, data, Qn::Permission::SavePermission);
 }
 
+template<typename TransactionParamType>
+bool hasPermissionImpl(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission)
+{
+	return detail::hasPermissionImpl(userId, data, permission, 0);
+}
+
 } // namespace detail
 
 template<typename TransactionParamType>
@@ -135,7 +139,7 @@ bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::P
 {
     if (Qn::UserAccessData(userId) == Qn::kDefaultUserAccess)
         return true;
-    return detail::hasPermissionImpl(userId, data, permission, 0);
+    return detail::hasPermissionImpl(userId, data, permission);
 }
 
 template<typename TransactionParamType>
