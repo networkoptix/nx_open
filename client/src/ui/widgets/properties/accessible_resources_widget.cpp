@@ -23,19 +23,50 @@
 
 namespace
 {
-    class QnResourcesListSortModel: public QSortFilterProxyModel
+    class QnResourcesListSortModel : public QSortFilterProxyModel
     {
         typedef QSortFilterProxyModel base_type;
+
     public:
         explicit QnResourcesListSortModel(QObject *parent = 0) :
-            base_type(parent)
+            base_type(parent),
+            m_allChecked(false)
         {
         }
-        virtual ~QnResourcesListSortModel() {}
+
+        virtual ~QnResourcesListSortModel()
+        {
+        }
 
         QnResourcePtr resource(const QModelIndex &index) const
         {
             return index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        }
+
+        QVariant data(const QModelIndex &index, int role) const
+        {
+            if (m_allChecked && role == Qt::CheckStateRole && index.column() == QnResourceListModel::CheckColumn)
+                return QVariant::fromValue<int>(Qt::Checked);
+
+            return base_type::data(index, role);
+        }
+
+        bool allChecked() const
+        {
+            return m_allChecked;
+        }
+
+        void setAllChecked(bool value)
+        {
+            if (m_allChecked == value)
+                return;
+
+            m_allChecked = value;
+
+            emit dataChanged(
+                index(0, QnResourceListModel::CheckColumn),
+                index(rowCount() - 1, QnResourceListModel::CheckColumn),
+                { Qt::CheckStateRole });
         }
 
     protected:
@@ -80,6 +111,8 @@ namespace
             return l->getUniqueId() < r->getUniqueId();
         }
 
+    private:
+        bool m_allChecked;
     };
 
     const QString kDummyResourceId(lit("dummy_resource"));
@@ -115,6 +148,8 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     viewModel->setSortRole(Qt::DisplayRole);
     viewModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     viewModel->sort(Qn::NameColumn);
+
+    connect(this, &QnAccessibleResourcesWidget::controlsChanged, viewModel, &QnResourcesListSortModel::setAllChecked);
 
     ui->resourcesTreeView->setModel(viewModel);
     ui->controlsTreeView->setModel(m_controlsModel.data());
@@ -255,6 +290,7 @@ void QnAccessibleResourcesWidget::initControlsModel()
 
         bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         ui->resourcesTreeView->setEnabled(!checked);
+        emit controlsChanged(checked);
         emit hasChangesChanged();
     };
 
