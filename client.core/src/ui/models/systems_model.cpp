@@ -455,9 +455,9 @@ bool QnSystemsModelPrivate::systemLess(
         return firstCompatible;
 
     const bool firstFullCompatible = getCompatibleVersion(first).isEmpty();
-    const bool sameFullComaptible =
+    const bool sameFullCompatible =
         (firstFullCompatible == getCompatibleVersion(second).isEmpty());
-    if (!sameFullComaptible)
+    if (!sameFullCompatible)
         return firstFullCompatible;
 
     return (first->name() < second->name());

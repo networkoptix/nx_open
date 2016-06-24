@@ -28,7 +28,7 @@
 #include "action_factories.h"
 #include "action_parameter_types.h"
 
-QnAction::QnAction(QnActions::IDType id, QObject *parent):
+QnAction::QnAction(QnActions::IDType id, QObject* parent) :
     QAction(parent),
     QnWorkbenchContextAware(parent),
     m_id(id),
@@ -42,8 +42,8 @@ QnAction::QnAction(QnActions::IDType id, QObject *parent):
     connect(this, &QAction::changed, this, &QnAction::updateToolTipSilent);
 }
 
-QnAction::~QnAction() {
-}
+QnAction::~QnAction()
+{}
 
 QnActions::IDType QnAction::id() const
 {
@@ -60,7 +60,7 @@ Qn::ActionParameterTypes QnAction::defaultParameterTypes() const
     return static_cast<Qn::ActionParameterTypes>(static_cast<int>(m_flags) & Qn::TargetTypeMask);
 }
 
-Qn::Permissions QnAction::requiredTargetPermissions(int target /*= -1*/) const
+Qn::Permissions QnAction::requiredTargetPermissions(int target /* = -1*/) const
 {
     return m_targetPermissions.value(target);
 }
@@ -95,7 +95,8 @@ const QString & QnAction::normalText() const
     return m_normalText;
 }
 
-void QnAction::setMode(QnActionTypes::ClientModes mode) {
+void QnAction::setMode(QnActionTypes::ClientModes mode)
+{
     m_mode = mode;
 }
 
@@ -104,8 +105,9 @@ Qn::ActionFlags QnAction::flags() const
     return m_flags;
 }
 
-void QnAction::setNormalText(const QString &normalText) {
-    if(m_normalText == normalText)
+void QnAction::setNormalText(const QString& normalText)
+{
+    if (m_normalText == normalText)
         return;
 
     m_normalText = normalText;
@@ -118,84 +120,96 @@ const QString & QnAction::toggledText() const
     return m_toggledText.isEmpty() ? m_normalText : m_toggledText;
 }
 
-void QnAction::setToggledText(const QString &toggledText) {
-    if(m_toggledText == toggledText)
+void QnAction::setToggledText(const QString& toggledText)
+{
+    if (m_toggledText == toggledText)
         return;
 
     m_toggledText = toggledText;
 
-    if(m_toggledText.isEmpty()) {
+    if (m_toggledText.isEmpty())
         disconnect(this, &QAction::toggled, this, &QnAction::updateText);
-    } else {
+    else
         connect(this, &QAction::toggled, this, &QnAction::updateText, Qt::UniqueConnection);
-    }
 
     updateText();
 }
 
-const QString & QnAction::pulledText() const
+const QString& QnAction::pulledText() const
 {
     return m_pulledText.isEmpty() ? m_normalText : m_pulledText;
 }
 
-void QnAction::setPulledText(const QString &pulledText) {
+void QnAction::setPulledText(const QString& pulledText)
+{
     m_pulledText = pulledText;
 }
 
-QnActionCondition * QnAction::condition() const
+QnActionCondition* QnAction::condition() const
 {
     return m_condition.data();
 }
 
-void QnAction::setCondition(QnActionCondition *condition) {
+void QnAction::setCondition(QnActionCondition* condition)
+{
     m_condition = condition;
 }
 
-QnActionFactory * QnAction::childFactory() const
+QnActionFactory* QnAction::childFactory() const
 {
     return m_childFactory.data();
 }
 
-void QnAction::setChildFactory(QnActionFactory *childFactory) {
+void QnAction::setChildFactory(QnActionFactory* childFactory)
+{
     m_childFactory = childFactory;
 }
 
-QnActionTextFactory * QnAction::textFactory() const
+QnActionTextFactory* QnAction::textFactory() const
 {
     return m_textFactory.data();
 }
 
-void QnAction::setTextFactory(QnActionTextFactory *textFactory) {
+void QnAction::setTextFactory(QnActionTextFactory* textFactory)
+{
     m_textFactory = textFactory;
 }
 
-const QList<QnAction *> & QnAction::children() const
+const QList<QnAction*>& QnAction::children() const
 {
     return m_children;
 }
 
-void QnAction::addChild(QnAction *action) {
+void QnAction::addChild(QnAction* action)
+{
     m_children.push_back(action);
 }
 
-void QnAction::removeChild(QnAction *action) {
+void QnAction::removeChild(QnAction* action)
+{
     m_children.removeOne(action);
 }
 
-QString QnAction::defaultToolTipFormat() const {
-    if(shortcuts().empty()) {
+QString QnAction::defaultToolTipFormat() const
+{
+    if (shortcuts().empty())
+    {
         return lit("%n");
-    } else {
+    }
+    else
+    {
         return lit("%n (<b>%s</b>)");
     }
 }
 
-QString QnAction::toolTipFormat() const {
+QString QnAction::toolTipFormat() const
+{
     return m_toolTipFormat.isEmpty() ? defaultToolTipFormat() : m_toolTipFormat;
 }
 
-void QnAction::setToolTipFormat(const QString &toolTipFormat) {
-    if(m_toolTipFormat == toolTipFormat)
+void QnAction::setToolTipFormat(const QString& toolTipFormat)
+{
+    if (m_toolTipFormat == toolTipFormat)
         return;
 
     m_toolTipFormat = toolTipFormat;
@@ -203,7 +217,7 @@ void QnAction::setToolTipFormat(const QString &toolTipFormat) {
     updateToolTip(true);
 }
 
-Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const
+Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnActionParameters& parameters) const
 {
     if (!isVisible())
         return Qn::InvisibleAction; // TODO: #Elric cheat!
@@ -219,11 +233,11 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
         return Qn::InvisibleAction;
 
     if (qnRuntime->isVideoWallMode() &&
-        !m_mode.testFlag(QnActionTypes::VideoWallMode) )
+        !m_mode.testFlag(QnActionTypes::VideoWallMode))
         return Qn::InvisibleAction;
 
     if (qnRuntime->isActiveXMode() &&
-        !m_mode.testFlag(QnActionTypes::ActiveXMode) )
+        !m_mode.testFlag(QnActionTypes::ActiveXMode))
         return Qn::InvisibleAction;
 
     int size = parameters.size();
@@ -261,7 +275,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
             else if (key == Qn::CurrentLayoutMediaItemsRole)
             {
                 const QnResourceList& resList = QnActionParameterTypes::resources(context()->display()->widgets());
-                for (const QnResourcePtr &res : resList)
+                for (const QnResourcePtr& res : resList)
                 {
                     if (res.dynamicCast<QnMediaResource>())
                         resources.push_back(res);
@@ -290,33 +304,41 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
     return Qn::EnabledAction;
 }
 
-bool QnAction::event(QEvent *event)
+bool QnAction::event(QEvent* event)
 {
     if (event->type() != QEvent::Shortcut)
         return QObject::event(event);
 
     // Shortcuts
-    QShortcutEvent *e = static_cast<QShortcutEvent *>(event);
+    QShortcutEvent* e = static_cast<QShortcutEvent*>(event);
 
     if (e->isAmbiguous())
     {
         NX_ASSERT(m_flags.testFlag(Qn::IntentionallyAmbiguous), lit("Ambiguous shortcut overload: %1.").arg(e->key().toString()));
 
-        QSet<QAction *> actions;
-        for (QWidget *widget : associatedWidgets())
-            for (QAction *action : widget->actions())
+        QSet<QAction*> actions;
+        for (QWidget* widget : associatedWidgets())
+        {
+            for (QAction* action : widget->actions())
+            {
                 if (action->shortcuts().contains(e->key()))
                     actions.insert(action);
+            }
+        }
 
-        for (QGraphicsWidget *widget : associatedGraphicsWidgets())
-            for (QAction *action : widget->actions())
+        for (QGraphicsWidget* widget : associatedGraphicsWidgets())
+        {
+            for (QAction* action : widget->actions())
+            {
                 if (action->shortcuts().contains(e->key()))
                     actions.insert(action);
+            }
+        }
 
         /* Just processing current action further. */
         actions.remove(this);
 
-        for (QAction *action : actions)
+        for (QAction* action : actions)
         {
             QShortcutEvent se(e->key(), e->shortcutId(), false);
             QCoreApplication::sendEvent(action, &se);
@@ -326,9 +348,9 @@ bool QnAction::event(QEvent *event)
     QnActionParameters parameters;
     Qn::ActionScope scope = static_cast<Qn::ActionScope>(static_cast<int>(this->scope()));
 
-    if (QnActionTargetProvider *targetProvider = QnWorkbenchContextAware::menu()->targetProvider())
+    if (QnActionTargetProvider* targetProvider = QnWorkbenchContextAware::menu()->targetProvider())
     {
-         if (!flags().testFlag(Qn::ScopelessHotkey))
+        if (!flags().testFlag(Qn::ScopelessHotkey))
             scope = targetProvider->currentScope();
 
         if (!flags().testFlag(Qn::TargetlessHotkey))
@@ -342,56 +364,60 @@ bool QnAction::event(QEvent *event)
     return false;
 }
 
-void QnAction::updateText() {
-    if(isChecked()) {
-        setText(toggledText());
-    } else {
-        setText(normalText());
-    }
+void QnAction::updateText()
+{
+    setText(isChecked() ? toggledText() : normalText());
 }
 
-void QnAction::updateToolTip(bool notify) {
-    if(!toolTip().endsWith(m_toolTipMarker))
+void QnAction::updateToolTip(bool notify)
+{
+    if (!toolTip().endsWith(m_toolTipMarker))
         return; /* We have an explicitly set tooltip. */
 
     /* This slot is the first to be invoked from changed() signal,
      * so we don't want to emit additional changed() signals if we were called from it. */
     bool signalsBlocked = false;
-    if(notify)
+    if (notify)
         signalsBlocked = blockSignals(true);
 
     QString toolTip = toolTipFormat();
 
     int nameIndex = toolTip.indexOf(lit("%n"));
-    if(nameIndex != -1) {
+    if (nameIndex != -1)
+    {
         QString name = !m_pulledText.isEmpty() ? m_pulledText : text();
         toolTip.replace(nameIndex, 2, name);
     }
 
     int shortcutIndex = toolTip.indexOf(lit("%s"));
-    if(shortcutIndex != -1)
+    if (shortcutIndex != -1)
         toolTip.replace(shortcutIndex, 2, shortcut().toString(QKeySequence::NativeText));
 
     setToolTip(toolTip + m_toolTipMarker);
 
-    if(notify)
+    if (notify)
         blockSignals(signalsBlocked);
 }
 
-void QnAction::updateToolTipSilent() {
+void QnAction::updateToolTipSilent()
+{
     updateToolTip(false);
 }
 
-void QnAction::addConditionalText(QnActionCondition *condition, const QString &text) {
+void QnAction::addConditionalText(QnActionCondition* condition, const QString& text)
+{
     m_conditionalTexts << ConditionalText(condition, text);
 }
 
-bool QnAction::hasConditionalTexts() {
+bool QnAction::hasConditionalTexts()
+{
     return !m_conditionalTexts.isEmpty();
 }
 
-QString QnAction::checkConditionalText(const QnActionParameters &parameters) const {
-    for (const ConditionalText &conditionalText: m_conditionalTexts){
+QString QnAction::checkConditionalText(const QnActionParameters& parameters) const
+{
+    for (const ConditionalText& conditionalText : m_conditionalTexts)
+    {
         if (conditionalText.condition->check(parameters))
             return conditionalText.text;
     }

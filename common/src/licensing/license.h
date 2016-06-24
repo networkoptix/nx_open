@@ -81,6 +81,7 @@ public:
     QString version() const;
     QString brand() const;
     QString expiration() const; // TODO: #Ivan Passing date as a string is totally evil. Please make sure your code is easy to use!!!
+    bool neverExpire() const;
 
     QByteArray rawLicense() const;
 
