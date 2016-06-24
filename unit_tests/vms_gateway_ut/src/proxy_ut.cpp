@@ -42,10 +42,9 @@ void testProxyUrl(
     ASSERT_EQ(testMsgBody, msgBody);
 }
 
-TEST_F(VmsGatewayFunctionalTest, simple)
+TEST_F(VmsGatewayFunctionalTest, IpSpecified)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
+    ASSERT_TRUE(startAndWaitUntilStarted(true, true));
     testHttpServer()->registerStaticProcessor(
         testPath,
         testMsgBody,
@@ -75,6 +74,44 @@ TEST_F(VmsGatewayFunctionalTest, simple)
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())),
         nx_http::StatusCode::notFound);
+}
+
+TEST_F(VmsGatewayFunctionalTest, IpSpecified_noDefaultPort)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted(true, false));
+    testHttpServer()->registerStaticProcessor(
+        testPath,
+        testMsgBody,
+        contentType);
+
+    // Default port is not here
+    testProxyUrl(QUrl(lit("http://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().address.toString())
+        .arg(QLatin1String(testPath))),
+        nx_http::StatusCode::serviceUnavailable);
+
+    // Port specified
+    testProxyUrl(QUrl(lit("http://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(QLatin1String(testPath))));
+}
+
+TEST_F(VmsGatewayFunctionalTest, IpForbidden)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted(false, false));
+    testHttpServer()->registerStaticProcessor(
+        testPath,
+        testMsgBody,
+        contentType);
+
+    // Ip Address Is forbidden
+    testProxyUrl(QUrl(lit("http://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().address.toString())
+        .arg(QLatin1String(testPath))),
+        nx_http::StatusCode::forbidden);
 }
 
 }   // namespace test

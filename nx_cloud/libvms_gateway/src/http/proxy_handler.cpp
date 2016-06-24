@@ -6,6 +6,7 @@
 #include "proxy_handler.h"
 
 #include <nx/network/http/buffer_source.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/cpp14.h>
 
@@ -55,8 +56,17 @@ void ProxyHandler::processRequest(
 
     SocketAddress systemAddress(pathItems[0].toString());
     pathItems.removeAt(0);
-    if (systemAddress.port == 0)
-        systemAddress.port = m_settings.http().proxyTargetPort;
+
+    if (!network::cloud::AddressResolver::
+        kCloudAddressRegExp.exactMatch(systemAddress.address.toString()))
+    {
+        // No cloud address means direct IP
+        if (!m_settings.cloudConnect().allowIpTarget)
+            return completionHandler(nx_http::StatusCode::forbidden, nullptr);
+
+        if (systemAddress.port == 0)
+            systemAddress.port = m_settings.http().proxyTargetPort;
+    }
 
     if (pathItems.isEmpty())
     {

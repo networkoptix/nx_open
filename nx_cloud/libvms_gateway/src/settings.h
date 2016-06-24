@@ -61,6 +61,7 @@ class CloudConnect
 {
 public:
     bool replaceHostAddressWithPublicAddress;
+    bool allowIpTarget;
     QString fetchPublicIpUrl;
 
     CloudConnect();

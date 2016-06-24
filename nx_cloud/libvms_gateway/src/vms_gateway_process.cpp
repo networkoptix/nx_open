@@ -188,9 +188,9 @@ int VmsGatewayProcess::exec()
         if (m_terminated)
             return 0;
 
-        NX_LOG(lit("%1 has been started")
-            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName()),
-            cl_logALWAYS);
+        NX_LOG(lm("%1 has been started on %2")
+            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName())
+            .container(m_httpEndpoints), cl_logALWAYS);
 
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
