@@ -40,7 +40,7 @@ const QMap<SystemUri::ClientCommand, QString> clientCommandToString
     {SystemUri::ClientCommand::None,            "_invalid_"},
     {SystemUri::ClientCommand::Client,          "client"},
     {SystemUri::ClientCommand::LoginToCloud,    "cloud"},
-    {SystemUri::ClientCommand::ConnectToSystem, "system"}
+    {SystemUri::ClientCommand::ConnectToSystem, "systems"}
 };
 
 const QMap<SystemUri::SystemAction, QString> systemActionToString
