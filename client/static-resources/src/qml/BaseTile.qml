@@ -1,75 +1,51 @@
 import QtQuick 2.5;
 import QtQuick.Controls 1.2;
 import QtGraphicalEffects 1.0;
+import Qt.labs.controls 1.0;
 
 import "."
 
 Item
 {
-    id: thisComponent;
+    id: control;
 
     property Item visualParent;
-    property string systemName;
-    property bool isRecentlyConnected;
 
-    property Component centralAreaDelegate;
-    property Component expandedAreaDelegate;
-    property bool allowExpanding;
+    property alias tileColor: tileArea.color;
+    property bool isHovered: hoverIndicator.containsMouse || (expandedOpacity == 1);
 
-    property string notAvailableLabelText: "";
-
-    property bool isAvailable: true;
-    property bool isExpandable: true;
-    property bool isOnline: false;
-    property bool isValidVersion: true;
-    property bool isValidCustomization: true;
-    property bool isCompatibilityMode: false;
-
-    property bool isExpanded;
-
-    property color standardColor: Style.colors.custom.systemTile.background;
-    property color hoveredColor: Style.lighterColor(standardColor);
-    property color inactiveColor: Style.colors.shadow;
+    property alias titleLabel: systemNameLabel;
     property alias collapseButton: collapseTileButton;
-    property Item collapseButtonTabItem: null;
+    property alias indicator: indicatorControl;
 
-    Binding
-    {
-        target: thisComponent;
-        property: "isExpanded";
-        value: (tileHolder.state !== "collapsed") && allowExpanding;
-    }
-    Binding
-    {
-        target: thisComponent;
-        property: "allowExpanding";
-        value: isExpandable && isAvailable;
-    }
+    property alias areaLoader: areaLoader;
 
-    property alias centralArea: centralAreaLoader.item;
-    property alias expandedArea: expandedAreaLoader.item;
+    property bool isExpanded: false;
+    property bool isAvailable: false;
+    property real expandedOpacity: collapseTileButton.opacity;
 
-    signal connectClicked();
+    ///
+
+    signal collapsedTileClicked();
 
     function toggle()
     {
-        tileHolder.state = (!allowExpanding || (tileHolder.state == "expanded")
-            ? "collapsed" : "expanded");
+        tileHolder.state = (isExpanded ? "collapsed" : "expanded");
     }
 
     implicitWidth: 280;
     implicitHeight: 96;
     z: (transition.running ? 100 : 0)
 
-    FocusScope
+    Item
     {
         id: tileHolder;
 
-        readonly property real expadedHeight: (loadersColumn.y
-            + centralAreaLoader.height + expandedAreaLoader.height);
-        width: thisComponent.width;
+        readonly property real expadedHeight: (areaLoader.y + areaLoader.height);
+        width: control.width;
 
         state: "collapsed";
+
         states:
         [
             State
@@ -79,10 +55,10 @@ Item
                 ParentChange
                 {
                     target: tileHolder;
-                    parent: thisComponent;
+                    parent: control;
                     x: 0;
                     y: 0;
-                    height: thisComponent.height;
+                    height: control.height;
                 }
 
                 PropertyChanges
@@ -94,12 +70,6 @@ Item
                 PropertyChanges
                 {
                     target: shadow;
-                    opacity: 0;
-                }
-
-                PropertyChanges
-                {
-                    target: expandedAreaLoader;
                     opacity: 0;
                 }
 
@@ -137,12 +107,6 @@ Item
 
                 PropertyChanges
                 {
-                    target: expandedAreaLoader;
-                    opacity: 1;
-                }
-
-                PropertyChanges
-                {
                     target: indicator;
                     opacity: 0;
                 }
@@ -153,46 +117,66 @@ Item
         {
             id: transition;
 
-            ParentAnimation
+            SequentialAnimation
             {
-                NumberAnimation
+                PropertyAction
                 {
-                    properties: "x, y";
-                    easing.type: Easing.InOutCubic;
-                    duration: 400;
+                    target: control;
+                    property: "isExpanded";
+                    value: true;
                 }
 
-                NumberAnimation
+                ParallelAnimation
                 {
-                    properties: "height";
-                    easing.type: Easing.OutCubic;
-                    duration: 400;
+                    ParentAnimation
+                    {
+                        NumberAnimation
+                        {
+                            properties: "x, y";
+                            easing.type: Easing.InOutCubic;
+                            duration: 400;
+                        }
+
+                        NumberAnimation
+                        {
+                            properties: "height";
+                            easing.type: Easing.OutCubic;
+                            duration: 400;
+                        }
+                    }
+
+                    NumberAnimation
+                    {
+                        targets: [collapseTileButton];
+                        properties: "opacity";
+                        easing.type: Easing.OutCubic;
+                        duration: 200;
+                    }
+
+                    NumberAnimation
+                    {
+                        targets: [shadow];
+                        properties: "opacity";
+                        easing.type: Easing.OutCubic;
+                        duration: 400;
+                    }
+
+                    NumberAnimation
+                    {
+                        target: indicator;
+                        properties: "opacity";
+                        easing.type: (tileHolder.state == "collapsed" ?
+                              Easing.InCubic : Easing.OutCubic);
+                        duration: 200;
+                    }
                 }
-            }
 
-            NumberAnimation
-            {
-                target: collapseTileButton;
-                properties: "opacity";
-                easing.type: Easing.OutCubic;
-                duration: 200;
-            }
-
-            NumberAnimation
-            {
-                targets: [expandedAreaLoader, shadow];
-                properties: "opacity";
-                easing.type: Easing.OutCubic;
-                duration: 400;
-            }
-
-            NumberAnimation
-            {
-                target: indicator;
-                properties: "opacity";
-                easing.type: (tileHolder.state == "collapsed" ?
-                      Easing.InCubic : Easing.OutCubic);
-                duration: 200;
+                PropertyAction
+                {
+                    target: control;
+                    property: "isExpanded";
+                    value: (tileHolder.state == "expanded");
+                }
             }
         }
 
@@ -202,7 +186,7 @@ Item
 
             anchors.fill: tileArea;
 
-            visible: thisComponent.isExpanded;
+            visible: control.isExpanded;
             radius: Style.custom.systemTile.shadowRadius;
             samples: Style.custom.systemTile.shadowSamples;
             color: Style.colors.shadow;
@@ -213,16 +197,18 @@ Item
         {
             id: toggleMouseArea;
 
-            x: (thisComponent.isExpanded ? -parent.x : 0);
-            y: (thisComponent.isExpanded ? -parent.y : 0);
+            x: (control.isExpanded ? -parent.x : 0);
+            y: (control.isExpanded ? -parent.y : 0);
             width: tileHolder.parent.width;
             height: tileHolder.parent.height;
 
             hoverEnabled: true;
             onClicked:
             {
-                if (thisComponent.enabled)
-                    thisComponent.toggle();
+                if (!control.isExpanded)
+                    control.collapsedTileClicked();
+                else
+                    control.toggle();
             }
         }
 
@@ -230,21 +216,10 @@ Item
         {
             id: tileArea;
 
-            enabled: thisComponent.enabled;
-
-            readonly property bool isHovered: (!thisComponent.isExpanded && hoverIndicator.containsMouse);
+            enabled: control.enabled;
 
             clip: true;
-            color:
-            {
-                if (!thisComponent.isAvailable)
-                    return thisComponent.inactiveColor;
-                if (isHovered || thisComponent.isExpanded)
-                    return thisComponent.hoveredColor;
-
-                return thisComponent.standardColor;
-            }
-
+            color: Style.colors.custom.systemTile.background;
             anchors.fill: parent;
             radius: 2;
 
@@ -253,15 +228,13 @@ Item
                 id: hoverIndicator;
 
                 anchors.fill: parent;
-
-                acceptedButtons: (thisComponent.isExpanded
-                    ? Qt.AllButtons :Qt.NoButton);
+                acceptedButtons: (control.isExpanded ? Qt.AllButtons :Qt.NoButton);
                 hoverEnabled: true;
             }
 
             NxLabel
             {
-                id: systemNameText;
+                id: systemNameLabel;
 
                 disableable: false;
                 anchors.left: parent.left;
@@ -273,11 +246,9 @@ Item
                 anchors.topMargin: 12;
 
                 elide: Text.ElideRight;
-                text: systemName;
 
                 height: Style.custom.systemTile.systemNameLabelHeight;
-                color: (thisComponent.isAvailable ? Style.colors.text
-                    : Style.colors.midlight);
+                color: (control.isAvailable ? Style.colors.text : Style.colors.midlight);
                 font: Style.fonts.systemTile.systemName;
             }
 
@@ -296,77 +267,33 @@ Item
                 bkgColor: tileArea.color;
                 hoveredColor: Style.colors.custom.systemTile.closeButtonBkg;
 
-                onClicked: { thisComponent.toggle(); }
-                KeyNavigation.tab: thisComponent.collapseButtonTabItem;
+                onClicked: { control.toggle(); }
             }
 
-            Column
+            Loader
             {
-                id: loadersColumn;
+                id: areaLoader;
 
                 anchors.left: parent.left;
                 anchors.right: parent.right;
-                anchors.top: systemNameText.bottom;
+                anchors.top: systemNameLabel.bottom;
 
                 anchors.leftMargin: 12;
                 anchors.rightMargin: 16;
 
-                Loader
-                {
-                    id: centralAreaLoader;
-
-                    anchors.left: parent.left;
-                    anchors.right: parent.right;
-
-                    sourceComponent: thisComponent.centralAreaDelegate;
-                }
-
-
-                Loader
-                {
-                    id: expandedAreaLoader;
-
-                    anchors.left: parent.left;
-                    anchors.right: parent.right;
-
-                    visible: (opacity != 0);
-                    sourceComponent: thisComponent.expandedAreaDelegate;
-                }
+                sourceComponent: control.centralAreaDelegate;
             }
 
             Indicator
             {
-                id: indicator;
+                id: indicatorControl;
 
-                property bool isErrorIndicator: (!thisComponent.isValidCustomization
-                    || !thisComponent.isValidVersion);
-                property bool isWarningIndicator: (!isErrorIndicator && isCompatibilityMode);
+                visible: false;
 
                 anchors.right: parent.right;
                 anchors.top: parent.top;
                 anchors.rightMargin: 14;
                 anchors.topMargin: 66;
-
-                visible: thisComponent.notAvailableLabelText.length;
-
-                text: thisComponent.notAvailableLabelText;
-                textColor:
-                {
-                    if (isWarningIndicator || isErrorIndicator)
-                        return Style.colors.shadow;
-                    else
-                        return Style.colors.windowText;
-                }
-
-                color:
-                {
-                    if (isWarningIndicator)
-                        return Style.colors.yellow_main;
-                    else if (isErrorIndicator)
-                        return Style.colors.red_main;
-                    else
-                        return Style.colors.custom.systemTile.offlineIndicatorBkg;
-                }
             }
         }
     }
