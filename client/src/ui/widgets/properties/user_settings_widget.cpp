@@ -194,11 +194,9 @@ bool QnUserSettingsWidget::canApplyChanges() const
 void QnUserSettingsWidget::setupInputFields()
 {
     ui->loginInputField->setTitle(tr("Login"));
+    ui->loginInputField->setEmptyInputAllowed(false, tr("Login cannot be empty."));
     ui->loginInputField->setValidator([this](const QString& text)
     {
-        if (text.isEmpty())
-            return Qn::ValidationResult(tr("Login cannot be empty."));
-
         for (const QnUserResourcePtr& user : qnResPool->getResources<QnUserResource>())
         {
             if (user == m_model->user())
