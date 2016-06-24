@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include <QtCore/QDateTime>
 #include <QtCore/QString>
