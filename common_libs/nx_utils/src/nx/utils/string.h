@@ -44,7 +44,13 @@ enum MetricPrefix
 * \param pattern                       Pattern to use for result construction.
 *                                      <tt>%1</tt> will be replaced with size in resulting units, and <tt>%2</tt> with unit name.
 */
-NX_UTILS_API QString formatFileSize(qint64 size, int precision = 1, int prefixThreshold = 1, MetricPrefix minPrefix = NoPrefix, MetricPrefix maxPrefix = YottaPrefix, bool useBinaryPrefixes = true, const QString &pattern = lit("%1 %2"));
+NX_UTILS_API QString formatFileSize(qint64 size,
+                                    int precision = 1,
+                                    int prefixThreshold = 1,
+                                    MetricPrefix minPrefix = NoPrefix,
+                                    MetricPrefix maxPrefix = YottaPrefix,
+                                    bool useBinaryPrefixes = true,
+                                    const QString &pattern = QLatin1String("%1 %2"));
 
 /**
 * \param string                        String to perform replacement on.
