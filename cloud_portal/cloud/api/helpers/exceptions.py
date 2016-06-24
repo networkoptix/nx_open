@@ -152,6 +152,46 @@ class APILogicException(APIException):
                                                 status_code=status.HTTP_200_OK)
 
 
+def validate_mediaserver_response(func):
+    def validate_error(response_data):
+        if 'resultCode' not in response_data or 'errorText' not in response_data:
+            raise APIInternalException('No valid error message from cloud_db', ErrorCodes.cloud_invalid_response)
+
+    def validator(*args, **kwargs):
+        response = func(*args, **kwargs)
+
+        if response.status_code == status.HTTP_204_NO_CONTENT:  # No content
+            return None
+
+        # 1. Validate JSON response. If not a json - raise exception
+        # Treat JSON response problems as Internal Server Errors
+        try:
+            response_data = response.json()
+        except ValueError:
+            response_data = None
+
+        errors = {
+            status.HTTP_500_INTERNAL_SERVER_ERROR: APIInternalException,
+            status.HTTP_503_SERVICE_UNAVAILABLE: APIServiceException,
+            status.HTTP_404_NOT_FOUND: APINotFoundException,
+            # HTTP_403_FORBIDDEN
+            status.HTTP_401_UNAUTHORIZED: APINotAuthorisedException,
+            status.HTTP_400_BAD_REQUEST: APIRequestException,
+        }
+
+        if response.status_code in errors:
+            if response_data:
+                validate_error(response_data)
+                raise errors[response.status_code](response_data['errorText'], error_code=response_data['resultCode'])
+            else:
+                raise errors[response.status_code](response.text, error_code=ErrorCodes.unknown_error)
+
+        # everything is OK - return server's response
+        return response_data
+
+    return validator
+
+
 def validate_response(func):
     def validate_error(response_data):
         if 'resultCode' not in response_data or 'errorText' not in response_data:

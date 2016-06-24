@@ -1,7 +1,7 @@
 import requests
 from requests.auth import HTTPDigestAuth
 from cloud import settings
-from api.helpers.exceptions import validate_response
+from api.helpers.exceptions import validate_mediaserver_response
 import urlparse
 import logging
 logger = logging.getLogger(__name__)
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 CLOUD_GATEWAY_URL = settings.CLOUD_CONNECT['gateway']
 
 
-@validate_response
+@validate_mediaserver_response
 def get(system_id, url, email=None, password=None):
     request = urlparse.urljoin(CLOUD_GATEWAY_URL, system_id+'/')
     request = urlparse.urljoin(request, url)
@@ -21,7 +21,7 @@ def get(system_id, url, email=None, password=None):
     return requests.get(request, auth=auth)
 
 
-@validate_response
+@validate_mediaserver_response
 def post(system_id, url, data, email=None, password=None):
     request = urlparse.urljoin(CLOUD_GATEWAY_URL, system_id+'/')
     request = urlparse.urljoin(request, url)
