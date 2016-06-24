@@ -23,6 +23,7 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QProxyStyle>
+#include <QtWidgets/QInputDialog>
 #include <private/qfont_p.h>
 
 #include <ui/common/popup_shadow.h>
@@ -2920,6 +2921,16 @@ void QnNxStyle::polish(QWidget *widget)
             topLevel->setContentsMargins(0, 2, 0, 2);
             popupToCustomizeShadow = topLevel;
         }
+    }
+
+    /*
+     * Insert horizontal separator line into QInputDialog above its button box.
+     * Since input dialogs are short-lived, don't bother with unpolishing.
+     */
+    if (auto inputDialog = qobject_cast<QInputDialog*>(widget))
+    {
+        Q_D(const QnNxStyle);
+        d->polishInputDialog(inputDialog);
     }
 
 #ifdef CUSTOMIZE_POPUP_SHADOWS
