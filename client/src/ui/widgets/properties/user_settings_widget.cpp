@@ -45,6 +45,14 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
         ui->permissionsLabel->setText(tr("TODO: #GDM #FIXME"));
     });
 
+    connect(m_model, &QnUserSettingsModel::userChanged, this, [this]()
+    {
+        ui->passwordInputField->setEmptyInputAllowed(
+            m_model->mode() != QnUserSettingsModel::NewUser,
+            ui->passwordInputField->emptyInputHint());
+        ui->passwordInputField->reset();
+    });
+
     setupInputFields();
 
     QnAligner* aligner = new QnAligner(this);
@@ -215,7 +223,7 @@ void QnUserSettingsWidget::setupInputFields()
     ui->emailInputField->setValidator(Qn::defaultEmailValidator());
 
     ui->passwordInputField->setTitle(tr("Password"));
-    ui->passwordInputField->setPasswordMode(QLineEdit::Password, m_model->mode() != QnUserSettingsModel::NewUser, true);
+    ui->passwordInputField->setPasswordMode(QLineEdit::Password, true, true);
     ui->passwordInputField->setValidator([this](const QString& text)
     {
         /* Show warning message if admin has renamed an existing user and has not entered new password. */
@@ -232,6 +240,8 @@ void QnUserSettingsWidget::setupInputFields()
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
+
+    //TODO: #vkutin really not sure this logic must be implemented inside the generic class
     ui->confirmPasswordInputField->setConfirmationMode(ui->passwordInputField, tr("Passwords do not match."));
 
     for (auto field : inputFields())

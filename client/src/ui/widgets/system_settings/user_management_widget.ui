@@ -24,9 +24,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QTreeView" name="usersTable">
+      <widget class="QnTreeView" name="usersTable">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+        <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -141,7 +141,7 @@
      <item>
       <widget class="QPushButton" name="rolesButton">
        <property name="text">
-        <string>Roles...</string>
+        <string>Edit Roles...</string>
        </property>
       </widget>
      </item>
@@ -176,6 +176,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnTreeView</class>
+   <extends>QTreeView</extends>
+   <header location="global">ui/widgets/common/tree_view.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>filterLineEdit</tabstop>
   <tabstop>usersTable</tabstop>

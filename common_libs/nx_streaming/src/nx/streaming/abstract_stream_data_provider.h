@@ -5,6 +5,7 @@
 #include <core/resource/resource_consumer.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <core/resource/resource_media_layout.h>
+#include <utils/common/from_this_to_shared.h>
 
 class QnAbstractStreamDataProvider;
 class QnLiveStreamProvider;
@@ -16,7 +17,9 @@ class QnAbstractDataReceptor;
 
 struct AVCodecContext;
 
-class QnAbstractVideoCamera
+class QnAbstractVideoCamera:
+    public QnFromThisToShared<QnAbstractVideoCamera>
+
 {
 public:
     virtual QSharedPointer<QnLiveStreamProvider> getPrimaryReader() = 0;
@@ -56,7 +59,7 @@ public:
     virtual bool hasVideo() const { return true; }
     bool needConfigureProvider() const;
     virtual void startIfNotRunning(){ start(); }
-    virtual QnAbstractVideoCamera* getOwner() const { return nullptr;}
+    virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const { return QnSharedResourcePointer<QnAbstractVideoCamera>();}
 
 signals:
     void videoParamsChanged(AVCodecContext * codec);

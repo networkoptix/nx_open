@@ -133,7 +133,10 @@ bool QnCameraAudioTransmitPolicy::isResourceValid(const QnVirtualCameraResourceP
 QString QnCameraAudioTransmitPolicy::getText(const QnResourceList &resources, const bool detailed) {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     int invalid = invalidResourcesCount<QnCameraAudioTransmitPolicy>(cameras);
-    return genericCameraText<QnCameraAudioTransmitPolicy>(cameras, detailed, tr("%1 doesn't support two-way audio", "", invalid), invalid);
+    if (cameras.isEmpty())
+        return tr("Select device");
+    else
+        return genericCameraText<QnCameraAudioTransmitPolicy>(cameras, detailed, tr("%1 doesn't support two-way audio", "", invalid), invalid);
 }
 
 bool QnCameraRecordingPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {

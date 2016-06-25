@@ -61,12 +61,23 @@ CloudDBProcess::CloudDBProcess( int argc, char **argv )
 #ifdef USE_QAPPLICATION
     QtService<QtSingleCoreApplication>(argc, argv, QnLibCloudDbAppInfo::applicationName()),
 #endif
-    m_argc( argc ),
-    m_argv( argv ),
-    m_terminated( false ),
-    m_timerID( -1 ),
-    m_httpMessageDispatcher( nullptr ),
-    m_authorizationManager( nullptr )
+    m_argc(argc),
+    m_argv(argv),
+    m_terminated(false),
+    m_timerID(-1),
+    m_settings(nullptr),
+    m_dbManager(nullptr),
+    m_timerManager(nullptr),
+    m_emailManager(nullptr),
+    m_streeManager(nullptr),
+    m_httpMessageDispatcher(nullptr),
+    m_tempPasswordManager(nullptr),
+    m_accountManager(nullptr),
+    m_eventManager(nullptr),
+    m_systemManager(nullptr),
+    m_authenticationManager(nullptr),
+    m_authorizationManager(nullptr),
+    m_authProvider(nullptr)
 {
 #ifdef USE_QAPPLICATION
     setServiceDescription(QnLibCloudDbAppInfo::applicationDisplayName());
@@ -127,6 +138,7 @@ int CloudDBProcess::exec()
         initializeLogging( settings );
 
         const auto& httpAddrToListenList = settings.endpointsToListen();
+        m_settings = &settings;
         if( httpAddrToListenList.empty() )
         {
             NX_LOG( "No HTTP address to listen", cl_logALWAYS );
@@ -134,6 +146,7 @@ int CloudDBProcess::exec()
         }
 
         nx::db::AsyncSqlQueryExecutor dbManager(settings.dbConnectionOptions());
+        m_dbManager = &dbManager;
         if( !initializeDB(&dbManager) )
         {
             NX_LOG( lit("Failed to initialize DB connection"), cl_logALWAYS );
@@ -141,15 +154,18 @@ int CloudDBProcess::exec()
         }
 
         nx::utils::TimerManager timerManager;
+        m_timerManager = &timerManager;
         timerManager.start();
 
         std::unique_ptr<AbstractEmailManager> emailManager(
             EMailManagerFactory::create(settings));
+        m_emailManager = emailManager.get();
 
         CdbAttrNameSet cdbAttrNameSet;
         StreeManager streeManager(
             cdbAttrNameSet,
             settings.auth().rulesXmlPath);
+        m_streeManager = &streeManager;
 
         nx_http::MessageDispatcher httpMessageDispatcher;
         m_httpMessageDispatcher = &httpMessageDispatcher;
@@ -158,14 +174,18 @@ int CloudDBProcess::exec()
         TemporaryAccountPasswordManager tempPasswordManager(
             settings,
             &dbManager);
+        m_tempPasswordManager = &tempPasswordManager;
 
         AccountManager accountManager(
             settings,
+            streeManager,
             &tempPasswordManager,
             &dbManager,
             emailManager.get());
+        m_accountManager = &accountManager;
 
         EventManager eventManager(settings);
+        m_eventManager = &eventManager;
 
         SystemManager systemManager(
             settings,
@@ -173,6 +193,7 @@ int CloudDBProcess::exec()
             accountManager,
             eventManager,
             &dbManager);
+        m_systemManager = &systemManager;
 
         //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
@@ -188,6 +209,7 @@ int CloudDBProcess::exec()
             std::move(authDataProviders),
             authRestrictionList,
             streeManager);
+        m_authenticationManager = &authenticationManager;
 
         AuthorizationManager authorizationManager(
             streeManager,
@@ -199,6 +221,7 @@ int CloudDBProcess::exec()
             settings,
             accountManager,
             systemManager);
+        m_authProvider = &authProvider;
 
         //registering HTTP handlers
         registerApiHandlers(
@@ -206,7 +229,9 @@ int CloudDBProcess::exec()
             authorizationManager,
             &accountManager,
             &systemManager,
-            &authProvider);
+            &authProvider,
+            &eventManager);
+        //TODO #ak remove eventManager.registerHttpHandlers and register in registerApiHandlers
         eventManager.registerHttpHandlers(
             authorizationManager,
             &httpMessageDispatcher);
@@ -320,7 +345,8 @@ void CloudDBProcess::registerApiHandlers(
     const AuthorizationManager& authorizationManager,
     AccountManager* const accountManager,
     SystemManager* const systemManager,
-    AuthenticationProvider* const authProvider)
+    AuthenticationProvider* const authProvider,
+    EventManager* const /*eventManager*/)
 {
     msgDispatcher->registerRequestProcessor<PingHandler>(
         PingHandler::kHandlerPath,
@@ -508,6 +534,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kSystemExpirationTime);
     dbStructureUpdater.addUpdateScript(db::kReplaceBlobWithVarchar);
     dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentials);
+    dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentialsProlongationPeriod);
     return dbStructureUpdater.updateStructSync();
 }
 

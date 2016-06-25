@@ -3,6 +3,7 @@ import QtQuick.Layouts 1.1
 import Qt.labs.controls 1.0
 import Nx 1.0
 import Nx.Items 1.0
+import com.networkoptix.qml 1.0
 
 Pane
 {
@@ -24,12 +25,19 @@ Pane
         }
     }
 
+    QnCloudSystemInformationWatcher
+    {
+        id: cloudInformationWatcher
+    }
+
     contentItem: SystemInformationBlock
     {
         topPadding: 16
         bottomPadding: 16
         systemName: connectionManager.systemName
         address: connectionManager.currentHost
-        user: connectionManager.currentLogin
+        user: userWatcher.userName
+        ownerDescription: cloudInformationWatcher.ownerDescription
+        cloud: connectionManager.connectionType == QnConnectionManager.CloudConnection
     }
 }

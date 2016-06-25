@@ -32,6 +32,8 @@ ApplicationWindow
         onCurrentItemChanged: sideNavigation.close()
     }
 
+    UiController {}
+
     Component.onCompleted:
     {
         updateNavigationBarPadding()
@@ -43,6 +45,10 @@ ApplicationWindow
             lockScreenOrientation()
             Workflow.openResourcesScreen(getLastUsedSystemId())
             connectionManager.connectToServer(lastUsedUrl)
+        }
+        else if (!cloudStatusWatcher.cloudLogin)
+        {
+            Workflow.openCloudWelcomeScreen()
         }
         else
         {

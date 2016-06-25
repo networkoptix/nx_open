@@ -177,11 +177,6 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const
                             return m_actionParams.emailAddress;
                         case QnBusiness::ShowPopupAction:
                             return (int)m_actionParams.userGroup;
-                        case QnBusiness::PlaySoundAction:
-                        case QnBusiness::PlaySoundOnceAction:
-                            return m_actionParams.url;
-                        case QnBusiness::SayTextAction:
-                            return m_actionParams.sayText;
                         default:
                             break;
                     }
@@ -265,21 +260,6 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
                     // TODO: #GDM #Business you're implicitly relying on what enum values are, which is very bad.
                     // This code will fail silently if someone changes the header. Please write it properly.
                     params.userGroup = (QnBusiness::UserGroup)value.toInt();
-                    setActionParams(params);
-                    break;
-                }
-                case QnBusiness::PlaySoundAction:
-                case QnBusiness::PlaySoundOnceAction:
-                {
-                    QnBusinessActionParameters params = m_actionParams;
-                    params.url = value.toString();
-                    setActionParams(params);
-                    break;
-                }
-                case QnBusiness::SayTextAction:
-                {
-                    QnBusinessActionParameters params = m_actionParams;
-                    params.sayText = value.toString();
                     setActionParams(params);
                     break;
                 }
@@ -737,10 +717,6 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
             else
                 return qnResIconCache->icon(QnResourceIconCache::Users);
         }
-        case QnBusiness::PlaySoundAction:
-        case QnBusiness::PlaySoundOnceAction:
-        case QnBusiness::SayTextAction:
-            return qnSkin->icon("events/sound.png");
 
         case QnBusiness::ShowTextOverlayAction:
         case QnBusiness::ShowOnAlarmLayoutAction:
@@ -832,9 +808,11 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return isResourcesListValid<QnCameraOutputPolicy>(QnBusiness::filteredResources<QnCameraOutputPolicy::resource_type>(m_actionResources));
         case QnBusiness::PlaySoundAction:
         case QnBusiness::PlaySoundOnceAction:
-            return !m_actionParams.url.isEmpty();
+            return !m_actionParams.url.isEmpty() &&
+                    isResourcesListValid<QnCameraAudioTransmitPolicy>(QnBusiness::filteredResources<QnCameraOutputPolicy::resource_type>(m_actionResources));
         case QnBusiness::SayTextAction:
-            return !m_actionParams.sayText.isEmpty();
+            return !m_actionParams.sayText.isEmpty() &&
+                    isResourcesListValid<QnCameraAudioTransmitPolicy>(QnBusiness::filteredResources<QnCameraOutputPolicy::resource_type>(m_actionResources));
         case QnBusiness::ExecutePtzPresetAction:
             return isResourcesListValid<QnExecPtzPresetPolicy>(QnBusiness::filteredResources<QnExecPtzPresetPolicy::resource_type>(m_actionResources)) &&
                     m_actionResources.size() == 1 &&
@@ -955,22 +933,12 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     {
         return QnCameraOutputPolicy::getText(resources, detailed);
     }
+
     case QnBusiness::PlaySoundAction:
     case QnBusiness::PlaySoundOnceAction:
-    {
-        QString filename = m_actionParams.url;
-        if (filename.isEmpty())
-            return tr("Select Sound");
-        QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
-        return soundModel->titleByFilename(filename);
-    }
     case QnBusiness::SayTextAction:
-    {
-        QString text = m_actionParams.sayText;
-        if (text.isEmpty())
-            return tr("Enter Text");
-        return text;
-    }
+        return QnCameraAudioTransmitPolicy::getText(resources, detailed);
+
     case QnBusiness::ExecutePtzPresetAction:
         return QnExecPtzPresetPolicy::getText(resources, detailed);
 

@@ -17,7 +17,6 @@
 #include <ui/models/system_hosts_model.h>
 #include <ui/models/recent_user_connections_model.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/handlers/workbench_connect_handler.h>
 #include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
@@ -57,7 +56,6 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
 
-    m_itemsWatcher(parent),
     m_visibleControls(true),
     m_visible(false),
     m_connectingNow(false),
@@ -76,23 +74,6 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent) :
 
     connect(action(QnActions::DisconnectAction), &QAction::triggered
         , this, &QnWorkbenchWelcomeScreen::showScreen);
-
-    const auto connectHandler = context()->instance<QnWorkbenchConnectHandler>();
-    connect(connectHandler, &QnWorkbenchConnectHandler::connectedChanged, this,
-        [this, connectHandler]() 
-    {
-        // If handler shows that we are not connected it can mean reconnection process too.
-        // So, just hide screen when it is definitely connected
-        if (connectHandler->connected())
-            setVisible(false);
-    });
-
-    connect(&m_itemsWatcher, &QnWorkbenchLayoutItemsWatcher::itemsCountChanged, this, [this]()
-    {
-        // Close welcome screen if any layout item is shown
-        if (m_itemsWatcher.itemsCount())
-            setVisible(false);
-    });
         
     connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this, [this]()
     {
@@ -100,6 +81,12 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent) :
     });
 
     setVisible(true);
+
+    connect(qnSettings, &QnClientSettings::valueChanged, this, [this](int valueId)
+    {
+        if (valueId == QnClientSettings::AUTO_LOGIN)
+            emit resetAutoLogin();
+    });
 }
 
 QnWorkbenchWelcomeScreen::~QnWorkbenchWelcomeScreen()
@@ -202,6 +189,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
         QnActionParameters params;
         params.setArgument(Qn::UrlRole, url);
         params.setArgument(Qn::StorePasswordRole, storePassword);
+        params.setArgument(Qn::ForceRemoveOldConnectionRole, !storePassword);
         params.setArgument(Qn::AutoLoginRole, autoLogin);
         menu()->trigger(QnActions::ConnectAction, params);
     };

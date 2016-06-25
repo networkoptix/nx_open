@@ -73,10 +73,12 @@ public:
 class TemporaryCredentialsParams
 :
     public api::TemporaryCredentialsParams,
-    public stree::AbstractResourceReader
+    public stree::AbstractResourceReader,
+    public stree::AbstractResourceWriter
 {
 public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
+    virtual void put(int resID, const QVariant& value) override;
 };
 
 class AccessRestrictions
@@ -110,6 +112,8 @@ public:
     std::string passwordHa1;
     std::string realm;
     std::uint32_t expirationTimestampUtc;
+    /** each use of credentials increases expiration time by this period. Used if non-zero */
+    unsigned int prolongationPeriodSec;
     int maxUseCount;
     int useCount;
     //!this password has been sent to user's email address
@@ -120,7 +124,7 @@ public:
 };
 
 #define TemporaryAccountCredentials_Fields (accountEmail)(login)(passwordHa1)(realm) \
-    (expirationTimestampUtc)(maxUseCount)(useCount)(isEmailCode)
+    (expirationTimestampUtc)(prolongationPeriodSec)(maxUseCount)(useCount)(isEmailCode)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (TemporaryAccountCredentials),

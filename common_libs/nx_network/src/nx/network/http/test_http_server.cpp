@@ -48,7 +48,7 @@ public:
     }
 
     virtual void processRequest(
-        const nx_http::HttpServerConnection& /*connection*/,
+        nx_http::HttpServerConnection* const /*connection*/,
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,

@@ -23,9 +23,9 @@
 #include <camera/cam_display.h>
 #include <camera/camera_data_manager.h>
 
-#include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_startup_parameters.h>
 
 #include <common/common_module.h>
 
@@ -217,11 +217,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::OpenLayoutsInNewWindowAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsInNewWindowAction_triggered()));
     connect(action(QnActions::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
     connect(action(QnActions::OpenNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openNewWindowAction_triggered()));
-    
-    connect(action(QnActions::BrowseLocalFilesAction), &QAction::triggered, this, [this]()
-        { setWelcomeScreenVisible(false); });
-    connect(action(QnActions::ShowWelcomeScreenAction), &QAction::triggered, this, [this]()
-        { setWelcomeScreenVisible(true); });
 
     connect(action(QnActions::MediaFileSettingsAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(QnActions::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
@@ -279,6 +274,30 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::DelayedForcedExitAction),                &QAction::triggered,    this,   [this] {  closeApplication(true);    }, Qt::QueuedConnection);
 
     connect(action(QnActions::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
+
+    const auto browseAction = action(QnActions::BrowseLocalFilesModeAction);
+    const auto setWelcomeScreenVisible = [this](bool visible)
+    {
+        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->setVisible(visible);
+    };
+
+    const auto idChangedHandler = [setWelcomeScreenVisible, browseAction](const QnUuid & /* id */)
+    {
+        const bool connected = !qnCommon->remoteGUID().isNull();
+        browseAction->setChecked(connected);
+    };
+
+    connect(qnCommon, &QnCommonModule::remoteIdChanged, this, idChangedHandler);
+    connect(browseAction, &QAction::toggled, this, [setWelcomeScreenVisible](bool checked)
+    {
+        setWelcomeScreenVisible(!checked);
+    });
+
+    connect(display(), &QnWorkbenchDisplay::widgetAdded, this, [browseAction]()
+    {
+        browseAction->setChecked(true);
+    });
 
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
@@ -422,15 +441,14 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
         arguments << QString::fromUtf8(QnAppServerConnectionFactory::url().toEncoded());
     }
 
-    if(mainWindow()) {
+    if(mainWindow())
+    {
         int screen = context()->instance<QnScreenManager>()->nextFreeScreen();
-        arguments << QLatin1String("--screen") << QString::number(screen);
+        arguments << QnStartupParameters::kScreenKey << QString::number(screen);
     }
 
     if (qnRuntime->isDevMode())
         arguments << lit("--dev-mode-key=razrazraz");
-
-    qDebug() << "Starting new instance with args" << arguments;
 
 #ifdef Q_OS_MACX
     mac_startDetached(qApp->applicationFilePath(), arguments);
@@ -848,16 +866,6 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     qnResourcesChangesManager->saveCamerasCore(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera) {
         camera->setParentId(serverId);
     });
-}
-
-void QnWorkbenchActionHandler::setWelcomeScreenVisible(bool visible)
-{
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    NX_ASSERT(welcomeScreen, "Welcome screen has not been created yet");
-    if (!welcomeScreen)
-        return;
-
-    welcomeScreen->setVisible(visible);
 }
 
 void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
@@ -2225,7 +2233,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
         if (componentName.isEmpty())
             continue;
 
-        QString version = data.version.toString();
+        QString version = L'v' + data.version.toString();
 
         bool updateRequested = (data.component == Qn::ServerComponent) &&
             QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
@@ -2234,7 +2242,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
             version = setWarningStyleHtml(version);
 
         /* Consistency with 'About' dialog. */
-        QString component = lit("%1: v%2").arg(componentName, version);
+        QString component = lit("%1: %2").arg(componentName, version);
         messageParts << component;
     }
 
@@ -2253,10 +2261,11 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 
     QPushButton *updateButton = messageBox->addButton(tr("Update..."), QDialogButtonBox::HelpRole);
-    connect(updateButton, &QPushButton::clicked, this, [this]
+    connect(updateButton, &QPushButton::clicked, this, [this, dialog = messageBox.data()]
     {
+        dialog->accept();
         menu()->trigger(QnActions::SystemUpdateAction);
-    }, Qt::QueuedConnection);
+    });
 
     messageBox->exec();
 }

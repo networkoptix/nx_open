@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_access_data.h>
 
 #include <nx/utils/uuid.h>
 #include "nx/utils/type_utils.h"
@@ -15,138 +16,50 @@
 namespace ec2
 {
 
-inline bool hasPermission(const QnUuid &userId, const ApiServerFootageData &data, Qn::Permission permission)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    QnResourcePtr target = qnResPool->getResourceById(data.serverGuid);
+bool hasPermission(const QnUuid &userId, const ApiServerFootageData &data, Qn::Permission permission);
 
-    return qnResourceAccessManager->hasPermission(userResource, target, permission);
-}
+bool hasPermission(const QnUuid &userId, const ApiCameraAttributesData &data, Qn::Permission permission);
 
-inline bool hasPermission(const QnUuid &userId, const ApiCameraAttributesData &data, Qn::Permission permission)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    QnResourcePtr target = qnResPool->getResourceById(data.cameraID);
+bool hasPermission(const QnUuid &userId, const ApiMediaServerUserAttributesData &data, Qn::Permission permission);
 
-    return qnResourceAccessManager->hasPermission(userResource, target, permission);
-}
+bool hasPermission(const QnUuid &userId, const ApiAccessRightsData &data, Qn::Permission permission);
 
-inline bool hasPermission(const QnUuid &userId, const ApiMediaServerUserAttributesData &data, Qn::Permission permission)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    QnResourcePtr target = qnResPool->getResourceById(data.serverID);
+bool hasPermission(const QnUuid &userId, const ApiResourceParamWithRefData &data, Qn::Permission permission);
 
-    return qnResourceAccessManager->hasPermission(userResource, target, permission);
-}
+bool hasPermission(const QnUuid &/*userId*/, const ApiStoredFilePath &/*data*/, Qn::Permission /*permission*/);
 
-inline bool hasPermission(const QnUuid &userId, const ApiAccessRightsData &data, Qn::Permission permission)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    QnResourcePtr target = qnResPool->getResourceById(data.userId);
+bool hasPermission(const QnUuid &/*userId*/, const ApiStoredFileData &/*data*/, Qn::Permission /*permission*/);
 
-    return qnResourceAccessManager->hasPermission(userResource, target, permission);
-}
+bool hasPermission(const QnUuid &/*userId*/, const ApiClientInfoData &/*data*/, Qn::Permission /*permission*/);
 
-inline bool hasPermission(const QnUuid &userId, const ApiResourceParamWithRefData &data, Qn::Permission permission)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    QnResourcePtr target = qnResPool->getResourceById(data.resourceId);
+bool hasPermission(const QnUuid &/*userId*/, const ApiResourceTypeData &/*data*/, Qn::Permission /*permission*/);
+bool hasPermission(const QnUuid &/*userId*/, const ApiTransactionData &/*data*/, Qn::Permission /*permission*/);
 
-    return qnResourceAccessManager->hasPermission(userResource, target, permission);
-}
+bool hasPermission(const QnUuid &userId, const ApiLicenseData &/*data*/, Qn::Permission /*permission*/);
 
-inline bool hasPermission(const QnUuid &/*userId*/, const ApiStoredFilePath &/*data*/, Qn::Permission /*permission*/)
-{
-    return true;
-}
+bool hasPermission(const QnUuid &userId, const ApiLicenseOverflowData &/*data*/, Qn::Permission /*permission*/);
 
-inline bool hasPermission(const QnUuid &/*userId*/, const ApiStoredFileData &/*data*/, Qn::Permission /*permission*/)
-{
-    return true;
-}
+bool hasPermission(const QnUuid &userId, const ApiDatabaseDumpData &/*data*/, Qn::Permission /*permission*/);
 
-inline bool hasPermission(const QnUuid &/*userId*/, const ApiClientInfoData &/*data*/, Qn::Permission /*permission*/)
-{
-    return true;
-}
+bool hasPermission(const QnUuid &userId, const ApiVideowallControlMessageData &/*data*/, Qn::Permission /*permission*/);
 
-inline bool hasPermission(const QnUuid &/*userId*/, const ApiResourceTypeData &/*data*/, Qn::Permission /*permission*/)
-{
-    return true;
-}
-inline bool hasPermission(const QnUuid &/*userId*/, const ApiTransactionData &/*data*/, Qn::Permission /*permission*/)
-{
-    return true;
-}
+bool hasPermission(const QnUuid &userId, const ApiBusinessRuleData &/*data*/, Qn::Permission /*permission*/);
 
-inline bool hasPermission(const QnUuid &userId, const ApiLicenseData &/*data*/, Qn::Permission /*permission*/)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-}
+bool hasPermission(const QnUuid &userId, const ApiBusinessActionData &/*data*/, Qn::Permission permission);
 
-inline bool hasPermission(const QnUuid &userId, const ApiLicenseOverflowData &/*data*/, Qn::Permission /*permission*/)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-}
+bool hasPermission(const QnUuid &userId, const ApiUpdateUploadData &/*data*/, Qn::Permission /*permission*/);
 
-inline bool hasPermission(const QnUuid &userId, const ApiDatabaseDumpData &/*data*/, Qn::Permission /*permission*/)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-}
+bool hasPermission(const QnUuid &userId, const ApiUpdateInstallData &/*data*/, Qn::Permission /*permission*/);
 
-inline bool hasPermission(const QnUuid &userId, const ApiVideowallControlMessageData &/*data*/, Qn::Permission /*permission*/)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalControlVideoWallPermission);
-    return true;
-}
+bool hasPermission(const QnUuid &userId, const ApiUpdateUploadResponceData &/*data*/, Qn::Permission /*permission*/);
 
-inline bool hasPermission(const QnUuid &userId, const ApiBusinessRuleData &/*data*/, Qn::Permission /*permission*/)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-}
+bool hasPermission(const QnUuid &userId, const ApiPeerSystemTimeData &/*data*/, Qn::Permission /*permission*/);
 
-inline bool hasPermission(const QnUuid &userId, const ApiBusinessActionData &/*data*/, Qn::Permission permission)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    if (permission == Qn::Permission::SavePermission)
-        return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-    else return true;
-}
+bool hasPermission(const QnUuid &userId, const ApiSystemStatistics &/*data*/, Qn::Permission /*permission*/);
 
-inline bool hasPermission(const QnUuid &userId, const ApiUpdateUploadData &/*data*/, Qn::Permission /*permission*/)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-}
+bool hasPermission(const QnUuid &userId, const ApiUserGroupData&/*data*/, Qn::Permission /*permission*/);
 
-inline bool hasPermission(const QnUuid &userId, const ApiUpdateInstallData &/*data*/, Qn::Permission /*permission*/)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-}
-
-inline bool hasPermission(const QnUuid &userId, const ApiUpdateUploadResponceData &/*data*/, Qn::Permission /*permission*/)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-}
-
-inline bool hasPermission(const QnUuid &userId, const ApiPeerSystemTimeData &/*data*/, Qn::Permission /*permission*/)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-}
-
-inline bool hasPermission(const QnUuid &userId, const ApiSystemStatistics &/*data*/, Qn::Permission /*permission*/)
-{
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-}
+bool hasPermission(const QnUuid &userId, const ApiDiscoveredServerData&/*data*/, Qn::Permission permission);
 
 template<typename TransactionParamType>
 bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission);
@@ -201,12 +114,11 @@ auto hasModifyPermissionImpl(const QnUuid &userId, const TransactionParamType &d
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
 
-    /* Check if resource needs to be created. */
     QnResourcePtr target = qnResPool->getResourceById(data.id);
     if (!target)
-        return qnResourceAccessManager->canCreateResource(userResource, data);
-
-    return qnResourceAccessManager->canModifyResource(userResource, target, data);
+        return qnResourceAccessManager->canCreateResource(userResource, data) || hasPermission(userId, data, Qn::Permission::SavePermission);
+    else
+        return qnResourceAccessManager->canModifyResource(userResource, target, data);
 }
 
 
@@ -221,12 +133,16 @@ auto hasModifyPermissionImpl(const QnUuid &userId, const TransactionParamType &d
 template<typename TransactionParamType>
 bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission)
 {
+    if (Qn::UserAccessData(userId) == Qn::kDefaultUserAccess)
+        return true;
     return detail::hasPermissionImpl(userId, data, permission, 0);
 }
 
 template<typename TransactionParamType>
 bool hasModifyPermission(const QnUuid &userId, const TransactionParamType &data)
 {
+    if (Qn::UserAccessData(userId) == Qn::kDefaultUserAccess)
+        return true;
     return detail::hasModifyPermissionImpl(userId, data, 0);
 }
 

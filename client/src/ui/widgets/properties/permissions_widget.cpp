@@ -29,16 +29,16 @@ QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsModel* permissions
     };
 
     /* Manager permissions. */
-    createCheckBox(Qn::GlobalEditCamerasPermission,         tr("Can edit camera settings"));
-    createCheckBox(Qn::GlobalControlVideoWallPermission,    tr("Can control videowalls"));
-    createCheckBox(Qn::GlobalViewLogsPermission,            tr("Can view event log"));
+    createCheckBox(Qn::GlobalEditCamerasPermission,         tr("Edit camera settings"));
+    createCheckBox(Qn::GlobalControlVideoWallPermission,    tr("Control videowalls"));
+    createCheckBox(Qn::GlobalViewLogsPermission,            tr("View event log"));
 
     /* Viewer permissions. */
-    createCheckBox(Qn::GlobalViewArchivePermission,         tr("Can view archives of available cameras"));
-    createCheckBox(Qn::GlobalExportPermission,              tr("Can export archives of available cameras"));
-    createCheckBox(Qn::GlobalViewBookmarksPermission,       tr("Can view bookmarks of available cameras"));
-    createCheckBox(Qn::GlobalManageBookmarksPermission,     tr("Can modify bookmarks of available cameras"));
-    createCheckBox(Qn::GlobalUserInputPermission,           tr("Can change camera's PTZ state"));
+    createCheckBox(Qn::GlobalViewArchivePermission,         tr("View archives"));
+    createCheckBox(Qn::GlobalExportPermission,              tr("Export archives"));
+    createCheckBox(Qn::GlobalViewBookmarksPermission,       tr("View bookmarks"));
+    createCheckBox(Qn::GlobalManageBookmarksPermission,     tr("Modify bookmarks"));
+    createCheckBox(Qn::GlobalUserInputPermission,           tr("Change camera's PTZ state"));
 
     ui->permissionsLayout->addStretch();
 }

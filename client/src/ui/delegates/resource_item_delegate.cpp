@@ -109,12 +109,13 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
     QStyle* style = option.widget ? option.widget->style() : QApplication::style();
 
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if (Qn::isSeparatorNode(nodeType))
+    /* If item is separator, draw it: */
+    if (option.features == QStyleOptionViewItem::None)
     {
         int y = option.rect.top() + option.rect.height() / 2;
         QnScopedPainterPenRollback penRollback(painter, option.palette.color(QPalette::Midlight));
         painter->drawLine(0, y, option.rect.right(), y);
+        return;
     }
 
     /* Select icon and text color by item state: */
@@ -141,6 +142,13 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         extraColor = m_colors.extraText;
     }
 
+    if (index.column() == Qn::CustomColumn)
+    {
+        QVariant customColor = index.data(Qt::ForegroundRole);
+        if (!customColor.isNull() && customColor.canConvert<QColor>())
+            mainColor = customColor.value<QColor>();
+    };
+
     /* Due to Qt bug, State_Editing is not set in option.state, so detect editing differently: */
     const QAbstractItemView* view = qobject_cast<const QAbstractItemView*>(option.widget);
     bool editing = view && view->indexWidget(option.index);
@@ -151,6 +159,11 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
     /* Paint background: */
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
+
+    /* Set opacity if disabled: */
+    QnScopedPainterOpacityRollback opacityRollback(painter);
+    if (!option.state.testFlag(QStyle::State_Enabled))
+        painter->setOpacity(painter->opacity() * 0.3);
 
     /* Draw icon: */
     if (option.features.testFlag(QStyleOptionViewItem::HasDecoration))
@@ -221,13 +234,13 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
 QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
 {
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if (Qn::isSeparatorNode(nodeType))
-        return style::Metrics::kSeparatorSize + QSize(0, m_rowSpacing);
-
     /* Initialize style option: */
     QStyleOptionViewItem option(styleOption);
     initStyleOption(&option, index);
+
+    /* If item is separator, return separator size: */
+    if (option.features == QStyleOptionViewItem::None)
+        return style::Metrics::kSeparatorSize + QSize(0, m_rowSpacing);
 
     // TODO #vkutin Keep this while checkboxed items are painted by default implementation:
     if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
@@ -293,8 +306,9 @@ void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const
     auto view = qobject_cast<const QAbstractItemView*>(option->widget);
     if (!view || !view->iconSize().isValid())
     {
-        enum { kMaxIconSize = 20 };
-        option->decorationSize = QSize(kMaxIconSize, m_fixedHeight > 0 ? m_fixedHeight : kMaxIconSize);
+        enum { kMaxIconSize = 32 };
+        int maxSize = m_fixedHeight > 0 ? m_fixedHeight : kMaxIconSize;
+        option->decorationSize = QSize(maxSize, maxSize);
     }
 
     /* Call inherited implementation.
@@ -304,6 +318,15 @@ void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const
     /* But if the item has no icon, restore decoration size to saved default: */
     if (option->icon.isNull())
         option->decorationSize = defaultDecorationSize;
+
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    if (Qn::isSeparatorNode(nodeType))
+        option->features = QStyleOptionViewItem::None;
+    else
+        option->features |= QStyleOptionViewItem::HasDisplay;
+
+    if (!option->state.testFlag(QStyle::State_Enabled))
+        option->state &= ~(QStyle::State_Selected | QStyle::State_MouseOver);
 }
 
 QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
@@ -403,9 +426,13 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
 
 void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const
 {
-    const QString customExtInfoTemplate = lit(" - %1");
-
     baseName = index.data(Qt::DisplayRole).toString();
+    extInfo = QString();
+
+    if (index.column() > Qn::NameColumn)
+        return;
+
+    static const QString kCustomExtInfoTemplate = lit(" - %1");
 
     /* Two-component text from resource information: */
     auto infoLevel = m_customInfoLevel;
@@ -422,7 +449,7 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
 
     if (nodeType == Qn::VideoWallItemNode)
     {
-        extInfo = customExtInfoTemplate.arg(resource->getName());
+        extInfo = kCustomExtInfoTemplate.arg(resource->getName());
     }
     else
     {
@@ -430,6 +457,6 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
         extInfo = info.extraInfo();
 
         if (resource->hasFlags(Qn::user) && !extInfo.isEmpty())
-            extInfo = customExtInfoTemplate.arg(extInfo);
+            extInfo = kCustomExtInfoTemplate.arg(extInfo);
     }
 }

@@ -17,6 +17,7 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
 
     ui->newPasswordInputField->setTitle(tr("New Password"));
     ui->newPasswordInputField->setPasswordMode(QLineEdit::Password, false, true);
+    ui->newPasswordInputField->reset();
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
@@ -70,10 +71,10 @@ bool QnChangeUserPasswordDialog::validate()
     return result;
 }
 
-void QnChangeUserPasswordDialog::done(int r)
+void QnChangeUserPasswordDialog::accept()
 {
-    if (r == Accepted && !validate())
+    if (!validate())
         return;
 
-    base_type::done(r);
+    base_type::accept();
 }

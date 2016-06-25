@@ -113,6 +113,8 @@ Rectangle
 
                         LocalSystemTile
                         {
+                            id: localTile;
+
                             property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
                             recentUserConnectionsModel:
                                 QnRecentUserConnectionsData { systemName: model.systemName; }
@@ -124,12 +126,15 @@ Rectangle
 
                             isValidVersion: model.isCompatibleVersion;
                             isValidCustomization: model.isCorrectCustomization;
+                            isCompatibilityMode: model.compatibleVersion;
                             notAvailableLabelText:
                             {
                                 if (!isValidVersion)
                                     return model.wrongVersion;
                                 else if (!isValidCustomization)
                                     return model.wrongCustomization;
+                                else if (isCompatibilityMode)
+                                    return model.compatibleVersion;
 
                                 return "";
                             }
@@ -149,6 +154,12 @@ Rectangle
 
                             enabled: (!isExpanded || !context.connectingNow);
                             visible: (index < grid.rows * grid.columns);
+
+                            Connections
+                            {
+                                target: context;
+                                onResetAutoLogin: { localTile.autoLogin = false; }
+                            }
                         }
                     }
 
@@ -167,6 +178,7 @@ Rectangle
 
                             isValidVersion: model.isCompatibleVersion;
                             isValidCustomization: model.isCorrectCustomization;
+                            isCompatibilityMode: model.compatibleVersion;
 
                             notAvailableLabelText:
                             {
@@ -174,6 +186,8 @@ Rectangle
                                     return model.wrongVersion;
                                 else if (!isValidCustomization)
                                     return model.wrongCustomization;
+                                else if (isCompatibilityMode)
+                                    return model.compatibleVersion;
                                 else if (!isOnline)
                                     return "OFFLINE";
 

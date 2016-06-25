@@ -18,7 +18,7 @@ ConnectionParameters::ConnectionParameters()
 {
 }
 
-void ConnectionParameters::serialize(nx::stun::Message* const message)
+void ConnectionParameters::serializeAttributes(nx::stun::Message* const message)
 {
     message->addAttribute(
         stun::cc::attrs::rendezvousConnectTimeout,
@@ -31,7 +31,7 @@ void ConnectionParameters::serialize(nx::stun::Message* const message)
         udpTunnelKeepAliveRetries);
 }
 
-bool ConnectionParameters::parse(const nx::stun::Message& message)
+bool ConnectionParameters::parseAttributes(const nx::stun::Message& message)
 {
     //all attributes are optional
 

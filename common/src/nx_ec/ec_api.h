@@ -74,6 +74,7 @@ namespace ec2
     signals:
         void statusChanged( const QnUuid& resourceId, Qn::ResourceStatus status );
         void resourceParamChanged( const ApiResourceParamWithRefData& param );
+        void resourceParamRemoved( const ApiResourceParamWithRefData& param );
         void resourceRemoved( const QnUuid& resourceId );
     };
 
@@ -199,7 +200,6 @@ namespace ec2
         virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
         virtual int getStatusList( const QnUuid &resourceId, impl::GetStatusListHandlerPtr handler ) = 0;
         virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
-        virtual int removeParams(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
         virtual int remove( const QVector<QnUuid>& resourceList, impl::SimpleHandlerPtr handler ) = 0;
     };

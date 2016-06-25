@@ -41,10 +41,9 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/handlers/workbench_connect_handler.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
 
 #include "action_parameter_types.h"
@@ -638,14 +637,22 @@ Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters
     return context()->workbench()->currentLayout()->items().size() <= 1 ? Qn::DisabledAction : Qn::EnabledAction;
 }
 
-Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources) {
-    if(resources.size() != 1)
+Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources)
+{
+    if (resources.size() != 1)
         return Qn::InvisibleAction;
 
-    bool watchable = !(resources[0]->flags() & Qn::live) || accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission);
-    return watchable ? Qn::EnabledAction : Qn::InvisibleAction;
+    bool hasFootage = resources[0]->flags().testFlag(Qn::video);
+    return hasFootage
+        ? Qn::EnabledAction
+        : Qn::InvisibleAction;
+}
 
-    // TODO: #Elric this will fail (?) if we have sync with some UTC resource on the scene.
+Qn::ActionVisibility QnTimelineVisibleActionCondition::check(const QnActionParameters &parameters)
+{
+    return context()->navigator()->isPlayingSupported()
+        ? Qn::EnabledAction
+        : Qn::InvisibleAction;
 }
 
 Qn::ActionVisibility QnToggleTitleBarActionCondition::check(const QnActionParameters &) {
@@ -850,30 +857,15 @@ Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &parame
         : Qn::EnabledAction;
 }
 
-QnBrowseLocalFilesCondition::QnBrowseLocalFilesCondition(QObject *parent) :
+QnBrowseLocalFilesCondition::QnBrowseLocalFilesCondition(QObject* parent) :
     QnActionCondition(parent)
 {
 }
 
-Qn::ActionVisibility QnBrowseLocalFilesCondition::check(const QnActionParameters &parameters)
+Qn::ActionVisibility QnBrowseLocalFilesCondition::check(const QnActionParameters& parameters)
 {
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    return (welcomeScreen && welcomeScreen->isVisible() ?
-        Qn::EnabledAction : Qn::InvisibleAction);
-}
-
-QnShowWelcomeScreenCondition::QnShowWelcomeScreenCondition(QObject *parent) :
-    QnActionCondition(parent)
-{
-}
-
-Qn::ActionVisibility QnShowWelcomeScreenCondition::check(const QnActionParameters &parameters)
-{
-    const auto connectHandler = context()->instance<QnWorkbenchConnectHandler>();
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    const bool correctInstances = welcomeScreen && connectHandler;
-    return (correctInstances && !welcomeScreen->isVisible() && !connectHandler->connected() ?
-        Qn::EnabledAction : Qn::InvisibleAction);
+    const bool connected = !qnCommon->remoteGUID().isNull();
+    return (connected ? Qn::InvisibleAction : Qn::EnabledAction);
 }
 
 Qn::ActionVisibility QnChangeResolutionActionCondition::check(const QnActionParameters &) {

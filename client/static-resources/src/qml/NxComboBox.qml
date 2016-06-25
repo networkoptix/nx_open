@@ -16,7 +16,62 @@ ComboBox
 
     property bool isEditMode: false;
     property string text;
-    currentIndex: 0;
+
+    property int overflowCurrentIndex: -1;
+
+    onCountChanged:
+    {
+        if (overflowCurrentIndex === -1)
+            return;
+
+        // Workaround: below onRowsInserted may be connected to signal before combobox component, thus
+        // count is not changed before it is processed. Thus we use this temp variable to store new
+        // overflown index and update currentIndex in this case
+        currentIndex = overflowCurrentIndex;
+        overflowCurrentIndex = -1;
+    }
+
+    Connections
+    {
+        target: model;
+        onRowsRemoved:
+        {
+            if (currentIndex == -1)
+                return;
+
+            if (count === 0)
+                currentIndex = -1;
+            else if (currentIndex >= first && currentIndex <= last)
+                currentIndex = -1;  // This item has been removed
+            else if (currentIndex > last)
+                currentIndex -= (last - first + 1);
+        }
+
+        onRowsInserted:
+        {
+            if (currentIndex == -1)
+                currentIndex = 0;
+            else if (currentIndex >= first)
+            {
+                var newCurrenIndex = currentIndex + (last - first + 1);
+                if (newCurrenIndex < count)
+                    currentItemIndex = newCurrenIndex;
+                else
+                    overflowCurrentIndex = newCurrenIndex;
+            }
+        }
+        onRowsMoved:
+        {
+            if (currentIndex == -1)
+                return;
+            else if (currentIndex >= start && currentIndex <= end)
+                currentIndex += (row - start);
+            else if ((currentIndex < start) && (row <= currentIndex))
+                currentIndex += (end - start + 1);
+            else if ((currentIndex > end) && (row >= currentIndex))
+                currentIndex -= (end - start + 1);
+        }
+    }
 
     textRole: "display";
 
@@ -25,6 +80,7 @@ ComboBox
     height: 28;
 
     opacity: (enabled ? 1.0 : 0.3);
+
 
     onActiveFocusChanged:
     {

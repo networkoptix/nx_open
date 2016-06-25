@@ -79,14 +79,21 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
 }
 
 
-bool QnLayoutExportTool::prepareStorage() {
-    if (m_realFilename == QnLayoutFileStorageResource::removeProtocolPrefix(m_layout->getUrl())) {
+bool QnLayoutExportTool::prepareStorage()
+{
+    const bool isExeFile =
+#ifdef Q_OS_WIN
+        m_targetFilename.endsWith(lit(".exe"));
+#else
+        false;
+#endif
+    if (isExeFile || m_realFilename == QnLayoutFileStorageResource::removeProtocolPrefix(m_layout->getUrl())) {
         // can not override opened layout. save to tmp file, then rename
         m_realFilename += lit(".tmp");
     }
 
 #ifdef Q_OS_WIN
-    if (m_targetFilename.endsWith(lit(".exe")))
+    if (isExeFile)
     {
         if (QnNovLauncher::createLaunchingFile(m_realFilename) != 0)
         {

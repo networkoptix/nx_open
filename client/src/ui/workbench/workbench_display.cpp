@@ -60,6 +60,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/videowall_screen_widget.h>
 #include <ui/graphics/items/resource/web_resource_widget.h>
+#include <ui/graphics/items/resource/web_view.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
@@ -228,6 +229,24 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(m_curtainActivityInstrument,    SIGNAL(activityResumed()),                                  this,                   SLOT(at_curtainActivityInstrument_activityStarted()));
     connect(m_widgetActivityInstrument,     SIGNAL(activityStopped()),                                  this,                   SLOT(at_widgetActivityInstrument_activityStopped()));
     connect(m_widgetActivityInstrument,     SIGNAL(activityResumed()),                                  this,                   SLOT(at_widgetActivityInstrument_activityStarted()));
+
+    /* We should disable all one-key shortcuts while web view is in the focus. */
+    connect(m_focusListenerInstrument, &FocusListenerInstrument::focusItemChanged, this, [this]()
+    {
+        bool isWebView = scene() && dynamic_cast<QnWebView*>(scene()->focusItem());
+        action(QnActions::JumpToLiveAction)->setEnabled(!isWebView);    // L
+        action(QnActions::ToggleMuteAction)->setEnabled(!isWebView);    // M
+        action(QnActions::ToggleSyncAction)->setEnabled(!isWebView);    // S
+        action(QnActions::JumpToEndAction)->setEnabled(!isWebView);     // X
+        action(QnActions::JumpToStartAction)->setEnabled(!isWebView);   // Z
+        action(QnActions::PlayPauseAction)->setEnabled(!isWebView);     // Space
+
+        /* "Delete" button */
+        action(QnActions::DeleteVideowallMatrixAction)->setEnabled(!isWebView);
+        action(QnActions::RemoveLayoutItemAction)->setEnabled(!isWebView);
+        action(QnActions::RemoveFromServerAction)->setEnabled(!isWebView);
+        action(QnActions::StopSharingLayoutAction)->setEnabled(!isWebView);
+    });
 
     /* Create zoomed toggle. */
     m_zoomedToggle = new QnToggle(false, this);

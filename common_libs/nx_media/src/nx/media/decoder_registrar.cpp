@@ -22,9 +22,16 @@
 namespace nx {
 namespace media {
 
-void DecoderRegistrar::registerDecoders(std::shared_ptr<AbstractResourceAllocator> allocator)
+void DecoderRegistrar::registerDecoders(
+    std::shared_ptr<AbstractResourceAllocator> allocator,
+    const QSize& maxFfmpegResolution,
+    bool liteClientMode)
 {
     assert(allocator);
+
+    VideoDecoderRegistry::instance()->setLiteClientMode(liteClientMode);
+
+    // ATTENTION: Order of registration defines the priority of choosing: first comes first.
 
     #if defined(Q_OS_ANDROID)
     {
@@ -44,8 +51,12 @@ void DecoderRegistrar::registerDecoders(std::shared_ptr<AbstractResourceAllocato
     #endif // ENABLE_PROXY_DECODER
 
     #if !defined(DISABLE_FFMPEG)
+    {
+        FfmpegVideoDecoder::setMaxResolution(maxFfmpegResolution);
+
         VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
         AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();
+    }
     #endif // !DISABLE_FFMPEG
 
     VideoDecoderRegistry::instance()->addPlugin<JpegDecoder>();

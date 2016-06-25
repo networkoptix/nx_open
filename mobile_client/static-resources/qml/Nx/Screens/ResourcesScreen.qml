@@ -86,7 +86,7 @@ Page
         displayMarginEnd: anchors.bottomMargin
         enabled: d.enabled
 
-        layoutId: sideNavigation.activeLayout
+        layoutId: uiController.layoutId
 
         ScrollIndicator.vertical: ScrollIndicator
         {
@@ -204,13 +204,25 @@ Page
         onConnectionFailed:
         {
             var lastUsedSystemId = getLastUsedSystemId()
-            Workflow.openFailedSessionScreen(
-                        lastUsedSystemId,
-                        connectionManager.currentHost,
-                        connectionManager.currentLogin,
-                        connectionManager.currentPassword,
-                        status,
-                        infoParameter)
+            var connectionType = connectionManager.connectionType
+            if (connectionType == QnConnectionManager.CloudConnection)
+            {
+                Workflow.openSessionsScreenWithWarning(qsTr("Cannot connect to %1").arg(getLastUsedSystemId()))
+            }
+            else if (connectionType == QnConnectionManager.LiteClientConnection)
+            {
+                Workflow.openSessionsScreenWithWarning(qsTr("Cannot connect to the server"))
+            }
+            else
+            {
+                Workflow.openFailedSessionScreen(
+                            lastUsedSystemId,
+                            connectionManager.currentHost,
+                            connectionManager.currentLogin,
+                            connectionManager.currentPassword,
+                            status,
+                            infoParameter)
+            }
         }
 
         onInitialResourcesReceived:

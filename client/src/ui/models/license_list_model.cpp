@@ -14,183 +14,245 @@
 #include <utils/common/synctime.h>
 #include "utils/math/math.h"
 
-QnLicenseListModel::QnLicenseListModel(QObject *parent):
-    base_type(parent)
-{
-    rebuild();
+namespace {
+
+/** How many ms before expiration should we show warning. Default value is 15 days. */
+const qint64 kExpirationWarningTimeMs = 15ll * 1000ll * 60ll * 60ll * 24ll;
+
 }
 
-QnLicenseListModel::~QnLicenseListModel() {
+QnLicenseListModel::QnLicenseListModel(QObject *parent) :
+    base_type(parent)
+{}
+
+QnLicenseListModel::~QnLicenseListModel()
+{
     return;
 }
 
-const QList<QnLicensePtr> &QnLicenseListModel::licenses() const {
-    return m_licenses;
+int QnLicenseListModel::rowCount(const QModelIndex& parent) const
+{
+    if (parent.isValid())
+        return 0;
+
+    return m_licenses.size();
 }
 
-void QnLicenseListModel::setLicenses(const QList<QnLicensePtr> &licenses) {
-    m_licenses = licenses;
+int QnLicenseListModel::columnCount(const QModelIndex& parent) const
+{
+    if (parent.isValid())
+        return 0;
 
-    rebuild();
+    return ColumnCount;
 }
 
-QList<QnLicenseListModel::Column> QnLicenseListModel::columns() const {
-    return m_columns;
-}
+QVariant QnLicenseListModel::data(const QModelIndex& index, int role) const
+{
+    if (!hasIndex(index.row(), index.column(), index.parent()))
+        return QVariant();
 
-void QnLicenseListModel::setColumns(const QList<Column> &columns) {
-    if(m_columns == columns)
-        return;
+    QnLicensePtr license = m_licenses[index.row()];
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(license->serverId());
 
-    foreach(Column column, columns) {
-        if(column < 0 || column >= ColumnCount) {
-            qnWarning("Invalid column '%1'.", static_cast<int>(column));
-            return;
+    switch (role)
+    {
+        case Qt::DisplayRole:
+        case Qt::StatusTipRole:
+        case Qt::WhatsThisRole:
+        case Qt::AccessibleTextRole:
+        case Qt::AccessibleDescriptionRole:
+        case Qt::ToolTipRole:
+            switch (index.column())
+            {
+                case TypeColumn:
+                    return license->displayName();
+
+                case CameraCountColumn:
+                    return QString::number(license->cameraCount());
+
+                case LicenseKeyColumn:
+                    return QString::fromLatin1(license->key());
+
+                case ExpirationDateColumn:
+                    return license->neverExpire()
+                        ? tr("Never")
+                        : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString(Qt::SystemLocaleShortDate);
+
+                case LicenseStatusColumn:
+                    return getLicenseStatus(license);
+
+                case ServerColumn:
+                    return server
+                        ? QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl)
+                        : tr("<Server not found>");
+
+                default:
+                    break;
+            } // switch (column)
+            break;
+
+        case Qt::TextAlignmentRole:
+            switch (index.column())
+            {
+                case CameraCountColumn:
+                    return static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
+
+                default:
+                    return static_cast<int>(Qt::AlignLeft | Qt::AlignVCenter);
+            } // switch (column)
+            break;
+
+        case Qt::ForegroundRole:
+        {
+            if (!qnLicensePool->isLicenseValid(license))
+                return QBrush(m_colors.expired);
+
+            switch (index.column())
+            {
+                case LicenseStatusColumn:
+                {
+                    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+                    qint64 expirationTime = license->expirationTime();
+
+                    qint64 timeLeft = expirationTime - currentTime;
+                    if (expirationTime > 0 && timeLeft < 0)
+                        return QBrush(m_colors.expired);
+
+                    if (expirationTime > 0 && timeLeft < kExpirationWarningTimeMs)
+                        return QBrush(m_colors.warning);
+
+                    break;
+                }
+
+                case ServerColumn:
+                    if (!server)
+                        return QBrush(m_colors.expired);
+                    break;
+
+                default:
+                    break;
+            } // switch (column)
+            return QBrush(m_colors.normal);
         }
-    }
 
-    m_columns = columns;
+        case Qt::DecorationRole:
+            if (index.column() == ServerColumn && server)
+                return qnResIconCache->icon(QnResourceIconCache::Server);
+            break;
 
-    rebuild();
+        case LicenseRole:
+            return qVariantFromValue(license);
+
+        default:
+            break;
+    } // switch (role)
+
+    return QVariant();
 }
 
-const QnLicensesListModelColors QnLicenseListModel::colors() const {
+QVariant QnLicenseListModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Vertical)
+        return QVariant();
+
+    if (section >= ColumnCount)
+        return QVariant();
+
+    if (role != Qt::DisplayRole)
+        return base_type::headerData(section, orientation, role);
+
+    switch (section)
+    {
+        case TypeColumn:            return tr("Type");
+        case CameraCountColumn:     return tr("Amount");
+        case LicenseKeyColumn:      return tr("License Key");
+        case ExpirationDateColumn:  return tr("Expiration Date");
+        case LicenseStatusColumn:   return tr("Status");
+        case ServerColumn:          return tr("Server");
+        default:
+            break;
+    }
+    return QVariant();
+}
+
+void QnLicenseListModel::updateLicenses(const QnLicenseList& licenses)
+{
+    /* setLicenses() is called quite often, so we optimize it to maintain exiting selection model. */
+
+    QSet<QnLicensePtr> existing = m_licenses.toSet();
+    QSet<QnLicensePtr> updated = licenses.toSet();
+
+    QSet<QnLicensePtr> toAdd = updated - existing;
+    QSet<QnLicensePtr> toRemove = existing - updated;
+
+    for (const QnLicensePtr& license: toRemove)
+        removeLicense(license);
+
+    for (const QnLicensePtr& license : toAdd)
+        addLicense(license);
+}
+
+const QnLicensesListModelColors QnLicenseListModel::colors() const
+{
     return m_colors;
 }
 
-void QnLicenseListModel::setColors(const QnLicensesListModelColors &colors) {
+void QnLicenseListModel::setColors(const QnLicensesListModelColors &colors)
+{
+    beginResetModel();
     m_colors = colors;
-    rebuild();
+    endResetModel();
 }
 
+QString QnLicenseListModel::getLicenseStatus(const QnLicensePtr& license) const
+{
+    QnLicense::ErrorCode errCode;
+    if (!qnLicensePool->isLicenseValid(license, &errCode))
+        return license->errorMessage(errCode);
 
-QString QnLicenseListModel::columnTitle(Column column) {
-    switch(column) {
-    case TypeColumn:            return tr("Type");
-    case CameraCountColumn:     return tr("Amount");
-    case LicenseKeyColumn:      return tr("License Key");
-    case ExpirationDateColumn:  return tr("Expiration Date");
-    case LicenseStatusColumn:   return tr("Status");
-    case ServerColumn:          return tr("Server");
-    default:
-        NX_ASSERT(false);
-        return QString();
-    }
-}
+    qint64 currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 expirationTimeMs = license->expirationTime();
 
-QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr &license, const QnLicensesListModelColors &colors) {
-    QStandardItem *item = new QStandardItem();
-    item->setData(QBrush(colors.normal), Qt::ForegroundRole);
+    qint64 timeLeftMs = expirationTimeMs - currentTimeMs;
+    if (expirationTimeMs > 0 && timeLeftMs < 0)
+        return tr("Expired");
 
-    switch(column) {
-    case TypeColumn:
-        item->setText(license->displayName());
-        item->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
-        break;
-    case CameraCountColumn:
-        item->setText(QString::number(license->cameraCount()));
-        item->setData(Qt::AlignRight, Qt::TextAlignmentRole);
-        break;
-    case LicenseKeyColumn:
-        item->setText(QLatin1String(license->key()));
-        item->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
-        break;
-    case ExpirationDateColumn:
-        item->setText(license->expirationTime() < 0 ? tr("Never") : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString(Qt::SystemLocaleShortDate));
-        item->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
-        break;
-    case LicenseStatusColumn:
-        {
-            QnLicense::ErrorCode errCode;
-            if (qnLicensePool->isLicenseValid(license, &errCode))
-            {
-                qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-                qint64 expirationTime = license->expirationTime();
+    if (expirationTimeMs > 0 && timeLeftMs < kExpirationWarningTimeMs)
+    {
+        int daysLeft = QDateTime::fromMSecsSinceEpoch(currentTimeMs).date().daysTo(QDateTime::fromMSecsSinceEpoch(expirationTimeMs).date());
+        if (daysLeft == 0)
+            return tr("Today");
 
-                qint64 day = 1000ll * 60ll * 60ll * 24ll;
-                qint64 timeLeft = expirationTime - currentTime;
-                if(expirationTime > 0 && timeLeft < 0) {
-                    item->setText(tr("Expired"));
-                    item->setData(QBrush(colors.expired), Qt::ForegroundRole);
-                }
-                else if(expirationTime > 0 && timeLeft < 15 * day)
-                {
-                        item->setData(QBrush(colors.warning), Qt::ForegroundRole);
-                        int daysLeft = QDateTime::fromMSecsSinceEpoch(currentTime).date().daysTo(QDateTime::fromMSecsSinceEpoch(expirationTime).date());
-                        if(daysLeft == 0) {
-                            item->setText(tr("Today"));
-                        } else if(daysLeft == 1) {
-                            item->setText(tr("Tomorrow"));
-                        } else {
-                            item->setText(tr("In %n days", 0, daysLeft));
-                        }
-                }
-                else {
-                    item->setText(tr("OK"));
-                }
-            }
-            else {
-                item->setText(license->errorMessage(errCode));
-                item->setData(QBrush(colors.expired), Qt::ForegroundRole);
-            }
-            break;
-        }
-        item->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
-    case ServerColumn:
-        {
-            QnUuid serverId = license->serverId();
-            QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(serverId);
-            if (!server)
-            {
-                item->setText(tr("<Server not found>"));
-                item->setData(QVariant(), Qt::DecorationRole);
-                item->setData(QBrush(colors.expired), Qt::ForegroundRole);
-            }
-            else
-            {
-                item->setText(QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree()));
-                item->setData(qnResIconCache->icon(QnResourceIconCache::Server).pixmap(16, 16), Qt::DecorationRole);
-                item->setData(QBrush(colors.normal), Qt::ForegroundRole);
-            }
-            item->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
-        }
-        break;
-    default:
-        NX_ASSERT(false);
+        if (daysLeft == 1)
+            return tr("Tomorrow");
+
+        return tr("In %n days", "", daysLeft);
     }
 
-    if (!qnLicensePool->isLicenseValid(license))
-        item->setData(QBrush(colors.expired), Qt::ForegroundRole);
-
-    return item;
+    return tr("OK");
 }
 
-void QnLicenseListModel::rebuild() {
-    clear();
-    if(m_columns.isEmpty())
-        return;
-
-    /* Fill header. */
-    setColumnCount(m_columns.size());
-    for(int c = 0; c < m_columns.size(); c++)
-        setHeaderData(c, Qt::Horizontal, columnTitle(m_columns[c]));
-
-    /* Fill data. */
-    for(int r = 0; r < m_licenses.size(); r++) {
-        QList<QStandardItem *> items;
-        for(int c = 0; c < m_columns.size(); c++)
-            items.push_back(createItem(m_columns[c], m_licenses[r], m_colors));
-        items[0]->setData(r, Qt::UserRole);
-
-        appendRow(items);
-    }
-}
-
-QnLicensePtr QnLicenseListModel::license(const QModelIndex &index) const {
-    bool ok = false;
-    int r = index.sibling(index.row(), 0).data(Qt::UserRole).toInt(&ok);
-    if(!ok || r < 0 || r >= m_licenses.size())
+QnLicensePtr QnLicenseListModel::license(const QModelIndex &index) const
+{
+    if (!index.isValid())
         return QnLicensePtr();
+    return data(index, LicenseRole).value<QnLicensePtr>();
+}
 
-    return m_licenses[r];
+void QnLicenseListModel::addLicense(const QnLicensePtr& license)
+{
+    int count = m_licenses.size();
+    beginInsertRows(QModelIndex(), count, count);
+    m_licenses << license;
+    endInsertRows();
+}
+
+void QnLicenseListModel::removeLicense(const QnLicensePtr& license)
+{
+    int idx = m_licenses.indexOf(license);
+    if (idx < 0)
+        return;
+    beginRemoveRows(QModelIndex(), idx, idx);
+    m_licenses.removeAt(idx);
+    endRemoveRows();
 }

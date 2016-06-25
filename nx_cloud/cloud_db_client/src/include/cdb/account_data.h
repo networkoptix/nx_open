@@ -67,7 +67,7 @@ public:
 };
 
 
-class TemporaryCredentialsParams
+class TemporaryCredentialsTimeouts
 {
 public:
     std::chrono::seconds expirationPeriod;
@@ -77,11 +77,30 @@ public:
     bool autoProlongationEnabled;
     std::chrono::seconds prolongationPeriod;
 
-    TemporaryCredentialsParams()
+
+    TemporaryCredentialsTimeouts()
     :
-        autoProlongationEnabled(false)
+        expirationPeriod(0),
+        autoProlongationEnabled(false),
+        prolongationPeriod(0)
     {
     }
+};
+
+/** Input parameters of \a create_temporary_credentials request */
+class TemporaryCredentialsParams
+{
+public:
+    /** Type of key to issue.
+        Following types are defined:
+        - short
+        - long
+    */
+    std::string type;
+    /**
+        This structure is ignored if \a type is non-empty
+    */
+    TemporaryCredentialsTimeouts timeouts;
 };
 
 class TemporaryCredentials
@@ -89,6 +108,8 @@ class TemporaryCredentials
 public:
     std::string login;
     std::string password;
+    /** Parameters of credentials created */
+    TemporaryCredentialsTimeouts timeouts;
 };
 
 }   //api

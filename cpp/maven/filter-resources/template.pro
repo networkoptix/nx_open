@@ -216,7 +216,7 @@ win* {
 unix: {
   DEFINES += QN_EXPORT=
   clang {
-    QMAKE_CXXFLAGS += -std=c++14 -Wno-c++14-extensions
+    QMAKE_CXXFLAGS += -Wno-c++14-extensions -Wno-inconsistent-missing-override
   } else {
     #QMAKE_CXXFLAGS += -std=c++1y
   }
@@ -294,6 +294,7 @@ ios {
     QMAKE_MOC_OPTIONS += -DQ_OS_IOS
     QMAKE_IOS_DEPLOYMENT_TARGET = 8.0
     XCODEBUILD_FLAGS += -jobs 4
+    QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedef
 }
 
 

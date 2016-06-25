@@ -4,7 +4,7 @@
 
 #include <nx/utils/singleton.h>
 
-#include <core/user_recent_connection_data.h>
+#include <client_core/user_recent_connection_data.h>
 
 class QnRecentUserConnectionsModel;
 

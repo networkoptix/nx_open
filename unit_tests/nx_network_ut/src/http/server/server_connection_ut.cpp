@@ -51,10 +51,10 @@ public:
 
     //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
-        stree::ResourceContainer authInfo,
+        nx_http::HttpServerConnection* const /*connection*/,
+        stree::ResourceContainer /*authInfo*/,
         nx_http::Request request,
-        nx_http::Response* const response,
+        nx_http::Response* const /*response*/,
         std::function<void(
             const nx_http::StatusCode::Value statusCode,
             std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
@@ -117,8 +117,8 @@ public:
 
     //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
-        stree::ResourceContainer authInfo,
+        nx_http::HttpServerConnection* const /*connection*/,
+        stree::ResourceContainer /*authInfo*/,
         nx_http::Request request,
         nx_http::Response* const response,
         std::function<void(

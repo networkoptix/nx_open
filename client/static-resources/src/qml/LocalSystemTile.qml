@@ -99,7 +99,11 @@ BaseTile
             KeyNavigation.tab: expandedArea.loginTextItem;
             KeyNavigation.backtab: hostChooseItem;
 
-            onCurrentItemIndexChanged: { updatePasswordData(currentItemIndex); }
+            onCurrentItemIndexChanged:
+            {
+                expandedArea.password = ""; // Force clear password field on user change
+                updatePasswordData(currentItemIndex);
+            }
         }
     }
 
@@ -189,6 +193,13 @@ BaseTile
                 text: qsTr("Auto-login");
 
                 onCheckedChanged: { thisComponent.autoLogin = checked; }
+
+                Binding
+                {
+                    target: autoLoginCheckBoxPrivate;
+                    property: "checked";
+                    value: thisComponent.autoLogin;
+                }
             }
         }
 
@@ -206,8 +217,20 @@ BaseTile
         }
     }
 
+    Connections
+    {
+        target: recentUserConnectionsModel;
+        onConnectionDataChanged: { updatePasswordData(index); }
+    }
+
     function updatePasswordData(currentItemIndex)
     {
+        if (centralArea && centralArea.userChooseField &&
+                (currentItemIndex !== centralArea.userChooseField.currentItemIndex))
+        {
+            return; // Do not update if it is not current item
+        }
+
         var hasStoredPasswordValue = (recentUserConnectionsModel
             && recentUserConnectionsModel.getData("hasStoredPassword", currentItemIndex));
 
@@ -217,12 +240,10 @@ BaseTile
             return;
 
         expandedArea.storePasswordCheckbox.checked = hasStoredPassword;
-        if (!hasStoredPassword)
-            return;
-
-        var storedPassword = recentUserConnectionsModel.getData(
-            "password", currentItemIndex);
-        expandedArea.password = storedPassword;
+        if (hasStoredPassword)
+            expandedArea.password = recentUserConnectionsModel.getData("password", currentItemIndex);
+        else
+            expandedArea.password = "";
     }
 
     Component.onCompleted: { updatePasswordData(0); }

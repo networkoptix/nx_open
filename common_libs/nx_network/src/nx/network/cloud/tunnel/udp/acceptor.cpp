@@ -12,10 +12,10 @@ namespace cloud {
 namespace udp {
 
 TunnelAcceptor::TunnelAcceptor(
-    SocketAddress peerAddress,
+    std::list<SocketAddress> peerAddresses,
     nx::hpm::api::ConnectionParameters connectionParametes)
 :
-    m_peerAddress(std::move(peerAddress)),
+    m_peerAddresses(std::move(peerAddresses)),
     m_connectionParameters(std::move(connectionParametes)),
     m_udpRetransmissionTimeout(stun::UDPClient::kDefaultRetransmissionTimeOut),
     m_udpMaxRetransmissions(stun::UDPClient::kDefaultMaxRetransmissions)
@@ -50,10 +50,19 @@ void TunnelAcceptor::accept(std::function<void(
 
             m_udpMediatorConnection->socket()->bindToAioThread(
                 m_mediatorConnection->getAioThread());
+            if (!m_udpMediatorConnection->socket()->bind(SocketAddress::anyAddress))
+                return executeAcceptHandler(SystemError::getLastOSErrorCode());
 
             hpm::api::ConnectionAckRequest ackRequest;
             ackRequest.connectSessionId = m_connectionId;
             ackRequest.connectionMethods = hpm::api::ConnectionMethod::udpHolePunching;
+
+            const auto port = m_udpMediatorConnection->localAddress().port;
+            for (const auto ifInfo: getAllIPv4Interfaces())
+            {
+                SocketAddress boundAddress(ifInfo.address.toString(), port);
+                ackRequest.udpEndpointList.push_back(std::move(boundAddress));
+            }
 
             m_udpMediatorConnection->setRetransmissionTimeOut(m_udpRetransmissionTimeout);
             m_udpMediatorConnection->setMaxRetransmissions(m_udpMaxRetransmissions);
@@ -69,12 +78,9 @@ void TunnelAcceptor::pleaseStop(
     m_mediatorConnection->pleaseStop(
         [this, handler = std::move(handler)]()
         {
-            if (m_udtConnectionSocket)
-                m_udtConnectionSocket->pleaseStopSync();
-
-            if (m_udpMediatorConnection)
-                m_udpMediatorConnection->pleaseStopSync();
-
+            m_udpMediatorConnection.reset();
+            m_sockets.clear();
+            m_connections.clear();
             handler();
         });
 }
@@ -92,57 +98,80 @@ void TunnelAcceptor::connectionAckResult(
         return executeAcceptHandler(SystemError::connectionAbort);
     }
 
-    auto socket = m_udpMediatorConnection->takeSocket();
+    auto udpSocket = m_udpMediatorConnection->takeSocket();
     m_udpMediatorConnection.reset();
 
-    m_udtConnectionSocket.reset(new UdtStreamSocket);
-    m_udtConnectionSocket->bindToAioThread(
-        m_mediatorConnection->getAioThread());
-
-    if (!m_udtConnectionSocket->bindToUdpSocket(std::move(*socket)) ||
-        !m_udtConnectionSocket->setRendezvous(true) ||
-        !m_udtConnectionSocket->setSendTimeout(
-            m_connectionParameters.rendezvousConnectTimeout.count()) ||
-        !m_udtConnectionSocket->setNonBlockingMode(true))
+    auto localAddress = udpSocket->getLocalAddress();
+    auto timeout = m_connectionParameters.rendezvousConnectTimeout.count();
+    for (const auto& address : m_peerAddresses)
     {
-        return executeAcceptHandler(
-            SystemError::getLastOSErrorCode());
-    }
+        auto udtSocket = std::make_unique<UdtStreamSocket>();
+        udtSocket->bindToAioThread(m_mediatorConnection->getAioThread());
 
-    initiateUdtConnection();
+        if ((udpSocket
+                ? udtSocket->bindToUdpSocket(std::move(*udpSocket))
+                : udtSocket->bind(localAddress)) &&
+            udtSocket->setRendezvous(true) &&
+            udtSocket->setSendTimeout(timeout) &&
+            udtSocket->setNonBlockingMode(true))
+        {
+            udpSocket.reset();
+            auto it = m_sockets.emplace(m_sockets.end(), std::move(udtSocket));
+            startUdtConnection(it, address);
+        }
+        else
+        {
+            return executeAcceptHandler(SystemError::getLastOSErrorCode());
+        }
+    }
 }
 
-void TunnelAcceptor::initiateUdtConnection()
+void TunnelAcceptor::startUdtConnection(
+    std::list<std::unique_ptr<UdtStreamSocket>>::iterator socketIt,
+    const SocketAddress& target)
 {
     NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
     NX_LOGX(lm("Initiate rendevous UDT connection from %1 to %2, "
         "connectionId=%3, remotePeerId=%4")
-        .arg(m_udtConnectionSocket->getLocalAddress().toString())
-        .arg(m_peerAddress.toString())
+        .str((*socketIt)->getLocalAddress()).str(target)
         .arg(m_connectionId).arg(m_remotePeerId), cl_logDEBUG2);
 
-    m_udtConnectionSocket->connectAsync(
-        m_peerAddress,
-        [this](SystemError::ErrorCode code)
+    (*socketIt)->connectAsync(
+        target,
+        [this, socketIt, target](SystemError::ErrorCode code)
         {
+            auto socket = std::move(*socketIt);
+            m_sockets.erase(socketIt);
+
             NX_LOGX(lm("Rendezvous UDT connection from %1 to %2 result: %3, "
                 "connectionId=%4, remotePeerId=%5")
-                .arg(m_udtConnectionSocket->getLocalAddress().toString())
-                .arg(m_peerAddress.toString()).arg(SystemError::toString(code))
+                .str(socket->getLocalAddress()).str(target).arg(SystemError::toString(code))
                 .arg(m_connectionId).arg(m_remotePeerId), cl_logDEBUG1);
 
             if (code != SystemError::noError)
                 return executeAcceptHandler(code);
 
-            auto socket = std::move(m_udtConnectionSocket);
-            m_udtConnectionSocket = nullptr;
+            auto connectionIt = m_connections.emplace(
+                m_connections.end(),
+                std::make_unique<IncomingControlConnection>(
+                    m_connectionId, std::move(socket), m_connectionParameters));
 
-            executeAcceptHandler(
-                SystemError::noError,
-                std::make_unique<IncomingTunnelConnection>(
-                    m_connectionId,
-                    std::move(socket),
-                    m_connectionParameters));
+            (*connectionIt)->setErrorHandler(
+                [this, connectionIt](SystemError::ErrorCode code)
+                {
+                    m_connections.erase(connectionIt);
+                    executeAcceptHandler(code);
+                });
+
+            (*connectionIt)->start(
+                [this, connectionIt]()
+                {
+                    auto tunnel = std::make_unique<IncomingTunnelConnection>(
+                        std::move(*connectionIt));
+
+                    m_connections.erase(connectionIt);
+                    executeAcceptHandler(SystemError::noError, std::move(tunnel));
+                });
         });
 }
 
@@ -152,6 +181,13 @@ void TunnelAcceptor::executeAcceptHandler(
 {
     NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
     NX_ASSERT(m_acceptHandler);
+
+    if (code != SystemError::noError && (!m_sockets.empty() || !m_connections.empty()))
+    {
+        // It is to early to give up, while some connections are in progress
+        // let's wait for more results
+        return;
+    }
 
     const auto handler = std::move(m_acceptHandler);
     m_acceptHandler = nullptr;

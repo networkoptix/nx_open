@@ -8,6 +8,9 @@
 class QnConnectionManager;
 class QnMobileAppInfo;
 class QnContextSettings;
+class QnCloudStatusWatcher;
+class QnMobileClientUiController;
+class QnUserWatcher;
 
 class QnContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
@@ -16,6 +19,9 @@ class QnContext: public QObject, public QnInstanceStorage {
     Q_PROPERTY(QnConnectionManager* connectionManager READ connectionManager NOTIFY connectionManagerChanged)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo READ applicationInfo NOTIFY applicationInfoChanged)
     Q_PROPERTY(QnContextSettings* settings READ settings NOTIFY settingsChanged)
+    Q_PROPERTY(QnCloudStatusWatcher* cloudStatusWatcher READ cloudStatusWatcher NOTIFY cloudStatusWatcherChanged)
+    Q_PROPERTY(QnMobileClientUiController* uiController READ uiController NOTIFY nothingChanged)
+    Q_PROPERTY(QnUserWatcher* userWatcher READ userWatcher NOTIFY nothingChanged)
     Q_PROPERTY(bool liteMode READ liteMode NOTIFY liteModeChanged)
 
 public:
@@ -33,6 +39,14 @@ public:
     QnContextSettings *settings() const {
         return m_settings;
     }
+
+    QnMobileClientUiController* uiController() const
+    {
+        return m_uiController;
+    }
+
+    QnCloudStatusWatcher* cloudStatusWatcher() const;
+    QnUserWatcher* userWatcher() const;
 
     Q_INVOKABLE void enterFullscreen();
     Q_INVOKABLE void exitFullscreen();
@@ -57,21 +71,26 @@ public:
     Q_INVOKABLE QString getLastUsedSystemId() const;
     Q_INVOKABLE QString getLastUsedUrl() const;
 
+    Q_INVOKABLE void setCloudCredentials(const QString& login, const QString& password);
+
     Q_INVOKABLE QString lp(const QString& path) const;
     void setLocalPrefix(const QString& prefix);
 
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
+    void nothingChanged();
     void connectionManagerChanged();
     void colorThemeChanged();
     void applicationInfoChanged();
     void settingsChanged();
+    void cloudStatusWatcherChanged();
     void liteModeChanged();
 
 private:
     QnConnectionManager *m_connectionManager;
     QnMobileAppInfo *m_appInfo;
     QnContextSettings *m_settings;
+    QnMobileClientUiController* m_uiController;
 
     QString m_localPrefix;
 };

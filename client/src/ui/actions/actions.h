@@ -35,14 +35,9 @@ QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
         DisconnectAction,
 
         /**
-        * Hides welcome screen and show unlogged client
+        * Switchs mode to browse local files/show welcome screen
         */
-        BrowseLocalFilesAction,
-
-        /**
-        * Shows welcome screen
-        */
-        ShowWelcomeScreenAction,
+        BrowseLocalFilesModeAction,
 
         /**
          * Forcefully disconnects from the current server (if any).

@@ -61,6 +61,7 @@
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/web_view.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/notifications/notifications_collection_widget.h>
 
@@ -476,7 +477,7 @@ QnImageButtonWidget* QnWorkbenchUi::newShowHideButton(QGraphicsItem* parent, QAc
     return button;
 }
 
-QnImageButtonWidget* QnWorkbenchUi::newPinButton(QGraphicsItem* parent, QAction* action)
+QnImageButtonWidget* QnWorkbenchUi::newPinButton(QGraphicsItem* parent, QAction* action, bool smallIcon)
 {
     QnImageButtonWidget* button = new QnImageButtonWidget(parent);
     context()->statisticsModule()->registerButton(aliasFromAction(action), button);
@@ -486,7 +487,11 @@ QnImageButtonWidget* QnWorkbenchUi::newPinButton(QGraphicsItem* parent, QAction*
     else
         button->setCheckable(true);
 
-    button->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
+    if (smallIcon)
+        button->setIcon(qnSkin->icon("panel/pin_small.png", "panel/unpin_small.png"));
+    else
+        button->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
+
     button->setCached(true);
 
     int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
@@ -505,8 +510,12 @@ Qn::ActionScope QnWorkbenchUi::currentScope() const
     if (focusItem == m_sliderItem)
         return Qn::SliderScope;
 
-    if (!focusItem || dynamic_cast<QnResourceWidget *>(focusItem))
+    if (!focusItem || dynamic_cast<QnResourceWidget*>(focusItem))
         return Qn::SceneScope;
+
+    /* We should not handle any button as an action while the item was focused. */
+    if (dynamic_cast<QnWebView*>(focusItem))
+        return Qn::InvalidScope;
 
     return Qn::MainScope;
 }
@@ -2006,7 +2015,7 @@ void QnWorkbenchUi::at_calendarWidget_dateClicked(const QDate &date)
 
 void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
 {
-    QnCalendarWidget *calendarWidget = new QnCalendarWidget();
+    QnCalendarWidget* calendarWidget = new QnCalendarWidget();
     setHelpTopic(calendarWidget, Qn::MainWindow_Calendar_Help);
     navigator()->setCalendar(calendarWidget);
 
@@ -2023,7 +2032,7 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
 
     const auto pinCalendarAction = action(QnActions::PinCalendarAction);
     pinCalendarAction->setChecked(settings.state != Qn::PaneState::Unpinned);
-    m_calendarPinButton = newPinButton(m_controlsWidget, pinCalendarAction);
+    m_calendarPinButton = newPinButton(m_controlsWidget, pinCalendarAction, true);
     m_calendarPinButton->setFocusProxy(m_calendarItem);
 
     const auto toggleCalendarAction = action(QnActions::ToggleCalendarAction);
@@ -2093,7 +2102,7 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
 
     enum { kCellsCountOffset = 2 };
     const int size = calendarWidget->headerHeight();
-    m_calendarPinOffset = QPoint(-kCellsCountOffset * size, (size - m_calendarPinButton->size().height()) / 2.0f);
+    m_calendarPinOffset = QPoint(-kCellsCountOffset * size, 0.0);
     m_dayTimeOffset = QPoint(-m_dayTimeWidget->headerHeight() , 0);
 }
 

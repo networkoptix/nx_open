@@ -413,8 +413,14 @@ static const char kTemporaryAccountCredentials[] =
 "                                                                                               \
 ALTER TABLE account_password ADD COLUMN login VARCHAR(255);                                     \
 UPDATE account_password SET login=(select email from account where id=account_password.account_id);     \
-CREATE UNIQUE INDEX account_password_unique_login ON account_password (login);                  \
 UPDATE account_password SET access_rights='+/cdb/account/update';                               \
+";                                                                                              
+
+
+//#CLOUD-186
+static const char kTemporaryAccountCredentialsProlongationPeriod[] =
+"                                                                                               \
+ALTER TABLE account_password ADD COLUMN prolongation_period_sec INTEGER DEFAULT 0;              \
 ";                                                                                              
 
 }   //db

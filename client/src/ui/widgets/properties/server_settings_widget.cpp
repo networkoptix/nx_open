@@ -42,20 +42,19 @@
 #include <utils/math/interpolator.h>
 #include <utils/math/color_transformations.h>
 
-namespace
-{
-    static const int PC_SERVER_MAX_CAMERAS = 128;
-    static const int ARM_SERVER_MAX_CAMERAS = 12;
-    static const int EDGE_SERVER_MAX_CAMERAS = 1;
+namespace {
+static const int PC_SERVER_MAX_CAMERAS = 128;
+static const int ARM_SERVER_MAX_CAMERAS = 12;
+static const int EDGE_SERVER_MAX_CAMERAS = 1;
 }
 
 
 //#define QN_SHOW_ARCHIVE_SPACE_COLUMN
 
-QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/):
+QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-      ui(new Ui::ServerSettingsWidget)
+    ui(new Ui::ServerSettingsWidget)
     , m_server()
     , m_tableBottomLabel()
     , m_maxCamerasAdjusted(false)
@@ -64,21 +63,20 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/):
 {
     ui->setupUi(this);
 
-
     setWarningStyle(ui->failoverWarningLabel);
 
     /* Set up context help. */
-    setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
-    setHelpTopic(ui->nameLabel,           ui->maxCamerasSpinBox,              Qn::ServerSettings_General_Help);
-    setHelpTopic(ui->ipAddressLabel,      ui->ipAddressLineEdit,              Qn::ServerSettings_General_Help);
-    setHelpTopic(ui->portLabel,           ui->portLineEdit,                   Qn::ServerSettings_General_Help);
-    setHelpTopic(ui->failoverGroupBox,                                        Qn::ServerSettings_Failover_Help);
+    setHelpTopic(ui->nameLabel, ui->nameLineEdit, Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->nameLabel, ui->maxCamerasSpinBox, Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->ipAddressLabel, ui->ipAddressLineEdit, Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->portLabel, ui->portLineEdit, Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->failoverGroupBox, Qn::ServerSettings_Failover_Help);
 
-    connect(ui->pingButton,             &QPushButton::clicked,      this,   &QnServerSettingsWidget::at_pingButton_clicked);
+    connect(ui->pingButton, &QPushButton::clicked, this, &QnServerSettingsWidget::at_pingButton_clicked);
 
-    connect(ui->nameLineEdit,           &QLineEdit::textChanged,    this,   &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->nameLineEdit, &QLineEdit::textChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->failoverGroupBox,       &QGroupBox::toggled,       this,   [this](bool checked)
+    connect(ui->failoverGroupBox, &QGroupBox::toggled, this, [this](bool checked)
     {
         ui->maxCamerasWidget->setEnabled(checked);
         updateFailoverLabel();
@@ -86,13 +84,14 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/):
     });
 
 
-    connect(ui->maxCamerasSpinBox,      QnSpinboxIntValueChanged,       this,   [this] {
+    connect(ui->maxCamerasSpinBox, QnSpinboxIntValueChanged, this, [this]
+    {
         m_maxCamerasAdjusted = true;
         updateFailoverLabel();
         emit hasChangesChanged();
     });
 
-    connect(ui->failoverPriorityButton, &QPushButton::clicked,  action(QnActions::OpenFailoverPriorityAction), &QAction::trigger);
+    connect(ui->failoverPriorityButton, &QPushButton::clicked, action(QnActions::OpenFailoverPriorityAction), &QAction::trigger);
 
     retranslateUi();
 }
@@ -100,21 +99,25 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/):
 QnServerSettingsWidget::~QnServerSettingsWidget()
 {}
 
-QnMediaServerResourcePtr QnServerSettingsWidget::server() const {
+QnMediaServerResourcePtr QnServerSettingsWidget::server() const
+{
     return m_server;
 }
 
-void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server) {
+void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server)
+{
     if (m_server == server)
         return;
 
-    if (m_server) {
+    if (m_server)
+    {
         disconnect(m_server, nullptr, this, nullptr);
     }
 
     m_server = server;
 
-    if (m_server) {
+    if (m_server)
+    {
         connect(m_server, &QnResource::nameChanged, this, [this](const QnResourcePtr &resource)
         {
             if (ui->nameLineEdit->text() != m_initServerName)   /// Field was changed
@@ -133,15 +136,18 @@ void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server) {
     updateReadOnly();
 }
 
-void QnServerSettingsWidget::setReadOnlyInternal(bool readOnly) {
+void QnServerSettingsWidget::setReadOnlyInternal(bool readOnly)
+{
     using ::setReadOnly;
     setReadOnly(ui->failoverGroupBox, readOnly);
     setReadOnly(ui->maxCamerasSpinBox, readOnly);
 
 }
 
-void QnServerSettingsWidget::updateReadOnly() {
-    bool readOnly = [&](){
+void QnServerSettingsWidget::updateReadOnly()
+{
+    bool readOnly = [&]()
+    {
         if (!m_server)
             return true;
         return !accessController()->hasPermissions(m_server, Qn::WritePermission | Qn::SavePermission);
@@ -153,7 +159,11 @@ void QnServerSettingsWidget::updateReadOnly() {
     ui->nameLineEdit->setReadOnly(readOnly || QnMediaServerResource::isEdgeServer(m_server));
 }
 
-bool QnServerSettingsWidget::hasChanges() const {
+bool QnServerSettingsWidget::hasChanges() const
+{
+    if (!m_server)
+        return false;
+
     if (isReadOnly())
         return false;
 
@@ -170,22 +180,24 @@ bool QnServerSettingsWidget::hasChanges() const {
     return false;
 }
 
-void QnServerSettingsWidget::retranslateUi() {
+void QnServerSettingsWidget::retranslateUi()
+{
     QString failoverText = QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("server will take devices automatically from offline servers"),
         tr("server will take cameras automatically from offline servers"));
 
-    ui->failoverGroupBox->setTitle(tr("Failover \t") + lit("(%1)").arg(failoverText));
+    ui->failoverGroupBox->setTitle(tr("Failover") + lit("\t(%1)").arg(failoverText));
 
     ui->maxCamerasLabel->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Max devices on this server:"),
         tr("Max cameras on this server:")
-        ));
+    ));
 
     updateFailoverLabel();
 }
 
-void QnServerSettingsWidget::loadDataToUi() {
+void QnServerSettingsWidget::loadDataToUi()
+{
     if (!m_server)
         return;
 
@@ -201,7 +213,7 @@ void QnServerSettingsWidget::loadDataToUi() {
     ui->maxCamerasSpinBox->setMaximum(maxCameras);
 
     int currentMaxCamerasValue = m_server->getMaxCameras();
-    if( currentMaxCamerasValue == 0 )
+    if (currentMaxCamerasValue == 0)
         currentMaxCamerasValue = maxCameras;
 
     ui->maxCamerasSpinBox->setValue(currentMaxCamerasValue);
@@ -214,11 +226,16 @@ void QnServerSettingsWidget::loadDataToUi() {
     updateUrl();
 }
 
-void QnServerSettingsWidget::applyChanges() {
+void QnServerSettingsWidget::applyChanges()
+{
+    if (!m_server)
+        return;
+
     if (isReadOnly())
         return;
 
-    qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server) {
+    qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server)
+    {
         server->setName(ui->nameLineEdit->text());
         server->setMaxCameras(ui->maxCamerasSpinBox->value());
         server->setRedundancy(ui->failoverGroupBox->isChecked());
@@ -238,9 +255,14 @@ void QnServerSettingsWidget::updateUrl()
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnServerSettingsWidget::updateFailoverLabel() {
+void QnServerSettingsWidget::updateFailoverLabel()
+{
 
-    auto getErrorText = [this] {
+    auto getErrorText = [this]
+    {
+        if (!m_server)
+            return QString();
+
         if (qnResPool->getResources<QnMediaServerResource>().size() < 2)
             return tr("At least two servers are required for this feature.");
 
@@ -267,6 +289,10 @@ void QnServerSettingsWidget::updateFailoverLabel() {
 }
 
 
-void QnServerSettingsWidget::at_pingButton_clicked() {
+void QnServerSettingsWidget::at_pingButton_clicked()
+{
+    if (!m_server)
+        return;
+
     menu()->trigger(QnActions::PingAction, QnActionParameters(m_server));
 }

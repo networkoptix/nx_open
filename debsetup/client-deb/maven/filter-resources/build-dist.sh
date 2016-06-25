@@ -56,6 +56,7 @@ CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 # Prepare stage dir
 rm -rf $STAGEBASE
 mkdir -p $BINSTAGE/imageformats
+mkdir -p $BINSTAGE/audio
 mkdir -p $BINSTAGE/platforminputcontexts
 mkdir -p $HELPSTAGE
 mkdir -p $LIBSTAGE
@@ -88,7 +89,7 @@ cp -r $CLIENT_PLATFORMINPUTCONTEXTS_PATH/*.* $BINSTAGE/platforminputcontexts
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
 cp -r $CLIENT_XCBGLINTEGRATIONS_PATH $BINSTAGE
 cp -r $CLIENT_QML_PATH $BINSTAGE
-cp -r $CLIENT_AUDIO_PATH $BINSTAGE
+cp -r $CLIENT_AUDIO_PATH/*.* $BINSTAGE/audio
 cp -r $CLIENT_VOX_PATH $BINSTAGE
 cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE
 rm -f $LIBSTAGE/*.debug

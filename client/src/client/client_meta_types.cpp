@@ -24,8 +24,6 @@
 #include <utils/ping_utility.h>
 #include <utils/app_server_file_cache.h>
 
-#include <core/core_meta_types.h>
-
 namespace {
     volatile bool qn_clientMetaTypes_initialized = false;
 
@@ -41,7 +39,7 @@ void QnClientMetaTypes::initialize() {
         return;
 
     QnCommonMetaTypes::initialize();
-    QnCoreMetaTypes::initialize();
+    QnClientCoreMetaTypes::initialize();
 
     qRegisterMetaType<Qt::KeyboardModifiers>();
     qRegisterMetaType<QVector<QnUuid> >();
@@ -106,7 +104,6 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnRoutingManagementColors>();
     qRegisterMetaType<QnAuditLogColors>();
     qRegisterMetaType<QnRecordingStatsColors>();
-    qRegisterMetaType<QnUserManagementColors>();
     qRegisterMetaType<QnVideowallManageWidgetColors>();
     qRegisterMetaType<QnServerUpdatesColors>();
     qRegisterMetaType<QnBackupScheduleColors>();
@@ -140,7 +137,6 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnRoutingManagementColors>();
     QnJsonSerializer::registerSerializer<QnAuditLogColors>();
     QnJsonSerializer::registerSerializer<QnRecordingStatsColors>();
-    QnJsonSerializer::registerSerializer<QnUserManagementColors>();
     QnJsonSerializer::registerSerializer<QnVideowallManageWidgetColors>();
     QnJsonSerializer::registerSerializer<QnServerUpdatesColors>();
     QnJsonSerializer::registerSerializer<QnBackupScheduleColors>();

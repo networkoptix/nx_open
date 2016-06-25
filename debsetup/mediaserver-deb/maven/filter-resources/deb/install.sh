@@ -11,7 +11,7 @@ DISTRIB=${installer.name}-mediaserver-${release.version}.${buildNumber}-${arch}-
 
 update () {
     export DEBIAN_FRONTEND=noninteractive
-    dpkg -iB $DISTRIB
+    dpkg -i $DISTRIB
 }
 
 if [ "$1" != "" ]

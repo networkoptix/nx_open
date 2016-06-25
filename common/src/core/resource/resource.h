@@ -170,7 +170,7 @@ public:
     bool hasUnprocessedCommands() const;
 #endif
 
-    bool isInitialized() const;
+    virtual bool isInitialized() const;
 
     static void stopAsyncTasks();
     static void pleaseStopAsyncTasks();
@@ -208,6 +208,8 @@ public:
 
     bool setProperty(const QString &key, const QVariant& value,
                      PropertyOptions options = DEFAULT_OPTIONS);
+
+    bool removeProperty(const QString& key);
 
     template<typename Update>
     bool updateProperty(const QString &key, const Update& update)

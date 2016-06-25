@@ -54,6 +54,7 @@ public:
 
     static QString layoutPrefix();
 
+    virtual QString getPath() const override;
 public:
     static const int MAX_FILES_AT_LAYOUT = 256;
 

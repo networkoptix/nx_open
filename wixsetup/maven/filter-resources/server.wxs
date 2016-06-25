@@ -66,6 +66,8 @@
                     </Component>                                              
                 </Directory>
 
+                <Directory Id="$(var.customization)ServerVoxDir" Name="vox"/>                                                
+                
                 <Component Id="ServerSigar">
                     <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="6" />
                 </Component>
@@ -221,6 +223,7 @@
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerQuazip" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
+            <ComponentGroupRef Id="ServerVoxComponent"/>            
             <ComponentRef Id="ServerSigar"/>
 
 

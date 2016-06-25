@@ -30,6 +30,8 @@ public:
     ~ModuleLauncher()
     {
         stop();
+        for (auto ptr: m_args)
+            delete ptr;
     }
 
     void start()

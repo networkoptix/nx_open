@@ -2,8 +2,7 @@
 
 #include <client/client_recent_connections_manager.h>
 
-#include <core/core_settings.h>
-#include <core/user_recent_connection_data.h>
+#include <client_core/client_core_settings.h>
 
 #include <nx/utils/raii_guard.h>
 #include <utils/math/math.h>
@@ -28,6 +27,34 @@ namespace
             result.insert(it.value(), it.key());
         return result;
     }();
+
+
+    // Removes duplicate connection to same system with the same user.
+    // Prefers to store connection with saved password
+    QnUserRecentConnectionDataList removeDuplicates(QnUserRecentConnectionDataList list)
+    {
+        QnUserRecentConnectionDataList result;
+        while (!list.empty())
+        {
+            const auto itStoredPass = std::find_if(list.begin(), list.end(), 
+                [](const QnUserRecentConnectionData &connection)
+            {
+                return connection.isStoredPassword;
+            });
+
+            /// Stores first found connection with password (if found) or just first connection
+            const auto connectionData = *list.begin();
+            result.append(itStoredPass == list.end() ? connectionData : *itStoredPass);
+            const auto newEnd = std::remove_if(list.begin(), list.end(), 
+                [userName = connectionData.url.userName()](const QnUserRecentConnectionData &connection) 
+            {
+                return (userName == connection.url.userName());
+            });
+            list.erase(newEnd, list.end());
+        }
+        return result;
+    }
+
 }
 
 QnRecentUserConnectionsModel::QnRecentUserConnectionsModel(QObject *parent)
@@ -67,57 +94,64 @@ QString QnRecentUserConnectionsModel::firstUser() const
     if (!hasConnections())
         return QString();
 
-    return m_data.first().userName;
+    return m_data.first().url.userName();
 }
 
 void QnRecentUserConnectionsModel::updateData(const QnUserRecentConnectionDataList &newData)
 {
-    if (m_data == newData)
+    const auto filteredData = removeDuplicates(newData);
+    if (m_data == filteredData)
         return;
 
     const bool hadConnections = hasConnections();
     const bool firstDataChanged = !m_data.isEmpty() && !newData.isEmpty() && m_data.first() != newData.first();
-
-    auto itCurrent = m_data.begin();
-    for (auto &newDataValue : newData)
+    
+    const auto newCount = filteredData.size();
+    for (int newIndex = 0; newIndex != newCount; ++newIndex)
     {
-        if (itCurrent == m_data.end())
+        const auto connectionData = filteredData.at(newIndex);
+        const auto it = std::find_if(m_data.begin(), m_data.end(), 
+            [connectionData](const QnUserRecentConnectionData &data)
         {
-            const int startIndex = m_data.size();
-            const int finishIndex = newData.size() - 1;
+            return (data.url.userName() == connectionData.url.userName());
+        });
 
-            beginInsertRows(QModelIndex(), startIndex, finishIndex);
-            const auto endInsertRowsGuard = QnRaiiGuard::createDestructable(
-                [this]() { endInsertRows(); });
-
-            for (auto it = newData.begin() + startIndex; it != newData.end(); ++it)
-                m_data.append(*it);
-
-            itCurrent = m_data.end();
-            break;
-        }
-
-        auto &oldDataValue = *itCurrent;
-        if (oldDataValue != newDataValue)
+        if (it == m_data.end())
         {
-            oldDataValue = newDataValue;
-            const auto modelIndex = index(itCurrent - m_data.begin());
-            dataChanged(modelIndex, modelIndex);
+            // Element not found - just insert it
+            beginInsertRows(QModelIndex(), newIndex, newIndex);
+            m_data.insert(newIndex, connectionData);
+            endInsertRows();
         }
+        else
+        {
+            const auto oldIndex = (it - m_data.begin());
+            const auto data = m_data.at(oldIndex);
+            const int diff = (oldIndex < newIndex ? -1 : 0);
+            if (oldIndex != newIndex)
+            {
+                // Move element to proper position
+                beginMoveRows(QModelIndex(), oldIndex, oldIndex, QModelIndex(), newIndex);
 
-        ++itCurrent;
+                m_data.erase(m_data.begin() + oldIndex);
+                m_data.insert(newIndex + diff, connectionData);
+                endMoveRows();
+            }
+            else if (data != connectionData)
+            {
+                m_data[newIndex + diff] = connectionData;
+                emit connectionDataChanged(newIndex + diff);
+            }
+        }
     }
 
-    if (itCurrent != m_data.end())
+    if (m_data.size() > filteredData.size())
     {
-        const int startIndex = (itCurrent - m_data.begin());
-        const int finishIndex = m_data.size();
-
+        const auto startIndex = filteredData.size();
+        const auto finishIndex = m_data.size() - 1;
         beginRemoveRows(QModelIndex(), startIndex, finishIndex);
-        const auto emdRemoveRowsGuard = QnRaiiGuard::createDestructable(
-            [this]() { endRemoveRows(); });
-
-        m_data.erase(itCurrent, m_data.end());
+        m_data.erase(m_data.begin() + startIndex, m_data.end());
+        endRemoveRows();
     }
 
     if (hadConnections != hasConnections())
@@ -145,9 +179,9 @@ QVariant QnRecentUserConnectionsModel::data(const QModelIndex &index, int role) 
     switch (role)
     {
         case UserNameRole:
-            return userPasswordData.userName;
+            return userPasswordData.url.userName();
         case PasswordRole:
-            return userPasswordData.password;
+            return userPasswordData.url.password();
         case HasStoredPasswordRole:
             return userPasswordData.isStoredPassword;
         default:

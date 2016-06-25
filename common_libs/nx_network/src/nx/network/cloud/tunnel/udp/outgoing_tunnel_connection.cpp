@@ -42,7 +42,7 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     //    m_timeouts.maxConnectionInactivityPeriod(),
     //    std::bind(&OutgoingTunnelConnection::onKeepAliveTimeout, this));
 
-    hpm::api::UdpHolePunchingSyn syn;
+    hpm::api::UdpHolePunchingSynRequest syn;
     stun::Message message;
     syn.serialize(&message);
     m_controlConnection->sendMessage(std::move(message));
@@ -114,7 +114,7 @@ void OutgoingTunnelConnection::establishNewConnection(
 
     auto newConnection = std::make_unique<UdtStreamSocket>();
     if (!socketAttributes.applyTo(newConnection.get()) ||
-        !newConnection->bind(m_localPunchedAddress) ||
+        !newConnection->bind(SocketAddress(HostAddress::anyHost, m_localPunchedAddress.port)) ||
         !newConnection->setNonBlockingMode(true))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
@@ -154,7 +154,7 @@ void OutgoingTunnelConnection::establishNewConnection(
 }
 
 void OutgoingTunnelConnection::setControlConnectionClosedHandler(
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_controlConnectionClosedHandler = std::move(handler);
 }
@@ -269,7 +269,7 @@ void OutgoingTunnelConnection::closeConnection(
     {
         auto controlConnectionClosedHandler =
             std::move(m_controlConnectionClosedHandler);
-        controlConnectionClosedHandler();
+        controlConnectionClosedHandler(closeReason);
     }
 
     if (!controlConnection)
@@ -282,15 +282,24 @@ void OutgoingTunnelConnection::closeConnection(
 void OutgoingTunnelConnection::onStunMessageReceived(
     nx::stun::Message message)
 {
-    hpm::api::UdpHolePunchingSynAck synAck;
-    bool parsed = synAck.parse(message);
-
-    //TODO: #ak Replase asserts with actual error handling
-    NX_ASSERT(parsed);
-    NX_ASSERT(synAck.connectSessionId == m_connectionId);
+    hpm::api::UdpHolePunchingSynResponse synAck;
+    if (synAck.parse(message))
+    {
+        if (synAck.connectSessionId != m_connectionId)
+        {
+            NX_LOGX(lm("cross-nat %1. Received SYN response with unexpected "
+                       "connection id: %2 vs %1")
+                .arg(m_connectionId).arg(synAck.connectSessionId), cl_logDEBUG1);
+        }
+    }
+    else
+    {
+        NX_LOGX(lm("cross-nat %1. Failed to parse SYN response")
+            .arg(m_connectionId), cl_logDEBUG1);
+    }
 
     NX_LOGX(lm("cross-nat %1. Control connection has been verified")
-        .arg(m_connectionId), cl_logDEBUG1);
+        .arg(m_connectionId), cl_logDEBUG2);
 }
 
 void OutgoingTunnelConnection::onKeepAliveTimeout()

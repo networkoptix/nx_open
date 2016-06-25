@@ -130,6 +130,8 @@ void FfmpegVideoDecoderPrivate::closeCodecContext()
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoder
 
+QSize FfmpegVideoDecoder::s_maxResolution;
+
 FfmpegVideoDecoder::FfmpegVideoDecoder(
     const ResourceAllocatorPtr& allocator, const QSize& resolution)
 :
@@ -150,6 +152,13 @@ bool FfmpegVideoDecoder::isCompatible(const CodecID codec, const QSize& resoluti
     Q_UNUSED(codec);
     Q_UNUSED(resolution)
     return true;
+}
+
+QSize FfmpegVideoDecoder::maxResolution(const CodecID codec)
+{
+    QN_UNUSED(codec);
+
+    return s_maxResolution;
 }
 
 int FfmpegVideoDecoder::decode(
@@ -267,6 +276,11 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
 #endif
 
     result->reset(videoFrame);
+}
+
+void FfmpegVideoDecoder::setMaxResolution(const QSize& maxResolution)
+{
+    s_maxResolution = maxResolution;
 }
 
 } // namespace media

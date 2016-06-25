@@ -439,6 +439,8 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(this));
     else if (actionType == QnBusiness::SendMailAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailPolicy>(this));
+    else if (actionType == QnBusiness::PlaySoundAction || actionType == QnBusiness::PlaySoundOnceAction || actionType == QnBusiness::SayTextAction)
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(this));
 
     dialog.setSelectedResources(m_model->actionResources());
 

@@ -23,7 +23,7 @@ namespace {
         typedef std::function<void(Qn::FailoverPriority)> ButtonCallback;
 
         QnFailoverPriorityDialogDelegate(
-            ButtonCallback callback, 
+            ButtonCallback callback,
             QnFailoverPriorityResourceModelDelegate* customColumnDelegate,
             QWidget* parent):
 
@@ -35,7 +35,7 @@ namespace {
             , m_customColumnDelegate(customColumnDelegate)
         {}
 
-        ~QnFailoverPriorityDialogDelegate() 
+        ~QnFailoverPriorityDialogDelegate()
         {}
 
         virtual void init(QWidget* parent) override {
@@ -136,7 +136,7 @@ namespace {
         ButtonCallback m_callback;
         QnResourceTreeModelCustomColumnDelegate* m_customColumnDelegate;
     };
-  
+
 }
 
 

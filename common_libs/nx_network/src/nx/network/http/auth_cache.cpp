@@ -38,8 +38,11 @@ namespace nx_http
         if( request->requestLine.method != authzData.method )
             return false;
 
+        if( authzData.userName != url.userName() )
+            return false;
+
         if( authzData.authorizationHeader &&
-            authzData.url == url )
+            authzData.url == url)
         {
             //using already-known Authorization header
             nx_http::insertOrReplaceHeader(
@@ -87,7 +90,8 @@ namespace nx_http
         }
 
         if( m_cachedAuthorization->url.host() != url.host() ||
-            m_cachedAuthorization->url.port() != url.port() )
+            m_cachedAuthorization->url.port() != url.port() ||
+            m_cachedAuthorization->url.userName() != url.userName() )
         {
             return authzItem;
         }

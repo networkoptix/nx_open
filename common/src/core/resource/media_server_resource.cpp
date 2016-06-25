@@ -20,6 +20,7 @@
 
 #include <rest/server/json_rest_result.h>
 
+#include <network/module_finder.h>
 #include <utils/common/app_info.h>
 #include "utils/common/delete_later.h"
 #include "utils/common/sleep.h"
@@ -29,6 +30,7 @@
 #include "network/networkoptixmodulerevealcommon.h"
 #include "nx/fusion/serialization/lexical.h"
 #include "api/server_rest_connection.h"
+#include <common/common_module.h>
 
 namespace {
     const QString protoVersionPropertyName = lit("protoVersion");
@@ -65,13 +67,22 @@ QnMediaServerResource::QnMediaServerResource():
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
     connect(this, &QnResource::resourceChanged, this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
     connect(this, &QnResource::propertyChanged, this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
+    Qn::directConnect(QnModuleFinder::instance(), &QnModuleFinder::modulePrimaryAddressChanged, this, &QnMediaServerResource::at_apiUrlChanged);
 }
 
 QnMediaServerResource::~QnMediaServerResource()
 {
+    directDisconnectAll();
     QnMutexLocker lock( &m_mutex );
     m_runningIfRequests.clear();
 }
+
+void QnMediaServerResource::at_apiUrlChanged(const QnModuleInformation& module, const SocketAddress&)
+{
+    if (module.id == getId())
+        emit apiUrlChanged(toSharedPointer(this));
+}
+
 
 void QnMediaServerResource::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
 {
@@ -145,27 +156,6 @@ void QnMediaServerResource::setName( const QString& name )
         (*lk)->name = name;
     }
     emit nameChanged(toSharedPointer(this));
-}
-
-
-void QnMediaServerResource::setApiUrl(const QString &apiUrl)
-{
-    {
-        QnMutexLocker lock(&m_mutex);
-        if (apiUrl == m_apiUrl)
-            return;
-
-        m_apiUrl = apiUrl;
-        if (m_apiConnection)
-            m_apiConnection->setUrl(m_apiUrl);
-    }
-    emit apiUrlChanged(::toSharedPointer(this));
-}
-
-QString QnMediaServerResource::getApiUrl() const
-{
-    QnMutexLocker lock( &m_mutex );
-    return m_apiUrl;
 }
 
 void QnMediaServerResource::setNetAddrList(const QList<SocketAddress>& netAddrList)
@@ -251,7 +241,7 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
 
     /* We want the video server connection to be deleted in its associated thread,
      * no matter where the reference count reached zero. Hence the custom deleter. */
-    if (!m_apiConnection && !m_apiUrl.isEmpty())
+    if (!m_apiConnection && !getApiUrl().isEmpty())
     {
         QnMediaServerResourcePtr thisPtr = toSharedPointer(this).dynamicCast<QnMediaServerResource>();
         m_apiConnection = QnMediaServerConnectionPtr(
@@ -272,6 +262,18 @@ rest::QnConnectionPtr QnMediaServerResource::restConnection()
     return m_restConnection;
 }
 
+void QnMediaServerResource::setUrl(const QString& url) 
+{
+    QnResource::setUrl(url);
+    QString apiUrl = getApiUrl();
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_apiConnection)
+            m_apiConnection->setUrl(apiUrl);
+    }
+    emit apiUrlChanged(toSharedPointer(this));
+}
+
 QnStorageResourceList QnMediaServerResource::getStorages() const
 {
     return qnResPool->getResourcesByParentId(getId()).filtered<QnStorageResource>();
@@ -279,9 +281,7 @@ QnStorageResourceList QnMediaServerResource::getStorages() const
 
 void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddress)
 {
-    QString apiScheme = QUrl(getApiUrl()).scheme();
     QString urlScheme = QUrl(getUrl()).scheme();
-    setApiUrl(lit("%1://%2").arg(apiScheme).arg(primaryAddress.toString()));
     setUrl(lit("%1://%2").arg(urlScheme).arg(primaryAddress.toString()));
 }
 
@@ -369,12 +369,11 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
     }
 
 
-    const bool currentPortChanged = (portFromUrl(m_apiUrl) != localOther->getPort());
+    const bool currentPortChanged = (portFromUrl(getApiUrl()) != localOther->getPort());
     if (netAddrListChanged || currentPortChanged )
     {
-        m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
         if (m_apiConnection)
-            m_apiConnection->setUrl(m_apiUrl);
+            m_apiConnection->setUrl(getApiUrl());
         if (currentPortChanged )
             modifiedFields << "portChanged";
     } else {
@@ -492,7 +491,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.version = m_version;
     moduleInformation.systemInformation = m_systemInfo;
     moduleInformation.systemName = m_systemName;
-    moduleInformation.port = QUrl(m_apiUrl).port();
+    moduleInformation.port = getPort();
     moduleInformation.id = getId();
     moduleInformation.serverFlags = getServerFlags();
 
@@ -514,7 +513,6 @@ void QnMediaServerResource::setFakeServerModuleInformation(const QnModuleInforma
         QString address = addressList.first().toString();
         quint16 port = moduleInformation.port;
         QString url = QString(lit("http://%1:%2")).arg(address).arg(port);
-        setApiUrl(url);
         setUrl(url);
     }
     if (!moduleInformation.name.isEmpty())
@@ -603,6 +601,30 @@ QString QnMediaServerResource::getAuthKey() const
 void QnMediaServerResource::setAuthKey(const QString& authKey)
 {
     m_authKey = authKey;
+}
+
+QString QnMediaServerResource::getApiUrl() const
+{
+    QUrl url;
+    SocketAddress address = QnModuleFinder::instance()->primaryAddress(getId());
+    QString hostString = lit("localhost");
+    int port = -1;
+    if (!address.isNull())
+    {
+        hostString = address.address.toString();
+        port = address.port > 0 ? address.port : -1;
+    }
+    else if (!getUrl().isEmpty())
+    {
+        QUrl url(getUrl());
+        hostString = url.host();
+        port = url.port();
+    }
+    url.setHost(hostString);
+    url.setPort(port);
+    url.setScheme(lit("https"));
+
+    return url.toString();
 }
 
 QString QnMediaServerResource::realm() const

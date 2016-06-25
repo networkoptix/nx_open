@@ -1,8 +1,10 @@
+#if !defined(EDGE_SERVER)
 #include "text_to_wav.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
 
+#include <mutex>
 #include <memory>
 
 #include <festival/festival.h>
@@ -208,8 +210,14 @@ namespace
 }
 #endif
 
+static std::once_flag festivalInitialized;
+static std::once_flag festivalDenitialized;
+
 static void initFestival()
 {
+#ifdef QN_USE_VLD
+    VLDDisable();
+#endif
     //initializing festival engine
     //sprintf( festivalVoxPath, "%s/festival.vox/lib/", QN_BUILDENV_PATH );
 #ifndef Q_OS_MAC
@@ -222,26 +230,33 @@ static void initFestival()
     const int heap_size = 1510000;  // default scheme heap size
     const int load_init_files = 1; // we want the festival init files loaded
     festival_initialize( load_init_files, heap_size );
+#ifdef QN_USE_VLD
+    VLDEnable();
+#endif
 }
+
+static void deinitFestival()
+{
+    festival_wait_for_spooler();
+    festival_tidy_up();
+}
+
 
 class FestivalInitializer
 {
 public:
     FestivalInitializer()
     {
-#ifdef QN_USE_VLD
-        VLDDisable();
-#endif
-        initFestival();
-#ifdef QN_USE_VLD
-        VLDEnable();
-#endif
+        std::call_once(festivalInitialized, initFestival);
     }
 
     ~FestivalInitializer()
     {
-        festival_wait_for_spooler();
-        festival_tidy_up();
+        /*
+         * Really we should not do it more than once.
+         * Guarding to prevent troubles in unit tests.
+         */
+        std::call_once(festivalDenitialized, deinitFestival);
     }
 };
 
@@ -374,3 +389,4 @@ QSharedPointer<TextToWaveServer::SynthetiseSpeechTask> TextToWaveServer::addTask
     task->dest = dest;
     return m_textQueue.push( task ) ? task : QSharedPointer<SynthetiseSpeechTask>();
 }
+#endif

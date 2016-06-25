@@ -5,6 +5,7 @@
 #include <QtCore/QUrl>
 #include <QtCore/QPointer>
 
+#include <api/global_settings.h>
 #include <cdb/connection.h>
 #include <utils/common/delayed.h>
 
@@ -62,6 +63,7 @@ public:
     bool loggedIn;
 
     QnCloudSystemList cloudSystems;
+    QnCloudSystem currentSystem;
 
 public:
     void updateConnection(bool initial = false);
@@ -70,6 +72,7 @@ private:
     void setStatus(QnCloudStatusWatcher::Status newStatus);
     void setCloudSystems(const QnCloudSystemList &newCloudSystems);
     void checkAndSetStatus(QnCloudStatusWatcher::Status newStatus);
+    void updateCurrentSystem();
 };
 
 QnCloudStatusWatcher::QnCloudStatusWatcher(QObject *parent)
@@ -111,6 +114,7 @@ void QnCloudStatusWatcher::setCloudPassword(const QString &password)
     Q_D(QnCloudStatusWatcher);
     d->cloudPassword = password;
     d->updateConnection();
+    emit passwordChanged();
 }
 
 void QnCloudStatusWatcher::setCloudCredentials(const QString &login, const QString &password, bool initial)
@@ -120,10 +124,12 @@ void QnCloudStatusWatcher::setCloudCredentials(const QString &login, const QStri
     if (d->cloudLogin == login && d->cloudPassword == password)
         return;
 
-    setCloudLogin(login);
+    d->cloudLogin = login;
     d->cloudPassword = password;
 
     d->updateConnection(initial);
+    emit loginChanged();
+    emit passwordChanged();
 }
 
 QString QnCloudStatusWatcher::cloudEndpoint() const
@@ -226,6 +232,8 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
     updateTimer->setInterval(kUpdateInterval);
     updateTimer->start();
     connect(updateTimer, &QTimer::timeout, q, &QnCloudStatusWatcher::updateSystems);
+    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
+            this, &QnCloudStatusWatcherPrivate::updateCurrentSystem);
 }
 
 void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
@@ -266,11 +274,13 @@ void QnCloudStatusWatcherPrivate::setCloudSystems(const QnCloudSystemList &newCl
 
     Q_Q(QnCloudStatusWatcher);
     emit q->cloudSystemsChanged(cloudSystems);
+
+    updateCurrentSystem();
 }
 
 void QnCloudStatusWatcherPrivate::checkAndSetStatus(QnCloudStatusWatcher::Status newStatus)
 {
-    switch (newStatus)
+    switch (status)
     {
     case QnCloudStatusWatcher::Online:
     case QnCloudStatusWatcher::LoggedOut:
@@ -283,6 +293,26 @@ void QnCloudStatusWatcherPrivate::checkAndSetStatus(QnCloudStatusWatcher::Status
         else
             setStatus(newStatus);
         break;
+    }
+}
+
+void QnCloudStatusWatcherPrivate::updateCurrentSystem()
+{
+    Q_Q(QnCloudStatusWatcher);
+
+    const auto systemId = qnGlobalSettings->cloudSystemID();
+
+    const auto it = std::find_if(
+        cloudSystems.begin(), cloudSystems.end(),
+        [systemId](const QnCloudSystem& system) { return systemId == system.id; });
+
+    if (it == cloudSystems.end())
+        return;
+
+    if (!it->fullEqual(currentSystem))
+    {
+        currentSystem = *it;
+        emit q->currentSystemChanged(currentSystem);
     }
 }
 
@@ -300,4 +330,13 @@ bool QnCloudSystem::operator ==(const QnCloudSystem &other) const
     return id == other.id &&
            name == other.name &&
            authKey == other.authKey;
+}
+
+bool QnCloudSystem::fullEqual(const QnCloudSystem& other) const
+{
+    return id == other.id &&
+           name == other.name &&
+           authKey == other.authKey &&
+           ownerAccountEmail == other.ownerAccountEmail &&
+           ownerFullName == other.ownerFullName;
 }

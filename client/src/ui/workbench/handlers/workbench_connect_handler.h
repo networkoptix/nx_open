@@ -24,13 +24,13 @@ public:
 
     struct StoreConnectionSettings
     {
-        QString connectionAlias;
         bool storePassword;
         bool autoLogin;
+        bool forceRemoveOldConnection;
 
-        static StoreConnectionSettingsPtr create(const QString &connectionAlias
-            , bool storePassword
-            , bool autoLogin);
+        static StoreConnectionSettingsPtr create(bool storePassword,
+            bool autoLogin,
+            bool forceRemoveOldConnection);
     };
 
     /// @brief Connects to server and stores successful connection data 
@@ -55,9 +55,6 @@ public:
 
     /** Clear all local data structures. */
     void clearConnection();
-
-signals:
-    void connectedChanged();
 
 private:
     void at_messageProcessor_connectionOpened();

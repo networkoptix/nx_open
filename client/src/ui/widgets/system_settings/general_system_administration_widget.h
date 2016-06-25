@@ -1,5 +1,4 @@
-#ifndef QN_GENERAL_SYSTEM_ADMINISTRATION_WIDGET_H
-#define QN_GENERAL_SYSTEM_ADMINISTRATION_WIDGET_H
+#pragma once
 
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
@@ -8,13 +7,14 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui_general_system_administration_widget.h>
 
-struct QnHTTPRawResponse;
 
-class QnGeneralSystemAdministrationWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware {
+class QnGeneralSystemAdministrationWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+{
     Q_OBJECT
     typedef QnAbstractPreferencesWidget base_type;
+
 public:
-    QnGeneralSystemAdministrationWidget(QWidget *parent = NULL);
+    QnGeneralSystemAdministrationWidget(QWidget* parent = nullptr);
 
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
@@ -22,16 +22,13 @@ public:
     virtual bool hasChanges() const override;
 
     virtual void retranslateUi() override;
-protected:
-    void resizeEvent(QResizeEvent *event) override;
 
+protected:
     void setReadOnlyInternal(bool readOnly) override;
+
 private:
     bool isDatabaseBackupAvailable() const;
 
 private:
     QScopedPointer<Ui::GeneralSystemAdministrationWidget> ui;
 };
-
-
-#endif // QN_GENERAL_SYSTEM_ADMINISTRATION_WIDGET_H

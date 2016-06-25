@@ -1,11 +1,14 @@
 #include "runtime_transaction_log.h"
 
+#include <nx/utils/log/log.h>
+
+
 namespace ec2
 {
 
 QnRuntimeTransactionLog::QnRuntimeTransactionLog(QObject* parent):
     QObject(parent)
-{ 
+{
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
 }
@@ -38,7 +41,7 @@ void QnRuntimeTransactionLog::clearOldRuntimeDataUnsafe(QnMutexLockerBase& lock,
     auto itr = m_state.values.lowerBound(QnTranStateKey(key.peerID, QnUuid()));
     bool newPeerFound = false;
     bool oldPeerFound = false;
-    while (itr != m_state.values.end() && itr.key().peerID == key.peerID) 
+    while (itr != m_state.values.end() && itr.key().peerID == key.peerID)
     {
         if (itr.key().dbID == key.dbID) {
             newPeerFound = true;
@@ -73,7 +76,7 @@ void QnRuntimeTransactionLog::clearRuntimeData()
     QnMutexLocker lock( &m_mutex );
     m_state.values.clear();
     m_data.clear();
-    
+
 }
 
 bool QnRuntimeTransactionLog::contains(const QnTranState& state) const
@@ -81,8 +84,20 @@ bool QnRuntimeTransactionLog::contains(const QnTranState& state) const
     QnMutexLocker lock( &m_mutex );
     for (auto itr = state.values.begin(); itr != state.values.end(); ++itr)
     {
-        if (itr.value() > m_state.values.value(itr.key()))
+        if (!m_state.values.contains(itr.key()))
+        {
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Runtime info for peer %1 (dbId %2) is missing...")
+                .arg(itr.key().peerID.toString()).arg(itr.key().dbID.toString()), cl_logDEBUG1);
             return false;
+        }
+
+        if (itr.value() > m_state.values.value(itr.key()))
+        {
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Runtime info for peer %1 (dbId %2) is old (%3 vs %4) ...")
+                .arg(itr.key().peerID.toString()).arg(itr.key().dbID.toString())
+                .arg(m_state.values.value(itr.key())).arg(itr.value()), cl_logDEBUG1);
+            return false;
+        }
     }
     return true;
 }
