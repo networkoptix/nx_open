@@ -41,8 +41,8 @@ public:
      */
     QSize maxResolution(const CodecID codec);
 
-    bool isLiteClientMode() const;
-    void setLiteClientMode(bool liteMode);
+    bool isTranscodingEnabled() const;
+    void setTranscodingEnabled(bool transcodingEnabled);
 
     /**
      * Register video decoder plugin.
@@ -93,7 +93,7 @@ private:
 
     std::vector<Metadata> m_plugins;
 
-    bool m_isLiteClientMode;
+    bool m_isTranscodingEnabled;
 };
 
 } // namespace media

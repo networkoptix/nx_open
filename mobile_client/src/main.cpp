@@ -132,7 +132,7 @@ int runUi(QGuiApplication *application) {
     }
 
     nx::media::DecoderRegistrar::registerDecoders(
-        allocator, maxFfmpegResolution, context.liteMode());
+        allocator, maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
 
     return application->exec();
 }
