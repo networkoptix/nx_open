@@ -25,7 +25,7 @@ namespace {
 
     const QnSoftwareVersion minimalSupportedVersion(2, 5, 0, 0);
     const QString kCloudConnectionScheme = lit("cloud");
-    const QString kLiteClientConntectionScheme = lit("liteclient");
+    const QString kLiteClientConnectionScheme = lit("liteclient");
 
     enum { kInvalidHandle = -1 };
 
@@ -39,7 +39,7 @@ namespace {
     {
         if (scheme == kCloudConnectionScheme)
             return QnConnectionManager::CloudConnection;
-        else if (scheme == kLiteClientConntectionScheme)
+        else if (scheme == kLiteClientConnectionScheme)
             return QnConnectionManager::LiteClientConnection;
         else
             return QnConnectionManager::NormalConnection;
