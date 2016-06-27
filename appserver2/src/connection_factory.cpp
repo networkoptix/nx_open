@@ -691,31 +691,31 @@ PRINT << "connectAsync(): Output url: " << url;
         registerGetFuncHandler<std::nullptr_t, ApiUserDataList>(p, ApiCommand::getUsers);
 
         /**%apidoc GET /ec2/getUserGroups
-        * Return user groups registered in the system.
-        * %param[default] format
-        * %return Return object in requested format
-        * %// AbstractUserManager::getUserGroups
+         * Return user groups registered in the system.
+         * %param[default] format
+         * %return Return object in requested format
+         * %// AbstractUserManager::getUserGroups
         */
         registerGetFuncHandler<std::nullptr_t, ApiUserGroupDataList>(p, ApiCommand::getUserGroups);
 
         /**%apidoc GET /ec2/getAccessRights
-        * Return list of accessible resources ids for each user in the system.
-        * %param[default] format
-        * %return Return object in requested format
-        * %// AbstractUserManager::getAccessRights
-        */
+         * Return list of accessible resources ids for each user in the system.
+         * %param[default] format
+         * %return Return object in requested format
+         * %// AbstractUserManager::getAccessRights
+         */
         registerGetFuncHandler<std::nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
 
         /**%apidoc POST /ec2/setAccessRights
-        * <p>
-        * Parameters should be passed as a JSON object in POST message body with
-        * content type "application/json". Example of such object can be seen in
-        * the result of the corresponding GET function.
-        * </p>
-        * %param userId User unique id.
-        * %param resourceIds List of accessible resources ids.
-        * %// AbstractUserManager::setAccessRights
-        */
+         * <p>
+         * Parameters should be passed as a JSON object in POST message body with
+         * content type "application/json". Example of such object can be seen in
+         * the result of the corresponding GET function.
+         * </p>
+         * %param userId User unique id.
+         * %param resourceIds List of accessible resources ids.
+         * %// AbstractUserManager::setAccessRights
+         */
         registerUpdateFuncHandler<ApiAccessRightsData>(p, ApiCommand::setAccessRights);
 
         /**%apidoc POST /ec2/saveUser
@@ -734,7 +734,7 @@ PRINT << "connectAsync(): Output url: " << url;
          *     a previously received object, use false when creating a new one.
          *     %value false
          *     %value true
- * %param permissions Combination (via "|") of the following flags:
+         * %param permissions Combination (via "|") of the following flags:
          *     %value GlobalAdminPermission Admin, can edit other non-admins.
          *     %value GlobalEditCamerasPermission Can edit camera settings.
          *     %value GlobalControlVideoWallPermission Can control videowalls.
@@ -780,36 +780,36 @@ PRINT << "connectAsync(): Output url: " << url;
 
 
         /**%apidoc POST /ec2/saveUserGroup
-        * <p>
-        * Parameters should be passed as a JSON object in POST message body with
-        * content type "application/json". Example of such object can be seen in
-        * the result of the corresponding GET function.
-        * </p>
-        * %param id Group unique id. Should be generated when creating a new group.
-        * %param name Group name.
-        * %param permissions Combination (via "|") of the following flags:
-        *     %value GlobalEditCamerasPermission Can edit camera settings.
-        *     %value GlobalControlVideoWallPermission Can control videowalls.
-        *     %value GlobalViewArchivePermission Can view archives of available cameras.
-        *     %value GlobalExportPermission Can export archives of available cameras.
-        *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
-        *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
-        *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O buttons.
-        *     %value GlobalAccessAllCamerasPermission Has access to all cameras
-        * %// AbstractUserManager::saveGroup
-        */
+         * <p>
+         * Parameters should be passed as a JSON object in POST message body with
+         * content type "application/json". Example of such object can be seen in
+         * the result of the corresponding GET function.
+         * </p>
+         * %param id Group unique id. Should be generated when creating a new group.
+         * %param name Group name.
+         * %param permissions Combination (via "|") of the following flags:
+         *     %value GlobalEditCamerasPermission Can edit camera settings.
+         *     %value GlobalControlVideoWallPermission Can control videowalls.
+         *     %value GlobalViewArchivePermission Can view archives of available cameras.
+         *     %value GlobalExportPermission Can export archives of available cameras.
+         *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
+         *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
+         *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O buttons.
+         *     %value GlobalAccessAllCamerasPermission Has access to all cameras
+         * %// AbstractUserManager::saveGroup
+         */
         registerUpdateFuncHandler<ApiUserGroupData>(p, ApiCommand::saveUserGroup);
 
         /**%apidoc POST /ec2/removeUserGroup
-        * Delete the specified user group.
-        * <p>
-        * Parameters should be passed as a JSON object in POST message body with
-        * content type "application/json". Example of such object can be seen in
-        * the result of the corresponding GET function.
-        * </p>
-        * %param id User unique id.
-        * %// AbstractUserManager::removeUserGroup
-        */
+         * Delete the specified user group.
+         * <p>
+         * Parameters should be passed as a JSON object in POST message body with
+         * content type "application/json". Example of such object can be seen in
+         * the result of the corresponding GET function.
+         * </p>
+         * %param id User unique id.
+         * %// AbstractUserManager::removeUserGroup
+         */
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeUserGroup);
 
         /**%apidoc GET /ec2/getVideowalls
