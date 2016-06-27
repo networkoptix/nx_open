@@ -149,10 +149,11 @@ PRINT << "processQueryAsync(): Input url: " <<  ecBaseUrl;
             query.addQueryItem("format", QnLexical::serialized(format));
             requestUrl.setQuery(query);
 PRINT << "processQueryAsync(): Output url: " <<  requestUrl;
-            QString effectiveUserName = QUrlQuery(ecBaseUrl).queryItemValue(lit("effectiveUserName"));
+            QString effectiveUserName =
+                QUrlQuery(ecBaseUrl).queryItemValue(lit("effectiveUserName"));
             if (!effectiveUserName.isEmpty())
             {
-                httpClient->setEffectiveUserName(effectiveUserName);
+                httpClient->setCustomUserName(effectiveUserName);
 PRINT << "processQueryAsync(): effectiveUserName: " << effectiveUserName;
             }
 

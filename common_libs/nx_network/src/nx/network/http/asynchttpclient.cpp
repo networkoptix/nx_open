@@ -309,9 +309,9 @@ namespace nx_http
         m_proxyUserPassword = userPassword;
     }
 
-    void AsyncHttpClient::setEffectiveUserName(const QString& effectiveUserName)
+    void AsyncHttpClient::setCustomUserName(const QString& customUserName)
     {
-        m_effectiveUserName = effectiveUserName;
+        m_customUserName = customUserName;
     }
 
     void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
@@ -815,20 +815,21 @@ namespace nx_http
         m_url.setUserName(m_userName);
         m_url.setPassword(m_userPassword);
 
-        if (!m_effectiveUserName.isEmpty())
-        {
-            nx_http::insertOrReplaceHeader(
-                &m_request.headers,
-                HttpHeader(Qn::EFFECTIVE_USER_NAME_HEADER_NAME, m_effectiveUserName.toUtf8()));
-        }
-
-        //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
-        //TODO #ak remove it after 2.3 support is over
+        // X-Nx-User-Name was originally added to help server to port data from 2.1 to 2.3 and from
+        // 2.3 to 2.4 (generate user's digest). Also used to supply user name when authorizing with
+        // authKey.
         if (!m_userName.isEmpty())
         {
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()));
+        }
+
+        if (!m_customUserName.isEmpty())
+        {
+            nx_http::insertOrReplaceHeader(
+                &m_request.headers,
+                HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_customUserName.toUtf8()));
         }
 
         if (m_precalculatedAuthorizationDisabled)
