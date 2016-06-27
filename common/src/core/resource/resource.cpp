@@ -875,6 +875,24 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
     return isModified;
 }
 
+bool QnResource::removeProperty(const QString& key)
+{
+    {
+        QnMutexLocker lk( &m_mutex );
+        if( m_id.isNull() )
+        {
+            m_locallySavedProperties.erase(key);
+            return false;
+        }
+    }
+
+    NX_ASSERT(!getId().isNull());
+    propertyDictionary->removeProperty(getId(), key);
+    emitPropertyChanged(key);
+
+    return true;
+}
+
 bool QnResource::setProperty(const QString &key, const QVariant& value, PropertyOptions options)
 {
     return setProperty(key, value.toString(), options);

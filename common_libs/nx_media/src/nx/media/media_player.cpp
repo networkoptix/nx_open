@@ -547,7 +547,12 @@ static QSize limitResolution(const QSize& desiredResolution, const QSize& limit)
 
 static QSize resolutionWithHeightAndAspect(int height, const QSize& aspect)
 {
-    return QSize((height * aspect.width()) / aspect.height(), height);
+    static const int kWidthRoundingFactor = 16; //< Used for rounding width up.
+
+    const int desiredWidth = (height * aspect.width()) / aspect.height();
+    const int roundedWidth = (desiredWidth + (kWidthRoundingFactor - 1)) / kWidthRoundingFactor;
+    const int newHeight = (roundedWidth * aspect.height()) / aspect.width();
+    return QSize(roundedWidth, newHeight);
 }
 
 } // namespace
@@ -673,7 +678,7 @@ bool PlayerPrivate::initDataProvider()
 
 bool PlayerPrivate::isTranscodingSupported(const QnVirtualCameraResourcePtr& camera)
 {
-    if (VideoDecoderRegistry::instance()->isLiteClientMode())
+    if (!VideoDecoderRegistry::instance()->isTranscodingEnabled())
         return false;
 
     QnMediaServerResourcePtr server = liveMode ? camera->getParentServer()

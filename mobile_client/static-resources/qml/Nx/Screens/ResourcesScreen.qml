@@ -204,12 +204,14 @@ Page
         onConnectionFailed:
         {
             var lastUsedSystemId = getLastUsedSystemId()
-            if (connectionManager.cloudSystem)
+            var connectionType = connectionManager.connectionType
+            if (connectionType == QnConnectionManager.CloudConnection)
             {
-                Workflow.openFailedCloudSessionScreen(
-                            lastUsedSystemId,
-                            status,
-                            infoParameter)
+                Workflow.openSessionsScreenWithWarning(qsTr("Cannot connect to %1").arg(getLastUsedSystemId()))
+            }
+            else if (connectionType == QnConnectionManager.LiteClientConnection)
+            {
+                Workflow.openSessionsScreenWithWarning(qsTr("Cannot connect to the server"))
             }
             else
             {

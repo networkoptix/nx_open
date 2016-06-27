@@ -564,7 +564,6 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData& 
     fromResourceToApi(src, static_cast<ApiResourceData&>(dst));
 
     dst.networkAddresses = serializeNetAddrList(src->getNetAddrList());
-    dst.apiUrl = src->getApiUrl();
     dst.flags = src->getServerFlags();
     dst.version = src->getVersion().toString();
     dst.systemInfo = src->getSystemInfo().toString();
@@ -579,7 +578,6 @@ void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& 
     QList<SocketAddress> resNetAddrList;
     deserializeNetAddrList(src.networkAddresses, resNetAddrList);
 
-    dst->setApiUrl(src.apiUrl);
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);
     dst->setVersion(QnSoftwareVersion(src.version));

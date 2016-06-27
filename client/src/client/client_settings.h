@@ -10,8 +10,8 @@
 #include <core/resource/resource_display_info.h>
 
 #include <client/client_globals.h>
-#include <client/client_connection_data.h>
 #include <client/client_model_types.h>
+#include <client_core/user_recent_connection_data.h>
 
 #include <ui/workbench/workbench_pane_settings.h>
 
@@ -198,9 +198,8 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportDir,          setLastExportDir,           LAST_EXPORT_DIR,            QString())
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateHash,        userWorkbenchStates,    setUserWorkbenchStates,     USER_WORKBENCH_STATES,      QnWorkbenchStateHash())
         QN_DECLARE_RW_PROPERTY(QnLicenseWarningStateHash,   licenseWarningStates,   setLicenseWarningStates,    LICENSE_WARNING_STATES,     QnLicenseWarningStateHash())
-        QN_DECLARE_R_PROPERTY (QnConnectionData,            defaultConnection,                                  DEFAULT_CONNECTION,         QnConnectionData())
-        QN_DECLARE_RW_PROPERTY(QnConnectionData,            lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())
-        QN_DECLARE_RW_PROPERTY(QnConnectionDataList,        customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList())
+        QN_DECLARE_R_PROPERTY (QnUserRecentConnectionData,  defaultConnection,                                  DEFAULT_CONNECTION,         QnUserRecentConnectionData())
+        QN_DECLARE_RW_PROPERTY(QnUserRecentConnectionData,  lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnUserRecentConnectionData())
         QN_DECLARE_RW_PROPERTY(QString,                     extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     translationPath,        setTranslationPath,         TRANSLATION_PATH,           QLatin1String(":/translations/common_en_US.qm"))

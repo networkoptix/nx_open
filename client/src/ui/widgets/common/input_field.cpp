@@ -44,42 +44,51 @@ public:
         return false;
     }
 
+    Qn::ValidationResult validationResult() const
+    {
+        QString text = input->text();
+        QString trimmed = text.trimmed();
+
+        Qn::ValidationResult validationResult(QValidator::Acceptable);
+
+        if (trimmed.isEmpty())
+        {
+            validationResult = emptyInputAllowed ?
+                Qn::ValidationResult(QValidator::Acceptable) :
+                Qn::ValidationResult(emptyInputHint);
+        }
+        else if (!terminalSpacesAllowed && trimmed != text)
+        {
+            validationResult = Qn::ValidationResult(terminalSpacesHint);
+        }
+        else if (confirmationPrimaryField && confirmationPrimaryField->text() != text &&
+            !confirmationPrimaryField->text().trimmed().isEmpty())
+        {
+            validationResult = Qn::ValidationResult(confirmationFailureHint);
+        }
+        else
+        {
+            if (validator)
+                validationResult = validator(text);
+
+            if ((validationResult.state == QValidator::Acceptable) && passwordIndicator)
+            {
+                const auto& info = passwordIndicator->currentInformation();
+                if (info.acceptance() == QnPasswordInformation::Inacceptable)
+                    validationResult = Qn::ValidationResult(info.hint());
+            }
+        }
+
+        return validationResult;
+    }
+
     void validate()
     {
         clearValidationResult();
 
         updatePasswordIndicatorVisibility();
 
-        QString text = input->text();
-        QString trimmed = text.trimmed();
-
-        if (trimmed.isEmpty())
-        {
-            lastValidationResult = emptyInputAllowed ?
-                Qn::ValidationResult(QValidator::Acceptable) :
-                Qn::ValidationResult(emptyInputHint);
-        }
-        else if (!terminalSpacesAllowed && trimmed != text)
-        {
-            lastValidationResult = Qn::ValidationResult(terminalSpacesHint);
-        }
-        else if (confirmationPrimaryField && confirmationPrimaryField->text() != text &&
-                !confirmationPrimaryField->text().trimmed().isEmpty())
-        {
-            lastValidationResult = Qn::ValidationResult(confirmationFailureHint);
-        }
-        else
-        {
-            if (validator)
-                lastValidationResult = validator(text);
-
-            if ((lastValidationResult.state == QValidator::Acceptable) && passwordIndicator)
-            {
-                const auto& info = passwordIndicator->currentInformation();
-                if (info.acceptance() == QnPasswordInformation::Inacceptable)
-                    lastValidationResult = Qn::ValidationResult(info.hint());
-            }
-        }
+        lastValidationResult = validationResult();
 
         QString hintText = lastValidationResult.errorMessage;
         if (hint->text() != hintText)
@@ -314,19 +323,13 @@ void QnInputField::clear()
 bool QnInputField::isValid() const
 {
     Q_D(const QnInputField);
-    if (d->validator)
-        return d->validator(d->input->text()).state == QValidator::Acceptable;
-
-    if (d->passwordIndicator)
-        return d->passwordIndicator->currentInformation().acceptance() != QnPasswordInformation::Inacceptable;
-
-    return true;
+    return d->validationResult().state == QValidator::Acceptable;
 }
 
-bool QnInputField::lastValidationResult() const
+QValidator::State QnInputField::lastValidationResult() const
 {
     Q_D(const QnInputField);
-    return d->lastValidationResult.state != QValidator::Invalid;
+    return d->lastValidationResult.state;
 }
 
 void QnInputField::setValidator(Qn::TextValidateFunction validator, bool validateImmediately)

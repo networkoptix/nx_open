@@ -60,6 +60,9 @@ namespace
     const QLatin1String kReplaceHostAddressWithPublicAddress("cloudConnect/replaceHostAddressWithPublicAddress");
     const QLatin1String kDefaultReplaceHostAddressWithPublicAddress("true");
 
+    const QLatin1String kAllowIpTarget("cloudConnect/allowIpTarget");
+    const QLatin1String kDefaultAllowIpTarget("false");
+
     const QLatin1String kFetchPublicIpUrl("cloudConnect/fetchPublicIpUrl");
     const QLatin1String kDefaultFetchPublicIpUrl("http://networkoptix.com/myip");
 }
@@ -78,7 +81,8 @@ Http::Http()
 
 CloudConnect::CloudConnect()
 :
-    replaceHostAddressWithPublicAddress(false)
+    replaceHostAddressWithPublicAddress(false),
+    allowIpTarget(false)
 {
 }
 
@@ -218,6 +222,10 @@ void Settings::loadConfiguration()
         m_settings.value(
             kReplaceHostAddressWithPublicAddress,
             kDefaultReplaceHostAddressWithPublicAddress).toString() == "true";
+    m_cloudConnect.allowIpTarget =
+        m_settings.value(
+            kAllowIpTarget,
+            kDefaultAllowIpTarget).toString() == "true";
     m_cloudConnect.fetchPublicIpUrl = 
         m_settings.value(
             kFetchPublicIpUrl,

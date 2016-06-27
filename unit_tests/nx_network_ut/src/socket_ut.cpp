@@ -108,7 +108,7 @@ protected:
 */
 TEST( Socket, AsyncOperationCancellation )
 {
-    static const std::chrono::milliseconds TEST_DURATION( 200 );
+    static const std::chrono::seconds TEST_DURATION(3);
     static const int TEST_RUNS = 5;
     static const int THREADS = 3;
 

@@ -52,6 +52,7 @@ public slots:
 signals:
     void systemNameChanged();
     void hasConnectionsChanged();
+    void connectionDataChanged(int index);
     void firstUserChanged();
 
 private:

@@ -35,8 +35,11 @@ IncomingTunnelConnection::IncomingTunnelConnection(
     });
 
     m_serverSocket->bindToAioThread(m_controlConnection->socket()->getAioThread());
+    const auto localAddressToBindTo = SocketAddress(
+        HostAddress::anyHost,
+        m_controlConnection->socket()->getLocalAddress().port);
     if (!m_serverSocket->setNonBlockingMode(true) ||
-        !m_serverSocket->bind(m_controlConnection->socket()->getLocalAddress()) ||
+        !m_serverSocket->bind(localAddressToBindTo) ||
         !m_serverSocket->listen())
     {
         NX_LOGX(lm("Can not listen on server socket: ")

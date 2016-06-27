@@ -27,5 +27,5 @@ private:
 
 private:
     QAbstractItemView* m_itemView;
-    QModelIndex m_hoveredIndex;
+    QPersistentModelIndex m_hoveredIndex;
 };

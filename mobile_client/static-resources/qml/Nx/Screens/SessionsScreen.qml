@@ -28,8 +28,6 @@ Page
         }
     ]
 
-    warningText: qsTr("Cannot connect to %1").arg(applicationInfo.cloudName())
-
     Object
     {
         id: d
@@ -47,7 +45,15 @@ Page
             id: cloudWarningDelay
             interval: 5000
             running: d.cloudOffline
-            onTriggered: warningVisible = true
+            onTriggered:
+            {
+                // Don't overwrite the current warning
+                if (warningVisible)
+                    return
+
+                warningText = qsTr("Cannot connect to %1").arg(applicationInfo.cloudName())
+                warningVisible = true
+            }
         }
     }
 

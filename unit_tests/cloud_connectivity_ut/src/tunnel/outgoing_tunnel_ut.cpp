@@ -77,6 +77,11 @@ public:
             });
     }
 
+    virtual void setControlConnectionClosedHandler(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*errorCode*/) override
+    {
+    }
+
 private:
     UDPSocket m_aioThreadBinder;
     bool m_connectionShouldWorkFine;

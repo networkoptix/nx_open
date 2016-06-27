@@ -3,6 +3,7 @@
 #include <deque>
 
 #include <QtMultimedia/QVideoFrame>
+#include <QtCore/QMutexLocker>
 
 #include <utils/media/jpeg_utils.h>
 #include <utils/media/h264_utils.h>
@@ -61,6 +62,8 @@ struct FrameBasicInfo
     QSize size;
     CodecID codec;
 };
+
+static QMutex mutex;
 
 } // namespace
 
@@ -160,9 +163,13 @@ bool SeamlessVideoDecoder::decode(
         result->reset();
 
     FrameBasicInfo frameInfo(frame);
-    bool isSimilarParams = frameInfo.codec == d->prevFrameInfo.codec;
-    if (!frameInfo.size.isEmpty())
-        isSimilarParams &= frameInfo.size == d->prevFrameInfo.size;
+    bool isSimilarParams;
+    {
+        QMutexLocker lock(&mutex);
+        isSimilarParams = frameInfo.codec == d->prevFrameInfo.codec;
+        if (!frameInfo.size.isEmpty())
+            isSimilarParams &= frameInfo.size == d->prevFrameInfo.size;
+    }
     if (!isSimilarParams)
     {
         if (d->videoDecoder)
@@ -187,7 +194,10 @@ bool SeamlessVideoDecoder::decode(
         d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(
             frame->compressionType, frameInfo.size);
         d->decoderFrameOffset = d->frameNumber;
-        d->prevFrameInfo = frameInfo;
+        {
+            QMutexLocker lock(&mutex);
+            d->prevFrameInfo = frameInfo;
+        }
         d->clearMetadata();
     }
 
@@ -223,12 +233,14 @@ int SeamlessVideoDecoder::currentFrameNumber() const
 QSize SeamlessVideoDecoder::currentResolution() const
 {
     Q_D(const SeamlessVideoDecoder);
+    QMutexLocker lock(&mutex);
     return d->prevFrameInfo.size;
 }
 
 CodecID SeamlessVideoDecoder::currentCodec() const
 {
     Q_D(const SeamlessVideoDecoder);
+    QMutexLocker lock(&mutex);
     return d->prevFrameInfo.codec;
 }
 

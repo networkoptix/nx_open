@@ -43,13 +43,10 @@ public:
         const QnAuthMethodRestrictionList& authRestrictionList,
         const StreeManager& stree);
 
-    virtual bool authenticate(
+    virtual void authenticate(
         const nx_http::HttpServerConnection& connection,
         const nx_http::Request& request,
-        boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
-        stree::ResourceContainer* authProperties,
-        nx_http::HttpHeaders* const responseHeaders,
-        std::unique_ptr<nx_http::AbstractMsgBodySource>* const msgBody) override;
+        nx_http::AuthenticationCompletionHandler completionHandler) override;
         
     static nx::String realm(); 
 

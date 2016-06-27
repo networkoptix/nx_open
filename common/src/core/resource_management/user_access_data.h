@@ -34,7 +34,7 @@ QnUserResourcePtr getUserResourceByAccessData(const UserAccessData &userAccessDa
 * Default kDefaultUserAccess for server side is superuser.
 * For client side kDefaultUserAccess is not taken into account.
 */
-const UserAccessData kDefaultUserAccess;
+const UserAccessData kDefaultUserAccess(QnUuid(lit("{BC292159-2BE9-4E84-A242-BC6122B315E4}")));
 }
 
 #endif // __USER_ACCESS_DATA_H__
