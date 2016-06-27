@@ -99,6 +99,8 @@ void QnLinkHoverProcessor::linkHovered(const QString& href)
     if (pos == -1)
         return;
 
+    //TODO: #common #vkutin Implement a better parsing for this to work if "style" attribute already exists
+
     /* Insert color attribute before href attribute: */
     QString alteredText = m_originalText;
     QString colorString = hoveredColor().name(QColor::HexRgb);
