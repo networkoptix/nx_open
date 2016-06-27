@@ -952,7 +952,7 @@ enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
 // TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
 // Note: -1 is used for invalid time
-// Now it is returning when no archive data and archive is played backward
+// Now it is being returned when there is no archive data and archive is played backwards.
 enum { kNoTimeValue = 0 };
 
 /** Time value for 'unknown' / 'invalid'. Same as AV_NOPTS_VALUE. Checked in ffmpeg.cpp. */
