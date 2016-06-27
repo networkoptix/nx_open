@@ -17,8 +17,6 @@ protected:
 
     virtual bool isStreamOpened() const override;
 
-    bool needConfigureProvider() const;
-
     virtual QnAbstractMediaDataPtr getNextData() override;
 
     virtual void closeStream() override;

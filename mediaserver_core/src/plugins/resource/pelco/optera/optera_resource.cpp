@@ -28,6 +28,9 @@ namespace
     const int kMinimumTiledModeFirmwareVersion = 26;
 
     const uint kChangeCameraModeTimeout = 4000;
+
+    const int kSoapSendTimeout = 30;
+    const int kSoapRecieveTimeout = 30;
 }
 
 QnOpteraResource::QnOpteraResource()
@@ -118,6 +121,9 @@ CameraDiagnostics::Result QnOpteraResource::initInternal()
 
     if (status != CL_HTTP_SUCCESS)
         qDebug() << "Set stitching mode request failed (it's normal)";
+
+    setOnvifRequestsRecieveTimeout(kSoapRecieveTimeout);
+    setOnvifRequestsSendTimeout(kSoapSendTimeout);
 
     return CameraDiagnostics::InitializationInProgress();
 }

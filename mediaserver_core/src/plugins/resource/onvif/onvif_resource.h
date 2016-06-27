@@ -201,6 +201,12 @@ public:
     CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
+    virtual void setOnvifRequestsRecieveTimeout(int timeout);
+    virtual void setOnvifRequestsSendTimeout(int timeout);
+
+    virtual int getOnvifRequestsRecieveTimeout() const;
+    virtual int getOnvifRequestsSendTimeout() const;
+
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
@@ -242,7 +248,9 @@ public:
     void beforeConfigureStream();
     void afterConfigureStream();
 
-    static QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
+    double getClosestAvailableFps(double desiredFps);
+
+    QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
 
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
@@ -270,6 +278,8 @@ protected:
     virtual CameraDiagnostics::Result customInitialization(const CapabilitiesResp& /*capabilitiesResponse*/) {
         return CameraDiagnostics::NoErrorResult();
     }
+
+   
 
 private:
     void setMaxFps(int f);
@@ -523,6 +533,8 @@ private:
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
 protected:
     QnCameraAdvancedParams m_advancedParameters;
+    int m_onvifRecieveTimeout;
+    int m_onvifSendTimeout;
 };
 
 #endif //ENABLE_ONVIF

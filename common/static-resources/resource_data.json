@@ -1042,16 +1042,21 @@
             ],
             "forcedOnvifParams": {
                 "videoEncoders": [
-                    "ve0", "ve8",
-                    "ve1", "ve9",
-                    "ve2", "ve10",
-                    "ve3", "ve11",
-                    "ve4", "ve12",
-                    "ve5", "ve13",
-                    "ve6", "ve14",
-                    "ve7", "ve15"
+                    "ve0,ve8",
+                    "ve1,ve9",
+                    "ve2,ve10",
+                    "ve3,ve11",
+                    "ve4,ve12",
+                    "ve5,ve13",
+                    "ve6,ve14",
+                    "ve7,ve15"
                 ]
-            }
+            },
+			"trustToVideoSourceSize": false,
+			"useExistingOnvifProfies": true,
+			"controlFpsViaEncodingInterval": true,
+			"forcedSecondaryStreamResolution": "352x288",
+			"fpsBase": 25
         },
 		{
 			"keys": [
@@ -1190,6 +1195,13 @@
 			"shouldAppearAsSingleChannel": true,
 			"doNotAddVendorToDeviceName": true,
 			"videoLayout": "width=4;height=1;sensors=0,1,2,3"
+		},
+		{
+			"keys": [
+				"ACTI|A41", "ACTI|A81"
+			],
+			"forceONVIF": true,
+			"defaultCredentials" : "admin:123456"
 		}
     ]
 }

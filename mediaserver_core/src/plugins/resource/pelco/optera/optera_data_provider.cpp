@@ -37,13 +37,6 @@ bool QnOpteraDataProvider::isStreamOpened() const
     return  m_dataSource.isStreamOpened();
 }
 
-bool QnOpteraDataProvider::needConfigureProvider() const 
-{
-    //Temporarily hack until we don't figure out how to fight issue with 
-    //setting non-standard fps on Pelco's cameras  
-    return false;
-}
-
 CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
     bool isCameraControlRequired, 
     const QnLiveStreamParams& params)
@@ -54,14 +47,25 @@ CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
     m_dataSource.resetSources();
 
     auto videoChannelMapping = getVideoChannelMapping();
+    bool providerMustNotConfigureResource = false;
 
     for (const auto& resourceChannelMapping: videoChannelMapping)
     {
         auto resource = initSubChannelResource(
             resourceChannelMapping.resourceChannel);
-        
-        QnAbstractStreamDataProviderPtr source(
-            new QnOnvifStreamReader(resource));
+
+        auto onvifResPtr = m_resource.dynamicCast<QnPlOnvifResource>();
+
+        resource->setOnvifRequestsRecieveTimeout(
+            onvifResPtr->getOnvifRequestsRecieveTimeout());
+
+        resource->setOnvifRequestsSendTimeout(
+            onvifResPtr->getOnvifRequestsSendTimeout());
+
+        auto reader = new QnOnvifStreamReader(resource);
+        reader->setMustNotConfigureResource(providerMustNotConfigureResource);
+        providerMustNotConfigureResource = true;
+        QnAbstractStreamDataProviderPtr source(reader);
 
         m_dataSource.addDataSource(source);
 
@@ -83,7 +87,7 @@ CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
     m_dataSource.setUser(this);
     m_dataSource.proxyOpenStream(isCameraControlRequired, params); 
 
-    int triesLeft = 10;
+    int triesLeft = 40;
     while (!m_dataSource.isStreamOpened() && triesLeft-- && !m_needStop)
     {
         qDebug() << "Waiting for stream opening";
