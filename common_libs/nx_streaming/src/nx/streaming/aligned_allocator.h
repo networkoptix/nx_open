@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include <common/config.h>
+#include <nx/streaming/config.h>
 
 template <typename T, std::size_t N = CL_MEDIA_ALIGNMENT>
 class QnAlignedAllocator {

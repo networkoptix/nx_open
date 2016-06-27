@@ -4,6 +4,7 @@
 #include <utils/media/ffmpeg_helper.h>
 #include <decoders/audio/ffmpeg_audio_decoder.h>
 #include <nx/streaming/media_context.h>
+#include <nx/streaming/config.h>
 
 extern "C"
 {

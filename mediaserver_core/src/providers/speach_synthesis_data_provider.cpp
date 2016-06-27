@@ -8,6 +8,7 @@
 #include <transcoding/ffmpeg_audio_transcoder.h>
 #include <decoders/audio/ffmpeg_audio_decoder.h>
 #include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/config.h>
 
 namespace {
     const size_t kDefaultDataChunkSize = 2048;

@@ -1,14 +1,4 @@
-#include <common/config.h>
-#ifdef __cplusplus
-    #include <common/common_globals.h>
-#endif
-
-/* Boost headers. */
-#include <boost/foreach.hpp>
-#include <boost/array.hpp>
-#include <boost/algorithm/cxx11/all_of.hpp>
-#include <boost/algorithm/cxx11/any_of.hpp>
-#include <boost/range/algorithm/count_if.hpp>
+#include <nx/utils/compiler_options.h>
 
 /* Windows headers. */
 #ifdef _WIN32
@@ -16,10 +6,6 @@
 #   include <windows.h> /* You HAVE to include winsock2.h BEFORE windows.h */
 #   include <ws2tcpip.h>
 #   include <iphlpapi.h>
-
-#   if _MSC_VER < 1800
-#       define noexcept
-#   endif
 
 #endif
 
@@ -32,6 +18,16 @@ extern "C" {
     #include <libswscale/swscale.h>
     #include <libavutil/avstring.h>
 }
+
+#ifdef __cplusplus
+/* This file should be included only main in vms projects. */
+#include <common/common_globals.h>
+#endif
+
+/* Boost headers. */
+#include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
+#include <boost/range/algorithm/count_if.hpp>
 
 #ifdef __cplusplus
 

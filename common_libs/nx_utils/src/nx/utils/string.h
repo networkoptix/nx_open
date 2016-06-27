@@ -7,6 +7,8 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
+#include <nx/utils/literal.h>
+
 namespace nx {
 namespace utils {
 

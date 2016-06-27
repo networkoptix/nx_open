@@ -4,9 +4,7 @@
 #include <cmath>
 
 #include <nx/utils/log/assert.h>
-
-//TODO: #rvasilenko we need a better place for such constants
-#define DATETIME_NOW        std::numeric_limits<qint64>::max()
+#include <nx/utils/datetime.h>
 
 namespace nx {
 namespace utils {

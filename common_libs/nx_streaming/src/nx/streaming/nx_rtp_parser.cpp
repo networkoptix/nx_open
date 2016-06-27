@@ -5,7 +5,7 @@
 #include <nx/streaming/basic_media_context.h>
 #include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/rtsp_client.h>
-
+#include <nx/streaming/config.h>
 
 QnNxRtpParser::QnNxRtpParser()
 :
@@ -88,7 +88,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 if (dataSize < RTSP_FFMPEG_METADATA_HEADER_SIZE)
                     return false;
 
-                QnMetaDataV1 *metadata = new QnMetaDataV1(); 
+                QnMetaDataV1 *metadata = new QnMetaDataV1();
                 metadata->m_data.clear();
                 context.reset();
                 metadata->m_duration = ntohl(*((quint32*)payload))*1000;
@@ -136,7 +136,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 return false;
             }
 
-            if (m_nextDataPacket) 
+            if (m_nextDataPacket)
             {
                 m_nextDataPacket->opaque = cseq;
                 m_nextDataPacket->flags = static_cast<QnAbstractMediaData::MediaFlags>(flags);

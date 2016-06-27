@@ -19,8 +19,6 @@
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 
-#include <common/common_globals.h>
-
 #include <nx/utils/log/assert.h>
 #include <utils/common/html.h>
 

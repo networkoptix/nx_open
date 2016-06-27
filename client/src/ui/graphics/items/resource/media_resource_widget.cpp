@@ -82,6 +82,12 @@ namespace
 {
     enum { kMicroInMilliSeconds = 1000 };
 
+    // TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
+    // Note: -1 is used for invalid time
+    // Now it is returned when there is no archive data and archive is played backwards.
+    // Who returns it? --gdm?
+    enum { kNoTimeValue = 0 };
+
     const qreal kTwoWayAudioButtonSize = 44.0;
 
     bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)

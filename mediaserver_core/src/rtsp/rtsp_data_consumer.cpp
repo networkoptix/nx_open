@@ -3,6 +3,7 @@
 #include "rtsp_data_consumer.h"
 
 #include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/config.h>
 #include <rtsp/rtsp_connection.h>
 #include <utils/common/util.h>
 #include <utils/media/ffmpeg_helper.h>
@@ -11,6 +12,7 @@
 #include <utils/common/sleep.h>
 #include <nx/streaming/rtsp_client.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/streaming/config.h>
 #include <utils/common/synctime.h>
 #include <core/resource/security_cam_resource.h>
 #include <recorder/recording_manager.h>
@@ -210,7 +212,7 @@ void QnRtspDataConsumer::cleanupQueueToPos(int lastIndex, int ch)
         if (lastIndex > 0)
             m_someDataIsDropped = true;
     }
-    else 
+    else
     {
         for (int i = lastIndex - 1; i >= 0; --i)
         {
@@ -223,7 +225,7 @@ void QnRtspDataConsumer::cleanupQueueToPos(int lastIndex, int ch)
             }
         }
     }
-    
+
     // clone packet. Put to queue new copy because data is modified
     if (m_someDataIsDropped)
     {
@@ -239,7 +241,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
     m_dataQueue.push(nonConstData);
 
     // quality control
-    
+
     if (m_dataQueue.size() > MAX_DATA_QUEUE_SIZE ||
        (m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION))
     {
@@ -284,7 +286,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 
         m_dataQueue.unlock();
     }
-    
+
     // Queue to large. Clear data anyway causing video artifacts
     while(m_dataQueue.size() > MAX_DATA_QUEUE_SIZE * m_videoChannels)
     {
@@ -557,7 +559,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
                 }
             }
         }
-        if (isLive) 
+        if (isLive)
         {
             if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
                 return true; // data for other live quality stream
