@@ -74,6 +74,8 @@ bool hasPermissionImpl(const QnUuid &userId, const ApiUserGroupData&/*data*/, Qn
 
 bool hasPermissionImpl(const QnUuid &userId, const ApiDiscoveredServerData&/*data*/, Qn::Permission permission);
 
+bool hasPermissionImpl(const QnUuid &userId, const ApiUserData&/*data*/, Qn::Permission permission);
+
 template<typename TransactionParamType>
 auto hasPermissionImpl(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(data.id), bool>
 {
