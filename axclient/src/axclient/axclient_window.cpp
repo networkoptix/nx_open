@@ -11,7 +11,6 @@
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/widgets/main_window.h>
-#include <ui/workaround/fglrx_full_screen.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -219,7 +218,6 @@ void QnAxClientWindow::createMainWindow() {
     NX_ASSERT(m_mainWindow == NULL, Q_FUNC_INFO, "Double initialization");
 
     m_context.reset(new QnWorkbenchContext());
-    m_context->instance<QnFglrxFullScreen>();
 
     //TODO: #GDM is it really needed here?
     QnActions::IDType effectiveMaximizeActionId = QnActions::FullscreenAction;
