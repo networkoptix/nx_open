@@ -20,7 +20,7 @@
 
         <qt.libs>core core-private qml quick quick-private concurrent network sql multimedia xml</qt.libs>
         <!-- !!! DO NOT REMOVE DUPLICATES FROM global.libs UNLESS YOU KNOW WHAT YOU'RE DOING !!! -->
-        <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_streaming -lnx_network -lnx_fusion -lnx_utils -ludt</global.libs>
+        <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_vms_utils -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_streaming -lnx_network -lnx_fusion -lnx_utils -ludt</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU</linux.oslibs>
         <android.oslibs>-lturbojpeg</android.oslibs>

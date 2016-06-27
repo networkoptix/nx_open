@@ -22,6 +22,7 @@
 #include <context/context.h>
 #include <mobile_client/mobile_client_module.h>
 #include <mobile_client/mobile_client_settings.h>
+#include <mobile_client/mobile_client_uri_handler.h>
 
 #include <ui/camera_thumbnail_provider.h>
 #include <ui/window_utils.h>
@@ -51,6 +52,11 @@ int runUi(QGuiApplication *application) {
     QGuiApplication::setFont(font);
 
     QnContext context;
+
+    QScopedPointer<QnMobileClientUriHandler> uriHandler(new QnMobileClientUriHandler());
+    uriHandler->setUiController(context.uiController());
+    for (const auto& scheme: uriHandler->supportedSchemes())
+        QDesktopServices::setUrlHandler(scheme, uriHandler.data(), uriHandler->handlerMethodName());
 
     QStringList selectors;
 
