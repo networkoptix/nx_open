@@ -22,6 +22,7 @@
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
 #include <recorder/schedule_sync.h>
+#include <appserver/processor.h>
 
 #include <platform/monitoring/global_monitor.h>
 #include <platform/platform_abstraction.h>
@@ -503,25 +504,17 @@ void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archive
 
     for (const auto &camera : camerasToAdd)
     {
-        bool result = QnAppServerConnectionFactory::getConnection2()
-            ->getCameraManager(Qn::kDefaultUserAccess)
-            ->addCamera(
-                camera.coreData,
-                ec2::DummyHandler::instance(),
-                &ec2::DummyHandler::onRequestDone
+        ec2::ErrorCode errCode = 
+            QnAppserverResourceProcessor::addAndPropagateCamResource(
+                camera.coreData
             );
-
-        if (!result)
-            continue;
-
-        QnResourcePtr existCamRes = qnResPool->getResourceById(camera.coreData.id);
-        if (existCamRes && existCamRes->getTypeId() != camera.coreData.typeId)
-            qnResPool->removeResource(existCamRes);
-        QnCommonMessageProcessor::instance()->updateResource(camera.coreData);
-
-        for (const auto &prop : camera.properties)
-            propertyDictionary->setValue(prop.resourceId, prop.name, prop.value);
-        propertyDictionary->saveParams(camera.coreData.id);
+        if (errCode == ec2::ErrorCode::ok)
+        {   // Camera has successfully been added to the resource pool and propagated
+            // to other peers. Adding properties.
+            for (const auto &prop : camera.properties)
+                propertyDictionary->setValue(prop.resourceId, prop.name, prop.value);
+            propertyDictionary->saveParams(camera.coreData.id);
+        }
     }
 
     updateCameraHistory();
