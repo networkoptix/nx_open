@@ -37,10 +37,6 @@
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
 
-// TODO mike: REMOVE
-#define OUTPUT_PREFIX "[mike] connection_factory: "
-#include <nx/utils/debug_utils.h>
-
 static const char INCOMING_TRANSACTIONS_PATH[] = "ec2/forward_events";
 
 namespace ec2
@@ -119,7 +115,6 @@ namespace ec2
                                                   impl::ConnectHandlerPtr handler )
     {
         QUrl url = addr;
-PRINT << "connectAsync(): Input url: " << url;
         url.setUserName(url.userName().toLower());
 
         if (m_transactionMessageBus->localPeer().isMobileClient()) {
@@ -129,7 +124,6 @@ PRINT << "connectAsync(): Input url: " << url;
             url.setQuery(query);
         }
 
-PRINT << "connectAsync(): Output url: " << url;
         if (url.scheme() == "file")
             return establishDirectConnection(url, handler);
         else
@@ -1163,8 +1157,6 @@ PRINT << "connectAsync(): Output url: " << url;
         }
 
         const auto info = QString::fromUtf8( QJson::serialized( clientInfo )  );
-PRINT << "establishConnectionToRemoteServer(): url: " << addr << ", login: " << loginInfo.login
-<< ", passwordHash: " << loginInfo.passwordHash << ", clientInfo: " << info;
         NX_LOG( lit("%1 to %2 with %3").arg( Q_FUNC_INFO ).arg( addr.toString() ).arg( info ),
                 cl_logDEBUG1 );
 
