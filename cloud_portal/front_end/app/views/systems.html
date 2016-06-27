@@ -2,7 +2,7 @@
     <h1>Systems</h1>
 
     <div class="search-block row">
-        <div class="col-xs-12 col-sm-9 col-md-8 col-lg-6">
+        <div class="col-sm-9 col-md-8 col-lg-6">
             <input type="text" class="form-control" ng-model="search" placeholder="Search systems" ng-model-options="{ updateOn: 'default' }">
         </div>
         <div class="col-sm-3 col-md-4 col-lg-6">
@@ -17,7 +17,7 @@
             <p><button class="btn btn-default" ng-click="openClient(null)">Open VMS_NAME</button></p>
         </div>
 
-        <div ng-repeat="system in systems | filter:searchSystems as filtered" class="col-xs-12	col-sm-6 col-md-4 col-lg-3 system-button">
+        <div ng-repeat="system in systems | filter:searchSystems as filtered" class="col-sm-6 col-md-4 col-lg-3 system-button">
             <div class="panel panel-default hoverable">
                 <div class="panel-body" ng-click="openSystem(system)">
                     <h2 ng-bind-html="system.name | highlight:search"></h2>
