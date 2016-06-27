@@ -12,7 +12,6 @@
 #include <utils/common/sleep.h>
 #include <nx/streaming/rtsp_client.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
-#include <nx/streaming/config.h>
 #include <utils/common/synctime.h>
 #include <core/resource/security_cam_resource.h>
 #include <recorder/recording_manager.h>
