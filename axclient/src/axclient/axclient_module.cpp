@@ -10,10 +10,7 @@ QnAxClientModule::QnAxClientModule(QObject *parent) :
 {
     qnSettings->setLightMode(Qn::LightModeActiveX);
     qnRuntime->setActiveXMode(true);
-    qDebug() << "module created";
 }
 
 QnAxClientModule::~QnAxClientModule()
-{
-    qDebug() << "module destroyed";
-}
+{}

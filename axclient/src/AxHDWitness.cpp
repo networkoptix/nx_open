@@ -236,8 +236,6 @@ void AxHDWitness::slidePanelsOut()
 
 bool AxHDWitness::doInitialize()
 {
-    qDebug() << "doInitialize";
-
     /* Methods that should be called once and are not reversible. */
     win32_exception::installGlobalUnhandledExceptionHandler();
     AllowSetForegroundWindow(ASFW_ANY);
@@ -256,21 +254,16 @@ bool AxHDWitness::doInitialize()
     connect(qnAxClient, &QnAxClientWindow::connected, this, [this] { emit connectionProcessed(0, QString()); }, Qt::QueuedConnection);
     connect(qnAxClient, &QnAxClientWindow::disconnected, this, [this] { emit connectionProcessed(1, lit("error")); }, Qt::QueuedConnection);
 
-    qDebug() << "processing events";
     QApplication::processEvents();
 
-    qDebug() << "OK";
     return true;
 }
 
 void AxHDWitness::doFinalize()
 {
-    qDebug() << "finalizing...";
     m_axClientWindow.reset(nullptr);
     m_axClientModule.reset(nullptr);
 
-    qDebug() << "WaitingForQThreadToEmptyEventQueue";
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);
     waitingForObjectsToBeFreed.join();
-    qDebug() << "Finalization OK";
 }
