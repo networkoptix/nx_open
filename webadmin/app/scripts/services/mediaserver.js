@@ -446,7 +446,7 @@ angular.module('webadminApp')
                     self.getCurrentUser().then(function(data){
                         deferred.resolve(data.data.reply);
                     },function(error){
-                        deferred.resolve(null);
+                        deferred.reject(error);
                     });
                 });
 

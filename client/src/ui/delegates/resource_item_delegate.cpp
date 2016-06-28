@@ -427,6 +427,8 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
 void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const
 {
     baseName = index.data(Qt::DisplayRole).toString();
+    extInfo = QString();
+
     if (index.column() > Qn::NameColumn)
         return;
 

@@ -761,6 +761,8 @@ angular.module('webadminApp').controller('ViewCtrl',
 
 
 
+        },function(error){
+            alert('Server failure: cannot retrieve current user data');
         });
 
         $scope.$on(

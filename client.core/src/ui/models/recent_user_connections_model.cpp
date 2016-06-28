@@ -27,6 +27,34 @@ namespace
             result.insert(it.value(), it.key());
         return result;
     }();
+
+
+    // Removes duplicate connection to same system with the same user.
+    // Prefers to store connection with saved password
+    QnUserRecentConnectionDataList removeDuplicates(QnUserRecentConnectionDataList list)
+    {
+        QnUserRecentConnectionDataList result;
+        while (!list.empty())
+        {
+            const auto itStoredPass = std::find_if(list.begin(), list.end(), 
+                [](const QnUserRecentConnectionData &connection)
+            {
+                return connection.isStoredPassword;
+            });
+
+            /// Stores first found connection with password (if found) or just first connection
+            const auto connectionData = *list.begin();
+            result.append(itStoredPass == list.end() ? connectionData : *itStoredPass);
+            const auto newEnd = std::remove_if(list.begin(), list.end(), 
+                [userName = connectionData.url.userName()](const QnUserRecentConnectionData &connection) 
+            {
+                return (userName == connection.url.userName());
+            });
+            list.erase(newEnd, list.end());
+        }
+        return result;
+    }
+
 }
 
 QnRecentUserConnectionsModel::QnRecentUserConnectionsModel(QObject *parent)
@@ -71,16 +99,17 @@ QString QnRecentUserConnectionsModel::firstUser() const
 
 void QnRecentUserConnectionsModel::updateData(const QnUserRecentConnectionDataList &newData)
 {
-    if (m_data == newData)
+    const auto filteredData = removeDuplicates(newData);
+    if (m_data == filteredData)
         return;
 
     const bool hadConnections = hasConnections();
     const bool firstDataChanged = !m_data.isEmpty() && !newData.isEmpty() && m_data.first() != newData.first();
     
-    const auto newCount = newData.size();
+    const auto newCount = filteredData.size();
     for (int newIndex = 0; newIndex != newCount; ++newIndex)
     {
-        const auto connectionData = newData.at(newIndex);
+        const auto connectionData = filteredData.at(newIndex);
         const auto it = std::find_if(m_data.begin(), m_data.end(), 
             [connectionData](const QnUserRecentConnectionData &data)
         {
@@ -116,9 +145,9 @@ void QnRecentUserConnectionsModel::updateData(const QnUserRecentConnectionDataLi
         }
     }
 
-    if (m_data.size() > newData.size())
+    if (m_data.size() > filteredData.size())
     {
-        const auto startIndex = newData.size();
+        const auto startIndex = filteredData.size();
         const auto finishIndex = m_data.size() - 1;
         beginRemoveRows(QModelIndex(), startIndex, finishIndex);
         m_data.erase(m_data.begin() + startIndex, m_data.end());

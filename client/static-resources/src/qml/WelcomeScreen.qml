@@ -113,6 +113,8 @@ Rectangle
 
                         LocalSystemTile
                         {
+                            id: localTile;
+
                             property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
                             recentUserConnectionsModel:
                                 QnRecentUserConnectionsData { systemName: model.systemName; }
@@ -152,6 +154,12 @@ Rectangle
 
                             enabled: (!isExpanded || !context.connectingNow);
                             visible: (index < grid.rows * grid.columns);
+
+                            Connections
+                            {
+                                target: context;
+                                onResetAutoLogin: { localTile.autoLogin = false; }
+                            }
                         }
                     }
 
