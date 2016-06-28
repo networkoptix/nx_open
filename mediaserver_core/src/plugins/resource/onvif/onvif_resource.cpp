@@ -70,6 +70,7 @@ static const unsigned int RENEW_NOTIFICATION_FORWARDING_SECS = 5;
 static const unsigned int MS_PER_SECOND = 1000;
 static const unsigned int PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC = 1;
 static const int DEFAULT_SOAP_TIMEOUT = 10;
+static const quint32 MAX_TIME_DRIFT_UPDATE_PERIOD_MS = 15 * 60 * 1000; // 15 minutes
 
 //Forth times greater than default = 320 x 240
 
@@ -1244,17 +1245,22 @@ bool QnPlOnvifResource::isSoapAuthorized() const
 
 int QnPlOnvifResource::getTimeDrift() const
 {
+    if (m_timeDriftTimer.elapsed() > MAX_TIME_DRIFT_UPDATE_PERIOD_MS)
+        calcTimeDrift();
+
     return m_timeDrift;
 }
 
 void QnPlOnvifResource::setTimeDrift(int value)
 {
     m_timeDrift = value;
+    m_timeDriftTimer.restart();
 }
 
-void QnPlOnvifResource::calcTimeDrift()
+void QnPlOnvifResource::calcTimeDrift() const
 {
     m_timeDrift = calcTimeDrift(getDeviceOnvifUrl());
+    m_timeDriftTimer.restart();
 }
 
 int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl)
