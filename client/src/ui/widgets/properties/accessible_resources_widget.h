@@ -29,6 +29,13 @@ public:
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
 
+    bool isAll() const;
+    std::pair<int, int> selected() const;
+    QnResourceAccessFilter::Filter filter() const;
+
+    bool resourcePassFilter(const QnResourcePtr& resource) const;
+    static bool resourcePassFilter(const QnResourcePtr& resource, const QnUserResourcePtr& currentUser, QnResourceAccessFilter::Filter filter);
+
 private:
     void initControlsModel();
     void initResourcesModel();
