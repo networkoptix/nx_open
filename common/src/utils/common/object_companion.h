@@ -2,7 +2,6 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
-#include <QtWidgets/QWidget>
 #include <type_traits>
 #include <utility>
 

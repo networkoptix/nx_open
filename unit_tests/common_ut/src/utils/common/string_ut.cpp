@@ -10,7 +10,7 @@
 #include <QtCore/QDateTime>
 
 
-TEST( nx::utils::parseDateTime, general )
+TEST( parseDateTime, general )
 {
     const QString testDateStr( "2015-01-01T12:00:01" );
     static const qint64 USEC_PER_MS = 1000;
