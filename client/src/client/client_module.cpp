@@ -166,6 +166,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
 QnClientModule::~QnClientModule()
 {
     QnResourceDiscoveryManager::instance()->stop();
+    QnResource::stopAsyncTasks();
 
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
 
