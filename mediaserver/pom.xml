@@ -55,4 +55,45 @@
             <systemPath>${root.dir}/mediaserver_core/pom.xml</systemPath>
         </dependency>
     </dependencies>
+	
+	<profiles>
+        <profile>
+            <id>linux-isd-jaguar</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>isd</value>
+                </property>
+            </activation>
+            <properties>
+                <global.libs>-lmediaserver_core -lcommon -lappserver2 -lonvif -lquazip -lnxemail -lnx_speach_synthesizer</global.libs>
+				<linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl -lldap</linux.oslibs>
+				<linux.arm.oslibs>-llber -lsasl2 -lssl -lcrypto -lsigar -lldap</linux.arm.oslibs>
+            </properties>
+        </profile>
+        <profile>
+            <id>linux-isd-s2</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>isd_s2</value>
+                </property>
+            </activation>
+            <properties>
+                <global.libs>-lmediaserver_core -lcommon -lappserver2 -lonvif -lquazip -lnxemail -lnx_speach_synthesizer</global.libs>
+				<linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl -lldap</linux.oslibs>
+				<linux.arm.oslibs>-llber -lsasl2 -lssl -lcrypto -lsigar -lldap</linux.arm.oslibs>
+            </properties>
+        </profile>
+    </profiles>
 </project>

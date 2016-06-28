@@ -97,7 +97,7 @@ public:
      */
     void submit(const QnLayoutResourcePtr &resource) const;
 
-    /** 
+    /**
      * Notify all subscribers that layout title should be updated.
      */
     void notifyTitleChanged();
@@ -124,7 +124,7 @@ public:
      * \param[out] disposition          Disposition of free and occupied cells in the target region.
      * \returns                         Whether the items can be moved.
      */
-    bool canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition = NULL);
+    bool canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition = NULL) const;
 
     /**
      * \param items                     Items to move to new positions.
@@ -314,7 +314,7 @@ public:
      * @brief isSearchLayout            Check if this layout is preview search layout
      */
     bool isSearchLayout() const;
-    
+
 signals:
     /**
      * This signal is emitted when this layout is about to be destroyed
@@ -379,9 +379,6 @@ signals:
     void dataChanged(int role);
 
 private:
-    template<bool returnEarly>
-    bool canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition);
-
     void moveItemInternal(QnWorkbenchItem *item, const QRect &geometry);
     void updateBoundingRectInternal();
 

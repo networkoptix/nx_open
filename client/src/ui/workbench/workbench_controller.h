@@ -64,13 +64,13 @@ class QnWorkbenchController: public Connective<QObject>, public QnWorkbenchConte
 public:
     /**
      * Constructor.
-     * 
+     *
      * \param parent                    Parent for this object.
      */
     QnWorkbenchController(QObject *parent = NULL);
 
     /**
-     * Virtual destructor. 
+     * Virtual destructor.
      */
     virtual ~QnWorkbenchController();
 
@@ -136,6 +136,7 @@ protected:
     void showContextMenuAt(const QPoint &pos);
     Q_SLOT void showContextMenuAtInternal(const QPoint &pos, const WeakGraphicsItemPointerList &selectedItems);
 
+    void updateDraggedItems();
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
     void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
@@ -289,14 +290,13 @@ private:
     QPoint m_resizingSnapPoint;
 
 
-
     /* Dragging-related state. */
 
     /** Workbench items that are being dragged. */
-    QList<QnWorkbenchItem *> m_draggedWorkbenchItems;
+    QList<QnWorkbenchItem*> m_draggedWorkbenchItems;
 
     /** Workbench items that will be replaced as a result of a drag. */
-    QList<QnWorkbenchItem *> m_replacedWorkbenchItems;
+    QList<QnWorkbenchItem*> m_replacedWorkbenchItems;
 
     /** Current drag distance. */
     QPoint m_dragDelta;

@@ -133,6 +133,7 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
+        <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
         <toolchain.version>none</toolchain.version>
@@ -168,6 +169,8 @@
         <qtplugin2>platforms</qtplugin2>
 	<!-- Linux Only -->
         <qtplugin3/>
+	<!-- Unix Only -->
+        <qtplugin4/>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -379,7 +382,7 @@
                 <!--module>storage_plugins/ftpstorageplugin</module-->
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
-                <module>common_libs/nxemail</module>                
+                <module>common_libs/nxemail</module>
                 <module>common_libs/nx_speach_synthesizer</module>
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
@@ -566,11 +569,8 @@
                 <qt.classifier>${platform}-${arch}</qt.classifier>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
+                <qtplugin4>audio</qtplugin4>
             </properties>
-
-            <modules>
-                <module>common_libs/nx_speach_synthesizer</module>
-            </modules>
         </profile>
 
         <profile>
@@ -590,8 +590,10 @@
                 <qt.spec>macx-clang-libc++</qt.spec>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
+                <qtplugin4>audio</qtplugin4>
             </properties>
             <modules>
+                <module>common_libs/nx_speach_synthesizer</module>
                 <module>macsetup/client-dmg</module>
             </modules>
         </profile>
@@ -615,6 +617,7 @@
             </modules>
             <properties>
                 <qtplugin3>platforminputcontexts</qtplugin3>
+                <qtplugin4>audio</qtplugin4>
                 <modification>ubuntu</modification>
             </properties>
         </profile>
@@ -925,7 +928,7 @@
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <android.sdk>${environment.dir}/android/android-sdk</android.sdk>
                 <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
-                <android.ndk.host>linux-x86_64</android.ndk.host>
+                <android.ndk.host>linux-x86</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
                 <openssl.version>1.0.2g-SNAPSHOT</openssl.version>
                 <compile.option1/>

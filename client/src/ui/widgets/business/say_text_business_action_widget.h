@@ -12,7 +12,7 @@ class QnSayTextBusinessActionWidget: public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
-    
+
 public:
     explicit QnSayTextBusinessActionWidget(QWidget *parent = 0);
     ~QnSayTextBusinessActionWidget();
@@ -26,10 +26,6 @@ private slots:
     void enableTestButton();
     void at_testButton_clicked();
     void at_volumeSlider_valueChanged(int value);
-    void at_actionTargetsHolder_clicked();
-
-private:
-    QString getActionTargetsHolderText(const QnBusinessActionParameters& params) const;
 private:
     QScopedPointer<Ui::SayTextBusinessActionWidget> ui;
 };

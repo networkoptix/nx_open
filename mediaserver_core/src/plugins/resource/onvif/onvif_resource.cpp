@@ -69,6 +69,7 @@ static const unsigned int DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT = 6
 static const unsigned int RENEW_NOTIFICATION_FORWARDING_SECS = 5;
 static const unsigned int MS_PER_SECOND = 1000;
 static const unsigned int PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC = 1;
+static const unsigned int MAX_IO_PORTS_PER_DEVICE = 200;
 static const int DEFAULT_SOAP_TIMEOUT = 10;
 static const quint32 MAX_TIME_DRIFT_UPDATE_PERIOD_MS = 15 * 60 * 1000; // 15 minutes
 
@@ -596,17 +597,30 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         capabilitiesResponse.Capabilities->Device->IO->InputConnectors &&
         *capabilitiesResponse.Capabilities->Device->IO->InputConnectors > 0)
     {
-        for (
-            int i = 1;
-            i <= *capabilitiesResponse.Capabilities->Device->IO->InputConnectors;
-            ++i)
+
+        const auto portsCount = *capabilitiesResponse.Capabilities
+            ->Device
+            ->IO
+            ->InputConnectors;
+
+        if (portsCount <= MAX_IO_PORTS_PER_DEVICE)
         {
-            QnIOPortData inputPort;
-            inputPort.portType = Qn::PT_Input;
-            inputPort.id = lit("%1").arg(i);
-            inputPort.inputName = tr("Input %1").arg(i);
-            allPorts.emplace_back(std::move(inputPort));
+            for (int i = 1; i <= portsCount; ++i)
+            {
+                QnIOPortData inputPort;
+                inputPort.portType = Qn::PT_Input;
+                inputPort.id = lit("%1").arg(i);
+                inputPort.inputName = tr("Input %1").arg(i);
+                allPorts.emplace_back(std::move(inputPort));
+            }
         }
+        else
+        {
+            NX_LOG( lit("Device has too many input ports. Url: %1")
+                .arg(getUrl()), cl_logDEBUG1 );
+        }
+
+            
     }
 
     setIOPorts(std::move(allPorts));
@@ -1148,6 +1162,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsLocal& opts
         QnMutexLocker lock( &m_mutex );
         m_resolutionList = opts.resolutions;
         qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
+
     }
 
     QnMutexLocker lock( &m_mutex );
@@ -1443,7 +1458,8 @@ bool QnPlOnvifResource::fetchRelayInputInfo( const CapabilitiesResp& capabilitie
         capabilitiesResponse.Capabilities->Device &&
         capabilitiesResponse.Capabilities->Device->IO &&
         capabilitiesResponse.Capabilities->Device->IO->InputConnectors &&
-        *capabilitiesResponse.Capabilities->Device->IO->InputConnectors > 0 )
+        *capabilitiesResponse.Capabilities->Device->IO->InputConnectors > 0  && 
+        *capabilitiesResponse.Capabilities->Device->IO->InputConnectors < MAX_IO_PORTS_PER_DEVICE)
     {
         //camera has input port
         setCameraCapability( Qn::RelayInputCapability, true );
@@ -1793,6 +1809,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     QList<VideoOptionsLocal> optionsList;
     for(const QString& encoderToken: videoEncodersTokens)
     {
+
         int retryCount = getMaxOnvifRequestTries();
         int soapRes = SOAP_ERR;
 
@@ -2088,6 +2105,7 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
 
     if (!m_videoSourceSize.isValid())
         return CameraDiagnostics::NoErrorResult();
+    
 
     NX_LOG(QString(lit("ONVIF debug: videoSourceSize is %1x%2 for camera %3")).
         arg(m_videoSourceSize.width()).arg(m_videoSourceSize.height()).arg(getHostAddress()), cl_logDEBUG1);
@@ -2097,6 +2115,7 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
     {
         if (resolution.width() <= m_videoSourceSize.width() && resolution.height() <= m_videoSourceSize.height()) 
             trustToVideoSourceSize = true; // trust to videoSourceSize if at least 1 appropriate resolution is exists.
+        
     }
 
     bool videoSourceSizeIsRight = resData.value<bool>(Qn::TRUST_TO_VIDEO_SOURCE_SIZE_PARAM_NAME, true);
@@ -2109,6 +2128,7 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
             arg(m_videoSourceSize.width()).arg(m_videoSourceSize.height()).arg(getHostAddress()), cl_logDEBUG1);
         return CameraDiagnostics::NoErrorResult();
     }
+
 
     QList<QSize>::iterator it = m_resolutionList.begin();
     while (it != m_resolutionList.end())
@@ -3406,6 +3426,13 @@ bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const r
     }
 
     m_relayOutputInfo.clear();
+    if (response.RelayOutputs.size() > MAX_IO_PORTS_PER_DEVICE)
+    {
+        NX_LOG( lit("Device has too many relay outputs. endpoint %1")
+            .arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
+        return false;
+    }
+
     for( size_t i = 0; i < response.RelayOutputs.size(); ++i )
     {
         m_relayOutputInfo.push_back( RelayOutputInfo(

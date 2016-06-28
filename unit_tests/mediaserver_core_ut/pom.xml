@@ -32,7 +32,7 @@
         <global.libs>-lmediaserver_core -lcommon -lappserver2 -lonvif -lquazip -lnxemail -lnx_speach_synthesizer -lFestival -lestools -leststring -lestbase</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32 Wldap32.lib Crypt32.lib</windows.oslibs>
-        <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl -lldap</linux.oslibs>
+        <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl -lldap -ltermcap</linux.oslibs>
         <linux.arm.oslibs>-llber -lsasl2 -lssl -lcrypto -lsigar</linux.arm.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>

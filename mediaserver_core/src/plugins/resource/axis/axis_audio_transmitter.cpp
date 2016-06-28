@@ -24,18 +24,22 @@ namespace
 }
 
 
-QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res) :
+QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res):
     QnAbstractAudioTransmitter(),
     m_resource(res),
     m_noAuth(false),
     m_state(TransmitterState::WaitingForConnection)
 {
-
+    connect(m_resource, &QnResource::parentIdChanged, this, [this]()
+    {
+        pleaseStop();
+    }, Qt::DirectConnection);
 }
 
 QnAxisAudioTransmitter::~QnAxisAudioTransmitter()
 {
     stop();
+    disconnect(m_resource, nullptr, this, nullptr);
 }
 
 
@@ -221,17 +225,18 @@ bool QnAxisAudioTransmitter::sendData(
     return true;
 }
 
-bool QnAxisAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data)
+bool QnAxisAudioTransmitter::processAudioData(const QnConstCompressedAudioDataPtr& audioData)
 {
     if (m_state != TransmitterState::ReadyForTransmission && !startTransmission())
         return true;
 
-    if (!m_transcoder->isOpened() && !m_transcoder->open(data->context))
+    if (!m_transcoder->isOpened() && !m_transcoder->open(audioData->context))
         return true; //< always return true. It means skip input data.
 
     if (!m_socket)
         return true;
     QnAbstractMediaDataPtr transcoded;
+    auto data = audioData;
     do
     {
         m_transcoder->transcodePacket(data, &transcoded);
