@@ -363,6 +363,7 @@ void QnLog::applyArguments(const nx::utils::ArgumentParser& arguments)
     {
         initLog(*value);
         logLevel = logLevelFromString(*value);
+        s_disableLogConfiguration = true;
     }
 
     if (const auto value = arguments.get(QLatin1String("log-file")))
