@@ -193,6 +193,13 @@ BaseTile
                 text: qsTr("Auto-login");
 
                 onCheckedChanged: { thisComponent.autoLogin = checked; }
+
+                Binding
+                {
+                    target: autoLoginCheckBoxPrivate;
+                    property: "checked";
+                    value: thisComponent.autoLogin;
+                }
             }
         }
 

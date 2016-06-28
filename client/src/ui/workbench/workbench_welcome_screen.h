@@ -102,6 +102,8 @@ signals:
 
     void connectingNowChanged();
 
+    void resetAutoLogin();
+
 private:
     void showScreen();
 

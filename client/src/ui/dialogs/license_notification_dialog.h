@@ -21,7 +21,6 @@ public:
     QnLicenseNotificationDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnLicenseNotificationDialog();
 
-    const QList<QnLicensePtr> &licenses() const;
     void setLicenses(const QList<QnLicensePtr> &licenses);
 
 private:

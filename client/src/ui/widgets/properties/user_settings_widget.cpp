@@ -234,12 +234,6 @@ void QnUserSettingsWidget::setupInputFields()
             return Qn::ValidationResult(tr("User has been renamed. Password must be updated."));
         }
 
-        if (m_model->mode() == QnUserSettingsModel::NewUser &&
-            text.isEmpty())
-        {
-            return Qn::ValidationResult(tr("Password cannot be empty.")); //TODO: #vkutin text string duplication
-        }
-
         /* Further validation will be done by password strength indicator. */
         return Qn::kValidResult;
     });
