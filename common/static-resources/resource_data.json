@@ -1054,7 +1054,14 @@
                     "ve7", "ve15"
                 ]
             }
-        }
+        },
+		{
+			"keys": [
+				"ACTI|A41", "ACTI|A81"
+			],
+			"forceONVIF": true,
+			"defaultCredentials" : "admin:123456"
+		}
     ]
 }
 
