@@ -254,13 +254,29 @@ bool AxHDWitness::doInitialize()
     connect(qnAxClient, &QnAxClientWindow::connected, this, [this] { emit connectionProcessed(0, QString()); }, Qt::QueuedConnection);
     connect(qnAxClient, &QnAxClientWindow::disconnected, this, [this] { emit connectionProcessed(1, lit("error")); }, Qt::QueuedConnection);
 
+#ifdef QN_DEBUG_REGEXP_STATIC_FIASCO
+    static int initializationCount = 0;
+    ++initializationCount;
+    qDebug() << "init count" << initializationCount;
+    if (initializationCount == 2)
+    {
+        QThread::msleep(10 * 1000);
+        QRegExp test(QLatin1String("test"));
+        qDebug() << test.exactMatch(QLatin1String("test"));
+    }
+#endif //QN_DEBUG_REGEXP_STATIC_FIASCO
+
     QApplication::processEvents();
 
     return true;
 }
 
+
+
 void AxHDWitness::doFinalize()
 {
+
+
     m_axClientWindow.reset(nullptr);
     m_axClientModule.reset(nullptr);
 
