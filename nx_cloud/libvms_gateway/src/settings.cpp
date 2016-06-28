@@ -56,6 +56,9 @@ namespace
     const QLatin1String kHttpProxyTargetPort("http/proxyTargetPort");
     const int kDefaultHttpProxyTargetPort = 0;
 
+    const QLatin1String kHttpConnectSupport("http/connectSupport");
+    const int kDefaultHttpConnectSupport = 0;
+
     //cloudConnect
     const QLatin1String kReplaceHostAddressWithPublicAddress("cloudConnect/replaceHostAddressWithPublicAddress");
     const QLatin1String kDefaultReplaceHostAddressWithPublicAddress("true");
@@ -75,7 +78,8 @@ namespace conf {
 
 Http::Http()
 :
-    proxyTargetPort(0)
+    proxyTargetPort(0),
+    connectSupport(false)
 {
 }
 
@@ -216,6 +220,10 @@ void Settings::loadConfiguration()
     //http
     m_http.proxyTargetPort = 
         m_settings.value(kHttpProxyTargetPort, kDefaultHttpProxyTargetPort).toInt();
+    m_http.connectSupport =
+        m_settings.value(
+            kHttpConnectSupport,
+            kDefaultHttpConnectSupport) == "true";
 
     //CloudConnect
     m_cloudConnect.replaceHostAddressWithPublicAddress =
