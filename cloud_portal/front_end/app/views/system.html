@@ -76,8 +76,8 @@
                         <tbody>
                         <tr ng-repeat="user in system.users" class="hoverable">
                             <td class="user-name">{{user.fullName}}</td>
-                            <td >{{user.accountEmail}}</td>
-                            <td>
+                            <td class="user-email">{{user.accountEmail}}</td>
+                            <td class="user-role">
                                 <span class="inactive" ng-if="!system.isAvailable"
                                     title="{{system.stateMessage}}">{{L.accessRoles[user.accessRole].label || user.accessRole}}</span>
                                 <span ng-if="system.isAvailable">{{user.group.name || L.accessRoles[user.accessRole].label || user.accessRole}}</span>

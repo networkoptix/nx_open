@@ -199,8 +199,18 @@ footer {
 .user-name{
   @include ellipsis;
 }
-td.user-name{
-  max-width: 200px;
+td{
+    &.user-name{
+      max-width: 200px;
+    }
+    &.user-email{
+      @include ellipsis;
+      max-width: 240px;
+    }
+    &.user-role{
+      @include ellipsis;
+      max-width: 120px;
+    }
 }
 .button-cell{
     padding-right: 6px !important;

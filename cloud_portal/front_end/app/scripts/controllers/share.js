@@ -100,7 +100,7 @@ angular.module('cloudApp')
             user.groupId = role.groupId||'';
             user.permissions = role.permissions||'';
 
-            cloudApi.share(systemId, user.accountEmail);
+            cloudApi.share(systemId, user.email, accessRole);
 
             return mediaserver.saveUser(systemId, user);
         }
