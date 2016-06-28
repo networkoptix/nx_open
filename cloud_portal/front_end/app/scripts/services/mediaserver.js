@@ -20,7 +20,7 @@ angular.module('cloudApp')
                 return $http.post(gateway(systemId) + '/ec2/saveUser',this.cleanUserObject(user));
             },
             deleteUser: function(systemId, userId){
-                return $http.post(gateway(systemId) + '/ec2/removeUser', {userId:userId});
+                return $http.post(gateway(systemId) + '/ec2/removeUser', {id:userId});
             },
             cleanUserObject:function(user){ // Remove unnesesary fields from the object
                 return; //TODO: uncomment after #VMS-2968

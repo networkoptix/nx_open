@@ -124,7 +124,7 @@ angular.module('cloudApp')
                 then(function(){
                     // Run a process of sharing
                     $scope.unsharing = process.init(function(){
-                        return mediaserver.deleteUser(systemId, user.userId);
+                        return mediaserver.deleteUser(systemId, user.id);
                     },{
                         successMessage: L.system.permissionsRemoved.replace('{accountEmail}',user.accountEmail),
                         errorPrefix:'Sharing failed:'
