@@ -19,7 +19,7 @@ bool QnObjectCompanionManager::uninstall(QObject* parent, const char* id)
     return !deleter.isNull();
 }
 
-bool QnObjectCompanionManager::attach(QObject* parent, QObject* companion, const char* id)
+bool QnObjectCompanionManager::attachUnique(QObject* parent, QObject* companion, const char* id)
 {
     const QByteArray internalId = companionId(id);
     if (getCompanion(parent, internalId))

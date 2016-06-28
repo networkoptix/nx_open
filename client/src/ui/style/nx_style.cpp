@@ -2944,13 +2944,13 @@ void QnNxStyle::polish(QWidget *widget)
     }
 
     if (auto label = qobject_cast<QLabel*>(widget))
-        QnObjectCompanion<QnLinkHoverProcessor>::install(label, kLinkHoverProcessorCompanion);
+        QnObjectCompanion<QnLinkHoverProcessor>::installUnique(label, kLinkHoverProcessorCompanion);
 
 #ifdef CUSTOMIZE_POPUP_SHADOWS
     if (popupToCustomizeShadow)
     {
         /* Create customized shadow: */
-        if (auto shadow = QnObjectCompanion<QnPopupShadow>::install(popupToCustomizeShadow, kPopupShadowCompanion))
+        if (auto shadow = QnObjectCompanion<QnPopupShadow>::installUnique(popupToCustomizeShadow, kPopupShadowCompanion))
         {
             QnPaletteColor shadowColor = mainColor(Colors::kBase).darker(3);
             shadowColor.setAlphaF(0.5);
