@@ -169,6 +169,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
     else if (!groupId.isNull())
     {
         result |= userGroup(groupId).permissions;   /*< If the group does not exist, permissions will be empty. */
+        result &= ~Qn::GlobalAdminPermission;       /*< If user belongs to group, he cannot be an admin - by design. */
     }
 
     {

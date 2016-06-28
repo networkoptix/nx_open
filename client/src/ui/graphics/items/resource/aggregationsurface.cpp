@@ -14,6 +14,8 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include "opengl_renderer.h"
 
+#include <nx/streaming/config.h>
+
 //#define PERFORMANCE_TEST
 
 #ifdef PERFORMANCE_TEST

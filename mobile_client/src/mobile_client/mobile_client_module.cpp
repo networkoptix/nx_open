@@ -1,6 +1,7 @@
 #include "mobile_client_module.h"
 
 #include <QtGui/QGuiApplication>
+#include <QtGui/QDesktopServices>
 
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>

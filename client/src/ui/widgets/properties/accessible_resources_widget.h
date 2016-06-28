@@ -35,6 +35,9 @@ private:
 
     void updateThumbnail(const QModelIndex& index = QModelIndex());
 
+signals:
+    void controlsChanged(bool useAll);
+
 private:
     QScopedPointer<Ui::AccessibleResourcesWidget> ui;
     QnAbstractPermissionsModel* const m_permissionsModel;

@@ -10,6 +10,7 @@
 
 #include <utils/common/byte_array.h>
 
+#include <nx/streaming/config.h>
 #include "media_data_packet.h"
 
 

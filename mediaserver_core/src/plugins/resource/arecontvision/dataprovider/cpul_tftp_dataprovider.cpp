@@ -10,6 +10,7 @@
 
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <nx/streaming/config.h>
 
 #include "../resource/av_resource.h"
 #include "../tools/simple_tftp_client.h"
@@ -135,7 +136,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     }
 
     m_videoFrameBuff.clear();
-    
+
     QnByteArray& img = m_videoFrameBuff;
 
     // ==========================================
@@ -310,7 +311,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
     QnByteArray& imgToSend = videoData->m_data;
     imgToSend.write(m_videoFrameBuff);
-    
+
 
     if (iFrame)
         videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;

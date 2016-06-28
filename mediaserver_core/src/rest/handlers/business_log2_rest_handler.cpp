@@ -11,7 +11,7 @@
 
 #include <core/resource/camera_resource.h>
 #include "core/resource_management/resource_pool.h"
-#include "utils/common/string.h"
+#include "nx/utils/string.h"
 
 int QnBusinessLog2RestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& contentBody, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
@@ -29,9 +29,9 @@ int QnBusinessLog2RestHandler::executeGet(const QString& path, const QnRequestPa
     for (int i = 0; i < params.size(); ++i)
     {
         if (params[i].first == "from")
-            period.startTimeMs = parseDateTime(params[i].second) / 1000;
+            period.startTimeMs = nx::utils::parseDateTime(params[i].second) / 1000;
         else if (params[i].first == "to")
-            period.durationMs = parseDateTime(params[i].second)/1000 - period.startTimeMs;
+            period.durationMs = nx::utils::parseDateTime(params[i].second)/1000 - period.startTimeMs;
         else if (params[i].first == "physicalId") {
             QnResourcePtr res = qSharedPointerDynamicCast<QnVirtualCameraResource> (qnResPool->getNetResourceByPhysicalId(params[i].second));
             if (res)

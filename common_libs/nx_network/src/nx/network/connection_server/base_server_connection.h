@@ -115,10 +115,9 @@ namespace nx_api
         */
         void startReadingConnection()
         {
-            using namespace std::placeholders;
             m_streamSocket->readSomeAsync(
                 &m_readBuffer,
-                std::bind( &SelfType::onBytesRead, this, _1, _2 ) );
+                std::bind( &SelfType::onBytesRead, this, std::placeholders::_1, std::placeholders::_2 ) );
         }
 
         /*!
@@ -126,10 +125,9 @@ namespace nx_api
         */
         void sendBufAsync( const nx::Buffer& buf )
         {
-            using namespace std::placeholders;
             m_streamSocket->sendAsync(
                 buf,
-                std::bind( &SelfType::onBytesSent, this, _1, _2 ) );
+                std::bind( &SelfType::onBytesSent, this, std::placeholders::_1, std::placeholders::_2 ) );
             m_bytesToSend = buf.size();
         }
 
@@ -183,8 +181,6 @@ namespace nx_api
 
         void onBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
         {
-            using namespace std::placeholders;
-
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
             if( bytesRead == 0 )    //connection closed by remote peer
@@ -202,7 +198,7 @@ namespace nx_api
             m_readBuffer.resize( 0 );
             m_streamSocket->readSomeAsync(
                 &m_readBuffer,
-                std::bind(&SelfType::onBytesRead, this, _1, _2));
+                std::bind(&SelfType::onBytesRead, this, std::placeholders::_1, std::placeholders::_2));
         }
 
         void onBytesSent( SystemError::ErrorCode errorCode, size_t count )

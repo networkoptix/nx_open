@@ -9,7 +9,7 @@
 #include <QtCore/QSharedPointer>
 
 #include "utils/common/request_param.h"
-#include "utils/common/string.h"
+#include "nx/utils/string.h"
 
 
 class TCPSocket;

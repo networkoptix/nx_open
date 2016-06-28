@@ -5,7 +5,7 @@
 
 #include <nx/network/socket_global.h>
 #include <utils/common/command_line_parser.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 #include "listen_mode.h"
 #include "client_mode.h"

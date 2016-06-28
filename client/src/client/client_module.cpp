@@ -135,7 +135,7 @@ namespace
             translation = translationManager->defaultTranslation();
 
         translationManager->installTranslation(translation);
-        return std::move(translationManager);
+        return translationManager;
     }
 
     void initializeStatisticsManager(QnCommonModule *commonModule)

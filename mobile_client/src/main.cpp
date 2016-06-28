@@ -22,12 +22,14 @@
 #include <context/context.h>
 #include <mobile_client/mobile_client_module.h>
 #include <mobile_client/mobile_client_settings.h>
+#include <mobile_client/mobile_client_uri_handler.h>
 
 #include <ui/camera_thumbnail_provider.h>
 #include <ui/window_utils.h>
 #include <ui/texture_size_helper.h>
 #include <camera/camera_thumbnail_cache.h>
 #include <ui/helpers/font_loader.h>
+#include <utils/intent_listener_android.h>
 
 #include <nx/media/decoder_registrar.h>
 #include <resource_allocator.h>
@@ -50,6 +52,11 @@ int runUi(QGuiApplication *application) {
     QGuiApplication::setFont(font);
 
     QnContext context;
+
+    QScopedPointer<QnMobileClientUriHandler> uriHandler(new QnMobileClientUriHandler());
+    uriHandler->setUiController(context.uiController());
+    for (const auto& scheme: uriHandler->supportedSchemes())
+        QDesktopServices::setUrlHandler(scheme, uriHandler.data(), uriHandler->handlerMethodName());
 
     QStringList selectors;
 
@@ -220,6 +227,10 @@ int main(int argc, char *argv[])
 
     parseCommandLine(application);
     migrateSettings();
+
+#ifdef Q_OS_ANDROID
+    registerIntentListener();
+#endif
 
     int result = runApplication(&application);
 

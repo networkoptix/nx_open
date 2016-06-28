@@ -9,6 +9,7 @@
 #include <nx/network/http/httptypes.h>
 
 #include "nx/streaming/video_data_packet.h"
+#include <nx/streaming/config.h>
 
 extern int getIntParam(const char* pos);
 
@@ -36,7 +37,7 @@ PlDlinkStreamReader::PlDlinkStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res),
     m_rtpReader(res)
 {
-    
+
 }
 
 PlDlinkStreamReader::~PlDlinkStreamReader()
@@ -116,7 +117,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
     {
         return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
     }
-	
+
     if (isCameraControlRequired) {
         if (role != Qn::CR_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
             res->setMotionMaskPhysical(0);
@@ -140,7 +141,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
         QString rtspUrl(m_profile.url);
         if (!rtspUrl.contains(".sdp"))
             rtspUrl = getRTPurl(m_profile.number); //< DLink with old firmware. profile url contains some string, but it can't be passed to the RTSP
-        
+
         m_rtpReader.setRequest(rtspUrl);
         return m_rtpReader.openStream();
     }
@@ -248,14 +249,14 @@ QByteArray PlDlinkStreamReader::getQualityString(const QnLiveStreamParams& param
     return info.possibleQualities[qualityIndex];
 }
 
-QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, const QnLiveStreamParams& params) 
+QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
     QnDlink_cam_info info = res->getCamInfo();
 
     Qn::ConnectionRole role = getRole();
     QnDlink_ProfileInfo profile;
-    
+
     QSize resolution;
 
     if (role == Qn::CR_SecondaryLiveVideo)
@@ -323,7 +324,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
         return QnAbstractMediaDataPtr(0); // must be bad header
 
     if (vh->ulDataLength > 1024*1024*10)
-        return QnAbstractMediaDataPtr(0); // to big video image 
+        return QnAbstractMediaDataPtr(0); // to big video image
 
 
     int dataLeft = vh->ulDataLength;//qMin(vh->ulDataLength, (quint32)1024*1024*10); // to avoid crash
@@ -331,7 +332,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
 
     QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, dataLeft+FF_INPUT_BUFFER_PADDING_SIZE));
     char* curPtr = videoData->m_data.data();
-    videoData->m_data.startWriting(dataLeft); // this call does nothing 
+    videoData->m_data.startWriting(dataLeft); // this call does nothing
     videoData->m_data.finishWriting(dataLeft);
 
     while (dataLeft > 0)
@@ -453,7 +454,7 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
                 empty = false;
         }
     }
-   
+
 
     QnMetaDataV1Ptr motion;
 
@@ -464,7 +465,7 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
 
 
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
-    motion->m_duration = 1000*1000*1000; // 1000 sec 
+    motion->m_duration = 1000*1000*1000; // 1000 sec
     filterMotionByMask(motion);
     return motion;
 }

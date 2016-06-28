@@ -12,7 +12,7 @@
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     base_type(parent),
@@ -86,7 +86,7 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
 
         ec2::ApiUserGroupData group;
         group.id = QnUuid::createUuid();
-        group.name = generateUniqueString(usedNames, tr("New Group"), tr("New Group %1"));
+        group.name = nx::utils::generateUniqueString(usedNames, tr("New Group"), tr("New Group %1"));
         group.permissions = Qn::NoGlobalPermissions;
 
         int row = m_model->addGroup(group);

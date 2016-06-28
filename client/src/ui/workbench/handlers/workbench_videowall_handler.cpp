@@ -81,7 +81,7 @@
 #include <nx/utils/collection.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/license_usage_helper.h>
 #include <utils/common/uuid_pool.h>
 #include <utils/common/counter.h>
@@ -1269,7 +1269,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
         usedNames << resource->getName().trimmed().toLower();
 
     //TODO: #GDM #VW refactor to corresponding dialog
-    QString proposedName = generateUniqueString(usedNames, tr("Video Wall"), tr("Video Wall %1") );
+    QString proposedName = nx::utils::generateUniqueString(usedNames, tr("Video Wall"), tr("Video Wall %1") );
 
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Video Wall..."));

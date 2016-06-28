@@ -41,6 +41,11 @@ void QnMobileClientUiController::setLayoutId(const QString& layoutId)
     emit layoutIdChanged();
 }
 
+void QnMobileClientUiController::disconnectFromSystem()
+{
+    emit disconnectRequested();
+}
+
 void QnMobileClientUiController::openResourcesScreen()
 {
     emit resourcesScreenRequested();

@@ -1,6 +1,6 @@
 #define QT_NO_CAST_FROM_ASCII
 
-#include <common/config.h>
+#include <nx/utils/compiler_options.h>
 
 #ifdef _WIN32
 #   define FD_SETSIZE 2048
@@ -56,6 +56,7 @@
 #include <QtCore/QtDebug>
 #include <QtCore/QUrlQuery>
 
-#include <nx/utils/deprecation.h>
-
 #endif
+
+#include <nx/utils/literal.h>
+#include <nx/utils/deprecation.h>

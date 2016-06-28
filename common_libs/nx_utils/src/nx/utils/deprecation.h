@@ -1,9 +1,8 @@
-#ifndef QN_DEPRECATION_H
-#define QN_DEPRECATION_H
+#pragma once
 
 /**
  * @file
- * 
+ *
  * Hacks to prevent the usage of some badly designed libraries and library features.
  */
 
@@ -74,7 +73,7 @@ namespace boost {
 /* Prevent the usage of Q_GLOBAL_STATIC_WITH_INITIALIZER as it is not thread-safe.
  * See http://lists.qt-project.org/pipermail/development/2012-March/002636.html. */
 #undef Q_GLOBAL_STATIC_WITH_INITIALIZER
-#define Q_GLOBAL_STATIC_WITH_INITIALIZER Q_GLOBAL_STATIC_WITH_INITIALIZER___IS_DEPRECATED 
+#define Q_GLOBAL_STATIC_WITH_INITIALIZER Q_GLOBAL_STATIC_WITH_INITIALIZER___IS_DEPRECATED
 
 
 /* Prevent usage of custom file dialogs on mac os due to appstore limitations  */
@@ -83,5 +82,3 @@ namespace boost {
 #endif
 
 #endif // __cplusplus
-
-#endif // QN_DEPRECATION_H
