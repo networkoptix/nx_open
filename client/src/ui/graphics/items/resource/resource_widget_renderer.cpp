@@ -57,6 +57,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
     m_panoFactor = channelCount;
 
     m_channelRenderers.resize( channelCount );
+    m_channelSourceSize.resize( channelCount );
     m_renderingEnabled.resize( channelCount, true );
 
     for( int i = 0; i < channelCount; ++i )
@@ -258,10 +259,12 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
     }
 
     QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);
-    if(m_sourceSize == sourceSize)
+
+    if (m_channelSourceSize[image->channel] == sourceSize)
         return;
 
-    m_sourceSize = sourceSize;
+    m_channelSourceSize[image->channel] = sourceSize;
+    m_sourceSize = calcTotalSourceSize();
 
     emit sourceSizeChanged();
 }
@@ -364,4 +367,38 @@ void QnResourceWidgetRenderer::setHistogramConsumer(QnHistogramConsumer* value)
         if( ctx.renderer )
             ctx.renderer->setHistogramConsumer(value);
     }
+}
+
+QSize QnResourceWidgetRenderer::calcTotalSourceSize() const
+{
+    QSize totalSourceSize;
+    auto channelCount = m_channelSourceSize.size();
+
+    std::map<int, int> widthFrequencyMap;
+    std::map<int, int> heightFrequentMap;
+
+    for (int channelNum = 0; channelNum < channelCount; channelNum++)
+    {
+        widthFrequencyMap[m_channelSourceSize[channelNum].width()]++;
+        heightFrequentMap[m_channelSourceSize[channelNum].height()]++;
+    }
+
+    totalSourceSize.setWidth(
+        getMostFrequentSize(widthFrequencyMap));
+
+    totalSourceSize.setHeight(
+        getMostFrequentSize(heightFrequentMap));
+
+    return totalSourceSize;
+}
+
+int QnResourceWidgetRenderer::getMostFrequentSize(std::map<int, int>& sizeMap) const
+{
+    auto maxSize = std::max_element(sizeMap.begin(), sizeMap.end(), 
+        [](const std::pair<int, int>& l, const std::pair<int, int>& r)
+        {
+            return l.second < r.second;
+        });
+
+    return maxSize->first;
 }

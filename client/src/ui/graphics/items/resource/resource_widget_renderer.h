@@ -104,6 +104,11 @@ signals:
     void sourceSizeChanged();
     void beforeDestroy();
     void fisheyeCenterChanged(QPointF center, qreal radius);
+
+private:
+    QSize calcTotalSourceSize() const;
+    int getMostFrequentSize(std::map<int, int>& sizeMap) const;
+    
 private:
     struct RenderingTools
     {
@@ -129,6 +134,8 @@ private:
 
     /** Current source size, in square pixels. */
     QSize m_sourceSize;
+
+    std::vector<QSize> m_channelSourceSize;
 
     /** Mutex that is used for synchronization. */
     mutable QnMutex m_mutex;
