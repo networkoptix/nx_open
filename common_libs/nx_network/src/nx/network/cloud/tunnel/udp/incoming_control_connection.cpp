@@ -23,16 +23,10 @@ IncomingControlConnection::IncomingControlConnection(
     m_maxKeepAliveInterval(
         connectionParameters.udpTunnelKeepAliveInterval *
         connectionParameters.udpTunnelKeepAliveRetries),
-    m_lastKeepAlive(std::chrono::system_clock::now())
+    m_lastKeepAlive(std::chrono::steady_clock::now())
 {
     m_buffer.reserve(kBufferSize);
     m_parser.setMessage(&m_message);
-}
-
-IncomingControlConnection::~IncomingControlConnection()
-{
-	NX_ASSERT(m_socket->isInSelfAioThread());
-	NX_LOG(lm("Removed"), cl_logDEBUG1);
 }
 
 void IncomingControlConnection::setErrorHandler(
@@ -53,7 +47,7 @@ void IncomingControlConnection::start(
 
 void IncomingControlConnection::resetLastKeepAlive()
 {
-    m_lastKeepAlive = std::chrono::system_clock::now();
+    m_lastKeepAlive = std::chrono::steady_clock::now();
 	NX_LOG(lm("Update last keep alive"), cl_logDEBUG2);
 }
 
@@ -65,7 +59,7 @@ const AbstractStreamSocket* IncomingControlConnection::socket()
 void IncomingControlConnection::monitorKeepAlive()
 {
     using namespace std::chrono;
-    auto timePassed = system_clock::now() - m_lastKeepAlive;
+    auto timePassed = steady_clock::now() - m_lastKeepAlive;
     if (timePassed >= m_maxKeepAliveInterval)
         return handleError(SystemError::timedOut);
 
