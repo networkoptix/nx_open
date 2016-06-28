@@ -16,15 +16,26 @@ angular.module('cloudApp')
             getAccessRight: function(systemId){
                 return $http.get(gateway(systemId) + '/ec2/getAccessRights');
             },
-            saveUser: function(systemId,user){
-                return $http.post(gateway(systemId) + '/ec2/saveUser',user);
+            saveUser: function(systemId, user){
+                return $http.post(gateway(systemId) + '/ec2/saveUser',this.cleanUserObject(user));
+            },
+            deleteUser: function(systemId, userId){
+                return $http.post(gateway(systemId) + '/ec2/removeUser', {userId:userId});
+            },
+            cleanUserObject:function(user){ // Remove unnesesary fields from the object
+                return; //TODO: uncomment after #VMS-2968
+
+                var supportedFields = ['email', 'userId', 'groupId', 'permissions', 'isCloud'];
+                var cleanedUser = {};
+                for(var i in supportedFields){
+                    cleanedUser[supportedFields[i]] = user[supportedFields[i]];
+                }
+                return cleanedUser;
             },
             userObject: function(fullName, accountEmail){
                 return {
-
                     'email': accountEmail,
                     'name': accountEmail,
-                    'fullName': fullName,
 
                     'isCloud': true,
                     'isEnabled': true,
@@ -34,6 +45,7 @@ angular.module('cloudApp')
 
 
                     //TODO: Remove the trash below after #VMS-2968
+                    'fullName': fullName,
                     'id': '{' + uuid2.newuuid() + '}',
                     'isAdmin': false,
                     'cryptSha512Hash': '',

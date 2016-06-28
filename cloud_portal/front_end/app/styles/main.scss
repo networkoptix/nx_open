@@ -202,6 +202,11 @@ footer {
 td.user-name{
   max-width: 200px;
 }
+.button-cell{
+    padding-right: 6px !important;
+    padding-left: 6px !important;
+    text-align: center;
+}
 .system-button {
   user-select: none;
   cursor: pointer;
@@ -358,6 +363,7 @@ td.user-name{
 
 .image-link,
 .image-link:hover{
+  @include ellipsis;
   text-decoration: none !important;
 }
 

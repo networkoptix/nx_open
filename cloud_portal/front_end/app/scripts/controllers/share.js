@@ -29,14 +29,11 @@ angular.module('cloudApp')
 
         function findRole(user, accessRoles){
             return _.find(accessRoles,function(role){
-                if(!user.localData){
-                    return role.accessRole == user.accessRole;
-                }
-                if(user.localData.groupId){
-                    return role.groupId == user.localData.groupId;
+                if(user.groupId){
+                    return role.groupId == user.groupId;
                 }
 
-                return user.localData.permissions == role.permissions;
+                return user.permissions == role.permissions;
             });
         }
 
@@ -96,48 +93,16 @@ angular.module('cloudApp')
             var accessRole = role.accessRole;
             var user = $scope.user;
 
-            console.log("doShare", role, user);
-            //$scope.isNewShare
-
-
-            // 1. Try to apply changes to the system
-            function saveLocal(){
-                if(!user.localData){
-                    user.localData = mediaserver.userObject(user.fullName, user.accountEmail);
-                }
-
-                user.localData.groupId = role.groupId||'';
-                user.localData.permissions = role.permissions||'';
-
-                return mediaserver.saveUser(systemId, user.localData);
+            if(!user.userId){
+                user = mediaserver.userObject(user.fullName, user.accountEmail);
             }
 
-            var deferred = $q.defer();
+            user.groupId = role.groupId||'';
+            user.permissions = role.permissions||'';
 
-            // 2. Save changes to the cloud
-            function saveCloud(){
-                if(role.groupId){
-                    role.accessRole = Config.accessRoles.custom;
-                }
+            cloudApi.share(systemId, user.accountEmail);
 
-                return cloudApi.share(systemId, $scope.user.accountEmail, role.accessRole).then(function(success){
-                    deferred.resolve(success);
-                },function(error){
-                    deferred.reject(error);
-                })
-            }
-
-            var mustSaveLocal = user.localData || $scope.user.role.groupId;
-            saveLocal().then(function(){
-                saveCloud();
-            },function(error){
-                if(mustSaveLocal){
-                    return deferred.reject(error);
-                }
-                saveCloud();
-            });
-
-            return deferred.promise;
+            return mediaserver.saveUser(systemId, user);
         }
 
         $scope.sharing = process.init(function(){

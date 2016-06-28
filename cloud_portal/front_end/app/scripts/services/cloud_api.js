@@ -163,10 +163,12 @@ angular.module('cloudApp')
             users:function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/users');
             },
+
+            // TODO Remove this method in 3.0.0
             share:function(systemId, userEmail, role){
                 return $http.post(apiBase + '/systems/' + systemId + '/users', {
                     user_email: userEmail,
-                    role:role
+                    role: role
                 });
             },
             unshare:function(systemId,userEmail){
@@ -175,6 +177,7 @@ angular.module('cloudApp')
                     role: Config.accessRoles.unshare
                 });
             },
+
             disconnect:function(systemId, password){
                 return $http.post(apiBase + '/systems/disconnect', {
                     system_id: systemId,

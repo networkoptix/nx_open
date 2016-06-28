@@ -49,7 +49,8 @@ var Config = {
     accessRoles: {
         unshare: 'none',
         default: 'viewer',
-        custom:     'custom',
+        disabled: 'disabled',
+        custom: 'custom',
         owner:   'owner',
         order: [
             'liveViewer',

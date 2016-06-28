@@ -13,6 +13,10 @@ var L = {
         unavailable: 'unavailable'
     },
     accessRoles: {
+        disabled:{
+            label: 'disabled',
+            description: 'User is disabled in the system'
+        },
         owner: {
             label: 'owner',
             description: 'Can do pretty much everything with his system'
@@ -86,6 +90,10 @@ var L = {
     system:{
         yourSystem: 'Your system',
         mySystemSearch: 'IMeMyMine',
+
+        unavailable: 'System is unreachable',
+        offline: 'System is offline',
+
         confirmDisconnectTitle: "Disconnect system from PRODUCT_NAME?",
         confirmDisconnectAction: "Disconnect",
 

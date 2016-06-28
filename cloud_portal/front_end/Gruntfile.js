@@ -96,12 +96,12 @@ module.exports = function (grunt) {
 
 
                 // cloud-demo.hdw.mx
-                /* {context: '/api/',    host: 'cloud-demo.hdw.mx', port: 80},
+                {context: '/api/',    host: 'cloud-demo.hdw.mx', port: 80},
                 {context: '/notifications/',    host: 'cloud-demo.hdw.mx', port: 80}/**/
 
 
                 // Local vagrant
-                {context: '/api/',    host: 'cloud-local', port: 80},
+                /*{context: '/api/',    host: 'cloud-local', port: 80},
                 {context: '/notifications/',    host: 'cloud-local', port: 80}/**/
             ],
             livereload: {
