@@ -12,10 +12,12 @@ Item
     property Item visualParent;
 
     property alias tileColor: tileArea.color;
-    property bool isHovered: hoverIndicator.containsMouse || (expandedOpacity == 1);
+    property bool isHovered: hoverIndicator.containsMouse ||
+        (expandedOpacity == 1) || menuButton.isHovered;
 
     property alias titleLabel: systemNameLabel;
     property alias collapseButton: collapseTileButton;
+    property alias menuButton: menuButtonControl;
     property alias indicator: indicatorControl;
 
     property alias areaLoader: areaLoader;
@@ -23,8 +25,6 @@ Item
     property bool isExpanded: false;
     property bool isAvailable: false;
     property real expandedOpacity: collapseTileButton.opacity;
-
-    ///
 
     signal collapsedTileClicked();
 
@@ -78,6 +78,12 @@ Item
                     target: indicator;
                     opacity: 1;
                 }
+
+                PropertyChanges
+                {
+                    target: menuButtonControl;
+                    opacity: 1;
+                }
             },
 
             State
@@ -108,6 +114,12 @@ Item
                 PropertyChanges
                 {
                     target: indicator;
+                    opacity: 0;
+                }
+
+                PropertyChanges
+                {
+                    target: menuButtonControl;
                     opacity: 0;
                 }
             }
@@ -147,7 +159,7 @@ Item
 
                     NumberAnimation
                     {
-                        targets: [collapseTileButton];
+                        targets: [collapseTileButton, menuButtonControl];
                         properties: "opacity";
                         easing.type: Easing.OutCubic;
                         duration: 200;
@@ -238,11 +250,13 @@ Item
 
                 disableable: false;
                 anchors.left: parent.left;
-                anchors.right: (collapseTileButton.visible ? collapseTileButton.left : parent.right);
+                anchors.right: (collapseTileButton.visible ? collapseTileButton.left :
+                    (menuButtonControl.visible ? menuButtonControl.left : parent.right));
                 anchors.top: parent.top;
 
                 anchors.leftMargin: 16;
-                anchors.rightMargin: (collapseTileButton.visible ? 0 : anchors.leftMargin);
+                anchors.rightMargin: (collapseTileButton.visible || menuButtonControl.visible ?
+                    0 : anchors.leftMargin);
                 anchors.topMargin: 12;
 
                 elide: Text.ElideRight;
@@ -250,6 +264,20 @@ Item
                 height: Style.custom.systemTile.systemNameLabelHeight;
                 color: (control.isAvailable ? Style.colors.text : Style.colors.midlight);
                 font: Style.fonts.systemTile.systemName;
+            }
+
+            NxMenuButton
+            {
+                id: menuButtonControl;
+
+                width: 24;
+                height: 24;
+
+                anchors.right: parent.right;
+                anchors.top: parent.top;
+
+                anchors.rightMargin: 8;
+                anchors.topMargin: 16;
             }
 
             NxButton

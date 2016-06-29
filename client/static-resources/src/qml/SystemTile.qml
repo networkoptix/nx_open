@@ -96,28 +96,44 @@ BaseTile
         if (!control.isAvailable)
             return;
 
-        if (impl.tileType === impl.kFactorySystemTileType)
+        if (control.isFactoryTile)
         {
             var factorySystemHost = areaLoader.item.host;
             console.log("Show wizard for system <", systemName
                 , ">, host <", factorySystemHost, ">");
             context.setupFactorySystem(factorySystemHost);
         }
-        else if (impl.tileType === impl.kCloudSystemTileType)
+        else if (isCloudTile)
         {
             var cloudHost = control.impl.hostsModel.firstHost;
             console.log("Connecting to cloud system <", systemName
                 , ">, throug the host <", cloudHost, ">");
             context.connectToCloudSystem(cloudHost);
         }
-        else // Local system tileColor
+        else // Local system tile
         {
-            toggle();
+            if (impl.hasSavedConnection)
+                control.impl.connectToLocalSystem();
+            else
+                toggle();
         }
     }
 
-    // Tune
     titleLabel.text: (isFactoryTile ? "New System" : systemName);
+
+    menuButton
+    {
+        visible: impl.hasSavedConnection;
+
+        menu: NxPopupMenu
+        {
+            NxMenuItem
+            {
+                text: "Edit";
+                onTriggered: control.toggle();
+            }
+        }
+    }
 
     areaLoader.source:
     {
@@ -169,18 +185,7 @@ BaseTile
         target: (areaLoader.item ? areaLoader.item : null);
         ignoreUnknownSignals: true;
 
-        onConnectRequested:
-        {
-            var tile  = control.areaLoader.item;
-            console.log("Connecting to local system<", control.systemName
-                , "host <", tile.selectedHost, "> with credentials: "
-                , tile.selectedUser, ":", tile.selectedPassword
-                , tile.savePassword, tile.autoLogin);
-
-            context.connectToLocalSystem(tile.selectedHost,
-                tile.selectedUser, tile.selectedPassword,
-                tile.savePassword, tile.autoLogin);
-        }
+        onConnectRequested: { control.impl.connectToLocalSystem(); }
     }
 
     Connections
@@ -217,5 +222,31 @@ BaseTile
         readonly property color standardColor: Style.colors.custom.systemTile.background;
         readonly property color hoveredColor: Style.lighterColor(standardColor);
         readonly property color inactiveColor: Style.colors.shadow;
+
+        readonly property bool hasSavedConnection:
+        {
+            if (control.isFactoryTile || control.isCloudTile)
+                return false;
+
+            var systemTile = areaLoader.item;
+            return systemTile.savePassword && systemTile.selectedUser.length &&
+                systemTile.selectedPassword.length;
+        }
+
+        function connectToLocalSystem()
+        {
+            if (isFactoryTile || isCloudTile)
+                return;
+
+            var tile  = control.areaLoader.item;
+            console.log("Connecting to local system<", control.systemName
+                , "host <", tile.selectedHost, "> with credentials: "
+                , tile.selectedUser, ":", tile.selectedPassword
+                , tile.savePassword, tile.autoLogin);
+
+            context.connectToLocalSystem(tile.selectedHost,
+                tile.selectedUser, tile.selectedPassword,
+                tile.savePassword, tile.autoLogin);
+        }
     }
 }

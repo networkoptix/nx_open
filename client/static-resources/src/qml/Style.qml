@@ -31,8 +31,18 @@ QtObject
     property QtObject label: QtObject
     {
         readonly property real height: 16;
-        readonly property font font: Qt.font({ pixelSize: 13, weight: Font.Normal});
+        readonly property font font: Qt.font({ pixelSize: 13, weight: Font.Normal });
         readonly property color color: colors.windowText;
+    }
+
+    property QtObject menu: QtObject
+    {
+        readonly property real height: 24;
+        readonly property font font: Qt.font({ pixelSize: 13, weight: Font.Normal });
+        readonly property color color: colors.text;
+        readonly property color colorHovered: colors.brandContrast;
+        readonly property color background: colors.midlight;
+        readonly property color backgroundHovered: colors.brand;
     }
 
     property QtObject textEdit: QtObject
