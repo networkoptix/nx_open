@@ -689,7 +689,7 @@ namespace ec2
          * %param[default] format
          * %return Return object in requested format
          * %// AbstractUserManager::getUserGroups
-        */
+         */
         registerGetFuncHandler<std::nullptr_t, ApiUserGroupDataList>(p, ApiCommand::getUserGroups);
 
         /**%apidoc GET /ec2/getAccessRights
