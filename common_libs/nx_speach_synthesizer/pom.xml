@@ -19,14 +19,10 @@
         <product.title>${company.name} nx_speach_synthesizer</product.title>
         <!--Global libs-->
         <qt.libs>core concurrent</qt.libs>
-        <global.libs>-lcommon -lestools -leststring -lestbase</global.libs>
+        <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
-        <linux.oslibs>-ltermcap</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
-
-        <rdep.windows.packages>festival</rdep.windows.packages>
-        <rdep.mac.packages>festival</rdep.mac.packages>
-
+        <rdep.packages>festival</rdep.packages>
     </properties>
 
     <dependencies>
@@ -62,63 +58,6 @@
             </activation>            
             <properties>
                 <buildLib>staticlib</buildLib>
-            </properties>
-        </profile>  
-
-        <profile>
-            <id>linux-noarm</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>arch</name>
-                    <value>!arm</value>
-                </property>
-            </activation>
-
-            <properties>
-                <rdep.linux.packages>festival</rdep.linux.packages>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>linux-arm-bpi</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>bpi</value>
-                </property>
-            </activation>
-
-            <properties>
-                <rdep.linux.packages>festival</rdep.linux.packages>
-            </properties>
-        </profile>  
-
-        <profile>
-            <id>linux-arm-bananapi</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>bananapi</value>
-                </property>
-            </activation>
-
-            <properties>
-                <rdep.linux.packages>festival</rdep.linux.packages>
             </properties>
         </profile>  
 

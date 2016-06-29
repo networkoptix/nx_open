@@ -8,8 +8,8 @@
 
 namespace {
     QStringList getExtensionsFromFilter(const QString &filter) {
-        QRegExp filterRegExp(lit(".*\\((.*)\\).*"));
-        QRegExp extensionRegExp(lit("\\*\\.(.*)"));
+        QRegExp filterRegExp(QLatin1String(".*\\((.*)\\).*"));
+        QRegExp extensionRegExp(QLatin1String("\\*\\.(.*)"));
 
         QSet<QString> extensions;
         QStringList filters = filter.split(lit(";;"), QString::SkipEmptyParts);

@@ -275,3 +275,71 @@ void QnWorkbenchAccessController::at_accessibleResourcesChanged(const QnUuid& us
     if (m_user && m_user->getId() == userId)
         recalculateAllPermissions();
 }
+
+QString QnWorkbenchAccessController::userRoleName(const QnUserResourcePtr& user) const
+{
+    if (!user)
+        return QString();
+
+    if (user->isOwner())
+        return tr("Owner");
+
+    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(user);
+    if (permissions.testFlag(Qn::GlobalAdminPermission))
+        return tr("Administrator");
+
+    QnUuid groupId = user->userGroup();
+    for (const ec2::ApiUserGroupData& group : qnResourceAccessManager->userGroups())
+    {
+        if (group.id == groupId)
+            return group.name;
+    }
+
+    if (permissions == Qn::GlobalAdvancedViewerPermissionSet)
+        return tr("Advanced Viewer");
+
+    if (permissions == Qn::GlobalViewerPermissionSet)
+        return tr("Viewer");
+
+    if (permissions == Qn::GlobalLiveViewerPermissionSet)
+        return tr("Live Viewer");
+
+    return tr("Custom");
+}
+
+QString QnWorkbenchAccessController::userRoleDescription(const QnUserResourcePtr& user) const
+{
+    if (!user)
+        return QString();
+
+    if (user->isOwner())
+        return tr("Has access to whole system and can do everything.");
+
+    return userRoleDescription(qnResourceAccessManager->globalPermissions(user), user->userGroup());
+}
+
+QString QnWorkbenchAccessController::userRoleDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId) const
+{
+    if (permissions.testFlag(Qn::GlobalAdminPermission))
+        return tr("Has access to whole system and can manage it. Can create users.");
+
+    if (!groupId.isNull())
+    {
+        for (const ec2::ApiUserGroupData& group : qnResourceAccessManager->userGroups())
+        {
+            if (group.id == groupId)
+                return tr("Custom user role.");
+        }
+    }
+
+    if (permissions == Qn::GlobalAdvancedViewerPermissionSet)
+        return tr("Can manage all cameras and bookmarks.");
+
+    if (permissions == Qn::GlobalViewerPermissionSet)
+        return tr("Can view all cameras and export video.");
+
+    if (permissions == Qn::GlobalLiveViewerPermissionSet)
+        return tr("Can view live video from all cameras.");
+
+    return tr("Custom permissions.");
+}
