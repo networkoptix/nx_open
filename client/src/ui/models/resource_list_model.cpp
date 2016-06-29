@@ -13,7 +13,8 @@
 QnResourceListModel::QnResourceListModel(QObject *parent) :
     base_type(parent),
     m_readOnly(false),
-    m_checkable(false),
+    m_hasCheckboxes(false),
+    m_userCheckable(true),
     m_statusIgnored(false),
     m_resources(),
     m_checkedResources()
@@ -34,18 +35,28 @@ void QnResourceListModel::setReadOnly(bool readOnly)
     m_readOnly = readOnly;
 }
 
-bool QnResourceListModel::isCheckable() const
+bool QnResourceListModel::hasCheckboxes() const
 {
-    return m_checkable;
+    return m_hasCheckboxes;
 }
 
-void QnResourceListModel::setCheckable(bool value)
+void QnResourceListModel::setHasCheckboxes(bool value)
 {
-    if (m_checkable == value)
+    if (m_hasCheckboxes == value)
         return;
     beginResetModel();
-    m_checkable = value;
+    m_hasCheckboxes = value;
     endResetModel();
+}
+
+bool QnResourceListModel::userCheckable() const
+{
+    return m_userCheckable;
+}
+
+void QnResourceListModel::setUserCheckable(bool value)
+{
+    m_userCheckable = value;
 }
 
 bool QnResourceListModel::isStatusIgnored() const
@@ -137,7 +148,7 @@ void QnResourceListModel::setCheckedResources(const QSet<QnUuid>& ids)
 int QnResourceListModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    if (m_checkable)
+    if (m_hasCheckboxes)
         return ColumnCount;
     return ColumnCount - 1; //CheckColumn is the last
 }
@@ -156,9 +167,10 @@ Qt::ItemFlags QnResourceListModel::flags(const QModelIndex &index) const
         return Qt::NoItemFlags;
 
     int column = index.column();
+    int userCheckableFlag = m_userCheckable ? Qt::ItemIsUserCheckable : 0;
 
     if (column == CheckColumn)
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | userCheckableFlag;
 
     Qt::ItemFlags result = base_type::flags(index);
     if(m_readOnly)
@@ -170,7 +182,6 @@ Qt::ItemFlags QnResourceListModel::flags(const QModelIndex &index) const
 
     return result | Qt::ItemIsEditable;
 }
-
 
 QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
 {
@@ -211,6 +222,12 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
                 : Qt::Unchecked;
         break;
 
+    //TODO: #vkutin #GDM #common Refactor/replace this role
+    case Qn::DisabledRole:
+        return m_checkedResources.contains(resource->getId())
+            ? false
+            : true;
+
     case Qn::ResourceRole:
         return QVariant::fromValue<QnResourcePtr>(resource);
     case Qn::ResourceFlagsRole:
@@ -242,9 +259,13 @@ bool QnResourceListModel::setData(const QModelIndex &index, const QVariant &valu
             m_checkedResources.insert(resource->getId());
         else
             m_checkedResources.remove(resource->getId());
-        emit dataChanged(index, index, QVector<int>() << Qt::CheckStateRole);
+
+        emit dataChanged(index.sibling(index.row(), 0),
+                         index.sibling(index.row(), ColumnCount - 1),
+                         { Qt::CheckStateRole, Qn::DisabledRole });
         return true;
     }
+
     return false;
 }
 

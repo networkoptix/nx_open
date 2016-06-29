@@ -12,6 +12,8 @@
 #include <client/client_meta_types.h>
 #include <client/client_settings.h>
 
+#include <ui/models/resource_list_model.h>
+
 #include <ui/style/skin.h>
 #include <ui/style/helper.h>
 #include <ui/style/noptix_style.h>
@@ -390,10 +392,13 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
     if (workbench() && resource == workbench()->context()->user())
         return ItemState::Selected;
 
+    QVariant isNotSelected = index.data(Qn::DisabledRole); // in accordance with QnResourceListModel
+    if (isNotSelected.canConvert<bool>() && !isNotSelected.toBool())
+        return ItemState::Selected;
+
     QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
     QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
     QnUuid uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
-
 
     /* Determine central workbench item: */
     QnWorkbenchItem* centralItem = workbench() ? workbench()->item(Qn::CentralRole) : nullptr;

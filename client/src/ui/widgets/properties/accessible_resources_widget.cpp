@@ -174,12 +174,13 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
         QMargins margins = ui->resourceListLayout->contentsMargins();
         margins.setRight(event->type() == QEvent::Show ? 16 : 8);
         ui->resourceListLayout->setContentsMargins(margins);
+        ui->resourceListLayout->activate();
     });
 
     auto itemDelegate = new QnResourceItemDelegate(this);
     itemDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
 
-    auto setupTreeView = [itemDelegate](QnTreeView* treeView)
+    auto setupTreeView = [this, itemDelegate](QnTreeView* treeView)
     {
         treeView->setItemDelegate(itemDelegate);
         treeView->header()->setStretchLastSection(false);
@@ -198,6 +199,9 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
         int newCheckValue = checkboxIdx.data(Qt::CheckStateRole).toInt() != Qt::Checked ? Qt::Checked : Qt::Unchecked;
         model->setData(checkboxIdx, newCheckValue, Qt::CheckStateRole);
     };
+
+    connect(ui->resourcesTreeView, &QnTreeView::clicked, this, toggleCheckbox);
+    connect(ui->controlsTreeView,  &QnTreeView::clicked, this, toggleCheckbox);
 
     auto batchToggleCheckboxes = [this](const QModelIndex& index)
     {
@@ -218,10 +222,8 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
             model->setData(index, newCheckValue, Qt::CheckStateRole);
     };
 
-    connect(ui->resourcesTreeView, &QnTreeView::clicked,        this, toggleCheckbox);
-    connect(ui->controlsTreeView,  &QnTreeView::clicked,        this, toggleCheckbox);
-    connect(ui->resourcesTreeView, &QnTreeView::spacePressed,   this, batchToggleCheckboxes);
-    connect(ui->controlsTreeView,  &QnTreeView::spacePressed,   this, batchToggleCheckboxes);
+    connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, batchToggleCheckboxes);
+    connect(ui->controlsTreeView,  &QnTreeView::spacePressed, this, batchToggleCheckboxes);
 
     connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, &QnAccessibleResourcesWidget::updateThumbnail);
     updateThumbnail();
@@ -318,7 +320,8 @@ void QnAccessibleResourcesWidget::initControlsModel()
     /* Create separate dummy resource id for each filter, but once per application run. */
     dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
     m_controlsModel->setResources(QnResourceList() << dummy);
-    m_controlsModel->setCheckable(true);
+    m_controlsModel->setHasCheckboxes(true);
+    m_controlsModel->setUserCheckable(false);
     m_controlsModel->setStatusIgnored(true);
 
     auto modelUpdated = [this](const QModelIndex& index = QModelIndex())
@@ -386,7 +389,8 @@ bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resour
 
 void QnAccessibleResourcesWidget::initResourcesModel()
 {
-    m_resourcesModel->setCheckable(true);
+    m_resourcesModel->setHasCheckboxes(true);
+    m_resourcesModel->setUserCheckable(false);
     m_resourcesModel->setStatusIgnored(true);
 
     auto handleResourceAdded = [this](const QnResourcePtr& resource)

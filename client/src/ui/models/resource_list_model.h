@@ -34,8 +34,11 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
-    bool isCheckable() const;
-    void setCheckable(bool value);
+    bool hasCheckboxes() const;
+    void setHasCheckboxes(bool value);
+
+    bool userCheckable() const;
+    void setUserCheckable(bool value);
 
     bool isStatusIgnored() const;
     void setStatusIgnored(bool value);
@@ -57,7 +60,8 @@ private:
 
 private:
     bool m_readOnly;
-    bool m_checkable;
+    bool m_hasCheckboxes;
+    bool m_userCheckable;
     bool m_statusIgnored;
     QnResourceList m_resources;
     QSet<QnUuid> m_checkedResources;
