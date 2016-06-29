@@ -17,6 +17,7 @@
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource_list_model.h>
 #include <ui/style/helper.h>
+#include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -324,6 +325,7 @@ void QnAccessibleResourcesWidget::initControlsModel()
     dummy->setName(tr("All Media Resources"));
     /* Create separate dummy resource id for each filter, but once per application run. */
     dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
+    qnResIconCache->setKey(dummy.staticCast<QnResource>(), QnResourceIconCache::Cameras);
     m_controlsModel->setResources(QnResourceList() << dummy);
     m_controlsModel->setHasCheckboxes(true);
     m_controlsModel->setUserCheckable(false);
