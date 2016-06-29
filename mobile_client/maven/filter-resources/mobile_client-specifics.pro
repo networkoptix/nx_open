@@ -54,5 +54,5 @@ ios {
 
     QMAKE_XCODE_CODE_SIGN_IDENTITY = ${ios.sign.identity}
     XCODEBUILD_FLAGS += PROVISIONING_PROFILE=${provisioning_profile_id}
-    XCODEBUILD_FLAGS += CODE_SIGN_ENTITLEMENTS=mobile_client.entitlements
+    XCODEBUILD_FLAGS += CODE_SIGN_ENTITLEMENTS=${mobile_client_entitlements}
 }
