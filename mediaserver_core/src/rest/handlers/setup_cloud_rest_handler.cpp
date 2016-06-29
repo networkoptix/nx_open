@@ -73,11 +73,21 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnU
         return nx_http::StatusCode::ok;
     }
 
+    const auto systemNameBak = qnCommon->localSystemName();
+    if (!changeSystemName(newSystemName, 0, 0, true, Qn::UserAccessData(userId)))
+    {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Cannot change system name"));
+        return nx_http::StatusCode::ok;
+    }
+
     QnSaveCloudSystemCredentialsHandler subHandler;
     int httpResult = subHandler.execute(data, result);
     if (result.error != QnJsonRestResult::NoError)
+    {
+        //changing system name back
+        changeSystemName(systemNameBak, 0, 0, true, Qn::UserAccessData(userId));
         return httpResult;
-    changeSystemName(newSystemName, 0, 0, true, Qn::UserAccessData(userId));
+    }
     qnGlobalSettings->setNewSystem(false);
     if (qnGlobalSettings->synchronizeNowSync())
         qnCommon->updateModuleInformation();
