@@ -1,17 +1,13 @@
 #include "user_group_settings_widget.h"
 #include "ui_user_group_settings_widget.h"
 
-#include <api/app_server_connection.h>
-
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 
 #include <ui/models/resource_properties/user_groups_settings_model.h>
-#include <ui/style/custom_style.h>
+#include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
+
 
 QnUserGroupSettingsWidget::QnUserGroupSettingsWidget(QnUserGroupSettingsModel* model, QWidget* parent /*= 0*/) :
     base_type(parent),
@@ -23,6 +19,8 @@ QnUserGroupSettingsWidget::QnUserGroupSettingsWidget(QnUserGroupSettingsModel* m
     ui->setupUi(this);
     ui->usersListTreeView->setModel(m_usersModel);
 
+    ui->usersListTreeView->setProperty(style::Properties::kSuppressHoverPropery, true);
+
     connect(ui->nameLineEdit, &QLineEdit::textChanged, this, &QnUserGroupSettingsWidget::applyChanges);
 
     connect(ui->deleteGroupButton, &QPushButton::clicked, this, [this]()
@@ -33,7 +31,8 @@ QnUserGroupSettingsWidget::QnUserGroupSettingsWidget(QnUserGroupSettingsModel* m
 }
 
 QnUserGroupSettingsWidget::~QnUserGroupSettingsWidget()
-{}
+{
+}
 
 bool QnUserGroupSettingsWidget::hasChanges() const
 {

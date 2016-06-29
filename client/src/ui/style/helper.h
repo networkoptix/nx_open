@@ -48,6 +48,7 @@ namespace style
         static const char *kSliderFeatures;         /**< Name of a property to add extra slider features. */
         static const char *kDontPolishFontProperty;
         static const char *kTabShape;
+        static const char *kSuppressHoverPropery;   /**< Name of a property to suppress hovering of itemview items. */
     };
 
     /** Flags of additional slider features */

@@ -34,13 +34,14 @@ namespace style
     const QMargins Metrics::kGroupBoxContentMargins(dp(16), dp(16), dp(16), dp(16));
     const qreal Metrics::kGroupBoxCornerRadius = dp(2.0);
 
-    const char *Properties::kHoveredRowProperty = "_qn_hoveredRow";
-    const char *Properties::kHoveredIndexProperty = "_qn_hoveredIndex";
-    const char *Properties::kAccentStyleProperty = "_qn_accentStyle";
-    const char *Properties::kSliderLength = "_qn_sliderLength";
-    const char *Properties::kSliderFeatures = "_qn_sliderFeatures";
-    const char *Properties::kDontPolishFontProperty = "_qn_dontPolishFont";
-    const char *Properties::kTabShape = "_qn_tabShape";
+    const char* Properties::kHoveredRowProperty = "_qn_hoveredRow";
+    const char* Properties::kHoveredIndexProperty = "_qn_hoveredIndex";
+    const char* Properties::kAccentStyleProperty = "_qn_accentStyle";
+    const char* Properties::kSliderLength = "_qn_sliderLength";
+    const char* Properties::kSliderFeatures = "_qn_sliderFeatures";
+    const char* Properties::kDontPolishFontProperty = "_qn_dontPolishFont";
+    const char* Properties::kTabShape = "_qn_tabShape";
+    const char* Properties::kSuppressHoverPropery = "_qn_suppressHover";
 
     qreal dpr(qreal value)
     {

@@ -550,7 +550,8 @@ void QnNxStyle::drawPrimitive(
 
                     /* Obtain hover information: */
                     QBrush hoverBrush = option->palette.midlight();
-                    bool hasHover = item->state.testFlag(State_MouseOver) && item->state.testFlag(State_Enabled);
+                    bool hasHover = item->state.testFlag(State_MouseOver) && item->state.testFlag(State_Enabled) &&
+                        !tree->property(Properties::kSuppressHoverPropery).toBool();
 
                     bool hoverOpaque = hasHover && isColorOpaque(hoverBrush.color());
 
@@ -608,15 +609,16 @@ void QnNxStyle::drawPrimitive(
                 bool selectionOpaque = hasSelection && isColorOpaque(selectionBrush.color());
 
                 bool hasHover = item->state.testFlag(State_MouseOver);
-                if (qobject_cast<const QTreeView*>(widget))
+                if (widget)
                 {
-                    /* Enabled items of treeview already have hover painted in PE_PanelItemViewRow. */
-                    if (item->state.testFlag(State_Enabled))
+                    if (widget->property(Properties::kSuppressHoverPropery).toBool() ||
+                        qobject_cast<const QTreeView*>(widget) && item->state.testFlag(State_Enabled))
+                    {
+                        /* Itemviews with kSuppressHoverPropery should suppress hover. */
+                        /* Enabled items of treeview already have hover painted in PE_PanelItemViewRow. */
                         hasHover = false;
-                }
-                else
-                {
-                    if (!hasHover)
+                    }
+                    else
                     {
                         /* Obtain Nx hovered row information: */
                         QVariant value = widget->property(Properties::kHoveredRowProperty);
