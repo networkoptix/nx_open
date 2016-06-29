@@ -2,6 +2,9 @@
 
 #include <QtWidgets/QApplication>
 
+#include <common/common_globals.h>
+#include <common/common_module.h>
+
 #include <core/resource/camera_history.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
@@ -11,8 +14,6 @@
 
 #include <client/client_meta_types.h>
 #include <client/client_settings.h>
-
-#include <ui/models/resource_list_model.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/helper.h>
@@ -26,7 +27,6 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <common/common_module.h>
 
 QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
     base_type(parent),
