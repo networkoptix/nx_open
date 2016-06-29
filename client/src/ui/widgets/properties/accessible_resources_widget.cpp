@@ -180,7 +180,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     auto itemDelegate = new QnResourceItemDelegate(this);
     itemDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
 
-    auto setupTreeView = [this, itemDelegate](QnTreeView* treeView)
+    auto setupTreeView = [itemDelegate](QnTreeView* treeView)
     {
         treeView->setItemDelegate(itemDelegate);
         treeView->header()->setStretchLastSection(false);
