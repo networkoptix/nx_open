@@ -30,6 +30,7 @@
 #include <utils/common/systemerror.h>
 
 #include "access_control/authentication_manager.h"
+#include "http/connect_handler.h"
 #include "http/proxy_handler.h"
 #include "libvms_gateway_app_info.h"
 #include "stree/cdb_ns.h"
@@ -281,6 +282,16 @@ void VmsGatewayProcess::registerApiHandlers(
         [&settings]() -> std::unique_ptr<ProxyHandler> {
             return std::make_unique<ProxyHandler>(settings);
         });
+
+    if (settings.http().connectSupport)
+    {
+        msgDispatcher->registerRequestProcessor<ConnectHandler>(
+            nx_http::kAnyPath,
+            [&settings]() -> std::unique_ptr<ConnectHandler> {
+                return std::make_unique<ConnectHandler>(settings);
+            },
+            nx_http::StringType("CONNECT"));
+    }
 }
 
 void VmsGatewayProcess::publicAddressFetched(const QHostAddress& publicAddress)

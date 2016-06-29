@@ -192,6 +192,8 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
 
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
+    NX_LOG(lm("Issuing request to %1").arg(urlStr), cl_logALWAYS);
+
     nx_http::HttpClient client;
     client.setSendTimeoutMs(15000);
     if (!client.doGet(urlStr) || !client.response())
@@ -214,6 +216,7 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
     }
 
     std::cout << std::endl;
+    NX_LOG(lm("completed request to %1").arg(urlStr), cl_logALWAYS);
     return 0;
 }
 

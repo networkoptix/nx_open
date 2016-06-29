@@ -33,12 +33,16 @@ namespace nx_http
     void HttpServerConnection::pleaseStop(
         nx::utils::MoveOnlyFunc<void()> completionHandler)
     {
-        BaseType::pleaseStop(
-            [this, completionHandler = std::move(completionHandler)]()
-            {
-                m_currentMsgBody.reset();   //we are in aio thread, so this is ok
-                completionHandler();
-            });
+        auto finalize = [this, completionHandler = std::move(completionHandler)]()
+        {
+            m_currentMsgBody.reset(); // we are in aio thread, so this is ok
+            completionHandler();
+        };
+
+        if (socket())
+            BaseType::pleaseStop(std::move(finalize));
+        else
+            finalize();
     }
 
     void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
@@ -83,7 +87,7 @@ namespace nx_http
                     std::unique_ptr<AbstractMsgBodySource> msgBody) mutable
             {
                 auto strongThis = weakThis.lock();
-                if (!strongThis)
+                if (!strongThis || !socket())
                     return; //connection has been removed while request authentication in progress
 
                 strongThis->post(
@@ -133,7 +137,7 @@ namespace nx_http
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody) mutable
         {
             auto strongThis = weakThis.lock();
-            if (!strongThis)
+            if (!strongThis || !socket())
                 return; //connection has been removed while request has been processed
             strongThis->post(
                 [this, strongThis = std::move(strongThis),
