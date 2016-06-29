@@ -167,7 +167,7 @@ Qt::ItemFlags QnResourceListModel::flags(const QModelIndex &index) const
         return Qt::NoItemFlags;
 
     int column = index.column();
-    int userCheckableFlag = m_userCheckable ? Qt::ItemIsUserCheckable : 0;
+    Qt::ItemFlag userCheckableFlag = m_userCheckable ? Qt::ItemIsUserCheckable : Qt::NoItemFlags;
 
     if (column == CheckColumn)
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | userCheckableFlag;
