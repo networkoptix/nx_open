@@ -157,18 +157,45 @@ PageBase
 
         controls:
         [
-            // TODO: #dklychkov enable if we need the menu
-//            QnIconButton {
-//                anchors.verticalCenter: parent.verticalCenter
-//                anchors.right: parent.right
-//                anchors.rightMargin: 8
-//                icon: "image://icon/more_vert.png"
-//                onClicked: {
-//                    cameraMenu.updateGeometry(this)
-//                    cameraMenu.show()
-//                }
-//            }
+            IconButton
+            {
+                icon: lp("/images/more_vert.png")
+                onClicked:
+                {
+                    menu.open()
+                }
+            }
         ]
+    }
+
+    Menu
+    {
+        id: menu
+
+        parent: videoScreen
+        x: parent.width - width - 8
+        y: 8
+
+        MenuItem
+        {
+            text: qsTr("Change Quality")
+            onClicked:
+            {
+                var dialog = Workflow.openDialog("Screens/private/VideoScreen/QualityDialog.qml")
+                dialog.actualQuality = player.currentResolution
+                dialog.activeQuality = player.videoQuality
+                dialog.onActiveQualityChanged.connect(
+                    function()
+                    {
+                        player.videoQuality = dialog.activeQuality
+                    }
+                )
+            }
+        }
+        MenuItem
+        {
+            text: qsTr("Information")
+        }
     }
 
     ScalableVideo
