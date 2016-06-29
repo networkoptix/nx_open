@@ -340,7 +340,7 @@ int QnFileStorageResource::mountTmpDrive() const
     uncString.replace(lit("/"), lit("\\"));
 
     QString cifsOptionsString =
-        lit("sec=ntlm,username=%1,password=%2,unc=\\\\%3")
+        lit("rsize=8192,wsize=8192,sec=ntlm,username=%1,password=%2,unc=\\\\%3")
             .arg(url.userName())
             .arg(aux::passwordFromUrl(url))
             .arg(uncString);
@@ -745,7 +745,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
         uncString.replace(lit("/"), lit("\\"));
 
         QString cifsOptionsString =
-            lit("sec=ntlm,username=%1,password=%2,unc=\\\\%3")
+            lit("rsize=8192,wsize=8192,sec=ntlm,username=%1,password=%2,unc=\\\\%3")
                 .arg(url.userName())
                 .arg(aux::passwordFromUrl(url))
                 .arg(uncString);
