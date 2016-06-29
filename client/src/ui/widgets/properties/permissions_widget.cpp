@@ -34,11 +34,11 @@ QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsModel* permissions
     createCheckBox(Qn::GlobalViewLogsPermission,            tr("View event log"));
 
     /* Viewer permissions. */
-    createCheckBox(Qn::GlobalViewArchivePermission,         tr("View archives"));
-    createCheckBox(Qn::GlobalExportPermission,              tr("Export archives"));
+    createCheckBox(Qn::GlobalViewArchivePermission,         tr("View archive"));
+    createCheckBox(Qn::GlobalExportPermission,              tr("Export archive"));
     createCheckBox(Qn::GlobalViewBookmarksPermission,       tr("View bookmarks"));
     createCheckBox(Qn::GlobalManageBookmarksPermission,     tr("Modify bookmarks"));
-    createCheckBox(Qn::GlobalUserInputPermission,           tr("Change camera's PTZ state"));
+    createCheckBox(Qn::GlobalUserInputPermission,           tr("Use PTZ"));
 
     ui->permissionsLayout->addStretch();
 }
