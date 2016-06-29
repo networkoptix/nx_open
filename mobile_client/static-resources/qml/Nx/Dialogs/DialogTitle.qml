@@ -4,7 +4,7 @@ import Nx 1.0
 Text
 {
     width: parent ? parent.width : implicitWidth
-    height: implicitHeight + topPadding + bottomPadding
+    height: contentHeight + topPadding + bottomPadding
     padding: 16
     font.pixelSize: 18
     font.weight: Font.DemiBold

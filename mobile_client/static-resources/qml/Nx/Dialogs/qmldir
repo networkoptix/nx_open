@@ -4,5 +4,6 @@ DialogBase 1.0 DialogBase.qml
 DialogButton 1.0 DialogButton.qml
 DialogTitle 1.0 DialogTitle.qml
 DialogMessage 1.0 DialogMessage.qml
+DialogSeparator 1.0 DialogSeparator.qml
 
 DownloadOldClientDialog 1.0 DownloadOldClientDialog.qml
