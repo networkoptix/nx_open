@@ -191,6 +191,14 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
 
     ui->resourcesTreeView->setMouseTracking(true);
 
+    auto toggleCheckbox = [this](const QModelIndex& index)
+    {
+        QAbstractItemModel* model = static_cast<QnTreeView*>(sender())->model();
+        QModelIndex checkboxIdx = index.sibling(index.row(), QnResourceListModel::CheckColumn);
+        int newCheckValue = checkboxIdx.data(Qt::CheckStateRole).toInt() != Qt::Checked ? Qt::Checked : Qt::Unchecked;
+        model->setData(checkboxIdx, newCheckValue, Qt::CheckStateRole);
+    };
+
     auto batchToggleCheckboxes = [this](const QModelIndex& index)
     {
         QAbstractItemModel* model = static_cast<QnTreeView*>(sender())->model();
@@ -210,8 +218,10 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
             model->setData(index, newCheckValue, Qt::CheckStateRole);
     };
 
-    connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, batchToggleCheckboxes);
-    connect(ui->controlsTreeView,  &QnTreeView::spacePressed, this, batchToggleCheckboxes);
+    connect(ui->resourcesTreeView, &QnTreeView::clicked,        this, toggleCheckbox);
+    connect(ui->controlsTreeView,  &QnTreeView::clicked,        this, toggleCheckbox);
+    connect(ui->resourcesTreeView, &QnTreeView::spacePressed,   this, batchToggleCheckboxes);
+    connect(ui->controlsTreeView,  &QnTreeView::spacePressed,   this, batchToggleCheckboxes);
 
     connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, &QnAccessibleResourcesWidget::updateThumbnail);
     updateThumbnail();

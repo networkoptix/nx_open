@@ -117,8 +117,17 @@ Click «New role» button to create one.</string>
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
         <property name="rootIsDecorated">
          <bool>false</bool>
+        </property>
+        <property name="uniformRowHeights">
+         <bool>true</bool>
         </property>
         <property name="headerHidden">
          <bool>true</bool>
