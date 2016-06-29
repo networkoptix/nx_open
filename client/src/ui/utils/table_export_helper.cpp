@@ -105,18 +105,18 @@ void QnTableExportHelper::getGridData(QAbstractItemView* grid, bool onlySelected
     QString textResult;
     QString htmlResult;
     {
-        QnHtmlTag htmlTag("html", &htmlResult, QnHtmlTag::BothBreaks);
-        QnHtmlTag bodyTag("body", &htmlResult, QnHtmlTag::BothBreaks);
-        QnHtmlTag tableTag("table", &htmlResult, QnHtmlTag::BothBreaks);
+        QnHtmlTag htmlTag("html", htmlResult, QnHtmlTag::BothBreaks);
+        QnHtmlTag bodyTag("body", htmlResult, QnHtmlTag::BothBreaks);
+        QnHtmlTag tableTag("table", htmlResult, QnHtmlTag::BothBreaks);
 
         { /* Creating header. */
-            QnHtmlTag rowGuard("tr", &htmlResult);
+            QnHtmlTag rowGuard("tr", htmlResult);
             for (int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
             {
                 int column = list[i].column();
 
                 QString header = model->headerData(column, Qt::Horizontal).toString();
-                QnHtmlTag thTag("th", &htmlResult, QnHtmlTag::NoBreaks);
+                QnHtmlTag thTag("th", htmlResult, QnHtmlTag::NoBreaks);
                 htmlResult.append(header);
 
                 if (i > 0)
@@ -137,7 +137,7 @@ void QnTableExportHelper::getGridData(QAbstractItemView* grid, bool onlySelected
                     prevRow = list[i].row();
                     textResult.append(lit("\n"));
                     rowTag.reset();   /*< close tag before opening new. */
-                    rowTag.reset(new QnHtmlTag("tr", &htmlResult));
+                    rowTag.reset(new QnHtmlTag("tr", htmlResult));
                 }
                 else
                 {
@@ -151,7 +151,7 @@ void QnTableExportHelper::getGridData(QAbstractItemView* grid, bool onlySelected
                 if (htmlData.isEmpty())
                     htmlData = escapeHtml(textData);
 
-                QnHtmlTag cellTag("td", &htmlResult, QnHtmlTag::NoBreaks);
+                QnHtmlTag cellTag("td", htmlResult, QnHtmlTag::NoBreaks);
                 htmlResult.append(htmlData);
             }
         }

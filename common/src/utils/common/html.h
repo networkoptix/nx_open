@@ -16,12 +16,12 @@ public:
     };
     Q_DECLARE_FLAGS(LineBreaks, LineBreak)
 
-    QnHtmlTag(const QLatin1String& tag, QString* result, LineBreaks lineBreaks = AfterClose);
-    QnHtmlTag(const char* tag, QString* result, LineBreaks lineBreaks = AfterClose);
+    QnHtmlTag(const QLatin1String& tag, QString& result, LineBreaks lineBreaks = AfterClose);
+    QnHtmlTag(const char* tag, QString& result, LineBreaks lineBreaks = AfterClose);
     ~QnHtmlTag();
 private:
     QLatin1String m_tag;
-    QString* m_result;
+    QString& m_result;
     LineBreaks m_lineBreaks;
 };
 
