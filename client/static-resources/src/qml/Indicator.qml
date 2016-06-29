@@ -6,9 +6,9 @@ Rectangle
 {
     id: thisComponent;
 
-    property string text;
-    property font font: Style.fonts.systemTile.indicator;
-    property color textColor: Style.colors.shadow;
+    property alias text: labelText.text;
+    property alias font: labelText.font;
+    property alias textColor: labelText.color;
 
     color: Style.colors.red_main;
 
@@ -24,8 +24,7 @@ Rectangle
         leftPadding: 8;
         rightPadding: leftPadding;
 
-        text: thisComponent.text;
-        font: thisComponent.font;
+        font: Style.fonts.systemTile.indicator;
         color: thisComponent.textColor;
 
         verticalAlignment: Text.AlignVCenter;

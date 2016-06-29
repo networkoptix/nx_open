@@ -104,12 +104,6 @@ public:
     bool canModifyResource  (const QnUserResourcePtr& user, const QnUserResourcePtr& target,        const ec2::ApiUserData& update) const;
     bool canModifyResource  (const QnUserResourcePtr& user, const QnVideoWallResourcePtr& target,   const ec2::ApiVideowallData& update) const;
 
-    /**
-    * \param user                      User resource to get role name for.
-    * \returns                         Name of user's role.
-    */
-    QString userRoleName(const QnUserResourcePtr& user) const;
-
 signals:
     void accessibleResourcesChanged(const QnUuid& userId);
 

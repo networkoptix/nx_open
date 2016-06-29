@@ -82,6 +82,25 @@ public:
      */
     QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr& resource) const;
 
+    /**
+    * \param user                      User resource to get role name for.
+    * \returns                         Name of user's role.
+    */
+    QString userRoleName(const QnUserResourcePtr& user) const;
+
+    /**
+    * \param user                      User resource to get role description for.
+    * \returns                         Description of user's role.
+    */
+    QString userRoleDescription(const QnUserResourcePtr& user) const;
+
+    /**
+    * \param permissions               Permissions to get role description for.
+    * \param groupId                   An uuid of custom user role, if applicable.
+    * \returns                         Description of user's role.
+    */
+    QString userRoleDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId = QnUuid()) const;
+
     bool canCreateStorage(const QnUuid& serverId) const;
     bool canCreateLayout(const QnUuid& layoutParentId) const;
     bool canCreateUser(Qn::GlobalPermissions targetPermissions, bool isOwner) const;

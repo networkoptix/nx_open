@@ -39,11 +39,6 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     connect(ui->enabledButton,          &QPushButton::clicked,          this,   &QnUserSettingsWidget::hasChangesChanged);
     connect(ui->roleComboBox,           QnComboboxCurrentIndexChanged,  this,   &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->roleComboBox,           QnComboboxCurrentIndexChanged,  this,   [this]()
-    {
-        //ui->permissionsLabel->setText(m_model->permissionsDescription(selectedPermissions(), selectedUserGroup()));
-        ui->permissionsLabel->setText(tr("TODO: #GDM #FIXME"));
-    });
 
     connect(m_model, &QnUserSettingsModel::userChanged, this, [this]()
     {
@@ -63,6 +58,11 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     aligner->addWidget(ui->roleLabel);
     layout()->activate();
+}
+
+void QnUserSettingsWidget::updatePermissionsLabel(const QString& text)
+{
+    ui->permissionsLabel->setText(text);
 }
 
 QnUserSettingsWidget::~QnUserSettingsWidget()
@@ -131,7 +131,6 @@ void QnUserSettingsWidget::loadDataToUi()
     ui->passwordInputField->clear();
     ui->confirmPasswordInputField->clear();
     ui->enabledButton->setChecked(m_model->user()->isEnabled());
-    ui->permissionsLabel->setText(m_model->permissionsDescription());
 
     for (auto field : inputFields())
         field->reset();

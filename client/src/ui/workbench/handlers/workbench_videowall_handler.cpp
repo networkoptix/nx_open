@@ -1,7 +1,6 @@
 #include "workbench_videowall_handler.h"
 
 #include <QtCore/QProcess>
-#include <QtCore/QRegExp>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 

@@ -95,32 +95,25 @@ int elideDomNode(QDomNode &node
 } //anonymous namespace
 
 
-QnHtmlTag::QnHtmlTag(const QLatin1String& tag, QString* result, LineBreaks lineBreaks) :
+QnHtmlTag::QnHtmlTag(const QLatin1String& tag, QString& result, LineBreaks lineBreaks) :
     m_tag(tag),
     m_result(result),
     m_lineBreaks(lineBreaks)
 {
-    NX_ASSERT(result);
-    if (!result)
-        return;
-
-    result->append(lit("<%1>").arg(m_tag));
+    result.append(lit("<%1>").arg(m_tag));
     if (m_lineBreaks.testFlag(AfterOpen))
-        result->append(L'\n');
+        result.append(L'\n');
 }
 
-QnHtmlTag::QnHtmlTag(const char* tag, QString* result, LineBreaks lineBreaks) :
+QnHtmlTag::QnHtmlTag(const char* tag, QString& result, LineBreaks lineBreaks) :
     QnHtmlTag(QLatin1String(tag), result, lineBreaks)
 {}
 
 QnHtmlTag::~QnHtmlTag()
 {
-    if (!m_result)
-        return;
-
-    m_result->append(lit("</%1>").arg(m_tag));
+    m_result.append(lit("</%1>").arg(m_tag));
     if (m_lineBreaks.testFlag(AfterClose))
-        m_result->append(L'\n');
+        m_result.append(L'\n');
 }
 
 QString htmlBold(const QString &source)

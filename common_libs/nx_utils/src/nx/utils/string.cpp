@@ -171,7 +171,7 @@ QString generateUniqueString(const QStringList &usedStrings, const QString &defa
     for (const QString &string : usedStrings)
         lowerStrings << string.toLower();
 
-    QRegExp pattern = QRegExp(templateString.arg(lit("?([0-9]+)?")).toLower());
+    QRegExp pattern = QRegExp(templateString.arg(QLatin1String("?([0-9]+)?")).toLower());
 
     /* Prepare new name. */
     int number = 0;
