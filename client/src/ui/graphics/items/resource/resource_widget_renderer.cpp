@@ -264,7 +264,7 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
         return;
 
     m_channelSourceSize[image->channel] = sourceSize;
-    m_sourceSize = calcTotalSourceSize();
+    m_sourceSize = getMostFrequentChannelSourceSize();
 
     emit sourceSizeChanged();
 }
@@ -369,9 +369,9 @@ void QnResourceWidgetRenderer::setHistogramConsumer(QnHistogramConsumer* value)
     }
 }
 
-QSize QnResourceWidgetRenderer::calcTotalSourceSize() const
+QSize QnResourceWidgetRenderer::getMostFrequentChannelSourceSize() const
 {
-    QSize totalSourceSize;
+    QSize sourceSize;
     auto channelCount = m_channelSourceSize.size();
 
     std::map<int, int> widthFrequencyMap;
@@ -379,17 +379,20 @@ QSize QnResourceWidgetRenderer::calcTotalSourceSize() const
 
     for (int channelNum = 0; channelNum < channelCount; channelNum++)
     {
-        widthFrequencyMap[m_channelSourceSize[channelNum].width()]++;
-        heightFrequentMap[m_channelSourceSize[channelNum].height()]++;
+        if (!m_channelSourceSize[channelNum].isEmpty())
+        {
+            widthFrequencyMap[m_channelSourceSize[channelNum].width()]++;
+            heightFrequentMap[m_channelSourceSize[channelNum].height()]++;
+        }
     }
 
-    totalSourceSize.setWidth(
+    sourceSize.setWidth(
         getMostFrequentSize(widthFrequencyMap));
 
-    totalSourceSize.setHeight(
+    sourceSize.setHeight(
         getMostFrequentSize(heightFrequentMap));
 
-    return totalSourceSize;
+    return sourceSize;
 }
 
 int QnResourceWidgetRenderer::getMostFrequentSize(std::map<int, int>& sizeMap) const
@@ -400,5 +403,5 @@ int QnResourceWidgetRenderer::getMostFrequentSize(std::map<int, int>& sizeMap) c
             return l.second < r.second;
         });
 
-    return maxSize->first;
+    return maxSize == sizeMap.end() ? -1 : maxSize->first;
 }

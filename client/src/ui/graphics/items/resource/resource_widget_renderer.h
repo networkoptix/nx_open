@@ -106,7 +106,7 @@ signals:
     void fisheyeCenterChanged(QPointF center, qreal radius);
 
 private:
-    QSize calcTotalSourceSize() const;
+    QSize getMostFrequentChannelSourceSize() const;
     int getMostFrequentSize(std::map<int, int>& sizeMap) const;
     
 private:

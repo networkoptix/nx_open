@@ -153,7 +153,7 @@ bool QnStreamMixer::canAcceptData() const
 void QnStreamMixer::putData(const QnAbstractDataPacketPtr &data)
 {
     auto mediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
-
+    
     if (!mediaData)
         return;
 
@@ -162,8 +162,6 @@ void QnStreamMixer::putData(const QnAbstractDataPacketPtr &data)
 
 bool QnStreamMixer::needConfigureProvider() const 
 {
-    qDebug() << "Stream mixer's needConfigureProvider";
-
     if (!m_user)
         return false;
 
@@ -207,7 +205,7 @@ QnAbstractMediaDataPtr QnStreamMixer::retrieveData()
         if (data)
             break;
     }
-
+    
     return std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     
 }
@@ -231,10 +229,7 @@ bool QnStreamMixer::isStreamOpened() const
         }
 
         if (mediaStreamProvider->isStreamOpened())
-        {
-            qDebug() << "At least one stream is opened";
             return true;
-        }
     }
 
     return false;

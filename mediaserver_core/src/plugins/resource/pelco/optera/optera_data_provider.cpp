@@ -6,6 +6,12 @@
 #include <core/resource_management/resource_data_pool.h>
 
 
+namespace 
+{
+    const int kOpteraReceiveTimout = 30;
+    const int kOpteraSendTimeout = 30;
+}
+
 QnOpteraDataProvider::QnOpteraDataProvider(const QnResourcePtr& res) : 
     CLServerPushStreamReader(res),
     m_onvifRes(res.dynamicCast<QnPlOnvifResource>())
@@ -54,13 +60,8 @@ CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
         auto resource = initSubChannelResource(
             resourceChannelMapping.resourceChannel);
 
-        auto onvifResPtr = m_resource.dynamicCast<QnPlOnvifResource>();
-
-        resource->setOnvifRequestsRecieveTimeout(
-            onvifResPtr->getOnvifRequestsRecieveTimeout());
-
-        resource->setOnvifRequestsSendTimeout(
-            onvifResPtr->getOnvifRequestsSendTimeout());
+        resource->setOnvifRequestsRecieveTimeout(kOpteraReceiveTimout);
+        resource->setOnvifRequestsSendTimeout(kOpteraSendTimeout);
 
         auto reader = new QnOnvifStreamReader(resource);
         reader->setMustNotConfigureResource(providerMustNotConfigureResource);
