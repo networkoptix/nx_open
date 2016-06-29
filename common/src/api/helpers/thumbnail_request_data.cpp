@@ -4,7 +4,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/fusion/model_functions.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnThumbnailRequestData::RoundMethod,
                                           (QnThumbnailRequestData::KeyFrameBeforeMethod,    "before")
@@ -73,7 +73,7 @@ void QnThumbnailRequestData::loadFromParams( const QnRequestParamList& params )
         if (timeValue == kLatestTimeValue)
             msecSinceEpoch = kLatestThumbnail;
         else
-            msecSinceEpoch = parseDateTimeMsec(timeValue);
+            msecSinceEpoch = nx::utils::parseDateTimeMsec(timeValue);
     }
 
     rotation      = QnLexical::deserialized<int>(params.value(rotationKey),                 rotation);

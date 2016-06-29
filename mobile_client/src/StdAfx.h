@@ -1,6 +1,6 @@
 #define QT_NO_CAST_FROM_ASCII
 
-#include <common/config.h>
+#include <nx/utils/compiler_options.h>
 
 #ifdef _WIN32
 #   define FD_SETSIZE 2048
@@ -16,10 +16,6 @@
 /* STL headers. */
 #include <algorithm>
 #include <functional>
-
-/* Boost headers. */
-#include <boost/foreach.hpp>
-#include <boost/array.hpp>
 
 /* QT headers. */
 #include <QtCore/QObject>

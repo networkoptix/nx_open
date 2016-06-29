@@ -2,7 +2,7 @@
 
 #include <core/resource/media_server_resource.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 QnSortedServerUpdatesModel::QnSortedServerUpdatesModel(QObject *parent) :
     QSortFilterProxyModel(parent)
@@ -26,7 +26,7 @@ bool QnSortedServerUpdatesModel::lessThan(const QModelIndex &left, const QModelI
     QString lname = left.data(Qt::DisplayRole).toString();
     QString rname = right.data(Qt::DisplayRole).toString();
 
-    int result = naturalStringCompare(lname, rname, Qt::CaseInsensitive);
+    int result = nx::utils::naturalStringCompare(lname, rname, Qt::CaseInsensitive);
     if(result != 0)
         return result < 0;
 

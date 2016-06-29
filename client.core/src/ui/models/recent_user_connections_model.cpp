@@ -36,17 +36,24 @@ namespace
         QnUserRecentConnectionDataList result;
         while (!list.empty())
         {
-            const auto itStoredPass = std::find_if(list.begin(), list.end(), 
-                [](const QnUserRecentConnectionData &connection)
+            const auto connectionData = *list.begin();
+            const auto userName = connectionData.url.userName();
+            if (userName.isEmpty())
             {
-                return connection.isStoredPassword;
+                list.pop_front();
+                continue;
+            }
+
+            const auto itStoredPass = std::find_if(list.begin(), list.end(),
+                [userName](const QnUserRecentConnectionData &connection)
+            {
+                return (connection.isStoredPassword && (connection.url.userName() == userName));
             });
 
             /// Stores first found connection with password (if found) or just first connection
-            const auto connectionData = *list.begin();
             result.append(itStoredPass == list.end() ? connectionData : *itStoredPass);
-            const auto newEnd = std::remove_if(list.begin(), list.end(), 
-                [userName = connectionData.url.userName()](const QnUserRecentConnectionData &connection) 
+            const auto newEnd = std::remove_if(list.begin(), list.end(),
+                [userName = connectionData.url.userName()](const QnUserRecentConnectionData &connection)
             {
                 return (userName == connection.url.userName());
             });
@@ -105,12 +112,12 @@ void QnRecentUserConnectionsModel::updateData(const QnUserRecentConnectionDataLi
 
     const bool hadConnections = hasConnections();
     const bool firstDataChanged = !m_data.isEmpty() && !newData.isEmpty() && m_data.first() != newData.first();
-    
+
     const auto newCount = filteredData.size();
     for (int newIndex = 0; newIndex != newCount; ++newIndex)
     {
         const auto connectionData = filteredData.at(newIndex);
-        const auto it = std::find_if(m_data.begin(), m_data.end(), 
+        const auto it = std::find_if(m_data.begin(), m_data.end(),
             [connectionData](const QnUserRecentConnectionData &data)
         {
             return (data.url.userName() == connectionData.url.userName());

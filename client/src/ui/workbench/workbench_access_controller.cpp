@@ -20,15 +20,17 @@
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_manager.h"
 
+QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) :
+    QObject(parent)
+{
+}
 
-
-QnWorkbenchAccessController::QnWorkbenchAccessController(QObject *parent):
+QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
     base_type(parent),
-    QnWorkbenchContextAware(parent)
-    , m_user()
-    , m_globalPermissions(Qn::NoGlobalPermissions)
-    , m_readOnlyMode(false)
-
+    QnWorkbenchContextAware(parent),
+    m_user(),
+    m_globalPermissions(Qn::NoGlobalPermissions),
+    m_readOnlyMode(false)
 {
     connect(qnResPool,          &QnResourcePool::resourceAdded,                     this,   &QnWorkbenchAccessController::at_resourcePool_resourceAdded);
     connect(qnResPool,          &QnResourcePool::resourceRemoved,                   this,   &QnWorkbenchAccessController::at_resourcePool_resourceRemoved);
@@ -41,10 +43,11 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject *parent):
     recalculateAllPermissions();
 }
 
-QnWorkbenchAccessController::~QnWorkbenchAccessController() {
+QnWorkbenchAccessController::~QnWorkbenchAccessController()
+{
 }
 
-Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr &resource) const
+Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr& resource) const
 {
     if (!m_dataByResource.contains(resource))
         return calculatePermissions(resource);
@@ -52,15 +55,15 @@ Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr &re
     return m_dataByResource.value(resource).permissions;
 }
 
-Qn::Permissions QnWorkbenchAccessController::combinedPermissions(const QnResourceList &resources) const
+Qn::Permissions QnWorkbenchAccessController::combinedPermissions(const QnResourceList& resources) const
 {
     Qn::Permissions result = Qn::AllPermissions;
-    for (const QnResourcePtr &resource : resources)
+    for (const QnResourcePtr& resource : resources)
         result &= permissions(resource);
     return result;
 }
 
-bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, Qn::Permissions requiredPermissions) const
+bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr& resource, Qn::Permissions requiredPermissions) const
 {
     return (permissions(resource) & requiredPermissions) == requiredPermissions;
 }
@@ -75,15 +78,15 @@ bool QnWorkbenchAccessController::hasGlobalPermission(Qn::GlobalPermission requi
     return m_globalPermissions.testFlag(requiredPermission);
 }
 
-QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnResourcePtr &resource) const
+QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnResourcePtr& resource) const
 {
     NX_ASSERT(m_dataByResource.contains(resource));
 
-    if(!m_dataByResource.contains(resource))
+    if (!m_dataByResource.contains(resource))
         return NULL;
 
-    PermissionsData &data = m_dataByResource[resource];
-    if(!data.notifier)
+    PermissionsData& data = m_dataByResource[resource];
+    if (!data.notifier)
         data.notifier = new QnWorkbenchPermissionsNotifier(const_cast<QnWorkbenchAccessController *>(this));
     return data.notifier;
 }
@@ -123,7 +126,7 @@ bool QnWorkbenchAccessController::canCreateWebPage() const
     return qnResourceAccessManager->canCreateWebPage(m_user);
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResourcePtr &resource) const
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResourcePtr& resource) const
 {
     NX_ASSERT(resource);
 
@@ -147,7 +150,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     return qnResourceAccessManager->permissions(m_user, resource);
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const QnLayoutResourcePtr &layout) const
+Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const QnLayoutResourcePtr& layout) const
 {
     NX_ASSERT(layout);
 
@@ -209,20 +212,20 @@ Qn::GlobalPermissions QnWorkbenchAccessController::calculateGlobalPermissions() 
     return qnResourceAccessManager->globalPermissions(m_user);
 }
 
-void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr &resource) {
+void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr& resource) {
     setPermissionsInternal(resource, calculatePermissions(resource));
 }
 
-void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions) {
-    if(m_dataByResource.contains(resource) &&
+void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr& resource, Qn::Permissions permissions) {
+    if (m_dataByResource.contains(resource) &&
         permissions == this->permissions(resource))
         return;
 
-    PermissionsData &data = m_dataByResource[resource];
+    PermissionsData& data = m_dataByResource[resource];
     data.permissions = permissions;
 
     emit permissionsChanged(resource);
-    if(data.notifier)
+    if (data.notifier)
         emit data.notifier->permissionsChanged(resource);
 }
 
@@ -237,17 +240,17 @@ void QnWorkbenchAccessController::recalculateAllPermissions()
     m_globalPermissions = calculateGlobalPermissions();
     m_readOnlyMode = qnCommon->isReadOnly();
 
-    for(const QnResourcePtr &resource: qnResPool->getResources())
+    for (const QnResourcePtr& resource: qnResPool->getResources())
         updatePermissions(resource);
 }
 
-void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr &resource)
+void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr& resource)
 {
-    connect(resource, &QnResource::parentIdChanged,    this, &QnWorkbenchAccessController::updatePermissions);
+    connect(resource, &QnResource::parentIdChanged,         this, &QnWorkbenchAccessController::updatePermissions);
 
-    if (const QnLayoutResourcePtr &layout = resource.dynamicCast<QnLayoutResource>())
+    if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
     {
-        connect(layout, &QnLayoutResource::lockedChanged,       this, &QnWorkbenchAccessController::updatePermissions);
+        connect(layout, &QnLayoutResource::lockedChanged,   this, &QnWorkbenchAccessController::updatePermissions);
     }
 
     if (const QnUserResourcePtr& user = resource.dynamicCast<QnUserResource>())
@@ -259,7 +262,7 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
     updatePermissions(resource);
 }
 
-void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
+void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
 {
     disconnect(resource, NULL, this, NULL);
 
@@ -271,4 +274,72 @@ void QnWorkbenchAccessController::at_accessibleResourcesChanged(const QnUuid& us
 {
     if (m_user && m_user->getId() == userId)
         recalculateAllPermissions();
+}
+
+QString QnWorkbenchAccessController::userRoleName(const QnUserResourcePtr& user) const
+{
+    if (!user)
+        return QString();
+
+    if (user->isOwner())
+        return tr("Owner");
+
+    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(user);
+    if (permissions.testFlag(Qn::GlobalAdminPermission))
+        return tr("Administrator");
+
+    QnUuid groupId = user->userGroup();
+    for (const ec2::ApiUserGroupData& group : qnResourceAccessManager->userGroups())
+    {
+        if (group.id == groupId)
+            return group.name;
+    }
+
+    if (permissions == Qn::GlobalAdvancedViewerPermissionSet)
+        return tr("Advanced Viewer");
+
+    if (permissions == Qn::GlobalViewerPermissionSet)
+        return tr("Viewer");
+
+    if (permissions == Qn::GlobalLiveViewerPermissionSet)
+        return tr("Live Viewer");
+
+    return tr("Custom");
+}
+
+QString QnWorkbenchAccessController::userRoleDescription(const QnUserResourcePtr& user) const
+{
+    if (!user)
+        return QString();
+
+    if (user->isOwner())
+        return tr("Has access to whole system and can do everything.");
+
+    return userRoleDescription(qnResourceAccessManager->globalPermissions(user), user->userGroup());
+}
+
+QString QnWorkbenchAccessController::userRoleDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId) const
+{
+    if (permissions.testFlag(Qn::GlobalAdminPermission))
+        return tr("Has access to whole system and can manage it. Can create users.");
+
+    if (!groupId.isNull())
+    {
+        for (const ec2::ApiUserGroupData& group : qnResourceAccessManager->userGroups())
+        {
+            if (group.id == groupId)
+                return tr("Custom user role.");
+        }
+    }
+
+    if (permissions == Qn::GlobalAdvancedViewerPermissionSet)
+        return tr("Can manage all cameras and bookmarks.");
+
+    if (permissions == Qn::GlobalViewerPermissionSet)
+        return tr("Can view all cameras and export video.");
+
+    if (permissions == Qn::GlobalLiveViewerPermissionSet)
+        return tr("Can view live video from all cameras.");
+
+    return tr("Custom permissions.");
 }

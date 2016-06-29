@@ -24,6 +24,7 @@ extern "C"
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/abstract_data_consumer.h>
+#include <nx/streaming/config.h>
 #include <plugins/resource/desktop_win/win_audio_device_info.h>
 #include <decoders/audio/ffmpeg_audio_decoder.h>
 #include <utils/common/synctime.h>

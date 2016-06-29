@@ -14,7 +14,7 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/help/help_topics.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/delayed.h>
 
 #include <QtGui/QTextDocument>
@@ -405,10 +405,10 @@ namespace
         };
 
         enum { kFirstPosition = 0 };
-        int position = createLabel(kFirstPosition, elideString(bookmark.name, kMaxHeaderLength)
+        int position = createLabel(kFirstPosition, nx::utils::elideString(bookmark.name, kMaxHeaderLength)
             , colors.text, this, bookmarkItemsLayout, kNameLabelIndex);
 
-        position = createLabel(position, elideString(bookmark.description, kMaxBodyLength)
+        position = createLabel(position, nx::utils::elideString(bookmark.description, kMaxBodyLength)
             , colors.text, this, bookmarkItemsLayout, kDescriptionLabelIndex);
 
 

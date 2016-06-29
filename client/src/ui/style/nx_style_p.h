@@ -48,6 +48,9 @@ public:
             const QRect& rect,
             const QColor& color) const;
 
+    /* Insert horizontal separator line into QInputDialog above its button box. */
+    bool polishInputDialog(QInputDialog* inputDialog) const;
+
 public:
     QnGenericPalette palette;
     QnNoptixStyleAnimator *idleAnimator;

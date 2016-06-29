@@ -135,7 +135,7 @@ namespace
             translation = translationManager->defaultTranslation();
 
         translationManager->installTranslation(translation);
-        return std::move(translationManager);
+        return translationManager;
     }
 
     void initializeStatisticsManager(QnCommonModule *commonModule)
@@ -166,6 +166,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
 QnClientModule::~QnClientModule()
 {
     QnResourceDiscoveryManager::instance()->stop();
+    QnResource::stopAsyncTasks();
 
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
 
@@ -366,7 +367,7 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         logFileNameSuffix = startupParams.videoWallItemGuid.isNull()
             ? startupParams.videoWallGuid.toString()
             : startupParams.videoWallItemGuid.toString();
-        logFileNameSuffix.replace(QRegExp(lit("[{}]")), lit("_"));
+        logFileNameSuffix.replace(QRegExp(QLatin1String("[{}]")), QLatin1String("_"));
     }
 
     static const int DEFAULT_MAX_LOG_FILE_SIZE = 10 * 1024 * 1024;

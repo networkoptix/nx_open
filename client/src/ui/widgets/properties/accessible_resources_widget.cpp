@@ -18,24 +18,57 @@
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/common/string.h>
+#include <utils/common/event_processors.h>
+
+#include <nx/utils/string.h>
 
 
 namespace
 {
-    class QnResourcesListSortModel: public QSortFilterProxyModel
+    class QnResourcesListSortModel : public QSortFilterProxyModel
     {
         typedef QSortFilterProxyModel base_type;
+
     public:
         explicit QnResourcesListSortModel(QObject *parent = 0) :
-            base_type(parent)
+            base_type(parent),
+            m_allChecked(false)
         {
         }
-        virtual ~QnResourcesListSortModel() {}
+
+        virtual ~QnResourcesListSortModel()
+        {
+        }
 
         QnResourcePtr resource(const QModelIndex &index) const
         {
             return index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        }
+
+        QVariant data(const QModelIndex &index, int role) const
+        {
+            if (m_allChecked && role == Qt::CheckStateRole && index.column() == QnResourceListModel::CheckColumn)
+                return QVariant::fromValue<int>(Qt::Checked);
+
+            return base_type::data(index, role);
+        }
+
+        bool allChecked() const
+        {
+            return m_allChecked;
+        }
+
+        void setAllChecked(bool value)
+        {
+            if (m_allChecked == value)
+                return;
+
+            m_allChecked = value;
+
+            emit dataChanged(
+                index(0, QnResourceListModel::CheckColumn),
+                index(rowCount() - 1, QnResourceListModel::CheckColumn),
+                { Qt::CheckStateRole });
         }
 
     protected:
@@ -71,7 +104,7 @@ namespace
                 /* Sort by name. */
                 QString leftDisplay = left.data(Qt::DisplayRole).toString();
                 QString rightDisplay = right.data(Qt::DisplayRole).toString();
-                int result = naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
+                int result = nx::utils::naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
                 if (result != 0)
                     return result < 0;
             }
@@ -80,6 +113,8 @@ namespace
             return l->getUniqueId() < r->getUniqueId();
         }
 
+    private:
+        bool m_allChecked;
     };
 
     const QString kDummyResourceId(lit("dummy_resource"));
@@ -116,6 +151,8 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     viewModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     viewModel->sort(Qn::NameColumn);
 
+    connect(this, &QnAccessibleResourcesWidget::controlsChanged, viewModel, &QnResourcesListSortModel::setAllChecked);
+
     ui->resourcesTreeView->setModel(viewModel);
     ui->controlsTreeView->setModel(m_controlsModel.data());
     ui->controlsTreeView->setVisible(m_controlsVisible);
@@ -126,6 +163,18 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->resourcesTreeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
+
+    auto showHideSignalizer = new QnMultiEventSignalizer(this);
+    showHideSignalizer->addEventType(QEvent::Show);
+    showHideSignalizer->addEventType(QEvent::Hide);
+    scrollBar->installEventFilter(showHideSignalizer);
+    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this, [this](QObject* object, QEvent* event)
+    {
+        Q_UNUSED(object);
+        QMargins margins = ui->resourceListLayout->contentsMargins();
+        margins.setRight(event->type() == QEvent::Show ? 16 : 8);
+        ui->resourceListLayout->setContentsMargins(margins);
+    });
 
     auto itemDelegate = new QnResourceItemDelegate(this);
     itemDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
@@ -197,6 +246,21 @@ void QnAccessibleResourcesWidget::loadDataToUi()
     m_resourcesModel->setCheckedResources(QnResourceAccessFilter::filteredResources(m_filter, m_permissionsModel->accessibleResources()));
 }
 
+bool QnAccessibleResourcesWidget::isAll() const
+{
+    return m_controlsVisible && !m_controlsModel->checkedResources().isEmpty();
+}
+
+std::pair<int, int> QnAccessibleResourcesWidget::selected() const
+{
+    return std::make_pair(m_resourcesModel->checkedResources().size(), m_resourcesModel->rowCount());
+}
+
+QnResourceAccessFilter::Filter QnAccessibleResourcesWidget::filter() const
+{
+    return m_filter;
+}
+
 void QnAccessibleResourcesWidget::applyChanges()
 {
     auto accessibleResources = m_permissionsModel->accessibleResources();
@@ -255,6 +319,7 @@ void QnAccessibleResourcesWidget::initControlsModel()
 
         bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         ui->resourcesTreeView->setEnabled(!checked);
+        emit controlsChanged(checked);
         emit hasChangesChanged();
     };
 
@@ -262,15 +327,15 @@ void QnAccessibleResourcesWidget::initControlsModel()
     connect(m_controlsModel.data(), &QnResourceListModel::modelReset,  this, modelUpdated);
 }
 
-void QnAccessibleResourcesWidget::initResourcesModel()
+bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resource) const
 {
-    m_resourcesModel->setCheckable(true);
-    m_resourcesModel->setStatusIgnored(true);
+    return resourcePassFilter(resource, context()->user(), m_filter);
+}
 
-    auto resourcePassFilter = [this](const QnResourcePtr& resource)
+bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resource, const QnUserResourcePtr& currentUser, QnResourceAccessFilter::Filter filter)
+{
+    switch (filter)
     {
-        switch (m_filter)
-        {
         case QnResourceAccessFilter::CamerasFilter:
             if (resource->hasFlags(Qn::desktop_camera))
                 return false;
@@ -278,7 +343,7 @@ void QnAccessibleResourcesWidget::initResourcesModel()
 
         case QnResourceAccessFilter::LayoutsFilter:
         {
-            if (!context()->user())
+            if (!currentUser)
                 return false;
 
             if (!resource->hasFlags(Qn::layout))
@@ -288,7 +353,7 @@ void QnAccessibleResourcesWidget::initResourcesModel()
             if (!layout)
                 return false;
 
-                /* Hide "Preview Search" layouts */
+            /* Hide "Preview Search" layouts */
             if (layout->data().contains(Qn::LayoutSearchStateRole)) //TODO: #GDM make it consistent with QnWorkbenchLayout::isSearchLayout
                 return false;
 
@@ -299,16 +364,22 @@ void QnAccessibleResourcesWidget::initResourcesModel()
                 return false;
 
             return !layout->hasFlags(Qn::local) &&
-                (layout->isShared() || layout->getParentId() == context()->user()->getId());
+                (layout->isShared() || layout->getParentId() == currentUser->getId());
         }
 
         default:
             break;
-        }
-        return false;
-    };
+    }
 
-    auto handleResourceAdded = [this, resourcePassFilter](const QnResourcePtr& resource)
+    return false;
+};
+
+void QnAccessibleResourcesWidget::initResourcesModel()
+{
+    m_resourcesModel->setCheckable(true);
+    m_resourcesModel->setStatusIgnored(true);
+
+    auto handleResourceAdded = [this](const QnResourcePtr& resource)
     {
         if (!resourcePassFilter(resource))
             return;
@@ -330,14 +401,14 @@ void QnAccessibleResourcesWidget::initResourcesModel()
         }
     });
 
-
     connect(m_resourcesModel.data(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
     {
         if (roles.contains(Qt::CheckStateRole)
             && topLeft.column() <= QnResourceListModel::CheckColumn
-            && bottomRight.column() >= QnResourceListModel::CheckColumn
-            )
+            && bottomRight.column() >= QnResourceListModel::CheckColumn)
+        {
             emit hasChangesChanged();
+        }
     });
 }
 

@@ -3,6 +3,8 @@
 
 #include <nx/utils/thread/mutex.h>
 
+#include <nx/streaming/config.h>
+
 ////////////////////////////////////////////////////////////
 //// QnRegion class
 ////////////////////////////////////////////////////////////
@@ -382,7 +384,7 @@ QString serializeMotionRegion(const QnMotionRegion& region)
                 rectList << QString::number(i) << QString::number(rect.left()) << QString::number(rect.top()) << QString::number(rect.width()) << QString::number(rect.height());
                 regionList << rectList.join(QLatin1String(","));
             }
-        }            
+        }
     }
 
     return regionList.join(QLatin1String(";"));

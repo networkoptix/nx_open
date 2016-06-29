@@ -319,3 +319,45 @@ void QnNxStylePrivate::drawCross(
     painter->drawLine(crossRect.topLeft(), crossRect.bottomRight());
     painter->drawLine(crossRect.topRight(), crossRect.bottomLeft());
 }
+
+/* Insert horizontal separator line into QInputDialog above its button box: */
+bool QnNxStylePrivate::polishInputDialog(QInputDialog* inputDialog) const
+{
+    NX_ASSERT(inputDialog);
+
+    inputDialog->sizeHint(); // to ensure lazy layout is set up
+    QLayout* oldLayout = inputDialog->layout();
+
+    static const QString kTopmostLayoutName = lit("_qn_inputDialogLayout");
+    if (oldLayout->objectName() == kTopmostLayoutName)
+        return false;
+
+    QDialogButtonBox* buttonBox = inputDialog->findChild<QDialogButtonBox*>(QString(), Qt::FindDirectChildrenOnly);
+    if (!buttonBox || buttonBox->isHidden())
+        return false;
+
+    auto container = new QWidget(inputDialog);
+    container->setLayout(oldLayout);
+
+    auto newLayout = new QVBoxLayout(inputDialog);
+    newLayout->setObjectName(kTopmostLayoutName);
+
+    auto line = new QFrame(inputDialog);
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+
+    newLayout->addWidget(container);
+    newLayout->addWidget(line);
+    newLayout->addWidget(buttonBox);
+
+    const int margin = Metrics::kDefaultTopLevelMargin;
+    const QMargins kDefaultMargins(margin, margin, margin, margin);
+    const QMargins kZeroMargins;
+    buttonBox->setContentsMargins(kDefaultMargins);
+    oldLayout->setContentsMargins(kDefaultMargins);
+    newLayout->setContentsMargins(kZeroMargins);
+    newLayout->setSpacing(0);
+    newLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
+
+    return true;
+}

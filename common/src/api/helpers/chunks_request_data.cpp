@@ -8,7 +8,7 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <utils/common/util.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 namespace {
     const QString startTimeKey(lit("startTime"));
@@ -49,10 +49,10 @@ QnChunksRequestData QnChunksRequestData::fromParams(const QnRequestParamList& pa
     QnChunksRequestData request;
 
     if (params.contains(startTimeKey))
-        request.startTimeMs = parseDateTime(params.value(startTimeKey)) / USEC_PER_MS;
+        request.startTimeMs = nx::utils::parseDateTime(params.value(startTimeKey)) / USEC_PER_MS;
 
     if (params.contains(endTimeKey))
-        request.endTimeMs = parseDateTime(params.value(endTimeKey)) / USEC_PER_MS;
+        request.endTimeMs = nx::utils::parseDateTime(params.value(endTimeKey)) / USEC_PER_MS;
 
     if (params.contains(detailKey))
         request.detailLevel = params.value(detailKey).toLongLong();

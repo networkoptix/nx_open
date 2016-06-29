@@ -12,7 +12,7 @@
 #include <nx/utils/random.h>
 
 #include <utils/common/cpp14.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 
 namespace nx {
@@ -418,8 +418,8 @@ QString toString(const ConnectionTestStatistics& data)
 {
     return lm("Connections online: %1, total: %2. Bytes in/out: %3/%4.")
         .arg(data.onlineConnections).arg(data.totalConnections)
-        .arg(bytesToString(data.bytesReceived))
-        .arg(bytesToString(data.bytesSent));
+        .arg(nx::utils::bytesToString(data.bytesReceived))
+        .arg(nx::utils::bytesToString(data.bytesSent));
 }
 
 bool operator==(

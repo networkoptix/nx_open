@@ -1,8 +1,6 @@
 #ifndef _UNIVERSAL_CLIENT_UTIL_H
 #define _UNIVERSAL_CLIENT_UTIL_H
 
-#include <common/config.h>
-
 #include <QtCore/QString>
 
 template <typename T, size_t N>
@@ -11,7 +9,7 @@ char (&ArraySizeHelper(T (&array)[N]))[N];
 
 /**
  * Remove directory recursively.
- * 
+ *
  * \param dirName                       Name of the directory to remove.
  * \returns                             Whether the operation completer successfully.
  */
@@ -19,7 +17,7 @@ bool removeDir(const QString &dirName);
 
 /**
  * Convert path from native to universal.
- * 
+ *
  * \param path                          Path to convert.
  * \returns                             Converted path.
  */
@@ -87,7 +85,7 @@ static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
 /**
  * Returns random integer number between min and max parameters. Thread-safe.
  * Correctness of parameters is responsibility of the callee.
- * 
+ *
  * \returns                             Random number in range [min, max).
  */
 int random(int min, int max);

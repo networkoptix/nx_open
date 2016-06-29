@@ -19,7 +19,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/actions.h>
 
-#include <ui/common/grid_widget_helper.h>
+#include <ui/utils/table_export_helper.h>
 #include <ui/common/item_view_hover_tracker.h>
 #include <ui/delegates/audit_item_delegate.h>
 #include <ui/help/help_topic_accessor.h>
@@ -930,7 +930,7 @@ void QnAuditLogDialog::retranslateUi()
 void QnAuditLogDialog::at_exportAction_triggered()
 {
     if (currentGridView())
-        QnGridWidgetHelper::exportToFile(currentGridView(), this, tr("Export selected records to a file"));
+        QnTableExportHelper::exportToFile(currentGridView(), true, this, tr("Export selected records to a file"));
 }
 
 void QnAuditLogDialog::at_selectAllAction_triggered()
@@ -942,7 +942,7 @@ void QnAuditLogDialog::at_selectAllAction_triggered()
 void QnAuditLogDialog::at_clipboardAction_triggered()
 {
     if (currentGridView())
-        QnGridWidgetHelper::copyToClipboard(currentGridView());
+        QnTableExportHelper::copyToClipboard(currentGridView());
 }
 
 void QnAuditLogDialog::disableUpdateData()

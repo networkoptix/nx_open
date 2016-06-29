@@ -9,7 +9,7 @@
 namespace {
 
     const int dataVersion = 0;
-    const QString key = QnAppInfo::customizationName() + lit("/QnScreenManager/") + QString::number(dataVersion);
+    const QString key = QnAppInfo::customizationName() + QLatin1String("/QnScreenManager/") + QString::number(dataVersion);
     const int maxClients = 64;
     const int checkDeadsInterval = 60 * 1000;
     const int refreshDelay = 1000;

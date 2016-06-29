@@ -62,6 +62,8 @@ private:
     QnLicenseList selectedLicenses() const;
     bool canRemoveLicense(const QnLicensePtr &license) const;
 
+    void exportLicenses();
+
 private:
     Q_DISABLE_COPY(QnLicenseManagerWidget)
 

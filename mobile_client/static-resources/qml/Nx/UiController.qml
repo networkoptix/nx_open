@@ -7,6 +7,13 @@ Object
     {
         target: uiController
 
+        onDisconnectRequested:
+        {
+            clearLastUsedConnection()
+            sideNavigation.close()
+            connectionManager.disconnectFromServer(false)
+            Workflow.openSessionsScreen()
+        }
         onResourcesScreenRequested: Workflow.openResourcesScreen(connectionManager.systemName)
         onVideoScreenRequested: Workflow.openVideoScreen(resourceId)
     }

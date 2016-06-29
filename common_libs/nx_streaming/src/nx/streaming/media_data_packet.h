@@ -10,11 +10,11 @@
 
 #include <utils/common/byte_array.h>
 #include <utils/media/sse_helper.h>
-#include <utils/common/aligned_allocator.h>
 #include <utils/memory/abstract_allocator.h>
 #include <utils/memory/system_allocator.h>
 #include <utils/math/math.h>
 
+#include "aligned_allocator.h"
 #include "abstract_data_packet.h"
 
 #include "media_context.h"

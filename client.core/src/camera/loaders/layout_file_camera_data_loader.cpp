@@ -13,6 +13,8 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
 
+#include <nx/streaming/config.h>
+
 namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
 }
@@ -89,7 +91,7 @@ int QnLayoutFileCameraDataLoader::load(const QString &filter, const qint64 resol
     case Qn::MotionContent:
         {
             QList<QRegion> motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
-            for (const QRegion &region: motionRegions) 
+            for (const QRegion &region: motionRegions)
             {
                 if (!region.isEmpty())
                     return loadMotion(motionRegions);

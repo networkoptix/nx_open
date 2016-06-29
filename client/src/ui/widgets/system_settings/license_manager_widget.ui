@@ -34,7 +34,7 @@
      <property name="flat">
       <bool>true</bool>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
+     <layout class="QGridLayout" name="gridLayout" columnstretch="1,0,0">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -47,7 +47,7 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
+      <item row="0" column="0" colspan="3">
        <widget class="QTreeView" name="gridLicenses">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -69,22 +69,46 @@
         </property>
        </widget>
       </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0">
+      <item row="1" column="2">
+       <widget class="QPushButton" name="removeButton">
+        <property name="text">
+         <string>Remove</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" rowspan="2">
+       <widget class="QLabel" name="infoLabel">
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="detailsButton">
+        <property name="text">
+         <string>Selected License Details</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLabel" name="infoLabel"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="removeButton">
-          <property name="text">
-           <string>Remove</string>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-         </widget>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="detailsButton">
+         <widget class="QPushButton" name="exportLicensesButton">
           <property name="text">
-           <string>Selected License Details</string>
+           <string>Export Licenses...</string>
           </property>
          </widget>
         </item>

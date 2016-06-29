@@ -17,7 +17,7 @@
 #include <client/client_settings.h>
 
 #include <utils/common/event_processors.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/resource_property_adaptors.h>
 #include <utils/local_file_cache.h>
@@ -171,10 +171,10 @@ void QnPtzManageDialog::loadData(const QnPtzData &data) {
     QnPtzPresetList presets = data.presets;
     QnPtzTourList tours = data.tours;
     std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
-        return naturalStringLess(l.name, r.name);
+        return nx::utils::naturalStringLess(l.name, r.name);
     });
     std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
-        return naturalStringLess(l.name, r.name);
+        return nx::utils::naturalStringLess(l.name, r.name);
     });
 
     m_model->setTours(tours);
@@ -312,7 +312,7 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
         QnPtzPresetList presets;
         if (controller()->getPresets(&presets)) {
             std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
-                return naturalStringLess(l.name, r.name);
+                return nx::utils::naturalStringLess(l.name, r.name);
             });
             m_model->setPresets(presets);
         }
@@ -322,7 +322,7 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
         QnPtzTourList tours;
         if (controller()->getTours(&tours)) {
             std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
-                return naturalStringLess(l.name, r.name);
+                return nx::utils::naturalStringLess(l.name, r.name);
             });
             m_model->setTours(tours);
         }

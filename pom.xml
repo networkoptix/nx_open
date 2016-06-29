@@ -849,6 +849,7 @@
             <modules>
                 <!--<module>plugins/rpi_cam</module>-->
                 <module>edge_firmware/rpi</module>
+                <module>common_libs/nx_speach_synthesizer</module>
             </modules>
         </profile>
 
@@ -885,6 +886,7 @@
                 <module>client.core</module>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
+                <module>common_libs/nx_speach_synthesizer</module>
                 <module>mobile_client</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
@@ -917,6 +919,7 @@
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
                 <module>edge_firmware/rpi</module>
+                <module>common_libs/nx_speach_synthesizer</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
@@ -951,6 +954,7 @@
                 <module>client</module>
                 <module>client.bin</module>
                 <module>common_libs/nx_audio</module>
+                <module>common_libs/nx_speach_synthesizer</module>
             </modules>
         </profile>
         <profile>

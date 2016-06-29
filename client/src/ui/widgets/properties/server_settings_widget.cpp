@@ -36,7 +36,7 @@
 
 #include <nx/utils/uuid.h>
 #include <utils/common/counter.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/variant.h>
 #include <utils/common/event_processors.h>
 #include <utils/math/interpolator.h>

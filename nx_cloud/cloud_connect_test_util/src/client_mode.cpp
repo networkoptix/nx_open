@@ -5,7 +5,7 @@
 #include <nx/network/test_support/socket_test_helper.h>
 
 #include <utils/common/command_line_parser.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 static const auto kDefaultTotalConnections = 100;
 static const int kDefaultMaxConcurrentConnections = 1;
@@ -24,7 +24,7 @@ void printConnectOptions(std::ostream* const outStream)
         "  --total-connections={"<< kDefaultTotalConnections <<"}\n"
         "                       Number of connections to try\n"
         "  --max-concurrent-connections={"<< kDefaultMaxConcurrentConnections <<"}\n"
-        "  --bytes-to-receive={"<< bytesToString(kDefaultBytesToReceive).toStdString() <<"}\n"
+        "  --bytes-to-receive={" << nx::utils::bytesToString(kDefaultBytesToReceive).toStdString() << "}\n"
         "                       Bytes to receive before closing connection\n"
         "  --bytes-to-send={N}  Bytes to send before closing connection\n"
         "  --udt                Force using udt socket. Disables cloud connect\n"
@@ -51,7 +51,7 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
     nx::network::test::TestTrafficLimitType
         trafficLimitType = nx::network::test::TestTrafficLimitType::incoming;
 
-    QString trafficLimit = bytesToString(kDefaultBytesToReceive);
+    QString trafficLimit = nx::utils::bytesToString(kDefaultBytesToReceive);
     args.read("bytes-to-receive", &trafficLimit);
 
     if (args.read("bytes-to-send", &trafficLimit))
@@ -109,7 +109,7 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
         return 1;
     }
 
-    uint64_t trafficLimitBytes = stringToBytes(trafficLimit);
+    uint64_t trafficLimitBytes = nx::utils::stringToBytes(trafficLimit);
     trafficLimitBytes = trafficLimitBytes ? trafficLimitBytes : kDefaultBytesToReceive;
 
     QStringList targetStrings;
@@ -120,7 +120,7 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
     std::cout
         << lm("Target(s): %1\n").arg(targetStrings.join(lit(", "))).toStdString()
         << lm("Limit(type=%1): %2").arg(static_cast<int>(trafficLimitType))
-           .arg(bytesToString(trafficLimitBytes))
+           .arg(nx::utils::bytesToString(trafficLimitBytes))
            .toStdString()
         << std::endl;
 
@@ -162,9 +162,9 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
         "  total connections: " <<
             connectionsGenerator.totalConnectionsEstablished() << "\n"
         "  total bytes sent: " <<
-            bytesToString(connectionsGenerator.totalBytesSent()).toStdString() << "\n"
+            nx::utils::bytesToString(connectionsGenerator.totalBytesSent()).toStdString() << "\n"
         "  total bytes received: " <<
-            bytesToString(connectionsGenerator.totalBytesReceived()).toStdString() << "\n"
+            nx::utils::bytesToString(connectionsGenerator.totalBytesReceived()).toStdString() << "\n"
         "  total incomplete tasks: " <<
             connectionsGenerator.totalIncompleteTasks() << "\n"
         "  return codes: " << returnCodes.join(QLatin1Literal("; ")).toStdString() << "\n" <<

@@ -13,7 +13,7 @@
 #include <ui/models/camera_list_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/actions/action_manager.h>
-#include <ui/common/grid_widget_helper.h>
+#include <ui/utils/table_export_helper.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -179,13 +179,13 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
 }
 
 void QnCameraListDialog::at_exportAction_triggered() {
-    QnGridWidgetHelper::exportToFile(ui->camerasView, this, QnDeviceDependentStrings::getDefaultNameFromSet(
+    QnTableExportHelper::exportToFile(ui->camerasView, true, this, QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Export selected devices to a file."),
         tr("Export selected cameras to a file.")
         ));
 }
 
 void QnCameraListDialog::at_clipboardAction_triggered() {
-    QnGridWidgetHelper::copyToClipboard(ui->camerasView);
+    QnTableExportHelper::copyToClipboard(ui->camerasView);
 }
 

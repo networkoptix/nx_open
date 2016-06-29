@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 #include "functional_tests/mediator_functional_test.h"
 
@@ -29,7 +29,7 @@ TEST_F(Statistics, listening_peer_list)
         client = clientConnection();
 
     const auto system1 = addRandomSystem();
-    auto server1 = addServer(system1, generateRandomName(16));
+    auto server1 = addServer(system1, nx::utils::generateRandomName(16));
 
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
     data::ListeningPeersBySystem listeningPeers;

@@ -8,7 +8,7 @@
 #include <common/common_module.h>
 #include <network/router.h>
 #include <nx/network/http/httpclient.h>
-
+#include <nx/streaming/config.h>
 
 namespace
 {

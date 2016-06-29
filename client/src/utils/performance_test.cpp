@@ -31,7 +31,7 @@ void QnPerformanceTest::detectLightMode() {
 
 #ifdef Q_OS_LINUX
     QString cpuName = QnPerformance::cpuName();
-    QRegExp poorCpuRegExp(lit("Intel\\(R\\) (Atom\\(TM\\)|Celeron\\(R\\)) CPU .*"));
+    QRegExp poorCpuRegExp(QLatin1String("Intel\\(R\\) (Atom\\(TM\\)|Celeron\\(R\\)) CPU .*"));
     poorCpu = poorCpuRegExp.exactMatch(cpuName);
     NX_LOG(lit("QnPerformanceTest: CPU: \"%1\" poor: %2").arg(cpuName).arg(poorCpu), cl_logINFO);
 
@@ -43,7 +43,7 @@ void QnPerformanceTest::detectLightMode() {
                 glXMakeCurrent(display, DefaultRootWindow(display), context);
 
                 QString renderer = QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
-                QRegExp poorRendererRegExp(lit("Gallium .* on llvmpipe .*|Mesa DRI Intel\\(R\\) Bay Trail.*"));
+                QRegExp poorRendererRegExp(QLatin1String("Gallium .* on llvmpipe .*|Mesa DRI Intel\\(R\\) Bay Trail.*"));
                 poorGpu = poorRendererRegExp.exactMatch(renderer);
                 NX_LOG(lit("QnPerformanceTest: Renderer: \"%1\" poor: %2").arg(renderer).arg(poorGpu), cl_logINFO);
 
