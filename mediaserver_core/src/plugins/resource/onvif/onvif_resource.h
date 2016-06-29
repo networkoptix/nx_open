@@ -488,6 +488,8 @@ private:
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
     QString m_portNamePrefixToIgnore;
+    size_t m_inputPortCount;
+    std::vector<QString> m_portAliases;
 
     void removePullPointSubscription();
     void pullMessages( quint64 timerID );

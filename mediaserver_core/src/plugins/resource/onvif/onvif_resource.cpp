@@ -246,7 +246,8 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_renewSubscriptionTimerID(0),
     m_maxChannels(1),
     m_streamConfCounter(0),
-    m_prevPullMessageResponseClock(0)
+    m_prevPullMessageResponseClock(0),
+    m_inputPortCount(0)
 {
     m_monotonicClock.start();
     m_advSettingsLastUpdated.restart();
@@ -598,6 +599,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
             ->Device
             ->IO
             ->InputConnectors;
+
+        m_inputPortCount = portsCount;
 
         if (portsCount <= MAX_IO_PORTS_PER_DEVICE)
         {
@@ -1030,10 +1033,24 @@ void QnPlOnvifResource::notificationReceived(
     bool& currentPortState = m_relayInputStates[portSourceIter->value];
     if( currentPortState != newPortState )
     {
+        QString portId = portSourceIter->value;
+        size_t aliasesCount = m_portAliases.size();
+        if (aliasesCount && aliasesCount == m_inputPortCount)
+        {
+            for (size_t i = 0; i < aliasesCount; i++)
+            {
+                if (m_portAliases[i] == portSourceIter->value)
+                {
+                    portId = lit("%1").arg(i);
+                    break;
+                }
+            }
+        }
+
         currentPortState = newPortState;
         emit cameraInput(
             toSharedPointer(),
-            portSourceIter->value,
+            portId,
             newPortState,
             qnSyncTime->currentUSecsSinceEpoch() );   //it is not absolutely correct, but better than de-synchronized timestamp from camera
     }
@@ -1421,7 +1438,6 @@ bool QnPlOnvifResource::fetchRelayInputInfo( const CapabilitiesResp& capabilitie
     {
         //camera has input port
         setCameraCapability( Qn::RelayInputCapability, true );
-        return true;
     }
 
     const QAuthenticator& auth = getAuth();
@@ -1436,9 +1452,14 @@ bool QnPlOnvifResource::fetchRelayInputInfo( const CapabilitiesResp& capabilitie
     const int soapCallResult = soapWrapper.getDigitalInputs( request, response );
     if( soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND )
     {
-        NX_LOG( lit("Failed to get relay digital input list. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
+        NX_LOG( lit("Failed to get relay digital input list. endpoint %1")
+            .arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
         return true;
     }
+
+    m_portAliases.clear();
+    for ( const auto& input: response.DigitalInputs)
+        m_portAliases.push_back(QString::fromStdString(input->token));
 
     return true;
 }
