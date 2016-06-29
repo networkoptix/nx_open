@@ -810,9 +810,8 @@ namespace nx_http
         m_url.setUserName(m_userName);
         m_url.setPassword(m_userPassword);
 
-        // X-Nx-User-Name was originally added to help server to port data from 2.1 to 2.3 and from
-        // 2.3 to 2.4 (generate user's digest). Also used to supply user name when authorizing with
-        // authKey.
+        //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
+        //TODO #ak remove it after 2.3 support is over
         if (!m_userName.isEmpty())
         {
             nx_http::insertOrReplaceHeader(

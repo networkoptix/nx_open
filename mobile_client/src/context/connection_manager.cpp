@@ -18,9 +18,6 @@
 #include <mobile_client/mobile_client_settings.h>
 #include <watchers/user_watcher.h>
 
-#define OUTPUT_PREFIX "mobile_client[connection_manager]: "
-#include <nx/utils/debug_utils.h>
-
 namespace {
 
     const QnSoftwareVersion minimalSupportedVersion(2, 5, 0, 0);
@@ -166,11 +163,6 @@ QnSoftwareVersion QnConnectionManager::connectionVersion() const
 void QnConnectionManager::connectToServer(const QUrl &url)
 {
     Q_D(QnConnectionManager);
-
-    if (!url.isValid())
-        PRINT << "ERROR: connectToServer() cancelled because url is not valid: " << url.toString();
-    else
-        PRINT << "QnConnectionManager::connectToServer(url: " << url.toString() << ")";
 
     if (connectionState() != QnConnectionManager::Disconnected)
         disconnectFromServer(false);
