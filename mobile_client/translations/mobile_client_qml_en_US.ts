@@ -10,8 +10,8 @@
     <message numerus="yes">
         <source>%n cameras are hidden</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n camera is hidden</numerusform>
+            <numerusform>%n cameras are hidden</numerusform>
         </translation>
     </message>
 </context>

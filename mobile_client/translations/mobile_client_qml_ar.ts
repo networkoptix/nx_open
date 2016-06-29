@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="en">
+<TS version="2.1" language="ar" sourcelanguage="en">
 <context>
     <name>QnCameraFlow</name>
     <message>
@@ -10,8 +10,12 @@
     <message numerus="yes">
         <source>%n cameras are hidden</source>
         <translation type="unfinished">
-            <numerusform>%n camera is hidden</numerusform>
-            <numerusform>%n cameras are hidden</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -35,17 +39,17 @@ required</source>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished">Auto</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnDiscoveredSessionItem</name>
     <message>
-        <source>incompatible server version</source>
+        <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown</source>
+        <source>incompatible server version</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -158,7 +162,7 @@ required</source>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished">Auto</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

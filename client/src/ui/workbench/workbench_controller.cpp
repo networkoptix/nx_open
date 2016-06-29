@@ -592,6 +592,11 @@ void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos, const W
     menu->exec(pos);
 }
 
+void QnWorkbenchController::updateDraggedItems()
+{
+    display()->setDraggedItems(m_draggedWorkbenchItems.toSet());
+}
+
 // -------------------------------------------------------------------------- //
 // Screen recording
 // -------------------------------------------------------------------------- //
@@ -914,20 +919,23 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     }
 }
 
-void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
+void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphicsItem *> &items)
+{
     TRACE("MOVE STARTED");
 
     /* Build item lists. */
-    foreach (QGraphicsItem *item, items) {
+    for (QGraphicsItem *item: items)
+    {
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-        if(widget == NULL)
+        if (!widget)
             continue;
 
         m_draggedWorkbenchItems.push_back(widget->item());
-
         opacityAnimator(widget)->animateTo(widgetManipulationOpacity);
+        updateDraggedItems();
     }
-    if(m_draggedWorkbenchItems.empty())
+
+    if (m_draggedWorkbenchItems.empty())
         return;
 
     m_selectionOverlayHackInstrumentDisabled2 = true;
@@ -941,84 +949,90 @@ void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphic
     opacityAnimator(display()->gridItem())->animateTo(1.0);
 }
 
-void QnWorkbenchController::at_move(QGraphicsView *, const QPointF &totalDelta) {
-    if(m_draggedWorkbenchItems.empty())
+void QnWorkbenchController::at_move(QGraphicsView*, const QPointF& totalDelta)
+{
+    if (m_draggedWorkbenchItems.empty())
         return;
 
-    QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
+    QnWorkbenchLayout* layout = m_draggedWorkbenchItems[0]->layout();
 
     QPoint newDragDelta = mapper()->mapDeltaToGridF(totalDelta).toPoint();
-    //TODO: #GDM revert if
-    if(newDragDelta != m_dragDelta) {
-        display()->gridItem()->setCellState(m_dragGeometries, QnGridItem::Initial);
+    if (newDragDelta == m_dragDelta)
+        return;
 
-        m_dragDelta = newDragDelta;
-        m_replacedWorkbenchItems.clear();
-        m_dragGeometries.clear();
+    display()->gridItem()->setCellState(m_dragGeometries, QnGridItem::Initial);
 
-        /* Handle single widget case. */
-        bool finished = false;
-        if(m_draggedWorkbenchItems.size() == 1) {
-            QnWorkbenchItem *draggedWorkbenchItem = m_draggedWorkbenchItems[0];
+    m_dragDelta = newDragDelta;
+    m_replacedWorkbenchItems.clear();
+    m_dragGeometries.clear();
 
-            /* Find item that dragged item was dropped on. */
-            QSet<QnWorkbenchItem *> replacedWorkbenchItems = layout->items(draggedWorkbenchItem->geometry().adjusted(m_dragDelta.x(), m_dragDelta.y(), m_dragDelta.x(), m_dragDelta.y()));
-            if(replacedWorkbenchItems.size() == 1) {
-                QnWorkbenchItem *replacedWorkbenchItem = *replacedWorkbenchItems.begin();
+    /* Handle single widget case. */
+    bool finished = false;
+    if (m_draggedWorkbenchItems.size() == 1 && m_draggedWorkbenchItems[0])
+    {
+        QnWorkbenchItem* draggedWorkbenchItem = m_draggedWorkbenchItems[0];
 
-                /* Switch places if dropping smaller one on a bigger one. */
-                if(replacedWorkbenchItem != NULL && replacedWorkbenchItem != draggedWorkbenchItem && draggedWorkbenchItem->isPinned()) {
-                    QSizeF draggedSize = draggedWorkbenchItem->geometry().size();
-                    QSizeF replacedSize = replacedWorkbenchItem->geometry().size();
-                    if(replacedSize.width() > draggedSize.width() && replacedSize.height() > draggedSize.height()) {
-                        QnResourceWidget *draggedWidget = display()->widget(draggedWorkbenchItem);
-                        QnResourceWidget *replacedWidget = display()->widget(replacedWorkbenchItem);
+        /* Find item that dragged item was dropped on. */
+        QSet<QnWorkbenchItem *> replacedWorkbenchItems = layout->items(draggedWorkbenchItem->geometry().adjusted(m_dragDelta.x(), m_dragDelta.y(), m_dragDelta.x(), m_dragDelta.y()));
+        if (replacedWorkbenchItems.size() == 1)
+        {
+            QnWorkbenchItem* replacedWorkbenchItem = *replacedWorkbenchItems.begin();
 
-                        m_replacedWorkbenchItems.push_back(replacedWorkbenchItem);
+            /* Switch places if dropping smaller one on a bigger one. */
+            if (replacedWorkbenchItem && replacedWorkbenchItem != draggedWorkbenchItem && draggedWorkbenchItem->isPinned())
+            {
+                QSizeF draggedSize = draggedWorkbenchItem->geometry().size();
+                QSizeF replacedSize = replacedWorkbenchItem->geometry().size();
+                if (replacedSize.width() > draggedSize.width() && replacedSize.height() > draggedSize.height())
+                {
+                    QnResourceWidget *draggedWidget = display()->widget(draggedWorkbenchItem);
+                    QnResourceWidget *replacedWidget = display()->widget(replacedWorkbenchItem);
 
-                        if(draggedWidget->hasAspectRatio()) {
-                            m_dragGeometries.push_back(bestDoubleBoundedGeometry(mapper(), replacedWorkbenchItem->geometry(), draggedWidget->aspectRatio()));
-                        } else {
-                            m_dragGeometries.push_back(replacedWorkbenchItem->geometry());
-                        }
+                    m_replacedWorkbenchItems.push_back(replacedWorkbenchItem);
 
-                        if(replacedWidget->hasAspectRatio()) {
-                            m_dragGeometries.push_back(bestDoubleBoundedGeometry(mapper(), draggedWorkbenchItem->geometry(), replacedWidget->aspectRatio()));
-                        } else {
-                            m_dragGeometries.push_back(draggedWorkbenchItem->geometry());
-                        }
+                    if (draggedWidget->hasAspectRatio())
+                        m_dragGeometries.push_back(bestDoubleBoundedGeometry(mapper(), replacedWorkbenchItem->geometry(), draggedWidget->aspectRatio()));
+                    else
+                        m_dragGeometries.push_back(replacedWorkbenchItem->geometry());
 
-                        finished = true;
-                    }
+                    if (replacedWidget->hasAspectRatio())
+                        m_dragGeometries.push_back(bestDoubleBoundedGeometry(mapper(), draggedWorkbenchItem->geometry(), replacedWidget->aspectRatio()));
+                    else
+                        m_dragGeometries.push_back(draggedWorkbenchItem->geometry());
+
+                    finished = true;
                 }
             }
         }
+    }
 
-        /* Handle all other cases. */
-        if(!finished) {
-            QList<QRect> replacedGeometries;
-            foreach (QnWorkbenchItem *workbenchItem, m_draggedWorkbenchItems) {
-                QRect geometry = workbenchItem->geometry().adjusted(m_dragDelta.x(), m_dragDelta.y(), m_dragDelta.x(), m_dragDelta.y());
-                m_dragGeometries.push_back(geometry);
-                if(workbenchItem->isPinned())
-                    replacedGeometries.push_back(geometry);
-            }
-
-            m_replacedWorkbenchItems = layout->items(replacedGeometries).subtract(m_draggedWorkbenchItems.toSet()).toList();
-
-            replacedGeometries.clear();
-            foreach (QnWorkbenchItem *workbenchItem, m_replacedWorkbenchItems)
-                replacedGeometries.push_back(workbenchItem->geometry().adjusted(-m_dragDelta.x(), -m_dragDelta.y(), -m_dragDelta.x(), -m_dragDelta.y()));
-
-            m_dragGeometries.append(replacedGeometries);
+    /* Handle all other cases. */
+    if (!finished)
+    {
+        QList<QRect> replacedGeometries;
+        for (QnWorkbenchItem* workbenchItem: m_draggedWorkbenchItems)
+        {
+            QRect geometry = workbenchItem->geometry().adjusted(m_dragDelta.x(), m_dragDelta.y(), m_dragDelta.x(), m_dragDelta.y());
+            m_dragGeometries.push_back(geometry);
+            if (workbenchItem->isPinned())
+                replacedGeometries.push_back(geometry);
         }
 
-        QnWorkbenchLayout::Disposition disposition;
-        layout->canMoveItems(m_draggedWorkbenchItems + m_replacedWorkbenchItems, m_dragGeometries, &disposition);
+        m_replacedWorkbenchItems = layout->items(replacedGeometries).subtract(m_draggedWorkbenchItems.toSet()).toList();
 
-        display()->gridItem()->setCellState(disposition.free, QnGridItem::Allowed);
-        display()->gridItem()->setCellState(disposition.occupied, QnGridItem::Disallowed);
+        replacedGeometries.clear();
+        for (QnWorkbenchItem* workbenchItem: m_replacedWorkbenchItems)
+            replacedGeometries.push_back(workbenchItem->geometry().adjusted(-m_dragDelta.x(), -m_dragDelta.y(), -m_dragDelta.x(), -m_dragDelta.y()));
+
+        m_dragGeometries.append(replacedGeometries);
     }
+
+    QnWorkbenchLayout::Disposition disposition;
+    layout->canMoveItems(m_draggedWorkbenchItems + m_replacedWorkbenchItems, m_dragGeometries, &disposition); /*< Just calculating disposition. */
+
+    display()->gridItem()->setCellState(disposition.free, QnGridItem::Allowed);
+    display()->gridItem()->setCellState(disposition.occupied, QnGridItem::Disallowed);
+
 }
 
 void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphicsItem *> &) {
@@ -1031,10 +1045,11 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
         QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
 
         /* Do drag. */
-        QList<QnWorkbenchItem *> workbenchItems = m_draggedWorkbenchItems + m_replacedWorkbenchItems;
+        QList<QnWorkbenchItem*> workbenchItems = m_draggedWorkbenchItems + m_replacedWorkbenchItems;
         bool success = layout->moveItems(workbenchItems, m_dragGeometries);
 
-        foreach(QnWorkbenchItem *item, workbenchItems) {
+        for (QnWorkbenchItem *item: workbenchItems)
+        {
             QnResourceWidget *widget = display()->widget(item);
 
             /* Adjust geometry deltas if everything went fine. */
@@ -1046,7 +1061,7 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
         }
 
         /* Re-sync everything. */
-        foreach(QnWorkbenchItem *workbenchItem, workbenchItems)
+        for (QnWorkbenchItem* workbenchItem: workbenchItems)
             display()->synchronize(workbenchItem);
 
         /* Un-raise the raised item if it was among the dragged ones. */
@@ -1061,6 +1076,7 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
     m_draggedWorkbenchItems.clear();
     m_replacedWorkbenchItems.clear();
     m_dragGeometries.clear();
+    updateDraggedItems();
 
     if(m_selectionOverlayHackInstrumentDisabled2) {
         display()->selectionOverlayHackInstrument()->recursiveEnable();
@@ -1334,17 +1350,20 @@ void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
     connect(widget, SIGNAL(rotationStopRequested()),    this,   SLOT(at_widget_rotationStopRequested()));
 }
 
-void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
+void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget)
+{
     if(widget == m_resizedWidget)
         m_resizedWidget = NULL;
 
     QnWorkbenchItem *item = widget->item();
-    if(m_draggedWorkbenchItems.contains(item)) {
+    if (m_draggedWorkbenchItems.contains(item))
+    {
         m_draggedWorkbenchItems.removeOne(item);
-        if(m_draggedWorkbenchItems.empty())
+        updateDraggedItems();
+        if (m_draggedWorkbenchItems.empty())
             m_moveInstrument->resetLater();
     }
-    if(m_replacedWorkbenchItems.contains(item))
+    if (m_replacedWorkbenchItems.contains(item))
         m_replacedWorkbenchItems.removeOne(item);
 
     widget->removeEventFilter(this);
