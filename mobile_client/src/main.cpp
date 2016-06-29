@@ -28,6 +28,7 @@
 #include <ui/texture_size_helper.h>
 #include <camera/camera_thumbnail_cache.h>
 #include <ui/helpers/font_loader.h>
+#include <ui/videowall_handler.h>
 
 #include <nx/media/decoder_registrar.h>
 #include <resource_allocator.h>
@@ -50,6 +51,8 @@ int runUi(QGuiApplication *application) {
     QGuiApplication::setFont(font);
 
     QnContext context;
+
+    qnCommon->instance<QnVideowallHandler>()->setUiController(context.uiController());
 
     QStringList selectors;
 
@@ -137,7 +140,7 @@ int runUi(QGuiApplication *application) {
     return application->exec();
 }
 
-int runApplication(QGuiApplication *application) {
+int runApplication(QGuiApplication *application, const QnUuid& videowallInstanceGuid) {
     // these functions should be called in every thread that wants to use rand() and qrand()
     srand(time(NULL));
     qsrand(time(NULL));
@@ -152,6 +155,8 @@ int runApplication(QGuiApplication *application) {
     runtimeData.peer.peerType = Qn::PT_MobileClient; // TODO: #dklychkov check connection type
     runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = QnAppInfo::productNameShort();
+    if (!videowallInstanceGuid.isNull())
+        runtimeData.videoWallInstanceGuid = videowallInstanceGuid;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
 
     int result = runUi(application);
@@ -177,19 +182,30 @@ void initLog()
     }
 }
 
-void parseCommandLine(const QCoreApplication& application)
+void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallInstanceGuid)
 {
     QCommandLineParser parser;
 
     const auto basePathOption = QCommandLineOption(
-                                lit("base-path"),
-                                lit("The directory which contains runtime ui resources: 'qml' and 'images'."),
-                                lit("basePath"));
+        lit("base-path"),
+        lit("The directory which contains runtime ui resources: 'qml' and 'images'."),
+        lit("basePath"));
     parser.addOption(basePathOption);
+
     const auto liteModeOption = QCommandLineOption(
-                                lit("lite-mode"),
-                                lit("Enable lite mode."));
+        lit("lite-mode"),
+        lit("Enable lite mode."));
     parser.addOption(liteModeOption);
+
+    const auto urlOption = QCommandLineOption(
+        lit("url"),
+        lit("URL to be used for server connection instead of asking login/password."));
+    parser.addOption(urlOption);
+
+    const auto videowallInstanceGuidOption = QCommandLineOption(
+        lit("videowall-instance-guid"),
+        lit("GUID which is used to check Videowall Control messages."));
+    parser.addOption(videowallInstanceGuidOption);
 
     parser.process(application);
 
@@ -205,6 +221,15 @@ void parseCommandLine(const QCoreApplication& application)
 
     if (parser.isSet(liteModeOption))
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
+
+    if (parser.isSet(urlOption))
+        qnSettings->setLastUsedUrl(parser.value(urlOption));
+
+    if (parser.isSet(videowallInstanceGuidOption) && outVideowallInstanceGuid)
+    {
+        *outVideowallInstanceGuid = QnUuid::fromStringSafe(
+            parser.value(videowallInstanceGuidOption));
+    }
 }
 
 int main(int argc, char *argv[])
@@ -216,12 +241,14 @@ int main(int argc, char *argv[])
     initLog();
 
     QnMobileClientModule mobile_client;
-    Q_UNUSED(mobile_client)
+    Q_UNUSED(mobile_client);
 
-    parseCommandLine(application);
+    QnUuid videowallInstanceGuid;
+    parseCommandLine(application, &videowallInstanceGuid);
+
     migrateSettings();
 
-    int result = runApplication(&application);
+    int result = runApplication(&application, videowallInstanceGuid);
 
     return result;
 }

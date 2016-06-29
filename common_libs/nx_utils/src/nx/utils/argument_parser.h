@@ -14,7 +14,7 @@ namespace utils {
 /*!
     Supports both "-a value" and "--arg=value" syntax. "-" and "--" are ommitted
 */
-class QN_EXPORT ArgumentParser
+class NX_UTILS_API ArgumentParser
 {
 public:
     ArgumentParser(int argc = 0, char **argv = nullptr);

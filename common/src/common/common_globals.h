@@ -365,6 +365,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SF_Has_HDD = 0x080,
         SF_NewSystem = 0x100, /**< System is just installed, it has default admin password and is not linked to the cloud. */
         SF_SupportsTranscoding = 0x200,
+        SF_HasLiteClient = 0x400,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
@@ -952,7 +953,7 @@ enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
 // TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
 // Note: -1 is used for invalid time
-// Now it is returning when no archive data and archive is played backward
+// Now it is being returned when there is no archive data and archive is played backwards.
 enum { kNoTimeValue = 0 };
 
 /** Time value for 'unknown' / 'invalid'. Same as AV_NOPTS_VALUE. Checked in ffmpeg.cpp. */

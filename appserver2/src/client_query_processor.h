@@ -140,6 +140,7 @@ namespace ec2
             QUrlQuery query;
             toUrlParams(input, &query);
             Qn::SerializationFormat format = serializationFormatFromUrl(ecBaseUrl);
+
             query.addQueryItem("format", QnLexical::serialized(format));
             requestUrl.setQuery(query);
 
