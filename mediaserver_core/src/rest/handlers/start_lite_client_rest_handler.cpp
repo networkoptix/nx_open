@@ -65,11 +65,11 @@ int QnStartLiteClientRestHandler::executeGet(
 
     const QnUuid videowallInstanceGuid = server->getId();
 
-    NX_LOG(lit("startLiteClient: script: '%1', url: '%2', videowallInstanceGuid: '%3'")
+    NX_LOG(lit("startLiteClient: %1 -url '%2' -videowall-instance-guid '%3'")
         .arg(fileName).arg(url.toString()).arg(videowallInstanceGuid.toString()), cl_logDEBUG2);
 
     if (!QProcess::startDetached(fileName, QStringList({
-        url.toString(), videowallInstanceGuid.toString() })))
+        "-url", url.toString(), "-videowall-instance-guid", videowallInstanceGuid.toString() })))
     {
         qWarning() << lit("Can't start script '%1' because of system error").arg(kScriptName);
     }

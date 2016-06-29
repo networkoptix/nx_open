@@ -309,11 +309,6 @@ namespace nx_http
         m_proxyUserPassword = userPassword;
     }
 
-    void AsyncHttpClient::setCustomUserName(const QString& customUserName)
-    {
-        m_customUserName = customUserName;
-    }
-
     void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
     {
         m_precalculatedAuthorizationDisabled = val;
@@ -823,13 +818,6 @@ namespace nx_http
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()));
-        }
-
-        if (!m_customUserName.isEmpty())
-        {
-            nx_http::insertOrReplaceHeader(
-                &m_request.headers,
-                HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_customUserName.toUtf8()));
         }
 
         if (m_precalculatedAuthorizationDisabled)

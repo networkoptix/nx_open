@@ -28,10 +28,6 @@
 #include "http/custom_headers.h"
 #include "api/model/audit/auth_session.h"
 
-// TODO mike: REMOVE
-#define OUTPUT_PREFIX "[mike] client_query_processor: "
-#include <nx/utils/debug_utils.h>
-
 namespace {
     Qn::SerializationFormat serializationFormatFromUrl(const QUrl &url, Qn::SerializationFormat defaultFormat = Qn::UbjsonFormat) {
         Qn::SerializationFormat format = defaultFormat;
@@ -124,7 +120,6 @@ namespace ec2
         template<class InputData, class OutputData, class HandlerType>
             void processQueryAsync( const QUrl& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
-PRINT << "processQueryAsync(): Input url: " <<  ecBaseUrl;
             QUrl requestUrl( ecBaseUrl );
             nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
             httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
@@ -148,14 +143,6 @@ PRINT << "processQueryAsync(): Input url: " <<  ecBaseUrl;
 
             query.addQueryItem("format", QnLexical::serialized(format));
             requestUrl.setQuery(query);
-PRINT << "processQueryAsync(): Output url: " <<  requestUrl;
-            QString effectiveUserName =
-                QUrlQuery(ecBaseUrl).queryItemValue(lit("effectiveUserName"));
-            if (!effectiveUserName.isEmpty())
-            {
-                httpClient->setCustomUserName(effectiveUserName);
-PRINT << "processQueryAsync(): effectiveUserName: " << effectiveUserName;
-            }
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
