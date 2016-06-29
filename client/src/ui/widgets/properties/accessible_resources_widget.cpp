@@ -13,8 +13,10 @@
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
+#include <ui/common/indentation.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource_list_model.h>
+#include <ui/style/helper.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -168,11 +170,12 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     showHideSignalizer->addEventType(QEvent::Show);
     showHideSignalizer->addEventType(QEvent::Hide);
     scrollBar->installEventFilter(showHideSignalizer);
-    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this, [this](QObject* object, QEvent* event)
+    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this, [this, scrollBar](QObject* object, QEvent* event)
     {
         Q_UNUSED(object);
         QMargins margins = ui->resourceListLayout->contentsMargins();
-        margins.setRight(event->type() == QEvent::Show ? 16 : 8);
+        int margin = style()->pixelMetric(QStyle::PM_DefaultTopLevelMargin);
+        margins.setRight(event->type() == QEvent::Show ? margin + scrollBar->width() : margin);
         ui->resourceListLayout->setContentsMargins(margins);
         ui->resourceListLayout->activate();
     });
@@ -182,10 +185,12 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
 
     auto setupTreeView = [itemDelegate](QnTreeView* treeView)
     {
+        const QnIndentation kIndents(1, 0);
         treeView->setItemDelegate(itemDelegate);
         treeView->header()->setStretchLastSection(false);
         treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
         treeView->header()->setSectionResizeMode(QnResourceListModel::NameColumn, QHeaderView::Stretch);
+        treeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(kIndents));
     };
     setupTreeView(ui->resourcesTreeView);
     setupTreeView(ui->controlsTreeView);

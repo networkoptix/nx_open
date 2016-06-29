@@ -41,14 +41,15 @@ namespace style
     class Properties
     {
     public:
-        static const char *kHoveredRowProperty;
-        static const char *kHoveredIndexProperty;
+        static const char *kHoveredRowProperty;     /**< Name of a property to hold index of hovered itemview row (int). */
+        static const char *kHoveredIndexProperty;   /**< Name of a property to hold hovered itemview item index (QPersistentModelIndex). */
         static const char *kAccentStyleProperty;
         static const char *kSliderLength;           /**< Name of a property to change default width of the slider handle. */
         static const char *kSliderFeatures;         /**< Name of a property to add extra slider features. */
         static const char *kDontPolishFontProperty;
         static const char *kTabShape;
-        static const char *kSuppressHoverPropery;   /**< Name of a property to suppress hovering of itemview items. */
+        static const char *kSuppressHoverPropery;   /**< Name of a property to suppress hovering of itemview items (bool). */
+        static const char* kSideIndentation;        /**< Name of a property to hold overridden leftmost and rightmost itemview item margins (QnIndentation). */
     };
 
     /** Flags of additional slider features */

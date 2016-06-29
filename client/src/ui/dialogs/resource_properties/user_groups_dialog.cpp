@@ -5,7 +5,9 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_access_manager.h>
 
+#include <ui/common/indentation.h>
 #include <ui/models/resource_properties/user_groups_settings_model.h>
+#include <ui/style/helper.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/properties/user_group_settings_widget.h>
 #include <ui/widgets/properties/accessible_resources_widget.h>
@@ -14,6 +16,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <nx/utils/string.h>
+
 
 QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     base_type(parent),
@@ -50,6 +53,10 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->groupsTreeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
+
+    int margin = style()->pixelMetric(QStyle::PM_DefaultTopLevelMargin);
+    ui->groupsTreeView->setProperty(style::Properties::kSideIndentation,
+        QVariant::fromValue(QnIndentation(margin, margin)));
 
     QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);

@@ -29,8 +29,11 @@
    <item>
     <widget class="QWidget" name="resourcesListWidget" native="true">
      <layout class="QVBoxLayout" name="resourceListLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <property name="leftMargin">
-       <number>8</number>
+       <number>16</number>
       </property>
       <property name="topMargin">
        <number>16</number>
@@ -82,24 +85,17 @@
        </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <property name="spacing">
-         <number>0</number>
+       <widget class="Line" name="line">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>10</height>
+         </size>
         </property>
-        <property name="leftMargin">
-         <number>8</number>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="rightMargin">
-         <number>8</number>
-        </property>
-        <item>
-         <widget class="Line" name="line">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       </widget>
       </item>
       <item>
        <widget class="QnTreeView" name="resourcesTreeView">

@@ -42,6 +42,7 @@ namespace style
     const char* Properties::kDontPolishFontProperty = "_qn_dontPolishFont";
     const char* Properties::kTabShape = "_qn_tabShape";
     const char* Properties::kSuppressHoverPropery = "_qn_suppressHover";
+    const char* Properties::kSideIndentation = "_qn_sideIndentation";
 
     qreal dpr(qreal value)
     {

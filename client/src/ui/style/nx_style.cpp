@@ -26,6 +26,7 @@
 #include <QtWidgets/QInputDialog>
 #include <private/qfont_p.h>
 
+#include <ui/common/indentation.h>
 #include <ui/common/popup_shadow.h>
 #include <ui/common/link_hover_processor.h>
 #include <ui/delegates/styled_combo_box_delegate.h>
@@ -215,6 +216,75 @@ namespace
             return false;
 
         return true;
+    }
+
+    QnIndentation itemViewItemIndentation(const QStyleOptionViewItem* item)
+    {
+        static const QnIndentation kDefaultIndentation(Metrics::kStandardPadding, Metrics::kStandardPadding);
+
+        auto view = qobject_cast<const QAbstractItemView*>(item->widget);
+        if (!view)
+            return kDefaultIndentation;
+
+        if (item->viewItemPosition == QStyleOptionViewItem::Middle)
+            return kDefaultIndentation;
+
+        QVariant value = view->property(Properties::kSideIndentation);
+        if (!value.canConvert<QnIndentation>())
+            return kDefaultIndentation;
+
+        QnIndentation indentation = value.value<QnIndentation>();
+        switch (item->viewItemPosition)
+        {
+            case QStyleOptionViewItem::Beginning:
+                indentation.setRight(kDefaultIndentation.right());
+                break;
+
+            case QStyleOptionViewItem::End:
+                indentation.setLeft(kDefaultIndentation.left());
+                break;
+
+            case QStyleOptionViewItem::Invalid:
+            {
+                const QModelIndex& index = item->index;
+                if (!index.isValid())
+                    return kDefaultIndentation;
+
+                struct VisibilityChecker : public QAbstractItemView
+                {
+                    using QAbstractItemView::isIndexHidden;
+                };
+
+                auto checker = static_cast<const VisibilityChecker*>(view);
+
+                for (int column = index.column() - 1; column > 0; --column)
+                {
+                    if (!checker->isIndexHidden(index.sibling(index.row(), column)))
+                    {
+                        indentation.setLeft(kDefaultIndentation.left());
+                        break;
+                    }
+                }
+
+                int columnCount = view->model()->columnCount(view->rootIndex());
+                for (int column = index.column() + 1; column < columnCount; ++column)
+                {
+                    if (!checker->isIndexHidden(index.sibling(index.row(), column)))
+                    {
+                        indentation.setRight(kDefaultIndentation.right());
+                        break;
+                    }
+                }
+
+                break;
+            }
+
+            case QStyleOptionViewItem::OnlyOne:
+            default:
+                break;
+        }
+
+        return indentation;
     }
 
     template <class T>
@@ -2357,8 +2427,9 @@ QRect QnNxStyle::subElementRect(
             if (auto item = qstyleoption_cast<const QStyleOptionViewItem*>(option))
             {
                 int defaultMargin = pixelMetric(PM_FocusFrameHMargin, option, widget) + 1;
-                int marginAddition = qMax(Metrics::kStandardPadding - defaultMargin, 0);
-                QRect rect = item->rect.adjusted(marginAddition, 0, -marginAddition, 0);
+                QnIndentation indents = itemViewItemIndentation(item);
+
+                QRect rect = item->rect.adjusted(indents.left() - defaultMargin, 0, -(indents.right() - defaultMargin), 0);
 
                 /* Workaround to be able to align icon in an icon-only viewitem by model / Qt::TextAlignmentRole: */
                 if (isIconOnlyItem(*item))
@@ -2565,13 +2636,19 @@ QSize QnNxStyle::sizeFromContents(
         case CT_ItemViewItem:
         {
             if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
-                if (isCheckboxOnlyItem(*item))
-                    return QSize(Metrics::kStandardPadding * 2 + Metrics::kCheckIndicatorSize, Metrics::kCheckIndicatorSize);
+            {
+                QnIndentation indents = itemViewItemIndentation(item);
 
-            QSize sz = base_type::sizeFromContents(type, option, size, widget);
-            sz.setHeight(qMax(sz.height(), Metrics::kViewRowHeight));
-            sz.setWidth(sz.width() + (Metrics::kStandardPadding - pixelMetric(PM_FocusFrameHMargin, option, widget) - 1) * 2);
-            return sz;
+                if (isCheckboxOnlyItem(*item))
+                    return QSize(indents.left() + indents.right() + Metrics::kCheckIndicatorSize, Metrics::kCheckIndicatorSize);
+
+                QSize sz = base_type::sizeFromContents(type, option, size, widget);
+                sz.setHeight(qMax(sz.height(), Metrics::kViewRowHeight));
+                    sz.setWidth(sz.width() + indents.left() + indents.right() - (pixelMetric(PM_FocusFrameHMargin, option, widget) + 1) * 2);
+                return sz;
+            }
+
+            break;
         }
 
         case CT_ProgressBar:
