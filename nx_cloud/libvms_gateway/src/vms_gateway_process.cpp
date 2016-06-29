@@ -30,6 +30,7 @@
 #include <utils/common/systemerror.h>
 
 #include "access_control/authentication_manager.h"
+#include "http/connect_handler.h"
 #include "http/proxy_handler.h"
 #include "libvms_gateway_app_info.h"
 #include "stree/cdb_ns.h"
@@ -188,9 +189,9 @@ int VmsGatewayProcess::exec()
         if (m_terminated)
             return 0;
 
-        NX_LOG(lit("%1 has been started")
-            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName()),
-            cl_logALWAYS);
+        NX_LOG(lm("%1 has been started on %2")
+            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName())
+            .container(m_httpEndpoints), cl_logALWAYS);
 
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
@@ -281,6 +282,16 @@ void VmsGatewayProcess::registerApiHandlers(
         [&settings]() -> std::unique_ptr<ProxyHandler> {
             return std::make_unique<ProxyHandler>(settings);
         });
+
+    if (settings.http().connectSupport)
+    {
+        msgDispatcher->registerRequestProcessor<ConnectHandler>(
+            nx_http::kAnyPath,
+            [&settings]() -> std::unique_ptr<ConnectHandler> {
+                return std::make_unique<ConnectHandler>(settings);
+            },
+            nx_http::StringType("CONNECT"));
+    }
 }
 
 void VmsGatewayProcess::publicAddressFetched(const QHostAddress& publicAddress)

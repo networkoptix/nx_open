@@ -105,10 +105,13 @@ QByteArray QnSpeachSynthesisDataProvider::doSynthesis(const QString &text)
 {
     QBuffer soundBuf;
     soundBuf.open(QIODevice::WriteOnly);
-    auto ttvInstance = TextToWaveServer::instance();
-    const size_t kSynthesizerOutputHeaderSize = 52;
 
+#ifndef DISABLE_FESTIVAL
+    auto ttvInstance = TextToWaveServer::instance();
     ttvInstance->generateSoundSync(text, &soundBuf);
+#endif
+
+    const size_t kSynthesizerOutputHeaderSize = 52;
     return soundBuf.data().mid(kSynthesizerOutputHeaderSize);
 }
 

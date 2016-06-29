@@ -14,7 +14,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>connection_mediator</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Cloud Connection Mediator</name>
+    <name>NX Cloud Connection Mediator</name>
 
     <properties>
         <guid>${connection_mediator.guid}</guid>

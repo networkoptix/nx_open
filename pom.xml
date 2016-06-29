@@ -422,13 +422,17 @@
                 </property>
             </activation>
             <modules>
+                <module>unit_tests/appserver2_ut</module>
                 <module>unit_tests/common_ut</module>
+                <module>unit_tests/client_ut</module>
                 <module>unit_tests/cloud_connectivity_ut</module>
                 <module>unit_tests/connection_mediator_ut</module>
                 <module>unit_tests/cloud_db_ut</module>
                 <!--<module>unit_tests/image_library_plugin_ut</module>-->
                 <module>unit_tests/mediaserver_core_ut</module>
                 <module>unit_tests/nx_network_ut</module>
+                <module>unit_tests/vms_gateway_ut</module>
+                <module>unit_tests/vms_utils_ut</module>
                 <!--<module>unit_tests/traytool_ut</module>-->
             </modules>
         </profile>
@@ -941,6 +945,7 @@
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>tx1</modification>
                 <rdep.target>tx1</rdep.target>
+                <gcc.version>4.8.4</gcc.version>
                 <qt.spec/>
                 <linux.defines>DISABLE_FESTIVAL</linux.defines>
             </properties>

@@ -38,6 +38,9 @@ public:
 
         RadassModeChanged,
 
+        EnterFullscreen,
+        ExitFullscreen,
+
         Count
     };
 

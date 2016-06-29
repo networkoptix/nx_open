@@ -291,9 +291,11 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->store<QnQtbugWorkaround>(new QnQtbugWorkaround());
 #endif
 
+#ifndef DISABLE_FESTIVAL
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
     common->store<TextToWaveServer>(textToWaveServer.take());
+#endif
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)

@@ -24,17 +24,17 @@ void printConnectOptions(std::ostream* const outStream)
         "  --total-connections={"<< kDefaultTotalConnections <<"}\n"
         "                       Number of connections to try\n"
         "  --max-concurrent-connections={"<< kDefaultMaxConcurrentConnections <<"}\n"
-        "  --bytes-to-receive={"<< nx::utils::bytesToString(kDefaultBytesToReceive).toStdString() <<"}\n"
+        "  --bytes-to-receive={" << nx::utils::bytesToString(kDefaultBytesToReceive).toStdString() << "}\n"
         "                       Bytes to receive before closing connection\n"
         "  --bytes-to-send={N}  Bytes to send before closing connection\n"
         "  --udt                Force using udt socket. Disables cloud connect\n"
         "  --ssl                 Use SSL on top of client sockets\n";
 }
 
-int runInConnectMode(const std::multimap<QString, QString>& args)
+int runInConnectMode(const nx::utils::ArgumentParser& args)
 {
     QString target;
-    if (!readArg(args, "target", &target))
+    if (!args.read("target", &target))
     {
         std::cerr << "error. Required parameter \"target\" is missing" << std::endl;
         return 1;
@@ -43,28 +43,28 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     int totalConnections = kDefaultTotalConnections;
-    readArg(args, "total-connections", &totalConnections);
+    args.read("total-connections", &totalConnections);
 
     int maxConcurrentConnections = kDefaultMaxConcurrentConnections;
-    readArg(args, "max-concurrent-connections", &maxConcurrentConnections);
+    args.read("max-concurrent-connections", &maxConcurrentConnections);
 
     nx::network::test::TestTrafficLimitType
         trafficLimitType = nx::network::test::TestTrafficLimitType::incoming;
 
     QString trafficLimit = nx::utils::bytesToString(kDefaultBytesToReceive);
-    readArg(args, "bytes-to-receive", &trafficLimit);
+    args.read("bytes-to-receive", &trafficLimit);
 
-    if (readArg(args, "bytes-to-send", &trafficLimit))
+    if (args.read("bytes-to-send", &trafficLimit))
         trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing; 
 
     auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
-    if (args.find("ping") != args.end())
+    if (args.get("ping"))
         transmissionMode = nx::network::test::TestTransmissionMode::ping;
 
-    if (args.find("udt") != args.end())
+    if (args.get("udt"))
         SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::udt);
 
-    if (args.find("ssl") != args.end())
+    if (args.get("ssl"))
     {
         if (transmissionMode == nx::network::test::TestTransmissionMode::spam)
         {
@@ -181,16 +181,18 @@ void printHttpClientOptions(std::ostream* const outStream)
         "  --url={http url}     Url to trigger\n";
 }
 
-int runInHttpClientMode(const std::multimap<QString, QString>& args)
+int runInHttpClientMode(const nx::utils::ArgumentParser& args)
 {
     QString urlStr;
-    if (!readArg(args, "url", &urlStr))
+    if (!args.read("url", &urlStr))
     {
         std::cerr << "error. Required parameter \"url\" is missing" << std::endl;
         return 1;
     }
 
     nx::network::SocketGlobals::mediatorConnector().enable(true);
+
+    NX_LOG(lm("Issuing request to %1").arg(urlStr), cl_logALWAYS);
 
     nx_http::HttpClient client;
     client.setSendTimeoutMs(15000);
@@ -214,6 +216,7 @@ int runInHttpClientMode(const std::multimap<QString, QString>& args)
     }
 
     std::cout << std::endl;
+    NX_LOG(lm("completed request to %1").arg(urlStr), cl_logALWAYS);
     return 0;
 }
 

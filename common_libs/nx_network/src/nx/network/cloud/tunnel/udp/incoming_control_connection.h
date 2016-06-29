@@ -31,8 +31,6 @@ public:
         std::unique_ptr<UdtStreamSocket> socket,
         const nx::hpm::api::ConnectionParameters& connectionParameters);
 
-	~IncomingControlConnection();
-
     /** This handler is called when error accures (so object is not usefull any more) */
     void setErrorHandler(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
@@ -61,7 +59,7 @@ private:
     const std::unique_ptr<UdtStreamSocket> m_socket;
     const std::chrono::milliseconds m_maxKeepAliveInterval;
 
-    std::chrono::system_clock::time_point m_lastKeepAlive;
+    std::chrono::steady_clock::time_point m_lastKeepAlive;
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_errorHandler;
     utils::MoveOnlyFunc<void()> m_selectedHandler;
 

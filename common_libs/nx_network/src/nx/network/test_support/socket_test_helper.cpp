@@ -24,7 +24,6 @@ namespace test {
 ////////////////////////////////////////////////////////////
 namespace
 {
-    const size_t READ_BUF_SIZE = 4*1024;
     std::atomic<int> TestConnectionIDCounter(0);
     std::atomic<int> TestConnection_count(0);
 }
@@ -48,8 +47,8 @@ TestConnection::TestConnection(
     m_id( ++TestConnectionIDCounter ),
     m_accepted(true)
 {
-    m_readBuffer.reserve( READ_BUF_SIZE );
-    m_outData = nx::utils::generateRandomData( READ_BUF_SIZE );
+    m_readBuffer.reserve( kReadBufferSize );
+    m_outData = nx::utils::generateRandomData( kReadBufferSize );
 
     ++TestConnection_count;
 }
@@ -74,8 +73,8 @@ TestConnection::TestConnection(
     m_id( ++TestConnectionIDCounter ),
     m_accepted(false)
 {
-    m_readBuffer.reserve( READ_BUF_SIZE );
-    m_outData = nx::utils::generateRandomData( READ_BUF_SIZE );
+    m_readBuffer.reserve( kReadBufferSize );
+    m_outData = nx::utils::generateRandomData( kReadBufferSize );
 
     ++TestConnection_count;
 }
@@ -238,7 +237,7 @@ void TestConnection::startEchoIO()
                 {
                     // start all over again
                     m_readBuffer.resize(0);
-                    m_readBuffer.reserve(READ_BUF_SIZE);
+                    m_readBuffer.reserve(kReadBufferSize);
                     startEchoIO();
                 });
         });
@@ -297,7 +296,7 @@ void TestConnection::readAllAsync( std::function<void()> handler )
             if (code != SystemError::noError || bytes == 0)
                 return reportFinish( code );
 
-            if (static_cast<size_t>(m_readBuffer.size()) >= READ_BUF_SIZE)
+            if (static_cast<size_t>(m_readBuffer.size()) >= kReadBufferSize)
                 handler();
             else
                 return readAllAsync(std::move(handler));
@@ -357,7 +356,7 @@ void TestConnection::onDataReceived(
 
     m_totalBytesReceived += bytesRead;
     m_readBuffer.clear();
-    m_readBuffer.reserve( READ_BUF_SIZE );
+    m_readBuffer.reserve( kReadBufferSize );
 
     if (m_limitType == TestTrafficLimitType::incoming &&
         m_totalBytesReceived >= m_trafficLimit)

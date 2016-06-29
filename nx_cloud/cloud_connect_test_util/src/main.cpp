@@ -4,13 +4,13 @@
 #include <thread>
 
 #include <nx/network/socket_global.h>
-#include <utils/common/command_line_parser.h>
+#include <nx/utils/argument_parser.h>
 #include <nx/utils/string.h>
 
 #include "listen_mode.h"
 #include "client_mode.h"
 
-void printHelp(int /*argc*/, char* /*argv*/[])
+void printHelp()
 {
     std::cout << "\n";
     nx::cctu::printListenOptions(&std::cout);
@@ -30,41 +30,31 @@ void printHelp(int /*argc*/, char* /*argv*/[])
 
 int main(int argc, char* argv[])
 {
-    std::multimap<QString, QString> args;
-    parseCmdArgs(argc, argv, &args);
-    if (args.find("help") != args.end())
+    nx::utils::ArgumentParser args(argc, argv);
+    if (args.get("help"))
     {
-        printHelp(argc, argv);
+        printHelp();
         return 0;
     }
 
     nx::network::SocketGlobals::InitGuard socketGlobalsGuard;
 
     // common options
-    const auto mediatorIt = args.find("enforce-mediator");
-    if (mediatorIt != args.end())
-    {
-        nx::network::SocketGlobals::mediatorConnector().
-            mockupAddress(mediatorIt->second);
-    }
-    const auto logLevelIt = args.find("log-level");
-    if (logLevelIt != args.end())
-        QnLog::initLog(logLevelIt->second);
+    QnLog::applyArguments(args);
+    nx::network::SocketGlobals::applyArguments(args);
 
     // reading mode
-    if (args.find("listen") != args.end())
+    if (args.get("listen"))
         return nx::cctu::runInListenMode(args);
 
-    if (args.find("connect") != args.end())
+    if (args.get("connect"))
         return nx::cctu::runInConnectMode(args);
 
-    if (args.find("http-client") != args.end())
+    if (args.get("http-client"))
         return nx::cctu::runInHttpClientMode(args);
 
     std::cerr<<"error. Unknown mode"<<std::endl;
-    printHelp(argc, argv);
-
-    return 0;
+    printHelp();
 }
 
 //--http-client --url=http://admin:admin@server1.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d/api/gettime

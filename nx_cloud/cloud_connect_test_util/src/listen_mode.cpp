@@ -149,12 +149,12 @@ public:
     std::vector<SocketContext> socketContexts;
 };
 
-int runInListenMode(const std::multimap<QString, QString>& args)
+int runInListenMode(const nx::utils::ArgumentParser& args)
 {
     using namespace nx::network;
 
     auto transmissionMode = test::TestTransmissionMode::spam;
-    if (args.find("ping") != args.end())
+    if (args.get("ping"))
         transmissionMode = test::TestTransmissionMode::pong;
 
     std::unique_ptr<AbstractStreamServerSocket> serverSocket;
@@ -168,11 +168,9 @@ int runInListenMode(const std::multimap<QString, QString>& args)
     test::RandomDataTcpServer server(
         test::TestTrafficLimitType::none, 0, transmissionMode);
 
-    auto credentialsIter = args.find("cloud-credentials");
-    auto localAddressIter = args.find("local-address");
-    if (credentialsIter != args.end())
+    if (const auto credentials = args.get("cloud-credentials"))
     {
-        const auto cloudCredentials = credentialsIter->second.split(":");
+        const auto cloudCredentials = credentials->split(":");
         if (cloudCredentials.size() != 2)
         {
             std::cerr << "error. Parameter cloud-credentials MUST have format system_id:authentication_key" << std::endl;
@@ -182,11 +180,11 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         std::vector<String> serverIds;
         {
             QString serverId = nx::utils::generateRandomName(7);
-            readArg(args, "server-id", &serverId);
+            args.read("server-id", &serverId);
             serverIds.push_back(serverId.toUtf8());
 
             int serverCount = 1;
-            readArg(args, "server-count", &serverCount);
+            args.read("server-count", &serverCount);
             for (int i = serverIds.size(); i < serverCount; i++)
                 serverIds.push_back((serverId + QString::number(i)).toUtf8());
         }
@@ -201,17 +199,16 @@ int runInListenMode(const std::multimap<QString, QString>& args)
             return 2;
         }
     }
-    else if (localAddressIter != args.end())
+    else if (const auto localAddress = args.get("local-address"))
     {
-        const bool isUdt = args.find("udt") != args.end();
-
-        if (isUdt)
+        if (args.get("udt"))
             serverSocket = std::make_unique<UdtStreamServerSocket>();
         else
             serverSocket = std::make_unique<TCPServerSocket>();
-        server.setLocalAddress(SocketAddress(localAddressIter->second));
-        std::cout << "listening on local "<<(isUdt ? "udt" : "tcp")<<" address "
-            << localAddressIter->second.toStdString() << std::endl;
+
+        server.setLocalAddress(SocketAddress(*localAddress));
+        std::cout << "listening on local " << (args.get("udt") ? "udt" : "tcp")
+            << " address " << localAddress->toStdString() << std::endl;
     }
     else
     {
@@ -219,7 +216,7 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         return 3;
     }
 
-    if (args.find("ssl") != args.end())
+    if (args.get("ssl"))
     {
         if (transmissionMode == test::TestTransmissionMode::spam)
         {

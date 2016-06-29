@@ -37,12 +37,12 @@ public:
 
     /**
      * @return Some sort of a maximum for all resolutions returned for the codec by
-     * AbstractVideoDecoder::maxResolution(), or (0, 0) if it cannot be determined.
+     * AbstractVideoDecoder::maxResolution(), or Invalid if it cannot be determined.
      */
     QSize maxResolution(const CodecID codec);
 
-    bool isLiteClientMode() const;
-    void setLiteClientMode(bool liteMode);
+    bool isTranscodingEnabled() const;
+    void setTranscodingEnabled(bool transcodingEnabled);
 
     /**
      * Register video decoder plugin.
@@ -93,7 +93,7 @@ private:
 
     std::vector<Metadata> m_plugins;
 
-    bool m_isLiteClientMode;
+    bool m_isTranscodingEnabled;
 };
 
 } // namespace media
