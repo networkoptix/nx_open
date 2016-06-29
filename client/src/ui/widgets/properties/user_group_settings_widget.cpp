@@ -7,7 +7,7 @@
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 
-#include <ui/models/resource_properties/user_grous_settings_model.h>
+#include <ui/models/resource_properties/user_groups_settings_model.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
@@ -57,7 +57,7 @@ void QnUserGroupSettingsWidget::loadDataToUi()
         m_usersModel->appendRow(new QStandardItem(qnResIconCache->icon(QnResourceIconCache::User), user->getName()));
 
     if (users.isEmpty())
-        m_usersModel->appendRow(new QStandardItem(tr("No users in this group")));
+        m_usersModel->appendRow(new QStandardItem(tr("No users have this role")));
 
 }
 

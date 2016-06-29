@@ -5,7 +5,7 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_access_manager.h>
 
-#include <ui/models/resource_properties/user_grous_settings_model.h>
+#include <ui/models/resource_properties/user_groups_settings_model.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/properties/user_group_settings_widget.h>
 #include <ui/widgets/properties/accessible_resources_widget.h>
@@ -26,7 +26,7 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
 {
     ui->setupUi(this);
 
-    addPage(SettingsPage, m_settingsPage, tr("Group Info"));
+    addPage(SettingsPage, m_settingsPage, tr("Role Info"));
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
     addPage(CamerasPage, m_camerasPage, tr("Media Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
@@ -66,19 +66,13 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
         Q_UNUSED(previous);
 
         bool valid = current.isValid();
-
-        ui->groupInfoStackedWidget->setCurrentWidget(valid
-            ? ui->groupInfoPage
-            : ui->noGroupsPage
-        );
-
+        ui->groupInfoStackedWidget->setCurrentWidget(valid ? ui->groupInfoPage : ui->noGroupsPage);
         if (!valid)
             return;
 
         QnUuid groupId = current.data(Qn::UuidRole).value<QnUuid>();
         if (m_model->selectedGroup() == groupId)
             return;
-
 
 //         for (auto page : allPages())
 //             page.widget->applyChanges();
@@ -101,10 +95,48 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
         ui->groupsTreeView->selectionModel()->setCurrentIndex(m_model->index(row), QItemSelectionModel::ClearAndSelect);
         updateButtonBox();
     });
+
+    auto modelChanged = [this]()
+    {
+        bool hasGroups = m_model->rowCount() > 0;
+        ui->groupsTreeView->setVisible(hasGroups);
+        ui->groupsListUnderline->setVisible(hasGroups);
+
+        if (hasGroups && !ui->groupsTreeView->selectionModel()->currentIndex().isValid())
+        {
+            ui->groupsTreeView->selectionModel()->setCurrentIndex(
+                m_model->index(0, 0),
+                QItemSelectionModel::SelectCurrent);
+        }
+    };
+
+    connect(m_model, &QAbstractItemModel::modelReset,   this, modelChanged);
+    connect(m_model, &QAbstractItemModel::rowsRemoved,  this, modelChanged);
+    connect(m_model, &QAbstractItemModel::rowsInserted, this, modelChanged);
+
+    modelChanged();
 }
 
 QnUserGroupsDialog::~QnUserGroupsDialog()
-{}
+{
+}
+
+bool QnUserGroupsDialog::selectGroup(QnUuid groupId)
+{
+    ec2::ApiUserGroupDataList groups = m_model->groups();
+    ec2::ApiUserGroupDataList::const_iterator group = std::find_if(groups.cbegin(), groups.cend(),
+        [groupId](const ec2::ApiUserGroupData& elem)
+        {
+            return elem.id == groupId;
+        });
+
+    if (group == groups.end())
+        return false;
+
+    QModelIndex index = m_model->index(group - groups.begin());
+    ui->groupsTreeView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent);
+    return true;
+}
 
 bool QnUserGroupsDialog::hasChanges() const
 {

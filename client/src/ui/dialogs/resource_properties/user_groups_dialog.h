@@ -35,6 +35,8 @@ public:
     QnUserGroupsDialog(QWidget* parent = NULL);
     virtual ~QnUserGroupsDialog();
 
+    bool selectGroup(QnUuid groupId);
+
 protected:
     virtual bool hasChanges() const override;
     virtual void applyChanges() override;

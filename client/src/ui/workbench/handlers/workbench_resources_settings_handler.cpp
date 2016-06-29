@@ -104,7 +104,13 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
 
 void QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered()
 {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnUuid groupId = parameters.argument(Qn::ResourceUidRole).value<QnUuid>();
+
     QScopedPointer<QnUserGroupsDialog> groupsDialog(new QnUserGroupsDialog(mainWindow()));
+    if (!groupId.isNull())
+        groupsDialog->selectGroup(groupId);
+
     groupsDialog->exec();
 }
 

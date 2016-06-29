@@ -87,9 +87,11 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     ui->buttonBox->addButton(m_editGroupsButton, QDialogButtonBox::HelpRole);
     connect(m_editGroupsButton, &QPushButton::clicked, this, [this]
     {
-        menu()->trigger(QnActions::UserGroupsAction);
+        QnUuid groupId = isPageVisible(ProfilePage) ? m_user->userGroup() : m_settingsPage->selectedUserGroup();
+        menu()->trigger(QnActions::UserGroupsAction, QnActionParameters().withArgument(Qn::ResourceUidRole, groupId));
         m_settingsPage->updateAccessRightsPresets();
     });
+
     m_editGroupsButton->setVisible(false);
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);

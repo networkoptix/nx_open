@@ -1,4 +1,4 @@
-#include "user_grous_settings_model.h"
+#include "user_groups_settings_model.h"
 
 #include <core/resource_management/resource_access_manager.h>
 
@@ -120,8 +120,9 @@ QSet<QnUuid> QnUserGroupSettingsModel::accessibleResources(const QnUuid& groupId
     return m_accessibleResources.value(groupId);
 }
 
-int QnUserGroupSettingsModel::rowCount(const QModelIndex& index) const
+int QnUserGroupSettingsModel::rowCount(const QModelIndex& parent) const
 {
+    Q_UNUSED(parent);
     return static_cast<int>(m_groups.size());
 }
 
