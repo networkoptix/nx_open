@@ -5,7 +5,6 @@
 
 #include <camera/camera_thumbnail_cache.h>
 #include <utils/mobile_app_info.h>
-#include <utils/common/app_info.h>
 #include <common/common_module.h>
 #include <context/connection_manager.h>
 #include <context/context_settings.h>
@@ -156,7 +155,7 @@ QString QnContext::getLastUsedSystemId() const
 QString QnContext::getLastUsedUrl() const
 {
     QUrl url = qnSettings->lastUsedUrl();
-    qDebug() << "=============>" << url << url.isValid();
+
     if (!url.isValid() || url.userName().isEmpty())
         return QString();
 
