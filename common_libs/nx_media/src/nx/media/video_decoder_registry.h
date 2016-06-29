@@ -37,7 +37,7 @@ public:
 
     /**
      * @return Some sort of a maximum for all resolutions returned for the codec by
-     * AbstractVideoDecoder::maxResolution(), or (0, 0) if it cannot be determined.
+     * AbstractVideoDecoder::maxResolution(), or Invalid if it cannot be determined.
      */
     QSize maxResolution(const CodecID codec);
 

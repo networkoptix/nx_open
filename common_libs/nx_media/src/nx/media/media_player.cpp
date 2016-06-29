@@ -525,6 +525,9 @@ static const QSize kMaxTranscodingResolution(1920, 1080);
 
 static QSize limitResolution(const QSize& desiredResolution, const QSize& limit)
 {
+    if (desiredResolution.isEmpty() || limit.isEmpty())
+        return desiredResolution;
+
     QSize result = desiredResolution;
 
     if (result.width() > limit.width())
@@ -862,8 +865,11 @@ int Player::videoQuality() const
 void Player::setVideoQuality(int videoQuality)
 {
     Q_D(Player);
+    if (d->videoQuality == videoQuality)
+        return;
     d->videoQuality = videoQuality;
     d->applyVideoQuality();
+    emit videoQualityChanged();
 }
 
 QSize Player::currentResolution() const

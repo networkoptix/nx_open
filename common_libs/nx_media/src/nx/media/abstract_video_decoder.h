@@ -42,7 +42,7 @@ public:
      * ATTENTION: The definition of maximum for resolution is left somewhat fuzzy: complete
      * implementation would probably require to define the maximum as a set of resolutions with
      * either maximum width or maximum height (similar to how Android does it).
-     * @return Max supported resolution for the specified codec, or (0, 0) if there is no limit or
+     * @return Max supported resolution for the specified codec, or Invalid if there is no limit or
      * the codec is not supported.
      */
     static QSize maxResolution(const CodecID codec)
