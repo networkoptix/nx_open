@@ -112,7 +112,7 @@ void QnSystemDescriptionAggregator::removeSystem(const QString& id)
         NX_ASSERT(false, "Never should get here!");
 
 
-    NX_ASSERT(!m_cloudSystem && !m_localSystem, "Empty system aggregator");
+    NX_ASSERT(m_cloudSystem || m_localSystem, "Empty system aggregator");
     emitChangesSignals(wasCloudSystem, oldServers);
 }
 
