@@ -52,6 +52,8 @@ bool nx::vms::client::SelfUpdater::registerUriHandler()
                                                        qApp->applicationFilePath(),
                                                        nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
                                                        m_clientVersion);
+#else
+    return true;
 #endif
 }
 
@@ -135,7 +137,7 @@ bool nx::vms::client::SelfUpdater::updateApplauncher()
         //TODO: #GDM appinfo?
         QStringList filters = {
             QLatin1String("*.dll"),
-            QLatin1String("*Launcher.exe")
+            QLatin1String("applauncher.exe")
         };
 
         QString sourcePath = qApp->applicationDirPath();
@@ -169,25 +171,6 @@ bool nx::vms::client::SelfUpdater::updateApplauncher()
 
 
     return true;
-
-    /* Following code will be required a bit later. */
-
-    //QnClientModule::initApplication();
-    //QString appPath = QDir(qApp->applicationFilePath()).canonicalPath();
-    //QDir dataLocation(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + lit("/../client/"));
-    //dataLocation.makeAbsolute();
-
-    ///* Check that we are running downloaded version. */
-    //bool runningDownloadedApp = appPath.startsWith(dataLocation.canonicalPath());
-
-    ///* Update process must be run only if we are running client from userData folder. */
-    //if (!runningDownloadedApp)
-    //    return true;
-
-    ///* Check that installed version is older. */
-    //const QString installationPath = QnAppInfo::installationRoot();
-
-    //return true;
 }
 
 nx::utils::SoftwareVersion nx::vms::client::SelfUpdater::getVersionFromFile(const QString& filename) const
