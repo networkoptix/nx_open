@@ -52,6 +52,8 @@ var Config = {
         disabled: 'disabled',
         custom: 'custom',
         owner:   'owner',
+        editUserPermissionFlag: 'GlobalAdminPermission',
+        editUserAccessRoleFlag: 'Admin', // TODO: remove it later when cloud permissions
         order: [
             'liveViewer',
             'viewer',
@@ -62,6 +64,7 @@ var Config = {
         options: [
             {
                 accessRole: 'owner',
+                readOnly: true,
                 isAdmin: true
             },
             {
@@ -78,6 +81,7 @@ var Config = {
             },
             {
                 accessRole: 'cloudAdmin',
+                readOnly: true,
                 permissions: 'GlobalAdminPermission|GlobalEditCamerasPermission|GlobalControlVideoWallPermission|GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllCamerasPermission'
             }
         ]

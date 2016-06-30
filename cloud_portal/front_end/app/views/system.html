@@ -1,102 +1,16 @@
-
 <div class="auth-visible" process-loading="gettingSystem">
-    <div class="row">
-        <div class="col-sm-6">
-            <h1 ng-if="gettingSystem.success">{{system.info.name}}
-                <span ng-if="!system.isOnline" class="label"
-                      ng-class="Config.systemStatuses[system.info.stateOfHealth].style || Config.systemStatuses.default.style">
-                      {{Config.systemStatuses[system.info.stateOfHealth].label||system.info.stateOfHealth}}</span>
-            </h1>
-        </div>
-        <div class="col-sm-6">
-            <div class="pull-right-sm">
-                <button class="btn btn-default"
-                        ng-disabled="!system.isAvailable"
-                        title="{{system.stateMessage}}"
-                        ng-click="share()" ng-if="system.info.sharingPermissions.length">
-                    <span class="glyphicon glyphicon-share"></span> Share</button>
-                &nbsp;
-                <button class="btn btn-default" ng-click="open(null)"
-                        title="{{system.stateMessage}}"
-                        ng-disabled="!system.isOnline">Open in VMS_NAME</button>
-            </div>
-        </div>
-    </div>
+    <ng-include src="'static/views/components/system-header.html'"></ng-include>
     <div class="row"  ng-if="gettingSystem.success">
-
         <div class="col-md-4 col-md-push-8">
-
-            <div class="panel panel-default" ng-if="isOwner">
-                <div class="panel-body">
-                    <h2>Your system</h2>
-                    <p></p>
-                    <button class="btn btn-default" ng-click="disconnect()">Disconnect from
-                        <span class="product-name">PRODUCT_NAME</span></button>
-                </div>
-            </div>
-
-            <div class="panel panel-default" ng-if="!isOwner">
-                <div class="panel-body">
-                    <h2>Owner</h2>
-                    <h3 class="user-name">{{system.info.ownerFullName}}</h3>
-                    <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
-                    <hr>
-                    <p>
-                        Your permissions:
-                        <b>{{L.accessRoles[system.info.accessRole].label || system.info.accessRole}}</b>
-                    </p>
-                    <button class="btn btn-default" ng-click="delete()">Remove from my Account</button>
-                </div>
-            </div>
+            <ng-include src="'static/views/components/system-card.html'"></ng-include>
         </div>
-
         <div class="col-md-8 col-md-pull-4">
-
-            <div class="no-access-panel" ng-if="!system.info.sharingPermissions.length" >
+            <div class="no-access-panel" ng-if="!system.permissions.editUsers" >
                 <span class="no-access-panel-body">
                     You have no access to view system information
                 </span>
             </div>
-            <div class="panel panel-default"
-                 process-loading="gettingSystemUsers">
-                <div class="panel-body" ng-if="system.info.sharingPermissions.length">
-                    <h2>Users</h2>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover" ng-if="system.users.length">
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Permissions</th>
-                            <th class="button-cell"></th>
-                            <th class="button-cell"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="user in system.users" class="hoverable">
-                            <td class="user-name">{{user.fullName}}</td>
-                            <td class="user-email">{{user.accountEmail}}</td>
-                            <td class="user-role">
-                                <span class="inactive" ng-if="!system.isAvailable"
-                                    title="{{system.stateMessage}}">{{L.accessRoles[user.accessRole].label || user.accessRole}}</span>
-                                <span ng-if="system.isAvailable">{{user.group.name || L.accessRoles[user.accessRole].label || user.accessRole}}</span>
-                            </td>
-                            <td class="button-cell"><a href=''
-                                   class="hover-visible image-link"
-                                   ng-if="system.isAvailable && user.accountEmail != account.email && user.accessRole!=Config.accessRoles.owner"
-                                   title="Edit permissions"
-                                   ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span><span class="visible-lg-inline">&nbsp;&nbsp;Edit</span></span></a></td>
-                            <td class="button-cell"><a href=''
-                                   class="hover-visible image-link" ng-if="system.isAvailable && user.accessRole!=Config.accessRoles.owner"
-                                   title="Delete"
-                                   ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span><span class="visible-lg-inline">&nbsp;&nbsp;Delete</span></a></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
+            <ng-include src="'static/views/components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>
         </div>
     </div>
 </div>

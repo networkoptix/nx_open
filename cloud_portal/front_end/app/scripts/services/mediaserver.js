@@ -7,6 +7,9 @@ angular.module('cloudApp')
              return Config.apiBase + '/systems/' + serverId  + '/proxy';
         }
         var service = {
+            getCurrentUser: function(systemId){
+                return $http.get(gateway(systemId) + '/ec2/getCurrentUser');
+            },
             getUsers: function(systemId){
                 return $http.get(gateway(systemId) + '/ec2/getUsers');
             },

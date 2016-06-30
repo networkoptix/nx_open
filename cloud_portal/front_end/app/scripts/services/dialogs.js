@@ -120,7 +120,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                         redirect: !keepPage
                     }}).result;
             },
-            share:function(isOwner, system, user){
+            share:function(system, user){
                 var url = 'share';
                 var title = L.sharing.shareTitle;
                 if(user){
@@ -135,7 +135,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                     params: {
                         system: system,
                         user: user,
-                        isOwner: isOwner
+                        isOwner: system.isMine
                     }
                 }).result;
             },

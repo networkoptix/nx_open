@@ -1,0 +1,22 @@
+<div class="row">
+    <div class="col-sm-6">
+        <h1 ng-if="gettingSystem.success">{{system.info.name}}
+            <span ng-if="!system.isOnline" class="label"
+                  ng-class="Config.systemStatuses[system.info.stateOfHealth].style || Config.systemStatuses.default.style">
+                  {{Config.systemStatuses[system.info.stateOfHealth].label||system.info.stateOfHealth}}</span>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <div class="pull-right-sm">
+            <button class="btn btn-default"
+                    ng-disabled="!system.isAvailable"
+                    title="{{system.stateMessage}}"
+                    ng-click="share()" ng-if="system.permissions.editUsers">
+                <span class="glyphicon glyphicon-share"></span> Share</button>
+            &nbsp;
+            <button class="btn btn-default" ng-click="open(null)"
+                    title="{{system.stateMessage}}"
+                    ng-disabled="!system.isOnline">Open in VMS_NAME</button>
+        </div>
+    </div>
+</div>

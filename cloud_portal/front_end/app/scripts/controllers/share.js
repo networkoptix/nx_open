@@ -28,13 +28,14 @@ angular.module('cloudApp')
         }
 
         function findRole(user, accessRoles){
-            return _.find(accessRoles,function(role){
+            var role = _.find(accessRoles,function(role){
                 if(user.groupId){
                     return role.groupId == user.groupId;
                 }
 
                 return user.permissions == role.permissions;
             });
+            return role || accessRoles[accessRoles.length-1]; // Last option is custom
         }
 
         function processAccessRoles(roles){
@@ -49,18 +50,18 @@ angular.module('cloudApp')
                 return index >= 0 ? index: 10000;
             });
 
-            if(system.cacheData){
+            if(system.groups){
                 // Add groups sorted by name
-                _.each(system.cacheData.groups,function(group){
+                _.each(system.groups,function(group){
                     $scope.accessRoles.push({
-                        accessRole: Config.accessRoles.custom,
+                        accessRole: Config.accessRoles.custom.accessRole,
                         groupId: group.id,
                         label: group.name
                     })
                 });
             }
             $scope.accessRoles.push({
-                accessRole: Config.accessRoles.custom,
+                accessRole: Config.accessRoles.custom.accessRole,
                 label: L.accessRoles.custom.label
             })
             $scope.user.role = findRole($scope.user, $scope.accessRoles);
