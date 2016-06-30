@@ -810,7 +810,7 @@ namespace ec2
 						NX_LOG(
 							QnLog::EC2_TRAN_LOG,
 							lit("Can't handle transaction %1: %2. Reopening connection...")
-								. arg(ApiCommand::toString(tran.command))
+								.arg(ApiCommand::toString(tran.command))
 								.arg(ec2::toString(errorCode)),
 							cl_logWARNING 
 						);

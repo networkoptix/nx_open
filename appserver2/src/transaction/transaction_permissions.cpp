@@ -6,9 +6,6 @@ bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiResourceParam
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
     QnResourcePtr target = qnResPool->getResourceById(data.resourceId);
-    if (!target)
-        return false;
-
     return qnResourceAccessManager->hasPermission(userResource, target, permission);
 }
 
