@@ -18,7 +18,7 @@ namespace ec2 {
         QString systemRuntime;
 
         QString cpuArchitecture, cpuModelName;
-        qint64 phisicalMemory;
+        qint64 phisicalMemory; //< TODO: Fix typo: "physical".
         QString openGLVersion, openGLVendor, openGLRenderer;
     };
 #define ApiClientInfoData_Fields (id)(parentId) \
