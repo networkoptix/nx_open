@@ -134,12 +134,24 @@ bool hasPermissionImpl(const QnUuid &userId, const TransactionParamType &data, Q
 	return detail::hasPermissionImpl(userId, data, permission, 0);
 }
 
+inline bool hasAdminAccess(const QnUuid& userId)
+{
+	if (Qn::UserAccessData(userId) == Qn::kDefaultUserAccess)
+		return true;
+	auto userResource = 
+		qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+	return qnResourceAccessManager->hasGlobalPermission(
+		userResource,
+		Qn::GlobalPermission::GlobalAdminPermission);
+}
+
 } // namespace detail
+
 
 template<typename TransactionParamType>
 bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission)
 {
-    if (Qn::UserAccessData(userId) == Qn::kDefaultUserAccess)
+	if (detail::hasAdminAccess(userId))
         return true;
     bool result = detail::hasPermissionImpl(userId, data, permission);
 	return result;
@@ -148,7 +160,7 @@ bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::P
 template<typename TransactionParamType>
 bool hasModifyPermission(const QnUuid &userId, const TransactionParamType &data)
 {
-    if (Qn::UserAccessData(userId) == Qn::kDefaultUserAccess)
+	if (detail::hasAdminAccess(userId))
         return true;
     bool result = detail::hasModifyPermissionImpl(userId, data, 0);
 	return result;

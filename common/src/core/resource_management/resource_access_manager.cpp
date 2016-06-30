@@ -248,8 +248,7 @@ bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, c
     if (QnWebPageResourcePtr webPage = target.dynamicCast<QnWebPageResource>())
         return canCreateWebPage(user);
 
-    /* Other resources cannot be added manually. */
-    return false;
+    return hasGlobalPermission(user, Qn::GlobalAdminPermission);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const

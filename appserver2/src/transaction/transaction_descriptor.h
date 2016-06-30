@@ -152,8 +152,7 @@ struct DefaultPermissionCheckHelper
     template<typename Param>
     static auto check(const QnUuid &userId, const QnUuid &/*paramsId*/, Qn::Permission permission, char) -> bool
     {
-        Param param;
-        return hasPermission(userId, param, permission);
+		return true;
     }
 };
 

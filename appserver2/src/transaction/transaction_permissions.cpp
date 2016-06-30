@@ -5,8 +5,13 @@
 bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiResourceParamWithRefData &data, Qn::Permission permission)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    QnResourcePtr target = qnResPool->getResourceById(data.resourceId);
-    return qnResourceAccessManager->hasPermission(userResource, target, permission);
+    if (permission == Qn::Permission::SavePermission)
+        return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+    else if (permission == Qn::Permission::ReadPermission)
+        return true;
+    else
+        NX_ASSERT(0);
+    return false;
 }
 
 bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiSystemStatistics &/*data*/, Qn::Permission /*permission*/)
