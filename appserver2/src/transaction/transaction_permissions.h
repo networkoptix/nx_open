@@ -66,11 +66,11 @@ bool hasPermissionImpl(const QnUuid &userId, const ApiUpdateInstallData &/*data*
 
 bool hasPermissionImpl(const QnUuid &userId, const ApiUpdateUploadResponceData &/*data*/, Qn::Permission /*permission*/);
 
-bool hasPermissionImpl(const QnUuid &userId, const ApiPeerSystemTimeData &/*data*/, Qn::Permission /*permission*/);
+bool hasPermissionImpl(const QnUuid &userId, const ApiPeerSystemTimeData &/*data*/, Qn::Permission permission);
 
 bool hasPermissionImpl(const QnUuid &userId, const ApiSystemStatistics &/*data*/, Qn::Permission /*permission*/);
 
-bool hasPermissionImpl(const QnUuid &userId, const ApiUserGroupData&/*data*/, Qn::Permission /*permission*/);
+bool hasPermissionImpl(const QnUuid &userId, const ApiUserGroupData& data, Qn::Permission permission);
 
 bool hasPermissionImpl(const QnUuid &userId, const ApiDiscoveredServerData&/*data*/, Qn::Permission permission);
 
@@ -141,7 +141,8 @@ bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::P
 {
     if (Qn::UserAccessData(userId) == Qn::kDefaultUserAccess)
         return true;
-    return detail::hasPermissionImpl(userId, data, permission);
+    bool result = detail::hasPermissionImpl(userId, data, permission);
+	return result;
 }
 
 template<typename TransactionParamType>
@@ -149,7 +150,8 @@ bool hasModifyPermission(const QnUuid &userId, const TransactionParamType &data)
 {
     if (Qn::UserAccessData(userId) == Qn::kDefaultUserAccess)
         return true;
-    return detail::hasModifyPermissionImpl(userId, data, 0);
+    bool result = detail::hasModifyPermissionImpl(userId, data, 0);
+	return result;
 }
 
 } // namespace ec2

@@ -18,10 +18,16 @@ bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiSystemStatist
     return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
-bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiPeerSystemTimeData &/*data*/, Qn::Permission /*permission*/)
+bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiPeerSystemTimeData &/*data*/, Qn::Permission permission)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+    if (permission == Qn::Permission::SavePermission)
+        return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+    else if (permission == Qn::Permission::ReadPermission)
+        return true;
+    else
+        NX_ASSERT(0);
+    return false;
 }
 
 bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiUpdateUploadResponceData &/*data*/, Qn::Permission /*permission*/)
