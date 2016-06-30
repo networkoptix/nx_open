@@ -146,14 +146,23 @@ function openCloudScreen()
     item.forceActiveFocus()
 }
 
-function openDialog(path)
+function openDialog(path, properties)
 {
     var component = Qt.createComponent(path)
-    var dialog = component.createObject(stackView)
+    var dialog = component.createObject(mainWindow.contentItem, properties ? properties : {})
     dialog.open()
-    // TODO: #dklychkov forceActiveFocus doesn't work for some reason. Investigate.
-//    dialog.forceActiveFocus()
     return dialog
+}
+
+function openInformationDialog(title, message)
+{
+    openDialog(
+        "Dialogs/InformationDialog.qml",
+        {
+            "title": title,
+            "message": message
+        }
+    )
 }
 
 function openOldClientDownloadSuggestion()

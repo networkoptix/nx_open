@@ -5,5 +5,6 @@ DialogButton 1.0 DialogButton.qml
 DialogTitle 1.0 DialogTitle.qml
 DialogMessage 1.0 DialogMessage.qml
 DialogSeparator 1.0 DialogSeparator.qml
+DialogButtonBox 1.0 DialogButtonBox.qml
 
-DownloadOldClientDialog 1.0 DownloadOldClientDialog.qml
+InformationDialog 1.0 InformationDialog.qml

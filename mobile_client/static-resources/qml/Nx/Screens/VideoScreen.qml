@@ -181,9 +181,14 @@ PageBase
             text: qsTr("Change Quality")
             onClicked:
             {
-                var dialog = Workflow.openDialog("Screens/private/VideoScreen/QualityDialog.qml")
-                dialog.actualQuality = player.currentResolution
-                dialog.activeQuality = player.videoQuality
+                var dialog = Workflow.openDialog(
+                    "Screens/private/VideoScreen/QualityDialog.qml",
+                    {
+                        "actualQuality": player.currentResolution,
+                        "activeQuality": player.videoQuality
+                    }
+                )
+
                 dialog.onActiveQualityChanged.connect(
                     function()
                     {

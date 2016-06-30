@@ -12,6 +12,7 @@ Button
     font.weight: Font.Normal
 
     implicitHeight: 48
+    implicitWidth: parent ? parent.width / parent.children.length : 200
     radius: 0
 
     padding: 0
