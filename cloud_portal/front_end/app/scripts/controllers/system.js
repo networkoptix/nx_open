@@ -9,11 +9,10 @@ angular.module('cloudApp')
         $scope.L = L;
         var systemId = $routeParams.systemId;
 
-        $scope.system = system(systemId);
-
 
         account.requireLogin().then(function(account){
             $scope.account = account;
+            $scope.system = system(systemId, account.email);
             $scope.gettingSystem.run();
         });
 

@@ -95,7 +95,21 @@ angular.module('cloudApp')
             var user = $scope.user;
 
             if(!user.userId){
-                user = mediaserver.userObject(user.fullName, user.accountEmail);
+                if(user.accountEmail == system.currentUserEmail){
+                    var deferred = $q.defer();
+                    deferred.reject({resultCode:'cantEditYourself'});
+                    return deferred.promise;
+                }
+
+                user = _.find(system.users,function(u){
+                    return user.accountEmail == u.accountEmail;
+                })||mediaserver.userObject(user.fullName, user.accountEmail);
+
+                if(!user.canBeEdited && !system.isMine){
+                    var deferred = $q.defer();
+                    deferred.reject({resultCode:'cantEditAdmin'});
+                    return deferred.promise;
+                }
             }
 
             user.groupId = role.groupId||'';

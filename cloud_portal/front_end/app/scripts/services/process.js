@@ -71,11 +71,12 @@ angular.module('cloudApp')
                         );
 
                         function handleError(data){
+
                             self.processing = false;
                             self.finished = true;
                             self.error = true;
                             self.errorData = data;
-                            var formatted = formatError(data.data, errorCodes);
+                            var formatted = formatError(data.data || data, errorCodes);
                             if(formatted !== false){
                                 self.errorMessage = formatted;
                                 // Error handler here

@@ -67,7 +67,10 @@ var L = {
         passwordMismatch: 'Wrong password',
 
         systemForbidden: 'You have no access to this system',
-        systemNotFound: 'This system wasn\'t found'
+        systemNotFound: 'This system wasn\'t found',
+
+        cantEditYourself: 'You can\'t change your own permissions',
+        cantEditAdmin: 'This user already has administrator privileges'
 
     },
     passwordRequirements:
@@ -79,7 +82,6 @@ var L = {
         commonMessage: 'This password is in top most popular passwords in the world'
     },
     sharing:{
-        cantEditYourself: 'Can\'t edit yourself',
         confirmOwner: 'You are going to change the owner of your system. You will not be able to return this power back!',
 
         shareTitle: 'Share',

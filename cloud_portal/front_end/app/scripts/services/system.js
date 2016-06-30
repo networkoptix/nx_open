@@ -208,9 +208,9 @@ angular.module('cloudApp')
             }); // Anyway - send another request to cloud_db to remove myselft
         }
 
-        return function(systemId){
+        return function(systemId, email){
             if(!systems[systemId]){
-                systems[systemId] = new system(systemId);
+                systems[systemId] = new system(systemId, email);
             }
             return systems[systemId];
         };
