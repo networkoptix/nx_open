@@ -64,11 +64,33 @@ VmsGatewayFunctionalTest::~VmsGatewayFunctionalTest()
 
 bool VmsGatewayFunctionalTest::startAndWaitUntilStarted()
 {
+    return startAndWaitUntilStarted(true, true, true);
+}
+
+bool VmsGatewayFunctionalTest::startAndWaitUntilStarted(
+    bool allowIpTarget, bool proxyTargetPort, bool connectSupport)
+{
     if (!m_testHttpServer->bindAndListen())
         return false;
 
-    addArg("-http/proxyTargetPort");
-    addArg(QByteArray::number(m_testHttpServer->serverAddress().port).constData());
+    if (allowIpTarget)
+    {
+        addArg("-cloudConnect/allowIpTarget");
+        addArg("true");
+    }
+
+    if (proxyTargetPort)
+    {
+        addArg("-http/proxyTargetPort");
+        addArg(QByteArray::number(
+            m_testHttpServer->serverAddress().port).constData());
+    }
+
+    if (connectSupport)
+    {
+        addArg("-http/connectSupport");
+        addArg("true");
+    }
 
     if (!utils::test::ModuleLauncher<VmsGatewayProcessPublic>::startAndWaitUntilStarted())
         return false;

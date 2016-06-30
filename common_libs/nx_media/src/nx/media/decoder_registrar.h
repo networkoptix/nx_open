@@ -23,7 +23,7 @@ public:
     static void registerDecoders(
         std::shared_ptr<AbstractResourceAllocator> allocator,
         const QSize& maxFfmpegResolution,
-        bool liteClientMode);
+        bool isTranscodingEnabled);
 };
 
 } // namespace media

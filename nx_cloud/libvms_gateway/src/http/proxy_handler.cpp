@@ -6,6 +6,7 @@
 #include "proxy_handler.h"
 
 #include <nx/network/http/buffer_source.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/cpp14.h>
 
@@ -52,8 +53,20 @@ void ProxyHandler::processRequest(
         completionHandler(nx_http::StatusCode::forbidden, nullptr);
         return;
     }
-    const auto systemAddressString = pathItems[0];
+
+    SocketAddress systemAddress(pathItems[0].toString());
     pathItems.removeAt(0);
+
+    if (!network::cloud::AddressResolver::
+        kCloudAddressRegExp.exactMatch(systemAddress.address.toString()))
+    {
+        // No cloud address means direct IP
+        if (!m_settings.cloudConnect().allowIpTarget)
+            return completionHandler(nx_http::StatusCode::forbidden, nullptr);
+
+        if (systemAddress.port == 0)
+            systemAddress.port = m_settings.http().proxyTargetPort;
+    }
 
     if (pathItems.isEmpty())
     {
@@ -83,7 +96,7 @@ void ProxyHandler::processRequest(
     m_request = std::move(request);
     //TODO #ak updating request (e.g., Host header)
     m_targetPeerSocket->connectAsync(
-        SocketAddress(systemAddressString.toString(), m_settings.http().proxyTargetPort),
+        systemAddress,
         std::bind(&ProxyHandler::onConnected, this, std::placeholders::_1));
 }
 

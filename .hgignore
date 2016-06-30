@@ -50,6 +50,7 @@ Release
 */arm-isd_s2/*
 */arm-rpi/*
 */arm-bpi/*
+*/arm-tx1/*
 */target/*
 */target-isd/*
 */target-isd_s2/*

@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_speach_synthesizer</artifactId>
     <packaging>pom</packaging>
-    <name>Nx speach synthesizer</name>
+    <name>NX Speach Synthesizer Library</name>
 
     <properties>
         <guid>${nx_speach_synthesizer.guid}</guid>
@@ -33,9 +33,9 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>    
-    </dependencies>       
-    
+        </dependency>
+    </dependencies>
+
     <profiles>
         <profile>
             <id>windows</id>
@@ -43,7 +43,7 @@
                 <os>
                     <family>Windows</family>
                 </os>
-            </activation>            
+            </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
             </properties>
@@ -54,13 +54,33 @@
             <activation>
                 <os>
                     <family>unix</family>
-                </os> 
-            </activation>            
+                </os>
+            </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
             </properties>
-        </profile>  
+        </profile>
 
-    </profiles> 
+        <profile>
+            <id>linux-arm-tx1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>tx1</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- cut off festival -->
+                <linux.oslibs></linux.oslibs>
+                <rdep.linux.packages></rdep.linux.packages>
+            </properties>
+        </profile>
+
+    </profiles>
 
 </project>

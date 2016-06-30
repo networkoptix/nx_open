@@ -19,7 +19,6 @@
 
 #include <nx/utils/log/assert.h>
 
-
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
     m_mutex(QnMutex::NonRecursive)
@@ -635,8 +634,10 @@ bool QnResourceAccessManager::canCreateWebPage(const QnUserResourcePtr& user) co
     return hasGlobalPermission(user, Qn::GlobalAdminPermission);
 }
 
-bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnStorageResourcePtr& target, const ec2::ApiStorageData& update) const
+bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnResourcePtr& target, const ec2::ApiStorageData& update) const
 {
+    NX_ASSERT(target.dynamicCast<QnStorageResource>());
+
     /* Storages cannot be moved from one server to another. */
     if (target->getParentId() != update.parentId)
         return false;
@@ -645,8 +646,10 @@ bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, c
     return hasPermission(user, target, Qn::SavePermission);
 }
 
-bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnLayoutResourcePtr& target, const ec2::ApiLayoutData& update) const
+bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnResourcePtr& target, const ec2::ApiLayoutData& update) const
 {
+    NX_ASSERT(target.dynamicCast<QnLayoutResource>());
+
     /* If we are changing layout parent, it is equal to creating new layout. */
     if (target->getParentId() != update.parentId)
         return canCreateLayout(user, update.parentId);
@@ -655,13 +658,16 @@ bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, c
     return hasPermission(user, target, Qn::SavePermission);
 }
 
-bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnUserResourcePtr& target, const ec2::ApiUserData& update) const
+bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnResourcePtr& target, const ec2::ApiUserData& update) const
 {
+    auto userResource = target.dynamicCast<QnUserResource>();
+    NX_ASSERT(userResource);
+
     if (!user || !target)
         return false;
 
     /* Nobody can make user an owner (isAdmin ec2 field) unless target user is already an owner. */
-    if (!target->isOwner() && update.isAdmin)
+    if (!userResource->isOwner() && update.isAdmin)
         return false;
 
     /* We should have full access to user to modify him. */
@@ -670,29 +676,32 @@ bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, c
     if (target->getName() != update.name)
         requiredPermissions |= Qn::WriteNamePermission;
 
-    if (target->getHash() != update.hash)
+    if (userResource->getHash() != update.hash)
         requiredPermissions |= Qn::WritePasswordPermission;
 
-    if (target->getDigest() != update.digest)       //TODO: #rvasilenko describe somewhere password changing logic, it looks like hell to me
+    if (userResource->getDigest() != update.digest)       //TODO: #rvasilenko describe somewhere password changing logic, it looks like hell to me
         requiredPermissions |= Qn::WritePasswordPermission;
 
-    if (target->getRawPermissions() != update.permissions)
+    if (userResource->getRawPermissions() != update.permissions)
         requiredPermissions |= Qn::WriteAccessRightsPermission;
 
-    if (target->getEmail() != update.email)
+    if (userResource->getEmail() != update.email)
         requiredPermissions |= Qn::WriteEmailPermission;
 
-    if (target->fullName() != update.fullName)
+    if (userResource->fullName() != update.fullName)
         requiredPermissions |= Qn::WriteFullNamePermission;
 
     return hasPermission(user, target, requiredPermissions);
 }
 
-bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnVideoWallResourcePtr& target, const ec2::ApiVideowallData& update) const
+bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnResourcePtr& target, const ec2::ApiVideowallData& update) const
 {
-    auto hasItemsChange = [target, update]
+    auto videoWallResource = target.dynamicCast<QnVideoWallResource>();
+    NX_ASSERT(videoWallResource);
+
+    auto hasItemsChange = [&videoWallResource, update]
     {
-        auto items = target->items()->getItems();
+        auto items = videoWallResource->items()->getItems();
 
         /* Quick check */
         if (items.size() != update.items.size())

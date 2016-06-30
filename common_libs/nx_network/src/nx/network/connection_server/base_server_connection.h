@@ -157,7 +157,9 @@ namespace nx_api
         */
         std::unique_ptr<AbstractCommunicatingSocket> takeSocket()
         {
-            return std::move(m_streamSocket);
+            auto socket = std::move(m_streamSocket);
+            m_streamSocket = nullptr;
+            return std::move(socket);
         }
 
     protected:

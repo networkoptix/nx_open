@@ -99,10 +99,10 @@ public:
         return hasPermission(user, target, Qn::ReadWriteSavePermission);
     }
 
-    bool canModifyResource  (const QnUserResourcePtr& user, const QnStorageResourcePtr& target,     const ec2::ApiStorageData& update) const;
-    bool canModifyResource  (const QnUserResourcePtr& user, const QnLayoutResourcePtr& target,      const ec2::ApiLayoutData& update) const;
-    bool canModifyResource  (const QnUserResourcePtr& user, const QnUserResourcePtr& target,        const ec2::ApiUserData& update) const;
-    bool canModifyResource  (const QnUserResourcePtr& user, const QnVideoWallResourcePtr& target,   const ec2::ApiVideowallData& update) const;
+    bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,     const ec2::ApiStorageData& update) const;
+    bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,      const ec2::ApiLayoutData& update) const;
+    bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,        const ec2::ApiUserData& update) const;
+    bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,   const ec2::ApiVideowallData& update) const;
 
 signals:
     void accessibleResourcesChanged(const QnUuid& userId);

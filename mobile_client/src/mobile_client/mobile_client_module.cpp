@@ -25,6 +25,8 @@
 #include <finders/direct_systems_finder.h>
 #include <client/client_recent_connections_manager.h>
 
+#include "ui/videowall_handler.h"
+
 #include "mobile_client_message_processor.h"
 #include "mobile_client_meta_types.h"
 #include "mobile_client_settings.h"
@@ -64,6 +66,8 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
     common->store<QnMobileClientCameraFactory>(new QnMobileClientCameraFactory());
     common->store<QnClientRecentConnectionsManager>(new QnClientRecentConnectionsManager());
+
+    common->store<QnVideowallHandler>(new QnVideowallHandler());
 
     QnUserWatcher *userWatcher = new QnUserWatcher();
     common->store<QnUserWatcher>(userWatcher);
