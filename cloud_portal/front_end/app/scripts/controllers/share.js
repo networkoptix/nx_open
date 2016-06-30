@@ -68,12 +68,8 @@ angular.module('cloudApp')
         }
 
         processAccessRoles([{ accessRole: $scope.user.accessRole }]);
-        // dialogSettings.params.
-        cloudApi.accessRoles(systemId).then(function(roles){
-            processAccessRoles(roles.data);
-        },function(){
-            processAccessRoles(Config.accessRoles.options);
-        });
+
+        processAccessRoles(Config.accessRoles.options);
 
 
         // TODO: add groups from system cache
@@ -90,34 +86,7 @@ angular.module('cloudApp')
         };
 
         function doShare(){
-            var role = $scope.user.role;
-            var accessRole = role.accessRole;
-            var user = $scope.user;
-
-            if(!user.userId){
-                if(user.accountEmail == system.currentUserEmail){
-                    var deferred = $q.defer();
-                    deferred.reject({resultCode:'cantEditYourself'});
-                    return deferred.promise;
-                }
-
-                user = _.find(system.users,function(u){
-                    return user.accountEmail == u.accountEmail;
-                })||mediaserver.userObject(user.fullName, user.accountEmail);
-
-                if(!user.canBeEdited && !system.isMine){
-                    var deferred = $q.defer();
-                    deferred.reject({resultCode:'cantEditAdmin'});
-                    return deferred.promise;
-                }
-            }
-
-            user.groupId = role.groupId||'';
-            user.permissions = role.permissions||'';
-
-            cloudApi.share(systemId, user.email, accessRole);
-
-            return mediaserver.saveUser(systemId, user);
+            return system.saveUser($scope.user, $scope.user.role);
         }
 
         $scope.sharing = process.init(function(){

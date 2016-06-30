@@ -16,6 +16,7 @@ angular.module('cloudApp')
             this.groups = [];
             this.info = {name:''};
             this.permissions = {};
+            this.accessRole = '';
             
             this.currentUserEmail = currentUserEmail;
             this.updateSystemState();
@@ -34,10 +35,16 @@ angular.module('cloudApp')
         system.prototype.checkPermissions = function(){
             var self = this;
             self.permissions = {};
+            self.accessRole = self.info.accessRole;
             if(self.currentUserRecord){
+                var role = findAccessRole(self.currentUserRecord.isAdmin, self.currentUserRecord.permissions);
+                self.accessRole = role.accessRole;
                 self.permissions.editAdmins = self.currentUserRecord.isAdmin;
                 self.permissions.editUsers = self.currentUserRecord.isAdmin || self.currentUserRecord.permissions.indexOf(Config.accessRoles.editUserPermissionFlag>=0);
             }else{
+
+                var role = findAccessRole(self.isMine, self.info.accessRole);
+                self.accessRole = role.accessRole;
                 if(self.isMine){
                     self.permissions.editUsers = true;
                     self.permissions.editAdmins = true;
@@ -85,8 +92,6 @@ angular.module('cloudApp')
             permissions = normalizePermissionString(permissions);
 
             var role = _.find(Config.accessRoles.options,function(option){
-                //console.log("check permission:", option, isAdmin, permissions, option.permissions == permissions);
-
                 return isAdmin && option.isAdmin || !isAdmin && option.permissions == permissions;
             })
 
@@ -190,8 +195,42 @@ angular.module('cloudApp')
         };
 
 
+        system.prototype.saveUser = function(user, role){
+            console.log("saveUser",user,role);
+            var accessRole = role.accessRole;
+
+            if(!user.userId){
+                if(user.accountEmail == this.currentUserEmail){
+                    var deferred = $q.defer();
+                    deferred.reject({resultCode:'cantEditYourself'});
+                    return deferred.promise;
+                }
+
+                user = _.find(this.users,function(u){
+                    return user.accountEmail == u.email;
+                })||mediaserver.userObject(user.fullName, user.accountEmail);
+
+                if(!user.canBeEdited && !this.isMine){
+                    var deferred = $q.defer();
+                    deferred.reject({resultCode:'cantEditAdmin'});
+                    return deferred.promise;
+                }
+            }
+
+            user.groupId = role.groupId || '';
+            user.permissions = role.permissions || '';
+
+            cloudApi.share(this.id, user.email, accessRole);
+
+            return mediaserver.saveUser(this.id, user);
+        }
+
         system.prototype.deleteUser = function(user){
             var self = this;
+
+            // TODO: remove later
+            cloudApi.unshare(self.id, user.accountEmail);
+
             return mediaserver.deleteUser(self.id, user.id).then(function(){
                 self.users = _.without(self.users, user);
             });
@@ -205,7 +244,7 @@ angular.module('cloudApp')
             }
             return cloudApi.unshare(self.id, self.currentUserEmail).then(function(){
                 delete systems[self.id]
-            }); // Anyway - send another request to cloud_db to remove myselft
+            }); // Anyway - send another request to cloud_db to remove myself
         }
 
         return function(systemId, email){

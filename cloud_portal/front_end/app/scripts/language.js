@@ -34,7 +34,7 @@ var L = {
             description: 'Can view live video from cameras and archive, configure cameras'
         },
         cloudAdmin: {
-            label: 'admin',
+            label: 'administrator',
             description: 'Can configure system and share it'
         },
         custom:{
