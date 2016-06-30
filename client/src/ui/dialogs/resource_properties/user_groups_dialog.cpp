@@ -128,7 +128,7 @@ QnUserGroupsDialog::~QnUserGroupsDialog()
 {
 }
 
-bool QnUserGroupsDialog::selectGroup(QnUuid groupId)
+bool QnUserGroupsDialog::selectGroup(const QnUuid& groupId)
 {
     ec2::ApiUserGroupDataList groups = m_model->groups();
     ec2::ApiUserGroupDataList::const_iterator group = std::find_if(groups.cbegin(), groups.cend(),
