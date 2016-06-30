@@ -14,6 +14,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/applauncher_utils.h>
+#include <utils/directory_backup.h>
 
 namespace {
 
@@ -86,7 +87,7 @@ bool nx::vms::client::SelfUpdater::updateApplauncher()
     if (m_clientVersion <= applauncherVersion)
     {
         NX_LOG(lit("Applauncher is up to date"), cl_logINFO);
-        return false;
+        return true;
     }
 
     NX_LOG(lit("Applauncher is too old, updating from %1").arg(applauncherVersion.toString()), cl_logINFO);
@@ -101,75 +102,63 @@ bool nx::vms::client::SelfUpdater::updateApplauncher()
         return false;
     }
 
-    /* Delete old backup. */
-    QString backupDirPath = applauncherDirPath + lit("/backup");
-    QDir backupDir(backupDirPath);
-    if (!backupDir.removeRecursively())
+    //TODO: #GDM appinfo?
+    const QStringList kTargetFileFilters =
     {
-        NX_LOG(lit("Could not clear backup directory: %1").arg(backupDirPath), cl_logERROR);
-        return false;
-    }
+        QLatin1String("*.dll"),
+        QLatin1String("version"),
+        QLatin1String("applauncher.exe")
+    };
 
     /* Move installed applaucher to backup folder. */
+    QString backupDirPath = applauncherDirPath + lit("/backup");
+    QnDirectoryBackup backup(applauncherDirPath, kTargetFileFilters, backupDirPath);
+    if (!backup.backup(QnDirectoryBackup::Behavior::Move))
     {
-        if (!applauncherDir.mkpath(backupDirPath))
-            return false;
-        QStringList oldFiles = applauncherDir.entryList(QDir::NoDotAndDotDot | QDir::Files);
-        oldFiles.removeAll(lit("update.lock")); //TODO: #GDM duplicated string
-
-        /* First, copy all files. */
-        for (const QString& filename : oldFiles)
-        {
-            if (!QFile(filename).copy(backupDirPath + L'/' + filename))
-                return false;
-        }
-
-        /* Only then delete existing. */
-        for (const QString& filename : oldFiles)
-        {
-            if (!QFile::remove(filename))
-                return false;
-        }
+        NX_LOG(lit("Could not backup to %1.").arg(backupDirPath), cl_logERROR);
+        return false;
     }
 
     /* Copy our applauncher with all libs to destination folder. */
+    QnDirectoryBackup updatedSource(qApp->applicationDirPath(), kTargetFileFilters, applauncherDirPath);
+    bool success = updatedSource.backup();
+    if (!success)
     {
-        //TODO: #GDM appinfo?
-        QStringList filters = {
-            QLatin1String("*.dll"),
-            QLatin1String("applauncher.exe")
-        };
-
-        QString sourcePath = qApp->applicationDirPath();
-
-        QStringList targetFiles = QDir(sourcePath).entryList(filters, QDir::NoDotAndDotDot | QDir::Files);
-        for (const QString& filename : targetFiles)
-        {
-            QString sourceFilename = sourcePath + L'/' + filename;
-            QString targetFilename = applauncherDirPath + L'/' + filename;
-            if (!QFile(sourceFilename).copy(targetFilename))
-            {
-                NX_LOG(lit("Could not copy files: %1 to %2")
-                       .arg(filename)
-                       .arg(targetFilename), cl_logERROR);
-                return false;
-            }
-        }
+        NX_LOG(lit("Failed to update Applauncher."), cl_logERROR);
+        backup.restore();
     }
 
-    /* If failed, restore data from backup. */
+    /* Run updated (or restored) applauncher. */
+    QString applauncherPath = applauncherDirPath + lit("/applauncher.exe");
 
-    /* Run updated applauncher. */
+    //TODO: #GDM here will be passed arguments to just run, without compatibility client
+    QStringList applauncherArguments;
 
-
-    /* Finally, save version to file. */
-    if (!saveVersionToFile(versionFile, m_clientVersion))
+    if (QFileInfo::exists(applauncherPath) && QProcess::startDetached(applauncherPath, applauncherArguments))
     {
-        NX_LOG(lit("Version could not be written to file: %1").arg(versionFile), cl_logERROR);
+        NX_LOG(lit("Applauncher process started successfully."), cl_logINFO);
+    }
+    else
+    {
+        NX_LOG(lit("Applauncher process could not be started %1.").arg(applauncherPath), cl_logERROR);
+        success = false;
+    }
+
+    /* If we failed, return now. */
+    if (!success)
+    {
         return false;
     }
 
+    /* Finally, is case o f success, save version to file. */
+    if (!saveVersionToFile(versionFile, m_clientVersion))
+    {
+        NX_LOG(lit("Version could not be written to file: %1.").arg(versionFile), cl_logERROR);
+        NX_LOG(lit("Failed to update Applauncher."), cl_logERROR);
+        return false;
+    }
 
+    NX_LOG(lit("Applauncher updated successfully."), cl_logINFO);
     return true;
 }
 
