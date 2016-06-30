@@ -71,14 +71,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
 {
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
 
-#ifdef Q_OS_WIN
-    nx::vms::client::SelfUpdater updater(startupParams);
-
-    /* Immediately exit if run under administrator. */
-    if (startupParams.hasAdminPermissions)
-        return kSuccessCode;
-#endif // Q_OS_WIN
-
     const bool allowMultipleClientInstances = startupParams.allowMultipleClientInstances
         || !startupParams.customUri.isNull()
         || !startupParams.videoWallGuid.isNull();
@@ -95,6 +87,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     }
 
     QnClientModule client(startupParams);
+
+    /* Running updater after QApplication and NX_LOG are initialized. */
+    nx::vms::client::SelfUpdater updater(startupParams);
+
+    /* Immediately exit if run under administrator. */
+    if (startupParams.hasAdminPermissions)
+        return kSuccessCode;
 
     /* Initialize sound. */
     QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());

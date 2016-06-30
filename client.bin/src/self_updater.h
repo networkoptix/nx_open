@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef Q_OS_WIN
-
 #include <nx/utils/software_version.h>
 
 struct QnStartupParameters;
@@ -18,7 +16,10 @@ public:
 
 private:
     bool registerUriHandler();
-    bool updateClientInstallation();
+    bool updateApplauncher();
+
+    nx::utils::SoftwareVersion getVersionFromFile(const QString& filename) const;
+    bool saveVersionToFile(const QString& filename, const nx::utils::SoftwareVersion& version) const;
 
 private:
     nx::utils::SoftwareVersion m_clientVersion;
@@ -28,5 +29,3 @@ private:
 }
 }
 }
-
-#endif //Q_OS_WIN

@@ -158,6 +158,11 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     initSingletons(startupParams);
     initRuntimeParams(startupParams);
     initLog(startupParams);
+
+    /* Do not initialize anything else because we must exit immediately if run under administrator. */
+    if (startupParams.hasAdminPermissions)
+        return;
+
     initNetwork(startupParams);
     initSkin(startupParams);
     initLocalResources(startupParams);

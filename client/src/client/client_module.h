@@ -14,10 +14,9 @@ public:
     QnClientModule(const QnStartupParameters &startupParams = QnStartupParameters(), QObject *parent = NULL);
     virtual ~QnClientModule();
 
-    static void initApplication();
-
     void initDesktopCamera(QGLWidget* window);
 private:
+    void initApplication();
     void initThread();
     void initMetaInfo();
     void initSingletons     (const QnStartupParameters& startupParams);

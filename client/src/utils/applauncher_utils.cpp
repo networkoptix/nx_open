@@ -140,10 +140,10 @@ namespace applauncher
         request.version = version;
         request.zipFileName = zipFileName;
         api::Response response;
-        api::ResultType::Value result = sendCommandToLauncher( request, &response );
-        if( result != api::ResultType::ok )
+        api::ResultType::Value result = sendCommandToLauncher(request, &response);
+        if (result != api::ResultType::ok)
             return result;
-        if( response.result != api::ResultType::ok )
+        if (response.result != api::ResultType::ok)
             return response.result;
         return response.result;
     }
@@ -168,6 +168,18 @@ namespace applauncher
         api::ResultType::Value result = sendCommandToLauncher( request, &response );
         if( result != api::ResultType::ok )
             return result;
+        return response.result;
+    }
+
+    applauncher::api::ResultType::Value quitApplauncher()
+    {
+        api::QuitTask task;
+        api::Response response;
+        api::ResultType::Value result = sendCommandToLauncher(task, &response);
+        if (result != api::ResultType::ok)
+            return result;
+        if (response.result != api::ResultType::ok)
+            return response.result;
         return response.result;
     }
 
