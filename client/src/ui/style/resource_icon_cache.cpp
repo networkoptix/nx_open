@@ -129,7 +129,7 @@ QIcon QnResourceIconCache::icon(const QnResourcePtr& resource)
     return icon(key(resource));
 }
 
-void QnResourceIconCache::setKey(QnResourcePtr& resource, Key key)
+void QnResourceIconCache::setKey(const QnResourcePtr& resource, Key key)
 {
     resource->setProperty(customKeyProperty, QString::number(static_cast<int>(key), 16));
 }

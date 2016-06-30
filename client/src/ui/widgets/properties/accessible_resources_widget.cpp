@@ -325,7 +325,7 @@ void QnAccessibleResourcesWidget::initControlsModel()
     dummy->setName(tr("All Media Resources"));
     /* Create separate dummy resource id for each filter, but once per application run. */
     dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
-    qnResIconCache->setKey(dummy.staticCast<QnResource>(), QnResourceIconCache::Cameras);
+    qnResIconCache->setKey(dummy, QnResourceIconCache::Cameras);
     m_controlsModel->setResources(QnResourceList() << dummy);
     m_controlsModel->setHasCheckboxes(true);
     m_controlsModel->setUserCheckable(false);
