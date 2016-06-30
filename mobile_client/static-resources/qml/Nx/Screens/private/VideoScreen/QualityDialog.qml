@@ -11,8 +11,12 @@ DialogBase
     property int activeQuality: QnPlayer.Low
     property size actualQuality
 
+    implicitHeight: Math.min(parent.height, contentItem.implicitHeight)
+
     closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
     deleteOnClose: true
+
+    background: null
 
     contentItem: Flickable
     {
@@ -25,6 +29,16 @@ DialogBase
 
         contentWidth: width
         contentHeight: column.height
+
+        topMargin: 16
+        bottomMargin: 16
+        contentY: 0
+
+        Rectangle
+        {
+            anchors.fill: column
+            color: ColorTheme.contrast3
+        }
 
         Column
         {

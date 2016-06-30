@@ -8,8 +8,8 @@ Popup
 
     property bool deleteOnClose: false
 
-    width: Math.min(328, parent.width - 32)
-    height: Math.min(parent.height - 56 * 2, contentItem.implicitHeight)
+    implicitWidth: Math.min(328, parent.width - 32)
+    implicitHeight: Math.min(parent.height - 56 * 2, contentItem.implicitHeight)
     x: (parent.width - width) / 2
     y: (parent.height - height) / 2
     padding: 0
