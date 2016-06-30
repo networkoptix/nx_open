@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 
 #include <utils/common/connective.h>
-#include <network/system_description.h>
+#include <network/base_system_description.h>
 
 class QnAbstractSystemsFinder : public Connective<QObject>
 {

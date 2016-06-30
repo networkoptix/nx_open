@@ -6,6 +6,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx_ec/impl/ec_api_impl.h>
 #include <utils/common/connective.h>
+#include <network/system_description.h>
 #include <finders/abstract_systems_finder.h>
 #include <watchers/cloud_status_watcher.h>
 
@@ -34,13 +35,13 @@ private:
 
     void onCloudError(QnCloudStatusWatcher::ErrorCode error);
     
-    void updateSystemInternal(const QnSystemDescriptionPtr &system);
+    void updateSystemInternal(const QnSystemDescription::PointerType &system);
 
     void pingServerInternal(const QString &host
         , int serverPriority
         , const QString &systemId);
 
-    void checkOutdatedServersInternal(const QnSystemDescriptionPtr &system);
+    void checkOutdatedServersInternal(const QnSystemDescription::PointerType &system);
 
     void updateSystems();
 
@@ -49,7 +50,7 @@ private:
 
 private:
     typedef QScopedPointer<QTimer> QTimerPtr;
-    typedef QHash<QString, QnSystemDescriptionPtr> SystemsHash;
+    typedef QHash<QString, QnSystemDescription::PointerType> SystemsHash;
     typedef QHash<int, QString> RequestIdToSystemHash;
 
     const QTimerPtr m_updateSystemsTimer;

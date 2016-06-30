@@ -49,8 +49,13 @@ QnCloudSystemsFinder::~QnCloudSystemsFinder()
 
 QnAbstractSystemsFinder::SystemDescriptionList QnCloudSystemsFinder::systems() const
 {
+    SystemDescriptionList result;
+
     const QnMutexLocker lock(&m_mutex);
-    return m_systems.values();
+    for (const auto& system : m_systems)
+        result.append(system.dynamicCast<QnBaseSystemDescription>());
+
+    return result;
 }
 
 QnSystemDescriptionPtr QnCloudSystemsFinder::getSystem(const QString &id) const
@@ -67,7 +72,7 @@ QnSystemDescriptionPtr QnCloudSystemsFinder::getSystem(const QString &id) const
         , systemDescriptions.end(), predicate);
 
     return (it == systemDescriptions.end()
-        ? QnSystemDescriptionPtr() : *it);
+        ? QnSystemDescriptionPtr() : (*it).dynamicCast<QnBaseSystemDescription>());
 }
 
 
@@ -129,7 +134,8 @@ void QnCloudSystemsFinder::onCloudError(QnCloudStatusWatcher::ErrorCode error)
     // if any error automatically
 }
 
-void QnCloudSystemsFinder::updateSystemInternal(const QnSystemDescriptionPtr &system)
+void QnCloudSystemsFinder::updateSystemInternal(
+    const QnSystemDescription::PointerType &system)
 {
     using namespace nx::network;
     typedef std::vector<cloud::TypedAddress> AddressVector;
@@ -236,7 +242,8 @@ void QnCloudSystemsFinder::pingServerInternal(const QString &host
         httpRequestTimeouts);
 }
 
-void QnCloudSystemsFinder::checkOutdatedServersInternal(const QnSystemDescriptionPtr &system)
+void QnCloudSystemsFinder::checkOutdatedServersInternal(
+    const QnSystemDescription::PointerType &system)
 {
     const auto servers = system->servers();
     for (const auto serverInfo : servers)

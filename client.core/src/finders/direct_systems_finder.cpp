@@ -2,6 +2,7 @@
 #include "direct_systems_finder.h"
 
 #include <network/module_finder.h>
+#include <nx/network/socket_common.h>
 
 QnDirectSystemsFinder::QnDirectSystemsFinder(QObject *parent)
     : base_type(parent)
@@ -27,7 +28,11 @@ QnDirectSystemsFinder::~QnDirectSystemsFinder()
 
 QnAbstractSystemsFinder::SystemDescriptionList QnDirectSystemsFinder::systems() const
 {
-    return m_systems.values();
+    SystemDescriptionList result;
+    for (const auto& description : m_systems.values())
+        result.append(description.dynamicCast<QnBaseSystemDescription>());
+
+    return result;
 }
 
 QnSystemDescriptionPtr QnDirectSystemsFinder::getSystem(const QString &id) const
@@ -70,7 +75,7 @@ void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformati
     if (systemDescription->containsServer(moduleInformation.id))
         systemDescription->updateServer(moduleInformation);
     else
-        systemDescription->addServer(moduleInformation);
+        systemDescription->addServer(moduleInformation, QnSystemDescription::kDefaultPriority);
     
     m_serverToSystem[moduleInformation.id] = systemDescription->name();
 

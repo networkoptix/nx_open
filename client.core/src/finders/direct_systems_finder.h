@@ -2,6 +2,8 @@
 #pragma once
 
 #include <finders/abstract_systems_finder.h>
+#include <network/system_description.h>
+#include <nx/network/socket_common.h>
 
 struct QnModuleInformation;
 
@@ -25,7 +27,7 @@ private:
 
     void removeServer(const QnModuleInformation &moduleInformation);
 
-    typedef QHash<QString, QnSystemDescriptionPtr> SystemsHash;
+    typedef QHash<QString, QnSystemDescription::PointerType> SystemsHash;
     void updateServer(const SystemsHash::iterator systemIt
         , const QnModuleInformation &moduleInformation);
 

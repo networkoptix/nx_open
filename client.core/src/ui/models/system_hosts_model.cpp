@@ -85,21 +85,21 @@ void QnSystemHostsModel::reloadHosts()
             addServer(system, server.id);
 
         const auto serverAddedConnection =
-            connect(system, &QnSystemDescription::serverAdded, this
+            connect(system, &QnBaseSystemDescription::serverAdded, this
                 , [this, system](const QnUuid &id)
         {
             addServer(system, id);
         });
 
         const auto serverRemovedConnection =
-            connect(system, &QnSystemDescription::serverRemoved, this
+            connect(system, &QnBaseSystemDescription::serverRemoved, this
                 , [this, system](const QnUuid &id)
         {
             removeServer(system, id);
         });
 
         const auto changedConnection =
-            connect(system, &QnSystemDescription::serverChanged, this
+            connect(system, &QnBaseSystemDescription::serverChanged, this
                 , [this, system](const QnUuid &id, QnServerFields fields)
         {
             if (fields.testFlag(QnServerField::HostField))

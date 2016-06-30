@@ -276,8 +276,8 @@ Item
                 anchors.right: parent.right;
                 anchors.top: parent.top;
 
-                anchors.rightMargin: 8;
-                anchors.topMargin: 16;
+                anchors.rightMargin: 6;
+                anchors.topMargin: 12;
             }
 
             NxButton

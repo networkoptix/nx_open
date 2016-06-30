@@ -23,19 +23,19 @@ namespace
 #undef EXTRACT_CHANGE_FLAG
 }
 
-QnSystemDescriptionPtr QnSystemDescription::createLocalSystem(const QString &systemId
+QnSystemDescription::PointerType QnSystemDescription::createLocalSystem(const QString &systemId
     , const QString &systemName)
 {
-    return QnSystemDescriptionPtr(
+    return PointerType(
         new QnSystemDescription(systemId, systemName));
 }
 
-QnSystemDescriptionPtr QnSystemDescription::createCloudSystem(const QString &systemId
+QnSystemDescription::PointerType QnSystemDescription::createCloudSystem(const QString &systemId
     , const QString &systemName
     , const QString &ownerAccountEmail
     , const QString &ownerFullName)
 {
-    return QnSystemDescriptionPtr(
+    return PointerType(
         new QnSystemDescription(systemId, systemName
             , ownerAccountEmail, ownerFullName));
 }
@@ -148,7 +148,7 @@ QnServerFields QnSystemDescription::updateServer(const QnModuleInformation &serv
 
     if (!containsServer)
     {
-        addServer(serverInfo);
+        addServer(serverInfo, kDefaultPriority);
         return QnServerField::NoField;
     }
 

@@ -103,7 +103,8 @@ public:
             const QnUuid &serverId,
             QnServerFields fields);
 
-    QStringListModel* createStringListModel(const QStringList& data) const;
+    void emitDataChanged(const QnSystemDescriptionPtr& systemDescription
+        , QVector<int> roles);
 
     void resetModel();
 
@@ -297,8 +298,23 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
     };
 
     data->connections <<
-        connect(systemDescription, &QnSystemDescription::serverChanged,
+        connect(systemDescription, &QnBaseSystemDescription::serverChanged,
                 this, serverChangedHandler);
+
+    data->connections << connect(systemDescription, &QnBaseSystemDescription::idChanged,this, [this, systemDescription]()
+    {
+        emitDataChanged(systemDescription, QVector<int>() << SystemIdRoleId);
+    });
+
+    data->connections << connect(systemDescription, &QnBaseSystemDescription::isCloudSystemChanged, this, [this, systemDescription]()
+    {
+        emitDataChanged(systemDescription, QVector<int>(1, IsCloudSystemRoleId));
+    });
+
+    data->connections << connect(systemDescription, &QnBaseSystemDescription::ownerChanged, this, [this, systemDescription]()
+    {
+        emitDataChanged(systemDescription, QVector<int>() << OwnerDescriptionRoleId);
+    });
 
     const bool isMaximumNumber = (internalData.size() >= maxCount);
     const bool emitInsertSignal = (position < maxCount);
@@ -383,6 +399,26 @@ QnSystemsModelPrivate::InternalList::iterator QnSystemsModelPrivate::getInternal
 
     const auto foundId = (*it)->system->id();
     return (foundId == systemDescription->id() ? it : internalData.end());
+}
+
+void QnSystemsModelPrivate::emitDataChanged(const QnSystemDescriptionPtr& systemDescription
+    , QVector<int> roles)
+{
+    const auto dataIt = std::find_if(internalData.begin(), internalData.end(), 
+        [id = systemDescription->id()](const InternalSystemDataPtr &value)
+    {
+        return (value->system->id() == id);
+    });
+
+    if (dataIt == internalData.end())
+        return;
+    
+    Q_Q(QnSystemsModel);
+
+    const int row = (dataIt - internalData.begin());
+    const auto modelIndex = q->index(row);
+
+    q->dataChanged(modelIndex, modelIndex, roles);
 }
 
 void QnSystemsModelPrivate::at_serverChanged(

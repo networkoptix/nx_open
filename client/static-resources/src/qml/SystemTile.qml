@@ -232,6 +232,9 @@ BaseTile
                 return false;
 
             var systemTile = areaLoader.item;
+            if (!systemTile)
+                return false;
+
             return systemTile.savePassword && systemTile.selectedUser.length &&
                 systemTile.selectedPassword.length;
         }
