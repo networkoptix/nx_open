@@ -49,6 +49,7 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/network/http/http_mod_manager.h>
+#include <vms_gateway_embeddable.h>
 #include <nx/utils/log/log.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
@@ -296,6 +297,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     textToWaveServer->start();
     common->store<TextToWaveServer>(textToWaveServer.take());
 #endif
+
+    common->store<nx::cloud::gateway::VmsGatewayEmbeddable>(
+        new nx::cloud::gateway::VmsGatewayEmbeddable());
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)

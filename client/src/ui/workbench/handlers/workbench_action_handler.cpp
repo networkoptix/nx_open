@@ -137,6 +137,7 @@
 #include <nx/network/http/httptypes.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
+#include <vms_gateway_embeddable.h>
 
 
 #ifdef Q_OS_MACX
@@ -1493,9 +1494,12 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     if (!context()->user())
         return;
 
-    QUrl url = server->getApiUrl();
-    url.setScheme(lit("http"));
-    url.setPath(lit("/api/showLog"));
+    QUrl serverUrl = server->getApiUrl();
+    auto vmsGatewayAddress = nx::cloud::gateway::VmsGatewayEmbeddable::instance()
+        ->endpoint().toString();
+
+    QUrl url(lit("http://%1/%2:%3/api/showLog")
+        .arg(vmsGatewayAddress).arg(serverUrl.host()).arg(serverUrl.port()));
 
     QString login = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();
