@@ -317,7 +317,11 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     lk.unlock();
 
     /* Handle conflicting servers */
-    if (!item.moduleInformation.id.isNull() && item.moduleInformation.runtimeId != moduleInformation.runtimeId) {
+    if (!item.moduleInformation.id.isNull() &&
+        (item.moduleInformation.runtimeId != moduleInformation.runtimeId) &&
+        !item.addresses.contains(endpoint)) // Same ip:port with different runtime id means that
+                                            // server was restarted    
+    {
         bool oldModuleIsValid = item.moduleInformation.systemName == qnCommon->localSystemName();
         bool newModuleIsValid = moduleInformation.systemName == qnCommon->localSystemName();
 
