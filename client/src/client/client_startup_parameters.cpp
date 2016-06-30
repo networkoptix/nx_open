@@ -106,7 +106,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     result.videoWallGuid = QnUuid(strVideoWallGuid);
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
 
-    return std::move(result);
+    return result;
 }
 
 QnStartupParameters::QnStartupParameters()
