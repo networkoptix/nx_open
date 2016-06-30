@@ -66,22 +66,24 @@ QnResourceData QnResourceDataPool::data(const QString& _vendor, const QString& _
 
     QnResourceData result;
     
-    QnMutexLocker lock(&m_cachedDataMtx);
-
-    for (const auto& key: keyList)
     {
-        if (!m_cachedResultByKey.contains(key)) 
+        QnMutexLocker lock(&m_cachedDataMtx);
+
+        for (const auto& key: keyList)
         {
-            for(auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr) 
+            if (!m_cachedResultByKey.contains(key))
             {
-                if (wildcardMatch(itr.key(), key))
-                    result.add(itr.value());
+                for (auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr)
+                {
+                    if (wildcardMatch(itr.key(), key))
+                        result.add(itr.value());
+                }
+                m_cachedResultByKey.insert(key, result);
             }
-            m_cachedResultByKey.insert(key, result);
-        } 
-        else 
-        {
-            result = m_cachedResultByKey[key];
+            else
+            {
+                result.add(m_cachedResultByKey[key]);
+            }
         }
     }
 
