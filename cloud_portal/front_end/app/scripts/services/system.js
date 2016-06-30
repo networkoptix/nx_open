@@ -173,7 +173,7 @@ angular.module('cloudApp')
                     self.users = _.sortBy(users,function(user){
                         var isMe = user.accountEmail === self.currentUserEmail;
                         var isOwner = user.accountEmail === self.info.ownerAccountEmail || user.isAdmin;
-                        var isAdmin = findAccessRole(user.isAdmin, user.permissions).readOnly;
+                        var isAdmin = findAccessRole(user.isAdmin, user.permissions || user.accessRole).readOnly;
 
                         user.canBeDeleted = !isOwner && (!isAdmin || self.isMine);
                         user.canBeEdited = !isOwner && !isMe && (!isAdmin || self.isMine);

@@ -87,7 +87,7 @@ angular.module('cloudApp')
                         return caller().then(function(data){
                             self.processing = false;
                             self.finished = true;
-                            if(data.data && data.data.resultCode && data.data.resultCode != L.errorCodes.ok){
+                            if(data && data.data && data.data.resultCode && data.data.resultCode != L.errorCodes.ok){
                                 handleError(data);
                             } else {
                                 self.success = true;
