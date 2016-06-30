@@ -37,6 +37,9 @@ angular.module('cloudApp')
             },
             userObject: function(fullName, accountEmail){
                 return {
+                    'canBeEdited' : true,
+                    'canBeDeleted' : true,
+
                     'email': accountEmail,
                     'name': accountEmail,
 

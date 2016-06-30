@@ -196,7 +196,6 @@ angular.module('cloudApp')
 
 
         system.prototype.saveUser = function(user, role){
-            console.log("saveUser",user,role);
             var accessRole = role.accessRole;
 
             if(!user.userId){
@@ -208,7 +207,11 @@ angular.module('cloudApp')
 
                 user = _.find(this.users,function(u){
                     return user.accountEmail == u.email;
-                })||mediaserver.userObject(user.fullName, user.accountEmail);
+                });
+                if(!user){ // user not found - create a new one
+                    user = mediaserver.userObject(user.fullName, user.accountEmail);
+                    self.users.push(user);
+                }
 
                 if(!user.canBeEdited && !this.isMine){
                     var deferred = $q.defer();
@@ -219,10 +222,11 @@ angular.module('cloudApp')
 
             user.groupId = role.groupId || '';
             user.permissions = role.permissions || '';
-
             cloudApi.share(this.id, user.email, accessRole);
 
-            return mediaserver.saveUser(this.id, user);
+            return mediaserver.saveUser(this.id, user).then(function(result){
+                user.accessRole = accessRole;
+            });
         }
 
         system.prototype.deleteUser = function(user){
