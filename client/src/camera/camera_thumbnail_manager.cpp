@@ -14,26 +14,27 @@
 #include <nx/fusion/model_functions.h>
 #include <ui/style/skin.h>
 
-namespace {
-
+namespace
+{
     const QSize kDefaultThumbnailSize(0, 200);
 
     const int kUpdateThumbnailsPeriodMs = 10 * 1000;
 
     const rest::Handle kInvalidHandle = 0;
+
+} // unnamed namespace
+
+QnCameraThumbnailManager::ThumbnailData::ThumbnailData() :
+    status(None),
+    loadingHandle(kInvalidHandle)
+{
 }
 
-QnCameraThumbnailManager::ThumbnailData::ThumbnailData()
-    : status(None)
-    , loadingHandle(kInvalidHandle)
-{}
 
-
-QnCameraThumbnailManager::QnCameraThumbnailManager(QObject *parent)
-    : QObject(parent)
-    , m_thumnailSize(kDefaultThumbnailSize)
-    , m_refreshingTimer(new QTimer(this))
-
+QnCameraThumbnailManager::QnCameraThumbnailManager(QObject* parent) :
+    QObject(parent),
+    m_thumnailSize(kDefaultThumbnailSize),
+    m_refreshingTimer(new QTimer(this))
 {
     m_refreshingTimer->setInterval(kUpdateThumbnailsPeriodMs);
 
@@ -46,34 +47,48 @@ QnCameraThumbnailManager::QnCameraThumbnailManager(QObject *parent)
     updateStatusPixmaps();
 }
 
-QnCameraThumbnailManager::~QnCameraThumbnailManager() {}
+QnCameraThumbnailManager::~QnCameraThumbnailManager()
+{
+}
 
-void QnCameraThumbnailManager::selectResource(const QnVirtualCameraResourcePtr &camera) {
+void QnCameraThumbnailManager::selectResource(const QnVirtualCameraResourcePtr& camera)
+{
     ThumbnailData& data = m_thumbnailByCamera[camera];
-    if (data.status == None || data.status == Refreshing) {
+    if (data.status == None || data.status == Refreshing)
+    {
         data.loadingHandle = loadThumbnailForCamera(camera);
-        if (data.loadingHandle != kInvalidHandle) {
+        if (data.loadingHandle != kInvalidHandle)
+        {
             if (data.status != Refreshing)
                 data.status = Loading;
-        } else {
+        }
+        else
+        {
             data.status = NoData;
         }
     }
 
     QPixmap thumbnail;
-    switch (data.status) {
-    case None: //should never come here
-        break;
-    case Loading:
-    case NoData:
-        thumbnail = m_statusPixmaps[data.status];
-        break;
-    case Loaded:
-    case Refreshing:
-        thumbnail = QPixmap::fromImage(data.thumbnail);
-        break;
+    switch (data.status)
+    {
+        case None: //should never come here
+            break;
+
+        case Loading:
+        case NoData:
+            thumbnail = m_statusPixmaps[data.status];
+            break;
+
+        case Loaded:
+        case Refreshing:
+            thumbnail = QPixmap::fromImage(data.thumbnail);
+            break;
     }
-    emit thumbnailReadyDelayed(camera->getId(), thumbnail);
+
+    QnUuid cameraId = camera->getId();
+
+    emit statusChanged(cameraId, data.status);
+    emit thumbnailReadyDelayed(cameraId, thumbnail);
 }
 
 QSize QnCameraThumbnailManager::thumbnailSize() const
@@ -81,11 +96,13 @@ QSize QnCameraThumbnailManager::thumbnailSize() const
     return m_thumnailSize;
 }
 
-QPixmap QnCameraThumbnailManager::statusPixmap(ThumbnailStatus status) {
+QPixmap QnCameraThumbnailManager::statusPixmap(ThumbnailStatus status)
+{
     return m_statusPixmaps[status];
 }
 
-QPixmap QnCameraThumbnailManager::scaledPixmap(const QPixmap &pixmap) const {
+QPixmap QnCameraThumbnailManager::scaledPixmap(const QPixmap& pixmap) const
+{
     /* Check if no scaling required. */
     if (m_thumnailSize.isNull())
         return pixmap;
@@ -115,8 +132,8 @@ void QnCameraThumbnailManager::setThumbnailSize(const QSize &size)
     updateStatusPixmaps();
 }
 
-rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCameraResourcePtr &camera) {
-
+rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCameraResourcePtr& camera)
+{
     if (!camera || !camera->hasVideo(nullptr))
         return kInvalidHandle;
 
@@ -130,7 +147,7 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCam
         return kInvalidHandle;
 
     QPointer<QnCameraThumbnailManager> guard(this);
-    return qnCommon->currentServer()->restConnection()->cameraThumbnailAsync(request,  [guard, this, request] (bool success, rest::Handle id, const QByteArray &imageData)
+    return qnCommon->currentServer()->restConnection()->cameraThumbnailAsync(request,  [guard, this, request] (bool success, rest::Handle id, const QByteArray& imageData)
     {
         if (!guard)
             return;
@@ -141,6 +158,8 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCam
         ThumbnailData &data = m_thumbnailByCamera[request.camera];
         if (data.loadingHandle != id)
             return;
+
+        ThumbnailStatus oldStatus = data.status;
 
         data.loadingHandle = kInvalidHandle;
         data.status = NoData;
@@ -157,13 +176,18 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCam
             ? QPixmap::fromImage(data.thumbnail)
             : m_statusPixmaps[data.status];
 
-        emit thumbnailReady(request.camera->getId(), thumbnail);
+        QnUuid cameraId = request.camera->getId();
+
+        if (oldStatus != data.status)
+            emit statusChanged(cameraId, data.status);
+
+        emit thumbnailReady(cameraId, thumbnail);
+
     }, QThread::currentThread());
-
-
 }
 
-void QnCameraThumbnailManager::at_resPool_statusChanged(const QnResourcePtr &resource) {
+void QnCameraThumbnailManager::at_resPool_statusChanged(const QnResourcePtr& resource)
+{
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (!camera)
         return;
@@ -171,7 +195,8 @@ void QnCameraThumbnailManager::at_resPool_statusChanged(const QnResourcePtr &res
     if (!m_thumbnailByCamera.contains(camera))
         return;
 
-     ThumbnailData &data = m_thumbnailByCamera[camera];
+     ThumbnailData& data = m_thumbnailByCamera[camera];
+
      if (!isUpdateRequired(camera, data.status))
          return;
 
@@ -181,25 +206,31 @@ void QnCameraThumbnailManager::at_resPool_statusChanged(const QnResourcePtr &res
          : NoData;
 }
 
-void QnCameraThumbnailManager::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
+void QnCameraThumbnailManager::at_resPool_resourceRemoved(const QnResourcePtr& resource)
+{
     if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
         m_thumbnailByCamera.remove(camera);
 }
 
-bool QnCameraThumbnailManager::isUpdateRequired(const QnVirtualCameraResourcePtr &camera, const ThumbnailStatus status) const {
-    switch (camera->getStatus()) {
-    case Qn::Recording:
-        return (status != Loading) && (status != Refreshing);
-    case Qn::Online:
-        return (status == NoData);
-    default:
-        break;
+bool QnCameraThumbnailManager::isUpdateRequired(const QnVirtualCameraResourcePtr& camera, const ThumbnailStatus status) const
+{
+    switch (camera->getStatus())
+    {
+        case Qn::Recording:
+            return (status != Loading) && (status != Refreshing);
+
+        case Qn::Online:
+            return (status == NoData);
+
+        default:
+            return false;
     }
-    return false;
 }
 
-void QnCameraThumbnailManager::forceRefreshThumbnails() {
-    for (auto it = m_thumbnailByCamera.begin(); it != m_thumbnailByCamera.end(); ++it) {
+void QnCameraThumbnailManager::forceRefreshThumbnails()
+{
+    for (auto it = m_thumbnailByCamera.begin(); it != m_thumbnailByCamera.end(); ++it)
+    {
         if (!isUpdateRequired(it.key(), it->status))
             continue;
 

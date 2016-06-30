@@ -14,7 +14,8 @@ class QnCameraThumbnailManager : public QObject
 {
     Q_OBJECT
 public:
-    enum ThumbnailStatus {
+    enum ThumbnailStatus
+    {
         None,
         Loading,
         Loaded,
@@ -22,34 +23,37 @@ public:
         Refreshing
     };
 
-    explicit QnCameraThumbnailManager(QObject *parent = 0);
+    explicit QnCameraThumbnailManager(QObject* parent = nullptr);
     virtual ~QnCameraThumbnailManager();
 
-    void selectResource(const QnVirtualCameraResourcePtr &camera);
+    void selectResource(const QnVirtualCameraResourcePtr& camera);
 
     QSize thumbnailSize() const;
-    void setThumbnailSize(const QSize &size);
+    void setThumbnailSize(const QSize& size);
 
     QPixmap statusPixmap(ThumbnailStatus status);
+
 signals:
-    void thumbnailReady(const QnUuid &resourceId, const QPixmap& thumbnail);
+    void statusChanged(const QnUuid& resourceId, ThumbnailStatus status);
+    void thumbnailReady(const QnUuid& resourceId, const QPixmap& thumbnail);
 
 private slots:
-    void at_resPool_statusChanged(const QnResourcePtr &resource);
-    void at_resPool_resourceRemoved(const QnResourcePtr &resource);
+    void at_resPool_statusChanged(const QnResourcePtr& resource);
+    void at_resPool_resourceRemoved(const QnResourcePtr& resource);
 
 private:
-    Q_SIGNAL void thumbnailReadyDelayed(const QnUuid &resourceId, const QPixmap& thumbnail);
+    Q_SIGNAL void thumbnailReadyDelayed(const QnUuid& resourceId, const QPixmap& thumbnail);
 
-    rest::Handle loadThumbnailForCamera(const QnVirtualCameraResourcePtr &camera);
+    rest::Handle loadThumbnailForCamera(const QnVirtualCameraResourcePtr& camera);
 
-    bool isUpdateRequired(const QnVirtualCameraResourcePtr &camera, const ThumbnailStatus status) const;
+    bool isUpdateRequired(const QnVirtualCameraResourcePtr& camera, const ThumbnailStatus status) const;
     void forceRefreshThumbnails();
 
-    QPixmap scaledPixmap(const QPixmap &pixmap) const;
+    QPixmap scaledPixmap(const QPixmap& pixmap) const;
     void updateStatusPixmaps();
 
-    struct ThumbnailData {
+    struct ThumbnailData
+    {
         ThumbnailData();
 
         QImage thumbnail;

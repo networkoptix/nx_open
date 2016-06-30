@@ -287,6 +287,16 @@
         }
     },
 
+    "QnResourcePreviewWidget": {
+        "palette": {
+            "default": {
+                "window":        "dark7",
+                "dark":          "dark9",
+                "windowText":    "light16"
+            }
+        }
+    },
+
     "QnPanel": {
         "palette": {
             "default": {

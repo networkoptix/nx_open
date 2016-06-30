@@ -144,6 +144,12 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
             break;
     }
 
+    QFont font;
+    font.setPixelSize(24);
+    font.setWeight(QFont::Light);
+    ui->previewWidget->setFont(font);
+    ui->previewWidget->setThumbnailSize(QSize(160, 0));
+
     initControlsModel();
     initResourcesModel();
 
@@ -454,6 +460,7 @@ void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
     {
         ui->previewWidget->setTargetResource(camera->getId());
         ui->previewWidget->show();
+        ui->verticalLayout->activate();
     }
     else
     {
