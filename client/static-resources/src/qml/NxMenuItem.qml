@@ -7,13 +7,13 @@ Labs.MenuItem
 {
     id: control;
 
-    implicitWidth: (label.width + leftPadding + rightPadding);
+    implicitWidth: label.width;
 
     label: Text
     {
         id: label;
-        leftPadding: 8;
-        rightPadding: 8;
+        leftPadding: (control.leftPadding ? control.leftPadding : 8);
+        rightPadding: (control.rightPadding ? control.rightPadding : 8);
 
         verticalAlignment: Qt.AlignVCenter;
         horizontalAlignment: Qt.AlignLeft;
