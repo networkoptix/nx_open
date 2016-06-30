@@ -1450,19 +1450,19 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
         return false;
 
     /* Check if remote peer has rights to receive transaction */
- //   auto td = getTransactionDescriptorByValue(value);
- //   bool remoteHasRights = td->checkPermissions(m_userAccessData.userId, tranParamsId, Qn::Permission::ReadPermission);
-	//if (!remoteHasRights)
-	//{
-	//	NX_LOG(
-	//		QnLog::EC2_TRAN_LOG,
-	//		lit("Permission check failed while sending SERIALIZED transaction %1 to peer %2")
-	//			.arg(ec2::ApiCommand::toString(value))
-	//			.arg(remotePeer().id.toString()),
-	//		cl_logDEBUG1
-	//	);
-	//	return false;
-	//}
+    auto td = getTransactionDescriptorByValue(value);
+    bool remoteHasRights = td->checkPermissions(m_userAccessData.userId, tranParamsId, Qn::Permission::ReadPermission);
+	if (!remoteHasRights)
+	{
+		NX_LOG(
+			QnLog::EC2_TRAN_LOG,
+			lit("Permission check failed while sending SERIALIZED transaction %1 to peer %2")
+				.arg(ec2::ApiCommand::toString(value))
+				.arg(remotePeer().id.toString()),
+			cl_logDEBUG1
+		);
+		return false;
+	}
 
     QnTransactionTransportHeader header(_header);
     NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
