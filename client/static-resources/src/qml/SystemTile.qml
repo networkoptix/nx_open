@@ -28,7 +28,7 @@ BaseTile
             return false;
 
         if (isCloudTile)
-            return control.areaLoader && control.areaLoader.item.isOnline;
+            return control.areaLoader.item && control.areaLoader.item.isOnline;
 
         return true;
     }
@@ -130,6 +130,9 @@ BaseTile
             NxMenuItem
             {
                 text: "Edit";
+                leftPadding: 16;
+                rightPadding: 16;
+
                 onTriggered: control.toggle();
             }
         }
@@ -175,7 +178,7 @@ BaseTile
             else // Cloud system
             {
                 currentAreaItem.userName = Qt.binding( function() { return control.ownerDescription; });
-                currentAreaItem.isOnline = Qt.binding( function() { return control.isAvailable; } )
+                currentAreaItem.isOnline = Qt.binding( function() { return control.impl.isOnline; } )
             }
         }
     }
