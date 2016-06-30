@@ -123,4 +123,12 @@ Page
                 Workflow.openNewSessionScreen()
         }
     }
+
+    function openConnectionWarningDialog(systemName)
+    {
+        var message = systemName ?
+                    qsTr("Cannot connect to the system \"%1\"").arg(systemName) :
+                    qsTr("Cannot connect to the server")
+        Workflow.openInformationDialog(message, qsTr("Check your network connection or contact a system administrator"))
+    }
 }

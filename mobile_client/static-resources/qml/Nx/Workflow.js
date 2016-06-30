@@ -19,52 +19,16 @@ function openSessionsScreen()
     item.forceActiveFocus()
 }
 
-function openSessionsScreenWithWarning(message)
+function openSessionsScreenWithWarning(systemName)
 {
     var item = stackView.replace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
-    item.forceActiveFocus()
-    item.warningText = message
-    item.warningVisible = true
+    item.openConnectionWarningDialog(systemName)
 }
 
 function openNewSessionScreen()
 {
     var item = stackView.push(Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"))
     item.focusHostField()
-}
-
-function openFailedSessionScreen(systemName, address, login, password, connectionStatus, info)
-{
-    var item = null
-    if (stackView.get(0, Controls.StackView.ForceLoad).objectName == "sessionsScreen")
-    {
-        item = stackView.push(
-                Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
-                {
-                    "systemName": systemName,
-                    "address": address,
-                    "login": login,
-                    "password": password,
-                }
-        )
-    }
-    else
-    {
-        item = stackView.replace(
-                null,
-                Qt.resolvedUrl("Screens/SessionsScreen.qml"),
-                {},
-                Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
-                {
-                    "systemName": systemName,
-                    "address": address,
-                    "login": login,
-                    "password": password,
-                }
-        )
-    }
-    item.showWarning(connectionStatus, info)
-    item.forceActiveFocus()
 }
 
 function openDiscoveredSession(systemName, address)

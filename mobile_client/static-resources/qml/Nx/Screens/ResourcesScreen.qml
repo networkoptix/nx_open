@@ -203,26 +203,10 @@ Page
 
         onConnectionFailed:
         {
-            var lastUsedSystemId = getLastUsedSystemId()
-            var connectionType = connectionManager.connectionType
-            if (connectionType == QnConnectionManager.CloudConnection)
-            {
-                Workflow.openSessionsScreenWithWarning(qsTr("Cannot connect to %1").arg(getLastUsedSystemId()))
-            }
-            else if (connectionType == QnConnectionManager.LiteClientConnection)
-            {
-                Workflow.openSessionsScreenWithWarning(qsTr("Cannot connect to the server"))
-            }
-            else
-            {
-                Workflow.openFailedSessionScreen(
-                            lastUsedSystemId,
-                            connectionManager.currentHost,
-                            connectionManager.currentLogin,
-                            connectionManager.currentPassword,
-                            status,
-                            infoParameter)
-            }
+            var systemName = title ? title : getLastUsedSystemId()
+            Workflow.openSessionsScreenWithWarning(
+                connectionManager.connectionType == QnConnectionManager.LiteClientConnection
+                    ? "" : systemName)
         }
 
         onInitialResourcesReceived:
