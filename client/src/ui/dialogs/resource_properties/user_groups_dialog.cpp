@@ -5,7 +5,7 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_access_manager.h>
 
-#include <ui/common/indentation.h>
+#include <ui/common/indents.h>
 #include <ui/models/resource_properties/user_groups_settings_model.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
@@ -56,7 +56,7 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
 
     int margin = style()->pixelMetric(QStyle::PM_DefaultTopLevelMargin);
     ui->groupsTreeView->setProperty(style::Properties::kSideIndentation,
-        QVariant::fromValue(QnIndentation(margin, margin)));
+        QVariant::fromValue(QnIndents(margin, margin)));
 
     QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);

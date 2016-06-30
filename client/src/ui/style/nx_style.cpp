@@ -26,7 +26,7 @@
 #include <QtWidgets/QInputDialog>
 #include <private/qfont_p.h>
 
-#include <ui/common/indentation.h>
+#include <ui/common/indents.h>
 #include <ui/common/popup_shadow.h>
 #include <ui/common/link_hover_processor.h>
 #include <ui/delegates/styled_combo_box_delegate.h>
@@ -218,37 +218,37 @@ namespace
         return true;
     }
 
-    QnIndentation itemViewItemIndentation(const QStyleOptionViewItem* item)
+    QnIndents itemViewItemIndents(const QStyleOptionViewItem* item)
     {
-        static const QnIndentation kDefaultIndentation(Metrics::kStandardPadding, Metrics::kStandardPadding);
+        static const QnIndents kDefaultIndents(Metrics::kStandardPadding, Metrics::kStandardPadding);
 
         auto view = qobject_cast<const QAbstractItemView*>(item->widget);
         if (!view)
-            return kDefaultIndentation;
+            return kDefaultIndents;
 
         if (item->viewItemPosition == QStyleOptionViewItem::Middle)
-            return kDefaultIndentation;
+            return kDefaultIndents;
 
         QVariant value = view->property(Properties::kSideIndentation);
-        if (!value.canConvert<QnIndentation>())
-            return kDefaultIndentation;
+        if (!value.canConvert<QnIndents>())
+            return kDefaultIndents;
 
-        QnIndentation indentation = value.value<QnIndentation>();
+        QnIndents Indents = value.value<QnIndents>();
         switch (item->viewItemPosition)
         {
             case QStyleOptionViewItem::Beginning:
-                indentation.setRight(kDefaultIndentation.right());
+                Indents.setRight(kDefaultIndents.right());
                 break;
 
             case QStyleOptionViewItem::End:
-                indentation.setLeft(kDefaultIndentation.left());
+                Indents.setLeft(kDefaultIndents.left());
                 break;
 
             case QStyleOptionViewItem::Invalid:
             {
                 const QModelIndex& index = item->index;
                 if (!index.isValid())
-                    return kDefaultIndentation;
+                    return kDefaultIndents;
 
                 struct VisibilityChecker : public QAbstractItemView
                 {
@@ -261,7 +261,7 @@ namespace
                 {
                     if (!checker->isIndexHidden(index.sibling(index.row(), column)))
                     {
-                        indentation.setLeft(kDefaultIndentation.left());
+                        Indents.setLeft(kDefaultIndents.left());
                         break;
                     }
                 }
@@ -271,7 +271,7 @@ namespace
                 {
                     if (!checker->isIndexHidden(index.sibling(index.row(), column)))
                     {
-                        indentation.setRight(kDefaultIndentation.right());
+                        Indents.setRight(kDefaultIndents.right());
                         break;
                     }
                 }
@@ -284,7 +284,7 @@ namespace
                 break;
         }
 
-        return indentation;
+        return Indents;
     }
 
     template <class T>
@@ -2427,7 +2427,7 @@ QRect QnNxStyle::subElementRect(
             if (auto item = qstyleoption_cast<const QStyleOptionViewItem*>(option))
             {
                 int defaultMargin = pixelMetric(PM_FocusFrameHMargin, option, widget) + 1;
-                QnIndentation indents = itemViewItemIndentation(item);
+                QnIndents indents = itemViewItemIndents(item);
 
                 QRect rect = item->rect.adjusted(indents.left() - defaultMargin, 0, -(indents.right() - defaultMargin), 0);
 
@@ -2637,7 +2637,7 @@ QSize QnNxStyle::sizeFromContents(
         {
             if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
             {
-                QnIndentation indents = itemViewItemIndentation(item);
+                QnIndents indents = itemViewItemIndents(item);
 
                 if (isCheckboxOnlyItem(*item))
                     return QSize(indents.left() + indents.right() + Metrics::kCheckIndicatorSize, Metrics::kCheckIndicatorSize);

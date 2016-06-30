@@ -2,12 +2,12 @@
 
 #include <QtCore/QMetaType>
 
-class QnIndentation
+class QnIndents
 {
 public:
-    QnIndentation();
-    QnIndentation(int indent);
-    QnIndentation(int left, int right);
+    QnIndents();
+    QnIndents(int left, int right);
+    explicit QnIndents(int indent);
 
     int left() const;
     void setLeft(int value);
@@ -19,4 +19,4 @@ protected:
     int m_left, m_right;
 };
 
-Q_DECLARE_METATYPE(QnIndentation);
+Q_DECLARE_METATYPE(QnIndents);

@@ -13,7 +13,7 @@
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
-#include <ui/common/indentation.h>
+#include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource_list_model.h>
 #include <ui/style/helper.h>
@@ -186,7 +186,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
 
     auto setupTreeView = [itemDelegate](QnTreeView* treeView)
     {
-        const QnIndentation kIndents(1, 0);
+        const QnIndents kIndents(1, 0);
         treeView->setItemDelegate(itemDelegate);
         treeView->header()->setStretchLastSection(false);
         treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);

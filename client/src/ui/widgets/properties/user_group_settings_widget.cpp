@@ -4,7 +4,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 
-#include <ui/common/indentation.h>
+#include <ui/common/indents.h>
 #include <ui/models/resource_properties/user_groups_settings_model.h>
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
@@ -21,7 +21,7 @@ QnUserGroupSettingsWidget::QnUserGroupSettingsWidget(QnUserGroupSettingsModel* m
     ui->usersListTreeView->setModel(m_usersModel);
 
     ui->usersListTreeView->setProperty(style::Properties::kSuppressHoverPropery, true);
-    ui->usersListTreeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndentation()));
+    ui->usersListTreeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents()));
 
     connect(ui->nameLineEdit, &QLineEdit::textChanged, this, &QnUserGroupSettingsWidget::applyChanges);
 
