@@ -33,7 +33,8 @@ namespace
     const int kSoapRecieveTimeout = 30;
 }
 
-QnOpteraResource::QnOpteraResource()
+QnOpteraResource::QnOpteraResource() :
+    m_videoLayout(nullptr)
 {
     qDebug() << "Creating Optera resource";
 }
@@ -48,7 +49,7 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
     QN_UNUSED(dataProvider);
 
     if (m_videoLayout)
-        ;//return m_videoLayout;
+        return m_videoLayout;
 
     auto resData = qnCommon->dataPool()->data(getVendor(), getModel());
     auto layoutStr = resData.value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);

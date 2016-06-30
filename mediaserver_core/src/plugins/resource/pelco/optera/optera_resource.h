@@ -1,3 +1,5 @@
+#pragma once
+
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <utils/network/http/httpclient.h>
 #include <core/dataprovider/stream_mixer.h>
