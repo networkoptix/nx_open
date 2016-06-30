@@ -2,6 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QLockFile>
+#include <QtCore/QStandardPaths>
 
 #include <api/applauncher_api.h>
 
@@ -29,7 +30,7 @@ nx::vms::client::SelfUpdater::SelfUpdater(const QnStartupParameters& startupPara
     if (!startupParams.engineVersion.isEmpty())
         m_clientVersion = nx::utils::SoftwareVersion(startupParams.engineVersion);
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
     /* If handler must be updated AND client is not run under administrator, do it. */
     if (!registerUriHandler() && !startupParams.hasAdminPermissions)
     {
@@ -39,6 +40,8 @@ nx::vms::client::SelfUpdater::SelfUpdater(const QnStartupParameters& startupPara
                                              << QnStartupParameters::kHasAdminPermissionsKey
                                              << QnStartupParameters::kAllowMultipleClientInstancesKey);
     }
+#elif defined(Q_OS_LINUX)
+    registerUriHandler();
 #endif
 
     /* Updating applauncher only if we are not run under administrator to avoid collisions. */
@@ -48,11 +51,20 @@ nx::vms::client::SelfUpdater::SelfUpdater(const QnStartupParameters& startupPara
 
 bool nx::vms::client::SelfUpdater::registerUriHandler()
 {
-#ifdef Q_OS_WIN
-    return nx::utils::registerSystemUriProtocolHandler(nx::vms::utils::AppInfo::nativeUriProtocol(),
-                                                       qApp->applicationFilePath(),
-                                                       nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
-                                                       m_clientVersion);
+#if defined(Q_OS_WIN) || defined(Q_OS_LINUX)
+    QString binaryPath = qApp->applicationFilePath();
+
+#if defined(Q_OS_LINUX)
+    // TODO: #dklychkov Place runner script name to app info
+    binaryPath = QDir::cleanPath(QDir(binaryPath).absoluteFilePath(lit("../") + lit("client")));
+#endif
+
+    return nx::utils::registerSystemUriProtocolHandler(
+        nx::vms::utils::AppInfo::nativeUriProtocol(),
+        binaryPath,
+        QnAppInfo::productNameLong(),
+        nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
+        m_clientVersion);
 #else
     return true;
 #endif
