@@ -99,23 +99,25 @@ angular.module('cloudApp')
         }
 
 
+        system.prototype.isEmptyGuid = function(guid){
+            if(!guid){
+                return true;
+            }
+            guid = guid.replace(/[{}0\-]/gi,'');
+            return guid == '';
+        }
+
         system.prototype.getUsersDataFromTheSystem = function(){
             var self = this;
             function processUsers(users, groups, accessRights){
-                function isEmptyGuid(guid){
-                    if(!guid){
-                        return true;
-                    }
-                    guid = guid.replace(/[{}0\-]/gi,'');
-                    return guid == '';
-                }
+
 
                 var groupAssoc = _.indexBy(groups,'id');
                 users = _.filter(users, function(user){ return user.isCloud; });
                 // var accessRightsAssoc = _.indexBy(accessRights,'userId');
 
                 _.each(users,function(user){
-                    if(!isEmptyGuid(user.groupId)){
+                    if(!self.isEmptyGuid(user.groupId)){
                         user.group = groupAssoc[user.groupId];
                         //user.accessRights = accessRightsAssoc[user.groupId];
                         user.accessRole = user.group.name;

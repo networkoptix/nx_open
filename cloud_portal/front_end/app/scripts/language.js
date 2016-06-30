@@ -14,31 +14,31 @@ var L = {
     },
     accessRoles: {
         disabled:{
-            label: 'disabled',
+            label: 'Disabled',
             description: 'User is disabled in the system'
         },
         owner: {
-            label: 'owner',
+            label: 'Owner',
             description: 'Can do pretty much everything with his system'
         },
         viewer: {
-            label: 'viewer',
+            label: 'Viewer',
             description: 'Can view live video from cameras and archive'
         },
         liveViewer: {
-            label: 'live viewer',
+            label: 'Live viewer',
             description: 'Can view only live video from cameras'
         },
         advancedViewer: {
-            label: 'advanced viewer',
+            label: 'Advanced viewer',
             description: 'Can view live video from cameras and archive, configure cameras'
         },
         cloudAdmin: {
-            label: 'administrator',
+            label: 'Administrator',
             description: 'Can configure system and share it'
         },
         custom:{
-            label: 'custom',
+            label: 'Custom',
             description: 'Access to specified resources with specified rights'
         }
     },

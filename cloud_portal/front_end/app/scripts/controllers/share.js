@@ -29,7 +29,7 @@ angular.module('cloudApp')
 
         function findRole(user, accessRoles){
             var role = _.find(accessRoles,function(role){
-                if(user.groupId){
+                if(!system.isEmptyGuid(user.groupId)){
                     return role.groupId == user.groupId;
                 }
 
@@ -38,8 +38,11 @@ angular.module('cloudApp')
             return role || accessRoles[accessRoles.length-1]; // Last option is custom
         }
 
-        function processAccessRoles(roles){
-            var filteredRoles = _.filter(roles,function(role){
+        function processAccessRoles(){
+            var filteredRoles = _.filter(Config.accessRoles.options,function(role){
+                if(role.isAdmin || role.readOnly && !system.isMine){
+                    return false;
+                }
                 role.label = L.accessRoles[role.accessRole]? L.accessRoles[role.accessRole].label : role.accessRole;
                 return  (Config.accessRoles.order.indexOf(role.accessRole)>=0) &&   // 1. Access role must be registered
                         role.accessRole != Config.accessRoles.unshare;            // 2. Remove unsharing role from interface
@@ -67,12 +70,7 @@ angular.module('cloudApp')
             $scope.user.role = findRole($scope.user, $scope.accessRoles);
         }
 
-        processAccessRoles([{ accessRole: $scope.user.accessRole }]);
-
-        processAccessRoles(Config.accessRoles.options);
-
-
-        // TODO: add groups from system cache
+        processAccessRoles();
 
 
         $scope.formatUserName = function(){
