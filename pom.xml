@@ -489,11 +489,11 @@
                 <additional.qtlibs>DBus, WebChannel, Webkit, WebkitWidgets</additional.qtlibs>
             </properties>
             <modules>
-                <module>applauncher</module>
+                <module>common_libs/nx_audio</module>            
+                <module>client/applauncher</module>
                 <module>client/libclient_core</module>
                 <module>client/libclient</module>
                 <module>client/desktop_client</module>
-                <module>common_libs/nx_audio</module>
             </modules>
         </profile>
         <profile>
