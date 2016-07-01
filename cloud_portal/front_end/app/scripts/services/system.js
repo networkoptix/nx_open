@@ -10,7 +10,7 @@ angular.module('cloudApp')
         function system(systemId,currentUserEmail){
             this.id = systemId;
             this.users = [];
-            this.isAvailable = false;
+            this.isAvailable = true;
             this.isOnline = false;
             this.isMine = false;
             this.groups = [];

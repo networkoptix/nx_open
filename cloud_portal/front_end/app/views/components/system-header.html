@@ -4,6 +4,10 @@
             <span ng-if="!system.isOnline" class="label"
                   ng-class="Config.systemStatuses[system.info.stateOfHealth].style || Config.systemStatuses.default.style">
                   {{Config.systemStatuses[system.info.stateOfHealth].label||system.info.stateOfHealth}}</span>
+
+            <span ng-if="system.isOnline&&!system.isAvailable" class="label"
+                  ng-class="Config.systemStatuses.unavailable.style">
+                  {{Config.systemStatuses.unavailable.label}}</span>
         </h1>
     </div>
     <div class="col-sm-6">
