@@ -18,6 +18,7 @@ NX_UTILS_API bool registerSystemUriProtocolHandler(
     const QString& applicationBinaryPath,
     const QString& applicationName,
     const QString& description,
+    const QString& customization,
     const SoftwareVersion& version);
 #endif
 

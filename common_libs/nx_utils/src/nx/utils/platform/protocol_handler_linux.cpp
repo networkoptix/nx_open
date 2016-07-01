@@ -14,6 +14,7 @@ bool registerSystemUriProtocolHandler(
     const QString& applicationBinaryPath,
     const QString& applicationName,
     const QString& description,
+    const QString& customization,
     const SoftwareVersion& version)
 {
     const auto appsLocation = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
@@ -28,9 +29,14 @@ bool registerSystemUriProtocolHandler(
     {
         QScopedPointer<QSettings> settings(new QSettings(handlerFile, QSettings::IniFormat));
         settings->beginGroup(kEntry);
-        SoftwareVersion existingVersion(settings->value("Version").toString());
-        if (existingVersion >= version)
+        SoftwareVersion existingVersion(settings->value(lit("Version")).toString());
+        if (existingVersion > version)
             return true;
+        if (existingVersion == version &&
+            settings->value(lit("Exec")).toString() == applicationBinaryPath)
+        {
+            return true;
+        }
     }
 
     // We can't use QSettings to write the file because it escapes spaces in the group names.
@@ -46,13 +52,12 @@ bool registerSystemUriProtocolHandler(
     result += lit("Name=%1\n").arg(applicationName);
     result += lit("Exec=%1\n").arg(applicationBinaryPath);
     result += lit("Comment=%1\n").arg(description);
-    // TODO: #dklychkov Specify icon
-    // result += lit("Icon=%1\n").arg(lit(""));
+    result += lit("Icon=vmsclient-%1.png\n").arg(customization);
     result += lit("Type=%1\n").arg(lit("Application"));
     result += lit("StartupNotify=%1\n").arg(lit("true"));
     result += lit("Terminal=%1\n").arg(lit("false"));
     result += lit("NoDisplay=%1\n").arg(lit("true"));
-    result += lit("MimeType=%1\n").arg(lit("x-scheme-handler/") + protocol);
+    result += lit("MimeType=x-scheme-handler/%1\n").arg(protocol);
 
     file.write(result.toUtf8());
     file.close();

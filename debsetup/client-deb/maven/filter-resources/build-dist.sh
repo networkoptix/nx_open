@@ -70,6 +70,7 @@ mv -f usr/share/applications/icon.desktop usr/share/applications/${installer.nam
 # Copy client binary, old version libs
 cp -r $CLIENT_BIN_PATH/client.bin $BINSTAGE/client-bin
 cp -r $CLIENT_BIN_PATH/applauncher $BINSTAGE/applauncher-bin
+cp -r bin/client $BINSTAGE
 cp -r bin/applauncher $BINSTAGE
 
 # Copy icons

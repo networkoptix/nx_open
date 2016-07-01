@@ -18,9 +18,11 @@ bool registerSystemUriProtocolHandler(
     const QString& applicationBinaryPath,
     const QString& applicationName,
     const QString& description,
+    const QString& customization,
     const SoftwareVersion& version)
 {
     Q_UNUSED(applicationName)
+    Q_UNUSED(customization)
 
     static const QString kClassesRootPath = "HKEY_CLASSES_ROOT\\";
     static const QString kDefaultValueKey = ".";

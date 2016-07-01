@@ -21,7 +21,6 @@ namespace {
 
 const int kUpdateLockTimeoutMs = 1000;
 
-
 }
 
 nx::vms::client::SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
@@ -55,8 +54,7 @@ bool nx::vms::client::SelfUpdater::registerUriHandler()
     QString binaryPath = qApp->applicationFilePath();
 
 #if defined(Q_OS_LINUX)
-    // TODO: #dklychkov Place runner script name to app info
-    binaryPath = QDir::cleanPath(QDir(binaryPath).absoluteFilePath(lit("../") + lit("client")));
+    binaryPath = QDir::cleanPath(QDir(binaryPath).absoluteFilePath(lit("../client")));
 #endif
 
     return nx::utils::registerSystemUriProtocolHandler(
@@ -64,6 +62,7 @@ bool nx::vms::client::SelfUpdater::registerUriHandler()
         binaryPath,
         QnAppInfo::productNameLong(),
         nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
+        QnAppInfo::customizationName(),
         m_clientVersion);
 #else
     return true;
