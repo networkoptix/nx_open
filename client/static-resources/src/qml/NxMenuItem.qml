@@ -7,18 +7,20 @@ Labs.MenuItem
 {
     id: control;
 
-    implicitWidth: label.width;
+    implicitWidth: label.implicitWidth + leftPadding + rightPadding;
+    implicitHeight: Style.menu.height;
 
     label: Text
     {
         id: label;
-        leftPadding: (control.leftPadding ? control.leftPadding : 8);
-        rightPadding: (control.rightPadding ? control.rightPadding : 8);
 
-        verticalAlignment: Qt.AlignVCenter;
-        horizontalAlignment: Qt.AlignLeft;
+        verticalAlignment: Text.AlignVCenter;
+        horizontalAlignment: Text.AlignLeft;
 
-        height: Style.menu.height;
+        x: control.leftPadding;
+        y: control.topPadding;
+        width: control.availableWidth;
+        height: control.availableHeight;
         text: control.text;
         color: (hoverArea.containsMouse ? Style.menu.colorHovered : Style.menu.color);
         font: Style.menu.font;
@@ -27,7 +29,6 @@ Labs.MenuItem
 
     background: Rectangle
     {
-        implicitHeight: Style.menu.height;
         color: (hoverArea.containsMouse ?
             Style.menu.backgroundHovered : Style.menu.background);
     }
