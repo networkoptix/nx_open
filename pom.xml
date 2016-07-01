@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness</name>
+    <name>Nx Witness</name>
 
     <scm>
         <connection>scm:hg:file:///${basedir}</connection>
@@ -88,30 +88,32 @@
 
         <client.name>${company.name} ${product.name} Client</client.name>
         <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
+        
         <mobile_client.name>${company.name} ${product.name} Mobile Client</mobile_client.name>
         <mobile_client.display.name>${company.name} ${display.product.name} Mobile Client</mobile_client.display.name>
-        <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
+
         <applauncher.name>${product.name} Launcher</applauncher.name>
         <applauncher.display.name>${display.product.name} Launcher</applauncher.display.name>
-        
-        <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
-        <evidence_plugin.name>${company.name} Evidence integration plugin</evidence_plugin.name>
-        <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
 
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
         <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
 
-        <!-- > 
+        <traytool.name>${product.name} Tray Assistant</traytool.name>
+        <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
+
+        <!-- >
             When you are adding new names to this list, please note the following:
             1) Names are actual only for binary project. Libraries should not require the name.
             2) Different ".name" and ".display.name" options are implementation of the migration hack HD Witness -> Nx Witness.
                They are NOT needed for all new projects. Just use single ".name".
         </!-->
-        
+
         <nxtool.name>${short.company.name} Server Tool</nxtool.name>
         <testcamera.name>${company.name} Test Camera</testcamera.name>
-        <traytool.name>${product.name} Tray Assistant</traytool.name>
-        <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
+        <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
+        <evidence_plugin.name>${company.name} Evidence integration plugin</evidence_plugin.name>
+        <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
+        <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
         <cloud_connect_auto_test.name>${company.name} Cloud Connect Auto Test</cloud_connect_auto_test.name>
@@ -492,7 +494,7 @@
                 <additional.qtlibs>DBus, WebChannel, Webkit, WebkitWidgets</additional.qtlibs>
             </properties>
             <modules>
-                <module>common_libs/nx_audio</module>            
+                <module>common_libs/nx_audio</module>
                 <module>client/applauncher</module>
                 <module>client/libclient_core</module>
                 <module>client/libclient</module>
@@ -527,7 +529,7 @@
                 <client.binary.name>${product.name}.exe</client.binary.name>
                 <applauncher.binary.name>applauncher.exe</applauncher.binary.name>
                 <minilauncher.binary.name>${product.name} Launcher.exe</minilauncher.binary.name>
-                
+
                 <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
                 <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
 
@@ -896,7 +898,7 @@
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speach_synthesizer</module>
-                <module>client/libclient_core</module>                
+                <module>client/libclient_core</module>
                 <module>client/mobile_client</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
@@ -1071,7 +1073,7 @@
             <modules>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
-                <module>client/libclient_core</module>                
+                <module>client/libclient_core</module>
                 <module>client/mobile_client</module>
             </modules>
         </profile>
