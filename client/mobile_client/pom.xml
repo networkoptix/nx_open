@@ -2,7 +2,7 @@
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
         <version>3.0.0-SNAPSHOT</version>
-        <relativePath>../cpp</relativePath>
+        <relativePath>../../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
@@ -13,6 +13,7 @@
     <name>Nx Witness Mobile Client</name>
 
     <properties>
+        <root.dir>${basedir}/../..</root.dir>
         <guid>${mobile_client.guid}</guid>
         <product.title>${mobile_client.name}</product.title>
         <product.display.title>${mobile_client.display.name}</product.display.title>
@@ -39,7 +40,7 @@
         <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/testing.mobileprovision</provisioning_profile>
         <mobile_client_entitlements>mobile_client-beta.entitlements</mobile_client_entitlements>
         <provisioning_profile_id/>
-    </properties>   
+    </properties>
 
 
     <dependencies>
@@ -55,22 +56,22 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_audio</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
-        </dependency>   
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_media</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_media/pom.xml</systemPath>
-        </dependency>           
+        </dependency>
     </dependencies>
 
     <build>
-        <plugins>      
+        <plugins>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>2.5</version>
@@ -90,13 +91,13 @@
                                         <include>*.apk</include>
                                         <include>*.ipa</include>
                                     </includes>
-                                </fileset>                                                                  
+                                </fileset>
                             </filesets>
-                            <skip>${clean-skip}</skip>							
-                        </configuration>            
+                            <skip>${clean-skip}</skip>
+                        </configuration>
                     </execution>
                 </executions>
-            </plugin>    
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -113,14 +114,14 @@
                             <arguments>
                                 <argument>pre-build.py</argument>
                             </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                            <workingDirectory>${project.build.directory}</workingDirectory>
                         </configuration>
-                    </execution>                   
+                    </execution>
                 </executions>
-            </plugin>               
-        </plugins>    
+            </plugin>
+        </plugins>
     </build>
-    
+
     <profiles>
         <profile>
             <id>nobeta</id>
@@ -184,7 +185,7 @@
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>mac</family>
-                </os>                
+                </os>
                 <property>
                     <name>box</name>
                     <value>ios</value>

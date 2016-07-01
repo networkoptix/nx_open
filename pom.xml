@@ -890,11 +890,11 @@
                 <!-- Banana pie uses same distro as rpi -->
                 <module>common_libs/nx_bpi_videonode_plugin</module>
                 <module>edge_firmware/rpi</module>
-                <module>client/libclient_core</module>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speach_synthesizer</module>
-                <module>mobile_client</module>
+                <module>client/libclient_core</module>                
+                <module>client/mobile_client</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
@@ -1066,10 +1066,10 @@
                 <compile.options/>
             </properties>
             <modules>
-                <module>client/libclient_core</module>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
-                <module>mobile_client</module>
+                <module>client/libclient_core</module>                
+                <module>client/mobile_client</module>
             </modules>
         </profile>
         <profile>
