@@ -421,9 +421,6 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     if (!user || !layout)
         return Qn::NoPermissions;
 
-	if (hasGlobalPermission(user, Qn::GlobalPermission::GlobalVideoWallLayoutPermission))
-		return true;
-
     //TODO: #GDM Code duplication with QnWorkbenchAccessController::calculatePermissionsInternal
     auto checkReadOnly = [this](Qn::Permissions permissions)
     {
@@ -461,6 +458,10 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         /* Owner can do anything. */
         if (user->isOwner())
             return Qn::FullLayoutPermissions;
+
+		/* 'Videowall user' should have read access to the layouts */
+		if (hasGlobalPermission(user, Qn::GlobalPermission::GlobalVideoWallLayoutPermission))
+			return Qn::ReadPermission;
 
         QnUuid ownerId = layout->getParentId();
 
