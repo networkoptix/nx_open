@@ -18,8 +18,10 @@ angular.module('webadminApp')
                     isAdmin: user.isAdmin,
                     name: user.name
                 };
-            },function(){
-                alert('Server failure: cannot retrieve current user data');
+            },function(error){
+                if(error.status !== 401) {
+                    alert('Server failure: cannot retrieve current user data');
+                }
             });
         });
         $scope.isActive = function (path) {
