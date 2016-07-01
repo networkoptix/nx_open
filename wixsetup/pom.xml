@@ -44,7 +44,7 @@
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/client.bin/pom.xml</systemPath>            
+            <systemPath>${root.dir}/client/desktop_client/pom.xml</systemPath>            
         </dependency>
         
         <dependency>
@@ -62,7 +62,7 @@
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/axclient/pom.xml</systemPath>            
+            <systemPath>${root.dir}/client/activex_client/pom.xml</systemPath>            
         </dependency>					
     </dependencies>		
 

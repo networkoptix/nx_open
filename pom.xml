@@ -492,7 +492,7 @@
                 <module>applauncher</module>
                 <module>client.core</module>
                 <module>client/libclient</module>
-                <module>client.bin</module>
+                <module>client/desktop_client</module>
                 <module>common_libs/nx_audio</module>
             </modules>
         </profile>
@@ -599,7 +599,7 @@
                 </file>
             </activation>
             <modules>
-                <module>axclient</module>
+                <module>client/activex_client</module>
                 <module>plugins/nxinterface</module>
                 <module>plugins/nxcontrol</module>
                 <module>plugins/acs/paxton</module>
@@ -959,7 +959,7 @@
             <modules>
                 <module>client.core</module>
                 <module>client/libclient</module>
-                <module>client.bin</module>
+                <module>client/desktop_client</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speach_synthesizer</module>
             </modules>

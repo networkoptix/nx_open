@@ -15,6 +15,7 @@
     <name>NX Witness Client ActiveX Component</name>
 
     <properties>
+        <root.dir>${basedir}/../..</root.dir>
         <guid>${axclient.guid}</guid>
         <product.title>${client.name}</product.title>
         <product.display.title>${client.display.name}</product.display.title>
