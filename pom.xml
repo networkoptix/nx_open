@@ -88,7 +88,7 @@
 
         <client.name>${company.name} ${product.name} Client</client.name>
         <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
-        
+
         <mobile_client.name>${company.name} ${product.name} Mobile Client</mobile_client.name>
         <mobile_client.display.name>${company.name} ${display.product.name} Mobile Client</mobile_client.display.name>
 
@@ -581,6 +581,7 @@
                 <module>media_db_util</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
+                <module>client/minilauncher</module>
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
