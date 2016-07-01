@@ -26,7 +26,7 @@ class QnPopupShadow : public QObject
     Q_PROPERTY(int spread READ spread WRITE setSpread)
 
 public:
-    QnPopupShadow(QWidget* popup);
+    explicit QnPopupShadow(QWidget* popup);
     virtual ~QnPopupShadow();
 
     const QColor& color() const;

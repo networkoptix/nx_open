@@ -10,12 +10,13 @@
  *
  * It also adds several features that the QTreeView is lacking.
  */
-class QnTreeView: public QTreeView {
+class QnTreeView: public QTreeView
+{
     Q_OBJECT
-
     typedef QTreeView base_type;
+
 public:
-    QnTreeView(QWidget *parent = NULL);
+    explicit QnTreeView(QWidget *parent = nullptr);
 
     virtual ~QnTreeView();
 

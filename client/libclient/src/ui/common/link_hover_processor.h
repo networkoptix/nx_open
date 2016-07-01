@@ -8,7 +8,7 @@
 class QnLinkHoverProcessor : public QObject
 {
 public:
-    QnLinkHoverProcessor(QLabel* parent);
+    explicit QnLinkHoverProcessor(QLabel* parent);
 
 protected:
     virtual QColor hoveredColor() const;

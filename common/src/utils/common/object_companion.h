@@ -47,7 +47,7 @@ class QnObjectCompanion : public Base, public QnObjectCompanionManager
 
 public:
     template<class ParentType>
-    QnObjectCompanion(ParentType* parent) : Base(parent) {}
+    explicit QnObjectCompanion(ParentType* parent) : Base(parent) {}
 
     /** Create and attach a companion if no other companion was attached: */
     template<class ParentType>

@@ -15,7 +15,7 @@ class QnResourcePreviewWidget : public Connective<QWidget>
     typedef Connective<QWidget> base_type;
 
 public:
-    QnResourcePreviewWidget(QWidget* parent = nullptr);
+    explicit QnResourcePreviewWidget(QWidget* parent = nullptr);
     virtual ~QnResourcePreviewWidget();
 
     QnUuid targetResource() const;

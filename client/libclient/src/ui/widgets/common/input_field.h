@@ -26,7 +26,7 @@ class QnInputField : public QWidget
     typedef QWidget base_type;
 
 public:
-    QnInputField(QWidget* parent = nullptr);
+    explicit QnInputField(QWidget* parent = nullptr);
     virtual ~QnInputField();
 
     QString title() const;

@@ -8,7 +8,7 @@ class QnItemViewHoverTracker : public QObject
     Q_OBJECT
 
 public:
-    QnItemViewHoverTracker(QAbstractItemView* parent);
+    explicit QnItemViewHoverTracker(QAbstractItemView* parent);
 
     const QModelIndex& hoveredIndex() const;
 

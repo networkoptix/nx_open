@@ -98,7 +98,7 @@ class QnBusyIndicatorWidget : public QWidget, public QnBusyIndicatorPainter
     Q_PROPERTY(unsigned int totalTimeMs     READ totalTimeMs)
 
 public:
-    QnBusyIndicatorWidget(QWidget* parent = nullptr);
+    explicit QnBusyIndicatorWidget(QWidget* parent = nullptr);
 
     virtual QSize minimumSizeHint() const override;
     virtual QSize sizeHint() const override;
@@ -133,7 +133,7 @@ class QnBusyIndicatorGraphicsWidget : public Animated<GraphicsWidget>, public Qn
     using base_type = Animated<GraphicsWidget>;
 
 public:
-    QnBusyIndicatorGraphicsWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = 0);
+    explicit QnBusyIndicatorGraphicsWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = 0);
 
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 

@@ -17,7 +17,7 @@ class QnWidgetAnchor : public QObject
     Q_PROPERTY(QMargins margins READ margins WRITE setMargins)
 
 public:
-    QnWidgetAnchor(QWidget* widget);
+    explicit QnWidgetAnchor(QWidget* widget);
 
     void setEdges(Qt::Edges anchors);
     Qt::Edges edges() const;
