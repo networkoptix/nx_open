@@ -13,6 +13,8 @@
 #include <utils/common/ldap_fwd.h>
 #include <utils/common/optional.h>
 
+#include <common/common_globals.h>
+
 #include <core/resource/resource_fwd.h>
 
 class QnAbstractResourcePropertyAdaptor;

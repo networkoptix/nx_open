@@ -144,7 +144,7 @@
             </activation>
 
             <properties>
-                <rdep.linux.packages>festival</rdep.linux.packages>
+                <rdep.linux.packages>festival any/festival-vox</rdep.linux.packages>
             </properties>
         </profile>
     </profiles>

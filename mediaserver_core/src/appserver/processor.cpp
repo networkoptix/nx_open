@@ -136,32 +136,61 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
     fromApiToResource(userAttrsData, m_defaultUserAttrs);
 }
 
+ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
+    const ec2::ApiCameraData& apiCameraData
+)
+{   // Add resource (camera) to the Resource Pool before launching transaction.
+    // The order is important because while executing the transaction, specifically when 
+    // remote peer access rights are being checked, the resource should already reside in the 
+    // Resource Pool so ResourceAccessManager could check access rights for the pair
+    // (remotePeerUserId, resourceId).
+    QnResourcePtr existCamRes = qnResPool->getResourceById(apiCameraData.id);
+    if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
+        qnResPool->removeResource(existCamRes);
+    QnCommonMessageProcessor::instance()->updateResource(apiCameraData);
+
+    ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()
+        ->getCameraManager(Qn::kDefaultUserAccess)
+        ->addCameraSync(apiCameraData);
+    if (errorCode != ec2::ErrorCode::ok) 
+    {
+        NX_LOG(
+            QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1")
+                .arg(ec2::toString(errorCode)), 
+            cl_logWARNING 
+        );
+        // Here, if the transaction has failed, we have to restore Resource Pool 
+        // initial (before cameraResource processing began) state.
+        qnResPool->removeResource(qnResPool->getResourceById(apiCameraData.id));
+        if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
+            QnCommonMessageProcessor::instance()->updateResource(existCamRes);
+        return errorCode;
+    }
+
+    return ec2::ErrorCode::ok;
+}
+
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource) const
 {
-    if( cameraResource->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceById(cameraResource->getId()))
+    bool resourceExists = static_cast<bool>(
+        qnResPool->getResourceById(cameraResource->getId())
+    );
+    if (cameraResource->hasFlags(Qn::search_upd_only) && !resourceExists)
         return;   //ignoring newly discovered camera
 
     cameraResource->setFlags(cameraResource->flags() & ~Qn::parent_change);
     NX_ASSERT(!cameraResource->getId().isNull());
 
-    ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
-
     ec2::ApiCameraData apiCamera;
     fromResourceToApi(cameraResource, apiCamera);
 
-    ec2::ErrorCode errorCode = connection->getCameraManager(Qn::kDefaultUserAccess)->addCameraSync(apiCamera);
-    if( errorCode != ec2::ErrorCode::ok ) {
-        NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
-        return;
+    if (addAndPropagateCamResource(apiCamera) == ec2::ErrorCode::ok)
+    {   // finally, when transaction is successful we can save params
+        // for our new resource.
+        propertyDictionary->saveParams(cameraResource->getId());
     }
 
-    QnResourcePtr existCamRes = qnResPool->getResourceById(cameraResource->getId());
-    if (existCamRes && existCamRes->getTypeId() != cameraResource->getTypeId())
-        qnResPool->removeResource(existCamRes);
-    QnCommonMessageProcessor::instance()->updateResource(cameraResource);
-    propertyDictionary->saveParams( cameraResource->getId() );
-
-    if (!existCamRes && m_defaultUserAttrs)
+    if (!resourceExists && m_defaultUserAttrs)
     {
         QnCameraUserAttributesPtr userAttrCopy(new QnCameraUserAttributes(*m_defaultUserAttrs.data()));
         if (!userAttrCopy->scheduleDisabled) {
@@ -178,7 +207,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager(Qn::kDefaultUserAccess)->saveUserAttributesSync(attrsList);
         if (errCode != ec2::ErrorCode::ok)
         {
-            NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errCode)), cl_logWARNING );
             return;
         }
         QSet<QByteArray> modifiedFields;

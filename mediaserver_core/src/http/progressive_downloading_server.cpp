@@ -10,7 +10,7 @@
 
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/adaptive_sleep.h>
 #include <utils/fs/file.h>
@@ -24,6 +24,7 @@
 #include "core/resource/camera_resource.h"
 
 #include "nx/streaming/archive_stream_reader.h"
+#include <nx/streaming/config.h>
 #include "plugins/resource/server_archive/server_archive_delegate.h"
 
 #include "transcoding/transcoder.h"
@@ -119,7 +120,7 @@ protected:
     {
         if (m_liveMode)
             return true;
-        else 
+        else
             return QnAbstractDataConsumer::canAcceptData();
     }
 
@@ -183,8 +184,8 @@ protected:
         QnByteArray result(CL_MEDIA_ALIGNMENT, 0);
         bool isArchive = !(media->flags & QnAbstractMediaData::MediaFlags_LIVE);
 
-        QnByteArray* const resultPtr = 
-            (m_dataOutput.get() && 
+        QnByteArray* const resultPtr =
+            (m_dataOutput.get() &&
              !isArchive && // thin out only live frames
              m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop) ? NULL : &result;
 
@@ -287,7 +288,7 @@ private:
         if (m_dataOutput.get())
         {   // Wait if bandwidth is not sufficient inside postPacket().
             // This is to ensure that we will send every archive packet.
-            // This shouldn't affect live packets, as we thin them out above. 
+            // This shouldn't affect live packets, as we thin them out above.
             // Refer to processData() for details.
             m_dataOutput->postPacket(outPacket, m_maxFramesToCacheBeforeDrop);
             if (m_dataOutput->failed())
@@ -329,7 +330,7 @@ private:
     void finalizeMediaStream()
     {
         QnByteArray result(CL_MEDIA_ALIGNMENT, 0);
-        if ((m_owner->getTranscoder()->finalize(&result) == 0) && 
+        if ((m_owner->getTranscoder()->finalize(&result) == 0) &&
             (result.size() > 0))
         {
             sendFrame(AV_NOPTS_VALUE, result);
@@ -435,7 +436,7 @@ QByteArray QnProgressiveDownloadingConsumer::getMimeType(const QByteArray& strea
         return "video/x-f4v";
     else if (streamingFormat == "mpjpeg")
         return "multipart/x-mixed-replace;boundary=--ffserver";
-    else 
+    else
         return QByteArray();
 }
 
@@ -561,7 +562,7 @@ void QnProgressiveDownloadingConsumer::run()
             qreal customAR = mediaRes->customAspectRatio();
             extraParams.setRotation(rotation);
             extraParams.setCustomAR(customAR);
-            
+
             d->transcoder.setExtraTranscodeParams(extraParams);
             d->transcoder.setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
         }
@@ -583,7 +584,7 @@ void QnProgressiveDownloadingConsumer::run()
             {
                 if (!streamInfo.transcodingRequired
                     && streamInfo.codec == d->videoCodec
-                    && (resolutionStr.isEmpty() || 
+                    && (resolutionStr.isEmpty() ||
                         requestedResolutionStr == streamInfo.resolution))
                 {
                     qualityToUse = streamInfo.encoderIndex == 0
@@ -623,7 +624,7 @@ void QnProgressiveDownloadingConsumer::run()
         bool continuousTimestamps = decodedUrlQuery.queryItemValue(CONTINUOUS_TIMESTAMPS_PARAM_NAME) != lit("false");
 
         const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
-        
+
         const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
         if (rtOptimization && MSSettings::roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
             d->transcoder.setUseRealTimeOptimization(true);
@@ -671,7 +672,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
         else {
             bool utcFormatOK = false;
-            timeUSec = parseDateTime( position );
+            timeUSec = nx::utils::parseDateTime( position );
 
             if (isUTCRequest)
             {
@@ -692,7 +693,7 @@ void QnProgressiveDownloadingConsumer::run()
                         const QnAbstractMediaDataPtr& data = archive->getNextData();
                         if (data)
                         {
-                            if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO) 
+                            if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO)
                             {
                                 timestamp = data->timestamp;
                                 break;
@@ -715,7 +716,7 @@ void QnProgressiveDownloadingConsumer::run()
                         else
                             ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLatin1() + QByteArray("\"");
                     }
-                    d->response.messageBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});"); 
+                    d->response.messageBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});");
                     sendResponse(CODE_OK, "application/json");
                 }
                 else {
@@ -731,12 +732,12 @@ void QnProgressiveDownloadingConsumer::run()
             d->archiveDP->jumpTo( timeUSec, timeUSec );
 
             if (!endPosition.isEmpty())
-                dataConsumer.setEndTimeUsec(parseDateTime(endPosition));
+                dataConsumer.setEndTimeUsec(nx::utils::parseDateTime(endPosition));
 
             d->archiveDP->start();
             dataProvider = d->archiveDP;
         }
-        
+
         if (dataProvider == 0)
         {
             d->response.messageBody = "Video camera is not ready yet\r\n";
@@ -773,7 +774,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         NX_LOG( lit("Done with progressive download (url %1) connection from %2. Reason: %3").
             arg(getDecodedUrl().toString()).arg(socket()->getForeignAddress().toString()).
-            arg((!dataConsumer.isRunning() ? lit("Data consumer stopped") : 
+            arg((!dataConsumer.isRunning() ? lit("Data consumer stopped") :
                 (!d->socket->isConnected() ? lit("Connection has been closed") :
                  lit("Terminated")))), cl_logDEBUG1 );
 
@@ -810,7 +811,7 @@ int QnProgressiveDownloadingConsumer::getVideoStreamResolution() const
         return 90000;
     else if (d->streamingFormat == "mp4")
         return 90000;
-    else 
+    else
         return 60;
 }
 

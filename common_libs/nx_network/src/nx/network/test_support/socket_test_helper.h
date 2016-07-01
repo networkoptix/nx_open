@@ -44,6 +44,8 @@ class NX_NETWORK_API TestConnection
     public QnStoppableAsync
 {
 public:
+    static constexpr size_t kReadBufferSize = 4 * 1024;
+
     /*!
         \param handler to be called on connection closure or after \a bytesToSendThrough bytes have been sent
     */

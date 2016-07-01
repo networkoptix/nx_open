@@ -127,7 +127,7 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/mime_data.h>
 #include <utils/common/event_processors.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/time.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>

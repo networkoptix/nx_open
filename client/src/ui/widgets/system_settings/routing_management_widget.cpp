@@ -23,7 +23,7 @@
 #include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <nx/network/socket_common.h>
-#include "utils/common/string.h"
+#include "nx/utils/string.h"
 #include "utils/common/util.h"
 
 namespace {
@@ -58,7 +58,7 @@ namespace {
         bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
             QString leftString = left.data(sortRole()).toString();
             QString rightString = right.data(sortRole()).toString();
-            return naturalStringLess(leftString, rightString);
+            return nx::utils::naturalStringLess(leftString, rightString);
         }
     };
 

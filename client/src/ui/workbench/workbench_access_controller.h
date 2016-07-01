@@ -13,13 +13,15 @@
 class QnWorkbenchContext;
 class QnResourcePool;
 
-class QnWorkbenchPermissionsNotifier: public QObject {
-    Q_OBJECT;
+class QnWorkbenchPermissionsNotifier: public QObject
+{
+    Q_OBJECT
+
 public:
-    QnWorkbenchPermissionsNotifier(QObject *parent = NULL): QObject(parent) {}
+    QnWorkbenchPermissionsNotifier(QObject* parent = nullptr);
 
 signals:
-    void permissionsChanged(const QnResourcePtr &resource);
+    void permissionsChanged(const QnResourcePtr& resource);
 
 private:
     friend class QnWorkbenchAccessController;
@@ -29,19 +31,21 @@ private:
 /**
  * This class implements access control.
  */
-class QnWorkbenchAccessController: public Connective<QObject>, public QnWorkbenchContextAware {
+class QnWorkbenchAccessController: public Connective<QObject>, public QnWorkbenchContextAware
+{
     Q_OBJECT
 
     typedef Connective<QObject> base_type;
+
 public:
-    QnWorkbenchAccessController(QObject *parent = NULL);
+    QnWorkbenchAccessController(QObject* parent = nullptr);
     virtual ~QnWorkbenchAccessController();
 
     /**
      * \param resource                  Resource to get permissions for.
      * \returns                         Permissions for the given resource.
      */
-    Qn::Permissions permissions(const QnResourcePtr &resource) const;
+    Qn::Permissions permissions(const QnResourcePtr& resource) const;
 
     /**
      * \param resource                  Resource to check permissions for.
@@ -49,13 +53,13 @@ public:
      * \returns                         Whether actual permissions for the given resource
      *                                  include required permissions.
      */
-    bool hasPermissions(const QnResourcePtr &resource, Qn::Permissions requiredPermissions) const;
+    bool hasPermissions(const QnResourcePtr& resource, Qn::Permissions requiredPermissions) const;
 
     /**
      * \param resources                 List of resources to get combined permissions for.
      * \returns                         Bitwise AND combination of permissions for the provided resources.
      */
-    Qn::Permissions combinedPermissions(const QnResourceList &resources) const;
+    Qn::Permissions combinedPermissions(const QnResourceList& resources) const;
 
     /**
      * \returns                         Global permissions of the current user,
@@ -76,35 +80,57 @@ public:
      * \returns                         Notifier that can be used to track permission changes for
      *                                  the given resource.
      */
-    QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr &resource) const;
+    QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr& resource) const;
+
+    /**
+    * \param user                      User resource to get role name for.
+    * \returns                         Name of user's role.
+    */
+    QString userRoleName(const QnUserResourcePtr& user) const;
+
+    /**
+    * \param user                      User resource to get role description for.
+    * \returns                         Description of user's role.
+    */
+    QString userRoleDescription(const QnUserResourcePtr& user) const;
+
+    /**
+    * \param permissions               Permissions to get role description for.
+    * \param groupId                   An uuid of custom user role, if applicable.
+    * \returns                         Description of user's role.
+    */
+    QString userRoleDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId = QnUuid()) const;
 
     bool canCreateStorage(const QnUuid& serverId) const;
     bool canCreateLayout(const QnUuid& layoutParentId) const;
     bool canCreateUser(Qn::GlobalPermissions targetPermissions, bool isOwner) const;
     bool canCreateVideoWall() const;
     bool canCreateWebPage() const;
+
 signals:
     /**
      * \param resource                  Resource for which permissions have changed.
      *                                  Guaranteed not to be null.
      */
-    void permissionsChanged(const QnResourcePtr &resource);
+    void permissionsChanged(const QnResourcePtr& resource);
 
 protected slots:
-    void updatePermissions(const QnResourcePtr &resource);
+    void updatePermissions(const QnResourcePtr& resource);
 
-    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
-    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
+    void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
+    void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
 
     void at_accessibleResourcesChanged(const QnUuid& userId);
+
 private:
     void recalculateAllPermissions();
 
-    void setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions);
+    void setPermissionsInternal(const QnResourcePtr& resource, Qn::Permissions permissions);
 
-    Qn::Permissions calculatePermissions(const QnResourcePtr &resource) const;
-    Qn::Permissions calculatePermissionsInternal(const QnLayoutResourcePtr &layout) const;
+    Qn::Permissions calculatePermissions(const QnResourcePtr& resource) const;
+    Qn::Permissions calculatePermissionsInternal(const QnLayoutResourcePtr& layout) const;
     Qn::GlobalPermissions calculateGlobalPermissions() const;
+
 private:
     struct PermissionsData
     {

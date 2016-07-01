@@ -21,7 +21,7 @@
 
 #include <network/authenticate_helper.h>
 #include <nx/utils/log/log.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/systemerror.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/av_codec_helper.h>
@@ -713,7 +713,7 @@ namespace nx_hls
             {
                 //converting startDatetime to startTimestamp
                     //this is secondary functionality, not used by this HLS implementation (since all chunks are referenced by npt timestamps)
-                startTimestamp = parseDateTime( startDatetimeIter->second );
+                startTimestamp = nx::utils::parseDateTime( startDatetimeIter->second );
             }
             else
             {
@@ -721,7 +721,7 @@ namespace nx_hls
                 std::multimap<QString, QString>::const_iterator startDatetimeIter =
                     requestParams.find( QLatin1String( StreamingParams::START_DATETIME_PARAM_NAME ) );
                 if( startDatetimeIter != requestParams.end() )
-                    startTimestamp = parseDateTime( startDatetimeIter->second );
+                    startTimestamp = nx::utils::parseDateTime( startDatetimeIter->second );
             }
         }
         quint64 chunkDuration = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
@@ -868,7 +868,7 @@ namespace nx_hls
             std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(StreamingParams::START_POS_PARAM_NAME);
             if( startDatetimeIter != requestParams.end() )
             {
-                startTimestamp = parseDateTime( startDatetimeIter->second );
+                startTimestamp = nx::utils::parseDateTime( startDatetimeIter->second );
             }
             else
             {
@@ -876,7 +876,7 @@ namespace nx_hls
                 std::multimap<QString, QString>::const_iterator startDatetimeIter =
                     requestParams.find( StreamingParams::START_DATETIME_PARAM_NAME );
                 if( startDatetimeIter != requestParams.end() )
-                    startTimestamp = parseDateTime( startDatetimeIter->second );
+                    startTimestamp = nx::utils::parseDateTime( startDatetimeIter->second );
             }
         }
 

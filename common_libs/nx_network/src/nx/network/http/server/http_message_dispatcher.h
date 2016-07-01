@@ -23,6 +23,9 @@ namespace nx_http
             std::unique_ptr<nx_http::AbstractMsgBodySource> )
         > HttpRequestCompletionFunc;
 
+    static const nx_http::StringType kAnyMethod;
+    static const QString kAnyPath;
+
     class NX_NETWORK_API MessageDispatcher
     {
     public:
@@ -32,18 +35,20 @@ namespace nx_http
         template<typename RequestHandlerType>
         bool registerRequestProcessor(
             const QString& path,
-            std::function<std::unique_ptr<RequestHandlerType>()> factoryFunc )
+            std::function<std::unique_ptr<RequestHandlerType>()> factoryFunc,
+            const nx_http::StringType& method = kAnyMethod)
         {
-            return m_factories.emplace(
+            return m_factories[method].emplace(
                 path,
                 std::move(factoryFunc)).second;
         }
 
         template<typename RequestHandlerType>
-        bool registerRequestProcessor( const QString& path )
+        bool registerRequestProcessor(
+            const QString& path, const nx_http::StringType& method = kAnyMethod)
         {
-            return m_factories.emplace(
-                path,
+            return registerRequestProcessor(
+                path, method,
                 []()->std::unique_ptr<AbstractHttpRequestHandler>{
                     return std::make_unique<RequestHandlerType>(); } ).second;
         }
@@ -79,35 +84,61 @@ namespace nx_http
         {
             NX_ASSERT( message.type == nx_http::MessageType::request );
 
-            auto it = m_factories.find( message.request->requestLine.url.path() );
             std::unique_ptr<AbstractHttpRequestHandler> requestProcessor;
-            if (it != m_factories.end())
-                requestProcessor = it->second();
-            else if (m_defaultHandlerFactory)
+            const auto method = message.request->requestLine.method;
+            const auto path = message.request->requestLine.url.path();
+
+            if (!m_factories.empty())
+            {
+                auto methodFactory = m_factories.find(method);
+                if (methodFactory != m_factories.end())
+                {
+                    const auto maker = methodFactory->second.find(path);
+                    if (maker != methodFactory->second.end())
+                        requestProcessor = maker->second();
+
+                    const auto anyMaker = methodFactory->second.find(kAnyPath);
+                    if (anyMaker != methodFactory->second.end())
+                        requestProcessor = anyMaker->second();
+                }
+            }
+
+            if (!requestProcessor) // could not find handler by specific method
+            {
+                auto methodFactory = m_factories.find(kAnyMethod);
+                if (methodFactory != m_factories.end())
+                {
+                    auto maker = methodFactory->second.find(path);
+                    if (maker != methodFactory->second.end())
+                        requestProcessor = maker->second();
+                }
+            }
+
+            if (!requestProcessor) // could not find any specific handler
+            {
+                if (!m_defaultHandlerFactory)
+                    return false;
+
                 requestProcessor = m_defaultHandlerFactory();
-            else
-                return false;
+            }
 
-            auto requestProcessorPtr = requestProcessor.release();  //TODO #ak get rid of this when general lambdas available
-
+            //TODO #ak get rid of this when general lambdas available
+            auto requestProcessorPtr = requestProcessor.release();
             return requestProcessorPtr->processRequest(
-                conn,
-                std::move( message ),
-                std::move( authInfo ),
+                conn, std::move(message), std::move(authInfo),
                 [completionFunc, requestProcessorPtr](
                     nx_http::Message&& responseMsg,
-                    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody ) mutable
+                    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody) mutable
                 {
-                    completionFunc( std::move(responseMsg), std::move(responseMsgBody) );
+                    completionFunc(std::move(responseMsg), std::move(responseMsgBody));
                     delete requestProcessorPtr;
-                } );
+                });
         }
 
     private:
-        std::map<
-            QString,
-            std::function<std::unique_ptr<AbstractHttpRequestHandler>()>
-        > m_factories;
+        std::map<nx_http::StringType, std::map<
+            QString, std::function<std::unique_ptr<AbstractHttpRequestHandler>()>
+        >> m_factories;
         std::function<std::unique_ptr<AbstractHttpRequestHandler>()> m_defaultHandlerFactory;
     };
 }

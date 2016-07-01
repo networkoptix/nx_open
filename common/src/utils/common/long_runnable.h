@@ -1,8 +1,6 @@
 #ifndef QN_LONG_RUNNABLE_H
 #define QN_LONG_RUNNABLE_H
 
-#include <common/config.h>
-
 #include <QtCore/QThread>
 #include <QtCore/QSharedPointer>
 
@@ -92,7 +90,7 @@ private:
 
 
 /**
- * Helper cleanup class to use QnLongRunnable inside Qt smart pointers in a 
+ * Helper cleanup class to use QnLongRunnable inside Qt smart pointers in a
  * non-blocking fashion.
  */
 struct QnRunnableCleanup {
@@ -112,9 +110,9 @@ struct QnRunnableCleanup {
         if(!runnable)
             return;
 
-        if(runnable->isRunning()) 
+        if(runnable->isRunning())
             runnable->stop();
-        
+
         delete runnable;
     }
 };

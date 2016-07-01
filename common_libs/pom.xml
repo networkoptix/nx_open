@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>common_libs</artifactId>
     <packaging>pom</packaging>
-    <name>Network Optix Common Libraries</name>
+    <name>Network Optix Common Libraryraries</name>
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>

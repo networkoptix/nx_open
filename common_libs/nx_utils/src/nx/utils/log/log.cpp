@@ -356,6 +356,20 @@ bool QnLog::initLog(QnLog *externalInstance, int logID )
     return logs()->init( logID, std::unique_ptr< QnLog >( externalInstance ) );
 }
 
+void QnLog::applyArguments(const nx::utils::ArgumentParser& arguments)
+{
+    QnLogLevel logLevel(cl_logDEBUG1);
+
+    if (const auto value = arguments.get(QLatin1String("log-file")))
+        instance()->create(*value, 1024 * 1024 * 10, 5, logLevel);
+
+    if (const auto value = arguments.get(QLatin1String("log-level")))
+    {
+        instance()->setLogLevel(logLevelFromString(*value));
+        s_disableLogConfiguration = true;
+    }
+}
+
 QString QnLog::logFileName( int logID )
 {
     return instance(logID)->d->syncCurrFileName();

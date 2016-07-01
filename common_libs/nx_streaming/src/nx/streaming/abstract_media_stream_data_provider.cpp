@@ -3,6 +3,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/config.h>
 #include <utils/common/sleep.h>
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
@@ -36,7 +37,7 @@ void QnAbstractMediaStreamDataProvider::setNeedKeyData()
     if (m_numberOfchannels==0)
         m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();
 
-    
+
     for (int i = 0; i < m_numberOfchannels; ++i)
         m_gotKeyFrame[i] = 0;
 }
@@ -54,7 +55,7 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
     if (m_numberOfchannels==0)
         m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();
 
-   
+
     for (int i = 0; i < m_numberOfchannels; ++i)
         if (m_gotKeyFrame[i]==0)
             return true;

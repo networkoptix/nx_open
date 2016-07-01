@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>vms_gateway</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Cloud vms_gateway</name>
+    <name>NX Cloud VMS Gateway</name>
 
     <properties>
         <guid>${vms_gateway.guid}</guid>

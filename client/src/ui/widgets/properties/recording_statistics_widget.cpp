@@ -14,7 +14,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/common/grid_widget_helper.h>
+#include <ui/utils/table_export_helper.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -440,12 +440,12 @@ void QnRecordingStatisticsWidget::at_eventsGrid_customContextMenuRequested(const
 
 void QnRecordingStatisticsWidget::at_exportAction_triggered()
 {
-    QnGridWidgetHelper::exportToFile(ui->gridEvents, this, tr("Export selected events to file"));
+    QnTableExportHelper::exportToFile(ui->gridEvents, true, this, tr("Export selected events to file"));
 }
 
 void QnRecordingStatisticsWidget::at_clipboardAction_triggered()
 {
-    QnGridWidgetHelper::copyToClipboard(ui->gridEvents);
+    QnTableExportHelper::copyToClipboard(ui->gridEvents);
 }
 
 void QnRecordingStatisticsWidget::at_mouseButtonRelease(QObject* sender, QEvent* event)
