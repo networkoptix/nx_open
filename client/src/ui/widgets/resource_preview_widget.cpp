@@ -92,16 +92,13 @@ void QnResourcePreviewWidget::setTargetResource(const QnUuid &target)
     m_target = target;
     m_resolutionHint = QSize();
 
-    if (QnResourcePtr targetResource = qnResPool->getResourceById(m_target))
+    if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(m_target))
     {
-        if (QnVirtualCameraResourcePtr camera = targetResource.dynamicCast<QnVirtualCameraResource>())
-        {
-            m_thumbnailManager->selectResource(camera);
+        m_thumbnailManager->selectResource(camera);
 
-            CameraMediaStreams s = camera->mediaStreams();
-            if (!s.streams.empty())
-                m_resolutionHint = s.streams[0].getResolution();
-        }
+        CameraMediaStreams s = camera->mediaStreams();
+        if (!s.streams.empty())
+            m_resolutionHint = s.streams[0].getResolution();
     }
 
     m_preview->setPixmap(QPixmap());
