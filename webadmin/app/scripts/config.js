@@ -21,8 +21,8 @@ var Config = {
 
         portalUrl: 'http://cloud-demo.hdw.mx',
         apiUrl: '/api',
-        portalRegisterUrl: '/static/index.html#/register',
-        portalSystemUrl: '/static/index.html#/systems/{systemId}'
+        portalRegisterUrl: '/register',
+        portalSystemUrl: '/systems/{systemId}'
     },
 
     webclientEnabled: true, // set to false to disable webclient from top menu and show placeholder instead
