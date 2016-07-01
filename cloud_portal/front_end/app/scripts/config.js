@@ -1,7 +1,8 @@
 'use strict';
 
 var Config = {
-    googleAnalyticsCode: 'UA-71145034-2',
+    googleAnalyticsCode: 'UA-51046510-4',
+    googleTagsCode: 'GTM-5MRNWP',
     apiBase: '/api',
     clientProtocol: 'nx-vms:',
     nativeDomain: 'cloud-demo.hdw.mx',
