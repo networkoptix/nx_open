@@ -5,6 +5,7 @@ from os.path import abspath as _abspath
 from sys import platform as _platform
 
 ARCH="${arch}"
+PLATFORM="${platform}"
 BOX="${box}"
 CONFIGURATION="${build.configuration}"
 TARGET_DIR=_abspath("${libdir}")
