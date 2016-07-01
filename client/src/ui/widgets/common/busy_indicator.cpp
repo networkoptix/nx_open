@@ -38,11 +38,14 @@ public:
 
     void timeChanged()
     {
-        totalTimeMs = qMax(downTimeMs + fadeInTimeMs + upTimeMs + fadeOutTimeMs, 1U);
+        totalTimeMs = downTimeMs + fadeInTimeMs + upTimeMs + fadeOutTimeMs;
     }
 
     qreal opacityFromTime(int timeMs) const
     {
+        if (!totalTimeMs)
+            return 1.0;
+
         timeMs %= totalTimeMs;
         unsigned int ms = timeMs < 0 ? timeMs += totalTimeMs : timeMs;
 
@@ -51,7 +54,7 @@ public:
 
         ms -= downTimeMs;
 
-        if (ms <= fadeInTimeMs)
+        if (ms < fadeInTimeMs)
             return minimumOpacity + (static_cast<qreal>(ms) / fadeInTimeMs) * (1.0 - minimumOpacity);
 
         ms -= fadeInTimeMs;
@@ -129,7 +132,7 @@ qreal QnBusyIndicatorPainter::dotRadius() const
 void QnBusyIndicatorPainter::setDotRadius(qreal radius)
 {
     Q_D(QnBusyIndicatorPainter);
-    radius = qMax(0.1, radius);
+    radius = qMax(0.0, radius);
 
     QSize oldSize = d->indicatorSize;
 
@@ -322,6 +325,9 @@ void QnBusyIndicatorPainter::updateIndicator()
 void QnBusyIndicatorPainter::tick(int deltaMs)
 {
     Q_D(QnBusyIndicatorPainter);
+    if (!d->totalTimeMs)
+        return;
+
     d->currentTimeMs = (d->currentTimeMs + deltaMs) % d->totalTimeMs;
     updateIndicator();
 }
