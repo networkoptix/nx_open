@@ -51,6 +51,7 @@ angular.module('cloudApp')
 
 
                     //TODO: Remove the trash below after #VMS-2968
+                    'accountEmail': accountEmail,
                     'fullName': fullName,
                     'id': '{' + uuid2.newuuid() + '}',
                     'isAdmin': false,

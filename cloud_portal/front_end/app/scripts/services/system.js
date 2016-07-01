@@ -198,7 +198,7 @@ angular.module('cloudApp')
 
 
         system.prototype.saveUser = function(user, role){
-            var accessRole = role.accessRole;
+            var accessRole = role.accessRole || role.label;
 
             if(!user.userId){
                 if(user.accountEmail == this.currentUserEmail){
@@ -207,13 +207,14 @@ angular.module('cloudApp')
                     return deferred.promise;
                 }
 
-                user = _.find(this.users,function(u){
+                var existingUser = _.find(this.users,function(u){
                     return user.accountEmail == u.email;
                 });
-                if(!user){ // user not found - create a new one
-                    user = mediaserver.userObject(user.fullName, user.accountEmail);
-                    self.users.push(user);
+                if(!existingUser){ // user not found - create a new one
+                    existingUser = mediaserver.userObject(user.fullName, user.accountEmail);
+                    this.users.push(existingUser);
                 }
+                user = existingUser;
 
                 if(!user.canBeEdited && !this.isMine){
                     var deferred = $q.defer();
