@@ -1041,7 +1041,7 @@ void QnPlOnvifResource::notificationReceived(
             {
                 if (m_portAliases[i] == portSourceIter->value)
                 {
-                    portId = lit("%1").arg(i);
+                    portId = lit("%1").arg(i + 1);
                     break;
                 }
             }
