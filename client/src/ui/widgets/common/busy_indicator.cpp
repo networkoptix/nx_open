@@ -8,22 +8,21 @@
 #include <ui/common/geometry.h>
 
 
-class QnBusyIndicatorPrivate
+class QnBusyIndicatorPainterPrivate
 {
 public:
-    QnBusyIndicatorPrivate() :
+    QnBusyIndicatorPainterPrivate() :
         dotCount(3),
         dotSpacing(8),
         dotRadius(4.0),
-        dotDiameter(roundedDiameter(dotRadius)),
         minimumOpacity(0.0),
-        opacityRange(1.0 - minimumOpacity),
         dotLagMs(200),
         downTimeMs(300),
         fadeInTimeMs(500),
         upTimeMs(0),
         fadeOutTimeMs(500),
-        totalTimeMs(0)
+        totalTimeMs(0),
+        currentTimeMs(0)
     {
         sizeChanged();
         timeChanged();
@@ -31,26 +30,15 @@ public:
 
     void sizeChanged()
     {
+        unsigned int dotSize = this->dotSize();
         indicatorSize = QSize(
-            dotDiameter * dotCount + dotSpacing * (dotCount - 1),
-            dotDiameter);
+            dotSize * dotCount + dotSpacing * (dotCount - 1),
+            dotSize);
     }
 
     void timeChanged()
     {
         totalTimeMs = qMax(downTimeMs + fadeInTimeMs + upTimeMs + fadeOutTimeMs, 1U);
-    }
-
-    void setDotRadius(qreal radius)
-    {
-        dotRadius = radius;
-        dotDiameter = roundedDiameter(radius);
-    }
-
-    void setMinimumOpacity(qreal opacity)
-    {
-        minimumOpacity = qBound(0.0, opacity, 1.0);
-        opacityRange = 1.0 - minimumOpacity;
     }
 
     qreal opacityFromTime(int timeMs) const
@@ -64,7 +52,7 @@ public:
         ms -= downTimeMs;
 
         if (ms <= fadeInTimeMs)
-            return minimumOpacity + (static_cast<qreal>(ms) / fadeInTimeMs) * opacityRange;
+            return minimumOpacity + (static_cast<qreal>(ms) / fadeInTimeMs) * (1.0 - minimumOpacity);
 
         ms -= fadeInTimeMs;
 
@@ -72,19 +60,18 @@ public:
             return 1.0;
 
         ms -= upTimeMs;
-        return 1.0 - (static_cast<qreal>(ms) / fadeOutTimeMs) * opacityRange;
+        return 1.0 - (static_cast<qreal>(ms) / fadeOutTimeMs) * (1.0 - minimumOpacity);
     }
 
-    static unsigned int roundedDiameter(qreal radius)
+    unsigned int dotSize() const
     {
-        return static_cast<unsigned int>(std::ceil(radius * 2.0));
+        return static_cast<unsigned int>(std::ceil(dotRadius * 2.0));
     }
 
 public:
     unsigned int dotCount;
     unsigned int dotSpacing;
     qreal dotRadius;
-    unsigned int dotDiameter;
 
     qreal minimumOpacity;
     qreal opacityRange;
@@ -106,24 +93,24 @@ public:
 * QnBusyIndicator
 */
 
-QnBusyIndicator::QnBusyIndicator() :
-    d_ptr(new QnBusyIndicatorPrivate())
+QnBusyIndicatorPainter::QnBusyIndicatorPainter() :
+    d_ptr(new QnBusyIndicatorPainterPrivate())
 {
 }
 
-QnBusyIndicator::~QnBusyIndicator()
+QnBusyIndicatorPainter::~QnBusyIndicatorPainter()
 {
 }
 
-unsigned int QnBusyIndicator::dotCount() const
+unsigned int QnBusyIndicatorPainter::dotCount() const
 {
-    Q_D(const QnBusyIndicator);
+    Q_D(const QnBusyIndicatorPainter);
     return d->dotCount;
 }
 
-void QnBusyIndicator::setDotCount(unsigned int count)
+void QnBusyIndicatorPainter::setDotCount(unsigned int count)
 {
-    Q_D(QnBusyIndicator);
+    Q_D(QnBusyIndicatorPainter);
     if (d->dotCount == count)
         return;
 
@@ -133,37 +120,37 @@ void QnBusyIndicator::setDotCount(unsigned int count)
     indicatorSizeChanged();
 }
 
-qreal QnBusyIndicator::dotRadius() const
+qreal QnBusyIndicatorPainter::dotRadius() const
 {
-    Q_D(const QnBusyIndicator);
+    Q_D(const QnBusyIndicatorPainter);
     return d->dotRadius;
 }
 
-void QnBusyIndicator::setDotRadius(qreal radius)
+void QnBusyIndicatorPainter::setDotRadius(qreal radius)
 {
-    Q_D(QnBusyIndicator);
+    Q_D(QnBusyIndicatorPainter);
     radius = qMax(0.1, radius);
 
-    unsigned int oldDiameter = d->dotDiameter;
+    QSize oldSize = d->indicatorSize;
 
-    d->setDotRadius(radius);
+    d->dotRadius = radius;
+    d->sizeChanged();
 
-    if (oldDiameter != d->dotDiameter)
-    {
-        d->sizeChanged();
+    if (oldSize != d->indicatorSize)
         indicatorSizeChanged();
-    }
+    else
+        updateIndicator();
 }
 
-unsigned int QnBusyIndicator::dotSpacing() const
+unsigned int QnBusyIndicatorPainter::dotSpacing() const
 {
-    Q_D(const QnBusyIndicator);
+    Q_D(const QnBusyIndicatorPainter);
     return d->dotSpacing;
 }
 
-void QnBusyIndicator::setDotSpacing(unsigned int spacing)
+void QnBusyIndicatorPainter::setDotSpacing(unsigned int spacing)
 {
-    Q_D(QnBusyIndicator);
+    Q_D(QnBusyIndicatorPainter);
     if (d->dotSpacing == spacing)
         return;
 
@@ -173,106 +160,112 @@ void QnBusyIndicator::setDotSpacing(unsigned int spacing)
     indicatorSizeChanged();
 }
 
-qreal QnBusyIndicator::minimumOpacity() const
+qreal QnBusyIndicatorPainter::minimumOpacity() const
 {
-    Q_D(const QnBusyIndicator);
+    Q_D(const QnBusyIndicatorPainter);
     return d->minimumOpacity;
 }
 
-void QnBusyIndicator::setMinimumOpacity(qreal opacity)
+void QnBusyIndicatorPainter::setMinimumOpacity(qreal opacity)
 {
-    Q_D(QnBusyIndicator);
-    d->setMinimumOpacity(opacity);
+    Q_D(QnBusyIndicatorPainter);
+    d->minimumOpacity = opacity;
+    updateIndicator();
 }
 
-int QnBusyIndicator::dotLagMs() const
+int QnBusyIndicatorPainter::dotLagMs() const
 {
-    Q_D(const QnBusyIndicator);
+    Q_D(const QnBusyIndicatorPainter);
     return d->dotLagMs;
 }
 
-void QnBusyIndicator::setDotLagMs(int lag)
+void QnBusyIndicatorPainter::setDotLagMs(int lag)
 {
-    Q_D(QnBusyIndicator);
+    Q_D(QnBusyIndicatorPainter);
     if (d->dotLagMs == lag)
         return;
 
     d->dotLagMs = lag;
+    updateIndicator();
 }
 
-unsigned int QnBusyIndicator::downTimeMs() const
+unsigned int QnBusyIndicatorPainter::downTimeMs() const
 {
-    Q_D(const QnBusyIndicator);
+    Q_D(const QnBusyIndicatorPainter);
     return d->downTimeMs;
 }
 
-void QnBusyIndicator::setDownTimeMs(unsigned int ms)
+void QnBusyIndicatorPainter::setDownTimeMs(unsigned int ms)
 {
-    Q_D(QnBusyIndicator);
+    Q_D(QnBusyIndicatorPainter);
     if (d->downTimeMs == ms)
         return;
 
     d->downTimeMs = ms;
     d->timeChanged();
+    updateIndicator();
 }
 
-unsigned int QnBusyIndicator::fadeInTimeMs() const
+unsigned int QnBusyIndicatorPainter::fadeInTimeMs() const
 {
-    Q_D(const QnBusyIndicator);
+    Q_D(const QnBusyIndicatorPainter);
     return d->fadeInTimeMs;
 }
 
-void QnBusyIndicator::setFadeInTimeMs(unsigned int ms)
+void QnBusyIndicatorPainter::setFadeInTimeMs(unsigned int ms)
 {
-    Q_D(QnBusyIndicator);
+    Q_D(QnBusyIndicatorPainter);
     if (d->fadeInTimeMs == ms)
         return;
 
     d->fadeInTimeMs = ms;
     d->timeChanged();
+    updateIndicator();
 }
 
-unsigned int QnBusyIndicator::upTimeMs() const
+unsigned int QnBusyIndicatorPainter::upTimeMs() const
 {
-    Q_D(const QnBusyIndicator);
+    Q_D(const QnBusyIndicatorPainter);
     return d->upTimeMs;
 }
 
-void QnBusyIndicator::setUpTimeMs(unsigned int ms)
+void QnBusyIndicatorPainter::setUpTimeMs(unsigned int ms)
 {
-    Q_D(QnBusyIndicator);
+    Q_D(QnBusyIndicatorPainter);
     if (d->upTimeMs == ms)
         return;
 
     d->upTimeMs = ms;
     d->timeChanged();
+    updateIndicator();
 }
 
-unsigned int QnBusyIndicator::fadeOutTimeMs() const
+unsigned int QnBusyIndicatorPainter::fadeOutTimeMs() const
 {
-    Q_D(const QnBusyIndicator);
+    Q_D(const QnBusyIndicatorPainter);
     return d->fadeOutTimeMs;
 }
 
-void QnBusyIndicator::setFadeOutTimeMs(unsigned int ms)
+void QnBusyIndicatorPainter::setFadeOutTimeMs(unsigned int ms)
 {
-    Q_D(QnBusyIndicator);
+    Q_D(QnBusyIndicatorPainter);
     if (d->fadeOutTimeMs == ms)
         return;
 
     d->fadeOutTimeMs = ms;
     d->timeChanged();
+    updateIndicator();
 }
 
-unsigned int QnBusyIndicator::totalTimeMs() const
+unsigned int QnBusyIndicatorPainter::totalTimeMs() const
 {
-    Q_D(const QnBusyIndicator);
+    Q_D(const QnBusyIndicatorPainter);
     return d->totalTimeMs;
 }
 
-void QnBusyIndicator::setAnimationTimesMs(unsigned int downTimeMs, unsigned int fadeInTimeMs, unsigned int upTimeMs, unsigned int fadeOutTimeMs)
+void QnBusyIndicatorPainter::setAnimationTimesMs(unsigned int downTimeMs, unsigned int fadeInTimeMs, unsigned int upTimeMs, unsigned int fadeOutTimeMs)
 {
-    Q_D(QnBusyIndicator);
+    Q_D(QnBusyIndicatorPainter);
     bool changed = downTimeMs != d->downTimeMs || fadeInTimeMs != d->fadeInTimeMs ||
                    upTimeMs != d->upTimeMs || fadeOutTimeMs != d->fadeOutTimeMs;
 
@@ -282,39 +275,55 @@ void QnBusyIndicator::setAnimationTimesMs(unsigned int downTimeMs, unsigned int 
     d->fadeOutTimeMs = fadeOutTimeMs;
 
     if (changed)
+    {
         d->timeChanged();
+        updateIndicator();
+    }
 }
 
-QSize QnBusyIndicator::indicatorSize() const
+QSize QnBusyIndicatorPainter::indicatorSize() const
 {
-    Q_D(const QnBusyIndicator);
+    Q_D(const QnBusyIndicatorPainter);
     return d->indicatorSize;
 }
 
-void QnBusyIndicator::paintIndicator(QPainter* painter, const QPointF& origin, int currentTimeMs)
+void QnBusyIndicatorPainter::paintIndicator(QPainter* painter, const QPointF& origin)
 {
-    Q_D(const QnBusyIndicator);
+    Q_D(const QnBusyIndicatorPainter);
 
     QnScopedPainterOpacityRollback opacityRollback(painter);
 
-    qreal radius = d->dotDiameter * 0.5;
-    QPointF center(origin.x() + radius, origin.y() + radius);
+    unsigned int dotSize = d->dotSize();
+    qreal centerDistance = dotSize + d->dotSpacing;
 
-    unsigned int delta = d->dotDiameter + d->dotSpacing;
-    int timeMs = currentTimeMs;
+    qreal halfSize = dotSize * 0.5;
+    QPointF center(origin.x() + halfSize, origin.y() + halfSize);
+
+    int timeMs = d->currentTimeMs;
 
     for (unsigned int i = 0; i != d->dotCount; ++i)
     {
         painter->setOpacity(d->opacityFromTime(timeMs));
         painter->drawEllipse(center, d->dotRadius, d->dotRadius);
 
-        center.setX(center.x() + delta);
+        center.setX(center.x() + centerDistance);
         timeMs -= d->dotLagMs;
     }
 }
 
-void QnBusyIndicator::indicatorSizeChanged()
+void QnBusyIndicatorPainter::indicatorSizeChanged()
 {
+}
+
+void QnBusyIndicatorPainter::updateIndicator()
+{
+}
+
+void QnBusyIndicatorPainter::tick(int deltaMs)
+{
+    Q_D(QnBusyIndicatorPainter);
+    d->currentTimeMs = (d->currentTimeMs + deltaMs) % d->totalTimeMs;
+    updateIndicator();
 }
 
 /*
@@ -322,8 +331,7 @@ void QnBusyIndicator::indicatorSizeChanged()
 */
 
 QnBusyIndicatorWidget::QnBusyIndicatorWidget(QWidget* parent) :
-    QWidget(parent),
-    m_currentTimeMs(0)
+    QWidget(parent)
 {
     setFocusPolicy(Qt::NoFocus);
 
@@ -353,7 +361,7 @@ void QnBusyIndicatorWidget::paintEvent(QPaintEvent* event)
     painter.setBrush(palette().color(foregroundRole()));
     painter.setPen(Qt::NoPen);
 
-    paintIndicator(&painter, indicatorRect().topLeft(), m_currentTimeMs);
+    paintIndicator(&painter, indicatorRect().topLeft());
 }
 
 void QnBusyIndicatorWidget::indicatorSizeChanged()
@@ -361,9 +369,8 @@ void QnBusyIndicatorWidget::indicatorSizeChanged()
     updateGeometry();
 }
 
-void QnBusyIndicatorWidget::tick(int deltaMs)
+void QnBusyIndicatorWidget::updateIndicator()
 {
-    m_currentTimeMs = (m_currentTimeMs + deltaMs) % totalTimeMs();
     update(indicatorRect());
 }
 
@@ -394,7 +401,7 @@ void QnBusyIndicatorGraphicsWidget::paint(QPainter* painter, const QStyleOptionG
     QnScopedPainterBrushRollback brushRollback(painter, palette().color(QPalette::WindowText));
     QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
 
-    paintIndicator(painter, indicatorRect().topLeft(), m_currentTimeMs);
+    paintIndicator(painter, indicatorRect().topLeft());
 }
 
 QSizeF QnBusyIndicatorGraphicsWidget::sizeHint(Qt::SizeHint which, const QSizeF& constraint) const
@@ -421,9 +428,8 @@ void QnBusyIndicatorGraphicsWidget::indicatorSizeChanged()
     updateGeometry();
 }
 
-void QnBusyIndicatorGraphicsWidget::tick(int deltaMs)
+void QnBusyIndicatorGraphicsWidget::updateIndicator()
 {
-    m_currentTimeMs = (m_currentTimeMs + deltaMs) % totalTimeMs();
     update(indicatorRect());
 }
 

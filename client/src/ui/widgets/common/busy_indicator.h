@@ -10,12 +10,12 @@
 /*
  * Primitive class able to paint dot indicator for specified time moment.
  */
-class QnBusyIndicatorPrivate;
-class QnBusyIndicator
+class QnBusyIndicatorPainterPrivate;
+class QnBusyIndicatorPainter : protected AnimationTimerListener
 {
 public:
-    QnBusyIndicator();
-    virtual ~QnBusyIndicator();
+    QnBusyIndicatorPainter();
+    virtual ~QnBusyIndicatorPainter();
 
     /** Number of dots in the indicator: */
     unsigned int dotCount() const;
@@ -61,21 +61,27 @@ public:
     void setAnimationTimesMs(unsigned int downTimeMs, unsigned int fadeInTimeMs, unsigned int upTimeMs, unsigned int fadeOutTimeMs);
 
     /** Paint method: */
-    void paintIndicator(QPainter* painter, const QPointF& origin, int currentTimeMs);
+    void paintIndicator(QPainter* painter, const QPointF& origin);
 
 protected:
     /** Protected overridable called when indicator size changes. */
     virtual void indicatorSizeChanged();
 
+    /** Protected overridable called when indicator needs to be redrawn. */
+    virtual void updateIndicator();
+
+    /** Overridden tick of animation timer listener: */
+    virtual void tick(int deltaMs) override;
+
 private:
-    QScopedPointer<QnBusyIndicatorPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(QnBusyIndicator);
+    QScopedPointer<QnBusyIndicatorPainterPrivate> d_ptr;
+    Q_DECLARE_PRIVATE(QnBusyIndicatorPainter);
 };
 
 /*
  * Widget class representing animated dot indicator.
  */
-class QnBusyIndicatorWidget : public QWidget, public QnBusyIndicator, protected AnimationTimerListener
+class QnBusyIndicatorWidget : public QWidget, public QnBusyIndicatorPainter
 {
     Q_OBJECT
 
@@ -100,18 +106,15 @@ public:
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void indicatorSizeChanged() override;
-    virtual void tick(int deltaMs) override;
+    virtual void updateIndicator() override;
 
     QRect indicatorRect() const;
-
-private:
-    int m_currentTimeMs;
 };
 
 /*
 * Graphics Widget class representing animated dot indicator.
 */
-class QnBusyIndicatorGraphicsWidget : public Animated<GraphicsWidget>, public QnBusyIndicator, protected AnimationTimerListener
+class QnBusyIndicatorGraphicsWidget : public Animated<GraphicsWidget>, public QnBusyIndicatorPainter
 {
     Q_OBJECT
 
@@ -137,10 +140,7 @@ public:
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint = QSizeF()) const override;
     virtual void indicatorSizeChanged() override;
-    virtual void tick(int deltaMs) override;
+    virtual void updateIndicator() override;
 
     QRectF indicatorRect() const;
-
-private:
-    int m_currentTimeMs;
 };
