@@ -89,6 +89,12 @@ public:
     QString userRoleName(const QnUserResourcePtr& user) const;
 
     /**
+    * \param permissions               Peermission set to get role name for.
+    * \returns                         Name of user's role.
+    */
+    QString standardRoleName(Qn::GlobalPermissions permissions) const;
+
+    /**
     * \param user                      User resource to get role description for.
     * \returns                         Description of user's role.
     */

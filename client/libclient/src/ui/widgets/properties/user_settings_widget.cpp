@@ -277,9 +277,10 @@ void QnUserSettingsWidget::updateAccessRightsPresets()
     if (!m_model->user())
         return;
 
-    auto addBuiltInGroup = [this](const QString &name, Qn::GlobalPermissions permissions)
+    auto addBuiltInGroup = [this](Qn::GlobalPermissions permissions)
     {
         int index = ui->roleComboBox->count();
+        QString name = accessController()->standardRoleName(permissions);
         ui->roleComboBox->insertItem(index, name);
         ui->roleComboBox->setItemData(index,   qVariantFromValue(QnUuid()),    kUserGroupIdRole);
         ui->roleComboBox->setItemData(index,   qVariantFromValue(permissions), kPermissionsRole);
@@ -296,11 +297,11 @@ void QnUserSettingsWidget::updateAccessRightsPresets()
 
     // show for an admin or for anyone opened by owner
     if (permissions.testFlag(Qn::GlobalAdminPermission) || (context()->user() && context()->user()->isOwner()))
-        addBuiltInGroup(tr("Administrator"), Qn::GlobalAdminPermissionsSet);
+        addBuiltInGroup(Qn::GlobalAdminPermissionsSet);
 
-    addBuiltInGroup(tr("Advanced Viewer"),   Qn::GlobalAdvancedViewerPermissionSet);
-    addBuiltInGroup(tr("Viewer"),            Qn::GlobalViewerPermissionSet);
-    addBuiltInGroup(tr("Live Viewer"),       Qn::GlobalLiveViewerPermissionSet);
+    addBuiltInGroup(Qn::GlobalAdvancedViewerPermissionSet);
+    addBuiltInGroup(Qn::GlobalViewerPermissionSet);
+    addBuiltInGroup(Qn::GlobalLiveViewerPermissionSet);
 
     bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
     auto groups = qnResourceAccessManager->userGroups();
@@ -316,7 +317,7 @@ void QnUserSettingsWidget::updateAccessRightsPresets()
             addCustomGroup(group);
     }
 
-    addBuiltInGroup(tr("Custom"), Qn::NoGlobalPermissions);
+    addBuiltInGroup(Qn::NoGlobalPermissions); // "Custom"
 
     /* If there is only one entry in permissions combobox, this check doesn't matter. */
     int customPermissionsIndex = ui->roleComboBox->count() - 1;

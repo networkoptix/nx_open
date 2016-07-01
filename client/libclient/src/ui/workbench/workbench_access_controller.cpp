@@ -285,8 +285,8 @@ QString QnWorkbenchAccessController::userRoleName(const QnUserResourcePtr& user)
         return tr("Owner");
 
     Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(user);
-    if (permissions.testFlag(Qn::GlobalAdminPermission))
-        return tr("Administrator");
+    if (permissions.testFlag(Qn::GlobalAdminPermission)) // admin permission is checked before user role
+        return standardRoleName(permissions);
 
     QnUuid groupId = user->userGroup();
     for (const ec2::ApiUserGroupData& group : qnResourceAccessManager->userGroups())
@@ -295,16 +295,28 @@ QString QnWorkbenchAccessController::userRoleName(const QnUserResourcePtr& user)
             return group.name;
     }
 
-    if (permissions == Qn::GlobalAdvancedViewerPermissionSet)
-        return tr("Advanced Viewer");
+    return standardRoleName(permissions);
+}
 
-    if (permissions == Qn::GlobalViewerPermissionSet)
-        return tr("Viewer");
+QString QnWorkbenchAccessController::standardRoleName(Qn::GlobalPermissions permissions) const
+{
+    if (permissions.testFlag(Qn::GlobalAdminPermission))
+        return tr("Administrator");
 
-    if (permissions == Qn::GlobalLiveViewerPermissionSet)
-        return tr("Live Viewer");
+    switch (permissions)
+    {
+        case Qn::GlobalAdvancedViewerPermissionSet:
+            return tr("Advanced Viewer");
 
-    return tr("Custom");
+        case Qn::GlobalViewerPermissionSet:
+            return tr("Viewer");
+
+        case Qn::GlobalLiveViewerPermissionSet:
+            return tr("Live Viewer");
+
+        default:
+            return tr("Custom");
+    }
 }
 
 QString QnWorkbenchAccessController::userRoleDescription(const QnUserResourcePtr& user) const
