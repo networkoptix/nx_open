@@ -68,11 +68,11 @@ var Config = {
                 isAdmin: true
             },
             {
-                accessRole: 'viewer',
+                accessRole: 'liveViewer',
                 permissions: 'GlobalAccessAllCamerasPermission'
             },
             {
-                accessRole: 'liveViewer',
+                accessRole: 'viewer',
                 permissions:'GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalAccessAllCamerasPermission'
             },
             {

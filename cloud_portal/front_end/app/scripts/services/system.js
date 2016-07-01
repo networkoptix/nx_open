@@ -137,7 +137,7 @@ angular.module('cloudApp')
                     }
                 });
 
-                self.groups = _.sortBy(groups,function(group){return group.name});
+                self.groups = _.sortBy(groups,function(group){return group.name;});
                 return users;
             }
 
