@@ -47,7 +47,7 @@ QnSystemDescriptionPtr QnDirectSystemsFinder::getSystem(const QString &id) const
         , systemDescriptions.end(), predicate);
     
     return (it == systemDescriptions.end() 
-        ? QnSystemDescriptionPtr() : *it);
+        ? QnSystemDescriptionPtr() : QnSystemDescriptionPtr(*it));
 }
 
 void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformation)
