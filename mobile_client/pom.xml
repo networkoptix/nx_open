@@ -49,7 +49,7 @@
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/client/pom.xml</systemPath>
+            <systemPath>${root.dir}/client/libclient_core/pom.xml</systemPath>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

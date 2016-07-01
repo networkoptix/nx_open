@@ -1,15 +1,5 @@
-QT += xmlpatterns
-TRANSLATIONS += ${basedir}/translations/client_en.ts \
-
-#				${basedir}/translations/client_ru.ts \
-#				${basedir}/translations/client_zh-CN.ts \
-#				${basedir}/translations/client_fr.ts \
-#				${basedir}/translations/client_jp.ts \
-#				${basedir}/translations/client_ko.ts \
-#				${basedir}/translations/client_pt-BR.ts \
-
 INCLUDEPATH +=  ${root.dir}/appserver2/src \
-                ${root.dir}/client.core/src \
+                ${root.dir}/client/libclient_core/src \
                 ${root.dir}/common_libs/nx_vms_utils/src \
                 ${root.dir}/client/libclient/src \
                 ${root.dir}/common_libs/nx_speach_synthesizer/src

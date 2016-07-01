@@ -4,7 +4,7 @@ DEF_FILE = ${basedir}/contrib/activeqt/control/qaxserver.def
 DEFINES += HDW_SDK
 
 INCLUDEPATH +=  ${root.dir}/appserver2/src \
-                ${root.dir}/client.core/src \
+                ${root.dir}/client/libclient_core/src \
                 ${root.dir}/common_libs/nx_vms_utils/src \
                 ${root.dir}/common_libs/nx_speach_synthesizer/src/ \
                 ${root.dir}/client/libclient/src \
