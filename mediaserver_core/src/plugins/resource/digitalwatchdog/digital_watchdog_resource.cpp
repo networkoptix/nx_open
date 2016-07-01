@@ -1,13 +1,14 @@
 #ifdef ENABLE_ONVIF
 
 #include "digital_watchdog_resource.h"
-
-#include "onvif/soapDeviceBindingProxy.h"
+#include "dw_stream_reader.h"
 #include "dw_ptz_controller.h"
-#include "dw_zoom_ptz_controller.h"
-#include "common/common_module.h"
-#include "core/resource_management/resource_data_pool.h"
 #include "newdw_ptz_controller.h"
+#include "dw_zoom_ptz_controller.h"
+
+#include <onvif/soapDeviceBindingProxy.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_data_pool.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 static const int HTTP_PORT = 80;
@@ -95,6 +96,11 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::initInternal()
     const CameraDiagnostics::Result result = QnPlOnvifResource::initInternal();
 
     return result;
+}
+
+QnAbstractStreamDataProvider *QnDigitalWatchdogResource::createLiveDataProvider()
+{
+    return new QnDWStreamReader(toSharedPointer(this));
 }
 
 
