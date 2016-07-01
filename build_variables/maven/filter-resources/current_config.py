@@ -4,6 +4,7 @@ from os import pathsep as _pathsep
 from os.path import abspath as _abspath
 
 ARCH="${arch}"
+PLATFORM="${platform}"
 BOX="${box}"
 CONFIGURATION="${build.configuration}"
 TARGET="${rdep.target}"
