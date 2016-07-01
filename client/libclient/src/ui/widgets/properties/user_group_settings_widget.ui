@@ -19,6 +19,9 @@
    </property>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>8</number>
+     </property>
      <item>
       <widget class="QLabel" name="nameLabel">
        <property name="text">
@@ -33,6 +36,9 @@
    </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="spacing">
+      <number>8</number>
+     </property>
      <item>
       <widget class="QLabel" name="usersLabel">
        <property name="text">
