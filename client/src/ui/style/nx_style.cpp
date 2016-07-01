@@ -1409,6 +1409,10 @@ void QnNxStyle::drawControl(
                 /* Special frame for multiline text edits: */
                 if (qobject_cast<const QPlainTextEdit*>(widget) || qobject_cast<const QTextEdit*>(widget))
                 {
+                    /* If NoFrame shape is set, draw no panel: */
+                    if (static_cast<const QFrame*>(widget)->frameShape() == QFrame::NoFrame)
+                        return;
+
                     /* Frame entire widget rect, with scrollbars: */
                     QStyleOptionFrame frameCopy(*frame);
                     frameCopy.rect = widget->rect();

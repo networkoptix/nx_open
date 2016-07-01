@@ -150,6 +150,14 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     ui->previewWidget->setFont(font);
     ui->previewWidget->setThumbnailSize(QSize(160, 0));
 
+    font.setPixelSize(13);
+    font.setWeight(QFont::DemiBold);
+    ui->namePlainText->setFont(font);
+    ui->namePlainText->setProperty(style::Properties::kDontPolishFontProperty, true);
+    ui->namePlainText->setFocusPolicy(Qt::NoFocus);
+    ui->namePlainText->viewport()->unsetCursor();
+    ui->namePlainText->document()->setDocumentMargin(0.0);
+
     initControlsModel();
     initResourcesModel();
 
@@ -443,7 +451,7 @@ void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
 {
     if (!index.isValid())
     {
-        ui->nameLabel->setText(QString());
+        ui->namePlainText->setPlainText(QString());
         ui->previewWidget->hide();
         return;
     }
@@ -453,7 +461,7 @@ void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
         : index.sibling(index.row(), QnResourceListModel::NameColumn);
 
     QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
-    ui->nameLabel->setText(toolTip);
+    ui->namePlainText->setPlainText(toolTip);
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
