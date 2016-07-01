@@ -67,7 +67,14 @@ void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
     if (const auto value = arguments.get(QLatin1String("enforce-socket")))
         SocketFactory::enforceStreamSocketType(*value);
 
-    SocketFactory::enforceSsl((bool)arguments.get(QLatin1String("enforce-ssl")));
+    if (arguments.get(QLatin1String("enforce-ssl")))
+        SocketFactory::enforceSsl();
+
+    if (const auto value = arguments.get<size_t>(QLatin1String("timeout-multiplier")))
+        SocketFactory::setTimeoutMultiplier(*value);
+
+    if (arguments.get(QLatin1String("disable-time-asserts")))
+        SocketFactory::disableTimeAsserts();
 }
 
 QnMutex SocketGlobals::s_mutex;

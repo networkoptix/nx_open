@@ -15,7 +15,7 @@ VmsGatewayEmbeddable::VmsGatewayEmbeddable()
     addArg("-http/connectSupport", "true");
 
     // do not allow VmsGateway reinit the log
-    QnLog::s_disableLogConfiguration = true;
+    addArg("-log/logLevel", "none");
 
     if (startAndWaitUntilStarted())
     {

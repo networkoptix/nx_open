@@ -183,8 +183,7 @@ public:
     }
 
     bool sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran,
-                                   const QnTransactionTransportHeader& _header, const QnUuid &tranParamsId,
-                                   ApiCommand::Value value);
+                                   const QnTransactionTransportHeader& _header);
 
     void doOutgoingConnect(const QUrl& remotePeerUrl);
     void close();

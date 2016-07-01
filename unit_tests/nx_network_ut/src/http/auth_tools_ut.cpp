@@ -1,14 +1,11 @@
-/**********************************************************
-* Sep 25, 2015
-* a.kolesnikov
-***********************************************************/
-
-#include <nx/network/http/auth_tools.h>
-
 #include <gtest/gtest.h>
 
 #include <nx/network/http/auth_tools.h>
+#include <nx/utils/log/log.h>
 
+
+namespace nx_http {
+namespace test {
 
 TEST(HttpAuthDigest, partialResponse_test)
 {
@@ -36,3 +33,44 @@ TEST(HttpAuthDigest, partialResponse_test)
 
     ASSERT_EQ(responseFromPartial, response);
 }
+
+void testCalcDigestResponse(
+    const StringType& method,
+    const StringType& userName,
+    const boost::optional<StringType>& userPassword,
+    const boost::optional<BufferType>& predefinedHA1,
+    const StringType& algorithm = {})
+{
+    header::WWWAuthenticate authHeader(header::AuthScheme::digest);
+    authHeader.params.insert("realm", "test@networkoptix.com");
+    authHeader.params.insert("qop", "auth");
+    authHeader.params.insert("nonce", "dcd98b7102dd2f0e8b11d0f600bfb0c093");
+    if (!algorithm.isEmpty())
+        authHeader.params.insert("algorithm", algorithm);
+
+    header::DigestAuthorization digestHeader;
+    ASSERT_TRUE(calcDigestResponse(
+        method, userName, userPassword, predefinedHA1, "/some/uri",
+        authHeader, &digestHeader));
+
+    ASSERT_TRUE(validateAuthorization(
+        method, userName, userPassword, predefinedHA1, digestHeader));
+}
+
+TEST(HttpAuthDigest, calcDigestResponse)
+{
+    for (const StringType& method: {"GET", "POST"})
+    for (const StringType& user: {"user", "admin"})
+    for (const boost::optional<StringType>& password: {
+         boost::optional<StringType>(), boost::optional<StringType>("admin")})
+    for (const StringType& algorithm: {"", "MD5", "SHA-256"})
+    {
+        NX_LOGX(lm("Test method='%1', user='%2, password='%3, algorithm='%4'")
+            .args(method, user, password, algorithm), cl_logDEBUG1);
+
+        testCalcDigestResponse(method, user, password, boost::none, algorithm);
+    }
+}
+
+} // namespace test
+} // namespace nx_http

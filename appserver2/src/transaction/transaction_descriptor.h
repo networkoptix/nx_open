@@ -136,25 +136,6 @@ struct TransactionDescriptorBase
     {}
 
     virtual ~TransactionDescriptorBase() {}
-    virtual bool checkPermissions(const QnUuid &userId, const QnUuid &tranParamsId, Qn::Permission permission) const = 0;
-};
-
-struct DefaultPermissionCheckHelper
-{
-    template<typename Param>
-    static auto check(const QnUuid &userId, const QnUuid &paramsId, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(std::declval<Param>().id), bool>
-    {
-        Param param;
-        param.id = paramsId;
-        return hasPermission(userId, param, permission);
-    }
-
-    template<typename Param>
-    static auto check(const QnUuid &userId, const QnUuid &/*paramsId*/, Qn::Permission permission, char) -> bool
-    {
-        Param param;
-        return hasPermission(userId, param, permission);
-    }
 };
 
 template<typename ParamType>
@@ -186,11 +167,6 @@ struct TransactionDescriptor : TransactionDescriptorBase
           createTransactionFromAbstractTransactionFunc(std::forward<CreateTranF>(createTransactionFromAbstractTransactionFunc)),
           triggerNotificationFunc(std::forward<TriggerNotificationF>(triggerNotificationFunc))
     {}
-
-    virtual bool checkPermissions(const QnUuid &userId, const QnUuid &tranParamsId, Qn::Permission permission) const override
-    {
-        return DefaultPermissionCheckHelper::check<ParamType>(userId, tranParamsId, permission, 0);
-    }
 };
 
 typedef std::shared_ptr<TransactionDescriptorBase> DescriptorBasePtr;

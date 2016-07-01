@@ -103,6 +103,18 @@ public:
         return arg(a.get(), fieldWidth, fillChar);
     }
 
+    template<typename T>
+    QnLogMessage arg(
+        const boost::optional<T>& a,
+        int fieldWidth = 0,
+        QChar fillChar = QLatin1Char(' '))
+    {
+        if (a)
+            return arg(a.get(), fieldWidth, fillChar);
+        else
+            return arg("boost::none", fieldWidth, fillChar);
+    }
+
     //!Prints integer value
     template<typename T>
     QnLogMessage arg(
@@ -139,6 +151,18 @@ public:
     QnLogMessage container(const T& a, Args ... args)
     {
         return arg(containerString(a, std::forward(args) ...));
+    }
+
+    template<typename T, typename ... Args>
+    QnLogMessage args(const T& a, Args ... args)
+    {
+        return arg(a).args(std::forward<Args>(args) ...);
+    }
+
+    template<typename T>
+    QnLogMessage args(const T& a)
+    {
+        return arg(a);
     }
 
     operator QString() const; 

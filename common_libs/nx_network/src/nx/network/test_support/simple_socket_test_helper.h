@@ -537,10 +537,12 @@ void socketSimpleAcceptMixed(
         endpoint = std::move(serverAddress);
 
     // no clients yet
-    std::unique_ptr<AbstractStreamSocket> accepted0(server->accept());
-    ASSERT_EQ(accepted0, nullptr);
-    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::wouldBlock);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    {
+        std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
+        ASSERT_EQ(accepted, nullptr);
+        ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::wouldBlock);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
 
     auto client = clientMaker();
     ASSERT_TRUE(client->setSendTimeout(1000));
@@ -563,8 +565,8 @@ void socketSimpleAcceptMixed(
         //so giving internal socket implementation some time...
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
-    std::unique_ptr<AbstractStreamSocket> accepted1(server->accept());
-    ASSERT_NE(accepted1, nullptr)<< SystemError::getLastOSErrorText().toStdString();
+    std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
+    ASSERT_NE(accepted, nullptr) << SystemError::getLastOSErrorText().toStdString();
 
     pleaseStopSync(std::move(client));
     pleaseStopSync(std::move(server));

@@ -18,7 +18,8 @@ const char *qn_logLevelNames[] = {"UNKNOWN", "NONE", "ALWAYS", "ERROR", "WARNING
 const char UTF8_BOM[] = "\xEF\xBB\xBF";
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
-    const QString str = value.toUpper().trimmed();
+    QString str = value.toUpper().trimmed();
+    if (str == QLatin1String("DEBUG1")) str = QLatin1String("DEBUG");
 
     for (uint i = 0; i < sizeof(qn_logLevelNames)/sizeof(char*); ++i) {
         if (str == QLatin1String(qn_logLevelNames[i]))
@@ -365,7 +366,10 @@ void QnLog::applyArguments(const nx::utils::ArgumentParser& arguments)
 
     if (const auto value = arguments.get(QLatin1String("log-level")))
     {
-        instance()->setLogLevel(logLevelFromString(*value));
+        logLevel = logLevelFromString(*value);
+        NX_CRITICAL(logLevel != cl_logUNKNOWN);
+
+        instance()->setLogLevel(logLevel);
         s_disableLogConfiguration = true;
     }
 }
