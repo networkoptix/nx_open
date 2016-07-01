@@ -11,11 +11,10 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>appserver2</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness AppServer2 Library</name>    
+    <name>Nx Witness AppServer2 Library</name>    
 
     <properties>
         <guid>${appserver2.guid}</guid>
-        <product.title>${appserver2.name}</product.title>  
 
         <template>lib</template>
         <buildLib>sharedlib</buildLib>

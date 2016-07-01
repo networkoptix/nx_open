@@ -1,6 +1,6 @@
 project(udt)
 set(PROJECT_SHORTNAME "udt")
-set(PROJECT_LONGNAME "${nxtool.company.name} UDP-based Data Transfer Library")
+set(PROJECT_LONGNAME "${short.company.name} UDP-based Data Transfer Library")
 
 remove_definitions(-D_CONSOLE
                 -DUDT_API=__declspec\(dllimport\)

@@ -1,6 +1,6 @@
 project(applauncher)
 set(PROJECT_SHORTNAME "applauncher")
-set(PROJECT_LONGNAME "${nxtool.company.name} Application Launcher")
+set(PROJECT_LONGNAME "${short.company.name} Application Launcher")
 if(WIN32)
     set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
 endif()
