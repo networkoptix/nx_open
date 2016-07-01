@@ -11,6 +11,8 @@
 
 #include <utils/common/unused.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/datetime.h>
+#include <nx/utils/literal.h>
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
@@ -365,6 +367,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SF_Has_HDD = 0x080,
         SF_NewSystem = 0x100, /**< System is just installed, it has default admin password and is not linked to the cloud. */
         SF_SupportsTranscoding = 0x200,
+        SF_HasLiteClient = 0x400,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
@@ -544,7 +547,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and QnActions::ConnectAction. */
-        ForceRemoveOldConnectionRole,               /**< Role for flag that shows if we have to remove or clean 
+        ForceRemoveOldConnectionRole,               /**< Role for flag that shows if we have to remove or clean
                                                          previous connection to specified system using selected user. */
         AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                         (or to the last system) automatically next time */
@@ -944,32 +947,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
 // TODO: #Elric #enum
 
+/* Motion Detection constants */
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
-
-
-/** Time value for 'now'. */
-#define DATETIME_NOW        std::numeric_limits<qint64>::max()
-
-// TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
-// Note: -1 is used for invalid time
-// Now it is returning when no archive data and archive is played backward
-enum { kNoTimeValue = 0 };
-
-/** Time value for 'unknown' / 'invalid'. Same as AV_NOPTS_VALUE. Checked in ffmpeg.cpp. */
-#define DATETIME_INVALID    std::numeric_limits<qint64>::min()
-
-
-/**
- * \def lit
- * Helper macro to mark strings that are not to be translated.
- */
-#define QN_USE_QT_STRING_LITERALS
-#ifdef QN_USE_QT_STRING_LITERALS
-namespace QnLitDetail { template<int N> void check_string_literal(const char (&)[N]) {} }
-#   define lit(s) (QnLitDetail::check_string_literal(s), QStringLiteral(s))
-#else
-#   define lit(s) QLatin1String(s)
-#endif
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::TimePeriodContent)(Qn::Corner),

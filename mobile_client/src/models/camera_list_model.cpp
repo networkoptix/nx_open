@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <models/available_camera_list_model.h>
 #include <camera/camera_thumbnail_cache.h>
 #include <mobile_client/mobile_client_roles.h>
@@ -141,14 +141,14 @@ bool QnCameraListModel::lessThan(const QModelIndex& left, const QModelIndex& rig
     const auto leftName = left.data(Qn::ResourceNameRole).toString();
     const auto rightName = right.data(Qn::ResourceNameRole).toString();
 
-    int res = naturalStringCompare(leftName, rightName, Qt::CaseInsensitive);
+    int res = nx::utils::naturalStringCompare(leftName, rightName, Qt::CaseInsensitive);
     if (res != 0)
         return res < 0;
 
     const auto leftAddress = left.data(Qn::IpAddressRole).toString();
     const auto rightAddress = right.data(Qn::IpAddressRole).toString();
 
-    res = naturalStringCompare(leftAddress, rightAddress);
+    res = nx::utils::naturalStringCompare(leftAddress, rightAddress);
     if (res != 0)
         return res < 0;
 

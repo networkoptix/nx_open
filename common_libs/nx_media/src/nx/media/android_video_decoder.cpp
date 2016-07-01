@@ -157,9 +157,6 @@ private:
 //-------------------------------------------------------------------------------------------------
 // AndroidVideoDecoderPrivate
 
-QMap<CodecID, QSize> AndroidVideoDecoderPrivate::maxResolutions;
-QMutex AndroidVideoDecoderPrivate::maxResolutionsMutex;
-
 class AndroidVideoDecoderPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(AndroidVideoDecoder)
@@ -240,6 +237,9 @@ private:
     std::unique_ptr<QOpenGLContext> threadGlCtx;
     std::unique_ptr<QOffscreenSurface> offscreenSurface;
 };
+
+QMap<CodecID, QSize> AndroidVideoDecoderPrivate::maxResolutions;
+QMutex AndroidVideoDecoderPrivate::maxResolutionsMutex;
 
 FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
 {
@@ -461,7 +461,7 @@ bool AndroidVideoDecoder::isCompatible(const CodecID codec, const QSize& resolut
     return resolution.width() <= maxSize.width() && resolution.height() <= maxSize.height();
 }
 
-static QSize AndroidVideoDecoder::maxResolution(const CodecID codec)
+QSize AndroidVideoDecoder::maxResolution(const CodecID codec)
 {
     AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(codec);
 

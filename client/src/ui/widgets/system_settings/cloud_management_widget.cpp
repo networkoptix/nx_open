@@ -12,7 +12,8 @@
 #include <ui/style/skin.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/string.h>
+
+#include <utils/common/html.h>
 
 namespace
 {

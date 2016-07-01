@@ -101,6 +101,12 @@ public:
         *b = strdup(arg);
     }
 
+    void addArg(const char* arg, const char* value)
+    {
+        addArg(arg);
+        addArg(value);
+    }
+
 protected:
     const std::unique_ptr<ModuleProcessType>& moduleInstance()
     {

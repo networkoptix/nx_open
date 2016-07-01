@@ -5,7 +5,6 @@
 #include <QtWidgets/QStyleOptionProgressBar>
 
 #include <ui/graphics/items/standard/graphics_style.h>
-#include <common/config.h>
 
 class QnNoptixStyleAnimator;
 class QnSkin;

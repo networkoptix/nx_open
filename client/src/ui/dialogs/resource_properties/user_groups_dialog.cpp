@@ -6,13 +6,14 @@
 #include <core/resource_management/resource_access_manager.h>
 
 #include <ui/models/resource_properties/user_grous_settings_model.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/properties/user_group_settings_widget.h>
 #include <ui/widgets/properties/accessible_resources_widget.h>
 #include <ui/widgets/properties/permissions_widget.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     base_type(parent),
@@ -45,6 +46,11 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
 
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(ui->groupsPanel);
+    scrollBar->setUseItemViewPaddingWhenVisible(false);
+    scrollBar->setUseMaximumSpace(true);
+    ui->groupsTreeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
+
     QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
     safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
@@ -57,6 +63,8 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
 
     connect(ui->groupsTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, [this](const QModelIndex& current, const QModelIndex& previous)
     {
+        Q_UNUSED(previous);
+
         bool valid = current.isValid();
 
         ui->groupInfoStackedWidget->setCurrentWidget(valid
@@ -86,7 +94,7 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
 
         ec2::ApiUserGroupData group;
         group.id = QnUuid::createUuid();
-        group.name = generateUniqueString(usedNames, tr("New Group"), tr("New Group %1"));
+        group.name = nx::utils::generateUniqueString(usedNames, tr("New Role"), tr("New Role %1"));
         group.permissions = Qn::NoGlobalPermissions;
 
         int row = m_model->addGroup(group);

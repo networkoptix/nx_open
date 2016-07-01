@@ -16,7 +16,7 @@
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/utils/std/future.h>
 #include <utils/common/guard.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 
 namespace nx {
@@ -432,7 +432,7 @@ TEST_F(SocketUdt, DISABLED_allDataReadAfterFin)
     auto acceptResult = connectionAcceptedFuture.get();
     ASSERT_EQ(SystemError::noError, acceptResult.first);
 
-    const QByteArray testMessage = generateRandomName(testMessageLength);
+    const QByteArray testMessage = nx::utils::generateRandomName(testMessageLength);
     ASSERT_EQ(
         testMessage.size(),
         clientSock->send(testMessage.constData(), testMessage.size()));

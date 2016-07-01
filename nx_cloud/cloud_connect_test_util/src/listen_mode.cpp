@@ -8,7 +8,7 @@
 #include <nx/network/ssl_socket.h>
 
 #include <utils/common/command_line_parser.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
@@ -179,7 +179,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
 
         std::vector<String> serverIds;
         {
-            QString serverId = generateRandomName(7);
+            QString serverId = nx::utils::generateRandomName(7);
             args.read("server-id", &serverId);
             serverIds.push_back(serverId.toUtf8());
 
@@ -199,8 +199,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
             return 2;
         }
     }
-    else
-    if (const auto localAddress = args.get("local-address"))
+    else if (const auto localAddress = args.get("local-address"))
     {
         if (args.get("udt"))
             serverSocket = std::make_unique<UdtStreamServerSocket>();

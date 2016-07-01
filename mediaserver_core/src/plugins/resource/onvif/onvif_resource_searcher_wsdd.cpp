@@ -5,7 +5,7 @@
 #include <nx/utils/uuid.h>
 
 #include <nx/network/nettools.h>
-#include "utils/common/string.h"
+#include "nx/utils/string.h"
 #include <nx/utils/log/log.h>
 
 #include "core/resource/camera_resource.h"
@@ -637,7 +637,7 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
 
     QString mac = getMac(source, header);
 
-    QString endpointId = replaceNonFileNameCharacters(getEndpointAddress(source), QLatin1Char('_'));
+    QString endpointId = nx::utils::replaceNonFileNameCharacters(getEndpointAddress(source), QLatin1Char('_'));
     QString uniqId = !mac.isEmpty() ? mac : endpointId;
 
     hash.insert(appropriateAddr, EndpointAdditionalInfo(name, manufacturer, mac, uniqId, host));

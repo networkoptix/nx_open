@@ -13,7 +13,7 @@
 #include "utils/common/synctime.h"
 
 #include <utils/media/av_codec_helper.h>
-
+#include <nx/streaming/config.h>
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10*1000;
@@ -185,7 +185,7 @@ Qn::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
             m_softMotionRole = Qn::CR_LiveVideo;
         else if (m_forcedMotionStream == lit("secondary"))
             m_softMotionRole = Qn::CR_SecondaryLiveVideo;
-        else 
+        else
         {
             if (m_cameraRes && !m_cameraRes->hasDualStreaming2() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
                 m_softMotionRole = Qn::CR_LiveVideo;

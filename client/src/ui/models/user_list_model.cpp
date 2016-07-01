@@ -7,7 +7,8 @@
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
-#include <utils/common/string.h>
+#include <ui/workbench/workbench_access_controller.h>
+#include <nx/utils/string.h>
 
 class QnUserListModelPrivate : public Connective<QObject>
 {
@@ -203,6 +204,7 @@ void QnUserListModelPrivate::setCheckState(Qt::CheckState state, const QnUserRes
 
 QnUserListModel::QnUserListModel(QObject* parent) :
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     d(new QnUserListModelPrivate(this))
 {
 }
@@ -242,7 +244,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
             {
                 case LoginColumn        : return user->getName();
                 case FullNameColumn     : return user->fullName();
-                case UserRoleColumn     : return qnResourceAccessManager->userRoleName(user);
+                case UserRoleColumn     : return accessController()->userRoleName(user);
                 default                 : break;
 
             } // switch (column)
@@ -482,5 +484,5 @@ bool QnSortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex&
     }
 
     /* Otherwise sort by login (which is unique): */
-    return naturalStringLess(leftUser->getName(), rightUser->getName());
+    return nx::utils::naturalStringLess(leftUser->getName(), rightUser->getName());
 }

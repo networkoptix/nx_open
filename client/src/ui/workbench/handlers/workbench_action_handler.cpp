@@ -127,7 +127,7 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/mime_data.h>
 #include <utils/common/event_processors.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/time.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -137,6 +137,7 @@
 #include <nx/network/http/httptypes.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
+#include <vms_gateway_embeddable.h>
 
 
 #ifdef Q_OS_MACX
@@ -1493,9 +1494,12 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     if (!context()->user())
         return;
 
-    QUrl url = server->getApiUrl();
-    url.setScheme(lit("http"));
-    url.setPath(lit("/api/showLog"));
+    QUrl serverUrl = server->getApiUrl();
+    auto vmsGatewayAddress = nx::cloud::gateway::VmsGatewayEmbeddable::instance()
+        ->endpoint().toString();
+
+    QUrl url(lit("http://%1/%2:%3/api/showLog")
+        .arg(vmsGatewayAddress).arg(serverUrl.host()).arg(serverUrl.port()));
 
     QString login = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();

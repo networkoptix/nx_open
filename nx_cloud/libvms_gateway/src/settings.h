@@ -53,6 +53,7 @@ class Http
 {
 public:
     int proxyTargetPort;
+    bool connectSupport;
 
     Http();
 };

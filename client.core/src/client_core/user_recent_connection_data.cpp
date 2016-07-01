@@ -4,7 +4,7 @@
 #include <QtCore/QSettings>
 
 #include <nx/fusion/model_functions.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <client_core/user_recent_connection_data.h>
 
 namespace 
@@ -40,7 +40,7 @@ QnUserRecentConnectionData::QnUserRecentConnectionData(const QString& name,
 void QnUserRecentConnectionData::writeToSettings(QSettings* settings
     , const QnUserRecentConnectionData& data)
 {
-    const auto encryptedPass = xorEncrypt(data.url.password(), kXorKey);
+    const auto encryptedPass = nx::utils::xorEncrypt(data.url.password(), kXorKey);
     settings->setValue(kUrlNameTag, data.url.toString());
     settings->setValue(kPasswordTag, encryptedPass);
     settings->setValue(kSystemNameTag, data.systemName);
@@ -59,7 +59,7 @@ QnUserRecentConnectionData QnUserRecentConnectionData::fromSettings(QSettings *s
 
     const auto encryptedPass = settings->value(kPasswordTag).toString();
     if (!encryptedPass.isEmpty())
-        data.url.setPassword(xorDecrypt(encryptedPass, kXorKey));
+        data.url.setPassword(nx::utils::xorDecrypt(encryptedPass, kXorKey));
 
     return data;
 }

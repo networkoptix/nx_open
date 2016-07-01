@@ -12,6 +12,8 @@
 
 #include "nx/fusion/serialization/binary_functions.h"
 
+#include <nx/streaming/config.h>
+
 #include "plugins/resource/avi/avi_dvd_resource.h"
 #include "plugins/resource/avi/avi_bluray_resource.h"
 #include "plugins/resource/avi/filetypesupport.h"

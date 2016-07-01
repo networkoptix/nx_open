@@ -29,7 +29,7 @@
 #include <ui/style/custom_style.h>
 
 #include <utils/email/email.h>
-#include <utils/common/string.h>
+#include <utils/common/html.h>
 
 #include "openal/qtvaudiodevice.h"
 #include <utils/common/app_info.h>

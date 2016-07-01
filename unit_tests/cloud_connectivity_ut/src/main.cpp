@@ -14,17 +14,8 @@ int main(int argc, char **argv)
     nx::network::SocketGlobalsHolder socketGlobalsInstance;
     ::testing::InitGoogleMock(&argc, argv);
 
-    for (int i = 0; i < argc; ++i)
-    {
-        std::string arg(argv[i]);
-        if (arg.find("--log-level=") == 0)
-        {
-            QnLog::initLog(QString::fromStdString(arg.substr(12)));
-
-            // do not allow mediator process reinit log engine
-            QnLog::s_disableLogConfiguration = true;
-        }
-    }
+    nx::utils::ArgumentParser args(argc, argv);
+    QnLog::applyArguments(args);
 
     const int result = RUN_ALL_TESTS();
     return result;

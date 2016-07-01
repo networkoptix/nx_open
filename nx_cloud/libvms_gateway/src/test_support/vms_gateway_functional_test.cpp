@@ -18,7 +18,7 @@
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
 #include <utils/common/cpp14.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/sync_call.h>
 #include <utils/crypt/linux_passwd_crypt.h>
 #include <nx/fusion/serialization/json.h>
@@ -64,11 +64,11 @@ VmsGatewayFunctionalTest::~VmsGatewayFunctionalTest()
 
 bool VmsGatewayFunctionalTest::startAndWaitUntilStarted()
 {
-    return startAndWaitUntilStarted(true, true);
+    return startAndWaitUntilStarted(true, true, true);
 }
 
 bool VmsGatewayFunctionalTest::startAndWaitUntilStarted(
-    bool allowIpTarget, bool proxyTargetPort)
+    bool allowIpTarget, bool proxyTargetPort, bool connectSupport)
 {
     if (!m_testHttpServer->bindAndListen())
         return false;
@@ -77,13 +77,19 @@ bool VmsGatewayFunctionalTest::startAndWaitUntilStarted(
     {
         addArg("-cloudConnect/allowIpTarget");
         addArg("true");
+    }
 
-        if (proxyTargetPort)
-        {
-            addArg("-http/proxyTargetPort");
-            addArg(QByteArray::number(
-                m_testHttpServer->serverAddress().port).constData());
-        }
+    if (proxyTargetPort)
+    {
+        addArg("-http/proxyTargetPort");
+        addArg(QByteArray::number(
+            m_testHttpServer->serverAddress().port).constData());
+    }
+
+    if (connectSupport)
+    {
+        addArg("-http/connectSupport");
+        addArg("true");
     }
 
     if (!utils::test::ModuleLauncher<VmsGatewayProcessPublic>::startAndWaitUntilStarted())

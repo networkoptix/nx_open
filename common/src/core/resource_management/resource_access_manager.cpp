@@ -168,6 +168,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
     else if (!groupId.isNull())
     {
         result |= userGroup(groupId).permissions;   /*< If the group does not exist, permissions will be empty. */
+        result &= ~Qn::GlobalAdminPermission;       /*< If user belongs to group, he cannot be an admin - by design. */
     }
 
     {
@@ -720,33 +721,4 @@ bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, c
 
     /* Otherwise - default behavior. */
     return hasPermission(user, target, Qn::SavePermission);
-}
-
-QString QnResourceAccessManager::userRoleName(const QnUserResourcePtr& user) const
-{
-    if (!user)
-        return QString();
-
-    if (user->isOwner())
-        return tr("Owner");
-
-    Qn::GlobalPermissions permissions = globalPermissions(user);
-    if (permissions.testFlag(Qn::GlobalAdminPermission))
-        return tr("Administrator");
-
-    QnUuid groupId = user->userGroup();
-    for (const ec2::ApiUserGroupData& group : userGroups())
-        if (group.id == groupId)
-            return group.name;
-
-    if (permissions == Qn::GlobalAdvancedViewerPermissionSet)
-        return tr("Advanced Viewer");
-
-    if (permissions == Qn::GlobalViewerPermissionSet)
-        return tr("Viewer");
-
-    if (permissions == Qn::GlobalLiveViewerPermissionSet)
-        return tr("Live Viewer");
-
-    return tr("Custom");
 }

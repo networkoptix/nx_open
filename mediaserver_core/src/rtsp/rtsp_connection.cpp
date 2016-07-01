@@ -24,7 +24,7 @@ extern "C"
 #include <core/resource/user_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/network/http/httptypes.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 #include <network/tcp_connection_priv.h>
 #include <nx/network/rtsp/rtsp_types.h>
@@ -317,7 +317,7 @@ void QnRtspConnectionProcessor::parseRequest()
     if (pos.isEmpty())
         processRangeHeader();
     else
-        d->startTime = parseDateTime( pos ); //pos.toLongLong();
+        d->startTime = nx::utils::parseDateTime( pos ); //pos.toLongLong();
     QByteArray resolutionStr = getParamValue("resolution", urlQuery, d->request.headers).split('/')[0];
     if (!resolutionStr.isEmpty())
     {

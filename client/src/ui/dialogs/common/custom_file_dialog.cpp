@@ -3,7 +3,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 //TODO: #GDM include and use <ui/workaround/cancel_drag.h>
 QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory, const QString &filter):
@@ -99,5 +99,5 @@ void QnCustomFileDialog::at_accepted() {
 }
 
 QString QnCustomFileDialog::selectedExtension() const {
-    return extractFileExtension(selectedNameFilter());
+    return nx::utils::extractFileExtension(selectedNameFilter());
 }

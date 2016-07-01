@@ -8,7 +8,7 @@
 #include <QtCore/QUrl>
 #include <QtGui/QDesktopServices>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/mac_utils.h>
 
 namespace
@@ -81,7 +81,7 @@ QString QnEnvironment::getUniqueFileName(const QString &dirName, const QString &
         existingFiles << info.completeBaseName();
     }
 
-    QString name = generateUniqueString(existingFiles, baseName, baseName + lit("_%1"));
+    QString name = nx::utils::generateUniqueString(existingFiles, baseName, baseName + lit("_%1"));
     return QFileInfo(dirName, name).absoluteFilePath();
 }
 

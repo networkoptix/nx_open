@@ -7,7 +7,7 @@
 #include <numeric>
 #include <algorithm>
 
-#include "string_utils.h"
+#include "string.h"
 
 #if defined(OUTPUT_PREFIX)
     #error OUTPUT_PREFIX should NOT be defined while compiling this .cpp file.

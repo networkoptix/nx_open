@@ -74,6 +74,7 @@ public:
     };
 
     SystemUri();
+    SystemUri(const QUrl& url);
     SystemUri(const QString& uri);
     SystemUri(const SystemUri& other);
     virtual ~SystemUri();

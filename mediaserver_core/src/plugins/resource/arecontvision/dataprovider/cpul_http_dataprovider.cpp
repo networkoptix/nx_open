@@ -5,6 +5,7 @@
 
 #include "../resource/av_resource.h"
 #include "nx/streaming/video_data_packet.h"
+#include <nx/streaming/config.h>
 
 #include "cpul_http_dataprovider.h"
 

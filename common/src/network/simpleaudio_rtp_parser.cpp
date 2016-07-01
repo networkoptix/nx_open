@@ -8,6 +8,7 @@
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/config.h>
 
 QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():
     QnRtpAudioStreamParser(),
@@ -25,7 +26,7 @@ QnSimpleAudioRtpParser::~QnSimpleAudioRtpParser()
 }
 
 void QnSimpleAudioRtpParser::setCodecId(CodecID codecId)
-{   
+{
     m_codecId = codecId;
 }
 
@@ -47,14 +48,14 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
         else if (lines[i].startsWith("a=fmtp"))
         {
             QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split(';');
-            for(QByteArray param: params) 
+            for(QByteArray param: params)
             {
                 param = param.trimmed();
                 //processStringParam("mode-set", m_mode, param);
             }
-        }   
+        }
     }
-    
+
     const auto context = new QnAvCodecMediaContext(m_codecId);
     m_context = QnConstMediaContextPtr(context);
     const auto av = context->getAvCodecContext();

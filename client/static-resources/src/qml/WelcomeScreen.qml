@@ -78,137 +78,26 @@ Rectangle
 
                 model: QnSystemsModel {}
 
-                delegate: Loader
+                delegate: SystemTile
                 {
-                    id: tileLoader;
-
-                    z: (item ? item.z : 0);
-
-                    Component
-                    {
-                        id: factorySystemTile;
-
-                        FactorySystemTile
-                        {
-                            property var hostsModel: QnSystemHostsModel { systemId: model.systemId; }
-
-                            visualParent: screenHolder;
-                            systemName: qsTr("New System");
-                            host: hostsModel.firstHost;
-
-                            onConnectClicked:
-                            {
-                                console.log("Show wizard for system <", systemName
-                                    , ">, host <", host, ">");
-                                context.setupFactorySystem(host);
-                            }
-
-                            visible: (index < grid.rows * grid.columns);
-                        }
-                    }
-
-                    Component
-                    {
-                        id: localSystemTile;
-
-                        LocalSystemTile
-                        {
-                            id: localTile;
-
-                            property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
-                            recentUserConnectionsModel:
-                                QnRecentUserConnectionsData { systemName: model.systemName; }
-
-                            visualParent: screenHolder;
-
-                            systemName: model.systemName;
-                            isRecentlyConnected: (recentUserConnectionsModel ? recentUserConnectionsModel.hasConnections : false);
-
-                            isValidVersion: model.isCompatibleVersion;
-                            isValidCustomization: model.isCorrectCustomization;
-                            isCompatibilityMode: model.compatibleVersion;
-                            notAvailableLabelText:
-                            {
-                                if (!isValidVersion)
-                                    return model.wrongVersion;
-                                else if (!isValidCustomization)
-                                    return model.wrongCustomization;
-                                else if (isCompatibilityMode)
-                                    return model.compatibleVersion;
-
-                                return "";
-                            }
-
-                            isExpandable: model.isCompatible;
-                            isAvailable: isExpandable;
-                            knownHostsModel: hostsModel;
-
-                            onConnectClicked:
-                            {
-                                console.log("Connecting to local system <", systemName
-                                    , ">, host <", selectedHost, "> with credentials: "
-                                    , selectedUser, ":", selectedPassword);
-                                context.connectToLocalSystem(selectedHost, selectedUser
-                                    , selectedPassword, storePassword, autoLogin);
-                            }
-
-                            enabled: (!isExpanded || !context.connectingNow);
-                            visible: (index < grid.rows * grid.columns);
-
-                            Connections
-                            {
-                                target: context;
-                                onResetAutoLogin: { localTile.autoLogin = false; }
-                            }
-                        }
-                    }
-
-                    Component
-                    {
-                        id: cloudSystemTile;
-
-                        CloudSystemTile
-                        {
-                            property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
-
-                            visualParent: screenHolder;
-                            userName: model.ownerDescription;
-                            systemName: model.systemName;
-                            isOnline: !hostsModel.isEmpty;
-
-                            isValidVersion: model.isCompatibleVersion;
-                            isValidCustomization: model.isCorrectCustomization;
-                            isCompatibilityMode: model.compatibleVersion;
-
-                            notAvailableLabelText:
-                            {
-                                if (!isValidVersion)
-                                    return model.wrongVersion;
-                                else if (!isValidCustomization)
-                                    return model.wrongCustomization;
-                                else if (isCompatibilityMode)
-                                    return model.compatibleVersion;
-                                else if (!isOnline)
-                                    return "OFFLINE";
-
-                                return "";
-                            }
+                    visualParent: screenHolder;
 
 
-                            onConnectClicked:
-                            {
-                                console.log("Connecting to cloud system <", systemName
-                                    , ">, throug the host <", hostsModel.firstHost, ">");
-                                context.connectToCloudSystem(hostsModel.firstHost);
-                            }
-                            visible: (index < grid.rows * grid.columns);
-                        }
-                    }
+                    //
 
-                    sourceComponent: (model.isFactorySystem ? factorySystemTile
-                        : (model.isCloudSystem ? cloudSystemTile : localSystemTile));
+                    systemId: model.systemId;
+                    systemName: model.systemName;
+                    ownerDescription: model.ownerDescription
 
-                    onLoaded: { grid.watcher.addItem(tileLoader.item); }
+                    isFactoryTile: model.isFactorySystem;
+                    isCloudTile: model.isCloudSystem;
+
+                    wrongVersion: model.wrongVersion;
+                    wrongCustomization: model.wrongCustomization;
+                    compatibleVersion: model.compatibleVersion;
+
+                    Component.onCompleted: { grid.watcher.addItem(this); }
+
                 }
             }
         }

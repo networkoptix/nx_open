@@ -1,4 +1,3 @@
-
-#ifndef _USING_V110_SDK71_
-#define _USING_V110_SDK71_
-#endif
+#include <nx/utils/compiler_options.h>
+#include <nx/utils/literal.h>
+#include <nx/utils/deprecation.h>

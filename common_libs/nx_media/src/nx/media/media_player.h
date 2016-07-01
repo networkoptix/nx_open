@@ -60,7 +60,7 @@ class Player: public QObject
     /**
      * Either one of enum VideoQuality values, or approximate vertical resolution.
      */
-    Q_PROPERTY(int videoQuality READ videoQuality WRITE setVideoQuality)
+    Q_PROPERTY(int videoQuality READ videoQuality WRITE setVideoQuality NOTIFY videoQualityChanged)
 
     /**
      * Is (0, 0) if no video is playing or the resolution is not available.
@@ -139,6 +139,7 @@ signals:
     void mediaStatusChanged();
     void reconnectOnPlayChanged();
     void liveModeChanged();
+    void videoQualityChanged();
 
 private:
     QScopedPointer<PlayerPrivate> d_ptr;
