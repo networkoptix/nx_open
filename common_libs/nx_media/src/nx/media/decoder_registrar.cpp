@@ -17,6 +17,10 @@
     #include "android_audio_decoder.h"
 #endif // Q_OS_ANDROID
 
+#if defined(Q_OS_IOS)
+#include "ios_video_decoder.h"
+#endif // Q_OS_IOS
+
 #include "jpeg_decoder.h"
 
 namespace nx {
@@ -42,6 +46,14 @@ void DecoderRegistrar::registerDecoders(
     }
     #endif // Q_OS_ANDROID
 
+#if defined(Q_OS_IOS)
+    {
+        static const int kHardwareDecodersCount = 1;
+        VideoDecoderRegistry::instance()->addPlugin<IOSVideoDecoder>(allocator,
+            kHardwareDecodersCount);
+    }
+#endif // Q_OS_IOS
+    
     #if defined(ENABLE_PROXY_DECODER)
     {
         static const int kHardwareDecodersCount = 1;
