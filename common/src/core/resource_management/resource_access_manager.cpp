@@ -249,8 +249,7 @@ bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, c
     if (QnWebPageResourcePtr webPage = target.dynamicCast<QnWebPageResource>())
         return canCreateWebPage(user);
 
-    /* Other resources cannot be added manually. */
-    return false;
+    return hasGlobalPermission(user, Qn::GlobalAdminPermission);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const
@@ -421,6 +420,9 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     NX_ASSERT(layout);
     if (!user || !layout)
         return Qn::NoPermissions;
+
+	if (hasGlobalPermission(user, Qn::GlobalPermission::GlobalVideoWallLayoutPermission))
+		return true;
 
     //TODO: #GDM Code duplication with QnWorkbenchAccessController::calculatePermissionsInternal
     auto checkReadOnly = [this](Qn::Permissions permissions)

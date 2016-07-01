@@ -29,23 +29,7 @@ namespace ec2
 
         static QnTransactionLog* instance();
 
-        struct TranMiscData
-        {
-            QnUuid paramsId;
-            ApiCommand::Value value;
-            QByteArray data;
-
-            TranMiscData(const QnUuid &paramsId, ApiCommand::Value value, const QByteArray &data)
-            :
-                paramsId(paramsId),
-                value(value),
-                data(data)
-            {}
-        };
-
-        typedef QList<TranMiscData> TranMiscDataListType;
-
-        ErrorCode getTransactionsAfter(const QnTranState& state, TranMiscDataListType &result);
+        ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
         QnTranState getTransactionsState();
 
         bool contains(const QnTranState& state) const;
@@ -112,7 +96,6 @@ namespace ec2
         void setTransactionLogTime(qint64 value);
         ErrorCode saveToDB(
             const QnAbstractTransaction &tranID,
-            const QnUuid &paramId,
             const QnUuid &hash,
             const QByteArray &data);
     private:

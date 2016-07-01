@@ -7,35 +7,17 @@ namespace ec2
 {
 namespace detail
 {
-    template<typename Param>
-    auto getApiIdImpl(const Param &p, int) -> nx::utils::SfinaeCheck<decltype(p.id), QnUuid>
-    {
-        return p.id;
-    }
-
-    template<typename Param>
-    auto getApiIdImpl(const Param &, char) -> QnUuid
-    {
-        return QnUuid();
-    }
-
-    template<typename Param>
-    QnUuid getApiId(const QnTransaction<Param> &tran)
-    {
-        return getApiIdImpl(tran.params, 0);
-    }
-
     template<typename T, typename F>
     ErrorCode saveTransactionImpl(const QnTransaction<T>& tran, ec2::QnTransactionLog *tlog, F f)
     {
         QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-        return tlog->saveToDB(tran, getApiId(tran), f(tran.params), serializedTran);
+        return tlog->saveToDB(tran, f(tran.params), serializedTran);
     }
 
     template<typename T, typename F>
     ErrorCode saveSerializedTransactionImpl(const QnTransaction<T>& tran, const QByteArray& serializedTran, QnTransactionLog *tlog, F f)
     {
-        return tlog->saveToDB(tran, getApiId(tran), f(tran.params), serializedTran);
+        return tlog->saveToDB(tran, f(tran.params), serializedTran);
     }
 
     struct InvalidGetHashHelper

@@ -123,8 +123,12 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                 *usedAuthMethod = AuthMethod::videowall;
             if (qnResPool->getResourceById<QnVideoWallResource>(QnUuid(videoWall_auth)).isNull())
                 return Qn::Auth_Forbidden;
-            else
-                return Qn::Auth_OK;
+			else
+			{
+				if (authUserId)
+					*authUserId = Qn::kVideowallUserAccess.userId;
+				return Qn::Auth_OK;
+			}
         }
     }
 
