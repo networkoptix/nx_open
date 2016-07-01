@@ -7,7 +7,7 @@ INCLUDEPATH +=  ${root.dir}/appserver2/src \
                 ${root.dir}/client.core/src \
                 ${root.dir}/common_libs/nx_vms_utils/src \
                 ${root.dir}/common_libs/nx_speach_synthesizer/src/ \
-                ${root.dir}/client/src \
+                ${root.dir}/client/libclient/src \
 
 LIBS += $$FESTIVAL_LIB
 

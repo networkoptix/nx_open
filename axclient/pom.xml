@@ -103,7 +103,7 @@
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/client/pom.xml</systemPath>
+            <systemPath>${root.dir}/client/libclient/pom.xml</systemPath>
         </dependency>           
     </dependencies>
 

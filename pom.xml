@@ -491,7 +491,7 @@
             <modules>
                 <module>applauncher</module>
                 <module>client.core</module>
-                <module>client</module>
+                <module>client/libclient</module>
                 <module>client.bin</module>
                 <module>common_libs/nx_audio</module>
             </modules>
@@ -958,7 +958,7 @@
             </properties>
             <modules>
                 <module>client.core</module>
-                <module>client</module>
+                <module>client/libclient</module>
                 <module>client.bin</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speach_synthesizer</module>
