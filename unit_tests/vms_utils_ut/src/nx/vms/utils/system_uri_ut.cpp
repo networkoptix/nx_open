@@ -642,13 +642,3 @@ TEST_F(SystemUriTest, assignmentOperator)
     copy = SystemUri(m_uri.toString());
     assertEqual(m_uri, copy);
 }
-
-TEST_F(SystemUriTest, shortUrlForm)
-{
-    m_uri.setDomain(kLocalDomain);
-    m_uri.setSystemId(kLocalSystemId);
-    m_uri.setAuthenticator(kUser, kPassword);
-    m_uri.setClientCommand(SystemUri::ClientCommand::ConnectToSystem);
-
-    validateLink(QString("%1/systems?auth=%2").arg(kLocalDomain).arg(kEncodedAuthKey));
-}
