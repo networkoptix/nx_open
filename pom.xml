@@ -117,6 +117,7 @@
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
         <cloud_connect_auto_test.name>${company.name} Cloud Connect Auto Test</cloud_connect_auto_test.name>
+        <minilauncher.name>${company.name} ${display.product.name} Launcher</minilauncher.name>
 
         <!-- Binary Filenames (defaults for linux) -->
         <client.binary.name>client-bin</client.binary.name>
