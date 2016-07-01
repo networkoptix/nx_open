@@ -1,4 +1,5 @@
 #ifndef DISABLE_FFMPEG
+#if defined (Q_OS_IOS)
 
 #include "ios_video_decoder.h"
 
@@ -30,11 +31,18 @@ namespace {
 
     void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height)
     {
-        for (int i = 0; i < height; ++i)
+        if (src_stride == dst_stride)
         {
-            memcpy(dst, src, width);
-            dst += dst_stride;
-            src += src_stride;
+            memcpy(dst, src, src_stride * height);
+        }
+        else
+        {
+            for (int i = 0; i < height; ++i)
+            {
+                memcpy(dst, src, width);
+                dst += dst_stride;
+                src += src_stride;
+            }
         }
     }
 
@@ -96,7 +104,6 @@ public:
     :
         codecContext(nullptr),
         frame(av_frame_alloc()),
-        tmp_frame(av_frame_alloc()),
         lastPts(AV_NOPTS_VALUE)
     {
     }
@@ -107,7 +114,6 @@ public:
             av_videotoolbox_default_free(codecContext);
 
         closeCodecContext();
-        av_frame_free(&tmp_frame);
         av_frame_free(&frame);
     }
 
@@ -116,7 +122,6 @@ public:
 
     AVCodecContext* codecContext;
     AVFrame* frame;
-    AVFrame* tmp_frame;
     qint64 lastPts;
 };
     
@@ -237,36 +242,38 @@ int IOSVideoDecoder::decode(
     if (res <= 0 || !gotPicture)
         return res; //< Negative value means error, zero means buffering.
 
-#if !defined(TARGET_OS_IPHONE)
-    if (!d->frame->data[0])
-        return res;
-#else
-    av_frame_unref(d->tmp_frame);
+    ffmpegToQtVideoFrame(outDecodedFrame);
+    return d->frame->coded_picture_number;
+}
+
+void IOSVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
+{
+    Q_D(IOSVideoDecoder);
+
     
     CVPixelBufferRef pixbuf = (CVPixelBufferRef)d->frame->data[3];
     OSType pixel_format = CVPixelBufferGetPixelFormatType(pixbuf);
-
+    
+    AVPixelFormat ffmpegPixelFormat;
+    
     switch (pixel_format) {
-        case kCVPixelFormatType_420YpCbCr8Planar: d->tmp_frame->format = AV_PIX_FMT_YUV420P; break;
-        case kCVPixelFormatType_422YpCbCr8:       d->tmp_frame->format = AV_PIX_FMT_UYVY422; break;
-        case kCVPixelFormatType_32BGRA:           d->tmp_frame->format = AV_PIX_FMT_BGRA; break;
-        case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange: d->tmp_frame->format = AV_PIX_FMT_NV12; break;
+        case kCVPixelFormatType_420YpCbCr8Planar: ffmpegPixelFormat = AV_PIX_FMT_YUV420P; break;
+        case kCVPixelFormatType_422YpCbCr8:       ffmpegPixelFormat = AV_PIX_FMT_UYVY422; break;
+        case kCVPixelFormatType_32BGRA:           ffmpegPixelFormat = AV_PIX_FMT_BGRA; break;
+        case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange: ffmpegPixelFormat = AV_PIX_FMT_NV12; break;
         default:
-            return AVERROR(ENOSYS);
+            return;
     }
     
-    d->tmp_frame->width  = d->frame->width;
-    d->tmp_frame->height = d->frame->height;
-    av_frame_get_buffer(d->tmp_frame, 32);
     
     CVPixelBufferLockBaseAddress(pixbuf, kCVPixelBufferLock_ReadOnly);
     
     uint8_t *data[4] = { 0 };
     int linesize[4] = { 0 };
-    int planes, ret, i;
+    int planes = 1, ret, i;
     
-    if (CVPixelBufferIsPlanar(pixbuf)) {
-        
+    if (CVPixelBufferIsPlanar(pixbuf))
+    {
         planes = CVPixelBufferGetPlaneCount(pixbuf);
         for (i = 0; i < planes; i++) {
             data[i]     = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(pixbuf, i);
@@ -277,28 +284,7 @@ int IOSVideoDecoder::decode(
         linesize[0] = CVPixelBufferGetBytesPerRow(pixbuf);
     }
     
-    av_image_copy(d->tmp_frame->data, d->tmp_frame->linesize,
-                  (const uint8_t **)data, linesize, (AVPixelFormat)d->tmp_frame->format,
-                  d->frame->width, d->frame->height);
     
-    ret = av_frame_copy_props(d->tmp_frame, d->frame);
-    CVPixelBufferUnlockBaseAddress(pixbuf, kCVPixelBufferLock_ReadOnly);
-    if (ret < 0)
-        return ret;
-    
-    av_frame_unref(d->frame);
-    av_frame_move_ref(d->frame, d->tmp_frame);
-#endif
-
-    
-    ffmpegToQtVideoFrame(outDecodedFrame);
-    return d->frame->coded_picture_number;
-}
-
-void IOSVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
-{
-    Q_D(IOSVideoDecoder);
-
     const int alignedWidth = qPower2Ceil((unsigned)d->frame->width, (unsigned)kMediaAlignment);
     const int numBytes = avpicture_get_size(AV_PIX_FMT_YUV420P, alignedWidth, d->frame->height);
     const int lineSize = alignedWidth;
@@ -312,17 +298,16 @@ void IOSVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
     videoFrame->map(QAbstractVideoBuffer::WriteOnly);
     uchar* buffer = videoFrame->bits();
 
-    
-    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat)d->frame->format);
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get(ffmpegPixelFormat);
     
     quint8* dstData[3];
     dstData[0] = buffer;
     dstData[1] = buffer + lineSize * d->frame->height;
     dstData[2] = dstData[1] + lineSize * d->frame->height / (descr->log2_chroma_w +1) / (descr->log2_chroma_h + 1);
 
-    for (int i = 0; i < descr->nb_components; ++i)
+    for (int i = 0; i < planes; ++i)
     {
-        if (!d->frame->data[i])
+        if (!data[i])
             break;
         int kx = 1;
         int ky = 1;
@@ -334,19 +319,20 @@ void IOSVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
         }
         copyPlane(
             dstData[i],
-            d->frame->data[i],
+            data[i],
             d->frame->width / kx,
             lineSize / kx,
-            d->frame->linesize[i],
+            linesize[i],
             d->frame->height / ky);
     }
 
     videoFrame->unmap();
-
+    
     result->reset(videoFrame);
 }
 
 } // namespace media
 } // namespace nx
 
+#endif // (Q_OS_IOS)
 #endif // DISABLE_FFMPEG

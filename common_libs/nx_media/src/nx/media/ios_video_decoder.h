@@ -1,6 +1,7 @@
 #pragma once
 
 #ifndef DISABLE_FFMPEG
+#if defined (Q_OS_IOS)
 
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
@@ -41,4 +42,5 @@ private:
 } // namespace media
 } // namespace nx
 
+#endif // Q_OS_IOS
 #endif // #DISABLE_FFMPEG
