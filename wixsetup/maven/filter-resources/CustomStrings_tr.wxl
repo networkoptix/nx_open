@@ -43,12 +43,12 @@
     <String Id="AppServerDlg_Port"                                  Overridable="yes">Port</String>
     <String Id="AppServerDlg_Login"                                 Overridable="yes">Giriş</String>
     <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">Şifre oluştur</String>
-    <String Id="AppServerDlg_Network"                               Overridable="yes">AĞ</String>    
+    <String Id="AppServerDlg_Network"                               Overridable="yes">AĞ</String>
     <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">Proxy Port</String>
-    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Şİfreyi doğrula</String>   
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Ek parametreler</String>   
-    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Sistemin kameraları optimize etmesine izin ver (Önerilir)</String>   
-    <String Id="AppServerDlg_StatisticsReportAllowed"               Overridable="yes">Geliştiriciye hata raporlarını ve istatiklerini gönder</String>   
+    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Şİfreyi doğrula</String>
+    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Ek parametreler</String>
+    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Sistemin kameraları optimize etmesine izin ver (Önerilir)</String>
+    <String Id="AppServerDlg_StatisticsReportAllowed"               Overridable="yes">Geliştiriciye hata raporlarını ve istatiklerini gönder</String>
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">Oynat ${display.product.name}</String>
@@ -60,14 +60,14 @@
     <!-- NxtoolDlg -->
     <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">Kısayollar</String>
     <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">Masaüstüne kısayol oluştur</String>
-    
+
     <!-- DowngradeWarningDlg -->
-    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes"> [ProductName] ın son versiyonu zaten yüklü.</String> 
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes"> [ProductName] ın son versiyonu zaten yüklü.</String>
 
     <!-- EmptyPasswordDlg -->
     <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">Geçersiz şifre</String>
-    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">Şifre boş olamaz</String>     
-    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">Uyarı</String>     
+    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">Şifre boş olamaz</String>
+    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">Uyarı</String>
 
     <!-- InstallTypeDlg -->
     <String Id="InstallTypeDlg_Full"                                Overridable="yes">Tam yükleme</String>
@@ -75,28 +75,28 @@
     <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Sadece İstasyon</String>
     <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Gelişmiş</String>
     <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Lütfen yükleme tipini seçiniz</String>
-    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Yükleme tipi</String>       
+    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Yükleme tipi</String>
 
     <!-- InvalidPasswordDlg -->
-    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">şifreler aynı ve boş olmamalıdır</String>    
+    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">şifreler aynı ve boş olmamalıdır</String>
 
     <!-- MediaDirDlg -->
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">varsayılan kayıt yeri için ileri ye tıklayın yada değiştirmek için tıklayın.</String>
     <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">Medya kayıt sunucusu</String>
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">LÜtfen kayıt klasörünü seçin:</String>
-    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Giriş</String>    
+    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Giriş</String>
 
     <!-- MediaServerDlg -->
     <String Id="MediaServerDlg_Host"                                Overridable="yes">Sunucu</String>
     <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Port</String>
     <String Id="MediaServerDlg_Login"                               Overridable="yes">Giriş</String>
-    <String Id="MediaServerDlg_Password"                            Overridable="yes">Şİfre</String>  
-    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Şİfreyi onayla</String>  
+    <String Id="MediaServerDlg_Password"                            Overridable="yes">Şİfre</String>
+    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Şİfreyi onayla</String>
     <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Sunucu portu</String>
     <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Bağlantı ayarları</String>
     <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Sunucu konfigürasyonu</String>
-    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Sunucu</String>  
-    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">Sunucu ismi</String>  
+    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Sunucu</String>
+    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">Sunucu ismi</String>
 
     <!-- MyExitDialog -->
 
@@ -104,7 +104,6 @@
     <String Id="MyFeaturesDlg_Components"                           Overridable="yes">Bileşenler</String>
     <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.display.name} (I want to view video recorded elsewhere)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (I want to record locally on this PC)</String>
-    <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (Database management. Should not be installed more than once in a network)</String>    
 
     <!-- PasswordDlg -->
     <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">Lütfen yönetici şifresini girin</String>
@@ -112,23 +111,23 @@
     <String Id="PasswordDlg_GroupBox"                               Overridable="yes">Yönetici Bilgileri</String>
     <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">Giriş</String>
     <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">şifre oluştur</String>
-    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">Şifreyi onayla</String>    
-    <String Id="PasswordDlg_SystemNameLabel"                        Overridable="yes">Sunucu adı</String>    
+    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">Şifreyi onayla</String>
+    <String Id="PasswordDlg_SystemNameLabel"                        Overridable="yes">Sunucu adı</String>
 
     <!-- PasswordShouldMatchDlg -->
-    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">konfigürasyon hatası</String>    
-    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">uyarı</String>    
-    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">şifreler aynı olmalı</String>    
+    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">konfigürasyon hatası</String>
+    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">uyarı</String>
+    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">şifreler aynı olmalı</String>
 
     <!-- PortDuplicateDlg -->
-    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Yanlış port</String>    
-    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">Uyarı</String>    
-    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">Aynı port iki kere ayarlanamaz.Konfigürasyonu kontrol edin</String>    
+    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Yanlış port</String>
+    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">Uyarı</String>
+    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">Aynı port iki kere ayarlanamaz.Konfigürasyonu kontrol edin</String>
 
     <!-- PortIsBusyDlg -->
-    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">Port [BUSYPORT] atandı.</String>    
-    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">Uyarı</String>    
-    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Port zaten atanmış. Eğer eminseniz ileriyi tıklayın.</String>    
+    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">Port [BUSYPORT] atandı.</String>
+    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">Uyarı</String>
+    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Port zaten atanmış. Eğer eminseniz ileriyi tıklayın.</String>
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">${display.product.name} i yükleme bitince çalıştır .</String>
@@ -136,34 +135,34 @@
     <String Id="Product_ArchMismatch"                               Overridable="yes">bu yükleme dosyası 32 bit OS ler içindir.Yükleme yapılamıyor.</String>
 
     <!-- SelectionWarningDlg -->
-    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">En az bir bileşen seçmelisiniz</String>    
+    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">En az bir bileşen seçmelisiniz</String>
 
     <!-- UninstallOptionsDlg -->
     <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">Kaldırma seçenekleri</String>
     <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">${display.product.name} Veritabanını tut</String>
     <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">${display.product.name} Veritabanını kaldır</String>
-    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">Mevcut</String>  
-    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">Saklanılan versiyon:</String>   
-    
+    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">Mevcut</String>
+    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">Saklanılan versiyon:</String>
+
     <!-- UpgradeDlg -->
-    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Önceki bir sürüm yüklü</String>    
-    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Yükleme tipi</String>    
-    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Sistem güncelleniyor</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Veritabanı bozuk yada kurtarılamadı. Yeni veritabanı oluşturuldu. Sisteme erişmek için kullanıcı adı admin şifre admin tür.Lütfen ilk oturumda bilgileri güncelleyin.</String>    
+    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Önceki bir sürüm yüklü</String>
+    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Yükleme tipi</String>
+    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Sistem güncelleniyor</String>
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Veritabanı bozuk yada kurtarılamadı. Yeni veritabanı oluşturuldu. Sisteme erişmek için kullanıcı adı admin şifre admin tür.Lütfen ilk oturumda bilgileri güncelleyin.</String>
 
     <!-- WixSchedFirewallExceptions -->
-    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Windows güvenlik duvarına bağlanılamadı.  ([2]   [3]   [4]   [5])</String>    
-    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">Güvenlik duvarı konfigüre ediliyor.</String>    
-    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">Güvenlik duvarı konfigüre ediliyor.</String>    
-    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">Güvenlik duvarı ayarları geri alınıyor.</String>    
-    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">Güvenlik duvarı ayarları yükleniyor.</String>    
-    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">Güvenlik duvarı ayarları geri alınıyor.</String>    
-    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">Güvenlik duvarı ayarı kaldırılıyor.</String>    
-    
+    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Windows güvenlik duvarına bağlanılamadı.  ([2]   [3]   [4]   [5])</String>
+    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">Güvenlik duvarı konfigüre ediliyor.</String>
+    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">Güvenlik duvarı konfigüre ediliyor.</String>
+    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">Güvenlik duvarı ayarları geri alınıyor.</String>
+    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">Güvenlik duvarı ayarları yükleniyor.</String>
+    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">Güvenlik duvarı ayarları geri alınıyor.</String>
+    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">Güvenlik duvarı ayarı kaldırılıyor.</String>
+
     <!-- WixInstallDirDlgTitle -->
     <String Id="InstallDirDlg_Title"                                Overridable="yes">[ProductName] Yükleme</String>
     <String Id="InstallDirDlgChange"                                Overridable="yes">&amp;Change...</String>
     <String Id="InstallDirDlgTitle"                                 Overridable="yes">{\WixUI_Font_Title}Destination Folder</String>
-    <String Id="InstallDirDlgDescription"                           Overridable="yes">Yükleme için ileri ye tıklayın yada özel yükleme için tıklayın/String>
-    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Yükle [ProductName] to:</String>    
+    <String Id="InstallDirDlgDescription"                           Overridable="yes">Yükleme için ileri ye tıklayın yada özel yükleme için tıklayın</String>
+    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Yükle [ProductName] to:</String>
 </WixLocalization>

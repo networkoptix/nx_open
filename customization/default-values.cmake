@@ -40,7 +40,7 @@ set (background.cycle "120")
 set (uri.protocol "vms")
 
 set (nxtoolUpgradeCode "cc740987-5070-4750-b853-327417176031")
-set (nxtool.company.name "${company.name}")
+set (short.company.name "${company.name}")
 set (company.support.link "${company.support.address}")
 
 # Help and settings URLs

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness</name>
+    <name>Nx Witness</name>
 
     <scm>
         <connection>scm:hg:file:///${basedir}</connection>
@@ -85,33 +85,44 @@
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
         <linux.release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</linux.release.version>
-        <appserver.name>Enterprise Controller</appserver.name>
-        <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
+
         <client.name>${company.name} ${product.name} Client</client.name>
         <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
+
         <mobile_client.name>${company.name} ${product.name} Mobile Client</mobile_client.name>
         <mobile_client.display.name>${company.name} ${display.product.name} Mobile Client</mobile_client.display.name>
-        <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
+
         <applauncher.name>${product.name} Launcher</applauncher.name>
         <applauncher.display.name>${display.product.name} Launcher</applauncher.display.name>
+
+        <mediaserver.name>${company.name} Media Server</mediaserver.name>
+        <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
+
+        <traytool.name>${product.name} Tray Assistant</traytool.name>
+        <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
+
+        <!-- >
+            When you are adding new names to this list, please note the following:
+            1) Names are actual only for binary project. Libraries should not require the name.
+            2) Different ".name" and ".display.name" options are implementation of the migration hack HD Witness -> Nx Witness.
+               They are NOT needed for all new projects. Just use single ".name".
+        </!-->
+
+        <nxtool.name>${short.company.name} Server Tool</nxtool.name>
+        <testcamera.name>${company.name} Test Camera</testcamera.name>
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <evidence_plugin.name>${company.name} Evidence integration plugin</evidence_plugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
-        <!--ftpstorageplugin.name>${company.name} Ftp storage plugin</ftpstorageplugin.name-->
-        <mediaserver.name>${company.name} Media Server</mediaserver.name>
-        <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
-        <mediaserver_core.name>${company.name} Media Server Core</mediaserver_core.name>
-        <mediaserver_core.display.name>${display.product.name} Media Server Core</mediaserver_core.display.name>
-        <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
-        <mediaproxy.display.name>${company.name} Media Proxy</mediaproxy.display.name>
-        <nxtool.name>${nxtool.company.name} Server Tool</nxtool.name>
-        <nxtool.display.name>${nxtool.company.name} Server Tool</nxtool.display.name>
-        <testcamera.name>${company.name} Test Camera</testcamera.name>
-        <traytool.name>${product.name} Tray Assistant</traytool.name>
-        <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
+        <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
         <cloud_connect_auto_test.name>${company.name} Cloud Connect Auto Test</cloud_connect_auto_test.name>
+        <minilauncher.name>${company.name} ${display.product.name} Launcher</minilauncher.name>
+
+        <!-- Binary Filenames (defaults for linux) -->
+        <client.binary.name>client-bin</client.binary.name>
+        <minilauncher.binary.name>applauncher</minilauncher.binary.name>
+        <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
 
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
@@ -129,8 +140,7 @@
         <newmobile/>
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
-        <client.binary.name>client-bin</client.binary.name>
-        <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
+
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
         <!-- compile.option2. See profile angle  -->
@@ -485,11 +495,11 @@
                 <additional.qtlibs>DBus, WebChannel, Webkit, WebkitWidgets</additional.qtlibs>
             </properties>
             <modules>
-                <module>applauncher</module>
-                <module>client.core</module>
-                <module>client</module>
-                <module>client.bin</module>
                 <module>common_libs/nx_audio</module>
+                <module>client/applauncher</module>
+                <module>client/libclient_core</module>
+                <module>client/libclient</module>
+                <module>client/desktop_client</module>
             </modules>
         </profile>
         <profile>
@@ -518,7 +528,9 @@
                 <VCVars>VS140COMNTOOLS</VCVars>
                 <modification>winxp</modification>
                 <client.binary.name>${product.name}.exe</client.binary.name>
-                <applauncher.binary.name>${product.name} Launcher.exe</applauncher.binary.name>
+                <applauncher.binary.name>applauncher.exe</applauncher.binary.name>
+                <minilauncher.binary.name>${product.name} Launcher.exe</minilauncher.binary.name>
+
                 <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
                 <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
 
@@ -569,6 +581,7 @@
                 <module>media_db_util</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
+                <module>client/minilauncher</module>
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
@@ -593,7 +606,7 @@
                 </file>
             </activation>
             <modules>
-                <module>axclient</module>
+                <module>client/activex_client</module>
                 <module>plugins/nxinterface</module>
                 <module>plugins/nxcontrol</module>
                 <module>plugins/acs/paxton</module>
@@ -694,7 +707,8 @@
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
                 <client.binary.name>${display.product.name}</client.binary.name>
-                <applauncher.binary.name>${display.product.name} Launcher</applauncher.binary.name>
+                <minilauncher.binary.name>${display.product.name} Launcher</minilauncher.binary.name>
+                <applauncher.binary.name>applauncher</applauncher.binary.name>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
@@ -883,11 +897,11 @@
                 <!-- Banana pie uses same distro as rpi -->
                 <module>common_libs/nx_bpi_videonode_plugin</module>
                 <module>edge_firmware/rpi</module>
-                <module>client.core</module>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speach_synthesizer</module>
-                <module>mobile_client</module>
+                <module>client/libclient_core</module>
+                <module>client/mobile_client</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
@@ -950,9 +964,9 @@
                 <linux.defines>DISABLE_FESTIVAL</linux.defines>
             </properties>
             <modules>
-                <module>client.core</module>
-                <module>client</module>
-                <module>client.bin</module>
+                <module>client/libclient_core</module>
+                <module>client/libclient</module>
+                <module>client/desktop_client</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speach_synthesizer</module>
             </modules>
@@ -1059,10 +1073,10 @@
                 <compile.options/>
             </properties>
             <modules>
-                <module>client.core</module>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
-                <module>mobile_client</module>
+                <module>client/libclient_core</module>
+                <module>client/mobile_client</module>
             </modules>
         </profile>
         <profile>

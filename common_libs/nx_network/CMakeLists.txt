@@ -1,6 +1,6 @@
 project(nx_network)
 set(PROJECT_SHORTNAME "nx_network")
-set(PROJECT_LONGNAME "${nxtool.company.name} Network Library")
+set(PROJECT_LONGNAME "${short.company.name} Network Library")
 
 remove_definitions(-D_CONSOLE
                 -DNX_NETWORK_API=__declspec\(dllimport\)

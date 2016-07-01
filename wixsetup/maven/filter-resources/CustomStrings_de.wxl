@@ -101,7 +101,6 @@
     <String Id="MyFeaturesDlg_Components"                           Overridable="yes">Komponenten</String>
     <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (Ich möchte Videos in anderen Archiven ansehen)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (Ich möchte auf diesem Rechner lokal aufzeichnen)</String>
-    <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (Datenbankmanagement. Sollte je Netzwerk nur einmal installiert werden.)</String>    
 
     <!-- PasswordDlg -->
     <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">Bitte geben Sie das Administratorkennwort ein</String>

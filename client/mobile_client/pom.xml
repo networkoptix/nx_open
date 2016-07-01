@@ -1,0 +1,265 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"> <parent>
+        <artifactId>cpp</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.0.0-SNAPSHOT</version>
+        <relativePath>../../cpp</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.0.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>mobile_client</artifactId>
+    <packaging>pom</packaging>
+    <name>Nx Witness Mobile Client</name>
+
+    <properties>
+        <root.dir>${basedir}/../..</root.dir>
+        <guid>${mobile_client.guid}</guid>
+        <product.title>${mobile_client.name}</product.title>
+        <product.display.title>${mobile_client.display.name}</product.display.title>
+        <template>app</template>
+
+        <qt.libs>core core-private qml quick quick-private concurrent network sql multimedia xml</qt.libs>
+        <!-- !!! DO NOT REMOVE DUPLICATES FROM global.libs UNLESS YOU KNOW WHAT YOU'RE DOING !!! -->
+        <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_vms_utils -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_streaming -lnx_network -lnx_fusion -lnx_utils -ludt</global.libs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
+        <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU</linux.oslibs>
+        <android.oslibs>-lturbojpeg</android.oslibs>
+        <ios.oslibs>-lturbojpeg -framework OpenAL</ios.oslibs>
+
+        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
+
+        <rdep.packages>openssl ffmpeg roboto-ttf</rdep.packages>
+        <rdep.windows.packages>quazip openal</rdep.windows.packages>
+        <rdep.linux.packages>quazip</rdep.linux.packages>
+        <rdep.android.packages>openal libjpeg-turbo</rdep.android.packages>
+        <rdep.ios.packages>libjpeg-turbo</rdep.ios.packages>
+
+        <project.version.code>${buildNumber}</project.version.code>
+        <project.version.name>${release.version}</project.version.name>
+        <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/testing.mobileprovision</provisioning_profile>
+        <mobile_client_entitlements>mobile_client-beta.entitlements</mobile_client_entitlements>
+        <provisioning_profile_id/>
+    </properties>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>client.core</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/client/libclient_core/pom.xml</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_audio</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_media</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_media/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>auto-clean</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>*.apk</include>
+                                        <include>*.ipa</include>
+                                    </includes>
+                                </fileset>
+                            </filesets>
+                            <skip>${clean-skip}</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>additional-build-steps</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>pre-build.py</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>nobeta</id>
+            <activation>
+                <property>
+                    <name>beta</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <properties>
+                <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/production.mobileprovision</provisioning_profile>
+                <mobile_client_entitlements>mobile_client-release.entitlements</mobile_client_entitlements>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+                <google.keystore>${customization.dir}/mobile_client/key.store</google.keystore>
+                <google.storepass>${android.storepass}</google.storepass>
+                <google.keypass>${android.keypass}</google.keypass>
+                <google.alias>${namespace.additional}</google.alias>
+                <!-- Exclude roboto-ttf package because the font is present on the every android device. -->
+                <rdep.packages>openssl ffmpeg</rdep.packages>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>build-apk</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <chmod file="${project.build.directory}/deploy-android.sh" perm="755"/>
+                                        <exec dir="${project.build.directory}" executable="${project.build.directory}/deploy-android.sh" failifexecutionfails="true" />
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>mac</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>ios</value>
+                </property>
+            </activation>
+            <properties>
+                <ios.defines>DISABLE_FFMPEG</ios.defines>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>gmaven-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <properties>
+                                        <provisioning_script>${root.dir}/build_utils/shell/get_provisioning_id.sh ${provisioning_profile}</provisioning_script>
+                                    </properties>
+                                    <source>
+                                        def command = project.properties.provisioning_script
+                                        def process = command.execute()
+                                        process.waitFor()
+                                        project.properties.provisioning_profile_id = process.in.text.trim()
+                                    </source>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>build-ipa</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <chmod file="${project.build.directory}/deploy-ios.sh" perm="755"/>
+                                        <exec dir="${project.build.directory}" executable="${project.build.directory}/deploy-ios.sh" failifexecutionfails="true" />
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>quazip opengl-es-mali openal</rdep.linux.packages>
+                <linux.oslibs>-lz</linux.oslibs>
+            </properties>
+        </profile>
+    </profiles>
+</project>

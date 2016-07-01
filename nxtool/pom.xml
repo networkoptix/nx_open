@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nxtool</artifactId>
     <packaging>pom</packaging>
-    <name>NX Server Configuration Tool</name>    
+    <name>Nx Server Configuration Tool</name>    
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -25,7 +25,7 @@
     <properties>
         <guid>${nxtool.guid}</guid>
         <product.title>${nxtool.name}</product.title>  
-        <product.display.title>${nxtool.display.name}</product.display.title>
+        <product.display.title>${nxtool.name>}</product.display.title>
         <template>app</template>
 
         <qt.libs>qml quick core gui network</qt.libs>
