@@ -13,6 +13,7 @@
     
     <?define productName = "${display.product.name}"?>
     <?define applauncherName = "${applauncher.name}"?>
+    <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>
     <?define clientName = "${product.name}"?>
     <?define nxtoolName = "${nxtool.company.name} Server Tool"?>
 

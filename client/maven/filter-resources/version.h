@@ -4,7 +4,7 @@
  * This file is used only to compile launcher.exe.
  * Do not include it and do not use these variables in the main project.
  */
-#define QN_CLIENT_EXECUTABLE_NAME    "${product.name}.exe"
+#define QN_CLIENT_EXECUTABLE_NAME    "${client.binary.name}"
 
 /*
  * Really, guys!

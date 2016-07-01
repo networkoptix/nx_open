@@ -6,6 +6,7 @@
 
 #include <api/applauncher_api.h>
 
+#include <client/client_app_info.h>
 #include <client/client_module.h>
 #include <client/client_startup_parameters.h>
 
@@ -118,7 +119,7 @@ bool nx::vms::client::SelfUpdater::updateApplauncher()
     {
         QLatin1String("*.dll"),
         QLatin1String("version"),
-        QLatin1String("applauncher.exe")
+        QnClientAppInfo::applauncherBinaryName()
     };
 
     /* Move installed applaucher to backup folder. */
@@ -140,11 +141,11 @@ bool nx::vms::client::SelfUpdater::updateApplauncher()
     }
 
     /* Run updated (or restored) applauncher. */
-    QString applauncherPath = applauncherDirPath + lit("/applauncher.exe");
+    //TODO: #GDM this will not work on linux (LD_LIBRARY_PATH). We should start minilauncher instead.
+    QString applauncherPath = applauncherDirPath + L'/' + QnClientAppInfo::applauncherBinaryName();
 
     //TODO: #GDM here will be passed arguments to just run, without compatibility client
     QStringList applauncherArguments;
-
     if (QFileInfo::exists(applauncherPath) && QProcess::startDetached(applauncherPath, applauncherArguments))
     {
         NX_LOG(lit("Applauncher process started successfully."), cl_logINFO);

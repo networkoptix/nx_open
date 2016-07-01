@@ -113,6 +113,11 @@
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
         <cloud_connect_auto_test.name>${company.name} Cloud Connect Auto Test</cloud_connect_auto_test.name>
 
+        <!-- Binary Filenames (defaults for linux) -->
+        <client.binary.name>client-bin</client.binary.name>
+        <minilauncher.binary.name>applauncher</minilauncher.binary.name>
+        <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
+
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
         <build.configuration>debug</build.configuration>
@@ -129,8 +134,7 @@
         <newmobile/>
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
-        <client.binary.name>client-bin</client.binary.name>
-        <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
+
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
         <!-- compile.option2. See profile angle  -->
@@ -518,7 +522,9 @@
                 <VCVars>VS140COMNTOOLS</VCVars>
                 <modification>winxp</modification>
                 <client.binary.name>${product.name}.exe</client.binary.name>
-                <applauncher.binary.name>${product.name} Launcher.exe</applauncher.binary.name>
+                <applauncher.binary.name>applauncher.exe</applauncher.binary.name>
+                <minilauncher.binary.name>${product.name} Launcher.exe</minilauncher.binary.name>
+                
                 <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
                 <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
 
@@ -694,7 +700,8 @@
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
                 <client.binary.name>${display.product.name}</client.binary.name>
-                <applauncher.binary.name>${display.product.name} Launcher</applauncher.binary.name>
+                <minilauncher.binary.name>${display.product.name} Launcher</minilauncher.binary.name>
+                <applauncher.binary.name>applauncher</applauncher.binary.name>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>

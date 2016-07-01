@@ -108,6 +108,12 @@ def create_commands_set(project, folder, msi):
         get_fix_dialog_command(folder, msi),
     ]
     
+def rename(folder, old_name, new_name):
+    if os.path.exists(join(folder, new_name)):
+        os.unlink(join(folder, new_name))
+    if os.path.exists(join(folder, old_name)):
+        shutil.copy2(join(folder, old_name), join(folder, new_name))
+    
 def main():
     commands = []
     commands += create_commands_set('client-only', client_msi_folder, client_msi_name)
@@ -136,15 +142,9 @@ def main():
 
     execute_command(get_iss_command())
 
-    if os.path.exists(join(bin_source_dir, '${product.name} Launcher.exe')):
-        os.unlink(join(bin_source_dir, '${product.name} Launcher.exe'))
-    if os.path.exists(join(bin_source_dir, 'applauncher.exe')):
-        shutil.copy2(join(bin_source_dir, 'applauncher.exe'), join(bin_source_dir, '${product.name} Launcher.exe'))
-
-    if os.path.exists(join(bin_source_dir, '${product.name}.exe')):
-        os.unlink(join(bin_source_dir, '${product.name}.exe'))
-    if os.path.exists(join(bin_source_dir, 'client.bin.exe')):
-        shutil.copy2(join(bin_source_dir, 'client.bin.exe'), join(bin_source_dir, '${product.name}.exe'))
+    #Debug code to make applauncher work from the build_environment/target/bin folder
+    rename(bin_source_dir, 'minilauncher.exe', '${minilauncher.binary.name}')
+    rename(bin_source_dir, 'client.bin.exe', '${client.binary.name}')
 
 if __name__ == '__main__':
     main()

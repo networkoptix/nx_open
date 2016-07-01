@@ -5,16 +5,20 @@
     <Fragment Id='FragmentClient'>
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="$(var.customization)ClientDir" Name="Client">
-                <Directory Id="$(var.customization)HelpDir" Name="help"/>                         
+                <Directory Id="$(var.customization)HelpDir" Name="help"/>
 
                 <Directory Id="$(var.clientDirId)" Name="$(var.releaseVersionFull)">
 
-                    <Component Id="AppLauncherExecutable">
-                        <File Id="applauncher.exe" Name="$(var.applauncherName).exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes" DiskId="14">
+                    <Component Id="MiniLauncherExecutable">
+                        <File Id="minilauncher.exe" Name="$(var.minilauncherBinaryName)" Source="$(var.SourceDir)/minilauncher.exe" KeyPath="yes" DiskId="14">
                             <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="$(var.productName)"
                               WorkingDirectory='$(var.clientDirId)' Advertise="yes" Icon="icon_menu.exe" >
                             </Shortcut>
                         </File>
+                    </Component>
+
+                    <Component Id="AppLauncherExecutable">
+                        <File Id="applauncher.exe" Name="applauncher.exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes" DiskId="14"/>
                     </Component>
 
                     <Component Id="AppLauncherConfiguration">
@@ -25,67 +29,66 @@
                         <RegistryKey Root="HKLM"
                                  Key="Software\[Manufacturer]\$(var.applauncherName)">
                             <RegistryValue Type="string" Name="mirrorListUrl" Value="$(var.mirrorListUrl)"/>
-                        </RegistryKey>                        
-                    </Component>                                
+                        </RegistryKey>
+                    </Component>
 
                     <Component Id="DefaultLanguage">
                         <RegistryKey Root="HKCU"
                                  Key="Software\[Manufacturer]\$(var.clientName)">
                             <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_$(var.translation1).qm"/>
                         </RegistryKey>
-                    </Component>    
+                    </Component>
 
-                    <!-- Demo only!!! -->
                     <Component Id="ClientUriHandler">
                         <RegistryKey Root="HKCR" Key="$(var.uriProtocol)">
                             <RegistryValue Type="string" Value="URL:[ProductName] Protocol"/>
                             <RegistryValue Type="string" Name="URL Protocol" Value=""/>
+                            <RegistryValue Type="string" Name="version" Value="$(var.releaseVersionFull)"/>
                             <RegistryKey Key="DefaultIcon">
                                 <RegistryValue Type="string" Value='"[INSTALLDIR]Client\$(var.releaseVersionFull)\$(var.clientName).exe" ,0'/>
-                            </RegistryKey>                             
+                            </RegistryKey>
                             <RegistryKey Key="shell">
                                 <RegistryValue Type="string" Value="open"/>
                                 <RegistryKey Key="open">
                                     <RegistryKey Key="command">
                                         <RegistryValue Type="string" Value='"[INSTALLDIR]Client\$(var.releaseVersionFull)\$(var.clientName).exe" -- "%1"' />
-                                    </RegistryKey>  
-                                </RegistryKey>                            
-                            </RegistryKey>                       
-                        </RegistryKey>                 
-                    </Component>                    
-                    <!-- Demo only!!! END -->
-                    
+                                    </RegistryKey>
+                                </RegistryKey>
+                            </RegistryKey>
+                        </RegistryKey>
+                    </Component>
+
                     <Component Id="clientShortcutDesktop">
                         <Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
 
                         <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\$(var.applauncherName)" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
 
                         <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="$(var.productName)"
-                          WorkingDirectory='$(var.clientDirId)' Target="[#applauncher.exe]" Icon="icon_desktop.exe">
+                          WorkingDirectory='$(var.clientDirId)' Target="[#minilauncher.exe]" Icon="icon_desktop.exe">
                         </Shortcut>
-                    </Component>                            
+                    </Component>
 
                     <Directory Id="ImageFormats" Name="imageformats">
-                    </Directory>    
+                    </Directory>
 
                     <Directory Id="Plugins" Name="plugins">
-                    </Directory>                        
+                    </Directory>
 
                     <Directory Id="Platforms" Name="platforms">
                     </Directory>
-                    
+
                     <Directory Id="Audio" Name="audio">
                     </Directory>
 
                     <Directory Id="ClientQml" Name="qml"/>
                     <Directory Id="ClientFontsDir" Name="fonts"/>
-                    <Directory Id="$(var.customization)VoxDir" Name="vox"/>                                
+                    <Directory Id="$(var.customization)VoxDir" Name="vox"/>
 
                     <Component Id="ClientExecutable">
                         <File Id="client.exe" Name="$(var.clientName).exe" Source="$(var.SourceDir)/client.bin.exe" KeyPath="yes" DiskId="14">
                             <fire:FirewallException Id="FirewallExceptionClient" Name="$(var.productName)" Scope="any" IgnoreFailure="yes"/>
                         </File>
-                    </Component>                                
+                    </Component>
 
                     <Component Id="ClientConfiguration">
                         <Condition>
@@ -108,7 +111,7 @@
                     <Component Id="ClientVsRedistributable">
                         <File Id="VcRedist.exe" Name="vcredist_$(var.arch).exe" Source="$(var.SourceDir)\vcredist_$(var.arch).exe" DiskId="15" />
                     </Component>
-                </Directory>                 
+                </Directory>
             </Directory>
         </DirectoryRef>
 
@@ -150,7 +153,7 @@
             </Component>
             <Component>
                 <File Id="nx_vms_utils.dll" Name="nx_vms_utils.dll" Source="$(var.SourceDir)/nx_vms_utils.dll" DiskId="13" />
-            </Component>            
+            </Component>
             <Component>
                 <File Id="nx_network.dll" Name="nx_network.dll" Source="$(var.SourceDir)/nx_network.dll" DiskId="4" />
             </Component>
@@ -158,24 +161,24 @@
                 <File Id="udt.dll" Name="udt.dll" Source="$(var.SourceDir)/udt.dll" DiskId="4" />
             </Component>
         </ComponentGroup>
-        
+
         <ComponentGroup Id="ClientOpenAL" Directory="$(var.clientDirId)">
             <Component>
                 <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="$(var.SourceDir)\OpenAL32.dll" DiskId="13"/>
             </Component>
         </ComponentGroup>
-        
+
         <?if $(var.quicksync) = true ?>
         <ComponentGroup Id="ClientQuickSync" Directory="Plugins">
             <Component>
                 <File Id="quicksyncdecoder.dll" Name="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll" DiskId="13"/>
             </Component>
             <Component>
-                <File Id="hw_decoding_conf.xml" Name="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml" DiskId="13"/>                               
+                <File Id="hw_decoding_conf.xml" Name="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml" DiskId="13"/>
             </Component>
-        </ComponentGroup>                            
+        </ComponentGroup>
         <?endif?>
-        
+
         <ComponentGroup Id="ClientQTLibraries" Directory="$(var.clientDirId)">
             <Component>
                 <File Id="Qt5Core.dll" Name="Qt5Core.dll" Source="$(var.QtDir)\Qt5Core.dll" DiskId="7"/>
@@ -196,60 +199,60 @@
                 <File Id="Qt5XmlPatterns.dll" Name="Qt5XmlPatterns.dll" Source="$(var.QtDir)\Qt5XmlPatterns.dll" DiskId="8" />
             </Component>
             <Component>
-                <File Id="Qt5Concurrent.dll" Name="Qt5Concurrent.dll" Source="$(var.QtDir)\Qt5Concurrent.dll" DiskId="8"  />                
-            </Component>             
-            <Component>
-                <File Id="Qt5Sql.dll" Name="Qt5Sql.dll" Source="$(var.QtDir)\Qt5Sql.dll" DiskId="8"  />                
+                <File Id="Qt5Concurrent.dll" Name="Qt5Concurrent.dll" Source="$(var.QtDir)\Qt5Concurrent.dll" DiskId="8"  />
             </Component>
-            <Component>            
+            <Component>
+                <File Id="Qt5Sql.dll" Name="Qt5Sql.dll" Source="$(var.QtDir)\Qt5Sql.dll" DiskId="8"  />
+            </Component>
+            <Component>
                 <File Id="Qt5Widgets.dll" Name="Qt5Widgets.dll" Source="$(var.QtDir)\Qt5Widgets.dll" DiskId="9" />
             </Component>
             <Component>
                 <File Id="Qt5OpenGL.dll" Name="Qt5OpenGL.dll" Source="$(var.QtDir)\Qt5OpenGL.dll" DiskId="10" />
             </Component>
 			<Component>
-                <File Id="Qt5WebChannel.dll" Name="Qt5WebChannel.dll" Source="$(var.QtDir)\Qt5WebChannel.dll" DiskId="10"  />                
-            </Component>            
-            <Component>
-                <File Id="Qt5PrintSupport.dll" Name="Qt5PrintSupport.dll" Source="$(var.QtDir)\Qt5PrintSupport.dll" DiskId="10"  />                
-            </Component>             
-            <Component>
-                <File Id="Qt5MultimediaWidgets.dll" Name="Qt5MultimediaWidgets.dll" Source="$(var.QtDir)\Qt5MultimediaWidgets.dll" DiskId="10"  />                
-            </Component>             
-            <Component>
-                <File Id="Qt5Qml.dll" Name="Qt5Qml.dll" Source="$(var.QtDir)\Qt5Qml.dll" DiskId="10"  />                
-            </Component>       
-            <Component>
-                <File Id="Qt5Quick.dll" Name="Qt5Quick.dll" Source="$(var.QtDir)\Qt5Quick.dll" DiskId="10"  />                
+                <File Id="Qt5WebChannel.dll" Name="Qt5WebChannel.dll" Source="$(var.QtDir)\Qt5WebChannel.dll" DiskId="10"  />
             </Component>
             <Component>
-                <File Id="Qt5QuickWidgets.dll" Name="Qt5QuickWidgets.dll" Source="$(var.QtDir)\Qt5QuickWidgets.dll" DiskId="10"  />                
+                <File Id="Qt5PrintSupport.dll" Name="Qt5PrintSupport.dll" Source="$(var.QtDir)\Qt5PrintSupport.dll" DiskId="10"  />
             </Component>
             <Component>
-                <File Id="Qt5LabsTemplates.dll" Name="Qt5LabsTemplates.dll" Source="$(var.QtDir)\Qt5LabsTemplates.dll" DiskId="10"  />                
-            </Component>    
+                <File Id="Qt5MultimediaWidgets.dll" Name="Qt5MultimediaWidgets.dll" Source="$(var.QtDir)\Qt5MultimediaWidgets.dll" DiskId="10"  />
+            </Component>
             <Component>
-                <File Id="Qt5WebKit.dll" Name="Qt5WebKit.dll" Source="$(var.QtDir)\Qt5WebKit.dll" DiskId="11"  />                
-            </Component>             
+                <File Id="Qt5Qml.dll" Name="Qt5Qml.dll" Source="$(var.QtDir)\Qt5Qml.dll" DiskId="10"  />
+            </Component>
             <Component>
-                <File Id="Qt5WebKitWidgets.dll" Name="Qt5WebKitWidgets.dll" Source="$(var.QtDir)\Qt5WebKitWidgets.dll" DiskId="11"  />                
-            </Component>            
+                <File Id="Qt5Quick.dll" Name="Qt5Quick.dll" Source="$(var.QtDir)\Qt5Quick.dll" DiskId="10"  />
+            </Component>
             <Component>
-                <File Id="icudt53.dll" Name="icudt53.dll" Source="$(var.QtDir)\icudt53.dll" DiskId="5"  />                
-            </Component>                 
+                <File Id="Qt5QuickWidgets.dll" Name="Qt5QuickWidgets.dll" Source="$(var.QtDir)\Qt5QuickWidgets.dll" DiskId="10"  />
+            </Component>
             <Component>
-                <File Id="icuin53.dll" Name="icuin53.dll" Source="$(var.QtDir)\icuin53.dll" DiskId="5"  />                
-            </Component>                 
+                <File Id="Qt5LabsTemplates.dll" Name="Qt5LabsTemplates.dll" Source="$(var.QtDir)\Qt5LabsTemplates.dll" DiskId="10"  />
+            </Component>
             <Component>
-                <File Id="icuuc53.dll" Name="icuuc53.dll" Source="$(var.QtDir)\icuuc53.dll" DiskId="5"  />                
-            </Component>                
+                <File Id="Qt5WebKit.dll" Name="Qt5WebKit.dll" Source="$(var.QtDir)\Qt5WebKit.dll" DiskId="11"  />
+            </Component>
+            <Component>
+                <File Id="Qt5WebKitWidgets.dll" Name="Qt5WebKitWidgets.dll" Source="$(var.QtDir)\Qt5WebKitWidgets.dll" DiskId="11"  />
+            </Component>
+            <Component>
+                <File Id="icudt53.dll" Name="icudt53.dll" Source="$(var.QtDir)\icudt53.dll" DiskId="5"  />
+            </Component>
+            <Component>
+                <File Id="icuin53.dll" Name="icuin53.dll" Source="$(var.QtDir)\icuin53.dll" DiskId="5"  />
+            </Component>
+            <Component>
+                <File Id="icuuc53.dll" Name="icuuc53.dll" Source="$(var.QtDir)\icuuc53.dll" DiskId="5"  />
+            </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="ClientQuazip" Directory="$(var.clientDirId)">
             <Component>
-                <File Id="quazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="6" />                
+                <File Id="quazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="6" />
             </Component>
-        </ComponentGroup>        
+        </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenSSL" Directory="$(var.clientDirId)">
             <Component>
@@ -258,7 +261,7 @@
             <Component>
                 <File Id="ssl_ssleay32.dll" Name="ssleay32.dll" Source="$(var.SourceDir)\ssleay32.dll" DiskId="6"/>
             </Component>
-        </ComponentGroup>    
+        </ComponentGroup>
 
         <ComponentGroup Id="ImageFormats" Directory="ImageFormats">
             <Component>
@@ -277,21 +280,22 @@
                 <File Id="qtaudio_windows.dll" Name="qtaudio_windows.dll" Source="$(var.QtPluginsDir)\audio\qtaudio_windows.dll" DiskId="12" />
             </Component>
         </ComponentGroup>
-        
+
         <ComponentGroup Id="Platforms" Directory="Platforms">
             <Component>
                 <File Id="qwindows.dll" Name="qwindows.dll" Source="$(var.QtPluginsDir)\platforms\qwindows.dll" DiskId="9" />
             </Component>
-        </ComponentGroup>            
+        </ComponentGroup>
 
         <Feature Id="ClientFeature" Title="$(var.productName) Client" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
 
             <ComponentRef Id="NovFileAssociation"/>
 
+            <ComponentRef Id="MiniLauncherExecutable" />
             <ComponentRef Id="AppLauncherExecutable" />
-            <ComponentRef Id="AppLauncherConfiguration" />          
-            <ComponentRef Id="DefaultLanguage" />                                         
+            <ComponentRef Id="AppLauncherConfiguration" />
+            <ComponentRef Id="DefaultLanguage" />
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="clientShortcutDesktop"/>
             <ComponentRef Id="ClientUriHandler"/>
@@ -314,7 +318,7 @@
             <ComponentGroupRef Id="AudioPlugins" />
             <ComponentGroupRef Id="ClientOpenAL" />
             <ComponentGroupRef Id="ClientOpenSSL" />
-            <ComponentRef Id="ClientSigar"/>        
+            <ComponentRef Id="ClientSigar"/>
             <ComponentRef Id="ClientVsRedistributable"/>
         </Feature>
     </Fragment>
