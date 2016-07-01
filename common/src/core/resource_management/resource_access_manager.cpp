@@ -421,6 +421,9 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     if (!user || !layout)
         return Qn::NoPermissions;
 
+	if (hasGlobalPermission(user, Qn::GlobalPermission::GlobalVideoWallLayoutPermission))
+		return true;
+
     //TODO: #GDM Code duplication with QnWorkbenchAccessController::calculatePermissionsInternal
     auto checkReadOnly = [this](Qn::Permissions permissions)
     {
