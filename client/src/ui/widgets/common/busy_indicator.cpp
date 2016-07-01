@@ -49,7 +49,7 @@ public:
         timeMs %= totalTimeMs;
         unsigned int ms = timeMs < 0 ? timeMs += totalTimeMs : timeMs;
 
-        if (ms <= downTimeMs)
+        if (ms < downTimeMs)
             return minimumOpacity;
 
         ms -= downTimeMs;
@@ -59,7 +59,7 @@ public:
 
         ms -= fadeInTimeMs;
 
-        if (ms <= upTimeMs)
+        if (ms < upTimeMs)
             return 1.0;
 
         ms -= upTimeMs;
