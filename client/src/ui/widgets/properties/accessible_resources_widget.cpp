@@ -149,6 +149,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     font.setWeight(QFont::Light);
     ui->previewWidget->setFont(font);
     ui->previewWidget->setThumbnailSize(QSize(160, 0));
+    ui->previewWidget->hide();
 
     font.setPixelSize(13);
     font.setWeight(QFont::DemiBold);
@@ -157,6 +158,15 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     ui->namePlainText->setFocusPolicy(Qt::NoFocus);
     ui->namePlainText->viewport()->unsetCursor();
     ui->namePlainText->document()->setDocumentMargin(0.0);
+    ui->namePlainText->hide();
+
+    connect(ui->namePlainText->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, this,
+        [this](const QSizeF& size)
+        {
+            /* QPlainTextDocument measures height in lines, not pixels. */
+            int height = static_cast<int>(this->fontMetrics().height() * size.height());
+            ui->namePlainText->setMaximumHeight(height);
+        });
 
     initControlsModel();
     initResourcesModel();
@@ -451,7 +461,7 @@ void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
 {
     if (!index.isValid())
     {
-        ui->namePlainText->setPlainText(QString());
+        ui->namePlainText->hide();
         ui->previewWidget->hide();
         return;
     }
@@ -462,6 +472,7 @@ void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
 
     QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
     ui->namePlainText->setPlainText(toolTip);
+    ui->namePlainText->show();
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
