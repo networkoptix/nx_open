@@ -82,7 +82,7 @@ void CloudUserListSynchonizer::syncAllCloudUsers()
         api::SystemSharing systemSharing;
         systemSharing.accountEmail = user->getName().toStdString();
         systemSharing.systemID = qnGlobalSettings->cloudSystemID().toStdString();
-        systemSharing.accessRole = permissionsToCloudAccessRole(user);
+        permissionsToCloudAccessRole(user, &systemSharing);
         cloudUserList.sharing.push_back(std::move(systemSharing));
     }
 
@@ -173,24 +173,33 @@ void CloudUserListSynchonizer::onUserModificationsSaved(
         });
 }
 
-nx::cdb::api::SystemAccessRole CloudUserListSynchonizer::permissionsToCloudAccessRole(
-    const QnUserResourcePtr& user)
+void CloudUserListSynchonizer::permissionsToCloudAccessRole(
+    const QnUserResourcePtr& user,
+    api::SystemSharing* const systemSharing)
 {
     if (!user->isEnabled())
-        return nx::cdb::api::SystemAccessRole::disabled;
+    {
+        systemSharing->accessRole = nx::cdb::api::SystemAccessRole::disabled;
+        return;
+    }
 
     const auto permissions = qnResourceAccessManager->globalPermissions(user);
     switch (permissions)
     {
         case Qn::GlobalAdminPermissionsSet:
-            return nx::cdb::api::SystemAccessRole::localAdmin;
+            systemSharing->accessRole = nx::cdb::api::SystemAccessRole::localAdmin;
+            break;
         case Qn::GlobalAdvancedViewerPermissionSet:
-            return nx::cdb::api::SystemAccessRole::advancedViewer;
+            systemSharing->accessRole = nx::cdb::api::SystemAccessRole::advancedViewer;
+            break;
         case Qn::GlobalViewerPermissionSet:
-            return nx::cdb::api::SystemAccessRole::viewer;
+            systemSharing->accessRole = nx::cdb::api::SystemAccessRole::viewer;
+            break;
         case Qn::GlobalLiveViewerPermissionSet:
-            return nx::cdb::api::SystemAccessRole::liveViewer;
+            systemSharing->accessRole = nx::cdb::api::SystemAccessRole::liveViewer;
+            break;
         default:
-            return nx::cdb::api::SystemAccessRole::custom;
+            systemSharing->accessRole = nx::cdb::api::SystemAccessRole::custom;
+            break;
     }
 }

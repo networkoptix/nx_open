@@ -49,6 +49,7 @@ private:
     void onResourceChanged(const QnResourcePtr& resource);
     void onUserModificationsSaved(nx::cdb::api::ResultCode resultCode);
 
-    static nx::cdb::api::SystemAccessRole permissionsToCloudAccessRole(
-        const QnUserResourcePtr& user);
+    static void permissionsToCloudAccessRole(
+        const QnUserResourcePtr& user,
+        nx::cdb::api::SystemSharing* const systemSharing);
 };

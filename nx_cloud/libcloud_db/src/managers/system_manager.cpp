@@ -280,6 +280,34 @@ void SystemManager::shareSystem(
             _1, _2, std::move(completionHandler)));
 }
 
+void SystemManager::setSystemUserList(
+    const AuthorizationInfo& authzInfo,
+    data::SystemSharingList sharingDataList,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    std::string systemId;
+    if (!authzInfo.get(attr::authSystemID, &systemId))
+        return completionHandler(api::ResultCode::forbidden);
+
+    //checking that all sharings belong to the same system
+    for (const auto& sharingData: sharingDataList.sharing)
+    {
+        if (sharingData.systemID != systemId ||
+            sharingData.accessRole == api::SystemAccessRole::owner)
+        {
+            return completionHandler(api::ResultCode::forbidden);
+        }
+    }
+
+    using namespace std::placeholders;
+    m_dbManager->executeUpdate<data::SystemSharingList>(
+        std::bind(&SystemManager::updateUserListInDB, this, _1, systemId, _2),
+        std::move(sharingDataList),
+        std::bind(&SystemManager::userListUpdated,
+            this, m_startedAsyncCallsCounter.getScopedIncrement(),
+            _1, systemId, _2, std::move(completionHandler)));
+}
+
 void SystemManager::getCloudUsersOfSystem(
     const AuthorizationInfo& authzInfo,
     const data::DataFilter& filter,
@@ -759,6 +787,78 @@ void SystemManager::sharingUpdated(
         {
             //inserting modified version
             accountSystemPairIndex.emplace(sharing);
+        }
+
+        return completionHandler(api::ResultCode::ok);
+    }
+
+    completionHandler(
+        dbResult == nx::db::DBResult::notFound
+        ? api::ResultCode::notFound
+        : api::ResultCode::dbError);
+}
+
+nx::db::DBResult SystemManager::updateUserListInDB(
+    QSqlDatabase* const connection,
+    const std::string& systemId,
+    const data::SystemSharingList& sharingList)
+{
+    //removing old access rights
+    QSqlQuery removeAccessRightsQuery(*connection);
+    removeAccessRightsQuery.prepare(
+        "DELETE FROM system_to_account "
+        "WHERE system_id=:systemID AND "
+            "access_role_id != (SELECT id FROM access_role WHERE description='owner')");
+    removeAccessRightsQuery.bindValue(":systemID", QnSql::serialized_field(systemId));
+    if (!removeAccessRightsQuery.exec())
+    {
+        NX_LOG(lm("Failed to remove system users from DB. system %1. %2")
+            .arg(systemId).arg(connection->lastError().text()), cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
+    //adding new users
+    for (const auto& sharingData: sharingList.sharing)
+    {
+        if (sharingData.accessRole == api::SystemAccessRole::none)
+            continue;
+        const auto resCode = updateSharingInDB(connection, sharingData);
+        if (resCode != nx::db::DBResult::ok)
+            return resCode;
+    }
+
+    return nx::db::DBResult::ok;
+}
+
+void SystemManager::userListUpdated(
+    QnCounter::ScopedIncrement asyncCallLocker,
+    nx::db::DBResult dbResult,
+    const std::string& systemId,
+    data::SystemSharingList sharingList,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    if (dbResult == nx::db::DBResult::ok)
+    {
+        //updating access rights in cache
+        QnMutexLocker lk(&m_mutex);
+        auto& sharingBySystemId = m_accountAccessRoleForSystem.get<kSharingBySystemId>();
+        const auto systemSharingRange = sharingBySystemId.equal_range(systemId);
+        for (auto it = systemSharingRange.first; it != systemSharingRange.second; )
+        {
+            if (it->accessRole == api::SystemAccessRole::owner)
+            {
+                ++it;
+                continue;
+            }
+            it = sharingBySystemId.erase(it++);
+        }
+
+        auto& accountSystemPairIndex =
+            m_accountAccessRoleForSystem.get<kSharingUniqueIndex>();
+        for (auto& sharingData: sharingList.sharing)
+        {
+            if (sharingData.accessRole != api::SystemAccessRole::none)
+                accountSystemPairIndex.emplace(std::move(sharingData));
         }
 
         return completionHandler(api::ResultCode::ok);

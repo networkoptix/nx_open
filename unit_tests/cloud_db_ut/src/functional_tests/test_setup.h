@@ -136,6 +136,10 @@ public:
     api::ResultCode ping(
         const std::string& systemID,
         const std::string& authKey);
+    api::ResultCode setSystemUserList(
+        const std::string& systemID,
+        const std::string& authKey,
+        api::SystemSharingList sharings);
 
     /** finds sharing of \a systemID to account \a accountEmail.
         \return reference to an element of \a sharings

@@ -413,6 +413,11 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::system, DataActionType::update);
 
     registerHttpHandler(
+        kSystemSetSystemUserListPath,
+        &SystemManager::setSystemUserList, systemManager,
+        EntityType::system, DataActionType::update);
+
+    registerHttpHandler(
         kSystemGetCloudUsersPath,
         &SystemManager::getCloudUsersOfSystem, systemManager,
         EntityType::system, DataActionType::fetch);
