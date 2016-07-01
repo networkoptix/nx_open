@@ -75,10 +75,10 @@ namespace ec2
 
     struct SendTransactionToTransportFastFuction {
         bool operator()(QnTransactionMessageBus *bus, Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, QnTransactionTransport *sender,
-                        const QnTransactionTransportHeader &transportHeader, const QnUuid &tranParamsId, ApiCommand::Value value) const
+                        const QnTransactionTransportHeader &transportHeader) const
         {
             Q_UNUSED(bus)
-                return sender->sendSerializedTransaction(srcFormat, serializedTran, transportHeader, tranParamsId, value);
+                return sender->sendSerializedTransaction(srcFormat, serializedTran, transportHeader);
         }
     };
 
@@ -901,7 +901,9 @@ namespace ec2
         }
     }
 
-    void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<ApiSyncRequestData> &tran)
+    void QnTransactionMessageBus::onGotTransactionSyncRequest(
+		QnTransactionTransport* sender,
+		const QnTransaction<ApiSyncRequestData> &tran)
     {
         sender->setWriteSync(true);
 
@@ -911,7 +913,7 @@ namespace ec2
         QnTransactionTransportHeader ttBroadcast(ttUnicast);
         ttBroadcast.flags |= Qn::TT_ProxyToClient;
 
-        QnTransactionLog::TranMiscDataListType serializedTransactions;
+        QList<QByteArray> serializedTransactions;
         const ErrorCode errorCode = transactionLog->getTransactionsAfter(
             tran.params.persistentState,
             serializedTransactions);
@@ -931,16 +933,18 @@ namespace ec2
             sendRuntimeInfo(sender, ttBroadcast, tran.params.runtimeState);
 
             using namespace std::placeholders;
-            for(const auto& tranMiscData: serializedTransactions)
-                if(!handleTransaction(Qn::UbjsonFormat,
-                    tranMiscData.data,
-                    std::bind(SendTransactionToTransportFuction(), this, _1, sender, ttBroadcast),
-                    std::bind(
-                        SendTransactionToTransportFastFuction(),
-                        this, _1, _2, sender, ttBroadcast,
-                        tranMiscData.paramsId,
-                        tranMiscData.value)))
-                    sender->setState(QnTransactionTransport::Error);
+            for(const auto& serializedTran: serializedTransactions)
+				if (!handleTransaction(Qn::UbjsonFormat,
+									   serializedTran,
+									   std::bind(
+										   SendTransactionToTransportFuction(),
+										   this, _1, sender, ttBroadcast),
+									   std::bind(
+										   SendTransactionToTransportFastFuction(),
+										   this, _1, _2, sender, ttBroadcast)))
+				{
+					sender->setState(QnTransactionTransport::Error);
+				}
 
             QnTransaction<ApiTranSyncDoneData> tranSyncDone(ApiCommand::tranSyncDone);
             tranSyncResponse.params.result = 0;
