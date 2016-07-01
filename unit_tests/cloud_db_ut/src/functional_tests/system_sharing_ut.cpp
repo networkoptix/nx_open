@@ -33,8 +33,8 @@ TEST_F(SystemSharing, getCloudUsers)
     {
         std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
-            getSystemSharings(account1.email, account1Password, "sdfnoowertn", &sharings),
-            api::ResultCode::forbidden);
+            api::ResultCode::forbidden,
+            getSystemSharings(account1.email, account1Password, "sdfnoowertn", &sharings));
     }
 
     api::AccountData account2;

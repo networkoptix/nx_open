@@ -24,6 +24,11 @@ bool DataFilter::getAsVariant(int resID, QVariant* const value) const
     return m_rc.getAsVariant(resID, value);
 }
 
+void DataFilter::put(int resID, const QVariant& value)
+{
+    m_rc.put(resID, value);
+}
+
 bool DataFilter::empty() const
 {
     return m_rc.empty();
@@ -50,16 +55,31 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, DataFilter* const dataFilter)
             continue;
         QVariant val(item.second);
         val.convert(resDescription.type);
-        dataFilter->m_rc.put(resDescription.id, std::move(val));
+        dataFilter->put(resDescription.id, std::move(val));
     }
 
     return true;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (DataFilter),
-    (json),
-    _Fields)
+bool deserialize(QnJsonContext*, const QJsonValue& value, DataFilter* dataFilter)
+{
+    if (value.type() != QJsonValue::Object)
+        return false;
+
+    const QJsonObject jsonMap = value.toObject();
+    for (auto it = jsonMap.begin(); it != jsonMap.end(); ++it)
+    {
+        const auto resDescription =
+            StreeManager::instance()->resourceNameSet().findResourceByName(it.key());
+        if (resDescription.id == stree::INVALID_RES_ID)
+            continue;
+        QVariant val(it.value());
+        val.convert(resDescription.type);
+        dataFilter->put(resDescription.id, std::move(val));
+    }
+
+    return true;
+}
 
 }   //data
 }   //cdb
