@@ -7,6 +7,7 @@ extern "C" {
 #include <libavcodec/videotoolbox.h>
 #include <libavutil/imgutils.h>
 #include <libavutil/pixdesc.h>
+#include <libavutil/frame.h>
 } // extern "C"
 
 #include <utils/media/ffmpeg_helper.h>
@@ -39,6 +40,12 @@ namespace {
         }
     }
 
+    static enum AVPixelFormat get_format(AVCodecContext *s, const enum AVPixelFormat *pix_fmts)
+    {
+        int status = av_videotoolbox_default_init(s);
+        return pix_fmts[0];
+    }
+    
 }
 
 class InitFfmpegLib
@@ -91,14 +98,19 @@ public:
     :
         codecContext(nullptr),
         frame(av_frame_alloc()),
+        tmp_frame(av_frame_alloc()),
         lastPts(AV_NOPTS_VALUE)
     {
     }
 
     ~FfmpegVideoDecoderPrivate()
     {
+        if (codecContext)
+            av_videotoolbox_default_free(codecContext);
+
         closeCodecContext();
-        av_free(frame);
+        av_frame_free(&tmp_frame);
+        av_frame_free(&frame);
     }
 
     void initContext(const QnConstCompressedVideoDataPtr& frame);
@@ -106,78 +118,15 @@ public:
 
     AVCodecContext* codecContext;
     AVFrame* frame;
-    AVFrame *tmp_frame;
+    AVFrame* tmp_frame;
     qint64 lastPts;
-
-    QByteArray testData;
 };
-
-    static enum AVPixelFormat get_format(AVCodecContext *s, const enum AVPixelFormat *pix_fmts)
-    {
-        FfmpegVideoDecoderPrivate *vdp = (FfmpegVideoDecoderPrivate *) s->opaque;
-        vdp->tmp_frame = av_frame_alloc();
-        
-        int status = av_videotoolbox_default_init(s);
-        
-        return pix_fmts[0];
-        
-//        InputStream *ist = s->opaque;
-//        const enum AVPixelFormat *p;
-//        int ret;
-//        
-//        for (p = pix_fmts; *p != -1; p++) {
-//            const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(*p);
-//            const HWAccel *hwaccel;
-//            
-//            if (!(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
-//                break;
-//            
-//            hwaccel = get_hwaccel(*p);
-//            if (!hwaccel ||
-//                (ist->active_hwaccel_id && ist->active_hwaccel_id != hwaccel->id) ||
-//                (ist->hwaccel_id != HWACCEL_AUTO && ist->hwaccel_id != hwaccel->id))
-//                continue;
-//            
-//            ret = hwaccel->init(s);
-//            if (ret < 0) {
-//                if (ist->hwaccel_id == hwaccel->id) {
-//                    av_log(NULL, AV_LOG_FATAL,
-//                           "%s hwaccel requested for input stream #%d:%d, "
-//                           "but cannot be initialized.\n", hwaccel->name,
-//                           ist->file_index, ist->st->index);
-//                    return AV_PIX_FMT_NONE;
-//                }
-//                continue;
-//            }
-//            ist->active_hwaccel_id = hwaccel->id;
-//            ist->hwaccel_pix_fmt   = *p;
-//            break;
-//        }
-//        
-//        return *p;
-    }
     
 void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
 {
     if (!frame)
         return;
 
-    AVHWAccel *hwaccel = 0;
-    while (hwaccel = av_hwaccel_next(hwaccel)) {
-        if (!strcmp(hwaccel->name, "h264_videotoolbox"))
-            break;
-        
-        qWarning() << "HW Accel: " << hwaccel->name;
-    }
-    
-    AVCodec *codec1 = nullptr;
-    while ((codec1 = av_codec_next(codec1)) != nullptr) {
-        QString codecName(codec1->long_name);
-        // if (codecName.contains("264"))
-            qWarning() << "Codec: " << codec1->name;
-    }
-    
-    // auto codec = avcodec_find_decoder_by_name("h264_videotoolbox");
     auto codec = avcodec_find_decoder(frame->compressionType);
     codecContext = avcodec_alloc_context3(codec);
     if (frame->context)
@@ -185,45 +134,8 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
 
     codecContext->thread_count = 1;
     codecContext->opaque = this;
-    
-//    codecContext->width = 1920;
-//    codecContext->height = 1080;
-//    
-//    codecContext->sample_aspect_ratio = AVRational {1, 1};
-//    codecContext->colorspace = AVCOL_SPC_BT709;
-    
     codecContext->get_format = get_format;
-    
-    //codecContext->thread_count = 4; //< Uncomment this line if decoder with internal buffer is required
-    
-//    const quint8* end = (const quint8*)(frame->data() + frame->dataSize());
-//    const quint8* spsNal = NALUnit::findNextNAL((const quint8*)frame->data(), end);
-//    const quint8* spsEnd = NALUnit::findNALWithStartCode(spsNal, end, true);
-//    const quint8* ppsNal = NALUnit::findNextNAL(spsNal, end);
-//    const quint8* ppsEnd = NALUnit::findNALWithStartCode(ppsNal, end, true);
-//
-//    int spsLen = spsEnd - spsNal;
-//    int ppsLen = ppsEnd - ppsNal;
-//    
-//    codecContext->extradata_size = spsLen + ppsLen + 2*2 + 5 + 2;
-//    codecContext->extradata = (quint8*)malloc(codecContext->extradata_size);
-//    
-//    codecContext->extradata[0] = 1;
-//    codecContext->extradata[1] = 0;
-//    codecContext->extradata[2] = 0;
-//    codecContext->extradata[3] = 0;
-//    codecContext->extradata[4] = 1; // nal length = 2 ( 1+1)
-//    codecContext->extradata[5] = 1; // number of sps
-//    codecContext->extradata[6] = spsLen >> 8;
-//    codecContext->extradata[7] = spsLen % 256;
-//    memcpy(codecContext->extradata + 8, spsNal, spsLen);
-//    quint8* curPtr = codecContext->extradata + 8 + spsLen;
-//    *curPtr++ = 1;  // number of sps
-//    *curPtr++ = ppsLen >> 8;
-//    *curPtr++ = ppsLen % 256;
-//    memcpy(curPtr, ppsNal, ppsLen);
-    
-    //memcpy(codecContext->extradata, frame->data(), codecContext->extradata_size);
+    codecContext->extradata_size = 1;
     
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
@@ -231,25 +143,6 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
         closeCodecContext();
         return;
     }
-
-    // codecContext->pix_fmt = AV_PIX_FMT_VIDEOTOOLBOX;
-//    codecContext->hwaccel = hwaccel;
-    // int status = av_videotoolbox_default_init(codecContext);
-    
-    /*
-    AVPacket avpkt;
-    av_init_packet(&avpkt);
-    
-    avpkt.data = (unsigned char*) frame->data();
-    avpkt.size = static_cast<int>(frame->dataSize());
-    
-    int gotPicture = 0;
-    int res = avcodec_decode_video2(codecContext, this->frame, &gotPicture, &avpkt);
-*/
-    codecContext->extradata_size = 1;
-    
-    
-    // qWarning() << status;
 }
 
 void FfmpegVideoDecoderPrivate::closeCodecContext()
@@ -353,9 +246,6 @@ int FfmpegVideoDecoder::decode(
         case kCVPixelFormatType_32BGRA:           d->tmp_frame->format = AV_PIX_FMT_BGRA; break;
         case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange: d->tmp_frame->format = AV_PIX_FMT_NV12; break;
         default:
-//            av_get_codec_tag_string(codec_str, sizeof(codec_str), s->codec_tag);
-//            av_log(NULL, AV_LOG_ERROR,
-//                   "%s: Unsupported pixel format: %s\n", codec_str, videotoolbox_pixfmt);
             return AVERROR(ENOSYS);
     }
     
@@ -403,31 +293,6 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
 {
     Q_D(FfmpegVideoDecoder);
 
-#if 0
-    // test data
-    const QVideoFrame::PixelFormat Format_Tiled32x32NV12 = QVideoFrame::PixelFormat(QVideoFrame::Format_User + 17);
-
-    if (d->testData.isEmpty())
-    {
-        QFile file("f:\\yuv_frames\\frame_1920x1080_26_native.dat");
-        file.open(QIODevice::ReadOnly);
-        d->testData = file.readAll();
-    }
-
-    quint8* srcData[4];
-    srcData[0] = (quint8*) d->testData.data();
-    srcData[1] = srcData[0] + qPower2Ceil((unsigned) d->frame->width, 32) * qPower2Ceil((unsigned) d->frame->height, 32);
-
-    int srcLineSize[4];
-    srcLineSize[0] = srcLineSize[1] = qPower2Ceil((unsigned) d->frame->width, 32);
-
-    auto alignedBuffer = new AlignedMemVideoBuffer(srcData, srcLineSize, 2); //< two planes buffer
-    auto videoFrame = new QVideoFrame(alignedBuffer, QSize(d->frame->width, d->frame->height), Format_Tiled32x32NV12);
-
-    // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert usec to msec.
-    videoFrame->setStartTime(d->frame->pkt_dts / 1000);
-
-#else
     const int alignedWidth = qPower2Ceil((unsigned)d->frame->width, (unsigned)kMediaAlignment);
     const int numBytes = avpicture_get_size(AV_PIX_FMT_YUV420P, alignedWidth, d->frame->height);
     const int lineSize = alignedWidth;
@@ -471,7 +336,6 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
     }
 
     videoFrame->unmap();
-#endif
 
     result->reset(videoFrame);
 }
