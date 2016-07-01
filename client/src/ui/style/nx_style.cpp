@@ -2900,21 +2900,25 @@ void QnNxStyle::polish(QWidget *widget)
 
     if (qobject_cast<QPlainTextEdit*>(widget) || qobject_cast<QTextEdit*>(widget))
     {
-        /*
-         * There are only three ways to change content margins of QPlainTextEdit or QTextEdit without subclassing:
-         *  - use QTextDocument::setDocumentMargin(), but that margin is uniform
-         *  - use Qt stylesheets, but they're slow and it's not a good idea to change stylesheet in polish()
-         *  - hack access to protected method QAbstractScrollArea::setViewportMargins()
-         */
-        ViewportMarginsAccessHack* area = static_cast<ViewportMarginsAccessHack*>(static_cast<QAbstractScrollArea*>(widget));
+        /* Adjust margins only for text edits with frame: */
+        if (static_cast<const QFrame*>(widget)->frameShape() != QFrame::NoFrame)
+        {
+            /*
+             * There are only three ways to change content margins of QPlainTextEdit or QTextEdit without subclassing:
+             *  - use QTextDocument::setDocumentMargin(), but that margin is uniform
+             *  - use Qt stylesheets, but they're slow and it's not a good idea to change stylesheet in polish()
+             *  - hack access to protected method QAbstractScrollArea::setViewportMargins()
+             */
+            ViewportMarginsAccessHack* area = static_cast<ViewportMarginsAccessHack*>(static_cast<QAbstractScrollArea*>(widget));
 
-        QnTypedPropertyBackup<QMargins, ViewportMarginsAccessHack>::backup(area, &ViewportMarginsAccessHack::viewportMargins,
-            QN_SETTER(ViewportMarginsAccessHack::setViewportMargins), kViewportMarginsBackupId);
+            QnTypedPropertyBackup<QMargins, ViewportMarginsAccessHack>::backup(area, &ViewportMarginsAccessHack::viewportMargins,
+                QN_SETTER(ViewportMarginsAccessHack::setViewportMargins), kViewportMarginsBackupId);
 
-        const int kTextDocumentDefaultMargin = 4; // in Qt
-        int h = style::Metrics::kStandardPadding - kTextDocumentDefaultMargin;
-        int v = dp(6) - kTextDocumentDefaultMargin;
-        area->setViewportMargins(QMargins(h, v, h, v));
+            const int kTextDocumentDefaultMargin = 4; // in Qt
+            int h = style::Metrics::kStandardPadding - kTextDocumentDefaultMargin;
+            int v = dp(6) - kTextDocumentDefaultMargin;
+            area->setViewportMargins(QMargins(h, v, h, v));
+        }
 
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
         {
