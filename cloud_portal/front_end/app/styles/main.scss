@@ -10,6 +10,7 @@
 html {
   position: relative;
   min-height: 100%;
+  overflow-y: scroll; /* CLOUD-373: this is hack: we fix vertical scroll to prevent the page from shaking when it appears or disappears*/
 }
 body {
   /* Margin bottom by footer height */
