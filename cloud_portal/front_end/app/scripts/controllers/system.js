@@ -2,8 +2,8 @@
 
 angular.module('cloudApp')
     .controller('SystemCtrl', ['$scope', 'cloudApi', '$routeParams', '$location', 'urlProtocol', 'dialogs', 'process',
-    'account', '$q', 'system',
-    function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process, account, $q, system) {
+    'account', '$q', 'system', '$timeout',
+    function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process, account, $q, system, $timeout) {
 
         $scope.Config = Config;
         $scope.L = L;
@@ -27,6 +27,12 @@ angular.module('cloudApp')
             errorPrefix:'System info is unavailable:'
         }).then(loadUsers);
 
+        function delayedUpdateSystemInfo(){
+            return $timeout(function(){
+                return $scope.system.update().finally(delayedUpdateSystemInfo);
+            },Config.updateInterval);
+        }
+
         //Retrieve users list
         $scope.gettingSystemUsers = process.init(function(){
             return $scope.system.getUsers();
@@ -36,6 +42,7 @@ angular.module('cloudApp')
             if($routeParams.callShare){
                 $scope.share().finally(cleanUrl);
             }
+            delayedUpdateSystemInfo();
         });
 
 

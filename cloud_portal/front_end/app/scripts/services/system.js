@@ -58,7 +58,12 @@ angular.module('cloudApp')
                 var deferred = $q.defer();
                 var self = this;
                 this.infoPromise = cloudApi.system(self.id).then(function(result){
-                    self.info = result.data[0];
+                    if(self.info){
+                        $.extend(true, self.info, result.data[0]); // Update
+                    }else{
+                        self.info = result.data[0];
+                    }
+
                     self.isOnline = self.info.stateOfHealth == Config.systemStatuses.onlineStatus;
                     self.isMine = self.info.ownerAccountEmail == self.currentUserEmail;
 
@@ -252,6 +257,20 @@ angular.module('cloudApp')
             return cloudApi.unshare(self.id, self.currentUserEmail).then(function(){
                 delete systems[self.id]
             }); // Anyway - send another request to cloud_db to remove myself
+        }
+
+        system.prototype.update = function(){
+            var self = this;
+            self.infoPromise = null; //Clear cache
+            return self.getInfo().then(function(){
+                if(self.usersPromise){
+                    self.usersPromise = null;
+                    return self.getUsers().then(function(){
+                        return self;
+                    });
+                }
+                return self;
+            });
         }
 
         return function(systemId, email){
