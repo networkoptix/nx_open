@@ -31,11 +31,10 @@ angular.module('cloudApp')
         var stopTimeout = false;
         function delayedUpdateSystemInfo(){
             if(!stopTimeout){
-                $scope.updateTimeout = $timeout(function(){
+                return $timeout(function(){
                     return $scope.system.update().finally(delayedUpdateSystemInfo);
                 },Config.updateInterval);
             }
-            return $scope.updateTimeout;
         }
         $scope.$on("$destroy", function( event ) { stopTimeout = true; } );
 

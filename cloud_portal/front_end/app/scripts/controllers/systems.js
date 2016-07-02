@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('SystemsCtrl', ['$scope', 'cloudApi', '$location', 'urlProtocol', 'process', 'account', function ($scope, cloudApi, $location, urlProtocol, process, account) {
+    .controller('SystemsCtrl', ['$scope', 'cloudApi', '$location', 'urlProtocol', 'process', 'account', '$timeout',
+    function ($scope, cloudApi, $location, urlProtocol, process, account, $timeout) {
 
         account.requireLogin().then(function(account){
             $scope.account = account;
@@ -25,12 +26,27 @@ angular.module('cloudApp')
 
             });
         }
+
+        var stopTimeout = false;
+        function delayedUpdateSystems(){
+            if(!stopTimeout){
+                return $timeout(function(){
+                    return cloudApi.systems().then(function(result){
+                        $scope.systems = sortSystems(result.data);
+                    }).finally(delayedUpdateSystems);
+                },Config.updateInterval);
+            }
+        }
+        $scope.$on("$destroy", function( event ) { stopTimeout = true; } );
+
+
         $scope.gettingSystems = process.init(function(){
             return cloudApi.systems();
         },{
             errorPrefix: 'Systems list is unavailable:'
         }).then(function(result){
             $scope.systems = sortSystems(result.data);
+            delayedUpdateSystems();
         });
         $scope.gettingSystems.run();
 
