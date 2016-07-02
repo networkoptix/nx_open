@@ -27,11 +27,17 @@ angular.module('cloudApp')
             errorPrefix:'System info is unavailable:'
         }).then(loadUsers);
 
+
+        var stopTimeout = false;
         function delayedUpdateSystemInfo(){
-            return $timeout(function(){
-                return $scope.system.update().finally(delayedUpdateSystemInfo);
-            },Config.updateInterval);
+            if(!stopTimeout){
+                $scope.updateTimeout = $timeout(function(){
+                    return $scope.system.update().finally(delayedUpdateSystemInfo);
+                },Config.updateInterval);
+            }
+            return $scope.updateTimeout;
         }
+        $scope.$on("$destroy", function( event ) { stopTimeout = true; } );
 
         //Retrieve users list
         $scope.gettingSystemUsers = process.init(function(){
