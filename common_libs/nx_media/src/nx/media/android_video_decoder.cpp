@@ -157,9 +157,6 @@ private:
 //-------------------------------------------------------------------------------------------------
 // AndroidVideoDecoderPrivate
 
-QMap<CodecID, QSize> AndroidVideoDecoderPrivate::maxResolutions;
-QMutex AndroidVideoDecoderPrivate::maxResolutionsMutex;
-
 class AndroidVideoDecoderPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(AndroidVideoDecoder)
