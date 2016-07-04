@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 29, 2015
-* akolesnikov
-***********************************************************/
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -16,6 +11,7 @@ int main(int argc, char **argv)
 
     nx::utils::ArgumentParser args(argc, argv);
     QnLog::applyArguments(args);
+    nx::network::SocketGlobals::applyArguments(args);
 
     const int result = RUN_ALL_TESTS();
     return result;

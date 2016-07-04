@@ -386,8 +386,11 @@ protected:
                 acceptServerForever();
                 socket->sendAsync(
                     network::test::kTestMessage,
-                    [](SystemError::ErrorCode code, size_t size)
+                    [this, socket](SystemError::ErrorCode code, size_t size)
                     {
+                        NX_LOGX(lm("test message is sent to %1").arg(socket),
+                            cl_logDEBUG2);
+
                         ASSERT_EQ(code, SystemError::noError);
                         ASSERT_EQ(size, network::test::kTestMessage.size());
                     });
@@ -419,8 +422,9 @@ protected:
     {
         auto socketPtr = std::make_unique<TCPSocket>();
         auto socket = socketPtr.get();
-        ASSERT_TRUE(socketPtr->setSendTimeout(100));
-        ASSERT_TRUE(socketPtr->setRecvTimeout(100));
+        const auto timeout = 1000 * SocketFactory::timeoutMultiplier();
+        ASSERT_TRUE(socketPtr->setSendTimeout(timeout));
+        ASSERT_TRUE(socketPtr->setRecvTimeout(timeout));
         ASSERT_TRUE(socketPtr->setNonBlockingMode(true));
 
         {
@@ -428,12 +432,15 @@ protected:
             m_connectSockets.emplace(socket, std::move(socketPtr));
         }
 
-        NX_LOGX(lm("start %1 -> %2").arg(socket).str(peer), cl_logDEBUG1);
+        NX_LOGX(lm("client %1 -> %2 (timeout=%3)")
+            .arg(socket).str(peer).arg(timeout), cl_logDEBUG1);
+
         connectClient(socket, peer);
     }
 
     void connectClient(AbstractStreamSocket* socket, const SocketAddress& peer)
     {
+        const auto delay = 200 * SocketFactory::timeoutMultiplier();
         if (auto address = m_addressBinder.random(peer))
         {
             NX_LOGX(lm("connect %1 -> %2").arg(socket).str(*address), cl_logDEBUG2);
@@ -445,13 +452,13 @@ protected:
                         return readOnClient(socket, peer);
 
                     socket->registerTimer(
-                        200, [=](){ connectClient(socket, peer); });
+                        delay, [=](){ connectClient(socket, peer); });
                 });
         }
         else
         {
             socket->registerTimer(
-                rand() % 1000 + 100,
+                rand() % 1000 + delay,
                 [=]()
                 {
                     if (auto address = m_addressBinder.random(peer))
@@ -460,7 +467,7 @@ protected:
                     NX_LOGX(lm("indicate %1 -> %2").arg(socket).str(peer), cl_logDEBUG2);
                     emitIndication(peer);
                     socket->registerTimer(
-                        200, [=](){ connectClient(socket, peer); });
+                        delay, [=](){ connectClient(socket, peer); });
                 });
         }
     }
@@ -498,7 +505,9 @@ protected:
                     size != static_cast<size_t>(
                         network::test::kTestMessage.size()))
                 {
-                    NX_LOGX(lm("read %1 failed").arg(socket), cl_logDEBUG2);
+                    NX_LOGX(lm("read %1 failed (size=%2): %3")
+                        .args(socket, size, SystemError::toString(code)), cl_logDEBUG2);
+
                     return startClient(peer);
                 }
 

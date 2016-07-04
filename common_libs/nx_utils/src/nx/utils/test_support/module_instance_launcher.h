@@ -31,7 +31,7 @@ public:
     {
         stop();
         for (auto ptr: m_args)
-            delete ptr;
+            free(ptr);
     }
 
     void start()

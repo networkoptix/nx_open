@@ -104,7 +104,7 @@ TEST_F(UdpHolePunching, simpleAsync)
 
 TEST_F(UdpHolePunching, loadTest)
 {
-    const std::chrono::seconds testDuration(7);
+    const std::chrono::seconds testDuration(7 * SocketFactory::timeoutMultiplier());
     const int maxSimultaneousConnections = 25;
     const int bytesToSendThroughConnection = 1024 * 1024;
 

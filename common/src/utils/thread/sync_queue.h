@@ -127,7 +127,7 @@ public:
     typename Base::ResultType pop() /* overlap */
     {
         auto value = Base::pop(m_timeout);
-        NX_ASSERT(value, "TestSyncQueue::pop() timeout");
+        NX_CRITICAL(value, "TestSyncQueue::pop() timeout");
         return std::move(*value);
     }
 
