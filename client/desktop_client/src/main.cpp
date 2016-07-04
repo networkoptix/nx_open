@@ -91,8 +91,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     /* Running updater after QApplication and NX_LOG are initialized. */
     nx::vms::client::SelfUpdater updater(startupParams);
 
-    /* Immediately exit if run under administrator. */
-    if (startupParams.hasAdminPermissions)
+    /* Immediately exit if run in self-update mode. */
+    if (startupParams.selfUpdateMode)
         return kSuccessCode;
 
     /* Initialize sound. */

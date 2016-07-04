@@ -28,8 +28,8 @@ struct QnStartupParameters
     bool fullScreenDisabled;
     bool showFullInfo;
 
-    bool hasAdminPermissions;
-    const static QString kHasAdminPermissionsKey;
+    bool selfUpdateMode;
+    const static QString kSelfUpdateKey;
 
     QString devModeKey;
     QString authenticationString;

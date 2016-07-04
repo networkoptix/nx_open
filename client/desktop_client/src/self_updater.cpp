@@ -24,20 +24,27 @@ const int kUpdateLockTimeoutMs = 1000;
 
 }
 
-nx::vms::client::SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
+namespace nx {
+namespace vms {
+namespace client {
+
+
+
+SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
     m_clientVersion(QnAppInfo::applicationVersion())
 {
     if (!startupParams.engineVersion.isEmpty())
         m_clientVersion = nx::utils::SoftwareVersion(startupParams.engineVersion);
 
+
 #if defined(Q_OS_WIN)
     /* If handler must be updated AND client is not run under administrator, do it. */
-    if (!registerUriHandler() && !startupParams.hasAdminPermissions)
+    if (!registerUriHandler() && !startupParams.selfUpdateMode)
     {
         /* Start another client instance with admin permissions if required. */
         nx::utils::runAsAdministratorWithUAC(qApp->applicationFilePath(),
                                              QStringList()
-                                             << QnStartupParameters::kHasAdminPermissionsKey
+                                             << QnStartupParameters::kSelfUpdateKey
                                              << QnStartupParameters::kAllowMultipleClientInstancesKey);
     }
 #elif defined(Q_OS_LINUX)
@@ -45,11 +52,11 @@ nx::vms::client::SelfUpdater::SelfUpdater(const QnStartupParameters& startupPara
 #endif
 
     /* Updating applauncher only if we are not run under administrator to avoid collisions. */
-    if (!startupParams.hasAdminPermissions)
+    if (!startupParams.selfUpdateMode)
         updateApplauncher();
 }
 
-bool nx::vms::client::SelfUpdater::registerUriHandler()
+bool SelfUpdater::registerUriHandler()
 {
 #if defined(Q_OS_WIN) || defined(Q_OS_LINUX)
     QString binaryPath = qApp->applicationFilePath();
@@ -70,7 +77,7 @@ bool nx::vms::client::SelfUpdater::registerUriHandler()
 #endif
 }
 
-bool nx::vms::client::SelfUpdater::updateApplauncher()
+bool SelfUpdater::updateApplauncher()
 {
     /* Check if applauncher binary exists in our installation. */
 
@@ -174,7 +181,12 @@ bool nx::vms::client::SelfUpdater::updateApplauncher()
     return true;
 }
 
-nx::utils::SoftwareVersion nx::vms::client::SelfUpdater::getVersionFromFile(const QString& filename) const
+bool SelfUpdater::updateMinilauncher()
+{
+    return true;
+}
+
+nx::utils::SoftwareVersion SelfUpdater::getVersionFromFile(const QString& filename) const
 {
     QFile versionFile(filename);
     if (!versionFile.exists())
@@ -192,7 +204,7 @@ nx::utils::SoftwareVersion nx::vms::client::SelfUpdater::getVersionFromFile(cons
     return nx::utils::SoftwareVersion(versionFile.readLine());
 }
 
-bool nx::vms::client::SelfUpdater::saveVersionToFile(const QString& filename, const nx::utils::SoftwareVersion& version) const
+bool SelfUpdater::saveVersionToFile(const QString& filename, const nx::utils::SoftwareVersion& version) const
 {
     QFile versionFile(filename);
     if (!versionFile.open(QIODevice::WriteOnly))
@@ -204,3 +216,7 @@ bool nx::vms::client::SelfUpdater::saveVersionToFile(const QString& filename, co
     QByteArray data = version.toString().toUtf8();
     return versionFile.write(data) == data.size();
 }
+
+} // namespace client
+} // namespace vms
+} // namespace nx

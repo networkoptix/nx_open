@@ -43,7 +43,7 @@ namespace
 
 const QString QnStartupParameters::kScreenKey(lit("--screen"));
 const QString QnStartupParameters::kAllowMultipleClientInstancesKey(lit("--no-single-application"));
-const QString QnStartupParameters::kHasAdminPermissionsKey(lit("--has-admin-permissions"));
+const QString QnStartupParameters::kSelfUpdateKey(lit("--self-update"));
 
 QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     , char **argv)
@@ -72,7 +72,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.skipMediaFolderScan,  "--skip-media-folder-scan");
     addParserParam(commandLineParser, &result.engineVersion,        "--override-version");
     addParserParam(commandLineParser, &result.showFullInfo,         "--show-full-info");
-    addParserParam(commandLineParser, &result.hasAdminPermissions,  kHasAdminPermissionsKey);
+    addParserParam(commandLineParser, &result.selfUpdateMode,       kSelfUpdateKey);
 
     /* Persistent settings override. */
     addParserParam(commandLineParser, &result.logLevel, "--log-level");
@@ -121,7 +121,7 @@ QnStartupParameters::QnStartupParameters()
     , forceLocalSettings(false)
     , fullScreenDisabled(kDefaultNoFullScreen)
     , showFullInfo(false)
-    , hasAdminPermissions(false)
+    , selfUpdateMode(false)
 
     , devModeKey()
     , authenticationString()

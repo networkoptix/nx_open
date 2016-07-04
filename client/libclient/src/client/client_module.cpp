@@ -159,8 +159,8 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     initRuntimeParams(startupParams);
     initLog(startupParams);
 
-    /* Do not initialize anything else because we must exit immediately if run under administrator. */
-    if (startupParams.hasAdminPermissions)
+    /* Do not initialize anything else because we must exit immediately if run in self-update mode. */
+    if (startupParams.selfUpdateMode)
         return;
 
     initNetwork(startupParams);
@@ -245,11 +245,16 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     QnCommonModule *common = new QnCommonModule(this);
 
-    common->store<QnFfmpegInitializer>(new QnFfmpegInitializer());
     common->store<QnTranslationManager>(translationManager.release());
     common->store<QnClientCoreSettings>(new QnClientCoreSettings());
     common->store<QnClientRuntimeSettings>(new QnClientRuntimeSettings());
     common->store<QnClientSettings>(clientSettingsPtr.take()); /* Now common owns the link. */
+
+    /* Shorted initialization if run in self-update mode. */
+    if (startupParams.selfUpdateMode)
+        return;
+
+    common->store<QnFfmpegInitializer>(new QnFfmpegInitializer());
 
     auto clientInstanceManager = new QnClientInstanceManager(); /* Depends on QnClientSettings */
     common->store<QnClientInstanceManager>(clientInstanceManager);
