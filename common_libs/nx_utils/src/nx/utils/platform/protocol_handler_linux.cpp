@@ -50,7 +50,7 @@ bool registerSystemUriProtocolHandler(
 
     result += lit("Version=%1\n").arg(version.toString());
     result += lit("Name=%1\n").arg(applicationName);
-    result += lit("Exec=%1\n").arg(applicationBinaryPath);
+    result += lit("Exec=%1 %u\n").arg(applicationBinaryPath);
     result += lit("Comment=%1\n").arg(description);
     result += lit("Icon=vmsclient-%1.png\n").arg(customization);
     result += lit("Type=%1\n").arg(lit("Application"));

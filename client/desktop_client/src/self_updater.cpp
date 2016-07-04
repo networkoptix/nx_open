@@ -55,7 +55,7 @@ bool SelfUpdater::registerUriHandler()
     QString binaryPath = qApp->applicationFilePath();
 
 #if defined(Q_OS_LINUX)
-    binaryPath = QDir::cleanPath(QDir(binaryPath).absoluteFilePath(lit("../client")));
+    binaryPath = qApp->applicationDirPath() + lit("/client");
 #endif
 
     return nx::utils::registerSystemUriProtocolHandler(
@@ -65,6 +65,7 @@ bool SelfUpdater::registerUriHandler()
         nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
         QnAppInfo::customizationName(),
         m_clientVersion);
+
 #else
     return true;
 #endif
