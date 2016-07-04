@@ -25,7 +25,7 @@
         <template>lib</template>
 
         <qt.libs>core core-private gui network opengl xml xmlpatterns sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
-        <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client -lnx_speach_synthesizer -lnx_vms_utils -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient_core -lclient -lcloud_db_client -lnx_speach_synthesizer -lnx_vms_utils -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -ld3d9</windows.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
@@ -91,7 +91,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>client.core</artifactId>
+            <artifactId>client_core</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>

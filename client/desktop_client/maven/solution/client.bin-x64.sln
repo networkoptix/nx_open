@@ -18,11 +18,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client-x64", "${root.dir}\c
 		${common.guid} = ${common.guid}
 		${nx_streaming.guid} = ${nx_streaming.guid}
 		${nx_audio.guid} = ${nx_audio.guid}
-		${client.core.guid} = ${client.core.guid}
+		${client_core.guid} = ${client_core.guid}
 		${nx_speach_synthesizer.guid} = $${nx_speach_synthesizer.guid}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client.core-x64", "${root.dir}\client\libclient_core\src\client.core-x64.vcxproj", "${client.core.guid}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_core-x64", "${root.dir}\client\libclient_core\src\client_core-x64.vcxproj", "${client_core.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
@@ -99,10 +99,10 @@ Global
 		${client.guid}.Debug|x64.Build.0 = Debug|x64
 		${client.guid}.Release|x64.ActiveCfg = Release|x64
 		${client.guid}.Release|x64.Build.0 = Release|x64
-		${client.core.guid}.Debug|x64.ActiveCfg = Debug|x64
-		${client.core.guid}.Debug|x64.Build.0 = Debug|x64
-		${client.core.guid}.Release|x64.ActiveCfg = Release|x64
-		${client.core.guid}.Release|x64.Build.0 = Release|x64
+		${client_core.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${client_core.guid}.Debug|x64.Build.0 = Debug|x64
+		${client_core.guid}.Release|x64.ActiveCfg = Release|x64
+		${client_core.guid}.Release|x64.Build.0 = Release|x64
 		${common.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${common.guid}.Debug|x64.Build.0 = Debug|x64
 		${common.guid}.Release|x64.ActiveCfg = Release|x64

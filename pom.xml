@@ -59,7 +59,7 @@
         <mediaserver.guid>{ee61c3cc-791c-4f9f-9917-9e7c9ce9e907}</mediaserver.guid>
         <mobile_client.guid>{4d58c9a4-8dbe-480c-a974-634a7e2862ef}</mobile_client.guid>
         <applauncher.guid>{75b8ee80-e089-4de2-b7a1-d1464a9b4351}</applauncher.guid>
-        <client.core.guid>{7b7822da-47c1-4758-a07f-c2edcfc63d66}</client.core.guid>
+        <client_core.guid>{7b7822da-47c1-4758-a07f-c2edcfc63d66}</client_core.guid>
         <client.bin.guid>{6de071a7-831c-43a1-88ae-ee9e12cd4050}</client.bin.guid>
         <client.guid>{6a4121d4-b02f-4e35-b941-ca9a9a2efb69}</client.guid>
         <axclient.guid>{d3f564c6-315b-426b-8ed3-890d91300374}</axclient.guid>

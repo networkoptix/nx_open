@@ -12,7 +12,7 @@
 /**
  * Convenience class for uniform initialization of metatypes in client module.
  * 
- * Also initializes metatypes from common and client.core module.
+ * Also initializes metatypes from common and client_core module.
  */
 class QnClientMetaTypes {
 public:

@@ -1,4 +1,5 @@
 TEMPLATE = lib
+TARGET = client_core
 
 INCLUDEPATH +=  ${root.dir}/appserver2/src \
                 ${root.dir}/common_libs/nx_vms_utils/src \

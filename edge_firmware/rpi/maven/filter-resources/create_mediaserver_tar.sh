@@ -97,7 +97,7 @@ if [[ "${box}" == "bpi" ]]; then
     LIBS_TO_COPY+=( \
     ldpreloadhook \
     libcedrus \
-    libclient.core \
+    libclient_core \
     libnx_audio \
     libnx_media \
     libopenal \
