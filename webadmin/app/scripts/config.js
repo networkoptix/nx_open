@@ -21,8 +21,8 @@ var Config = {
 
         portalUrl: 'http://cloud-demo.hdw.mx',
         apiUrl: '/api',
-        portalRegisterUrl: '/static/index.html#/register',
-        portalSystemUrl: '/static/index.html#/systems/{systemId}'
+        portalRegisterUrl: '/register',
+        portalSystemUrl: '/systems/{systemId}'
     },
 
     webclientEnabled: true, // set to false to disable webclient from top menu and show placeholder instead
@@ -44,7 +44,7 @@ var Config = {
         minLength: 8,
         minLengthMessage:L.passwordRequirements.minLengthMessage,
         maxLength: 255,
-        requiredRegex: '[\x21-\x7E]|[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]',
+        requiredRegex: '^[\x21-\x7E]$|^[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$',
         requiredMessage: L.passwordRequirements.requiredMessage,
         strongPasswordCheck: function(password){
 
