@@ -12,7 +12,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "desktop_client-x86", "${roo
 		${libclient.guid} = ${libclient.guid}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client-x86", "${root.dir}\client\libclient\src\client-x86.vcxproj", "${libclient.guid}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libclient-x86", "${root.dir}\client\libclient\src\libclient-x86.vcxproj", "${libclient.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
