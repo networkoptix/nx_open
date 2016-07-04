@@ -99,7 +99,7 @@ void CloudUserListSynchonizer::onConnectedToCloud()
     dispatch(
         [this]
         {
-            NX_ASSERT(m_connection);
+            NX_ASSERT(!m_connection);
             m_connection = m_cloudConnectionManager->getCloudConnection();
             m_taskQueue.clear();
             m_taskQueue.push_back(TaskType::resyncAllUsers);
