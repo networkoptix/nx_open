@@ -144,7 +144,7 @@ def main():
 
     #Debug code to make applauncher work from the build_environment/target/bin folder
     rename(bin_source_dir, 'minilauncher.exe', '${minilauncher.binary.name}')
-    rename(bin_source_dir, 'client.bin.exe', '${client.binary.name}')
+    rename(bin_source_dir, 'client.exe', '${client.binary.name}')
 
 if __name__ == '__main__':
     main()

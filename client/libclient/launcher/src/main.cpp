@@ -270,7 +270,7 @@ int launchFile(const wstring& executePath)
         if (!startProcessAsync(buffer, dstDir))
         {
             // todo: refactor it. Current version have different 'exe' name for installer and debug mode. So, try both names
-            wsprintf(buffer, L"\"%s\" \"%s\"", getFullFileName(dstDir, L"client.bin.exe").c_str(), executePath.c_str());
+            wsprintf(buffer, L"\"%s\" \"%s\"", getFullFileName(dstDir, L"desktop_client.exe").c_str(), executePath.c_str());
             startProcessAsync(buffer, dstDir);
         }
 

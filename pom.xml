@@ -60,7 +60,7 @@
         <mobile_client.guid>{4d58c9a4-8dbe-480c-a974-634a7e2862ef}</mobile_client.guid>
         <applauncher.guid>{75b8ee80-e089-4de2-b7a1-d1464a9b4351}</applauncher.guid>
         <client_core.guid>{7b7822da-47c1-4758-a07f-c2edcfc63d66}</client_core.guid>
-        <client.bin.guid>{6de071a7-831c-43a1-88ae-ee9e12cd4050}</client.bin.guid>
+        <desktop_client.guid>{6de071a7-831c-43a1-88ae-ee9e12cd4050}</desktop_client.guid>
         <client.guid>{6a4121d4-b02f-4e35-b941-ca9a9a2efb69}</client.guid>
         <axclient.guid>{d3f564c6-315b-426b-8ed3-890d91300374}</axclient.guid>
         <traytool.guid>{e2bc6f17-8fc1-4aeb-b614-3fe2c74c41f6}</traytool.guid>

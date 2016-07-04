@@ -30,7 +30,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>client.bin</artifactId>
+            <artifactId>desktop_client</artifactId>
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
