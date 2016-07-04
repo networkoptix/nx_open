@@ -183,6 +183,12 @@ void CloudUserListSynchonizer::permissionsToCloudAccessRole(
         return;
     }
 
+    if (user->isOwner())
+    {
+        systemSharing->accessRole = nx::cdb::api::SystemAccessRole::owner;
+        return;
+    }
+
     const auto permissions = qnResourceAccessManager->globalPermissions(user);
     switch (permissions)
     {
