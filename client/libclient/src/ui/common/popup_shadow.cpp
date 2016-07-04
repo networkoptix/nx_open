@@ -320,9 +320,7 @@ bool QnPopupShadow::eventFilter(QObject* object, QEvent* event)
             case QEvent::Show:
             {
                 d->updateGeometry();
-                d->shadow->showNormal();
-                if (d->shadow->isActiveWindow())
-                    d->popup->activateWindow();
+                d->shadow->setVisible(true);
                 d->popup->raise();
                 break;
             }
