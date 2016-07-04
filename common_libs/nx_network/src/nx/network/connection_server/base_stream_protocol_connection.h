@@ -67,43 +67,22 @@ namespace nx_api
         {
         }
 
-        void bytesReceived( const nx::Buffer& buf )
+        void bytesReceived(const nx::Buffer& buf)
         {
-            for( size_t pos = 0; pos < (size_t)buf.size(); )
+            size_t pos = 0;
+            if (buf.isEmpty())
             {
-                //parsing message
-                size_t bytesProcessed = 0;
-                switch( m_parser.parse( pos > 0 ? buf.mid((int)pos) : buf, &bytesProcessed ) )
+                //reporting eof of file to the parser
+                invokeMessageParser(buf, &pos);
+                return;
+            }
+
+            for (; pos < (size_t)buf.size(); )
+            {
+                if (!invokeMessageParser(buf, &pos))
                 {
-                    case ParserState::init:
-                    case ParserState::inProgress:
-                        NX_ASSERT( pos+bytesProcessed == (size_t)buf.size() );
-                        return;
-
-                    case ParserState::done:
-                    {
-                        //processing request
-                        //NOTE interleaving is not supported yet
-
-                        {
-                            nx::utils::ObjectDestructionFlag::Watcher watcher(
-                                &m_connectionFreedFlag);
-                            static_cast<CustomConnectionType*>(this)->processMessage(
-                                std::move(m_request));
-                            if (watcher.objectDestroyed())
-                                return; //connection has been removed by handler
-                        }
-
-                        m_parser.reset();
-                        m_request.clear();
-                        m_parser.setMessage( &m_request );
-                        pos += bytesProcessed;
-                        break;
-                    }
-
-                    case ParserState::failed:
-                        //TODO : #ak ignore all following data and close connection?
-                        return;
+                    //TODO : #ak ignore all following data and close connection?
+                    return;
                 }
             }
         }
@@ -237,6 +216,53 @@ namespace nx_api
         std::function<void(SystemError::ErrorCode)> m_sendCompletionHandler;
         std::deque<SendTask> m_sendQueue;
         nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
+
+
+        /**
+            @param buf source buffer
+            @param pos Position inside source buffer. Moved by number of bytes read
+        */
+        bool invokeMessageParser(const nx::Buffer& buf, size_t* const pos)
+        {
+            //parsing message
+            size_t bytesProcessed = 0;
+            switch (m_parser.parse(*pos > 0 ? buf.mid((int)*pos) : buf, &bytesProcessed))
+            {
+                case ParserState::init:
+                case ParserState::inProgress:
+                    *pos += bytesProcessed;
+                    NX_ASSERT(*pos == (size_t)buf.size());
+                    return true;
+
+                case ParserState::done:
+                {
+                    //processing request
+                    //NOTE interleaving is not supported yet
+
+                    {
+                        nx::utils::ObjectDestructionFlag::Watcher watcher(
+                            &m_connectionFreedFlag);
+                        static_cast<CustomConnectionType*>(this)->processMessage(
+                            std::move(m_request));
+                        if (watcher.objectDestroyed())
+                            return false; //connection has been removed by handler
+                    }
+
+                    m_parser.reset();
+                    m_request.clear();
+                    m_parser.setMessage(&m_request);
+                    *pos += bytesProcessed;
+                    return true;
+                }
+
+                case ParserState::failed:
+                    //TODO : #ak ignore all further data and close connection?
+                    return false;
+            }
+
+            NX_ASSERT(false);
+            return false;
+        }
 
         void sendMessageInternal( const MessageType& msg )
         {

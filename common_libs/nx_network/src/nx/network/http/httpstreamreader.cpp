@@ -176,6 +176,11 @@ namespace nx_http
         return m_httpMessage;
     }
 
+    Message HttpStreamReader::takeMessage()
+    {
+        return std::move(m_httpMessage);
+    }
+
     HttpStreamReader::ReadState HttpStreamReader::state() const
     {
         return m_state;
