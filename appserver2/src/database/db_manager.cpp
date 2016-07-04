@@ -1533,6 +1533,12 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 
 ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 internalId)
 {
+    if (data.permissions & Qn::GlobalPermission::INTERNAL_GlobalVideoWallLayoutPermission) 
+    {
+        NX_ASSERT(0, "This enum entry is only for the internal use");
+        return ErrorCode::forbidden;
+    }
+
     {
         const QString authQueryStr = data.hash.isEmpty()
             ? "UPDATE auth_user SET is_superuser=:isAdmin, email=:email where username=:name"
