@@ -115,8 +115,8 @@
                 <version>2.6</version>
                 <executions>
                     <execution>
-                        <id>copy-project-resources</id>
-                        <phase>${resources.phase}</phase>
+                        <id>copy-customization-resources</id>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
