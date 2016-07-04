@@ -57,6 +57,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data);
 void serializeToUrlQuery(const AccountUpdateData&, QUrlQuery* const urlQuery);
 
+void serialize(QnJsonContext*, const AccountUpdateData&, QJsonValue*);
 bool deserialize(QnJsonContext*, const QJsonValue&, AccountUpdateData*);
 
 

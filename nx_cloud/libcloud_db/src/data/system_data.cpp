@@ -54,7 +54,7 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
 //// class SystemSharing
 ////////////////////////////////////////////////////////////
 
-bool SystemSharing::getAsVariant( int resID, QVariant* const value ) const
+bool SystemSharing::getAsVariant(int resID, QVariant* const value) const
 {
     switch (resID)
     {
@@ -70,6 +70,18 @@ bool SystemSharing::getAsVariant( int resID, QVariant* const value ) const
         default:
             return false;
     }
+}
+
+bool SystemSharingList::getAsVariant(int resID, QVariant* const value) const
+{
+    return false;
+}
+
+bool loadFromUrlQuery(
+    const QUrlQuery& /*urlQuery*/,
+    SystemSharingList* const /*systemSharing*/)
+{
+    return false;
 }
 
 
@@ -115,6 +127,10 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SystemData),
     (sql_record),
     _FieldsEx);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (SystemSharingList),
+    (json),
+    _Fields);
 
 }   //data
 }   //cdb

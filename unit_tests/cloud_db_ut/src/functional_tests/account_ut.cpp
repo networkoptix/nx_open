@@ -15,6 +15,7 @@
 #include <data/account_data.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <nx/fusion/model_functions.h>
 
@@ -336,12 +337,27 @@ TEST_F(Account, requestQueryDecode)
         "test@yandex.ru",
         moduleInfo().realm.c_str(),
         account1Password.c_str()).constData();
+    account1.customization = QnAppInfo::customizationName().toStdString();
 
+    nx_http::HttpClient httpClient;
+    QUrl url(
+        lm("http://127.0.0.1:%1/cdb/account/register?email=%2&fullName=%3&passwordHa1=%4&customization=%5")
+        .arg(endpoint().port).arg(account1.email).arg(account1.fullName)
+        .arg(account1.passwordHa1).arg(QnAppInfo::customizationName().toStdString()));
+    ASSERT_TRUE(httpClient.doGet(url));
+    ASSERT_EQ(nx_http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
+    QByteArray responseBody;
+    while (!httpClient.eof())
+        responseBody += httpClient.fetchMessageBodyBuffer();
     api::AccountConfirmationCode activationCode;
-    result = addAccount(&account1, &account1Password, &activationCode);
-    ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QnAppInfo::customizationName().toStdString());
+    activationCode = QJson::deserialized<api::AccountConfirmationCode>(responseBody);
     ASSERT_TRUE(!activationCode.code.empty());
+
+    //api::AccountConfirmationCode activationCode;
+    //result = addAccount(&account1, &account1Password, &activationCode);
+    //ASSERT_EQ(result, api::ResultCode::ok);
+    //ASSERT_EQ(account1.customization, QnAppInfo::customizationName().toStdString());
+    //ASSERT_TRUE(!activationCode.code.empty());
 
     std::string activatedAccountEmail;
     result = activateAccount(activationCode, &activatedAccountEmail);

@@ -413,6 +413,11 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::system, DataActionType::update);
 
     registerHttpHandler(
+        kSystemSetSystemUserListPath,
+        &SystemManager::setSystemUserList, systemManager,
+        EntityType::system, DataActionType::update);
+
+    registerHttpHandler(
         kSystemGetCloudUsersPath,
         &SystemManager::getCloudUsersOfSystem, systemManager,
         EntityType::system, DataActionType::fetch);
@@ -535,6 +540,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kReplaceBlobWithVarchar);
     dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentials);
     dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentialsProlongationPeriod);
+    dbStructureUpdater.addUpdateScript(db::kAddCustomAndDisabledAccessRoles);
     return dbStructureUpdater.updateStructSync();
 }
 

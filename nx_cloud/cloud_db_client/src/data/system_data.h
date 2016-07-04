@@ -80,6 +80,8 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemAccessRole), (lexical))
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing);
 void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const systemSharing);
+
 #define SystemSharing_Fields (accountEmail)(systemID)(accessRole)
 #define SystemSharingList_Fields (sharing)
 

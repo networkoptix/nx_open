@@ -21,6 +21,7 @@ const char* kSystemBindPath = "/cdb/system/bind";
 const char* kSystemUnbindPath = "/cdb/system/unbind";
 const char* kSystemGetPath = "/cdb/system/get";
 const char* kSystemSharePath = "/cdb/system/share";
+const char* kSystemSetSystemUserListPath = "/cdb/system/set_system_user_list";
 const char* kSystemGetCloudUsersPath = "/cdb/system/get_cloud_users";
 const char* kSystemGetAccessRoleListPath = "/cdb/system/get_access_role_list";
 const char* kSystemUpdateSystemNamePath = "/cdb/system/update_system_name";

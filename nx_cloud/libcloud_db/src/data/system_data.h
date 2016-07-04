@@ -91,6 +91,18 @@ public:
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 
+class SystemSharingList
+:
+    public stree::AbstractResourceReader
+{
+public:
+    std::vector<SystemSharing> sharing;
+
+    virtual bool getAsVariant(int resID, QVariant* const value) const override;
+};
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const systemSharing);
+
 //!for requests passing just system id
 class SystemID
 :
@@ -115,6 +127,10 @@ public:
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),
     (sql_record));
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (SystemSharingList),
+    (json));
 
 }   //data
 }   //cdb

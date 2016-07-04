@@ -55,6 +55,12 @@ public:
     virtual void shareSystem(
         SystemSharing sharingData,
         std::function<void(ResultCode)> completionHandler) = 0;
+    /** Overwrites all system sharings.
+        \note Allowed for systems only
+    */
+    virtual void setSystemUserList(
+        SystemSharingList sharings,
+        std::function<void(ResultCode)> completionHandler) = 0;
     /** Returns sharings (account email, access role) for every system of account authorized */
     virtual void getCloudUsersOfSystem(
         std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) = 0;
