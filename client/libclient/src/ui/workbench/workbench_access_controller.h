@@ -1,7 +1,7 @@
-#ifndef QN_WORKBENCH_ACCESS_CONTROLLER_H
-#define QN_WORKBENCH_ACCESS_CONTROLLER_H
+#pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QList>
 
 #include <core/resource/resource_fwd.h>
 
@@ -89,12 +89,6 @@ public:
     QString userRoleName(const QnUserResourcePtr& user) const;
 
     /**
-    * \param permissions               Peermission set to get role name for.
-    * \returns                         Name of user's role.
-    */
-    QString standardRoleName(Qn::GlobalPermissions permissions) const;
-
-    /**
     * \param user                      User resource to get role description for.
     * \returns                         Description of user's role.
     */
@@ -106,6 +100,33 @@ public:
     * \returns                         Description of user's role.
     */
     QString userRoleDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId = QnUuid()) const;
+
+    /**
+    * \returns                         A set of permissions for standard (built-in) roles.
+    */
+    static const QList<Qn::GlobalPermissions>& standardRoles();
+
+    /**
+    * \param permissions               Peermission set to get role name for.
+    * \returns                         Name of role.
+    */
+    static QString standardRoleName(Qn::GlobalPermissions permissions);
+
+    /**
+    * \param permissions               Peermission set to get role description for.
+    * \returns                         Description of role.
+    */
+    static QString standardRoleDescription(Qn::GlobalPermissions permissions);
+
+    /**
+    * \returns                         Description of custom role.
+    */
+    static QString customRoleDescription();
+
+    /**
+    * \returns                         Description of custom permissions.
+    */
+    static QString customPermissionsDescription();
 
     bool canCreateStorage(const QnUuid& serverId) const;
     bool canCreateLayout(const QnUuid& layoutParentId) const;
@@ -151,6 +172,3 @@ private:
     bool m_readOnlyMode;
     mutable QHash<QnResourcePtr, PermissionsData> m_dataByResource;
 };
-
-
-#endif // QN_WORKBENCH_ACCESS_CONTROLLER_H

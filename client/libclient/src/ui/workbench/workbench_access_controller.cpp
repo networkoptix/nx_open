@@ -289,16 +289,39 @@ QString QnWorkbenchAccessController::userRoleName(const QnUserResourcePtr& user)
         return standardRoleName(permissions);
 
     QnUuid groupId = user->userGroup();
-    for (const ec2::ApiUserGroupData& group : qnResourceAccessManager->userGroups())
+    if (!groupId.isNull())
     {
-        if (group.id == groupId)
-            return group.name;
+        ec2::ApiUserGroupData userGroup = qnResourceAccessManager->userGroup(groupId);
+        if (!userGroup.name.isEmpty())
+            return userGroup.name;
     }
 
     return standardRoleName(permissions);
 }
 
-QString QnWorkbenchAccessController::standardRoleName(Qn::GlobalPermissions permissions) const
+QString QnWorkbenchAccessController::userRoleDescription(const QnUserResourcePtr& user) const
+{
+    if (!user)
+        return QString();
+
+    if (user->isOwner())
+        return tr("Has access to whole system and can do everything.");
+
+    return userRoleDescription(qnResourceAccessManager->globalPermissions(user), user->userGroup());
+}
+
+QString QnWorkbenchAccessController::userRoleDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId) const
+{
+    if (permissions.testFlag(Qn::GlobalAdminPermission))
+        return standardRoleDescription(permissions); // admin permission is checked before user role
+
+    if (!groupId.isNull() && !qnResourceAccessManager->userGroup(groupId).name.isEmpty())
+        return customRoleDescription();
+
+    return standardRoleDescription(permissions);
+}
+
+QString QnWorkbenchAccessController::standardRoleName(Qn::GlobalPermissions permissions)
 {
     if (permissions.testFlag(Qn::GlobalAdminPermission))
         return tr("Administrator");
@@ -319,39 +342,45 @@ QString QnWorkbenchAccessController::standardRoleName(Qn::GlobalPermissions perm
     }
 }
 
-QString QnWorkbenchAccessController::userRoleDescription(const QnUserResourcePtr& user) const
-{
-    if (!user)
-        return QString();
-
-    if (user->isOwner())
-        return tr("Has access to whole system and can do everything.");
-
-    return userRoleDescription(qnResourceAccessManager->globalPermissions(user), user->userGroup());
-}
-
-QString QnWorkbenchAccessController::userRoleDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId) const
+QString QnWorkbenchAccessController::standardRoleDescription(Qn::GlobalPermissions permissions)
 {
     if (permissions.testFlag(Qn::GlobalAdminPermission))
         return tr("Has access to whole system and can manage it. Can create users.");
 
-    if (!groupId.isNull())
+    switch (permissions)
     {
-        for (const ec2::ApiUserGroupData& group : qnResourceAccessManager->userGroups())
-        {
-            if (group.id == groupId)
-                return tr("Custom user role.");
-        }
+        case Qn::GlobalAdvancedViewerPermissionSet:
+            return tr("Can manage all cameras and bookmarks.");
+
+        case Qn::GlobalViewerPermissionSet:
+            return tr("Can view all cameras and export video.");
+
+        case Qn::GlobalLiveViewerPermissionSet:
+            return tr("Can view live video from all cameras.");
+
+        default:
+            return customPermissionsDescription();
     }
+}
 
-    if (permissions == Qn::GlobalAdvancedViewerPermissionSet)
-        return tr("Can manage all cameras and bookmarks.");
+QString QnWorkbenchAccessController::customRoleDescription()
+{
+    return tr("Custom user role.");
+}
 
-    if (permissions == Qn::GlobalViewerPermissionSet)
-        return tr("Can view all cameras and export video.");
-
-    if (permissions == Qn::GlobalLiveViewerPermissionSet)
-        return tr("Can view live video from all cameras.");
-
+QString QnWorkbenchAccessController::customPermissionsDescription()
+{
     return tr("Custom permissions.");
+}
+
+const QList<Qn::GlobalPermissions>& QnWorkbenchAccessController::standardRoles()
+{
+    static const QList<Qn::GlobalPermissions> roles({
+        Qn::GlobalAdminPermissionsSet,
+        Qn::GlobalAdvancedViewerPermissionSet,
+        Qn::GlobalViewerPermissionSet,
+        Qn::GlobalLiveViewerPermissionSet
+    });
+
+    return roles;
 }

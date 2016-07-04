@@ -32,6 +32,26 @@ public:
         connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnUserListModelPrivate::at_resourcePool_resourceRemoved);
         connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
 
+        connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated, this,
+            [this](const ec2::ApiUserGroupData& group)
+            {
+                auto isUserAffected = [&group](const QnUserResourcePtr& user)
+                {
+                    return user->userGroup() == group.id;
+                };
+
+                auto begin = std::find_if(userList.begin(), userList.end(), isUserAffected);
+                if (begin == userList.end())
+                    return;
+
+                auto end = std::find_if(userList.rbegin(), QnUserResourceList::reverse_iterator(begin), isUserAffected).base();
+
+                QModelIndex first = model->index(begin - userList.begin(), QnUserListModel::UserRoleColumn);
+                QModelIndex last = first.sibling(first.row() + (end - begin) - 1, QnUserListModel::UserRoleColumn);
+
+                emit model->dataChanged(first, last, { Qt::DisplayRole });
+        });
+
         for (const QnUserResourcePtr& user: userList)
             at_resourcePool_resourceAdded(user);
     }
@@ -56,10 +76,10 @@ void QnUserListModelPrivate::at_resourcePool_resourceAdded(const QnResourcePtr& 
     if (!user)
         return;
 
-    connect(user,   &QnUserResource::nameChanged,           this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
-    connect(user,   &QnUserResource::fullNameChanged,       this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
-    connect(user,   &QnUserResource::permissionsChanged,    this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
-    connect(user,   &QnUserResource::enabledChanged,        this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+    connect(user, &QnUserResource::nameChanged,        this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+    connect(user, &QnUserResource::fullNameChanged,    this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+    connect(user, &QnUserResource::permissionsChanged, this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+    connect(user, &QnUserResource::enabledChanged,     this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
 
     if (userIndex(user->getId()) != -1)
         return;

@@ -15,6 +15,7 @@ namespace Ui
 }
 
 class QnUserSettingsModel;
+class QnUserRolesModel;
 class QnInputField;
 
 class QnUserSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
@@ -35,15 +36,17 @@ public:
     Qn::GlobalPermissions selectedPermissions() const;
 
     void updatePermissionsLabel(const QString& text);
-    void updateAccessRightsPresets();
 
 private:
     void setupInputFields();
     QList<QnInputField*> inputFields() const;
 
+    void updateRoleComboBox();
     void updateControlsAccess();
     bool validMode() const;
+
 private:
     QScopedPointer<Ui::UserSettingsWidget> ui;
     QnUserSettingsModel* const m_model;
+    QnUserRolesModel* const m_rolesModel;
 };

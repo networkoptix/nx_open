@@ -11,6 +11,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/models/resource_properties/user_settings_model.h>
+#include <ui/models/user_roles_model.h>
 #include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -19,17 +20,13 @@
 #include <nx/utils/string.h>
 #include <utils/email/email.h>
 
-namespace
-{
-    const int kUserGroupIdRole = Qt::UserRole + 1;
-    const int kPermissionsRole = Qt::UserRole + 2;
-}
 
 QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* parent /*= 0*/) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::UserSettingsWidget()),
-    m_model(model)
+    m_model(model),
+    m_rolesModel(new QnUserRolesModel(this))
 {
     ui->setupUi(this);
 
@@ -37,8 +34,13 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     setHelpTopic(ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->enabledButton, Qn::UserSettings_DisableUser_Help);
 
+    ui->roleComboBox->setModel(m_rolesModel);
+
     connect(ui->enabledButton,          &QPushButton::clicked,          this,   &QnUserSettingsWidget::hasChangesChanged);
     connect(ui->roleComboBox,           QnComboboxCurrentIndexChanged,  this,   &QnUserSettingsWidget::hasChangesChanged);
+
+    connect(m_rolesModel,               &QnUserRolesModel::modelReset,  this,   &QnUserSettingsWidget::updateRoleComboBox);
+    connect(m_rolesModel,               &QnUserRolesModel::rowsRemoved, this,   &QnUserSettingsWidget::updateRoleComboBox);
 
     connect(m_model, &QnUserSettingsModel::userChanged, this, [this]()
     {
@@ -122,7 +124,7 @@ void QnUserSettingsWidget::loadDataToUi()
     if (!validMode())
         return;
 
-    updateAccessRightsPresets();
+    updateRoleComboBox();
     updateControlsAccess();
 
     ui->loginInputField->setText(m_model->user()->getName());
@@ -256,6 +258,33 @@ QList<QnInputField*> QnUserSettingsWidget::inputFields() const
     };
 }
 
+void QnUserSettingsWidget::updateRoleComboBox()
+{
+    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_model->user());
+
+    /* If there is only one entry in permissions combobox, this check doesn't matter. */
+    int customPermissionsIndex = ui->roleComboBox->count() - 1;
+    NX_ASSERT(customPermissionsIndex == 0 ||
+        ui->roleComboBox->itemData(customPermissionsIndex, Qn::GlobalPermissionsRole).value<Qn::GlobalPermissions>() == Qn::NoGlobalPermissions);
+    NX_ASSERT(customPermissionsIndex == 0 ||
+        ui->roleComboBox->itemData(customPermissionsIndex, Qn::UuidRole).value<QnUuid>().isNull());
+
+    int permissionsIndex = customPermissionsIndex;
+    if (!m_model->user()->userGroup().isNull())
+    {
+        permissionsIndex = ui->roleComboBox->findData(qVariantFromValue(m_model->user()->userGroup()), Qn::UuidRole, Qt::MatchExactly);
+    }
+    else if (permissions != Qn::NoGlobalPermissions)
+    {
+        permissionsIndex = ui->roleComboBox->findData(qVariantFromValue(permissions), Qn::GlobalPermissionsRole, Qt::MatchExactly);
+    }
+
+    if (permissionsIndex < 0)
+        permissionsIndex = customPermissionsIndex;
+
+    ui->roleComboBox->setCurrentIndex(permissionsIndex);
+}
+
 void QnUserSettingsWidget::updateControlsAccess()
 {
     Qn::Permissions permissions = m_model->user()
@@ -270,85 +299,28 @@ void QnUserSettingsWidget::updateControlsAccess()
     ui->enabledButton->setVisible(permissions.testFlag(Qn::WriteAccessRightsPermission));
 }
 
-void QnUserSettingsWidget::updateAccessRightsPresets()
-{
-    ui->roleComboBox->clear();
+    //bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    //auto groups = qnResourceAccessManager->userGroups();
+    //std::sort(groups.begin(), groups.end(), [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
+    //{
+    //    /* Case Sensitive sort. */
+    //    return nx::utils::naturalStringCompare(l.name, r.name) < 0;
+    //});
 
-    if (!m_model->user())
-        return;
-
-    auto addBuiltInGroup = [this](Qn::GlobalPermissions permissions)
-    {
-        int index = ui->roleComboBox->count();
-        QString name = accessController()->standardRoleName(permissions);
-        ui->roleComboBox->insertItem(index, name);
-        ui->roleComboBox->setItemData(index,   qVariantFromValue(QnUuid()),    kUserGroupIdRole);
-        ui->roleComboBox->setItemData(index,   qVariantFromValue(permissions), kPermissionsRole);
-    };
-
-    auto addCustomGroup = [this](const ec2::ApiUserGroupData &group)
-    {
-        int index = ui->roleComboBox->count();
-        ui->roleComboBox->insertItem(index, group.name);
-        ui->roleComboBox->setItemData(index, qVariantFromValue(group.id),      kUserGroupIdRole);
-    };
-
-    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_model->user());
-
-    // show for an admin or for anyone opened by owner
-    if (permissions.testFlag(Qn::GlobalAdminPermission) || (context()->user() && context()->user()->isOwner()))
-        addBuiltInGroup(Qn::GlobalAdminPermissionsSet);
-
-    addBuiltInGroup(Qn::GlobalAdvancedViewerPermissionSet);
-    addBuiltInGroup(Qn::GlobalViewerPermissionSet);
-    addBuiltInGroup(Qn::GlobalLiveViewerPermissionSet);
-
-    bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
-    auto groups = qnResourceAccessManager->userGroups();
-    std::sort(groups.begin(), groups.end(), [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
-    {
-        /* Case Sensitive sort. */
-        return nx::utils::naturalStringCompare(l.name, r.name) < 0;
-    });
-
-    for (const ec2::ApiUserGroupData& group : groups)
-    {
-        if (isAdmin || group.id == m_model->user()->userGroup())
-            addCustomGroup(group);
-    }
-
-    addBuiltInGroup(Qn::NoGlobalPermissions); // "Custom"
-
-    /* If there is only one entry in permissions combobox, this check doesn't matter. */
-    int customPermissionsIndex = ui->roleComboBox->count() - 1;
-    NX_ASSERT(customPermissionsIndex == 0 ||
-        ui->roleComboBox->itemData(customPermissionsIndex, kPermissionsRole).value<Qn::GlobalPermissions>() == Qn::NoGlobalPermissions);
-    NX_ASSERT(customPermissionsIndex == 0 ||
-        ui->roleComboBox->itemData(customPermissionsIndex, kUserGroupIdRole).value<QnUuid>().isNull());
-
-    int permissionsIndex = customPermissionsIndex;
-    if (!m_model->user()->userGroup().isNull())
-    {
-        permissionsIndex = ui->roleComboBox->findData(qVariantFromValue(m_model->user()->userGroup()), kUserGroupIdRole, Qt::MatchExactly);
-    }
-    else if (permissions != Qn::NoGlobalPermissions)
-    {
-        permissionsIndex = ui->roleComboBox->findData(qVariantFromValue(permissions), kPermissionsRole, Qt::MatchExactly);
-    }
-
-    if (permissionsIndex < 0)
-        permissionsIndex = customPermissionsIndex;
-    ui->roleComboBox->setCurrentIndex(permissionsIndex);
-}
+    //for (const ec2::ApiUserGroupData& group : groups)
+    //{
+    //    if (isAdmin || group.id == m_model->user()->userGroup())
+    //        addCustomGroup(group);
+    //}
 
 Qn::GlobalPermissions QnUserSettingsWidget::selectedPermissions() const
 {
-    return ui->roleComboBox->itemData(ui->roleComboBox->currentIndex(), kPermissionsRole).value<Qn::GlobalPermissions>();
+    return ui->roleComboBox->itemData(ui->roleComboBox->currentIndex(), Qn::GlobalPermissionsRole).value<Qn::GlobalPermissions>();
 }
 
 QnUuid QnUserSettingsWidget::selectedUserGroup() const
 {
-    return ui->roleComboBox->itemData(ui->roleComboBox->currentIndex(), kUserGroupIdRole).value<QnUuid>();
+    return ui->roleComboBox->itemData(ui->roleComboBox->currentIndex(), Qn::UuidRole).value<QnUuid>();
 }
 
 bool QnUserSettingsWidget::validMode() const

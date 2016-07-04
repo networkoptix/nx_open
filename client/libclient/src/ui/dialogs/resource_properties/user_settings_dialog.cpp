@@ -89,7 +89,6 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     {
         QnUuid groupId = isPageVisible(ProfilePage) ? m_user->userGroup() : m_settingsPage->selectedUserGroup();
         menu()->trigger(QnActions::UserGroupsAction, QnActionParameters().withArgument(Qn::ResourceUidRole, groupId));
-        m_settingsPage->updateAccessRightsPresets();
     });
 
     m_editGroupsButton->setVisible(false);
