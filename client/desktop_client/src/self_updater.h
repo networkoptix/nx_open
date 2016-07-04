@@ -51,6 +51,8 @@ private:
     nx::utils::SoftwareVersion getVersionFromFile(const QString& filename) const;
     bool saveVersionToFile(const QString& filename, const nx::utils::SoftwareVersion& version) const;
 
+    Result osCheck(Operation operation, bool result);
+    void launchWithAdminPermissions();
 private:
     nx::utils::SoftwareVersion m_clientVersion;
 };

@@ -36,24 +36,17 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
     if (!startupParams.engineVersion.isEmpty())
         m_clientVersion = nx::utils::SoftwareVersion(startupParams.engineVersion);
 
+    QMap<Operation, Result> results;
+    results[Operation::RegisterUriHandler] = osCheck(Operation::RegisterUriHandler, registerUriHandler());
+    results[Operation::UpdateApplauncher] = osCheck(Operation::UpdateApplauncher, updateApplauncher());
+    results[Operation::UpdateMinilauncher] = osCheck(Operation::UpdateMinilauncher, updateMinilauncher());
 
-#if defined(Q_OS_WIN)
-    /* If handler must be updated AND client is not run under administrator, do it. */
-    if (!registerUriHandler() && !startupParams.selfUpdateMode)
-    {
-        /* Start another client instance with admin permissions if required. */
-        nx::utils::runAsAdministratorWithUAC(qApp->applicationFilePath(),
-                                             QStringList()
-                                             << QnStartupParameters::kSelfUpdateKey
-                                             << QnStartupParameters::kAllowMultipleClientInstancesKey);
-    }
-#elif defined(Q_OS_LINUX)
-    registerUriHandler();
-#endif
+    /* If we are already in self-update mode, just exit in any case. */
+    if (startupParams.selfUpdateMode)
+        return;
 
-    /* Updating applauncher only if we are not run under administrator to avoid collisions. */
-    if (!startupParams.selfUpdateMode)
-        updateApplauncher();
+    if (std::any_of(results.cbegin(), results.cend(), [](Result value) { return value == Result::AdminRequired; } ))
+        launchWithAdminPermissions();
 }
 
 bool SelfUpdater::registerUriHandler()
@@ -215,6 +208,58 @@ bool SelfUpdater::saveVersionToFile(const QString& filename, const nx::utils::So
 
     QByteArray data = version.toString().toUtf8();
     return versionFile.write(data) == data.size();
+}
+
+SelfUpdater::Result SelfUpdater::osCheck(Operation operation, bool result)
+{
+    if (result)
+        return Result::Success;
+
+#if defined(Q_OS_WIN)
+    switch (operation)
+    {
+        case Operation::RegisterUriHandler:
+        case Operation::UpdateMinilauncher:
+            return Result::AdminRequired;
+        case Operation::UpdateApplauncher:
+            return Result::Failure;
+        default:
+            NX_ASSERT(false);
+            break;
+    }
+    return Result::Failure;
+#elif defined(Q_OS_LINUX)
+    switch (operation)
+    {
+        case Operation::UpdateMinilauncher:
+            return Result::AdminRequired;
+        case Operation::RegisterUriHandler:
+        case Operation::UpdateApplauncher:
+            return Result::Failure;
+        default:
+            NX_ASSERT(false);
+            break;
+    }
+    return Result::Failure;
+#elif defined(Q_OS_MAC)
+    return Result::Failure;
+#endif
+
+}
+
+void SelfUpdater::launchWithAdminPermissions()
+{
+#if defined(Q_OS_WIN)
+    /* Start another client instance with admin permissions if required. */
+    nx::utils::runAsAdministratorWithUAC(qApp->applicationFilePath(),
+                                         QStringList()
+                                         << QnStartupParameters::kSelfUpdateKey
+                                         << QnStartupParameters::kAllowMultipleClientInstancesKey);
+#elif defined(Q_OS_LINUX)
+
+#elif defined(Q_OS_MAC)
+
+#endif
 }
 
 } // namespace client
