@@ -7,6 +7,13 @@ Object
     {
         target: uiController
 
+        onConnectRequested:
+        {
+            sideNavigation.close()
+            connectionManager.connectToServer(url)
+            Workflow.openResourcesScreen()
+        }
+
         onDisconnectRequested:
         {
             clearLastUsedConnection()

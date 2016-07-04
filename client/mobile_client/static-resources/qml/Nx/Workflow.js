@@ -15,8 +15,17 @@ function popCurrentScreen()
 
 function openSessionsScreen()
 {
-    var item = stackView.replace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
-    item.forceActiveFocus()
+    var item = stackView.get(0, Controls.StackView.ForceLoad)
+    if (item && item.objectName == "sessionsScreen")
+    {
+        if (stackView.depth > 1)
+            stackView.pop(item)
+    }
+    else
+    {
+        item = stackView.replace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
+        item.forceActiveFocus()
+    }
 }
 
 function openSessionsScreenWithWarning(systemName)

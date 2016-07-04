@@ -2,10 +2,42 @@
 
 #include <nx/vms/utils/system_uri.h>
 #include <nx/vms/utils/app_info.h>
+#include <utils/common/app_info.h>
 #include <watchers/cloud_status_watcher.h>
 
 #include "mobile_client_ui_controller.h"
 #include "mobile_client_settings.h"
+
+namespace {
+
+QUrl getConnectionUrl(const nx::vms::utils::SystemUri& uri)
+{
+    if (!uri.isValid() || uri.systemId().isEmpty())
+        return QUrl();
+
+    const auto split = uri.systemId().splitRef(L':', QString::SkipEmptyParts);
+    if (split.size() > 2)
+        return QUrl();
+
+    int port = -1;
+    if (split.size() == 2)
+    {
+        bool ok;
+        port = split.last().toInt(&ok);
+        if (!ok)
+            return QUrl();
+    }
+
+    QUrl result;
+    result.setScheme(lit("http"));
+    result.setHost(split.first().toString());
+    result.setPort(port);
+    result.setUserName(uri.authenticator().user);
+    result.setPassword(uri.authenticator().password);
+    return result;
+}
+
+} // namespace
 
 QnMobileClientUriHandler::QnMobileClientUriHandler(QObject* parent) :
     QObject(parent),
@@ -33,11 +65,12 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
     using namespace nx::vms::utils;
 
     SystemUri uri(url);
-    if (!uri.isValid())
+    if (!uri.isValid() ||
+        (uri.protocol() != SystemUri::Protocol::Native && uri.domain() != QnAppInfo::defaultCloudHost()))
     {
         if (uri.scope() == SystemUri::Scope::Generic)
         {
-            // Recall openUrl to let QDesktopServices open URL in browser.
+            // Re-call openUrl to let QDesktopServices open URL in browser.
             QDesktopServices::openUrl(url);
         }
         return;
@@ -51,6 +84,8 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
             // Do nothing because the app will be raised by OS whithout our help.
             break;
         case SystemUri::ClientCommand::ConnectToSystem:
+            if (m_uiController)
+                m_uiController->connectToSystem(getConnectionUrl(uri));
             break;
         case SystemUri::ClientCommand::LoginToCloud:
             if (m_uiController)

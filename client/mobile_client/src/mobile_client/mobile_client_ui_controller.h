@@ -18,10 +18,12 @@ public:
 
 public slots:
     void disconnectFromSystem();
+    void connectToSystem(const QUrl& url);
     void openResourcesScreen();
     void openVideoScreen(const QnUuid& cameraId);
 
 signals:
+    void connectRequested(const QUrl& url);
     void disconnectRequested();
     void layoutIdChanged();
     void resourcesScreenRequested();

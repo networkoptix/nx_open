@@ -46,6 +46,11 @@ void QnMobileClientUiController::disconnectFromSystem()
     emit disconnectRequested();
 }
 
+void QnMobileClientUiController::connectToSystem(const QUrl& url)
+{
+    emit connectRequested(url);
+}
+
 void QnMobileClientUiController::openResourcesScreen()
 {
     emit resourcesScreenRequested();
