@@ -22,7 +22,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libclient-x86", "${root.dir
 		${nx_speach_synthesizer.guid} = $${nx_speach_synthesizer.guid}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_core-x86", "${root.dir}\client\libclient_core\src\client_core-x86.vcxproj", "${client_core.guid}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libclient_core-x86", "${root.dir}\client\libclient_core\src\libclient_core-x86.vcxproj", "${libclient_core.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
