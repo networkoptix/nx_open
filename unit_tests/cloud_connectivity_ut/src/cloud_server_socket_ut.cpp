@@ -422,7 +422,7 @@ protected:
     {
         auto socketPtr = std::make_unique<TCPSocket>();
         auto socket = socketPtr.get();
-        const auto timeout = 1000 * SocketFactory::timeoutMultiplier();
+        const auto timeout = 3000 * SocketFactory::timeoutMultiplier();
         ASSERT_TRUE(socketPtr->setSendTimeout(timeout));
         ASSERT_TRUE(socketPtr->setRecvTimeout(timeout));
         ASSERT_TRUE(socketPtr->setNonBlockingMode(true));
@@ -440,7 +440,7 @@ protected:
 
     void connectClient(AbstractStreamSocket* socket, const SocketAddress& peer)
     {
-        const auto delay = 200 * SocketFactory::timeoutMultiplier();
+        const auto delay = 500 * SocketFactory::timeoutMultiplier();
         if (auto address = m_addressBinder.random(peer))
         {
             NX_LOGX(lm("connect %1 -> %2").arg(socket).str(*address), cl_logDEBUG2);
@@ -458,7 +458,7 @@ protected:
         else
         {
             socket->registerTimer(
-                rand() % 1000 + delay,
+                rand() % delay,
                 [=]()
                 {
                     if (auto address = m_addressBinder.random(peer))
