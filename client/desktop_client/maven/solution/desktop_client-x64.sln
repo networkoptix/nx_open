@@ -9,10 +9,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "desktop_client-x64", "${roo
 		${common.guid} = ${common.guid}
 		${nx_streaming.guid} = ${nx_streaming.guid}
 		${nx_audio.guid} = ${nx_audio.guid}
-		${client.guid} = ${client.guid}
+		${libclient.guid} = ${libclient.guid}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client-x64", "${root.dir}\client\libclient\src\client-x64.vcxproj", "${client.guid}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client-x64", "${root.dir}\client\libclient\src\client-x64.vcxproj", "${libclient.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
@@ -95,10 +95,10 @@ Global
 		${desktop_client.guid}.Debug|x64.Build.0 = Debug|x64
 		${desktop_client.guid}.Release|x64.ActiveCfg = Release|x64
 		${desktop_client.guid}.Release|x64.Build.0 = Release|x64
-		${client.guid}.Debug|x64.ActiveCfg = Debug|x64
-		${client.guid}.Debug|x64.Build.0 = Debug|x64
-		${client.guid}.Release|x64.ActiveCfg = Release|x64
-		${client.guid}.Release|x64.Build.0 = Release|x64
+		${libclient.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${libclient.guid}.Debug|x64.Build.0 = Debug|x64
+		${libclient.guid}.Release|x64.ActiveCfg = Release|x64
+		${libclient.guid}.Release|x64.Build.0 = Release|x64
 		${client_core.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${client_core.guid}.Debug|x64.Build.0 = Debug|x64
 		${client_core.guid}.Release|x64.ActiveCfg = Release|x64

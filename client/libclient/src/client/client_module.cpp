@@ -221,7 +221,7 @@ void QnClientModule::initDesktopCamera(QGLWidget* window)
 
 void QnClientModule::initMetaInfo()
 {
-    Q_INIT_RESOURCE(client);
+    Q_INIT_RESOURCE(libclient);
     Q_INIT_RESOURCE(appserver2);
     QnClientMetaTypes::initialize();
 }

@@ -1,3 +1,5 @@
+TARGET = client
+
 INCLUDEPATH +=  ${root.dir}/appserver2/src \
                 ${root.dir}/client/libclient_core/src \
                 ${root.dir}/common_libs/nx_vms_utils/src \
