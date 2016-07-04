@@ -34,6 +34,7 @@ TEST(CloudModuleEndPointFetcher, common)
                 cdbEndpoint = endpoint;
             });
         const auto result = endpointFuture.get();
+        endPointFetcher.pleaseStopSync();
         if (result == nx_http::StatusCode::serviceUnavailable)
             continue;   //sometimes server reports 503
         ASSERT_EQ(result, nx_http::StatusCode::ok);
