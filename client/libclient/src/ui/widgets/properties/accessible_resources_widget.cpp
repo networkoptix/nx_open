@@ -28,6 +28,12 @@
 
 namespace
 {
+    const int kNoDataFontPixelSize = 24;
+    const int kNoDataFontWeight = QFont::Light;
+    const int kCameraNameFontPixelSize = 13;
+    const int kCameraNameFontWeight = QFont::DemiBold;
+    const int kCameraPreviewWidthPixels = 160;
+
     class QnResourcesListSortModel : public QSortFilterProxyModel
     {
         typedef QSortFilterProxyModel base_type;
@@ -145,14 +151,14 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     }
 
     QFont font;
-    font.setPixelSize(24);
-    font.setWeight(QFont::Light);
+    font.setPixelSize(kNoDataFontPixelSize);
+    font.setWeight(kNoDataFontWeight);
     ui->previewWidget->setFont(font);
-    ui->previewWidget->setThumbnailSize(QSize(160, 0));
+    ui->previewWidget->setThumbnailSize(QSize(kCameraPreviewWidthPixels, 0));
     ui->previewWidget->hide();
 
-    font.setPixelSize(13);
-    font.setWeight(QFont::DemiBold);
+    font.setPixelSize(kCameraNameFontPixelSize);
+    font.setWeight(kCameraNameFontWeight);
     ui->namePlainText->setFont(font);
     ui->namePlainText->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->namePlainText->setFocusPolicy(Qt::NoFocus);
@@ -160,6 +166,10 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     ui->namePlainText->document()->setDocumentMargin(0.0);
     ui->namePlainText->hide();
 
+    /*
+     * We use QPlainTextEdit instead of QLabel because we want the label wrapped at any place, not just word boundary.
+     *  But it doesn't have precise vertical size hint, therefore we have to adjust maximum vertical size.
+     */
     connect(ui->namePlainText->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, this,
         [this](const QSizeF& size)
         {
