@@ -54,7 +54,7 @@ void OutgoingTunnel::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 
     if (!m_connectors.empty())
     {
-        BarrierHandler barrier(
+        utils::BarrierHandler barrier(
             [this, handler = std::move(handler)]() mutable
             {
                 m_timer.post(

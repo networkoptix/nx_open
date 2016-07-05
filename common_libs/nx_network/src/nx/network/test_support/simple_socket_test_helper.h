@@ -6,7 +6,7 @@
 
 #include <boost/optional.hpp>
 
-#include <utils/thread/sync_queue.h>
+#include <nx/utils/test_support/sync_queue.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/abstract_socket.h>
@@ -232,8 +232,8 @@ void socketSimpleAsync(
     int clientCount,
     StopSocketFunc stopSocket)
 {
-    nx::TestSyncQueue< SystemError::ErrorCode > serverResults;
-    nx::TestSyncQueue< SystemError::ErrorCode > clientResults;
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > serverResults;
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > clientResults;
 
     auto server = serverMaker();
     ASSERT_TRUE(server->setNonBlockingMode(true));
@@ -323,8 +323,8 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
 {
     static const std::chrono::milliseconds timeout(1500);
 
-    nx::TestSyncQueue< SystemError::ErrorCode > acceptResults;
-    nx::TestSyncQueue< SystemError::ErrorCode > connectResults;
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > acceptResults;
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > connectResults;
 
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectedSockets;
@@ -534,7 +534,7 @@ void socketSimpleTrueAsync(
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
-    nx::TestSyncQueue<bool> stopQueue;
+    nx::utils::TestSyncQueue<bool> stopQueue;
     socketSimpleAsync<ServerSocketMaker, ClientSocketMaker>(
         serverMaker, clientMaker, serverAddress, serverAddress, testMessage, clientCount,
         [&](std::unique_ptr<QnStoppableAsync> socket)
@@ -609,7 +609,7 @@ void socketSingleAioThread(
 {
     aio::AbstractAioThread* aioThread(nullptr);
     std::vector<decltype(clientMaker())> sockets;
-    nx::TestSyncQueue<nx::utils::thread::id> threadIdQueue;
+    nx::utils::TestSyncQueue<nx::utils::thread::id> threadIdQueue;
 
     for (auto i = 0; i < clientCount; ++i)
     {
@@ -728,7 +728,7 @@ void socketAcceptTimeoutAsync(
     ASSERT_TRUE(server->bind(serverAddress));
     ASSERT_TRUE(server->listen(5));
 
-    nx::TestSyncQueue< SystemError::ErrorCode > serverResults;
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > serverResults;
     const auto start = std::chrono::system_clock::now();
     server->acceptAsync([&](SystemError::ErrorCode /*code*/,
                             AbstractStreamSocket* /*socket*/)

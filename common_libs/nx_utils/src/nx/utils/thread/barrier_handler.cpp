@@ -1,6 +1,7 @@
 #include "barrier_handler.h"
 
 namespace nx {
+namespace utils {
 
 BarrierHandler::BarrierHandler(nx::utils::MoveOnlyFunc<void()> handler)
 {
@@ -24,4 +25,5 @@ std::function<void()> BarrierHandler::fork()
     return [holder]() { holder->reset(); };
 }
 
+} // namespace utils
 } // namespace nx

@@ -22,7 +22,7 @@ SocketGlobals::~SocketGlobals()
 
     nx::utils::promise< void > promise;
     {
-        BarrierHandler barrier([&](){ promise.set_value(); });
+        utils::BarrierHandler barrier([&](){ promise.set_value(); });
         m_addressResolver.pleaseStop( barrier.fork() );
         m_addressPublisher.pleaseStop( barrier.fork() );
         m_mediatorConnector->pleaseStop( barrier.fork() );

@@ -4,7 +4,7 @@
 #include <nx/network/upnp/upnp_async_client.h>
 #include <nx/network/upnp/upnp_port_mapper.h>
 #include <nx/utils/std/thread.h>
-#include <utils/thread/sync_queue.h>
+#include <nx/utils/thread/sync_queue.h>
 
 
 namespace nx_upnp {
@@ -58,7 +58,7 @@ private:
     mutable QMutex m_mutex;
     Mappings m_mappings;
     nx::utils::thread m_thread;
-    nx::SyncQueue< std::function< void() > > m_tasks;
+    nx::utils::SyncQueue< std::function< void() > > m_tasks;
 };
 
 class PortMapperMocked

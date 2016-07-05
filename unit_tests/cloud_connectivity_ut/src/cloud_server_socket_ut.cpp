@@ -537,7 +537,7 @@ protected:
 
     std::shared_ptr<stun::test::AsyncClientMock> m_stunClient;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
-    TestSyncQueue<SystemError::ErrorCode> m_connectedResults;
+    utils::TestSyncQueue<SystemError::ErrorCode> m_connectedResults;
     std::vector<nx::utils::thread> m_threads;
 
     QnMutex m_mutex;

@@ -201,7 +201,7 @@ AbstractStreamSocket* MultipleServerSocket::accept()
 
 void MultipleServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    nx::BarrierHandler barrier(
+    nx::utils::BarrierHandler barrier(
         [this, handler = std::move(handler)]()
         {
             m_acceptHandler = nullptr;

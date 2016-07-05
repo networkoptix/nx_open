@@ -5,7 +5,7 @@
 #include <gmock/gmock.h>
 
 #include <common/common_globals.h>
-#include <utils/thread/sync_queue.h>
+#include <nx/utils/test_support/sync_queue.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/stun/async_client_user.h>
@@ -64,7 +64,7 @@ protected:
     SystemError::ErrorCode sendTestRequestSync()
     {
         Message request(Header(MessageClass::request, MethodType::bindingMethod));
-        TestSyncMultiQueue<SystemError::ErrorCode, Message> waiter;
+        utils::TestSyncMultiQueue<SystemError::ErrorCode, Message> waiter;
         client->sendRequest(std::move(request), waiter.pusher());
         return waiter.pop().first;
     }
@@ -85,7 +85,7 @@ protected:
 
     SystemError::ErrorCode sendIndicationSync(int method)
     {
-        TestSyncQueue<SystemError::ErrorCode> sendWaiter;
+        utils::TestSyncQueue<SystemError::ErrorCode> sendWaiter;
         const auto connection = server->connections.front();
         connection->sendMessage(
             Message(Header(MessageClass::indication, method)),
@@ -138,7 +138,7 @@ TEST_F(StunClientServerTest, RequestResponse)
     {
         Message request(Header(MessageClass::request, MethodType::bindingMethod));
 
-        TestSyncMultiQueue<SystemError::ErrorCode, Message> waiter;
+        utils::TestSyncMultiQueue<SystemError::ErrorCode, Message> waiter;
         client->sendRequest(std::move(request), waiter.pusher());
 
         const auto result = waiter.pop();
@@ -161,7 +161,7 @@ TEST_F(StunClientServerTest, RequestResponse)
     {
         Message request(Header(MessageClass::request, 0xFFF /* unknown */));
 
-        TestSyncMultiQueue<SystemError::ErrorCode, Message> waiter;
+        utils::TestSyncMultiQueue<SystemError::ErrorCode, Message> waiter;
         client->sendRequest(std::move(request), waiter.pusher());
 
         const auto result = waiter.pop();
@@ -182,7 +182,7 @@ TEST_F(StunClientServerTest, Indications)
 {
     const auto address = startServer();
 
-    TestSyncQueue<Message> recvWaiter;
+    utils::TestSyncQueue<Message> recvWaiter;
     client->connect(address);
     client->setIndicationHandler(0xAB, recvWaiter.pusher());
     client->setIndicationHandler(0xCD, recvWaiter.pusher());
@@ -213,7 +213,7 @@ struct TestUser
         sendRequest(std::move(request), responses.pusher());
     }
 
-    TestSyncMultiQueue<SystemError::ErrorCode, Message> responses;
+    utils::TestSyncMultiQueue<SystemError::ErrorCode, Message> responses;
 };
 
 static const size_t USER_COUNT = 3;

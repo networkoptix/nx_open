@@ -270,7 +270,7 @@ void AddressResolver::cancel(
     }
 
     {
-        BarrierHandler barrier(std::move(handler));
+        utils::BarrierHandler barrier(std::move(handler));
         QnMutexLocker lk(&m_mutex);
         const auto range = m_requests.equal_range(requestId);
         for (auto it = range.first; it != range.second;)
