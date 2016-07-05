@@ -1,5 +1,4 @@
-#ifndef QN_CAMERA_SETTINGS_WIDGET_H
-#define QN_CAMERA_SETTINGS_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 #include "api/media_server_connection.h"
@@ -12,12 +11,14 @@ class QStackedWidget;
 class QnSingleCameraSettingsWidget;
 class QnMultipleCameraSettingsWidget;
 
-class QnCameraSettingsWidget: public QWidget, public QnWorkbenchContextAware {
+class QnCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware
+{
     Q_OBJECT;
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
 
 public:
-    enum Mode {
+    enum Mode
+    {
         InvalidMode,
         EmptyMode,
         SingleMode,
@@ -89,6 +90,3 @@ private:
     QnSingleCameraSettingsWidget *m_singleWidget;
     QnMultipleCameraSettingsWidget *m_multiWidget;
 };
-
-
-#endif // QN_CAMERA_SETTINGS_WIDGET_H

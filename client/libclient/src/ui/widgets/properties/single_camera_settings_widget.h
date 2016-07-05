@@ -1,5 +1,4 @@
-#ifndef CAMERA_SETTINGS_DIALOG_H
-#define CAMERA_SETTINGS_DIALOG_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
@@ -13,7 +12,7 @@
 #include <nx/utils/uuid.h>
 
 namespace Ui {
-    class SingleCameraSettingsWidget;
+class SingleCameraSettingsWidget;
 }
 
 class QVBoxLayout;
@@ -22,7 +21,8 @@ class QnCameraSettingsWidgetPrivate;
 class QnImageProvider;
 class CameraAdvancedSettingsWebPage;
 
-class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware {
+class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware
+{
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
@@ -46,22 +46,26 @@ public:
     bool hasChanges() const;
 
     /** Checks if user changed schedule controls but not applied them */
-    bool hasScheduleControlsChanges() const {
+    bool hasScheduleControlsChanges() const
+    {
         return m_hasScheduleControlsChanges;
     }
 
     /** Clear flag that user changed schedule controls but not applied them */
-    void clearScheduleControlsChanges() {
+    void clearScheduleControlsChanges()
+    {
         m_hasScheduleControlsChanges = false;
     }
 
     /** Checks if user changed motion controls but not applied them */
-    bool hasMotionControlsChanges() const {
+    bool hasMotionControlsChanges() const
+    {
         return m_hasMotionControlsChanges;
     }
 
     /** Clear flag that  user changed motion controls but not applied them */
-    void clearMotionControlsChanges() {
+    void clearMotionControlsChanges()
+    {
         m_hasMotionControlsChanges = false;
     }
 
@@ -91,7 +95,7 @@ protected:
 
     QnCameraSettingsWidgetPrivate* d_ptr;
 
-private slots:
+    private slots:
     void at_tabWidget_currentChanged();
     void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
@@ -162,5 +166,3 @@ private:
     QHash<QnUuid, QnImageProvider*> m_imageProvidersByResourceId;
 
 };
-
-#endif // CAMERA_SETTINGS_DIALOG_H

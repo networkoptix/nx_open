@@ -1,5 +1,4 @@
-#ifndef QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
-#define QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 #include "api/media_server_connection.h"
@@ -9,12 +8,13 @@
 #include <ui/common/updatable.h>
 
 namespace Ui {
-    class MultipleCameraSettingsWidget;
+class MultipleCameraSettingsWidget;
 }
 
 class QnCameraSettingsWidgetPrivate;
 
-class QnMultipleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware, public QnUpdatable {
+class QnMultipleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware, public QnUpdatable
+{
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
@@ -40,17 +40,20 @@ public:
     /** Check if second stream is enabled if there are Motion+LQ tasks in schedule. */
     bool isValidSecondStream();
 
-    bool hasDbChanges() const {
+    bool hasDbChanges() const
+    {
         return m_hasDbChanges;
     }
 
     /** Checks if user changed controls but not applied them to the schedule */
-    bool hasScheduleControlsChanges() const {
+    bool hasScheduleControlsChanges() const
+    {
         return m_hasScheduleControlsChanges;
     }
 
     /** Clear flag that user changed schedule controls but not applied them */
-    void clearScheduleControlsChanges() {
+    void clearScheduleControlsChanges()
+    {
         m_hasScheduleControlsChanges = false;
     }
 
@@ -61,7 +64,7 @@ public:
 signals:
     void hasChangesChanged();
 
-private slots:
+    private slots:
     void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged(int state);
@@ -97,5 +100,3 @@ private:
     bool m_readOnly;
     bool m_inUpdateMaxFps;
 };
-
-#endif // QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
