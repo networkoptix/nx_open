@@ -91,7 +91,8 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
             if (m_uiController)
             {
                 m_uiController->disconnectFromSystem();
-//                qnCloudStatusWatcher->setCloudCredentials(uri.authenticator().user, uri.authenticator().password);
+                qnCloudStatusWatcher->setCloudCredentials(
+                    uri.authenticator().user, uri.authenticator().password);
             }
             break;
     }
