@@ -220,7 +220,8 @@ public:
                 if (destinationIndex > sourceIndex)
                 {
                     /* Role moved forward: */
-                    newPosition = std::rotate(roleIterator, roleIterator + 1, newPosition);
+                    std::rotate(roleIterator, roleIterator + 1, newPosition);
+                    --newPosition;
                     --destinationInFullList;
                 }
                 else
