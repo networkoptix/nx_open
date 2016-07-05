@@ -947,12 +947,12 @@
                 <rdep.target>tx1</rdep.target>
                 <gcc.version>4.8.4</gcc.version>
                 <qt.spec/>
-                <linux.defines>DISABLE_FESTIVAL</linux.defines>
             </properties>
             <modules>
                 <module>client.core</module>
                 <module>client</module>
                 <module>client.bin</module>
+                <module>nx_cloud/libvms_gateway</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speach_synthesizer</module>
             </modules>

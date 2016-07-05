@@ -108,7 +108,7 @@
             <properties>
                 <rdep.linux.packages>festival any/festival-vox</rdep.linux.packages>
             </properties>
-        </profile>  
+        </profile>
 
         <profile>
             <id>linux-arm-bananapi</id>
@@ -127,7 +127,7 @@
             <properties>
                 <rdep.linux.packages>festival any/festival-vox</rdep.linux.packages>
             </properties>
-        </profile>  
+        </profile>
 
         <profile>
             <id>linux-arm-rpi</id>
@@ -140,6 +140,25 @@
                 <property>
                     <name>box</name>
                     <value>rpi</value>
+                </property>
+            </activation>
+
+            <properties>
+                <rdep.linux.packages>festival any/festival-vox</rdep.linux.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>linux-arm-tx1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>tx1</value>
                 </property>
             </activation>
 

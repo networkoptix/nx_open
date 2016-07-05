@@ -22,7 +22,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
-    
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>appserver2</artifactId>
@@ -36,20 +36,29 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_streaming</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>  
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_vms_utils</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_vms_utils/pom.xml</systemPath>
-        </dependency>  
-        
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libvms_gateway</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libvms_gateway/pom.xml</systemPath>
+        </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloud_db_client</artifactId>
@@ -58,7 +67,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/nx_cloud/cloud_db_client/pom.xml</systemPath>
         </dependency>
-        
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_fusion</artifactId>
@@ -66,7 +75,7 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
-        </dependency>         
+        </dependency>
     </dependencies>
 
     <properties>
@@ -81,7 +90,7 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <rdep.packages>openssl ffmpeg</rdep.packages>
     </properties>
-    
+
     <profiles>
         <profile>
             <id>windows</id>
@@ -89,7 +98,7 @@
                 <os>
                     <family>Windows</family>
                 </os>
-            </activation>            
+            </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
             </properties>
@@ -99,12 +108,12 @@
             <activation>
                 <os>
                     <family>unix</family>
-                </os> 
-            </activation>            
+                </os>
+            </activation>
             <properties>
                 <buildLib>sharedlib</buildLib>
             </properties>
-        </profile>	
+        </profile>
         <profile>
             <id>mobile-android</id>
             <activation>
@@ -148,5 +157,5 @@
                 <rdep.linux.packages>quazip opengl-es-mali</rdep.linux.packages>
             </properties>
         </profile>
-    </profiles>	
+    </profiles>
 </project>
