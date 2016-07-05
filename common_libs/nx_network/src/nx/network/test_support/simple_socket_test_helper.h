@@ -59,7 +59,8 @@ void syncSocketServerMainFunc(
     Buffer testMessage,
     int clientCount,
     ServerSocketType server,
-    nx::utils::promise<SocketAddress>* startedPromise)
+    nx::utils::promise<SocketAddress>* startedPromise,
+    bool ignoreReadWriteError = false)
 {
     ASSERT_TRUE(server->setReuseAddrFlag(true));
 
@@ -126,13 +127,18 @@ void syncSocketServerMainFunc(
             continue;
 
         const auto incomingMessage = readNBytes(client.get(), testMessage.size());
-        ASSERT_TRUE(!incomingMessage.isEmpty())
-            << SystemError::getLastOSErrorText().toStdString();
-
-        ASSERT_EQ(testMessage, incomingMessage);
+        if (!ignoreReadWriteError)
+        {
+            ASSERT_TRUE(!incomingMessage.isEmpty())
+                << SystemError::getLastOSErrorText().toStdString();
+            ASSERT_EQ(testMessage, incomingMessage);
+        }
 
         const int bytesSent = client->send(testMessage);
-        ASSERT_NE(-1, bytesSent) << SystemError::getLastOSErrorText().toStdString();
+        if (!ignoreReadWriteError)
+        {
+            ASSERT_NE(-1, bytesSent) << SystemError::getLastOSErrorText().toStdString();
+        }
 
         //waiting for connection to be closed by client
         QByteArray buf(64, 0);
@@ -169,7 +175,8 @@ void socketSimpleSync(
         testMessage,
         clientCount,
         std::move(server),
-        &promise);
+        &promise,
+        false);
 
     auto serverAddress = promise.get_future().get();
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -398,7 +405,10 @@ void socketShutdown(
             useAsyncPriorSync ? kTestMessage : Buffer(),
             1,
             serverMaker(),
-            &promise);
+            &promise,
+            true);  //this test shuts down socket, so any server socket operation may fail 
+                    //at any moment, so ignoring errors in serverThread.
+                    //Testing that shutdown interrupts client socket operations
 
         auto serverAddress = promise.get_future().get();
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -447,7 +457,21 @@ void socketShutdown(
 
                 nx::Buffer readBuffer;
                 readBuffer.resize(4096);
-                while (client->recv(readBuffer.data(), readBuffer.size(), 0) > 0);
+                //while (client->recv(readBuffer.data(), readBuffer.size(), 0) > 0);
+
+                for (;;)
+                {
+                    const int bytesRead = client->recv(readBuffer.data(), readBuffer.size(), 0);
+                    if (bytesRead > 0)
+                        continue;
+                    if (bytesRead < 0 &&
+                        SystemError::getLastOSErrorCode() == SystemError::wouldBlock)
+                    {
+                        continue;
+                    }
+                    break;  //connection closed
+                }
+
                 recvExitedPromise.set_value();
             });
 
@@ -466,8 +490,15 @@ void socketShutdown(
             std::future_status::ready,
             recvExitedPromise.get_future().wait_for(std::chrono::seconds(1)));
 
+        using namespace std::chrono;
+        const auto t1 = steady_clock::now();
         serverThread.join();
+        const auto t2 = steady_clock::now();
+        std::cout<<"serverThread.join() took "
+            <<duration_cast<seconds>(t2-t1).count()<<std::endl;
         clientThread.join();
+        std::cout<<"clientThread.join() took "
+            <<duration_cast<seconds>(steady_clock::now()-t2).count()<<std::endl;
     }
 }
 
