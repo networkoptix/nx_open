@@ -1495,7 +1495,7 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
         return;
 
     QUrl serverUrl = server->getApiUrl();
-    auto vmsGatewayAddress = nx::cloud::gateway::VmsGatewayEmbeddable::instance()
+    const auto vmsGatewayAddress = nx::cloud::gateway::VmsGatewayEmbeddable::instance()
         ->endpoint().toString();
 
     QUrl url(lit("http://%1/%2:%3/api/showLog")
