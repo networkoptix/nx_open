@@ -17,10 +17,12 @@ public:
     void setLayoutId(const QString& layoutId);
 
 public slots:
+    void disconnectFromSystem();
     void openResourcesScreen();
     void openVideoScreen(const QnUuid& cameraId);
 
 signals:
+    void disconnectRequested();
     void layoutIdChanged();
     void resourcesScreenRequested();
     void videoScreenRequested(const QString& cameraId);

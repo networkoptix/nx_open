@@ -4,7 +4,7 @@
 #include <QtCore/QSettings>
 
 #include <nx/utils/raii_guard.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 namespace
 {

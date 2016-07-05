@@ -4,6 +4,8 @@
 
 #include <core/resource/resource.h>
 
+#include <nx/streaming/config.h>
+
 #include <nx/utils/log/log.h>
 
 struct FffmpegLog

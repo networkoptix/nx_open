@@ -6,6 +6,7 @@
 #include <QtCore/QTemporaryFile>
 
 #include "nx/streaming/video_data_packet.h"
+#include <nx/streaming/config.h>
 #include "licensing/license.h"
 #include "utils/media/nalUnits.h"
 #include "utils/common/util.h"
@@ -122,7 +123,7 @@ void QnSignHelper::doUpdateDigest(CodecID codecId, const quint8* extradata, int 
         while (curNal < dataEnd - reqUnitSize)
         {
             int curSize = 0;
-            for (int i = 0; i < reqUnitSize; ++i) 
+            for (int i = 0; i < reqUnitSize; ++i)
                 curSize = (curSize << 8) + curNal[i];
             curNal += reqUnitSize;
             curSize = qMin(curSize, (int)(dataEnd - curNal));
@@ -175,7 +176,7 @@ QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
                 writer.putBit(1);
             else if (avgColor >= (255-COLOR_THRESHOLD))
                 writer.putBit(0);
-            else 
+            else
                 return QByteArray(); // invalid data
 
             // check colors plane
@@ -313,7 +314,7 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
     m_roundRectPixmap = QPixmap(SQUARE_SIZE, SQUARE_SIZE);
     QPainter tmpPainter(&m_roundRectPixmap);
     tmpPainter.fillRect(0,0, SQUARE_SIZE, SQUARE_SIZE, signBkColor);
-    
+
     tmpPainter.setBrush(Qt::black);
     tmpPainter.setPen(QColor(signBkColor.red()/2,signBkColor.green()/2,signBkColor.blue()/2));
     tmpPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
@@ -355,8 +356,8 @@ void QnSignHelper::drawOnSignFrame(AVFrame* frame)
         srcLineSize[0] = img.bytesPerLine();
         srcLineSize[1] = srcLineSize[2] = srcLineSize[3] = 0;
         sws_scale(scaleContext,
-            srcData, srcLineSize, 
-            0, frame->height, 
+            srcData, srcLineSize,
+            0, frame->height,
             frame->data, frame->linesize);
 
         sws_freeContext(scaleContext);
@@ -504,13 +505,13 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, QnCo
     frame.m_shortDeserializeMode = false;
     if (frame.deserialize(&newSps, &newPps) != 0)
         return -1;
-    if (!frame.moveHeaderField(frame.m_picOrderBitPos+8, oldLen, newLen)) 
+    if (!frame.moveHeaderField(frame.m_picOrderBitPos+8, oldLen, newLen))
         return out_size;
 
     oldLen = oldSps.log2_max_frame_num;
     newLen = newSps.log2_max_frame_num;
     NX_ASSERT(newLen <= oldLen);
-    if (!frame.moveHeaderField(frame.m_frameNumBitPos+8, oldLen, newLen)) 
+    if (!frame.moveHeaderField(frame.m_frameNumBitPos+8, oldLen, newLen))
         return out_size;
 
     out_size = frame.encodeNAL(nalData, videoBufSize-nalCodeLen) + nalCodeLen;
@@ -555,7 +556,7 @@ int QnSignHelper::correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* 
     }
     else {
         int tmp = out_size - reqUnitSize;
-        for (int i = 0; i < reqUnitSize; ++i) 
+        for (int i = 0; i < reqUnitSize; ++i)
         {
             videoBuf[reqUnitSize-1-i] = (quint8) tmp;
             tmp >>= 8;
@@ -576,7 +577,7 @@ int QnSignHelper::runX264Process(AVFrame* frame, QString optionStr, quint8* rezB
     file.write((const char*) frame->data[1], frame->linesize[1]*frame->height/(1 << descr->log2_chroma_h));
     file.write((const char*) frame->data[2], frame->linesize[2]*frame->height/(1 << descr->log2_chroma_h));
     file.close();
-                                                        
+
     QString executableName = closeDirPath(qApp->applicationDirPath()) + QLatin1String("x264");
     QString command(QLatin1String("\"%1\" %2 -o \"%3\" --input-res %4x%5 \"%6\""));
     QString outFileName(tempName + QLatin1String(".264"));
@@ -676,24 +677,24 @@ QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcC
             out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, 0); // flush encoder buffer
     }
 
-    if (videoCodecCtx->codec_id == CODEC_ID_H264) 
+    if (videoCodecCtx->codec_id == CODEC_ID_H264)
     {
         // skip x264 SEI message
         out_size = removeH264SeiMessage(videoBuf, out_size);
 
         // make X264 frame compatible with existing stream
-        out_size = correctX264Bitstream(srcCodecExtraData, iFrame, videoCodecCtx, videoBuf, out_size, videoBufSize); 
+        out_size = correctX264Bitstream(srcCodecExtraData, iFrame, videoCodecCtx, videoBuf, out_size, videoBufSize);
         if (out_size == -1)
             goto error_label;
             // change nal prefix if need
-        out_size = correctNalPrefix(srcCodecExtraData, videoBuf, out_size, videoBufSize); 
+        out_size = correctNalPrefix(srcCodecExtraData, videoBuf, out_size, videoBufSize);
     }
 
     generatedFrame = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
     generatedFrame->compressionType = videoCodecCtx->codec_id;
     generatedFrame->m_data.write((const char*) videoBuf, out_size);
     generatedFrame->flags = QnAbstractMediaData::MediaFlags_AVKey;
-    generatedFrame->channelNumber = 0; 
+    generatedFrame->channelNumber = 0;
 error_label:
     delete [] videoBuf;
     QnFfmpegHelper::deleteAvCodecContext(videoCodecCtx);

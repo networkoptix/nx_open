@@ -25,11 +25,11 @@ namespace media {
 void DecoderRegistrar::registerDecoders(
     std::shared_ptr<AbstractResourceAllocator> allocator,
     const QSize& maxFfmpegResolution,
-    bool liteClientMode)
+    bool isTranscodingEnabled)
 {
     assert(allocator);
 
-    VideoDecoderRegistry::instance()->setLiteClientMode(liteClientMode);
+    VideoDecoderRegistry::instance()->setTranscodingEnabled(isTranscodingEnabled);
 
     // ATTENTION: Order of registration defines the priority of choosing: first comes first.
 

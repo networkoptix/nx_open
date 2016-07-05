@@ -1,21 +1,6 @@
 #pragma once
 
 // -------------------------------------------------------------------------- //
-// Application globals. Do not change.
-// -------------------------------------------------------------------------- //
-
-/** Media data alignment. We use 32 for compatibility with AVX instruction set */
-#define CL_MEDIA_ALIGNMENT 32
-
-/** Additional free space at a end of memory block. Some ffmpeg calls requires it */
-#define CL_MEDIA_EXTRA 8
-
-#define CL_MAX_CHANNELS 4 // TODO: #Elric get rid of this definition
-
-//TODO: #GDM think about correct place
-static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
-
-// -------------------------------------------------------------------------- //
 // Library & Compiler globals. Do not change.
 // -------------------------------------------------------------------------- //
 
@@ -72,6 +57,12 @@ static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
 #   pragma warning(error: 4806) /* unsafe operation: no value of type 'INTEGRAL' promoted to type 'ENUM' can equal the given constant */
 #endif
 
+/* Compatibility for msvc2012 */
+#ifdef _WIN32
+#   if _MSC_VER < 1800
+#       define noexcept
+#   endif
+#endif
 
 
 // -------------------------------------------------------------------------- //

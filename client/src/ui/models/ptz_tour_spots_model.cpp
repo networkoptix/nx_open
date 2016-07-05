@@ -7,7 +7,7 @@
 #include <ui/style/globals.h>
 
 #include <nx/utils/collection.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 namespace {
     static const qreal speedLowest  = 0.15;
@@ -103,7 +103,7 @@ void QnPtzTourSpotsModel::setSpots(const QnPtzTourSpotList &spots) {
 QnPtzPresetList QnPtzTourSpotsModel::sortedPresets() const {
     QnPtzPresetList result = m_presets;
     std::sort(result.begin(), result.end(),  [](const QnPtzPreset &l, const QnPtzPreset &r) {
-        return naturalStringLess(l.name, r.name);
+        return nx::utils::naturalStringLess(l.name, r.name);
     });
     return result;
 }

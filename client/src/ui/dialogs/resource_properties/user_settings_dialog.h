@@ -49,6 +49,7 @@ protected:
 
 private:
     void updateControlsVisibility();
+    void permissionsChanged();
 
 private:
     Q_DISABLE_COPY(QnUserSettingsDialog)

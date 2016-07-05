@@ -4,6 +4,7 @@
 
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/config.h>
 #include "utils/media/audio_processor.h"
 #include "utils/media/ffmpeg_helper.h"
 

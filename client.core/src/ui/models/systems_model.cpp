@@ -191,10 +191,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
     case OwnerDescriptionRoleId:
     {
         if (!systemDescription->isCloudSystem())
-        {
-            NX_ASSERT(false, "Non-cloud system can't have cloud owner!");
-            return lit("WRONG USER NAME! BUG");
-        }
+            return QString(); // No owner for local system
 
         if ((qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Online)
             && (qnCloudStatusWatcher->cloudLogin() == systemDescription->ownerAccountEmail()))

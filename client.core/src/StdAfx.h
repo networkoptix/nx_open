@@ -1,11 +1,11 @@
 #define QT_NO_CAST_FROM_ASCII
 
-#include <common/config.h>
-#ifdef __cplusplus
-#   include <common/common_globals.h>
-#endif
+#include <nx/utils/compiler_options.h>
 
 #ifdef __cplusplus
+
+/* This file should be included only main in vms projects. */
+#include <common/common_globals.h>
 
 /* STL headers. */
 #include <algorithm>
@@ -47,3 +47,6 @@
 #include <QtGui/QPixmapCache>
 
 #endif
+
+#include <nx/utils/literal.h>
+#include <nx/utils/deprecation.h>

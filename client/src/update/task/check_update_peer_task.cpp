@@ -38,7 +38,7 @@ namespace {
         QString data = QString::fromUtf8(infoFile.readAll());
         infoFile.close();
 
-        QRegExp minimalVersionRegExp(lit("\"minimalVersion\"\\s*:\\s*\"([\\d\\.]+)\""));
+        QRegExp minimalVersionRegExp(QLatin1String("\"minimalVersion\"\\s*:\\s*\"([\\d\\.]+)\""));
         if (minimalVersionRegExp.indexIn(data) != -1)
             return QnSoftwareVersion(minimalVersionRegExp.cap(1));
 
@@ -186,7 +186,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
     NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Reply received from %1.").arg(reply->url().toString()), cl_logDEBUG2);
 
     QByteArray data = reply->data();
-    
+
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
 
     if (m_currentUpdateUrl == m_mainUpdateUrl) {

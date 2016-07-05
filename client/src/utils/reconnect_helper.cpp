@@ -17,7 +17,7 @@
 #include <client/client_settings.h>
 
 #include <nx/utils/collection.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <network/module_finder.h>
 
 namespace {
@@ -68,7 +68,7 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /* = NULL*/):
 
     std::sort(m_allServers.begin(), m_allServers.end(), [serverName](const QnMediaServerResourcePtr &left, const QnMediaServerResourcePtr &right)
     {
-        return naturalStringLess(serverName(left), serverName(right));
+        return nx::utils::naturalStringLess(serverName(left), serverName(right));
     });
 
     printLog("Full server list:");

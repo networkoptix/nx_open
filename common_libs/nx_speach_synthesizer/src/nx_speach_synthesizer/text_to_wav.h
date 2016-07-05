@@ -1,4 +1,4 @@
-#if !defined(EDGE_SERVER)
+#if !defined(EDGE_SERVER) && !defined(DISABLE_FESTIVAL)
 
 #ifndef TEXT_TO_WAV_H
 #define TEXT_TO_WAV_H

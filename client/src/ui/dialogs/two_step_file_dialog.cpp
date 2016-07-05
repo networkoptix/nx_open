@@ -10,7 +10,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/dialogs/common/file_dialog.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 namespace {
 
@@ -126,7 +126,7 @@ QString QnTwoStepFileDialog::selectedFile() const {
         NX_ASSERT(false);
     }
 
-    QString selectedExtension = extractFileExtension(selectedNameFilter());
+    QString selectedExtension = nx::utils::extractFileExtension(selectedNameFilter());
 
     if (!fileName.endsWith(selectedExtension))
         fileName += selectedExtension;

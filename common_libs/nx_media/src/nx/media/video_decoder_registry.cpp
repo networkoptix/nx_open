@@ -1,4 +1,3 @@
-#include <elf.h>
 #include "video_decoder_registry.h"
 
 #include <QtCore/QMutexLocker>
@@ -85,14 +84,14 @@ QSize VideoDecoderRegistry::maxResolution(const CodecID codec)
     return result;
 }
 
-bool VideoDecoderRegistry::isLiteClientMode() const
+bool VideoDecoderRegistry::isTranscodingEnabled() const
 {
-    return m_isLiteClientMode;
+    return m_isTranscodingEnabled;
 }
 
-void VideoDecoderRegistry::setLiteClientMode(bool liteMode)
+void VideoDecoderRegistry::setTranscodingEnabled(bool transcodingEnabled)
 {
-    m_isLiteClientMode = liteMode;
+    m_isTranscodingEnabled = transcodingEnabled;
 }
 
 } // namespace media

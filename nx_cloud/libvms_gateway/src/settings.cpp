@@ -56,9 +56,15 @@ namespace
     const QLatin1String kHttpProxyTargetPort("http/proxyTargetPort");
     const int kDefaultHttpProxyTargetPort = 0;
 
+    const QLatin1String kHttpConnectSupport("http/connectSupport");
+    const int kDefaultHttpConnectSupport = 0;
+
     //cloudConnect
     const QLatin1String kReplaceHostAddressWithPublicAddress("cloudConnect/replaceHostAddressWithPublicAddress");
     const QLatin1String kDefaultReplaceHostAddressWithPublicAddress("true");
+
+    const QLatin1String kAllowIpTarget("cloudConnect/allowIpTarget");
+    const QLatin1String kDefaultAllowIpTarget("false");
 
     const QLatin1String kFetchPublicIpUrl("cloudConnect/fetchPublicIpUrl");
     const QLatin1String kDefaultFetchPublicIpUrl("http://networkoptix.com/myip");
@@ -72,13 +78,15 @@ namespace conf {
 
 Http::Http()
 :
-    proxyTargetPort(0)
+    proxyTargetPort(0),
+    connectSupport(false)
 {
 }
 
 CloudConnect::CloudConnect()
 :
-    replaceHostAddressWithPublicAddress(false)
+    replaceHostAddressWithPublicAddress(false),
+    allowIpTarget(false)
 {
 }
 
@@ -212,12 +220,20 @@ void Settings::loadConfiguration()
     //http
     m_http.proxyTargetPort = 
         m_settings.value(kHttpProxyTargetPort, kDefaultHttpProxyTargetPort).toInt();
+    m_http.connectSupport =
+        m_settings.value(
+            kHttpConnectSupport,
+            kDefaultHttpConnectSupport) == "true";
 
     //CloudConnect
     m_cloudConnect.replaceHostAddressWithPublicAddress =
         m_settings.value(
             kReplaceHostAddressWithPublicAddress,
             kDefaultReplaceHostAddressWithPublicAddress).toString() == "true";
+    m_cloudConnect.allowIpTarget =
+        m_settings.value(
+            kAllowIpTarget,
+            kDefaultAllowIpTarget).toString() == "true";
     m_cloudConnect.fetchPublicIpUrl = 
         m_settings.value(
             kFetchPublicIpUrl,

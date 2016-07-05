@@ -12,7 +12,7 @@
 #include <nx/utils/flat_map.h>
 #include <utils/common/property_storage.h>
 #include <utils/common/evaluator.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 #include "palette_data.h"
 #include "pen_data.h"

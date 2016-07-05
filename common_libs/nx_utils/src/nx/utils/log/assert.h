@@ -84,13 +84,13 @@ private:
             \
             if (!isOk) \
                 nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
-        } while (false)
+        } while (0)
 #else
     #define NX_CHECK(condition, message, action) \
         do { \
             if (!(condition)) \
                 nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
-        } while (false)
+        } while (0)
 #endif
 
 #define NX_CRITICAL_IMPL(condition, message) NX_CHECK(condition, message, Crash)

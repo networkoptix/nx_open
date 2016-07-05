@@ -7,8 +7,6 @@
 
 #include <QtCore/QBuffer>
 
-#include <common/common_globals.h>
-
 #include <nx/network/app_info.h>
 
 #include <nx/utils/log/log.h>

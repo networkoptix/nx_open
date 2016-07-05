@@ -37,7 +37,6 @@
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
 
-
 static const char INCOMING_TRANSACTIONS_PATH[] = "ec2/forward_events";
 
 namespace ec2
@@ -686,31 +685,31 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiUserDataList>(p, ApiCommand::getUsers);
 
         /**%apidoc GET /ec2/getUserGroups
-        * Return user groups registered in the system.
-        * %param[default] format
-        * %return Return object in requested format
-        * %// AbstractUserManager::getUserGroups
-        */
+         * Return user groups registered in the system.
+         * %param[default] format
+         * %return Return object in requested format
+         * %// AbstractUserManager::getUserGroups
+         */
         registerGetFuncHandler<std::nullptr_t, ApiUserGroupDataList>(p, ApiCommand::getUserGroups);
 
         /**%apidoc GET /ec2/getAccessRights
-        * Return list of accessible resources ids for each user in the system.
-        * %param[default] format
-        * %return Return object in requested format
-        * %// AbstractUserManager::getAccessRights
-        */
+         * Return list of accessible resources ids for each user in the system.
+         * %param[default] format
+         * %return Return object in requested format
+         * %// AbstractUserManager::getAccessRights
+         */
         registerGetFuncHandler<std::nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
 
         /**%apidoc POST /ec2/setAccessRights
-        * <p>
-        * Parameters should be passed as a JSON object in POST message body with
-        * content type "application/json". Example of such object can be seen in
-        * the result of the corresponding GET function.
-        * </p>
-        * %param userId User unique id.
-        * %param resourceIds List of accessible resources ids.
-        * %// AbstractUserManager::setAccessRights
-        */
+         * <p>
+         * Parameters should be passed as a JSON object in POST message body with
+         * content type "application/json". Example of such object can be seen in
+         * the result of the corresponding GET function.
+         * </p>
+         * %param userId User unique id.
+         * %param resourceIds List of accessible resources ids.
+         * %// AbstractUserManager::setAccessRights
+         */
         registerUpdateFuncHandler<ApiAccessRightsData>(p, ApiCommand::setAccessRights);
 
         /**%apidoc POST /ec2/saveUser
@@ -729,7 +728,7 @@ namespace ec2
          *     a previously received object, use false when creating a new one.
          *     %value false
          *     %value true
- * %param permissions Combination (via "|") of the following flags:
+         * %param permissions Combination (via "|") of the following flags:
          *     %value GlobalAdminPermission Admin, can edit other non-admins.
          *     %value GlobalEditCamerasPermission Can edit camera settings.
          *     %value GlobalControlVideoWallPermission Can control videowalls.
@@ -775,36 +774,36 @@ namespace ec2
 
 
         /**%apidoc POST /ec2/saveUserGroup
-        * <p>
-        * Parameters should be passed as a JSON object in POST message body with
-        * content type "application/json". Example of such object can be seen in
-        * the result of the corresponding GET function.
-        * </p>
-        * %param id Group unique id. Should be generated when creating a new group.
-        * %param name Group name.
-        * %param permissions Combination (via "|") of the following flags:
-        *     %value GlobalEditCamerasPermission Can edit camera settings.
-        *     %value GlobalControlVideoWallPermission Can control videowalls.
-        *     %value GlobalViewArchivePermission Can view archives of available cameras.
-        *     %value GlobalExportPermission Can export archives of available cameras.
-        *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
-        *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
-        *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O buttons.
-        *     %value GlobalAccessAllCamerasPermission Has access to all cameras
-        * %// AbstractUserManager::saveGroup
-        */
+         * <p>
+         * Parameters should be passed as a JSON object in POST message body with
+         * content type "application/json". Example of such object can be seen in
+         * the result of the corresponding GET function.
+         * </p>
+         * %param id Group unique id. Should be generated when creating a new group.
+         * %param name Group name.
+         * %param permissions Combination (via "|") of the following flags:
+         *     %value GlobalEditCamerasPermission Can edit camera settings.
+         *     %value GlobalControlVideoWallPermission Can control videowalls.
+         *     %value GlobalViewArchivePermission Can view archives of available cameras.
+         *     %value GlobalExportPermission Can export archives of available cameras.
+         *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
+         *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
+         *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O buttons.
+         *     %value GlobalAccessAllCamerasPermission Has access to all cameras
+         * %// AbstractUserManager::saveGroup
+         */
         registerUpdateFuncHandler<ApiUserGroupData>(p, ApiCommand::saveUserGroup);
 
         /**%apidoc POST /ec2/removeUserGroup
-        * Delete the specified user group.
-        * <p>
-        * Parameters should be passed as a JSON object in POST message body with
-        * content type "application/json". Example of such object can be seen in
-        * the result of the corresponding GET function.
-        * </p>
-        * %param id User unique id.
-        * %// AbstractUserManager::removeUserGroup
-        */
+         * Delete the specified user group.
+         * <p>
+         * Parameters should be passed as a JSON object in POST message body with
+         * content type "application/json". Example of such object can be seen in
+         * the result of the corresponding GET function.
+         * </p>
+         * %param id User unique id.
+         * %// AbstractUserManager::removeUserGroup
+         */
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeUserGroup);
 
         /**%apidoc GET /ec2/getVideowalls
@@ -820,7 +819,7 @@ namespace ec2
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeVideowall);
         registerUpdateFuncHandler<ApiVideowallControlMessageData>(p, ApiCommand::videowallControl);
 
-		registerGetFuncHandler<std::nullptr_t, ApiWebPageDataList>( p, ApiCommand::getWebPages );
+        registerGetFuncHandler<std::nullptr_t, ApiWebPageDataList>( p, ApiCommand::getWebPages );
         registerUpdateFuncHandler<ApiWebPageData>( p, ApiCommand::saveWebPage );
         //AbstractWebPageManager::remove
         registerUpdateFuncHandler<ApiIdData>( p, ApiCommand::removeWebPage );
@@ -1131,7 +1130,8 @@ namespace ec2
         return reqID;
     }
 
-    int Ec2DirectConnectionFactory::establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo )
+    int Ec2DirectConnectionFactory::establishConnectionToRemoteServer(
+        const QUrl& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo)
     {
         const int reqID = generateRequestID();
 
@@ -1160,12 +1160,14 @@ namespace ec2
         NX_LOG( lit("%1 to %2 with %3").arg( Q_FUNC_INFO ).arg( addr.toString() ).arg( info ),
                 cl_logDEBUG1 );
 
-        auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo )
-        {
-            remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler);
-        };
+        auto func =
+            [this, reqID, addr, handler](
+                ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
+            {
+                remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler);
+            };
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
-            addr, ApiCommand::connect, loginInfo, func );
+            addr, ApiCommand::connect, loginInfo, func);
         return reqID;
     }
 
@@ -1342,33 +1344,33 @@ namespace ec2
             connectionInfo->effectiveUserName =
                 nx_http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
 
-		if (!loginInfo.clientInfo.id.isNull())
+        if (!loginInfo.clientInfo.id.isNull())
         {
-			auto clientInfo = loginInfo.clientInfo;
-			clientInfo.parentId = qnCommon->moduleGUID();
+            auto clientInfo = loginInfo.clientInfo;
+            clientInfo.parentId = qnCommon->moduleGUID();
 
-			ApiClientInfoDataList infos;
+            ApiClientInfoDataList infos;
             auto result = dbManager(Qn::kDefaultUserAccess).doQuery(clientInfo.id, infos);
-			if (result != ErrorCode::ok)
-				return result;
+            if (result != ErrorCode::ok)
+                return result;
 
             if (infos.size() && QJson::serialized(clientInfo) == QJson::serialized(infos.front()))
-			{
-				NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
-					cl_logDEBUG2);
-				return ErrorCode::ok;
-			}
+            {
+                NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
+                    cl_logDEBUG2);
+                return ErrorCode::ok;
+            }
 
             QnTransaction<ApiClientInfoData> transaction(ApiCommand::saveClientInfo, clientInfo);
             m_serverQueryProcessor.getAccess(Qn::kDefaultUserAccess).processUpdateAsync(transaction,
                 [&](ErrorCode result) {
-					if (result == ErrorCode::ok) {
-						NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
-							cl_logINFO);
-					}
-					else {
-						NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
-							.arg(toString(result)), cl_logERROR);
+                    if (result == ErrorCode::ok) {
+                        NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
+                            cl_logINFO);
+                    }
+                    else {
+                        NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
+                            .arg(toString(result)), cl_logERROR);
                     }
                 });
         }
@@ -1417,23 +1419,34 @@ namespace ec2
     template<class InputDataType>
     void Ec2DirectConnectionFactory::registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, Qn::GlobalPermission permission )
     {
-        restProcessorPool->registerHandler( lit("ec2/%1").arg(ApiCommand::toString(cmd)), new UpdateHttpHandler<InputDataType>(m_directConnection), permission);
+        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+            new UpdateHttpHandler<InputDataType>(m_directConnection),
+            permission);
     }
 
     template<class InputDataType, class CustomActionType>
-    void Ec2DirectConnectionFactory::registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, CustomActionType customAction, Qn::GlobalPermission permission )
+    void Ec2DirectConnectionFactory::registerUpdateFuncHandler(
+        QnRestProcessorPool* const restProcessorPool,
+        ApiCommand::Value cmd,
+        CustomActionType customAction,
+        Qn::GlobalPermission permission)
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new UpdateHttpHandler<InputDataType>(m_directConnection, customAction), permission );
+            new UpdateHttpHandler<InputDataType>(m_directConnection, customAction), permission);
     }
 
     template<class InputDataType, class OutputDataType>
-    void Ec2DirectConnectionFactory::registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, Qn::GlobalPermission permission )
+    void Ec2DirectConnectionFactory::registerGetFuncHandler(
+        QnRestProcessorPool* const restProcessorPool,
+        ApiCommand::Value cmd,
+        Qn::GlobalPermission permission)
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new QueryHttpHandler2<InputDataType, OutputDataType>(cmd, &m_serverQueryProcessor), permission );
+            new QueryHttpHandler2<InputDataType, OutputDataType>(cmd, &m_serverQueryProcessor),
+                permission);
     }
 
     template<class InputType, class OutputType>
@@ -1446,7 +1459,8 @@ namespace ec2
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
             new FlexibleQueryHttpHandler<InputType, OutputType>(
                 cmd,
-                std::move(handler)), permission);
+                std::move(handler)),
+            permission);
     }
 
     //!Registers handler which is able to modify HTTP response
@@ -1454,12 +1468,14 @@ namespace ec2
     void Ec2DirectConnectionFactory::registerFunctorWithResponseHandler(
         QnRestProcessorPool* const restProcessorPool,
         ApiCommand::Value cmd,
-        std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler, Qn::GlobalPermission permission)
+        std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler,
+        Qn::GlobalPermission permission)
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
             new FlexibleQueryHttpHandler<InputType, OutputType>(
                 cmd,
-                std::move(handler)), permission);
+                std::move(handler)),
+            permission);
     }
 }

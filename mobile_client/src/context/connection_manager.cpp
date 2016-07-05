@@ -22,7 +22,7 @@ namespace {
 
     const QnSoftwareVersion minimalSupportedVersion(2, 5, 0, 0);
     const QString kCloudConnectionScheme = lit("cloud");
-    const QString kLiteClientConntectionScheme = lit("liteclient");
+    const QString kLiteClientConnectionScheme = lit("liteclient");
 
     enum { kInvalidHandle = -1 };
 
@@ -36,12 +36,13 @@ namespace {
     {
         if (scheme == kCloudConnectionScheme)
             return QnConnectionManager::CloudConnection;
-        else if (scheme == kLiteClientConntectionScheme)
+        else if (scheme == kLiteClientConnectionScheme)
             return QnConnectionManager::LiteClientConnection;
         else
             return QnConnectionManager::NormalConnection;
     }
-}
+
+} // namespace
 
 class QnConnectionManagerPrivate : public Connective<QObject> {
     QnConnectionManager *q_ptr;
@@ -166,11 +167,10 @@ void QnConnectionManager::connectToServer(const QUrl &url)
     if (connectionState() != QnConnectionManager::Disconnected)
         disconnectFromServer(false);
 
-    QUrl fixedUrl(url);
-    if (fixedUrl.port() == -1)
-        fixedUrl.setPort(defaultServerPort());
-
-    d->setUrl(fixedUrl);
+    QUrl actualUrl = url;
+    if (actualUrl.port() == -1)
+        actualUrl.setPort(defaultServerPort());
+    d->setUrl(actualUrl);
     d->doConnect();
 }
 

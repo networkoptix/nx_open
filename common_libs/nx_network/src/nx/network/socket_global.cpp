@@ -59,6 +59,17 @@ void SocketGlobals::verifyInitialization()
         "SocketGlobals::InitGuard must be initialized before using Sockets");
 }
 
+void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
+{
+    if (const auto value = arguments.get(QLatin1String("enforce-mediator")))
+        mediatorConnector().mockupAddress(*value);
+
+    if (const auto value = arguments.get(QLatin1String("enforce-socket")))
+        SocketFactory::enforceStreamSocketType(*value);
+
+    SocketFactory::enforceSsl((bool)arguments.get(QLatin1String("enforce-ssl")));
+}
+
 QnMutex SocketGlobals::s_mutex;
 std::atomic<bool> SocketGlobals::s_isInitialized(false);
 size_t SocketGlobals::s_counter(0);

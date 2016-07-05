@@ -52,7 +52,7 @@
 #include <ui/style/skin.h>
 #include <utils/aspect_ratio.h>
 #include <utils/license_usage_helper.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 namespace
 {
@@ -433,7 +433,7 @@ QString QnResourceWidget::calculateTitleText() const {
         kMaxNameLength = 30
     };
 
-    return elideString(m_resource->getName(), kMaxNameLength);
+    return nx::utils::elideString(m_resource->getName(), kMaxNameLength);
 }
 
 void QnResourceWidget::updateTitleText() {

@@ -7,7 +7,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <utils/common/util.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 
 namespace
@@ -48,10 +48,10 @@ void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params)
     QnMultiserverRequestData::loadFromParams(params);
 
     if (params.contains(startTimeKey))
-        filter.startTimeMs = parseDateTime(params.value(startTimeKey)) / USEC_PER_MS;
+        filter.startTimeMs = nx::utils::parseDateTime(params.value(startTimeKey)) / USEC_PER_MS;
 
     if (params.contains(endTimeKey))
-        filter.endTimeMs = parseDateTime(params.value(endTimeKey))  / USEC_PER_MS;
+        filter.endTimeMs = nx::utils::parseDateTime(params.value(endTimeKey))  / USEC_PER_MS;
 
     QnLexical::deserialize(params.value(sortColumnKey), &filter.orderBy.column);
     QnLexical::deserialize(params.value(sortOrderKey), &filter.orderBy.order);

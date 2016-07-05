@@ -115,7 +115,7 @@
                 "shadow":           "dark5",
                 "highlight":        "brand_core",
                 "highlightedText":  "brand_contrast",
-                "link":             "blue10",
+                "link":             "blue12",
                 "linkVisited":      "blue11",
                 "alternateBase":    "dark7",
                 "toolTipBase":      "#f0f0f0",
@@ -136,11 +136,22 @@
                 "shadow":           "dark5.setAlpha(75)",
                 "highlight":        "brand_core",
                 "highlightedText":  "brand_contrast.setAlpha(75)",
-                "link":             "blue10.setAlpha(75)",
+                "link":             "blue12.setAlpha(75)",
                 "linkVisited":      "blue11.setAlpha(75)",
                 "alternateBase":    "dark7.setAlpha(75)",
                 "toolTipBase":      "#f0f0f0",
                 "toolTipText":      "#222222"
+            }
+        }
+    },
+
+    "QWidget": {
+        "palette": {
+            "default": {
+                "link":             "blue10"
+            },
+            "inactive": {
+                "link":             "blue12"
             }
         }
     },
@@ -203,8 +214,7 @@
                 "midlight":         "dark12.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(102)",
                 "text":             "light10",
-                "highlightedText":  "light4",
-                "link":             "blue12"
+                "highlightedText":  "light4"
             }
         }
     },

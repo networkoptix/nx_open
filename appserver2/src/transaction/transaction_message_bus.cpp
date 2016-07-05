@@ -717,8 +717,9 @@ namespace ec2
 
 
         NX_LOG( QnLog::EC2_TRAN_LOG, printTransaction("got transaction", tran, transportHeader, sender), cl_logDEBUG1);
-        // process system transactions
-        switch(tran.command) {
+		        // process system transactions
+        switch(tran.command) 
+		{
         case ApiCommand::lockRequest:
         case ApiCommand::lockResponse:
         case ApiCommand::unlockRequest:
@@ -754,41 +755,71 @@ namespace ec2
         case ApiCommand::updatePersistentSequence:
             updatePersistentMarker(tran, sender);
             break;
-        case ApiCommand::installUpdate:
-        case ApiCommand::uploadUpdate:
-        case ApiCommand::changeSystemName:
-        {
-            auto userResource = Qn::getUserResourceByAccessData(sender->getUserAccessData());
-            bool userHasAdminRights = userResource && qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-
-            if (!userHasAdminRights)
-            {
-                NX_LOG(QnLog::EC2_TRAN_LOG, lit("Can't handle transaction %1 because of no administrator rights. Reopening connection...").arg(ApiCommand::toString(tran.command)), cl_logWARNING);
-                sender->setState(QnTransactionTransport::Error);
-                return;
-            }
-            break;
-        }
         default:
-            // general transaction
-            if (!tran.persistentInfo.isNull() && detail::QnDbManager::instance())
-            {
-                QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-                ErrorCode errorCode = dbManager(Qn::UserAccessData(sender->getUserAccessData())).executeTransaction(tran, serializedTran);
-                switch(errorCode) {
-                case ErrorCode::ok:
-                    break;
-                case ErrorCode::containsBecauseTimestamp:
-                    proxyFillerTransaction(tran, transportHeader);
-                case ErrorCode::containsBecauseSequence:
-                    return; // do not proxy if transaction already exists
-                default:
-                    NX_LOG( QnLog::EC2_TRAN_LOG, lit("Can't handle transaction %1: %2. Reopening connection...").
-                        arg(ApiCommand::toString(tran.command)).arg(ec2::toString(errorCode)), cl_logWARNING );
-                    sender->setState(QnTransactionTransport::Error);
-                    return;
-                }
-            }
+			switch (tran.command)
+			{
+			case ApiCommand::installUpdate:
+			case ApiCommand::uploadUpdate:
+			case ApiCommand::changeSystemName:
+			{	// Transactions listed here should not go to the DbManager. 
+				// We are only interested in relevant notifications triggered.
+				// Also they are allowed only if sender is Admin.
+				auto userResource = Qn::getUserResourceByAccessData(
+					sender->getUserAccessData()
+				);
+				bool userHasAdminRights = 
+					userResource && 
+					qnResourceAccessManager->hasGlobalPermission(
+						userResource,
+						Qn::GlobalPermission::GlobalAdminPermission
+					);
+				if (!userHasAdminRights)
+				{
+					NX_LOG(
+						QnLog::EC2_TRAN_LOG,
+						lit("Can't handle transaction %1 because of no administrator rights. Reopening connection...")
+							.arg(ApiCommand::toString(tran.command)),
+						cl_logWARNING
+					);
+					sender->setState(QnTransactionTransport::Error);
+					return;
+				}
+				break;
+			}
+			default:
+				// These ones are 'general' transactions. They will go through the DbManager 
+				// and also will be notified about via the relevant notification manager.
+				if (!tran.persistentInfo.isNull() && detail::QnDbManager::instance())
+				{
+					QByteArray serializedTran = 
+						QnUbjsonTransactionSerializer::instance()->serializedTransaction(
+							tran
+						);
+					ErrorCode errorCode = 
+						dbManager(Qn::UserAccessData(sender->getUserAccessData()))
+							.executeTransaction(tran, serializedTran);
+					switch(errorCode) 
+					{
+					case ErrorCode::ok:
+						break;
+					case ErrorCode::containsBecauseTimestamp:
+						proxyFillerTransaction(tran, transportHeader);
+					case ErrorCode::containsBecauseSequence:
+						return; // do not proxy if transaction already exists
+					default:
+						NX_LOG(
+							QnLog::EC2_TRAN_LOG,
+							lit("Can't handle transaction %1: %2. Reopening connection...")
+								. arg(ApiCommand::toString(tran.command))
+								.arg(ec2::toString(errorCode)),
+							cl_logWARNING 
+						);
+						sender->setState(QnTransactionTransport::Error);
+						return;
+					}
+				}
+				break;
+			}
 
             if( m_handler )
                 m_handler->triggerNotification(tran);

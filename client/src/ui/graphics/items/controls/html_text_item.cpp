@@ -7,7 +7,7 @@
 
 #include <ui/workaround/sharp_pixmap_painting.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/scoped_painter_rollback.h>
 

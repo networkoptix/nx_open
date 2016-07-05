@@ -4,11 +4,11 @@
 ***********************************************************/
 
 #include "rtsp_types.h"
-
+#include <nx/utils/datetime.h>
 
 namespace nx_rtsp
 {
-    namespace 
+    namespace
     {
         void extractNptTime( const nx_http::StringType& strValue, qint64* dst )
         {
@@ -41,7 +41,7 @@ namespace nx_rtsp
             const auto values = rangeType[1].split('-');
             if( values.isEmpty() || values.size() > 2 )
                 return false;
-        
+
             extractNptTime(values[0], startTime);
             if (values.size() > 1 && !values[1].isEmpty())
                 extractNptTime(values[1], endTime);

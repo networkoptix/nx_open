@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QAction>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/resource_property_adaptors.h>
 #include <utils/aspect_ratio.h>
 
@@ -30,7 +30,7 @@ QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnAction
         layouts.append(qnResPool->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>());
 
     std::sort(layouts.begin(), layouts.end(), [](const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
-        return naturalStringLess(l->getName(), r->getName());
+        return nx::utils::naturalStringLess(l->getName(), r->getName());
     });
 
     QList<QAction *> result;
@@ -80,10 +80,10 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
     widget->ptzController()->getActiveObject(&activeObject);
 
     std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
-        return naturalStringLess(l.name, r.name);
+        return nx::utils::naturalStringLess(l.name, r.name);
     });
     std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
-        return naturalStringLess(l.name, r.name);
+        return nx::utils::naturalStringLess(l.name, r.name);
     });
 
     QnPtzHotkeysResourcePropertyAdaptor adaptor;

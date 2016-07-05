@@ -3,7 +3,7 @@
 
 #include <QtWidgets/QSlider>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/math/color_transformations.h>
 #include <ui/style/helper.h>
 
@@ -69,8 +69,9 @@ public:
         update();
     }
 
-    static QString formatSize(qint64 size) {
-        return formatFileSize(size, 1, 10);
+    static QString formatSize(qint64 size)
+    {
+        return nx::utils::formatFileSize(size, /*precision*/ 1, /*prefixThreshold*/ 10); /*< TODO: #rvasilenko what is 10? */
     }
 
 protected:

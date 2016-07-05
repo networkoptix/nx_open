@@ -5,6 +5,7 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/rtsp_client.h>
+#include <nx/streaming/config.h>
 #include <utils/common/synctime.h>
 
 #if 0
@@ -379,7 +380,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     if (readed < RtpHeader::RTP_HEADER_SIZE + 1) {
         return false;
     }
-    
+
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
     const quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
     int bytesLeft = readed - RtpHeader::RTP_HEADER_SIZE;
@@ -470,7 +471,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
                     memcpy(m_chromaTable, curPtr + 64*lummaSize, 64*chromaSize);
                 }
             }
-            
+
             curPtr += length;
             bytesLeft -= length;
         }
@@ -479,7 +480,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
             m_lastJpegQ = jpegQ;
         }
 
-        if (m_hdrQ != jpegQ || dri != m_hdrDri || m_hdrWidth != width || m_hdrHeight != height) 
+        if (m_hdrQ != jpegQ || dri != m_hdrDri || m_hdrWidth != width || m_hdrHeight != height)
         {
             if (jpegQ != 255)
                 m_headerLen = makeHeaders(m_hdrBuffer, jpegType, width, height, m_lummaTable, m_chromaTable, dri); // use deep copy
@@ -503,7 +504,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
 
     // See ToDo in the header.
     /*
-    if (!m_context) 
+    if (!m_context)
     {
         m_context = QnMediaContextPtr(new QnAvCodecMediaContext(CODEC_ID_MJPEG));
         m_context->ctx()->pix_fmt = (jpegType & 1) == 1 ? PIX_FMT_YUV420P : PIX_FMT_YUV422P;
@@ -542,8 +543,8 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         //m_videoData->context = m_context;
         videoData->width = width*8;
         videoData->height = height*8;
-        
-        if (m_timeHelper) 
+
+        if (m_timeHelper)
             videoData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
         else
             videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;

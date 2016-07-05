@@ -1,12 +1,8 @@
-
 #include "mustache_helper.h"
-
 
 #include <QtCore/QFile>
 #include <QtCore/QIODevice>
 #include <QtCore/QFileInfo>
-
-#include <common/common_globals.h>
 
 bool renderTemplateFromFile(
     const QString& filename,

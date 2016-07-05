@@ -8,7 +8,6 @@
 #include <QtGui/QStandardItemModel>
 
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QInputDialog>
 
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
@@ -203,7 +202,7 @@ void QnLoginDialog::accept() {
         return;
     }
 
-    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(url,this, 
+    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(url,this,
         [this, url](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
     {
         if (m_requestHandle != handle)
@@ -215,7 +214,7 @@ void QnLoginDialog::accept() {
         QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
         switch (status) {
         case QnConnectionDiagnosticsHelper::Result::Success:
-        {   
+        {
             const bool autoLogin = ui->autoLoginCheckBox->isChecked();
             QnActionParameters params;
             params.setArgument(Qn::UrlRole, url);
@@ -277,7 +276,7 @@ void QnLoginDialog::hideEvent(QHideEvent *event)
     m_renderingWidget->stopPlayback();
 }
 
-void QnLoginDialog::resetConnectionsModel() 
+void QnLoginDialog::resetConnectionsModel()
 {
 
     if (m_lastUsedItem != NULL)
@@ -285,12 +284,12 @@ void QnLoginDialog::resetConnectionsModel()
 
     QModelIndex selectedIndex;
     auto connections = qnClientCoreSettings->recentUserConnections();
-    const auto lastConnection = (connections.empty() ? 
+    const auto lastConnection = (connections.empty() ?
         QnUserRecentConnectionData() : connections.first());
 
     m_lastUsedItem = ::newConnectionItem(tr("* Last used connection *"), lastConnection.url);
 
-    if (m_lastUsedItem != NULL) 
+    if (m_lastUsedItem != NULL)
     {
         m_connectionsModel->insertRow(0, m_lastUsedItem);
         selectedIndex = m_connectionsModel->index(0, 0);
@@ -306,7 +305,7 @@ void QnLoginDialog::resetConnectionsModel()
     at_connectionsComboBox_currentIndexChanged(selectedIndex);
 }
 
-void QnLoginDialog::resetSavedSessionsModel() 
+void QnLoginDialog::resetSavedSessionsModel()
 {
     auto recentConnections = qnClientCoreSettings->recentUserConnections();
 
@@ -314,7 +313,7 @@ void QnLoginDialog::resetSavedSessionsModel()
         recentConnections.append(qnSettings->defaultConnection());
 
     m_savedSessionsItem->removeRows(0, m_savedSessionsItem->rowCount());
-    for (const auto& connection: recentConnections) 
+    for (const auto& connection: recentConnections)
     {
         if (!connection.isStoredPassword && connection.name.isEmpty())
             continue;
@@ -513,10 +512,10 @@ void QnLoginDialog::at_saveButton_clicked() {
     {
         const auto button = QnMessageBox::warning(this, tr("Connection already exists."),
             tr("A connection with this name already exists. Do you want to overwrite it?"),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, 
+            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
             QDialogButtonBox::Yes);
 
-        switch(button) 
+        switch(button)
         {
             case QDialogButtonBox::Cancel:
                 return;
@@ -537,14 +536,14 @@ void QnLoginDialog::at_saveButton_clicked() {
         const auto button = QnMessageBox::warning(this, tr("Can not connect to the server"),
             tr("Can not connect to server with specified credentials. Do you want to save this connection?"),
             QDialogButtonBox::Yes | QDialogButtonBox::No, QDialogButtonBox::No);
-        
+
         if (button == QDialogButtonBox::No)
             return;
     }
 
     bool rejected = false;
     const auto itNewEnd = std::remove_if(connections.begin(), connections.end(),
-        [this, &rejected, systemName, userName = url.userName()] 
+        [this, &rejected, systemName, userName = url.userName()]
         (const QnUserRecentConnectionData& connection)
     {
         if (rejected || (connection.systemName != systemName) || (connection.url.userName() != userName))

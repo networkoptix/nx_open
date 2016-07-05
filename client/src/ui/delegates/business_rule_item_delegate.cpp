@@ -199,7 +199,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             btn->setSelectionTarget(QnResourceSelectionDialog::UserResourceTarget);
         }
         else if (actionType == QnBusiness::PlaySoundAction ||
-            actionType == QnBusiness::PlaySoundOnceAction |
+            actionType == QnBusiness::PlaySoundOnceAction ||
             actionType == QnBusiness::SayTextAction)
         {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(btn));

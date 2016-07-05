@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mediaserver_core</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Media Server Core</name>
+    <name>HD Witness Media Server Library</name>
 
     <properties>
         <guid>${mediaserver_core.guid}</guid>

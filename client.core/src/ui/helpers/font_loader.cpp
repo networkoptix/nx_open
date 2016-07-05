@@ -8,7 +8,7 @@
 void QnFontLoader::loadFonts(const QString& path)
 {
     QDir fontsDir(path);
-    QStringList fontFiles = { lit("*.ttf") };
+    QStringList fontFiles = { QLatin1String("*.ttf") };
     for (const QString& entry: fontsDir.entryList(fontFiles, QDir::Files))
     {
         QString fontFile = fontsDir.absoluteFilePath(entry);

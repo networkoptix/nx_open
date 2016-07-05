@@ -8,6 +8,8 @@
 #include <QtCore/QtEndian>
 #include <QCryptographicHash>
 
+#include <nx/utils/literal.h>
+
 #include <common/common_globals.h>
 
 inline QnUuid intToGuid(qint32 value, const QByteArray& postfix)

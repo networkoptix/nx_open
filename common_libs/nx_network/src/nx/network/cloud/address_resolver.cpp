@@ -1,7 +1,5 @@
 #include "address_resolver.h"
 
-#include "common/common_globals.h"
-
 #include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>

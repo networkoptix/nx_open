@@ -82,7 +82,7 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_speach_synthesizer</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_speach_synthesizer/pom.xml</systemPath>
         </dependency>
@@ -167,7 +167,7 @@
             </activation>
             <properties>
                 <!-- cut off festival -->
-                <rdep.packages>openssl ffmpeg quazip roboto-ttf</rdep.packages>
+                <rdep.packages>openssl ffmpeg quazip any/roboto-ttf any/help</rdep.packages>
             </properties>
         </profile>
    </profiles>

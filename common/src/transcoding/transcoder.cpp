@@ -16,6 +16,7 @@
 #include <transcoding/filters/rotate_image_filter.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/streaming/config.h>
 #include <core/resource/camera_resource.h>
 #include <nx/fusion/serialization/json.h>
 
@@ -126,7 +127,7 @@ QSize findSavedResolution(const QnConstCompressedVideoDataPtr& video)
     if (!res)
         return result;
     const CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(res->getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME ).toLatin1() );
-    for(const auto& stream: supportedMediaStreams.streams) 
+    for(const auto& stream: supportedMediaStreams.streams)
     {
         QStringList resolutionInfo = stream.resolution.split(L'x');
         if (resolutionInfo.size() == 2) {
@@ -186,7 +187,7 @@ QnTranscoder::QnTranscoder():
     m_packetizedMode(false),
     m_useRealTimeOptimization(false)
 {
-    QThread::currentThread()->setPriority(QThread::LowPriority); 
+    QThread::currentThread()->setPriority(QThread::LowPriority);
 }
 
 QnTranscoder::~QnTranscoder()
@@ -323,9 +324,9 @@ int QnTranscoder::setVideoCodec(
     return OperationResult::Success;
 }
 
-void QnTranscoder::setUseRealTimeOptimization(bool value) 
-{ 
-    m_useRealTimeOptimization = value; 
+void QnTranscoder::setUseRealTimeOptimization(bool value)
+{
+    m_useRealTimeOptimization = value;
     if (m_vTranscoder)
         m_vTranscoder->setUseRealTimeOptimization(value);
 }
@@ -353,8 +354,8 @@ QnTranscoder::OperationResult QnTranscoder::setAudioCodec(CodecID codec, Transco
             m_lastErrMessage = tr("Unknown transcode method");
             break;
     }
-    return m_lastErrMessage.isEmpty() 
-        ? OperationResult::Success 
+    return m_lastErrMessage.isEmpty()
+        ? OperationResult::Success
         : OperationResult::Error;
 }
 
@@ -397,7 +398,7 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         {
             return 0; // not ready to init
         }
-        int rez = open(m_delayedVideoQueue.isEmpty() ? QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first(), 
+        int rez = open(m_delayedVideoQueue.isEmpty() ? QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first(),
                        m_delayedAudioQueue.isEmpty() ? QnConstCompressedAudioDataPtr() : m_delayedAudioQueue.first());
         if (rez != 0)
             return rez;
@@ -428,10 +429,10 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         if (errCode != 0)
             return errCode;
     }
-    
+
     if( result )
         result->write(m_internalBuffer.data(), m_internalBuffer.size());
-    
+
     return OperationResult::Success;
 }
 

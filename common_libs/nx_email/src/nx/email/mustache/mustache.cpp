@@ -19,8 +19,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 
-#include <common/common_globals.h>
 #include <nx/utils/log/assert.h>
+#include <utils/common/html.h>
 
 using namespace Mustache;
 
@@ -29,41 +29,6 @@ QString Mustache::renderTemplate(const QString& templateString, const QVariant& 
     Mustache::QtVariantContext context(args);
     Mustache::Renderer renderer;
     return renderer.render(templateString, &context);
-}
-
-QString escapeHtml(const QString& input)
-{
-    QString escaped(input);
-    for (int i=0; i < escaped.count();) {
-        const char* replacement = 0;
-        ushort ch = escaped.at(i).unicode();
-        if (ch == '&') {
-            replacement = "&amp;";
-        } else if (ch == '<') {
-            replacement = "&lt;";
-        } else if (ch == '>') {
-            replacement = "&gt;";
-        } else if (ch == '"') {
-            replacement = "&quot;";
-        }
-        if (replacement) {
-            escaped.replace(i, 1, QLatin1String(replacement));
-            i += static_cast<int>(strlen(replacement));
-        } else {
-            ++i;
-        }
-    }
-    return escaped;
-}
-
-QString unescapeHtml(const QString& escaped)
-{
-    QString unescaped(escaped);
-    unescaped.replace(QLatin1String("&lt;"), QLatin1String("<"));
-    unescaped.replace(QLatin1String("&gt;"), QLatin1String(">"));
-    unescaped.replace(QLatin1String("&amp;"), QLatin1String("&"));
-    unescaped.replace(QLatin1String("&quot;"), QLatin1String("\""));
-    return unescaped;
 }
 
 Context::Context(PartialResolver* resolver)

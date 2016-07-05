@@ -14,11 +14,11 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>media_db_util</artifactId>
     <packaging>pom</packaging>
-    <name>Media DB utility</name>
+    <name>HD Witness Media DB Utility</name>
 
     <properties>
         <guid>${media_db_util.guid}</guid>
-        <product.title>${company.name} Media DB utility</product.title>
+        <product.title>${company.name} HD Witness Media DB Utility</product.title>
 
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <global.libs>-lmediaserver_core -lcommon -lnx_network -lnx_streaming -lappserver2 -ludt -lcloud_db_client -lnx_email -lnx_fusion -lnx_utils</global.libs>

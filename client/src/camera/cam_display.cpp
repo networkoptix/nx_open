@@ -11,6 +11,7 @@
 
 #include "core/resource/camera_resource.h"
 #include "nx/streaming/media_data_packet.h"
+#include <nx/streaming/config.h>
 
 #include "decoders/audio/ffmpeg_audio_decoder.h"
 #include "nx/streaming/archive_stream_reader.h"

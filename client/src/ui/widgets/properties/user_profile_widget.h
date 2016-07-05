@@ -19,8 +19,8 @@ class QnUserSettingsModel;
 class QnUserProfileWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-
     typedef Connective<QnAbstractPreferencesWidget> base_type;
+
 public:
     QnUserProfileWidget(QnUserSettingsModel* model, QWidget* parent = 0);
     virtual ~QnUserProfileWidget();
@@ -30,6 +30,8 @@ public:
     virtual void applyChanges() override;
 
     virtual bool canApplyChanges() const override;
+
+    void updatePermissionsLabel(const QString& text);
 
 private:
     void updateControlsAccess();

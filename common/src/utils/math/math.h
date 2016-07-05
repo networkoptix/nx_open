@@ -13,7 +13,6 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
 
-#include <common/config.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
 

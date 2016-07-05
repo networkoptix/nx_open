@@ -1,4 +1,4 @@
-#if !defined(EDGE_SERVER)
+#if !defined(EDGE_SERVER) && !defined(DISABLE_FESTIVAL)
 #include "text_to_wav.h"
 
 #include <QtCore/QCoreApplication>

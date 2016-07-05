@@ -9,7 +9,7 @@
 #include <ui/style/skin.h>
 #include <ui/widgets/videowall_manage_widget.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <utils/math/color_transformations.h>
@@ -566,7 +566,7 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
 
         QnVideoWallItem item;
         if (modelItem.itemType == ItemType::Added || !videowall->items()->hasItem(modelItem.id)) {
-            item.name = generateUniqueString([&videowall] () {
+            item.name = nx::utils::generateUniqueString([&videowall] () {
                 QStringList used;
                 foreach (const QnVideoWallItem &item, videowall->items()->getItems())
                     used << item.name;

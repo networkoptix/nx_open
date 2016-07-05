@@ -99,13 +99,7 @@ Drawer
                 text: qsTr("Disconnect from server")
                 visible: connectionManager.online ||
                          connectionManager.connectionState == QnConnectionManager.Connecting
-                onClicked:
-                {
-                    clearLastUsedConnection()
-                    sideNavigation.close()
-                    connectionManager.disconnectFromServer(false)
-                    Workflow.openSessionsScreen()
-                }
+                onClicked: uiController.disconnectFromSystem()
             }
 
             SideNavigationButton

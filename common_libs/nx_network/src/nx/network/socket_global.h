@@ -3,6 +3,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/singleton.h>
+#include <nx/utils/argument_parser.h>
 #include <utils/common/cpp14.h>
 
 #include "aio/aioservice.h"
@@ -47,6 +48,8 @@ public:
     static void init(); /** Should be called before any socket use */
     static void deinit(); /** Should be called when sockets are not needed any more */
     static void verifyInitialization();
+
+    static void applyArguments(const utils::ArgumentParser& arguments);
 
 	class InitGuard
 	{

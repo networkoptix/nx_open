@@ -21,8 +21,9 @@
 #include <update/update_checker.h>
 #include <update/update_info.h>
 
+#include <utils/common/html.h>
+
 #include <utils/common/app_info.h>
-#include <utils/common/string.h>
 #include <utils/common/util.h>
 
 namespace {

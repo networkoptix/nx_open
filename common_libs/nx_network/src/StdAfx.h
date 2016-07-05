@@ -1,13 +1,4 @@
-#include <common/config.h>
-#ifdef __cplusplus
-    #include <common/common_globals.h>
-#endif
-
-#ifdef _WIN32
-#   if _MSC_VER < 1800
-#       define noexcept
-#   endif
-#endif
+#include <nx/utils/compiler_options.h>
 
 /* Windows headers. */
 #ifdef _WIN32
@@ -17,25 +8,9 @@
 #   include <windows.h> /* You HAVE to include winsock2.h BEFORE windows.h */
 #   include <ws2tcpip.h>
 #   include <iphlpapi.h>
-
-#   if _MSC_VER < 1800
-#       define noexcept
-#   endif
-
-
-/* DXVA headers (should be included before ffmpeg headers). */
-#   ifdef _USE_DXVA
-#       include <d3d9.h>
-#       include <dxva2api.h>
-#       include <windows.h>
-#       include <windowsx.h>
-#       include <ole2.h>
-#       include <commctrl.h>
-#       include <shlwapi.h>
-#       include <Strsafe.h>
-#   endif
 #else
 #    include <arpa/inet.h>
 #endif
 
+#include <nx/utils/literal.h>
 #include <nx/utils/deprecation.h>

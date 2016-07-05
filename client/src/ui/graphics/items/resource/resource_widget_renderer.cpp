@@ -6,6 +6,8 @@
 #include <utils/common/performance.h>
 #include <client/client_runtime_settings.h>
 
+#include <nx/streaming/config.h>
+
 #include "decodedpicturetoopengluploader.h"
 #include "decodedpicturetoopengluploadercontextpool.h"
 

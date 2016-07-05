@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud_db</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Cloud cloud_db</name>
+    <name>NX Cloud Db</name>
 
     <properties>
         <guid>${cloud_db.guid}</guid>

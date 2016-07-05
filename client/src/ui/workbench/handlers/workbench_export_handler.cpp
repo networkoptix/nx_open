@@ -45,7 +45,7 @@
 #include <ui/help/help_topic_accessor.h>
 
 #include <utils/common/event_processors.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 #include <utils/common/app_info.h>
 
@@ -307,7 +307,7 @@ void QnWorkbenchExportHandler::exportTimeSelection(
 
     int timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(mediaResource);
 
-    QString namePart = replaceNonFileNameCharacters(mediaResource->toResourcePtr()->getName(), L'_');
+    QString namePart = nx::utils::replaceNonFileNameCharacters(mediaResource->toResourcePtr()->getName(), L'_');
     QString timePart = (mediaResource->toResource()->flags() & Qn::utc)
             ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs + timeOffset).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
             : QTime(0, 0, 0, 0).addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
@@ -659,7 +659,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     QString baseName = layout->getName();
     if (qnRuntime->isActiveXMode() || baseName.isEmpty())
         baseName = tr("exported");
-    QString suggestion = replaceNonFileNameCharacters(baseName, QLatin1Char('_'));
+    QString suggestion = nx::utils::replaceNonFileNameCharacters(baseName, QLatin1Char('_'));
     suggestion = QnEnvironment::getUniqueFileName(previousDir, QFileInfo(suggestion).baseName());
 
     QString fileName;

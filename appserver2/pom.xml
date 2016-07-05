@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>appserver2</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Witness AppServer2 Library</name>    
+    <name>HD Witness AppServer2 Library</name>    
 
     <properties>
         <guid>${appserver2.guid}</guid>

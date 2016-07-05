@@ -109,10 +109,14 @@ void QnUserProfileWidget::loadDataToUi()
 
     ui->loginInputField->setText(m_model->user()->getName());
     ui->nameInputField->setText(m_model->user()->fullName());
-    ui->groupInputField->setText(m_model->groupName());
-    ui->permissionsLabel->setText(m_model->permissionsDescription());
+    ui->groupInputField->setText(accessController()->userRoleName(m_model->user()));
     ui->emailInputField->setText(m_model->user()->getEmail());
     m_newPassword.clear();
+}
+
+void QnUserProfileWidget::updatePermissionsLabel(const QString& text)
+{
+    ui->permissionsLabel->setText(text);
 }
 
 void QnUserProfileWidget::applyChanges()
@@ -139,7 +143,7 @@ void QnUserProfileWidget::applyChanges()
             QnAppServerConnectionFactory::setUrl(url);
 
             auto connections = qnClientCoreSettings->recentUserConnections();
-            if (!connections.isEmpty() && 
+            if (!connections.isEmpty() &&
                 !connections.first().url.password().isEmpty() &&
                 qnUrlEqual(connections.first().url, url))
             {

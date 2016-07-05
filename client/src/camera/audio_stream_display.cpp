@@ -8,6 +8,7 @@
 
 #include "client/client_settings.h"
 
+#include <nx/streaming/config.h>
 
 #define DEFAULT_AUDIO_FRAME_SIZE (AVCODEC_MAX_AUDIO_FRAME_SIZE*2)
 int  MAX_AUDIO_FRAME_SIZE = DEFAULT_AUDIO_FRAME_SIZE*5;
@@ -304,7 +305,7 @@ void QnAudioStreamDisplay::playCurrentBuffer()
         //resume(); // does nothing if resumed already
 
         // play audio
-        if (!m_audioSound) 
+        if (!m_audioSound)
         {
             QnMutexLocker lock( &m_guiSync );
             m_audioSound = QtvAudioDevice::instance()->addSound(audioFormat);

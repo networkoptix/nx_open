@@ -32,6 +32,7 @@
 #include "stree/socket_attr_reader.h"
 #include "stree/stree_manager.h"
 
+#include <common/common_globals.h> //for Qn::SerializationFormat
 
 namespace nx {
 namespace cdb {
@@ -62,7 +63,7 @@ void AuthenticationManager::authenticate(
 
     api::ResultCode authResult = api::ResultCode::notAuthorized;
     auto guard = makeScopedGuard(
-        [&authResult, &wwwAuthenticate, &authProperties, 
+        [&authResult, &wwwAuthenticate, &authProperties,
         &responseHeaders, &msgBody, &completionHandler]()
         {
             if (authResult != api::ResultCode::ok)

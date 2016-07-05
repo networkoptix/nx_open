@@ -34,7 +34,7 @@
 #include <ui/workbench/workbench_item.h>
 
 #include <utils/license_usage_helper.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/qtimespan.h>
 
 namespace {
@@ -771,7 +771,7 @@ QString QnServerResourceWidget::calculateTitleText() const {
         kMaxNameLength = 30
     };
 
-    QString name = elideString(QnResourceDisplayInfo(m_resource).toString(Qn::RI_WithUrl), kMaxNameLength);
+    QString name = nx::utils::elideString(QnResourceDisplayInfo(m_resource).toString(Qn::RI_WithUrl), kMaxNameLength);
 
     qint64 uptimeMs = m_resource->getStatus() == Qn::Online
         ? m_manager->uptimeMs(m_resource)

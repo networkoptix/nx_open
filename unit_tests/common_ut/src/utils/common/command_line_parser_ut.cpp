@@ -5,35 +5,37 @@
 
 #include <gtest/gtest.h>
 
-#include <utils/common/command_line_parser.h>
+#include <nx/utils/argument_parser.h>
 
 
-TEST(parseCmdArgs, common)
+TEST(ArgumentParser, common)
 {
     char* argv[] = {"/path/to/bin", "-a", "aaa", "--arg1=arg1", "--arg2", "-b", "-c", "ccc", "-ddd", "val_ddd", "-e", "eee", "--arg3=" };
     const auto argc = sizeof(argv) / sizeof(*argv);
 
-    std::multimap<QString, QString> args;
-    parseCmdArgs(
-        argc,
-        argv,
-        &args);
-    ASSERT_EQ(args.size(), 8);
+    nx::utils::ArgumentParser args(argc, argv);
 
-    ASSERT_TRUE(args.find("a") != args.end());
-    ASSERT_EQ(args.find("a")->second, "aaa");
-    ASSERT_TRUE(args.find("arg1") != args.end());
-    ASSERT_EQ(args.find("arg1")->second, "arg1");
-    ASSERT_TRUE(args.find("arg2") != args.end());
-    ASSERT_TRUE(args.find("arg2")->second.isEmpty());
-    ASSERT_TRUE(args.find("b") != args.end());
-    ASSERT_TRUE(args.find("b")->second.isEmpty());
-    ASSERT_TRUE(args.find("arg3") != args.end());
-    ASSERT_TRUE(args.find("arg3")->second.isEmpty());
-    ASSERT_TRUE(args.find("c") != args.end());
-    ASSERT_EQ(args.find("c")->second, "ccc");
-    ASSERT_TRUE(args.find("e") != args.end());
-    ASSERT_EQ(args.find("e")->second, "eee");
-    ASSERT_TRUE(args.find("ddd") != args.end());
-    ASSERT_EQ(args.find("ddd")->second, "val_ddd");
+    ASSERT_TRUE((bool)args.get("a"));
+    ASSERT_EQ(*args.get("a"), "aaa");
+
+    ASSERT_TRUE((bool)args.get("arg1"));
+    ASSERT_EQ(*args.get("arg1"), "arg1");
+
+    ASSERT_TRUE((bool)args.get("arg2"));
+    ASSERT_TRUE(args.get("arg2")->isEmpty());
+
+    ASSERT_TRUE((bool)args.get("b"));
+    ASSERT_TRUE(args.get("b")->isEmpty());
+
+    ASSERT_TRUE((bool)args.get("arg3"));
+    ASSERT_TRUE(args.get("arg3")->isEmpty());
+
+    ASSERT_TRUE((bool)args.get("c"));
+    ASSERT_EQ(*args.get("c"), "ccc");
+
+    ASSERT_TRUE((bool)args.get("e"));
+    ASSERT_EQ(*args.get("e"), "eee");
+
+    ASSERT_TRUE((bool)args.get("ddd"));
+    ASSERT_EQ(*args.get("ddd"), "val_ddd");
 }

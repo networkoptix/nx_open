@@ -20,10 +20,10 @@ class QnInputField;
 class QnUserSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-
     typedef Connective<QnAbstractPreferencesWidget> base_type;
+
 public:
-    QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* parent = 0);
+    QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* parent = nullptr);
     virtual ~QnUserSettingsWidget();
 
     virtual bool hasChanges() const override;
@@ -34,6 +34,7 @@ public:
     QnUuid selectedUserGroup() const;
     Qn::GlobalPermissions selectedPermissions() const;
 
+    void updatePermissionsLabel(const QString& text);
     void updateAccessRightsPresets();
 
 private:

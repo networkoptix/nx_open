@@ -8,6 +8,7 @@
 #include <transcoding/ffmpeg_audio_transcoder.h>
 #include <decoders/audio/ffmpeg_audio_decoder.h>
 #include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/config.h>
 
 namespace {
     const size_t kDefaultDataChunkSize = 2048;
@@ -104,10 +105,13 @@ QByteArray QnSpeachSynthesisDataProvider::doSynthesis(const QString &text)
 {
     QBuffer soundBuf;
     soundBuf.open(QIODevice::WriteOnly);
-    auto ttvInstance = TextToWaveServer::instance();
-    const size_t kSynthesizerOutputHeaderSize = 52;
 
+#ifndef DISABLE_FESTIVAL
+    auto ttvInstance = TextToWaveServer::instance();
     ttvInstance->generateSoundSync(text, &soundBuf);
+#endif
+
+    const size_t kSynthesizerOutputHeaderSize = 52;
     return soundBuf.data().mid(kSynthesizerOutputHeaderSize);
 }
 

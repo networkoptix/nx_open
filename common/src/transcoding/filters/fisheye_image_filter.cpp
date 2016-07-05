@@ -5,6 +5,8 @@
 #include <QtGui/QMatrix4x4>
 #include <QtCore/QtMath>
 
+#include <nx/streaming/config.h>
+
 #include <utils/math/math.h>
 #include <utils/media/frame_info.h>
 

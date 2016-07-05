@@ -10,7 +10,7 @@
 #include <nx/network/http/asynchttpclient.h>
 
 namespace {
-    const QRegExp DW_RES_SETTINGS_FILTER(lit("[{},']"));
+    const QRegExp DW_RES_SETTINGS_FILTER(QLatin1String("[{},']"));
     const int kHttpReadTimeout = 1000 * 10;
 
     const int kPravisHttpPort = 10080;
@@ -104,13 +104,13 @@ QString QnWin4NetCameraProxy::toInnerValue(const QnCameraAdvancedParameter &para
     return innerValue;
 }
 
-bool QnWin4NetCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, const QString &value) 
+bool QnWin4NetCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, const QString &value)
 {
     QString innerValue = toInnerValue(parameter, value);
 
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
 
-    if (parameter.tag == lit("POST")) {     
+    if (parameter.tag == lit("POST")) {
         QString paramQuery;
         QString query;
 
@@ -136,7 +136,7 @@ bool QnWin4NetCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, 
 QnCameraAdvancedParamValueList QnWin4NetCameraProxy::requestParamValues(const QString &request) const {
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
     CLHttpStatus status = httpClient.doGET(request);
-    if (status == CL_HTTP_SUCCESS) 
+    if (status == CL_HTTP_SUCCESS)
     {
         QByteArray body;
         httpClient.readAll(body);
@@ -149,7 +149,7 @@ QnCameraAdvancedParamValueList QnWin4NetCameraProxy::requestParamValues(const QS
 QnCameraAdvancedParamValueList QnWin4NetCameraProxy::getParamsList() const {
     QnCameraAdvancedParamValueList result;
     result.append(requestParamValues(lit("cgi-bin/getconfig.cgi?action=color")));
-    result.append(requestParamValues(lit("cgi-bin/getconfig.cgi?action=ftpUpgradeInfo")));  
+    result.append(requestParamValues(lit("cgi-bin/getconfig.cgi?action=ftpUpgradeInfo")));
     return result;
 }
 
@@ -204,7 +204,7 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
 {
     QnCameraAdvancedParamValueList result;
     int workers = 0;
-    
+
     QnMutex waitMutex;
     QnWaitCondition waitCond;
 
@@ -225,7 +225,7 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
             {
                 QnMutexLocker lock(&waitMutex);
                 QnCameraAdvancedParamValue param;
-                if (statusCode == nx_http::StatusCode::ok && !msgBody.isEmpty()) 
+                if (statusCode == nx_http::StatusCode::ok && !msgBody.isEmpty())
                     param.value = fromInnerValue(cameraAdvParam, parseParamFromHttpResponse(cameraAdvParam, msgBody));
                 else
                     qWarning() << "error reading param" << cameraAdvParam.id << "for camera" << m_host;

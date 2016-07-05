@@ -5,7 +5,6 @@
 
 #include <camera/camera_thumbnail_cache.h>
 #include <utils/mobile_app_info.h>
-#include <utils/common/app_info.h>
 #include <common/common_module.h>
 #include <context/connection_manager.h>
 #include <context/context_settings.h>
@@ -156,20 +155,25 @@ QString QnContext::getLastUsedSystemId() const
 QString QnContext::getLastUsedUrl() const
 {
     QUrl url = qnSettings->lastUsedUrl();
+
     if (!url.isValid() || url.userName().isEmpty())
         return QString();
 
-    QnRecentUserConnectionsModel connectionsModel;
-    connectionsModel.setSystemName(getLastUsedSystemId());
-    if (!connectionsModel.hasConnections())
-        return QString();
+    if (url.password().isEmpty())
+    {
+        QnRecentUserConnectionsModel connectionsModel;
+        connectionsModel.setSystemName(getLastUsedSystemId());
+        if (!connectionsModel.hasConnections())
+            return QString();
 
-    const auto firstIndex = connectionsModel.index(0);
-    QString password = connectionsModel.data(firstIndex, QnRecentUserConnectionsModel::PasswordRole).toString();
-    if (password.isEmpty())
-        return QString();
+        const auto firstIndex = connectionsModel.index(0);
+        QString password = connectionsModel.data(firstIndex, QnRecentUserConnectionsModel::PasswordRole).toString();
+        if (password.isEmpty())
+            return QString();
 
-    url.setPassword(password);
+        url.setPassword(password);
+    }
+
     return url.toString();
 }
 

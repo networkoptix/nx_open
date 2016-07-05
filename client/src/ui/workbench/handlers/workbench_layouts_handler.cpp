@@ -35,7 +35,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 
 #include <utils/common/counter.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
@@ -51,7 +51,7 @@ namespace
                 usedNames.push_back(layout->getName());
         }
 
-        return generateUniqueString(usedNames, defaultName, nameTemplate);
+        return nx::utils::generateUniqueString(usedNames, defaultName, nameTemplate);
     }
 
     /**

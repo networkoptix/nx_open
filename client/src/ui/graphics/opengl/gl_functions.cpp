@@ -33,9 +33,9 @@ namespace {
  */
 class QnGlFunctionsGlobal {
 public:
-    QnGlFunctionsGlobal(): 
+    QnGlFunctionsGlobal():
         m_initialized(false),
-        m_maxTextureSize(DefaultMaxTextureSize)  
+        m_maxTextureSize(DefaultMaxTextureSize)
     {}
 
     GLint maxTextureSize() const {
@@ -52,7 +52,7 @@ public:
                 qnWarning("No OpenGL context in scope, initialization failed.");
                 return;
             }
-            
+
             /* Nothing bad could come out of this call, so const_cast is OK. */
             const_cast<QGLContext *>(context)->makeCurrent();
         }
@@ -66,7 +66,7 @@ public:
 #endif
         m_maxTextureSize = maxTextureSize;
     }
-    
+
     // This function is for MacOS workaround for wrong max texture size of Intel HD3000
     void overrideMaxTextureSize(GLint maxTextureSize) {
         m_maxTextureSize = maxTextureSize;
@@ -89,7 +89,7 @@ Q_GLOBAL_STATIC(QnGlFunctionsGlobal, qn_glFunctionsGlobal)
  */
 class QnGlFunctionsPrivate {
 public:
-    QnGlFunctionsPrivate(const QGLContext *context): 
+    QnGlFunctionsPrivate(const QGLContext *context):
         m_context(context),
         m_features(0)
     {
@@ -104,7 +104,7 @@ public:
 		}
 		m_openGLInfoCache = m_openGLInfo;
 
-        if (m_openGLInfo.vendor.contains(lit("Tungsten Graphics")) && 
+        if (m_openGLInfo.vendor.contains(lit("Tungsten Graphics")) &&
 			m_openGLInfo.renderer.contains(lit("Gallium 0.1, Poulsbo on EMGD")))
 		{
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
@@ -113,14 +113,14 @@ public:
 #ifdef Q_OS_MACX
         /* Intel HD 3000 driver handles textures with size > 4096 incorrectly (see bug #3141).
          * To fix that we have to override maximum texture size to 4096 for this graphics adapter. */
-        if (m_openGLInfo.vendor.contains(lit("Intel")) && 
-            QRegExp(lit(".*Intel.+3000.*")).exactMatch(m_openGLInfo.renderer))
+        if (m_openGLInfo.vendor.contains(lit("Intel")) &&
+            QRegExp(QLatin1String(".*Intel.+3000.*")).exactMatch(m_openGLInfo.renderer))
         {
             qn_glFunctionsGlobal()->overrideMaxTextureSize(4096);
         }
 #endif
 
-        
+
 #ifdef Q_OS_LINUX
         QDir atiProcDir(lit("/proc/ati"));
         if(atiProcDir.exists()) /* Checking for fglrx driver. */
@@ -181,7 +181,7 @@ QnGlFunctions::QnGlFunctions(const QGLContext *context) {
     QnGlFunctionsPrivateStorage *storage = qn_glFunctionsPrivateStorage();
     if(storage)
         d = qn_glFunctionsPrivateStorage()->get(context);
-    
+
     if(d.isNull()) /* Application is being shut down. */
         d = QSharedPointer<QnGlFunctionsPrivate>(new QnGlFunctionsPrivate(NULL));
 }
@@ -220,9 +220,9 @@ namespace {
     QnGlFunctions::Features estimateFeatures() {
         QnGlFunctions::Features result(0);
 
-        DISPLAY_DEVICEW dd; 
-        dd.cb = sizeof(dd); 
-        DWORD dev = 0; 
+        DISPLAY_DEVICEW dd;
+        dd.cb = sizeof(dd);
+        DWORD dev = 0;
         while (EnumDisplayDevices(0, dev, &dd, 0)) {
             if (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) {
                 QString v = QString::fromWCharArray(dd.DeviceString);
@@ -232,7 +232,7 @@ namespace {
             }
             ZeroMemory(&dd, sizeof(dd));
             dd.cb = sizeof(dd);
-            dev++; 
+            dev++;
         }
         return result;
     }

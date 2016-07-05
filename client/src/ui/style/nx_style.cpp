@@ -23,15 +23,20 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QProxyStyle>
+#include <QtWidgets/QInputDialog>
 #include <private/qfont_p.h>
 
 #include <ui/common/popup_shadow.h>
+#include <ui/common/link_hover_processor.h>
 #include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/dialogs/common/generic_tabbed_dialog.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/common/input_field.h>
-#include <utils/common/scoped_painter_rollback.h>
+
+#include <utils/common/object_companion.h>
 #include <utils/common/property_backup.h>
+#include <utils/common/scoped_painter_rollback.h>
+
 
 #define CUSTOMIZE_POPUP_SHADOWS
 
@@ -46,7 +51,9 @@ namespace
 
     const QSize kSwitchFocusFrameMargins = QSize(4, 4); // 2 at left, 2 at right, 2 at top, 2 at bottom
 
-    const char* kPopupShadowProperty = "_qn_popupShadowObject";
+    const char* kPopupShadowCompanion = "popupShadow";
+
+    const char* kLinkHoverProcessorCompanion = "linkHoverProcessor";
 
     const int kCompactTabFocusMargin = 2;
 
@@ -243,6 +250,9 @@ namespace
         return CommonScrollBar;
     }
 
+    /*
+     * Class to gain access to protected property QAbstractScrollArea::viewportMargins:
+     */
     class ViewportMarginsAccessHack : public QAbstractScrollArea
     {
     public:
@@ -251,6 +261,7 @@ namespace
     };
 
 } // unnamed namespace
+
 
 QnNxStylePrivate::QnNxStylePrivate() :
     QCommonStylePrivate(),
@@ -2922,22 +2933,31 @@ void QnNxStyle::polish(QWidget *widget)
         }
     }
 
+    /*
+     * Insert horizontal separator line into QInputDialog above its button box.
+     * Since input dialogs are short-lived, don't bother with unpolishing.
+     */
+    if (auto inputDialog = qobject_cast<QInputDialog*>(widget))
+    {
+        Q_D(const QnNxStyle);
+        d->polishInputDialog(inputDialog);
+    }
+
+    if (auto label = qobject_cast<QLabel*>(widget))
+        QnObjectCompanion<QnLinkHoverProcessor>::install(label, kLinkHoverProcessorCompanion);
+
 #ifdef CUSTOMIZE_POPUP_SHADOWS
     if (popupToCustomizeShadow)
     {
         /* Create customized shadow: */
-        if (popupToCustomizeShadow->property(kPopupShadowProperty).value<QnPopupShadow*>() == nullptr)
+        if (auto shadow = QnObjectCompanion<QnPopupShadow>::install(popupToCustomizeShadow, kPopupShadowCompanion))
         {
             QnPaletteColor shadowColor = mainColor(Colors::kBase).darker(3);
             shadowColor.setAlphaF(0.5);
-
-            auto shadow = new QnPopupShadow(popupToCustomizeShadow);
             shadow->setColor(shadowColor);
             shadow->setOffset(0, 10);
             shadow->setBlurRadius(20);
             shadow->setSpread(0);
-
-            popupToCustomizeShadow->setProperty(kPopupShadowProperty, QVariant::fromValue(shadow));
         }
     }
 #endif
@@ -2978,13 +2998,11 @@ void QnNxStyle::unpolish(QWidget* widget)
 
 #ifdef CUSTOMIZE_POPUP_SHADOWS
     if (popupWithCustomizedShadow)
-    {
-        /* Remove customized shadow: */
-        QScopedPointer<QnPopupShadow> shadow(popupWithCustomizedShadow->property(kPopupShadowProperty).value<QnPopupShadow*>());
-        if (shadow)
-            popupWithCustomizedShadow->setProperty(kPopupShadowProperty, QVariant());
-    }
+        QnObjectCompanionManager::uninstall(popupWithCustomizedShadow, kPopupShadowCompanion);
 #endif
+
+    if (auto label = qobject_cast<QLabel*>(widget))
+        QnObjectCompanionManager::uninstall(label, kLinkHoverProcessorCompanion);
 
     if (auto tabBar = qobject_cast<QTabBar*>(widget))
     {

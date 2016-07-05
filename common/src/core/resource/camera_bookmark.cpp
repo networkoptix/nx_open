@@ -399,7 +399,7 @@ bool QnCameraBookmarkSearchFilter::checkBookmark(const QnCameraBookmark &bookmar
     if (text.isEmpty())
         return true;
 
-    for (const QString &word: text.split(QRegExp(lit("[\\W]")), QString::SkipEmptyParts)) {
+    for (const QString &word: text.split(QRegExp(QLatin1String("[\\W]")), QString::SkipEmptyParts)) {
         bool tagFound = false;
 
         for (const QString &tag: bookmark.tags) {
@@ -412,7 +412,7 @@ bool QnCameraBookmarkSearchFilter::checkBookmark(const QnCameraBookmark &bookmar
         if (tagFound)
             continue;
 
-        QRegExp wordRegExp(lit("\\b%1").arg(word), Qt::CaseInsensitive);
+        QRegExp wordRegExp(QString(QLatin1String("\\b%1")).arg(word), Qt::CaseInsensitive);
 
         if (wordRegExp.indexIn(bookmark.name) != -1 ||
             wordRegExp.indexIn(bookmark.description) != -1)

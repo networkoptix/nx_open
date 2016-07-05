@@ -295,7 +295,6 @@ QVariant QnStorageListModel::data(const QModelIndex &index, int role) const
 
     switch(role) {
     case Qt::DisplayRole:
-    case Qn::DisplayHtmlRole:
         return displayData(index, false);
     case Qn::TextWidthDataRole:
         return displayData(index, true);

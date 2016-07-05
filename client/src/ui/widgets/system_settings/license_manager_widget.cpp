@@ -32,6 +32,7 @@
 #include <ui/models/license_list_model.h>
 #include <ui/dialogs/license_details_dialog.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
+#include <ui/utils/table_export_helper.h>
 
 #include <utils/license_usage_helper.h>
 #include <utils/common/product_features.h>
@@ -49,8 +50,7 @@ public:
 protected:
     virtual bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const
     {
-        if (source_left.column() != QnLicenseListModel::ExpirationDateColumn
-            || source_right.column() != QnLicenseListModel::ExpirationDateColumn)
+        if (source_left.column() != source_right.column())
             return base_type::lessThan(source_left, source_right);
 
         QnLicensePtr left = source_left.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
@@ -59,11 +59,23 @@ protected:
         if (!left || !right)
             return (left < right);
 
-        /* Permanent licenses should be the last. */
-        if (left->neverExpire() != right->neverExpire())
-            return right->neverExpire();
+        switch (source_left.column())
+        {
+            case QnLicenseListModel::ExpirationDateColumn:
+                /* Permanent licenses should be the last. */
+                if (left->neverExpire() != right->neverExpire())
+                    return right->neverExpire();
 
-        return left->expirationTime() < right->expirationTime();
+                return left->expirationTime() < right->expirationTime();
+
+            case QnLicenseListModel::CameraCountColumn:
+                return left->cameraCount() < right->cameraCount();
+
+            default:
+                break;
+        }
+
+        return base_type::lessThan(source_left, source_right);
     }
 
 };
@@ -94,6 +106,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 
     connect(ui->detailsButton,  &QPushButton::clicked, this, &QnLicenseManagerWidget::at_licenseDetailsButton_clicked);
     connect(ui->removeButton,   &QPushButton::clicked, this, &QnLicenseManagerWidget::at_removeButton_clicked);
+    connect(ui->exportLicensesButton, &QPushButton::clicked, this, &QnLicenseManagerWidget::exportLicenses);
 
     connect(ui->gridLicenses->selectionModel(), &QItemSelectionModel::currentChanged,   this, &QnLicenseManagerWidget::updateButtons);
     connect(ui->gridLicenses->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QnLicenseManagerWidget::updateButtons);
@@ -414,8 +427,15 @@ bool QnLicenseManagerWidget::canRemoveLicense(const QnLicensePtr &license) const
     return !license->isValid(&errCode) && errCode != QnLicense::FutureLicense;
 }
 
+void QnLicenseManagerWidget::exportLicenses()
+{
+    QnTableExportHelper::exportToFile(ui->gridLicenses, false, this, tr("Export licenses to a file"));
+}
+
 void QnLicenseManagerWidget::updateButtons()
 {
+    ui->exportLicensesButton->setEnabled(!m_licenses.isEmpty());
+
     QModelIndex idx = ui->gridLicenses->selectionModel()->currentIndex();
     QnLicensePtr license = m_model->license(idx);
 

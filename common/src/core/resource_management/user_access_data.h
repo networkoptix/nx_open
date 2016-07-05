@@ -4,6 +4,8 @@
 #include <nx/utils/uuid.h>
 #include <core/resource/resource_fwd.h>
 
+#include <nx/utils/literal.h>
+
 namespace Qn
 {
 struct UserAccessData

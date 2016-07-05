@@ -5,12 +5,14 @@
 #include <utils/media/bitStream.h>
 #include <utils/common/synctime.h>
 
+#include <nx/streaming/config.h>
+
 #ifdef Q_OS_OSX
 #include <smmintrin.h>
 #endif
 
 QnAbstractMediaData::QnAbstractMediaData( DataType _dataType )
-: 
+:
     dataType(_dataType),
     compressionType(CODEC_ID_NONE),
     flags(MediaFlags_None),
@@ -128,7 +130,7 @@ inline bool mathImage_cpu(const simd128i* data, const simd128i* mask, int maskSt
 {
     uint64_t* curPtr = (uint64_t*) data;
     curPtr += maskStart*2;
-    uint64_t* maskPtr = (uint64_t*) mask; 
+    uint64_t* maskPtr = (uint64_t*) mask;
     maskPtr += maskStart*2;
 
     for (int i = maskStart; i <= maskEnd; ++i)
@@ -146,7 +148,7 @@ bool QnMetaDataV1::matchImage(const simd128i* data, const simd128i* mask, int ma
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     if (useSSE41())
         return mathImage_sse41(data, mask, maskStart, maskEnd);
-    else 
+    else
         return mathImage_sse2(data, mask, maskStart, maskEnd);
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM
@@ -251,7 +253,7 @@ bool QnMetaDataV1::isEmpty() const
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     if (useSSE41())
         return metadataIsEmpty_sse41((__m128i*) m_data.data());
-    else 
+    else
         return metadataIsEmpty_sse2((__m128i*) m_data.data());
 #elif __arm__ && __ARM_NEON__
     return metadataIsEmpty_cpu(m_data.data());
@@ -274,7 +276,7 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 {
     if ((quint64)m_firstTimestamp == AV_NOPTS_VALUE)
         m_firstTimestamp = timestamp;
-    else 
+    else
         m_duration = qMax(m_duration, timestamp - m_firstTimestamp);
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
@@ -320,7 +322,7 @@ bool QnMetaDataV1::isMotionAt(int x, int y) const
     return b & (128 >> (shift&7));
 }
 
-void QnMetaDataV1::setMotionAt(int x, int y) 
+void QnMetaDataV1::setMotionAt(int x, int y)
 {
     NX_ASSERT(x<MD_WIDTH);
     NX_ASSERT(y<MD_HEIGHT);

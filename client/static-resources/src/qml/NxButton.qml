@@ -7,6 +7,8 @@ Button
 {
     id: thisComponent;
 
+    property bool enableHover: true;
+
     property bool isHovered: hoverArea.containsMouse;
     property bool isAccentButton: false;
     property color bkgColor: (isAccentButton? Style.colors.brand : Style.colors.button);
@@ -38,7 +40,7 @@ Button
 
         anchors.fill: parent;
         acceptedButtons: Qt.NoButton;
-        hoverEnabled: true;
+        hoverEnabled: thisComponent.enableHover;
     }
 
     background: Item

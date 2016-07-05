@@ -13,7 +13,7 @@
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/variant.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 #include <ui/style/globals.h>
 
@@ -131,7 +131,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         return baseValue;
     }
     case CLOUD_PASSWORD:
-        return xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), xorKey);
+        return nx::utils::xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), xorKey);
 
     case WORKBENCH_PANES:
     {
@@ -166,7 +166,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         break;
     }
     case CLOUD_PASSWORD:
-        base_type::writeValueToSettings(settings, id, xorEncrypt(value.toString(), xorKey));
+        base_type::writeValueToSettings(settings, id, nx::utils::xorEncrypt(value.toString(), xorKey));
         break;
 
     case UPDATE_FEED_URL:

@@ -9,7 +9,7 @@
 
 #include <ui/style/resource_icon_cache.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 namespace {
     const qreal BYTES_IN_GB = 1000000000.0;
@@ -54,7 +54,7 @@ bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModel
 
     switch(left.column()) {
     case QnRecordingStatsModel::CameraNameColumn:
-        return naturalStringLess(left.data(Qt::DisplayRole).toString(), right.data(Qt::DisplayRole).toString());
+        return nx::utils::naturalStringLess(left.data(Qt::DisplayRole).toString(), right.data(Qt::DisplayRole).toString());
     case QnRecordingStatsModel::BytesColumn:
         return leftData.recordedBytes < rightData.recordedBytes;
     case QnRecordingStatsModel::DurationColumn:
@@ -101,7 +101,7 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
             int maxLength = qMax(foreignText.length(), kMaxNameLength); /* There is no need to limit name to be shorter than predefined string. */
             return isForeign
                 ? foreignText
-                : elideString(
+                : nx::utils::elideString(
                     QnResourceDisplayInfo(qnResPool->getResourceByUniqueId(value.uniqueId)).toString(qnSettings->extraInfoInTree()),
                     maxLength);
         }
@@ -192,7 +192,6 @@ QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) c
 {
     switch(role) {
     case Qt::DisplayRole:
-    case Qn::DisplayHtmlRole:
         return footerDisplayData(index);
     case Qt::ToolTipRole:
         return tooltipText(static_cast<Columns>(index.column()));
@@ -248,7 +247,6 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
 
     switch(role) {
     case Qt::DisplayRole:
-    case Qn::DisplayHtmlRole:
         return displayData(index);
     case Qt::DecorationRole:
         return qnResIconCache->icon(getResource(index));

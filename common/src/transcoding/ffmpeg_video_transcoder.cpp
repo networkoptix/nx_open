@@ -9,6 +9,7 @@
 #include "filters/crop_image_filter.h"
 #include "utils/common/util.h"
 #include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/config.h>
 
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
@@ -154,7 +155,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
     const auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
     if (auto ret = transcodePacketImpl(video, result))
         return ret;
-    
+
     if (m_lastEncodedTime != qint64(AV_NOPTS_VALUE))
         movigAverage(m_averageVideoTimePerFrame, video->timestamp - m_lastEncodedTime);
     m_lastEncodedTime = video->timestamp;
@@ -165,7 +166,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
 int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result)
 {
-    
+
     if (!m_encoderCtx)
         open(video);
 

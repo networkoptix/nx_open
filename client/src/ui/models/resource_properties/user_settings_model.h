@@ -36,19 +36,8 @@ public:
     virtual QSet<QnUuid> accessibleResources() const override;
     virtual void setAccessibleResources(const QSet<QnUuid>& value) override;
 
-    QString groupName() const;
-
-    /** Return human-readable permissions description for the target user */
-    QString permissionsDescription() const;
-
-    /** Return human-readable permissions description for the selected permissions set. */
-    QString permissionsDescription(const QnUserResourcePtr& user, const QnUuid& groupId) const;
-
 signals:
     void userChanged(const QnUserResourcePtr& newUser);
-
-private:
-    QString getCustomPermissionsDescription(const QnUuid& id, Qn::GlobalPermissions permissions) const;
 
 private:
     Mode m_mode;

@@ -214,15 +214,18 @@ void AudioPlayer::run()
             case sSynthesizing:
             case sSynthesizingAutoPlay:
             {
+                #ifndef DISABLE_FESTIVAL
+                    if (!m_synthesizingTarget->open(QIODevice::WriteOnly) ||
+                        !TextToWaveServer::instance()->generateSoundSync(
+                            m_textToPlay, m_synthesizingTarget.get()))
+                    {
+                        emit done();
+                        m_state = sReady;
+                        m_resultCode = rcSynthesizingError;
+                        continue;
+                    }
+                #endif
 
-                if (!m_synthesizingTarget->open(QIODevice::WriteOnly) ||
-                    !TextToWaveServer::instance()->generateSoundSync(m_textToPlay, m_synthesizingTarget.get()))
-                {
-                    emit done();
-                    m_state = sReady;
-                    m_resultCode = rcSynthesizingError;
-                    continue;
-                }
                 m_synthesizingTarget->close();
                 if (m_state == sSynthesizingAutoPlay)
                     m_state = sPlaying;

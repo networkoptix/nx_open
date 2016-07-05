@@ -9,6 +9,7 @@
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/config.h>
 
 #include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/rtsp_client.h>
@@ -57,7 +58,7 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
         else if (lines[i].startsWith("a=fmtp"))
         {
             QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split(';');
-            for(QByteArray param: params) 
+            for(QByteArray param: params)
             {
                 param = param.trimmed();
                 processIntParam("sizeLength", m_sizeLength, param);
@@ -74,11 +75,11 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
                 processStringParam("mode", m_mode, param);
                 processIntParam("constantSize", m_constantSize, param);
             }
-        }   
+        }
     }
     m_auHeaderExists = m_sizeLength || m_indexLength || m_indexDeltaLength || m_CTSDeltaLength || m_DTSDeltaLength || m_randomAccessIndication || m_streamStateIndication;
     m_aacHelper.readConfig(m_config);
-    
+
     const auto context = new QnAvCodecMediaContext(CODEC_ID_AAC);
     m_context = QnConstMediaContextPtr(context);
     const auto av = context->getAvCodecContext();
@@ -127,7 +128,7 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
         return false;
 
     //bool isLastPacket = rtpHeader->marker;
-    try 
+    try
     {
         if (m_auHeaderExists)
         {
@@ -138,7 +139,7 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
             if (curPtr + auHeaderLen > end)
                 return false;
             BitStreamReader reader(curPtr, curPtr + auHeaderLen);
-            while(reader.getBitsCount() < auHeaderLen) 
+            while(reader.getBitsCount() < auHeaderLen)
             {
                 if (m_sizeLength)
                     auSize << reader.getBits(m_sizeLength);
@@ -177,7 +178,7 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
     for (int i = 0; curPtr < end; ++i)
     {
         int unitSize = m_constantSize;
-        
+
         if (!m_constantSize) {
             if (auSize.size() < i+1)
                 return false;

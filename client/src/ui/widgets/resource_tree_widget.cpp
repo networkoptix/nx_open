@@ -7,7 +7,7 @@
 
 #include <common/common_meta_types.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 #include <core/resource/camera_history.h>
 #include <core/resource/resource.h>
@@ -177,7 +177,7 @@ protected:
             /* Sort by name. */
             QString leftDisplay = left.data(Qt::DisplayRole).toString();
             QString rightDisplay = right.data(Qt::DisplayRole).toString();
-            int result = naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
+            int result = nx::utils::naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
             if(result != 0)
                 return result < 0;
         }

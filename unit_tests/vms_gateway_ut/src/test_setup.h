@@ -1,10 +1,6 @@
-/**********************************************************
-* May 19, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
+#include <gtest/gtest.h>
 #include <test_support/vms_gateway_functional_test.h>
 
 

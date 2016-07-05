@@ -63,7 +63,7 @@ extern "C"
 #include <utils/common/delayed.h>
 #include <utils/common/pending_operation.h>
 #include <utils/common/scoped_value_rollback.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <utils/threaded_chunks_merge_tool.h>
@@ -1437,7 +1437,7 @@ void QnWorkbenchNavigator::updateLines() {
             kMaxNameLength = 30
         };
 
-        m_timeSlider->setLineComment(CurrentLine, elideString(m_currentWidget->resource()->getName(), kMaxNameLength));
+        m_timeSlider->setLineComment(CurrentLine, nx::utils::elideString(m_currentWidget->resource()->getName(), kMaxNameLength));
     } else {
         m_timeSlider->setLineVisible(CurrentLine, false);
         m_timeSlider->setLineVisible(SyncedLine, false);

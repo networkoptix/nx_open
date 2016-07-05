@@ -1,5 +1,6 @@
 #include "rtp_universal_encoder.h"
 #include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/config.h>
 #include "common/common_module.h"
 
 #include <core/resource/param.h>
@@ -614,9 +615,9 @@ static char *sdp_write_media_attributes(
 }
 
 
-QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, 
-                                             CodecID transcodeToCodec, 
-                                             const QSize& videoSize, 
+QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media,
+                                             CodecID transcodeToCodec,
+                                             const QSize& videoSize,
                                              const QnImageFilterHelper& extraTranscodeParams)
 :
     m_outputBuffer(CL_MEDIA_ALIGNMENT, 0),
@@ -738,7 +739,7 @@ quint32 QnUniversalRtpEncoder::getFrequency()
 
 quint8 QnUniversalRtpEncoder::getPayloadtype()
 {
-    // static payload type 
+    // static payload type
     for (int i = 0; AVRtpPayloadTypes[i].pt >= 0; ++i)
     {
         if (AVRtpPayloadTypes[i].codec_id == m_codec)

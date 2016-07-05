@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"> <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
         <version>3.0.0-SNAPSHOT</version>
@@ -19,8 +18,9 @@
         <product.display.title>${mobile_client.display.name}</product.display.title>
         <template>app</template>
 
-        <qt.libs>core qml quick quick-private concurrent network sql multimedia xml</qt.libs>
-        <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_network -lnx_fusion -lnx_utils -ludt</global.libs>
+        <qt.libs>core core-private qml quick quick-private concurrent network sql multimedia xml</qt.libs>
+        <!-- !!! DO NOT REMOVE DUPLICATES FROM global.libs UNLESS YOU KNOW WHAT YOU'RE DOING !!! -->
+        <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_vms_utils -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_streaming -lnx_network -lnx_fusion -lnx_utils -ludt</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU</linux.oslibs>
         <android.oslibs>-lturbojpeg</android.oslibs>
@@ -37,6 +37,7 @@
         <project.version.code>${buildNumber}</project.version.code>
         <project.version.name>${release.version}</project.version.name>
         <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/testing.mobileprovision</provisioning_profile>
+        <mobile_client_entitlements>mobile_client-beta.entitlements</mobile_client_entitlements>
         <provisioning_profile_id/>
     </properties>   
 
@@ -131,6 +132,7 @@
             </activation>
             <properties>
                 <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/production.mobileprovision</provisioning_profile>
+                <mobile_client_entitlements>mobile_client-release.entitlements</mobile_client_entitlements>
             </properties>
         </profile>
 

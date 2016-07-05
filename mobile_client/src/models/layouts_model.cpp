@@ -6,7 +6,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <utils/common/connective.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <common/common_module.h>
 #include <watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
@@ -274,7 +274,7 @@ bool QnLayoutsModel::lessThan(const QModelIndex& left, const QModelIndex& right)
     const auto leftName = leftLayout->getName();
     const auto rightName = rightLayout->getName();
 
-    auto cmp = naturalStringCompare(leftName, rightName, Qt::CaseInsensitive);
+    auto cmp = nx::utils::naturalStringCompare(leftName, rightName, Qt::CaseInsensitive);
     if (cmp != 0)
         return cmp < 0;
 

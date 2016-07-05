@@ -10,7 +10,7 @@
 #include <ui/processors/drag_processor.h>
 #include <ui/widgets/videowall_manage_widget_p.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {

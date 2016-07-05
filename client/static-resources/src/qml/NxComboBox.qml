@@ -33,7 +33,9 @@ ComboBox
 
     Connections
     {
-        target: model;
+        target: (model ? model : null);
+        ignoreUnknownSignals: true;
+
         onRowsRemoved:
         {
             if (currentIndex == -1)

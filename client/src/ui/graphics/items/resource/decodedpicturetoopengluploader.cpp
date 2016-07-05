@@ -44,6 +44,8 @@ extern "C"
 #endif
 #include "transcoding/filters/contrast_image_filter.h"
 
+#include <nx/streaming/config.h>
+
 //#define UPLOAD_SYSMEM_FRAMES_ASYNC
 #define UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
 #define USE_MIN_GL_TEXTURES

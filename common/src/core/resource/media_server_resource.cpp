@@ -264,14 +264,18 @@ rest::QnConnectionPtr QnMediaServerResource::restConnection()
 
 void QnMediaServerResource::setUrl(const QString& url) 
 {
+    QString oldApiUrl = getApiUrl();
     QnResource::setUrl(url);
     QString apiUrl = getApiUrl();
+    if (oldApiUrl != apiUrl)
     {
-        QnMutexLocker lock(&m_mutex);
-        if (m_apiConnection)
-            m_apiConnection->setUrl(apiUrl);
+        {
+            QnMutexLocker lock(&m_mutex);
+            if (m_apiConnection)
+                m_apiConnection->setUrl(apiUrl);
+        }
+        emit apiUrlChanged(toSharedPointer(this));
     }
-    emit apiUrlChanged(toSharedPointer(this));
 }
 
 QnStorageResourceList QnMediaServerResource::getStorages() const

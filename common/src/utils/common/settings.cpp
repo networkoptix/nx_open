@@ -32,16 +32,15 @@ QnSettings::QnSettings(
 
 void QnSettings::parseArgs(int argc, char **argv)
 {
-    parseCmdArgs(argc, argv, &m_args);
+    m_args.parse(argc, argv);
 }
 
 QVariant QnSettings::value(
     const QString& key,
     const QVariant& defaultValue) const
 {
-    auto argIter = m_args.find(key);
-    if (argIter != m_args.end())
-        return QVariant(argIter->second);
+    if (const auto value = m_args.get(key))
+        return QVariant(*value);
 
     return m_systemSettings.value(key, defaultValue);
 }
