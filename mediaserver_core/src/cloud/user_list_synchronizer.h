@@ -23,6 +23,8 @@ class CloudUserListSynchonizer
     public nx::network::aio::BasicPollable,
     public Qn::EnableSafeDirectConnection
 {
+    Q_OBJECT
+
 public:
     CloudUserListSynchonizer(CloudConnectionManager* const cloudConnectionManager);
     ~CloudUserListSynchonizer();
