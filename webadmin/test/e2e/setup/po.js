@@ -6,6 +6,7 @@ var Page = function () {
 
     var p = this;
 
+    this.logoutButton = element(by.css('[title=Logout]'));
     this.mediaServersLinks = element.all(by.repeater('server in mediaServers')).all(by.tagName('a'));
     //this.resetButton = element(by.buttonText('Reset System'));
     this.resetButton = element(by.buttonText('Restore factory defaults'));
@@ -18,7 +19,8 @@ var Page = function () {
     this.detachButton = this.dialog.element(by.buttonText('Restore factory defaults'));
     this.closeButton = this.dialog.element(by.buttonText('Close'));
 
-    this.setupDialog = element(by.css('.modal')).element(by.css('.panel'));
+    this.setupDialog = element(by.cssContainingText('.panel-heading', 'Configure new server')).element(by.xpath('../..'));
+
     this.nextButton = this.setupDialog.element(by.cssContainingText('button', 'Next'));
     this.backButton = this.setupDialog.element(by.css('.glyphicon-arrow-left'));
     this.systemNameInput = this.setupDialog.element(by.model('settings.systemName'));
@@ -64,11 +66,9 @@ var Page = function () {
 
         // If login dialog appears, reload page.
         browser.sleep(500);
-        p.helper.checkPresent(element(by.model('user.username'))).then( function() {
-            browser.refresh();
-            browser.sleep(1000);
+        this.helper.checkPresent(element(by.model('user.username'))).then( function() {
+            p.get();
         });
-        this.helper.waitIfNotDisplayed(this.setupDialog, 1000);
     }
 };
 
