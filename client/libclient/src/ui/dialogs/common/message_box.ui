@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>130</height>
+    <height>143</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
@@ -30,6 +30,9 @@
     <layout class="QHBoxLayout" name="contentLayout" stretch="0,1">
      <property name="spacing">
       <number>16</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMinAndMaxSize</enum>
      </property>
      <property name="leftMargin">
       <number>16</number>
@@ -88,6 +91,9 @@
         </widget>
        </item>
        <item>
+        <widget class="QComboBox" name="comboBox"/>
+       </item>
+       <item>
         <widget class="QCheckBox" name="checkBox">
          <property name="text">
           <string notr="true"/>
@@ -117,6 +123,10 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>comboBox</tabstop>
+  <tabstop>checkBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -127,11 +137,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>248</x>
-     <y>254</y>
+     <y>142</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
-     <y>274</y>
+     <y>142</y>
     </hint>
    </hints>
   </connection>
@@ -142,12 +152,12 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>299</x>
+     <y>142</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
-     <y>274</y>
+     <y>142</y>
     </hint>
    </hints>
   </connection>

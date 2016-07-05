@@ -73,6 +73,12 @@ public:
     QString informativeText() const;
     void setInformativeText(const QString &text);
 
+    int currentComboBoxIndex() const;
+    void setCurrentComboBoxIndex(int index);
+    QString currentComboBoxText() const;
+    void setComboBoxModel(QAbstractItemModel* model);
+    void setComboBoxItems(const QStringList& items);
+
     QString checkBoxText() const;
     void setCheckBoxText(const QString &text);
     bool isChecked() const;

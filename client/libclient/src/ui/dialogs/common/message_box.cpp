@@ -1,6 +1,7 @@
 #include "message_box.h"
 #include "ui_message_box.h"
 
+#include <QtGui/QStandardItemModel>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 
@@ -22,6 +23,7 @@ public:
     QAbstractButton *defaultButton;
     QAbstractButton *escapeButton;
     QnMessageBox::Icon icon;
+    QStandardItemModel* simpleModel;
 
     QnMessageBoxPrivate(QnMessageBox *parent);
 
@@ -29,17 +31,19 @@ public:
     void detectDefaultButton();
     void detectEscapeButton();
     void stylizeButtons();
+    QStandardItemModel* ensureSimpleModel();
     int execReturnCode(QAbstractButton *button) const;
 };
 
 
-QnMessageBoxPrivate::QnMessageBoxPrivate(QnMessageBox *parent)
-    : QObject(parent),
-      q_ptr(parent),
-      clickedButton(nullptr),
-      defaultButton(nullptr),
-      escapeButton(nullptr),
-      icon(QnMessageBox::NoIcon)
+QnMessageBoxPrivate::QnMessageBoxPrivate(QnMessageBox* parent) :
+    QObject(parent),
+    q_ptr(parent),
+    clickedButton(nullptr),
+    defaultButton(nullptr),
+    escapeButton(nullptr),
+    icon(QnMessageBox::NoIcon),
+    simpleModel(nullptr)
 {
 }
 
@@ -51,6 +55,7 @@ void QnMessageBoxPrivate::init()
             [this](QAbstractButton *button) { clickedButton = button; }
     );
 
+    q->ui->comboBox->hide();
     q->ui->checkBox->hide();
     q->ui->informativeLabel->hide();
 
@@ -145,6 +150,14 @@ void QnMessageBoxPrivate::stylizeButtons()
 
     for (QAbstractButton *button: q->buttons())
         setAccentStyle(button, button == defaultButton);
+}
+
+QStandardItemModel* QnMessageBoxPrivate::ensureSimpleModel()
+{
+    if (!simpleModel)
+        simpleModel = new QStandardItemModel(this);
+
+    return simpleModel;
 }
 
 int QnMessageBoxPrivate::execReturnCode(QAbstractButton *button) const
@@ -454,6 +467,57 @@ void QnMessageBox::setInformativeText(const QString &text)
 {
     ui->informativeLabel->setText(text);
     ui->informativeLabel->setVisible(!text.isEmpty());
+}
+
+int QnMessageBox::currentComboBoxIndex() const
+{
+    return ui->comboBox->isHidden() ? -1 : ui->comboBox->currentIndex();
+}
+
+void QnMessageBox::setCurrentComboBoxIndex(int index)
+{
+    ui->comboBox->setCurrentIndex(index);
+}
+
+QString QnMessageBox::currentComboBoxText() const
+{
+    return ui->comboBox->isHidden() ? QString() : ui->comboBox->currentText();
+}
+
+void QnMessageBox::setComboBoxModel(QAbstractItemModel* model)
+{
+    if (model)
+    {
+        ui->comboBox->setModel(model);
+        ui->comboBox->show();
+    }
+    else
+    {
+        if (!ui->comboBox->isHidden())
+        {
+            Q_D(QnMessageBox);
+            ui->comboBox->setModel(d->ensureSimpleModel());
+            ui->comboBox->hide();
+        }
+    }
+}
+
+void QnMessageBox::setComboBoxItems(const QStringList& items)
+{
+    if (items.empty())
+    {
+        setComboBoxModel(nullptr);
+        return;
+    }
+
+    Q_D(QnMessageBox);
+    QStandardItemModel* model = d->ensureSimpleModel();
+    model->clear();
+
+    for (const QString& item : items)
+        model->appendRow(new QStandardItem(item));
+
+    ui->comboBox->show();
 }
 
 QString QnMessageBox::checkBoxText() const
