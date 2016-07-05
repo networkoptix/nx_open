@@ -85,7 +85,7 @@
       <item>
        <widget class="QLineEdit" name="tagsLineEdit">
         <property name="placeholderText">
-         <string>List of tags divided by commas or spaces</string>
+         <string>List of tags divided by commas</string>
         </property>
        </widget>
       </item>
