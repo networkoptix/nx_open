@@ -147,7 +147,7 @@ QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::servers() co
     auto result = (m_cloudSystem ? m_cloudSystem->servers() : ServersList());
     
     const auto localSystemServers = (m_localSystem ? m_localSystem->servers() : ServersList());
-    const auto toAddList = (localSystemServers, result);
+    const auto toAddList = subtractLists(localSystemServers, result);
     std::copy(toAddList.begin(), toAddList.end(), std::back_inserter(result));
 
     return result;
