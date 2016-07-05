@@ -52,6 +52,8 @@ void ProxyHandler::processRequest(
         return;
     }
 
+    //TODO #ak avoid request loop by using Via header
+
     //connecting to the target host
     m_targetPeerSocket = SocketFactory::createStreamSocket();
     m_targetPeerSocket->bindToAioThread(connection->getAioThread());
@@ -95,9 +97,11 @@ nx_http::StatusCode::Value ProxyHandler::fetchTargetEndpointAndPrepareRequest(
     nx_http::Request* const request,
     SocketAddress* const targetEndpoint)
 {
-    if (m_settings.http().allowTargetEndpointInUrl &&
-        !request->requestLine.url.host().isEmpty())
+    if (!request->requestLine.url.host().isEmpty())
     {
+        if (!m_settings.http().allowTargetEndpointInUrl)
+            return nx_http::StatusCode::forbidden;
+
         //using original url path
         *targetEndpoint = SocketAddress(
             request->requestLine.url.host(),
