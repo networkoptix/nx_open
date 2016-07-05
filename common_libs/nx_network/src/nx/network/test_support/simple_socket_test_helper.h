@@ -108,6 +108,9 @@ void syncSocketServerMainFunc(
             }
             else
             {
+                if (ignoreReadWriteError && !client)
+                    continue;
+
                 ASSERT_NE(nullptr, client);
                 ASSERT_TRUE(client->setNonBlockingMode(false))
                     << SystemError::getLastOSErrorText().toStdString();
@@ -116,6 +119,8 @@ void syncSocketServerMainFunc(
         else
         {
             client.reset(server->accept());
+            if (ignoreReadWriteError && !client)
+                continue;
         }
         
         ASSERT_TRUE(client.get())
@@ -491,14 +496,8 @@ void socketShutdown(
             recvExitedPromise.get_future().wait_for(std::chrono::seconds(1)));
 
         using namespace std::chrono;
-        const auto t1 = steady_clock::now();
         serverThread.join();
-        const auto t2 = steady_clock::now();
-        std::cout<<"serverThread.join() took "
-            <<duration_cast<seconds>(t2-t1).count()<<std::endl;
         clientThread.join();
-        std::cout<<"clientThread.join() took "
-            <<duration_cast<seconds>(steady_clock::now()-t2).count()<<std::endl;
     }
 }
 
