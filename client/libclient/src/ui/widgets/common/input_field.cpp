@@ -51,7 +51,12 @@ public:
 
         Qn::ValidationResult validationResult(QValidator::Acceptable);
 
-        if (trimmed.isEmpty())
+        if (confirmationPrimaryField && confirmationPrimaryField->text() != text &&
+            !confirmationPrimaryField->text().trimmed().isEmpty())
+        {
+            validationResult = Qn::ValidationResult(confirmationFailureHint);
+        }
+        else if (trimmed.isEmpty())
         {
             validationResult = emptyInputAllowed ?
                 Qn::ValidationResult(QValidator::Acceptable) :
@@ -60,11 +65,6 @@ public:
         else if (!terminalSpacesAllowed && trimmed != text)
         {
             validationResult = Qn::ValidationResult(terminalSpacesHint);
-        }
-        else if (confirmationPrimaryField && confirmationPrimaryField->text() != text &&
-            !confirmationPrimaryField->text().trimmed().isEmpty())
-        {
-            validationResult = Qn::ValidationResult(confirmationFailureHint);
         }
         else
         {
