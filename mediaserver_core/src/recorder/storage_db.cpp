@@ -265,6 +265,15 @@ bool QnStorageDb::createDatabase(const QString &fileName)
     return true;
 }
 
+void QnStorageDb::close()
+{
+    if (m_vacuumThread.joinable())
+        m_vacuumThread.join();
+
+    m_dbHelper.stop();
+    return m_ioDevice->close();
+}
+
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() 
 {
     QVector<DeviceFileCatalogPtr> result;

@@ -8,6 +8,7 @@
 #include <climits>
 #include <vector>
 #include <algorithm>
+#include <cerrno>
 
 #include <QtCore>
 #include <QtSql>
@@ -344,6 +345,20 @@ private:
     CatalogCont m_catalogs;
 };
 
+std::string dbErrorToString(nx::media_db::Error error)
+{
+    switch (error)
+    {
+        case nx::media_db::Error::NoError: return "No Error";
+        case nx::media_db::Error::ReadError: return "Read Error";
+        case nx::media_db::Error::WriteError: return "Write Error";
+        case nx::media_db::Error::ParseError: return "Parse Error";
+        case nx::media_db::Error::Eof: return "EOF";
+        case nx::media_db::Error::WrongMode: return "Wrong DB Mode";
+    }
+    return "Unknown error";
+}
+
 class TestDbHelperHandler : public nx::media_db::DbHelperHandler
 {
 public:
@@ -364,7 +379,8 @@ public:
         top.id = cameraOp.getCameraId();
         top.uuidLen = cameraOp.getCameraUniqueIdLen();
         
-        ASSERT_TRUE(m_tdm->seekAndSet(top));
+        if (!m_tdm->seekAndSet(top))
+            initErrorString("Camera operation not found in the test data");
     }
 
     void handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp, 
@@ -382,7 +398,8 @@ public:
         tfop.fileSize = mediaFileOp.getFileSize();
         tfop.startTime = mediaFileOp.getStartTime();
 
-        ASSERT_TRUE(m_tdm->seekAndSet(tfop));
+        if (!m_tdm->seekAndSet(tfop))
+            initErrorString("Media file operation not found in the test data");
     }
 
     void handleError(nx::media_db::Error error) override
@@ -393,19 +410,51 @@ public:
     void handleRecordWrite(nx::media_db::Error error) override
     {
         *m_error = error;
-        ASSERT_TRUE(error == nx::media_db::Error::NoError ||
-                    error == nx::media_db::Error::Eof);
+        if (error != nx::media_db::Error::NoError && 
+            error != nx::media_db::Error::Eof)
+        {
+            initErrorString(dbErrorToString(error));
+        }
     }
+
+    const std::string* const getErrorString() const
+    {
+        return m_errorString.get();
+    }
+
+private:
+    void initErrorString(const std::string& errorString)
+    {
+        if (!m_errorString)
+            m_errorString = std::unique_ptr<std::string>(new std::string(errorString));
+    }
+
 private:
     nx::media_db::Error *m_error;
     TestDataManager *m_tdm;
+    std::unique_ptr<std::string> m_errorString;
 };
 
 
-void initDbFile(QFile *dbFile, const QString &workDirPath)
+void initDbFile(QFile *dbFile, const QString &fileName)
 {
-    dbFile->setFileName(QDir(workDirPath).absoluteFilePath("file.mdb"));
-    dbFile->open(QIODevice::ReadWrite);
+    FILE* fd = fopen(fileName.toLatin1().constData(), "w+b");
+    ASSERT_TRUE(fd != nullptr) << "DB file open failed: " << strerror(errno);
+    dbFile->setFileName(fileName);
+    ASSERT_TRUE(dbFile->open(fd, QIODevice::ReadWrite, QFileDevice::AutoCloseHandle)) 
+        << strerror(errno);
+}
+
+void reopenDbFile(QFile *dbFile, const QString& fileName)
+{
+    ASSERT_TRUE(dbFile->isOpen()) << "Reopen failed. File is not opened";
+    dbFile->close();
+    FILE* fd = fopen(fileName.toLatin1().constData(), "r+b");
+    ASSERT_TRUE(fd != nullptr) << "DB file " << fileName.toLatin1().constData() 
+                               << " open failed: " << strerror(errno);
+    dbFile->setFileName(fileName);
+    ASSERT_TRUE(dbFile->open(fd, QIODevice::ReadWrite, QFileDevice::AutoCloseHandle)) 
+        << strerror(errno);
 }
 
 TEST(MediaDbTest, BitsTwiddling)
@@ -477,9 +526,9 @@ TEST(MediaDbTest, ReadWrite_Simple)
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
-    const QString workDirPath = *workDirResource.getDirName();
+    QString fileName = QDir(*workDirResource.getDirName()).absoluteFilePath("file.mdb");
     QFile dbFile;
-    initDbFile(&dbFile, workDirPath);
+    initDbFile(&dbFile, fileName);
 
     nx::media_db::Error error;
     TestDataManager tdm(10000);
@@ -499,10 +548,11 @@ TEST(MediaDbTest, ReadWrite_Simple)
     for (auto &data : tdm.dataVector)
         boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
 
+    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
+
     dbHelper.setMode(nx::media_db::Mode::Read);
     dbHelper.reset();
-    dbFile.close();
-    dbFile.open(QIODevice::ReadWrite);
+    reopenDbFile(&dbFile, fileName);
 
     uint8_t dbVersion;
 
@@ -515,6 +565,7 @@ TEST(MediaDbTest, ReadWrite_Simple)
     while (error == nx::media_db::Error::NoError)
         dbHelper.readRecord();
 
+    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
     dbFile.close();
 
     size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
@@ -527,13 +578,13 @@ TEST(MediaDbTest, DbFileTruncate)
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
-    const QString workDirPath = *workDirResource.getDirName();
+    QString fileName = QDir(*workDirResource.getDirName()).absoluteFilePath("file.mdb");
     int truncateCount = 1000;
 
     while (truncateCount-- >= 0)
     {
         QFile dbFile;
-        initDbFile(&dbFile, workDirPath);
+        initDbFile(&dbFile, fileName);
 
         nx::media_db::Error error;
         TestDataManager tdm(1);
@@ -546,20 +597,24 @@ TEST(MediaDbTest, DbFileTruncate)
         for (auto &data : tdm.dataVector)
             boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
 
+        ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
+
         dbHelper.setMode(nx::media_db::Mode::Read);
-        dbFile.close();
-        dbFile.open(QIODevice::ReadOnly);
+        reopenDbFile(&dbFile, fileName);
 
         QByteArray content = dbFile.readAll();
-        ASSERT_TRUE(dbFile.remove());
+        ASSERT_NE(content.size(), 0);
+        dbFile.close();
+        ASSERT_TRUE(QFile::remove(fileName)) << "DB file " 
+                                     << fileName.toLatin1().constData() 
+                                     << " remove failed";
         // truncating randomly last record
         content.truncate(content.size() - genRandomNumber<1, sizeof(qint64) * 2 - 1>());
 
-        initDbFile(&dbFile, workDirPath);
+        initDbFile(&dbFile, fileName);
         dbFile.write(content);
-        dbFile.close();
 
-        dbFile.open(QIODevice::ReadOnly);
+        reopenDbFile(&dbFile, fileName);
         dbHelper.setDevice(&dbFile);
 
         uint8_t dbVersion;
@@ -572,8 +627,11 @@ TEST(MediaDbTest, DbFileTruncate)
         while (error == nx::media_db::Error::NoError)
             dbHelper.readRecord();
 
+        ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
+
+        dbFile.close();
         ASSERT_TRUE(error == nx::media_db::Error::ReadError) << (int)error;
-        ASSERT_TRUE(dbFile.remove());
+        ASSERT_TRUE(QFile::remove(fileName));
 
         size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
                                            [](const TestData &td) { return td.visited; });
@@ -587,9 +645,9 @@ TEST(MediaDbTest, ReadWrite_MT)
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
-    const QString workDirPath = *workDirResource.getDirName();
+    QString fileName = QDir(*workDirResource.getDirName()).absoluteFilePath("file.mdb");
     QFile dbFile;
-    initDbFile(&dbFile, workDirPath);
+    initDbFile(&dbFile, fileName);
 
     const size_t threadsNum = 4;
     const size_t recordsCount = 1000;
@@ -622,10 +680,11 @@ TEST(MediaDbTest, ReadWrite_MT)
         if (threads[i].joinable())
             threads[i].join();
 
+    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
+
     dbHelper.setMode(nx::media_db::Mode::Read);
     dbHelper.reset();
-    dbFile.close();
-    dbFile.open(QIODevice::ReadWrite);
+    reopenDbFile(&dbFile, fileName);
 
     uint8_t dbVersion;
     error = dbHelper.readFileHeader(&dbVersion);
@@ -636,6 +695,8 @@ TEST(MediaDbTest, ReadWrite_MT)
 
     while (error == nx::media_db::Error::NoError)
         dbHelper.readRecord();
+
+    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
 
     size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
                                        [](const TestData &td) { return td.visited; });
@@ -663,8 +724,7 @@ TEST(MediaDbTest, ReadWrite_MT)
 
     // and now read again from the beginning
     dbHelper.setMode(nx::media_db::Mode::Read); // wait for writer here
-    dbFile.close();
-    dbFile.open(QIODevice::ReadWrite);
+    reopenDbFile(&dbFile, fileName);
 
     error = dbHelper.readFileHeader(&dbVersion);
     ASSERT_TRUE(dbVersion == boost::get<TestFileHeader>(tdm.dataVector[0].data).dbVersion);
@@ -685,10 +745,13 @@ TEST(MediaDbTest, ReadWrite_MT)
         dbHelper.readRecord();
     }
 
+    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
+
     readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
                                 [](const TestData &td) { return td.visited; });
     ASSERT_TRUE(readRecords == tdm.dataVector.size()) << readRecords;
     dbFile.close();
+    QFile::remove(fileName);
 }
 
 TEST(MediaDbTest, StorageDB)
@@ -832,10 +895,17 @@ TEST(MediaDbTest, StorageDB)
                                    });
     if (!allVisited)
     {
-        size_t notVisited = std::count_if(tcm.get().cbegin(), tcm.get().cend(), [] (const TestChunkManager::TestChunk &tc) { return !tc.isDeleted && !tc.isVisited; });
+        size_t notVisited = std::count_if(
+                tcm.get().cbegin(), 
+                tcm.get().cend(), 
+                [](const TestChunkManager::TestChunk &tc) 
+                { return !tc.isDeleted && !tc.isVisited; });
         qWarning() << lit("Not visited count: %1").arg(notVisited);
     }
     ASSERT_EQ(allVisited, true);
+
+    sdb.close();
+    ASSERT_TRUE(QFile::remove(workDirPath + lit("/test.nxdb")));
 }
 
 TEST(MediaDbTest, Migration_from_sqlite)
@@ -875,14 +945,18 @@ TEST(MediaDbTest, Migration_from_sqlite)
     QString simplifiedGUID = QnStorageDbPool::getLocalGuid();
     QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
     //QString fileName = closeDirPath(workDirPath) + lit("media.sqlite");
-    QSqlDatabase sqlDb = QSqlDatabase::addDatabase(lit("QSQLITE"), QString("QnStorageManager_%1").arg(fileName));
+    auto sqlDb = std::unique_ptr<QSqlDatabase>(
+            new QSqlDatabase(
+                QSqlDatabase::addDatabase(
+                    lit("QSQLITE"), 
+                    QString("QnStorageManager_%1").arg(fileName))));
 
-    sqlDb.setDatabaseName(fileName);
-    ASSERT_TRUE(sqlDb.open());
-    ASSERT_TRUE(QnDbHelper::execSQLFile(lit(":/01_create_storage_db.sql"), sqlDb));
+    sqlDb->setDatabaseName(fileName);
+    ASSERT_TRUE(sqlDb->open());
+    ASSERT_TRUE(QnDbHelper::execSQLFile(lit(":/01_create_storage_db.sql"), *sqlDb));
 
     const size_t kMaxCatalogs = 4;
-    const size_t kMaxChunks = 200;
+    const size_t kMaxChunks = 50;
     const size_t k23MaxChunks = kMaxChunks * 2 / 3;
     const size_t k13MaxChunks = kMaxChunks / 3;
     std::vector<DeviceFileCatalogPtr> referenceCatalogs;
@@ -908,7 +982,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
     {
         for (size_t j = 0; j < k23MaxChunks; ++j)
         {
-            QSqlQuery query(sqlDb);
+            QSqlQuery query(*sqlDb);
             ASSERT_TRUE(query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)"));
             DeviceFileCatalog::Chunk const &chunk = referenceCatalogs[i]->getChunks().at(j);
 
@@ -930,6 +1004,11 @@ TEST(MediaDbTest, Migration_from_sqlite)
     result = storage->initOrUpdate();
     ASSERT_TRUE(result);
 
+    auto connectionName = sqlDb->connectionName();
+    sqlDb->close();
+    sqlDb.reset();
+    QSqlDatabase::removeDatabase(connectionName);
+
     auto sdb = qnStorageDbPool->getSDB(storage);
     ASSERT_TRUE(result);
     sdb->loadFullFileCatalog();
@@ -944,10 +1023,6 @@ TEST(MediaDbTest, Migration_from_sqlite)
         }
     }
 
-    auto connectionName = sqlDb.connectionName();
-    sqlDb.close();
-    sqlDb = QSqlDatabase();
-    QSqlDatabase::removeDatabase(connectionName);
     QnStorageManager::migrateSqliteDatabase(storage);
     auto mergedCatalogs = sdb->loadFullFileCatalog();
 
@@ -960,5 +1035,8 @@ TEST(MediaDbTest, Migration_from_sqlite)
         ASSERT_TRUE(mergedIt != mergedCatalogs.cend());
         ASSERT_TRUE((*mergedIt)->getChunks() == referenceCatalogs[i]->getChunks());
     }
+
+    sdb->close();
+    ASSERT_TRUE(QFile::remove(fileName + lit("_deprecated")));
 }
 
