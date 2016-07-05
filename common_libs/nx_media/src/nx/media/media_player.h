@@ -4,6 +4,7 @@
 #include <QtCore/QUrl>
 #include <QtMultimedia/QMediaPlayer>
 #include <QtCore/QSize>
+#include <QtCore/QRect>
 
 class QAbstractVideoSurface;
 
@@ -67,6 +68,8 @@ class Player: public QObject
      */
     Q_PROPERTY(QSize currentResolution READ currentResolution)
 
+    Q_PROPERTY(QRect videoGeometry READ videoGeometry WRITE setVideoGeometry NOTIFY videoGeometryChanged)
+
 public:
     enum class State
     {
@@ -125,6 +128,9 @@ public:
 
     QSize currentResolution() const;
 
+    QRect videoGeometry() const;
+    void setVideoGeometry(const QRect& rect);
+
 public slots:
     void play();
     void pause();
@@ -140,6 +146,7 @@ signals:
     void reconnectOnPlayChanged();
     void liveModeChanged();
     void videoQualityChanged();
+    void videoGeometryChanged();
 
 private:
     QScopedPointer<PlayerPrivate> d_ptr;

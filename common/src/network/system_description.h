@@ -1,82 +1,58 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
 
 #include <network/module_information.h>
+#include <network/base_system_description.h>
 #include <nx/utils/uuid.h>
-#include <nx/network/socket_common.h>
 
-class QnSystemDescription;
-typedef QSharedPointer<QnSystemDescription> QnSystemDescriptionPtr;
-
-enum class QnServerField
+class QnSystemDescription : public QnBaseSystemDescription
 {
-    NoField                 = 0x00
-    , NameField             = 0x01
-    , SystemNameField       = 0x02
-    , HostField             = 0x04
-    , FlagsField            = 0x08
-};
-Q_DECLARE_FLAGS(QnServerFields, QnServerField)
-Q_DECLARE_METATYPE(QnServerFields)
-
-class QnSystemDescription : public QObject
-{
-    Q_OBJECT
-    typedef QObject base_type;
+    typedef QnBaseSystemDescription base_type;
 
 public:
-    static QnSystemDescriptionPtr createLocalSystem(const QString &systemId
+    typedef QSharedPointer<QnSystemDescription> PointerType;
+    static PointerType createLocalSystem(const QString &systemId
         , const QString &systemName);
 
-    static QnSystemDescriptionPtr createCloudSystem(const QString &systemId
+    static PointerType createCloudSystem(const QString &systemId
         , const QString &systemName
         , const QString &ownerAccountEmail
         , const QString &ownerFullName);
 
     virtual ~QnSystemDescription();
 
-    QString id() const;
+public: // overrides
+    QString id() const override;
 
-    QString name() const;
+    QString name() const override;
 
-    QString ownerAccountEmail() const;
+    QString ownerAccountEmail() const override;
 
-    QString ownerFullName() const;
+    QString ownerFullName() const override;
 
-    bool isCloudSystem() const;
+    bool isCloudSystem() const override;
 
-    typedef QList<QnModuleInformation> ServersList;
-    ServersList servers() const;
+    ServersList servers() const override;
 
-    enum { kDefaultPriority = 0};
-    void addServer(const QnModuleInformation &serverInfo
-        , int priority = kDefaultPriority);
+    bool containsServer(const QnUuid &serverId) const override;
 
-    bool containsServer(const QnUuid &serverId) const;
+    QnModuleInformation getServer(const QnUuid &serverId) const override;
 
-    QnModuleInformation getServer(const QnUuid &serverId) const;
+    QString getServerHost(const QnUuid &serverId) const override;
+
+    qint64 getServerLastUpdatedMs(const QnUuid &serverId) const override;
+
+public:
+    enum { kDefaultPriority = 0 };
+    void addServer(const QnModuleInformation &serverInfo, int priority);
 
     QnServerFields updateServer(const QnModuleInformation &serverInfo);
 
     void removeServer(const QnUuid &serverId);
 
-    void setServerHost(const QnUuid &serverId
-        , const QString &host);
-
-    QString getServerHost(const QnUuid &serverId) const;
-
-    qint64 getServerLastUpdatedMs(const QnUuid &serverId) const;
-
-signals:
-    void serverAdded(const QnUuid &serverId);
-
-    void serverRemoved(const QnUuid &serverId);
-
-    void serverChanged(const QnUuid &serverId
-        , QnServerFields flags);
+    void setServerHost(const QnUuid &serverId, const QString &host);
 
 private:
     QnSystemDescription(const QString &systemId
@@ -102,6 +78,4 @@ private:
     ServerInfoHash m_servers;
     PrioritiesMap m_prioritized;
     HostsHash m_hosts;
-
-
 };
