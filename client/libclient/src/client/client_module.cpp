@@ -254,6 +254,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     if (startupParams.selfUpdateMode)
         return;
 
+    // TODO: #dklychkov Move to client core module
     common->store<QnFfmpegInitializer>(new QnFfmpegInitializer());
 
     auto clientInstanceManager = new QnClientInstanceManager(); /* Depends on QnClientSettings */
