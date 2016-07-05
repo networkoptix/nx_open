@@ -630,8 +630,6 @@ QSGNode *QnTimeline::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeD
         updateChunksNode(static_cast<QSGGeometryNode*>(node->childAtIndex(1)));
     }
 
-    update();
-
     return node;
 }
 
@@ -1127,6 +1125,8 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
     const auto originalWindowEnd = windowEnd;
     const auto originalWindowPosition = originalWindowStart + (originalWindowEnd - originalWindowStart) / 2;
 
+    bool updateRequired = false;
+
     if (!stickToEnd && autoPlay) {
         qint64 shift = dt * autoPlaySpeed * playSpeedCorrection;
         windowStart += shift;
@@ -1217,6 +1217,8 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
             else
                 zoomLevel = qMax(targetZoomLevel, zoomLevel - zoomAnimationSpeed * dt);
         }
+
+        updateRequired = true;
     }
 
     if (!qFuzzyCompare(textLevel, targetTextLevel)) {
@@ -1231,14 +1233,29 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
             else
                 textLevel = qMax(targetTextLevel, textLevel - textOpacityAnimationSpeed * dt);
         }
+
+        updateRequired = true;
     }
 
+    bool windowUpdateRequired = false;
     if (originalWindowStart != windowStart)
+    {
         emit parent->windowStartChanged();
+        windowUpdateRequired = true;
+    }
     if (originalWindowEnd != windowEnd)
+    {
         emit parent->windowEndChanged();
+        windowUpdateRequired = true;
+    }
     if (originalWindowPosition != parent->position())
+    {
         emit parent->positionChanged();
+        windowUpdateRequired = true;
+    }
+
+    windowUpdateRequired = (windowUpdateRequired && startBoundTime >= 0);
+    updateRequired = (updateRequired || windowUpdateRequired);
 
     qreal targetTextOpacity = hasArchive() ? 1.0 : 0.0;
     if (!qFuzzyCompare(textOpacity, targetTextOpacity)) {
@@ -1246,6 +1263,8 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
             textOpacity = qMin(targetTextOpacity, textOpacity + textOpacityAnimationSpeed * dt);
         else
             textOpacity = qMax(targetTextOpacity, textOpacity - textOpacityAnimationSpeed * dt);
+
+        updateRequired = true;
     }
 
     bool live = parent->position() + 1000 >= QDateTime::currentMSecsSinceEpoch();
@@ -1256,6 +1275,8 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
             liveOpacity = qMin(targetLiveOpacity, liveOpacity + liveOpacityAnimationSpeed * dt);
         else
             liveOpacity = qMax(targetLiveOpacity, liveOpacity - liveOpacityAnimationSpeed * dt);
+
+        updateRequired = true;
     }
 
     qreal targetActiveLiveOpacity = live ? 1.0 : 0.0;
@@ -1264,16 +1285,23 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
             activeLiveOpacity = qMin(targetActiveLiveOpacity, activeLiveOpacity + liveOpacityAnimationSpeed * dt);
         else
             activeLiveOpacity = qMax(targetActiveLiveOpacity, activeLiveOpacity - liveOpacityAnimationSpeed * dt);
+
+        updateRequired = true;
     }
 
     if (live) {
         stripesPosition += dt * stripesMovingSpeed;
         while (stripesPosition > 1.0)
             stripesPosition -= 1.0;
+
+        updateRequired = true;
     }
 
     if (justStopped)
         parent->moveFinished();
+
+    if (updateRequired)
+        parent->update();
 }
 
 void QnTimelinePrivate::zoomWindow(qreal factor) {

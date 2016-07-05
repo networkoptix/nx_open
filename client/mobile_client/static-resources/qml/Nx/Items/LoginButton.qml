@@ -32,5 +32,6 @@ FocusScope
     {
         anchors.centerIn: parent
         opacity: 1.0 - connectButton.opacity
+        running: opacity > 0
     }
 }

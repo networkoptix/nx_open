@@ -12,7 +12,6 @@ PageBase
 
     padding: 16
     topPadding: 24
-
     header: WarningPanel
     {
         id: warningPanel

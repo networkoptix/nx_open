@@ -166,6 +166,7 @@ Page
 
             CirclesBusyIndicator
             {
+                running: loadingDummy.visible
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
