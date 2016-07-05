@@ -89,17 +89,19 @@ Qn::CameraSettingsTab QnCameraSettingsWidget::currentTab() const {
     }
 }
 
-void QnCameraSettingsWidget::setCurrentTab(Mode mode, Qn::CameraSettingsTab tab) {
-    switch(mode) {
-    case SingleMode:
-        m_singleWidget->setCurrentTab(tab);
-        break;
-    case MultiMode:
-        m_multiWidget->setCurrentTab(tab);
-        break;
-    default:
-        m_emptyTab = tab;
-        break;
+void QnCameraSettingsWidget::setCurrentTab(Mode mode, Qn::CameraSettingsTab tab)
+{
+    switch (mode)
+    {
+        case SingleMode:
+            m_singleWidget->setCurrentTab(tab);
+            break;
+        case MultiMode:
+            m_multiWidget->setCurrentTab(tab);
+            break;
+        default:
+            m_emptyTab = tab;
+            break;
     }
 }
 
@@ -241,37 +243,39 @@ void QnCameraSettingsWidget::submitToResources() {
     }
 }
 
-void QnCameraSettingsWidget::setMode(Mode mode) {
+void QnCameraSettingsWidget::setMode(Mode mode)
+{
     Mode oldMode = this->mode();
-    if(mode == oldMode)
+    if (mode == oldMode)
         return;
 
     bool oldHasChanges = hasDbChanges();
     Qn::CameraSettingsTab oldTab = currentTab();
 
-    if(m_stackedWidget->currentIndex() == SingleMode || m_stackedWidget->currentIndex() == MultiMode)
+    if (m_stackedWidget->currentIndex() == SingleMode || m_stackedWidget->currentIndex() == MultiMode)
         disconnect(m_stackedWidget->currentWidget(), SIGNAL(hasChangesChanged()), this, SIGNAL(hasChangesChanged()));
 
     setCurrentTab(mode, oldTab);
 
-    switch(oldMode) {
-    case SingleMode:
-        m_singleWidget->setCamera(QnVirtualCameraResourcePtr());
-        break;
-    case MultiMode:
-        m_multiWidget->setCameras(QnVirtualCameraResourceList());
-        break;
-    default:
-        break;
+    switch (oldMode)
+    {
+        case SingleMode:
+            m_singleWidget->setCamera(QnVirtualCameraResourcePtr());
+            break;
+        case MultiMode:
+            m_multiWidget->setCameras(QnVirtualCameraResourceList());
+            break;
+        default:
+            break;
     }
 
     m_stackedWidget->setCurrentIndex(mode);
 
-    if(m_stackedWidget->currentIndex() == SingleMode || m_stackedWidget->currentIndex() == MultiMode)
+    if (m_stackedWidget->currentIndex() == SingleMode || m_stackedWidget->currentIndex() == MultiMode)
         connect(m_stackedWidget->currentWidget(), SIGNAL(hasChangesChanged()), this, SIGNAL(hasChangesChanged()));
 
     bool newHasChanges = hasDbChanges();
-    if(oldHasChanges != newHasChanges)
+    if (oldHasChanges != newHasChanges)
         emit hasChangesChanged();
 
     emit modeChanged();

@@ -714,27 +714,30 @@ void QnSingleCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled) 
 }
 
 
-int QnSingleCameraSettingsWidget::tabIndex(Qn::CameraSettingsTab tab) const {
-    switch (tab) {
-    case Qn::GeneralSettingsTab:
-        return ui->tabWidget->indexOf(ui->generalTab);
-    case Qn::RecordingSettingsTab:
-        return ui->tabWidget->indexOf(ui->recordingTab);
-    case Qn::IOPortsSettingsTab:
-        return ui->tabWidget->indexOf(ui->ioSettingsTab);
-    case Qn::MotionSettingsTab:
-        return ui->tabWidget->indexOf(ui->motionTab);
-    case Qn::FisheyeCameraSettingsTab:
-        return ui->tabWidget->indexOf(ui->fisheyeTab);
-    case Qn::AdvancedCameraSettingsTab:
-        return ui->tabWidget->indexOf(ui->advancedTab);
-    case Qn::ExpertCameraSettingsTab:
-        return ui->tabWidget->indexOf(ui->expertTab);
-    default:
-        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
-        break;
+int QnSingleCameraSettingsWidget::tabIndex(Qn::CameraSettingsTab tab) const
+{
+    switch (tab)
+    {
+        case Qn::GeneralSettingsTab:
+            return ui->tabWidget->indexOf(ui->generalTab);
+        case Qn::RecordingSettingsTab:
+            return ui->tabWidget->indexOf(ui->recordingTab);
+        case Qn::IOPortsSettingsTab:
+            return ui->tabWidget->indexOf(ui->ioSettingsTab);
+        case Qn::MotionSettingsTab:
+            return ui->tabWidget->indexOf(ui->motionTab);
+        case Qn::FisheyeCameraSettingsTab:
+            return ui->tabWidget->indexOf(ui->fisheyeTab);
+        case Qn::AdvancedCameraSettingsTab:
+            return ui->tabWidget->indexOf(ui->advancedTab);
+        case Qn::ExpertCameraSettingsTab:
+            return ui->tabWidget->indexOf(ui->expertTab);
+        default:
+            break;
     }
-    return -1;
+
+    /* Passing here is totally normal because we want to save the current tab while switching between dialog modes. */
+    return ui->tabWidget->indexOf(ui->generalTab);
 }
 
 void QnSingleCameraSettingsWidget::setTabEnabledSafe(Qn::CameraSettingsTab tab, bool enabled) {

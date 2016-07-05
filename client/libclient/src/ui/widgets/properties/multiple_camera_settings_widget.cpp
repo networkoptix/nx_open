@@ -110,32 +110,35 @@ Qn::CameraSettingsTab QnMultipleCameraSettingsWidget::currentTab() const {
     return Qn::GeneralSettingsTab;
 }
 
-void QnMultipleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
-    /* Using field names here so that changes in UI file will lead to compilation errors. */
+void QnMultipleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab)
+{
+/* Using field names here so that changes in UI file will lead to compilation errors. */
 
-    if (!ui->tabWidget->isTabEnabled(tabIndex(tab))) {
+    if (!ui->tabWidget->isTabEnabled(tabIndex(tab)))
+    {
         ui->tabWidget->setCurrentWidget(ui->tabGeneral);
         return;
     }
 
-    switch(tab) {
-    case Qn::GeneralSettingsTab:
-    case Qn::IOPortsSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabGeneral);
-        break;
-    case Qn::RecordingSettingsTab:
-    case Qn::MotionSettingsTab:
-    case Qn::AdvancedCameraSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabRecording);
-        break;
-    case Qn::ExpertCameraSettingsTab:
+    switch (tab)
+    {
+        case Qn::GeneralSettingsTab:
+        case Qn::IOPortsSettingsTab:
+            ui->tabWidget->setCurrentWidget(ui->tabGeneral);
+            break;
+        case Qn::RecordingSettingsTab:
+        case Qn::MotionSettingsTab:
+        case Qn::AdvancedCameraSettingsTab:
+            ui->tabWidget->setCurrentWidget(ui->tabRecording);
+            break;
+        case Qn::ExpertCameraSettingsTab:
 
-        ui->tabWidget->setCurrentWidget(ui->expertTab);
-        break;
-    default:
-        qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
-        ui->tabWidget->setCurrentWidget(ui->tabGeneral);
-        break;
+            ui->tabWidget->setCurrentWidget(ui->expertTab);
+            break;
+        default:
+            qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
+            ui->tabWidget->setCurrentWidget(ui->tabGeneral);
+            break;
     }
 }
 
@@ -422,19 +425,22 @@ void QnMultipleCameraSettingsWidget::setHasDbChanges(bool hasChanges) {
 }
 
 
-int QnMultipleCameraSettingsWidget::tabIndex(Qn::CameraSettingsTab tab) const {
-    switch (tab) {
-    case Qn::GeneralSettingsTab:
-        return ui->tabWidget->indexOf(ui->tabGeneral);
-    case Qn::RecordingSettingsTab:
-        return ui->tabWidget->indexOf(ui->tabRecording);
-    case Qn::ExpertCameraSettingsTab:
-        return ui->tabWidget->indexOf(ui->expertTab);
-    default:
-        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
-        break;
+int QnMultipleCameraSettingsWidget::tabIndex(Qn::CameraSettingsTab tab) const
+{
+    switch (tab)
+    {
+        case Qn::GeneralSettingsTab:
+            return ui->tabWidget->indexOf(ui->tabGeneral);
+        case Qn::RecordingSettingsTab:
+            return ui->tabWidget->indexOf(ui->tabRecording);
+        case Qn::ExpertCameraSettingsTab:
+            return ui->tabWidget->indexOf(ui->expertTab);
+        default:
+            break;
     }
-    return -1;
+
+    /* Passing here is totally normal because we want to save the current tab while switching between dialog modes. */
+    return ui->tabWidget->indexOf(ui->tabGeneral);
 }
 
 void QnMultipleCameraSettingsWidget::setTabEnabledSafe(Qn::CameraSettingsTab tab, bool enabled) {
