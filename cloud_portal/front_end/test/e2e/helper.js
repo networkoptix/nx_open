@@ -114,10 +114,11 @@ var Helper = function () {
     this.userEmailNoPerm = 'noptixqa+noperm@gmail.com';
 
     this.roles = {
-        admin: 'option[label=admin]',
-        viewer: 'option[label=viewer]',
-        advViewer: 'option[label~=advanced]',
-        liveViewer: 'option[label~=live]'
+        admin: 'Administrator',
+        viewer: 'Viewer',
+        advViewer: 'Advanced viewer',
+        liveViewer: 'Live viewer',
+        custom: 'Custom'
     };
 
     this.userFirstName = 'TestFirstName';
@@ -147,7 +148,7 @@ var Helper = function () {
     this.userPasswordHierog = '您都可以享受源源不絕的好禮及優惠';
     this.userPasswordWrong = 'qweqwe123';
 
-    this.loginSuccessElement = element.all(by.css('.auth-visible')).first(); // some element on page, that is only visible when user is authenticated
+    this.loginSuccessElement = element(by.cssContainingText('h1','Systems')); // some element on page, that is only visible when user is authenticated
     //this.loggedOutElement = element(by.css('.container.ng-scope')).all(by.css('.auth-hidden')).first(); // some element on page visible to not auth user
     this.htmlBody = element(by.css('body'));
 
@@ -180,7 +181,7 @@ var Helper = function () {
         h.forms.login.emailInput.sendKeys(usrEmail);
         h.forms.login.passwordInput.sendKeys(usrPassword);
         h.forms.login.submitButton.click();
-        browser.sleep(2000); // such a shame, but I can't solve it right now
+        browser.sleep(2000);
     };
 
     this.logout = function() {
@@ -264,9 +265,9 @@ var Helper = function () {
     };
 
     this.shareSystemWith = function(email, role, systemLink) {
-        var sharedRole = role || 'admin';
-        var systemLinkCode = systemLink || '/a74840da-f135-4522-abd9-5a8c6fb8591f';
-        var roleOption = h.forms.share.roleField.element(by.css(sharedRole));
+        var sharedRole = role || 'Administrator';
+        var systemLinkCode = systemLink || '/ed08e87a-dd8f-4893-aa6d-b4e29f849d2b';
+        var roleOption = h.forms.share.roleField.element(by.cssContainingText('option', sharedRole));
 
         this.getSysPage(systemLinkCode);
 
