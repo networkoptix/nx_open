@@ -166,10 +166,10 @@ module.exports = function (grunt) {
 
                 //Vitaly Kutin
                 /*{context: '/api/',      host: '10.0.3.197', port: 7001},
-                {context: '/ec2/',      host: '10.0.3.197', port: 7001},
-                {context: '/hls/',      host: '10.0.3.197', port: 7001},
-                {context: '/media/',    host: '10.0.3.197', port: 7001},
-                {context: '/proxy/',    host: '10.0.3.197', port: 7001}/**/
+                 {context: '/ec2/',      host: '10.0.3.197', port: 7001},
+                 {context: '/hls/',      host: '10.0.3.197', port: 7001},
+                 {context: '/media/',    host: '10.0.3.197', port: 7001},
+                 {context: '/proxy/',    host: '10.0.3.197', port: 7001}/**/
 
                 // Olya - external
                 /*{context: '/api/',      host: '95.31.136.2', port: 7011},
@@ -229,9 +229,16 @@ module.exports = function (grunt) {
                  {context: '/media/',    host: '10.1.5.130', port: 7001},
                  {context: '/proxy/',    host: '10.1.5.130', port: 7001}/**/
 
+                //Korneeva
+                {context: '/web/',      host: '10.0.3.65', port: 7001},
+                {context: '/api/',      host: '10.0.3.65', port: 7001},
+                {context: '/ec2/',      host: '10.0.3.65', port: 7001},
+                {context: '/hls/',      host: '10.0.3.65', port: 7001},
+                {context: '/media/',    host: '10.0.3.65', port: 7001},
+                {context: '/proxy/',    host: '10.0.3.65', port: 7001}/**/
 
                 //Parallels - Burbank
-                {context: '/web/',      host: '10.1.5.104', port: 7001},
+                /*{context: '/web/',      host: '10.1.5.104', port: 7001},
                 {context: '/api/',      host: '10.1.5.104', port: 7001},
                 {context: '/ec2/',      host: '10.1.5.104', port: 7001},
                 {context: '/hls/',      host: '10.1.5.104', port: 7001},
@@ -678,7 +685,8 @@ module.exports = function (grunt) {
         },
         'protractor_webdriver': {
             options:{
-
+                command: 'webdriver-manager start -Djava.security.egd=file:///dev/urandom',
+                keepAlive : true
             },
             default:{
 
@@ -723,8 +731,8 @@ module.exports = function (grunt) {
         'connect:test',
         'protractor_webdriver',
         'shell:print_version',
-        'protractor:all',
-        'newer:jshint'
+        'protractor:all'
+        //'newer:jshint'
         //'karma'
     ]);
     grunt.registerTask('code', [
@@ -790,6 +798,4 @@ module.exports = function (grunt) {
         'build',
         'scp:demo_fast'
     ]);
-
-
 };
