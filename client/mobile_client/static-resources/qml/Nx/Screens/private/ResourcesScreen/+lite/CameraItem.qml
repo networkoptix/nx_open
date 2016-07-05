@@ -194,7 +194,7 @@ Control
                     item: videoOutput
                     onScenePosChanged:
                     {
-                        player.globalVideoGeometry = Qt.rect(
+                        player.videoGeometry = Qt.rect(
                             scenePos.x,
                             scenePos.y,
                             videoOutput.width,
