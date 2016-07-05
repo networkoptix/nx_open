@@ -719,9 +719,9 @@ namespace ec2
          * the result of the corresponding GET function.
          * </p>
          * %param id User unique id. Should be generated when creating a new user.
-         * %param parentId Should be empty.
+         * %param[opt] parentId Should be empty.
          * %param name User name.
-         * %param url Should be empty.
+         * %param[opt] url Should be empty.
          * %param typeId Should have fixed value.
          *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}
          * %param isAdmin Indended for internal use; keep the value when saving
@@ -739,15 +739,15 @@ namespace ec2
          *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O buttons.
          *     %value GlobalAccessAllCamerasPermission Has access to all cameras
          * %param email User's email.
-         * %param digest HA1 digest hash from user password, as per RFC 2069. When modifying an
+         * %param[opt] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
          *     existing user, supply empty string. When creating a new user, calculate the value
          *     based on UTF-8 password as follows:
          *     <code>digest = md5(name + ":" + realm + ":" + password).toHex();</code>
-         * %param hash User password hash. When modifying an existing user, supply empty string.
+         * %param[opt] hash User password hash. When modifying an existing user, supply empty string.
          *     When creating a new user, calculate the value based on UTF-8 password as follows:
          *     <code>salt = rand().toHex();
          *     hash = "md5$" + salt + "$" + md5(salt + password).toHex();</code>
-         * %param cryptSha512Hash Cryptography key hash. Supply empty string
+         * %param[opt] cryptSha512Hash Cryptography key hash. Supply empty string
          *     when creating, keep the value when modifying.
          * %param realm Should have fixed value which can be obtained via gettime call.
          * %param isLdap Whether the user was imported from LDAP.
