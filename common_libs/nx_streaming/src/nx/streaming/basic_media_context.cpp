@@ -1,6 +1,7 @@
 #include "basic_media_context.h"
 
 #include <nx/streaming/media_context_serializable_data.h>
+#include <nx/utils/log/log.h>
 
 #if !defined(DISABLE_FFMPEG)
     #include <utils/media/ffmpeg_helper.h> //< for deserializeMediaContextFromDepricatedFormat()
