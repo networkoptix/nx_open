@@ -5,12 +5,12 @@
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/audio_data_packet.h>
 
-class QnSpeachSynthesisDataProvider : public QnAbstractStreamDataProvider
+class QnSpeechSynthesisDataProvider : public QnAbstractStreamDataProvider
 {
 Q_OBJECT
 public:
-    explicit QnSpeachSynthesisDataProvider(const QString& text);
-    virtual ~QnSpeachSynthesisDataProvider();
+    explicit QnSpeechSynthesisDataProvider(const QString& text);
+    virtual ~QnSpeechSynthesisDataProvider();
 
     virtual void run() override;
 
@@ -19,7 +19,7 @@ public:
     void setText(const QString& text);
 
 signals:
-    void finished(QnSpeachSynthesisDataProvider*);
+    void finished(QnSpeechSynthesisDataProvider*);
 
 private:
     QByteArray doSynthesis(const QString& text);

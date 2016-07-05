@@ -19,7 +19,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libclient-x86", "${root.dir
 		${nx_streaming.guid} = ${nx_streaming.guid}
 		${nx_audio.guid} = ${nx_audio.guid}
 		${client_core.guid} = ${client_core.guid}
-		${nx_speach_synthesizer.guid} = $${nx_speach_synthesizer.guid}
+		${nx_speech_synthesizer.guid} = $${nx_speech_synthesizer.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libclient_core-x86", "${root.dir}\client\libclient_core\src\libclient_core-x86.vcxproj", "${libclient_core.guid}"
@@ -52,7 +52,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_audio-x86", "${root.dir}
 		${nx_utils.guid} = ${nx_utils.guid}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_speach_synthesizer-x86", "${root.dir}\common_libs\nx_speach_synthesizer\src\nx_speach_synthesizer-x86.vcxproj", "${nx_speach_synthesizer.guid}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_speech_synthesizer-x86", "${root.dir}\common_libs\nx_speech_synthesizer\src\nx_speech_synthesizer-x86.vcxproj", "${nx_speech_synthesizer.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${common.guid} = ${common.guid}
 		${nx_utils.guid} = ${nx_utils.guid}
@@ -135,10 +135,10 @@ Global
 		${nx_fusion.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_fusion.guid}.Release|Win32.ActiveCfg = Release|Win32
 		${nx_fusion.guid}.Release|Win32.Build.0 = Release|Win32
-		${nx_speach_synthesizer.guid}.Debug|Win32.ActiveCfg = Debug|Win32
-		${nx_speach_synthesizer.guid}.Debug|Win32.Build.0 = Debug|Win32
-		${nx_speach_synthesizer.guid}.Release|Win32.ActiveCfg = Release|Win32
-		${nx_speach_synthesizer.guid}.Release|Win32.Build.0 = Release|Win32
+		${nx_speech_synthesizer.guid}.Debug|Win32.ActiveCfg = Debug|Win32
+		${nx_speech_synthesizer.guid}.Debug|Win32.Build.0 = Debug|Win32
+		${nx_speech_synthesizer.guid}.Release|Win32.ActiveCfg = Release|Win32
+		${nx_speech_synthesizer.guid}.Release|Win32.Build.0 = Release|Win32
 		${nx_vms_utils.guid}.Debug|Win32.ActiveCfg = Debug|Win32
 		${nx_vms_utils.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_vms_utils.guid}.Release|Win32.ActiveCfg = Release|Win32

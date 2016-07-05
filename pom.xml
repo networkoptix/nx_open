@@ -32,7 +32,7 @@
         <cloud_connect_test_util.guid>{931F412E-DCC2-426B-93CD-1F551CA69D93}</cloud_connect_test_util.guid>
         <media_db_util.guid>{931E412E-4CB2-426B-93CD-1F581CA69D93}</media_db_util.guid>
         <nx_email.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nx_email.guid>
-        <nx_speach_synthesizer.guid>{08927adb-9495-49a3-990d-e56d699203f7}</nx_speach_synthesizer.guid>
+        <nx_speech_synthesizer.guid>{08927adb-9495-49a3-990d-e56d699203f7}</nx_speech_synthesizer.guid>
         <nx_streaming.guid>{3c0acd3f-d641-4690-a7c5-129cb4bea938}</nx_streaming.guid>
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
         <nx_network.guid>{71fb3cab-00f4-41a3-af08-ae0a61b8c79e}</nx_network.guid>
@@ -464,7 +464,7 @@
                 <module>nx_sdk</module>
                 <module>nx_storage_sdk</module>
 
-                <module>common_libs/nx_speach_synthesizer</module>
+                <module>common_libs/nx_speech_synthesizer</module>
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
                 <module>media_db_util</module>
@@ -712,7 +712,7 @@
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
-                <module>common_libs/nx_speach_synthesizer</module>
+                <module>common_libs/nx_speech_synthesizer</module>
                 <module>macsetup/client-dmg</module>
             </modules>
         </profile>
@@ -863,7 +863,7 @@
             <modules>
                 <!--<module>plugins/rpi_cam</module>-->
                 <module>edge_firmware/rpi</module>
-                <module>common_libs/nx_speach_synthesizer</module>
+                <module>common_libs/nx_speech_synthesizer</module>
             </modules>
         </profile>
 
@@ -899,7 +899,7 @@
                 <module>edge_firmware/rpi</module>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
-                <module>common_libs/nx_speach_synthesizer</module>
+                <module>common_libs/nx_speech_synthesizer</module>
                 <module>client/libclient_core</module>
                 <module>client/mobile_client</module>
                 <module>nx_cloud/libconnection_mediator</module>
@@ -933,7 +933,7 @@
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
                 <module>edge_firmware/rpi</module>
-                <module>common_libs/nx_speach_synthesizer</module>
+                <module>common_libs/nx_speech_synthesizer</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
@@ -968,7 +968,7 @@
                 <module>client/libclient</module>
                 <module>client/desktop_client</module>
                 <module>common_libs/nx_audio</module>
-                <module>common_libs/nx_speach_synthesizer</module>
+                <module>common_libs/nx_speech_synthesizer</module>
             </modules>
         </profile>
         <profile>

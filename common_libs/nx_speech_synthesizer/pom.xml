@@ -10,13 +10,13 @@
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>nx_speach_synthesizer</artifactId>
+    <artifactId>nx_speech_synthesizer</artifactId>
     <packaging>pom</packaging>
-    <name>NX Speach Synthesizer Library</name>
+    <name>NX Speech Synthesizer Library</name>
 
     <properties>
-        <guid>${nx_speach_synthesizer.guid}</guid>
-        <product.title>${company.name} nx_speach_synthesizer</product.title>
+        <guid>${nx_speech_synthesizer.guid}</guid>
+        <product.title>${company.name} nx_speech_synthesizer</product.title>
         <!--Global libs-->
         <qt.libs>core concurrent</qt.libs>
         <global.libs>-lcommon</global.libs>

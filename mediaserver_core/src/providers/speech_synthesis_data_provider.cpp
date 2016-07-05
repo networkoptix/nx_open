@@ -1,7 +1,7 @@
 #if !defined(EDGE_SERVER)
+#include "speech_synthesis_data_provider.h"
 
-#include <nx_speach_synthesizer/text_to_wav.h>
-#include "speach_synthesis_data_provider.h"
+#include <nx_speech_synthesizer/text_to_wav.h>
 #include <core/dataconsumer/audio_data_transmitter.h>
 #include <core/resource/resource.h>
 #include <QtCore/QBuffer>
@@ -14,7 +14,7 @@ namespace {
     const size_t kDefaultDataChunkSize = 2048;
 }
 
-QnSpeachSynthesisDataProvider::QnSpeachSynthesisDataProvider(const QString& text) :
+QnSpeechSynthesisDataProvider::QnSpeechSynthesisDataProvider(const QString& text) :
     QnAbstractStreamDataProvider(QnResourcePtr(new QnResource())),
     m_text(text),
     m_curPos(0)
@@ -22,12 +22,12 @@ QnSpeachSynthesisDataProvider::QnSpeachSynthesisDataProvider(const QString& text
     m_ctx = initializeAudioContext();
 }
 
-QnSpeachSynthesisDataProvider::~QnSpeachSynthesisDataProvider()
+QnSpeechSynthesisDataProvider::~QnSpeechSynthesisDataProvider()
 {
     stop();
 }
 
-QnConstMediaContextPtr QnSpeachSynthesisDataProvider::initializeAudioContext()
+QnConstMediaContextPtr QnSpeechSynthesisDataProvider::initializeAudioContext()
 {
     auto synthesizer = TextToWaveServer::instance();
     auto format = synthesizer->getAudioFormat();
@@ -53,7 +53,7 @@ QnConstMediaContextPtr QnSpeachSynthesisDataProvider::initializeAudioContext()
     return QnConstMediaContextPtr(new QnAvCodecMediaContext(ctx));
 }
 
-QnAbstractMediaDataPtr QnSpeachSynthesisDataProvider::getNextData()
+QnAbstractMediaDataPtr QnSpeechSynthesisDataProvider::getNextData()
 {
     if (m_curPos >= m_rawBuffer.size())
         return QnAbstractMediaDataPtr();
@@ -76,7 +76,7 @@ QnAbstractMediaDataPtr QnSpeachSynthesisDataProvider::getNextData()
     return QnAbstractMediaDataPtr(packet);
 }
 
-void QnSpeachSynthesisDataProvider::run()
+void QnSpeechSynthesisDataProvider::run()
 {
     m_rawBuffer = doSynthesis(m_text);
 
@@ -89,19 +89,19 @@ void QnSpeachSynthesisDataProvider::run()
     afterRun();
 }
 
-void QnSpeachSynthesisDataProvider::afterRun()
+void QnSpeechSynthesisDataProvider::afterRun()
 {
     QnAbstractMediaDataPtr endOfStream(new QnEmptyMediaData());
     endOfStream->dataProvider = this;
     putData(endOfStream);
 }
 
-void QnSpeachSynthesisDataProvider::setText(const QString &text)
+void QnSpeechSynthesisDataProvider::setText(const QString &text)
 {
     m_text = text;
 }
 
-QByteArray QnSpeachSynthesisDataProvider::doSynthesis(const QString &text)
+QByteArray QnSpeechSynthesisDataProvider::doSynthesis(const QString &text)
 {
     QBuffer soundBuf;
     soundBuf.open(QIODevice::WriteOnly);

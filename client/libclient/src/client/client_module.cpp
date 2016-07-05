@@ -52,7 +52,7 @@
 #include <nx/utils/log/log.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
-#include <nx_speach_synthesizer/text_to_wav.h>
+#include <nx_speech_synthesizer/text_to_wav.h>
 
 #include <platform/platform_abstraction.h>
 
