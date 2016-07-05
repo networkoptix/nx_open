@@ -68,3 +68,45 @@ bool QnMediaContextSerializableData::deserialize(const QByteArray& data)
 
     return true;
 }
+
+void QnMediaContextSerializableData::initializeFrom(const AVCodecContext* context)
+{
+    codecId = context->codec_id;
+    codecType = context->codec_type;
+    if (context->rc_eq)
+    {
+        rcEq = QByteArray(context->rc_eq,
+            (int) strlen(context->rc_eq) + 1); //< Array should include '\0'.
+    }
+    if (context->extradata)
+    {
+        extradata = QByteArray((const char*) context->extradata,
+            context->extradata_size);
+    }
+    if (context->intra_matrix)
+    {
+        intraMatrix.assign(context->intra_matrix,
+            context->intra_matrix + QnAvCodecHelper::kMatrixLength);
+    }
+    if (context->inter_matrix)
+    {
+        interMatrix.assign(context->inter_matrix,
+            context->inter_matrix + QnAvCodecHelper::kMatrixLength);
+    }
+    if (context->rc_override)
+    {
+        rcOverride.assign(context->rc_override,
+            context->rc_override + context->rc_override_count);
+    }
+    channels = context->channels;
+    sampleRate = context->sample_rate;
+    sampleFmt = context->sample_fmt;
+    bitsPerCodedSample = context->bits_per_coded_sample;
+    codedWidth = context->coded_width;
+    codedHeight = context->coded_height;
+    width = context->width;
+    height = context->height;
+    bitRate = context->bit_rate;
+    channelLayout = context->channel_layout;
+    blockAlign = context->block_align;
+}

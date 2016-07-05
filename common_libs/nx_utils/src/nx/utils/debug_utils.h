@@ -10,7 +10,7 @@
 #include <cstdint>
 
 #if defined(QT_CORE_LIB)
-    #include <QDebug>
+    #include <QtCore/QDebug>
 #else // QT_CORE_LIB
     #include <iostream>
 #endif // QT_CORE_LIB
@@ -108,6 +108,10 @@ private:
 
 /** Debug tool - implicitly unaligned pointer. */
 NX_UTILS_API uint8_t* debugUnalignPtr(void* data);
+
+/** Debug tool - dump binary data using PRINT. */
+void debugPrintBin(const char* bytes, int size, const char* tag, const char* outputPrefix);
+#define NX_PRINT_BIN(BYTES, SIZE, TAG) nx::utils::debugPrintBin((BYTES), (SIZE), (TAG), (OUTPUT_PREFIX))
 
 } // namespace utils
 } // namespace nx
