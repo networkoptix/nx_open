@@ -162,9 +162,7 @@ public:
 protected:
     struct NX_NETWORK_API HostAddressInfo
     {
-        explicit HostAddressInfo(
-            const HostAddress& hostAddress,
-            bool _isLikelyCloudAddress);
+        explicit HostAddressInfo(bool _isLikelyCloudAddress);
 
         const bool isLikelyCloudAddress;
         std::vector<AddressEntry> fixedEntries;

@@ -120,7 +120,7 @@ void AddressResolver::addFixedAddress(
     AddressEntry entry(hostAddress);
     auto& entries = m_info.emplace(
         hostName,
-        HostAddressInfo(hostName, isCloudHostName(&lk, hostName.toString())))
+        HostAddressInfo(isCloudHostName(&lk, hostName.toString())))
             .first->second.fixedEntries;
 
     const auto it = std::find(entries.begin(), entries.end(), entry);
@@ -212,7 +212,7 @@ void AddressResolver::resolveAsync(
     QnMutexLocker lk(&m_mutex);
     auto info = m_info.emplace(
         hostName,
-        HostAddressInfo(hostName, isCloudHostName(&lk, hostName.toString()))).first;
+        HostAddressInfo(isCloudHostName(&lk, hostName.toString()))).first;
     info->second.checkExpirations();
     tryFastDomainResolve(info);
     if (info->second.isResolved(natTraversal))
@@ -308,9 +308,7 @@ void AddressResolver::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
     m_mediatorConnection->pleaseStop(std::move(handler));
 }
 
-AddressResolver::HostAddressInfo::HostAddressInfo(
-    const HostAddress& hostAddress,
-    bool _isLikelyCloudAddress)
+AddressResolver::HostAddressInfo::HostAddressInfo(bool _isLikelyCloudAddress)
 :
     isLikelyCloudAddress(_isLikelyCloudAddress),
     m_dnsState(State::unresolved),
@@ -563,7 +561,7 @@ std::vector<Guard> AddressResolver::grabHandlers(
 }
 
 bool AddressResolver::isCloudHostName(
-    QnMutexLockerBase* const lk,
+    QnMutexLockerBase* const /*lk*/,
     const QString& hostName) const
 {
     return m_cloudAddressRegExp.exactMatch(hostName);
