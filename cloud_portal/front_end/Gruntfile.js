@@ -250,7 +250,7 @@ module.exports = function (grunt) {
                         dot: true,
                         src: [
                             '.tmp',
-                            '<%= yeoman.app %>/styles/custom',
+                            '<%= yeoman.app %>/styles/custom'
                         ]
                     }
                 ]
@@ -533,8 +533,7 @@ module.exports = function (grunt) {
             },
             all: {   // Grunt requires at least one target to run so you can simply put 'all: {}' here too.
                 options: {
-                    //configFile: 'e2e.conf.js', // Target-specific config file
-                    args: {} // Target-specific arguments
+                    args: {specs: ['test/e2e/*/*spec.js']} // Target-specific arguments
                 }
             },
             restore_all_pass: {
@@ -575,7 +574,8 @@ module.exports = function (grunt) {
         },
         protractor_webdriver: {
             options:{
-                command: 'webdriver-manager start -Djava.security.egd=file:///dev/urandom',
+                keepAlive : true,
+                command: 'webdriver-manager start -Djava.security.egd=file:///dev/urandom'
             },
             default:{
 
