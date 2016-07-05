@@ -11,6 +11,7 @@
 #include <ui/models/systems_model.h>
 #include <ui/models/recent_user_connections_model.h>
 #include <ui/models/system_hosts_model.h>
+#include <ui/helpers/scene_position_listener.h>
 #include <models/camera_list_model.h>
 #include <models/saved_sessions_model.h>
 #include <models/discovered_sessions_model.h>
@@ -64,6 +65,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnQuickItemMouseTracker>("com.networkoptix.qml", 1, 0, "ItemMouseTracker");
     qmlRegisterType<QnQuickTextInput>("com.networkoptix.qml", 1, 0, "QnTextInput");
     qmlRegisterType<QnMobileClientUiController>("com.networkoptix.qml", 1, 0, "QnMobileClientUiController");
+    qmlRegisterType<QnScenePositionListener>("com.networkoptix.qml", 1, 0, "QnScenePositionListener");
 
     qmlRegisterRevision<QQuickTextInput, 6>("com.networkoptix.qml", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("com.networkoptix.qml", 1, 0);

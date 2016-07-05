@@ -184,8 +184,23 @@ Control
 
             VideoOutput
             {
+                id: videoOutput
+
                 anchors.fill: parent
                 source: player
+
+                QnScenePositionListener
+                {
+                    item: videoOutput
+                    onScenePosChanged:
+                    {
+                        player.globalVideoGeometry = Qt.rect(
+                            scenePos.x,
+                            scenePos.y,
+                            videoOutput.width,
+                            videoOutput.height)
+                    }
+                }
             }
 
             MediaPlayer
