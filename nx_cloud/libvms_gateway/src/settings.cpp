@@ -12,8 +12,9 @@
 #include <QtCore/QString>
 
 #include <libvms_gateway_app_info.h>
-#include <nx/utils/timer_manager.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/common/app_info.h>
 
 
@@ -54,10 +55,13 @@ namespace
 
     //http
     const QLatin1String kHttpProxyTargetPort("http/proxyTargetPort");
-    const int kDefaultHttpProxyTargetPort = 0;
+    const int kDefaultHttpProxyTargetPort = nx_http::DEFAULT_HTTP_PORT;
 
     const QLatin1String kHttpConnectSupport("http/connectSupport");
     const int kDefaultHttpConnectSupport = 0;
+
+    const QLatin1String kHttpAllowTargetEndpointInUrl("http/allowTargetEndpointInUrl");
+    const QLatin1String kDefaultHttpAllowTargetEndpointInUrl("false");
 
     //cloudConnect
     const QLatin1String kReplaceHostAddressWithPublicAddress("cloudConnect/replaceHostAddressWithPublicAddress");
@@ -79,7 +83,8 @@ namespace conf {
 Http::Http()
 :
     proxyTargetPort(0),
-    connectSupport(false)
+    connectSupport(false),
+    allowTargetEndpointInUrl(false)
 {
 }
 
@@ -224,6 +229,10 @@ void Settings::loadConfiguration()
         m_settings.value(
             kHttpConnectSupport,
             kDefaultHttpConnectSupport) == "true";
+    m_http.allowTargetEndpointInUrl =
+        m_settings.value(
+            kHttpAllowTargetEndpointInUrl,
+            kDefaultHttpAllowTargetEndpointInUrl).toString() == "true";
 
     //CloudConnect
     m_cloudConnect.replaceHostAddressWithPublicAddress =

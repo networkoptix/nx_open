@@ -8,9 +8,9 @@ namespace cloud {
 namespace gateway {
 namespace test {
 
-const nx_http::BufferType testPath("/test");
-const nx_http::BufferType testMsgBody("bla-bla-bla");
-const nx_http::BufferType contentType("text/plain");
+static const QString testPath("/test");
+static const nx_http::BufferType testMsgBody("bla-bla-bla");
+static const nx_http::BufferType contentType("text/plain");
 
 class VmsGatewayProxyTest
 :
@@ -27,22 +27,32 @@ public:
 
     void testProxyUrl(
         const QUrl& url,
-        nx_http::StatusCode::Value status = nx_http::StatusCode::ok)
+        nx_http::StatusCode::Value expectedReponseStatusCode = nx_http::StatusCode::ok)
     {
         nx_http::HttpClient httpClient;
-        ASSERT_TRUE(httpClient.doGet(url));
-        ASSERT_EQ(status, httpClient.response()->statusLine.statusCode);
+        testProxyUrl(&httpClient, url, expectedReponseStatusCode);
+    }
 
-        if (status != nx_http::StatusCode::ok)
+    void testProxyUrl(
+        nx_http::HttpClient* const httpClient,
+        const QUrl& url,
+        nx_http::StatusCode::Value expectedReponseStatusCode)
+    {
+        ASSERT_TRUE(httpClient->doGet(url));
+        ASSERT_EQ(
+            expectedReponseStatusCode,
+            httpClient->response()->statusLine.statusCode);
+
+        if (expectedReponseStatusCode != nx_http::StatusCode::ok)
             return;
 
         ASSERT_EQ(
             contentType,
-            nx_http::getHeaderValue(httpClient.response()->headers, "Content-Type"));
+            nx_http::getHeaderValue(httpClient->response()->headers, "Content-Type"));
 
         nx_http::BufferType msgBody;
-        while (!httpClient.eof())
-            msgBody += httpClient.fetchMessageBodyBuffer();
+        while (!httpClient->eof())
+            msgBody += httpClient->fetchMessageBodyBuffer();
 
         ASSERT_EQ(testMsgBody, msgBody);
     }
@@ -56,19 +66,19 @@ TEST_F(VmsGatewayProxyTest, IpSpecified)
     testProxyUrl(QUrl(lit("http://%1/%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().address.toString())
-        .arg(QLatin1String(testPath))));
+        .arg(testPath)));
 
     // Specified
     testProxyUrl(QUrl(lit("http://%1/%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
-        .arg(QLatin1String(testPath))));
+        .arg(testPath)));
 
     // Wrong port
     testProxyUrl(QUrl(lit("http://%1/%2:777%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().address.toString())
-        .arg(QLatin1String(testPath))),
+        .arg(testPath)),
         nx_http::StatusCode::serviceUnavailable);
 
     // Wrong path
@@ -86,14 +96,14 @@ TEST_F(VmsGatewayProxyTest, NoDefaultPort)
     testProxyUrl(QUrl(lit("http://%1/%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().address.toString())
-        .arg(QLatin1String(testPath))),
+        .arg(testPath)),
         nx_http::StatusCode::serviceUnavailable);
 
     // Port specified
     testProxyUrl(QUrl(lit("http://%1/%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
-        .arg(QLatin1String(testPath))));
+        .arg(testPath)));
 }
 
 TEST_F(VmsGatewayProxyTest, IpForbidden)
@@ -104,8 +114,23 @@ TEST_F(VmsGatewayProxyTest, IpForbidden)
     testProxyUrl(QUrl(lit("http://%1/%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().address.toString())
-        .arg(QLatin1String(testPath))),
+        .arg(testPath)),
         nx_http::StatusCode::forbidden);
+}
+
+//testing proxying in case of request line like "GET http://192.168.0.1:2343/some/path HTTP/1.1"
+TEST_F(VmsGatewayProxyTest, proxyByRequestUrl)
+{
+    addArg("-http/allowTargetEndpointInUrl", "true");
+    addArg("-cloudConnect/replaceHostAddressWithPublicAddress", "false");
+    ASSERT_TRUE(startAndWaitUntilStarted(true, true, true));
+
+    const QUrl targetUrl =
+        lit("http://%1%2").arg(testHttpServer()->serverAddress().toString()).arg(testPath);
+    nx_http::HttpClient httpClient;
+    httpClient.setResponseReadTimeoutMs(1000000);
+    httpClient.setProxyVia(endpoint());
+    testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
 }
 
 }   // namespace test
