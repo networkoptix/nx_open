@@ -1,22 +1,36 @@
 #include "user_groups_settings_model.h"
 
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
 
 #include <ui/style/resource_icon_cache.h>
 
 #include <nx/utils/string.h>
+
+
+QnUserGroupSettingsModel::RoleReplacement::RoleReplacement() :
+    RoleReplacement(QnUuid(), Qn::GlobalLiveViewerPermissionSet)
+{
+}
+
+QnUserGroupSettingsModel::RoleReplacement::RoleReplacement(
+            const QnUuid& group,
+            Qn::GlobalPermissions permissions) :
+    group(group),
+    permissions(permissions)
+{
+}
 
 QnUserGroupSettingsModel::QnUserGroupSettingsModel(QObject* parent /*= nullptr*/) :
     base_type(parent),
     m_currentGroupId(),
     m_groups()
 {
-
 }
 
 QnUserGroupSettingsModel::~QnUserGroupSettingsModel()
 {
-
 }
 
 ec2::ApiUserGroupDataList QnUserGroupSettingsModel::groups() const
@@ -27,15 +41,20 @@ ec2::ApiUserGroupDataList QnUserGroupSettingsModel::groups() const
 void QnUserGroupSettingsModel::setGroups(const ec2::ApiUserGroupDataList& value)
 {
     beginResetModel();
+
     m_groups = value;
     std::sort(m_groups.begin(), m_groups.end(), [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
     {
         /* Case Sensitive sort. */
         return nx::utils::naturalStringCompare(l.name, r.name) < 0;
     });
+
     m_accessibleResources.clear();
     for (const auto& group : m_groups)
         m_accessibleResources[group.id] = qnResourceAccessManager->accessibleResources(group.id);
+
+    m_replacements.clear();
+
     endResetModel();
 }
 
@@ -51,13 +70,14 @@ int QnUserGroupSettingsModel::addGroup(const ec2::ApiUserGroupData& group)
     return row;
 }
 
-void QnUserGroupSettingsModel::removeGroup(const QnUuid& id)
+void QnUserGroupSettingsModel::removeGroup(const QnUuid& id, const RoleReplacement& replacement)
 {
     auto iter = std::find_if(m_groups.begin(), m_groups.end(), [id](const ec2::ApiUserGroupData& elem) { return elem.id == id; });
     int row = std::distance(m_groups.begin(), iter);
 
     beginRemoveRows(QModelIndex(), row, row);
     m_groups.erase(iter);
+    m_replacements[id] = replacement;
     endRemoveRows();
 
     if (id == m_currentGroupId)
@@ -177,5 +197,41 @@ ec2::ApiUserGroupDataList::const_iterator QnUserGroupSettingsModel::currentGroup
         return m_groups.cend();
 
     return std::find_if(m_groups.cbegin(), m_groups.cend(), [this](const ec2::ApiUserGroupData& elem) { return elem.id == m_currentGroupId; });
+}
+
+QnUserResourceList QnUserGroupSettingsModel::users(const QnUuid& groupId)
+{
+    if (groupId.isNull())
+        return QnUserResourceList();
+
+    return qnResPool->getResources<QnUserResource>().filtered([groupId](const QnUserResourcePtr& user)
+    {
+        return user->userGroup() == groupId;
+    });
+}
+
+QnUserResourceList QnUserGroupSettingsModel::users() const
+{
+    return users(m_currentGroupId);
+}
+
+QnUserGroupSettingsModel::RoleReplacement QnUserGroupSettingsModel::replacement(const QnUuid& source) const
+{
+    RoleReplacement replacement = directReplacement(source);
+    while (!replacement.group.isNull())
+    {
+        auto iterator = m_replacements.find(replacement.group);
+        if (iterator != m_replacements.end())
+            replacement = *iterator;
+        else
+            break;
+    }
+
+    return replacement;
+}
+
+QnUserGroupSettingsModel::RoleReplacement QnUserGroupSettingsModel::directReplacement(const QnUuid& source) const
+{
+    return m_replacements[source];
 }
 

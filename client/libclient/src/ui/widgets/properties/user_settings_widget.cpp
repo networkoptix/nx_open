@@ -164,9 +164,8 @@ void QnUserSettingsWidget::applyChanges()
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
         QnUuid groupId = selectedUserGroup();
-        if (!groupId.isNull())
-            m_model->user()->setUserGroup(groupId);
-        else
+        m_model->user()->setUserGroup(groupId);
+        if (groupId.isNull())
             m_model->user()->setRawPermissions(selectedPermissions());
     }
 

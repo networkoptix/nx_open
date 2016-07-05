@@ -10,6 +10,9 @@
     <height>485</height>
    </rect>
   </property>
+  <property name="windowTitle">
+   <string>User Roles</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,1">
    <property name="spacing">
     <number>0</number>

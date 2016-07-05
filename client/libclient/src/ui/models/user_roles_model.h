@@ -5,6 +5,8 @@
 
 #include <utils/common/connective.h>
 
+#include <nx_ec/data/api_fwd.h>
+
 
 class QnUserRolesModelPrivate;
 class QnUserRolesModel : public Connective<QAbstractItemModel>
@@ -23,6 +25,10 @@ public:
 
     void setUserRoles(bool enabled);
     void setUserRoles(const QList<QnUuid>& roles);
+    void setUserRoles(const ec2::ApiUserGroupDataList& roles);
+
+    bool updateUserRole(const ec2::ApiUserGroupData& role);
+    bool removeUserRole(const QnUuid& id);
 
     void setCustomRole(bool enabled);
 

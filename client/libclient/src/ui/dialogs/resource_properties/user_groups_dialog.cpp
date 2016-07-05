@@ -4,6 +4,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource/user_resource.h>
 
 #include <ui/common/indents.h>
 #include <ui/models/resource_properties/user_groups_settings_model.h>
@@ -187,6 +188,17 @@ void QnUserGroupsDialog::applyChanges()
     {
         if (groupsLeft.contains(group.id))
             continue;
+
+        auto replacement = m_model->replacement(group.id);
+        for (auto user : m_model->users(group.id))
+        {
+            qnResourcesChangesManager->saveUser(user, [replacement](const QnUserResourcePtr &user)
+            {
+                user->setUserGroup(replacement.group);
+                if (replacement.group.isNull())
+                    user->setRawPermissions(replacement.permissions);
+            });
+        }
 
         qnResourcesChangesManager->removeUserGroup(group.id);
     }

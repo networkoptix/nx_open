@@ -9,8 +9,17 @@
 class QnUserGroupSettingsModel : public QAbstractListModel, public QnAbstractPermissionsModel
 {
     Q_OBJECT
-
     typedef QAbstractListModel base_type;
+
+public:
+    struct RoleReplacement
+    {
+        QnUuid group;
+        Qn::GlobalPermissions permissions;
+        RoleReplacement();
+        RoleReplacement(const QnUuid& group, Qn::GlobalPermissions permissions);
+    };
+
 public:
     QnUserGroupSettingsModel(QObject* parent = nullptr);
     virtual ~QnUserGroupSettingsModel();
@@ -20,7 +29,15 @@ public:
 
     /** Add new group. Returns index of added group in the model. */
     int addGroup(const ec2::ApiUserGroupData& group);
-    void removeGroup(const QnUuid& id);
+
+    void removeGroup(const QnUuid& id, const RoleReplacement& replacement);
+
+    /* Final replacement for a deleted role. */
+    RoleReplacement replacement(const QnUuid& source) const;
+
+    /* Direct replacement for a deleted role. May reference a role that is also deleted.
+    * Might be needed if we decide to offer custom permissions replacements. */
+    RoleReplacement directReplacement(const QnUuid& source) const;
 
     /** Select group as current. */
     void selectGroup(const QnUuid& value);
@@ -40,6 +57,12 @@ public:
     /** Get accessible resources for the given group - just for convenience. */
     QSet<QnUuid> accessibleResources(const QnUuid& groupId) const;
 
+    /** Get list of users for given group. */
+    static QnUserResourceList users(const QnUuid& groupId);
+
+    /** Get list of users for selected group. */
+    QnUserResourceList users() const;
+
     /* Methods of QAbstractItemModel */
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -53,4 +76,5 @@ private:
     QnUuid m_currentGroupId;
     ec2::ApiUserGroupDataList m_groups;
     QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
+    QHash<QnUuid, RoleReplacement> m_replacements;
 };

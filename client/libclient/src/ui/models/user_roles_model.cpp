@@ -101,10 +101,11 @@ public:
             setStandardRoles(QList<Qn::GlobalPermissions>());
     }
 
-    void setUserRoles(ec2::ApiUserGroupDataList roles)
+    void setUserRoles(ec2::ApiUserGroupDataList roles, bool watchServerChanges)
     {
-        std::sort(roles.begin(), roles.end(), &QnUserRolesModelPrivate::lessRoleByName);
+        watchUserRoleChanged(watchServerChanges);
 
+        std::sort(roles.begin(), roles.end(), &QnUserRolesModelPrivate::lessRoleByName);
         if (userRoles == roles)
             return;
 
@@ -132,17 +133,15 @@ public:
                 correctRoles.push_back(*roleIterator);
         }
 
-        watchUserRoleChanged(true);
-        setUserRoles(correctRoles);
+        setUserRoles(correctRoles, true);
     }
 
     void setUserRoles(bool enabled)
     {
-        watchUserRoleChanged(enabled);
         if (enabled)
-            setUserRoles(allUserRoles());
+            setUserRoles(allUserRoles(), true);
         else
-            setUserRoles(ec2::ApiUserGroupDataList());
+            setUserRoles(ec2::ApiUserGroupDataList(), false);
     }
 
     void enableCustomRole(bool enable)
@@ -176,7 +175,7 @@ public:
             roles << RoleDescription(Qn::NoGlobalPermissions);
     }
 
-    bool insertOrUpdateUserRole(const ec2::ApiUserGroupData& userRole)
+    bool updateUserRole(const ec2::ApiUserGroupData& userRole)
     {
         Q_Q(QnUserRolesModel);
         auto roleIterator = std::find_if(userRoles.begin(), userRoles.end(),
@@ -274,7 +273,7 @@ public:
         {
             addOrUpdateRoleConnection = connect(
                 qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated,
-                this, &QnUserRolesModelPrivate::insertOrUpdateUserRole);
+                this, &QnUserRolesModelPrivate::updateUserRole);
 
             removeRoleConnection = connect(
                 qnResourceAccessManager, &QnResourceAccessManager::userGroupRemoved,
@@ -359,6 +358,24 @@ void QnUserRolesModel::setUserRoles(const QList<QnUuid>& roles)
 {
     Q_D(QnUserRolesModel);
     d->setUserRoles(roles);
+}
+
+void QnUserRolesModel::setUserRoles(const ec2::ApiUserGroupDataList& roles)
+{
+    Q_D(QnUserRolesModel);
+    d->setUserRoles(roles, true);
+}
+
+bool QnUserRolesModel::updateUserRole(const ec2::ApiUserGroupData& role)
+{
+    Q_D(QnUserRolesModel);
+    return d->updateUserRole(role);
+}
+
+bool QnUserRolesModel::removeUserRole(const QnUuid& id)
+{
+    Q_D(QnUserRolesModel);
+    return d->removeUserRole(id);
 }
 
 QModelIndex QnUserRolesModel::index(int row, int column, const QModelIndex& parent) const
