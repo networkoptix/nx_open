@@ -7,6 +7,7 @@
 
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/cloud/address_resolver.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/cpp14.h>
 
@@ -125,6 +126,7 @@ nx_http::StatusCode::Value ProxyHandler::fetchTargetEndpointAndPrepareRequest(
         *targetEndpoint = SocketAddress(pathItems[0].toString());
         pathItems.removeAt(0);
 
+        auto query = request->requestLine.url.query();
         if (pathItems.isEmpty())
         {
             request->requestLine.url = "/";
@@ -134,10 +136,11 @@ nx_http::StatusCode::Value ProxyHandler::fetchTargetEndpointAndPrepareRequest(
             NX_ASSERT(pathItems[0].position() > 0);
             request->requestLine.url = path.mid(pathItems[0].position() - 1);  //-1 to include '/'
         }
+        request->requestLine.url.setQuery(std::move(query));
     }
 
-    if (!network::cloud::AddressResolver::
-        kCloudAddressRegExp.exactMatch(targetEndpoint->address.toString()))
+    if (!network::SocketGlobals::addressResolver()
+            .isCloudHostName(targetEndpoint->address.toString()))
     {
         // No cloud address means direct IP
         if (!m_settings.cloudConnect().allowIpTarget)

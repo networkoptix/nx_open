@@ -1,5 +1,6 @@
 #include "test_setup.h"
 
+#include <nx/network/http/buffer_source.h>
 #include <nx/network/http/httpclient.h>
 
 
@@ -9,8 +10,44 @@ namespace gateway {
 namespace test {
 
 static const QString testPath("/test");
+static const QString testQuery("testQuery");
+static const QString testPathAndQuery(lit("%1?%2").arg(testPath).arg(testQuery));
 static const nx_http::BufferType testMsgBody("bla-bla-bla");
-static const nx_http::BufferType contentType("text/plain");
+static const nx_http::BufferType testMsgContentType("text/plain");
+
+class VmsGatewayProxyTestHandler
+    :
+    public nx_http::AbstractHttpRequestHandler
+{
+public:
+    VmsGatewayProxyTestHandler()
+    {
+    }
+
+    virtual void processRequest(
+        nx_http::HttpServerConnection* const /*connection*/,
+        stree::ResourceContainer /*authInfo*/,
+        nx_http::Request request,
+        nx_http::Response* const /*response*/,
+        std::function<void(
+            const nx_http::StatusCode::Value statusCode,
+            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
+    {
+        if (request.requestLine.url.path() == testPath &&
+            request.requestLine.url.query() == testQuery)
+        {
+            completionHandler(
+                nx_http::StatusCode::ok,
+                std::make_unique< nx_http::BufferSource >(testMsgContentType, testMsgBody));
+        }
+        else
+        {
+            completionHandler(
+                nx_http::StatusCode::badRequest,
+                nullptr);
+        }
+    }
+};
 
 class VmsGatewayProxyTest
 :
@@ -19,10 +56,7 @@ class VmsGatewayProxyTest
 public:
     void SetUp() override
     {
-        testHttpServer()->registerStaticProcessor(
-            testPath,
-            testMsgBody,
-            contentType);
+        testHttpServer()->registerRequestProcessor<VmsGatewayProxyTestHandler>(testPath);
     }
 
     void testProxyUrl(
@@ -38,6 +72,7 @@ public:
         const QUrl& url,
         nx_http::StatusCode::Value expectedReponseStatusCode)
     {
+        httpClient->setResponseReadTimeoutMs(1000*1000);
         ASSERT_TRUE(httpClient->doGet(url));
         ASSERT_EQ(
             expectedReponseStatusCode,
@@ -47,7 +82,7 @@ public:
             return;
 
         ASSERT_EQ(
-            contentType,
+            testMsgContentType,
             nx_http::getHeaderValue(httpClient->response()->headers, "Content-Type"));
 
         nx_http::BufferType msgBody;
@@ -66,19 +101,19 @@ TEST_F(VmsGatewayProxyTest, IpSpecified)
     testProxyUrl(QUrl(lit("http://%1/%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().address.toString())
-        .arg(testPath)));
+        .arg(testPathAndQuery)));
 
     // Specified
     testProxyUrl(QUrl(lit("http://%1/%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
-        .arg(testPath)));
+        .arg(testPathAndQuery)));
 
     // Wrong port
     testProxyUrl(QUrl(lit("http://%1/%2:777%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().address.toString())
-        .arg(testPath)),
+        .arg(testPathAndQuery)),
         nx_http::StatusCode::serviceUnavailable);
 
     // Wrong path
@@ -96,14 +131,14 @@ TEST_F(VmsGatewayProxyTest, NoDefaultPort)
     testProxyUrl(QUrl(lit("http://%1/%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().address.toString())
-        .arg(testPath)),
+        .arg(testPathAndQuery)),
         nx_http::StatusCode::serviceUnavailable);
 
     // Port specified
     testProxyUrl(QUrl(lit("http://%1/%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
-        .arg(testPath)));
+        .arg(testPathAndQuery)));
 }
 
 TEST_F(VmsGatewayProxyTest, IpForbidden)
@@ -114,7 +149,7 @@ TEST_F(VmsGatewayProxyTest, IpForbidden)
     testProxyUrl(QUrl(lit("http://%1/%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().address.toString())
-        .arg(testPath)),
+        .arg(testPathAndQuery)),
         nx_http::StatusCode::forbidden);
 }
 
@@ -126,9 +161,8 @@ TEST_F(VmsGatewayProxyTest, proxyByRequestUrl)
     ASSERT_TRUE(startAndWaitUntilStarted(true, true, true));
 
     const QUrl targetUrl =
-        lit("http://%1%2").arg(testHttpServer()->serverAddress().toString()).arg(testPath);
+        lit("http://%1%2").arg(testHttpServer()->serverAddress().toString()).arg(testPathAndQuery);
     nx_http::HttpClient httpClient;
-    httpClient.setResponseReadTimeoutMs(1000000);
     httpClient.setProxyVia(endpoint());
     testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
 }
