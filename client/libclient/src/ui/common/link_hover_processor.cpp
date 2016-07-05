@@ -8,8 +8,7 @@
 
 QnLinkHoverProcessor::QnLinkHoverProcessor(QLabel* parent) :
     QObject(parent),
-    m_label(parent),
-    m_textAltered(false)
+    m_label(parent)
 {
     NX_ASSERT(parent);
     if (!parent)
@@ -32,8 +31,9 @@ QnLinkHoverProcessor::QnLinkHoverProcessor(QLabel* parent) :
             case QEvent::HoverEnter:
             case QEvent::HoverMove:
             {
-                if (!m_textAltered)
-                    m_originalText = m_label->text();
+                QString text = m_label->text();
+                if (m_currentText != text)
+                    m_originalText = text;
                 break;
             }
 
@@ -66,7 +66,8 @@ auto QnLinkHoverProcessor::labelChangeFunctor(const QString& text, bool hovered)
     {
         m_label->setText(text);
         m_label->repaint();
-        m_textAltered = hovered;
+
+        m_currentText = text;
 
         if (hovered)
             m_label->setCursor(Qt::PointingHandCursor);
@@ -90,7 +91,7 @@ void QnLinkHoverProcessor::linkHovered(const QString& href)
     }
 
     /* Find anchor position: */
-    int pos = m_originalText.indexOf(href);
+    int pos = m_originalText.indexOf(href.toHtmlEscaped());
     if (pos == -1)
         return;
 

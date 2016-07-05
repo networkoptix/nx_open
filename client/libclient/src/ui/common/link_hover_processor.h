@@ -20,5 +20,5 @@ private:
 private:
     QLabel* m_label;
     QString m_originalText;
-    bool m_textAltered;
+    QString m_currentText;
 };
