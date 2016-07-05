@@ -59,8 +59,8 @@ public:
         return m_data[3];
     }
 
-    friend bool operator<(const SoftwareVersion &l, const SoftwareVersion &r);
-    friend bool operator==(const SoftwareVersion &l, const SoftwareVersion &r);
+    friend bool NX_UTILS_API operator<(const SoftwareVersion &l, const SoftwareVersion &r);
+    friend bool NX_UTILS_API operator==(const SoftwareVersion &l, const SoftwareVersion &r);
 private:
     std::array<int, 4> m_data;
 };

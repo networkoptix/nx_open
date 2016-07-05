@@ -16,7 +16,7 @@ public:
     static QObject* companion(QObject* parent, const char* id);
 
     /** Attach a companion if no other companion was attached: */
-    static bool attach(QObject* parent, QObject* companion, const char* id);
+    static bool attachUnique(QObject* parent, QObject* companion, const char* id);
 
     /** Attach a companion and return previously attached companion: */
     static void attach(QObject* parent, QObject* companion, const char* id, QObject*& previousCompanion);
@@ -47,11 +47,11 @@ class QnObjectCompanion : public Base, public QnObjectCompanionManager
 
 public:
     template<class ParentType>
-    QnObjectCompanion(ParentType* parent) : Base(parent) {}
+    explicit QnObjectCompanion(ParentType* parent) : Base(parent) {}
 
     /** Create and attach a companion if no other companion was attached: */
     template<class ParentType>
-    static QnObjectCompanion<Base>* install(ParentType* parent, const char* id)
+    static QnObjectCompanion<Base>* installUnique(ParentType* parent, const char* id)
     {
         const QByteArray internalId = QnObjectCompanionManager::companionId(id);
         if (QnObjectCompanionManager::getCompanion(parent, internalId))

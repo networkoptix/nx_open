@@ -13,8 +13,17 @@
 namespace nx {
 namespace utils {
 
-bool registerSystemUriProtocolHandler(const QString& protocol, const QString& applicationBinaryPath, const QString& description, const SoftwareVersion& version)
+bool registerSystemUriProtocolHandler(
+    const QString& protocol,
+    const QString& applicationBinaryPath,
+    const QString& applicationName,
+    const QString& description,
+    const QString& customization,
+    const SoftwareVersion& version)
 {
+    Q_UNUSED(applicationName)
+    Q_UNUSED(customization)
+
     static const QString kClassesRootPath = "HKEY_CLASSES_ROOT\\";
     static const QString kDefaultValueKey = ".";
     static const QString kVersionKey = "version";

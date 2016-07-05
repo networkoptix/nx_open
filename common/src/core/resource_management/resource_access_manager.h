@@ -107,6 +107,9 @@ public:
 signals:
     void accessibleResourcesChanged(const QnUuid& userId);
 
+    void userGroupAddedOrUpdated(const ec2::ApiUserGroupData& userGroup);
+    void userGroupRemoved(const QnUuid& groupId);
+
 private:
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);

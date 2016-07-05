@@ -1,0 +1,8 @@
+#!/bin/sh
+
+DIR=$(dirname $(readlink -f $0))
+
+export LD_LIBRARY_PATH=$DIR/../lib
+export vblank_mode=0
+
+$DIR/client-bin $@

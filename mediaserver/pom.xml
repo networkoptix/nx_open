@@ -20,7 +20,7 @@
         <template>app</template>
 
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lmediaserver_core -lcommon -lnx_network -lnx_streaming -lappserver2 -ludt -lcloud_db_client -lnx_email -lnx_speach_synthesizer -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lmediaserver_core -lcommon -lnx_network -lnx_streaming -lappserver2 -ludt -lcloud_db_client -lnx_email -lnx_speech_synthesizer -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
         <linux.oslibs>-lldap -ldl -ltermcap</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
@@ -28,7 +28,7 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <rdep.packages>openssl ffmpeg onvif quazip sigar</rdep.packages>
         <rdep.linux.arm.packages>sasl2 openldap</rdep.linux.arm.packages>
-
+        <rdep.linux.packages>festival any/festival-vox</rdep.linux.packages>
         <rdep.windows.packages>festival any/festival-vox</rdep.windows.packages>
         <rdep.mac.packages>festival any/festival-vox</rdep.mac.packages>
     </properties>
@@ -69,30 +69,12 @@
             </activation>
             <properties>
                 <rdep.linux.arm.packages>sasl2 openldap libcreateprocess</rdep.linux.arm.packages>
+                <rdep.linux.packages/>
             </properties>
         </profile>
 
         <profile>
-            <id>linux-noarm</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>arch</name>
-                    <value>!arm</value>
-                </property>
-            </activation>
-
-            <properties>
-                <rdep.linux.packages>festival any/festival-vox</rdep.linux.packages>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>linux-arm-bpi</id>
+            <id>linux-isd-s2</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -101,50 +83,11 @@
                 </os>
                 <property>
                     <name>box</name>
-                    <value>bpi</value>
+                    <value>isd_s2</value>
                 </property>
             </activation>
-
             <properties>
-                <rdep.linux.packages>festival any/festival-vox</rdep.linux.packages>
-            </properties>
-        </profile>  
-
-        <profile>
-            <id>linux-arm-bananapi</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>bananapi</value>
-                </property>
-            </activation>
-
-            <properties>
-                <rdep.linux.packages>festival any/festival-vox</rdep.linux.packages>
-            </properties>
-        </profile>  
-
-        <profile>
-            <id>linux-arm-rpi</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>rpi</value>
-                </property>
-            </activation>
-
-            <properties>
-                <rdep.linux.packages>festival any/festival-vox</rdep.linux.packages>
+                <rdep.linux.packages/>
             </properties>
         </profile>
     </profiles>

@@ -1,6 +1,6 @@
 project(nx_media)
 set(PROJECT_SHORTNAME "nx_media")
-set(PROJECT_LONGNAME "${nxtool.company.name} Multimedia Library")
+set(PROJECT_LONGNAME "${short.company.name} Multimedia Library")
 
 find_sources(src)
 ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)

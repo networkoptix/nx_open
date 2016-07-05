@@ -101,14 +101,20 @@ ec2::ApiUserGroupData QnResourceAccessManager::userGroup(const QnUuid& groupId) 
 
 void QnResourceAccessManager::addOrUpdateUserGroup(const ec2::ApiUserGroupData& userGroup)
 {
-    QnMutexLocker lk(&m_mutex);
-    m_userGroups[userGroup.id] = userGroup;
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_userGroups[userGroup.id] = userGroup;
+    }
+    emit userGroupAddedOrUpdated(userGroup);
 }
 
 void QnResourceAccessManager::removeUserGroup(const QnUuid& groupId)
 {
-    QnMutexLocker lk(&m_mutex);
-    m_userGroups.remove(groupId);
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_userGroups.remove(groupId);
+    }
+    emit userGroupRemoved(groupId);
 }
 
 QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userId) const

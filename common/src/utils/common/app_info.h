@@ -48,6 +48,7 @@ struct QnAppInfo
     static QString helpUrl();                   //#GDM #FIXME will not work in 3.0
 
     static QString updateGeneratorUrl();
+    static QString defaultCloudHost();
     static QString defaultCloudPortalUrl();
     static QString defaultCloudModulesXmlUrl();
     static QString cloudName();
