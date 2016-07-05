@@ -70,11 +70,15 @@ void QnSystemDescriptionAggregator::mergeSystem(const QnSystemDescriptionPtr& sy
     const bool wasCloudSystem = isCloudSystem();
     const auto oldServers = servers();
 
-    if (isInCloud)
-        m_cloudSystem = system;
-    else
-        m_localSystem = system;
+    QnSystemDescriptionPtr& target = (isInCloud ? m_cloudSystem : m_localSystem);
+    target = system;
 
+    connect(target.data(), &QnBaseSystemDescription::serverAdded, 
+        this, &QnSystemDescriptionAggregator::serverAdded);
+    connect(target.data(), &QnBaseSystemDescription::serverRemoved,
+        this, &QnSystemDescriptionAggregator::serverRemoved);
+    connect(target.data(), &QnBaseSystemDescription::serverChanged,
+        this, &QnSystemDescriptionAggregator::serverChanged);
     emitChangesSignals(wasCloudSystem, oldServers);
 }
 
@@ -104,15 +108,19 @@ void QnSystemDescriptionAggregator::removeSystem(const QString& id)
     const auto wasCloudSystem = isCloudSystem();
     const auto oldServers = servers();
 
-    if (m_cloudSystem && m_cloudSystem->id() == id)
-        m_cloudSystem.reset();
-    else if (m_localSystem && m_localSystem->id() == id)
-        m_localSystem.reset();
-    else
+    const bool removeCloudSystem = (m_cloudSystem && m_cloudSystem->id() == id);
+    QnSystemDescriptionPtr& target = (removeCloudSystem ? m_cloudSystem : 
+        (m_localSystem && m_localSystem->id() == id ? m_localSystem : QnSystemDescriptionPtr()));
+
+    if (!target)
         NX_ASSERT(false, "Never should get here!");
+    
+    disconnect(target.data(), nullptr, this, nullptr);
+    target.reset();
 
+    if (!m_cloudSystem && !m_localSystem)
+        NX_ASSERT(false, "Empty system aggregator");
 
-    NX_ASSERT(m_cloudSystem || m_localSystem, "Empty system aggregator");
     emitChangesSignals(wasCloudSystem, oldServers);
 }
 
