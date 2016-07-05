@@ -108,15 +108,20 @@ void QnSystemDescriptionAggregator::removeSystem(const QString& id)
     const auto wasCloudSystem = isCloudSystem();
     const auto oldServers = servers();
 
-    const bool removeCloudSystem = (m_cloudSystem && m_cloudSystem->id() == id);
-    QnSystemDescriptionPtr& target = (removeCloudSystem ? m_cloudSystem : 
-        (m_localSystem && m_localSystem->id() == id ? m_localSystem : QnSystemDescriptionPtr()));
+    QnSystemDescriptionPtr* target = nullptr;
+    if (m_cloudSystem && m_cloudSystem->id() == id)
+        target = &m_cloudSystem;
+    else if (m_localSystem && m_localSystem->id() == id)
+        target = &m_localSystem;
 
     if (!target)
+    {
         NX_ASSERT(false, "Never should get here!");
+        return;
+    }
     
-    disconnect(target.data(), nullptr, this, nullptr);
-    target.reset();
+    disconnect(target->data(), nullptr, this, nullptr);
+    target->reset();
 
     if (!m_cloudSystem && !m_localSystem)
         NX_ASSERT(false, "Empty system aggregator");
