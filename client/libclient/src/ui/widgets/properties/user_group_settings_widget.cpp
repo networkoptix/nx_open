@@ -16,8 +16,8 @@ QnUserGroupSettingsWidget::QnUserGroupSettingsWidget(QnUserGroupSettingsModel* m
     QnWorkbenchContextAware(parent),
     ui(new Ui::UserGroupSettingsWidget()),
     m_model(model),
-    m_usersModel(new QStandardItemModel(parent)),
-    m_replacementRoles(new QnUserRolesModel(parent, true, false, false))
+    m_usersModel(new QStandardItemModel(this)),
+    m_replacementRoles(new QnUserRolesModel(this, true, false, false))
 {
     ui->setupUi(this);
     ui->usersListTreeView->setModel(m_usersModel);

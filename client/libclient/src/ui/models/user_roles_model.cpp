@@ -116,26 +116,6 @@ public:
         q->endResetModel();
     }
 
-    void setUserRoles(const QList<QnUuid>& roles)
-    {
-        ec2::ApiUserGroupDataList correctRoles;
-        ec2::ApiUserGroupDataList availableRoles = qnResourceAccessManager->userGroups();
-
-        for (const auto& id : roles)
-        {
-            auto roleIterator = std::find_if(availableRoles.begin(), availableRoles.end(),
-                [&id](const ec2::ApiUserGroupData& role)
-                {
-                    return role.id == id;
-                });
-
-            if (roleIterator != availableRoles.end())
-                correctRoles.push_back(*roleIterator);
-        }
-
-        setUserRoles(correctRoles, true);
-    }
-
     void setUserRoles(bool enabled)
     {
         if (enabled)
@@ -281,8 +261,8 @@ public:
         }
         else
         {
-            qnResourceAccessManager->disconnect(addOrUpdateRoleConnection);
-            qnResourceAccessManager->disconnect(removeRoleConnection);
+            QObject::disconnect(addOrUpdateRoleConnection);
+            QObject::disconnect(removeRoleConnection);
         }
     }
 
@@ -298,7 +278,7 @@ public:
 
     static bool lessRoleByName(const ec2::ApiUserGroupData& r1, const ec2::ApiUserGroupData& r2)
     {
-        return nx::utils::naturalStringCompare(r1.name, r2.name) < 0;
+        return nx::utils::naturalStringCompare(r1.name, r2.name, Qt::CaseInsensitive) < 0;
     }
 
 public:
@@ -352,12 +332,6 @@ void QnUserRolesModel::setUserRoles(bool enabled)
 {
     Q_D(QnUserRolesModel);
     d->setUserRoles(enabled);
-}
-
-void QnUserRolesModel::setUserRoles(const QList<QnUuid>& roles)
-{
-    Q_D(QnUserRolesModel);
-    d->setUserRoles(roles);
 }
 
 void QnUserRolesModel::setUserRoles(const ec2::ApiUserGroupDataList& roles)

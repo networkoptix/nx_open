@@ -45,8 +45,8 @@ void QnUserGroupSettingsModel::setGroups(const ec2::ApiUserGroupDataList& value)
     m_groups = value;
     std::sort(m_groups.begin(), m_groups.end(), [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
     {
-        /* Case Sensitive sort. */
-        return nx::utils::naturalStringCompare(l.name, r.name) < 0;
+        /* Case Insensitive sort. */
+        return nx::utils::naturalStringCompare(l.name, r.name, Qt::CaseInsensitive) < 0;
     });
 
     m_accessibleResources.clear();

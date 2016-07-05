@@ -20,11 +20,10 @@ public:
 
     /* Role-specific stuff: */
 
-    void setStandardRoles(bool enabled);
+    void setStandardRoles(bool enabled = true);
     void setStandardRoles(const QList<Qn::GlobalPermissions>& standardRoles);
 
-    void setUserRoles(bool enabled);
-    void setUserRoles(const QList<QnUuid>& roles);
+    void setUserRoles(bool enabled = true);
     void setUserRoles(const ec2::ApiUserGroupDataList& roles);
 
     bool updateUserRole(const ec2::ApiUserGroupData& role);
