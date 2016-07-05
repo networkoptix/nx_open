@@ -23,7 +23,7 @@ public:
     QAbstractButton *defaultButton;
     QAbstractButton *escapeButton;
     QnMessageBox::Icon icon;
-    QStandardItemModel* simpleModel;
+    QStringListModel* simpleModel;
 
     QnMessageBoxPrivate(QnMessageBox *parent);
 
@@ -31,7 +31,7 @@ public:
     void detectDefaultButton();
     void detectEscapeButton();
     void stylizeButtons();
-    QStandardItemModel* ensureSimpleModel();
+    QStringListModel* ensureSimpleModel();
     int execReturnCode(QAbstractButton *button) const;
 };
 
@@ -152,10 +152,10 @@ void QnMessageBoxPrivate::stylizeButtons()
         setAccentStyle(button, button == defaultButton);
 }
 
-QStandardItemModel* QnMessageBoxPrivate::ensureSimpleModel()
+QStringListModel* QnMessageBoxPrivate::ensureSimpleModel()
 {
     if (!simpleModel)
-        simpleModel = new QStandardItemModel(this);
+        simpleModel = new QStringListModel(this);
 
     return simpleModel;
 }
@@ -511,12 +511,8 @@ void QnMessageBox::setComboBoxItems(const QStringList& items)
     }
 
     Q_D(QnMessageBox);
-    QStandardItemModel* model = d->ensureSimpleModel();
-    model->clear();
-
-    for (const QString& item : items)
-        model->appendRow(new QStandardItem(item));
-
+    QStringListModel* model = d->ensureSimpleModel();
+    model->setStringList(items);
     ui->comboBox->show();
 }
 
