@@ -7,15 +7,24 @@
     <x>0</x>
     <y>0</y>
     <width>463</width>
-    <height>370</height>
+    <height>346</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="spacing">
     <number>16</number>
    </property>
+   <property name="leftMargin">
+    <number>16</number>
+   </property>
+   <property name="topMargin">
+    <number>16</number>
+   </property>
+   <property name="rightMargin">
+    <number>16</number>
+   </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>16</number>
    </property>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -111,8 +120,8 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>20</width>
-       <height>147</height>
+       <width>0</width>
+       <height>0</height>
       </size>
      </property>
     </spacer>
