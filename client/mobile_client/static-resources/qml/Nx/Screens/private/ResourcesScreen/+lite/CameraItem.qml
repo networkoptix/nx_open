@@ -63,6 +63,8 @@ Control
                 {
                     if (d.offline || d.unauthorized)
                         return thumbnailDummyComponent
+                    else if (useVideo)
+                        return videoComponent
                     else if (!cameraItem.thumbnail)
                         return thumbnailPreloaderComponent
                     else
