@@ -71,6 +71,10 @@ bool SelfUpdater::registerUriHandler()
         QnAppInfo::customizationName(),
         m_clientVersion);
 
+#elif defined(Q_OS_MAC)
+    return nx::utils::registerSystemUriProtocolHandler(
+        nx::vms::utils::AppInfo::nativeUriProtocol(),
+        QnClientAppInfo::macOsBundleName());
 #else
     return true;
 #endif
