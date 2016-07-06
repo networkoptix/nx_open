@@ -13,6 +13,7 @@
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/test_support/test_options.h>
 #include <utils/common/guard.h>
 
 
@@ -617,7 +618,7 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
                 ASSERT_EQ(nullptr, result.second);
 
                 #ifdef _DEBUG
-                    if (!SocketFactory::areTimeAssertsDisabled())
+                    if (!utils::TestOptions::areTimeAssertsDisabled())
                     {
                         EXPECT_GT(actualTimeout, timeout - timeoutCorrection);
                         EXPECT_LT(actualTimeout, timeout + timeoutCorrection);

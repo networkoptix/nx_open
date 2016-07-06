@@ -1,16 +1,12 @@
-#define GTEST_HAS_POSIX_RE 0
-#include <gtest/gtest.h>
 #include <QtCore>
-
 #include "utils.h"
+
 #include <nx/network/socket_global.h>
+#include <nx/utils/test_support/run_test.h>
 
 nx::ut::cfg::Config config;
 
-namespace
-{
-
-void fillConfig(QCoreApplication &app)
+static void fillConfig(QCoreApplication &app)
 {
     QCommandLineParser parser;
     parser.addOptions({{{"t", "tmp"}, "Temporary working directory path. Default: 'tmp'", "tmp"},
@@ -37,15 +33,9 @@ void fillConfig(QCoreApplication &app)
 
 }
 
-} // anonymous namespace
-
 int main(int argc, char **argv)
 {
-	nx::network::SocketGlobals::InitGuard sgGuard;
     QCoreApplication app(argc, argv);
     fillConfig(app);
-
-    ::testing::InitGoogleTest(&argc, argv);
-    const int result = RUN_ALL_TESTS();
-    return result;
+    return nx::utils::runTest(argc, argv);
 }

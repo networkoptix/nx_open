@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
@@ -10,7 +9,7 @@
 #include <nx/network/test_support/stun_async_client_mock.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
-
+#include <nx/utils/test_support/test_options.h>
 
 namespace nx {
 namespace network {
@@ -422,7 +421,7 @@ protected:
     {
         auto socketPtr = std::make_unique<TCPSocket>();
         auto socket = socketPtr.get();
-        const auto timeout = 3000 * SocketFactory::timeoutMultiplier();
+        const auto timeout = 3000 * utils::TestOptions::timeoutMultiplier();
         ASSERT_TRUE(socketPtr->setSendTimeout(timeout));
         ASSERT_TRUE(socketPtr->setRecvTimeout(timeout));
         ASSERT_TRUE(socketPtr->setNonBlockingMode(true));
@@ -440,7 +439,7 @@ protected:
 
     void connectClient(AbstractStreamSocket* socket, const SocketAddress& peer)
     {
-        const auto delay = 500 * SocketFactory::timeoutMultiplier();
+        const auto delay = 500 * utils::TestOptions::timeoutMultiplier();
         if (auto address = m_addressBinder.random(peer))
         {
             NX_LOGX(lm("connect %1 -> %2").arg(socket).str(*address), cl_logDEBUG2);

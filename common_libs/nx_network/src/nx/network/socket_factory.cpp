@@ -181,28 +181,6 @@ bool SocketFactory::isSslEnforced()
     return s_isSslEnforced;
 }
 
-void SocketFactory::setTimeoutMultiplier(size_t value)
-{
-    s_timeoutMultiplier = value;
-    qWarning() << ">>> SocketFactory::setTimeoutMultiplier(" << value << ") <<<";
-}
-
-size_t SocketFactory::timeoutMultiplier()
-{
-    return s_timeoutMultiplier;
-}
-
-void SocketFactory::disableTimeAsserts(bool areDisabled)
-{
-    s_disableTimeAsserts = areDisabled;
-    qWarning() << ">>> SocketFactory::disableTimeAsserts(" << areDisabled << ") <<<";
-}
-
-bool SocketFactory::areTimeAssertsDisabled()
-{
-    return s_disableTimeAsserts;
-}
-
 SocketFactory::CreateStreamSocketFuncType
     SocketFactory::setCreateStreamSocketFunc(
         CreateStreamSocketFuncType newFactoryFunc)
@@ -227,5 +205,3 @@ std::atomic< SocketFactory::SocketType >
 
 std::atomic< bool > SocketFactory::s_isSslEnforced( false );
 
-std::atomic< size_t > SocketFactory::s_timeoutMultiplier(1);
-std::atomic< bool > SocketFactory::s_disableTimeAsserts(false);

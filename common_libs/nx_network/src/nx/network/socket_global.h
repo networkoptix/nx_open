@@ -14,6 +14,7 @@
 #include "cloud/mediator_connector.h"
 #include "cloud/tunnel/outgoing_tunnel_pool.h"
 
+#define NX_NETWORK_SOCKET_GLOBALS
 
 namespace nx {
 namespace network {
