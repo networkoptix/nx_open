@@ -9,13 +9,13 @@ qmldir_nxtool = os.path.join('${root.dir}/nxtool/static-resources/src', 'qml')
 os.environ["PATH"] = "%s;%s\\bin" % (os.environ['PATH'], qtdir)
 
 # Windows only so we can use Windows syntax here
-commands = ['${environment.dir}\\bin\\windeployqt.exe ${libdir}\\${arch}\\bin\\${build.configuration}\client.bin.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir qml' % qmldir,\
+commands = ['${environment.dir}\\bin\\windeployqt.exe ${libdir}\\${arch}\\bin\\${build.configuration}\desktop_client.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir qml' % qmldir,\
 'del /f/q qml\QtWebProcess.exe'
 'heat dir %s -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out ClientQml.wxs -cg ClientQmlComponent -dr ClientQml -var var.ClientQmlDir' % qmldir
 ]
 
 if __name__ == '__main__':
-    cmd = '${environment.dir}\\bin\\windeployqt.exe ${libdir}\\${arch}\\bin\\${build.configuration}\client.bin.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir clientqml' % qmldir
+    cmd = '${environment.dir}\\bin\\windeployqt.exe ${libdir}\\${arch}\\bin\\${build.configuration}\desktop_client.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir clientqml' % qmldir
     p = subprocess.Popen(cmd, shell=True, stdout=PIPE, stderr=subprocess.STDOUT)
     out, err = p.communicate()
     print out

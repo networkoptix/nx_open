@@ -2,7 +2,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
  
 project(appserver2)
 set(PROJECT_SHORTNAME "appserver2")
-set(PROJECT_LONGNAME "${nxtool.company.name} New Enterprise Controller")
+set(PROJECT_LONGNAME "${short.company.name} New Enterprise Controller")
 
 # Additional Include Directories
 include_directories (${include_directories} src)        

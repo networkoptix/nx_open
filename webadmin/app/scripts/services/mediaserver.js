@@ -104,6 +104,7 @@ angular.module('webadminApp')
                 return $http.post(proxy + '/web/api/cookieLogout');
             },
             login:function(login,password){
+                login = login.toLowerCase();
                 var deferred = $q.defer();
                 var self = this;
                 function reject(error){

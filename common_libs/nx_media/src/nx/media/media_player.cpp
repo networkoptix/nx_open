@@ -154,6 +154,9 @@ public:
     // See property comment.
     int videoQuality;
 
+    // Video geometry inside the application window.
+    QRect videoGeometry;
+
     void applyVideoQuality();
 
 private:
@@ -655,6 +658,12 @@ bool PlayerPrivate::initDataProvider()
 
     applyVideoQuality();
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
+    // TODO: #mshevchenko Uncomment the code below and implement the corresponding method.
+//    dataConsumer->setVideoGeometryAccessor(
+//        [guardedThis = QPointer<PlayerPrivate>(this)]()
+//        {
+//            return guardedThis ? guardedThis->videoGeometry : QRect();
+//        });
 
     archiveReader->addDataProcessor(dataConsumer.get());
     connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame,
@@ -879,6 +888,22 @@ QSize Player::currentResolution() const
         return d->dataConsumer->currentResolution();
     else
         return QSize();
+}
+
+QRect Player::videoGeometry() const
+{
+    Q_D(const Player);
+    return d->videoGeometry;
+}
+
+void Player::setVideoGeometry(const QRect& rect)
+{
+    Q_D(Player);
+    if (d->videoGeometry == rect)
+        return;
+
+    d->videoGeometry = rect;
+    emit videoGeometryChanged();
 }
 
 } // namespace media

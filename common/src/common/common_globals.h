@@ -603,6 +603,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         ActionEmitterType,                          /** */
         ActionEmittedBy,                            /** */
+
+        GlobalPermissionsRole,                      /**< Global permissions role. Value of type Qn::GlobalPermissions. */
+
         RoleCount
     };
 

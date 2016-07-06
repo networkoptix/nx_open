@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <nx/utils/log/assert.h>
+
 #if QT_VERSION == 0x050201
 static inline quint32 f2i(float f)
 {

@@ -238,7 +238,7 @@
 #include <database/server_db.h>
 
 #if !defined(EDGE_SERVER)
-#include <nx_speach_synthesizer/text_to_wav.h>
+#include <nx_speech_synthesizer/text_to_wav.h>
 #endif
 
 #include <streaming/audio_streamer_pool.h>
