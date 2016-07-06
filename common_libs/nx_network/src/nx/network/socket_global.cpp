@@ -87,10 +87,7 @@ void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
 {
     QnMutexLocker lock(&s_instance->m_mutex);
     if (s_instance->m_customInits.emplace(init, deinit).second)
-    {
-        lock.unlock();
         init();
-    }
 }
 
 QnMutex SocketGlobals::s_mutex;
