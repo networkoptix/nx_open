@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gtest/gtest.h>
+
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
@@ -23,11 +25,7 @@ public:
 
     void timedOut()
     {
-        #ifdef FAIL
-            FAIL() << "TestSyncQueue::pop() has timed out";
-        #else
-            #error "nx::utils::TestSyncQueue requires GTest"
-        #endif
+        GTEST_FAIL() << "TestSyncQueue::pop() has timed out";
     }
 
     typename Base::ResultType pop() /* overlap */
