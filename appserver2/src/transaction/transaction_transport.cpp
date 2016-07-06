@@ -22,7 +22,6 @@
 #include "utils/common/systemerror.h"
 #include <nx/network/socket_factory.h>
 #include "transaction_log.h"
-#include <transaction/chunked_transfer_encoder.h>
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
