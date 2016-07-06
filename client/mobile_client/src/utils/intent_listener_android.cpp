@@ -1,6 +1,6 @@
 #include "intent_listener_android.h"
 
-#ifdef Q_OS_ANDROID
+#if defined(Q_OS_ANDROID)
 
 #include <QtGui/QDesktopServices>
 #include <QtAndroidExtras/QAndroidJniObject>
@@ -28,9 +28,7 @@ class QnIntentListener : public QtAndroidPrivate::NewIntentListener
 
         qDebug() << "Opening URI" << uriString;
 
-        //TODO: #dklychkov Uncomment when filter is implemented.
-        //return QDesktopServices::openUrl(url);
-        return true;
+        return QDesktopServices::openUrl(url);
     }
 };
 
@@ -39,4 +37,4 @@ void registerIntentListener()
     QtAndroidPrivate::registerNewIntentListener(new QnIntentListener());
 }
 
-#endif
+#endif // defined(Q_OS_ANDROID)
