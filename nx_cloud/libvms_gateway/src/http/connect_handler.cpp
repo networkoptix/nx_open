@@ -1,5 +1,6 @@
 #include "connect_handler.h"
 
+#include <nx/network/socket_global.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/utils/log/log.h>
@@ -33,8 +34,8 @@ void ConnectHandler::processRequest(
     static_cast<void>(response);
 
     SocketAddress targetAddress(request.requestLine.url.path());
-    if (!network::cloud::AddressResolver::
-        kCloudAddressRegExp.exactMatch(targetAddress.address.toString()))
+    if (!network::SocketGlobals::addressResolver()
+            .isCloudHostName(targetAddress.address.toString()))
     {
         // No cloud address means direct IP
         if (!m_settings.cloudConnect().allowIpTarget)

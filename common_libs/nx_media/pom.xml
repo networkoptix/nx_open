@@ -35,6 +35,7 @@
             </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
+                <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
             </properties>
         </profile>
 

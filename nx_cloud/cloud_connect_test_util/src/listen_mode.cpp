@@ -103,7 +103,7 @@ public:
         QStringList failedListening;
         nx::utils::promise<void> registerPromise;
         {
-            nx::BarrierHandler barrier(
+            nx::utils::BarrierHandler barrier(
                 [&registerPromise](){ registerPromise.set_value(); });
 
             for (auto& context: socketContexts)

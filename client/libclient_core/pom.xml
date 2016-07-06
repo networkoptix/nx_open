@@ -66,6 +66,15 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>libvms_gateway</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libvms_gateway/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cloud_db_client</artifactId>
             <version>${project.version}</version>
             <type>pom</type>

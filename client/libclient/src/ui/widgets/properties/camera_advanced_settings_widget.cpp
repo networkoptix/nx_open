@@ -16,6 +16,7 @@
 #include <core/resource_management/resource_data_pool.h>
 
 #include <ui/widgets/properties/camera_advanced_settings_web_page.h>
+#include <vms_gateway_embeddable.h>
 
 namespace
 {
@@ -119,7 +120,36 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
 
         targetUrl.setUserName(auth.user());
         targetUrl.setPassword(auth.password());
-        m_cameraAdvancedSettingsWebPage->networkAccessManager()->setProxy(QnNetworkProxyFactory::instance()->proxyToResource(m_camera));
+
+        #define USE_VMS_GATEWAY_PROXY_FOR_WEB_VIEW
+        #ifdef USE_VMS_GATEWAY_PROXY_FOR_WEB_VIEW
+            // The idea is simple:
+            // 1. webView connects to vmsGateway directly without auth
+            // 2. vmsGateway forwards http to server (server proxy auth takes place)
+            // 3. server proxies http to camera (camera http auth takes place)
+
+            // TODO: #mux Currently vmsGateway breaks client connection on
+            //  camera auth, need to find out why
+
+            const auto currentServerUrl = QnAppServerConnectionFactory::url();
+            targetUrl.setHost(currentServerUrl.host());
+            targetUrl.setPort(currentServerUrl.port());
+
+            const auto vmsGatewayAddress =
+                nx::cloud::gateway::VmsGatewayEmbeddable::instance()->endpoint();
+
+            const QNetworkProxy gatewayProxy(
+                QNetworkProxy::HttpProxy,
+                vmsGatewayAddress.address.toString(), vmsGatewayAddress.port,
+                currentServerUrl.userName(), currentServerUrl.password());
+
+            m_cameraAdvancedSettingsWebPage->networkAccessManager()
+                ->setProxy(gatewayProxy);
+        #else
+            const auto serverProxy = QnNetworkProxyFactory::instance()->proxyToResource(m_camera);
+            m_cameraAdvancedSettingsWebPage->networkAccessManager()
+                ->setProxy(serverProxy);
+        #endif
 
         ui->webView->reload();
         ui->webView->load(QNetworkRequest(targetUrl));

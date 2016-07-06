@@ -434,9 +434,6 @@ void CloudServerSocket::acceptAsyncInternal(
         [this, handler = std::move(handler)](
             std::unique_ptr<AbstractStreamSocket> socket) mutable
         {
-            //NX_ASSERT(!m_acceptedSocket, Q_FUNC_INFO, "concurrently accepted socket");
-            NX_LOGX(lm("accepted socket %1").arg(socket), cl_logDEBUG2);
-
             if (socket)
             {
                 NX_LOGX(lm("return socket %1").arg(socket), cl_logDEBUG2);

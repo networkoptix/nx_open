@@ -24,6 +24,7 @@
 #include <finders/cloud_systems_finder.h>
 #include <finders/direct_systems_finder.h>
 #include <client/client_recent_connections_manager.h>
+#include <utils/media/ffmpeg_initializer.h>
 
 #include "ui/videowall_handler.h"
 
@@ -54,6 +55,9 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(this);
     common->setModuleGUID(QnUuid::createUuid());
+
+    // TODO: #mshevchenko Remove when client_core_module is created.
+    common->store<QnFfmpegInitializer>(new QnFfmpegInitializer());
 
     common->store<QnTranslationManager>(translationManager);
     common->store<QnClientCoreSettings>(new QnClientCoreSettings());

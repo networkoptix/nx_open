@@ -62,6 +62,8 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemAccessRole,
     (SystemAccessRole::none, "none")
+    (SystemAccessRole::disabled, "disabled")
+    (SystemAccessRole::custom, "custom")
     (SystemAccessRole::liveViewer, "liveViewer")
     (SystemAccessRole::viewer, "viewer")
     (SystemAccessRole::advancedViewer, "advancedViewer")
@@ -108,6 +110,14 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery)
     urlQuery->addQueryItem(
         SystemSharing_accessRole_field,
         QnLexical::serialized(data.accessRole));
+}
+
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const systemSharing)
+{
+    //TODO
+    NX_EXPECT(false);
+    return false;
 }
 
 

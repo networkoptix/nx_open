@@ -49,6 +49,8 @@ public:
 
 signals:
     void cloudBindingStatusChanged(bool boundToCloud);
+    void connectedToCloud();
+    void disconnectedFromCloud();
 
 private:
     QString m_cloudSystemID;

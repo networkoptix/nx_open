@@ -233,6 +233,7 @@
 #include "rest/handlers/script_list_rest_handler.h"
 #include "cloud/cloud_connection_manager.h"
 #include "cloud/cloud_system_name_updater.h"
+#include "cloud/user_list_synchronizer.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 
@@ -268,31 +269,42 @@ bool restartFlag = false;
 void restartServer(int restartTimeout);
 
 namespace {
-    const QString YES = lit("yes");
-    const QString NO = lit("no");
-    const QString GUID_IS_HWID = lit("guidIsHWID");
-    const QString SERVER_GUID = lit("serverGuid");
-    const QString SERVER_GUID2 = lit("serverGuid2");
-    const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
-    const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode");
-    const QString ADMIN_PSWD_HASH = lit("adminMd5Hash");
-    const QString ADMIN_PSWD_DIGEST = lit("adminMd5Digest");
-    const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
+const QString YES = lit("yes");
+const QString NO = lit("no");
+const QString GUID_IS_HWID = lit("guidIsHWID");
+const QString SERVER_GUID = lit("serverGuid");
+const QString SERVER_GUID2 = lit("serverGuid2");
+const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
+const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode");
+const QString ADMIN_PSWD_HASH = lit("adminMd5Hash");
+const QString ADMIN_PSWD_DIGEST = lit("adminMd5Digest");
+const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 
-    bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
-    {
-        QList<QnResourceTypePtr> resourceTypeList;
-        const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kDefaultUserAccess)->getResourceTypesSync(&resourceTypeList);
-        if (errorCode != ec2::ErrorCode::ok)
-        {
-            NX_LOG(QString::fromLatin1("Failed to load resource types. %1").arg(ec2::toString(errorCode)), cl_logERROR);
-            return false;
-        }
+bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
+{
+	QList<QnResourceTypePtr> resourceTypeList;
+	const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kDefaultUserAccess)->getResourceTypesSync(&resourceTypeList);
+	if (errorCode != ec2::ErrorCode::ok)
+	{
+		NX_LOG(QString::fromLatin1("Failed to load resource types. %1").arg(ec2::toString(errorCode)), cl_logERROR);
+		return false;
+	}
 
-        qnResTypePool->replaceResourceTypeList(resourceTypeList);
-        return true;
-    }
-};
+	qnResTypePool->replaceResourceTypeList(resourceTypeList);
+	return true;
+}
+
+void addFakeVideowallUser()
+{
+	ec2::ApiUserData fakeUserData;
+	fakeUserData.permissions = Qn::GlobalPermission::GlobalVideoWallModePermissionSet;
+	fakeUserData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
+	auto fakeUser = ec2::fromApiToResource(fakeUserData);
+	fakeUser->setId(Qn::kVideowallUserAccess.userId);
+	qnResPool->addResource(fakeUser);
+}
+
+}
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
@@ -1806,6 +1818,7 @@ void MediaServerProcess::run()
 
     CloudConnectionManager cloudConnectionManager;
     CloudSystemNameUpdater cloudSystemNameUpdater(&cloudConnectionManager);
+    CloudUserListSynchonizer cloudUserListSynchonizer(&cloudConnectionManager);
     auto authHelper = std::make_unique<QnAuthHelper>(&cloudConnectionManager);
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
@@ -2344,6 +2357,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
     loadResourcesFromECS(messageProcessor.data());
+	addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
 
     if (isNewServerInstance || systemName.isDefault())

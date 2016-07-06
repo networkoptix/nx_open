@@ -50,6 +50,10 @@ private:
     > m_requestCompletionHandler;
     std::unique_ptr<nx_http::AsyncMessagePipeline> m_targetHostPipeline;
 
+    nx_http::StatusCode::Value fetchTargetEndpointAndPrepareRequest(
+        const nx_http::HttpServerConnection& connection,
+        nx_http::Request* const request,
+        SocketAddress* const targetEndpoint);
     void onConnected(SystemError::ErrorCode errorCode);
     void onMessageFromTargetHost(nx_http::Message message);
 };

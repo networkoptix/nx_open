@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
 
 #include <thread>
-#include <utils/thread/sync_queue.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
+namespace utils {
 namespace test {
 
 class SyncQueueTest
@@ -81,4 +82,5 @@ TEST_F(SyncQueueTest, TimedPop)
 }
 
 } // namespace test
+} // namespace utils
 } // namespace nx

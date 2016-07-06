@@ -24,18 +24,21 @@ CloudModuleEndPointFetcher::CloudModuleEndPointFetcher(
     std::unique_ptr<AbstractEndpointSelector> endpointSelector)
 :
     m_moduleName(std::move(moduleName)),
-    m_endpointSelector(std::move(endpointSelector))
+    m_endpointSelector(std::move(endpointSelector)),
+    m_requestIsRunning(false)
 {
 }
 
 CloudModuleEndPointFetcher::~CloudModuleEndPointFetcher()
 {
-    QnMutexLocker lk(&m_mutex);
-    auto httpClientLocal = std::move(m_httpClient);
-    lk.unlock();
-    if (httpClientLocal)
-        httpClientLocal->terminate();
-    //assuming m_endpointSelector will wait for completion handler to return
+    stopWhileInAioThread();
+}
+
+void CloudModuleEndPointFetcher::stopWhileInAioThread()
+{
+    //we do not need mutex here since noone uses object anymore 
+    //    and internal events are delivered in same aio thread
+    m_httpClient.reset();
     m_endpointSelector.reset();
 }
 
@@ -59,34 +62,41 @@ void CloudModuleEndPointFetcher::get(
         return;
     }
 
+    //if async resolve is already started, should wait for its completion
+    m_resolveHandlers.emplace_back(std::move(handler));
+
+    if (m_requestIsRunning)
+        return;
+
+    NX_ASSERT(!m_httpClient);
     //if requested url is unknown, fetching description xml
     m_httpClient = nx_http::AsyncHttpClient::create();
+    m_httpClient->bindToAioThread(getAioThread());
     QObject::connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::done,
         m_httpClient.get(), [this](nx_http::AsyncHttpClientPtr client){
             onHttpClientDone(std::move(client));
         },
         Qt::DirectConnection);
+    m_requestIsRunning = true;
     m_httpClient->doGet(QUrl(nx::network::AppInfo::cloudModulesXmlUrl()));
-
-    //if async resolve is already started, should wait for its completion
-    m_resolveHandlers.emplace_back(std::move(handler));
 }
 
 void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)
 {
-    auto guard = makeScopedGuard([this](){
-        QnMutexLocker lk(&m_mutex);
-        m_httpClient.reset();
-    });
+    QnMutexLocker lk(&m_mutex);
+
+    m_httpClient.reset();
 
     if (!client->response())
         return signalWaitingHandlers(
+            &lk,
             nx_http::StatusCode::serviceUnavailable,
             SocketAddress());
 
     if (client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
         return signalWaitingHandlers(
+            &lk,
             static_cast<nx_http::StatusCode::Value>(
                 client->response()->statusLine.statusCode),
             SocketAddress());
@@ -96,6 +106,7 @@ void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr cl
         endpoints.empty())
     {
         return signalWaitingHandlers(
+            &lk,
             nx_http::StatusCode::serviceUnavailable,
             SocketAddress());
     }
@@ -105,7 +116,14 @@ void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr cl
     m_endpointSelector->selectBestEndpont(
         m_moduleName,
         std::move(endpoints),
-        std::bind(&CloudModuleEndPointFetcher::endpointSelected, this, _1, _2));
+        [this](
+            nx_http::StatusCode::Value result,
+            SocketAddress selectedEndpoint)
+        {
+            post(std::bind(
+                &CloudModuleEndPointFetcher::endpointSelected, this,
+                result, std::move(selectedEndpoint)));
+        });
 }
 
 bool CloudModuleEndPointFetcher::parseCloudXml(
@@ -133,28 +151,31 @@ bool CloudModuleEndPointFetcher::parseCloudXml(
 }
 
 void CloudModuleEndPointFetcher::signalWaitingHandlers(
+    QnMutexLockerBase* const lk,
     nx_http::StatusCode::Value statusCode,
     const SocketAddress& endpoint)
 {
-    QnMutexLocker lk(&m_mutex);
     auto handlers = std::move(m_resolveHandlers);
-    lk.unlock();
+    m_resolveHandlers = decltype(m_resolveHandlers)();
+    m_requestIsRunning = false;
+    lk->unlock();
     for (auto& handler : handlers)
         handler(statusCode, endpoint);
+    lk->relock();
 }
 
 void CloudModuleEndPointFetcher::endpointSelected(
     nx_http::StatusCode::Value result,
     SocketAddress selectedEndpoint)
 {
-    if (result != nx_http::StatusCode::ok)
-        return signalWaitingHandlers(result, std::move(selectedEndpoint));
-
     QnMutexLocker lk(&m_mutex);
+
+    if (result != nx_http::StatusCode::ok)
+        return signalWaitingHandlers(&lk, result, std::move(selectedEndpoint));
+
     NX_ASSERT(!m_endpoint);
     m_endpoint = selectedEndpoint;
-    lk.unlock();
-    signalWaitingHandlers(result, selectedEndpoint);
+    signalWaitingHandlers(&lk, result, selectedEndpoint);
 }
 
 } // namespace cloud
