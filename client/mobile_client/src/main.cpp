@@ -195,6 +195,15 @@ void initLog()
             /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
             cl_logDEBUG2);
     }
+
+    if (conf.enableLog)
+    {
+        QnLog::instance(QnLog::MAIN_LOG_ID)->create(
+            QLatin1String(conf.tempPath()) + QLatin1String("mobile_client"),
+            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
+            /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
+            cl_logDEBUG2);
+    }
 }
 
 void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallInstanceGuid)

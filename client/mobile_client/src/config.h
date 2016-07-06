@@ -8,7 +8,9 @@ struct FlagConfig: public nx::utils::FlagConfig
 {
     using nx::utils::FlagConfig::FlagConfig;
 
-    NX_FLAG(0, enableEc2TranLog, "");
+    NX_FLAG(0, enableLog, "Enable mobile_client logging to temp path (DEBUG2 level).");
+
+    NX_FLAG(0, enableEc2TranLog, "Enable ec2_tran logging to temp path (DEBUG2 level).");
 
     NX_FLAG(0, execAtGlThreadOnBeforeSynchronizing, "Connect lambda execution to specified event.");
     NX_FLAG(1, execAtGlThreadOnFrameSwapped, "Connect lambda execution to specified event.");
