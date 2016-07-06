@@ -23,6 +23,7 @@
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <nx/utils/flag_config.h>
+#include <nx/utils/log/log.h>
 
 #define OUTPUT_PREFIX "media_player: "
 #include <nx/utils/debug_utils.h>
@@ -573,9 +574,23 @@ void PlayerPrivate::applyTranscodingIfPossible(
         if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(
             archiveReader->getTranscodingCodec(), transcodingResolution))
         {
+            NX_LOG(lit("[media_player] Set transcoding to %1 x %2")
+                .arg(transcodingResolution.width()).arg(transcodingResolution.height()),
+                cl_logDEBUG2);
             archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
                 transcodingResolution);
         }
+        else
+        {
+            NX_LOG(lit("[media_player] Transcoding to %1 x %2 not supported => Set low stream")
+                .arg(transcodingResolution.width()).arg(transcodingResolution.height()),
+                cl_logDEBUG2);
+        }
+    }
+    else
+    {
+        NX_LOG(lit("[media_player] Transcoding not supported for the camera => Set low stream"),
+            cl_logDEBUG2);
     }
 }
 
@@ -605,9 +620,22 @@ void PlayerPrivate::doApplyVideoQuality(
         if (highCodec != CODEC_ID_NONE && !highResolution.isEmpty()) //< High stream exists.
         {
             if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(highCodec, highResolution))
+            {
+                NX_LOG(lit("[media_player] High stream requested => Set high stream"),
+                    cl_logDEBUG2);
                 archiveReader->setQuality(MEDIA_Quality_High, /*fastSwitch*/ true);
+            }
             else
+            {
+                NX_LOG(lit("[media_player] High stream requested but compatible decoder missing:"),
+                    cl_logDEBUG2);
                 applyTranscodingIfPossible(camera, highResolution);
+            }
+        }
+        else
+        {
+            NX_LOG(lit("[media_player] High stream requested but missing => Set low stream"),
+                cl_logDEBUG2);
         }
     }
     else if (!lowStreamRequested) //< Custom resolution requested; videoQuality is lines count.
@@ -619,12 +647,34 @@ void PlayerPrivate::doApplyVideoQuality(
             aspect = QSize(16, 9);
 
         const QSize& desiredResolution = resolutionWithHeightAndAspect(videoQuality, aspect);
+
         const QSize& maxResolution =
             VideoDecoderRegistry::instance()->maxResolution(archiveReader->getTranscodingCodec());
+        const QSize& transcodingResolution = limitResolution(desiredResolution, maxResolution);
 
-        applyTranscodingIfPossible(camera, limitResolution(desiredResolution, maxResolution));
+        if (transcodingResolution == desiredResolution)
+        {
+            NX_LOG(lit("[media_player] Custom resolution of %1p requested; "
+                "desired resolution is %2 x %3:")
+                .arg(videoQuality).arg(desiredResolution.width()).arg(desiredResolution.height()),
+                cl_logDEBUG2);
+        }
+        else
+        {
+            NX_LOG(lit("[media_player] Custom resolution of %1p requested; "
+                "desired resolution is %2 x %3, limited to %4 x %5:")
+                .arg(videoQuality).arg(desiredResolution.width()).arg(desiredResolution.height())
+                .arg(transcodingResolution.width()).arg(transcodingResolution.height()),
+                cl_logDEBUG2);
+        }
+
+        applyTranscodingIfPossible(camera, transcodingResolution);
     }
-}
+    else
+    {
+        NX_LOG(lit("[media_player] Low stream requested => Set low stream"), cl_logDEBUG2);
+    }
+};
 
 bool PlayerPrivate::createArchiveReader()
 {
