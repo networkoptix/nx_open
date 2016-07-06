@@ -5,23 +5,6 @@
 #include <core/resource/resource.h>
 #include "utils/common/util.h"
 
-extern "C"
-{
-    // this function placed at <libavformat/internal.h> header
-    void ff_read_frame_flush(AVFormatContext *s);
-};
-
-static void free_packet_buffer(AVPacketList **pkt_buf, AVPacketList **pkt_buf_end)
-{
-    while (*pkt_buf) {
-        AVPacketList *pktl = *pkt_buf;
-        *pkt_buf = pktl->next;
-        av_free_packet(&pktl->pkt);
-        av_freep(&pktl);
-    }
-    *pkt_buf_end = NULL;
-}
-
 static const int IO_BLOCK_SIZE = 1024 * 32;
 
 QnAVIPlaylistArchiveDelegate::QnAVIPlaylistArchiveDelegate() :
@@ -176,7 +159,7 @@ qint64 QnAVIPlaylistArchiveDelegate::seek(qint64 mksec, bool /*findIFrame*/)
     m_inSeek = true;
     if (directSeekToPosition(relativeMksec))
     {
-        ff_read_frame_flush(m_formatContext);
+        avformat_flush(m_formatContext);
     } else
     {
         avformat_seek_file(m_formatContext, -1, 0, relativeMksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
