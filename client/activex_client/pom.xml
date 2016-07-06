@@ -91,7 +91,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>client_core</artifactId>
+            <artifactId>libclient_core</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
