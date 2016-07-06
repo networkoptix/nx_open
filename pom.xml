@@ -530,6 +530,7 @@
                 <client.binary.name>${product.name}.exe</client.binary.name>
                 <applauncher.binary.name>applauncher.exe</applauncher.binary.name>
                 <minilauncher.binary.name>${product.name} Launcher.exe</minilauncher.binary.name>
+                <installation.root>C:/Program Files/${company.name}/${display.product.name}/</installation.root>
 
                 <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
                 <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
@@ -540,7 +541,7 @@
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
                 <machine.type>X64</machine.type>
-                <installation.root>C:/Program Files/${company.name}/${display.product.name}/</installation.root>
+                
             </properties>
 
         </profile>
@@ -558,7 +559,6 @@
             </activation>
             <properties>
                 <machine.type>X86</machine.type>
-                <installation.root>C:/Program Files (x86)/${company.name}/${display.product.name}/</installation.root>
             </properties>
         </profile>
         <profile>

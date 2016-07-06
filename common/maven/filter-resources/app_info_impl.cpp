@@ -208,8 +208,3 @@ bool QnAppInfo::freeLicenseIsTrial()
     return ${freeLicenseIsTrial};
 }
 
-QString QnAppInfo::installationRoot()
-{
-    return QStringLiteral("${installation.root}");
-}
-
