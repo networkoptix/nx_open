@@ -830,11 +830,6 @@ TEST(MediaDbTest, StorageDB)
             new QnResourcePropertyDictionary);
     }
 
-    std::unique_ptr<QnStorageDbPool> dbPool;
-    if (!qnStorageDbPool) {
-        dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
-    }
-
     bool result;
     QnFileStorageResourcePtr storage(new QnFileStorageResource);
     storage->setUrl(workDirPath);
@@ -953,9 +948,6 @@ TEST(MediaDbTest, StorageDB)
         qWarning() << lit("Not visited count: %1").arg(notVisited);
     }
     ASSERT_EQ(allVisited, true);
-
-    sdb.close();
-    ASSERT_TRUE(QFile::remove(workDirPath + lit("/test.nxdb")));
 }
 
 TEST(MediaDbTest, Migration_from_sqlite)
@@ -982,11 +974,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
             new QnResourcePropertyDictionary);
     }
 
-    std::unique_ptr<QnStorageDbPool> dbPool;
-    if (!qnStorageDbPool) {
-        dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
-    }
-    auto dbPoolPtr = dbPool->create();
+    auto dbPoolRef = qnStorageDbPool->create();
 
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
@@ -1085,8 +1073,5 @@ TEST(MediaDbTest, Migration_from_sqlite)
         ASSERT_TRUE(mergedIt != mergedCatalogs.cend());
         ASSERT_TRUE((*mergedIt)->getChunks() == referenceCatalogs[i]->getChunks());
     }
-
-    sdb->close();
-    ASSERT_TRUE(QFile::remove(fileName + lit("_deprecated")));
 }
 
