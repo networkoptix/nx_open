@@ -7,7 +7,7 @@
 namespace nx {
 namespace utils {
 
-class TestOptions
+class NX_UTILS_API TestOptions
 {
 public:
     static void setTimeoutMultiplier(size_t value);
