@@ -36,7 +36,9 @@ namespace {
     
     static enum AVPixelFormat get_format(AVCodecContext *s, const enum AVPixelFormat *pix_fmts)
     {
-        av_videotoolbox_default_init(s);
+        int status = av_videotoolbox_default_init(s);
+        if (status != 0)
+            qWarning() << "IOS hardware decoder init failure:" << status;
         return pix_fmts[0];
     }
 
@@ -268,6 +270,7 @@ bool IOSVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolutio
 {
     if (codec != AV_CODEC_ID_H264 &&
         codec != AV_CODEC_ID_H263 &&
+        codec != AV_CODEC_ID_H263P &&
         codec != AV_CODEC_ID_MPEG4 &&
         codec != AV_CODEC_ID_MPEG1VIDEO &&
         codec != AV_CODEC_ID_MPEG2VIDEO)
@@ -283,7 +286,10 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
 {
     QN_UNUSED(codec);
     //todo: implement me. Need detect at runtime.
-    return QSize(1920, 1080);
+    if (codec == AV_CODEC_ID_H264)
+        return QSize(1920, 1080);
+    else
+        return QSize(1280, 720);
 }
 
 int IOSVideoDecoder::decode(
