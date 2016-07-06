@@ -173,7 +173,7 @@ TEST_F(VmsGatewayProxyTest, proxyingChunkedBody)
 {
     addArg("-http/allowTargetEndpointInUrl", "true");
     addArg("-cloudConnect/replaceHostAddressWithPublicAddress", "false");
-    ASSERT_TRUE(startAndWaitUntilStarted(true, true, true));
+    ASSERT_TRUE(startAndWaitUntilStarted(true, true, false));
 
     const QUrl targetUrl =
        lit("http://%1%2").arg(testHttpServer()->serverAddress().toString())
