@@ -579,8 +579,8 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                 outFrame->pkt_dts = m_frame->pkt_dts;
             }
         }
-#endif
         else
+#endif
         {
             if (!outFrame->isExternalData())
             {
