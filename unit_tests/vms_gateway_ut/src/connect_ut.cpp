@@ -42,7 +42,7 @@ public:
     network::test::RandomDataTcpServer server;
 };
 
-TEST_F(VmsGatewayConnectTest, IpSpecified)
+TEST_F(VmsGatewayConnectTest, DISABLED_IpSpecified)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
 
@@ -61,7 +61,7 @@ TEST_F(VmsGatewayConnectTest, IpSpecified)
     ASSERT_TRUE(writeData.startsWith(readData));
 }
 
-TEST_F(VmsGatewayConnectTest, ConnectNotSupported)
+TEST_F(VmsGatewayConnectTest, DISABLED_ConnectNotSupported)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(true, false, false));
 
@@ -70,7 +70,7 @@ TEST_F(VmsGatewayConnectTest, ConnectNotSupported)
     server.pleaseStopSync();
 }
 
-TEST_F(VmsGatewayConnectTest, IpForbidden)
+TEST_F(VmsGatewayConnectTest, DISABLED_IpForbidden)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(false, false, true));
 

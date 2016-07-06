@@ -13,7 +13,7 @@ VmsGatewayEmbeddable::VmsGatewayEmbeddable()
     addArg("-general/listenOn", "127.0.0.1:0");
     addArg("-cloudConnect/allowIpTarget", "true");
     addArg("-http/allowTargetEndpointInUrl", "true");
-    addArg("-http/connectSupport", "true");
+    //addArg("-http/connectSupport", "true");
 
     // do not allow VmsGateway reinit the log
     addArg("-log/logLevel", "none");

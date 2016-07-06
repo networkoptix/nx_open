@@ -285,6 +285,9 @@ void VmsGatewayProcess::registerApiHandlers(
 
     if (settings.http().connectSupport)
     {
+        NX_ASSERT(false, "Currently ConnectHandler has so issues:"
+            "please see implementation TODOs");
+
         msgDispatcher->registerRequestProcessor<ConnectHandler>(
             nx_http::kAnyPath,
             [&settings]() -> std::unique_ptr<ConnectHandler> {

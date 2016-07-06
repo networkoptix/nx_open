@@ -88,25 +88,28 @@ void ConnectHandler::connect(const SocketAddress& address)
 
             // TODO: #mux Find a way to steal socket after sending an automatic response
             m_request.requestLine.version.serialize(&m_connectionBuffer);
-            m_connectionBuffer.append(Buffer(" 200 Connection estabilished\n\n"));
+            m_connectionBuffer.append(Buffer(" 200 Connection estabilished\r\n\r\n"));
 
+            // TODO: #mux Currently there is a problem as m_connection may have some data
+            //  in it's buffer (client does not has to wait for CONNECT response before
+            //  sending data through)
             m_connectionSocket = m_connection->takeSocket();
             m_connectionSocket->cancelIOSync(network::aio::etNone);
             m_connectionSocket->sendAsync(
                 m_connectionBuffer,
                 [this](SystemError::ErrorCode result, size_t)
-            {
-                if (result != SystemError::noError)
-                    return socketError(m_connectionSocket.get(), result);
+                {
+                    if (result != SystemError::noError)
+                        return socketError(m_connectionSocket.get(), result);
 
-                m_connectionBuffer.reserve(kDefaultBufferSize);
-                m_connectionBuffer.resize(0);
-                stream(m_connectionSocket.get(), m_targetSocket.get(), &m_connectionBuffer);
+                    m_connectionBuffer.reserve(kDefaultBufferSize);
+                    m_connectionBuffer.resize(0);
+                    stream(m_connectionSocket.get(), m_targetSocket.get(), &m_connectionBuffer);
 
-                m_targetBuffer.reserve(kDefaultBufferSize);
-                m_targetBuffer.resize(0);
-                stream(m_targetSocket.get(), m_connectionSocket.get(), &m_targetBuffer);
-            });
+                    m_targetBuffer.reserve(kDefaultBufferSize);
+                    m_targetBuffer.resize(0);
+                    stream(m_targetSocket.get(), m_connectionSocket.get(), &m_targetBuffer);
+                });
         });
 }
 

@@ -123,24 +123,6 @@ TEST_F(VmsGatewayProxyTest, IpSpecified)
         nx_http::StatusCode::notFound);
 }
 
-TEST_F(VmsGatewayProxyTest, NoDefaultPort)
-{
-    ASSERT_TRUE(startAndWaitUntilStarted(true, false, false));
-
-    // Default port is not here
-    testProxyUrl(QUrl(lit("http://%1/%2%3")
-        .arg(endpoint().toString())
-        .arg(testHttpServer()->serverAddress().address.toString())
-        .arg(testPathAndQuery)),
-        nx_http::StatusCode::serviceUnavailable);
-
-    // Port specified
-    testProxyUrl(QUrl(lit("http://%1/%2%3")
-        .arg(endpoint().toString())
-        .arg(testHttpServer()->serverAddress().toString())
-        .arg(testPathAndQuery)));
-}
-
 TEST_F(VmsGatewayProxyTest, IpForbidden)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(false, false, false));
@@ -158,7 +140,7 @@ TEST_F(VmsGatewayProxyTest, proxyByRequestUrl)
 {
     addArg("-http/allowTargetEndpointInUrl", "true");
     addArg("-cloudConnect/replaceHostAddressWithPublicAddress", "false");
-    ASSERT_TRUE(startAndWaitUntilStarted(true, true, true));
+    ASSERT_TRUE(startAndWaitUntilStarted(true, true, false));
 
     const QUrl targetUrl =
         lit("http://%1%2").arg(testHttpServer()->serverAddress().toString()).arg(testPathAndQuery);
