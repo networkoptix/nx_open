@@ -422,6 +422,11 @@ public:
         return m_errorString.get();
     }
 
+    void resetErrorString()
+    {
+        m_errorString.reset();
+    }
+
 private:
     void initErrorString(const std::string& errorString)
     {
@@ -455,6 +460,42 @@ void reopenDbFile(QFile *dbFile, const QString& fileName)
     dbFile->setFileName(fileName);
     ASSERT_TRUE(dbFile->open(fd, QIODevice::ReadWrite, QFileDevice::AutoCloseHandle)) 
         << strerror(errno);
+}
+
+TEST(MediaDbTest, SimpleFileWriteTest)
+{
+    nx::ut::utils::WorkDirResource workDirResource;
+    ASSERT_TRUE((bool)workDirResource.getDirName());
+
+    QString fileName = QDir(*workDirResource.getDirName()).absoluteFilePath("file.tst");
+    QFile file(fileName);
+    file.open(QIODevice::ReadWrite);
+    QDataStream stream(&file);
+    stream.setByteOrder(QDataStream::LittleEndian);
+    quint64 tmp;
+
+    for (int i = 0; i < 1000; ++i)
+    {
+        tmp = i;
+        stream << tmp;
+        ASSERT_NE(stream.status(), QDataStream::WriteFailed) 
+            << "Stream status: " 
+            << stream.status();
+    }
+
+    stream.resetStatus();
+    file.close();
+    file.open(QIODevice::ReadWrite);
+    stream.setDevice(&file);
+    
+    for (int i = 0; i < 1000; ++i)
+    {
+        stream >> tmp;
+        ASSERT_EQ(tmp, i);
+        ASSERT_EQ(stream.status(), QDataStream::Ok) 
+            << "Stream status: " 
+            << stream.status();
+    }
 }
 
 TEST(MediaDbTest, BitsTwiddling)
@@ -548,7 +589,8 @@ TEST(MediaDbTest, ReadWrite_Simple)
     for (auto &data : tdm.dataVector)
         boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
 
-    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
+    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
+    testHandler.resetErrorString();
 
     dbHelper.setMode(nx::media_db::Mode::Read);
     dbHelper.reset();
@@ -565,7 +607,8 @@ TEST(MediaDbTest, ReadWrite_Simple)
     while (error == nx::media_db::Error::NoError)
         dbHelper.readRecord();
 
-    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
+    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
+    testHandler.resetErrorString();
     dbFile.close();
 
     size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
@@ -597,7 +640,8 @@ TEST(MediaDbTest, DbFileTruncate)
         for (auto &data : tdm.dataVector)
             boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
 
-        ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
+        ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
+        testHandler.resetErrorString();
 
         dbHelper.setMode(nx::media_db::Mode::Read);
         reopenDbFile(&dbFile, fileName);
@@ -627,7 +671,8 @@ TEST(MediaDbTest, DbFileTruncate)
         while (error == nx::media_db::Error::NoError)
             dbHelper.readRecord();
 
-        ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
+        ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
+        testHandler.resetErrorString();
 
         dbFile.close();
         ASSERT_TRUE(error == nx::media_db::Error::ReadError) << (int)error;
@@ -680,7 +725,8 @@ TEST(MediaDbTest, ReadWrite_MT)
         if (threads[i].joinable())
             threads[i].join();
 
-    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
+    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
+    testHandler.resetErrorString();
 
     dbHelper.setMode(nx::media_db::Mode::Read);
     dbHelper.reset();
@@ -696,7 +742,8 @@ TEST(MediaDbTest, ReadWrite_MT)
     while (error == nx::media_db::Error::NoError)
         dbHelper.readRecord();
 
-    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
+    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
+    testHandler.resetErrorString();
 
     size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
                                        [](const TestData &td) { return td.visited; });
@@ -745,7 +792,8 @@ TEST(MediaDbTest, ReadWrite_MT)
         dbHelper.readRecord();
     }
 
-    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << testHandler.getErrorString();
+    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
+    testHandler.resetErrorString();
 
     readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
                                 [](const TestData &td) { return td.visited; });
