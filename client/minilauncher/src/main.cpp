@@ -1,13 +1,11 @@
-#include <set>
 #include <string>
-#include <vector>
-#include <fstream>
+
 #include <tchar.h>
 #include <Windows.h>
-#include "version.h"
-#include <iostream>
 #include "Shlwapi.h"
-#include <algorithm>
+#include "shlobj.h"
+
+#include "version.h"
 
 typedef signed __int64 int64_t;
 
@@ -23,7 +21,19 @@ wstring closeDirPath(const wstring& name)
         return name + L'/';
 }
 
-wstring getDstDir()
+wstring getSharedApplauncherDir()
+{
+    wchar_t result[MAX_PATH];
+    if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, result)))
+    {
+        // Append product-specific path
+        PathAppend(result, L"\\" QN_ORGANIZATION_NAME  L"\\applauncher\\"  QN_CUSTOMIZATION_NAME);
+    }
+    return wstring(closeDirPath(result));
+
+}
+
+wstring getInstalledApplauncherDir()
 {
     wchar_t ownPath[MAX_PATH];
 
@@ -78,21 +88,31 @@ BOOL startProcessAsync(wchar_t* commandline, const wstring& dstDir)
     );
 }
 
-int launchFile()
+bool launchInDir(const wstring& dir)
 {
     try
     {
-        wstring dstDir = getDstDir();
         wchar_t buffer[MAX_PATH * 2 + 3];
-        wsprintf(buffer, L"\"%s\" --exec \"%s\"", getFullFileName(dstDir, QN_APPLAUNCHER_BINARY_NAME).c_str(), dstDir.c_str());
-        if (startProcessAsync(buffer, dstDir))
-            return 0;
-        return 1;
+        wsprintf(buffer, L"\"%s\" --exec \"%s\"", getFullFileName(dir, QN_APPLAUNCHER_BINARY_NAME).c_str(), dir.c_str());
+        if (startProcessAsync(buffer, dir))
+            return true;
+        return false;
     }
     catch (...)
     {
-        return -1;
+        return false;
     }
+}
+
+int launchFile()
+{
+    if (launchInDir(getSharedApplauncherDir()))
+        return 0;
+
+    if (launchInDir(getInstalledApplauncherDir()))
+        return 0;
+
+    return 1;
 }
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -100,6 +120,13 @@ int _tmain(int argc, _TCHAR* argv[])
     (int)(argc);    /* Q_UNUSED */
     (void*)(argv);  /* Q_UNUSED */
 
-    return launchFile();
+    try
+    {
+        return launchFile();
+    }
+    catch (...)
+    {
+        return 2;
+    }
 }
 
