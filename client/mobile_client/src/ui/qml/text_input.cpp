@@ -24,6 +24,7 @@ public:
     bool dragStarted;
 
     void resizeBackground();
+    void updateInputMethod();
 };
 
 QnQuickTextInputPrivate::QnQuickTextInputPrivate() :
@@ -54,9 +55,31 @@ void QnQuickTextInputPrivate::resizeBackground()
     }
 }
 
+void QnQuickTextInputPrivate::updateInputMethod()
+{
+    Q_Q(const QnQuickTextInput);
+
+    if (!q->hasActiveFocus())
+        return;
+
+    auto inputMethod = qApp->inputMethod();
+
+    bool enabled = q->isEnabled() && q->isVisible();
+    if (enabled)
+        inputMethod->show();
+    else
+        inputMethod->hide();
+}
+
 QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
     base_type(*(new QnQuickTextInputPrivate), parent)
 {
+    Q_D(QnQuickTextInput);
+
+    auto updateInputMethod = [d](){ d->updateInputMethod(); };
+
+    connect(this, &QnQuickTextInput::visibleChanged, updateInputMethod);
+    connect(this, &QnQuickTextInput::enabledChanged, updateInputMethod);
 }
 
 QnQuickTextInput::~QnQuickTextInput()
