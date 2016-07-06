@@ -13,6 +13,7 @@
 extern "C"
 {
 #include <libavutil/error.h>
+#include <libavutil/opt.h>
 }
 
 QnFfmpegHelper::StaticHolder QnFfmpegHelper::StaticHolder::instance;
@@ -241,10 +242,16 @@ void QnFfmpegHelper::closeFfmpegIOContext(AVIOContext* ioContext)
 {
     if (ioContext)
     {
+        avio_flush(ioContext);
+
         QIODevice* ioDevice = (QIODevice*) ioContext->opaque;
         delete ioDevice;
         ioContext->opaque = 0;
-        avio_close(ioContext);
+        //avio_close2(ioContext);
+
+        av_freep(&ioContext->buffer);
+        av_opt_free(ioContext);
+        av_free(ioContext);
     }
 }
 
