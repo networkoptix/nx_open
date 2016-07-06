@@ -143,17 +143,9 @@ bool SelfUpdater::updateApplauncher()
         backup.restore();
     }
 
-    /* Run newest applauncher via minilauncher. */
-    QString minilauncherPath = qApp->applicationDirPath() + L'/' + QnClientAppInfo::minilauncherBinaryName();
-    if (QFileInfo::exists(minilauncherPath) && QProcess::startDetached(minilauncherPath, QStringList())) /*< arguments are MUST here */
-    {
-        NX_LOG(lit("Minilauncher process started successfully."), cl_logINFO);
-    }
-    else
-    {
-        NX_LOG(lit("Minilauncher process could not be started %1.").arg(minilauncherPath), cl_logERROR);
-        success = false;
-    }
+    /* Run newest applauncher via minilauncher. Here we must be sure minilauncher is updated. */
+    if (!runMinilaucher())
+        return false;
 
     /* If we failed, return now. */
     if (!success)
@@ -259,6 +251,37 @@ void SelfUpdater::launchWithAdminPermissions()
 #elif defined(Q_OS_MAC)
 
 #endif
+}
+
+bool SelfUpdater::isMinilaucherUpdated() const
+{
+    QString minilauncherPath = qApp->applicationDirPath() + L'/' + QnClientAppInfo::minilauncherBinaryName();
+    QFileInfo minilauncherInfo(minilauncherPath);
+    if (!minilauncherInfo.exists())
+        return false;
+
+    QString applauncherPath = qApp->applicationDirPath() + L'/' + QnClientAppInfo::applauncherBinaryName();
+    QFileInfo applauncherInfo(applauncherPath);
+    if (!applauncherInfo.exists())
+        return false; /*< That means there is an old applauncher only, it is named as minilauncher. */
+
+    /* Check that files are different. */
+    return minilauncherInfo.size() != applauncherInfo.size();
+}
+
+bool SelfUpdater::runMinilaucher() const
+{
+    if (!isMinilaucherUpdated())
+        return false;
+
+    QString minilauncherPath = qApp->applicationDirPath() + L'/' + QnClientAppInfo::minilauncherBinaryName();
+    if (QFileInfo::exists(minilauncherPath) && QProcess::startDetached(minilauncherPath, QStringList())) /*< arguments are MUST here */
+    {
+        NX_LOG(lit("Minilauncher process started successfully."), cl_logINFO);
+        return true;
+    }
+    NX_LOG(lit("Minilauncher process could not be started %1.").arg(minilauncherPath), cl_logERROR);
+    return false;
 }
 
 } // namespace client

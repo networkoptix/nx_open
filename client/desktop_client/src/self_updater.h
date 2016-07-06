@@ -53,6 +53,9 @@ private:
 
     Result osCheck(Operation operation, bool result);
     void launchWithAdminPermissions();
+
+    bool isMinilaucherUpdated() const;
+    bool runMinilaucher() const;
 private:
     nx::utils::SoftwareVersion m_clientVersion;
 };
