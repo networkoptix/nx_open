@@ -152,6 +152,12 @@ int runUi(QGuiApplication *application) {
     nx::media::DecoderRegistrar::registerDecoders(
         allocator, maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
 
+#if defined(Q_OS_ANDROID)
+    QUrl initialIntentData = getInitialIntentData();
+    if (initialIntentData.isValid())
+        QDesktopServices::openUrl(initialIntentData);
+#endif
+
     return application->exec();
 }
 
