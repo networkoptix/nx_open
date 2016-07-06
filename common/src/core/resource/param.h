@@ -41,6 +41,7 @@ namespace Qn
     static const QString CAMERA_AUDIO_CODEC_PARAM_NAME = lit("audioCodec");
     static const QString FORCED_PRIMARY_STREAM_RESOLUTION_PARAM_NAME = lit("forcedPrimaryStreamResolution");
     static const QString FORCED_SECONDARY_STREAM_RESOLUTION_PARAM_NAME = lit("forcedSecondaryStreamResolution");
+    static const QString DO_NOT_CONFIGURE_CAMERA_PARAM_NAME = lit("doNotConfigureCamera");
     static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
     static const QString VIDEO_LAYOUT_PARAM_NAME2 = lit("videoLayout"); //used in resource_data.json
 

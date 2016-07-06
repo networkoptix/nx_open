@@ -1,6 +1,7 @@
 #include "stream_mixer.h"
 #include <core/dataprovider/spush_media_stream_provider.h>
 #include <utils/common/sleep.h>
+#include <utils/common/log.h>
 
 namespace
 {
@@ -175,9 +176,18 @@ void QnStreamMixer::proxyOpenStream(bool isCameraControlRequired, const QnLiveSt
     for (auto& source: m_sourceMap)
     {
         if (source.provider)
+        {
+            source.provider->stop();
             source.provider->startIfNotRunning();
+        }
         else
-            qDebug() << "Stream mixer, where is source's provider?";
+        {
+            NX_LOG(
+                lit("StreamMixer::proxyOpenStream(), sources have no correspondent provider"),
+                cl_logWARNING);
+
+            qDebug() << lit("Stream mixer, where is source's provider?");
+        }
     }
 }
 
@@ -224,7 +234,7 @@ bool QnStreamMixer::isStreamOpened() const
 
         if (!mediaStreamProvider)
         {
-            qDebug() << "Stream Mixer, couldn't cast to QnAbstractMediaStreamProvider";
+            qDebug() << "StreamMixer::isStreamOpened(), couldn't cast to QnAbstractMediaStreamProvider";
             continue;
         }
 

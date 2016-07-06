@@ -160,10 +160,28 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     return result;
 }
 
-CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bool isPrimary, QString* const streamUrl, bool isCameraControlRequired, const QnLiveStreamParams& params ) const
+CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
+    bool isPrimary,
+    QString* const streamUrl,
+    bool isCameraControlRequired,
+    const QnLiveStreamParams& params ) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_onvifRes->getTimeDrift());
+    MediaSoapWrapper soapWrapper(
+        m_onvifRes->getMediaUrl().toStdString().c_str(),
+        auth.user(),
+        auth.password(),
+        m_onvifRes->getTimeDrift());
+
+    auto proxy = soapWrapper.getProxy();
+    auto onvifRes = m_resource.dynamicCast<QnPlOnvifResource>();
+
+    if (onvifRes)
+    {
+        proxy->soap->recv_timeout = onvifRes->getOnvifRequestsRecieveTimeout();
+        proxy->soap->send_timeout = onvifRes->getOnvifRequestsSendTimeout();
+    }
+
     CameraInfoParams info;
 
     if (QnResource::isStopping())

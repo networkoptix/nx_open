@@ -10,6 +10,8 @@ namespace
 {
     const int kOpteraReceiveTimout = 30;
     const int kOpteraSendTimeout = 30;
+    const quint16 kStreamOpenWaitingTimeMs = 40000;
+    const quint16 kSingleWaitingIterationMs = 20;
 }
 
 QnOpteraDataProvider::QnOpteraDataProvider(const QnResourcePtr& res) : 
@@ -53,7 +55,12 @@ CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
     m_dataSource.resetSources();
 
     auto videoChannelMapping = getVideoChannelMapping();
-    bool providerMustNotConfigureResource = false;
+
+    auto resData = qnCommon->dataPool()->data(
+        m_resource.dynamicCast<QnSecurityCamResource>());
+
+    bool doNotConfigureCamera = resData.value<bool>(
+        Qn::DO_NOT_CONFIGURE_CAMERA_PARAM_NAME, false);
 
     for (const auto& resourceChannelMapping: videoChannelMapping)
     {
@@ -64,10 +71,13 @@ CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
         resource->setOnvifRequestsSendTimeout(kOpteraSendTimeout);
 
         auto reader = new QnOnvifStreamReader(resource);
-        reader->setMustNotConfigureResource(providerMustNotConfigureResource);
-        providerMustNotConfigureResource = true;
-        QnAbstractStreamDataProviderPtr source(reader);
+        reader->setMustNotConfigureResource(doNotConfigureCamera);
 
+        QnAbstractStreamDataProviderPtr source(reader);
+        if (!doNotConfigureCamera)
+            reader->setDesiredLiveParams(params);
+
+        doNotConfigureCamera = true;
         m_dataSource.addDataSource(source);
 
         for (const auto& channelMapping: resourceChannelMapping.channelMap)
@@ -88,12 +98,9 @@ CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
     m_dataSource.setUser(this);
     m_dataSource.proxyOpenStream(isCameraControlRequired, params); 
 
-    int triesLeft = 40;
+    auto triesLeft = kStreamOpenWaitingTimeMs / kSingleWaitingIterationMs;
     while (!m_dataSource.isStreamOpened() && triesLeft-- && !m_needStop)
-    {
-        qDebug() << "Waiting for stream opening";
-        QnSleep::msleep(1000);
-    }
+        QnSleep::msleep(kSingleWaitingIterationMs);
 
     return CameraDiagnostics::NoErrorResult();
 }
