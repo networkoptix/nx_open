@@ -1,7 +1,6 @@
 'use strict';
 
 var Config = {
-    googleAnalyticsCode: 'UA-51046510-4',
     googleTagsCode: 'GTM-5MRNWP',
     apiBase: '/api',
     clientProtocol: 'nx-vms:',
