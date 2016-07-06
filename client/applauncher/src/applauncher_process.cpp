@@ -122,15 +122,14 @@ void ApplauncherProcess::processRequest(
 void ApplauncherProcess::launchMostRecentClient()
 {
     QnSoftwareVersion versionToLaunch;
-    QString appArgs;
-    if (!getVersionToLaunch(&versionToLaunch, &appArgs))
+    if (!getVersionToLaunch(&versionToLaunch))
         return;
 
     applauncher::api::Response response;
     enum { kTriesCount = 2 };
     for (int i = 0; i < kTriesCount; ++i)
     {
-        const auto startAppTask = std::make_shared<applauncher::api::StartApplicationTask>(versionToLaunch, appArgs);
+        const auto startAppTask = std::make_shared<applauncher::api::StartApplicationTask>(versionToLaunch, QString());
         if (startApplication(startAppTask, &response))
             break;
 
@@ -206,14 +205,13 @@ bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
     if (m_mode != Mode::Quit)
     {
         QnSoftwareVersion versionToLaunch;
-        QString appArgs;
-        if (!getVersionToLaunch(&versionToLaunch, &appArgs))
+        if (!getVersionToLaunch(&versionToLaunch))
         {
             NX_LOG(QString::fromLatin1("Failed to find what to launch. Will not post any task to the named pipe"), cl_logDEBUG1);
             return false;
         }
 
-        applauncher::api::StartApplicationTask startTask(versionToLaunch, appArgs);
+        applauncher::api::StartApplicationTask startTask(versionToLaunch);
         startTask.autoRestore = true;
         serializedTask = startTask.serialize();
     }
@@ -227,9 +225,7 @@ bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
 
 static const QLatin1String MOST_RECENT_VERSION_PARAM_NAME("mostRecentVersion");
 
-bool ApplauncherProcess::getVersionToLaunch(
-    QnSoftwareVersion* const versionToLaunch,
-    QString* const appArgs)
+bool ApplauncherProcess::getVersionToLaunch(QnSoftwareVersion* const versionToLaunch)
 {
     if (m_settings->contains(MOST_RECENT_VERSION_PARAM_NAME))
     {
@@ -597,7 +593,7 @@ void ApplauncherProcess::onInstallationDone(InstallationProcess* installationPro
         {
             applauncher::api::Response response;
             startApplication(
-                std::make_shared<applauncher::api::StartApplicationTask>(installationProcess->getVersion(), QString()),
+                std::make_shared<applauncher::api::StartApplicationTask>(installationProcess->getVersion()),
                 &response);
         }
     }
