@@ -166,7 +166,7 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
     int bottom = frame->height;
     QSize imageSize(right - left, bottom - top);
 
-    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) frame->format);
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     int prevRoundMode = _MM_GET_ROUNDING_MODE();

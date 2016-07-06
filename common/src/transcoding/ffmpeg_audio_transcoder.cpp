@@ -10,6 +10,7 @@
 namespace
 {
     static const int MAX_AUDIO_JITTER = 1000 * 200;
+    static const int AVCODEC_MAX_AUDIO_FRAME_SIZE = 192000; // 1 second of 48khz 32bit audio
 
     int calcBits(quint64 value)
     {
@@ -211,7 +212,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         avpkt.data = const_cast<quint8*>((const quint8*)media->data());
         avpkt.size = static_cast<int>(media->dataSize());
 
-        int decodedAudioSize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+        //int decodedAudioSize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
         // TODO: #vasilenko avoid using deprecated methods
 
         bool needResample=
@@ -222,11 +223,20 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         QnByteArray& bufferToDecode = needResample ? m_unresampledData : m_resampledData;
         quint8* decodedDataEndPtr = (quint8*) bufferToDecode.data() + bufferToDecode.size();
 
-        int len = avcodec_decode_audio3(m_decoderContext, (short *)(decodedDataEndPtr), &decodedAudioSize, &avpkt);
+        //int len = avcodec_decode_audio3(m_decoderContext, (short *)(decodedDataEndPtr), &decodedAudioSize, &avpkt);
+
+        // todo: ffmpeg-test
+        AVFrame outFrame;
+        int got_frame = 0;
+        int decodeResult = avcodec_decode_audio4(m_decoderContext, &outFrame, &got_frame, &avpkt);
+        int decodedAudioSize = outFrame.pkt_size;
+        if (got_frame)
+            memcpy(decodedDataEndPtr, outFrame.data, decodedAudioSize);
+
         if (m_encoderCtx->frame_size == 0)
             m_encoderCtx->frame_size = m_decoderContext->frame_size;
 
-        if (len < 0)
+        if (decodeResult < 0)
             return -3;
 
         if (decodedAudioSize > 0)
@@ -271,13 +281,25 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
     int encoderFrameSize = m_encoderCtx->frame_size * sampleSize(m_encoderCtx->sample_fmt) * m_encoderCtx->channels;
 
-    // TODO: #vasilenko avoid using deprecated methods
     int encoded = 0;
+    // todo: ffmpeg-test
     while (encoded == 0 && m_resampledData.size() >= encoderFrameSize)
     {
-        encoded = avcodec_encode_audio(m_encoderCtx, m_audioEncodingBuffer, FF_MIN_BUFFER_SIZE, (const short*) m_resampledData.data());
-        if (encoded < 0)
+        //encoded = avcodec_encode_audio(m_encoderCtx, m_audioEncodingBuffer, FF_MIN_BUFFER_SIZE, (const short*) m_resampledData.data());
+        AVPacket outputPacket;
+        outputPacket.data = m_audioEncodingBuffer;
+        outputPacket.size = FF_MIN_BUFFER_SIZE;
+
+        AVFrame inputFrame;
+        inputFrame.data[0] = (quint8*) m_resampledData.data();
+        inputFrame.pkt_size = encoderFrameSize;
+
+        int got_packet = 0;
+
+        if (avcodec_encode_audio2(m_encoderCtx, &outputPacket, &inputFrame, &got_packet) < 0)
             return -3; //< TODO: needs refactor. add enum with error codes
+        if (got_packet)
+            encoded = outputPacket.size;
         int resampledBufferRest = m_resampledData.size() - encoderFrameSize;
         memmove(m_resampledData.data(), m_resampledData.data() + encoderFrameSize, resampledBufferRest);
         m_resampledData.resize(resampledBufferRest);

@@ -154,7 +154,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
     const auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
     if (auto ret = transcodePacketImpl(video, result))
         return ret;
-    
+
     if (m_lastEncodedTime != qint64(AV_NOPTS_VALUE))
         movigAverage(m_averageVideoTimePerFrame, video->timestamp - m_lastEncodedTime);
     m_lastEncodedTime = video->timestamp;
@@ -165,7 +165,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
 int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result)
 {
-    
+
     if (!m_encoderCtx)
         open(video);
 
@@ -213,16 +213,24 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         }
     }
 
-    //TODO: #vasilenko avoid using deprecated methods
-    int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame.data());
-    if (encoded < 0)
-        return -3;
+    //TODO: ffmpeg-test
+    //int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame.data());
 
-    QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded);
+    AVPacket outPacket;
+    outPacket.data = m_videoEncodingBuffer;
+    outPacket.size = MAX_VIDEO_FRAME;
+    int got_packet = 0;
+    int encodeResult = avcodec_encode_video2(m_encoderCtx, &outPacket, decodedFrame.data(), &got_packet);
+    if (encodeResult < 0)
+        return -3;
+    if (!got_packet)
+        return 0;
+
+    QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, outPacket.size);
     resultVideoData->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
     if(m_encoderCtx->coded_frame->key_frame)
         resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
-    resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
+    resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, outPacket.size); // todo: remove data copy here!
     resultVideoData->compressionType = updateCodec(m_codecId);
     *result = QnCompressedVideoDataPtr(resultVideoData);
 

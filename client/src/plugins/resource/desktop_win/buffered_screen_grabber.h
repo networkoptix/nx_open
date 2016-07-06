@@ -30,7 +30,7 @@ public:
     bool dataExist();
 
     AVRational getFrameRate();
-    PixelFormat format() const { return m_grabber.format(); }
+    AVPixelFormat format() const { return m_grabber.format(); }
     int width() const          { return m_grabber.width();  }
     int height() const         { return m_grabber.height(); }
     int screenWidth() const    { return m_grabber.screenWidth(); }

@@ -89,7 +89,7 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
     //TODO/IMPL
     //dst->metadata = QnMetaDataV1Ptr( new QnMetaDataV1( *src->metadata ) );
 
-    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[src->format];
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) src->format);
     for (int i = 0; i < descr->nb_components && src->data[i]; ++i)
     {
         int h = src->height;
@@ -124,7 +124,7 @@ void CLVideoDecoderOutput::fillRightEdge()
 {
     if (format == -1)
         return;
-    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
     quint8 filler = 0;
     int w = width;
     int h = height;
@@ -149,7 +149,7 @@ void CLVideoDecoderOutput::fillRightEdge()
 
 void CLVideoDecoderOutput::memZerro()
 {
-    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
     for (int i = 0; i < descr->nb_components && data[i]; ++i)
     {
         int w = linesize[i];
@@ -178,10 +178,10 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
 
     int rc = 32 >> (newFormat == AV_PIX_FMT_RGBA || newFormat == AV_PIX_FMT_ABGR || newFormat == AV_PIX_FMT_BGRA ? 2 : 0);
     int roundWidth = qPower2Ceil((unsigned) width, rc);
-    int numBytes = avpicture_get_size((PixelFormat) format, roundWidth, height);
+    int numBytes = avpicture_get_size((AVPixelFormat) format, roundWidth, height);
     if (numBytes > 0) {
         numBytes += FF_INPUT_BUFFER_PADDING_SIZE; // extra alloc space due to ffmpeg doc
-        avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, roundWidth, height);
+        avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (AVPixelFormat) format, roundWidth, height);
         fillRightEdge();
     }
 }
@@ -194,9 +194,9 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     height = newHeight;
     format = newFormat;
 
-    int numBytes = avpicture_get_size((PixelFormat) format, lineSizeHint, height);
+    int numBytes = avpicture_get_size((AVPixelFormat) format, lineSizeHint, height);
     if (numBytes > 0) {
-        avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, lineSizeHint, height);
+        avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (AVPixelFormat) format, lineSizeHint, height);
         fillRightEdge();
     }
 }
@@ -300,7 +300,7 @@ void CLVideoDecoderOutput::saveToFile(const char* filename)
 }
 #endif
 
-bool CLVideoDecoderOutput::isPixelFormatSupported(PixelFormat format)
+bool CLVideoDecoderOutput::isPixelFormatSupported(AVPixelFormat format)
 {
     return format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUV444P;
 }
@@ -311,7 +311,7 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
     NX_ASSERT(height == frame->height);
     NX_ASSERT(format == frame->format);
 
-    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
     for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
     {
         int h = height;
@@ -348,7 +348,7 @@ QImage CLVideoDecoderOutput::toImage() const
     CLVideoDecoderOutput dst;
     dst.reallocate(width, height, AV_PIX_FMT_BGRA);
 
-    SwsContext* scaleContext = sws_getContext(width, height, (PixelFormat) format,
+    SwsContext* scaleContext = sws_getContext(width, height, (AVPixelFormat) format,
                                               width, height, AV_PIX_FMT_BGRA,
                                               SWS_BICUBIC, NULL, NULL, NULL);
     sws_scale(scaleContext, data, linesize, 0, height, dst.data, dst.linesize);
@@ -371,17 +371,17 @@ void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)
     channel = other->channel;
 }
 
-CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, PixelFormat newFormat)
+CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, AVPixelFormat newFormat)
 {
     if (newFormat == AV_PIX_FMT_NONE)
-        newFormat = (PixelFormat) format;
+        newFormat = (AVPixelFormat) format;
     CLVideoDecoderOutput* dst(new CLVideoDecoderOutput);
     dst->reallocate(newSize.width(), newSize.height(), newFormat);
     dst->assignMiscData(this);
     dst->sample_aspect_ratio = 1.0;
 
     SwsContext* scaleContext = sws_getContext(
-        width, height, (PixelFormat) format,
+        width, height, (AVPixelFormat) format,
         newSize.width(), newSize.height(), newFormat,
         SWS_BICUBIC, NULL, NULL, NULL);
 
@@ -414,7 +414,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
     dstPict->reallocate(dstWidth, dstHeight, format);
     dstPict->assignMiscData(this);
 
-    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
     for (int i = 0; i < descr->nb_components && data[i]; ++i)
     {
         int filler = (i == 0 ? 0x0 : 0x80);

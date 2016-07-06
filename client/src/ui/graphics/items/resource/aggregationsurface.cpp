@@ -41,12 +41,12 @@ namespace
     }
 } // anonymous namespace
 
-static bool isYuvFormat( PixelFormat format )
+static bool isYuvFormat(AVPixelFormat format )
 {
     return format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUV444P;
 }
 
-static int glRGBFormat( PixelFormat format )
+static int glRGBFormat(AVPixelFormat format )
 {
     if( !isYuvFormat( format ) )
     {
@@ -172,7 +172,7 @@ static QAtomicInt totalLockedRectCount = 0;
 //////////////////////////////////////////////////////////
 // AggregationSurface
 //////////////////////////////////////////////////////////
-AggregationSurface::AggregationSurface( PixelFormat format, const QSize& size )
+AggregationSurface::AggregationSurface(AVPixelFormat format, const QSize& size )
 :
     m_format( format ),
     m_textureFormat( AV_PIX_FMT_NONE ),
@@ -632,7 +632,7 @@ Q_GLOBAL_STATIC( AggregationSurfacePool, aggregationSurfacePoolInstanceGetter );
 
 QSharedPointer<AggregationSurfaceRect> AggregationSurfacePool::takeSurfaceRect(
     const GLContext* glContext,
-    const PixelFormat format,
+    const AVPixelFormat format,
     const QSize& requiredEmptySize )
 {
     if( requiredEmptySize.isEmpty() || requiredEmptySize.isNull() || !requiredEmptySize.isValid() )

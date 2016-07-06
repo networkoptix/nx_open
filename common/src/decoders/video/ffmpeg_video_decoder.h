@@ -44,14 +44,14 @@ public:
 
     AVCodecContext* getContext() const;
 
-    PixelFormat GetPixelFormat() const;
+    virtual AVPixelFormat GetPixelFormat() const override;
     QnAbstractPictureDataRef::PicStorageType targetMemoryType() const;
     int getWidth() const  { return m_context->width;  }
     int getHeight() const { return m_context->height; }
     //!Implementation of QnAbstractVideoDecoder::getOriginalPictureSize
     virtual QSize getOriginalPictureSize() const override;
     double getSampleAspectRatio() const;
-    virtual PixelFormat getFormat() const { return m_context->pix_fmt; }
+    virtual AVPixelFormat getFormat() const { return m_context->pix_fmt; }
     virtual void flush();
     virtual const AVFrame* lastFrame() const override { return m_frame; }
     void determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data);
@@ -84,7 +84,7 @@ private:
     QImage m_tmpImg;
     CLVideoDecoderOutput m_tmpQtFrame;
 
-    
+
     AVFrame *m_deinterlacedFrame;
 
 #ifdef _USE_DXVA
@@ -111,7 +111,7 @@ private:
 
     int m_forceSliceDecoding;
     typedef QVector<QPair<qint64, QnMetaDataV1Ptr> > MotionMap; // I have used vector instead map because of 2-3 elements is tipical size
-    MotionMap m_motionMap; 
+    MotionMap m_motionMap;
     QAtomicInt* const m_swDecoderCount;
     mutable double m_prevSampleAspectRatio;
     bool m_forcedMtDecoding;

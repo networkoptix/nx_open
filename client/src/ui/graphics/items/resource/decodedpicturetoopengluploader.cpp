@@ -452,7 +452,7 @@ public:
     {
     }
 
-    void setPictureFormat( PixelFormat format )
+    void setPictureFormat(AVPixelFormat format )
     {
         if( m_format == format )
             return;
@@ -506,7 +506,7 @@ public:
 private:
     mutable std::vector<GLuint> m_picTextures;
     QScopedPointer<QnGlRendererTexture> m_textures[MAX_PLANE_COUNT];
-    PixelFormat m_format;
+    AVPixelFormat m_format;
 #ifdef GL_COPY_AGGREGATION
     QSharedPointer<AggregationSurfaceRect> m_surfaceRect;
 #endif
@@ -524,12 +524,12 @@ DecodedPictureToOpenGLUploader::UploadedPicture::PBOData::PBOData()
 }
 
 
-PixelFormat DecodedPictureToOpenGLUploader::UploadedPicture::colorFormat() const
+AVPixelFormat DecodedPictureToOpenGLUploader::UploadedPicture::colorFormat() const
 {
     return m_colorFormat;
 }
 
-void DecodedPictureToOpenGLUploader::UploadedPicture::setColorFormat( PixelFormat newFormat )
+void DecodedPictureToOpenGLUploader::UploadedPicture::setColorFormat(AVPixelFormat newFormat )
 {
     m_colorFormat = newFormat;
 }
@@ -1154,7 +1154,7 @@ public:
             m_uploader->uploadDataToGl(
 #endif
                 m_dest,
-                (PixelFormat)m_src->format,
+                (AVPixelFormat)m_src->format,
                 m_src->width,
                 m_src->height,
                 m_src->data,
@@ -1891,12 +1891,12 @@ void DecodedPictureToOpenGLUploader::pictureDataUploadCancelled( AsyncPicDataUpl
     m_cond.wakeAll();   //notifying that uploading finished
 }
 
-static bool isYuvFormat( PixelFormat format )
+static bool isYuvFormat(AVPixelFormat format )
 {
     return format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUV444P;
 }
 
-static int glRGBFormat( PixelFormat format )
+static int glRGBFormat(AVPixelFormat format )
 {
     if( !isYuvFormat( format ) )
     {
@@ -1916,7 +1916,7 @@ static int glRGBFormat( PixelFormat format )
     }
     return GL_RGBA;
 }
-static int glBytesPerPixel( PixelFormat format )
+static int glBytesPerPixel(AVPixelFormat format )
 {
     if( !isYuvFormat( format ) )
     {
@@ -1989,7 +1989,7 @@ ImageCorrectionParams DecodedPictureToOpenGLUploader::getImageCorrection() const
 }
 
 /*
-static QString toString( PixelFormat format )
+static QString toString( AVPixelFormat format )
 {
     switch( format )
     {
@@ -2007,7 +2007,7 @@ static QString toString( PixelFormat format )
 
 bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
-    const PixelFormat format,
+    const AVPixelFormat format,
     const unsigned int width,
     const unsigned int height,
     uint8_t* planes[],
@@ -2304,7 +2304,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 #ifdef GL_COPY_AGGREGATION
 bool DecodedPictureToOpenGLUploader::uploadDataToGlWithAggregation(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
-    const PixelFormat format,
+    const AVPixelFormat format,
     const unsigned int width,
     const unsigned int height,
     uint8_t* planes[],

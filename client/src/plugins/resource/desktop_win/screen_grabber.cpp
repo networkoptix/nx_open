@@ -223,7 +223,7 @@ HRESULT        QnScreenGrabber::InitD3D(HWND hWnd)
     return S_OK;
 }
 
-void QnScreenGrabber::allocateTmpFrame(int width, int height, PixelFormat format)
+void QnScreenGrabber::allocateTmpFrame(int width, int height, AVPixelFormat format)
 {
     m_tmpFrameWidth = width;
     m_tmpFrameHeight = height;
@@ -288,7 +288,7 @@ CaptureInfoPtr QnScreenGrabber::captureFrame()
     {
         rez->opaque = m_openGLData[m_currentIndex];
         QGenericReturnArgument ret;
-        
+
         //QMetaObject::invokeMethod(this, "captureFrameOpenGL", Qt::BlockingQueuedConnection, ret, Q_ARG(void*, &rez));
         {
             QnMutexLocker lock( &m_guiWaitMutex );
@@ -348,7 +348,7 @@ void QnScreenGrabber::drawLogo(quint8* data, int width, int height)
         return;
     int left = width - m_logo.width() - LOGO_CORNER_OFFSET;
     int top = m_mode == Qn::WindowMode ? LOGO_CORNER_OFFSET : height - m_logo.height() - LOGO_CORNER_OFFSET;
-    
+
     QImage buffer(data, width, height, QImage::Format_ARGB32_Premultiplied);
     QPainter painter(&buffer);
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver); // enable alpha blending
@@ -592,7 +592,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int dataStride, int width, int h
     {
         if (roundWidth != m_tmpFrameWidth || height != m_tmpFrameHeight)
             allocateTmpFrame(roundWidth, height, AV_PIX_FMT_YUV420P);
-#if 0   
+#if 0
         // perfomance test
         QTime t1, t2;
         t1.start();
@@ -604,7 +604,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int dataStride, int width, int h
         }
         int time1 = t1.elapsed();
         t2.start();
-        
+
         for (int i = 0; i < 1000; ++i)
         {
             bgra_to_yv12_sse_intr(data, width * 4,

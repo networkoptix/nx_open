@@ -33,10 +33,10 @@ class AggregationSurface
 public:
     /*!
         Required opengl textures are created here, so appropriate opengl context MUST be current
-        \param format Format is stored data. Supported formats are \a AV_PIX_FMT_YUV420P and \a AV_PIX_FMT_NV12 
+        \param format Format is stored data. Supported formats are \a AV_PIX_FMT_YUV420P and \a AV_PIX_FMT_NV12
         \param size Surface size in pixels
     */
-    AggregationSurface( PixelFormat format, const QSize& size );
+    AggregationSurface(AVPixelFormat format, const QSize& size );
 
     //!Ensures that \a requiredRect is uploaded to opengl memory
     /*!
@@ -89,9 +89,9 @@ private:
     QScopedPointer<QnGlRendererTexture1> m_textures[MAX_PLANE_COUNT];
     SysMemPlane m_buffers[MAX_PLANE_COUNT];
     //!format of data in system memory buffers
-    PixelFormat m_format;
+    AVPixelFormat m_format;
     //!format of data in opengl memory
-    PixelFormat m_textureFormat;
+    AVPixelFormat m_textureFormat;
     bool m_convertToRgb;
     uchar* m_yuv2rgbBuffer;
     int m_yuv2rgbBufferLen;
@@ -114,7 +114,7 @@ class AggregationSurfacePool;
 class AggregationSurfaceRect
 {
 public:
-    AggregationSurfaceRect( const QSharedPointer<AggregationSurface>& surface, const QRect& rect ); 
+    AggregationSurfaceRect( const QSharedPointer<AggregationSurface>& surface, const QRect& rect );
     ~AggregationSurfaceRect();
 
     const QSharedPointer<AggregationSurface>& surface() const;
@@ -150,7 +150,7 @@ public:
     */
     QSharedPointer<AggregationSurfaceRect> takeSurfaceRect(
         const GLContext* glContext,
-        const PixelFormat format,
+        const AVPixelFormat format,
         const QSize& requiredEmptySize );
     //!Removes all surfaces associated with \a glContext. \a glContext MUST NOT be NULL
     void removeSurfaces( GLContext* const glContext );
@@ -158,7 +158,7 @@ public:
     static AggregationSurfacePool* instance();
 
 private:
-    typedef std::multimap<std::pair<const GLContext*, PixelFormat>, QSharedPointer<AggregationSurface> > AggregationSurfaceContainer;
+    typedef std::multimap<std::pair<const GLContext*, AVPixelFormat>, QSharedPointer<AggregationSurface> > AggregationSurfaceContainer;
 
     QnMutex m_mutex;
     AggregationSurfaceContainer m_surfaces;

@@ -40,7 +40,7 @@ public:
 
     int addRenderer(QnAbstractRenderer* draw);
     int removeRenderer(QnAbstractRenderer* draw);
-    
+
     FrameDisplayStatus display(
         QnCompressedVideoDataPtr data,
         bool draw,
@@ -54,7 +54,7 @@ public:
 
     void setSpeed(float value);
     virtual CLVideoDecoderOutputPtr getScreenshot(bool anyQuality) override;
-    virtual QImage getGrayscaleScreenshot() override; 
+    virtual QImage getGrayscaleScreenshot() override;
     void setCurrentTime(qint64 time);
     void canUseBufferedFrameDisplayer(bool value);
     qint64 nextReverseTime() const;
@@ -100,7 +100,7 @@ private:
     bool m_renderListModified;
 
     /**
-      * to reduce image size for weak video cards 
+      * to reduce image size for weak video cards
       */
 
     QSharedPointer<CLVideoDecoderOutput> m_frameQueue[MAX_FRAME_QUEUE_SIZE];
@@ -151,22 +151,22 @@ private:
     QnFrameScaler::DownscaleFactor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
     QnFrameScaler::DownscaleFactor determineScaleFactor(
         QSet<QnAbstractRenderer*> renderList,
-        int channelNumber, 
-        int srcWidth, 
-        int srcHeight, 
+        int channelNumber,
+        int srcWidth,
+        int srcHeight,
         QnFrameScaler::DownscaleFactor force_factor);
     bool processDecodedFrame(QnAbstractVideoDecoder* dec, const QSharedPointer<CLVideoDecoderOutput>& outFrame, bool enableFrameQueue, bool reverseMode);
     void checkQueueOverflow(QnAbstractVideoDecoder* dec);
     void clearReverseQueue();
     /*!
-        \param outFrame MUST contain initialized \a CLVideoDecoderOutput object, but method is allowed to return just reference 
+        \param outFrame MUST contain initialized \a CLVideoDecoderOutput object, but method is allowed to return just reference
             to another frame and not copy data to this object (TODO)
     */
     bool getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
     void calcSampleAR(QSharedPointer<CLVideoDecoderOutput> outFrame, QnAbstractVideoDecoder* dec);
 
-    bool downscaleFrame(const CLVideoDecoderOutputPtr& src, const CLVideoDecoderOutputPtr& dst, QnFrameScaler::DownscaleFactor scaleFactor, PixelFormat pixFmt);
+    bool downscaleFrame(const CLVideoDecoderOutputPtr& src, const CLVideoDecoderOutputPtr& dst, QnFrameScaler::DownscaleFactor scaleFactor, AVPixelFormat pixFmt);
 };
 
 #endif //QN_VIDEO_STREAM_DISPLAY_H

@@ -48,7 +48,7 @@ class AVPacketUploader;
     \note All methods are thread-safe
     \note GUI thread does not get blocked by decoder thread if \a asyncDepth > 0
     \note this class provides decoded picture to renderer in order they were passed to it
-    \note Single instance of \a DecodedPictureToOpenGLUploader can manage decoded pictures of same type. 
+    \note Single instance of \a DecodedPictureToOpenGLUploader can manage decoded pictures of same type.
         Calling \a uploadDecodedPicture with pictures of different types may lead to undefined behavour
 */
 class DecodedPictureToOpenGLUploader
@@ -66,8 +66,8 @@ public:
         friend class AsyncPicDataUploader;
 
     public:
-        PixelFormat colorFormat() const;
-        void setColorFormat( PixelFormat newFormat );
+        AVPixelFormat colorFormat() const;
+        void setColorFormat(AVPixelFormat newFormat );
         int width() const;
         int height() const;
         //const QVector2D& texCoords() const;
@@ -105,7 +105,7 @@ public:
             PBOData();
         };
 
-        PixelFormat m_colorFormat;
+        AVPixelFormat m_colorFormat;
         int m_width;
         int m_height;
         unsigned int m_sequence;
@@ -166,7 +166,7 @@ public:
     //!Uploads \a decodedPicture to opengl texture(s). Used by decoder thread
     /*!
         Blocks till upload is done
-        \note Method does not save reference to \a decodedPicture, but it can save reference to \a decodedPicture->picData. 
+        \note Method does not save reference to \a decodedPicture, but it can save reference to \a decodedPicture->picData.
             As soon as uploader is done with \a decodedPicture->picData it releases reference to it
     */
     void uploadDecodedPicture(
@@ -230,7 +230,7 @@ public:
     */
     bool uploadDataToGl(
         UploadedPicture* const dest,
-        PixelFormat format,
+        AVPixelFormat format,
         unsigned int width,
         unsigned int height,
         uint8_t* planes[],
@@ -239,7 +239,7 @@ public:
 #ifdef GL_COPY_AGGREGATION
     bool uploadDataToGlWithAggregation(
         DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
-        const PixelFormat format,
+        const AVPixelFormat format,
         const unsigned int width,
         const unsigned int height,
         uint8_t* planes[],
@@ -273,7 +273,7 @@ private:
     bool m_hardwareDecoderUsed;
     bool m_asyncUploadUsed;
     QGLContext* m_initializedCtx;
-    
+
     ImageCorrectionParams m_imageCorrection;
 
     bool usingShaderYuvToRgb() const;

@@ -449,7 +449,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
         // ### handle errors
         if (m_context->pix_fmt == -1)
-            m_context->pix_fmt = PixelFormat(0);
+            m_context->pix_fmt = AVPixelFormat(0);
 
 
         bool dataWithNalPrefixes = (m_context->extradata==0 || m_context->extradata[0] == 0);
@@ -551,7 +551,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         else
             outFrame->metadata.reset();
 
-        PixelFormat correctedPixelFormat = GetPixelFormat();
+        AVPixelFormat correctedPixelFormat = GetPixelFormat();
         if (!outFrame->isExternalData() &&
             (outFrame->width != m_context->width || outFrame->height != m_context->height ||
             outFrame->format != correctedPixelFormat || outFrame->linesize[0] != m_frame->linesize[0]))
@@ -559,6 +559,8 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             outFrame->reallocate(m_context->width, m_context->height, correctedPixelFormat, m_frame->linesize[0]);
         }
 
+#if 0
+        // todo: ffmpeg-test . implement me
         if (m_frame->interlaced_frame && m_context->thread_count > 1)
         {
 
@@ -577,7 +579,9 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                 outFrame->pkt_dts = m_frame->pkt_dts;
             }
         }
-        else {
+#endif
+        else
+        {
             if (!outFrame->isExternalData())
             {
                 if (outFrame->format == AV_PIX_FMT_YUV420P)
@@ -664,7 +668,7 @@ double QnFfmpegVideoDecoder::getSampleAspectRatio() const
     return result;
 }
 
-PixelFormat QnFfmpegVideoDecoder::GetPixelFormat() const
+AVPixelFormat QnFfmpegVideoDecoder::GetPixelFormat() const
 {
     if (m_usedQtImage)
         return AV_PIX_FMT_RGBA;

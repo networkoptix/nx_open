@@ -55,8 +55,8 @@ QnGlRendererShaders::QnGlRendererShaders(QObject *parent): QObject(parent) {
     yv12ToRgbWithGamma = new QnYv12ToRgbWithGammaShaderProgram(this);
     yv12ToRgba = new QnYv12ToRgbaShaderProgram(this);
     nv12ToRgb = new QnNv12ToRgbShaderProgram(this);
-    
-    
+
+
     const QString GAMMA_STRING(lit("clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0)"));
 
     fisheyePtzProgram = new QnFisheyeRectilinearProgram(this);
@@ -84,7 +84,7 @@ Q_GLOBAL_STATIC(QnGlRendererShadersStorage, qn_glRendererShaders_instanceStorage
 // -------------------------------------------------------------------------- //
 // QnGLRenderer
 // -------------------------------------------------------------------------- //
-bool QnGLRenderer::isPixelFormatSupported( PixelFormat pixfmt )
+bool QnGLRenderer::isPixelFormatSupported(AVPixelFormat pixfmt )
 {
     switch( pixfmt )
     {
@@ -129,9 +129,9 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     NX_ASSERT( context );
 
     applyMixerSettings( m_brightness, m_contrast, m_hue, m_saturation );
-    
+
     m_shaders = qn_glRendererShaders_instanceStorage()->get(context);
-    
+
 
 
     cl_log.log( QString(QLatin1String("OpenGL max texture size: %1.")).arg(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE)), cl_logINFO );
@@ -157,7 +157,7 @@ void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
 }
 
 Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &targetRect)
-{    
+{
     NX_LOG( lit("Entered QnGLRenderer::paint"), cl_logDEBUG2 );
 
     QOpenGLFunctions::initializeOpenGLFunctions();
@@ -177,18 +177,18 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
     if( !draw )
     {
         result = Qn::CannotRender;
-    } 
+    }
     else if( picLock->width() > 0 && picLock->height() > 0 )
     {
-        const float v_array[] = { 
-            (float)targetRect.left(), 
+        const float v_array[] = {
+            (float)targetRect.left(),
             (float)targetRect.top(),
             (float)targetRect.right(),
-            (float)targetRect.top(), 
-            (float)targetRect.right(), 
-            (float)targetRect.bottom(), 
-            (float)targetRect.left(), 
-            (float)targetRect.bottom() 
+            (float)targetRect.top(),
+            (float)targetRect.right(),
+            (float)targetRect.bottom(),
+            (float)targetRect.left(),
+            (float)targetRect.bottom()
         };
         switch( picLock->colorFormat() )
         {
@@ -218,7 +218,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                     v_array );
                 break;
 
-            case AV_PIX_FMT_YUV420P:              
+            case AV_PIX_FMT_YUV420P:
                 NX_ASSERT( isYV12ToRgbShaderUsed() );
                 drawYV12VideoTexture(
                     picLock,
@@ -246,7 +246,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
 
         QnMutexLocker lock( &m_mutex );
 
-        if( picLock->pts() != AV_NOPTS_VALUE && m_prevFrameSequence != picLock->sequence()) 
+        if( picLock->pts() != AV_NOPTS_VALUE && m_prevFrameSequence != picLock->sequence())
         {
             if (m_timeChangeEnabled) {
                 m_lastDisplayedTime = picLock->pts();
@@ -292,7 +292,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
     shader->release();
 }
 
-void QnGLRenderer::setScreenshotInterface(ScreenshotInterface* value) { 
+void QnGLRenderer::setScreenshotInterface(ScreenshotInterface* value) {
     m_screenshotInterface = value;
 }
 
@@ -383,7 +383,7 @@ void QnGLRenderer::drawYV12VideoTexture(
         fisheyeShader->setDewarpingParams(mediaParams, itemParams, ar, (float)tex0Coords.right(), (float)tex0Coords.bottom());
     }
 
-    if (gammaShader) 
+    if (gammaShader)
     {
         if (!isPaused() && !isStillImage) {
             gammaShader->setImageCorrection(picLock->imageCorrectionResult());
@@ -392,7 +392,7 @@ void QnGLRenderer::drawYV12VideoTexture(
         }
         else {
             gammaShader->setImageCorrection(calcImageCorrection());
-            if (m_histogramConsumer) 
+            if (m_histogramConsumer)
                 m_histogramConsumer->setHistogramData(m_imageCorrector);
         }
     }
@@ -658,9 +658,9 @@ void QnGLRenderer::setDisplayedRect(const QRectF& rect)
     m_displayedRect = rect;
 }
 
-void QnGLRenderer::setHistogramConsumer(QnHistogramConsumer* value) 
-{ 
-    m_histogramConsumer = value; 
+void QnGLRenderer::setHistogramConsumer(QnHistogramConsumer* value)
+{
+    m_histogramConsumer = value;
 }
 
 void QnGLRenderer::setFisheyeController(QnFisheyePtzController* controller)

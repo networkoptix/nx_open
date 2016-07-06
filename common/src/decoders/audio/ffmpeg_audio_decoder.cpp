@@ -104,31 +104,37 @@ bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
     int outbuf_len = 0;
 
-    while (size > 0) 
+    while (size > 0)
     {
-
-        int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-
-        if (outbuf_len + out_size > (int)result.capacity())
-        {
-            //NX_ASSERT(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
-            result.reserve(result.capacity() * 2);
-            outbuf = (quint8*) result.data() + outbuf_len;
-        }
 
         AVPacket avpkt;
         av_init_packet(&avpkt);
         avpkt.data = (quint8*)inbuf_ptr;
         avpkt.size = size;
 
-        // TODO: #vasilenko avoid using deprecated methods
-        int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
+        //int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
 
-        if (len < 0) 
+        AVFrame outFrame;
+        int got_frame = 0;
+        // todo: ffmpeg-test
+        int len = avcodec_decode_audio4(c, &outFrame, &got_frame, &avpkt);
+        if (got_frame)
+        {
+            if (outbuf_len + outFrame.pkt_size > (int)result.capacity())
+            {
+                //NX_ASSERT(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
+                result.reserve(result.capacity() * 2);
+                outbuf = (quint8*)result.data() + outbuf_len;
+            }
+
+            memcpy(outbuf, outFrame.data, outFrame.pkt_size);
+        }
+
+        if (len < 0)
             return false;
 
-        outbuf_len+=out_size;
-        outbuf+=out_size;
+        outbuf_len += outFrame.pkt_size;
+        outbuf += outFrame.pkt_size;
         size -= len;
         inbuf_ptr += len;
 
