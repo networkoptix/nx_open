@@ -472,9 +472,11 @@ TEST(MediaDbTest, SimpleFileWriteTest)
     file.open(QIODevice::ReadWrite);
     QDataStream stream(&file);
     stream.setByteOrder(QDataStream::LittleEndian);
-    quint64 tmp;
 
-    for (int i = 0; i < 1000; ++i)
+    quint64 tmp;
+    const size_t kMaxWrites = 10 * 1000 * 1000l;
+
+    for (size_t i = 0; i < kMaxWrites; ++i)
     {
         tmp = i;
         stream << tmp;
@@ -488,7 +490,7 @@ TEST(MediaDbTest, SimpleFileWriteTest)
     file.open(QIODevice::ReadWrite);
     stream.setDevice(&file);
     
-    for (int i = 0; i < 1000; ++i)
+    for (size_t i = 0; i < kMaxWrites; ++i)
     {
         stream >> tmp;
         ASSERT_EQ(tmp, i);
@@ -589,10 +591,10 @@ TEST(MediaDbTest, ReadWrite_Simple)
     for (auto &data : tdm.dataVector)
         boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
 
+    dbHelper.setMode(nx::media_db::Mode::Read);
     ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
     testHandler.resetErrorString();
 
-    dbHelper.setMode(nx::media_db::Mode::Read);
     dbHelper.reset();
     reopenDbFile(&dbFile, fileName);
 
@@ -640,10 +642,10 @@ TEST(MediaDbTest, DbFileTruncate)
         for (auto &data : tdm.dataVector)
             boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
 
+        dbHelper.setMode(nx::media_db::Mode::Read);
         ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
         testHandler.resetErrorString();
 
-        dbHelper.setMode(nx::media_db::Mode::Read);
         reopenDbFile(&dbFile, fileName);
 
         QByteArray content = dbFile.readAll();
@@ -725,11 +727,11 @@ TEST(MediaDbTest, ReadWrite_MT)
         if (threads[i].joinable())
             threads[i].join();
 
-    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
-    testHandler.resetErrorString();
 
     dbHelper.setMode(nx::media_db::Mode::Read);
     dbHelper.reset();
+    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
+    testHandler.resetErrorString();
     reopenDbFile(&dbFile, fileName);
 
     uint8_t dbVersion;
