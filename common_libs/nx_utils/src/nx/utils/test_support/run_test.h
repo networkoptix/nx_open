@@ -1,6 +1,5 @@
 #pragma once
 
-#define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 
 #ifdef USE_GMOCK
