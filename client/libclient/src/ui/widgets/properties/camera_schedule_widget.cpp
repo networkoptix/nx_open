@@ -165,6 +165,12 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
+    ui->enableRecordingCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
+
+    ui->scheduleGridGroupBox->setTitle(lit("%1\t(%2)").arg(
+        ui->scheduleGridGroupBox->title()).arg(
+        tr("based on server time")));
+
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityLow), Qn::QualityLow);
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityNormal), Qn::QualityNormal);
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHigh), Qn::QualityHigh);
@@ -213,9 +219,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->displayQualityCheckBox,     &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::at_displayQualiteCheckBox_stateChanged);
     connect(ui->displayFpsCheckBox,         &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::at_displayFpsCheckBox_stateChanged);
 
-    connect(ui->enableRecordingCheckBox,    &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::updateGridEnabledState);
     connect(ui->enableRecordingCheckBox,    &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::updateLicensesLabelText);
-
     connect(ui->enableRecordingCheckBox,    &QCheckBox::stateChanged,                       this, notifyAboutScheduleEnabledChanged);
 
     connect(ui->gridWidget,                 &QnScheduleGridWidget::cellActivated,           this, &QnCameraScheduleWidget::at_gridWidget_cellActivated);
@@ -689,8 +693,8 @@ bool QnCameraScheduleWidget::isRecordingParamsAvailable() const
     return m_recordingParamsAvailable;
 }
 
-
-void QnCameraScheduleWidget::updateArchiveRangeEnabledState() {
+void QnCameraScheduleWidget::updateArchiveRangeEnabledState()
+{
     bool isEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
     ui->spinBoxMaxDays->setEnabled(isEnabled && ui->checkBoxMaxArchive->checkState() == Qt::Unchecked);
     ui->spinBoxMinDays->setEnabled(isEnabled && ui->checkBoxMinArchive->checkState() == Qt::Unchecked);
@@ -699,15 +703,8 @@ void QnCameraScheduleWidget::updateArchiveRangeEnabledState() {
 
 void QnCameraScheduleWidget::updateGridEnabledState()
 {
-    bool enabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
-
-    ui->scheduleGridGroupBox->setEnabled(enabled);
-    ui->settingsGroupBox->setEnabled(enabled);
-    ui->motionGroupBox->setEnabled(enabled && m_recordingParamsAvailable);
-    ui->gridWidget->setEnabled(enabled && !m_changesDisabled);
-
-    ui->checkBoxMinArchive->setEnabled(enabled);
-    ui->checkBoxMaxArchive->setEnabled(enabled);
+    ui->motionGroupBox->setEnabled(m_recordingParamsAvailable);
+    ui->gridWidget->setEnabled(m_changesDisabled);
     updateArchiveRangeEnabledState();
 }
 
@@ -715,15 +712,16 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
 {
     QnCamLicenseUsageHelper helper;
 
-    switch(ui->enableRecordingCheckBox->checkState()) {
-    case Qt::Checked:
-        helper.propose(m_cameras, true);
-        break;
-    case Qt::Unchecked:
-        helper.propose(m_cameras, false);
-        break;
-    default:
-        break;
+    switch(ui->enableRecordingCheckBox->checkState())
+    {
+        case Qt::Checked:
+            helper.propose(m_cameras, true);
+            break;
+        case Qt::Unchecked:
+            helper.propose(m_cameras, false);
+            break;
+        default:
+            break;
     }
     ui->licensesUsageWidget->loadData(&helper);
 }
