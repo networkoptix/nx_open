@@ -234,4 +234,8 @@ void CloudConnectionManager::cloudSettingsChanged()
     }
 
     emit cloudBindingStatusChanged(boundToCloud);
+    if (boundToCloud)
+        emit connectedToCloud();
+    else
+        emit disconnectedFromCloud();
 }

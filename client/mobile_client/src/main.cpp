@@ -37,6 +37,14 @@
 #include "config.h"
 using mobile_client::conf;
 
+// TODO mike: REMOVE
+#ifdef Q_OS_WIN
+    #include <common/systemexcept_win32.h>
+#endif
+#ifdef Q_OS_LINUX
+    #include <common/systemexcept_linux.h>
+#endif
+
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
     QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
@@ -241,6 +249,14 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
 
 int main(int argc, char *argv[])
 {
+    #if defined(Q_OS_WIN)
+        AllowSetForegroundWindow(ASFW_ANY);
+        win32_exception::installGlobalUnhandledExceptionHandler();
+    #endif
+    #if defined(Q_OS_LINUX)
+        linux_exception::installCrashSignalHandler();
+    #endif
+
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QGuiApplication application(argc, argv);
 
@@ -255,9 +271,9 @@ int main(int argc, char *argv[])
 
     migrateSettings();
 
-#ifdef Q_OS_ANDROID
-    registerIntentListener();
-#endif
+    #if defined(Q_OS_ANDROID)
+        registerIntentListener();
+    #endif
 
     int result = runApplication(&application, videowallInstanceGuid);
 

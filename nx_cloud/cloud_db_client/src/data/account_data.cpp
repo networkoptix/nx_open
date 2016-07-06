@@ -146,6 +146,24 @@ void serializeToUrlQuery(const AccountUpdateData& data, QUrlQuery* const urlQuer
             QString::fromStdString(data.customization.get()));
 }
 
+void serialize(QnJsonContext*, const AccountUpdateData& data, QJsonValue* jsonValue)
+{
+    QJsonObject jsonObject;
+    if (data.passwordHa1)
+        jsonObject.insert(
+            AccountUpdateData_passwordHa1_field,
+            QString::fromStdString(data.passwordHa1.get()));
+    if (data.fullName)
+        jsonObject.insert(
+            AccountUpdateData_fullName_field,
+            QString::fromStdString(data.fullName.get()));
+    if (data.customization)
+        jsonObject.insert(
+            AccountUpdateData_customization_field,
+            QString::fromStdString(data.customization.get()));
+    *jsonValue = jsonObject;
+}
+
 bool deserialize(QnJsonContext*, const QJsonValue& value, AccountUpdateData* data)
 {
     if (value.type() != QJsonValue::Object)

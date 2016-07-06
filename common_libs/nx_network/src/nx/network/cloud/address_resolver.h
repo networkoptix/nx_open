@@ -86,8 +86,6 @@ class NX_NETWORK_API AddressResolver
         : public QnStoppableAsync
 {
 public:
-    static const QRegExp kCloudAddressRegExp;
-
     typedef hpm::api::MediatorClientTcpConnection MediatorConnection;
     AddressResolver(std::shared_ptr<MediatorConnection> mediatorConnection);
     virtual ~AddressResolver() = default;
@@ -157,12 +155,14 @@ public:
 
     bool isRequestIdKnown(void* requestId) const;
 
+    bool isCloudHostName(const QString& hostName) const;
+
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 protected:
     struct NX_NETWORK_API HostAddressInfo
     {
-        explicit HostAddressInfo(const HostAddress& hostAddress);
+        explicit HostAddressInfo(bool _isLikelyCloudAddress);
 
         const bool isLikelyCloudAddress;
         std::vector<AddressEntry> fixedEntries;
@@ -244,6 +244,11 @@ protected:
 
     DnsResolver m_dnsResolver;
     std::shared_ptr<MediatorConnection> m_mediatorConnection;
+    const QRegExp m_cloudAddressRegExp;
+
+    bool isCloudHostName(
+        QnMutexLockerBase* const lk,
+        const QString& hostName) const;
 };
 
 } // namespace cloud

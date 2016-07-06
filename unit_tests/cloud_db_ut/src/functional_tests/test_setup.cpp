@@ -626,6 +626,22 @@ api::ResultCode CdbFunctionalTest::ping(
     return resCode;
 }
 
+api::ResultCode CdbFunctionalTest::setSystemUserList(
+    const std::string& systemID,
+    const std::string& authKey,
+    api::SystemSharingList sharings)
+{
+    auto connection = connectionFactory()->createConnection(systemID, authKey);
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) = makeSyncCall<nx::cdb::api::ResultCode>(
+        std::bind(
+            &nx::cdb::api::SystemManager::setSystemUserList,
+            connection->systemManager(),
+            std::move(sharings),
+            std::placeholders::_1));
+    return resCode;
+}
+
 const api::SystemSharingEx& CdbFunctionalTest::findSharing(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,

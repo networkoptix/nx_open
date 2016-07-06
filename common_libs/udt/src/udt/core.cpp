@@ -235,7 +235,7 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
     {
         case UDT_LINGER:
             m_Linger = *(linger*)optval;
-            break;
+            return;
 
         default:
             break;

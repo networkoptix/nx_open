@@ -857,7 +857,7 @@ void CommunicatingSocket<InterfaceToImplement>::registerTimer(
     nx::utils::MoveOnlyFunc<void()> handler )
 {
     //currently, aio considers 0 timeout as no timeout and will NOT call handler
-    NX_ASSERT(timeoutMs > std::chrono::milliseconds(0));
+    //NX_ASSERT(timeoutMs > std::chrono::milliseconds(0));
     if (timeoutMs == std::chrono::milliseconds(0))
         timeoutMs = std::chrono::milliseconds(1);  //handler of zero timer will NOT be called
     return m_aioHelper->registerTimer(timeoutMs, std::move(handler));

@@ -7,7 +7,7 @@
 #include <nx/network/stun/message.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
-#include <utils/thread/sync_queue.h>
+#include <nx/utils/test_support/sync_queue.h>
 
 
 namespace nx {
@@ -28,7 +28,7 @@ class IncomingTunnelConnectionTest
 protected:
     void SetUp() override
     {
-        TestSyncQueue<SystemError::ErrorCode> results;
+        utils::TestSyncQueue<SystemError::ErrorCode> results;
 
         auto tmpSocket = makeSocket(true);
         ASSERT_TRUE(tmpSocket->setSendTimeout(0));
@@ -130,10 +130,10 @@ protected:
 
     SocketAddress connectionAddress;
     std::unique_ptr<IncomingTunnelConnection> connection;
-    TestSyncQueue<SystemError::ErrorCode> acceptResults;
+    utils::TestSyncQueue<SystemError::ErrorCode> acceptResults;
 
     std::unique_ptr<UdtStreamSocket> freeSocket;
-    TestSyncQueue<SystemError::ErrorCode> connectResults;
+    utils::TestSyncQueue<SystemError::ErrorCode> connectResults;
 
     QnMutex m_mutex;
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;

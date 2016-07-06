@@ -14,6 +14,7 @@
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -26,6 +27,8 @@ namespace cloud {
 
 //!Retrieves url to the specified cloud module
 class NX_NETWORK_API CloudModuleEndPointFetcher
+:
+    public aio::BasicPollable
 {
 public:
     CloudModuleEndPointFetcher(
@@ -33,9 +36,10 @@ public:
         std::unique_ptr<AbstractEndpointSelector> endpointSelector);
     ~CloudModuleEndPointFetcher();
 
+    virtual void stopWhileInAioThread() override;
+
     //!Specify endpoint explicitely
     void setEndpoint(SocketAddress endpoint);
-
     //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
     void get(std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler);
 
@@ -46,12 +50,14 @@ private:
     QString m_moduleName;
     std::vector<std::function<void(nx_http::StatusCode::Value, SocketAddress)>> m_resolveHandlers;
     std::unique_ptr<AbstractEndpointSelector> m_endpointSelector;
+    bool m_requestIsRunning;
 
     void onHttpClientDone(nx_http::AsyncHttpClientPtr client);
     bool parseCloudXml(
         QByteArray xmlData,
         std::vector<SocketAddress>* const endpoints);
     void signalWaitingHandlers(
+        QnMutexLockerBase* const lk,
         nx_http::StatusCode::Value statusCode,
         const SocketAddress& endpoint);
     void endpointSelected(

@@ -8,7 +8,7 @@
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/udp_server.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
-#include <utils/thread/sync_queue.h>
+#include <nx/utils/test_support/sync_queue.h>
 
 
 namespace nx {
@@ -277,10 +277,10 @@ protected:
 
     bool isUdpServerEnabled;
     size_t connectionRequests;
-    TestSyncQueue<SystemError::ErrorCode> connectResults;
+    utils::TestSyncQueue<SystemError::ErrorCode> connectResults;
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectSockets;
 
-    TestSyncQueue<SystemError::ErrorCode> acceptResults;
+    utils::TestSyncQueue<SystemError::ErrorCode> acceptResults;
     std::unique_ptr<AbstractIncomingTunnelConnection> tunnelConnection;
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
 };

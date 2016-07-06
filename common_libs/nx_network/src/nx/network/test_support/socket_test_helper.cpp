@@ -488,7 +488,7 @@ void RandomDataTcpServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
             auto acceptedConnections = std::move(m_aliveConnections);
             lk.unlock();
 
-            BarrierHandler completionHandlerInvoker(std::move(handler));
+            utils::BarrierHandler completionHandlerInvoker(std::move(handler));
             for (auto& connection: acceptedConnections)
             {
                 auto connectionPtr = connection.get();
@@ -659,7 +659,7 @@ void ConnectionsGenerator::pleaseStop(
     m_terminated = true;
     auto connections = std::move(m_connections);
     lk.unlock();
-    BarrierHandler allConnectionsStoppedFuture(std::move(handler));
+    utils::BarrierHandler allConnectionsStoppedFuture(std::move(handler));
     for (auto& idAndConnection: connections)
     {
         auto connectionPtr = idAndConnection.second.get();

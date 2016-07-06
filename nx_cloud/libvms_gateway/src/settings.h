@@ -53,7 +53,9 @@ class Http
 {
 public:
     int proxyTargetPort;
+    /** Enables support of Http CONNECT method */
     bool connectSupport;
+    bool allowTargetEndpointInUrl;
 
     Http();
 };

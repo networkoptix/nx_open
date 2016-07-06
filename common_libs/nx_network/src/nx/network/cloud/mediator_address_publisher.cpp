@@ -128,7 +128,7 @@ void MediatorAddressPublisher::pleaseStop(nx::utils::MoveOnlyFunc<void()> handle
         m_state = State::kTerminated;
     }
 
-    nx::BarrierHandler barrier( std::move(handler) );
+    nx::utils::BarrierHandler barrier( std::move(handler) );
     m_timer.pleaseStop( barrier.fork() );
 
     QnMutexLocker lk( &m_mutex );

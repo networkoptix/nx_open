@@ -615,10 +615,14 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
 
                 ASSERT_EQ(SystemError::timedOut, result.first);
                 ASSERT_EQ(nullptr, result.second);
-#ifdef _DEBUG
-                EXPECT_GT(actualTimeout, timeout - timeoutCorrection);
-                EXPECT_LT(actualTimeout, timeout + timeoutCorrection);
-#endif
+
+                #ifdef _DEBUG
+                    if (!SocketFactory::areTimeAssertsDisabled())
+                    {
+                        EXPECT_GT(actualTimeout, timeout - timeoutCorrection);
+                        EXPECT_LT(actualTimeout, timeout + timeoutCorrection);
+                    }
+                #endif
             }
         }
 }
