@@ -224,8 +224,6 @@ bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
     return addTaskToThePipe( serializedTask );
 }
 
-static const QLatin1String PREVIOUS_LAUNCHED_VERSION_PARAM_NAME( "previousLaunchedVersion" );
-static const QLatin1String PREVIOUS_USED_CMD_PARAMS_PARAM_NAME( "previousUsedCmdParams" );
 static const QLatin1String MOST_RECENT_VERSION_PARAM_NAME( "mostRecentVersion" );
 
 bool ApplauncherProcess::getVersionToLaunch(
@@ -245,12 +243,7 @@ bool ApplauncherProcess::getVersionToLaunch(
         }
     }
 
-    if( m_settings->contains( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ) )
-    {
-        *versionToLaunch = QnSoftwareVersion(m_settings->value( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ).toString());
-        *appArgs = m_settings->value( PREVIOUS_USED_CMD_PARAMS_PARAM_NAME ).toString();
-    }
-    else if( m_installationManager->count() > 0 )
+    if( m_installationManager->count() > 0 )
     {
         *versionToLaunch = m_installationManager->latestVersion();
         //leaving default cmd params
@@ -401,7 +394,6 @@ bool ApplauncherProcess::startApplication(
             environment) )
     {
         NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG1 );
-        m_settings->setValue( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME, task->version.toString() );
         m_settings->setValue( MOST_RECENT_VERSION_PARAM_NAME, m_installationManager->latestVersion().toString() );
         m_settings->sync();
         response->result = applauncher::api::ResultType::ok;
