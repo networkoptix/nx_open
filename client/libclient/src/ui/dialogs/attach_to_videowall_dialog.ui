@@ -13,23 +13,36 @@
   <property name="windowTitle">
    <string>Attach to Video Wall...</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="previewGroupBox">
-     <property name="title">
-      <string>Preview</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
       <item>
-       <widget class="QnVideowallManageWidget" name="manageWidget" native="true"/>
+       <widget class="QGroupBox" name="previewGroupBox">
+        <property name="title">
+         <string>Preview</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QnVideowallManageWidget" name="manageWidget" native="true"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="licensesLabel">
+        <property name="text">
+         <string notr="true">&lt;Licenses usage text&gt;</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="licensesLabel">
-     <property name="text">
-      <string notr="true">&lt;Licenses usage text&gt;</string>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
