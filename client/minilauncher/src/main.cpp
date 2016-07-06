@@ -17,7 +17,7 @@ wstring closeDirPath(const wstring& name)
 {
     if (name.empty())
         return name;
-    else if (name[name.length()-1] == L'/' || name[name.length()-1] == L'\\')
+    else if (name[name.length() - 1] == L'/' || name[name.length() - 1] == L'\\')
         return name;
     else
         return name + L'/';
@@ -50,7 +50,7 @@ wstring getFullFileName(const wstring& folder, const wstring& fileName)
         if (value[i] == L'\\')
             value[i] = L'/';
     }
-    if (value[value.length()-1] != L'/')
+    if (value[value.length() - 1] != L'/')
         value += L'/';
     value += fileName;
 
@@ -64,10 +64,10 @@ bool startProcessAsync(wchar_t* commandline, const wstring& dstDir)
     memset(&lpStartupInfo, 0, sizeof(lpStartupInfo));
     memset(&lpProcessInfo, 0, sizeof(lpProcessInfo));
     return CreateProcess(0, commandline,
-        NULL, NULL, NULL, NULL, NULL,
-        dstDir.c_str(),
-        &lpStartupInfo,
-        &lpProcessInfo);
+                         NULL, NULL, NULL, NULL, NULL,
+                         dstDir.c_str(),
+                         &lpStartupInfo,
+                         &lpProcessInfo);
 }
 
 int launchFile()
@@ -75,12 +75,13 @@ int launchFile()
     try
     {
         wstring dstDir = getDstDir();
-        wchar_t buffer[MAX_PATH*2 +3];
+        wchar_t buffer[MAX_PATH * 2 + 3];
         wsprintf(buffer, L"\"%s\" \"%s\"", getFullFileName(dstDir, QN_CLIENT_EXECUTABLE_NAME).c_str(), dstDir.c_str());
         if (startProcessAsync(buffer, dstDir))
             return 0;
         return 1;
-    } catch(...)
+    }
+    catch (...)
     {
         return -1;
     }
@@ -94,14 +95,14 @@ wstring unquoteStr(std::wstring str)
         str = str.substr(1, MAX_PATH);
     if (str.empty())
         return str;
-    if (str[str.length()-1] == L'"')
-        str = str.substr(0, str.length()-1);
+    if (str[str.length() - 1] == L'"')
+        str = str.substr(0, str.length() - 1);
     return str;
 }
 
 int _tmain(int argc, _TCHAR* argv[])
 {
     launchFile();
-	return 0;
+    return 0;
 }
 

@@ -2,7 +2,7 @@
 
 #include <QtCore/qsystemdetection.h>
 
-#if (defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)) || defined(Q_OS_WINDOWS)
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 
 #include <execinfo.h>
 #include <fcntl.h>
@@ -258,4 +258,4 @@ std::string linux_exception::getCrashPattern()
     return ss.str();
 }
 
-#endif
+#endif // defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)

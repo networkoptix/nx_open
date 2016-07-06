@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>249</width>
-    <height>103</height>
+    <height>122</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -61,6 +61,13 @@
     </widget>
    </item>
    <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QnDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -74,14 +81,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnCharComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">ui/widgets/common/char_combo_box.h</header>
-  </customwidget>
-  <customwidget>
    <class>QnDialogButtonBox</class>
    <extends>QDialogButtonBox</extends>
    <header location="global">ui/widgets/common/dialog_button_box.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QnCharComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">ui/widgets/common/char_combo_box.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
