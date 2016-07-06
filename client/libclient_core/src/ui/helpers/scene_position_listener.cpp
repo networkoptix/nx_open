@@ -71,10 +71,14 @@ void QnScenePositionListener::setEnabled(bool enabled)
         QQuickItemPrivate::get(m_item)->removeItemChangeListener(this, kItemChangeTypes);
         removeAncestorListeners(m_item->parentItem());
     }
+
+    updateScenePos();
 }
 
 void QnScenePositionListener::itemGeometryChanged(QQuickItem* item, const QRectF&, const QRectF&)
 {
+    Q_UNUSED(item)
+
     if (!m_item)
         return;
 

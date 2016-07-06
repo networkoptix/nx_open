@@ -34,8 +34,11 @@ Item
     implicitWidth: handleItem.width
     implicitHeight: handleItem.height
 
-    x: anchorX - anchorShift
-    y: input.cursorRectangle.y + input.cursorRectangle.height
+    property real localX: anchorX - anchorShift
+    property real localY: input.cursorRectangle.y + input.cursorRectangle.height
+
+    x: localX
+    y: localY
 
     visible: false
 
