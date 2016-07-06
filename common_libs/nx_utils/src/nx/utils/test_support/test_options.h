@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include <nx/utils/argument_parser.h>
 
 namespace nx {
