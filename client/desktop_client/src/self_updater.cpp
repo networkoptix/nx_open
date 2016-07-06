@@ -75,8 +75,11 @@ bool SelfUpdater::updateApplauncher()
 {
     /* Check if applauncher binary exists in our installation. */
 
-    QString applauncherDirPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + lit("/../applauncher");
-    QDir applauncherDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + lit("/../applauncher"));
+    QString applauncherDirPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation)
+        + lit("/../applauncher/")
+        + QnAppInfo::customizationName();
+
+    QDir applauncherDir(applauncherDirPath);
     if (!QDir().mkpath(applauncherDirPath))
     {
         NX_LOG(lit("Cannot make folder for applaucher: %1").arg(applauncherDirPath), cl_logERROR);
@@ -115,7 +118,6 @@ bool SelfUpdater::updateApplauncher()
         return false;
     }
 
-    //TODO: #GDM appinfo?
     const QStringList kTargetFileFilters =
     {
         QLatin1String("*.dll"),
@@ -141,19 +143,15 @@ bool SelfUpdater::updateApplauncher()
         backup.restore();
     }
 
-    /* Run updated (or restored) applauncher. */
-    //TODO: #GDM this will not work on linux (LD_LIBRARY_PATH). We should start minilauncher instead.
-    QString applauncherPath = applauncherDirPath + L'/' + QnClientAppInfo::applauncherBinaryName();
-
-    //TODO: #GDM here will be passed arguments to just run, without compatibility client
-    QStringList applauncherArguments;
-    if (QFileInfo::exists(applauncherPath) && QProcess::startDetached(applauncherPath, applauncherArguments))
+    /* Run newest applauncher via minilauncher. */
+    QString minilauncherPath = qApp->applicationDirPath() + L'/' + QnClientAppInfo::minilauncherBinaryName();
+    if (QFileInfo::exists(minilauncherPath) && QProcess::startDetached(minilauncherPath, QStringList())) /*< arguments are MUST here */
     {
-        NX_LOG(lit("Applauncher process started successfully."), cl_logINFO);
+        NX_LOG(lit("Minilauncher process started successfully."), cl_logINFO);
     }
     else
     {
-        NX_LOG(lit("Applauncher process could not be started %1.").arg(applauncherPath), cl_logERROR);
+        NX_LOG(lit("Minilauncher process could not be started %1.").arg(minilauncherPath), cl_logERROR);
         success = false;
     }
 
