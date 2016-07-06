@@ -32,10 +32,17 @@ class ApplauncherProcess
     Q_OBJECT
 
 public:
+    enum class Mode
+    {
+        Default,
+        Background,
+        Quit
+    };
+
     ApplauncherProcess(
         QSettings* const userSettings,
         InstallationManager* const installationManager,
-        bool quitMode,
+        Mode mode,
         const QString& mirrorListUrl );
 
     //!Implementation of \a ApplauncherProcess::pleaseStop()
@@ -65,7 +72,7 @@ private:
 
     bool m_terminated;
     InstallationManager* const m_installationManager;
-    const bool m_quitMode;
+    const Mode m_mode;
     const QString m_mirrorListUrl;
     TaskServerNew m_taskServer;
     QSettings* const m_settings;

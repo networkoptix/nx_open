@@ -50,6 +50,9 @@ static void printHelp()
         "    --dir={local path} Path to local directory to sync\n"
         "    --url={http url} Url of remote http directory to sync with\n"
         "\n"
+        "  Background mode\n"
+        "    --exec Run in background mode\n"
+        "\n"
         "  Installation mode (installs requested version)\n"
         "    --install Run in installation mode (install version specified by following parameters)\n"
         "    --version= Mandatory in installation mode\n"
@@ -90,6 +93,7 @@ int main( int argc, char* argv[] )
     bool displayHelp = false;
 
     bool syncMode = false;
+    bool backgroundMode = false;
     QString localDir;
     QString remoteUrl;
     bool installMode = false;
@@ -99,7 +103,7 @@ int main( int argc, char* argv[] )
     QString moduleToInstall( QString::fromLatin1("client") );
     QString installationPath;
     QString devModeKey;
-    
+
     QString fileToDownload;
     QString destFilePath;
 
@@ -110,6 +114,7 @@ int main( int argc, char* argv[] )
     commandLineParser.addParameter( &quitMode, "quit", NULL, QString(), QVariant(true) );
     commandLineParser.addParameter( &displayHelp, "--help", NULL, QString(), QVariant(true) );
     commandLineParser.addParameter( &syncMode, "--rsync", NULL, QString(), QVariant(true) );
+    commandLineParser.addParameter( &backgroundMode, "--exec", NULL, QString(), QVariant(true) );
     commandLineParser.addParameter( &localDir, "--dir", NULL, QString(), QString() );
     commandLineParser.addParameter( &remoteUrl, "--url", NULL, QString(), QString() );
     commandLineParser.addParameter( &installMode, "--install", NULL, QString(), QVariant(true) );
@@ -127,7 +132,7 @@ int main( int argc, char* argv[] )
     QDir::setCurrent( QCoreApplication::applicationDirPath() );
 
     QString appName = QnApplauncherAppInfo::applicationName();
-    
+
     QSettings globalSettings( QSettings::SystemScope, QnAppInfo::organizationName(), appName );
     QSettings userSettings( QSettings::UserScope, QnAppInfo::organizationName(), appName );
 
@@ -171,11 +176,17 @@ int main( int argc, char* argv[] )
 
     ProcessUtils::initialize();
 
+    ApplauncherProcess::Mode mode = ApplauncherProcess::Mode::Default;
+    if (quitMode)
+        mode = ApplauncherProcess::Mode::Quit;
+    else if (backgroundMode)
+        mode = ApplauncherProcess::Mode::Background;
+
     QScopedPointer<nx::utils::TimerManager> timerManager(new nx::utils::TimerManager());
     ApplauncherProcess applauncherProcess(
         &userSettings,
         &installationManager,
-        quitMode,
+        mode,
         mirrorListUrl );
 
     applauncherProcess.setDevModeKey(devModeKey);
@@ -193,7 +204,7 @@ int main( int argc, char* argv[] )
         // Wait for app to finish + 100ms just in case (in may be still running after unlocking QSingleApplication lock file).
         while (app.isRunning()) {
             Sleep(100);
-        } 
+        }
         Sleep(100);
     }
 #endif

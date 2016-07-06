@@ -20,12 +20,12 @@
 ApplauncherProcess::ApplauncherProcess(
     QSettings* const settings,
     InstallationManager* const installationManager,
-    bool quitMode,
+    Mode mode,
     const QString& mirrorListUrl )
 :
     m_terminated( false ),
     m_installationManager( installationManager ),
-    m_quitMode( quitMode ),
+    m_mode( mode ),
     m_mirrorListUrl( mirrorListUrl ),
     m_taskServer( this ),
     m_settings( settings ),
@@ -143,28 +143,32 @@ void ApplauncherProcess::launchMostRecentClient()
 
 int ApplauncherProcess::run()
 {
-    if( !m_taskServer.listen( launcherPipeName ) )
+    if (!m_taskServer.listen(launcherPipeName))
     {
-        if( m_quitMode )
+        if (m_mode == Mode::Quit)
         {
             //asking already-running instance to stop
-            return addTaskToThePipe( applauncher::api::QuitTask().serialize() );
+            return addTaskToThePipe(applauncher::api::QuitTask().serialize());
         }
 
-        //another instance already running?
+        if (m_mode == Mode::Default)
+        {
+            //another instance already running?
 #ifdef Q_OS_WIN
-        launchMostRecentClient();
+            launchMostRecentClient();
 #else
-        sendTaskToRunningLauncherInstance();
+            sendTaskToRunningLauncherInstance();
 #endif
+        }
         return 0;
     }
 
     //we are the only running instance
-    if( m_quitMode )
+    if (m_mode == Mode::Quit)
         return 0;
 
-    launchMostRecentClient();
+    if (m_mode == Mode::Default)
+        launchMostRecentClient();
 
     std::unique_lock<std::mutex> lk( m_mutex );
     m_cond.wait( lk, [this](){ return m_terminated; } );
@@ -198,7 +202,7 @@ bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
     NX_LOG( QString::fromLatin1("Entered AddingTaskToNamedPipe"), cl_logDEBUG1 );
 
     QByteArray serializedTask;
-    if( !m_quitMode )
+    if (m_mode != Mode::Quit)
     {
         QnSoftwareVersion versionToLaunch;
         QString appArgs;
