@@ -34,3 +34,8 @@ int QnClientAppInfo::videoWallIconId()
 {
     return IDI_ICON_VIDEOWALL;
 }
+
+QString QnClientAppInfo::macOsBundleName()
+{
+    return QStringLiteral("${mac.bundle.identifier}");
+}
