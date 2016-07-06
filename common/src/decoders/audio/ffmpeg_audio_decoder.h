@@ -6,7 +6,7 @@
 #include "abstract_audio_decoder.h"
 
 /**
- * Client of this class is responsible for encoded data buffer meet ffmpeg 
+ * Client of this class is responsible for encoded data buffer meet ffmpeg
  * restrictions (see the comments for decoding functions for details).
  */
 class QnFfmpegAudioDecoder : public QnAbstractAudioDecoder
@@ -24,6 +24,7 @@ private:
 
     static bool m_first_instance;
     AVCodecID m_codec;
+    AVFrame* m_outFrame;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

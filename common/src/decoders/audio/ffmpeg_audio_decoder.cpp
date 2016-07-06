@@ -32,7 +32,8 @@ AVSampleFormat QnFfmpegAudioDecoder::audioFormatQtToFfmpeg(const QnAudioFormat& 
 
 QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(QnCompressedAudioDataPtr data):
     c(0),
-    m_codec(data->compressionType)
+    m_codec(data->compressionType),
+    m_outFrame(av_frame_alloc())
 {
     if (m_first_instance)
     {
@@ -87,6 +88,7 @@ QnFfmpegAudioDecoder::~QnFfmpegAudioDecoder(void)
 {
     QnFfmpegHelper::deleteAvCodecContext(c);
     c = 0;
+    av_frame_free(&m_outFrame);
 }
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bit stream readers read 32 or 64 bits at once and could read over the end.
@@ -114,27 +116,26 @@ bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
         //int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
 
-        AVFrame outFrame;
         int got_frame = 0;
         // todo: ffmpeg-test
-        int len = avcodec_decode_audio4(c, &outFrame, &got_frame, &avpkt);
+        int len = avcodec_decode_audio4(c, m_outFrame, &got_frame, &avpkt);
         if (got_frame)
         {
-            if (outbuf_len + outFrame.pkt_size > (int)result.capacity())
+            if (outbuf_len + m_outFrame->pkt_size > (int)result.capacity())
             {
                 //NX_ASSERT(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
                 result.reserve(result.capacity() * 2);
                 outbuf = (quint8*)result.data() + outbuf_len;
             }
 
-            memcpy(outbuf, outFrame.data, outFrame.pkt_size);
+            memcpy(outbuf, m_outFrame->data, m_outFrame->pkt_size);
         }
 
         if (len < 0)
             return false;
 
-        outbuf_len += outFrame.pkt_size;
-        outbuf += outFrame.pkt_size;
+        outbuf_len += m_outFrame->pkt_size;
+        outbuf += m_outFrame->pkt_size;
         size -= len;
         inbuf_ptr += len;
 

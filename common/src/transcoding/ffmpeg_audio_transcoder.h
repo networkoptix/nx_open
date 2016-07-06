@@ -33,11 +33,12 @@ private:
 
     qint64 m_lastTimestamp;
     QnConstMediaContextPtr m_context;
-    
+
     bool m_downmixAudio;
     int m_frameNum;
     ReSampleContext* m_resampleCtx;
     int m_dstSampleRate;
+    AVFrame* m_outFrame;
 };
 
 typedef QSharedPointer<QnFfmpegAudioTranscoder> QnFfmpegAudioTranscoderPtr;

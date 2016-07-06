@@ -64,7 +64,8 @@ QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(AVCodecID codecId):
     m_downmixAudio(false),
     m_frameNum(0),
     m_resampleCtx(0),
-    m_dstSampleRate(0)
+    m_dstSampleRate(0),
+    m_outFrame(av_frame_alloc())
 {
     m_bitrate = 128*1000;
     m_audioEncodingBuffer = (quint8*) qMallocAligned(AVCODEC_MAX_AUDIO_FRAME_SIZE, CL_MEDIA_ALIGNMENT);
@@ -78,6 +79,7 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
 
     QnFfmpegHelper::deleteAvCodecContext(m_encoderCtx);
     QnFfmpegHelper::deleteAvCodecContext(m_decoderContext);
+    av_frame_free(&m_outFrame);
 }
 
 bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
@@ -226,12 +228,11 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         //int len = avcodec_decode_audio3(m_decoderContext, (short *)(decodedDataEndPtr), &decodedAudioSize, &avpkt);
 
         // todo: ffmpeg-test
-        AVFrame outFrame;
         int got_frame = 0;
-        int decodeResult = avcodec_decode_audio4(m_decoderContext, &outFrame, &got_frame, &avpkt);
-        int decodedAudioSize = outFrame.pkt_size;
+        int decodeResult = avcodec_decode_audio4(m_decoderContext, m_outFrame, &got_frame, &avpkt);
+        int decodedAudioSize = m_outFrame->pkt_size;
         if (got_frame)
-            memcpy(decodedDataEndPtr, outFrame.data, decodedAudioSize);
+            memcpy(decodedDataEndPtr, m_outFrame->data, decodedAudioSize);
 
         if (m_encoderCtx->frame_size == 0)
             m_encoderCtx->frame_size = m_decoderContext->frame_size;
