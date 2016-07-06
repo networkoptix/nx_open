@@ -193,11 +193,13 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
         {
             if( (spsNaluStartOffset != (size_t)-1) && (spsNaluSize == 0) )
                 spsNaluSize = result->m_data.size() - spsNaluStartOffset;
-            result->m_data.uncheckedWrite(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+            if( !result->m_data.uncheckedWrite(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX)) )
+                return QnCompressedVideoDataPtr();
             if( (m_chunks[i].len > 0) && ((*((const char*)rtpBuffer + m_chunks[i].bufferOffset) & 0x1f) == nuSPS) )
                 spsNaluStartOffset = result->m_data.size();
         }
-        result->m_data.uncheckedWrite((const char*) rtpBuffer + m_chunks[i].bufferOffset, m_chunks[i].len);
+        if( !result->m_data.uncheckedWrite((const char*) rtpBuffer + m_chunks[i].bufferOffset, m_chunks[i].len) )
+            return QnCompressedVideoDataPtr();
     }
 
     if( (spsNaluStartOffset != (size_t)-1) )
