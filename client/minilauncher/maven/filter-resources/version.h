@@ -1,3 +1,3 @@
 #pragma once
 
-#define QN_CLIENT_EXECUTABLE_NAME    L"${client.binary.name}"
+#define QN_APPLAUNCHER_BINARY_NAME    L"${applauncher.binary.name}"

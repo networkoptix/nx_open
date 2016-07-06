@@ -57,17 +57,25 @@ wstring getFullFileName(const wstring& folder, const wstring& fileName)
     return value;
 }
 
-bool startProcessAsync(wchar_t* commandline, const wstring& dstDir)
+BOOL startProcessAsync(wchar_t* commandline, const wstring& dstDir)
 {
     STARTUPINFO lpStartupInfo;
     PROCESS_INFORMATION lpProcessInfo;
     memset(&lpStartupInfo, 0, sizeof(lpStartupInfo));
     memset(&lpProcessInfo, 0, sizeof(lpProcessInfo));
-    return CreateProcess(0, commandline,
-                         NULL, NULL, NULL, NULL, NULL,
-                         dstDir.c_str(),
-                         &lpStartupInfo,
-                         &lpProcessInfo);
+
+    return CreateProcess(
+        0,                  /*<  _In_opt_   LPCTSTR               lpApplicationName */
+        commandline,        /*< _Inout_opt_ LPTSTR                lpCommandLine */
+        NULL,               /*< _In_opt_    LPSECURITY_ATTRIBUTES lpProcessAttributes */
+        NULL,               /*< _In_opt_    LPSECURITY_ATTRIBUTES lpThreadAttributes */
+        NULL,               /*< _In_        BOOL                  bInheritHandles */
+        NULL,               /*< _In_        DWORD                 dwCreationFlags */
+        NULL,               /*< _In_opt_    LPVOID                lpEnvironment */
+        dstDir.c_str(),     /*< _In_opt_    LPCTSTR               lpCurrentDirectory */
+        &lpStartupInfo,     /*< _In_        LPSTARTUPINFO         lpStartupInfo */
+        &lpProcessInfo      /*< _Out_       LPPROCESS_INFORMATION lpProcessInformation */
+    );
 }
 
 int launchFile()
@@ -76,7 +84,7 @@ int launchFile()
     {
         wstring dstDir = getDstDir();
         wchar_t buffer[MAX_PATH * 2 + 3];
-        wsprintf(buffer, L"\"%s\" \"%s\"", getFullFileName(dstDir, QN_CLIENT_EXECUTABLE_NAME).c_str(), dstDir.c_str());
+        wsprintf(buffer, L"\"%s\" --exec \"%s\"", getFullFileName(dstDir, QN_APPLAUNCHER_BINARY_NAME).c_str(), dstDir.c_str());
         if (startProcessAsync(buffer, dstDir))
             return 0;
         return 1;
@@ -87,22 +95,11 @@ int launchFile()
     }
 }
 
-wstring unquoteStr(std::wstring str)
-{
-    if (str.empty())
-        return str;
-    if (str[0] == L'"')
-        str = str.substr(1, MAX_PATH);
-    if (str.empty())
-        return str;
-    if (str[str.length() - 1] == L'"')
-        str = str.substr(0, str.length() - 1);
-    return str;
-}
-
 int _tmain(int argc, _TCHAR* argv[])
 {
-    launchFile();
-    return 0;
+    (int)(argc);    /* Q_UNUSED */
+    (void*)(argv);  /* Q_UNUSED */
+
+    return launchFile();
 }
 
