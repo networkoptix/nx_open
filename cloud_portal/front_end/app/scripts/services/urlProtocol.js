@@ -28,7 +28,7 @@ angular.module('cloudApp')
                 };
 
                 if(linkSettings.systemId){
-                    settings.command = 'system';
+                    settings.command = 'systems';
                 }
 
                 $.extend(settings,linkSettings);

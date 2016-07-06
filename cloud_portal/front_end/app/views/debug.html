@@ -74,6 +74,14 @@
         </div>
     </div>
 
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button class="btn btn-default" ng-click="openLink()"
+                    title="{{system.stateMessage}}">Open in VMS_NAME</button>
+
+        </div>
+    </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">Formatted link:</label>
         <div class="col-sm-10">
@@ -83,8 +91,13 @@
         </div>
     </div>
 
+    <hr>
     <h1>Debug processes and notifications</h1>
-    <pre>{{formatJSON(debugProcess.process)}}</pre>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <pre>{{formatJSON(debugProcess.process)}}</pre>
+        </div>
+    </div>
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <label><input type="checkbox" ng-model="debugProcess.success"/>Success</label>
@@ -98,6 +111,7 @@
         </div>
     </div>
 
+    <hr>
     <h1>Debug email notifications</h1>
     <div class="form-group">
         <label class="col-sm-2 control-label">Email</label>

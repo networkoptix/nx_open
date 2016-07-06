@@ -99,19 +99,34 @@ angular.module('cloudApp')
             }
             return urlProtocol.generateLink(clearEmptyStrings($scope.linkSettings));
         }
+        $scope.openLink = function(){
+            $scope.linkSettings.actionParameters = null;
+            try{
+                $scope.actionParametersError = false;
+                if($scope.actionParameters  && $scope.actionParameters != ''){
+                    $scope.linkSettings.actionParameters = JSON.parse($scope.actionParameters);
+                }
+            }catch (a){
+                $scope.actionParametersError = true
+            }
 
-         $scope.getTempKey = function(){
+            urlProtocol.getLink(clearEmptyStrings($scope.linkSettings)).then(function(link){
+                window.location.href = link;
+            });
+        }
+
+        $scope.getTempKey = function(){
             account.authKey().then(function(authKey){
                 $scope.linkSettings.auth = authKey;
             },function(no_account){
                 console.error("couldn't retrieve temporary auth_key from cloud_portal",no_account);
                 $scope.linkSettings.auth = "couldn't retrieve temporary auth_key from cloud_portal";
             });
-         }
-         $scope.usePermCreds = function(){
+        }
+        $scope.usePermCreds = function(){
             var username = account.getEmail();
             var password = account.getPassword();
             $scope.linkSettings.auth = $base64.encode(username + ':' + password);
-         }
+        }
 
     }]);
