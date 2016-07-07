@@ -37,7 +37,7 @@
 #include "config.h"
 using mobile_client::conf;
 
-// TODO mike: REMOVE
+// TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
 #ifdef Q_OS_WIN
     #include <common/systemexcept_win32.h>
 #endif
@@ -264,6 +264,7 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
 
 int main(int argc, char *argv[])
 {
+    // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
     #if defined(Q_OS_WIN)
         AllowSetForegroundWindow(ASFW_ANY);
         win32_exception::installGlobalUnhandledExceptionHandler();
