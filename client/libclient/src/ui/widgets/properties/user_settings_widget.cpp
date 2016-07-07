@@ -42,14 +42,6 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     connect(m_rolesModel,               &QnUserRolesModel::modelReset,  this,   &QnUserSettingsWidget::updateRoleComboBox);
     connect(m_rolesModel,               &QnUserRolesModel::rowsRemoved, this,   &QnUserSettingsWidget::updateRoleComboBox);
 
-    connect(m_model, &QnUserSettingsModel::userChanged, this, [this]()
-    {
-        ui->passwordInputField->setEmptyInputAllowed(
-            m_model->mode() != QnUserSettingsModel::NewUser,
-            ui->passwordInputField->emptyInputHint());
-        ui->passwordInputField->reset();
-    });
-
     setupInputFields();
 
     QnAligner* aligner = new QnAligner(this);
@@ -128,6 +120,10 @@ void QnUserSettingsWidget::loadDataToUi()
     updateRoleComboBox();
     updateControlsAccess();
 
+    ui->passwordInputField->setEmptyInputAllowed(
+        m_model->mode() != QnUserSettingsModel::NewUser,
+        ui->passwordInputField->emptyInputHint());
+
     ui->loginInputField->setText(m_model->user()->getName());
     ui->emailInputField->setText(m_model->user()->getEmail());
     ui->nameInputField->setText(m_model->user()->fullName());
@@ -166,8 +162,7 @@ void QnUserSettingsWidget::applyChanges()
     /* Here we must be sure settings widget goes before the permissions one. */
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
-        QnUuid groupId = selectedUserGroup();
-        m_model->user()->setUserGroup(groupId);
+        m_model->user()->setUserGroup(selectedUserGroup());
         m_model->user()->setRawPermissions(selectedPermissions());
     }
 
