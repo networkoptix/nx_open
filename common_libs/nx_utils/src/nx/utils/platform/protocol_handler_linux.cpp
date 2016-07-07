@@ -12,6 +12,7 @@ namespace utils {
 bool registerSystemUriProtocolHandler(
     const QString& protocol,
     const QString& applicationBinaryPath,
+    const QString& macOsBundleId
     const QString& applicationName,
     const QString& description,
     const QString& customization,
