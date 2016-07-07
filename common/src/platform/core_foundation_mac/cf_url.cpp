@@ -6,12 +6,15 @@
 #include <QtCore/QString>
 #include <platform/core_foundation_mac/cf_string.h>
 
-cf::QnCFUrl::QnCFUrl() :
+cf::QnCFUrl::QnCFUrl()
+    :
     base_type()
-{}
+{
+}
 
 cf::QnCFUrl::~QnCFUrl()
-{}
+{
+}
 
 cf::QnCFUrl cf::QnCFUrl::createFileUrl(const QString& fileName)
 {
@@ -19,6 +22,7 @@ cf::QnCFUrl cf::QnCFUrl::createFileUrl(const QString& fileName)
 
     result.reset(CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
         QnCFString(fileName).ref(), kCFURLPOSIXPathStyle, false));
+
     return result;
 }
 

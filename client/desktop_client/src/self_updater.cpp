@@ -51,7 +51,7 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
 
 bool SelfUpdater::registerUriHandler()
 {
-#if defined(Q_OS_WIN) || defined(Q_OS_LINUX)
+#if defined(Q_OS_WIN) || defined(Q_OS_LINUX) || defined(Q_OS_MAC)
     QString binaryPath = qApp->applicationFilePath();
 
 #if defined(Q_OS_LINUX)
@@ -61,15 +61,11 @@ bool SelfUpdater::registerUriHandler()
     return nx::utils::registerSystemUriProtocolHandler(
         nx::vms::utils::AppInfo::nativeUriProtocol(),
         binaryPath,
+        QnClientAppInfo::macOsBundleName(),
         QnAppInfo::productNameLong(),
         nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
         QnAppInfo::customizationName(),
         m_clientVersion);
-
-#elif defined(Q_OS_MAC)
-    return nx::utils::registerSystemUriProtocolHandler(
-        nx::vms::utils::AppInfo::nativeUriProtocol(),
-        QnClientAppInfo::macOsBundleName());
 #else
     return true;
 #endif
