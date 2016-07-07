@@ -22,8 +22,6 @@ namespace {
 
 const int kUpdateLockTimeoutMs = 1000;
 
-const QString kVersionFile = lit("launcher.version");
-
 }
 
 namespace nx {
@@ -104,7 +102,7 @@ bool SelfUpdater::updateApplauncher()
     }
 
     /* Check installed applauncher version. */
-    QString versionFile = applauncherDirPath + L'/' + kVersionFile;
+    QString versionFile = applauncherDirPath + L'/' + QnClientAppInfo::launcherVersionFile();
     auto applauncherVersion = getVersionFromFile(versionFile);
     if (m_clientVersion <= applauncherVersion)
     {
@@ -282,7 +280,7 @@ bool SelfUpdater::isMinilaucherUpdated(const QString& installRoot) const
         return false;
 
     /* Check installed applauncher version. */
-    QString versionFile = installRoot + + L'/' + kVersionFile;
+    QString versionFile = installRoot + + L'/' + QnClientAppInfo::launcherVersionFile();
     auto minilauncherVersion = getVersionFromFile(versionFile);
     return (m_clientVersion <= minilauncherVersion);
 }
@@ -381,7 +379,7 @@ bool SelfUpdater::updateMinilauncherInDir(const QString& installRoot)
     }
 
     /* Finally, is case of success, save version to file. */
-    QString versionFile = installRoot + + L'/' + kVersionFile;
+    QString versionFile = installRoot + + L'/' + QnClientAppInfo::launcherVersionFile();
     if (!saveVersionToFile(versionFile, m_clientVersion))
     {
         NX_LOG(lit("Version could not be written to file: %1.").arg(versionFile), cl_logERROR);

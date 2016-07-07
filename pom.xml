@@ -124,6 +124,7 @@
         <minilauncher.binary.name>applauncher</minilauncher.binary.name>
         <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
         <installation.root>/opt/${deb.customization.company.name}</installation.root>
+        <launcher.version.file>launcher.version</launcher.version.file>
 
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
