@@ -4,7 +4,7 @@
 #if defined(Q_OS_MAC)
 
 #include <QtCore/QString>
-#include <platform/core_foundation/cf_ref_holder.h>
+#include <platform/core_foundation_mac/cf_ref_holder.h>
 
 namespace cf {
 

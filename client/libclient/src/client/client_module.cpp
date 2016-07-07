@@ -11,10 +11,7 @@
 #include <api/session_manager.h>
 
 #include <common/common_module.h>
-
-#ifdef Q_OS_WIN
-#include <common/systemexcept_win32.h>
-#endif
+#include <common/systemexcept.h>
 
 #include <camera/camera_bookmarks_manager.h>
 

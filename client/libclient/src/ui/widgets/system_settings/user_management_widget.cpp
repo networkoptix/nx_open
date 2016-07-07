@@ -387,7 +387,7 @@ bool QnUserManagementWidget::enableUser(const QnUserResourcePtr& user, bool enab
     if (user->isOwner())
         return false;
 
-    if (!accessController()->hasPermissions(user, Qn::WritePermission))
+    if (!accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission))
         return false;
 
     qnResourcesChangesManager->saveUser(user, [enabled](const QnUserResourcePtr &user)

@@ -6,8 +6,6 @@
 
 #include <qglobal.h>
 
-#if defined(Q_OS_DARWIN) || defined(Q_OS_LINUX)
-
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include "../file.h"
@@ -179,5 +177,3 @@ qint64 QnFile::getFileSize( const QString& fileName )
         return -1;
     return fstat.st_size;
 }
-
-#endif

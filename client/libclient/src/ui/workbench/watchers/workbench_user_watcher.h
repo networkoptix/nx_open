@@ -64,7 +64,6 @@ private:
     QString m_userName;
     QString m_userPassword;
     QByteArray m_userDigest;
-    Qn::GlobalPermissions m_userPermissions;
     QnUserResourcePtr m_user;
     bool m_reconnectOnPasswordChange;
 };

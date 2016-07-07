@@ -38,12 +38,7 @@
 using mobile_client::conf;
 
 // TODO mike: REMOVE
-#ifdef Q_OS_WIN
-    #include <common/systemexcept_win32.h>
-#endif
-#ifdef Q_OS_LINUX
-    #include <common/systemexcept_linux.h>
-#endif
+#include <common/systemexcept.h>
 
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());

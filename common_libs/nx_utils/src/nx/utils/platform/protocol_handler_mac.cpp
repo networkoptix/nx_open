@@ -5,15 +5,11 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
-#include <QtCore/QSet>
 
 #include <CoreServices/CoreServices.h>
 
-#include <platform/core_foundation/cf_url.h>
-#include <platform/core_foundation/cf_string.h>
-
-#include <utils/common/app_info.h>
-#include <utils/common/software_version.h>
+#include <platform/core_foundation_mac/cf_url.h>
+#include <platform/core_foundation_mac/cf_string.h>
 
 namespace {
 

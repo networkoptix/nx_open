@@ -2,13 +2,11 @@
 // 18 aug 2013    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifdef _WIN32
-
 #include "named_pipe_server.h"
 
 #include <aclapi.h>
 
-#include "named_pipe_socket_win32.h"
+#include "named_pipe_socket_win.h"
 
 #pragma comment(lib, "advapi32.lib")
 
@@ -211,5 +209,3 @@ SystemError::ErrorCode NamedPipeServer::accept( NamedPipeSocket** sock, int time
 
     return SystemError::noError;
 }
-
-#endif

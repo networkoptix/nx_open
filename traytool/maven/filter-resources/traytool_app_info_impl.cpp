@@ -8,7 +8,7 @@ QString QnTraytoolAppInfo::applicationName()
     return QStringLiteral("${product.title}");
 }
 
-QString QnTraytoolAppInfo::applicationDisplayName()
+QString QnTraytoolAppInfo::clientName()
 {
-    return QStringLiteral("${product.display.title}");
+    return QStringLiteral("${client.name}");
 }

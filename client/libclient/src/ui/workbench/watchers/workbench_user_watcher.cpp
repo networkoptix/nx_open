@@ -50,14 +50,16 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
     m_user = user;
     m_userPassword = QString();
     m_userDigest = QByteArray();
-    m_userPermissions = Qn::NoGlobalPermissions;
 
     if (m_user)
     {
         m_userDigest = m_user->getDigest();
-        m_userPermissions = qnResourceAccessManager->globalPermissions(m_user);
         connect(m_user, &QnResource::resourceChanged,        this, &QnWorkbenchUserWatcher::at_user_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
         connect(m_user, &QnUserResource::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
+        connect(m_user, &QnUserResource::userGroupChanged,   this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
+        connect(m_user, &QnUserResource::enabledChanged,     this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
+        connect(m_user, &QnUserResource::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
+
     }
 
     emit userChanged(user);
@@ -153,12 +155,6 @@ void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnResourcePtr &use
 {
     if (!m_user || user.dynamicCast<QnUserResource>() != m_user)
         return;
-
-    Qn::GlobalPermissions newPermissions = qnResourceAccessManager->globalPermissions(m_user);
-    /* Reconnect if some permissions were changed*/
-    const bool reconnect = (newPermissions != m_userPermissions);
-    m_userPermissions = newPermissions;
-    if (reconnect)
-        emit reconnectRequired();
+    emit reconnectRequired();
 }
 

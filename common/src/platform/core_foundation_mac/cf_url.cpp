@@ -4,7 +4,7 @@
 #if defined(Q_OS_MAC)
 
 #include <QtCore/QString>
-#include <platform/core_foundation/cf_string.h>
+#include <platform/core_foundation_mac/cf_string.h>
 
 cf::QnCFUrl::QnCFUrl() :
     base_type()
