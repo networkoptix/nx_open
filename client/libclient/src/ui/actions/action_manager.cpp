@@ -1466,7 +1466,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::UserGroupsAction).
         flags(Qn::Tree | Qn::NoTarget).
-        text(tr("Users Groups...")).
+        text(tr("User Roles...")).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this));
 
