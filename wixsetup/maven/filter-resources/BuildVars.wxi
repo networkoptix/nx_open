@@ -16,6 +16,7 @@
     <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>
     <?define clientName = "${product.name}"?>
     <?define nxtoolName = "${short.company.name} Server Tool"?>
+    <?define launcherVersionFile = "${launcher.version.file}"?>
 
     <?define productExeName = "${product.name}"?>
     <?define clientExeName = "${display.product.name}"?>
