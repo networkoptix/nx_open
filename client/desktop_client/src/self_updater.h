@@ -53,6 +53,13 @@ private:
 
     Result osCheck(Operation operation, bool result);
     void launchWithAdminPermissions();
+
+    bool isMinilaucherUpdated(const QString& installRoot) const;
+    bool runMinilaucher() const;
+    bool updateMinilauncherInDir(const QString& installRoot);
+
+    /** Get all paths where client might be installed. */
+    QStringList getClientInstallRoots() const;
 private:
     nx::utils::SoftwareVersion m_clientVersion;
 };

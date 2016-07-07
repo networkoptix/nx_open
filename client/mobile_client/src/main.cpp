@@ -152,6 +152,12 @@ int runUi(QGuiApplication *application) {
     nx::media::DecoderRegistrar::registerDecoders(
         allocator, maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
 
+#if defined(Q_OS_ANDROID)
+    QUrl initialIntentData = getInitialIntentData();
+    if (initialIntentData.isValid())
+        QDesktopServices::openUrl(initialIntentData);
+#endif
+
     return application->exec();
 }
 
@@ -262,7 +268,7 @@ int main(int argc, char *argv[])
         AllowSetForegroundWindow(ASFW_ANY);
         win32_exception::installGlobalUnhandledExceptionHandler();
     #endif
-    #if defined(Q_OS_LINUX)
+    #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
         linux_exception::installCrashSignalHandler();
     #endif
 

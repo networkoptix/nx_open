@@ -17,6 +17,16 @@ struct QnClientAppInfo
     /** Name of the client binary in the filesystem (client-bin, HD Witness.exe). */
     static QString clientBinaryName();
 
+    /** Directory where all software is installed by default. */
+    static QString installationRoot();
+
     /** Resource file id for videowall shortcut. */
     static int videoWallIconId();
+
+#if defined(Q_OS_MAC)
+    /** Mac OS Installer Bundle Name */
+    static QString macOsBundleName();
+#endif
+
+    static QString launcherVersionFile();
 };

@@ -57,9 +57,6 @@ struct QnAppInfo
     static QString freeLicenseKey();
     static bool    freeLicenseIsTrial();
 
-    /** Folder where application is installed normally. */
-    static QString installationRoot();
-
     // helpers:
 
     inline

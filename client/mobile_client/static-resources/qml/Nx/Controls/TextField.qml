@@ -224,6 +224,7 @@ QnTextInput
     {
         id: selectionStartHandle
         anchor: "selectionStart"
+        input: control
         x: positionListener.scenePos.x + localX
         y: positionListener.scenePos.y + localY
         parent: control.activeFocus ? Window.contentItem : control
@@ -233,6 +234,7 @@ QnTextInput
     {
         id: selectionEndHandle
         anchor: "selectionEnd"
+        input: control
         x: positionListener.scenePos.x + localX
         y: positionListener.scenePos.y + localY
         parent: control.activeFocus ? Window.contentItem : control

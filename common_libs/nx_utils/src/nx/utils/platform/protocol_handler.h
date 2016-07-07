@@ -21,9 +21,15 @@ NX_UTILS_API bool registerSystemUriProtocolHandler(
     const QString& customization,
     const SoftwareVersion& version);
 #endif
-
 #ifdef Q_OS_WIN
 NX_UTILS_API bool runAsAdministratorWithUAC(const QString& applicationBinaryPath, const QStringList& parameters);
+#endif
+
+#ifdef Q_OS_MAC
+NX_UTILS_API bool registerSystemUriProtocolHandler(
+    const QString& protocol
+    , const QString& bundleId);
+
 #endif
 
 } // namespace utils

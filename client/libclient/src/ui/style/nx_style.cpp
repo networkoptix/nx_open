@@ -145,8 +145,12 @@ namespace
     {
         if (qstyleoption_cast<const QStyleOptionButton*>(option))
         {
-            if (option->state.testFlag(QStyle::State_On) || option->state.testFlag(QStyle::State_Off))
+            if (option->state.testFlag(QStyle::State_On) ||
+                option->state.testFlag(QStyle::State_Off) ||
+                option->state.testFlag(QStyle::State_NoChange))
+            {
                 return true;
+            }
 
             const QAbstractButton* buttonWidget = qobject_cast<const QAbstractButton*>(option->styleObject);
             if (buttonWidget && buttonWidget->isCheckable())
@@ -154,6 +158,11 @@ namespace
         }
 
         return false;
+    }
+
+    bool isSwitchButtonCheckbox(const QWidget* widget)
+    {
+        return widget && widget->property(Properties::kCheckBoxAsButton).toBool();
     }
 
     /* Checks whether view item contains a checkbox without any text or decoration: */
@@ -1399,6 +1408,9 @@ void QnNxStyle::drawControl(
 {
     Q_D(const QnNxStyle);
 
+    if (element == CE_CheckBox && isSwitchButtonCheckbox(widget))
+        element = CE_PushButton;
+
     switch (element)
     {
         case CE_ShapedFrame:
@@ -2498,6 +2510,9 @@ QSize QnNxStyle::sizeFromContents(
         const QSize &size,
         const QWidget *widget) const
 {
+    if (type == CT_CheckBox && isSwitchButtonCheckbox(widget))
+        type = CT_PushButton;
+
     switch (type)
     {
         case CT_CheckBox:
