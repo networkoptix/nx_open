@@ -23,6 +23,8 @@ class QnContext: public QObject, public QnInstanceStorage {
     Q_PROPERTY(QnMobileClientUiController* uiController READ uiController NOTIFY nothingChanged)
     Q_PROPERTY(QnUserWatcher* userWatcher READ userWatcher NOTIFY nothingChanged)
     Q_PROPERTY(bool liteMode READ liteMode NOTIFY liteModeChanged)
+    Q_PROPERTY(bool testMode READ testMode NOTIFY nothingChanged)
+    Q_PROPERTY(QString initialTest READ initialTest NOTIFY nothingChanged)
 
 public:
     QnContext(QObject *parent = NULL);
@@ -63,6 +65,9 @@ public:
     Q_INVOKABLE int getMaxTextureSize() const;
 
     Q_INVOKABLE bool liteMode() const;
+
+    Q_INVOKABLE bool testMode() const;
+    Q_INVOKABLE QString initialTest() const;
 
     Q_INVOKABLE void removeSavedConnection(const QString& systemName);
 

@@ -232,7 +232,14 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
         lit("GUID which is used to check Videowall Control messages."));
     parser.addOption(videowallInstanceGuidOption);
 
-    parser.process(application);
+    auto testOption = QCommandLineOption(
+        lit("test"),
+        lit("Enable test."),
+        lit("test"));
+    testOption.setHidden(true);
+    parser.addOption(testOption);
+
+    parser.parse(application.arguments());
 
     if (parser.isSet(basePathOption))
     {
@@ -254,6 +261,12 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
     {
         *outVideowallInstanceGuid = QnUuid::fromStringSafe(
             parser.value(videowallInstanceGuidOption));
+    }
+
+    if (parser.isSet(testOption))
+    {
+        qnSettings->setTestMode(true);
+        qnSettings->setInitialTest(parser.value(testOption));
     }
 }
 

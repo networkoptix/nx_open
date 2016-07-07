@@ -34,6 +34,8 @@ ApplicationWindow
 
     UiController {}
 
+    Loader { id: testLoader }
+
     Component.onCompleted:
     {
         updateNavigationBarPadding()
@@ -54,6 +56,9 @@ ApplicationWindow
         {
             Workflow.openSessionsScreen()
         }
+
+        if (initialTest)
+            Workflow.startTest(initialTest)
     }
 
     Component.onDestruction:

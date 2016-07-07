@@ -73,6 +73,7 @@ Page
     CamerasGrid
     {
         id: camerasGrid
+        objectName: "camerasGrid"
 
         anchors
         {
