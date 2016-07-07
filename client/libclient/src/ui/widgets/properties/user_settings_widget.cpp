@@ -103,8 +103,10 @@ bool QnUserSettingsWidget::hasChanges() const
             Qn::GlobalPermissions permissions = selectedPermissions();
             if (permissions != Qn::NoGlobalPermissions
                 && permissions != qnResourceAccessManager->globalPermissions(m_model->user()))
+            {
                 return true;
         }
+    }
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
@@ -167,7 +169,6 @@ void QnUserSettingsWidget::applyChanges()
     {
         QnUuid groupId = selectedUserGroup();
         m_model->user()->setUserGroup(groupId);
-        if (groupId.isNull())
             m_model->user()->setRawPermissions(selectedPermissions());
     }
 
@@ -299,20 +300,6 @@ void QnUserSettingsWidget::updateControlsAccess()
     ui->nameInputField->setReadOnly(!permissions.testFlag(Qn::WriteFullNamePermission));
     ui->enabledButton->setVisible(permissions.testFlag(Qn::WriteAccessRightsPermission));
 }
-
-    //bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
-    //auto groups = qnResourceAccessManager->userGroups();
-    //std::sort(groups.begin(), groups.end(), [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
-    //{
-    //    /* Case Sensitive sort. */
-    //    return nx::utils::naturalStringCompare(l.name, r.name) < 0;
-    //});
-
-    //for (const ec2::ApiUserGroupData& group : groups)
-    //{
-    //    if (isAdmin || group.id == m_model->user()->userGroup())
-    //        addCustomGroup(group);
-    //}
 
 Qn::GlobalPermissions QnUserSettingsWidget::selectedPermissions() const
 {

@@ -195,8 +195,7 @@ void QnUserGroupsDialog::applyChanges()
             qnResourcesChangesManager->saveUser(user, [replacement](const QnUserResourcePtr &user)
             {
                 user->setUserGroup(replacement.group);
-                if (replacement.group.isNull())
-                    user->setRawPermissions(replacement.permissions);
+                user->setRawPermissions(replacement.permissions);
             });
         }
 
