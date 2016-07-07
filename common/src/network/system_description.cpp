@@ -23,49 +23,52 @@ namespace
 #undef EXTRACT_CHANGE_FLAG
 }
 
-QnSystemDescription::PointerType QnSystemDescription::createLocalSystem(const QString &systemId
-    , const QString &systemName)
+QnSystemDescription::PointerType QnSystemDescription::createLocalSystem(
+    const QString& systemId, 
+    const QString& systemName)
 {
-    return PointerType(
-        new QnSystemDescription(systemId, systemName));
+    return PointerType(new QnSystemDescription(systemId, systemName));
 }
 
-QnSystemDescription::PointerType QnSystemDescription::createCloudSystem(const QString &systemId
-    , const QString &systemName
-    , const QString &ownerAccountEmail
-    , const QString &ownerFullName)
+QnSystemDescription::PointerType QnSystemDescription::createCloudSystem(
+    const QString& systemId,
+    const QString& systemName,
+    const QString& ownerAccountEmail,
+    const QString& ownerFullName)
 {
     return PointerType(
         new QnSystemDescription(systemId, systemName
             , ownerAccountEmail, ownerFullName));
 }
 
-QnSystemDescription::QnSystemDescription(const QString &systemId
-    , const QString &systemName)
-    : m_id(systemId)
-    , m_systemName(systemName)
-    , m_ownerAccountEmail()
-    , m_ownerFullName()
-    , m_isCloudSystem(false)
-    , m_serverTimestamps()
-    , m_servers()
-    , m_prioritized()
-    , m_hosts()
+QnSystemDescription::QnSystemDescription(const QString& systemId, const QString& systemName)
+    : 
+    m_id(systemId),
+    m_systemName(systemName),
+    m_ownerAccountEmail(),
+    m_ownerFullName(),
+    m_isCloudSystem(false),
+    m_serverTimestamps(),
+    m_servers(),
+    m_prioritized(),
+    m_hosts()
 {}
 
-QnSystemDescription::QnSystemDescription(const QString &systemId
-    , const QString &systemName
-    , const QString &cloudOwnerAccountEmail
-    , const QString &ownerFullName)
-    : m_id(systemId)
-    , m_systemName(systemName)
-    , m_ownerAccountEmail(cloudOwnerAccountEmail)
-    , m_ownerFullName(ownerFullName)
-    , m_isCloudSystem(true)
-    , m_serverTimestamps()
-    , m_servers()
-    , m_prioritized()
-    , m_hosts() 
+QnSystemDescription::QnSystemDescription(
+    const QString& systemId,
+    const QString& systemName,
+    const QString& cloudOwnerAccountEmail,
+    const QString& ownerFullName)
+    : 
+    m_id(systemId),
+    m_systemName(systemName),
+    m_ownerAccountEmail(cloudOwnerAccountEmail),
+    m_ownerFullName(ownerFullName),
+    m_isCloudSystem(true),
+    m_serverTimestamps(),
+    m_servers(),
+    m_prioritized(),
+    m_hosts() 
 {}
 
 QnSystemDescription::~QnSystemDescription()
@@ -108,12 +111,10 @@ QnSystemDescription::ServersList QnSystemDescription::servers() const
     return result;
 }
 
-void QnSystemDescription::addServer(const QnModuleInformation &serverInfo
-    , int priority)
+void QnSystemDescription::addServer(const QnModuleInformation& serverInfo, int priority)
 {
     const bool containsServer = m_servers.contains(serverInfo.id);
-    NX_ASSERT(!containsServer, Q_FUNC_INFO
-        , "System contains specified server");
+    NX_ASSERT(!containsServer, Q_FUNC_INFO, "System contains specified server");
 
     if (containsServer)
     {
@@ -127,24 +128,24 @@ void QnSystemDescription::addServer(const QnModuleInformation &serverInfo
     emit serverAdded(serverInfo.id);
 }
 
-bool QnSystemDescription::containsServer(const QnUuid &serverId) const
+bool QnSystemDescription::containsServer(const QnUuid& serverId) const
 {
     return m_servers.contains(serverId);
 }
 
-QnModuleInformation QnSystemDescription::getServer(const QnUuid &serverId) const
+QnModuleInformation QnSystemDescription::getServer(const QnUuid& serverId) const
 {
-    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO
-        , "System does not contain specified server");
+    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO,
+        "System does not contain specified server");
     return m_servers.value(serverId);
 }
 
-QnServerFields QnSystemDescription::updateServer(const QnModuleInformation &serverInfo)
+QnServerFields QnSystemDescription::updateServer(const QnModuleInformation& serverInfo)
 {
     const auto it = m_servers.find(serverInfo.id);
     const bool containsServer = (it != m_servers.end());
-    NX_ASSERT(containsServer, Q_FUNC_INFO
-        , "System does not contain specified server");
+    NX_ASSERT(containsServer, Q_FUNC_INFO, 
+        "System does not contain specified server");
 
     if (!containsServer)
     {
@@ -152,7 +153,7 @@ QnServerFields QnSystemDescription::updateServer(const QnModuleInformation &serv
         return QnServerField::NoField;
     }
 
-    auto &current = it.value();
+    auto& current = it.value();
     const auto changes = getChanges(current, serverInfo);
     m_serverTimestamps[serverInfo.id].restart();
     current = serverInfo;
@@ -163,18 +164,16 @@ QnServerFields QnSystemDescription::updateServer(const QnModuleInformation &serv
     return changes;
 }
 
-void QnSystemDescription::removeServer(const QnUuid &serverId)
+void QnSystemDescription::removeServer(const QnUuid& serverId)
 {
     const bool containsServer = m_servers.contains(serverId);
-    NX_ASSERT(containsServer, Q_FUNC_INFO
-        , "System does not contain specified server");
+    NX_ASSERT(containsServer, Q_FUNC_INFO,
+        "System does not contain specified server");
     if (!containsServer)
         return;
 
-    const auto priorityPred = [serverId](const QnUuid &id)
-        { return (serverId == id); };
-    const auto it = std::find_if(m_prioritized.begin()
-        , m_prioritized.end(), priorityPred);
+    const auto priorityPred = [serverId](const QnUuid &id) { return (serverId == id); };
+    const auto it = std::find_if(m_prioritized.begin(), m_prioritized.end(), priorityPred);
     if (it != m_prioritized.end())
         m_prioritized.erase(it);
 
@@ -185,13 +184,12 @@ void QnSystemDescription::removeServer(const QnUuid &serverId)
         emit serverRemoved(serverId);
 }
 
-void QnSystemDescription::setServerHost(const QnUuid &serverId
-    , const QString &host)
+void QnSystemDescription::setServerHost(const QnUuid& serverId, const QString& host)
 {
     const bool containsServer = m_servers.contains(serverId);
 
-    NX_ASSERT(containsServer, Q_FUNC_INFO
-        , "System does not contain specified server");
+    NX_ASSERT(containsServer, Q_FUNC_INFO,
+        "System does not contain specified server");
 
     if (!containsServer)
         return;
@@ -207,18 +205,18 @@ void QnSystemDescription::setServerHost(const QnUuid &serverId
     emit serverChanged(serverId, QnServerField::HostField);
 }
 
-QString QnSystemDescription::getServerHost(const QnUuid &serverId) const
+QString QnSystemDescription::getServerHost(const QnUuid& serverId) const
 {
-    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO
-        , "System does not contain specified server");
+    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO,
+        "System does not contain specified server");
 
     return m_hosts.value(serverId);
 }
 
-qint64 QnSystemDescription::getServerLastUpdatedMs(const QnUuid &serverId) const
+qint64 QnSystemDescription::getServerLastUpdatedMs(const QnUuid& serverId) const
 {
-    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO
-        , "System does not contain specified server");
+    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO, 
+        "System does not contain specified server");
 
     return m_serverTimestamps.value(serverId).elapsed();
 }
