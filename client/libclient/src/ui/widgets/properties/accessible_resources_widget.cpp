@@ -330,7 +330,6 @@ void QnAccessibleResourcesWidget::applyChanges()
         for (const auto& layout : layoutsToShare)
         {
             layout->setParentId(QnUuid());
-            NX_ASSERT(layout->isShared());
             menu()->trigger(QnActions::SaveLayoutAction, QnActionParameters(layout));
         }
     }
@@ -428,8 +427,7 @@ bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resour
             if (layout->isFile())
                 return false;
 
-            return !layout->hasFlags(Qn::local) &&
-                (layout->isShared() || layout->getParentId() == currentUser->getId());
+            return layout->isShared() || layout->getParentId() == currentUser->getId();
         }
 
         default:
@@ -463,22 +461,11 @@ void QnAccessibleResourcesWidget::initResourcesModel()
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this, refreshModel);
     refreshModel();
 
-    auto handleResourceRemoved = [this](const QnResourcePtr& resource)
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this, refreshModel](const QnResourcePtr& resource)
     {
         m_resourcesModel->removeResource(resource);
-    };
-
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this, handleResourceRemoved](const QnResourcePtr& resource)
-    {
-        handleResourceRemoved(resource);
         if (resource == context()->user())
-        {
-            for (const QnResourcePtr& modelResource : m_resourcesModel->resources())
-            {
-                if (!resourcePassFilter(modelResource))
-                    handleResourceRemoved(modelResource);
-            }
-        }
+            refreshModel();
     });
 
     connect(m_resourcesModel.data(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
