@@ -4,6 +4,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include "abstract_audio_decoder.h"
+#include <utils/media/ffmpeg_helper.h>
 
 /**
  * Client of this class is responsible for encoded data buffer meet ffmpeg
@@ -19,12 +20,13 @@ public:
     static AVSampleFormat audioFormatQtToFfmpeg(const QnAudioFormat& fmt);
 
 private:
-    AVCodec *codec;
-    AVCodecContext *c; // TODO: #vasilenko please name these members properly
+    AVCodec* codec;
+    AVCodecContext* m_audioDecoderCtx;
 
     static bool m_first_instance;
     AVCodecID m_codec;
     AVFrame* m_outFrame;
+    std::unique_ptr<QnFfmpegAudioHelper> m_audioHelper;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

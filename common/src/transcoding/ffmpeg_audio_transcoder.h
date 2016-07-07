@@ -7,6 +7,7 @@
 
 #include "transcoder.h"
 #include "utils/common/byte_array.h"
+#include <utils/media/ffmpeg_helper.h>
 
 class QnFfmpegAudioTranscoder: public QnAudioTranscoder
 {
@@ -39,6 +40,7 @@ private:
     ReSampleContext* m_resampleCtx;
     int m_dstSampleRate;
     AVFrame* m_outFrame;
+    std::unique_ptr<QnFfmpegAudioHelper> m_audioHelper;
 };
 
 typedef QSharedPointer<QnFfmpegAudioTranscoder> QnFfmpegAudioTranscoderPtr;

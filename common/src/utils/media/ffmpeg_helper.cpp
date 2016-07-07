@@ -13,6 +13,7 @@
 extern "C"
 {
 #include <libavutil/error.h>
+#include <libswresample/swresample.h>
 #include <libavutil/opt.h>
 }
 
@@ -261,4 +262,36 @@ QString QnFfmpegHelper::getErrorStr(int errnum)
     if (av_strerror(errnum, result.data(), result.size()) != 0)
         return QString(QString::fromLatin1("Unknown FFMPEG error with code %d")).arg(errnum);
     return QString::fromLatin1(result);
+}
+
+int QnFfmpegHelper::audioSampleSize(AVCodecContext* ctx)
+{
+    return ctx->channels * av_get_bytes_per_sample(ctx->sample_fmt);
+}
+
+
+QnFfmpegAudioHelper::QnFfmpegAudioHelper(AVCodecContext* decoderContex):
+    m_swr(swr_alloc())
+{
+    av_opt_set_int(m_swr, "in_channel_layout", decoderContex->channel_layout, 0);
+    av_opt_set_int(m_swr, "out_channel_layout", decoderContex->channel_layout, 0);
+    av_opt_set_int(m_swr, "in_sample_rate", decoderContex->sample_rate, 0);
+    av_opt_set_int(m_swr, "out_sample_rate", decoderContex->sample_rate, 0);
+    av_opt_set_sample_fmt(m_swr, "in_sample_fmt", decoderContex->sample_fmt, 0);
+    av_opt_set_sample_fmt(m_swr, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
+    swr_init(m_swr);
+}
+
+QnFfmpegAudioHelper::~QnFfmpegAudioHelper()
+{
+    swr_free(&m_swr);
+}
+
+void QnFfmpegAudioHelper::copyAudioSamples(quint8* dst, const AVFrame* src)
+{
+    quint8* tmpData[4];
+    tmpData[0] = dst;
+    swr_convert(m_swr,
+        tmpData, src->nb_samples,
+        (const quint8**) src->data, src->nb_samples);
 }

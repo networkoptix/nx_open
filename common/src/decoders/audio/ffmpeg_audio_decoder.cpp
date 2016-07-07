@@ -31,7 +31,7 @@ AVSampleFormat QnFfmpegAudioDecoder::audioFormatQtToFfmpeg(const QnAudioFormat& 
 // ================================================
 
 QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(QnCompressedAudioDataPtr data):
-    c(0),
+    m_audioDecoderCtx(0),
     m_codec(data->compressionType),
     m_outFrame(av_frame_alloc())
 {
@@ -49,15 +49,15 @@ QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(QnCompressedAudioDataPtr data):
     else
     {
         codec = 0;
-        c = 0;
+        m_audioDecoderCtx = 0;
         return;
     }
 
-    c = avcodec_alloc_context3(codec);
+    m_audioDecoderCtx = avcodec_alloc_context3(codec);
 
     if (data->context)
     {
-        QnFfmpegHelper::mediaContextToAvCodecContext(c, data->context);
+        QnFfmpegHelper::mediaContextToAvCodecContext(m_audioDecoderCtx, data->context);
     }
     else {
         NX_ASSERT(false, Q_FUNC_INFO, "Audio packets without codec is deprecated!");
@@ -81,13 +81,13 @@ QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(QnCompressedAudioDataPtr data):
         }
         */
     }
-    avcodec_open2(c, codec, NULL);
+    avcodec_open2(m_audioDecoderCtx, codec, NULL);
 }
 
 QnFfmpegAudioDecoder::~QnFfmpegAudioDecoder(void)
 {
-    QnFfmpegHelper::deleteAvCodecContext(c);
-    c = 0;
+    QnFfmpegHelper::deleteAvCodecContext(m_audioDecoderCtx);
+    m_audioDecoderCtx = m_audioDecoderCtx;
     av_frame_free(&m_outFrame);
 }
 
@@ -118,26 +118,29 @@ bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
         int got_frame = 0;
         // todo: ffmpeg-test
-        int len = avcodec_decode_audio4(c, m_outFrame, &got_frame, &avpkt);
+        int inputConsumed = avcodec_decode_audio4(m_audioDecoderCtx, m_outFrame, &got_frame, &avpkt);
+        if (inputConsumed < 0)
+            return false;
         if (got_frame)
         {
-            if (outbuf_len + m_outFrame->pkt_size > (int)result.capacity())
+            int decodedBytes = m_outFrame->nb_samples * QnFfmpegHelper::audioSampleSize(m_audioDecoderCtx);
+            if (outbuf_len + decodedBytes > (int)result.capacity())
             {
                 //NX_ASSERT(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
                 result.reserve(result.capacity() * 2);
                 outbuf = (quint8*)result.data() + outbuf_len;
             }
 
-            memcpy(outbuf, m_outFrame->data, m_outFrame->pkt_size);
+            if (!m_audioHelper)
+                m_audioHelper.reset(new QnFfmpegAudioHelper(m_audioDecoderCtx));
+            m_audioHelper->copyAudioSamples(outbuf, m_outFrame);
+
+            outbuf_len += decodedBytes;
+            outbuf += decodedBytes;
         }
 
-        if (len < 0)
-            return false;
-
-        outbuf_len += m_outFrame->pkt_size;
-        outbuf += m_outFrame->pkt_size;
-        size -= len;
-        inbuf_ptr += len;
+        size -= inputConsumed;
+        inbuf_ptr += inputConsumed;
 
     }
     result.finishWriting(outbuf_len);

@@ -63,6 +63,8 @@ public:
 
     static QString getErrorStr(int errnum);
 
+    static int audioSampleSize(AVCodecContext* ctx);
+
 private:
     static void copyMediaContextFieldsToAvCodecContext(
         AVCodecContext* av, const QnConstMediaContextPtr& media);
@@ -90,6 +92,19 @@ private:
         StaticHolder(const StaticHolder&);
         void operator=(const StaticHolder&);
     };
+};
+
+struct SwrContext;
+
+class QnFfmpegAudioHelper
+{
+public:
+    QnFfmpegAudioHelper(AVCodecContext* decoderContex);
+    ~QnFfmpegAudioHelper();
+
+    void copyAudioSamples(quint8* dst, const AVFrame* src);
+private:
+    SwrContext* m_swr;
 };
 
 #endif // __FFMPEG_HELPER_H
