@@ -83,17 +83,31 @@ def gentext(file, path, extensions, text):
 
                 cond = ''
                 if n.endswith('_win') or parent.endswith('_win'):
-                    cond = 'win*:'
-                elif n.endswith('_mac') or parent.endswith('_mac'):
-                    cond = 'mac:'
+                    cond = 'win32:'
                 elif n.endswith('_linux') or parent.endswith('_linux'):
                     cond = 'linux*:'
+                    if os.path.exists(rreplace(p, '_linux', '_android')):
+                        cond += '!android:'
                 elif n.endswith('_unix'):
                     cond = 'unix:'
-                    if(os.path.exists(rreplace(p, '_unix', '_mac'))):
-                        cond += '!mac:'
-                    if(os.path.exists(rreplace(p, '_unix', '_linux'))):
+                    if os.path.exists(rreplace(p, '_unix', '_linux')):
                         cond += '!linux*:'
+                    if os.path.exists(rreplace(p, '_unix', '_mac')):
+                        cond += '!mac:'
+                    if os.path.exists(rreplace(p, '_unix', '_macx')):
+                        cond += '!macx:'
+                    if os.path.exists(rreplace(p, '_unix', '_android')):
+                        cond += '!android:'
+                    if os.path.exists(rreplace(p, '_unix', '_ios')):
+                        cond += '!ios:'
+                elif n.endswith('_mac') or parent.endswith('_mac'):
+                    cond = 'mac:'
+                elif n.endswith('_macx') or parent.endswith('_macx'):
+                    cond = 'macx:'
+                elif n.endswith('_android') or parent.endswith('_android'):
+                    cond = 'android:'
+                elif n.endswith('_ios') or parent.endswith('_ios'):
+                    cond = 'ios:'
 
                 print >> file, '\n%s%s%s/%s' % (cond, text, path, os.path.join(parent, f))
 
