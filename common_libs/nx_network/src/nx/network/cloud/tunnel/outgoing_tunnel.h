@@ -8,6 +8,7 @@
 #include <utils/common/stoppable.h>
 
 #include "abstract_tunnel_connector.h"
+#include "nx/network/aio/basic_pollable.h"
 #include "nx/network/aio/timer.h"
 #include "nx/network/system_socket.h"
 #include "tunnel.h"
@@ -26,9 +27,20 @@ namespace cloud {
 */
 class NX_NETWORK_API OutgoingTunnel
 :
-    public Tunnel
+    public aio::BasicPollable
 {
 public:
+    typedef std::function<void(SystemError::ErrorCode,
+        std::unique_ptr<AbstractStreamSocket>)> SocketHandler;
+
+    enum class State
+    {
+        kInit,
+        kConnecting,
+        kConnected,
+        kClosed
+    };
+
     typedef std::function<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>)> NewConnectionHandler;
@@ -39,7 +51,9 @@ public:
     /**
        \note Calling party MUST not use object after \a OutgoingTunnel::pleaseStop call
      */
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void stopWhileInAioThread() override;
+
+    void setStateHandler(nx::utils::MoveOnlyFunc<void(State)> handler);
 
     /** Establish new connection.
     * @param timeout Zero means no timeout
@@ -54,6 +68,8 @@ public:
     void establishNewConnection(
         SocketAttributes socketAttributes,
         NewConnectionHandler handler);
+
+    static QString stateToString(State state);
 
 private:
     struct ConnectionRequestData
@@ -70,12 +86,15 @@ private:
         std::chrono::steady_clock::time_point,
         ConnectionRequestData> m_connectHandlers;
     std::map<CloudConnectType, std::unique_ptr<AbstractTunnelConnector>> m_connectors;
-    aio::Timer m_timer;
+    //std::unique_ptr<CrossNatConnector> m_connector;
+    std::unique_ptr<aio::Timer> m_timer;
     bool m_terminated;
     boost::optional<std::chrono::steady_clock::time_point> m_timerTargetClock;
-    int m_counter;
-    std::shared_ptr<AbstractOutgoingTunnelConnection> m_connection;
+    std::unique_ptr<AbstractOutgoingTunnelConnection> m_connection;
     SystemError::ErrorCode m_lastErrorCode;
+    QnMutex m_mutex;
+    State m_state;
+    nx::utils::MoveOnlyFunc<void(State)> m_stateHandler;
 
     void updateTimerIfNeeded();
     void updateTimerIfNeededNonSafe(
@@ -93,14 +112,6 @@ private:
         CloudConnectType connectorType,
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
-
-    void connectorsTerminated(
-        nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler);
-    void connectorsTerminatedNonSafe(
-        QnMutexLockerBase* const /*lock*/,
-        nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler);
-    void connectionTerminated(
-        nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler);
 };
 
 } // namespace cloud
