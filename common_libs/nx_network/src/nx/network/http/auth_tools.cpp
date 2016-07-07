@@ -51,11 +51,11 @@ bool addAuthorization(
 boost::optional<QCryptographicHash::Algorithm> parseAlgorithm(
     const StringType& algorithm)
 {
-    // TODO: #mux Perhaps we shell support some other algorithms?
+    // TODO: #mux Perhaps we should support some other algorithms?
     if (algorithm == "MD5") return QCryptographicHash::Md5;
     if (algorithm == "SHA-256") return QCryptographicHash::Sha256;
 
-    if (algorithm == "") return QCryptographicHash::Md5; // default
+    if (algorithm.isEmpty()) return QCryptographicHash::Md5; //< default
     return boost::none;
 }
 
