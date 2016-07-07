@@ -174,7 +174,7 @@ static bool calcDigestResponse(
 {
     const auto algorithm = fieldOrEmpty(inputParams, "algorithm");
     if (!parseAlgorithm(algorithm))
-        return false; // such algorithm is not supported
+        return false; //< such algorithm is not supported
 
     const auto nonce = fieldOrEmpty(inputParams, "nonce");
     const auto realm = fieldOrEmpty(inputParams, "realm");
@@ -182,7 +182,7 @@ static bool calcDigestResponse(
 
     // TODO #ak qop can have value "auth,auth-int". That should be supported
     if (qop.indexOf("auth-int") != -1)
-        return false;   // qop=auth-int is not supported
+        return false; //< qop=auth-int is not supported
 
     const BufferType& ha1 = predefinedHA1
         ? predefinedHA1.get()
@@ -258,7 +258,7 @@ bool validateAuthorization(
 {
     const auto& digestParams = digestAuthorizationHeader.digest->params;
 
-    const auto uri =  fieldOrEmpty(digestParams, "uri");
+    const auto uri = fieldOrEmpty(digestParams, "uri");
     if (uri.isEmpty())
         return false;
 
