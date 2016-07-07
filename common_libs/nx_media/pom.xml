@@ -25,6 +25,17 @@
         <rdep.ios.packages>libjpeg-turbo</rdep.ios.packages>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>    
+    </dependencies>    
+    
     <profiles>
         <profile>
             <id>windows</id>
