@@ -28,7 +28,7 @@ wstring utf8toUtf16(const string& str)
     if (charsConverted == 0)
         throw runtime_error("Failed converting UTF-8 string to UTF-16");
 
-    return wstring(&buffer[0], charsConverted);
+    return wstring(buffer.data(), charsConverted);
 }
 
 wstring closeDirPath(const wstring& name)
