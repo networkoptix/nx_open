@@ -74,7 +74,6 @@ libavutil \
 liblber-2.4 \
 libldap-2.4 \
 libldap_r-2.4 \
-libpostproc \
 libquazip \
 libsasl2 \
 libsigar \

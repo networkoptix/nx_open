@@ -66,7 +66,6 @@ libnx_utils.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libnx_email.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libpostproc.so.52.0.100 \
 libquazip.so.1.0.0 \
 libsasl2.so.3.0.0 \
 liblber-2.4.so.2.10.5 \
