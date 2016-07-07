@@ -93,6 +93,7 @@ private:
 
     std::vector<AudioSourceInfoPtr> m_audioSourcesInfo;
     SpeexPreprocessState* m_speexPreprocessState;
+    AVFrame* m_inputFrame;
 };
 
 

@@ -287,7 +287,8 @@ QnDesktopDataProvider::QnDesktopDataProvider (
     m_capturingStopped(false),
     m_logo(logo),
     m_started(false),
-    m_isInitialized(false)
+    m_isInitialized(false),
+    m_inputAudioFrame(av_frame_alloc())
 {
     if (audioDevice || audioDevice2)
     {
@@ -307,6 +308,7 @@ QnDesktopDataProvider::QnDesktopDataProvider (
 QnDesktopDataProvider::~QnDesktopDataProvider()
 {
     stop();
+    av_frame_free(&m_inputAudioFrame);
 }
 
 int QnDesktopDataProvider::calculateBitrate()
@@ -649,13 +651,12 @@ void QnDesktopDataProvider::putAudioData()
         outputPacket.data = m_encodedAudioBuf;
         outputPacket.size = FF_MIN_BUFFER_SIZE;
 
-        AVFrame inputFrame;
-        inputFrame.data[0] = (quint8*) buffer1;
-        inputFrame.pkt_size = m_audioCodecCtx->frame_size * 2;
+        m_inputAudioFrame->data[0] = (quint8*) buffer1;
+        m_inputAudioFrame->nb_samples = m_audioCodecCtx->frame_size;
 
         int got_packet = 0;
 
-        if (avcodec_encode_audio2(m_audioCodecCtx, &outputPacket, &inputFrame, &got_packet) < 0)
+        if (avcodec_encode_audio2(m_audioCodecCtx, &outputPacket, m_inputAudioFrame, &got_packet) < 0)
             continue;
         if (got_packet)
         {

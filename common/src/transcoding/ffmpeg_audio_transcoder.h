@@ -41,6 +41,7 @@ private:
     int m_dstSampleRate;
     AVFrame* m_outFrame;
     std::unique_ptr<QnFfmpegAudioHelper> m_audioHelper;
+    AVFrame* m_inputFrame;
 };
 
 typedef QSharedPointer<QnFfmpegAudioTranscoder> QnFfmpegAudioTranscoderPtr;

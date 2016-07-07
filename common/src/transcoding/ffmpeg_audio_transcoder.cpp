@@ -66,7 +66,8 @@ QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(AVCodecID codecId):
     m_frameNum(0),
     m_resampleCtx(0),
     m_dstSampleRate(0),
-    m_outFrame(av_frame_alloc())
+    m_outFrame(av_frame_alloc()),
+    m_inputFrame(av_frame_alloc())
 {
     m_bitrate = 128*1000;
     m_audioEncodingBuffer = (quint8*) qMallocAligned(AVCODEC_MAX_AUDIO_FRAME_SIZE, CL_MEDIA_ALIGNMENT);
@@ -81,6 +82,7 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
     QnFfmpegHelper::deleteAvCodecContext(m_encoderCtx);
     QnFfmpegHelper::deleteAvCodecContext(m_decoderContext);
     av_frame_free(&m_outFrame);
+    av_frame_free(&m_inputFrame);
 }
 
 bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
@@ -264,13 +266,12 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         outputPacket.data = m_audioEncodingBuffer;
         outputPacket.size = FF_MIN_BUFFER_SIZE;
 
-        AVFrame inputFrame;
-        inputFrame.data[0] = (quint8*) m_resampledData.data();
-        inputFrame.pkt_size = encoderFrameSize;
+        m_inputFrame->data[0] = (quint8*) m_resampledData.data();
+        m_inputFrame->nb_samples = m_encoderCtx->frame_size;
 
         int got_packet = 0;
 
-        if (avcodec_encode_audio2(m_encoderCtx, &outputPacket, &inputFrame, &got_packet) < 0)
+        if (avcodec_encode_audio2(m_encoderCtx, &outputPacket, m_inputFrame, &got_packet) < 0)
             return -3; //< TODO: needs refactor. add enum with error codes
         if (got_packet)
             encoded = outputPacket.size;

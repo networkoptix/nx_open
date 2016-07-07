@@ -27,7 +27,8 @@ QnDesktopAudioOnlyDataProvider::QnDesktopAudioOnlyDataProvider(QnResourcePtr ptr
     QnDesktopDataProviderBase(ptr),
     m_initialized(false),
     m_stopping(false),
-    m_encoderBuffer(nullptr)
+    m_encoderBuffer(nullptr),
+    m_inputFrame(av_frame_alloc())
 {
 }
 
@@ -36,6 +37,7 @@ QnDesktopAudioOnlyDataProvider::~QnDesktopAudioOnlyDataProvider()
     if (m_encoderBuffer)
         av_free(m_encoderBuffer);
     stop();
+    av_frame_free(&m_inputFrame);
 }
 
 void QnDesktopAudioOnlyDataProvider::pleaseStop()
@@ -364,16 +366,15 @@ QnWritableCompressedAudioDataPtr QnDesktopAudioOnlyDataProvider::encodePacket(ch
         (const short*) buffer);
     */
 
-    AVFrame inputFrame;
-    inputFrame.data[0] = (quint8*)buffer;
-    inputFrame.pkt_size = inputFrameSize;
+    m_inputFrame->data[0] = (quint8*)buffer;
+    m_inputFrame->nb_samples = ctx->frame_size;
 
     AVPacket outputPacket;
     outputPacket.data = m_encoderBuffer;
     outputPacket.size = FF_MIN_BUFFER_SIZE;
 
     int got_packet = 0;
-    if (avcodec_encode_audio2(ctx, &outputPacket, &inputFrame, &got_packet) < 0)
+    if (avcodec_encode_audio2(ctx, &outputPacket, m_inputFrame, &got_packet) < 0)
         return audio;
 
     if (got_packet)
