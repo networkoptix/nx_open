@@ -14,3 +14,8 @@ QString QnApplauncherAppInfo::mirrorListUrl()
 {
     return QStringLiteral("${mirrorListUrl}");
 }
+
+QString QnApplauncherAppInfo::installationRoot()
+{
+    return QStringLiteral("${installation.root}");
+}

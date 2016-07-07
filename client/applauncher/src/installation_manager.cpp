@@ -9,8 +9,11 @@
 #include <QtCore/QDir>
 #include <QtCore/QRegExp>
 
-#include <utils/common/app_info.h>
+#include <applauncher_app_info.h>
+
 #include <nx/utils/log/log.h>
+
+#include <utils/common/app_info.h>
 #include <utils/update/zip_utils.h>
 
 
@@ -51,15 +54,10 @@ void InstallationManager::removeInstallation(const QnSoftwareVersion &version)
     m_installationByVersion.remove(version);
 }
 
-InstallationManager::InstallationManager(QObject *parent): QObject(parent)
+InstallationManager::InstallationManager(QObject *parent):
+    QObject(parent)
 {
     //TODO/IMPL disguise writable install directories for different modules
-
-    //NOTE application path may be not-writable (actually it is always so if application running with no admistrator rights),
-        //so selecting different path for new installations
-//    QDir appDir( QCoreApplication::applicationDirPath() );
-//    appDir.cdUp();
-//    m_rootInstallDirectoryList.push_back( appDir.absolutePath() );
 
     m_installationsDir = QDir(defaultDirectoryForInstallations());
     updateInstalledVersionsInformation();
@@ -75,36 +73,45 @@ void InstallationManager::updateInstalledVersionsInformation()
     NX_LOG(QString::fromLatin1("Checking current version (%1)").arg(QnAppInfo::applicationVersion()), cl_logDEBUG1);
 
     QnClientInstallationPtr current = QnClientInstallation::installationForPath(QCoreApplication::applicationDirPath());
-    if (current) {
+    if (current)
+    {
         current->setVersion(QnSoftwareVersion(QnAppInfo::applicationVersion()));
         current->setNeedsVerification(false);
         installations.insert(current->version(), current);
-    } else {
+    }
+    else
+    {
         NX_LOG(QString::fromLatin1("Can't find client binary in %1").arg(QCoreApplication::applicationDirPath()), cl_logWARNING);
     }
 
     // find other versions
-    const QStringList &entries = m_installationsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-    foreach (const QString &entry, entries) {
-        if (!versionDirRegExp.exactMatch(entry))
-            continue;
+    QList<QDir> roots = { m_installationsDir, QnApplauncherAppInfo::installationRoot() };
+    for (const QDir& root : roots)
+    {
+        QStringList entries = root.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
 
-        QnClientInstallationPtr installation = QnClientInstallation::installationForPath(m_installationsDir.absoluteFilePath(entry));
-        if (installation.isNull())
-            continue;
+        for (const QString &entry : entries)
+        {
+            if (!versionDirRegExp.exactMatch(entry))
+                continue;
 
-        if (!installation->verify())
-            continue;
+            QnClientInstallationPtr installation = QnClientInstallation::installationForPath(m_installationsDir.absoluteFilePath(entry));
+            if (installation.isNull())
+                continue;
 
-        installation->setVersion(QnSoftwareVersion(entry));
-        installations.insert(installation->version(), installation);
+            if (!installation->verify())
+                continue;
 
-        NX_LOG(QString::fromLatin1("Compatibility version %1 found").arg(entry), cl_logDEBUG1);
+            installation->setVersion(QnSoftwareVersion(entry));
+            installations.insert(installation->version(), installation);
+
+            NX_LOG(QString::fromLatin1("Compatibility version %1 found").arg(entry), cl_logDEBUG1);
+        }
+
+        std::unique_lock<std::mutex> lk(m_mutex);
+        m_installationByVersion = std::move(installations);
+        lk.unlock();
     }
-
-    std::unique_lock<std::mutex> lk(m_mutex);
-    m_installationByVersion = std::move(installations);
-    lk.unlock();
 
     createGhosts();
 }
