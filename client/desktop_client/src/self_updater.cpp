@@ -38,9 +38,6 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
     if (!startupParams.engineVersion.isEmpty())
         m_clientVersion = nx::utils::SoftwareVersion(startupParams.engineVersion);
 
-    if (startupParams.selfUpdateMode)
-        QMessageBox::information(nullptr, lit("dbg"), lit("waiting for debugger"));
-
     QMap<Operation, Result> results;
     results[Operation::RegisterUriHandler] = osCheck(Operation::RegisterUriHandler, registerUriHandler());
     results[Operation::UpdateApplauncher] = osCheck(Operation::UpdateApplauncher, updateApplauncher());
@@ -402,15 +399,18 @@ QStringList SelfUpdater::getClientInstallRoots() const
 {
     QStringList result;
 
-    //TODO: #dklychkov check linux path
-    QString baseRoot = QnClientAppInfo::installationRoot() + lit("/Client/");
+    QString baseRoot = QnClientAppInfo::installationRoot() + lit("/client/");
     for (const QString& dir : QDir(baseRoot).entryList(QDir::NoDotAndDotDot | QDir::Dirs))
     {
         nx::utils::SoftwareVersion version(dir);
         if (version.isNull())
             continue;
 
-        result << baseRoot + dir;
+        QString clientRoot = baseRoot + dir;
+#if defined(Q_OS_LINUX)
+        clientRoot = clientRoot + lit("/bin");
+#endif
+        result << clientRoot;
     }
 
     return result;

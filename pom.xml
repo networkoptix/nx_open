@@ -119,10 +119,11 @@
         <cloud_connect_auto_test.name>${company.name} Cloud Connect Auto Test</cloud_connect_auto_test.name>
         <minilauncher.name>${company.name} ${display.product.name} Launcher</minilauncher.name>
 
-        <!-- Binary Filenames (defaults for linux) -->
+        <!-- Binary Filenames and paths (defaults for linux) -->
         <client.binary.name>client-bin</client.binary.name>
         <minilauncher.binary.name>applauncher</minilauncher.binary.name>
         <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
+        <installation.root>/opt/${deb.customization.company.name}</installation.root>
 
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
