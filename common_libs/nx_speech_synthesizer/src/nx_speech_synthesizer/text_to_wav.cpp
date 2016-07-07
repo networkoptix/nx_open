@@ -10,8 +10,6 @@
 #include <festival/festival.h>
 #include <festival/EST_wave_aux.h>
 
-#include <utils/common/app_info.h>
-
 #ifdef QN_USE_VLD
 #include <vld.h>
 #endif
