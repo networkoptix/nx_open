@@ -224,7 +224,8 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
 
     const auto urlOption = QCommandLineOption(
         lit("url"),
-        lit("URL to be used for server connection instead of asking login/password."));
+        lit("URL to be used for server connection instead of asking login/password."),
+        lit("url"));
     parser.addOption(urlOption);
 
     const auto videowallInstanceGuidOption = QCommandLineOption(
