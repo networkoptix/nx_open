@@ -190,7 +190,7 @@ void QnUserGroupsDialog::applyChanges()
             continue;
 
         auto replacement = m_model->replacement(group.id);
-        for (auto user : m_model->users(group.id))
+        for (auto user : m_model->users(group.id, false))
         {
             qnResourcesChangesManager->saveUser(user, [replacement](const QnUserResourcePtr &user)
             {

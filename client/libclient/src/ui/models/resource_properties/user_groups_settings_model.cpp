@@ -199,20 +199,27 @@ ec2::ApiUserGroupDataList::const_iterator QnUserGroupSettingsModel::currentGroup
     return std::find_if(m_groups.cbegin(), m_groups.cend(), [this](const ec2::ApiUserGroupData& elem) { return elem.id == m_currentGroupId; });
 }
 
-QnUserResourceList QnUserGroupSettingsModel::users(const QnUuid& groupId)
+QnUserResourceList QnUserGroupSettingsModel::users(const QnUuid& groupId, bool withCandidates) const
 {
     if (groupId.isNull())
         return QnUserResourceList();
 
-    return qnResPool->getResources<QnUserResource>().filtered([groupId](const QnUserResourcePtr& user)
+    return qnResPool->getResources<QnUserResource>().filtered([this, groupId, withCandidates](const QnUserResourcePtr& user)
     {
-        return user->userGroup() == groupId;
+        QnUuid userGroup = user->userGroup();
+        if (userGroup == groupId)
+            return true;
+
+        if (!withCandidates)
+            return false;
+
+        return replacement(userGroup).group == groupId;
     });
 }
 
-QnUserResourceList QnUserGroupSettingsModel::users() const
+QnUserResourceList QnUserGroupSettingsModel::users(bool withCandidates) const
 {
-    return users(m_currentGroupId);
+    return users(m_currentGroupId, withCandidates);
 }
 
 QnUserGroupSettingsModel::RoleReplacement QnUserGroupSettingsModel::replacement(const QnUuid& source) const
