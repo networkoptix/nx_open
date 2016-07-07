@@ -152,6 +152,12 @@ int runUi(QGuiApplication *application) {
     nx::media::DecoderRegistrar::registerDecoders(
         allocator, maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
 
+#if defined(Q_OS_ANDROID)
+    QUrl initialIntentData = getInitialIntentData();
+    if (initialIntentData.isValid())
+        QDesktopServices::openUrl(initialIntentData);
+#endif
+
     return application->exec();
 }
 
@@ -191,6 +197,15 @@ void initLog()
     {
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
             QLatin1String(conf.tempPath()) + QLatin1String("ec2_tran"),
+            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
+            /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
+            cl_logDEBUG2);
+    }
+
+    if (conf.enableLog)
+    {
+        QnLog::instance(QnLog::MAIN_LOG_ID)->create(
+            QLatin1String(conf.tempPath()) + QLatin1String("mobile_client"),
             /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
             /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
             cl_logDEBUG2);

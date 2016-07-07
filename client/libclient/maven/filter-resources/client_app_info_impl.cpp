@@ -30,7 +30,24 @@ QString QnClientAppInfo::clientBinaryName()
     return QStringLiteral("${client.binary.name}");
 }
 
+QString QnClientAppInfo::installationRoot()
+{
+    return QStringLiteral("${installation.root}");
+}
+
 int QnClientAppInfo::videoWallIconId()
 {
     return IDI_ICON_VIDEOWALL;
+}
+
+#if defined(Q_OS_MAC)
+QString QnClientAppInfo::macOsBundleName()
+{
+    return QStringLiteral("${mac.bundle.identifier}");
+}
+#endif
+
+QString QnClientAppInfo::launcherVersionFile()
+{
+    return QStringLiteral("${launcher.version.file}");
 }

@@ -65,14 +65,19 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
     using namespace nx::vms::utils;
 
     SystemUri uri(url);
-    if (!uri.isValid() ||
-        (uri.protocol() != SystemUri::Protocol::Native && uri.domain() != QnAppInfo::defaultCloudHost()))
+
+    if (!uri.isValid())
+        return;
+
+    if (uri.protocol() != SystemUri::Protocol::Native
+        && uri.domain() != QnAppInfo::defaultCloudHost())
     {
         if (uri.scope() == SystemUri::Scope::Generic)
         {
             // Re-call openUrl to let QDesktopServices open URL in browser.
             QDesktopServices::openUrl(url);
         }
+
         return;
     }
 
