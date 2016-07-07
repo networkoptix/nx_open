@@ -82,6 +82,8 @@ int QtvSound::getFormat(const QnAudioFormat &audioFormat)
 {
     if (audioFormat.sampleType() == QnAudioFormat::Float)
         return false;
+    if (audioFormat.sampleSize() > 16)
+        return false;
 
     QByteArray requestFormat;
     int bitsPerSample = audioFormat.sampleSize();

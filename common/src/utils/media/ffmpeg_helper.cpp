@@ -412,7 +412,7 @@ QnFfmpegAudioHelper::QnFfmpegAudioHelper(AVCodecContext* decoderContex):
     av_opt_set_int(m_swr, "in_sample_rate", decoderContex->sample_rate, 0);
     av_opt_set_int(m_swr, "out_sample_rate", decoderContex->sample_rate, 0);
     av_opt_set_sample_fmt(m_swr, "in_sample_fmt", decoderContex->sample_fmt, 0);
-    av_opt_set_sample_fmt(m_swr, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
+    av_opt_set_sample_fmt(m_swr, "out_sample_fmt", av_get_packed_sample_fmt(decoderContex->sample_fmt), 0);
     swr_init(m_swr);
 }
 

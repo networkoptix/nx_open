@@ -35,6 +35,7 @@ static const char* codecIdToLiteral(AVCodecID codecId)
         case AV_CODEC_ID_HUFFYUV: return "HUFFYUV";
         case AV_CODEC_ID_CYUV: return "CYUV";
         case AV_CODEC_ID_H264: return "H264";
+        case AV_CODEC_ID_HEVC: return "H265";
         case AV_CODEC_ID_INDEO3: return "INDEO3";
         case AV_CODEC_ID_VP3: return "VP3";
         case AV_CODEC_ID_THEORA: return "THEORA";
@@ -316,7 +317,7 @@ static const char* codecIdToLiteral(AVCodecID codecId)
         // identify it.
         case AV_CODEC_ID_PROBE: return "PROBE";
 
-        // _FAKE_ codec to indicate a raw MPEG-2 TS stream (only used by 
+        // _FAKE_ codec to indicate a raw MPEG-2 TS stream (only used by
         // libavformat).
         case AV_CODEC_ID_MPEG2TS: return "MPEG2TS";
 

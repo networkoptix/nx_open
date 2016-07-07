@@ -56,6 +56,7 @@ QnCodecAudioFormat::QnCodecAudioFormat(const QnConstMediaContextPtr& c)
             break;
 
         case AV_SAMPLE_FMT_FLT:
+        case AV_SAMPLE_FMT_FLTP:
             setSampleSize(32);
             setSampleType(QnAudioFormat::Float);
             break;
