@@ -84,9 +84,7 @@ void InstallationManager::updateInstalledVersionsInformation()
         NX_LOG(QString::fromLatin1("Can't find client binary in %1").arg(QCoreApplication::applicationDirPath()), cl_logWARNING);
     }
 
-    // find other versions
-    QList<QDir> roots = { m_installationsDir, QnApplauncherAppInfo::installationRoot() };
-    for (const QDir& root : roots)
+    auto fillInstallationsFromDir = [this, &installations](const QDir& root, bool verify)
     {
         QStringList entries = root.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
 
@@ -95,11 +93,13 @@ void InstallationManager::updateInstalledVersionsInformation()
             if (!versionDirRegExp.exactMatch(entry))
                 continue;
 
-            QnClientInstallationPtr installation = QnClientInstallation::installationForPath(m_installationsDir.absoluteFilePath(entry));
+            QnClientInstallationPtr installation = QnClientInstallation::installationForPath(root.absoluteFilePath(entry));
             if (installation.isNull())
                 continue;
 
-            if (!installation->verify())
+            installation->setNeedsVerification(verify);
+
+            if (verify && !installation->verify())
                 continue;
 
             installation->setVersion(QnSoftwareVersion(entry));
@@ -107,11 +107,16 @@ void InstallationManager::updateInstalledVersionsInformation()
 
             NX_LOG(QString::fromLatin1("Compatibility version %1 found").arg(entry), cl_logDEBUG1);
         }
+    };
 
-        std::unique_lock<std::mutex> lk(m_mutex);
-        m_installationByVersion = std::move(installations);
-        lk.unlock();
-    }
+    // find other versions
+    QString baseRoot = QnApplauncherAppInfo::installationRoot() + lit("/client/"); /*< Default client install location. */
+    fillInstallationsFromDir(m_installationsDir, true);
+    fillInstallationsFromDir(baseRoot, false);             /*< We should verify downloaded installations only. */
+
+    std::unique_lock<std::mutex> lk(m_mutex);
+    m_installationByVersion = std::move(installations);
+    lk.unlock();
 
     createGhosts();
 }
