@@ -135,6 +135,7 @@
 #include <utils/email/email.h>
 #include <utils/math/math.h>
 #include <nx/network/http/httptypes.h>
+#include <utils/common/cpp14.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
 #include <vms_gateway_embeddable.h>
@@ -1494,24 +1495,50 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     if (!context()->user())
         return;
 
-    QUrl serverUrl = server->getApiUrl();
+    QUrl serverUrl(server->getApiUrl());
+    serverUrl.setPath(lit("/api/getNonce"));
+
+    nx_http::AsyncHttpClientPtr client = nx_http::AsyncHttpClient::create();
+    auto reply = std::make_unique<QnAsyncHttpClientReply>(client, this);
+    connect(
+        reply.get(), &QnAsyncHttpClientReply::finished,
+        this, &QnWorkbenchActionHandler::at_serverLogsAction_getNonce);
+
+    m_httpReplys.emplace(serverUrl, LogRequest{std::move(server), std::move(reply)});
+    client->doGet(serverUrl);
+}
+
+void QnWorkbenchActionHandler::at_serverLogsAction_getNonce(QnAsyncHttpClientReply *reply) {
+    auto it = m_httpReplys.find(reply->url());
+    auto request = std::move(it->second);
+    m_httpReplys.erase(it);
+
+    QnJsonRestResult result;
+    NonceReply auth;
+    if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
+    {
+        // TODO: #mux Show error to user?
+        return;
+    }
+
     const auto vmsGatewayAddress = nx::cloud::gateway::VmsGatewayEmbeddable::instance()
         ->endpoint().toString();
 
     QUrl url(lit("http://%1/%2:%3/api/showLog")
-        .arg(vmsGatewayAddress).arg(serverUrl.host()).arg(serverUrl.port()));
+        .arg(vmsGatewayAddress).arg(reply->url().host()).arg(reply->url().port()));
 
     QString login = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();
+
     QUrlQuery urlQuery(url);
-    auto nonce = QByteArray::number( qnSyncTime->currentUSecsSinceEpoch(), 16 );
     urlQuery.addQueryItem(
         lit("auth"),
         QLatin1String(createHttpQueryAuthParam(
-            login, password, server->realm(), nx_http::Method::GET, nonce)));
+            login, password, auth.realm, nx_http::Method::GET, auth.nonce.toUtf8())));
+
     urlQuery.addQueryItem(lit("lines"), QLatin1String("1000"));
     url.setQuery(urlQuery);
-    url = QnNetworkProxyFactory::instance()->urlToResource(url, server);
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, request.server);
     QDesktopServices::openUrl(url);
 }
 
