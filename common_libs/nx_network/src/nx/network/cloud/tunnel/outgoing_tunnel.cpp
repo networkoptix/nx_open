@@ -33,6 +33,17 @@ OutgoingTunnel::~OutgoingTunnel()
     stopWhileInAioThread();
 }
 
+void OutgoingTunnel::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    BaseType::bindToAioThread(aioThread);
+    if (m_timer)
+        m_timer->bindToAioThread(aioThread);
+    if (m_connector)
+        m_connector->bindToAioThread(aioThread);
+    //if (m_connection)
+    //    m_connection->bindToAioThread(aioThread);
+}
+
 void OutgoingTunnel::stopWhileInAioThread()
 {
     //do not need to lock mutex since it is unexpected if 
@@ -249,7 +260,7 @@ void OutgoingTunnel::startAsyncTunnelConnect(QnMutexLockerBase* const /*locker*/
     using namespace std::placeholders;
 
     m_state = State::kConnecting;
-    m_connector = std::make_unique<CrossNatConnector>(m_targetPeerAddress);
+    m_connector = ConnectorFactory::createCrossNatConnector(m_targetPeerAddress);
     m_connector->bindToAioThread(getAioThread());
     m_connector->connect(
         kCloudConnectorTimeout,

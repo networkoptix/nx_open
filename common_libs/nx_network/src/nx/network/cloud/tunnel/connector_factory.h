@@ -7,6 +7,7 @@
 
 #include <map>
 
+#include "abstract_cross_nat_connector.h"
 #include "abstract_tunnel_connector.h"
 #include "nx/network/cloud/address_resolver.h"
 
@@ -21,10 +22,14 @@ public:
     typedef std::map<
         CloudConnectType,
         std::unique_ptr<AbstractTunnelConnector>> CloudConnectors;
-    typedef std::function<CloudConnectors(const AddressEntry& /*targetAddress*/)> FactoryFunc;
+    typedef std::function<
+        std::unique_ptr<AbstractCrossNatConnector>(
+            const AddressEntry& /*targetAddress*/)> FactoryFunc;
 
     static CloudConnectors createAllCloudConnectors(const AddressEntry& address);
-    /** Set */
+
+    static std::unique_ptr<AbstractCrossNatConnector>
+        createCrossNatConnector(const AddressEntry& address);
     static FactoryFunc setFactoryFunc(FactoryFunc newFactoryFunc);
 };
 

@@ -5,6 +5,7 @@
 
 #include "connector_factory.h"
 
+#include "cross_nat_connector.h"
 #include "nx/network/socket_global.h"
 #include "udp/connector.h"
 
@@ -13,25 +14,28 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-static ConnectorFactory::FactoryFunc factoryFunc;
-
 ConnectorFactory::CloudConnectors 
     ConnectorFactory::createAllCloudConnectors(const AddressEntry& address)
+{
+    NX_CRITICAL(false);
+
+    CloudConnectors connectors;
+    //auto udpHolePunchingConnector = std::make_unique<udp::TunnelConnector>(address);
+    //connectors.emplace(
+    //    CloudConnectType::kUdtHp,
+    //    std::move(udpHolePunchingConnector));
+    return connectors;
+}
+
+static ConnectorFactory::FactoryFunc factoryFunc;
+
+std::unique_ptr<AbstractCrossNatConnector> 
+    ConnectorFactory::createCrossNatConnector(const AddressEntry& address)
 {
     if (factoryFunc)
         return factoryFunc(address);
 
-    CloudConnectors connectors;
-    auto udpHolePunchingConnector = std::make_unique<udp::TunnelConnector>(address);
-    const auto originatingHostAddressReplacement = 
-        SocketGlobals::cloudConnectSettings().originatingHostAddressReplacement();
-    if (originatingHostAddressReplacement)
-        udpHolePunchingConnector->replaceOriginatingHostAddress(
-            *originatingHostAddressReplacement);
-    connectors.emplace(
-        CloudConnectType::kUdtHp,
-        std::move(udpHolePunchingConnector));
-    return connectors;
+    return std::make_unique<CrossNatConnector>(address);
 }
 
 ConnectorFactory::FactoryFunc 

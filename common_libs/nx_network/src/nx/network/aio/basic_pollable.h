@@ -36,6 +36,9 @@ public:
 
     virtual void stopWhileInAioThread() = 0;
 
+protected:
+    Timer* timer();
+
 private:
     Timer m_timer;
 };

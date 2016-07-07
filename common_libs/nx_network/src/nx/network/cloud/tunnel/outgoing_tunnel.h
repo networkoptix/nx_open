@@ -30,6 +30,8 @@ class NX_NETWORK_API OutgoingTunnel
 :
     public aio::BasicPollable
 {
+    typedef aio::BasicPollable BaseType;
+
 public:
     typedef std::function<void(SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>)> SocketHandler;
@@ -49,6 +51,7 @@ public:
     OutgoingTunnel(AddressEntry targetPeerAddress);
     virtual ~OutgoingTunnel();
 
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     /**
        \note Calling party MUST not use object after \a OutgoingTunnel::pleaseStop call
      */
@@ -86,7 +89,7 @@ private:
     std::multimap<
         std::chrono::steady_clock::time_point,
         ConnectionRequestData> m_connectHandlers;
-    std::unique_ptr<CrossNatConnector> m_connector;
+    std::unique_ptr<AbstractCrossNatConnector> m_connector;
     std::unique_ptr<aio::Timer> m_timer;
     bool m_terminated;
     boost::optional<std::chrono::steady_clock::time_point> m_timerTargetClock;

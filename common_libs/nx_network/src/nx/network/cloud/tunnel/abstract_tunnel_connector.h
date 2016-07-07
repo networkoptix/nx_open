@@ -14,6 +14,7 @@
 
 #include "nx/network/aio/abstract_pollable.h"
 #include "abstract_outgoing_tunnel_connection.h"
+#include "nx/network/cloud/data/connect_data.h"
 #include "tunnel.h"
 
 
@@ -29,6 +30,11 @@ class NX_NETWORK_API AbstractTunnelConnector
     public aio::AbstractPollable
 {
 public:
+    typedef nx::utils::MoveOnlyFunc<void(
+        nx::hpm::api::UdpHolePunchingResultCode resultCode,
+        SystemError::ErrorCode sysErrorCode,
+        std::unique_ptr<AbstractOutgoingTunnelConnection>)> ConnectCompletionHandler;
+
     /** Helps to decide which method shall be used first */
     virtual int getPriority() const = 0;
     /** Establishes connection to the target host.
@@ -38,10 +44,9 @@ public:
         \param handler \a AbstractTunnelConnector can be safely freed within this handler
      */
     virtual void connect(
+        const hpm::api::ConnectResponse& response,
         std::chrono::milliseconds timeout,
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode errorCode,
-            std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler) = 0;
+        ConnectCompletionHandler handler) = 0;
     virtual const AddressEntry& targetPeerAddress() const = 0;
 };
 
