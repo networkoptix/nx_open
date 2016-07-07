@@ -878,6 +878,7 @@
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
+                <festival.version>2.1x</festival.version>
                 <modification>bpi</modification>
                 <rdep.target>bpi</rdep.target>
                 <liteMode>true</liteMode>

@@ -41,4 +41,24 @@
             <systemPath>${root.dir}/mediaserver_core/pom.xml</systemPath>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <linux.oslibs>-ldl -lldap</linux.oslibs>
+            </properties>
+        </profile>
+    </profiles>
 </project>
