@@ -267,14 +267,25 @@ void QnBusinessRulesDialog::reject() {
     base_type::reject();
 }
 
-bool QnBusinessRulesDialog::eventFilter(QObject *object, QEvent *event) {
-    if (event->type() == QEvent::KeyPress) {
+bool QnBusinessRulesDialog::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress)
+    {
         QKeyEvent* pKeyEvent = static_cast<QKeyEvent*>(event);
-        if (pKeyEvent->key() == Qt::Key_Delete) {
-            at_deleteButton_clicked();
-            return true;
+        switch (pKeyEvent->key())
+        {
+            case Qt::Key_Delete:
+#if defined(Q_OS_MAC)
+            case Qt::Key_Backspace:
+#endif
+                at_deleteButton_clicked();
+                return true;
+            default:
+                break;;
         }
-    } else if (event->type() == QEvent::ContextMenu) {
+    }
+    else if (event->type() == QEvent::ContextMenu)
+    {
         QContextMenuEvent *pContextEvent = static_cast<QContextMenuEvent*>(event);
         m_popupMenu->exec(pContextEvent->globalPos());
         return true;
