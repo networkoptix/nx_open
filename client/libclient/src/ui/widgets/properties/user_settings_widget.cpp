@@ -105,8 +105,8 @@ bool QnUserSettingsWidget::hasChanges() const
                 && permissions != qnResourceAccessManager->globalPermissions(m_model->user()))
             {
                 return true;
+            }
         }
-    }
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
@@ -116,7 +116,6 @@ bool QnUserSettingsWidget::hasChanges() const
     if (permissions.testFlag(Qn::WriteFullNamePermission))
         if (m_model->user()->fullName() != ui->nameInputField->text().trimmed())
             return true;
-
 
     return false;
 }
@@ -169,7 +168,7 @@ void QnUserSettingsWidget::applyChanges()
     {
         QnUuid groupId = selectedUserGroup();
         m_model->user()->setUserGroup(groupId);
-            m_model->user()->setRawPermissions(selectedPermissions());
+        m_model->user()->setRawPermissions(selectedPermissions());
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
@@ -262,6 +261,9 @@ QList<QnInputField*> QnUserSettingsWidget::inputFields() const
 
 void QnUserSettingsWidget::updateRoleComboBox()
 {
+    if (!m_model->user())
+        return;
+
     Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_model->user());
 
     /* If there is only one entry in permissions combobox, this check doesn't matter. */
