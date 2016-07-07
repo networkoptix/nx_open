@@ -38,6 +38,9 @@ public:
     virtual void shareSystem(
         api::SystemSharing sharingData,
         std::function<void(api::ResultCode)> completionHandler) override;
+    virtual void setSystemUserList(
+        api::SystemSharingList sharings,
+        std::function<void(api::ResultCode)> completionHandler) override;
     virtual void getCloudUsersOfSystem(
         std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) override;
     virtual void getCloudUsersOfSystem(

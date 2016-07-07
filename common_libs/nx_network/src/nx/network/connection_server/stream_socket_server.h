@@ -151,11 +151,10 @@ public:
     //!Calls \a AbstractStreamServerSocket::listen
     bool listen()
     {
-        using namespace std::placeholders;
-
         if( !m_socket->listen() )
             return false;
-        m_socket->acceptAsync( std::bind( &SelfType::newConnectionAccepted, this, _1, _2 ) );
+        m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this,
+                                        std::placeholders::_1, std::placeholders::_2));
         return true;
     }
 
@@ -168,8 +167,6 @@ public:
         SystemError::ErrorCode /*errorCode*/,
         AbstractStreamSocket* newConnection )
     {
-        using namespace std::placeholders;
-
         //TODO #ak handle errorCode: try to call acceptAsync after some delay?
 
         if( newConnection )
@@ -178,7 +175,8 @@ public:
             conn->startReadingConnection();
             this->saveConnection(std::move(conn));
         }
-        m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this, _1, _2));
+        m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this,
+                                        std::placeholders::_1, std::placeholders::_2));
     }
 
 protected:

@@ -44,6 +44,8 @@ public:
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         OnNewConnectionHandler handler) = 0;
+    virtual void setControlConnectionClosedHandler(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 };
 
 } // namespace cloud

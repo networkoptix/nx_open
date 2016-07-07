@@ -30,6 +30,8 @@ public:
     ~ModuleLauncher()
     {
         stop();
+        for (auto ptr: m_args)
+            free(ptr);
     }
 
     void start()
@@ -97,6 +99,12 @@ public:
     {
         auto b = std::back_inserter(m_args);
         *b = strdup(arg);
+    }
+
+    void addArg(const char* arg, const char* value)
+    {
+        addArg(arg);
+        addArg(value);
     }
 
 protected:

@@ -22,7 +22,6 @@
 #include "utils/common/systemerror.h"
 #include <nx/network/socket_factory.h>
 #include "transaction_log.h"
-#include <transaction/chunked_transfer_encoder.h>
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
@@ -1443,17 +1442,21 @@ void QnTransactionTransport::setExtraDataBuffer(const QByteArray& data)
 }
 
 bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran,
-                                                       const QnTransactionTransportHeader& _header, const QnUuid &tranParamsId,
-                                                       ApiCommand::Value value)
+                                                       const QnTransactionTransportHeader& _header)
 {
     if (srcFormat != m_remotePeer.dataFormat)
         return false;
 
     /* Check if remote peer has rights to receive transaction */
-    auto td = getTransactionDescriptorByValue(value);
-    bool remoteHasRights = td->checkPermissions(m_userAccessData.userId, tranParamsId, Qn::Permission::ReadPermission);
-    if (!remoteHasRights)
-        return false;
+	if (!ec2::hasAdminAccess(m_userAccessData.userId))
+	{
+		NX_LOG(
+			QnLog::EC2_TRAN_LOG,
+			lit("Permission check failed while sending SERIALIZED transaction to peer %1")
+				.arg(remotePeer().id.toString()),
+			cl_logDEBUG1);
+		return false;
+	}
 
     QnTransactionTransportHeader header(_header);
     NX_ASSERT(header.processedPeers.contains(m_localPeer.id));

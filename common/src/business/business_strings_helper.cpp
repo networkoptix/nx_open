@@ -398,7 +398,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     }
     case ServerStartedReason:
     {
-        result = tr("Server restarted unexpectedly.");
+        result = tr("Server stopped unexpectedly.");
         break;
     }
     case StorageIoErrorReason:

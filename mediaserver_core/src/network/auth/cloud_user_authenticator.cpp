@@ -93,8 +93,16 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     const nx_http::header::Authorization& authorizationHeader,
     nx_http::HttpHeaders* const responseHeaders)
 {
+    if (authorizationHeader.authScheme != nx_http::header::AuthScheme::digest)
+    {
+        //supporting only digest authentication for cloud-based authentication
+        return m_defaultAuthenticator->authorize(
+            method,
+            authorizationHeader,
+            responseHeaders);
+    }
+
     if (!isValidCloudUserName(authorizationHeader.userid()) ||
-        (authorizationHeader.authScheme != nx_http::header::AuthScheme::digest) ||      //supporting only digest authentication for cloud-based authentication
         (!m_cdbNonceFetcher.isValidCloudNonce(authorizationHeader.digest->params["nonce"])))    //nonce must be valid cloud nonce
     {
         if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)

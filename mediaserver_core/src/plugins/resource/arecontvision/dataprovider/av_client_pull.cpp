@@ -6,7 +6,7 @@
 #include <utils/common/util.h>
 
 #include "../resource/av_resource.h"
-
+#include <nx/streaming/config.h>
 
 QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnResourcePtr& res)
 :

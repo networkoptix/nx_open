@@ -11,7 +11,7 @@
 #include <nx/utils/thread/barrier_handler.h>
 
 #include <utils/crypt/linux_passwd_crypt.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/sync_call.h>
 
 
@@ -30,7 +30,7 @@ MediaServerEmulator::MediaServerEmulator(
         false,
         SocketFactory::NatTraversalType::nttDisabled),
     m_systemData(std::move(systemData)),
-    m_serverId(serverName.isEmpty() ? generateRandomName(16) : std::move(serverName)),
+    m_serverId(serverName.isEmpty() ? nx::utils::generateRandomName(16) : std::move(serverName)),
     m_mediatorUdpClient(
         std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
             mediatorEndpoint,

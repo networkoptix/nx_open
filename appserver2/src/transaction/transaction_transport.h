@@ -134,8 +134,17 @@ public:
     {
         /* Check if peer has enough rights to receive transaction */
         bool peerHasEnoughRights = ec2::hasPermission(m_userAccessData.userId, transaction.params, Qn::Permission::ReadPermission);
-        if (!peerHasEnoughRights)
-            return;
+		if (!peerHasEnoughRights)
+		{
+			NX_LOG(
+				QnLog::EC2_TRAN_LOG, 
+				lit("Permission check failed while sending transaction %1 to peer %2")
+					.arg(transaction.toString())
+					.arg(remotePeer().id.toString()),
+				cl_logDEBUG1 
+			);
+			return;
+		}
 
         QnTransactionTransportHeader header(_header);
         NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
@@ -174,8 +183,7 @@ public:
     }
 
     bool sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran,
-                                   const QnTransactionTransportHeader& _header, const QnUuid &tranParamsId,
-                                   ApiCommand::Value value);
+                                   const QnTransactionTransportHeader& _header);
 
     void doOutgoingConnect(const QUrl& remotePeerUrl);
     void close();

@@ -15,7 +15,6 @@
 
     <properties>
         <guid>${appserver2.guid}</guid>
-        <product.title>${appserver2.name}</product.title>  
 
         <template>lib</template>
         <buildLib>sharedlib</buildLib>

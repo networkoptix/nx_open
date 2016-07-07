@@ -10,6 +10,7 @@
 
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/config.h>
 #include <core/dataprovider/cpull_media_stream_provider.h>
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/camera_resource.h>

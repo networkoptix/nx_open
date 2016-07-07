@@ -31,6 +31,8 @@ public:
     ~VmsGatewayFunctionalTest();
 
     virtual bool startAndWaitUntilStarted() override;
+    bool startAndWaitUntilStarted(
+        bool allowIpTarget, bool proxyTargetPort, bool connectSupport);
 
     SocketAddress endpoint() const;
     const std::unique_ptr<TestHttpServer>& testHttpServer() const;

@@ -16,10 +16,6 @@ namespace {
         QSet<QString> result;
         for (const SocketAddress& address : server->getAllAvailableAddresses())
         {
-            //TODO: #dklyckov why are we filtering addresses by port here?
-            if (address.port != port)
-                continue;
-
             result << address.address.toString();
         }
         return result;

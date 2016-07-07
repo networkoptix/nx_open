@@ -309,6 +309,11 @@ namespace nx_http
         m_proxyUserPassword = userPassword;
     }
 
+    void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
+    {
+        m_proxyEndpoint = proxyEndpoint;
+    }
+
     void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
     {
         m_precalculatedAuthorizationDisabled = val;
@@ -700,7 +705,10 @@ namespace nx_http
 
     void AsyncHttpClient::initiateTcpConnection()
     {
-        const SocketAddress remoteAddress(m_url.host(), m_url.port(nx_http::DEFAULT_HTTP_PORT));
+        const SocketAddress remoteAddress = 
+            m_proxyEndpoint
+            ? m_proxyEndpoint.get()
+            : SocketAddress(m_url.host(), m_url.port(nx_http::DEFAULT_HTTP_PORT));
 
         m_state = sInit;
 
@@ -776,7 +784,10 @@ namespace nx_http
         const bool useHttp11 = true;   //TODO #ak check if we need it (e.g. we using keep-alive or requesting live capture)
 
         m_request.requestLine.method = httpMethod;
-        m_request.requestLine.url = m_url.path() + (m_url.hasQuery() ? (QLatin1String("?") + m_url.query()) : QString());
+        if (m_proxyEndpoint)
+            m_request.requestLine.url = m_url;
+        else    //if no proxy specified then erasing http://host:port from request url
+            m_request.requestLine.url = m_url.path() + (m_url.hasQuery() ? (QLatin1String("?") + m_url.query()) : QString());
         m_request.requestLine.version = useHttp11 ? nx_http::http_1_1 : nx_http::http_1_0;
 
         nx_http::insertOrReplaceHeader(
@@ -813,9 +824,11 @@ namespace nx_http
         //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
         //TODO #ak remove it after 2.3 support is over
         if (!m_userName.isEmpty())
+        {
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()));
+        }
 
         if (m_precalculatedAuthorizationDisabled)
             return;

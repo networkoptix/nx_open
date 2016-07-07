@@ -13,6 +13,7 @@
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/test_support/test_options.h>
 #include <utils/common/guard.h>
 
 
@@ -75,6 +76,11 @@ public:
                     handler(SystemError::connectionReset, nullptr, false);
                 }
             });
+    }
+
+    virtual void setControlConnectionClosedHandler(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*errorCode*/) override
+    {
     }
 
 private:
@@ -610,10 +616,14 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
 
                 ASSERT_EQ(SystemError::timedOut, result.first);
                 ASSERT_EQ(nullptr, result.second);
-#ifdef _DEBUG
-                EXPECT_GT(actualTimeout, timeout - timeoutCorrection);
-                EXPECT_LT(actualTimeout, timeout + timeoutCorrection);
-#endif
+
+                #ifdef _DEBUG
+                    if (!utils::TestOptions::areTimeAssertsDisabled())
+                    {
+                        EXPECT_GT(actualTimeout, timeout - timeoutCorrection);
+                        EXPECT_LT(actualTimeout, timeout + timeoutCorrection);
+                    }
+                #endif
             }
         }
 }

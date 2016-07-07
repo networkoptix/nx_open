@@ -53,6 +53,9 @@ class Http
 {
 public:
     int proxyTargetPort;
+    /** Enables support of Http CONNECT method */
+    bool connectSupport;
+    bool allowTargetEndpointInUrl;
 
     Http();
 };
@@ -61,6 +64,7 @@ class CloudConnect
 {
 public:
     bool replaceHostAddressWithPublicAddress;
+    bool allowIpTarget;
     QString fetchPublicIpUrl;
 
     CloudConnect();

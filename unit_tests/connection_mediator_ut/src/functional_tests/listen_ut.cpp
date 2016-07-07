@@ -8,7 +8,7 @@
 
 #include <nx/network/socket_global.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/sync_call.h>
 
 #include <listening_peer_pool.h>

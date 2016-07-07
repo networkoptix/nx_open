@@ -147,6 +147,140 @@ void QnFfmpegHelper::deleteAvCodecContext(AVCodecContext* context)
     av_freep(&context);
 }
 
+//-------------------------------------------------------------------------------------------------
+// Backwards compatibility with v2.5.
+
+namespace {
+
+enum CodecCtxField { Field_RC_EQ, Field_EXTRADATA, Field_INTRA_MATRIX, Field_INTER_MATRIX,
+    Field_OVERRIDE, Field_Channels, Field_SampleRate, Field_Sample_Fmt, Field_BitsPerSample,
+    Field_CodedWidth, Field_CodedHeight };
+
+/**
+ * Copied from v2.5 ffmpeg_helper.cpp.
+ * @return nullptr on deserialization error.
+ */
+static AVCodecContext* deserializeCodecContextFromDepricatedFormat(const char* data, int dataLen)
+{
+    static const char* const kError = "ERROR deserializing MediaContext 2.5:";
+    AVCodec* codec = nullptr;
+
+    QByteArray tmpArray(data, dataLen);
+    QBuffer buffer(&tmpArray);
+    buffer.open(QIODevice::ReadOnly);
+    AVCodecID codecId = AV_CODEC_ID_NONE;
+    int bytesRead = (int) buffer.read((char*) &codecId, 4);
+    if (bytesRead < 4)
+    {
+        qWarning() << kError << "Less than 4 bytes";
+        goto error;
+    }
+
+    codec = avcodec_find_decoder(codecId);
+    if (codec == nullptr)
+    {
+        qWarning() << kError << "Codec not found:" << codecId;
+        goto error;
+    }
+    AVCodecContext* ctx = avcodec_alloc_context3(codec);
+
+    char objectType;
+
+    for (;;)
+    {
+        int bytesRead = (int) buffer.read(&objectType, 1);
+        if (bytesRead < 1)
+            break;
+        CodecCtxField field = (CodecCtxField) objectType;
+        int size;
+        if (buffer.read((char*) &size, 4) != 4)
+        {
+            qWarning() << kError << "Unable to read 4 bytes";
+            goto error;
+        }
+        size = ntohl(size);
+        char* fieldData = (char*) av_malloc(size);
+        bytesRead = (int) buffer.read(fieldData, size);
+        if (bytesRead != size)
+        {
+            av_free(fieldData);
+            qWarning() << kError << "Not enough bytes: expected" << size << "but got" << bytesRead;
+            goto error;
+        }
+
+        switch (field)
+        {
+            case Field_RC_EQ:
+                ctx->rc_eq = fieldData;
+                break;
+            case Field_EXTRADATA:
+                ctx->extradata = (quint8*) fieldData;
+                ctx->extradata_size = size;
+                break;
+            case Field_INTRA_MATRIX:
+                ctx->intra_matrix = (quint16*) fieldData;
+                break;
+            case Field_INTER_MATRIX:
+                ctx->inter_matrix = (quint16*) fieldData;
+                break;
+            case Field_OVERRIDE:
+                ctx->rc_override = (RcOverride*) fieldData;
+                ctx->rc_override_count = size / sizeof(*ctx->rc_override);
+                break;
+            case Field_Channels:
+                ctx->channels = *((int*) fieldData);
+                av_free(fieldData);
+                break;
+            case Field_SampleRate:
+                ctx->sample_rate = *((int*) fieldData);
+                av_free(fieldData);
+                break;
+            case Field_Sample_Fmt:
+                ctx->sample_fmt = *((AVSampleFormat*) fieldData);
+                av_free(fieldData);
+                break;
+            case Field_BitsPerSample:
+                ctx->bits_per_coded_sample = *((int*) fieldData);
+                av_free(fieldData);
+                break;
+            case Field_CodedWidth:
+                ctx->coded_width = *((int*) fieldData);
+                av_free(fieldData);
+                break;
+            case Field_CodedHeight:
+                ctx->coded_height = *((int*) fieldData);
+                av_free(fieldData);
+                break;
+        }
+    }
+
+    ctx->codec_id = codecId;
+    ctx->codec_type = codec->type;
+    return ctx;
+
+error:
+    QnFfmpegHelper::deleteAvCodecContext(ctx);
+    return nullptr;
+}
+
+} // namespace
+
+bool QnFfmpegHelper::deserializeMediaContextFromDepricatedFormat(
+    QnMediaContextSerializableData* context, const char* data, int dataLen)
+{
+    AVCodecContext* avCodecContext = deserializeCodecContextFromDepricatedFormat(data, dataLen);
+    if (!avCodecContext)
+        return false;
+
+    context->initializeFrom(avCodecContext);
+
+    QnFfmpegHelper::deleteAvCodecContext(avCodecContext);
+
+    return true;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
 {
     QIODevice* reader = reinterpret_cast<QIODevice*> (opaque);

@@ -79,9 +79,8 @@ public:
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         OnNewConnectionHandler handler) override;
-
-    void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void()> handler);
+    virtual void setControlConnectionClosedHandler(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
 private:
     typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
@@ -107,7 +106,8 @@ private:
     QnMutex m_mutex;
     bool m_pleaseStopHasBeenCalled;
     bool m_pleaseStopCompleted;
-    nx::utils::MoveOnlyFunc<void()> m_controlConnectionClosedHandler;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>
+        m_controlConnectionClosedHandler;
 
     void proceedWithConnection(
         UdtStreamSocket* connectionPtr,

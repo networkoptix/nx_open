@@ -11,7 +11,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
-
+#include <nx/utils/test_support/test_options.h>
 
 namespace nx {
 namespace network {
@@ -104,7 +104,7 @@ TEST_F(UdpHolePunching, simpleAsync)
 
 TEST_F(UdpHolePunching, loadTest)
 {
-    const std::chrono::seconds testDuration(7);
+    const std::chrono::seconds testDuration(7 * utils::TestOptions::timeoutMultiplier());
     const int maxSimultaneousConnections = 25;
     const int bytesToSendThroughConnection = 1024 * 1024;
 

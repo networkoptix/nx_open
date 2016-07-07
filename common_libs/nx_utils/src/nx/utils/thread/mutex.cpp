@@ -20,11 +20,7 @@ QnMutex::QnMutex( QnMutex::RecursionMode mode )
 
 QnMutex::~QnMutex()
 {
-    if (!m_impl->currentLockStack.empty())
-    {
-        int* x = nullptr;
-        *x = 1;
-    }
+    NX_EXPECT(m_impl->currentLockStack.empty());
 
     delete m_impl;
     m_impl = nullptr;

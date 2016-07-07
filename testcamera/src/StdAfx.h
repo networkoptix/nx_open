@@ -1,4 +1,4 @@
-#include <common/config.h>
+#include <nx/utils/compiler_options.h>
 
 /* Boost headers. */
 #include <boost/foreach.hpp>
@@ -13,6 +13,5 @@ extern "C" {
     #include <libavutil/avstring.h>
 }
 
-#ifdef __cplusplus
-#   include <common/common_globals.h>
-#endif
+#include <nx/utils/literal.h>
+#include <nx/utils/deprecation.h>

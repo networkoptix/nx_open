@@ -20,6 +20,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/utils/std/thread.h>
+#include <nx/utils/test_support/test_options.h>
 
 
 namespace nx {
@@ -108,7 +109,9 @@ protected:
 */
 TEST( Socket, AsyncOperationCancellation )
 {
-    static const std::chrono::milliseconds TEST_DURATION( 200 );
+    static const std::chrono::milliseconds TEST_DURATION(
+        300 * nx::utils::TestOptions::timeoutMultiplier());
+
     static const int TEST_RUNS = 5;
     static const int THREADS = 3;
 

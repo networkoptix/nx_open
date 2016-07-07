@@ -2,7 +2,7 @@
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
-#include <utils/thread/sync_queue.h>
+#include <nx/utils/test_support/sync_queue.h>
 
 namespace nx {
 namespace network {
@@ -88,7 +88,7 @@ public:
         utils::MoveOnlyFunc<void(HaInfoIterator it)> checker)
     {
         NX_LOGX(lm("resolveAndCheckState %1").str(address), cl_logDEBUG1);
-        nx::TestSyncQueue<bool> syncQueue;
+        nx::utils::TestSyncQueue<bool> syncQueue;
         static const size_t kSimultaneousQueries = 100;
         for (size_t counter = kSimultaneousQueries; counter; --counter)
         {

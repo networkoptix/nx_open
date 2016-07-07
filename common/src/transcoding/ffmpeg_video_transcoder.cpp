@@ -9,6 +9,7 @@
 #include "filters/crop_image_filter.h"
 #include "utils/common/util.h"
 #include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/config.h>
 
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;

@@ -42,19 +42,39 @@ AuthenticationManager::AuthenticationManager(
 {
 }
 
-bool AuthenticationManager::authenticate(
+void AuthenticationManager::authenticate(
     const nx_http::HttpServerConnection& connection,
     const nx_http::Request& request,
-    boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
-    stree::ResourceContainer* authProperties,
-    nx_http::HttpHeaders* const responseHeaders,
-    std::unique_ptr<nx_http::AbstractMsgBodySource>* const msgBody)
+    nx_http::AuthenticationCompletionHandler completionHandler)
 {
+    bool authenticationResult = false;
+    stree::ResourceContainer authInfo;
+    boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate;
+    nx_http::HttpHeaders responseHeaders;
+    std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
+    auto scopedGuard = makeScopedGuard(
+        [&authenticationResult, &authInfo, &wwwAuthenticate,
+            &responseHeaders, &msgBody, &completionHandler]() mutable
+        {
+            completionHandler(
+                authenticationResult,
+                std::move(authInfo),
+                std::move(wwwAuthenticate),
+                std::move(responseHeaders),
+                std::move(msgBody));
+        });
+
     const auto allowedAuthMethods = m_authRestrictionList.getAllowedAuthMethods(request);
     if (allowedAuthMethods & AuthMethod::noAuth)
-        return true;
+    {
+        authenticationResult = true;
+        return;
+    }
     if (!(allowedAuthMethods & AuthMethod::httpDigest))
-        return false;
+    {
+        authenticationResult = false;
+        return;
+    }
 
     const auto authHeaderIter = request.headers.find(header::Authorization::NAME);
 
@@ -84,21 +104,26 @@ bool AuthenticationManager::authenticate(
     if (auto authenticated = authTraversalResult.get(attr::authenticated))
     {
         if (authenticated.get().toBool())
-            return true;
+        {
+            authenticationResult = true;
+            return;
+        }
     }
 
     if (!authzHeader ||
         (authzHeader->authScheme != header::AuthScheme::digest) ||
         (authzHeader->userid().isEmpty()))
     {
-        addWWWAuthenticateHeader(wwwAuthenticate);
-        return false;
+        addWWWAuthenticateHeader(&wwwAuthenticate);
+        authenticationResult = false;
+        return;
     }
 
     if (!validateNonce(authzHeader->digest->params["nonce"]))
     {
-        addWWWAuthenticateHeader(wwwAuthenticate);
-        return false;
+        addWWWAuthenticateHeader(&wwwAuthenticate);
+        authenticationResult = false;
+        return;
     }
 
     const auto userID = authzHeader->userid();
@@ -114,7 +139,10 @@ bool AuthenticationManager::authenticate(
     if (auto foundHa1 = authTraversalResult.get(attr::ha1))
     {
         if (validateHa1Func(foundHa1.get().toString().toLatin1()))
-            return true;
+        {
+            authenticationResult = true;
+            return;
+        }
     }
     if (auto password = authTraversalResult.get(attr::userPassword))
     {
@@ -123,11 +151,12 @@ bool AuthenticationManager::authenticate(
                 realm(),
                 password.get().toString())))
         {
-            return true;
+            authenticationResult = true;
+            return;
         }
     }
 
-    return false;
+    authenticationResult = false;
 }
 
 nx::String AuthenticationManager::realm()

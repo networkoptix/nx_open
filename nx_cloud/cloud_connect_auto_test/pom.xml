@@ -14,7 +14,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud_connect_auto_test</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Cloud Connect Auto Test</name>
+    <name>NX Cloud Connect Auto Test</name>
 
     <properties>
         <guid>${cloud_connect_auto_test.guid}</guid>

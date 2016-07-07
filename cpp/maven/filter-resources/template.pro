@@ -216,7 +216,7 @@ win* {
 unix: {
   DEFINES += QN_EXPORT=
   clang {
-    QMAKE_CXXFLAGS += -std=c++14 -Wno-c++14-extensions
+    QMAKE_CXXFLAGS += -Wno-c++14-extensions -Wno-inconsistent-missing-override
   } else {
     #QMAKE_CXXFLAGS += -std=c++1y
   }

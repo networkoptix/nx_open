@@ -39,7 +39,6 @@ CdbFunctionalTest::CdbFunctionalTest()
     m_port(0),
     m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
 {
-    m_port = (std::rand() % 10000) + 50000;
     m_tmpDir =
         (sTemporaryDirectoryPath.isEmpty() ? QDir::homePath() : sTemporaryDirectoryPath) +
         "/cdb_ut.data";
@@ -47,7 +46,7 @@ CdbFunctionalTest::CdbFunctionalTest()
 
     addArg("/path/to/bin");
     addArg("-e");
-    addArg("-listenOn"); addArg(lit("127.0.0.1:%1").arg(m_port).toLatin1().constData());
+    addArg("-listenOn"); addArg(lit("127.0.0.1:0").toLatin1().constData());
     addArg("-log/logLevel"); addArg("DEBUG2");
     addArg("-dataDir"); addArg(m_tmpDir.toLatin1().constData());
     
@@ -623,6 +622,22 @@ api::ResultCode CdbFunctionalTest::ping(
                 &nx::cdb::api::Connection::ping,
                 connection.get(),
                 std::placeholders::_1));
+    return resCode;
+}
+
+api::ResultCode CdbFunctionalTest::setSystemUserList(
+    const std::string& systemID,
+    const std::string& authKey,
+    api::SystemSharingList sharings)
+{
+    auto connection = connectionFactory()->createConnection(systemID, authKey);
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) = makeSyncCall<nx::cdb::api::ResultCode>(
+        std::bind(
+            &nx::cdb::api::SystemManager::setSystemUserList,
+            connection->systemManager(),
+            std::move(sharings),
+            std::placeholders::_1));
     return resCode;
 }
 

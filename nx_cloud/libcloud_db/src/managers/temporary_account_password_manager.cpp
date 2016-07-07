@@ -91,12 +91,14 @@ void TemporaryAccountPasswordManager::authenticateByName(
         result = api::ResultCode::ok;
 
         ++curIt->second.useCount;
+        //TODO #ak prolonging expiration period if present
+
         checkTemporaryPasswordForExpiration(&lk, curIt);
         return;
     }
 }
 
-void TemporaryAccountPasswordManager::createTemporaryPassword(
+void TemporaryAccountPasswordManager::registerTemporaryCredentials(
     const AuthorizationInfo& /*authzInfo*/,
     data::TemporaryAccountCredentials tmpPasswordData,
     std::function<void(api::ResultCode)> completionHandler)
@@ -189,6 +191,7 @@ nx::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
             ap.password_ha1 as passwordHa1,                                     \
             ap.realm,                                                           \
             ap.expiration_timestamp_utc as expirationTimestampUtc,              \
+            ap.prolongation_period_sec as prolongationPeriodSec,                \
             ap.max_use_count as maxUseCount,                                    \
             ap.use_count as useCount,                                           \
             ap.is_email_code as isEmailCode,                                    \
@@ -222,9 +225,11 @@ nx::db::DBResult TemporaryAccountPasswordManager::insertTempPassword(
     QSqlQuery insertTempPassword(*connection);
     insertTempPassword.prepare(
         "INSERT INTO account_password (id, account_id, login, password_ha1, realm, "
-            "expiration_timestamp_utc, max_use_count, use_count, is_email_code, access_rights) "
-        "VALUES (:id, (SELECT id FROM account WHERE email=:accountEmail), :login, :passwordHa1, :realm, "
-            ":expirationTimestampUtc, :maxUseCount, :useCount, :isEmailCode, :accessRights)");
+            "expiration_timestamp_utc, prolongation_period_sec, max_use_count, "
+            "use_count, is_email_code, access_rights) "
+        "VALUES (:id, (SELECT id FROM account WHERE email=:accountEmail), :login, "
+            ":passwordHa1, :realm, :expirationTimestampUtc, :prolongationPeriodSec, "
+            ":maxUseCount, :useCount, :isEmailCode, :accessRights)");
     QnSql::bind(tempPasswordData, &insertTempPassword);
     insertTempPassword.bindValue(
         ":accessRights",

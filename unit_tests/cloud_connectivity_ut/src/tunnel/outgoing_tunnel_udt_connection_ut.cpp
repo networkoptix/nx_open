@@ -4,6 +4,7 @@
 #include <nx/network/cloud/tunnel/udp/outgoing_tunnel_connection.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/test_support/test_options.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/guard.h>
 
@@ -234,17 +235,20 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
         ASSERT_EQ(nullptr, result.connection);
         ASSERT_TRUE(result.stillValid);
 
-#ifdef _DEBUG
-        const auto connectTime =
-            connectContexts[i].endTime - connectContexts[i].startTime;
+        #ifdef _DEBUG
+            if (!utils::TestOptions::areTimeAssertsDisabled())
+            {
+                const auto connectTime =
+                    connectContexts[i].endTime - connectContexts[i].startTime;
 
-        auto connectTimeDiff = 
-            connectTime > connectContexts[i].timeout
-            ? connectTime - connectContexts[i].timeout
-            : connectContexts[i].timeout - connectTime;
-        //NOTE some timeout fault will always be there, so this NX_ASSERT may fail sometimes
-        ASSERT_LE(connectTimeDiff, acceptableTimeoutFault);
-#endif
+                auto connectTimeDiff =
+                    connectTime > connectContexts[i].timeout
+                    ? connectTime - connectContexts[i].timeout
+                    : connectContexts[i].timeout - connectTime;
+
+                ASSERT_LE(connectTimeDiff, acceptableTimeoutFault);
+            }
+        #endif
     }
 
     tunnelConnection.pleaseStopSync();
@@ -310,7 +314,7 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
 
     nx::utils::promise<void> controlConnectionClosedPromise;
     tunnelConnection.setControlConnectionClosedHandler(
-        [&controlConnectionClosedPromise]
+        [&controlConnectionClosedPromise](SystemError::ErrorCode /*errorCode*/)
         {
             controlConnectionClosedPromise.set_value();
         });

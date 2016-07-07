@@ -4,6 +4,7 @@
 
 #include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/rtsp_client.h>
+#include <nx/streaming/config.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
 
@@ -104,7 +105,7 @@ void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines)
                             }
                             if( nal.size() > 0 && (nal[0] & 0x1f) == nuSPS )
                                 decodeSpsInfo( nal );
-                            
+
                             m_sdpSpsPps << QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX)).append(nal);
                         }
                     }
@@ -286,7 +287,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
     //int don;
     quint8 nalUnitType;
 
-    if (readed < RtpHeader::RTP_HEADER_SIZE + 1) 
+    if (readed < RtpHeader::RTP_HEADER_SIZE + 1)
         return clearInternalBuffer();
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
@@ -310,7 +311,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         return clearInternalBuffer();
 
     bool isPacketLost = m_prevSequenceNum != -1 && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
-    
+
     if (m_videoFrameSize > MAX_ALLOWED_FRAME_SIZE)
     {
         NX_LOG("Too large RTP/H.264 frame. Truncate video buffer", cl_logWARNING);

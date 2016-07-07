@@ -114,7 +114,7 @@ void OutgoingTunnelConnection::establishNewConnection(
 
     auto newConnection = std::make_unique<UdtStreamSocket>();
     if (!socketAttributes.applyTo(newConnection.get()) ||
-        !newConnection->bind(m_localPunchedAddress) ||
+        !newConnection->bind(SocketAddress(HostAddress::anyHost, m_localPunchedAddress.port)) ||
         !newConnection->setNonBlockingMode(true))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
@@ -154,7 +154,7 @@ void OutgoingTunnelConnection::establishNewConnection(
 }
 
 void OutgoingTunnelConnection::setControlConnectionClosedHandler(
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_controlConnectionClosedHandler = std::move(handler);
 }
@@ -269,7 +269,7 @@ void OutgoingTunnelConnection::closeConnection(
     {
         auto controlConnectionClosedHandler =
             std::move(m_controlConnectionClosedHandler);
-        controlConnectionClosedHandler();
+        controlConnectionClosedHandler(closeReason);
     }
 
     if (!controlConnection)

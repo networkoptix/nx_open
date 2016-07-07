@@ -9,6 +9,10 @@ describe('Settings Page', function () {
         p.get();
     });
 
+    //it("Enter wrong password at login screen",function(){
+    // TODO
+    //});
+
     it("Change port: should not allow to set empty or bad port",function(){
         p.setPort(100000);
         expect(p.portInput.getAttribute('class')).toMatch('ng-invalid');

@@ -173,6 +173,11 @@ QString QnAppInfo::updateGeneratorUrl()
     return QStringLiteral("${update.generator.url}");
 }
 
+QString QnAppInfo::defaultCloudHost()
+{
+    return QStringLiteral("${cloud.host}");
+}
+
 QString QnAppInfo::defaultCloudPortalUrl()
 {
     return QStringLiteral("${cloud.portalUrl}");
@@ -201,10 +206,5 @@ QString QnAppInfo::freeLicenseKey()
 bool QnAppInfo::freeLicenseIsTrial()
 {
     return ${freeLicenseIsTrial};
-}
-
-QString QnAppInfo::installationRoot()
-{
-    return QStringLiteral("${installation.root}");
 }
 

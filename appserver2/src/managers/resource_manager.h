@@ -25,12 +25,20 @@ namespace ec2
         }
 
         void triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran ) {
-            emit resourceParamChanged(tran.params );
+            if (tran.command == ApiCommand::setResourceParam)
+                emit resourceParamChanged(tran.params);
+            else if (tran.command == ApiCommand::removeResourceParam)
+                emit resourceParamRemoved(tran.params);
         }
 
         void triggerNotification( const QnTransaction<ApiResourceParamWithRefDataList>& tran ) {
-            for(const ec2::ApiResourceParamWithRefData& param: tran.params)
-                emit resourceParamChanged(param);
+            for (const ec2::ApiResourceParamWithRefData& param : tran.params)
+            {
+                if (tran.command == ApiCommand::setResourceParams)
+                    emit resourceParamChanged(param);
+                else if (tran.command == ApiCommand::removeResourceParams)
+                    emit resourceParamRemoved(param);
+            }
         }
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran ) {
@@ -66,8 +74,6 @@ namespace ec2
 
         //!Implementation of AbstractResourceManager::save
         virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) override;
-        //!Implementation of AbstractResourceManager::removeParams
-        virtual int removeParams(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::remove
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
         virtual int remove( const QVector<QnUuid>& idList, impl::SimpleHandlerPtr handler ) override;

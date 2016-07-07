@@ -1,6 +1,8 @@
 #ifndef QN_PARAM_H
 #define QN_PARAM_H
 
+#include <nx/utils/literal.h>
+
 #include <QString>
 
 namespace Qn

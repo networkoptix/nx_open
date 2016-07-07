@@ -75,10 +75,10 @@ namespace ec2
 
     struct SendTransactionToTransportFastFuction {
         bool operator()(QnTransactionMessageBus *bus, Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, QnTransactionTransport *sender,
-                        const QnTransactionTransportHeader &transportHeader, const QnUuid &tranParamsId, ApiCommand::Value value) const
+                        const QnTransactionTransportHeader &transportHeader) const
         {
             Q_UNUSED(bus)
-                return sender->sendSerializedTransaction(srcFormat, serializedTran, transportHeader, tranParamsId, value);
+                return sender->sendSerializedTransaction(srcFormat, serializedTran, transportHeader);
         }
     };
 
@@ -717,8 +717,9 @@ namespace ec2
 
 
         NX_LOG( QnLog::EC2_TRAN_LOG, printTransaction("got transaction", tran, transportHeader, sender), cl_logDEBUG1);
-        // process system transactions
-        switch(tran.command) {
+		        // process system transactions
+        switch(tran.command) 
+		{
         case ApiCommand::lockRequest:
         case ApiCommand::lockResponse:
         case ApiCommand::unlockRequest:
@@ -754,41 +755,71 @@ namespace ec2
         case ApiCommand::updatePersistentSequence:
             updatePersistentMarker(tran, sender);
             break;
-        case ApiCommand::installUpdate:
-        case ApiCommand::uploadUpdate:
-        case ApiCommand::changeSystemName:
-        {
-            auto userResource = Qn::getUserResourceByAccessData(sender->getUserAccessData());
-            bool userHasAdminRights = userResource && qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-
-            if (!userHasAdminRights)
-            {
-                NX_LOG(QnLog::EC2_TRAN_LOG, lit("Can't handle transaction %1 because of no administrator rights. Reopening connection...").arg(ApiCommand::toString(tran.command)), cl_logWARNING);
-                sender->setState(QnTransactionTransport::Error);
-                return;
-            }
-            break;
-        }
         default:
-            // general transaction
-            if (!tran.persistentInfo.isNull() && detail::QnDbManager::instance())
-            {
-                QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-                ErrorCode errorCode = dbManager(Qn::UserAccessData(sender->getUserAccessData())).executeTransaction(tran, serializedTran);
-                switch(errorCode) {
-                case ErrorCode::ok:
-                    break;
-                case ErrorCode::containsBecauseTimestamp:
-                    proxyFillerTransaction(tran, transportHeader);
-                case ErrorCode::containsBecauseSequence:
-                    return; // do not proxy if transaction already exists
-                default:
-                    NX_LOG( QnLog::EC2_TRAN_LOG, lit("Can't handle transaction %1: %2. Reopening connection...").
-                        arg(ApiCommand::toString(tran.command)).arg(ec2::toString(errorCode)), cl_logWARNING );
-                    sender->setState(QnTransactionTransport::Error);
-                    return;
-                }
-            }
+			switch (tran.command)
+			{
+			case ApiCommand::installUpdate:
+			case ApiCommand::uploadUpdate:
+			case ApiCommand::changeSystemName:
+			{	// Transactions listed here should not go to the DbManager. 
+				// We are only interested in relevant notifications triggered.
+				// Also they are allowed only if sender is Admin.
+				auto userResource = Qn::getUserResourceByAccessData(
+					sender->getUserAccessData()
+				);
+				bool userHasAdminRights = 
+					userResource && 
+					qnResourceAccessManager->hasGlobalPermission(
+						userResource,
+						Qn::GlobalPermission::GlobalAdminPermission
+					);
+				if (!userHasAdminRights)
+				{
+					NX_LOG(
+						QnLog::EC2_TRAN_LOG,
+						lit("Can't handle transaction %1 because of no administrator rights. Reopening connection...")
+							.arg(ApiCommand::toString(tran.command)),
+						cl_logWARNING
+					);
+					sender->setState(QnTransactionTransport::Error);
+					return;
+				}
+				break;
+			}
+			default:
+				// These ones are 'general' transactions. They will go through the DbManager 
+				// and also will be notified about via the relevant notification manager.
+				if (!tran.persistentInfo.isNull() && detail::QnDbManager::instance())
+				{
+					QByteArray serializedTran = 
+						QnUbjsonTransactionSerializer::instance()->serializedTransaction(
+							tran
+						);
+					ErrorCode errorCode = 
+						dbManager(Qn::UserAccessData(sender->getUserAccessData()))
+							.executeTransaction(tran, serializedTran);
+					switch(errorCode) 
+					{
+					case ErrorCode::ok:
+						break;
+					case ErrorCode::containsBecauseTimestamp:
+						proxyFillerTransaction(tran, transportHeader);
+					case ErrorCode::containsBecauseSequence:
+						return; // do not proxy if transaction already exists
+					default:
+						NX_LOG(
+							QnLog::EC2_TRAN_LOG,
+							lit("Can't handle transaction %1: %2. Reopening connection...")
+								.arg(ApiCommand::toString(tran.command))
+								.arg(ec2::toString(errorCode)),
+							cl_logWARNING 
+						);
+						sender->setState(QnTransactionTransport::Error);
+						return;
+					}
+				}
+				break;
+			}
 
             if( m_handler )
                 m_handler->triggerNotification(tran);
@@ -870,7 +901,9 @@ namespace ec2
         }
     }
 
-    void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<ApiSyncRequestData> &tran)
+    void QnTransactionMessageBus::onGotTransactionSyncRequest(
+		QnTransactionTransport* sender,
+		const QnTransaction<ApiSyncRequestData> &tran)
     {
         sender->setWriteSync(true);
 
@@ -880,7 +913,7 @@ namespace ec2
         QnTransactionTransportHeader ttBroadcast(ttUnicast);
         ttBroadcast.flags |= Qn::TT_ProxyToClient;
 
-        QnTransactionLog::TranMiscDataListType serializedTransactions;
+        QList<QByteArray> serializedTransactions;
         const ErrorCode errorCode = transactionLog->getTransactionsAfter(
             tran.params.persistentState,
             serializedTransactions);
@@ -900,16 +933,18 @@ namespace ec2
             sendRuntimeInfo(sender, ttBroadcast, tran.params.runtimeState);
 
             using namespace std::placeholders;
-            for(const auto& tranMiscData: serializedTransactions)
-                if(!handleTransaction(Qn::UbjsonFormat,
-                    tranMiscData.data,
-                    std::bind(SendTransactionToTransportFuction(), this, _1, sender, ttBroadcast),
-                    std::bind(
-                        SendTransactionToTransportFastFuction(),
-                        this, _1, _2, sender, ttBroadcast,
-                        tranMiscData.paramsId,
-                        tranMiscData.value)))
-                    sender->setState(QnTransactionTransport::Error);
+            for(const auto& serializedTran: serializedTransactions)
+				if (!handleTransaction(Qn::UbjsonFormat,
+									   serializedTran,
+									   std::bind(
+										   SendTransactionToTransportFuction(),
+										   this, _1, sender, ttBroadcast),
+									   std::bind(
+										   SendTransactionToTransportFastFuction(),
+										   this, _1, _2, sender, ttBroadcast)))
+				{
+					sender->setState(QnTransactionTransport::Error);
+				}
 
             QnTransaction<ApiTranSyncDoneData> tranSyncDone(ApiCommand::tranSyncDone);
             tranSyncResponse.params.result = 0;

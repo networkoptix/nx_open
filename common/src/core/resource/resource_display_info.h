@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
+#include <common/common_globals.h>
 
 class QnResourceDisplayInfo
 {

@@ -12,6 +12,7 @@ extern "C"
 #include <QtCore/QIODevice>
 
 #include <nx/streaming/media_context.h>
+#include <nx/streaming/media_context_serializable_data.h>
 
 /** Static.
  * Contains utilities which rely on ffmpeg implementation.
@@ -56,6 +57,13 @@ public:
      */
     static void deleteAvCodecContext(AVCodecContext* context);
 
+    /**
+     * Deserialize MediaContext from binary format used in v2.5. Requires ffmpeg impl to fill
+     * default values. QnMediaContextSerializableData fields are expected to be non-initialized.
+     */
+    static bool deserializeMediaContextFromDepricatedFormat(
+        QnMediaContextSerializableData* context, const char* data, int dataLen);
+
     static AVIOContext* createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int ioBlockSize = 32768);
     static AVIOContext* createFfmpegIOContext(QIODevice* ioDevice, int ioBlockSize = 32768);
     static void closeFfmpegIOContext(AVIOContext* ioContext);
@@ -89,8 +97,8 @@ private:
             avCodec.type = AVMEDIA_TYPE_VIDEO;
         }
 
-        StaticHolder(const StaticHolder&);
-        void operator=(const StaticHolder&);
+        StaticHolder(const StaticHolder&) /*= delete*/;
+        void operator=(const StaticHolder&) /*= delete*/;
     };
 };
 

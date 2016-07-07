@@ -28,7 +28,7 @@ namespace nx_api
     /*!
         \a CustomConnectionType MUST implement following methods:
         \code {*.cpp}
-            //!Received data from remote host
+            //!Received data from remote host. Empty buffer signals end-of-file
             void bytesReceived( const nx::Buffer& buf );
             //!Submitted data has been sent, \a m_writeBuffer has some free space
             void readyToSendData();
@@ -115,10 +115,9 @@ namespace nx_api
         */
         void startReadingConnection()
         {
-            using namespace std::placeholders;
             m_streamSocket->readSomeAsync(
                 &m_readBuffer,
-                std::bind( &SelfType::onBytesRead, this, _1, _2 ) );
+                std::bind( &SelfType::onBytesRead, this, std::placeholders::_1, std::placeholders::_2 ) );
         }
 
         /*!
@@ -126,10 +125,9 @@ namespace nx_api
         */
         void sendBufAsync( const nx::Buffer& buf )
         {
-            using namespace std::placeholders;
             m_streamSocket->sendAsync(
                 buf,
-                std::bind( &SelfType::onBytesSent, this, _1, _2 ) );
+                std::bind( &SelfType::onBytesSent, this, std::placeholders::_1, std::placeholders::_2 ) );
             m_bytesToSend = buf.size();
         }
 
@@ -159,7 +157,9 @@ namespace nx_api
         */
         std::unique_ptr<AbstractCommunicatingSocket> takeSocket()
         {
-            return std::move(m_streamSocket);
+            auto socket = std::move(m_streamSocket);
+            m_streamSocket = nullptr;
+            return std::move(socket);
         }
 
     protected:
@@ -183,12 +183,8 @@ namespace nx_api
 
         void onBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
         {
-            using namespace std::placeholders;
-
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
-            if( bytesRead == 0 )    //connection closed by remote peer
-                return handleSocketError(SystemError::connectionReset);
 
             NX_ASSERT( (size_t)m_readBuffer.size() == bytesRead );
 
@@ -199,10 +195,13 @@ namespace nx_api
                     return; //connection has been removed by handler
             }
 
+            if (bytesRead == 0)    //connection closed by remote peer
+                return handleSocketError(SystemError::connectionReset);
+
             m_readBuffer.resize( 0 );
             m_streamSocket->readSomeAsync(
                 &m_readBuffer,
-                std::bind(&SelfType::onBytesRead, this, _1, _2));
+                std::bind(&SelfType::onBytesRead, this, std::placeholders::_1, std::placeholders::_2));
         }
 
         void onBytesSent( SystemError::ErrorCode errorCode, size_t count )

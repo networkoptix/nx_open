@@ -291,6 +291,11 @@ QString QnLicense::expiration() const
     return m_expiration;
 }
 
+bool QnLicense::neverExpire() const
+{
+    return m_expiration.isEmpty();
+}
+
 QByteArray QnLicense::rawLicense() const
 {
     return m_rawLicense;
@@ -404,12 +409,9 @@ QByteArray QnLicense::toString() const
     return m_rawLicense;
 }
 
-qint64 QnLicense::expirationTime() const {
-
-    //return QDateTime::currentMSecsSinceEpoch() + 1000 * 1000;
-
-
-    if(m_expiration.isEmpty())
+qint64 QnLicense::expirationTime() const
+{
+    if (neverExpire())
         return -1;
 
     QDateTime result = QDateTime::fromString(m_expiration, QLatin1String("yyyy-MM-dd hh:mm:ss"));
@@ -648,8 +650,8 @@ void QnLicensePool::addLicense(const QnLicensePtr &license)
 {
     QnMutexLocker locker( &m_mutex );
 
-    if (addLicense_i(license))
-        emit licensesChanged();
+    addLicense_i(license);
+    emit licensesChanged();
 }
 
 void QnLicensePool::removeLicense(const QnLicensePtr &license)
@@ -675,8 +677,8 @@ void QnLicensePool::addLicenses(const QnLicenseList &licenses)
 {
     QnMutexLocker locker( &m_mutex );
 
-    if (addLicenses_i(licenses))
-        emit licensesChanged();
+    addLicenses_i(licenses);
+    emit licensesChanged();
 }
 
 void QnLicensePool::replaceLicenses(const ec2::ApiLicenseDataList& licenses)

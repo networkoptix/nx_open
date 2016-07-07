@@ -18,11 +18,12 @@ var Helper = function () {
 
     this.activeSystem = 'http://10.0.3.196:7001';
     this.incompatibleSystem = 'http://10.0.3.202:7001';
-    this.password = 'admin';
+    this.password = 'qweasd123';
+    this.cloudEmail = 'noptixqa+owner@gmail.com';
 
-    //this.checkElementFocusedBy = function(element, attribute) {
-    //    expect(element.getAttribute(attribute)).toEqual(browser.driver.switchTo().activeElement().getAttribute(attribute));
-    //};
+    this.checkElementFocusedBy = function(element, attribute) {
+        expect(element.getAttribute(attribute)).toEqual(browser.driver.switchTo().activeElement().getAttribute(attribute));
+    };
 
     //this.isSubstr = function(string, substring) {
     //    if (string.indexOf(substring) > -1) return true;
@@ -56,6 +57,14 @@ var Helper = function () {
         });
     };
 
+    this.waitIfNotDisplayed = function(elem, timeout) {
+        var timeoutUsed = timeout || 1000;
+        self.checkDisplayed(elem).then( null, function(err) {
+            console.log(err);
+            browser.sleep( timeoutUsed );
+        });
+    };
+
     this.closeDialogIfPresent = function(dialog, closeButton) {
         self.checkPresent(dialog).then( function() {
             closeButton.click();
@@ -81,6 +90,30 @@ var Helper = function () {
         browser.ignoreSynchronization = true;
         if (typeof callback === 'function') callback();
         browser.ignoreSynchronization = false;
+    };
+
+    this.setupWizardDialog = element(by.css('.modal')).element(by.css('.panel'));
+    this.completeSetup = function() {
+        var setupDialog = element(by.css('.modal')).element(by.css('.panel'));
+        var nextButton = self.setupWizardDialog.element(by.cssContainingText('button', 'Next'));
+        var systemNameInput = self.setupWizardDialog.element(by.model('settings.systemName'));
+        var skipCloud = self.setupWizardDialog.element(by.linkText('Skip this step for now'));
+        var localPasswordInput = self.setupWizardDialog.element(by.model('ngModel'));
+        //var localPasswordInput = self.setupWizardDialog.element(by.model('settings.localPassword'));
+        var localPasswordConfInput = self.setupWizardDialog.element(by.model('settings.localPasswordConfirmation'));
+        var finishButton = self.setupWizardDialog.element(by.buttonText('Finish'));
+
+        expect(setupDialog.isDisplayed()).toBe(true);
+        nextButton.click();
+        systemNameInput.sendKeys('autotest-system');
+        nextButton.click();
+        skipCloud.click();
+        localPasswordInput.sendKeys(self.password);
+        localPasswordConfInput.sendKeys(self.password);
+        expect(setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
+        nextButton.click();
+        finishButton.click();
+        self.checkPresent(setupDialog).then( function(){ finishButton.click() }, function(){});
     }
 };
 

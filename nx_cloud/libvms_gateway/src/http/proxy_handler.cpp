@@ -6,6 +6,8 @@
 #include "proxy_handler.h"
 
 #include <nx/network/http/buffer_source.h>
+#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/cpp14.h>
 
@@ -32,7 +34,7 @@ void ProxyHandler::processRequest(
     nx_http::HttpServerConnection* const connection,
     stree::ResourceContainer authInfo,
     nx_http::Request request,
-    nx_http::Response* const response,
+    nx_http::Response* const /*response*/,
     std::function<void(
         const nx_http::StatusCode::Value statusCode,
         std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)> completionHandler)
@@ -41,29 +43,16 @@ void ProxyHandler::processRequest(
 
     //{http|rtsp}://{nx_vms_gateway_host}/{[server_id.]cloud_system_id}/{system request path}
 
-    //parsing request path
-    const QString& path = request.requestLine.url.path();
-    auto pathItems = path.splitRef('/', QString::SkipEmptyParts);
-    if (pathItems.isEmpty())
+    SocketAddress targetEndpoint;
+    const auto statusCode = 
+        fetchTargetEndpointAndPrepareRequest(*connection, &request, &targetEndpoint);
+    if (!nx_http::StatusCode::isSuccessCode(statusCode))
     {
-        NX_LOGX(lm("Failed to find address string in request path %1 received from %2")
-            .arg(path).arg(connection->socket()->getForeignAddress().toString()),
-            cl_logDEBUG1);
-        completionHandler(nx_http::StatusCode::forbidden, nullptr);
+        completionHandler(statusCode, nullptr);
         return;
     }
-    const auto systemAddressString = pathItems[0];
-    pathItems.removeAt(0);
 
-    if (pathItems.isEmpty())
-    {
-        request.requestLine.url = "/";
-    }
-    else
-    {
-        NX_ASSERT(pathItems[0].position() > 0);
-        request.requestLine.url = path.mid(pathItems[0].position()-1);  //-1 to include '/'
-    }
+    //TODO #ak avoid request loop by using Via header
 
     //connecting to the target host
     m_targetPeerSocket = SocketFactory::createStreamSocket();
@@ -83,7 +72,7 @@ void ProxyHandler::processRequest(
     m_request = std::move(request);
     //TODO #ak updating request (e.g., Host header)
     m_targetPeerSocket->connectAsync(
-        SocketAddress(systemAddressString.toString(), m_settings.http().proxyTargetPort),
+        targetEndpoint,
         std::bind(&ProxyHandler::onConnected, this, std::placeholders::_1));
 }
 
@@ -101,6 +90,71 @@ void ProxyHandler::closeConnection(
 
     auto handler = std::move(m_requestCompletionHandler);
     handler(nx_http::StatusCode::serviceUnavailable, nullptr);  //TODO #ak better status code
+}
+
+nx_http::StatusCode::Value ProxyHandler::fetchTargetEndpointAndPrepareRequest(
+    const nx_http::HttpServerConnection& connection,
+    nx_http::Request* const request,
+    SocketAddress* const targetEndpoint)
+{
+    if (!request->requestLine.url.host().isEmpty())
+    {
+        if (!m_settings.http().allowTargetEndpointInUrl)
+            return nx_http::StatusCode::forbidden;
+
+        //using original url path
+        *targetEndpoint = SocketAddress(
+            request->requestLine.url.host(),
+            request->requestLine.url.port(nx_http::DEFAULT_HTTP_PORT));
+        request->requestLine.url.setScheme(QString());
+        request->requestLine.url.setHost(QString());
+        request->requestLine.url.setPort(-1);
+
+        nx_http::insertOrReplaceHeader(
+            &request->headers,
+            nx_http::HttpHeader("Host", targetEndpoint->toString().toUtf8()));
+    }
+    else
+    {
+        //looking for proxy target in request path
+        const QString& path = request->requestLine.url.path();
+        auto pathItems = path.splitRef('/', QString::SkipEmptyParts);
+        if (pathItems.isEmpty())
+        {
+            NX_LOGX(lm("Failed to find address string in request path %1 received from %2")
+                .arg(path).arg(connection.socket()->getForeignAddress().toString()),
+                cl_logDEBUG1);
+            return nx_http::StatusCode::badRequest;
+        }
+
+        *targetEndpoint = SocketAddress(pathItems[0].toString());
+        pathItems.removeAt(0);
+
+        auto query = request->requestLine.url.query();
+        if (pathItems.isEmpty())
+        {
+            request->requestLine.url = "/";
+        }
+        else
+        {
+            NX_ASSERT(pathItems[0].position() > 0);
+            request->requestLine.url = path.mid(pathItems[0].position() - 1);  //-1 to include '/'
+        }
+        request->requestLine.url.setQuery(std::move(query));
+    }
+
+    if (!network::SocketGlobals::addressResolver()
+            .isCloudHostName(targetEndpoint->address.toString()))
+    {
+        // No cloud address means direct IP
+        if (!m_settings.cloudConnect().allowIpTarget)
+            return nx_http::StatusCode::forbidden;
+
+        if (targetEndpoint->port == 0)
+            targetEndpoint->port = m_settings.http().proxyTargetPort;
+    }
+
+    return nx_http::StatusCode::ok;
 }
 
 void ProxyHandler::onConnected(SystemError::ErrorCode errorCode)
@@ -163,6 +217,7 @@ void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
         nx_http::insertOrReplaceHeader(
             &message.response->headers,
             nx_http::HttpHeader("Content-Encoding", "identity"));
+        message.response->headers.erase("Transfer-Encoding");   //no support for streaming body yet
 
         msgBody = std::make_unique<nx_http::BufferSource>(
             contentTypeIter->second,

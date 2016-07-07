@@ -70,7 +70,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
             if (params[i].second.toLower().trimmed() == "latest")
                 time = QnThumbnailRequestData::kLatestThumbnail;
             else
-                time = parseDateTime(params[i].second.toUtf8());
+                time = nx::utils::parseDateTime(params[i].second.toUtf8());
         }
         else if (params[i].first == "rotate") {
             rotate = params[i].second.toInt();

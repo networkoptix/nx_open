@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud_db-deb</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Cloud Cloud Db Deb Package</name>
+    <name>NX Cloud Db Deb Package</name>
 
     <properties>
         <!-- Change it to point relatively to the root-->

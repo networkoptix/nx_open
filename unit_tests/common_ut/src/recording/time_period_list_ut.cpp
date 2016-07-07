@@ -5,6 +5,7 @@
 #include <QtCore/QDebug>
 
 #include <recording/time_period_list.h>
+#include <nx/utils/test_support/test_options.h>
 
 namespace {
 #ifdef _DEBUG
@@ -75,7 +76,8 @@ TEST( QnTimePeriodsListTest, mergeBigData )
     qint64 timestamp2 = QDateTime::currentMSecsSinceEpoch();
 
     ASSERT_EQ(resultPeriods, merged);
-    ASSERT_LE(timestamp2 - timestamp1, bigDataTestsLimitMs);
+    if (!nx::utils::TestOptions::areTimeAssertsDisabled())
+        ASSERT_LE(timestamp2 - timestamp1, bigDataTestsLimitMs);
 }
 
 TEST( QnTimePeriodsListTest, unionBigData )
@@ -117,7 +119,8 @@ TEST( QnTimePeriodsListTest, unionBigData )
     qint64 timestamp2 = QDateTime::currentMSecsSinceEpoch();
 
     ASSERT_EQ(resultPeriods, lists[0]);
-    ASSERT_LE(timestamp2 - timestamp1, bigDataTestsLimitMs);
+    if (!nx::utils::TestOptions::areTimeAssertsDisabled())
+        ASSERT_LE(timestamp2 - timestamp1, bigDataTestsLimitMs);
 }
 
 TEST( QnTimePeriodsListTest, unionBySameChunk )

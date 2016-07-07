@@ -20,7 +20,7 @@
 #include <nx/network/compat_poll.h>
 #include <nx/network/socket.h>
 #include <nx/utils/log/log.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/systemerror.h>
 
 #include "network/universal_tcp_listener.h"

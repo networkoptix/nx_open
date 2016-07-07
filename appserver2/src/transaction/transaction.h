@@ -193,6 +193,11 @@ APPLY(313, getCamerasEx, ApiCameraDataExList, \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
                        InvalidTriggerNotificationHelper()) \
+APPLY(314, removeCameraUserAttributes, ApiIdData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       &apiIdDataTriggerNotificationHelper) \
 APPLY(400, getMediaServers, ApiMediaServerDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -334,8 +339,8 @@ APPLY(702, removeVideowall, ApiIdData, \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper) \
 APPLY(703, videowallControl, ApiVideowallControlMessageData, \
-                       false, \
-                       false, \
+                       false, /* persistent*/\
+                       false, /* system*/ \
                        InvalidGetHashHelper(), \
                        VideowallNotificationManagerHelper()) \
 APPLY(800, getBusinessRules, ApiBusinessRuleDataList, \

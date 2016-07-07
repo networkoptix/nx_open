@@ -35,7 +35,7 @@ public:
 
     const AudioOutput* audioOutput() const;
 
-    /** Can be empty if not available. */
+    /** Can be Invalid if not available. */
     QSize currentResolution() const;
 
     /** Can be AV_CODEC_ID_NONE if not available. */

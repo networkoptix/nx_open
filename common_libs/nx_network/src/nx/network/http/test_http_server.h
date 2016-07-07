@@ -33,6 +33,17 @@ public:
             path,
             std::move(factoryFunc) );
     }
+    template<typename RequestHandlerType>
+    bool registerRequestProcessor(const QString& path)
+    {
+        return m_httpMessageDispatcher.registerRequestProcessor<RequestHandlerType>(
+            path,
+            []() -> std::unique_ptr<RequestHandlerType>
+            {
+                return std::make_unique<RequestHandlerType>();
+            });
+    }
+
 
     bool registerStaticProcessor(
         const QString& path,

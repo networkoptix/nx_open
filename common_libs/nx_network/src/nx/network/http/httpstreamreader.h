@@ -63,6 +63,8 @@ namespace nx_http
             \return Actual only after state changed from \a readingMessageHeaders to \a waitingMessageStart or \a readingMessageBody
         */
         const Message& message() const;
+        /** moves message out of parser */
+        Message takeMessage();
         ReadState state() const;
         size_t messageBodyBufferSize() const;
         //!Returns internal message body buffer and clears internal buffer

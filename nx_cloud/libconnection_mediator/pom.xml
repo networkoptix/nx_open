@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>libconnection_mediator</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Cloud Connection Mediator Lib</name>
+    <name>NX Cloud Connection Mediator Library</name>
 
     <properties>
         <guid>${libconnection_mediator.guid}</guid>

@@ -49,7 +49,7 @@
 #include <business/business_event_connector.h>
 
 #if !defined(EDGE_SERVER)
-#include <providers/speach_synthesis_data_provider.h>
+#include <providers/speech_synthesis_data_provider.h>
 #endif
 
 #include <providers/stored_file_data_provider.h>
@@ -334,9 +334,9 @@ bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusine
     if (!transmitter)
         return false;
 
-    QnAbstractStreamDataProviderPtr speachProvider(new QnSpeachSynthesisDataProvider(text));
-    transmitter->subscribe(speachProvider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
-    speachProvider->startIfNotRunning();
+    QnAbstractStreamDataProviderPtr speechProvider(new QnSpeechSynthesisDataProvider(text));
+    transmitter->subscribe(speechProvider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
+    speechProvider->startIfNotRunning();
     return true;
 #else
     return true;

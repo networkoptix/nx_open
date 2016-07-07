@@ -19,6 +19,9 @@
 #include "transaction/transaction_log.h"
 #include "transaction/transaction_message_bus.h"
 #include <transaction/binary_transaction_serializer.h>
+#include <api/app_server_connection.h>
+#include <managers/camera_manager.h>
+#include <managers/resource_manager.h>
 #include "api/model/audit/auth_session.h"
 
 
@@ -98,51 +101,7 @@ public:
     template<class HandlerType>
     void processUpdateAsync( QnTransaction<ApiIdData>& tran, HandlerType handler )
     {
-        //TODO #ak there is processUpdateSync with same switch. Remove switch from here!
-
-        switch (tran.command)
-        {
-        case ApiCommand::removeMediaServer:
-            return removeResourceAsync( tran, ApiObject_Server, handler );
-        case ApiCommand::removeUser:
-            return removeResourceAsync( tran, ApiObject_User, handler );
-        case ApiCommand::removeResource:
-        {
-            QnTransaction<ApiIdData> updatedTran = tran;
-            switch(dbManager(m_userAccessData).getObjectType(tran.params.id))
-            {
-            case ApiObject_Server:
-                updatedTran.command = ApiCommand::removeMediaServer;
-                break;
-            case ApiObject_Camera:
-                updatedTran.command = ApiCommand::removeCamera;
-                break;
-            case ApiObject_Storage:
-                updatedTran.command = ApiCommand::removeStorage;
-                break;
-            case ApiObject_User:
-                updatedTran.command = ApiCommand::removeUser;
-                break;
-            case ApiObject_Layout:
-                updatedTran.command = ApiCommand::removeLayout;
-                break;
-            case ApiObject_Videowall:
-                updatedTran.command = ApiCommand::removeVideowall;
-                break;
-            case ApiObject_WebPage:
-                updatedTran.command = ApiCommand::removeWebPage;
-                break;
-            case ApiObject_BusinessRule:
-                updatedTran.command = ApiCommand::removeBusinessRule;
-                break;
-            default:
-                return processUpdateAsync(tran, handler, 0); // call default handler
-            }
-            return processUpdateAsync(updatedTran, handler);
-        }
-        default:
-            return processUpdateAsync(tran, handler, 0); // call default handler
-        }
+        return processUpdateAsync(tran, handler, 0); // call default handler
     }
 
     //!Execute transaction
@@ -330,21 +289,139 @@ private:
             std::bind( &ServerQueryProcessor::removeResourceSync, this, _1, resourceType, _2 ) );
     }
 
+    template<typename Manager, typename BaseManagerPtr>
+    ErrorCode removeObjAttrHelper(
+        const QnUuid& id, 
+        ApiCommand::Value command, 
+        const BaseManagerPtr& baseManagerPtr,
+        std::list<std::function<void()>>* const transactionsToSend)
+    {
+        QnTransaction<ApiIdData> removeObjAttrTran(command, ApiIdData(id));
+        ErrorCode errorCode = processUpdateSync(removeObjAttrTran, transactionsToSend, 0);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+
+        auto objNotificationManager = std::dynamic_pointer_cast<Manager>(baseManagerPtr);
+        NX_ASSERT(objNotificationManager);
+        if (objNotificationManager)
+            objNotificationManager->triggerNotification(removeObjAttrTran);
+
+        return ErrorCode::ok;
+    }
+            
+    inline ErrorCode removeObjParamsHelper(
+        const QnTransaction<ApiIdData>& tran,
+        const AbstractECConnectionPtr& connection,
+        std::list<std::function<void()>>* const transactionsToSend)
+    {
+        ApiResourceParamWithRefDataList resourceParams;
+        dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
+
+        ErrorCode errorCode = processMultiUpdateSync(
+            ApiCommand::removeResourceParam,
+            tran.isLocal,
+            tran.deliveryInfo,
+            resourceParams,
+            transactionsToSend);
+
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+
+        auto resourceNotificationManager =
+            std::dynamic_pointer_cast<QnResourceNotificationManager>(
+                connection->getResourceNotificationManager());
+        NX_ASSERT(resourceNotificationManager);
+        if (resourceNotificationManager)
+        {
+            for (const auto& param : resourceParams)
+            {
+                QnTransaction<ApiResourceParamWithRefData> removeParamTran(
+                    ApiCommand::Value::removeResourceParam,
+                    param);
+                resourceNotificationManager->triggerNotification(removeParamTran);
+            }
+        }
+
+        return errorCode;
+    }
+
     ErrorCode removeResourceSync(
         QnTransaction<ApiIdData>& tran,
         ApiObjectType resourceType,
         std::list<std::function<void()>>* const transactionsToSend )
     {
         ErrorCode errorCode = ErrorCode::ok;
+        auto connection = QnAppServerConnectionFactory::getConnection2();
 
-        errorCode = processMultiUpdateSync(
-            ApiCommand::removeResource,
-            tran.isLocal,
-            tran.deliveryInfo,
-            dbManager(m_userAccessData).getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id)).toIdList(),
-            transactionsToSend );
+#define runAndCheckError(expr, message) \
+    do \
+    { \
+        ErrorCode errorCode = (expr); \
+        if (errorCode != ErrorCode::ok) \
+        { \
+            NX_LOG((message), cl_logWARNING); \
+            return errorCode; \
+        } \
+    } while (0)
+
+        switch (resourceType)
+        {
+        case ApiObject_Camera:
+        {
+            runAndCheckError(
+                removeObjAttrHelper<QnCameraNotificationManager>(
+                    tran.params.id,
+                    ApiCommand::removeCameraUserAttributes, 
+                    connection->getCameraNotificationManager(),
+                    transactionsToSend),
+                lit("Remove camera attributes failed"));
+
+            runAndCheckError(
+                removeObjParamsHelper(tran, connection, transactionsToSend),
+                lit("Remove camera params failed"));
+            break;
+        }
+        case ApiObject_Server:
+        {
+            runAndCheckError(
+                removeObjAttrHelper<QnMediaServerNotificationManager>(
+                    tran.params.id,
+                    ApiCommand::removeServerUserAttributes, 
+                    connection->getMediaServerNotificationManager(),
+                    transactionsToSend),
+                lit("Remove server attrs failed"));
+            
+            runAndCheckError(
+                removeObjParamsHelper(tran, connection, transactionsToSend),
+                lit("Remove server params failed"));
+
+            runAndCheckError(
+                processMultiUpdateSync(
+                    ApiCommand::removeResource,
+                    tran.isLocal,
+                    tran.deliveryInfo,
+                    dbManager(m_userAccessData)
+                        .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
+                        .toIdList(),
+                    transactionsToSend),
+                lit("Remove server child resources failed"));
+
+            break;
+        }
+        case ApiObject_User: 
+        {
+            runAndCheckError(
+                removeObjParamsHelper(tran, connection, transactionsToSend),
+                lit("Remove user params failed"));
+            break;
+        }
+        default:
+            NX_ASSERT(0);
+        }
         if( errorCode != ErrorCode::ok )
             return errorCode;
+
+#undef runAndCheckError
 
         return processUpdateSync( tran, transactionsToSend, 0 );
     }
@@ -401,6 +478,8 @@ private:
             return removeResourceSync( tran, ApiObject_Server, transactionsToSend );
         case ApiCommand::removeUser:
             return removeResourceSync( tran, ApiObject_User, transactionsToSend );
+        case ApiCommand::removeCamera:
+            return removeResourceSync( tran, ApiObject_Camera, transactionsToSend );
         case ApiCommand::removeResource:
         {
             QnTransaction<ApiIdData> updatedTran = tran;

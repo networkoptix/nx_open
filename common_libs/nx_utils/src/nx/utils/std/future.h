@@ -94,19 +94,7 @@ public:
     std::future_status wait_for(
         const std::chrono::duration<Rep, Period>& timeout_duration) const
     {
-        std::unique_lock<std::mutex> lk(m_mutex);
-
-        const auto t0 = std::chrono::steady_clock::now();
-        while (!m_satisfied)
-        {
-            const auto timePassed = std::chrono::steady_clock::now() - t0;
-            if (timePassed >= timeout_duration)
-                return std::future_status::timeout;
-            const auto timeLeftToWait = timeout_duration - timePassed;
-            if (m_cond.wait_for(lk, timeLeftToWait, [this]{ return m_satisfied; }))
-                break;
-        }
-        return std::future_status::ready;
+        return wait_until(std::chrono::steady_clock::now() + timeout_duration);
     }
 
     template<class Clock, class Duration>

@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
@@ -10,7 +9,7 @@
 #include <nx/network/test_support/stun_async_client_mock.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
-
+#include <nx/utils/test_support/test_options.h>
 
 namespace nx {
 namespace network {
@@ -386,8 +385,11 @@ protected:
                 acceptServerForever();
                 socket->sendAsync(
                     network::test::kTestMessage,
-                    [](SystemError::ErrorCode code, size_t size)
+                    [this, socket](SystemError::ErrorCode code, size_t size)
                     {
+                        NX_LOGX(lm("test message is sent to %1").arg(socket),
+                            cl_logDEBUG2);
+
                         ASSERT_EQ(code, SystemError::noError);
                         ASSERT_EQ(size, network::test::kTestMessage.size());
                     });
@@ -419,8 +421,9 @@ protected:
     {
         auto socketPtr = std::make_unique<TCPSocket>();
         auto socket = socketPtr.get();
-        ASSERT_TRUE(socketPtr->setSendTimeout(100));
-        ASSERT_TRUE(socketPtr->setRecvTimeout(100));
+        const auto timeout = 3000 * utils::TestOptions::timeoutMultiplier();
+        ASSERT_TRUE(socketPtr->setSendTimeout(timeout));
+        ASSERT_TRUE(socketPtr->setRecvTimeout(timeout));
         ASSERT_TRUE(socketPtr->setNonBlockingMode(true));
 
         {
@@ -428,12 +431,15 @@ protected:
             m_connectSockets.emplace(socket, std::move(socketPtr));
         }
 
-        NX_LOGX(lm("start %1 -> %2").arg(socket).str(peer), cl_logDEBUG1);
+        NX_LOGX(lm("client %1 -> %2 (timeout=%3)")
+            .arg(socket).str(peer).arg(timeout), cl_logDEBUG1);
+
         connectClient(socket, peer);
     }
 
     void connectClient(AbstractStreamSocket* socket, const SocketAddress& peer)
     {
+        const auto delay = 500 * utils::TestOptions::timeoutMultiplier();
         if (auto address = m_addressBinder.random(peer))
         {
             NX_LOGX(lm("connect %1 -> %2").arg(socket).str(*address), cl_logDEBUG2);
@@ -445,13 +451,13 @@ protected:
                         return readOnClient(socket, peer);
 
                     socket->registerTimer(
-                        200, [=](){ connectClient(socket, peer); });
+                        delay, [=](){ connectClient(socket, peer); });
                 });
         }
         else
         {
             socket->registerTimer(
-                rand() % 1000 + 100,
+                rand() % delay,
                 [=]()
                 {
                     if (auto address = m_addressBinder.random(peer))
@@ -460,7 +466,7 @@ protected:
                     NX_LOGX(lm("indicate %1 -> %2").arg(socket).str(peer), cl_logDEBUG2);
                     emitIndication(peer);
                     socket->registerTimer(
-                        200, [=](){ connectClient(socket, peer); });
+                        delay, [=](){ connectClient(socket, peer); });
                 });
         }
     }
@@ -498,7 +504,9 @@ protected:
                     size != static_cast<size_t>(
                         network::test::kTestMessage.size()))
                 {
-                    NX_LOGX(lm("read %1 failed").arg(socket), cl_logDEBUG2);
+                    NX_LOGX(lm("read %1 failed (size=%2): %3")
+                        .args(socket, size, SystemError::toString(code)), cl_logDEBUG2);
+
                     return startClient(peer);
                 }
 
@@ -528,7 +536,7 @@ protected:
 
     std::shared_ptr<stun::test::AsyncClientMock> m_stunClient;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
-    TestSyncQueue<SystemError::ErrorCode> m_connectedResults;
+    utils::TestSyncQueue<SystemError::ErrorCode> m_connectedResults;
     std::vector<nx::utils::thread> m_threads;
 
     QnMutex m_mutex;

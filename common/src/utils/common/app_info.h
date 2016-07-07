@@ -48,6 +48,7 @@ struct QnAppInfo
     static QString helpUrl();                   //#GDM #FIXME will not work in 3.0
 
     static QString updateGeneratorUrl();
+    static QString defaultCloudHost();
     static QString defaultCloudPortalUrl();
     static QString defaultCloudModulesXmlUrl();
     static QString cloudName();
@@ -55,9 +56,6 @@ struct QnAppInfo
     static int     freeLicenseCount();
     static QString freeLicenseKey();
     static bool    freeLicenseIsTrial();
-
-    /** Folder where application is installed normally. */
-    static QString installationRoot();
 
     // helpers:
 

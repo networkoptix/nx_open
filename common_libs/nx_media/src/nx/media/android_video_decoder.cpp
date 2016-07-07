@@ -238,6 +238,9 @@ private:
     std::unique_ptr<QOffscreenSurface> offscreenSurface;
 };
 
+QMap<CodecID, QSize> AndroidVideoDecoderPrivate::maxResolutions;
+QMutex AndroidVideoDecoderPrivate::maxResolutionsMutex;
+
 FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
 {
     QElapsedTimer tm;
@@ -458,7 +461,7 @@ bool AndroidVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resol
     return resolution.width() <= maxSize.width() && resolution.height() <= maxSize.height();
 }
 
-static QSize AndroidVideoDecoder::maxResolution(const AVCodecID codec)
+QSize AndroidVideoDecoder::maxResolution(const AVCodecID codec)
 {
     AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(codec);
 

@@ -12,6 +12,7 @@
 #include "nx/streaming/video_data_packet.h"
 #include "core/resource/resource_media_layout.h"
 #include "../resource/av_panoramic.h"
+#include <nx/streaming/config.h>
 
 // ======================================================
 
@@ -112,7 +113,7 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
     }
 
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
-    motion->m_duration = 1000*1000*1000; // 1000 sec 
+    motion->m_duration = 1000*1000*1000; // 1000 sec
     motion->channelNumber = m_motionData;
     filterMotionByMask(motion);
     return motion;
@@ -279,7 +280,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     }
 
     bool iFrame = true;
-    
+
     if (h264)
     {
 
@@ -348,7 +349,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
     QnWritableCompressedVideoDataPtr videoData( new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT,m_videoFrameBuff.size()) );
     videoData->m_data.write(m_videoFrameBuff);
-    
+
 
     if (iFrame)
         videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;

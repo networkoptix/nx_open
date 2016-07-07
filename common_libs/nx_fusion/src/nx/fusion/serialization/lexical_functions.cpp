@@ -99,9 +99,10 @@ bool deserialize(const QString &value, QnUuid *target)
     QnUuid result = QnUuid::fromStringSafe(value);
     if (result.isNull()
         && value != QLatin1String("00000000-0000-0000-0000-000000000000")
-        && value != QLatin1String("{00000000-0000-0000-0000-000000000000}")
-        )
+        && value != QLatin1String("{00000000-0000-0000-0000-000000000000}"))
+    {
         return false;
+    }
 
     *target = result;
     return true;

@@ -3,6 +3,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/singleton.h>
+#include <nx/utils/argument_parser.h>
 #include <utils/common/cpp14.h>
 
 #include "aio/aioservice.h"
@@ -13,6 +14,7 @@
 #include "cloud/mediator_connector.h"
 #include "cloud/tunnel/outgoing_tunnel_pool.h"
 
+#define NX_NETWORK_SOCKET_GLOBALS
 
 namespace nx {
 namespace network {
@@ -44,21 +46,29 @@ public:
     cloud::CloudConnectSettings& cloudConnectSettings()
     { return s_instance->m_cloudConnectSettings; }
 
-    static void init(); /** Should be called before any socket use */
-    static void deinit(); /** Should be called when sockets are not needed any more */
+    static void init(); /**< Should be called before any socket use */
+    static void deinit(); /**< Should be called when sockets are not needed any more */
     static void verifyInitialization();
 
-	class InitGuard
-	{
-	public:
-		InitGuard() { init(); }
-		~InitGuard() { deinit(); }
+    static void applyArguments(const utils::ArgumentParser& arguments);
+
+    typedef void (*CustomInit)();
+    typedef void (*CustomDeinit)();
+
+    /** Invokes @param init only once, calls @param deinit in destructor */
+    static void customInit(CustomInit init, CustomDeinit deinit = nullptr);
+
+    class InitGuard
+    {
+    public:
+        InitGuard() { init(); }
+        ~InitGuard() { deinit(); }
 
         InitGuard( const InitGuard& ) = delete;
         InitGuard( InitGuard&& ) = delete;
         InitGuard& operator=( const InitGuard& ) = delete;
         InitGuard& operator=( InitGuard&& ) = delete;
-	};
+    };
 
 private:
     SocketGlobals();
@@ -78,6 +88,9 @@ private:
     cloud::MediatorAddressPublisher m_addressPublisher;
     cloud::OutgoingTunnelPool m_outgoingTunnelPool;
     cloud::CloudConnectSettings m_cloudConnectSettings;
+
+    QnMutex m_mutex;
+    std::map<CustomInit, CustomDeinit> m_customInits;
 };
 
 class SocketGlobalsHolder

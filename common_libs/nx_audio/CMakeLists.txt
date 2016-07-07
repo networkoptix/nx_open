@@ -1,6 +1,6 @@
 project(nx_audio)
 set(PROJECT_SHORTNAME "nx_audio")
-set(PROJECT_LONGNAME "${nxtool.company.name} Audio Library")
+set(PROJECT_LONGNAME "${short.company.name} Audio Library")
 
 find_sources(src)
 ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)

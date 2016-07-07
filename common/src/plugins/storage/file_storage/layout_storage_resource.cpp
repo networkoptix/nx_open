@@ -537,4 +537,10 @@ QString QnLayoutFileStorageResource::layoutPrefix() {
     return prefix;
 }
 
+QString QnLayoutFileStorageResource::getPath() const
+{
+    Q_ASSERT(!QUrl(getUrl()).scheme().isEmpty());
+    return removeProtocolPrefix(getUrl());
+}
+
 #endif // ENABLE_ARCHIVE

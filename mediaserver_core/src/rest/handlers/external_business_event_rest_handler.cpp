@@ -34,7 +34,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
         }
     }
     if (params.contains("timestamp"))
-        businessParams.eventTimestampUsec = parseDateTime(params["timestamp"]);
+        businessParams.eventTimestampUsec = nx::utils::parseDateTime(params["timestamp"]);
     if (params.contains("eventResourceId"))
         businessParams.eventResourceId = QnUuid::fromStringSafe(params["eventResourceId"]);
     if (params.contains("state")) {

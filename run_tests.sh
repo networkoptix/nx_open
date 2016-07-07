@@ -22,6 +22,7 @@ if [ $run_tests == "true" ]; then
     echo "    \"Nat\": \"natj\"," >> ../devtools/testing/testconf_local.py
     echo "    \"Behind\": \"behindj\"," >> ../devtools/testing/testconf_local.py
     echo "}" >> ../devtools/testing/testconf_local.py
+    echo "SKIP_ALL = set(('nx_network_ut', 'cloud_db_ut', 'mediaserver_core_ut',))" >> ../devtools/testing/testconf_local.py    
     ERRORLEVEL=$?
     if [[ $ERRORLEVEL -ne 0 ]]; then echo $ERRORLEVEL && exit $ERRORLEVEL; fi
     cd testing

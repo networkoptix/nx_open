@@ -180,6 +180,7 @@ bool AccessRestrictions::authorize(const stree::AbstractResourceReader& requestA
 TemporaryAccountCredentials::TemporaryAccountCredentials()
 :
     expirationTimestampUtc(0),
+    prolongationPeriodSec(0),
     maxUseCount(0),
     useCount(0),
     isEmailCode(false)

@@ -16,7 +16,7 @@
 #include <nx/utils/thread/wait_condition.h>
 
 #include <utils/common/cpp14.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/sync_call.h>
 
 
@@ -387,7 +387,7 @@ TEST_F(StunUDP, client_response_injection)
         }
         else
         {
-            const auto buf = generateRandomName(100 + (rand() % 300));
+            const auto buf = nx::utils::generateRandomName(100 + (rand() % 300));
             ASSERT_EQ(buf.size(), udpSocket->send(buf))
                 << SystemError::getLastOSErrorText().toStdString();
         }

@@ -1,7 +1,8 @@
-#ifdef __linux__
+#pragma once
 
-#ifndef SYSTEMEXCEPT_LINUX_H
-#define SYSTEMEXCEPT_LINUX_H
+#include <QtCore/qsystemdetection.h>
+
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 
 #include <string>
 
@@ -27,6 +28,4 @@ public:
     static std::string getCrashPattern();
 };
 
-#endif // SYSTEMEXCEPT_LINUX_H
-
-#endif // __linux__
+#endif // defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)

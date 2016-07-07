@@ -6,7 +6,7 @@
 
 #include <boost/optional.hpp>
 
-#include <utils/thread/sync_queue.h>
+#include <nx/utils/test_support/sync_queue.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/abstract_socket.h>
@@ -59,7 +59,8 @@ void syncSocketServerMainFunc(
     Buffer testMessage,
     int clientCount,
     ServerSocketType server,
-    nx::utils::promise<SocketAddress>* startedPromise)
+    nx::utils::promise<SocketAddress>* startedPromise,
+    bool ignoreReadWriteError = false)
 {
     ASSERT_TRUE(server->setReuseAddrFlag(true));
 
@@ -116,7 +117,10 @@ void syncSocketServerMainFunc(
         {
             client.reset(server->accept());
         }
-        
+
+        if (ignoreReadWriteError && !client)
+            continue;
+
         ASSERT_TRUE(client.get())
             << SystemError::getLastOSErrorText().toStdString() << " on " << i;
         ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
@@ -126,13 +130,18 @@ void syncSocketServerMainFunc(
             continue;
 
         const auto incomingMessage = readNBytes(client.get(), testMessage.size());
-        ASSERT_TRUE(!incomingMessage.isEmpty())
-            << SystemError::getLastOSErrorText().toStdString();
-
-        ASSERT_EQ(testMessage, incomingMessage);
+        if (!ignoreReadWriteError)
+        {
+            ASSERT_TRUE(!incomingMessage.isEmpty())
+                << SystemError::getLastOSErrorText().toStdString();
+            ASSERT_EQ(testMessage, incomingMessage);
+        }
 
         const int bytesSent = client->send(testMessage);
-        ASSERT_NE(-1, bytesSent) << SystemError::getLastOSErrorText().toStdString();
+        if (!ignoreReadWriteError)
+        {
+            ASSERT_NE(-1, bytesSent) << SystemError::getLastOSErrorText().toStdString();
+        }
 
         //waiting for connection to be closed by client
         QByteArray buf(64, 0);
@@ -169,7 +178,8 @@ void socketSimpleSync(
         testMessage,
         clientCount,
         std::move(server),
-        &promise);
+        &promise,
+        false);
 
     auto serverAddress = promise.get_future().get();
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -220,8 +230,8 @@ void socketSimpleAsync(
     int clientCount,
     StopSocketFunc stopSocket)
 {
-    nx::TestSyncQueue< SystemError::ErrorCode > serverResults;
-    nx::TestSyncQueue< SystemError::ErrorCode > clientResults;
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > serverResults;
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > clientResults;
 
     auto server = serverMaker();
     ASSERT_TRUE(server->setNonBlockingMode(true));
@@ -311,8 +321,8 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
 {
     static const std::chrono::milliseconds timeout(1500);
 
-    nx::TestSyncQueue< SystemError::ErrorCode > acceptResults;
-    nx::TestSyncQueue< SystemError::ErrorCode > connectResults;
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > acceptResults;
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > connectResults;
 
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectedSockets;
@@ -398,7 +408,10 @@ void socketShutdown(
             useAsyncPriorSync ? kTestMessage : Buffer(),
             1,
             serverMaker(),
-            &promise);
+            &promise,
+            true);  //this test shuts down socket, so any server socket operation may fail 
+                    //at any moment, so ignoring errors in serverThread.
+                    //Testing that shutdown interrupts client socket operations
 
         auto serverAddress = promise.get_future().get();
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -447,7 +460,21 @@ void socketShutdown(
 
                 nx::Buffer readBuffer;
                 readBuffer.resize(4096);
-                while (client->recv(readBuffer.data(), readBuffer.size(), 0) > 0);
+                //while (client->recv(readBuffer.data(), readBuffer.size(), 0) > 0);
+
+                for (;;)
+                {
+                    const int bytesRead = client->recv(readBuffer.data(), readBuffer.size(), 0);
+                    if (bytesRead > 0)
+                        continue;
+                    if (bytesRead < 0 &&
+                        SystemError::getLastOSErrorCode() == SystemError::wouldBlock)
+                    {
+                        continue;
+                    }
+                    break;  //connection closed
+                }
+
                 recvExitedPromise.set_value();
             });
 
@@ -466,6 +493,7 @@ void socketShutdown(
             std::future_status::ready,
             recvExitedPromise.get_future().wait_for(std::chrono::seconds(1)));
 
+        using namespace std::chrono;
         serverThread.join();
         clientThread.join();
     }
@@ -504,7 +532,7 @@ void socketSimpleTrueAsync(
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
-    nx::TestSyncQueue<bool> stopQueue;
+    nx::utils::TestSyncQueue<bool> stopQueue;
     socketSimpleAsync<ServerSocketMaker, ClientSocketMaker>(
         serverMaker, clientMaker, serverAddress, serverAddress, testMessage, clientCount,
         [&](std::unique_ptr<QnStoppableAsync> socket)
@@ -537,9 +565,12 @@ void socketSimpleAcceptMixed(
         endpoint = std::move(serverAddress);
 
     // no clients yet
-    ASSERT_EQ(server->accept(), nullptr);
-    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::wouldBlock);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    {
+        std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
+        ASSERT_EQ(accepted, nullptr);
+        ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::wouldBlock);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
 
     auto client = clientMaker();
     ASSERT_TRUE(client->setSendTimeout(1000));
@@ -562,8 +593,8 @@ void socketSimpleAcceptMixed(
         //so giving internal socket implementation some time...
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
-    ASSERT_NE(server->accept(), nullptr)
-        << SystemError::getLastOSErrorText().toStdString();
+    std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
+    ASSERT_NE(accepted, nullptr) << SystemError::getLastOSErrorText().toStdString();
 
     pleaseStopSync(std::move(client));
     pleaseStopSync(std::move(server));
@@ -576,7 +607,7 @@ void socketSingleAioThread(
 {
     aio::AbstractAioThread* aioThread(nullptr);
     std::vector<decltype(clientMaker())> sockets;
-    nx::TestSyncQueue<nx::utils::thread::id> threadIdQueue;
+    nx::utils::TestSyncQueue<nx::utils::thread::id> threadIdQueue;
 
     for (auto i = 0; i < clientCount; ++i)
     {
@@ -695,7 +726,7 @@ void socketAcceptTimeoutAsync(
     ASSERT_TRUE(server->bind(serverAddress));
     ASSERT_TRUE(server->listen(5));
 
-    nx::TestSyncQueue< SystemError::ErrorCode > serverResults;
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > serverResults;
     const auto start = std::chrono::system_clock::now();
     server->acceptAsync([&](SystemError::ErrorCode /*code*/,
                             AbstractStreamSocket* /*socket*/)

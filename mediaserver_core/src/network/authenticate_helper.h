@@ -64,7 +64,7 @@ public:
     static QByteArray symmetricalEncode(const QByteArray& data);
 
     enum class NonceProvider { automatic, local };
-    QByteArray generateNonce(NonceProvider provider = NonceProvider::local) const;
+    QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
 
     Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 

@@ -84,14 +84,14 @@ QSize VideoDecoderRegistry::maxResolution(const AVCodecID codec)
     return result;
 }
 
-bool VideoDecoderRegistry::isLiteClientMode() const
+bool VideoDecoderRegistry::isTranscodingEnabled() const
 {
-    return m_isLiteClientMode;
+    return m_isTranscodingEnabled;
 }
 
-void VideoDecoderRegistry::setLiteClientMode(bool liteMode)
+void VideoDecoderRegistry::setTranscodingEnabled(bool transcodingEnabled)
 {
-    m_isLiteClientMode = liteMode;
+    m_isTranscodingEnabled = transcodingEnabled;
 }
 
 } // namespace media

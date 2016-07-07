@@ -9,6 +9,7 @@
 #include <map>
 
 #include <QtCore/QSettings>
+#include <nx/utils/argument_parser.h>
 
 
 //!Able to take settings from \a QSettings class (win32 registry or ini file) or from command line arguments
@@ -33,7 +34,7 @@ public:
 
 private:
     QSettings m_systemSettings;
-    std::multimap<QString, QString> m_args;
+    nx::utils::ArgumentParser m_args;
 };
 
 #endif  //NX_SETTINGS_H

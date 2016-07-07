@@ -18,7 +18,8 @@ const char *qn_logLevelNames[] = {"UNKNOWN", "NONE", "ALWAYS", "ERROR", "WARNING
 const char UTF8_BOM[] = "\xEF\xBB\xBF";
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
-    const QString str = value.toUpper().trimmed();
+    QString str = value.toUpper().trimmed();
+    if (str == QLatin1String("DEBUG1")) str = QLatin1String("DEBUG");
 
     for (uint i = 0; i < sizeof(qn_logLevelNames)/sizeof(char*); ++i) {
         if (str == QLatin1String(qn_logLevelNames[i]))
@@ -354,6 +355,23 @@ bool QnLog::initLog(QnLog *externalInstance, int logID )
         return true;
 
     return logs()->init( logID, std::unique_ptr< QnLog >( externalInstance ) );
+}
+
+void QnLog::applyArguments(const nx::utils::ArgumentParser& arguments)
+{
+    QnLogLevel logLevel(cl_logDEBUG1);
+
+    if (const auto value = arguments.get(QLatin1String("log-file")))
+        instance()->create(*value, 1024 * 1024 * 10, 5, logLevel);
+
+    if (const auto value = arguments.get(QLatin1String("log-level")))
+    {
+        logLevel = logLevelFromString(*value);
+        NX_CRITICAL(logLevel != cl_logUNKNOWN);
+
+        instance()->setLogLevel(logLevel);
+        s_disableLogConfiguration = true;
+    }
 }
 
 QString QnLog::logFileName( int logID )

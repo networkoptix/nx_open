@@ -12,8 +12,9 @@
 #include <QtCore/QString>
 
 #include <libvms_gateway_app_info.h>
-#include <nx/utils/timer_manager.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/common/app_info.h>
 
 
@@ -54,11 +55,20 @@ namespace
 
     //http
     const QLatin1String kHttpProxyTargetPort("http/proxyTargetPort");
-    const int kDefaultHttpProxyTargetPort = 0;
+    const int kDefaultHttpProxyTargetPort = nx_http::DEFAULT_HTTP_PORT;
+
+    const QLatin1String kHttpConnectSupport("http/connectSupport");
+    const int kDefaultHttpConnectSupport = 0;
+
+    const QLatin1String kHttpAllowTargetEndpointInUrl("http/allowTargetEndpointInUrl");
+    const QLatin1String kDefaultHttpAllowTargetEndpointInUrl("false");
 
     //cloudConnect
     const QLatin1String kReplaceHostAddressWithPublicAddress("cloudConnect/replaceHostAddressWithPublicAddress");
     const QLatin1String kDefaultReplaceHostAddressWithPublicAddress("true");
+
+    const QLatin1String kAllowIpTarget("cloudConnect/allowIpTarget");
+    const QLatin1String kDefaultAllowIpTarget("false");
 
     const QLatin1String kFetchPublicIpUrl("cloudConnect/fetchPublicIpUrl");
     const QLatin1String kDefaultFetchPublicIpUrl("http://networkoptix.com/myip");
@@ -72,13 +82,16 @@ namespace conf {
 
 Http::Http()
 :
-    proxyTargetPort(0)
+    proxyTargetPort(0),
+    connectSupport(false),
+    allowTargetEndpointInUrl(false)
 {
 }
 
 CloudConnect::CloudConnect()
 :
-    replaceHostAddressWithPublicAddress(false)
+    replaceHostAddressWithPublicAddress(false),
+    allowIpTarget(false)
 {
 }
 
@@ -212,12 +225,24 @@ void Settings::loadConfiguration()
     //http
     m_http.proxyTargetPort = 
         m_settings.value(kHttpProxyTargetPort, kDefaultHttpProxyTargetPort).toInt();
+    m_http.connectSupport =
+        m_settings.value(
+            kHttpConnectSupport,
+            kDefaultHttpConnectSupport) == "true";
+    m_http.allowTargetEndpointInUrl =
+        m_settings.value(
+            kHttpAllowTargetEndpointInUrl,
+            kDefaultHttpAllowTargetEndpointInUrl).toString() == "true";
 
     //CloudConnect
     m_cloudConnect.replaceHostAddressWithPublicAddress =
         m_settings.value(
             kReplaceHostAddressWithPublicAddress,
             kDefaultReplaceHostAddressWithPublicAddress).toString() == "true";
+    m_cloudConnect.allowIpTarget =
+        m_settings.value(
+            kAllowIpTarget,
+            kDefaultAllowIpTarget).toString() == "true";
     m_cloudConnect.fetchPublicIpUrl = 
         m_settings.value(
             kFetchPublicIpUrl,

@@ -5,7 +5,6 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 
-#include <common/config.h>
 #include <nx/utils/log/assert.h>
 
 
@@ -59,7 +58,7 @@ void QnEventSignalEmitterPool::grow(QnEventSignalEmitter *emitter) {
 QnEventSignalEmitterPool::Signal QnEventSignalEmitterPool::allocate() {
     if(m_freeList.isEmpty())
         grow(new QnEventSignalEmitter(this));
-    
+
     Signal result = m_freeList.back();
     m_freeList.pop_back();
     return result;

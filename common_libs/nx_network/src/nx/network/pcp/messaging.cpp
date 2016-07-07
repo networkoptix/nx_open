@@ -1,6 +1,7 @@
 #include "messaging.h"
 
 #include "utils/memory/data_stream_helpers.h"
+#include <nx/utils/random.h>
 
 static const int NONCE_SIZE = 12;
 static const int IP_SIZE = 16;
@@ -121,10 +122,9 @@ QDataStream& operator>>(QDataStream& stream, PeerMessage& data)
 
 QByteArray makeRandomNonce()
 {
-    QByteArray nonce(NONCE_SIZE, Qt::Uninitialized);
-    for (auto& b : nonce)
-        b = static_cast<char>(qrand());
-    return nonce;
+    bool isOk;
+    auto data = nx::utils::generateRandomData(NONCE_SIZE, &isOk);
+    return isOk ? data : QByteArray();
 }
 
 } // namespace pcp

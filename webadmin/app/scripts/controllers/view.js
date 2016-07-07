@@ -727,39 +727,37 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         });
 
-        mediaserver.getCurrentUser().then(function(result){
+        mediaserver.getCurrentUser().then(function(result) {
             isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
             canViewLive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewLivePermission);
             canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewArchivePermission);
 
-            if(!canViewLive){
+            if (!canViewLive) {
                 return;
             }
 
             var userId = result.data.reply.id;
 
-            if(isAdmin){
+            if (isAdmin) {
                 requestResourses(); //Show  whole tree
                 return;
             }
-            mediaserver.getLayouts().then(function(data){
+            mediaserver.getLayouts().then(function (data) {
 
                 availableCameras = _.chain(data.data).
-                    filter(function(layout){
+                    filter(function (layout) {
                         return layout.parentId === userId;
                     }).
-                    map(function(layout){
+                    map(function (layout) {
                         return layout.items;
                     }).
                     flatten().
-                    map(function(item){
+                    map(function (item) {
                         return item.resourceId;
                     }).uniq().value();
 
                 requestResourses();
             });
-
-
 
         });
 

@@ -10,6 +10,7 @@
 #include <QtCore/QDebug>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/argument_parser.h>
 
 #include "log_message.h"
 #include "assert.h"
@@ -96,6 +97,8 @@ public:
 
     static void initLog(const QString &logLevelStr, int logID = MAIN_LOG_ID);
     static bool initLog(QnLog *externalInstance, int logID = MAIN_LOG_ID);
+
+    static void applyArguments(const nx::utils::ArgumentParser& arguments);
 
     static QString logFileName( int logID = MAIN_LOG_ID );
     static const std::shared_ptr< Logs >& logs();

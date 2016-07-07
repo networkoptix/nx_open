@@ -32,7 +32,7 @@ const QMap<SystemUri::Protocol, QString> protocolToString
 {
     {SystemUri::Protocol::Http, "http"},
     {SystemUri::Protocol::Https, "https"},
-    {SystemUri::Protocol::Native, AppInfo::nativeUriProtocol()} //TODO: #GDM make customizable
+    {SystemUri::Protocol::Native, AppInfo::nativeUriProtocol()}
 };
 
 const QMap<SystemUri::ClientCommand, QString> clientCommandToString
@@ -40,7 +40,7 @@ const QMap<SystemUri::ClientCommand, QString> clientCommandToString
     {SystemUri::ClientCommand::None,            "_invalid_"},
     {SystemUri::ClientCommand::Client,          "client"},
     {SystemUri::ClientCommand::LoginToCloud,    "cloud"},
-    {SystemUri::ClientCommand::ConnectToSystem, "system"}
+    {SystemUri::ClientCommand::ConnectToSystem, "systems"}
 };
 
 const QMap<SystemUri::SystemAction, QString> systemActionToString
@@ -120,12 +120,8 @@ public:
         parameters(other.parameters)
     {}
 
-    void parse(const QString& uri)
+    void parse(const QUrl& url)
     {
-        QUrl url = QUrl::fromUserInput(uri);
-        if (!url.isValid())
-            return;
-
         protocol = protocolToString.key(url.scheme().toLower(), SystemUri::Protocol::Native);
         domain = url.host();
         int port = url.port(kDefaultPort);
@@ -394,11 +390,21 @@ SystemUri::SystemUri() :
 
 }
 
+SystemUri::SystemUri(const QUrl& url) :
+    SystemUri()
+{
+    Q_D(SystemUri);
+    d->parse(url);
+}
+
 SystemUri::SystemUri(const QString& uri) :
     SystemUri()
 {
     Q_D(SystemUri);
-    d->parse(uri);
+
+    QUrl url(uri);
+    if (url.isValid())
+        d->parse(url);
 }
 
 nx::vms::utils::SystemUri::SystemUri(const SystemUri& other) :

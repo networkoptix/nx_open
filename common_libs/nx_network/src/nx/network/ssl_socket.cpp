@@ -323,7 +323,7 @@ public:
     SslAsyncBioHelper(
         SSL* ssl, AbstractStreamSocket* underly_socket, bool is_server);
 
-    ~SslAsyncBioHelper();
+    virtual ~SslAsyncBioHelper();
 
 public:
     // BIO operation function. These 2 BIO operation function will simulate BIO memory
@@ -1666,7 +1666,10 @@ bool SslSocket::shutdown()
 {
     Q_D(const SslSocket);
     if (!d->emulateBlockingMode)
+    {
+        d->wrappedSocket->pleaseStopSync();
         return d->wrappedSocket->shutdown();
+    }
 
     utils::promise<void> promise;
     d->wrappedSocket->dispatch([&]()
@@ -1865,29 +1868,29 @@ void MixedSslSocket::readSomeAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(MixedSslSocket);
-    if (!d->initState && !d->useSSL) {
+    if (!d->initState && !d->useSSL)
         return d->wrappedSocket->readSomeAsync(buffer, std::move(handler));
-    } else {
-        d->ioMode.store(SslSocket::ASYNC,std::memory_order_release);
-        MixedSslAsyncBioHelper* ssl_ptr =
-            static_cast< MixedSslAsyncBioHelper* >(d->asyncSslHelper.get());
-        if (ssl_ptr->is_initialized() && !ssl_ptr->is_ssl())
-            return d->wrappedSocket->readSomeAsync(buffer,std::move(handler));
 
-        d->wrappedSocket->post(
-            [this,buffer,handler]() mutable {
-                Q_D(MixedSslSocket);
-                MixedSslAsyncBioHelper* ssl_ptr =
-                    static_cast< MixedSslAsyncBioHelper* >(d->asyncSslHelper.get());
-                if (!d->initState)
-                    ssl_ptr->set_ssl(d->useSSL);
-                if (ssl_ptr->is_initialized() && !ssl_ptr->is_ssl()) {
-                    d->wrappedSocket->readSomeAsync(buffer, std::move(handler));
-                } else {
-                    ssl_ptr->asyncRecv(buffer, std::move(handler));
-                }
+    auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
+    d->ioMode.store(SslSocket::ASYNC,std::memory_order_release);
+    if (helper->is_initialized() && !helper->is_ssl())
+        return d->wrappedSocket->readSomeAsync(buffer,std::move(handler));
+
+    d->wrappedSocket->dispatch(
+        [d, helper, buffer, handler = std::move(handler)]() mutable
+        {
+            if (!d->initState)
+                helper->set_ssl(d->useSSL);
+
+            if (helper->is_initialized() && !helper->is_ssl())
+                return d->wrappedSocket->readSomeAsync(buffer, std::move(handler));
+
+            d->wrappedSocket->post(
+                [helper, buffer, handler = std::move(handler)]() mutable
+                {
+                    helper->asyncRecv(buffer, std::move(handler));
+                });
         });
-    }
 }
 
 void MixedSslSocket::sendAsync(
@@ -1895,29 +1898,29 @@ void MixedSslSocket::sendAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(MixedSslSocket);
-    if (!d->initState && !d->useSSL) {
+    if (!d->initState && !d->useSSL)
         return d->wrappedSocket->sendAsync(buffer, std::move(handler));
-    } else {
-        d->ioMode.store(SslSocket::ASYNC,std::memory_order_release);
-        MixedSslAsyncBioHelper* ssl_ptr =
-            static_cast< MixedSslAsyncBioHelper* >(d->asyncSslHelper.get());
-        if (ssl_ptr->is_initialized() && !ssl_ptr->is_ssl())
-            return d->wrappedSocket->sendAsync(buffer,std::move(handler));
 
-        d->wrappedSocket->post(
-            [this,&buffer,handler]() mutable {
-                Q_D(MixedSslSocket);
-                MixedSslAsyncBioHelper* ssl_ptr =
-                    static_cast< MixedSslAsyncBioHelper* >(d->asyncSslHelper.get());
-                if (!d->initState)
-                    ssl_ptr->set_ssl(d->useSSL);
-                if (ssl_ptr->is_initialized() && !ssl_ptr->is_ssl()) {
-                    d->wrappedSocket->sendAsync(buffer, std::move(handler));
-                } else {
-                    ssl_ptr->asyncSend(buffer, std::move(handler));
-                }
+    auto helper = static_cast< MixedSslAsyncBioHelper* >(d->asyncSslHelper.get());
+    d->ioMode.store(SslSocket::ASYNC,std::memory_order_release);
+    if (helper->is_initialized() && !helper->is_ssl())
+        return d->wrappedSocket->sendAsync(buffer,std::move(handler));
+
+    d->wrappedSocket->dispatch(
+        [d, helper, &buffer, handler = std::move(handler)]() mutable
+        {
+            if (!d->initState)
+                helper->set_ssl(d->useSSL);
+
+            if (helper->is_initialized() && !helper->is_ssl())
+                return d->wrappedSocket->sendAsync(buffer, std::move(handler));
+
+            d->wrappedSocket->post(
+                [helper, &buffer, handler = std::move(handler)]() mutable
+                {
+                    helper->asyncSend(buffer, std::move(handler));
+                });
         });
-    }
 }
 
 SslServerSocket::SslServerSocket(

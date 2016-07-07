@@ -4,6 +4,7 @@
 #ifndef DISABLE_FFMPEG
 
 #include "media_context.h"
+#include <nx/streaming/media_context_serializable_data.h>
 
 /**
  * Implementation of QnMediaContext which wraps (and owns) AVCodecContext. Does

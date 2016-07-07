@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/sync_call.h>
 
 #include <test_support/mediaserver_emulator.h>
@@ -87,7 +87,7 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
         client = clientConnection();
 
     const auto system1 = addRandomSystem();
-    auto server1 = addServer(system1, generateRandomName(16));
+    auto server1 = addServer(system1, nx::utils::generateRandomName(16));
     auto server2 = addServer(system1, server1->serverId());
 
     //resolving, last added server is chosen
@@ -128,7 +128,7 @@ TEST_F(MediatorFunctionalTest, resolve_unkownDomain)
         makeSyncCall<api::ResultCode, api::ResolveDomainResponse>(std::bind(
             &nx::hpm::api::MediatorClientTcpConnection::resolveDomain,
             client.get(),
-            api::ResolveDomainRequest(generateRandomName(16)),
+            api::ResolveDomainRequest(nx::utils::generateRandomName(16)),
             std::placeholders::_1));
 
     ASSERT_EQ(api::ResultCode::notFound, resultCode);

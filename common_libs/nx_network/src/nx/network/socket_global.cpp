@@ -22,7 +22,7 @@ SocketGlobals::~SocketGlobals()
 
     nx::utils::promise< void > promise;
     {
-        BarrierHandler barrier([&](){ promise.set_value(); });
+        utils::BarrierHandler barrier([&](){ promise.set_value(); });
         m_addressResolver.pleaseStop( barrier.fork() );
         m_addressPublisher.pleaseStop( barrier.fork() );
         m_mediatorConnector->pleaseStop( barrier.fork() );
@@ -31,6 +31,12 @@ SocketGlobals::~SocketGlobals()
 
     promise.get_future().wait();
     m_mediatorConnector.reset();
+
+    for (const auto& init: m_customInits)
+    {
+        if (init.second)
+            init.second();
+    }
 }
 
 void SocketGlobals::init()
@@ -57,6 +63,25 @@ void SocketGlobals::verifyInitialization()
     NX_CRITICAL(
         s_isInitialized,
         "SocketGlobals::InitGuard must be initialized before using Sockets");
+}
+
+void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
+{
+    if (const auto value = arguments.get(QLatin1String("enforce-mediator")))
+        mediatorConnector().mockupAddress(*value);
+
+    if (const auto value = arguments.get(QLatin1String("enforce-socket")))
+        SocketFactory::enforceStreamSocketType(*value);
+
+    if (arguments.get(QLatin1String("enforce-ssl")))
+        SocketFactory::enforceSsl();
+}
+
+void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
+{
+    QnMutexLocker lock(&s_instance->m_mutex);
+    if (s_instance->m_customInits.emplace(init, deinit).second)
+        init();
 }
 
 QnMutex SocketGlobals::s_mutex;

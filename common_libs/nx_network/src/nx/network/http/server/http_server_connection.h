@@ -80,9 +80,18 @@ namespace nx_http
         bool m_isPersistent;
         std::deque<ResponseContext> m_responseQueue;
 
-        bool authenticateRequest(
-            const nx_http::Request& request,
-            stree::ResourceContainer* const authInfo);
+        void onAuthenticationDone(
+            bool authenticationResult,
+            stree::ResourceContainer authInfo,
+            nx_http::Message requestMessage,
+            boost::optional<header::WWWAuthenticate> wwwAuthenticate,
+            nx_http::HttpHeaders responseHeaders,
+            std::unique_ptr<AbstractMsgBodySource> msgBody);
+        void sendUnauthorizedResponse(
+            const nx_http::MimeProtoVersion& protoVersion,
+            boost::optional<header::WWWAuthenticate> wwwAuthenticate,
+            nx_http::HttpHeaders responseHeaders,
+            std::unique_ptr<AbstractMsgBodySource> msgBody);
         void prepareAndSendResponse(
             nx_http::MimeProtoVersion version,
             nx_http::Message&& response,

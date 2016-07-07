@@ -1,14 +1,10 @@
-
+#include <nx/utils/compiler_options.h>
 #include "custom_printers.h"
-
-#ifdef _WIN32
-#   if _MSC_VER < 1800
-#       define noexcept
-#   endif
-#endif
 
 extern "C"
 {
     #include <libavformat/avformat.h>
 }
 
+#include <nx/utils/literal.h>
+#include <nx/utils/deprecation.h>

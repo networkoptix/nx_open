@@ -236,6 +236,6 @@ TEST(QnMediaDataPacket, main)
         std::make_shared<QnAvCodecMediaContext>(avCodecContextFromBasic));
     testMediaContextFieldsEqual(
         avCodecMediaContext, avCodecMediaContextFromBasic);
-    
-    av_free(avCodecContextFromBasic);
+
+    QnFfmpegHelper::deleteAvCodecContext(avCodecContextFromBasic);
 }

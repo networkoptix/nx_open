@@ -7,7 +7,7 @@
 #include <numeric>
 #include <algorithm>
 
-#include "string_utils.h"
+#include "string.h"
 
 #if defined(OUTPUT_PREFIX)
     #error OUTPUT_PREFIX should NOT be defined while compiling this .cpp file.
@@ -161,6 +161,70 @@ uint8_t* debugUnalignPtr(void* data)
     static const int kMediaAlignment = 32;
     return (uint8_t*) (
         (17 + ((uintptr_t) data) + kMediaAlignment - 1) / kMediaAlignment * kMediaAlignment);
+}
+
+namespace {
+
+static const int kHexDumpBytesPerLine = 16;
+
+static std::string hexDumpLine(const char* bytes, int size)
+{
+    if (size <= 0)
+        return "";
+
+    std::string result;
+
+    // Print Hex.
+    for (int i = 0; i < size; ++i)
+    {
+        if (i > 0)
+            result.append(" ");
+        result.append(stringFormat("%02X", bytes[i]));
+    }
+    // Print spaces to align "|" properly.
+    for (int i = size; i < kHexDumpBytesPerLine; ++i)
+        result.append(3, ' ');
+
+    result.append(" | ");
+
+    // Print ASCII chars.
+    for (int i = 0; i < size; ++i)
+    {
+        if (bytes[i] >= 32 && bytes[i] <= 126) //< ASCII printable
+            result.append(1, bytes[i]);
+        else
+            result.append(1, '.');
+    }
+    return result;
+}
+
+} // namespace
+
+void debugPrintBin(const char* bytes, int size, const char* tag, const char* outputPrefix)
+{
+    const std::string header = stringFormat("Hex dump \"%s\" [%d]", tag, size);
+
+    const char* const OUTPUT_PREFIX = outputPrefix; //< Will be used by PRINT macro.
+
+    if (size <= 8) //< Print in single line.
+    {
+        PRINT << header << " { " << hexDumpLine(bytes, size) << " }";
+    }
+    else
+    {
+        PRINT << header;
+        PRINT << "{";
+        int count = size;
+        const char* p = bytes;
+        while (count > 0)
+        {
+            const int len = count >= kHexDumpBytesPerLine ? kHexDumpBytesPerLine : count;
+            PRINT << "    " << hexDumpLine(p, len);
+            p += len;
+            count -= len;
+        }
+        PRINT << "}";
+    }
 }
 
 } // namespace utils

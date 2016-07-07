@@ -6,6 +6,7 @@
 #include <QtCore/QTemporaryFile>
 
 #include "nx/streaming/video_data_packet.h"
+#include <nx/streaming/config.h>
 #include "licensing/license.h"
 #include "utils/media/nalUnits.h"
 #include "utils/common/util.h"

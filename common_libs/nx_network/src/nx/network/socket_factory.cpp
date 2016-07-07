@@ -199,9 +199,9 @@ SocketFactory::CreateStreamServerSocketFuncType
     return bak;
 }
 
-// TODO: Change to Cloud when avaliable
 std::atomic< SocketFactory::SocketType >
     SocketFactory::s_enforcedStreamSocketType(
         SocketFactory::SocketType::cloud );
 
 std::atomic< bool > SocketFactory::s_isSslEnforced( false );
+

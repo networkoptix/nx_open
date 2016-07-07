@@ -177,7 +177,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
         {
             pathStream << randomString() << "/";
         }
-        pathStream << randomString() << ".tmp";
+        pathStream << randomString() << ".testfile";
         return pathStream.str();
     };
 
@@ -242,8 +242,15 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
             };
         recursiveRemover(rootFileList);
         rootFileList = storage->getFileList(storage->getUrl());
-        ASSERT_TRUE(rootFileList.isEmpty() || (rootFileList.size() == 1 && 
-                                               rootFileList.at(0).fileName().indexOf(".sql") != -1));
+        bool hasTestFilesLeft = std::any_of(
+            rootFileList.cbegin(),
+            rootFileList.cend(),
+            [](const QnAbstractStorageResource::FileInfo& fi)
+            {
+                return fi.fileName().indexOf(".testfile") != -1;
+            }
+        );
+        ASSERT_TRUE(rootFileList.isEmpty() || !hasTestFilesLeft);
 
         // rename file
         QString fileName = closeDirPath(storage->getUrl()) + lit("old_name.tmp");

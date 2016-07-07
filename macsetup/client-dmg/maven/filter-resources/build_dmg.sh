@@ -12,6 +12,9 @@ RELEASE_VERSION=${release.version}
 AS_SRC=app-store
 PKG_FILE="${finalName}.pkg"
 
+QT_DIR="${qt.dir}"
+QT_VERSION="${qt.version}"
+
 ln -s /Applications $SRC/Applications
 
 mv $SRC/client.app "$SRC/${display.product.name}.app"
@@ -42,7 +45,7 @@ function patch_dsstore
 patch_dsstore "$SRC/DS_Store" "$SRC/.DS_Store" $RELEASE_VERSION
 rm "$SRC/DS_Store"
 
-python macdeployqt.py "$SRC/${display.product.name}.app" "$BINARIES" "$LIBRARIES" "$HELP"
+python macdeployqt.py "$SRC/${display.product.name}.app" "$BINARIES" "$LIBRARIES" "$HELP" "$QT_DIR" "$QT_VERSION"
 security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
 
 # Boris, move this to a separate script (of even folder), please
