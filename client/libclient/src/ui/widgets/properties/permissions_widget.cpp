@@ -38,7 +38,7 @@ QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsModel* permissions
     createCheckBox(Qn::GlobalExportPermission,              tr("Export archive"));
     createCheckBox(Qn::GlobalViewBookmarksPermission,       tr("View bookmarks"));
     createCheckBox(Qn::GlobalManageBookmarksPermission,     tr("Modify bookmarks"));
-    createCheckBox(Qn::GlobalUserInputPermission,           tr("Use PTZ"));
+    createCheckBox(Qn::GlobalUserInputPermission,           tr("User Input"));
 
     ui->permissionsLayout->addStretch();
 }
