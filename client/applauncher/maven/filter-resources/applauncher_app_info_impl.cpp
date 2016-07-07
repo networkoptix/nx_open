@@ -2,7 +2,7 @@
 
 QString QnApplauncherAppInfo::applicationName()
 {
-    return QStringLiteral("${display.product.name}");
+    return QStringLiteral("${product.title}");
 }
 
 QString QnApplauncherAppInfo::clientBinaryName()
