@@ -136,6 +136,8 @@ void QnUserSettingsWidget::loadDataToUi()
 
     for (auto field : inputFields())
         field->reset();
+
+    ui->loginInputField->setFocus();
 }
 
 void QnUserSettingsWidget::applyChanges()
