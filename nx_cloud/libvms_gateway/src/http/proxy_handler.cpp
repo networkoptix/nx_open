@@ -217,7 +217,7 @@ void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
         nx_http::insertOrReplaceHeader(
             &message.response->headers,
             nx_http::HttpHeader("Content-Encoding", "identity"));
-        message.response->headers.erase("Transfer-Encoding");   //no support for streaming body currently
+        message.response->headers.erase("Transfer-Encoding");   //no support for streaming body yet
 
         msgBody = std::make_unique<nx_http::BufferSource>(
             contentTypeIter->second,
