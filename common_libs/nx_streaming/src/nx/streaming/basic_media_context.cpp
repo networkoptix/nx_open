@@ -5,7 +5,7 @@
 
 #if !defined(DISABLE_FFMPEG)
     #include <utils/media/ffmpeg_helper.h> //< for deserializeMediaContextFromDepricatedFormat()
-#endif // !DISABLE_FFMPEG
+#endif
 
 /**
  * ATTENTION: m_data is created with all fields non-initialized.
@@ -64,12 +64,17 @@ static bool deserializeMediaContext(
     }
     else //< Deprecated format from v2.5.
     {
-        if (!QnFfmpegHelper::deserializeMediaContextFromDepricatedFormat(
-            context, data.data(), data.size()))
-        {
-            // Serialization errors are already logged.
+        #if defined(DISABLE_FFMPEG)
+            qWarning() << kError << "Looks like v2.5 format, but ffmpeg is disabled";
             return false;
-        }
+        #else
+            if (!QnFfmpegHelper::deserializeMediaContextFromDepricatedFormat(
+                context, data.data(), data.size()))
+            {
+                // Serialization errors are already logged.
+                return false;
+            }
+        #endif
     }
     return true;
 }
