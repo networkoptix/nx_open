@@ -12,12 +12,14 @@ namespace utils {
 bool registerSystemUriProtocolHandler(
     const QString& protocol,
     const QString& applicationBinaryPath,
-    const QString& macOsBundleId
+    const QString& macOsBundleId,
     const QString& applicationName,
     const QString& description,
     const QString& customization,
     const SoftwareVersion& version)
 {
+    Q_UNUSED(macOsBundleId)
+    
     const auto appsLocation = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
     if (appsLocation.isEmpty())
         return false;
