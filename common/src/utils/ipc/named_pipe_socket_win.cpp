@@ -2,11 +2,9 @@
 // 18 aug 2013    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifdef _WIN32
-
 #include "named_pipe_socket.h"
 
-#include "named_pipe_socket_win32.h"
+#include "named_pipe_socket_win.h"
 
 
 ////////////////////////////////////////////////////////////
@@ -112,5 +110,3 @@ NamedPipeSocket::NamedPipeSocket( NamedPipeSocketImpl* implToUse )
     m_impl( implToUse )
 {
 }
-
-#endif

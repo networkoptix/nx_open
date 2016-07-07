@@ -1,7 +1,4 @@
-
-#ifdef _WIN32
-
-#include "systemexcept_win32.h"
+#include "systemexcept_win.h"
 
 #include <memory>
 #include <fstream>
@@ -402,5 +399,3 @@ void LegacyDump( HANDLE hThread ) {
         }
     }
 }
-
-#endif
