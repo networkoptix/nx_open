@@ -8,6 +8,7 @@
 #include <utils/common/stoppable.h>
 
 #include "abstract_tunnel_connector.h"
+#include "cross_nat_connector.h"
 #include "nx/network/aio/basic_pollable.h"
 #include "nx/network/aio/timer.h"
 #include "nx/network/system_socket.h"
@@ -85,8 +86,7 @@ private:
     std::multimap<
         std::chrono::steady_clock::time_point,
         ConnectionRequestData> m_connectHandlers;
-    std::map<CloudConnectType, std::unique_ptr<AbstractTunnelConnector>> m_connectors;
-    //std::unique_ptr<CrossNatConnector> m_connector;
+    std::unique_ptr<CrossNatConnector> m_connector;
     std::unique_ptr<aio::Timer> m_timer;
     bool m_terminated;
     boost::optional<std::chrono::steady_clock::time_point> m_timerTargetClock;
@@ -109,7 +109,6 @@ private:
     void onTunnelClosed(SystemError::ErrorCode errorCode);
     void startAsyncTunnelConnect(QnMutexLockerBase* const locker);
     void onConnectorFinished(
-        CloudConnectType connectorType,
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
 };

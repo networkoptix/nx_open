@@ -39,7 +39,7 @@ void OutgoingTunnel::stopWhileInAioThread()
     //  someone calls public methods while stopping object
 
     m_terminated = true;
-    m_connectors.clear();
+    m_connector.reset();
     m_connection.reset();
     m_timer.reset();
 
@@ -246,46 +246,27 @@ void OutgoingTunnel::onTunnelClosed(SystemError::ErrorCode errorCode)
 
 void OutgoingTunnel::startAsyncTunnelConnect(QnMutexLockerBase* const /*locker*/)
 {
+    using namespace std::placeholders;
+
     m_state = State::kConnecting;
-    m_connectors = ConnectorFactory::createAllCloudConnectors(m_targetPeerAddress);
-    for (auto& connector: m_connectors)
-    {
-        auto connectorType = connector.first;
-        connector.second->bindToAioThread(getAioThread());
-        connector.second->connect(
-            kCloudConnectorTimeout,
-            [connectorType, this](
-                SystemError::ErrorCode errorCode,
-                std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
-            {
-                onConnectorFinished(
-                    connectorType,
-                    errorCode,
-                    std::move(connection));
-            });
-    }
+    m_connector = std::make_unique<CrossNatConnector>(m_targetPeerAddress);
+    m_connector->bindToAioThread(getAioThread());
+    m_connector->connect(
+        kCloudConnectorTimeout,
+        std::bind(&OutgoingTunnel::onConnectorFinished, this, _1, _2));
 }
 
 void OutgoingTunnel::onConnectorFinished(
-    CloudConnectType connectorType,
     SystemError::ErrorCode errorCode,
     std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
 {
     QnMutexLocker lk(&m_mutex);
 
-    const auto connectorIter = m_connectors.find(connectorType);
-    if (connectorIter == m_connectors.end())
-        return; //it can happen when stopping OutgoingTunnel
-    auto connector = std::move(connectorIter->second);
-    m_connectors.erase(connectorIter);
+    NX_ASSERT(!m_connection);
+    m_connector.reset();
 
     if (errorCode == SystemError::noError)
     {
-        if (m_connection)
-            return; //tunnel has already been connected, just ignoring this connection
-        m_connectors.clear();   //cancelling other connectors
-
-        //NX_CRITICAL(connection->getAioThread() == getAioThread());
         m_connection = std::move(connection);
         m_connection->setControlConnectionClosedHandler(
             std::bind(&OutgoingTunnel::onTunnelClosed, this, std::placeholders::_1));
@@ -313,10 +294,6 @@ void OutgoingTunnel::onConnectorFinished(
         m_connectHandlers.clear();
         return;
     }
-
-    //connection failed
-    if (!m_connectors.empty())
-        return; //waiting for other connectors to complete
 
     //reporting error to everyone who is waiting
     auto connectHandlers = std::move(m_connectHandlers);
