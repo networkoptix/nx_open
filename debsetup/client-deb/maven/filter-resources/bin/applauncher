@@ -1,8 +1,21 @@
 #!/bin/bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-export LD_LIBRARY_PATH=$DIR/../lib
 export vblank_mode=0
 
-$DIR/applauncher-bin $@
+USER_APPLAUNCHER_DIR="$HOME/.local/share/${company.name}/applauncher/${customization}"
+
+if [ -x "$USER_APPLAUNCHER_DIR/bin/applauncher-bin" ]
+then
+    APPLAUNCHER_DIR="$USER_APPLAUNCHER_DIR/bin"
+    export LD_LIBRARY_PATH="$USER_APPLAUNCHER_DIR/lib":$LD_LIBRARY_PATH
+else
+    APPLAUNCHER_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    if [ ! -x "$APPLAUNCHER_DIR/applauncher-bin" ]
+    then
+        echo "Error: applauncher-bin is not found."
+        exit 1
+    fi
+    export LD_LIBRARY_PATH="$APPLAUNCHER_DIR/../lib":$LD_LIBRARY_PATH
+fi
+
+"$APPLAUNCHER_DIR/applauncher-bin" $@
