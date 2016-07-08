@@ -381,7 +381,7 @@ bool SelfUpdater::updateMinilauncherInDir(const QString& installRoot)
     }
 
     /* Finally, is case of success, save version to file. */
-    const QString versionFile = installRoot + + L'/' + QnClientAppInfo::launcherVersionFile();
+    const QString versionFile = installRoot + L'/' + QnClientAppInfo::launcherVersionFile();
     if (!saveVersionToFile(versionFile, m_clientVersion))
     {
         NX_LOG(lit("Version could not be written to file: %1.").arg(versionFile), cl_logERROR);
