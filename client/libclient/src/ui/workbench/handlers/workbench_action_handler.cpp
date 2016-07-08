@@ -1504,25 +1504,29 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
         reply.get(), &QnAsyncHttpClientReply::finished,
         this, &QnWorkbenchActionHandler::at_serverLogsAction_getNonce);
 
-    m_httpReplys.emplace(serverUrl, LogRequest{std::move(server), std::move(reply)});
+    // TODO: Think of preloader in case of user complains about delay
+    m_logRequests.emplace(serverUrl, LogRequest{std::move(server), std::move(reply)});
     client->doGet(serverUrl);
 }
 
 void QnWorkbenchActionHandler::at_serverLogsAction_getNonce(QnAsyncHttpClientReply *reply) {
-    auto it = m_httpReplys.find(reply->url());
+    auto it = m_logRequests.find(reply->url());
     auto request = std::move(it->second);
-    m_httpReplys.erase(it);
+    m_logRequests.erase(it);
 
     QnJsonRestResult result;
     NonceReply auth;
     if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
     {
-        // TODO: #mux Show error to user?
+        QnMessageBox::warning(mainWindow(),
+            tr("Cannot open server log"),
+            tr("Could not execute initial server query"));
+
         return;
     }
 
-    const auto vmsGatewayAddress = nx::cloud::gateway::VmsGatewayEmbeddable::instance()
-        ->endpoint().toString();
+    const auto vmsGatewayAddress = nx::cloud::gateway::VmsGatewayEmbeddable
+        ::instance()->endpoint().toString();
 
     QUrl url(lit("http://%1/%2:%3/api/showLog")
         .arg(vmsGatewayAddress).arg(reply->url().host()).arg(reply->url().port()));

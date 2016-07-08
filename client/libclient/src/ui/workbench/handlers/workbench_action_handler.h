@@ -283,7 +283,7 @@ private:
         std::unique_ptr<QnAsyncHttpClientReply> replay;
     };
 
-    std::map<QUrl, LogRequest> m_httpReplys;
+    std::map<QUrl, LogRequest> m_logRequests;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H
