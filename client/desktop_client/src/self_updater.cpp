@@ -79,7 +79,7 @@ bool SelfUpdater::updateApplauncher()
         + lit("/../applauncher/")
         + QnAppInfo::customizationName();
 
-    QDir applauncherDir(applauncherDirPath);
+    const QDir applauncherDir(applauncherDirPath);
     if (!QDir().mkpath(applauncherDirPath))
     {
         NX_LOG(lit("Cannot make folder for applaucher: %1").arg(applauncherDirPath), cl_logERROR);
@@ -87,7 +87,7 @@ bool SelfUpdater::updateApplauncher()
     }
     applauncherDirPath = applauncherDir.canonicalPath();
 
-    QString lockFilePath = applauncherDirPath + lit("/update.lock");
+    const QString lockFilePath = applauncherDirPath + lit("/update.lock");
 
     /* Lock updating file to make sure we will not try to update applauncher by several client instances. */
     QLockFile applauncherLock(lockFilePath);
@@ -98,8 +98,8 @@ bool SelfUpdater::updateApplauncher()
     }
 
     /* Check installed applauncher version. */
-    QString versionFile = applauncherDirPath + L'/' + QnClientAppInfo::launcherVersionFile();
-    auto applauncherVersion = getVersionFromFile(versionFile);
+    const QString versionFile = applauncherDirPath + L'/' + QnClientAppInfo::launcherVersionFile();
+    const auto applauncherVersion = getVersionFromFile(versionFile);
     if (m_clientVersion <= applauncherVersion)
     {
         NX_LOG(lit("Applauncher is up to date"), cl_logINFO);
@@ -109,7 +109,7 @@ bool SelfUpdater::updateApplauncher()
     NX_LOG(lit("Applauncher is too old, updating from %1").arg(applauncherVersion.toString()), cl_logINFO);
 
     /* Check if no applauncher instance is running. If there is, try to kill it. */
-    auto killApplauncherResult = applauncher::quitApplauncher();
+    const auto killApplauncherResult = applauncher::quitApplauncher();
     if (killApplauncherResult != applauncher::api::ResultType::ok &&                /*< Successfully killed. */
         killApplauncherResult != applauncher::api::ResultType::connectError)        /*< Not running. */
     {
@@ -126,7 +126,7 @@ bool SelfUpdater::updateApplauncher()
     };
 
     /* Move installed applaucher to backup folder. */
-    QString backupDirPath = applauncherDirPath + lit("/backup");
+    const QString backupDirPath = applauncherDirPath + lit("/backup");
     QnDirectoryBackup backup(applauncherDirPath, kTargetFileFilters, backupDirPath);
     if (!backup.backup(QnDirectoryBackup::Behavior::Move))
     {
@@ -136,8 +136,8 @@ bool SelfUpdater::updateApplauncher()
 
     /* Copy our applauncher with all libs to destination folder. */
     QnDirectoryBackup updatedSource(qApp->applicationDirPath(), kTargetFileFilters, applauncherDirPath);
-    bool success = updatedSource.backup();
-    if (!success)
+    const bool updateSuccess = updatedSource.backup(); //TODO: #GDM may be rename class and its methods to something else?
+    if (!updateSuccess)
     {
         NX_LOG(lit("Failed to update Applauncher."), cl_logERROR);
         backup.restore();
@@ -148,10 +148,8 @@ bool SelfUpdater::updateApplauncher()
         return false;
 
     /* If we failed, return now. */
-    if (!success)
-    {
+    if (!updateSuccess)
         return false;
-    }
 
     /* Finally, is case of success, save version to file. */
     if (!saveVersionToFile(versionFile, m_clientVersion))
@@ -207,7 +205,7 @@ bool SelfUpdater::saveVersionToFile(const QString& filename, const nx::utils::So
         return false;
     }
 
-    QByteArray data = version.toString().toUtf8();
+    const QByteArray data = version.toString().toUtf8();
     return versionFile.write(data) == data.size();
 }
 
@@ -268,13 +266,13 @@ void SelfUpdater::launchWithAdminPermissions()
 
 bool SelfUpdater::isMinilaucherUpdated(const QString& installRoot) const
 {
-    QString minilauncherPath = installRoot + L'/' + QnClientAppInfo::minilauncherBinaryName();
-    QFileInfo minilauncherInfo(minilauncherPath);
+    const QString minilauncherPath = installRoot + L'/' + QnClientAppInfo::minilauncherBinaryName();
+    const QFileInfo minilauncherInfo(minilauncherPath);
     if (!minilauncherInfo.exists())
         return false;
 
-    QString applauncherPath = installRoot + L'/' + QnClientAppInfo::applauncherBinaryName();
-    QFileInfo applauncherInfo(applauncherPath);
+    const QString applauncherPath = installRoot + L'/' + QnClientAppInfo::applauncherBinaryName();
+    const QFileInfo applauncherInfo(applauncherPath);
     if (!applauncherInfo.exists())
         return false; /*< That means there is an old applauncher only, it is named as minilauncher. */
 
@@ -283,15 +281,15 @@ bool SelfUpdater::isMinilaucherUpdated(const QString& installRoot) const
         return false;
 
     /* Check installed applauncher version. */
-    QString versionFile = installRoot + + L'/' + QnClientAppInfo::launcherVersionFile();
+    const QString versionFile = installRoot + L'/' + QnClientAppInfo::launcherVersionFile();
     auto minilauncherVersion = getVersionFromFile(versionFile);
     return (m_clientVersion <= minilauncherVersion);
 }
 
 bool SelfUpdater::runMinilaucher() const
 {
-    QString minilauncherPath = qApp->applicationDirPath() + L'/' + QnClientAppInfo::minilauncherBinaryName();
-    QStringList args = { lit("--exec") }; /*< We don't want another client instance here. */
+    const QString minilauncherPath = qApp->applicationDirPath() + L'/' + QnClientAppInfo::minilauncherBinaryName();
+    const QStringList args = { lit("--exec") }; /*< We don't want another client instance here. */
     if (QFileInfo::exists(minilauncherPath) && QProcess::startDetached(minilauncherPath, args)) /*< arguments are MUST here */
     {
         NX_LOG(lit("Minilauncher process started successfully."), cl_logINFO);
@@ -307,11 +305,11 @@ bool SelfUpdater::updateMinilauncherInDir(const QString& installRoot)
         return true;
 
 #if defined(Q_OS_WIN)
-    QString applauncherPath = installRoot + L'/' + QnClientAppInfo::applauncherBinaryName();
+    const QString applauncherPath = installRoot + L'/' + QnClientAppInfo::applauncherBinaryName();
     if (!QFileInfo::exists(applauncherPath))
     {
         NX_LOG(lit("Renaming applauncher..."), cl_logINFO);
-        QString sourceApplauncherPath = installRoot + L'/' + QnClientAppInfo::minilauncherBinaryName();
+        const QString sourceApplauncherPath = installRoot + L'/' + QnClientAppInfo::minilauncherBinaryName();
         if (!QFileInfo::exists(sourceApplauncherPath))
         {
             NX_LOG(lit("Source applauncher could not be found at %1!")
@@ -335,7 +333,7 @@ bool SelfUpdater::updateMinilauncherInDir(const QString& installRoot)
     /* On linux (and mac?) applaucher binary should not be renamed, we only update shell script. */
 
     NX_LOG(lit("Updating minilauncher..."), cl_logINFO);
-    QString sourceMinilauncherPath = qApp->applicationDirPath() + L'/' + QnClientAppInfo::minilauncherBinaryName();
+    const QString sourceMinilauncherPath = qApp->applicationDirPath() + L'/' + QnClientAppInfo::minilauncherBinaryName();
     if (!QFileInfo::exists(sourceMinilauncherPath))
     {
         NX_LOG(lit("Source minilauncher could not be found at %1!")
@@ -344,8 +342,8 @@ bool SelfUpdater::updateMinilauncherInDir(const QString& installRoot)
         return false;
     }
 
-    QString minilauncherPath = installRoot + L'/' + QnClientAppInfo::minilauncherBinaryName();
-    QString minilauncherBackupPath = minilauncherPath + lit(".bak");
+    const QString minilauncherPath = installRoot + L'/' + QnClientAppInfo::minilauncherBinaryName();
+    const QString minilauncherBackupPath = minilauncherPath + lit(".bak");
 
     /* Existing minilauncher should be backed up. */
     if (QFileInfo::exists(minilauncherPath))
@@ -383,7 +381,7 @@ bool SelfUpdater::updateMinilauncherInDir(const QString& installRoot)
     }
 
     /* Finally, is case of success, save version to file. */
-    QString versionFile = installRoot + + L'/' + QnClientAppInfo::launcherVersionFile();
+    const QString versionFile = installRoot + + L'/' + QnClientAppInfo::launcherVersionFile();
     if (!saveVersionToFile(versionFile, m_clientVersion))
     {
         NX_LOG(lit("Version could not be written to file: %1.").arg(versionFile), cl_logERROR);
@@ -401,7 +399,7 @@ QStringList SelfUpdater::getClientInstallRoots() const
 {
     QStringList result;
 
-    QString baseRoot = QnClientAppInfo::installationRoot() + lit("/client/");
+    const QString baseRoot = QnClientAppInfo::installationRoot() + lit("/client/");
     for (const QString& dir : QDir(baseRoot).entryList(QDir::NoDotAndDotDot | QDir::Dirs))
     {
         nx::utils::SoftwareVersion version(dir);
