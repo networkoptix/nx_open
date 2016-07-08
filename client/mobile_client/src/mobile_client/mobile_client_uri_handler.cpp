@@ -22,12 +22,10 @@ void QnMobileClientUriHandler::setUiController(QnMobileClientUiController* uiCon
 
 QStringList QnMobileClientUriHandler::supportedSchemes()
 {
-    const auto protocols =
-        {
-            SystemUri::Protocol::Native,
-            SystemUri::Protocol::Http,
-            SystemUri::Protocol::Https
-        };
+    const auto protocols = {
+        SystemUri::Protocol::Native,
+        SystemUri::Protocol::Http,
+        SystemUri::Protocol::Https};
 
     QStringList result;
     for (auto protocol: protocols)
