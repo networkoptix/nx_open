@@ -1,5 +1,7 @@
 #include <string>
 #include <vector>
+#include <locale>
+#include <codecvt>
 
 #include <tchar.h>
 #include <Windows.h>
@@ -10,28 +12,13 @@
 
 typedef signed __int64 int64_t;
 
-using namespace std;
-
-wstring utf8toUtf16(const string& str)
+std::wstring utf8toUtf16(const std::string& str)
 {
-    if (str.empty())
-        return wstring();
-
-    size_t charsNeeded = ::MultiByteToWideChar(CP_UTF8, 0,
-                                               str.data(), (int)str.size(), NULL, 0);
-    if (charsNeeded == 0)
-        throw runtime_error("Failed converting UTF-8 string to UTF-16");
-
-    vector<wchar_t> buffer(charsNeeded);
-    int charsConverted = ::MultiByteToWideChar(CP_UTF8, 0,
-                                               str.data(), (int)str.size(), &buffer[0], buffer.size());
-    if (charsConverted == 0)
-        throw runtime_error("Failed converting UTF-8 string to UTF-16");
-
-    return wstring(buffer.data(), charsConverted);
+    std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > converter;
+    return converter.from_bytes(str);
 }
 
-wstring closeDirPath(const wstring& name)
+std::wstring closeDirPath(const std::wstring& name)
 {
     if (name.empty())
         return name;
@@ -41,7 +28,7 @@ wstring closeDirPath(const wstring& name)
         return name + L'/';
 }
 
-wstring getSharedApplauncherDir()
+std::wstring getSharedApplauncherDir()
 {
     wchar_t result[MAX_PATH];
     if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, result)))
@@ -49,11 +36,11 @@ wstring getSharedApplauncherDir()
         // Append product-specific path
         PathAppend(result, L"\\" QN_ORGANIZATION_NAME  L"\\applauncher\\"  QN_CUSTOMIZATION_NAME);
     }
-    return wstring(closeDirPath(result));
+    return std::wstring(closeDirPath(result));
 
 }
 
-wstring getInstalledApplauncherDir()
+std::wstring getInstalledApplauncherDir()
 {
     wchar_t ownPath[MAX_PATH];
 
@@ -66,15 +53,15 @@ wstring getInstalledApplauncherDir()
         PathRemoveFileSpecW(ownPath);
     }
 
-    return wstring(closeDirPath(ownPath));
+    return std::wstring(closeDirPath(ownPath));
 }
 
-wstring getFullFileName(const wstring& folder, const wstring& fileName)
+std::wstring getFullFileName(const std::wstring& folder, const std::wstring& fileName)
 {
     if (folder.empty())
         return fileName;
 
-    wstring value = folder;
+    std::wstring value = folder;
     for (int i = 0; i < value.length(); ++i)
     {
         if (value[i] == L'\\')
@@ -87,7 +74,7 @@ wstring getFullFileName(const wstring& folder, const wstring& fileName)
     return value;
 }
 
-BOOL startProcessAsync(wchar_t* commandline, const wstring& dstDir)
+BOOL startProcessAsync(wchar_t* commandline, const std::wstring& dstDir)
 {
     STARTUPINFO lpStartupInfo;
     PROCESS_INFORMATION lpProcessInfo;
@@ -108,7 +95,7 @@ BOOL startProcessAsync(wchar_t* commandline, const wstring& dstDir)
     );
 }
 
-bool launchInDir(const wstring& dir, int argc, _TCHAR* argv[])
+bool launchInDir(const std::wstring& dir, int argc, _TCHAR* argv[])
 {
     try
     {
@@ -117,7 +104,7 @@ bool launchInDir(const wstring& dir, int argc, _TCHAR* argv[])
 
         for (int i = 1; i < argc; ++i)
         {
-            wstring argument(utf8toUtf16(argv[i]));
+            std::wstring argument(utf8toUtf16(argv[i]));
             offset = wsprintf(buffer + offset, L" %s", argument.c_str());
         }
 
