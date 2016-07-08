@@ -231,7 +231,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
                         m_encoderCtx->sample_rate,
                         m_decoderContext->sample_rate,
                         m_encoderCtx->sample_fmt,
-                        m_decoderContext->sample_fmt,
+                        av_get_packed_sample_fmt(m_decoderContext->sample_fmt),
                         16, 10, 0, 0.8);
                 }
 
