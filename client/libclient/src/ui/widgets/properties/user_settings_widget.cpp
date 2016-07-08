@@ -192,6 +192,7 @@ void QnUserSettingsWidget::setupInputFields()
 {
     ui->loginInputField->setTitle(tr("Login"));
     ui->loginInputField->setEmptyInputAllowed(false, tr("Login cannot be empty."));
+
     ui->loginInputField->setValidator([this](const QString& text)
     {
         for (const QnUserResourcePtr& user : qnResPool->getResources<QnUserResource>())
@@ -205,11 +206,17 @@ void QnUserSettingsWidget::setupInputFields()
             return Qn::ValidationResult(tr("User with specified login already exists."));
         }
 
-        /* Check if we must update password for the other user. */
-        if (m_model->mode() == QnUserSettingsModel::OtherSettings)
-            ui->passwordInputField->validate();
-
         return Qn::kValidResult;
+    });
+
+    connect(ui->loginInputField, &QnInputField::editingFinished, this, [this]()
+    {
+        /* Check if we must update password for the other user. */
+        bool mustUpdatePassword = m_model->mode() == QnUserSettingsModel::OtherSettings
+            && ui->loginInputField->text() != m_model->user()->getName();
+
+        ui->passwordInputField->setEmptyInputAllowed(!mustUpdatePassword,
+            tr("User has been renamed. Password must be updated."));
     });
 
     ui->nameInputField->setTitle(tr("Name"));
@@ -219,24 +226,14 @@ void QnUserSettingsWidget::setupInputFields()
 
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setPasswordMode(QLineEdit::Password, true, true);
-    ui->passwordInputField->setValidator([this](const QString& text)
-    {
-        /* Show warning message if admin has renamed an existing user and has not entered new password. */
-        if (m_model->mode() == QnUserSettingsModel::OtherSettings &&
-            ui->loginInputField->text() != m_model->user()->getName() &&
-            text.isEmpty())
-        {
-            return Qn::ValidationResult(tr("User has been renamed. Password must be updated."));
-        }
 
-        /* Further validation will be done by password strength indicator. */
-        return Qn::kValidResult;
+    connect(ui->passwordInputField, &QnInputField::editingFinished, this, [this]()
+    {
+        ui->confirmPasswordInputField->validate();
     });
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
-
-    //TODO: #vkutin really not sure this logic must be implemented inside the generic class
     ui->confirmPasswordInputField->setConfirmationMode(ui->passwordInputField, tr("Passwords do not match."));
 
     for (auto field : inputFields())

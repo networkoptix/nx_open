@@ -35,10 +35,12 @@ public:
 
     virtual bool eventFilter(QObject* watched, QEvent* event)
     {
-        /* On focus make input look usual even if there is error. Hint will be visible though. */
+        /* On focus make input look usual even if there is error. */
         if (watched == input && event->type() == QEvent::FocusIn)
         {
             input->setPalette(parent->palette());
+            hint->setVisible(false);
+            hint->setText(QString());
             lastValidationResult.state = QValidator::Intermediate;
         }
 
@@ -129,6 +131,11 @@ public:
         }
     }
 
+    QLineEdit* primaryInput()
+    {
+        return confirmationPrimaryField ? confirmationPrimaryField->d_ptr->input : nullptr;
+    }
+
     QWidget* parent;
     QLabel* title;
     QLabel* hint;
@@ -191,6 +198,7 @@ QnInputField::QnInputField(QWidget* parent /*= nullptr*/) :
     d->hint->setVisible(false);
 
     connect(d->input, &QLineEdit::textChanged, this, &QnInputField::textChanged);
+    connect(d->input, &QLineEdit::editingFinished, this, &QnInputField::editingFinished);
 }
 
 QnInputField::~QnInputField()
@@ -428,8 +436,26 @@ void QnInputField::setConfirmationMode(const QnInputField* primaryField, const Q
     if (d->confirmationPrimaryField == primaryField && d->confirmationFailureHint == hint)
         return;
 
+    if (auto primaryInput = d->primaryInput())
+        primaryInput->disconnect(this);
+
     d->confirmationPrimaryField = primaryField;
     d->confirmationFailureHint = hint;
+
+    if (auto primaryInput = d->primaryInput())
+    {
+        connect(primaryInput, &QLineEdit::textChanged, this,
+            [this]()
+            {
+                Q_D(QnInputField);
+                if (!d->input->text().trimmed().isEmpty() ||
+                    d->lastValidationResult.state != QValidator::Acceptable)
+                {
+                    validate();
+                }
+            });
+    }
+
     validate();
 }
 

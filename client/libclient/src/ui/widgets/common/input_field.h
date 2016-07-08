@@ -3,6 +3,7 @@
 #include <QtWidgets/QWidget>
 
 #include <ui/utils/validators.h>
+#include <utils/common/connective.h>
 
 class QnPasswordStrengthIndicator;
 class QnInputFieldPrivate;
@@ -12,7 +13,7 @@ class AbstractAccessor;
  * Common class for various input fields.
  * Can check input for validity and display warning hint if something wrong.
  */
-class QnInputField : public QWidget
+class QnInputField : public Connective<QWidget>
 {
     Q_OBJECT
 
@@ -23,7 +24,7 @@ class QnInputField : public QWidget
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
     Q_PROPERTY(bool passwordIndicatorEnabled READ passwordIndicatorEnabled WRITE setPasswordIndicatorEnabled)
 
-    typedef QWidget base_type;
+    typedef Connective<QWidget> base_type;
 
 public:
     explicit QnInputField(QWidget* parent = nullptr);
@@ -80,6 +81,7 @@ public:
 
 signals:
     void textChanged(const QString& text);
+    void editingFinished();
 
 private:
     static QString defaultEmptyInputHint();
