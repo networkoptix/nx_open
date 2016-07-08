@@ -145,13 +145,30 @@ void QnResourceAccessManager::setAccessibleResources(const QnUuid& userId, const
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr& user) const
 {
+    auto filterDependantPermissions = [](Qn::GlobalPermissions value)
+    {
+        Qn::GlobalPermissions result = value;
+        if (!result.testFlag(Qn::GlobalViewArchivePermission))
+        {
+            result &= ~Qn::GlobalViewBookmarksPermission;
+            result &= ~Qn::GlobalExportPermission;
+        }
+
+        if (!result.testFlag(Qn::GlobalViewBookmarksPermission))
+        {
+            result &= ~Qn::GlobalManageBookmarksPermission;
+        }
+        return result;
+    };
+
+
     //NX_ASSERT(user, Q_FUNC_INFO, "We must not request permissions for absent user.");
     if (!user)
         return Qn::NoGlobalPermissions;
 
     /* Handle just-created user situation. */
     if (user->flags().testFlag(Qn::local))
-        return user->getRawPermissions();
+        return filterDependantPermissions(user->getRawPermissions());
 
     NX_ASSERT(user->resourcePool(), Q_FUNC_INFO, "Requesting permissions for non-pool user");
 
@@ -176,6 +193,8 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
         result |= userGroup(groupId).permissions;   /*< If the group does not exist, permissions will be empty. */
         result &= ~Qn::GlobalAdminPermission;       /*< If user belongs to group, he cannot be an admin - by design. */
     }
+
+    result = filterDependantPermissions(result);
 
     {
         QnMutexLocker lk(&m_mutex);
