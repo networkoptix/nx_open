@@ -4,8 +4,6 @@
 * PollSet class implementation for linux
 ***********************************************************/
 
-#ifdef __linux__
-
 #include <qglobal.h>
 
 #include "pollset.h"
@@ -469,6 +467,3 @@ namespace aio
 
 }
 }
-
-#endif  //__linux__
-

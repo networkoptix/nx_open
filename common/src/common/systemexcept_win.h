@@ -1,8 +1,4 @@
-
-#ifdef _WIN32
-
-#ifndef SYSTEMEXCEPT_WIN32_H
-#define SYSTEMEXCEPT_WIN32_H
+#pragma once
 
 #include <string>
 #include <windows.h>
@@ -33,8 +29,3 @@ public:
     static std::string getCrashDirectory();
     static std::string getCrashPattern();
 };
-
-
-#endif    //SYSTEMEXCEPT_WIN32_H
-
-#endif

@@ -171,6 +171,13 @@ bool SelfUpdater::updateApplauncher()
 
 bool SelfUpdater::updateMinilauncher()
 {
+    /* Do not try to update minilauncher when started from the default directory. */
+    if (qApp->applicationDirPath().startsWith(QnClientAppInfo::installationRoot(), Qt::CaseInsensitive))
+    {
+        NX_LOG(lit("Minilauncher will not be updated."), cl_logINFO);
+        return true;
+    }
+
     bool success = true;
     for (const QString& installRoot : getClientInstallRoots())
         success &= updateMinilauncherInDir(installRoot);
@@ -288,7 +295,8 @@ bool SelfUpdater::isMinilaucherUpdated(const QString& installRoot) const
 bool SelfUpdater::runMinilaucher() const
 {
     QString minilauncherPath = qApp->applicationDirPath() + L'/' + QnClientAppInfo::minilauncherBinaryName();
-    if (QFileInfo::exists(minilauncherPath) && QProcess::startDetached(minilauncherPath, QStringList())) /*< arguments are MUST here */
+    QStringList args = { lit("--exec") }; /*< We don't want another client instance here. */
+    if (QFileInfo::exists(minilauncherPath) && QProcess::startDetached(minilauncherPath, args)) /*< arguments are MUST here */
     {
         NX_LOG(lit("Minilauncher process started successfully."), cl_logINFO);
         return true;

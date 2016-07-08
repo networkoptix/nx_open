@@ -42,14 +42,6 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     connect(m_rolesModel,               &QnUserRolesModel::modelReset,  this,   &QnUserSettingsWidget::updateRoleComboBox);
     connect(m_rolesModel,               &QnUserRolesModel::rowsRemoved, this,   &QnUserSettingsWidget::updateRoleComboBox);
 
-    connect(m_model, &QnUserSettingsModel::userChanged, this, [this]()
-    {
-        ui->passwordInputField->setEmptyInputAllowed(
-            m_model->mode() != QnUserSettingsModel::NewUser,
-            ui->passwordInputField->emptyInputHint());
-        ui->passwordInputField->reset();
-    });
-
     setupInputFields();
 
     QnAligner* aligner = new QnAligner(this);
@@ -103,7 +95,9 @@ bool QnUserSettingsWidget::hasChanges() const
             Qn::GlobalPermissions permissions = selectedPermissions();
             if (permissions != Qn::NoGlobalPermissions
                 && permissions != qnResourceAccessManager->globalPermissions(m_model->user()))
+            {
                 return true;
+            }
         }
     }
 
@@ -114,7 +108,6 @@ bool QnUserSettingsWidget::hasChanges() const
     if (permissions.testFlag(Qn::WriteFullNamePermission))
         if (m_model->user()->fullName() != ui->nameInputField->text().trimmed())
             return true;
-
 
     return false;
 }
@@ -127,6 +120,10 @@ void QnUserSettingsWidget::loadDataToUi()
     updateRoleComboBox();
     updateControlsAccess();
 
+    ui->passwordInputField->setEmptyInputAllowed(
+        m_model->mode() != QnUserSettingsModel::NewUser,
+        ui->passwordInputField->emptyInputHint());
+
     ui->loginInputField->setText(m_model->user()->getName());
     ui->emailInputField->setText(m_model->user()->getEmail());
     ui->nameInputField->setText(m_model->user()->fullName());
@@ -136,6 +133,8 @@ void QnUserSettingsWidget::loadDataToUi()
 
     for (auto field : inputFields())
         field->reset();
+
+    ui->loginInputField->setFocus();
 }
 
 void QnUserSettingsWidget::applyChanges()
@@ -163,10 +162,8 @@ void QnUserSettingsWidget::applyChanges()
     /* Here we must be sure settings widget goes before the permissions one. */
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
-        QnUuid groupId = selectedUserGroup();
-        m_model->user()->setUserGroup(groupId);
-        if (groupId.isNull())
-            m_model->user()->setRawPermissions(selectedPermissions());
+        m_model->user()->setUserGroup(selectedUserGroup());
+        m_model->user()->setRawPermissions(selectedPermissions());
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
@@ -259,6 +256,9 @@ QList<QnInputField*> QnUserSettingsWidget::inputFields() const
 
 void QnUserSettingsWidget::updateRoleComboBox()
 {
+    if (!m_model->user())
+        return;
+
     Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_model->user());
 
     /* If there is only one entry in permissions combobox, this check doesn't matter. */
@@ -297,20 +297,6 @@ void QnUserSettingsWidget::updateControlsAccess()
     ui->nameInputField->setReadOnly(!permissions.testFlag(Qn::WriteFullNamePermission));
     ui->enabledButton->setVisible(permissions.testFlag(Qn::WriteAccessRightsPermission));
 }
-
-    //bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
-    //auto groups = qnResourceAccessManager->userGroups();
-    //std::sort(groups.begin(), groups.end(), [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
-    //{
-    //    /* Case Sensitive sort. */
-    //    return nx::utils::naturalStringCompare(l.name, r.name) < 0;
-    //});
-
-    //for (const ec2::ApiUserGroupData& group : groups)
-    //{
-    //    if (isAdmin || group.id == m_model->user()->userGroup())
-    //        addCustomGroup(group);
-    //}
 
 Qn::GlobalPermissions QnUserSettingsWidget::selectedPermissions() const
 {

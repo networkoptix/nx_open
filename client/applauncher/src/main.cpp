@@ -6,8 +6,9 @@
 #include <iostream>
 
 #include <qtsinglecoreapplication.h>
-#include <QDir>
-#include <QThread>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QDir>
+#include <QtCore/QThread>
 
 #include <utils/common/command_line_parser.h>
 #include <nx/utils/log/log.h>
@@ -32,8 +33,6 @@ static BOOL WINAPI stopServer_WIN(DWORD /*dwCtrlType*/)
     return TRUE;
 }
 #endif
-
-static QString SERVICE_NAME = QString::fromLatin1("%1%2").arg(QnAppInfo::customizationName()).arg(QLatin1String("AppLauncher"));
 
 static void printHelp()
 {
@@ -128,19 +127,22 @@ int main(int argc, char* argv[])
     commandLineParser.addParameter(&destFilePath, "--out-file", "-o", QString(), QString());
     commandLineParser.parse(argc, argv, stderr);
 
-    QtSingleCoreApplication app(SERVICE_NAME, argc, argv);
+    qApp->setOrganizationName(QnAppInfo::organizationName());
+    qApp->setApplicationName(QnApplauncherAppInfo::applicationName());
+    qApp->setApplicationVersion(QnAppInfo::applicationVersion());
+
+    QtSingleCoreApplication app(QnApplauncherAppInfo::applicationName(), argc, argv);
     QDir::setCurrent(QCoreApplication::applicationDirPath());
 
-    QString appName = QnApplauncherAppInfo::applicationName();
-
-    QSettings globalSettings(QSettings::SystemScope, QnAppInfo::organizationName(), appName);
-    QSettings userSettings(QSettings::UserScope, QnAppInfo::organizationName(), appName);
+    QSettings globalSettings(QSettings::SystemScope, QnAppInfo::organizationName(), QnApplauncherAppInfo::applicationName());
+    QSettings userSettings(QSettings::UserScope, QnAppInfo::organizationName(), QnApplauncherAppInfo::applicationName());
 
     if (mirrorListUrl.isEmpty())
         mirrorListUrl = globalSettings.value("mirrorListUrl", QnApplauncherAppInfo::mirrorListUrl()).toString();
 
     if (mirrorListUrl.isEmpty())
         NX_LOG("MirrorListUrl is empty", cl_logWARNING);
+
     if (displayHelp)
     {
         printHelp();
@@ -154,7 +156,7 @@ int main(int argc, char* argv[])
         QnLog::initLog(logLevel);
     }
 
-    NX_LOG(appName + " started", cl_logALWAYS);
+    NX_LOG(QnApplauncherAppInfo::applicationName() + " started", cl_logALWAYS);
     NX_LOG("Software version: " + QnAppInfo::applicationVersion(), cl_logALWAYS);
     NX_LOG("Software revision: " + QnAppInfo::applicationRevision(), cl_logALWAYS);
 
@@ -234,7 +236,7 @@ int syncDir(const QString& localDir, QString remoteUrl)
     auto syncher = std::make_shared<RDirSyncher>(QUrl(remoteUrl), localDir, &dummyEventReceiver);
     if (!syncher->startAsync())
     {
-        std::cerr << "Error: Failed to start synchronizaion" << std::endl;
+        std::cerr << "Error: Failed to start synchronization" << std::endl;
         return 2;
     }
 

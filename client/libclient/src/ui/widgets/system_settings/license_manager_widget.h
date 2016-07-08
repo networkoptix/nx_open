@@ -43,7 +43,6 @@ private slots:
     void at_downloadError();
     void at_licensesReceived(const QByteArray& licenseKey, ec2::ErrorCode errorCode, const QnLicenseList& licenses);
     void at_licenseDetailsButton_clicked();
-    void at_removeButton_clicked();
     void at_gridLicenses_doubleClicked(const QModelIndex &index);
     void at_licenseWidget_stateChanged();
 
@@ -61,6 +60,7 @@ private:
 
     QnLicenseList selectedLicenses() const;
     bool canRemoveLicense(const QnLicensePtr &license) const;
+    void removeSelectedLicenses();
 
     void exportLicenses();
 

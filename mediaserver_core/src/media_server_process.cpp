@@ -189,13 +189,7 @@
 #include <utils/common/app_info.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
 
-#ifdef _WIN32
-#include "common/systemexcept_win32.h"
-#endif
-
-#ifdef __linux__
-#include "common/systemexcept_linux.h"
-#endif
+#include <common/systemexcept.h>
 
 #include "platform/hardware_information.h"
 #include "platform/platform_abstraction.h"

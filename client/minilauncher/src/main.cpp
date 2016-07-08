@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 
 #include <tchar.h>
 #include <Windows.h>
@@ -10,6 +11,25 @@
 typedef signed __int64 int64_t;
 
 using namespace std;
+
+wstring utf8toUtf16(const string& str)
+{
+    if (str.empty())
+        return wstring();
+
+    size_t charsNeeded = ::MultiByteToWideChar(CP_UTF8, 0,
+                                               str.data(), (int)str.size(), NULL, 0);
+    if (charsNeeded == 0)
+        throw runtime_error("Failed converting UTF-8 string to UTF-16");
+
+    vector<wchar_t> buffer(charsNeeded);
+    int charsConverted = ::MultiByteToWideChar(CP_UTF8, 0,
+                                               str.data(), (int)str.size(), &buffer[0], buffer.size());
+    if (charsConverted == 0)
+        throw runtime_error("Failed converting UTF-8 string to UTF-16");
+
+    return wstring(&buffer[0], charsConverted);
+}
 
 wstring closeDirPath(const wstring& name)
 {
@@ -88,12 +108,20 @@ BOOL startProcessAsync(wchar_t* commandline, const wstring& dstDir)
     );
 }
 
-bool launchInDir(const wstring& dir)
+bool launchInDir(const wstring& dir, int argc, _TCHAR* argv[])
 {
     try
     {
         wchar_t buffer[MAX_PATH * 2 + 3];
-        wsprintf(buffer, L"\"%s\" --exec \"%s\"", getFullFileName(dir, QN_APPLAUNCHER_BINARY_NAME).c_str(), dir.c_str());
+        int offset = wsprintf(buffer, L"\"%s\"", getFullFileName(dir, QN_APPLAUNCHER_BINARY_NAME).c_str(), dir.c_str());
+
+        for (int i = 1; i < argc; ++i)
+        {
+            wstring argument(utf8toUtf16(argv[i]));
+            offset = wsprintf(buffer + offset, L" %s", argument.c_str());
+        }
+
+        wsprintf(buffer + offset, L" \"%s\"", dir.c_str());
         if (startProcessAsync(buffer, dir))
             return true;
         return false;
@@ -104,12 +132,12 @@ bool launchInDir(const wstring& dir)
     }
 }
 
-int launchFile()
+int launchFile(int argc, _TCHAR* argv[])
 {
-    if (launchInDir(getSharedApplauncherDir()))
+    if (launchInDir(getSharedApplauncherDir(), argc, argv))
         return 0;
 
-    if (launchInDir(getInstalledApplauncherDir()))
+    if (launchInDir(getInstalledApplauncherDir(), argc, argv))
         return 0;
 
     return 1;
@@ -117,12 +145,10 @@ int launchFile()
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-    (int)(argc);    /* Q_UNUSED */
-    (void*)(argv);  /* Q_UNUSED */
-
     try
     {
-        return launchFile();
+        /* All additional arguments are passed to applauncher. */
+        return launchFile(argc, argv);
     }
     catch (...)
     {

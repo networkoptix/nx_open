@@ -278,7 +278,7 @@ void QnWorkbenchAccessController::at_accessibleResourcesChanged(const QnUuid& us
 
 QString QnWorkbenchAccessController::userRoleName(const QnUserResourcePtr& user) const
 {
-    if (!user)
+    if (!user || !user->resourcePool())
         return QString();
 
     if (user->isOwner())
@@ -301,7 +301,7 @@ QString QnWorkbenchAccessController::userRoleName(const QnUserResourcePtr& user)
 
 QString QnWorkbenchAccessController::userRoleDescription(const QnUserResourcePtr& user) const
 {
-    if (!user)
+    if (!user || !user->resourcePool())
         return QString();
 
     if (user->isOwner())
