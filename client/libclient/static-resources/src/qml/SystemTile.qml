@@ -64,7 +64,7 @@ BaseTile
             else if (compatibleVersion.length)
                 return compatibleVersion;
             else if (!impl.isOnline)
-                return "OFFLINE";
+                return qsTr("OFFLINE");
 
             return "";
         }
@@ -99,15 +99,15 @@ BaseTile
         if (control.isFactoryTile)
         {
             var factorySystemHost = areaLoader.item.host;
-            console.log("Show wizard for system <", systemName
-                , ">, host <", factorySystemHost, ">");
+            console.log("Show wizard for system <", systemName,
+                ">, host <", factorySystemHost, ">");
             context.setupFactorySystem(factorySystemHost);
         }
         else if (isCloudTile)
         {
             var cloudHost = control.impl.hostsModel.firstHost;
-            console.log("Connecting to cloud system <", systemName
-                , ">, throug the host <", cloudHost, ">");
+            console.log("Connecting to cloud system <", systemName,
+                ">, throug the host <", cloudHost, ">");
             context.connectToCloudSystem(cloudHost);
         }
         else // Local system tile
@@ -119,7 +119,7 @@ BaseTile
         }
     }
 
-    titleLabel.text: (isFactoryTile ? "New System" : systemName);
+    titleLabel.text: (isFactoryTile ? qsTr("New System") : systemName);
 
     menuButton
     {
@@ -245,10 +245,10 @@ BaseTile
                 return;
 
             var tile  = control.areaLoader.item;
-            console.log("Connecting to local system<", control.systemName
-                , "host <", tile.selectedHost, "> with credentials: "
-                , tile.selectedUser, ":", tile.selectedPassword
-                , tile.savePassword, tile.autoLogin);
+            console.log("Connecting to local system<", control.systemName,
+                "host <", tile.selectedHost, "> with credentials: ",
+                tile.selectedUser, ":", tile.selectedPassword,
+                tile.savePassword, tile.autoLogin);
 
             context.connectToLocalSystem(tile.selectedHost,
                 tile.selectedUser, tile.selectedPassword,

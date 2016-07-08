@@ -491,14 +491,11 @@ void QnMessageBox::setComboBoxModel(QAbstractItemModel* model)
         ui->comboBox->setModel(model);
         ui->comboBox->show();
     }
-    else
+    else if (!ui->comboBox->isHidden())
     {
-        if (!ui->comboBox->isHidden())
-        {
-            Q_D(QnMessageBox);
-            ui->comboBox->setModel(d->ensureSimpleModel());
-            ui->comboBox->hide();
-        }
+        Q_D(QnMessageBox);
+        ui->comboBox->setModel(d->ensureSimpleModel());
+        ui->comboBox->hide();
     }
 }
 

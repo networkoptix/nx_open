@@ -1,12 +1,8 @@
-
 #pragma once
 
-#if defined(Q_OS_MAC)
+#include <type_traits>
 
 #include <CoreFoundation/CoreFoundation.h>
-
-#include <type_traits>
-#include <QDebug>
 
 namespace cf {
 
@@ -14,7 +10,7 @@ template<typename CFRefType>
 class QnCFRefHolder
 {
 public:
-    typedef const typename std::remove_pointer<CFRefType>::type *const_cf_ref;
+    typedef const typename std::remove_pointer<CFRefType>::type* const_cf_ref;
 
     CFRefType ref();
 
@@ -29,7 +25,7 @@ protected:
 
     ~QnCFRefHolder();
 
-    QnCFRefHolder& operator = (const QnCFRefHolder& other);
+    QnCFRefHolder& operator=(const QnCFRefHolder& other);
 
     void reset(CFRefType ref = nullptr);
 
@@ -39,12 +35,15 @@ private:
 
 template<typename CFRefType>
 QnCFRefHolder<CFRefType>::QnCFRefHolder()
-    : m_ref(nullptr)
-{}
+    :
+    m_ref(nullptr)
+{
+}
 
 template<typename CFRefType>
 QnCFRefHolder<CFRefType>::QnCFRefHolder(const QnCFRefHolder& other)
-    : m_ref(other.ref())
+    :
+    m_ref(other.ref())
 {
     if (m_ref)
         CFRetain(m_ref);
@@ -52,8 +51,10 @@ QnCFRefHolder<CFRefType>::QnCFRefHolder(const QnCFRefHolder& other)
 
 template<typename CFRefType>
 QnCFRefHolder<CFRefType>::QnCFRefHolder(CFRefType ref)
-    : m_ref(ref)
-{}
+    :
+    m_ref(ref)
+{
+}
 
 template<typename CFRefType>
 QnCFRefHolder<CFRefType>::~QnCFRefHolder()
@@ -84,7 +85,7 @@ void QnCFRefHolder<CFRefType>::reset(CFRefType ref)
 }
 
 template<typename CFRefType>
-QnCFRefHolder<CFRefType>& QnCFRefHolder<CFRefType>::operator = (const QnCFRefHolder& other)
+QnCFRefHolder<CFRefType>& QnCFRefHolder<CFRefType>::operator=(const QnCFRefHolder& other)
 {
     reset(other.ref());
     if (m_ref)
@@ -94,5 +95,3 @@ QnCFRefHolder<CFRefType>& QnCFRefHolder<CFRefType>::operator = (const QnCFRefHol
 }
 
 } // namespace cf
-
-#endif

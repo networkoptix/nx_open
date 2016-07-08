@@ -291,8 +291,6 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     {
         /* Try to load last used connection. */
         url = qnSettings->lastUsedConnection().url;
-        if (!url.isValid())
-            url = qnSettings->defaultConnection().url;
 
         /* Try to connect with saved password. */
         const bool autoLogin = qnSettings->autoLogin();

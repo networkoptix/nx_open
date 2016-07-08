@@ -1,5 +1,4 @@
 import QtQuick 2.6;
-import QtQuick.Controls 1.2;
 
 import ".."
 
@@ -25,7 +24,7 @@ Item
     property QtObject activeItemSelector: SingleActiveItemSelector
     {
         variableName: "isMasked";
-        deactivateFunc: function(item ) { item.isMaskedPrivate = false; };
+        deactivateFunc: function(item) { item.isMaskedPrivate = false; };
     }
 
     signal connectRequested();

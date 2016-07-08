@@ -28,8 +28,11 @@
 #include <watchers/cloud_system_information_watcher.h>
 #include <watchers/user_watcher.h>
 #include <mobile_client/mobile_client_ui_controller.h>
+#include <client_core/client_core_meta_types.h>
 
 void QnMobileClientMetaTypes::initialize() {
+    QnClientCoreMetaTypes::initialize();
+
     registerMetaTypes();
     registerQmlTypes();
 }
