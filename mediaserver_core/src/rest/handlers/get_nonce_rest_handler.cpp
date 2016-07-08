@@ -17,7 +17,7 @@ struct QnNoncemReply
 #define QnNoncemReply_Fields (nonce)(realm)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnNoncemReply, (json))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnNoncemReply), (json), _Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnNoncemReply), (json), _Fields)
 
 int QnGetNonceRestHandler::executeGet(const QString &, const QnRequestParams & params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {

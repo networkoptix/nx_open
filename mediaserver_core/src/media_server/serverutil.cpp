@@ -80,8 +80,7 @@ QString getDataDirectory()
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (PasswordData),
     (json),
-    _Fields,
-    (optional, true));
+    _Fields)
 
 PasswordData::PasswordData(const QnRequestParams &params)
 {

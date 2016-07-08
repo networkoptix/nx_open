@@ -100,8 +100,7 @@ void serializeToUrlQuery(const AccountConfirmationCode& data, QUrlQuery* const u
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((AccountData), (json)(sql_record), _Fields)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (AccountConfirmationCode), (json)(sql_record), _Fields, (optional, false))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((AccountConfirmationCode), (json)(sql_record), _Fields)
 
 ////////////////////////////////////////////////////////////
 //// class AccountUpdateData
