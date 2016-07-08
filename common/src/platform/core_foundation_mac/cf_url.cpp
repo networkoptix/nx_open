@@ -1,8 +1,6 @@
 
 #include "cf_url.h"
 
-#if defined(Q_OS_MAC)
-
 #include <QtCore/QString>
 #include <platform/core_foundation_mac/cf_string.h>
 
@@ -26,4 +24,3 @@ cf::QnCFUrl cf::QnCFUrl::createFileUrl(const QString& fileName)
     return result;
 }
 
-#endif
