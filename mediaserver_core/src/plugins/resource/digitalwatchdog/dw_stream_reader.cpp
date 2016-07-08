@@ -40,8 +40,7 @@ void QnDWStreamReader::postStreamConfigureHook()
     if (result != CL_HTTP_SUCCESS)
     {
         auto message = lit(
-            "QnDWStreamReader: couldn't set stream profile to `High` "
-            "for camera %1 (%2)")
+            "QnDWStreamReader: couldn't set stream profile to `High` for camera %1 (%2)")
             .arg(secRes->getModel())
             .arg(secRes->getUrl());
 
