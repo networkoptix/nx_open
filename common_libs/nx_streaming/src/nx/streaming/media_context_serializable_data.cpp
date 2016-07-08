@@ -24,7 +24,7 @@ QN_FUSION_DECLARE_FUNCTIONS(AVSampleFormat, (numeric))
 #define RcOverride_Fields (start_frame)(end_frame)(qscale)(quality_factor)
 QN_FUSION_DECLARE_FUNCTIONS(RcOverride, (ubjson))
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(\
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (QnMediaContextSerializableData)(RcOverride), (ubjson), _Fields)
 
 QByteArray QnMediaContextSerializableData::serialize() const

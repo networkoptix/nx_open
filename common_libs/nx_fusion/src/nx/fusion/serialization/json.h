@@ -128,7 +128,7 @@ namespace QJson {
     }
 
     template<class T>
-    bool deserialize(QnJsonContext *ctx, const QJsonObject &value, const QString &key, T *target, bool optional = false, bool *found = NULL) {
+    bool deserialize(QnJsonContext *ctx, const QJsonObject &value, const QString &key, T *target, bool optional = true, bool *found = NULL) {
         QJsonObject::const_iterator pos = value.find(key);
         if(pos == value.end()) {
             if(found)
@@ -177,7 +177,7 @@ namespace QJson {
     }
 
     template<class T>
-    bool deserialize(const QJsonObject &value, const QString &key, T *target, bool optional = false) {
+    bool deserialize(const QJsonObject &value, const QString &key, T *target, bool optional = true) {
         QnJsonContext ctx;
         return QJson::deserialize(&ctx, value, key, target, optional);
     }

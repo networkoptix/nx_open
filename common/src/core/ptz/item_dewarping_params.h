@@ -34,6 +34,8 @@ struct QnItemDewarpingParams: public boost::equality_comparable1<QnItemDewarping
     friend bool operator==(const QnItemDewarpingParams &l, const QnItemDewarpingParams &r);
 };
 
+#define QnItemDewarpingParams_Fields (enabled)(xAngle)(yAngle)(fov)(panoFactor)
+
 QN_FUSION_DECLARE_FUNCTIONS(QnItemDewarpingParams, (json)(metatype))
 
 #endif // ITEM_DEWARPING_PARAMS_H

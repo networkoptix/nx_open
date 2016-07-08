@@ -46,12 +46,12 @@
  *      QSize,
  *      ((getter, &QSize::width)(setter, &QSize::setWidth)(name, "width"))
  *      ((getter, &QSize::height)(setter, &QSize::setHeight)(name, "height")),
- *      (optional, true)
+ *      (optional, false)
  * )
  * \endcode
  *
  * This code defines two members for <tt>QSize</tt>, and the last parameter
- * marks them as optional.
+ * marks them as mandatory.
  *
  *
  * \param CLASS                         Class to register fusion adaptor for.
@@ -184,13 +184,13 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * \code
  * QN_FUSION_ADAPT_CLASS_GSN(
  *      QSize,
- *      ((&QSize::width, &QSize::setWidth, "width")(optional, true))
+ *      ((&QSize::width, &QSize::setWidth, "width")(optional, false))
  *      ((&QSize::height, &QSize::setHeight, "height"))
  * )
  * \endcode
  *
  * This code defines two members for class <tt>QSize</tt>, with <tt>width</tt>
- * as optional.
+ * as mandatory.
  *
  * \see QN_FUSION_ADAPT_CLASS
  */
@@ -332,7 +332,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * QN_FUSION_UNROLL_SHORTCUT_SEQ(
  *     (getter, setter, name),
  *     ((&QSize::width, &QSize::setWidth, "width"))
- *     ((&QSize::height, &QSize::setHeight, "height")(optional, true))
+ *     ((&QSize::height, &QSize::setHeight, "height")(optional, false))
  * )
  * \endcode
  *
@@ -340,7 +340,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  *
  * \code
  * ((getter, &QSize::width)(setter, &QSize::setWidth)(name, "width"))
- * ((getter, &QSize::height)(setter, &QSize::setHeight)(name, "height")(optional, true))
+ * ((getter, &QSize::height)(setter, &QSize::setHeight)(name, "height")(optional, false))
  * \endcode
  */
 #define QN_FUSION_UNROLL_SHORTCUT_SEQ(KEYS_TUPLE, MEMBER_SEQ)                   \

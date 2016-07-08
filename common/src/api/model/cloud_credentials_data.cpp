@@ -11,8 +11,4 @@ CloudCredentialsData::CloudCredentialsData(const QnRequestParams& params):
 {
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (CloudCredentialsData),
-    (json),
-    _Fields,
-    (optional, true));
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((CloudCredentialsData), (json), _Fields);

@@ -25,6 +25,9 @@ namespace ec2 {
         , displayInfo(false)
     {}
 
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+        (ApiLayoutItemData)(ApiLayoutItemWithRefData)(ApiLayoutData),
+        (ubjson)(xml)(json)(sql_record)(csv_record),
+        _Fields)
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ApiLayoutItemData) (ApiLayoutItemWithRefData) (ApiLayoutData), (ubjson)(xml)(json)(sql_record)(csv_record), _Fields, (optional, true))
 } // namespace ec2
