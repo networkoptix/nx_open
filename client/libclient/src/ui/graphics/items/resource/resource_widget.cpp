@@ -54,54 +54,58 @@
 #include <utils/license_usage_helper.h>
 #include <nx/utils/string.h>
 
-namespace
-{
-    const qreal kButtonsSize = 24.0;
+namespace {
+const qreal kButtonsSize = 24.0;
 
 
-    /** Frame extension multiplier determines the width of frame extension relative
-     * to frame width.
-     *
-     * Frame events are processed not only when hovering over the frame itself,
-     * but also over its extension. */
-    const qreal frameExtensionMultiplier = 1.0;
+/** Frame extension multiplier determines the width of frame extension relative
+ * to frame width.
+ *
+ * Frame events are processed not only when hovering over the frame itself,
+ * but also over its extension. */
+const qreal frameExtensionMultiplier = 1.0;
 
-    /** Default timeout before the video is displayed as "loading", in milliseconds. */
+/** Default timeout before the video is displayed as "loading", in milliseconds. */
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
-    const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION;
+const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION;
 #else
-    const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION * 3;
+const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION * 3;
 #endif
 
-    /** Background color for overlay panels. */
+/** Background color for overlay panels. */
 
-    const QColor infoBackgroundColor = QColor(0, 0, 0, 127); // TODO: #gdm #customization
+const QColor infoBackgroundColor = QColor(0, 0, 0, 127); // TODO: #gdm #customization
 
-    const QColor overlayTextColor = QColor(255, 255, 255); // TODO: #gdm #customization
+const QColor overlayTextColor = QColor(255, 255, 255); // TODO: #gdm #customization
 
-    const float noAspectRatio = -1.0;
+const float noAspectRatio = -1.0;
 
-    //Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
-    QSharedPointer<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() ); // TODO: #Elric get rid of this
+//Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
+QSharedPointer<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout(new QnDefaultResourceVideoLayout()); // TODO: #Elric get rid of this
 
-    void splitFormat(const QString &format, QString *left, QString *right) {
-        int index = format.indexOf(QLatin1Char('\t'));
-        if(index != -1) {
-            *left = format.mid(0, index);
-            *right = format.mid(index + 1);
-        } else {
-            *left = format;
-            *right = QString();
-        }
+void splitFormat(const QString &format, QString *left, QString *right)
+{
+    int index = format.indexOf(QLatin1Char('\t'));
+    if (index != -1)
+    {
+        *left = format.mid(0, index);
+        *right = format.mid(index + 1);
     }
+    else
+    {
+        *left = format;
+        *right = QString();
+    }
+}
 
-    bool itemBelongsToValidLayout(QnWorkbenchItem *item) {
-        return (item
+bool itemBelongsToValidLayout(QnWorkbenchItem *item)
+{
+    return (item
             && item->layout()
             && item->layout()->resource()
             && item->layout()->resource()->resourcePool()
             && !item->layout()->resource()->getParentId().isNull());
-    }
+}
 } // anonymous namespace
 
 QnResourceWidget::OverlayWidgets::OverlayWidgets()
@@ -117,7 +121,7 @@ QnResourceWidget::OverlayWidgets::OverlayWidgets()
 // -------------------------------------------------------------------------- //
 // Logic
 // -------------------------------------------------------------------------- //
-QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
+QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent) :
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_item(item),
@@ -162,7 +166,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     /* Status overlay. */
     m_statusOverlayWidget = new QnStatusOverlayWidget(m_resource, this);
     addOverlayWidget(m_statusOverlayWidget
-        , detail::OverlayParams(UserVisible, true, false, StatusLayer));
+                     , detail::OverlayParams(UserVisible, true, false, StatusLayer));
 
 
     /* Initialize resource. */
@@ -184,62 +188,63 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     updateButtonsVisibility();
     updateCursor();
 
-    connect(this, &QnResourceWidget::rotationChanged, this, [this]() {
+    connect(this, &QnResourceWidget::rotationChanged, this, [this]()
+    {
         if (m_enclosingGeometry.isValid())
             setGeometry(calculateGeometry(m_enclosingGeometry));
     });
 }
 
-QnResourceWidget::~QnResourceWidget() {
+QnResourceWidget::~QnResourceWidget()
+{
     ensureAboutToBeDestroyedEmitted();
 }
 
 //TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
 void QnResourceWidget::addInfoOverlay()
 {
-    {
-        QnHtmlTextItemOptions infoOptions;
-        infoOptions.backgroundColor = infoBackgroundColor;
-        infoOptions.borderRadius = 2;
-        infoOptions.autosize = true;
+    QnHtmlTextItemOptions infoOptions;
+    infoOptions.backgroundColor = infoBackgroundColor;
+    infoOptions.borderRadius = 2;
+    infoOptions.autosize = true;
 
-        enum { kMargin = 2 };
+    enum { kMargin = 2 };
 
-        m_overlayWidgets->detailsItem->setOptions(infoOptions);
-        m_overlayWidgets->detailsItem->setProperty(Qn::NoBlockMotionSelection, true);
-        auto detailsOverlay = new QnScrollableOverlayWidget(Qt::AlignLeft, this);
-        detailsOverlay->setProperty(Qn::NoBlockMotionSelection, true);
-        detailsOverlay->setContentsMargins(kMargin, 0, 0, kMargin);
-        detailsOverlay->addItem(m_overlayWidgets->detailsItem);
-        detailsOverlay->setMaxFillCoeff(QSizeF(0.3, 0.8));
-        addOverlayWidget(detailsOverlay
-            , detail::OverlayParams(UserVisible, true, true, InfoLayer));
-        m_overlayWidgets->detailsOverlay = detailsOverlay;
-        setOverlayWidgetVisible(m_overlayWidgets->detailsOverlay, false, false);
+    m_overlayWidgets->detailsItem->setOptions(infoOptions);
+    m_overlayWidgets->detailsItem->setProperty(Qn::NoBlockMotionSelection, true);
+    auto detailsOverlay = new QnScrollableOverlayWidget(Qt::AlignLeft, this);
+    detailsOverlay->setProperty(Qn::NoBlockMotionSelection, true);
+    detailsOverlay->setContentsMargins(kMargin, 0, 0, kMargin);
+    detailsOverlay->addItem(m_overlayWidgets->detailsItem);
+    detailsOverlay->setMaxFillCoeff(QSizeF(0.3, 0.8));
+    addOverlayWidget(detailsOverlay
+                     , detail::OverlayParams(UserVisible, true, true, InfoLayer));
+    m_overlayWidgets->detailsOverlay = detailsOverlay;
+    setOverlayWidgetVisible(m_overlayWidgets->detailsOverlay, false, false);
 
 
-        m_overlayWidgets->positionItem->setOptions(infoOptions);
-        m_overlayWidgets->positionItem->setProperty(Qn::NoBlockMotionSelection, true);
-        auto positionOverlay = new QnScrollableOverlayWidget(Qt::AlignRight, this);
-        positionOverlay->setProperty(Qn::NoBlockMotionSelection, true);
-        positionOverlay->setContentsMargins(0, 0, kMargin, kMargin);
-        positionOverlay->addItem(m_overlayWidgets->positionItem);
-        positionOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
-        addOverlayWidget(positionOverlay
-            , detail::OverlayParams(UserVisible, true, true, InfoLayer));
-        m_overlayWidgets->positionOverlay = positionOverlay;
-        setOverlayWidgetVisible(m_overlayWidgets->positionOverlay, false, false);
-    }
+    m_overlayWidgets->positionItem->setOptions(infoOptions);
+    m_overlayWidgets->positionItem->setProperty(Qn::NoBlockMotionSelection, true);
+    auto positionOverlay = new QnScrollableOverlayWidget(Qt::AlignRight, this);
+    positionOverlay->setProperty(Qn::NoBlockMotionSelection, true);
+    positionOverlay->setContentsMargins(0, 0, kMargin, kMargin);
+    positionOverlay->addItem(m_overlayWidgets->positionItem);
+    positionOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
+    addOverlayWidget(positionOverlay
+                     , detail::OverlayParams(UserVisible, true, true, InfoLayer));
+    m_overlayWidgets->positionOverlay = positionOverlay;
+    setOverlayWidgetVisible(m_overlayWidgets->positionOverlay, false, false);
+
 }
 
-//TODO: #ynikitenkov headerLayout->setContentsMargins(0, 0, 0, 1);
+//TODO: #ynikitenkov #high emplace back headerLayout->setContentsMargins(0, 0, 0, 1);
 void QnResourceWidget::addMainOverlay()
 {
     m_overlayWidgets->buttonsOverlay = new QnButtonsOverlay(this);
 
     m_overlayWidgets->buttonsOverlay = new QnButtonsOverlay(this);
     addOverlayWidget(m_overlayWidgets->buttonsOverlay
-        , detail::OverlayParams(UserVisible, true, true, InfoLayer));
+                     , detail::OverlayParams(UserVisible, true, true, InfoLayer));
     setOverlayWidgetVisible(m_overlayWidgets->buttonsOverlay, false, false);
 }
 
@@ -282,20 +287,24 @@ void QnResourceWidget::createButtons()
     buttonsOverlay()->leftButtonsBar()->addButton(Qn::RecordingStatusIconButton, iconButton);
 }
 
-const QnResourcePtr &QnResourceWidget::resource() const {
+const QnResourcePtr &QnResourceWidget::resource() const
+{
     return m_resource;
 }
 
-QnWorkbenchItem* QnResourceWidget::item() const {
+QnWorkbenchItem* QnResourceWidget::item() const
+{
     return m_item.data();
 }
 
-const QRectF &QnResourceWidget::zoomRect() const {
+const QRectF &QnResourceWidget::zoomRect() const
+{
     return m_zoomRect;
 }
 
-void QnResourceWidget::setZoomRect(const QRectF &zoomRect) {
-    if(qFuzzyEquals(m_zoomRect, zoomRect))
+void QnResourceWidget::setZoomRect(const QRectF &zoomRect)
+{
+    if (qFuzzyEquals(m_zoomRect, zoomRect))
         return;
 
     m_zoomRect = zoomRect;
@@ -303,12 +312,14 @@ void QnResourceWidget::setZoomRect(const QRectF &zoomRect) {
     emit zoomRectChanged();
 }
 
-QnResourceWidget *QnResourceWidget::zoomTargetWidget() const {
+QnResourceWidget *QnResourceWidget::zoomTargetWidget() const
+{
     return QnWorkbenchContextAware::display()->zoomTargetWidget(const_cast<QnResourceWidget *>(this));
 }
 
-void QnResourceWidget::setFrameWidth(qreal frameWidth) {
-    if(qFuzzyCompare(m_frameWidth, frameWidth))
+void QnResourceWidget::setFrameWidth(qreal frameWidth)
+{
+    if (qFuzzyCompare(m_frameWidth, frameWidth))
         return;
 
     prepareGeometryChange();
@@ -318,12 +329,14 @@ void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     setWindowFrameMargins(extendedFrameWidth, extendedFrameWidth, extendedFrameWidth, extendedFrameWidth);
 }
 
-QColor QnResourceWidget::frameDistinctionColor() const {
+QColor QnResourceWidget::frameDistinctionColor() const
+{
     return m_frameDistinctionColor;
 }
 
-void QnResourceWidget::setFrameDistinctionColor(const QColor &frameColor) {
-    if(m_frameDistinctionColor == frameColor)
+void QnResourceWidget::setFrameDistinctionColor(const QColor &frameColor)
+{
+    if (m_frameDistinctionColor == frameColor)
         return;
 
     m_frameDistinctionColor = frameColor;
@@ -331,16 +344,19 @@ void QnResourceWidget::setFrameDistinctionColor(const QColor &frameColor) {
     emit frameDistinctionColorChanged();
 }
 
-const QnResourceWidgetFrameColors &QnResourceWidget::frameColors() const {
+const QnResourceWidgetFrameColors &QnResourceWidget::frameColors() const
+{
     return m_frameColors;
 }
 
-void QnResourceWidget::setFrameColors(const QnResourceWidgetFrameColors &frameColors) {
+void QnResourceWidget::setFrameColors(const QnResourceWidgetFrameColors &frameColors)
+{
     m_frameColors = frameColors;
 }
 
-void QnResourceWidget::setAspectRatio(float aspectRatio) {
-    if(qFuzzyCompare(m_aspectRatio, aspectRatio))
+void QnResourceWidget::setAspectRatio(float aspectRatio)
+{
+    if (qFuzzyCompare(m_aspectRatio, aspectRatio))
         return;
 
     m_aspectRatio = aspectRatio;
@@ -349,21 +365,24 @@ void QnResourceWidget::setAspectRatio(float aspectRatio) {
     emit aspectRatioChanged();
 }
 
-float QnResourceWidget::visualAspectRatio() const {
+float QnResourceWidget::visualAspectRatio() const
+{
     if (!hasAspectRatio())
         return -1;
 
     return QnAspectRatio::isRotated90(rotation()) ? 1 / m_aspectRatio : m_aspectRatio;
 }
 
-float QnResourceWidget::defaultVisualAspectRatio() const {
+float QnResourceWidget::defaultVisualAspectRatio() const
+{
     if (m_enclosingGeometry.isNull())
         return defaultAspectRatio();
 
     return m_enclosingGeometry.width() / m_enclosingGeometry.height();
 }
 
-float QnResourceWidget::visualChannelAspectRatio() const {
+float QnResourceWidget::visualChannelAspectRatio() const
+{
     if (!channelLayout())
         return visualAspectRatio();
 
@@ -374,27 +393,34 @@ float QnResourceWidget::visualChannelAspectRatio() const {
         return visualAspectRatio() / layoutAspectRatio;
 }
 
-QRectF QnResourceWidget::enclosingGeometry() const {
+QRectF QnResourceWidget::enclosingGeometry() const
+{
     return m_enclosingGeometry;
 }
 
-void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry, bool updateGeometry) {
+void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry, bool updateGeometry)
+{
     m_enclosingGeometry = enclosingGeometry;
     if (updateGeometry)
         setGeometry(calculateGeometry(enclosingGeometry));
 }
 
-QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry, qreal rotation) const {
-    if (!enclosingGeometry.isEmpty()) {
+QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry, qreal rotation) const
+{
+    if (!enclosingGeometry.isEmpty())
+    {
         /* Calculate bounds of the rotated item. */
         qreal aspectRatio = hasAspectRatio() ? m_aspectRatio : defaultVisualAspectRatio();
         return encloseRotatedGeometry(enclosingGeometry, aspectRatio, rotation);
-    } else {
+    }
+    else
+    {
         return enclosingGeometry;
     }
 }
 
-QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) const {
+QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) const
+{
     return calculateGeometry(enclosingGeometry, this->rotation());
 }
 
@@ -410,7 +436,7 @@ QString QnResourceWidget::titleTextFormat() const
 
 void QnResourceWidget::setTitleTextFormat(const QString &titleTextFormat)
 {
-    if(m_titleTextFormat == titleTextFormat)
+    if (m_titleTextFormat == titleTextFormat)
         return;
 
     m_titleTextFormat = titleTextFormat;
@@ -419,7 +445,8 @@ void QnResourceWidget::setTitleTextFormat(const QString &titleTextFormat)
     updateTitleText();
 }
 
-void QnResourceWidget::setTitleTextInternal(const QString &titleText) {
+void QnResourceWidget::setTitleTextInternal(const QString &titleText)
+{
     QString leftText, rightText;
 
     splitFormat(titleText, &leftText, &rightText);
@@ -428,28 +455,34 @@ void QnResourceWidget::setTitleTextInternal(const QString &titleText) {
     m_overlayWidgets->buttonsOverlay->extraInfoLabel()->setText(rightText);
 }
 
-QString QnResourceWidget::calculateTitleText() const {
-    enum {
+QString QnResourceWidget::calculateTitleText() const
+{
+    enum
+    {
         kMaxNameLength = 30
     };
 
     return nx::utils::elideString(m_resource->getName(), kMaxNameLength);
 }
 
-void QnResourceWidget::updateTitleText() {
+void QnResourceWidget::updateTitleText()
+{
     setTitleTextInternal(m_titleTextFormatHasPlaceholder ? m_titleTextFormat.arg(calculateTitleText()) : m_titleTextFormat);
 }
 
-void QnResourceWidget::updateInfoText() {
+void QnResourceWidget::updateInfoText()
+{
     updateDetailsText();
     updatePositionText();
 }
 
-QString QnResourceWidget::calculateDetailsText() const {
+QString QnResourceWidget::calculateDetailsText() const
+{
     return QString();
 }
 
-void QnResourceWidget::updateDetailsText() {
+void QnResourceWidget::updateDetailsText()
+{
     if (!isOverlayWidgetVisible(m_overlayWidgets->detailsOverlay))
         return;
 
@@ -458,11 +491,13 @@ void QnResourceWidget::updateDetailsText() {
     m_overlayWidgets->detailsItem->setVisible(!text.isEmpty());
 }
 
-QString QnResourceWidget::calculatePositionText() const {
+QString QnResourceWidget::calculatePositionText() const
+{
     return QString();
 }
 
-void QnResourceWidget::updatePositionText() {
+void QnResourceWidget::updatePositionText()
+{
     if (!isOverlayWidgetVisible(m_overlayWidgets->positionOverlay))
         return;
 
@@ -471,14 +506,16 @@ void QnResourceWidget::updatePositionText() {
     m_overlayWidgets->positionItem->setVisible(!text.isEmpty());
 }
 
-QCursor QnResourceWidget::calculateCursor() const {
+QCursor QnResourceWidget::calculateCursor() const
+{
     return Qt::ArrowCursor;
 }
 
-void QnResourceWidget::updateCursor() {
+void QnResourceWidget::updateCursor()
+{
     QCursor newCursor = calculateCursor();
     QCursor oldCursor = this->cursor();
-    if(newCursor.shape() != oldCursor.shape() || newCursor.shape() == Qt::BitmapCursor)
+    if (newCursor.shape() != oldCursor.shape() || newCursor.shape() == Qt::BitmapCursor)
         setCursor(newCursor);
 }
 
@@ -494,24 +531,26 @@ QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint, Qt::WindowFram
 
     QSizeF result = constraint;
 
-    switch (pinSection) {
-    case Qt::TopSection:
-    case Qt::BottomSection:
-        result.setWidth(constraint.height() * m_aspectRatio);
-        break;
-    case Qt::LeftSection:
-    case Qt::RightSection:
-        result.setHeight(constraint.width() / m_aspectRatio);
-        break;
-    default:
-        result = expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
-        break;
+    switch (pinSection)
+    {
+        case Qt::TopSection:
+        case Qt::BottomSection:
+            result.setWidth(constraint.height() * m_aspectRatio);
+            break;
+        case Qt::LeftSection:
+        case Qt::RightSection:
+            result.setHeight(constraint.width() / m_aspectRatio);
+            break;
+        default:
+            result = expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
+            break;
     }
 
     return result;
 }
 
-void QnResourceWidget::updateCheckedButtons() {
+void QnResourceWidget::updateCheckedButtons()
+{
     if (!item())
         return;
 
@@ -519,19 +558,21 @@ void QnResourceWidget::updateCheckedButtons() {
     buttonsOverlay()->rightButtonsBar()->setCheckedButtons(checkedButtons);
 }
 
-QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
+QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+{
     QSizeF result = base_type::sizeHint(which, constraint);
 
-    if(!hasAspectRatio())
+    if (!hasAspectRatio())
         return result;
 
-    if(which == Qt::MinimumSize)
+    if (which == Qt::MinimumSize)
         return expanded(m_aspectRatio, result, Qt::KeepAspectRatioByExpanding);
 
     return result;
 }
 
-QRectF QnResourceWidget::channelRect(int channel) const {
+QRectF QnResourceWidget::channelRect(int channel) const
+{
     /* Channel rect is handled at shader level if dewarping is enabled. */
     QRectF rect = ((m_options & DisplayDewarped) || zoomRect().isNull()) ? this->rect() : unsubRect(this->rect(), zoomRect());
 
@@ -546,8 +587,9 @@ QRectF QnResourceWidget::channelRect(int channel) const {
 }
 
 // TODO: #Elric remove useRelativeCoordinates
-QRectF QnResourceWidget::exposedRect(int channel, bool accountForViewport, bool accountForVisibility, bool useRelativeCoordinates) {
-    if(accountForVisibility && (!isVisible() || qFuzzyIsNull(effectiveOpacity())))
+QRectF QnResourceWidget::exposedRect(int channel, bool accountForViewport, bool accountForVisibility, bool useRelativeCoordinates)
+{
+    if (accountForVisibility && (!isVisible() || qFuzzyIsNull(effectiveOpacity())))
         return QRectF();
 
     QRectF channelRect = this->channelRect(channel);
@@ -555,23 +597,27 @@ QRectF QnResourceWidget::exposedRect(int channel, bool accountForViewport, bool 
         return QRectF();
 
     QRectF result = channelRect.intersected(rect());
-    if(result.isEmpty())
+    if (result.isEmpty())
         return QRectF();
 
-    if(accountForViewport) {
-        if(scene()->views().empty())
+    if (accountForViewport)
+    {
+        if (scene()->views().empty())
             return QRectF();
         QGraphicsView *view = scene()->views()[0];
 
         QRectF viewportRect = mapRectFromScene(QnSceneTransformations::mapRectToScene(view, view->viewport()->rect()));
         result = result.intersected(viewportRect);
-        if(result.isEmpty())
+        if (result.isEmpty())
             return QRectF();
     }
 
-    if(useRelativeCoordinates) {
+    if (useRelativeCoordinates)
+    {
         return QnGeometry::toSubRect(channelRect, result);
-    } else {
+    }
+    else
+    {
         return result;
     }
 }
@@ -593,11 +639,13 @@ Qn::RenderStatus QnResourceWidget::renderStatus() const
     return m_renderStatus;
 }
 
-bool QnResourceWidget::isLocalActive() const {
+bool QnResourceWidget::isLocalActive() const
+{
     return m_localActive;
 }
 
-void QnResourceWidget::setLocalActive(bool localActive) {
+void QnResourceWidget::setLocalActive(bool localActive)
+{
     m_localActive = localActive;
 }
 
@@ -616,29 +664,31 @@ void QnResourceWidget::setCheckedButtons(int buttons)
 int QnResourceWidget::checkedButtons() const
 {
     return (buttonsOverlay()->rightButtonsBar()->checkedButtons()
-        | buttonsOverlay()->leftButtonsBar()->checkedButtons());
+            | buttonsOverlay()->leftButtonsBar()->checkedButtons());
 }
 
 int QnResourceWidget::visibleButtons() const
 {
     return (buttonsOverlay()->rightButtonsBar()->visibleButtons()
-        | buttonsOverlay()->leftButtonsBar()->visibleButtons());
+            | buttonsOverlay()->leftButtonsBar()->visibleButtons());
 }
 
-int QnResourceWidget::calculateButtonsVisibility() const {
+int QnResourceWidget::calculateButtonsVisibility() const
+{
     int result = Qn::InfoButton;
 
     if (!(m_options & WindowRotationForbidden))
         result |= Qn::RotateButton;
 
     Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
-    if((accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions)
+    if ((accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions)
         result |= Qn::CloseButton;
 
     return result;
 }
 
-void QnResourceWidget::updateButtonsVisibility() {
+void QnResourceWidget::updateButtonsVisibility()
+{
     // TODO: #ynikitenkov Change destroying sequence: items should be destroyed before layout
     if (!item() || !item()->layout())
         return;
@@ -650,27 +700,31 @@ void QnResourceWidget::updateButtonsVisibility() {
     buttonsOverlay()->leftButtonsBar()->setVisibleButtons(visibleButtons);
 }
 
-QCursor QnResourceWidget::windowCursorAt(Qn::WindowFrameSection section) const {
-    if(section == Qn::NoSection)
+QCursor QnResourceWidget::windowCursorAt(Qn::WindowFrameSection section) const
+{
+    if (section == Qn::NoSection)
         return calculateCursor();
 
     return base_type::windowCursorAt(section);
 }
 
-int QnResourceWidget::helpTopicAt(const QPointF &) const {
+int QnResourceWidget::helpTopicAt(const QPointF &) const
+{
     return -1;
 }
 
-void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
-    if(m_aboutToBeDestroyedEmitted)
+void QnResourceWidget::ensureAboutToBeDestroyedEmitted()
+{
+    if (m_aboutToBeDestroyedEmitted)
         return;
 
     m_aboutToBeDestroyedEmitted = true;
     emit aboutToBeDestroyed();
 }
 
-void QnResourceWidget::setOptions(Options options) {
-    if(m_options == options)
+void QnResourceWidget::setOptions(Options options)
+{
+    if (m_options == options)
         return;
 
     Options changedOptions = m_options ^ options;
@@ -680,12 +734,14 @@ void QnResourceWidget::setOptions(Options options) {
     emit optionsChanged();
 }
 
-const QSize &QnResourceWidget::channelScreenSize() const {
+const QSize &QnResourceWidget::channelScreenSize() const
+{
     return m_channelScreenSize;
 }
 
-void QnResourceWidget::setChannelScreenSize(const QSize &size) {
-    if(size == m_channelScreenSize)
+void QnResourceWidget::setChannelScreenSize(const QSize &size)
+{
+    if (size == m_channelScreenSize)
         return;
 
     m_channelScreenSize = size;
@@ -693,11 +749,13 @@ void QnResourceWidget::setChannelScreenSize(const QSize &size) {
     channelScreenSizeChangedNotify();
 }
 
-bool QnResourceWidget::isInfoVisible() const {
+bool QnResourceWidget::isInfoVisible() const
+{
     return options().testFlag(DisplayInfo);
 }
 
-void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
+void QnResourceWidget::setInfoVisible(bool visible, bool animate)
+{
     if (isInfoVisible() == visible)
         return;
 
@@ -706,13 +764,14 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
     updateHud(animate);
 }
 
-Qn::ResourceStatusOverlay QnResourceWidget::statusOverlay() const {
+Qn::ResourceStatusOverlay QnResourceWidget::statusOverlay() const
+{
     return m_statusOverlay;
 }
 
 void QnResourceWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay, bool animate)
 {
-    if(m_statusOverlay == statusOverlay)
+    if (m_statusOverlay == statusOverlay)
         return;
 
     m_statusOverlay = statusOverlay;
@@ -722,42 +781,59 @@ void QnResourceWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay,
         ? 0.0
         : 1.0;
 
-    if(animate)
+    if (animate)
         opacityAnimator(m_statusOverlayWidget)->animateTo(opacity);
     else
         m_statusOverlayWidget->setOpacity(opacity);
 }
 
-Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceStatus, bool hasVideo) const {
-    if (resourceStatus == Qn::Offline) {
+Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceStatus, bool hasVideo) const
+{
+    if (resourceStatus == Qn::Offline)
+    {
         return Qn::OfflineOverlay;
-    } else if (resourceStatus == Qn::Unauthorized) {
+    }
+    else if (resourceStatus == Qn::Unauthorized)
+    {
         return Qn::UnauthorizedOverlay;
-    } else if(m_renderStatus == Qn::NewFrameRendered) {
+    }
+    else if (m_renderStatus == Qn::NewFrameRendered)
+    {
         return Qn::EmptyOverlay;
-    } else if(!hasVideo) {
+    }
+    else if (!hasVideo)
+    {
         return Qn::NoVideoDataOverlay;
-    } else if(m_renderStatus == Qn::NothingRendered || m_renderStatus == Qn::CannotRender) {
+    }
+    else if (m_renderStatus == Qn::NothingRendered || m_renderStatus == Qn::CannotRender)
+    {
         return Qn::LoadingOverlay;
-    } else if(QDateTime::currentMSecsSinceEpoch() - m_lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) {
+    }
+    else if (QDateTime::currentMSecsSinceEpoch() - m_lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec)
+    {
         /* m_renderStatus is OldFrameRendered at this point. */
         return Qn::LoadingOverlay;
-    } else {
+    }
+    else
+    {
         return Qn::EmptyOverlay;
     }
 }
 
-Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay() const {
+Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay() const
+{
     const auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
     return calculateStatusOverlay(m_resource->getStatus(), mediaRes && mediaRes->hasVideo(0));
 }
 
-void QnResourceWidget::updateStatusOverlay() {
+void QnResourceWidget::updateStatusOverlay()
+{
     setStatusOverlay(calculateStatusOverlay());
 }
 
-void QnResourceWidget::setChannelLayout(QnConstResourceVideoLayoutPtr channelLayout) {
-    if(m_channelsLayout == channelLayout)
+void QnResourceWidget::setChannelLayout(QnConstResourceVideoLayoutPtr channelLayout)
+{
+    if (m_channelsLayout == channelLayout)
         return;
 
     m_channelsLayout = channelLayout;
@@ -765,11 +841,13 @@ void QnResourceWidget::setChannelLayout(QnConstResourceVideoLayoutPtr channelLay
     channelLayoutChangedNotify();
 }
 
-int QnResourceWidget::channelCount() const {
+int QnResourceWidget::channelCount() const
+{
     return m_channelsLayout->channelCount();
 }
 
-void QnResourceWidget::updateHud(bool animate) {
+void QnResourceWidget::updateHud(bool animate)
+{
 
     /*
         Logic must be the following:
@@ -784,32 +862,32 @@ void QnResourceWidget::updateHud(bool animate) {
     /* Motion mask widget should not have overlays at all */
 
     bool isInactiveInFullScreen = (options().testFlag(FullScreenMode)
-        && !options().testFlag(ActivityPresence));
+                                   && !options().testFlag(ActivityPresence));
 
     bool overlaysCanBeVisible = (!isInactiveInFullScreen
-        && !options().testFlag(QnResourceWidget::InfoOverlaysForbidden));
+                                 && !options().testFlag(QnResourceWidget::InfoOverlaysForbidden));
 
     bool detailsVisible = m_options.testFlag(DisplayInfo);
-    if(QnImageButtonWidget *infoButton = buttonsOverlay()->rightButtonsBar()->button(Qn::InfoButton))
+    if (QnImageButtonWidget *infoButton = buttonsOverlay()->rightButtonsBar()->button(Qn::InfoButton))
         infoButton->setChecked(detailsVisible);
 
     bool alwaysShowName = m_options.testFlag(AlwaysShowName);
 
-    const bool showOnlyCameraName         = ((overlaysCanBeVisible && detailsVisible) || alwaysShowName) && !m_mouseInWidget;
-    const bool showCameraNameWithButtons  = overlaysCanBeVisible && m_mouseInWidget;
-    const bool showPosition               = overlaysCanBeVisible && (detailsVisible || m_mouseInWidget);
-    const bool showDetailedInfo           = overlaysCanBeVisible && detailsVisible && (m_mouseInWidget || qnRuntime->showFullInfo());
+    const bool showOnlyCameraName = ((overlaysCanBeVisible && detailsVisible) || alwaysShowName) && !m_mouseInWidget;
+    const bool showCameraNameWithButtons = overlaysCanBeVisible && m_mouseInWidget;
+    const bool showPosition = overlaysCanBeVisible && (detailsVisible || m_mouseInWidget);
+    const bool showDetailedInfo = overlaysCanBeVisible && detailsVisible && (m_mouseInWidget || qnRuntime->showFullInfo());
 
     const bool showButtonsOverlay = (showOnlyCameraName || showCameraNameWithButtons);
 
 
     bool updatePositionTextRequired = (showPosition && !isOverlayWidgetVisible(m_overlayWidgets->positionOverlay));
-    setOverlayWidgetVisible(m_overlayWidgets->positionOverlay,               showPosition,               animate);
+    setOverlayWidgetVisible(m_overlayWidgets->positionOverlay, showPosition, animate);
     if (updatePositionTextRequired)
         updatePositionText();
 
     bool updateDetailsTextRequired = (showDetailedInfo && !isOverlayWidgetVisible(m_overlayWidgets->detailsOverlay));
-    setOverlayWidgetVisible(m_overlayWidgets->detailsOverlay,                showDetailedInfo,           animate);
+    setOverlayWidgetVisible(m_overlayWidgets->detailsOverlay, showDetailedInfo, animate);
     if (updateDetailsTextRequired)
         updateDetailsText();
 
@@ -817,14 +895,16 @@ void QnResourceWidget::updateHud(bool animate) {
     m_overlayWidgets->buttonsOverlay->setSimpleMode(showOnlyCameraName);
 }
 
-bool QnResourceWidget::isHovered() const {
+bool QnResourceWidget::isHovered() const
+{
     return m_mouseInWidget;
 }
 
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
-void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
+void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
+{
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter);
     QnScopedPainterFontRollback fontRollback(painter);
@@ -834,11 +914,12 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     Qn::RenderStatus renderStatus = Qn::NothingRendered;
 
-    for(int i = 0; i < channelCount(); i++) {
+    for (int i = 0; i < channelCount(); i++)
+    {
         /* Draw content. */
         QRectF channelRect = this->channelRect(i);
         QRectF paintRect = this->exposedRect(i, false, false, false);
-        if(paintRect.isEmpty())
+        if (paintRect.isEmpty())
             continue;
 
         renderStatus = qMax(renderStatus, paintChannelBackground(painter, i, channelRect, paintRect));
@@ -852,34 +933,47 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     /* Update overlay. */
     m_renderStatus = renderStatus;
-    if(renderStatus == Qn::NewFrameRendered)
+    if (renderStatus == Qn::NewFrameRendered)
         m_lastNewFrameTimeMSec = QDateTime::currentMSecsSinceEpoch();
     updateStatusOverlay();
 
     emit painted();
 }
 
-void QnResourceWidget::paintChannelForeground(QPainter *, int, const QRectF &) {
+void QnResourceWidget::paintChannelForeground(QPainter *, int, const QRectF &)
+{
     return;
 }
 
-void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
-    if(qFuzzyIsNull(m_frameOpacity))
+void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
+    if (qFuzzyIsNull(m_frameOpacity))
         return;
 
     QColor color;
-    if(isSelected()) {
+    if (isSelected())
+    {
         color = m_frameColors.selected;
-    } else if(isLocalActive()) {
-        if(m_frameDistinctionColor.isValid()) {
+    }
+    else if (isLocalActive())
+    {
+        if (m_frameDistinctionColor.isValid())
+        {
             color = m_frameDistinctionColor.lighter();
-        } else {
+        }
+        else
+        {
             color = m_frameColors.active;
         }
-    } else {
-        if(m_frameDistinctionColor.isValid()) {
+    }
+    else
+    {
+        if (m_frameDistinctionColor.isValid())
+        {
             color = m_frameDistinctionColor;
-        } else {
+        }
+        else
+        {
             color = m_frameColors.normal;
         }
     }
@@ -891,23 +985,25 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
 
     QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
-    painter->fillRect(QRectF(-fw,     -fw,     w + fw * 2,  fw), color);
-    painter->fillRect(QRectF(-fw,     h,       w + fw * 2,  fw), color);
-    painter->fillRect(QRectF(-fw,     0,       fw,          h),  color);
-    painter->fillRect(QRectF(w,       0,       fw,          h),  color);
+    painter->fillRect(QRectF(-fw, -fw, w + fw * 2, fw), color);
+    painter->fillRect(QRectF(-fw, h, w + fw * 2, fw), color);
+    painter->fillRect(QRectF(-fw, 0, fw, h), color);
+    painter->fillRect(QRectF(w, 0, fw, h), color);
 }
 
-void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
-    if(!isSelected())
+void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect)
+{
+    if (!isSelected())
         return;
 
-    if(!(m_options & DisplaySelection))
+    if (!(m_options & DisplaySelection))
         return;
 
     painter->fillRect(rect, palette().color(QPalette::Highlight));
 }
 
-float QnResourceWidget::defaultAspectRatio() const {
+float QnResourceWidget::defaultAspectRatio() const
+{
     if (item())
         return item()->data(Qn::ItemAspectRatioRole, noAspectRatio);
     return noAspectRatio;
@@ -922,10 +1018,12 @@ QnResourceWidget::OverlayWidgets* QnResourceWidget::overlayWidgets() const
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-bool QnResourceWidget::windowFrameEvent(QEvent *event) {
+bool QnResourceWidget::windowFrameEvent(QEvent *event)
+{
     bool result = base_type::windowFrameEvent(event);
 
-    if(event->type() == QEvent::GraphicsSceneHoverMove) {
+    if (event->type() == QEvent::GraphicsSceneHoverMove)
+    {
         QGraphicsSceneHoverEvent *e = static_cast<QGraphicsSceneHoverEvent *>(event);
 
         /* Qt does not unset a cursor unless mouse pointer leaves widget's frame.
@@ -933,14 +1031,15 @@ bool QnResourceWidget::windowFrameEvent(QEvent *event) {
          * As this widget may not have a frame section associated with some parts of
          * its frame, cursor must be unset manually. */
         Qt::WindowFrameSection section = windowFrameSectionAt(e->pos());
-        if(section == Qt::NoSection)
+        if (section == Qt::NoSection)
             updateCursor();
     }
 
     return result;
 }
 
-void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
+void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
     m_mouseInWidget = true;
 
     setOverlayVisible();
@@ -948,12 +1047,14 @@ void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverEnterEvent(event);
 }
 
-void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
+{
     setOverlayVisible();
     base_type::hoverMoveEvent(event);
 }
 
-void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
     m_mouseInWidget = false;
 
     setOverlayVisible(false);
@@ -979,17 +1080,20 @@ void QnResourceWidget::optionsChangedNotify(Options changedFlags)
         updateHud(true);
 }
 
-void QnResourceWidget::at_itemDataChanged(int role) {
+void QnResourceWidget::at_itemDataChanged(int role)
+{
     if (role != Qn::ItemCheckedButtonsRole)
         return;
     updateCheckedButtons();
 }
 
-void QnResourceWidget::at_infoButton_toggled(bool toggled) {
+void QnResourceWidget::at_infoButton_toggled(bool toggled)
+{
     setInfoVisible(toggled);
 }
 
-void QnResourceWidget::at_buttonBar_checkedButtonsChanged() {
+void QnResourceWidget::at_buttonBar_checkedButtonsChanged()
+{
     if (!item())
         return;
 
@@ -997,4 +1101,3 @@ void QnResourceWidget::at_buttonBar_checkedButtonsChanged() {
     item()->setData(Qn::ItemCheckedButtonsRole, checkedButtons);
     update();
 }
-
