@@ -541,7 +541,7 @@
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
                 <machine.type>X64</machine.type>
-
+                <launcher.version.dir>${libdir}/${arch}/bin/${build.configuration}</launcher.version.dir>
             </properties>
 
         </profile>
@@ -654,6 +654,7 @@
                 <windows>false</windows>
                 <script.extension>sh</script.extension>
                 <festival.version>2.1</festival.version>
+                <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>
             </properties>
         </profile>
         <profile>
