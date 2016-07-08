@@ -161,6 +161,11 @@ namespace detail
         return QnTransactionLog::makeHash(params.cameraID.toRfc4122(), "camera_attributes");
     }
 
+    QnUuid createHashForApiAccessRightsDataHelper(const ApiAccessRightsData& params)
+    {
+        return QnTransactionLog::makeHash(params.userId.toRfc4122(), "access_rights");
+    }
+
     QnUuid createHashForApiLicenseDataHelper(const ApiLicenseData &params)
     {
         return QnTransactionLog::makeHash(params.key, "ApiLicense");
