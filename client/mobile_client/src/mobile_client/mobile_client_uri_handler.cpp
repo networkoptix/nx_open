@@ -1,16 +1,17 @@
 #include "mobile_client_uri_handler.h"
 
 #include <nx/vms/utils/system_uri.h>
-#include <nx/vms/utils/app_info.h>
 #include <utils/common/app_info.h>
 #include <watchers/cloud_status_watcher.h>
 
 #include "mobile_client_ui_controller.h"
 #include "mobile_client_settings.h"
 
+using nx::vms::utils::SystemUri;
+
 namespace {
 
-QUrl getConnectionUrl(const nx::vms::utils::SystemUri& uri)
+QUrl getConnectionUrl(const SystemUri& uri)
 {
     if (!uri.isValid() || uri.systemId().isEmpty())
         return QUrl();
@@ -52,7 +53,18 @@ void QnMobileClientUriHandler::setUiController(QnMobileClientUiController* uiCon
 
 QStringList QnMobileClientUriHandler::supportedSchemes()
 {
-    return { nx::vms::utils::AppInfo::nativeUriProtocol(), lit("http"), lit("https") };
+    const auto protocols =
+        {
+            SystemUri::Protocol::Native,
+            SystemUri::Protocol::Http,
+            SystemUri::Protocol::Https
+        };
+
+    QStringList result;
+    for (auto protocol: protocols)
+        result.append(SystemUri::toString(protocol));
+
+    return result;
 }
 
 const char*QnMobileClientUriHandler::handlerMethodName()
@@ -62,8 +74,6 @@ const char*QnMobileClientUriHandler::handlerMethodName()
 
 void QnMobileClientUriHandler::handleUrl(const QUrl& url)
 {
-    using namespace nx::vms::utils;
-
     SystemUri uri(url);
 
     if (!uri.isValid())
