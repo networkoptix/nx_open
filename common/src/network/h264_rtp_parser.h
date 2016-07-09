@@ -22,19 +22,13 @@ public:
     virtual ~CLH264RtpParser();
     virtual void setSDPInfo(QList<QByteArray> lines) override;
 
-    virtual bool processData(
-        quint8* rtpBufferBase, 
-        int bufferOffset, 
-        int bytesRead, 
-        const RtspStatistic& statistics, 
-        bool& gotData) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) override;
 
 private:
     QMap <int, QByteArray> m_allNonSliceNal;
     QList<QByteArray> m_sdpSpsPps;
     SPSUnit m_sps;
     bool m_spsInitialized;
-    bool m_canUseMarkerBit;
     int m_frequency;
     int m_rtpChannel;
     int m_prevSequenceNum;
@@ -46,30 +40,31 @@ private:
     quint16 m_firstSeqNum;
     quint16 m_packetPerNal;
 
+    //QnByteArray m_videoBuffer;
     int m_videoFrameSize;
+    bool m_previousPacketHasMarkerBit;
     std::vector<quint8> m_nextFrameChunksBuffer;
-    mutable bool m_previousPacketHasMarkerBit;
-
 private:
     void serializeSpsPps(QnByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);
+    bool isSliceNal(quint8 nalUnitType) const;
+    bool isFirstSliceNal(const quint8 nalType, const quint8* data, int dataLen) const;
+    bool isPacketStartsNewFrame(
+        const quint8* curPtr,
+        const quint8* bufferEnd) const;
+    void backupCurrentData(quint8* rtpBufferBase);
+    bool isIFrame(const quint8* data, int dataLen) const;
 
     QnCompressedVideoDataPtr createVideoData(
         const quint8            *rtpBuffer,
         quint32                 rtpTime,
         const RtspStatistic     &statistics
-    );
+        );
+    bool isBufferOverflow() const;
 
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine
-    void updateNalFlags(int nalUnitType, const quint8* data, int dataLen);
+    void updateNalFlags(const quint8* data, int dataLen);
     int getSpsPpsSize() const;
-
-    bool isPacketStartsNewFrame(int packetType, const quint8*, const quint8* rtpBufferStart, const quint8* bufferEnd) const;
-    bool isSliceNal(quint8 nalUnitType) const;
-    bool isFirstSliceNal(const quint8 nalType, const quint8* data, int dataLen ) const;
-    bool isIFrame(const quint8* data, int dataLen) const;
-
-    void backupNextFrameChunks(const char* bufferStart);
 };
 
 #endif // ENABLE_DATA_PROVIDERS
