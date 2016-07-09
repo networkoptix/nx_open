@@ -37,6 +37,9 @@
 #include "config.h"
 using mobile_client::conf;
 
+// TODO mike: REMOVE
+#include <common/systemexcept.h>
+
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
     QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
@@ -144,6 +147,12 @@ int runUi(QGuiApplication *application) {
     nx::media::DecoderRegistrar::registerDecoders(
         allocator, maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
 
+#if defined(Q_OS_ANDROID)
+    QUrl initialIntentData = getInitialIntentData();
+    if (initialIntentData.isValid())
+        QDesktopServices::openUrl(initialIntentData);
+#endif
+
     return application->exec();
 }
 
@@ -187,6 +196,15 @@ void initLog()
             /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
             cl_logDEBUG2);
     }
+
+    if (conf.enableLog)
+    {
+        QnLog::instance(QnLog::MAIN_LOG_ID)->create(
+            QLatin1String(conf.tempPath()) + QLatin1String("mobile_client"),
+            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
+            /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
+            cl_logDEBUG2);
+    }
 }
 
 void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallInstanceGuid)
@@ -206,7 +224,8 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
 
     const auto urlOption = QCommandLineOption(
         lit("url"),
-        lit("URL to be used for server connection instead of asking login/password."));
+        lit("URL to be used for server connection instead of asking login/password."),
+        lit("url"));
     parser.addOption(urlOption);
 
     const auto videowallInstanceGuidOption = QCommandLineOption(
@@ -214,7 +233,14 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
         lit("GUID which is used to check Videowall Control messages."));
     parser.addOption(videowallInstanceGuidOption);
 
-    parser.process(application);
+    auto testOption = QCommandLineOption(
+        lit("test"),
+        lit("Enable test."),
+        lit("test"));
+    testOption.setHidden(true);
+    parser.addOption(testOption);
+
+    parser.parse(application.arguments());
 
     if (parser.isSet(basePathOption))
     {
@@ -237,10 +263,24 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
         *outVideowallInstanceGuid = QnUuid::fromStringSafe(
             parser.value(videowallInstanceGuidOption));
     }
+
+    if (parser.isSet(testOption))
+    {
+        qnSettings->setTestMode(true);
+        qnSettings->setInitialTest(parser.value(testOption));
+    }
 }
 
 int main(int argc, char *argv[])
 {
+    #if defined(Q_OS_WIN)
+        AllowSetForegroundWindow(ASFW_ANY);
+        win32_exception::installGlobalUnhandledExceptionHandler();
+    #endif
+    #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
+        linux_exception::installCrashSignalHandler();
+    #endif
+
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QGuiApplication application(argc, argv);
 
@@ -255,9 +295,9 @@ int main(int argc, char *argv[])
 
     migrateSettings();
 
-#ifdef Q_OS_ANDROID
-    registerIntentListener();
-#endif
+    #if defined(Q_OS_ANDROID)
+        registerIntentListener();
+    #endif
 
     int result = runApplication(&application, videowallInstanceGuid);
 

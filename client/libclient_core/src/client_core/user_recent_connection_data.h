@@ -36,8 +36,6 @@ struct QnUserRecentConnectionDataList : public QList<QnUserRecentConnectionData>
     typedef QList<QnUserRecentConnectionData> base_type;
 
 public:
-    enum { kNotFoundIndex = -1};
-
     QnUserRecentConnectionDataList();
 
     ~QnUserRecentConnectionDataList();

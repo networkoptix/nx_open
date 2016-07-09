@@ -37,22 +37,6 @@ namespace detail {
 // Udt library initialization and tear down routine.
 // =========================================================
 
-class UdtLibrary {
-public:
-    static void Initialize() {
-        std::call_once(kOnceFlag,&UdtLibrary::InitializeUdt);
-    }
-
-private:
-    static void InitializeUdt() {
-        UDT::startup();
-    }
-private:
-    static std::once_flag kOnceFlag;
-};
-
-std::once_flag UdtLibrary::kOnceFlag;
-
 void AddressFrom( const SocketAddress& local_addr , sockaddr_in* out ) {
     memset(out, 0, sizeof(*out));    // Zero out address structure
     out->sin_family = AF_INET;       // Internet address
@@ -117,7 +101,9 @@ UdtSocket<InterfaceToImplement>::UdtSocket()
 :
     UdtSocket(new detail::UdtSocketImpl(), detail::SocketState::closed)
 {
-    detail::UdtLibrary::Initialize();
+    SocketGlobals::customInit(
+        reinterpret_cast<SocketGlobals::CustomInit>(&UDT::startup),
+        reinterpret_cast<SocketGlobals::CustomDeinit>(&UDT::cleanup));
 }
 
 template<typename InterfaceToImplement>

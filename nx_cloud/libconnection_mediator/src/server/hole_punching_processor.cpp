@@ -74,7 +74,7 @@ HolePunchingProcessor::~HolePunchingProcessor()
 
     nx::utils::promise<void> allSessionsStoppedPromise;
     {
-        nx::BarrierHandler barrier(
+        nx::utils::BarrierHandler barrier(
             [&allSessionsStoppedPromise]() { allSessionsStoppedPromise.set_value(); });
         for (const auto& connectSession: localSessions)
             connectSession.second->pleaseStop(barrier.fork());

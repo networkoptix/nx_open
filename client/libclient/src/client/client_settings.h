@@ -49,7 +49,6 @@ public:
         LAST_RECORDING_DIR,
         LAST_EXPORT_DIR,
 
-        DEFAULT_CONNECTION,
         LAST_USED_CONNECTION,
         CUSTOM_CONNECTIONS,
 
@@ -198,7 +197,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportDir,          setLastExportDir,           LAST_EXPORT_DIR,            QString())
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateHash,        userWorkbenchStates,    setUserWorkbenchStates,     USER_WORKBENCH_STATES,      QnWorkbenchStateHash())
         QN_DECLARE_RW_PROPERTY(QnLicenseWarningStateHash,   licenseWarningStates,   setLicenseWarningStates,    LICENSE_WARNING_STATES,     QnLicenseWarningStateHash())
-        QN_DECLARE_R_PROPERTY (QnUserRecentConnectionData,  defaultConnection,                                  DEFAULT_CONNECTION,         QnUserRecentConnectionData())
         QN_DECLARE_RW_PROPERTY(QnUserRecentConnectionData,  lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnUserRecentConnectionData())
         QN_DECLARE_RW_PROPERTY(QString,                     extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))

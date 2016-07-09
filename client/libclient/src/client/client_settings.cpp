@@ -86,22 +86,6 @@ QnClientSettings::~QnClientSettings() {
 
 QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
     switch(id) {
-    case DEFAULT_CONNECTION: {
-        QnUserRecentConnectionData result;
-        result.url.setScheme(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http"));
-        result.url.setHost(settings->value(QLatin1String("appserverHost"), QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
-        result.url.setPort(settings->value(QLatin1String("appserverPort"), DEFAULT_APPSERVER_PORT).toInt());
-        result.url.setUserName(settings->value(QLatin1String("appserverLogin"), QLatin1String("admin")).toString());
-        result.name = QLatin1String("default");
-
-        if(!result.url.isValid() || result.url.isRelative() || result.url.host().isEmpty())
-            result.url = QUrl(QString(QLatin1String("%1://admin@%2:%3")).
-                arg(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http")).
-                arg(QLatin1String(DEFAULT_APPSERVER_HOST)).
-                arg(DEFAULT_APPSERVER_PORT));
-
-        return QVariant::fromValue<QnUserRecentConnectionData>(result);
-    }
     case LAST_USED_CONNECTION: {
         settings->beginGroup(QLatin1String("AppServerConnections"));
         settings->beginGroup(QLatin1String("lastUsed"));

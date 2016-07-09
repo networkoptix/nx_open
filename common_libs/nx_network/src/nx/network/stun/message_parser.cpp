@@ -491,8 +491,11 @@ int MessageParser::parseEndMessageIntegrity( MessageParserBuffer& buffer ) {
     }
 }
 
-nx_api::ParserState::Type MessageParser::parse( const nx::Buffer& user_buffer , std::size_t* bytes_transferred ) {
-    NX_ASSERT( !user_buffer.isEmpty() );
+nx_api::ParserState MessageParser::parse( const nx::Buffer& user_buffer , std::size_t* bytes_transferred )
+{
+    if (user_buffer.isEmpty())  //end-of-file received
+        return nx_api::ParserState::inProgress;
+
     // Setting up the buffer environment variables
     MessageParserBuffer buffer(&m_tempBuffer,user_buffer);
     // Tick the parsing state machine

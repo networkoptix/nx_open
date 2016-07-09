@@ -1,11 +1,4 @@
-////////////////////////////////////////////////////////////
-// 18 aug 2013    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef NAMED_PIPE_SOCKET_UNIX_H
-#define NAMED_PIPE_SOCKET_UNIX_H
-
-#ifndef _WIN32
+#pragma once
 
 class NamedPipeSocketImpl
 {
@@ -16,7 +9,3 @@ public:
 
     NamedPipeSocketImpl();
 };
-
-#endif
-
-#endif  //NAMED_PIPE_SOCKET_UNIX_H

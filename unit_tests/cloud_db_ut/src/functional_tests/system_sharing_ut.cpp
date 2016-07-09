@@ -33,8 +33,8 @@ TEST_F(SystemSharing, getCloudUsers)
     {
         std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
-            getSystemSharings(account1.email, account1Password, "sdfnoowertn", &sharings),
-            api::ResultCode::forbidden);
+            api::ResultCode::forbidden,
+            getSystemSharings(account1.email, account1Password, "sdfnoowertn", &sharings));
     }
 
     api::AccountData account2;
@@ -984,6 +984,125 @@ TEST_F(SystemSharing, DISABLED_remove_sharing_unknown_system)
             system1.id,
             std::string(),
             api::SystemAccessRole::none));
+}
+
+TEST_F(SystemSharing, setSystemUserList)
+{
+    //waiting for cloud_db initialization
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    api::AccountData account1;
+    std::string account1Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account1, &account1Password));
+
+    api::AccountData account2;
+    std::string account2Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account2, &account2Password));
+
+    api::AccountData account3;
+    std::string account3Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account3, &account3Password));
+
+    //adding system1 to account1
+    api::SystemData system1;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.email, account1Password, &system1));
+
+    //adding system2 to account1
+    api::SystemData system2;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.email, account1Password, &system2));
+
+    //adding system3 to account2
+    api::SystemData system3;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account2.email, account2Password, &system3));
+
+    //sharing system1 with account2 as viewer
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        shareSystem(
+            account1.email,
+            account1Password,
+            system1.id,
+            account2.email,
+            api::SystemAccessRole::viewer));
+
+    //sharing system1 with account3
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        shareSystem(
+            account1.email,
+            account1Password,
+            system1.id,
+            account3.email,
+            api::SystemAccessRole::advancedViewer));
+
+    {
+        std::vector<api::SystemSharingEx> sharings;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystemSharings(account1.email, account1Password, system1.id, &sharings));
+        ASSERT_EQ(3, sharings.size());
+        ASSERT_EQ(
+            api::SystemAccessRole::owner,
+            accountAccessRoleForSystem(sharings, account1.email, system1.id));
+        ASSERT_EQ(
+            api::SystemAccessRole::viewer,
+            accountAccessRoleForSystem(sharings, account2.email, system1.id));
+        ASSERT_EQ(
+            api::SystemAccessRole::advancedViewer,
+            accountAccessRoleForSystem(sharings, account3.email, system1.id));
+    }
+
+    api::SystemSharingList newSystemUserList;
+    api::SystemSharing account2ToSystem1;
+    account2ToSystem1.accountEmail = account2.email;
+    account2ToSystem1.systemID = system1.id;
+    account2ToSystem1.accessRole = api::SystemAccessRole::viewer;
+    newSystemUserList.sharing.push_back(std::move(account2ToSystem1));
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        setSystemUserList(system1.id, system1.authKey, std::move(newSystemUserList)));
+
+    {
+        std::vector<api::SystemSharingEx> sharings;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystemSharings(account1.email, account1Password, system1.id, &sharings));
+        ASSERT_EQ(2, sharings.size());
+        ASSERT_EQ(
+            api::SystemAccessRole::owner,
+            accountAccessRoleForSystem(sharings, account1.email, system1.id));
+        ASSERT_EQ(
+            api::SystemAccessRole::viewer,
+            accountAccessRoleForSystem(sharings, account2.email, system1.id));
+    }
+
+    //setting empty user list
+    newSystemUserList.sharing.clear();
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        setSystemUserList(system1.id, system1.authKey, std::move(newSystemUserList)));
+    {
+        std::vector<api::SystemSharingEx> sharings;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystemSharings(account1.email, account1Password, system1.id, &sharings));
+        ASSERT_EQ(1, sharings.size());
+        ASSERT_EQ(
+            api::SystemAccessRole::owner,
+            accountAccessRoleForSystem(sharings, account1.email, system1.id));
+    }
 }
 
 }   //cdb

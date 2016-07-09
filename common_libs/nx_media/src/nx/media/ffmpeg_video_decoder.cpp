@@ -1,6 +1,5 @@
-#ifndef DISABLE_FFMPEG
-
 #include "ffmpeg_video_decoder.h"
+#if !defined(DISABLE_FFMPEG)
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -20,55 +19,18 @@ namespace media {
 
 namespace {
 
-    void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height)
+static void copyPlane(unsigned char* dst, const unsigned char* src,
+    int width, int dst_stride, int src_stride, int height)
+{
+    for (int i = 0; i < height; ++i)
     {
-        for (int i = 0; i < height; ++i)
-        {
-            memcpy(dst, src, width);
-            dst += dst_stride;
-            src += src_stride;
-        }
+        memcpy(dst, src, width);
+        dst += dst_stride;
+        src += src_stride;
     }
-
 }
 
-
-class InitFfmpegLib
-{
-public:
-    //TODO: #rvasilenko replace this static class with QnFfmpegInitializer instance,
-    // which will be destroyed in correct time.
-    // Now av_lockmgr_register(nullptr) is not called in htis project at all
-    InitFfmpegLib()
-    {
-        //QnFfmpegInitializer* initializer = new QnFfmpegInitializer()
-        av_register_all();
-        if (av_lockmgr_register(&InitFfmpegLib::lockmgr) != 0)
-            qCritical() << "Failed to register ffmpeg lock manager";
-    }
-
-    static int lockmgr(void** mtx, enum AVLockOp op)
-    {
-        QnMutex** qMutex = (QnMutex**)mtx;
-        switch (op)
-        {
-        case AV_LOCK_CREATE:
-            *qMutex = new QnMutex();
-            return 0;
-        case AV_LOCK_OBTAIN:
-            (*qMutex)->lock();
-            return 0;
-        case AV_LOCK_RELEASE:
-            (*qMutex)->unlock();
-            return 0;
-        case AV_LOCK_DESTROY:
-            delete *qMutex;
-            return 0;
-        default:
-            return 1;
-        }
-    }
-};
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoderPrivate
@@ -134,13 +96,11 @@ QSize FfmpegVideoDecoder::s_maxResolution;
 
 FfmpegVideoDecoder::FfmpegVideoDecoder(
     const ResourceAllocatorPtr& allocator, const QSize& resolution)
-:
+    :
     AbstractVideoDecoder(),
     d_ptr(new FfmpegVideoDecoderPrivate())
 {
     QN_UNUSED(allocator, resolution);
-    static InitFfmpegLib init;
-    QN_UNUSED(init);
 }
 
 FfmpegVideoDecoder::~FfmpegVideoDecoder()
@@ -286,4 +246,4 @@ void FfmpegVideoDecoder::setMaxResolution(const QSize& maxResolution)
 } // namespace media
 } // namespace nx
 
-#endif // DISABLE_FFMPEG
+#endif // !DISABLE_FFMPEG

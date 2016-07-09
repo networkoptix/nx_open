@@ -3,11 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#ifdef _WIN32
-
 #include <isd/vmux/vmux_iface.h>
-
-
 
 Vmux::Vmux()
 {
@@ -48,5 +44,3 @@ int Vmux::GetJpegInfo   (int stream, vmux_jpeg_info_t *jpeg_info,
 {
     return 0;
 }
-
-#endif  //_WIN32

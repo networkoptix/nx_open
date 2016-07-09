@@ -1,15 +1,15 @@
-#ifndef SYNC_QUEUE_H
-#define SYNC_QUEUE_H
+#pragma once
 
+#include <boost/optional.hpp>
 #include <functional>
 #include <queue>
-#include <boost/optional.hpp>
+#include <tuple>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
-
 namespace nx {
+namespace utils {
 
 template<typename Result>
 class SyncQueue
@@ -31,14 +31,13 @@ private:
     std::queue<Result> m_queue;
 };
 
-// TODO: replace with variadic template
-template< typename R1, typename R2 >
+template<typename R1, typename R2>
 class SyncMultiQueue
 :
-    public SyncQueue< std::pair< R1, R2 > >
+    public SyncQueue<std::pair<R1, R2>>
 {
 public:
-    std::function< void( R1, R2 ) > pusher() /* overlap */;
+    std::function<void(R1, R2)> pusher() /* overlap */;
 };
 
 // --- implementation ---
@@ -91,56 +90,20 @@ bool SyncQueue<Result>::isEmpty()
     return m_queue.empty();
 }
 
-template< typename Result>
-std::function< void( Result ) > SyncQueue<Result>::pusher()
+template<typename Result>
+std::function<void(Result) > SyncQueue<Result>::pusher()
 {
-    return [ this ]( Result result ) { push( std::move( result ) ); };
+    return [this](Result result) { push(std::move(result)); };
 }
 
-template< typename R1, typename R2 >
-std::function< void( R1, R2 ) > SyncMultiQueue<R1, R2>::pusher()
+template<typename R1, typename R2>
+std::function<void(R1, R2)> SyncMultiQueue<R1, R2>::pusher()
 {
-    return [ this ]( R1 r1, R2 r2 )
+    return [this](R1 r1, R2 r2)
     {
-        this->push( std::make_pair( std::move(r1), std::move(r2) ) );
+        this->push(std::make_pair(std::move(r1), std::move(r2)));
     };
 }
 
-// --- test features ---
-
-// Every test MUST be finite!
-static const std::chrono::minutes kTestSyncQueueTimeout(1);
-
-template<typename Base>
-class TestSyncQueueBase
-:
-    public Base
-{
-public:
-    explicit TestSyncQueueBase(
-        std::chrono::milliseconds timeout = kTestSyncQueueTimeout)
-    :
-        m_timeout(timeout)
-    {
-    }
-
-    typename Base::ResultType pop() /* overlap */
-    {
-        auto value = Base::pop(m_timeout);
-        NX_ASSERT(value, "TestSyncQueue::pop() timeout");
-        return std::move(*value);
-    }
-
-private:
-    std::chrono::milliseconds m_timeout;
-};
-
-template<typename Result>
-using TestSyncQueue = TestSyncQueueBase<SyncQueue<Result>>;
-
-template<typename R1, typename R2>
-using TestSyncMultiQueue = TestSyncQueueBase<SyncMultiQueue<R1, R2>>;
-
+} // namespace utils
 } // namespace nx
-
-#endif // SYNC_QUEUE_H

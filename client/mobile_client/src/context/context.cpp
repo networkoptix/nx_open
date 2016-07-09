@@ -119,6 +119,16 @@ bool QnContext::liteMode() const
     return false;
 }
 
+bool QnContext::testMode() const
+{
+    return qnSettings->testMode();
+}
+
+QString QnContext::initialTest() const
+{
+    return qnSettings->initialTest();
+}
+
 void QnContext::removeSavedConnection(const QString& systemName)
 {
     auto lastConnections = qnClientCoreSettings->recentUserConnections();

@@ -43,6 +43,7 @@ namespace style
     const char* Properties::kTabShape = "_qn_tabShape";
     const char* Properties::kSuppressHoverPropery = "_qn_suppressHover";
     const char* Properties::kSideIndentation = "_qn_sideIndentation";
+    const char* Properties::kCheckBoxAsButton = "_qn_checkBoxAsButton";
 
     qreal dpr(qreal value)
     {

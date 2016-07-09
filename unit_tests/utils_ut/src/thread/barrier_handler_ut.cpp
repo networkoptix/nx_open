@@ -3,6 +3,7 @@
 #include <nx/utils/thread/barrier_handler.h>
 
 namespace nx {
+namespace utils {
 namespace test {
 
 TEST( BarrierHandler, Normal )
@@ -36,4 +37,5 @@ TEST( BarrierHandler, Fast )
 }
 
 } // namespace test
+} // namespace utils
 } // namespace nx

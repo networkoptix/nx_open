@@ -30,6 +30,13 @@ struct QnMediaContextSerializableData
      */
     bool deserialize(const QByteArray& data);
 
+    /**
+     * Initialize all fields copying data from the specified AVCodecContext.
+     *
+     * ATTENTION: All fields are assumed to be non-initialized before the call.
+     */
+    void initializeFrom(const AVCodecContext* context);
+
     //--------------------------------------------------------------------------
     /// Fields defined in ffmpeg's AVCodecContext.
     //@{

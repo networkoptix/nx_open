@@ -119,6 +119,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnUpdateResult>();
     qRegisterMetaType<QnCheckForUpdateResult>();
 
+    QMetaType::registerComparators<QnUuid>();
+
     QnJsonSerializer::registerSerializer<QnBookmarkColors>();
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
     QnJsonSerializer::registerSerializer<QnTimeScrollBarColors>();

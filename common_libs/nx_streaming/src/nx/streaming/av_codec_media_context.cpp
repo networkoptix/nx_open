@@ -5,7 +5,6 @@
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/av_codec_helper.h>
 #include <nx/utils/log/assert.h>
-#include <nx/streaming/media_context_serializable_data.h>
 
 QnAvCodecMediaContext::~QnAvCodecMediaContext()
 {
@@ -36,44 +35,7 @@ QByteArray QnAvCodecMediaContext::serialize() const
 {
     QnMediaContextSerializableData data;
 
-    data.codecId = m_context->codec_id;
-    data.codecType = m_context->codec_type;
-    if (m_context->rc_eq)
-    {
-        data.rcEq = QByteArray(m_context->rc_eq,
-            (int) strlen(m_context->rc_eq) + 1); //< Array should include '\0'.
-    }
-    if (m_context->extradata)
-    {
-        data.extradata = QByteArray((const char*) m_context->extradata,
-            m_context->extradata_size);
-    }
-    if (m_context->intra_matrix)
-    {
-        data.intraMatrix.assign(m_context->intra_matrix,
-            m_context->intra_matrix + QnAvCodecHelper::kMatrixLength);
-    }
-    if (m_context->inter_matrix)
-    {
-        data.interMatrix.assign(m_context->inter_matrix,
-            m_context->inter_matrix + QnAvCodecHelper::kMatrixLength);
-    }
-    if (m_context->rc_override)
-    {
-        data.rcOverride.assign(m_context->rc_override,
-            m_context->rc_override + m_context->rc_override_count);
-    }
-    data.channels = m_context->channels;
-    data.sampleRate = m_context->sample_rate;
-    data.sampleFmt = m_context->sample_fmt;
-    data.bitsPerCodedSample = m_context->bits_per_coded_sample;
-    data.codedWidth = m_context->coded_width;
-    data.codedHeight = m_context->coded_height;
-    data.width = m_context->width;
-    data.height = m_context->height;
-    data.bitRate = m_context->bit_rate;
-    data.channelLayout = m_context->channel_layout;
-    data.blockAlign = m_context->block_align;
+    data.initializeFrom(m_context);
 
     return data.serialize();
 }
@@ -89,7 +51,7 @@ void QnAvCodecMediaContext::setExtradata(
     m_context->extradata_size = extradata_size;
 }
 
-//------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 CodecID QnAvCodecMediaContext::getCodecId() const
 {

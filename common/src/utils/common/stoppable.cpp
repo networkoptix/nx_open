@@ -24,7 +24,7 @@ void QnStoppableAsync::pleaseStopImpl(
     for( auto& ptr : stoppables )
         tmpStoppables.push_back( ptr.get() );
 
-    nx::BarrierHandler barrier(
+    nx::utils::BarrierHandler barrier(
         [stoppables = std::move(stoppables),
             completionHandler = std::move(completionHandler)]() mutable
         {

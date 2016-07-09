@@ -32,7 +32,7 @@ const QMap<SystemUri::Protocol, QString> protocolToString
 {
     {SystemUri::Protocol::Http, "http"},
     {SystemUri::Protocol::Https, "https"},
-    {SystemUri::Protocol::Native, AppInfo::nativeUriProtocol()} //TODO: #GDM make customizable
+    {SystemUri::Protocol::Native, AppInfo::nativeUriProtocol()}
 };
 
 const QMap<SystemUri::ClientCommand, QString> clientCommandToString

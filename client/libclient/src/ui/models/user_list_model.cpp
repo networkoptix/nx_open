@@ -349,7 +349,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
         case Qn::DisabledRole:
         {
             if (index.column() == EnabledColumn)
-                return user->isOwner();
+                return !accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission);
             break;
         }
 
@@ -466,9 +466,6 @@ bool QnSortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex&
     {
         case QnUserListModel::EnabledColumn:
         {
-            if (leftUser->isOwner())
-                return true;
-
             bool leftEnabled = leftUser->isEnabled();
             bool rightEnabled = rightUser->isEnabled();
             if (leftEnabled != rightEnabled)

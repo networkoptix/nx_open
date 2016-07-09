@@ -323,7 +323,7 @@ public:
     SslAsyncBioHelper(
         SSL* ssl, AbstractStreamSocket* underly_socket, bool is_server);
 
-    ~SslAsyncBioHelper();
+    virtual ~SslAsyncBioHelper();
 
 public:
     // BIO operation function. These 2 BIO operation function will simulate BIO memory

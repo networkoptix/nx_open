@@ -16,6 +16,7 @@ namespace Ui
 
 class QnUserGroupSettingsModel;
 class QnUserRolesModel;
+class QnUserGroupSettingsWidgetPrivate;
 
 class QnUserGroupSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
@@ -32,7 +33,7 @@ public:
 
 private:
     QScopedPointer<Ui::UserGroupSettingsWidget> ui;
-    QnUserGroupSettingsModel* m_model;
-    QStandardItemModel* m_usersModel;
-    QnUserRolesModel* m_replacementRoles;
+
+    QnUserGroupSettingsWidgetPrivate* d_ptr;
+    Q_DECLARE_PRIVATE(QnUserGroupSettingsWidget);
 };

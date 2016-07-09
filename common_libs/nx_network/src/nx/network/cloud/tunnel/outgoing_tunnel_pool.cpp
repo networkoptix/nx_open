@@ -30,7 +30,7 @@ void OutgoingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHa
     //stopping all tunnels. Assuming no one calls establishNewConnection anymore
     QnMutexLocker lock(&m_mutex);
     m_stopping = true;
-    nx::BarrierHandler tunnelsStoppedFuture(
+    nx::utils::BarrierHandler tunnelsStoppedFuture(
         [this, completionHandler = move(completionHandler)]() mutable
         {
             tunnelsStopped(std::move(completionHandler));

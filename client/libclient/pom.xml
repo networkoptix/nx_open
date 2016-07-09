@@ -22,7 +22,7 @@
         <root.dir>${basedir}/../..</root.dir>
 
         <qt.libs>core core-private gui widgets-private network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
-        <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient_core -lnx_speech_synthesizer -ludt -lcloud_db_client -lnx_vms_utils -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient_core -lnx_speech_synthesizer -ludt -lcloud_db_client -lnx_vms_utils -lnx_fusion -lnx_utils -lvms_gateway</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
@@ -90,7 +90,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>client_core</artifactId>
+            <artifactId>libclient_core</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
@@ -105,6 +105,15 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_speech_synthesizer/pom.xml</systemPath>
         </dependency>
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libvms_gateway</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libvms_gateway/pom.xml</systemPath>
+        </dependency>        
     </dependencies>
 
     <build>
@@ -184,25 +193,6 @@
             </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>linux-arm-tx1</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>tx1</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- cut off festival -->
-                <rdep.packages>openssl ffmpeg quazip any/roboto-ttf any/help</rdep.packages>
             </properties>
         </profile>
    </profiles>

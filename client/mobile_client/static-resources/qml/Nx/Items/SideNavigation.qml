@@ -110,6 +110,20 @@ Drawer
                 onClicked: Workflow.openSettingsScreen()
             }
 
+            SideNavigationButton
+            {
+                text: qsTr("Start test")
+                visible: testMode && !testLoader.item
+                onClicked: Workflow.openDialog("Test/TestSelectionDialog.qml")
+            }
+
+            SideNavigationButton
+            {
+                text: qsTr("Stop test")
+                visible: testMode && testLoader.item
+                onClicked: Workflow.stopTest()
+            }
+
             VersionLabel {}
         }
     }

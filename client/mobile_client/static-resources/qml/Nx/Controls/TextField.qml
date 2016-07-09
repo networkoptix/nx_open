@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import QtQuick.Window 2.2
 import com.networkoptix.qml 1.0
 import Nx 1.0
 
@@ -200,22 +201,42 @@ QnTextInput
 //        d.updateSelectionHandles()
 //    }
 
+    QnScenePositionListener
+    {
+        id: positionListener
+        item: control
+        enabled: cursorHandle.visible ||
+                 selectionStartHandle.visible ||
+                 selectionEndHandle.visible
+    }
+
     InputHandle
     {
         id: cursorHandle
         anchor: "cursorPosition"
         input: control
+        x: positionListener.scenePos.x + localX
+        y: positionListener.scenePos.y + localY
+        parent: control.activeFocus ? Window.contentItem : control
     }
 
     InputHandle
     {
         id: selectionStartHandle
         anchor: "selectionStart"
+        input: control
+        x: positionListener.scenePos.x + localX
+        y: positionListener.scenePos.y + localY
+        parent: control.activeFocus ? Window.contentItem : control
     }
 
     InputHandle
     {
         id: selectionEndHandle
         anchor: "selectionEnd"
+        input: control
+        x: positionListener.scenePos.x + localX
+        y: positionListener.scenePos.y + localY
+        parent: control.activeFocus ? Window.contentItem : control
     }
 }

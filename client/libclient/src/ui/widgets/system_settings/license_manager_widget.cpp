@@ -36,6 +36,7 @@
 
 #include <utils/license_usage_helper.h>
 #include <utils/common/product_features.h>
+#include <utils/common/event_processors.h>
 
 namespace {
 
@@ -102,10 +103,31 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->gridLicenses->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->gridLicenses->header()->setSortIndicator(QnLicenseListModel::LicenseKeyColumn, Qt::AscendingOrder);
 
+    /* By [Delete] key remove licenses. */
+    auto keySignalizer = new QnSingleEventSignalizer(this);
+    keySignalizer->setEventType(QEvent::KeyPress);
+    ui->gridLicenses->installEventFilter(keySignalizer);
+    connect(keySignalizer, &QnSingleEventSignalizer::activated, this, [this](QObject* object, QEvent* event)
+    {
+        Q_UNUSED(object);
+        int key = static_cast<QKeyEvent*>(event)->key();
+        switch (key)
+        {
+            case Qt::Key_Delete:
+#if defined(Q_OS_MAC)
+            case Qt::Key_Backspace:
+#endif
+                removeSelectedLicenses();
+            default:
+                return;
+        }
+    });
+
+
     setHelpTopic(this, Qn::SystemSettings_Licenses_Help);
 
     connect(ui->detailsButton,  &QPushButton::clicked, this, &QnLicenseManagerWidget::at_licenseDetailsButton_clicked);
-    connect(ui->removeButton,   &QPushButton::clicked, this, &QnLicenseManagerWidget::at_removeButton_clicked);
+    connect(ui->removeButton,   &QPushButton::clicked, this, &QnLicenseManagerWidget::removeSelectedLicenses);
     connect(ui->exportLicensesButton, &QPushButton::clicked, this, &QnLicenseManagerWidget::exportLicenses);
 
     connect(ui->gridLicenses->selectionModel(), &QItemSelectionModel::currentChanged,   this, &QnLicenseManagerWidget::updateButtons);
@@ -427,6 +449,22 @@ bool QnLicenseManagerWidget::canRemoveLicense(const QnLicensePtr &license) const
     return !license->isValid(&errCode) && errCode != QnLicense::FutureLicense;
 }
 
+void QnLicenseManagerWidget::removeSelectedLicenses()
+{
+    for (const QnLicensePtr& license : selectedLicenses())
+    {
+        if (!canRemoveLicense(license))
+            continue;
+
+        auto removeLisencesHandler = [this, license](int reqID, ec2::ErrorCode errorCode)
+        {
+            at_licenseRemoved(reqID, errorCode, license);
+        };
+
+        QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kDefaultUserAccess)->removeLicense(license, this, removeLisencesHandler);
+    }
+}
+
 void QnLicenseManagerWidget::exportLicenses()
 {
     QnTableExportHelper::exportToFile(ui->gridLicenses, false, this, tr("Export licenses to a file"));
@@ -569,22 +607,6 @@ void QnLicenseManagerWidget::at_licenseDetailsButton_clicked()
 {
     QModelIndex index = ui->gridLicenses->selectionModel()->currentIndex();
     showLicenseDetails(m_model->license(index));
-}
-
-void QnLicenseManagerWidget::at_removeButton_clicked()
-{
-    for (const QnLicensePtr& license : selectedLicenses())
-    {
-        if (!canRemoveLicense(license))
-            continue;
-
-        auto removeLisencesHandler = [this, license](int reqID, ec2::ErrorCode errorCode)
-        {
-            at_licenseRemoved(reqID, errorCode, license);
-        };
-
-        QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kDefaultUserAccess)->removeLicense(license, this, removeLisencesHandler);
-    }
 }
 
 void QnLicenseManagerWidget::at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license)

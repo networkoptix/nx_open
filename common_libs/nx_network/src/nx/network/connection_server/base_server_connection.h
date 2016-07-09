@@ -28,7 +28,7 @@ namespace nx_api
     /*!
         \a CustomConnectionType MUST implement following methods:
         \code {*.cpp}
-            //!Received data from remote host
+            //!Received data from remote host. Empty buffer signals end-of-file
             void bytesReceived( const nx::Buffer& buf );
             //!Submitted data has been sent, \a m_writeBuffer has some free space
             void readyToSendData();
@@ -185,8 +185,6 @@ namespace nx_api
         {
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
-            if( bytesRead == 0 )    //connection closed by remote peer
-                return handleSocketError(SystemError::connectionReset);
 
             NX_ASSERT( (size_t)m_readBuffer.size() == bytesRead );
 
@@ -196,6 +194,9 @@ namespace nx_api
                 if (watcher.objectDestroyed())
                     return; //connection has been removed by handler
             }
+
+            if (bytesRead == 0)    //connection closed by remote peer
+                return handleSocketError(SystemError::connectionReset);
 
             m_readBuffer.resize( 0 );
             m_streamSocket->readSomeAsync(

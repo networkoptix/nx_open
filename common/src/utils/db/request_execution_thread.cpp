@@ -86,7 +86,7 @@ void DbRequestExecutionThread::run()
         const auto result = task->execute(&m_dbConnection);
         if (result != DBResult::ok)
         {
-            NX_LOG(lit("Request failed with error %1")
+            NX_LOGX(lit("DB request failed with error %1")
                 .arg(m_dbConnection.lastError().text()), cl_logWARNING);
             //TODO #ak reopen connection?
         }

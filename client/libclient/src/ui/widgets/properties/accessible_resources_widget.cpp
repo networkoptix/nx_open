@@ -2,6 +2,7 @@
 #include "ui_accessible_resources_widget.h"
 
 #include <client/client_globals.h>
+#include <client/client_message_processor.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_type.h>
@@ -329,13 +330,22 @@ void QnAccessibleResourcesWidget::applyChanges()
         for (const auto& layout : layoutsToShare)
         {
             layout->setParentId(QnUuid());
-            NX_ASSERT(layout->isShared());
             menu()->trigger(QnActions::SaveLayoutAction, QnActionParameters(layout));
         }
     }
 
     accessibleResources.subtract(oldFiltered);
     accessibleResources.unite(newFiltered);
+
+    /* Some resources may be deleted while we are editing user. Do not store them in DB. */
+    QSet<QnUuid> unavailable;
+    for (const QnUuid& id : accessibleResources)
+    {
+        if (!qnResPool->getResourceById(id))
+            unavailable << id;
+    }
+    accessibleResources.subtract(unavailable);
+
     m_permissionsModel->setAccessibleResources(accessibleResources);
 
     if (m_controlsVisible)
@@ -417,8 +427,7 @@ bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resour
             if (layout->isFile())
                 return false;
 
-            return !layout->hasFlags(Qn::local) &&
-                (layout->isShared() || layout->getParentId() == currentUser->getId());
+            return layout->isShared() || layout->getParentId() == currentUser->getId();
         }
 
         default:
@@ -441,19 +450,22 @@ void QnAccessibleResourcesWidget::initResourcesModel()
         m_resourcesModel->addResource(resource);
     };
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, handleResourceAdded);
-    for (const QnResourcePtr& resource : qnResPool->getResources())
-        handleResourceAdded(resource);
+    auto refreshModel = [this, handleResourceAdded]()
+    {
+        m_resourcesModel->setResources(QnResourceList());
+        for (const QnResourcePtr& resource : qnResPool->getResources())
+            handleResourceAdded(resource);
+    };
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, handleResourceAdded);
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this, refreshModel);
+    refreshModel();
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this, refreshModel](const QnResourcePtr& resource)
     {
         m_resourcesModel->removeResource(resource);
-        auto accessibleResources = m_permissionsModel->accessibleResources();
-        if (accessibleResources.contains(resource->getId()))
-        {
-            accessibleResources.remove(resource->getId());
-            m_permissionsModel->setAccessibleResources(accessibleResources);
-        }
+        if (resource == context()->user())
+            refreshModel();
     });
 
     connect(m_resourcesModel.data(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)

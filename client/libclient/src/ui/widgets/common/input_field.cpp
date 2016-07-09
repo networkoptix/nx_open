@@ -23,6 +23,8 @@ public:
     {
         hint->setWordWrap(true);
         input->installEventFilter(this);
+        parent->setFocusProxy(input);
+
         connect(input, &QLineEdit::textChanged,     this, &QnInputFieldPrivate::updatePasswordIndicatorVisibility);
         connect(input, &QLineEdit::editingFinished, this, [this]()
         {

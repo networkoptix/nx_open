@@ -7,13 +7,6 @@
 
 #include <qglobal.h>
 
-#ifdef Q_OS_WIN
-#include <common/systemexcept_win32.h>
-#endif
-#ifdef Q_OS_LINUX
-#include <common/systemexcept_linux.h>
-#endif
-
 #ifdef Q_OS_LINUX
 #   include <unistd.h>
 #endif
@@ -34,6 +27,8 @@
 #include <QtWidgets/QDesktopWidget>
 #include <QtGui/QDesktopServices>
 #include <QtSingleApplication>
+
+#include <common/systemexcept.h>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>

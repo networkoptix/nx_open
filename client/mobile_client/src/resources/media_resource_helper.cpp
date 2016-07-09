@@ -133,7 +133,8 @@ int QnMediaResourceHelper::rotation() const
 }
 
 QnMediaResourceHelperPrivate::QnMediaResourceHelperPrivate(QnMediaResourceHelper* parent) :
-    q_ptr(parent)
+    q_ptr(parent),
+    aspectRatio(0.0)
 {
 }
 

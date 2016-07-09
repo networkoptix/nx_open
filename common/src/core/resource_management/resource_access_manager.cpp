@@ -255,8 +255,7 @@ bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, c
     if (QnWebPageResourcePtr webPage = target.dynamicCast<QnWebPageResource>())
         return canCreateWebPage(user);
 
-    /* Other resources cannot be added manually. */
-    return false;
+    return hasGlobalPermission(user, Qn::GlobalAdminPermission);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const
@@ -465,6 +464,10 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         /* Owner can do anything. */
         if (user->isOwner())
             return Qn::FullLayoutPermissions;
+
+		/* 'Videowall user' should have read access to the layouts */
+		if (hasGlobalPermission(user, Qn::GlobalPermission::INTERNAL_GlobalVideoWallLayoutPermission))
+			return Qn::ReadPermission;
 
         QnUuid ownerId = layout->getParentId();
 

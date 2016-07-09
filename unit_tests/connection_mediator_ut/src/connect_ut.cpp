@@ -8,7 +8,7 @@
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/stun/async_client.h>
-#include <utils/thread/sync_queue.h>
+#include <nx/utils/test_support/sync_queue.h>
 #include <nx/network/stun/server_connection.h>
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/message_dispatcher.h>
@@ -92,7 +92,7 @@ TEST_F( ConnectTest, BindConnect )
         request.insertIntegrity( SYSTEM_ID, AUTH_KEY );
         cloud.expect_getSystem( SYSTEM_ID, AUTH_KEY );
 
-        TestSyncMultiQueue< SystemError::ErrorCode, stun::Message > waiter;
+        nx::utils::TestSyncMultiQueue< SystemError::ErrorCode, stun::Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();

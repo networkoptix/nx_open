@@ -30,7 +30,6 @@
 #include <ui/common/popup_shadow.h>
 #include <ui/common/link_hover_processor.h>
 #include <ui/delegates/styled_combo_box_delegate.h>
-#include <ui/dialogs/common/generic_tabbed_dialog.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/common/input_field.h>
 
@@ -146,8 +145,12 @@ namespace
     {
         if (qstyleoption_cast<const QStyleOptionButton*>(option))
         {
-            if (option->state.testFlag(QStyle::State_On) || option->state.testFlag(QStyle::State_Off))
+            if (option->state.testFlag(QStyle::State_On) ||
+                option->state.testFlag(QStyle::State_Off) ||
+                option->state.testFlag(QStyle::State_NoChange))
+            {
                 return true;
+            }
 
             const QAbstractButton* buttonWidget = qobject_cast<const QAbstractButton*>(option->styleObject);
             if (buttonWidget && buttonWidget->isCheckable())
@@ -155,6 +158,11 @@ namespace
         }
 
         return false;
+    }
+
+    bool isSwitchButtonCheckbox(const QWidget* widget)
+    {
+        return widget && widget->property(Properties::kCheckBoxAsButton).toBool();
     }
 
     /* Checks whether view item contains a checkbox without any text or decoration: */
@@ -1400,6 +1408,9 @@ void QnNxStyle::drawControl(
 {
     Q_D(const QnNxStyle);
 
+    if (element == CE_CheckBox && isSwitchButtonCheckbox(widget))
+        element = CE_PushButton;
+
     switch (element)
     {
         case CE_ShapedFrame:
@@ -2301,19 +2312,12 @@ QRect QnNxStyle::subElementRect(
         {
             if (auto buttonBox = qobject_cast<const QDialogButtonBox *>(widget))
             {
-                if (const QWidget* parentWidget = buttonBox->parentWidget())
-                {
-                    if (parentWidget->isTopLevel() && parentWidget->layout())
-                    {
-                        QMargins margins = parentWidget->layout()->contentsMargins();
-                        if (margins.isNull() && buttonBox->contentsMargins().isNull())
+                if (qobject_cast<const QDialog*>(buttonBox->parentWidget()))
                         {
                             int margin = proxy()->pixelMetric(PM_DefaultTopLevelMargin);
                             return QnGeometry::dilated(option->rect, margin);
                         }
                     }
-                }
-            }
             break;
         }
 
@@ -2506,6 +2510,9 @@ QSize QnNxStyle::sizeFromContents(
         const QSize &size,
         const QWidget *widget) const
 {
+    if (type == CT_CheckBox && isSwitchButtonCheckbox(widget))
+        type = CT_PushButton;
+
     switch (type)
     {
         case CT_CheckBox:
@@ -2723,16 +2730,30 @@ int QnNxStyle::pixelMetric(
         case PM_LayoutLeftMargin:
         case PM_LayoutRightMargin:
         case PM_LayoutTopMargin:
-            if (qobject_cast<const QnAbstractPreferencesWidget*>(widget))
-                return proxy()->pixelMetric(PM_DefaultTopLevelMargin);
-            if (qobject_cast<const QnGenericTabbedDialog*>(widget))
+        {
+            if (!widget)
+                return proxy()->pixelMetric(PM_DefaultChildMargin);
+
+            if (qobject_cast<const QDialog*>(widget) ||
+                qobject_cast<const QDialogButtonBox*>(widget)) // button box has outer margins
+            {
                 return 0;
-            return base_type::pixelMetric(metric, option, widget);
+            }
+
+            if (qobject_cast<const QnAbstractPreferencesWidget*>(widget) ||
+                qobject_cast<const QDialog*>(widget->parentWidget()) ||
+                widget->isWindow() /*but not dialog*/)
+            {
+                return proxy()->pixelMetric(PM_DefaultTopLevelMargin);
+            }
+
+            return proxy()->pixelMetric(PM_DefaultChildMargin);
+        }
 
         case PM_LayoutHorizontalSpacing:
             return Metrics::kDefaultLayoutSpacing.width();
         case PM_LayoutVerticalSpacing:
-            return (qobject_cast<const QnGenericTabbedDialog*>(widget) == nullptr) ? Metrics::kDefaultLayoutSpacing.height() : 0;
+            return (qobject_cast<const QDialog*>(widget)) ? 0 : Metrics::kDefaultLayoutSpacing.height();
 
         case PM_MenuVMargin:
             return dp(2);

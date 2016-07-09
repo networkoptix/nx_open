@@ -20,23 +20,19 @@ namespace data {
 class DataFilter
 :
     public stree::AbstractIteratableContainer,
-    public stree::AbstractResourceReader
+    public stree::AbstractResourceReader,
+    public stree::AbstractResourceWriter
 {
-    friend bool loadFromUrlQuery(const QUrlQuery& urlQuery, DataFilter* const dataFilter);
-
 public:
     //!Implementation of \a stree::AbstractIteratableContainer::begin
     virtual std::unique_ptr<stree::AbstractConstIterator> begin() const override;
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
+    //!Implementation of \a stree::AbstractResourceWriter::put
+    virtual void put(int resID, const QVariant& value) override;
 
     //!Empty filter means data should not be filtered
     bool empty() const;
-
-    /** TODO #ak do something with this class. 
-        This variable is required by QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES
-    */
-    int dummy;
 
     stree::ResourceContainer& resources();
     const stree::ResourceContainer& resources() const;
@@ -46,12 +42,7 @@ private:
 };
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, DataFilter* const dataFilter);
-
-#define DataFilter_Fields (dummy)
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (DataFilter),
-    (json))
+bool deserialize(QnJsonContext*, const QJsonValue&, DataFilter*);
 
 }   //data
 }   //cdb

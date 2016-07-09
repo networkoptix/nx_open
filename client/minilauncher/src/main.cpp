@@ -1,29 +1,46 @@
-#include <set>
 #include <string>
 #include <vector>
-#include <fstream>
+#include <locale>
+#include <codecvt>
+
 #include <tchar.h>
 #include <Windows.h>
-#include "version.h"
-#include <iostream>
 #include "Shlwapi.h"
-#include <algorithm>
+#include "shlobj.h"
+
+#include "version.h"
 
 typedef signed __int64 int64_t;
 
-using namespace std;
+std::wstring utf8toUtf16(const std::string& str)
+{
+    std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > converter;
+    return converter.from_bytes(str);
+}
 
-wstring closeDirPath(const wstring& name)
+std::wstring closeDirPath(const std::wstring& name)
 {
     if (name.empty())
         return name;
-    else if (name[name.length()-1] == L'/' || name[name.length()-1] == L'\\')
+    else if (name[name.length() - 1] == L'/' || name[name.length() - 1] == L'\\')
         return name;
     else
         return name + L'/';
 }
 
-wstring getDstDir()
+std::wstring getSharedApplauncherDir()
+{
+    wchar_t result[MAX_PATH];
+    if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, result)))
+    {
+        // Append product-specific path
+        PathAppend(result, L"\\" QN_ORGANIZATION_NAME  L"\\applauncher\\"  QN_CUSTOMIZATION_NAME);
+    }
+    return std::wstring(closeDirPath(result));
+
+}
+
+std::wstring getInstalledApplauncherDir()
 {
     wchar_t ownPath[MAX_PATH];
 
@@ -36,72 +53,93 @@ wstring getDstDir()
         PathRemoveFileSpecW(ownPath);
     }
 
-    return wstring(closeDirPath(ownPath));
+    return std::wstring(closeDirPath(ownPath));
 }
 
-wstring getFullFileName(const wstring& folder, const wstring& fileName)
+std::wstring getFullFileName(const std::wstring& folder, const std::wstring& fileName)
 {
     if (folder.empty())
         return fileName;
 
-    wstring value = folder;
+    std::wstring value = folder;
     for (int i = 0; i < value.length(); ++i)
     {
         if (value[i] == L'\\')
             value[i] = L'/';
     }
-    if (value[value.length()-1] != L'/')
+    if (value[value.length() - 1] != L'/')
         value += L'/';
     value += fileName;
 
     return value;
 }
 
-bool startProcessAsync(wchar_t* commandline, const wstring& dstDir)
+BOOL startProcessAsync(wchar_t* commandline, const std::wstring& dstDir)
 {
     STARTUPINFO lpStartupInfo;
     PROCESS_INFORMATION lpProcessInfo;
     memset(&lpStartupInfo, 0, sizeof(lpStartupInfo));
     memset(&lpProcessInfo, 0, sizeof(lpProcessInfo));
-    return CreateProcess(0, commandline,
-        NULL, NULL, NULL, NULL, NULL,
-        dstDir.c_str(),
-        &lpStartupInfo,
-        &lpProcessInfo);
+
+    return CreateProcess(
+        0,                  /*<  _In_opt_   LPCTSTR               lpApplicationName */
+        commandline,        /*< _Inout_opt_ LPTSTR                lpCommandLine */
+        NULL,               /*< _In_opt_    LPSECURITY_ATTRIBUTES lpProcessAttributes */
+        NULL,               /*< _In_opt_    LPSECURITY_ATTRIBUTES lpThreadAttributes */
+        NULL,               /*< _In_        BOOL                  bInheritHandles */
+        NULL,               /*< _In_        DWORD                 dwCreationFlags */
+        NULL,               /*< _In_opt_    LPVOID                lpEnvironment */
+        dstDir.c_str(),     /*< _In_opt_    LPCTSTR               lpCurrentDirectory */
+        &lpStartupInfo,     /*< _In_        LPSTARTUPINFO         lpStartupInfo */
+        &lpProcessInfo      /*< _Out_       LPPROCESS_INFORMATION lpProcessInformation */
+    );
 }
 
-int launchFile()
+bool launchInDir(const std::wstring& dir, int argc, _TCHAR* argv[])
 {
     try
     {
-        wstring dstDir = getDstDir();
-        wchar_t buffer[MAX_PATH*2 +3];
-        wsprintf(buffer, L"\"%s\" \"%s\"", getFullFileName(dstDir, QN_CLIENT_EXECUTABLE_NAME).c_str(), dstDir.c_str());
-        if (startProcessAsync(buffer, dstDir))
-            return 0;
-        return 1;
-    } catch(...)
+        wchar_t buffer[MAX_PATH * 2 + 3];
+        int offset = wsprintf(buffer, L"\"%s\"", getFullFileName(dir, QN_APPLAUNCHER_BINARY_NAME).c_str(), dir.c_str());
+
+        for (int i = 1; i < argc; ++i)
+        {
+            std::wstring argument(utf8toUtf16(argv[i]));
+            offset = wsprintf(buffer + offset, L" %s", argument.c_str());
+        }
+
+        wsprintf(buffer + offset, L" \"%s\"", dir.c_str());
+        if (startProcessAsync(buffer, dir))
+            return true;
+        return false;
+    }
+    catch (...)
     {
-        return -1;
+        return false;
     }
 }
 
-wstring unquoteStr(std::wstring str)
+int launchFile(int argc, _TCHAR* argv[])
 {
-    if (str.empty())
-        return str;
-    if (str[0] == L'"')
-        str = str.substr(1, MAX_PATH);
-    if (str.empty())
-        return str;
-    if (str[str.length()-1] == L'"')
-        str = str.substr(0, str.length()-1);
-    return str;
+    if (launchInDir(getSharedApplauncherDir(), argc, argv))
+        return 0;
+
+    if (launchInDir(getInstalledApplauncherDir(), argc, argv))
+        return 0;
+
+    return 1;
 }
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-    launchFile();
-	return 0;
+    try
+    {
+        /* All additional arguments are passed to applauncher. */
+        return launchFile(argc, argv);
+    }
+    catch (...)
+    {
+        return 2;
+    }
 }
 

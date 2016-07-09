@@ -85,17 +85,19 @@ public:
         handler();
     }
 
-    /*!
-        \return \a false if failed to initiate async request
-    */
-    void get(std::function<HandlerFunc> handler)
+    void execute(std::function<HandlerFunc> handler)
     {
         m_handler = std::move(handler);
-        m_httpClient->doGet(m_url);
+        if (m_requestContentType.isEmpty())
+            m_httpClient->doGet(m_url);
+        else
+            m_httpClient->doPost(m_url, m_requestContentType, std::move(m_requestBody));
     }
 
 protected:
     QUrl m_url;
+    nx_http::StringType m_requestContentType;
+    nx_http::BufferType m_requestBody;
     std::function<HandlerFunc> m_handler;
 
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) = 0;
@@ -131,7 +133,10 @@ public:
     :
         ParentType(std::move(url))
     {
-        detail::serializeToUrl(input, &this->m_url);
+        this->m_requestBody = QJson::serialized(input);
+        this->m_requestContentType =
+            Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+        //detail::serializeToUrl(input, &this->m_url);
     }
     
 private:
@@ -190,7 +195,10 @@ public:
     :
         ParentType(std::move(url))
     {
-        detail::serializeToUrl(input, &m_url);
+        this->m_requestBody = QJson::serialized(input);
+        this->m_requestContentType =
+            Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+        //detail::serializeToUrl(input, &m_url);
     }
     
 private:
