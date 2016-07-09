@@ -22,7 +22,12 @@ public:
     virtual ~CLH264RtpParser();
     virtual void setSDPInfo(QList<QByteArray> lines) override;
 
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) override;
+    virtual bool processData(
+        quint8* rtpBufferBase, 
+        int bufferOffset, 
+        int bytesRead, 
+        const RtspStatistic& statistics, 
+        bool& gotData) override;
 
 private:
     QMap <int, QByteArray> m_allNonSliceNal;
@@ -41,18 +46,9 @@ private:
     quint16 m_firstSeqNum;
     quint16 m_packetPerNal;
 
-    bool m_prevBuiltinPpsFound;
-    bool m_prevBuiltinSpsFound;
-    bool m_prevKeyDataExists;
-    bool m_prevIdrFound;
-    bool m_prevFrameExists;
-
-    //QnByteArray m_videoBuffer;
     int m_videoFrameSize;
-    int m_additionalVideoFrameSize;
-    std::vector<Chunk> m_previousChunks;
-    char* m_previousChunksBuf[MAX_ALLOWED_FRAME_SIZE];
-    size_t m_previousChunksBufOffset;
+    std::vector<quint8> m_nextFrameChunksBuffer;
+    mutable bool m_previousPacketHasMarkerBit;
 
 private:
     void serializeSpsPps(QnByteArray& dst);
@@ -65,11 +61,15 @@ private:
     );
 
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine
-    bool clearPreviousChunksBuffer();
     void updateNalFlags(int nalUnitType, const quint8* data, int dataLen);
-    void updatePrevNalFlags(int nalUnitType, const quint8* data, int dataLen);
-    void createVideoDataAndServePrevChunksBuffer();
     int getSpsPpsSize() const;
+
+    bool isPacketStartsNewFrame(int packetType, const quint8*, const quint8* rtpBufferStart, const quint8* bufferEnd) const;
+    bool isSliceNal(quint8 nalUnitType) const;
+    bool isFirstSliceNal(const quint8 nalType, const quint8* data, int dataLen ) const;
+    bool isIFrame(const quint8* data, int dataLen) const;
+
+    void backupNextFrameChunks(const char* bufferStart);
 };
 
 #endif // ENABLE_DATA_PROVIDERS
