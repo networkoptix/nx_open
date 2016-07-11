@@ -1,10 +1,7 @@
-
 #include "motion_window.h"
-
 #include <utils/thread/mutex.h>
-
-#include "core/datapacket/media_data_packet.h"
-
+#include <core/datapacket/media_data_packet.h>
+#include <utils/common/log.h>
 
 
 ////////////////////////////////////////////////////////////
@@ -325,9 +322,20 @@ void parseMotionRegionList(QList<QnMotionRegion>& regions, const QByteArray& reg
 {
     QList<QByteArray> regList = regionsString.split(':');
     regions.clear();
+
     // for compatibility with previous version. By default screen filled medium sensitivity motion window
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         regions << QnMotionRegion();
+
+    if (regList.size() > CL_MAX_CHANNELS)
+    {
+        NX_LOG(
+            lit("Number of motion regions is more than maximum number of channels (%1/%2)")
+                .arg(regList.size())
+                .arg(CL_MAX_CHANNELS), 
+            cl_logWARNING);
+        return;
+    }
 
     for (int i = 0; i < regList.size(); ++i)
         parseMotionRegion(regions[i], regList[i]);

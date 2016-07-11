@@ -69,12 +69,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraC
         NETOPTIX_SECONDARY_TOKEN += postfix;
     }
 
-    /*
-    if (!m_onvifRes->isSoapAuthorized()) {
-        m_onvifRes->setStatus(Qn::Unauthorized);
-        return;
-    }
-    */
+    preStreamConfigureHook();
 
     QString streamUrl;
     CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl( &streamUrl, isCameraControlRequired, params );
@@ -86,17 +81,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraC
         return result;
     }
 
-    /*
-    QUrl url(streamUrlFull);
-
-    QString streamUrl = url.path();
-    int port = url.port();
-
-    if (port > 0)
-    {
-        streamUrl = QString(":") + QString::number(port) + streamUrl;
-    }
-    */  
+    postStreamConfigureHook();
 
     m_multiCodec.setRole(getRole());
     m_multiCodec.setRequest(streamUrl);
