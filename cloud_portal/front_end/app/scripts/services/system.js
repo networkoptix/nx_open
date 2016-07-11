@@ -94,8 +94,6 @@ angular.module('cloudApp')
         });
 
         function findAccessRole(isAdmin, permissions){
-            permissions = normalizePermissionString(permissions);
-
             var role = _.find(Config.accessRoles.options,function(option){
                 return isAdmin && option.isAdmin || !isAdmin && option.permissions == permissions;
             })
@@ -115,8 +113,6 @@ angular.module('cloudApp')
         system.prototype.getUsersDataFromTheSystem = function(){
             var self = this;
             function processUsers(users, groups, accessRights){
-
-
                 var groupAssoc = _.indexBy(groups,'id');
                 users = _.filter(users, function(user){ return user.isCloud; });
                 // var accessRightsAssoc = _.indexBy(accessRights,'userId');
@@ -128,6 +124,7 @@ angular.module('cloudApp')
                         user.accessRole = user.group.name;
                     }else{
                         //user.accessRights = accessRightsAssoc[user.id];
+                        user.permissions = normalizePermissionString(user.permissions);
                         user.accessRole = findAccessRole(user.isAdmin, user.permissions).accessRole;
                     }
                     if(!user.isEnabled){
