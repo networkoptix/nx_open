@@ -130,19 +130,31 @@ void QnFileConnectionProcessor::run()
     int rez = nx_http::StatusCode::ok;
     QByteArray contentType = kDefaultContentType;
     QByteArray contentEncoding;
+    QDateTime lastModified;
+    QIODevicePtr file;
 
-    QIODevicePtr file = getStaticFile(path);
-    if (!file)
-        rez = nx_http::StatusCode::notFound;
-
-    QDateTime lastModified = staticFileLastModified(file.get());
-    QString modifiedSinceStr = nx_http::getHeaderValue(d->request.headers, "If-Modified-Since");
-    if (!modifiedSinceStr.isEmpty())
+    if (!path.contains(".."))
     {
-        QDateTime modifiedSince = QDateTime::fromString(modifiedSinceStr, Qt::RFC2822Date);
-        if (lastModified <= modifiedSince)
-            rez = nx_http::StatusCode::notModified;
-        //TODO: #rvasilenko invalid content type will be returned here
+        file = getStaticFile(path);
+        if (file)
+        {
+            lastModified = staticFileLastModified(file.get());
+            QString modifiedSinceStr = nx_http::getHeaderValue(d->request.headers, "If-Modified-Since");
+            if (!modifiedSinceStr.isEmpty())
+            {
+                QDateTime modifiedSince = QDateTime::fromString(modifiedSinceStr, Qt::RFC2822Date);
+                if (lastModified <= modifiedSince)
+                    rez = nx_http::StatusCode::notModified;
+            }
+        }
+        else
+        {
+            rez = nx_http::StatusCode::notFound;
+        }
+    }
+    else
+    {
+        rez = nx_http::StatusCode::forbidden;
     }
 
     if (rez == nx_http::StatusCode::ok)
@@ -157,14 +169,9 @@ void QnFileConnectionProcessor::run()
         else
         {
             d->response.messageBody = file->readAll();
-#ifndef _DEBUG
             if (d->response.messageBody.size() < cachedFiles.maxCost())
                 cachedFiles.insert(path, new CacheEntry(d->response.messageBody, lastModified), d->response.messageBody.size());
-#endif
         }
-
-        const QString fileFormat = QFileInfo(path).suffix().toLower();
-        contentType = contentTypes.value(fileFormat, kDefaultContentType);
 
 #ifndef EDGE_SERVER
         if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty())
@@ -176,6 +183,10 @@ void QnFileConnectionProcessor::run()
         }
 #endif
     }
+
+    const QString fileFormat = QFileInfo(path).suffix().toLower();
+    contentType = contentTypes.value(fileFormat, kDefaultContentType);
+
     d->response.headers.insert(nx_http::HttpHeader("Last-Modified", dateTimeToHTTPFormat(lastModified)));
     sendResponse(rez, contentType, contentEncoding);
 }
