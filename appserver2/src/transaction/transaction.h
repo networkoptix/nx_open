@@ -303,6 +303,11 @@ APPLY(507, removeUserGroup, ApiIdData, \
                        false, \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper) \
+APPLY(508, getPredefinedRoles, ApiPredefinedRoleDataList, \
+                        false, /* persistent*/ \
+                        false, /* system*/ \
+                        InvalidGetHashHelper(), /* getHash*/ \
+                        InvalidTriggerNotificationHelper()) /* trigger notification*/ \
 APPLY(600, getLayouts, ApiLayoutDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \

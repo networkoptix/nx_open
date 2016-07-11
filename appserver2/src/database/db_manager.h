@@ -240,6 +240,9 @@ namespace detail
         //getUserGroupList
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserGroupDataList& groupList);
 
+        //getPredefinedRoles
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& rolesList);
+
         //getAccessRights
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
 
@@ -735,7 +738,7 @@ public:
     ErrorCode executeTransaction(const QnTransaction<Container<Param>> &tran, SerializedTransaction &&serializedTran)
     {
         bool userHasNotPermissionForAllResources = std::any_of(tran.params.cbegin(), tran.params.cend(),
-                                                               [this](const Param& param) 
+                                                               [this](const Param& param)
                                                                {
                                                                    return !hasPermission(param, Qn::Permission::SavePermission);
                                                                });

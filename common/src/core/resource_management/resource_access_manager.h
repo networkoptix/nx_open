@@ -23,6 +23,8 @@ class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnR
 public:
     QnResourceAccessManager(QObject* parent = nullptr);
 
+    static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
+
     void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList);
 
     ec2::ApiUserGroupDataList userGroups() const;
