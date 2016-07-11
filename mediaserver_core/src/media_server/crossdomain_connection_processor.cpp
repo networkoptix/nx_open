@@ -1,0 +1,79 @@
+#include "crossdomain_connection_processor.h"
+
+#include <network/tcp_connection_priv.h>
+#include <nx/network/http/httptypes.h>
+#include <core/resource/media_server_resource.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <api/global_settings.h>
+
+namespace {
+    static const QByteArray kContentType = "application/xml";
+    static const QByteArray kIfacePattern = "%SERVER_IF_LIST%";
+    static const QByteArray kCrossdomainPattern = "%CLOUD_PORTAL_URL%";
+}
+
+class QnCrossdomainConnectionProcessorPrivate : public QnTCPConnectionProcessorPrivate
+{
+public:
+};
+
+QnCrossdomainConnectionProcessor::QnCrossdomainConnectionProcessor(
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnTcpListener* /*_owner*/)
+    :
+    QnTCPConnectionProcessor(
+    new QnCrossdomainConnectionProcessorPrivate,
+    socket)
+{
+}
+
+QnCrossdomainConnectionProcessor::~QnCrossdomainConnectionProcessor()
+{
+    stop();
+}
+
+void QnCrossdomainConnectionProcessor::run()
+{
+    Q_D(QnCrossdomainConnectionProcessor);
+
+    initSystemThreadId();
+
+    if (d->clientRequest.isEmpty()) {
+        if (!readRequest())
+            return;
+    }
+    parseRequest();
+    d->response.messageBody.clear();
+
+    QnUuid selfId = qnCommon->moduleGUID();
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(selfId);
+    QFile file(":/static/crossdomain.xml");
+    if (!mServer || !file.open(QFile::ReadOnly))
+    {
+        sendResponse(nx_http::StatusCode::notFound, kContentType, QByteArray());
+        return;
+    }
+
+    QList<QByteArray> lines = file.readAll().split('\n');
+    for (int i = lines.size() - 1; i >= 0; --i)
+    {
+        QByteArray pattern = lines[i];
+        if (lines[i].contains(kIfacePattern))
+        {
+            lines.removeAt(i);
+            for (const auto& addr: mServer->getAllAvailableAddresses())
+                lines.insert(i, pattern.replace(kIfacePattern, addr.address.toString().toUtf8()));
+        }
+        else if (lines[i].contains(kCrossdomainPattern))
+        {
+            lines.removeAt(i);
+            QString portalUrl = QUrl(qnGlobalSettings->cloudPortalUrl()).host();
+            if (!portalUrl.isEmpty())
+                lines.insert(i, pattern.replace(kCrossdomainPattern, portalUrl.toUtf8()));
+        }
+    }
+
+    d->response.messageBody = lines.join('\n');
+    sendResponse(nx_http::StatusCode::ok, kContentType, QByteArray());
+}
