@@ -13,6 +13,12 @@ Row
     height: 16;
     spacing: 4;
 
+    onPagesCountChanged:
+    {
+        if (currentPage >= pagesCount)
+            currentPage = pagesCount - 1;
+    }
+
     NxImageButton
     {
         id: leftArrow;

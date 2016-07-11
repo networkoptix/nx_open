@@ -79,11 +79,13 @@ Rectangle
                     to: 0;
                 }
 
-                PropertyAction
+                ScriptAction
                 {
-                    target: grid;
-                    property: "contentY";
-                    value: grid.contentItem.y + switchPageAnimation.pageIndex * grid.cellHeight * 2;
+                    script:
+                    {
+                        grid.positionViewAtIndex(switchPageAnimation.pageIndex * grid.colsCount * grid.rowsCount
+                            , GridView.Beginning);
+                    }
                 }
 
                 NumberAnimation
@@ -97,7 +99,7 @@ Rectangle
             }
 
             clip: true;
-            interactive: true;
+            interactive: false;
 
             y: Math.max((control.height - height) / 2, 212);
             width: colsCount * cellWidth;
@@ -105,7 +107,7 @@ Rectangle
 
             cellWidth: tileWidth + tileSpacing;
             cellHeight: tileHeight + tileSpacing;
-            cacheBuffer: 64;
+
             anchors.horizontalCenter: parent.horizontalCenter;
 
             property QtObject watcher: SingleActiveItemSelector
