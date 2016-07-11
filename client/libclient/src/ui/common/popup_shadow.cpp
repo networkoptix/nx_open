@@ -20,6 +20,8 @@ public:
         popupHadNativeShadow(!popup->windowFlags().testFlag(Qt::NoDropShadowWindowHint)),
         q_ptr(q)
     {
+        QObject::connect(popup, &QObject::destroyed, q, [this]() { this->popup = nullptr; });
+
         const Qt::WindowFlags kExtraFlags(
             Qt::Popup |
             Qt::FramelessWindowHint |
@@ -50,14 +52,13 @@ public:
         delete shadow;
 
         /* Restore popup's native shadow if needed: */
-        if (popup && popupHadNativeShadow && popup->testAttribute(Qt::WA_WState_Created))
+        if (popup && popupHadNativeShadow)
             popup->setWindowFlags(popup->windowFlags() & ~Qt::NoDropShadowWindowHint);
-
     }
 
     void updateGeometry()
     {
-        if (shadow.isNull() || popup.isNull())
+        if (!shadow || !popup)
             return;
 
         if (!popup->isVisible())
@@ -212,7 +213,7 @@ public:
         return pixmap;
     }
 
-    QPointer<QWidget> popup;
+    QWidget* popup;
     QPointer<QLabel> shadow;
 
     QColor color;
