@@ -64,6 +64,9 @@ Rectangle
             readonly property int rowsCount: (grid.count < 3 ? 1 : 2);
             readonly property int pagesCount: Math.ceil(grid.count / (colsCount * rowsCount));
 
+            opacity: 0;
+            snapMode: GridView.SnapOneRow;
+
             SequentialAnimation
             {
                 id: switchPageAnimation;
@@ -83,8 +86,10 @@ Rectangle
                 {
                     script:
                     {
-                        grid.positionViewAtIndex(switchPageAnimation.pageIndex * grid.colsCount * grid.rowsCount
-                            , GridView.Beginning);
+                        var pageIndex = switchPageAnimation.pageIndex;
+                        var tilesPerPage = grid.colsCount * grid.rowsCount;
+                        var firstItemIndex = pageIndex * tilesPerPage;
+                        grid.positionViewAtIndex(firstItemIndex, GridView.Beginning);
                     }
                 }
 

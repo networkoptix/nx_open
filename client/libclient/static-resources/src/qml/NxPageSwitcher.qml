@@ -17,6 +17,8 @@ Row
     {
         if (currentPage >= pagesCount)
             currentPage = pagesCount - 1;
+        else if ((currentPage < 0) && (pagesCount > 0))
+            currentPage = 0;
     }
 
     NxImageButton
