@@ -824,7 +824,7 @@ namespace ec2
                         break;
                 }
 
-                if (m_handler && (!isCommonTransaction || !detail::QnDbManager::instance()))
+                if (m_handler && (!isCommonTransaction || qnCommon->localPeerType() != Qn::PT_Server))
                     m_handler->triggerNotification(tran);
 
                 // this is required to allow client place transactions directly into transaction message bus

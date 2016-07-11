@@ -680,7 +680,11 @@ class ECConnectionNotificationManager;
         virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() = 0;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
-        virtual ECConnectionNotificationManager* notificationManager() { return nullptr; }
+        virtual ECConnectionNotificationManager* notificationManager() 
+        { 
+            NX_ASSERT(0);
+            return nullptr; 
+        }
 
         /*!
             \param handler Functor with params: (requestID, ErrorCode, QByteArray dbFile)
