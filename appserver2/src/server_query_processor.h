@@ -20,8 +20,7 @@
 #include "transaction/transaction_message_bus.h"
 #include <transaction/binary_transaction_serializer.h>
 #include <api/app_server_connection.h>
-#include <managers/camera_manager.h>
-#include <managers/resource_manager.h>
+#include <ec_connection_notification_manager.h>
 #include "api/model/audit/auth_session.h"
 
 
@@ -289,61 +288,16 @@ private:
             std::bind( &ServerQueryProcessor::removeResourceSync, this, _1, resourceType, _2 ) );
     }
 
-    template<typename Manager, typename BaseManagerPtr>
     ErrorCode removeObjAttrHelper(
-        const QnUuid& id, 
-        ApiCommand::Value command, 
-        const BaseManagerPtr& baseManagerPtr,
-        std::list<std::function<void()>>* const transactionsToSend)
-    {
-        QnTransaction<ApiIdData> removeObjAttrTran(command, ApiIdData(id));
-        ErrorCode errorCode = processUpdateSync(removeObjAttrTran, transactionsToSend, 0);
-        if (errorCode != ErrorCode::ok)
-            return errorCode;
+        const QnUuid& id,
+        ApiCommand::Value command,
+        const AbstractECConnectionPtr& connection,
+        std::list<std::function<void()>>* const transactionsToSend);
 
-        auto objNotificationManager = std::dynamic_pointer_cast<Manager>(baseManagerPtr);
-        NX_ASSERT(objNotificationManager);
-        if (objNotificationManager)
-            objNotificationManager->triggerNotification(removeObjAttrTran);
-
-        return ErrorCode::ok;
-    }
-            
-    inline ErrorCode removeObjParamsHelper(
+    ErrorCode removeObjParamsHelper(
         const QnTransaction<ApiIdData>& tran,
         const AbstractECConnectionPtr& connection,
-        std::list<std::function<void()>>* const transactionsToSend)
-    {
-        ApiResourceParamWithRefDataList resourceParams;
-        dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
-
-        ErrorCode errorCode = processMultiUpdateSync(
-            ApiCommand::removeResourceParam,
-            tran.isLocal,
-            tran.deliveryInfo,
-            resourceParams,
-            transactionsToSend);
-
-        if (errorCode != ErrorCode::ok)
-            return errorCode;
-
-        auto resourceNotificationManager =
-            std::dynamic_pointer_cast<QnResourceNotificationManager>(
-                connection->getResourceNotificationManager());
-        NX_ASSERT(resourceNotificationManager);
-        if (resourceNotificationManager)
-        {
-            for (const auto& param : resourceParams)
-            {
-                QnTransaction<ApiResourceParamWithRefData> removeParamTran(
-                    ApiCommand::Value::removeResourceParam,
-                    param);
-                resourceNotificationManager->triggerNotification(removeParamTran);
-            }
-        }
-
-        return errorCode;
-    }
+        std::list<std::function<void()>>* const transactionsToSend);
 
     ErrorCode removeResourceSync(
         QnTransaction<ApiIdData>& tran,
@@ -369,10 +323,10 @@ private:
         case ApiObject_Camera:
         {
             runAndCheckError(
-                removeObjAttrHelper<QnCameraNotificationManager>(
+                removeObjAttrHelper(
                     tran.params.id,
                     ApiCommand::removeCameraUserAttributes, 
-                    connection->getCameraNotificationManager(),
+                    connection,
                     transactionsToSend),
                 lit("Remove camera attributes failed"));
 
@@ -384,10 +338,10 @@ private:
         case ApiObject_Server:
         {
             runAndCheckError(
-                removeObjAttrHelper<QnMediaServerNotificationManager>(
+                removeObjAttrHelper(
                     tran.params.id,
                     ApiCommand::removeServerUserAttributes, 
-                    connection->getMediaServerNotificationManager(),
+                    connection,
                     transactionsToSend),
                 lit("Remove server attrs failed"));
             
@@ -462,6 +416,10 @@ private:
         NX_ASSERT(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
         if (errorCode != ErrorCode::ok)
             return errorCode;
+
+        QnAppServerConnectionFactory::getConnection2()
+            ->notificationManager()
+            ->triggerNotification(tran);
 
         transactionsToSend->push_back( std::bind(SendTransactionFunction(), tran ) );
 

@@ -139,10 +139,12 @@ namespace ec2
                 m_customAction( tran );
 
              // update local data
-            if (errorCode == ErrorCode::ok) {
-                m_connection->auditManager()->addAuditRecord(tran.command, tran.params, owner->authSession()); // add audit record before notification to ensure removed resource still alive
-                m_connection->notificationManager()->triggerNotification(tran);
-            }
+            if (errorCode == ErrorCode::ok) 
+                // add audit record before notification to ensure removed resource still alive
+                m_connection->auditManager()->addAuditRecord(
+                    tran.command, 
+                    tran.params, 
+                    owner->authSession()); 
 
             return (errorCode == ErrorCode::ok)
                 ? nx_http::StatusCode::ok

@@ -34,6 +34,8 @@ namespace ec2
             emit removed(tran.params.id);
         else if (tran.command == ApiCommand::removeStorage)
             emit storageRemoved(tran.params.id);
+        else if (tran.command == ApiCommand::removeServerUserAttributes)
+            emit userAttributesRemoved(tran.params.id);
         else
             NX_ASSERT(0, "Invalid transaction", Q_FUNC_INFO);
     }
