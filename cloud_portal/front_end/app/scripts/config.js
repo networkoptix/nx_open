@@ -6,9 +6,9 @@ var Config = {
     clientProtocol: 'nx-vms:',
     nativeDomain: 'cloud-demo.hdw.mx',
     cacheTimeout: 20 * 1000, // Cache lives for 30 seconds
-    updateInterval:  30 * 1000, // Update content on pages every 30 seconds
+    updateInterval:  30 * 1000, // Update content on pages every 30 seconds // TODO: Change this value back
 
-    alertTimeout: 30 * 1000,  // Alerts are shown for 3 seconds
+    alertTimeout: 3 * 1000,  // Alerts are shown for 3 seconds
     alertsMaxCount: 5,
 
     redirectAuthorised:'/systems', // Page for redirecting all authorised users
