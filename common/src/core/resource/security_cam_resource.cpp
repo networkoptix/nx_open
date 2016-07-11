@@ -115,6 +115,35 @@ void QnSecurityCamResource::resetCameraInfoSavedToDisk(const QString &storageUrl
     SAFE(m_cameraInfoSavedToDisk[storageUrl] = false);
 }
 
+void QnSecurityCamResource::resetAllCameraInfoSavedToDisk()
+{
+	SAFE(m_cameraInfoSavedToDisk.clear());
+}
+
+bool QnSecurityCamResource::setProperty(
+	const QString &key,
+	const QString &value,
+	PropertyOptions options)
+{
+	resetAllCameraInfoSavedToDisk();
+	return QnResource::setProperty(key, value, options);
+}
+
+bool QnSecurityCamResource::setProperty(
+	const QString &key,
+	const QVariant& value,
+	PropertyOptions options)
+{
+	resetAllCameraInfoSavedToDisk();
+	return QnResource::setProperty(key, value, options);
+}
+
+bool QnSecurityCamResource::removeProperty(const QString& key)
+{
+	resetAllCameraInfoSavedToDisk();
+	return QnResource::removeProperty(key);
+}
+
 bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(lit("groupplay"));
 }

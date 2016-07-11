@@ -203,13 +203,17 @@ public:
         NO_ALLOW_EMPTY      = 1 << 2,
     };
 
-    bool setProperty(const QString &key, const QString &value,
-                     PropertyOptions options = DEFAULT_OPTIONS);
+    virtual bool setProperty(
+		const QString &key, 
+		const QString &value, 
+		PropertyOptions options = DEFAULT_OPTIONS);
 
-    bool setProperty(const QString &key, const QVariant& value,
-                     PropertyOptions options = DEFAULT_OPTIONS);
+    virtual bool setProperty(
+		const QString &key,
+		const QVariant& value,
+		PropertyOptions options = DEFAULT_OPTIONS);
 
-    bool removeProperty(const QString& key);
+    virtual bool removeProperty(const QString& key);
 
     template<typename Update>
     bool updateProperty(const QString &key, const Update& update)
