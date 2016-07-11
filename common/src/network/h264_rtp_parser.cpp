@@ -339,6 +339,7 @@ void CLH264RtpParser::updateNalFlags(const quint8* data, int dataLen)
             else if (!m_idrFound && isIFrame(data, dataLen)) {
                 m_keyDataExists = true;
             }
+            break; //< optimization
         }
 
         data = NALUnit::findNextNAL(data, dataEnd);
@@ -349,7 +350,7 @@ bool CLH264RtpParser::isPacketStartsNewFrame(
     const quint8* curPtr,
     const quint8* bufferEnd) const
 {
-    int packetType = *curPtr & 0x1f;
+    int packetType = *curPtr++ & 0x1f;
 
     if (!m_frameExists)
         return false; //< no slice found so far. no need to create frame
@@ -377,10 +378,10 @@ bool CLH264RtpParser::isPacketStartsNewFrame(
     {
         return false;
     }
-    else if ((packetType == FU_A_PACKET || packetType == FU_B_PACKET)
-        && !(*curPtr & 0x80))
+    else if (packetType == FU_A_PACKET || packetType == FU_B_PACKET)
     {
-        return false;
+        if (!(*curPtr & 0x80))
+            return false; //< FU_A/B continue packet
     }
     else
     {
