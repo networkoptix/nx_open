@@ -21,6 +21,12 @@
 
         {
             "keys": [
+                "ActiveCam|*"
+            ],
+            "forceONVIF": true
+        },
+        {
+            "keys": [
                 "DW|*","ISD|*"
             ],
             "possibleDefaultCredentials": [
@@ -29,18 +35,105 @@
                     "password": "admin"
                 }
             ]
-        },       
+        },
+        {
+            "keys": [
+                "FLIR|AX8"
+            ],
+            "alarmsCount" : 5,
+            "ioSettings": [
+                {
+                    "id": "1",
+                    "inputName": "FLIR-INPUT-1",
+                    "portType": "Input",
+                    "supportedPortTypes":"Input"
+                },
+                {
+                    "id": "101",
+                    "outputName": "FLIR-OUTPUT-1",
+                    "portType": "Output",
+                    "supportedPortTypes": "Output"
+                },
+                {
+                    "id": "alarm_spot_1",
+                    "inputName": "Spot1",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_1",
+                    "inputName": "Box1",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_2",
+                    "inputName": "Box2",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_3",
+                    "inputName": "Box3",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_4",
+                    "inputName": "Box4",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_5",
+                    "inputName": "Box5",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_6",
+                    "inputName": "Box6",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                }
+            ]
+        },
+        {
+            "keys": [
+                "FLIR|A310"
+            ],
+            "ioSettings": [
+                {
+                    "id": "1",
+                    "inputName": "FLIR-INPUT-1",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "2",
+                    "inputName": "FLIR-INPUT-2",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "101",
+                    "outputName": "FLIR-OUTPUT-1",
+                    "portType": "Output",
+                    "supportedPortTypes": "Output"
+                },
+                {
+                    "id": "102",
+                    "outputName": "FLIR-OUTPUT-2",
+                    "portType": "Output",
+                    "supportedPortTypes": "Output"
+                }
+            ]
+        },
         {
             "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
             "advancedParametersTemplate": "nx-cube.xml"
-        },
-		{
-            "keys": [
-                "ActiveCam|*"
-            ],
-            "forceONVIF": true
         },
         {
             "keys": [
@@ -67,6 +160,19 @@
             ],
             "nxDeviceName": "Nx-Dome",
             "nxDeviceModel": "Nx-Dome-05924"
+        },
+        {
+            "keys": [
+                "Axis|1031W"
+            ],
+            "advancedParametersOverload":
+            {
+                "root.Audio.A0.InputGain":
+                {
+                    "range":"Mute,Auto,-12,-9,-6,-3,-1.5,0,1.5,3,6,9,12,15,18,21,24,27,30,34",
+                    "internalRange":"mute,auto,-12,-9,-6,-3,-1.5,0,1.5,3,6,9,12,15,18,21,24,27,30,34"
+                }
+            }
         },
         {
             "keys": [

@@ -16,11 +16,13 @@ public:
     virtual bool endElement( const QString& namespaceURI, const QString& localName, const QString& qName ) override;
 private:
     const ApiResourceTypeData* findResTypeByName(const QString& name);
+    ApiResourceTypeData* getRootResourceType(const QString& type) const;
     bool addParentType(ApiResourceTypeData& data, const QString& parentName);
     bool processResource(const QString& localName, const QXmlAttributes& attrs);
     bool processParam(const QString& localName, const QXmlAttributes& attrs);
 private:
     ApiResourceTypeDataList& m_data;
+    ApiResourceTypeData* m_rootResType;
     QString m_vendor;
     bool m_resTypeFound;
 };
