@@ -23,7 +23,6 @@ Row
 
     NxImageButton
     {
-        id: leftArrow;
         enabled: (currentPage > 0);
         onClicked: { --currentPage; }
         anchors.verticalCenter: parent.verticalCenter;
@@ -60,7 +59,6 @@ Row
 
     NxImageButton
     {
-        id: rightArraw
         enabled: (currentPage < (pagesCount - 1));
         anchors.verticalCenter: parent.verticalCenter;
         onClicked: { ++currentPage; }
