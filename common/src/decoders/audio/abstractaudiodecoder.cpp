@@ -6,7 +6,13 @@
 
 CLAbstractAudioDecoder* CLAudioDecoderFactory::createDecoder(QnCompressedAudioDataPtr data)
 {
-    return new CLFFmpegAudioDecoder(data);
+    auto result = new CLFFmpegAudioDecoder(data);
+    if (!result->isInitialized())
+    {
+        delete result;
+        return nullptr;
+    }
+    return result;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

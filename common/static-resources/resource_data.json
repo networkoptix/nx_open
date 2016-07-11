@@ -1061,6 +1061,13 @@
 			],
 			"forceONVIF": true,
 			"defaultCredentials" : "admin:123456"
+		},
+		{
+			"keys": [
+				"DW|*|A*"
+			],
+			"showUrl": true,
+			"urlLocalePath": "cgi-bin/index.cgi"
 		}
     ]
 }
