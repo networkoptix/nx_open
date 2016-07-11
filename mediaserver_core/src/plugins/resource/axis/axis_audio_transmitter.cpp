@@ -3,6 +3,7 @@
 #include <http/custom_headers.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/utils/std/future.h>
 
 namespace
 {
@@ -126,6 +127,23 @@ void QnAxisAudioTransmitter::at_httpDone(nx_http::AsyncHttpClientPtr http)
     }
 }
 
+std::unique_ptr<AbstractStreamSocket> QnAxisAudioTransmitter::takeSocket(const nx_http::AsyncHttpClientPtr& httpClient)
+{
+    //NOTE m_asyncHttpClient->takeSocket() can only be called within m_asyncHttpClient's aio thread
+    std::unique_ptr<AbstractStreamSocket> sock;
+    nx::utils::promise<void> socketTakenPromise;
+    httpClient->dispatch(
+        [this, &sock, &socketTakenPromise, &httpClient]()
+    {
+        sock = std::move(httpClient->takeSocket());
+        socketTakenPromise.set_value();
+    });
+    socketTakenPromise.get_future().wait();
+
+    if (!sock || !sock->setNonBlockingMode(false))
+        return nullptr;
+    return sock;
+}
 
 bool QnAxisAudioTransmitter::startTransmission()
 {
@@ -192,15 +210,14 @@ bool QnAxisAudioTransmitter::startTransmission()
 
     if (m_state == TransmitterState::ReadyForTransmission)
     {
-        m_socket = httpClient->takeSocket();
-        m_socket->setNonBlockingMode(false);
+        m_socket = takeSocket(httpClient);
     }
     else
     {
         m_state = TransmitterState::Failed;
+        httpClient->terminate();
     }
 
-    httpClient->terminate();
     return m_socket != nullptr;
 
 }

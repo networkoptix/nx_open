@@ -4,6 +4,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QByteArray>
 #include <QStringList>
+#include <nx/fusion/model_functions_fwd.h>
 
 //!Splits \a data by \a delimiter not closed within quotes
 /*!
@@ -50,5 +51,14 @@ class HttpAuthenticationClientContext;
      const QString& realm,
      const QByteArray& method,
      QByteArray nonce);
+
+struct NonceReply
+{
+    QString nonce;
+    QString realm;
+};
+#define NonceReply_Fields (nonce)(realm)
+
+QN_FUSION_DECLARE_FUNCTIONS(NonceReply, (json))
 
 #endif

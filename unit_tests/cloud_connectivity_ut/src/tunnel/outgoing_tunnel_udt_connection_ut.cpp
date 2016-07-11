@@ -4,6 +4,7 @@
 #include <nx/network/cloud/tunnel/udp/outgoing_tunnel_connection.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/test_support/test_options.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/guard.h>
 
@@ -235,7 +236,7 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
         ASSERT_TRUE(result.stillValid);
 
         #ifdef _DEBUG
-            if (!SocketFactory::areTimeAssertsDisabled())
+            if (!utils::TestOptions::areTimeAssertsDisabled())
             {
                 const auto connectTime =
                     connectContexts[i].endTime - connectContexts[i].startTime;

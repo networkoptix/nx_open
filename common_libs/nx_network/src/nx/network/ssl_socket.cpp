@@ -1183,6 +1183,7 @@ public:
     // the pain of
     std::atomic<SslSocket::IOMode> ioMode;
     std::atomic<bool> emulateBlockingMode;
+    std::atomic<bool> shutdown;
     std::unique_ptr<SslAsyncBioHelper> asyncSslHelper;
 
     typedef utils::promise<std::pair<SystemError::ErrorCode, size_t>> AsyncPromise;
@@ -1197,7 +1198,8 @@ public:
         extraBufferLen(0),
         ecnryptionEnabled(false),
         ioMode(SslSocket::SYNC),
-        emulateBlockingMode(false)
+        emulateBlockingMode(false),
+        shutdown(false)
     {
     }
 };
@@ -1467,6 +1469,9 @@ int SslSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*/)
 int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(SslSocket);
+    if (d->shutdown)
+        return SystemError::setLastErrorCode(SystemError::notConnected), -1;
+
     if (d->emulateBlockingMode)
     {
         // the mode could be switched to non blocking, but SSL engine is
@@ -1509,6 +1514,9 @@ int SslSocket::sendInternal(const void* buffer, unsigned int bufferLen)
 int SslSocket::send(const void* buffer, unsigned int bufferLen)
 {
     Q_D(SslSocket);
+    if (d->shutdown)
+        return SystemError::setLastErrorCode(SystemError::notConnected), -1;
+
     if (d->emulateBlockingMode)
     {
         // the mode could be switched to non blocking, but SSL engine is
@@ -1664,7 +1672,8 @@ bool SslSocket::getNonBlockingMode(bool* val) const
 
 bool SslSocket::shutdown()
 {
-    Q_D(const SslSocket);
+    Q_D(SslSocket);
+    d->shutdown.store(true);
     if (!d->emulateBlockingMode)
     {
         d->wrappedSocket->pleaseStopSync();

@@ -36,7 +36,6 @@ public:
     virtual ~QnStorageDb();
 
     bool open(const QString& fileName);
-    void close();
 
     bool deleteRecords(const QString& cameraUniqueId,
                        QnServer::ChunksCatalog catalog, 

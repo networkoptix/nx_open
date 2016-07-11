@@ -64,7 +64,7 @@ VmsGatewayFunctionalTest::~VmsGatewayFunctionalTest()
 
 bool VmsGatewayFunctionalTest::startAndWaitUntilStarted()
 {
-    return startAndWaitUntilStarted(true, true, true);
+    return startAndWaitUntilStarted(true, true, false);
 }
 
 bool VmsGatewayFunctionalTest::startAndWaitUntilStarted(
