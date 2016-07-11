@@ -59,22 +59,6 @@ public:
     QValidator::State lastValidationResult() const;
 
     void setValidator(Qn::TextValidateFunction validator, bool validateImmediately = false);
-
-    bool emptyInputAllowed() const;
-    const QString& emptyInputHint() const;
-    void setEmptyInputAllowed(bool enabled, const QString& hint = defaultEmptyInputHint());
-
-    bool terminalSpacesAllowed() const;
-    const QString& terminalSpacesHint() const;
-    void setTerminalSpacesAllowed(bool allow, const QString& hint = defaultTerminalSpacesHint());
-
-    void setPasswordMode(QLineEdit::EchoMode echoMode, bool allowEmptyPassword, bool showStrengthIndicator);
-
-    bool confirmationMode() const;
-    const QnInputField* confirmationPrimaryField() const;
-    const QString& confirmationFailureHint() const;
-    void setConfirmationMode(const QnInputField* primaryField, const QString& hint = QString());
-
     void reset();
 
     static AbstractAccessor* createLabelWidthAccessor();
@@ -82,10 +66,6 @@ public:
 signals:
     void textChanged(const QString& text);
     void editingFinished();
-
-private:
-    static QString defaultEmptyInputHint();
-    static QString defaultTerminalSpacesHint();
 
 private:
     friend class LabelWidthAccessor;

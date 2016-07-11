@@ -15,8 +15,6 @@ public:
         hint(new QLabel(parent)),
         input(new QLineEdit(parent)),
         lastValidationResult(QValidator::Acceptable),
-        emptyInputAllowed(true),
-        terminalSpacesAllowed(true),
         validator(),
         passwordIndicator(nullptr),
         hidePasswordIndicatorWhenEmpty(true)
@@ -50,38 +48,17 @@ public:
 
     Qn::ValidationResult validationResult() const
     {
-        QString text = input->text();
-        QString trimmed = text.trimmed();
-
         Qn::ValidationResult validationResult(QValidator::Acceptable);
-
-        if (confirmationPrimaryField && confirmationPrimaryField->text() != text &&
-            !confirmationPrimaryField->text().trimmed().isEmpty())
-        {
-            validationResult = Qn::ValidationResult(confirmationFailureHint);
-        }
-        else if (trimmed.isEmpty())
-        {
-            validationResult = emptyInputAllowed ?
-                Qn::ValidationResult(QValidator::Acceptable) :
-                Qn::ValidationResult(emptyInputHint);
-        }
-        else if (!terminalSpacesAllowed && trimmed != text)
-        {
-            validationResult = Qn::ValidationResult(terminalSpacesHint);
-        }
-        else
-        {
             if (validator)
-                validationResult = validator(text);
+            validationResult = validator(input->text());
 
-            if ((validationResult.state == QValidator::Acceptable) && passwordIndicator)
+            if ((validationResult.state == QValidator::Acceptable)
+                && passwordIndicator && passwordIndicator->isVisible())
             {
                 const auto& info = passwordIndicator->currentInformation();
                 if (info.acceptance() == QnPasswordInformation::Inacceptable)
                     validationResult = Qn::ValidationResult(info.hint());
             }
-        }
 
         return validationResult;
     }
@@ -131,27 +108,12 @@ public:
         }
     }
 
-    QLineEdit* primaryInput()
-    {
-        return confirmationPrimaryField ? confirmationPrimaryField->d_ptr->input : nullptr;
-    }
-
     QWidget* parent;
     QLabel* title;
     QLabel* hint;
     QLineEdit* input;
 
     Qn::ValidationResult lastValidationResult;
-
-    bool emptyInputAllowed;
-    QString emptyInputHint;
-
-    bool terminalSpacesAllowed;
-    QString terminalSpacesHint;
-
-    QPointer<const QnInputField> confirmationPrimaryField;
-    QString confirmationFailureHint;
-
     Qn::TextValidateFunction validator;
 
     QnPasswordStrengthIndicator* passwordIndicator;
@@ -367,69 +329,7 @@ AbstractAccessor* QnInputField::createLabelWidthAccessor()
     return new LabelWidthAccessor();
 }
 
-bool QnInputField::emptyInputAllowed() const
-{
-    Q_D(const QnInputField);
-    return d->emptyInputAllowed;
-}
-
-const QString& QnInputField::emptyInputHint() const
-{
-    Q_D(const QnInputField);
-    return d->emptyInputHint;
-}
-
-void QnInputField::setEmptyInputAllowed(bool enabled, const QString& hint)
-{
-    Q_D(QnInputField);
-    if (d->emptyInputAllowed == enabled && d->emptyInputHint == hint)
-        return;
-
-    d->emptyInputAllowed = enabled;
-    d->emptyInputHint = hint;
-    validate();
-}
-
-bool QnInputField::terminalSpacesAllowed() const
-{
-    Q_D(const QnInputField);
-    return d->terminalSpacesAllowed;
-}
-
-const QString& QnInputField::terminalSpacesHint() const
-{
-    Q_D(const QnInputField);
-    return d->terminalSpacesHint;
-}
-
-void QnInputField::setTerminalSpacesAllowed(bool allow, const QString& hint)
-{
-    Q_D(QnInputField);
-    if (d->terminalSpacesAllowed == allow && d->terminalSpacesHint == hint)
-        return;
-
-    d->terminalSpacesAllowed = allow;
-    d->terminalSpacesHint = hint;
-    validate();
-}
-
-bool QnInputField::confirmationMode() const
-{
-    return confirmationPrimaryField() != nullptr;
-}
-
-const QnInputField* QnInputField::confirmationPrimaryField() const
-{
-    Q_D(const QnInputField);
-    return d->confirmationPrimaryField;
-}
-
-const QString& QnInputField::confirmationFailureHint() const
-{
-    Q_D(const QnInputField);
-    return d->confirmationFailureHint;
-}
-
+#if 0
 void QnInputField::setConfirmationMode(const QnInputField* primaryField, const QString& hint)
 {
     Q_D(QnInputField);
@@ -458,21 +358,4 @@ void QnInputField::setConfirmationMode(const QnInputField* primaryField, const Q
 
     validate();
 }
-
-void QnInputField::setPasswordMode(QLineEdit::EchoMode echoMode, bool allowEmptyPassword, bool showStrengthIndicator)
-{
-    setEchoMode(echoMode);
-    setEmptyInputAllowed(allowEmptyPassword, tr("Password cannot be empty."));
-    setTerminalSpacesAllowed(false);
-    setPasswordIndicatorEnabled(showStrengthIndicator, true, false);
-}
-
-QString QnInputField::defaultEmptyInputHint()
-{
-    return tr("Value cannot be empty.");
-}
-
-QString QnInputField::defaultTerminalSpacesHint()
-{
-    return tr("Avoid leading and trailing spaces.");
-}
+#endif

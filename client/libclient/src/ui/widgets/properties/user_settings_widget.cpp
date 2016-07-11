@@ -120,9 +120,8 @@ void QnUserSettingsWidget::loadDataToUi()
     updateRoleComboBox();
     updateControlsAccess();
 
-    ui->passwordInputField->setEmptyInputAllowed(
-        m_model->mode() != QnUserSettingsModel::NewUser,
-        ui->passwordInputField->emptyInputHint());
+    ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(
+        m_model->mode() != QnUserSettingsModel::NewUser));
 
     ui->loginInputField->setText(m_model->user()->getName());
     ui->emailInputField->setText(m_model->user()->getEmail());
@@ -191,10 +190,11 @@ bool QnUserSettingsWidget::canApplyChanges() const
 void QnUserSettingsWidget::setupInputFields()
 {
     ui->loginInputField->setTitle(tr("Login"));
-    ui->loginInputField->setEmptyInputAllowed(false, tr("Login cannot be empty."));
-
     ui->loginInputField->setValidator([this](const QString& text)
     {
+        if (text.trimmed().isEmpty())
+            return Qn::ValidationResult(tr("Login cannot be empty."));
+
         for (const QnUserResourcePtr& user : qnResPool->getResources<QnUserResource>())
         {
             if (user == m_model->user())
@@ -215,8 +215,8 @@ void QnUserSettingsWidget::setupInputFields()
         bool mustUpdatePassword = m_model->mode() == QnUserSettingsModel::OtherSettings
             && ui->loginInputField->text() != m_model->user()->getName();
 
-        ui->passwordInputField->setEmptyInputAllowed(!mustUpdatePassword,
-            tr("User has been renamed. Password must be updated."));
+        ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(
+            !mustUpdatePassword, tr("User has been renamed. Password must be updated.")), true);
     });
 
     ui->nameInputField->setTitle(tr("Name"));
@@ -225,16 +225,23 @@ void QnUserSettingsWidget::setupInputFields()
     ui->emailInputField->setValidator(Qn::defaultEmailValidator());
 
     ui->passwordInputField->setTitle(tr("Password"));
-    ui->passwordInputField->setPasswordMode(QLineEdit::Password, true, true);
+    ui->passwordInputField->setEchoMode(QLineEdit::Password);
+    ui->passwordInputField->setPasswordIndicatorEnabled(true);
 
-    connect(ui->passwordInputField, &QnInputField::editingFinished, this, [this]()
+    connect(ui->passwordInputField, &QnInputField::textChanged, this, [this]()
     {
+        if (!ui->confirmPasswordInputField->text().isEmpty())
         ui->confirmPasswordInputField->validate();
     });
 
+    connect(ui->passwordInputField, &QnInputField::editingFinished,
+        ui->confirmPasswordInputField, &QnInputField::validate);
+
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
-    ui->confirmPasswordInputField->setConfirmationMode(ui->passwordInputField, tr("Passwords do not match."));
+    ui->confirmPasswordInputField->setValidator(Qn::defaultConfirmationValidator(
+        [this]() { return ui->passwordInputField->text(); },
+        tr("Passwords do not match.")));
 
     for (auto field : inputFields())
         connect(field, &QnInputField::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);

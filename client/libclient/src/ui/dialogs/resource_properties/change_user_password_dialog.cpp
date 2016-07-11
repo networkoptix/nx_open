@@ -16,19 +16,23 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
     ui->setupUi(this);
 
     ui->newPasswordInputField->setTitle(tr("New Password"));
-    ui->newPasswordInputField->setPasswordMode(QLineEdit::Password, false, true);
+    ui->newPasswordInputField->setEchoMode(QLineEdit::Password);
+    ui->newPasswordInputField->setPasswordIndicatorEnabled(true);
+    ui->newPasswordInputField->setValidator(Qn::defaultPasswordValidator(false));
     ui->newPasswordInputField->reset();
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
-    ui->confirmPasswordInputField->setConfirmationMode(ui->newPasswordInputField, tr("Passwords do not match."));
+    ui->confirmPasswordInputField->setValidator(Qn::defaultConfirmationValidator(
+        [this]() { return ui->newPasswordInputField->text(); },
+        tr("Passwords do not match.")));
 
     ui->currentPasswordInputField->setTitle(tr("Current Password"));
     ui->currentPasswordInputField->setEchoMode(QLineEdit::Password);
     ui->currentPasswordInputField->setValidator([this](const QString& text)
     {
         if (text.isEmpty())
-            return Qn::ValidationResult(tr("To modify your password, please enter the existing one."));
+            return Qn::ValidationResult(tr("To modify your password please enter the existing one."));
 
         if (!context()->user()->checkPassword(text))
             return Qn::ValidationResult(tr("Invalid current password."));
