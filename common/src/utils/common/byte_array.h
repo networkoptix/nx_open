@@ -73,13 +73,7 @@ public:
      * \param data                      Pointer to the data to append to this array
      * \param size                      Size of the data to append.
      */
-    void uncheckedWrite( const char *data, unsigned int size );
-    //{
-    //    Q_ASSERT_X(m_size + size <= m_capacity, "Buffer MUST be preallocated!", Q_FUNC_INFO);
-    //    memcpy(m_data + m_size, data, size);
-    //    m_size += size;
-    //}
-
+    bool uncheckedWrite( const char *data, unsigned int size );
 
     /**
      * \param data                      Data to append to this array.

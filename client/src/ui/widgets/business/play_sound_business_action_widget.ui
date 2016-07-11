@@ -7,13 +7,24 @@
     <x>0</x>
     <y>0</y>
     <width>589</width>
-    <height>74</height>
+    <height>149</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QCheckBox" name="playToClient">
+       <property name="text">
+        <string>Play to user</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item>
     <layout class="QHBoxLayout" name="selectLayout" stretch="1,0">
      <item>

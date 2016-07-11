@@ -193,7 +193,7 @@ private:
     bool checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
 
     QMap<QString, QnProcessorAggregationInfo> m_aggregateActions; // aggregation counter for instant actions
-    QMap<QString, int> m_actionInProgress;              // remove duplicates for long actions
+    QMap<QString, QSet<QnUuid>> m_actionInProgress;              // remove duplicates for long actions
     QTimer m_timer;
 
     /*!

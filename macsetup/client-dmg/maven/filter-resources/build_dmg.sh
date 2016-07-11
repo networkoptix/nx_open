@@ -63,7 +63,7 @@ then
         codesign -f -v -s "${mac.app.sign.identity}" "$f"
     done
 
-    for f in $AS_SRC/"${display.product.name}".app/Contents/MacOS/{imageformats,platforms,styles}/*.dylib
+    for f in $AS_SRC/"${display.product.name}".app/Contents/MacOS/{imageformats,platforms,styles,audio}/*.dylib
     do
         codesign -f -v -s "${mac.app.sign.identity}" "$f"
     done

@@ -63,6 +63,8 @@ int QnBusiness::actionHelpId(QnBusiness::ActionType type) {
         return Qn::EventsActions_ExecutePtzPreset_Help;
     case QnBusiness::ShowTextOverlayAction:
         return Qn::EventsActions_ShowTextOverlay_Help;
+    case QnBusiness::ExecHttpRequestAction:
+        return Qn::EventsActions_ExecHttpRequest_Help;
     default:
         return -1;
     }

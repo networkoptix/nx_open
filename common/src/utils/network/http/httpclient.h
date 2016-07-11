@@ -6,7 +6,9 @@
 #ifndef HTTPCLIENT_H
 #define HTTPCLIENT_H
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 
 #include <utils/thread/wait_condition.h>
 #include <utils/thread/mutex.h>
@@ -47,6 +49,7 @@ namespace nx_http
             const nx_http::StringType& contentType,
             nx_http::StringType messageBody );
         const Response* response() const;
+        SystemError::ErrorCode lastSysErrorCode() const;
         //!
         bool eof() const;
         //!
@@ -62,11 +65,18 @@ namespace nx_http
         void setSubsequentReconnectTries( int reconnectTries );
         //!See \a AsyncHttpClient::setTotalReconnectTries
         void setTotalReconnectTries( int reconnectTries );
+
+        //!See \a AsyncHttpClient::setSendTimeoutMs
+        void setSendTimeoutMs( unsigned int sendTimeoutMs );
+        //!See \a AsyncHttpClient::setResponseReadTimeoutMs
+        void setResponseReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
         //!See \a AsyncHttpClient::setMessageBodyReadTimeoutMs
         void setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
         void setUserAgent( const QString& userAgent );
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
+
+        QSharedPointer<AbstractStreamSocket> takeSocket();
 
     private:
         nx_http::AsyncHttpClientPtr m_asyncHttpClient;
@@ -78,6 +88,8 @@ namespace nx_http
         std::vector<std::pair<StringType, StringType>> m_additionalHeaders;
         boost::optional<int> m_subsequentReconnectTries;
         boost::optional<int> m_reconnectTries;
+        boost::optional<unsigned int> m_sendTimeoutMs;
+        boost::optional<unsigned int> m_responseReadTimeoutMs;
         boost::optional<unsigned int> m_messageBodyReadTimeoutMs;
         boost::optional<QString> m_userAgent;
         boost::optional<QString> m_userName;

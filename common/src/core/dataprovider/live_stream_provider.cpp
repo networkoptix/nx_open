@@ -43,8 +43,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_softMotionRole(Qn::CR_Default),
     m_softMotionLastChannel(0),
     m_videoChannels(1),
-    m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1),
-    m_owner(0)
+    m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         m_motionMaskBinData[i] = (simd128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
@@ -72,20 +71,20 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
 }
 
 
-void QnLiveStreamProvider::setOwner(QnAbstractVideoCamera* owner)
+void QnLiveStreamProvider::setOwner(QnSharedResourcePointer<QnAbstractVideoCamera> owner)
 {
-    m_owner = owner;
+    m_owner = owner.toWeakRef();
 }
 
-QnAbstractVideoCamera* QnLiveStreamProvider::getOwner() const
+QnSharedResourcePointer<QnAbstractVideoCamera> QnLiveStreamProvider::getOwner() const
 {
-    return m_owner;
+    return m_owner.toStrongRef();
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
 {
     directDisconnectAll();
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         qFreeAligned(m_motionMaskBinData[i]);
 }
 
@@ -144,9 +143,9 @@ void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        if (m_owner)
+        if (auto owner = getOwner())
         {
-            if (auto lp = m_owner->getSecondaryReader())
+            if (auto lp = owner->getSecondaryReader())
             {
                 lp->setQuality(m_cameraRes->getSecondaryStreamQuality());
                 lp->onPrimaryFpsUpdated(getLiveParams().fps);
@@ -176,7 +175,7 @@ Qn::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 {
     QnMutexLocker lock( &m_motionRoleMtx );
 
-    if (m_softMotionRole == Qn::CR_Default) 
+    if (m_softMotionRole == Qn::CR_Default)
     {
         m_forcedMotionStream = m_cameraRes->getProperty(QnMediaResource::motionStreamKey()).toLower();
         if (m_forcedMotionStream == lit("primary"))
@@ -232,12 +231,12 @@ void QnLiveStreamProvider::setFps(float f)
         f = m_newLiveParams.fps;
 
     }
-    
+
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        if (m_owner) {
-            QnLiveStreamProviderPtr lp = m_owner->getSecondaryReader();
+        if (auto owner = getOwner()) {
+            QnLiveStreamProviderPtr lp = owner->getSecondaryReader();
             if (lp)
                 lp->onPrimaryFpsUpdated(f);
         }
@@ -259,9 +258,9 @@ bool QnLiveStreamProvider::isMaxFps() const
     return m_newLiveParams.fps >= m_cameraRes->getMaxFps()-0.1;
 }
 
-bool QnLiveStreamProvider::needMetaData() 
+bool QnLiveStreamProvider::needMetaData()
 {
-    // I assume this function is called once per video frame 
+    // I assume this function is called once per video frame
 
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
     {
@@ -290,7 +289,7 @@ bool QnLiveStreamProvider::needMetaData()
         }
         return result;
     }
-    
+
     return false; // not motion configured
 }
 
@@ -356,7 +355,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
     Q_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
     // now primary has newFps
     // this is secondary stream
-    // need to adjust fps 
+    // need to adjust fps
 
     int maxFps = m_cameraRes->getMaxFps();
 
@@ -406,7 +405,7 @@ QnMetaDataV1Ptr QnLiveStreamProvider::getMetaData()
 QnMetaDataV1Ptr QnLiveStreamProvider::getCameraMetadata()
 {
     QnMetaDataV1Ptr result(new QnMetaDataV1(1));
-    result->m_duration = 1000*1000*1000; // 1000 sec 
+    result->m_duration = 1000*1000*1000; // 1000 sec
     return result;
 }
 
@@ -434,7 +433,7 @@ bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResource* netRes)
 void QnLiveStreamProvider::startIfNotRunning()
 {
     QnMutexLocker mtx( &m_mutex );
-    if (!isRunning())    
+    if (!isRunning())
     {
         m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1;
         start();
@@ -466,7 +465,7 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
     //no secondary stream and no motion, may be primary stream is now OK for motion?
     bool newValue = newResolution.width()*newResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION;
     bool cameraValue = m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability;
-    if (newValue != cameraValue) 
+    if (newValue != cameraValue)
     {
         if( newValue)
             m_cameraRes->setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );

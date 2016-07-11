@@ -59,7 +59,7 @@ namespace
 
     QnBusinessActionParameters convertOldActionParameters(const QByteArray &value) {
         enum Param {
-            SoundUrlParam,
+            UrlParam,
             EmailAddressParam,
             UserGroupParam,
             FpsParam,
@@ -91,8 +91,8 @@ namespace
             QByteArray field(value.data() + prevPos + 1, nextPos - prevPos - 1);
             switch ((Param) i)
             {
-            case SoundUrlParam:
-                result.soundUrl = QString::fromUtf8(field.data(), field.size());
+            case UrlParam:
+                result.url = QString::fromUtf8(field.data(), field.size());
                 break;
             case EmailAddressParam:
                 result.emailAddress = QString::fromUtf8(field.data(), field.size());

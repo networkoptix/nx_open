@@ -1,9 +1,11 @@
+#include <core/resource/camera_resource.h>
 #include "play_sound_business_action_widget.h"
 #include "ui_play_sound_business_action_widget.h"
 
 #include <QtCore/QFileInfo>
 
 #include <business/business_action_parameters.h>
+#include <ui/style/resource_icon_cache.h>
 
 #include <openal/qtvaudiodevice.h>
 
@@ -17,6 +19,7 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <core/resource_management/resource_pool.h>
 
 QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -36,6 +39,7 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent
     connect(ui->testButton, SIGNAL(clicked()), this, SLOT(at_testButton_clicked()));
     connect(ui->manageButton, SIGNAL(clicked()), this, SLOT(at_manageButton_clicked()));
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(at_volumeSlider_valueChanged(int)));
+    connect(ui->playToClient, SIGNAL(stateChanged(int)), this, SLOT(paramsChanged()));
 
     connect(QtvAudioDevice::instance(), &QtvAudioDevice::volumeChanged, this, [this] {
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
@@ -70,10 +74,12 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fi
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
+    auto params = model()->actionParams();
     if (fields & QnBusiness::ActionParamsField) {
-        m_filename = model()->actionParams().soundUrl;
+        m_filename = params.url;
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
         ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));
+        ui->playToClient->setChecked(params.playToClient);
     }
 }
 
@@ -85,8 +91,9 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
     if (!soundModel->loaded())
         return;
 
-    QnBusinessActionParameters params;
-    params.soundUrl = soundModel->filenameByRow(ui->pathComboBox->currentIndex());
+    auto params = model()->actionParams();
+    params.url = soundModel->filenameByRow(ui->pathComboBox->currentIndex());
+    params.playToClient = ui->playToClient->isChecked();
     model()->setActionParams(params);
 }
 

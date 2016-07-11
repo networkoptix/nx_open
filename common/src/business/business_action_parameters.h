@@ -12,8 +12,8 @@ struct QnBusinessActionParameters {
     /** Additional parameter for event log convenience. Does not filled when the action really occurs. */
     QnUuid actionResourceId;
 
-    // Play Sound
-    QString soundUrl;
+    // Play Sound / exec HTTP action
+    QString url;
 
     // Email
     QString emailAddress;
@@ -39,7 +39,7 @@ struct QnBusinessActionParameters {
     // Bookmark
     QString tags;
 
-    // Generic text: Show Text Overlay
+    // Generic text: Show Text Overlay / exec HTTP action: message body
     QString text;
 
     // Generic duration: Bookmark, Show Text Overlay
@@ -60,14 +60,18 @@ struct QnBusinessActionParameters {
     //! Bookmark start time adjusted to the left by this value
     int recordBeforeMs;
 
+    //Say text
+    bool playToClient;
+
     /**
      * \returns                        Whether all parameters have default values.
      */
     bool isDefault() const;
 };
 
-#define QnBusinessActionParameters_Fields (actionResourceId)(soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)(recordBeforeMs)
+#define QnBusinessActionParameters_Fields (actionResourceId)(url)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
+    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)\
+    (forced)(presetId)(useSource)(recordBeforeMs)(playToClient)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
 

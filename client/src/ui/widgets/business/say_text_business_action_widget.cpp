@@ -1,7 +1,9 @@
+#include <core/resource/camera_resource.h>
 #include "say_text_business_action_widget.h"
 #include "ui_say_text_business_action_widget.h"
 
 #include <business/business_action_parameters.h>
+#include <ui/style/resource_icon_cache.h>
 
 #include <openal/qtvaudiodevice.h>
 
@@ -10,6 +12,7 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <core/resource_management/resource_pool.h>
 
 QnSayTextBusinessActionWidget::QnSayTextBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -20,6 +23,7 @@ QnSayTextBusinessActionWidget::QnSayTextBusinessActionWidget(QWidget *parent) :
     ui->volumeSlider->setValue(qRound(QtvAudioDevice::instance()->volume() * 100));
 
     connect(ui->textEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
+    connect(ui->playToClient, SIGNAL(stateChanged(int)), this, SLOT(paramsChanged()));
     connect(ui->testButton, SIGNAL(clicked()), this, SLOT(at_testButton_clicked()));
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(at_volumeSlider_valueChanged(int)));
 
@@ -48,8 +52,12 @@ void QnSayTextBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fiel
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
+    auto params = model()->actionParams();
     if (fields & QnBusiness::ActionParamsField)
-        ui->textEdit->setText(model()->actionParams().sayText);
+    {
+        ui->textEdit->setText(params.sayText);
+        ui->playToClient->setChecked(params.playToClient);
+    }
 }
 
 void QnSayTextBusinessActionWidget::paramsChanged() {
@@ -58,8 +66,9 @@ void QnSayTextBusinessActionWidget::paramsChanged() {
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    QnBusinessActionParameters params;
+    auto params = model()->actionParams();
     params.sayText = ui->textEdit->text();
+    params.playToClient = ui->playToClient->isChecked();
     model()->setActionParams(params);
 }
 

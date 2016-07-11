@@ -17,12 +17,24 @@
     
     "version": "1.0",
     "data": [
-        
-		{
+
+
+        {
             "keys": [
                 "ActiveCam|*"
             ],
             "forceONVIF": true
+        },
+        {
+            "keys": [
+                "DW|*","ISD|*"
+            ],
+            "possibleDefaultCredentials": [
+                {
+                    "user": "admin",
+                    "password": "admin"
+                }
+            ]
         },
         {
             "keys": [
@@ -117,7 +129,7 @@
                 }
             ]
         },
-        {        
+        {
             "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
@@ -191,7 +203,7 @@
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04", "*|DW-CP16",
                 "Avigilon|ENC-*",
-                "ACTI|V32",
+                "ACTI|V32", "ACTi Corporation|V32",
                 "BOSCH|VIP-X1600-XFM4"
             ],
             "analogEncoder": true
@@ -221,10 +233,28 @@
         },
         {
             "keys": [
-                "ISD|XPM-FL72-48MP"
+                "ISD|XPM-FL72-48MP",
+                "DW|XPM-FL72-48MP",
+                "DW|DWC-PZV2M72T",
+                "DigitalWatchdog|DWC-PZV2M72T"
             ],
-            "isDW": true
+            "isdDwCam": true,
+            "showUrl": true,
+            "urlLocalePath": "priv/cam.html"
         },
+		
+        {
+            "keys": [
+                "DW|DWCA-C128-64", 
+                "DW|DWCA-C12C-64", 
+                "DW|DWCA-VF25W28-64",
+                "DW|DWCA-VF25WIR4-64",
+                "DW|DWCA-VF25WIR8-64",
+                "DW|DWC-PZV2M72T"
+            ],
+            "isdDwCam": true
+        },
+		
         {
             "keys": [
                 "vista|*"
@@ -1113,7 +1143,38 @@
                 "Honeywell*|*"
             ],
             "portNamePrefixToIgnore": "AlarmOut"
-        }
+        },
+        {
+            "keys": [
+                "Pelco|NET5508*"
+            ],
+            "forcedOnvifParams": {
+                "videoEncoders": [
+                    "ve0", "ve8",
+                    "ve1", "ve9",
+                    "ve2", "ve10",
+                    "ve3", "ve11",
+                    "ve4", "ve12",
+                    "ve5", "ve13",
+                    "ve6", "ve14",
+                    "ve7", "ve15"
+                ]
+            }
+        },
+		{
+			"keys": [
+				"ACTI|A41", "ACTI|A81"
+			],
+			"forceONVIF": true,
+			"defaultCredentials" : "admin:123456"
+		},
+		{
+			"keys": [
+				"DW|*|A*"
+			],
+			"showUrl": true,
+			"urlLocalePath": "cgi-bin/index.cgi"
+		}
     ]
 }
 

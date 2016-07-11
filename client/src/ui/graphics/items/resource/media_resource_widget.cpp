@@ -244,7 +244,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         connect(overlayWidgets().positionOverlay, &GraphicsWidget::geometryChanged, this, updateContentsMargins);
         connect(overlayWidgets().positionOverlay, &QnScrollableOverlayWidget::contentSizeChanged, this, updateContentsMargins);
         /* Let widgets to be displayed before updating margins. */
-        executeDelayed(updateContentsMargins);
+        executeDelayedParented(updateContentsMargins, kDefaultDelay, this);
     }
 
 

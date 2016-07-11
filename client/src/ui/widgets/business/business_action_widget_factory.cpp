@@ -11,6 +11,7 @@
 #include <ui/widgets/business/show_text_overlay_action_widget.h>
 #include <ui/widgets/business/show_on_alarm_layout_action_widget.h>
 #include <ui/widgets/business/ptz_preset_business_action_widget.h>
+#include <ui/widgets/business/exec_http_request_action_widget.h>
 
 QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(QnBusiness::ActionType actionType, QWidget *parent) {
     switch (actionType) {
@@ -36,6 +37,8 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(QnBu
         return new QnShowTextOverlayActionWidget(parent);
     case QnBusiness::ShowOnAlarmLayoutAction:
         return new QnShowOnAlarmLayoutActionWidget(parent);
+    case QnBusiness::ExecHttpRequestAction:
+        return new QnExecHttpRequestActionWidget(parent);
     default:
         break;
     }

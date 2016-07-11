@@ -58,6 +58,7 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
     case ExecutePtzPresetAction:    return tr("Execute PTZ preset");
     case ShowTextOverlayAction:     return tr("Show text overlay");
     case ShowOnAlarmLayoutAction:   return tr("Show on Alarm Layout");
+    case ExecHttpRequestAction:     return tr("Do HTTP request");
 
     default:
         break;

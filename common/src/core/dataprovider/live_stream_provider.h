@@ -25,16 +25,6 @@ static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 720 * 576;
 
 class QnLiveStreamProvider;
 
-class QnAbstractVideoCamera
-{
-public:
-    virtual QSharedPointer<QnLiveStreamProvider> getPrimaryReader() = 0;
-    virtual QSharedPointer<QnLiveStreamProvider> getSecondaryReader() = 0;
-
-    virtual void inUse(void* user) = 0;
-    virtual void notInUse(void* user) = 0;
-};
-
 struct QnLiveStreamParams
 {
     Qn::StreamQuality quality;
@@ -60,15 +50,15 @@ public:
     virtual void setQuality(Qn::StreamQuality q);
     virtual void setCameraControlDisabled(bool value);
 
-    // for live providers only 
+    // for live providers only
     virtual void setFps(float f);
     bool isMaxFps() const;
 
     void onPrimaryFpsUpdated(int newFps);
     QnLiveStreamParams getLiveParams();
 
-    // I assume this function is called once per video frame 
-    bool needMetaData(); 
+    // I assume this function is called once per video frame
+    bool needMetaData();
 
     void onStreamReopen();
 
@@ -91,14 +81,14 @@ public:
         Start provider if not running yet.
         @param canTouchCameraSettings can control camera settings if true
     */
-    void startIfNotRunning();
+    virtual void startIfNotRunning() override;
 
     bool isCameraControlDisabled() const;
     void filterMotionByMask(const QnMetaDataV1Ptr& motion);
     void updateSoftwareMotionStreamNum();
 
-    void setOwner(QnAbstractVideoCamera* owner);
-    QnAbstractVideoCamera* getOwner() const;
+    void setOwner(QnSharedResourcePointer<QnAbstractVideoCamera> owner);
+    virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
     virtual void pleaseReopenStream() = 0;
 protected:
     /*! Called when @param currentStreamParams are updated */
@@ -152,7 +142,7 @@ private:
                               bool isCameraConfigured );
 
 private:
-    QnAbstractVideoCamera* m_owner;
+    QWeakPointer<QnAbstractVideoCamera> m_owner;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

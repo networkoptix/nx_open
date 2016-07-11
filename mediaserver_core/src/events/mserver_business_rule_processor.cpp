@@ -2,6 +2,7 @@
 
 #include <QtCore/QList>
 
+#include <version.h>
 #include "api/app_server_connection.h"
 
 #include "business/actions/panic_business_action.h"
@@ -48,6 +49,18 @@
 #include "utils/common/delayed.h"
 #include <business/business_event_connector.h>
 
+#if !defined(EDGE_SERVER)
+#include <providers/speach_synthesis_data_provider.h>
+#endif
+
+#include <providers/stored_file_data_provider.h>
+#include <streaming/audio_streamer_pool.h>
+#include <plugins/resource/archive/archive_stream_reader.h>
+#include <utils/common/systemerror.h>
+#include <utils/network/http/httptypes.h>
+#include "utils/network/http/asynchttpclient.h"
+#include <plugins/resource/avi/avi_resource.h>
+
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
     const QString tpEventLogoFilename(lit("eventLogoFilename"));
@@ -85,6 +98,8 @@ namespace {
 
     static const QChar kOldEmailDelimiter(L';');
     static const QChar kNewEmailDelimiter(L' ');
+
+    static const QByteArray kExecHttpActionContentType("text/plain");
 };
 
 struct QnEmailAttachmentData {
@@ -218,6 +233,16 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         case QnBusiness::ExecutePtzPresetAction:
             result = executePtzAction(action);
             break;
+        case QnBusiness::ExecHttpRequestAction:
+            result = executeHttpRequestAction(action);
+			break;
+
+        case QnBusiness::SayTextAction:
+            result = executeSayTextAction(action);
+            break;
+        case QnBusiness::PlaySoundAction:
+        case QnBusiness::PlaySoundOnceAction:
+            result = executePlaySoundAction(action);
         default:
             break;
         }
@@ -227,6 +252,85 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         qnServerDb->saveActionToDB(action);
 
     return result;
+}
+
+bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusinessActionPtr &action)
+{
+    const auto params = action->getParams();
+    const auto resource = qnResPool->getResourceById<QnSecurityCamResource>(params.actionResourceId);
+
+    if (!resource)
+        return false;
+
+    QnAudioTransmitterPtr transmitter;
+    if (resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
+        transmitter = resource->getAudioTransmitter();
+
+    if (!transmitter)
+        return false;
+
+
+    if (action->actionType() == QnBusiness::PlaySoundOnceAction)
+    {
+        auto url = lit("dbfile://notifications/") + params.url;
+
+        QnAviResourcePtr resource(new QnAviResource(url));
+        resource->setStatus(Qn::Online);
+        QnAbstractStreamDataProviderPtr provider(
+            resource->createDataProvider(Qn::ConnectionRole::CR_Default));
+
+        provider.dynamicCast<QnAbstractArchiveReader>()->setCycleMode(false);
+
+        transmitter->subscribe(provider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
+
+        provider->startIfNotRunning();
+    }
+    else
+    {
+
+        QnAbstractStreamDataProviderPtr provider;
+        if (action->getToggleState() == QnBusiness::ActiveState)
+        {
+            provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
+            transmitter->subscribe(provider, QnAbstractAudioTransmitter::kContinuousNotificationPriority);
+            provider->startIfNotRunning();
+        }
+        else if (action->getToggleState() == QnBusiness::InactiveState)
+        {
+            provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
+            transmitter->unsubscribe(provider.data());
+            if (provider->processorsCount() == 0)
+                QnAudioStreamerPool::instance()->destroyActionDataProvider(action);
+        }
+    }
+
+    return true;
+
+}
+
+bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusinessActionPtr& action)
+{
+#if !defined(EDGE_SERVER)
+    const auto params = action->getParams();
+    const auto text = params.sayText;
+    const auto resource = qnResPool->getResourceById<QnSecurityCamResource>(params.actionResourceId);
+    if (!resource)
+        return false;
+
+    QnAudioTransmitterPtr transmitter;
+    if (resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
+        transmitter = resource->getAudioTransmitter();
+
+    if (!transmitter)
+        return false;
+
+    QnAbstractStreamDataProviderPtr speachProvider(new QnSpeachSynthesisDataProvider(text));
+    transmitter->subscribe(speachProvider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
+    speachProvider->startIfNotRunning();
+    return true;
+#else
+    return true;
+#endif
 }
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessActionPtr& action)
@@ -244,6 +348,51 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessAct
     mediaServer->setPanicMode(val);
     propertyDictionary->saveParams(mediaServer->getId());
     return true;
+}
+
+bool QnMServerBusinessRuleProcessor::executeHttpRequestAction(const QnAbstractBusinessActionPtr& action)
+{
+    QUrl url(action->getParams().url);
+
+    if (action->getParams().text.isEmpty())
+    {
+        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType messageBody)
+        {
+            if( osErrorCode != SystemError::noError ||
+                statusCode != nx_http::StatusCode::ok )
+            {
+                qWarning() << "Failed to execute HTTP action for url "
+                    << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                    << "osErrorCode:" << osErrorCode
+                    << "HTTP result:" << statusCode
+                    << "message:" << messageBody;
+            }
+        };
+
+        return nx_http::downloadFileAsync(
+            url,
+            callback );
+    }
+    else
+    {
+        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode)
+        {
+            if( osErrorCode != SystemError::noError ||
+                statusCode != nx_http::StatusCode::ok )
+            {
+                qWarning() << "Failed to execute HTTP action for url "
+                           << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                           << "osErrorCode:" << osErrorCode
+                           << "HTTP result:" << statusCode;
+            }
+        };
+
+        return nx_http::uploadDataAsync(url,
+            action->getParams().text.toUtf8(),
+            kExecHttpActionContentType,
+            nx_http::HttpHeaders(),
+            callback);
+    }
 }
 
 bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessActionPtr& action)
@@ -691,7 +840,7 @@ QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusine
 void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusinessActionPtr& action) const
 {
     QStringList unfiltered = getRecipients(action);
-    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) 
+    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources()))
         unfiltered << user->getEmail();
 
     auto recipientsFilter = [](const QString& email)

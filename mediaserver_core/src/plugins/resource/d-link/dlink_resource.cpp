@@ -146,7 +146,6 @@ QSize QnDlink_cam_info::secondaryStreamResolution() const
 QnPlDlinkResource::QnPlDlinkResource()
 {
     setVendor(lit("Dlink"));
-    setDefaultAuth(QLatin1String("admin"), QLatin1String(""));
 }
 
 bool QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
@@ -229,6 +228,8 @@ QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
 CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
+
+    updateDefaultAuthIfEmpty(QLatin1String("admin"), QLatin1String(""));
 
     CLHttpStatus status;
     QByteArray cam_info_file = downloadFile(status, QLatin1String("config/stream_info.cgi"),  getHostAddress(), 80, 1000, getAuth());

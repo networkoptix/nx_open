@@ -3,7 +3,7 @@
 
 #include <QtCore/QtGlobal>
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
 
 #include <QtCore/QIODevice>
 #include <QtMultimedia/QAudioInput>
@@ -20,11 +20,12 @@
 #include "screen_grabber.h"
 #include "buffered_screen_grabber.h"
 #include <utils/media/voice_spectrum_analyzer.h>
+#include <plugins/resource/desktop_camera/desktop_data_provider_base.h>
 
 class CaptureAudioStream;
 class QnAbstractDataConsumer;
 
-class QnDesktopDataProvider: public QnAbstractMediaStreamDataProvider
+class QnDesktopDataProvider: public QnDesktopDataProviderBase
 {
     Q_OBJECT
 
@@ -41,16 +42,15 @@ public:
                         const QPixmap& logo       // logo over video
                        );
     virtual ~QnDesktopDataProvider();
-    QString lastErrorStr() const { return m_lastErrorStr; }
 
     virtual void start(Priority priority = InheritPriority) override;
 
-    void beforeDestroyDataProvider(QnAbstractDataConsumer* dataProviderWrapper);
+    virtual void beforeDestroyDataProvider(QnAbstractDataConsumer* dataProviderWrapper) override;
     void addDataProcessor(QnAbstractDataConsumer* consumer);
 
-    bool isInitialized() const;
+    virtual bool isInitialized() const override;
 
-    QnConstResourceAudioLayoutPtr getAudioLayout();
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 
     bool readyToStop() const;
 
@@ -131,14 +131,11 @@ private:
     QString m_lastErrorStr;
     bool m_capturingStopped;
     const QPixmap m_logo;
-    //QSet<void*> m_needKeyData;
     qint64 m_initTime;
     mutable QnMutex m_startMutex;
     bool m_started;
     bool m_isInitialized;
 
-    class QnDesktopAudioLayout;
-    QSharedPointer<QnDesktopAudioLayout> m_audioLayout;
     QPointer<QnVoiceSpectrumAnalyzer> m_soundAnalyzer;
 
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,  DWORD_PTR dwParam1, DWORD_PTR dwParam2);

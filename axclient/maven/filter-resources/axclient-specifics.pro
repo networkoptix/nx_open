@@ -12,7 +12,8 @@ INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${qt.dir}/include/QtGui/$$QT_VERSION/QtGui/ \
                 ${root.dir}/appserver2/src/ \
                 ${root.dir}/client.core/src/ \
-                ${root.dir}/client/src/
+                ${root.dir}/client/src/ \
+                ${root.dir}/common_libs/nx_speach_synthesizer/src/
               
 CONFIG(debug, debug|release) {
   QMAKE_POST_LINK = ..\${arch}\post.bat debug ${arch};

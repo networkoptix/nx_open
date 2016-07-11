@@ -37,7 +37,6 @@ QnStardotResource::QnStardotResource():
     m_motionMaskBinData(0)
 {
     setVendor(lit("Stardot"));
-    setDefaultAuth(lit("admin"), lit("admin"));
 }
 
 QnStardotResource::~QnStardotResource()
@@ -134,6 +133,10 @@ void QnStardotResource::parseInfo(const QByteArray& info)
 CameraDiagnostics::Result QnStardotResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
+
+    updateDefaultAuthIfEmpty(lit("admin"), lit("admin"));
+
+
     CLHttpStatus status;
        
     QByteArray resList = makeStardotRequest(lit("info.cgi?resolutions&api=2"), status);

@@ -40,7 +40,8 @@
 
         <project.version.code>${buildNumber}</project.version.code>
         <project.version.name>${release.version}</project.version.name>
-        <provisioning_profile>${customization.dir}/mobile_client/ios/provisioning_profiles/testing.mobileprovision</provisioning_profile>
+        <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/testing.mobileprovision</provisioning_profile>
+        <mobile_client_entitlements>mobile_client-beta.entitlements</mobile_client_entitlements>
         <provisioning_profile_id/>
     </properties>   
 
@@ -118,7 +119,8 @@
                 </property>
             </activation>
             <properties>
-                <provisioning_profile>${customization.dir}/mobile_client/ios/provisioning_profiles/production.mobileprovision</provisioning_profile>
+                <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/production.mobileprovision</provisioning_profile>
+                <mobile_client_entitlements>mobile_client-release.entitlements</mobile_client_entitlements>
             </properties>
         </profile>
 

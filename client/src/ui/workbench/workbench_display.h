@@ -36,6 +36,7 @@ class QnAbstractRenderer;
 
 class QnWorkbench;
 class QnWorkbenchItem;
+
 class QnWorkbenchLayout;
 class QnResourceWidget;
 class QnResourceDisplay;
@@ -58,7 +59,7 @@ class QnCamDisplay;
 
 /**
  * This class ties a workbench, a scene and a view together.
- * 
+ *
  * It presents some low-level functions for viewport and item manipulation.
  */
 class QnWorkbenchDisplay: public Connective<QObject>, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations {
@@ -70,7 +71,7 @@ class QnWorkbenchDisplay: public Connective<QObject>, public QnWorkbenchContextA
 public:
     /**
      * Constructor.
-     * 
+     *
      * \param parent                    Parent object for this workbench display.
      */
     QnWorkbenchDisplay(QObject *parent = NULL);
@@ -93,7 +94,7 @@ public:
     void setLightMode(Qn::LightModeFlags mode);
 
     /**
-     * \returns                         Instrument manager owned by this workbench display. 
+     * \returns                         Instrument manager owned by this workbench display.
      */
     InstrumentManager *instrumentManager() const {
         return m_instrumentManager;
@@ -164,7 +165,7 @@ public:
     void setScene(QGraphicsScene *scene);
 
     /**
-     * \returns                         Current graphics view of this workbench display. 
+     * \returns                         Current graphics view of this workbench display.
      *                                  May be NULL.
      */
     QnGraphicsView *view() const {
@@ -177,17 +178,17 @@ public:
     void setView(QnGraphicsView *view);
 
     /**
-     * \returns                         Grid item. 
+     * \returns                         Grid item.
      */
     QnGridItem *gridItem() const;
 
     /**
-     * \returns                         Curtain item (that is painted in black when a single widget is zoomed). 
+     * \returns                         Curtain item (that is painted in black when a single widget is zoomed).
      */
     QnCurtainItem* curtainItem() const;
 
     /**
-     * \returns                         Curtain item animator. 
+     * \returns                         Curtain item animator.
      */
     QnCurtainAnimator* curtainAnimator() const;
 
@@ -226,7 +227,7 @@ public:
 
     /**
      * \param item                      Item to get enclosing geometry for.
-     * \returns                         Given item's enclosing geometry in scene 
+     * \returns                         Given item's enclosing geometry in scene
      *                                  coordinates as defined by the model.
      *                                  Note that actual geometry may differ because of
      *                                  aspect ration constraints.
@@ -261,10 +262,10 @@ public:
     QRectF boundedViewportGeometry() const;
 
     /**
-     * This function can be used in case the "actual" viewport differs from the 
+     * This function can be used in case the "actual" viewport differs from the
      * "real" one. This can be the case if control panels are drawn on the scene.
      *
-     * \param margins                   New viewport margins. 
+     * \param margins                   New viewport margins.
      */
     void setViewportMargins(const QMargins &margins);
 
@@ -297,12 +298,12 @@ public:
     qreal layerZValue(Qn::ItemLayer layer) const;
 
     void synchronize(QnWorkbenchItem *item, bool animate = true);
-    
+
     void synchronize(QnResourceWidget *widget, bool animate = true);
 
 
     QPoint mapViewportToGrid(const QPoint &viewportPoint) const;
-    
+
     QPoint mapGlobalToGrid(const QPoint &globalPoint) const;
 
     QPointF mapViewportToGridF(const QPoint &viewportPoint) const;
@@ -322,6 +323,9 @@ public:
     QRectF raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const;
 
     QGLWidget *newGlWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) const;
+
+    QSet<QnWorkbenchItem*> draggedItems() const;
+    void setDraggedItems(const QSet<QnWorkbenchItem*>& value);
 
 public slots:
     void fitInView(bool animate = true);
@@ -454,7 +458,6 @@ private:
     /** Zoomed state toggle. */
     QnToggle *m_zoomedToggle;
 
-
     /* Internal state. */
 
     QList<QnResourceWidget *> m_widgets;
@@ -496,6 +499,8 @@ private:
 
     /** Whether we are changing layout now. */
     bool m_inChangeLayout;
+
+    QSet<QnWorkbenchItem*> m_draggedItems;
 
 
     /* Instruments. */

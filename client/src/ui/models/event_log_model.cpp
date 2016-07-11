@@ -401,6 +401,9 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
             static const auto kUsersTempltate = tr("%1 users");
             return kUsersTempltate.arg(QString::number(users.size()));
         }
+        else if (actionType == QnBusiness::ExecHttpRequestAction) {
+            return QUrl(action.actionParams.url).toString(QUrl::RemoveUserInfo);
+        }
         else
             return getResourceNameString(action.actionParams.actionResourceId);
     }

@@ -13,11 +13,11 @@ namespace QnBusiness {
         case SendMailAction:
         case DiagnosticsAction:
         case ShowPopupAction:
+            return false;
+
         case PlaySoundOnceAction:
         case PlaySoundAction:
         case SayTextAction:
-            return false;
-
         case CameraOutputAction:
         case CameraOutputOnceAction:
         case BookmarkAction:
@@ -48,6 +48,7 @@ namespace QnBusiness {
         case ExecutePtzPresetAction:
         case ShowTextOverlayAction:
         case ShowOnAlarmLayoutAction:
+        case ExecHttpRequestAction:
             return false;
 
         case SendMailAction:
@@ -70,6 +71,8 @@ namespace QnBusiness {
         case SayTextAction:
         case ExecutePtzPresetAction:
         case ShowOnAlarmLayoutAction:
+            return false;
+        case ExecHttpRequestAction:
             return false;
 
         case CameraOutputAction:
@@ -147,6 +150,7 @@ namespace QnBusiness {
             << ExecutePtzPresetAction
             << ShowTextOverlayAction
             << ShowOnAlarmLayoutAction
+            << ExecHttpRequestAction
             ;
         return result;
     }

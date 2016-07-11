@@ -62,6 +62,16 @@ public:
     static bool multiChoiceListIsValid() { return true; }
 };
 
+class QnCameraAudioTransmitPolicy {
+    Q_DECLARE_TR_FUNCTIONS(QnCameraAudioTransmitPolicy)
+public:
+    typedef QnVirtualCameraResource resource_type;
+    static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
+    static QString getText(const QnResourceList &resources, const bool detailed = true);
+    static inline bool emptyListIsValid() { return true; }
+    static bool multiChoiceListIsValid() { return true; }
+};
+
 class QnCameraRecordingPolicy {
     Q_DECLARE_TR_FUNCTIONS(QnCameraRecordingPolicy)
 public:

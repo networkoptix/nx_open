@@ -84,13 +84,20 @@ int QnDesktopCameraStreamReader::processTextResponse()
             bufferSize += 4;
         }
     }
-    
+
     if (startPos == -1)
         return -1;
-    
+
     QByteArray textMessage = QByteArray::fromRawData((char*)m_recvBuffer, startPos);
     memmove(m_recvBuffer, m_recvBuffer + startPos, bufferSize - startPos);
     return bufferSize - startPos;
+}
+
+QnAbstractMediaDataPtr QnDesktopCameraStreamReader::createEmptyPacket()
+{
+    QnAbstractMediaDataPtr eofData(new QnEmptyMediaData());
+    eofData->dataProvider = this;
+    return eofData;
 }
 
 QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
@@ -101,23 +108,23 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
     QnAbstractMediaDataPtr result;
 
     int bufferSize = 0;
-    while (!m_needStop && m_socket->isConnected() && !result) 
+    while (!m_needStop && m_socket->isConnected() && !result)
     {
-        while (m_socket->isConnected() && bufferSize < 4) 
+        while (m_socket->isConnected() && bufferSize < 4)
         {
             int readed = m_socket->recv(m_recvBuffer + bufferSize, 4 - bufferSize);
             if (readed > 0)
                 bufferSize += readed;
             else {
                 m_socket->close();
-                return result;
+                return createEmptyPacket();
             }
 
             if (bufferSize == 4 && (m_recvBuffer[0] != '$' || m_recvBuffer[1] > 1)) // check for streamID [0..1] as well
                 bufferSize = processTextResponse();
         }
         if (!m_socket->isConnected())
-            return result;
+            return createEmptyPacket();
 
         int packetSize = (m_recvBuffer[2]<<8) + m_recvBuffer[3];
         quint8 streamIndex = m_recvBuffer[1];
@@ -134,7 +141,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
             }
             else {
                 m_socket->close();
-                return result;
+                return createEmptyPacket();
             }
         }
         if (streamIndex >= MEDIA_STREAM_COUNT)
@@ -153,17 +160,17 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         }
         bufferSize = 0;
 
-        if (!m_needStop 
-            && m_socket->isConnected() 
+        if (!m_needStop
+            && m_socket->isConnected()
             && m_keepaliveTimer.elapsed() >= KEEP_ALIVE_INTERVAL
-            && QnDesktopCameraResourceSearcher::instance()) 
+            && QnDesktopCameraResourceSearcher::instance())
         {
             quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
             QString request = QString(lit("KEEP-ALIVE %1 RTSP/1.0\r\ncSeq: %2\r\n\r\n")).arg("*").arg(cseq);
             if (m_socket->send(request.toLatin1()) < request.size())
             {
                 m_socket->close();
-                return result;
+                return createEmptyPacket();
             }
             m_keepaliveTimer.restart();
         }

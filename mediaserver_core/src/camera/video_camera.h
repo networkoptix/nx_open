@@ -104,6 +104,6 @@ private:
     QElapsedTimer m_lastActivityTimer;
 };
 
-typedef std::shared_ptr<QnVideoCamera> QnVideoCameraPtr;
+typedef QnSharedResourcePointer<QnVideoCamera> QnVideoCameraPtr;
 
 #endif // __VIDEO_CAMERA_H__

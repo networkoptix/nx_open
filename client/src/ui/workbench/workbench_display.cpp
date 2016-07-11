@@ -370,6 +370,27 @@ QGLWidget *QnWorkbenchDisplay::newGlWidget(QWidget *parent, Qt::WindowFlags wind
     return QnGlWidgetFactory::create<QnGLWidget>(parent, windowFlags);
 }
 
+QSet<QnWorkbenchItem*> QnWorkbenchDisplay::draggedItems() const
+{
+    return m_draggedItems;
+}
+
+void QnWorkbenchDisplay::setDraggedItems(const QSet<QnWorkbenchItem*>& value)
+{
+    if (m_draggedItems == value)
+        return;
+
+    auto stoppedDragging = m_draggedItems - value;
+    m_draggedItems = value;
+
+    for (auto item: stoppedDragging)
+    {
+        if (!item)
+            continue;
+        synchronizeGeometry(item, true);
+    }
+}
+
 void QnWorkbenchDisplay::initSceneView() {
     assert(m_scene && m_view);
 
@@ -1378,13 +1399,22 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnWorkbenchItem *item, bool animate
     synchronizeGeometry(widget, animate);
 }
 
-void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool animate) {
-    if(widget == NULL) {
+void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool animate)
+{
+    if (!widget)
+    {
         qnNullWarning(widget);
         return;
     }
-
     QnWorkbenchItem *item = widget->item();
+
+    if (m_draggedItems.contains(item))
+    {
+        qDebug() << "cannot sync geometry for dragged item";
+        return;
+    }
+
+
     QnResourceWidget *zoomedWidget = m_widgetByRole[Qn::ZoomedRole];
     QnResourceWidget *raisedWidget = m_widgetByRole[Qn::RaisedRole];
 

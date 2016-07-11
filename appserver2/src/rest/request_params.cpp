@@ -82,12 +82,12 @@ namespace ec2
             deserialize(params, lit("info_openGLRenderer"),     &data->clientInfo.openGLRenderer);
         }
 
-        return 
+        return
             deserialize(params, lit("login"),  &data->login) &&
             deserialize(params, lit("digest"), &data->passwordHash);
     }
 
-    void toUrlParams(const ApiLoginData& data, QUrlQuery* query) 
+    void toUrlParams(const ApiLoginData& data, QUrlQuery* query)
     {
         serialize(data.login,        lit("login"),  query);
         serialize(data.passwordHash, lit("digest"), query);
@@ -109,5 +109,4 @@ namespace ec2
 
     bool parseHttpRequestParams(const QString&, const QnRequestParamList &, std::nullptr_t *) { return true; }
     void toUrlParams(const std::nullptr_t &, QUrlQuery *) {}
-
 }

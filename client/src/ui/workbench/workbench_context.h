@@ -23,9 +23,7 @@ class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchUserWatcher;
 class QnWorkbenchLayoutWatcher;
-#ifdef Q_OS_WIN
 class QnWorkbenchDesktopCameraWatcher;
-#endif
 class QnActionManager;
 
 /**

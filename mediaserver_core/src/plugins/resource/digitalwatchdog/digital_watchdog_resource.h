@@ -29,6 +29,9 @@ public:
     CLSimpleHTTPClient httpClient() const;
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
+
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const override;
     virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params) override;
     virtual QSet<QString> calculateSupportedAdvancedParameters() const override;
@@ -42,6 +45,7 @@ private:
     void enableOnvifSecondStream();
     QString fetchCameraModel();
     bool disableB2FramesForActiDW();
+    bool isCproChipset() const;
 private:
     bool m_hasZoom;
 

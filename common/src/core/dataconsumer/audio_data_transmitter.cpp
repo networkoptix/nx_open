@@ -2,53 +2,131 @@
 
 #include "audio_data_transmitter.h"
 #include <utils/common/sleep.h>
+#include <core/resource/resource.h>
 #include <QFile>
 
-QnAbstractAudioTransmitter::QnAbstractAudioTransmitter() :
-    QnAbstractDataConsumer(1000)
+QnAbstractAudioTransmitter::QnAbstractAudioTransmitter():
+    QnAbstractDataConsumer(1000),
+    m_transmittedPacketDuration(0),
+    m_prevUsedProvider(nullptr)
 {
-    qDebug() << "Abstract Audio data Transmitter ctor";
+
+}
+
+void QnAbstractAudioTransmitter::endOfRun()
+{
+    QnMutexLocker lock(&m_mutex);
+    while (!m_providers.empty())
+        unsubscribeUnsafe(m_providers.begin()->second.data());
+    m_prevUsedProvider = nullptr;
+}
+
+void QnAbstractAudioTransmitter::makeRealTimeDelay(const QnConstCompressedAudioDataPtr& audioData)
+{
+    m_transmittedPacketDuration += audioData->getDurationMs();
+    qint64  diff = m_transmittedPacketDuration - m_elapsedTimer.elapsed();
+    if(diff > 0)
+        QnSleep::msleep(diff);
 }
 
 bool QnAbstractAudioTransmitter::processData(const QnAbstractDataPacketPtr &data)
 {
-    QnConstAbstractDataPacketPtr constData(data);
-    QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(constData);
+    QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
+    if (!media)
+        return true;
 
-    auto dataProviderCopy = m_dataProvider; //< this shared pointer could be modified from the other thread
-    if (dataProviderCopy && dataProviderCopy.data() == data->dataProvider)
+    if (media->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
-        if (media->dataType == QnAbstractMediaData::AUDIO)
-            return processAudioData(media);
+        unsubscribe(media->dataProvider);
+        return true;
+    }
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_providers.empty() || m_providers.begin()->second != data->dataProvider)
+            return true; //< data from non active provider
+    }
+
+    if (auto audioData = std::dynamic_pointer_cast<const QnCompressedAudioData>(data))
+    {
+        if (m_prevUsedProvider != data->dataProvider)
+        {
+            m_prevUsedProvider = data->dataProvider;
+            m_transmittedPacketDuration = 0;
+            m_elapsedTimer.restart();
+            prepare();
+        }
+        if (!processAudioData(audioData))
+            return false;
+
+        makeRealTimeDelay(audioData);
     }
 
     return true;
 }
 
-void QnAbstractAudioTransmitter::unsubscribe(QnLiveStreamProviderPtr dataProvider)
+void QnAbstractAudioTransmitter::unsubscribe(QnAbstractStreamDataProvider* dataProvider)
 {
-    if (dataProvider && dataProvider == m_dataProvider)
-    {
-        dataProvider->getOwner()->notInUse(this);
-        dataProvider->removeDataProcessor(this);
-        m_dataProvider.clear();
-        stop();
-    }
+    QnMutexLocker lock(&m_mutex);
+    unsubscribeUnsafe(dataProvider);
 }
 
-
-void QnAbstractAudioTransmitter::subscribe(QnLiveStreamProviderPtr dataProvider)
+void QnAbstractAudioTransmitter::removePacketsByProvider(QnAbstractStreamDataProvider* dataProvider)
 {
-    if (m_dataProvider)
+    m_dataQueue.lock();
+    for (int i = m_dataQueue.size() - 1; i >= 0; --i)
     {
-        m_dataProvider->getOwner()->notInUse(this);
-        m_dataProvider->removeDataProcessor(this);
+        auto packet = m_dataQueue.atUnsafe(i);
+        if (packet && packet->dataProvider == dataProvider)
+            m_dataQueue.remoteAtUnsafe(i);
+    }
+    m_dataQueue.unlock();
+}
+
+void QnAbstractAudioTransmitter::unsubscribeUnsafe(QnAbstractStreamDataProvider* dataProvider)
+{
+    for (auto itr = m_providers.begin(); itr != m_providers.end(); ++itr)
+    {
+        auto provider = itr->second;
+        if (provider == dataProvider)
+        {
+            if (auto owner = provider->getOwner())
+                owner->notInUse(this);
+            provider->removeDataProcessor(this);
+            removePacketsByProvider(dataProvider);
+            m_providers.erase(itr);
+            break;
+        }
     }
 
-    m_dataProvider = dataProvider;
+    if (m_providers.empty())
+        pleaseStop();
+}
+
+void QnAbstractAudioTransmitter::subscribe(
+    QnAbstractStreamDataProviderPtr dataProvider,
+    int priorityClass)
+{
+    if (!dataProvider)
+        return;
+
+    // add timestamp to priority class (6 lower bytes is timestamp, 2 high byte priorityClass)
+    qint64 priority = ((qint64)priorityClass << 48) + QDateTime::currentMSecsSinceEpoch();
+
+    QnMutexLocker lock(&m_mutex);
+    for (auto itr = m_providers.begin(); itr != m_providers.end(); ++itr)
+    {
+        if (itr->second == dataProvider)
+            return; // already exists
+    }
+
+    m_providers.emplace(priority, dataProvider);
+
     dataProvider->addDataProcessor(this);
+    if (auto owner = dataProvider->getOwner())
+        owner->inUse(this);
     dataProvider->startIfNotRunning();
-    dataProvider->getOwner()->inUse(this);
+
     start();
 }
 

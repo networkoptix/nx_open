@@ -77,6 +77,7 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
         case QnBusiness::ExecutePtzPresetAction:
         case QnBusiness::ShowTextOverlayAction:
         case QnBusiness::ShowOnAlarmLayoutAction:
+        case QnBusiness::ExecHttpRequestAction:
             break;
 
         default:

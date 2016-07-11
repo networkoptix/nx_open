@@ -8,7 +8,7 @@
 
 QnMdnsResourceSearcher::QnMdnsResourceSearcher()
 {
-    QnMdnsListener::instance()->registerConsumer((long) this);
+    QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
 }
 
 QnMdnsResourceSearcher::~QnMdnsResourceSearcher()
@@ -25,7 +25,7 @@ QnResourceList QnMdnsResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    QnMdnsListener::ConsumerDataList data = QnMdnsListener::instance()->getData((long) this);
+    QnMdnsListener::ConsumerDataList data = QnMdnsListener::instance()->getData((std::uintptr_t) this);
     for (int i = 0; i < data.size(); ++i)
     {
         const QString& localAddress = data[i].localAddress;

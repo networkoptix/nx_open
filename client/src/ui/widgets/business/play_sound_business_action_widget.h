@@ -33,6 +33,7 @@ private slots:
     void at_manageButton_clicked();
     void at_soundModel_itemChanged(const QString &filename);
     void at_volumeSlider_valueChanged(int value);
+
 private:
     QScopedPointer<Ui::PlaySoundBusinessActionWidget> ui;
 

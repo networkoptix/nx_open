@@ -19,6 +19,8 @@
 #include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
 
 namespace
 {
@@ -171,7 +173,7 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
     colors(),
 
     q_ptr(owner),
-    
+
     m_started(false),
     m_state(OK),
     m_requestHandle(0),
@@ -246,7 +248,7 @@ void QnTwoWayAudioWidgetPrivate::startStreaming()
     if (!camera)
         return;
 
-    auto server = camera->getParentServer();
+    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
     if (!server || server->getStatus() != Qn::Online)
         return;
 
@@ -297,13 +299,14 @@ void QnTwoWayAudioWidgetPrivate::stopStreaming()
     if (!camera)
         return;
 
-    auto server = camera->getParentServer();
+    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
     if (!server || server->getStatus() != Qn::Online)
         return;
 
     //TODO: #GDM What should we do if we cannot stop streaming?
-    if (m_state != Error)
-        server->restConnection()->twoWayAudioCommand(camera->getId(), false, rest::ServerConnection::GetCallback());
+
+    /* Sending stop anyway, because we can get here in 'Streaming is not ready' error state. */
+    server->restConnection()->twoWayAudioCommand(camera->getId(), false, rest::ServerConnection::GetCallback());
 }
 
 void QnTwoWayAudioWidgetPrivate::setFixedHeight(qreal height)

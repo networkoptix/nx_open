@@ -12,7 +12,7 @@ class QnSayTextBusinessActionWidget: public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
-    
+
 public:
     explicit QnSayTextBusinessActionWidget(QWidget *parent = 0);
     ~QnSayTextBusinessActionWidget();

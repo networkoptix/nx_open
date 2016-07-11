@@ -93,7 +93,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             continue;
         }
         QnSecurityCamResourcePtr existRes = qnResPool->getResourceById<QnSecurityCamResource>((*itr)->getId());
-        if (existRes && existRes->hasFlags(Qn::foreigner))
+        if (existRes && existRes->hasFlags(Qn::foreigner) && !existRes->hasFlags(Qn::desktop_camera))
         {
             m_tmpForeignResources.insert(camRes->getId(), camRes);
             itr = resources.erase(itr);

@@ -10,7 +10,6 @@ const QString QnPlIqResource::MANUFACTURE(lit("IqEye"));
 QnPlIqResource::QnPlIqResource()
 {
     setVendor(lit("IqEye"));
-    setDefaultAuth(lit("root"), lit("system"));
 }
 
 QString QnPlIqResource::getDriverName() const
@@ -43,6 +42,10 @@ void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
 CameraDiagnostics::Result QnPlIqResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
+
+    updateDefaultAuthIfEmpty(lit("root"), lit("system"));
+
+
     const CLHttpStatus status = setOID(QLatin1String("1.2.6.5"), QLatin1String("1")); // Reset crop to maximum size
     switch( status )
     {

@@ -154,6 +154,7 @@ QN_HELP_TOPIC(EventsActions_ShowOnAlarmLayout_Help,             "showing_cameras
 QN_HELP_TOPIC(EventsActions_Bookmark_Help,                      "create_bookmark.htm")
 QN_HELP_TOPIC(EventsActions_ExecutePtzPreset_Help,              "execute_ptz_preset.htm")
 QN_HELP_TOPIC(EventsActions_ShowTextOverlay_Help,               "display_text_on_cameras.htm")
+QN_HELP_TOPIC(EventsActions_ExecHttpRequest_Help,               "http_action.htm")
 
 QN_HELP_TOPIC(EventsActions_EcConnectionLost_Help,				"ec_connection_lost.htm")
 QN_HELP_TOPIC(EventsActions_NoLicenses_Help,					"licenses_are_not_configured.htm")

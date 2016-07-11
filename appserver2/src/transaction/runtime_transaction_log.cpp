@@ -1,5 +1,8 @@
 #include "runtime_transaction_log.h"
 
+#include <utils/common/log.h>
+
+
 namespace ec2
 {
 
@@ -81,8 +84,20 @@ bool QnRuntimeTransactionLog::contains(const QnTranState& state) const
     QnMutexLocker lock( &m_mutex );
     for (auto itr = state.values.begin(); itr != state.values.end(); ++itr)
     {
-        if (itr.value() > m_state.values.value(itr.key()))
+        if (!m_state.values.contains(itr.key()))
+        {
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Runtime info for peer %1 (dbId %2) is missing...")
+                .arg(itr.key().peerID.toString()).arg(itr.key().dbID.toString()), cl_logDEBUG1);
             return false;
+        }
+
+        if (itr.value() > m_state.values.value(itr.key()))
+        {
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Runtime info for peer %1 (dbId %2) is old (%3 vs %4) ...")
+                .arg(itr.key().peerID.toString()).arg(itr.key().dbID.toString())
+                .arg(m_state.values.value(itr.key())).arg(itr.value()), cl_logDEBUG1);
+            return false;
+        }
     }
     return true;
 }
