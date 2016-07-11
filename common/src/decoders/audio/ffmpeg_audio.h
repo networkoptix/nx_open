@@ -16,13 +16,14 @@ public:
     ~CLFFmpegAudioDecoder();
 
     static AVSampleFormat audioFormatQtToFfmpeg(const QnAudioFormat& fmt);
-
+    bool isInitialized() const;
 private:
     AVCodec *codec;
     AVCodecContext *c; // TODO: #vasilenko please name these members properly
 
     static bool m_first_instance;
     CodecID m_codec;
+    bool m_initialized;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

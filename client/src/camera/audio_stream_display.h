@@ -22,7 +22,7 @@ public:
     QnAudioStreamDisplay(int buffMs, int prebufferMs);
     ~QnAudioStreamDisplay();
 
-    void putData(QnCompressedAudioDataPtr data, qint64 minTime = 0);
+    bool putData(QnCompressedAudioDataPtr data, qint64 minTime = 0);
     void enqueueData(QnCompressedAudioDataPtr data, qint64 minTime = 0);
     void suspend();
 
@@ -43,9 +43,9 @@ public:
     // returns start buffering time or AV_NOPTS_VALUE if audio is not buffering
     qint64 startBufferingTime() const;
 
-    // returns false if format is not supported 
+    // returns false if format is not supported
     bool isFormatSupported() const;
-    
+
     // forcing downmixing, even if output device supports multichannel output
     void setForceDownmix(bool value);
 
