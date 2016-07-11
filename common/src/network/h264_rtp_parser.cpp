@@ -505,7 +505,7 @@ bool CLH264RtpParser::processData(
                     return clearInternalBuffer();
 
                 nalUnitType = *curPtr & 0x1f;
-                m_chunks.emplace_back(Chunk(curPtr-rtpBufferBase, nalUnitLen, true));
+                m_chunks.emplace_back(curPtr-rtpBufferBase, nalUnitLen, true);
                 m_videoFrameSize += nalUnitLen + 4;
                 updateNalFlags(curPtr, bufferEnd - curPtr);
                 curPtr += nalUnitLen;
@@ -553,7 +553,7 @@ bool CLH264RtpParser::processData(
                 --curPtr;
                 *curPtr = nalUnitType;
             }
-            m_chunks.emplace_back(Chunk(curPtr-rtpBufferBase, bufferEnd - curPtr, m_packetPerNal == 0));
+            m_chunks.emplace_back(curPtr-rtpBufferBase, bufferEnd - curPtr, m_packetPerNal == 0);
             m_videoFrameSize += bufferEnd - curPtr + (m_packetPerNal == 0 ? 4 : 0);
             break;
         }
@@ -568,7 +568,7 @@ bool CLH264RtpParser::processData(
         {
             curPtr--;
             nalUnitType = *curPtr & 0x1f;
-            m_chunks.emplace_back(Chunk(curPtr-rtpBufferBase, bufferEnd - curPtr, true));
+            m_chunks.emplace_back(curPtr-rtpBufferBase, bufferEnd - curPtr, true);
             m_videoFrameSize += bufferEnd - curPtr + 4;
             updateNalFlags(curPtr, bufferEnd - curPtr);
             break; // ignore unknown data
