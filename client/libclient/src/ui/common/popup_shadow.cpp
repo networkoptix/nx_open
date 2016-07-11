@@ -25,7 +25,8 @@ public:
             Qt::FramelessWindowHint |
             Qt::NoDropShadowWindowHint |
             Qt::WindowTransparentForInput |
-            Qt::WindowDoesNotAcceptFocus);
+            Qt::WindowDoesNotAcceptFocus |
+            Qt::BypassGraphicsProxyWidget);
 
         shadow->setWindowFlags(shadow->windowFlags() | kExtraFlags);
         shadow->setAttribute(Qt::WA_TranslucentBackground);
