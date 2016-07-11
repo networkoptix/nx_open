@@ -1,9 +1,7 @@
 #pragma once
 
 #include <QtCore/QString>
-
-#include <utils/common/qt_private_headers.h>
-#include QT_CORE_PRIVATE_HEADER(qsimd_p.h)
+#include <QtCore/private/qsimd_p.h>
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
 #include <xmmintrin.h>

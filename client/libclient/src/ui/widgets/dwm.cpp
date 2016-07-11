@@ -11,20 +11,8 @@
 
 #include <utils/common/invocation_event.h>
 
-#ifdef QN_HAS_DWM
-#if QT_VERSION == 0x050201
-#include <QtWidgets/5.2.1/QtWidgets/private/qwidget_p.h>
-#elif QT_VERSION == 0x050401
-#include <QtWidgets/5.4.1/QtWidgets/private/qwidget_p.h>
-#elif QT_VERSION == 0x050500
-#include <QtWidgets/5.5.0/QtWidgets/private/qwidget_p.h>
-#elif QT_VERSION == 0x050501
-#include <QtWidgets/5.5.1/QtWidgets/private/qwidget_p.h>
-#elif QT_VERSION == 0x050600
-#include <QtWidgets/5.6.0/QtWidgets/private/qwidget_p.h>
-#else
-#error "Include proper header here!"
-#endif
+#if defined(QN_HAS_DWM)
+#include <QtWidgets/private/qwidget_p.h>
 
 #include <qt_windows.h>
 #include <utils/qt5port_win.h>
@@ -634,5 +622,3 @@ bool QnDwmPrivate::getMinMaxInfoEvent(MSG *message, long *result) {
 }
 
 #endif // QN_HAS_DWM
-
-

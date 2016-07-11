@@ -1,11 +1,8 @@
-#ifndef QN_EVENT_LOOP_H
-#define QN_EVENT_LOOP_H
+#pragma once
 
 #include <QtCore/QThread>
-
-#ifndef Q_OS_ANDROID
-    #include <utils/common/qt_private_headers.h>
-    #include QT_CORE_PRIVATE_HEADER(qthread_p.h)
+#if !defined(Q_OS_ANDROID)
+    #include <QtCore/private/qthread_p.h>
 #endif
 
 /**
@@ -17,13 +14,12 @@
  *                                      compilation. Therefore it should be used for
  *                                      error checking only.
  */
-inline bool qnHasEventLoop(QThread *thread) {
-#ifndef Q_OS_ANDROID
+inline bool qnHasEventLoop(QThread* thread)
+{
+#if !defined(Q_OS_ANDROID)
     int loopLevel = QThreadData::get2(thread)->loopLevel;
     return loopLevel > 0;
 #else
     return true;
 #endif
 }
-
-#endif // QN_EVENT_LOOP_H
