@@ -20,9 +20,9 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     QnWorkbenchStateDelegate(parent),
     m_reconnectOnPasswordChange(true)
 {
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived, this,  &QnWorkbenchUserWatcher::forcedUpdate);
+    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived, this, &QnWorkbenchUserWatcher::forcedUpdate);
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved,   this,   &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
 }
 
 QnWorkbenchUserWatcher::~QnWorkbenchUserWatcher() {}
@@ -41,7 +41,7 @@ void QnWorkbenchUserWatcher::forcedUpdate()
 
 void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
 {
-    if(m_user == user)
+    if (m_user == user)
         return;
 
     if (m_user)
@@ -54,10 +54,10 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
     if (m_user)
     {
         m_userDigest = m_user->getDigest();
-        connect(m_user, &QnResource::resourceChanged,        this, &QnWorkbenchUserWatcher::at_user_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
+        connect(m_user, &QnResource::resourceChanged, this, &QnWorkbenchUserWatcher::at_user_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
         connect(m_user, &QnUserResource::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
-        connect(m_user, &QnUserResource::userGroupChanged,   this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
-        connect(m_user, &QnUserResource::enabledChanged,     this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
+        connect(m_user, &QnUserResource::userGroupChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
+        connect(m_user, &QnUserResource::enabledChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
         connect(m_user, &QnUserResource::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
 
     }
@@ -65,8 +65,9 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
     emit userChanged(user);
 }
 
-void QnWorkbenchUserWatcher::setUserName(const QString &name) {
-    if(m_userName == name)
+void QnWorkbenchUserWatcher::setUserName(const QString &name)
+{
+    if (m_userName == name)
         return;
     m_userName = name;
     setCurrentUser(calculateCurrentUser());
@@ -104,18 +105,21 @@ void QnWorkbenchUserWatcher::setReconnectOnPasswordChange(bool reconnect)
 }
 
 
-QnUserResourcePtr QnWorkbenchUserWatcher::calculateCurrentUser() const {
-    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>()) {
-        if ( user->getName().toLower() != m_userName.toLower() )
+QnUserResourcePtr QnWorkbenchUserWatcher::calculateCurrentUser() const
+{
+    for (const QnUserResourcePtr &user : qnResPool->getResources<QnUserResource>())
+    {
+        if (user->getName().toLower() != m_userName.toLower())
             continue;
         return user;
     }
     return QnUserResourcePtr();
 }
 
-void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
+void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
+{
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if(!user || user != m_user)
+    if (!user || user != m_user)
         return;
 
     setCurrentUser(QnUserResourcePtr());
@@ -123,7 +127,8 @@ void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr
         menu()->trigger(QnActions::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
 }
 
-bool QnWorkbenchUserWatcher::isReconnectRequired(const QnUserResourcePtr &user) {
+bool QnWorkbenchUserWatcher::isReconnectRequired(const QnUserResourcePtr &user)
+{
     if (m_userName.isEmpty())
         return false;   //we are not connected
 
@@ -145,7 +150,8 @@ bool QnWorkbenchUserWatcher::isReconnectRequired(const QnUserResourcePtr &user) 
     return false;
 }
 
-void QnWorkbenchUserWatcher::at_user_resourceChanged(const QnResourcePtr &resource) {
+void QnWorkbenchUserWatcher::at_user_resourceChanged(const QnResourcePtr &resource)
+{
     if (!isReconnectRequired(resource.dynamicCast<QnUserResource>()))
         return;
     emit reconnectRequired();
