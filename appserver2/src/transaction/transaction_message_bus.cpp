@@ -757,7 +757,6 @@ namespace ec2
                 break;
             default:
             {
-                bool isCommonTransaction = false;
                 switch (tran.command)
                 {
                     case ApiCommand::installUpdate:
@@ -789,7 +788,6 @@ namespace ec2
                         break;
                     }
                     default:
-                        isCommonTransaction = true;
                         // These ones are 'general' transactions. They will go through the DbManager 
                         // and also will be notified about via the relevant notification manager.
                         if (!tran.persistentInfo.isNull() && detail::QnDbManager::instance())
@@ -824,7 +822,7 @@ namespace ec2
                         break;
                 }
 
-                if (m_handler && (!isCommonTransaction || qnCommon->localPeerType() != Qn::PT_Server))
+                if (m_handler)
                     m_handler->triggerNotification(tran);
 
                 // this is required to allow client place transactions directly into transaction message bus
