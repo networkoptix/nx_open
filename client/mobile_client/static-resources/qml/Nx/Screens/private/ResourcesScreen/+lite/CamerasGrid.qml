@@ -23,6 +23,7 @@ GridView
         width: cellWidth
         height: cellHeight
 
+        resourceId: model.uuid
         text: model.resourceName
         status: model.resourceStatus
         thumbnail: model.thumbnail
