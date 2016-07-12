@@ -18,11 +18,19 @@
 QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     base_type(parent),
     QnWorkbenchStateDelegate(parent),
+    m_userName(),
+    m_userPassword(),
+    m_userDigest(),
+    m_user(),
+    m_group(),
     m_reconnectOnPasswordChange(true)
 {
     connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived, this, &QnWorkbenchUserWatcher::forcedUpdate);
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
+
+    connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated, this, &QnWorkbenchUserWatcher::at_userGroupAddedOrUpdated);
+    connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupRemoved, this, &QnWorkbenchUserWatcher::at_userGroupRemoved);
 }
 
 QnWorkbenchUserWatcher::~QnWorkbenchUserWatcher() {}
@@ -50,15 +58,18 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
     m_user = user;
     m_userPassword = QString();
     m_userDigest = QByteArray();
+    m_group = ec2::ApiUserGroupData();
 
     if (m_user)
     {
         m_userDigest = m_user->getDigest();
-        connect(m_user, &QnResource::resourceChanged, this, &QnWorkbenchUserWatcher::at_user_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
-        connect(m_user, &QnUserResource::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
-        connect(m_user, &QnUserResource::userGroupChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
-        connect(m_user, &QnUserResource::enabledChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
-        connect(m_user, &QnUserResource::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
+        if (!m_user->userGroup().isNull())
+            m_group = qnResourceAccessManager->userGroup(m_user->userGroup());
+        connect(m_user, &QnResource::resourceChanged,           this, &QnWorkbenchUserWatcher::at_user_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
+        connect(m_user, &QnUserResource::permissionsChanged,    this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
+        connect(m_user, &QnUserResource::userGroupChanged,      this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
+        connect(m_user, &QnUserResource::enabledChanged,        this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
+        connect(m_user, &QnUserResource::permissionsChanged,    this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
 
     }
 
@@ -154,6 +165,7 @@ void QnWorkbenchUserWatcher::at_user_resourceChanged(const QnResourcePtr &resour
 {
     if (!isReconnectRequired(resource.dynamicCast<QnUserResource>()))
         return;
+
     emit reconnectRequired();
 }
 
@@ -161,6 +173,25 @@ void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnResourcePtr &use
 {
     if (!m_user || user.dynamicCast<QnUserResource>() != m_user)
         return;
+
+    emit reconnectRequired();
+}
+
+void QnWorkbenchUserWatcher::at_userGroupAddedOrUpdated(const ec2::ApiUserGroupData& userGroup)
+{
+    if (!m_user|| m_user->userGroup() != userGroup.id)
+        return;
+
+    m_group = userGroup;
+    emit reconnectRequired();
+}
+
+void QnWorkbenchUserWatcher::at_userGroupRemoved(const QnUuid& groupId)
+{
+    if (!m_user || m_user->userGroup() != groupId)
+        return;
+
+    m_group = ec2::ApiUserGroupData();
     emit reconnectRequired();
 }
 
