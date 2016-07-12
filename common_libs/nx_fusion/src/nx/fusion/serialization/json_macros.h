@@ -89,7 +89,10 @@ namespace QJsonDetail {
 
 } // namespace QJsonDetail
 
-
+#if defined(_MSC_VER)
+/* Workaround against boost bug in variadic templates implementation, introduced in Boost 1.57. */
+#pragma warning(disable:4003)
+#endif
 QN_FUSION_REGISTER_SERIALIZATION_VISITORS(QJsonValue, QJsonDetail::SerializationVisitor, QJsonDetail::DeserializationVisitor)
 
 
