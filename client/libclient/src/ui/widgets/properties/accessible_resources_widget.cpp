@@ -426,6 +426,9 @@ bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resour
             if (layout->isFile())
                 return false;
 
+            if (layout->hasFlags(Qn::local))
+                return false;
+
             return layout->isShared() || layout->getParentId() == currentUser->getId();
         }
 
@@ -446,6 +449,10 @@ void QnAccessibleResourcesWidget::initResourcesModel()
     {
         if (!resourcePassFilter(resource))
             return;
+
+        if (m_resourcesModel->resources().contains(resource))
+            return;
+
         m_resourcesModel->addResource(resource);
     };
 
@@ -457,15 +464,29 @@ void QnAccessibleResourcesWidget::initResourcesModel()
     };
 
     connect(qnResPool, &QnResourcePool::resourceAdded, this, handleResourceAdded);
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this, refreshModel);
-    refreshModel();
 
+    if (m_filter == QnResourceAccessFilter::LayoutsFilter)
+    {
+        connect(qnResPool, &QnResourcePool::resourceAdded, this, [this, handleResourceAdded](const QnResourcePtr& resource)
+        {
+            if (!resource.dynamicCast<QnLayoutResource>())
+                return;
+
+            /* Looks like hack as we have no dynamic filter model and must maintain list manually.
+             * Really the only scenario we should handle is when the layout becomes remote (after it is saved). */
+            connect(resource.data(), &QnResource::flagsChanged, this, handleResourceAdded);
+        });
+    }
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this, refreshModel](const QnResourcePtr& resource)
     {
+        disconnect(resource.data(), nullptr, this, nullptr);
         m_resourcesModel->removeResource(resource);
         if (resource == context()->user())
             refreshModel();
     });
+
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this, refreshModel);
+    refreshModel();
 
     connect(m_resourcesModel.data(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
     {
