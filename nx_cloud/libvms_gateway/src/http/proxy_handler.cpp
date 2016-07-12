@@ -55,7 +55,9 @@ void ProxyHandler::processRequest(
     //TODO #ak avoid request loop by using Via header
 
     //connecting to the target host
-    m_targetPeerSocket = SocketFactory::createStreamSocket();
+    m_targetPeerSocket = SocketFactory::createStreamSocket(
+        connection->isSsl() && m_settings.http().sslSupport);
+
     m_targetPeerSocket->bindToAioThread(connection->getAioThread());
     if (!m_targetPeerSocket->setNonBlockingMode(true) ||
         !m_targetPeerSocket->setRecvTimeout(m_settings.tcp().recvTimeout) ||

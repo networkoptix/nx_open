@@ -1762,46 +1762,12 @@ void MediaServerProcess::run()
         nx_ms_conf::DEFAULT_CREATE_FULL_CRASH_DUMP ).toBool() );
 #endif
 
-    const auto sslCertPath = MSSettings::roSettings()->value(
-        nx_ms_conf::SSL_CERTIFICATE_PATH,
-        getDataDirectory() + lit( "/ssl/cert.pem")).toString();
-
-    nx::String sslCertData;
-    QFile f(sslCertPath);
-    if (!f.open(QIODevice::ReadOnly) || (sslCertData = f.readAll()).isEmpty())
-    {
-        f.close();
-        qWarning() << "Could not find valid SSL certificate at "
-            << f.fileName() << ". Generating a new one";
-
-        QDir parentDir = QFileInfo(f).absoluteDir();
-        if (!parentDir.exists() && !QDir().mkpath(parentDir.absolutePath()))
-        {
-            qWarning() << "Could not create directory "
-                << parentDir.absolutePath();
-        }
-
-        sslCertData = nx::network::SslEngine::makeCertificateAndKey(
-            QnAppInfo::productName().toUtf8(), "US",
-            QnAppInfo::organizationName().toUtf8());
-
-        if (sslCertData.isEmpty())
-        {
-             qWarning() << "Could not generate SSL certificate ";
-        }
-        else
-        {
-            if (!f.open(QIODevice::WriteOnly) ||
-                f.write(sslCertData) != sslCertData.size())
-            {
-                qWarning() << "Could not write SSL certificate to file";
-            }
-
-            f.close();
-        }
-    }
-
-    nx::network::SslEngine::useCertificateAndPkey(sslCertData);
+    nx::network::SslEngine::useOrCreateCertificate(
+        MSSettings::roSettings()->value(
+            nx_ms_conf::SSL_CERTIFICATE_PATH,
+            getDataDirectory() + lit( "/ssl/cert.pem")).toString(),
+        QnAppInfo::productName().toUtf8(), "US",
+        QnAppInfo::organizationName().toUtf8());
 
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnCameraHistoryPool> historyPool(new QnCameraHistoryPool());

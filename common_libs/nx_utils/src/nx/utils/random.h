@@ -14,6 +14,9 @@
 namespace nx {
 namespace utils {
 
+/** std::rand() implementation which ensures timed seed injection */
+NX_UTILS_API int rand();
+
 /** Uses uniform_int_distribution.
     @return \a false if could not generate random data.
 

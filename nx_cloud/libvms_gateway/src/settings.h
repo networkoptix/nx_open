@@ -56,6 +56,8 @@ public:
     /** Enables support of Http CONNECT method */
     bool connectSupport;
     bool allowTargetEndpointInUrl;
+    bool sslSupport;
+    QString sslCertPath;
 
     Http();
 };
