@@ -33,7 +33,7 @@ namespace nx {
 namespace media {
 
 namespace {
-    
+
     static enum AVPixelFormat get_format(AVCodecContext *s, const enum AVPixelFormat *pix_fmts)
     {
         int status = av_videotoolbox_default_init(s);
@@ -73,13 +73,13 @@ public:
     {
         av_frame_move_ref(frame, _frame);
     }
-    
+
     virtual ~IOSMemoryBufferPrivate()
     {
         av_buffer_unref(&frame->buf[0]);
-        av_frame_free(&frame);	
+        av_frame_free(&frame);
     }
-    
+
     virtual int map(
                     QAbstractVideoBuffer::MapMode mode,
                     int* numBytes,
@@ -88,7 +88,7 @@ public:
     {
         CVPixelBufferRef pixbuf = (CVPixelBufferRef)frame->data[3];
         CVPixelBufferLockBaseAddress(pixbuf, kCVPixelBufferLock_ReadOnly);
-        
+
         int planes = 1;
         *numBytes = 0;
         if (CVPixelBufferIsPlanar(pixbuf))
@@ -107,12 +107,12 @@ public:
             linesize[0] = CVPixelBufferGetBytesPerRow(pixbuf);
             *numBytes = linesize[0] * CVPixelBufferGetHeight(pixbuf);
         }
-        
+
         return planes;
     }
 };
-    
-    
+
+
 class IOSMemoryBuffer: public QAbstractVideoBuffer
 {
     Q_DECLARE_PRIVATE(IOSMemoryBuffer)
@@ -123,12 +123,12 @@ public:
                              NoHandle)
     {
     }
-    
+
     virtual MapMode mapMode() const override
     {
         return d_func()->mapMode;
     }
-    
+
     virtual uchar* map(MapMode mode, int *numBytes, int *bytesPerLine) override
     {
         Q_D(IOSMemoryBuffer);
@@ -143,43 +143,6 @@ public:
         Q_D(IOSMemoryBuffer);
         CVPixelBufferRef pixbuf = (CVPixelBufferRef) d->frame->data[3];
         CVPixelBufferUnlockBaseAddress(pixbuf, kCVPixelBufferLock_ReadOnly);
-    }
-};
-    
-class InitFfmpegLib
-{
-public:
-    //TODO: #rvasilenko replace this static class with QnFfmpegInitializer instance,
-    // which will be destroyed in correct time.
-    // Now av_lockmgr_register(nullptr) is not called in htis project at all
-    InitFfmpegLib()
-    {
-        //QnFfmpegInitializer* initializer = new QnFfmpegInitializer()
-        av_register_all();
-        if (av_lockmgr_register(&InitFfmpegLib::lockmgr) != 0)
-            qCritical() << "Failed to register ffmpeg lock manager";
-    }
-
-    static int lockmgr(void** mtx, enum AVLockOp op)
-    {
-        QnMutex** qMutex = (QnMutex**)mtx;
-        switch (op)
-        {
-        case AV_LOCK_CREATE:
-            *qMutex = new QnMutex();
-            return 0;
-        case AV_LOCK_OBTAIN:
-            (*qMutex)->lock();
-            return 0;
-        case AV_LOCK_RELEASE:
-            (*qMutex)->unlock();
-            return 0;
-        case AV_LOCK_DESTROY:
-            delete *qMutex;
-            return 0;
-        default:
-            return 1;
-        }
     }
 };
 
@@ -216,7 +179,7 @@ public:
     AVFrame* frame;
     qint64 lastPts;
 };
-    
+
 void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
 {
     if (!frame)
@@ -231,14 +194,14 @@ void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
     codecContext->opaque = this;
     codecContext->get_format = get_format;
     codecContext->extradata_size = 1;
-    
+
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
         qWarning() << "Can't open decoder for codec" << frame->compressionType;
         closeCodecContext();
         return;
     }
-    
+
     // keep frame unless we call 'av_buffer_unref'
     codecContext->refcounted_frames = 1;
 }
@@ -259,7 +222,6 @@ IOSVideoDecoder::IOSVideoDecoder(
     d_ptr(new IOSVideoDecoderPrivate())
 {
     QN_UNUSED(allocator, resolution);
-    static InitFfmpegLib init;
 }
 
 IOSVideoDecoder::~IOSVideoDecoder()
@@ -348,12 +310,12 @@ int IOSVideoDecoder::decode(
     auto qtPixelFormat = toQtPixelFormat(CVPixelBufferGetPixelFormatType(pixBuf));
     if (qtPixelFormat == QVideoFrame::Format_Invalid)
         return -1; //< report error
-    
+
     QAbstractVideoBuffer* buffer = new IOSMemoryBuffer(d->frame); //< frame is moved here. null object after the call
     d->frame = av_frame_alloc();
     QVideoFrame* videoFrame = new QVideoFrame(buffer, frameSize, qtPixelFormat);
     videoFrame->setStartTime(startTimeMs);
-    
+
     outDecodedFrame->reset(videoFrame);
     return d->frame->coded_picture_number;
 }

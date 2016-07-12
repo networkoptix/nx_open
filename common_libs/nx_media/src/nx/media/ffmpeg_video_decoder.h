@@ -33,9 +33,6 @@ public:
         const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 
 private:
-    void ffmpegToQtVideoFrame(QVideoFramePtr* result);
-
-private:
     static QSize s_maxResolution;
 
     QScopedPointer<FfmpegVideoDecoderPrivate> d_ptr;

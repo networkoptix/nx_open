@@ -3,34 +3,123 @@
 
 extern "C" {
 #include <libavformat/avformat.h>
-} // extern "C"
+#include <libavutil/pixdesc.h>
+};
+
 
 #include <utils/media/ffmpeg_helper.h>
-#include <utils/media/ffmpeg_initializer.h>
-
 #include <nx/utils/thread/mutex.h>
 
 #include "aligned_mem_video_buffer.h"
-
-#include <QtCore/QFile>
+#include <QtMultimedia/QAbstractVideoBuffer>
+#include <utils/common/qt_private_headers.h>
+#include QT_PRIVATE_HEADER(QtMultimedia,qabstractvideobuffer_p.h)
 
 namespace nx {
 namespace media {
 
 namespace {
 
-static void copyPlane(unsigned char* dst, const unsigned char* src,
-    int width, int dst_stride, int src_stride, int height)
-{
-    for (int i = 0; i < height; ++i)
+    QVideoFrame::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
     {
-        memcpy(dst, src, width);
-        dst += dst_stride;
-        src += src_stride;
+        switch (pixFormat)
+        {
+        case AV_PIX_FMT_YUV420P:
+        case AV_PIX_FMT_YUVJ420P:
+            return QVideoFrame::Format_YUV420P;
+        case AV_PIX_FMT_YUV422P:
+        case AV_PIX_FMT_YUVJ422P:
+            return QVideoFrame::Format_YV12;
+        case AV_PIX_FMT_BGRA:
+            return QVideoFrame::Format_BGRA32;
+        case AV_PIX_FMT_NV12:
+            return QVideoFrame::Format_NV12;
+        default:
+            return QVideoFrame::Format_Invalid;
+        }
     }
-}
 
 } // namespace
+
+class AvFrameMemoryBufferPrivate: public QAbstractVideoBufferPrivate
+{
+public:
+    AVFrame* frame;
+    QAbstractVideoBuffer::MapMode mapMode;
+public:
+    AvFrameMemoryBufferPrivate(AVFrame* _frame):
+        QAbstractVideoBufferPrivate(),
+        frame(av_frame_alloc()),
+        mapMode(QAbstractVideoBuffer::NotMapped)
+    {
+        av_frame_move_ref(frame, _frame);
+    }
+
+    virtual ~AvFrameMemoryBufferPrivate()
+    {
+        av_buffer_unref(&frame->buf[0]);
+        av_frame_free(&frame);
+    }
+
+    virtual int map(
+        QAbstractVideoBuffer::MapMode mode,
+        int* numBytes,
+        int linesize[4],
+        uchar* data[4]) override
+    {
+        int planes = 0;
+        *numBytes = 0;
+
+        const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat)frame->format);
+
+        for (int i = 0; i < 4 && frame->data[i]; ++i)
+        {
+            ++planes;
+            data[i] = frame->data[i];
+            linesize[i] = frame->linesize[i];
+
+            int bytesPerPlane = linesize[i] * frame->height;
+            if (i > 0)
+            {
+                bytesPerPlane >>= descr->log2_chroma_h + descr->log2_chroma_w;
+                bytesPerPlane *= descr->comp->step;
+            }
+            *numBytes += bytesPerPlane;
+        }
+        return planes;
+    }
+};
+
+class AvFrameMemoryBuffer: public QAbstractVideoBuffer
+{
+    Q_DECLARE_PRIVATE(AvFrameMemoryBuffer)
+public:
+    AvFrameMemoryBuffer(AVFrame* frame)
+    :
+    QAbstractVideoBuffer(
+        *(new AvFrameMemoryBufferPrivate(frame)),
+        NoHandle)
+    {
+    }
+
+    virtual MapMode mapMode() const override
+    {
+        return d_func()->mapMode;
+    }
+
+    virtual uchar* map(MapMode mode, int *numBytes, int *bytesPerLine) override
+    {
+        Q_D(AvFrameMemoryBuffer);
+        *bytesPerLine = d->frame->linesize[0];
+        AVPixelFormat pixFmt = (AVPixelFormat) d->frame->format;
+        *numBytes = avpicture_get_size(pixFmt, d->frame->linesize[0], d->frame->height);
+        return d->frame->data[0];
+    }
+
+    virtual void unmap() override
+    {
+    }
+};
 
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoderPrivate
@@ -61,8 +150,6 @@ public:
     AVCodecContext* codecContext;
     AVFrame* frame;
     qint64 lastPts;
-
-    QByteArray testData;
 };
 
 void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
@@ -81,6 +168,9 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
         closeCodecContext();
         return;
     }
+
+    // keep frame unless we call 'av_buffer_unref'
+    codecContext->refcounted_frames = 1;
 }
 
 void FfmpegVideoDecoderPrivate::closeCodecContext()
@@ -95,7 +185,8 @@ void FfmpegVideoDecoderPrivate::closeCodecContext()
 QSize FfmpegVideoDecoder::s_maxResolution;
 
 FfmpegVideoDecoder::FfmpegVideoDecoder(
-    const ResourceAllocatorPtr& allocator, const QSize& resolution)
+    const ResourceAllocatorPtr& allocator,
+    const QSize& resolution)
     :
     AbstractVideoDecoder(),
     d_ptr(new FfmpegVideoDecoderPrivate())
@@ -110,8 +201,13 @@ FfmpegVideoDecoder::~FfmpegVideoDecoder()
 bool FfmpegVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
 {
     Q_UNUSED(codec);
-    Q_UNUSED(resolution)
-    return true;
+
+    const QSize maxRes = maxResolution(codec);
+    if (maxRes.isEmpty())
+        return true;
+
+    return resolution.width() <= maxRes.width() &&
+            resolution.height() <= maxRes.height();
 }
 
 QSize FfmpegVideoDecoder::maxResolution(const AVCodecID codec)
@@ -130,7 +226,7 @@ int FfmpegVideoDecoder::decode(
     {
         d->initContext(compressedVideoData);
         if (!d->codecContext)
-            return -1;
+            return -1; //< error
     }
 
     AVPacket avpkt;
@@ -169,73 +265,21 @@ int FfmpegVideoDecoder::decode(
     if (res <= 0 || !gotPicture)
         return res; //< Negative value means error, zero means buffering.
 
-    ffmpegToQtVideoFrame(outDecodedFrame);
+    QSize frameSize(d->frame->width, d->frame->height);
+    AVPixelFormat pixelFormat = (AVPixelFormat) d->frame->format;
+    qint64 startTimeMs = d->frame->pkt_dts / 1000;
+
+    auto qtPixelFormat = toQtPixelFormat(pixelFormat);
+    if (qtPixelFormat == QVideoFrame::Format_Invalid)
+        return -1; //< report error
+
+    QAbstractVideoBuffer* buffer = new AvFrameMemoryBuffer(d->frame); //< frame is moved here. null object after the call
+    d->frame = av_frame_alloc();
+    QVideoFrame* videoFrame = new QVideoFrame(buffer, frameSize, qtPixelFormat);
+    videoFrame->setStartTime(startTimeMs);
+
+    outDecodedFrame->reset(videoFrame);
     return d->frame->coded_picture_number;
-}
-
-void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
-{
-    Q_D(FfmpegVideoDecoder);
-
-#if 0
-    // test data
-    const QVideoFrame::PixelFormat Format_Tiled32x32NV12 = QVideoFrame::PixelFormat(QVideoFrame::Format_User + 17);
-
-    if (d->testData.isEmpty())
-    {
-        QFile file("f:\\yuv_frames\\frame_1920x1080_26_native.dat");
-        file.open(QIODevice::ReadOnly);
-        d->testData = file.readAll();
-    }
-
-    quint8* srcData[4];
-    srcData[0] = (quint8*) d->testData.data();
-    srcData[1] = srcData[0] + qPower2Ceil((unsigned) d->frame->width, 32) * qPower2Ceil((unsigned) d->frame->height, 32);
-
-    int srcLineSize[4];
-    srcLineSize[0] = srcLineSize[1] = qPower2Ceil((unsigned) d->frame->width, 32);
-
-    auto alignedBuffer = new AlignedMemVideoBuffer(srcData, srcLineSize, 2); //< two planes buffer
-    auto videoFrame = new QVideoFrame(alignedBuffer, QSize(d->frame->width, d->frame->height), Format_Tiled32x32NV12);
-
-    // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert usec to msec.
-    videoFrame->setStartTime(d->frame->pkt_dts / 1000);
-
-#else
-    const int alignedWidth = qPower2Ceil((unsigned)d->frame->width, (unsigned)kMediaAlignment);
-    const int numBytes = avpicture_get_size(AV_PIX_FMT_YUV420P, alignedWidth, d->frame->height);
-    const int lineSize = alignedWidth;
-
-    auto alignedBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, lineSize);
-    auto videoFrame = new QVideoFrame(
-        alignedBuffer, QSize(d->frame->width, d->frame->height), QVideoFrame::Format_YUV420P);
-    // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert usec to msec.
-    videoFrame->setStartTime(d->frame->pkt_dts / 1000);
-
-    videoFrame->map(QAbstractVideoBuffer::WriteOnly);
-    uchar* buffer = videoFrame->bits();
-
-    quint8* dstData[3];
-    dstData[0] = buffer;
-    dstData[1] = buffer + lineSize * d->frame->height;
-    dstData[2] = dstData[1] + lineSize * d->frame->height / 4;
-
-    for (int i = 0; i < 3; ++i)
-    {
-        const int k = (i == 0 ? 0 : 1);
-        copyPlane(
-            dstData[i],
-            d->frame->data[i],
-            d->frame->width >> k,
-            lineSize >> k,
-            d->frame->linesize[i],
-            d->frame->height >> k);
-    }
-
-    videoFrame->unmap();
-#endif
-
-    result->reset(videoFrame);
 }
 
 void FfmpegVideoDecoder::setMaxResolution(const QSize& maxResolution)
