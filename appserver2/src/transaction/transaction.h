@@ -286,7 +286,7 @@ APPLY(503, getAccessRights, ApiAccessRightsDataList, \
 APPLY(504, setAccessRights, ApiAccessRightsData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       CreateHashByUserIdHelper(), /* getHash*/ \
+                       &createHashForApiAccessRightsDataHelper, /* getHash*/ \
                        UserNotificationManagerHelper()) /* trigger notification*/ \
 APPLY(505, getUserGroups, ApiUserGroupDataList, \
                        false, \

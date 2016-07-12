@@ -51,8 +51,6 @@ TEST( QnStoppableAsync, SingleAsync )
     StoppableTestClass s;
     nx::utils::promise< bool > p;
     s.pleaseStop([ & ](){ p.set_value( true ); });
-
-    ASSERT_TRUE( s.isRunning() );
     ASSERT_TRUE( p.get_future().get() );
     ASSERT_FALSE( s.isRunning() );
 }

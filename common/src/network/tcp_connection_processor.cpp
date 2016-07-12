@@ -215,9 +215,13 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
             d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
     }
 
-    nx_http::insertOrReplaceHeader(
-        &d->response.headers,
-        nx_http::HttpHeader("Server", nx_http::serverString() ) );
+    if (d->authenticatedOnce)
+    {
+        //revealing Server name to authenticated entity only
+        nx_http::insertOrReplaceHeader(
+            &d->response.headers,
+            nx_http::HttpHeader("Server", nx_http::serverString() ) );
+    }
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
         nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );

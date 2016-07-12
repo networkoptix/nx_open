@@ -108,9 +108,6 @@ void syncSocketServerMainFunc(
             }
             else
             {
-                if (ignoreReadWriteError && !client)
-                    continue;
-
                 ASSERT_NE(nullptr, client);
                 ASSERT_TRUE(client->setNonBlockingMode(false))
                     << SystemError::getLastOSErrorText().toStdString();
@@ -119,10 +116,11 @@ void syncSocketServerMainFunc(
         else
         {
             client.reset(server->accept());
-            if (ignoreReadWriteError && !client)
-                continue;
         }
-        
+
+        if (ignoreReadWriteError && !client)
+            continue;
+
         ASSERT_TRUE(client.get())
             << SystemError::getLastOSErrorText().toStdString() << " on " << i;
         ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));

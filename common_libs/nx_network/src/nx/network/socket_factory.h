@@ -63,13 +63,6 @@ public:
     static void enforceSsl( bool isEnforced = true );
     static bool isSslEnforced();
 
-    /*! Global timeout related options
-     *  \note for VALGRIND use ONLY! */
-    static void setTimeoutMultiplier( size_t value );
-    static size_t timeoutMultiplier();
-    static void disableTimeAsserts( bool areDisabled = true );
-    static bool areTimeAssertsDisabled();
-
     /** Sets new factory. Returns old one */
     static CreateStreamSocketFuncType 
         setCreateStreamSocketFunc(CreateStreamSocketFuncType newFactoryFunc);
@@ -85,9 +78,6 @@ private:
 
     static std::atomic< SocketType > s_enforcedStreamSocketType;
     static std::atomic< bool > s_isSslEnforced;
-
-    static std::atomic< size_t > s_timeoutMultiplier;
-    static std::atomic< bool > s_disableTimeAsserts;
 };
 
 #endif  //SOCKET_FACTORY_H

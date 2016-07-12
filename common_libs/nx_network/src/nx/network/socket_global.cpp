@@ -75,22 +75,13 @@ void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
 
     if (arguments.get(QLatin1String("enforce-ssl")))
         SocketFactory::enforceSsl();
-
-    if (const auto value = arguments.get<size_t>(QLatin1String("timeout-multiplier")))
-        SocketFactory::setTimeoutMultiplier(*value);
-
-    if (arguments.get(QLatin1String("disable-time-asserts")))
-        SocketFactory::disableTimeAsserts();
 }
 
 void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
 {
     QnMutexLocker lock(&s_instance->m_mutex);
     if (s_instance->m_customInits.emplace(init, deinit).second)
-    {
-        lock.unlock();
         init();
-    }
 }
 
 QnMutex SocketGlobals::s_mutex;

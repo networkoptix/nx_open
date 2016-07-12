@@ -27,6 +27,7 @@
 
 #include <utils/color_space/image_correction.h>
 #include "api/model/camera_list_reply.h"
+#include <nx/network/http/async_http_client_reply.h>
 
 class QAction;
 class QMenu;
@@ -172,6 +173,7 @@ protected slots:
     void at_currentLayoutSettingsAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverLogsAction_triggered();
+    void at_serverLogsAction_getNonce(QnAsyncHttpClientReply* client);
     void at_serverIssuesAction_triggered();
     void at_pingAction_triggered();
     void at_thumbnailsSearchAction_triggered();
@@ -274,6 +276,14 @@ private:
         QnMediaServerResourcePtr dstServer;
     };
     QMap<int, CameraMovingInfo> m_awaitingMoveCameras;
+
+    struct LogRequest
+    {
+        QnMediaServerResourcePtr server;
+        std::unique_ptr<QnAsyncHttpClientReply> replay;
+    };
+
+    std::map<QUrl, LogRequest> m_logRequests;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H
