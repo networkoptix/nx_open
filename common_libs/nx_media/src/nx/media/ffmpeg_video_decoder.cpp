@@ -44,7 +44,7 @@ public:
     FfmpegVideoDecoderPrivate()
     :
         codecContext(nullptr),
-        frame(avcodec_alloc_frame()),
+        frame(av_frame_alloc()),
         lastPts(AV_NOPTS_VALUE)
     {
     }
@@ -107,14 +107,14 @@ FfmpegVideoDecoder::~FfmpegVideoDecoder()
 {
 }
 
-bool FfmpegVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
+bool FfmpegVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
 {
     Q_UNUSED(codec);
     Q_UNUSED(resolution)
     return true;
 }
 
-QSize FfmpegVideoDecoder::maxResolution(const CodecID codec)
+QSize FfmpegVideoDecoder::maxResolution(const AVCodecID codec)
 {
     QN_UNUSED(codec);
 
@@ -203,7 +203,7 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
 
 #else
     const int alignedWidth = qPower2Ceil((unsigned)d->frame->width, (unsigned)kMediaAlignment);
-    const int numBytes = avpicture_get_size(PIX_FMT_YUV420P, alignedWidth, d->frame->height);
+    const int numBytes = avpicture_get_size(AV_PIX_FMT_YUV420P, alignedWidth, d->frame->height);
     const int lineSize = alignedWidth;
 
     auto alignedBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, lineSize);
