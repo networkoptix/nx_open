@@ -4,6 +4,7 @@
 
 #include <client_core/user_recent_connection_data.h>
 #include <test/qml_test_helper.h>
+#include <ui/helpers/scene_position_listener.h>
 
 void QnClientCoreMetaTypes::initialize()
 {
@@ -13,4 +14,5 @@ void QnClientCoreMetaTypes::initialize()
     qRegisterMetaTypeStreamOperators<QnUserRecentConnectionDataList>();
 
     qmlRegisterType<QnQmlTestHelper>("Nx.Test", 1, 0, "QmlTestHelper");
+    qmlRegisterType<QnScenePositionListener>("com.networkoptix.qml", 1, 0, "QnScenePositionListener");
 }

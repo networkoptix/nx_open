@@ -1,9 +1,6 @@
 #pragma once
 
-#include <QtCore/QThread>
-#if !defined(Q_OS_ANDROID)
-    #include <QtCore/private/qthread_p.h>
-#endif
+class QThread;
 
 /**
  * \param thread                        Thread to check.
@@ -14,12 +11,4 @@
  *                                      compilation. Therefore it should be used for
  *                                      error checking only.
  */
-inline bool qnHasEventLoop(QThread* thread)
-{
-#if !defined(Q_OS_ANDROID)
-    int loopLevel = QThreadData::get2(thread)->loopLevel;
-    return loopLevel > 0;
-#else
-    return true;
-#endif
-}
+bool qnHasEventLoop(QThread* thread);
