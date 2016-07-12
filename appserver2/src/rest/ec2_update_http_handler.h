@@ -148,7 +148,8 @@ namespace ec2
 
             return (errorCode == ErrorCode::ok)
                 ? nx_http::StatusCode::ok
-                : nx_http::StatusCode::internalServerError;
+                : (errorCode == ErrorCode::forbidden) ? nx_http::StatusCode::forbidden 
+                                                      : nx_http::StatusCode::internalServerError;
         }
 
     private:
