@@ -13,15 +13,15 @@
     #error OUTPUT_PREFIX should NOT be defined while compiling this .cpp file.
 #endif // OUTPUT_PREFIX
 
-namespace nx {
-namespace utils {
-
 #if defined(QT_CORE_LIB)
     QDebug operator<<(QDebug d, const std::string& s)
     {
         return d << s.c_str();
     }
 #endif // QT_CORE_LIB
+
+namespace nx {
+namespace utils {
 
 long getTimeMs()
 {

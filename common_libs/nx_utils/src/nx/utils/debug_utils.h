@@ -8,9 +8,11 @@
 
 #include <memory>
 #include <cstdint>
+#include <cstring>
 
 #if defined(QT_CORE_LIB)
     #include <QtCore/QDebug>
+    NX_UTILS_API QDebug operator<<(QDebug d, const std::string& s);
 #else // QT_CORE_LIB
     #include <iostream>
 #endif // QT_CORE_LIB
@@ -37,7 +39,6 @@ static inline const char* relative_src_filename(const char* s)
 #if defined(QT_CORE_LIB)
 
     // TODO: Rewrite using log.h
-    NX_UTILS_API QDebug operator<<(QDebug d, const std::string& s);
     #define PRINT qWarning().nospace() << OUTPUT_PREFIX
 
     #define LL qDebug().nospace() << "####### line " << __LINE__ \
