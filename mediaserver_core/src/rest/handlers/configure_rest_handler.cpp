@@ -35,36 +35,89 @@ namespace
         ResultFail,
         ResultSkip
     };
+
 }
 
-int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
+struct ConfigureSystemData: public PasswordData
+{
+    ConfigureSystemData():
+        PasswordData(),
+        wholeSystem(false),
+        sysIdTime(0),
+        tranLogTime(0),
+        port(0)
+    {
+    }
+
+    ConfigureSystemData(const QnRequestParams& params):
+        PasswordData(params),
+        systemName(params.value(lit("systemName"))),
+        wholeSystem(params.value(lit("wholeSystem"), lit("false")) != lit("false")),
+        sysIdTime(params.value(lit("sysIdTime")).toLongLong()),
+        tranLogTime(params.value(lit("tranLogTime")).toLongLong()),
+        port(params.value(lit("port")).toInt())
+    {
+    }
+
+    QString systemName;
+    bool wholeSystem;
+    qint64 sysIdTime;
+    qint64 tranLogTime;
+    int port;
+};
+
+#define ConfigureSystemData_Fields PasswordData_Fields (systemName)(wholeSystem)(sysIdTime)(tranLogTime)(port)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (ConfigureSystemData),
+    (json),
+    _Fields,
+    (optional, true));
+
+int QnConfigureRestHandler::executeGet(
+    const QString &path,
+    const QnRequestParams &params,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path)
+    return execute(ConfigureSystemData(params), result, owner);
+}
 
-    if (MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt()) {
+int QnConfigureRestHandler::executePost(
+    const QString &path,
+    const QnRequestParams &params,
+    const QByteArray &body,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
+{
+    Q_UNUSED(path)
+    Q_UNUSED(params)
+    ConfigureSystemData data = QJson::deserialized<ConfigureSystemData>(body);
+    return execute(std::move(data), result, owner);
+}
+
+int QnConfigureRestHandler::execute(
+    const ConfigureSystemData& data,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
+{
+    if (MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt())
+    {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
         return nx_http::StatusCode::forbidden;
     }
 
-    bool wholeSystem = params.value(lit("wholeSystem"), lit("false")) != lit("false");
-    const QString systemName = params.value(lit("systemName"));
-
-    PasswordData passwordData(params);
-
     QString errStr;
-    if (!validatePasswordData(passwordData, &errStr))
+    if (!validatePasswordData(data, &errStr))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return CODE_OK;
     }
 
-    qint64 sysIdTime = params.value(lit("sysIdTime")).toLongLong();
-    qint64 tranLogTime = params.value(lit("tranLogTime")).toLongLong();
-    int port = params.value(lit("port")).toInt();
-
     /* set system name */
     QString oldSystemName = qnCommon->localSystemName();
-    if (!systemName.isEmpty() && systemName != qnCommon->localSystemName())
+    if (!data.systemName.isEmpty() && data.systemName != qnCommon->localSystemName())
     {
         if (!backupDatabase())
         {
@@ -72,38 +125,52 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
             return CODE_OK;
         }
 
-        if (!changeSystemName(systemName, sysIdTime, tranLogTime, !wholeSystem, Qn::UserAccessData(owner->authUserId())))
+        if (!changeSystemName(
+            data.systemName,
+            data.sysIdTime,
+            data.tranLogTime,
+            !data.wholeSystem,
+            Qn::UserAccessData(owner->authUserId())))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             return CODE_OK;
         }
-        if (wholeSystem)
-            QnAppServerConnectionFactory::getConnection2()->getMiscManager(Qn::UserAccessData(owner->authUserId()))
-                                                          ->changeSystemName(systemName, sysIdTime, tranLogTime, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        if (data.wholeSystem)
+        {
+            auto connection = QnAppServerConnectionFactory::getConnection2();
+            auto manager = connection->getMiscManager(Qn::UserAccessData(owner->authUserId()));
+            manager->changeSystemName(
+                data.systemName,
+                data.sysIdTime,
+                data.tranLogTime,
+                ec2::DummyHandler::instance(),
+                &ec2::DummyHandler::onRequestDone);
+        }
 
         /* reset connections if systemName is changed */
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemNameChanged);
-        QString description = lit("%1 -> %2").arg(oldSystemName).arg(systemName);
+        QString description = lit("%1 -> %2").arg(oldSystemName).arg(data.systemName);
         auditRecord.addParam("description", description.toUtf8());
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
     /* set port */
-    int changePortResult = changePort(owner->authUserId(), port);
-    if (changePortResult == ResultFail) {
+    int changePortResult = changePort(owner->authUserId(), data.port);
+    if (changePortResult == ResultFail)
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Port is busy"));
-        port = 0;   //not switching port
-    }
 
     /* set password */
-    if (passwordData.hasPassword())
+    if (data.hasPassword())
     {
-        if (!changeAdminPassword(passwordData, owner->authUserId())) {
+        if (!changeAdminPassword(data, owner->authUserId()))
+        {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
         }
-        else {
+        else
+        {
             auto adminUser = qnResPool->getAdministrator();
-            if (adminUser) {
+            if (adminUser)
+            {
                 QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_UserUpdate);
                 auditRecord.resources.push_back(adminUser->getId());
                 qnAuditManager->addAuditRecord(auditRecord);
@@ -115,37 +182,28 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     reply.restartNeeded = false;
     result.setReply(reply);
 
-    if (port) {
-        owner->owner()->updatePort(port);
+    if (changePortResult == ResultOk)
+    {
+        owner->owner()->updatePort(data.port);
         owner->owner()->waitForPortUpdated();
     }
 
     return CODE_OK;
 }
 
-void QnConfigureRestHandler::afterExecute(const QString& /*path*/, const QnRequestParamList& /*params*/,
-                                          const QByteArray& /*body*/, const QnRestConnectionProcessor* /*owner*/)
-{
-    /*
-    QnJsonRestResult reply;
-    if (QJson::deserialize(body, &reply) && reply.error() ==  QnJsonRestResult::NoError) {
-        int port = params.value(lit("port")).toInt();
-        if (port) {
-            owner->owner()->updatePort(port);
-        }
-    }
-    */
-}
-
 int QnConfigureRestHandler::changePort(const QnUuid &userId, int port)
 {
-    if (port == 0 || port == MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt())
+    int sPort = MSSettings::roSettings()->value(
+        nx_ms_conf::SERVER_PORT,
+        nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
+    if (port == 0 || port == sPort)
         return ResultSkip;
 
     if (port < 0)
         return ResultFail;
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnMediaServerResourcePtr server =
+        qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server)
         return ResultFail;
 
@@ -165,9 +223,10 @@ int QnConfigureRestHandler::changePort(const QnUuid &userId, int port)
 
     ec2::ApiMediaServerData apiServer;
     ec2::fromResourceToApi(server, apiServer);
-    if (QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::UserAccessData(userId))->saveSync(apiServer) != ec2::ErrorCode::ok)
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto manager = connection->getMediaServerManager(Qn::UserAccessData(userId));
+    if (manager->saveSync(apiServer) != ec2::ErrorCode::ok)
         return ResultFail;
-
 
     MSSettings::roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);
 
