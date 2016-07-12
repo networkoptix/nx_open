@@ -380,7 +380,11 @@ void PlayerPrivate::presentNextFrame()
     }
 
     if (videoSurface && videoSurface->isActive())
+    {
         videoSurface->present(*scaleFrame(videoFrameToRender));
+        if (dataConsumer)
+            dataConsumer->setDisplayedTimeUs(videoFrameToRender->startTime() * 1000);
+    }
 
     setPosition(videoFrameToRender->startTime());
 

@@ -9,6 +9,7 @@
 
 #include "media_fwd.h"
 #include "audio_output.h"
+#include <utils/media/externaltimesource.h>
 
 class QnArchiveStreamReader;
 
@@ -21,7 +22,9 @@ class SeamlessAudioDecoder;
 /**
  * Private class used in nx::media::Player.
  */
-class PlayerDataConsumer: public QnAbstractDataConsumer
+class PlayerDataConsumer:
+    public QnAbstractDataConsumer,
+    public QnlTimeSource
 {
     Q_OBJECT
     typedef QnAbstractDataConsumer base_type;
@@ -40,6 +43,29 @@ public:
 
     /** Can be CODEC_ID_NONE if not available. */
     CodecID currentCodec() const;
+
+    // ----  QnlTimeSource interface ----
+
+    /*
+    * @return current time. May be different from displayed time. After seek for example, while no any frames are really displayed
+    */
+    virtual qint64 getCurrentTime() const override;
+
+    /*
+    * @return Return last displayed time
+    */
+    virtual qint64 getDisplayedTime() const override;
+    void setDisplayedTimeUs(qint64 value); //< not part of QnlTimeSource interface
+
+    /*
+    * @return Return time of the next frame
+    */
+    virtual qint64 getNextTime() const override;
+
+    /*
+    * @return Return external clock to sync several video with each other.
+    */
+    virtual qint64 getExternalTime() const override;
 
 signals:
     /** Hint to render to display current data with no delay due to seek operation in progress. */
@@ -100,6 +126,9 @@ private:
         WaitForNextBOF //< noDelay will be disabled as soon as next BOF frame is received
     };
     NoDelayState m_noDelayState;
+
+    std::atomic<qint64> m_lastFrameTimeUs;
+    std::atomic<qint64> m_lastDisplayedTimeUs;
 };
 
 } // namespace media
