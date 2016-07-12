@@ -6,7 +6,7 @@ import "."
 
 Rectangle
 {
-    id: thisComponent;
+    id: control;
 
     width: context.pageSize.width;
     height: context.pageSize.height;
@@ -38,28 +38,88 @@ Rectangle
             onLogout: context.logoutFromCloud();
         }
 
-        Grid
+        GridView
         {
             id: grid;
 
-            y: Math.max((thisComponent.height - height) / 2, 232);
-            anchors.horizontalCenter: parent.horizontalCenter;
-
             readonly property int horizontalOffset: 40;
+            readonly property int tileHeight: 96;
             readonly property int tileWidth: 280;
-            property int maxColumns: ((parent.width - 2 * horizontalOffset) / tileWidth)
-            property int desiredColumns: Math.min(itemsSource.count, 4);
+            readonly property int tileSpacing: 16;
+
+            readonly property int maxColsCount: Math.min(Math.floor(parent.width - 2 * horizontalOffset) / cellWidth, 4);
+            readonly property int desiredColsCount:
+            {
+                if (grid.count < 3)
+                    return grid.count;
+                else if (grid.count < 5)
+                    return 2;
+                else if (grid.count < 7)
+                    return 3;
+                else
+                    return 4;
+            }
+
+            readonly property int colsCount: Math.min(maxColsCount, desiredColsCount);
+            readonly property int rowsCount: (grid.count < 3 ? 1 : 2);
+            readonly property int pagesCount: Math.ceil(grid.count / (colsCount * rowsCount));
+
+            opacity: 0;
+            snapMode: GridView.SnapOneRow;
+
+            SequentialAnimation
+            {
+                id: switchPageAnimation;
+
+                property int pageIndex: -1;
+
+                NumberAnimation
+                {
+                    target: grid;
+                    property: "opacity";
+                    duration: 200;
+                    easing.type: Easing.Linear;
+                    to: 0;
+                }
+
+                ScriptAction
+                {
+                    script:
+                    {
+                        var pageIndex = switchPageAnimation.pageIndex;
+                        var tilesPerPage = grid.colsCount * grid.rowsCount;
+                        var firstItemIndex = pageIndex * tilesPerPage;
+                        grid.positionViewAtIndex(firstItemIndex, GridView.Beginning);
+                    }
+                }
+
+                NumberAnimation
+                {
+                    target: grid;
+                    property: "opacity";
+                    duration: 200;
+                    easing.type: Easing.Linear;
+                    to: 1;
+                }
+            }
+
+            clip: true;
+            interactive: false;
+
+            y: Math.max((control.height - height) / 2, 212);
+            width: colsCount * cellWidth;
+            height: rowsCount * cellHeight;
+
+            cellWidth: tileWidth + tileSpacing;
+            cellHeight: tileHeight + tileSpacing;
+
+            anchors.horizontalCenter: parent.horizontalCenter;
 
             property QtObject watcher: SingleActiveItemSelector
             {
                 variableName: "isExpanded";
                 deactivateFunc: function(item) { item.toggle(); };
             }
-
-            rows: (itemsSource.count > 3 ? 2 : 1);
-            columns: Math.min(desiredColumns, maxColumns);
-
-            spacing: 16;
 
 
             Connections
@@ -72,17 +132,20 @@ Rectangle
                 }
             }
 
-            Repeater
+            model: QnSystemsModel {}
+
+            delegate: Item
             {
-                id: itemsSource;
+                z: tile.z;
+                width: grid.cellWidth;
+                height: grid.cellHeight;
 
-                model: QnSystemsModel {}
-
-                delegate: SystemTile
+                SystemTile
                 {
+                    id: tile;
                     visualParent: screenHolder;
-
-
+                    anchors.horizontalCenter: parent.horizontalCenter;
+                    anchors.verticalCenter: parent.verticalCenter;
                     //
 
                     systemId: model.systemId;
@@ -97,8 +160,32 @@ Rectangle
                     compatibleVersion: model.compatibleVersion;
 
                     Component.onCompleted: { grid.watcher.addItem(this); }
-
                 }
+            }
+
+            function setPage(index)
+            {
+                switchPageAnimation.stop();
+                switchPageAnimation.pageIndex = index;
+                switchPageAnimation.start();
+            }
+        }
+
+        NxPageSwitcher
+        {
+            id: pageSwitcher;
+
+            visible: (pagesCount > 0);
+            anchors.horizontalCenter: grid.horizontalCenter;
+            anchors.top: grid.bottom;
+            anchors.topMargin: 8;
+
+            pagesCount: grid.pagesCount;
+
+            onCurrentPageChanged:
+            {
+                if ((currentPage >= 0) && (currentPage < pagesCount))
+                    grid.setPage(currentPage);
             }
         }
 

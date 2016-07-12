@@ -141,6 +141,9 @@ signals:
      */
     void permissionsChanged(const QnResourcePtr& resource);
 
+    /** Notify that current user's global permissions were changed. */
+    void globalPermissionsChanged();
+
 protected slots:
     void updatePermissions(const QnResourcePtr& resource);
 

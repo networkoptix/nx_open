@@ -13,8 +13,6 @@
 
 namespace
 {
-    enum { kMaxTilesCount = 8 };
-
     enum RoleId
     {
         FirstRoleId = Qt::UserRole + 1
@@ -128,7 +126,6 @@ public:
     bool isCorrectCustomization(const QnSystemDescriptionPtr& systemDescription) const;
     bool isFactorySystem(const QnSystemDescriptionPtr& systemDescription) const;
 
-    const int maxCount;
     QnDisconnectHelper disconnectHelper;
     InternalList internalData;
     QnSoftwareVersion minimalVersion;
@@ -168,7 +165,7 @@ int QnSystemsModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
 
-    return std::min(d->internalData.count(), d->maxCount);
+    return d->internalData.count();
 }
 
 QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
@@ -260,7 +257,6 @@ RoleNames QnSystemsModel::roleNames() const
 QnSystemsModelPrivate::QnSystemsModelPrivate(QnSystemsModel* parent)
     : base_type(parent)
     , q_ptr(parent)
-    , maxCount(kMaxTilesCount)    // TODO: do we need to change it dynamically or from outside? Think about it.
     , disconnectHelper()
     , internalData()
     , minimalVersion(1, 0)
@@ -318,33 +314,9 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
         emitDataChanged(systemDescription, QVector<int>() << OwnerDescriptionRoleId);
     });
 
-    const bool isMaximumNumber = (internalData.size() >= maxCount);
-    const bool emitInsertSignal = (position < maxCount);
-
-    {
-        const auto beginInsertRowsCallback = [this, position]()
-        {
-            Q_Q(QnSystemsModel);
-            q->beginInsertRows(QModelIndex(), position, position);
-        };
-        const auto endInserRowsCallback = [this]()
-        {
-            Q_Q(QnSystemsModel);
-            q->endInsertRows();
-        };
-
-        const auto insertionGuard = (emitInsertSignal ?
-            QnRaiiGuard::create(beginInsertRowsCallback, endInserRowsCallback)
-            : QnRaiiGuard::createEmpty());
-
-        internalData.insert(insertPos, data);
-    }
-
-    if (emitInsertSignal && isMaximumNumber)
-    {
-        q->beginRemoveRows(QModelIndex(), maxCount, maxCount);
-        q->endRemoveRows();
-    }
+    q->beginInsertRows(QModelIndex(), position, position);
+    internalData.insert(insertPos, data);
+    q->endInsertRows();
 }
 
 void QnSystemsModelPrivate::removeSystem(const QString &systemId)
@@ -361,31 +333,10 @@ void QnSystemsModelPrivate::removeSystem(const QString &systemId)
         return;
 
     const int position = (removeIt - internalData.begin());
-    const bool moreThanMaximum = (internalData.size() > maxCount);
-    const bool emitRemoveSignal = (position <= maxCount);
 
-    {
-        internalData.erase(removeIt);
-
-        const auto beginRemoveRowsHandler = [q, position]()
-        {
-            q->beginRemoveRows(QModelIndex(), position, position);
-        };
-        const auto endRemoveRowsHandler = [q]()
-        {
-            q->endRemoveRows();
-        };
-
-        const auto removeGuard = (emitRemoveSignal
-            ? QnRaiiGuard::create(beginRemoveRowsHandler, endRemoveRowsHandler)
-            : QnRaiiGuard::createEmpty());
-    }
-
-    if (emitRemoveSignal && moreThanMaximum)
-    {
-        q->beginInsertRows(QModelIndex(), maxCount - 1, maxCount - 1);
-        q->endInsertRows();
-    }
+    q->beginRemoveRows(QModelIndex(), position, position);
+    internalData.erase(removeIt);
+    q->endRemoveRows();
 }
 
 QnSystemsModelPrivate::InternalList::iterator QnSystemsModelPrivate::getInternalDataIt(

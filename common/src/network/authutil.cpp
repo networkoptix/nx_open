@@ -123,5 +123,4 @@ QByteArray createHttpQueryAuthParam(
     return (userName.toUtf8().toLower() + ":" + nonce + ":" + authDigest).toBase64();
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (NonceReply), (json), _Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((NonceReply), (json), _Fields)

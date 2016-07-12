@@ -136,7 +136,7 @@ done
 #copying qt libs
 QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql"
 if [[ "${box}" == "bpi" ]]; then
-    QTLIBS="Concurrent Core EglDeviceIntegration Gui LabsTemplates MultimediaQuick_p Multimedia Network OpenGL Qml Quick Sql Widgets Xml XmlPatterns"
+    QTLIBS="Concurrent Core EglDeviceIntegration Gui LabsTemplates MultimediaQuick_p Multimedia Network Qml Quick Sql Xml XmlPatterns"
 fi
 for var in $QTLIBS
 do

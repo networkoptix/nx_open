@@ -30,7 +30,6 @@ public:
 
         connect(qnResPool, &QnResourcePool::resourceAdded,   this, &QnUserListModelPrivate::at_resourcePool_resourceAdded);
         connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnUserListModelPrivate::at_resourcePool_resourceRemoved);
-        connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
 
         connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated, this,
             [this](const ec2::ApiUserGroupData& group)

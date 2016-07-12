@@ -47,11 +47,8 @@ void serializeToUrlQuery(const AuthRequest& authRequest, QUrlQuery* const urlQue
         QString::fromStdString(authRequest.realm));
 }
 
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (NonceData)(AuthRequest)(AuthResponse),
-    (json),
-    _Fields)
+    (NonceData)(AuthRequest)(AuthResponse), (json), _Fields, (optional, false))
 
 }   //api
 }   //cdb

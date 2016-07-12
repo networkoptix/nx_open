@@ -23,16 +23,65 @@ public:
         q_ptr(parent),
         model(model),
         usersModel(new QStandardItemModel(this)),
-        replacementRoles(new QnUserRolesModel(this, true, false, false))
+        replacementRoles(new QnUserRolesModel(this,
+            true,  /* standardRoles */
+            false, /* userRoles (will be filled later) */
+            false  /* customRole */))
     {
-        connect(qnResPool, &QnResourcePool::resourceAdded, this,
-            &QnUserGroupSettingsWidgetPrivate::at_resourcePool_resourceAdded);
+        for (const auto& user : qnResPool->getResources<QnUserResource>())
+            connectUserSignals(user);
 
-        connect(qnResPool, &QnResourcePool::resourceChanged, this,
-            &QnUserGroupSettingsWidgetPrivate::at_resourcePool_resourceChanged);
+        connect(qnResPool, &QnResourcePool::resourceAdded, this,
+            [this](const QnResourcePtr& resource)
+            {
+                QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+                if (!user)
+                    return;
+
+                connectUserSignals(user);
+
+                if (user->userGroup() == this->model->selectedGroup())
+                    userAddedOrUpdated(user);
+            });
 
         connect(qnResPool, &QnResourcePool::resourceRemoved, this,
-            &QnUserGroupSettingsWidgetPrivate::at_resourcePool_resourceRemoved);
+            [this](const QnResourcePtr& resource)
+            {
+                QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+                if (!user)
+                    return;
+
+                disconnectUserSignals(user);
+
+                if (user->userGroup() == this->model->selectedGroup())
+                    userMaybeRemoved(user);
+            });
+    }
+
+    void connectUserSignals(const QnUserResourcePtr& user)
+    {
+        connect(user, &QnResource::nameChanged, this,
+            [this](const QnResourcePtr& resource)
+            {
+                auto user = resource.staticCast<QnUserResource>();
+                if (user->userGroup() == model->selectedGroup())
+                    userAddedOrUpdated(user);
+            });
+
+        connect(user, &QnUserResource::userGroupChanged, this,
+            [this](const QnResourcePtr& resource)
+            {
+                auto user = resource.staticCast<QnUserResource>();
+                if (user->userGroup() == model->selectedGroup())
+                    userAddedOrUpdated(user);
+                else
+                    userMaybeRemoved(user);
+            });
+    }
+
+    void disconnectUserSignals(const QnUserResourcePtr& user)
+    {
+        user->disconnect(this);
     }
 
     void resetUsers()
@@ -42,20 +91,14 @@ public:
         for (const auto& user : users)
             addUser(user);
 
-        updateUsers();
+        correctUsersTable();
     }
 
     void addUser(const QnUserResourcePtr& user)
     {
         auto item = new QStandardItem(qnResIconCache->icon(QnResourceIconCache::User), user->getName());
-        item->setData(QVariant::fromValue(user), Qn::ResourceRole);
+        item->setData(QVariant::fromValue<QnResourcePtr>(user), Qn::ResourceRole);
         usersModel->appendRow(item);
-    }
-
-    void updateUsers()
-    {
-        if (usersModel->rowCount() == 0)
-            usersModel->appendRow(new QStandardItem(tr("No users have this role")));
     }
 
     bool hasUsers() const
@@ -132,75 +175,47 @@ public:
         emit q->hasChangesChanged();
     }
 
-    // Currently selected group user was added or updated:
+    // User was assigned currently selected role, or its name was updated:
     void userAddedOrUpdated(const QnUserResourcePtr& user)
     {
         QModelIndex index = userIndex(user);
         if (index.isValid())
         {
-            // Updated:
             usersModel->setData(index, user->getName(), Qt::DisplayRole);
             return;
         }
 
-        // Added:
         if (!hasUsers())
             usersModel->clear();
 
         addUser(user);
     }
 
-    // Currently selected group user was probably removed:
-    void userMaybeRemoved(const QnUserResourcePtr& user)
+    // User was possibly removed from currently selected role:
+    void userMaybeRemoved(const QnUserResourcePtr& resource)
     {
-        QModelIndex index = userIndex(user);
+        QModelIndex index = userIndex(resource);
         if (!index.isValid())
             return;
 
         usersModel->removeRow(index.row());
-        updateUsers();
+        correctUsersTable();
     }
 
     QModelIndex userIndex(const QnUserResourcePtr& user)
     {
         auto existingUsers = usersModel->match(usersModel->index(0, 0),
             Qn::ResourceRole,
-            QVariant::fromValue(user),
+            QVariant::fromValue<QnResourcePtr>(user),
             1, Qt::MatchExactly);
 
         return existingUsers.empty() ? QModelIndex() : existingUsers[0];
     }
 
-    void at_resourcePool_resourceAdded(const QnResourcePtr& resource)
+    void correctUsersTable()
     {
-        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        if (!user)
-            return;
-
-        if (user->userGroup() == model->selectedGroup())
-            userAddedOrUpdated(user);
-    }
-
-    void at_resourcePool_resourceChanged(const QnResourcePtr& resource)
-    {
-        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        if (!user)
-            return;
-
-        if (user->userGroup() == model->selectedGroup())
-            userAddedOrUpdated(user);
-        else
-            userMaybeRemoved(user);
-    }
-
-    void at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
-    {
-        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        if (!user)
-            return;
-
-        if (user->userGroup() == model->selectedGroup())
-            userMaybeRemoved(user);
+        if (usersModel->rowCount() == 0)
+            usersModel->appendRow(new QStandardItem(tr("No users have this role")));
     }
 
 public:

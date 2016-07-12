@@ -18,7 +18,8 @@ namespace
     const auto kNameTag = lit("name");
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnUserRecentConnectionData, (datastream)(eq), QnUserRecentConnectionData_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnUserRecentConnectionData), (datastream)(eq), _Fields)
 
 QnUserRecentConnectionData::QnUserRecentConnectionData() :
     name(),

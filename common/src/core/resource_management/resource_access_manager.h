@@ -23,6 +23,11 @@ class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnR
 public:
     QnResourceAccessManager(QObject* parent = nullptr);
 
+    static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
+
+    /** Get set of global permissions, that will not work without the given one. */
+    static Qn::GlobalPermissions dependentPermissions(Qn::GlobalPermission value);
+
     void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList);
 
     ec2::ApiUserGroupDataList userGroups() const;

@@ -806,6 +806,15 @@ namespace ec2
          */
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeUserGroup);
 
+
+        /**%apidoc GET /ec2/getPredefinedRoles
+        * Return list of predefined user roles.
+        * %param[default] format
+        * %return Return object in requested format
+        */
+        registerGetFuncHandler<std::nullptr_t, ApiPredefinedRoleDataList>(p, ApiCommand::getPredefinedRoles);
+
+
         /**%apidoc GET /ec2/getVideowalls
          * Return list of video walls
          * %param[default] format

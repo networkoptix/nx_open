@@ -237,8 +237,13 @@ void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr& re
 void QnWorkbenchAccessController::recalculateAllPermissions()
 {
     m_user = context()->user();
-    m_globalPermissions = calculateGlobalPermissions();
+    auto newGlobalPermissions = calculateGlobalPermissions();
+    bool changed = newGlobalPermissions != m_globalPermissions;
+    m_globalPermissions = newGlobalPermissions;
     m_readOnlyMode = qnCommon->isReadOnly();
+
+    if (changed)
+        emit globalPermissionsChanged();
 
     for (const QnResourcePtr& resource: qnResPool->getResources())
         updatePermissions(resource);

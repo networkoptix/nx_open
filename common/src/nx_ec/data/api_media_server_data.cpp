@@ -35,10 +35,19 @@ namespace ec2 {
         return result;
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ApiStorageData) (ApiMediaServerData) (ApiMediaServerUserAttributesData) (ApiMediaServerDataEx), (ubjson)(xml)(json)(sql_record)(csv_record), _Fields, (optional, true))
+    #define SERVER_TYPES \
+        (ApiStorageData) \
+        (ApiMediaServerData) \
+        (ApiMediaServerUserAttributesData) \
+        (ApiMediaServerDataEx)
 
-        QN_FUSION_DEFINE_FUNCTIONS(ApiMediaServerData, (eq))
-        QN_FUSION_DEFINE_FUNCTIONS(ApiMediaServerUserAttributesData, (eq))
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+        SERVER_TYPES,
+        (ubjson)(xml)(json)(sql_record)(csv_record),
+        _Fields)
+
+    QN_FUSION_DEFINE_FUNCTIONS(ApiMediaServerData, (eq))
+    QN_FUSION_DEFINE_FUNCTIONS(ApiMediaServerUserAttributesData, (eq))
 
 
     ApiMediaServerUserAttributesData::ApiMediaServerUserAttributesData():

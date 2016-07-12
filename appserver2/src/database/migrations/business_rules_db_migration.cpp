@@ -121,9 +121,10 @@ struct CameraOutputParametersV30
     (CameraOutputParametersV23)\
     (CameraOutputParametersV30)\
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(MIGRATION_ACTION_PARAM_TYPES, (json));
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(MIGRATION_ACTION_PARAM_TYPES, (json), _Fields, (optional, true) )
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(MIGRATION_ACTION_PARAM_TYPES, (json))
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    MIGRATION_ACTION_PARAM_TYPES, (json), _Fields, (optional, false))
 
 bool doRemap(const QSqlDatabase& database, int id, const QVariant& newVal, const QString& fieldName)
 {

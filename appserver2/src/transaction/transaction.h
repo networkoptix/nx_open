@@ -303,6 +303,11 @@ APPLY(507, removeUserGroup, ApiIdData, \
                        false, \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper) \
+APPLY(508, getPredefinedRoles, ApiPredefinedRoleDataList, \
+                        false, /* persistent*/ \
+                        false, /* system*/ \
+                        InvalidGetHashHelper(), /* getHash*/ \
+                        InvalidTriggerNotificationHelper()) /* trigger notification*/ \
 APPLY(600, getLayouts, ApiLayoutDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -752,7 +757,7 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         QnUuid tranGuid;
         QnAbstractTransaction tran;
     };
-#define ApiTransactionDataFields (tranGuid)(tran)
+#define ApiTransactionData_Fields (tranGuid)(tran)
 QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))
 
 

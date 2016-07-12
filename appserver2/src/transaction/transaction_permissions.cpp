@@ -64,10 +64,12 @@ bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiBusinessRuleD
     return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
-bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiLicenseData &/*data*/, Qn::Permission /*permission*/)
+bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiLicenseData &/*data*/, Qn::Permission permission)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+    if (permission == Qn::Permission::SavePermission)
+        return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+    return true;
 }
 
 bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiUserGroupData&/*data*/, Qn::Permission permission)

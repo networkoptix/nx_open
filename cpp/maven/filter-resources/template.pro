@@ -51,6 +51,7 @@ CONFIG(debug, debug|release) {
     #Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
     #DEFINES += ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
   }
+  CONFIG += qml_debug
 }
 else {
   CONFIGURATION=release

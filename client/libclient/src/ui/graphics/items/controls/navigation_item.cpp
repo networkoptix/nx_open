@@ -14,10 +14,11 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
 
+#include <ui/actions/action_manager.h>
+
 #include <ui/common/palette.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
-#include <ui/workbench/workbench.h>
 #include <ui/graphics/items/controls/speed_slider.h>
 #include <ui/graphics/items/controls/volume_slider.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
@@ -28,12 +29,14 @@
 #include <ui/help/help_topics.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/widgets/calendar_widget.h>
-#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
 #include <core/resource/resource.h>
 
@@ -287,6 +290,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     connect(this, &QGraphicsWidget::geometryChanged, [this, sliderLayout]() { m_separators->setGeometry(sliderLayout->geometry()); });
 
+    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this, &QnNavigationItem::updateBookButtonEnabled);
+
     /* Register actions. */
     addAction(action(QnActions::PreviousFrameAction));
     addAction(action(QnActions::NextFrameAction));
@@ -432,7 +437,7 @@ void QnNavigationItem::updateJumpButtonsTooltips()
     bool hasPeriods = navigator()->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsPeriods;
 
     // TODO: #Elric this is cheating!
-    action(QnActions::JumpToStartAction)->setText(hasPeriods ? tr("Previuos Chunk") : tr("To Start"));
+    action(QnActions::JumpToStartAction)->setText(hasPeriods ? tr("Previous Chunk") : tr("To Start"));
     action(QnActions::JumpToEndAction)->setText(hasPeriods ? tr("Next Chunk") : tr("To End"));
 
     updatePlaybackButtonsEnabled(); // TODO: #Elric remove this once buttonwidget <-> action enabled sync is implemented. OR when we disable actions and not buttons.
@@ -445,8 +450,8 @@ void QnNavigationItem::updateBookButtonEnabled()
     const bool motionSearchMode = (currentWidget
         && currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
 
-    const bool bookmarksEnabled = (currentWidget
-        && currentWidget->resource()->flags().testFlag(Qn::live));
+    const bool bookmarksEnabled = accessController()->hasGlobalPermission(Qn::GlobalViewBookmarksPermission)
+        && (currentWidget && currentWidget->resource()->flags().testFlag(Qn::live));
 
     const auto layout = workbench()->currentLayout();
     const bool bookmarkMode = (bookmarksEnabled && !motionSearchMode

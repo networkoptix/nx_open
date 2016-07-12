@@ -302,10 +302,4 @@ void serialize(QnJsonContext *ctx, const QnCameraAdvancedParameter::DataType &va
 	QJson::serialize(ctx, QnCameraAdvancedParameter::dataTypeToString(value), target);
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-	QnCameraAdvancedParameterTypes,
-	(json),
-	_Fields,
-	(optional, true)
-	)
-
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QnCameraAdvancedParameterTypes, (json), _Fields)

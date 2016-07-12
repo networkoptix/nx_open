@@ -187,13 +187,15 @@ void serializeToUrlQuery(const SystemNameUpdate& data, QUrlQuery* const urlQuery
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),
     (json),
-    _Fields);
+    _Fields,
+    (optional, false))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList)(SystemSharingEx) \
         (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList),
     (json),
-    _Fields);
+    _Fields,
+    (optional, false))
 
 }   //api
 }   //cdb

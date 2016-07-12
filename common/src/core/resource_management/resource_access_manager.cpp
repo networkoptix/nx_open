@@ -60,6 +60,35 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnResourceAccessManager::invalidateResourceCache);
 }
 
+ec2::ApiPredefinedRoleDataList QnResourceAccessManager::getPredefinedRoles()
+{
+    static ec2::ApiPredefinedRoleDataList kPredefinedRoles;
+    if (kPredefinedRoles.empty())
+    {
+        kPredefinedRoles.emplace_back(tr("Owner"), Qn::NoGlobalPermissions, true);
+        kPredefinedRoles.emplace_back(tr("Administrator"), Qn::GlobalAdminPermission);
+        kPredefinedRoles.emplace_back(tr("Advanced Viewer"), Qn::GlobalAdvancedViewerPermissionSet);
+        kPredefinedRoles.emplace_back(tr("Viewer"), Qn::GlobalViewerPermissionSet);
+        kPredefinedRoles.emplace_back(tr("Live Viewer"), Qn::GlobalLiveViewerPermissionSet);
+    }
+    return kPredefinedRoles;
+}
+
+Qn::GlobalPermissions QnResourceAccessManager::dependentPermissions(Qn::GlobalPermission value)
+{
+    switch (value)
+    {
+        case Qn::GlobalViewArchivePermission:
+            return Qn::GlobalViewBookmarksPermission | Qn::GlobalExportPermission | Qn::GlobalManageBookmarksPermission;
+        case Qn::GlobalViewBookmarksPermission:
+            return Qn::GlobalManageBookmarksPermission;
+        default:
+            break;
+    }
+    return Qn::NoGlobalPermissions;
+
+}
+
 void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList)
 {
     QnMutexLocker lk(&m_mutex);
@@ -145,13 +174,31 @@ void QnResourceAccessManager::setAccessibleResources(const QnUuid& userId, const
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr& user) const
 {
+    auto filterDependentPermissions = [](Qn::GlobalPermissions value)
+    {
+        //TODO: #GDM code duplication with ::dependentPermissions() method.
+        Qn::GlobalPermissions result = value;
+        if (!result.testFlag(Qn::GlobalViewArchivePermission))
+        {
+            result &= ~Qn::GlobalViewBookmarksPermission;
+            result &= ~Qn::GlobalExportPermission;
+        }
+
+        if (!result.testFlag(Qn::GlobalViewBookmarksPermission))
+        {
+            result &= ~Qn::GlobalManageBookmarksPermission;
+        }
+        return result;
+    };
+
+
     //NX_ASSERT(user, Q_FUNC_INFO, "We must not request permissions for absent user.");
     if (!user)
         return Qn::NoGlobalPermissions;
 
     /* Handle just-created user situation. */
     if (user->flags().testFlag(Qn::local))
-        return user->getRawPermissions();
+        return filterDependentPermissions(user->getRawPermissions());
 
     NX_ASSERT(user->resourcePool(), Q_FUNC_INFO, "Requesting permissions for non-pool user");
 
@@ -176,6 +223,8 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
         result |= userGroup(groupId).permissions;   /*< If the group does not exist, permissions will be empty. */
         result &= ~Qn::GlobalAdminPermission;       /*< If user belongs to group, he cannot be an admin - by design. */
     }
+
+    result = filterDependentPermissions(result);
 
     {
         QnMutexLocker lk(&m_mutex);

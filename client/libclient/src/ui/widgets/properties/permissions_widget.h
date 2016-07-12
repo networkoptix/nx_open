@@ -28,6 +28,10 @@ public:
     virtual void applyChanges() override;
 
     Qn::GlobalPermissions selectedPermissions() const;
+
+private:
+    void updateDependentPermissions();
+
 private:
     QScopedPointer<Ui::PermissionsWidget> ui;
 

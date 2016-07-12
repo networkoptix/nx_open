@@ -16,6 +16,7 @@ Image
 
     signal clicked();
 
+    opacity: (enabled || disabledIconUrl.length ? 1 : 0.3);
     source:
     {
         if (!control.enabled && disabledIconUrl.length)
