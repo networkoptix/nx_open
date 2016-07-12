@@ -1,6 +1,6 @@
-#ifndef QN_SCHEDULE_GRID_WIDGET_H
-#define QN_SCHEDULE_GRID_WIDGET_H
+#pragma once
 
+#include <array>
 #include <QtCore/QVariant>
 #include <QtGui/QColor>
 #include <QtWidgets/QWidget>
@@ -8,20 +8,24 @@
 #include <client/client_color_types.h>
 
 
-//TODO: #Elric omg look at these global constants =)
-static const int COL_COUNT = 24;
-static const int ROW_COUNT = 7;
-
-class QnScheduleGridWidget : public QWidget {
+class QnScheduleGridWidget : public QWidget
+{
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
     Q_PROPERTY(QnScheduleGridColors colors READ colors WRITE setColors)
 
+    enum
+    {
+        kHoursPerDay = 24,
+        kDaysPerWeek = 7
+    };
+
 public:
-    explicit QnScheduleGridWidget(QWidget *parent = 0);
+    explicit QnScheduleGridWidget(QWidget* parent = nullptr);
     virtual ~QnScheduleGridWidget();
 
-    enum ParamType {
+    enum ParamType
+    {
         FpsParam,
         QualityParam,
         RecordTypeParam,
@@ -33,21 +37,17 @@ public:
     void setShowFps(bool value);
     void setShowQuality(bool value);
 
-    inline int rowCount() const { return ROW_COUNT; }
-    inline int columnCount() const { return COL_COUNT; }
+    inline int rowCount() const { return kDaysPerWeek; }
+    inline int columnCount() const { return kHoursPerDay; }
 
-    QVariant cellValue(const QPoint &cell, ParamType paramType) const;
-    void setCellValue(const QPoint &cell, ParamType paramType, const QVariant &value);
+    QVariant cellValue(const QPoint& cell, ParamType paramType) const;
+    void setCellValue(const QPoint& cell, ParamType paramType, const QVariant& value);
     void resetCellValues();
 
-    Qn::RecordingType cellRecordingType(const QPoint &cell) const;
-    void setCellRecordingType(const QPoint &cell, const Qn::RecordingType &value);
+    Qn::RecordingType cellRecordingType(const QPoint& cell) const;
+    void setCellRecordingType(const QPoint& cell, const Qn::RecordingType& value);
 
     virtual QSize minimumSizeHint() const override;
-
-    // TODO: #Elric implement this properly, handle ChangeEvent
-    void setEnabled(bool val);
-    bool isEnabled() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
@@ -55,48 +55,52 @@ public:
     void setMaxFps(int maxFps, int maxDualStreamFps); // todo: move this methods to camera schedule widget
     int getMaxFps(bool motionPlusLqOnly); // todo: move this methods to camera schedule widget
 
-    const QnScheduleGridColors &colors() const;
-    void setColors(const QnScheduleGridColors &colors);
+    const QnScheduleGridColors& colors() const;
+    void setColors(const QnScheduleGridColors& colors);
 
 signals:
-    void cellActivated(const QPoint &cell);
-    void cellValueChanged(const QPoint &cell);
+    void cellActivated(const QPoint& cell);
+    void cellValueChanged(const QPoint& cell);
 
     void colorsChanged();
 
 protected:
-    virtual void mouseMoveEvent(QMouseEvent *event) override;
-    virtual void mousePressEvent(QMouseEvent *event) override;
-    virtual void mouseReleaseEvent(QMouseEvent *event) override;
-    virtual void leaveEvent(QEvent *event) override;
-    virtual void paintEvent(QPaintEvent *event) override;
-    virtual void resizeEvent(QResizeEvent *event) override;
+    virtual void mouseMoveEvent(QMouseEvent* event) override;
+    virtual void mousePressEvent(QMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QMouseEvent* event) override;
+    virtual void leaveEvent(QEvent* event) override;
+    virtual void paintEvent(QPaintEvent* event) override;
+    virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
-    typedef QVariant CellParams[ParamCount];
+    using CellParams = std::array<QVariant, ParamCount>;
+    using RowParams = std::array<CellParams, kDaysPerWeek>;
+    using GridParams = std::array<RowParams, kHoursPerDay>;
 
-    void setCellValueInternal(const QPoint &cell, const CellParams &value);
-    void setCellValueInternal(const QPoint &cell, ParamType type, const QVariant &value);
-    void updateCellValueInternal(const QPoint &cell);
+    void setCellValueInternal(const QPoint& cell, const CellParams& value);
+    void setCellValueInternal(const QPoint& cell, ParamType type, const QVariant& value);
+    void updateCellValueInternal(const QPoint& cell);
 
-    QPoint mapToGrid(const QPoint &pos, bool doTruncate) const;
+    QPoint mapToGrid(const QPoint& pos, bool doTruncate) const;
 
     int cellSize() const;
     void initMetrics();
 
-    bool isValidCell(const QPoint &cell) const;
+    bool isValidCell(const QPoint& cell) const;
     bool isValidRow(int row) const;
     bool isValidColumn(int column) const;
-
-    QColor disabledCellColor(const QColor &baseColor) const;
 
     void updateSelectedCellsRect();
 
     void updateCellColors();
 
+    QRectF horizontalHeaderCell(int x) const;
+    QRectF verticalHeaderCell(int y) const;
+    QRectF cornerHeaderCell() const;
+
 private:
     CellParams m_defaultParams;
-    CellParams m_gridParams[COL_COUNT][ROW_COUNT];
+    GridParams m_gridParams;
     bool m_showFps;
     bool m_showQuality;
     QString m_cornerText;
@@ -113,13 +117,14 @@ private:
     bool m_mousePressed;
     QFont m_labelsFont;
     QFont m_gridFont;
-
-    QColor m_cellColors[Qn::RT_Count];
-    QColor m_insideColors[Qn::RT_Count];
     QnScheduleGridColors m_colors;
+
+    using TypeColors = std::array<QColor, Qn::RT_Count>;
+    TypeColors m_cellColors;
+    TypeColors m_cellColorsHovered;
+    TypeColors m_insideColors;
+    TypeColors m_insideColorsHovered;
 
     bool m_enabled;
     bool m_readOnly;
 };
-
-#endif // QN_SCHEDULE_GRID_WIDGET_H
