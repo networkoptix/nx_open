@@ -68,6 +68,7 @@
 #include <media_server/server_update_tool.h>
 #include <media_server/server_connector.h>
 #include <media_server/file_connection_processor.h>
+#include <media_server/crossdomain_connection_processor.h>
 #include <media_server/resource_status_watcher.h>
 #include <media_server/media_server_resource_searchers.h>
 
@@ -1645,6 +1646,7 @@ bool MediaServerProcess::initTcpListener(
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     m_universalTcpListener->addHandler<QnFileConnectionProcessor>("HTTP", "static");
+    m_universalTcpListener->addHandler<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
     m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
@@ -1829,6 +1831,7 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogout"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getCurrentUser"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/static/*"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), AuthMethod::noAuth);
 
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), AuthMethod::noAuth );
@@ -2361,9 +2364,6 @@ void MediaServerProcess::run()
         qnGlobalSettings->setNewSystem(true);
     }
 
-
-    if (qnGlobalSettings->isCrossdomainXmlEnabled())
-        m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
 
     auto upnpPortMapper = initializeUpnpPortMapper();
 
