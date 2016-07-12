@@ -54,26 +54,26 @@ public:
     // ----  QnlTimeSource interface ----
 
     /**
-    * @return Current time.
-    * May be different from displayed time.
-    * After seek for example, while no any frames are really displayed.
-    */
+     * @return Current time.
+     * May be different from displayed time.
+     * After seek for example, while no any frames are really displayed.
+     */
     virtual qint64 getCurrentTime() const override;
 
     /**
-    * @return Last displayed time.
-    */
+     * @return Last displayed time.
+     */
     virtual qint64 getDisplayedTime() const override;
     void setDisplayedTimeUs(qint64 value); //< not part of QnlTimeSource interface
 
     /**
-    * @return Time of the next frame.
-    */
+     * @return Time of the next frame.
+     */
     virtual qint64 getNextTime() const override;
 
     /**
-    * @return External clock to sync several video with each other.
-    */
+     * @return External clock to sync several video with each other.
+     */
     virtual qint64 getExternalTime() const override;
 
 signals:
