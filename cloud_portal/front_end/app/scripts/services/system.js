@@ -169,7 +169,7 @@ angular.module('cloudApp')
             if(!this.usersPromise){
                 var self = this;
                 var promise = null;
-                if(self.isOnline){ // Two separate cases - either we get info from the system (presuming it has actual names)
+                if(false && self.isOnline){ // Two separate cases - either we get info from the system (presuming it has actual names)
                     promise = self.getUsersDataFromTheSystem(self.id).catch(function(){
                         return self.getUsersCachedInCloud(self.id);
                     });
@@ -227,7 +227,9 @@ angular.module('cloudApp')
 
             user.groupId = role.groupId || '';
             user.permissions = role.permissions || '';
-            cloudApi.share(this.id, user.email, accessRole);
+
+            // TODO: remove later
+            //cloudApi.share(this.id, user.email, accessRole);
 
             return mediaserver.saveUser(this.id, user).then(function(result){
                 user.accessRole = accessRole;
@@ -238,7 +240,7 @@ angular.module('cloudApp')
             var self = this;
 
             // TODO: remove later
-            cloudApi.unshare(self.id, user.accountEmail);
+            //cloudApi.unshare(self.id, user.accountEmail);
 
             return mediaserver.deleteUser(self.id, user.id).then(function(){
                 self.users = _.without(self.users, user);

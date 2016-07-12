@@ -1,157 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
     <meta charset="utf-8">
-    <title>Page Not Found :(</title>
-    <style>
-      ::-moz-selection {
-        background: #b3d4fc;
-        text-shadow: none;
-      }
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
 
-      ::selection {
-        background: #b3d4fc;
-        text-shadow: none;
-      }
+    <base href="/" />
 
-      html {
-        padding: 30px 10px;
-        font-size: 20px;
-        line-height: 1.4;
-        color: #737373;
-        background: #f0f0f0;
-        -webkit-text-size-adjust: 100%;
-        -ms-text-size-adjust: 100%;
-      }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-      html,
-      input {
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      }
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="/static/images/favicon.ico">
 
-      body {
-        max-width: 500px;
-        _width: 500px;
-        padding: 30px 20px 50px;
-        border: 1px solid #b3b3b3;
-        border-radius: 4px;
-        margin: 0 auto;
-        box-shadow: 0 1px 10px #a7a7a7, inset 0 1px 0 #fff;
-        background: #fcfcfc;
-      }
+    <link rel="stylesheet" href="fonts/roboto/roboto_bold/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_light/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_regular/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_medium/stylesheet.css" />
 
-      h1 {
-        margin: 0 10px;
-        font-size: 50px;
-        text-align: center;
-      }
+    <!-- build:css({.tmp,app}) static/styles/index-404.css -->
 
-      h1 span {
-        color: #bbb;
-      }
+    <link rel="stylesheet" href="bower_components/ngToast/dist/ngToast.css">
+    <link rel="stylesheet" href="bower_components/ngToast/dist/ngToast-animations.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
 
-      h3 {
-        margin: 1.5em 0 0.5em;
-      }
+</head>
+<body ng-app="cloudApp" class="loading">
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
 
-      p {
-        margin: 1em 0;
-      }
+<!-- Add your site or application content here -->
 
-      ul {
-        padding: 0 0 0 40px;
-        margin: 1em 0;
-      }
+<noscript>
+    Please, turn on JavaScript in your browser
+</noscript>
 
-      .container {
-        max-width: 380px;
-        _width: 380px;
-        margin: 0 auto;
-      }
+<header></header>
 
-      /* google search */
+<ng-include src="'/static/views/404.html'" ></ng-include>
 
-      #goog-fixurl ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
+<footer></footer>
 
-      #goog-fixurl form {
-        margin: 0;
-      }
+<!--[if lt IE 9]>
+<!-- build:js static/scripts/ie-downgrade.js -->
+<script src="bower_components/es5-shim/es5-shim.js"></script>
+<script src="bower_components/json3/lib/json3.min.js"></script>
+<!-- endbuild -->
+<!--[endif]-->
 
-      #goog-wm-qt,
-      #goog-wm-sb {
-        border: 1px solid #bbb;
-        font-size: 16px;
-        line-height: normal;
-        vertical-align: top;
-        color: #444;
-        border-radius: 2px;
-      }
+<!-- build:js static/scripts/vendor-404.js -->
+<!-- bower:js -->
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/json3/lib/json3.js"></script>
+<script src="bower_components/es5-shim/es5-shim.js"></script>
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.js"></script>
+<script src="bower_components/angular-resource/angular-resource.js"></script>
+<script src="bower_components/angular-cookies/angular-cookies.js"></script>
+<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+<script src="bower_components/angular-route/angular-route.js"></script>
+<script src="bower_components/angular-animate/angular-animate.js"></script>
+<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="bower_components/underscore/underscore.js"></script>
+<script src="bower_components/jquery-mousewheel/jquery.mousewheel.js"></script>
+<script src="bower_components/angular-cookie/angular-cookie.js"></script>
+<script src="bower_components/ngstorage/ngStorage.js"></script>
+<script src="bower_components/angular-base64/angular-base64.js"></script>
+<script src="bower_components/ngToast/dist/ngToast.js"></script>
+<!-- endbower -->
+<!-- endbuild -->
 
-      #goog-wm-qt {
-        width: 220px;
-        height: 20px;
-        padding: 5px;
-        margin: 5px 10px 0 0;
-        box-shadow: inset 0 1px 1px #ccc;
-      }
+<script src="static/scripts/language.js"></script>
 
-      #goog-wm-sb {
-        display: inline-block;
-        height: 32px;
-        padding: 0 10px;
-        margin: 5px 0 0;
-        white-space: nowrap;
-        cursor: pointer;
-        background-color: #f5f5f5;
-        background-image: -webkit-linear-gradient(rgba(255,255,255,0), #f1f1f1);
-        background-image: -moz-linear-gradient(rgba(255,255,255,0), #f1f1f1);
-        background-image: -ms-linear-gradient(rgba(255,255,255,0), #f1f1f1);
-        background-image: -o-linear-gradient(rgba(255,255,255,0), #f1f1f1);
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        *overflow: visible;
-        *display: inline;
-        *zoom: 1;
-      }
+<!-- build:js({.tmp,app}) static/scripts/scripts-404.js -->
 
-      #goog-wm-sb:hover,
-      #goog-wm-sb:focus {
-        border-color: #aaa;
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-        background-color: #f8f8f8;
-      }
+<script src="scripts/config.js"></script>
+<script src="scripts/app.js"></script>
 
-      #goog-wm-qt:hover,
-      #goog-wm-qt:focus {
-        border-color: #105cb6;
-        outline: 0;
-        color: #222;
-      }
+<script src="scripts/controllers/startPage.js"></script>
+<script src="scripts/controllers/login.js"></script>
+<script src="scripts/controllers/register.js"></script>
+<script src="scripts/controllers/systems.js"></script>
+<script src="scripts/controllers/system.js"></script>
+<script src="scripts/controllers/share.js"></script>
+<script src="scripts/controllers/account.js"></script>
+<script src="scripts/controllers/activateRestore.js"></script>
+<script src="scripts/controllers/static.js"></script>
+<script src="scripts/controllers/debug.js"></script>
+<script src="scripts/controllers/disconnect.js"></script>
 
-      input::-moz-focus-inner {
-        padding: 0;
-        border: 0;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Not found <span>:(</span></h1>
-      <p>Sorry, but the page you were trying to view does not exist.</p>
-      <p>It looks like this was the result of either:</p>
-      <ul>
-        <li>a mistyped address</li>
-        <li>an out-of-date link</li>
-      </ul>
-      <script>
-        var GOOG_FIXURL_LANG = (navigator.language || '').slice(0,2),GOOG_FIXURL_SITE = location.host;
-      </script>
-      <script src="//linkhelp.clients.google.com/tbproxy/lh/wm/fixurl.js"></script>
-    </div>
-  </body>
+<script src="scripts/directives/header.js"></script>
+<script src="scripts/directives/footer.js"></script>
+<script src="scripts/directives/process.js"></script>
+<script src="scripts/directives/validateField.js"></script>
+<script src="scripts/directives/autofocus.js"></script>
+<script src="scripts/directives/passwordInput.js"></script>
+<script src="scripts/directives/validateEmail.js"></script>
+
+<script src="scripts/services/angular-uuid2.js"></script>
+<script src="scripts/services/dialogs.js"></script>
+<script src="scripts/services/cloud_api.js"></script>
+<script src="scripts/services/process.js"></script>
+<script src="scripts/services/urlProtocol.js"></script>
+<script src="scripts/services/mediaserver.js"></script>
+<script src="scripts/services/system.js"></script>
+<script src="scripts/services/account.js"></script>
+<script src="scripts/filters/highlight.js"></script>
+
+<script src="scripts/bigBrother.js"></script>
+<!-- endbuild -->
+
+</body>
 </html>

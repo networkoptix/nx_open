@@ -137,9 +137,12 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.callLogin = true; }]
             }
         })
-        .otherwise({
+        .when('/', {
             templateUrl: 'static/views/startPage.html',
             controller: 'StartPageCtrl'
+        })
+        .otherwise({
+            templateUrl: 'static/views/404.html'
         });
 }]).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
     var original = $location.path;

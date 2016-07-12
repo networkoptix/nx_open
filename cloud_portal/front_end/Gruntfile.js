@@ -37,8 +37,7 @@ module.exports = function (grunt) {
         wiredep: {
             target: {
                 src: [
-                    '<%= yeoman.app %>/login.html',
-                    '<%= yeoman.app %>/index.html',
+                    '<%= yeoman.app %>/*.html',
                     '<%= yeoman.app %>/index.xsl'
                 ],
                 ignorePath: '<%= yeoman.app %>/'
@@ -340,7 +339,7 @@ module.exports = function (grunt) {
         // concat, minify and revision files. Creates configurations in memory so
         // additional tasks can operate on them
         useminPrepare: {
-            html: ['<%= yeoman.app %>/login.html','<%= yeoman.app %>/index.html', '<%= yeoman.app %>/api.xsl'],
+            html: ['<%= yeoman.app %>/*.html', '<%= yeoman.app %>/api.xsl'],
             options: {
                 dest: '<%= yeoman.dist %>'
             }
