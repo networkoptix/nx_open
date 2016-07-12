@@ -21,22 +21,27 @@ Column
     bottomPadding: 16;
     spacing: 16;
 
+    opacity: 0;
     anchors.left: (parent ? parent.left : undefined);
     anchors.right: (parent ? parent.right : undefined);
 
     signal connectButtonClicked();
 
+
+    onOpacityChanged:
+    {
+        if (opacity < 1.0 || !visible)
+            return;
+
+        if (loginTextItem.visible)
+            loginTextItem.forceActiveFocus();
+        else
+            passwordTextItem.forceActiveFocus();
+    }
+
     Column
     {
         width: parent.width;
-
-        onVisibleChanged:
-        {
-            if (loginTextItem.visible)
-                loginTextItem.forceActiveFocus();
-            else
-                passwordTextItem.forceActiveFocus();
-        }
 
         spacing: 8;
 
