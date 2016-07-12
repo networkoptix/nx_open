@@ -74,6 +74,21 @@ ec2::ApiPredefinedRoleDataList QnResourceAccessManager::getPredefinedRoles()
     return kPredefinedRoles;
 }
 
+Qn::GlobalPermissions QnResourceAccessManager::dependentPermissions(Qn::GlobalPermission value)
+{
+    switch (value)
+    {
+        case Qn::GlobalViewArchivePermission:
+            return Qn::GlobalViewBookmarksPermission | Qn::GlobalExportPermission | Qn::GlobalManageBookmarksPermission;
+        case Qn::GlobalViewBookmarksPermission:
+            return Qn::GlobalManageBookmarksPermission;
+        default:
+            break;
+    }
+    return Qn::NoGlobalPermissions;
+
+}
+
 void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList)
 {
     QnMutexLocker lk(&m_mutex);
@@ -159,8 +174,9 @@ void QnResourceAccessManager::setAccessibleResources(const QnUuid& userId, const
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr& user) const
 {
-    auto filterDependantPermissions = [](Qn::GlobalPermissions value)
+    auto filterDependentPermissions = [](Qn::GlobalPermissions value)
     {
+        //TODO: #GDM code duplication with ::dependentPermissions() method.
         Qn::GlobalPermissions result = value;
         if (!result.testFlag(Qn::GlobalViewArchivePermission))
         {
@@ -182,7 +198,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
 
     /* Handle just-created user situation. */
     if (user->flags().testFlag(Qn::local))
-        return filterDependantPermissions(user->getRawPermissions());
+        return filterDependentPermissions(user->getRawPermissions());
 
     NX_ASSERT(user->resourcePool(), Q_FUNC_INFO, "Requesting permissions for non-pool user");
 
@@ -208,7 +224,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
         result &= ~Qn::GlobalAdminPermission;       /*< If user belongs to group, he cannot be an admin - by design. */
     }
 
-    result = filterDependantPermissions(result);
+    result = filterDependentPermissions(result);
 
     {
         QnMutexLocker lk(&m_mutex);
