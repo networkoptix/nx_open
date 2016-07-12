@@ -105,7 +105,10 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
     {
         QnMutexLocker lock(&m_queueMutex);
         if (!m_videoDecoder)
+        {
             m_videoDecoder.reset(new SeamlessVideoDecoder());
+            m_videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
+        }
         if (!m_audioDecoder)
             m_audioDecoder.reset(new SeamlessAudioDecoder());
     }
@@ -313,6 +316,12 @@ CodecID PlayerDataConsumer::currentCodec() const
         return m_videoDecoder->currentCodec();
     else
         return CODEC_ID_NONE;
+}
+
+void PlayerDataConsumer::setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor)
+{
+    NX_ASSERT(videoGeometryAccessor);
+    m_videoGeometryAccessor = videoGeometryAccessor;
 }
 
 qint64 PlayerDataConsumer::getCurrentTime() const

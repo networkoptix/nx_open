@@ -143,4 +143,4 @@ int ProxyVideoDecoder::decode(
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

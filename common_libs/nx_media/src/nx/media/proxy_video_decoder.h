@@ -18,8 +18,7 @@ class ProxyVideoDecoderPrivate;
  * which is intended not to be the part of netoptix_vms tree, and has an interface not depending on
  * ffmpeg, thus, can be compiled with a different ffmpeg version.
  */
-class ProxyVideoDecoder
-:
+class ProxyVideoDecoder:
     public AbstractVideoDecoder
 {
 public:
@@ -43,4 +42,4 @@ private:
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

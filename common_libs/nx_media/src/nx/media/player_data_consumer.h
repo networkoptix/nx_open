@@ -2,6 +2,7 @@
 
 #include <deque>
 #include <atomic>
+#include <functional>
 
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/video_data_packet.h>
@@ -30,6 +31,9 @@ class PlayerDataConsumer:
     typedef QnAbstractDataConsumer base_type;
 
 public:
+    typedef std::function<QRect()> VideoGeometryAccessor;
+
+public:
     PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader);
     virtual ~PlayerDataConsumer();
 
@@ -43,6 +47,9 @@ public:
 
     /** Can be CODEC_ID_NONE if not available. */
     CodecID currentCodec() const;
+
+    /** Should be called before other methods; needed by some decoders, e.g. hw-based. */
+    void setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor);
 
     // ----  QnlTimeSource interface ----
 
@@ -126,6 +133,8 @@ private:
         WaitForNextBOF //< noDelay will be disabled as soon as next BOF frame is received
     };
     NoDelayState m_noDelayState;
+
+    VideoGeometryAccessor m_videoGeometryAccessor;
 
     std::atomic<qint64> m_lastFrameTimeUs;
     std::atomic<qint64> m_lastDisplayedTimeUs;

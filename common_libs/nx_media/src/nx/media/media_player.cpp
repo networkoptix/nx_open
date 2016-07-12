@@ -5,6 +5,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtOpenGL/QGL>
 #include <QtCore/QTimer>
+#include <QtCore/QMutex>
 
 #include <utils/common/delayed.h>
 #include <core/resource_management/resource_pool.h>
@@ -59,6 +60,10 @@ struct NxMediaFlagConfig: public nx::utils::FlagConfig
     NX_STRING_PARAM("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
     NX_FLAG(0, outputFrameDelays, "Log if frame delay is negative.");
     NX_FLAG(0, enableFps, "");
+    NX_INT_PARAM(-1, hwVideoX, "If not -1, override hardware video window X.");
+    NX_INT_PARAM(-1, hwVideoY, "If not -1, override hardware video window Y.");
+    NX_INT_PARAM(-1, hwVideoWidth, "If not -1, override hardware video window width.");
+    NX_INT_PARAM(-1, hwVideoHeight, "If not -1, override hardware video window height.");
 };
 NxMediaFlagConfig conf("nx_media");
 
@@ -158,6 +163,9 @@ public:
     // Video geometry inside the application window.
     QRect videoGeometry;
 
+    // Protects access to videoGeometry.
+    mutable QMutex videoGeometryMutex;
+
     void applyVideoQuality();
 
 private:
@@ -191,8 +199,7 @@ private:
         QSize highResolution, CodecID highCodec, QSize lowResolution, CodecID lowCodec);
 };
 
-PlayerPrivate::PlayerPrivate(Player *parent)
-:
+PlayerPrivate::PlayerPrivate(Player *parent):
     QObject(parent),
     q_ptr(parent),
     state(Player::State::Stopped),
@@ -678,7 +685,7 @@ void PlayerPrivate::doApplyVideoQuality(
     {
         NX_LOG(lit("[media_player] Low stream requested => Set low stream"), cl_logDEBUG2);
     }
-};
+}
 
 bool PlayerPrivate::createArchiveReader()
 {
@@ -712,12 +719,27 @@ bool PlayerPrivate::initDataProvider()
 
     applyVideoQuality();
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
-    // TODO: #mshevchenko Uncomment the code below and implement the corresponding method.
-//    dataConsumer->setVideoGeometryAccessor(
-//        [guardedThis = QPointer<PlayerPrivate>(this)]()
-//        {
-//            return guardedThis ? guardedThis->videoGeometry : QRect();
-//        });
+    dataConsumer->setVideoGeometryAccessor(
+        [guardedThis = QPointer<PlayerPrivate>(this)]()
+        {
+            QRect r;
+            if (guardedThis)
+            {
+                QMutexLocker lock(&guardedThis->videoGeometryMutex);
+                r = guardedThis->videoGeometry;
+            }
+
+            if (conf.hwVideoX != -1)
+                r.setX(conf.hwVideoX);
+            if (conf.hwVideoY != -1)
+                r.setY(conf.hwVideoY);
+            if (conf.hwVideoWidth != -1)
+                r.setWidth(conf.hwVideoWidth);
+            if (conf.hwVideoHeight != -1)
+                r.setHeight(conf.hwVideoHeight);
+
+            return r;
+        });
 
     archiveReader->addDataProcessor(dataConsumer.get());
     connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame,
@@ -947,16 +969,23 @@ QSize Player::currentResolution() const
 QRect Player::videoGeometry() const
 {
     Q_D(const Player);
+    QMutexLocker lock(&d->videoGeometryMutex);
     return d->videoGeometry;
 }
 
 void Player::setVideoGeometry(const QRect& rect)
 {
     Q_D(Player);
-    if (d->videoGeometry == rect)
-        return;
 
-    d->videoGeometry = rect;
+    {
+        QMutexLocker lock(&d->videoGeometryMutex);
+
+        if (d->videoGeometry == rect)
+            return;
+
+        d->videoGeometry = rect;
+    }
+
     emit videoGeometryChanged();
 }
 
