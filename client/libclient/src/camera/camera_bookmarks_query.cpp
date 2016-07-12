@@ -46,6 +46,15 @@ void QnCameraBookmarksQuery::setCamera(const QnVirtualCameraResourcePtr &value)
     setCameras(cameras);
 }
 
+bool QnCameraBookmarksQuery::removeCamera(const QnVirtualCameraResourcePtr &value)
+{
+    if (!m_cameras.contains(value))
+        return false;
+    m_cameras.remove(value);
+    emit queryChanged();
+    return true;
+}
+
 QnCameraBookmarkSearchFilter QnCameraBookmarksQuery::filter() const
 {
     return m_filter;

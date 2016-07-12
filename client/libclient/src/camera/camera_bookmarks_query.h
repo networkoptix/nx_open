@@ -35,6 +35,12 @@ public:
     /// @param value            Single camera. If it is empty, query will become invalid.
     void setCamera(const QnVirtualCameraResourcePtr &value);
 
+    /// @brief                  Remove camera from the target cameras set.
+    ///                         Actual data will be forcefully updated if the new camera set value differs from current.
+    /// @param value            Single camera. If the resulting set is empty, query will become invalid.
+    /// @returns                True if camera was really removed, false otherwise.
+    bool removeCamera(const QnVirtualCameraResourcePtr &value);
+
     /// @brief                  Query loads bookmarks filtered by the given filter.
     /// @returns                Current filter.
     QnCameraBookmarkSearchFilter filter() const;

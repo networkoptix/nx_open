@@ -150,6 +150,8 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmar
     connect(timer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkPendingBookmarks);
     connect(timer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkQueriesUpdate);
     timer->start();
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnCameraBookmarksManagerPrivate::removeCameraFromQueries);
 }
 
 QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
@@ -554,4 +556,42 @@ void QnCameraBookmarksManagerPrivate::checkPendingBookmarks()
         else
             ++it;
     }
+}
+
+void QnCameraBookmarksManagerPrivate::removeCameraFromQueries(const QnResourcePtr& resource)
+{
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
+    auto cameraId = camera->getUniqueId();
+
+    for (QueryInfo &info : m_queries)
+    {
+        QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
+        NX_ASSERT(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+        if (!query)
+            continue;
+
+        if (!query->removeCamera(camera))
+            continue;
+
+        bool changed = false;
+        for (auto it = info.bookmarksCache.begin(); it != info.bookmarksCache.end(); )
+        {
+            if (it->cameraId == cameraId)
+            {
+                it = info.bookmarksCache.erase(it);
+                changed = true;
+            }
+            else
+            {
+                ++it;
+            }
+        }
+
+        if (changed)
+            emit query->bookmarksChanged(info.bookmarksCache);
+    }
+
 }
