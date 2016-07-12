@@ -2300,6 +2300,14 @@ QRect QnNxStyle::subElementRect(
 {
     switch (subElement)
     {
+        case SE_CheckBoxClickRect:
+        {
+            if (isSwitchButtonCheckbox(widget))
+                return option->rect;
+
+            break;
+        }
+
         case SE_LineEditContents:
         {
             if (!widget || !widget->parent() || !qobject_cast<const QAbstractItemView*>(widget->parent()->parent()))
@@ -2313,11 +2321,11 @@ QRect QnNxStyle::subElementRect(
             if (auto buttonBox = qobject_cast<const QDialogButtonBox *>(widget))
             {
                 if (qobject_cast<const QDialog*>(buttonBox->parentWidget()))
-                        {
-                            int margin = proxy()->pixelMetric(PM_DefaultTopLevelMargin);
-                            return QnGeometry::dilated(option->rect, margin);
-                        }
-                    }
+                {
+                    int margin = proxy()->pixelMetric(PM_DefaultTopLevelMargin);
+                    return QnGeometry::dilated(option->rect, margin);
+                }
+            }
             break;
         }
 
