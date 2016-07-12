@@ -69,7 +69,8 @@ bool checkBookmarkForQuery(const QnCameraBookmarksQueryPtr &query, const QnCamer
 QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo()
     : operation(OperationType::Add)
     , callback()
-{}
+{
+}
 
 QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(
     OperationType operation,
@@ -78,7 +79,8 @@ QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(
     : operation(operation)
     , callback(callback)
     , bookmarkId(bookmarkId)
-{}
+{
+}
 
 
 /************************************************************************/
@@ -100,7 +102,8 @@ QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo(const QnCameraBookmarksQue
     , state(QueryState::Invalid)
     , requestTimer()
     , requestId(invalidRequestId)
-{}
+{
+}
 
 
 /************************************************************************/
@@ -150,7 +153,8 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmar
 }
 
 QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
-{}
+{
+}
 
 int QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraResourceSet &cameras
     , const QnCameraBookmarkSearchFilter &filter

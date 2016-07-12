@@ -8,10 +8,12 @@ QnCameraBookmarksQuery::QnCameraBookmarksQuery(const QnVirtualCameraResourceSet 
     , m_id(QUuid::createUuid())
     , m_cameras(cameras)
     , m_filter(filter)
-{}
+{
+}
 
 QnCameraBookmarksQuery::~QnCameraBookmarksQuery()
-{}
+{
+}
 
 QUuid QnCameraBookmarksQuery::id() const
 {
