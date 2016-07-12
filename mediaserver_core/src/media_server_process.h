@@ -35,6 +35,8 @@ namespace ec2 {
     class CrashReporter;
 }
 
+void restartServer(int restartTimeout);
+
 class MediaServerProcess : public QnLongRunnable
 {
     Q_OBJECT
