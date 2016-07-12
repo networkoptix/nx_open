@@ -599,7 +599,7 @@
                 <module>client/activex_client</module>
                 <module>plugins/nxinterface</module>
                 <module>plugins/nxcontrol</module>
-                <module>plugins/acs/paxton</module>
+                <module>plugins/acs/paxton-plugin</module>
                 <module>plugins/acs/paxton-installer</module>
             </modules>
         </profile>
