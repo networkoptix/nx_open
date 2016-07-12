@@ -265,13 +265,13 @@ void QnResourceBrowserWidget::setCurrentTab(Tab tab)
 
 bool QnResourceBrowserWidget::isLayoutSearchable(QnWorkbenchLayout* layout) const
 {
-    return accessController()->permissions(layout->resource()) & Qn::WritePermission;
+    return accessController()->hasPermissions(layout->resource(), Qn::WritePermission | Qn::AddRemoveItemsPermission);
 }
 
 QnResourceSearchProxyModel* QnResourceBrowserWidget::layoutModel(QnWorkbenchLayout* layout, bool create) const
 {
     QnResourceSearchProxyModel* result = layout->property(qn_searchModelPropertyName).value<QnResourceSearchProxyModel*>();
-    if (create && !result && isLayoutSearchable(layout))
+    if (create && !result)
     {
         result = new QnResourceSearchProxyModel(layout);
         result->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -731,16 +731,6 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent* event)
         if (workbench())
         {
             QnWorkbenchLayout* layout = workbench()->currentLayout();
-            if (!isLayoutSearchable(layout))
-            {
-                QString filter = ui->filterLineEdit->text();
-                menu()->trigger(QnActions::OpenNewTabAction);
-                setLayoutFilter(layout, QString()); /* Clear old layout's filter. */
-
-                layout = workbench()->currentLayout();
-                ui->filterLineEdit->setText(filter);
-            }
-
             QnResourceSearchProxyModel* model = layoutModel(layout, true);
 
             QString filter = ui->filterLineEdit->text();
