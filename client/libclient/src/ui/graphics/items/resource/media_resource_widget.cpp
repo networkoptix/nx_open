@@ -274,7 +274,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         updateIoModuleVisibility(false);
     }
 
-    if (m_camera && m_camera->hasTwoWayAudio())
+    if (m_camera && m_camera->hasTwoWayAudio() && accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
     {
         auto twoWayAudioItem = new QnTwoWayAudioWidget();
         twoWayAudioItem->setCamera(m_camera);
@@ -1224,8 +1224,8 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         && item()->layout()->isSearchLayout();
 
     if(m_camera
-        && m_camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)
-        && !m_camera->hasPtzCapabilities(Qn::VirtualPtzCapability)
+        && m_camera->hasAnyOfPtzCapabilities(Qn::ContinuousPtzCapabilities)
+        && !m_camera->hasAnyOfPtzCapabilities(Qn::VirtualPtzCapability)
         && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
         && !isExportedLayout
         && !isPreviewSearchLayout

@@ -113,7 +113,6 @@
 #include <rest/handlers/get_system_name_rest_handler.h>
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
-#include <rest/handlers/camera_bookmarks_rest_handler.h>
 #include <rest/handlers/crash_server_handler.h>
 #include <rest/handlers/external_business_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
@@ -1290,6 +1289,32 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     }
 
     {
+        //loading accessible resources
+        ec2::ApiAccessRightsDataList accessRights;
+        while ((rez = ec2Connection->getUserManager(Qn::kDefaultUserAccess)->getAccessRightsSync(&accessRights)) != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get accessRights. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+        messageProcessor->resetAccessRights(accessRights);
+    }
+
+    {
+        //loading user roles
+        ec2::ApiUserGroupDataList roles;
+        while ((rez = ec2Connection->getUserManager(Qn::kDefaultUserAccess)->getUserGroupsSync(&roles)) != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get roles. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+        messageProcessor->resetUserRoles(roles);
+    }
+
+    {
         //loading business rules
         QnBusinessEventRuleList rules;
         while( (rez = ec2Connection->getBusinessEventManager(Qn::kDefaultUserAccess)->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
@@ -1603,8 +1628,6 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler());
 
     QnRestProcessorPool::instance()->registerHandler("api/transmitAudio", new QnAudioTransmissionRestHandler());
-
-    QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 
     QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
     QnRestProcessorPool::instance()->registerHandler("ec2/cameraHistory", new QnCameraHistoryRestHandler());

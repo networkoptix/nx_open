@@ -6,11 +6,14 @@
 #include <common/common_globals.h>
 
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource/user_resource.h>
 
 #include <nx/utils/string.h>
+#include <nx/utils/raii_guard.h>
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace
 {
@@ -66,6 +69,9 @@ public:
     {
         std::sort(userRoles.begin(), userRoles.end(), &QnUserRolesModelPrivate::lessRoleByName);
         updateRoles();
+
+        connect(context(), &QnWorkbenchContext::userChanged, this, &QnUserRolesModelPrivate::updateRoles);
+
         if (user)
             watchUserRoleChanged(true);
     }
@@ -143,10 +149,17 @@ public:
 
     void updateRoles()
     {
+        const auto resetGuard = QnRaiiGuard::create([this]() { q_ptr->beginResetModel(); }, [this]() { q_ptr->endResetModel(); });
+
         roles.clear();
+        if (!context()->user())
+            return;
 
         for (auto permissions : standardRoles)
-            roles << RoleDescription(permissions);
+        {
+            if (qnResourceAccessManager->canCreateUser(context()->user(), permissions, false))
+                roles << RoleDescription(permissions);
+        }
 
         for (auto role : userRoles)
             roles << RoleDescription(role);

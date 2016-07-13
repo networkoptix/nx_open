@@ -77,7 +77,7 @@ namespace
     const int maxReconnectTimeout = 10*1000;                // 10 seconds
     const int maxVideowallReconnectTimeout = 96*60*60*1000; // 4 days
 
-    void storeSystemConnection(const QString &systemName, QUrl url, 
+    void storeSystemConnection(const QString &systemName, QUrl url,
         bool storePassword, bool autoLogin, bool forceRemoveOldConnection)
     {
         auto recentConnections = qnClientCoreSettings->recentUserConnections();
@@ -92,7 +92,7 @@ namespace
         const auto itFoundConnection = std::find_if(recentConnections.begin(), recentConnections.end()
             , [systemName, userName = url.userName()](const QnUserRecentConnectionData& connection)
         {
-            return ((connection.systemName == systemName) && 
+            return ((connection.systemName == systemName) &&
                 (connection.url.userName() == userName));
         });
 
@@ -127,6 +127,7 @@ namespace
         qnSettings->setLastUsedConnection(targetConnection);
         qnClientCoreSettings->setRecentUserConnections(recentConnections);
         qnSettings->setAutoLogin(autoLogin);
+        qnSettings->save();
     }
 }
 
@@ -176,7 +177,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
 
     connect(action(QnActions::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showLoginDialog);
     connect(action(QnActions::BeforeExitAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
-    
+
     context()->instance<QnAppServerNotificationCache>();
 }
 
@@ -291,8 +292,6 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     {
         /* Try to load last used connection. */
         url = qnSettings->lastUsedConnection().url;
-        if (!url.isValid())
-            url = qnSettings->defaultConnection().url;
 
         /* Try to connect with saved password. */
         const bool autoLogin = qnSettings->autoLogin();
@@ -332,6 +331,7 @@ void QnWorkbenchConnectHandler::at_disconnectAction_triggered() {
         : false;
     disconnectFromServer(force);
     qnSettings->setAutoLogin(false);
+    qnSettings->save();
 }
 
 bool QnWorkbenchConnectHandler::connected() const {
@@ -422,7 +422,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     {
         if (storeSettings && (code == ec2::ErrorCode::ok))
         {
-            storeSystemConnection(systemName, appServerUrl,storeSettings->storePassword, 
+            storeSystemConnection(systemName, appServerUrl,storeSettings->storePassword,
                 storeSettings->autoLogin, storeSettings->forceRemoveOldConnection);
         }
 

@@ -526,7 +526,7 @@ QSize CameraMediaStreamInfo::getResolution() const
         return QSize();
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \
-        (CameraMediaStreamInfo)(CameraMediaStreams) \
-        (CameraBitrateInfo)(CameraBitrates), \
-        (json), _Fields )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (CameraMediaStreamInfo)(CameraMediaStreams)(CameraBitrateInfo)(CameraBitrates),
+    (json),
+    _Fields)

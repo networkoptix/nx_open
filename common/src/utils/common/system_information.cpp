@@ -6,7 +6,8 @@
 
 #include <utils/common/app_info.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSystemInformation, (ubjson)(xml)(json)(datastream)(eq)(hash), QnSystemInformation_Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnSystemInformation), (ubjson)(xml)(json)(datastream)(eq)(hash), _Fields)
 
 QnSystemInformation::QnSystemInformation(const QString &platform, const QString &arch, const QString &modification) :
     arch(arch),

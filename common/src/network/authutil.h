@@ -8,12 +8,12 @@
 
 //!Splits \a data by \a delimiter not closed within quotes
 /*!
-    E.g.: 
+    E.g.:
     \code
     one, two, "three, four"
     \endcode
 
-    will be splitted to 
+    will be splitted to
     \code
     one
     two

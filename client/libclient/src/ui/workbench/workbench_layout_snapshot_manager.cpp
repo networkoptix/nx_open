@@ -101,13 +101,16 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
     if (qnCommon->isReadOnly())
         return false;
 
+    NX_ASSERT(!layout->isFile());
+    if (layout->isFile())
+        return false;
+
     /* Submit all changes from workbench to resource. */
     if (QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(layout))
         synchronizer->submit();
 
     ec2::ApiLayoutData apiLayout;
     ec2::fromResourceToApi(layout, apiLayout);
-
 
     int reqID = QnAppServerConnectionFactory::getConnection2()->getLayoutManager(Qn::kDefaultUserAccess)->save(
         apiLayout, this, [this, layout, callback](int reqID, ec2::ErrorCode errorCode)

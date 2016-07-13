@@ -34,6 +34,8 @@ ApplicationWindow
 
     UiController {}
 
+    Loader { id: testLoader }
+
     Component.onCompleted:
     {
         updateNavigationBarPadding()
@@ -54,6 +56,9 @@ ApplicationWindow
         {
             Workflow.openSessionsScreen()
         }
+
+        if (initialTest)
+            Workflow.startTest(initialTest)
     }
 
     Component.onDestruction:
@@ -61,20 +66,34 @@ ApplicationWindow
         connectionManager.disconnectFromServer(true)
     }
 
+    Connections
+    {
+        target: Qt.inputMethod
+        onKeyboardRectangleChanged: updateNavigationBarPadding()
+    }
+
+    Behavior on bottomPadding
+    {
+        enabled: Qt.platform.os == "android"
+        NumberAnimation  { duration: 200; easing.type: Easing.InCubic  }
+    }
+
     function updateNavigationBarPadding()
     {
         if (Qt.platform.os != "android")
             return
 
+        var keyboardHeight = Qt.inputMethod.keyboardRectangle.height / Screen.devicePixelRatio
+
         if (getDeviceIsPhone() && Screen.primaryOrientation == Qt.LandscapeOrientation)
         {
             rightPadding = getNavigationBarHeight()
-            bottomPadding = 0
+            bottomPadding = keyboardHeight
         }
         else
         {
             rightPadding = 0
-            bottomPadding = getNavigationBarHeight()
+            bottomPadding = getNavigationBarHeight() + keyboardHeight
         }
     }
 

@@ -23,8 +23,16 @@ public:
     bool restore(Behavior behavior = Behavior::Copy) const;
 
 private:
+    enum class OverwritePolicy
+    {
+        Skip,       /*< Files with same names will not be overridden. */
+        CheckSize,  /*< Files with different size will be overridden.  */
+        CheckDate,  /*< Older files will be overridden. */
+        Forced      /*< All files will be overridden. */
+    };
+
     QStringList calculateFilenames(const QString& originalDirectory, const QStringList& nameFilters) const;
-    bool copyFiles(const QString& sourceDirectory, const QString& targetDirectory) const;
+    bool copyFiles(const QString& sourceDirectory, const QString& targetDirectory, OverwritePolicy overwritePolicy) const;
     bool deleteFiles(const QString& targetDirectory) const;
 
 private:

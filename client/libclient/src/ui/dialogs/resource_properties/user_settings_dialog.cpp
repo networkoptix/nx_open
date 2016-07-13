@@ -25,7 +25,7 @@ namespace
 {
     static std::map<QnResourceAccessFilter::Filter, QString> kCategoryNameByFilter
     {
-        { QnResourceAccessFilter::CamerasFilter, QnUserSettingsDialog::tr("Media Resources") },
+        { QnResourceAccessFilter::MediaFilter, QnUserSettingsDialog::tr("Media Resources") },
         { QnResourceAccessFilter::LayoutsFilter, QnUserSettingsDialog::tr("Layouts") }
     };
 
@@ -41,7 +41,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     m_profilePage(new QnUserProfileWidget(m_model, this)),
     m_settingsPage(new QnUserSettingsWidget(m_model, this)),
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
-    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::CamerasFilter, this)),
+    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::MediaFilter, this)),
     m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this)),
     m_editGroupsButton(new QPushButton(tr("Edit Roles..."), this))
 {
@@ -138,8 +138,8 @@ void QnUserSettingsDialog::permissionsChanged()
 
         std::pair<int, int> counts(0, currentUserIsAdmin ? 0 : -1);
 
-        if (filter == QnResourceAccessFilter::CamerasFilter &&
-            permissions.testFlag(Qn::GlobalAccessAllCamerasPermission))
+        if (filter == QnResourceAccessFilter::MediaFilter &&
+            permissions.testFlag(Qn::GlobalAccessAllMediaPermission))
         {
             return descriptionHtml(filter, true, counts);
         }
@@ -172,7 +172,7 @@ void QnUserSettingsDialog::permissionsChanged()
             Qn::GlobalPermissions groupPermissions = qnResourceAccessManager->userGroup(groupId).permissions;
 
             permissionsText += kHtmlTableTemplate.arg(
-                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::CamerasFilter, groupId, groupPermissions, false)) +
+                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, groupId, groupPermissions, false)) +
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, groupId, groupPermissions, false)));
         }
         else if (!m_user->isOwner() && !permissions.testFlag(Qn::GlobalAdminPermission))
@@ -191,7 +191,7 @@ void QnUserSettingsDialog::permissionsChanged()
                     QnUuid userId = m_user->getId();
 
                     permissionsText += kHtmlTableTemplate.arg(
-                        kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::CamerasFilter, userId, permissions, false)) +
+                        kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, userId, permissions, false)) +
                         kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, userId, permissions, false)));
                 }
             }
@@ -224,7 +224,7 @@ void QnUserSettingsDialog::permissionsChanged()
             Qn::GlobalPermissions groupPermissions = qnResourceAccessManager->userGroup(groupId).permissions;
 
             permissionsText += kHtmlTableTemplate.arg(
-                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::CamerasFilter, groupId, groupPermissions, true)) +
+                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, groupId, groupPermissions, true)) +
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, groupId, groupPermissions, true)));
         }
 

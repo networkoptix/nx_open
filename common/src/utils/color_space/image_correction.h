@@ -48,6 +48,8 @@ struct ImageCorrectionParams
     bool enabled;
 };
 
+#define ImageCorrectionParams_Fields (blackLevel)(whiteLevel)(gamma)(enabled)
+
 QN_FUSION_DECLARE_FUNCTIONS(ImageCorrectionParams, (json)(metatype))
 
 struct ImageCorrectionResult

@@ -93,7 +93,7 @@
 
     <ComponentGroup Id="OemDriverComponents" Directory="DvrMiniDriversDir">
       <Component Id="OemMiniDriverComponent" Guid="{149E7683-5F12-4AE0-A877-71634D704632}">
-        <File Id="${ax.className}.OemDvrMiniDriver.dll" Source="..\..\paxton\x86\bin\Release\${ax.className}.OemDvrMiniDriver.Merged.dll" KeyPath="yes"/>
+        <File Id="${ax.className}.OemDvrMiniDriver.dll" Source="..\..\paxton-plugin\x86\bin\Release\${ax.className}.OemDvrMiniDriver.Merged.dll" KeyPath="yes"/>
       </Component>
     </ComponentGroup>
   </Fragment>

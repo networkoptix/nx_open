@@ -166,7 +166,7 @@
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
-        <qt.version>5.6.0</qt.version>
+        <qt.version>5.6.1</qt.version>
         <gtest.version>1.7.0</gtest.version>
         <gmock.version>1.7.0</gmock.version>
         <ffmpeg.version>0.11.4</ffmpeg.version>
@@ -177,7 +177,7 @@
         <onvif.version>2.1.2-io2</onvif.version>
         <sigar.version>1.7</sigar.version>
         <festival.version>2.4</festival.version>
-        <boost.version>1.56.0</boost.version>
+        <boost.version>1.60.0</boost.version>
         <quazip.version>0.7.1</quazip.version>
         <openal.version>1.16</openal.version>
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
@@ -491,6 +491,7 @@
                 <module>client/desktop_client</module>
                 <module>common_libs/nx_media</module>
                 <module>client/mobile_client</module>
+		<module>nx_cloud/libvms_gateway</module>
             </modules>
         </profile>
         <profile>
@@ -526,13 +527,16 @@
                 <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
                 <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
 
+                <!-- TODO: #gdm Remove it when Qt 5.6.1 is ready for windows. -->
+                <qt.version>5.6.0</qt.version>
+
                 <profile.classifier>${platform}</profile.classifier>
                 <windows>true</windows>
                 <unix>false</unix>
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
                 <machine.type>X64</machine.type>
-
+                <launcher.version.dir>${libdir}/${arch}/bin/${build.configuration}</launcher.version.dir>
             </properties>
 
         </profile>
@@ -600,7 +604,7 @@
                 <module>client/activex_client</module>
                 <module>plugins/nxinterface</module>
                 <module>plugins/nxcontrol</module>
-                <module>plugins/acs/paxton</module>
+                <module>plugins/acs/paxton-plugin</module>
                 <module>plugins/acs/paxton-installer</module>
             </modules>
         </profile>
@@ -645,6 +649,7 @@
                 <windows>false</windows>
                 <script.extension>sh</script.extension>
                 <festival.version>2.1</festival.version>
+                <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>
             </properties>
         </profile>
         <profile>

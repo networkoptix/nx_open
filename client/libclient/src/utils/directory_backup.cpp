@@ -26,7 +26,7 @@ bool QnDirectoryBackup::backup(Behavior behavior) const
         return false;
     }
 
-    bool copyResult = copyFiles(m_originalDirectory, m_backupDirectory);
+    bool copyResult = copyFiles(m_originalDirectory, m_backupDirectory, OverwritePolicy::Forced);
     if (behavior == Behavior::Copy)
         return copyResult;
 
@@ -40,7 +40,7 @@ bool QnDirectoryBackup::backup(Behavior behavior) const
     {
         /* If deleting was not successful, try restore backup. */
         NX_LOG(lit("Could not cleanup original directory %1, trying to restore backup.").arg(m_originalDirectory), cl_logERROR);
-        if (!copyFiles(m_backupDirectory, m_originalDirectory))
+        if (!copyFiles(m_backupDirectory, m_originalDirectory, OverwritePolicy::Skip))
         {
             NX_LOG(lit("Could not restore backup. System is is invalid state."), cl_logERROR);
         }
@@ -61,7 +61,7 @@ bool QnDirectoryBackup::restore(Behavior behavior) const
         return false;
     }
 
-    bool copyResult = copyFiles(m_backupDirectory, m_originalDirectory);
+    bool copyResult = copyFiles(m_backupDirectory, m_originalDirectory, OverwritePolicy::Forced);
     if (behavior == Behavior::Copy)
         return copyResult;
 
@@ -80,14 +80,55 @@ QStringList QnDirectoryBackup::calculateFilenames(const QString& originalDirecto
     return QDir(originalDirectory).entryList(nameFilters, QDir::NoDotAndDotDot | QDir::Files);
 }
 
-bool QnDirectoryBackup::copyFiles(const QString& sourceDirectory, const QString& targetDirectory) const
+bool QnDirectoryBackup::copyFiles(const QString& sourceDirectory, const QString& targetDirectory, OverwritePolicy overwritePolicy) const
 {
+
+    /* Check if target file must be overridden by source file. */
+    auto needOverwrite = [overwritePolicy](const QString& source, const QString& target)
+    {
+        switch (overwritePolicy)
+        {
+            case OverwritePolicy::Skip:
+                return false;
+
+            case OverwritePolicy::CheckDate:
+                return QFileInfo(source).lastModified() >= QFileInfo(target).lastModified();
+
+            case OverwritePolicy::CheckSize:
+                return QFileInfo(source).size() != QFileInfo(target).size();
+
+            case OverwritePolicy::Forced:
+                return true;
+
+            default:
+                NX_ASSERT(false, Q_FUNC_INFO, "All cases must be handled.");
+                break;
+        }
+        return false;
+    };
+
+
     /* Always try to copy as much files as possible even if we have failed some. */
     bool success = true;
     for (const QString& filename : m_filenames)
     {
         const QString sourceFilename = sourceDirectory + L'/' + filename;
         const QString targetFilename = targetDirectory + L'/' + filename;
+
+        if (QFile::exists(targetFilename))
+        {
+            if (!needOverwrite(sourceFilename, targetFilename))
+                continue;
+
+            if (!QFile::remove(targetFilename))
+            {
+                NX_LOG(lit("Could not overwrite file %1")
+                       .arg(targetFilename), cl_logERROR);
+                success = false;
+                continue;
+            }
+        }
+
         if (!QFile(sourceFilename).copy(targetFilename))
         {
             NX_LOG(lit("Could not copy file %1 to %2")

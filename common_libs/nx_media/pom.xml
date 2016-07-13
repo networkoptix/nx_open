@@ -17,7 +17,7 @@
         <guid>${nx_media.guid}</guid>
         <product.title>${company.name} nx_media</product.title>
 
-        <qt.libs>core gui multimedia opengl multimedia-private</qt.libs>
+        <qt.libs>core gui multimedia multimedia-private</qt.libs>
         <global.libs>-lcommon</global.libs>
 
         <rdep.packages>ffmpeg</rdep.packages>

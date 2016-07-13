@@ -12,7 +12,12 @@ unix {
 QT = ${qt.libs}
 
 ## GLOBAL CONFIGURATIONS
-CONFIG += precompile_header $$BUILDLIB $$LIBTYPE
+!ios|equals(TEMPLATE, app) {
+    CONFIG += precompile_header
+} else {
+    QMAKE_CXXFLAGS += -include ${project.build.sourceDirectory}/StdAfx.h
+}
+CONFIG += $$BUILDLIB $$LIBTYPE
 CONFIG -= flat
 CONFIG += no_private_qt_headers_warning
 CONFIG += c++14
@@ -51,6 +56,7 @@ CONFIG(debug, debug|release) {
     #Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
     #DEFINES += ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
   }
+  CONFIG += qml_debug
 }
 else {
   CONFIGURATION=release

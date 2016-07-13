@@ -58,10 +58,10 @@ public:
     QSet<QnUuid> accessibleResources(const QnUuid& groupId) const;
 
     /** Get list of users for given group. */
-    static QnUserResourceList users(const QnUuid& groupId);
+    QnUserResourceList users(const QnUuid& groupId, bool withCandidates) const;
 
     /** Get list of users for selected group. */
-    QnUserResourceList users() const;
+    QnUserResourceList users(bool withCandidates) const;
 
     /* Methods of QAbstractItemModel */
 

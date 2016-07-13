@@ -12,11 +12,7 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ModuleInfo),
-    (json),
-    _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ModuleInfo), (json), _Fields)
 
 }   //api
 }   //cdb

@@ -35,17 +35,16 @@ public: // overrides
 
     ServersList servers() const override;
 
-    bool containsServer(const QnUuid &serverId) const override;
+    bool containsServer(const QnUuid& serverId) const override;
 
-    QnModuleInformation getServer(const QnUuid &serverId) const override;
+    QnModuleInformation getServer(const QnUuid& serverId) const override;
 
-    QString getServerHost(const QnUuid &serverId) const override;
+    QString getServerHost(const QnUuid& serverId) const override;
 
-    qint64 getServerLastUpdatedMs(const QnUuid &serverId) const override;
+    qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
 
 private:
-    void emitChangesSignals(bool wasCloudSystem
-        , const ServersList& oldServers);
+    void emitChangesSignals(bool wasCloudSystem, const ServersList& oldServers);
 
 private:
     QnSystemDescriptionPtr m_cloudSystem;

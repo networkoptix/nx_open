@@ -26,6 +26,8 @@
 #include "settings.h"
 #include <media_server/serverutil.h>
 
+#include <rest/helpers/permissions_helper.h>
+
 
 namespace
 {
@@ -102,12 +104,8 @@ int QnConfigureRestHandler::execute(
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
-    if (MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt())
-    {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
-        return nx_http::StatusCode::forbidden;
-    }
-
+    if (QnPermissionsHelper::isSafeMode())
+        return QnPermissionsHelper::safeModeError(result);
     QString errStr;
     if (!validatePasswordData(data, &errStr))
     {

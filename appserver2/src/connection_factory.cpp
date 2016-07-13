@@ -737,7 +737,7 @@ namespace ec2
          *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
          *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
          *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O buttons.
-         *     %value GlobalAccessAllCamerasPermission Has access to all cameras
+         *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
          * %param email User's email.
          * %param[opt] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
          *     existing user, supply empty string. When creating a new user, calculate the value
@@ -789,7 +789,7 @@ namespace ec2
          *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
          *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
          *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O buttons.
-         *     %value GlobalAccessAllCamerasPermission Has access to all cameras
+         *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
          * %// AbstractUserManager::saveGroup
          */
         registerUpdateFuncHandler<ApiUserGroupData>(p, ApiCommand::saveUserGroup);
@@ -805,6 +805,15 @@ namespace ec2
          * %// AbstractUserManager::removeUserGroup
          */
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeUserGroup);
+
+
+        /**%apidoc GET /ec2/getPredefinedRoles
+        * Return list of predefined user roles.
+        * %param[default] format
+        * %return Return object in requested format
+        */
+        registerGetFuncHandler<std::nullptr_t, ApiPredefinedRoleDataList>(p, ApiCommand::getPredefinedRoles);
+
 
         /**%apidoc GET /ec2/getVideowalls
          * Return list of video walls

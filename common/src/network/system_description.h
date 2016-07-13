@@ -13,13 +13,15 @@ class QnSystemDescription : public QnBaseSystemDescription
 
 public:
     typedef QSharedPointer<QnSystemDescription> PointerType;
-    static PointerType createLocalSystem(const QString &systemId
-        , const QString &systemName);
+    static PointerType createLocalSystem(
+        const QString &systemId,
+        const QString &systemName);
 
-    static PointerType createCloudSystem(const QString &systemId
-        , const QString &systemName
-        , const QString &ownerAccountEmail
-        , const QString &ownerFullName);
+    static PointerType createCloudSystem(
+        const QString &systemId, 
+        const QString &systemName, 
+        const QString &ownerAccountEmail,
+        const QString &ownerFullName);
 
     virtual ~QnSystemDescription();
 
@@ -36,32 +38,32 @@ public: // overrides
 
     ServersList servers() const override;
 
-    bool containsServer(const QnUuid &serverId) const override;
+    bool containsServer(const QnUuid& serverId) const override;
 
-    QnModuleInformation getServer(const QnUuid &serverId) const override;
+    QnModuleInformation getServer(const QnUuid& serverId) const override;
 
-    QString getServerHost(const QnUuid &serverId) const override;
+    QString getServerHost(const QnUuid& serverId) const override;
 
-    qint64 getServerLastUpdatedMs(const QnUuid &serverId) const override;
+    qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
 
 public:
     enum { kDefaultPriority = 0 };
-    void addServer(const QnModuleInformation &serverInfo, int priority);
+    void addServer(const QnModuleInformation& serverInfo, int priority);
 
-    QnServerFields updateServer(const QnModuleInformation &serverInfo);
+    QnServerFields updateServer(const QnModuleInformation& serverInfo);
 
-    void removeServer(const QnUuid &serverId);
+    void removeServer(const QnUuid& serverId);
 
-    void setServerHost(const QnUuid &serverId, const QString &host);
+    void setServerHost(const QnUuid& serverId, const QString& host);
 
 private:
-    QnSystemDescription(const QString &systemId
-        , const QString &systemName);
+    QnSystemDescription(const QString& systemId, const QString& systemName);
 
-    QnSystemDescription(const QString &systemId
-        , const QString &systemName
-        , const QString &cloudOwnerAccountEmail
-        , const QString &ownerFullName);
+    QnSystemDescription(
+        const QString& systemId,
+        const QString& systemName,
+        const QString& cloudOwnerAccountEmail,
+        const QString& ownerFullName);
 
 private:
     typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;

@@ -439,9 +439,12 @@ QnCameraBookmarkSearchFilter QnCameraBookmarkSearchFilter::invalidFilter() {
 void serialize_field(const QnCameraBookmarkTags& /*value*/, QVariant* /*target*/) {return ;}
 void deserialize_field(const QVariant& /*value*/, QnCameraBookmarkTags* /*target*/) {return ;}
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBookmarkSortOrder, (json)(eq), QnBookmarkSortOrder_Fields, (optional, true) )
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBookmarkSparsingOptions, (json)(eq), QnBookmarkSparsingOptions_Fileds, (optional, true) )
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(eq), QnCameraBookmarkSearchFilter_Fields, (optional, true) )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnBookmarkSortOrder)(QnBookmarkSparsingOptions)(QnCameraBookmarkSearchFilter),
+    (json)(eq),
+    _Fields)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmark,      (sql_record)(json)(ubjson)(xml)(csv_record)(eq), QnCameraBookmark_Fields,    (optional, true))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmarkTag,   (sql_record)(json)(ubjson)(xml)(csv_record)(eq), QnCameraBookmarkTag_Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnCameraBookmark)(QnCameraBookmarkTag),
+    (sql_record)(json)(ubjson)(xml)(csv_record)(eq),
+    _Fields)

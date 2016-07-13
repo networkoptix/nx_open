@@ -121,14 +121,28 @@ public:
 
     QColor normalLabel;
     QColor weekendLabel;
-    QColor selectedLabel;
-    QColor disabledLabel;
+    QColor gridLabel;
+    QColor allLabel;
 
     QColor recordNever;
     QColor recordAlways;
     QColor recordMotion;
+
+    QColor recordNeverHovered;
+    QColor recordAlwaysHovered;
+    QColor recordMotionHovered;
+
+    QColor hoveredBackground;
+    QColor pressedBackground;
+
+    QColor gridLine;
+
+    QColor border;
 };
-#define QnScheduleGridColors_Fields (normalLabel)(weekendLabel)(selectedLabel)(disabledLabel)(recordNever)(recordAlways)(recordMotion)
+#define QnScheduleGridColors_Fields (normalLabel)(weekendLabel)(gridLabel)(allLabel) \
+    (recordNever)(recordAlways)(recordMotion) \
+    (recordNeverHovered)(recordAlwaysHovered)(recordMotionHovered) \
+    (hoveredBackground)(pressedBackground)(gridLine)(border)
 
 
 struct QnGridColors {
@@ -334,6 +348,15 @@ struct QnPasswordStrengthColors
 };
 #define QnPasswordStrengthColors_Fields (inacceptable)(acceptable)(good)
 
+struct QnMotionSensitivityColors
+{
+    QnMotionSensitivityColors();
+
+    QVector<QColor> normal;
+    QVector<QColor> hovered;
+};
+#define QnMotionSensitivityColors_Fields (normal)(hovered)
+
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
@@ -347,7 +370,8 @@ struct QnPasswordStrengthColors
     (QnCompositeTextOverlayColors) \
     (QnGraphicsMessageBoxColors) \
     (QnResourceItemColors) \
-    (QnPasswordStrengthColors)
+    (QnPasswordStrengthColors) \
+    (QnMotionSensitivityColors)
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

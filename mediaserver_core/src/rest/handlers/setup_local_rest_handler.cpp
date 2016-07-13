@@ -36,8 +36,7 @@ struct SetupLocalSystemData: public PasswordData
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SetupLocalSystemData),
     (json),
-    _Fields,
-    (optional, true));
+    _Fields)
 
 int QnSetupLocalSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {

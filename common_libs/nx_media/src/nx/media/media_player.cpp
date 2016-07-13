@@ -3,7 +3,6 @@
 #include <QtMultimedia/QAbstractVideoSurface>
 #include <QtMultimedia/QVideoSurfaceFormat>
 #include <QtCore/QElapsedTimer>
-#include <QtOpenGL/QGL>
 #include <QtCore/QTimer>
 #include <QtCore/QMutex>
 

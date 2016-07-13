@@ -24,6 +24,4 @@ struct CloudCredentialsData
 
 #define CloudCredentialsData_Fields (reset)(cloudSystemID)(cloudAuthKey)(cloudAccountName)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (CloudCredentialsData),
-    (json));
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((CloudCredentialsData), (json))

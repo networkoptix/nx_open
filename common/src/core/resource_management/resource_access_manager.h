@@ -23,6 +23,11 @@ class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnR
 public:
     QnResourceAccessManager(QObject* parent = nullptr);
 
+    static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
+
+    /** Get set of global permissions, that will not work without the given one. */
+    static Qn::GlobalPermissions dependentPermissions(Qn::GlobalPermission value);
+
     void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList);
 
     ec2::ApiUserGroupDataList userGroups() const;
@@ -113,6 +118,7 @@ signals:
 private:
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);
+    void invalidateResourceCacheInternal(const QnUuid& resourceId);
 
     Qn::Permissions calculatePermissions(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
 

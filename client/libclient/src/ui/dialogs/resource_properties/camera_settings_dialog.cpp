@@ -88,7 +88,10 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
 QnCameraSettingsDialog::~QnCameraSettingsDialog() {
 }
 
-void QnCameraSettingsDialog::retranslateUi() {
+void QnCameraSettingsDialog::retranslateUi()
+{
+    base_type::retranslateUi();
+
     auto cameras = m_settingsWidget->cameras();
 
     const QString windowTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(

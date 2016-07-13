@@ -65,6 +65,8 @@ public:
     qreal hStretch;
 };
 
+#define QnMediaDewarpingParams_Fields (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius)(hStretch)
+
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnMediaDewarpingParams::ViewMode)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnMediaDewarpingParams::ViewMode, (lexical)(numeric))

@@ -1,5 +1,6 @@
-#ifndef __FFMPEG_HELPER_H
-#define __FFMPEG_HELPER_H
+#pragma once
+
+#if !defined(DISABLE_FFMPEG)
 
 #include "core/resource/resource_fwd.h"
 
@@ -100,4 +101,4 @@ private:
     };
 };
 
-#endif // __FFMPEG_HELPER_H
+#endif // !defined(DISABLE_FFMPEG)

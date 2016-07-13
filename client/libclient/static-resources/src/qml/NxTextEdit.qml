@@ -6,80 +6,135 @@ import "."
 
 // TODO: left\right icons\btns implementation
 
-TextField
+FocusScope
 {
-    height: 28;
+    id: control;
 
-    property bool error; // TODO: improve logic: autoreset error when text changing
+    property alias text: textField.text;
+    property alias font: textField.font;
+    property alias echoMode: textField.echoMode;
+    property alias error: textField.error;
+    property alias hasFocus: textField.activeFocus;
 
-    opacity: (enabled ? 1.0 : 0.3);
+    property Component leftControlDelegate;
+    property Component rightControlDelegate;
 
-    style: nxTextEditStyle;
+    property alias leftControl: leftControlLoader.item;
+    property alias rightControl: rightControlLoader.item;
 
-    Component
+    signal accepted();
+
+    onActiveFocusChanged:
     {
-        id: nxTextEditStyle;  // TODO: move in separate file
+        if (activeFocus)
+            textField.forceActiveFocus();
+    }
 
-        TextFieldStyle
+    height: Math.max(leftControlLoader.height, textField.height, rightControlLoader.height);
+
+    Loader
+    {
+        id: leftControlLoader;
+
+        anchors.verticalCenter: parent.verticalCenter;
+        sourceComponent: leftControlDelegate;
+        z: 1;
+    }
+
+    TextField
+    {
+        id: textField;
+
+        height: 28;
+        anchors.left: (leftControlDelegate ? leftControlLoader.right : parent.left);
+        anchors.right: (rightControlLoader ? rightControlLoader.left : parent.right);
+
+        activeFocusOnPress: true;
+        property bool error: false; // TODO: improve logic: autoreset error when text changing
+
+        opacity: (enabled ? 1.0 : 0.3);
+
+        style: nxTextEditStyle;
+
+        onAccepted: control.accepted();
+
+        Component
         {
-            background: Rectangle
+            id: nxTextEditStyle;
+
+            TextFieldStyle
             {
-                color:
+                background: Rectangle
                 {
-                    if (control.readOnly)
-                        return Style.colorWithAlpha(Style.colors.shadow, 0.2);
-
-                    if (control.activeFocus)
-                        return Style.darkerColor(Style.colors.shadow);
-
-                    return Style.colors.shadow;
-                }
-
-                radius: 1;
-                border.width: 1;
-                border.color:
-                {
-                    if (control.error)
-                        return Style.colors.red_main;
-                    if (control.readOnly)
-                        return Style.colorWithAlpha(Style.colors.shadow, 0.4);
-                    // TODO: ? add behavior of current non-focused item
-//                    if (control.focus && !control.activeFocus)
-//                        return Style.darkerColor(Style.colors.brand, 4);
-
-                    return Style.darkerColor(color);
-                }
-
-                Rectangle
-                {
-                    id: topInnerShadow;
-
-                    visible: (!control.readOnly && control.activeFocus)
-                    anchors.top: parent.top;
-                    height: 1;
-                    x: 1;
-                    width: parent.width - 2 * x;
-                    color: Style.darkerColor(Style.colors.shadow, 3);
-                }
-
-                Rectangle
-                {
-                    id: rightInnerShadow;
-
-                    visible: (!control.readOnly && control.activeFocus)
+                    anchors.left: parent.left;
                     anchors.right: parent.right;
-                    width: 1;
-                    y: 1;
-                    height: parent.height - 2 * y;
-                    color: Style.darkerColor(Style.colors.shadow, 3);
+                    anchors.leftMargin: (leftControlLoader.item ? -leftControlLoader.width : 0);
+                    anchors.rightMargin: (rightControlLoader.item ? -rightControlLoader.width : 0);
+
+                    color:
+                    {
+                        if (control.readOnly)
+                            return Style.colorWithAlpha(Style.colors.shadow, 0.2);
+
+                        if (control.activeFocus)
+                            return Style.darkerColor(Style.colors.shadow);
+
+                        return Style.colors.shadow;
+                    }
+
+                    radius: 1;
+                    border.width: 1;
+                    border.color:
+                    {
+                        if (control.error)
+                            return Style.colors.red_main;
+                        if (control.readOnly)
+                            return Style.colorWithAlpha(Style.colors.shadow, 0.4);
+
+                        return Style.darkerColor(color);
+                    }
+
+                    Rectangle
+                    {
+                        id: topInnerShadow;
+
+                        visible: (!control.readOnly && control.activeFocus)
+                        anchors.top: parent.top;
+                        height: 1;
+                        x: 1;
+                        width: parent.width - 2 * x;
+                        color: Style.darkerColor(Style.colors.shadow, 3);
+                    }
+
+                    Rectangle
+                    {
+                        id: rightInnerShadow;
+
+                        visible: (!control.readOnly && control.activeFocus)
+                        anchors.right: parent.right;
+                        width: 1;
+                        y: 1;
+                        height: parent.height - 2 * y;
+                        color: Style.darkerColor(Style.colors.shadow, 3);
+                    }
                 }
+
+                font: (control.readOnly ? Style.textEdit.fontReadOnly : Style.textEdit.font);
+                textColor: Style.textEdit.color;
+
+                placeholderTextColor: Style.colors.midlight;
+                renderType: Text.QtRendering;
             }
-
-            font: (control.readOnly ? Style.textEdit.fontReadOnly : Style.textEdit.font);
-            textColor: Style.textEdit.color;
-
-            placeholderTextColor: Style.colors.midlight;
-            renderType: Text.QtRendering;
         }
+    }
+
+    Loader
+    {
+        id: rightControlLoader;
+
+        anchors.verticalCenter: parent.verticalCenter;
+        anchors.right: parent.right;
+        z: 1;
+        sourceComponent: rightControlDelegate;
     }
 }

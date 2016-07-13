@@ -13,9 +13,21 @@ PageBase
     padding: 16
     topPadding: 24
 
-    header: WarningPanel
+    header: Column
     {
-        id: warningPanel
+        width: parent.width
+
+        Rectangle
+        {
+            width: parent.width
+            height: getStatusBarHeight()
+            color: ColorTheme.windowBackground
+        }
+
+        WarningPanel
+        {
+            id: warningPanel
+        }
     }
 
     Flickable
@@ -23,7 +35,6 @@ PageBase
         id: flickable
 
         anchors.fill: parent
-        anchors.topMargin: header.height
 
         contentWidth: content.width
         contentHeight: content.height
