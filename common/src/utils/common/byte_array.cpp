@@ -3,7 +3,9 @@
 
 #include <functional>
 
+#include <common/common_globals.h>
 #include <plugins/plugin_tools.h>
+#include <utils/common/log.h>
 #include <utils/memory/system_allocator.h>
 
 #include "warnings.h"
@@ -113,11 +115,22 @@ unsigned int QnByteArray::write( const char *data, unsigned int size )
     return size;
 }
 
-void QnByteArray::uncheckedWrite( const char *data, unsigned int size )
+bool QnByteArray::uncheckedWrite( const char *data, unsigned int size )
 {
-    Q_ASSERT_X(m_size + size <= m_capacity, "Buffer MUST be preallocated!", Q_FUNC_INFO);
+    if (m_size + size > m_capacity)
+    {
+        Q_ASSERT_X(false, "Buffer MUST be preallocated!", Q_FUNC_INFO);
+
+        NX_LOG(lit("%1: failure, no space left (cap=%2, size=%3) for data: %4")
+            .arg(QLatin1String(Q_FUNC_INFO)).arg(m_capacity).arg(m_size)
+            .arg(QString::fromUtf8(QByteArray(data, size).toHex())), cl_logERROR);
+
+        return false;
+    }
+
     memcpy(m_data + m_size, data, size);  //1s
     m_size += size;
+    return true;
 }
 
 unsigned int QnByteArray::write(quint8 value)

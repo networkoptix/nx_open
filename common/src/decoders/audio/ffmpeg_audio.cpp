@@ -34,7 +34,8 @@ AVSampleFormat CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(const QnAudioFormat& 
 
 CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
     c(0),
-    m_codec(data->compressionType)
+    m_codec(data->compressionType),
+    m_initialized(false)
 {
     if (m_first_instance)
     {
@@ -82,8 +83,12 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
         }
         */
     }
-    avcodec_open2(c, codec, NULL);
+    m_initialized = avcodec_open2(c, codec, NULL) >= 0;
+}
 
+bool CLFFmpegAudioDecoder::isInitialized() const
+{
+    return m_initialized;
 }
 
 CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
@@ -107,7 +112,7 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
     int outbuf_len = 0;
 
-    while (size > 0) 
+    while (size > 0)
     {
 
         int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
@@ -127,7 +132,7 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
         // TODO: #vasilenko avoid using deprecated methods
         int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
 
-        if (len < 0) 
+        if (len < 0)
             return false;
 
         outbuf_len+=out_size;

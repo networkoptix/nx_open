@@ -1,7 +1,7 @@
 #include "resource_data.h"
 #include "param.h"
 #include <cassert>
-
+#include <api/model/api_ioport_data.h>
 #include <core/ptz/ptz_mapper.h>
 #include <core/onvif/onvif_config_data.h>
 #include <utils/serialization/json_functions.h>
@@ -18,6 +18,7 @@ public:
         registerKey<Qn::PtzCapabilities>(lit("ptzCapabilities"));
         registerKey<Qn::PtzTraits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
+        registerKey<QnIOPortDataList>(lit("ioSettings"));
         registerKey<QList<QnCredentials>>(Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
         registerKey<QList<QnResourceChannelMapping>>(
             Qn::VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME);

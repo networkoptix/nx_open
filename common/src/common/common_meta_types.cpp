@@ -305,6 +305,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnAuditRecordList>();
 
     qRegisterMetaType<QnOptionalBool>();
+    qRegisterMetaType<QnIOPortData>();
+    qRegisterMetaType<QnIOPortDataList>();
     qRegisterMetaType<QList<QMap<QString, QString>>>();
 
     qRegisterMetaType<QList<QnCredentials>>();
@@ -317,6 +319,8 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QList<QMap<QString, QString>>>();
 
     QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();
+    QnJsonSerializer::registerSerializer<QnIOPortData>();
+    QnJsonSerializer::registerSerializer<QnIOPortDataList>();
     QnJsonSerializer::registerSerializer<QList<QnCredentials>>();
     QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();

@@ -15,6 +15,7 @@
 #include "plugins/resource/axis/axis_onvif_resource.h"
 #include "plugins/resource/avigilon/avigilon_resource.h"
 #include <plugins/resource/pelco/optera/optera_resource.h>
+#include "plugins/resource/flir/flir_onvif_resource.h"
 #include "../vista/vista_resource.h"
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
@@ -177,7 +178,6 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     //TODO: #vasilenko UTF unuse std::string
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), QString(), QString(), 0);
 
-    
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
     if (existResource) {
@@ -401,6 +401,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
 #ifdef ENABLE_AXIS
     else if (manufacture.toLower().contains(QLatin1String("axis")))
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());
+    else if (manufacture.toLower().contains(QLatin1String("flir")))
+        resource = QnPlOnvifResourcePtr(new QnFlirOnvifResource());
 #endif
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
