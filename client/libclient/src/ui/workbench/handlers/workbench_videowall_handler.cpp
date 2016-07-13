@@ -1751,12 +1751,16 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
 
     if (!videoWallItems.isEmpty())
     {
-        foreach(const QnVideoWallItemIndex &index, videoWallItems)
+        for (const QnVideoWallItemIndex &index: videoWallItems)
         {
             if (!index.isValid())
                 continue;
+
             if (QnLayoutResourcePtr layout = qnResPool->getResourceById<QnLayoutResource>(index.item().layout))
-                targetResources << layout;
+            {
+                if (!layout->isFile())
+                    targetResources << layout;
+            }
         }
 
         /* Dragging single videowall item causing swap (if Shift is not pressed). */
@@ -1765,8 +1769,22 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     }
     else
     {
-        targetResources = parameters.resources();
+        for (const QnResourcePtr& resource : parameters.resources())
+        {
+            if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+            {
+                if (!layout->isFile())
+                    targetResources << layout;
+            }
+            else
+            {
+                targetResources << resource;
+            }
+        }
     }
+
+    if (targetResources.isEmpty())
+        return;
 
     enum class Action
     {

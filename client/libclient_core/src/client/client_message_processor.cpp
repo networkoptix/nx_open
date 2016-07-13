@@ -115,18 +115,32 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
 
-    if (ownResource.isNull())
+    if (!ownResource)
+    {
         qnResPool->addResource(resource);
+    }
     else
-        ownResource->update(resource);
+    {
+        // TODO: #GDM #high #3.0 don't update layout if we're re-reading resources,
+        // this leads to unsaved layouts spontaneously rolling back to last saved state.
+        // This will make work very unstable when admin modifies our access rights.
+        // Solution is to move 'saved/modified' flags to Qn::ResourceFlags. VMS-3180
+        QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>();
+        if (layout && layout->isFile())
+        {
+            /* Intentionally do nothing. Local layouts must not be overridden by server's.
+             * Really that means GUID conflict, caused by saving of local layouts to server. */
+        }
+        else
+        {
+            ownResource->update(resource);
+            if (layout)
+                layout->requestStore();
+        }
+    }
 
-    // TODO: #Elric #2.3 don't update layout if we're re-reading resources,
-    // this leads to unsaved layouts spontaneously rolling back to last saved state.
-
-    if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
-        layout->requestStore();
-
-    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>()) {
+    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+    {
         if (user->isOwner())
             qnCommon->updateModuleInformation();
     }
