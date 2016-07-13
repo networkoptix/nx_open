@@ -1751,7 +1751,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
 
     if (!videoWallItems.isEmpty())
     {
-        for (const QnVideoWallItemIndex &index: videoWallItems)
+        for (const QnVideoWallItemIndex &index : videoWallItems)
         {
             if (!index.isValid())
                 continue;
@@ -2234,7 +2234,7 @@ void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(const e
 
     //check for messages with next sequence
     restoreMessages(controllerUuid, sequence);
-}
+    }
 
 void QnWorkbenchVideoWallHandler::at_display_widgetAdded(QnResourceWidget* widget)
 {
@@ -2497,7 +2497,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(int role)
             qDebug() << "SENDER: cannot deserialize" << item->uuid() << debugRole(role) << data;
 #endif
             break;
-    }
+        }
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemDataChanged);
     message[roleKey] = QString::number(role);

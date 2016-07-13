@@ -48,34 +48,42 @@ QnClientMessageProcessor::QnClientMessageProcessor():
 
 }
 
-void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connection) {
+void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connection)
+{
 
     m_status.setState(connection
         ? QnConnectionState::Connecting
         : QnConnectionState::Disconnected);
 
-    if (connection) {
+    if (connection)
+    {
         qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
         //TODO: #GDM in case of cloud sockets we need to modify QnAppServerConnectionFactory::url() - add server id before cloud id
-    } else if (m_connected) { // double init by null is allowed
+    }
+    else if (m_connected)
+    { // double init by null is allowed
         NX_ASSERT(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
         data.peer.id = qnCommon->remoteGUID();
         qnCommon->setRemoteGUID(QnUuid());
         m_connected = false;
         emit connectionClosed();
-    } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
+    }
+    else if (!qnCommon->remoteGUID().isNull())
+    { // we are trying to reconnect to server now
         qnCommon->setRemoteGUID(QnUuid());
     }
 
     QnCommonMessageProcessor::init(connection);
 }
 
-QnConnectionState QnClientMessageProcessor::connectionState() const {
+QnConnectionState QnClientMessageProcessor::connectionState() const
+{
     return m_status.state();
 }
 
-void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
+void QnClientMessageProcessor::setHoldConnection(bool holdConnection)
+{
     if (m_holdConnection == holdConnection)
         return;
 
@@ -85,18 +93,21 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
         emit connectionClosed();
 }
 
-void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
+void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
+{
     base_type::connectToConnection(connection);
     connect(connection->getMiscNotificationManager(), &ec2::AbstractMiscNotificationManager::systemNameChangeRequested,
-            this, &QnClientMessageProcessor::at_systemNameChangeRequested);
+        this, &QnClientMessageProcessor::at_systemNameChangeRequested);
 }
 
-void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
+void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
+{
     base_type::disconnectFromConnection(connection);
     connection->getMiscNotificationManager()->disconnect(this);
 }
 
-void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) {
+void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status)
+{
     resource->setStatus(status);
 }
 
@@ -146,9 +157,11 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     }
 }
 
-void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
+void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data)
+{
     base_type::handleRemotePeerFound(data);
-    if (qnCommon->remoteGUID().isNull()) {
+    if (qnCommon->remoteGUID().isNull())
+    {
         qWarning() << "at_remotePeerFound received while disconnected";
         return;
     }
@@ -165,10 +178,12 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
         emit connectionOpened();
 }
 
-void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
+void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data)
+{
     base_type::handleRemotePeerLost(data);
 
-    if (qnCommon->remoteGUID().isNull()) {
+    if (qnCommon->remoteGUID().isNull())
+    {
         qWarning() << "at_remotePeerLost received while disconnected";
         return;
     }
@@ -197,7 +212,8 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
         emit connectionClosed();
 }
 
-void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &systemName) {
+void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &systemName)
+{
     if (qnCommon->localSystemName() == systemName)
         return;
 
