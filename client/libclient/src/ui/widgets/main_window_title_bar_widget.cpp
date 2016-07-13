@@ -190,6 +190,7 @@ void QnMainWindowTitleBarWidget::setTabBarStuffVisible(bool visible)
     d->tabBar->setVisible(visible);
     d->newTabButton->setVisible(visible);
     d->currentLayoutsButton->setVisible(visible);
+    action(QnActions::OpenNewTabAction)->setEnabled(visible);
 }
 
 bool QnMainWindowTitleBarWidget::event(QEvent* event)

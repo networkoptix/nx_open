@@ -193,11 +193,10 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
                 hosts.append(lit(" "));
             }
 
-            return lit("%1 %2 %3 %4").arg(
-                data(index, SystemNameRoleId).toString(),
+            return QStringList({data(index, SystemNameRoleId).toString(),
                 data(index, OwnerDescriptionRoleId).toString(),
-                systemDescription->ownerAccountEmail(),
-                hosts);
+                systemDescription->ownerAccountEmail(), hosts}
+                ).join(lit(" "));
         }
         case SystemNameRoleId:
             return d->getDisplayName(systemDescription);
