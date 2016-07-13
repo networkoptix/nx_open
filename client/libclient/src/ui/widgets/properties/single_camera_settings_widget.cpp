@@ -21,6 +21,7 @@
 
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_manager.h>
+#include <ui/common/aligner.h>
 #include <ui/common/read_only.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -50,8 +51,10 @@
 #include "client/client_settings.h"
 
 namespace {
+
 const QSize fisheyeThumbnailSize(0, 0); //unlimited size for better calibration
-}
+
+} // unnamed namespace
 
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
@@ -92,55 +95,105 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     setHelpTopic(ui->advancedTab, Qn::CameraSettings_Properties_Help);
     setHelpTopic(ui->fisheyeTab, Qn::CameraSettings_Dewarping_Help);
 
-    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(at_tabWidget_currentChanged()));
+    connect(ui->tabWidget, &QTabWidget::currentChanged,
+        this, &QnSingleCameraSettingsWidget::at_tabWidget_currentChanged);
     at_tabWidget_currentChanged();
 
-    connect(ui->nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(at_dbDataChanged()));
-    connect(ui->enableAudioCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dbDataChanged()));
-    connect(ui->loginEdit, SIGNAL(textChanged(const QString &)), this, SLOT(at_dbDataChanged()));
-    connect(ui->passwordEdit, SIGNAL(textChanged(const QString &)), this, SLOT(at_dbDataChanged()));
+    connect(ui->nameEdit, &QLineEdit::textChanged,
+        this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->cameraScheduleWidget, SIGNAL(scheduleTasksChanged()), this, SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
-    connect(ui->cameraScheduleWidget, SIGNAL(recordingSettingsChanged()), this, SLOT(at_cameraScheduleWidget_recordingSettingsChanged()));
-    connect(ui->cameraScheduleWidget, SIGNAL(gridParamsChanged()), this, SLOT(at_cameraScheduleWidget_gridParamsChanged()));
-    connect(ui->cameraScheduleWidget, SIGNAL(controlsChangesApplied()), this, SLOT(at_cameraScheduleWidget_controlsChangesApplied()));
-    connect(ui->cameraScheduleWidget, SIGNAL(scheduleEnabledChanged(int)), this, SLOT(at_cameraScheduleWidget_scheduleEnabledChanged()));
+    connect(ui->enableAudioCheckBox, &QCheckBox::stateChanged,
+        this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->cameraScheduleWidget, SIGNAL(gridParamsChanged()), this, SLOT(updateMaxFPS()));
-    connect(ui->cameraScheduleWidget, SIGNAL(scheduleEnabledChanged(int)), this, SLOT(at_dbDataChanged()));
-    connect(ui->cameraScheduleWidget, SIGNAL(archiveRangeChanged()), this, SLOT(at_dbDataChanged()));
-    connect(ui->webPageLabel, SIGNAL(linkActivated(const QString &)), this, SLOT(at_linkActivated(const QString &)));
-    connect(ui->motionWebPageLabel, SIGNAL(linkActivated(const QString &)), this, SLOT(at_linkActivated(const QString &)));
+    connect(ui->loginEdit, &QLineEdit::textChanged,
+        this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->cameraMotionButton, SIGNAL(clicked(bool)), this, SLOT(at_motionTypeChanged()));
-    connect(ui->softwareMotionButton, SIGNAL(clicked(bool)), this, SLOT(at_motionTypeChanged()));
-    connect(ui->sensitivitySlider, SIGNAL(valueChanged(int)), this, SLOT(updateMotionWidgetSensitivity()));
-    connect(ui->resetMotionRegionsButton, &QPushButton::clicked, this, &QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked);
-    connect(ui->pingButton, &QPushButton::clicked, this, [this] { menu()->trigger(QnActions::PingAction, QnActionParameters(m_camera)); });
+    connect(ui->passwordEdit, &QLineEdit::textChanged,
+        this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->licensingWidget, &QnLicensesProposeWidget::changed, this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
-    connect(ui->licensingWidget, &QnLicensesProposeWidget::changed, this, [this]
-    {
-        ui->cameraScheduleWidget->setScheduleEnabled(ui->licensingWidget->state() == Qt::Checked);
-    });
+    connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::scheduleTasksChanged,
+        this, &QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged);
+    connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::recordingSettingsChanged,
+        this, &QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged);
+    connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::gridParamsChanged,
+        this, &QnSingleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged);
+    connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::controlsChangesApplied,
+        this, &QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplied);
+    connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::scheduleEnabledChanged,
+        this, &QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged);
 
-    connect(ui->expertSettingsWidget, SIGNAL(dataChanged()), this, SLOT(at_dbDataChanged()));
+    connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::gridParamsChanged,
+        this, &QnSingleCameraSettingsWidget::updateMaxFPS);
+    connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::scheduleEnabledChanged,
+        this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
+    connect(ui->cameraScheduleWidget, &QnCameraScheduleWidget::archiveRangeChanged,
+        this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->fisheyeSettingsWidget, SIGNAL(dataChanged()), this, SLOT(at_fisheyeSettingsChanged()));
+    connect(ui->webPageLink, &QLabel::linkActivated,
+        this, &QnSingleCameraSettingsWidget::at_linkActivated);
 
-    connect(ui->imageControlWidget, &QnImageControlWidget::fisheyeChanged, this, &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
-    connect(ui->imageControlWidget, &QnImageControlWidget::changed, this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
+    connect(ui->motionWebPageLabel, &QLabel::linkActivated,
+        this, &QnSingleCameraSettingsWidget::at_linkActivated);
 
-    connect(ui->ioPortSettingsWidget, &QnIOPortSettingsWidget::dataChanged, this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
+    connect(ui->cameraMotionButton, &QPushButton::clicked,
+        this, &QnSingleCameraSettingsWidget::at_motionTypeChanged);
 
-    connect(ui->advancedSettingsWidget, &QnCameraAdvancedSettingsWidget::hasChangesChanged, this, &QnSingleCameraSettingsWidget::hasChangesChanged);
+    connect(ui->softwareMotionButton, &QPushButton::clicked,
+        this, &QnSingleCameraSettingsWidget::at_motionTypeChanged);
+
+    connect(ui->sensitivitySlider, &QnTextTickSlider::valueChanged,
+        this, &QnSingleCameraSettingsWidget::updateMotionWidgetSensitivity);
+
+    connect(ui->resetMotionRegionsButton, &QPushButton::clicked,
+        this, &QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked);
+
+    connect(ui->pingButton, &QPushButton::clicked, this,
+        [this] { menu()->trigger(QnActions::PingAction, QnActionParameters(m_camera)); });
+
+    connect(ui->licensingWidget, &QnLicensesProposeWidget::changed,
+        this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
+    connect(ui->licensingWidget, &QnLicensesProposeWidget::changed, this,
+        [this]
+        {
+            ui->cameraScheduleWidget->setScheduleEnabled(ui->licensingWidget->state() == Qt::Checked);
+        });
+
+    connect(ui->expertSettingsWidget, &QnCameraExpertSettingsWidget::dataChanged,
+        this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
+
+    connect(ui->fisheyeSettingsWidget, &QnFisheyeSettingsWidget::dataChanged,
+        this, &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
+
+    connect(ui->imageControlWidget, &QnImageControlWidget::fisheyeChanged,
+        this, &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
+    connect(ui->imageControlWidget, &QnImageControlWidget::changed,
+        this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
+
+    connect(ui->ioPortSettingsWidget, &QnIOPortSettingsWidget::dataChanged,
+        this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
+
+    connect(ui->advancedSettingsWidget, &QnCameraAdvancedSettingsWidget::hasChangesChanged,
+        this, &QnSingleCameraSettingsWidget::hasChangesChanged);
 
     updateFromResource(true);
     retranslateUi();
+
+    QnAligner* aligner = new QnAligner(this);
+    aligner->addWidgets({
+        ui->nameLabel,
+        ui->modelLabel,
+        ui->firmwareLabel,
+        ui->vendorLabel,
+        ui->ipAddressLabel,
+        ui->webPageLabel,
+        ui->macAddressLabel,
+        ui->loginLabel,
+        ui->passwordLabel });
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget()
-{}
+{
+}
 
 void QnSingleCameraSettingsWidget::retranslateUi()
 {
@@ -152,7 +205,6 @@ void QnSingleCameraSettingsWidget::retranslateUi()
         ), m_camera
     ));
 }
-
 
 const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const
 {
@@ -180,9 +232,9 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
 
     if (m_camera)
     {
-        connect(m_camera, SIGNAL(urlChanged(const QnResourcePtr &)), this, SLOT(updateIpAddressText()));
-        connect(m_camera, SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(updateIpAddressText()));
-        connect(m_camera, &QnResource::urlChanged, this, &QnSingleCameraSettingsWidget::updateWebPageText); // TODO: #GDM also listen to hostAddress changes?
+        connect(m_camera, &QnResource::urlChanged,      this, &QnSingleCameraSettingsWidget::updateIpAddressText);
+        connect(m_camera, &QnResource::resourceChanged, this, &QnSingleCameraSettingsWidget::updateIpAddressText);
+        connect(m_camera, &QnResource::urlChanged,      this, &QnSingleCameraSettingsWidget::updateWebPageText); // TODO: #GDM also listen to hostAddress changes?
         connect(m_camera, &QnResource::resourceChanged, this, &QnSingleCameraSettingsWidget::updateWebPageText); // TODO: #GDM why?
         connect(m_camera, &QnResource::resourceChanged, this, &QnSingleCameraSettingsWidget::updateMotionCapabilities);
     }
@@ -200,38 +252,28 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const
     QWidget *tab = ui->tabWidget->currentWidget();
 
     if (tab == ui->generalTab)
-    {
         return Qn::GeneralSettingsTab;
-    }
-    else if (tab == ui->recordingTab)
-    {
+
+    if (tab == ui->recordingTab)
         return Qn::RecordingSettingsTab;
-    }
-    else if (tab == ui->ioSettingsTab)
-    {
+
+    if (tab == ui->ioSettingsTab)
         return Qn::IOPortsSettingsTab;
-    }
-    else if (tab == ui->motionTab)
-    {
+
+    if (tab == ui->motionTab)
         return Qn::MotionSettingsTab;
-    }
-    else if (tab == ui->advancedTab)
-    {
+
+    if (tab == ui->advancedTab)
         return Qn::AdvancedCameraSettingsTab;
-    }
-    else if (tab == ui->expertTab)
-    {
+
+    if (tab == ui->expertTab)
         return Qn::ExpertCameraSettingsTab;
-    }
-    else if (tab == ui->fisheyeTab)
-    {
+
+    if (tab == ui->fisheyeTab)
         return Qn::FisheyeCameraSettingsTab;
-    }
-    else
-    {
-        qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
-        return Qn::GeneralSettingsTab;
-    }
+
+    qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
+    return Qn::GeneralSettingsTab;
 }
 
 void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab)
@@ -619,8 +661,11 @@ void QnSingleCameraSettingsWidget::connectToMotionWidget()
 {
     NX_ASSERT(m_motionWidget);
 
-    connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_dbDataChanged()), Qt::UniqueConnection);
-    connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_motionRegionListChanged()), Qt::UniqueConnection);
+    connect(m_motionWidget, &QnCameraMotionMaskWidget::motionRegionListChanged, this,
+        &QnSingleCameraSettingsWidget::at_dbDataChanged, Qt::UniqueConnection);
+
+    connect(m_motionWidget, &QnCameraMotionMaskWidget::motionRegionListChanged, this,
+        &QnSingleCameraSettingsWidget::at_motionRegionListChanged, Qt::UniqueConnection);
 }
 
 void QnSingleCameraSettingsWidget::showMaxFpsWarningIfNeeded()
@@ -911,7 +956,7 @@ void QnSingleCameraSettingsWidget::updateWebPageText()
                 webPageAddress += QLatin1Char(':') + QString::number(url.port());
         }
 
-        ui->webPageLabel->setText(lit("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
+        ui->webPageLink->setText(lit("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
 
         if (!m_camera->isDtsBased())
         {
@@ -925,7 +970,7 @@ void QnSingleCameraSettingsWidget::updateWebPageText()
     }
     else
     {
-        ui->webPageLabel->clear();
+        ui->webPageLink->clear();
         ui->motionWebPageLabel->clear();
     }
 }

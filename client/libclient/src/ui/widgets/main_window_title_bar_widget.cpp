@@ -76,16 +76,21 @@ public:
 public:
     QToolButton* mainMenuButton;
     QnLayoutTabBar* tabBar;
+    QToolButton* newTabButton;
+    QToolButton* currentLayoutsButton;
     bool skipDoubleClickFlag;
 };
 
 QnMainWindowTitleBarWidgetPrivate::QnMainWindowTitleBarWidgetPrivate(
-        QnMainWindowTitleBarWidget* parent)
-    : QObject(parent)
-    , q_ptr(parent)
-    , mainMenuButton(nullptr)
-    , tabBar(nullptr)
-    , skipDoubleClickFlag(false)
+    QnMainWindowTitleBarWidget* parent)
+    :
+    QObject(parent),
+    q_ptr(parent),
+    mainMenuButton(nullptr),
+    tabBar(nullptr),
+    newTabButton(nullptr),
+    currentLayoutsButton(nullptr),
+    skipDoubleClickFlag(false)
 {
 }
 
@@ -136,10 +141,13 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     layout->addWidget(newVLine());
     layout->addWidget(d->tabBar);
     layout->addWidget(newVLine());
-    layout->addWidget(newActionButton(action(QnActions::OpenNewTabAction),
-        Qn::MainWindow_TitleBar_NewLayout_Help, false, kTabBarButtonSize));
-    layout->addWidget(newActionButton(action(QnActions::OpenCurrentUserLayoutMenu),
-        true, kTabBarButtonSize));
+
+    d->newTabButton = newActionButton(action(QnActions::OpenNewTabAction),
+        Qn::MainWindow_TitleBar_NewLayout_Help, false, kTabBarButtonSize);
+    d->currentLayoutsButton = newActionButton(action(QnActions::OpenCurrentUserLayoutMenu),
+        true, kTabBarButtonSize);
+    layout->addWidget(d->newTabButton);
+    layout->addWidget(d->currentLayoutsButton);
     layout->addStretch(1);
     layout->addSpacing(80);
     layout->addWidget(newVLine());
@@ -174,6 +182,15 @@ QnLayoutTabBar* QnMainWindowTitleBarWidget::tabBar() const
 {
     Q_D(const QnMainWindowTitleBarWidget);
     return d->tabBar;
+}
+
+void QnMainWindowTitleBarWidget::setTabBarStuffVisible(bool visible)
+{
+    Q_D(const QnMainWindowTitleBarWidget);
+    d->tabBar->setVisible(visible);
+    d->newTabButton->setVisible(visible);
+    d->currentLayoutsButton->setVisible(visible);
+    action(QnActions::OpenNewTabAction)->setEnabled(visible);
 }
 
 bool QnMainWindowTitleBarWidget::event(QEvent* event)

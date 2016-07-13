@@ -49,16 +49,16 @@ public:
     Qn::ValidationResult validationResult() const
     {
         Qn::ValidationResult validationResult(QValidator::Acceptable);
-            if (validator)
+        if (validator)
             validationResult = validator(input->text());
 
-            if ((validationResult.state == QValidator::Acceptable)
-                && passwordIndicator && passwordIndicator->isVisible())
-            {
-                const auto& info = passwordIndicator->currentInformation();
-                if (info.acceptance() == QnPasswordInformation::Inacceptable)
-                    validationResult = Qn::ValidationResult(info.hint());
-            }
+        if ((validationResult.state == QValidator::Acceptable)
+            && passwordIndicator && passwordIndicator->isVisible())
+        {
+            const auto& info = passwordIndicator->currentInformation();
+            if (info.acceptance() == QnPasswordInformation::Inacceptable)
+                validationResult = Qn::ValidationResult(info.hint());
+        }
 
         return validationResult;
     }
@@ -328,34 +328,3 @@ AbstractAccessor* QnInputField::createLabelWidthAccessor()
 {
     return new LabelWidthAccessor();
 }
-
-#if 0
-void QnInputField::setConfirmationMode(const QnInputField* primaryField, const QString& hint)
-{
-    Q_D(QnInputField);
-    if (d->confirmationPrimaryField == primaryField && d->confirmationFailureHint == hint)
-        return;
-
-    if (auto primaryInput = d->primaryInput())
-        primaryInput->disconnect(this);
-
-    d->confirmationPrimaryField = primaryField;
-    d->confirmationFailureHint = hint;
-
-    if (auto primaryInput = d->primaryInput())
-    {
-        connect(primaryInput, &QLineEdit::textChanged, this,
-            [this]()
-            {
-                Q_D(QnInputField);
-                if (!d->input->text().trimmed().isEmpty() ||
-                    d->lastValidationResult.state != QValidator::Acceptable)
-                {
-                    validate();
-                }
-            });
-    }
-
-    validate();
-}
-#endif

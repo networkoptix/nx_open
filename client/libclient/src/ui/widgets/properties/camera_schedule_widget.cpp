@@ -707,7 +707,7 @@ void QnCameraScheduleWidget::updateArchiveRangeEnabledState()
 void QnCameraScheduleWidget::updateGridEnabledState()
 {
     ui->motionGroupBox->setEnabled(m_recordingParamsAvailable);
-    ui->gridWidget->setEnabled(m_changesDisabled);
+    ui->gridWidget->setEnabled(!m_changesDisabled);
     updateArchiveRangeEnabledState();
 }
 
@@ -786,7 +786,8 @@ void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled)
     ui->fpsSpinBox->setMaximum(maximum);
 }
 
-void QnCameraScheduleWidget::updateColors() {
+void QnCameraScheduleWidget::updateColors()
+{
     ui->recordAlwaysButton->setColor(ui->gridWidget->colors().recordAlways);
     ui->recordMotionButton->setColor(ui->gridWidget->colors().recordMotion);
     ui->recordMotionPlusLQButton->setColor(ui->gridWidget->colors().recordMotion);

@@ -118,6 +118,7 @@ signals:
 private:
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);
+    void invalidateResourceCacheInternal(const QnUuid& resourceId);
 
     Qn::Permissions calculatePermissions(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
 

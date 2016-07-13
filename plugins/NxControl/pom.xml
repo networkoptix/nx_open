@@ -43,12 +43,12 @@
         </dependency>        
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>axclient</artifactId>
+            <artifactId>activex_client</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/axclient/pom.xml</systemPath>
-        </dependency>        
+            <systemPath>${root.dir}/client/activex_client/pom.xml</systemPath>
+        </dependency>           
     </dependencies>  
     <build>
         <directory>${arch}</directory>

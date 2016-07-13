@@ -4,7 +4,7 @@ import "."
 
 Text
 {
-    id: thisComponent;
+    id: control;
 
     property bool acceptClicks: false;
     property bool autoHoverable: false;
@@ -36,9 +36,9 @@ Text
 
     Binding
     {
-        target: thisComponent;
+        target: control;
         property: "isHovered";
-        when: thisComponent.autoHoverable;
+        when: control.autoHoverable;
         value: hoverArea.containsMouse;
     }
 
@@ -48,12 +48,14 @@ Text
 
         anchors.fill: parent;
         acceptedButtons: (acceptClicks ? Qt.AllButtons : Qt.NoButton);
-        hoverEnabled: thisComponent.autoHoverable;
+        hoverEnabled: control.autoHoverable;
 
-        cursorShape: (thisComponent.isHovered
-            ? thisComponent.hoveredCursorShape
+        cursorShape: (control.isHovered
+            ? control.hoveredCursorShape
             : Qt.ArrowCursor);
 
-        onClicked: thisComponent.clicked();
+        onClicked: control.clicked();
+
+        visible: (control.acceptClicks || control.autoHoverable) && (control.opacity > 0);
     }
 }

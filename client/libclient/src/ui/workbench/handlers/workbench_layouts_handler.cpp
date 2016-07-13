@@ -650,6 +650,9 @@ void QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered()
         return;
 
     NX_ASSERT(!layout->isFile());
+    if (layout->isFile())
+        return;
+
     auto accessible = qnResourceAccessManager->accessibleResources(user->getId());
     if (accessible.contains(layout->getId()))
         return;

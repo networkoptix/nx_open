@@ -813,14 +813,23 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>enableRecordingCheckBox</tabstop>
   <tabstop>licensesButton</tabstop>
   <tabstop>fpsSpinBox</tabstop>
   <tabstop>qualityComboBox</tabstop>
+  <tabstop>recordAlwaysButton</tabstop>
   <tabstop>recordMotionButton</tabstop>
   <tabstop>recordMotionPlusLQButton</tabstop>
   <tabstop>noRecordButton</tabstop>
+  <tabstop>displayQualityCheckBox</tabstop>
+  <tabstop>displayFpsCheckBox</tabstop>
+  <tabstop>spinBoxMinDays</tabstop>
+  <tabstop>checkBoxMinArchive</tabstop>
+  <tabstop>spinBoxMaxDays</tabstop>
+  <tabstop>checkBoxMaxArchive</tabstop>
   <tabstop>recordBeforeSpinBox</tabstop>
   <tabstop>recordAfterSpinBox</tabstop>
+  <tabstop>exportScheduleButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

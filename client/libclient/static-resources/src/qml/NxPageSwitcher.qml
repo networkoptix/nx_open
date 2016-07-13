@@ -8,23 +8,24 @@ Row
     id: control;
 
     property alias pagesCount: pageIndicator.count;
-    property alias currentPage: pageIndicator.currentIndex;
 
     height: 16;
     spacing: 4;
 
+    signal currentPageChanged(int index, bool byClick);
+
     onPagesCountChanged:
     {
-        if (currentPage >= pagesCount)
-            currentPage = pagesCount - 1;
-        else if ((currentPage < 0) && (pagesCount > 0))
-            currentPage = 0;
+        if (impl.currentPage >= pagesCount)
+            impl.updateCurrentPage(pagesCount - 1, false);
+        else if ((impl.currentPage < 0) && (pagesCount > 0))
+            impl.updateCurrentPage(0, false);
     }
 
     NxImageButton
     {
-        enabled: (currentPage > 0);
-        onClicked: { --currentPage; }
+        enabled: (impl.currentPage > 0);
+        onClicked: { impl.updateCurrentPage(impl.currentPage - 1, true); }
         anchors.verticalCenter: parent.verticalCenter;
         width: 24;
         height: 18;
@@ -45,7 +46,7 @@ Row
             width: 18;
             height: 18;
 
-            property bool selected: (control.currentPage == index);
+            property bool selected: (impl.currentPage == index);
             readonly property string selectedUrl: "qrc:/skin/welcome_page/paginator_dot_selected.png";
             readonly property string hoveredUrl: "qrc:/skin/welcome_page/paginator_dot_hovered.png";
             readonly property string standardUrl: "qrc:/skin/welcome_page/paginator_dot.png";
@@ -53,15 +54,15 @@ Row
             standardIconUrl: (selected ? selectedUrl : standardUrl);
             hoveredIconUrl: (selected ? selectedUrl : hoveredUrl)
 
-            onClicked: (control.currentPage = index );
+            onClicked: (impl.updateCurrentPage(index, true));
         }
     }
 
     NxImageButton
     {
-        enabled: (currentPage < (pagesCount - 1));
+        enabled: (impl.currentPage < (pagesCount - 1));
         anchors.verticalCenter: parent.verticalCenter;
-        onClicked: { ++currentPage; }
+        onClicked: { impl.updateCurrentPage(impl.currentPage + 1, true); }
         width: 24;
         height: 18;
 
@@ -69,4 +70,17 @@ Row
         hoveredIconUrl: "qrc:/skin/welcome_page/paginator_next_hovered.png";
     }
 
+    property QtObject impl: QtObject
+    {
+        property int currentPage: -1;
+
+        function updateCurrentPage(index, byClick)
+        {
+            if (currentPage == index)
+                return;
+
+            currentPage = index;
+            control.currentPageChanged(index, byClick);
+        }
+    }
 }

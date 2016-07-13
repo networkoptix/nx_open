@@ -97,15 +97,22 @@ QnIoModuleColors::QnIoModuleColors() {
     buttonBackground = QColor("#1c1c1c");
 }
 
-QnScheduleGridColors::QnScheduleGridColors() {
-    normalLabel =   QColor(255, 255, 255, 255);
-    weekendLabel =  QColor(255, 128, 128, 255);
-    selectedLabel = QColor(64,  128, 192, 255);
-    disabledLabel = QColor(183, 183, 183, 255);
-
-    recordNever =   QColor(64,  64,  64);
-    recordAlways =  QColor(0,   100, 0);
-    recordMotion =  QColor(100, 0,   0);
+QnScheduleGridColors::QnScheduleGridColors() :
+    normalLabel(255, 255, 255),
+    weekendLabel(255, 0, 0),
+    gridLabel(0, 0, 0),
+    allLabel(127, 127, 127),
+    recordNever(64, 64, 64),
+    recordAlways(0, 100, 0),
+    recordMotion(100, 0, 0),
+    recordNeverHovered(96, 96, 96),
+    recordAlwaysHovered(0, 160, 0),
+    recordMotionHovered(160, 0, 0),
+    hoveredBackground(0, 0, 0, 0),
+    pressedBackground(0, 0, 0, 0),
+    gridLine(255, 255, 255),
+    border(0, 0, 0)
+{
 }
 
 QnGridColors::QnGridColors() {
@@ -243,6 +250,32 @@ QnPasswordStrengthColors::QnPasswordStrengthColors() :
     inacceptable(Qt::red),
     acceptable(Qt::yellow),
     good(Qt::green)
+{
+}
+
+QnMotionSensitivityColors::QnMotionSensitivityColors() :
+    normal({
+        QColor(0x698796),
+        QColor(0x627CD6),
+        QColor(0x23A4CB),
+        QColor(0x31BAA2),
+        QColor(0x79BC66),
+        QColor(0xB8BC37),
+        QColor(0xFBA405),
+        QColor(0xE97119),
+        QColor(0xD24729),
+        QColor(0xC22626) }),
+    hovered({
+        QColor(0x7D97A4),
+        QColor(0x768FE4),
+        QColor(0x37C2E4),
+        QColor(0x5ADCBB),
+        QColor(0x95E37F),
+        QColor(0xD9DD4B),
+        QColor(0xFFBF4A),
+        QColor(0xF5861E),
+        QColor(0xEC6239),
+        QColor(0xE73535) })
 {
 }
 

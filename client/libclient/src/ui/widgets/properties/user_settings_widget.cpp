@@ -212,11 +212,13 @@ void QnUserSettingsWidget::setupInputFields()
     connect(ui->loginInputField, &QnInputField::editingFinished, this, [this]()
     {
         /* Check if we must update password for the other user. */
-        bool mustUpdatePassword = m_model->mode() == QnUserSettingsModel::OtherSettings
-            && ui->loginInputField->text() != m_model->user()->getName();
+        if (m_model->mode() == QnUserSettingsModel::OtherSettings && m_model->user())
+        {
+            bool mustUpdatePassword = ui->loginInputField->text() != m_model->user()->getName();
 
-        ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(
-            !mustUpdatePassword, tr("User has been renamed. Password must be updated.")), true);
+            ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(
+                !mustUpdatePassword, tr("User has been renamed. Password must be updated.")), true);
+        }
     });
 
     ui->nameInputField->setTitle(tr("Name"));

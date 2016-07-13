@@ -74,25 +74,27 @@ bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiLicenseData &
 
 bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiUserGroupData&/*data*/, Qn::Permission permission)
 {
+    if (permission == Qn::Permission::ReadPermission)
+        return true;
+
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
     if (permission == Qn::Permission::SavePermission)
         return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-    else if (permission == Qn::Permission::ReadPermission)
-        return true;
-    else
-        NX_ASSERT(0);
+
+    NX_ASSERT(false);
     return false;
 }
 
 bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiDiscoveredServerData&/*data*/, Qn::Permission permission)
 {
+    if (permission == Qn::Permission::ReadPermission)
+        return true;
+
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
     if (permission == Qn::Permission::SavePermission)
         return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-    else if (permission == Qn::Permission::ReadPermission)
-        return true;
-    else
-        NX_ASSERT(0);
+
+    NX_ASSERT(false);
     return false;
 }
 
@@ -147,25 +149,14 @@ bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiMediaServerUs
 
 bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiAccessRightsData &/*data*/, Qn::Permission permission)
 {
-    auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    if (permission == Qn::Permission::SavePermission)
-        return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-    else if (permission == Qn::Permission::ReadPermission)
+    if (permission == Qn::Permission::ReadPermission)
         return true;
-    else
-        NX_ASSERT(0);
-    return false;
-}
 
-bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiUserData&/*data*/, Qn::Permission permission)
-{
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
     if (permission == Qn::Permission::SavePermission)
         return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-    else if (permission == Qn::Permission::ReadPermission)
-        return true;
-    else
-        NX_ASSERT(0);
+
+    NX_ASSERT(false);
     return false;
 }
 
@@ -185,5 +176,4 @@ bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiVideowallCont
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
     return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalControlVideoWallPermission);
-    return true;
 }

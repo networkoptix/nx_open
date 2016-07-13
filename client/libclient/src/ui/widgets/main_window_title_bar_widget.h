@@ -23,6 +23,11 @@ public:
 
     QnLayoutTabBar* tabBar() const;
 
+    /**
+    * Sets tab bar and "add"/"tabs list menu" buttons visible (or not)
+    */
+    void setTabBarStuffVisible(bool visible);
+
 protected:
     virtual bool event(QEvent* event) override;
     virtual void mouseDoubleClickEvent(QMouseEvent* event) override;

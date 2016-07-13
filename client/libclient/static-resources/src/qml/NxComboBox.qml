@@ -88,6 +88,8 @@ ComboBox
     {
         if (activeFocus)
             textInputItem.forceActiveFocus();
+        else if (popup)
+            popup.visible = false;
     }
 
     Binding

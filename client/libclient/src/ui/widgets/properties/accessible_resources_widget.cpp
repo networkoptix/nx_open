@@ -135,7 +135,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     ui(new Ui::AccessibleResourcesWidget()),
     m_permissionsModel(permissionsModel),
     m_filter(filter),
-    m_controlsVisible(filter == QnResourceAccessFilter::CamerasFilter), /*< Show 'All' checkbox only for cameras. */
+    m_controlsVisible(filter == QnResourceAccessFilter::MediaFilter), /*< Show 'All' checkbox only for cameras. */
     m_resourcesModel(new QnResourceListModel()),
     m_controlsModel(new QnResourceListModel())
 {
@@ -278,7 +278,7 @@ bool QnAccessibleResourcesWidget::hasChanges() const
     if (m_controlsVisible)
     {
         bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
-        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllCamerasPermission) != checkedAll)
+        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllMediaPermission) != checkedAll)
             return true;
     }
 
@@ -290,7 +290,7 @@ void QnAccessibleResourcesWidget::loadDataToUi()
     if (m_controlsVisible)
     {
         QSet<QnUuid> checkedControls;
-        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllCamerasPermission))
+        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllMediaPermission))
             for (const auto& resource : m_controlsModel->resources())
                 checkedControls << resource->getId();   /*< Really we are checking the only dummy resource. */
         m_controlsModel->setCheckedResources(checkedControls);
@@ -352,9 +352,9 @@ void QnAccessibleResourcesWidget::applyChanges()
         bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
         Qn::GlobalPermissions permissions = m_permissionsModel->rawPermissions();
         if (checkedAll)
-            permissions |= Qn::GlobalAccessAllCamerasPermission;
+            permissions |= Qn::GlobalAccessAllMediaPermission;
         else
-            permissions &= ~Qn::GlobalAccessAllCamerasPermission;
+            permissions &= ~Qn::GlobalAccessAllMediaPermission;
         m_permissionsModel->setRawPermissions(permissions);
     }
 }
@@ -399,7 +399,7 @@ bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resour
 {
     switch (filter)
     {
-        case QnResourceAccessFilter::CamerasFilter:
+        case QnResourceAccessFilter::MediaFilter:
             if (resource->hasFlags(Qn::desktop_camera))
                 return false;
             return (resource->hasFlags(Qn::web_page) || resource->hasFlags(Qn::server_live_cam));

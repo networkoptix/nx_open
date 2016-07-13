@@ -44,6 +44,8 @@ public:
     void resetCameraUserAttributesList( const ec2::ApiCameraAttributesDataList& cameraUserAttributesList );
     void resetPropertyList(const ec2::ApiResourceParamWithRefDataList& params);
     void resetStatusList(const ec2::ApiResourceStatusDataList& params);
+    void resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights);
+    void resetUserRoles(const ec2::ApiUserGroupDataList& roles);
 signals:
     void connectionOpened();
     void connectionClosed();
@@ -89,7 +91,6 @@ protected:
     void resetLicenses(const ec2::ApiLicenseDataList& licenses);
     void resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList);
     void resetTime();
-    void resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights);
 
     virtual bool canRemoveResource(const QnUuid& resourceId);
     virtual void removeResourceIgnored(const QnUuid& resourceId);
