@@ -5,51 +5,59 @@
 namespace nx_modbus
 {
 
-class QnModbusAsyncClient
+class QnModbusAsyncClient: public QObject
 {
+    Q_OBJECT
+
     enum class ModbusClientState
     {
-        Ready,
-        SendingMessage,
-        ReadingHeader,
-        ReadingData
+        ready,
+        sendingMessage,
+        readingHeader,
+        readingData
     };
 
 public:
     QnModbusAsyncClient();
     void doModbusRequestAsync(const ModbusRequest& request);
 
-    ModbusResponse readDiscreteInputsAsync();
+    void readDiscreteInputsAsync();
 
-    ModbusResponse readCoilsAsync();
-    ModbusResponse writeCoilsAsync();
+    void readCoilsAsync(quint16 startCoil, quint16 coilNumber);
+    void writeCoilsAsync();
 
-    ModbusResponse readInputRegistersAsync();
+    void readInputRegistersAsync();
 
-    ModbusResponse readHoldingRegistersAsync(quint16 startRegister, quint16 registerCount);
-    ModbusResponse writeHoldingRegistersAsync(quint16 startRegister, const QByteArray& data);
+    void readHoldingRegistersAsync(quint32 startRegister, quint32 registerCount);
+    void writeHoldingRegistersAsync(quint32 startRegister, const QByteArray& data);
+
+    QString getLastErrorString() const;
 
 signals:
-    void done(const ModbusResponse& response);
+    void done(ModbusResponse response);
     void error();
 
 private:
     void initSocket();
     void readAsync();
-    void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );
-    void onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead );
+    void asyncSendDone(AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten);
+    void onSomeBytesReadAsync(AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead);
 
     void processState();
     void processHeader();
     void processData();
+
+    ModbusMBAPHeader buildHeader(const ModbusRequest& request);
 
 private:
     quint16 m_requestTransactionId;
     quint16 m_requestFunctionCode;
     quint16 m_responseLength;
 
+    QString m_lastErrorString;
+
     ModbusClientState m_state;
-    QnByteArray m_recvBuffer;
+    QByteArray m_recvBuffer;
     std::shared_ptr<AbstractStreamSocket> m_socket;
 };
 

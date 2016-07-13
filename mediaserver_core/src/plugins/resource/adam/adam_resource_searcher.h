@@ -23,18 +23,26 @@ public:
     ~QnAdamResourceSearcher();
 
     virtual QString manufacture() const override;
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck);
+
+    virtual QList<QnResourcePtr> checkHostAddr(
+        const QUrl& url, 
+        const QAuthenticator& auth, 
+        bool doMultichannelCheck);
+
     virtual QnResourceList findResources() override;
 
-    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams &params) override;
+    virtual QnResourcePtr createResource(
+        const QnUuid& resourceTypeId, 
+        const QnResourceParams& params) override;
 
 private:
-    QString executeAsciiCommand(QnModbusClient& client, const QString& command);
-    QString getAdamModuleName(QnModbusClient& client);
-    QString getAdamModuleFirmware(QnModbusClient& client);
+    QString generatePhysicalId(const QString& url) const;
+    QByteArray executeAsciiCommand(nx_modbus::QnModbusClient& client, const QString& command);
+    QString getAdamModuleName(nx_modbus::QnModbusClient& client);
+    QString getAdamModuleFirmware(nx_modbus::QnModbusClient& client);
 
 private:
     QnUuid m_typeId;
-    std::shared_ptr<QnModbusClient> m_modbusClient;
+    std::shared_ptr<nx_modbus::QnModbusClient> m_modbusClient;
     std::shared_ptr<UDPSocket> m_broadcastSocket;
 };

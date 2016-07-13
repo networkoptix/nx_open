@@ -89,6 +89,7 @@
 #include <plugins/resource/stardot/stardot_resource_searcher.h>
 #include <plugins/resource/test_camera/testcamera_resource_searcher.h>
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
+#include <plugins/resource/adam/adam_resource_searcher.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <plugins/storage/file_storage/db_storage_resource.h>
@@ -2195,6 +2196,10 @@ void MediaServerProcess::run()
     OnvifResourceSearcher onvifResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&onvifResourceSearcher);
 #endif //ENABLE_ONVIF
+
+    QnAdamResourceSearcher advantechAdamResourceSearcher;
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&advantechAdamResourceSearcher);
+
 #endif
 
 #if !defined(EDGE_SERVER)

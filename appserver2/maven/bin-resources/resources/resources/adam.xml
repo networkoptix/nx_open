@@ -1,0 +1,6 @@
+<resources>
+    <oem name = "AdvantechADAM">
+    <resource name="AdvantechADAMCommon" id="1a67aa50-8aa2-431f-8d30-bacbb65b88ba" type="IOModule"/>
+    <resource name = "ADAM-6052" public="AdvantechADAMCommon"/>
+    </oem>
+</resources>

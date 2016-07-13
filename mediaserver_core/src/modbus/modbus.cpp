@@ -22,12 +22,12 @@ ModbusMBAPHeader ModbusMBAPHeader::decode(const QByteArray& header)
 {
     ModbusMBAPHeader decoded;
 
-    QDataStream stream(&header, QIODevice::ReadOnly);
+    QDataStream stream(const_cast<QByteArray*>(&header), QIODevice::ReadOnly);
     stream.setByteOrder(QDataStream::BigEndian);
     stream
-        >> decoded.transactionId;
+        >> decoded.transactionId
         >> decoded.protocolId
-        >> decoded.length;
+        >> decoded.length
         >> decoded.unitId;
 
     return decoded;

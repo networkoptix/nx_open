@@ -11,7 +11,7 @@ namespace
 
 QnModbusAsyncClient::QnModbusAsyncClient()
 {
-
+    initSocket();
 }
 
 void QnModbusAsyncClient::initSocket()
@@ -24,7 +24,7 @@ void QnModbusAsyncClient::initSocket()
     if (!m_socket->setRecvTimeout(kRecvTimeout) ||
         !m_socket->setSendTimeout(kSendTimeout))
     {
-        m_socket.clear();
+        m_socket.reset();
     }
 }
 
@@ -33,7 +33,7 @@ void QnModbusAsyncClient::readAsync()
     auto handler = std::bind(
         &QnModbusAsyncClient::onSomeBytesReadAsync,
         this,
-        sock,
+        m_socket.get(),
         std::placeholders::_1,
         std::placeholders::_2);
 
@@ -48,11 +48,13 @@ void QnModbusAsyncClient::asyncSendDone(
 
     if (errorCode != SystemError::noError)
     {
-        m_state = ModbusClientState::Ready;
+        m_lastErrorString = lit("ModbusAsyncClient: error while sending request. %1")
+            .arg(errorCode);
+        m_state = ModbusClientState::ready;
         emit error();
         return;
     }
-
+    
     readAsync();
 }
 
@@ -64,7 +66,9 @@ void QnModbusAsyncClient::onSomeBytesReadAsync(
 
     if ( errorCode != SystemError::noError)
     {
-        m_state = ModbusClientState::Ready;
+        m_lastErrorString = lit("ModbusAsyncClient: error while reading response. %1")
+            .arg(errorCode);
+        m_state = ModbusClientState::ready;
         emit error();
     }
 
@@ -73,8 +77,8 @@ void QnModbusAsyncClient::onSomeBytesReadAsync(
 
 void QnModbusAsyncClient::processState()
 {
-    if (m_state == ModbusClientState::Ready
-        || m_state == ModbusClientState::SendingMessage)
+    if (m_state == ModbusClientState::ready
+        || m_state == ModbusClientState::sendingMessage)
     {
         const auto logMessage = lit(
             "ModbusAsyncClient: Got unexpected data. It's not good");
@@ -82,16 +86,17 @@ void QnModbusAsyncClient::processState()
         NX_LOG(logMessage, cl_logWARNING);
         qDebug() << logMessage;
 
-        m_state = ModbusClientState::Ready;
+        m_state = ModbusClientState::ready;
+        m_lastErrorString = logMessage;
         emit error();
 
         return;
     }
-    else if (m_state == ModbusClientState::ReadingHeader)
+    else if (m_state == ModbusClientState::readingHeader)
     {
         processHeader();
     }
-    else if (m_state == ModbusClientState::ReadingData)
+    else if (m_state == ModbusClientState::readingData)
     {
         processData();
     }
@@ -99,7 +104,7 @@ void QnModbusAsyncClient::processState()
 
 void QnModbusAsyncClient::processHeader()
 {
-    Q_ASSERT(m_state == ModbusClientState::ReadingHeader);
+    Q_ASSERT(m_state == ModbusClientState::readingHeader);
 
     if (m_recvBuffer.size() < ModbusMBAPHeader::size)
         return;
@@ -109,7 +114,7 @@ void QnModbusAsyncClient::processHeader()
 
     if (m_recvBuffer.size() > ModbusMBAPHeader::size)
     {
-        m_state = ModbusClientState::ReadingData;
+        m_state = ModbusClientState::readingData;
         processData();
     }
 }
@@ -117,7 +122,7 @@ void QnModbusAsyncClient::processHeader()
 void QnModbusAsyncClient::processData()
 {
 
-    Q_ASSERT(m_state == ModbusClientState::ReadingData);
+    Q_ASSERT(m_state == ModbusClientState::readingData);
 
     const quint16 fullMessageLength = ModbusMBAPHeader::size
         + m_responseLength
@@ -131,16 +136,16 @@ void QnModbusAsyncClient::processData()
 
     if (m_recvBuffer.size() > fullMessageLength)
     {
-        const auto logMessage = lit(
-            "ModbusAsyncClient: "
-            "buffer size is more than response length. "
-            "Buffer size: %1 bytes, response length: %2 bytes.")
+        const auto logMessage = 
+            lit("ModbusAsyncClient: buffer size is more than expected response length.") 
+            + lit("Buffer size: %1 bytes, response length: %2 bytes.")
             .arg(m_recvBuffer.size())
             .arg(fullMessageLength);
 
         NX_LOG(logMessage, cl_logWARNING);
         qDebug() << logMessage;
 
+        m_lastErrorString = logMessage;
         emit error();
         return;
     }
@@ -148,7 +153,7 @@ void QnModbusAsyncClient::processData()
     if (m_recvBuffer.size() == fullMessageLength)
     {
         auto response = ModbusResponse::decode(m_recvBuffer);
-        m_state = ModbusClientState::Ready;
+        m_state = ModbusClientState::ready;
 
         emit done(response);
     }
@@ -167,8 +172,45 @@ void QnModbusAsyncClient::doModbusRequestAsync(const ModbusRequest &request)
         std::placeholders::_1,
         std::placeholders::_2);
 
-    m_state = ModbusClientState::SendingMessage;
+    m_state = ModbusClientState::sendingMessage;
+    m_recvBuffer.clear();
     m_socket->sendAsync(data, handler);
 }
 
+void QnModbusAsyncClient::readCoilsAsync(quint16 startCoil, quint16 coilNumber)
+{
+    ModbusRequest request;
+
+    request.functionCode = FunctionCode::kReadCoils;
+    
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::BigEndian);
+    
+    stream << startCoil << coilNumber;
+
+    request.data = data;
+    request.header = buildHeader(request);
+
+    doModbusRequestAsync(request);
+}
+
+ModbusMBAPHeader QnModbusAsyncClient::buildHeader(const ModbusRequest& request)
+{
+    ModbusMBAPHeader header;
+
+    header.transactionId = ++m_requestTransactionId;
+    header.protocolId = 0x00;
+    header.unitId = 0x01;
+    header.length = sizeof(header.unitId)
+        + sizeof(request.functionCode)
+        + request.data.size();
+
+    return header;
+}
+
+QString QnModbusAsyncClient::getLastErrorString() const
+{
+    return m_lastErrorString;
+}
 

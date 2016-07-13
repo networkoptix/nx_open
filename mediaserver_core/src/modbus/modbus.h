@@ -1,10 +1,14 @@
 #pragma once
+
 #include <qglobal.h>
 
 namespace nx_modbus
 {
 
 const quint8 kErrorCodeLowerLimit = 0x80;
+
+const quint16 kCoilStateOn = 0xff00;
+const quint16 kCoilStateOff = 0x0000;
 
 namespace FunctionCode {
     const quint8 kReadCoils = 0x01;
@@ -59,7 +63,7 @@ struct ModbusMBAPHeader
 
     static QByteArray encode(const ModbusMBAPHeader& header);
     static ModbusMBAPHeader decode(const QByteArray& header);
-    static size_t size =
+    static const size_t size =
         sizeof(decltype(ModbusMBAPHeader::transactionId)) +
         sizeof(decltype(ModbusMBAPHeader::protocolId)) +
         sizeof(decltype(ModbusMBAPHeader::length)) +
