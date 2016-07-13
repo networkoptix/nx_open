@@ -96,6 +96,10 @@ var L = {
         unavailable: 'System is unreachable',
         offline: 'System is offline',
 
+        confirmRenameTitle: 'System name',
+        confirmRenameAction: 'Save',
+        successRename: 'System name was successfully saved',
+
         confirmDisconnectTitle: "Disconnect system from PRODUCT_NAME?",
         confirmDisconnectAction: "Disconnect",
 

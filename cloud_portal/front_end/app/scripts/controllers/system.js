@@ -92,6 +92,12 @@ angular.module('cloudApp')
             }
         };
 
+        $scope.rename = function(){
+            return dialogs.rename(systemId, $scope.system.info.name).then(function(finalName){
+                $scope.system.info.name = finalName;
+            });
+        };
+
         $scope.share = function(){
             // Call share dialog, run process inside
             return dialogs.share($scope.system).then(loadUsers);

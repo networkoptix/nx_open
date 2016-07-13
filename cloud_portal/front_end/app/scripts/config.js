@@ -54,7 +54,11 @@ var Config = {
         custom: 'custom',
         owner:   'owner',
         editUserPermissionFlag: 'GlobalAdminPermission',
-        editUserAccessRoleFlag: 'Admin', // TODO: remove it later when cloud permissions
+        globalAdminPermissionFlag: 'GlobalAdminPermission',
+
+        editUserAccessRoleFlag: 'Admin', // TODO: remove it later when cloud permissions are ready
+        globalAdminAccessRoleFlag: 'Admin', // TODO: remove it later when cloud permissions are ready
+
         order: [
             'liveViewer',
             'viewer',

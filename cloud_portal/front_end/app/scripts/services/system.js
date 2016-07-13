@@ -41,6 +41,7 @@ angular.module('cloudApp')
                 self.accessRole = role.accessRole;
                 self.permissions.editAdmins = self.currentUserRecord.isAdmin;
                 self.permissions.editUsers = self.currentUserRecord.isAdmin || self.currentUserRecord.permissions.indexOf(Config.accessRoles.editUserPermissionFlag>=0);
+                self.permissions.isAdmin = self.currentUserRecord.isAdmin || self.currentUserRecord.permissions.indexOf(Config.accessRoles.globalAdminPermissionFlag>=0);
             }else{
 
                 var role = findAccessRole(self.isMine, self.info.accessRole);
@@ -48,8 +49,10 @@ angular.module('cloudApp')
                 if(self.isMine){
                     self.permissions.editUsers = true;
                     self.permissions.editAdmins = true;
+                    self.permissions.isAdmin = true;
                 }else{
                     self.permissions.editUsers = self.info.accessRole.indexOf(Config.accessRoles.editUserAccessRoleFlag>=0);
+                    self.permissions.isAdmin = self.info.accessRole.indexOf(Config.accessRoles.globalAdminAccessRoleFlag>=0);
                 }
             }
         }
@@ -169,7 +172,7 @@ angular.module('cloudApp')
             if(!this.usersPromise){
                 var self = this;
                 var promise = null;
-                if(false && self.isOnline){ // Two separate cases - either we get info from the system (presuming it has actual names)
+                if(self.isOnline){ // Two separate cases - either we get info from the system (presuming it has actual names)
                     promise = self.getUsersDataFromTheSystem(self.id).catch(function(){
                         return self.getUsersCachedInCloud(self.id);
                     });

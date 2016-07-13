@@ -2,7 +2,10 @@
 <div class="panel panel-default" ng-if="system.isMine">
     <div class="panel-body">
         <h2>Your system</h2>
-        <p></p>
+
+        <p ng-if="system.permissions.isAdmin && system.isAvailable">
+            <button class="btn btn-default" ng-click="rename()">Rename the system</button>
+        </p>
         <button class="btn btn-default" ng-click="disconnect()">Disconnect from
             <span class="product-name">PRODUCT_NAME</span></button>
     </div>
@@ -17,6 +20,10 @@
         <p>
             Your permissions:
             <b>{{L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+        </p>
+
+        <p ng-if="system.permissions.isAdmin && system.isAvailable">
+            <button class="btn btn-default" ng-click="rename()">Rename the system</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">Remove from my Account</button>
     </div>

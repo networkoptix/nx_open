@@ -139,6 +139,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                     }
                 }).result;
             },
+
             disconnect:function(systemId){
                 var title = L.system.confirmDisconnectTitle;
 
@@ -152,6 +153,22 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                     }
                 }).result;
             },
+            rename:function(systemId, systemName){
+                var title = L.system.confirmRenameTitle;
+
+                return openDialog({
+                    title:title,
+                    template: 'static/views/dialogs/rename.html',
+                    hasFooter: false,
+                    cancellable:true,
+                    params: {
+                        systemId: systemId,
+                        systemName: systemName
+                    }
+                }).result;
+            },
+
+
             closeMe:function($scope, result){
 
                 // TODO: We must replace this hack with something more angular-way,
