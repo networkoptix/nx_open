@@ -5,12 +5,12 @@
 class QnCrossdomainConnectionProcessorPrivate;
 
 /**
-* Dynamically construct crossdomain.xml result
-* It's allow access from domains:
-* 1. All server interfaces
-* 2. Server public IP
-* 3. Cloud portal URL
-*/
+ * Dynamically construct crossdomain.xml result
+ * It's allow access from domains:
+ * 1. All server interfaces
+ * 2. Server public IP
+ * 3. Cloud portal URL
+ */
 
 class QnCrossdomainConnectionProcessor: public QnTCPConnectionProcessor
 {

@@ -11,21 +11,21 @@ namespace {
     static const QByteArray kContentType = "application/xml";
     static const QByteArray kIfacePattern = "%SERVER_IF_LIST%";
     static const QByteArray kCrossdomainPattern = "%CLOUD_PORTAL_URL%";
-}
+} // namespace
 
 class QnCrossdomainConnectionProcessorPrivate : public QnTCPConnectionProcessorPrivate
 {
-public:
 };
 
 QnCrossdomainConnectionProcessor::QnCrossdomainConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
-    QnTcpListener* /*_owner*/)
+    QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(
-    new QnCrossdomainConnectionProcessorPrivate,
-    socket)
+        new QnCrossdomainConnectionProcessorPrivate,
+        socket)
 {
+    Q_UNUSED(owner);
 }
 
 QnCrossdomainConnectionProcessor::~QnCrossdomainConnectionProcessor()
@@ -39,7 +39,8 @@ void QnCrossdomainConnectionProcessor::run()
 
     initSystemThreadId();
 
-    if (d->clientRequest.isEmpty()) {
+    if (d->clientRequest.isEmpty())
+    {
         if (!readRequest())
             return;
     }
@@ -68,7 +69,7 @@ void QnCrossdomainConnectionProcessor::run()
         else if (lines[i].contains(kCrossdomainPattern))
         {
             lines.removeAt(i);
-            QString portalUrl = QUrl(qnGlobalSettings->cloudPortalUrl()).host();
+            const QString portalUrl = QUrl(qnGlobalSettings->cloudPortalUrl()).host();
             if (!portalUrl.isEmpty())
                 lines.insert(i, pattern.replace(kCrossdomainPattern, portalUrl.toUtf8()));
         }
