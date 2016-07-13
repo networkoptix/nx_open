@@ -257,13 +257,11 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
     qreal trOffset = cellSize / 6;
     qreal trSize = cellSize / 10;
 
-    QPointF points[6];
-    points[0] = QPointF(cellSize - trOffset - trSize, trOffset);
-    points[1] = QPointF(cellSize - trOffset, trOffset + trSize);
-    points[2] = QPointF(trOffset + trSize, cellSize - trOffset);
-    points[3] = QPointF(trOffset, cellSize - trSize - trOffset);
-    points[4] = (points[0] + points[1]) / 2;
-    points[5] = (points[2] + points[3]) / 2;
+    std::array<QPointF, 4> points({
+        QPointF(cellSize - trOffset - trSize, trOffset),
+        QPointF(cellSize - trOffset, trOffset + trSize),
+        QPointF(trOffset + trSize, cellSize - trOffset),
+        QPointF(trOffset, cellSize - trSize - trOffset) });
 
     for (int x = 0; x < columnCount(); ++x)
     {
@@ -298,9 +296,8 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
             {
                 p.setBrush(colorInside);
                 p.setPen(m_colors.border);
-                p.drawPolygon(points, 4);
-                p.drawLine(QPointF(cellSize, 0), points[4]);
-                p.drawLine(points[5], QPointF(0, cellSize));
+                p.drawLine(QPointF(cellSize, 0), QPointF(0, cellSize));
+                p.drawPolygon(points.data(), points.size());
             }
 
             // draw text parameters
@@ -313,7 +310,12 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
                     p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize * 0.75, cellSize *0.5)), Qt::AlignCenter, m_gridParams[x][y][FpsParam].toString());
 
                 if (m_showQuality)
-                    p.drawText(QRectF(QPointF(cellSize * 0.25, cellSize * 0.5), QPointF(cellSize, cellSize)), Qt::AlignCenter, toShortDisplayString(quality));
+                {
+                    if (m_showFps)
+                        p.drawText(QRectF(QPointF(cellSize * 0.25, cellSize * 0.5), QPointF(cellSize, cellSize)), Qt::AlignCenter, toShortDisplayString(quality));
+                    else
+                        p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize * 0.75, cellSize *0.5)), Qt::AlignCenter, toShortDisplayString(quality));
+                }
             }
 
             p.setTransform(transform);
