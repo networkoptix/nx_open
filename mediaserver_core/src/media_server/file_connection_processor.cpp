@@ -111,16 +111,16 @@ QByteArray QnFileConnectionProcessor::readStaticFile(const QString& path)
 
 bool QnFileConnectionProcessor::loadFile(
     const QString& path,
-    QDateTime& lastModified,
-    QByteArray& result)
+    QDateTime* outLastModified,
+    QByteArray* outData)
 {
     QnMutexLocker lock(&cacheMutex);
 
     CacheEntry* cachedData = cachedFiles.object(path);
     if (cachedData)
     {
-        result = cachedData->data;
-        lastModified = cachedData->lastModified;
+        *outData = cachedData->data;
+        *outLastModified = cachedData->lastModified;
         return true;
     }
 
@@ -128,10 +128,10 @@ bool QnFileConnectionProcessor::loadFile(
     if (!file)
         return false;
 
-    result = file->readAll();
-    lastModified = staticFileLastModified(file);
-    if (result.size() < cachedFiles.maxCost())
-        cachedFiles.insert(path, new CacheEntry(result, lastModified), result.size());
+    *outData = file->readAll();
+    *outLastModified = staticFileLastModified(file);
+    if (outData->size() < cachedFiles.maxCost())
+        cachedFiles.insert(path, new CacheEntry(*outData, *outLastModified), outData->size());
     return true;
 }
 
@@ -172,7 +172,7 @@ void QnFileConnectionProcessor::run()
     }
 
     QDateTime lastModified;
-    if (!loadFile(path, lastModified, d->response.messageBody))
+    if (!loadFile(path, &lastModified, &d->response.messageBody))
     {
         sendResponse(nx_http::StatusCode::notFound, contentType, QByteArray());
         return;

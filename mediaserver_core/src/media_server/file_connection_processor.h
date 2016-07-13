@@ -19,8 +19,8 @@ protected:
 private:
     bool loadFile(
         const QString& path,
-        QDateTime& lastModified,
-        QByteArray& result);
+        QDateTime* outLastModified,
+        QByteArray* outData);
     QByteArray compressMessageBody(const QByteArray& contentType);
 private:
     Q_DECLARE_PRIVATE(QnFileConnectionProcessor);
