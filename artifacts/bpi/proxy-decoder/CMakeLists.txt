@@ -8,8 +8,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNX_UTILS_API= -DPROXY_DECOD
 set(SOURCE_FILES
     proxy_decoder.h
     proxy_decoder.cpp
-    flag_config.h
-    flag_config.cpp
+    nx/utils/flag_config.h
+    nx/utils/flag_config.cpp
+    nx/utils/debug_utils.h
+    nx/utils/debug_utils.cpp
+    nx/utils/string.h
     vdpau_utils.h
     vdpau_utils.cpp
     vdpau_session.h

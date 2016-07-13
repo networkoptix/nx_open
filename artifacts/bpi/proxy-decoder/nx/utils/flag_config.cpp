@@ -60,7 +60,7 @@ static bool parseNameValue(const char* const s, std::string* outName, std::strin
         *outValue += *(p++);
 
     // Trim trailing spaces in value.
-    int i = outValue->size() - 1;
+    int i = (int) outValue->size() - 1;
     while (i >= 0 && isWhitespace((*outValue)[i]))
         --i;
     *outValue = outValue->substr(0, i + 1);

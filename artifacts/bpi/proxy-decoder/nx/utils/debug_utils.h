@@ -8,9 +8,10 @@
 
 #include <memory>
 #include <cstdint>
+#include <cstring>
 
 #if defined(QT_CORE_LIB)
-    #include <QDebug>
+    #include <QtCore/QDebug>
 #else // QT_CORE_LIB
     #include <iostream>
 #endif // QT_CORE_LIB
@@ -20,25 +21,26 @@ namespace utils {
 
 // TODO: Consider renaming PRINT and OUTPUT. Consider introducing namespace 'debug'.
 
+namespace {
+
+/** @return Part of a source code filename which is a path relative to "nx_vms..." folder. */
+static inline const char* relative_src_filename(const char* s)
+{
+    /*unused*/ (void) relative_src_filename;
+    auto pos = std::string(__FILE__).find("common_libs"); //< This file resides in "common_libs".
+    if (pos != std::string::npos && pos < strlen(s) && strncmp(s, __FILE__, pos) == 0)
+        return s + pos;
+    return s; //< Use original file name.
+}
+
+} // namespace
+
 #if defined(QT_CORE_LIB)
 
     // TODO: Rewrite using log.h
     NX_UTILS_API QDebug operator<<(QDebug d, const std::string& s);
     #define PRINT qWarning().nospace() << OUTPUT_PREFIX
 
-    namespace {
-        /** @return Part of a source code filename which is a path relative to "nx_vms..." folder. */
-        static inline const char* relative_src_filename(const char* s)
-        {
-            static_cast<void>(&relative_src_filename);
-            //< This file resides in "common_libs".
-            auto pos = std::string(__FILE__).find("common_libs");
-            if (pos == std::string::npos || pos >= strlen(s))
-                return s;
-            else
-                return s + pos;
-        }
-    } // namespace
     #define LL qDebug().nospace() << "####### line " << __LINE__ \
         << " [" << nx::utils::relative_src_filename(__FILE__) << "]";
 
@@ -50,7 +52,8 @@ namespace utils {
     #define PRINT nx::utils::EndWithEndl() /*operator,*/, std::cerr << OUTPUT_PREFIX
 
     // Log execution of a line - to use, put double-L at the beginning of the line.
-    #define LL std::cerr << "####### line " << __LINE__ << " [" << __FILE__ << "]\n";
+    #define LL std::cerr << "####### line " << __LINE__ \
+        << " [" << nx::utils::relative_src_filename(__FILE__) << "]\n";
 
 #endif // QT_CORE_LIB
 
@@ -106,6 +109,10 @@ private:
 
 /** Debug tool - implicitly unaligned pointer. */
 NX_UTILS_API uint8_t* debugUnalignPtr(void* data);
+
+/** Debug tool - dump binary data using PRINT. */
+void debugPrintBin(const char* bytes, int size, const char* tag, const char* outputPrefix);
+#define NX_PRINT_BIN(BYTES, SIZE, TAG) nx::utils::debugPrintBin((BYTES), (SIZE), (TAG), (OUTPUT_PREFIX))
 
 } // namespace utils
 } // namespace nx

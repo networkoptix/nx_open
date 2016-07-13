@@ -49,7 +49,7 @@ extern "C" {
 //#define OUTPUT_PREFIX "<ModuleName>: "
 #include "nx/utils/debug_utils.h"
 
-#include "nx/utils/string_utils.h"
+#include "nx/utils/string.h"
 using nx::utils::stringFormat;
 
 /**

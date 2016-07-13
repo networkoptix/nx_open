@@ -10,7 +10,7 @@
 
 //-------------------------------------------------------------------------------------------------
 
-uint32_t fullScreenWidthHeight = 0;
+uint32_t g_fullScreenWidthHeight = 0;
 
 VdpGetProcAddress* vdp_get_proc_address = nullptr;
 VdpGetErrorString* vdp_get_error_string = nullptr;
@@ -82,7 +82,7 @@ static Drawable createX11Window(Display* display)
     const Window window = XCreateSimpleWindow(
         display, rootWindow, /*x*/ 0, /*y*/ 0, rootWindowAttrs.width, rootWindowAttrs.height,
         /*border_width*/ 0, black, white);
-    fullScreenWidthHeight = (rootWindowAttrs.height << 16) | rootWindowAttrs.width;
+    g_fullScreenWidthHeight = (rootWindowAttrs.height << 16) | rootWindowAttrs.width;
 
     if (!XMapWindow(display, window))
     {
@@ -151,7 +151,7 @@ static VdpDevice getVdpDeviceWithoutX11(Drawable* outDrawable)
     VdpDevice vdpDevice = VDP_INVALID_HANDLE;
 
     VDP(vdp_device_create_x11(
-        (Display*) &fullScreenWidthHeight, -1, &vdpDevice, &vdp_get_proc_address));
+        (Display*) &g_fullScreenWidthHeight, -1, &vdpDevice, &vdp_get_proc_address));
     vdpCheckHandle(vdpDevice, "Device");
     assert(vdp_get_proc_address);
 

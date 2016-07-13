@@ -137,7 +137,7 @@ VdpRect VdpauSession::obtainDestinationVideoRect(int x, int y, int width, int he
     int windowHeight = 0;
     if (x == 0 && y == 0 && width == 0 && height == 0) //< All zeroes mean full-screen.
     {
-        if (fullScreenWidthHeight == 0) //< Fallback if VDPAU didn't provide screen size.
+        if (g_fullScreenWidthHeight == 0) //< Fallback if VDPAU didn't provide screen size.
         {
             windowWidth = 1920;
             windowHeight = 1080;
@@ -150,8 +150,8 @@ VdpRect VdpauSession::obtainDestinationVideoRect(int x, int y, int width, int he
         }
         else
         {
-            windowWidth = fullScreenWidthHeight & 0xFFFF;
-            windowHeight = (fullScreenWidthHeight >> 16) & 0xFFFF;
+            windowWidth = g_fullScreenWidthHeight & 0xFFFF;
+            windowHeight = (g_fullScreenWidthHeight >> 16) & 0xFFFF;
             if (!m_videoRectReported)
             {
                 m_videoRectReported = true;

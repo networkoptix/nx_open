@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <cstdio>
+
 namespace nx {
 namespace utils {
 
