@@ -42,6 +42,10 @@ public:
         const String& name, const String& country, const String& company);
 
     static bool useCertificateAndPkey(const String& certData);
+
+    static void useOrCreateCertificate(
+        const QString& filePath,
+        const String& name, const String& country, const String& company);
 };
 
 class NX_NETWORK_API SslSocket
@@ -79,6 +83,7 @@ public:
         unsigned short foreignPort,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
     virtual bool enableClientEncryption() override;
+    virtual bool isEncryptionEnabled() const override;
 
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,

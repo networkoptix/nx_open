@@ -8,9 +8,12 @@
 
 #include <memory>
 #include <cstdint>
+#include <cstring>
 
 #if defined(QT_CORE_LIB)
     #include <QtCore/QDebug>
+    #include <QtCore/QThread>
+    NX_UTILS_API QDebug operator<<(QDebug d, const std::string& s);
 #else // QT_CORE_LIB
     #include <iostream>
 #endif // QT_CORE_LIB
@@ -25,7 +28,7 @@ namespace {
 /** @return Part of a source code filename which is a path relative to "nx_vms..." folder. */
 static inline const char* relative_src_filename(const char* s)
 {
-    /*unused*/ (void) relative_src_filename;
+    /*unused*/ (void) &relative_src_filename;
     auto pos = std::string(__FILE__).find("common_libs"); //< This file resides in "common_libs".
     if (pos != std::string::npos && pos < strlen(s) && strncmp(s, __FILE__, pos) == 0)
         return s + pos;
@@ -37,10 +40,10 @@ static inline const char* relative_src_filename(const char* s)
 #if defined(QT_CORE_LIB)
 
     // TODO: Rewrite using log.h
-    NX_UTILS_API QDebug operator<<(QDebug d, const std::string& s);
     #define PRINT qWarning().nospace() << OUTPUT_PREFIX
 
     #define LL qDebug().nospace() << "####### line " << __LINE__ \
+        << ", thread " << QThread::currentThreadId() \
         << " [" << nx::utils::relative_src_filename(__FILE__) << "]";
 
 #else // QT_CORE_LIB

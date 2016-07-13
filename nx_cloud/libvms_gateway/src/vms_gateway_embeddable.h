@@ -20,11 +20,13 @@ class VmsGatewayEmbeddable
     Q_OBJECT
 
 public:
-    VmsGatewayEmbeddable();
+    VmsGatewayEmbeddable(bool isSslEnabled, const QString& certPath = {});
 
+    bool isSslEnabled() const;
     SocketAddress endpoint() const;
 
 private:
+    const bool m_isSslEnabled;
     SocketAddress m_endpoint;
 };
 

@@ -248,6 +248,18 @@ public:
     //!Set list of IO ports
     void setIOPorts(const QnIOPortDataList& ports);
 
+    virtual bool setProperty(
+		const QString &key, 
+		const QString &value, 
+		PropertyOptions options = DEFAULT_OPTIONS) override;
+
+    virtual bool setProperty(
+		const QString &key,
+		const QVariant& value,
+		PropertyOptions options = DEFAULT_OPTIONS) override;
+
+    virtual bool removeProperty(const QString& key) override;
+
     //!Returns list if IO ports
     QnIOPortDataList getIOPorts() const;
 
@@ -361,6 +373,7 @@ private:
     mutable CachedValue<bool> m_cachedIsIOModule;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
+    void resetAllCameraInfoSavedToDisk();
 
     mutable std::map<QString, bool> m_cameraInfoSavedToDisk; // Storage pool to flag
 

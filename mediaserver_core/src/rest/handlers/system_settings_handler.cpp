@@ -43,7 +43,7 @@ int QnSystemSettingsHandler::executeGet(
             auto paramIter = params.find(setting->key());
             if (paramIter == params.end())
                 continue;
-            setting->setValue(paramIter.value());
+            setting->setSerializedValue(paramIter.value());
             dirty = true;
         }
         reply.settings.emplace(setting->key(), setting->serializedValue());

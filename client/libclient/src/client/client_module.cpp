@@ -307,7 +307,10 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 #endif
 
     common->store<nx::cloud::gateway::VmsGatewayEmbeddable>(
-        new nx::cloud::gateway::VmsGatewayEmbeddable());
+        new nx::cloud::gateway::VmsGatewayEmbeddable(
+            // TODO: #mux Currently browsers show certificate error, so SSL is disabled
+            //  for beter user expirience
+            false));
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)

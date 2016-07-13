@@ -34,7 +34,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>    
-    </dependencies>    
+    </dependencies>      
     
     <profiles>
         <profile>

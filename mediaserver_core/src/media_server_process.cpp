@@ -68,6 +68,7 @@
 #include <media_server/server_update_tool.h>
 #include <media_server/server_connector.h>
 #include <media_server/file_connection_processor.h>
+#include <media_server/crossdomain_connection_processor.h>
 #include <media_server/resource_status_watcher.h>
 #include <media_server/media_server_resource_searchers.h>
 
@@ -145,6 +146,7 @@
 #include <rest/handlers/settime_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
 #include <rest/handlers/detach_rest_handler.h>
+#include <rest/handlers/restore_state_rest_handler.h>
 #include <rest/handlers/setup_local_rest_handler.h>
 #include <rest/handlers/setup_cloud_rest_handler.h>
 #include <rest/handlers/merge_systems_rest_handler.h>
@@ -229,6 +231,7 @@
 #include "cloud/user_list_synchronizer.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
+#include <server/server_globals.h>
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -250,7 +253,6 @@ static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
 static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 //static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
-static const QString REMOVE_DB_PARAM_NAME(lit("removeDbOnStartup"));
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray NO_SETUP_WIZARD("noSetupWizard");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
@@ -259,7 +261,6 @@ class MediaServerProcess;
 static MediaServerProcess* serviceMainInstance = 0;
 void stopServer(int signal);
 bool restartFlag = false;
-void restartServer(int restartTimeout);
 
 namespace {
 const QString YES = lit("yes");
@@ -884,7 +885,7 @@ void initAppServerConnection(QSettings &settings)
         if (!staticDBPath.isEmpty()) {
             params.addQueryItem("staticdb_path", staticDBPath);
         }
-        if (MSSettings::roSettings()->value(REMOVE_DB_PARAM_NAME).toBool())
+        if (MSSettings::roSettings()->value(QnServer::kRemoveDbParamName).toBool())
             params.addQueryItem("cleanupDb", QString());
     }
 
@@ -956,7 +957,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
 
     nx::ServerSetting::setSysIdTime(value);
     if (sender != qnCommon->moduleGUID()) {
-        MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "1");
+        MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
         saveAdminPswdHash();
         restartServer(0);
     }
@@ -1615,6 +1616,7 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/detachFromSystem", new QnDetachFromSystemRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/restoreState", new QnRestoreStateRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
@@ -1668,6 +1670,7 @@ bool MediaServerProcess::initTcpListener(
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     m_universalTcpListener->addHandler<QnFileConnectionProcessor>("HTTP", "static");
+    m_universalTcpListener->addHandler<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
     m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
@@ -1783,46 +1786,12 @@ void MediaServerProcess::run()
         nx_ms_conf::DEFAULT_CREATE_FULL_CRASH_DUMP ).toBool() );
 #endif
 
-    const auto sslCertPath = MSSettings::roSettings()->value(
-        nx_ms_conf::SSL_CERTIFICATE_PATH,
-        getDataDirectory() + lit( "/ssl/cert.pem")).toString();
-
-    nx::String sslCertData;
-    QFile f(sslCertPath);
-    if (!f.open(QIODevice::ReadOnly) || (sslCertData = f.readAll()).isEmpty())
-    {
-        f.close();
-        qWarning() << "Could not find valid SSL certificate at "
-            << f.fileName() << ". Generating a new one";
-
-        QDir parentDir = QFileInfo(f).absoluteDir();
-        if (!parentDir.exists() && !QDir().mkpath(parentDir.absolutePath()))
-        {
-            qWarning() << "Could not create directory "
-                << parentDir.absolutePath();
-        }
-
-        sslCertData = nx::network::SslEngine::makeCertificateAndKey(
-            QnAppInfo::productName().toUtf8(), "US",
-            QnAppInfo::organizationName().toUtf8());
-
-        if (sslCertData.isEmpty())
-        {
-             qWarning() << "Could not generate SSL certificate ";
-        }
-        else
-        {
-            if (!f.open(QIODevice::WriteOnly) ||
-                f.write(sslCertData) != sslCertData.size())
-            {
-                qWarning() << "Could not write SSL certificate to file";
-            }
-
-            f.close();
-        }
-    }
-
-    nx::network::SslEngine::useCertificateAndPkey(sslCertData);
+    nx::network::SslEngine::useOrCreateCertificate(
+        MSSettings::roSettings()->value(
+            nx_ms_conf::SSL_CERTIFICATE_PATH,
+            getDataDirectory() + lit( "/ssl/cert.pem")).toString(),
+        QnAppInfo::productName().toUtf8(), "US",
+        QnAppInfo::organizationName().toUtf8());
 
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnCameraHistoryPool> historyPool(new QnCameraHistoryPool());
@@ -1852,6 +1821,7 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogout"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getCurrentUser"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/static/*"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), AuthMethod::noAuth);
 
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), AuthMethod::noAuth );
@@ -2034,7 +2004,7 @@ void MediaServerProcess::run()
     if (needToStop())
         return; //TODO #ak correctly deinitialize what has been initialised
 
-    MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "0");
+    MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "0");
 
     connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &MediaServerProcess::at_databaseDumped);
     qnCommon->setRemoteGUID(QnUuid(connectInfo.ecsGuid));
@@ -2384,9 +2354,6 @@ void MediaServerProcess::run()
         qnGlobalSettings->setNewSystem(true);
     }
 
-
-    if (qnGlobalSettings->isCrossdomainXmlEnabled())
-        m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
 
     auto upnpPortMapper = initializeUpnpPortMapper();
 

@@ -489,7 +489,9 @@
                 <module>client/libclient_core</module>
                 <module>client/libclient</module>
                 <module>client/desktop_client</module>
-                <module>nx_cloud/libvms_gateway</module>
+                <module>common_libs/nx_media</module>
+                <module>client/mobile_client</module>
+		<module>nx_cloud/libvms_gateway</module>
             </modules>
         </profile>
         <profile>

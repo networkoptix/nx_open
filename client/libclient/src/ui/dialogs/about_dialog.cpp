@@ -31,7 +31,7 @@
 #include <utils/email/email.h>
 #include <utils/common/html.h>
 
-#include "openal/qtvaudiodevice.h"
+#include <nx/audio/audiodevice.h>
 #include <utils/common/app_info.h>
 
 namespace {
@@ -149,7 +149,9 @@ void QnAboutDialog::retranslateUi()
     credits << lit("<b>Qt v.%1</b> - Copyright (c) 2012 Nokia Corporation.").arg(QLatin1String(QT_VERSION_STR));
     credits << lit("<b>FFMpeg %1</b> - Copyright (c) 2000-2012 FFmpeg developers.").arg(versionString(QnAppInfo::ffmpegVersion()));
     credits << lit("<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 LAME developers.");
-    credits << lit("<b>OpenAL %1</b> - Copyright (c) 2000-2006 %2.").arg(QtvAudioDevice::instance()->versionString()).arg(QtvAudioDevice::instance()->company());
+    credits << lit("<b>OpenAL %1</b> - Copyright (c) 2000-2006 %2.")
+        .arg(nx::audio::AudioDevice::instance()->versionString())
+        .arg(nx::audio::AudioDevice::instance()->company());
     credits << lit("<b>SIGAR %1</b> - Copyright (c) 2004-2011 VMware Inc.").arg(versionString(QnAppInfo::sigarVersion()));
     credits << lit("<b>Boost %1</b> - Copyright (c) 2000-2012 Boost developers.").arg(versionString(QnAppInfo::boostVersion()));
 

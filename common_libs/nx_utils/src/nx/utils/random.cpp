@@ -9,10 +9,24 @@
 #include <limits>
 #include <mutex>
 #include <random>
+#include <ctime>
 
 
 namespace nx {
 namespace utils {
+
+static bool initRand()
+{
+    qsrand(static_cast<uint>(time(nullptr)));
+    return true;
+}
+
+int rand()
+{
+    static bool init = initRand();
+    static_cast<void>(init);
+    return qrand();
+}
 
 namespace {
 struct RandomGenerationContext

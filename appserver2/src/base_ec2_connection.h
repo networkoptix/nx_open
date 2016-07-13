@@ -91,7 +91,8 @@ namespace ec2
         virtual void setTransactionLogTime(qint64 value) override;
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
-        ECConnectionNotificationManager* notificationManager() { return m_notificationManager.get(); }
+        virtual ECConnectionNotificationManager* notificationManager() override 
+        { return m_notificationManager.get(); }
         ECConnectionAuditManager* auditManager() { return m_auditManager.get(); }
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;

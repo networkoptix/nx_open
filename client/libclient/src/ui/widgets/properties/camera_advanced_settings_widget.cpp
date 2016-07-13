@@ -128,19 +128,23 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
             // 2. vmsGateway forwards http to server (server proxy auth takes place)
             // 3. server proxies http to camera (camera http auth takes place)
 
-            // TODO: #mux Currently vmsGateway breaks client connection on
-            //  camera auth, need to find out why
-
             const auto currentServerUrl = QnAppServerConnectionFactory::url();
             targetUrl.setHost(currentServerUrl.host());
             targetUrl.setPort(currentServerUrl.port());
 
-            const auto vmsGatewayAddress =
-                nx::cloud::gateway::VmsGatewayEmbeddable::instance()->endpoint();
+            auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
 
+            // TODO: #mux QWebView behave strange in case of HTTP, it issues
+            //  "CONNECT <host>:<port>" which can not be correctly handled right now.
+            //  Need to work around it somehow.
+            //
+            // if (gateway->isSslEnabled())
+            //     targetUrl.setScheme(lit("https"));
+
+            const auto gatewayAddress = gateway->endpoint();
             const QNetworkProxy gatewayProxy(
                 QNetworkProxy::HttpProxy,
-                vmsGatewayAddress.address.toString(), vmsGatewayAddress.port,
+                gatewayAddress.address.toString(), gatewayAddress.port,
                 currentServerUrl.userName(), currentServerUrl.password());
 
             m_cameraAdvancedSettingsWebPage->networkAccessManager()

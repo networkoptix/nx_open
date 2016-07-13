@@ -29,8 +29,7 @@ public:
     static ProxyVideoDecoderPrivate* createImplYuvNative(const Params& params);
     static ProxyVideoDecoderPrivate* createImplGl(const Params& params);
 
-    ProxyVideoDecoderPrivate(const Params& params)
-    :
+    ProxyVideoDecoderPrivate(const Params& params):
         m_params(params),
         m_proxyDecoder(ProxyDecoder::create(params.resolution.width(), params.resolution.height()))
     {
@@ -67,6 +66,11 @@ protected:
         return *m_proxyDecoder.get();
     }
 
+    QRect getVideoGeometry() const
+    {
+        return m_params.owner->getVideoGeometry();
+    }
+
     void setQVideoFrame(
         QVideoFramePtr* outDecodedFrame,
         QAbstractVideoBuffer* videoBuffer,
@@ -88,4 +92,4 @@ private:
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

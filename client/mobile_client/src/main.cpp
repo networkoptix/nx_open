@@ -252,7 +252,7 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
             qWarning() << lit("File %1 doesn't exist. Loading from qrc...").arg(path);
     }
 
-    if (parser.isSet(liteModeOption))
+    if (parser.isSet(liteModeOption) || conf.forceLiteMode)
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
 
     if (parser.isSet(urlOption))

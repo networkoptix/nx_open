@@ -283,7 +283,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpdateNotificationsEnabled, true, this);
     m_backupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(kNameBackupQualities, Qn::CameraBackup_Both, this);
     m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameBackupNewCamerasByDefault, false, this);
-	m_crossdomainXmlEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCrossdomainEnabled, true, this);
     m_upnpPortMappingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpnpPortMappingEnabled, true, this);
     m_newSystemAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameNewSystem, false, this);
 
@@ -309,7 +308,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_updateNotificationsEnabledAdaptor
         << m_backupQualitiesAdaptor
         << m_backupNewCamerasByDefaultAdaptor
-		<< m_crossdomainXmlEnabledAdaptor
         << m_upnpPortMappingEnabledAdaptor
         << m_newSystemAdaptor
         << m_arecontRtspEnabledAdaptor
@@ -360,16 +358,6 @@ bool QnGlobalSettings::isServerAutoDiscoveryEnabled() const {
 void QnGlobalSettings::setServerAutoDiscoveryEnabled(bool enabled)
 {
     m_serverAutoDiscoveryEnabledAdaptor->setValue(enabled);
-}
-
-bool QnGlobalSettings::isCrossdomainXmlEnabled() const
-{
-    return m_crossdomainXmlEnabledAdaptor->value();
-}
-
-void QnGlobalSettings::setCrossdomainXmlEnabled(bool enabled)
-{
-    m_crossdomainXmlEnabledAdaptor->setValue(enabled);
 }
 
 void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {

@@ -160,14 +160,6 @@ void QnUniversalRequestProcessor::run()
 
     while (1)
     {
-        if( d->clientRequest.startsWith(nx_flash_sock::POLICY_FILE_REQUEST_NAME) )
-        {
-            QFile f( QString::fromLatin1(nx_flash_sock::CROSS_DOMAIN_XML_PATH) );
-            if( f.open( QIODevice::ReadOnly ) )
-                sendData( f.readAll() );
-            break;
-        }
-
         if (ready)
         {
             t.restart();

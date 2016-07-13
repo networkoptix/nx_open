@@ -14,8 +14,9 @@
 #include <openssl/ssl.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/type_utils.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/type_utils.h>
 #include <utils/common/systemerror.h>
 
 #ifdef max
@@ -325,6 +326,8 @@ public:
 
     virtual ~SslAsyncBioHelper();
 
+    virtual bool isSsl() const { return true; }
+
 public:
     // BIO operation function. These 2 BIO operation function will simulate BIO memory
     // type. For read, it will simply checks the input read buffer, and for write operations
@@ -386,6 +389,7 @@ private:
 
     void continueRead();
     void continueWrite();
+
 protected:
     AbstractStreamSocket* socket()
     {
@@ -870,6 +874,8 @@ bool SslAsyncBioHelper::asyncRecv(
 class MixedSslAsyncBioHelper : public SslAsyncBioHelper
 {
 public:
+    bool isSsl() const override { return m_isSsl; }
+
     struct SnifferData
     {
         std::function<void(SystemError::ErrorCode,std::size_t)> completionHandler;
@@ -1052,8 +1058,8 @@ const std::chrono::seconds SslEngine::kCertExpiration =
 String SslEngine::makeCertificateAndKey(
     const String& common, const String& country, const String& company)
 {
-    const auto data = SslStaticData::instance();
-    const int serialNumber = qrand();
+    SslStaticData::instance();
+    const int serialNumber = nx::utils::rand();
 
     auto number = utils::wrapUnique(BN_new(), &BN_free);
     if (!number || !BN_set_word(number.get(), RSA_F4))
@@ -1163,6 +1169,39 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
     }
 
     return true;
+}
+
+void SslEngine::useOrCreateCertificate(
+    const QString& filePath,
+    const String& name, const String& country, const String& company)
+{
+    String certData;
+    QFile file(filePath);
+    if (filePath.isEmpty()
+        || !file.open(QIODevice::ReadOnly)
+        || (certData = file.readAll()).isEmpty())
+    {
+        file.close();
+        NX_LOG(lm("Could not find valid SSL certificate '%1', generate new one")
+            .arg(filePath), cl_logALWAYS);
+
+        certData = makeCertificateAndKey(name, country, company);
+
+        NX_ASSERT(!certData.isEmpty());
+        if (!filePath.isEmpty())
+        {
+            if (!file.open(QIODevice::WriteOnly) ||
+                file.write(certData) != certData.size())
+            {
+                NX_LOG(lm("Could not write SSL certificate to file"),
+                    cl_logERROR);
+            }
+
+            file.close();
+        }
+    }
+
+    useCertificateAndPkey(certData);
 }
 
 class SslSocketPrivate
@@ -1627,6 +1666,15 @@ bool SslSocket::enableClientEncryption()
     NX_ASSERT(!d->isServerSide);
     d->ecnryptionEnabled = true;
     return doHandshake();
+}
+
+bool SslSocket::isEncryptionEnabled() const
+{
+    Q_D(const SslSocket);
+    if (d->ioMode == IOMode::ASYNC)
+        return d->asyncSslHelper->isSsl();
+    else
+        return d->ecnryptionEnabled;
 }
 
 void SslSocket::cancelIOAsync(
