@@ -12,7 +12,7 @@ unix {
 QT = ${qt.libs}
 
 ## GLOBAL CONFIGURATIONS
-!ios {
+!ios|equals(TEMPLATE, app) {
     CONFIG += precompile_header
 } else {
     QMAKE_CXXFLAGS += -include ${project.build.sourceDirectory}/StdAfx.h
