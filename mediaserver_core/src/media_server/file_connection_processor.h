@@ -17,10 +17,10 @@ public:
 protected:
     virtual void run() override;
 private:
-    QByteArray loadFile(
-        const QIODevicePtr& file,
+    bool loadFile(
         const QString& path,
-        const QDateTime& lastModified);
+        QDateTime& lastModified,
+        QByteArray& result);
     QByteArray compressMessageBody(const QByteArray& contentType);
 private:
     Q_DECLARE_PRIVATE(QnFileConnectionProcessor);

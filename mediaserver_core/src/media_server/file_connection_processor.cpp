@@ -70,16 +70,16 @@ namespace {
         return QIODevicePtr();
     }
 
-    QDateTime staticFileLastModified(QIODevice* device)
+    QDateTime staticFileLastModified(const QIODevicePtr& device)
     {
-        if (!device)
-            return QDateTime();
-
-        if (QFile* file = qobject_cast<QFile*>(device))
-            return QFileInfo(*file).lastModified();
-
         static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
-        QDateTime result = QFileInfo(packageName).lastModified();
+
+        QDateTime result;
+        if (QFile* file = qobject_cast<QFile*>(device.get()))
+            result = QFileInfo(*file).lastModified();
+        else
+            result = QFileInfo(packageName).lastModified();
+
         // zero msec in result
         return result.addMSecs(-result.time().msec());
     }
@@ -109,21 +109,30 @@ QByteArray QnFileConnectionProcessor::readStaticFile(const QString& path)
     return QByteArray();
 }
 
-QByteArray QnFileConnectionProcessor::loadFile(
-    const QIODevicePtr& file,
+bool QnFileConnectionProcessor::loadFile(
     const QString& path,
-    const QDateTime& lastModified)
+    QDateTime& lastModified,
+    QByteArray& result)
 {
     QnMutexLocker lock(&cacheMutex);
 
     CacheEntry* cachedData = cachedFiles.object(path);
-    if (cachedData && cachedData->lastModified == lastModified)
-        return cachedData->data;
+    if (cachedData)
+    {
+        result = cachedData->data;
+        lastModified = cachedData->lastModified;
+        return true;
+    }
 
-    QByteArray result = file->readAll();
+    QIODevicePtr file = getStaticFile(path);
+    if (!file)
+        return false;
+
+    result = file->readAll();
+    lastModified = staticFileLastModified(file);
     if (result.size() < cachedFiles.maxCost())
         cachedFiles.insert(path, new CacheEntry(result, lastModified), result.size());
-    return result;
+    return true;
 }
 
 QByteArray QnFileConnectionProcessor::compressMessageBody(const QByteArray& contentType)
@@ -162,14 +171,13 @@ void QnFileConnectionProcessor::run()
         return;
     }
 
-    QIODevicePtr file = getStaticFile(path);
-    if (!file)
+    QDateTime lastModified;
+    if (!loadFile(path, lastModified, d->response.messageBody))
     {
         sendResponse(nx_http::StatusCode::notFound, contentType, QByteArray());
         return;
     }
 
-    QDateTime lastModified = staticFileLastModified(file.get());
     nx_http::HttpHeader modifiedHeader("Last-Modified", dateTimeToHTTPFormat(lastModified));
     d->response.headers.insert(modifiedHeader);
     QString modifiedSinceStr = nx_http::getHeaderValue(d->request.headers, "If-Modified-Since");
@@ -183,6 +191,5 @@ void QnFileConnectionProcessor::run()
         }
     }
 
-    d->response.messageBody = loadFile(file, path, lastModified);
     sendResponse(nx_http::StatusCode::ok, contentType, compressMessageBody(contentType));
 }
