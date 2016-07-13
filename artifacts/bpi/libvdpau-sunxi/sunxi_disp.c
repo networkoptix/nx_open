@@ -231,78 +231,140 @@ static void sunxi_disp_close(struct sunxi_disp *sunxi_disp)
 	free(sunxi_disp);
 }
 
-static int sunxi_disp_set_video_layer(struct sunxi_disp *sunxi_disp, int x, int y, int width, int height, output_surface_ctx_t *surface)
+static void set_ycbcr_format(__disp_fb_t* fb, VdpYCbCrFormat format)
 {
-	struct sunxi_disp_private *disp = (struct sunxi_disp_private *)sunxi_disp;
+    switch (format) {
+        case VDP_YCBCR_FORMAT_YUYV:
+            fb->mode = DISP_MOD_INTERLEAVED;
+            fb->format = DISP_FORMAT_YUV422;
+            fb->seq = DISP_SEQ_YUYV;
+            break;
+        case VDP_YCBCR_FORMAT_UYVY:
+            fb->mode = DISP_MOD_INTERLEAVED;
+            fb->format = DISP_FORMAT_YUV422;
+            fb->seq = DISP_SEQ_UYVY;
+            break;
+        case VDP_YCBCR_FORMAT_NV12:
+            fb->mode = DISP_MOD_NON_MB_UV_COMBINED;
+            fb->format = DISP_FORMAT_YUV420;
+            fb->seq = DISP_SEQ_UVUV;
+            break;
+        case VDP_YCBCR_FORMAT_YV12:
+            fb->mode = DISP_MOD_NON_MB_PLANAR;
+            fb->format = DISP_FORMAT_YUV420;
+            fb->seq = DISP_SEQ_UVUV;
+            break;
+        default:
+        case INTERNAL_YCBCR_FORMAT:
+            fb->mode = DISP_MOD_MB_UV_COMBINED;
+            fb->format = DISP_FORMAT_YUV420;
+            fb->seq = DISP_SEQ_UVUV;
+            break;
+    }
+}
+
+void set_video_info_geometry(
+    __disp_layer_info_t* v, int x, int y, const output_surface_ctx_t* surface)
+{
+    v->fb.addr[0] = cedrus_mem_get_phys_addr(surface->yuv->data);
+    v->fb.addr[1] = cedrus_mem_get_phys_addr(surface->yuv->data) + surface->vs->luma_size;
+    v->fb.addr[2] = cedrus_mem_get_phys_addr(surface->yuv->data) + surface->vs->luma_size + surface->vs->chroma_size / 2;
+
+    v->fb.size.width = surface->vs->width;
+    v->fb.size.height = surface->vs->height;
+
+    v->src_win.x = surface->video_src_rect.x0;
+    v->src_win.y = surface->video_src_rect.y0;
+    v->src_win.width = surface->video_src_rect.x1 - surface->video_src_rect.x0;
+    v->src_win.height = surface->video_src_rect.y1 - surface->video_src_rect.y0;
+
+    v->scn_win.x = x + surface->video_dst_rect.x0;
+    v->scn_win.y = y + surface->video_dst_rect.y0;
+    v->scn_win.width = surface->video_dst_rect.x1 - surface->video_dst_rect.x0;
+    v->scn_win.height = surface->video_dst_rect.y1 - surface->video_dst_rect.y0;
+
+    if (v->scn_win.y < 0 && v->scn_win.height != 0)
+    {
+        const int scn_clip = -(v->scn_win.y);
+        const int src_clip = scn_clip * v->src_win.height / v->scn_win.height;
+        v->src_win.y += src_clip;
+        v->src_win.height -= src_clip;
+        v->scn_win.y = 0;
+        v->scn_win.height -= scn_clip;
+    }
+
+    // Log coords and sizes each time any of them changes.
+    static char prevCoordsStr[1000] = {0};
+    char coordsStr[1000];
+    snprintf(coordsStr, sizeof(coordsStr),
+        "video %d x %d @(%d, %d); surface %d x %d @(%d, %d); fb %d x %d",
+        v->src_win.width, v->src_win.height, v->src_win.x, v->src_win.y,
+        v->scn_win.width, v->scn_win.height, v->scn_win.x, v->scn_win.y,
+        v->fb.size.width, v->fb.size.height);
+    if (strcmp(coordsStr, prevCoordsStr) != 0)
+    {
+        strcpy(prevCoordsStr, coordsStr);
+        VDPAU_DBG("[disp1] Coords: %s", coordsStr);
+    }
+}
+
+static void set_enhancement_and_csc(
+    struct sunxi_disp_private* disp, output_surface_ctx_t *surface, bool layerJustOpened)
+{
+    bool enhancementTurnedOff = false;
+    // Note: might be more reliable (but slower and problematic when there
+    // are driver issues and the GET functions return wrong values) to query the
+    // old values instead of relying on our internal csc_change.
+    // Since the driver calculates a matrix out of these values after each
+    // set doing this unconditionally is costly.
+    if (surface->csc_change)
+    {
+        if (!conf.disableCscMatrix)
+        {
+            DISP(DISP_CMD_LAYER_ENHANCE_OFF, 0, disp->video_layer, 0, 0);
+            enhancementTurnedOff = true;
+            if (conf.outputEnhancement)
+                VDPAU_DBG("[disp1] ENHANCEMENT=OFF: needed before settings CSC Matrix");
+            DISP(DISP_CMD_LAYER_SET_BRIGHT, 0, disp->video_layer, 0xff * surface->brightness + 0x20, 0);
+            DISP(DISP_CMD_LAYER_SET_CONTRAST, 0, disp->video_layer, 0x20 * surface->contrast, 0);
+            DISP(DISP_CMD_LAYER_SET_SATURATION, 0, disp->video_layer, 0x20 * surface->saturation, 0);
+            // hue scale is randomly chosen, no idea how it maps exactly
+            DISP(DISP_CMD_LAYER_SET_HUE, 0, disp->video_layer, (32 / 3.14) * surface->hue + 0x20, 0);
+        }
+        surface->csc_change = 0;
+    }
+
+    if ((layerJustOpened && conf.enhancementOn) || (!conf.enhancementOff && enhancementTurnedOff))
+    {
+        DISP(DISP_CMD_LAYER_ENHANCE_ON, 0, disp->video_layer, 0, 0);
+        if (conf.outputEnhancement)
+        {
+            VDPAU_DBG("[disp1] ENHANCEMENT=ON: %s",
+                conf.enhancementOn
+                    ? "conf.enhancementOn=true"
+                    : "restoring after setting CSC Matrix");
+        }
+    }
+    else if (layerJustOpened && conf.enhancementOff && !enhancementTurnedOff)
+    {
+        DISP(DISP_CMD_LAYER_ENHANCE_OFF, 0, disp->video_layer, 0, 0);
+        if (conf.outputEnhancement)
+            VDPAU_DBG("[disp1] ENHANCEMENT=OFF: conf.enhancementOff=true");
+    }
+}
+
+static int sunxi_disp_set_video_layer(struct sunxi_disp *sunxi_disp,
+    int x, int y, int width, int height, output_surface_ctx_t *surface)
+{
+    /*unused*/ (void) width;
+    /*unused*/ (void) height;
+
+	struct sunxi_disp_private* disp = (struct sunxi_disp_private *) sunxi_disp;
 	__disp_layer_info_t* const v = &disp->video_info;
 
-	switch (surface->vs->source_format) {
-	case VDP_YCBCR_FORMAT_YUYV:
-		v->fb.mode = DISP_MOD_INTERLEAVED;
-		v->fb.format = DISP_FORMAT_YUV422;
-		v->fb.seq = DISP_SEQ_YUYV;
-		break;
-	case VDP_YCBCR_FORMAT_UYVY:
-		v->fb.mode = DISP_MOD_INTERLEAVED;
-		v->fb.format = DISP_FORMAT_YUV422;
-		v->fb.seq = DISP_SEQ_UYVY;
-		break;
-	case VDP_YCBCR_FORMAT_NV12:
-		v->fb.mode = DISP_MOD_NON_MB_UV_COMBINED;
-		v->fb.format = DISP_FORMAT_YUV420;
-		v->fb.seq = DISP_SEQ_UVUV;
-		break;
-	case VDP_YCBCR_FORMAT_YV12:
-		v->fb.mode = DISP_MOD_NON_MB_PLANAR;
-		v->fb.format = DISP_FORMAT_YUV420;
-		v->fb.seq = DISP_SEQ_UVUV;
-		break;
-	default:
-	case INTERNAL_YCBCR_FORMAT:
-		v->fb.mode = DISP_MOD_MB_UV_COMBINED;
-		v->fb.format = DISP_FORMAT_YUV420;
-		v->fb.seq = DISP_SEQ_UVUV;
-		break;
-	}
+    set_ycbcr_format(&v->fb, surface->vs->source_format);
 
-	v->fb.addr[0] = cedrus_mem_get_phys_addr(surface->yuv->data);
-	v->fb.addr[1] = cedrus_mem_get_phys_addr(surface->yuv->data) + surface->vs->luma_size;
-	v->fb.addr[2] = cedrus_mem_get_phys_addr(surface->yuv->data) + surface->vs->luma_size + surface->vs->chroma_size / 2;
-
-	v->fb.size.width = surface->vs->width;
-	v->fb.size.height = surface->vs->height;
-	v->src_win.x = surface->video_src_rect.x0;
-	v->src_win.y = surface->video_src_rect.y0;
-	v->src_win.width = surface->video_src_rect.x1 - surface->video_src_rect.x0;
-	v->src_win.height = surface->video_src_rect.y1 - surface->video_src_rect.y0;
-
-	v->scn_win.x = x + surface->video_dst_rect.x0;
-	v->scn_win.y = y + surface->video_dst_rect.y0;
-	v->scn_win.width = surface->video_dst_rect.x1 - surface->video_dst_rect.x0;
-	v->scn_win.height = surface->video_dst_rect.y1 - surface->video_dst_rect.y0;
-
-	if (v->scn_win.y < 0)
-	{
-		int scn_clip = -(v->scn_win.y);
-		int src_clip = scn_clip * v->src_win.height / v->scn_win.height;
-		v->src_win.y += src_clip;
-		v->src_win.height -= src_clip;
-		v->scn_win.y = 0;
-		v->scn_win.height -= scn_clip;
-	}
-
-	// Log coords and sizes each time any of them changes.
-	static char prevCoordsStr[1000] = {0};
-	char coordsStr[1000];
-	snprintf(coordsStr, sizeof(coordsStr),
-		"video %d x %d @(%d, %d) -> surface %d x %d @(%d, %d)",
-		v->src_win.width, v->src_win.height, v->src_win.x, v->src_win.y,
-		v->scn_win.width, v->scn_win.height, v->scn_win.x, v->scn_win.y);
-	if (strcmp(coordsStr, prevCoordsStr) != 0)
-	{
-		strcpy(prevCoordsStr, coordsStr);
-		VDPAU_DBG("[disp1] Coords: %s", coordsStr);
-	}
+    set_video_info_geometry(v, x, y, surface);
 
 	if (conf.surfaceSleepUs > 0)
 		usleep(conf.surfaceSleepUs);
@@ -324,39 +386,7 @@ static int sunxi_disp_set_video_layer(struct sunxi_disp *sunxi_disp, int x, int 
 		DISP(DISP_CMD_LAYER_SET_FB, 0, disp->video_layer, &v->fb, 0);
 	}
 
-	bool enhancementTurnedOff = false;
-	// Note: might be more reliable (but slower and problematic when there
-	// are driver issues and the GET functions return wrong values) to query the
-	// old values instead of relying on our internal csc_change.
-	// Since the driver calculates a matrix out of these values after each
-	// set doing this unconditionally is costly.
-	if (surface->csc_change)
-	{
-		if (!conf.disableCscMatrix)
-		{
-			DISP(DISP_CMD_LAYER_ENHANCE_OFF, 0, disp->video_layer, 0, 0);
-			enhancementTurnedOff = true;
-			VDPAU_DBG("[disp1] ENHANCEMENT=OFF: needed before settings CSC Matrix");
-			DISP(DISP_CMD_LAYER_SET_BRIGHT, 0, disp->video_layer, 0xff * surface->brightness + 0x20, 0);
-			DISP(DISP_CMD_LAYER_SET_CONTRAST, 0, disp->video_layer, 0x20 * surface->contrast, 0);
-			DISP(DISP_CMD_LAYER_SET_SATURATION, 0, disp->video_layer, 0x20 * surface->saturation, 0);
-			// hue scale is randomly chosen, no idea how it maps exactly
-			DISP(DISP_CMD_LAYER_SET_HUE, 0, disp->video_layer, (32 / 3.14) * surface->hue + 0x20, 0);
-		}
-		surface->csc_change = 0;
-	}
-
-	if ((layerJustOpened && conf.enhancementOn) || (!conf.enhancementOff && enhancementTurnedOff))
-	{
-		DISP(DISP_CMD_LAYER_ENHANCE_ON, 0, disp->video_layer, 0, 0);
-		VDPAU_DBG("[disp1] ENHANCEMENT=ON: %s",
-			conf.enhancementOn ? "conf.enhancementOn=true" : "restoring after setting CSC Matrix");
-	}
-	else if (layerJustOpened && conf.enhancementOff && !enhancementTurnedOff)
-	{
-		DISP(DISP_CMD_LAYER_ENHANCE_OFF, 0, disp->video_layer, 0, 0);
-		VDPAU_DBG("[disp1] ENHANCEMENT=OFF: conf.enhancementOff=true");
-	}
+    set_enhancement_and_csc(disp, surface, layerJustOpened);
 
 	return 0;
 }

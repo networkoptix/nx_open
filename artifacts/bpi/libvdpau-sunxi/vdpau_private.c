@@ -29,6 +29,12 @@ static void log_in_uint(uint32_t value, const char* name)
         VDPAU_DBG("    [in] %s: %u", name, value);
 }
 
+static void log_in_uint64(uint64_t value, const char* name)
+{
+    if (conf.enableOutput)
+        VDPAU_DBG("    [in] %s: %llu", name, value);
+}
+
 static void log_in_int(int value, const char* name)
 {
     if (conf.enableOutput)
@@ -878,6 +884,11 @@ VdpStatus log_presentation_queue_display(
     VdpTime earliest_presentation_time)
 {
     log_call("vdp_presentation_queue_display");
+    log_in_uint(presentation_queue, "presentation_queue");
+    log_in_uint(surface, "surface");
+    log_in_uint(clip_width, "clip_width");
+    log_in_uint(clip_height, "clip_height");
+    log_in_uint64(earliest_presentation_time, "earliest_presentation_time");
     VdpStatus result = vdp_presentation_queue_display(
         presentation_queue, surface, clip_width, clip_height, earliest_presentation_time);
     return log_result(result, "vdp_presentation_queue_display");

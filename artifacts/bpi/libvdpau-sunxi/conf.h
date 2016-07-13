@@ -11,6 +11,7 @@
     NX_FLAG(0, disableCscMatrix, "Disable disp calls for CSC Matrix params which also turn on Enhancement."); \
     NX_FLAG(0, enhancementOn, "Always issue DISP_CMD_LAYER_ENHANCE_ON after opening Video Layer."); \
     NX_FLAG(0, enhancementOff, "Always issue DISP_CMD_LAYER_ENHANCE_OFF after opening Video Layer."); \
+    NX_FLAG(0, outputEnhancement, "Log issuing DISP_CMD_LAYER_ENHANCE_..."); \
     NX_INT_PARAM(0, surfaceSleepUs, "Delay before switching to next surface, 0.."); \
 }
 

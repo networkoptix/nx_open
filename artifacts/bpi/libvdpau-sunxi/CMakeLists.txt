@@ -38,8 +38,8 @@ set(SOURCE_FILES
     conf.h
     conf.cpp
     flag_config_c.h
-    flag_config.h
-    flag_config.cpp
+    nx/utils/flag_config.h
+    nx/utils/flag_config.cpp
 )
 
 # Directory containing all necessary headers from the libraries used.

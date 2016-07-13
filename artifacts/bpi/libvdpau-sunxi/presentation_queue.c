@@ -203,6 +203,7 @@ VdpStatus vdp_presentation_queue_display(VdpPresentationQueue presentation_queue
 		XTranslateCoordinates(q->device->display, q->target->drawable,
     	    RootWindow(q->device->display, q->device->screen), 0, 0, &x, &y, &c);
 		VDPAU_DBG_ONCE("Video coords: x: %d, y: %d; provided by XTranslateCoordinates()", x, y);
+
 		if (conf.enableXClearWindow)
             XClearWindow(q->device->display, q->target->drawable);
 	}
