@@ -6,6 +6,7 @@
 #include <core/onvif/onvif_config_data.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/common/credentials.h>
+#include <core/dataprovider/stream_mixer.h>
 
 class QnResourceDataJsonSerializer: public QnJsonSerializer {
 public:
@@ -19,6 +20,8 @@ public:
         registerKey<QStringList>(lit("vistaFocusDevices"));
         registerKey<QnIOPortDataList>(lit("ioSettings"));
         registerKey<QList<QnCredentials>>(Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+        registerKey<QList<QnResourceChannelMapping>>(
+            Qn::VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME);
     }
 
 protected:
