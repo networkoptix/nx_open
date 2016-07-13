@@ -9,6 +9,7 @@
 #include <core/resource/user_resource.h>
 
 #include <nx/utils/string.h>
+#include <nx/utils/raii_guard.h>
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -148,6 +149,8 @@ public:
 
     void updateRoles()
     {
+        const auto resetGuard = QnRaiiGuard::create([this]() { q_ptr->beginResetModel(); }, [this]() { q_ptr->endResetModel(); });
+
         roles.clear();
         if (!context()->user())
             return;
