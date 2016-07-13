@@ -140,10 +140,11 @@ angular.module('cloudApp', [
 
         .when('/download', {
             templateUrl: 'static/views/download.html',
-            controller: 'DownloadCtrl',
-            resolve: {
-                test: ['$route',function ($route) { $route.current.params.callLogin = true; }]
-            }
+            controller: 'DownloadCtrl'
+        })
+        .when('/download/:platform', {
+            templateUrl: 'static/views/download.html',
+            controller: 'DownloadCtrl'
         })
         .when('/', {
             templateUrl: 'static/views/startPage.html',

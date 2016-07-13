@@ -2,15 +2,19 @@
 <p>Latest version: <b>{{downloads.version}}</b></p>
 <p ng-if="downloads.description" ng-bind-html="downloads.description"></p>
 <p><a ng-href="{{downloads.readMoreLink}}" target="_blank">What's new in this version?</a></p>
-<uib-tabset active="active">
-    <uib-tab index="{{platform.name}}" ng-repeat="platform in downloads.platforms" heading="{{platform.name}}">
+
+<uib-tabset>
+    <uib-tab ng-repeat="platform in downloads.platforms"
+             active="platform.active"
+             heading="{{platform.name}}"
+             select="changeHash(platform)" >
         <div class="panel panel-default">
             <div class="panel-heading" ng-if="platform.description" ng-bind-html="platform.description"></div>
             <div class="panel-body">
                 <div class="container">
                     <div class="col-md-6" ng-repeat="group in platform.linksGroups">
                         <h2 ng-if="group.name">{{group.name}}</h2>
-                        <br>
+                        <br ng-if="group.name">
                         <p ng-repeat="link in group.links">
                             <a ng-href="{{link.src}}" ng-class="link.classes">
                                 {{link.name}}
