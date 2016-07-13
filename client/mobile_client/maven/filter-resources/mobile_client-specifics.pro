@@ -63,7 +63,7 @@ ios {
     launch_image.files = $$files(${basedir}/${arch}/ios/Launch.xib)
     QMAKE_BUNDLE_DATA += launch_image
 
-    QMAKE_XCODE_CODE_SIGN_IDENTITY = ${ios.sign.identity}
+    QMAKE_XCODE_CODE_SIGN_IDENTITY = "${ios.sign.identity}"
     XCODEBUILD_FLAGS += PROVISIONING_PROFILE=${provisioning_profile_id}
     XCODEBUILD_FLAGS += CODE_SIGN_ENTITLEMENTS=${mobile_client_entitlements}
 }
