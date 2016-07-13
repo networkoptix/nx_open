@@ -38,8 +38,8 @@ public:
     void removeUserGroup(const QnUuid& groupId);
 
     /** List of resources ids, the given user has access to. */
-    QSet<QnUuid> accessibleResources(const QnUuid& userId) const;
-    void setAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& resources);
+    QSet<QnUuid> accessibleResources(const QnUuid& userOrGroupId) const;
+    void setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources);
 
     /**
     * \param user                      User to get global permissions for.

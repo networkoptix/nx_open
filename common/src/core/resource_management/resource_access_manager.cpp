@@ -162,6 +162,13 @@ void QnResourceAccessManager::addOrUpdateUserGroup(const ec2::ApiUserGroupData& 
         QnMutexLocker lk(&m_mutex);
         m_userGroups[userGroup.id] = userGroup;
     }
+
+    for (const auto& user : qnResPool->getResources<QnUserResource>())
+    {
+        if (user->userGroup() == userGroup.id)
+            invalidateResourceCache(user);
+    }
+
     emit userGroupAddedOrUpdated(userGroup);
 }
 
@@ -171,33 +178,40 @@ void QnResourceAccessManager::removeUserGroup(const QnUuid& groupId)
         QnMutexLocker lk(&m_mutex);
         m_userGroups.remove(groupId);
     }
+
+    for (const auto& user : qnResPool->getResources<QnUserResource>())
+    {
+        if (user->userGroup() == groupId)
+            invalidateResourceCache(user);
+    }
+
     emit userGroupRemoved(groupId);
 }
 
-QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userId) const
+QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userOrGroupId) const
 {
     QnMutexLocker lk(&m_mutex);
-    return m_accessibleResources[userId];
+    return m_accessibleResources[userOrGroupId];
 }
 
-void QnResourceAccessManager::setAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& resources)
+void QnResourceAccessManager::setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources)
 {
     {
         QnMutexLocker lk(&m_mutex);
-        if (m_accessibleResources[userId] == resources)
+        if (m_accessibleResources[userOrGroupId] == resources)
             return;
 
-        m_accessibleResources[userId] = resources;
-
-        for (auto iter = m_permissionsCache.begin(); iter != m_permissionsCache.end();)
-        {
-            if (iter.key().userId == userId)
-                iter = m_permissionsCache.erase(iter);
-            else
-                ++iter;
-        }
+        m_accessibleResources[userOrGroupId] = resources;
     }
-    emit accessibleResourcesChanged(userId);
+
+    invalidateResourceCacheInternal(userOrGroupId);
+    for (const auto& user : qnResPool->getResources<QnUserResource>())
+    {
+        if (user->userGroup() == userOrGroupId)
+            invalidateResourceCache(user);
+    }
+
+    emit accessibleResourcesChanged(userOrGroupId);
 }
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr& user) const
@@ -219,8 +233,6 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
         return result;
     };
 
-
-    //NX_ASSERT(user, Q_FUNC_INFO, "We must not request permissions for absent user.");
     if (!user)
         return Qn::NoGlobalPermissions;
 
@@ -239,17 +251,23 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
             return *iter;
     }
 
-    Qn::GlobalPermissions result = user->getRawPermissions();
+    Qn::GlobalPermissions result;
     QnUuid groupId = user->userGroup();
 
-    if (user->isOwner() || result.testFlag(Qn::GlobalAdminPermission))
+    if (user->isOwner())
     {
-        result |= Qn::GlobalAdminPermissionsSet;
+        result = Qn::GlobalAdminPermissionsSet;
     }
     else if (!groupId.isNull())
     {
-        result |= userGroup(groupId).permissions;   /*< If the group does not exist, permissions will be empty. */
+        result = userGroup(groupId).permissions;    /*< If the group does not exist, permissions will be empty. */
         result &= ~Qn::GlobalAdminPermission;       /*< If user belongs to group, he cannot be an admin - by design. */
+    }
+    else
+    {
+        result = user->getRawPermissions();
+        if (result.testFlag(Qn::GlobalAdminPermission))
+            result |= Qn::GlobalAdminPermissionsSet;
     }
 
     result = filterDependentPermissions(result);
@@ -642,7 +660,11 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
     if (!user || !resource)
         return false;
 
-    QSet<QnUuid> accessible = accessibleResources(user->getId());
+    QnUuid keyId = user->userGroup();
+    if (keyId.isNull())
+        keyId = user->getId();
+
+    QSet<QnUuid> accessible = accessibleResources(keyId);
     QnUuid resourceId = resource->getId();
     if (accessible.contains(resourceId))
         return true;
