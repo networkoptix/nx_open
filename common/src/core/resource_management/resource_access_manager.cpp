@@ -621,17 +621,17 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
             return true;
     }
 
-    auto requiredPermission = [this, resource]()
+    /* Web Pages behave totally like cameras. */
+    bool isMediaResource = resource.dynamicCast<QnVirtualCameraResource>()
+        || resource.dynamicCast<QnWebPageResource>();
+
+    auto requiredPermission = [this, resource, isMediaResource]()
     {
-        if (resource.dynamicCast<QnVirtualCameraResource>())
-            return Qn::GlobalAccessAllCamerasPermission;
+        if (isMediaResource)
+            return Qn::GlobalAccessAllMediaPermission;
 
         if (resource.dynamicCast<QnVideoWallResource>())
             return Qn::GlobalControlVideoWallPermission;
-
-        /* Web Pages behave totally like cameras. */
-        if (resource.dynamicCast<QnWebPageResource>())
-            return Qn::GlobalAccessAllCamerasPermission;
 
         /* Default value (e.g. for users, servers and layouts). */
         return Qn::GlobalAdminPermission;

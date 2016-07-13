@@ -59,7 +59,7 @@ QnPermissionsWidget::~QnPermissionsWidget()
 bool QnPermissionsWidget::hasChanges() const
 {
     Qn::GlobalPermissions value = m_permissionsModel->rawPermissions();
-    value &= ~Qn::GlobalAccessAllCamerasPermission; /*< This permission is handled separately. */
+    value &= ~Qn::GlobalAccessAllMediaPermission; /*< This permission is handled separately. */
 
     return selectedPermissions() != value;
 }

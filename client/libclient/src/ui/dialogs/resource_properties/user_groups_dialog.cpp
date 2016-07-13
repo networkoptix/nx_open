@@ -25,7 +25,7 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     m_model(new QnUserGroupSettingsModel(this)),
     m_settingsPage(new QnUserGroupSettingsWidget(m_model, this)),
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
-    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::CamerasFilter, this)),
+    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::MediaFilter, this)),
     m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this))
 {
     ui->setupUi(this);
