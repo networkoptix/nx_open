@@ -327,6 +327,7 @@ module.exports = function (grunt) {
 
                         '<%= yeoman.dist %>/scripts/{,*/}*.js',
                         '!<%= yeoman.dist %>/scripts/{,*/}language.js',
+                        '!<%= yeoman.dist %>/scripts/{,*/}downloads.js',
                         '<%= yeoman.dist %>/styles/{,*/}*.css'//,
                         //'<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
                         //'<%= yeoman.dist %>/fonts/*'
@@ -454,6 +455,7 @@ module.exports = function (grunt) {
                             '*.xsl',
                             'scripts/{,*/}*.json',
                             'scripts/language.js',
+                            'scripts/downloads.js',
                             'views/{,*/}*.html',
                             'customization/*',
                             //'bower_components/**/*',
