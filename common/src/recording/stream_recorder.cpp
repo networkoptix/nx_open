@@ -826,11 +826,14 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 audioStream->first_dts = 0;
             }
 
-            m_recordingContextVector[i].formatCtx->pb = QnFfmpegHelper::createFfmpegIOContext(
-                m_recordingContextVector[i].storage, 
-                url, 
-                QIODevice::WriteOnly
-            );
+            uintptr_t filePtr;
+            m_recordingContextVector[i].formatCtx->pb = 
+                QnFfmpegHelper::createFfmpegIOContext(
+                    m_recordingContextVector[i].storage, 
+                    url, 
+                    uint32_t(QIODevice::WriteOnly) | (getBufferMultiplier() << 0x8),
+                    &filePtr);
+            fileCreated(filePtr);
 
             if (m_recordingContextVector[i].formatCtx->pb == 0)
             {

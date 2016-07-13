@@ -194,6 +194,8 @@ private:
     void updateSignatureAttr(size_t i);
     qint64 findNextIFrame(qint64 baseTime);
     void cleanFfmpegContexts();
+    virtual void fileCreated(uintptr_t /*filePtr*/) const {}
+    virtual int getBufferMultiplier() const { return -1; }
 protected:
     QnResourcePtr m_device;
     bool m_firstTime;

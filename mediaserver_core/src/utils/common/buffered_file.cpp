@@ -5,6 +5,7 @@ extern "C"
     #include <libavutil/avutil.h>
 }
 
+#include <cmath>
 #include "buffered_file.h"
 #include <QSharedPointer>
 #include "utils/common/util.h"
@@ -20,6 +21,7 @@ extern "C"
 static const int SECTOR_SIZE = 32768;
 static const qint64 AVG_USAGE_AGGREGATE_TIME = 15 * 1000000ll; // aggregation time in usecs
 static const int DATA_PRIORITY_THRESHOLD = SECTOR_SIZE * 2;
+const int kMaxBufferSizePow = 14;
 
 // -------------- QueueFileWriter ------------
 
@@ -311,6 +313,16 @@ bool QBufferedFile::updatePos()
     if (bufferOffset < 0 || bufferOffset > m_cycleBuffer.size())
     {
         flushBuffer();
+        int currentPow = static_cast<int>(
+            std::log(m_cycleBuffer.maxSize()) /
+            std::log(2));
+        if (currentPow < kMaxBufferSizePow)
+        {
+            currentPow += 1;
+            int newSize = 1 << currentPow;
+            m_cycleBuffer.resize(newSize);
+            emit seekDetected(reinterpret_cast<uintptr_t>(this), currentPow);
+        }
         if (m_isDirectIO)
             m_filePos = qPower2Floor((quint64) m_lastSeekPos, SECTOR_SIZE);
         else

@@ -1,6 +1,7 @@
 #ifndef __RECORDING_MANAGER_H__
 #define __RECORDING_MANAGER_H__
 
+#include <map>
 #include <QtCore/QTimer>
 #include <QtCore/QObject>
 #include <QtCore/QMap>
@@ -34,6 +35,45 @@ struct Recorders
     QSharedPointer<QnDualStreamingHelper> dualStreamingHelper;
 };
 
+class WriteBufferMultiplierManager : public QObject
+{
+    Q_OBJECT
+    struct Key
+    {
+        QnServer::ChunksCatalog catalog;
+        QnUuid resourceId;
+        Key(QnServer::ChunksCatalog catalog, const QnUuid& resourceId) :
+            catalog(catalog),
+            resourceId(resourceId)
+        {}
+        Key() {}
+    };
+    friend bool operator < (const Key& lhs, const Key& rhs)
+    {
+        return lhs.resourceId < rhs.resourceId ? 
+            true : 
+            lhs.catalog < rhs.catalog;
+    }
+    typedef std::map<Key, int> RecToMultType;
+    typedef std::map<uintptr_t, Key> FileToRecType;
+
+public:
+    int getMultForCam(
+        QnServer::ChunksCatalog catalog, 
+        const QnUuid& resourceId);
+    void setFilePtr(
+        uintptr_t filePtr,
+        QnServer::ChunksCatalog catalog, 
+        const QnUuid& resourceId);
+public slots:
+    void at_seekDetected(uintptr_t filePtr, int pow);
+        
+private:
+    RecToMultType m_recToMult;
+    FileToRecType m_fileToRec;
+    QnMutex m_mutex;
+};
+
 class QnRecordingManager: public QThread
 {
     Q_OBJECT
@@ -57,6 +97,8 @@ public:
     bool startForcedRecording(const QnSecurityCamResourcePtr& camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
 
     bool stopForcedRecording(const QnSecurityCamResourcePtr& camRes, bool afterThresholdCheck = true);
+
+    WriteBufferMultiplierManager& getBufferManager() { return m_writeBufferManager; }
 signals:
     void recordingDisabled(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
 private slots:
@@ -96,6 +138,7 @@ private:
     ec2::QnDistributedMutex* m_licenseMutex;
     int m_tooManyRecordingCnt;
     qint64 m_recordingStopTime;
+    WriteBufferMultiplierManager m_writeBufferManager;
 };
 
 #define qnRecordingManager QnRecordingManager::instance()

@@ -20,6 +20,7 @@ class QnFileStorageResource: public QnStorageResource
 private:
     static const QString FROM_SEP;
     static const QString TO_SEP;
+
 public:
     QnFileStorageResource();
     ~QnFileStorageResource();

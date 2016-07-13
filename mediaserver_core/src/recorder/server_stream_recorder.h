@@ -82,6 +82,8 @@ private:
     void keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md);
     bool isPanicMode() const;
     bool isRedundantSyncOn() const;
+    virtual void fileCreated(uintptr_t filePtr) const override;
+    virtual int getBufferMultiplier() const override;
 private slots:
     void at_recordingFinished(
         const ErrorStruct   &status,

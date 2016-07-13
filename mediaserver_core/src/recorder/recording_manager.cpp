@@ -652,3 +652,36 @@ QnServerDataProviderFactory* QnServerDataProviderFactory::instance()
 {
     return qn_serverDataProviderFactory_instance();
 }
+
+int WriteBufferMultiplierManager::getMultForCam(
+    QnServer::ChunksCatalog catalog, 
+    const QnUuid& resourceId)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_recToMult.find(Key(catalog, resourceId));
+    if (it == m_recToMult.cend())
+        return 0;
+    else
+        return it->second;
+}
+
+void WriteBufferMultiplierManager::setFilePtr(
+    uintptr_t filePtr,
+    QnServer::ChunksCatalog catalog,
+    const QnUuid& resourceId)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_fileToRec[filePtr] = Key(catalog, resourceId);
+}
+
+void WriteBufferMultiplierManager::at_seekDetected(uintptr_t filePtr, int pow)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto recIt = m_fileToRec.find(filePtr);
+    if (recIt != m_fileToRec.cend())
+    {
+        m_recToMult[recIt->second] = pow;
+        m_fileToRec.erase(recIt);
+    }
+}
+

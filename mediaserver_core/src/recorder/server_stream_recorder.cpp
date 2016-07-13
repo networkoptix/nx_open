@@ -26,6 +26,8 @@
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */
+#include <recorder/recording_manager.h>
+#include <utils/common/buffered_file.h>
 
 static const int MOTION_PREBUFFER_SIZE = 8;
 
@@ -210,6 +212,26 @@ QnScheduleTask QnServerStreamRecorder::currentScheduleTask() const
 {
     QnMutexLocker lock( &m_scheduleMutex );
     return m_currentScheduleTask;
+}
+
+void QnServerStreamRecorder::fileCreated(uintptr_t filePtr) const
+{
+    connect(
+        (QBufferedFile*)filePtr,
+        &QBufferedFile::seekDetected,
+        &qnRecordingManager->getBufferManager(),
+        &WriteBufferMultiplierManager::at_seekDetected);
+    qnRecordingManager->getBufferManager().setFilePtr(
+        filePtr,
+        m_catalog,
+        m_device->getId());
+}
+
+int QnServerStreamRecorder::getBufferMultiplier() const
+{
+    return qnRecordingManager->getBufferManager().getMultForCam(
+        m_catalog, 
+        m_device->getId());
 }
 
 void QnServerStreamRecorder::updateStreamParams()

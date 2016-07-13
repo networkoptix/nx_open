@@ -27,7 +27,12 @@ public:
     static void serializeCodecContext(const AVCodecContext *ctx, QByteArray *data);
     static AVCodecContext *deserializeCodecContext(const char *data, int dataLen);
 
-    static AVIOContext* createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int ioBlockSize = 32768);
+    static AVIOContext* createFfmpegIOContext(
+        QnStorageResourcePtr resource, 
+        const QString& url, 
+        uint32_t openMode, 
+        uintptr_t* filePtr = nullptr,
+        int ioBlockSize = 32768);
     static AVIOContext* createFfmpegIOContext(QIODevice* ioDevice, int ioBlockSize = 32768);
     static void closeFfmpegIOContext(AVIOContext* ioContext);
     static qint64 getFileSizeByIOContext(AVIOContext* ioContext);

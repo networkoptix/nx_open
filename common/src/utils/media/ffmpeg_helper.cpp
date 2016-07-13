@@ -537,14 +537,21 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
 }
 
 
-AVIOContext* QnFfmpegHelper::createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int ioBlockSize)
+AVIOContext* QnFfmpegHelper::createFfmpegIOContext(
+    QnStorageResourcePtr resource, 
+    const QString& url,
+    uint32_t openMode,
+    uintptr_t* filePtr,
+    int ioBlockSize)
 {
     QString path = url;
 
     quint8* ioBuffer;
     AVIOContext* ffmpegIOContext;
 
-    QIODevice* ioDevice = resource->open(path, openMode);
+    QIODevice* ioDevice = resource->open(path, static_cast<QIODevice::OpenMode>(openMode));
+    if (filePtr)
+        *filePtr = reinterpret_cast<uintptr_t>(ioDevice);
     if (ioDevice == 0)
         return 0;
 

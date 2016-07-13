@@ -81,17 +81,19 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
     int ffmpegBufferSize = 0;
 
     int systemFlags = 0;
+    openMode = (QIODevice::OpenMode)((uint32_t(openMode)) & 0xff);
+    uint32_t writeBufferMult = ((uint32_t)openMode >> 8) & 0xff;
     if (openMode & QIODevice::WriteOnly)
     {
         ioBlockSize = MSSettings::roSettings()->value(
             nx_ms_conf::IO_BLOCK_SIZE,
-            nx_ms_conf::DEFAULT_IO_BLOCK_SIZE
-        ).toInt();
+            nx_ms_conf::DEFAULT_IO_BLOCK_SIZE).toInt();
 
-        ffmpegBufferSize = MSSettings::roSettings()->value(
-            nx_ms_conf::FFMPEG_BUFFER_SIZE,
-            nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE
-        ).toInt();;
+        ffmpegBufferSize = qMax(
+            MSSettings::roSettings()->value(
+                nx_ms_conf::FFMPEG_BUFFER_SIZE,
+                nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE).toInt(),
+            (1 << writeBufferMult));
 
 #ifdef Q_OS_WIN
         if (MSSettings::roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
@@ -112,9 +114,7 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
             std::shared_ptr<IQnFile>(new QnFile(fileName)),
             ioBlockSize,
             ffmpegBufferSize,
-            getId()
-        )
-    );
+            getId()));
     rez->setSystemFlags(systemFlags);
     if (!rez->open(openMode))
         return 0;
