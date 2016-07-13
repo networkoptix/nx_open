@@ -130,8 +130,18 @@ angular.module('webadminApp')
                 $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
                 $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;
                 $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;
+                $scope.canRunClient = data.data.reply.indexOf('lite_client') >= 0;
+                $scope.canStopClient = data.data.reply.indexOf('stop_lite_client') >= 0;
             }
         });
+
+        $scope.runClient = function(){
+            mediaserver.execute('lite_client').then(resultHandler, errorHandler);
+        };
+
+        $scope.stopClient = function(){
+            mediaserver.execute('stop_lite_client').then(resultHandler, errorHandler);
+        };
 
         $scope.renameSystem = function(){
             mediaserver.changeSystemName($scope.settings.systemName).then(resultHandler, errorHandler);
