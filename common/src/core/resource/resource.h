@@ -177,7 +177,9 @@ public:
         Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
     */
     Qn::PtzCapabilities getPtzCapabilities() const;
-    bool hasPtzCapabilities(Qn::PtzCapabilities capabilities) const;
+
+    /** Check if camera has any of provided capabilities. */
+    bool hasAnyOfPtzCapabilities(Qn::PtzCapabilities capabilities) const;
     void setPtzCapabilities(Qn::PtzCapabilities capabilities);
     void setPtzCapability(Qn::PtzCapabilities capability, bool value);
     QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here

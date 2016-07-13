@@ -1224,8 +1224,8 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         && item()->layout()->isSearchLayout();
 
     if(m_camera
-        && m_camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)
-        && !m_camera->hasPtzCapabilities(Qn::VirtualPtzCapability)
+        && m_camera->hasAnyOfPtzCapabilities(Qn::ContinuousPtzCapabilities)
+        && !m_camera->hasAnyOfPtzCapabilities(Qn::VirtualPtzCapability)
         && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
         && !isExportedLayout
         && !isPreviewSearchLayout

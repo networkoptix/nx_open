@@ -1176,7 +1176,7 @@ Qn::PtzCapabilities QnResource::getPtzCapabilities() const
     return Qn::PtzCapabilities(getProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME).toInt());
 }
 
-bool QnResource::hasPtzCapabilities(Qn::PtzCapabilities capabilities) const
+bool QnResource::hasAnyOfPtzCapabilities(Qn::PtzCapabilities capabilities) const
 {
     return getPtzCapabilities() & capabilities;
 }
