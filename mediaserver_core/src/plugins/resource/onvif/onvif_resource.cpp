@@ -249,9 +249,9 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_maxChannels(1),
     m_streamConfCounter(0),
     m_prevPullMessageResponseClock(0),
+    m_inputPortCount(0),
     m_onvifRecieveTimeout(DEFAULT_SOAP_TIMEOUT),
-    m_onvifSendTimeout(DEFAULT_SOAP_TIMEOUT),
-    m_inputPortCount(0)
+    m_onvifSendTimeout(DEFAULT_SOAP_TIMEOUT)
 {
     m_monotonicClock.start();
     m_advSettingsLastUpdated.restart();
