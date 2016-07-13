@@ -5,7 +5,7 @@
 #include <business/business_action_parameters.h>
 #include <ui/style/resource_icon_cache.h>
 
-#include <openal/qtvaudiodevice.h>
+#include <nx/audio/audiodevice.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/media/audio_player.h>
@@ -20,17 +20,19 @@ QnSayTextBusinessActionWidget::QnSayTextBusinessActionWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->volumeSlider->setValue(qRound(QtvAudioDevice::instance()->volume() * 100));
+    ui->volumeSlider->setValue(qRound(nx::audio::AudioDevice::instance()->volume() * 100));
 
     connect(ui->textEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
     connect(ui->playToClient, SIGNAL(stateChanged(int)), this, SLOT(paramsChanged()));
     connect(ui->testButton, SIGNAL(clicked()), this, SLOT(at_testButton_clicked()));
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(at_volumeSlider_valueChanged(int)));
 
-    connect(QtvAudioDevice::instance(), &QtvAudioDevice::volumeChanged, this, [this] {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
-        ui->volumeSlider->setValue(qRound(QtvAudioDevice::instance()->volume() * 100));
-    });
+    connect(nx::audio::AudioDevice::instance(), &nx::audio::AudioDevice::volumeChanged, this,
+        [this]
+        {
+            QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+            ui->volumeSlider->setValue(qRound(nx::audio::AudioDevice::instance()->volume() * 100));
+        });
 
     setHelpTopic(this, Qn::EventsActions_Speech_Help);
 }
@@ -87,5 +89,5 @@ void QnSayTextBusinessActionWidget::at_volumeSlider_valueChanged(int value) {
     if (m_updating)
         return;
 
-    QtvAudioDevice::instance()->setVolume((qreal)value * 0.01);
+    nx::audio::AudioDevice::instance()->setVolume((qreal)value * 0.01);
 }
