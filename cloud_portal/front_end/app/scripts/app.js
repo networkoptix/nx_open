@@ -137,6 +137,14 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.callLogin = true; }]
             }
         })
+
+        .when('/download', {
+            templateUrl: 'static/views/download.html',
+            controller: 'DownloadCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.callLogin = true; }]
+            }
+        })
         .when('/', {
             templateUrl: 'static/views/startPage.html',
             controller: 'StartPageCtrl'
