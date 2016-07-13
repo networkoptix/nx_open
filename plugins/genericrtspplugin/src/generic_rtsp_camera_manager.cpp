@@ -12,6 +12,26 @@
 
 #include "generic_rtsp_media_encoder.h"
 
+namespace
+{
+    static const char* rtspPluginParamsXML =
+       "<?xml version=\"1.0\"?>                                           \
+        <plugin                                                           \
+                name=\"GenericRtspPlugin\"                                \
+                version=\"1\"                                             \
+                unique_id=\"eedd2bfd-39fb-49ae-85ce-f5f47124e39b\">       \
+            <parameters>                                                  \
+                <group name=\"Main\">                                     \
+                    <param                                                \
+                        name=\"rtsp_url\"                                 \
+                        description=\"RTSP URL\"                          \
+                        dataType=\"String\"                               \
+                        readOnly=\"true\"/>                               \
+                </group>                                                  \
+            </parameters>                                                 \
+        </plugin>";
+}
+
 
 GenericRTSPCameraManager::GenericRTSPCameraManager( const nxcip::CameraInfo& info )
 :
@@ -155,16 +175,6 @@ int GenericRTSPCameraManager::setMotionMask( nxcip::Picture* /*motionMask*/ )
 
 const char* GenericRTSPCameraManager::getParametersDescriptionXML() const
 {
-    static const char* rtspPluginParamsXML = "\
-        <cameras>                                                                                                   \
-            <camera name=\"rtsp_cam\">                                                                              \
-                <group name=\"main\">                                                                               \
-                    <param name=\"rtsp_url\" description=\"RTSP URL\" dataType=\"String\" readOnly=\"true\"/>       \
-                </group>                                                                                            \
-            </camera>                                                                                               \
-        </cameras>                                                                                                  \
-        ";
-
     return rtspPluginParamsXML;
 }
 

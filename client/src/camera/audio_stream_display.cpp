@@ -189,13 +189,22 @@ bool QnAudioStreamDisplay::initFormatConvertRule(QnAudioFormat format)
     return false; // conversion rule not found
 }
 
-void QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
+bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
 {
     QnMutexLocker lock(&m_audioQueueMutex);
+
+    if (m_decoder[data->compressionType] == nullptr)
+    {
+        m_decoder[data->compressionType] = CLAudioDecoderFactory::createDecoder(data);
+        if (m_decoder[data->compressionType] == nullptr)
+            return false;
+    }
+
+
     m_lastAudioTime = data->timestamp;
     static const int MAX_BUFFER_LEN = 3000;
     if (data == 0 && !m_audioSound) // do not need to check audio device in case of data=0 and no audio device
-        return;
+        return false;
 
     // some times distance between audio packets in file is very large ( may be more than audio_device buffer );
     // audio_device buffer is small, and we need to put data from packets audio device. to do it we call this function with 0 pinter
@@ -213,7 +222,7 @@ void QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     {
         clearAudioBuffer();
         m_startBufferingTime = data->timestamp;
-        return;
+        return true;
     }
 
     if (data!=0)
@@ -232,6 +241,8 @@ void QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     //cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
     //cl_log.log("ms in ring buff = ", (int)ms_from_size(m_audio.format, m_ringbuff->bytesAvailable()), cl_logALWAYS);
     /**/
+
+    return true;
 }
 
 bool QnAudioStreamDisplay::isPlaying() const
@@ -267,12 +278,6 @@ void QnAudioStreamDisplay::playCurrentBuffer()
             return;
         }
 
-        if (m_decoder[data->compressionType] == 0)
-        {
-            m_decoder[data->compressionType] = CLAudioDecoderFactory::createDecoder(data);
-
-        }
-
         if (!m_decoder[data->compressionType]->decode(data, m_decodedAudioBuffer))
             return;
 
@@ -305,7 +310,7 @@ void QnAudioStreamDisplay::playCurrentBuffer()
         //resume(); // does nothing if resumed already
 
         // play audio
-        if (!m_audioSound) 
+        if (!m_audioSound)
         {
             QnMutexLocker lock( &m_guiSync );
             m_audioSound = QtvAudioDevice::instance()->addSound(audioFormat);

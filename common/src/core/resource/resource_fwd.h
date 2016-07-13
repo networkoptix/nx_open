@@ -177,6 +177,10 @@ typedef QList<QnVideoWallMatrixIndex> QnVideoWallMatrixIndexList;
 class QnAviResource;
 typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;
 
+class QnFlirEIPResource;
+typedef QnSharedResourcePointer<QnFlirEIPResource> QnFlirEIPResourcePtr;
+typedef QnSharedResourcePointerList<QnFlirEIPResource> QnFlirEIPResourceList;
+
 class QnAdamResource;
 typedef QnSharedResourcePointer<QnAdamResource> QnAdamResourcePtr;
 
