@@ -74,8 +74,6 @@ bool hasPermissionImpl(const QnUuid &userId, const ApiUserGroupData& data, Qn::P
 
 bool hasPermissionImpl(const QnUuid &userId, const ApiDiscoveredServerData&/*data*/, Qn::Permission permission);
 
-bool hasPermissionImpl(const QnUuid &userId, const ApiUserData&/*data*/, Qn::Permission permission);
-
 template<typename TransactionParamType>
 auto hasPermissionImpl(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(data.id), bool>
 {
@@ -136,21 +134,18 @@ bool hasPermissionImpl(const QnUuid &userId, const TransactionParamType &data, Q
 
 } // namespace detail
 
-inline bool hasAdminAccess(const QnUuid& userId)
+inline bool hasOwnerAccess(const QnUuid& userId)
 {
 	if (Qn::UserAccessData(userId) == Qn::kDefaultUserAccess)
 		return true;
-	auto userResource = 
-		qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-	return qnResourceAccessManager->hasGlobalPermission(
-		userResource,
-		Qn::GlobalPermission::GlobalAdminPermission);
+	auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+    return userResource && userResource->isEnabled() && userResource->isOwner();
 }
 
 template<typename TransactionParamType>
 bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission)
 {
-	if (hasAdminAccess(userId))
+	if (hasOwnerAccess(userId))
         return true;
     bool result = detail::hasPermissionImpl(userId, data, permission);
 	return result;
@@ -159,7 +154,7 @@ bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::P
 template<typename TransactionParamType>
 bool hasModifyPermission(const QnUuid &userId, const TransactionParamType &data)
 {
-	if (hasAdminAccess(userId))
+	if (hasOwnerAccess(userId))
         return true;
     bool result = detail::hasModifyPermissionImpl(userId, data, 0);
 	return result;

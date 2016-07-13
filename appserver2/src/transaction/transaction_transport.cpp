@@ -1448,7 +1448,7 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
         return false;
 
     /* Check if remote peer has rights to receive transaction */
-	if (!ec2::hasAdminAccess(m_userAccessData.userId))
+	if (!ec2::hasOwnerAccess(m_userAccessData.userId))
 	{
 		NX_LOG(
 			QnLog::EC2_TRAN_LOG,
