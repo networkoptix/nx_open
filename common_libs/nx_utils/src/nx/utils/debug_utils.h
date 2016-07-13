@@ -12,6 +12,7 @@
 
 #if defined(QT_CORE_LIB)
     #include <QtCore/QDebug>
+    #include <QtCore/QThread>
     NX_UTILS_API QDebug operator<<(QDebug d, const std::string& s);
 #else // QT_CORE_LIB
     #include <iostream>
@@ -42,6 +43,7 @@ static inline const char* relative_src_filename(const char* s)
     #define PRINT qWarning().nospace() << OUTPUT_PREFIX
 
     #define LL qDebug().nospace() << "####### line " << __LINE__ \
+        << ", thread " << QThread::currentThreadId() \
         << " [" << nx::utils::relative_src_filename(__FILE__) << "]";
 
 #else // QT_CORE_LIB

@@ -226,7 +226,10 @@ bool SeamlessVideoDecoder::decode(
     }
 
     if (d->queue.empty())
-        return decodedFrameNum >= 0; //< Return false if decoding fails and no queued frames are left.
+    {
+        // Return false if decoding fails and no queued frames are left.
+        return decodedFrameNum >= 0;
+    }
 
     *result = std::move(d->queue.front());
     d->queue.pop_front();
