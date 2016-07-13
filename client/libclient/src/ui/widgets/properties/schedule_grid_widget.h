@@ -84,6 +84,8 @@ private:
     QPoint mapToGrid(const QPoint& pos, bool doTruncate) const;
 
     int cellSize() const;
+    int calculateCellSize(bool headersCalculated) const;
+
     void initMetrics();
 
     bool isValidCell(const QPoint& cell) const;
@@ -127,4 +129,6 @@ private:
 
     bool m_enabled;
     bool m_readOnly;
+
+    mutable int m_cellSize;
 };

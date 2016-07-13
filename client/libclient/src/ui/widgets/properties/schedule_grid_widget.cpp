@@ -16,7 +16,7 @@
 namespace
 {
     const int kWeekSize = 7;
-    const int kTextSpacing = 4;
+    const int kTextSpacing = 6;
 
     const qreal kMinimumLabelsFontSize = 10.0;
     const qreal kMaximumLabelsFontSize = 14.0;
@@ -28,12 +28,18 @@ namespace
 } // anonymous namespace
 
 
-QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent)
-    : QWidget(parent)
+QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent) :
+    QWidget(parent),
+    m_showFps(true),
+    m_showQuality(true),
+    m_gridLeftOffset(0),
+    m_gridTopOffset(0),
+    m_mousePressed(false),
+    m_enabled(true),
+    m_readOnly(false),
+    m_cellSize(-1)
 {
     m_mouseMoveCell = QPoint(-2, -2);
-    m_enabled = true;
-    m_readOnly = false;
     m_defaultParams[FpsParam] = 10;
     m_defaultParams[QualityParam] = Qn::QualityNormal;
     m_defaultParams[RecordTypeParam] = Qn::RT_Always;
@@ -52,14 +58,7 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent)
 
     m_cornerText = tr("All");
 
-    m_gridLeftOffset = 0;
-    m_gridTopOffset = 0;
-    m_mousePressed = false;
     setMouseTracking(true);
-
-    m_showFps = true;
-    m_showQuality = true;
-
     m_labelsFont = font();
 }
 
@@ -69,8 +68,23 @@ QnScheduleGridWidget::~QnScheduleGridWidget()
 
 int QnScheduleGridWidget::cellSize() const
 {
-    int cellWidth = qFloor((width() - 0.5 - m_gridLeftOffset) / columnCount());
-    int cellHeight = qFloor((height() - 0.5 - m_gridTopOffset) / rowCount());
+    if (m_cellSize < 0)
+        m_cellSize = calculateCellSize(true);
+
+    return m_cellSize;
+}
+
+int QnScheduleGridWidget::calculateCellSize(bool headersCalculated) const
+{
+    if (headersCalculated)
+    {
+        int cellWidth = qFloor((width() - 0.5 - m_gridLeftOffset) / columnCount());
+        int cellHeight = qFloor((height() - 0.5 - m_gridTopOffset) / rowCount());
+        return qMin(cellWidth, cellHeight);
+    }
+
+    int cellWidth = qFloor((width() - 0.5) / (columnCount() + 1));
+    int cellHeight = qFloor((height() - 0.5) / (rowCount() + 1));
     return qMin(cellWidth, cellHeight);
 }
 
@@ -78,7 +92,9 @@ void QnScheduleGridWidget::initMetrics()
 {
     // determine labels font size
     m_labelsFont.setPointSizeF(kMinimumLabelsFontSize);
+    m_cellSize = -1;
 
+    int desiredCellSize = calculateCellSize(false);
     do
     {
         m_gridLeftOffset = 0;
@@ -96,13 +112,16 @@ void QnScheduleGridWidget::initMetrics()
             m_gridTopOffset = qMax(sz.height(), m_gridTopOffset);
         }
 
-        m_cornerSize = QSize(maxWidth + kTextSpacing, maxHeight + kTextSpacing);
         m_gridLeftOffset += kTextSpacing;
         m_gridTopOffset += kTextSpacing;
         m_labelsFont.setPointSizeF(m_labelsFont.pointSizeF() + kFontIncreaseStep);
 
-    } while (m_gridLeftOffset < cellSize()*0.5 && m_labelsFont.pointSizeF() < kMaximumLabelsFontSize);
+    } while (m_gridLeftOffset < desiredCellSize*0.5 && m_labelsFont.pointSizeF() < kMaximumLabelsFontSize);
 
+    m_gridLeftOffset = qMax(m_gridLeftOffset, desiredCellSize);
+    m_gridTopOffset = qMax(m_gridTopOffset, desiredCellSize);
+
+    m_cornerSize = QSize(m_gridLeftOffset, m_gridTopOffset);
     qreal cellSize = this->cellSize();
 
     qreal totalWidth = m_gridLeftOffset + (cellSize * columnCount());
@@ -158,7 +177,7 @@ QSize QnScheduleGridWidget::minimumSizeHint() const
 
 QRectF QnScheduleGridWidget::horizontalHeaderCell(int x) const
 {
-    qreal cellSize = this->cellSize(); //TODO: #vkutin Cache this
+    qreal cellSize = this->cellSize();
     return QRectF(
         m_gridLeftOffset + x * cellSize,
         m_gridTopOffset - m_cornerSize.height(),
@@ -168,7 +187,7 @@ QRectF QnScheduleGridWidget::horizontalHeaderCell(int x) const
 
 QRectF QnScheduleGridWidget::verticalHeaderCell(int y) const
 {
-    qreal cellSize = this->cellSize(); //TODO: #vkutin Cache this
+    qreal cellSize = this->cellSize();
     return QRectF(
         m_gridLeftOffset - m_cornerSize.width(),
         m_gridTopOffset + y * cellSize,
