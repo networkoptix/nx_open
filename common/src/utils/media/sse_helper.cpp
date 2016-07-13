@@ -89,7 +89,7 @@ QString getCPUString()
 //TODO: #ak give up following Q_OS_MAC check
 //TODO/ARM: sse analog
 
-#if defined(__arm__)
+#if defined(__arm__) || defined(Q_OS_IOS)
 
 bool useSSE2()
 {
