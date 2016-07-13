@@ -24,7 +24,7 @@ Rectangle
         {
             id: cloudPanel;
 
-            y: ((grid.y - height) / 2);
+            y: ((gridHolder.y - height) / 2);
             anchors.horizontalCenter: parent.horizontalCenter;
 
             userName: context.cloudUserName;
@@ -38,156 +38,190 @@ Rectangle
             onLogout: context.logoutFromCloud();
         }
 
-        GridView
+        NxSearchEdit
         {
-            id: grid;
+            visualParent: screenHolder;
 
-            readonly property int horizontalOffset: 40;
-            readonly property int tileHeight: 96;
-            readonly property int tileWidth: 280;
-            readonly property int tileSpacing: 16;
+            anchors.bottom: gridHolder.top;
+            anchors.bottomMargin: 8;
+            anchors.horizontalCenter: parent.horizontalCenter;
 
-            readonly property int maxColsCount: Math.min(Math.floor(parent.width - 2 * horizontalOffset) / cellWidth, 4);
-            readonly property int desiredColsCount:
+            onQueryChanged: { grid.model.setFilterWildcard(query); }
+        }
+
+        Item
+        {
+            id: gridHolder;
+
+            y: Math.max((control.height - height) / 2, 212);
+            height: grid.tileHeight * 2 + grid.tileSpacing;
+            width: parent.width;
+
+            GridView
             {
-                if (grid.count < 3)
-                    return grid.count;
-                else if (grid.count < 5)
-                    return 2;
-                else if (grid.count < 7)
-                    return 3;
-                else
-                    return 4;
-            }
+                id: grid;
 
-            readonly property int colsCount: Math.min(maxColsCount, desiredColsCount);
-            readonly property int rowsCount: (grid.count < 3 ? 1 : 2);
-            readonly property int pagesCount: Math.ceil(grid.count / (colsCount * rowsCount));
+                keyNavigationWraps: false;
 
-            opacity: 0;
-            snapMode: GridView.SnapOneRow;
+                readonly property int horizontalOffset: 40;
+                readonly property int tileHeight: 96;
+                readonly property int tileWidth: 280;
+                readonly property int tileSpacing: 16;
 
-            SequentialAnimation
-            {
-                id: switchPageAnimation;
-
-                property int pageIndex: -1;
-
-                NumberAnimation
+                readonly property int maxColsCount: Math.min(Math.floor(parent.width - 2 * horizontalOffset) / cellWidth, 4);
+                readonly property int desiredColsCount:
                 {
-                    target: grid;
-                    property: "opacity";
-                    duration: 200;
-                    easing.type: Easing.Linear;
-                    to: 0;
+                    if (grid.count < 3)
+                        return grid.count;
+                    else if (grid.count < 5)
+                        return 2;
+                    else if (grid.count < 7)
+                        return 3;
+                    else
+                        return 4;
                 }
 
-                ScriptAction
+                readonly property int colsCount: Math.min(maxColsCount, desiredColsCount);
+                readonly property int rowsCount: (grid.count < 3 ? 1 : 2);
+                readonly property int pagesCount: Math.ceil(grid.count / (colsCount * rowsCount));
+
+                opacity: 0;
+                snapMode: GridView.SnapOneRow;
+                cacheBuffer: tileHeight * 32;   // cache of 32 rows;
+
+                SequentialAnimation
                 {
-                    script:
+                    id: switchPageAnimation;
+
+                    property int pageIndex: -1;
+
+                    NumberAnimation
                     {
-                        var pageIndex = switchPageAnimation.pageIndex;
-                        var tilesPerPage = grid.colsCount * grid.rowsCount;
-                        var firstItemIndex = pageIndex * tilesPerPage;
-                        grid.positionViewAtIndex(firstItemIndex, GridView.Beginning);
+                        target: grid;
+                        property: "opacity";
+                        duration: 200;
+                        easing.type: Easing.Linear;
+                        to: 0;
+                    }
+
+                    ScriptAction
+                    {
+                        script: { grid.setPositionTo(switchPageAnimation.pageIndex); }
+                    }
+
+                    NumberAnimation
+                    {
+                        target: grid;
+                        property: "opacity";
+                        duration: 200;
+                        easing.type: Easing.Linear;
+                        to: 1;
                     }
                 }
 
-                NumberAnimation
+                clip: true;
+                interactive: false;
+
+                anchors.centerIn: parent;
+                width: colsCount * cellWidth;
+                height: rowsCount * cellHeight;
+
+                cellWidth: tileWidth + tileSpacing;
+                cellHeight: tileHeight + tileSpacing;
+
+                anchors.horizontalCenter: parent.horizontalCenter;
+
+                property QtObject watcher: SingleActiveItemSelector
                 {
-                    target: grid;
-                    property: "opacity";
-                    duration: 200;
-                    easing.type: Easing.Linear;
-                    to: 1;
+                    variableName: "isExpanded";
+                    deactivateFunc: function(item) { item.toggle(); };
+                }
+
+
+                Connections
+                {
+                    target: context;
+                    onIsVisibleChanged:
+                    {
+                        if (!context.isVisible)
+                            grid.watcher.resetCurrentItem();
+                    }
+                }
+
+                model: QnQmlSortFilterProxyModel
+                {
+                    model: QnSystemsModel {}
+                    filterCaseSensitivity: Qt.CaseInsensitive;
+                    filterRole: 257;    // Search text role
+                }
+
+                delegate: Item
+                {
+                    z: tile.z;
+                    width: grid.cellWidth;
+                    height: grid.cellHeight;
+
+                    SystemTile
+                    {
+                        id: tile;
+                        visualParent: screenHolder;
+                        anchors.horizontalCenter: parent.horizontalCenter;
+                        anchors.verticalCenter: parent.verticalCenter;
+
+                        systemId: model.systemId;
+                        systemName: model.systemName;
+                        ownerDescription: model.ownerDescription
+
+                        isFactoryTile: model.isFactorySystem;
+                        isCloudTile: model.isCloudSystem;
+
+                        wrongVersion: model.wrongVersion;
+                        wrongCustomization: model.wrongCustomization;
+                        compatibleVersion: model.compatibleVersion;
+
+                        Component.onCompleted: { grid.watcher.addItem(this); }
+                    }
+                }
+
+                function setPage(index, animate)
+                {
+                    switchPageAnimation.stop();
+                    if (animate || (opacity == 0)) //< Opacity is 0 on first show
+                    {
+                        switchPageAnimation.pageIndex = index;
+                        switchPageAnimation.start();
+                    }
+                    else
+                        grid.setPositionTo(index);
+                }
+
+                function setPositionTo(index)
+                {
+                    var tilesPerPage = grid.colsCount * grid.rowsCount;
+                    var firstItemIndex = index * tilesPerPage;
+                    grid.positionViewAtIndex(firstItemIndex, GridView.Beginning);
                 }
             }
 
-            clip: true;
-            interactive: false;
-
-            y: Math.max((control.height - height) / 2, 212);
-            width: colsCount * cellWidth;
-            height: rowsCount * cellHeight;
-
-            cellWidth: tileWidth + tileSpacing;
-            cellHeight: tileHeight + tileSpacing;
-
-            anchors.horizontalCenter: parent.horizontalCenter;
-
-            property QtObject watcher: SingleActiveItemSelector
+            NxPageSwitcher
             {
-                variableName: "isExpanded";
-                deactivateFunc: function(item) { item.toggle(); };
-            }
+                id: pageSwitcher;
 
+                visible: (pagesCount > 1);
+                anchors.horizontalCenter: gridHolder.horizontalCenter;
+                anchors.top: gridHolder.bottom;
+                anchors.topMargin: 8;
 
-            Connections
-            {
-                target: context;
-                onIsVisibleChanged:
+                pagesCount: grid.pagesCount;
+
+                onCurrentPageChanged:
                 {
-                    if (!context.isVisible)
-                        grid.watcher.resetCurrentItem();
+                    if ((index >= 0) && (index < pagesCount))
+                        grid.setPage(index, byClick);
                 }
-            }
-
-            model: QnSystemsModel {}
-
-            delegate: Item
-            {
-                z: tile.z;
-                width: grid.cellWidth;
-                height: grid.cellHeight;
-
-                SystemTile
-                {
-                    id: tile;
-                    visualParent: screenHolder;
-                    anchors.horizontalCenter: parent.horizontalCenter;
-                    anchors.verticalCenter: parent.verticalCenter;
-                    //
-
-                    systemId: model.systemId;
-                    systemName: model.systemName;
-                    ownerDescription: model.ownerDescription
-
-                    isFactoryTile: model.isFactorySystem;
-                    isCloudTile: model.isCloudSystem;
-
-                    wrongVersion: model.wrongVersion;
-                    wrongCustomization: model.wrongCustomization;
-                    compatibleVersion: model.compatibleVersion;
-
-                    Component.onCompleted: { grid.watcher.addItem(this); }
-                }
-            }
-
-            function setPage(index)
-            {
-                switchPageAnimation.stop();
-                switchPageAnimation.pageIndex = index;
-                switchPageAnimation.start();
             }
         }
 
-        NxPageSwitcher
-        {
-            id: pageSwitcher;
-
-            visible: (pagesCount > 0);
-            anchors.horizontalCenter: grid.horizontalCenter;
-            anchors.top: grid.bottom;
-            anchors.topMargin: 8;
-
-            pagesCount: grid.pagesCount;
-
-            onCurrentPageChanged:
-            {
-                if ((currentPage >= 0) && (currentPage < pagesCount))
-                    grid.setPage(currentPage);
-            }
-        }
 
         NxButton
         {
