@@ -485,6 +485,11 @@ void QnCommonMessageProcessor::resetAccessRights(const ec2::ApiAccessRightsDataL
     qnResourceAccessManager->resetAccessibleResources(accessRights);
 }
 
+void QnCommonMessageProcessor::resetUserRoles(const ec2::ApiUserGroupDataList& roles)
+{
+    qnResourceAccessManager->resetUserGroups(roles);
+}
+
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &)
 {
     return true;
@@ -572,9 +577,8 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resetPropertyList(fullData.allProperties);
     resetCamerasWithArchiveList(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
-    qnResourceAccessManager->resetAccessibleResources(fullData.accessRights);
-    qnResourceAccessManager->resetUserGroups(fullData.userGroups);
-
+    resetAccessRights(fullData.accessRights);
+    resetUserRoles(fullData.userGroups);
     resetLicenses(fullData.licenses);
     resetTime();
 

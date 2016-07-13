@@ -1288,6 +1288,32 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     }
 
     {
+        //loading accessible resources
+        ec2::ApiAccessRightsDataList accessRights;
+        while ((rez = ec2Connection->getUserManager(Qn::kDefaultUserAccess)->getAccessRightsSync(&accessRights)) != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get accessRights. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+        messageProcessor->resetAccessRights(accessRights);
+    }
+
+    {
+        //loading user roles
+        ec2::ApiUserGroupDataList roles;
+        while ((rez = ec2Connection->getUserManager(Qn::kDefaultUserAccess)->getUserGroupsSync(&roles)) != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get roles. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+        messageProcessor->resetUserRoles(roles);
+    }
+
+    {
         //loading business rules
         QnBusinessEventRuleList rules;
         while( (rez = ec2Connection->getBusinessEventManager(Qn::kDefaultUserAccess)->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )

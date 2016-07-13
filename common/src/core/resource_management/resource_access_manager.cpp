@@ -31,12 +31,34 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         m_permissionsCache.clear();
     });
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, [this] (const QnResourcePtr& resource)
+    auto invalidateCacheForLayoutItems = [this](const QnResourcePtr& resource)
     {
         if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
         {
-            connect(layout, &QnResource::parentIdChanged,           this, &QnResourceAccessManager::invalidateResourceCache); /* To make layouts global */
-            connect(layout, &QnLayoutResource::lockedChanged,       this, &QnResourceAccessManager::invalidateResourceCache);
+            for (const auto& item : layout->getItems())
+                invalidateResourceCacheInternal(item.resource.id);
+        }
+    };
+
+    auto handleResourceAdded = [this, invalidateCacheForLayoutItems] (const QnResourcePtr& resource)
+    {
+        if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
+        {
+            auto invalidateCacheForLayoutItem = [this](const QnLayoutResourcePtr &layout, const QnLayoutItemData &item)
+            {
+                Q_UNUSED(layout);
+                invalidateResourceCacheInternal(item.resource.id);
+            };
+
+            /* To make layouts global */
+            connect(layout, &QnResource::parentIdChanged,       this, &QnResourceAccessManager::invalidateResourceCache);
+            connect(layout, &QnLayoutResource::lockedChanged,   this, &QnResourceAccessManager::invalidateResourceCache);
+
+            /* Some cameras may become available to users - or vice versa. */
+            connect(layout, &QnResource::parentIdChanged,       this, invalidateCacheForLayoutItems);
+            connect(layout, &QnLayoutResource::itemAdded,       this, invalidateCacheForLayoutItem);
+            connect(layout, &QnLayoutResource::itemChanged,     this, invalidateCacheForLayoutItem);
+            connect(layout, &QnLayoutResource::itemRemoved,     this, invalidateCacheForLayoutItem);
         }
 
         if (const QnUserResourcePtr& user = resource.dynamicCast<QnUserResource>())
@@ -51,13 +73,19 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
             for (auto storage : server->getStorages())
                 invalidateResourceCache(storage);
         }
-    });
+    };
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, handleResourceAdded);
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this, invalidateCacheForLayoutItems](const QnResourcePtr& resource)
     {
         disconnect(resource, nullptr, this, nullptr);
+        invalidateResourceCache(resource);
+        invalidateCacheForLayoutItems(resource);
     });
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnResourceAccessManager::invalidateResourceCache);
+
+    for (const QnResourcePtr& resource : qnResPool->getResources())
+        handleResourceAdded(resource);
 }
 
 ec2::ApiPredefinedRoleDataList QnResourceAccessManager::getPredefinedRoles()
@@ -244,7 +272,6 @@ bool QnResourceAccessManager::hasGlobalPermission(const QnUserResourcePtr& user,
 
 Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& user, const QnResourcePtr& resource) const
 {
-    //NX_ASSERT(user && resource, Q_FUNC_INFO, "We must not request permissions for absent resources.");
     if (!user || !resource)
         return Qn::NoPermissions;
 
@@ -340,13 +367,16 @@ void QnResourceAccessManager::invalidateResourceCache(const QnResourcePtr& resou
     if (!resource)
         return;
 
-    QnUuid id = resource->getId();
+    invalidateResourceCacheInternal(resource->getId());
+}
 
+void QnResourceAccessManager::invalidateResourceCacheInternal(const QnUuid& resourceId)
+{
     QnMutexLocker lk(&m_mutex);
-    m_globalPermissionsCache.remove(id);
+    m_globalPermissionsCache.remove(resourceId);
     for (auto iter = m_permissionsCache.begin(); iter != m_permissionsCache.end();)
     {
-        if (iter.key().userId == id || iter.key().resourceId == id)
+        if (iter.key().userId == resourceId || iter.key().resourceId == resourceId)
             iter = m_permissionsCache.erase(iter);
         else
             ++iter;
@@ -439,9 +469,6 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnVideoWallResourcePtr& videoWall) const
 {
     NX_ASSERT(videoWall);
-
-    if (!isAccessibleResource(user, videoWall))
-        return Qn::NoPermissions;
 
     if (hasGlobalPermission(user, Qn::GlobalControlVideoWallPermission))
     {
@@ -615,11 +642,10 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
     if (!user || !resource)
         return false;
 
-    {
-        QnMutexLocker lk(&m_mutex);
-        if (m_accessibleResources[user->getId()].contains(resource->getId()))
-            return true;
-    }
+    QSet<QnUuid> accessible = accessibleResources(user->getId());
+    QnUuid resourceId = resource->getId();
+    if (accessible.contains(resourceId))
+        return true;
 
     /* Web Pages behave totally like cameras. */
     bool isMediaResource = resource.dynamicCast<QnVirtualCameraResource>()
@@ -637,7 +663,27 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
         return Qn::GlobalAdminPermission;
     };
 
-    return hasGlobalPermission(user, requiredPermission());
+    if (hasGlobalPermission(user, requiredPermission()))
+        return true;
+
+    /* Here we are checking if the camera exists on one of the shared layouts, available to given user. */
+    if (isMediaResource)
+    {
+
+        QnLayoutResourceList layouts = qnResPool->getResources(accessible).filtered<QnLayoutResource>();
+        for (const QnLayoutResourcePtr& layout : layouts)
+        {
+            if (!layout->isShared())
+                continue;
+
+            for (const auto& item : layout->getItems())
+                if (item.resource.id == resourceId)
+                    return true;
+        }
+
+    }
+
+    return false;
 }
 
 bool QnResourceAccessManager::canCreateStorage(const QnUserResourcePtr& user, const QnUuid& storageParentId) const

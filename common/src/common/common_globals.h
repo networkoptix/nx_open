@@ -891,7 +891,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* Manager permissions. */
         GlobalEditCamerasPermission             = 0x00000002,   /**< Can edit camera settings. */
         GlobalControlVideoWallPermission        = 0x00000004,   /**< Can control videowalls. */
-        INTERNAL_GlobalVideoWallLayoutPermission			= 0x00000008,   // !!For internal use only!! Videowall layout access.
+        INTERNAL_GlobalVideoWallLayoutPermission= 0x00000008,   // !!For internal use only!! Videowall layout access.
         GlobalViewLogsPermission                = 0x00000010,   /**< Can access event log and audit trail. */
 
         /* Viewer permissions. */
