@@ -254,8 +254,8 @@ void DeviceSearcher::onSomeBytesRead(
 
     const QUrl descriptionUrl( QLatin1String( locationHeader->second ) );
     uuidStr += descriptionUrl.toString();
-
-    startFetchDeviceXml( uuidStr, descriptionUrl, remoteHost );
+    if (descriptionUrl.isValid())
+        startFetchDeviceXml( uuidStr, descriptionUrl, remoteHost );
 }
 
 void DeviceSearcher::dispatchDiscoverPackets()
