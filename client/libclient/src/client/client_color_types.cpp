@@ -253,6 +253,32 @@ QnPasswordStrengthColors::QnPasswordStrengthColors() :
 {
 }
 
+QnMotionSensitivityColors::QnMotionSensitivityColors() :
+    normal({
+        QColor(0x698796),
+        QColor(0x627CD6),
+        QColor(0x23A4CB),
+        QColor(0x31BAA2),
+        QColor(0x79BC66),
+        QColor(0xB8BC37),
+        QColor(0xFBA405),
+        QColor(0xE97119),
+        QColor(0xD24729),
+        QColor(0xC22626) }),
+    hovered({
+        QColor(0x7D97A4),
+        QColor(0x768FE4),
+        QColor(0x37C2E4),
+        QColor(0x5ADCBB),
+        QColor(0x95E37F),
+        QColor(0xD9DD4B),
+        QColor(0xFFBF4A),
+        QColor(0xF5861E),
+        QColor(0xEC6239),
+        QColor(0xE73535) })
+{
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
     (json)(eq),
