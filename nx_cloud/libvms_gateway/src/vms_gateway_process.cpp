@@ -1,8 +1,3 @@
-/**********************************************************
-* May 17, 2016
-* akolesnikov
-***********************************************************/
-
 #include "vms_gateway_process.h"
 
 #include <algorithm>
@@ -18,6 +13,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/ssl_socket.h>
 #include <nx/utils/log/log.h>
 
 #include <api/global_settings.h>
@@ -167,10 +163,17 @@ int VmsGatewayProcess::exec()
             settings,
             &httpMessageDispatcher);
 
+        if (settings.http().sslSupport)
+        {
+            network::SslEngine::useOrCreateCertificate(
+                settings.http().sslCertPath, QnAppInfo::productName().toUtf8(),
+                "US", QnAppInfo::organizationName().toUtf8());
+        }
+
         MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
             &authenticationManager,
             &httpMessageDispatcher,
-            false,  //TODO #ak enable ssl when it works properly
+            settings.http().sslSupport,
             SocketFactory::NatTraversalType::nttDisabled);
 
         if (!multiAddressHttpServer.bind(httpAddrToListenList))
@@ -285,6 +288,9 @@ void VmsGatewayProcess::registerApiHandlers(
 
     if (settings.http().connectSupport)
     {
+        NX_CRITICAL(false, "Currently ConnectHandler has so issues:"
+            "please see implementation TODOs");
+
         msgDispatcher->registerRequestProcessor<ConnectHandler>(
             nx_http::kAnyPath,
             [&settings]() -> std::unique_ptr<ConnectHandler> {

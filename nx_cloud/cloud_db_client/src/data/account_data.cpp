@@ -98,18 +98,9 @@ void serializeToUrlQuery(const AccountConfirmationCode& data, QUrlQuery* const u
         QString::fromStdString(data.code));
 }
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((AccountData), (json)(sql_record), _Fields)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (AccountData),
-    (json)(sql_record),
-    _Fields,
-    (optional, true))
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (AccountConfirmationCode),
-    (json)(sql_record),
-    _Fields)
-
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((AccountConfirmationCode), (json)(sql_record), _Fields)
 
 ////////////////////////////////////////////////////////////
 //// class AccountUpdateData
@@ -204,11 +195,7 @@ void serializeToUrlQuery(const AccountEmail& data, QUrlQuery* const urlQuery)
         QString::fromStdString(data.email));
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (AccountEmail),
-    (json),
-    _Fields)
-
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((AccountEmail), (json), _Fields, (optional, false))
 
 ////////////////////////////////////////////////////////////
 //// class TemporaryCredentials
@@ -288,8 +275,7 @@ void serializeToUrlQuery(
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (TemporaryCredentialsTimeouts)(TemporaryCredentialsParams)(TemporaryCredentials),
     (json),
-    _Fields,
-    (optional, true))
+    _Fields)
 
 }   //api
 }   //cdb

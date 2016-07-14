@@ -1,13 +1,6 @@
-/**********************************************************
-* 05 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
+#include <nx/utils/test_support/run_test.h>
 
-#include <gtest/gtest.h>
-
-
-int main( int argc, char** argv )
+int main(int argc, char** argv)
 {
-    ::testing::InitGoogleTest( &argc, argv );
-    return RUN_ALL_TESTS();
+    return nx::utils::runTest(argc, argv);
 }

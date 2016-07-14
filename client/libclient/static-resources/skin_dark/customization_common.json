@@ -632,7 +632,25 @@
             "medium": "#cc853d",
             "high": "#ff5500"
         }
-    }
-    
+    },
+
+    "QnScheduleGridWidget": {
+        "colors": {
+            "normalLabel": "light10",
+            "weekendLabel": "red_core",
+            "allLabel": "light16",
+            "recordNever": "dark5",
+            "recordAlways": "green_core",
+            "recordMotion": "red_d1",
+            "recordNeverHovered": "dark6",
+            "recordAlwaysHovered": "green_l1",
+            "recordMotionHovered": "red_core",
+            "hoveredBackground": "dark9",
+            "pressedBackground": "dark6",
+            "gridLine": "dark7",
+            "gridLabel": "dark4",
+            "border": "dark4"
+        }
+    }    
 }
 

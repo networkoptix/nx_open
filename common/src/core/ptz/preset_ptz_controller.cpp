@@ -7,6 +7,12 @@
 
 #include "ptz_preset.h"
 
+bool deserialize(const QString& value, QnPtzPresetRecordHash* target)
+{
+    Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
+    return false;
+}
+
 namespace {
     const QString propertyKey = lit("ptzPresets");
 }
@@ -37,7 +43,7 @@ Q_DECLARE_METATYPE(QnPtzPresetRecordHash)
 // -------------------------------------------------------------------------- //
 // QnPresetPtzController
 // -------------------------------------------------------------------------- //
-QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseController): 
+QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzPresetRecordHash>(lit("ptzPresets"), QnPtzPresetRecordHash(), this))
 {
@@ -52,7 +58,7 @@ QnPresetPtzController::~QnPresetPtzController() {
 }
 
 bool QnPresetPtzController::extends(Qn::PtzCapabilities capabilities) {
-    return 
+    return
         ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
         (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
         !(capabilities & Qn::PresetsPtzCapability);
@@ -97,7 +103,7 @@ bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset) {
         if(record.preset == preset)
             return true; /* No need to save it. */
         record.preset = preset;
-    
+
         m_adaptor->setValue(records);
     }
 

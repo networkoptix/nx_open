@@ -84,6 +84,13 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
         conf.skipNextReload();
     }
 
+    if (conf.disable)
+    {
+        PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
+              << ") -> false: conf.disable is set";
+        return false;
+    }
+
     // Odd frame dimensions are not tested and can be unsupported due to UV having half-res.
     if (resolution.width() % 2 != 0 || resolution.height() % 2 != 0)
     {
@@ -104,13 +111,6 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
     {
         OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
             << ") -> false: codec != CODEC_ID_H264";
-        return false;
-    }
-
-    if (conf.disable)
-    {
-        PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: conf.disable is set";
         return false;
     }
 
@@ -143,4 +143,4 @@ int ProxyVideoDecoder::decode(
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

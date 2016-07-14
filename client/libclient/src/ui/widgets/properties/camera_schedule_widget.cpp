@@ -167,10 +167,6 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     ui->enableRecordingCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
 
-    ui->scheduleGridGroupBox->setTitle(lit("%1\t(%2)").arg(
-        ui->scheduleGridGroupBox->title()).arg(
-        tr("based on server time")));
-
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityLow), Qn::QualityLow);
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityNormal), Qn::QualityNormal);
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHigh), Qn::QualityHigh);
@@ -271,15 +267,23 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     retranslateUi();
 }
 
-QnCameraScheduleWidget::~QnCameraScheduleWidget() {
-    return;
+QnCameraScheduleWidget::~QnCameraScheduleWidget()
+{
 }
 
-void QnCameraScheduleWidget::retranslateUi() {
+void QnCameraScheduleWidget::retranslateUi()
+{
+    ui->retranslateUi(this);
+
     QString warnText = (qnResPool && qnResPool->containsIoModules())
         ? tr("Warning! High minimum value could decrease other devices' recording durations.")
         : tr("Warning! High minimum value could decrease other cameras' recording durations.");
+
     ui->minArchiveDaysWarningLabel->setText(warnText);
+
+    ui->scheduleGridGroupBox->setTitle(lit("%1\t(%2)").arg(
+        ui->scheduleGridGroupBox->title()).arg(
+            tr("based on server time")));
 }
 
 void QnCameraScheduleWidget::afterContextInitialized() {
@@ -289,8 +293,8 @@ void QnCameraScheduleWidget::afterContextInitialized() {
     updateLicensesButtonVisible();
 }
 
-
-bool QnCameraScheduleWidget::hasHeightForWidth() const {
+bool QnCameraScheduleWidget::hasHeightForWidth() const
+{
     return false;   //TODO: #GDM temporary fix to handle string freeze
                     // all labels with word-wrap should be replaced by QnWordWrappedLabel.
                     // This widget has 5 of them (label_4.._8, exportWarningLabel)
@@ -695,16 +699,15 @@ bool QnCameraScheduleWidget::isRecordingParamsAvailable() const
 
 void QnCameraScheduleWidget::updateArchiveRangeEnabledState()
 {
-    bool isEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
-    ui->spinBoxMaxDays->setEnabled(isEnabled && ui->checkBoxMaxArchive->checkState() == Qt::Unchecked);
-    ui->spinBoxMinDays->setEnabled(isEnabled && ui->checkBoxMinArchive->checkState() == Qt::Unchecked);
+    ui->spinBoxMaxDays->setEnabled(ui->checkBoxMaxArchive->checkState() == Qt::Unchecked);
+    ui->spinBoxMinDays->setEnabled(ui->checkBoxMinArchive->checkState() == Qt::Unchecked);
     validateArchiveLength();
 }
 
 void QnCameraScheduleWidget::updateGridEnabledState()
 {
     ui->motionGroupBox->setEnabled(m_recordingParamsAvailable);
-    ui->gridWidget->setEnabled(m_changesDisabled);
+    ui->gridWidget->setEnabled(!m_changesDisabled);
     updateArchiveRangeEnabledState();
 }
 
@@ -731,14 +734,10 @@ void QnCameraScheduleWidget::updateLicensesButtonVisible()
     ui->licensesButton->setVisible(accessController()->hasGlobalPermission(Qn::GlobalAdminPermission));
 }
 
-void QnCameraScheduleWidget::updateRecordSpinboxes(){
-    bool motionEnabled = m_motionAvailable && (
-                ui->recordMotionButton->isChecked() ||
-                ui->recordMotionPlusLQButton->isChecked() ||
-                hasMotionOnGrid()
-                );
-    ui->recordBeforeSpinBox->setEnabled(motionEnabled);
-    ui->recordAfterSpinBox->setEnabled(motionEnabled);
+void QnCameraScheduleWidget::updateRecordSpinboxes()
+{
+    ui->recordBeforeSpinBox->setEnabled(m_motionAvailable);
+    ui->recordAfterSpinBox->setEnabled(m_motionAvailable);
 }
 
 void QnCameraScheduleWidget::updateMotionButtons() {
@@ -787,7 +786,8 @@ void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled)
     ui->fpsSpinBox->setMaximum(maximum);
 }
 
-void QnCameraScheduleWidget::updateColors() {
+void QnCameraScheduleWidget::updateColors()
+{
     ui->recordAlwaysButton->setColor(ui->gridWidget->colors().recordAlways);
     ui->recordMotionButton->setColor(ui->gridWidget->colors().recordMotion);
     ui->recordMotionPlusLQButton->setColor(ui->gridWidget->colors().recordMotion);

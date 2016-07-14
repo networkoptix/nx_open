@@ -39,7 +39,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
 
-#include <openal/qtvaudiodevice.h>
+#include <nx/audio/audiodevice.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_handler.h>
@@ -91,7 +91,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
         return kSuccessCode;
 
     /* Initialize sound. */
-    QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());
+    nx::audio::AudioDevice::instance()->setVolume(qnSettings->audioVolume());
 
     QnHelpHandler helpHandler;
     qApp->installEventFilter(&helpHandler);
@@ -149,7 +149,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     int result = application->exec();
 
     /* Write out settings. */
-    qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
+    qnSettings->setAudioVolume(nx::audio::AudioDevice::instance()->volume());
     qnSettings->save();
 
     return result;

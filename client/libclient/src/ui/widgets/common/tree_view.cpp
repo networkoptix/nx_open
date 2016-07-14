@@ -89,7 +89,7 @@ QSize QnTreeView::viewportSizeHint() const
     /*
      * Fix for Qt 5.6 bug: viewportSizeHint() returns size hint for visible area only.
      */
-#if QT_VERSION != 0x050600
+#if QT_VERSION != 0x050600 && QT_VERSION != 0x050601
 #error Check if this workaround is required in current Qt version
 #endif
     return base_type::viewportSizeHint() + QSize(horizontalOffset(), verticalOffset());

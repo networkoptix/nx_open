@@ -23,9 +23,10 @@ struct ListeningPeer
 {
     QString id;
     QString endpoint;
+    std::vector<QString> forwardedEndpoints;
 };
 
-#define ListeningPeer_Fields (id)(endpoint)
+#define ListeningPeer_Fields (id)(endpoint)(forwardedEndpoints)
 
 
 struct ListeningPeerList

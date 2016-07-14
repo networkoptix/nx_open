@@ -123,6 +123,8 @@ namespace detail
     {
         switch( tran.command )
         {
+        case ApiCommand::removeServerUserAttributes:
+            return notificationParams.mediaServerNotificationManager->triggerNotification(tran);
         case ApiCommand::removeResource:
             return notificationParams.resourceNotificationManager->triggerNotification( tran );
         case ApiCommand::removeCamera:
@@ -159,6 +161,11 @@ namespace detail
     QnUuid createHashForApiCameraAttributesDataHelper(const ApiCameraAttributesData &params)
     {
         return QnTransactionLog::makeHash(params.cameraID.toRfc4122(), "camera_attributes");
+    }
+
+    QnUuid createHashForApiAccessRightsDataHelper(const ApiAccessRightsData& params)
+    {
+        return QnTransactionLog::makeHash(params.userId.toRfc4122(), "access_rights");
     }
 
     QnUuid createHashForApiLicenseDataHelper(const ApiLicenseData &params)

@@ -436,8 +436,12 @@ public:
         const QString& foreignAddress,
         unsigned short foreignPort,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) = 0;
+
     //!Do SSL handshake and use encryption on succeeding data exchange
     virtual bool enableClientEncryption() = 0;
+
+    //!Has handshake has been initiated
+    virtual bool isEncryptionEnabled() const = 0;
 };
 
 //!Interface for server socket, accepting stream connections

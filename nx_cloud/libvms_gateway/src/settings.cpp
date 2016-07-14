@@ -63,6 +63,12 @@ namespace
     const QLatin1String kHttpAllowTargetEndpointInUrl("http/allowTargetEndpointInUrl");
     const QLatin1String kDefaultHttpAllowTargetEndpointInUrl("false");
 
+    const QLatin1String kHttpSslSupport("http/sslSupport");
+    const QLatin1String kDefaultHttpSslSupport("false");
+
+    const QLatin1String kHttpSslCertPath("http/sslCertPath");
+    const QLatin1String kDefaultHttpSslCertPath("");
+
     //cloudConnect
     const QLatin1String kReplaceHostAddressWithPublicAddress("cloudConnect/replaceHostAddressWithPublicAddress");
     const QLatin1String kDefaultReplaceHostAddressWithPublicAddress("true");
@@ -84,7 +90,8 @@ Http::Http()
 :
     proxyTargetPort(0),
     connectSupport(false),
-    allowTargetEndpointInUrl(false)
+    allowTargetEndpointInUrl(false),
+    sslSupport(true)
 {
 }
 
@@ -233,6 +240,14 @@ void Settings::loadConfiguration()
         m_settings.value(
             kHttpAllowTargetEndpointInUrl,
             kDefaultHttpAllowTargetEndpointInUrl).toString() == "true";
+    m_http.sslSupport =
+        m_settings.value(
+            kHttpSslSupport,
+            kDefaultHttpSslSupport).toString() == "true";
+    m_http.sslCertPath =
+        m_settings.value(
+            kHttpSslCertPath,
+            kDefaultHttpSslCertPath).toString();
 
     //CloudConnect
     m_cloudConnect.replaceHostAddressWithPublicAddress =

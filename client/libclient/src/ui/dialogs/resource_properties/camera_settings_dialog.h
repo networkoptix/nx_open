@@ -31,6 +31,7 @@ public:
 
 protected:
     virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
+    virtual void retranslateUi() override;
 
 private slots:
     void at_settingsWidget_hasChangesChanged();
@@ -39,6 +40,7 @@ private slots:
     void at_diagnoseButton_clicked();
     void at_rulesButton_clicked();
     void at_openButton_clicked();
+
 private:
     void updateReadOnly();
 
@@ -49,10 +51,9 @@ private:
      * \see Feature #1195
      */
     void submitToResources(bool checkControls = false);
-    
+
     void saveCameras(const QnVirtualCameraResourceList &cameras);
 
-    void retranslateUi();
 private:
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;

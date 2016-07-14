@@ -258,9 +258,16 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
             {
                 return false;
             }
+
             appServerUrl.setUserName(startupParams.videoWallGuid.toString());
         }
-        menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
+        auto params = QnActionParameters().withArgument(Qn::UrlRole, appServerUrl);
+        if (qnSettings->autoLogin())
+        {
+            params.setArgument(Qn::AutoLoginRole, true);
+            params.setArgument(Qn::StorePasswordRole, true);
+        }
+        menu()->trigger(QnActions::ConnectAction, params);
     }
 
     if (!startupParams.videoWallGuid.isNull())

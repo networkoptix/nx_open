@@ -34,6 +34,7 @@ QN_DECLARE_METAOBJECT_HEADER(QnServer, ChunksCatalog, )
             (static_cast<int>(lhs) & static_cast<int>(rhs));
     }
 
+    static const QByteArray kRemoveDbParamName = "removeDbOnStartup";
+
 } // namespace QnServer
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (QnServer::ChunksCatalog), (metatype)(lexical) )
-

@@ -8,6 +8,8 @@ struct FlagConfig: public nx::utils::FlagConfig
 {
     using nx::utils::FlagConfig::FlagConfig;
 
+    NX_FLAG(0, forceLiteMode, "Launch mobile_client in lite_mode, regardless of the platform.");
+
     NX_FLAG(0, enableLog, "Enable mobile_client logging to temp path (DEBUG2 level).");
 
     NX_FLAG(0, enableEc2TranLog, "Enable ec2_tran logging to temp path (DEBUG2 level).");

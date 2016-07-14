@@ -64,6 +64,5 @@ QString QnModuleInformation::nxClientId() {
     return ::nxClientId;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformation, (ubjson)(xml)(json)(eq), QnModuleInformation_Fields, (optional, true))
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformationWithAddresses, (ubjson)(xml)(json)(eq), QnModuleInformationWithAddresses_Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnModuleInformation)(QnModuleInformationWithAddresses), (ubjson)(xml)(json)(eq), _Fields)

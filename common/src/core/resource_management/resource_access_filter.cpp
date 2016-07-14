@@ -9,14 +9,14 @@
 
 QList<QnResourceAccessFilter::Filter> QnResourceAccessFilter::allFilters()
 {
-    return QList<Filter>() << CamerasFilter << LayoutsFilter;
+    return QList<Filter>() << MediaFilter << LayoutsFilter;
 }
 
 QnResourceList QnResourceAccessFilter::filteredResources(Filter filter, const QnResourceList& source)
 {
     switch (filter)
     {
-    case QnResourceAccessFilter::CamerasFilter:
+    case QnResourceAccessFilter::MediaFilter:
         return source.filtered<QnResource>([](const QnResourcePtr& resource)
         {
             if (resource->hasFlags(Qn::desktop_camera))

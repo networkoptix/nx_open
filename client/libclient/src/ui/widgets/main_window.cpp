@@ -402,6 +402,7 @@ void QnMainWindow::updateWidgetsVisibility()
     // Always show title bar for welcome screen (it does not matter if it is fullscreen)
 
     m_titleBar->setVisible(isTitleVisible());
+    m_titleBar->setTabBarStuffVisible(!isWelcomeScreenVisible());
     updateWelcomeScreenVisibility(isWelcomeScreenVisible());
     updateDwmState();
 }

@@ -1,9 +1,6 @@
-#include <gtest/gtest.h>
+#include <nx/utils/test_support/run_test.h>
 
 int main(int argc, char **argv)
 {
-    ::testing::InitGoogleTest(&argc, argv);
-
-    const int result = RUN_ALL_TESTS();
-    return result;
+    return nx::utils::runTest(argc, argv);
 }

@@ -41,12 +41,6 @@ protected:
 class StunClientServerTest: public ::testing::Test
 {
 protected:
-    static quint16 newPort()
-    {
-        static quint16 port = 3345;
-        return ++port; // to avoid possible address overlap
-    }
-
     static AbstractAsyncClient::Settings defaultSettings()
     {
         AbstractAsyncClient::Settings settings;

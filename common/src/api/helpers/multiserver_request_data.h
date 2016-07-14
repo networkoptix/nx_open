@@ -7,11 +7,14 @@
 struct QnMultiserverRequestData
 {
     template <typename T>
-    static T fromParams(const QnRequestParamList& params) {
+    static T fromParams(const QnRequestParamList& params)
+    {
         T request;
         request.loadFromParams(params);
         return request;
     }
+
+    explicit QnMultiserverRequestData(const QnRequestParamList& params);
 
     virtual void loadFromParams(const QnRequestParamList& params);
     virtual QnRequestParamList toParams() const;
@@ -28,5 +31,5 @@ struct QnMultiserverRequestData
 protected:
     /* Avoid creating invalid instances when making local requests. */
     QnMultiserverRequestData();
-    QnMultiserverRequestData(const QnMultiserverRequestData &src) /* = default //TODO: #GDM default is supported in vs2015 */;
+    QnMultiserverRequestData(const QnMultiserverRequestData &src);
 };

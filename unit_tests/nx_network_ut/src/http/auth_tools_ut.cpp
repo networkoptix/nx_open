@@ -59,16 +59,22 @@ void testCalcDigestResponse(
 
 TEST(HttpAuthDigest, calcDigestResponse)
 {
-    for (const StringType& method: {"GET", "POST"})
-    for (const StringType& user: {"user", "admin"})
-    for (const boost::optional<StringType>& password: {
-         boost::optional<StringType>(), boost::optional<StringType>("admin")})
-    for (const StringType& algorithm: {"", "MD5", "SHA-256"})
+    for (const StringType& method: {"GET", "POST", "PUT"})
     {
-        NX_LOGX(lm("Test method='%1', user='%2, password='%3, algorithm='%4'")
-            .args(method, user, password, algorithm), cl_logDEBUG1);
+        for (const StringType& user: {"user", "admin"})
+        {
+            typedef boost::optional<StringType> OptionalStr;
+            for (const OptionalStr& password: {OptionalStr(), OptionalStr("admin")})
+            {
+                for (const StringType& algorithm: {"", "MD5", "SHA-256"})
+                {
+                    NX_LOGX(lm("Test method='%1', user='%2', password='%3', algorithm='%4'")
+                        .args(method, user, password, algorithm), cl_logDEBUG1);
 
-        testCalcDigestResponse(method, user, password, boost::none, algorithm);
+                    testCalcDigestResponse(method, user, password, boost::none, algorithm);
+                }
+            }
+        }
     }
 }
 

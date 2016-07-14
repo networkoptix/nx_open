@@ -911,7 +911,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::OpenBookmarksSearchAction).
         flags(Qn::Main | Qn::GlobalHotkey).
-        requiredGlobalPermission(Qn::GlobalViewArchivePermission).
+        requiredGlobalPermission(Qn::GlobalViewBookmarksPermission).
         text(tr("Bookmark Search...")).
         shortcut(lit("Ctrl+B")).
         autoRepeat(false);
@@ -1720,6 +1720,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::AddCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Add Bookmark...")).
+        requiredGlobalPermission(Qn::GlobalManageBookmarksPermission).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnAddBookmarkActionCondition(this),
@@ -1728,7 +1729,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::EditCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Edit Bookmark...")).
-        requiredGlobalPermission(Qn::GlobalEditCamerasPermission).
+        requiredGlobalPermission(Qn::GlobalManageBookmarksPermission).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnModifyBookmarkActionCondition(this),
@@ -1737,7 +1738,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::RemoveCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Remove Bookmark...")).
-        requiredGlobalPermission(Qn::GlobalEditCamerasPermission).
+        requiredGlobalPermission(Qn::GlobalManageBookmarksPermission).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnModifyBookmarkActionCondition(this),
@@ -1746,7 +1747,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::RemoveBookmarksAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Remove Bookmarks...")).
-        requiredGlobalPermission(Qn::GlobalEditCamerasPermission).
+        requiredGlobalPermission(Qn::GlobalManageBookmarksPermission).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnRemoveBookmarksActionCondition(this),
@@ -1880,6 +1881,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::BookmarksModeAction).
         flags(Qn::NoTarget).
         text(tr("Show Bookmarks")).
+        requiredGlobalPermission(Qn::GlobalViewBookmarksPermission).
         toggledText(tr("Hide Bookmarks"));
 
     factory(QnActions::ToggleCalendarAction).

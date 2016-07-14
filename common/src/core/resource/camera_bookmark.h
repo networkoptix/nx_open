@@ -35,7 +35,7 @@ struct QnBookmarkSparsingOptions
 
     static const QnBookmarkSparsingOptions kNosparsing;
 };
-#define QnBookmarkSparsingOptions_Fileds (used)(minVisibleLengthMs)
+#define QnBookmarkSparsingOptions_Fields (used)(minVisibleLengthMs)
 
 /**
  * @brief The QnCameraBookmark struct               Bookmarked part of the camera archive.
@@ -163,11 +163,12 @@ Q_DECLARE_METATYPE(QnCameraBookmarkList)
 Q_DECLARE_METATYPE(QnCameraBookmarkTags)
 Q_DECLARE_METATYPE(QnCameraBookmarkTagList)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSortOrder, (json)(metatype)(eq))
-QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSparsingOptions, (json)(metatype)(eq))
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (QnBookmarkSortOrder)(QnBookmarkSparsingOptions)(QnCameraBookmarkSearchFilter),
+    (json)(metatype)(eq))
 
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark,    (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkTag, (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (QnCameraBookmark)(QnCameraBookmarkTag),
+    (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
 
 #endif //QN_CAMERA_BOOKMARK_H

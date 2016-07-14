@@ -31,6 +31,23 @@ TEST(aioTimer, modify_timeout)
     }
 }
 
+TEST(aioTimer, cancellation)
+{
+    const auto timeout = std::chrono::seconds(2);
+
+    nx::utils::promise<void> timedoutPromise;
+    auto timeoutHandler = [&timedoutPromise] { timedoutPromise.set_value(); };
+
+    aio::Timer timer;
+    timer.start(timeout, timeoutHandler);
+    timer.post([&timer]{ timer.cancelSync(); });
+
+    ASSERT_EQ(
+        std::future_status::timeout,
+        timedoutPromise.get_future().wait_for(timeout*2));
+    timer.pleaseStopSync();
+}
+
 }   //aio
 }   //network
 }   //nx

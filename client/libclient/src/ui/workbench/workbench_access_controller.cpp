@@ -176,6 +176,11 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
         return permissions &~ (Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission);
     };
 
+    /* Some layouts are created with predefined permissions. */
+    QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
+    if (permissions.isValid() && permissions.canConvert<int>())
+        return checkReadOnly(static_cast<Qn::Permissions>(permissions.toInt())); // TODO: #Elric listen to changes
+
     if (layout->isFile())
         return checkLocked(Qn::ReadWriteSavePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission);
 
@@ -190,10 +195,6 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
      */
     if (!m_user)
         return Qn::NoPermissions;
-
-    QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
-    if (permissions.isValid() && permissions.canConvert<int>())
-        return checkReadOnly(static_cast<Qn::Permissions>(permissions.toInt())); // TODO: #Elric listen to changes
 
     return qnResourceAccessManager->permissions(m_user, layout);
 }
@@ -237,8 +238,13 @@ void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr& re
 void QnWorkbenchAccessController::recalculateAllPermissions()
 {
     m_user = context()->user();
-    m_globalPermissions = calculateGlobalPermissions();
+    auto newGlobalPermissions = calculateGlobalPermissions();
+    bool changed = newGlobalPermissions != m_globalPermissions;
+    m_globalPermissions = newGlobalPermissions;
     m_readOnlyMode = qnCommon->isReadOnly();
+
+    if (changed)
+        emit globalPermissionsChanged();
 
     for (const QnResourcePtr& resource: qnResPool->getResources())
         updatePermissions(resource);

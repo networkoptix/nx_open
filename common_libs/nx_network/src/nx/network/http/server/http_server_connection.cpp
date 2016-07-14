@@ -33,16 +33,12 @@ namespace nx_http
     void HttpServerConnection::pleaseStop(
         nx::utils::MoveOnlyFunc<void()> completionHandler)
     {
-        auto finalize = [this, completionHandler = std::move(completionHandler)]()
-        {
-            m_currentMsgBody.reset(); // we are in aio thread, so this is ok
-            completionHandler();
-        };
-
-        if (socket())
-            BaseType::pleaseStop(std::move(finalize));
-        else
-            finalize();
+        BaseType::pleaseStop(
+            [this, completionHandler = std::move(completionHandler)]()
+            {
+                m_currentMsgBody.reset(); // we are in aio thread, so this is ok
+                completionHandler();
+            });
     }
 
     void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )

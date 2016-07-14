@@ -216,7 +216,6 @@ QList<SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
     for (const QUrl &url : getIgnoredUrls())
         ignored.insert(toAddress(url));
 
-    const auto port = getPort();
     for (const auto& address : getNetAddrList())
     {
         if (ignored.contains(address))

@@ -120,9 +120,8 @@ void QnUserSettingsWidget::loadDataToUi()
     updateRoleComboBox();
     updateControlsAccess();
 
-    ui->passwordInputField->setEmptyInputAllowed(
-        m_model->mode() != QnUserSettingsModel::NewUser,
-        ui->passwordInputField->emptyInputHint());
+    ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(
+        m_model->mode() != QnUserSettingsModel::NewUser));
 
     ui->loginInputField->setText(m_model->user()->getName());
     ui->emailInputField->setText(m_model->user()->getEmail());
@@ -191,9 +190,11 @@ bool QnUserSettingsWidget::canApplyChanges() const
 void QnUserSettingsWidget::setupInputFields()
 {
     ui->loginInputField->setTitle(tr("Login"));
-    ui->loginInputField->setEmptyInputAllowed(false, tr("Login cannot be empty."));
     ui->loginInputField->setValidator([this](const QString& text)
     {
+        if (text.trimmed().isEmpty())
+            return Qn::ValidationResult(tr("Login cannot be empty."));
+
         for (const QnUserResourcePtr& user : qnResPool->getResources<QnUserResource>())
         {
             if (user == m_model->user())
@@ -205,11 +206,19 @@ void QnUserSettingsWidget::setupInputFields()
             return Qn::ValidationResult(tr("User with specified login already exists."));
         }
 
-        /* Check if we must update password for the other user. */
-        if (m_model->mode() == QnUserSettingsModel::OtherSettings)
-            ui->passwordInputField->validate();
-
         return Qn::kValidResult;
+    });
+
+    connect(ui->loginInputField, &QnInputField::editingFinished, this, [this]()
+    {
+        /* Check if we must update password for the other user. */
+        if (m_model->mode() == QnUserSettingsModel::OtherSettings && m_model->user())
+        {
+            bool mustUpdatePassword = ui->loginInputField->text() != m_model->user()->getName();
+
+            ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(
+                !mustUpdatePassword, tr("User has been renamed. Password must be updated.")), true);
+        }
     });
 
     ui->nameInputField->setTitle(tr("Name"));
@@ -218,26 +227,23 @@ void QnUserSettingsWidget::setupInputFields()
     ui->emailInputField->setValidator(Qn::defaultEmailValidator());
 
     ui->passwordInputField->setTitle(tr("Password"));
-    ui->passwordInputField->setPasswordMode(QLineEdit::Password, true, true);
-    ui->passwordInputField->setValidator([this](const QString& text)
-    {
-        /* Show warning message if admin has renamed an existing user and has not entered new password. */
-        if (m_model->mode() == QnUserSettingsModel::OtherSettings &&
-            ui->loginInputField->text() != m_model->user()->getName() &&
-            text.isEmpty())
-        {
-            return Qn::ValidationResult(tr("User has been renamed. Password must be updated."));
-        }
+    ui->passwordInputField->setEchoMode(QLineEdit::Password);
+    ui->passwordInputField->setPasswordIndicatorEnabled(true);
 
-        /* Further validation will be done by password strength indicator. */
-        return Qn::kValidResult;
+    connect(ui->passwordInputField, &QnInputField::textChanged, this, [this]()
+    {
+        if (!ui->confirmPasswordInputField->text().isEmpty())
+        ui->confirmPasswordInputField->validate();
     });
+
+    connect(ui->passwordInputField, &QnInputField::editingFinished,
+        ui->confirmPasswordInputField, &QnInputField::validate);
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
-
-    //TODO: #vkutin really not sure this logic must be implemented inside the generic class
-    ui->confirmPasswordInputField->setConfirmationMode(ui->passwordInputField, tr("Passwords do not match."));
+    ui->confirmPasswordInputField->setValidator(Qn::defaultConfirmationValidator(
+        [this]() { return ui->passwordInputField->text(); },
+        tr("Passwords do not match.")));
 
     for (auto field : inputFields())
         connect(field, &QnInputField::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);

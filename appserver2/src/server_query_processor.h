@@ -19,6 +19,8 @@
 #include "transaction/transaction_log.h"
 #include "transaction/transaction_message_bus.h"
 #include <transaction/binary_transaction_serializer.h>
+#include <api/app_server_connection.h>
+#include <ec_connection_notification_manager.h>
 #include "api/model/audit/auth_session.h"
 
 
@@ -286,85 +288,85 @@ private:
             std::bind( &ServerQueryProcessor::removeResourceSync, this, _1, resourceType, _2 ) );
     }
 
+    ErrorCode removeObjAttrHelper(
+        const QnUuid& id,
+        ApiCommand::Value command,
+        const AbstractECConnectionPtr& connection,
+        std::list<std::function<void()>>* const transactionsToSend);
+
+    ErrorCode removeObjParamsHelper(
+        const QnTransaction<ApiIdData>& tran,
+        const AbstractECConnectionPtr& connection,
+        std::list<std::function<void()>>* const transactionsToSend);
+
     ErrorCode removeResourceSync(
         QnTransaction<ApiIdData>& tran,
         ApiObjectType resourceType,
         std::list<std::function<void()>>* const transactionsToSend )
     {
         ErrorCode errorCode = ErrorCode::ok;
-        
+        auto connection = QnAppServerConnectionFactory::getConnection2();
+
+#define runAndCheckError(expr, message) \
+    do \
+    { \
+        ErrorCode errorCode = (expr); \
+        if (errorCode != ErrorCode::ok) \
+        { \
+            NX_LOG((message), cl_logWARNING); \
+            return errorCode; \
+        } \
+    } while (0)
+
         switch (resourceType)
         {
         case ApiObject_Camera:
         {
-            QnTransaction<ApiIdData> removeCameraAttrTran(
-                ApiCommand::removeCameraUserAttributes, 
-                ApiIdData(tran.params.id));
+            runAndCheckError(
+                removeObjAttrHelper(
+                    tran.params.id,
+                    ApiCommand::removeCameraUserAttributes, 
+                    connection,
+                    transactionsToSend),
+                lit("Remove camera attributes failed"));
 
-            errorCode = processUpdateSync(removeCameraAttrTran, transactionsToSend, 0);
-            if (errorCode != ErrorCode::ok)
-                return errorCode;
-            
-            ApiResourceParamWithRefDataList resourceParams;
-            dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
-
-            errorCode = processMultiUpdateSync(
-                ApiCommand::removeResourceParam,
-                tran.isLocal,
-                tran.deliveryInfo,
-                resourceParams,
-                transactionsToSend);
-
+            runAndCheckError(
+                removeObjParamsHelper(tran, connection, transactionsToSend),
+                lit("Remove camera params failed"));
             break;
         }
         case ApiObject_Server:
         {
-            QnTransaction<ApiIdData> removeServerAttrTran(
-                ApiCommand::removeServerUserAttributes, 
-                ApiIdData(tran.params.id));
-
-            errorCode = processUpdateSync(removeServerAttrTran, transactionsToSend, 0);
-            if (errorCode != ErrorCode::ok)
-                return errorCode;
+            runAndCheckError(
+                removeObjAttrHelper(
+                    tran.params.id,
+                    ApiCommand::removeServerUserAttributes, 
+                    connection,
+                    transactionsToSend),
+                lit("Remove server attrs failed"));
             
-            ApiResourceParamWithRefDataList resourceParams;
-            dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
+            runAndCheckError(
+                removeObjParamsHelper(tran, connection, transactionsToSend),
+                lit("Remove server params failed"));
 
-            errorCode = processMultiUpdateSync(
-                ApiCommand::removeResourceParam,
-                tran.isLocal,
-                tran.deliveryInfo,
-                resourceParams,
-                transactionsToSend);
-
-            errorCode = processMultiUpdateSync(
-                ApiCommand::removeResource,
-                tran.isLocal,
-                tran.deliveryInfo,
-                dbManager(m_userAccessData).getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id)).toIdList(),
-                transactionsToSend);
+            runAndCheckError(
+                processMultiUpdateSync(
+                    ApiCommand::removeResource,
+                    tran.isLocal,
+                    tran.deliveryInfo,
+                    dbManager(m_userAccessData)
+                        .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
+                        .toIdList(),
+                    transactionsToSend),
+                lit("Remove server child resources failed"));
 
             break;
         }
         case ApiObject_User: 
         {
-            ApiResourceParamWithRefDataList resourceParams;
-            dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
-
-            errorCode = processMultiUpdateSync(
-                ApiCommand::removeResourceParam,
-                tran.isLocal,
-                tran.deliveryInfo,
-                resourceParams,
-                transactionsToSend);
-
-            errorCode = processMultiUpdateSync(
-                ApiCommand::removeResource,
-                tran.isLocal,
-                tran.deliveryInfo,
-                dbManager(m_userAccessData).getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id)).toIdList(),
-                transactionsToSend);
-
+            runAndCheckError(
+                removeObjParamsHelper(tran, connection, transactionsToSend),
+                lit("Remove user params failed"));
             break;
         }
         default:
@@ -372,6 +374,8 @@ private:
         }
         if( errorCode != ErrorCode::ok )
             return errorCode;
+
+#undef runAndCheckError
 
         return processUpdateSync( tran, transactionsToSend, 0 );
     }
@@ -412,6 +416,10 @@ private:
         NX_ASSERT(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
         if (errorCode != ErrorCode::ok)
             return errorCode;
+
+        QnAppServerConnectionFactory::getConnection2()
+            ->notificationManager()
+            ->triggerNotification(tran);
 
         transactionsToSend->push_back( std::bind(SendTransactionFunction(), tran ) );
 

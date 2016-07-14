@@ -36,8 +36,7 @@ struct SetupRemoveSystemData : public CloudCredentialsData
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SetupRemoveSystemData),
     (json),
-    _Fields,
-    (optional, true));
+    _Fields)
 
 int QnSetupCloudSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
