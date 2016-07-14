@@ -47,7 +47,7 @@ angular.module('webadminApp')
             //1. confirm detach
             var confirmation = 'Do you want to clear database and settings?';
             dialogs.confirmWithPassword(null, confirmation, 'Restore factory defaults').then(function(oldPassword){
-                mediaserver.detachFromSystem(oldPassword).then(function(data){
+                mediaserver.restoreFactoryDefaults(oldPassword).then(function(data){
                     if(data.data.error !== '0' && data.data.error !== 0){
                         // Some Error has happened
                         dialogs.alert(data.data.errorString);

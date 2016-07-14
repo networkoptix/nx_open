@@ -251,8 +251,8 @@ angular.module('webadminApp')
                 return deferred.promise;
             },
 
-            detachFromSystem:function(oldPassword){
-                return wrapPost(proxy + '/web/api/detachFromSystem',{
+            restoreFactoryDefaults:function(oldPassword){
+                return wrapPost(proxy + '/web/api/restoreState',{
                     oldPassword:oldPassword
                 });
             },
