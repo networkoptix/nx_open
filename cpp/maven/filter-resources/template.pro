@@ -6,10 +6,9 @@ LIBTYPE = ${libtype}
 TEMPLATE = ${template}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
-unix {
-    VERSION = ${linux.release.version}
-}
 QT = ${qt.libs}
+
+CONFIG += unversioned_soname unversioned_libname
 
 ## GLOBAL CONFIGURATIONS
 !ios|equals(TEMPLATE, app) {
