@@ -51,8 +51,8 @@ class WriteBufferMultiplierManager : public QObject
     friend bool operator < (const Key& lhs, const Key& rhs)
     {
         return lhs.resourceId < rhs.resourceId ? 
-            true : 
-            lhs.catalog < rhs.catalog;
+            true : lhs.resourceId > rhs.resourceId ? 
+				   false : lhs.catalog < rhs.catalog;
     }
     typedef std::map<Key, int> RecToSizeType;
     typedef std::map<uintptr_t, Key> FileToRecType;
