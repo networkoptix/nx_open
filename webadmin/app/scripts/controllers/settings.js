@@ -47,7 +47,7 @@ angular.module('webadminApp')
             //1. confirm detach
             var confirmation = 'Do you want to clear database and settings?';
             dialogs.confirmWithPassword(null, confirmation, 'Restore factory defaults').then(function(oldPassword){
-                mediaserver.detachFromSystem(oldPassword).then(function(data){
+                mediaserver.restoreFactoryDefaults(oldPassword).then(function(data){
                     if(data.data.error !== '0' && data.data.error !== 0){
                         // Some Error has happened
                         dialogs.alert(data.data.errorString);
@@ -130,8 +130,18 @@ angular.module('webadminApp')
                 $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
                 $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;
                 $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;
+                $scope.canRunClient = data.data.reply.indexOf('lite_client') >= 0;
+                $scope.canStopClient = data.data.reply.indexOf('stop_lite_client') >= 0;
             }
         });
+
+        $scope.runClient = function(){
+            mediaserver.execute('lite_client').then(resultHandler, errorHandler);
+        };
+
+        $scope.stopClient = function(){
+            mediaserver.execute('stop_lite_client').then(resultHandler, errorHandler);
+        };
 
         $scope.renameSystem = function(){
             mediaserver.changeSystemName($scope.settings.systemName).then(resultHandler, errorHandler);

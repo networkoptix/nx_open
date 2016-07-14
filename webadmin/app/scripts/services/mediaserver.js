@@ -176,27 +176,28 @@ angular.module('webadminApp')
                 return proxy !=='';
             },
             getUser:function(reload){
-                var deferred = $q.defer();
                 if(this.hasProxy()){ // Proxy means read-only
+                    var deferred = $q.defer();
                     deferred.resolve(false);
+                    return deferred.promise;
                 }
-                this.getCurrentUser(reload).then(function(result){
+
+                return this.getCurrentUser(reload).then(function(result){
                     /*jshint bitwise: false*/
-                    var hasEditServerPermission = result.data.reply.permissions & Config.globalEditServersPermissions;
+                    var hasEditServerPermission = result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0;
                     /*jshint bitwise: true*/
                     var isAdmin = result.data.reply.isAdmin || hasEditServerPermission;
 
                     var isOwner = result.data.reply.isAdmin ;
 
-                    deferred.resolve({
+                    return {
                         isAdmin:isAdmin,
                         isOwner:isOwner,
                         name:result.data.reply.name
-                    });
+                    };
                 },function(error){
                     deferred.reject(error);
                 });
-                return deferred.promise;
             },
             getScripts:function(){
                 return $http.get('/web/api/scriptList');
@@ -250,8 +251,8 @@ angular.module('webadminApp')
                 return deferred.promise;
             },
 
-            detachFromSystem:function(oldPassword){
-                return wrapPost(proxy + '/web/api/detachFromSystem',{
+            restoreFactoryDefaults:function(oldPassword){
+                return wrapPost(proxy + '/web/api/restoreState',{
                     oldPassword:oldPassword
                 });
             },
@@ -444,8 +445,8 @@ angular.module('webadminApp')
                         deferred.resolve(null);
                         return;
                     }
-                    self.getCurrentUser().then(function(data){
-                        deferred.resolve(data.data.reply);
+                    self.getUser().then(function(user){
+                        deferred.resolve(user);
                     },function(error){
                         deferred.reject(error);
                     });
