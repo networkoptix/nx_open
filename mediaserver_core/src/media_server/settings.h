@@ -54,7 +54,7 @@ namespace nx_ms_conf
         This required to minimize seeks on disk, since ffmpeg sometimes seeks to the left from current file position to fill in some media file structure size
     */
     static const QLatin1String FFMPEG_BUFFER_SIZE( "ffmpegBufferSize" );
-    static const int DEFAULT_FFMPEG_BUFFER_SIZE = 4*1024*1024;
+    static const int DEFAULT_FFMPEG_BUFFER_SIZE = 1*1024*1024;
 
     //!If no one uses HLS for thid time period (in seconds), than live media cache is stopped and cleaned. It will be restarted with next HLS request
     static const QLatin1String HLS_INACTIVITY_PERIOD( "hlsInactivityPeriod" );
