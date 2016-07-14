@@ -1,4 +1,3 @@
-TEMPLATE = lib
 TARGET = client_core
 
 INCLUDEPATH +=  ${root.dir}/appserver2/src \
