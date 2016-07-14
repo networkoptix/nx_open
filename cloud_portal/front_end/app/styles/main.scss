@@ -395,13 +395,18 @@ td{
   }
 
 }
-.jumbotron .promo-block{
 
-}
-
-.jumbotron a.large-link{
-    font-size: 32px;
-    text-decoration: underline;
+.error-page{
+    color:$dark10;
+    h1{
+        font-size:40px;
+    }
+    p{
+        font-size:24px;
+    }
+    a{
+        text-decoration: underline;
+    }
 }
 
 .cloud-icon img{
