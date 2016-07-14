@@ -15,7 +15,6 @@
 
 namespace
 {
-    const int kWeekSize = 7;
     const int kTextSpacing = 6;
 
     const qreal kMinimumLabelsFontSize = 10.0;
@@ -50,7 +49,7 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent) :
 
     QDate date(2010, 1, 1);
     date = date.addDays(1 - date.dayOfWeek());
-    for (int i = 0; i < kWeekSize; ++i)
+    for (int i = 0; i < kDaysPerWeek; ++i)
     {
         m_weekDays << date.toString(QLatin1String("ddd"));
         date = date.addDays(1);
@@ -297,7 +296,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
                 p.setBrush(colorInside);
                 p.setPen(m_colors.border);
                 p.drawLine(QPointF(cellSize, 0), QPointF(0, cellSize));
-                p.drawPolygon(points.data(), points.size());
+                p.drawPolygon(points.data(), static_cast<int>(points.size()));
             }
 
             // draw text parameters
