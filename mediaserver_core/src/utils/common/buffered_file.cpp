@@ -317,12 +317,14 @@ bool QBufferedFile::updatePos()
         int fileBlockSize = m_cycleBuffer.maxSize() - m_minBufferSize;
         int curPow = std::log(m_minBufferSize / 1024) / std::log(2);
         int newBufSize = (1 << (curPow + 1)) * 1024;
+#if 0
         qWarning()
             << "File" << (uintptr_t)this
             << "Min buf size = " << m_minBufferSize << "."
             << "Seek detected. Enlarging from " << m_cycleBuffer.maxSize()
             << " to " << fileBlockSize + newBufSize
             << ". Delta = " << newBufSize - m_minBufferSize;
+#endif
         if (newBufSize < kMaxBufferSize)
         {
             m_minBufferSize = newBufSize;
