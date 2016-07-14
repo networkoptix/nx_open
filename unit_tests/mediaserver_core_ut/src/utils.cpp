@@ -1,3 +1,7 @@
+// Needed for boost 1.60.0 seed_rng.hpp
+#undef NULL
+#define NULL (0)
+
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid.hpp>
