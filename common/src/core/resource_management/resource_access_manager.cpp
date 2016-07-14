@@ -40,11 +40,11 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         }
     };
 
-    auto handleResourceAdded = [this, invalidateCacheForLayoutItems] (const QnResourcePtr& resource)
+    auto handleResourceAdded = [this, invalidateCacheForLayoutItems](const QnResourcePtr& resource)
     {
         if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
         {
-            auto invalidateCacheForLayoutItem = [this](const QnLayoutResourcePtr &layout, const QnLayoutItemData &item)
+            auto invalidateCacheForLayoutItem = [this](const QnLayoutResourcePtr& layout, const QnLayoutItemData& item)
             {
                 Q_UNUSED(layout);
                 invalidateResourceCacheInternal(item.resource.id);
@@ -77,7 +77,9 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
 
     connect(qnResPool, &QnResourcePool::resourceAdded, this, handleResourceAdded);
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this, invalidateCacheForLayoutItems](const QnResourcePtr& resource)
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        [this, invalidateCacheForLayoutItems]
+    (const QnResourcePtr& resource)
     {
         disconnect(resource, nullptr, this, nullptr);
         invalidateResourceCache(resource);
@@ -695,7 +697,6 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
     /* Here we are checking if the camera exists on one of the shared layouts, available to given user. */
     if (isMediaResource)
     {
-
         QnLayoutResourceList layouts = qnResPool->getResources(accessible).filtered<QnLayoutResource>();
         for (const QnLayoutResourcePtr& layout : layouts)
         {
@@ -703,8 +704,10 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
                 continue;
 
             for (const auto& item : layout->getItems())
+            {
                 if (item.resource.id == resourceId)
                     return true;
+            }
         }
 
     }
