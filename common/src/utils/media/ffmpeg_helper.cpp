@@ -164,6 +164,7 @@ static AVCodecContext* deserializeCodecContextFromDepricatedFormat(const char* d
 {
     static const char* const kError = "ERROR deserializing MediaContext 2.5:";
     AVCodec* codec = nullptr;
+    AVCodecContext* ctx = nullptr;
 
     QByteArray tmpArray(data, dataLen);
     QBuffer buffer(&tmpArray);
@@ -182,7 +183,7 @@ static AVCodecContext* deserializeCodecContextFromDepricatedFormat(const char* d
         qWarning() << kError << "Codec not found:" << codecId;
         goto error;
     }
-    AVCodecContext* ctx = avcodec_alloc_context3(codec);
+    ctx = avcodec_alloc_context3(codec);
 
     char objectType;
 
