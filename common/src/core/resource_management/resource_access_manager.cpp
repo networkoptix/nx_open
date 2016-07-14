@@ -716,12 +716,16 @@ bool QnResourceAccessManager::canCreateStorage(const QnUserResourcePtr& user, co
 {
     if (!user || qnCommon->isReadOnly())
         return false;
+
     auto server = qnResPool->getResourceById<QnMediaServerResource>(storageParentId);
     return hasPermission(user, server, Qn::SavePermission);
 }
 
 bool QnResourceAccessManager::canCreateLayout(const QnUserResourcePtr& user, const QnUuid& layoutParentId) const
 {
+    if (!user || qnCommon->isReadOnly())
+        return false;
+
     /* Everybody can create own layouts. */
     if (layoutParentId == user->getId())
         return true;
@@ -740,6 +744,9 @@ bool QnResourceAccessManager::canCreateLayout(const QnUserResourcePtr& user, con
 
 bool QnResourceAccessManager::canCreateUser(const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions, bool isOwner) const
 {
+    if (!user || qnCommon->isReadOnly())
+        return false;
+
     /* Nobody can create owners. */
     if (isOwner)
         return false;
@@ -754,12 +761,18 @@ bool QnResourceAccessManager::canCreateUser(const QnUserResourcePtr& user, Qn::G
 
 bool QnResourceAccessManager::canCreateVideoWall(const QnUserResourcePtr& user) const
 {
+    if (!user || qnCommon->isReadOnly())
+        return false;
+
     /* Only admins can create new videowalls (and attach new screens). */
     return hasGlobalPermission(user, Qn::GlobalAdminPermission);
 }
 
 bool QnResourceAccessManager::canCreateWebPage(const QnUserResourcePtr& user) const
 {
+    if (!user || qnCommon->isReadOnly())
+        return false;
+
     /* Only admins can add new web pages. */
     return hasGlobalPermission(user, Qn::GlobalAdminPermission);
 }
@@ -826,24 +839,25 @@ bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, c
 
 bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnResourcePtr& target, const ec2::ApiVideowallData& update) const
 {
+    if (!user || qnCommon->isReadOnly())
+        return false;
+
     auto videoWallResource = target.dynamicCast<QnVideoWallResource>();
     NX_ASSERT(videoWallResource);
 
-    auto hasItemsChange = [&videoWallResource, update]
+    auto hasItemsChange = [items = videoWallResource->items()->getItems(), update]
     {
-        auto items = videoWallResource->items()->getItems();
-
         /* Quick check */
         if (items.size() != update.items.size())
-            return false;
+            return true;
 
         for (auto updated : update.items)
         {
             if (!items.contains(updated.guid))
-                return false;
+                return true;
         }
 
-        return true;
+        return false;
     };
 
     /* Only admin can add and remove videowall items. */
