@@ -19,7 +19,7 @@
                         ng-options="option as option.label for option in accessRoles"></select>
 
                 <span class="help-block">
-                    {{L.accessRoles[user.accessRole].description}}
+                    {{getRoleDescription()}}
                 </span>
             </div>
         </div>

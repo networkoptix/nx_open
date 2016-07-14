@@ -87,21 +87,20 @@ angular.module('cloudApp')
             return system.saveUser($scope.user, $scope.user.role);
         }
 
+        $scope.getRoleDescription = function(){
+            if($scope.user.role.groupId){
+                return L.accessRoles.customRole.description;
+            }
+            if(L.accessRoles[$scope.user.role.accessRole]){
+                return L.accessRoles[$scope.user.role.accessRole].description;
+            }
+
+            return L.accessRoles.custom.description;
+        }
+
         $scope.sharing = process.init(function(){
-            if($scope.user.accessRole == Config.accessRoles.owner) {
-                var deferred = $q.defer();
-
-                dialogs.confirm(L.sharing.confirmOwner).then(
-                    function () {
-                        doShare().then(function (data) {
-                            deferred.resolve(data);
-                        }, function () {
-                            deferred.reject(data);
-                        });
-                    }
-                );
-
-                return deferred.promise;
+            if($scope.user.role.accessRole == Config.accessRoles.owner) {
+                return dialogs.confirm(L.sharing.confirmOwner).then(doShare);
             }else{
                 return doShare();
             }

@@ -40,7 +40,11 @@ var L = {
         custom:{
             label: 'Custom',
             description: 'Access to specified resources with specified rights'
-        }
+        },
+        customRole:{
+            label: 'Custom role',
+            description: 'Custom user role specified in the system'
+        },
     },
     errorCodes:{
         ok: 'ok',
