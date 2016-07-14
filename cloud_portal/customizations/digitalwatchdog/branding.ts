@@ -11,6 +11,10 @@
       <translation>DW Spectrum</translation>
     </message>
     <message>
+      <source>{{downloadLink}}</source>
+      <translation>http://digital-watchdog.com/dw_spec_landing/</translation>
+    </message>
+    <message>
       <source>{{supportLink}}</source>
       <translation>http://digital-watchdog.com/contact-tech-support/</translation>
     </message>

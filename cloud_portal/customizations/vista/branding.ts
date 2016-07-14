@@ -11,6 +11,10 @@
       <translation>Qulu</translation>
     </message>
     <message>
+      <source>{{downloadLink}}</source>
+      <translation>http://vista-cctv.com/product/qulu/</translation>
+    </message>
+    <message>
       <source>{{supportLink}}</source>
       <translation>http://vista-cctv.com/technical-support/contact/</translation>
     </message>

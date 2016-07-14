@@ -11,6 +11,10 @@
       <translation>Nx Witness</translation>
     </message>
     <message>
+      <source>{{downloadLink}}</source>
+      <translation>http://www.networkoptix.com/live-demo#fulltrial</translation>
+    </message>
+    <message>
       <source>{{supportLink}}</source>
       <translation>http://support.networkoptix.com</translation>
     </message>
