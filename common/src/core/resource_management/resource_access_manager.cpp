@@ -675,6 +675,10 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
 
     auto requiredPermission = [this, resource, isMediaResource]()
     {
+        /* Desktop cameras available only by videowall control permission. */
+        if (resource->hasFlags(Qn::desktop_camera))
+            return Qn::GlobalControlVideoWallPermission;
+
         if (isMediaResource)
             return Qn::GlobalAccessAllMediaPermission;
 
