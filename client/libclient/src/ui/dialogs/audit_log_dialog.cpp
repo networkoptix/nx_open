@@ -576,6 +576,8 @@ void QnAuditLogDialog::at_headerCheckStateChanged(Qt::CheckState state)
     case Qt::Unchecked:
         masterGrid->clearSelection();
         break;
+    default:
+        break;
     }
 }
 
@@ -583,7 +585,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 {
     QnResourceList resList;
     QnByteArrayConstRef archiveData = record->extractParam("archiveExist");
-    int i = 0;
+    size_t i = 0;
     for (const auto& id: record->resources)
     {
         bool archiveExist = archiveData.size() > i && archiveData[i] == '1';

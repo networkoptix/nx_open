@@ -7,6 +7,8 @@
 #endif
 
 namespace {
+
+#if defined(Q_OS_MAC)
     QStringList getExtensionsFromFilter(const QString &filter) {
         QRegExp filterRegExp(QLatin1String(".*\\((.*)\\).*"));
         QRegExp extensionRegExp(QLatin1String("\\*\\.(.*)"));
@@ -25,6 +27,8 @@ namespace {
 
         return extensions.toList();
     }
+#endif // defined(Q_OS_MAC)
+
 }
 
 QString QnFileDialog::getExistingDirectory(QWidget *parent,
