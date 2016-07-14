@@ -92,7 +92,13 @@
                 <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()">Restore Everything But Network</button>
             </div>
         </div>
-
+        <div class="row" ng-if="canRunClient || canStopClient">
+            <div class="col-sm-12">
+                <h3>Run client application on server</h3>
+                <button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()">Run client</button>
+                <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">Stop client</button>
+            </div>
+        </div>
     </div>
     <hr/>
     <h2>All servers in the system</h2>

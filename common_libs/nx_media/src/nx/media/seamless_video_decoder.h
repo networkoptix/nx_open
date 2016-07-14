@@ -17,15 +17,20 @@ class SeamlessVideoDecoderPrivate;
  * VideoDecoderFactory to instantiate compatible VideoDecoder to decode next frame if
  * video parameters have changed.
  */
-class SeamlessVideoDecoder
-:
-    public QObject
+class SeamlessVideoDecoder: public QObject
 {
     Q_OBJECT
 
 public:
+    typedef std::function<QRect()> VideoGeometryAccessor;
+
+public:
     SeamlessVideoDecoder();
+
     virtual ~SeamlessVideoDecoder();
+
+    /** Should be called before other methods; needed by some decoders, e.g. hw-based. */
+    void setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor);
 
     /**
      * Decode a video frame. This is a sync function and it could take a lot of CPU. This call is

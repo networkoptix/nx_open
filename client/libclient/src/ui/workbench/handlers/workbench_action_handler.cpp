@@ -1525,11 +1525,11 @@ void QnWorkbenchActionHandler::at_serverLogsAction_getNonce(QnAsyncHttpClientRep
         return;
     }
 
-    const auto vmsGatewayAddress = nx::cloud::gateway::VmsGatewayEmbeddable
-        ::instance()->endpoint().toString();
-
-    QUrl url(lit("http://%1/%2:%3/api/showLog")
-        .arg(vmsGatewayAddress).arg(reply->url().host()).arg(reply->url().port()));
+    auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
+    QUrl url(lit("%1://%2/%3:%4/api/showLog")
+        .arg(gateway->isSslEnabled() ? lit("https") : lit("http"))
+        .arg(gateway->endpoint().toString())
+        .arg(reply->url().host()).arg(reply->url().port()));
 
     QString login = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();

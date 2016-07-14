@@ -123,6 +123,8 @@ namespace detail
     {
         switch( tran.command )
         {
+        case ApiCommand::removeServerUserAttributes:
+            return notificationParams.mediaServerNotificationManager->triggerNotification(tran);
         case ApiCommand::removeResource:
             return notificationParams.resourceNotificationManager->triggerNotification( tran );
         case ApiCommand::removeCamera:

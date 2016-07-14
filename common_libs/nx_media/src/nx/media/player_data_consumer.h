@@ -2,6 +2,7 @@
 
 #include <deque>
 #include <atomic>
+#include <functional>
 
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/video_data_packet.h>
@@ -9,6 +10,7 @@
 
 #include "media_fwd.h"
 #include "audio_output.h"
+#include <utils/media/externaltimesource.h>
 
 class QnArchiveStreamReader;
 
@@ -21,10 +23,15 @@ class SeamlessAudioDecoder;
 /**
  * Private class used in nx::media::Player.
  */
-class PlayerDataConsumer: public QnAbstractDataConsumer
+class PlayerDataConsumer:
+    public QnAbstractDataConsumer,
+    public QnlTimeSource
 {
     Q_OBJECT
     typedef QnAbstractDataConsumer base_type;
+
+public:
+    typedef std::function<QRect()> VideoGeometryAccessor;
 
 public:
     PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader);
@@ -40,6 +47,34 @@ public:
 
     /** Can be CODEC_ID_NONE if not available. */
     CodecID currentCodec() const;
+
+    /** Should be called before other methods; needed by some decoders, e.g. hw-based. */
+    void setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor);
+
+    // ----  QnlTimeSource interface ----
+
+    /**
+     * @return Current time.
+     * May be different from displayed time.
+     * After seek for example, while no any frames are really displayed.
+     */
+    virtual qint64 getCurrentTime() const override;
+
+    /**
+     * @return Last displayed time.
+     */
+    virtual qint64 getDisplayedTime() const override;
+    void setDisplayedTimeUs(qint64 value); //< not part of QnlTimeSource interface
+
+    /**
+     * @return Time of the next frame.
+     */
+    virtual qint64 getNextTime() const override;
+
+    /**
+     * @return External clock to sync several video with each other.
+     */
+    virtual qint64 getExternalTime() const override;
 
 signals:
     /** Hint to render to display current data with no delay due to seek operation in progress. */
@@ -100,6 +135,11 @@ private:
         WaitForNextBOF //< noDelay will be disabled as soon as next BOF frame is received
     };
     NoDelayState m_noDelayState;
+
+    VideoGeometryAccessor m_videoGeometryAccessor;
+
+    std::atomic<qint64> m_lastFrameTimeUs;
+    std::atomic<qint64> m_lastDisplayedTimeUs;
 };
 
 } // namespace media
