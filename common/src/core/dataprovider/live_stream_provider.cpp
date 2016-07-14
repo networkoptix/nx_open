@@ -129,6 +129,11 @@ void QnLiveStreamProvider::setCameraControlDisabled(bool value)
     m_prevCameraControlDisabled = value;
 }
 
+void QnLiveStreamProvider::setDesiredLiveParams(const QnLiveStreamParams &params)
+{
+    m_newLiveParams = params;
+}
+
 void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
 {
     {

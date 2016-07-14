@@ -177,5 +177,9 @@ typedef QList<QnVideoWallMatrixIndex> QnVideoWallMatrixIndexList;
 class QnAviResource;
 typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;
 
+class QnFlirEIPResource;
+typedef QnSharedResourcePointer<QnFlirEIPResource> QnFlirEIPResourcePtr;
+typedef QnSharedResourcePointerList<QnFlirEIPResource> QnFlirEIPResourceList;
+
 
 #endif // QN_RESOURCE_FWD_H
