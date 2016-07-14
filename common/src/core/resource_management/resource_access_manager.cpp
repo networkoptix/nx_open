@@ -75,16 +75,20 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         }
     };
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, handleResourceAdded);
-
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
-        [this, invalidateCacheForLayoutItems]
-    (const QnResourcePtr& resource)
+    auto handleResourceRemoved = [this, invalidateCacheForLayoutItems](const QnResourcePtr& resource)
     {
         disconnect(resource, nullptr, this, nullptr);
         invalidateResourceCache(resource);
         invalidateCacheForLayoutItems(resource);
-    });
+        if (resource.dynamicCast<QnVideoWallResource>())
+        {
+            for (const QnResourcePtr& desktopCam : qnResPool->getResourcesWithFlag(Qn::desktop_camera))
+                invalidateResourceCache(desktopCam);
+        }
+    };
+
+    connect(qnResPool, &QnResourcePool::resourceAdded,   this, handleResourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, handleResourceRemoved);
 
     for (const QnResourcePtr& resource : qnResPool->getResources())
         handleResourceAdded(resource);
@@ -662,6 +666,16 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
     if (!user || !resource)
         return false;
 
+    /* Handling desktop cameras before all other checks.
+     * Forbid access if there are no videowalls in the system. */
+    if (resource->hasFlags(Qn::desktop_camera))
+    {
+        if (qnResPool->getResourcesWithFlag(Qn::videowall).isEmpty())
+            return false;
+        /* Desktop cameras available only by videowall control permission. */
+        return hasGlobalPermission(user, Qn::GlobalControlVideoWallPermission);
+    }
+
     QnUuid keyId = user->userGroup();
     if (keyId.isNull())
         keyId = user->getId();
@@ -677,17 +691,11 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
 
     auto requiredPermission = [this, resource, isMediaResource]()
     {
-        /* Desktop cameras available only by videowall control permission. */
-        if (resource->hasFlags(Qn::desktop_camera))
-            return Qn::GlobalControlVideoWallPermission;
-
         if (isMediaResource)
             return Qn::GlobalAccessAllMediaPermission;
 
-        if (resource.dynamicCast<QnVideoWallResource>())
-            return Qn::GlobalControlVideoWallPermission;
-
-        /* Default value (e.g. for users, servers and layouts). */
+        /* Default value (for layouts). */
+        NX_ASSERT(resource.dynamicCast<QnLayoutResource>());
         return Qn::GlobalAdminPermission;
     };
 
