@@ -182,7 +182,7 @@ angular.module('webadminApp')
                 }
                 this.getCurrentUser(reload).then(function(result){
                     /*jshint bitwise: false*/
-                    var hasEditServerPermission = result.data.reply.permissions & Config.globalEditServersPermissions;
+                    var hasEditServerPermission = result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0;
                     /*jshint bitwise: true*/
                     var isAdmin = result.data.reply.isAdmin || hasEditServerPermission;
 

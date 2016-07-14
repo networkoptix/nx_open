@@ -35,7 +35,6 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         var isAdmin = false;
-        var canViewLive = false;
         var canViewArchive = false;
         var availableCameras = null;
 
@@ -728,13 +727,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         mediaserver.getCurrentUser().then(function(result) {
-            isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
-            canViewLive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewLivePermission);
-            canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewArchivePermission);
-
-            if (!canViewLive) {
-                return;
-            }
+            isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0);
+            canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
 
             var userId = result.data.reply.id;
 
