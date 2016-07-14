@@ -30,11 +30,12 @@ angular.module('cloudApp')
         function findRole(user, accessRoles){
             var role = _.find(accessRoles,function(role){
                 if(!system.isEmptyGuid(user.groupId)){
-                    return role.groupId == user.groupId;
+                    return role.groupId === user.groupId;
                 }
 
-                return user.permissions == role.permissions;
+                return user.permissions === role.permissions && !role.groupId;
             });
+
             return role || accessRoles[accessRoles.length-1]; // Last option is custom
         }
 
