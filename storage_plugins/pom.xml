@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>storage_plugins</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Storage Plugins</name>
+    <name>Nx Witness Storage Plugins</name>
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>

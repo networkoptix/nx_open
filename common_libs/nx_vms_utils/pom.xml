@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_vms_utils</artifactId>
     <packaging>pom</packaging>
-    <name>NX VMS Utils Library</name>
+    <name>Nx VMS Utils Library</name>
 
     <properties>
         <guid>${nx_vms_utils.guid}</guid>
