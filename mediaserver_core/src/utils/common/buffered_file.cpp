@@ -22,6 +22,7 @@ static const int SECTOR_SIZE = 32768;
 static const qint64 AVG_USAGE_AGGREGATE_TIME = 15 * 1000000ll; // aggregation time in usecs
 static const int DATA_PRIORITY_THRESHOLD = SECTOR_SIZE * 2;
 const int kMaxBufferSize = 16 * 1024 * 1024;
+const int kMkvMaxHeaderOffset = 1024;
 
 // -------------- QueueFileWriter ------------
 
@@ -314,23 +315,26 @@ bool QBufferedFile::updatePos()
     if (bufferOffset < 0 || bufferOffset > m_cycleBuffer.size())
     {
         flushBuffer();
-        int fileBlockSize = m_cycleBuffer.maxSize() - m_minBufferSize;
-        int curPow = std::log(m_minBufferSize / 1024) / std::log(2);
-        int newBufSize = (1 << (curPow + 1)) * 1024;
+		if (m_lastSeekPos > kMkvMaxHeaderOffset)
+		{
+			int fileBlockSize = m_cycleBuffer.maxSize() - m_minBufferSize;
+			int curPow = std::log(m_minBufferSize / 1024) / std::log(2);
+			int newBufSize = (1 << (curPow + 1)) * 1024;
 #if 0
-        qWarning()
-            << "File" << (uintptr_t)this
-            << "Min buf size = " << m_minBufferSize << "."
-            << "Seek detected. Enlarging from " << m_cycleBuffer.maxSize()
-            << " to " << fileBlockSize + newBufSize
-            << ". Delta = " << newBufSize - m_minBufferSize;
+			qWarning()
+				<< "File" << (uintptr_t)this
+				<< "Min buf size = " << m_minBufferSize << "."
+				<< "Seek detected. Enlarging from " << m_cycleBuffer.maxSize()
+				<< " to " << fileBlockSize + newBufSize
+				<< ". Delta = " << newBufSize - m_minBufferSize;
 #endif
-        if (newBufSize < kMaxBufferSize)
-        {
-            m_minBufferSize = newBufSize;
-            m_cycleBuffer.resize(fileBlockSize + newBufSize);
-            emit seekDetected(reinterpret_cast<uintptr_t>(this), newBufSize);
-        }
+			if (newBufSize < kMaxBufferSize)
+			{
+				m_minBufferSize = newBufSize;
+				m_cycleBuffer.resize(fileBlockSize + newBufSize);
+				emit seekDetected(reinterpret_cast<uintptr_t>(this), newBufSize);
+			}
+		}
         if (m_isDirectIO)
             m_filePos = qPower2Floor((quint64) m_lastSeekPos, SECTOR_SIZE);
         else
