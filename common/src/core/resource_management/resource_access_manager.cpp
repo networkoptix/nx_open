@@ -816,8 +816,10 @@ bool QnResourceAccessManager::canCreateLayout(const QnUserResourcePtr& user, con
 
     /* Only admins and videowall-admins can create global layouts. */
     if (layoutParentId.isNull())
+    {
         return hasGlobalPermission(user, Qn::GlobalAdminPermission)
             || hasGlobalPermission(user, Qn::GlobalControlVideoWallPermission);
+    }
 
     QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(layoutParentId);
     if (!owner)

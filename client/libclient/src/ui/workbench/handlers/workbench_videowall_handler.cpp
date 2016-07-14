@@ -1226,13 +1226,10 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 
     auto addToFiltered = [&](const QnResourcePtr &resource)
     {
-        if (!resource)
+        if (!resource.dynamicCast<QnMediaResource>() && !resource.dynamicCast<QnMediaServerResource>())
             return;
 
-        if (resource.dynamicCast<QnMediaResource>())
-            filtered << resource;
-        else if (resource.dynamicCast<QnMediaServerResource>())
-            filtered << resource;
+        filtered << resource;
 
         qreal ar = defaultAr;
         if (QnNetworkResourcePtr networkResource = resource.dynamicCast<QnNetworkResource>())
