@@ -37,9 +37,12 @@ public:
     void addOrUpdateUserGroup(const ec2::ApiUserGroupData& userGroup);
     void removeUserGroup(const QnUuid& groupId);
 
-    /** List of resources ids, the given user has access to. */
+    /** List of resources ids, the given user has access to (only given directly). */
     QSet<QnUuid> accessibleResources(const QnUuid& userOrGroupId) const;
     void setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources);
+
+    /** List of resources ids, the given user has access to (only given directly). */
+    QSet<QnUuid> accessibleResources(const QnUserResourcePtr& user) const;
 
     /**
     * \param user                      User to get global permissions for.
@@ -119,6 +122,9 @@ private:
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);
     void invalidateResourceCacheInternal(const QnUuid& resourceId);
+    void invalidateCacheForLayoutItem(const QnLayoutResourcePtr& layout, const QnLayoutItemData& item);
+    void invalidateCacheForLayoutItems(const QnResourcePtr& resource);
+    void invalidateCacheForVideowallItem(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
 
     Qn::Permissions calculatePermissions(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
 
@@ -130,7 +136,14 @@ private:
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnLayoutResourcePtr& layout)          const;
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnUserResourcePtr& targetUser)        const;
 
+    /** Check if resource (camera, webpage or layout) is available to given user. */
     bool isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
+
+    /** Check if given desktop camera or layout is available to given user through videowall. */
+    bool isAccessibleViaVideowall(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
+
+    /** Check if camera is placed to one of shared layouts, available to given user. */
+    bool isAccessibleViaLayouts(const QSet<QnUuid>& layoutIds, const QnResourcePtr& resource, bool sharedOnly) const;
 private:
     mutable QnMutex m_mutex;
 
