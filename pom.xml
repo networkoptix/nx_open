@@ -527,9 +527,6 @@
                 <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
                 <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
 
-                <!-- TODO: #gdm Remove it when Qt 5.6.1 is ready for windows. -->
-                <qt.version>5.6.0</qt.version>
-
                 <profile.classifier>${platform}</profile.classifier>
                 <windows>true</windows>
                 <unix>false</unix>
