@@ -344,13 +344,17 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
         std::future_status::ready,
         controlConnectionClosedPromise.get_future().wait_for(
             udpTunnelKeepAlive.maxConnectionInactivityPeriod() * 10));
-    const auto actualTimeout = std::chrono::steady_clock::now() - t1;
 
-#ifdef _DEBUG
-    EXPECT_LT(
-        actualTimeout,
-        udpTunnelKeepAlive.maxConnectionInactivityPeriod() * 15 / 10);
-#endif
+    #ifdef _DEBUG
+        if (!utils::TestOptions::areTimeAssertsDisabled())
+        {
+            EXPECT_LT(
+                std::chrono::steady_clock::now() - t1,
+                udpTunnelKeepAlive.maxConnectionInactivityPeriod() * 15 / 10);
+        }
+    #else
+        static_cast<void>(t1);
+    #endif
 
     auto connectContexts = startConnections(&tunnelConnection, 1);
     auto future = connectContexts[0].connectedPromise.get_future();
