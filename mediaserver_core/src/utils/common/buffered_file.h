@@ -110,6 +110,7 @@ public:
 
 signals:
     void seekDetected(uintptr_t obj, int bufferSizePow);
+    void fileClosed(uintptr_t obj);
     
 protected:
     qint64 writeUnbuffered(const char * data, qint64 len );

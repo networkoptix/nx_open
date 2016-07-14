@@ -54,11 +54,11 @@ class WriteBufferMultiplierManager : public QObject
             true : 
             lhs.catalog < rhs.catalog;
     }
-    typedef std::map<Key, int> RecToMultType;
+    typedef std::map<Key, int> RecToSizeType;
     typedef std::map<uintptr_t, Key> FileToRecType;
 
 public:
-    int getMultForCam(
+    int getSizeForCam(
         QnServer::ChunksCatalog catalog, 
         const QnUuid& resourceId);
     void setFilePtr(
@@ -66,10 +66,11 @@ public:
         QnServer::ChunksCatalog catalog, 
         const QnUuid& resourceId);
 public slots:
-    void at_seekDetected(uintptr_t filePtr, int pow);
+    void at_seekDetected(uintptr_t filePtr, int size);
+    void at_fileClosed(uintptr_t filePtr);
         
 private:
-    RecToMultType m_recToMult;
+    RecToSizeType m_recToMult;
     FileToRecType m_fileToRec;
     QnMutex m_mutex;
 };

@@ -28,6 +28,7 @@ public:
     static QnStorageResource* instance(const QString&);
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
+    QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode, int bufferSize);
 
     virtual float getAvarageWritingUsage() const override;
 

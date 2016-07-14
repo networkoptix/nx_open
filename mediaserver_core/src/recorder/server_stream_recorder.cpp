@@ -214,22 +214,56 @@ QnScheduleTask QnServerStreamRecorder::currentScheduleTask() const
     return m_currentScheduleTask;
 }
 
+void QnServerStreamRecorder::initIoContext(
+    const QnStorageResourcePtr& storage, 
+    const QString& url,
+    AVIOContext** context) 
+{
+    Q_ASSERT(context);
+    auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+    if (fileStorage)
+    {
+        QIODevice* ioDevice = fileStorage->open(
+            url,
+            QIODevice::WriteOnly,
+            getBufferSize());
+        if (ioDevice == 0)
+        {
+            *context = nullptr;
+            return;
+        }
+        *context = QnFfmpegHelper::createFfmpegIOContext(ioDevice);
+        if (!*context)
+            return;
+        fileCreated((uintptr_t)ioDevice);
+    }
+    else
+        QnStreamRecorder::initIoContext(storage, url, context);
+}
+
 void QnServerStreamRecorder::fileCreated(uintptr_t filePtr) const
 {
     connect(
         (QBufferedFile*)filePtr,
         &QBufferedFile::seekDetected,
         &qnRecordingManager->getBufferManager(),
-        &WriteBufferMultiplierManager::at_seekDetected);
+        &WriteBufferMultiplierManager::at_seekDetected,
+        Qt::DirectConnection);
+    connect(
+        (QBufferedFile*)filePtr,
+        &QBufferedFile::fileClosed,
+        &qnRecordingManager->getBufferManager(),
+        &WriteBufferMultiplierManager::at_fileClosed,
+        Qt::DirectConnection);
     qnRecordingManager->getBufferManager().setFilePtr(
         filePtr,
         m_catalog,
         m_device->getId());
 }
 
-int QnServerStreamRecorder::getBufferMultiplier() const
+int QnServerStreamRecorder::getBufferSize() const
 {
-    return qnRecordingManager->getBufferManager().getMultForCam(
+    return qnRecordingManager->getBufferManager().getSizeForCam(
         m_catalog, 
         m_device->getId());
 }

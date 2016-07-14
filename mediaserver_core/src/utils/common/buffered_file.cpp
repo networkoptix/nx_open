@@ -21,7 +21,7 @@ extern "C"
 static const int SECTOR_SIZE = 32768;
 static const qint64 AVG_USAGE_AGGREGATE_TIME = 15 * 1000000ll; // aggregation time in usecs
 static const int DATA_PRIORITY_THRESHOLD = SECTOR_SIZE * 2;
-const int kMaxBufferSizePow = 14;
+const int kMaxBufferSize = 16 * 1024 * 1024;
 
 // -------------- QueueFileWriter ------------
 
@@ -227,6 +227,7 @@ QBufferedFile::QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int fileB
 
 QBufferedFile::~QBufferedFile()
 {
+    emit fileClosed((uintptr_t)this);
     close();
 }
 qint64 QBufferedFile::size() const
@@ -313,15 +314,20 @@ bool QBufferedFile::updatePos()
     if (bufferOffset < 0 || bufferOffset > m_cycleBuffer.size())
     {
         flushBuffer();
-        int currentPow = static_cast<int>(
-            std::log(m_cycleBuffer.maxSize()) /
-            std::log(2));
-        if (currentPow < kMaxBufferSizePow)
+        int fileBlockSize = m_cycleBuffer.maxSize() - m_minBufferSize;
+        int curPow = std::log(m_minBufferSize / 1024) / std::log(2);
+        int newBufSize = (1 << (curPow + 1)) * 1024;
+        qWarning()
+            << "File" << (uintptr_t)this
+            << "Min buf size = " << m_minBufferSize << "."
+            << "Seek detected. Enlarging from " << m_cycleBuffer.maxSize()
+            << " to " << fileBlockSize + newBufSize
+            << ". Delta = " << newBufSize - m_minBufferSize;
+        if (newBufSize < kMaxBufferSize)
         {
-            currentPow += 1;
-            int newSize = 1 << currentPow;
-            m_cycleBuffer.resize(newSize);
-            emit seekDetected(reinterpret_cast<uintptr_t>(this), currentPow);
+            m_minBufferSize = newBufSize;
+            m_cycleBuffer.resize(fileBlockSize + newBufSize);
+            emit seekDetected(reinterpret_cast<uintptr_t>(this), newBufSize);
         }
         if (m_isDirectIO)
             m_filePos = qPower2Floor((quint64) m_lastSeekPos, SECTOR_SIZE);

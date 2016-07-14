@@ -96,6 +96,7 @@ void QnCommonMetaTypes::initialize() {
     if(qn_commonMetaTypes_initialized)
         return;
 
+    qRegisterMetaType<uintptr_t>("uintptr_t");
     qRegisterMetaType<QnUuid>();
     qRegisterMetaType<QSet<QnUuid>>("QSet<QnUuid>");
     qRegisterMetaType<QHostAddress>();

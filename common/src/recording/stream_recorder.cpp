@@ -826,14 +826,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 audioStream->first_dts = 0;
             }
 
-            uintptr_t filePtr;
-            m_recordingContextVector[i].formatCtx->pb = 
-                QnFfmpegHelper::createFfmpegIOContext(
-                    m_recordingContextVector[i].storage, 
-                    url, 
-                    uint32_t(QIODevice::WriteOnly) | (getBufferMultiplier() << 0x8),
-                    &filePtr);
-            fileCreated(filePtr);
+            initIoContext(
+                m_recordingContextVector[i].storage,
+                m_recordingContextVector[i].fileName,
+                &m_recordingContextVector[i].formatCtx->pb);
 
             if (m_recordingContextVector[i].formatCtx->pb == 0)
             {
@@ -877,6 +873,17 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
     } // for each storage
 
     return true;
+}
+
+void QnStreamRecorder::initIoContext(
+    const QnStorageResourcePtr& storage, 
+    const QString& url,
+    AVIOContext** context)
+{
+    *context = QnFfmpegHelper::createFfmpegIOContext(
+        storage, 
+        url, 
+        QIODevice::WriteOnly);
 }
 
 void QnStreamRecorder::setTruncateInterval(int seconds)

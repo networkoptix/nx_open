@@ -70,7 +70,15 @@ namespace aux
     }
 }
 
-QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
+QIODevice* QnFileStorageResource::open(const QString& fileName, QIODevice::OpenMode openMode)
+{
+    return open(fileName, openMode, 0);
+}
+
+QIODevice* QnFileStorageResource::open(
+    const QString& url, 
+    QIODevice::OpenMode openMode, 
+    int bufferSize)
 {
     if (!m_valid)
         return nullptr;
@@ -81,8 +89,6 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
     int ffmpegBufferSize = 0;
 
     int systemFlags = 0;
-    openMode = (QIODevice::OpenMode)((uint32_t(openMode)) & 0xff);
-    uint32_t writeBufferMult = ((uint32_t)openMode >> 8) & 0xff;
     if (openMode & QIODevice::WriteOnly)
     {
         ioBlockSize = MSSettings::roSettings()->value(
@@ -93,7 +99,7 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
             MSSettings::roSettings()->value(
                 nx_ms_conf::FFMPEG_BUFFER_SIZE,
                 nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE).toInt(),
-            (1 << writeBufferMult));
+            bufferSize);
 
 #ifdef Q_OS_WIN
         if (MSSettings::roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
