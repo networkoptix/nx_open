@@ -26,6 +26,7 @@
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
+#include <client/desktop_client_message_processor.h>
 
 #include <common/common_module.h>
 
@@ -278,28 +279,26 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
 
     const auto browseAction = action(QnActions::BrowseLocalFilesModeAction);
-    const auto setWelcomeScreenVisible = [this](bool visible)
-    {
-        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-        welcomeScreen->setVisible(visible);
-    };
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
 
-    const auto idChangedHandler = [setWelcomeScreenVisible, browseAction](const QnUuid & /* id */)
-    {
-        const bool connected = !qnCommon->remoteGUID().isNull();
-        browseAction->setChecked(connected);
-    };
+    connect(qnCommon, &QnCommonModule::remoteIdChanged, this,
+        [browseAction, welcomeScreen](const QnUuid& id)
+        {
+            const bool connected = !id.isNull();
+            if (!connected)
+                browseAction->setChecked(false);
+            else
+                welcomeScreen->setReceivingResources(true);
+        });
 
-    connect(qnCommon, &QnCommonModule::remoteIdChanged, this, idChangedHandler);
-    connect(browseAction, &QAction::toggled, this, [setWelcomeScreenVisible](bool checked)
-    {
-        setWelcomeScreenVisible(!checked);
-    });
+    connect(qnDesktopClientMessageProcessor, &QnDesktopClientMessageProcessor::initialResourcesReceived, this,
+        [browseAction]() { browseAction->setChecked(true); });
 
-    connect(display(), &QnWorkbenchDisplay::widgetAdded, this, [browseAction]()
-    {
-        browseAction->setChecked(true);
-    });
+    connect(browseAction, &QAction::toggled, this,
+        [this, welcomeScreen](bool checked) { welcomeScreen->setVisible(!checked); });
+
+    connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
+        [browseAction]() { browseAction->setChecked(true); });
 
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();

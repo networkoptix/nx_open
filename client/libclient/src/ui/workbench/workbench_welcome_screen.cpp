@@ -54,13 +54,15 @@ namespace
     }
 }
 
-QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent) :
+QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
+    :
     base_type(parent),
     QnWorkbenchContextAware(parent),
 
+    m_receivingResources(false),
     m_visibleControls(true),
     m_visible(false),
-    m_connectingNow(false),
+    m_connectingSystemName(),
     m_palette(extractPalette()),
     m_widget(createMainView(this)),
     m_pageSize(m_widget->size())
@@ -76,9 +78,12 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent) :
 
     connect(action(QnActions::DisconnectAction), &QAction::triggered
         , this, &QnWorkbenchWelcomeScreen::showScreen);
-        
+
     connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this, [this]()
     {
+        if (!m_visible)
+            setReceivingResources(false);   ///< Auto toggle off preloader
+
         context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
     });
 
@@ -152,49 +157,71 @@ void QnWorkbenchWelcomeScreen::setVisibleControls(bool visible)
     emit visibleControlsChanged();
 }
 
-bool QnWorkbenchWelcomeScreen::connectingNow() const
+QString QnWorkbenchWelcomeScreen::connectingToSystem() const
 {
-    return m_connectingNow;
+    return m_connectingSystemName;
 }
 
-void QnWorkbenchWelcomeScreen::setConnectingNow(bool value)
+void QnWorkbenchWelcomeScreen::setConnectingToSystem(const QString& value)
 {
-    if (m_connectingNow == value)
+    if (m_connectingSystemName == value)
         return;
 
-    m_connectingNow = value;
-    emit connectingNowChanged();
+    m_connectingSystemName = value;
+    emit connectingToSystemChanged();
 }
 
-void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
-    , const QString &userName
-    , const QString &password
-    , bool storePassword
-    , bool autoLogin)
+bool QnWorkbenchWelcomeScreen::receivingResources() const
 {
+    return m_receivingResources;
+}
+
+void QnWorkbenchWelcomeScreen::setReceivingResources(bool value)
+{
+    if (value == m_receivingResources)
+        return;
+
+    m_receivingResources = value;
+    emit receivingResourcesChanged();
+}
+
+void QnWorkbenchWelcomeScreen::connectToLocalSystem(
+    const QString& systemName,
+    const QString &serverUrl,
+    const QString &userName,
+    const QString &password,
+    bool storePassword,
+    bool autoLogin)
+{
+    if (!connectingToSystem().isEmpty())
+        return; //< Connection process is in progress
+
     // TODO: #ynikitenkov add look after connection process
     // and don't allow to connect to two or more servers simultaneously
-    const auto connectFunction = [this
-        , serverUrl, userName, password, storePassword, autoLogin]()
-    {
-        setConnectingNow(true);
-        const auto controlsGuard = QnRaiiGuard::createDestructable(
-            [this]() { setConnectingNow(false); });
+    const auto connectFunction =
+        [this, serverUrl, userName, password, storePassword, autoLogin, systemName]()
+        {
+            setConnectingToSystem(systemName);
 
-        QUrl url = QUrl::fromUserInput(serverUrl);
-        url.setScheme(lit("http"));
-        if (!password.isEmpty())
-            url.setPassword(password);
-        if (!userName.isEmpty())
-            url.setUserName(userName);
+            const auto completionGuard = QnRaiiGuard::createDestructable(
+                [this]() { setConnectingToSystem(QString()); });
 
-        QnActionParameters params;
-        params.setArgument(Qn::UrlRole, url);
-        params.setArgument(Qn::StorePasswordRole, storePassword);
-        params.setArgument(Qn::ForceRemoveOldConnectionRole, !storePassword);
-        params.setArgument(Qn::AutoLoginRole, autoLogin);
-        menu()->trigger(QnActions::ConnectAction, params);
-    };
+            QUrl url = QUrl::fromUserInput(serverUrl);
+            url.setScheme(lit("http"));
+            if (!password.isEmpty())
+                url.setPassword(password);
+            if (!userName.isEmpty())
+                url.setUserName(userName);
+
+            QnActionParameters params;
+            params.setArgument(Qn::UrlRole, url);
+            params.setArgument(Qn::StorePasswordRole, storePassword);
+            params.setArgument(Qn::ForceRemoveOldConnectionRole, !storePassword);
+            params.setArgument(Qn::AutoLoginRole, autoLogin);
+            params.setArgument(Qn::CompletionWatcherRole, completionGuard);
+
+            menu()->trigger(QnActions::ConnectAction, params);
+        };
 
     enum { kMinimalDelay = 1};
     // We have to use delayed execution to prevent client crash
@@ -202,12 +229,12 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
     executeDelayedParented(connectFunction, kMinimalDelay, this);
 }
 
-void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString &serverUrl)
+void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemName, const QString &serverUrl)
 {
     if (!isLoggedInToCloud())
         return;
 
-    connectToLocalSystem(serverUrl, qnCloudStatusWatcher->cloudLogin()
+    connectToLocalSystem(systemName, serverUrl, qnCloudStatusWatcher->cloudLogin()
         , qnCloudStatusWatcher->cloudPassword(), false, false);
 }
 
@@ -241,12 +268,12 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
 
         if (!dialog->localLogin().isEmpty() && !dialog->localPassword().isEmpty())
         {
-            connectToLocalSystem(serverUrl, dialog->localLogin(), dialog->localPassword(), false, false);
+            connectToLocalSystem(QString(), serverUrl, dialog->localLogin(), dialog->localPassword(), false, false);
         }
         else if (!dialog->cloudLogin().isEmpty() && !dialog->cloudPassword().isEmpty())
         {
             qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(dialog->cloudLogin(), dialog->cloudPassword(), true);
-            connectToLocalSystem(serverUrl, dialog->cloudLogin(), dialog->cloudPassword(), false, false);
+            connectToLocalSystem(QString(), serverUrl, dialog->cloudLogin(), dialog->cloudPassword(), false, false);
         }
 
     };
@@ -275,12 +302,6 @@ void QnWorkbenchWelcomeScreen::loginToCloud()
 void QnWorkbenchWelcomeScreen::createAccount()
 {
     menu()->trigger(QnActions::OpenCloudRegisterUrl);
-}
-
-void QnWorkbenchWelcomeScreen::tryHideScreen()
-{
-    if (!qnCommon->remoteGUID().isNull())
-        setVisible(false);
 }
 
 //

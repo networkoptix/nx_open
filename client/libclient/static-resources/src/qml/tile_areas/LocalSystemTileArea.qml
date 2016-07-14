@@ -15,7 +15,7 @@ Item
     property string selectedPassword: expandedArea.passwordTextField.text;
     property bool savePassword: expandedArea.savePasswordCheckbox.checked;
     property bool autoLogin: expandedArea.autoLoginCheckBox.checked;
-
+    property bool isConnecting: false;
     property var hostsModel;
     property var recentUserConnectionsModel;
 
@@ -80,7 +80,7 @@ Item
 
             model: control.hostsModel;
 
-            isAvailable: enabled && control.isExpandedTile;
+            isAvailable: enabled && control.isExpandedTile && !control.isConnecting;
 
             disabledLabelColor: Style.colors.midlight;
 
@@ -100,7 +100,7 @@ Item
 
             model: control.recentUserConnectionsModel;
 
-            isAvailable: enabled && control.isExpandedTile;
+            isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
             visible: control.impl.hasRecentConnections;
 
             disabledLabelColor: Style.colors.midlight;
@@ -132,9 +132,10 @@ Item
     {
         id: expandedArea;
 
+        isConnecting: control.isConnecting;
         anchors.top: collapsedArea.bottom;
         visible: control.isExpandedTile;
-        enabled: (control.isExpandedTile);
+        enabled: control.isExpandedTile;
         opacity: control.expandedOpacity;
         hasRecentConnections: control.impl.hasRecentConnections;
 
@@ -143,7 +144,6 @@ Item
 
         onConnectButtonClicked: { control.connectRequested(); }
     }
-
 
     property QtObject impl: QtObject
     {

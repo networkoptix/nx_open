@@ -18,7 +18,7 @@ Rectangle
         id: screenHolder;
 
         anchors.fill: parent;
-        visible: context.visibleControls;
+        visible: context.visibleControls && !context.receivingResources;
 
         CloudPanel
         {
@@ -235,6 +235,23 @@ Rectangle
         }
 
         Keys.onEscapePressed: context.tryHideScreen();
+    }
+
+
+    NxCirclesPreloader
+    {
+        visible: context.receivingResources;
+        anchors.centerIn: parent;
+    }
+
+    MouseArea
+    {
+        id: connectingStateEventOmitter;
+
+        anchors.fill: parent;
+        hoverEnabled: true;
+
+        visible: context.connectingToSystem.length;
     }
 }
 

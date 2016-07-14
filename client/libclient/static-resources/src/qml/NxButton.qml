@@ -5,7 +5,7 @@ import "."
 
 Button
 {
-    id: thisComponent;
+    id: control;
 
     property bool enableHover: true;
 
@@ -15,14 +15,18 @@ Button
 
     property color hoveredColor: Style.lighterColor(bkgColor);
     property color pressedColor: (isAccentButton
-      ? Style.darkerColor(hoveredColor) : thisComponent.bkgColor);
+      ? Style.darkerColor(hoveredColor) : control.bkgColor);
 
     property string iconUrl;
 
     height: 28;
 
-    opacity: (enabled ? 1.0
-        : (isAccentButton ? 0.2 : 0.3));
+    Binding
+    {
+        target: control;
+        property: "opacity";
+        value: (enabled ? 1.0 : (isAccentButton ? 0.2 : 0.3))
+    }
 
     Image
     {
@@ -30,8 +34,8 @@ Button
 
         anchors.fill: parent;
 
-        visible: thisComponent.iconUrl.length;
-        source: thisComponent.iconUrl;
+        visible: control.iconUrl.length;
+        source: control.iconUrl;
     }
 
     MouseArea
@@ -40,7 +44,7 @@ Button
 
         anchors.fill: parent;
         acceptedButtons: Qt.NoButton;
-        hoverEnabled: thisComponent.enableHover;
+        hoverEnabled: control.enableHover;
     }
 
     background: Item
@@ -49,27 +53,27 @@ Button
         {
             anchors.fill: parent;
 
-            color: (thisComponent.isHovered && !thisComponent.pressed ? thisComponent.hoveredColor
-                : (thisComponent.pressed ? thisComponent.pressedColor : thisComponent.bkgColor));
+            color: (control.isHovered && !control.pressed ? control.hoveredColor
+                : (control.pressed ? control.pressedColor : control.bkgColor));
 
             radius: 2;
 
-            border.color: (thisComponent.isAccentButton
+            border.color: (control.isAccentButton
                 ? Style.lighterColor(Style.colors.brand, 2) // TODO: add L4 colro - now it is only 2
                 : Style.darkerColor(Style.colors.brand, 4));
-            border.width: (thisComponent.activeFocus ? 1 : 0);
+            border.width: (control.activeFocus ? 1 : 0);
 
             Rectangle
             {
                 id: borderTop;
 
-                visible: thisComponent.pressed;
+                visible: control.pressed;
                 x: 1;
                 height:1;
                 width: parent.width - 2 * x;
                 anchors.top: parent.top;
-                anchors.topMargin: (thisComponent.activeFocus ? 1 : 0);
-                color: (thisComponent.isAccentButton
+                anchors.topMargin: (control.activeFocus ? 1 : 0);
+                color: (control.isAccentButton
                     ? Style.darkerColor(Style.colors.brand, 3)
                     : Style.darkerColor(Style.colors.button, 2));
             }
@@ -78,15 +82,15 @@ Button
             {
                 id: borderBottom;
 
-                visible: !thisComponent.pressed;
+                visible: !control.pressed;
                 x: 1;
                 height:1;
                 width: parent.width - 2 * x;
                 anchors.bottom: parent.bottom;
-                anchors.bottomMargin: (thisComponent.activeFocus ? 1 : 0);
-                color: (thisComponent.isAccentButton
+                anchors.bottomMargin: (control.activeFocus ? 1 : 0);
+                color: (control.isAccentButton
                     ? Style.darkerColor(Style.colors.brand, 3)
-                    : Style.darkerColor(Style.colors.button, thisComponent.isHovered ? 1 : 2));
+                    : Style.darkerColor(Style.colors.button, control.isHovered ? 1 : 2));
             }
         }
     }
@@ -98,9 +102,9 @@ Button
         leftPadding: 16;
         rightPadding: 16;
 
-        text: thisComponent.text;
+        text: control.text;
         font: Qt.font({ pixelSize: 13, weight: Font.Medium });
-        color: (thisComponent.isAccentButton
+        color: (control.isAccentButton
             ? Style.colors.brandContrast
             : Style.colors.buttonText);
     }

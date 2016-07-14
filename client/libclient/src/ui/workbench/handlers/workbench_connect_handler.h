@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 
+#include <nx/utils/raii_guard.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <crash_reporter.h>
 
@@ -19,32 +20,35 @@ public:
     explicit QnWorkbenchConnectHandler(QObject *parent = 0);
     ~QnWorkbenchConnectHandler();
 
-    struct StoreConnectionSettings;
-    typedef QSharedPointer<StoreConnectionSettings> StoreConnectionSettingsPtr;
+    struct ConnectionSettings;
+    typedef QSharedPointer<ConnectionSettings> ConnectionSettingsPtr;
 
-    struct StoreConnectionSettings
+    struct ConnectionSettings
     {
         bool storePassword;
         bool autoLogin;
         bool forceRemoveOldConnection;
+        QnRaiiGuardPtr completionWatcher;
 
-        static StoreConnectionSettingsPtr create(bool storePassword,
+        static ConnectionSettingsPtr create(
+            bool storePassword,
             bool autoLogin,
-            bool forceRemoveOldConnection);
+            bool forceRemoveOldConnection,
+            const QnRaiiGuardPtr& completionWatcher);
     };
 
-    /// @brief Connects to server and stores successful connection data 
-    /// according to specified settings. If no settings are specified no 
+    /// @brief Connects to server and stores successful connection data
+    /// according to specified settings. If no settings are specified no
     /// connection data will be stored.
 
     ec2::ErrorCode connectToServer(const QUrl &appServerUrl
-        , const StoreConnectionSettingsPtr &storeSettings
+        , const ConnectionSettingsPtr &storeSettings
         , bool silent);
 
     bool disconnectFromServer(bool force);
 
     ec2::AbstractECConnectionPtr connection2() const;
-    
+
     bool connected() const;
 
     void hideMessageBox();

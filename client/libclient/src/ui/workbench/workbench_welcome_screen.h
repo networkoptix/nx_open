@@ -9,8 +9,7 @@
 
 class QnCloudStatusWatcher;
 
-class QnWorkbenchWelcomeScreen : public Connective<QObject>
-    , public QnWorkbenchContextAware
+class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
@@ -22,7 +21,8 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>
 
     Q_PROPERTY(QSize pageSize READ pageSize WRITE setPageSize NOTIFY pageSizeChanged);
     Q_PROPERTY(bool visibleControls READ visibleControls WRITE setVisibleControls NOTIFY visibleControlsChanged)
-    Q_PROPERTY(bool connectingNow READ connectingNow WRITE setConnectingNow NOTIFY connectingNowChanged)
+    Q_PROPERTY(QString connectingToSystem READ connectingToSystem WRITE setConnectingToSystem NOTIFY connectingToSystemChanged)
+    Q_PROPERTY(bool receivingResources READ receivingResources WRITE setReceivingResources NOTIFY receivingResourcesChanged)
 
 public:
     QnWorkbenchWelcomeScreen(QObject *parent);
@@ -48,19 +48,25 @@ public: // Properties
 
     void setVisibleControls(bool visible);
 
-    bool connectingNow() const;
+    QString connectingToSystem() const;
 
-    void setConnectingNow(bool value);
+    void setConnectingToSystem(const QString& value);
+
+    bool receivingResources() const;
+
+    void setReceivingResources(bool value);
 
 public slots:
     // TODO: $ynikitenkov add multiple urls one-by-one  handling
-    void connectToLocalSystem(const QString &serverUrl
-        , const QString &userName
-        , const QString &password
-        , bool storePassword
-        , bool autoLogin);
+void connectToLocalSystem(
+    const QString& systemName,
+    const QString &serverUrl,
+    const QString &userName,
+    const QString &password,
+    bool storePassword,
+    bool autoLogin);
 
-    void connectToCloudSystem(const QString &serverUrl);
+    void connectToCloudSystem(const QString& systemName, const QString &serverUrl);
 
     void connectToAnotherSystem();
 
@@ -73,8 +79,6 @@ public slots:
     void loginToCloud();
 
     void createAccount();
-
-    void tryHideScreen();
 
 public slots:
     QColor getPaletteColor(const QString &group
@@ -100,9 +104,11 @@ signals:
 
     void visibleControlsChanged();
 
-    void connectingNowChanged();
+    void connectingToSystemChanged();
 
     void resetAutoLogin();
+
+    void receivingResourcesChanged();
 
 private:
     void showScreen();
@@ -117,9 +123,10 @@ private:
     typedef QPointer<QWidget> WidgetPtr;
     typedef QPointer<QnCloudStatusWatcher> CloudStatusWatcherPtr;
 
+    bool m_receivingResources;
     bool m_visibleControls;
     bool m_visible;
-    bool m_connectingNow;
+    QString m_connectingSystemName;
     const QnGenericPalette m_palette;
     const WidgetPtr m_widget;
     QSize m_pageSize;
