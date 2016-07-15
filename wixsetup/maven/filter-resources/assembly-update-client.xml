@@ -15,6 +15,7 @@
                 <include>platforms/*.dll</include>
                 <include>qml/**</include>
                 <include>av*.dll</include>
+                <include>applauncher.exe</include>                
                 <include>${product.name}*.exe</include>                
                 <include>lib*.dll</include>
                 <include>nx*.dll</include>

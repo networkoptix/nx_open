@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>desktop_client</artifactId>
     <packaging>pom</packaging>
-    <name>NX Witness Desktop Client</name>
+    <name>Nx Witness Desktop Client</name>
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>

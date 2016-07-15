@@ -6,10 +6,9 @@ LIBTYPE = ${libtype}
 TEMPLATE = ${template}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
-unix {
-    VERSION = ${linux.release.version}
-}
 QT = ${qt.libs}
+
+CONFIG += unversioned_soname unversioned_libname
 
 ## GLOBAL CONFIGURATIONS
 !ios|equals(TEMPLATE, app) {
@@ -240,7 +239,7 @@ unix: {
 }
 
 ## LINUX
-unix:!android:!mac {
+linux* {
   !arm {
     LIBS += ${linux.oslibs}
     QMAKE_CXXFLAGS += ${compiler.arguments}
@@ -261,6 +260,8 @@ unix:!android:!mac {
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
+
+  equals(TEMPLATE, app): QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 
 ## MAC OS

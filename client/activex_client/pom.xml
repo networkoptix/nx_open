@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>activex_client</artifactId>
     <packaging>pom</packaging>
-    <name>NX Witness Client ActiveX Component</name>
+    <name>Nx Witness Client ActiveX Component</name>
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>
@@ -24,7 +24,7 @@
         <rename-skip>true</rename-skip>
         <template>lib</template>
 
-        <qt.libs>core gui network opengl xml xmlpatterns sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
+        <qt.libs>core core-private gui network opengl xml xmlpatterns sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
         <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient_core -lclient -lcloud_db_client -lnx_speech_synthesizer -lnx_vms_utils -lnx_fusion -lnx_utils -lvms_gateway</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -ld3d9</windows.oslibs>
 

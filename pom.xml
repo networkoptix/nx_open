@@ -84,7 +84,6 @@
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
-        <linux.release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</linux.release.version>
 
         <client.name>${company.name} ${product.name} Client</client.name>
         <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
@@ -114,6 +113,7 @@
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
         <cloud_connect_auto_test.name>${company.name} Cloud Connect Auto Test</cloud_connect_auto_test.name>
         <minilauncher.name>${company.name} ${display.product.name} Launcher</minilauncher.name>
+        <media_db_util.name>${company.name} ${display.product.name} Media DB Utility</media_db_util.name>
 
         <product.display.title>${product.title}</product.display.title>
         
@@ -526,9 +526,6 @@
 
                 <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
                 <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
-
-                <!-- TODO: #gdm Remove it when Qt 5.6.1 is ready for windows. -->
-                <qt.version>5.6.0</qt.version>
 
                 <profile.classifier>${platform}</profile.classifier>
                 <windows>true</windows>

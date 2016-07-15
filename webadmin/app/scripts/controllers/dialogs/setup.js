@@ -407,8 +407,8 @@ angular.module('webadminApp')
             $log.log("Request for id and authKey on cloud portal ...");
             //1. Request auth key from cloud_db
             cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
-                function(message){
-                    if(message.data.resultCode && message.data.resultCode !== 'ok'){
+                function(message) {
+                    if (message.data.resultCode && message.data.resultCode !== 'ok') {
                         cloudErrorHandler(message);
                         return;
                     }
@@ -416,7 +416,7 @@ angular.module('webadminApp')
                     //2. Save settings to local server
                     $log.log("Cloud portal returned success: " + JSON.stringify(message.data));
 
-                    $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}",message.data.id);
+                    $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}", message.data.id);
 
                     $log.log("Request /api/setupCloudSystem on mediaserver ...");
                     mediaserver.setupCloudSystem($scope.settings.systemName,
@@ -432,7 +432,9 @@ angular.module('webadminApp')
 
                             $log.log("Mediaserver has linked system to the cloud");
                             $log.log("Apply cloud credentials in mediaserver ... ");
-                            updateCredentials( $scope.settings.cloudEmail, $scope.settings.cloudPassword, true ).catch(errorHandler);
+                            return updateCredentials( $scope.settings.cloudEmail, $scope.settings.cloudPassword, true ).then(function(){
+                                return mediaserver.getModuleInformation(true);
+                            },errorHandler);
                         },errorHandler);
                 }, cloudErrorHandler);
         }
@@ -493,7 +495,7 @@ angular.module('webadminApp')
                 $location.path('/settings');
                 setTimeout(function(){
                     window.location.reload();
-                })
+                });
             }
         };
 
