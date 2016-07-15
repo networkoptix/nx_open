@@ -19,6 +19,10 @@ class QnModbusAsyncClient: public QObject
 
 public:
     QnModbusAsyncClient();
+    QnModbusAsyncClient(const SocketAddress& endpoint);
+
+    void setEndpoint(const SocketAddress& endpoint);
+
     void doModbusRequestAsync(const ModbusRequest& request);
 
     void readDiscreteInputsAsync();
@@ -56,8 +60,11 @@ private:
 
     QString m_lastErrorString;
 
+    SocketAddress m_endpoint;
+
     ModbusClientState m_state;
     QByteArray m_recvBuffer;
+    QByteArray m_sendBuffer;
     std::shared_ptr<AbstractStreamSocket> m_socket;
 };
 

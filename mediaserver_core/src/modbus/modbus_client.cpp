@@ -33,6 +33,7 @@ bool QnModbusClient::initSocket()
         m_socket->shutdown();
 
     m_socket.reset(SocketFactory::createStreamSocket(false));
+    m_socket->setRecvTimeout(10000);
 
     // TODO: #dmishin add some checks here. 
     return true;
@@ -46,10 +47,10 @@ void QnModbusClient::setEndpoint(const SocketAddress& endpoint)
 
 bool QnModbusClient::connect()
 {
-    if (m_socket)
-        return m_socket->connect(m_endpoint, kDefaultConnectionTimeoutMs);
+    if (!m_socket)
+        initSocket();
 
-    return false;
+    return m_socket->connect(m_endpoint, kDefaultConnectionTimeoutMs);
 }
 
 ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, bool& success)
@@ -61,6 +62,9 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, boo
         success = false;
         return response;
     }
+
+    if (!m_socket->isConnected())
+        m_socket->connect(m_endpoint);
 
     success = true;
 
@@ -156,4 +160,13 @@ ModbusMBAPHeader QnModbusClient::buildHeader(const ModbusRequest& request)
         + request.data.size();
 
     return header;
+}
+
+void QnModbusClient::disconnect()
+{
+    if (m_socket)
+    {
+        m_socket->shutdown();
+        m_socket.reset();
+    }
 }

@@ -21,6 +21,7 @@ public:
     void setEndpoint(const SocketAddress& sockaddr);
 
     bool connect();
+    void disconnect();
 
     ModbusResponse doModbusRequest(const ModbusRequest&, bool& success);
 

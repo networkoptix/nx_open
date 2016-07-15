@@ -14,10 +14,24 @@ QnModbusAsyncClient::QnModbusAsyncClient()
     initSocket();
 }
 
+QnModbusAsyncClient::QnModbusAsyncClient(const SocketAddress& endpoint)
+{
+
+}
+
+void QnModbusAsyncClient::setEndpoint(const SocketAddress& endpoint)
+{
+    m_endpoint = endpoint;
+    initSocket();
+}
+
 void QnModbusAsyncClient::initSocket()
 {
     if (m_socket)
-        return;
+    {
+        m_socket->cancelAsyncIO();
+        m_socket->shutdown();
+    }
 
     m_socket = std::make_shared<TCPSocket>();
 
@@ -26,6 +40,9 @@ void QnModbusAsyncClient::initSocket()
     {
         m_socket.reset();
     }
+
+    m_sendBuffer.reserve(20000);
+    m_recvBuffer.reserve(20000);
 }
 
 void QnModbusAsyncClient::readAsync()
@@ -37,6 +54,11 @@ void QnModbusAsyncClient::readAsync()
         std::placeholders::_1,
         std::placeholders::_2);
 
+    m_recvBuffer.truncate(0);
+
+    qDebug() << "CAPCITY/SIZE" << m_recvBuffer.capacity() << m_recvBuffer.size();
+
+    m_state = ModbusClientState::readingHeader;
     m_socket->readSomeAsync(&m_recvBuffer, handler);
 }
 
@@ -54,7 +76,7 @@ void QnModbusAsyncClient::asyncSendDone(
         emit error();
         return;
     }
-    
+    m_recvBuffer.truncate(0);
     readAsync();
 }
 
@@ -161,7 +183,8 @@ void QnModbusAsyncClient::processData()
 
 void QnModbusAsyncClient::doModbusRequestAsync(const ModbusRequest &request)
 {
-    auto data = ModbusRequest::encode(request);
+    m_sendBuffer.truncate(0);
+    m_sendBuffer.append(ModbusRequest::encode(request));
     m_requestFunctionCode = request.functionCode;
     m_requestTransactionId = request.header.transactionId;
 
@@ -173,8 +196,11 @@ void QnModbusAsyncClient::doModbusRequestAsync(const ModbusRequest &request)
         std::placeholders::_2);
 
     m_state = ModbusClientState::sendingMessage;
-    m_recvBuffer.clear();
-    m_socket->sendAsync(data, handler);
+
+    if (!m_socket->isConnected())
+        m_socket->connect(m_endpoint);
+
+    m_socket->sendAsync(m_sendBuffer, handler);
 }
 
 void QnModbusAsyncClient::readCoilsAsync(quint16 startCoil, quint16 coilNumber)

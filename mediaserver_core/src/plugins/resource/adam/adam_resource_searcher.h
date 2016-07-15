@@ -35,6 +35,8 @@ public:
         const QnUuid& resourceTypeId, 
         const QnResourceParams& params) override;
 
+    virtual bool isSequential() const override { return true; };
+
 private:
     QString generatePhysicalId(const QString& url) const;
     QByteArray executeAsciiCommand(nx_modbus::QnModbusClient& client, const QString& command);

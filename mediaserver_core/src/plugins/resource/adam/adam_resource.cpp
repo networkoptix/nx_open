@@ -33,7 +33,20 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
 {
     QnSecurityCamResource::initInternal();
 
+    Qn::CameraCapabilities caps = Qn::NoCapabilities;
+
+    caps |= Qn::RelayInputCapability;
+    caps |= Qn::RelayOutputCapability;
+
     m_ioManager.reset(new QnAdamModbusIOManager(this));
+
+    QnIOPortDataList allPorts = m_ioManager->getInputPortList();
+    QnIOPortDataList outputPorts = m_ioManager->getOutputPortList();
+    allPorts.insert(allPorts.begin(), outputPorts.begin(), outputPorts.end());
+
+    setIOPorts(allPorts);
+    setCameraCapabilities(caps);
+    saveParams();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -58,7 +71,8 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
 
 void QnAdamResource::stopInputPortMonitoringAsync()
 {
-    m_ioManager->stopIOMonitoring();
+    if (m_ioManager)
+        m_ioManager->stopIOMonitoring();
 }
 
 bool QnAdamResource::isInputPortMonitored() const

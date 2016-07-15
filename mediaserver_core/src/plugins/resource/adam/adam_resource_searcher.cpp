@@ -81,7 +81,7 @@ QString QnAdamResourceSearcher::getAdamModuleName(nx_modbus::QnModbusClient& cli
     if(response.isEmpty())
         return QString();
 
-    return QString::fromLatin1(response);
+    return QString::fromLatin1(response).trimmed();
 }
 
 QString QnAdamResourceSearcher::getAdamModuleFirmware(nx_modbus::QnModbusClient& client)
@@ -93,7 +93,7 @@ QString QnAdamResourceSearcher::getAdamModuleFirmware(nx_modbus::QnModbusClient&
     if(response.isEmpty())
         return QString();
 
-    return QString::fromLatin1(response);
+    return QString::fromLatin1(response).trimmed();
 }
 
 QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
@@ -133,20 +133,32 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
 
     auto model = lit("ADAM-") + moduleName;
 
-    QnUuid typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), model);
+    qDebug() << "Advantech model" << model;
+
+    QnUuid typeId = qnResTypePool->getResourceTypeId(lit("AdvantechADAM"), model);
+
     if (typeId.isNull())
         return QList<QnResourcePtr>();
 
     QnAdamResourcePtr resource(new QnAdamResource());
-    resource->setTypeId(m_typeId);
+    resource->setTypeId(typeId);
     resource->setName(model);
     resource->setModel(model);
+    resource->setFirmware(firmware);
 
     // Advantech ADAM modules do not have any unique identifier that we can obtain.
-    resource->setPhysicalId(generatePhysicalId(url.toString()));
+    qDebug() << "PhysicalId" << generatePhysicalId(url.toString());
+
+    auto uid = generatePhysicalId(url.toString());
+
+    modbusClient.disconnect();
+
+    resource->setPhysicalId(uid);
 
     QUrl webInterfaceUrl(url);
     webInterfaceUrl.setScheme(lit("http"));
+    resource->setVendor(lit("Advantech"));
+    resource->setMAC( QnMacAddress(uid));
     resource->setUrl(webInterfaceUrl.toString());
     resource->setDefaultAuth(auth);
 

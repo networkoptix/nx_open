@@ -5,12 +5,13 @@
 #include <atomic>
 
 #include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <utils/common/timermanager.h>
 #include <modbus/modbus_async_client.h>
 #include <plugins/common_interfaces/abstract_io_manager.h>
 
 
-class QnAdamResource : public QnSecurityCamResource
+class QnAdamResource : public QnPhysicalCameraResource
 {
     Q_OBJECT
 public:
