@@ -675,7 +675,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(QnActions::NewVideoWallAction).
             flags(Qn::Main).
-            requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
+            requiredGlobalPermission(Qn::GlobalAdminPermission).
             text(tr("Video Wall...")).
             pulledText(tr("New Video Wall...")).
             condition(new QnForbiddenInSafeModeCondition(this)).
@@ -778,6 +778,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Save Video Wall View")).
         shortcut(lit("Ctrl+S")).
         autoRepeat(false).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnSaveVideowallReviewActionCondition(true, this),
@@ -786,6 +787,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::DropOnVideoWallItemAction).
         flags(Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::LayoutTarget | Qn::VideoWallItemTarget | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Drop Resources")).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         condition(new QnForbiddenInSafeModeCondition(this));
 
     factory().
@@ -1107,7 +1109,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::AttachToVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Attach to Video Wall...")).
         autoRepeat(false).
         condition(new QnConjunctionActionCondition(

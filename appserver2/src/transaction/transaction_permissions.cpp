@@ -177,3 +177,11 @@ bool ec2::detail::hasPermissionImpl(const QnUuid &userId, const ApiVideowallCont
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
     return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalControlVideoWallPermission);
 }
+
+bool ec2::hasOwnerAccess(const QnUuid& userId)
+{
+    if (Qn::UserAccessData(userId) == Qn::kDefaultUserAccess)
+        return true;
+    auto userResource = qnResPool->getResourceById<QnUserResource>(userId);
+    return userResource && userResource->isEnabled() && userResource->isOwner();
+}

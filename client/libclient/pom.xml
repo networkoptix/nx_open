@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>libclient</artifactId>
     <packaging>pom</packaging>
-    <name>NX Witness Client Library</name>
+    <name>Nx Witness Client Library</name>
    
     <properties>
         <guid>${libclient.guid}</guid>

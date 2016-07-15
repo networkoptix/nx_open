@@ -401,25 +401,25 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
         /* Control videowall actions */
 
-        connect(action(QnActions::NewVideoWallAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered);
-        connect(action(QnActions::AttachToVideoWallAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered);
-        connect(action(QnActions::DetachFromVideoWallAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered);
-        connect(action(QnActions::ResetVideoWallLayoutAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_resetVideoWallLayoutAction_triggered);
-        connect(action(QnActions::DeleteVideoWallItemAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered);
-        connect(action(QnActions::StartVideoWallAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered);
-        connect(action(QnActions::StopVideoWallAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered);
-        connect(action(QnActions::RenameVideowallEntityAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_renameAction_triggered);
-        connect(action(QnActions::IdentifyVideoWallAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered);
-        connect(action(QnActions::StartVideoWallControlAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered);
-        connect(action(QnActions::OpenVideoWallsReviewAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered);
-        connect(action(QnActions::SaveCurrentVideoWallReviewAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered);
-        connect(action(QnActions::SaveVideoWallReviewAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered);
-        connect(action(QnActions::DropOnVideoWallItemAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered);
-        connect(action(QnActions::PushMyScreenToVideowallAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered);
-        connect(action(QnActions::VideowallSettingsAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered);
-        connect(action(QnActions::SaveVideowallMatrixAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered);
-        connect(action(QnActions::LoadVideowallMatrixAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered);
-        connect(action(QnActions::DeleteVideowallMatrixAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered);
+        connect(action(QnActions::NewVideoWallAction),              &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered);
+        connect(action(QnActions::AttachToVideoWallAction),         &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered);
+        connect(action(QnActions::DetachFromVideoWallAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered);
+        connect(action(QnActions::ResetVideoWallLayoutAction),      &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_resetVideoWallLayoutAction_triggered);
+        connect(action(QnActions::DeleteVideoWallItemAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered);
+        connect(action(QnActions::StartVideoWallAction),            &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered);
+        connect(action(QnActions::StopVideoWallAction),             &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered);
+        connect(action(QnActions::RenameVideowallEntityAction),     &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_renameAction_triggered);
+        connect(action(QnActions::IdentifyVideoWallAction),         &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered);
+        connect(action(QnActions::StartVideoWallControlAction),     &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered);
+        connect(action(QnActions::OpenVideoWallsReviewAction),      &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered);
+        connect(action(QnActions::SaveCurrentVideoWallReviewAction),&QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered);
+        connect(action(QnActions::SaveVideoWallReviewAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered);
+        connect(action(QnActions::DropOnVideoWallItemAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered);
+        connect(action(QnActions::PushMyScreenToVideowallAction),   &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered);
+        connect(action(QnActions::VideowallSettingsAction),         &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered);
+        connect(action(QnActions::SaveVideowallMatrixAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered);
+        connect(action(QnActions::LoadVideowallMatrixAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered);
+        connect(action(QnActions::DeleteVideowallMatrixAction),     &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered);
 
         connect(display(), &QnWorkbenchDisplay::widgetAdded, this, &QnWorkbenchVideoWallHandler::at_display_widgetAdded);
         connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this, &QnWorkbenchVideoWallHandler::at_display_widgetAboutToBeRemoved);
@@ -1220,27 +1220,16 @@ QnVideoWallItemIndexList QnWorkbenchVideoWallHandler::targetList() const
 
 QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourceList &resources) const
 {
-
-    if (resources.size() == 1)
-    {
-        // If there is only one layout, return it
-        if (QnLayoutResourcePtr layout = resources.first().dynamicCast<QnLayoutResource>())
-            return layout;
-    }
-
     QnResourceList filtered;
     QMap<qreal, int> aspectRatios;
     qreal defaultAr = qnGlobals->defaultLayoutCellAspectRatio();
 
     auto addToFiltered = [&](const QnResourcePtr &resource)
     {
-        if (!resource)
+        if (!resource.dynamicCast<QnMediaResource>() && !resource.dynamicCast<QnMediaServerResource>())
             return;
 
-        if (resource.dynamicCast<QnMediaResource>())
-            filtered << resource;
-        else if (resource.dynamicCast<QnMediaServerResource>())
-            filtered << resource;
+        filtered << resource;
 
         qreal ar = defaultAr;
         if (QnNetworkResourcePtr networkResource = resource.dynamicCast<QnNetworkResource>())
@@ -1261,16 +1250,18 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
         }
     }
 
-    qreal desiredAspectRatio = defaultAr;
-    for (qreal ar : aspectRatios.keys())
-    {
-        if (aspectRatios[ar] > aspectRatios[desiredAspectRatio])
-            desiredAspectRatio = ar;
-    }
+    /* If we have provided the only layout, copy from it as much as possible. */
+    QnLayoutResourcePtr sourceLayout = resources.size() == 1
+        ? resources.first().dynamicCast<QnLayoutResource>()
+        : QnLayoutResourcePtr();
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setId(m_uuidPool->getFreeId());
-    if (filtered.size() == 1)
+    if (sourceLayout)
+    {
+        layout->setName(sourceLayout->getName());
+    }
+    else if (filtered.size() == 1)
     {
         QnResourcePtr resource = filtered.first();
         QString resourceName = resource->getName();
@@ -1288,28 +1279,45 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
             layout->setName(tr("%n items", "", filtered.size()));
     }
     qnResPool->markLayoutAutoGenerated(layout);
-
-    if (context()->user()) //TODO: #GDM and what if not?
-        layout->setParentId(context()->user()->getId());
-
-    layout->setCellSpacing(0, 0);
-    layout->setCellAspectRatio(desiredAspectRatio);
     layout->addFlags(Qn::local); // TODO: #Elric #EC2
 
-    /* Calculate size of the resulting matrix. */
-    const int matrixWidth = qMax(1, qRound(std::sqrt(desiredAspectRatio * filtered.size())));
-
-    int i = 0;
-    foreach(const QnResourcePtr &resource, filtered)
+    if (sourceLayout)
     {
-        QnLayoutItemData item;
-        item.flags = Qn::Pinned;
-        item.uuid = QnUuid::createUuid();
-        item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
-        item.resource.id = resource->getId();
-        item.resource.uniqueId = resource->getUniqueId();
-        layout->addItem(item);
-        i++;
+        layout->setCellSpacing(sourceLayout->cellSpacing());
+        layout->setCellAspectRatio(sourceLayout->cellAspectRatio());
+        layout->setItems(sourceLayout->getItems());
+        layout->setBackgroundImageFilename(sourceLayout->backgroundImageFilename());
+        layout->setBackgroundOpacity(sourceLayout->backgroundOpacity());
+        layout->setBackgroundSize(sourceLayout->backgroundSize());
+        layout->setLocked(sourceLayout->locked());
+    }
+    else
+    {
+        qreal desiredAspectRatio = defaultAr;
+        for (qreal ar : aspectRatios.keys())
+        {
+            if (aspectRatios[ar] > aspectRatios[desiredAspectRatio])
+                desiredAspectRatio = ar;
+        }
+
+        layout->setCellSpacing(0, 0);
+        layout->setCellAspectRatio(desiredAspectRatio);
+
+        /* Calculate size of the resulting matrix. */
+        const int matrixWidth = qMax(1, qRound(std::sqrt(desiredAspectRatio * filtered.size())));
+
+        int i = 0;
+        for (const QnResourcePtr &resource: filtered)
+        {
+            QnLayoutItemData item;
+            item.flags = Qn::Pinned;
+            item.uuid = QnUuid::createUuid();
+            item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
+            item.resource.id = resource->getId();
+            item.resource.uniqueId = resource->getUniqueId();
+            layout->addItem(item);
+            i++;
+        }
     }
 
     qnResPool->addResource(layout);
@@ -1409,10 +1417,15 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered()
     dialog->loadFromResource(videoWall);
     if (!dialog->exec())
         return;
-    dialog->submitToResource(videoWall);
+
+    qnResourcesChangesManager->saveVideoWall(videoWall, [d = dialog.data()](const QnVideoWallResourcePtr &videoWall)
+    {
+        d->submitToResource(videoWall);
+    });
+
 
     menu()->trigger(QnActions::OpenVideoWallsReviewAction, QnActionParameters(videoWall));
-    saveVideowallAndReviewLayout(videoWall);
+    //saveVideowallAndReviewLayout(videoWall);
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
@@ -2940,9 +2953,6 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWall
     }
     else
     { // e.g. workbench layout is empty
-     //TODO: #GDM SafeMode
-        ec2::ApiVideowallData apiVideowall;
-        fromResourceToApi(videowall, apiVideowall);
-        connection2()->getVideowallManager(Qn::kDefaultUserAccess)->save(apiVideowall, this, callback);
+        qnResourcesChangesManager->saveVideoWall(videowall, [](const QnVideoWallResourcePtr &) {});
     }
 }

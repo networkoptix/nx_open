@@ -14,7 +14,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_network_ut</artifactId>
     <packaging>pom</packaging>
-    <name>NX Network Unit Tests</name>
+    <name>Nx Network Unit Tests</name>
 
     <properties>
         <guid>${nx_network_ut.guid}</guid>

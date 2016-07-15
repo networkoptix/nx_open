@@ -21,7 +21,7 @@ OS_IS_WINDOWS = sys.platform.startswith("win32") or sys.platform.startswith("cyg
 # MinGW(MSYS) -> Native python (from buildenv, for example)
 def _cygwin_path(path):
     if len(path) > 1 and path[1] == ':':
-        prefix = '/cygdrive/' if sys.platform.startswith("cygwin") else '/'
+        prefix = '/cygdrive/' if OS_IS_WINDOWS else '/'
         drive_letter = path[0].lower()
         return "{0}{1}{2}".format(prefix, drive_letter, path[2:].replace("\\", "/"))
     return path
