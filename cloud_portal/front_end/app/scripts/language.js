@@ -1,6 +1,7 @@
 'use strict';
 
 var L = {
+    productName: 'PRODUCT_NAME',
     dialogs:{
         okButton: 'Ok',
         loginTitle: 'Login to PRODUCT_NAME'
@@ -25,8 +26,8 @@ var L = {
         contentPage: '',
         debug: 'Debug',
         login: 'Login -',
-        download: 'Download',
-        downloadPlatform: 'Download',
+        download: 'Download VMS_NAME',
+        downloadPlatform: 'Download VMS_NAME for ',
         startPage: '',
         pageNotFount: 'Page not found'
     },

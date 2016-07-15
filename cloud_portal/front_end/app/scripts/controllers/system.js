@@ -2,8 +2,9 @@
 
 angular.module('cloudApp')
     .controller('SystemCtrl', ['$scope', 'cloudApi', '$routeParams', '$location', 'urlProtocol', 'dialogs', 'process',
-    'account', '$q', 'system', '$poll',
-    function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process, account, $q, system, $poll) {
+    'account', '$q', 'system', '$poll', 'page',
+    function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process,
+    account, $q, system, $poll, page) {
 
         $scope.Config = Config;
         $scope.L = L;
@@ -124,6 +125,9 @@ angular.module('cloudApp')
                 });
         };
 
+        $scope.$watch('system.info.name',function(value){
+            page.title(value + ' -');
+        });
 
         function normalizePermissionString(permissions){
             return permissions.split('|').sort().join('|');

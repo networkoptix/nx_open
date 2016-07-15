@@ -2,7 +2,8 @@
 
 
 angular.module('cloudApp')
-    .controller('DownloadCtrl', ['$scope', '$routeParams','$location', function ($scope, $routeParams, $location) {
+    .controller('DownloadCtrl', ['$scope', '$routeParams', '$location', 'page',
+    function ($scope, $routeParams, $location, page) {
 
         $scope.downloads = DownloadsConfig;
 
@@ -24,6 +25,9 @@ angular.module('cloudApp')
 
         $scope.changeHash = function(platform){
             var addHash = (platform.os || platform.name);
+
+            page.title(L.pageTitles.downloadPlatform + platform.name);
+
             $location.path("/download/" + addHash, false);
         }
     }]);
