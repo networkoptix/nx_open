@@ -51,33 +51,33 @@ do
 done
 
 LIBS_TO_COPY=\
-( libavcodec.so.54.23.100 \
-libavdevice.so.54.0.100 \
-libavfilter.so.2.77.100 \
-libavformat.so.54.6.100 \
-libavutil.so.51.54.100 \
-libudt.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libcloud_db_client.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnx_fusion.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnx_network.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnx_streaming.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnx_utils.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnx_email.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libpostproc.so.52.0.100 \
-libquazip.so.1.0.0 \
-libsasl2.so.3.0.0 \
-liblber-2.4.so.2.10.5 \
-libldap-2.4.so.2.10.5 \
-libldap_r-2.4.so.2.10.5 \
+( libavcodec.so \
+libavdevice.so \
+libavfilter.so \
+libavformat.so \
+libavutil.so \
+libudt.so \
+libcommon.so \
+libcloud_db_client.so \
+libnx_fusion.so \
+libnx_network.so \
+libnx_streaming.so \
+libnx_utils.so \
+libnx_email.so \
+libappserver2.so \
+libmediaserver_core.so \
+libpostproc.so \
+libquazip.so \
+libsasl2.so \
+liblber-2.4.so.2 \
+libldap-2.4.so.2 \
+libldap_r-2.4.so.2 \
 libsigar.so \
-libswresample.so.0.15.100 \
-libswscale.so.2.1.100 )
+libswresample.so \
+libswscale.so )
 
-if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
-  LIBS_TO_COPY+=( libvpx.so.1.2.0 )
+if [ -e "$LIBS_DIR/libvpx.so" ]; then
+  LIBS_TO_COPY+=( libvpx.so )
 fi
 if [ -e "$LIBS_DIR/libcreateprocess.so" ]; then
   LIBS_TO_COPY+=( libcreateprocess.so )
@@ -91,22 +91,12 @@ echo "$VERSION" > $BUILD_DIR/$PREFIX_DIR/version.txt
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
 for var in "${LIBS_TO_COPY[@]}"
 do
-  cp $LIBS_DIR/${var}   $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+  echo "Adding lib" $var
+  cp $LIBS_DIR/${var}* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
   if [ ! -z "$STRIP" ]; then
-     echo $STRIP
      $STRIP $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
   fi
 done
-
-#generating links
-pushd $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
-LIBS="`find ./ -name '*.so.*.*.*'`"
-for var in $LIBS
-do
-    LINK_TARGET="`echo $var | sed 's/\(.*so.[0-9]\+\)\(.*\)/\1/'`"
-    ln -s $var $LINK_TARGET
-done
-popd
 
 #copying qt libs
 QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql"
