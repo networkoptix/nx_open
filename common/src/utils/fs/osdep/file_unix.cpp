@@ -8,7 +8,7 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include "../file.h"
 
 #include <sstream>
