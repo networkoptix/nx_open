@@ -159,7 +159,7 @@ angular.module('cloudApp')
                 return defer.promise;
             },
 
-            getCommonPasswords:cacheGet('scripts/commonPasswordsList.json',true),
+            getCommonPasswords:cacheGet('/static/scripts/commonPasswordsList.json',true),
             users:function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/users');
             },
