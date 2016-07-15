@@ -2,7 +2,7 @@
 
 angular.module('webadminApp')
     .controller('CloudDialogCtrl', function ($scope, $modalInstance, mediaserver, cloudAPI, connect, systemName,
-                                             cloudSystemID, cloudAccountName, $timeout) {
+                                             cloudSystemID, cloudAccountName) {
 
         //1. Detect action: connect or disconnect
         $scope.connect = connect;
