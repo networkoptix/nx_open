@@ -96,8 +96,8 @@ ec2::ApiPredefinedRoleDataList QnResourceAccessManager::getPredefinedRoles()
     static ec2::ApiPredefinedRoleDataList kPredefinedRoles;
     if (kPredefinedRoles.empty())
     {
-        kPredefinedRoles.emplace_back(tr("Owner"), Qn::NoGlobalPermissions, true);
-        kPredefinedRoles.emplace_back(tr("Administrator"), Qn::GlobalAdminPermission);
+        kPredefinedRoles.emplace_back(tr("Owner"), Qn::GlobalAdminPermissionsSet, true);
+        kPredefinedRoles.emplace_back(tr("Administrator"), Qn::GlobalAdminPermissionsSet);
         kPredefinedRoles.emplace_back(tr("Advanced Viewer"), Qn::GlobalAdvancedViewerPermissionSet);
         kPredefinedRoles.emplace_back(tr("Viewer"), Qn::GlobalViewerPermissionSet);
         kPredefinedRoles.emplace_back(tr("Live Viewer"), Qn::GlobalLiveViewerPermissionSet);
