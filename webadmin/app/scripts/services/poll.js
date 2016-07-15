@@ -25,6 +25,7 @@ angular.module('webadminApp')
                 activeInterval = $interval(function(){
                     activeFnPromise = fn(); // Call function
                     activeFnPromise.finally(function(result){
+                        activeFnPromise = null;
                         deferred.notify(result);
                         if(!cancelledPoll){
                             runPoll();
@@ -37,7 +38,7 @@ angular.module('webadminApp')
             function cancelPoll(){
                 cancelledPoll = true; // Stop triggering poll again
                 $interval.cancel(activeInterval); // Not sure if we need this
-                if(activeFnPromise.abort){  // fn returned $http-like promise - abort the request
+                if(activeFnPromise && activeFnPromise.abort){  // fn returned $http-like promise - abort the request
                     activeFnPromise.abort();
                 }
                 deferred.reject('cancelled');
@@ -51,9 +52,8 @@ angular.module('webadminApp')
             return promise;
         }
         poll.cancel = function( promise ){
-
             promise.abort();
-        }
+        };
 
 
         return poll;
