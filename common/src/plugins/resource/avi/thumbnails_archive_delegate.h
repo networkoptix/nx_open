@@ -32,6 +32,8 @@ private:
     qint64 m_frameStep;
     qint64 m_lastMediaTime;
     QnAbstractArchiveDelegatePtr m_baseDelegate;
+    int m_nextChannelNum;
+    int m_channelCount;
 };
 
 typedef QSharedPointer<QnThumbnailsArchiveDelegate> QnThumbnailsArchiveDelegatePtr;
