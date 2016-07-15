@@ -837,7 +837,7 @@ TEST_F(SystemSharing, get_access_role_list)
             account1.email,
             account1Password,
             system1.id,
-            account4.email,
+            account5.email,
             api::SystemAccessRole::viewer));
 
     api::AccountData account6;
@@ -874,6 +874,14 @@ TEST_F(SystemSharing, get_access_role_list)
         }
 
         {
+            std::vector<api::SystemSharingEx> sharings;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                getSystemSharings(account1.email, account1Password, system1.id, &sharings));
+            ASSERT_EQ(5, sharings.size());
+        }
+
+        {
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::ok,
@@ -887,6 +895,14 @@ TEST_F(SystemSharing, get_access_role_list)
         }
 
         {
+            std::vector<api::SystemSharingEx> sharings;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                getSystemSharings(account2.email, account2Password, system1.id, &sharings));
+            ASSERT_EQ(5, sharings.size());
+        }
+
+        {
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::ok,
@@ -896,10 +912,26 @@ TEST_F(SystemSharing, get_access_role_list)
         }
 
         {
+            std::vector<api::SystemSharingEx> sharings;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                getSystemSharings(account3.email, account3Password, system1.id, &sharings));
+            ASSERT_EQ(5, sharings.size());
+        }
+
+        {
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
-                api::ResultCode::forbidden,
+                api::ResultCode::ok,
                 getAccessRoleList(account4.email, account4Password, system1.id, &accessRoles));
+        }
+
+        {
+            std::vector<api::SystemSharingEx> sharings;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                getSystemSharings(account4.email, account4Password, system1.id, &sharings));
+            ASSERT_EQ(5, sharings.size());
         }
 
         {

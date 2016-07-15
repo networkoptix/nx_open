@@ -194,6 +194,9 @@ void QnProxySenderConnection::run()
     if (!m_needStop && gotRequest)
     {
         parseRequest();
-        processRequest(false);
+        auto handler = d->owner->findHandler(d->protocol, d->request);
+        bool noAuth;
+        if (handler && authenticate(&d->authUserId, &noAuth))
+            processRequest(noAuth);
     }
 }

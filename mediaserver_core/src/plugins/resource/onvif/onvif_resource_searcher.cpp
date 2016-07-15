@@ -44,6 +44,7 @@ bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 static const int ONVIF_SERVICE_DEFAULT_PORTS[] =
 {
     80,
+    8081, //FLIR default port
     8032, // DW default port
     50080, // NEW DW cam default port
     9988 // Dahui default port
@@ -133,7 +134,14 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         if (channel > 0)
             resource->updateToChannel(channel-1);
 
-        if (rpResource->getMaxChannels() > 1 ) {
+        auto resData = qnCommon
+            ->dataPool()
+            ->data(rpResource->getVendor(), rpResource->getModel());
+
+        bool shouldAppearAsSingleChannel = resData.value<bool>(
+            Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+
+        if (rpResource->getMaxChannels() > 1  && !shouldAppearAsSingleChannel) {
             resource->setGroupId(rpResource->getPhysicalId());
             resource->setGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
         }
@@ -182,6 +190,11 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         }
 
         OnvifResourceInformationFetcher fetcher;
+        auto resData = qnCommon->dataPool()->data(manufacturer, modelName);
+        auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
+
+        manufacturer = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
+
         QnUuid rt = fetcher.getOnvifResourceType(manufacturer, modelName);
         resource->setVendor( manufacturer );
         resource->setName( modelName );
@@ -199,13 +212,17 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 
         if(!resource->getUniqueId().isEmpty())
         {
+            auto maxChannels = resource->getMaxChannels();
             resource->detectVideoSourceCount();
             //if (channel > 0)
             //    resource->updateToChannel(channel-1);
             resList << resource;
             
+            bool shouldAppearAsSingleChannel = resData
+                .value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+
             // checking for multichannel encoders
-            if (doMultichannelCheck)
+            if (doMultichannelCheck && !shouldAppearAsSingleChannel)
             {
                 if (resource->getMaxChannels() > 1)
                 {
@@ -216,6 +233,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
                 for (int i = 1; i < resource->getMaxChannels(); ++i) 
                 {
                     QnPlOnvifResourcePtr res = createResource(resource->getTypeId(), QnResourceParams()).dynamicCast<QnPlOnvifResource>();
+                    res->setGroupId(resource->getPhysicalId());
+                    res->setGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
                     res->setVendor( manufacturer );
                     res->setPhysicalId(resource->getPhysicalId());
                     res->update(resource, true);
@@ -270,7 +289,6 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
         return result;
     }
     */
-    
     result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(
         resourceType->getName() == lit("ONVIF") && !params.vendor.isEmpty()
         ? params.vendor
