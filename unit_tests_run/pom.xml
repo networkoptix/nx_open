@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>unit_tests_run</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Unit Tests Runner</name>
+    <name>Nx Witness Unit Tests Runner</name>
 
     <properties>
         <root.dir>${basedir}/..</root.dir>

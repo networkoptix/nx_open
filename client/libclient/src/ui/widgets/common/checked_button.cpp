@@ -56,7 +56,7 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
 
         rect.adjust(0, 0, 1, 1);
         painter.drawLine(rect.bottomLeft(), rect.topRight());
-        painter.drawPolygon(points.data(), points.size());
+        painter.drawPolygon(points.data(), static_cast<int>(points.size()));
     }
 
     painter.end();

@@ -20,7 +20,7 @@ public:
 
     virtual bool processAudioData(const QnConstCompressedAudioDataPtr& data) override;
 
-    virtual bool isCompatible(const QnAudioFormat& format) const { return true; }
+    virtual bool isCompatible(const QnAudioFormat& /* format */) const { return true; }
     virtual void setOutputFormat(const QnAudioFormat& /* format */) override {}
     virtual bool isInitialized() const override { return m_initialized; }
 

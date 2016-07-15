@@ -85,6 +85,8 @@ void doTestInternal(int systemFlags)
     }
 
     ASSERT_EQ(checkResultFile.pos(), checkResultFile.size());
+
+    QFile::remove(kTestFileName);
 }
 
 TEST(BufferedFileWriter, noDirectIO)

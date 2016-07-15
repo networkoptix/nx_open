@@ -36,8 +36,19 @@ namespace Qn
     static const QString CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = lit("mediaStreams");
     static const QString CAMERA_BITRATE_INFO_LIST_PARAM_NAME = lit("bitrateInfos");
     static const QString CAMERA_STREAM_URLS_PARAM_NAME = lit("streamUrls");
+    static const QString CAMERA_ALLOWED_FPS_LIST_PARAM_NAME = lit("allowedFpsList");
+    static const QString TRUST_TO_VIDEO_SOURCE_SIZE_PARAM_NAME = lit("trustToVideoSourceSize");
+    static const QString FPS_BASE_PARAM_NAME = lit("fpsBase"); //used if we need to control fps via encoding interval (fps when encoding interval is 1)
+    static const QString CONTROL_FPS_VIA_ENCODING_INTERVAL_PARAM_NAME = lit("controlFpsViaEncodingInterval");
+    static const QString USE_EXISTING_ONVIF_PROFILES_PARAM_NAME = lit("useExistingOnvifProfiles");
     static const QString CAMERA_AUDIO_CODEC_PARAM_NAME = lit("audioCodec");
+    static const QString FORCED_PRIMARY_STREAM_RESOLUTION_PARAM_NAME = lit("forcedPrimaryStreamResolution");
+    static const QString FORCED_SECONDARY_STREAM_RESOLUTION_PARAM_NAME = lit("forcedSecondaryStreamResolution");
+    static const QString DO_NOT_CONFIGURE_CAMERA_PARAM_NAME = lit("doNotConfigureCamera");
     static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
+    static const QString VIDEO_LAYOUT_PARAM_NAME2 = lit("videoLayout"); //used in resource_data.json
+
+    static const QString SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME = lit("shouldAppearAsSingleChannel");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state
     static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
     static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
@@ -52,6 +63,9 @@ namespace Qn
     static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
     static const QString PTZ_CAPABILITIES_PARAM_NAME = lit("ptzCapabilities");
 	static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
+    static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype"); 
+    static const QString DO_NOT_ADD_VENDOR_TO_DEVICE_NAME = lit("doNotAddVendorToDeviceName");
+    static const QString VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME = lit("multiresourceVideoChannelMapping");
 
 
     // Mediaserver info for Statistics

@@ -11,7 +11,7 @@
     <version>3.0.0-SNAPSHOT</version>
     <artifactId>ftpstorageplugin</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Ftp storage plugin</name>	
+    <name>Nx Witness Ftp storage plugin</name>	
 
     <properties>
         <guid>${ftpstorageplugin.guid}</guid>

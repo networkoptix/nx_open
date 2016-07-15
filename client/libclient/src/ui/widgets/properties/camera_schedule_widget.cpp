@@ -276,13 +276,13 @@ void QnCameraScheduleWidget::retranslateUi()
     ui->retranslateUi(this);
 
     QString warnText = (qnResPool && qnResPool->containsIoModules())
-        ? tr("Warning! High minimum value could decrease other devices' recording durations.")
-        : tr("Warning! High minimum value could decrease other cameras' recording durations.");
+        ? tr("High minimum value can lead to archive length decrease on other devices.")
+        : tr("High minimum value can lead to archive length decrease on other cameras.");
 
     ui->minArchiveDaysWarningLabel->setText(warnText);
 
     ui->scheduleGridGroupBox->setTitle(lit("%1\t(%2)").arg(
-        ui->scheduleGridGroupBox->title()).arg(
+            tr("Recording Schedule")).arg(
             tr("based on server time")));
 }
 
@@ -291,13 +291,6 @@ void QnCameraScheduleWidget::afterContextInitialized() {
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnCameraScheduleWidget::updateLicensesButtonVisible);
     updatePanicLabelText();
     updateLicensesButtonVisible();
-}
-
-bool QnCameraScheduleWidget::hasHeightForWidth() const
-{
-    return false;   //TODO: #GDM temporary fix to handle string freeze
-                    // all labels with word-wrap should be replaced by QnWordWrappedLabel.
-                    // This widget has 5 of them (label_4.._8, exportWarningLabel)
 }
 
 void QnCameraScheduleWidget::connectToGridWidget()

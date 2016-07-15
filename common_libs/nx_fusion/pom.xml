@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_fusion</artifactId>
     <packaging>pom</packaging>
-    <name>NX Fusion Library</name>
+    <name>Nx Fusion Library</name>
 
     <properties>
         <guid>${nx_fusion.guid}</guid>

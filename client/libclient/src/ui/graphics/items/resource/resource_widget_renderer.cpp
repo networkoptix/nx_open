@@ -59,6 +59,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
     m_panoFactor = channelCount;
 
     m_channelRenderers.resize( channelCount );
+    m_channelSourceSize.resize( channelCount );
     m_renderingEnabled.resize( channelCount, true );
 
     for( int i = 0; i < channelCount; ++i )
@@ -260,10 +261,12 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
     }
 
     QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);
-    if(m_sourceSize == sourceSize)
+
+    if (m_channelSourceSize[image->channel] == sourceSize)
         return;
 
-    m_sourceSize = sourceSize;
+    m_channelSourceSize[image->channel] = sourceSize;
+    m_sourceSize = getMostFrequentChannelSourceSize();
 
     emit sourceSizeChanged();
 }
@@ -366,4 +369,41 @@ void QnResourceWidgetRenderer::setHistogramConsumer(QnHistogramConsumer* value)
         if( ctx.renderer )
             ctx.renderer->setHistogramConsumer(value);
     }
+}
+
+QSize QnResourceWidgetRenderer::getMostFrequentChannelSourceSize() const
+{
+    QSize sourceSize;
+    auto channelCount = m_channelSourceSize.size();
+
+    std::map<int, int> widthFrequencyMap;
+    std::map<int, int> heightFrequentMap;
+
+    for (int channelNum = 0; channelNum < channelCount; channelNum++)
+    {
+        if (!m_channelSourceSize[channelNum].isEmpty())
+        {
+            widthFrequencyMap[m_channelSourceSize[channelNum].width()]++;
+            heightFrequentMap[m_channelSourceSize[channelNum].height()]++;
+        }
+    }
+
+    sourceSize.setWidth(
+        getMostFrequentSize(widthFrequencyMap));
+
+    sourceSize.setHeight(
+        getMostFrequentSize(heightFrequentMap));
+
+    return sourceSize;
+}
+
+int QnResourceWidgetRenderer::getMostFrequentSize(std::map<int, int>& sizeMap) const
+{
+    auto maxSize = std::max_element(sizeMap.begin(), sizeMap.end(), 
+        [](const std::pair<int, int>& l, const std::pair<int, int>& r)
+        {
+            return l.second < r.second;
+        });
+
+    return maxSize == sizeMap.end() ? -1 : maxSize->first;
 }

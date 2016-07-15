@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_sdk</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness SDK</name>
+    <name>Nx Witness SDK</name>
 
     <properties>
         <root.dir>${basedir}/..</root.dir>
