@@ -239,7 +239,7 @@ unix: {
 }
 
 ## LINUX
-linux* {
+linux*:!android {
   !arm {
     LIBS += ${linux.oslibs}
     QMAKE_CXXFLAGS += ${compiler.arguments}
