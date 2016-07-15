@@ -5,6 +5,31 @@ var L = {
         okButton: 'Ok',
         loginTitle: 'Login to PRODUCT_NAME'
     },
+    pageTitles:{
+        template: '{{title}} PRODUCT_NAME',
+        default: 'PRODUCT_NAME',
+        registerSuccess: 'Welcome to',
+        register: 'Register in',
+        changePassword: 'Change password -',
+        account: 'Account settings -',
+        systems: 'Systems -',
+        system: 'System -',
+        systemShare: 'Share the system -',
+        activate: 'Activate account -',
+        activateSent: 'Activate account -',
+        activateSuccess: 'Account activated -',
+        activateCode: 'Activate account -',
+        restorePassword: 'Restore password -',
+        restorePasswordSuccess: 'Password saved -',
+        restorePasswordCode: 'Restore password -',
+        contentPage: '',
+        debug: 'Debug',
+        login: 'Login -',
+        download: 'Download',
+        downloadPlatform: 'Download',
+        startPage: '',
+        pageNotFount: 'Page not found'
+    },
     systemStatuses:{
         notActivated: 'not activated',
         activated: 'activated',
@@ -77,8 +102,7 @@ var L = {
         cantEditAdmin: 'This user already has administrator privileges'
 
     },
-    passwordRequirements:
-    {
+    passwordRequirements:{
         minLengthMessage:'Password must contain at least 8 characters',
         requiredMessage: 'Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces.',
         weakMessage: 'Use numbers, symbols in different case and special symbols to make your password stronger',

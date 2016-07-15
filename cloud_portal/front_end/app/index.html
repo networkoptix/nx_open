@@ -1,12 +1,12 @@
 <!doctype html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" ng-app="cloudApp" > <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" ng-app="cloudApp" > <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" ng-app="cloudApp" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" ng-app="cloudApp" > <!--<![endif]-->
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title></title>
+    <title ng-bind-html="pageTitle"></title>
     <meta name="description" content="">
 
     <base href="/" />
@@ -29,7 +29,7 @@
     <!-- endbuild -->
 
 </head>
-<body ng-app="cloudApp" class="loading">
+<body class="loading">
 <!--[if lt IE 7]>
 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
@@ -117,6 +117,8 @@
 <script src="scripts/services/mediaserver.js"></script>
 <script src="scripts/services/system.js"></script>
 <script src="scripts/services/account.js"></script>
+<script src="scripts/services/page.js"></script>
+
 <script src="scripts/filters/highlight.js"></script>
 
 <script src="scripts/bigBrother.js"></script>

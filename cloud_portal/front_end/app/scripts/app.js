@@ -19,12 +19,13 @@ angular.module('cloudApp', [
         combineDuplications: true,
         newestOnTop: false
     });
-}]).config(['$routeProvider', '$locationProvider',function ($routeProvider, $locationProvider) {
+}]).config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true); //Get rid of hash in urls
     $locationProvider.hashPrefix('!');
 
     $routeProvider
         .when('/register/success', {
+            title: L.pageTitles.registerSuccess,
             templateUrl: 'static/views/register.html',
             controller: 'RegisterCtrl',
             resolve: {
@@ -32,14 +33,17 @@ angular.module('cloudApp', [
             }
         })
         .when('/register/:email', {
+            title: L.pageTitles.register,
             templateUrl: 'static/views/register.html',
             controller: 'RegisterCtrl'
         })
         .when('/register', {
+            title: L.pageTitles.register,
             templateUrl: 'static/views/register.html',
             controller: 'RegisterCtrl'
         })
         .when('/account/password', {
+            title: L.pageTitles.changePassword,
             templateUrl: 'static/views/account.html',
             controller: 'AccountCtrl',
             resolve: {
@@ -47,6 +51,7 @@ angular.module('cloudApp', [
             }
         })
         .when('/account', {
+            title: L.pageTitles.account,
             templateUrl: 'static/views/account.html',
             controller: 'AccountCtrl',
             resolve: {
@@ -56,14 +61,17 @@ angular.module('cloudApp', [
 
 
         .when('/systems', {
+            title: L.pageTitles.systems,
             templateUrl: 'static/views/systems.html',
             controller: 'SystemsCtrl'
         })
         .when('/systems/:systemId', {
+            title: L.pageTitles.system,
             templateUrl: 'static/views/system.html',
             controller: 'SystemCtrl'
         })
         .when('/systems/:systemId/share', {
+            title: L.pageTitles.systemShare,
             templateUrl: 'static/views/system.html',
             controller: 'SystemCtrl',
             resolve: {
@@ -71,6 +79,7 @@ angular.module('cloudApp', [
             }
         })
         .when('/activate', {
+            title: L.pageTitles.activate,
             templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
@@ -78,6 +87,7 @@ angular.module('cloudApp', [
             }
         })
         .when('/activate/sent', {
+            title: L.pageTitles.activateSent,
             templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
@@ -85,6 +95,7 @@ angular.module('cloudApp', [
             }
         })
         .when('/activate/success',{
+            title: L.pageTitles.activateSuccess,
             templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
@@ -92,10 +103,12 @@ angular.module('cloudApp', [
             }
         })
         .when('/activate/:activateCode', {
+            title: L.pageTitles.activateCode,
             templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl'
         })
         .when('/restore_password', {
+            title: L.pageTitles.restorePassword,
             templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
@@ -103,6 +116,7 @@ angular.module('cloudApp', [
             }
         })
         .when('/restore_password/sent', {
+            title: L.pageTitles.restorePassword,
             templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
@@ -110,6 +124,7 @@ angular.module('cloudApp', [
             }
         })
         .when('/restore_password/success', {
+            title: L.pageTitles.restorePasswordSuccess,
             templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
@@ -117,20 +132,24 @@ angular.module('cloudApp', [
             }
         })
         .when('/restore_password/:restoreCode', {
+            title: L.pageTitles.restorePasswordCode,
             templateUrl: 'static/views/activate_restore.html',
             controller: 'ActivateRestoreCtrl'
         })
         .when('/content/:page', {
+            title: L.pageTitles.contentPage,
             templateUrl: 'static/views/static.html',
             controller: 'StaticCtrl'
         })
 
         .when('/debug', {
+            title: L.pageTitles.debug,
             templateUrl: 'static/views/debug.html',
             controller: 'DebugCtrl'
         })
 
         .when('/login', {
+            title: L.pageTitles.login,
             templateUrl: 'static/views/startPage.html',
             controller: 'StartPageCtrl',
             resolve: {
@@ -139,21 +158,25 @@ angular.module('cloudApp', [
         })
 
         .when('/download', {
+            title: L.pageTitles.download,
             templateUrl: 'static/views/download.html',
             controller: 'DownloadCtrl'
         })
         .when('/download/:platform', {
+            title: L.pageTitles.downloadPlatform,
             templateUrl: 'static/views/download.html',
             controller: 'DownloadCtrl'
         })
         .when('/', {
+            title: L.pageTitles.startPage,
             templateUrl: 'static/views/startPage.html',
             controller: 'StartPageCtrl'
         })
         .otherwise({
+            title: L.pageTitles.pageNotFount,
             templateUrl: 'static/views/404.html'
         });
-}]).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
+}]).run(['$route', '$rootScope', '$location', 'page', function ($route, $rootScope, $location, page) {
     var original = $location.path;
     $location.path = function (path, reload) {
         if (reload === false) {
@@ -165,4 +188,8 @@ angular.module('cloudApp', [
         }
         return original.apply($location, [path]);
     };
+
+    $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
+        page.title(current.$$route.title);
+    });
 }]);
