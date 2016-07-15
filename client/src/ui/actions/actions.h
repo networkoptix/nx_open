@@ -931,6 +931,11 @@ public:
         ExportLayoutAction,
 
         /**
+         * Exports timelapse.
+         */
+        ExportTimelapseAction,
+
+        /**
          * Bookmark selected range.
          */
         AddCameraBookmarkAction,
