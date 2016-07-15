@@ -1428,8 +1428,8 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                     QnSleep::msleep(40); // Audio buffer too large. waiting
             }
 
-            m_audioDisplay->putData(ad, nextVideoImageTime(0));
-            m_hadAudio = true;
+            if (m_audioDisplay->putData(ad, nextVideoImageTime(0)))
+                m_hadAudio = true;
         }
         else if (m_hadAudio || !m_hasVideo)
         {

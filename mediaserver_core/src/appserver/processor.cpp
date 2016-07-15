@@ -52,8 +52,15 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
 
-        if (camera->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(camera->getUrl()))
+        auto secResource = camera.dynamicCast<QnSecurityCamResource>();
+
+        QString urlStr = camera->getUrl();
+        if (secResource && !secResource->getGroupId().isEmpty())
+            urlStr = urlStr.left(urlStr.indexOf('?'));
+
+        if (camera->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(urlStr))
             continue; //race condition. manual camera just deleted
+
         if( camera->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceById(camera->getId()))
             continue;   //ignoring newly discovered camera
 
@@ -140,8 +147,8 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
     const ec2::ApiCameraData& apiCameraData
 )
 {   // Add resource (camera) to the Resource Pool before launching transaction.
-    // The order is important because while executing the transaction, specifically when 
-    // remote peer access rights are being checked, the resource should already reside in the 
+    // The order is important because while executing the transaction, specifically when
+    // remote peer access rights are being checked, the resource should already reside in the
     // Resource Pool so ResourceAccessManager could check access rights for the pair
     // (remotePeerUserId, resourceId).
     QnResourcePtr existCamRes = qnResPool->getResourceById(apiCameraData.id);
@@ -152,14 +159,14 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
     ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()
         ->getCameraManager(Qn::kDefaultUserAccess)
         ->addCameraSync(apiCameraData);
-    if (errorCode != ec2::ErrorCode::ok) 
+    if (errorCode != ec2::ErrorCode::ok)
     {
         NX_LOG(
             QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1")
-                .arg(ec2::toString(errorCode)), 
-            cl_logWARNING 
+                .arg(ec2::toString(errorCode)),
+            cl_logWARNING
         );
-        // Here, if the transaction has failed, we have to restore Resource Pool 
+        // Here, if the transaction has failed, we have to restore Resource Pool
         // initial (before cameraResource processing began) state.
         qnResPool->removeResource(qnResPool->getResourceById(apiCameraData.id));
         if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)

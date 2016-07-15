@@ -189,5 +189,10 @@ class QnWebPageResource;
 typedef QnSharedResourcePointer<QnWebPageResource> QnWebPageResourcePtr;
 typedef QnSharedResourcePointerList<QnWebPageResource> QnWebPageResourceList;
 
+class QnFlirEIPResource;
+typedef QnSharedResourcePointer<QnFlirEIPResource> QnFlirEIPResourcePtr;
+typedef QnSharedResourcePointerList<QnFlirEIPResource> QnFlirEIPResourceList;
+
+
 
 #endif // QN_RESOURCE_FWD_H

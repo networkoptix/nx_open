@@ -4,6 +4,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <nx/streaming/config.h>
+#include <nx/utils/log/log.h>
 
 ////////////////////////////////////////////////////////////
 //// QnRegion class
@@ -323,9 +324,20 @@ void parseMotionRegionList(QList<QnMotionRegion>& regions, const QByteArray& reg
 {
     QList<QByteArray> regList = regionsString.split(':');
     regions.clear();
+
     // for compatibility with previous version. By default screen filled medium sensitivity motion window
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         regions << QnMotionRegion();
+
+    if (regList.size() > CL_MAX_CHANNELS)
+    {
+        NX_LOG(
+            lit("Number of motion regions is more than maximum number of channels (%1/%2)")
+                .arg(regList.size())
+                .arg(CL_MAX_CHANNELS),
+            cl_logWARNING);
+        return;
+    }
 
     for (int i = 0; i < regList.size(); ++i)
         parseMotionRegion(regions[i], regList[i]);

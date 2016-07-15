@@ -381,16 +381,10 @@ void QnWorkbenchLayout::moveItemInternal(QnWorkbenchItem *item, const QRect &geo
     item->setGeometryInternal(geometry);
 }
 
-bool QnWorkbenchLayout::canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition) {
-    if(disposition == NULL) {
-        return canMoveItems<true>(items, geometries, NULL);
-    } else {
-        return canMoveItems<false>(items, geometries, disposition);
-    }
-}
+bool QnWorkbenchLayout::canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition) const
+{
+    const bool returnEarly = (disposition == nullptr);
 
-template<bool returnEarly>
-bool QnWorkbenchLayout::canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition) {
     if (items.size() != geometries.size()) {
         qnWarning("Sizes of the given containers do not match.");
         return false;

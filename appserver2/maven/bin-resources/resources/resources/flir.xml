@@ -1,0 +1,11 @@
+<resources>
+    <oem name = "FLIR">
+    <resource name="FLIR_COMMON" id="c9001f9d-230f-435d-a7a9-2e99b3b6a049" type="Camera"/>
+    <resource name = "FLIR-AX8" public="FLIR_COMMON">
+        <params>
+            <param name = "MaxFPS" default_value ="15"/>
+            <param name = "supportedMotion" default_value="softwaregrid"/>
+        </params>        
+    </resource>
+    </oem>
+</resources>
