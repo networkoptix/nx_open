@@ -71,10 +71,18 @@ public:
     virtual int decodeToDisplayQueue(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
         void **outFrameHandle) = 0;
 
+    struct Rect
+    {
+        int x;
+        int y;
+        int width;
+        int height;
+    };
+
     /**
      * Display previously decoded frame into the platform-specific framebuffer, fitting the frame
-     * (preserving aspect ratio) into the specified rect or into full-screen if rect params are 0.
+     * (preserving aspect ratio) into the specified geometry or into full-screen if rect is null.
      * @param frameHandle Can be null, then do nothing.
      */
-    virtual void displayDecoded(void* frameHandle, int x, int y, int width, int height) = 0;
+    virtual void displayDecoded(void* frameHandle, const Rect* rect) = 0;
 };

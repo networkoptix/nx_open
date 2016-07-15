@@ -23,7 +23,7 @@ public:
     VdpauHandler(int frameWidth, int frameHeight);
     ~VdpauHandler();
 
-    void display(int x, int y, int width, int height);
+    void display(const ProxyDecoder::Rect* rect);
 
 private:
     int m_frameWidth;
@@ -70,7 +70,7 @@ VdpauHandler::~VdpauHandler()
     m_vdpSession.reset(nullptr); //< To make logs appear in proper place.
 }
 
-void VdpauHandler::display(int x, int y, int width, int height)
+void VdpauHandler::display(const ProxyDecoder::Rect* rect)
 {
     const int videoSurfaceIndex = m_videoSurfaceIndex;
     m_videoSurfaceIndex = (m_videoSurfaceIndex + 1) % conf.videoSurfaceCount;
@@ -98,7 +98,7 @@ void VdpauHandler::display(int x, int y, int width, int height)
         debugDrawCheckerboardYNative((uint8_t*) yuvNative.virt, m_frameWidth, m_frameHeight);
     }
 
-    m_vdpSession->displayVideoSurface(videoSurface, x, y, width, height);
+    m_vdpSession->displayVideoSurface(videoSurface, rect);
 
     OUTPUT << "VdpauHandler::display() END";
 }
@@ -126,7 +126,7 @@ public:
         const CompressedFrame* compressedFrame, int64_t* outPtsUs,
         void **outFrameHandle) override;
 
-    virtual void displayDecoded(void* frameHandle, int x, int y, int width, int height) override;
+    virtual void displayDecoded(void* frameHandle, const Rect* rect) override;
 
 private:
     int m_frameWidth;
@@ -264,10 +264,16 @@ int Stub::decodeToDisplayQueue(
     return obtainResult(compressedFrame, outPtsUs);
 }
 
-void Stub::displayDecoded(void* frameHandle, int x, int y, int width, int height)
+void Stub::displayDecoded(void* frameHandle, const Rect* rect)
 {
-    OUTPUT << "displayDecoded(" << (frameHandle ? "frameHandle" : "nullptr")
-        << ", x: " << x << ", y: " << y << ", width: " << width << ", height: " << height << ")";
+    OUTPUT << "displayDecoded(" << (frameHandle ? "frameHandle" : "nullptr") << ", rect: "
+        << (rect
+            ? stringFormat(
+                "{x: %d, y: %d, width: %d, height: %d}",
+                rect->x, rect->y, rect->width, rect->height)
+            : "nullptr")
+        << ")";
+
     if (!frameHandle)
     {
         OUTPUT << "displayDecoded() END";
@@ -293,7 +299,7 @@ void Stub::displayDecoded(void* frameHandle, int x, int y, int width, int height
     }
 
     if (m_vdpHandler)
-        m_vdpHandler->display(x, y, width, height);
+        m_vdpHandler->display(rect);
 
     OUTPUT << "displayDecoded() END";
 }

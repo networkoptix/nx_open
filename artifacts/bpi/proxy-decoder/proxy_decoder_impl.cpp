@@ -39,7 +39,7 @@ public:
         const CompressedFrame* compressedFrame, int64_t* outPtsUs,
         void **outFrameHandle) override;
 
-    virtual void displayDecoded(void* frameHandle, int x, int y, int width, int height) override;
+    virtual void displayDecoded(void* frameHandle, const ProxyDecoder::Rect* rect) override;
 
 private:
     struct InitOnce
@@ -595,11 +595,16 @@ int Impl::decodeToDisplayQueue(const CompressedFrame* compressedFrame, int64_t* 
     return result;
 }
 
-void Impl::displayDecoded(void* frameHandle, int x, int y, int width, int height)
+void Impl::displayDecoded(void* frameHandle, const ProxyDecoder::Rect* rect)
 {
-    OUTPUT << "displayDecoded(" << (frameHandle ? "frameHandle" : "nullptr")
-        << ", x: " << x << ", y: " << y << ", width: " << width << ", height: " << height
+    OUTPUT << "displayDecoded(" << (frameHandle ? "frameHandle" : "nullptr") << ", rect: "
+        << (rect
+            ? stringFormat(
+                "{x: %d, y: %d, width: %d, height: %d}",
+                rect->x, rect->y, rect->width, rect->height)
+            : "nullptr")
         << ") BEGIN";
+
     if (!frameHandle)
     {
         OUTPUT << "displayDecoded() END";
@@ -617,7 +622,7 @@ void Impl::displayDecoded(void* frameHandle, int x, int y, int width, int height
 
     OUTPUT << "Using " << debugDumpRenderStateRefToStr(renderState, m_renderStates);
 
-    m_vdpSession->displayVideoSurface(renderState->surface, x, y, width, height);
+    m_vdpSession->displayVideoSurface(renderState->surface, rect);
 
     OUTPUT << "displayDecoded() END: " << debugDumpRenderStateRefToStr(renderState, m_renderStates);
 }

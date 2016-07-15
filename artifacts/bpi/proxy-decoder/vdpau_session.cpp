@@ -3,8 +3,7 @@
 #define OUTPUT_PREFIX "proxydecoder[vdpau]: "
 #include "proxy_decoder_utils.h"
 
-VdpauSession::VdpauSession(int frameWidth, int frameHeight)
-:
+VdpauSession::VdpauSession(int frameWidth, int frameHeight):
     m_frameWidth(frameWidth),
     m_frameHeight(frameHeight)
 {
@@ -99,12 +98,12 @@ VdpauSession::~VdpauSession()
 }
 
 void VdpauSession::displayVideoSurface(
-    VdpVideoSurface videoSurface, int x, int y, int width, int height)
+    VdpVideoSurface videoSurface, const ProxyDecoder::Rect* rect)
 {
     VdpOutputSurface outputSurface = obtainOutputSurface();
     assert(outputSurface != VDP_INVALID_HANDLE);
 
-    VdpRect rect = obtainDestinationVideoRect(x, y, width, height);
+    const VdpRect vdpRect = obtainDestinationVideoRect(rect);
 
     // In vdpau_sunxi, this links Video Surface to Output Surface; does not process pixel data.
     VDP(vdp_video_mixer_render(m_vdpMixer,
@@ -119,7 +118,7 @@ void VdpauSession::displayVideoSurface(
         /*video_source_rect*/ nullptr, //< Can be specified.
         outputSurface,
         /*destination_rect*/ nullptr, //< Not implemented.
-        /*destination_video_rect*/ &rect, //< Can be specified.
+        /*destination_video_rect*/ &vdpRect, //< Can be specified.
         /*layer_count*/ 0, //< Other values not implemented.
         /*layers*/ nullptr //< Not implemented.
     ));
@@ -131,11 +130,11 @@ void VdpauSession::displayVideoSurface(
     releaseOutputSurface(outputSurface);
 }
 
-VdpRect VdpauSession::obtainDestinationVideoRect(int x, int y, int width, int height)
+VdpRect VdpauSession::obtainDestinationVideoRect(const ProxyDecoder::Rect* rect)
 {
     int windowWidth = 0;
     int windowHeight = 0;
-    if (x == 0 && y == 0 && width == 0 && height == 0) //< All zeroes mean full-screen.
+    if (!rect) //< fullscreen
     {
         if (g_fullScreenWidthHeight == 0) //< Fallback if VDPAU didn't provide screen size.
         {
@@ -162,8 +161,8 @@ VdpRect VdpauSession::obtainDestinationVideoRect(int x, int y, int width, int he
     }
     else
     {
-        windowWidth = width;
-        windowHeight = height;
+        windowWidth = rect->width;
+        windowHeight = rect->height;
     }
 
     // Video position relative to window.
@@ -171,27 +170,29 @@ VdpRect VdpauSession::obtainDestinationVideoRect(int x, int y, int width, int he
     int videoY = 0;
     int videoWidth = 0;
     int videoHeight = 0;
-    if (windowWidth * m_frameHeight <= windowHeight * m_frameWidth) //< Video is "wider" than screen.
+    if (windowWidth * m_frameHeight <= windowHeight * m_frameWidth)
     {
+        // Video is "wider" than screen.
         videoWidth = windowWidth;
         videoHeight = (m_frameHeight * windowWidth) / m_frameWidth;
         videoX = 0;
         videoY = (windowHeight - videoHeight) / 2;
     }
-    else //< Screen is "wider" than video.
+    else
     {
+        // Screen is "wider" than video.
         videoWidth = (m_frameWidth * windowHeight) / m_frameHeight;
         videoHeight = windowHeight;
         videoX = (windowWidth - videoWidth) / 2;
         videoY = 0;
     }
 
-    VdpRect rect;
-    rect.x0 = x + videoX;
-    rect.x1 = rect.x0 + videoWidth;
-    rect.y0 = y + videoY;
-    rect.y1 = rect.y0 + videoHeight;
-    return rect;
+    VdpRect result;
+    result.x0 = (rect ? rect->x : 0) + videoX;
+    result.x1 = result.x0 + videoWidth;
+    result.y0 = (rect ? rect->y : 0) + videoY;
+    result.y1 = result.y0 + videoHeight;
+    return result;
 }
 
 VdpOutputSurface VdpauSession::obtainOutputSurface()

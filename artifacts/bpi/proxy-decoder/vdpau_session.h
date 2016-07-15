@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "proxy_decoder.h" //< for ProxyDecoder::Rect
+
 #include "vdpau_utils.h"
 
 class VdpauSession
@@ -10,15 +12,14 @@ public:
     VdpauSession(int frameWidth, int frameHeight);
     virtual ~VdpauSession();
 
-    void displayVideoSurface(
-        VdpVideoSurface videoSurface, int x, int y, int width, int height);
+    void displayVideoSurface(VdpVideoSurface videoSurface, const ProxyDecoder::Rect* rect);
 
     VdpDevice vdpDevice() const { return m_vdpDevice; }
 
 private:
     VdpOutputSurface obtainOutputSurface();
     void releaseOutputSurface(VdpOutputSurface outputSurface) const;
-    VdpRect obtainDestinationVideoRect(int x, int y, int width, int height);
+    VdpRect obtainDestinationVideoRect(const ProxyDecoder::Rect* rect);
 
 private:
     int m_frameWidth;
