@@ -288,7 +288,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         m_exportRecorder->addRecordingContext(fileName);
 
     m_exportRecorder->setRole(role);
-    m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
+    if (!timelapseFrameStepUs)
+        m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
     m_exportRecorder->setContainer(format);
     m_exportRecorder->setNeedCalcSignature(true);
 
