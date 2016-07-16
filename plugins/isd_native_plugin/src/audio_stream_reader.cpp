@@ -163,13 +163,13 @@ void AudioStreamReader::fillAudioFormat()
     switch( m_audioInfo.encoding )
     {
         case EncPCM:
-            m_audioFormat.compressionType = nxcip::CODEC_ID_PCM_S16LE;
+            m_audioFormat.compressionType = nxcip::AV_CODEC_ID_PCM_S16LE;
             break;
         case EncUlaw:
-            m_audioFormat.compressionType = nxcip::CODEC_ID_PCM_MULAW;
+            m_audioFormat.compressionType = nxcip::AV_CODEC_ID_PCM_MULAW;
             break;
         case EncAAC:
-            m_audioFormat.compressionType = nxcip::CODEC_ID_AAC;
+            m_audioFormat.compressionType = nxcip::AV_CODEC_ID_AAC;
             break;
         default:
             std::cerr << "ISD plugin: unsupported audio codec: "<<m_audioInfo.encoding<<"\n";
@@ -184,14 +184,14 @@ void AudioStreamReader::fillAudioFormat()
     m_audioFormat.channels = 1;
     switch( m_audioFormat.compressionType )
     {
-        case nxcip::CODEC_ID_AAC:
+        case nxcip::AV_CODEC_ID_AAC:
         {
             //TODO/IMPL parsing ADTS header to get sample rate
             break;
         }
 
-        //case nxcip::CODEC_ID_PCM_S16LE:
-        //case nxcip::CODEC_ID_PCM_MULAW:
+        //case nxcip::AV_CODEC_ID_PCM_S16LE:
+        //case nxcip::AV_CODEC_ID_PCM_MULAW:
         default:
             break;
     }

@@ -27,7 +27,7 @@ QnBufferedScreenGrabber::QnBufferedScreenGrabber(int displayNumber,
     }
     m_frames.resize(queueSize);
     for (int i = 0; i < m_frames.size(); ++i)
-        m_frames[i] = avcodec_alloc_frame();
+        m_frames[i] = av_frame_alloc();
 }
 
 QnBufferedScreenGrabber::~QnBufferedScreenGrabber()

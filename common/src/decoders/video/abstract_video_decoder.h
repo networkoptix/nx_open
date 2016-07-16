@@ -9,6 +9,10 @@
 #include "nx/streaming/video_data_packet.h"
 #include "utils/media/frame_info.h"
 
+extern "C"
+{
+#include <libavutil/pixfmt.h>
+}
 
 class QGLContext;
 
@@ -28,9 +32,9 @@ public:
     // TODO: #Elric #enum
     // for movies: full = IPB, fast == IP only, fastest = I only
     enum DecodeMode {
-        DecodeMode_NotDefined, 
-        DecodeMode_Full, 
-        DecodeMode_Fast, 
+        DecodeMode_NotDefined,
+        DecodeMode_Full,
+        DecodeMode_Fast,
         DecodeMode_Fastest
     };
 
@@ -49,7 +53,7 @@ public:
 
     virtual ~QnAbstractVideoDecoder() {}
 
-    virtual PixelFormat GetPixelFormat() const { return PIX_FMT_NONE; }
+    virtual AVPixelFormat GetPixelFormat() const { return AV_PIX_FMT_NONE; }
     //!Returns memory type to which decoder places decoded frames (system memory or opengl)
     virtual QnAbstractPictureDataRef::PicStorageType targetMemoryType() const = 0;
 
@@ -133,7 +137,7 @@ public:
         \param mtDecoding This hint tells that decoder is allowed (not have to) to perform multi-threaded decoding
         \param glContext OpenGL context used to draw to screen. Decoder, that renders pictures directly to opengl texture,
             MUST be aware of application gl context to create textures shared with this context
-        \param allowHardwareDecoding If true, method will try to find loaded hardware decoder plugin with support of requested stream type. 
+        \param allowHardwareDecoding If true, method will try to find loaded hardware decoder plugin with support of requested stream type.
             Otherwise, it will ignore any loaded decoder plugin
     */
     static QnAbstractVideoDecoder* createDecoder(

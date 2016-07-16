@@ -25,12 +25,12 @@ public:
     /*
     * \returns optimal audio decoder (in case of any) compatible with such frame. Returns null if no compatible decoder found.
     */
-    AudioDecoderPtr createCompatibleDecoder(const CodecID codec);
+    AudioDecoderPtr createCompatibleDecoder(const AVCodecID codec);
 
     /*
     * \returns true if compatible video decoder found
     */
-    bool hasCompatibleDecoder(const CodecID codec);
+    bool hasCompatibleDecoder(const AVCodecID codec);
 
     /** Register video decoder plugin */
     template <class Decoder>
@@ -45,7 +45,7 @@ private:
         Metadata() {}
 
         std::function<AbstractAudioDecoder* ()> instance;
-        std::function<bool(const CodecID codec)> isCompatible;
+        std::function<bool(const AVCodecID codec)> isCompatible;
     };
 
     template <class Decoder>

@@ -355,7 +355,7 @@ void ISDMotionEstimation::setMotionMask(const uint8_t* mask)
 
 MotionDataPicture* ISDMotionEstimation::getMotion()
 {
-    MotionDataPicture* motionData = new MotionDataPicture(nxcip::PIX_FMT_MONOBLACK);
+    MotionDataPicture* motionData = new MotionDataPicture(nxcip::AV_PIX_FMT_MONOBLACK);
     memcpy(motionData->data(), m_resultMotion, MD_WIDTH * MD_HEIGHT / 8);
     memset(m_resultMotion, 0, MD_HEIGHT * MD_WIDTH / 8);
     m_totalFrames++;

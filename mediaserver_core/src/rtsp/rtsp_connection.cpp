@@ -213,7 +213,7 @@ public:
     ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
     QByteArray clientGuid;
-    enum CodecID codecId;
+    enum AVCodecID codecId;
     qint64 startTime; // time from last range header
     qint64 endTime;   // time from last range header
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
@@ -232,14 +232,14 @@ public:
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
-static const CodecID DEFAULT_VIDEO_CODEC = CODEC_ID_H263P; 
+static const AVCodecID DEFAULT_VIDEO_CODEC = AV_CODEC_ID_H263P; 
 
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket)
 {
     Q_D(QnRtspConnectionProcessor);
     Q_UNUSED(_owner)
-    d->codecId = CODEC_ID_NONE;
+    d->codecId = AV_CODEC_ID_NONE;
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
@@ -310,7 +310,7 @@ void QnRtspConnectionProcessor::parseRequest()
         if (format)
             d->codecId = format->video_codec;
         else
-            d->codecId = CODEC_ID_NONE;
+            d->codecId = AV_CODEC_ID_NONE;
     };
 
     const QString pos = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).split('/')[0];
@@ -337,7 +337,7 @@ void QnRtspConnectionProcessor::parseRequest()
             }
         }
         d->transcodedVideoSize = videoSize;
-        if (d->codecId == CODEC_ID_NONE)
+        if (d->codecId == AV_CODEC_ID_NONE)
             d->codecId = DEFAULT_VIDEO_CODEC;
     }
 
@@ -592,14 +592,14 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
 QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QnConstResourceVideoLayoutPtr vLayout)
 {
     Q_D(QnRtspConnectionProcessor);
-    CodecID dstCodec;
+    AVCodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
         dstCodec = d->codecId;
     else
-        dstCodec = media && media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
-        //dstCodec = media && media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_VORBIS; // keep aac without transcoding for audio
-        //dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
-    //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
+        dstCodec = media && media->compressionType == AV_CODEC_ID_AAC ? AV_CODEC_ID_AAC : AV_CODEC_ID_MP2; // keep aac without transcoding for audio
+        //dstCodec = media && media->compressionType == AV_CODEC_ID_AAC ? AV_CODEC_ID_AAC : AV_CODEC_ID_VORBIS; // keep aac without transcoding for audio
+        //dstCodec = AV_CODEC_ID_AAC; // keep aac without transcoding for audio
+    //AVCodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? AV_CODEC_ID_MPEG4 : media->compressionType;
     QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
     
     QnResourcePtr res = getResource()->toResourcePtr();
@@ -621,34 +621,34 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
 
     switch (dstCodec)
     {
-        //case CODEC_ID_H264:
+        //case AV_CODEC_ID_H264:
         //    return QnRtspEncoderPtr(new QnRtspH264Encoder());
-        case CODEC_ID_NONE:
-        case CODEC_ID_H263:
-        case CODEC_ID_H263P:
-        case CODEC_ID_H264:
-        case CODEC_ID_MPEG1VIDEO:
-        case CODEC_ID_MPEG2VIDEO:
-        case CODEC_ID_MPEG4:
-        case CODEC_ID_AAC:
-        case CODEC_ID_MP2:
-        case CODEC_ID_MP3:
-        case CODEC_ID_PCM_ALAW:
-        case CODEC_ID_PCM_MULAW:
-        case CODEC_ID_PCM_S8:
-        case CODEC_ID_PCM_S16BE:
-        case CODEC_ID_PCM_S16LE:
-        case CODEC_ID_PCM_U16BE:
-        case CODEC_ID_PCM_U16LE:
-        case CODEC_ID_PCM_U8:
-        case CODEC_ID_MPEG2TS:
-        case CODEC_ID_AMR_NB:
-        case CODEC_ID_AMR_WB:
-        case CODEC_ID_VORBIS:
-        case CODEC_ID_THEORA:
-        case CODEC_ID_VP8:
-        case CODEC_ID_ADPCM_G722:
-        case CODEC_ID_ADPCM_G726:
+        case AV_CODEC_ID_NONE:
+        case AV_CODEC_ID_H263:
+        case AV_CODEC_ID_H263P:
+        case AV_CODEC_ID_H264:
+        case AV_CODEC_ID_MPEG1VIDEO:
+        case AV_CODEC_ID_MPEG2VIDEO:
+        case AV_CODEC_ID_MPEG4:
+        case AV_CODEC_ID_AAC:
+        case AV_CODEC_ID_MP2:
+        case AV_CODEC_ID_MP3:
+        case AV_CODEC_ID_PCM_ALAW:
+        case AV_CODEC_ID_PCM_MULAW:
+        case AV_CODEC_ID_PCM_S8:
+        case AV_CODEC_ID_PCM_S16BE:
+        case AV_CODEC_ID_PCM_S16LE:
+        case AV_CODEC_ID_PCM_U16BE:
+        case AV_CODEC_ID_PCM_U16LE:
+        case AV_CODEC_ID_PCM_U8:
+        case AV_CODEC_ID_MPEG2TS:
+        case AV_CODEC_ID_AMR_NB:
+        case AV_CODEC_ID_AMR_WB:
+        case AV_CODEC_ID_VORBIS:
+        case AV_CODEC_ID_THEORA:
+        case AV_CODEC_ID_VP8:
+        case AV_CODEC_ID_ADPCM_G722:
+        case AV_CODEC_ID_ADPCM_G726:
             universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, extraTranscodeParams)); // transcode src codec to MPEG4/AAC
             if (MSSettings::roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
                 universalEncoder->setUseRealTimeOptimization(true);
@@ -1107,7 +1107,7 @@ QnRtspFfmpegEncoder* QnRtspConnectionProcessor::createRtspFfmpegEncoder(bool isV
     Q_D(const QnRtspConnectionProcessor);
 
     QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder();
-    if (isVideo && !d->transcodedVideoSize.isEmpty() && d->codecId != CODEC_ID_NONE)
+    if (isVideo && !d->transcodedVideoSize.isEmpty() && d->codecId != AV_CODEC_ID_NONE)
         result->setDstResolution(d->transcodedVideoSize, d->codecId);
     return result;
 }

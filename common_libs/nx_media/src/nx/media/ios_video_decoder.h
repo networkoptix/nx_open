@@ -1,5 +1,7 @@
 #pragma once
-#if !defined(DISABLE_FFMPEG)
+
+#ifndef DISABLE_FFMPEG
+#if defined (Q_OS_IOS)
 
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
@@ -11,19 +13,16 @@
 namespace nx {
 namespace media {
 
-class FfmpegVideoDecoderPrivate;
+class IOSVideoDecoderPrivate;
 
 /**
  * Implements ffmpeg video decoder.
  */
-class FfmpegVideoDecoder: public AbstractVideoDecoder
+class IOSVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    /** @param maxResolution Limits applicability of the decoder. If empty, there is no limit. */
-    static void setMaxResolution(const QSize& maxResolution);
-
-    FfmpegVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
-    virtual ~FfmpegVideoDecoder();
+    IOSVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
+    virtual ~IOSVideoDecoder();
 
     static bool isCompatible(const AVCodecID codec, const QSize& resolution);
 
@@ -33,13 +32,15 @@ public:
         const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 
 private:
-    static QSize s_maxResolution;
+    void ffmpegToQtVideoFrame(QVideoFramePtr* result);
 
-    QScopedPointer<FfmpegVideoDecoderPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(FfmpegVideoDecoder);
+private:
+    QScopedPointer<IOSVideoDecoderPrivate> d_ptr;
+    Q_DECLARE_PRIVATE(IOSVideoDecoder);
 };
 
 } // namespace media
 } // namespace nx
 
-#endif // !DISABLE_FFMPEG
+#endif // Q_OS_IOS
+#endif // #DISABLE_FFMPEG
