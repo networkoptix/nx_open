@@ -1,6 +1,6 @@
 'use strict';
 var LoginPage = require('./po.js');
-describe('Login dialog', function () {
+fdescribe('Login dialog', function () {
 
     var p = new LoginPage();
 
@@ -365,7 +365,7 @@ describe('Login dialog', function () {
             var oldWindow = handles[0];
             var newWindow = handles[1];
             browser.switchTo().window(newWindow).then(function () {
-                expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false); // user is logged out
+                expect(p.helper.loginSuccessElement.isPresent()).toBe(false); // user is logged out
                 p.helper.login();
                 expect(p.helper.loginSuccessElement.isDisplayed()).toBe(true); // user is logged in
             });
@@ -373,7 +373,7 @@ describe('Login dialog', function () {
                 browser.refresh();
                 expect(p.helper.loginSuccessElement.isDisplayed()).toBe(true); // user is logged in
                 p.helper.logout();
-                expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false); // user is logged out
+                expect(p.helper.loginSuccessElement.isPresent()).toBe(false); // user is logged out
             });
             browser.switchTo().window(newWindow).then(function () {
                 browser.refresh();

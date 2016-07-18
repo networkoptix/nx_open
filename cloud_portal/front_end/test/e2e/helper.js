@@ -69,8 +69,8 @@ var Helper = function () {
         },
         share: {
             shareButton: element(by.partialButtonText('Share')),
-            emailField: element(by.model('share.accountEmail')),
-            roleField: element(by.model('share.accessRole')),
+            emailField: element(by.model('user.accountEmail')),
+            roleField: element(by.model('user.role')),
             submitButton: element(by.css('process-button')).element(by.buttonText('Share'))
         },
         logout: {
@@ -194,7 +194,7 @@ var Helper = function () {
                 browser.sleep(500); // such a shame, but I can't solve it right now
 
                 // Check that element that is visible only for authorized user is NOT displayed on page
-                expect(h.loginSuccessElement.isDisplayed()).toBe(false);
+                expect(h.loginSuccessElement.isPresent()).toBe(false);
             }
         });
     };
@@ -266,11 +266,10 @@ var Helper = function () {
 
     this.shareSystemWith = function(email, role, systemLink) {
         var sharedRole = role || 'Administrator';
-        var systemLinkCode = systemLink || '/ed08e87a-dd8f-4893-aa6d-b4e29f849d2b';
+        var systemLinkCode = systemLink || '/77663937-eae2-4875-921b-5af0330514eb';
         var roleOption = h.forms.share.roleField.element(by.cssContainingText('option', sharedRole));
 
         this.getSysPage(systemLinkCode);
-
         h.forms.share.shareButton.click();
         h.forms.share.emailField.sendKeys(email);
         h.forms.share.roleField.click();

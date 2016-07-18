@@ -51,9 +51,9 @@ describe('Systems list suite', function () {
         });
     });
 
-    it("should show system's state for systems (activated, online, offline)", function () {
+    it("should show system's state for systems if they are offline. Otherwise - button Open in Nx", function () {
         p.systemsList.each(function (elem) {
-            expect(elem.getText()).toContainAnyOf(['activated','online','offline']);
+            expect(elem.getText()).toContainAnyOf(['Open in Nx Witness','offline']);
         });
     });
 
@@ -78,7 +78,7 @@ describe('Systems list suite', function () {
 
     it("should open system page (users list) when clicked on system", function () {
         p.systemsList.count().then(function(count) {
-            for (var i= 0; i < count; i++) {
+            for (var i= 0; (i < count) && (i < 10); i++) { // Do not check more than 10 systems
                 p.systemsList.get(i).click();
                 // TODO: Write appropriate checks that system page is opened
                 expect(browser.getCurrentUrl()).toContain('/systems/');

@@ -214,7 +214,7 @@ describe('Registration suite', function () {
         p.helper.login();
         p.helper.get(p.url);
         // Check that element that is visible only for authorized user is NOT displayed on page
-        expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
+        expect(p.helper.loginSuccessElement.isPresent()).toBe(false);
         // Check that register form is opened
         expect(browser.getCurrentUrl()).toContain('register');
         expect(p.helper.htmlBody.getText()).toContain('By clicking Register, you agree to our Terms and Conditions');

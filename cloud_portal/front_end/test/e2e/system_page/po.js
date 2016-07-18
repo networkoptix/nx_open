@@ -7,8 +7,8 @@ var SystemPage = function () {
     this.alert = new AlertSuite();
 
     this.url = '/systems';
-    this.systemLink = '/a74840da-f135-4522-abd9-5a8c6fb8591f';
-    this.systemName = 'test-korneeva';
+    this.systemLink = '/77663937-eae2-4875-921b-5af0330514eb';
+    this.systemName = 'newsys';
 
     this.deleteConfirmations = {
         self: 'You are going to disconnect this system from your account. You will lose an access for this system. Are you sure?',
@@ -29,9 +29,9 @@ var SystemPage = function () {
     this.systemOwnElem = element.all(by.css('.panel')).get(0).all(by.css('h2,h3'));
     this.openInClientButton = element(by.partialButtonText('Open in '));
     this.shareButton = element(by.partialButtonText('Share'));
-    this.emailField = element(by.model('share.accountEmail'));
-    this.roleField = element(by.model('share.accessRole'));
-    this.roleOptionAdmin = this.roleField.element(by.css('option[label=admin]'));
+    this.emailField = element(by.model('user.accountEmail'));
+    this.roleField = element(by.model('user.role'));
+    this.roleOptionAdmin = this.roleField.element(by.cssContainingText('option', 'Administrator'));
     this.roleHintBlock = element(by.css('span.help-block'));
     this.submitShareButton = element(by.css('process-button')).element(by.buttonText('Share'));
     this.ownerDeleteButton = element(by.cssContainingText('button','Disconnect from'));
@@ -40,7 +40,7 @@ var SystemPage = function () {
     this.cancelDisconnectButton = this.disconnectDialog.element(by.buttonText('Cancel'));
 
     this.selectRoleOption = function(role) {
-        return this.roleField.element(by.css(role));
+        return this.helper.forms.share.roleField.element(by.cssContainingText('option', role));
     };
 
     this.users = element.all(by.repeater('user in system.users'));
