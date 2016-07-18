@@ -318,11 +318,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     setLayout(m_globalLayout);
 
+    m_currentPageHolder->addWidget(new QWidget());
     m_currentPageHolder->addWidget(m_view.data());
     m_currentPageHolder->addWidget(welcomeScreen->widget());
 
-    /* Post-initialize. */
-    updateWidgetsVisibility();
+/* Post-initialize. */
+
 #ifdef Q_OS_MACX
     setOptions(Options());
 #else
@@ -370,7 +371,18 @@ void QnMainWindow::updateWidgetsVisibility()
     const auto updateWelcomeScreenVisibility =
         [this](bool welcomeScreenIsVisible)
     {
-        enum { kSceneIndex, kWelcomePageIndex };
+        enum { kWorkaroundPage, kSceneIndex, kWelcomePageIndex };
+
+        // Due to flickering when switching between two opengl contexts
+        // we have to use intermediate non-opengl page switch.
+        m_currentPageHolder->setCurrentIndex(kWorkaroundPage);
+
+        if (welcomeScreenIsVisible)
+            m_titleBar->setVisible(isTitleVisible());
+        m_currentPageHolder->repaint();
+        if (!welcomeScreenIsVisible)
+            m_titleBar->setVisible(isTitleVisible());
+
         m_currentPageHolder->setCurrentIndex(welcomeScreenIsVisible
             ? kWelcomePageIndex : kSceneIndex);
 
@@ -401,7 +413,6 @@ void QnMainWindow::updateWidgetsVisibility()
 
     // Always show title bar for welcome screen (it does not matter if it is fullscreen)
 
-    m_titleBar->setVisible(isTitleVisible());
     m_titleBar->setTabBarStuffVisible(!isWelcomeScreenVisible());
     updateWelcomeScreenVisibility(isWelcomeScreenVisible());
     updateDwmState();

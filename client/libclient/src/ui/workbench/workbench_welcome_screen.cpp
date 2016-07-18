@@ -38,10 +38,33 @@ namespace
         qmlRegisterType<QnRecentUserConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentUserConnectionsModel");
 
         const auto quickView = new QQuickView();
-        quickView->rootContext()->setContextProperty(
-            kContextVariableName, context);
-        quickView->setSource(kWelcomeScreenSource);
-        return QWidget::createWindowContainer(quickView);
+        auto holder = new QStackedWidget();
+        holder->addWidget(new QWidget());
+        holder->addWidget(QWidget::createWindowContainer(quickView));
+
+        const auto loadQmlData = [quickView, context, holder]()
+            {
+                const auto updateQmlViewVisibility = [holder](QQuickView::Status status)
+                    {
+                        if (status != QQuickView::Ready)
+                            return false;
+
+                        enum { kQmlViewIndex = 1 };
+                        holder->setCurrentIndex(kQmlViewIndex);
+                        return true;
+                    };
+
+                QObject::connect(quickView, &QQuickView::statusChanged,
+                    quickView, updateQmlViewVisibility);
+
+                quickView->rootContext()->setContextProperty(
+                    kContextVariableName, context);
+                quickView->setSource(kWelcomeScreenSource);
+            };
+
+        // Async load of qml data
+        executeDelayedParented(loadQmlData, 0, quickView);
+        return holder;
     }
 
     QnGenericPalette extractPalette()
