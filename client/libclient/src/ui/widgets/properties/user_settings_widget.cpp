@@ -73,15 +73,18 @@ bool QnUserSettingsWidget::hasChanges() const
 
     Qn::Permissions permissions = accessController()->permissions(m_model->user());
 
-    if (permissions.testFlag(Qn::WriteNamePermission))
-        if (m_model->user()->getName() != ui->loginInputField->text().trimmed())
-            return true;
+    if (permissions.testFlag(Qn::WriteNamePermission)
+        && m_model->user()->getName() != ui->loginInputField->text().trimmed())
+    {
+        return true;
+    }
 
     if (permissions.testFlag(Qn::WritePasswordPermission)
         && !ui->passwordInputField->text().isEmpty()
-        && !m_model->user()->checkPassword(ui->passwordInputField->text())
-        )
+        && !m_model->user()->checkPassword(ui->passwordInputField->text()))
+    {
         return true;
+    }
 
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
@@ -95,9 +98,10 @@ bool QnUserSettingsWidget::hasChanges() const
         if (groupId.isNull())
         {
             /* Check if we have selected a predefined internal group. */
-            Qn::GlobalPermissions permissions = selectedPermissions();
-            if (permissions != Qn::NoGlobalPermissions
-                && permissions != qnResourceAccessManager->globalPermissions(m_model->user()))
+            Qn::UserRoleType roleType = selectedRole();
+            if (roleType != Qn::UserRoleType::CustomPermissions
+                && (qnResourceAccessManager->userRolePermissions(roleType)
+                    != qnResourceAccessManager->globalPermissions(m_model->user())))
             {
                 return true;
             }
@@ -165,7 +169,7 @@ void QnUserSettingsWidget::applyChanges()
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
         m_model->user()->setUserGroup(selectedUserGroup());
-        m_model->user()->setRawPermissions(selectedPermissions());
+        m_model->user()->setRawPermissions(qnResourceAccessManager->userRolePermissions(selectedRole()));
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
@@ -315,9 +319,9 @@ void QnUserSettingsWidget::updateControlsAccess()
     ui->enabledButton->setVisible(permissions.testFlag(Qn::WriteAccessRightsPermission));
 }
 
-Qn::GlobalPermissions QnUserSettingsWidget::selectedPermissions() const
+Qn::UserRoleType QnUserSettingsWidget::selectedRole() const
 {
-    return ui->roleComboBox->itemData(ui->roleComboBox->currentIndex(), Qn::GlobalPermissionsRole).value<Qn::GlobalPermissions>();
+    return ui->roleComboBox->itemData(ui->roleComboBox->currentIndex(), Qn::UserRoleTypeRole).value<Qn::UserRoleType>();
 }
 
 QnUuid QnUserSettingsWidget::selectedUserGroup() const

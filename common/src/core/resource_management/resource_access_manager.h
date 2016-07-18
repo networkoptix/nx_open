@@ -15,17 +15,16 @@
 
 #include <utils/common/connective.h>
 
+
 class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnResourceAccessManager>
 {
     Q_OBJECT
-
     typedef Connective<QObject> base_type;
+
 public:
     QnResourceAccessManager(QObject* parent = nullptr);
 
-    static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
-
-    /** Get set of global permissions, that will not work without the given one. */
+    /** Get a set of global permissions that will not work without the given one. */
     static Qn::GlobalPermissions dependentPermissions(Qn::GlobalPermission value);
 
     void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList);
@@ -112,6 +111,17 @@ public:
     bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,        const ec2::ApiUserData& update) const;
     bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,   const ec2::ApiVideowallData& update) const;
 
+    static const QList<Qn::UserRoleType>& predefinedRoles();
+
+    static QString userRoleName(Qn::UserRoleType userRole);
+    static QString userRoleDescription(Qn::UserRoleType userRole);
+    static Qn::GlobalPermissions userRolePermissions(Qn::UserRoleType userRole);
+
+    Qn::UserRoleType userRole(const QnUserResourcePtr& user) const;
+    QString userRoleName(const QnUserResourcePtr& user) const;
+
+    static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
+
 signals:
     void accessibleResourcesChanged(const QnUuid& userId);
 
@@ -144,6 +154,7 @@ private:
 
     /** Check if camera is placed to one of shared layouts, available to given user. */
     bool isAccessibleViaLayouts(const QSet<QnUuid>& layoutIds, const QnResourcePtr& resource, bool sharedOnly) const;
+
 private:
     mutable QnMutex m_mutex;
 

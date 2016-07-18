@@ -82,52 +82,6 @@ public:
      */
     QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr& resource) const;
 
-    /**
-    * \param user                      User resource to get role name for.
-    * \returns                         Name of user's role.
-    */
-    QString userRoleName(const QnUserResourcePtr& user) const;
-
-    /**
-    * \param user                      User resource to get role description for.
-    * \returns                         Description of user's role.
-    */
-    QString userRoleDescription(const QnUserResourcePtr& user) const;
-
-    /**
-    * \param permissions               Permissions to get role description for.
-    * \param groupId                   An uuid of custom user role, if applicable.
-    * \returns                         Description of user's role.
-    */
-    QString userRoleDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId = QnUuid()) const;
-
-    /**
-    * \returns                         A set of permissions for standard (built-in) roles.
-    */
-    static const QList<Qn::GlobalPermissions>& standardRoles();
-
-    /**
-    * \param permissions               Peermission set to get role name for.
-    * \returns                         Name of role.
-    */
-    static QString standardRoleName(Qn::GlobalPermissions permissions);
-
-    /**
-    * \param permissions               Peermission set to get role description for.
-    * \returns                         Description of role.
-    */
-    static QString standardRoleDescription(Qn::GlobalPermissions permissions);
-
-    /**
-    * \returns                         Description of custom role.
-    */
-    static QString customRoleDescription();
-
-    /**
-    * \returns                         Description of custom permissions.
-    */
-    static QString customPermissionsDescription();
-
     bool canCreateStorage(const QnUuid& serverId) const;
     bool canCreateLayout(const QnUuid& layoutParentId) const;
     bool canCreateUser(Qn::GlobalPermissions targetPermissions, bool isOwner) const;

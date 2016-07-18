@@ -33,7 +33,7 @@ public:
     virtual bool canApplyChanges() const override;
 
     QnUuid selectedUserGroup() const;
-    Qn::GlobalPermissions selectedPermissions() const;
+    Qn::UserRoleType selectedRole() const;
 
     void updatePermissionsLabel(const QString& text);
 
