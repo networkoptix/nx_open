@@ -30,6 +30,7 @@ public:
     float getAverageGopSize() const;
 
     virtual void setNeedKeyData();
+    virtual void setNeedKeyData(int channel);
     virtual bool needKeyData(int channel) const;
     virtual bool needKeyData() const;
 
