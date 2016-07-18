@@ -1,4 +1,7 @@
 #include "optera_resource.h"
+
+#ifdef ENABLE_ONVIF
+
 #include "optera_data_provider.h"
 #include <plugins/resource/onvif/onvif_resource_information_fetcher.h>
 #include <utils/network/http/httpclient.h>
@@ -6,7 +9,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_properties.h>
 
-namespace 
+namespace
 {
     const QString kOnvifResourceTypeName("ONVIF");
 
@@ -15,7 +18,7 @@ namespace
     const QString kOpteraDefaultPassword("admin");
 
     const QString kOnvifDeviceService("/onvif/device_service");
-    
+
     const QString kPanomersiveMode("Panomersive");
     const QString kTiledMode("Tiled");
     const QString kUnistreamMode("Unistream");
@@ -44,7 +47,7 @@ QnOpteraResource::~QnOpteraResource()
 
 }
 
-QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const 
+QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     QN_UNUSED(dataProvider);
 
@@ -80,7 +83,7 @@ CameraDiagnostics::Result QnOpteraResource::initInternal()
 
     if (!urlStr.startsWith("http://"))
         urlStr = lit("http://") + urlStr;
-    
+
     QUrl url = urlStr;
     auto auth = getAuth();
     auto firmware = getFirmware();
@@ -100,22 +103,22 @@ CameraDiagnostics::Result QnOpteraResource::initInternal()
     }
 
     CLSimpleHTTPClient http(
-        url.host(), 
-        url.port(nx_http::DEFAULT_HTTP_PORT), 
-        kChangeCameraModeTimeout, 
+        url.host(),
+        url.port(nx_http::DEFAULT_HTTP_PORT),
+        kChangeCameraModeTimeout,
         auth);
 
     QByteArray response;
 
     auto status = makeGetStitchingModeRequest(http, response);
-    QString currentStitchingMode; 
+    QString currentStitchingMode;
 
     if (status != CL_HTTP_SUCCESS)
         return CameraDiagnostics::UnknownErrorResult();
 
     currentStitchingMode = getCurrentStitchingMode(response);
 
-    if (currentStitchingMode == kTiledMode)    
+    if (currentStitchingMode == kTiledMode)
         return base_type::initInternal();
 
     status = makeSetStitchingModeRequest(http, kTiledMode);
@@ -141,10 +144,10 @@ QnAbstractStreamDataProvider* QnOpteraResource::createLiveDataProvider()
 CLHttpStatus QnOpteraResource::makeGetStitchingModeRequest(CLSimpleHTTPClient& http, QByteArray& response) const
 {
     QFile tpl(kGetStitchingModeQueryTpl);
-    
+
     if (!tpl.open(QIODevice::ReadOnly))
     {
-        qWarning() << "Optera resource, can't open query file (get)";  
+        qWarning() << "Optera resource, can't open query file (get)";
         return CL_HTTP_BAD_REQUEST;
     }
 
@@ -159,7 +162,7 @@ CLHttpStatus QnOpteraResource::makeGetStitchingModeRequest(CLSimpleHTTPClient& h
 CLHttpStatus QnOpteraResource::makeSetStitchingModeRequest(CLSimpleHTTPClient& http, const QString& mode) const
 {
     QFile tpl(kSetStitchingModeQueryTpl);
-    
+
     if (!tpl.open(QIODevice::ReadOnly))
     {
         qWarning() << "Optera resource, can't open query file (set)";
@@ -188,3 +191,5 @@ QString QnOpteraResource::getCurrentStitchingMode(const QByteArray& response) co
     return matches[1];
 
 }
+
+#endif // ENABLE_ONVIF
