@@ -1,18 +1,20 @@
 #pragma once
 
+#ifdef ENABLE_ONVIF
+
 #include <core/dataprovider/stream_mixer.h>
 #include <core/dataprovider/spush_media_stream_provider.h>
 
 class QnOpteraDataProvider : public CLServerPushStreamReader
 {
-public: 
+public:
     QnOpteraDataProvider(const QnResourcePtr& res);
     virtual ~QnOpteraDataProvider();
 
 protected:
 
     virtual CameraDiagnostics::Result openStreamInternal(
-        bool isCameraControlRequired, 
+        bool isCameraControlRequired,
         const QnLiveStreamParams& params) override;
 
     virtual bool isStreamOpened() const override;
@@ -35,3 +37,6 @@ private:
 };
 
 typedef std::shared_ptr<QnOpteraDataProvider> QnOpteraDataProviderPtr;
+
+#endif // #ifdef ENABLE_ONVIF
+
