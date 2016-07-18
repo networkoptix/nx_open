@@ -24,7 +24,8 @@ CLH264RtpParser::CLH264RtpParser():
         m_firstSeqNum(0),
         m_packetPerNal(0),
         m_videoFrameSize(0),
-        m_previousPacketHasMarkerBit(false)
+        m_previousPacketHasMarkerBit(false),
+        m_lastRtpTime(0)
 {
 }
 
@@ -231,7 +232,7 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
 
     if (m_timeHelper) {
         result->timestamp = m_timeHelper->getUsecTime(rtpTime, statistics, m_frequency);
-#ifdef _DEBUG
+#if 0
         qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
         if (qAbs(currentTime - result->timestamp) > 500*1000) {
             qDebug()
@@ -473,11 +474,12 @@ bool CLH264RtpParser::processData(
     {
         m_mediaData = createVideoData(
             rtpBufferBase,
-            ntohl(rtpHeader->timestamp),
+            m_lastRtpTime,
             statistics
             ); // last packet
         gotData = true;
     }
+    m_lastRtpTime = ntohl(rtpHeader->timestamp);
 
 
     m_packetPerNal++;
