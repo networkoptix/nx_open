@@ -4,13 +4,16 @@ import "."
 
 MaskedComboBox
 {
-    id: thisComponent;
+    id: control;
 
     property string iconUrl;
     property string hoveredIconUrl: iconUrl;
     property string disabledIconUrl: iconUrl;
 
-    property color disabledLabelColor: Style.label.color;
+    property string hoverExtraIconUrl;
+    property color disabledLabelColor: Style.colors.midlight;
+    property color standardLabelColor: Style.colors.windowText;
+    property color hoveredLabelColor: Style.lighterColor(standardLabelColor, 4);
 
     anchors.left: parent.left;
     anchors.right: parent.right;
@@ -50,17 +53,27 @@ MaskedComboBox
             {
                 id: textItem;
 
-                disableable: thisComponent.isAvailable;
+                disableable: control.isAvailable;
                 isHovered: hoverArea.containsMouse;
                 font: Style.fonts.systemTile.info;
-                disabledColor: thisComponent.disabledLabelColor;
+                standardColor: control.standardLabelColor;
+                hoveredColor: control.hoveredLabelColor;
+                disabledColor: control.disabledLabelColor;
 
                 Binding
                 {
                     target: textItem;
                     property: "text";
-                    value: thisComponent.value;
+                    value: control.value;
                 }
+            }
+
+            Image
+            {
+                id: pencilImage;
+
+                visible: hoverArea.containsMouse && isAvailable;
+                source: hoverExtraIconUrl;
             }
         }
 
@@ -69,7 +82,7 @@ MaskedComboBox
             id: hoverArea;
 
             anchors.fill: parent;
-            visible: thisComponent.isAvailable;
+            visible: control.isAvailable;
 
             hoverEnabled: true;
             acceptedButtons: Qt.NoButton;

@@ -82,12 +82,12 @@ Item
 
             isAvailable: enabled && control.isExpandedTile && !control.isConnecting;
 
-            disabledLabelColor: Style.colors.midlight;
-
             comboBoxTextRole: "display";
             iconUrl: "qrc:/skin/welcome_page/server.png";                   // TODO: add ecosystem class for hovered icons
             hoveredIconUrl: "qrc:/skin/welcome_page/server_hover.png";
             disabledIconUrl: "qrc:/skin/welcome_page/server_disabled.png";
+            hoverExtraIconUrl: "qrc:/skin/welcome_page/edit.png";
+
             Component.onCompleted: activeItemSelector.addItem(this);
 
             KeyNavigation.tab: userChooseItem;
@@ -103,12 +103,11 @@ Item
             isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
             visible: control.impl.hasRecentConnections;
 
-            disabledLabelColor: Style.colors.midlight;
-
             comboBoxTextRole: "userName";
             iconUrl: "qrc:/skin/welcome_page/user.png";
             hoveredIconUrl: "qrc:/skin/welcome_page/user_hover.png";
             disabledIconUrl: "qrc:/skin/welcome_page/user_disabled.png";
+            hoverExtraIconUrl: "qrc:/skin/welcome_page/edit.png";
 
             Component.onCompleted: activeItemSelector.addItem(this);
 

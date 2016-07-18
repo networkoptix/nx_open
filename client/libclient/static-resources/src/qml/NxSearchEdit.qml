@@ -13,6 +13,9 @@ NxTextEdit
 
     property string query;
 
+    backgroundColor: activeColor;
+    activeColor: Style.darkerColor(Style.colors.shadow, 2)
+
     state: "masked";
     width: mask.width;
 
