@@ -45,32 +45,6 @@ describe('Sharing.', function () {
         p.permDialogClose.click();
     });
 
-    it ("Sharing link with user /systems/{system_id}/share/{email} - opens dialog with locked email", function() {
-        var viewerEmail = p.helper.userEmailNoPerm;
-        p.helper.login(p.helper.userEmailOwner);
-
-        p.helper.get(p.helper.urls.systems + p.systemLink +'/share/' + viewerEmail);
-        expect(p.permDialog.isPresent()).toBe(true);
-        expect(p.permEmailFieldDisabled.isDisplayed()).toBe(true);
-        p.permDialogClose.click();
-    });
-
-    it ("Sharing link with existing user /systems/{system_id}/share/{email} - loads his name and permission", function() {
-        var viewerEmail = p.helper.userEmailLiveViewer;
-        var newName = 'visible users name';
-        p.helper.login(viewerEmail);
-        p.helper.changeAccountNames(newName, newName);
-        p.helper.logout();
-
-        p.helper.login(p.helper.userEmailOwner);
-
-        p.helper.get(p.helper.urls.systems + p.systemLink +'/share/' + viewerEmail);
-        expect(p.permDialog.isPresent()).toBe(true);
-        expect(p.permEmailFieldDisabled.getAttribute('value')).toContain(newName);
-        expect(p.permRoleField.getAttribute('value')).toContain('string:liveViewer');
-        p.permDialogClose.click();
-    });
-
     it ("Sharing link for anonimous - first ask login, then show share dialog", function() {
         p.helper.get(p.helper.urls.systems + p.systemLink +'/share');
         expect(p.loginButton.isDisplayed()).toBe(true);
@@ -96,7 +70,7 @@ describe('Sharing.', function () {
         p.helper.get(p.helper.urls.systems + p.systemLink +'/share');
         expect(p.permDialog.isPresent()).toBe(true);
         expect(p.permEmailFieldEnabled.isDisplayed()).toBe(true);
-        expect(p.roleField.getText()).toMatch('live viewer\nviewer\nadvanced viewer\nadmin');
+        expect(p.roleField.getText()).toMatch('Live viewer\nViewer\nAdvanced viewer\nAdministrator\nCustom');
         p.permDialogClose.click();
     });
 
@@ -158,7 +132,7 @@ describe('Sharing.', function () {
         p.selectRoleOption(p.helper.roles.liveViewer).click();
         p.permDialogSubmit.click();
         p.alert.catchAlert(p.alert.alertMessages.permissionAddSuccess, p.alert.alertTypes.success);
-        expect(p.usrDataRow(p.helper.userEmailViewer).getText()).toContain('live viewer');
+        expect(p.usrDataRow(p.helper.userEmailViewer).getText()).toContain('Live viewer');
         // Change permissions of live viewer to viewer back
         p.usrDataRow(p.helper.userEmailViewer).click();
         p.usrDataRow(p.helper.userEmailViewer).element(by.css('.glyphicon-pencil')).click();
@@ -187,7 +161,7 @@ describe('Sharing.', function () {
                 expect('Share dialog').toBe('absent');
             }
         });
-        expect(p.usrDataRow(newUserEmail).getText()).toContain('viewer');
+        expect(p.usrDataRow(newUserEmail).getText()).toContain('Viewer');
     });
 
     xit ("Share with registered user - sends him notification", function() {

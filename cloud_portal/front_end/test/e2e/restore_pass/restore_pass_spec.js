@@ -140,7 +140,7 @@ describe('Restore password page', function () {
         browser.sleep(1000);
         p.setNewPassword(p.helper.userPassword);
         p.helper.get();
-        expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
+        expect(p.helper.loginSuccessElement.isPresent()).toBe(false);
     });
 
     it("should handle click I forgot my password link at restore password page", function () {
