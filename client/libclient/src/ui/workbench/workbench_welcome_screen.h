@@ -87,8 +87,7 @@ public slots:
 
     QColor getLighterColor(const QColor& color, int offset = 1);
 
-    QColor colorWithAlpha(QColor color
-        , qreal alpha);
+    QColor colorWithAlpha(QColor color, qreal alpha);
 
 signals:
     void visibleChanged();

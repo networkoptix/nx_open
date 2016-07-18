@@ -91,16 +91,16 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_pageSize(m_widget->size())
 {
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged
-        , this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged
-        , this, &QnWorkbenchWelcomeScreen::isLoggedInToCloudChanged);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
+        this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
+        this, &QnWorkbenchWelcomeScreen::isLoggedInToCloudChanged);
 
     //
     m_widget->installEventFilter(this);
 
-    connect(action(QnActions::DisconnectAction), &QAction::triggered
-        , this, &QnWorkbenchWelcomeScreen::showScreen);
+    connect(action(QnActions::DisconnectAction), &QAction::triggered,
+        this, &QnWorkbenchWelcomeScreen::showScreen);
 
     connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this, [this]()
     {
@@ -257,8 +257,8 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemName, c
     if (!isLoggedInToCloud())
         return;
 
-    connectToLocalSystem(systemName, serverUrl, qnCloudStatusWatcher->cloudLogin()
-        , qnCloudStatusWatcher->cloudPassword(), false, false);
+    connectToLocalSystem(systemName, serverUrl, qnCloudStatusWatcher->cloudLogin(),
+        qnCloudStatusWatcher->cloudPassword(), false, false);
 }
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
@@ -303,8 +303,7 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 
     // Use delayed handling for proper animation
     enum { kNextEventDelay = 100 };
-    executeDelayedParented(showDialogHandler
-        , kNextEventDelay, this);
+    executeDelayedParented(showDialogHandler, kNextEventDelay, this);
 }
 
 void QnWorkbenchWelcomeScreen::logoutFromCloud()
