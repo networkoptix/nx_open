@@ -2184,9 +2184,6 @@ void MediaServerProcess::run()
 #endif
 
 
-    QnFlirResourceSearcher flirResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&flirResourceSearcher);
-
 #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
     QnPlVmax480ResourceSearcher::initStaticInstance( new QnPlVmax480ResourceSearcher() );
     QnResourceDiscoveryManager::instance()->addDeviceServer(QnPlVmax480ResourceSearcher::instance());
@@ -2199,6 +2196,9 @@ void MediaServerProcess::run()
 
     OnvifResourceSearcher onvifResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&onvifResourceSearcher);
+
+    QnFlirResourceSearcher flirResourceSearcher;
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&flirResourceSearcher);
 #endif //ENABLE_ONVIF
 #endif
 
