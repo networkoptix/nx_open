@@ -5,6 +5,7 @@
 
 import os
 import re
+import json
 import xml.etree.ElementTree as eTree
 from xml.dom import minidom
 
@@ -16,7 +17,29 @@ def unique_list(iter_list):
 def process_js_file(file_name):
     with open(file_name, 'r') as file_descriptor:
         data = file_descriptor.read()
+
+        print data
         strings = re.findall("(?<=').+?(?<!\\\\)(?=')", data)
+        strings += re.findall("(?<=\").+?(?<!\\\\)(?=\")", data)
+        strings = [x for x in strings if x not in ignore_strings]
+
+        if not strings:
+            return None
+
+        return {
+            'filename': file_name,
+            'inline': [],
+            'attributes': strings
+        }
+
+
+def process_json_file(file_name):
+    with open(file_name, 'r') as file_descriptor:
+        data = file_descriptor.read()
+
+        json.load(data)
+
+        strings = re.findall("(?<:\").+?(?<!\\\\)(?=\")", data)
         strings = [x for x in strings if x not in ignore_strings]
 
         if not strings:
@@ -145,10 +168,11 @@ def format_ts(strings, file_name):
 
 
 js_strings = extract_strings('../../front_end/dist/scripts', 'language.js', mode='js')
+js_strings1 = extract_strings('../../front_end/dist/', 'apple-app-site-association', mode='js')
 html_strings = extract_strings('../../front_end/dist/views', '.html')  # , dir_exclude='static'
-
 html_strings1 = extract_strings('../../front_end/dist/', '.html')  # , dir_exclude='static'
-format_ts(js_strings + html_strings + html_strings1, "cloud_portal.ts")
+
+format_ts(js_strings + js_strings1 + html_strings + html_strings1, "cloud_portal.ts")
 
 template_strings = extract_strings('../notifications/static/templates', '.mustache')
 format_ts(template_strings, "templates.ts")

@@ -3,7 +3,7 @@
 // Special service for operating with systems at high-level
 
 angular.module('cloudApp')
-    .factory('system', ['cloudApi', 'mediaserver', '$q', 'uuid2', function (cloudApi, mediaserver, $q, uuid2) {
+    .factory('system', ['cloudApi', 'mediaserver', '$q', 'uuid2', '$log', function (cloudApi, mediaserver, $q, uuid2, $log) {
 
         var systems = {};
 
@@ -148,7 +148,7 @@ angular.module('cloudApp')
 
             var deferred = $q.defer();
             function errorHandler(error){
-                console.error(error);
+                $log.error(error);
                 deferred.reject(error);
             }
             mediaserver.getUsers(self.id).then(function(result){
@@ -181,6 +181,9 @@ angular.module('cloudApp')
                 }
                 
                 this.usersPromise = promise.then(function(users){
+                    if(!$.isArray(users)){
+                        return false;
+                    }
                     // Sort users here
                     self.users = _.sortBy(users,function(user){
                         var isMe = user.accountEmail === self.currentUserEmail;

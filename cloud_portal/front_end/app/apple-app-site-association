@@ -1,0 +1,15 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "{{iOSappID}}",
+                "paths": [
+                    "/{{portalDomain}}/client*",
+                    "/{{portalDomain}}/cloud*",
+                    "/{{portalDomain}}/systems/*/client"
+                ]
+            }
+        ]
+    }
+}

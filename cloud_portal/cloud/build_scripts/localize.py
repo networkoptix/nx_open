@@ -55,6 +55,7 @@ def save_content(filename, content):
             print "save: " + filename
             file_descriptor.write(active_content)
 
+
 def process_files():
     for xml_file in xml_files:
         tree = eTree.parse(xml_file)

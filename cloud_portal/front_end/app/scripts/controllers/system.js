@@ -30,6 +30,7 @@ angular.module('cloudApp')
 
         function delayedUpdateSystemInfo(){
             var pollingSystemUpdate = $poll(function(){
+            console.log("poll function");
                 return $scope.system.update();
             },Config.updateInterval);
 
@@ -40,14 +41,13 @@ angular.module('cloudApp')
 
         //Retrieve users list
         $scope.gettingSystemUsers = process.init(function(){
-            return $scope.system.getUsers();
+            return $scope.system.getUsers().then(function(users){
+                if($routeParams.callShare){
+                    return $scope.share().finally(cleanUrl);
+                }
+            }).finally(delayedUpdateSystemInfo);
         },{
             errorPrefix:'Users list is unavailable:'
-        }).then(function(users){
-            if($routeParams.callShare){
-                $scope.share().finally(cleanUrl);
-            }
-            delayedUpdateSystemInfo();
         });
 
 
