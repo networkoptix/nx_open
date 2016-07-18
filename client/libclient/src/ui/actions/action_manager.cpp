@@ -477,7 +477,8 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Filter..."));
 
     factory(QnActions::ConnectAction).
-        flags(Qn::NoTarget);
+        flags(Qn::NoTarget).
+        checkable();
 
     factory(QnActions::ReconnectAction).
         flags(Qn::NoTarget).

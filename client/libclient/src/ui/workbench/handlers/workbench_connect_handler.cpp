@@ -241,6 +241,11 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered()
 {
+    const auto connectAction = action(QnActions::ConnectAction);
+    connectAction->setChecked(true);
+    auto uncheckConnectActionRaii = QnRaiiGuard::createDestructable(
+        [connectAction]() { connectAction->setChecked(false); });
+
     // ask user if he wants to save changes
     bool force = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
     if (connected() && !disconnectFromServer(force))

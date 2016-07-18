@@ -282,13 +282,20 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
 
     connect(qnCommon, &QnCommonModule::remoteIdChanged, this,
-        [browseAction, welcomeScreen](const QnUuid& id)
+        [this, browseAction, welcomeScreen](const QnUuid& id)
         {
             const bool connected = !id.isNull();
-            if (!connected)
+            if (connected)
+            {
+                // Show preloader for resources
                 browseAction->setChecked(false);
-            else
                 welcomeScreen->setReceivingResources(true);
+            }
+            else if (!action(QnActions::ConnectAction)->isChecked())
+            {
+                // Connection process is not in progress: just show welcome screen
+                browseAction->setChecked(false);
+            }
         });
 
     connect(qnDesktopClientMessageProcessor, &QnDesktopClientMessageProcessor::initialResourcesReceived, this,
