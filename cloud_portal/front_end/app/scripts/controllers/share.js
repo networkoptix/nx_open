@@ -13,9 +13,8 @@ angular.module('cloudApp')
         var systemId = system.id;
         $scope.isNewShare = !dialogSettings.params.user;
 
-        $scope.user = dialogSettings.params.user? _.clone(dialogSettings.params.user):{
-            accountEmail:'',
-            accessRole: Config.accessRoles.default
+        $scope.user = dialogSettings.params.user ? _.clone(dialogSettings.params.user):{
+            accountEmail:''
         };
 
         if(!$scope.isNewShare) {
@@ -27,48 +26,12 @@ angular.module('cloudApp')
             $scope.buttonText = L.sharing.editShareConfirmButton;
         }
 
-        function findRole(user, accessRoles){
-            var role = _.find(accessRoles,function(role){
-                if(!system.isEmptyGuid(user.groupId)){
-                    return role.groupId === user.groupId;
-                }
-
-                return user.permissions === role.permissions && !role.groupId;
-            });
-
-            return role || accessRoles[accessRoles.length-1]; // Last option is custom
-        }
-
         function processAccessRoles(){
-            var filteredRoles = _.filter(Config.accessRoles.options,function(role){
-                if(role.isAdmin || role.readOnly && !system.isMine){
-                    return false;
-                }
-                role.label = L.accessRoles[role.accessRole]? L.accessRoles[role.accessRole].label : role.accessRole;
-                return  (Config.accessRoles.order.indexOf(role.accessRole)>=0) &&   // 1. Access role must be registered
-                        role.accessRole != Config.accessRoles.unshare;            // 2. Remove unsharing role from interface
+            $scope.accessRoles = _.filter(system.accessRoles,function(role){
+                return ! (role.isOwner || role.isAdmin && !system.isMine);
             });
 
-            $scope.accessRoles = _.sortBy(filteredRoles,function(role){
-                var index = Config.accessRoles.order.indexOf(role.accessRole);
-                return index >= 0 ? index: 10000;
-            });
-
-            if(system.groups){
-                // Add groups sorted by name
-                _.each(system.groups,function(group){
-                    $scope.accessRoles.push({
-                        accessRole: Config.accessRoles.custom.accessRole,
-                        groupId: group.id,
-                        label: group.name
-                    })
-                });
-            }
-            $scope.accessRoles.push({
-                accessRole: Config.accessRoles.custom.accessRole,
-                label: L.accessRoles.custom.label
-            })
-            $scope.user.role = findRole($scope.user, $scope.accessRoles);
+            $scope.user.role = system.findAccessRole($scope.user);
         }
 
         processAccessRoles();
@@ -89,18 +52,20 @@ angular.module('cloudApp')
         }
 
         $scope.getRoleDescription = function(){
+            if($scope.user.role.description){
+                return $scope.user.role.description;
+            }
             if($scope.user.role.groupId){
                 return L.accessRoles.customRole.description;
             }
-            if(L.accessRoles[$scope.user.role.accessRole]){
-                return L.accessRoles[$scope.user.role.accessRole].description;
+            if(L.accessRoles[$scope.user.role.name]){
+                return L.accessRoles[$scope.user.role.name].description;
             }
-
             return L.accessRoles.custom.description;
         }
 
         $scope.sharing = process.init(function(){
-            if($scope.user.role.accessRole == Config.accessRoles.owner) {
+            if($scope.user.role.isOwner) {
                 return dialogs.confirm(L.sharing.confirmOwner).then(doShare);
             }else{
                 return doShare();

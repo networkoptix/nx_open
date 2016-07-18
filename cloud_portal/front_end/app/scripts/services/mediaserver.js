@@ -4,7 +4,13 @@ angular.module('cloudApp')
     .factory('mediaserver', ['$http', '$q', 'uuid2', function ($http, $q, uuid2) {
 
         function gateway(serverId){
-             return Config.apiBase + '/systems/' + serverId  + '/proxy';
+            return Config.apiBase + '/systems/' + serverId  + '/proxy';
+        }
+
+        function emulateResponse(data){
+            var deferred = $q.defer();
+            deferred.resolve({data:data});
+            return deferred.promise;
         }
         var service = {
             getCurrentUser: function(systemId){
@@ -13,11 +19,11 @@ angular.module('cloudApp')
             getUsers: function(systemId){
                 return $http.get(gateway(systemId) + '/ec2/getUsers');
             },
+            getPredefinedRoles: function(systemId){
+                return $http.get(gateway(systemId) + '/ec2/getPredefinedRoles');
+            },
             getUserGroups: function(systemId){
                 return $http.get(gateway(systemId) + '/ec2/getUserGroups');
-            },
-            getAccessRight: function(systemId){
-                return $http.get(gateway(systemId) + '/ec2/getAccessRights');
             },
             saveUser: function(systemId, user){
                 return $http.post(gateway(systemId) + '/ec2/saveUser', this.cleanUserObject(user));

@@ -102,6 +102,19 @@ module.exports = function (grunt) {
                 // Local vagrant
                 /*{context: '/api/',    host: 'cloud-local', port: 80},
                 {context: '/notifications/',    host: 'cloud-local', port: 80}/**/
+
+
+                // Hack to avoid gateway - don't work :(
+                /*{
+                    context: '/ec2/',
+                    host: '10.1.5.142',
+                    port: 7001,
+                    headers: { //admin:admin
+                        'Authorization': 'Basic YWRtaW46YWRtaW4='
+                    }
+                    // Use https://www.base64encode.org/ to calculate signature as base64(user:password)
+                }*/
+
             ],
             livereload: {
                 options: {

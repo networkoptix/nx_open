@@ -43,34 +43,38 @@ var L = {
             label: 'Disabled',
             description: 'User is disabled in the system'
         },
-        owner: {
+        'Owner': {
             label: 'Owner',
             description: 'Can do pretty much everything with his system'
         },
-        viewer: {
+        'Viewer': {
             label: 'Viewer',
             description: 'Can view live video from cameras and archive'
         },
-        liveViewer: {
-            label: 'Live viewer',
+        'Live Viewer': {
+            label: 'Live Viewer',
             description: 'Can view only live video from cameras'
         },
-        advancedViewer: {
-            label: 'Advanced viewer',
+        'Advanced Viewer': {
+            label: 'Advanced Viewer',
             description: 'Can view live video from cameras and archive, configure cameras'
+        },
+        'Administrator':{
+            label: 'Administrator',
+            description: 'Can configure system and share it'
+        },
+        'Custom':{
+            label: 'Custom',
+            description: 'Access to specified resources with specified rights'
         },
         cloudAdmin: {
             label: 'Administrator',
             description: 'Can configure system and share it'
         },
-        custom:{
-            label: 'Custom',
-            description: 'Access to specified resources with specified rights'
-        },
         customRole:{
             label: 'Custom role',
             description: 'Custom user role specified in the system'
-        },
+        }
     },
     errorCodes:{
         ok: 'ok',

@@ -37,15 +37,13 @@ angular.module('cloudApp')
             self.permissions = {};
             self.accessRole = self.info.accessRole;
             if(self.currentUserRecord){
-                var role = findAccessRole(self.currentUserRecord.isAdmin, self.currentUserRecord.permissions);
-                self.accessRole = role.accessRole;
-                self.permissions.editAdmins = self.currentUserRecord.isAdmin;
-                self.permissions.editUsers = self.currentUserRecord.isAdmin || self.currentUserRecord.permissions.indexOf(Config.accessRoles.editUserPermissionFlag>=0);
-                self.permissions.isAdmin = self.currentUserRecord.isAdmin || self.currentUserRecord.permissions.indexOf(Config.accessRoles.globalAdminPermissionFlag>=0);
+                var role = self.findAccessRole(self.currentUserRecord);
+                self.accessRole = role.name;
+                self.permissions.editAdmins = self.isOwner(self.currentUserRecord);
+                self.permissions.isAdmin = self.isOwner(self.currentUserRecord) || self.isAdmin(self.currentUserRecord);
+                self.permissions.editUsers = self.permissions.isAdmin || self.currentUserRecord.permissions.indexOf(Config.accessRoles.editUserPermissionFlag>=0);
             }else{
-
-                var role = findAccessRole(self.isMine, self.info.accessRole);
-                self.accessRole = role.accessRole;
+                self.accessRole = self.info.accessRole;
                 if(self.isMine){
                     self.permissions.editUsers = true;
                     self.permissions.editAdmins = true;
@@ -96,15 +94,6 @@ angular.module('cloudApp')
             }
         });
 
-        function findAccessRole(isAdmin, permissions){
-            var role = _.find(Config.accessRoles.options,function(option){
-                return isAdmin && option.isAdmin || !isAdmin && option.permissions == permissions;
-            })
-
-            return role || { accessRole: 'custom' };
-        }
-
-
         system.prototype.isEmptyGuid = function(guid){
             if(!guid){
                 return true;
@@ -113,9 +102,58 @@ angular.module('cloudApp')
             return guid == '';
         }
 
+
+        system.prototype.isOwner = function(user){
+            return user.isAdmin || user.accountEmail === this.info.ownerAccountEmail;
+        };
+
+        system.prototype.isAdmin = function(user){
+            return user.permissions && user.permissions.indexOf(Config.accessRoles.globalAdminPermissionFlag)>=0;
+        };
+
+        system.prototype.updateAccessRoles = function(){
+            if(!this.accessRoles){
+                var groupsList = _.map(this.groups, function(group){
+                    return {
+                        name: group.Name,
+                        groupId: group.id,
+                        group: group
+                    }
+                })
+
+                this.accessRoles = _.union(this.predefinedRoles, groupsList);
+                this.accessRoles.push({ name: 'Custom' });
+            }
+            return this.accessRoles;
+        };
+        system.prototype.findAccessRole = function(user){
+            var self = this;
+            var role = _.find(this.accessRoles,function(role){
+                if(user.isAdmin){ // Owner flag has top priority and overrides everything
+                    return role.isOwner == user.isAdmin;
+                }
+
+                if(!self.isEmptyGuid(user.groupId)){
+                    return role.groupId == user.groupId;
+                }
+                if(!self.isEmptyGuid(role.groupId)){
+                    return false;
+                }
+
+                // Admins has second priority
+                if(self.isAdmin(user)){
+                    return self.isAdmin(role);
+                }
+
+                return role.permissions == user.permissions;
+            });
+
+            return role || { name: 'Custom' };
+        };
+
         system.prototype.getUsersDataFromTheSystem = function(){
             var self = this;
-            function processUsers(users, groups, accessRights){
+            function processUsers(users, groups, predefinedRoles){
                 var groupAssoc = _.indexBy(groups,'id');
                 users = _.filter(users, function(user){ return user.isCloud; });
                 // var accessRightsAssoc = _.indexBy(accessRights,'userId');
@@ -128,7 +166,7 @@ angular.module('cloudApp')
                     }else{
                         //user.accessRights = accessRightsAssoc[user.id];
                         user.permissions = normalizePermissionString(user.permissions);
-                        user.accessRole = findAccessRole(user.isAdmin, user.permissions).accessRole;
+                        user.accessRole = self.findAccessRole(user).Name;
                     }
                     if(!user.isEnabled){
                         user.accessRole = Config.accessRoles.disabled;
@@ -142,7 +180,13 @@ angular.module('cloudApp')
                     }
                 });
 
+                self.predefinedRoles = predefinedRoles;
+                _.each(self.predefinedRoles, function(role){
+                    role.isAdmin = self.isAdmin(role);
+                });
+
                 self.groups = _.sortBy(groups,function(group){return group.name;});
+                self.updateAccessRoles();
                 return users;
             }
 
@@ -155,13 +199,12 @@ angular.module('cloudApp')
                 var usersList = result.data;
                 mediaserver.getUserGroups(self.id).then(function(result){
                     var userGroups = result.data;
-                    deferred.resolve(processUsers(usersList, userGroups));
-                    self.isAvailable = true;
-                    self.updateSystemState();
-                    //mediaserver.getAccessRight(self.id).then(function(result){
-                    //    var accessRights = result.data;
-                    //    processUsers(usersList,userGroups,accessRights);
-                    //},errorHandler);
+                    mediaserver.getPredefinedRoles(self.id).then(function(result){
+                        var predefinedRoles = result.data;
+                        deferred.resolve(processUsers(usersList, userGroups, predefinedRoles));
+                        self.isAvailable = true;
+                        self.updateSystemState();
+                    },errorHandler);
                 },errorHandler);
             },errorHandler);
 
@@ -187,8 +230,8 @@ angular.module('cloudApp')
                     // Sort users here
                     self.users = _.sortBy(users,function(user){
                         var isMe = user.accountEmail === self.currentUserEmail;
-                        var isOwner = user.accountEmail === self.info.ownerAccountEmail || user.isAdmin;
-                        var isAdmin = findAccessRole(user.isAdmin, user.permissions || user.accessRole).readOnly;
+                        var isOwner = self.isOwner(user);
+                        var isAdmin = self.isAdmin(user);
 
                         user.canBeDeleted = !isOwner && (!isAdmin || self.isMine);
                         user.canBeEdited = !isOwner && !isMe && (!isAdmin || self.isMine);
@@ -206,7 +249,7 @@ angular.module('cloudApp')
 
 
         system.prototype.saveUser = function(user, role){
-            var accessRole = role.accessRole || role.label;
+            var accessRole = role.Name || role.label;
 
             if(!user.userId){
                 if(user.accountEmail == this.currentUserEmail){

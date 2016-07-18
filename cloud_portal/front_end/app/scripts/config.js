@@ -49,10 +49,10 @@ var Config = {
     },
     accessRoles: {
         unshare: 'none',
-        default: 'viewer',
+        default: 'Viewer',
         disabled: 'disabled',
         custom: 'custom',
-        owner:   'owner',
+        owner:   'Owner',
         editUserPermissionFlag: 'GlobalAdminPermission',
         globalAdminPermissionFlag: 'GlobalAdminPermission',
 
@@ -65,30 +65,6 @@ var Config = {
             'advancedViewer',
             'cloudAdmin',
             'owner'
-        ],
-        options: [
-            {
-                accessRole: 'owner',
-                readOnly: true,
-                isAdmin: true
-            },
-            {
-                accessRole: 'liveViewer',
-                permissions: 'GlobalAccessAllCamerasPermission'
-            },
-            {
-                accessRole: 'viewer',
-                permissions:'GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalAccessAllCamerasPermission'
-            },
-            {
-                accessRole: 'advancedViewer',
-                permissions: 'GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllCamerasPermission'
-            },
-            {
-                accessRole: 'cloudAdmin',
-                readOnly: true,
-                permissions: 'GlobalAdminPermission|GlobalEditCamerasPermission|GlobalControlVideoWallPermission|GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllCamerasPermission'
-            }
         ]
     },
 

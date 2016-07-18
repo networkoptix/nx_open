@@ -30,7 +30,6 @@ angular.module('cloudApp')
 
         function delayedUpdateSystemInfo(){
             var pollingSystemUpdate = $poll(function(){
-            console.log("poll function");
                 return $scope.system.update();
             },Config.updateInterval);
 
