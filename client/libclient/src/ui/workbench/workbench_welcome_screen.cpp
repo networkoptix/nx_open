@@ -27,7 +27,7 @@ namespace
 {
     typedef QPointer<QnWorkbenchWelcomeScreen> GuardType;
 
-    QWidget *createMainView(QObject *context)
+    QWidget* createMainView(QObject* context)
     {
         static const auto kWelcomeScreenSource = lit("qrc:/src/qml/WelcomeScreen.qml");
         static const auto kContextVariableName = lit("context");
@@ -77,7 +77,7 @@ namespace
     }
 }
 
-QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
+QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     :
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -122,7 +122,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
 QnWorkbenchWelcomeScreen::~QnWorkbenchWelcomeScreen()
 {}
 
-QWidget *QnWorkbenchWelcomeScreen::widget()
+QWidget* QnWorkbenchWelcomeScreen::widget()
 {
     return m_widget.data();
 }
@@ -157,7 +157,7 @@ QSize QnWorkbenchWelcomeScreen::pageSize() const
     return m_pageSize;
 }
 
-void QnWorkbenchWelcomeScreen::setPageSize(const QSize &size)
+void QnWorkbenchWelcomeScreen::setPageSize(const QSize& size)
 {
     if (m_pageSize == size)
         return;
@@ -210,9 +210,9 @@ void QnWorkbenchWelcomeScreen::setReceivingResources(bool value)
 
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     const QString& systemName,
-    const QString &serverUrl,
-    const QString &userName,
-    const QString &password,
+    const QString& serverUrl,
+    const QString& userName,
+    const QString& password,
     bool storePassword,
     bool autoLogin)
 {
@@ -252,7 +252,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     executeDelayedParented(connectFunction, kMinimalDelay, this);
 }
 
-void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemName, const QString &serverUrl)
+void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemName, const QString& serverUrl)
 {
     if (!isLoggedInToCloud())
         return;
@@ -269,7 +269,7 @@ void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
     dialog->exec();
 }
 
-void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
+void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 {
     setVisibleControls(false);
     const auto controlsGuard = QnRaiiGuard::createDestructable(
@@ -329,28 +329,24 @@ void QnWorkbenchWelcomeScreen::createAccount()
 
 //
 
-QColor QnWorkbenchWelcomeScreen::getPaletteColor(const QString &group
-    , int index)
+QColor QnWorkbenchWelcomeScreen::getPaletteColor(const QString& group, int index)
 {
     return m_palette.color(group, index);
 }
 
-QColor QnWorkbenchWelcomeScreen::getDarkerColor(const QColor &color
-    , int offset)
+QColor QnWorkbenchWelcomeScreen::getDarkerColor(const QColor& color, int offset)
 {
     const auto paletteColor = m_palette.color(color);
     return paletteColor.darker(offset);
 }
 
-QColor QnWorkbenchWelcomeScreen::getLighterColor(const QColor &color
-    , int offset)
+QColor QnWorkbenchWelcomeScreen::getLighterColor(const QColor& color, int offset)
 {
     const auto paletteColor = m_palette.color(color);
     return paletteColor.lighter(offset);
 }
 
-QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color
-    , qreal alpha)
+QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color, qreal alpha)
 {
     color.setAlphaF(alpha);
     return color;
@@ -361,8 +357,7 @@ void QnWorkbenchWelcomeScreen::showScreen()
     setVisible(true);
 }
 
-bool QnWorkbenchWelcomeScreen::eventFilter(QObject *obj
-    , QEvent *event)
+bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)
 {
     switch(event->type())
     {

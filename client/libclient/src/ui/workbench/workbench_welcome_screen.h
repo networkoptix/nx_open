@@ -25,11 +25,11 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchC
     Q_PROPERTY(bool receivingResources READ receivingResources WRITE setReceivingResources NOTIFY receivingResourcesChanged)
 
 public:
-    QnWorkbenchWelcomeScreen(QObject *parent);
+    QnWorkbenchWelcomeScreen(QObject* parent);
 
     virtual ~QnWorkbenchWelcomeScreen();
 
-    QWidget *widget();
+    QWidget* widget();
 
 public: // Properties
     bool isVisible() const;
@@ -42,7 +42,7 @@ public: // Properties
 
     QSize pageSize() const;
 
-    void setPageSize(const QSize &size);
+    void setPageSize(const QSize& size);
 
     bool visibleControls() const;
 
@@ -60,17 +60,17 @@ public slots:
     // TODO: $ynikitenkov add multiple urls one-by-one  handling
 void connectToLocalSystem(
     const QString& systemName,
-    const QString &serverUrl,
-    const QString &userName,
-    const QString &password,
+    const QString& serverUrl,
+    const QString& userName,
+    const QString& password,
     bool storePassword,
     bool autoLogin);
 
-    void connectToCloudSystem(const QString& systemName, const QString &serverUrl);
+    void connectToCloudSystem(const QString& systemName, const QString& serverUrl);
 
     void connectToAnotherSystem();
 
-    void setupFactorySystem(const QString &serverUrl);
+    void setupFactorySystem(const QString& serverUrl);
 
     void logoutFromCloud();
 
@@ -81,14 +81,11 @@ void connectToLocalSystem(
     void createAccount();
 
 public slots:
-    QColor getPaletteColor(const QString &group
-        , int index);
+    QColor getPaletteColor(const QString& group, int index);
 
-    QColor getDarkerColor(const QColor &color
-        , int offset = 1);
+    QColor getDarkerColor(const QColor& color, int offset = 1);
 
-    QColor getLighterColor(const QColor &color
-        , int offset = 1);
+    QColor getLighterColor(const QColor& color, int offset = 1);
 
     QColor colorWithAlpha(QColor color
         , qreal alpha);
@@ -116,8 +113,7 @@ private:
     void enableScreen();
 
 private: // overrides
-    bool eventFilter(QObject *obj
-        , QEvent *event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
 
 private:
     typedef QPointer<QWidget> WidgetPtr;
