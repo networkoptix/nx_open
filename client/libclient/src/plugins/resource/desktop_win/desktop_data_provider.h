@@ -128,7 +128,7 @@ private:
     QSize m_captureResolution;
     float m_encodeQualuty;
     QWidget* m_widget;
-    QString m_lastErrorStr;
+
     bool m_capturingStopped;
     const QPixmap m_logo;
     qint64 m_initTime;
