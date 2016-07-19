@@ -72,7 +72,7 @@ QVector<QRect> QnRegion::rects() const
 QnMotionRegion::QnMotionRegion()
 {
     m_dirty = false;
-    addRect(DEFAULT_SENSITIVITY, QRect(0,0,MD_WIDTH, MD_HEIGHT));
+    addRect(kDefaultSensitivity, QRect(0,0,MD_WIDTH, MD_HEIGHT));
 }
 
 QnMotionRegion::QnMotionRegion( const QnMotionRegion& right )
@@ -97,7 +97,7 @@ QnMotionRegion& QnMotionRegion::operator=( const QnMotionRegion& right )
 
 void QnMotionRegion::removeDefaultMotion()
 {
-    for (int i = MIN_SENSITIVITY; i <= MAX_SENSITIVITY; ++i)
+    for (int i = 0; i < kSensitivityLevelCount; ++i)
         m_data[i] = QnRegion();
      m_dirty = true;
 }
@@ -115,7 +115,7 @@ QnRegion QnMotionRegion::getRegionBySens(int value) const
 QMultiMap<int, QRect> QnMotionRegion::getAllMotionRects() const
 {
     QMultiMap<int, QRect> result;
-    for (int sens = MIN_SENSITIVITY+1; sens <= MAX_SENSITIVITY; ++sens)
+    for (int sens = 1; sens < kSensitivityLevelCount; ++sens)
     {
         QVector<QRect> rects = getRectsBySens(sens);
         for (int i = 0; i < rects.size(); ++i)
@@ -165,7 +165,7 @@ QVector<QRect> QnMotionRegion::getRectsBySens(int value) const
 
 void QnMotionRegion::addRect(int sensitivity, const QRect& rect)
 {
-    for (int i = MIN_SENSITIVITY; i <= MAX_SENSITIVITY; ++i)
+    for (int i = 0; i < kSensitivityLevelCount; ++i)
     {
         m_data[i] -= rect;
     }
@@ -175,7 +175,7 @@ void QnMotionRegion::addRect(int sensitivity, const QRect& rect)
 
 bool QnMotionRegion::operator==(const QnMotionRegion& other) const
 {
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    for (int sens = 0; sens < QnMotionRegion::kSensitivityLevelCount; ++sens)
     {
         if (!(m_data[sens] == other.m_data[sens]))
             return false;
@@ -185,7 +185,7 @@ bool QnMotionRegion::operator==(const QnMotionRegion& other) const
 
 bool QnMotionRegion::operator!=(const QnMotionRegion& other) const
 {
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    for (int sens = 0; sens < QnMotionRegion::kSensitivityLevelCount; ++sens)
     {
         if (!(m_data[sens] == other.m_data[sens]))
             return true;
@@ -195,7 +195,7 @@ bool QnMotionRegion::operator!=(const QnMotionRegion& other) const
 
 bool QnMotionRegion::isEmpty() const
 {
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    for (int sens = 0; sens < QnMotionRegion::kSensitivityLevelCount; ++sens)
     {
         if (!m_data[sens].isEmpty())
             return false;
@@ -205,7 +205,7 @@ bool QnMotionRegion::isEmpty() const
 
 bool QnMotionRegion::updateSensitivityAt(const QPoint& pos, int newSens)
 {
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    for (int sens = 0; sens < QnMotionRegion::kSensitivityLevelCount; ++sens)
     {
         if (m_data[sens].contains(pos))
         {
@@ -254,7 +254,7 @@ QnMotionRegion::ErrorCode QnMotionRegion::isValid(int maxMotionRects, int maxMas
 {
     int count = 0;
     int sens_count = 0;
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    for (int sens = 1; sens < QnMotionRegion::kSensitivityLevelCount; ++sens)
     {
         int rects = getRectsBySens(sens).size();
         count +=  rects;
@@ -279,7 +279,7 @@ QnMotionRegion::ErrorCode QnMotionRegion::isValid(int maxMotionRects, int maxMas
 int QnMotionRegion::getMotionRectCount() const
 {
     int count = 0;
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    for (int sens = 1; sens < QnMotionRegion::kSensitivityLevelCount; ++sens)
     {
         count +=  getRectsBySens(sens).size();
     }
@@ -294,7 +294,7 @@ int QnMotionRegion::getMaskRectCount() const
 int QnMotionRegion::getMotionSensCount() const
 {
     int sens_count = 0;
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    for (int sens = 1; sens < QnMotionRegion::kSensitivityLevelCount; ++sens)
     {
         if (getRectsBySens(sens).size() > 0)
             sens_count++;
@@ -304,7 +304,7 @@ int QnMotionRegion::getMotionSensCount() const
 
 void QnMotionRegion::updatePathCache()
 {
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens){
+    for (int sens = 0; sens < QnMotionRegion::kSensitivityLevelCount; ++sens){
         QnRegion region = m_data[sens];
         if (sens > 0)
             region -= m_data[0];
@@ -374,7 +374,7 @@ QString serializeMotionRegion(const QnMotionRegion& region)
     QStringList regionList;
 
     //for (const QnMotionWindow& window: region)
-    for (int i = QnMotionRegion::MIN_SENSITIVITY; i <= QnMotionRegion::MAX_SENSITIVITY; ++i)
+    for (int i = 0; i < QnMotionRegion::kSensitivityLevelCount; ++i)
     {
         if (!region.getRegionBySens(i).isEmpty())
         {

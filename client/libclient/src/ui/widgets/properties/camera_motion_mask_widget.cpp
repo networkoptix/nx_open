@@ -175,7 +175,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
             m_resourceWidget->setFrameOpacity(0.0);
         }
     }
-    m_motionSensitivity = QnMotionRegion::MIN_SENSITIVITY;
+    m_motionSensitivity = 0;
 
     /* Consider motion mask list changed. */
     emit motionRegionListChanged();
