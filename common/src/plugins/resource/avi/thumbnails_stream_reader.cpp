@@ -1,5 +1,7 @@
 #include "thumbnails_stream_reader.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 
@@ -142,3 +144,5 @@ void QnThumbnailsStreamReader::setGroupId(const QByteArray& groupId)
 {
     m_delegate->setGroupId(groupId);
 }
+
+#endif
