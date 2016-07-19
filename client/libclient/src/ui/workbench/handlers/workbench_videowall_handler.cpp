@@ -2709,18 +2709,7 @@ void QnWorkbenchVideoWallHandler::updateMainWindowGeometry(const QnScreenSnaps &
     for (int i = 0; i < desktop->screenCount(); ++i)
         screens << desktop->screenGeometry(i);
     QRect targetGeometry = screenSnaps.geometry(screens);
-    bool equalsScreen = screens.contains(targetGeometry);
-
-    if (equalsScreen)
-    {
-        mainWindow()->setGeometry(targetGeometry);
-        menu()->action(QnActions::EffectiveMaximizeAction)->setChecked(true);
-    }
-    else
-    {
-        menu()->action(QnActions::EffectiveMaximizeAction)->setChecked(false);
-        mainWindow()->setGeometry(targetGeometry);
-    }
+    mainWindow()->setGeometry(targetGeometry);
 }
 
 void QnWorkbenchVideoWallHandler::updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action)

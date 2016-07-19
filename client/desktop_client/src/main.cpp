@@ -133,8 +133,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
         qApp->processEvents();
     }
 
-    const bool instantlyMaximize = !startupParams.fullScreenDisabled
-        && startupParams.videoWallGuid.isNull();
+    const bool instantlyMaximize = !startupParams.fullScreenDisabled && qnRuntime->isDesktopMode();
 
     if (instantlyMaximize)
         context->action(QnActions::EffectiveMaximizeAction)->trigger();
