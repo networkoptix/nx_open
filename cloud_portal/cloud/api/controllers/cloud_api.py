@@ -7,6 +7,13 @@ from api.helpers.exceptions import validate_response
 CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
 
 
+def lower_case_email(func):
+    def validator(*args, **kwargs):
+        args[0] = args[0].lower()
+        return func(*args, **kwargs)
+    return validator
+
+
 @validate_response
 def ping():
     request = CLOUD_DB_URL + "/ping"
@@ -16,6 +23,7 @@ def ping():
 class System(object):
     @staticmethod
     @validate_response
+    @lower_case_email
     def list(email, password):
         # TODO: create wrappers
         request = CLOUD_DB_URL + "/system/get"
@@ -23,6 +31,7 @@ class System(object):
 
     @staticmethod
     @validate_response
+    @lower_case_email
     def get(email, password, system_id):
         # TODO: create wrappers
         request = CLOUD_DB_URL + "/system/get"
@@ -33,6 +42,7 @@ class System(object):
 
     @staticmethod
     @validate_response
+    @lower_case_email
     def users(email, password, system_id):
         request = CLOUD_DB_URL + "/system/get_cloud_users"
         params = {
@@ -42,6 +52,7 @@ class System(object):
 
     @staticmethod
     @validate_response
+    @lower_case_email
     def share(email, password, system_id, account_email, role):
         request = CLOUD_DB_URL + "/system/share"
         params = {
@@ -53,6 +64,7 @@ class System(object):
 
     @staticmethod
     @validate_response
+    @lower_case_email
     def access_roles(email, password, system_id):
         request = CLOUD_DB_URL + "/system/get_access_role_list"
         params = {
@@ -62,6 +74,7 @@ class System(object):
 
     @staticmethod
     @validate_response
+    @lower_case_email
     def unbind(email, password, system_id):
         request = CLOUD_DB_URL + "/system/unbind"
         params = {
@@ -71,6 +84,7 @@ class System(object):
 
     @staticmethod
     @validate_response
+    @lower_case_email
     def bind(email, password, name):
         request = CLOUD_DB_URL + "/system/bind"
         customization = settings.CLOUD_CONNECT['customization']
@@ -85,6 +99,7 @@ class Account(object):
 
     @staticmethod
     @validate_response
+    @lower_case_email
     def register(email, password, first_name, last_name):
         customization = settings.CLOUD_CONNECT['customization']
         realm = settings.CLOUD_CONNECT['password_realm']
@@ -107,6 +122,7 @@ class Account(object):
 
     @staticmethod
     @validate_response
+    @lower_case_email
     def change_password(email, password, new_password):
         realm = settings.CLOUD_CONNECT['password_realm']
 
@@ -124,6 +140,7 @@ class Account(object):
 
     @staticmethod
     @validate_response
+    @lower_case_email
     def create_temporary_credentials(email, password, type):
         params = {
             'type': type
@@ -133,6 +150,7 @@ class Account(object):
 
     @staticmethod
     @validate_response
+    @lower_case_email
     def reset_password(user_email):
         params = {
             'email': user_email
@@ -151,6 +169,7 @@ class Account(object):
 
     @staticmethod
     @validate_response
+    @lower_case_email
     def reactivate(email):
         params = {
             'email': email
@@ -160,6 +179,7 @@ class Account(object):
 
     @staticmethod
     @validate_response
+    @lower_case_email
     def update(email, password, first_name, last_name):
         params = {
             'fullName': ' '.join((first_name, last_name))
@@ -169,6 +189,7 @@ class Account(object):
 
     @staticmethod
     @validate_response
+    @lower_case_email
     def get(email=None, password=None):
         # TODO: create wrappers
         request = CLOUD_DB_URL + '/account/get'

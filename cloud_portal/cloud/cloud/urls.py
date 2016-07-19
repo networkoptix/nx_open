@@ -23,10 +23,10 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
     url(r'^notifications/', include('notifications.urls')),
-    url(r'.*', TemplateView.as_view(template_name="static/index.html")),
 
-    url(r'apple-app-site-association', TemplateView.as_view(template_name="static/apple-app-site-association")),
-    url(r'\.well-known/apple-app-site-association', TemplateView.as_view(template_name="static/apple-app-site-association"))
-    # url(r'^$', RedirectView.as_view(url='/static/index.html'), name='index')
+    url(r'^apple-app-site-association', TemplateView.as_view(template_name="static/apple-app-site-association")),
+    url(r'^\.well-known/apple-app-site-association', TemplateView.as_view(template_name="static/apple-app-site-association")),
+
+    url(r'.*', TemplateView.as_view(template_name="static/index.html"))
 ]
 
