@@ -16,7 +16,7 @@ const QString QnStardotResource::MANUFACTURE(lit("Stardot"));
 static const int TCP_TIMEOUT = 3000;
 static const int DEFAULT_RTSP_PORT = 554;
 
-namespace 
+namespace
 {
     int resSquare(const QSize& size)
     {
@@ -66,7 +66,7 @@ QSize QnStardotResource::extractResolution(const QByteArray& resolutionStr) cons
     bool isDigit = params[0].at(0) >= '0' && params[0].at(0) <= '9';
     if (!isDigit)
         params[0] = params[0].mid(1);
-    
+
     return QSize(params[0].trimmed().toInt(), params[1].trimmed().toInt());
 }
 
@@ -138,7 +138,7 @@ CameraDiagnostics::Result QnStardotResource::initInternal()
 
 
     CLHttpStatus status;
-       
+
     QByteArray resList = makeStardotRequest(lit("info.cgi?resolutions&api=2"), status);
     if (status != CL_HTTP_SUCCESS)
         return CameraDiagnostics::UnknownErrorResult();
@@ -151,7 +151,7 @@ CameraDiagnostics::Result QnStardotResource::initInternal()
     if (status != CL_HTTP_SUCCESS)
         return CameraDiagnostics::UnknownErrorResult();
     parseInfo(info);
-    if (m_rtspPort == 0) 
+    if (m_rtspPort == 0)
     {
         qWarning() << "No H.264 RTSP port found for Stardot camera" << getHostAddress() << "Please update camera firmware";
         return CameraDiagnostics::UnknownErrorResult();
@@ -213,7 +213,7 @@ void QnStardotResource::setMotionMaskPhysical(int channel)
         return;
 
     QnMotionRegion region = getMotionRegion(0);
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    for (int sens = 1; sens < QnMotionRegion::kSensitivityLevelCount; ++sens)
     {
 
         if (!region.getRegionBySens(sens).isEmpty())

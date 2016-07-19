@@ -109,7 +109,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     MotionDataPicture* motionMask = new MotionDataPicture( nxcip::AV_PIX_FMT_GRAY8 );
     const QnMotionRegion& region = m_thirdPartyRes->getMotionRegion(0);
     //converting region
-    for( int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens )
+    for( int sens = 0; sens < QnMotionRegion::kSensitivityLevelCount; ++sens )
     {
         for( const QRect& rect: region.getRectsBySens(sens) )
         {
