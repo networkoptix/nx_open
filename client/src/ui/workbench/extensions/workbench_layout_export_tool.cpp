@@ -389,6 +389,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     m_storage,
                                     role,
                                     serverTimeZone,
+                                    0,
                                     QnImageFilterHelper()
                                     );
 
@@ -399,7 +400,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
 void QnLayoutExportTool::at_camera_exportFinished(
     const QnStreamRecorder::ErrorStruct &status,
     const QString                       &filename
-) 
+)
 {
     Q_UNUSED(filename)
     if (status.lastError != QnClientVideoCamera::NoError) {

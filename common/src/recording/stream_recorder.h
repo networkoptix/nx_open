@@ -194,6 +194,9 @@ protected:
         const QnStorageResourcePtr& storage, 
         const QString& url,
         AVIOContext** context);
+    virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
+    virtual bool isUtcOffsetAllowed() const { return true; }
+        
 private:
     void updateSignatureAttr(size_t i);
     qint64 findNextIFrame(qint64 baseTime);
