@@ -38,6 +38,7 @@ struct Recorders
 class WriteBufferMultiplierManager : public QObject
 {
     Q_OBJECT
+public: // 'public' for ut. don't use directly
     struct Key
     {
         QnServer::ChunksCatalog catalog;
@@ -69,7 +70,7 @@ public slots:
     void at_seekDetected(uintptr_t filePtr, int size);
     void at_fileClosed(uintptr_t filePtr);
         
-private:
+protected: // 'protected' -> enable access for ut
     RecToSizeType m_recToMult;
     FileToRecType m_fileToRec;
     QnMutex m_mutex;
