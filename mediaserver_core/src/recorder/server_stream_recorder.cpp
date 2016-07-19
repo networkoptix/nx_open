@@ -28,6 +28,7 @@
 #include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */
 #include <recorder/recording_manager.h>
 #include <utils/common/buffered_file.h>
+#include <utils/media/ffmpeg_helper.h>
 
 static const int MOTION_PREBUFFER_SIZE = 8;
 
