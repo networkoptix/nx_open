@@ -1,6 +1,8 @@
 #ifndef THUMBNAILS_STREAM_READER_H__
 #define THUMBNAILS_STREAM_READER_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/resource/resource_media_layout.h"
 #include "plugins/resource/archive/abstract_archive_delegate.h"
@@ -35,5 +37,7 @@ private:
     QnAbstractArchiveDelegate* m_delegate;
     int m_cseq;
 };
+
+#endif //ENABLE_DATA_PROVIDERS
 
 #endif //THUMBNAILS_STREAM_READER_H__
