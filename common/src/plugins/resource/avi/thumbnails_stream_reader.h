@@ -1,6 +1,7 @@
 #ifndef THUMBNAILS_STREAM_READER_H__
 #define THUMBNAILS_STREAM_READER_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
 extern "C"
 {
 #include <libavformat/avformat.h>
@@ -40,5 +41,7 @@ private:
     QnAbstractArchiveDelegate* m_delegate;
     int m_cseq;
 };
+
+#endif //ENABLE_DATA_PROVIDERS
 
 #endif //THUMBNAILS_STREAM_READER_H__

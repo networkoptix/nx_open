@@ -85,7 +85,7 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
     const auto av = context->getAvCodecContext();
     av->channels = m_aacHelper.m_channels;
     av->sample_rate = m_aacHelper.m_sample_rate;
-    av->sample_fmt = AV_SAMPLE_FMT_S16;
+    av->sample_fmt = AV_SAMPLE_FMT_FLTP;
     av->time_base.num = 1;
     av->time_base.den = m_aacHelper.m_sample_rate;
     context->setExtradata((const quint8*) m_config.data(), m_config.size());

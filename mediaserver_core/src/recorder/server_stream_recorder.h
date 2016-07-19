@@ -85,6 +85,12 @@ private:
     bool pauseRebuildIfHighData(QnMutexLockerBase* locker);
     bool resumeRebuildIfLowData(QnMutexLockerBase* locker);
     void resumeRebuild(QnMutexLockerBase* locker);
+    void fileCreated(uintptr_t filePtr) const;
+    int getBufferSize() const;
+    virtual void initIoContext(
+        const QnStorageResourcePtr& storage, 
+        const QString& url,
+        AVIOContext** context) override;
 private slots:
     void at_recordingFinished(
         const ErrorStruct   &status,

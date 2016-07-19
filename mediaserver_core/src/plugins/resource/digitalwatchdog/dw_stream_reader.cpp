@@ -1,3 +1,5 @@
+#ifdef ENABLE_ONVIF
+
 #include "dw_stream_reader.h"
 
 #include <nx/utils/log/log.h>
@@ -48,3 +50,5 @@ void QnDWStreamReader::postStreamConfigureHook()
         qDebug() << message;
     }
 }
+
+#endif
