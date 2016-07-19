@@ -233,8 +233,6 @@ Rectangle
 
             onClicked: context.connectToAnotherSystem();
         }
-
-        Keys.onEscapePressed: context.tryHideScreen();
     }
 
 
