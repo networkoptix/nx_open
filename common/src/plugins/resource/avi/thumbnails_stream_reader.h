@@ -3,7 +3,6 @@
 
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/resource/resource_media_layout.h"
-#include <libavformat/avformat.h>
 #include "plugins/resource/archive/abstract_archive_delegate.h"
 
 /*
