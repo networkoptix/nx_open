@@ -1,4 +1,5 @@
 #include "stream_mixer.h"
+
 #include <core/dataprovider/spush_media_stream_provider.h>
 #include <utils/common/sleep.h>
 #include <utils/common/log.h>
@@ -12,6 +13,7 @@ namespace
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnChannelMapping, (json), (originalChannel)(mappedChannels))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnResourceChannelMapping, (json), (resourceChannel)(channelMap))
 
+#ifdef ENABLE_DATA_PROVIDERS
 
 QnStreamMixer::QnStreamMixer() :
     m_queue(kDataQueueSize)
@@ -59,10 +61,10 @@ void QnStreamMixer::setUser(QnAbstractStreamDataProvider* user)
 
 
 void QnStreamMixer::makeChannelMappingOperation(
-    MapType type, 
-    OperationType opType, 
-    QnAbstractStreamDataProvider* source, 
-    quint32 channelNumber, 
+    MapType type,
+    OperationType opType,
+    QnAbstractStreamDataProvider* source,
+    quint32 channelNumber,
     quint32 mappedChannelNumber)
 {
     auto handle = reinterpret_cast<uintptr_t>(source);
@@ -72,12 +74,12 @@ void QnStreamMixer::makeChannelMappingOperation(
 
     auto& sourceInfo = m_sourceMap[handle];
 
-    auto& channelMap = 
-        type == MapType::Video ? 
-            sourceInfo.videoChannelMap : 
+    auto& channelMap =
+        type == MapType::Video ?
+            sourceInfo.videoChannelMap :
             sourceInfo.audioChannelMap;
 
-    if (opType == OperationType::Insert) 
+    if (opType == OperationType::Insert)
     {
         channelMap[channelNumber]
             .insert(mappedChannelNumber);
@@ -89,16 +91,16 @@ void QnStreamMixer::makeChannelMappingOperation(
         channelMap[channelNumber]
             .erase(mappedChannelNumber);
     }
-    
+
 }
 
 void QnStreamMixer::mapSourceVideoChannel(
-    QnAbstractStreamDataProvider* source, 
-    quint32 videoChannelNumber, 
+    QnAbstractStreamDataProvider* source,
+    quint32 videoChannelNumber,
     quint32 mappedVideoChannelNumber)
 {
     makeChannelMappingOperation(
-        MapType::Video, 
+        MapType::Video,
         OperationType::Insert,
         source,
         videoChannelNumber,
@@ -106,12 +108,12 @@ void QnStreamMixer::mapSourceVideoChannel(
 }
 
 void QnStreamMixer::mapSourceAudioChannel(
-    QnAbstractStreamDataProvider* source, 
-    quint32 audioChannelNumber, 
+    QnAbstractStreamDataProvider* source,
+    quint32 audioChannelNumber,
     quint32 mappedAudioChannelNumber)
 {
     makeChannelMappingOperation(
-        MapType::Audio, 
+        MapType::Audio,
         OperationType::Insert,
         source,
         audioChannelNumber,
@@ -119,12 +121,12 @@ void QnStreamMixer::mapSourceAudioChannel(
 }
 
 void QnStreamMixer::unmapSourceVideoChannel(
-    QnAbstractStreamDataProvider* source, 
-    quint32 videoChannelNumber, 
+    QnAbstractStreamDataProvider* source,
+    quint32 videoChannelNumber,
     quint32 mappedVideoChannelNumber)
 {
     makeChannelMappingOperation(
-        MapType::Video, 
+        MapType::Video,
         OperationType::Remove,
         source,
         videoChannelNumber,
@@ -132,12 +134,12 @@ void QnStreamMixer::unmapSourceVideoChannel(
 }
 
 void QnStreamMixer::unmapSourceAudioChannel(
-    QnAbstractStreamDataProvider* source, 
-    quint32 audioChannelNumber, 
+    QnAbstractStreamDataProvider* source,
+    quint32 audioChannelNumber,
     quint32 mappedAudioChannelNumber)
 {
     makeChannelMappingOperation(
-        MapType::Audio, 
+        MapType::Audio,
         OperationType::Remove,
         source,
         audioChannelNumber,
@@ -146,7 +148,7 @@ void QnStreamMixer::unmapSourceAudioChannel(
 
 
 
-bool QnStreamMixer::canAcceptData() const 
+bool QnStreamMixer::canAcceptData() const
 {
     return m_queue.size() < kDataQueueSize;
 }
@@ -154,14 +156,14 @@ bool QnStreamMixer::canAcceptData() const
 void QnStreamMixer::putData(const QnAbstractDataPacketPtr &data)
 {
     auto mediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
-    
+
     if (!mediaData)
         return;
 
     handlePacket(mediaData);
 }
 
-bool QnStreamMixer::needConfigureProvider() const 
+bool QnStreamMixer::needConfigureProvider() const
 {
     if (!m_user)
         return false;
@@ -215,9 +217,9 @@ QnAbstractMediaDataPtr QnStreamMixer::retrieveData()
         if (data)
             break;
     }
-    
+
     return std::dynamic_pointer_cast<QnAbstractMediaData>(data);
-    
+
 }
 
 bool QnStreamMixer::isStreamOpened() const
@@ -247,7 +249,7 @@ bool QnStreamMixer::isStreamOpened() const
 
 void QnStreamMixer::resetSources()
 {
-    QnMutexLocker lock(&m_mutex);   
+    QnMutexLocker lock(&m_mutex);
     m_sourceMap.clear();
 }
 
@@ -259,7 +261,7 @@ void QnStreamMixer::handlePacket(QnAbstractMediaDataPtr& data)
     if (m_sourceMap.contains(provider));
     {
         decltype(QnProviderChannelInfo::videoChannelMap)* channelMap;
-        
+
         if(data->dataType == QnAbstractMediaData::DataType::AUDIO)
             channelMap = &m_sourceMap[provider].audioChannelMap;
         else if(data->dataType == QnAbstractMediaData::DataType::VIDEO)
@@ -280,11 +282,13 @@ void QnStreamMixer::handlePacket(QnAbstractMediaDataPtr& data)
                 if (!isFirstIteration)
                     dataToPush.reset(dataToPush->clone());
 
-                dataToPush->channelNumber = mappedChannel; 
+                dataToPush->channelNumber = mappedChannel;
                 dataToPush->dataProvider = m_user;
                 m_queue.push(dataToPush);
                 isFirstIteration = false;
             }
-        }    
+        }
     }
 }
+
+#endif // ENABLE_DATA_PROVIDERS
