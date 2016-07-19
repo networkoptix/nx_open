@@ -84,7 +84,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     QnClientModule client(startupParams);
 
     /* Running updater after QApplication and NX_LOG are initialized. */
-    nx::vms::client::SelfUpdater updater(startupParams);
+    if (qnRuntime->isDesktopMode())
+    {
+        nx::vms::client::SelfUpdater updater(startupParams);
+    }
 
     /* Immediately exit if run in self-update mode. */
     if (startupParams.selfUpdateMode)
