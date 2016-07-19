@@ -27,3 +27,5 @@ public:
 private:
     const Handler m_destructionHandler;
 };
+
+Q_DECLARE_METATYPE(QnRaiiGuardPtr)

@@ -12,6 +12,11 @@ QnDesktopDataProviderBase::~QnDesktopDataProviderBase()
 
 }
 
+QString QnDesktopDataProviderBase::lastErrorStr() const
+{
+    return m_lastErrorStr;
+}
+
 // mux audio 1 and audio 2 to audio1 buffer
 // I have used intrisicts for SSE. It is portable for MSVC, GCC (mac, linux), Intel compiler
 #if !defined(__arm__)

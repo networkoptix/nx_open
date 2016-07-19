@@ -80,15 +80,17 @@
 
 namespace
 {
-    enum { kMicroInMilliSeconds = 1000 };
+    const int kMicroInMilliSeconds = 1000;
 
     // TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
     // Note: -1 is used for invalid time
     // Now it is returned when there is no archive data and archive is played backwards.
     // Who returns it? --gdm?
-    enum { kNoTimeValue = 0 };
+    const int kNoTimeValue = 0;
 
     const qreal kTwoWayAudioButtonSize = 44.0;
+
+    const qreal kMotionRegionAlpha = 0.4;
 
     bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
     {
@@ -903,7 +905,8 @@ void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRect
     painter->drawPath(path);
 }
 
-void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region) {
+void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter* painter, int channel, const QRectF& rect, const QnMotionRegion& region)
+{
     QPoint channelOffset = channelGridOffset(channel);
 
     qreal xStep = rect.width() / MD_WIDTH;
@@ -919,13 +922,15 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, 
     painter->setFont(font);
 
     /* Zero sensitivity is skipped as there should not be painted zeros */
-    for (int sensitivity = QnMotionRegion::MIN_SENSITIVITY + 1; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; ++sensitivity) {
+    for (int sensitivity = 1; sensitivity < QnMotionRegion::kSensitivityLevelCount; ++sensitivity)
+    {
         auto rects = region.getRectsBySens(sensitivity);
         if (rects.isEmpty())
             continue;
 
         m_sensStaticText[sensitivity].prepare(painter->transform(), font);
-        foreach(const QRect &rect, rects) {
+        for (const QRect& rect : rects)
+        {
             if (rect.width() < 2 || rect.height() < 2)
                 continue;
 
@@ -935,18 +940,25 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, 
     }
 }
 
-void QnMediaResourceWidget::paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect) {
+void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channel, const QRectF& rect)
+{
     ensureMotionSensitivity();
 
-    if (options() & DisplayMotionSensitivity) {
-        for (int i = QnMotionRegion::MIN_SENSITIVITY; i <= QnMotionRegion::MAX_SENSITIVITY; ++i) {
-            QColor color = i > 0 ? QColor(100 +  i * 3, 16 * (10 - i), 0, 96 + i * 2) : qnGlobals->motionMaskColor();
+    if (options() & DisplayMotionSensitivity)
+    {
+        NX_ASSERT(m_motionSensitivityColors.size() == QnMotionRegion::kSensitivityLevelCount, Q_FUNC_INFO);
+        for (int i = 1; i < QnMotionRegion::kSensitivityLevelCount; ++i)
+        {
+            QColor color = i < m_motionSensitivityColors.size() ? m_motionSensitivityColors[i] : QColor(Qt::darkRed);
+            color.setAlphaF(kMotionRegionAlpha);
             QPainterPath path = m_motionSensitivity[channel].getRegionBySensPath(i);
             paintFilledRegionPath(painter, rect, path, color, Qt::black);
         }
 
         paintMotionSensitivityIndicators(painter, channel, rect, m_motionSensitivity[channel]);
-    } else {
+    }
+    else
+    {
         paintFilledRegionPath(painter, rect, m_motionSensitivity[channel].getMotionMaskPath(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
     }
 }
@@ -1700,3 +1712,12 @@ QnCompositeTextOverlay *QnMediaResourceWidget::compositeTextOverlay()
     return m_compositeTextOverlay;
 }
 
+QVector<QColor> QnMediaResourceWidget::motionSensitivityColors() const
+{
+    return m_motionSensitivityColors;
+}
+
+void QnMediaResourceWidget::setMotionSensitivityColors(const QVector<QColor>& value)
+{
+    m_motionSensitivityColors = value;
+}

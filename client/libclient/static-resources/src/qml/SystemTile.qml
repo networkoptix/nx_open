@@ -19,6 +19,8 @@ BaseTile
     property string wrongCustomization;
     property string compatibleVersion;
 
+    isConnecting: ((systemName == context.connectingToSystem) && !isFactoryTile);
+
     isAvailable:
     {
         if (isFactoryTile)
@@ -108,7 +110,7 @@ BaseTile
             var cloudHost = control.impl.hostsModel.firstHost;
             console.log("Connecting to cloud system <", systemName,
                 ">, throug the host <", cloudHost, ">");
-            context.connectToCloudSystem(cloudHost);
+            context.connectToCloudSystem(control.systemName, cloudHost);
         }
         else // Local system tile
         {
@@ -166,6 +168,7 @@ BaseTile
                 currentAreaItem.recentUserConnectionsModel = control.impl.recentConnectionsModel;
                 currentAreaItem.enabled = Qt.binding( function () { return control.isAvailable; });
                 currentAreaItem.prevTabObject = Qt.binding( function() { return control.collapseButton; });
+                currentAreaItem.isConnecting = Qt.binding( function() { return control.isConnecting; });
             }
             else if (control.impl.tileType === control.impl.kFactorySystemTileType)
             {
@@ -250,7 +253,8 @@ BaseTile
                 tile.selectedUser, ":", tile.selectedPassword,
                 tile.savePassword, tile.autoLogin);
 
-            context.connectToLocalSystem(tile.selectedHost,
+            context.connectToLocalSystem(
+                control.systemName, tile.selectedHost,
                 tile.selectedUser, tile.selectedPassword,
                 tile.savePassword, tile.autoLogin);
         }

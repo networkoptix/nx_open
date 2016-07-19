@@ -9,7 +9,7 @@
 
 const QString QnPlDlinkResource::MANUFACTURE(lit("Dlink"));
 
-namespace 
+namespace
 {
 
     bool sizeCompare(const QSize &s1, const QSize &s2)
@@ -26,7 +26,7 @@ namespace
         return left.number < right.number;
     }
 
-    int extractProfileNum(const QByteArray& key) 
+    int extractProfileNum(const QByteArray& key)
     {
         QByteArray result;
         int rightPos = key.size()-1;
@@ -35,7 +35,7 @@ namespace
         return key.mid(rightPos+1).toInt();
     }
 
-    bool hasLiteralContinuation(const QByteArray& key, const QByteArray&prefix) 
+    bool hasLiteralContinuation(const QByteArray& key, const QByteArray&prefix)
     {
         QByteArray suffix = key.mid(prefix.size());
         for (int i = 0; i < suffix.size(); ++i) {
@@ -86,7 +86,7 @@ QSize QnDlink_cam_info::resolutionCloseTo(int width) const
     return result;
 }
 
-// returns next up bitrate 
+// returns next up bitrate
 QByteArray QnDlink_cam_info::bitrateCloseTo(int val)
 {
 
@@ -106,7 +106,7 @@ QByteArray QnDlink_cam_info::bitrateCloseTo(int val)
 
 }
 
-// returns next up frame rate 
+// returns next up frame rate
 int QnDlink_cam_info::frameRateCloseTo(int fr)
 {
     NX_ASSERT(possibleFps.size()>0);
@@ -294,7 +294,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
                 QByteArray t = bs;
                 if (m || k)
                     t = t.left(t.length()-1);
-                
+
                 int val = t.toInt();
                 if(m)
                     val *= 1024;
@@ -319,7 +319,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 
     std::sort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), std::greater<int>());
     std::sort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
-    
+
     for (auto itr = profilesMap.begin(); itr != profilesMap.end(); ++itr) {
         itr.value().number = itr.key();
         m_camInfo.profiles << itr.value();
@@ -342,11 +342,11 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
     float apectRatio = apectRatio_0;
 
     if (std::abs(apectRatio_0 - apectRatio_1) > 0.01)
-        apectRatio = apectRatio_1; // 
+        apectRatio = apectRatio_1; //
 
     QList<QSize>::iterator it = m_camInfo.resolutions.begin();
 
-    while (it != m_camInfo.resolutions.end()) 
+    while (it != m_camInfo.resolutions.end())
     {
         QSize s = *it;
 
@@ -379,9 +379,9 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     Q_UNUSED(channel);
 
     if (channel != 0)
-        return; // motion info used always once even for multisensor cameras 
+        return; // motion info used always once even for multisensor cameras
 
-    static int sensToLevelThreshold[10] = 
+    static int sensToLevelThreshold[10] =
     {
         0, // 0 - aka mask really filtered by server always
         10, // 1
@@ -397,7 +397,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
 
     int sensitivity = 50;
     QnMotionRegion region = getMotionRegion(0);
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    for (int sens = 1; sens < QnMotionRegion::kSensitivityLevelCount; ++sens)
     {
 
         if (!region.getRegionBySens(sens).isEmpty())

@@ -17,14 +17,15 @@
 #include <utils/common/app_info.h>
 
 
-QnClientMessageProcessor::QnClientMessageProcessor():
+QnClientMessageProcessor::QnClientMessageProcessor()
+    :
     base_type(),
+
+    m_status(),
     m_connected(false),
     m_holdConnection(false),
     m_waitingForPeerReconnect(false)
 {
-    m_status.setState(QnConnectionState::Disconnected);
-
     /*
      * On changing ec2 settings qnTransactionMessageBus reconnects all peers, therefore
      * disconnecting us from server. After that 'Reconnect' dialog appears and reconnects us.
@@ -50,8 +51,7 @@ QnClientMessageProcessor::QnClientMessageProcessor():
 
 void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connection)
 {
-
-    m_status.setState(connection
+    setConnectionState(connection
         ? QnConnectionState::Connecting
         : QnConnectionState::Disconnected);
 
@@ -80,6 +80,15 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
 QnConnectionState QnClientMessageProcessor::connectionState() const
 {
     return m_status.state();
+}
+
+void QnClientMessageProcessor::setConnectionState(QnConnectionState state)
+{
+    if (m_status.state() == state)
+        return;
+
+    m_status.setState(state);
+    emit connectionStateChanged();
 }
 
 void QnClientMessageProcessor::setHoldConnection(bool holdConnection)
@@ -169,7 +178,7 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    m_status.setState(QnConnectionState::Connected);
+    setConnectionState(QnConnectionState::Connected);
     m_connected = true;
 
     if (m_waitingForPeerReconnect)
@@ -196,10 +205,10 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
         that were not sent as TransactionMessageBus was stopped. Peer id is the same if we are
         connecting to the same server we are already connected to (and just disconnected).
     */
-    if (m_status.state() == QnConnectionState::Connecting)
+    if (connectionState() == QnConnectionState::Connecting)
         return;
 
-    m_status.setState(QnConnectionState::Reconnecting);
+    setConnectionState(QnConnectionState::Reconnecting);
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
     QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
@@ -223,7 +232,7 @@ void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &syste
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
-    m_status.setState(QnConnectionState::Ready);
+    setConnectionState(QnConnectionState::Ready);
 
     /* Get server time as soon as we setup connection. */
     qnSyncTime->currentMSecsSinceEpoch();

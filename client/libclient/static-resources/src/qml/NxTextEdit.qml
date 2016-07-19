@@ -22,6 +22,9 @@ FocusScope
     property alias leftControl: leftControlLoader.item;
     property alias rightControl: rightControlLoader.item;
 
+    property color backgroundColor: Style.colors.shadow;
+    property color activeColor: Style.darkerColor(backgroundColor);
+
     signal accepted();
 
     onActiveFocusChanged:
@@ -74,12 +77,12 @@ FocusScope
                     color:
                     {
                         if (control.readOnly)
-                            return Style.colorWithAlpha(Style.colors.shadow, 0.2);
+                            return Style.colorWithAlpha(backgroundColor, 0.2);
 
                         if (control.activeFocus)
-                            return Style.darkerColor(Style.colors.shadow);
+                            return activeColor;
 
-                        return Style.colors.shadow;
+                        return backgroundColor;
                     }
 
                     radius: 1;

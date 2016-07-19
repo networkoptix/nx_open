@@ -109,7 +109,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     MotionDataPicture* motionMask = new MotionDataPicture( nxcip::AV_PIX_FMT_GRAY8 );
     const QnMotionRegion& region = m_thirdPartyRes->getMotionRegion(0);
     //converting region
-    for( int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens )
+    for( int sens = 0; sens < QnMotionRegion::kSensitivityLevelCount; ++sens )
     {
         for( const QRect& rect: region.getRectsBySens(sens) )
         {
@@ -254,6 +254,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
         }
 
+        m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
         NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(mediaUrlStr).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
 
         //checking url type and creating corresponding data provider
