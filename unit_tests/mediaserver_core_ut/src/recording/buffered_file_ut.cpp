@@ -228,7 +228,7 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
                 files[i].mediaDeviceId),
             4096);
     }
-    // Now seeks within (fileEndPos - (4096 + 1024), fileEndPos) range 
+    // Now seeks within (fileEndPos - 4096, fileEndPos) range 
     // should not trigger physical seeks and therefore no seekDetected
     // signals should be emitted and recToSize data structure shouldn't be 
     // altered.
