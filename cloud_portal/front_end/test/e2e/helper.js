@@ -196,6 +196,9 @@ var Helper = function () {
                 // Check that element that is visible only for authorized user is NOT displayed on page
                 expect(h.loginSuccessElement.isPresent()).toBe(false);
             }
+            else {
+                console.log('FAILED TO LOG OUT: user is already logged out');
+            }
         });
     };
 
@@ -214,11 +217,16 @@ var Helper = function () {
     };
 
     this.register = function(firstName, lastName, email, password) {
+        var deferred = protractor.promise.defer();
+
         this.get(this.urls.register);
         expect(h.forms.register.firstNameInput.isPresent()).toBe(true);
         this.fillRegisterForm(firstName, lastName, email, password);
         expect(h.alert.successMessageElem.isDisplayed()).toBe(true);
         expect(h.alert.successMessageElem.getText()).toContain(this.alert.alertMessages.registerSuccess);
+        deferred.fulfill();
+
+        return deferred.promise;
     };
 
     this.getUrlFromEmail = function(email, userEmail, subject, where) {
