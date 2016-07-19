@@ -266,9 +266,7 @@ void QnMdnsSrvData::decode(const QByteArray& raw)
         sizeof(decltype(weight)) -
         sizeof(decltype(port));
 
-    target.append(stream.readRawData(
-        const_cast<char*>(position),
-        targetLength));
+    target.append(position, targetLength);
 }
 
 #endif // ENABLE_MDNS
