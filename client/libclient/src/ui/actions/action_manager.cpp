@@ -1771,6 +1771,12 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission).
         condition(new QnExportActionCondition(false, this));
 
+    factory(QnActions::ExportTimelapseAction).
+        flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget).
+        text(tr("Export Rapid Review...")).
+        requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission).
+        condition(new QnExportActionCondition(true, this));
+
     factory(QnActions::ThumbnailsSearchAction).
         flags(Qn::Slider | Qn::Scene | Qn::SingleTarget).
         mode(QnActionTypes::DesktopMode).

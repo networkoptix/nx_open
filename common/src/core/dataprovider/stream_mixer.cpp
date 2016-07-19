@@ -13,6 +13,7 @@ namespace
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnChannelMapping, (json), (originalChannel)(mappedChannels))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnResourceChannelMapping, (json), (resourceChannel)(channelMap))
 
+#ifdef ENABLE_DATA_PROVIDERS
 
 QnStreamMixer::QnStreamMixer() :
     m_queue(kDataQueueSize)
@@ -289,3 +290,5 @@ void QnStreamMixer::handlePacket(QnAbstractMediaDataPtr& data)
         }
     }
 }
+
+#endif // ENABLE_DATA_PROVIDERS

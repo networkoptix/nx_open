@@ -1,5 +1,7 @@
 #include "flir_onvif_resource.h"
 
+#ifdef ENABLE_ONVIF
+
 QnFlirOnvifResource::QnFlirOnvifResource()
 {
 }
@@ -13,3 +15,5 @@ CameraDiagnostics::Result QnFlirOnvifResource::initInternal()
 
     return CameraDiagnostics::NoErrorResult();
 }
+
+#endif // ENABLE_ONVIF

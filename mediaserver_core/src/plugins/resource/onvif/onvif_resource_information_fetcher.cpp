@@ -56,7 +56,7 @@ bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendo
     for (uint i = 0; i < sizeof(ANALOG_CAMERAS)/sizeof(ANALOG_CAMERAS[0]); ++i)
     {
         QString vendorAnalog = QLatin1String(ANALOG_CAMERAS[i][0]);
-        if ((vendor.compare(vendorAnalog, Qt::CaseInsensitive) == 0 || vendorAnalog == lit("*")) && 
+        if ((vendor.compare(vendorAnalog, Qt::CaseInsensitive) == 0 || vendorAnalog == lit("*")) &&
             model.compare(QString(QLatin1String(ANALOG_CAMERAS[i][1])), Qt::CaseInsensitive) == 0)
             return true;
     }
@@ -162,7 +162,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         shortModel = info.name.mid(info.manufacturer.length()).trimmed();
     QnResourceData resourceData = qnCommon->dataPool()->data(info.manufacturer, shortModel);
     const bool forceOnvif = resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME);
-    if (!forceOnvif) 
+    if (!forceOnvif)
     {
         if (ignoreCamera(info.manufacturer, info.name))
             return;
@@ -223,7 +223,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         auth.setUser(soapWrapper.getLogin());
         auth.setPassword(soapWrapper.getPassword());
         CameraDiagnostics::Result result = QnPlOnvifResource::readDeviceInformation(endpoint, auth, INT_MAX, &extInfo);
-        
+
         if (m_shouldStop)
             return;
 
@@ -239,7 +239,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             firmware = extInfo.firmware;
         if (!extInfo.mac.isEmpty())
             mac = extInfo.mac;
-            
+
         if( (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString()))) ||
             ignoreCamera(manufacturer, model) )
         {
@@ -263,13 +263,13 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
 
     resourceData = qnCommon->dataPool()->data(res->getVendor(), res->getModel());
-    bool shouldAppearAsSingleChannel = 
+    bool shouldAppearAsSingleChannel =
         resourceData.value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
     QnPlOnvifResourcePtr onvifRes = existResource.dynamicCast<QnPlOnvifResource>();
-    
+
     // checking for multichannel encoders
-    if(onvifRes && onvifRes->getMaxChannels() > 1 && !shouldAppearAsSingleChannel) 
+    if(onvifRes && onvifRes->getMaxChannels() > 1 && !shouldAppearAsSingleChannel)
     {
         QString groupName;
         QString groupId;
@@ -287,7 +287,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         res->setGroupId(groupId);
         res->setGroupName(groupName);
 
-        for (int i = 1; i < onvifRes->getMaxChannels(); ++i) 
+        for (int i = 1; i < onvifRes->getMaxChannels(); ++i)
         {
             auto subres = createResource(manufacturer, firmware, QHostAddress(sender), QHostAddress(info.discoveryIp),
                 model, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), endpoint);
@@ -313,11 +313,11 @@ QnUuid OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manu
         return rt;
     else if (isAnalogOnvifResource(manufacturer, model) && !onvifAnalogTypeId.isNull())
         return onvifAnalogTypeId;
-    else 
+    else
         return onvifTypeId; // no child resourceType found. Use root ONVIF resource type
 }
 
-QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QString& firmware, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& model, 
+QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QString& firmware, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& model,
     const QString& mac, const QString& uniqId, const QString& login, const QString& passwd, const QString& deviceUrl) const
 {
     Q_UNUSED(discoveryIp)
@@ -339,11 +339,11 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
 
     resource->setHostAddress(QHostAddress(sender).toString());
     resource->setModel(model);
-    if ( isModelContainVendor(manufacturerAlias, model) 
+    if ( isModelContainVendor(manufacturerAlias, model)
          || doNotAddVendorToDeviceName)
-        resource->setName(model); 
+        resource->setName(model);
     else
-        resource->setName(manufacturer + model); 
+        resource->setName(manufacturer + model);
     QnMacAddress macAddr(mac);
     resource->setMAC(macAddr);
     resource->setFirmware(firmware);
@@ -381,14 +381,14 @@ QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& respo
         ? QString()
         : QString::fromStdString(response.HardwareId) + QLatin1String("::") +
             (response.SerialNumber.empty()
-             ? QString() 
+             ? QString()
              : QString::fromStdString(response.SerialNumber));
 }
 
 QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManufacture(const QString& manufacture)
 {
     QnPlOnvifResourcePtr resource;
-    if (manufacture.toLower().contains(QLatin1String("digital watchdog")) || 
+    if (manufacture.toLower().contains(QLatin1String("digital watchdog")) ||
             manufacture.toLower().contains(QLatin1String("digitalwatchdog")))
         resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource());
     else if (manufacture.toLower() == QLatin1String("panoramic"))
@@ -408,9 +408,9 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
 #ifdef ENABLE_AXIS
     else if (manufacture.toLower().contains(QLatin1String("axis")))
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());
+#endif
     else if (manufacture.toLower().contains(QLatin1String("flir")))
         resource = QnPlOnvifResourcePtr(new QnFlirOnvifResource());
-#endif
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 

@@ -224,7 +224,7 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
                     arg(timeDiff).
                     arg(m_mediaResource ? m_mediaResource->getName() : QString()).
                     arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")),
-                    cl_logDEBUG1);
+                    cl_logDEBUG2);
 
                 media->timestamp = m_lastMediaTime[channel] + MIN_FRAME_DURATION;
             }

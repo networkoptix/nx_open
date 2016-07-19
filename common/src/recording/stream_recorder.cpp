@@ -450,6 +450,11 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     return true;
 }
 
+qint64 QnStreamRecorder::getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md)
+{
+    return md->timestamp - m_startDateTime;
+}
+
 void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex)
 {
     AVRational srcRate = {1, 1000000};
@@ -468,7 +473,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         AVPacket avPkt;
         av_init_packet(&avPkt);
 
-        qint64 dts = av_rescale_q(md->timestamp-m_startDateTime, srcRate, stream->time_base);
+        qint64 dts = av_rescale_q(getPacketTimeUsec(md), srcRate, stream->time_base);
         if (stream->cur_dts > 0)
             avPkt.dts = qMax((qint64)stream->cur_dts+1, dts);
         else
@@ -621,16 +626,19 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     0
                 );
 
-            qint64 startTime = m_startOffset+mediaData->timestamp/1000;
-            av_dict_set(
-                &m_recordingContextVector[i].formatCtx->metadata,
-                QnAviArchiveDelegate::getTagName(
-                    QnAviArchiveDelegate::StartTimeTag,
-                    fileExt
-                ),
-                QString::number(startTime).toLatin1().data(),
-                0
-            );
+            if (isUtcOffsetAllowed())
+            {
+                qint64 startTime = m_startOffset+mediaData->timestamp/1000;
+                av_dict_set(
+                    &m_recordingContextVector[i].formatCtx->metadata,
+                    QnAviArchiveDelegate::getTagName(
+                        QnAviArchiveDelegate::StartTimeTag,
+                        fileExt
+                    ),
+                    QString::number(startTime).toLatin1().data(),
+                    0
+                );
+            }
 
             av_dict_set(
                 &m_recordingContextVector[i].formatCtx->metadata,
