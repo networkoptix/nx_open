@@ -7,22 +7,23 @@
 #include <utils/common/connective.h>
 
 namespace Ui {
-    class CameraAdvancedSettingsWidget;
+class CameraAdvancedSettingsWidget;
 }
 
 class QNetworkReply;
 class CameraAdvancedSettingsWebPage;
 
-class QnCameraAdvancedSettingsWidget : public Connective<QWidget> {
+class QnCameraAdvancedSettingsWidget: public Connective<QWidget>
+{
     Q_OBJECT
 
-    typedef Connective<QWidget> base_type;
+    using base_type = Connective<QWidget>;
 public:
     QnCameraAdvancedSettingsWidget(QWidget* parent = 0);
     virtual ~QnCameraAdvancedSettingsWidget();
 
     QnVirtualCameraResourcePtr camera() const;
-    void setCamera(const QnVirtualCameraResourcePtr &camera);
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
 
     void updateFromResource();
 
@@ -36,17 +37,18 @@ signals:
     void hasChangesChanged();
 
 protected:
-    virtual void hideEvent(QHideEvent *event) override;
+    virtual void hideEvent(QHideEvent* event) override;
 
 private:
     void initWebView();
 
     void updatePage();
 
-    void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
-    void at_proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator * authenticator);
+    void at_authenticationRequired(QNetworkReply* reply, QAuthenticator* authenticator);
+    void at_proxyAuthenticationRequired(const QNetworkProxy& proxy, QAuthenticator* authenticator);
 private:
-    enum class Page {
+    enum class Page
+    {
         Empty,
         Manual,
         Web
