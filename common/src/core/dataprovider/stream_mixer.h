@@ -7,7 +7,6 @@
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/data_packet_queue.h>
 #include "live_stream_provider.h"
-
 struct QnChannelMapping
 {
     quint32 originalChannel;
@@ -27,6 +26,8 @@ Q_DECLARE_METATYPE(QList<QnResourceChannelMapping>)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnChannelMapping, (json))
 QN_FUSION_DECLARE_FUNCTIONS(QnResourceChannelMapping, (json))
+
+#ifdef ENABLE_DATA_PROVIDERS
 
 class QnStreamMixer: public QnAbstractDataReceptor
 {
@@ -109,3 +110,5 @@ private:
     QnAbstractStreamDataProvider* m_user;
     QnDataPacketQueue m_queue;
 };
+
+#endif // ENABLE_DATA_PROVIDERS

@@ -61,8 +61,6 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QObject* parent /
         m_searchers << new QnPlISDResourceSearcher();
     #endif
 
-        m_searchers << new QnFlirResourceSearcher();
-
     #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
         m_searchers << new QnPlVmax480ResourceSearcher();
     #endif
@@ -73,6 +71,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QObject* parent /
     #ifdef ENABLE_ONVIF
         m_searchers << new QnFlexWatchResourceSearcher();
         m_searchers << new OnvifResourceSearcher();
+        m_searchers << new QnFlirResourceSearcher();
     #endif //ENABLE_ONVIF
 #endif
 

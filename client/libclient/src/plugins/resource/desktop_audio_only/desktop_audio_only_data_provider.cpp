@@ -19,7 +19,7 @@ namespace {
     const auto kDefaultSampleSize = 16;
     const auto kDefaultChannelCount = 1;
     const auto kDefaultCodec = lit("audio/pcm");
-    const auto kEncoderCodecName = lit("libmp3lame");
+    const auto kEncoderCodecName = lit("mp2"); // libmp3lame
 
 }
 
