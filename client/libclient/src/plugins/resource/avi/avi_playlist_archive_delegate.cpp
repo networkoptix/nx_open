@@ -5,62 +5,6 @@
 #include <core/resource/resource.h>
 #include "utils/common/util.h"
 
-/*
-extern "C"
-{
-    // this function placed at <libavformat/internal.h> header
-    void ff_read_frame_flush(AVFormatContext *s);
-};
-*/
-
-static void free_packet_buffer(AVPacketList **pkt_buf, AVPacketList **pkt_buf_end)
-{
-    while (*pkt_buf) {
-        AVPacketList *pktl = *pkt_buf;
-        *pkt_buf = pktl->next;
-        av_free_packet(&pktl->pkt);
-        av_freep(&pktl);
-    }
-    *pkt_buf_end = NULL;
-}
-
-static void flush_packet_queue(AVFormatContext *s)
-{
-    free_packet_buffer(&s->parse_queue,       &s->parse_queue_end);
-    free_packet_buffer(&s->packet_buffer,     &s->packet_buffer_end);
-    free_packet_buffer(&s->raw_packet_buffer, &s->raw_packet_buffer_end);
-
-    s->raw_packet_buffer_remaining_size = RAW_PACKET_BUFFER_SIZE;
-}
-
-void ff_read_frame_flush(AVFormatContext *s)
-{
-#define RELATIVE_TS_BASE (INT64_MAX - (1LL<<48))
-
-    AVStream *st;
-    flush_packet_queue(s);
-
-    /* for each stream, reset read state */
-    for(uint i = 0; i < s->nb_streams; i++) {
-        st = s->streams[i];
-
-        //if (st->parser) {
-        //    av_parser_close(st->parser);
-        //    st->parser = NULL;
-        // }
-        st->last_IP_pts = AV_NOPTS_VALUE;
-        if(st->first_dts == qint64(AV_NOPTS_VALUE)) st->cur_dts = RELATIVE_TS_BASE;
-        else                                st->cur_dts = AV_NOPTS_VALUE; /* we set the current DTS to an unspecified origin */
-        st->reference_dts = AV_NOPTS_VALUE;
-
-        st->probe_packets = MAX_PROBE_PACKETS;
-
-        for(uint j=0; j<MAX_REORDER_DELAY+1; j++)
-            st->pts_buffer[j]= AV_NOPTS_VALUE;
-    }
-}
-
-
 static const int IO_BLOCK_SIZE = 1024 * 32;
 
 QnAVIPlaylistArchiveDelegate::QnAVIPlaylistArchiveDelegate() :
@@ -215,7 +159,7 @@ qint64 QnAVIPlaylistArchiveDelegate::seek(qint64 mksec, bool /*findIFrame*/)
     m_inSeek = true;
     if (directSeekToPosition(relativeMksec))
     {
-        ff_read_frame_flush(m_formatContext);
+        avformat_flush(m_formatContext);
     } else
     {
         avformat_seek_file(m_formatContext, -1, 0, relativeMksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
@@ -387,6 +331,6 @@ QnConstResourceVideoLayoutPtr QnAVIPlaylistArchiveDelegate::getVideoLayout()
 qint64 QnAVIPlaylistArchiveDelegate::endTime() const
 {
     if (!m_initialized && !const_cast<QnAVIPlaylistArchiveDelegate*>(this)->findStreams())
-        return 0;        
-    return m_totalContentLength; 
+        return 0;
+    return m_totalContentLength;
 }

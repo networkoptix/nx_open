@@ -12,7 +12,7 @@ QnAvCodecMediaContext::~QnAvCodecMediaContext()
     m_context = nullptr;
 }
 
-QnAvCodecMediaContext::QnAvCodecMediaContext(CodecID codecId):
+QnAvCodecMediaContext::QnAvCodecMediaContext(AVCodecID codecId):
     m_context(QnFfmpegHelper::createAvCodecContext(codecId))
 {
     NX_ASSERT(m_context);
@@ -53,7 +53,7 @@ void QnAvCodecMediaContext::setExtradata(
 
 //-------------------------------------------------------------------------------------------------
 
-CodecID QnAvCodecMediaContext::getCodecId() const
+AVCodecID QnAvCodecMediaContext::getCodecId() const
 {
     return m_context->codec_id;
 }

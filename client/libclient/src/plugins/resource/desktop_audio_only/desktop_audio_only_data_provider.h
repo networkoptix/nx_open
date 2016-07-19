@@ -77,7 +77,7 @@ private:
 
     void preprocessAudioBuffers(std::vector<AudioSourceInfoPtr>& preprocessList);
     void analyzeSpectrum(char* buffer);
-    QnWritableCompressedAudioDataPtr encodePacket(char* buffer);
+    QnWritableCompressedAudioDataPtr encodePacket(char* buffer, int inputFrameSize);
 
     QnAudioFormat fromQtAudioFormat(const QAudioFormat& format) const;
 
@@ -93,6 +93,7 @@ private:
 
     std::vector<AudioSourceInfoPtr> m_audioSourcesInfo;
     SpeexPreprocessState* m_speexPreprocessState;
+    AVFrame* m_inputFrame;
 };
 
 

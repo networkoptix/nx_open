@@ -28,16 +28,16 @@ namespace {
         return accumulator = accumulator * movingAvg + value * (1.0 - movingAvg);
     }
 
-    CodecID updateCodec(CodecID codec)
+    AVCodecID updateCodec(AVCodecID codec)
     {
-        if (codec == CODEC_ID_H263P)
-            return CODEC_ID_H263;
+        if (codec == AV_CODEC_ID_H263P)
+            return AV_CODEC_ID_H263;
         else
             return codec;
     }
 }
 
-QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
+QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(AVCodecID codecId):
     QnVideoTranscoder(codecId),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_encoderCtx(0),
@@ -95,7 +95,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx->codec_id = m_codecId;
     m_encoderCtx->width = m_resolution.width();
     m_encoderCtx->height = m_resolution.height();
-    m_encoderCtx->pix_fmt = m_codecId == CODEC_ID_MJPEG ? PIX_FMT_YUVJ420P : PIX_FMT_YUV420P;
+    m_encoderCtx->pix_fmt = m_codecId == AV_CODEC_ID_MJPEG ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P;
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     if (m_bitrate == -1)
         m_bitrate = QnTranscoder::suggestMediaStreamParams( m_codecId, QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality );
@@ -189,8 +189,8 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
     decodedFrame = processFilterChain(decodedFrame);
 
-    if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != PIX_FMT_YUV420P)
-        decodedFrame = CLVideoDecoderOutputPtr(decodedFrame->scaled(m_resolution, PIX_FMT_YUV420P));
+    if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != AV_PIX_FMT_YUV420P)
+        decodedFrame = CLVideoDecoderOutputPtr(decodedFrame->scaled(m_resolution, AV_PIX_FMT_YUV420P));
 
     static AVRational r = {1, 1000000};
     decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
@@ -214,16 +214,24 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         }
     }
 
-    //TODO: #vasilenko avoid using deprecated methods
-    int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame.data());
-    if (encoded < 0)
-        return -3;
+    //TODO: ffmpeg-test
+    //int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame.data());
 
-    QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded);
+    AVPacket outPacket;
+    outPacket.data = m_videoEncodingBuffer;
+    outPacket.size = MAX_VIDEO_FRAME;
+    int got_packet = 0;
+    int encodeResult = avcodec_encode_video2(m_encoderCtx, &outPacket, decodedFrame.data(), &got_packet);
+    if (encodeResult < 0)
+        return -3;
+    if (!got_packet)
+        return 0;
+
+    QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, outPacket.size);
     resultVideoData->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
     if(m_encoderCtx->coded_frame->key_frame)
         resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
-    resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
+    resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, outPacket.size); // todo: remove data copy here!
     resultVideoData->compressionType = updateCodec(m_codecId);
     *result = QnCompressedVideoDataPtr(resultVideoData);
 

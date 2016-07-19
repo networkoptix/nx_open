@@ -16,14 +16,10 @@ OS_IS_WINDOWS = sys.platform.startswith("win32") or sys.platform.startswith("cyg
 # Workaround against rsync bug:
 # all paths with semicolon are counted as remote,
 # so 'rsync rsync://server/path c:\test\path' won't work on windows
-# We assume here, that 
-# Cygwin -> cygwin's python is in use
-# MinGW(MSYS) -> Native python (from buildenv, for example)
 def _cygwin_path(path):
     if len(path) > 1 and path[1] == ':':
-        prefix = '/cygdrive/' if OS_IS_WINDOWS else '/'
         drive_letter = path[0].lower()
-        return "{0}{1}{2}".format(prefix, drive_letter, path[2:].replace("\\", "/"))
+        return "/cygdrive/{0}{1}".format(drive_letter, path[2:].replace("\\", "/"))
     return path
 
 def _is_remote_url(url):

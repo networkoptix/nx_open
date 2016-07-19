@@ -45,8 +45,8 @@ public:
     /** Can be Invalid if not available. */
     QSize currentResolution() const;
 
-    /** Can be CODEC_ID_NONE if not available. */
-    CodecID currentCodec() const;
+    /** Can be AV_CODEC_ID_NONE if not available. */
+    AVCodecID currentCodec() const;
 
     /** Should be called before other methods; needed by some decoders, e.g. hw-based. */
     void setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor);

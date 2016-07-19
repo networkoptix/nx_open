@@ -527,20 +527,19 @@ std::vector<Guard> AddressResolver::grabHandlers(
 
             it->second.inProgress = true;
             guards.push_back(Guard(
-                [this, it, entries, lastErrorCode, info]() {
-                    auto resolveDataPair = std::move(*it);
-                    {
-                        QnMutexLocker lk(&m_mutex);
-                        m_requests.erase(it);
-                    }
-
+                [this, it, entries, lastErrorCode, info]()
+                {
+                    Guard guard; //< Shell fire out of mutex scope
                     auto code = entries.empty() ? lastErrorCode : SystemError::noError;
-                    resolveDataPair.second.handler(code, std::move(entries));
+                    it->second.handler(code, std::move(entries));
 
                     QnMutexLocker lk(&m_mutex);
                     NX_LOGX(lm("Address %1 is resolved by request %2 to %3")
-                        .str(info->first).arg(resolveDataPair.first)
+                        .str(info->first).arg(it->first)
                         .container(entries), cl_logDEBUG2);
+
+                    guard = std::move(it->second.guard);
+                    m_requests.erase(it);
                     m_condition.wakeAll();
                 }));
         }

@@ -20,14 +20,14 @@ MotionDataPicture::MotionDataPicture( nxcip::PixelFormat _pixelFormat )
     m_height( nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH ),
     m_stride( 0 )
 {
-    NX_ASSERT( m_pixelFormat == nxcip::PIX_FMT_MONOBLACK || m_pixelFormat == nxcip::PIX_FMT_GRAY8 );
+    NX_ASSERT( m_pixelFormat == nxcip::AV_PIX_FMT_MONOBLACK || m_pixelFormat == nxcip::AV_PIX_FMT_GRAY8 );
 
     switch( m_pixelFormat )
     {
-        case nxcip::PIX_FMT_MONOBLACK:
+        case nxcip::AV_PIX_FMT_MONOBLACK:
             m_stride = nxpt::alignUp( m_width, CHAR_BIT ) / CHAR_BIT;
             break;
-        case nxcip::PIX_FMT_GRAY8:
+        case nxcip::AV_PIX_FMT_GRAY8:
             m_stride = m_width;
             break;
         default:
@@ -130,7 +130,7 @@ void MotionDataPicture::setPixel( int x, int y, int val )
 {
     switch( m_pixelFormat )
     {
-        case nxcip::PIX_FMT_MONOBLACK:
+        case nxcip::AV_PIX_FMT_MONOBLACK:
         {
             const size_t bitPos = x % CHAR_BIT;
             uint8_t* thatVeryByte = (m_data + m_stride*y) + (x / CHAR_BIT);
@@ -141,7 +141,7 @@ void MotionDataPicture::setPixel( int x, int y, int val )
             break;
         }
 
-        case nxcip::PIX_FMT_GRAY8:
+        case nxcip::AV_PIX_FMT_GRAY8:
             *(m_data + y*m_stride + x) = val;
             break;
 

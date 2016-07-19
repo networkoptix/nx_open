@@ -7,12 +7,12 @@
 #include "decoders/audio/abstract_audio_decoder.h"
 
 #include "client/client_settings.h"
-
 #include <nx/streaming/config.h>
-
 #include <nx/audio/audiodevice.h>
 
-#define DEFAULT_AUDIO_FRAME_SIZE (AVCODEC_MAX_AUDIO_FRAME_SIZE * 2)
+namespace {
+static const int AVCODEC_MAX_AUDIO_FRAME_SIZE = 192 * 1000;
+}
 
 QnAudioStreamDisplay::QnAudioStreamDisplay(int bufferMs, int prebufferMs):
     m_bufferMs(bufferMs),
@@ -262,17 +262,8 @@ void QnAudioStreamDisplay::playCurrentBuffer()
 
         //data->dataProvider->setNeedSleep(true); //< need to introduce delay again
 
-#if 0
-        CLAudioData audio;
-        audio.codec = data->compressionType;
-        audio.inbuf = (unsigned char*)data->data.data();
-        audio.inbuf_len = data->data.size();
-        audio.outbuf = &m_decodedaudio;
-        audio.outbuf_len = 0;
-        audio.format = data->format;
-#endif // 0
 
-        if (data->compressionType == CODEC_ID_NONE)
+        if (data->compressionType == AV_CODEC_ID_NONE)
         {
             cl_log.log(QLatin1String("QnAudioStreamDisplay::putdata: unknown codec type..."),
                 cl_logERROR);

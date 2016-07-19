@@ -195,7 +195,7 @@ private:
         const QnVirtualCameraResourcePtr& camera, const QSize& resolution);
 
     void doApplyVideoQuality(const QnVirtualCameraResourcePtr& camera,
-        QSize highResolution, CodecID highCodec, QSize lowResolution, CodecID lowCodec);
+        QSize highResolution, AVCodecID highCodec, QSize lowResolution, AVCodecID lowCodec);
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -513,19 +513,19 @@ void PlayerPrivate::applyVideoQuality()
 
     // Obtain Low and High stream codec and resolution.
     QSize highResolution;
-    CodecID highCodec = CODEC_ID_NONE;
+    AVCodecID highCodec = AV_CODEC_ID_NONE;
     QSize lowResolution;
-    CodecID lowCodec = CODEC_ID_NONE;
+    AVCodecID lowCodec = AV_CODEC_ID_NONE;
     for (const auto& stream: camera->mediaStreams().streams)
     {
         if (stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX) //< High
         {
-            highCodec = (CodecID) stream.codec;
+            highCodec = (AVCodecID) stream.codec;
             highResolution = stream.getResolution();
         }
         else if (stream.encoderIndex == CameraMediaStreamInfo::SECONDARY_STREAM_INDEX) //< Low
         {
-            lowCodec = (CodecID) stream.codec;
+            lowCodec = (AVCodecID) stream.codec;
             lowResolution = stream.getResolution();
         }
     }
@@ -573,7 +573,7 @@ static QSize resolutionWithHeightAndAspect(int height, const QSize& aspect)
 }
 
 static QSize transcodingResolution(
-    QSize lowResolution, QSize highResolution, int videoQuality, CodecID transcodingCodec)
+    QSize lowResolution, QSize highResolution, int videoQuality, AVCodecID transcodingCodec)
 {
     QSize aspect = highResolution;
     if (aspect.isEmpty()) //< High stream resolution is unknown.
@@ -639,13 +639,13 @@ bool PlayerPrivate::applyTranscodingIfPossible(
 
 /**
  * @param highResolution Can be empty.
- * @param highCodec Can be CODEC_ID_NONE.
+ * @param highCodec Can be AV_CODEC_ID_NONE.
  * @param lowResolution Can be empty.
- * @param lowCodec Can be CODEC_ID_NONE.
+ * @param lowCodec Can be AV_CODEC_ID_NONE.
  */
 void PlayerPrivate::doApplyVideoQuality(
     const QnVirtualCameraResourcePtr& camera,
-    QSize highResolution, CodecID highCodec, QSize lowResolution, CodecID lowCodec)
+    QSize highResolution, AVCodecID highCodec, QSize lowResolution, AVCodecID lowCodec)
 {
     Q_UNUSED(lowCodec);
 
@@ -659,7 +659,7 @@ void PlayerPrivate::doApplyVideoQuality(
 
     if (highStreamRequested)
     {
-        if (highCodec != CODEC_ID_NONE && !highResolution.isEmpty()) //< High stream exists.
+        if (highCodec != AV_CODEC_ID_NONE && !highResolution.isEmpty()) //< High stream exists.
         {
             if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(highCodec, highResolution))
             {

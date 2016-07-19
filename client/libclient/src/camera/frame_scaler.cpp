@@ -193,8 +193,8 @@ void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOut
     int src_width = src->width;
     int src_height = src->height;
 
-    const int chroma_h_factor = (src->format == PIX_FMT_YUV420P || src->format == PIX_FMT_YUV422P) ? 2 : 1;
-    const int chroma_v_factor = (src->format == PIX_FMT_YUV420P) ? 2 : 1;
+    const int chroma_h_factor = (src->format == AV_PIX_FMT_YUV420P || src->format == AV_PIX_FMT_YUV422P) ? 2 : 1;
+    const int chroma_v_factor = (src->format == AV_PIX_FMT_YUV420P) ? 2 : 1;
 
     // after downscale chroma_width must be divisible by 4 ( opengl requirements )
     const int mod_w = chroma_h_factor*factor*4;

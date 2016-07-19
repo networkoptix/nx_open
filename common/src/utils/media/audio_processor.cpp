@@ -34,8 +34,8 @@ static void down_mix_to_stereo(T *data, int channels, int len)
             rl = input[4];
             rr = input[5];
 
-            /* Postings on Doom9 say that Dolby specifically says the LFE (.1) 
-             * channel should usually be ignored during downmixing to Dolby ProLogic II, 
+            /* Postings on Doom9 say that Dolby specifically says the LFE (.1)
+             * channel should usually be ignored during downmixing to Dolby ProLogic II,
              * with quotes from official Dolby documentation. */
             Q_UNUSED(lfe);
 
@@ -58,11 +58,11 @@ int QnAudioProcessor::downmix(quint8* data, int size, AVCodecContext* ctx)
     if (ctx->channels <= 2)
         return size;
 
-    if (ctx->sample_fmt == AV_SAMPLE_FMT_U8)
+    if (ctx->sample_fmt == AV_SAMPLE_FMT_U8 || ctx->sample_fmt == AV_SAMPLE_FMT_U8P)
         down_mix_to_stereo<qint8>((qint8*)data, ctx->channels, size);
-    else if (ctx->sample_fmt == AV_SAMPLE_FMT_S16)
+    else if (ctx->sample_fmt == AV_SAMPLE_FMT_S16 || ctx->sample_fmt == AV_SAMPLE_FMT_S16P)
         down_mix_to_stereo<qint16>((qint16*)data, ctx->channels, size);
-    else if (ctx->sample_fmt == AV_SAMPLE_FMT_S32 || ctx->sample_fmt == AV_SAMPLE_FMT_FLT)
+    else if (ctx->sample_fmt == AV_SAMPLE_FMT_S32 || ctx->sample_fmt == AV_SAMPLE_FMT_S32P || ctx->sample_fmt == AV_SAMPLE_FMT_FLT)
         down_mix_to_stereo<qint32>((qint32*)data, ctx->channels, size);
     else
         NX_ASSERT(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");

@@ -33,7 +33,7 @@ public:
     /*!
         \param codecId
     */
-    QnQuickSyncVideoTranscoder( CodecID codecId );
+    QnQuickSyncVideoTranscoder( AVCodecID codecId );
     virtual ~QnQuickSyncVideoTranscoder();
 
     //!Implementation of QnCodecTranscoder::setParams
