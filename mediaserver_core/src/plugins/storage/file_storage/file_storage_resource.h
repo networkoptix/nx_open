@@ -19,6 +19,7 @@ class QnFileStorageResource: public QnStorageResource
 private:
     static const QString FROM_SEP;
     static const QString TO_SEP;
+
 public:
     QnFileStorageResource();
     ~QnFileStorageResource();
@@ -26,6 +27,7 @@ public:
     static QnStorageResource* instance(const QString&);
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
+    QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode, int bufferSize);
 
     virtual float getAvarageWritingUsage() const override;
 

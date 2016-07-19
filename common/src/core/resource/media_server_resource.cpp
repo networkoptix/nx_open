@@ -351,6 +351,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_version = localOther->m_version;
         m_systemInfo = localOther->m_systemInfo;
         m_systemName = localOther->m_systemName;
+        m_authKey = localOther->m_authKey;
 
         /*
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();

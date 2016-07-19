@@ -229,7 +229,7 @@ APPLY(405, getServerUserAttributes, ApiMediaServerUserAttributesDataList, \
                        InvalidGetHashHelper(), /* getHash*/ \
                        MediaServerNotificationManagerHelper()) \
 APPLY(406, removeServerUserAttributes, ApiIdData, \
-                       false, /* persistent*/ \
+                       true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper) \

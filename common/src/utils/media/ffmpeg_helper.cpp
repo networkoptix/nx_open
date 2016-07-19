@@ -323,7 +323,6 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
     return reader->seek(absolutePos);
 }
 
-
 AVIOContext* QnFfmpegHelper::createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int ioBlockSize)
 {
     QString path = url;

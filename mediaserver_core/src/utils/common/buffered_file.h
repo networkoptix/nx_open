@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <list>
+#include <cstdint>
 
 #include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QString>
@@ -67,6 +68,7 @@ private:
 
 class QN_EXPORT QBufferedFile: public QIODevice
 {
+    Q_OBJECT
 public:
     /*
     * Buffered file writing.
@@ -90,6 +92,10 @@ public:
 
     virtual qint64 writeData (const char * data, qint64 len ) override;
     virtual qint64 readData (char * data, qint64 len ) override;
+
+signals:
+    void seekDetected(uintptr_t obj, int bufferSizePow);
+    void fileClosed(uintptr_t obj);
     
 protected:
     qint64 writeUnbuffered(const char * data, qint64 len );

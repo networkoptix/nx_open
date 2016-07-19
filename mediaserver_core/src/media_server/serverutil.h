@@ -89,6 +89,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errString = nullptr);
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
+bool validateAdminPassword(const PasswordData& passwordData, QString* errStr);
 
 
 bool isLocalAppServer(const QString &host);
