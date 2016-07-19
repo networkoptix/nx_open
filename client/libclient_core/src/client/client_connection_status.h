@@ -2,7 +2,6 @@
 
 enum class QnConnectionState
 {
-    Invalid,
     Disconnected,
     Connecting,
     Connected,
@@ -19,7 +18,7 @@ public:
 class QnClientConnectionStatus
 {
 public:
-    QnClientConnectionStatus();
+    QnClientConnectionStatus(QnConnectionState state = QnConnectionState::Disconnected);
 
     QnConnectionState state() const;
     void setState(QnConnectionState state);

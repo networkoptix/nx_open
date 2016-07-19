@@ -22,7 +22,7 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchC
     Q_PROPERTY(QSize pageSize READ pageSize WRITE setPageSize NOTIFY pageSizeChanged);
     Q_PROPERTY(bool visibleControls READ visibleControls WRITE setVisibleControls NOTIFY visibleControlsChanged)
     Q_PROPERTY(QString connectingToSystem READ connectingToSystem WRITE setConnectingToSystem NOTIFY connectingToSystemChanged)
-    Q_PROPERTY(bool receivingResources READ receivingResources WRITE setReceivingResources NOTIFY receivingResourcesChanged)
+    Q_PROPERTY(bool globalPreloaderVisible READ globalPreloaderVisible WRITE setGlobalPreloaderVisible NOTIFY globalPreloaderVisibleChanged)
 
 public:
     QnWorkbenchWelcomeScreen(QObject* parent);
@@ -52,9 +52,9 @@ public: // Properties
 
     void setConnectingToSystem(const QString& value);
 
-    bool receivingResources() const;
+    bool globalPreloaderVisible() const;
 
-    void setReceivingResources(bool value);
+    void setGlobalPreloaderVisible(bool value);
 
 public slots:
     // TODO: $ynikitenkov add multiple urls one-by-one  handling
@@ -104,7 +104,7 @@ signals:
 
     void resetAutoLogin();
 
-    void receivingResourcesChanged();
+    void globalPreloaderVisibleChanged();
 
 private:
     void showScreen();

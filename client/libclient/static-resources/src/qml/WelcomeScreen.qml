@@ -18,7 +18,7 @@ Rectangle
         id: screenHolder;
 
         anchors.fill: parent;
-        visible: context.visibleControls && !context.receivingResources;
+        visible: context.visibleControls && !context.globalPreloaderVisible;
 
         CloudPanel
         {
@@ -240,7 +240,7 @@ Rectangle
 
     NxCirclesPreloader
     {
-        visible: context.receivingResources;
+        visible: context.globalPreloaderVisible;
         anchors.centerIn: parent;
     }
 

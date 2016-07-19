@@ -9,7 +9,6 @@ namespace {
 
 const QMap<QnConnectionState, QString> stateToString
 {
-    {QnConnectionState::Invalid,        lit("Invalid")},
     {QnConnectionState::Disconnected,   lit("Disconnected")},
     {QnConnectionState::Connecting,     lit("Connecting")},
     {QnConnectionState::Connected,      lit("Connected")},
@@ -24,11 +23,12 @@ QString QnConnectionStateUtils::toString(QnConnectionState state)
     return stateToString[state];
 }
 
-QnClientConnectionStatus::QnClientConnectionStatus():
-    m_state(QnConnectionState::Invalid)
+QnClientConnectionStatus::QnClientConnectionStatus(QnConnectionState state)
+    :
+    m_state(state),
+    m_allowedTransactions()
 {
     /* Default way. */
-    m_allowedTransactions.insert(QnConnectionState::Invalid,        QnConnectionState::Disconnected);
     m_allowedTransactions.insert(QnConnectionState::Disconnected,   QnConnectionState::Connecting);
     m_allowedTransactions.insert(QnConnectionState::Connecting,     QnConnectionState::Connected);
     m_allowedTransactions.insert(QnConnectionState::Connected,      QnConnectionState::Ready);

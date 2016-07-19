@@ -27,6 +27,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <client_core/client_core_settings.h>
+#include <client/desktop_client_message_processor.h>
 
 #include <nx_ec/ec_proto_version.h>
 #include <llutil/hardware_id.h>
@@ -43,6 +44,7 @@
 
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/opengl/gl_functions.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 
 #include <ui/style/skin.h>
 
@@ -52,6 +54,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_welcome_screen.h>
+#include <ui/workbench/workbench_display.h>
 
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
@@ -131,8 +134,10 @@ namespace
     }
 }
 
-QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
+QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent)
+    :
     base_type(parent),
+    m_processingConnectAction(false),
     QnWorkbenchContextAware(parent),
     m_connectingMessageBox(NULL),
     m_connectingHandle(0),
@@ -179,6 +184,45 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
     connect(action(QnActions::BeforeExitAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
 
     context()->instance<QnAppServerNotificationCache>();
+
+
+    const auto resourceModeAction = action(QnActions::ResourcesModeAction);
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+
+    connect(resourceModeAction, &QAction::toggled, this,
+        [this, welcomeScreen](bool checked) { welcomeScreen->setVisible(!checked); });
+
+    connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
+        [resourceModeAction]() { resourceModeAction->setChecked(true); });
+
+    connect(qnDesktopClientMessageProcessor, &QnDesktopClientMessageProcessor::connectionStateChanged, this,
+        [this, welcomeScreen, resourceModeAction]()
+    {
+        const auto state = qnDesktopClientMessageProcessor->connectionState();
+        switch (state)
+        {
+            case QnConnectionState::Disconnected:
+            {
+                if (!m_processingConnectAction)
+                {
+                    welcomeScreen->setGlobalPreloaderVisible(false);
+                    resourceModeAction->setChecked(false);  //< Shows welcome screen
+                }
+                break;
+            }
+            case QnConnectionState::Connecting:
+            case QnConnectionState::Connected:
+                welcomeScreen->setGlobalPreloaderVisible(true);
+                resourceModeAction->setChecked(false);  //< Shows welcome screen
+                break;
+            case QnConnectionState::Ready:
+                welcomeScreen->setGlobalPreloaderVisible(false);
+                resourceModeAction->setChecked(true); //< Hides welcome screen
+                break;
+            default:
+                break;
+        }
+    });
 }
 
 QnWorkbenchConnectHandler::~QnWorkbenchConnectHandler()
@@ -241,10 +285,12 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered()
 {
-    const auto connectAction = action(QnActions::ConnectAction);
-    connectAction->setChecked(true);
+    if (m_processingConnectAction)
+        return;
+
+    m_processingConnectAction = true;
     auto uncheckConnectActionRaii = QnRaiiGuard::createDestructable(
-        [connectAction]() { connectAction->setChecked(false); });
+        [this]() { m_processingConnectAction = false; });
 
     // ask user if he wants to save changes
     bool force = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
