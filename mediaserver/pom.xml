@@ -68,6 +68,7 @@
                 </property>
             </activation>
             <properties>
+                <linux.oslibs>-ldl -lldap</linux.oslibs>
                 <rdep.linux.arm.packages>sasl2 openldap libcreateprocess</rdep.linux.arm.packages>
                 <rdep.linux.packages/>
             </properties>
@@ -87,6 +88,7 @@
                 </property>
             </activation>
             <properties>
+                <linux.oslibs>-ldl -lldap</linux.oslibs>
                 <rdep.linux.packages/>
             </properties>
         </profile>
