@@ -947,11 +947,9 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channe
     if (options() & DisplayMotionSensitivity)
     {
         NX_ASSERT(m_motionSensitivityColors.size() == QnMotionRegion::kSensitivityLevelCount, Q_FUNC_INFO);
-        static const QColor kDefaultColor(127, 0, 0);
-
         for (int i = 1; i < QnMotionRegion::kSensitivityLevelCount; ++i)
         {
-            QColor color = i < m_motionSensitivityColors.size() ? m_motionSensitivityColors[i] : kDefaultColor;
+            QColor color = i < m_motionSensitivityColors.size() ? m_motionSensitivityColors[i] : QColor(Qt::darkRed);
             color.setAlphaF(kMotionRegionAlpha);
             QPainterPath path = m_motionSensitivity[channel].getRegionBySensPath(i);
             paintFilledRegionPath(painter, rect, path, color, Qt::black);
