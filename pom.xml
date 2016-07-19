@@ -456,7 +456,6 @@
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
-                <module>media_db_util</module>
 
                 <module>plugins/genericrtspplugin</module>
                 <module>plugins/image_library_plugin</module>
@@ -897,6 +896,7 @@
                 <module>client/libclient_core</module>
                 <module>client/mobile_client</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>media_db_util</module>
                 <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
         </profile>
@@ -929,6 +929,7 @@
                 <module>edge_firmware/rpi</module>
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>media_db_util</module>
                 <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
         </profile>
