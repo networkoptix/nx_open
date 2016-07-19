@@ -26,11 +26,11 @@ namespace
 {
     bool isIFrame( QnAbstractMediaDataPtr packet )
     {
-        CodecID codecId = packet->compressionType;
+        AVCodecID codecId = packet->compressionType;
 
-        NX_ASSERT( codecId == CODEC_ID_H264, "IFrame detection", "only CODEC_ID_H264 is supported" );
+        NX_ASSERT( codecId == AV_CODEC_ID_H264, "IFrame detection", "only AV_CODEC_ID_H264 is supported" );
 
-        if( !packet || codecId != CODEC_ID_H264 )
+        if( !packet || codecId != AV_CODEC_ID_H264 )
             return false;
 
         const void * data = packet->data();
@@ -106,7 +106,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     if( !camManager2 )
         return;
 
-    MotionDataPicture* motionMask = new MotionDataPicture( nxcip::PIX_FMT_GRAY8 );
+    MotionDataPicture* motionMask = new MotionDataPicture( nxcip::AV_PIX_FMT_GRAY8 );
     const QnMotionRegion& region = m_thirdPartyRes->getMotionRegion(0);
     //converting region
     for( int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens )
@@ -458,44 +458,44 @@ QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const
         : (m_builtinStreamReader.get() ? m_builtinStreamReader->getAudioLayout() : QnConstResourceAudioLayoutPtr());
 }
 
-CodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compressionType )
+AVCodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compressionType )
 {
     switch( compressionType )
     {
-        case nxcip::CODEC_ID_MPEG2VIDEO:
-            return CODEC_ID_MPEG2VIDEO;
-        case nxcip::CODEC_ID_H263:
-            return CODEC_ID_H263;
-        case nxcip::CODEC_ID_MJPEG:
-            return CODEC_ID_MJPEG;
-        case nxcip::CODEC_ID_MPEG4:
-            return CODEC_ID_MPEG4;
-        case nxcip::CODEC_ID_H264:
-            return CODEC_ID_H264;
-        case nxcip::CODEC_ID_THEORA:
-            return CODEC_ID_THEORA;
-        case nxcip::CODEC_ID_PNG:
-            return CODEC_ID_PNG;
-        case nxcip::CODEC_ID_GIF:
-            return CODEC_ID_GIF;
-        case nxcip::CODEC_ID_MP2:
-            return CODEC_ID_MP2;
-        case nxcip::CODEC_ID_MP3:
-            return CODEC_ID_MP3;
-        case nxcip::CODEC_ID_AAC:
-            return CODEC_ID_AAC;
-        case nxcip::CODEC_ID_PCM_S16LE:
-            return CODEC_ID_PCM_S16LE;
-        case nxcip::CODEC_ID_PCM_MULAW:
-            return CODEC_ID_PCM_MULAW;
-        case nxcip::CODEC_ID_AC3:
-            return CODEC_ID_AC3;
-        case nxcip::CODEC_ID_DTS:
-            return CODEC_ID_DTS;
-        case nxcip::CODEC_ID_VORBIS:
-            return CODEC_ID_VORBIS;
+        case nxcip::AV_CODEC_ID_MPEG2VIDEO:
+            return AV_CODEC_ID_MPEG2VIDEO;
+        case nxcip::AV_CODEC_ID_H263:
+            return AV_CODEC_ID_H263;
+        case nxcip::AV_CODEC_ID_MJPEG:
+            return AV_CODEC_ID_MJPEG;
+        case nxcip::AV_CODEC_ID_MPEG4:
+            return AV_CODEC_ID_MPEG4;
+        case nxcip::AV_CODEC_ID_H264:
+            return AV_CODEC_ID_H264;
+        case nxcip::AV_CODEC_ID_THEORA:
+            return AV_CODEC_ID_THEORA;
+        case nxcip::AV_CODEC_ID_PNG:
+            return AV_CODEC_ID_PNG;
+        case nxcip::AV_CODEC_ID_GIF:
+            return AV_CODEC_ID_GIF;
+        case nxcip::AV_CODEC_ID_MP2:
+            return AV_CODEC_ID_MP2;
+        case nxcip::AV_CODEC_ID_MP3:
+            return AV_CODEC_ID_MP3;
+        case nxcip::AV_CODEC_ID_AAC:
+            return AV_CODEC_ID_AAC;
+        case nxcip::AV_CODEC_ID_PCM_S16LE:
+            return AV_CODEC_ID_PCM_S16LE;
+        case nxcip::AV_CODEC_ID_PCM_MULAW:
+            return AV_CODEC_ID_PCM_MULAW;
+        case nxcip::AV_CODEC_ID_AC3:
+            return AV_CODEC_ID_AC3;
+        case nxcip::AV_CODEC_ID_DTS:
+            return AV_CODEC_ID_DTS;
+        case nxcip::AV_CODEC_ID_VORBIS:
+            return AV_CODEC_ID_VORBIS;
         default:
-            return CODEC_ID_NONE;
+            return AV_CODEC_ID_NONE;
     }
 }
 
@@ -534,13 +534,13 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
                 {
                     static const int DEFAULT_MOTION_DURATION = 1000*1000;
 
-                    if( srcMotionData->pixelFormat() == nxcip::PIX_FMT_MONOBLACK )
+                    if( srcMotionData->pixelFormat() == nxcip::AV_PIX_FMT_MONOBLACK )
                     {
                         //adding motion data
                         QnMetaDataV1Ptr motion( new QnMetaDataV1() );
                         const nxcip::Picture& motionPicture = *srcMotionData;
 
-                        if( motionPicture.pixelFormat() == nxcip::PIX_FMT_MONOBLACK )
+                        if( motionPicture.pixelFormat() == nxcip::AV_PIX_FMT_MONOBLACK )
                         {
                             NX_ASSERT( motionPicture.width() == MD_HEIGHT && motionPicture.height() == MD_WIDTH );
                             NX_ASSERT( motionPicture.xStride(0) * CHAR_BIT == motionPicture.width() );
@@ -616,7 +616,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
 
 void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& audioFormat )
 {
-    const CodecID ffmpegCodecId = toFFmpegCodecID(audioFormat.compressionType);
+    const AVCodecID ffmpegCodecId = toFFmpegCodecID(audioFormat.compressionType);
     const auto context = new QnAvCodecMediaContext(ffmpegCodecId);
     m_audioContext = QnConstMediaContextPtr(context);
     const auto av = context->getAvCodecContext();

@@ -1226,8 +1226,8 @@ public:
     std::unique_ptr<SslAsyncBioHelper> asyncSslHelper;
 
     typedef utils::promise<std::pair<SystemError::ErrorCode, size_t>> AsyncPromise;
-    std::unique_ptr<AsyncPromise> sendPromise;
-    std::unique_ptr<AsyncPromise> recvPromise;
+    std::atomic<AsyncPromise*> recvPromisePtr;
+    std::atomic<AsyncPromise*> sendPromisePtr;
 
     SslSocketPrivate()
     :
@@ -1238,7 +1238,9 @@ public:
         ecnryptionEnabled(false),
         ioMode(SslSocket::SYNC),
         emulateBlockingMode(false),
-        shutdown(false)
+        shutdown(false),
+        recvPromisePtr(nullptr),
+        sendPromisePtr(nullptr)
     {
     }
 };
@@ -1515,17 +1517,20 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     {
         // the mode could be switched to non blocking, but SSL engine is
         // still non-blocking
-        d->recvPromise.reset(new SslSocketPrivate::AsyncPromise);
+        SslSocketPrivate::AsyncPromise promise;
+        auto oldPromisePtr = d->recvPromisePtr.exchange(&promise);
+        NX_ASSERT(oldPromisePtr == nullptr);
+
         nx::Buffer localBuffer(bufferLen, '\0');
         readSomeAsync(
             &localBuffer,
-            [&](SystemError::ErrorCode code, size_t size)
+            [d](SystemError::ErrorCode code, size_t size)
             {
-                d->recvPromise->set_value(std::make_pair(code, size));
-                d->recvPromise.reset();
+                if (auto promisePtr = d->recvPromisePtr.exchange(nullptr))
+                    promisePtr->set_value({code, size});
             });
 
-        const auto result = d->recvPromise->get_future().get();
+        const auto result = promise.get_future().get();
         if (result.first == SystemError::noError)
             std::memcpy(localBuffer.data(), buffer, result.second);
         else
@@ -1560,17 +1565,20 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
     {
         // the mode could be switched to non blocking, but SSL engine is
         // still non-blocking
-        d->sendPromise.reset(new SslSocketPrivate::AsyncPromise);
+        SslSocketPrivate::AsyncPromise promise;
+        auto oldPromisePtr = d->sendPromisePtr.exchange(&promise);
+        NX_ASSERT(oldPromisePtr == nullptr);
+
         nx::Buffer localBuffer(static_cast<const char*>(buffer), bufferLen);
         sendAsync(
             localBuffer,
-            [&](SystemError::ErrorCode code, size_t size)
+            [d](SystemError::ErrorCode code, size_t size)
             {
-                d->sendPromise->set_value(std::make_pair(code, size));
-                d->sendPromise.reset();
+                if (auto promisePtr = d->sendPromisePtr.exchange(nullptr))
+                    promisePtr->set_value({code, size});
             });
 
-        const auto result = d->sendPromise->get_future().get();
+        const auto result = promise.get_future().get();
         if (result.first != SystemError::noError)
             SystemError::setLastErrorCode(result.first);
 
@@ -1729,17 +1737,17 @@ bool SslSocket::shutdown()
     }
 
     utils::promise<void> promise;
-    d->wrappedSocket->dispatch([&]()
-    {
-        if (d->sendPromise)
-            d->sendPromise->set_value({0, SystemError::interrupted});
+    d->wrappedSocket->pleaseStop(
+        [d, &promise]()
+        {
+            if (auto promisePtr = d->sendPromisePtr.exchange(nullptr))
+                promisePtr->set_value({SystemError::interrupted, 0});
 
-        if (d->recvPromise)
-            d->recvPromise->set_value({0, SystemError::interrupted});
+            if (auto promisePtr = d->recvPromisePtr.exchange(nullptr))
+                promisePtr->set_value({SystemError::interrupted, 0});
 
-        d->wrappedSocket->pleaseStopSync();
-        promise.set_value();
-    });
+            promise.set_value();
+        });
 
     promise.get_future().wait();
     return d->wrappedSocket->shutdown();

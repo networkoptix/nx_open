@@ -20,22 +20,37 @@
     </properties>
 
     <modules>
-        <!-- NX Section -->
         <module>cloud_connectivity_ut</module>
-        <module>cloud_db_ut</module>
-        <module>connection_mediator_ut</module>
         <module>nx_network_ut</module>
         <module>utils_ut</module>
 
-        <!-- VMS Section -->
         <module>appserver2_ut</module>
-        <module>client_ut</module>
         <module>common_ut</module>
         <module>mediaserver_core_ut</module>
-        <module>vms_gateway_ut</module>
         <module>vms_utils_ut</module>
-
-        <!--<module>unit_tests/image_library_plugin_ut</module>-->
-        <!--<module>unit_tests/traytool_ut</module>-->
     </modules>
+
+    <profiles>
+        <profile>
+            <id>noarm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>
+            <modules>
+                <module>cloud_db_ut</module>
+                <module>connection_mediator_ut</module>
+
+                <module>client_ut</module>
+                <module>vms_gateway_ut</module>
+            </modules>
+            <properties>
+                <modification>ubuntu</modification>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>

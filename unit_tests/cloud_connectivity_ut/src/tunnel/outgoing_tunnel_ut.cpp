@@ -612,14 +612,15 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
             for (auto& connectionContext : connectedPromises)
             {
                 const auto result = connectionContext.completionPromise.get_future().get();
-                const auto actualTimeout = connectionContext.endTime - connectionContext.startTime;
-
                 ASSERT_EQ(SystemError::timedOut, result.first);
                 ASSERT_EQ(nullptr, result.second);
 
                 #ifdef _DEBUG
                     if (!utils::TestOptions::areTimeAssertsDisabled())
                     {
+                        const auto actualTimeout =
+                            connectionContext.endTime - connectionContext.startTime;
+
                         EXPECT_GT(actualTimeout, timeout - timeoutCorrection);
                         EXPECT_LT(actualTimeout, timeout + timeoutCorrection);
                     }

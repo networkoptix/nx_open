@@ -44,8 +44,8 @@ enum CLCodecType
     CL_VARIOUSE_DECODERS
 };
 
-CLCodecType ffmpegCodecIdToInternal(CodecID ffmpegVideoCodecId);
-CodecID internalCodecIdToFfmpeg(CLCodecType internalCodecId);
+CLCodecType ffmpegCodecIdToInternal(AVCodecID ffmpegVideoCodecId);
+AVCodecID internalCodecIdToFfmpeg(CLCodecType internalCodecId);
 
 #endif // ENABLE_DATA_PROVIDERS
 

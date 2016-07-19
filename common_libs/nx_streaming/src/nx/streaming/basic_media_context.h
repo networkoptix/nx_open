@@ -24,7 +24,7 @@ public:
 
     //--------------------------------------------------------------------------
 
-    virtual CodecID getCodecId() const override;
+    virtual AVCodecID getCodecId() const override;
     virtual AVMediaType getCodecType() const override;
     virtual const char* getRcEq() const override;
     virtual const quint8* getExtradata() const override;

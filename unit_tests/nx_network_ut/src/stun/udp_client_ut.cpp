@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 31, 2015
-* akolesnikov
-***********************************************************/
-
 #include <condition_variable>
 #include <mutex>
 
@@ -12,13 +7,12 @@
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/udp_client.h>
 #include <nx/network/stun/udp_server.h>
+#include <nx/utils/string.h>
+#include <nx/utils/test_support/test_options.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-
 #include <utils/common/cpp14.h>
-#include <nx/utils/string.h>
 #include <utils/common/sync_call.h>
-
 
 namespace nx {
 namespace stun {
@@ -169,7 +163,8 @@ TEST_F(StunUDP, client_test_async)
 {
     static const int kRequestToSendCount = 1000;
     static const int kLocalServersCount = 10;
-    static const std::chrono::seconds kMaxResponsesWaitTime(3);
+    static const std::chrono::seconds kMaxResponsesWaitTime(
+        3 * utils::TestOptions::timeoutMultiplier());
 
     for (int i = 1; i < kLocalServersCount; ++i)
         addServer();
@@ -207,10 +202,10 @@ TEST_F(StunUDP, client_test_async)
 
     {
         std::unique_lock<std::mutex> lk(mutex);
-        cond.wait_for(
+        ASSERT_TRUE(cond.wait_for(
             lk,
             kMaxResponsesWaitTime,
-            [&expectedTransactionIDs]()->bool {return expectedTransactionIDs.empty();});
+            [&expectedTransactionIDs]()->bool {return expectedTransactionIDs.empty();}));
         ASSERT_TRUE(expectedTransactionIDs.empty());
     }
 

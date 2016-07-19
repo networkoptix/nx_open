@@ -347,12 +347,14 @@ void SystemManager::getCloudUsersOfSystem(
         {
             if (accountIter->accessRole != api::SystemAccessRole::owner &&
                 accountIter->accessRole != api::SystemAccessRole::cloudAdmin &&
+                accountIter->accessRole != api::SystemAccessRole::localAdmin &&
                 accountIter->accessRole != api::SystemAccessRole::maintenance)
             {
                 //TODO #ak this condition copies condition from authorization tree
                 //no access to system's sharing list is allowed for this account
                 continue;
             }
+
             const auto& systemIndex = m_accountAccessRoleForSystem.get<kSharingBySystemId>();
             const auto systemSharingRange = systemIndex.equal_range(accountIter->systemID);
             for (auto sharingIter = systemSharingRange.first;
@@ -994,6 +996,7 @@ api::SystemAccessRoleList SystemManager::getSharingPermissions(
             resultData.accessRoles.emplace_back(api::SystemAccessRole::maintenance);
 
         case api::SystemAccessRole::cloudAdmin:
+        case api::SystemAccessRole::localAdmin:
             resultData.accessRoles.emplace_back(api::SystemAccessRole::liveViewer);
             resultData.accessRoles.emplace_back(api::SystemAccessRole::viewer);
             resultData.accessRoles.emplace_back(api::SystemAccessRole::advancedViewer);
@@ -1004,7 +1007,6 @@ api::SystemAccessRoleList SystemManager::getSharingPermissions(
         case api::SystemAccessRole::liveViewer:
         case api::SystemAccessRole::viewer:
         case api::SystemAccessRole::advancedViewer:
-        case api::SystemAccessRole::localAdmin:
             break;
     }
 

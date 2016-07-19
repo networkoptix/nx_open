@@ -186,16 +186,16 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImage(const QnVirtualC
     return getImageWithCertainQuality( !useHQ, res, time, dstSize, roundMethod, rotation );
 }
 
-PixelFormat updatePixelFormat(PixelFormat fmt)
+AVPixelFormat updatePixelFormat(AVPixelFormat fmt)
 {
     switch(fmt)
     {
-    case PIX_FMT_YUV420P:
-        return PIX_FMT_YUVJ420P;
-    case PIX_FMT_YUV422P:
-        return PIX_FMT_YUVJ422P;
-    case PIX_FMT_YUV444P:
-        return PIX_FMT_YUVJ444P;
+    case AV_PIX_FMT_YUV420P:
+        return AV_PIX_FMT_YUVJ420P;
+    case AV_PIX_FMT_YUV422P:
+        return AV_PIX_FMT_YUVJ422P;
+    case AV_PIX_FMT_YUV444P:
+        return AV_PIX_FMT_YUVJ444P;
     default:
         return fmt;
     }
@@ -207,8 +207,8 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
 
     AVCodecContext* videoEncoderCodecCtx = avcodec_alloc_context3(0);
     videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
-    videoEncoderCodecCtx->codec_id = (format == "jpg" || format == "jpeg") ? CODEC_ID_MJPEG : CODEC_ID_PNG;
-    videoEncoderCodecCtx->pix_fmt = updatePixelFormat((PixelFormat) outFrame->format);
+    videoEncoderCodecCtx->codec_id = (format == "jpg" || format == "jpeg") ? AV_CODEC_ID_MJPEG : AV_CODEC_ID_PNG;
+    videoEncoderCodecCtx->pix_fmt = updatePixelFormat((AVPixelFormat) outFrame->format);
     videoEncoderCodecCtx->width = outFrame->width;
     videoEncoderCodecCtx->height = outFrame->height;
     videoEncoderCodecCtx->bit_rate = outFrame->width * outFrame->height;
@@ -224,8 +224,14 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
     else {
         const int MAX_VIDEO_FRAME = outFrame->width * outFrame->height * 3 / 2;
         quint8* m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
-        int encoded = avcodec_encode_video(videoEncoderCodecCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, outFrame.data());
-        result.append((const char*) m_videoEncodingBuffer, encoded);
+        //int encoded = avcodec_encode_video(videoEncoderCodecCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, outFrame.data());
+        AVPacket outPacket;
+        outPacket.data = m_videoEncodingBuffer;
+        outPacket.size = MAX_VIDEO_FRAME;
+        int got_packet = 0;
+        int encodeResult = avcodec_encode_video2(videoEncoderCodecCtx, &outPacket, outFrame.data(), &got_packet);
+        if (encodeResult == 0 && got_packet)
+            result.append((const char*) m_videoEncodingBuffer, outPacket.size);
         qFreeAligned(m_videoEncodingBuffer);
     }
     QnFfmpegHelper::deleteAvCodecContext(videoEncoderCodecCtx);

@@ -39,12 +39,12 @@ public:
      * @return Either a codec found in ffmpeg registry, or a static instance of a stub AVCodec in case
      * the proper codec is not available in ffmpeg; never null.
      */
-    static AVCodec* findAvCodec(CodecID codecId);
+    static AVCodec* findAvCodec(AVCodecID codecId);
 
     /**
      * @return Newly allocated AVCodecContext with a proper codec, codec_id and coded_type; never null.
      */
-    static AVCodecContext* createAvCodecContext(CodecID codecId);
+    static AVCodecContext* createAvCodecContext(AVCodecID codecId);
 
     /**
      * @return Newly allocated AVCodecContext with data deep-copied via avcodec_copy_context(); never null.
@@ -72,6 +72,8 @@ public:
 
     static QString getErrorStr(int errnum);
 
+    static int audioSampleSize(AVCodecContext* ctx);
+
 private:
     static void copyMediaContextFieldsToAvCodecContext(
         AVCodecContext* av, const QnConstMediaContextPtr& media);
@@ -92,13 +94,26 @@ private:
         StaticHolder()
         {
             memset(&avCodec, 0, sizeof(avCodec));
-            avCodec.id = CODEC_ID_NONE;
+            avCodec.id = AV_CODEC_ID_NONE;
             avCodec.type = AVMEDIA_TYPE_VIDEO;
         }
 
         StaticHolder(const StaticHolder&) /*= delete*/;
         void operator=(const StaticHolder&) /*= delete*/;
     };
+};
+
+struct SwrContext;
+
+class QnFfmpegAudioHelper
+{
+public:
+    QnFfmpegAudioHelper(AVCodecContext* decoderContex);
+    ~QnFfmpegAudioHelper();
+
+    void copyAudioSamples(quint8* dst, const AVFrame* src);
+private:
+    SwrContext* m_swr;
 };
 
 #endif // !defined(DISABLE_FFMPEG)

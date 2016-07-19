@@ -41,7 +41,7 @@ public:
     /// Fields defined in ffmpeg's AVCodecContext.
     //@{
 
-    virtual CodecID getCodecId() const = 0;
+    virtual AVCodecID getCodecId() const = 0;
     virtual AVMediaType getCodecType() const = 0;
 
     /// Nul-terminated ASCII string; can be null.

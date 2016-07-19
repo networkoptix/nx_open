@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo $*
+export CUSTOMIZATION=networkoptix
+if [ -f /tmp/nx1mobile_client.pid ]; then
+    kill -9 `cat /tmp/nx1mobile_client.pid`
+    rm /tmp/nx1mobile_client.pid
+fi
+

@@ -121,6 +121,7 @@ bool allowsAggregation(ActionType actionType)
         case BookmarkAction:
         case ShowTextOverlayAction:
         case CameraOutputAction:
+        case PlaySoundAction:
             return false;
         default:
             return true;

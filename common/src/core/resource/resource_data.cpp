@@ -1,11 +1,12 @@
 #include "resource_data.h"
 #include "param.h"
 #include <cassert>
-
+#include <api/model/api_ioport_data.h>
 #include <core/ptz/ptz_mapper.h>
 #include <core/onvif/onvif_config_data.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/credentials.h>
+#include <core/dataprovider/stream_mixer.h>
 
 class QnResourceDataJsonSerializer: public QnJsonSerializer {
 public:
@@ -17,7 +18,10 @@ public:
         registerKey<Qn::PtzCapabilities>(Qn::PTZ_CAPABILITIES_PARAM_NAME);
         registerKey<Qn::PtzTraits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
+        registerKey<QnIOPortDataList>(lit("ioSettings"));
         registerKey<QList<QnCredentials>>(Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+        registerKey<QList<QnResourceChannelMapping>>(
+            Qn::VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME);
     }
 
 protected:

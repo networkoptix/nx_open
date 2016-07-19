@@ -345,14 +345,14 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
 
         switch( it->codec )
         {
-            case CODEC_ID_H264:
+            case AV_CODEC_ID_H264:
                 it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
                 it->transports.push_back( QLatin1String(HLS_TRANSPORT_NAME) );
                 break;
-            case CODEC_ID_MPEG4:
+            case AV_CODEC_ID_MPEG4:
                 it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
                 break;
-            case CODEC_ID_MJPEG:
+            case AV_CODEC_ID_MJPEG:
                 it->transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
                 break;
             default:

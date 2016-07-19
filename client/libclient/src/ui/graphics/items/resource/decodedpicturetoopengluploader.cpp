@@ -443,7 +443,7 @@ class QnGlRendererTexturePack
 public:
     QnGlRendererTexturePack( const QSharedPointer<DecodedPictureToOpenGLUploaderPrivate>& renderer )
     :
-        m_format( PIX_FMT_NONE )
+        m_format( AV_PIX_FMT_NONE )
     {
         //TODO/IMPL allocate textures when needed, because not every format require 3 planes
         for( size_t i = 0; i < MAX_PLANE_COUNT; ++i )
@@ -454,7 +454,7 @@ public:
     {
     }
 
-    void setPictureFormat( PixelFormat format )
+    void setPictureFormat(AVPixelFormat format )
     {
         if( m_format == format )
             return;
@@ -508,7 +508,7 @@ public:
 private:
     mutable std::vector<GLuint> m_picTextures;
     QScopedPointer<QnGlRendererTexture> m_textures[MAX_PLANE_COUNT];
-    PixelFormat m_format;
+    AVPixelFormat m_format;
 #ifdef GL_COPY_AGGREGATION
     QSharedPointer<AggregationSurfaceRect> m_surfaceRect;
 #endif
@@ -526,12 +526,12 @@ DecodedPictureToOpenGLUploader::UploadedPicture::PBOData::PBOData()
 }
 
 
-PixelFormat DecodedPictureToOpenGLUploader::UploadedPicture::colorFormat() const
+AVPixelFormat DecodedPictureToOpenGLUploader::UploadedPicture::colorFormat() const
 {
     return m_colorFormat;
 }
 
-void DecodedPictureToOpenGLUploader::UploadedPicture::setColorFormat( PixelFormat newFormat )
+void DecodedPictureToOpenGLUploader::UploadedPicture::setColorFormat(AVPixelFormat newFormat )
 {
     m_colorFormat = newFormat;
 }
@@ -616,7 +616,7 @@ const QSharedPointer<AggregationSurfaceRect>& DecodedPictureToOpenGLUploader::Up
 
 DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPictureToOpenGLUploader* const uploader )
 :
-    m_colorFormat( PIX_FMT_NONE ),
+    m_colorFormat( AV_PIX_FMT_NONE ),
     m_width( 0 ),
     m_height( 0 ),
     m_sequence( 0 ),
@@ -831,9 +831,9 @@ public:
 #endif
                 pictureBuf,
 #ifdef RENDERER_SUPPORTS_NV12
-                PIX_FMT_NV12,
+                AV_PIX_FMT_NV12,
 #else
-                PIX_FMT_YUV420P,
+                AV_PIX_FMT_YUV420P,
 #endif
                 cropRect.width(),
                 cropRect.height(),
@@ -1156,7 +1156,7 @@ public:
             m_uploader->uploadDataToGl(
 #endif
                 m_dest,
-                (PixelFormat)m_src->format,
+                (AVPixelFormat)m_src->format,
                 m_src->width,
                 m_src->height,
                 m_src->data,
@@ -1258,7 +1258,7 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     unsigned int asyncDepth )
 :
     d( new DecodedPictureToOpenGLUploaderPrivate(mainContext) ),
-    m_format( PIX_FMT_NONE ),
+    m_format( AV_PIX_FMT_NONE ),
     m_yuv2rgbBuffer( NULL ),
     m_yuv2rgbBufferLen( 0 ),
     m_painterOpacity( 1.0 ),
@@ -1893,24 +1893,24 @@ void DecodedPictureToOpenGLUploader::pictureDataUploadCancelled( AsyncPicDataUpl
     m_cond.wakeAll();   //notifying that uploading finished
 }
 
-static bool isYuvFormat( PixelFormat format )
+static bool isYuvFormat(AVPixelFormat format )
 {
-    return format == PIX_FMT_YUV422P || format == PIX_FMT_YUV420P || format == PIX_FMT_YUV444P;
+    return format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUV444P;
 }
 
-static int glRGBFormat( PixelFormat format )
+static int glRGBFormat(AVPixelFormat format )
 {
     if( !isYuvFormat( format ) )
     {
         switch( format )
         {
-            case PIX_FMT_RGBA:
+            case AV_PIX_FMT_RGBA:
                 return GL_RGBA;
-            case PIX_FMT_BGRA:
+            case AV_PIX_FMT_BGRA:
                 return GL_BGRA_EXT;
-            case PIX_FMT_RGB24:
+            case AV_PIX_FMT_RGB24:
                 return GL_RGB;
-            case PIX_FMT_BGR24:
+            case AV_PIX_FMT_BGR24:
                 return GL_BGRA_EXT; //TODO: #asinaisky
             default:
                 break;
@@ -1918,17 +1918,17 @@ static int glRGBFormat( PixelFormat format )
     }
     return GL_RGBA;
 }
-static int glBytesPerPixel( PixelFormat format )
+static int glBytesPerPixel(AVPixelFormat format )
 {
     if( !isYuvFormat( format ) )
     {
         switch( format )
         {
-        case PIX_FMT_RGBA:
+        case AV_PIX_FMT_RGBA:
             return 4;
-        case PIX_FMT_BGRA:
+        case AV_PIX_FMT_BGRA:
             return 4;
-        case PIX_FMT_RGB24:
+        case AV_PIX_FMT_RGB24:
             return 3;
         default:
             break;
@@ -1991,16 +1991,16 @@ ImageCorrectionParams DecodedPictureToOpenGLUploader::getImageCorrection() const
 }
 
 /*
-static QString toString( PixelFormat format )
+static QString toString( AVPixelFormat format )
 {
     switch( format )
     {
-        case PIX_FMT_YUV444P:
-            return lit("PIX_FMT_YUV444P");
-        case PIX_FMT_YUV422P:
-            return lit("PIX_FMT_YUV422P");
-        case PIX_FMT_YUV420P:
-            return lit("PIX_FMT_YUV420P");
+        case AV_PIX_FMT_YUV444P:
+            return lit("AV_PIX_FMT_YUV444P");
+        case AV_PIX_FMT_YUV422P:
+            return lit("AV_PIX_FMT_YUV422P");
+        case AV_PIX_FMT_YUV420P:
+            return lit("AV_PIX_FMT_YUV420P");
         default:
             return lit("unknown");
     }
@@ -2009,7 +2009,7 @@ static QString toString( PixelFormat format )
 
 bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
-    const PixelFormat format,
+    const AVPixelFormat format,
     const unsigned int width,
     const unsigned int height,
     uint8_t* planes[],
@@ -2028,19 +2028,19 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     //emptyPictureBuf->m_glFence.sync();
 
 #ifdef DISABLE_FRAME_UPLOAD
-    emptyPictureBuf->setColorFormat( PIX_FMT_YUV420P );
+    emptyPictureBuf->setColorFormat( AV_PIX_FMT_YUV420P );
     return true;
 #endif
 
 #ifdef SINGLE_STREAM_UPLOAD
     if( this != runningUploader )
     {
-        emptyPictureBuf->setColorFormat( PIX_FMT_YUV420P );
+        emptyPictureBuf->setColorFormat( AV_PIX_FMT_YUV420P );
         return true;
     }
 #endif
 
-    const int planeCount = format == PIX_FMT_YUVA420P ? 4 : 3;
+    const int planeCount = format == AV_PIX_FMT_YUVA420P ? 4 : 3;
 
     unsigned int r_w[MAX_PLANE_COUNT];
     r_w[Y_PLANE_INDEX] = width & (std::numeric_limits<unsigned int>::max() - 1);    //using only odd width to simplify some things
@@ -2055,10 +2055,10 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
     switch( format )
     {
-        case PIX_FMT_YUV444P:
+        case AV_PIX_FMT_YUV444P:
             r_w[1] = r_w[2] = r_w[0];
         // fall through
-        case PIX_FMT_YUV422P:
+        case AV_PIX_FMT_YUV422P:
             h[1] = h[2] = height;
             break;
         default:
@@ -2069,7 +2069,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
 
 
-    if( (format == PIX_FMT_YUV420P || format == PIX_FMT_YUV422P || format == PIX_FMT_YUV444P || format == PIX_FMT_YUVA420P) && usingShaderYuvToRgb() )
+    if( (format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUV444P || format == AV_PIX_FMT_YUVA420P) && usingShaderYuvToRgb() )
     {
         //using pixel shader for yuv->rgb conversion
         for( int i = 0; i < planeCount; ++i )
@@ -2138,9 +2138,9 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
         glBindTexture( GL_TEXTURE_2D, 0 );
 
-        emptyPictureBuf->setColorFormat( format == PIX_FMT_YUVA420P ? PIX_FMT_YUVA420P : PIX_FMT_YUV420P );
+        emptyPictureBuf->setColorFormat( format == AV_PIX_FMT_YUVA420P ? AV_PIX_FMT_YUVA420P : AV_PIX_FMT_YUV420P );
     }
-   else if( format == PIX_FMT_NV12 && usingShaderNV12ToRgb() )
+   else if( format == AV_PIX_FMT_NV12 && usingShaderNV12ToRgb() )
     {
         for( int i = 0; i < 2; ++i )
         {
@@ -2175,7 +2175,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             //glCheckError("glPixelStorei");
         }
 
-        emptyPictureBuf->setColorFormat( PIX_FMT_NV12 );
+        emptyPictureBuf->setColorFormat( AV_PIX_FMT_NV12 );
     }
     else
     {
@@ -2186,7 +2186,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         int bytesPerPixel = 1;
         if( !isYuvFormat(format) )
         {
-            if( format == PIX_FMT_RGB24 || format == PIX_FMT_BGR24 )
+            if( format == AV_PIX_FMT_RGB24 || format == AV_PIX_FMT_BGR24 )
                 bytesPerPixel = 3;
             else
                 bytesPerPixel = 4;
@@ -2213,7 +2213,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         int lineInPixelsSize = lineSizes[0];
         switch (format)
         {
-            case PIX_FMT_YUV420P:
+            case AV_PIX_FMT_YUV420P:
                 if (useSSE2())
                 {
                     yuv420_argb32_simd_intr(pixels, planes[0], planes[2], planes[1],
@@ -2227,7 +2227,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                 }
                 break;
 
-            case PIX_FMT_YUV422P:
+            case AV_PIX_FMT_YUV422P:
                 if (useSSE2())
                 {
                     yuv422_argb32_simd_intr(pixels, planes[0], planes[2], planes[1],
@@ -2241,7 +2241,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                 }
                 break;
 
-            case PIX_FMT_YUV444P:
+            case AV_PIX_FMT_YUV444P:
                 if (useSSE2())
                 {
                     yuv444_argb32_simd_intr(pixels, planes[0], planes[2], planes[1],
@@ -2255,8 +2255,8 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                 }
                 break;
 
-            case PIX_FMT_RGB24:
-            case PIX_FMT_BGR24:
+            case AV_PIX_FMT_RGB24:
+            case AV_PIX_FMT_BGR24:
                 lineInPixelsSize /= 3;
                 break;
 
@@ -2282,7 +2282,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
         glBindTexture( GL_TEXTURE_2D, 0 );
 
-        emptyPictureBuf->setColorFormat( PIX_FMT_RGBA );
+        emptyPictureBuf->setColorFormat( AV_PIX_FMT_RGBA );
 
         //TODO: #ak free memory immediately for still images
     }
@@ -2306,7 +2306,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 #ifdef GL_COPY_AGGREGATION
 bool DecodedPictureToOpenGLUploader::uploadDataToGlWithAggregation(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
-    const PixelFormat format,
+    const AVPixelFormat format,
     const unsigned int width,
     const unsigned int height,
     uint8_t* planes[],

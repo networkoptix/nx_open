@@ -15,7 +15,7 @@ public:
     * param transcodeToCodec - if codec specified, all media packets are transcoded to specified codec.
     * param videoSize - transcoded video size
     */
-    QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, CodecID transcodeToCodec, const QSize& videoSize,
+    QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, AVCodecID transcodeToCodec, const QSize& videoSize,
                           const QnImageFilterHelper& extraTranscodeParams);
 
     virtual QByteArray getAdditionSDP( const std::map<QString, QString>& streamParams ) override;
@@ -38,7 +38,7 @@ private:
     int m_outputPos;
     int packetIndex;
     QnFfmpegTranscoder m_transcoder;
-    CodecID m_codec;
+    AVCodecID m_codec;
     bool m_isVideo;
     //quint32 m_firstTime;
     //bool m_isFirstPacket;

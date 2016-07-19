@@ -74,7 +74,7 @@ ProxyVideoDecoder::~ProxyVideoDecoder()
 {
 }
 
-bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
+bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
 {
     static bool calledOnce = false;
     if (!calledOnce)
@@ -107,10 +107,10 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
         return false;
     }
 
-    if (codec != CODEC_ID_H264)
+    if (codec != AV_CODEC_ID_H264)
     {
         OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: codec != CODEC_ID_H264";
+            << ") -> false: codec != AV_CODEC_ID_H264";
         return false;
     }
 
@@ -125,7 +125,7 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
     return true;
 }
 
-QSize ProxyVideoDecoder::maxResolution(const CodecID codec)
+QSize ProxyVideoDecoder::maxResolution(const AVCodecID codec)
 {
     QN_UNUSED(codec);
 

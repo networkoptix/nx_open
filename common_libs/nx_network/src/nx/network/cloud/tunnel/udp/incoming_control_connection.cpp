@@ -48,7 +48,7 @@ void IncomingControlConnection::start(
 void IncomingControlConnection::resetLastKeepAlive()
 {
     m_lastKeepAlive = std::chrono::steady_clock::now();
-	NX_LOG(lm("Update last keep alive"), cl_logDEBUG2);
+    NX_LOGX(lm("Update last keep alive"), cl_logDEBUG2);
 }
 
 const AbstractStreamSocket* IncomingControlConnection::socket()
@@ -59,11 +59,11 @@ const AbstractStreamSocket* IncomingControlConnection::socket()
 void IncomingControlConnection::monitorKeepAlive()
 {
     using namespace std::chrono;
-    auto timePassed = steady_clock::now() - m_lastKeepAlive;
-    if (timePassed >= m_maxKeepAliveInterval)
+    const auto timePassed = steady_clock::now() - m_lastKeepAlive;
+    const auto next = duration_cast<milliseconds>(m_maxKeepAliveInterval - timePassed);
+    if (next.count() <= 0)
         return handleError(SystemError::timedOut);
 
-    auto next = duration_cast<milliseconds>(m_maxKeepAliveInterval - timePassed);
 	NX_LOGX(lm("Set keep alive timer for %1 ms").arg(next.count()), cl_logDEBUG2);
     m_socket->registerTimer(next, [this](){ monitorKeepAlive(); });
 }

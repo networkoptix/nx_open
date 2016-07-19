@@ -782,10 +782,14 @@ SocketAddress CommunicatingSocket<InterfaceToImplement>::getForeignAddress() con
     unsigned int addr_len = sizeof(addr);
 
     const auto ret = getpeername(this->m_fd, (sockaddr *) &addr,(socklen_t *) &addr_len);
-    if (ret < 0) {
-        qnWarning("Fetch of foreign address failed (getpeername() = %1).", ret);
+    if (ret < 0)
+    {
+        NX_LOGX(lm("Fetch of foreign address failed: %1")
+            .arg(SystemError::getLastOSErrorText()), cl_logWARNING);
+
         return SocketAddress();
     }
+
     return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
 }
 

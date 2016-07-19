@@ -139,7 +139,7 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
                     mDataRemainedBeginIndex = -1;
 
 
-                videoData->compressionType = CODEC_ID_MJPEG;
+                videoData->compressionType = AV_CODEC_ID_MJPEG;
                 videoData->width = 1920;
                 videoData->height = 1088;
 

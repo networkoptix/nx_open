@@ -66,7 +66,6 @@ libnx_utils.so \
 libnx_email.so \
 libappserver2.so \
 libmediaserver_core.so \
-libpostproc.so \
 libquazip.so \
 libsasl2.so \
 liblber-2.4.so.2 \

@@ -6,7 +6,13 @@
 
 QnAbstractAudioDecoder* QnAudioDecoderFactory::createDecoder(QnCompressedAudioDataPtr data)
 {
-    return new QnFfmpegAudioDecoder(data);
+    auto result = new QnFfmpegAudioDecoder(data);
+    if (!result->isInitialized())
+    {
+        delete result;
+        return nullptr;
+    }
+    return result;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

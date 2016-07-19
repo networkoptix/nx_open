@@ -310,12 +310,12 @@ QSize PlayerDataConsumer::currentResolution() const
         return QSize();
 }
 
-CodecID PlayerDataConsumer::currentCodec() const
+AVCodecID PlayerDataConsumer::currentCodec() const
 {
     if (m_videoDecoder)
         return m_videoDecoder->currentCodec();
     else
-        return CODEC_ID_NONE;
+        return AV_CODEC_ID_NONE;
 }
 
 void PlayerDataConsumer::setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor)

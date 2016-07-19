@@ -193,7 +193,7 @@ void Impl::doDisplayDecodedFrame(void* frameHandle)
         {
             OUTPUT << logPrefix << " Fullscreen";
         }
-        proxyDecoder().displayDecoded(frameHandle, 0, 0, 0, 0); //< All-zeroes mean full-screen.
+        proxyDecoder().displayDecoded(frameHandle, /*rect*/ nullptr); //< Null mean fullscreen.
     }
     else
     {
@@ -202,7 +202,8 @@ void Impl::doDisplayDecodedFrame(void* frameHandle)
             OUTPUT << logPrefix << nx::utils::stringFormat(" %d x %d @(%d, %d)",
                 r.width(), r.height(), r.left(), r.top());
         }
-        proxyDecoder().displayDecoded(frameHandle, r.left(), r.top(), r.width(), r.height());
+        const ProxyDecoder::Rect rect{r.left(), r.top(), r.width(), r.height()};
+        proxyDecoder().displayDecoded(frameHandle, &rect);
     }
 }
 
