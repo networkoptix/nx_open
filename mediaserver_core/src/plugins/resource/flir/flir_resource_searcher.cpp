@@ -1,5 +1,8 @@
-#include <QtEndian>
 #include "flir_resource_searcher.h"
+
+#ifdef ENABLE_ONVIF
+
+#include <QtEndian>
 #include "flir_eip_resource.h"
 
 QnFlirResourceSearcher::QnFlirResourceSearcher()
@@ -185,3 +188,4 @@ void QnFlirResourceSearcher::createResource(const FlirDeviceInfo& info, const QA
     result << resource;
 }
 
+#endif // ENABLE_ONVIF

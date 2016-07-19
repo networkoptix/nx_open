@@ -401,6 +401,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     m_storage,
                                     role,
                                     serverTimeZone,
+                                    0,
                                     QnImageFilterHelper()
                                     );
 

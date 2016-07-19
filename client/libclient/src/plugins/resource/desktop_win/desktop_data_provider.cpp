@@ -449,7 +449,7 @@ bool QnDesktopDataProvider::init()
 
         m_encodedAudioBuf = (quint8*) av_malloc(FF_MIN_BUFFER_SIZE);
 
-        QString audioCodecName = QLatin1String("libmp3lame"); //< "aac"
+        QString audioCodecName = QLatin1String("mp2"); //< "libmp3lame"
         AVCodec* audioCodec = avcodec_find_encoder_by_name(audioCodecName.toLatin1().constData());
         if(audioCodec == 0)
         {

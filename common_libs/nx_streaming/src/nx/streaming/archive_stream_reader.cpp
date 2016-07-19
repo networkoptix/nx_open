@@ -1,6 +1,8 @@
 #include "archive_stream_reader.h"
 
-#include <numeric>
+#ifdef ENABLE_ARCHIVE
+
+#include <stdint.h>
 
 #include <core/resource/resource.h>
 
@@ -243,7 +245,7 @@ bool QnArchiveStreamReader::init()
             qint64 jumpTime = requiredJumpTime != qint64(AV_NOPTS_VALUE) ? requiredJumpTime : qnSyncTime->currentUSecsSinceEpoch();
             bool seekOk = m_delegate->seek(jumpTime, true) >= 0;
             Q_UNUSED(seekOk)
-            m_jumpMtx.lock();
+                m_jumpMtx.lock();
             if (m_requiredJumpTime == requiredJumpTime) {
                 if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
                     m_requiredJumpTime = AV_NOPTS_VALUE;
@@ -1328,3 +1330,5 @@ bool QnArchiveStreamReader::isRealTimeSource() const
 {
     return m_delegate && m_delegate->isRealTimeSource() && (m_requiredJumpTime == (qint64)AV_NOPTS_VALUE || m_requiredJumpTime == DATETIME_NOW);
 }
+
+#endif // ENABLE_ARCHIVE

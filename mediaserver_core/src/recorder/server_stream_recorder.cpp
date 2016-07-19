@@ -620,7 +620,10 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
             backupStorage = qnBackupStorageMan->getOptimalStorageRoot(provider);
 
         if (normalStorage || backupStorage)
-            setTruncateInterval(QnAbstractStorageResource::chunkLen/*m_storage->getChunkLen()*/);
+            setTruncateInterval(
+                MSSettings::roSettings()->value(
+                    nx_ms_conf::MEDIA_FILE_DURATION_SECONDS,
+                    nx_ms_conf::DEFAULT_MEDIA_FILE_DURATION_SECONDS).toInt());
 
         if (normalStorage)
             m_recordingContextVector.emplace_back(

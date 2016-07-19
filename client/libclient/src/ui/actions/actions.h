@@ -956,6 +956,11 @@ QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
         ExportLayoutAction,
 
         /**
+         * Exports timelapse.
+         */
+        ExportTimelapseAction,
+
+        /**
          * Bookmark selected range.
          */
         AddCameraBookmarkAction,
