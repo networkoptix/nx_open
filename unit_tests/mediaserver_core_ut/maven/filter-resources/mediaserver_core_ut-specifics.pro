@@ -2,6 +2,9 @@ CONFIG += console
 
 include( ${libdir}/gtest.pri )
 
+win32 {
+	DEFINES += NOMINMAX
+}
 !win32 {
   ext_debug2.target  = $(TARGET).debug
   ext_debug2.depends = $(TARGET)
