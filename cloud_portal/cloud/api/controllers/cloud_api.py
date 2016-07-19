@@ -8,9 +8,9 @@ CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
 
 
 def lower_case_email(func):
-    def validator(*args, **kwargs):
-        args[0] = args[0].lower()
-        return func(*args, **kwargs)
+    def validator(email, *args, **kwargs):
+        email = email.lower()
+        return func(email, *args, **kwargs)
     return validator
 
 
