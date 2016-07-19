@@ -1,7 +1,7 @@
-#ifndef QN_CLIENT_CONNECTION_STATUS_H
-#define QN_CLIENT_CONNECTION_STATUS_H
+#pragma once
 
-enum class QnConnectionState {
+enum class QnConnectionState
+{
     Invalid,
     Disconnected,
     Connecting,
@@ -10,12 +10,14 @@ enum class QnConnectionState {
     Ready
 };
 
-class QnConnectionStateUtils {
+class QnConnectionStateUtils
+{
 public:
     static QString toString(QnConnectionState state);
 };
 
-class QnClientConnectionStatus {
+class QnClientConnectionStatus
+{
 public:
     QnClientConnectionStatus();
 
@@ -30,4 +32,3 @@ private:
     QMultiMap<QnConnectionState, QnConnectionState> m_allowedTransactions;
 };
 
-#endif // QN_CLIENT_CONNECTION_STATUS_H
