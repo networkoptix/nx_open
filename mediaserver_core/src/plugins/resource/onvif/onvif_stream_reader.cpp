@@ -218,6 +218,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
     if (m_resource->updateProperty(Qn::CAMERA_STREAM_URLS_PARAM_NAME, updateUrls))
         propertyDictionary->saveParamsAsync(m_resource->getId());
 
+    m_onvifRes->updateSourceUrl(*streamUrl, getRole());
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3")
         .arg(*streamUrl).arg(m_resource->getUrl()).arg(role), cl_logINFO);
     return result;

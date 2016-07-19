@@ -254,6 +254,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
         }
 
+        m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
         NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(mediaUrlStr).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
 
         //checking url type and creating corresponding data provider

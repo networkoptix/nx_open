@@ -52,8 +52,11 @@ void QnCameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr 
     if (m_camera == camera)
         return;
 
-    QnMutexLocker locker(&m_cameraMutex);
-    m_camera = camera;
+    {
+        QnMutexLocker locker(&m_cameraMutex);
+        m_camera = camera;
+    }
+
     m_cameraAdvancedSettingsWebPage->setCamera(m_camera);
     ui->cameraAdvancedParamsWidget->setCamera(m_camera);
 }
@@ -61,6 +64,7 @@ void QnCameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr 
 void QnCameraAdvancedSettingsWidget::updateFromResource()
 {
     updatePage();
+    updateUrls();
 }
 
 void QnCameraAdvancedSettingsWidget::setPage(Page page)
@@ -109,6 +113,23 @@ void QnCameraAdvancedSettingsWidget::updatePage()
 
     Page newPage = calculatePage();
     setPage(newPage);
+}
+
+void QnCameraAdvancedSettingsWidget::updateUrls()
+{
+    if (!m_camera)
+    {
+        ui->primaryUrlLineEdit->setText(QString());
+        ui->secondaryUrlLineEdit->setText(QString());
+    }
+    else
+    {
+        ui->primaryUrlLineEdit->setText(m_camera->sourceUrl(Qn::CR_LiveVideo));
+        if (m_camera->hasDualStreaming2())
+            ui->secondaryUrlLineEdit->setText(m_camera->sourceUrl(Qn::CR_SecondaryLiveVideo));
+        else
+            ui->secondaryUrlLineEdit->setText(tr("Camera has no secondary stream"));
+    }
 }
 
 void QnCameraAdvancedSettingsWidget::reloadData()
