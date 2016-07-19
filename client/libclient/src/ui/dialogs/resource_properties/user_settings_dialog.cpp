@@ -161,10 +161,10 @@ void QnUserSettingsDialog::permissionsChanged()
 
     if (isPageVisible(ProfilePage))
     {
-        Qn::UserRoleType roleType = qnResourceAccessManager->userRole(m_user);
+        Qn::UserRole roleType = qnResourceAccessManager->userRole(m_user);
         QString permissionsText = qnResourceAccessManager->userRoleDescription(roleType);
 
-        if (roleType == Qn::UserRoleType::CustomUserGroup)
+        if (roleType == Qn::UserRole::CustomUserGroup)
         {
             /* Handle custom user role: */
             QnUuid groupId = m_user->userGroup();
@@ -174,7 +174,7 @@ void QnUserSettingsDialog::permissionsChanged()
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, groupId, groupPermissions, false)) +
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, groupId, groupPermissions, false)));
         }
-        else if (roleType == Qn::UserRoleType::CustomPermissions)
+        else if (roleType == Qn::UserRole::CustomPermissions)
         {
             QnUuid userId = m_user->getId();
             Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
@@ -188,10 +188,10 @@ void QnUserSettingsDialog::permissionsChanged()
     }
     else
     {
-        Qn::UserRoleType roleType = m_settingsPage->selectedRole();
+        Qn::UserRole roleType = m_settingsPage->selectedRole();
         QString permissionsText = qnResourceAccessManager->userRoleDescription(roleType);
 
-        if (roleType == Qn::UserRoleType::CustomUserGroup)
+        if (roleType == Qn::UserRole::CustomUserGroup)
         {
             /* Handle custom user role: */
             QnUuid groupId = m_settingsPage->selectedUserGroup();
@@ -201,7 +201,7 @@ void QnUserSettingsDialog::permissionsChanged()
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, groupId, groupPermissions, true)) +
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, groupId, groupPermissions, true)));
         }
-        else if (roleType == Qn::UserRoleType::CustomPermissions)
+        else if (roleType == Qn::UserRole::CustomPermissions)
         {
             /* Handle custom permissions: */
             auto descriptionFromWidget = [descriptionHtml](const QnAccessibleResourcesWidget* widget)
@@ -353,7 +353,7 @@ void QnUserSettingsDialog::updateControlsVisibility()
         || mode == QnUserSettingsModel::OtherSettings;
 
     bool customAccessRights = settingsPageVisible
-        && m_settingsPage->selectedRole() == Qn::UserRoleType::CustomPermissions;
+        && m_settingsPage->selectedRole() == Qn::UserRole::CustomPermissions;
 
     setPageVisible(ProfilePage,     profilePageVisible);
 

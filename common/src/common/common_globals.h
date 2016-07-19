@@ -608,7 +608,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         ActionEmittedBy,                            /** */
 
         GlobalPermissionsRole,                      /**< Global permissions role. Value of type Qn::GlobalPermissions. */
-        UserRoleTypeRole,                           /**< Type of user role. Value of type Qn::UserRoleType. */
+        UserRoleRole,                               /**< Type of user role. Value of type Qn::UserRole. */
 
         RoleCount
     };
@@ -941,7 +941,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     /**
     * An enumeration for user role types: predefined roles, custom groups, custom permissions.
     */
-    enum class UserRoleType
+    enum class UserRole
     {
         CustomUserGroup = -2,
         CustomPermissions = -1,
@@ -952,7 +952,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         LiveViewer,
     };
 
-    Q_DECLARE_METATYPE(UserRoleType);
+    Q_DECLARE_METATYPE(UserRole);
 
 
     /**

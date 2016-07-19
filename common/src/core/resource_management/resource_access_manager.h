@@ -111,13 +111,13 @@ public:
     bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,        const ec2::ApiUserData& update) const;
     bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,   const ec2::ApiVideowallData& update) const;
 
-    static const QList<Qn::UserRoleType>& predefinedRoles();
+    static const QList<Qn::UserRole>& predefinedRoles();
 
-    static QString userRoleName(Qn::UserRoleType userRole);
-    static QString userRoleDescription(Qn::UserRoleType userRole);
-    static Qn::GlobalPermissions userRolePermissions(Qn::UserRoleType userRole);
+    static QString userRoleName(Qn::UserRole userRole);
+    static QString userRoleDescription(Qn::UserRole userRole);
+    static Qn::GlobalPermissions userRolePermissions(Qn::UserRole userRole);
 
-    Qn::UserRoleType userRole(const QnUserResourcePtr& user) const;
+    Qn::UserRole userRole(const QnUserResourcePtr& user) const;
     QString userRoleName(const QnUserResourcePtr& user) const;
 
     static ec2::ApiPredefinedRoleDataList getPredefinedRoles();

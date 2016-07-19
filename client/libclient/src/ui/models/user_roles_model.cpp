@@ -21,7 +21,7 @@ namespace
     {
         RoleDescription() {}
 
-        RoleDescription(const Qn::UserRoleType roleType,
+        RoleDescription(const Qn::UserRole roleType,
             const QString& name = QString(),
             const QnUuid& roleUuid = QnUuid()) :
                 roleType(roleType),
@@ -34,13 +34,13 @@ namespace
 
         explicit RoleDescription(const ec2::ApiUserGroupData& userRole) :
             RoleDescription(
-                Qn::UserRoleType::CustomUserGroup,
+                Qn::UserRole::CustomUserGroup,
                 userRole.name,
                 userRole.id)
         {
         }
 
-        Qn::UserRoleType roleType;
+        Qn::UserRole roleType;
         QString name;
         QString description;
         Qn::GlobalPermissions permissions;
@@ -68,7 +68,7 @@ public:
             watchUserRoleChanged(true);
     }
 
-    void setStandardRoles(const QList<Qn::UserRoleType>& roles)
+    void setStandardRoles(const QList<Qn::UserRole>& roles)
     {
         if (standardRoles == roles)
             return;
@@ -85,7 +85,7 @@ public:
         if (enabled)
             setStandardRoles(allStandardRoles());
         else
-            setStandardRoles(QList<Qn::UserRoleType>());
+            setStandardRoles(QList<Qn::UserRole>());
     }
 
     void setUserRoles(ec2::ApiUserGroupDataList roles, bool watchServerChanges)
@@ -121,7 +121,7 @@ public:
 
         customRoleEnabled = enable;
         if (customRoleEnabled)
-            roles << RoleDescription(Qn::UserRoleType::CustomPermissions);
+            roles << RoleDescription(Qn::UserRole::CustomPermissions);
         else
             roles.pop_back();
 
@@ -146,7 +146,7 @@ public:
             roles << RoleDescription(role);
 
         if (customRoleEnabled)
-            roles << RoleDescription(Qn::UserRoleType::CustomPermissions);
+            roles << RoleDescription(Qn::UserRole::CustomPermissions);
     }
 
     bool updateUserRole(const ec2::ApiUserGroupData& userRole)
@@ -260,13 +260,13 @@ public:
         }
     }
 
-    static const QList<Qn::UserRoleType>& allStandardRoles()
+    static const QList<Qn::UserRole>& allStandardRoles()
     {
-        static QList<Qn::UserRoleType> roles;
+        static QList<Qn::UserRole> roles;
         if (roles.empty())
         {
             for (auto role : QnResourceAccessManager::predefinedRoles())
-                if (role != Qn::UserRoleType::Owner)
+                if (role != Qn::UserRole::Owner)
                     roles << role;
         }
 
@@ -287,7 +287,7 @@ public:
     QnUserRolesModel* q_ptr;
     Q_DECLARE_PUBLIC(QnUserRolesModel);
 
-    QList<Qn::UserRoleType> standardRoles;
+    QList<Qn::UserRole> standardRoles;
     ec2::ApiUserGroupDataList userRoles;
     bool customRoleEnabled;
 
@@ -406,7 +406,7 @@ QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(d->roles[index.row()].permissions);
 
         /* Role type: */
-        case Qn::UserRoleTypeRole:
+        case Qn::UserRoleRole:
             return QVariant::fromValue(d->roles[index.row()].roleType);
 
         default:

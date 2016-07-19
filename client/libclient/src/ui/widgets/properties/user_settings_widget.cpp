@@ -98,8 +98,8 @@ bool QnUserSettingsWidget::hasChanges() const
         if (groupId.isNull())
         {
             /* Check if we have selected a predefined internal group. */
-            Qn::UserRoleType roleType = selectedRole();
-            if (roleType != Qn::UserRoleType::CustomPermissions
+            Qn::UserRole roleType = selectedRole();
+            if (roleType != Qn::UserRole::CustomPermissions
                 && (qnResourceAccessManager->userRolePermissions(roleType)
                     != qnResourceAccessManager->globalPermissions(m_model->user())))
             {
@@ -319,9 +319,9 @@ void QnUserSettingsWidget::updateControlsAccess()
     ui->enabledButton->setVisible(permissions.testFlag(Qn::WriteAccessRightsPermission));
 }
 
-Qn::UserRoleType QnUserSettingsWidget::selectedRole() const
+Qn::UserRole QnUserSettingsWidget::selectedRole() const
 {
-    return ui->roleComboBox->itemData(ui->roleComboBox->currentIndex(), Qn::UserRoleTypeRole).value<Qn::UserRoleType>();
+    return ui->roleComboBox->itemData(ui->roleComboBox->currentIndex(), Qn::UserRoleRole).value<Qn::UserRole>();
 }
 
 QnUuid QnUserSettingsWidget::selectedUserGroup() const
