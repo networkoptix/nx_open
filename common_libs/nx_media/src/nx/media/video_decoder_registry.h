@@ -16,10 +16,10 @@ class AbstractVideoDecoder;
 typedef std::unique_ptr<AbstractVideoDecoder, void(*)(AbstractVideoDecoder*)> VideoDecoderPtr;
 
 /**
- * Allows to register various implementations for video decoders. The exact list of decoders can be
- * registered in runtime.
+ * Singleton. Allows to register various implementations for video decoders. The exact list of
+ * decoders can be registered in runtime.
  */
-class VideoDecoderRegistry // singleton
+class VideoDecoderRegistry
 {
 public:
     static VideoDecoderRegistry* instance();
@@ -47,7 +47,7 @@ public:
     /**
      * Register video decoder plugin.
      */
-    template <class Decoder>
+    template<class Decoder>
     void addPlugin(
         ResourceAllocatorPtr allocator = ResourceAllocatorPtr(),
         int maxUseCount = std::numeric_limits<int>::max())
@@ -55,17 +55,19 @@ public:
         m_plugins.push_back(MetadataImpl<Decoder>(allocator, maxUseCount));
     }
 
+    /** For tests. */
+    void reinitialize();
+
 private:
     struct Metadata
     {
-        Metadata()
-        :
+        Metadata():
             useCount(0),
             maxUseCount(std::numeric_limits<int>::max())
         {
         }
 
-        std::function<AbstractVideoDecoder* (
+        std::function<AbstractVideoDecoder*(
             const ResourceAllocatorPtr& allocator, const QSize& resolution)> createVideoDecoder;
         std::function<bool (const AVCodecID codec, const QSize& resolution)> isCompatible;
         std::function<QSize (const AVCodecID codec)> maxResolution;
@@ -74,7 +76,7 @@ private:
         int maxUseCount;
     };
 
-    template <class Decoder>
+    template<class Decoder>
     struct MetadataImpl: public Metadata
     {
         MetadataImpl(ResourceAllocatorPtr allocator, int maxUseCount)
