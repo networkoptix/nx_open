@@ -290,6 +290,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                 authResult == Qn::Auth_OK &&
                 qnResPool->getResourceById<QnMediaServerResource>(*authUserId))
             {
+                *authUserId = Qn::kDefaultUserAccess.userId;
                 auto itr = request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME);
                 if (itr != request.headers.end())
                 {

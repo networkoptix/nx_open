@@ -64,7 +64,7 @@ private:
     int runX264Process(AVFrame* frame, QString optionStr, quint8* rezBuffer);
     int removeH264SeiMessage(quint8* buffer, int size);
     static void doUpdateDigestNoCodec(QnCryptographicHash &ctx, const quint8* data, int size);
-    static void doUpdateDigest(CodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size);
+    static void doUpdateDigest(AVCodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size);
 
 private:
     QPixmap m_logo;

@@ -84,7 +84,6 @@
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
-        <linux.release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</linux.release.version>
 
         <client.name>${company.name} ${product.name} Client</client.name>
         <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
@@ -114,6 +113,7 @@
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
         <cloud_connect_auto_test.name>${company.name} Cloud Connect Auto Test</cloud_connect_auto_test.name>
         <minilauncher.name>${company.name} ${display.product.name} Launcher</minilauncher.name>
+        <media_db_util.name>${company.name} ${display.product.name} Media DB Utility</media_db_util.name>
 
         <product.display.title>${product.title}</product.display.title>
         
@@ -169,7 +169,7 @@
         <qt.version>5.6.1</qt.version>
         <gtest.version>1.7.0</gtest.version>
         <gmock.version>1.7.0</gmock.version>
-        <ffmpeg.version>0.11.4</ffmpeg.version>
+        <ffmpeg.version>3.1.1</ffmpeg.version>
         <openssl.version>1.0.2e</openssl.version>
         <openldap.version>2.4.42</openldap.version>
         <sasl2.version>2.1.26</sasl2.version>
@@ -456,7 +456,6 @@
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
-                <module>media_db_util</module>
 
                 <module>plugins/genericrtspplugin</module>
                 <module>plugins/image_library_plugin</module>
@@ -526,9 +525,6 @@
 
                 <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
                 <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
-
-                <!-- TODO: #gdm Remove it when Qt 5.6.1 is ready for windows. -->
-                <qt.version>5.6.0</qt.version>
 
                 <profile.classifier>${platform}</profile.classifier>
                 <windows>true</windows>
@@ -784,7 +780,6 @@
                 </property>
             </activation>
             <properties>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <toolchain.version>codesourcery-2014.05</toolchain.version>
                 <compiler>2011.09</compiler>
                 <qt.spec/>
@@ -815,7 +810,6 @@
                 </property>
             </activation>
             <properties>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f</openssl.version>
@@ -849,7 +843,6 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
                 <qt.spec/>
@@ -882,7 +875,6 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <festival.version>2.1x</festival.version>
                 <modification>bpi</modification>
                 <rdep.target>bpi</rdep.target>
@@ -900,6 +892,7 @@
                 <module>client/libclient_core</module>
                 <module>client/mobile_client</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>media_db_util</module>
                 <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
         </profile>
@@ -921,7 +914,6 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
                 <gcc.version>4.8.3</gcc.version>
@@ -932,6 +924,7 @@
                 <module>edge_firmware/rpi</module>
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>media_db_util</module>
                 <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
         </profile>
@@ -953,7 +946,6 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>tx1</modification>
                 <rdep.target>tx1</rdep.target>
                 <gcc.version>4.8.4</gcc.version>
@@ -1101,7 +1093,6 @@
                 <qt.spec/>
                 <openal.version>1.17.2</openal.version>
                 <openssl.version>1.0.2d</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <rdep.target>android-${arch}</rdep.target>
             </properties>
         </profile>
@@ -1148,8 +1139,8 @@
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>
+                <ffmpeg.version>3.0.0</ffmpeg.version>
                 <compile.option1/>
                 <rdep.target>ios</rdep.target>
             </properties>

@@ -22,10 +22,25 @@ int QnCurrentUserRestHandler::executeGet(const QString &, const QnRequestParams&
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     ec2::ApiUserDataList users;
-    if (ec2Connection->getUserManager(Qn::UserAccessData(owner->authUserId()))->getUsersSync(&users) !=  ec2::ErrorCode::ok)
+    ec2::ErrorCode ecode = 
+        ec2Connection->getUserManager(Qn::UserAccessData(userId))
+                     ->getUsersSync(&users);
+    if (ecode !=  ec2::ErrorCode::ok)
     {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error. Can't execute query 'getUsers'"));
-        return nx_http::StatusCode::internalServerError;
+        if (ecode == ec2::ErrorCode::forbidden)
+        {
+            result.setError(
+                QnJsonRestResult::Forbidden, 
+                lit("Forbidden"));
+            return nx_http::StatusCode::forbidden;
+        }
+        else
+        {
+            result.setError(
+                QnJsonRestResult::CantProcessRequest,
+                lit("Internal server error. Can't execute query 'getUsers'"));
+            return nx_http::StatusCode::internalServerError;
+        }
     }
 
     auto iter = std::find_if(users.cbegin(), users.cend(), [userId](const ec2::ApiUserData& user)

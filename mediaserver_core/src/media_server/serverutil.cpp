@@ -130,12 +130,8 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
     if (!data.password.isEmpty())
     {
         /* check old password */
-        if (!admin->checkPassword(data.oldPassword))
-        {
-            if (errString)
-                *errString = lit("Wrong current password specified");
+        if (!validateAdminPassword(data, errString))
             return false;
-        }
 
         /* set new password */
         updatedAdmin->setPassword(data.password);
@@ -179,6 +175,26 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
     admin->setCryptSha512Hash(updatedAdmin->getCryptSha512Hash());
 
     HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updatedAdmin);
+    return true;
+}
+
+bool validateAdminPassword(const PasswordData& passwordData, QString* errStr)
+{
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+    if (!admin)
+    {
+        if (errStr)
+            *errStr = lit("Temporary unavailable. Please try later.");
+        return false;
+    }
+
+    if (!admin->checkPassword(passwordData.oldPassword))
+    {
+        if (errStr)
+            *errStr = lit("Wrong current password specified");
+        return false;
+    }
+
     return true;
 }
 

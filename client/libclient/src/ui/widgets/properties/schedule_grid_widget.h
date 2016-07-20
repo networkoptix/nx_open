@@ -14,11 +14,8 @@ class QnScheduleGridWidget : public QWidget
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
     Q_PROPERTY(QnScheduleGridColors colors READ colors WRITE setColors)
 
-    enum
-    {
-        kHoursPerDay = 24,
-        kDaysPerWeek = 7
-    };
+    static constexpr int kDaysPerWeek = 7;
+    static constexpr int kHoursPerDay = 24;
 
 public:
     explicit QnScheduleGridWidget(QWidget* parent = nullptr);

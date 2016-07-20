@@ -348,15 +348,6 @@ struct QnPasswordStrengthColors
 };
 #define QnPasswordStrengthColors_Fields (inacceptable)(acceptable)(good)
 
-struct QnMotionSensitivityColors
-{
-    QnMotionSensitivityColors();
-
-    QVector<QColor> normal;
-    QVector<QColor> hovered;
-};
-#define QnMotionSensitivityColors_Fields (normal)(hovered)
-
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
@@ -370,8 +361,7 @@ struct QnMotionSensitivityColors
     (QnCompositeTextOverlayColors) \
     (QnGraphicsMessageBoxColors) \
     (QnResourceItemColors) \
-    (QnPasswordStrengthColors) \
-    (QnMotionSensitivityColors)
+    (QnPasswordStrengthColors)
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

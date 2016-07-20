@@ -132,15 +132,10 @@ bool hasPermissionImpl(const QnUuid &userId, const TransactionParamType &data, Q
 	return detail::hasPermissionImpl(userId, data, permission, 0);
 }
 
+
 } // namespace detail
 
-inline bool hasOwnerAccess(const QnUuid& userId)
-{
-	if (Qn::UserAccessData(userId) == Qn::kDefaultUserAccess)
-		return true;
-	auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return userResource && userResource->isEnabled() && userResource->isOwner();
-}
+bool hasOwnerAccess(const QnUuid& userId);
 
 template<typename TransactionParamType>
 bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission)

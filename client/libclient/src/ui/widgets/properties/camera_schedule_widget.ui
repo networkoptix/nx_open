@@ -62,7 +62,7 @@
      <item>
       <widget class="QGroupBox" name="scheduleGridGroupBox">
        <property name="title">
-        <string>Recording Schedule</string>
+        <string notr="true">&lt;Recording Schedule&gt;</string>
        </property>
        <property name="flat">
         <bool>true</bool>

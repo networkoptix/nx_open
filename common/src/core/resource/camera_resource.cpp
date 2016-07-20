@@ -14,10 +14,28 @@
 #include <utils/common/util.h>
 #include <utils/math/math.h>
 
+namespace {
+
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
 static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
 static const qint64 UPDATE_BITRATE_TIMEOUT_DAYS = 7;
+
+QString urlRoleParameter(Qn::ConnectionRole role)
+{
+    switch (role)
+    {
+        case Qn::CR_LiveVideo:
+            return Qn::kPrimaryUrl;
+        case Qn::CR_SecondaryLiveVideo:
+            return Qn::kSecondaryUrl;
+        default:
+            break;
+    }
+    return QString();
+}
+
+} //anonymous namespace
 
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_dtsFactory(0),
@@ -345,14 +363,14 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
 
         switch( it->codec )
         {
-            case CODEC_ID_H264:
+            case AV_CODEC_ID_H264:
                 it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
                 it->transports.push_back( QLatin1String(HLS_TRANSPORT_NAME) );
                 break;
-            case CODEC_ID_MPEG4:
+            case AV_CODEC_ID_MPEG4:
                 it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
                 break;
-            case CODEC_ID_MJPEG:
+            case AV_CODEC_ID_MJPEG:
                 it->transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
                 break;
             default:
@@ -441,6 +459,28 @@ void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, con
         setDefaultAuth(login, password);
         saveParams();
     }
+}
+
+QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
+{
+    QString key = urlRoleParameter(role);
+    if (key.isEmpty())
+        return QString(); /*< This role url is not stored. */
+
+    return getProperty(key);
+}
+
+void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::ConnectionRole role)
+{
+    QString key = urlRoleParameter(role);
+    if (key.isEmpty())
+        return; /*< This role url is not stored. */
+
+    if (url == sourceUrl(role))
+        return;
+
+    setProperty(key, url);
+    saveParams();
 }
 
 int QnVirtualCameraResource::saveAsync()

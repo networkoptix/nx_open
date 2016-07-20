@@ -262,7 +262,7 @@ TEST_F(Account, general)
             system1.id,
             account3.email,
             api::SystemAccessRole::localAdmin);
-        ASSERT_EQ(result, api::ResultCode::forbidden);
+        ASSERT_EQ(result, api::ResultCode::ok);
     }
 }
 

@@ -80,12 +80,12 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
     m_auHeaderExists = m_sizeLength || m_indexLength || m_indexDeltaLength || m_CTSDeltaLength || m_DTSDeltaLength || m_randomAccessIndication || m_streamStateIndication;
     m_aacHelper.readConfig(m_config);
 
-    const auto context = new QnAvCodecMediaContext(CODEC_ID_AAC);
+    const auto context = new QnAvCodecMediaContext(AV_CODEC_ID_AAC);
     m_context = QnConstMediaContextPtr(context);
     const auto av = context->getAvCodecContext();
     av->channels = m_aacHelper.m_channels;
     av->sample_rate = m_aacHelper.m_sample_rate;
-    av->sample_fmt = AV_SAMPLE_FMT_S16;
+    av->sample_fmt = AV_SAMPLE_FMT_FLTP;
     av->time_base.num = 1;
     av->time_base.den = m_aacHelper.m_sample_rate;
     context->setExtradata((const quint8*) m_config.data(), m_config.size());
@@ -192,7 +192,7 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
             rtpTimeOffset = auIndex[i];
 
         QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, unitSize));
-        audioData->compressionType = CODEC_ID_AAC;
+        audioData->compressionType = AV_CODEC_ID_AAC;
         audioData->context = m_context;
         if (m_timeHelper)
             audioData->timestamp = m_timeHelper->getUsecTime(rtpTime+rtpTimeOffset, statistics, m_frequency);

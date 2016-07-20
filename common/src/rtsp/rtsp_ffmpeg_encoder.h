@@ -28,7 +28,7 @@ public:
     virtual quint8 getPayloadtype() override;
     virtual QString getName() override;
 
-    void setDstResolution(const QSize& dstVideSize, CodecID dstCodec);
+    void setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec);
 
     void setLiveMarker(int value);
     void setAdditionFlags(quint16 value);
@@ -37,7 +37,7 @@ public:
 private:
     bool m_gotLivePacket;
     QnConstMediaContextPtr m_contextSent;
-    QMap<CodecID, QnConstMediaContextPtr> m_generatedContexts;
+    QMap<AVCodecID, QnConstMediaContextPtr> m_generatedContexts;
     QnConstAbstractMediaDataPtr m_media;
     const char* m_curDataBuffer;
     QByteArray m_codecCtxData;
@@ -46,11 +46,11 @@ private:
     bool m_eofReached;
     bool m_isLastDataContext;
     QSize m_dstVideSize;
-    CodecID m_dstCodec;
+    AVCodecID m_dstCodec;
 
     std::unique_ptr<QnFfmpegVideoTranscoder> m_videoTranscoder;
 
-    QnConstMediaContextPtr getGeneratedContext(CodecID compressionType);
+    QnConstMediaContextPtr getGeneratedContext(AVCodecID compressionType);
     QnConstAbstractMediaDataPtr transcodeVideoPacket(QnConstAbstractMediaDataPtr media);
 };
 

@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_speech_synthesizer</artifactId>
     <packaging>pom</packaging>
-    <name>NX Speech Synthesizer Library</name>
+    <name>Nx Speech Synthesizer Library</name>
 
     <properties>
         <guid>${nx_speech_synthesizer.guid}</guid>
@@ -59,6 +59,42 @@
             <properties>
                 <buildLib>staticlib</buildLib>
             </properties>
+        </profile>
+
+        <profile>
+            <id>linux-isd-jaguar</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>isd</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.packages></rdep.packages>
+            </properties>            
+        </profile>
+
+        <profile>
+            <id>linux-isd_s2</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>isd_s2</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.packages></rdep.packages>
+            </properties>            
         </profile>
     </profiles>
 

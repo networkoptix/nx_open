@@ -609,7 +609,7 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnLoggedInCondition(this));
 
-    factory(QnActions::BrowseLocalFilesModeAction).
+    factory(QnActions::ResourcesModeAction).
         flags(Qn::Main).
         text(tr("Browse Local Files")).
         toggledText(tr("Show Welcome Screen")).
@@ -675,7 +675,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(QnActions::NewVideoWallAction).
             flags(Qn::Main).
-            requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
+            requiredGlobalPermission(Qn::GlobalAdminPermission).
             text(tr("Video Wall...")).
             pulledText(tr("New Video Wall...")).
             condition(new QnForbiddenInSafeModeCondition(this)).
@@ -778,6 +778,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Save Video Wall View")).
         shortcut(lit("Ctrl+S")).
         autoRepeat(false).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnSaveVideowallReviewActionCondition(true, this),
@@ -786,6 +787,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::DropOnVideoWallItemAction).
         flags(Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::LayoutTarget | Qn::VideoWallItemTarget | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Drop Resources")).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         condition(new QnForbiddenInSafeModeCondition(this));
 
     factory().
@@ -1107,7 +1109,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::AttachToVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Attach to Video Wall...")).
         autoRepeat(false).
         condition(new QnConjunctionActionCondition(
@@ -1768,6 +1770,12 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Export Multi-Video...")).
         requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission).
         condition(new QnExportActionCondition(false, this));
+
+    factory(QnActions::ExportTimelapseAction).
+        flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget).
+        text(tr("Export Rapid Review...")).
+        requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission).
+        condition(new QnExportActionCondition(true, this));
 
     factory(QnActions::ThumbnailsSearchAction).
         flags(Qn::Slider | Qn::Scene | Qn::SingleTarget).

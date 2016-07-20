@@ -22,8 +22,6 @@ public:
     explicit QnCameraScheduleWidget(QWidget *parent = 0);
     virtual ~QnCameraScheduleWidget();
 
-    virtual bool hasHeightForWidth() const override;
-
     void setChangesDisabled(bool);
     bool isChangesDisabled() const;
 

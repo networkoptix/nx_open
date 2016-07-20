@@ -30,7 +30,7 @@ void fillDummyAvCodecContext(AVCodecContext* context)
         interMatrixDummy[i] = 57 - i;
     }
 
-    context->codec_id = CODEC_ID_FFMETADATA;
+    context->codec_id = AV_CODEC_ID_FFMETADATA;
     context->codec_type = AVMEDIA_TYPE_VIDEO;
     QnFfmpegHelper::copyAvCodecContextField((void**) &context->rc_eq, kRcEqDummy,
         strlen(kRcEqDummy) + 1);
@@ -209,7 +209,7 @@ void testAvCodecContextFieldsEqual(
 TEST(QnMediaDataPacket, main)
 {
     auto avCodecMediaContext(
-        std::make_shared<QnAvCodecMediaContext>(CODEC_ID_NONE));
+        std::make_shared<QnAvCodecMediaContext>(AV_CODEC_ID_NONE));
     fillDummyAvCodecContext(avCodecMediaContext->getAvCodecContext());
 
     const QByteArray data = avCodecMediaContext->serialize();

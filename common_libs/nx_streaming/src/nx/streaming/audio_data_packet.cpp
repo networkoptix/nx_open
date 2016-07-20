@@ -38,21 +38,25 @@ QnCodecAudioFormat::QnCodecAudioFormat(const QnConstMediaContextPtr& c)
     switch(c->getSampleFmt())
     {
         case AV_SAMPLE_FMT_U8: ///< unsigned 8 bits
+        case AV_SAMPLE_FMT_U8P:
             setSampleSize(8);
             setSampleType(QnAudioFormat::UnSignedInt);
             break;
 
         case AV_SAMPLE_FMT_S16: ///< signed 16 bits
+        case AV_SAMPLE_FMT_S16P:
             setSampleSize(16);
             setSampleType(QnAudioFormat::SignedInt);
             break;
 
         case AV_SAMPLE_FMT_S32:///< signed 32 bits
+        case AV_SAMPLE_FMT_S32P:
             setSampleSize(32);
             setSampleType(QnAudioFormat::SignedInt);
             break;
 
         case AV_SAMPLE_FMT_FLT:
+        case AV_SAMPLE_FMT_FLTP:
             setSampleSize(32);
             setSampleType(QnAudioFormat::Float);
             break;

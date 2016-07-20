@@ -19,7 +19,7 @@ namespace {
     const auto kDefaultSampleSize = 16;
     const auto kDefaultChannelCount = 1;
     const auto kDefaultCodec = lit("audio/pcm");
-    const auto kEncoderCodecName = lit("libmp3lame");
+    const auto kEncoderCodecName = lit("mp2"); // libmp3lame
 
 }
 
@@ -27,7 +27,8 @@ QnDesktopAudioOnlyDataProvider::QnDesktopAudioOnlyDataProvider(QnResourcePtr ptr
     QnDesktopDataProviderBase(ptr),
     m_initialized(false),
     m_stopping(false),
-    m_encoderBuffer(nullptr)
+    m_encoderBuffer(nullptr),
+    m_inputFrame(av_frame_alloc())
 {
 }
 
@@ -36,6 +37,7 @@ QnDesktopAudioOnlyDataProvider::~QnDesktopAudioOnlyDataProvider()
     if (m_encoderBuffer)
         av_free(m_encoderBuffer);
     stop();
+    av_frame_free(&m_inputFrame);
 }
 
 void QnDesktopAudioOnlyDataProvider::pleaseStop()
@@ -178,7 +180,7 @@ bool QnDesktopAudioOnlyDataProvider::initAudioEncoder()
         format.sampleSize() / kBitsInByte;
 
     m_encoderCtxPtr.reset(new QnAvCodecMediaContext(encoderCtx));
-    if ( avcodec_open(encoderCtx, audioCodec) < 0)
+    if ( avcodec_open2(encoderCtx, audioCodec, nullptr) < 0)
     {
         m_lastErrorStr = tr("Could not initialize audio encoder.");
         return false;
@@ -270,7 +272,7 @@ void QnDesktopAudioOnlyDataProvider::processData()
         preprocessAudioBuffers(m_audioSourcesInfo);
         auto firstBuffer = m_audioSourcesInfo.at(0)->frameBuffer;
         analyzeSpectrum(firstBuffer);
-        auto packet = encodePacket(firstBuffer);
+        auto packet = encodePacket(firstBuffer, kFrameSizeInBytes);
         if(packet && dataCanBeAccepted())
             putData(packet);
     }
@@ -350,19 +352,32 @@ void QnDesktopAudioOnlyDataProvider::analyzeSpectrum(char *buffer)
     m_soundAnalyzer->processData((qint16*)buffer, getFrameSize());
 }
 
-QnWritableCompressedAudioDataPtr QnDesktopAudioOnlyDataProvider::encodePacket(char *buffer)
+QnWritableCompressedAudioDataPtr QnDesktopAudioOnlyDataProvider::encodePacket(char *buffer, int inputFrameSize)
 {
     QnWritableCompressedAudioDataPtr audio(nullptr);
     auto ctx = m_encoderCtxPtr->getAvCodecContext();
-    auto encoderBuffer = m_encoderBuffer;
 
+    /*
+    auto encoderBuffer = m_encoderBuffer;
     auto bytesEncoded = avcodec_encode_audio(
         ctx,
         encoderBuffer,
         FF_MIN_BUFFER_SIZE,
         (const short*) buffer);
+    */
 
-    if (bytesEncoded > 0)
+    m_inputFrame->data[0] = (quint8*)buffer;
+    m_inputFrame->nb_samples = ctx->frame_size;
+
+    AVPacket outputPacket;
+    outputPacket.data = m_encoderBuffer;
+    outputPacket.size = FF_MIN_BUFFER_SIZE;
+
+    int got_packet = 0;
+    if (avcodec_encode_audio2(ctx, &outputPacket, m_inputFrame, &got_packet) < 0)
+        return audio;
+
+    if (got_packet)
     {
         AVRational timeBaseNative;
         timeBaseNative.num = 1;
@@ -374,10 +389,10 @@ QnWritableCompressedAudioDataPtr QnDesktopAudioOnlyDataProvider::encodePacket(ch
 
         audio.reset(new QnWritableCompressedAudioData(
             CL_MEDIA_ALIGNMENT,
-            bytesEncoded,
+            outputPacket.size,
             m_encoderCtxPtr));
 
-        audio->m_data.write((char*)encoderBuffer, bytesEncoded);
+        audio->m_data.write((char*) m_encoderBuffer, outputPacket.size);
         audio->compressionType = ctx->codec_id;
         audio->timestamp = QDateTime::currentMSecsSinceEpoch();
 

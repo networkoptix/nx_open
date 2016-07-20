@@ -15,6 +15,8 @@
 extern "C"
 {
 #include <libavutil/error.h>
+#include <libswresample/swresample.h>
+#include <libavutil/opt.h>
 }
 
 QnFfmpegHelper::StaticHolder QnFfmpegHelper::StaticHolder::instance;
@@ -101,7 +103,7 @@ void QnFfmpegHelper::copyMediaContextFieldsToAvCodecContext(
     av->frame_size = media->getFrameSize();
 }
 
-AVCodec* QnFfmpegHelper::findAvCodec(CodecID codecId)
+AVCodec* QnFfmpegHelper::findAvCodec(AVCodecID codecId)
 {
     AVCodec* codec = avcodec_find_decoder(codecId);
 
@@ -111,7 +113,7 @@ AVCodec* QnFfmpegHelper::findAvCodec(CodecID codecId)
     return codec;
 }
 
-AVCodecContext* QnFfmpegHelper::createAvCodecContext(CodecID codecId)
+AVCodecContext* QnFfmpegHelper::createAvCodecContext(AVCodecID codecId)
 {
     AVCodec* codec = findAvCodec(codecId);
     NX_ASSERT(codec);
@@ -164,12 +166,12 @@ static AVCodecContext* deserializeCodecContextFromDepricatedFormat(const char* d
 {
     static const char* const kError = "ERROR deserializing MediaContext 2.5:";
     AVCodec* codec = nullptr;
-    AVCodecContext* ctx = avcodec_alloc_context();
+    AVCodecContext* ctx = nullptr;
 
     QByteArray tmpArray(data, dataLen);
     QBuffer buffer(&tmpArray);
     buffer.open(QIODevice::ReadOnly);
-    CodecID codecId = CODEC_ID_NONE;
+    AVCodecID codecId = AV_CODEC_ID_NONE;
     int bytesRead = (int) buffer.read((char*) &codecId, 4);
     if (bytesRead < 4)
     {
@@ -183,6 +185,7 @@ static AVCodecContext* deserializeCodecContextFromDepricatedFormat(const char* d
         qWarning() << kError << "Codec not found:" << codecId;
         goto error;
     }
+    ctx = avcodec_alloc_context3(codec);
 
     char objectType;
 
@@ -320,7 +323,6 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
     return reader->seek(absolutePos);
 }
 
-
 AVIOContext* QnFfmpegHelper::createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int ioBlockSize)
 {
     QString path = url;
@@ -377,20 +379,56 @@ void QnFfmpegHelper::closeFfmpegIOContext(AVIOContext* ioContext)
 {
     if (ioContext)
     {
+        avio_flush(ioContext);
+
         QIODevice* ioDevice = (QIODevice*) ioContext->opaque;
         delete ioDevice;
         ioContext->opaque = 0;
-        avio_close(ioContext);
+        //avio_close2(ioContext);
+
+        av_freep(&ioContext->buffer);
+        av_opt_free(ioContext);
+        av_free(ioContext);
     }
 }
 
 QString QnFfmpegHelper::getErrorStr(int errnum)
 {
-    static const int AV_ERROR_MAX_STRING_SIZE = 64; //< Taken from newer Ffmpeg impl.
     QByteArray result(AV_ERROR_MAX_STRING_SIZE, '\0');
     if (av_strerror(errnum, result.data(), result.size()) != 0)
         return QString(QString::fromLatin1("Unknown FFMPEG error with code %d")).arg(errnum);
     return QString::fromLatin1(result);
+}
+
+int QnFfmpegHelper::audioSampleSize(AVCodecContext* ctx)
+{
+    return ctx->channels * av_get_bytes_per_sample(ctx->sample_fmt);
+}
+
+QnFfmpegAudioHelper::QnFfmpegAudioHelper(AVCodecContext* decoderContex):
+    m_swr(swr_alloc())
+{
+    av_opt_set_int(m_swr, "in_channel_layout", decoderContex->channel_layout, 0);
+    av_opt_set_int(m_swr, "out_channel_layout", decoderContex->channel_layout, 0);
+    av_opt_set_int(m_swr, "in_sample_rate", decoderContex->sample_rate, 0);
+    av_opt_set_int(m_swr, "out_sample_rate", decoderContex->sample_rate, 0);
+    av_opt_set_sample_fmt(m_swr, "in_sample_fmt", decoderContex->sample_fmt, 0);
+    av_opt_set_sample_fmt(m_swr, "out_sample_fmt", av_get_packed_sample_fmt(decoderContex->sample_fmt), 0);
+    swr_init(m_swr);
+}
+
+QnFfmpegAudioHelper::~QnFfmpegAudioHelper()
+{
+    swr_free(&m_swr);
+}
+
+void QnFfmpegAudioHelper::copyAudioSamples(quint8* dst, const AVFrame* src)
+{
+    quint8* tmpData[4];
+    tmpData[0] = dst;
+    swr_convert(m_swr,
+        tmpData, src->nb_samples,
+        (const quint8**) src->data, src->nb_samples);
 }
 
 #endif // !defined(DISABLE_FFMPEG)

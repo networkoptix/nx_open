@@ -204,28 +204,30 @@ int QnSecurityCamResource::reservedSecondStreamFps() const {
 }
 
 #ifdef ENABLE_DATA_PROVIDERS
-QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(Qn::ConnectionRole role) {
+QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(Qn::ConnectionRole role)
+{
     if (role == Qn::CR_LiveVideo || role == Qn::CR_Default || role == Qn::CR_SecondaryLiveVideo)
     {
 
         if (role == Qn::CR_SecondaryLiveVideo && !hasDualStreaming2())
-            return 0;
+            return nullptr;
 
         QnAbstractStreamDataProvider* result = createLiveDataProvider();
         if (result)
             result->setRole(role);
         return result;
-
-    }
-    else if (role == Qn::CR_Archive) {
-        QnAbstractStreamDataProvider* result = createArchiveDataProvider();
-        if (result)
-            return result;
     }
 
+    NX_ASSERT(role == Qn::CR_Archive);
+    if (QnAbstractStreamDataProvider* result = createArchiveDataProvider())
+        return result;
+
+    /* The one and only QnDataProviderFactory now is the QnServerDataProviderFactory class
+     * which handles only Qn::CR_Archive role. */
     if (m_dpFactory)
         return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
-    return 0;
+
+    return nullptr;
 }
 #endif // ENABLE_DATA_PROVIDERS
 

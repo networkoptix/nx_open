@@ -7,12 +7,12 @@
 #include "decoders/audio/abstract_audio_decoder.h"
 
 #include "client/client_settings.h"
-
 #include <nx/streaming/config.h>
-
 #include <nx/audio/audiodevice.h>
 
-#define DEFAULT_AUDIO_FRAME_SIZE (AVCODEC_MAX_AUDIO_FRAME_SIZE * 2)
+namespace {
+static const int AVCODEC_MAX_AUDIO_FRAME_SIZE = 192 * 1000;
+}
 
 QnAudioStreamDisplay::QnAudioStreamDisplay(int bufferMs, int prebufferMs):
     m_bufferMs(bufferMs),
@@ -187,17 +187,25 @@ bool QnAudioStreamDisplay::initFormatConvertRule(QnAudioFormat format)
     return false; //< conversion rule not found
 }
 
-void QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
+bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
 {
     QnMutexLocker lock(&m_audioQueueMutex);
+
+    if (m_decoders[data->compressionType] == nullptr)
+    {
+        m_decoders[data->compressionType] = QnAudioDecoderFactory::createDecoder(data);
+        if (m_decoders[data->compressionType] == nullptr)
+            return false;
+    }
+
 
     m_lastAudioTime = data->timestamp;
     static const int MAX_BUFFER_LEN = 3000;
     if (data == 0 && !m_sound) //< No need to check audio device if data=0 and no audio device.
-        return;
+        return false;
 
-    // Sometimes distance between audio packets in a file is very large (may be more than 
-    // audio_device buffer); audio_device buffer is small, and we need to put the data from the 
+    // Sometimes distance between audio packets in a file is very large (may be more than
+    // audio_device buffer); audio_device buffer is small, and we need to put the data from the
     // packets. To do it, we call this function with null pointer.
 
     //cl_log.log("AUDIO_QUUE = ", m_audioQueue.size(), cl_logALWAYS);
@@ -213,7 +221,7 @@ void QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     {
         clearAudioBuffer();
         m_startBufferingTime = data->timestamp;
-        return;
+        return true;
     }
 
     if (data != 0)
@@ -223,7 +231,7 @@ void QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     }
 
 
-    if (bufferSize >= m_tooFewDataDetected * m_prebufferMs 
+    if (bufferSize >= m_tooFewDataDetected * m_prebufferMs
         || m_audioQueue.size() >= MAX_BUFFER_LEN)
     {
         playCurrentBuffer();
@@ -233,6 +241,8 @@ void QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     //qint64 usInBuffer = ms_from_size(audio.format, bytesInBuffer);
     //cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
     //cl_log.log("ms in ring buff = ", (int)ms_from_size(m_audio.format, m_ringbuff->bytesAvailable()), cl_logALWAYS);
+
+    return true;
 }
 
 bool QnAudioStreamDisplay::isPlaying() const
@@ -252,26 +262,13 @@ void QnAudioStreamDisplay::playCurrentBuffer()
 
         //data->dataProvider->setNeedSleep(true); //< need to introduce delay again
 
-#if 0
-        CLAudioData audio;
-        audio.codec = data->compressionType;
-        audio.inbuf = (unsigned char*)data->data.data();
-        audio.inbuf_len = data->data.size();
-        audio.outbuf = &m_decodedaudio;
-        audio.outbuf_len = 0;
-        audio.format = data->format;
-#endif // 0
 
-        if (data->compressionType == CODEC_ID_NONE)
+        if (data->compressionType == AV_CODEC_ID_NONE)
         {
             cl_log.log(QLatin1String("QnAudioStreamDisplay::putdata: unknown codec type..."),
                 cl_logERROR);
             return;
         }
-
-        if (m_decoders[data->compressionType] == 0)
-            m_decoders[data->compressionType] = QnAudioDecoderFactory::createDecoder(data);
-
         if (!m_decoders[data->compressionType]->decode(data, m_decodedAudioBuffer))
             return;
 
@@ -333,7 +330,7 @@ int QnAudioStreamDisplay::msInQueue() const
     //qint64 new_t = m_audioQueue.last()->timestamp;
     //qint64 old_t = m_audioQueue.first()->timestamp;
 
-    qint64 diff = 
+    qint64 diff =
         m_audioQueue.last()->duration
         + m_audioQueue.last()->timestamp
         - m_audioQueue.first()->timestamp;

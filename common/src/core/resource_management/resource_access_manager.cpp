@@ -31,58 +31,61 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         m_permissionsCache.clear();
     });
 
-    auto invalidateCacheForLayoutItems = [this](const QnResourcePtr& resource)
+    auto handleResourceAdded = [this]
+        (const QnResourcePtr& resource)
     {
-        if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
+        if (const auto& layout = resource.dynamicCast<QnLayoutResource>())
         {
-            for (const auto& item : layout->getItems())
-                invalidateResourceCacheInternal(item.resource.id);
-        }
-    };
-
-    auto handleResourceAdded = [this, invalidateCacheForLayoutItems] (const QnResourcePtr& resource)
-    {
-        if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
-        {
-            auto invalidateCacheForLayoutItem = [this](const QnLayoutResourcePtr &layout, const QnLayoutItemData &item)
-            {
-                Q_UNUSED(layout);
-                invalidateResourceCacheInternal(item.resource.id);
-            };
-
             /* To make layouts global */
             connect(layout, &QnResource::parentIdChanged,       this, &QnResourceAccessManager::invalidateResourceCache);
             connect(layout, &QnLayoutResource::lockedChanged,   this, &QnResourceAccessManager::invalidateResourceCache);
 
             /* Some cameras may become available to users - or vice versa. */
-            connect(layout, &QnResource::parentIdChanged,       this, invalidateCacheForLayoutItems);
-            connect(layout, &QnLayoutResource::itemAdded,       this, invalidateCacheForLayoutItem);
-            connect(layout, &QnLayoutResource::itemChanged,     this, invalidateCacheForLayoutItem);
-            connect(layout, &QnLayoutResource::itemRemoved,     this, invalidateCacheForLayoutItem);
+            connect(layout, &QnResource::parentIdChanged,       this, &QnResourceAccessManager::invalidateCacheForLayoutItems);
+            connect(layout, &QnLayoutResource::itemAdded,       this, &QnResourceAccessManager::invalidateCacheForLayoutItem);
+            connect(layout, &QnLayoutResource::itemChanged,     this, &QnResourceAccessManager::invalidateCacheForLayoutItem);
+            connect(layout, &QnLayoutResource::itemRemoved,     this, &QnResourceAccessManager::invalidateCacheForLayoutItem);
         }
 
-        if (const QnUserResourcePtr& user = resource.dynamicCast<QnUserResource>())
+        if (const auto& user = resource.dynamicCast<QnUserResource>())
         {
             connect(user, &QnUserResource::permissionsChanged,  this, &QnResourceAccessManager::invalidateResourceCache);
             connect(user, &QnUserResource::userGroupChanged,    this, &QnResourceAccessManager::invalidateResourceCache);
         }
 
         /* Storage can be added (and permissions requested) before the server. */
-        if (const QnMediaServerResourcePtr& server = resource.dynamicCast<QnMediaServerResource>())
+        if (const auto& server = resource.dynamicCast<QnMediaServerResource>())
         {
             for (auto storage : server->getStorages())
                 invalidateResourceCache(storage);
         }
+
+        if (const auto& videowall = resource.dynamicCast<QnVideoWallResource>())
+        {
+            connect(videowall, &QnVideoWallResource::itemAdded,   this, &QnResourceAccessManager::invalidateCacheForVideowallItem);
+            connect(videowall, &QnVideoWallResource::itemChanged, this, &QnResourceAccessManager::invalidateCacheForVideowallItem);
+            connect(videowall, &QnVideoWallResource::itemRemoved, this, &QnResourceAccessManager::invalidateCacheForVideowallItem);
+        }
     };
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, handleResourceAdded);
-
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this, invalidateCacheForLayoutItems](const QnResourcePtr& resource)
+    auto handleResourceRemoved = [this](const QnResourcePtr& resource)
     {
         disconnect(resource, nullptr, this, nullptr);
         invalidateResourceCache(resource);
         invalidateCacheForLayoutItems(resource);
-    });
+
+        if (auto videowall = resource.dynamicCast<QnVideoWallResource>())
+        {
+            for (const auto& item : videowall->items()->getItems())
+                invalidateCacheForVideowallItem(videowall, item);
+
+            for (const QnResourcePtr& desktopCam : qnResPool->getResourcesWithFlag(Qn::desktop_camera))
+                invalidateResourceCache(desktopCam);
+        }
+    };
+
+    connect(qnResPool, &QnResourcePool::resourceAdded,   this, handleResourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, handleResourceRemoved);
 
     for (const QnResourcePtr& resource : qnResPool->getResources())
         handleResourceAdded(resource);
@@ -93,8 +96,8 @@ ec2::ApiPredefinedRoleDataList QnResourceAccessManager::getPredefinedRoles()
     static ec2::ApiPredefinedRoleDataList kPredefinedRoles;
     if (kPredefinedRoles.empty())
     {
-        kPredefinedRoles.emplace_back(tr("Owner"), Qn::NoGlobalPermissions, true);
-        kPredefinedRoles.emplace_back(tr("Administrator"), Qn::GlobalAdminPermission);
+        kPredefinedRoles.emplace_back(tr("Owner"), Qn::GlobalAdminPermissionsSet, true);
+        kPredefinedRoles.emplace_back(tr("Administrator"), Qn::GlobalAdminPermissionsSet);
         kPredefinedRoles.emplace_back(tr("Advanced Viewer"), Qn::GlobalAdvancedViewerPermissionSet);
         kPredefinedRoles.emplace_back(tr("Viewer"), Qn::GlobalViewerPermissionSet);
         kPredefinedRoles.emplace_back(tr("Live Viewer"), Qn::GlobalLiveViewerPermissionSet);
@@ -162,6 +165,13 @@ void QnResourceAccessManager::addOrUpdateUserGroup(const ec2::ApiUserGroupData& 
         QnMutexLocker lk(&m_mutex);
         m_userGroups[userGroup.id] = userGroup;
     }
+
+    for (const auto& user : qnResPool->getResources<QnUserResource>())
+    {
+        if (user->userGroup() == userGroup.id)
+            invalidateResourceCache(user);
+    }
+
     emit userGroupAddedOrUpdated(userGroup);
 }
 
@@ -171,33 +181,49 @@ void QnResourceAccessManager::removeUserGroup(const QnUuid& groupId)
         QnMutexLocker lk(&m_mutex);
         m_userGroups.remove(groupId);
     }
+
+    for (const auto& user : qnResPool->getResources<QnUserResource>())
+    {
+        if (user->userGroup() == groupId)
+            invalidateResourceCache(user);
+    }
+
     emit userGroupRemoved(groupId);
 }
 
-QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userId) const
+QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userOrGroupId) const
 {
     QnMutexLocker lk(&m_mutex);
-    return m_accessibleResources[userId];
+    return m_accessibleResources[userOrGroupId];
 }
 
-void QnResourceAccessManager::setAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& resources)
+QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUserResourcePtr& user) const
+{
+    QnUuid keyId = user->userGroup();
+    if (keyId.isNull())
+        keyId = user->getId();
+
+    return accessibleResources(keyId);
+}
+
+void QnResourceAccessManager::setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources)
 {
     {
         QnMutexLocker lk(&m_mutex);
-        if (m_accessibleResources[userId] == resources)
+        if (m_accessibleResources[userOrGroupId] == resources)
             return;
 
-        m_accessibleResources[userId] = resources;
-
-        for (auto iter = m_permissionsCache.begin(); iter != m_permissionsCache.end();)
-        {
-            if (iter.key().userId == userId)
-                iter = m_permissionsCache.erase(iter);
-            else
-                ++iter;
-        }
+        m_accessibleResources[userOrGroupId] = resources;
     }
-    emit accessibleResourcesChanged(userId);
+
+    invalidateResourceCacheInternal(userOrGroupId);
+    for (const auto& user : qnResPool->getResources<QnUserResource>())
+    {
+        if (user->userGroup() == userOrGroupId)
+            invalidateResourceCache(user);
+    }
+
+    emit accessibleResourcesChanged(userOrGroupId);
 }
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr& user) const
@@ -219,8 +245,6 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
         return result;
     };
 
-
-    //NX_ASSERT(user, Q_FUNC_INFO, "We must not request permissions for absent user.");
     if (!user)
         return Qn::NoGlobalPermissions;
 
@@ -239,17 +263,23 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
             return *iter;
     }
 
-    Qn::GlobalPermissions result = user->getRawPermissions();
+    Qn::GlobalPermissions result;
     QnUuid groupId = user->userGroup();
 
-    if (user->isOwner() || result.testFlag(Qn::GlobalAdminPermission))
+    if (user->isOwner())
     {
-        result |= Qn::GlobalAdminPermissionsSet;
+        result = Qn::GlobalAdminPermissionsSet;
     }
     else if (!groupId.isNull())
     {
-        result |= userGroup(groupId).permissions;   /*< If the group does not exist, permissions will be empty. */
+        result = userGroup(groupId).permissions;    /*< If the group does not exist, permissions will be empty. */
         result &= ~Qn::GlobalAdminPermission;       /*< If user belongs to group, he cannot be an admin - by design. */
+    }
+    else
+    {
+        result = user->getRawPermissions();
+        if (result.testFlag(Qn::GlobalAdminPermission))
+            result |= Qn::GlobalAdminPermissionsSet;
     }
 
     result = filterDependentPermissions(result);
@@ -381,6 +411,27 @@ void QnResourceAccessManager::invalidateResourceCacheInternal(const QnUuid& reso
         else
             ++iter;
     }
+}
+
+void QnResourceAccessManager::invalidateCacheForLayoutItem(const QnLayoutResourcePtr& layout, const QnLayoutItemData& item)
+{
+    Q_UNUSED(layout);
+    invalidateResourceCacheInternal(item.resource.id);
+}
+
+void QnResourceAccessManager::invalidateCacheForLayoutItems(const QnResourcePtr& resource)
+{
+    if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        for (const auto& item : layout->getItems())
+            invalidateCacheForLayoutItem(layout, item);
+    }
+}
+
+void QnResourceAccessManager::invalidateCacheForVideowallItem(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item)
+{
+    invalidateResourceCacheInternal(item.layout);
+    invalidateCacheForLayoutItems(qnResPool->getResourceById(item.layout));
 }
 
 Qn::Permissions QnResourceAccessManager::calculatePermissions(const QnUserResourcePtr& user, const QnResourcePtr& target) const
@@ -642,45 +693,104 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
     if (!user || !resource)
         return false;
 
-    QSet<QnUuid> accessible = accessibleResources(user->getId());
-    QnUuid resourceId = resource->getId();
-    if (accessible.contains(resourceId))
+    /* Handling desktop cameras before all other checks. */
+    if (resource->hasFlags(Qn::desktop_camera))
+        return isAccessibleViaVideowall(user, resource);
+
+    QSet<QnUuid> accessible = accessibleResources(user);
+    if (accessible.contains(resource->getId()))
         return true;
 
     /* Web Pages behave totally like cameras. */
     bool isMediaResource = resource.dynamicCast<QnVirtualCameraResource>()
         || resource.dynamicCast<QnWebPageResource>();
 
-    auto requiredPermission = [this, resource, isMediaResource]()
-    {
-        if (isMediaResource)
-            return Qn::GlobalAccessAllMediaPermission;
+    bool isLayout = resource->hasFlags(Qn::layout);
+    NX_ASSERT(isMediaResource || isLayout);
 
-        if (resource.dynamicCast<QnVideoWallResource>())
-            return Qn::GlobalControlVideoWallPermission;
+    auto requiredPermission = isMediaResource
+        ? Qn::GlobalAccessAllMediaPermission
+        : Qn::GlobalAdminPermission;
 
-        /* Default value (e.g. for users, servers and layouts). */
-        return Qn::GlobalAdminPermission;
-    };
-
-    if (hasGlobalPermission(user, requiredPermission()))
+    if (hasGlobalPermission(user, requiredPermission))
         return true;
 
     /* Here we are checking if the camera exists on one of the shared layouts, available to given user. */
     if (isMediaResource)
-    {
+        return isAccessibleViaLayouts(accessible, resource, true);
 
-        QnLayoutResourceList layouts = qnResPool->getResources(accessible).filtered<QnLayoutResource>();
-        for (const QnLayoutResourcePtr& layout : layouts)
+    /* Check if layout belongs to videowall. */
+    if (isLayout)
+        return isAccessibleViaVideowall(user, resource);
+
+    return false;
+}
+
+bool QnResourceAccessManager::isAccessibleViaVideowall(const QnUserResourcePtr& user, const QnResourcePtr& resource) const
+{
+    NX_ASSERT(resource);
+
+    if (!user || !resource)
+        return false;
+
+    /* Desktop cameras available only by videowall control permission. */
+    if (!hasGlobalPermission(user, Qn::GlobalControlVideoWallPermission))
+        return false;
+
+    auto videowalls = qnResPool->getResources<QnVideoWallResource>();
+
+    /* Forbid access if there are no videowalls in the system. */
+    if (videowalls.isEmpty())
+        return false;
+
+    bool isLayout = resource->hasFlags(Qn::layout);
+    bool isCamera = resource->hasFlags(Qn::desktop_camera);
+
+    /* Check if it is our desktop camera */
+    if (isCamera && (resource->getName() == user->getName()))
+        return true;
+
+    /* Check if camera is placed to videowall. */
+    QSet<QnUuid> layoutIds;
+    for (const auto& videowall : videowalls)
+    {
+        for (const auto& item : videowall->items()->getItems())
         {
-            if (!layout->isShared())
+            if (item.layout.isNull())
                 continue;
 
-            for (const auto& item : layout->getItems())
-                if (item.resource.id == resourceId)
-                    return true;
+            layoutIds << item.layout;
         }
+    }
+    if (isLayout)
+        return layoutIds.contains(resource->getId());
 
+    if (isCamera)
+        return isAccessibleViaLayouts(layoutIds, resource, false);
+
+    NX_ASSERT(false);
+    return false;
+}
+
+bool QnResourceAccessManager::isAccessibleViaLayouts(const QSet<QnUuid>& layoutIds, const QnResourcePtr& resource, bool sharedOnly) const
+{
+    NX_ASSERT(resource);
+    if (!resource)
+        return false;
+
+    QnUuid resourceId = resource->getId();
+    QnLayoutResourceList layouts = qnResPool->getResources(layoutIds).filtered<QnLayoutResource>();
+    for (const QnLayoutResourcePtr& layout : layouts)
+    {
+        /* When checking existing videowall, layouts may be not shared. */
+        if (sharedOnly && !layout->isShared())
+            continue;
+
+        for (const auto& item : layout->getItems())
+        {
+            if (item.resource.id == resourceId)
+                return true;
+        }
     }
 
     return false;
@@ -690,19 +800,26 @@ bool QnResourceAccessManager::canCreateStorage(const QnUserResourcePtr& user, co
 {
     if (!user || qnCommon->isReadOnly())
         return false;
+
     auto server = qnResPool->getResourceById<QnMediaServerResource>(storageParentId);
     return hasPermission(user, server, Qn::SavePermission);
 }
 
 bool QnResourceAccessManager::canCreateLayout(const QnUserResourcePtr& user, const QnUuid& layoutParentId) const
 {
+    if (!user || qnCommon->isReadOnly())
+        return false;
+
     /* Everybody can create own layouts. */
     if (layoutParentId == user->getId())
         return true;
 
-    /* Only admins can create global layouts. */
+    /* Only admins and videowall-admins can create global layouts. */
     if (layoutParentId.isNull())
-        return hasGlobalPermission(user, Qn::GlobalAdminPermission);
+    {
+        return hasGlobalPermission(user, Qn::GlobalAdminPermission)
+            || hasGlobalPermission(user, Qn::GlobalControlVideoWallPermission);
+    }
 
     QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(layoutParentId);
     if (!owner)
@@ -714,6 +831,9 @@ bool QnResourceAccessManager::canCreateLayout(const QnUserResourcePtr& user, con
 
 bool QnResourceAccessManager::canCreateUser(const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions, bool isOwner) const
 {
+    if (!user || qnCommon->isReadOnly())
+        return false;
+
     /* Nobody can create owners. */
     if (isOwner)
         return false;
@@ -728,12 +848,18 @@ bool QnResourceAccessManager::canCreateUser(const QnUserResourcePtr& user, Qn::G
 
 bool QnResourceAccessManager::canCreateVideoWall(const QnUserResourcePtr& user) const
 {
+    if (!user || qnCommon->isReadOnly())
+        return false;
+
     /* Only admins can create new videowalls (and attach new screens). */
     return hasGlobalPermission(user, Qn::GlobalAdminPermission);
 }
 
 bool QnResourceAccessManager::canCreateWebPage(const QnUserResourcePtr& user) const
 {
+    if (!user || qnCommon->isReadOnly())
+        return false;
+
     /* Only admins can add new web pages. */
     return hasGlobalPermission(user, Qn::GlobalAdminPermission);
 }
@@ -800,24 +926,25 @@ bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, c
 
 bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnResourcePtr& target, const ec2::ApiVideowallData& update) const
 {
+    if (!user || qnCommon->isReadOnly())
+        return false;
+
     auto videoWallResource = target.dynamicCast<QnVideoWallResource>();
     NX_ASSERT(videoWallResource);
 
-    auto hasItemsChange = [&videoWallResource, update]
+    auto hasItemsChange = [items = videoWallResource->items()->getItems(), update]
     {
-        auto items = videoWallResource->items()->getItems();
-
         /* Quick check */
         if (items.size() != update.items.size())
-            return false;
+            return true;
 
         for (auto updated : update.items)
         {
             if (!items.contains(updated.guid))
-                return false;
+                return true;
         }
 
-        return true;
+        return false;
     };
 
     /* Only admin can add and remove videowall items. */

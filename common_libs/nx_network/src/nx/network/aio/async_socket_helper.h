@@ -288,6 +288,7 @@ public:
         std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler )
     {
+        NX_CRITICAL(timeoutMs.count(), "Timer with timeout 0 does not make any sense");
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
 

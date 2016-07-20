@@ -13,6 +13,7 @@ class QnClientMessageProcessor : public QnCommonMessageProcessor
     Q_OBJECT
 
     typedef QnCommonMessageProcessor base_type;
+
 public:
     QnClientMessageProcessor();
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
@@ -20,6 +21,11 @@ public:
     void setHoldConnection(bool holdConnection);
 
     QnConnectionState connectionState() const;
+
+    void setConnectionState(QnConnectionState state);
+
+signals:
+    void connectionStateChanged();
 
 protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;

@@ -36,6 +36,7 @@ class QnAbstractRenderer;
 
 class QnWorkbench;
 class QnWorkbenchItem;
+
 class QnWorkbenchLayout;
 class QnResourceWidget;
 class QnResourceDisplay;
@@ -322,6 +323,9 @@ public:
 
     QGLWidget *newGlWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) const;
 
+    QSet<QnWorkbenchItem*> draggedItems() const;
+    void setDraggedItems(const QSet<QnWorkbenchItem*>& value);
+
 public slots:
     void fitInView(bool animate = true);
 
@@ -451,7 +455,6 @@ private:
     /** Zoomed state toggle. */
     QnToggle *m_zoomedToggle;
 
-
     /* Internal state. */
 
     QList<QnResourceWidget *> m_widgets;
@@ -490,6 +493,8 @@ private:
 
     /** Whether we are changing layout now. */
     bool m_inChangeLayout;
+
+    QSet<QnWorkbenchItem*> m_draggedItems;
 
 
     /* Instruments. */

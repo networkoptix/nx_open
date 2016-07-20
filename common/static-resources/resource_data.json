@@ -21,6 +21,12 @@
 
         {
             "keys": [
+                "ActiveCam|*"
+            ],
+            "forceONVIF": true
+        },
+        {
+            "keys": [
                 "DW|*","ISD|*"
             ],
             "possibleDefaultCredentials": [
@@ -29,18 +35,105 @@
                     "password": "admin"
                 }
             ]
-        },       
+        },
+        {
+            "keys": [
+                "FLIR|AX8"
+            ],
+            "alarmsCount" : 5,
+            "ioSettings": [
+                {
+                    "id": "1",
+                    "inputName": "FLIR-INPUT-1",
+                    "portType": "Input",
+                    "supportedPortTypes":"Input"
+                },
+                {
+                    "id": "101",
+                    "outputName": "FLIR-OUTPUT-1",
+                    "portType": "Output",
+                    "supportedPortTypes": "Output"
+                },
+                {
+                    "id": "alarm_spot_1",
+                    "inputName": "Spot1",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_1",
+                    "inputName": "Box1",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_2",
+                    "inputName": "Box2",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_3",
+                    "inputName": "Box3",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_4",
+                    "inputName": "Box4",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_5",
+                    "inputName": "Box5",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_6",
+                    "inputName": "Box6",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                }
+            ]
+        },
+        {
+            "keys": [
+                "FLIR|A310"
+            ],
+            "ioSettings": [
+                {
+                    "id": "1",
+                    "inputName": "FLIR-INPUT-1",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "2",
+                    "inputName": "FLIR-INPUT-2",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "101",
+                    "outputName": "FLIR-OUTPUT-1",
+                    "portType": "Output",
+                    "supportedPortTypes": "Output"
+                },
+                {
+                    "id": "102",
+                    "outputName": "FLIR-OUTPUT-2",
+                    "portType": "Output",
+                    "supportedPortTypes": "Output"
+                }
+            ]
+        },
         {
             "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
             "advancedParametersTemplate": "nx-cube.xml"
-        },
-		{
-            "keys": [
-                "ActiveCam|*"
-            ],
-            "forceONVIF": true
         },
         {
             "keys": [
@@ -67,6 +160,19 @@
             ],
             "nxDeviceName": "Nx-Dome",
             "nxDeviceModel": "Nx-Dome-05924"
+        },
+        {
+            "keys": [
+                "Axis|1031W"
+            ],
+            "advancedParametersOverload":
+            {
+                "root.Audio.A0.InputGain":
+                {
+                    "range":"Mute,Auto,-12,-9,-6,-3,-1.5,0,1.5,3,6,9,12,15,18,21,24,27,30,34",
+                    "internalRange":"mute,auto,-12,-9,-6,-3,-1.5,0,1.5,3,6,9,12,15,18,21,24,27,30,34"
+                }
+            }
         },
         {
             "keys": [
@@ -909,7 +1015,7 @@
                 "fromCamera": {
                     "x": {
                         "extrapolationMode": "PeriodicExtrapolation",
-                        "device":  [   1,  -1],
+                        "device":  [   -1,  1],
                         "logical": [-180, 180]
                     },
                     "y": {
@@ -1049,17 +1155,182 @@
             ],
             "forcedOnvifParams": {
                 "videoEncoders": [
-                    "ve0", "ve8",
-                    "ve1", "ve9",
-                    "ve2", "ve10",
-                    "ve3", "ve11",
-                    "ve4", "ve12",
-                    "ve5", "ve13",
-                    "ve6", "ve14",
-                    "ve7", "ve15"
+                    "ve0,ve8",
+                    "ve1,ve9",
+                    "ve2,ve10",
+                    "ve3,ve11",
+                    "ve4,ve12",
+                    "ve5,ve13",
+                    "ve6,ve14",
+                    "ve7,ve15"
                 ]
-            }
-        }
+            },
+			"trustToVideoSourceSize": false,
+			"useExistingOnvifProfies": true,
+			"controlFpsViaEncodingInterval": true,
+			"forcedSecondaryStreamResolution": "352x288",
+			"fpsBase": 25
+        },
+		{
+			"keys": [
+				"Pelco|IMM12018",
+				"Pelco|IMM12027",
+				"Pelco|IMM12036"
+			],
+			"onvifVendorSubtype": "PelcoOptera"
+		},
+        {
+            "keys": [
+                "PelcoOptera|IMM12018",
+                "PelcoOptera|IMM12027",
+                "PelcoOptera|IMM12036"
+            ],
+            "doNotConfigureCamera": false 
+        },
+		{
+			"keys": [
+				"PelcoOptera|IMM12018","Pelco|IMM12018"
+			],
+			"multiresourceVideoChannelMapping": [
+				{
+					"resourceChannel": 2,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [2]
+						}
+					]
+				},
+				{
+					"resourceChannel": 3,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [1]
+						}
+					]
+				},
+				{
+					"resourceChannel": 4,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [0]
+						}
+					]
+				}
+			],
+			"shouldAppearAsSingleChannel": true,
+			"doNotAddVendorToDeviceName": true,
+			"videoLayout": "width=3;height=1;sensors=0,1,2"
+		},
+		{
+			"keys": [
+				"PelcoOptera|IMM12027","Pelco|IMM12027"
+			],
+			"multiresourceVideoChannelMapping": [
+				{
+					"resourceChannel": 2,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [2]
+						}
+					]
+				},
+				{
+					"resourceChannel": 3,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [1]
+						}
+					]
+				},
+				{
+					"resourceChannel": 4,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [0]
+						}
+					]
+				},
+				{
+					"resourceChannel": 5,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [3]
+						}
+					]
+				}
+			],
+			"shouldAppearAsSingleChannel": true,
+			"doNotAddVendorToDeviceName": true,
+			"videoLayout": "width=3;height=2;sensors=0,1,2,4,5,3",
+			"defaultAR":"4x3"
+		},
+		{
+			"keys": [
+				"PelcoOptera|IMM12036","Pelco|IMM12036"
+			],
+			"multiresourceVideoChannelMapping": [
+				{
+					"resourceChannel": 2,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [3]
+						}
+					]
+				},
+				{
+					"resourceChannel": 3,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [2]
+						}
+					]
+				},
+				{
+					"resourceChannel": 4,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [1]
+						}
+					]
+				},
+				{
+					"resourceChannel": 6,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [0]
+						}
+					]
+				}
+			],
+			"shouldAppearAsSingleChannel": true,
+			"doNotAddVendorToDeviceName": true,
+			"videoLayout": "width=4;height=1;sensors=0,1,2,3"
+		},
+		{
+			"keys": [
+				"ACTI|A41", "ACTI|A81"
+			],
+			"forceONVIF": true,
+			"defaultCredentials" : "admin:123456"
+		},
+		{
+			"keys": [
+				"DW|*|A*"
+			],
+			"showUrl": true,
+			"urlLocalePath": "cgi-bin/index.cgi"
+		}
     ]
 }
 

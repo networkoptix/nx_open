@@ -135,6 +135,8 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
         qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting non empty rtsl url.";
         return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), lit("config/rtspurl.cgi?profileid=%1").arg(m_profile.url) );
     }
+
+    res->updateSourceUrl(m_profile.url, getRole());
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(m_profile.url).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
     if (m_profile.codec.contains("264"))
     {
@@ -181,7 +183,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
     else if (m_profile.codec == "MJPEG")
         return getNextDataMJPEG();
     else
-        return getNextDataMPEG(CODEC_ID_MPEG4);
+        return getNextDataMPEG(AV_CODEC_ID_MPEG4);
 }
 
 // =====================================================================================
@@ -305,7 +307,7 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, c
     return result;
 }
 
-QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
+QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(AVCodecID ci)
 {
     char headerBuffer[sizeof(ACS_VideoHeader)];
     uint gotInBuffer = 0;
@@ -407,7 +409,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
     if (contentLen > 2 && !(curPtr[-2] == (char)0xff && curPtr[-1] == (char)0xd9))
         videoData->m_data.finishWriting(-1);
 
-    videoData->compressionType = CODEC_ID_MJPEG;
+    videoData->compressionType = AV_CODEC_ID_MJPEG;
     videoData->width = m_resolution.width();
     videoData->height = m_resolution.height();
     videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;

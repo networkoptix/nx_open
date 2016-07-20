@@ -37,9 +37,14 @@ public:
     virtual void pleaseStop() override;
     virtual bool secondaryResolutionIsLarge() const override;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
+
+    void setMustNotConfigureResource(bool mustNotConfigureResource);
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
+    virtual void preStreamConfigureHook() {}
+    virtual void postStreamConfigureHook() {}
+
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
     virtual void setCameraControlDisabled(bool value) override;
@@ -99,6 +104,7 @@ private:
     Qn::StreamQuality m_cachedQuality;
     QElapsedTimer m_cachedTimer;
     Qn::StreamQuality m_cachedSecondaryQuality;
+    bool m_mustNotConfigureResource;
 };
 
 #endif //ENABLE_ONVIF

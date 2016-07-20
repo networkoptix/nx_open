@@ -32,7 +32,7 @@ public:
     virtual ~QnAbstractVideoDecoderPlugin() {}
 
     //!Returns list of MIME types of supported formats
-    virtual QList<CodecID> supportedCodecTypes() const = 0;
+    virtual QList<AVCodecID> supportedCodecTypes() const = 0;
     //!Returns true, if decoder CAN offer hardware acceleration. It does not mean it can decode every stream with hw acceleration
     /*!
         \note Actually, ability of hardware acceleration depends on stream parameters: resolution, bitrate, profile/level etc.
@@ -48,7 +48,7 @@ public:
         \note QnAbstractVideoDecoder::decode method of created object MUST be called from same thread that called this method
     */
     virtual QnAbstractVideoDecoder* create(
-            CodecID codecID,
+            AVCodecID codecID,
             const QnCompressedVideoDataPtr& data,
             const QGLContext* const glContext,
             int currentSWDecoderCount ) const = 0;

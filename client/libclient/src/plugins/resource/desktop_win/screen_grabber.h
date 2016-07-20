@@ -50,8 +50,8 @@ public:
     CaptureInfoPtr captureFrame();
     bool capturedDataToFrame(CaptureInfoPtr captureInfo, AVFrame* frame);
 
-    PixelFormat format() const { return PIX_FMT_YUV420P; }
-    //PixelFormat format() const { return PIX_FMT_BGRA; }
+    AVPixelFormat format() const { return AV_PIX_FMT_YUV420P; }
+    //AVPixelFormat format() const { return AV_PIX_FMT_BGRA; }
     int width() const;
     int height() const;
     qint64 currentTime() const;
@@ -68,7 +68,7 @@ private:
     Q_INVOKABLE void captureFrameOpenGL(CaptureInfoPtr data);
     void drawCursor(quint32* data, int dataStride, int height, int leftOffset, int topOffset, bool flip) const;
     void drawLogo(quint8* data, int width, int height);
-    void allocateTmpFrame(int width, int height, PixelFormat format);
+    void allocateTmpFrame(int width, int height, AVPixelFormat format);
 
 private:
     QPixmap m_logo;

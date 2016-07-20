@@ -32,7 +32,7 @@ public:
 
     QnYv12ToRgbShaderProgram *yv12ToRgb;
     QnYv12ToRgbWithGammaShaderProgram *yv12ToRgbWithGamma;
-    
+
     QnFisheyeRectilinearProgram* fisheyePtzProgram;
     QnFisheyeRectilinearProgram* fisheyePtzGammaProgram;
 
@@ -54,7 +54,7 @@ public:
 class QnGLRenderer : protected QnGlFunctions, protected QOpenGLFunctions
 {
 public:
-    static bool isPixelFormatSupported(PixelFormat pixfmt);
+    static bool isPixelFormatSupported(AVPixelFormat pixfmt);
 
     QnGLRenderer( const QGLContext* context, const DecodedPictureToOpenGLUploader& decodedPictureProvider );
     ~QnGLRenderer();
@@ -63,14 +63,14 @@ public:
         Called with corresponding QGLContext is surely alive
     */
     void beforeDestroy();
-    
+
     Qn::RenderStatus paint(const QRectF &sourceRect, const QRectF &targetRect);
 
     bool isLowQualityImage() const;
-    
+
     qint64 lastDisplayedTime() const;
 
-    QnMetaDataV1Ptr lastFrameMetadata() const; 
+    QnMetaDataV1Ptr lastFrameMetadata() const;
     bool isHardwareDecoderUsed() const;
 
     bool isYV12ToRgbShaderUsed() const;
@@ -81,14 +81,14 @@ public:
     void setFisheyeController(QnFisheyePtzController* controller);
     bool isFisheyeEnabled() const;
     ImageCorrectionParams getImageCorrectionParams() const { return m_imgCorrectParam; }
-    
+
     void setPaused(bool value) { m_paused = value; }
     bool isPaused() const { return m_paused; }
     void setScreenshotInterface(ScreenshotInterface* value);
     void setDisplayedRect(const QRectF& rect);
 
     void setHistogramConsumer(QnHistogramConsumer* value);
-    
+
 private:
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
     ImageCorrectionResult calcImageCorrection();
@@ -114,7 +114,7 @@ private:
     QnHistogramConsumer* m_histogramConsumer;
     QnFisheyePtzController* m_fisheyeController;
     QRectF m_displayedRect;
-    
+
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen
     void drawVideoTextureDirectly(

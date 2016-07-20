@@ -11,13 +11,13 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mediaserver_core</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Media Server Library</name>
+    <name>Nx Witness Media Server Library</name>
 
     <properties>
         <guid>${mediaserver_core.guid}</guid>
         <product.title>${mediaserver.name}</product.title>
         <product.display.title>${mediaserver.display.name}</product.display.title>
-        <template>app</template>
+        <template>lib</template>
 
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <global.libs>-lcommon -lappserver2 -ludt -lnx_email -lnx_streaming -lnx_network -lnx_speech_synthesizer -lnx_fusion -lnx_utils</global.libs>

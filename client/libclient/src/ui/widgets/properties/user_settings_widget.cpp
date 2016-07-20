@@ -77,7 +77,10 @@ bool QnUserSettingsWidget::hasChanges() const
         if (m_model->user()->getName() != ui->loginInputField->text().trimmed())
             return true;
 
-    if (permissions.testFlag(Qn::WritePasswordPermission) && !ui->passwordInputField->text().isEmpty()) //TODO: #GDM #access implement correct check
+    if (permissions.testFlag(Qn::WritePasswordPermission)
+        && !ui->passwordInputField->text().isEmpty()
+        && !m_model->user()->checkPassword(ui->passwordInputField->text())
+        )
         return true;
 
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
@@ -209,17 +212,25 @@ void QnUserSettingsWidget::setupInputFields()
         return Qn::kValidResult;
     });
 
-    connect(ui->loginInputField, &QnInputField::editingFinished, this, [this]()
-    {
-        /* Check if we must update password for the other user. */
-        if (m_model->mode() == QnUserSettingsModel::OtherSettings && m_model->user())
+    auto updatePasswordValidator = [this]
         {
-            bool mustUpdatePassword = ui->loginInputField->text() != m_model->user()->getName();
+            /* Check if we must update password for the other user. */
+            if (m_model->mode() == QnUserSettingsModel::OtherSettings && m_model->user())
+            {
+                bool mustUpdatePassword = ui->loginInputField->text() != m_model->user()->getName();
 
-            ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(
-                !mustUpdatePassword, tr("User has been renamed. Password must be updated.")), true);
-        }
-    });
+                ui->passwordInputField->setValidator(
+                    Qn::defaultPasswordValidator(
+                        !mustUpdatePassword,
+                        tr("User has been renamed. Password must be updated.")
+                    ),
+                    false);
+            }
+        };
+
+    connect(ui->loginInputField, &QnInputField::textChanged,     this, updatePasswordValidator);
+    connect(ui->loginInputField, &QnInputField::editingFinished, this, updatePasswordValidator);
+    connect(ui->loginInputField, &QnInputField::editingFinished, ui->passwordInputField, &QnInputField::validate);
 
     ui->nameInputField->setTitle(tr("Name"));
 
