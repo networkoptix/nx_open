@@ -22,6 +22,7 @@ class QnSignHelper
     Q_DECLARE_TR_FUNCTIONS(QnSignHelper)
 public:
     QnSignHelper();
+    ~QnSignHelper();
     void setLogo(QPixmap logo);
     QnCompressedVideoDataPtr createSignatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame);
 
@@ -38,7 +39,7 @@ public:
     void draw(QImage& img, bool drawText);
     void draw(QPainter& painter, const QSize& paintSize, bool drawText);
     //void drawTextLine(QPainter& painter, const QSize& paintSize,int lineNum, const QString& text);
-    
+
     //TODO: #Elric remove magic const from the function
     QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize);
     static void updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size);
@@ -81,6 +82,7 @@ private:
     QString m_versionStr;
     QString m_hwIdStr;
     QString m_licensedToStr;
+    AVPacket* m_outPacket;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

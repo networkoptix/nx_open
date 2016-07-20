@@ -226,6 +226,7 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
         quint8* m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
         //int encoded = avcodec_encode_video(videoEncoderCodecCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, outFrame.data());
         AVPacket outPacket;
+        av_init_packet(&outPacket);
         outPacket.data = m_videoEncodingBuffer;
         outPacket.size = MAX_VIDEO_FRAME;
         int got_packet = 0;

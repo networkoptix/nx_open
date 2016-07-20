@@ -370,6 +370,7 @@ QnWritableCompressedAudioDataPtr QnDesktopAudioOnlyDataProvider::encodePacket(ch
     m_inputFrame->nb_samples = ctx->frame_size;
 
     AVPacket outputPacket;
+    av_init_packet(&outputPacket);
     outputPacket.data = m_encoderBuffer;
     outputPacket.size = FF_MIN_BUFFER_SIZE;
 

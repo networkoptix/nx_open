@@ -6,6 +6,7 @@
 #ifndef LINUX_PROCESS_INFO_H
 #define LINUX_PROCESS_INFO_H
 
+#include <sys/types.h>
 
 namespace ProcessState
 {

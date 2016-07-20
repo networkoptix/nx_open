@@ -34,5 +34,5 @@ TEST(PcpCommunication, Simple)
     const MapMessage msg = { makeRandomNonce(), 0, 80, 8877, QByteArray(16, 0) };
 
     sender.send(head, msg);
-    QThread::sleep(10);
+    QThread::sleep(1);
 }
