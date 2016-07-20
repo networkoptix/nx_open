@@ -27,7 +27,7 @@
 <div class="panel-body text-center" ng-if="stepIs('systemName')">
     <h2>Give your System a name</h2>
     <p class="master-description">
-        System name helps you identify or find your system.
+        It'll help you identify or find your system.
     </p>
     <form class="master-controls" name="forms.systemNameForm" novalidate>
         <div class="form-group" validate-field>
@@ -92,14 +92,11 @@
 
     <h2>{{settings.presetCloudEmail}}</h2>
 
-    <div class="vertical-bottom">
-        <p>
-            <a href="" ng-click="next('cloudLogin')">Connect to another account</a>
-        </p>
-        <p>
-            <a href="" ng-click="skip()">Skip this step for now</a>
-        </p>
-    </div>
+    <p class="vertical-bottom">
+        <a href="" ng-click="next('cloudLogin')">Connect to another account</a>
+        <br>
+        <a href="" ng-click="skip()">Skip this step for now</a>
+    </p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
@@ -206,16 +203,16 @@
     <h2>System is ready to use</h2>
     <p>Login</p>
     <h4>{{settings.cloudEmail}}</h4>
-    <p>Sharing and account settings:</p>
+    <p>Sharing and account settings</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}" ng-click="openLink($event)">{{portalShortLink}}</a></h4>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
     <div class="master-success"><span class="glyphicon glyphicon-ok"></span></div>
     <h2>System is ready to use</h2>
-    <p>Server address:</p>
+    <p>Server address</p>
     <h4>{{serverAddress}}</h4>
-    <p>Administrator login:</p>
+    <p>Administrator login</p>
     <h4>{{settings.localLogin}}</h4>
 </div>
 
