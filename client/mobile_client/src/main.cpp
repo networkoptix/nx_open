@@ -101,7 +101,7 @@ int runUi(QGuiApplication *application) {
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
     if (mainWindow)
     {
-        if (context.liteMode())
+        if (context.liteMode() && !conf.disableFullScreen)
         {
             mainWindow->showFullScreen();
         }
