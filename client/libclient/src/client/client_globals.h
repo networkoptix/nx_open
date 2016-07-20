@@ -278,6 +278,18 @@ namespace Qn
         Thumbnails      /**< thumbnails pane    */
     };
 
+    /**
+     * Flags for messages that should be displayed to user only once
+     * (usually with 'Do not show anymore' checkbox).
+     */
+    enum class ShowOnceMessage
+    {
+        PtzPresetInUse  = 0x001
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ShowOnceMessage)
+    Q_DECLARE_FLAGS(ShowOnceMessages, ShowOnceMessage)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(ShowOnceMessages)
+
 } // namespace Qn
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
@@ -291,7 +303,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::LightModeFlags),
+    (Qn::LightModeFlags)(Qn::ShowOnceMessages),
     (metatype)(numeric)
     )
 
