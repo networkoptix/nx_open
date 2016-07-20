@@ -36,7 +36,7 @@ public:
         QPainter painter(this);
         QStyleOption option;
         option.initFrom(this);
-        option.rect = contentsRect();
+        option.rect = this->contentsRect();
         if (!customPaint(&painter, &option, this))
             Base::paintEvent(event);
     }
