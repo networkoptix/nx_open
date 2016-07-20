@@ -195,8 +195,6 @@ angular.module('webadminApp')
                         isOwner:isOwner,
                         name:result.data.reply.name
                     };
-                },function(error){
-                    deferred.reject(error);
                 });
             },
             getScripts:function(){
