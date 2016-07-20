@@ -4,4 +4,4 @@ deb-src http://ftp.de.debian.org/debian/ wheezy main non-free contrib
 deb http://security.debian.org/ wheezy/updates main contrib non-free
 deb-src http://security.debian.org/ wheezy/updates main contrib non-free
 deb http://downloads.hdwitness.com/nx1/default /
-deb http://ftp.debian.org/debian experimental main
+deb http://ftp.debian.org/debian sid main

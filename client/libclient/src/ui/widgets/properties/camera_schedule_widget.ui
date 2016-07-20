@@ -111,10 +111,19 @@
           <property name="fieldGrowthPolicy">
            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
           </property>
+          <property name="labelAlignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="verticalSpacing">
+           <number>8</number>
+          </property>
           <item row="0" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="fpsLabel">
             <property name="text">
              <string>FPS</string>
+            </property>
+            <property name="buddy">
+             <cstring>fpsSpinBox</cstring>
             </property>
            </widget>
           </item>
@@ -132,9 +141,12 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
+           <widget class="QLabel" name="qualityLabel">
             <property name="text">
              <string>Quality</string>
+            </property>
+            <property name="buddy">
+             <cstring>qualityComboBox</cstring>
             </property>
            </widget>
           </item>
@@ -152,8 +164,8 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>0</width>
-              <height>0</height>
+              <width>1</width>
+              <height>1</height>
              </size>
             </property>
            </spacer>
@@ -168,7 +180,10 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <property name="topMargin">
+            <number>2</number>
+           </property>
            <item>
             <layout class="QGridLayout" name="gridLayout" rowstretch="1,0" columnstretch="1,1,1,1">
              <property name="leftMargin">
@@ -183,7 +198,7 @@
              <item row="0" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_5">
                <item>
-                <widget class="QnCheckedButton" name="recordAlwaysButton">
+                <widget class="QnSelectableButton" name="recordAlwaysButton">
                  <property name="minimumSize">
                   <size>
                    <width>48</width>
@@ -227,7 +242,7 @@
              <item row="0" column="1">
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
-                <widget class="QnCheckedButton" name="recordMotionButton">
+                <widget class="QnSelectableButton" name="recordMotionButton">
                  <property name="minimumSize">
                   <size>
                    <width>48</width>
@@ -265,7 +280,7 @@
              <item row="0" column="2">
               <layout class="QHBoxLayout" name="horizontalLayout_7">
                <item>
-                <widget class="QnCheckedButton" name="recordMotionPlusLQButton">
+                <widget class="QnSelectableButton" name="recordMotionPlusLQButton">
                  <property name="minimumSize">
                   <size>
                    <width>48</width>
@@ -303,7 +318,7 @@
              <item row="0" column="3">
               <layout class="QHBoxLayout" name="horizontalLayout_8">
                <item>
-                <widget class="QnCheckedButton" name="noRecordButton">
+                <widget class="QnSelectableButton" name="noRecordButton">
                  <property name="minimumSize">
                   <size>
                    <width>48</width>
@@ -339,7 +354,7 @@
               </layout>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="label_4">
+              <widget class="QLabel" name="labelAlways">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -364,6 +379,9 @@
                <property name="wordWrap">
                 <bool>true</bool>
                </property>
+               <property name="buddy">
+                <cstring>recordAlwaysButton</cstring>
+               </property>
               </widget>
              </item>
              <item row="1" column="1">
@@ -382,6 +400,9 @@
                </property>
                <property name="wordWrap">
                 <bool>true</bool>
+               </property>
+               <property name="buddy">
+                <cstring>recordMotionButton</cstring>
                </property>
               </widget>
              </item>
@@ -402,10 +423,13 @@
                <property name="wordWrap">
                 <bool>true</bool>
                </property>
+               <property name="buddy">
+                <cstring>recordMotionPlusLQButton</cstring>
+               </property>
               </widget>
              </item>
              <item row="1" column="3">
-              <widget class="QLabel" name="label_8">
+              <widget class="QLabel" name="labelNoRecord">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -421,6 +445,9 @@
                <property name="wordWrap">
                 <bool>true</bool>
                </property>
+               <property name="buddy">
+                <cstring>noRecordButton</cstring>
+               </property>
               </widget>
              </item>
             </layout>
@@ -432,8 +459,8 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>0</width>
-               <height>0</height>
+               <width>1</width>
+               <height>1</height>
               </size>
              </property>
             </spacer>
@@ -452,10 +479,7 @@
          <height>100</height>
         </size>
        </property>
-       <layout class="QFormLayout" name="formLayout_4">
-        <property name="formAlignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-        </property>
+       <layout class="QFormLayout" name="formLayout_2">
         <property name="topMargin">
          <number>6</number>
         </property>
@@ -506,8 +530,8 @@
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>0</width>
-            <height>0</height>
+            <width>40</width>
+            <height>20</height>
            </size>
           </property>
          </spacer>
@@ -557,6 +581,9 @@
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
+             <property name="buddy">
+              <cstring>spinBoxMinDays</cstring>
+             </property>
             </widget>
            </item>
            <item row="0" column="1">
@@ -589,6 +616,9 @@
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="buddy">
+              <cstring>spinBoxMaxDays</cstring>
              </property>
             </widget>
            </item>
@@ -663,6 +693,9 @@
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
+             <property name="buddy">
+              <cstring>recordBeforeSpinBox</cstring>
+             </property>
             </widget>
            </item>
            <item row="0" column="1">
@@ -688,6 +721,9 @@
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="buddy">
+              <cstring>recordAfterSpinBox</cstring>
              </property>
             </widget>
            </item>
@@ -801,9 +837,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnCheckedButton</class>
+   <class>QnSelectableButton</class>
    <extends>QToolButton</extends>
-   <header location="global">ui/widgets/common/checked_button.h</header>
+   <header location="global">ui/widgets/common/selectable_button.h</header>
   </customwidget>
   <customwidget>
    <class>QnLicensesUsageWidget</class>

@@ -7,11 +7,11 @@
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
 
-#include <ui/style/globals.h>
 #include <client/client_settings.h>
-#include <utils/math/color_transformations.h>
-#include <utils/math/linear_combination.h>
 #include <core/resource/media_resource.h>
+#include <utils/common/scoped_painter_rollback.h>
+#include <utils/math/color_transformations.h>
+#include <ui/style/globals.h>
 
 namespace
 {
@@ -134,7 +134,9 @@ void QnScheduleGridWidget::initMetrics()
 
     // determine grid font size
     m_gridFont.setPointSizeF(kMinimumGridFontSize);
-    qreal maxLength = cellSize * 0.4545;
+    qreal maxLength = m_showFps && m_showQuality
+        ? cellSize * 0.5
+        : cellSize * 0.85;
 
     while (true)
     {
@@ -143,12 +145,14 @@ void QnScheduleGridWidget::initMetrics()
         bool tooBig = m_gridFont.pointSizeF() >= kMaximumGridFontSize;
 
         // checking all variants of quality string
-        for (int i = 0; i < Qn::StreamQualityCount && !tooBig; i++)
-            tooBig |= (metrics.width(Qn::toShortDisplayString(static_cast<Qn::StreamQuality>(i))) > maxLength);
+        if (m_showQuality)
+            for (int i = 0; i < Qn::StreamQualityCount && !tooBig; i++)
+                tooBig |= (metrics.width(Qn::toShortDisplayString(static_cast<Qn::StreamQuality>(i))) > maxLength);
 
         // checking numbers like 11, 22, .. 99
-        for (int i = 0; i < 9 && !tooBig; i++)
-            tooBig |= (metrics.width(QString::number(i*11)) > maxLength);
+        if (m_showFps)
+            for (int i = 0; i < 9 && !tooBig; i++)
+                tooBig |= (metrics.width(QString::number(i*11)) > maxLength);
 
         if (tooBig)
             break;
@@ -203,6 +207,42 @@ QRectF QnScheduleGridWidget::cornerHeaderCell() const
         m_cornerSize.height());
 }
 
+CustomPaintedBase::PaintFunction QnScheduleGridWidget::paintFunction(Qn::RecordingType type) const
+{
+    return [this, type](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
+    {
+        Q_UNUSED(widget);
+        bool hovered = option->state.testFlag(QStyle::State_MouseOver);
+
+        QColor color((hovered ? m_cellColorsHovered : m_cellColors)[type]);
+        QColor colorInside((hovered ? m_insideColorsHovered : m_insideColors)[type]);
+
+        painter->fillRect(option->rect, color);
+
+        if (colorInside.toRgb() != color.toRgb())
+        {
+            QnScopedPainterBrushRollback brushRollback(painter, colorInside);
+            QnScopedPainterPenRollback penRollback(painter, QPen(m_colors.border, 0));
+            QnScopedPainterTransformRollback transformRollback(painter);
+            painter->translate(option->rect.topLeft());
+            painter->scale(option->rect.width(), option->rect.height());
+
+            static const qreal trOffset = 1.0 / 6.0;
+            static const qreal trSize = 1.0 / 10.0;
+            static const std::array<QPointF, 4> points({
+                QPointF(1.0 - trOffset - trSize, trOffset),
+                QPointF(1.0 - trOffset, trOffset + trSize),
+                QPointF(trOffset + trSize, 1.0 - trOffset),
+                QPointF(trOffset, 1.0 - trSize - trOffset) });
+
+            painter->drawLine(0.0, 1.0, 1.0, 0.0);
+            painter->drawPolygon(points.data(), static_cast<int>(points.size()));
+        }
+
+        return true;
+    };
+}
+
 void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
@@ -211,7 +251,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
     if (!m_cornerSize.isValid())
         initMetrics();
 
-    qreal cellSize = this->cellSize();
+    int cellSize = this->cellSize();
 
     if (m_mouseMoveCell.y() == -1)
     {
@@ -252,52 +292,35 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
 
     p.translate(m_gridLeftOffset, m_gridTopOffset);
 
-    // draw grid colors/text
-    qreal trOffset = cellSize / 6;
-    qreal trSize = cellSize / 10;
-
-    std::array<QPointF, 4> points({
-        QPointF(cellSize - trOffset - trSize, trOffset),
-        QPointF(cellSize - trOffset, trOffset + trSize),
-        QPointF(trOffset + trSize, cellSize - trOffset),
-        QPointF(trOffset, cellSize - trSize - trOffset) });
+    QStyleOption option;
+    option.initFrom(this);
+    option.rect = QRect(0, 0, cellSize-1, cellSize-1);
 
     for (int x = 0; x < columnCount(); ++x)
     {
         for (int y = 0; y < rowCount(); ++y)
         {
             uint recordTypeIdx(m_gridParams[x][y][RecordTypeParam].toUInt());
-            bool hovered = false;
+            option.state &= ~QStyle::State_MouseOver;
 
             if (!m_mousePressed)
             {
                 if ((x == m_mouseMoveCell.x() || m_mouseMoveCell.x() == -1) &&
                     (y == m_mouseMoveCell.y() || m_mouseMoveCell.y() == -1))
                 {
-                    hovered = true;
+                    option.state |= QStyle::State_MouseOver;
                 }
             }
             else if (m_selectedCellsRect.normalized().contains(x, y))
             {
                 recordTypeIdx = m_defaultParams[RecordTypeParam].toUInt();
-                hovered = true;
+                option.state |= QStyle::State_MouseOver;
             }
-
-            QColor color((hovered ? m_cellColorsHovered : m_cellColors)[recordTypeIdx]);
-            QColor colorInside((hovered ? m_insideColorsHovered : m_insideColors)[recordTypeIdx]);
 
             QTransform transform = p.transform();
-            p.translate(x * cellSize, y * cellSize);
+            p.translate(x * cellSize + 1, y * cellSize + 1);
 
-            p.fillRect(0.0, 0.0, cellSize, cellSize, color);
-
-            if (colorInside.toRgb() != color.toRgb())
-            {
-                p.setBrush(colorInside);
-                p.setPen(m_colors.border);
-                p.drawLine(QPointF(cellSize, 0), QPointF(0, cellSize));
-                p.drawPolygon(points.data(), static_cast<int>(points.size()));
-            }
+            paintFunction(static_cast<Qn::RecordingType>(recordTypeIdx))(&p, &option, this);
 
             // draw text parameters
             if (recordTypeIdx != Qn::RT_Never)
@@ -306,14 +329,20 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
                 Qn::StreamQuality quality = (Qn::StreamQuality) m_gridParams[x][y][QualityParam].toInt();
 
                 if (m_showFps)
-                    p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize * 0.75, cellSize *0.5)), Qt::AlignCenter, m_gridParams[x][y][FpsParam].toString());
-
-                if (m_showQuality)
                 {
-                    if (m_showFps)
+                    if (m_showQuality)
+                    {
+                        p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize * 0.75, cellSize *0.5)), Qt::AlignCenter, m_gridParams[x][y][FpsParam].toString());
                         p.drawText(QRectF(QPointF(cellSize * 0.25, cellSize * 0.5), QPointF(cellSize, cellSize)), Qt::AlignCenter, toShortDisplayString(quality));
+                    }
                     else
-                        p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize * 0.75, cellSize *0.5)), Qt::AlignCenter, toShortDisplayString(quality));
+                    {
+                        p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)), Qt::AlignCenter, m_gridParams[x][y][FpsParam].toString());
+                    }
+                }
+                else if (m_showQuality)
+                {
+                    p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)), Qt::AlignCenter, toShortDisplayString(quality));
                 }
             }
 

@@ -22,6 +22,7 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 #include <client/client_globals.h>
 #include <client/client_color_types.h>
 #include <camera/resource_display.h> //< TODO: #Elric FWD!
+#include <ui/customization/customized.h>
 #include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/media/sse_helper.h>
@@ -33,9 +34,10 @@ class QnCachingCameraDataLoader;
 class QnIoModuleOverlayWidget;
 class QnCompositeTextOverlay;
 
-class QnMediaResourceWidget: public QnResourceWidget {
+class QnMediaResourceWidget: public Customized<QnResourceWidget>
+{
     Q_OBJECT
-    typedef QnResourceWidget base_type;
+    typedef Customized<QnResourceWidget> base_type;
 
     Q_PROPERTY(QVector<QColor> motionSensitivityColors READ motionSensitivityColors WRITE setMotionSensitivityColors);
 

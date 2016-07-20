@@ -136,33 +136,32 @@ namespace
 
 } // anonymous namespace
 
-QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent)
-    : QnResourceWidget(context, item, parent)
-    , m_resource(base_type::resource().dynamicCast<QnMediaResource>())
-    , m_camera(base_type::resource().dynamicCast<QnVirtualCameraResource>())
-    , m_display(nullptr)
-    , m_renderer(nullptr)
-    , m_motionSelection()
-    , m_motionSelectionPathCache()
-    , m_paintedChannels()
-    , m_motionSensitivity()
-    , m_motionSensitivityValid(false)
-    , m_binaryMotionMask()
-    , m_binaryMotionMaskValid(false)
-    , m_motionSelectionCacheValid(false)
-    , m_sensStaticText()
-    , m_ptzController(nullptr)
-    , m_homePtzController(nullptr)
-    , m_dewarpingParams()
-    , m_compositeTextOverlay(new QnCompositeTextOverlay(m_camera, navigator()
-        , [this](){ return getUtcCurrentTimeMs(); }, this))
-    , m_ioModuleOverlayWidget(nullptr)
-    , m_ioCouldBeShown(false)
-    , m_ioLicenceStatusHelper() /// Will be created only for I/O modules
-
-    , m_posUtcMs(DATETIME_INVALID)
+QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWorkbenchItem* item, QGraphicsItem* parent) :
+    base_type(context, item, parent),
+    m_resource(base_type::resource().dynamicCast<QnMediaResource>()),
+    m_camera(base_type::resource().dynamicCast<QnVirtualCameraResource>()),
+    m_display(nullptr),
+    m_renderer(nullptr),
+    m_motionSelection(),
+    m_motionSelectionPathCache(),
+    m_paintedChannels(),
+    m_motionSensitivity(),
+    m_motionSensitivityValid(false),
+    m_binaryMotionMask(),
+    m_binaryMotionMaskValid(false),
+    m_motionSelectionCacheValid(false),
+    m_sensStaticText(),
+    m_ptzController(nullptr),
+    m_homePtzController(nullptr),
+    m_dewarpingParams(),
+    m_compositeTextOverlay(new QnCompositeTextOverlay(m_camera, navigator(),
+        [this](){ return getUtcCurrentTimeMs(); }, this)),
+    m_ioModuleOverlayWidget(nullptr),
+    m_ioCouldBeShown(false),
+    m_ioLicenceStatusHelper(), /// Will be created only for I/O modules
+    m_posUtcMs(DATETIME_INVALID)
 {
-    if(!m_resource)
+    if (!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
 
     // TODO: #Elric
