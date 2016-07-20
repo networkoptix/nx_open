@@ -278,35 +278,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(action(QnActions::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
 
-    const auto browseAction = action(QnActions::BrowseLocalFilesModeAction);
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-
-    connect(qnCommon, &QnCommonModule::remoteIdChanged, this,
-        [this, browseAction, welcomeScreen](const QnUuid& id)
-        {
-            const bool connected = !id.isNull();
-            if (connected)
-            {
-                // Show preloader for resources
-                browseAction->setChecked(false);
-                welcomeScreen->setReceivingResources(true);
-            }
-            else if (!action(QnActions::ConnectAction)->isChecked())
-            {
-                // Connection process is not in progress: just show welcome screen
-                browseAction->setChecked(false);
-            }
-        });
-
-    connect(qnDesktopClientMessageProcessor, &QnDesktopClientMessageProcessor::initialResourcesReceived, this,
-        [browseAction]() { browseAction->setChecked(true); });
-
-    connect(browseAction, &QAction::toggled, this,
-        [this, welcomeScreen](bool checked) { welcomeScreen->setVisible(!checked); });
-
-    connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
-        [browseAction]() { browseAction->setChecked(true); });
-
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();

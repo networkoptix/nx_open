@@ -648,7 +648,7 @@
             "hoveredBackground": "dark9",
             "pressedBackground": "dark6",
             "gridLine": "dark7",
-            "gridLabel": "dark4",
+            "gridLabel": "light4",
             "border": "dark4"
         }
     },

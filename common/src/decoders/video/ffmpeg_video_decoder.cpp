@@ -112,6 +112,7 @@ void QnFfmpegVideoDecoder::flush()
     //avcodec_flush_buffers(c); // does not flushing output frames
     int got_picture = 0;
     AVPacket avpkt;
+    av_init_packet(&avpkt);
     avpkt.data = 0;
     avpkt.size = 0;
     while (avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt) > 0);
@@ -535,6 +536,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
     }
     else {
         AVPacket avpkt;
+        av_init_packet(&avpkt);
         avpkt.data = 0;
         avpkt.size = 0;
         avpkt.pts = avpkt.dts = m_prevTimestamp;

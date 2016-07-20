@@ -1,4 +1,7 @@
 #include "optera_resource.h"
+
+#ifdef ENABLE_ONVIF
+
 #include "optera_data_provider.h"
 #include <plugins/resource/onvif/onvif_resource_information_fetcher.h>
 #include <nx/network/http/asynchttpclient.h>
@@ -188,3 +191,5 @@ QString QnOpteraResource::getCurrentStitchingMode(const QByteArray& response) co
     return matches[1];
 
 }
+
+#endif // ENABLE_ONVIF

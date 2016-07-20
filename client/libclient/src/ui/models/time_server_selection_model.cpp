@@ -357,17 +357,16 @@ bool QnTimeServerSelectionModel::isSelected(quint64 priority) {
     return (priority & ec2::ApiRuntimeData::tpfPeerTimeSetByUser) > 0;
 }
 
-QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMSec) {
-    if (offsetMSec == 0)
-        return lit("0.00");
+QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMSec)
+{
+    static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours;
+    static const int kDoNotSuppress = -1;
+    static const int kMinimalOffsetMs = 1000;
 
-    //QChar sign = offsetMSec < 0
-    //    ? L'-'
-    //    : L'+';
+    if (offsetMSec < kMinimalOffsetMs)
+        return QString();
 
-    QTimeSpan span(offsetMSec);
-    span.normalize();
-    return span.toApproximateString();
+    return QTimeSpan(qAbs(offsetMSec)).toApproximateString(kDoNotSuppress, kFormat);
 }
 
 bool QnTimeServerSelectionModel::sameTimezone() const {

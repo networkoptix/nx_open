@@ -30,7 +30,6 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/globals.h>
-#include <ui/common/palette.h>
 
 #include "utils/common/checked_cast.h"
 
@@ -140,9 +139,10 @@ QnResourcePtr QnCameraMotionMaskWidget::camera() const {
     return m_camera;
 }
 
-void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
+void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
+{
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if(m_camera == camera)
+    if (m_camera == camera)
         return;
 
     m_camera = camera;
@@ -150,7 +150,8 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
     m_context->workbench()->currentLayout()->clear();
     m_resourceWidget = 0;
 
-    if(m_camera) {
+    if (m_camera)
+    {
         /* Add single item to the layout. */
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QnUuid::createUuid(), this);
         item->setPinned(true);
@@ -163,6 +164,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
             QnResourceWidget::WindowRotationForbidden |
             QnResourceWidget::SyncPlayForbidden |
             QnResourceWidget::InfoOverlaysForbidden;
+
         item->setData(Qn::ItemWidgetOptions, forcedOptions);
 
         m_context->workbench()->currentLayout()->addItem(item);
@@ -171,10 +173,14 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
         /* Set up the corresponding widget. */
         m_resourceWidget = dynamic_cast<QnMediaResourceWidget *>(m_context->display()->widget(item)); // TODO: #Elric check for NULL
         NX_ASSERT(m_resourceWidget);
-        if (m_resourceWidget) {
+
+        if (m_resourceWidget)
+        {
+            qApp->sendPostedEvents(m_resourceWidget, QnEvent::Customize);
             m_resourceWidget->setFrameOpacity(0.0);
         }
     }
+
     m_motionSensitivity = 0;
 
     /* Consider motion mask list changed. */
@@ -291,3 +297,7 @@ void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView *, QGraphicsItem *it
         emit motionRegionListChanged();
 }
 
+QVector<QColor> QnCameraMotionMaskWidget::motionSensitivityColors() const
+{
+    return m_resourceWidget ? m_resourceWidget->motionSensitivityColors() : QVector<QColor>();
+}

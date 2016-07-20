@@ -105,7 +105,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this, [this]()
     {
         if (!m_visible)
-            setReceivingResources(false);   ///< Auto toggle off preloader
+            setGlobalPreloaderVisible(false);   ///< Auto toggle off preloader
 
         context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
     });
@@ -194,18 +194,18 @@ void QnWorkbenchWelcomeScreen::setConnectingToSystem(const QString& value)
     emit connectingToSystemChanged();
 }
 
-bool QnWorkbenchWelcomeScreen::receivingResources() const
+bool QnWorkbenchWelcomeScreen::globalPreloaderVisible() const
 {
     return m_receivingResources;
 }
 
-void QnWorkbenchWelcomeScreen::setReceivingResources(bool value)
+void QnWorkbenchWelcomeScreen::setGlobalPreloaderVisible(bool value)
 {
     if (value == m_receivingResources)
         return;
 
     m_receivingResources = value;
-    emit receivingResourcesChanged();
+    emit globalPreloaderVisibleChanged();
 }
 
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(

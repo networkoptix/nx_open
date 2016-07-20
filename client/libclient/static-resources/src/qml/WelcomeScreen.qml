@@ -18,7 +18,7 @@ Rectangle
         id: screenHolder;
 
         anchors.fill: parent;
-        visible: context.visibleControls && !context.receivingResources;
+        visible: context.visibleControls && !context.globalPreloaderVisible;
 
         CloudPanel
         {
@@ -68,11 +68,14 @@ Rectangle
                 readonly property int tileWidth: 280;
                 readonly property int tileSpacing: 16;
 
-                readonly property int maxColsCount: Math.min(Math.floor(parent.width - 2 * horizontalOffset) / cellWidth, 4);
+                readonly property int maxColsCount:
+                {
+                    return Math.max(1, Math.min(Math.floor(parent.width - 2 * horizontalOffset) / cellWidth, 4));
+                }
                 readonly property int desiredColsCount:
                 {
                     if (grid.count < 3)
-                        return grid.count;
+                        return Math.max(1, grid.count);
                     else if (grid.count < 5)
                         return 2;
                     else if (grid.count < 7)
@@ -222,7 +225,6 @@ Rectangle
             }
         }
 
-
         NxButton
         {
             anchors.bottom: parent.bottom;
@@ -233,14 +235,11 @@ Rectangle
 
             onClicked: context.connectToAnotherSystem();
         }
-
-        Keys.onEscapePressed: context.tryHideScreen();
     }
-
 
     NxCirclesPreloader
     {
-        visible: context.receivingResources;
+        visible: context.globalPreloaderVisible;
         anchors.centerIn: parent;
     }
 
@@ -254,12 +253,3 @@ Rectangle
         visible: context.connectingToSystem.length;
     }
 }
-
-
-
-
-
-
-
-
-

@@ -48,7 +48,8 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(AVCodecID codecId):
     m_averageVideoTimePerFrame(0),
     m_encodedFrames(0),
     m_droppedFrames(0),
-    m_useRealTimeOptimization(false)
+    m_useRealTimeOptimization(false),
+    m_outPacket(av_packet_alloc())
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
@@ -64,6 +65,7 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 {
     qFreeAligned(m_videoEncodingBuffer);
     close();
+    av_packet_free(&m_outPacket);
 }
 
 void QnFfmpegVideoTranscoder::close()
@@ -217,21 +219,20 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     //TODO: ffmpeg-test
     //int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame.data());
 
-    AVPacket outPacket;
-    outPacket.data = m_videoEncodingBuffer;
-    outPacket.size = MAX_VIDEO_FRAME;
+    m_outPacket->data = m_videoEncodingBuffer;
+    m_outPacket->size = MAX_VIDEO_FRAME;
     int got_packet = 0;
-    int encodeResult = avcodec_encode_video2(m_encoderCtx, &outPacket, decodedFrame.data(), &got_packet);
+    int encodeResult = avcodec_encode_video2(m_encoderCtx, m_outPacket, decodedFrame.data(), &got_packet);
     if (encodeResult < 0)
         return -3;
     if (!got_packet)
         return 0;
 
-    QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, outPacket.size);
+    QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_outPacket->size);
     resultVideoData->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
     if(m_encoderCtx->coded_frame->key_frame)
         resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
-    resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, outPacket.size); // todo: remove data copy here!
+    resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, m_outPacket->size); // todo: remove data copy here!
     resultVideoData->compressionType = updateCodec(m_codecId);
     *result = QnCompressedVideoDataPtr(resultVideoData);
 

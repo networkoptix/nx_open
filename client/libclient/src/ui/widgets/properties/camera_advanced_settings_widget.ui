@@ -15,15 +15,50 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="primaryUrlLabel">
+       <property name="text">
+        <string>Primary Stream:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="secondaryUrlLabel">
+       <property name="text">
+        <string>Secondary Stream:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="primaryUrlLineEdit">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>URL is not available. Open video stream and try again.</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="secondaryUrlLineEdit">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>URL is not available. Open video stream and try again.</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
       <number>0</number>
      </property>
      <widget class="QWidget" name="noSettingsPage">
       <layout class="QVBoxLayout" name="verticalLayout_4">
-       <property name="margin">
-        <number>0</number>
-       </property>
        <item>
         <widget class="QLabel" name="noSettingsLabel">
          <property name="text">
@@ -38,9 +73,6 @@
      </widget>
      <widget class="QWidget" name="manualPage">
       <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
-       <property name="margin">
-        <number>0</number>
-       </property>
        <item>
         <widget class="QnCameraAdvancedParamsWidget" name="cameraAdvancedParamsWidget" native="true"/>
        </item>
@@ -48,9 +80,6 @@
      </widget>
      <widget class="QWidget" name="webPage">
       <layout class="QVBoxLayout" name="verticalLayout_3">
-       <property name="margin">
-        <number>0</number>
-       </property>
        <item>
         <widget class="QWebView" name="webView" native="true">
          <property name="url" stdset="0">

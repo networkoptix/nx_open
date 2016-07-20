@@ -866,10 +866,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
                                             WritePasswordPermission | WriteAccessRightsPermission,
 
         /* Media-specific permissions. */
-        ExportPermission                = 0x800,   /**< Permission to export video parts. */
+        ViewContentPermission           = 0x800,    /**< Permission to view video stream and web-pages. */
+        ExportPermission                = 0x1000,   /**< Permission to export video parts. */
 
         /* Camera-specific permissions. */
-        WritePtzPermission              = 0x1000,   /**< Permission to use camera's PTZ controls. */
+        WritePtzPermission              = 0x2000,   /**< Permission to use camera's PTZ controls. */
 
         AllPermissions = 0xFFFFFFFF
     };

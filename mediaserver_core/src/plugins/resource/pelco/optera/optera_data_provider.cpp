@@ -1,4 +1,7 @@
 #include "optera_data_provider.h"
+
+#ifdef ENABLE_ONVIF
+
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <plugins/resource/onvif/onvif_stream_reader.h>
 #include <utils/common/sleep.h>
@@ -6,7 +9,7 @@
 #include <core/resource_management/resource_data_pool.h>
 
 
-namespace 
+namespace
 {
     const int kOpteraReceiveTimout = 30;
     const int kOpteraSendTimeout = 30;
@@ -14,7 +17,7 @@ namespace
     const quint16 kSingleWaitingIterationMs = 20;
 }
 
-QnOpteraDataProvider::QnOpteraDataProvider(const QnResourcePtr& res) : 
+QnOpteraDataProvider::QnOpteraDataProvider(const QnResourcePtr& res) :
     CLServerPushStreamReader(res),
     m_onvifRes(res.dynamicCast<QnPlOnvifResource>())
 {
@@ -40,13 +43,13 @@ void QnOpteraDataProvider::closeStream()
     m_dataSource.setUser(nullptr);
 }
 
-bool QnOpteraDataProvider::isStreamOpened() const 
+bool QnOpteraDataProvider::isStreamOpened() const
 {
     return  m_dataSource.isStreamOpened();
 }
 
 CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
-    bool isCameraControlRequired, 
+    bool isCameraControlRequired,
     const QnLiveStreamParams& params)
 {
     if (isStreamOpened())
@@ -85,7 +88,7 @@ CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
             for(const auto& mappedChannel: channelMapping.mappedChannels)
             {
                 m_dataSource.mapSourceVideoChannel(
-                    source.data(), 
+                    source.data(),
                     channelMapping.originalChannel,
                     mappedChannel);
             }
@@ -96,7 +99,7 @@ CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
     //At this point I even don't know how Pelco's cameras transmit audio
 
     m_dataSource.setUser(this);
-    m_dataSource.proxyOpenStream(isCameraControlRequired, params); 
+    m_dataSource.proxyOpenStream(isCameraControlRequired, params);
 
     auto triesLeft = kStreamOpenWaitingTimeMs / kSingleWaitingIterationMs;
     while (!m_dataSource.isStreamOpened() && triesLeft-- && !m_needStop)
@@ -120,7 +123,7 @@ QnPlOnvifResourcePtr QnOpteraDataProvider::initSubChannelResource(quint32 channe
 
     QUrlQuery urlQuery(url);
     urlQuery.addQueryItem(
-        lit("channel"), 
+        lit("channel"),
         QString::number(channelNumber));
 
     url.setQuery(urlQuery);
@@ -148,10 +151,11 @@ QList<QnResourceChannelMapping> QnOpteraDataProvider::getVideoChannelMapping()
     auto secRes = m_resource.dynamicCast<QnSecurityCamResource>();
 
     auto resData = qnCommon->dataPool()->data(
-        secRes->getVendor(), 
+        secRes->getVendor(),
         secRes->getModel());
 
     return resData.value<QList<QnResourceChannelMapping>>(
         Qn::VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME);
 }
 
+#endif // ENABLE_ONVIF

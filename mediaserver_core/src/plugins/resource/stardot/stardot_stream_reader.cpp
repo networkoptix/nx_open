@@ -45,9 +45,9 @@ CameraDiagnostics::Result QnStardotStreamReader::openStreamInternal(bool isCamer
 
         CLHttpStatus status;
         m_stardotRes->makeStardotRequest(request, status);
-        if (status != CL_HTTP_SUCCESS) 
+        if (status != CL_HTTP_SUCCESS)
         {
-            if (status == CL_HTTP_AUTH_REQUIRED) 
+            if (status == CL_HTTP_AUTH_REQUIRED)
             {
                 m_resource->setStatus(Qn::Unauthorized);
                 QUrl requestedUrl;
@@ -62,6 +62,7 @@ CameraDiagnostics::Result QnStardotStreamReader::openStreamInternal(bool isCamer
     }
 
     QString streamUrl = m_stardotRes->getRtspUrl();
+    m_stardotRes->updateSourceUrl(streamUrl, getRole());
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(streamUrl).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
     m_multiCodec.setRole(getRole());
     m_multiCodec.setRequest(streamUrl);
@@ -156,7 +157,7 @@ void QnStardotStreamReader::processMotionBinData(const quint8* data, qint64 time
 {
     if (m_lastMetadata == 0) {
         m_lastMetadata = QnMetaDataV1Ptr(new QnMetaDataV1());
-        m_lastMetadata->m_duration = 1000*1000*10; // 10 sec 
+        m_lastMetadata->m_duration = 1000*1000*10; // 10 sec
         m_lastMetadata->timestamp = timestamp;
     }
 

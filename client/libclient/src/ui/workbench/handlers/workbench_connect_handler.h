@@ -70,6 +70,7 @@ private:
 
     void at_beforeExitAction_triggered();
 private:
+    bool m_processingConnectAction;
     QnGraphicsMessageBox* m_connectingMessageBox;
     int m_connectingHandle;
 

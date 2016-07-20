@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ENABLE_ONVIF
+
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <nx/network/http/httpclient.h>
 #include <core/dataprovider/stream_mixer.h>
@@ -39,3 +41,5 @@ private:
     std::map<int, QnPlOnvifResourcePtr> m_channelResources;
     mutable QnResourceVideoLayoutPtr m_videoLayout;
 };
+
+#endif // #ifdef ENABLE_ONVIF

@@ -130,6 +130,14 @@ namespace {
         *deltaEnd = newEnd - end;
     }
 
+    Qn::Permission requiredPermission(const QnResourcePtr& resource)
+    {
+        if (resource->hasFlags(Qn::web_page) || resource->hasFlags(Qn::media))
+            return Qn::ViewContentPermission;
+        return Qn::ReadPermission;
+    }
+
+
     /** Size multiplier for raised widgets. */
     const qreal focusExpansion = 100.0;
 
@@ -906,23 +914,26 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
     bringToFront(widget);
 }
 
-bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
+bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay)
+{
     int maxItems = (m_lightMode & Qn::LightModeSingleItem)
             ? 1
             : qnSettings->maxSceneVideoItems();
 
-    if (m_widgets.size() >= maxItems) {
+    if (m_widgets.size() >= maxItems)
+    {
         qnDeleteLater(item);
         return false;
     }
 
     QnResourcePtr resource = qnResPool->getResourceByUniqueId(item->resourceUid());
-    if(resource.isNull()) {
+    if (!resource || !accessController()->hasPermissions(resource, requiredPermission(resource)))
+    {
         qnDeleteLater(item);
         return false;
     }
 
-    QnResourceWidget *widget;
+    QnResourceWidget *widget = nullptr;
     if (resource->hasFlags(Qn::server))
     {
         widget = new QnServerResourceWidget(context(), item);
@@ -939,9 +950,9 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     {
         widget = new QnWebResourceWidget(context(), item);
     }
-    else
+
+    if (!widget)
     {
-        // TODO: #Elric unsupported for now
         qnDeleteLater(item);
         return false;
     }
@@ -2037,14 +2048,25 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged() {
     }
 }
 
-void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource) {
-    if(QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>()) {
-        if(QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource)) {
-            Qn::Permissions permissions = accessController()->permissions(resource);
-
-            if(!(permissions & Qn::ReadPermission))
+void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource)
+{
+    if (QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>())
+    {
+        if (QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource))
+        {
+            if (!accessController()->hasPermissions(resource, Qn::ReadPermission))
                 workbench()->removeLayout(layout);
         }
+    }
+
+    if (accessController()->hasPermissions(resource, requiredPermission(resource)))
+        return;
+
+    /* Here aboutToBeDestroyed will be called with corresponding handling. */
+    for (auto widget : m_widgetsByResource[resource])
+    {
+        widget->hide();
+        qnDeleteLater(widget);
     }
 }
 

@@ -44,6 +44,9 @@ public:
     int saveAsync();
     void updateDefaultAuthIfEmpty(const QString& login, const QString& password);
 
+    //! Camera source URL, commonly - rtsp link.
+    QString sourceUrl(Qn::ConnectionRole role) const;
+    void updateSourceUrl(const QString& url, Qn::ConnectionRole role);
 
     static int issuesTimeoutMs();
 

@@ -128,7 +128,7 @@ private:
     QSize m_captureResolution;
     float m_encodeQualuty;
     QWidget* m_widget;
-    QString m_lastErrorStr;
+
     bool m_capturingStopped;
     const QPixmap m_logo;
     qint64 m_initTime;
@@ -138,6 +138,8 @@ private:
 
     QPointer<QnVoiceSpectrumAnalyzer> m_soundAnalyzer;
     AVFrame* m_inputAudioFrame;
+    AVPacket* m_outPacket;
+
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,  DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 };
 

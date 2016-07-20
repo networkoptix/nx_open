@@ -104,8 +104,6 @@ protected slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
 
-    void at_accessibleResourcesChanged(const QnUuid& userId);
-
 private:
     void recalculateAllPermissions();
 

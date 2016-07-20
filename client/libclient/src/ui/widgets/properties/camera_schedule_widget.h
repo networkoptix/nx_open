@@ -8,6 +8,7 @@
 #include <ui/common/updatable.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+
 namespace Ui {
     class CameraScheduleWidget;
 }
@@ -70,6 +71,7 @@ public:
     int minRecordedDays() const;
 
     static const int RecordedDaysDontChange = INT_MAX;
+
 signals:
     void archiveRangeChanged();
     void scheduleTasksChanged();

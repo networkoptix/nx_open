@@ -37,8 +37,19 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
     connect(snapshotManager(),  &QnWorkbenchLayoutSnapshotManager::flagsChanged,    this,   &QnWorkbenchAccessController::updatePermissions);
 
     connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnWorkbenchAccessController::recalculateAllPermissions);
-    connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnWorkbenchAccessController::recalculateAllPermissions);
-    connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this, &QnWorkbenchAccessController::at_accessibleResourcesChanged);
+
+    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this, [this](const QSet<QnUuid>& resourceIds)
+    {
+        if (m_user && resourceIds.contains(m_user->getId()))
+        {
+            recalculateAllPermissions();
+            return;
+        }
+
+        for (const QnResourcePtr& resource : qnResPool->getResources(resourceIds))
+            updatePermissions(resource);
+    });
+
 
     recalculateAllPermissions();
 }
@@ -131,7 +142,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     NX_ASSERT(resource);
 
     if (QnAbstractArchiveResourcePtr archive = resource.dynamicCast<QnAbstractArchiveResource>())
-        return Qn::ReadPermission | Qn::ExportPermission;
+        return Qn::ReadPermission | Qn::ViewContentPermission | Qn::ExportPermission;
 
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
         return calculatePermissionsInternal(layout);
@@ -276,8 +287,3 @@ void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResour
     m_dataByResource.remove(resource);
 }
 
-void QnWorkbenchAccessController::at_accessibleResourcesChanged(const QnUuid& userId)
-{
-    if (m_user && m_user->getId() == userId)
-        recalculateAllPermissions();
-}

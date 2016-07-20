@@ -67,6 +67,7 @@ public:
 
     void setCheckInterfacesTimeout(unsigned int checkInterfacesTimeoutMs);
 
+    // TODO: #mux Fix the comment.
     //! Returns \fn run (DEBUG ONLY!)
     static bool isDisabled;
 
