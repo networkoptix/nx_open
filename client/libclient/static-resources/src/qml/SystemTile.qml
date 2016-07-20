@@ -11,7 +11,7 @@ BaseTile
     property string systemName;
     property string ownerDescription;
 
-    property var systemId;
+    property string systemId;
     property bool isFactoryTile: false;
     property bool isCloudTile: false;
 
@@ -19,7 +19,7 @@ BaseTile
     property string wrongCustomization;
     property string compatibleVersion;
 
-    isConnecting: ((systemName == context.connectingToSystem) && !isFactoryTile);
+    isConnecting: ((control.systemId == context.connectingToSystem) && !isFactoryTile);
 
     isAvailable:
     {
@@ -110,7 +110,7 @@ BaseTile
             var cloudHost = control.impl.hostsModel.firstHost;
             console.log("Connecting to cloud system <", systemName,
                 ">, throug the host <", cloudHost, ">");
-            context.connectToCloudSystem(control.systemName, cloudHost);
+            context.connectToCloudSystem(control.systemId, cloudHost);
         }
         else // Local system tile
         {
@@ -254,7 +254,7 @@ BaseTile
                 tile.savePassword, tile.autoLogin);
 
             context.connectToLocalSystem(
-                control.systemName, tile.selectedHost,
+                control.systemId, tile.selectedHost,
                 tile.selectedUser, tile.selectedPassword,
                 tile.savePassword, tile.autoLogin);
         }

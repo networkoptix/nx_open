@@ -45,13 +45,16 @@ QnSystemDescriptionPtr QnDirectSystemsFinder::getSystem(const QString &id) const
 
     const auto it = std::find_if(systemDescriptions.begin()
         , systemDescriptions.end(), predicate);
-    
-    return (it == systemDescriptions.end() 
+
+    return (it == systemDescriptions.end()
         ? QnSystemDescriptionPtr() : QnSystemDescriptionPtr(*it));
 }
 
-void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformation)
+void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
 {
+    if (moduleInformation.serverFlags.testFlag(Qn::SF_NewSystem))
+        moduleInformation.systemName = moduleInformation.id.toString();
+
     const auto systemIt = getSystemItByServer(moduleInformation.id);
     if (systemIt != m_systems.end())
     {
@@ -76,7 +79,7 @@ void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformati
         systemDescription->updateServer(moduleInformation);
     else
         systemDescription->addServer(moduleInformation, QnSystemDescription::kDefaultPriority);
-    
+
     m_serverToSystem[moduleInformation.id] = systemDescription->name();
 
     if (createNewSystem)
@@ -117,7 +120,7 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
     if (!changes.testFlag(QnServerField::SystemNameField))
         return;
 
-    // System name has changed. We have to remove server from current 
+    // System name has changed. We have to remove server from current
     // system and add to new
     const auto serverHost = systemDescription->getServerHost(moduleInformation.id);
     removeServer(moduleInformation);
