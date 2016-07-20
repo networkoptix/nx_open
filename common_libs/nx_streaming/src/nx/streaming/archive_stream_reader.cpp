@@ -816,7 +816,9 @@ begin_label:
     // Do not display archive in a future
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_UnsyncTime))
     {
-        if (isCompatiblePacketForMask(m_currentData) && m_currentData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
+        if (!m_resource->hasFlags(Qn::local) &&
+            isCompatiblePacketForMask(m_currentData) &&
+            m_currentData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
         {
             m_outOfPlaybackMask = true;
             return createEmptyPacket(reverseMode); // EOF reached
