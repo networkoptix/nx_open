@@ -463,7 +463,8 @@ bool QnResourceTreeModelNode::calculateBastard() const
                 return true;
             }
 
-            if (m_flags.testFlag(Qn::server) || m_flags.testFlag(Qn::live) || m_flags.testFlag(Qn::web_page))
+            //TODO: #GDM where can we put this check to be also available in QnWorkbenchDisplay?
+            if (m_flags.testFlag(Qn::media) || m_flags.testFlag(Qn::web_page))
             {
                 if (!accessController()->hasPermissions(m_resource, Qn::ViewContentPermission))
                     return true;
