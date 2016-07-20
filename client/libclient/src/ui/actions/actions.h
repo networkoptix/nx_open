@@ -35,9 +35,9 @@ QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
         DisconnectAction,
 
         /**
-        * Switchs mode to browse local files/show welcome screen
+        * Switches mode to browse resources/show welcome screen
         */
-        BrowseLocalFilesModeAction,
+        ResourcesModeAction,
 
         /**
          * Forcefully disconnects from the current server (if any).

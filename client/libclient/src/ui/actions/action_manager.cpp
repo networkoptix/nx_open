@@ -609,7 +609,7 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnLoggedInCondition(this));
 
-    factory(QnActions::BrowseLocalFilesModeAction).
+    factory(QnActions::ResourcesModeAction).
         flags(Qn::Main).
         text(tr("Browse Local Files")).
         toggledText(tr("Show Welcome Screen")).

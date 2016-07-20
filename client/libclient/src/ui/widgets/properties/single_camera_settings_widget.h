@@ -3,13 +3,12 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-
-#include "ui/workbench/workbench_context_aware.h"
+#include <ui/workbench/workbench_context_aware.h>
+#include <utils/common/connective.h>
+#include <nx/utils/uuid.h>
 
 #include "camera_settings_tab.h"
 
-#include <utils/common/connective.h>
-#include <nx/utils/uuid.h>
 
 namespace Ui {
 class SingleCameraSettingsWidget;
@@ -86,6 +85,8 @@ public:
 
     void setExportScheduleButtonEnabled(bool enabled);
 
+    Qn::MotionType selectedMotionType() const;
+
 signals:
     void hasChangesChanged();
 
@@ -134,6 +135,7 @@ private:
     void setTabEnabledSafe(Qn::CameraSettingsTab tab, bool enabled);
 
     void retranslateUi();
+
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
@@ -165,4 +167,5 @@ private:
 
     QHash<QnUuid, QnImageProvider*> m_imageProvidersByResourceId;
 
+    QButtonGroup* m_sensitivityButtons;
 };

@@ -9,8 +9,8 @@
 
 
 /*!
-    Copy-constructor and assignment operator perform deep-copy of object 
-    Problem with QRegion is that cannot be used with object's shallow copies safely in multiple threads simultaneously 
+    Copy-constructor and assignment operator perform deep-copy of object
+    Problem with QRegion is that cannot be used with object's shallow copies safely in multiple threads simultaneously
     because \a QRegion::rects() const method is not thread-safe (due to call to \a QRegionPrivate::vectorize function)
 */
 class QnRegion
@@ -53,11 +53,10 @@ public:
 
     QnMotionRegion& operator=( const QnMotionRegion& );
 
-    static const int MIN_SENSITIVITY = 0; // equal motion mask
-    static const int DEFAULT_SENSITIVITY = 5;
-    static const int MAX_SENSITIVITY = 9; // max motion sensitivity
+    static constexpr int kDefaultSensitivity = 5;
+    static constexpr int kSensitivityLevelCount = 10;
 
-    /** 
+    /**
     * \returns Windows if sum of rects in all regions in range [1..MAX] greater than maxRectCount
     * \returns Masks if sum of rects in motionMask region (index 0) greater than maxMaskRects OR
     * \returns Sens number of regions with at least 1 rect is greater than maxMotionSens
@@ -100,8 +99,8 @@ public:
 private:
     void updatePathCache();
 private:
-    QnRegion m_data[MAX_SENSITIVITY - MIN_SENSITIVITY + 1];
-    QPainterPath m_pathCache[MAX_SENSITIVITY - MIN_SENSITIVITY + 1];
+    QnRegion m_data[kSensitivityLevelCount];
+    QPainterPath m_pathCache[kSensitivityLevelCount];
     bool m_dirty;
 };
 

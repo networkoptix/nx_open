@@ -780,7 +780,6 @@
                 </property>
             </activation>
             <properties>
-                <ffmpeg.version>3.1.1</ffmpeg.version>
                 <toolchain.version>codesourcery-2014.05</toolchain.version>
                 <compiler>2011.09</compiler>
                 <qt.spec/>
@@ -811,7 +810,6 @@
                 </property>
             </activation>
             <properties>
-                <ffmpeg.version>3.1.1</ffmpeg.version>
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f</openssl.version>
@@ -845,7 +843,6 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>3.1.1</ffmpeg.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
                 <qt.spec/>
@@ -878,7 +875,6 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>3.1.1</ffmpeg.version>
                 <festival.version>2.1x</festival.version>
                 <modification>bpi</modification>
                 <rdep.target>bpi</rdep.target>
@@ -918,7 +914,6 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>3.1.1</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
                 <gcc.version>4.8.3</gcc.version>
@@ -951,7 +946,6 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>tx1</modification>
                 <rdep.target>tx1</rdep.target>
                 <gcc.version>4.8.4</gcc.version>
@@ -1099,7 +1093,6 @@
                 <qt.spec/>
                 <openal.version>1.17.2</openal.version>
                 <openssl.version>1.0.2d</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <rdep.target>android-${arch}</rdep.target>
             </properties>
         </profile>
@@ -1146,8 +1139,8 @@
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>
-                <ffmpeg.version>3.1.1</ffmpeg.version>
                 <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>
+                <ffmpeg.version>3.0.0</ffmpeg.version>
                 <compile.option1/>
                 <rdep.target>ios</rdep.target>
             </properties>

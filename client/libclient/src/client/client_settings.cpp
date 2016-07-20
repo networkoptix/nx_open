@@ -117,6 +117,12 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
     case CLOUD_PASSWORD:
         return nx::utils::xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), xorKey);
 
+    case SHOW_ONCE_MESSAGES:
+    {
+        QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
+        return qVariantFromValue(static_cast<Qn::ShowOnceMessages>(baseValue.toInt()));
+    }
+
     case WORKBENCH_PANES:
     {
         QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant()).value<QByteArray>();
@@ -153,13 +159,13 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         base_type::writeValueToSettings(settings, id, nx::utils::xorEncrypt(value.toString(), xorKey));
         break;
 
+    case SHOW_ONCE_MESSAGES:
+        base_type::writeValueToSettings(settings, id, static_cast<int>(value.value<Qn::ShowOnceMessages>()));
+
     case UPDATE_FEED_URL:
-    //case SHOWCASE_URL:
-    //case SHOWCASE_ENABLED:
     case SETTINGS_URL:
     case GL_VSYNC:
     case LIGHT_MODE:
-    case PTZ_PRESET_IN_USE_WARNING_DISABLED:
     case NO_CLIENT_UPDATE:
         break; /* Not to be saved to settings. */
 

@@ -13,6 +13,9 @@ NxTextEdit
 
     property string query;
 
+    backgroundColor: activeColor;
+    activeColor: Style.darkerColor(Style.colors.shadow, 2)
+
     state: "masked";
     width: mask.width;
 
@@ -36,22 +39,27 @@ NxTextEdit
     {
         id: cancelArea;
 
+        property bool cursorIsOutsideArea:
+        {
+            if (!containsMouse)
+                return false;
+
+            var editAreaPos = cancelArea.mapToItem(control, mouseX, mouseY);
+            return ((editAreaPos.x < 0) || (editAreaPos.y < 0)
+                || (editAreaPos.x > control.width) || (editAreaPos.y > control.height));
+        }
+
         parent: control.visualParent;
         anchors.fill: parent;
 
         visible: control.state == "editable";
 
+        hoverEnabled: true;
+        cursorShape: (cursorIsOutsideArea ? Qt.ArrowCursor : Qt.IBeamCursor);
         onPressed:
         {
-            if (!control.text.length)
-            {
-                var editAreaPos = cancelArea.mapToItem(control, mouse.x, mouse.y);
-                var isOutsideEditArea = ((editAreaPos.x < 0) || (editAreaPos.y < 0)
-                    || (editAreaPos.x > control.width) || (editAreaPos.y > control.height));
-
-                if (isOutsideEditArea)
-                    control.state = "masked";
-            }
+            if (!control.text.length && cancelArea.cursorIsOutsideArea)
+                control.state = "masked";
 
             mouse.accepted = false;
         }
@@ -70,6 +78,7 @@ NxTextEdit
             id: maskBackground;
             color: Style.colors.window;
             anchors.fill: parent;
+            anchors.margins: -2;
 
             visible: (searchCaption.opacity == 1);
         }
@@ -205,6 +214,4 @@ NxTextEdit
         interval: control.delay;
         onTriggered: { control.query = control.text; }
     }
-
-
 }

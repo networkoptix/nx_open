@@ -12,7 +12,7 @@
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 
-// TODO: #Elric move to config? 
+// TODO: #Elric move to config?
 // see https://code.google.com/p/arxlib/source/browse/include/arx/Utility.h
 #ifndef _MSC_VER
 #   define __forceinline inline
@@ -22,27 +22,27 @@
 #pragma warning( disable : 4700 )
 
 //#define DEBUG_CPU_MODE
-static const unsigned char BitReverseTable256[] = 
+static const unsigned char BitReverseTable256[] =
 {
-    0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0, 
-    0x08, 0x88, 0x48, 0xC8, 0x28, 0xA8, 0x68, 0xE8, 0x18, 0x98, 0x58, 0xD8, 0x38, 0xB8, 0x78, 0xF8, 
-    0x04, 0x84, 0x44, 0xC4, 0x24, 0xA4, 0x64, 0xE4, 0x14, 0x94, 0x54, 0xD4, 0x34, 0xB4, 0x74, 0xF4, 
-    0x0C, 0x8C, 0x4C, 0xCC, 0x2C, 0xAC, 0x6C, 0xEC, 0x1C, 0x9C, 0x5C, 0xDC, 0x3C, 0xBC, 0x7C, 0xFC, 
-    0x02, 0x82, 0x42, 0xC2, 0x22, 0xA2, 0x62, 0xE2, 0x12, 0x92, 0x52, 0xD2, 0x32, 0xB2, 0x72, 0xF2, 
+    0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0,
+    0x08, 0x88, 0x48, 0xC8, 0x28, 0xA8, 0x68, 0xE8, 0x18, 0x98, 0x58, 0xD8, 0x38, 0xB8, 0x78, 0xF8,
+    0x04, 0x84, 0x44, 0xC4, 0x24, 0xA4, 0x64, 0xE4, 0x14, 0x94, 0x54, 0xD4, 0x34, 0xB4, 0x74, 0xF4,
+    0x0C, 0x8C, 0x4C, 0xCC, 0x2C, 0xAC, 0x6C, 0xEC, 0x1C, 0x9C, 0x5C, 0xDC, 0x3C, 0xBC, 0x7C, 0xFC,
+    0x02, 0x82, 0x42, 0xC2, 0x22, 0xA2, 0x62, 0xE2, 0x12, 0x92, 0x52, 0xD2, 0x32, 0xB2, 0x72, 0xF2,
     0x0A, 0x8A, 0x4A, 0xCA, 0x2A, 0xAA, 0x6A, 0xEA, 0x1A, 0x9A, 0x5A, 0xDA, 0x3A, 0xBA, 0x7A, 0xFA,
-    0x06, 0x86, 0x46, 0xC6, 0x26, 0xA6, 0x66, 0xE6, 0x16, 0x96, 0x56, 0xD6, 0x36, 0xB6, 0x76, 0xF6, 
+    0x06, 0x86, 0x46, 0xC6, 0x26, 0xA6, 0x66, 0xE6, 0x16, 0x96, 0x56, 0xD6, 0x36, 0xB6, 0x76, 0xF6,
     0x0E, 0x8E, 0x4E, 0xCE, 0x2E, 0xAE, 0x6E, 0xEE, 0x1E, 0x9E, 0x5E, 0xDE, 0x3E, 0xBE, 0x7E, 0xFE,
     0x01, 0x81, 0x41, 0xC1, 0x21, 0xA1, 0x61, 0xE1, 0x11, 0x91, 0x51, 0xD1, 0x31, 0xB1, 0x71, 0xF1,
-    0x09, 0x89, 0x49, 0xC9, 0x29, 0xA9, 0x69, 0xE9, 0x19, 0x99, 0x59, 0xD9, 0x39, 0xB9, 0x79, 0xF9, 
+    0x09, 0x89, 0x49, 0xC9, 0x29, 0xA9, 0x69, 0xE9, 0x19, 0x99, 0x59, 0xD9, 0x39, 0xB9, 0x79, 0xF9,
     0x05, 0x85, 0x45, 0xC5, 0x25, 0xA5, 0x65, 0xE5, 0x15, 0x95, 0x55, 0xD5, 0x35, 0xB5, 0x75, 0xF5,
     0x0D, 0x8D, 0x4D, 0xCD, 0x2D, 0xAD, 0x6D, 0xED, 0x1D, 0x9D, 0x5D, 0xDD, 0x3D, 0xBD, 0x7D, 0xFD,
-    0x03, 0x83, 0x43, 0xC3, 0x23, 0xA3, 0x63, 0xE3, 0x13, 0x93, 0x53, 0xD3, 0x33, 0xB3, 0x73, 0xF3, 
+    0x03, 0x83, 0x43, 0xC3, 0x23, 0xA3, 0x63, 0xE3, 0x13, 0x93, 0x53, 0xD3, 0x33, 0xB3, 0x73, 0xF3,
     0x0B, 0x8B, 0x4B, 0xCB, 0x2B, 0xAB, 0x6B, 0xEB, 0x1B, 0x9B, 0x5B, 0xDB, 0x3B, 0xBB, 0x7B, 0xFB,
-    0x07, 0x87, 0x47, 0xC7, 0x27, 0xA7, 0x67, 0xE7, 0x17, 0x97, 0x57, 0xD7, 0x37, 0xB7, 0x77, 0xF7, 
+    0x07, 0x87, 0x47, 0xC7, 0x27, 0xA7, 0x67, 0xE7, 0x17, 0x97, 0x57, 0xD7, 0x37, 0xB7, 0x77, 0xF7,
     0x0F, 0x8F, 0x4F, 0xCF, 0x2F, 0xAF, 0x6F, 0xEF, 0x1F, 0x9F, 0x5F, 0xDF, 0x3F, 0xBF, 0x7F, 0xFF
 };
 
-static int sensitivityToMask[10] = 
+static int sensitivityToMask[10] =
 {
     255, //  0
     26,
@@ -57,7 +57,7 @@ static int sensitivityToMask[10] =
 
 };
 
-static const int MIN_SQUARE_BY_SENS[10] = 
+static const int MIN_SQUARE_BY_SENS[10] =
 {
     INT_MAX, // motion mask: 0
     sensitivityToMask[1]*68,
@@ -83,7 +83,7 @@ class SadTransformInit
     {
         if (value < 9)
             return 0;
-        
+
         double newValue;
         if (value < 32)
             newValue = std::pow((double)value, 1.40);
@@ -104,7 +104,7 @@ class SadTransformInit
             return value*1.2+0.5;
         else if (value < 128)
             return value*1.3+0.5;
-        else 
+        else
             return 255;
         */
         //double newValue = std::pow((double)value, sad_yPow);
@@ -114,7 +114,7 @@ class SadTransformInit
     }
 
 public:
-    SadTransformInit()  
+    SadTransformInit()
     {
 #ifdef DEBUG_TRANSFORM
         // debug
@@ -136,8 +136,8 @@ public:
 
 quint32 reverseBits(quint32 v)
 {
-    return (BitReverseTable256[v & 0xff]) | 
-        (BitReverseTable256[(v >> 8) & 0xff] << 8) | 
+    return (BitReverseTable256[v & 0xff]) |
+        (BitReverseTable256[(v >> 8) & 0xff] << 8) |
         (BitReverseTable256[(v >> 16) & 0xff] << 16) |
         (BitReverseTable256[(v >> 24) & 0xff] << 24);
 }
@@ -148,7 +148,7 @@ inline bool isMotionAt(const quint8* data, int x, int y)
     return data[shift/8] & (128 >> (shift&7));
 }
 
-inline void setMotionAt(quint8* data, int x, int y) 
+inline void setMotionAt(quint8* data, int x, int y)
 {
     int shift = x*MD_HEIGHT + y;
     data[shift/8] |= (128 >> (shift&7));
@@ -167,7 +167,7 @@ void fillFrameRect(CLVideoDecoderOutput* frame, const QRect& rect, quint8 value)
     }
 }
 
-/* 
+/*
 * returns matrix with avarage Y value
 */
 
@@ -260,7 +260,7 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT*2;
 #endif
-        }  
+        }
         curLineNum = nextLineNum;
         curLinePtr += lineSize*rowCnt;
         curLinePtrPrev += lineSize*rowCnt;
@@ -311,7 +311,7 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
             dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT*2;
 #endif
-        }  
+        }
         curLineNum = nextLineNum;
         curLinePtr += lineSize*rowCnt;
         dst++;
@@ -422,7 +422,7 @@ void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
             *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT;
 #endif
-        }  
+        }
         curLineNum = nextLineNum;
         curLinePtr += lineSize*rowCnt;
         dst++;
@@ -439,7 +439,7 @@ __m128i QnMotionEstimation::advanced_sad_x_x(const __m128i* src1, const __m128i*
 
     // get abs difference between frames
     __m128i pixelsAbs = _mm_sub_epi8(_mm_max_epi8(*src1, *src2), _mm_min_epi8(*src1, *src2));
-    
+
     // non linear transformation using precomputing table
     TRANSFORM_WORD(index, 0);
     TRANSFORM_WORD(index, 1);
@@ -467,7 +467,7 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
 
     NX_ASSERT(frame->linesize[0] % 16 == 0);
     NX_ASSERT(sqWidth % 8 == 0);
-    
+
     int sqWidthSteps = sqWidth / 8;
 
     const simd128i* curLinePtr = (const simd128i*) frame->data[0];
@@ -508,7 +508,7 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             linePtr++;
             linePtr2++;
 
-            
+
             // get avg value
             squareSum += _mm_cvtsi128_si32(blockSum); // SSE2
             squareStep++;
@@ -518,7 +518,7 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
 #endif
 
             squareStep++;
-            if (squareStep == sqWidthSteps) 
+            if (squareStep == sqWidthSteps)
                 flushData(rowCnt * sqWidth);
         }
         if (squareStep)
@@ -627,7 +627,7 @@ QnMotionEstimation::QnMotionEstimation(): m_channelNum(0)
 
 	/*m_numFrame = 0;
 	m_sumLogTime = 0;*/
-    
+
 #ifdef DEBUG_TRANSFORM
     static int gg = 0;
     if (gg == 0)
@@ -678,12 +678,12 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
 
         simd128i* dst = (simd128i*) (scaledMask/*&test0[0]*/ + MD_HEIGHT*iLineNum);
         simd128i* src = (simd128i*) (mask + MD_HEIGHT*y);
-        if (iLineNum > prevILineNum) 
+        if (iLineNum > prevILineNum)
         {
-            for (int i = 0; i < iLineNum - prevILineNum; ++i) 
+            for (int i = 0; i < iLineNum - prevILineNum; ++i)
                 memcpy(dst - i*MD_HEIGHT/sizeof(simd128i) , src, MD_HEIGHT);
         }
-        else 
+        else
 		{
 			dst[0] = _mm_min_epu8(dst[0], src[0]); // SSE2
             dst[1] = _mm_min_epu8(dst[1], src[1]); // SSE2
@@ -704,14 +704,14 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
 
         quint8* dst = scaledMask/*&test1[0]*/ + MD_HEIGHT*iLineNum;
         quint8* src = mask + MD_HEIGHT*y;
-        if (iLineNum > prevILineNum) 
+        if (iLineNum > prevILineNum)
 		{
-            for (int i = 0; i < iLineNum - prevILineNum; ++i) 
+            for (int i = 0; i < iLineNum - prevILineNum; ++i)
                 memcpy(dst - i*MD_HEIGHT , src , MD_HEIGHT);
         }
-        else 
+        else
 		{
-			for (int i = 0; i < MD_HEIGHT; ++i) 
+			for (int i = 0; i < MD_HEIGHT; ++i)
 				dst[i] = qMin(dst[i], src[i]);
 		}
 
@@ -720,7 +720,7 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
     }
 #endif
 	/*
-	Test to equality algoritms 
+	Test to equality algoritms
 	int it = 0;
 	for (int x = 0; x < m_scaledWidth; ++x)
     {
@@ -733,9 +733,9 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
 			it++;
 		};
 	};*/
-        
-        
-    
+
+
+
     //__m128i* curPtr = (__m128i*) mask;
      //for (int i = 0; i < m_scaledWidth*2; ++i)
      //   curPtr[i] = _mm_sub_epi8(curPtr[i], sse_0x80_const); // SSE2
@@ -819,7 +819,7 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
             {
                 int aroundMotionAmount =(int(curPtr[-1] > maskPtr[-1]) +
                                          int(curPtr[1]  > maskPtr[-1]) +
-                                         int(curPtr[-MD_HEIGHT] >maskPtr[-MD_HEIGHT]) + 
+                                         int(curPtr[-MD_HEIGHT] >maskPtr[-MD_HEIGHT]) +
                                          int(curPtr[MD_HEIGHT] >maskPtr[MD_HEIGHT]))*2 +
                                          int(curPtr[-1-MD_HEIGHT] >maskPtr[-1-MD_HEIGHT]) +
                                          int(curPtr[-1+MD_HEIGHT] >maskPtr[-1+MD_HEIGHT]) +
@@ -866,9 +866,9 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
     // 2.2 left col
     for (int y = 1; y < MD_HEIGHT; ++y, ++idx) {
         if (m_filteredFrame[idx]) {
-            if (m_linkedNums[idx-1]) 
+            if (m_linkedNums[idx-1])
                 m_linkedNums[idx] = m_linkedNums[idx-1];
-            else 
+            else
                 m_linkedNums[idx] = currentLinkIndex++;
         }
     }
@@ -880,7 +880,7 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         {
             if (m_linkedNums[idx-MD_HEIGHT])
                 m_linkedNums[idx] = m_linkedNums[idx-MD_HEIGHT];
-            else 
+            else
                 m_linkedNums[idx] = currentLinkIndex++;
         }
         idx++;
@@ -891,7 +891,7 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
             {
                 if (m_linkedNums[idx-1]) {
                     m_linkedNums[idx] = m_linkedNums[idx-1];
-                    if (m_linkedNums[idx-MD_HEIGHT] && m_linkedNums[idx-MD_HEIGHT] != m_linkedNums[idx]) 
+                    if (m_linkedNums[idx-MD_HEIGHT] && m_linkedNums[idx-MD_HEIGHT] != m_linkedNums[idx])
                     {
                         if (m_linkedNums[idx-MD_HEIGHT] < m_linkedNums[idx])
                             m_linkedMap[m_linkedNums[idx]] = m_linkedNums[idx-MD_HEIGHT];
@@ -951,7 +951,7 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
     for (int i = 0; i < MD_HEIGHT*m_scaledWidth;)
     {
         quint32 data = 0;
-        for (int k = 0; k < 32; ++k, ++i) 
+        for (int k = 0; k < 32; ++k, ++i)
         {
             data = (data << 1) + int(m_linkedSquare[m_linkedNums[i]] > MIN_SQUARE_BY_SENS[m_motionSensScaledMask[i]]);
             //data = (data << 1) + (int)(m_filteredFrame[i] >= m_scaledMask[i]);
@@ -992,7 +992,7 @@ void QnMotionEstimation::scaleFrame(const uint8_t* data, int width, int height, 
             // aggregate pixel
             uint16_t pixel = 0;
             const uint8_t* srcPtr = src;
-            for (int y = 0; y < lines; ++y) 
+            for (int y = 0; y < lines; ++y)
             {
                 for (int rep = 0; rep < xPixels; ++rep)
                     pixel += *srcPtr++;
@@ -1083,7 +1083,7 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     if (m_frames[0]->width == m_frames[1]->width
         && m_frames[0]->height == m_frames[1]->height
         && m_frames[0]->format == m_frames[1]->format
-        && (m_frames[idx]->width >= MD_WIDTH && m_frames[idx]->height >= MD_HEIGHT)) 
+        && (m_frames[idx]->width >= MD_WIDTH && m_frames[idx]->height >= MD_HEIGHT))
     {
         // calculate difference between frames
         if (m_xStep == 8)
@@ -1094,7 +1094,7 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
             getFrame_avgY_array_x_x (m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx], m_xStep);
 
         analizeMotionAmount(m_frameBuffer[idx]);
-        
+
 
     }
 #else
@@ -1108,7 +1108,7 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     analizeMotionAmount(m_frameDeltaBuffer);
 #endif
 
-	
+
 	/*
 	LARGE_INTEGER end_time;
 	if ( QueryPerformanceCounter(&end_time) )
@@ -1128,7 +1128,7 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     if (m_totalFrames == 0)
         m_totalFrames++;
 
-	
+
 
     return true;
 }
@@ -1187,16 +1187,16 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
             switch (m_totalFrames/8 % 4)
             {
                 case 0:
-                    val = x < MD_WIDTH/2 && y < MD_HEIGHT/2;                
+                    val = x < MD_WIDTH/2 && y < MD_HEIGHT/2;
                     break;
                 case 1:
-                    val = x > MD_WIDTH/2 && y < MD_HEIGHT/2;                
+                    val = x > MD_WIDTH/2 && y < MD_HEIGHT/2;
                     break;
                 case 2:
-                    val = x < MD_WIDTH/2 && y > MD_HEIGHT/2;                
+                    val = x < MD_WIDTH/2 && y > MD_HEIGHT/2;
                     break;
                 case 3:
-                    val = x > MD_WIDTH/2 && y > MD_HEIGHT/2;                
+                    val = x > MD_WIDTH/2 && y > MD_HEIGHT/2;
                     break;
             }
             if (val)
@@ -1215,7 +1215,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     for (int y = 0; y < MD_WIDTH; ++y)
     {
         int iLineNum = (scaledLineNum+32768) >> 16;
-        if (iLineNum > prevILineNum) 
+        if (iLineNum > prevILineNum)
         {
             dst[y] = m_resultMotion[iLineNum];
             for (int i = 1; i < iLineNum - prevILineNum; ++i)
@@ -1255,7 +1255,7 @@ void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
     m_motionSensMask = (quint8*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);
 
     memset(m_motionMask, 255, MD_WIDTH * MD_HEIGHT);
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    for (int sens = 0; sens < QnMotionRegion::kSensitivityLevelCount; ++sens)
     {
         for(const QRect& rect: region.getRectsBySens(sens))
         {

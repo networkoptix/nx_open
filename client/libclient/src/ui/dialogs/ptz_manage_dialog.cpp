@@ -487,11 +487,14 @@ void QnPtzManageDialog::at_deleteButton_clicked() {
                 break;
         }
 
-        if (presetIsInUse) {
-            if (!qnSettings->isPtzPresetInUseWarningDisabled()) {
+        if (presetIsInUse)
+        {
+            Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+            if (!messagesFilter.testFlag(Qn::ShowOnceMessage::PtzPresetInUse))
+            {
                 QnMessageBox messageBox(
                         QnMessageBox::Warning,
-                        -1,
+                        Qn::Empty_Help,
                         tr("Remove Preset"),
                         tr("This preset is used in some tours.") + L'\n'
                       + tr("These tours will become invalid if you remove it."),
@@ -503,9 +506,13 @@ void QnPtzManageDialog::at_deleteButton_clicked() {
 
                 int result = messageBox.exec();
 
-                qnSettings->setPtzPresetInUseWarningDisabled(messageBox.isChecked());
+                if (messageBox.isChecked())
+                {
+                    messagesFilter |= Qn::ShowOnceMessage::PtzPresetInUse;
+                    qnSettings->setShowOnceMessages(messagesFilter);
+                }
 
-                if (result == QDialogButtonBox::Cancel)
+                if (result != QDialogButtonBox::Ok)
                     break;
             }
         }
