@@ -26,7 +26,7 @@ class QnCameraMotionMaskWidget: public Connective<QWidget> {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
     typedef Connective<QWidget> base_type;
-        
+
 public:
     QnCameraMotionMaskWidget(QWidget *parent = 0);
     virtual ~QnCameraMotionMaskWidget();
@@ -47,6 +47,8 @@ public:
 
     /** Check if motion region is valid */
     bool isValidMotionRegion();
+
+    QVector<QColor> motionSensitivityColors() const;
 
 signals:
     void motionRegionListChanged();

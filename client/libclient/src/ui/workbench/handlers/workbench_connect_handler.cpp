@@ -137,8 +137,8 @@ namespace
 QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent)
     :
     base_type(parent),
-    m_processingConnectAction(false),
     QnWorkbenchContextAware(parent),
+    m_processingConnectAction(false),
     m_connectingMessageBox(NULL),
     m_connectingHandle(0),
     m_readyForConnection(true)

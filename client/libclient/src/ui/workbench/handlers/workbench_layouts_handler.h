@@ -42,6 +42,11 @@ private:
     void saveLayout(const QnLayoutResourcePtr &layout);
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
 
+    /** Ask user if layout should be saved. Actual when admin modifies shared layout
+     *  or layout belonging to user with custom access rights.
+     */
+    bool confirmLayoutChange(const QnLayoutResourcePtr &layout);
+
     /**
      * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.
      * @param buttons               Message box buttons.
