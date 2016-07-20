@@ -186,3 +186,13 @@ button, select{
     cursor: default;
   }
 }
+
+input[type="radio"], input[type="checkbox"] {
+  margin: 0;
+}
+.radio, .checkbox {
+  padding-left: 22px;
+}
+.radio input[type="radio"], .radio-inline input[type="radio"], .checkbox input[type="checkbox"], .checkbox-inline input[type="checkbox"] {
+   margin-left: -22px;
+}
