@@ -135,6 +135,8 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
         qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting non empty rtsl url.";
         return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), lit("config/rtspurl.cgi?profileid=%1").arg(m_profile.url) );
     }
+
+    res->updateSourceUrl(m_profile.url, getRole());
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(m_profile.url).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
     if (m_profile.codec.contains("264"))
     {

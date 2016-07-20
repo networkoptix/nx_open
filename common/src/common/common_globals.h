@@ -553,6 +553,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
                                                         (or to the last system) automatically next time */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                          Used in QnActions::ConnectAction. */
+        CompletionWatcherRole,                      /**< Role for guard that calls specified handler after action was processed.
+                                                         Used in QnActions::ConnectAction. */
+
         ForceRole,                                  /**< Role for 'forced' flag. Used in QnActions::DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
         CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
