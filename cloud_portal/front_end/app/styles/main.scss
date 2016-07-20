@@ -224,10 +224,10 @@ td{
   overflow: hidden;
 
   h2 {
+    @include ellipsis;
+
     line-height: 24px;
     margin-bottom: 2px;
-
-    @include ellipsis;
   }
   .user-name{
     font-size: $font-size-h6;
