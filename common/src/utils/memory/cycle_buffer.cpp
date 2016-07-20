@@ -7,8 +7,8 @@ QnMediaCyclicBuffer::QnMediaCyclicBuffer(size_type bufferSize, int align):
     m_offset(0),
     m_align(align)
 {
-    Q_ASSERT(bufferSize >= align);
     if (bufferSize > 0) {
+        Q_ASSERT(bufferSize >= align);
         m_buffer = (value_type*) qMallocAligned(bufferSize, align);
         Q_ASSERT_X(m_buffer, Q_FUNC_INFO, "not enough memory");
     }
