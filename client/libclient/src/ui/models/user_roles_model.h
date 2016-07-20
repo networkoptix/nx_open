@@ -21,7 +21,7 @@ public:
     /* Role-specific stuff: */
 
     void setStandardRoles(bool enabled = true);
-    void setStandardRoles(const QList<Qn::GlobalPermissions>& standardRoles);
+ //   void setStandardRoles(const QList<Qn::GlobalPermissions>& standardRoles);
 
     void setUserRoles(bool enabled = true);
     void setUserRoles(const ec2::ApiUserGroupDataList& roles);

@@ -608,6 +608,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         ActionEmittedBy,                            /** */
 
         GlobalPermissionsRole,                      /**< Global permissions role. Value of type Qn::GlobalPermissions. */
+        UserRoleRole,                               /**< Type of user role. Value of type Qn::UserRole. */
 
         RoleCount
     };
@@ -923,7 +924,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalManageBookmarksPermission | GlobalUserInputPermission | GlobalViewLogsPermission,
 
         /* Admin can do everything. */
-        GlobalAdminPermissionsSet           = GlobalAdminPermission | GlobalAdvancedViewerPermissionSet | GlobalControlVideoWallPermission | GlobalEditCamerasPermission,
+        GlobalAdminPermissionSet            = GlobalAdminPermission | GlobalAdvancedViewerPermissionSet | GlobalControlVideoWallPermission | GlobalEditCamerasPermission,
 
         /* PTZ here is intended - for SpaceX, see VMS-2208 */
         GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalUserInputPermission |
@@ -937,6 +938,22 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissions)
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(GlobalPermission)
 
+
+    /**
+    * An enumeration for user role types: predefined roles, custom groups, custom permissions.
+    */
+    enum class UserRole
+    {
+        CustomUserGroup = -2,
+        CustomPermissions = -1,
+        Owner = 0,
+        Administrator,
+        AdvancedViewer,
+        Viewer,
+        LiveViewer,
+    };
+
+    Q_DECLARE_METATYPE(UserRole);
 
 
     /**

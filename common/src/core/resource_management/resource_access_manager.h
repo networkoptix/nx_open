@@ -15,17 +15,16 @@
 
 #include <utils/common/connective.h>
 
+
 class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnResourceAccessManager>
 {
     Q_OBJECT
-
     typedef Connective<QObject> base_type;
+
 public:
     QnResourceAccessManager(QObject* parent = nullptr);
 
-    static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
-
-    /** Get set of global permissions, that will not work without the given one. */
+    /** Get a set of global permissions that will not work without the given one. */
     static Qn::GlobalPermissions dependentPermissions(Qn::GlobalPermission value);
 
     void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList);
@@ -111,6 +110,17 @@ public:
     bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,      const ec2::ApiLayoutData& update) const;
     bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,        const ec2::ApiUserData& update) const;
     bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,   const ec2::ApiVideowallData& update) const;
+
+    static const QList<Qn::UserRole>& predefinedRoles();
+
+    static QString userRoleName(Qn::UserRole userRole);
+    static QString userRoleDescription(Qn::UserRole userRole);
+    static Qn::GlobalPermissions userRolePermissions(Qn::UserRole userRole);
+
+    Qn::UserRole userRole(const QnUserResourcePtr& user) const;
+    QString userRoleName(const QnUserResourcePtr& user) const;
+
+    static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
 
 signals:
     void accessibleResourcesChanged(const QnUuid& userId);
