@@ -103,10 +103,10 @@ bool CloudStreamSocket::shutdown()
             stoppedPromise.set_value();
         });
 
+    stoppedPromise.get_future().wait();
     if (m_socketDelegate)
         m_socketDelegate->shutdown();
 
-    stoppedPromise.get_future().wait();
     return true;
 }
 
