@@ -141,6 +141,9 @@ angular.module('webadminApp')
                 $scope.settings.cloudEmail = data.cloudAccountName;
                 sendCredentialsToNativeClient();
                 $log.log("System is in cloud! go to CloudSuccess");
+                $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}", $scope.settings.cloudSystemID);
+                $scope.portalShortLink = Config.cloud.portalUrl;
+
                 $scope.next('cloudSuccess');
             },function(){
                 mediaserver.getModuleInformation(true).then(function (r) {
@@ -364,6 +367,7 @@ angular.module('webadminApp')
             if(debugMode){
                 $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
                 $scope.portalShortLink = Config.cloud.portalUrl;
+
                 $scope.next('cloudSuccess');
                 return;
             }
