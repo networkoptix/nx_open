@@ -40,9 +40,9 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder)
 void QnSystemsFinder::onSystemDiscovered(const QnSystemDescriptionPtr& systemDescription)
 {
     const auto it = std::find_if(m_systems.begin(), m_systems.end(),
-        [targetName = systemDescription->name()](const QnSystemDescriptionPtr &description)
+        [targetId = systemDescription->id()](const QnSystemDescriptionPtr &description)
     {
-        return (description->name() == targetName);
+        return (description->id() == targetId);
     });
 
     if (it != m_systems.end())
