@@ -60,6 +60,7 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
 
 Sound::~Sound()
 {
+    directDisconnectAll();
     if (!m_deinitialized)
         internalClear();
     delete [] m_proxyBuffer;
