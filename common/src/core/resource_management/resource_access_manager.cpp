@@ -466,11 +466,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(const QnUserResour
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnVirtualCameraResourcePtr& camera) const
 {
     NX_ASSERT(camera);
+    Qn::Permissions result = Qn::ReadPermission;
 
     if (!isAccessibleResource(user, camera))
-        return Qn::NoPermissions;
+        return result;
 
-    Qn::Permissions result = Qn::ReadPermission;
+    result |= Qn::ViewContentPermission;
     if (hasGlobalPermission(user, Qn::GlobalExportPermission))
         result |= Qn::ExportPermission;
 
@@ -489,15 +490,14 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnMediaServerResourcePtr& server) const
 {
     NX_ASSERT(server);
-    if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
-    {
-        if (qnCommon->isReadOnly())
-            return Qn::ReadPermission;
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
-    }
+    /* All users must have at least ReadPermission to send api requests
+     * (recorded periods, bookmarks, etc) and view servers on shared layouts. */
+    Qn::Permissions result = Qn::ReadPermission | Qn::ViewContentPermission;
 
-    /* All users must have at least ReadPermission to send api requests (recorded periods, bookmarks, etc). */
-    return Qn::ReadPermission;
+    if (hasGlobalPermission(user, Qn::GlobalAdminPermission) && !qnCommon->isReadOnly())
+        result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+
+    return result;
 }
 
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnStorageResourcePtr& storage) const
@@ -533,11 +533,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnWebPageResourcePtr& webPage) const
 {
     NX_ASSERT(webPage);
+    Qn::Permissions result = Qn::ReadPermission;
 
     if (!isAccessibleResource(user, webPage))
-        return Qn::NoPermissions;
+        return result;
 
-    Qn::Permissions result = Qn::ReadPermission;
+    result |= Qn::ViewContentPermission;
     if (qnCommon->isReadOnly())
         return result;
 

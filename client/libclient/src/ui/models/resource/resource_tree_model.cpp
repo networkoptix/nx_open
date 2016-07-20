@@ -401,8 +401,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         if (isAdmin)
             return m_rootNodes[Qn::UsersNode];
 
-        //TODO: #GDM #access remove comment when access rights check will be implemented on server
-        //NX_ASSERT(false, "Non-admin user can't see other users.");
+        /* We can get here in the process of reconnecting. */
         return bastardNode;
     }
 

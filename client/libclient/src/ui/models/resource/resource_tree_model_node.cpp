@@ -367,7 +367,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (m_parent && m_parent->type() == Qn::SharedLayoutNode)
             return !isAdmin;
 
-        return !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
+        return !accessController()->hasPermissions(m_resource, Qn::ViewContentPermission);
 
     /* These will be hidden or displayed together with videowall. */
     case Qn::VideoWallItemNode:
@@ -461,6 +461,12 @@ bool QnResourceTreeModelNode::calculateBastard() const
                 !qnResPool->getResourcesByParentId(m_resource->getId()).filtered<QnVirtualCameraResource>().isEmpty())
             {
                 return true;
+            }
+
+            if (m_flags.testFlag(Qn::server) || m_flags.testFlag(Qn::live) || m_flags.testFlag(Qn::web_page))
+            {
+                if (!accessController()->hasPermissions(m_resource, Qn::ViewContentPermission))
+                    return true;
             }
         }
         return false;
