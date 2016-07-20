@@ -288,7 +288,8 @@ QnDesktopDataProvider::QnDesktopDataProvider (
     m_logo(logo),
     m_started(false),
     m_isInitialized(false),
-    m_inputAudioFrame(av_frame_alloc())
+    m_inputAudioFrame(av_frame_alloc()),
+    m_outPacket(av_packet_alloc())
 {
     if (audioDevice || audioDevice2)
     {
@@ -309,6 +310,7 @@ QnDesktopDataProvider::~QnDesktopDataProvider()
 {
     stop();
     av_frame_free(&m_inputAudioFrame);
+    av_packet_free(&m_outPacket);
 }
 
 int QnDesktopDataProvider::calculateBitrate()
@@ -527,11 +529,10 @@ int QnDesktopDataProvider::processData(bool flush)
         return -1;
     //int out_size = avcodec_encode_video(m_videoCodecCtx, m_videoBuf, m_videoBufSize, flush ? 0 : m_frame);
 
-    AVPacket outPacket;
-    outPacket.data = m_videoBuf;
-    outPacket.size = m_videoBufSize;
+    m_outPacket->data = m_videoBuf;
+    m_outPacket->size = m_videoBufSize;
     int got_packet = 0;
-    int encodeResult = avcodec_encode_video2(m_videoCodecCtx, &outPacket, flush ? 0 : m_frame, &got_packet);
+    int encodeResult = avcodec_encode_video2(m_videoCodecCtx, m_outPacket, flush ? 0 : m_frame, &got_packet);
 
 
     if (encodeResult < 0)
@@ -551,8 +552,8 @@ int QnDesktopDataProvider::processData(bool flush)
     if (got_packet > 0)
     {
 
-        QnWritableCompressedVideoDataPtr video = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, outPacket.size, m_videoContext));
-        video->m_data.write((const char*) m_videoBuf, outPacket.size);
+        QnWritableCompressedVideoDataPtr video = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_outPacket->size, m_videoContext));
+        video->m_data.write((const char*) m_videoBuf, m_outPacket->size);
         video->compressionType = m_videoCodecCtx->codec_id;
         video->timestamp = av_rescale_q(m_videoCodecCtx->coded_frame->pts, m_videoCodecCtx->time_base, timeBaseNative) + m_initTime;
 
@@ -565,7 +566,7 @@ int QnDesktopDataProvider::processData(bool flush)
 
     putAudioData();
 
-    return outPacket.size;
+    return m_outPacket->size;
 }
 
 void QnDesktopDataProvider::putAudioData()
@@ -647,16 +648,15 @@ void QnDesktopDataProvider::putAudioData()
         //int aEncoded = avcodec_encode_audio(m_audioCodecCtx, m_encodedAudioBuf, FF_MIN_BUFFER_SIZE, buffer1);
         //if (aEncoded > 0)
 
-        AVPacket outputPacket;
-        outputPacket.data = m_encodedAudioBuf;
-        outputPacket.size = FF_MIN_BUFFER_SIZE;
+        m_outPacket->data = m_encodedAudioBuf;
+        m_outPacket->size = FF_MIN_BUFFER_SIZE;
 
         m_inputAudioFrame->data[0] = (quint8*) buffer1;
         m_inputAudioFrame->nb_samples = m_audioCodecCtx->frame_size;
 
         int got_packet = 0;
 
-        if (avcodec_encode_audio2(m_audioCodecCtx, &outputPacket, m_inputAudioFrame, &got_packet) < 0)
+        if (avcodec_encode_audio2(m_audioCodecCtx, m_outPacket, m_inputAudioFrame, &got_packet) < 0)
             continue;
         if (got_packet)
         {
@@ -668,8 +668,8 @@ void QnDesktopDataProvider::putAudioData()
             timeBaseMs.num = 1;
             timeBaseMs.den = 1000;
 
-            QnWritableCompressedAudioDataPtr audio = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, outputPacket.size, m_audioContext));
-            audio->m_data.write((const char*) m_encodedAudioBuf, outputPacket.size);
+            QnWritableCompressedAudioDataPtr audio = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, m_outPacket->size, m_audioContext));
+            audio->m_data.write((const char*) m_encodedAudioBuf, m_outPacket->size);
             audio->compressionType = m_audioCodecCtx->codec_id;
             audio->timestamp = av_rescale_q(audioPts, timeBaseMs, timeBaseNative) + m_initTime;
             //audio->timestamp = av_rescale_q(m_audioCodecCtx->coded_frame->pts, m_audioCodecCtx->time_base, timeBaseNative) + m_initTime;

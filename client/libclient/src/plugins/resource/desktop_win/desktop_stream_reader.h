@@ -35,6 +35,7 @@ private:
     char* m_encoderCodecName;
     bool m_initialized;
     AVFrame* m_frame;
+    AVPacket* m_outPacket;
 };
 
 #endif // Q_OS_WIN

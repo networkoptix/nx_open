@@ -61,7 +61,8 @@ float getAvgColor(const AVFrame* frame, int plane, const QRect& rect)
 }
 
 QnSignHelper::QnSignHelper():
-    m_cachedMetric(QFont())
+    m_cachedMetric(QFont()),
+    m_outPacket(av_packet_alloc())
 {
     m_opacity = 1.0;
     m_signBackground = Qt::white;
@@ -80,6 +81,11 @@ QnSignHelper::QnSignHelper():
             break;
         }
     }
+}
+
+QnSignHelper::~QnSignHelper()
+{
+    av_packet_free(&m_outPacket);
 }
 
 void QnSignHelper::updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size)
@@ -674,20 +680,19 @@ QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcC
         // TODO: #vasilenko avoid using deprecated methods
         //out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, frame);
 
-        AVPacket outPacket;
-        outPacket.data = videoBuf;
-        outPacket.size = videoBufSize;
+        m_outPacket->data = videoBuf;
+        m_outPacket->size = videoBufSize;
         int got_packet = 0;
-        avcodec_encode_video2(videoCodecCtx, &outPacket, frame, &got_packet);
+        avcodec_encode_video2(videoCodecCtx, m_outPacket, frame, &got_packet);
 
         if (!got_packet)
         {
-            outPacket.data = videoBuf;
-            outPacket.size = videoBufSize;
-            avcodec_encode_video2(videoCodecCtx, &outPacket, frame, &got_packet);  //< flush encoder buffer
+            m_outPacket->data = videoBuf;
+            m_outPacket->size = videoBufSize;
+            avcodec_encode_video2(videoCodecCtx, m_outPacket, frame, &got_packet);  //< flush encoder buffer
         }
         if (got_packet)
-            out_size = outPacket.size;
+            out_size = m_outPacket->size;
     }
 
     if (videoCodecCtx->codec_id == AV_CODEC_ID_H264)

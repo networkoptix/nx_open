@@ -9,7 +9,10 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
 
+#include <nx/utils/random.h>
 #include <utils/common/synctime.h>
+
+#include <QCollator>
 
 static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */
 static const bool DEFAULT_SERVER_AUTH = true;
@@ -18,6 +21,7 @@ static const uint MIN_DELAY_RATIO = 30;
 static const uint RND_DELAY_RATIO = 50;    /* 50% about 15 days */
 static const uint MAX_DELAY_RATIO = MIN_DELAY_RATIO + RND_DELAY_RATIO;
 
+static const uint SEND_AFTER_UPDATE_TIME = 3 * 60 * 60 * 1000; // 3h
 static const uint TIMER_CYCLE = 60 * 1000; /* msecs, update state every minute */
 static const uint TIMER_CYCLE_MAX = 24 * 60 * 60 * 1000; /* msecs, once a day at least */
 static const QString SERVER_API_COMMAND = lit("statserver/api/report");
@@ -37,11 +41,12 @@ namespace ec2
         :
          m_desktopCameraTypeId(getDesktopCameraTypeId(resourceManager))
         , m_msManager(msManager)
-        , m_timerCycle( TIMER_CYCLE )
+        , m_firstTime(true)
+        , m_timerCycle(TIMER_CYCLE)
         , m_timerDisabled(false)
         , m_timerId(boost::none)
     {
-        NX_ASSERT(MAX_DELAY_RATIO <= 100);
+        NX_CRITICAL(MAX_DELAY_RATIO <= 100);
         setupTimer();
     }
 
@@ -112,7 +117,7 @@ namespace ec2
             if (rType->getName() == QnResourceTypePool::kDesktopCameraTypeName)
                 return rType->getId();
 
-        NX_LOG(lit("Ec2StaticticsReporter: Can not get %1 resource type, using null")
+        NX_LOG(lm("Can not get %1 resource type, using null")
                .arg(QnResourceTypePool::kDesktopCameraTypeName), cl_logWARNING);
         return QnUuid();
     }
@@ -126,8 +131,7 @@ namespace ec2
                 std::bind(&Ec2StaticticsReporter::timerEvent, this),
                 std::chrono::milliseconds(m_timerCycle));
 
-            NX_LOG(lit("Ec2StaticticsReporter: Timer is set with delay %1")
-                   .arg(m_timerCycle), cl_logDEBUG1);
+            NX_LOGX(lm("Timer is set with delay %1").arg(m_timerCycle), cl_logDEBUG1);
         }
     }
 
@@ -170,7 +174,7 @@ namespace ec2
         if (!qnGlobalSettings->isStatisticsAllowed()
             || qnGlobalSettings->isNewSystem())
         {
-            NX_LOG(lit("Ec2StaticticsReporter: Automatic report system is disabled"), cl_logINFO);
+            NX_LOGX(lm("Automatic report system is disabled"), cl_logINFO);
 
             // Better luck next time (if report system will be enabled by another mediaserver)
             setupTimer();
@@ -178,37 +182,62 @@ namespace ec2
         }
 
         const QDateTime now = qnSyncTime->currentDateTime().toUTC();
-        const QDateTime lastTime = qnGlobalSettings->statisticsReportLastTime();
-        if (!lastTime.isValid())
+        if (plannedReportTime(now) <= now)
         {
-            qnGlobalSettings->setStatisticsReportLastTime(now);
-            qnGlobalSettings->synchronizeNow();
-        }
-
-        const uint timeCycle = nx::utils::parseTimerDuration(
-                    qnGlobalSettings->statisticsReportTimeCycle(),
-                    std::chrono::seconds(DEFAULT_TIME_CYCLE)).count() / 1000;
-        const uint maxDelay = timeCycle * MAX_DELAY_RATIO / 100;
-        if (!m_plannedReportTime || *m_plannedReportTime > now.addSecs(timeCycle + maxDelay))
-        {
-            static std::once_flag flag;
-            std::call_once(flag, [](){ qsrand((uint)QTime::currentTime().msec()); });
-
-            const auto minDelay = timeCycle * MIN_DELAY_RATIO / 100;
-            const auto rndDelay = timeCycle * (static_cast<uint>(qrand()) % RND_DELAY_RATIO) / 100;
-            m_plannedReportTime = (lastTime.isValid() ? lastTime : now).addSecs(minDelay + rndDelay);
-
-            NX_LOG(lit("Ec2StaticticsReporter: Last report was at %1, the next planned for %2")
-                   .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))
-                   .arg(m_plannedReportTime->toString(Qt::ISODate)), cl_logINFO);
-        }
-
-        if (*m_plannedReportTime <= now)
-            if( initiateReport() == ErrorCode::ok )
+            if (initiateReport() == ErrorCode::ok)
                 return;
+        }
 
         // let's retry a little later
         setupTimer();
+    }
+
+    QDateTime Ec2StaticticsReporter::plannedReportTime(const QDateTime& now)
+    {
+        if (m_firstTime)
+        {
+            m_firstTime = false;
+            const auto reportedVersion = qnGlobalSettings->statisticsReportLastVersion();
+            const auto currentVersion = QnAppInfo::applicationFullVersion();
+
+            QCollator collator;
+            collator.setNumericMode(true);
+            if (collator.compare(currentVersion, reportedVersion) > 0)
+            {
+                const uint timeCycle = nx::utils::parseTimerDuration(
+                    qnGlobalSettings->statisticsReportTimeCycle(),
+                    std::chrono::seconds(SEND_AFTER_UPDATE_TIME)).count() / 1000;
+
+                m_plannedReportTime = now.addSecs(nx::utils::randomInt(
+                      timeCycle * MIN_DELAY_RATIO / 100,
+                      timeCycle * MAX_DELAY_RATIO / 100));
+
+                NX_LOGX(lm("Last reported version is '%1' while running '%2', plan early report for %3")
+                    .arg(reportedVersion).arg(currentVersion)
+                    .arg(m_plannedReportTime->toString(Qt::ISODate)), cl_logINFO);
+
+                return *m_plannedReportTime;
+            }
+        }
+
+        const uint timeCycle = nx::utils::parseTimerDuration(
+            qnGlobalSettings->statisticsReportTimeCycle(),
+            std::chrono::seconds(DEFAULT_TIME_CYCLE)).count() / 1000;
+
+        const uint minDelay = timeCycle * MIN_DELAY_RATIO / 100;
+        const uint maxDelay = timeCycle * MAX_DELAY_RATIO / 100;
+        if (!m_plannedReportTime || *m_plannedReportTime > now.addSecs(maxDelay))
+        {
+            const QDateTime lastTime = qnGlobalSettings->statisticsReportLastTime();
+            m_plannedReportTime = (lastTime.isValid() ? lastTime : now).addSecs(
+                nx::utils::randomInt<uint>(minDelay, maxDelay));
+
+            NX_LOGX(lm("Last report was at %1, the next planned for %2")
+               .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))
+               .arg(m_plannedReportTime->toString(Qt::ISODate)), cl_logINFO);
+        }
+
+        return *m_plannedReportTime;
     }
 
     ErrorCode Ec2StaticticsReporter::initiateReport(QString* reportApi)
@@ -218,7 +247,7 @@ namespace ec2
         auto res = collectReportData(nullptr, &data);
         if (res != ErrorCode::ok)
         {
-            NX_LOG(lit("Ec2StaticticsReporter: Could not collect data, error: %1")
+            NX_LOGX(lm("Could not collect data, error: %1")
                    .arg(toString(res)), cl_logWARNING);
             return res;
         }
@@ -236,10 +265,12 @@ namespace ec2
         const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
         m_httpClient->doPost(url, contentType, QJson::serialized(data));
 
-        NX_LOG(lit("Ec2StaticticsReporter: Sending statistics asynchronously to %1")
+        NX_LOGX(lm("Sending statistics asynchronously to %1")
                .arg(url.toString()), cl_logDEBUG1);
 
-        if (reportApi) *reportApi = url.toString();
+        if (reportApi)
+            *reportApi = url.toString();
+
         return ErrorCode::ok;
     }
 
@@ -269,8 +300,8 @@ namespace ec2
         if (httpClient->hasRequestSuccesed())
         {
             m_timerCycle = TIMER_CYCLE;
-            NX_LOG(lit("Ec2StaticticsReporter: Statistics report successfully sent to %1")
-                   .arg(httpClient->url().toString()), cl_logINFO);
+            NX_LOGX(lm("Statistics report successfully sent to %1")
+                .str(httpClient->url()), cl_logINFO);
 
             const auto now = qnSyncTime->currentDateTime().toUTC();
             m_plannedReportTime = boost::none;
@@ -278,6 +309,7 @@ namespace ec2
             const int lastNumber = qnGlobalSettings->statisticsReportLastNumber();
             qnGlobalSettings->setStatisticsReportLastNumber(lastNumber + 1);
             qnGlobalSettings->setStatisticsReportLastTime(now);
+            qnGlobalSettings->setStatisticsReportLastVersion(QnAppInfo::applicationFullVersion());
             qnGlobalSettings->synchronizeNow();
         }
         else
@@ -285,8 +317,8 @@ namespace ec2
             if ((m_timerCycle *= 2) > TIMER_CYCLE_MAX)
                 m_timerCycle = TIMER_CYCLE_MAX;
 
-            NX_LOG(lit("Ec2StaticticsReporter: doPost to %1 has failed, update timer cycle to %2")
-                   .arg(httpClient->url().toString()).arg(m_timerCycle), cl_logWARNING);
+            NX_LOGX(lm("doPost to %1 has failed, update timer cycle to %2")
+                .str(httpClient->url()).arg(m_timerCycle), cl_logWARNING);
         }
 
         setupTimer();
