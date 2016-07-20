@@ -103,7 +103,6 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
         Q_UNUSED(value);
         m_rootNodes[rootNodeTypeForScope()]->updateRecursive();
     });
-    connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this, &QnResourceTreeModel::at_accessibleResourcesChanged);
 
     rebuildTree();
 
@@ -1311,13 +1310,4 @@ void QnResourceTreeModel::at_user_enabledChanged(const QnResourcePtr &resource)
 void QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged()
 {
     m_rootNodes[Qn::OtherSystemsNode]->update();
-}
-
-void QnResourceTreeModel::at_accessibleResourcesChanged(const QnUuid& userId)
-{
-    auto user = qnResPool->getResourceById<QnUserResource>(userId);
-    if (context()->user() == user)
-        rebuildTree();
-    else
-        updateSharedLayoutNodesForUser(user);
 }

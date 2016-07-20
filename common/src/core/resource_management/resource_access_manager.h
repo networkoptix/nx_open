@@ -118,6 +118,8 @@ signals:
     void userGroupAddedOrUpdated(const ec2::ApiUserGroupData& userGroup);
     void userGroupRemoved(const QnUuid& groupId);
 
+    /** Notify listeners that permissions possibly changed (not necessarily). */
+    void permissionsInvalidated(const QSet<QnUuid>& resourceIds);
 private:
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);
@@ -144,6 +146,10 @@ private:
 
     /** Check if camera is placed to one of shared layouts, available to given user. */
     bool isAccessibleViaLayouts(const QSet<QnUuid>& layoutIds, const QnResourcePtr& resource, bool sharedOnly) const;
+
+    void beginUpdateCache();
+    void endUpdateCache();
+
 private:
     mutable QnMutex m_mutex;
 
@@ -151,6 +157,12 @@ private:
     QHash<QnUuid, ec2::ApiUserGroupData> m_userGroups;
 
     mutable QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
+
+    /** Counter which is used to avoid repeating signals during one update process.  */
+    QAtomicInt m_cacheUpdateCounter;
+
+    /** Set of resources that were invalidated during current update process. */
+    QSet<QnUuid> m_invalidatedResources;
 
     struct PermissionKey
     {

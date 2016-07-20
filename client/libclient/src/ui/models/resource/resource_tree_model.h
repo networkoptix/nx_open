@@ -128,8 +128,6 @@ private slots:
 
     void at_serverAutoDiscoveryEnabledChanged();
 
-    void at_accessibleResourcesChanged(const QnUuid& userId);
-
 private:
     friend class QnResourceTreeModelNode;
 
