@@ -168,7 +168,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
         }))
             snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) | Qn::ResourceIsBeingSaved);
     }
-    else
+    else if (confirmLayoutChange(layout))
     {
         //TODO: #GDM #Common check existing layouts.
         //TODO: #GDM #Common all remotes layout checking and saving should be done in one place
@@ -345,6 +345,89 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     snapshotManager()->save(newLayout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
     if (shouldDelete)
         removeLayouts(QnLayoutResourceList() << layout);
+}
+
+bool QnWorkbenchLayoutsHandler::confirmLayoutChange(const QnLayoutResourcePtr &layout)
+{
+    NX_ASSERT(context()->user(), "Should never ask for layout saving when offline");
+    if (!context()->user())
+        return false;
+
+    QnUuid ownerId = layout->getParentId();
+
+    /* Never ask for own layouts. */
+    if (ownerId == context()->user()->getId())
+        return true;
+
+    /* Get list of all users with custom resources list. */
+    auto allCustomUsers = qnResPool->getResources<QnUserResource>().filtered(
+        []
+        (const QnUserResourcePtr& user)
+        {
+            return !qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission);
+        }
+    );
+
+    /* Do not warn if there are no such users - no side effects in any case. */
+    if (allCustomUsers.isEmpty())
+        return true;
+
+    /* Check shared layout */
+    if (ownerId.isNull())
+    {
+        /* Check if user have already silenced this warning. */
+        if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::SharedLayoutEdit))
+            return true;
+
+        /* Checking if custom users have access to this shared layout. */
+        auto accessibleToCustomUsers = std::any_of(
+            allCustomUsers.cbegin(), allCustomUsers.cend(),
+            [layout]
+            (const QnUserResourcePtr& user)
+            {
+                return qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission);
+            }
+        );
+
+        /* Do not warn if there are no such users - no side effects in any case. */
+        if (!accessibleToCustomUsers)
+            return true;
+
+        QnMessageBox messageBox(
+            QnMessageBox::Warning,
+            Qn::Empty_Help,
+            tr("Save Layout..."),
+            tr("Changes will affect many users"),
+            QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+            mainWindow());
+        messageBox.setDefaultButton(QDialogButtonBox::Cancel);
+        messageBox.setInformativeText(tr("This layout is shared. By changing this layout you change it for all users who have it."));
+        messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+
+        auto result  = messageBox.exec();
+        if (messageBox.isChecked())
+        {
+            Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+            messagesFilter |= Qn::ShowOnceMessage::SharedLayoutEdit;
+            qnSettings->setShowOnceMessages(messagesFilter);
+        }
+
+        return result == QDialogButtonBox::Ok;
+    }
+
+    /* Do not save layout for non-existing user */
+    QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(ownerId);
+    if (!owner)
+        return false;
+
+    /* Do not warn if owner is not custom user. */
+    if (qnResourceAccessManager->hasGlobalPermission(owner, Qn::GlobalAccessAllMediaPermission))
+        return true;
+
+
+
+
+    return true;
 }
 
 QDialogButtonBox::StandardButton QnWorkbenchLayoutsHandler::askOverrideLayout(QDialogButtonBox::StandardButtons buttons,

@@ -284,7 +284,8 @@ namespace Qn
      */
     enum class ShowOnceMessage
     {
-        PtzPresetInUse  = 0x001
+        PtzPresetInUse      = 0x001,
+        SharedLayoutEdit    = 0x002
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ShowOnceMessage)
     Q_DECLARE_FLAGS(ShowOnceMessages, ShowOnceMessage)
