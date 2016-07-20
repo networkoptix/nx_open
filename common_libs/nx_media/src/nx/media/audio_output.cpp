@@ -15,10 +15,10 @@ namespace media {
 //-------------------------------------------------------------------------------------------------
 // AudioOutputPrivate
 
-struct AudioOutputPrivate
+class AudioOutputPrivate
 {
-    AudioOutputPrivate(int initialBufferUsec, int maxBufferUsec)
-    :
+public:
+    AudioOutputPrivate(int initialBufferUsec, int maxBufferUsec):
         bufferSizeUsec(initialBufferUsec),
         frameDurationUsec(0),
         bufferingBytes(0),
@@ -40,8 +40,7 @@ struct AudioOutputPrivate
 //-------------------------------------------------------------------------------------------------
 // AudioOutput
 
-AudioOutput::AudioOutput(int initialBufferMs, int maxBufferMs)
-:
+AudioOutput::AudioOutput(int initialBufferMs, int maxBufferMs):
     d_ptr(new AudioOutputPrivate(initialBufferMs, maxBufferMs))
 {
 }
@@ -108,14 +107,14 @@ void AudioOutput::write(const AudioFramePtr& audioFrame)
 
     // Update sliding window with last audio PTS.
     d->timestampQueue.push_back(audioFrame->timestampUsec);
-    
+
     // max amount of frames in the audio queue
     qint64 elapsed = d->audioOutput->playTimeElapsedUsec();
     int maxFrames = elapsed / d->frameDurationUsec + 1;
-    
+
     // how many frames out of the queue now
-    const int deprecatedFrames = d->timestampQueue.size() - maxFrames;
-    
+    const int deprecatedFrames = (int) d->timestampQueue.size() - maxFrames;
+
     if (deprecatedFrames > 0)
     {
         d->timestampQueue.erase(
