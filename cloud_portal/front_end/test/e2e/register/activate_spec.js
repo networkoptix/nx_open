@@ -164,14 +164,15 @@ describe('User activation', function () {
     it('email can be sent again', function () {
         var userEmail = p.helper.getRandomEmail();
 
-        p.helper.register(null, null, userEmail);
-        // Read email but not visit the activation link
-        p.getActivationLink(userEmail).then( function(url) { console.log(url) });
+        p.helper.register(null, null, userEmail).then(function () {
+            // Read email but not visit the activation link
+            p.getActivationLink(userEmail).then( function(url) { console.log(url) });
+        });
+
         // Login
         p.helper.forms.login.openLink.click();
         p.helper.loginFromCurrPage(userEmail);
         // Follow the link in alert
-        //browser.pause();
         browser.ignoreSynchronization = true;
         element(by.linkText('Send confirmation link again')).click();
         browser.ignoreSynchronization = false;
