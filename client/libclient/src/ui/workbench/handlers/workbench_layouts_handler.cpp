@@ -424,8 +424,15 @@ bool QnWorkbenchLayoutsHandler::confirmLayoutChange(const QnLayoutResourcePtr &l
     if (qnResourceAccessManager->hasGlobalPermission(owner, Qn::GlobalAccessAllMediaPermission))
         return true;
 
+    //TODO: #GDM #implement me
+    /* Calculate added cameras, which were not available to user before, and show warning. */
+    /* Calculate removed cameras and show another warning. 1 ok, second cancel, so what? */
 
-
+    //TODO: #vkutin here new enum will be useful
+    if (owner->userGroup().isNull())
+    {
+        /* Separate checks for users belonging to groups. */
+    }
 
     return true;
 }
