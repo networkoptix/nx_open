@@ -96,8 +96,8 @@ angular.module('webadminApp')
 
 
         return {
-            getNonce:function(){
-               return $http.get(proxy + '/web/api/getNonce');
+            getNonce:function(login){
+               return $http.get(proxy + '/web/api/getNonce?userName=' + login);
             },
             logout:function(){
                 $localStorage.$reset();
@@ -112,7 +112,7 @@ angular.module('webadminApp')
                 }
 
                 function sendLogin(){
-                    self.getNonce().then(function(data){
+                    self.getNonce(login).then(function(data){
                         var realm = data.data.reply.realm;
                         var nonce = data.data.reply.nonce;
 
