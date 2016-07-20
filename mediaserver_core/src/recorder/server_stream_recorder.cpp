@@ -26,6 +26,9 @@
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */
+#include <recorder/recording_manager.h>
+#include <utils/common/buffered_file.h>
+#include <utils/media/ffmpeg_helper.h>
 
 static const int MOTION_PREBUFFER_SIZE = 8;
 
@@ -210,6 +213,60 @@ QnScheduleTask QnServerStreamRecorder::currentScheduleTask() const
 {
     QnMutexLocker lock( &m_scheduleMutex );
     return m_currentScheduleTask;
+}
+
+void QnServerStreamRecorder::initIoContext(
+    const QnStorageResourcePtr& storage, 
+    const QString& url,
+    AVIOContext** context) 
+{
+    Q_ASSERT(context);
+    auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+    if (fileStorage)
+    {
+        QIODevice* ioDevice = fileStorage->open(
+            url,
+            QIODevice::WriteOnly,
+            getBufferSize());
+        if (ioDevice == 0)
+        {
+            *context = nullptr;
+            return;
+        }
+        *context = QnFfmpegHelper::createFfmpegIOContext(ioDevice);
+        if (!*context)
+            return;
+        fileCreated((uintptr_t)ioDevice);
+    }
+    else
+        QnStreamRecorder::initIoContext(storage, url, context);
+}
+
+void QnServerStreamRecorder::fileCreated(uintptr_t filePtr) const
+{
+    connect(
+        (QBufferedFile*)filePtr,
+        &QBufferedFile::seekDetected,
+        &qnRecordingManager->getBufferManager(),
+        &WriteBufferMultiplierManager::at_seekDetected,
+        Qt::DirectConnection);
+    connect(
+        (QBufferedFile*)filePtr,
+        &QBufferedFile::fileClosed,
+        &qnRecordingManager->getBufferManager(),
+        &WriteBufferMultiplierManager::at_fileClosed,
+        Qt::DirectConnection);
+    qnRecordingManager->getBufferManager().setFilePtr(
+        filePtr,
+        m_catalog,
+        m_device->getId());
+}
+
+int QnServerStreamRecorder::getBufferSize() const
+{
+    return qnRecordingManager->getBufferManager().getSizeForCam(
+        m_catalog, 
+        m_device->getId());
 }
 
 void QnServerStreamRecorder::updateStreamParams()
@@ -580,7 +637,10 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
             backupStorage = qnBackupStorageMan->getOptimalStorageRoot(provider);
 
         if (normalStorage || backupStorage)
-            setTruncateInterval(QnAbstractStorageResource::chunkLen/*m_storage->getChunkLen()*/);
+            setTruncateInterval(
+                MSSettings::roSettings()->value(
+                    nx_ms_conf::MEDIA_FILE_DURATION_SECONDS,
+                    nx_ms_conf::DEFAULT_MEDIA_FILE_DURATION_SECONDS).toInt());
 
         if (normalStorage)
             m_recordingContextVector.emplace_back(

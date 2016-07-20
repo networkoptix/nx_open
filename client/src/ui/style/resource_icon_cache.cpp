@@ -72,7 +72,7 @@ QnResourceIconCache *QnResourceIconCache::instance() {
 }
 
 QIcon QnResourceIconCache::icon(Key key, bool unchecked) {
-    /* This function will be called from GUI thread only, 
+    /* This function will be called from GUI thread only,
      * so no synchronization is needed. */
 
     if((key & TypeMask) == Unknown && !unchecked)
@@ -80,11 +80,11 @@ QIcon QnResourceIconCache::icon(Key key, bool unchecked) {
 
     if(m_cache.contains(key))
         return m_cache.value(key);
-    
+
     QIcon icon = m_cache.value(key & TypeMask);
     QIcon overlay = m_cache.value(key & StatusMask);
     if(!icon.isNull() && !overlay.isNull()) {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "All icons should be pre-generated.");
+        //Q_ASSERT_X(false, Q_FUNC_INFO, "All icons should be pre-generated.");
 
         QPixmap pixmap = icon.pixmap(icon.actualSize(QSize(1024, 1024)));
         {
@@ -142,10 +142,10 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr &resource)
         key = User;
     } else if ((flags & Qn::videowall) == Qn::videowall) {
         key = VideoWall;
-    } 
+    }
 
     Key status = Unknown;
-    
+
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
             key = VideoWall;

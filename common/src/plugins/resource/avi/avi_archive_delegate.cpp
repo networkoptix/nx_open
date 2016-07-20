@@ -167,7 +167,7 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
     while (m_contexts.size() <= stream->index)
         m_contexts << QnMediaContextPtr(0);
 
-    if (m_contexts[stream->index] == 0 || 
+    if (m_contexts[stream->index] == 0 ||
         m_contexts[stream->index]->ctx()->codec_id != stream->codec->codec_id)
     {
 	    m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
@@ -335,7 +335,7 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
             m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
         }
-        
+
         getVideoLayout();
     }
     m_resource->setStatus(Qn::Online);
@@ -357,7 +357,7 @@ void QnAviArchiveDelegate::doNotFindStreamInfo()
 
 void QnAviArchiveDelegate::close()
 {
-    if (m_formatContext) 
+    if (m_formatContext)
         avformat_close_input(&m_formatContext);
 
     if (m_ioContext)
@@ -365,7 +365,7 @@ void QnAviArchiveDelegate::close()
         QnFfmpegHelper::closeFfmpegIOContext(m_ioContext);
         m_ioContext = 0;
     }
-    
+
     m_contexts.clear();
     m_formatContext = 0;
     m_initialized = false;
@@ -499,7 +499,7 @@ bool QnAviArchiveDelegate::findStreams()
             m_streamsFound = avformat_find_stream_info(m_formatContext, nullptr) >= 0;
         }
 
-        if (m_streamsFound) 
+        if (m_streamsFound)
         {
             m_duration = m_formatContext->duration;
             initLayoutStreams();
@@ -618,7 +618,7 @@ bool QnAviArchiveDelegate::deserializeLayout(QnCustomResourceVideoLayout* layout
         }
         if (i == 0) {
             layout->setSize(QSize(params[0].toInt(), params[1].toInt()));
-        } 
+        }
         else {
             layout->setChannel(params[0].toInt(), params[1].toInt(), i-1);
         }
@@ -692,9 +692,9 @@ const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
         case SoftwareTag:   return "encoded_by"; // "ITCH";
         case SignatureTag:  return "copyright"; // "ICOP";
         case DewarpingTag:  return "title";
-        case CustomTag:     return "IENG"; //IENG 
+        case CustomTag:     return "IENG"; //IENG
         }
-    } 
+    }
     else {
         switch(tag)
         {

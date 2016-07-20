@@ -158,9 +158,14 @@ namespace {
 
         virtual void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const override
         {
-            QHeaderView::paintSection(painter, rect, logicalIndex);
             if (logicalIndex == QnRecordingStatsModel::BitrateColumn)
             {
+                auto sortModel = dynamic_cast<QnSortedRecordingStatsModel*> (model());
+                auto m = dynamic_cast<QnRecordingStatsModel*> (sortModel->sourceModel());
+                m->setHeaderTextBlocked(true);
+                QHeaderView::paintSection(painter, rect, logicalIndex);
+                m->setHeaderTextBlocked(false);
+
                 QnScopedPainterFontRollback rollback(painter);
                 QnScopedPainterPenRollback rollback2(painter);
                 painter->setFont(font());
@@ -169,6 +174,9 @@ namespace {
                 QRect r(rect);
                 r.adjust(0, 0, -(width + SPACE_INTERVAL), 0);
                 painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the Last Recorded"));
+            }
+            else {
+                QHeaderView::paintSection(painter, rect, logicalIndex);
             }
         }
 

@@ -43,7 +43,6 @@ public:
         return static_cast<StoragePool>
             (static_cast<int>(lhs) & static_cast<int>(rhs));
     }
-
 } // namespace QnServer
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (QnServer::ChunksCatalog), (metatype)(lexical) )
 
