@@ -47,9 +47,7 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
         }
 
         for (const QnResourcePtr& resource : qnResPool->getResources(resourceIds))
-        {
             updatePermissions(resource);
-        }
     });
 
 
