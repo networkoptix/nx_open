@@ -44,6 +44,8 @@
 #include <utils/common/ldap.h>
 #include <nx/network/socket_common.h>
 
+#include <nx/utils/log/assert.h>
+
 namespace ec2 {
 
 struct overload_tag {};
@@ -163,6 +165,22 @@ void fromApiToResource(const ApiCameraData& src, QnVirtualCameraResourcePtr& dst
     dst->setStatusFlags(src.statusFlags);
 
     dst->setVendor(src.vendor);
+
+    /* Validate camera unique id */
+    const auto dId = dst->getId();
+    const auto dUid = dst->getUniqueId();
+    const auto uidToId = QnVirtualCameraResource::uniqueIdToId(dUid);
+    if (dId == uidToId)
+        return;
+
+    QString message = lit(R"("
+        Camera id != unique id:
+        id = %1;
+        uniqueId = %2;
+        uniqueIdToId = %3;")")
+        .arg(dId.toString()).arg(dUid).arg(uidToId.toString());
+    NX_ASSERT(false, "fromApiToResource()", message);
+
 }
 
 void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraData& dst)
