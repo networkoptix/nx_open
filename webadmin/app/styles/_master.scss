@@ -31,6 +31,14 @@
     position: absolute;
     bottom: 0;
     left: 0;
+
+    margin-bottom: 16px;
+
+    a{
+      display: inline-block;
+      line-height: 16px;
+      margin-top:8px;
+    }
   }
 
   h2 {
@@ -176,4 +184,10 @@
       }
     }
   }
+}
+
+[class*=hint--]:after,[class*=hint--]:before{
+  -webkit-transition-duration: 0s;
+  -moz-transition-duration: 0s;
+  transition-duration: 0s;
 }

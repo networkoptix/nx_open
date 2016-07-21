@@ -51,8 +51,7 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
 
     m_queuedDurationUs = 0;
 
-
-    connect(AudioDevice::instance(), &AudioDevice::volumeChanged, this, [this] (float value)
+    Qn::directConnect(AudioDevice::instance(), &AudioDevice::volumeChanged, this, [this] (float value)
     {
         setVolumeLevel(value);
     });
@@ -61,6 +60,7 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
 
 Sound::~Sound()
 {
+    directDisconnectAll();
     if (!m_deinitialized)
         internalClear();
     delete [] m_proxyBuffer;
@@ -268,7 +268,7 @@ bool Sound::playImpl()
     alGetSourcei(m_source, AL_SOURCE_STATE, &state);
     checkOpenALErrorDebug(m_device);
     // if already playing
-    if (AL_PLAYING != state) 
+    if (AL_PLAYING != state)
     {
         float volume = AudioDevice::instance()->volume();
         alSourcef(m_source, AL_GAIN, volume);
@@ -278,7 +278,7 @@ bool Sound::playImpl()
         ALint queuedBuffers = 0;
         alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queuedBuffers);
         checkOpenALErrorDebug(m_device);
-        if (queuedBuffers) 
+        if (queuedBuffers)
         {
             // play
             auto timerState = m_timer.state();

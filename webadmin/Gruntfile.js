@@ -230,13 +230,23 @@ module.exports = function (grunt) {
                  {context: '/proxy/',    host: '10.1.5.130', port: 7001}/**/
 
 
-                //Parallels - Burbank
-                {context: '/web/',      host: '10.1.5.105', port: 7001},
+                //la_office_test - Burbank
+                /*{context: '/web/',      host: '10.1.5.105', port: 7001},
                 {context: '/api/',      host: '10.1.5.105', port: 7001},
                 {context: '/ec2/',      host: '10.1.5.105', port: 7001},
                 {context: '/hls/',      host: '10.1.5.105', port: 7001},
                 {context: '/media/',    host: '10.1.5.105', port: 7001},
                 {context: '/proxy/',    host: '10.1.5.105', port: 7001}/**/
+
+
+                //Parallels - Burbank
+                {context: '/web/',      host: '10.1.5.142', port: 7001},
+                {context: '/api/',      host: '10.1.5.142', port: 7001},
+                {context: '/ec2/',      host: '10.1.5.142', port: 7001},
+                {context: '/hls/',      host: '10.1.5.142', port: 7001},
+                {context: '/media/',    host: '10.1.5.142', port: 7001},
+                {context: '/proxy/',    host: '10.1.5.142', port: 7001}/**/
+
 
                 // Parallels - Providencia
                 /*{context: '/web/',    host: '192.168.1.67', port: 7001},

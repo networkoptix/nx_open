@@ -87,7 +87,7 @@ bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolut
     if (conf.disable)
     {
         PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-              << ") -> false: conf.disable is set";
+            << ") -> false: conf.disable is set";
         return false;
     }
 
@@ -95,7 +95,7 @@ bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolut
     if (resolution.width() % 2 != 0 || resolution.height() % 2 != 0)
     {
         OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-                << ") -> false: only even width and height is supported";
+            << ") -> false: only even width and height is supported";
         return false;
     }
 
@@ -103,7 +103,8 @@ bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolut
     if (resolution.width() > maxRes.width() || resolution.height() > maxRes.height())
     {
         OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-               << ") -> false: only even width and height is supported";
+            << ") -> false: resolution is higher than " 
+            << maxRes.width() << " x " << maxRes.Height();
         return false;
     }
 

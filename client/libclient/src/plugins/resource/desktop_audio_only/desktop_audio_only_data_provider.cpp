@@ -19,7 +19,7 @@ namespace {
     const auto kDefaultSampleSize = 16;
     const auto kDefaultChannelCount = 1;
     const auto kDefaultCodec = lit("audio/pcm");
-    const auto kEncoderCodecName = lit("libmp3lame");
+    const auto kEncoderCodecName = lit("mp2"); // libmp3lame
 
 }
 
@@ -370,6 +370,7 @@ QnWritableCompressedAudioDataPtr QnDesktopAudioOnlyDataProvider::encodePacket(ch
     m_inputFrame->nb_samples = ctx->frame_size;
 
     AVPacket outputPacket;
+    av_init_packet(&outputPacket);
     outputPacket.data = m_encoderBuffer;
     outputPacket.size = FF_MIN_BUFFER_SIZE;
 

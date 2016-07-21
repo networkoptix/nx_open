@@ -12,8 +12,8 @@ Item
     property Item visualParent;
 
     property alias tileColor: tileArea.color;
-    property bool isHovered: hoverIndicator.containsMouse ||
-        (expandedOpacity == 1) || menuButton.isHovered;
+    property bool isHovered: (hoverIndicator.containsMouse ||
+        (expandedOpacity == 1) || menuButton.isHovered) && !isConnecting;
 
     property alias titleLabel: systemNameLabel;
     property alias collapseButton: collapseTileButton;
@@ -22,9 +22,10 @@ Item
 
     property alias areaLoader: areaLoader;
 
+    property bool isConnecting: false;
     property bool isExpanded: false;
     property bool isAvailable: false;
-    property real expandedOpacity: collapseTileButton.opacity;
+    property real expandedOpacity: shadow.opacity;
 
     signal collapsedTileClicked();
 
@@ -142,6 +143,8 @@ Item
                 {
                     ParentAnimation
                     {
+                        via: control.visualParent;
+
                         NumberAnimation
                         {
                             properties: "x, y";
@@ -217,6 +220,9 @@ Item
             hoverEnabled: true;
             onClicked:
             {
+                if (context.connectingToSystem.length)
+                    return;
+
                 if (!control.isExpanded)
                     control.collapsedTileClicked();
                 else
@@ -235,94 +241,110 @@ Item
             anchors.fill: parent;
             radius: 2;
 
-            MouseArea
+            Item
             {
-                id: hoverIndicator;
-
                 anchors.fill: parent;
-                acceptedButtons: (control.isExpanded ? Qt.AllButtons :Qt.NoButton);
-                hoverEnabled: true;
+
+                opacity: (control.isConnecting && !isExpanded ? 0.2 : 1);
+
+                MouseArea
+                {
+                    id: hoverIndicator;
+
+                    anchors.fill: parent;
+                    acceptedButtons: (control.isExpanded ? Qt.AllButtons :Qt.NoButton);
+                    hoverEnabled: true;
+                }
+
+                NxLabel
+                {
+                    id: systemNameLabel;
+
+                    disableable: false;
+                    anchors.left: parent.left;
+                    anchors.right: (collapseTileButton.visible ? collapseTileButton.left :
+                        (menuButtonControl.visible ? menuButtonControl.left : parent.right));
+                    anchors.top: parent.top;
+
+                    anchors.leftMargin: 16;
+                    anchors.rightMargin: (collapseTileButton.visible || menuButtonControl.visible ?
+                        0 : anchors.leftMargin);
+                    anchors.topMargin: 12;
+
+                    elide: Text.ElideRight;
+
+                    height: Style.custom.systemTile.systemNameLabelHeight;
+                    color: (control.isAvailable ? Style.colors.text : Style.colors.midlight);
+                    font: Style.fonts.systemTile.systemName;
+                }
+
+                NxMenuButton
+                {
+                    id: menuButtonControl;
+
+                    width: 24;
+                    height: 24;
+
+                    anchors.right: parent.right;
+                    anchors.top: parent.top;
+
+                    anchors.rightMargin: 6;
+                    anchors.topMargin: 12;
+                }
+
+                NxButton
+                {
+                    id: collapseTileButton;
+
+                    width: 40;
+                    height: 40;
+
+                    visible: (opacity != 0) && isExpanded;
+                    anchors.right: parent.right;
+                    anchors.top: parent.top;
+
+                    iconUrl: "qrc:/skin/welcome_page/close.png";
+                    bkgColor: tileArea.color;
+                    hoveredColor: Style.colors.custom.systemTile.closeButtonBkg;
+                    enabled: !control.isConnecting;
+
+                    onClicked: { control.toggle(); }
+                }
+
+                Loader
+                {
+                    id: areaLoader;
+
+                    anchors.left: parent.left;
+                    anchors.right: parent.right;
+                    anchors.top: systemNameLabel.bottom;
+
+                    anchors.leftMargin: 12;
+                    anchors.rightMargin: 16;
+
+                    sourceComponent: control.centralAreaDelegate;
+                }
+
+                Indicator
+                {
+                    id: indicatorControl;
+
+                    visible: false;
+
+                    anchors.right: parent.right;
+                    anchors.top: parent.top;
+                    anchors.rightMargin: 14;
+                    anchors.topMargin: 66;
+                }
             }
 
-            NxLabel
+            NxDotPreloader
             {
-                id: systemNameLabel;
-
-                disableable: false;
-                anchors.left: parent.left;
-                anchors.right: (collapseTileButton.visible ? collapseTileButton.left :
-                    (menuButtonControl.visible ? menuButtonControl.left : parent.right));
-                anchors.top: parent.top;
-
-                anchors.leftMargin: 16;
-                anchors.rightMargin: (collapseTileButton.visible || menuButtonControl.visible ?
-                    0 : anchors.leftMargin);
-                anchors.topMargin: 12;
-
-                elide: Text.ElideRight;
-
-                height: Style.custom.systemTile.systemNameLabelHeight;
-                color: (control.isAvailable ? Style.colors.text : Style.colors.midlight);
-                font: Style.fonts.systemTile.systemName;
+                visible: control.isConnecting && !control.isExpanded;
+                anchors.centerIn: parent;
+                color: Style.colors.text;
             }
 
-            NxMenuButton
-            {
-                id: menuButtonControl;
-
-                width: 24;
-                height: 24;
-
-                anchors.right: parent.right;
-                anchors.top: parent.top;
-
-                anchors.rightMargin: 6;
-                anchors.topMargin: 12;
-            }
-
-            NxButton
-            {
-                id: collapseTileButton;
-
-                width: 40;
-                height: 40;
-
-                visible: (opacity != 0);
-                anchors.right: parent.right;
-                anchors.top: parent.top;
-
-                iconUrl: "qrc:/skin/welcome_page/close.png";
-                bkgColor: tileArea.color;
-                hoveredColor: Style.colors.custom.systemTile.closeButtonBkg;
-
-                onClicked: { control.toggle(); }
-            }
-
-            Loader
-            {
-                id: areaLoader;
-
-                anchors.left: parent.left;
-                anchors.right: parent.right;
-                anchors.top: systemNameLabel.bottom;
-
-                anchors.leftMargin: 12;
-                anchors.rightMargin: 16;
-
-                sourceComponent: control.centralAreaDelegate;
-            }
-
-            Indicator
-            {
-                id: indicatorControl;
-
-                visible: false;
-
-                anchors.right: parent.right;
-                anchors.top: parent.top;
-                anchors.rightMargin: 14;
-                anchors.topMargin: 66;
-            }
         }
     }
 }

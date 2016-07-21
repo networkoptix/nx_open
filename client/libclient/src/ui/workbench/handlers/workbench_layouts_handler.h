@@ -1,5 +1,4 @@
-#ifndef WORKBENCH_LAYOUTS_HANDLER_H
-#define WORKBENCH_LAYOUTS_HANDLER_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -9,7 +8,7 @@
 
 class QnWorkbenchStateDelegate;
 
-class QnWorkbenchLayoutsHandler : public QObject, public QnWorkbenchContextAware
+class QnWorkbenchLayoutsHandler: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
@@ -24,7 +23,7 @@ public:
 protected:
     ec2::AbstractECConnectionPtr connection2() const;
 
-private slots:
+    private slots:
     void at_newUserLayoutAction_triggered();
     void at_saveLayoutAction_triggered();
     void at_saveCurrentLayoutAction_triggered();
@@ -39,15 +38,18 @@ private slots:
 
     void at_workbench_layoutsChanged();
 
-
-
 private:
     void saveLayout(const QnLayoutResourcePtr &layout);
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
 
+    /** Ask user if layout should be saved. Actual when admin modifies shared layout
+     *  or layout belonging to user with custom access rights.
+     */
+    bool confirmLayoutChange(const QnLayoutResourcePtr &layout);
+
     /**
-     * @brief askOverrideLayout     Show messagebox asking user if he really wants to override existsing layout.
-     * @param buttons               Messagebox buttons.
+     * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.
+     * @param buttons               Message box buttons.
      * @param defaultButton         Default button.
      * @return                      Selected button.
      */
@@ -68,5 +70,3 @@ private:
     /** Flag that we are in layouts closing process. */
     bool m_closingLayouts;
 };
-
-#endif // WORKBENCH_LAYOUTS_HANDLER_H

@@ -1,5 +1,4 @@
-#ifndef QN_PARAM_H
-#define QN_PARAM_H
+#pragma once
 
 #include <nx/utils/literal.h>
 
@@ -48,6 +47,9 @@ namespace Qn
     static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
     static const QString VIDEO_LAYOUT_PARAM_NAME2 = lit("videoLayout"); //used in resource_data.json
 
+    static const QString kPrimaryUrl = lit("primaryUrl");
+    static const QString kSecondaryUrl = lit("secondaryUrl");
+
     static const QString SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME = lit("shouldAppearAsSingleChannel");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state
     static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
@@ -63,7 +65,7 @@ namespace Qn
     static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
     static const QString PTZ_CAPABILITIES_PARAM_NAME = lit("ptzCapabilities");
 	static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
-    static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype"); 
+    static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype");
     static const QString DO_NOT_ADD_VENDOR_TO_DEVICE_NAME = lit("doNotAddVendorToDeviceName");
     static const QString VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME = lit("multiresourceVideoChannelMapping");
 
@@ -85,5 +87,3 @@ namespace Qn
     // Storage
     static const QString SPACE = lit("space");
 }
-
-#endif // QN_PARAM_H

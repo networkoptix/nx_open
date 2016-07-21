@@ -197,7 +197,7 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
-    
+
     QString maxSensorWidth;
     QString maxSensorHeight;
     {
@@ -413,7 +413,7 @@ QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
     }
 
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
-    motion->m_duration = 1000 * 1000 * 1000; // 1000 sec 
+    motion->m_duration = 1000 * 1000 * 1000; // 1000 sec
     return motion;
 }
 
@@ -546,7 +546,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString &id, QString &valu
 
     if (status != CL_HTTP_SUCCESS)
         return false;
-        
+
 
     QByteArray response;
     connection.readAll(response);
@@ -642,9 +642,9 @@ QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()
 void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
 {
     if (channel != 0)
-        return; // motion info used always once even for multisensor cameras 
+        return; // motion info used always once even for multisensor cameras
 
-    static int sensToLevelThreshold[10] = 
+    static int sensToLevelThreshold[10] =
     {
         31, // 0 - aka mask really filtered by server always
         31, // 1
@@ -659,9 +659,9 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
     };
 
     QnMotionRegion region = getMotionRegion(0);
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    for (int sens = 1; sens < QnMotionRegion::kSensitivityLevelCount; ++sens)
     {
-        
+
         if (!region.getRegionBySens(sens).isEmpty())
         {
             setParamPhysicalAsync(lit("mdlevelthreshold"), QString::number(sensToLevelThreshold[sens]));
@@ -685,7 +685,7 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(
 
     m_relayInputClient = nx_http::AsyncHttpClient::create();
     connect(m_relayInputClient.get(), &nx_http::AsyncHttpClient::done,
-            this, 
+            this,
             [this, completionHandler](nx_http::AsyncHttpClientPtr client) {
                 if (completionHandler)
                     completionHandler(

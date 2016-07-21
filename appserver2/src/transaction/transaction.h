@@ -424,7 +424,7 @@ APPLY(405, getServerUserAttributes, ApiMediaServerUserAttributesDataList, \
                        FilterListByAccess<ReadServerAttributesAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadServerAttributesAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(406, removeServerUserAttributes, ApiIdData, \
-                       false, /* persistent*/ \
+                       true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \

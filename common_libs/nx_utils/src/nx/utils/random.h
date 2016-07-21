@@ -17,6 +17,12 @@ namespace utils {
 /** std::rand() implementation which ensures timed seed injection */
 NX_UTILS_API int rand();
 
+template<typename T = int>
+T randomInt() { return static_cast<T>(rand()); }
+
+template<typename T>
+T randomInt(T min, T max) { return min + randomInt<T>() % (max - min); }
+
 /** Uses uniform_int_distribution.
     @return \a false if could not generate random data.
 

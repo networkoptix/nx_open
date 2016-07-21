@@ -404,7 +404,15 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     else if (!draw)
         m_lastIgnoreTime = data->timestamp;
 
-    const bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
+    bool enableFrameQueue;
+    bool needReinitDecoders;
+    {
+        QnMutexLocker lock(&m_mtx);
+        enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
+        needReinitDecoders = m_needReinitDecoders;
+        m_needReinitDecoders = false;
+    }
+
     if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS && m_canUseBufferedFrameDisplayer)
     {
         if (!m_bufferedFrameDisplayer) {
@@ -439,11 +447,10 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         m_queueUsed = false;
     }
 
-    if (m_needReinitDecoders) {
+    if (needReinitDecoders) {
         QnMutexLocker lock( &m_mtx );
         foreach(QnAbstractVideoDecoder* decoder, m_decoder)
             decoder->setMTDecoding(enableFrameQueue);
-        m_needReinitDecoders = false;
     }
 
     QSharedPointer<CLVideoDecoderOutput> m_tmpFrame( new CLVideoDecoderOutput() );
@@ -511,8 +518,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     outFrame->channel = data->channelNumber;
     outFrame->flags = 0;
 
-    if (!useTmpFrame)
-        outFrame->setUseExternalData(!enableFrameQueue);
+    outFrame->setUseExternalData(!enableFrameQueue && !useTmpFrame);
 
     m_mtx.lock();
 
@@ -864,6 +870,7 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::findScaleFactor(int width, 
 
 void QnVideoStreamDisplay::setMTDecoding(bool value)
 {
+    QnMutexLocker lock(&m_mtx);
     m_enableFrameQueue = value;
     m_needReinitDecoders = true;
 }
@@ -873,7 +880,10 @@ void QnVideoStreamDisplay::setSpeed(float value)
     m_speed = value;
     m_reverseMode = value < 0;
     if (m_reverseMode)
+    {
+        QnMutexLocker lock(&m_mtx);
         m_enableFrameQueue = true;
+    }
 
     QnMutexLocker lock( &m_mtx );
     for( QMap<AVCodecID, QnAbstractVideoDecoder*>::const_iterator

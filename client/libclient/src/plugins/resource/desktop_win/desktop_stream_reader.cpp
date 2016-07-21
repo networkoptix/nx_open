@@ -34,7 +34,9 @@ QnDesktopStreamreader::QnDesktopStreamreader(const QnResourcePtr &dev):
     m_videoBuf(0),
     m_videoBufSize(0),
     m_videoCodecCtx(0),
-    m_initialized(false)
+    m_initialized(false),
+    m_frame(nullptr),
+    m_outPacket(av_packet_alloc())
 {
     QString num= dev->getUniqueId();
     int idx = num.length()-1;
@@ -49,6 +51,7 @@ QnDesktopStreamreader::QnDesktopStreamreader(const QnResourcePtr &dev):
 QnDesktopStreamreader::~QnDesktopStreamreader()
 {
     closeStream();
+	av_packet_free(&m_outPacket);
 }
 
 bool QnDesktopStreamreader::init()
@@ -107,20 +110,18 @@ QnAbstractMediaDataPtr QnDesktopStreamreader::getNextData()
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);
 
-        //int encodeResult = avcodec_encode_video2(m_videoCodecCtx, m_videoBuf, m_videoBufSize, m_frame);
-        AVPacket outPacket;
-        outPacket.data = m_videoBuf;
-        outPacket.size = m_videoBufSize;
+        m_outPacket->data = m_videoBuf;
+        m_outPacket->size = m_videoBufSize;
         int got_packet = 0;
-        int encodeResult = avcodec_encode_video2(m_videoCodecCtx, &outPacket, m_frame, &got_packet);
+        int encodeResult = avcodec_encode_video2(m_videoCodecCtx, m_outPacket, m_frame, &got_packet);
 
         if (encodeResult < 0)
             continue;
 
         if (got_packet)
         {
-            QnWritableCompressedVideoData* videoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, outPacket.size);
-            videoData->m_data.write((const char*)m_videoBuf, outPacket.size);
+            QnWritableCompressedVideoData* videoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_outPacket->size);
+            videoData->m_data.write((const char*)m_videoBuf, m_outPacket->size);
 
             videoData->width = m_grabber->width();
             videoData->height = m_grabber->height();

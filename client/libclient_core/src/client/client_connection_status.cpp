@@ -1,25 +1,34 @@
 #include "client_connection_status.h"
 
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
+
 //#define STRICT_STATE_CONTROL
 
-QString QnConnectionStateUtils::toString(QnConnectionState state) {
-    switch (state) {
-    case QnConnectionState::Invalid:                return lit("Invalid");
-    case QnConnectionState::Disconnected:           return lit("Disconnected");
-    case QnConnectionState::Connecting:             return lit("Connecting");
-    case QnConnectionState::Connected:              return lit("Connected");
-    case QnConnectionState::Reconnecting:           return lit("Reconnecting");
-    case QnConnectionState::Ready:                  return lit("Ready");
-    }
-    qWarning() << "invalid state" << QString::number(static_cast<int>(state));
-    return QString();
+namespace {
+
+const QMap<QnConnectionState, QString> stateToString
+{
+    {QnConnectionState::Disconnected,   lit("Disconnected")},
+    {QnConnectionState::Connecting,     lit("Connecting")},
+    {QnConnectionState::Connected,      lit("Connected")},
+    {QnConnectionState::Reconnecting,   lit("Reconnecting")},
+    {QnConnectionState::Ready,          lit("Ready")}
+};
+
+} //anonymous namespace
+
+QString QnConnectionStateUtils::toString(QnConnectionState state)
+{
+    return stateToString[state];
 }
 
-QnClientConnectionStatus::QnClientConnectionStatus():
-    m_state(QnConnectionState::Invalid)
+QnClientConnectionStatus::QnClientConnectionStatus(QnConnectionState state)
+    :
+    m_state(state),
+    m_allowedTransactions()
 {
     /* Default way. */
-    m_allowedTransactions.insert(QnConnectionState::Invalid,        QnConnectionState::Disconnected);
     m_allowedTransactions.insert(QnConnectionState::Disconnected,   QnConnectionState::Connecting);
     m_allowedTransactions.insert(QnConnectionState::Connecting,     QnConnectionState::Connected);
     m_allowedTransactions.insert(QnConnectionState::Connected,      QnConnectionState::Ready);
@@ -40,24 +49,28 @@ QnClientConnectionStatus::QnClientConnectionStatus():
     m_allowedTransactions.insert(QnConnectionState::Disconnected,   QnConnectionState::Disconnected);
 }
 
-QnConnectionState QnClientConnectionStatus::state() const {
+QnConnectionState QnClientConnectionStatus::state() const
+{
     return m_state;
 }
 
-void QnClientConnectionStatus::setState(QnConnectionState state) {
+void QnClientConnectionStatus::setState(QnConnectionState state)
+{
 #ifdef STRICT_STATE_CONTROL
-    qDebug() << "QnClientConnectionStatus::setState" << QnConnectionStateUtils::toString(state);
+    qDebug() << "QnClientConnectionStatus::setState" << stateToString[m_state];
 #endif
 
     if (!m_allowedTransactions.values(m_state).contains(state))
-        warn(lit("Invalid state transaction %1 -> %2").arg(QnConnectionStateUtils::toString(m_state)).arg(QnConnectionStateUtils::toString(state)));
+        warn(lit("Invalid state transaction %1 -> %2").arg(stateToString[m_state]).arg(stateToString[state]));
 
     m_state = state;
 }
 
-void QnClientConnectionStatus::warn(const QString &message) const {
+void QnClientConnectionStatus::warn(const QString &message) const
+{
+    NX_LOG(message, cl_logWARNING);
 #ifdef STRICT_STATE_CONTROL
-    NX_ASSERT(false, Q_FUNC_INFO, message.toUtf8());
+    NX_EXPECT(false, Q_FUNC_INFO, message.toUtf8());
 #else
     qWarning() << message;
 #endif

@@ -32,9 +32,9 @@ AVSampleFormat QnFfmpegAudioDecoder::audioFormatQtToFfmpeg(const QnAudioFormat& 
 
 QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(QnCompressedAudioDataPtr data):
     m_audioDecoderCtx(0),
+    m_initialized(false),
     m_codec(data->compressionType),
-    m_outFrame(av_frame_alloc()),
-    m_initialized(false)
+    m_outFrame(av_frame_alloc())
 {
     if (m_first_instance)
     {

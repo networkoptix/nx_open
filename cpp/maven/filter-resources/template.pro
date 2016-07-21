@@ -7,6 +7,7 @@ TEMPLATE = ${template}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
 QT = ${qt.libs}
+BOX = ${box}
 
 CONFIG += unversioned_soname unversioned_libname
 
@@ -239,7 +240,7 @@ unix: {
 }
 
 ## LINUX
-linux* {
+linux*:!android {
   !arm {
     LIBS += ${linux.oslibs}
     QMAKE_CXXFLAGS += ${compiler.arguments}
@@ -254,7 +255,8 @@ linux* {
   } else {
     LIBS -= -lssl
     LIBS += ${linux.arm.oslibs}
-    QMAKE_CXXFLAGS += -ggdb1 -fno-omit-frame-pointer
+    QMAKE_CXXFLAGS += -fno-omit-frame-pointer
+    CONFIG(release, debug|release)|!equals(BOX, tx1): QMAKE_CXXFLAGS += -ggdb1
   }
   QMAKE_LFLAGS += -rdynamic
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers

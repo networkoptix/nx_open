@@ -172,6 +172,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             ? nx_http::getHeaderValue( request.headers, "Proxy-Authorization" )
             : nx_http::getHeaderValue( request.headers, "Authorization" );
         const nx_http::StringType nxUserName = nx_http::getHeaderValue( request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME );
+        bool canUpdateRealm = request.headers.find(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME) != request.headers.end();
         if( authorization.isEmpty() )
         {
             Qn::AuthResult authResult = Qn::Auth_WrongDigest;
@@ -189,8 +190,9 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                         if (errCode != Qn::Auth_OK)
                             return errCode;
                     }
-                    if( userResource->getRealm() != desiredRealm ||
-                        userResource->getDigest().isEmpty() )   //in case of ldap digest is initially empty
+                    if(canUpdateRealm &&
+                      (userResource->getRealm() != desiredRealm ||
+                       userResource->getDigest().isEmpty()) )   //in case of ldap digest is initially empty
                     {
                         //requesting client to re-calculate digest after upgrade to 2.4
                         nx_http::insertOrReplaceHeader(

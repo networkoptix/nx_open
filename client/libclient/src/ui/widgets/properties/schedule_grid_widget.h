@@ -7,6 +7,8 @@
 
 #include <client/client_color_types.h>
 
+#include <ui/common/custom_painted.h>
+
 
 class QnScheduleGridWidget : public QWidget
 {
@@ -54,6 +56,8 @@ public:
 
     const QnScheduleGridColors& colors() const;
     void setColors(const QnScheduleGridColors& colors);
+
+    CustomPaintedBase::PaintFunction paintFunction(Qn::RecordingType type) const;
 
 signals:
     void cellActivated(const QPoint& cell);

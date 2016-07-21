@@ -8,6 +8,7 @@
 #include <utils/media/audioformat.h>
 
 #include <utils/timer.h>
+#include <utils/common/safe_direct_connection.h>
 
 class AudioDevice;
 typedef struct ALCdevice_struct ALCdevice;
@@ -18,7 +19,7 @@ namespace audio {
 /**
  * Plays audio via openAL.
  */
-class Sound: public QObject
+class Sound: public QObject, public Qn::EnableSafeDirectConnection
 {
 public:
     Sound(ALCdevice* device, const QnAudioFormat& audioFormat);
@@ -89,7 +90,7 @@ private:
     void clearBuffers(bool clearAll);
 
     qint64 maxAudioJitterUs() const;
-    
+
     /** Device specific extra delay for played audio. */
     qint64 extraAudioDelayUs() const;
 

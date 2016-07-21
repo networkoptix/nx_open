@@ -57,6 +57,7 @@ private:
     qint64 m_droppedFrames;
 
     bool m_useRealTimeOptimization;
+    AVPacket* m_outPacket;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

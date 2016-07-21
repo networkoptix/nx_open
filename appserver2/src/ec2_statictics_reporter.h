@@ -19,8 +19,9 @@ namespace ec2
     public:
         /** Collects and reports statistics in automatic mode (by internal timer) */
         Ec2StaticticsReporter(
-                              const AbstractResourceManagerPtr& resourceManager,
-                              const AbstractMediaServerManagerPtr& msManager);
+            const AbstractResourceManagerPtr& resourceManager,
+            const AbstractMediaServerManagerPtr& msManager);
+
         ~Ec2StaticticsReporter();
 
         /** Collects \class ApiSystemStatistics in the entire system */
@@ -41,6 +42,7 @@ namespace ec2
         void removeTimer();
         void timerEvent();
 
+        QDateTime plannedReportTime(const QDateTime& now);
         ErrorCode initiateReport(QString* reportApi = 0);
         QnUuid getOrCreateSystemId();
 
@@ -52,6 +54,7 @@ namespace ec2
         AbstractMediaServerManagerPtr m_msManager;
 
         nx_http::AsyncHttpClientPtr m_httpClient;
+        bool m_firstTime;
         boost::optional<QDateTime> m_plannedReportTime;
         uint m_timerCycle;
 
