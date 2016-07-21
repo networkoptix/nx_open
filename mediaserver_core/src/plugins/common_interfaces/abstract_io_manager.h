@@ -10,6 +10,8 @@ namespace nx_io_managment
 enum class IOPortState
 {
     active,
+    activeLow,
+    activeHigh,
     nonActive,
 };
 
@@ -38,5 +40,9 @@ public:
 
     virtual QnIOPortDataList getInputPortList() const = 0;
 
+    virtual QnIOStateDataList getPortStates() const = 0;
+
     virtual void setInputPortStateChangeCallback(InputStateChangeCallback callback) = 0;
+
+    virtual void terminate() = 0;
 };

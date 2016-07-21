@@ -25,17 +25,21 @@ public:
 
     ModbusResponse doModbusRequest(const ModbusRequest&, bool& success);
 
+    // Discrete input is 1-bit read only field.
     ModbusResponse readDiscreteInputs();
 
-    ModbusResponse readCoils();
-    ModbusResponse writeCoils();
-
+    // Coil is 1-bit read/write field.
+    ModbusResponse readCoils(quint16 startCoilAddress, quint16 coilCount);
+    ModbusResponse writeCoils(quint16 startCoilAddress, const QByteArray& data);
     ModbusResponse writeSingleCoil(quint16 coilAddress, bool coilState);
 
-    ModbusResponse readInputRegisters();
+    // Input register is read only word of length 2 byte.
+    ModbusResponse readInputRegisters(quint16 startRegister, quint16 registerCount);
 
+    // Holding register is read/write word of length 2 byte.
     ModbusResponse readHoldingRegisters(quint16 startRegister, quint16 registerCount);
     ModbusResponse writeHoldingRegisters(quint16 startRegister, const QByteArray& data);
+    ModbusResponse writeSingleHoldingRegister(quint16 registerAddres, const QByteArray& data);
 
 private:
     bool initSocket();

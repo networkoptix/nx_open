@@ -67,4 +67,38 @@ ModbusResponse ModbusResponse::decode(const QByteArray &response)
     return decoded;
 }
 
+bool ModbusResponse::isException() const
+{
+    return functionCode > kErrorCodeLowerLimit;
+}
+
+QString ModbusResponse::getExceptionString() const
+{
+    if (functionCode < kErrorCodeLowerLimit)
+        return lit("Everything is fine.");
+
+    switch (exceptionFunctionCode)
+    {
+        case ExceptionFunctionCode::kIllegalFunction:
+            return lit("Illegal request function code");
+        case ExceptionFunctionCode::kIllegalDataAddress:
+            return lit("Illegal data address");
+        case ExceptionFunctionCode::kIllegalDataValue:
+            return lit("Illegal data value");
+        case ExceptionFunctionCode::kServerDeviceFailure:
+            return lit("Server device failure");
+        case ExceptionFunctionCode::kAcknowledge:
+            return lit("Acknowledge. Operation in progress. Not an error.");
+        case ExceptionFunctionCode::kServerDeviceBusy:
+            return lit("Server device is busy");
+        case ExceptionFunctionCode::kMemoryParityError:
+            return lit("Memory parity error");
+        case ExceptionFunctionCode::kGatewayPathUnavailable:
+            return lit("Gateway path unavailable");
+        case ExceptionFunctionCode::kGatewayTargetDeviceFailedToRespond:
+            return lit("Gateway target device failed to respond");
+        default:
+            return lit("Unknown error");
+    }
+}
 

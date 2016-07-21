@@ -38,106 +38,39 @@
         },
 		{
 			"keys": [
+				"Advantech|ADAM-6050"
+			],
+			"adamStartInputCoil": 0,
+			"adamInputCount": 12,
+			"adamStartOutputCoil": 16,
+			"adamOutputCount": 6
+		},
+		{
+			"keys": [
+				"Advantech|ADAM-6051"
+			],
+			"adamStartInputCoil": 0,
+			"adamInputCount": 14,
+			"adamStartOutputCoil": 16,
+			"adamOutputCount": 2
+		},
+		{
+			"keys": [
 				"Advantech|ADAM-6052"
 			],
-			"ioSettings": [
-				{
-					"id": "coil_0",
-					"inputName": "DI0",
-					"portType": "Input",
-					"supportedPortTypes": "Input"
-				},
-				{
-					"id": "coil_1",
-					"inputName": "DI1",
-					"portType": "Input",
-					"supportedPortTypes": "Input"
-				},
-				{
-					"id": "coil_2",
-					"inputName": "DI2",
-					"portType": "Input",
-					"supportedPortTypes": "Input"
-				},
-				{
-					"id": "coil_3",
-					"inputName": "DI3",
-					"portType": "Input",
-					"supportedPortTypes": "Input"
-				},
-				{
-					"id": "coil_4",
-					"inputName": "DI4",
-					"portType": "Input",
-					"supportedPortTypes": "Input"
-				},
-				{
-					"id": "coil_5",
-					"inputName": "DI5",
-					"portType": "Input",
-					"supportedPortTypes": "Input"
-				},
-				{
-					"id": "coil_6",
-					"inputName": "DI6",
-					"portType": "Input",
-					"supportedPortTypes": "Input"
-				},
-				{
-					"id": "coil_7",
-					"inputName": "DI7",
-					"portType": "Input",
-					"supportedPortTypes": "Input"
-				},
-				{
-					"id": "coil_16",
-					"outputName": "DO0",
-					"portType": "Output",
-					"supportedPortTypes": "Output"
-				},
-				{
-					"id": "coil_17",
-					"outputName": "DO1",
-					"portType": "Output",
-					"supportedPortTypes": "Output"
-				},
-				{
-					"id": "coil_18",
-					"outputName": "DO2",
-					"portType": "Output",
-					"supportedPortTypes": "Output"
-				},
-				{
-					"id": "coil_19",
-					"outputName": "DO3",
-					"portType": "Output",
-					"supportedPortTypes": "Output"
-				},
-				{
-					"id": "coil_20",
-					"outputName": "DO4",
-					"portType": "Output",
-					"supportedPortTypes": "Output"
-				},
-				{
-					"id": "coil_21",
-					"outputName": "DO5",
-					"portType": "Output",
-					"supportedPortTypes": "Output"
-				},
-				{
-					"id": "coil_22",
-					"outputName": "DO6",
-					"portType": "Output",
-					"supportedPortTypes": "Output"
-				},
-				{
-					"id": "coil_23",
-					"outputName": "DO7",
-					"portType": "Output",
-					"supportedPortTypes": "Output"
-				}
-			]
+			"adamStartInputCoil": 0,
+			"adamInputCount": 8,
+			"adamStartOutputCoil": 16,
+			"adamOutputCount": 8
+		},
+		{
+			"keys": [
+				"Advantech|ADAM-6060","Advantech|ADAM-6066"
+			],
+			"adamStartInputCoil": 0,
+			"adamInputCount": 6,
+			"adamStartOutputCoil": 16,
+			"adamOutputCount": 6
 		},
         {
             "keys": [

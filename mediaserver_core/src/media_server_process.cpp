@@ -2183,27 +2183,27 @@ void MediaServerProcess::run()
     QnPlISDResourceSearcher isdResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&isdResourceSearcher);
 #endif
-
-
-    QnFlirResourceSearcher flirResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&flirResourceSearcher);
+#ifdef ENABLE_ADVANTECH
+    QnAdamResourceSearcher advantechAdamResourceSearcher;
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&advantechAdamResourceSearcher);
+#endif
 
 #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
     QnPlVmax480ResourceSearcher::initStaticInstance( new QnPlVmax480ResourceSearcher() );
     QnResourceDiscoveryManager::instance()->addDeviceServer(QnPlVmax480ResourceSearcher::instance());
 #endif
 
-    //Onvif searcher should be the last:
+//Onvif searcher should be the last:
 #ifdef ENABLE_ONVIF
+    QnFlirResourceSearcher flirResourceSearcher;
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&flirResourceSearcher);
+
     QnFlexWatchResourceSearcher flexWatchResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&flexWatchResourceSearcher);
 
     OnvifResourceSearcher onvifResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&onvifResourceSearcher);
 #endif //ENABLE_ONVIF
-
-    QnAdamResourceSearcher advantechAdamResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&advantechAdamResourceSearcher);
 
 #endif
 

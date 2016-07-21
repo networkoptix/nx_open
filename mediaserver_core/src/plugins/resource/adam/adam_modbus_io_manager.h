@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ENABLE_ADVANTECH
+
 #include <deque>
 
 #include <core/resource/resource_fwd.h>
@@ -29,35 +31,45 @@ public:
 
     virtual QnIOPortDataList getOutputPortList() const override;
 
+    virtual QnIOStateDataList getPortStates() const override;
+
     virtual void setInputPortStateChangeCallback(InputStateChangeCallback callback) override;
 
-private:
-    quint32 getPortCoil(const QString& ioPortId, bool& success) const;
-    bool initializeIO();
-    void fetchCurrentInputStates();
-    void processInputStatesResponse(const nx_modbus::ModbusResponse& response);
+    virtual void terminate() override;
 
-    void scheduleMonitoringIteration();
+private:
+    bool initializeIO();
+
+    void fetchAllPortStates();
+
+    void processAllPortStatesResponse(const nx_modbus::ModbusResponse& response);
+    void updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex);
+
+    bool getBitValue(const QByteArray& bytes, quint64 bitIndex) const;
+    quint32 getPortCoil(const QString& ioPortId, bool& success) const;
 
     void routeMonitoringFlow(nx_modbus::ModbusResponse response);
     void handleMonitoringError();
+    void scheduleMonitoringIteration();
 
 private:
     QnResource* m_resource;
 
     std::atomic<bool> m_monitoringIsInProgress;
+    mutable QnMutex m_mutex;
+
     bool m_ioPortInfoFetched;
 
-    // All coils holding information about inputs are located in continuous address range
-    quint16 m_firstInputCoilAddress;
     quint64 m_inputMonitorTimerId;
 
     QnIOPortDataList m_inputs;
     QnIOPortDataList m_outputs;
 
-    std::deque<bool> m_inputStates;
+    QnIOStateDataList m_ioStates;
 
     nx_modbus::QnModbusAsyncClient m_client;
     nx_modbus::QnModbusClient m_outputClient;
     InputStateChangeCallback m_inputStateChangedCallback;
 };
+
+#endif //< ENABLE_ADVANTECH

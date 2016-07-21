@@ -5,7 +5,9 @@
 namespace nx_modbus
 {
 
+const quint16 kDefaultModbusPort = 502;
 const quint8 kErrorCodeLowerLimit = 0x80;
+const int kModbusMaxMessageLength = 512;
 
 const quint16 kCoilStateOn = 0xff00;
 const quint16 kCoilStateOff = 0x0000;
@@ -85,6 +87,9 @@ struct ModbusResponse
     quint8 functionCode;
     quint8 exceptionFunctionCode;
     QByteArray data;
+
+    bool isException() const;
+    QString getExceptionString() const;
 
     static ModbusResponse decode(const QByteArray& response);
 };

@@ -1,3 +1,5 @@
+#ifdef ENABLE_ADVANTECH
+
 #include <functional>
 #include <memory>
 
@@ -22,6 +24,8 @@ QnAdamResource::QnAdamResource()
 QnAdamResource::~QnAdamResource()
 {
     stopInputPortMonitoringAsync();
+    if (m_ioManager)
+        m_ioManager->terminate();
 }
 
 QString QnAdamResource::getDriverName() const
@@ -46,6 +50,11 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
 
     setIOPorts(allPorts);
     setCameraCapabilities(caps);
+
+    setFlags(flags() | Qn::io_module);
+    setProperty(Qn::VIDEO_DISABLED_PARAM_NAME, 1);
+    setProperty(Qn::IO_CONFIG_PARAM_NAME, 1);
+
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
@@ -57,7 +66,7 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
 
     auto callback = [this](QString portId, nx_io_managment::IOPortState inputState)
     {
-        bool isActive = inputState == nx_io_managment::IOPortState::active;
+        bool isActive = inputState < nx_io_managment::IOPortState::nonActive;
         emit cameraInput(
             toSharedPointer(),
             portId, 
@@ -77,25 +86,67 @@ void QnAdamResource::stopInputPortMonitoringAsync()
 
 bool QnAdamResource::isInputPortMonitored() const
 {
-    return m_ioManager->isMonitoringInProgress();
+    if (m_ioManager)
+        return m_ioManager->isMonitoringInProgress();
+
+    return false;
 }
 
 QnIOPortDataList QnAdamResource::getRelayOutputList() const
 {
-    return m_ioManager->getOutputPortList();
+    if (m_ioManager)
+        return m_ioManager->getOutputPortList();
+
+    return QnIOPortDataList();
 }
 
 QnIOPortDataList QnAdamResource::getInputPortList() const
 {
-    return m_ioManager->getInputPortList();
+    if (m_ioManager)
+        return m_ioManager->getInputPortList();
+
+    return QnIOPortDataList();
+}
+
+QnIOStateDataList QnAdamResource::ioStates() const 
+{
+    if (m_ioManager)
+        return m_ioManager->getPortStates();
+
+    return QnIOStateDataList();
 }
 
 bool QnAdamResource::setRelayOutputState(
     const QString& outputId, 
     bool isActive, 
-    unsigned int autoResetTimeoutMS )
+    unsigned int autoResetTimeoutMs )
 {
+    if (!m_ioManager)
+        return false;
 
-    // TODO: #dmishin implement auto-reset timeout.
+    if (autoResetTimeoutMs)
+    {
+        auto autoResetTimer = TimerManager::instance()->addTimer(
+            [this](quint64  timerId)
+            {
+                if (m_autoResetTimers.count(timerId))
+                {
+                    auto timerEntry = m_autoResetTimers[timerId];
+                    m_ioManager->setOutputPortState(
+                        timerEntry.portId, 
+                        timerEntry.state);
+                }
+                m_autoResetTimers.erase(timerId);
+            },
+            autoResetTimeoutMs);
+
+        PortTimerEntry portTimerEntry;
+        portTimerEntry.portId = outputId;
+        portTimerEntry.state = !isActive;
+        m_autoResetTimers[autoResetTimer] = portTimerEntry;
+    }
+
     return m_ioManager->setOutputPortState(outputId, isActive);
 }
+
+#endif //< ENABLE_ADVANTECH

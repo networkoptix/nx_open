@@ -1,23 +1,27 @@
 #pragma once
 
+#ifdef ENABLE_ADVANTECH
+
 #include <memory>
 #include <modbus/modbus_client.h>
 #include "core/resource_management/resource_searcher.h"
 #include "utils/network/socket.h"
 #include <qglobal.h>
 
-struct QnAdamAsciiCommand
-{
-    QnAdamAsciiCommand(const QString& string);
-    static const quint16 kStartAsciiRegister= 9999;
-    static const quint16 kReadAsciiRegisterCount = 125;
-    QByteArray data;
-    size_t wordNum;
-    size_t byteNum;
-};
+
 
 class QnAdamResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
+    struct QnAdamAsciiCommand
+    {
+        QnAdamAsciiCommand(const QString& string);
+        static const quint16 kStartAsciiRegister= 9999;
+        static const quint16 kReadAsciiRegisterCount = 125;
+        QByteArray data;
+        size_t wordNum;
+        size_t byteNum;
+    };
+
 public:
     QnAdamResourceSearcher();
     ~QnAdamResourceSearcher();
@@ -44,7 +48,7 @@ private:
     QString getAdamModuleFirmware(nx_modbus::QnModbusClient& client);
 
 private:
-    QnUuid m_typeId;
     std::shared_ptr<nx_modbus::QnModbusClient> m_modbusClient;
-    std::shared_ptr<UDPSocket> m_broadcastSocket;
 };
+
+#endif //< ENABLE_ADVANTECH

@@ -1,18 +1,42 @@
+#ifdef ENABLE_ADVANTECH
+
 #include "adam_resource.h"
 #include "adam_resource_searcher.h"
+
 #include <modbus/modbus_client.h>
 #include <common/common_module.h>
 #include <utils/common/log.h>
+#include <utils/common/sleep.h>
+#include <core/resource_management/resource_pool.h>
 
 namespace
 {
     const QString kDefaultUser("root");
     const QString kDefaultPassword("00000000");
-    const QString kAdamResourceType("ADVANTECH_ADAM_6000");
+    const QString kAdamResourceType("AdvantechADAM");
     const QString kHashPrefix("ADVANTECH_ADAM_MODULE_");
+
+    /** 
+     * I have no idea what it means but such a message is used by 
+     * Advantech Adam/Apax .NET Utility.
+     */
+    const char kAdamSearchMessage[60] = 
+    {
+        0x4d, 0x41, 0x44, 0x41, 0x00, 0x00, 0x00, 0x83, 0x01, 0x00,
+        0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    };
+
+    const quint16 kAdamAutodiscoveryPort = 5048;
+    const quint32 kAdamBroadcastBufferSize = 1024 * 5;
+    const quint32 kAdamBroadcastIntervalMs = 10000;
+    const quint32 kAdamBroadcastSleepInterval = 500;
 }
 
-QnAdamAsciiCommand::QnAdamAsciiCommand(const QString& command)
+QnAdamResourceSearcher::QnAdamAsciiCommand::QnAdamAsciiCommand(const QString& command)
 {
     data = command.toLatin1();
     data.append("\r");
@@ -24,12 +48,10 @@ QnAdamAsciiCommand::QnAdamAsciiCommand(const QString& command)
 
 QnAdamResourceSearcher::QnAdamResourceSearcher()
 {
-    m_typeId = qnResTypePool->getResourceTypeId(manufacture(), kAdamResourceType);
 }
 
 QnAdamResourceSearcher::~QnAdamResourceSearcher()
-{
-
+{    
 }
 
 QString QnAdamResourceSearcher::manufacture() const
@@ -55,18 +77,19 @@ QByteArray QnAdamResourceSearcher::executeAsciiCommand(
         QnAdamAsciiCommand::kStartAsciiRegister,
         command.data);
 
-    //TODO check response for validity
+    if (response.isException())
+        return QByteArray();
 
     response = client.readHoldingRegisters(
         QnAdamAsciiCommand::kStartAsciiRegister,
         QnAdamAsciiCommand::kReadAsciiRegisterCount);
 
-    //TODO check response for validity
-
-    qDebug() << "Index of exclamation mark" << response.data.indexOf("!");
-    if(response.data.indexOf("!") != 1)
+    if (response.isException())
         return QByteArray();
 
+    if(response.data.indexOf("!") != 1)
+        return QByteArray();
+    
     auto endOfStr = response.data.indexOf("\r");
 
     return response.data.mid(4, endOfStr);
@@ -101,9 +124,6 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
     const QAuthenticator &auth, 
     bool doMultichannelCheck)
 {
-
-    qDebug() << "Checking url for Advantech ADAM module:" << url;
-
     QList<QnResourcePtr> result;
     if( !url.scheme().isEmpty() && doMultichannelCheck )
         return result;
@@ -112,30 +132,22 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
 
     nx_modbus::QnModbusClient modbusClient(endpoint);
 
-    qDebug() << "Connecting to endpoint";
-
     if(!modbusClient.connect())
         return result;
 
     auto moduleName = getAdamModuleName(modbusClient);
-
-    qDebug() << "Got module name from device:" << moduleName;
 
     if(moduleName.isEmpty())
         return result;
 
     auto firmware = getAdamModuleFirmware(modbusClient);
 
-    qDebug() << "Got firmware from device:" << firmware;
-
     if(firmware.isEmpty())
         return result;
 
     auto model = lit("ADAM-") + moduleName;
 
-    qDebug() << "Advantech model" << model;
-
-    QnUuid typeId = qnResTypePool->getResourceTypeId(lit("AdvantechADAM"), model);
+    QnUuid typeId = qnResTypePool->getResourceTypeId(kAdamResourceType, model);
 
     if (typeId.isNull())
         return QList<QnResourcePtr>();
@@ -147,8 +159,6 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
     resource->setFirmware(firmware);
 
     // Advantech ADAM modules do not have any unique identifier that we can obtain.
-    qDebug() << "PhysicalId" << generatePhysicalId(url.toString());
-
     auto uid = generatePhysicalId(url.toString());
 
     modbusClient.disconnect();
@@ -170,7 +180,92 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
 QnResourceList QnAdamResourceSearcher::findResources()
 {
     QnResourceList result;
-    // TODO: #dmishin Need to reverse their discovery protocol.
+    auto interfaces = getAllIPv4Interfaces();
+
+    for (const auto& iface: interfaces)
+    {
+        if (shouldStop())
+            return result;
+
+        auto socket = std::make_shared<UDPSocket>();
+        socket->setReuseAddrFlag(true);
+
+        SocketAddress localAddress(iface.address.toString(), 0);    
+        if (!socket->bind(localAddress))
+        {
+            qDebug() << "Unable to bind socket to local address" << localAddress.toString();
+            continue;
+        }
+
+        SocketAddress foreignEndpoint(BROADCAST_ADDRESS, kAdamAutodiscoveryPort);
+        if (!socket->sendTo(kAdamSearchMessage, sizeof(kAdamSearchMessage), foreignEndpoint))
+        {
+            qDebug() << "Unable to send data to " << foreignEndpoint.toString();
+            continue;
+        }
+
+        QnSleep::msleep(kAdamBroadcastSleepInterval);
+
+        while (socket->hasData())
+        {
+            QByteArray datagram;
+            datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
+
+            SocketAddress remoteEndpoint;
+            auto bytesRead = socket->recvFrom(datagram.data(), datagram.size(), &remoteEndpoint);
+
+            if (remoteEndpoint.port != kAdamAutodiscoveryPort)
+                continue;
+
+            auto existingResources = qnResPool->getAllNetResourceByHostAddress(remoteEndpoint.address.toString());
+
+            if (!existingResources.isEmpty())
+            {
+                for (const auto& existingRes: existingResources)
+                {
+                    auto secRes = existingRes.dynamicCast<QnSecurityCamResource>();
+                    if (!secRes)
+                        continue;
+
+                    QnUuid typeId = qnResTypePool->getResourceTypeId(
+                        lit("AdvantechADAM"), 
+                        secRes->getModel());
+
+                    if (typeId.isNull())
+                        continue;
+
+                    QnAdamResourcePtr resource(new QnAdamResource());
+                    resource->setTypeId(typeId);
+                    resource->setName(secRes->getModel());
+                    resource->setModel(secRes->getName());
+                    resource->setFirmware(secRes->getFirmware());
+                    resource->setPhysicalId(secRes->getPhysicalId());
+                    resource->setVendor(secRes->getVendor());
+                    resource->setMAC( QnMacAddress(secRes->getPhysicalId()));
+                    resource->setUrl(secRes->getUrl());
+                    resource->setAuth(secRes->getAuth());
+
+                    result.push_back(resource);
+
+                }
+                continue;
+            }
+            else
+            {
+                QUrl url;
+                url.setScheme(lit("//"));
+                url.setHost(remoteEndpoint.address.toString());
+                url.setPort(nx_modbus::kDefaultModbusPort);
+
+                // No user/password required.
+                QAuthenticator auth;
+
+                auto res = checkHostAddr(url, auth, false);
+
+                result.append(res);
+            }
+        }
+    }
 
     return result;
 }
@@ -183,6 +278,7 @@ QnResourcePtr QnAdamResourceSearcher::createResource(const QnUuid &resourceTypeI
 
     if (resourceType.isNull())
     {
+        qDebug() << "No resource type for for ID" << resourceTypeId;
         NX_LOG(lit("No resource type for ID %1").arg(resourceTypeId.toString()), cl_logDEBUG1);
         return result;
     }
@@ -193,6 +289,10 @@ QnResourcePtr QnAdamResourceSearcher::createResource(const QnUuid &resourceTypeI
     result.reset(new QnAdamResource());
     result->setTypeId(resourceTypeId);
 
-    NX_LOG(lit("Create Advantech ADAM-6000 series camera resource. TypeID %1.").arg(resourceTypeId.toString()), cl_logDEBUG1);
+    NX_LOG(lit("Create Advantech ADAM-6000 series IO module resource. TypeID %1.")
+        .arg(resourceTypeId.toString()), 
+        cl_logDEBUG1);
     return result;
 }
+
+#endif //< ENABLE_ADVANTECH

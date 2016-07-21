@@ -2,6 +2,7 @@
 #define MANUAL_CAMERA_SEARCHER_H
 
 #include <memory>
+#include <atomic>
 
 #include <QtCore/QFuture>
 #include <QtNetwork/QAuthenticator>
@@ -40,15 +41,23 @@ public:
 
     void doSearch();
 
-
-
     QUrl url();
+    QString toString();
 
 private:
     QUrl m_url;
     QAuthenticator m_auth;
+
+    /** 
+     * If one of the searchers in task found a resource than other searchers in the same task 
+     * won't be launched.
+     */
     bool m_breakIfGotResult;
+
+    // Need to wait while task will be done before launching next task in queue.
     bool m_blocking;
+
+    // If we got some results from this task then other tasks in queue shouldn't be launched.
     bool m_interruptTaskProcesing;
     SearchDoneCallback m_callback;
     SearcherList m_searchers;
@@ -67,11 +76,7 @@ public:
     */
     bool run( QThreadPool* pool, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port );
     void cancel();
-
     QnManualCameraSearchProcessStatus status() const;
-
-protected:
-    bool isCancelled() const;
 
 private:
     QStringList getOnlineHosts(
@@ -82,19 +87,17 @@ private:
     void runTasks(QThreadPool* threadPool, const QString& queueName);
 
 private:
-    /** Mutex that is used to synchronize access to private fields. */
     mutable QnMutex m_mutex;
 
     QnManualCameraSearchStatus::State m_state;
-    bool m_singleAddressCheck;
-    QnConcurrent::QnFuture<QnManualCameraSearchCameraList>* m_scanProgress;
     QnManualCameraSearchCameraList m_results;
-    bool m_cancelled;
+    std::atomic<bool> m_cancelled;
     QnIpRangeCheckerAsync m_ipChecker;
     int m_hostRangeSize;
 
     QnWaitCondition m_waitCondition;
 
+    int m_remainingTaskCount;
     int m_totalTaskCount;
     QHash<QString, int> m_runningTaskCount;
     QHash<QString, QQueue<QnSearchTask>> m_urlSearchTaskQueues;

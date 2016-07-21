@@ -6,12 +6,13 @@ using namespace nx_modbus;
 namespace
 {
     const int kDefaultConnectionTimeoutMs = 4000; 
+    const int kSendTimeout = 4000;
+    const int kReceiveTimeout = 4000;
 }
 
 QnModbusClient::QnModbusClient():
     m_requestTransactionId(0)
 {
-
 }
 
 QnModbusClient::QnModbusClient(const SocketAddress& sockaddr) :
@@ -33,9 +34,13 @@ bool QnModbusClient::initSocket()
         m_socket->shutdown();
 
     m_socket.reset(SocketFactory::createStreamSocket(false));
-    m_socket->setRecvTimeout(10000);
 
-    // TODO: #dmishin add some checks here. 
+    if (!m_socket->setRecvTimeout(kReceiveTimeout)
+        || !m_socket->setSendTimeout(kSendTimeout))
+    {
+        return false;
+    }
+
     return true;
 }
 
@@ -47,8 +52,8 @@ void QnModbusClient::setEndpoint(const SocketAddress& endpoint)
 
 bool QnModbusClient::connect()
 {
-    if (!m_socket)
-        initSocket();
+    if (!m_socket && !initSocket())
+        return false;
 
     return m_socket->connect(m_endpoint, kDefaultConnectionTimeoutMs);
 }
@@ -57,30 +62,76 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, boo
 {
     ModbusResponse response;
 
-    if (!m_socket)
+    if (!m_socket && !initSocket())
     {
         success = false;
         return response;
     }
 
     if (!m_socket->isConnected())
-        m_socket->connect(m_endpoint);
+    {
+        if(!m_socket->connect(m_endpoint))
+        {
+            success = false;
+            return response;
+        }
+    }
 
     success = true;
 
     auto data = ModbusRequest::encode(request);
     auto bytesSent = m_socket->send(data.constData(), data.size());
+    int totalBytesSent = 0;
 
-    if (bytesSent < 1)
-        success = false;
+    while (totalBytesSent < data.size())
+    {
+        bytesSent = m_socket->send(
+            data.constData() + totalBytesSent, 
+            data.size() - totalBytesSent);
 
-    auto bytesRead = m_socket->recv(m_recvBuffer, kBufferSize);
+        if (bytesSent < 1)
+        {
+            success = false;
+            return response;
+        }
+        totalBytesSent += bytesSent;
+    }
+
+    auto totalBytesRead = 0;
+    auto bytesRead = 0;
+    auto bytesNeeded = kModbusMaxMessageLength;
+
+    while (true)
+    {
+        bytesRead = m_socket->recv(m_recvBuffer + totalBytesRead, kBufferSize - totalBytesRead);
+        if (bytesRead <= 0)
+        {
+            success = false;
+            return response;
+        }
+
+        totalBytesRead += bytesRead;
+
+        if (totalBytesRead >= bytesNeeded)
+            break;
+
+        if (totalBytesRead >= ModbusMBAPHeader::size)
+        {
+            auto header = ModbusMBAPHeader::decode(
+                QByteArray(m_recvBuffer, ModbusMBAPHeader::size));
+
+            bytesNeeded = header.length 
+                + sizeof(decltype(ModbusMBAPHeader::transactionId))
+                + sizeof(decltype(ModbusMBAPHeader::protocolId))
+                + sizeof(decltype(ModbusMBAPHeader::length));
+        }
+    }
 
     if (bytesRead < 0)
         success = false;
 
     if (success)
-        response = ModbusResponse::decode(QByteArray(m_recvBuffer, bytesRead));
+        response = ModbusResponse::decode(QByteArray(m_recvBuffer, bytesNeeded));
 
     return response;
 }
@@ -169,4 +220,13 @@ void QnModbusClient::disconnect()
         m_socket->shutdown();
         m_socket.reset();
     }
+}
+
+ModbusResponse QnModbusClient::writeSingleHoldingRegister(quint16 registerAddres, const QByteArray& data)
+{
+    ModbusResponse response;
+
+    Q_ASSERT_X(false, "ModbusClient::writeSingleHoldingRegister", "Not implemented");
+
+    return response;
 }

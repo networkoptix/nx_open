@@ -1,3 +1,5 @@
+#ifdef ENABLE_ADVANTECH
+
 #include <utils/common/log.h>
 #include <core/resource/security_cam_resource.h>
 #include <common/common_module.h>
@@ -11,15 +13,19 @@ using namespace nx_io_managment;
 
 namespace
 {
-    const unsigned int kInputPollingIntervalMs = 500;
+    const unsigned int kInputPollingIntervalMs = 200;
     const unsigned int kDefaultFirstInputCoilAddress = 0;
     const unsigned int kDefaultFirstOutputCoilAddress = 16;
+
+    const QString kAdamStartInputCoilParamName("adamStartInputCoil");
+    const QString kAdamStartOutputCoilParamName("adamStartOutputCoil");
+    const QString kAdamInputCountParamName("adamInputCount");
+    const QString kAdamOutputCountParamName("adamOutputCount");
 }
 
 QnAdamModbusIOManager::QnAdamModbusIOManager(QnResource* resource) :
     m_resource(resource),
-    m_ioPortInfoFetched(false),
-    m_firstInputCoilAddress(kDefaultFirstInputCoilAddress)
+    m_ioPortInfoFetched(false)
 {
     initializeIO();
 }
@@ -27,22 +33,23 @@ QnAdamModbusIOManager::QnAdamModbusIOManager(QnResource* resource) :
 QnAdamModbusIOManager::~QnAdamModbusIOManager()
 {
     stopIOMonitoring();
+    m_client.terminate();
 }
 
 bool QnAdamModbusIOManager::startIOMonitoring()
 {
-    auto securityResource = dynamic_cast<QnSecurityCamResource*>(
-        const_cast<QnResource*>(m_resource));
-
-    if (!securityResource)
-        return false;
-
     if (m_monitoringIsInProgress)
         return true;
 
     m_ioPortInfoFetched = initializeIO();
 
     if (!m_ioPortInfoFetched)
+        return false;
+
+    auto securityResource = dynamic_cast<QnSecurityCamResource*>(
+        const_cast<QnResource*>(m_resource));
+
+    if (!securityResource)
         return false;
 
     bool shouldNotStartMonitoring = 
@@ -64,15 +71,16 @@ bool QnAdamModbusIOManager::startIOMonitoring()
 
     m_monitoringIsInProgress = true;
 
+    QUrl url(m_resource->getUrl());
+    auto host  = url.host();
+    auto port = url.port(nx_modbus::kDefaultModbusPort);
 
-    auto host  = QUrl(m_resource->getUrl()).host();
-    auto port = 502;
     SocketAddress endpoint(host, port);
 
     m_client.setEndpoint(endpoint);
     m_outputClient.setEndpoint(endpoint);
 
-    fetchCurrentInputStates();
+    fetchAllPortStates();
 
     return true;
 }
@@ -95,9 +103,8 @@ bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isA
     bool success = true;
 
     auto coil = getPortCoil(outputId, success);
-    auto response = m_outputClient.writeSingleCoil(coil, isActive);
 
-    //TODO: #dmishin check response for validity (likely inside client)
+    auto response = m_outputClient.writeSingleCoil(coil, isActive);
 
     return true;
 }
@@ -117,9 +124,21 @@ QnIOPortDataList QnAdamModbusIOManager::getOutputPortList() const
     return m_outputs;
 }
 
+QnIOStateDataList QnAdamModbusIOManager::getPortStates() const 
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_ioStates;
+}
+
 void QnAdamModbusIOManager::setInputPortStateChangeCallback(InputStateChangeCallback callback)
 {
     m_inputStateChangedCallback = callback;
+}
+
+void QnAdamModbusIOManager::terminate()
+{
+    stopIOMonitoring();
+    m_client.terminate();
 }
 
 quint32 QnAdamModbusIOManager::getPortCoil(const QString& ioPortId, bool& success) const
@@ -145,90 +164,131 @@ bool QnAdamModbusIOManager::initializeIO()
 
     auto securityResource = dynamic_cast<QnSecurityCamResource*>(m_resource);
 
-    qDebug() << "IO Manager, device vendor/model:" << securityResource->getVendor() << "/" << securityResource->getModel();
-
     auto resourceData = qnCommon->dataPool()->data(
         securityResource->getVendor(), 
         securityResource->getModel());
 
-    auto ioPorts = resourceData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
+    auto startInputCoil = resourceData.value<quint16>(kAdamStartInputCoilParamName);
+    auto startOutputCoil = resourceData.value<quint16>(kAdamStartOutputCoilParamName);
+    auto inputCount = resourceData.value<quint16>(kAdamInputCountParamName);
+    auto outputCount = resourceData.value<quint16>(kAdamOutputCountParamName); 
 
-    for (const auto& ioPort: ioPorts)
+    for (auto i = startInputCoil; i < startInputCoil + inputCount; ++i)
     {
-        if (ioPort.portType == Qn::PT_Input)
-        {
-            qDebug() << "Input port" << ioPort.inputName;
-            m_inputs.push_back(ioPort);
-        }
-        else if (ioPort.portType == Qn::PT_Output)
-        {
-            qDebug() << "Output port" << ioPort.outputName;
-            m_outputs.push_back(ioPort);
-        }
-        else
-        {
-            auto message = lit(
-                "QnAdamModbusIOManager::fetchIOPorts, Unknown port type. Resource: %1, port ID: %2.")
-                .arg(m_resource->getUniqueId())
-                .arg(ioPort.id);
+        QnIOPortData port;
+        port.id = lit("coil_%1").arg(i);
+        port.inputName = lit("DI%1").arg(i);
+        port.portType = Qn::PT_Input;
+        port.supportedPortTypes = Qn::PT_Input;
+        m_inputs.push_back(port);
 
-            NX_LOG(message, cl_logDEBUG2);
-            qDebug() << message;
-        }
+        m_ioStates.emplace_back(port.id, false, qnSyncTime->currentMSecsSinceEpoch());
+    }
+
+
+    for (auto i = startOutputCoil; i < startOutputCoil + outputCount; ++i)
+    {
+        QnIOPortData port;
+        port.id = lit("coil_%1").arg(i);
+        port.outputName = lit("DO%1").arg(i - startOutputCoil);
+        port.portType = Qn::PT_Output;
+        port.supportedPortTypes = Qn::PT_Output;
+        m_outputs.push_back(port);
+
+        m_ioStates.emplace_back(port.id, false, qnSyncTime->currentMSecsSinceEpoch());
     }
 
     m_ioPortInfoFetched = true;
-    m_inputStates.resize(ioPorts.size());
 
     return true;
 }
 
-void QnAdamModbusIOManager::fetchCurrentInputStates()
+void QnAdamModbusIOManager::fetchAllPortStates()
 {
-    m_client.readCoilsAsync(m_firstInputCoilAddress, m_inputs.size());
+    bool status = true;
+    auto startCoil = getPortCoil(m_inputs[0].id, status);
+    auto lastCoil = getPortCoil(m_outputs[m_outputs.size() - 1].id, status);
+
+    if (status)
+        m_client.readCoilsAsync(startCoil, lastCoil - startCoil);
 }
 
-void QnAdamModbusIOManager::processInputStatesResponse(const nx_modbus::ModbusResponse& response)
+void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::ModbusResponse& response)
 {
+    if (!m_monitoringIsInProgress)
+        return;
+
     if (response.data.isEmpty())
         return;
 
-    // TODO: #dmishin check response for validity.
-    auto countOfBytes = response.data[0];
-    auto fetchedInputStates = response.data.mid(1);
+    if (response.isException())
+        return;
+
+    bool status = true;
     short kBitsInByte = 8;
-    size_t inputIndex = 0;
-    size_t inputCount = m_inputs.size();
 
+    auto inputCount = m_inputs.size();
+    auto outputCount = m_outputs.size();
+    
+    auto fetchedPortStates = response.data.mid(1);
+    quint64 bitsFetched = fetchedPortStates.size() * kBitsInByte;
 
-    // Each bit in the response data represents single input port.
-    for (const auto& byte: fetchedInputStates)
+    auto startInputCoilBit = getPortCoil(m_inputs[0].id, status);
+    auto startOutputCoilBit = getPortCoil(m_outputs[0].id, status);
+
+    if (!status)
+        return;
+
+    auto endInputCoilBit = startInputCoilBit + inputCount;
+    auto endOutputCoilBit = startOutputCoilBit + outputCount;
+    size_t portIndex = 0;
+
+    for (auto bitIndex = startInputCoilBit; bitIndex < endInputCoilBit; ++bitIndex)
     {
-        qDebug() << "DEBUG"  << sizeof(byte) << inputCount << inputIndex <<fetchedInputStates.toHex();
-        for (short bitIndex = 0; (bitIndex < kBitsInByte) && (inputCount > inputIndex); ++bitIndex)
-        {
-            qDebug() << "State of input" << inputIndex << (byte & (1 << bitIndex));
-
-            bool fetchedInputState = !!(byte & (1 << bitIndex));
-
-            qDebug() << fetchedInputState << m_inputStates[inputIndex];
-
-            if(fetchedInputState != m_inputStates[inputIndex])
-            {
-                IOPortState state = fetchedInputState ? 
-                    IOPortState::active : IOPortState::nonActive;
-
-                m_inputStates[inputIndex] = fetchedInputState;
-
-                m_inputStateChangedCallback(m_inputs[inputIndex].id, state);
-            }
-
-            inputIndex++;
-        }
-
-        if(inputCount > inputIndex)
-            break;
+        updatePortState(bitIndex, fetchedPortStates, portIndex);
+        portIndex++;
     }
+
+    for (auto bitIndex = startOutputCoilBit; bitIndex < endOutputCoilBit; ++bitIndex)
+    {
+        updatePortState(bitIndex, fetchedPortStates, portIndex);
+        portIndex++;
+    }
+}
+
+void QnAdamModbusIOManager::updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex)
+{
+    auto state = getBitValue(bytes, bitIndex);
+    bool stateChanged = m_ioStates[portIndex].isActive == state;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_ioStates[portIndex].isActive = state;
+        m_ioStates[portIndex].timestamp = qnSyncTime->currentMSecsSinceEpoch();
+    }
+
+    nx_io_managment::IOPortState currentState = m_ioStates[portIndex].isActive ? 
+        nx_io_managment::IOPortState::active : nx_io_managment::IOPortState::nonActive;
+
+    if (stateChanged)
+    {
+        m_inputStateChangedCallback(
+            m_ioStates[portIndex].id,
+            currentState);
+    }
+}
+
+bool QnAdamModbusIOManager::getBitValue(const QByteArray& bytes, quint64 bitIndex) const
+{
+    const auto kBitsInByte = 8;
+
+    int byteIndex = bitIndex / kBitsInByte; 
+
+    Q_ASSERT(byteIndex < bytes.size());
+
+    auto byte = bytes[byteIndex];
+
+    return !!(byte & (1 << bitIndex % kBitsInByte));
 }
 
 void QnAdamModbusIOManager::scheduleMonitoringIteration()
@@ -239,7 +299,7 @@ void QnAdamModbusIOManager::scheduleMonitoringIteration()
             [this](quint64 timerId)
             {
                 if (timerId == m_inputMonitorTimerId)
-                    fetchCurrentInputStates();
+                    fetchAllPortStates();
             },
             kInputPollingIntervalMs);
     }
@@ -247,7 +307,10 @@ void QnAdamModbusIOManager::scheduleMonitoringIteration()
 
 void QnAdamModbusIOManager::routeMonitoringFlow(nx_modbus::ModbusResponse response)
 {
-    processInputStatesResponse(response);
+    if (!m_monitoringIsInProgress)
+        return;
+
+    processAllPortStatesResponse(response);
     scheduleMonitoringIteration();
 }
 
@@ -258,3 +321,5 @@ void QnAdamModbusIOManager::handleMonitoringError()
     if (m_monitoringIsInProgress)
         scheduleMonitoringIteration();
 }
+
+#endif //< ENABLE_ADVANTECH

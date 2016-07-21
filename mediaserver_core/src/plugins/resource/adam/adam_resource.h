@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ENABLE_ADVANTECH
+
 #include <QtCore/QMap>
 #include <utils/thread/mutex.h>
 #include <atomic>
@@ -14,6 +16,13 @@
 class QnAdamResource : public QnPhysicalCameraResource
 {
     Q_OBJECT
+
+    struct PortTimerEntry
+    {
+        QString portId;
+        bool state;
+    };
+
 public:
     static const QString kManufacture;
 
@@ -31,6 +40,8 @@ public:
     virtual QnIOPortDataList getRelayOutputList() const override;
 
     virtual QnIOPortDataList getInputPortList() const override;
+
+    virtual QnIOStateDataList ioStates() const override;
 
     virtual bool setRelayOutputState(
         const QString& outputID,
@@ -51,6 +62,9 @@ protected:
 
 private:
     std::unique_ptr<QnAbstractIOManager> m_ioManager;
+    std::map<quint64, PortTimerEntry> m_autoResetTimers;
 
 
 };
+
+#endif //< ENABLE_ADVANTECH
