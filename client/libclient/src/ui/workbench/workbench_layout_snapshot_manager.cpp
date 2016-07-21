@@ -119,6 +119,11 @@ bool QnWorkbenchLayoutSnapshotManager::isSaveable(const QnLayoutResourcePtr &res
     return false;
 }
 
+bool QnWorkbenchLayoutSnapshotManager::isModified(const QnLayoutResourcePtr &resource) const
+{
+    return (flags(resource) & (Qn::ResourceIsChanged | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsChanged; /* Changed and not being saved. */
+}
+
 bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, SaveLayoutResultFunction callback)
 {
     if (qnCommon->isReadOnly())
@@ -155,7 +160,16 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
     return reqID > 0;
 }
 
-void QnWorkbenchLayoutSnapshotManager::store(const QnLayoutResourcePtr &resource) {
+QnWorkbenchLayoutSnapshot QnWorkbenchLayoutSnapshotManager::snapshot(const QnLayoutResourcePtr &layout) const
+{
+    NX_ASSERT(layout);
+    if (!layout)
+        return QnWorkbenchLayoutSnapshot();
+    return m_storage->snapshot(layout);
+}
+
+void QnWorkbenchLayoutSnapshotManager::store(const QnLayoutResourcePtr &resource)
+{
     if(!resource) {
         qnNullWarning(resource);
         return;

@@ -168,11 +168,14 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
         }))
             snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) | Qn::ResourceIsBeingSaved);
     }
-    else if (confirmLayoutChange(layout))
+    else
     {
         //TODO: #GDM #Common check existing layouts.
         //TODO: #GDM #Common all remotes layout checking and saving should be done in one place
-        snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
+        if (confirmLayoutChange(layout))
+            snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
+        else
+            snapshotManager()->restore(layout);
     }
 }
 
@@ -433,9 +436,73 @@ bool QnWorkbenchLayoutsHandler::confirmSharedLayoutChange(const QnLayoutResource
 
 bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForUser(const QnUserResourcePtr& user, const QnLayoutResourcePtr &layout)
 {
-    //TODO: #GDM #implement me
-    /* Calculate removed cameras and show warning */
-    return true;
+    auto layoutResources = [](const QnLayoutItemDataMap& items)
+    {
+        QSet<QnResourcePtr> result;
+        for (const auto& item : items)
+        {
+            if (auto resource = qnResPool->getResourceByDescriptor(item.resource))
+                result << resource;
+        }
+        return result;
+    };
+
+    auto inaccessible = [user](const QnResourcePtr& resource)
+    {
+        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::web_page))
+            return !qnResourceAccessManager->hasPermission(user, resource, Qn::ViewContentPermission);
+
+        /* Silently ignoring servers. */
+        return false;
+    };
+
+    /* Share added resources. */
+    auto snapshot = snapshotManager()->snapshot(layout);
+    auto oldResources = layoutResources(snapshot.items);
+    auto newResources = layoutResources(layout->getItems());
+
+    QnResourceList added = (newResources - oldResources).toList();
+    auto accessible = qnResourceAccessManager->accessibleResources(user);
+    for (const auto& toShare: added.filtered(inaccessible))
+        accessible << toShare->getId();
+    qnResourcesChangesManager->saveAccessibleResources(user->getId(), accessible);
+
+    /* Check if user have already silenced warning about kept access. */
+    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::UserLayoutItemsRemoved))
+        return true;
+
+    /* Calculate removed cameras that are still directly accessible. */
+    QSet<QnUuid> directlyAccessible;
+    for (const QnResourcePtr& removed : (oldResources - newResources))
+    {
+        QnUuid id = removed->getId();
+        if (accessible.contains(id))
+            directlyAccessible << id;
+    }
+
+    if (directlyAccessible.isEmpty())
+        return true;
+
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        Qn::Empty_Help,
+        tr("Save Layout..."),
+        tr("User will keep access to %n removed cameras", "", directlyAccessible.size()),
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        mainWindow());
+    messageBox.setDefaultButton(QDialogButtonBox::Cancel);
+    messageBox.setInformativeText(tr("To remove access go to User Settings."));
+    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+
+    auto result = messageBox.exec();
+    if (messageBox.isChecked())
+    {
+        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+        messagesFilter |= Qn::ShowOnceMessage::UserLayoutItemsRemoved;
+        qnSettings->setShowOnceMessages(messagesFilter);
+    }
+
+    return result == QDialogButtonBox::Ok;
 }
 
 bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForGroup(const QnUuid& groupId, const QnLayoutResourcePtr &layout)
@@ -453,12 +520,13 @@ bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForGroup(const QnUuid& groupI
         return true;
 
     /* If group contains of 1 user, work as if it was just custom user. */
-    if (groupUsers.size() == 1)
-        return confirmLayoutChangeForUser(groupUsers.first(), layout);
+//     if (groupUsers.size() == 1)
+//         return confirmLayoutChangeForUser(groupUsers.first(), layout);
 
     //TODO: #GDM #implement me
     /* Calculate added cameras, which were not available to group before, and show warning. */
     /* Calculate removed cameras and show another warning. 1 ok, second cancel, so what? */
+    return true;
 }
 
 QDialogButtonBox::StandardButton QnWorkbenchLayoutsHandler::askOverrideLayout(QDialogButtonBox::StandardButtons buttons,

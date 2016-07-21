@@ -284,8 +284,9 @@ namespace Qn
      */
     enum class ShowOnceMessage
     {
-        PtzPresetInUse      = 0x001,
-        SharedLayoutEdit    = 0x002
+        PtzPresetInUse          = 0x001,    /**< Delete ptz preset which is used in the tour. */
+        SharedLayoutEdit        = 0x002,    /**< Edit shared layout. */
+        UserLayoutItemsRemoved  = 0x004     /**< Items are removed from user's layout, but access still persist. */
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ShowOnceMessage)
     Q_DECLARE_FLAGS(ShowOnceMessages, ShowOnceMessage)
