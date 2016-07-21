@@ -96,6 +96,29 @@ void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resou
     emit flagsChanged(resource);
 }
 
+bool QnWorkbenchLayoutSnapshotManager::isChanged(const QnLayoutResourcePtr &resource) const
+{
+    return flags(resource).testFlag(Qn::ResourceIsChanged);
+}
+
+bool QnWorkbenchLayoutSnapshotManager::isLocal(const QnLayoutResourcePtr &resource) const
+{
+    NX_ASSERT(flags(resource).testFlag(Qn::ResourceIsLocal) == resource->hasFlags(Qn::local));
+    return flags(resource).testFlag(Qn::ResourceIsLocal);
+}
+
+bool QnWorkbenchLayoutSnapshotManager::isSaveable(const QnLayoutResourcePtr &resource) const
+{
+    Qn::ResourceSavingFlags flags = this->flags(resource);
+    if (flags.testFlag(Qn::ResourceIsBeingSaved))
+        return false;
+
+    if (flags & (Qn::ResourceIsLocal | Qn::ResourceIsChanged))
+        return true;
+
+    return false;
+}
+
 bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, SaveLayoutResultFunction callback)
 {
     if (qnCommon->isReadOnly())

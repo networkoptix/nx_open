@@ -40,28 +40,11 @@ public:
     Qn::ResourceSavingFlags flags(QnWorkbenchLayout *layout) const;
     void setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags);
 
-    bool isChanged(const QnLayoutResourcePtr &resource) const
-    {
-        return flags(resource).testFlag(Qn::ResourceIsChanged);
-    }
+    bool isChanged(const QnLayoutResourcePtr &resource) const;
 
-    bool isLocal(const QnLayoutResourcePtr &resource) const
-    {
-        NX_ASSERT(flags(resource).testFlag(Qn::ResourceIsLocal) == resource->hasFlags(Qn::local));
-        return flags(resource).testFlag(Qn::ResourceIsLocal);
-    }
+    bool isLocal(const QnLayoutResourcePtr &resource) const;
 
-    bool isSaveable(const QnLayoutResourcePtr &resource) const
-    {
-        Qn::ResourceSavingFlags flags = this->flags(resource);
-        if (flags.testFlag(Qn::ResourceIsBeingSaved))
-            return false;
-
-        if (flags & (Qn::ResourceIsLocal | Qn::ResourceIsChanged))
-            return true;
-
-        return false;
-    }
+    bool isSaveable(const QnLayoutResourcePtr &resource) const;
 
     bool isModified(const QnLayoutResourcePtr &resource) const {
         return (flags(resource) & (Qn::ResourceIsChanged | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsChanged; /* Changed and not being saved. */
