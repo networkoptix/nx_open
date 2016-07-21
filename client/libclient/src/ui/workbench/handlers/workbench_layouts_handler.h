@@ -20,7 +20,7 @@ public:
     bool tryClose(bool force);
     void forcedUpdate();
 
-protected:
+private:
     ec2::AbstractECConnectionPtr connection2() const;
 
     private slots:
@@ -46,6 +46,10 @@ private:
      *  or layout belonging to user with custom access rights.
      */
     bool confirmLayoutChange(const QnLayoutResourcePtr &layout);
+
+    bool confirmSharedLayoutChange(const QnLayoutResourcePtr &layout);
+    bool confirmLayoutChangeForUser(const QnUserResourcePtr& user, const QnLayoutResourcePtr &layout);
+    bool confirmLayoutChangeForGroup(const QnUuid& groupId, const QnLayoutResourcePtr &layout);
 
     /**
      * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.

@@ -629,10 +629,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 		if (hasGlobalPermission(user, Qn::GlobalPermission::INTERNAL_GlobalVideoWallLayoutPermission))
 			return Qn::ReadPermission;
 
-        QnUuid ownerId = layout->getParentId();
-
         /* Access to global layouts. Simple check is enough, exported layouts are checked on the client side. */
-        if (ownerId.isNull())
+        if (layout->isShared())
         {
             if (!isAccessibleResource(user, layout))
                 return Qn::NoPermissions;
@@ -645,7 +643,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         }
 
         /* Checking other user's layout*/
-        if (layout->getParentId() != user->getId())
+        QnUuid ownerId = layout->getParentId();
+        if (ownerId != user->getId())
         {
             /* Nobody's layout. Bug. */
             QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(ownerId);

@@ -359,82 +359,106 @@ bool QnWorkbenchLayoutsHandler::confirmLayoutChange(const QnLayoutResourcePtr &l
     if (ownerId == context()->user()->getId())
         return true;
 
-    /* Get list of all users with custom resources list. */
-    auto allCustomUsers = qnResPool->getResources<QnUserResource>().filtered(
-        []
-        (const QnUserResourcePtr& user)
-        {
-            return !qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission);
-        }
-    );
-
-    /* Do not warn if there are no such users - no side effects in any case. */
-    if (allCustomUsers.isEmpty())
-        return true;
-
     /* Check shared layout */
-    if (ownerId.isNull())
-    {
-        /* Check if user have already silenced this warning. */
-        if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::SharedLayoutEdit))
-            return true;
-
-        /* Checking if custom users have access to this shared layout. */
-        auto accessibleToCustomUsers = std::any_of(
-            allCustomUsers.cbegin(), allCustomUsers.cend(),
-            [layout]
-            (const QnUserResourcePtr& user)
-            {
-                return qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission);
-            }
-        );
-
-        /* Do not warn if there are no such users - no side effects in any case. */
-        if (!accessibleToCustomUsers)
-            return true;
-
-        QnMessageBox messageBox(
-            QnMessageBox::Warning,
-            Qn::Empty_Help,
-            tr("Save Layout..."),
-            tr("Changes will affect many users"),
-            QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-            mainWindow());
-        messageBox.setDefaultButton(QDialogButtonBox::Cancel);
-        messageBox.setInformativeText(tr("This layout is shared. By changing this layout you change it for all users who have it."));
-        messageBox.setCheckBoxText(tr("Do not show this message anymore"));
-
-        auto result  = messageBox.exec();
-        if (messageBox.isChecked())
-        {
-            Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
-            messagesFilter |= Qn::ShowOnceMessage::SharedLayoutEdit;
-            qnSettings->setShowOnceMessages(messagesFilter);
-        }
-
-        return result == QDialogButtonBox::Ok;
-    }
+    if (layout->isShared())
+        return confirmSharedLayoutChange(layout);
 
     /* Do not save layout for non-existing user */
     QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(ownerId);
     if (!owner)
         return false;
 
-    /* Do not warn if owner is not custom user. */
+    /* Do not warn if owner has access to all cameras anyway. */
     if (qnResourceAccessManager->hasGlobalPermission(owner, Qn::GlobalAccessAllMediaPermission))
         return true;
 
-    //TODO: #GDM #implement me
-    /* Calculate added cameras, which were not available to user before, and show warning. */
-    /* Calculate removed cameras and show another warning. 1 ok, second cancel, so what? */
-
-    //TODO: #vkutin here new enum will be useful
-    if (owner->userGroup().isNull())
+    auto role = qnResourceAccessManager->userRole(owner);
+    switch (role)
     {
-        /* Separate checks for users belonging to groups. */
+        case Qn::UserRole::CustomUserGroup:
+            return confirmLayoutChangeForGroup(owner->userGroup(), layout);
+        case Qn::UserRole::CustomPermissions:
+            return confirmLayoutChangeForUser(owner, layout);
+        default:
+            break;
     }
 
+    NX_ASSERT(false, "Should never get here");
     return true;
+}
+
+bool QnWorkbenchLayoutsHandler::confirmSharedLayoutChange(const QnLayoutResourcePtr &layout)
+{
+    /* Check if user have already silenced this warning. */
+    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::SharedLayoutEdit))
+        return true;
+
+    /* Checking if custom users have access to this shared layout. */
+    auto allUsers = qnResPool->getResources<QnUserResource>();
+    auto accessibleToCustomUsers = std::any_of(
+        allUsers.cbegin(), allUsers.cend(),
+        [layout]
+        (const QnUserResourcePtr& user)
+        {
+            return !qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission)
+                 && qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission);
+        }
+    );
+
+    /* Do not warn if there are no such users - no side effects in any case. */
+    if (!accessibleToCustomUsers)
+        return true;
+
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        Qn::Empty_Help,
+        tr("Save Layout..."),
+        tr("Changes will affect many users"),
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        mainWindow());
+    messageBox.setDefaultButton(QDialogButtonBox::Cancel);
+    messageBox.setInformativeText(tr("This layout is shared. By changing this layout you change it for all users who have it."));
+    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+
+    auto result = messageBox.exec();
+    if (messageBox.isChecked())
+    {
+        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+        messagesFilter |= Qn::ShowOnceMessage::SharedLayoutEdit;
+        qnSettings->setShowOnceMessages(messagesFilter);
+    }
+
+    return result == QDialogButtonBox::Ok;
+}
+
+bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForUser(const QnUserResourcePtr& user, const QnLayoutResourcePtr &layout)
+{
+    //TODO: #GDM #implement me
+    /* Calculate removed cameras and show warning */
+    return true;
+}
+
+bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForGroup(const QnUuid& groupId, const QnLayoutResourcePtr &layout)
+{
+    auto groupUsers = qnResPool->getResources<QnUserResource>().filtered(
+        [groupId]
+        (const QnUserResourcePtr& user)
+        {
+            return user->userGroup() == groupId;
+        }
+    );
+
+    NX_ASSERT(!groupUsers.isEmpty(), "Invalid user group");
+    if (groupUsers.isEmpty())
+        return true;
+
+    /* If group contains of 1 user, work as if it was just custom user. */
+    if (groupUsers.size() == 1)
+        return confirmLayoutChangeForUser(groupUsers.first(), layout);
+
+    //TODO: #GDM #implement me
+    /* Calculate added cameras, which were not available to group before, and show warning. */
+    /* Calculate removed cameras and show another warning. 1 ok, second cancel, so what? */
 }
 
 QDialogButtonBox::StandardButton QnWorkbenchLayoutsHandler::askOverrideLayout(QDialogButtonBox::StandardButtons buttons,
