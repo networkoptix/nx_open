@@ -4,16 +4,12 @@ angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,cloudAPI,$location,$timeout, dialogs) {
 
 
-        mediaserver.getUser().then(function(user){
-            if(!user.isAdmin){
-                $location.path('/info'); //no admin rights - redirect
+        mediaserver.getModuleInformation().then(function (r) {
+
+            if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly){
                 return;
             }
 
-            $scope.canMerge = user.isOwner;
-        });
-
-        mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = {
                 systemName: r.data.reply.systemName,
                 port: r.data.reply.port,
@@ -23,8 +19,23 @@ angular.module('webadminApp')
 
             $scope.oldSystemName = r.data.reply.systemName;
             $scope.oldPort = r.data.reply.port;
+            checkUserRights();
         });
 
+        function checkUserRights() {
+            mediaserver.getUser().then(function (user) {
+                if (!user.isAdmin) {
+                    $location.path('/info'); //no admin rights - redirect
+                    return;
+                }
+
+                $scope.canMerge = user.isOwner;
+
+                getCloudInfo();
+                requestScripts();
+                pingServers();
+            });
+        }
         $scope.Config = Config;
         $scope.password = '';
         $scope.oldPassword = '';
@@ -75,8 +86,6 @@ angular.module('webadminApp')
             });
         }
 
-
-
         function errorHandler(){
             dialogs.alert ('Connection error');
             return false;
@@ -125,15 +134,17 @@ angular.module('webadminApp')
         $scope.canRestoreSettings = false;
         $scope.canRestoreSettingsNotNetwork = false;
 
-        mediaserver.getScripts().then(function(data){
-            if(data.data && data.data.reply) {
-                $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
-                $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;
-                $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;
-                $scope.canRunClient = data.data.reply.indexOf('lite_client') >= 0;
-                $scope.canStopClient = data.data.reply.indexOf('stop_lite_client') >= 0;
-            }
-        });
+        function requestScripts() {
+            return mediaserver.getScripts().then(function (data) {
+                if (data.data && data.data.reply) {
+                    $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
+                    $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;
+                    $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;
+                    $scope.canRunClient = data.data.reply.indexOf('lite_client') >= 0;
+                    $scope.canStopClient = data.data.reply.indexOf('stop_lite_client') >= 0;
+                }
+            });
+        }
 
         $scope.runClient = function(){
             mediaserver.execute('lite_client').then(resultHandler, errorHandler);
@@ -193,45 +204,48 @@ angular.module('webadminApp')
                 return false;
             });
         }
-        
-        mediaserver.getMediaServers().then(function(data){
-            $scope.mediaServers = _.sortBy(data.data,function(server){
-                // Set active state for server
-                server.active = $scope.settings.id.replace('{','').replace('}','') === server.id.replace('{','').replace('}','');
-                return (server.status==='Online'?'0':'1') + server.Name + server.id;
-                // Sorting: online->name->id
-            });
-            $timeout(function() {
-                _.each($scope.mediaServers, function (server) {
-                    var i = 0;//1. Опрашиваем айпишники подряд
-                    checkServersIp(server, i);
+
+        function pingServers() {
+            return mediaserver.getMediaServers().then(function (data) {
+                $scope.mediaServers = _.sortBy(data.data, function (server) {
+                    // Set active state for server
+                    server.active = $scope.settings.id.replace('{', '').replace('}', '') === server.id.replace('{', '').replace('}', '');
+                    return (server.status === 'Online' ? '0' : '1') + server.Name + server.id;
+                    // Sorting: online->name->id
                 });
-            },1000);
-        });
-
-        mediaserver.systemCloudInfo().then(function(data){
-            $scope.cloudSystemID = data.cloudSystemID;
-            $scope.cloudAccountName = data.cloudAccountName;
-        },function(){
-            $scope.cloudSystemID = null;
-            $scope.cloudAccountName = null;
-
-            mediaserver.checkInternet().then(function (hasInternetOnServer) {
-                $scope.hasInternetOnServer = hasInternetOnServer;
+                $timeout(function () {
+                    _.each($scope.mediaServers, function (server) {
+                        var i = 0;//1. Опрашиваем айпишники подряд
+                        checkServersIp(server, i);
+                    });
+                }, 1000);
             });
+        }
 
-            cloudAPI.checkConnection().then(function () {
-                $scope.hasInternetOnClient = true;
-            }, function (error) {
-                $scope.hasInternetOnClient = false;
-                if (error.data && error.data.resultCode) {
-                    $scope.settings.internetError = formatError(error.data.resultCode);
-                } else {
-                    $scope.settings.internetError = "Couldn't check cloud connection";
-                }
+        function getCloudInfo() {
+            return mediaserver.systemCloudInfo().then(function (data) {
+                $scope.cloudSystemID = data.cloudSystemID;
+                $scope.cloudAccountName = data.cloudAccountName;
+            }, function () {
+                $scope.cloudSystemID = null;
+                $scope.cloudAccountName = null;
+
+                mediaserver.checkInternet().then(function (hasInternetOnServer) {
+                    $scope.hasInternetOnServer = hasInternetOnServer;
+                });
+
+                cloudAPI.checkConnection().then(function () {
+                    $scope.hasInternetOnClient = true;
+                }, function (error) {
+                    $scope.hasInternetOnClient = false;
+                    if (error.data && error.data.resultCode) {
+                        $scope.settings.internetError = formatError(error.data.resultCode);
+                    } else {
+                        $scope.settings.internetError = "Couldn't check cloud connection";
+                    }
+                });
             });
-        });
-
+        }
 
         function openCloudDialog(connect){
             $modal.open({
