@@ -163,7 +163,13 @@ void fromApiToResource(const ApiCameraData& src, QnVirtualCameraResourcePtr& dst
     dst->setStatusFlags(src.statusFlags);
 
     dst->setVendor(src.vendor);
-    NX_ASSERT(dst->getId() == QnVirtualCameraResource::uniqueIdToId(dst->getUniqueId()));
+
+    Q_ASSERT_X(dId == uidToId, "fromApiToResource()",
+        (QString::fromLatin1("Camera id != unique id: dst->getId() = " + dId.toString()
+        + QString::fromLatin1("; dst->getUniqueId() = ") + dUid
+        + QString::fromLatin1("; QnVirtualCameraResource::uniqueIdToId(dst->getUniqueId()) = ") 
+        + uidToId.toString()
+        ).toStdString().c_str());
 }
 
 void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraData& dst)
