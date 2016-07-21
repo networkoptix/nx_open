@@ -13,6 +13,7 @@
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
+#include <transaction/transaction_descriptor.h>
 
 #include "utils/common/id.h"
 #include <nx/utils/log/log.h>

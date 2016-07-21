@@ -53,7 +53,6 @@
 #include "managers/misc_manager.h"
 #include "managers/resource_manager.h"
 #include "managers/stored_file_manager.h"
-#include "managers/time_manager.h"
 #include "managers/updates_manager.h"
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
