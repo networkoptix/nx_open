@@ -47,6 +47,7 @@ public:
 
     bool isLocal(const QnLayoutResourcePtr &resource) const
     {
+        NX_ASSERT(flags(resource).testFlag(Qn::ResourceIsLocal) == resource->hasFlags(Qn::local));
         return flags(resource).testFlag(Qn::ResourceIsLocal);
     }
 
