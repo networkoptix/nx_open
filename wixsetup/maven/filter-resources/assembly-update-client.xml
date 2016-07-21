@@ -25,6 +25,8 @@
                 <include>sigar.dll</include>
                 <include>ssleay32.dll</include>
                 <include>swscale-2.dll</include>
+                <include>swresample-2.dll</include>
+                <include>swscale-4.dll</include>
                 <include>udt.dll</include>
                 <include>vcredist*.exe</include>
             </includes>		
