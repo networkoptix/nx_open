@@ -757,19 +757,6 @@ private:
         return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
-    //template<typename Param>
-    //bool hasPermission(const Param &param, Qn::Permission permission)
-    //{
-    //    switch (permission)
-    //    {
-    //    case Qn::Permission::SavePermission:
-    //        return ec2::hasModifyPermission(m_userAccessData.userId, param);
-    //    default:
-    //        return ec2::hasPermission(m_userAccessData.userId, param, permission);
-    //    }
-    //    return false;
-    //}
-
 private:
     Qn::UserAccessData m_userAccessData;
 };
