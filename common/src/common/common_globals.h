@@ -24,7 +24,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
     ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction FailoverPriority
-    Permission GlobalPermission
+    Permission GlobalPermission UserRole
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
     MotionTypes TimePeriodTypes
@@ -953,8 +953,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         LiveViewer,
     };
 
-    Q_DECLARE_METATYPE(UserRole);
-
 
     /**
      * Invalid value for a timezone UTC offset.
@@ -977,7 +975,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TimePeriodContent)(Qn::Corner),
+    (Qn::TimePeriodContent)(Qn::Corner)(Qn::UserRole),
     (metatype)
 )
 
@@ -1007,4 +1005,3 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzDataFields)(Qn::TTHeaderFlags)(Qn::ResourceInfoLevel),
     (metatype)(numeric)
 )
-
