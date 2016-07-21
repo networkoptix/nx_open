@@ -17,19 +17,21 @@ Sender::~Sender()
 
 void Sender::send(std::shared_ptr<QByteArray> request)
 {
+    auto& buffer = *request;
     m_socket->sendAsync(
-        *request,
-        [this, request = std::move(request)](SystemError::ErrorCode result, size_t)
+        buffer,
+        [this, request = std::move(request)](SystemError::ErrorCode result, size_t size)
     {
-        if (result != SystemError::noError)
+        if (result != SystemError::noError || size != request->size())
         {
-            NX_LOGX(lm("Send error: %1").arg(SystemError::toString(result)),
-                cl_logDEBUG1);
-
-            return;
+            NX_LOG(lm("PCP Send (size=%1) error: %2")
+                .arg(size).arg(SystemError::toString(result)), cl_logDEBUG1);
         }
-
-        NX_LOGX(lm("Sent: %1").arg(request->toHex()), cl_logDEBUG2);
+        else
+        {
+            NX_LOG(lm("PCP Sent (size=%1): %2")
+                .arg(size).arg(request->toHex()), cl_logDEBUG2);
+        }
     });
 }
 

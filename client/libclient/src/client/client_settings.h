@@ -132,9 +132,6 @@ public:
          *  It should be set from command-line and it disables light mode auto detection. */
         LIGHT_MODE_OVERRIDE,
 
-        /** Do not show warning when a preset is being deleted but it is used by some tours. */
-        PTZ_PRESET_IN_USE_WARNING_DISABLED,
-
         /** Unique id for this PC for videowall construction. */
         PC_UUID,
 
@@ -143,6 +140,12 @@ public:
 
         /** A list of the urls that were discovered by QnDirectModuleFinder. */
         KNOWN_SERVER_URLS,
+
+        /**
+         * Flags for messages that should be displayed to user only once
+         * (usually with 'Do not show anymore' checkbox).
+         */
+        SHOW_ONCE_MESSAGES,
 
         LOG_LEVEL,
         EC2_TRAN_LOG_LEVEL,
@@ -234,7 +237,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isVSyncEnabled,         setVSyncEnabled,            GL_VSYNC,                   true)
         QN_DECLARE_RW_PROPERTY(QnAspectRatioHash,           resourceAspectRatios,   setResourceAspectRatios,    RESOURCE_ASPECT_RATIOS,     QnAspectRatioHash())
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
-        QN_DECLARE_RW_PROPERTY(bool,                        isPtzPresetInUseWarningDisabled,    setPtzPresetInUseWarningDisabled,   PTZ_PRESET_IN_USE_WARNING_DISABLED, false)
+        QN_DECLARE_RW_PROPERTY(Qn::ShowOnceMessages,        showOnceMessages,       setShowOnceMessages,        SHOW_ONCE_MESSAGES,         0)
         QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0)
         QN_DECLARE_RW_PROPERTY(QnClientBackground,          background,             setBackground,              BACKGROUND,                 QnClientBackground())

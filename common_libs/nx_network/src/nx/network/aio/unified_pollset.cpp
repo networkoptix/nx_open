@@ -220,7 +220,7 @@ bool UnifiedPollSet::isValid() const
 
 void UnifiedPollSet::interrupt()
 {
-    quint8 buf[128];
+    static const quint8 buf[128] = { 0 };
     m_interruptSocket.sendTo(buf, sizeof(buf), m_interruptSocket.getLocalAddress());
 }
 

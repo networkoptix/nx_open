@@ -14,6 +14,7 @@
 #include <licensing/license.h>
 
 #include <ui/actions/action_manager.h>
+#include <ui/common/palette.h>
 #include <ui/common/read_only.h>
 #include <ui/common/checkbox_utils.h>
 #include <ui/dialogs/resource_selection_dialog.h>
@@ -199,11 +200,11 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
             emit archiveRangeChanged();
     };
 
-    connect(ui->recordAlwaysButton,         &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateGridParams);
-    connect(ui->recordMotionButton,         &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateGridParams);
-    connect(ui->recordMotionPlusLQButton,   &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateGridParams);
-    connect(ui->recordMotionPlusLQButton,   &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateMaxFpsValue);
-    connect(ui->noRecordButton,             &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->recordAlwaysButton,         &QToolButton::toggled,                          this, &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->recordMotionButton,         &QToolButton::toggled,                          this, &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->recordMotionPlusLQButton,   &QToolButton::toggled,                          this, &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->recordMotionPlusLQButton,   &QToolButton::toggled,                          this, &QnCameraScheduleWidget::updateMaxFpsValue);
+    connect(ui->noRecordButton,             &QToolButton::toggled,                          this, &QnCameraScheduleWidget::updateGridParams);
     connect(ui->qualityComboBox,            QnComboboxCurrentIndexChanged,                  this, &QnCameraScheduleWidget::updateGridParams);
     connect(ui->fpsSpinBox,                 QnSpinboxIntValueChanged,                       this, &QnCameraScheduleWidget::updateGridParams);
     connect(this,                           &QnCameraScheduleWidget::scheduleTasksChanged,  this, &QnCameraScheduleWidget::updateRecordSpinboxes);
@@ -585,15 +586,23 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
     else
         qWarning() << "QnCameraScheduleWidget::No record type is selected!";
 
+    for (auto label : { ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord })
+    {
+        auto button = qobject_cast<QAbstractButton*>(label->buddy());
+        QPalette::ColorRole foreground = button && button->isChecked() ? QPalette::Highlight : QPalette::WindowText;
+        label->setForegroundRole(foreground);
+    }
+
     bool enabled = !ui->noRecordButton->isChecked();
     ui->fpsSpinBox->setEnabled(enabled && m_recordingParamsAvailable);
     ui->qualityComboBox->setEnabled(enabled && m_recordingParamsAvailable);
     updateRecordSpinboxes();
 
-
-    if(!(m_readOnly && fromUserInput)) {
+    if (!(m_readOnly && fromUserInput))
+    {
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::RecordTypeParam, recordType);
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::DiffersFlagParam, false);
+
         if (ui->noRecordButton->isChecked())
         {
             ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FpsParam, QLatin1String("-"));
@@ -781,11 +790,10 @@ void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled)
 
 void QnCameraScheduleWidget::updateColors()
 {
-    ui->recordAlwaysButton->setColor(ui->gridWidget->colors().recordAlways);
-    ui->recordMotionButton->setColor(ui->gridWidget->colors().recordMotion);
-    ui->recordMotionPlusLQButton->setColor(ui->gridWidget->colors().recordMotion);
-    ui->recordMotionPlusLQButton->setInsideColor(ui->gridWidget->colors().recordAlways);
-    ui->noRecordButton->setColor(ui->gridWidget->colors().recordNever);
+    ui->recordAlwaysButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_Always));
+    ui->recordMotionButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_MotionOnly));
+    ui->recordMotionPlusLQButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_MotionAndLowQuality));
+    ui->noRecordButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_Never));
 }
 
 // -------------------------------------------------------------------------- //

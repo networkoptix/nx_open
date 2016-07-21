@@ -36,10 +36,10 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     m_applyButton = m_buttonBox->button(QDialogButtonBox::Apply);
     m_okButton = m_buttonBox->button(QDialogButtonBox::Ok);
 
-    m_openButton = new QPushButton(tr("Open in New Tab"));
+    m_openButton = new QPushButton(tr("Show on Layout"));
     m_buttonBox->addButton(m_openButton, QDialogButtonBox::HelpRole);
 
-    m_diagnoseButton = new QPushButton();
+    m_diagnoseButton = new QPushButton(tr("Event Log"));
     m_buttonBox->addButton(m_diagnoseButton, QDialogButtonBox::HelpRole);
 
     m_rulesButton = new QPushButton();
@@ -100,12 +100,6 @@ void QnCameraSettingsDialog::retranslateUi()
         tr("I/O Module Settings"),       tr("I/O Modules Settings")
         ), cameras);
 
-    const QString diagnosticsTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
-        tr("Device Diagnostics"),       tr("Devices Diagnostics"),
-        tr("Camera Diagnostics"),       tr("Cameras Diagnostics"),
-        tr("I/O Module Diagnostics"),    tr("I/O Modules Diagnostics")
-        ), cameras);
-
     const QString rulesTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
         tr("Device Rules"),             tr("Devices Rules"),
         tr("Camera Rules"),             tr("Cameras Rules"),
@@ -113,7 +107,6 @@ void QnCameraSettingsDialog::retranslateUi()
         ), cameras);
 
     setWindowTitle(windowTitle);
-    m_diagnoseButton->setText(diagnosticsTitle);
     m_rulesButton->setText(rulesTitle);
 }
 

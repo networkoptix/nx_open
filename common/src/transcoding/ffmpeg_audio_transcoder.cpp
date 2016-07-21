@@ -263,6 +263,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
     {
         //encoded = avcodec_encode_audio(m_encoderCtx, m_audioEncodingBuffer, FF_MIN_BUFFER_SIZE, (const short*) m_resampledData.data());
         AVPacket outputPacket;
+        av_init_packet(&outputPacket);
         outputPacket.data = m_audioEncodingBuffer;
         outputPacket.size = FF_MIN_BUFFER_SIZE;
 
