@@ -23,7 +23,8 @@
         <global.libs>-lnx_media -lcommon -lnx_streaming -lnx_audio -lnx_network -ludt -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib Iphlpapi.lib</windows.oslibs>
         <windows.defines>_VARIADIC_MAX=10 WIN32_LEAN_AND_MEAN</windows.defines>
-        <rdep.packages>gtest gmock openssl quazip ffmpeg openal</rdep.packages>
+        <rdep.packages>gtest gmock openssl quazip ffmpeg</rdep.packages>
+        <rdep.windows.packages>openal</rdep.windows.packages>
     </properties>
 
     <dependencies>
