@@ -29,6 +29,7 @@
 
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_user_manager.h>
+#include <nx/network/http/auth_tools.h>
 
 
 ////////////////////////////////////////////////////////////
@@ -837,4 +838,38 @@ Qn::AuthResult QnAuthHelper::checkDigestValidity(QnUserResourcePtr userResource,
         return Qn::Auth_OK;
 
     return QnLdapManager::instance()->authenticateWithDigest( userResource->getName(), QLatin1String(digest) );
+}
+
+bool QnAuthHelper::checkUserPassword(const QnUserResourcePtr& user, const QString& password)
+{
+    // 1. For users created in from version < 2.3
+    if (user->getDigest().isEmpty())
+    {
+        //hash is obsolete. Cannot remove it to maintain update from version < 2.3
+        //  hash becomes empty after changing user's realm
+        QList<QByteArray> values = user->getHash().split(L'$');
+        if (values.size() != 3)
+            return false;
+
+        QByteArray salt = values[1];
+        QCryptographicHash md5(QCryptographicHash::Md5);
+        md5.addData(salt);
+        md5.addData(password.toUtf8());
+        return md5.result().toHex() == values[2];
+    }
+
+    // 2. Local users
+    if (!user->isCloud())
+        return nx_http::calcHa1(user->getName().toLower(), user->getRealm(), password) == user->getDigest();
+
+    // 3. Cloud users
+    QByteArray auth = createHttpQueryAuthParam(
+        user->getName(),
+        password,
+        user->getRealm(),
+        "GET",
+        qnAuthHelper->generateNonce());
+
+    nx_http::Response response;
+    return authenticateByUrl(auth, QByteArray("GET"), response) == Qn::Auth_OK;
 }

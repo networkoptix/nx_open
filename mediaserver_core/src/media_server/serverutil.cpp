@@ -32,6 +32,8 @@
 #include "server_connector.h"
 #include <transaction/transaction_message_bus.h>
 #include "cloud/cloud_system_name_updater.h"
+#include <core/resource_management/resource_access_manager.h>
+#include <network/authutil.h>
 
 
 namespace
@@ -130,7 +132,7 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
     if (!data.password.isEmpty())
     {
         /* check old password */
-        if (!validateAdminPassword(data, errString))
+        if (!validateOwnerPassword(data, errString))
             return false;
 
         /* set new password */
@@ -178,24 +180,30 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
     return true;
 }
 
-bool validateAdminPassword(const PasswordData& passwordData, QString* errStr)
+bool validateOwnerPassword(const PasswordData& passwordData, QString* errStr)
 {
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (!admin)
+    auto users = qnResPool->getResources<QnUserResource>().filtered(
+        [] (const QnUserResourcePtr& user)
+        {
+            return user->isOwner() && user->isEnabled();
+        });
+
+    if (users.isEmpty())
     {
         if (errStr)
             *errStr = lit("Temporary unavailable. Please try later.");
         return false;
     }
 
-    if (!admin->checkPassword(passwordData.oldPassword))
+    for (const auto& user : users)
     {
-        if (errStr)
-            *errStr = lit("Wrong current password specified");
-        return false;
+        if (qnAuthHelper->checkUserPassword(user, passwordData.oldPassword))
+            return true;
     }
 
-    return true;
+    if (errStr)
+        *errStr = lit("Wrong current password specified");
+    return false;
 }
 
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr)

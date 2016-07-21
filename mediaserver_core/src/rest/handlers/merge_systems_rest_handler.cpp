@@ -31,6 +31,7 @@
 #include "http/custom_headers.h"
 
 #include <rest/helpers/permissions_helper.h>
+#include <network/authenticate_helper.h>
 
 namespace
 {
@@ -95,7 +96,8 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::internalServerError;
     }
 
-    if (!admin->checkPassword(currentPassword)) {
+    if (!qnAuthHelper->checkUserPassword(admin, currentPassword))
+    {
         NX_LOG(lit("QnMergeSystemsRestHandler. Wrong admin password"), cl_logDEBUG1);
         result.setError(QnJsonRestResult::InvalidParameter, lit("currentPassword"));
         return nx_http::StatusCode::ok;

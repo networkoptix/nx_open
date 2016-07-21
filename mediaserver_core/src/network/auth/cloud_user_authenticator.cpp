@@ -21,6 +21,7 @@
 
 #include "cdb_nonce_fetcher.h"
 #include "cloud/cloud_connection_manager.h"
+#include <api/global_settings.h>
 
 
 static const std::chrono::minutes UNSUCCESSFUL_AUTHORIZATION_RESULT_CACHE_PERIOD(1);
@@ -426,6 +427,8 @@ QnUserResourcePtr CloudUserAuthenticator::createCloudUser(
     userData.fullName = userName;
     userData.digest = "invalid_digest";
     userData.hash = "invalid_hash";
+    if (userName == qnGlobalSettings->cloudAccountName())
+        userData.isAdmin = true;
     bool result = QnAppServerConnectionFactory::getConnection2()
         ->getUserManager(Qn::kDefaultUserAccess)->save(
             userData, QnUuid::createUuid().toString(),  //using random password because cloud account password is used to authenticate request
