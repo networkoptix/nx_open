@@ -52,7 +52,8 @@ ios {
     OTHER_FILES += $${QMAKE_INFO_PLIST}
     OBJECTIVE_SOURCES += \
         ${basedir}/src/ui/window_utils_ios.mm \
-        ${basedir}/src/utils/settings_migration_ios.mm
+        ${basedir}/src/utils/settings_migration_ios.mm \
+        ${basedir}/src/utils/app_delegate.mm
 
     ios_icon.files = $$files(${basedir}/${arch}/ios/images/icon*.png)
     QMAKE_BUNDLE_DATA += ios_icon
