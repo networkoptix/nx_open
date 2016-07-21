@@ -1981,7 +1981,12 @@ void QnNxStyle::drawControl(
 
         case CE_Splitter:
         {
-            painter->fillRect(option->rect, option->palette.shadow());
+            QStyleOptionFrame frameOption;
+            frameOption.QStyleOption::operator = (*option);
+            frameOption.frameShape = option->state.testFlag(State_Horizontal) ? QFrame::VLine : QFrame::HLine;
+            frameOption.lineWidth = 1;
+            frameOption.state |= State_Sunken;
+            proxy()->drawControl(CE_ShapedFrame, &frameOption, painter, widget);
             break;
         }
 
@@ -2790,7 +2795,7 @@ int QnNxStyle::pixelMetric(
             return dp(8);
 
         case PM_SplitterWidth:
-            return dp(1);
+            return dp(Metrics::kDefaultTopLevelMargin*2 + 1);
 
         case PM_TabBarTabHSpace:
         case PM_TabBarTabVSpace:
