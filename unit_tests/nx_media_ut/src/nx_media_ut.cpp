@@ -77,7 +77,7 @@ public:
     {
         testSetOwnedArchiveReader(archiveReader);
     }
-    
+
     using Player::testSetCamera;
 };
 
@@ -91,7 +91,7 @@ public:
 
     virtual ~MockVideoDecoder() {}
 
-    static bool isCompatible(const CodecID codec, const QSize& resolution)
+    static bool isCompatible(const AVCodecID codec, const QSize& resolution)
     {
         QN_UNUSED(codec);
 
@@ -122,7 +122,7 @@ public:
         return true;
     }
 
-    static QSize maxResolution(const CodecID codec)
+    static QSize maxResolution(const AVCodecID codec)
     {
         QN_UNUSED(codec);
         return s_maxResolution;
@@ -140,16 +140,16 @@ public:
 public:
     // Should be assigned externally.
     static QSize s_maxResolution;
-    static CodecID s_transcodingCodec;
+    static AVCodecID s_transcodingCodec;
     static QSize s_maxTranscodingResolution;
 };
 QSize MockVideoDecoder::s_maxResolution{};
-CodecID MockVideoDecoder::s_transcodingCodec{CODEC_ID_NONE};
+AVCodecID MockVideoDecoder::s_transcodingCodec{AV_CODEC_ID_NONE};
 QSize MockVideoDecoder::s_maxTranscodingResolution{};
 
 class MockServer: public QnMediaServerResource
 {
-public:    
+public:
     MockServer()
     {
         setId(QnUuid::createUuid());
@@ -182,7 +182,7 @@ public:
         removeProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME);
 
         // For mock camera, use a codec that will never match any reasonable transcoding codec.
-        static const int kCodec = /*102400*/ CODEC_ID_PROBE;
+        static const int kCodec = /*102400*/ AV_CODEC_ID_PROBE;
 
         const QString highStr = highResolution.isEmpty()
             ? ""
@@ -228,19 +228,19 @@ private:
         {
             if (stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX) //< High
             {
-                LOG(lit("Camera High stream: %1 x %2, CodecID %3")
+                LOG(lit("Camera High stream: %1 x %2, AVCodecID %3")
                     .arg(stream.getResolution().width()).arg(stream.getResolution().height())
                     .arg(stream.codec));
             }
             else if (stream.encoderIndex == CameraMediaStreamInfo::SECONDARY_STREAM_INDEX) //< Low
             {
-                LOG(lit("Camera Low stream: %1 x %2, CodecID %3")
+                LOG(lit("Camera Low stream: %1 x %2, AVCodecID %3")
                     .arg(stream.getResolution().width()).arg(stream.getResolution().height())
                     .arg(stream.codec));
             }
             else
             {
-                LOG(lit("INTERNAL ERROR: Unexpected camera stream: %1 x %2, CodecID %3")
+                LOG(lit("INTERNAL ERROR: Unexpected camera stream: %1 x %2, AVCodecID %3")
                     .arg(stream.getResolution().width()).arg(stream.getResolution().height())
                     .arg(stream.codec));
                 ASSERT(false);
@@ -274,7 +274,7 @@ public:
 private:
     QualitySetCallback m_qualitySetCallback;
 };
-        
+
 //-------------------------------------------------------------------------------------------------
 // Test mechanism.
 
@@ -295,15 +295,15 @@ public:
 
     // Can be called multiple times.
     void test(int sourceCodeLineNumber, const char* sourceCodeLineString,
-        bool clientSupportsTranscoding, 
-        bool serverSupportsTranscoding, 
+        bool clientSupportsTranscoding,
+        bool serverSupportsTranscoding,
         QSize maxTranscodingResolution,
         QSize maxDecoderResolution,
         QSize highStreamResolution,
         QSize lowStreamResolution,
         int videoQuality,
         QSize expectedQuality)
-    {   
+    {
         LOG(lit("=============================================================================="));
         if (conf.printTestLine)
         {
@@ -326,7 +326,7 @@ public:
         m_player->testSetCamera(m_camera);
 
         m_player->setVideoQuality(videoQuality); //< Calls handleSetQuality().
-        
+
         EXPECT_TRUE(m_calledSetQuality) << "setQuality() has not been called by Player";
         if (m_calledSetQuality)
         {
@@ -347,7 +347,7 @@ private:
         if (expectedMediaQuality != m_actualQuality)
         {
             ADD_FAILURE() << "MediaQuality: "
-                << "expected " << mediaQualityToString(expectedMediaQuality) 
+                << "expected " << mediaQualityToString(expectedMediaQuality)
                 << ", actual " << mediaQualityToString(m_actualQuality);
         }
 
@@ -438,7 +438,7 @@ TEST_F(NxMediaPlayerTest, SetQuality)
     // NOTE: kMaxTranscodingResolution is defined in Player private as 1920 x 1080.
 
   // TranscoSupported                                                       Quality
-  //  Client  Server  MaxTranscoRes MaxDecoderRes HighStreamRes LowStreamRes  hi/lo  Expected    
+  //  Client  Server  MaxTranscoRes MaxDecoderRes HighStreamRes LowStreamRes  hi/lo  Expected
 
     // High stream requested.
     T(false,  false,  none,         {1920,1080},  {1920,1080},  { 320, 240},    hi,  high       );
@@ -477,7 +477,7 @@ TEST_F(NxMediaPlayerTest, SetQuality)
     T(true,   true,   {1280, 720},  none,         {3840,2160},  { 320, 240},  1440,  low        );
 
     #undef T
-    
+
     finishTest(HasFailure());
 }
 
