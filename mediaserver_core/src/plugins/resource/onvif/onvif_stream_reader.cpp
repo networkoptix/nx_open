@@ -207,20 +207,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
 
-    const auto role = QString::number(getRole());
-    const auto updateUrls = [&](QString in)
-    {
-        QJsonObject streamUrls = QJsonDocument::fromJson(in.toUtf8()).object();
-        streamUrls[role] = QUrl(*streamUrl).path();
-        return QString::fromUtf8(QJsonDocument(streamUrls).toJson());
-    };
-
-    if (m_resource->updateProperty(Qn::CAMERA_STREAM_URLS_PARAM_NAME, updateUrls))
-        propertyDictionary->saveParamsAsync(m_resource->getId());
-
     m_onvifRes->updateSourceUrl(*streamUrl, getRole());
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3")
-        .arg(*streamUrl).arg(m_resource->getUrl()).arg(role), cl_logINFO);
+        .arg(*streamUrl).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
     return result;
 }
 
