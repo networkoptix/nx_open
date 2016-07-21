@@ -208,4 +208,17 @@ angular.module('webadminApp')
             }
             changeTransactionLogLevel();
         };
+
+        $scope.restartServer = function(passPort){
+            $modal.open({
+                templateUrl: 'views/restart.html',
+                controller: 'RestartCtrl',
+                resolve:{
+                    port:function(){
+                        return passPort?$scope.settings.port:null;
+                    }
+                }
+            });
+        };
+
     });
