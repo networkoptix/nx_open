@@ -39,17 +39,29 @@ private:
     void at_workbench_layoutsChanged();
 
 private:
-    void saveLayout(const QnLayoutResourcePtr &layout);
+    void saveLayout(const QnLayoutResourcePtr &layout, bool silent = false);
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
+
+    struct LayoutChange
+    {
+        QnLayoutResourcePtr layout;
+        QnResourceList added;
+        QnResourceList removed;
+    };
+
+    LayoutChange calculateLayoutChange(const QnLayoutResourcePtr& layout);
 
     /** Ask user if layout should be saved. Actual when admin modifies shared layout
      *  or layout belonging to user with custom access rights.
      */
-    bool confirmLayoutChange(const QnLayoutResourcePtr &layout);
+    bool confirmLayoutChange(const LayoutChange& change);
 
-    bool confirmSharedLayoutChange(const QnLayoutResourcePtr &layout);
-    bool confirmLayoutChangeForUser(const QnUserResourcePtr& user, const QnLayoutResourcePtr &layout);
-    bool confirmLayoutChangeForGroup(const QnUuid& groupId, const QnLayoutResourcePtr &layout);
+    bool confirmSharedLayoutChange(const LayoutChange& change);
+    bool confirmLayoutChangeForUser(const QnUserResourcePtr& user, const LayoutChange& change);
+    bool confirmLayoutChangeForGroup(const QnUuid& groupId, const LayoutChange& change);
+
+    /** If user has custom access rights, he must be given direct access to cameras on changed layout. */
+    void grantAccessRightsForUser(const QnUserResourcePtr& user, const LayoutChange& change);
 
     /**
      * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.
