@@ -173,12 +173,12 @@ void fromApiToResource(const ApiCameraData& src, QnVirtualCameraResourcePtr& dst
     if (dId == uidToId)
         return;
 
-    QString message = lit(R"("
+    QString message = lit(R"(
         Camera id != unique id:
         id = %1;
         uniqueId = %2;
-        uniqueIdToId = %3;")")
-        .arg(dId.toString()).arg(dUid).arg(uidToId.toString());
+        uniqueIdToId = %3;
+    )").arg(dId.toString()).arg(dUid).arg(uidToId.toString());
     NX_ASSERT(false, "fromApiToResource()", message);
 
 }
