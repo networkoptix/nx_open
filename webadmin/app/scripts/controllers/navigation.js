@@ -19,7 +19,7 @@ angular.module('webadminApp')
                     name: user.name
                 };
             },function(error){
-                if(error.status !== 401) {
+                if(error.status !== 401 && error.status !== 403) {
                     alert('Server failure: cannot retrieve current user data');
                 }
             });
