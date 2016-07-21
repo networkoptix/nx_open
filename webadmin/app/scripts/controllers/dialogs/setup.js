@@ -710,6 +710,11 @@ angular.module('webadminApp')
                     }
                     $scope.systemSettings[settingName] = systemSettings[settingName];
 
+                    if($scope.Config.settingsConfig[settingName].type === 'checkbox' &&
+                        $scope.systemSettings[settingName] === Config.undefinedValue){
+                        $scope.systemSettings[settingName] = true;
+                    }
+                    
                     if($scope.Config.settingsConfig[settingName].type === 'number'){
                         $scope.systemSettings[settingName] = parseInt($scope.systemSettings[settingName]);
                     }

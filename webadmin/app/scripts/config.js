@@ -69,6 +69,7 @@ var Config = {
         commonMessage: L.passwordRequirements.commonMessage
     },
 
+    undefinedValue:'__qn_undefined_value__',
     settingsConfig: {
         auditTrailEnabled: {label: 'Audit trail enabled', type: 'checkbox'},
         cameraSettingsOptimization: {label: 'Allow device setting optimization', type: 'checkbox', setupWizard: true},
