@@ -678,7 +678,7 @@ public:
         ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, t2);
         if (errorCode != ErrorCode::ok)
             return errorCode;
-        if (ec2::getTransactionDescriptorByParam<T2>()->checkReadPermissionFunc(m_userAccessData.userId, t2))
+        if (!ec2::getTransactionDescriptorByParam<T2>()->checkReadPermissionFunc(m_userAccessData.userId, t2))
         {
             errorCode = ErrorCode::forbidden;
             t2 = T2();

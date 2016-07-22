@@ -525,7 +525,8 @@ namespace detail
             if (systemSuperAccess(userId))
                 return true;
             auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-            return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+            bool result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+            return result;
         }
     };
 
@@ -537,8 +538,9 @@ namespace detail
             if (systemSuperAccess(userId))
                 return RemotePeerAccess::Allowed;
             auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-            return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission) ? 
+            RemotePeerAccess result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission) ? 
                 RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+            return result;
         }
     };
 
@@ -581,7 +583,7 @@ namespace detail
         template<typename ParamContainer>
         bool operator()(const QnUuid& userId, const ParamContainer& paramContainer)
         {
-            ParamContainer tmpContainer;
+            ParamContainer tmpContainer = paramContainer;
             FilterListByAccess<SingleAccess>()(userId, tmpContainer);
             if (paramContainer.size() != tmpContainer.size())
                 return false;
@@ -595,9 +597,9 @@ namespace detail
         template<typename ParamContainer>
         bool operator()(const QnUuid& userId, const ParamContainer& paramContainer)
         {
-            ParamContainer tmpContainer;
+            ParamContainer tmpContainer = paramContainer;
             FilterListByAccess<SingleAccess>()(userId, tmpContainer);
-            return !tmpContainer.empty();
+            return tmpContaiener.size() != paramContainer.size() && tmpContainer.empty();
         }
     };
 
@@ -607,9 +609,9 @@ namespace detail
         template<typename ParamContainer>
         RemotePeerAccess operator()(const QnUuid& userId, const ParamContainer& paramContainer)
         {
-            ParamContainer tmpContainer;
+            ParamContainer tmpContainer = paramContainer;
             FilterListByAccess<SingleAccess>()(userId, tmpContainer);
-            if (tmpContainer.empty())
+            if (paramContainer.size() != tmpContainer.size() && tmpContainer.empty())
                 return RemotePeerAccess::Forbidden;
             if (tmpContainer.size() == paramContainer.size())
                 return RemotePeerAccess::Allowed;
