@@ -440,7 +440,15 @@ namespace detail
     {
         bool operator()(const QnUuid& userId, const ApiResourceParamWithRefData& param)
         {
-            return ModifyResourceAccess()(userId, param.resourceId);
+            if (systemSuperAccess(userId))
+                return true;
+            auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+
+            QnResourcePtr target = qnResPool->getResourceById(param.resourceId);
+            if (!target)
+                return qnResourceAccessManager->canCreateResource(userResource, param);
+            else
+                return qnResourceAccessManager->hasPermission(userResource, target, Qn::Permission::SavePermission);
         }
     };
 
