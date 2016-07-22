@@ -624,7 +624,8 @@ module.exports = function (grunt) {
         'usemin',
         'htmlmin',
         'shell:version',
-        'shell:generate_translation'
+        'shell:generate_translation',
+        'shell:localize'
     ]);
 
     grunt.registerTask('default', [

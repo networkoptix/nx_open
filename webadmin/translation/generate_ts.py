@@ -178,7 +178,7 @@ html_strings = extract_strings('../static/views', '.html')  # , dir_exclude='sta
 
 html_strings1 = extract_strings('../static/', 'index.html')  # , dir_exclude='static'
 
-format_ts(js_strings + html_strings + html_strings1, "webadmin.ts")
+format_ts(js_strings + html_strings + html_strings1, "webadmin_gen.ts")
 
 # template_strings = extract_strings('../notifications/static/templates', '.mustache')
 # format_ts(template_strings, "templates.ts")
