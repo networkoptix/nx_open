@@ -130,7 +130,11 @@ public:
             replacementRoles->removeUserRole(model->selectedGroup());
 
             messageBox.setInformativeText(tr("All users that had this role will be assigned the following role:"));
-            messageBox.setComboBoxModel(replacementRoles);
+
+            QComboBox* comboBox = new QComboBox();
+            messageBox.addCustomWidget(comboBox);
+
+            comboBox->setModel(replacementRoles);
 
             //TODO: #vkutin Find the best replacement instead of just choosing Live Viewer
             QnUuid bestReplacementId;
@@ -152,12 +156,12 @@ public:
                     1, Qt::MatchExactly);
             }
 
-            messageBox.setCurrentComboBoxIndex(indices.empty() ? 0 : indices[0].row());
+            comboBox->setCurrentIndex(indices.empty() ? 0 : indices[0].row());
 
             if (messageBox.exec() != QDialogButtonBox::Ok)
                 return;
 
-            QModelIndex index = replacementRoles->index(messageBox.currentComboBoxIndex(), 0);
+            QModelIndex index = replacementRoles->index(comboBox->currentIndex(), 0);
             NX_ASSERT(index.isValid());
 
             replacement = QnUserGroupSettingsModel::RoleReplacement(
