@@ -65,7 +65,7 @@
                                         <div class="pull-right caption-row">
                                             <span class="caption-row">
                                                 <icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-up" title-true="collapse" ></icon>
-                                                <icon for=" server.collapsed && cameras[server.id].length>0" on-true="chevron-down" title-true="expand"  ></icon>
+                                                <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-down" title-true="expand" ></icon>
                                             </span>
                                         </div>
                                         <div>
@@ -80,7 +80,7 @@
                                     </a>
                                     <ul class="nav "
                                         collapse="server.collapsed"
-                                        ng-class="{edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy }">
+                                        ng-class="{edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy}" >
                                         <li ng-repeat="camera in cameras[server.id]"
                                             ng-class="{active:activeCamera===camera}"
                                             ng-if="camera.visible"
