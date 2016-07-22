@@ -378,6 +378,7 @@ namespace detail
         if (systemSuperAccess(userId))
             return true;
         QnResourcePtr target = qnResPool->getResourceById(resourceId);
+        bool isTarget = (bool)target;
         auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
         return qnResourceAccessManager->hasPermission(userResource, target, permission);
     }
@@ -439,7 +440,7 @@ namespace detail
     {
         bool operator()(const QnUuid& userId, const ApiResourceParamWithRefData& param)
         {
-            return resourceAccessHelper(userId, param.resourceId, Qn::Permission::SavePermission);
+            return ModifyResourceAccess()(userId, param.resourceId);
         }
     };
 
