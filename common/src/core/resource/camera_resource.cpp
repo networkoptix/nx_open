@@ -465,7 +465,7 @@ QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
     if (!storeUrlForRole(role))
         return QString();
 
-    QJsonObject streamUrls = QJsonDocument::fromJson(getProperty(Qn::kStreamUrls).toUtf8()).object();
+    QJsonObject streamUrls = QJsonDocument::fromJson(getProperty(Qn::CAMERA_STREAM_URLS).toUtf8()).object();
     const auto roleStr = QString::number(role);
     return streamUrls[roleStr].toString();
 }
@@ -475,7 +475,7 @@ void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::Connection
     if (!storeUrlForRole(role))
         return;
 
-    if (updateProperty(Qn::kStreamUrls,
+    if (updateProperty(Qn::CAMERA_STREAM_URLS,
         [url, role]
         (QString oldValue)
         {
