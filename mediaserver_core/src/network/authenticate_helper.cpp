@@ -842,25 +842,8 @@ Qn::AuthResult QnAuthHelper::checkDigestValidity(QnUserResourcePtr userResource,
 
 bool QnAuthHelper::checkUserPassword(const QnUserResourcePtr& user, const QString& password)
 {
-    // 1. For users created in from version < 2.3
-    if (user->getDigest().isEmpty())
-    {
-        //hash is obsolete. Cannot remove it to maintain update from version < 2.3
-        //  hash becomes empty after changing user's realm
-        QList<QByteArray> values = user->getHash().split(L'$');
-        if (values.size() != 3)
-            return false;
-
-        QByteArray salt = values[1];
-        QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(salt);
-        md5.addData(password.toUtf8());
-        return md5.result().toHex() == values[2];
-    }
-
-    // 2. Local users
     if (!user->isCloud())
-        return nx_http::calcHa1(user->getName().toLower(), user->getRealm(), password) == user->getDigest();
+        return user->checkLocalUserPassword(password);
 
     // 3. Cloud users
     QByteArray auth = createHttpQueryAuthParam(

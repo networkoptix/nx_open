@@ -79,7 +79,7 @@ bool QnUserSettingsWidget::hasChanges() const
 
     if (permissions.testFlag(Qn::WritePasswordPermission)
         && !ui->passwordInputField->text().isEmpty()
-        && !m_model->user()->checkPassword(ui->passwordInputField->text())
+        && !m_model->user()->checkLocalUserPassword(ui->passwordInputField->text())
         )
         return true;
 

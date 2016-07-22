@@ -36,6 +36,8 @@ public:
 
     void generateHash();
 
+    bool checkLocalUserPassword(const QString &password);
+
     QByteArray getDigest() const;
     void setDigest(const QByteArray& digest, bool isValidated = false);
 
