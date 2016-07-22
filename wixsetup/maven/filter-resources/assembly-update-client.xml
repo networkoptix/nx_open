@@ -15,9 +15,9 @@
                 <include>platforms/*.dll</include>
                 <include>qml/**</include>
                 <include>av*.dll</include>
-                <include>${applauncher.binary.name}.exe</include>                
-                <include>${client.binary.name}.exe</include>
-                <include>${minilauncher.binary.name}.exe</include>
+                <include>${applauncher.binary.name}</include>                
+                <include>${client.binary.name}</include>
+                <include>${minilauncher.binary.name}</include>
                 <include>lib*.dll</include>
                 <include>nx*.dll</include>
                 <include>OpenAL32.dll</include>
