@@ -361,6 +361,7 @@ upgrade() {
 #only if boot from SD Card for the first time after upgrading 2.5 to 3.0
 upgrade_sd() {
     export DEBIAN_FRONTEND=noninteractive
+    dpkg -i /opt/deb/libvdpau/*.deb
     cp /etc/apt/sources.list /etc/apt/sources.list_bk
     echo "deb file:/opt/deb/libc6 /" > /etc/apt/sources.list
     apt-get update
