@@ -76,7 +76,7 @@ APPLY(6, peerAliveInfo, ApiPeerAliveData, \
                        true, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
-                       AdminAccessOnly(), /* save permission checker */ \
+                       AllowForAllAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
