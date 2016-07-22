@@ -10,11 +10,13 @@ typedef QSharedPointer<QnBaseSystemDescription> QnSystemDescriptionPtr;
 
 enum class QnServerField
 {
-    NoField = 0x00, 
+    NoField = 0x00,
     NameField = 0x01,
     SystemNameField = 0x02,
     HostField = 0x04,
-    FlagsField = 0x08
+    FlagsField = 0x08,
+    IsFactoryFlag = 0x10,
+    CloudIdField = 0x20
 };
 Q_DECLARE_FLAGS(QnServerFields, QnServerField)
 Q_DECLARE_METATYPE(QnServerFields)
@@ -25,7 +27,7 @@ class QnBaseSystemDescription : public QObject
     typedef QObject base_type;
 
 public:
-    QnBaseSystemDescription() : base_type() 
+    QnBaseSystemDescription() : base_type()
     {
     }
 

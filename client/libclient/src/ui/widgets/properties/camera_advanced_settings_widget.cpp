@@ -121,10 +121,12 @@ void QnCameraAdvancedSettingsWidget::updateUrls()
     {
         ui->primaryUrlLineEdit->setText(QString());
         ui->secondaryUrlLineEdit->setText(QString());
+        ui->secondaryUrlLineEdit->setEnabled(true);
     }
     else
     {
         ui->primaryUrlLineEdit->setText(m_camera->sourceUrl(Qn::CR_LiveVideo));
+        ui->secondaryUrlLineEdit->setEnabled(m_camera->hasDualStreaming2());
         if (m_camera->hasDualStreaming2())
             ui->secondaryUrlLineEdit->setText(m_camera->sourceUrl(Qn::CR_SecondaryLiveVideo));
         else

@@ -90,38 +90,47 @@ void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvan
 }
 
 
-QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString &name, const std::vector<QnCameraAdvancedParameter> &params) {
+QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& name, const std::vector<QnCameraAdvancedParameter>& params)
+{
 	QGroupBox* groupBox = new QGroupBox(m_contentsWidget);
-	groupBox->setTitle(name);
+    groupBox->setFlat(true);
+    groupBox->setTitle(name);
 	groupBox->setLayout(new QHBoxLayout(groupBox));
 
 	QScrollArea* scrollArea = new QScrollArea(groupBox);
 	scrollArea->setWidgetResizable(true);
-
 	groupBox->layout()->addWidget(scrollArea);
-	
+
 	QWidget* scrollAreaWidgetContents = new QWidget();
+    scrollAreaWidgetContents->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
 
-	QFormLayout* formLayout = new QFormLayout(scrollAreaWidgetContents);
-	scrollAreaWidgetContents->setLayout(formLayout);
-	scrollArea->setWidget(scrollAreaWidgetContents);
+	QGridLayout* gridLayout = new QGridLayout(scrollAreaWidgetContents);
+	scrollAreaWidgetContents->setLayout(gridLayout);
+    scrollArea->setWidget(scrollAreaWidgetContents);
 
-	for(const QnCameraAdvancedParameter &param: params) {
-		QnAbstractCameraAdvancedParamWidget* widget = QnCameraAdvancedParamWidgetFactory::createWidget(param, scrollAreaWidgetContents);
-		if (!widget)
-			continue;
+    for (const auto& param : params)
+    {
+        QnAbstractCameraAdvancedParamWidget* widget = QnCameraAdvancedParamWidgetFactory::createWidget(param, scrollAreaWidgetContents);
+        if (!widget)
+            continue;
 
-		QLabel* label = new QLabel(scrollAreaWidgetContents);
-		label->setToolTip(param.description);
-		if (param.dataType != QnCameraAdvancedParameter::DataType::Button)
-			label->setText(lit("%1: ").arg(param.name));
-		formLayout->addRow(label, widget);
+        if (param.dataType != QnCameraAdvancedParameter::DataType::Button)
+        {
+            QLabel* label = new QLabel(scrollAreaWidgetContents);
+            label->setToolTip(param.description);
+            label->setText(lit("%1: ").arg(param.name));
+            label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+            label->setBuddy(widget);
+            gridLayout->addWidget(label, gridLayout->rowCount(), 0);
+        }
+
+        gridLayout->addWidget(widget, gridLayout->rowCount(), 1);
 		m_paramWidgetsById[param.id] = widget;
 
-		/* Widget is disabled until it receive correct value. */
+		/* Widget is disabled until it receives correct value. */
 		if (QnCameraAdvancedParameter::dataTypeHasValue(param.dataType))
 			widget->setEnabled(false);
-        else 
+        else
             connect(widget, &QnAbstractCameraAdvancedParamWidget::valueChanged, this, &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
 	}
 

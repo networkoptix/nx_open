@@ -109,7 +109,7 @@ void QnUserProfileWidget::loadDataToUi()
 
     ui->loginInputField->setText(m_model->user()->getName());
     ui->nameInputField->setText(m_model->user()->fullName());
-    ui->groupInputField->setText(accessController()->userRoleName(m_model->user()));
+    ui->groupInputField->setText(qnResourceAccessManager->userRoleName(m_model->user()));
     ui->emailInputField->setText(m_model->user()->getEmail());
     m_newPassword.clear();
 }

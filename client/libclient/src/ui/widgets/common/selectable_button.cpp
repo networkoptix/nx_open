@@ -77,6 +77,13 @@ void QnSelectableButton::paintEvent(QPaintEvent* event)
     QStyleOptionToolButton option;
     initStyleOption(&option);
 
+    if (!option.state.testFlag(QStyle::State_Enabled))
+    {
+        const qreal kDisabledOpacity = 0.3;
+        painter.setOpacity(kDisabledOpacity);
+        option.state &= ~(QStyle::State_Sunken | QStyle::State_MouseOver);
+    }
+
     if (option.state.testFlag(QStyle::State_On))
     {
         paintMarker(&painter, palette().highlight());
@@ -87,8 +94,7 @@ void QnSelectableButton::paintEvent(QPaintEvent* event)
         paintMarker(&painter, palette().dark());
         option.state &= ~QStyle::State_MouseOver;
     }
-    else if (option.state.testFlag(QStyle::State_MouseOver)
-          && option.state.testFlag(QStyle::State_Enabled))
+    else if (option.state.testFlag(QStyle::State_MouseOver))
     {
         paintMarker(&painter, palette().midlight());
     }

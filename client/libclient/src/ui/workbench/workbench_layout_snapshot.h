@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_data.h>
 
+//TODO: #GDM replace with ec2::ApiLayoutData
 class QnWorkbenchLayoutSnapshot {
 public:
     QnWorkbenchLayoutSnapshot(): cellAspectRatio(-1.0), cellSpacing(-1.0, -1.0) {}

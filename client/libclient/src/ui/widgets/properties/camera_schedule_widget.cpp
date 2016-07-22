@@ -146,9 +146,11 @@ namespace {
         bool m_hasVideo;
     };
 
-    const int defaultMinArchiveDays = 1;
-    const int dangerousMinArchiveDays = 5;
-    const int defaultMaxArchiveDays = 30;
+    const int kDefaultMinArchiveDays = 1;
+    const int kDangerousMinArchiveDays = 5;
+    const int kDefaultMaxArchiveDays = 30;
+    const int kRecordingTypeLabelFontSize = 12;
+    const int kRecordingTypeLabelFontWeight = QFont::DemiBold;
 }
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
@@ -187,6 +189,17 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QnCheckbox::autoCleanTristate(ui->enableRecordingCheckBox);
     QnCheckbox::autoCleanTristate(ui->checkBoxMinArchive);
     QnCheckbox::autoCleanTristate(ui->checkBoxMaxArchive);
+
+    QFont labelFont;
+    labelFont.setPixelSize(kRecordingTypeLabelFontSize);
+    labelFont.setWeight(kRecordingTypeLabelFontWeight);
+
+    for (auto label : { ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord })
+    {
+        label->setFont(labelFont);
+        label->setProperty(style::Properties::kDontPolishFontProperty, true);
+    }
+
 
     auto notifyAboutScheduleEnabledChanged = [this](int state)
     {
@@ -388,7 +401,7 @@ void QnCameraScheduleWidget::updateScheduleEnabled() {
 }
 
 void QnCameraScheduleWidget::updateMinDays() {
-    auto calcMinDays = [](int d) { return d == 0 ? defaultMinArchiveDays : qAbs(d);  };
+    auto calcMinDays = [](int d) { return d == 0 ? kDefaultMinArchiveDays : qAbs(d);  };
 
     const int minDays = m_cameras.isEmpty()
         ? 0
@@ -405,7 +418,7 @@ void QnCameraScheduleWidget::updateMinDays() {
 }
 
 void QnCameraScheduleWidget::updateMaxDays() {
-    auto calcMaxDays = [](int d) { return d == 0 ? defaultMaxArchiveDays : qAbs(d);  };
+    auto calcMaxDays = [](int d) { return d == 0 ? kDefaultMaxArchiveDays : qAbs(d);  };
 
     const int maxDays = m_cameras.isEmpty()
         ? 0
@@ -1000,5 +1013,5 @@ void QnCameraScheduleWidget::validateArchiveLength() {
         if (ui->spinBoxMaxDays->value() < ui->spinBoxMinDays->value())
             ui->spinBoxMaxDays->setValue(ui->spinBoxMinDays->value());
     }
-    ui->minArchiveDaysWarningLabel->setVisible(ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() > dangerousMinArchiveDays);
+    ui->minArchiveDaysWarningLabel->setVisible(ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() > kDangerousMinArchiveDays);
 }

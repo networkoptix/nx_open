@@ -192,7 +192,7 @@ void CloudUserListSynchonizer::permissionsToCloudAccessRole(
     const auto permissions = qnResourceAccessManager->globalPermissions(user);
     switch (permissions)
     {
-        case Qn::GlobalAdminPermissionsSet:
+        case Qn::GlobalAdminPermissionSet:
             systemSharing->accessRole = nx::cdb::api::SystemAccessRole::localAdmin;
             break;
         case Qn::GlobalAdvancedViewerPermissionSet:

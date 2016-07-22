@@ -117,14 +117,11 @@ namespace Qn
      */
     enum ResourceSavingFlag
     {
-        /** Resource is local and has never been saved to Server. */
-        ResourceIsLocal = 0x1,
-
         /** Resource is currently being saved to Server. */
-        ResourceIsBeingSaved = 0x2,
+        ResourceIsBeingSaved = 0x1,
 
         /** Unsaved changes are present in the resource. */
-        ResourceIsChanged = 0x4
+        ResourceIsChanged = 0x2
     };
     Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)
@@ -284,8 +281,9 @@ namespace Qn
      */
     enum class ShowOnceMessage
     {
-        PtzPresetInUse      = 0x001,
-        SharedLayoutEdit    = 0x002
+        PtzPresetInUse          = 0x001,    /**< Delete ptz preset which is used in the tour. */
+        SharedLayoutEdit        = 0x002,    /**< Edit shared layout. */
+        UserLayoutItemsRemoved  = 0x004     /**< Items are removed from user's layout, but access still persist. */
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ShowOnceMessage)
     Q_DECLARE_FLAGS(ShowOnceMessages, ShowOnceMessage)

@@ -414,7 +414,7 @@ QnUserResourcePtr CloudUserAuthenticator::createCloudUser(
         case nx::cdb::api::SystemAccessRole::maintenance:   //TODO #ak need a separate role for integrator
         case nx::cdb::api::SystemAccessRole::owner:
         case nx::cdb::api::SystemAccessRole::localAdmin:
-            userData.permissions = Qn::GlobalAdminPermissionsSet;
+            userData.permissions = Qn::GlobalAdminPermissionSet;
             break;
     }
 

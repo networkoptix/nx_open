@@ -807,11 +807,7 @@ void QnSingleCameraSettingsWidget::updateMotionAvailability()
     if (m_camera && m_camera->isDtsBased())
         return;
 
-    bool motionAvailable = true;
-
-    if (ui->motionDetectionCheckBox->isChecked())
-        motionAvailable = m_camera && (m_camera->getCameraBasedMotionType() != Qn::MT_NoMotion);
-
+    bool motionAvailable = ui->motionDetectionCheckBox->isChecked();
     ui->cameraScheduleWidget->setMotionAvailable(motionAvailable);
 }
 
