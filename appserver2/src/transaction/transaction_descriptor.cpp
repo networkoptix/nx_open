@@ -378,8 +378,9 @@ namespace detail
         if (systemSuperAccess(userId))
             return true;
         QnResourcePtr target = qnResPool->getResourceById(resourceId);
-        bool isTarget = (bool)target;
         auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+        if (qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission))
+            return true;
         return qnResourceAccessManager->hasPermission(userResource, target, permission);
     }
 
