@@ -31,7 +31,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>libnx_media</artifactId>
+            <artifactId>nx_media</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
