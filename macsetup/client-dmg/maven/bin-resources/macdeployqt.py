@@ -51,14 +51,15 @@ def prepare(binary, sbindir, tlibdir):
 
     os.mkdir(tlibdir)
 
-    tresdir = join(os.path.dirname(tbindir), 'Resources')
+    tcontentsdir = os.path.dirname(tbindir)
+    tresdir = join(tcontentsdir, 'Resources')
 
     shutil.copyfile(join(sbindir, 'desktop_client'), binary)
     os.chmod(binary, 0755)
     yield binary
 
     ignore = shutil.ignore_patterns('*debug*', '.*')
-    for subfolder in 'platforms', 'imageformats', 'audio', 'qml':
+    for subfolder in 'platforms', 'imageformats', 'audio':
         tfolder = join(tbindir, subfolder)
         shutil.copytree(join(sbindir, subfolder), tfolder, ignore=ignore)
         for f in os.listdir(tfolder):
@@ -67,6 +68,7 @@ def prepare(binary, sbindir, tlibdir):
             yield dep
 
     shutil.copytree(join(sbindir, 'vox'), join(tresdir, 'vox'))
+    shutil.copytree(join(sbindir, 'qml'), join(tcontentsdir, 'qml'))
 
 
 def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
