@@ -102,6 +102,30 @@ void QnUserResource::generateHash()
     setCryptSha512Hash(linuxCryptSha512(password.toUtf8(), generateSalt(LINUX_CRYPT_SALT_LENGTH)));
 }
 
+bool QnUserResource::checkLocalUserPassword(const QString &password)
+{
+    QnMutexLocker locker(&m_mutex);
+
+    if (!m_digest.isEmpty())
+    {
+        return nx_http::calcHa1(m_name.toLower(), m_realm, password) == m_digest;
+    }
+    else
+    {
+        //hash is obsolete. Cannot remove it to maintain update from version < 2.3
+        //  hash becomes empty after changing user's realm
+        QList<QByteArray> values = m_hash.split(L'$');
+        if (values.size() != 3)
+            return false;
+
+        QByteArray salt = values[1];
+        QCryptographicHash md5(QCryptographicHash::Md5);
+        md5.addData(salt);
+        md5.addData(password.toUtf8());
+        return md5.result().toHex() == values[2];
+    }
+}
+
 void QnUserResource::setDigest(const QByteArray& digest, bool isValidated)
 {
     {

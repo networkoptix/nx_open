@@ -519,20 +519,16 @@ bool QnDbManager::init(const QUrl& dbUrl)
     bool updateUserResource = false;
     if( !defaultAdminPassword.isEmpty() )
     {
-        QnUserResource tmpUserResource(QnUserType::Local);
-        tmpUserResource.setName(userResource->getName());
-        tmpUserResource.setPassword(defaultAdminPassword);
-        tmpUserResource.generateHash();
-
-        if (userResource->getHash()  != tmpUserResource.getHash() ||
-            userResource->getRealm() != tmpUserResource.getRealm())
+        if (!userResource->checkLocalUserPassword(defaultAdminPassword) ||
+            userResource->getRealm() != QnAppInfo::realm())
         {
             userResource->setPassword( defaultAdminPassword);
             userResource->generateHash();
             updateUserResource = true;
         }
     }
-    if (!md5Password.isEmpty() || !digestPassword.isEmpty()) {
+    if (!md5Password.isEmpty() || !digestPassword.isEmpty())
+    {
         userResource->setHash(md5Password);
         userResource->setDigest(digestPassword);
         updateUserResource = true;
