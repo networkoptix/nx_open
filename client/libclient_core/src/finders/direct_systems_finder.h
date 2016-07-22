@@ -23,7 +23,7 @@ public: // overrides
     QnSystemDescriptionPtr getSystem(const QString &id) const override;
 
 private:
-    void addServer(const QnModuleInformation &moduleInformation);
+    void addServer(QnModuleInformation moduleInformation);
 
     void removeServer(const QnModuleInformation &moduleInformation);
 

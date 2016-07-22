@@ -345,6 +345,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
      */
     QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
     Q_UNUSED(vsyncWorkaround);
+
+    updateWidgetsVisibility();
 }
 
 QnMainWindow::~QnMainWindow() {

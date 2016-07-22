@@ -122,41 +122,45 @@ void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
 
 void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 {
+    NX_ASSERT(resource);
     /*
      * In rare cases we can receive updateResource call when the client is
      * in the reconnect process (it starts an event loop inside the main
      * thread). Populating the resource pool or changing resources is highly
      * inappropriate at that time.
      * */
-    if (!m_connection)
+    if (!m_connection || !resource)
         return;
 
-    QnCommonMessageProcessor::updateResource(resource);
+    auto isFile = [](const QnResourcePtr &resource)
+    {
+        QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
+        return layout && layout->isFile();
+    };
 
     QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
 
+    /* Security check. Local layouts must not be overridden by server's.
+    * Really that means GUID conflict, caused by saving of local layouts to server. */
+    if (isFile(resource) || isFile(ownResource))
+        return;
+
+    resource->addFlags(Qn::remote);
+    resource->removeFlags(Qn::local);
+
+    QnCommonMessageProcessor::updateResource(resource);
     if (!ownResource)
     {
         qnResPool->addResource(resource);
     }
     else
     {
-        // TODO: #GDM #high #3.0 don't update layout if we're re-reading resources,
+        // TODO: #GDM don't update layout if we're re-reading resources,
         // this leads to unsaved layouts spontaneously rolling back to last saved state.
-        // This will make work very unstable when admin modifies our access rights.
         // Solution is to move 'saved/modified' flags to Qn::ResourceFlags. VMS-3180
-        QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>();
-        if (layout && layout->isFile())
-        {
-            /* Intentionally do nothing. Local layouts must not be overridden by server's.
-             * Really that means GUID conflict, caused by saving of local layouts to server. */
-        }
-        else
-        {
-            ownResource->update(resource);
-            if (layout)
-                layout->requestStore();
-        }
+        ownResource->update(resource);
+        if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
+            layout->requestStore();
     }
 
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())

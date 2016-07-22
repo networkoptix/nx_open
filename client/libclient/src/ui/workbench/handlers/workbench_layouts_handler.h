@@ -20,7 +20,7 @@ public:
     bool tryClose(bool force);
     void forcedUpdate();
 
-protected:
+private:
     ec2::AbstractECConnectionPtr connection2() const;
 
     private slots:
@@ -39,13 +39,32 @@ protected:
     void at_workbench_layoutsChanged();
 
 private:
+
+    /** Save target file, local or remote layout. */
     void saveLayout(const QnLayoutResourcePtr &layout);
+
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
+
+    struct LayoutChange
+    {
+        QnLayoutResourcePtr layout;
+        QnResourceList added;
+        QnResourceList removed;
+    };
+
+    LayoutChange calculateLayoutChange(const QnLayoutResourcePtr& layout);
 
     /** Ask user if layout should be saved. Actual when admin modifies shared layout
      *  or layout belonging to user with custom access rights.
      */
-    bool confirmLayoutChange(const QnLayoutResourcePtr &layout);
+    bool confirmLayoutChange(const LayoutChange& change);
+
+    bool confirmSharedLayoutChange(const LayoutChange& change);
+    bool confirmLayoutChangeForUser(const QnUserResourcePtr& user, const LayoutChange& change);
+    bool confirmLayoutChangeForGroup(const QnUuid& groupId, const LayoutChange& change);
+
+    /** If user has custom access rights, he must be given direct access to cameras on changed layout. */
+    void grantAccessRightsForUser(const QnUserResourcePtr& user, const LayoutChange& change);
 
     /**
      * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.

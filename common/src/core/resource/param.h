@@ -34,7 +34,7 @@ namespace Qn
     static const QString CAMERA_CAPABILITIES_PARAM_NAME = lit("cameraCapabilities");
     static const QString CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = lit("mediaStreams");
     static const QString CAMERA_BITRATE_INFO_LIST_PARAM_NAME = lit("bitrateInfos");
-    static const QString CAMERA_STREAM_URLS_PARAM_NAME = lit("streamUrls");
+    static const QString CAMERA_STREAM_URLS = lit("streamUrls");
     static const QString CAMERA_ALLOWED_FPS_LIST_PARAM_NAME = lit("allowedFpsList");
     static const QString TRUST_TO_VIDEO_SOURCE_SIZE_PARAM_NAME = lit("trustToVideoSourceSize");
     static const QString FPS_BASE_PARAM_NAME = lit("fpsBase"); //used if we need to control fps via encoding interval (fps when encoding interval is 1)
@@ -46,9 +46,6 @@ namespace Qn
     static const QString DO_NOT_CONFIGURE_CAMERA_PARAM_NAME = lit("doNotConfigureCamera");
     static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
     static const QString VIDEO_LAYOUT_PARAM_NAME2 = lit("videoLayout"); //used in resource_data.json
-
-    static const QString kPrimaryUrl = lit("primaryUrl");
-    static const QString kSecondaryUrl = lit("secondaryUrl");
 
     static const QString SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME = lit("shouldAppearAsSingleChannel");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state

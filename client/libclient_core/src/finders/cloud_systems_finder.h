@@ -17,7 +17,7 @@ class QnCloudSystemsFinder : public Connective<QnAbstractSystemsFinder>
 {
     Q_OBJECT
     typedef Connective<QnAbstractSystemsFinder> base_type;
-    
+
 public:
     QnCloudSystemsFinder(QObject *parent = nullptr);
 
@@ -34,8 +34,10 @@ private:
     void setCloudSystems(const QnCloudSystemList &systems);
 
     void onCloudError(QnCloudStatusWatcher::ErrorCode error);
-    
+
     void updateSystemInternal(const QnSystemDescription::PointerType &system);
+
+    void processFactoryServer(const QnModuleInformation& serverInfo);
 
     void pingServerInternal(const QString &host
         , int serverPriority
@@ -57,5 +59,6 @@ private:
     mutable QnMutex m_mutex;
 
     SystemsHash m_systems;
+    SystemsHash m_factorySystems;
     RequestIdToSystemHash m_requestToSystem;
 };

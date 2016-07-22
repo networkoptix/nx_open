@@ -18,7 +18,6 @@
 #include <utils/common/checked_cast.h>
 
 #include "workbench_context.h"
-#include "workbench_layout_snapshot_manager.h"
 
 QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) :
     QObject(parent)
@@ -34,7 +33,6 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
 {
     connect(qnResPool,          &QnResourcePool::resourceAdded,                     this,   &QnWorkbenchAccessController::at_resourcePool_resourceAdded);
     connect(qnResPool,          &QnResourcePool::resourceRemoved,                   this,   &QnWorkbenchAccessController::at_resourcePool_resourceRemoved);
-    connect(snapshotManager(),  &QnWorkbenchLayoutSnapshotManager::flagsChanged,    this,   &QnWorkbenchAccessController::updatePermissions);
 
     connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnWorkbenchAccessController::recalculateAllPermissions);
 
@@ -190,13 +188,13 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
     /* Some layouts are created with predefined permissions. */
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
     if (permissions.isValid() && permissions.canConvert<int>())
-        return checkReadOnly(static_cast<Qn::Permissions>(permissions.toInt())); // TODO: #Elric listen to changes
+        return checkReadOnly(static_cast<Qn::Permissions>(permissions.toInt()) | Qn::ViewContentPermission); // TODO: #Elric listen to changes
 
     if (layout->isFile())
-        return checkLocked(Qn::ReadWriteSavePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission);
+        return checkLocked(Qn::ReadWriteSavePermission | Qn::ViewContentPermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission);
 
     /* User can do everything with local layouts except removing from server. */
-    if (snapshotManager()->isLocal(layout))
+    if (layout->hasFlags(Qn::local))
         return checkLocked(checkLoggedIn(checkReadOnly(static_cast<Qn::Permissions>(Qn::FullLayoutPermissions &~Qn::RemovePermission))));
 
     /*
@@ -264,6 +262,7 @@ void QnWorkbenchAccessController::recalculateAllPermissions()
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr& resource)
 {
     connect(resource, &QnResource::parentIdChanged,         this, &QnWorkbenchAccessController::updatePermissions);
+    connect(resource, &QnResource::flagsChanged,            this, &QnWorkbenchAccessController::updatePermissions);
 
     if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
     {
@@ -287,111 +286,3 @@ void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResour
     m_dataByResource.remove(resource);
 }
 
-QString QnWorkbenchAccessController::userRoleName(const QnUserResourcePtr& user) const
-{
-    if (!user || !user->resourcePool())
-        return QString();
-
-    if (user->isOwner())
-        return tr("Owner");
-
-    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(user);
-    if (permissions.testFlag(Qn::GlobalAdminPermission)) // admin permission is checked before user role
-        return standardRoleName(permissions);
-
-    QnUuid groupId = user->userGroup();
-    if (!groupId.isNull())
-    {
-        ec2::ApiUserGroupData userGroup = qnResourceAccessManager->userGroup(groupId);
-        if (!userGroup.name.isEmpty())
-            return userGroup.name;
-    }
-
-    return standardRoleName(permissions);
-}
-
-QString QnWorkbenchAccessController::userRoleDescription(const QnUserResourcePtr& user) const
-{
-    if (!user || !user->resourcePool())
-        return QString();
-
-    if (user->isOwner())
-        return tr("Has access to whole system and can do everything.");
-
-    return userRoleDescription(qnResourceAccessManager->globalPermissions(user), user->userGroup());
-}
-
-QString QnWorkbenchAccessController::userRoleDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId) const
-{
-    if (permissions.testFlag(Qn::GlobalAdminPermission))
-        return standardRoleDescription(permissions); // admin permission is checked before user role
-
-    if (!groupId.isNull() && !qnResourceAccessManager->userGroup(groupId).name.isEmpty())
-        return customRoleDescription();
-
-    return standardRoleDescription(permissions);
-}
-
-QString QnWorkbenchAccessController::standardRoleName(Qn::GlobalPermissions permissions)
-{
-    if (permissions.testFlag(Qn::GlobalAdminPermission))
-        return tr("Administrator");
-
-    switch (permissions)
-    {
-        case Qn::GlobalAdvancedViewerPermissionSet:
-            return tr("Advanced Viewer");
-
-        case Qn::GlobalViewerPermissionSet:
-            return tr("Viewer");
-
-        case Qn::GlobalLiveViewerPermissionSet:
-            return tr("Live Viewer");
-
-        default:
-            return tr("Custom");
-    }
-}
-
-QString QnWorkbenchAccessController::standardRoleDescription(Qn::GlobalPermissions permissions)
-{
-    if (permissions.testFlag(Qn::GlobalAdminPermission))
-        return tr("Has access to whole system and can manage it. Can create users.");
-
-    switch (permissions)
-    {
-        case Qn::GlobalAdvancedViewerPermissionSet:
-            return tr("Can manage all cameras and bookmarks.");
-
-        case Qn::GlobalViewerPermissionSet:
-            return tr("Can view all cameras and export video.");
-
-        case Qn::GlobalLiveViewerPermissionSet:
-            return tr("Can view live video from all cameras.");
-
-        default:
-            return customPermissionsDescription();
-    }
-}
-
-QString QnWorkbenchAccessController::customRoleDescription()
-{
-    return tr("Custom user role.");
-}
-
-QString QnWorkbenchAccessController::customPermissionsDescription()
-{
-    return tr("Custom permissions.");
-}
-
-const QList<Qn::GlobalPermissions>& QnWorkbenchAccessController::standardRoles()
-{
-    static const QList<Qn::GlobalPermissions> roles({
-        Qn::GlobalAdminPermissionsSet,
-        Qn::GlobalAdvancedViewerPermissionSet,
-        Qn::GlobalViewerPermissionSet,
-        Qn::GlobalLiveViewerPermissionSet
-    });
-
-    return roles;
-}

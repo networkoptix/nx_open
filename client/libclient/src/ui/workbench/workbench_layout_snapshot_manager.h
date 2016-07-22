@@ -10,6 +10,8 @@
 
 #include <client/client_globals.h>
 
+#include <ui/workbench/workbench_layout_snapshot.h>
+
 #include "workbench_context_aware.h"
 
 class QnWorkbenchContext;
@@ -33,6 +35,8 @@ public:
     typedef std::function<void(bool, const QnLayoutResourcePtr &)>  SaveLayoutResultFunction;
     bool save(const QnLayoutResourcePtr &resource, SaveLayoutResultFunction callback);
 
+    QnWorkbenchLayoutSnapshot snapshot(const QnLayoutResourcePtr &layout) const;
+
     void store(const QnLayoutResourcePtr &resource);
     void restore(const QnLayoutResourcePtr &resource);
 
@@ -40,33 +44,10 @@ public:
     Qn::ResourceSavingFlags flags(QnWorkbenchLayout *layout) const;
     void setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags);
 
-    bool isChanged(const QnLayoutResourcePtr &resource) const
-    {
-        return flags(resource).testFlag(Qn::ResourceIsChanged);
-    }
+    bool isChanged(const QnLayoutResourcePtr &resource) const;
+    bool isSaveable(const QnLayoutResourcePtr &resource) const;
+    bool isModified(const QnLayoutResourcePtr &resource) const;
 
-    bool isLocal(const QnLayoutResourcePtr &resource) const
-    {
-        return flags(resource).testFlag(Qn::ResourceIsLocal);
-    }
-
-    bool isSaveable(const QnLayoutResourcePtr &resource) const
-    {
-        Qn::ResourceSavingFlags flags = this->flags(resource);
-        if (flags.testFlag(Qn::ResourceIsBeingSaved))
-            return false;
-
-        if (flags & (Qn::ResourceIsLocal | Qn::ResourceIsChanged))
-            return true;
-
-        return false;
-    }
-
-    bool isModified(const QnLayoutResourcePtr &resource) const {
-        return (flags(resource) & (Qn::ResourceIsChanged | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsChanged; /* Changed and not being saved. */
-    }
-
-    // TODO: #Elric move out?
 
 signals:
     void flagsChanged(const QnLayoutResourcePtr &resource);
@@ -74,8 +55,6 @@ signals:
 protected:
     void connectTo(const QnLayoutResourcePtr &resource);
     void disconnectFrom(const QnLayoutResourcePtr &resource);
-
-    Qn::ResourceSavingFlags defaultFlags(const QnLayoutResourcePtr &resource) const;
 
 protected slots:
 
