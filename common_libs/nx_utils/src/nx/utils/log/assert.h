@@ -73,8 +73,8 @@ private:
 } // namespace nx
 
 #ifdef NX_CHECK_MEASURE_TIME
-    #define NX_CHECK(condition, message, action) \
-        do { \
+    #define NX_CHECK(condition, message, action) do \
+        { \
             auto begin = std::chrono::system_clock::now(); \
             auto isOk = static_cast<bool>(condition); \
             auto time = std::chrono::system_clock::now() - begin; \
@@ -86,8 +86,8 @@ private:
                 nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
         } while (0)
 #else
-    #define NX_CHECK(condition, message, action) \
-        do { \
+    #define NX_CHECK(condition, message, action) do \
+        { \
             if (!(condition)) \
                 nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
         } while (0)
