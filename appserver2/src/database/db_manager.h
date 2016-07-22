@@ -636,12 +636,6 @@ public:
     QnDbManagerAccess(const Qn::UserAccessData &userAccessData);
     ApiObjectType getObjectType(const QnUuid& objectId);
 
-    template<typename T1, typename T2>
-    ErrorCode doQuery(const T1& t1, T2& t2)
-    {
-        return doQueryImpl(t1, t2, 0);
-    }
-
     template <typename T1>
     ErrorCode doQuery(const T1 &t1, ApiFullInfoData &data)
     {
@@ -678,21 +672,8 @@ public:
     ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
     void getResourceParamsNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& resourceParams);
 
-    template <typename Param, typename SerializedTransaction>
-    ErrorCode executeTransactionNoLock(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
-    {
-        return executeTransactionNoLockImpl(tran, serializedTran, 0);
-    }
-
-    template <class Param, class SerializedTransaction>
-    ErrorCode executeTransaction(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
-    {
-        return executeTransactionImpl(tran, serializedTran, 0);
-    }
-
-private:
     template <typename T1, typename T2>
-    ErrorCode doQueryImpl(const T1 &t1, T2 &t2, ...)
+    ErrorCode doQuery(const T1 &t1, T2 &t2)
     {
         ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, t2);
         if (errorCode != ErrorCode::ok)
@@ -705,33 +686,33 @@ private:
         return errorCode;
     }
 
-    template<typename T1, typename T2>
-    ErrorCode doQueryImpl(const T1 &inParam, T2& outParam, typename T2::value_type*)
+    template<typename T1, template<typename, typename> class Cont, typename T2, typename A>
+    ErrorCode doQuery(const T1 &inParam, Cont<T2,A>& outParam)
     {
         ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(inParam, outParam);
         auto outParamOriginalSize = outParam.size();
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        ec2::getTransactionDescriptorByParam<T2>()->filterByReadPermissionFunc(m_userAccessData.userId, outParam);
+        ec2::getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_userAccessData.userId, outParam);
         if (outParam.size() != outParamOriginalSize && outParam.size() == 0)
             return ErrorCode::forbidden;
         return errorCode;
     }
 
     template <typename Param, typename SerializedTransaction>
-    ErrorCode executeTransactionNoLockImpl(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran, ...)
+    ErrorCode executeTransactionNoLock(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
     {
         if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData.userId, tran.params))
             return ErrorCode::forbidden;
         return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
-    template <typename Param, typename SerializedTransaction>
-    ErrorCode executeTransactionNoLockImpl(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran, typename Param::value_type*)
+    template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
+    ErrorCode executeTransactionNoLock(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
     {
         auto outParamContainer = tran.params;
-        ec2::getTransactionDescriptorByParam<Param>()->filterBySavePermissionFunc(m_userAccessData.userId, outParamContainer);
+        ec2::getTransactionDescriptorByParam<Cont<Param,A>>()->filterBySavePermissionFunc(m_userAccessData.userId, outParamContainer);
         if (outParamContainer.size() != tran.params.size())
             return ErrorCode::forbidden;
 
@@ -739,18 +720,18 @@ private:
     }
 
     template <class Param, class SerializedTransaction>
-    ErrorCode executeTransactionImpl(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran, ...)
+    ErrorCode executeTransaction(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
     {
         if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData.userId, tran.params))
             return ErrorCode::forbidden;
         return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
-    template <typename Param, typename SerializedTransaction>
-    ErrorCode executeTransactionImpl(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran, typename Param::value_type*)
+    template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
+    ErrorCode executeTransaction(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
     {
-        Param paramCopy = tran.params;
-        ec2::getTransactionDescriptorByParam<Param>()->filterBySavePermissionFunc(m_userAccessData.userId, paramCopy);
+        Cont<Param,A> paramCopy = tran.params;
+        ec2::getTransactionDescriptorByParam<Cont<Param,A>>()->filterBySavePermissionFunc(m_userAccessData.userId, paramCopy);
         if (paramCopy.size() != tran.params.size())
             return ErrorCode::forbidden;
 

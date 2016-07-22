@@ -168,8 +168,9 @@ private:
         }
     }
 
+public:
     template<class T>
-    void sendTransactionHelper(const QnTransaction<T>& transaction, const QnTransactionTransportHeader& header, ...)
+    void sendTransaction(const QnTransaction<T>& transaction, const QnTransactionTransportHeader& header)
     {
         auto remoteAccess = ec2::getTransactionDescriptorByTransaction(transaction)->checkRemotePeerAccessFunc(m_userAccessData.userId, transaction.params);
         if (remoteAccess == RemotePeerAccess::Forbidden)
@@ -183,8 +184,8 @@ private:
         sendTransactionImpl(transaction, header);
     }
 
-    template<typename Param>
-    void sendTransactionHelper(const QnTransaction<Param>& transaction, const QnTransactionTransportHeader& header, typename Param::value_type*)
+    template<template<typename, typename> class Cont, typename Param, typename A>
+    void sendTransaction(const QnTransaction<Cont<Param,A>>& transaction, const QnTransactionTransportHeader& header)
     {
         auto td = ec2::getTransactionDescriptorByTransaction(transaction);
         auto remoteAccess = td->checkRemotePeerAccessFunc(m_userAccessData.userId, transaction.params);
@@ -204,7 +205,7 @@ private:
                    .arg(remotePeer().id.toString()),
                 cl_logDEBUG1);
 
-            Param filteredParams = transaction.params;
+            Cont<Param,A> filteredParams = transaction.params;
             td->filterByReadPermissionFunc(m_userAccessData.userId, filteredParams);
             auto newTransaction = transaction;
             newTransaction.params = filteredParams;
@@ -212,13 +213,6 @@ private:
             sendTransactionImpl(newTransaction, header);
         }
         sendTransactionImpl(transaction, header);
-    }
-
-public:
-    template<typename Param>
-    void sendTransaction(const QnTransaction<Param>& tran, const QnTransactionTransportHeader& header)
-    {
-        sendTransactionHelper(tran, header, 0);
     }
 
     bool sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran,
