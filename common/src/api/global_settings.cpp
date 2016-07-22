@@ -374,7 +374,8 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     if(!user)
         return;
 
-    if(!user->isOwner())
+    // todo: refactor this. Globabal settings should be moved from admin user to another place
+    if(user->getName() != lit("admin"))
         return;
 
     {
