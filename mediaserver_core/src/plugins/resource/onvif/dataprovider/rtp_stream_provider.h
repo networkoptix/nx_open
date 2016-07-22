@@ -14,6 +14,7 @@ public:
 
     void setRequest(const QString& request);
     QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+    virtual void pleaseStop() override;
 protected:
     
 
