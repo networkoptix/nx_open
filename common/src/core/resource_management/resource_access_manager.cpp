@@ -626,7 +626,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         });
 
         if (hasDesktopCamera)
-            return checkReadOnly(Qn::ReadPermission | Qn::RemovePermission);
+            return checkReadOnly(Qn::ReadPermission | Qn::ViewContentPermission | Qn::RemovePermission);
     }
 
 
@@ -645,7 +645,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         if (layout->isShared())
         {
             if (!isAccessibleResource(user, layout))
-                return Qn::NoPermissions;
+                return Qn::ReadPermission;
 
             /* Global layouts editor. */
             if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
@@ -663,13 +663,13 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         QnUuid ownerId = layout->getParentId();
         if (ownerId != user->getId())
         {
-            /* Nobody's layout. Bug. */
             QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(ownerId);
-            NX_ASSERT(owner);
+
+            /* Layout of user, which we don't know of. */
             if (!owner)
                 return hasGlobalPermission(user, Qn::GlobalAdminPermission)
                     ? Qn::FullLayoutPermissions
-                    : Qn::NoPermissions;
+                    : Qn::ReadPermission;
 
             /* We can modify layout for user if we can modify this user. */
             Qn::Permissions userPermissions = permissions(user, owner);
@@ -680,7 +680,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
             if (userPermissions.testFlag(Qn::ReadPermission))
                 return Qn::ModifyLayoutPermission;
 
-            return Qn::NoPermissions;
+            return Qn::ReadPermission;
         }
 
         /* User can do whatever he wants with own layouts. */

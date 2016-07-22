@@ -20,8 +20,9 @@ QnLayoutResource::QnLayoutResource():
     setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kLayoutTypeId));
 }
 
-QString QnLayoutResource::getUniqueId() const {
-    if (hasFlags(Qn::local | Qn::url))
+QString QnLayoutResource::getUniqueId() const
+{
+    if (isFile())
         return getUrl();
     return base_type::getUniqueId();
 }
@@ -358,7 +359,7 @@ void QnLayoutResource::setLocked(bool value) {
 
 bool QnLayoutResource::isFile() const
 {
-    return flags().testFlag(Qn::url) && !getUrl().isEmpty();
+    return !getUrl().isEmpty();
 }
 
 bool QnLayoutResource::isShared() const

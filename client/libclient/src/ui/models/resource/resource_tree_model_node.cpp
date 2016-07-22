@@ -421,6 +421,10 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
         if (QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>())
         {
+            /* Layouts do require ViewContentPermission now. */
+            if (!accessController()->hasPermissions(m_resource, Qn::ViewContentPermission))
+                return true;
+
             /* Hide local layouts that are not file-based. */
             if (layout->hasFlags(Qn::local) && !layout->isFile())
                 return true;

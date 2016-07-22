@@ -600,7 +600,7 @@ void QnResourceTreeModel::updateSharedLayoutNodes(const QnLayoutResourcePtr& lay
         }
 
         /* Add node if required. */
-        if (qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission))
+        if (qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission))
         {
             usersToUpdate << user;
             continue;
@@ -652,7 +652,7 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
                 continue;
 
             TRACE("Checking node " << layout->getName() << " under user " << user->getName());
-            if (qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission))
+            if (qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission))
                 ensureSharedLayoutNode(parentNode, layout)->update();
         }
 
@@ -663,7 +663,7 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
             if (!existingNode || !existingNode->resource())
                 continue;
 
-            if (!qnResourceAccessManager->hasPermission(user, existingNode->resource(), Qn::ReadPermission))
+            if (!qnResourceAccessManager->hasPermission(user, existingNode->resource(), Qn::ViewContentPermission))
                 nodesToDelete << existingNode;
         }
     }
