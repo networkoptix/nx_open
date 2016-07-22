@@ -55,5 +55,14 @@ var L = {
         serverStarting:'server is starting',
         serverRestarting:'server is restarting',
         serverOffline: 'server is offline',
+    },
+    fileUpload:{
+        started: 'Updating successfully started. It will take several minutes',
+        upToDate: 'Updating failed. The provided version is already installed.',
+        invalidFile: 'Updating failed. Provided file is not a valid update archive.',
+        incompatibleSystem: 'Updating failed. Provided file is targeted for another system.',
+        extractionError: 'Updating failed. Extraction failed, check available storage.',
+        installationError: 'Updating failed. Couldn\'t execute installation script.',
+        selectFiles: 'Select files'
     }
 };
