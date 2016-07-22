@@ -161,6 +161,16 @@ private:
     void endUpdateCache();
 
 private:
+    class UpdateCacheGuard
+    {
+    public:
+        UpdateCacheGuard(QnResourceAccessManager* parent);
+        ~UpdateCacheGuard();
+    private:
+        QnResourceAccessManager* m_parent;
+    };
+
+private:
     mutable QnMutex m_mutex;
 
     QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;

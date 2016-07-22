@@ -19,6 +19,25 @@
 
 #include <nx/utils/log/assert.h>
 
+//#define DEBUG_PERMISSIONS
+#ifdef DEBUG_PERMISSIONS
+#define TRACE(...) qDebug() << "QnResourceAccessManager: " << __VA_ARGS__;
+#else
+#define TRACE(...)
+#endif
+
+QnResourceAccessManager::UpdateCacheGuard::UpdateCacheGuard(QnResourceAccessManager* parent) :
+    m_parent(parent)
+{
+    parent->beginUpdateCache();
+}
+
+QnResourceAccessManager::UpdateCacheGuard::~UpdateCacheGuard()
+{
+    m_parent->endUpdateCache();
+}
+
+
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
     m_mutex(QnMutex::NonRecursive),
@@ -32,13 +51,12 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
     /* This change affects all accessible resources. */
     connect(qnCommon,& QnCommonModule::readOnlyChanged, this, [this](bool readOnly)
     {
-        beginUpdateCache();
+        UpdateCacheGuard guard(this);
         {
             Q_UNUSED(readOnly);
             QnMutexLocker lk(&m_mutex);
             m_permissionsCache.clear();
         }
-        endUpdateCache();
     });
 
     auto handleResourceAdded = [this]
@@ -66,10 +84,9 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         /* Storage can be added (and permissions requested) before the server. */
         if (const auto& server = resource.dynamicCast<QnMediaServerResource>())
         {
-            beginUpdateCache();
+            UpdateCacheGuard guard(this);
             for (auto storage : server->getStorages())
                 invalidateResourceCache(storage);
-            endUpdateCache();
         }
 
         if (const auto& videowall = resource.dynamicCast<QnVideoWallResource>())
@@ -82,7 +99,7 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
 
     auto handleResourceRemoved = [this](const QnResourcePtr& resource)
     {
-        beginUpdateCache();
+        UpdateCacheGuard guard(this);
         disconnect(resource, nullptr, this, nullptr);
         invalidateResourceCache(resource);
         invalidateCacheForLayoutItems(resource);
@@ -95,7 +112,6 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
             for (const QnResourcePtr& desktopCam : qnResPool->getResourcesWithFlag(Qn::desktop_camera))
                 invalidateResourceCache(desktopCam);
         }
-        endUpdateCache();
     };
 
     connect(qnResPool, &QnResourcePool::resourceAdded,   this, handleResourceAdded);
@@ -122,7 +138,7 @@ Qn::GlobalPermissions QnResourceAccessManager::dependentPermissions(Qn::GlobalPe
 
 void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList)
 {
-    beginUpdateCache();
+    UpdateCacheGuard guard(this);
     {
         QnMutexLocker lk(&m_mutex);
         m_accessibleResources.clear();
@@ -134,7 +150,6 @@ void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRight
         }
         m_permissionsCache.clear();
     }
-    endUpdateCache();
 }
 
 ec2::ApiUserGroupDataList QnResourceAccessManager::userGroups() const
@@ -149,7 +164,7 @@ ec2::ApiUserGroupDataList QnResourceAccessManager::userGroups() const
 
 void QnResourceAccessManager::resetUserGroups(const ec2::ApiUserGroupDataList& userGroups)
 {
-    beginUpdateCache();
+    UpdateCacheGuard guard(this);
     {
         QnMutexLocker lk(&m_mutex);
         m_permissionsCache.clear();
@@ -158,7 +173,6 @@ void QnResourceAccessManager::resetUserGroups(const ec2::ApiUserGroupDataList& u
         for (const auto& group : userGroups)
             m_userGroups.insert(group.id, group);
     }
-    endUpdateCache();
 }
 
 ec2::ApiUserGroupData QnResourceAccessManager::userGroup(const QnUuid& groupId) const
@@ -216,27 +230,28 @@ QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUserResourcePt
 
 void QnResourceAccessManager::setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources)
 {
-    beginUpdateCache();
     {
-        QnMutexLocker lk(&m_mutex);
-        if (m_accessibleResources[userOrGroupId] == resources)
-            return;
+        UpdateCacheGuard guard(this);
+        {
+            QnMutexLocker lk(&m_mutex);
+            if (m_accessibleResources[userOrGroupId] == resources)
+                return;
 
-        auto removed = m_accessibleResources[userOrGroupId] - resources;
-        auto added = resources - m_accessibleResources[userOrGroupId];
-        m_accessibleResources[userOrGroupId] = resources;
+            auto removed = m_accessibleResources[userOrGroupId] - resources;
+            auto added = resources - m_accessibleResources[userOrGroupId];
+            m_accessibleResources[userOrGroupId] = resources;
 
-        m_invalidatedResources += removed;
-        m_invalidatedResources += added;
+            m_invalidatedResources += removed;
+            m_invalidatedResources += added;
+        }
+
+        invalidateResourceCacheInternal(userOrGroupId);
+        for (const auto& user : qnResPool->getResources<QnUserResource>())
+        {
+            if (user->userGroup() == userOrGroupId)
+                invalidateResourceCache(user);
+        }
     }
-
-    invalidateResourceCacheInternal(userOrGroupId);
-    for (const auto& user : qnResPool->getResources<QnUserResource>())
-    {
-        if (user->userGroup() == userOrGroupId)
-            invalidateResourceCache(user);
-    }
-    endUpdateCache();
 
     emit accessibleResourcesChanged(userOrGroupId);
 }
@@ -412,9 +427,8 @@ void QnResourceAccessManager::invalidateResourceCache(const QnResourcePtr& resou
     if (!resource)
         return;
 
-    beginUpdateCache();
+    UpdateCacheGuard guard(this);
     invalidateResourceCacheInternal(resource->getId());
-    endUpdateCache();
 }
 
 void QnResourceAccessManager::invalidateResourceCacheInternal(const QnUuid& resourceId)
@@ -441,29 +455,26 @@ void QnResourceAccessManager::invalidateResourceCacheInternal(const QnUuid& reso
 void QnResourceAccessManager::invalidateCacheForLayoutItem(const QnLayoutResourcePtr& layout, const QnLayoutItemData& item)
 {
     Q_UNUSED(layout);
-    beginUpdateCache();
+    UpdateCacheGuard guard(this);
     invalidateResourceCacheInternal(item.resource.id);
-    endUpdateCache();
 }
 
 void QnResourceAccessManager::invalidateCacheForLayoutItems(const QnResourcePtr& resource)
 {
-    beginUpdateCache();
+    UpdateCacheGuard guard(this);
     if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
     {
         for (const auto& item : layout->getItems())
             invalidateCacheForLayoutItem(layout, item);
     }
-    endUpdateCache();
 }
 
 void QnResourceAccessManager::invalidateCacheForVideowallItem(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item)
 {
     Q_UNUSED(resource);
-	beginUpdateCache();
+    UpdateCacheGuard guard(this);
     invalidateResourceCacheInternal(item.layout);
     invalidateCacheForLayoutItems(qnResPool->getResourceById(item.layout));
-    endUpdateCache();
 }
 
 Qn::Permissions QnResourceAccessManager::calculatePermissions(const QnUserResourcePtr& user, const QnResourcePtr& target) const
@@ -497,6 +508,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(const QnUserResour
 
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnVirtualCameraResourcePtr& camera) const
 {
+    TRACE("Calculate permissions of user " << user->getName() << " to camera " << camera->getName())
     NX_ASSERT(camera);
     Qn::Permissions result = Qn::ReadPermission;
 
@@ -583,6 +595,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnLayoutResourcePtr& layout) const
 {
+    TRACE("Calculate permissions of user " << user->getName() << " to layout " << layout->getName())
     NX_ASSERT(layout);
     if (!user || !layout)
         return Qn::NoPermissions;
@@ -830,12 +843,14 @@ bool QnResourceAccessManager::isAccessibleViaLayouts(const QSet<QnUuid>& layoutI
 
 void QnResourceAccessManager::beginUpdateCache()
 {
-    ++m_cacheUpdateCounter;
+    int counter = ++m_cacheUpdateCounter;
+    TRACE("beginUpdateCache " << counter);
 }
 
 void QnResourceAccessManager::endUpdateCache()
 {
     int counter = --m_cacheUpdateCounter;
+    TRACE("endUpdateCache " << counter);
     NX_ASSERT(counter >= 0);
     if (counter > 0)
         return;
@@ -1165,3 +1180,4 @@ ec2::ApiPredefinedRoleDataList QnResourceAccessManager::getPredefinedRoles()
 
     return kPredefinedRoles;
 }
+

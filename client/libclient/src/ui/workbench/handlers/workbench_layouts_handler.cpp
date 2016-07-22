@@ -138,7 +138,7 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
         snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
 }
 
-void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout, bool silent)
+void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
 {
     if (!layout)
         return;
@@ -178,9 +178,9 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout, bo
         auto owner = layout->getParentResource().dynamicCast<QnUserResource>();
         if (owner && qnResourceAccessManager->userRole(owner) == Qn::UserRole::CustomPermissions)
             grantAccessRightsForUser(owner, change);
+        //TODO: #GDM #access Grant access rights for groups?
 
-        /* In some cases  */
-        if (!silent && confirmLayoutChange(change))
+        if (confirmLayoutChange(change))
             snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
         else
             snapshotManager()->restore(layout);
@@ -861,9 +861,19 @@ void QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered()
 
     if (!layout->isShared())
         layout->setParentId(QnUuid());
+    NX_ASSERT(layout->isShared());
 
-    /* If layout is changed, it will automatically be saved here. */
-    saveLayout(layout, true);
+    /* If layout is changed, it will automatically be saved here (and become shared if needed).
+     * Also we do not grant direct access to cameras anyway as layout will become shared
+     * and do not ask confirmation, so we do not use common saveLayout() method anyway. */
+    if (!snapshotManager()->save(layout,
+        [this]
+        (bool success, const QnLayoutResourcePtr &layout)
+        {
+            QN_UNUSED(success, layout);
+        }))
+        return;
+
 
     /* Admins anyway have all shared layouts. */
     if (qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAdminPermission))
@@ -875,7 +885,6 @@ void QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered()
 
     accessible << layout->getId();
     qnResourcesChangesManager->saveAccessibleResources(user->getId(), accessible);
-
 }
 
 void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()

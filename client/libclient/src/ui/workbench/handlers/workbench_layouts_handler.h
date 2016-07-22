@@ -39,7 +39,10 @@ private:
     void at_workbench_layoutsChanged();
 
 private:
-    void saveLayout(const QnLayoutResourcePtr &layout, bool silent = false);
+
+    /** Save target file, local or remote layout. */
+    void saveLayout(const QnLayoutResourcePtr &layout);
+
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
 
     struct LayoutChange
