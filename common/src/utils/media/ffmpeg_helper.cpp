@@ -410,6 +410,8 @@ QnFfmpegAudioHelper::QnFfmpegAudioHelper(AVCodecContext* decoderContex):
 {
     av_opt_set_int(m_swr, "in_channel_layout", decoderContex->channel_layout, 0);
     av_opt_set_int(m_swr, "out_channel_layout", decoderContex->channel_layout, 0);
+    av_opt_set_int(m_swr, "in_channel_count", decoderContex->channels, 0);
+    av_opt_set_int(m_swr, "out_channel_count", decoderContex->channels, 0);
     av_opt_set_int(m_swr, "in_sample_rate", decoderContex->sample_rate, 0);
     av_opt_set_int(m_swr, "out_sample_rate", decoderContex->sample_rate, 0);
     av_opt_set_sample_fmt(m_swr, "in_sample_fmt", decoderContex->sample_fmt, 0);
