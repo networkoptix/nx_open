@@ -6,6 +6,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/common/synctime.h>
 #include <utils/common/timermanager.h>
+#include <utils/common/log.h>
 
 #include "adam_modbus_io_manager.h"
 
@@ -38,6 +39,8 @@ QnAdamModbusIOManager::~QnAdamModbusIOManager()
 
 bool QnAdamModbusIOManager::startIOMonitoring()
 {
+    QnMutexLocker lock(&m_mutex);
+
     if (m_monitoringIsInProgress)
         return true;
 
@@ -87,6 +90,7 @@ bool QnAdamModbusIOManager::startIOMonitoring()
 
 void QnAdamModbusIOManager::stopIOMonitoring()
 {
+    QnMutexLocker lock(&m_mutex);
     m_monitoringIsInProgress = false;
 
     QObject::disconnect(
@@ -222,7 +226,12 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::Modbus
         return;
 
     if (response.isException())
+    {
+        qDebug() 
+            << lit("QnAdamModbusIOManager::processAllPortStatesResponse(), Exception has occured %1")
+                .arg(m_client.getLastErrorString());
         return;
+    }
 
     bool status = true;
     short kBitsInByte = 8;
@@ -317,6 +326,8 @@ void QnAdamModbusIOManager::routeMonitoringFlow(nx_modbus::ModbusResponse respon
 void QnAdamModbusIOManager::handleMonitoringError()
 {
     auto error = m_client.getLastErrorString();
+
+    NX_LOG(error, cl_logDEBUG2);
 
     if (m_monitoringIsInProgress)
         scheduleMonitoringIteration();

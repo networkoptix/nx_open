@@ -233,14 +233,13 @@ bool QnManualCameraSearcher::run(
 
     {
         QnMutexLocker lock( &m_mutex );
-
         if (m_state == QnManualCameraSearchStatus::Aborted)
             return false;
 
         m_totalTaskCount = 0;
         m_remainingTaskCount = 0;
         m_urlSearchTaskQueues.clear();
-        m_runningTaskCount.clear();
+        m_searchQueueContexts.clear();
         m_cancelled = false;
     }
     
@@ -248,11 +247,14 @@ bool QnManualCameraSearcher::run(
         [this, threadPool](const QnManualCameraSearchCameraList& results, QnSearchTask* const task)
         {
             auto queueName = task->url().toString();
-
             {
                 QnMutexLocker lock(&m_mutex);
                 m_remainingTaskCount--;
-                m_runningTaskCount[queueName]--;
+
+                auto& context = m_searchQueueContexts[queueName];
+
+                context.isBlocked = false;
+                context.runningTaskCount--;
 
                 if (m_cancelled)
                 {
@@ -260,35 +262,23 @@ bool QnManualCameraSearcher::run(
                     return;
                 }
 
-                if (m_runningTaskCount[queueName] > 0)
-                    return;
-
                 m_results.append(results);
-            }
 
-            QList<QnSearchTask> taskToRun;
-
-            if (task->doesInterruptTaskProcessing() && !results.isEmpty())
-            {
+                if (task->doesInterruptTaskProcessing() && !results.isEmpty())
                 {
-                    QnMutexLocker lock(&m_mutex);
-                    while (!m_urlSearchTaskQueues[queueName].isEmpty())
-                    {
-                        m_urlSearchTaskQueues[queueName].dequeue();
-                        m_remainingTaskCount--;
-                    }
-
-                    if (m_remainingTaskCount == 0 || m_cancelled)
-                        m_waitCondition.wakeOne();
+                    m_remainingTaskCount -= m_urlSearchTaskQueues[queueName].size();
+                    context.isInterrupted = true;
                 }
 
-                return;
             }
 
-            runTasks(threadPool, queueName);
+            runTasks(threadPool);
 
-            if (m_remainingTaskCount == 0 || m_cancelled)
-                m_waitCondition.wakeOne();
+            {
+                QnMutexLocker lock(&m_mutex);
+                if (m_remainingTaskCount == 0 || m_cancelled)
+                    m_waitCondition.wakeOne();
+            }
         };
 
     QnSearchTask::SearcherList sequentialSearchers;
@@ -324,6 +314,7 @@ bool QnManualCameraSearcher::run(
         hostToCheck = sequentialTask.url().toString();
 
         m_urlSearchTaskQueues[hostToCheck].enqueue(sequentialTask);
+        m_searchQueueContexts[hostToCheck] = SearchTaskQueueContext();
 
         m_remainingTaskCount++;
         
@@ -343,48 +334,48 @@ bool QnManualCameraSearcher::run(
     }
 
     m_totalTaskCount = m_remainingTaskCount;
-    m_state = QnManualCameraSearchStatus::CheckingHost;
-   
-    for (const auto& queueName: m_urlSearchTaskQueues.keys())
+
     {
+        QnMutexLocker lock(&m_mutex);
+        m_state = QnManualCameraSearchStatus::CheckingHost;
         if (m_cancelled)
         {
             m_state = QnManualCameraSearchStatus::Aborted;
             return true;
         }
-
-        runTasks(threadPool, queueName);
     }
+
+    runTasks(threadPool);
+
+    auto hasRunningTasks = 
+        [this]() -> bool
+        {
+            for (const auto& context: m_searchQueueContexts)
+            {
+                if (context.isInterrupted)
+                    continue;
+
+                if (context.runningTaskCount > 0)
+                    return true;
+            }
+
+            return false;
+        };
+    
 
     int kMaxWaitTime = 2000;
 
+    QnMutex localMutex;
+    QnMutexLocker localLock(&localMutex);
+    while((m_remainingTaskCount > 0 && !m_cancelled) || hasRunningTasks())
+        m_waitCondition.wait(&localMutex, kMaxWaitTime);
+
+    QnMutexLocker lock( &m_mutex );
     {
-        bool hasRunningTasks = false;
-        for (const auto& runningTasksCount: m_runningTaskCount)
-        {
-            if (hasRunningTasks = runningTasksCount > 0)
-                break;
-        }
-
-        QnMutex localMutex;
-        QnMutexLocker localLock(&localMutex);
-        while( (m_remainingTaskCount > 0 && !m_cancelled) || hasRunningTasks)
-        {
-            m_waitCondition.wait(&localMutex, kMaxWaitTime);
-            for (const auto& runningTasksCount: m_runningTaskCount)
-            {
-                if (hasRunningTasks = runningTasksCount > 0)
-                    break;
-            }
-        }
+        if (!m_cancelled)
+            m_state = QnManualCameraSearchStatus::Finished;
     }
-
-    if (!m_cancelled)
-    {
-        QnMutexLocker lock( &m_mutex );
-        m_state = QnManualCameraSearchStatus::Finished;
-    }
-
+    
     return true;
 }
 
@@ -419,7 +410,6 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
     QnMutexLocker lock( &m_mutex );
     QnManualCameraSearchProcessStatus result;
 
-    // filling cameras field
     switch (m_state) 
     {
         case QnManualCameraSearchStatus::CheckingHost:
@@ -439,7 +429,6 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
         }
     }
 
-    // filling state field
     switch (m_state) 
     {
         case QnManualCameraSearchStatus::Finished:
@@ -455,7 +444,6 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
         case QnManualCameraSearchStatus::CheckingOnline:
         {
             Q_ASSERT(m_hostRangeSize);
-            //considering it to be half of entire job
             int currentProgress = m_ipChecker.hostsChecked() 
                 * PORT_SCAN_MAX_PROGRESS_PERCENT 
                 / m_hostRangeSize;
@@ -470,7 +458,6 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
         }
         case QnManualCameraSearchStatus::CheckingHost:
         {
-
             auto currentPercent = m_totalTaskCount ? 
                std::floor(0.5  
                     + (static_cast<double>(MAX_PERCENT) - PORT_SCAN_MAX_PROGRESS_PERCENT) 
@@ -536,30 +523,85 @@ QStringList QnManualCameraSearcher::getOnlineHosts(
     return onlineHosts;
 }
 
-void QnManualCameraSearcher::runTasks(QThreadPool* threadPool, const QString& queueName)
+void QnManualCameraSearcher::runTasks(QThreadPool* threadPool)
 {
-    Q_ASSERT(m_urlSearchTaskQueues.contains(queueName));
+    QnMutexLocker lock(&m_mutex);
 
-    if (m_runningTaskCount[queueName] > 0)
-        return;
-
-    auto& queue = m_urlSearchTaskQueues[queueName];
-
-    while(!queue.isEmpty())
+    if (m_cancelled)
     {
-        if (m_cancelled)
+        m_state = QnManualCameraSearchStatus::Aborted;
+        return;
+    }
+
+    int totalRunningTasks = 0;
+
+    for (const auto& context: m_searchQueueContexts)
+    {
+        if (!context.isInterrupted)
+            totalRunningTasks += context.runningTaskCount;
+    }
+
+    auto canRunTask = 
+        [&totalRunningTasks, threadPool, this]() -> bool
         {
-            m_state = QnManualCameraSearchStatus::Aborted;
-            return;
+            bool allQueuesAreBlocked = true;
+            for (const auto& queueName: m_urlSearchTaskQueues.keys())
+            {
+                auto& context = m_searchQueueContexts[queueName];
+                if (!context.isBlocked)
+                {
+                    allQueuesAreBlocked = false;
+                    break;
+                }
+            }
+            return (totalRunningTasks <= threadPool->maxThreadCount())
+                && !m_urlSearchTaskQueues.isEmpty()
+                && !allQueuesAreBlocked;
+        };
+
+    /**
+     * We are launching tasks until count of running tasks do not exceeds 
+     * maximum thread count in pool.
+     */
+    while(canRunTask())
+    {
+        // Take one task from each queue.
+        for (auto it = m_urlSearchTaskQueues.begin(); it != m_urlSearchTaskQueues.end();)
+        {
+            auto queueName = it.key();
+
+            auto& queue = m_urlSearchTaskQueues[queueName];
+            auto& context = m_searchQueueContexts[queueName];
+
+            if (it->isEmpty() || context.isInterrupted)
+            {
+                it = m_urlSearchTaskQueues.erase(it);
+                continue;
+            }
+            else
+            {
+                it++;
+            }
+
+            if (!canRunTask())
+                break;
+
+            if (context.isBlocked)
+                continue;
+
+            QnSearchTask task = queue.dequeue();
+
+            auto taskFn = std::bind(&QnSearchTask::doSearch, task);
+            QnConcurrent::run(threadPool, taskFn);
+
+            context.runningTaskCount++;
+            totalRunningTasks++;
+
+            if (task.isBlocking())
+            {
+                context.isBlocked = true;
+                break;
+            }
         }
-
-        QnSearchTask task = queue.dequeue();
-        auto taskFn = std::bind(&QnSearchTask::doSearch, task);
-        QnConcurrent::run(threadPool, taskFn);
-
-        m_runningTaskCount[queueName]++;
-
-        if (task.isBlocking())
-            break;
     }
 }

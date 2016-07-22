@@ -67,6 +67,18 @@ private:
 //!Scans different addresses simultaneously (using aio or concurrent operations)
 class QnManualCameraSearcher {
 
+    struct SearchTaskQueueContext 
+    {
+        SearchTaskQueueContext() : 
+            isBlocked(false), 
+            isInterrupted(false), 
+            runningTaskCount(0) {};
+
+        bool isBlocked;
+        bool isInterrupted;
+        int runningTaskCount;
+    };
+
 public:
     QnManualCameraSearcher();
     ~QnManualCameraSearcher();
@@ -84,23 +96,26 @@ private:
         const QString& endAddr, 
         int port = nx_http::DEFAULT_HTTP_PORT);
 
-    void runTasks(QThreadPool* threadPool, const QString& queueName);
+    void runTasks(QThreadPool* threadPool);
 
 private:
     mutable QnMutex m_mutex;
 
-    QnManualCameraSearchStatus::State m_state;
     QnManualCameraSearchCameraList m_results;
+    QnManualCameraSearchStatus::State m_state;
     std::atomic<bool> m_cancelled;
+
     QnIpRangeCheckerAsync m_ipChecker;
     int m_hostRangeSize;
 
     QnWaitCondition m_waitCondition;
 
-    int m_remainingTaskCount;
     int m_totalTaskCount;
-    QHash<QString, int> m_runningTaskCount;
-    QHash<QString, QQueue<QnSearchTask>> m_urlSearchTaskQueues;
+    int m_remainingTaskCount;
+
+    QMap<QString, QQueue<QnSearchTask>> m_urlSearchTaskQueues;
+    QMap<QString, SearchTaskQueueContext> m_searchQueueContexts;
+
 };
 
 #endif // MANUAL_CAMERA_SEARCHER_H
