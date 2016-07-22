@@ -57,8 +57,8 @@ angular.module('webadminApp')
 
         $scope.openRestoreDefaultsDialog = function () {
             //1. confirm detach
-            var confirmation = 'Do you want to clear database and settings? This process will take some time and server will be restarted afterwards.';
-            dialogs.confirmWithPassword(null, confirmation, 'Restore factory defaults').then(function(oldPassword){
+            var confirmation = L.settings.confirmRestoreDefault;
+            dialogs.confirmWithPassword(null, L.settings.confirmRestoreDefault, L.settings.confirmRestoreDefaultTitle).then(function(oldPassword){
                 mediaserver.restoreFactoryDefaults(oldPassword).then(function(data){
                     if(data.data.error !== '0' && data.data.error !== 0){
                         // Some Error has happened
@@ -68,8 +68,8 @@ angular.module('webadminApp')
 
                     restartServer();
                 },function(error){
-                    dialogs.alert('Can\'t proceed with action: unexpected error has happened');
-                    $log.log("can't detach");
+                    dialogs.alert(L.settings.unexpectedError);
+                    $log.log('can\'t detach');
                     $log.error(error);
                 });
             });
@@ -88,7 +88,7 @@ angular.module('webadminApp')
         }
 
         function errorHandler(){
-            dialogs.alert ('Connection error');
+            dialogs.alert (L.settings.connnetionError);
             return false;
         }
         function resultHandler (r){
@@ -100,15 +100,15 @@ angular.module('webadminApp')
                     case 'UNAUTHORIZED':
                     case 'password':
                     case 'PASSWORD':
-                        errorToShow = 'Wrong password.';
+                        errorToShow = L.settings.wrongPassword;
                 }
-                dialogs.alert('Error: ' + errorToShow);
+                dialogs.alert( L.settings.error + errorToShow);
             }else if (data.reply.restartNeeded) {
-                dialogs.confirm('All changes saved. New settings will be applied after restart. \n Do you want to restart server now?').then(function() {
+                dialogs.confirm(L.settings.restartNeeded).then(function() {
                     restartServer(true);
                 });
             } else {
-                dialogs.alert('Settings saved');
+                dialogs.alert(L.settings.settingsSaved);
                 if( $scope.settings.port !==  window.location.port ) {
                     window.location.href = (window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port + window.location.pathname + window.location.hash);
                 }else{
@@ -127,7 +127,7 @@ angular.module('webadminApp')
 
 // execute/scryptname&mode
         $scope.restart = function () {
-            dialogs.confirm('Do you want to restart server now?').then(function(){
+            dialogs.confirm(L.settings.confirmRestart).then(function(){
                 restartServer(false);
             });
         };
@@ -152,9 +152,9 @@ angular.module('webadminApp')
                 if (r.data.reply.settings.cloudPortalUrl) {
                     Config.cloud.portalUrl = r.data.reply.settings.cloudPortalUrl;
                     $scope.portalUrl = Config.cloud.portalUrl;
-                    $log.log("Read cloud portal url from advanced settings: " + Config.cloud.portalUrl);
+                    $log.log('Read cloud portal url from advanced settings: ' + Config.cloud.portalUrl);
                 } else {
-                    $log.log("No cloud portal url in advanced settings");
+                    $log.log('No cloud portal url in advanced settings');
                 }
             });
         }
@@ -172,19 +172,19 @@ angular.module('webadminApp')
         };
 
         $scope.hardwareRestart = function(){
-            dialogs.confirm('Do you want to restart server\'s operation system?').then(function(){
+            dialogs.confirm(L.settings.confirmHardwareRestart).then(function(){
                 mediaserver.execute('reboot').then(resultHandler, errorHandler);
             });
         };
 
         $scope.restoreSettings = function(){
-            dialogs.confirm('Do you want to restart all server\'s settings? Archive will be saved, but network settings will be reset.').then(function(){
+            dialogs.confirm(L.settings.confirmRestoreSettings).then(function(){
                 mediaserver.execute('restore').then(resultHandler, errorHandler);
             });
         };
 
         $scope.restoreSettingsNotNetwork = function(){
-            dialogs.confirm('Do you want to restart all server\'s settings? Archive and network settings will be saved.').then(function(){
+            dialogs.confirm(L.settings.confirmRestoreSettingsNotNetwork).then(function(){
                 mediaserver.execute('restore_keep_ip').then(resultHandler, errorHandler);
             });
         };
@@ -206,7 +206,7 @@ angular.module('webadminApp')
                     checkServersIp(server, i + 1);
                 }
                 else {
-                    server.status = 'Unavailable';
+                    server.status = L.settings.unavailable;
 
                     $scope.mediaServers = _.sortBy($scope.mediaServers,function(server){
                         return (server.status==='Online'?'0':'1') + server.Name + server.id;
@@ -254,7 +254,7 @@ angular.module('webadminApp')
                     if (error.data && error.data.resultCode) {
                         $scope.settings.internetError = formatError(error.data.resultCode);
                     } else {
-                        $scope.settings.internetError = "Couldn't check cloud connection";
+                        $scope.settings.internetError = L.settings.couldntCheckInternet;
                     }
                 });
             });
