@@ -39,6 +39,8 @@ var Config = {
          target: '' // new|frame
          }*/
     ],
+    emailRegex:"^[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+(\\.[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}\\.?$", // Check only @ and . in the email
+
     passwordRequirements: {
         minLength: 8,
         minLengthMessage:L.passwordRequirements.minLengthMessage,
