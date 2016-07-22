@@ -56,7 +56,7 @@ angular.module('webadminApp')
 
         $scope.openRestoreDefaultsDialog = function () {
             //1. confirm detach
-            var confirmation = 'Do you want to clear database and settings?';
+            var confirmation = 'Do you want to clear database and settings? This process will take some time and server will be restarted afterwards.';
             dialogs.confirmWithPassword(null, confirmation, 'Restore factory defaults').then(function(oldPassword){
                 mediaserver.restoreFactoryDefaults(oldPassword).then(function(data){
                     if(data.data.error !== '0' && data.data.error !== 0){
@@ -64,8 +64,8 @@ angular.module('webadminApp')
                         dialogs.alert(data.data.errorString);
                         return;
                     }
-                    //2. reload page - he will be redirected to master
-                    window.location.reload();
+
+                    restartServer();
                 },function(error){
                     dialogs.alert('Can\'t proceed with action: unexpected error has happened');
                     $log.log("can't detach");

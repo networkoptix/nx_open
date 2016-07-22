@@ -11,7 +11,6 @@ angular.module('webadminApp')
                 ngModel:'='
             },
             link:function(scope, element, attrs, ngModel){
-                console.log("model:", scope.ngModel,'-', ngModel);
                 scope.Config = Config;
                 scope.weakPassword = true;
                 function loadCommonPasswords(){

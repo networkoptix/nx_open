@@ -680,9 +680,9 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         var poll = $poll(reloader,reloadInterval);
         $scope.$on( '$destroy', function( ) {
-                $poll.cancel(poll);
-            }
-        );
+            killSubscription();
+            $poll.cancel(poll);
+        });
 
 
         var desktopCameraTypeId = null;
@@ -732,7 +732,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             requestResourses(); //Show  whole tree
         });
 
-        $rootScope.$on('$routeChangeStart', function (event, next/*, current*/) {
+        var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
             $scope.selectCameraById(next.params.cameraId, $location.search().time || false);
         });
 
