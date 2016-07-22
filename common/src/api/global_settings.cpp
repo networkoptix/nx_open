@@ -482,6 +482,20 @@ bool QnGlobalSettings::synchronizeNowSync()
     return propertyDictionary->saveParams(m_admin->getId());
 }
 
+bool QnGlobalSettings::takeFromSettings(QSettings* settings)
+{
+    bool changed = false;
+
+    changed |= m_statisticsReportTimeCycleAdaptor->takeFromSettings(settings);
+    changed |= m_statisticsReportUpdateDelayAdaptor->takeFromSettings(settings);
+    changed |= m_statisticsReportServerApiAdaptor->takeFromSettings(settings);
+
+    changed |= m_cloudSystemIDAdaptor->takeFromSettings(settings);
+    changed |= m_cloudAuthKeyAdaptor->takeFromSettings(settings);
+
+    return changed ? synchronizeNowSync() : false;
+}
+
 bool QnGlobalSettings::isUpdateNotificationsEnabled() const
 {
     return m_updateNotificationsEnabledAdaptor->value();

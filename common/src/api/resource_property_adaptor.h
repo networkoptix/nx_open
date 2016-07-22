@@ -1,7 +1,7 @@
-#ifndef QN_RESOURCE_PROPERTY_ADAPTOR_H
-#define QN_RESOURCE_PROPERTY_ADAPTOR_H
+#pragma once
 
 #include <QtCore/QAtomicInt>
+#include <QSettings>
 
 #include <utils/common/connective.h>
 
@@ -120,6 +120,7 @@ public:
     virtual void setSerializedValue(const QVariant& value) = 0;
 
     void saveToResource();
+    bool takeFromSettings(QSettings* settings);
 
 signals:
     void valueChanged();
@@ -227,6 +228,3 @@ public:
         base_type(key, new QnLexicalResourcePropertyHandler<T>(), defaultValue, parent)
     {}
 };
-
-
-#endif // QN_RESOURCE_PROPERTY_ADAPTOR_H

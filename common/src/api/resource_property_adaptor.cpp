@@ -178,6 +178,16 @@ void QnAbstractResourcePropertyAdaptor::saveToResource()
     processSaveRequests();
 }
 
+bool QnAbstractResourcePropertyAdaptor::takeFromSettings(QSettings* settings)
+{
+    const auto value = settings->value(m_key);
+    if (value.isNull())
+        return false;
+
+    setValueInternal(value);
+    settings->remove(m_key);
+    return true;
+}
 
 void QnAbstractResourcePropertyAdaptor::processSaveRequests()
 {
