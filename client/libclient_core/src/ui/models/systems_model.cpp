@@ -558,9 +558,6 @@ bool QnSystemsModelPrivate::isCorrectCustomization(
 bool QnSystemsModelPrivate::isFactorySystem(
         const QnSystemDescriptionPtr& systemDescription) const
 {
-    if (systemDescription->isCloudSystem())
-        return false;
-
     const auto servers = systemDescription->servers();
     if (servers.isEmpty())
         return false;

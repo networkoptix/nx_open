@@ -16,15 +16,15 @@ QnSystemsFinder::~QnSystemsFinder()
 
 void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder)
 {
-    const auto discoveredConnection = 
+    const auto discoveredConnection =
         connect(finder, &QnAbstractSystemsFinder::systemDiscovered
         , this, &QnSystemsFinder::onSystemDiscovered);
 
-    const auto lostConnection = 
+    const auto lostConnection =
         connect(finder, &QnAbstractSystemsFinder::systemLost
         , this, &QnSystemsFinder::onSystemLost);
 
-    const auto destroyedConnection = 
+    const auto destroyedConnection =
         connect(finder, &QObject::destroyed, this, [this, finder]()
     {
         m_finders.remove(finder);
@@ -39,16 +39,20 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder)
 
 void QnSystemsFinder::onSystemDiscovered(const QnSystemDescriptionPtr& systemDescription)
 {
-    const auto it = std::find_if(m_systems.begin(), m_systems.end(), 
-        [targetName = systemDescription->name()](const QnSystemDescriptionPtr &description)
+    const auto it = std::find_if(m_systems.begin(), m_systems.end(),
+        [targetId = systemDescription->id()](const QnSystemDescriptionPtr &description)
     {
-        return (description->name() == targetName);
+        return (description->id() == targetId);
     });
 
     if (it != m_systems.end())
     {
-        (*it)->mergeSystem(systemDescription);
-        return;
+        const auto existingSystem = *it;
+        if (!systemDescription->isCloudSystem() || !existingSystem->isCloudSystem())
+        {
+            (*it)->mergeSystem(systemDescription);
+            return;
+        }
     }
 
     const AggregatorPtr target(new QnSystemDescriptionAggregator(systemDescription));
@@ -56,9 +60,9 @@ void QnSystemsFinder::onSystemDiscovered(const QnSystemDescriptionPtr& systemDes
     emit systemDiscovered(target.dynamicCast<QnBaseSystemDescription>());
 }
 
-void QnSystemsFinder::onSystemLost(const QString& systemId) 
+void QnSystemsFinder::onSystemLost(const QString& systemId)
 {
-    const auto it = std::find_if(m_systems.begin(), m_systems.end(), 
+    const auto it = std::find_if(m_systems.begin(), m_systems.end(),
         [systemId](const AggregatorPtr& aggregator)
     {
         return aggregator->containsSystem(systemId);
@@ -73,7 +77,7 @@ void QnSystemsFinder::onSystemLost(const QString& systemId)
         aggregator->removeSystem(systemId);
         return;
     }
-    
+
     m_systems.erase(it);
     emit systemLost(aggregator->id());
 }

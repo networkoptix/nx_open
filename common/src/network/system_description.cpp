@@ -13,10 +13,20 @@ namespace
     QnServerFields getChanges(const QnModuleInformation &before
         , const QnModuleInformation &after)
     {
-        const auto result =
+        auto result =
             (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemNameField)
             | EXTRACT_CHANGE_FLAG(name, QnServerField::NameField)
-            | EXTRACT_CHANGE_FLAG(serverFlags, QnServerField::FlagsField));
+            | EXTRACT_CHANGE_FLAG(serverFlags, QnServerField::FlagsField)
+            | EXTRACT_CHANGE_FLAG(cloudSystemId, QnServerField::CloudIdField));
+
+        if (result.testFlag(QnServerField::FlagsField))
+        {
+            const auto isNewSystem = [](const QnModuleInformation& info)
+                { return info.serverFlags.testFlag(Qn::SF_NewSystem); };
+
+            if (isNewSystem(before) != isNewSystem(after))
+                result |= QnServerField::IsFactoryFlag;
+        }
 
         return result;
     }
@@ -24,7 +34,7 @@ namespace
 }
 
 QnSystemDescription::PointerType QnSystemDescription::createLocalSystem(
-    const QString& systemId, 
+    const QString& systemId,
     const QString& systemName)
 {
     return PointerType(new QnSystemDescription(systemId, systemName));
@@ -42,7 +52,7 @@ QnSystemDescription::PointerType QnSystemDescription::createCloudSystem(
 }
 
 QnSystemDescription::QnSystemDescription(const QString& systemId, const QString& systemName)
-    : 
+    :
     m_id(systemId),
     m_systemName(systemName),
     m_ownerAccountEmail(),
@@ -59,7 +69,7 @@ QnSystemDescription::QnSystemDescription(
     const QString& systemName,
     const QString& cloudOwnerAccountEmail,
     const QString& ownerFullName)
-    : 
+    :
     m_id(systemId),
     m_systemName(systemName),
     m_ownerAccountEmail(cloudOwnerAccountEmail),
@@ -68,7 +78,7 @@ QnSystemDescription::QnSystemDescription(
     m_serverTimestamps(),
     m_servers(),
     m_prioritized(),
-    m_hosts() 
+    m_hosts()
 {}
 
 QnSystemDescription::~QnSystemDescription()
@@ -144,7 +154,7 @@ QnServerFields QnSystemDescription::updateServer(const QnModuleInformation& serv
 {
     const auto it = m_servers.find(serverInfo.id);
     const bool containsServer = (it != m_servers.end());
-    NX_ASSERT(containsServer, Q_FUNC_INFO, 
+    NX_ASSERT(containsServer, Q_FUNC_INFO,
         "System does not contain specified server");
 
     if (!containsServer)
@@ -215,7 +225,7 @@ QString QnSystemDescription::getServerHost(const QnUuid& serverId) const
 
 qint64 QnSystemDescription::getServerLastUpdatedMs(const QnUuid& serverId) const
 {
-    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO, 
+    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO,
         "System does not contain specified server");
 
     return m_serverTimestamps.value(serverId).elapsed();

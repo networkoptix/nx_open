@@ -280,7 +280,7 @@ void QnCloudStatusWatcherPrivate::setCloudSystems(const QnCloudSystemList &newCl
 
 void QnCloudStatusWatcherPrivate::checkAndSetStatus(QnCloudStatusWatcher::Status newStatus)
 {
-    switch (status)
+    switch (newStatus)
     {
     case QnCloudStatusWatcher::Online:
     case QnCloudStatusWatcher::LoggedOut:
@@ -288,9 +288,7 @@ void QnCloudStatusWatcherPrivate::checkAndSetStatus(QnCloudStatusWatcher::Status
         break;
     case QnCloudStatusWatcher::Unauthorized:
     case QnCloudStatusWatcher::Offline:
-        if (newStatus == QnCloudStatusWatcher::LoggedOut)
-            setStatus(QnCloudStatusWatcher::LoggedOut);
-        else
+        if (status != QnCloudStatusWatcher::LoggedOut)
             setStatus(newStatus);
         break;
     }

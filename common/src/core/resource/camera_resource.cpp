@@ -21,18 +21,17 @@ static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
 static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
 static const qint64 UPDATE_BITRATE_TIMEOUT_DAYS = 7;
 
-QString urlRoleParameter(Qn::ConnectionRole role)
+bool storeUrlForRole(Qn::ConnectionRole role)
 {
     switch (role)
     {
         case Qn::CR_LiveVideo:
-            return Qn::kPrimaryUrl;
         case Qn::CR_SecondaryLiveVideo:
-            return Qn::kSecondaryUrl;
+            return true;
         default:
             break;
     }
-    return QString();
+    return false;
 }
 
 } //anonymous namespace
@@ -463,24 +462,30 @@ void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, con
 
 QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
 {
-    QString key = urlRoleParameter(role);
-    if (key.isEmpty())
-        return QString(); /*< This role url is not stored. */
+    if (!storeUrlForRole(role))
+        return QString();
 
-    return getProperty(key);
+    QJsonObject streamUrls = QJsonDocument::fromJson(getProperty(Qn::CAMERA_STREAM_URLS).toUtf8()).object();
+    const auto roleStr = QString::number(role);
+    return streamUrls[roleStr].toString();
 }
 
 void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::ConnectionRole role)
 {
-    QString key = urlRoleParameter(role);
-    if (key.isEmpty())
-        return; /*< This role url is not stored. */
-
-    if (url == sourceUrl(role))
+    if (!storeUrlForRole(role))
         return;
 
-    setProperty(key, url);
-    saveParams();
+    if (updateProperty(Qn::CAMERA_STREAM_URLS,
+        [url, role]
+        (QString oldValue)
+        {
+            const auto roleStr = QString::number(role);
+            QJsonObject streamUrls = QJsonDocument::fromJson(oldValue.toUtf8()).object();
+            streamUrls[roleStr] = url;
+            return QString::fromUtf8(QJsonDocument(streamUrls).toJson());
+        }
+    ))
+        saveParams();
 }
 
 int QnVirtualCameraResource::saveAsync()
