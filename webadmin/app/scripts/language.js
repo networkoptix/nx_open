@@ -41,5 +41,19 @@ var L = {
         connectionFailed: 'Connection failed: ',
         mergeFailed: 'Merge failed: ',
         mergeSucceed: 'Merge succeed.'
+    },
+    login:{
+        incorrectPassword: 'Login or password is incorrect'
+    },
+    navigaion:{
+        cannotGetUser: 'Server failure: cannot retrieve current user data'
+    },
+    offlineDialog: {
+        serverOffline:'server is offline'
+    },
+    restartDialog:{
+        serverStarting:'server is starting',
+        serverRestarting:'server is restarting',
+        serverOffline: 'server is offline',
     }
 };
