@@ -321,7 +321,7 @@ qint64 nx::ServerSetting::getSysIdTime()
 void nx::ServerSetting::setSysIdTime(qint64 value)
 {
     auto settings = MSSettings::roSettings();
-    settings->setValue(SYSTEM_IDENTITY_TIME, QString());
+    settings->setValue(SYSTEM_IDENTITY_TIME, value);
 }
 
 QByteArray nx::ServerSetting::decodeAuthKey(const QByteArray& authKey)
