@@ -236,7 +236,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             // that's the case when user press "Save As" and enters the same name as this layout already has
             if (name == layout->getName() && user == layoutOwnerUser && hasSavePermission)
             {
-                if (snapshotManager()->isLocal(layout))
+                if (layout->hasFlags(Qn::local))
                 {
                     saveLayout(layout);
                     return;
@@ -328,7 +328,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     newLayout->setItems(items);
 
     const bool isCurrent = (layout == workbench()->currentLayout()->resource());
-    bool shouldDelete = snapshotManager()->isLocal(layout) &&
+    bool shouldDelete = layout->hasFlags(Qn::local) &&
         (name == layout->getName() || isCurrent);
 
     /* If it is current layout, close it and open the new one instead. */
@@ -578,9 +578,13 @@ void QnWorkbenchLayoutsHandler::removeLayouts(const QnLayoutResourceList &layout
     if (!canRemoveLayouts(layouts))
         return;
 
-    foreach(const QnLayoutResourcePtr &layout, layouts)
+    for (const QnLayoutResourcePtr &layout : layouts)
     {
-        if (snapshotManager()->isLocal(layout))
+        NX_ASSERT(!layout->isFile());
+        if (layout->isFile())
+            continue;
+
+        if (layout->hasFlags(Qn::local))
             qnResPool->removeResource(layout); /* This one can be simply deleted from resource pool. */
         else
             connection2()->getLayoutManager(Qn::kDefaultUserAccess)->remove(layout->getId(), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
@@ -697,10 +701,10 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
         counter->decrement();
     }
 
-    foreach(const QnLayoutResourcePtr &resource, rollbackResources)
+    for (const QnLayoutResourcePtr &resource: rollbackResources)
         snapshotManager()->restore(resource);
 
-    foreach(const QnLayoutResourcePtr &resource, resources)
+    for (const QnLayoutResourcePtr &resource: resources)
     {
         if (QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(resource))
         {
@@ -708,10 +712,8 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
             delete layout;
         }
 
-        Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
-        if ((flags & (Qn::ResourceIsLocal | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsLocal) /* Local, not being saved. */
-            if (!resource->isFile()) /* Not a file. */
-                qnResPool->removeResource(resource);
+        if (resource->hasFlags(Qn::local) && !resource->isFile())
+            qnResPool->removeResource(resource);
     }
 }
 
@@ -761,8 +763,8 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
         if (!existing.isEmpty())
         {
             bool allAreLocal = true;
-            foreach(const QnLayoutResourcePtr &layout, existing)
-                allAreLocal &= snapshotManager()->isLocal(layout);
+            for (const QnLayoutResourcePtr &layout : existing)
+                allAreLocal &= layout->hasFlags(Qn::local);
             if (allAreLocal)
             {
                 removeLayouts(existing);
@@ -932,7 +934,7 @@ void QnWorkbenchLayoutsHandler::at_layout_saved(bool success, const QnLayoutReso
     if (success)
         return;
 
-    if (!snapshotManager()->isLocal(layout) || QnWorkbenchLayout::instance(layout))
+    if (!layout->hasFlags(Qn::local) || QnWorkbenchLayout::instance(layout))
         return;
 
     int button = QnResourceListDialog::exec(

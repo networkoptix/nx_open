@@ -42,10 +42,12 @@ QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *pare
 QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager()
 {}
 
-Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const {
-    if(!resource) {
+Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const
+{
+    if (!resource)
+    {
         qnNullWarning(resource);
-        return Qn::ResourceIsLocal;
+        return Qn::ResourceSavingFlags();
     }
 
     QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags>::const_iterator pos = m_flagsByLayout.find(resource);
@@ -54,7 +56,7 @@ Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutRe
         if (resource->resourcePool())
         {
             /* We didn't get the notification from resource pool yet. */
-            return defaultFlags(resource);
+            return Qn::ResourceSavingFlags();
         }
         else
         {
@@ -66,15 +68,17 @@ Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutRe
     return *pos;
 }
 
-Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(QnWorkbenchLayout *layout) const {
-    if(!layout) {
+Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(QnWorkbenchLayout *layout) const
+{
+    if (!layout)
+    {
         qnNullWarning(layout);
-        return Qn::ResourceIsLocal;
+        return Qn::ResourceSavingFlags();
     }
 
     QnLayoutResourcePtr resource = layout->resource();
-    if(!resource)
-        return Qn::ResourceIsLocal;
+    if (!resource)
+        return Qn::ResourceSavingFlags();
 
     return flags(resource);
 }
@@ -85,9 +89,12 @@ void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resou
         NX_ASSERT(accessController()->hasPermissions(resource, Qn::SavePermission), Q_FUNC_INFO, "Saving unsaveable resource");
 
     QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags>::iterator pos = m_flagsByLayout.find(resource);
-    if(pos == m_flagsByLayout.end()) {
+    if (pos == m_flagsByLayout.end())
+    {
         pos = m_flagsByLayout.insert(resource, flags);
-    } else if(*pos == flags) {
+    }
+    else if (*pos == flags)
+    {
         return;
     }
 
@@ -96,27 +103,21 @@ void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resou
     emit flagsChanged(resource);
 }
 
-bool QnWorkbenchLayoutSnapshotManager::isChanged(const QnLayoutResourcePtr &resource) const
+bool QnWorkbenchLayoutSnapshotManager::isChanged(const QnLayoutResourcePtr &layout) const
 {
-    return flags(resource).testFlag(Qn::ResourceIsChanged);
+    return flags(layout).testFlag(Qn::ResourceIsChanged);
 }
 
-bool QnWorkbenchLayoutSnapshotManager::isLocal(const QnLayoutResourcePtr &resource) const
+bool QnWorkbenchLayoutSnapshotManager::isSaveable(const QnLayoutResourcePtr &layout) const
 {
-    NX_ASSERT(flags(resource).testFlag(Qn::ResourceIsLocal) == resource->hasFlags(Qn::local));
-    return flags(resource).testFlag(Qn::ResourceIsLocal);
-}
-
-bool QnWorkbenchLayoutSnapshotManager::isSaveable(const QnLayoutResourcePtr &resource) const
-{
-    Qn::ResourceSavingFlags flags = this->flags(resource);
+    Qn::ResourceSavingFlags flags = this->flags(layout);
     if (flags.testFlag(Qn::ResourceIsBeingSaved))
         return false;
 
-    if (flags & (Qn::ResourceIsLocal | Qn::ResourceIsChanged))
+    if (layout->hasFlags(Qn::local))
         return true;
 
-    return false;
+    return flags.testFlag(Qn::ResourceIsChanged);
 }
 
 bool QnWorkbenchLayoutSnapshotManager::isModified(const QnLayoutResourcePtr &resource) const
@@ -236,38 +237,28 @@ void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr 
     disconnect(resource, NULL, this, NULL);
 }
 
-Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::defaultFlags(const QnLayoutResourcePtr &resource) const {
-    Qn::ResourceSavingFlags result;
-
-    if(resource->flags() & Qn::local)
-        result |= Qn::ResourceIsLocal;
-
-    return result;
-}
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
+void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnResourcePtr &resource)
+{
     QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-    if(!layoutResource)
+    if (!layoutResource)
         return;
 
     /* Consider it saved by default. */
     m_storage->store(layoutResource);
 
-    Qn::ResourceSavingFlags flags = defaultFlags(layoutResource);
-    setFlags(layoutResource, flags);
-
-    layoutResource->setFlags(flags & Qn::ResourceIsLocal ? layoutResource->flags() & ~Qn::remote : layoutResource->flags() | Qn::remote); // TODO: #Elric this code does not belong here.
+    setFlags(layoutResource, Qn::ResourceSavingFlags());
 
     /* Subscribe to changes to track changed status. */
     connectTo(layoutResource);
 }
 
-void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
+void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
+{
     QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-    if(!layoutResource)
+    if (!layoutResource)
         return;
 
     m_storage->remove(layoutResource);

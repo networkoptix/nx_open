@@ -422,7 +422,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>())
         {
             /* Hide local layouts that are not file-based. */
-            if (snapshotManager()->isLocal(layout) && !layout->isFile())
+            if (layout->hasFlags(Qn::local) && !layout->isFile())
                 return true;
 
             /* Hide "Preview Search" layouts */

@@ -117,14 +117,11 @@ namespace Qn
      */
     enum ResourceSavingFlag
     {
-        /** Resource is local and has never been saved to Server. */
-        ResourceIsLocal = 0x1,
-
         /** Resource is currently being saved to Server. */
-        ResourceIsBeingSaved = 0x2,
+        ResourceIsBeingSaved = 0x1,
 
         /** Unsaved changes are present in the resource. */
-        ResourceIsChanged = 0x4
+        ResourceIsChanged = 0x2
     };
     Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)

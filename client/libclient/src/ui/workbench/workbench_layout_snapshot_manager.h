@@ -45,7 +45,6 @@ public:
     void setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags);
 
     bool isChanged(const QnLayoutResourcePtr &resource) const;
-    bool isLocal(const QnLayoutResourcePtr &resource) const;
     bool isSaveable(const QnLayoutResourcePtr &resource) const;
     bool isModified(const QnLayoutResourcePtr &resource) const;
 
@@ -56,8 +55,6 @@ signals:
 protected:
     void connectTo(const QnLayoutResourcePtr &resource);
     void disconnectFrom(const QnLayoutResourcePtr &resource);
-
-    Qn::ResourceSavingFlags defaultFlags(const QnLayoutResourcePtr &resource) const;
 
 protected slots:
 

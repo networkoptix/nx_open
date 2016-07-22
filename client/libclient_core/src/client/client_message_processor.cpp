@@ -131,6 +131,8 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     if (!m_connection)
         return;
 
+    resource->addFlags(Qn::remote);
+    resource->removeFlags(Qn::local);
     QnCommonMessageProcessor::updateResource(resource);
 
     QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());

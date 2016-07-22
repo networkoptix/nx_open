@@ -18,7 +18,6 @@
 #include <utils/common/checked_cast.h>
 
 #include "workbench_context.h"
-#include "workbench_layout_snapshot_manager.h"
 
 QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) :
     QObject(parent)
@@ -34,7 +33,6 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
 {
     connect(qnResPool,          &QnResourcePool::resourceAdded,                     this,   &QnWorkbenchAccessController::at_resourcePool_resourceAdded);
     connect(qnResPool,          &QnResourcePool::resourceRemoved,                   this,   &QnWorkbenchAccessController::at_resourcePool_resourceRemoved);
-    connect(snapshotManager(),  &QnWorkbenchLayoutSnapshotManager::flagsChanged,    this,   &QnWorkbenchAccessController::updatePermissions);
 
     connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnWorkbenchAccessController::recalculateAllPermissions);
 
@@ -196,7 +194,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
         return checkLocked(Qn::ReadWriteSavePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission);
 
     /* User can do everything with local layouts except removing from server. */
-    if (snapshotManager()->isLocal(layout))
+    if (layout->hasFlags(Qn::local))
         return checkLocked(checkLoggedIn(checkReadOnly(static_cast<Qn::Permissions>(Qn::FullLayoutPermissions &~Qn::RemovePermission))));
 
     /*
@@ -264,6 +262,7 @@ void QnWorkbenchAccessController::recalculateAllPermissions()
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr& resource)
 {
     connect(resource, &QnResource::parentIdChanged,         this, &QnWorkbenchAccessController::updatePermissions);
+    connect(resource, &QnResource::flagsChanged,            this, &QnWorkbenchAccessController::updatePermissions);
 
     if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
     {
