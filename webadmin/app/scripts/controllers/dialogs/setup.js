@@ -724,6 +724,10 @@ angular.module('webadminApp')
                 var systemSettings = r.data.reply.settings;
                 if(r.data.reply.settings.cloudPortalUrl){
                     Config.cloud.portalUrl = r.data.reply.settings.cloudPortalUrl;
+                    $scope.portalUrl = Config.cloud.portalUrl;
+                    $log.log("Read cloud portal url from advanced settings: " + Config.cloud.portalUrl);
+                }else{
+                    $log.log("No cloud portal url in advanced settings");
                 }
                 $scope.systemSettings = {};
 

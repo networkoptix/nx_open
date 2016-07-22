@@ -32,6 +32,7 @@ angular.module('webadminApp')
                 $scope.canMerge = user.isOwner;
 
                 getCloudInfo();
+                readPortalUrl();
                 requestScripts();
                 pingServers();
             });
@@ -142,6 +143,18 @@ angular.module('webadminApp')
                     $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;
                     $scope.canRunClient = data.data.reply.indexOf('lite_client') >= 0;
                     $scope.canStopClient = data.data.reply.indexOf('stop_lite_client') >= 0;
+                }
+            });
+        }
+
+        function readPortalUrl(){
+            mediaserver.systemSettings().then(function(r) {
+                if (r.data.reply.settings.cloudPortalUrl) {
+                    Config.cloud.portalUrl = r.data.reply.settings.cloudPortalUrl;
+                    $scope.portalUrl = Config.cloud.portalUrl;
+                    $log.log("Read cloud portal url from advanced settings: " + Config.cloud.portalUrl);
+                } else {
+                    $log.log("No cloud portal url in advanced settings");
                 }
             });
         }
