@@ -75,8 +75,19 @@ QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUuid &p
     }
     return result;
 }
-}
 
+QSet<QnResourcePtr> layoutResources(const QnLayoutItemDataMap& items)
+{
+    QSet<QnResourcePtr> result;
+    for (const auto& item : items)
+    {
+        if (auto resource = qnResPool->getResourceByDescriptor(item.resource))
+            result << resource;
+    }
+    return result;
+};
+
+}
 
 
 QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
@@ -359,17 +370,6 @@ QnWorkbenchLayoutsHandler::LayoutChange QnWorkbenchLayoutsHandler::calculateLayo
     LayoutChange result;
     result.layout = layout;
 
-    auto layoutResources = [](const QnLayoutItemDataMap& items)
-    {
-        QSet<QnResourcePtr> result;
-        for (const auto& item : items)
-        {
-            if (auto resource = qnResPool->getResourceByDescriptor(item.resource))
-                result << resource;
-        }
-        return result;
-    };
-
     /* Share added resources. */
     auto snapshot = snapshotManager()->snapshot(layout);
     auto oldResources = layoutResources(snapshot.items);
@@ -435,7 +435,7 @@ bool QnWorkbenchLayoutsHandler::confirmSharedLayoutChange(const LayoutChange& ch
         (const QnUserResourcePtr& user)
         {
             return !qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission)
-                 && qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission);
+                 && qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission);
         }
     );
 
@@ -529,6 +529,67 @@ bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForGroup(const QnUuid& groupI
     /* Calculate added cameras, which were not available to group before, and show warning. */
     /* Calculate removed cameras and show another warning. 1 ok, second cancel, so what? */
     return true;
+}
+
+bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts)
+{
+    /* Check if user have already silenced this warning. */
+    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::StopSharingLayoutUser))
+        return true;
+
+    QnLayoutResourceList accessible = layouts.filtered(
+        [user]
+        (const QnLayoutResourcePtr& layout)
+        {
+            return qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission);
+        });
+    NX_ASSERT(accessible.size() == layouts.size(), "We are not supposed to stop sharing inaccessible layouts.");
+
+    if (qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+        return true;
+
+    /* Calculate all resources that were available through these layouts. */
+    QSet<QnResourcePtr> mediaResources;
+    for (const auto& layout: accessible)
+        mediaResources += layoutResources(layout->getItems());
+
+    /* Skip resources that still will be accessible. */
+    for (const auto& directlyAvailable: qnResPool->getResources(qnResourceAccessManager->accessibleResources(user)))
+        mediaResources -= directlyAvailable;
+
+    /* Skip resources that still will be accessible through other dialogs. */
+    for (const auto& layout : qnResPool->getResources<QnLayoutResource>().filtered(
+        [user, layouts]
+        (const QnLayoutResourcePtr& layout)
+        {
+            return layout->isShared()
+                && qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission)
+                && !layouts.contains(layout);
+        }
+        ))
+    {
+        mediaResources -= layoutResources(layout->getItems());
+    }
+
+    if (mediaResources.isEmpty())
+        return true;
+
+    auto result = QnResourceListDialog::exec(
+        mainWindow(),
+        mediaResources.toList(),
+        tr("Stop Sharing Layout..."),
+        tr("By removing layout(s) //here list // from user you make %n cameras unavailable?", "", mediaResources.size()),
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel
+    );
+
+//     if (messageBox.isChecked())
+//     {
+//         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+//         messagesFilter |= Qn::ShowOnceMessage::StopSharingLayoutUser;
+//         qnSettings->setShowOnceMessages(messagesFilter);
+//     }
+
+    return result == QDialogButtonBox::Ok;
 }
 
 void QnWorkbenchLayoutsHandler::grantAccessRightsForUser(const QnUserResourcePtr& user, const LayoutChange& change)
@@ -898,6 +959,11 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
     if (!user)
         return;
 
+    if (!confirmStopSharingLayouts(user, layouts))
+        return;
+
+    //TODO: #GDM #implement stop sharing for roled user
+
     auto accessible = qnResourceAccessManager->accessibleResources(user->getId());
     for (const auto& layout : layouts)
     {
@@ -905,7 +971,6 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
         accessible.remove(layout->getId());
     }
     qnResourcesChangesManager->saveAccessibleResources(user->getId(), accessible);
-
 }
 
 void QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered()

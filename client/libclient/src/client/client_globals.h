@@ -283,7 +283,8 @@ namespace Qn
     {
         PtzPresetInUse          = 0x001,    /**< Delete ptz preset which is used in the tour. */
         SharedLayoutEdit        = 0x002,    /**< Edit shared layout. */
-        UserLayoutItemsRemoved  = 0x004     /**< Items are removed from user's layout, but access still persist. */
+        UserLayoutItemsRemoved  = 0x004,    /**< Items are removed from user's layout, but access still persist. */
+        StopSharingLayoutUser   = 0x008     /**< Delete shared layout from common/custom user. */
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ShowOnceMessage)
     Q_DECLARE_FLAGS(ShowOnceMessages, ShowOnceMessage)

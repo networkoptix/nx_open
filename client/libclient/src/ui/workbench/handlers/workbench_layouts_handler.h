@@ -63,6 +63,8 @@ private:
     bool confirmLayoutChangeForUser(const QnUserResourcePtr& user, const LayoutChange& change);
     bool confirmLayoutChangeForGroup(const QnUuid& groupId, const LayoutChange& change);
 
+    bool confirmStopSharingLayouts(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts);
+
     /** If user has custom access rights, he must be given direct access to cameras on changed layout. */
     void grantAccessRightsForUser(const QnUserResourcePtr& user, const LayoutChange& change);
 
