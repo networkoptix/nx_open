@@ -37,6 +37,196 @@
       <source>This password is in top most popular passwords in the world</source>
       <translation> </translation>
     </message>
+    <message>
+      <location/>
+      <source>Do you want to restart server now?</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Couldn\'t check cloud connection</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do you want to clear database and settings? This process will take some time and server will be restarted afterwards.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Restore factory defaults</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can\'t proceed with action: unexpected error has happened</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Connection error</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Wrong password.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Error:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>All changes saved. New settings will be applied after restart. \n Do you want to restart server now?</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Settings saved</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do you want to restart server\'s operation system?</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do you want to restore all server\'s settings? Archive will be saved, but network settings will be reset.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do you want to restart all server\'s settings? Archive and network settings will be saved.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Unavailable</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>System is unreachable or doesn\'t exist.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Incorrect current password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Wrong password.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Found system has incompatible version.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Wrong url.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can\'t merge systems. Remote system is in safe mode.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can\'t merge systems. Maybe one of the systems is in safe mode.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Warning: You are about to merge Systems with START licenses. As only 1 START license is allowed per System after your merge you will only have 1 START license remaining. If you understand this and would like to proceed please click Merge to continue.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Connection failed:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Merge failed:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Merge succeed.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Login or password is incorrect</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Server failure: cannot retrieve current user data</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>server is offline</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>server is starting</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>server is restarting</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>server is offline</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Updating successfully started. It will take several minutes</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Updating failed. The provided version is already installed.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Updating failed. Provided file is not a valid update archive.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Updating failed. Provided file is targeted for another system.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Updating failed. Extraction failed, check available storage.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Updating failed. Couldn\'t execute installation script.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select files</source>
+      <translation> </translation>
+    </message>
   </context>
   <context>
     <name>../static/views/advanced.html</name>

@@ -6,7 +6,7 @@ from os.path import join
 
 
 # 1. read ts into xml
-xml_files = ('cloud_portal.ts', 'templates.ts')
+xml_files = ('webadmin.ts',)
 root_directory = ''
 
 # Read branding info
@@ -88,5 +88,5 @@ def process_files():
         save_content(active_filename, active_content)
 
 
-read_branding()
+# read_branding()
 process_files()

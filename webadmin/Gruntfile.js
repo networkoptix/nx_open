@@ -503,6 +503,12 @@ module.exports = function (grunt) {
             },
             print_version:{
                 command: 'hg parent'
+            },
+            generate_translation:{
+                command: 'cd translation; python generate_ts.py; python localize.py'
+            },
+            localize:{
+                command: 'cd translation; python localize.py'
             }
         },
 
@@ -617,7 +623,8 @@ module.exports = function (grunt) {
         'rev',
         'usemin',
         'htmlmin',
-        'shell:version'
+        'shell:version',
+        'shell:generate_translation'
     ]);
 
     grunt.registerTask('default', [
