@@ -20,14 +20,14 @@ namespace
      * I have no idea what it means but such a message is used by 
      * Advantech Adam/Apax .NET Utility.
      */
-    const char kAdamSearchMessage[60] = 
+    const unsigned char kAdamSearchMessage[60] = 
     {
         0x4d, 0x41, 0x44, 0x41, 0x00, 0x00, 0x00, 0x83, 0x01, 0x00,
         0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     };
 
     const quint16 kAdamAutodiscoveryPort = 5048;
@@ -214,6 +214,9 @@ QnResourceList QnAdamResourceSearcher::findResources()
             SocketAddress remoteEndpoint;
             auto bytesRead = socket->recvFrom(datagram.data(), datagram.size(), &remoteEndpoint);
 
+            if (bytesRead <= 0)
+                return result;
+
             if (remoteEndpoint.port != kAdamAutodiscoveryPort)
                 continue;
 
@@ -272,8 +275,9 @@ QnResourceList QnAdamResourceSearcher::findResources()
 
 QnResourcePtr QnAdamResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams &params)
 {
-    QnNetworkResourcePtr result;
+    QN_UNUSED(params);
 
+    QnNetworkResourcePtr result;
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
 
     if (resourceType.isNull())

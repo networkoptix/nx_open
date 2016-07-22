@@ -66,7 +66,7 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
 
     auto callback = [this](QString portId, nx_io_managment::IOPortState inputState)
     {
-        bool isActive = inputState < nx_io_managment::IOPortState::nonActive;
+        bool isActive = nx_io_managment::isActiveIOPortState(inputState);
         emit cameraInput(
             toSharedPointer(),
             portId, 

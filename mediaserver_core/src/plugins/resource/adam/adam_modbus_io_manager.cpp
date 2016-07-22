@@ -22,6 +22,8 @@ namespace
     const QString kAdamStartOutputCoilParamName("adamStartOutputCoil");
     const QString kAdamInputCountParamName("adamInputCount");
     const QString kAdamOutputCountParamName("adamOutputCount");
+
+    const int kDebounceIterationCount = 4;
 }
 
 QnAdamModbusIOManager::QnAdamModbusIOManager(QnResource* resource) :
@@ -61,6 +63,8 @@ bool QnAdamModbusIOManager::startIOMonitoring()
 
     if (shouldNotStartMonitoring)
         return false;
+
+    m_debouncedValues.clear();
 
     QObject::connect(
         &m_client, &nx_modbus::QnModbusAsyncClient::done, 
@@ -110,6 +114,11 @@ bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isA
 
     auto response = m_outputClient.writeSingleCoil(coil, isActive);
 
+    if (response.isException())
+        return false;
+
+    setDebounceForPort(outputId, isActive);
+
     return true;
 }
 
@@ -130,8 +139,7 @@ QnIOPortDataList QnAdamModbusIOManager::getOutputPortList() const
 
 QnIOStateDataList QnAdamModbusIOManager::getPortStates() const 
 {
-    QnMutexLocker lock(&m_mutex);
-    return m_ioStates;
+    return getDebouncedStates();
 }
 
 void QnAdamModbusIOManager::setInputPortStateChangeCallback(InputStateChangeCallback callback)
@@ -234,13 +242,11 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::Modbus
     }
 
     bool status = true;
-    short kBitsInByte = 8;
 
     auto inputCount = m_inputs.size();
     auto outputCount = m_outputs.size();
     
     auto fetchedPortStates = response.data.mid(1);
-    quint64 bitsFetched = fetchedPortStates.size() * kBitsInByte;
 
     auto startInputCoilBit = getPortCoil(m_inputs[0].id, status);
     auto startOutputCoilBit = getPortCoil(m_outputs[0].id, status);
@@ -267,17 +273,16 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::Modbus
 
 void QnAdamModbusIOManager::updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex)
 {
+    QnMutexLocker lock(&m_mutex);
+
     auto state = getBitValue(bytes, bitIndex);
-    bool stateChanged = m_ioStates[portIndex].isActive == state;
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_ioStates[portIndex].isActive = state;
-        m_ioStates[portIndex].timestamp = qnSyncTime->currentMSecsSinceEpoch();
-    }
-
-    nx_io_managment::IOPortState currentState = m_ioStates[portIndex].isActive ? 
-        nx_io_managment::IOPortState::active : nx_io_managment::IOPortState::nonActive;
+    bool stateChanged = m_ioStates[portIndex].isActive != state;
+        
+    m_ioStates[portIndex].isActive = state;
+    m_ioStates[portIndex].timestamp = qnSyncTime->currentMSecsSinceEpoch();
+    
+    nx_io_managment::IOPortState currentState = 
+        nx_io_managment::fromBoolToIOPortState(m_ioStates[portIndex].isActive);
 
     if (stateChanged)
     {
@@ -285,6 +290,36 @@ void QnAdamModbusIOManager::updatePortState(size_t bitIndex, const QByteArray& b
             m_ioStates[portIndex].id,
             currentState);
     }
+}
+
+void QnAdamModbusIOManager::setDebounceForPort(const QString& portId, bool portState)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    DebouncedValue value;
+    value.debouncedValue = portState;
+    value.lifetimeCounter = kDebounceIterationCount;
+
+    m_debouncedValues[portId] = value;
+}
+
+QnIOStateDataList QnAdamModbusIOManager::getDebouncedStates() const
+{
+    QnMutexLocker lock(&m_mutex);
+
+    auto debouncedStates = m_ioStates;
+
+    for (auto& state: debouncedStates)
+    { 
+        if (m_debouncedValues.find(state.id) != m_debouncedValues.end())
+        {
+            state.isActive = m_debouncedValues[state.id].debouncedValue; 
+            if (!--m_debouncedValues[state.id].lifetimeCounter)
+                m_debouncedValues.erase(state.id);
+        }
+    }
+
+    return debouncedStates;
 }
 
 bool QnAdamModbusIOManager::getBitValue(const QByteArray& bytes, quint64 bitIndex) const

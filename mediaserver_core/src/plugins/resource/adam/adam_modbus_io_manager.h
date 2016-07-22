@@ -12,6 +12,13 @@
 class QnAdamModbusIOManager: public QObject, public QnAbstractIOManager
 {
     Q_OBJECT
+
+    struct DebouncedValue
+    {
+        bool debouncedValue;
+        int lifetimeCounter;
+    };
+
 public: 
 
     // Resource is not owned by IO manager. Maybe weak pointer would be better.
@@ -44,6 +51,8 @@ private:
 
     void processAllPortStatesResponse(const nx_modbus::ModbusResponse& response);
     void updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex);
+    void setDebounceForPort(const QString& portId, bool portState);
+    QnIOStateDataList getDebouncedStates() const;
 
     bool getBitValue(const QByteArray& bytes, quint64 bitIndex) const;
     quint32 getPortCoil(const QString& ioPortId, bool& success) const;
@@ -70,6 +79,8 @@ private:
     nx_modbus::QnModbusAsyncClient m_client;
     nx_modbus::QnModbusClient m_outputClient;
     InputStateChangeCallback m_inputStateChangedCallback;
+
+    mutable std::map<QString, DebouncedValue> m_debouncedValues;
 };
 
 #endif //< ENABLE_ADVANTECH

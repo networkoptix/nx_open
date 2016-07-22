@@ -15,6 +15,10 @@ enum class IOPortState
     nonActive,
 };
 
+bool isActiveIOPortState(IOPortState state);
+
+IOPortState fromBoolToIOPortState(bool state);
+
 }
 
 class QnAbstractIOManager
