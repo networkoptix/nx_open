@@ -316,6 +316,7 @@ module.exports = function (grunt) {
                 files: {
                     src: [
                         '<%= yeoman.dist %>/scripts/{,*/}*.js',
+                        '!<%= yeoman.dist %>/scripts/{,*/}language.js',
                         '<%= yeoman.dist %>/styles/{,*/}*.css'//,
                         //'<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
                         //'<%= yeoman.dist %>/fonts/*'
@@ -431,6 +432,7 @@ module.exports = function (grunt) {
                             '*.xml',
                             '*.xsl',
                             'views/{,*/}*.html',
+                            'scripts/language.js',
                             'customization/*',
                             //'bower_components/**/*',
                             //'bower_components/videogular-themes-default/videogular.css',
