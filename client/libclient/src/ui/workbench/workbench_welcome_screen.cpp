@@ -209,7 +209,7 @@ void QnWorkbenchWelcomeScreen::setGlobalPreloaderVisible(bool value)
 }
 
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(
-    const QString& systemName,
+    const QString& systemId,
     const QString& serverUrl,
     const QString& userName,
     const QString& password,
@@ -222,9 +222,9 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     // TODO: #ynikitenkov add look after connection process
     // and don't allow to connect to two or more servers simultaneously
     const auto connectFunction =
-        [this, serverUrl, userName, password, storePassword, autoLogin, systemName]()
+        [this, serverUrl, userName, password, storePassword, autoLogin, systemId]()
         {
-            setConnectingToSystem(systemName);
+            setConnectingToSystem(systemId);
 
             const auto completionGuard = QnRaiiGuard::createDestructable(
                 [this]() { setConnectingToSystem(QString()); });
@@ -252,12 +252,12 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     executeDelayedParented(connectFunction, kMinimalDelay, this);
 }
 
-void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemName, const QString& serverUrl)
+void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId, const QString& serverUrl)
 {
     if (!isLoggedInToCloud())
         return;
 
-    connectToLocalSystem(systemName, serverUrl, qnCloudStatusWatcher->cloudLogin(),
+    connectToLocalSystem(systemId, serverUrl, qnCloudStatusWatcher->cloudLogin(),
         qnCloudStatusWatcher->cloudPassword(), false, false);
 }
 

@@ -263,7 +263,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
             {
                 case LoginColumn        : return user->getName();
                 case FullNameColumn     : return user->fullName();
-                case UserRoleColumn     : return accessController()->userRoleName(user);
+                case UserRoleColumn     : return qnResourceAccessManager->userRoleName(user);
                 default                 : break;
 
             } // switch (column)

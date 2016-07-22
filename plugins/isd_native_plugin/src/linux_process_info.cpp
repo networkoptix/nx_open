@@ -6,7 +6,7 @@
 #include "linux_process_info.h"
 #include <cstring>
 #include <cstdio>
-
+#include <cstdlib>
 
 namespace ProcessState
 {

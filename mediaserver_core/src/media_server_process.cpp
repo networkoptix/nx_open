@@ -2354,41 +2354,9 @@ void MediaServerProcess::run()
         qnGlobalSettings->setNewSystem(true);
     }
 
-
     auto upnpPortMapper = initializeUpnpPortMapper();
 
-    //TODO: #GDM #2.6 take keys from one place
-    {
-        const QString statisticsReportTimeCycleKey(lit("statisticsReportTimeCycle"));
-        const QString value = MSSettings::roSettings()->value(statisticsReportTimeCycleKey).toString();
-        if (!value.isEmpty())
-            qnGlobalSettings->setStatisticsReportTimeCycle(value);
-        MSSettings::roSettings()->remove(statisticsReportTimeCycleKey);
-    }
-
-    {
-        const QString statisticsReportServerApiKey(lit("statisticsReportServerApi"));
-        const QString value = MSSettings::roSettings()->value(statisticsReportServerApiKey).toString();
-        if (!value.isEmpty())
-            qnGlobalSettings->setStatisticsReportServerApi(value);
-        MSSettings::roSettings()->remove(statisticsReportServerApiKey);
-    }
-
-    {
-        const QString value = MSSettings::roSettings()->value(QnGlobalSettings::kNameCloudSystemID).toString();
-        if (!value.isEmpty())
-            qnGlobalSettings->setCloudSystemID(value);
-        MSSettings::roSettings()->remove(QnGlobalSettings::kNameCloudSystemID);
-    }
-
-    {
-        const QString value = MSSettings::roSettings()->value(QnGlobalSettings::kNameCloudAuthKey).toString();
-        if (!value.isEmpty())
-            qnGlobalSettings->setCloudAuthKey(value);
-        MSSettings::roSettings()->remove(QnGlobalSettings::kNameCloudAuthKey);
-    }
-
-    qnGlobalSettings->synchronizeNowSync();
+    qnGlobalSettings->takeFromSettings(MSSettings::roSettings());
     qnCommon->updateModuleInformation();
 
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())

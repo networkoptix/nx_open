@@ -59,14 +59,14 @@ public: // Properties
 public slots:
     // TODO: $ynikitenkov add multiple urls one-by-one  handling
 void connectToLocalSystem(
-    const QString& systemName,
+    const QString& systemId,
     const QString& serverUrl,
     const QString& userName,
     const QString& password,
     bool storePassword,
     bool autoLogin);
 
-    void connectToCloudSystem(const QString& systemName, const QString& serverUrl);
+    void connectToCloudSystem(const QString& systemId, const QString& serverUrl);
 
     void connectToAnotherSystem();
 

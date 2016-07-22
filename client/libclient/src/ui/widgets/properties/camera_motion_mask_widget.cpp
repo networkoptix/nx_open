@@ -7,6 +7,7 @@
 #include <QtOpenGL/QGLWidget>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/user_resource.h>
 
 #include <ui/animation/curtain_animator.h>
 #include <ui/graphics/view/graphics_view.h>
@@ -36,13 +37,15 @@
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent):
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     m_readOnly(false),
     m_controlMaxRects(false)
 {
     init();
 }
 
-void QnCameraMotionMaskWidget::init() {
+void QnCameraMotionMaskWidget::init()
+{
     m_motionSensitivity = 0;
 
     /* Set up scene & view. */
@@ -55,9 +58,17 @@ void QnCameraMotionMaskWidget::init() {
     /* Set up model & control machinery. */
     m_context.reset(new QnWorkbenchContext(this));
 
-    auto workbenchLayout = new QnWorkbenchLayout(this);
-    workbenchLayout->setCellSpacing(QSizeF(0, 0));
-    m_context->workbench()->setCurrentLayout(workbenchLayout);
+    createWorkbenchLayout();
+
+    //TODO: #vkutin #GDM Refactor this in future versions.
+    // Either get rid or temporary workbench or use one global access controller.
+    auto updateUser = [this](const QnUserResourcePtr& newUser)
+    {
+        m_context->setUserName(newUser ? newUser->getName() : QString());
+    };
+
+    updateUser(context()->user());
+    connect(context(), &QnWorkbenchContext::userChanged, this, updateUser);
 
     QnWorkbenchDisplay *display = m_context->display();
     display->setLightMode(Qn::LightModeFull);
@@ -104,6 +115,13 @@ void QnCameraMotionMaskWidget::init() {
     setLayout(layout);
 }
 
+void QnCameraMotionMaskWidget::createWorkbenchLayout()
+{
+    auto workbenchLayout = new QnWorkbenchLayout(this);
+    workbenchLayout->setCellSpacing(QSizeF(0, 0));
+    m_context->workbench()->setCurrentLayout(workbenchLayout);
+}
+
 QnCameraMotionMaskWidget::~QnCameraMotionMaskWidget() {
     return;
 }
@@ -147,8 +165,11 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 
     m_camera = camera;
 
+    if (m_camera && m_context->workbench()->layouts().empty())
+        createWorkbenchLayout();
+
     m_context->workbench()->currentLayout()->clear();
-    m_resourceWidget = 0;
+    m_resourceWidget = nullptr;
 
     if (m_camera)
     {

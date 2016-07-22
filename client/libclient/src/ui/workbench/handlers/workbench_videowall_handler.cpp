@@ -460,7 +460,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
         updateItemsLayout(items, layout->getId());
     };
 
-    if (snapshotManager()->isLocal(layout) || snapshotManager()->isModified(layout))
+    if (layout->hasFlags(Qn::local) || snapshotManager()->isModified(layout))
     {
         auto callback = [this, items, reset](bool success, const QnLayoutResourcePtr &layout)
         {
@@ -484,10 +484,10 @@ void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIn
         return;
 
     QnLayoutResourceList unsavedLayouts;
-    if (firstLayout && (snapshotManager()->isLocal(firstLayout) || snapshotManager()->isModified(firstLayout)))
+    if (firstLayout && (firstLayout->hasFlags(Qn::local) || snapshotManager()->isModified(firstLayout)))
         unsavedLayouts << firstLayout;
 
-    if (secondLayout && (snapshotManager()->isLocal(secondLayout) || snapshotManager()->isModified(secondLayout)))
+    if (secondLayout && (secondLayout->hasFlags(Qn::local) || snapshotManager()->isModified(secondLayout)))
         unsavedLayouts << secondLayout;
 
     auto swap = [this](const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout)

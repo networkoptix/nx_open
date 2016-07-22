@@ -7,6 +7,8 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/motion_window.h>
 
+#include <ui/workbench/workbench_context_aware.h>
+
 #include <utils/common/connective.h>
 
 class MotionSelectionInstrument;
@@ -22,7 +24,8 @@ class QnWorkbenchItem;
 class QnWorkbenchContext;
 class QnMediaResourceWidget;
 
-class QnCameraMotionMaskWidget: public Connective<QWidget> {
+class QnCameraMotionMaskWidget: public Connective<QWidget>, protected QnWorkbenchContextAware
+{
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
     typedef Connective<QWidget> base_type;
@@ -63,6 +66,7 @@ protected slots:
 
 private:
     void init();
+    void createWorkbenchLayout();
     void showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::ErrorCode errCode);
 
 private:

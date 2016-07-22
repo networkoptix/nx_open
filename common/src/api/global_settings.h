@@ -21,6 +21,7 @@ class QnAbstractResourcePropertyAdaptor;
 
 template<class T>
 class QnResourcePropertyAdaptor;
+class QSettings;
 
 class QnGlobalSettings: public Connective<QObject>, public Singleton<QnGlobalSettings> {
     Q_OBJECT
@@ -35,6 +36,7 @@ public:
 
     void synchronizeNow();
     bool synchronizeNowSync();
+    bool takeFromSettings(QSettings* settings);
 
     QSet<QString> disabledVendorsSet() const;
     QString disabledVendors() const;

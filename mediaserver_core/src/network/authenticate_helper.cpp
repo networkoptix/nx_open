@@ -29,6 +29,7 @@
 
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_user_manager.h>
+#include <nx/network/http/auth_tools.h>
 
 
 ////////////////////////////////////////////////////////////
@@ -837,4 +838,21 @@ Qn::AuthResult QnAuthHelper::checkDigestValidity(QnUserResourcePtr userResource,
         return Qn::Auth_OK;
 
     return QnLdapManager::instance()->authenticateWithDigest( userResource->getName(), QLatin1String(digest) );
+}
+
+bool QnAuthHelper::checkUserPassword(const QnUserResourcePtr& user, const QString& password)
+{
+    if (!user->isCloud())
+        return user->checkLocalUserPassword(password);
+
+    // 3. Cloud users
+    QByteArray auth = createHttpQueryAuthParam(
+        user->getName(),
+        password,
+        user->getRealm(),
+        "GET",
+        qnAuthHelper->generateNonce());
+
+    nx_http::Response response;
+    return authenticateByUrl(auth, QByteArray("GET"), response) == Qn::Auth_OK;
 }
