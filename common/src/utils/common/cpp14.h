@@ -1,54 +1,60 @@
-/**********************************************************
-* 20 may 2015
-* a.kolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef libcommon_cpp14_h
-#define libcommon_cpp14_h
-
+/**
+ *  Some c++14 features missing in MS Visual studio 2012 and GCC 4.8 are
+ *  defined here
+ */
 #include <atomic>
 #include <memory>
 
 #ifndef __clang__
 
 #ifdef __GNUC__
-#include <features.h>
+    #include <features.h>
 #endif
 
+namespace std {
 
-////////////////////////////////////////////////////////////////////////////
-// Some c++14 features missing in MS Visual studio 2012 and GCC 4.8 are
-// defined here
-////////////////////////////////////////////////////////////////////////////
-
-
-namespace std
-{
 #if defined(_MSC_VER)
-#   if _MSC_VER <= 1700
-#       define USE_OWN_MAKE_UNIQUE
-#   endif
+    #if _MSC_VER <= 1700
+        #define USE_OWN_MAKE_UNIQUE
+    #endif
 #elif defined(__GNUC_PREREQ)
-#   if !__GNUC_PREREQ(4,9)
-#      define USE_OWN_MAKE_UNIQUE
-#   endif
+    #if !__GNUC_PREREQ(4,9)
+        #define USE_OWN_MAKE_UNIQUE
+    #endif
 #elif defined(__ANDROID__)
-#   if !__GNUC_PREREQ__(4,9)
-#       define USE_OWN_MAKE_UNIQUE
-#   endif
+    #if !__GNUC_PREREQ__(4,9)
+        #define USE_OWN_MAKE_UNIQUE
+    #endif
 #endif
 
 #ifdef USE_OWN_MAKE_UNIQUE
-template<
-    typename T,
-    typename... Args
-> std::unique_ptr<T> make_unique(Args&&... args)
-{
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-#endif  //USE_OWN_MAKE_UNIQUE
-}   //std
+    template<typename T, typename... Args>
+    std::unique_ptr<T> make_unique(Args&&... args)
+    {
+        return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+    }
+#endif
+
+#ifdef NX_DEFINE_EXCEPTION_PTR
+    typedef std::shared_ptr<exception> exception_ptr;
+
+    template <typename E>
+    exception_ptr make_exception_ptr(E e) { return std::make_shared<E>(std::move(e)); }
+
+    inline
+    exception_ptr current_exception()
+    {
+        try { throw; }
+        catch (std::exception e) { return make_exception_ptr(std::move(e)); }
+        return exception_ptr();
+    }
+
+    inline
+    void rethrow_exception(exception_ptr p) { throw *p; }
+#endif
+
+} // namespace std
 
 #endif // __clang__
-
-#endif  //libcommon_cpp14_h
