@@ -358,6 +358,7 @@ namespace nx_http
             }
         }
 
+        m_contentDecoder.reset();
         HttpHeaders::const_iterator contentEncodingIter = m_httpMessage.headers().find( nx_http::StringType("Content-Encoding") );
         if( contentEncodingIter != m_httpMessage.headers().end() &&
             contentEncodingIter->second != "identity" )
