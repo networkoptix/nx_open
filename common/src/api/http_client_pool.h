@@ -47,8 +47,8 @@ private:
     QnMutex m_mutex;
     std::vector<AsyncHttpClientPtr> m_clientPool;
     std::vector<RequestInfo> m_requestInProgress;
-    int m_requestId;
     int m_maxPoolSize;
+    int m_requestId;
 };
 
 } // nx_http

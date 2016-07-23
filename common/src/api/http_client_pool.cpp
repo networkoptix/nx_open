@@ -12,7 +12,8 @@ namespace nx_http {
 
 HttpClientPool::HttpClientPool(QObject *parent):
     QObject(),
-    m_maxPoolSize(kDefaultPoolSize)
+    m_maxPoolSize(kDefaultPoolSize),
+    m_requestId(0)
 {
 }
 
@@ -78,6 +79,7 @@ void HttpClientPool::terminate(int handle)
             if (request.httpClient)
                 request.httpClient->terminate();
             m_requestInProgress.erase(itr);
+            sendNextRequestUnsafe();
             break;
         }
     }
