@@ -29,6 +29,7 @@
 #include <nx/network/socket_global.h>
 
 #include <nx/utils/timer_manager.h>
+#include <api/http_client_pool.h>
 
 QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(common);
@@ -59,6 +60,7 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     instance<QnResourceAccessManager>();
 
     instance<QnGlobalSettings>();
+    instance<nx_http::ClientPool>();
 
     /* Init members. */
     m_runUuid = QnUuid::createUuid();

@@ -91,7 +91,6 @@
 #endif
 
 #include <watchers/cloud_status_watcher.h>
-#include <api/http_client_pool.h>
 
 static QtMessageHandler defaultMsgHandler = 0;
 
@@ -261,7 +260,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->setModuleGUID(clientInstanceManager->instanceGuid());
 
     common->store<QnGlobals>(new QnGlobals());
-    common->store<nx_http::HttpClientPool>(new nx_http::HttpClientPool());
     common->store<QnSessionManager>(new QnSessionManager());
 
     common->store<QnRedAssController>(new QnRedAssController());

@@ -31,9 +31,9 @@ QnSessionManager::QnSessionManager(QObject *parent)
 {
     qRegisterMetaType<AsyncRequestInfo>();
 
-    auto httpPool = nx_http::HttpClientPool::instance();
+    auto httpPool = nx_http::ClientPool::instance();
     Qn::directConnect(
-        httpPool, &nx_http::HttpClientPool::done,
+        httpPool, &nx_http::ClientPool::done,
         this, &QnSessionManager::onHttpClientDone);
 }
 
@@ -46,7 +46,7 @@ QnSessionManager::~QnSessionManager()
     auto requestInProgress = std::move(m_requestInProgress);
     lk.unlock();
 
-    auto httpPool = nx_http::HttpClientPool::instance();
+    auto httpPool = nx_http::ClientPool::instance();
     for (auto& httpClientAndRequestInfo : requestInProgress)
         httpPool->terminate(httpClientAndRequestInfo.first);
 }
@@ -252,7 +252,7 @@ int QnSessionManager::sendAsyncRequest(
     requestUrl.setUserName(appServerUrl.userName());
     requestUrl.setPassword(appServerUrl.password());
 
-    auto httpPool = nx_http::HttpClientPool::instance();
+    auto httpPool = nx_http::ClientPool::instance();
 
     const auto msgBodyContentType =
         nx_http::getHeaderValue(headers, nx_http::header::kContentType);

@@ -10,14 +10,14 @@ namespace {
 
 namespace nx_http {
 
-HttpClientPool::HttpClientPool(QObject *parent):
+ClientPool::ClientPool(QObject *parent):
     QObject(),
     m_maxPoolSize(kDefaultPoolSize),
     m_requestId(0)
 {
 }
 
-HttpClientPool::~HttpClientPool()
+ClientPool::~ClientPool()
 {
     std::vector<AsyncHttpClientPtr> dataCopy;
     {
@@ -29,54 +29,54 @@ HttpClientPool::~HttpClientPool()
         value->terminate();
 }
 
-void HttpClientPool::setPoolSize(int value)
+void ClientPool::setPoolSize(int value)
 {
     m_maxPoolSize = value;
 }
 
-HttpClientPool* HttpClientPool::instance()
+ClientPool* ClientPool::instance()
 {
-    NX_ASSERT(qnCommon->instance<HttpClientPool>(), Q_FUNC_INFO, "Make sure http client pool exists");
-    return qnCommon->instance<HttpClientPool>();
+    NX_ASSERT(qnCommon->instance<ClientPool>(), Q_FUNC_INFO, "Make sure http client pool exists");
+    return qnCommon->instance<ClientPool>();
 }
 
-int HttpClientPool::doGet(const QUrl& url, nx_http::HttpHeaders headers)
+int ClientPool::doGet(const QUrl& url, nx_http::HttpHeaders headers)
 {
-    QnMutexLocker lock(&m_mutex);
-    int requestId = ++m_requestId;
-    RequestInfo request;
+    Request request;
     request.method = Method::GET;
     request.url = url;
     request.headers = headers;
-    request.handle = requestId;
-
-    m_requestInProgress.push_back(std::move(request));
-    sendNextRequestUnsafe();
-    return requestId;
+    return sendRequest(request);
 }
 
-int HttpClientPool::doPost(
+int ClientPool::doPost(
     const QUrl& url,
     nx_http::HttpHeaders headers,
     const QByteArray& contentType,
     const QByteArray& msgBody)
 {
-    QnMutexLocker lock(&m_mutex);
-    int requestId = ++m_requestId;
-    RequestInfo request;
+    Request request;
     request.method = Method::POST;
     request.url = url;
     request.headers = headers;
-    request.handle = requestId;
     request.contentType = contentType;
-    request.msgBody = msgBody;
+    request.messageBody = msgBody;
+    return sendRequest(request);
+}
 
-    m_requestInProgress.push_back(std::move(request));
+int ClientPool::sendRequest(const Request& request)
+{
+    RequestInternal requestInternal(request);
+
+    QnMutexLocker lock(&m_mutex);
+    int requestId = ++m_requestId;
+    requestInternal.handle = requestId;
+    m_requestInProgress.push_back(std::move(requestInternal));
     sendNextRequestUnsafe();
     return requestId;
 }
 
-void HttpClientPool::terminate(int handle)
+void ClientPool::terminate(int handle)
 {
     QnMutexLocker lock(&m_mutex);
     for (auto itr = m_requestInProgress.begin(); itr != m_requestInProgress.end(); ++itr)
@@ -93,16 +93,17 @@ void HttpClientPool::terminate(int handle)
     }
 }
 
-void HttpClientPool::sendRequestUnsafe(const RequestInfo& request, AsyncHttpClientPtr httpClient)
+void ClientPool::sendRequestUnsafe(const RequestInternal& request, AsyncHttpClientPtr httpClient)
 {
     httpClient->setAdditionalHeaders(request.headers);
+    httpClient->setAuthType(request.authType);
     if (request.method == Method::GET)
         httpClient->doGet(request.url);
     else
-        httpClient->doPost(request.url, request.contentType, request.msgBody);
+        httpClient->doPost(request.url, request.contentType, request.messageBody);
 }
 
-void HttpClientPool::sendNextRequestUnsafe()
+void ClientPool::sendNextRequestUnsafe()
 {
     for (auto& request: m_requestInProgress)
     {
@@ -118,7 +119,7 @@ void HttpClientPool::sendNextRequestUnsafe()
     }
 }
 
-AsyncHttpClientPtr HttpClientPool::getHttpClientUnsafe(const QUrl& url)
+AsyncHttpClientPtr ClientPool::getHttpClientUnsafe(const QUrl& url)
 {
     AsyncHttpClientPtr result;
 
@@ -152,7 +153,7 @@ AsyncHttpClientPtr HttpClientPool::getHttpClientUnsafe(const QUrl& url)
 
         connect(
             result.get(), &nx_http::AsyncHttpClient::done,
-            this, &HttpClientPool::at_HttpClientDone,
+            this, &ClientPool::at_HttpClientDone,
             Qt::DirectConnection);
 
 
@@ -162,7 +163,7 @@ AsyncHttpClientPtr HttpClientPool::getHttpClientUnsafe(const QUrl& url)
     return result;
 }
 
-void HttpClientPool::at_HttpClientDone(nx_http::AsyncHttpClientPtr clientPtr)
+void ClientPool::at_HttpClientDone(nx_http::AsyncHttpClientPtr clientPtr)
 {
     int requestId = -1;
 
