@@ -37,6 +37,11 @@ public:
     {
     }
 
+    TestHttpServer* testHttpServer()
+    {
+        return m_testHttpServer.get();
+    }
+
 protected:
     std::unique_ptr<TestHttpServer> m_testHttpServer;
 };
@@ -155,5 +160,90 @@ TEST_F( AsyncHttpClientTest, motionJpegRetrieval )
 
     clients.clear();
 }
+
+TEST_F(AsyncHttpClientTest, MultiRequestTest)
+{
+    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
+        "/test",
+        "SimpleTest",
+        "application/text"));
+    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
+        "/test2",
+        "SimpleTest2",
+        "application/text"));
+    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
+        "/test3",
+        "SimpleTest3",
+        "application/text"));
+    ASSERT_TRUE(testHttpServer()->bindAndListen());
+
+    const QUrl url(lit("http://127.0.0.1:%1/test")
+        .arg(testHttpServer()->serverAddress().port));
+    const QUrl url2(lit("http://127.0.0.1:%1/test2")
+        .arg(testHttpServer()->serverAddress().port));
+    const QUrl url3(lit("http://127.0.0.1:%1/test3")
+        .arg(testHttpServer()->serverAddress().port));
+
+    auto client = nx_http::AsyncHttpClient::create();
+
+    QByteArray expectedResponse;
+
+    QnMutex mutex;
+    QnWaitCondition waitCond;
+    bool requestFinished = false;
+
+    QObject::connect(
+        client.get(), &nx_http::AsyncHttpClient::done,
+        client.get(),
+        [&](nx_http::AsyncHttpClientPtr client)
+    {
+        ASSERT_FALSE(client->failed());
+        ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);
+        ASSERT_EQ(client->fetchMessageBodyBuffer(), expectedResponse);
+        auto contentTypeIter = client->response()->headers.find("Content-Type");
+        ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
+
+        QnMutexLocker lock(&mutex);
+        requestFinished = true;
+        waitCond.wakeAll();
+    }, Qt::DirectConnection);
+
+    static const int kWaitTimeoutMs = 1000 * 10;
+    // step 0: check if client reconnect smoothly if server already dropped connection
+    // step 1: check 2 requests in a row via same connection
+    for (int i = 0; i < 2; ++i)
+    {
+        testHttpServer()->setForceConnectionClose(i == 0);
+
+        {
+            QnMutexLocker lock(&mutex);
+            requestFinished = false;
+            expectedResponse = "SimpleTest";
+            client->doGet(url);
+            while (!requestFinished)
+                ASSERT_TRUE(waitCond.wait(&mutex, kWaitTimeoutMs));
+        }
+
+        {
+            QnMutexLocker lock(&mutex);
+            requestFinished = false;
+            expectedResponse = "SimpleTest2";
+            client->doGet(url2);
+            while (!requestFinished)
+                ASSERT_TRUE(waitCond.wait(&mutex, kWaitTimeoutMs));
+        }
+
+        {
+            QnMutexLocker lock(&mutex);
+            requestFinished = false;
+            expectedResponse = "SimpleTest3";
+            client->doGet(url3);
+            while (!requestFinished)
+                ASSERT_TRUE(waitCond.wait(&mutex, kWaitTimeoutMs));
+        }
+
+    }
+}
+
 
 } // namespace nx_http
