@@ -19,6 +19,14 @@ HttpClientPool::HttpClientPool(QObject *parent):
 
 HttpClientPool::~HttpClientPool()
 {
+    std::vector<AsyncHttpClientPtr> dataCopy;
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_requestInProgress.clear();
+        std::swap(dataCopy, m_clientPool);
+    }
+    for (auto value: dataCopy)
+        value->terminate();
 }
 
 void HttpClientPool::setPoolSize(int value)
