@@ -346,23 +346,22 @@ bool QnManualCameraSearcher::run(
             return false;
         };
 
+    
+    QnMutexLocker lock(&m_mutex);
+    m_state = QnManualCameraSearchStatus::CheckingHost;
+    if (m_cancelled)
     {
-        QnMutexLocker lock(&m_mutex);
-        m_state = QnManualCameraSearchStatus::CheckingHost;
-        if (m_cancelled)
-        {
-            m_state = QnManualCameraSearchStatus::Aborted;
-            return true;
-        }
-
-        runTasksUnsafe(threadPool);
-    
-        while((m_remainingTaskCount > 0 && !m_cancelled) || hasRunningTasks())
-            m_waitCondition.wait(&m_mutex, kMaxWaitTimeMs);
-    
-        if (!m_cancelled)
-            m_state = QnManualCameraSearchStatus::Finished;
+        m_state = QnManualCameraSearchStatus::Aborted;
+        return true;
     }
+
+    runTasksUnsafe(threadPool);
+
+    while((m_remainingTaskCount > 0 && !m_cancelled) || hasRunningTasks())
+        m_waitCondition.wait(&m_mutex, kMaxWaitTimeMs);
+
+    if (!m_cancelled)
+        m_state = QnManualCameraSearchStatus::Finished;
     
     return true;
 }
