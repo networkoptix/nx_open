@@ -95,6 +95,8 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
         this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
         this, &QnWorkbenchWelcomeScreen::isLoggedInToCloudChanged);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
+        this, &QnWorkbenchWelcomeScreen::isOfflineConnectionChanged);
 
     //
     m_widget->installEventFilter(this);
@@ -149,7 +151,12 @@ QString QnWorkbenchWelcomeScreen::cloudUserName() const
 
 bool QnWorkbenchWelcomeScreen::isLoggedInToCloud() const
 {
-    return (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Online);
+    return (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut);
+}
+
+bool QnWorkbenchWelcomeScreen::isOfflineConnection() const
+{
+    return (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Offline);
 }
 
 QSize QnWorkbenchWelcomeScreen::pageSize() const

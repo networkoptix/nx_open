@@ -14,15 +14,16 @@ QnSystemsFinder::QnSystemsFinder(QObject *parent)
 QnSystemsFinder::~QnSystemsFinder()
 {}
 
-void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder)
+void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder,
+    bool isCloudFinder)
 {
     const auto discoveredConnection =
         connect(finder, &QnAbstractSystemsFinder::systemDiscovered
         , this, &QnSystemsFinder::onSystemDiscovered);
 
     const auto lostConnection =
-        connect(finder, &QnAbstractSystemsFinder::systemLost
-        , this, &QnSystemsFinder::onSystemLost);
+        connect(finder, &QnAbstractSystemsFinder::systemLost, this,
+            [this, isCloudFinder](const QString& id) { onSystemLost(id, isCloudFinder); });
 
     const auto destroyedConnection =
         connect(finder, &QObject::destroyed, this, [this, finder]()
@@ -35,16 +36,13 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder)
         << destroyedConnection;
 
     m_finders.insert(finder, connectionHolder);
+    for (const auto system : finder->systems())
+        onSystemDiscovered(system);
 }
 
 void QnSystemsFinder::onSystemDiscovered(const QnSystemDescriptionPtr& systemDescription)
 {
-    const auto it = std::find_if(m_systems.begin(), m_systems.end(),
-        [targetId = systemDescription->id()](const QnSystemDescriptionPtr &description)
-    {
-        return (description->id() == targetId);
-    });
-
+    const auto it = m_systems.find(systemDescription->id());
     if (it != m_systems.end())
     {
         const auto existingSystem = *it;
@@ -56,25 +54,29 @@ void QnSystemsFinder::onSystemDiscovered(const QnSystemDescriptionPtr& systemDes
     }
 
     const AggregatorPtr target(new QnSystemDescriptionAggregator(systemDescription));
-    m_systems.append(target);
+    m_systems.insert(target->id(), target);
+
+    QSharedPointer<QString> lastIdHolder(new QString(target->id()));
+    connect(target, &QnSystemDescriptionAggregator::idChanged, target,
+        [this, lastIdHolder, target]()
+        {
+            m_systems.remove(*lastIdHolder);
+            m_systems.insert(target->id(), target);
+            *lastIdHolder = target->id();
+        });
     emit systemDiscovered(target.dynamicCast<QnBaseSystemDescription>());
 }
 
-void QnSystemsFinder::onSystemLost(const QString& systemId)
+void QnSystemsFinder::onSystemLost(const QString& systemId, bool isCloudSystem)
 {
-    const auto it = std::find_if(m_systems.begin(), m_systems.end(),
-        [systemId](const AggregatorPtr& aggregator)
-    {
-        return aggregator->containsSystem(systemId);
-    });
-
+    const auto it = m_systems.find(systemId);
     if (it == m_systems.end())
         return;
 
     const auto aggregator = *it;
     if (aggregator->isAggregator())
     {
-        aggregator->removeSystem(systemId);
+        aggregator->removeSystem(systemId, isCloudSystem);
         return;
     }
 
@@ -93,12 +95,6 @@ QnAbstractSystemsFinder::SystemDescriptionList QnSystemsFinder::systems() const
 
 QnSystemDescriptionPtr QnSystemsFinder::getSystem(const QString &id) const
 {
-    QnSystemDescriptionPtr result;
-    for (const auto finder : m_finders.keys())
-    {
-        result = finder->getSystem(id);
-        if (result)
-            break;
-    }
-    return result;
+    const auto it = m_systems.find(id);
+    return (it == m_systems.end() ? QnSystemDescriptionPtr() : *it);
 }

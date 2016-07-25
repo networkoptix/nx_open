@@ -33,8 +33,6 @@ private:
 
     void setCloudSystems(const QnCloudSystemList &systems);
 
-    void onCloudError(QnCloudStatusWatcher::ErrorCode error);
-
     void updateSystemInternal(const QnSystemDescription::PointerType &system);
 
     void processFactoryServer(const QnModuleInformation& serverInfo);
@@ -59,6 +57,6 @@ private:
     mutable QnMutex m_mutex;
 
     SystemsHash m_systems;
-    SystemsHash m_factorySystems;
+    SystemsHash m_factorySystems;       //< Stores cloud-factory systems with one factory server
     RequestIdToSystemHash m_requestToSystem;
 };

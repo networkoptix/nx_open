@@ -235,6 +235,17 @@ Rectangle
 
             onClicked: context.connectToAnotherSystem();
         }
+
+        NxBanner
+        {
+            visible: context.isOfflineConnection;
+
+            anchors.top: parent.top;
+            anchors.topMargin: 16;
+            anchors.horizontalCenter: parent.horizontalCenter;
+
+            textControl.text: qsTr("You have no internet access. Some cloud features could be unavailable.");
+        }
     }
 
     NxCirclesPreloader
@@ -252,4 +263,5 @@ Rectangle
 
         visible: context.connectingToSystem.length;
     }
+
 }

@@ -6,7 +6,7 @@
 namespace {
 
     QnBaseSystemDescription::ServersList subtractLists(
-        const QnBaseSystemDescription::ServersList& first, 
+        const QnBaseSystemDescription::ServersList& first,
         const QnBaseSystemDescription::ServersList& second)
     {
         QnBaseSystemDescription::ServersList result;
@@ -27,12 +27,10 @@ namespace {
 }
 
 QnSystemDescriptionAggregator::QnSystemDescriptionAggregator(const QnSystemDescriptionPtr& systemDescription)
-    : m_cloudSystem(systemDescription && systemDescription->isCloudSystem() ? 
-        systemDescription : QnSystemDescriptionPtr())
-    , m_localSystem(systemDescription && !systemDescription->isCloudSystem() ?
-        systemDescription : QnSystemDescriptionPtr())
+    : m_cloudSystem()
+    , m_localSystem()
 {
-    NX_ASSERT(m_cloudSystem || m_localSystem, "Empty system description is no allowed");
+    mergeSystem(systemDescription);
 }
 
 QnSystemDescriptionAggregator::~QnSystemDescriptionAggregator()
@@ -73,7 +71,7 @@ void QnSystemDescriptionAggregator::mergeSystem(const QnSystemDescriptionPtr& sy
     QnSystemDescriptionPtr& target = (isInCloud ? m_cloudSystem : m_localSystem);
     target = system;
 
-    connect(target.data(), &QnBaseSystemDescription::serverAdded, 
+    connect(target.data(), &QnBaseSystemDescription::serverAdded,
         this, &QnSystemDescriptionAggregator::serverAdded);
     connect(target.data(), &QnBaseSystemDescription::serverRemoved,
         this, &QnSystemDescriptionAggregator::serverRemoved);
@@ -102,23 +100,29 @@ void QnSystemDescriptionAggregator::emitChangesSignals(bool wasCloudSystem, cons
         emit serverAdded(server.id);
 }
 
-void QnSystemDescriptionAggregator::removeSystem(const QString& id)
+void QnSystemDescriptionAggregator::removeSystem(const QString& id, bool isCloud )
 {
     const auto wasCloudSystem = isCloudSystem();
     const auto oldServers = servers();
 
     QnSystemDescriptionPtr* target = nullptr;
-    if (m_cloudSystem && m_cloudSystem->id() == id)
-        target = &m_cloudSystem;
+    if (isCloud)
+    {
+        if (m_cloudSystem && m_cloudSystem->id() == id)
+            target = &m_cloudSystem;
+    }
     else if (m_localSystem && m_localSystem->id() == id)
+    {
         target = &m_localSystem;
+    }
+
 
     if (!target)
     {
         NX_ASSERT(false, "Never should get here!");
         return;
     }
-    
+
     disconnect(target->data(), nullptr, this, nullptr);
     target->reset();
 
@@ -157,7 +161,7 @@ QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::servers() co
 {
     // Cloud servers has priority under local servers
     auto result = (m_cloudSystem ? m_cloudSystem->servers() : ServersList());
-    
+
     const auto localSystemServers = (m_localSystem ? m_localSystem->servers() : ServersList());
     const auto toAddList = subtractLists(localSystemServers, result);
     std::copy(toAddList.begin(), toAddList.end(), std::back_inserter(result));
@@ -167,7 +171,7 @@ QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::servers() co
 
 bool QnSystemDescriptionAggregator::containsServer(const QnUuid& serverId) const
 {
-    return ((m_cloudSystem && m_cloudSystem->containsServer(serverId)) || 
+    return ((m_cloudSystem && m_cloudSystem->containsServer(serverId)) ||
         (m_localSystem && m_localSystem->containsServer(serverId)));
 }
 

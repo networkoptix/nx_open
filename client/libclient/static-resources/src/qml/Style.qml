@@ -69,6 +69,16 @@ QtObject
             readonly property real shadowRadius: 24;
             readonly property int shadowSamples: 24;
         }
+
+        property QtObject banner: QtObject
+        {
+            property QtObject warning: QtObject
+            {
+                readonly property real backgroundOpacity: 0.2;
+                readonly property color backgroundColor: colors.red_main;
+                readonly property color textColor: "#CF8989";
+            }
+        }
     }
 
     //
@@ -88,7 +98,7 @@ QtObject
         readonly property color brand: context.getPaletteColor("brand", 4);
 
         readonly property color brandContrast: "white";
-        readonly property color red_main: context.getPaletteColor("red", 2);
+        readonly property color red_main: context.getPaletteColor("red", 4);
         readonly property color yellow_main: context.getPaletteColor("yellow", 0);
 
         property QtObject custom: QtObject

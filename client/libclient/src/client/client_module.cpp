@@ -286,9 +286,20 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     /* Just to feel safe */
     QScopedPointer<QnCloudStatusWatcher> cloudStatusWatcher(new QnCloudStatusWatcher());
+    cloudStatusWatcher->setStayConnected(!qnSettings->cloudPassword().isEmpty());
     cloudStatusWatcher->setCloudEndpoint(clientSettings->cdbEndpoint());
     cloudStatusWatcher->setCloudCredentials(clientSettings->cloudLogin(), clientSettings->cloudPassword(), true);
     common->store<QnCloudStatusWatcher>(cloudStatusWatcher.take());
+
+    connect(qnSettings, &QnClientSettings::valueChanged, this,
+        [this, common](int id)
+    {
+        if (id != QnClientSettings::CLOUD_PASSWORD)
+            return;
+
+        if (auto cloudWatcher = common->instance<QnCloudStatusWatcher>())
+            cloudWatcher->setStayConnected(!qnSettings->cloudPassword().isEmpty());
+    });
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
@@ -475,8 +486,8 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     QScopedPointer<QnSystemsFinder> systemsFinder(new QnSystemsFinder());
     QScopedPointer<QnDirectSystemsFinder> directSystemsFinder(new QnDirectSystemsFinder());
     QScopedPointer<QnCloudSystemsFinder> cloudSystemsFinder(new QnCloudSystemsFinder());
-    systemsFinder->addSystemsFinder(directSystemsFinder.data());
-    systemsFinder->addSystemsFinder(cloudSystemsFinder.data());
+    systemsFinder->addSystemsFinder(directSystemsFinder.data(), false);
+    systemsFinder->addSystemsFinder(cloudSystemsFinder.data(), true);
     qnCommon->store<QnSystemsFinder>(systemsFinder.take());
     qnCommon->store<QnDirectSystemsFinder>(directSystemsFinder.take());
     qnCommon->store<QnCloudSystemsFinder>(cloudSystemsFinder.take());
