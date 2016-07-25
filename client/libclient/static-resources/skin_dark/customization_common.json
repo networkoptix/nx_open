@@ -653,6 +653,14 @@
         }
     },
 
+    "QnNotificationWidget" : {
+        "palette": { 
+            "default": {
+                "dark": "dark6"
+            }
+        }
+    },
+
     "QnMediaResourceWidget": {
         "motionSensitivityColors": [
             "light16",
