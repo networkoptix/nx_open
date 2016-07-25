@@ -111,6 +111,8 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             {
                 if (usedAuthMethod)
                     *usedAuthMethod = AuthMethod::tempUrlQueryParam;
+                if (authUserId)
+                    *authUserId = it->second.authUserId;
                 return Qn::Auth_OK;
             }
         }
@@ -342,7 +344,10 @@ QnAuthMethodRestrictionList* QnAuthHelper::restrictionList()
     return &m_authMethodRestrictionList;
 }
 
-QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath( const QString& path, unsigned int periodMillis )
+QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath(
+    const QnUuid& authUserId,
+    const QString& path,
+    unsigned int periodMillis)
 {
     QString authKey = QnUuid::createUuid().toString();
     if( authKey.isEmpty() )
@@ -362,6 +367,7 @@ QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath( cons
     TempAuthenticationKeyCtx ctx;
     ctx.timeGuard = std::move( timerGuard );
     ctx.path = path;
+    ctx.authUserId = authUserId;
     m_authenticatedPaths.emplace( authKey, std::move( ctx ) );
 
     return QPair<QString, QString>( TEMP_AUTH_KEY_NAME, authKey );
