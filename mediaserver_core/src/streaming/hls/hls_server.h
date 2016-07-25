@@ -80,6 +80,7 @@ namespace nx_hls
         nx_http::StatusCode::Value getPlaylist(
             const nx_http::Request& request,
             const QnSecurityCamResourcePtr& camResource,
+            const QnUserResourcePtr& userResource,
             const QnVideoCameraPtr& videoCamera,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
@@ -106,6 +107,7 @@ namespace nx_hls
             nx_http::Response* const response );
 
         nx_http::StatusCode::Value createSession(
+            const QnUuid& authUserId,
             const QString& requestedPlaylistPath,
             const QString& sessionID,
             const std::multimap<QString, QString>& requestParams,
