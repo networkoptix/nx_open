@@ -36,13 +36,13 @@ public:
     virtual ~ClientPool();
     static ClientPool* instance();
 
-    int doGet(const QUrl& url, nx_http::HttpHeaders headers);
+    int doGet(const QUrl& url, nx_http::HttpHeaders headers = nx_http::HttpHeaders());
 
     int doPost(
         const QUrl& url,
-        nx_http::HttpHeaders headers,
         const QByteArray& contentType,
-        const QByteArray& msgBody);
+        const QByteArray& msgBody,
+        nx_http::HttpHeaders headers = nx_http::HttpHeaders());
 
     int sendRequest(const Request& request);
 

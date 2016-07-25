@@ -261,7 +261,7 @@ int QnSessionManager::sendAsyncRequest(
     if (method == nx_http::Method::GET)
         requestInfo.handle = httpPool->doGet(requestUrl, std::move(headers));
     else
-        requestInfo.handle = httpPool->doPost(requestUrl, std::move(headers), msgBodyContentType, msgBody);
+        requestInfo.handle = httpPool->doPost(requestUrl, msgBodyContentType, msgBody, std::move(headers));
 
     QnMutexLocker lk(&m_mutex);
     m_requestInProgress.emplace(requestInfo.handle, requestInfo);

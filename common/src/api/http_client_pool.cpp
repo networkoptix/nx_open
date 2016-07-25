@@ -16,11 +16,14 @@ namespace {
 
 namespace nx_http {
 
+static ClientPool* staticInstance;
+
 ClientPool::ClientPool(QObject *parent):
     QObject(),
     m_maxPoolSize(kDefaultPoolSize),
     m_requestId(0)
 {
+    staticInstance = this;
 }
 
 ClientPool::~ClientPool()
@@ -32,6 +35,7 @@ ClientPool::~ClientPool()
     }
     for (auto itr = dataCopy.begin(); itr != dataCopy.end(); ++itr)
         itr->second->client->terminate();
+    staticInstance = nullptr;
 }
 
 void ClientPool::setPoolSize(int value)
@@ -41,8 +45,8 @@ void ClientPool::setPoolSize(int value)
 
 ClientPool* ClientPool::instance()
 {
-    NX_ASSERT(qnCommon->instance<ClientPool>(), Q_FUNC_INFO, "Make sure http client pool exists");
-    return qnCommon->instance<ClientPool>();
+    NX_ASSERT(staticInstance, Q_FUNC_INFO, "Make sure http client pool exists");
+    return staticInstance;
 }
 
 int ClientPool::doGet(const QUrl& url, nx_http::HttpHeaders headers)
@@ -56,9 +60,9 @@ int ClientPool::doGet(const QUrl& url, nx_http::HttpHeaders headers)
 
 int ClientPool::doPost(
     const QUrl& url,
-    nx_http::HttpHeaders headers,
     const QByteArray& contentType,
-    const QByteArray& msgBody)
+    const QByteArray& msgBody,
+    nx_http::HttpHeaders headers)
 {
     Request request;
     request.method = Method::POST;
