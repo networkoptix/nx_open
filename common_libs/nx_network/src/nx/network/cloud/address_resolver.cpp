@@ -529,7 +529,7 @@ std::vector<Guard> AddressResolver::grabHandlers(
             guards.push_back(Guard(
                 [this, it, entries, lastErrorCode, info]()
                 {
-                    Guard guard; //< Shell fire out of mutex scope
+                    Guard guard; //< Shall fire out of mutex scope
                     auto code = entries.empty() ? lastErrorCode : SystemError::noError;
                     it->second.handler(code, std::move(entries));
 
