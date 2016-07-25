@@ -5,7 +5,7 @@
 #include <utils/math/math.h>
 #include <nx/fusion/model_functions.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ImageCorrectionParams, (json), (blackLevel)(whiteLevel)(gamma)(enabled))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ImageCorrectionParams), (json), _Fields)
 
 static const int MIN_GAMMA_RANGE = 6;
 static const float NORM_RANGE_START = 0.0; //16.0

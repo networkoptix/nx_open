@@ -1,6 +1,8 @@
 #include "proxy_video_decoder_private.h"
 #if defined(ENABLE_PROXY_DECODER)
 
+#include <nx/utils/string.h>
+
 #define OUTPUT_PREFIX "ProxyVideoDecoder<display>: "
 #include "proxy_video_decoder_utils.h"
 
@@ -11,9 +13,10 @@ namespace media {
 
 namespace {
 
-class Impl
-:
-    public ProxyVideoDecoderPrivate
+static const QRect kUndefinedVideoGeometry{-1, -1, -1, -1};
+static const QRect kFullscreenVideoGeometry{0, 0, 0, 0};
+
+class Impl: public ProxyVideoDecoderPrivate
 {
 public:
     using ProxyVideoDecoderPrivate::ProxyVideoDecoderPrivate;
@@ -26,7 +29,14 @@ private:
     class VideoBuffer;
 
 private:
+    /** Call doDisplayDecodedFrame() depending on conf: either via Lambda, or immediately. */
     void displayDecodedFrame(void* frameHandle);
+
+    /** Call proxydecoder().displayDecoded() immediately. */
+    void doDisplayDecodedFrame(void* frameHandle);
+
+private:
+    QRect prevVideoGeometry = kUndefinedVideoGeometry;
 };
 
 class Impl::VideoBuffer
@@ -134,8 +144,8 @@ void Impl::displayDecodedFrame(void* frameHandle)
 
                     if (conf.displayAsyncSleepMs > 0)
                         usleep(conf.displayAsyncSleepMs * 1000);
-                    // TODO: All-zeroes mean full-screen. Implement passing coords from QML.
-                    self->proxyDecoder().displayDecoded(frameHandle, 0, 0, 0, 0);
+
+                    self->doDisplayDecodedFrame(frameHandle);
                 }
                 else
                 {
@@ -145,8 +155,55 @@ void Impl::displayDecodedFrame(void* frameHandle)
     }
     else
     {
-        // TODO: All-zeroes mean full-screen. Implement passing coords from QML.
-        proxyDecoder().displayDecoded(frameHandle, 0, 0, 0, 0);
+        doDisplayDecodedFrame(frameHandle);
+    }
+}
+
+void Impl::doDisplayDecodedFrame(void* frameHandle)
+{
+    QRect r = getVideoGeometry();
+
+    const char* logPrefix = nullptr; //< Do not log by default.
+    if (r != prevVideoGeometry)
+    {
+        if (r == QRect()) //< getVideoGeometry() did not provide a value.
+        {
+            if (prevVideoGeometry == kUndefinedVideoGeometry)
+            {
+                logPrefix = "VideoGeometry: Initially not provided =>";
+                r = kFullscreenVideoGeometry;
+            }
+            else
+            {
+                logPrefix = "VideoGeometry: Not provided => use previous";
+                r = prevVideoGeometry;
+            }
+        }
+        else
+        {
+            logPrefix = "VideoGeometry:";
+        }
+    }
+
+    prevVideoGeometry = r;
+
+    if (r.isNull())
+    {
+        if (logPrefix)
+        {
+            OUTPUT << logPrefix << " Fullscreen";
+        }
+        proxyDecoder().displayDecoded(frameHandle, /*rect*/ nullptr); //< Null mean fullscreen.
+    }
+    else
+    {
+        if (logPrefix)
+        {
+            OUTPUT << logPrefix << nx::utils::stringFormat(" %d x %d @(%d, %d)",
+                r.width(), r.height(), r.left(), r.top());
+        }
+        const ProxyDecoder::Rect rect{r.left(), r.top(), r.width(), r.height()};
+        proxyDecoder().displayDecoded(frameHandle, &rect);
     }
 }
 

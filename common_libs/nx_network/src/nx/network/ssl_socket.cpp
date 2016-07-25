@@ -14,8 +14,9 @@
 #include <openssl/ssl.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/type_utils.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/type_utils.h>
 #include <utils/common/systemerror.h>
 
 #ifdef max
@@ -325,6 +326,8 @@ public:
 
     virtual ~SslAsyncBioHelper();
 
+    virtual bool isSsl() const { return true; }
+
 public:
     // BIO operation function. These 2 BIO operation function will simulate BIO memory
     // type. For read, it will simply checks the input read buffer, and for write operations
@@ -386,6 +389,7 @@ private:
 
     void continueRead();
     void continueWrite();
+
 protected:
     AbstractStreamSocket* socket()
     {
@@ -870,6 +874,8 @@ bool SslAsyncBioHelper::asyncRecv(
 class MixedSslAsyncBioHelper : public SslAsyncBioHelper
 {
 public:
+    bool isSsl() const override { return m_isSsl; }
+
     struct SnifferData
     {
         std::function<void(SystemError::ErrorCode,std::size_t)> completionHandler;
@@ -1052,8 +1058,8 @@ const std::chrono::seconds SslEngine::kCertExpiration =
 String SslEngine::makeCertificateAndKey(
     const String& common, const String& country, const String& company)
 {
-    const auto data = SslStaticData::instance();
-    const int serialNumber = qrand();
+    SslStaticData::instance();
+    const int serialNumber = nx::utils::rand();
 
     auto number = utils::wrapUnique(BN_new(), &BN_free);
     if (!number || !BN_set_word(number.get(), RSA_F4))
@@ -1165,6 +1171,39 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
     return true;
 }
 
+void SslEngine::useOrCreateCertificate(
+    const QString& filePath,
+    const String& name, const String& country, const String& company)
+{
+    String certData;
+    QFile file(filePath);
+    if (filePath.isEmpty()
+        || !file.open(QIODevice::ReadOnly)
+        || (certData = file.readAll()).isEmpty())
+    {
+        file.close();
+        NX_LOG(lm("Could not find valid SSL certificate '%1', generate new one")
+            .arg(filePath), cl_logALWAYS);
+
+        certData = makeCertificateAndKey(name, country, company);
+
+        NX_ASSERT(!certData.isEmpty());
+        if (!filePath.isEmpty())
+        {
+            if (!file.open(QIODevice::WriteOnly) ||
+                file.write(certData) != certData.size())
+            {
+                NX_LOG(lm("Could not write SSL certificate to file"),
+                    cl_logERROR);
+            }
+
+            file.close();
+        }
+    }
+
+    useCertificateAndPkey(certData);
+}
+
 class SslSocketPrivate
 {
 public:
@@ -1183,11 +1222,12 @@ public:
     // the pain of
     std::atomic<SslSocket::IOMode> ioMode;
     std::atomic<bool> emulateBlockingMode;
+    std::atomic<bool> shutdown;
     std::unique_ptr<SslAsyncBioHelper> asyncSslHelper;
 
     typedef utils::promise<std::pair<SystemError::ErrorCode, size_t>> AsyncPromise;
-    std::unique_ptr<AsyncPromise> sendPromise;
-    std::unique_ptr<AsyncPromise> recvPromise;
+    std::atomic<AsyncPromise*> recvPromisePtr;
+    std::atomic<AsyncPromise*> sendPromisePtr;
 
     SslSocketPrivate()
     :
@@ -1197,7 +1237,10 @@ public:
         extraBufferLen(0),
         ecnryptionEnabled(false),
         ioMode(SslSocket::SYNC),
-        emulateBlockingMode(false)
+        emulateBlockingMode(false),
+        shutdown(false),
+        recvPromisePtr(nullptr),
+        sendPromisePtr(nullptr)
     {
     }
 };
@@ -1467,21 +1510,27 @@ int SslSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*/)
 int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(SslSocket);
+    if (d->shutdown)
+        return SystemError::setLastErrorCode(SystemError::notConnected), -1;
+
     if (d->emulateBlockingMode)
     {
         // the mode could be switched to non blocking, but SSL engine is
         // still non-blocking
-        d->recvPromise.reset(new SslSocketPrivate::AsyncPromise);
+        SslSocketPrivate::AsyncPromise promise;
+        auto oldPromisePtr = d->recvPromisePtr.exchange(&promise);
+        NX_ASSERT(oldPromisePtr == nullptr);
+
         nx::Buffer localBuffer(bufferLen, '\0');
         readSomeAsync(
             &localBuffer,
-            [&](SystemError::ErrorCode code, size_t size)
+            [d](SystemError::ErrorCode code, size_t size)
             {
-                d->recvPromise->set_value(std::make_pair(code, size));
-                d->recvPromise.reset();
+                if (auto promisePtr = d->recvPromisePtr.exchange(nullptr))
+                    promisePtr->set_value({code, size});
             });
 
-        const auto result = d->recvPromise->get_future().get();
+        const auto result = promise.get_future().get();
         if (result.first == SystemError::noError)
             std::memcpy(localBuffer.data(), buffer, result.second);
         else
@@ -1509,21 +1558,27 @@ int SslSocket::sendInternal(const void* buffer, unsigned int bufferLen)
 int SslSocket::send(const void* buffer, unsigned int bufferLen)
 {
     Q_D(SslSocket);
+    if (d->shutdown)
+        return SystemError::setLastErrorCode(SystemError::notConnected), -1;
+
     if (d->emulateBlockingMode)
     {
         // the mode could be switched to non blocking, but SSL engine is
         // still non-blocking
-        d->sendPromise.reset(new SslSocketPrivate::AsyncPromise);
+        SslSocketPrivate::AsyncPromise promise;
+        auto oldPromisePtr = d->sendPromisePtr.exchange(&promise);
+        NX_ASSERT(oldPromisePtr == nullptr);
+
         nx::Buffer localBuffer(static_cast<const char*>(buffer), bufferLen);
         sendAsync(
             localBuffer,
-            [&](SystemError::ErrorCode code, size_t size)
+            [d](SystemError::ErrorCode code, size_t size)
             {
-                d->sendPromise->set_value(std::make_pair(code, size));
-                d->sendPromise.reset();
+                if (auto promisePtr = d->sendPromisePtr.exchange(nullptr))
+                    promisePtr->set_value({code, size});
             });
 
-        const auto result = d->sendPromise->get_future().get();
+        const auto result = promise.get_future().get();
         if (result.first != SystemError::noError)
             SystemError::setLastErrorCode(result.first);
 
@@ -1621,6 +1676,15 @@ bool SslSocket::enableClientEncryption()
     return doHandshake();
 }
 
+bool SslSocket::isEncryptionEnabled() const
+{
+    Q_D(const SslSocket);
+    if (d->ioMode == IOMode::ASYNC)
+        return d->asyncSslHelper->isSsl();
+    else
+        return d->ecnryptionEnabled;
+}
+
 void SslSocket::cancelIOAsync(
     nx::network::aio::EventType eventType,
     nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
@@ -1664,7 +1728,8 @@ bool SslSocket::getNonBlockingMode(bool* val) const
 
 bool SslSocket::shutdown()
 {
-    Q_D(const SslSocket);
+    Q_D(SslSocket);
+    d->shutdown.store(true);
     if (!d->emulateBlockingMode)
     {
         d->wrappedSocket->pleaseStopSync();
@@ -1672,17 +1737,17 @@ bool SslSocket::shutdown()
     }
 
     utils::promise<void> promise;
-    d->wrappedSocket->dispatch([&]()
-    {
-        if (d->sendPromise)
-            d->sendPromise->set_value({0, SystemError::interrupted});
+    d->wrappedSocket->pleaseStop(
+        [d, &promise]()
+        {
+            if (auto promisePtr = d->sendPromisePtr.exchange(nullptr))
+                promisePtr->set_value({SystemError::interrupted, 0});
 
-        if (d->recvPromise)
-            d->recvPromise->set_value({0, SystemError::interrupted});
+            if (auto promisePtr = d->recvPromisePtr.exchange(nullptr))
+                promisePtr->set_value({SystemError::interrupted, 0});
 
-        d->wrappedSocket->pleaseStopSync();
-        promise.set_value();
-    });
+            promise.set_value();
+        });
 
     promise.get_future().wait();
     return d->wrappedSocket->shutdown();

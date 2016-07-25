@@ -41,7 +41,7 @@ struct QnMediaContextSerializableData
     /// Fields defined in ffmpeg's AVCodecContext.
     //@{
 
-    CodecID codecId;
+    AVCodecID codecId;
     AVMediaType codecType;
     QByteArray rcEq; ///< Empty (represents char* null) or nul-terminated.
     QByteArray extradata;

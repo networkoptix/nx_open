@@ -21,7 +21,7 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
         m_size = size;
         QSize newSize(frame->width * m_layout->size().width(), frame->height * m_layout->size().height());
         if (m_tiledFrame)
-            m_tiledFrame = CLVideoDecoderOutputPtr(m_tiledFrame->scaled(newSize, (PixelFormat) frame->format));
+            m_tiledFrame = CLVideoDecoderOutputPtr(m_tiledFrame->scaled(newSize, (AVPixelFormat) frame->format));
         else {
             m_tiledFrame = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
             m_tiledFrame->reallocate(newSize, frame->format);

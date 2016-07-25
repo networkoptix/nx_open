@@ -57,8 +57,10 @@ namespace
 
     const QString kNameStatisticsAllowed(lit("statisticsAllowed"));
     const QString kNameStatisticsReportLastTime(lit("statisticsReportLastTime"));
+    const QString kNameStatisticsReportLastVersion(lit("statisticsReportLastVersion"));
     const QString kNameStatisticsReportLastNumber(lit("statisticsReportLastNumber"));
     const QString kNameStatisticsReportTimeCycle(lit("statisticsReportTimeCycle"));
+    const QString kNameStatisticsReportUpdateDelay(lit("statisticsReportUpdateDelay"));
     const QString kNameSystemId(lit("systemId"));
     const QString kNameSystemNameForId(lit("systemNameForId"));
     const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
@@ -183,8 +185,10 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initStaticticsAdaptors()
 {
     m_statisticsAllowedAdaptor = new QnLexicalResourcePropertyAdaptor<QnOptionalBool>(kNameStatisticsAllowed, QnOptionalBool(), this);
     m_statisticsReportLastTimeAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportLastTime, QString(), this);
+    m_statisticsReportLastVersionAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportLastVersion, QString(), this);
     m_statisticsReportLastNumberAdaptor = new QnLexicalResourcePropertyAdaptor<int>(kNameStatisticsReportLastNumber, 0, this);
     m_statisticsReportTimeCycleAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportTimeCycle, QString(), this);
+    m_statisticsReportUpdateDelayAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportUpdateDelay, QString(), this);
     m_systemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(kNameSystemId, QnUuid(), this);
     m_systemNameForIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSystemNameForId, QString(), this);
     m_statisticsReportServerApiAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportServerApi, QString(), this);
@@ -195,8 +199,10 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initStaticticsAdaptors()
     result
         << m_statisticsAllowedAdaptor
         << m_statisticsReportLastTimeAdaptor
+        << m_statisticsReportLastVersionAdaptor
         << m_statisticsReportLastNumberAdaptor
         << m_statisticsReportTimeCycleAdaptor
+        << m_statisticsReportUpdateDelayAdaptor
         << m_systemIdAdaptor
         << m_systemNameForIdAdaptor
         << m_statisticsReportServerApiAdaptor
@@ -283,7 +289,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpdateNotificationsEnabled, true, this);
     m_backupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(kNameBackupQualities, Qn::CameraBackup_Both, this);
     m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameBackupNewCamerasByDefault, false, this);
-	m_crossdomainXmlEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCrossdomainEnabled, true, this);
     m_upnpPortMappingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpnpPortMappingEnabled, true, this);
     m_newSystemAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameNewSystem, false, this);
 
@@ -309,7 +314,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_updateNotificationsEnabledAdaptor
         << m_backupQualitiesAdaptor
         << m_backupNewCamerasByDefaultAdaptor
-		<< m_crossdomainXmlEnabledAdaptor
         << m_upnpPortMappingEnabledAdaptor
         << m_newSystemAdaptor
         << m_arecontRtspEnabledAdaptor
@@ -362,16 +366,6 @@ void QnGlobalSettings::setServerAutoDiscoveryEnabled(bool enabled)
     m_serverAutoDiscoveryEnabledAdaptor->setValue(enabled);
 }
 
-bool QnGlobalSettings::isCrossdomainXmlEnabled() const
-{
-    return m_crossdomainXmlEnabledAdaptor->value();
-}
-
-void QnGlobalSettings::setCrossdomainXmlEnabled(bool enabled)
-{
-    m_crossdomainXmlEnabledAdaptor->setValue(enabled);
-}
-
 void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     if(m_admin)
         return;
@@ -380,7 +374,8 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     if(!user)
         return;
 
-    if(!user->isOwner())
+    // todo: refactor this. Globabal settings should be moved from admin user to another place
+    if(user->getName() != lit("admin"))
         return;
 
     {
@@ -488,6 +483,20 @@ bool QnGlobalSettings::synchronizeNowSync()
     return propertyDictionary->saveParams(m_admin->getId());
 }
 
+bool QnGlobalSettings::takeFromSettings(QSettings* settings)
+{
+    bool changed = false;
+
+    changed |= m_statisticsReportTimeCycleAdaptor->takeFromSettings(settings);
+    changed |= m_statisticsReportUpdateDelayAdaptor->takeFromSettings(settings);
+    changed |= m_statisticsReportServerApiAdaptor->takeFromSettings(settings);
+
+    changed |= m_cloudSystemIDAdaptor->takeFromSettings(settings);
+    changed |= m_cloudAuthKeyAdaptor->takeFromSettings(settings);
+
+    return changed ? synchronizeNowSync() : false;
+}
+
 bool QnGlobalSettings::isUpdateNotificationsEnabled() const
 {
     return m_updateNotificationsEnabledAdaptor->value();
@@ -545,6 +554,16 @@ void QnGlobalSettings::setStatisticsReportLastTime(const QDateTime& value)
     m_statisticsReportLastTimeAdaptor->setValue(value.toString(Qt::ISODate));
 }
 
+QString QnGlobalSettings::statisticsReportLastVersion() const
+{
+    return m_statisticsReportLastVersionAdaptor->value();
+}
+
+void QnGlobalSettings::setStatisticsReportLastVersion(const QString& value)
+{
+    m_statisticsReportLastVersionAdaptor->setValue(value);
+}
+
 int QnGlobalSettings::statisticsReportLastNumber() const
 {
     return m_statisticsReportLastNumberAdaptor->value();
@@ -563,6 +582,16 @@ QString QnGlobalSettings::statisticsReportTimeCycle() const
 void QnGlobalSettings::setStatisticsReportTimeCycle(const QString& value)
 {
     m_statisticsReportTimeCycleAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::statisticsReportUpdateDelay() const
+{
+    return m_statisticsReportUpdateDelayAdaptor->value();
+}
+
+void QnGlobalSettings::setStatisticsReportUpdateDelay(const QString& value)
+{
+    m_statisticsReportUpdateDelayAdaptor->setValue(value);
 }
 
 const QString QnGlobalSettings::kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));

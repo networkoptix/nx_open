@@ -51,13 +51,14 @@ public:
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-    
+
     void clear();
     void setModelData(const QnRecordingStatsReply& data);
     QnRecordingStatsReply modelData() const;
 
     QnRecordingStatsColors colors() const;
     void setColors(const QnRecordingStatsColors &colors);
+    void setHeaderTextBlocked(bool value);
 signals:
     void colorsChanged();
 private:
@@ -81,4 +82,5 @@ private:
 
     QnRecordingStatsColors m_colors;
     bool m_isForecastRole;
+    bool m_isHeaderTextBlocked;
 };

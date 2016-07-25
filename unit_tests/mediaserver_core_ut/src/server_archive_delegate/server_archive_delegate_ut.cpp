@@ -19,6 +19,7 @@ extern "C" {
 #include <utils/common/util.h>
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/common/writer_pool.h>
+#include <nx/utils/log/log.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -213,9 +214,8 @@ public:
 
     void print() const
     {
-        qDebug() << lit("We have %1 files, %2 time periods")
-                        .arg(m_fileCount)
-                        .arg(m_timeLine.m_timeLine.size());
+        NX_LOGX(lm("We have %1 files, %2 time periods")
+            .arg(m_fileCount).arg(m_timeLine.m_timeLine.size()), cl_logDEBUG1);
 
         //qint64 prevStartTime;
         //int prevDuration;

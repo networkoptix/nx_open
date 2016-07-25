@@ -54,6 +54,8 @@ struct QnModuleInformation;
 */
 namespace ec2
 {
+class ECConnectionNotificationManager;
+
     struct QnPeerTimeInfo {
 
         QnPeerTimeInfo():
@@ -678,6 +680,11 @@ namespace ec2
         virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() = 0;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
+        virtual ECConnectionNotificationManager* notificationManager() 
+        { 
+            NX_ASSERT(0);
+            return nullptr; 
+        }
 
         /*!
             \param handler Functor with params: (requestID, ErrorCode, QByteArray dbFile)

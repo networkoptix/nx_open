@@ -7,8 +7,7 @@
 #include <core/resource/user_resource.h>
 
 #include <common/common_module.h>
-#include <common/systemexcept_linux.h>
-#include <common/systemexcept_win32.h>
+#include <common/systemexcept.h>
 
 #include <utils/common/app_info.h>
 #include <nx/utils/log/log.h>

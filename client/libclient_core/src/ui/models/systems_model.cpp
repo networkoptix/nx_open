@@ -13,13 +13,12 @@
 
 namespace
 {
-    enum { kMaxTilesCount = 8 };
-
     enum RoleId
     {
         FirstRoleId = Qt::UserRole + 1
 
-        , SystemNameRoleId = FirstRoleId
+        , SearchRoleId = FirstRoleId
+        , SystemNameRoleId
         , SystemIdRoleId
 
         , OwnerDescriptionRoleId
@@ -127,8 +126,8 @@ public:
     QString getIncompatibleCustomization(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCorrectCustomization(const QnSystemDescriptionPtr& systemDescription) const;
     bool isFactorySystem(const QnSystemDescriptionPtr& systemDescription) const;
+    QString getDisplayName(const QnSystemDescriptionPtr& systemDescription) const;
 
-    const int maxCount;
     QnDisconnectHelper disconnectHelper;
     InternalList internalData;
     QnSoftwareVersion minimalVersion;
@@ -168,7 +167,7 @@ int QnSystemsModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
 
-    return std::min(d->internalData.count(), d->maxCount);
+    return d->internalData.count();
 }
 
 QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
@@ -185,48 +184,62 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
     const auto systemDescription = d->internalData[row]->system;
     switch(role)
     {
-    case SystemNameRoleId:
-        return systemDescription->name();
-    case SystemIdRoleId:
-        return systemDescription->id();
-    case OwnerDescriptionRoleId:
-    {
-        if (!systemDescription->isCloudSystem())
-            return QString(); // No owner for local system
-
-        if ((qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Online)
-            && (qnCloudStatusWatcher->cloudLogin() == systemDescription->ownerAccountEmail()))
+        case SearchRoleId:
         {
-            return tr("Your system");
+            QString hosts;
+            for (const auto& moduleInfo : systemDescription->servers())
+            {
+                hosts.append(systemDescription->getServerHost(moduleInfo.id));
+                hosts.append(lit(" "));
+            }
+
+            return QStringList({data(index, SystemNameRoleId).toString(),
+                data(index, OwnerDescriptionRoleId).toString(),
+                systemDescription->ownerAccountEmail(), hosts}
+                ).join(lit(" "));
         }
+        case SystemNameRoleId:
+            return d->getDisplayName(systemDescription);
+        case SystemIdRoleId:
+            return systemDescription->id();
+        case OwnerDescriptionRoleId:
+        {
+            if (!systemDescription->isCloudSystem())
+                return QString(); // No owner for local system
 
-        const auto fullName = systemDescription->ownerFullName();
-        return (fullName.isEmpty() ? systemDescription->ownerAccountEmail()
-            : tr("%1's system", "%1 is a user name").arg(fullName));
-    }
-    case LastPasswordsModelRoleId:
-        return QVariant();  // TODO
-    case IsFactorySystemRoleId:
-        return d->isFactorySystem(systemDescription);
-    case IsCloudSystemRoleId:
-        return systemDescription->isCloudSystem();
-    case IsOnlineRoleId:
-        return !systemDescription->servers().isEmpty();
-    case IsCompatibleRoleId:
-        return d->isCompatibleSystem(systemDescription);
-    case IsCorrectCustomizationRoleId:
-        return d->isCorrectCustomization(systemDescription);
-    case IsCompatibleVersionRoleId:
-        return d->isCompatibleVersion(systemDescription);
-    case WrongVersionRoleId:
-        return d->getIncompatibleVersion(systemDescription);
-    case CompatibleVersionRoleId:
-        return d->getCompatibleVersion(systemDescription);
-    case WrongCustomizationRoleId:
-        return d->getIncompatibleCustomization(systemDescription);
+            if ((qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Online)
+                && (qnCloudStatusWatcher->cloudLogin() == systemDescription->ownerAccountEmail()))
+            {
+                return tr("Your system");
+            }
 
-    default:
-        return QVariant();
+            const auto fullName = systemDescription->ownerFullName();
+            return (fullName.isEmpty() ? systemDescription->ownerAccountEmail()
+                : tr("%1's system", "%1 is a user name").arg(fullName));
+        }
+        case LastPasswordsModelRoleId:
+            return QVariant();  // TODO
+        case IsFactorySystemRoleId:
+            return d->isFactorySystem(systemDescription);
+        case IsCloudSystemRoleId:
+            return systemDescription->isCloudSystem();
+        case IsOnlineRoleId:
+            return !systemDescription->servers().isEmpty();
+        case IsCompatibleRoleId:
+            return d->isCompatibleSystem(systemDescription);
+        case IsCorrectCustomizationRoleId:
+            return d->isCorrectCustomization(systemDescription);
+        case IsCompatibleVersionRoleId:
+            return d->isCompatibleVersion(systemDescription);
+        case WrongVersionRoleId:
+            return d->getIncompatibleVersion(systemDescription);
+        case CompatibleVersionRoleId:
+            return d->getCompatibleVersion(systemDescription);
+        case WrongCustomizationRoleId:
+            return d->getIncompatibleCustomization(systemDescription);
+
+        default:
+            return QVariant();
     }
 }
 
@@ -260,7 +273,6 @@ RoleNames QnSystemsModel::roleNames() const
 QnSystemsModelPrivate::QnSystemsModelPrivate(QnSystemsModel* parent)
     : base_type(parent)
     , q_ptr(parent)
-    , maxCount(kMaxTilesCount)    // TODO: do we need to change it dynamically or from outside? Think about it.
     , disconnectHelper()
     , internalData()
     , minimalVersion(1, 0)
@@ -275,7 +287,8 @@ void QnSystemsModelPrivate::updateOwnerDescription()
     if (!count)
         return;
 
-    emit q->dataChanged(q->index(0), q->index(count - 1), QVector<int>{ OwnerDescriptionRoleId });
+    emit q->dataChanged(q->index(0), q->index(count - 1), QVector<int>()
+        << OwnerDescriptionRoleId << SearchRoleId);
 }
 
 void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescription)
@@ -291,60 +304,49 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
     const int position = (insertPos == internalData.end()
         ? internalData.size() : insertPos - internalData.begin());
 
-    const auto serverChangedHandler = [this, systemDescription]
-        (const QnUuid &serverId, QnServerFields fields)
+    data->connections << connect(systemDescription, &QnBaseSystemDescription::serverChanged, this,
+        [this, systemDescription] (const QnUuid &serverId, QnServerFields fields)
+        {
+            at_serverChanged(systemDescription, serverId, fields);
+        }
+    );
+
+    data->connections << connect(systemDescription, &QnBaseSystemDescription::idChanged,this,
+        [this, systemDescription]()
+        {
+            emitDataChanged(systemDescription, QVector<int>() << SystemIdRoleId);
+        }
+    );
+
+    data->connections << connect(systemDescription, &QnBaseSystemDescription::isCloudSystemChanged, this,
+        [this, systemDescription]()
+        {
+            // Move system to right place. No data will not be preserved in case of cloud-to-system (and vice versa) state change
+            removeSystem(systemDescription->id());
+            addSystem(systemDescription);
+        }
+    );
+
+    data->connections << connect(systemDescription, &QnBaseSystemDescription::ownerChanged, this,
+        [this, systemDescription]()
+        {
+            emitDataChanged(systemDescription, QVector<int>() << OwnerDescriptionRoleId << SearchRoleId);
+        }
+    );
+
+    const auto serverAction = [this, systemDescription](const QnUuid& id)
     {
-        at_serverChanged(systemDescription, serverId, fields);
+        emitDataChanged(systemDescription, QVector<int>() << SearchRoleId);
     };
 
-    data->connections <<
-        connect(systemDescription, &QnBaseSystemDescription::serverChanged,
-                this, serverChangedHandler);
+    data->connections
+        << connect(systemDescription, &QnBaseSystemDescription::serverAdded, this, serverAction);
+    data->connections
+        << connect(systemDescription, &QnBaseSystemDescription::serverRemoved, this, serverAction);
 
-    data->connections << connect(systemDescription, &QnBaseSystemDescription::idChanged,this, [this, systemDescription]()
-    {
-        emitDataChanged(systemDescription, QVector<int>() << SystemIdRoleId);
-    });
-
-    data->connections << connect(systemDescription, &QnBaseSystemDescription::isCloudSystemChanged, this, [this, systemDescription]()
-    {
-        // Move system to right place. No data will not be preserved in case of cloud-to-system (and vice versa) state change 
-        removeSystem(systemDescription->id());
-        addSystem(systemDescription);
-    });
-
-    data->connections << connect(systemDescription, &QnBaseSystemDescription::ownerChanged, this, [this, systemDescription]()
-    {
-        emitDataChanged(systemDescription, QVector<int>() << OwnerDescriptionRoleId);
-    });
-
-    const bool isMaximumNumber = (internalData.size() >= maxCount);
-    const bool emitInsertSignal = (position < maxCount);
-
-    {
-        const auto beginInsertRowsCallback = [this, position]()
-        {
-            Q_Q(QnSystemsModel);
-            q->beginInsertRows(QModelIndex(), position, position);
-        };
-        const auto endInserRowsCallback = [this]()
-        {
-            Q_Q(QnSystemsModel);
-            q->endInsertRows();
-        };
-
-        const auto insertionGuard = (emitInsertSignal ?
-            QnRaiiGuard::create(beginInsertRowsCallback, endInserRowsCallback)
-            : QnRaiiGuard::createEmpty());
-
-        internalData.insert(insertPos, data);
-    }
-
-    if (emitInsertSignal && isMaximumNumber)
-    {
-        q->beginRemoveRows(QModelIndex(), maxCount, maxCount);
-        q->endRemoveRows();
-    }
+    q->beginInsertRows(QModelIndex(), position, position);
+    internalData.insert(insertPos, data);
+    q->endInsertRows();
 }
 
 void QnSystemsModelPrivate::removeSystem(const QString &systemId)
@@ -361,31 +363,10 @@ void QnSystemsModelPrivate::removeSystem(const QString &systemId)
         return;
 
     const int position = (removeIt - internalData.begin());
-    const bool moreThanMaximum = (internalData.size() > maxCount);
-    const bool emitRemoveSignal = (position <= maxCount);
 
-    {
-        internalData.erase(removeIt);
-
-        const auto beginRemoveRowsHandler = [q, position]()
-        {
-            q->beginRemoveRows(QModelIndex(), position, position);
-        };
-        const auto endRemoveRowsHandler = [q]()
-        {
-            q->endRemoveRows();
-        };
-
-        const auto removeGuard = (emitRemoveSignal
-            ? QnRaiiGuard::create(beginRemoveRowsHandler, endRemoveRowsHandler)
-            : QnRaiiGuard::createEmpty());
-    }
-
-    if (emitRemoveSignal && moreThanMaximum)
-    {
-        q->beginInsertRows(QModelIndex(), maxCount - 1, maxCount - 1);
-        q->endInsertRows();
-    }
+    q->beginRemoveRows(QModelIndex(), position, position);
+    internalData.erase(removeIt);
+    q->endRemoveRows();
 }
 
 QnSystemsModelPrivate::InternalList::iterator QnSystemsModelPrivate::getInternalDataIt(
@@ -406,7 +387,7 @@ QnSystemsModelPrivate::InternalList::iterator QnSystemsModelPrivate::getInternal
 void QnSystemsModelPrivate::emitDataChanged(const QnSystemDescriptionPtr& systemDescription
     , QVector<int> roles)
 {
-    const auto dataIt = std::find_if(internalData.begin(), internalData.end(), 
+    const auto dataIt = std::find_if(internalData.begin(), internalData.end(),
         [id = systemDescription->id()](const InternalSystemDataPtr &value)
     {
         return (value->system->id() == id);
@@ -414,7 +395,7 @@ void QnSystemsModelPrivate::emitDataChanged(const QnSystemDescriptionPtr& system
 
     if (dataIt == internalData.end())
         return;
-    
+
     Q_Q(QnSystemsModel);
 
     const int row = (dataIt - internalData.begin());
@@ -439,7 +420,7 @@ void QnSystemsModelPrivate::at_serverChanged(
         removeSystem(systemDescription->id());
         addSystem(systemDescription);
     }
-    
+
     const auto dataIt = getInternalDataIt(systemDescription);
     if (dataIt == internalData.end())
         return;
@@ -450,7 +431,7 @@ void QnSystemsModelPrivate::at_serverChanged(
     const auto testFlag = [this, q, modelIndex, fields](QnServerField field, int role)
     {
         if (fields.testFlag(field))
-            emit q->dataChanged(modelIndex, modelIndex, QVector<int>(1, role));
+            emit q->dataChanged(modelIndex, modelIndex, QVector<int>() << role << SearchRoleId);
     };
 
     testFlag(QnServerField::HostField, IsOnlineRoleId);
@@ -529,7 +510,7 @@ QString QnSystemsModelPrivate::getIncompatibleVersion(
 
     const auto incompatibleIt =
         std::find_if(servers.begin(), servers.end(), predicate);
-    return (incompatibleIt == servers.end() ? QString() : 
+    return (incompatibleIt == servers.end() ? QString() :
         incompatibleIt->version.toString(QnSoftwareVersion::BugfixFormat));
 }
 
@@ -577,9 +558,6 @@ bool QnSystemsModelPrivate::isCorrectCustomization(
 bool QnSystemsModelPrivate::isFactorySystem(
         const QnSystemDescriptionPtr& systemDescription) const
 {
-    if (systemDescription->isCloudSystem())
-        return false;
-
     const auto servers = systemDescription->servers();
     if (servers.isEmpty())
         return false;
@@ -592,4 +570,9 @@ bool QnSystemsModelPrivate::isFactorySystem(
     const bool isFactory =
         std::any_of(servers.begin(), servers.end(), predicate);
     return isFactory;
+}
+
+QString QnSystemsModelPrivate::getDisplayName(const QnSystemDescriptionPtr& systemDescription) const
+{
+    return (isFactorySystem(systemDescription) ? tr("New system") : systemDescription->name());
 }

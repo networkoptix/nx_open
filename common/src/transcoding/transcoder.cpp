@@ -21,7 +21,7 @@
 #include <nx/fusion/serialization/json.h>
 
 // ---------------------------- QnCodecTranscoder ------------------
-QnCodecTranscoder::QnCodecTranscoder(CodecID codecId)
+QnCodecTranscoder::QnCodecTranscoder(AVCodecID codecId)
 :
     m_bitrate(-1),
     m_quality(Qn::QualityNormal)
@@ -83,7 +83,7 @@ QSize QnCodecTranscoder::roundSize(const QSize& size)
 
 // --------------------------- QnVideoTranscoder -----------------
 
-QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):
+QnVideoTranscoder::QnVideoTranscoder(AVCodecID codecId):
     QnCodecTranscoder(codecId)
 {
 
@@ -174,8 +174,8 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
 
 QnTranscoder::QnTranscoder():
-    m_videoCodec(CODEC_ID_NONE),
-    m_audioCodec(CODEC_ID_NONE),
+    m_videoCodec(AV_CODEC_ID_NONE),
+    m_audioCodec(AV_CODEC_ID_NONE),
     m_videoStreamCopy(false),
     m_audioStreamCopy(false),
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
@@ -196,7 +196,7 @@ QnTranscoder::~QnTranscoder()
 }
 
 int QnTranscoder::suggestMediaStreamParams(
-    CodecID codec,
+    AVCodecID codec,
     QSize resolution,
     Qn::StreamQuality quality,
     QnCodecParams::Value* const params )
@@ -233,7 +233,7 @@ int QnTranscoder::suggestMediaStreamParams(
 
     int result = hiEnd * resolutionFactor;
 
-    if( codec == CODEC_ID_MJPEG )
+    if( codec == AV_CODEC_ID_MJPEG )
     {
         //setting qmin and qmax, since mjpeg encoder uses only these
         if( params && !params->contains(QnCodecParams::qmin) && !params->contains(QnCodecParams::qmax) )
@@ -269,7 +269,7 @@ int QnTranscoder::suggestMediaStreamParams(
 }
 
 int QnTranscoder::setVideoCodec(
-    CodecID codec,
+    AVCodecID codec,
     TranscodeMethod method,
     Qn::StreamQuality quality,
     const QSize& resolution,
@@ -300,7 +300,7 @@ int QnTranscoder::setVideoCodec(
             m_extraTranscodeParams.setCodec(codec);
             ffmpegTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(resolution));
 
-            if (codec != CODEC_ID_H263P) {
+            if (codec != AV_CODEC_ID_H263P) {
                 // H263P has bug for multi thread encoding in current ffmpeg version
                 bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
                 if (isAtom || resolution.height() >= 1080)
@@ -331,7 +331,7 @@ void QnTranscoder::setUseRealTimeOptimization(bool value)
         m_vTranscoder->setUseRealTimeOptimization(value);
 }
 
-QnTranscoder::OperationResult QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
+QnTranscoder::OperationResult QnTranscoder::setAudioCodec(AVCodecID codec, TranscodeMethod method)
 {
     m_audioCodec = codec;
     switch (method)
@@ -388,12 +388,12 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         else
             m_delayedAudioQueue << std::dynamic_pointer_cast<const QnCompressedAudioData> (media);
         doTranscoding = false;
-        if (m_videoCodec != CODEC_ID_NONE && m_delayedVideoQueue.isEmpty()
+        if (m_videoCodec != AV_CODEC_ID_NONE && m_delayedVideoQueue.isEmpty()
                                           && m_delayedAudioQueue.size() < kMaxDelayedQueueSize)
         {
             return 0; // not ready to init
         }
-        if (m_audioCodec != CODEC_ID_NONE && m_delayedAudioQueue.isEmpty()
+        if (m_audioCodec != AV_CODEC_ID_NONE && m_delayedAudioQueue.isEmpty()
                                           && m_delayedVideoQueue.size() < kMaxDelayedQueueSize)
         {
             return 0; // not ready to init

@@ -30,7 +30,6 @@ public:
 
         connect(qnResPool, &QnResourcePool::resourceAdded,   this, &QnUserListModelPrivate::at_resourcePool_resourceAdded);
         connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnUserListModelPrivate::at_resourcePool_resourceRemoved);
-        connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
 
         connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated, this,
             [this](const ec2::ApiUserGroupData& group)
@@ -264,7 +263,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
             {
                 case LoginColumn        : return user->getName();
                 case FullNameColumn     : return user->fullName();
-                case UserRoleColumn     : return accessController()->userRoleName(user);
+                case UserRoleColumn     : return qnResourceAccessManager->userRoleName(user);
                 default                 : break;
 
             } // switch (column)
@@ -349,7 +348,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
         case Qn::DisabledRole:
         {
             if (index.column() == EnabledColumn)
-                return user->isOwner();
+                return !accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission);
             break;
         }
 
@@ -466,9 +465,6 @@ bool QnSortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex&
     {
         case QnUserListModel::EnabledColumn:
         {
-            if (leftUser->isOwner())
-                return true;
-
             bool leftEnabled = leftUser->isEnabled();
             bool rightEnabled = rightUser->isEnabled();
             if (leftEnabled != rightEnabled)

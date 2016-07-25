@@ -45,12 +45,22 @@ QnSystemDescriptionPtr QnDirectSystemsFinder::getSystem(const QString &id) const
 
     const auto it = std::find_if(systemDescriptions.begin()
         , systemDescriptions.end(), predicate);
-    
-    return (it == systemDescriptions.end() 
+
+    return (it == systemDescriptions.end()
         ? QnSystemDescriptionPtr() : QnSystemDescriptionPtr(*it));
 }
 
-void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformation)
+QString getTargetSystemId(const QnModuleInformation& serverInfo)
+{
+    if (serverInfo.serverFlags.testFlag(Qn::SF_NewSystem))
+        return serverInfo.id.toString();
+    else if (!serverInfo.cloudSystemId.isEmpty())
+        return serverInfo.cloudSystemId;
+
+    return serverInfo.systemName;
+}
+
+void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
 {
     const auto systemIt = getSystemItByServer(moduleInformation.id);
     if (systemIt != m_systems.end())
@@ -59,16 +69,15 @@ void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformati
         return;
     }
 
-    auto itSystem = m_systems.find(moduleInformation.systemName);
+    const auto systemId = getTargetSystemId(moduleInformation);
+    auto itSystem = m_systems.find(systemId);
     const auto createNewSystem = (itSystem == m_systems.end());
     if (createNewSystem)
     {
-        const auto localSystemId = QnUuid::createUuid().toString();
         const auto systemDescription = QnSystemDescription::createLocalSystem(
-            localSystemId, moduleInformation.systemName);
+            systemId, moduleInformation.systemName);
 
-        itSystem = m_systems.insert(
-            moduleInformation.systemName, systemDescription);
+        itSystem = m_systems.insert(systemId, systemDescription);
     }
 
     const auto systemDescription = itSystem.value();
@@ -76,8 +85,8 @@ void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformati
         systemDescription->updateServer(moduleInformation);
     else
         systemDescription->addServer(moduleInformation, QnSystemDescription::kDefaultPriority);
-    
-    m_serverToSystem[moduleInformation.id] = systemDescription->name();
+
+    m_serverToSystem[moduleInformation.id] = systemId;
 
     if (createNewSystem)
         emit systemDiscovered(systemDescription);
@@ -114,11 +123,15 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
 
     auto systemDescription = systemIt.value();
     const auto changes = systemDescription->updateServer(moduleInformation);
-    if (!changes.testFlag(QnServerField::SystemNameField))
+    if (!changes.testFlag(QnServerField::SystemNameField)
+        && !changes.testFlag(QnServerField::IsFactoryFlag)
+        && !changes.testFlag(QnServerField::CloudIdField))
+    {
         return;
+    }
 
-    // System name has changed. We have to remove server from current 
-    // system and add to new
+    // System name or factory status has changed. We have to
+    // remove server from current system and add to new
     const auto serverHost = systemDescription->getServerHost(moduleInformation.id);
     removeServer(moduleInformation);
     addServer(moduleInformation);
@@ -145,8 +158,8 @@ QnDirectSystemsFinder::getSystemItByServer(const QnUuid &serverId)
     if (it == m_serverToSystem.end())
         return m_systems.end();
 
-    const auto systemName = it.value();
-    return m_systems.find(systemName);
+    const auto systemId = it.value();
+    return m_systems.find(systemId);
 }
 
 

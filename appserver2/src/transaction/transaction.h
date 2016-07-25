@@ -25,47 +25,92 @@ APPLY(1, tranSyncRequest, ApiSyncRequestData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(2, tranSyncResponse, QnTranStateResponse, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(3, lockRequest, ApiLockData, \
                        false, /* persistent*/ \
                        true, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(4, lockResponse, ApiLockData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(5, unlockRequest, ApiLockData, \
                        false, /* persistent*/ \
                        true, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(6, peerAliveInfo, ApiPeerAliveData, \
                        false, /* persistent*/ \
                        true, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       AllowForAllAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(7, tranSyncDone, ApiTranSyncDoneData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(100, testConnection, ApiLoginData, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(101, connect, ApiLoginData, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(102, openReverseConnection, ApiReverseConnectionData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
@@ -74,32 +119,62 @@ APPLY(102, openReverseConnection, ApiReverseConnectionData, \
                        { \
                             NX_ASSERT(tran.command == ApiCommand::openReverseConnection); \
                             emit notificationParams.ecConnection->reverseConnectionRequested(tran.params); \
-                       })  /* trigger notification*/ \
+                       },  /* trigger notification*/ \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(201, removeResource, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       &apiIdDataTriggerNotificationHelper) /* trigger notification*/ \
+                       &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(202, setResourceStatus, ApiResourceStatusData, \
                        true,  /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdRfc4122Helper(), /* getHash*/ \
-                       ResourceNotificationManagerHelper()) \
+                       ResourceNotificationManagerHelper(), \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(204, setResourceParams, ApiResourceParamWithRefDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       ResourceNotificationManagerHelper()) \
+                       ResourceNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceParamAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceParamAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(203, getResourceParams, ApiResourceParamWithRefDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       ResourceNotificationManagerHelper()) \
+                       ResourceNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceParamAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceParamAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(205, getResourceTypes, ApiResourceTypeDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(206, getFullInfo, ApiFullInfoData, \
                        false, /* persistent*/ \
                        false, /* system*/ \
@@ -109,42 +184,82 @@ APPLY(206, getFullInfo, ApiFullInfoData, \
                            emit notificationParams.ecConnection->initNotification(tran.params); \
                            for(const ApiDiscoveryData& data: tran.params.discoveryData) \
                                notificationParams.discoveryNotificationManager->triggerNotification(data); \
-                       }) \
+                       }, \
+                       AllowForAllAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(208, setResourceParam, ApiResourceParamWithRefData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashForResourceParamWithRefDataHelper(), /* getHash*/ \
-                       ResourceNotificationManagerHelper()) \
+                       ResourceNotificationManagerHelper(), \
+                       ModifyResourceParamAccess(), /* save permission checker */ \
+                       ReadResourceParamAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       ReadResourceParamAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(209, removeResourceParam, ApiResourceParamWithRefData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashForResourceParamWithRefDataHelper(), /* getHash*/ \
-                       ResourceNotificationManagerHelper()) \
+                       ResourceNotificationManagerHelper(), \
+                       ModifyResourceParamAccess(), /* save permission checker */ \
+                       ReadResourceParamAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(210, removeResourceParams, ApiResourceParamWithRefDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       ResourceNotificationManagerHelper()) \
+                       ResourceNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceParamAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(211, getStatusList, ApiResourceStatusDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(212, removeResources, ApiIdDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       &apiIdDataListTriggerNotificationHelper) \
+                       &apiIdDataListTriggerNotificationHelper, \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(300, getCameras, ApiCameraDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       CameraNotificationManagerHelper()) \
+                       CameraNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(301, saveCamera, ApiCameraData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       CameraNotificationManagerHelper()) \
+                       CameraNotificationManagerHelper(), \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(302, saveCameras, ApiCameraDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -152,227 +267,462 @@ APPLY(302, saveCameras, ApiCameraDataList, \
                        [] (const QnTransaction<ApiCameraDataList> &tran, const NotificationParams &notificationParams) \
                          { \
                             notificationParams.cameraNotificationManager->triggerNotification(tran); \
-                         }) \
+                         }, \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(303, removeCamera, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       &apiIdDataTriggerNotificationHelper) \
+                       &apiIdDataTriggerNotificationHelper, \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(304, getCameraHistoryItems, ApiServerFootageDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyFootageDataAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadFootageDataAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadFootageDataAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(305, addCameraHistoryItem, ApiServerFootageData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        &createHashForServerFootageDataHelper, /* getHash*/ \
-                       CameraNotificationManagerHelper()) \
+                       CameraNotificationManagerHelper(), \
+                       ModifyFootageDataAccess(), /* save permission checker */ \
+                       ReadFootageDataAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       ReadFootageDataAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(309, removeCameraHistoryItem, ApiServerFootageData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        &createHashForServerFootageDataHelper, /* getHash*/ \
-                       CameraNotificationManagerHelper()) \
+                       CameraNotificationManagerHelper(), \
+                       ModifyFootageDataAccess(), /* save permission checker */ \
+                       ReadFootageDataAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(310, saveCameraUserAttributes, ApiCameraAttributesData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        &createHashForApiCameraAttributesDataHelper, /* getHash*/ \
-                       CameraNotificationManagerHelper()) \
+                       CameraNotificationManagerHelper(), \
+                       ModifyCameraAttributesAccess(), /* save permission checker */ \
+                       ReadCameraAttributesAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       ReadCameraAttributesAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(311, saveCameraUserAttributesList, ApiCameraAttributesDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       CameraNotificationManagerHelper()) \
+                       CameraNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyCameraAttributesAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadCameraAttributesAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadCameraAttributesAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(312, getCameraUserAttributes, ApiCameraAttributesDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       CameraNotificationManagerHelper()) \
+                       CameraNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyCameraAttributesAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadCameraAttributesAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadCameraAttributesAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(313, getCamerasEx, ApiCameraDataExList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(314, removeCameraUserAttributes, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       &apiIdDataTriggerNotificationHelper) \
+                       &apiIdDataTriggerNotificationHelper, \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(400, getMediaServers, ApiMediaServerDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(401, saveMediaServer, ApiMediaServerData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       MediaServerNotificationManagerHelper()) \
+                       MediaServerNotificationManagerHelper(), \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(402, removeMediaServer, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       &apiIdDataTriggerNotificationHelper) \
+                       &apiIdDataTriggerNotificationHelper, \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(403, saveServerUserAttributes, ApiMediaServerUserAttributesData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        &createHashForApiMediaServerUserAttributesDataHelper, /* getHash*/ \
-                       MediaServerNotificationManagerHelper()) \
+                       MediaServerNotificationManagerHelper(), \
+                       ModifyServerAttributesAccess(), /* save permission checker */ \
+                       ReadServerAttributesAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       ReadServerAttributesAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(404, saveServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       MediaServerNotificationManagerHelper()) \
+                       MediaServerNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyServerAttributesAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadServerAttributesAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadServerAttributesAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(405, getServerUserAttributes, ApiMediaServerUserAttributesDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       MediaServerNotificationManagerHelper()) \
+                       MediaServerNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyServerAttributesAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadServerAttributesAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadServerAttributesAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(406, removeServerUserAttributes, ApiIdData, \
-                       false, /* persistent*/ \
+                       true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       &apiIdDataTriggerNotificationHelper) \
+                       &apiIdDataTriggerNotificationHelper, \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(407, saveStorage, ApiStorageData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       MediaServerNotificationManagerHelper()) \
+                       MediaServerNotificationManagerHelper(), \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(408, saveStorages, ApiStorageDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       MediaServerNotificationManagerHelper()) \
+                       MediaServerNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(409, removeStorage, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       &apiIdDataTriggerNotificationHelper) \
+                       &apiIdDataTriggerNotificationHelper, \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(410, removeStorages, ApiIdDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       &apiIdDataListTriggerNotificationHelper) \
+                       &apiIdDataListTriggerNotificationHelper, \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(411, getMediaServersEx, ApiMediaServerDataExList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(412, getStorages, ApiStorageDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       MediaServerNotificationManagerHelper()) \
+                       MediaServerNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(500, getUsers, ApiUserDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(501, saveUser, ApiUserData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       UserNotificationManagerHelper()) \
+                       UserNotificationManagerHelper(), \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(502, removeUser, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       &apiIdDataTriggerNotificationHelper) /* trigger notification*/ \
+                       &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(503, getAccessRights, ApiAccessRightsDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(504, setAccessRights, ApiAccessRightsData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       CreateHashByUserIdHelper(), /* getHash*/ \
-                       UserNotificationManagerHelper()) /* trigger notification*/ \
+                       &createHashForApiAccessRightsDataHelper, /* getHash*/ \
+                       UserNotificationManagerHelper(), /* trigger notification*/ \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(505, getUserGroups, ApiUserGroupDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(506, saveUserGroup, ApiUserGroupData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
-                       UserNotificationManagerHelper()) \
+                       UserNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(507, removeUserGroup, ApiIdData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
-                       &apiIdDataTriggerNotificationHelper) \
+                       &apiIdDataTriggerNotificationHelper, \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+APPLY(508, getPredefinedRoles, ApiPredefinedRoleDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(600, getLayouts, ApiLayoutDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(601, saveLayout, ApiLayoutData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       LayoutNotificationManagerHelper()) /* trigger notification*/ \
+                       LayoutNotificationManagerHelper(), /* trigger notification*/ \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(602, saveLayouts, ApiLayoutDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       LayoutNotificationManagerHelper()) /* trigger notification*/ \
+                       LayoutNotificationManagerHelper(), /* trigger notification*/ \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(603, removeLayout, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       &apiIdDataTriggerNotificationHelper) /* trigger notification*/ \
+                       &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(700, getVideowalls, ApiVideowallDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(701, saveVideowall, ApiVideowallData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       VideowallNotificationManagerHelper()) /* trigger notification*/ \
+                       VideowallNotificationManagerHelper(), /* trigger notification*/ \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(702, removeVideowall, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), \
-                       &apiIdDataTriggerNotificationHelper) \
+                       &apiIdDataTriggerNotificationHelper, \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(703, videowallControl, ApiVideowallControlMessageData, \
                        false, /* persistent*/\
                        false, /* system*/ \
                        InvalidGetHashHelper(), \
-                       VideowallNotificationManagerHelper()) \
+                       VideowallNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(800, getBusinessRules, ApiBusinessRuleDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(801, saveBusinessRule, ApiBusinessRuleData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
-                       BusinessEventNotificationManagerHelper()) \
+                       BusinessEventNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(802, removeBusinessRule, ApiIdData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
-                       &apiIdDataTriggerNotificationHelper) \
+                       &apiIdDataTriggerNotificationHelper, \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(803, resetBusinessRules, ApiResetBusinessRuleData, \
                        true, \
                        false, \
                        [] (const ApiResetBusinessRuleData&) { return QnTransactionLog::makeHash("reset_brule", ADD_HASH_DATA); }, \
-                       BusinessEventNotificationManagerHelper()) \
+                       BusinessEventNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(804, broadcastBusinessAction, ApiBusinessActionData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       BusinessEventNotificationManagerHelper()) \
+                       BusinessEventNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(805, execBusinessAction, ApiBusinessActionData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       BusinessEventNotificationManagerHelper()) \
+                       BusinessEventNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(904, removeStoredFile, ApiStoredFilePath, \
                        true, \
                        false, \
@@ -381,168 +731,333 @@ APPLY(904, removeStoredFile, ApiStoredFilePath, \
                         { \
                             NX_ASSERT(tran.command == ApiCommand::removeStoredFile); \
                             notificationParams.storedFileNotificationManager->triggerNotification(tran); \
-                        }) \
+                        }, \
+                       AllowForAllAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(901, getStoredFile, ApiStoredFileData, \
                        false, \
                        false, \
                        &createHashForApiStoredFileDataHelper, \
-                       StoredFileNotificationManagerHelper()) \
+                       StoredFileNotificationManagerHelper(), \
+                       AllowForAllAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(902, addStoredFile, ApiStoredFileData, \
                        true, \
                        false, \
                        &createHashForApiStoredFileDataHelper, \
-                       StoredFileNotificationManagerHelper()) \
+                       StoredFileNotificationManagerHelper(), \
+                       AllowForAllAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(903, updateStoredFile, ApiStoredFileData, \
                        true, \
                        false, \
                        &createHashForApiStoredFileDataHelper, \
-                       StoredFileNotificationManagerHelper()) \
+                       StoredFileNotificationManagerHelper(), \
+                       AllowForAllAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(900, listDirectory, ApiStoredDirContents, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(905, getStoredFiles, ApiStoredFileDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1000, getLicenses, ApiLicenseDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       LicenseNotificationManagerHelper()) \
+                       LicenseNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1001, addLicense, ApiLicenseData, \
                        true, \
                        false, \
                        &createHashForApiLicenseDataHelper, \
-                       LicenseNotificationManagerHelper()) \
+                       LicenseNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1002, addLicenses, ApiLicenseDataList, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \
-                       LicenseNotificationManagerHelper()) \
+                       LicenseNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1003, removeLicense, ApiLicenseData, \
                        true, \
                        false, \
                        &createHashForApiLicenseDataHelper, \
-                       LicenseNotificationManagerHelper()) \
+                       LicenseNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1200, uploadUpdate, ApiUpdateUploadData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
-                       UpdateNotificationManagerHelper()) \
+                       UpdateNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1201, uploadUpdateResponce, ApiUpdateUploadResponceData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
-                       UpdateNotificationManagerHelper()) \
+                       UpdateNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1202, installUpdate, ApiUpdateInstallData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
-                       UpdateNotificationManagerHelper()) \
+                       UpdateNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1301, discoveredServerChanged, ApiDiscoveredServerData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       DiscoveryNotificationManagerHelper()) \
+                       DiscoveryNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1302, discoveredServersList, ApiDiscoveredServerDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       DiscoveryNotificationManagerHelper()) \
+                       DiscoveryNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1401, discoverPeer, ApiDiscoverPeerData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       DiscoveryNotificationManagerHelper()) \
+                       DiscoveryNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1402, addDiscoveryInformation, ApiDiscoveryData, \
                        true, \
                        false, \
                        &createHashForApiDiscoveryDataHelper, \
-                       DiscoveryNotificationManagerHelper()) \
+                       DiscoveryNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1403, removeDiscoveryInformation, ApiDiscoveryData, \
                        true, \
                        false, \
                        &createHashForApiDiscoveryDataHelper, \
-                       DiscoveryNotificationManagerHelper()) \
+                       DiscoveryNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1404, getDiscoveryData, ApiDiscoveryDataList, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \
-                       DiscoveryNotificationManagerHelper()) \
+                       DiscoveryNotificationManagerHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1500, getWebPages, ApiWebPageDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1501, saveWebPage, ApiWebPageData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
-                       WebPageNotificationManagerHelper()) \
+                       WebPageNotificationManagerHelper(), \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1502, removeWebPage, ApiIdData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
-                       &apiIdDataTriggerNotificationHelper) \
+                       &apiIdDataTriggerNotificationHelper, \
+                       ModifyResourceAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(2001, forcePrimaryTimeServer, ApiIdData, \
                        false, \
                        false, \
                        CreateHashByIdHelper(), \
-                       &apiIdDataTriggerNotificationHelper) \
+                       &apiIdDataTriggerNotificationHelper, \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(2002, broadcastPeerSystemTime, ApiPeerSystemTimeData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
-                       EmptyNotificationHelper()) \
+                       EmptyNotificationHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(2003, getCurrentTime, ApiTimeData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(2004, changeSystemName, ApiSystemNameData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
                        [] (const QnTransaction<ApiSystemNameData> &tran, const NotificationParams &notificationParams) \
-                        { return notificationParams.miscNotificationManager->triggerNotification(tran); }) \
+                        { return notificationParams.miscNotificationManager->triggerNotification(tran); }, \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(2005, getKnownPeersSystemTime, ApiPeerSystemTimeDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(2006, markLicenseOverflow, ApiLicenseOverflowData, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \
-                       ResourceNotificationManagerHelper()) \
+                       ResourceNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(2007, getSettings, ApiResourceParamDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(4001, getClientInfos, ApiClientInfoDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(4002, saveClientInfo, ApiClientInfoData, \
                        true, \
                        false, \
                        CreateHashByIdRfc4122Helper(), \
-                       EmptyNotificationHelper()) \
+                       EmptyNotificationHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(5001, getStatisticsReport, ApiSystemStatistics, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(5002, triggerStatisticsReport, ApiStatisticsServerInfo, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       InvalidTriggerNotificationHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(9004, runtimeInfoChanged, ApiRuntimeData, \
                        false, \
                        true, \
@@ -551,7 +1066,12 @@ APPLY(9004, runtimeInfoChanged, ApiRuntimeData, \
                         { \
                             NX_ASSERT(tran.command == ApiCommand::runtimeInfoChanged); \
                             emit notificationParams.ecConnection->runtimeInfoChanged(tran.params); \
-                        }) \
+                        }, \
+                       AllowForAllAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(9005, dumpDatabase, ApiDatabaseDumpData, \
                        false, \
                        false, \
@@ -559,7 +1079,12 @@ APPLY(9005, dumpDatabase, ApiDatabaseDumpData, \
                        [] (const QnTransaction<ApiDatabaseDumpData> &, const NotificationParams &notificationParams) \
                         { \
                             emit notificationParams.ecConnection->databaseDumped(); \
-                        }) \
+                        }, \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(9006, restoreDatabase, ApiDatabaseDumpData, \
                        true, \
                        false, \
@@ -567,22 +1092,42 @@ APPLY(9006, restoreDatabase, ApiDatabaseDumpData, \
                        [] (const QnTransaction<ApiDatabaseDumpData> &, const NotificationParams &notificationParams) \
                         { \
                             emit notificationParams.ecConnection->databaseDumped(); \
-                        }) \
+                        }, \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(9009, updatePersistentSequence, ApiUpdateSequenceData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       EmptyNotificationHelper()) \
+                       EmptyNotificationHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(9010, dumpDatabaseToFile, ApiDatabaseDumpToFileData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       EmptyNotificationHelper()) \
+                       EmptyNotificationHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AdminOnlyAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(10000, getTransactionLog, ApiTransactionDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper())
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 
 
 #define TRANSACTION_ENUM_APPLY(value, name, ...) name = value,
@@ -752,7 +1297,7 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         QnUuid tranGuid;
         QnAbstractTransaction tran;
     };
-#define ApiTransactionDataFields (tranGuid)(tran)
+#define ApiTransactionData_Fields (tranGuid)(tran)
 QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))
 
 

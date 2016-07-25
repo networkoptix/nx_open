@@ -1,7 +1,3 @@
-
-#pragma once
-
-
 #pragma once
 
 #include <QtCore/QObject>
@@ -14,11 +10,13 @@ typedef QSharedPointer<QnBaseSystemDescription> QnSystemDescriptionPtr;
 
 enum class QnServerField
 {
-    NoField = 0x00
-    , NameField = 0x01
-    , SystemNameField = 0x02
-    , HostField = 0x04
-    , FlagsField = 0x08
+    NoField = 0x00,
+    NameField = 0x01,
+    SystemNameField = 0x02,
+    HostField = 0x04,
+    FlagsField = 0x08,
+    IsFactoryFlag = 0x10,
+    CloudIdField = 0x20
 };
 Q_DECLARE_FLAGS(QnServerFields, QnServerField)
 Q_DECLARE_METATYPE(QnServerFields)
@@ -29,8 +27,9 @@ class QnBaseSystemDescription : public QObject
     typedef QObject base_type;
 
 public:
-    QnBaseSystemDescription()
-        : base_type() {}
+    QnBaseSystemDescription() : base_type()
+    {
+    }
 
     virtual ~QnBaseSystemDescription() {}
 
@@ -49,11 +48,11 @@ public:
 
     virtual bool containsServer(const QnUuid &serverId) const = 0;
 
-    virtual QnModuleInformation getServer(const QnUuid &serverId) const = 0;
+    virtual QnModuleInformation getServer(const QnUuid& serverId) const = 0;
 
-    virtual QString getServerHost(const QnUuid &serverId) const = 0;
+    virtual QString getServerHost(const QnUuid& serverId) const = 0;
 
-    virtual qint64 getServerLastUpdatedMs(const QnUuid &serverId) const = 0;
+    virtual qint64 getServerLastUpdatedMs(const QnUuid& serverId) const = 0;
 
 signals:
     void idChanged();
@@ -62,9 +61,9 @@ signals:
 
     void ownerChanged();
 
-    void serverAdded(const QnUuid &serverId);
+    void serverAdded(const QnUuid& serverId);
 
-    void serverRemoved(const QnUuid &serverId);
+    void serverRemoved(const QnUuid& serverId);
 
-    void serverChanged(const QnUuid &serverId, QnServerFields flags);
+    void serverChanged(const QnUuid& serverId, QnServerFields flags);
 };

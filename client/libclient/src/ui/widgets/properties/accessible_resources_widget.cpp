@@ -2,6 +2,7 @@
 #include "ui_accessible_resources_widget.h"
 
 #include <client/client_globals.h>
+#include <client/client_message_processor.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_type.h>
@@ -26,116 +27,115 @@
 #include <nx/utils/string.h>
 
 
-namespace
+namespace {
+const int kNoDataFontPixelSize = 24;
+const int kNoDataFontWeight = QFont::Light;
+const int kCameraNameFontPixelSize = 13;
+const int kCameraNameFontWeight = QFont::DemiBold;
+const int kCameraPreviewWidthPixels = 160;
+
+class QnResourcesListSortModel: public QSortFilterProxyModel
 {
-    const int kNoDataFontPixelSize = 24;
-    const int kNoDataFontWeight = QFont::Light;
-    const int kCameraNameFontPixelSize = 13;
-    const int kCameraNameFontWeight = QFont::DemiBold;
-    const int kCameraPreviewWidthPixels = 160;
+    typedef QSortFilterProxyModel base_type;
 
-    class QnResourcesListSortModel : public QSortFilterProxyModel
+public:
+    explicit QnResourcesListSortModel(QObject *parent = 0):
+        base_type(parent),
+        m_allChecked(false)
     {
-        typedef QSortFilterProxyModel base_type;
+    }
 
-    public:
-        explicit QnResourcesListSortModel(QObject *parent = 0) :
-            base_type(parent),
-            m_allChecked(false)
+    virtual ~QnResourcesListSortModel()
+    {
+    }
+
+    QnResourcePtr resource(const QModelIndex &index) const
+    {
+        return index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    }
+
+    QVariant data(const QModelIndex &index, int role) const
+    {
+        if (m_allChecked && role == Qt::CheckStateRole && index.column() == QnResourceListModel::CheckColumn)
+            return QVariant::fromValue<int>(Qt::Checked);
+
+        return base_type::data(index, role);
+    }
+
+    bool allChecked() const
+    {
+        return m_allChecked;
+    }
+
+    void setAllChecked(bool value)
+    {
+        if (m_allChecked == value)
+            return;
+
+        m_allChecked = value;
+
+        emit dataChanged(
+            index(0, QnResourceListModel::CheckColumn),
+            index(rowCount() - 1, QnResourceListModel::CheckColumn),
+            {Qt::CheckStateRole});
+    }
+
+protected:
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
+    {
+        QnResourcePtr l = resource(left);
+        QnResourcePtr r = resource(right);
+
+        if (!l || !r)
+            return l < r;
+
+        if (l->getTypeId() != r->getTypeId())
         {
+            QnVirtualCameraResourcePtr lcam = l.dynamicCast<QnVirtualCameraResource>();
+            QnVirtualCameraResourcePtr rcam = r.dynamicCast<QnVirtualCameraResource>();
+            if (!lcam || !rcam)
+                return lcam < rcam;
         }
 
-        virtual ~QnResourcesListSortModel()
+        if (l->hasFlags(Qn::layout) && r->hasFlags(Qn::layout))
         {
+            QnLayoutResourcePtr leftLayout = l.dynamicCast<QnLayoutResource>();
+            QnLayoutResourcePtr rightLayout = r.dynamicCast<QnLayoutResource>();
+            NX_ASSERT(leftLayout && rightLayout);
+            if (!leftLayout || !rightLayout)
+                return leftLayout < rightLayout;
+
+            if (leftLayout->isShared() != rightLayout->isShared())
+                return leftLayout->isShared();
         }
 
-        QnResourcePtr resource(const QModelIndex &index) const
         {
-            return index.data(Qn::ResourceRole).value<QnResourcePtr>();
+            /* Sort by name. */
+            QString leftDisplay = left.data(Qt::DisplayRole).toString();
+            QString rightDisplay = right.data(Qt::DisplayRole).toString();
+            int result = nx::utils::naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
+            if (result != 0)
+                return result < 0;
         }
 
-        QVariant data(const QModelIndex &index, int role) const
-        {
-            if (m_allChecked && role == Qt::CheckStateRole && index.column() == QnResourceListModel::CheckColumn)
-                return QVariant::fromValue<int>(Qt::Checked);
+        /* We want the order to be defined even for items with the same name. */
+        return l->getUniqueId() < r->getUniqueId();
+    }
 
-            return base_type::data(index, role);
-        }
+private:
+    bool m_allChecked;
+};
 
-        bool allChecked() const
-        {
-            return m_allChecked;
-        }
-
-        void setAllChecked(bool value)
-        {
-            if (m_allChecked == value)
-                return;
-
-            m_allChecked = value;
-
-            emit dataChanged(
-                index(0, QnResourceListModel::CheckColumn),
-                index(rowCount() - 1, QnResourceListModel::CheckColumn),
-                { Qt::CheckStateRole });
-        }
-
-    protected:
-        virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
-        {
-            QnResourcePtr l = resource(left);
-            QnResourcePtr r = resource(right);
-
-            if (!l || !r)
-                return l < r;
-
-            if (l->getTypeId() != r->getTypeId())
-            {
-                QnVirtualCameraResourcePtr lcam = l.dynamicCast<QnVirtualCameraResource>();
-                QnVirtualCameraResourcePtr rcam = r.dynamicCast<QnVirtualCameraResource>();
-                if (!lcam || !rcam)
-                    return lcam < rcam;
-            }
-
-            if (l->hasFlags(Qn::layout) && r->hasFlags(Qn::layout))
-            {
-                QnLayoutResourcePtr leftLayout = l.dynamicCast<QnLayoutResource>();
-                QnLayoutResourcePtr rightLayout = r.dynamicCast<QnLayoutResource>();
-                NX_ASSERT(leftLayout && rightLayout);
-                if (!leftLayout || !rightLayout)
-                    return leftLayout < rightLayout;
-
-                if (leftLayout->isShared() != rightLayout->isShared())
-                    return leftLayout->isShared();
-            }
-
-            {
-                /* Sort by name. */
-                QString leftDisplay = left.data(Qt::DisplayRole).toString();
-                QString rightDisplay = right.data(Qt::DisplayRole).toString();
-                int result = nx::utils::naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
-                if (result != 0)
-                    return result < 0;
-            }
-
-            /* We want the order to be defined even for items with the same name. */
-            return l->getUniqueId() < r->getUniqueId();
-        }
-
-    private:
-        bool m_allChecked;
-    };
-
-    const QString kDummyResourceId(lit("dummy_resource"));
+const QString kDummyResourceId(lit("dummy_resource"));
 }
 
-QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsModel* permissionsModel, QnResourceAccessFilter::Filter filter, QWidget* parent /*= 0*/) :
+QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsModel* permissionsModel, QnResourceAccessFilter::Filter filter, QWidget* parent /*= 0*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::AccessibleResourcesWidget()),
     m_permissionsModel(permissionsModel),
     m_filter(filter),
-    m_controlsVisible(filter == QnResourceAccessFilter::CamerasFilter), /*< Show 'All' checkbox only for cameras. */
+    m_controlsVisible(filter == QnResourceAccessFilter::MediaFilter), /*< Show 'All' checkbox only for cameras. */
     m_resourcesModel(new QnResourceListModel()),
     m_controlsModel(new QnResourceListModel())
 {
@@ -172,11 +172,11 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
      */
     connect(ui->namePlainText->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, this,
         [this](const QSizeF& size)
-        {
-            /* QPlainTextDocument measures height in lines, not pixels. */
-            int height = static_cast<int>(this->fontMetrics().height() * size.height());
-            ui->namePlainText->setMaximumHeight(height);
-        });
+    {
+        /* QPlainTextDocument measures height in lines, not pixels. */
+        int height = static_cast<int>(this->fontMetrics().height() * size.height());
+        ui->namePlainText->setMaximumHeight(height);
+    });
 
     initControlsModel();
     initResourcesModel();
@@ -241,7 +241,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     };
 
     connect(ui->resourcesTreeView, &QnTreeView::clicked, this, toggleCheckbox);
-    connect(ui->controlsTreeView,  &QnTreeView::clicked, this, toggleCheckbox);
+    connect(ui->controlsTreeView, &QnTreeView::clicked, this, toggleCheckbox);
 
     auto batchToggleCheckboxes = [this](const QModelIndex& index)
     {
@@ -263,7 +263,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     };
 
     connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, batchToggleCheckboxes);
-    connect(ui->controlsTreeView,  &QnTreeView::spacePressed, this, batchToggleCheckboxes);
+    connect(ui->controlsTreeView, &QnTreeView::spacePressed, this, batchToggleCheckboxes);
 
     connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, &QnAccessibleResourcesWidget::updateThumbnail);
     updateThumbnail();
@@ -278,7 +278,7 @@ bool QnAccessibleResourcesWidget::hasChanges() const
     if (m_controlsVisible)
     {
         bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
-        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllCamerasPermission) != checkedAll)
+        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllMediaPermission) != checkedAll)
             return true;
     }
 
@@ -290,7 +290,7 @@ void QnAccessibleResourcesWidget::loadDataToUi()
     if (m_controlsVisible)
     {
         QSet<QnUuid> checkedControls;
-        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllCamerasPermission))
+        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllMediaPermission))
             for (const auto& resource : m_controlsModel->resources())
                 checkedControls << resource->getId();   /*< Really we are checking the only dummy resource. */
         m_controlsModel->setCheckedResources(checkedControls);
@@ -329,13 +329,22 @@ void QnAccessibleResourcesWidget::applyChanges()
         for (const auto& layout : layoutsToShare)
         {
             layout->setParentId(QnUuid());
-            NX_ASSERT(layout->isShared());
             menu()->trigger(QnActions::SaveLayoutAction, QnActionParameters(layout));
         }
     }
 
     accessibleResources.subtract(oldFiltered);
     accessibleResources.unite(newFiltered);
+
+    /* Some resources may be deleted while we are editing user. Do not store them in DB. */
+    QSet<QnUuid> unavailable;
+    for (const QnUuid& id : accessibleResources)
+    {
+        if (!qnResPool->getResourceById(id))
+            unavailable << id;
+    }
+    accessibleResources.subtract(unavailable);
+
     m_permissionsModel->setAccessibleResources(accessibleResources);
 
     if (m_controlsVisible)
@@ -343,9 +352,9 @@ void QnAccessibleResourcesWidget::applyChanges()
         bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
         Qn::GlobalPermissions permissions = m_permissionsModel->rawPermissions();
         if (checkedAll)
-            permissions |= Qn::GlobalAccessAllCamerasPermission;
+            permissions |= Qn::GlobalAccessAllMediaPermission;
         else
-            permissions &= ~Qn::GlobalAccessAllCamerasPermission;
+            permissions &= ~Qn::GlobalAccessAllMediaPermission;
         m_permissionsModel->setRawPermissions(permissions);
     }
 }
@@ -378,7 +387,7 @@ void QnAccessibleResourcesWidget::initControlsModel()
     };
 
     connect(m_controlsModel.data(), &QnResourceListModel::dataChanged, this, modelUpdated);
-    connect(m_controlsModel.data(), &QnResourceListModel::modelReset,  this, modelUpdated);
+    connect(m_controlsModel.data(), &QnResourceListModel::modelReset, this, modelUpdated);
 }
 
 bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resource) const
@@ -390,7 +399,7 @@ bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resour
 {
     switch (filter)
     {
-        case QnResourceAccessFilter::CamerasFilter:
+        case QnResourceAccessFilter::MediaFilter:
             if (resource->hasFlags(Qn::desktop_camera))
                 return false;
             return (resource->hasFlags(Qn::web_page) || resource->hasFlags(Qn::server_live_cam));
@@ -417,8 +426,10 @@ bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resour
             if (layout->isFile())
                 return false;
 
-            return !layout->hasFlags(Qn::local) &&
-                (layout->isShared() || layout->getParentId() == currentUser->getId());
+            if (layout->hasFlags(Qn::local))
+                return false;
+
+            return layout->isShared() || layout->getParentId() == currentUser->getId();
         }
 
         default:
@@ -438,23 +449,44 @@ void QnAccessibleResourcesWidget::initResourcesModel()
     {
         if (!resourcePassFilter(resource))
             return;
+
+        if (m_resourcesModel->resources().contains(resource))
+            return;
+
         m_resourcesModel->addResource(resource);
     };
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, handleResourceAdded);
-    for (const QnResourcePtr& resource : qnResPool->getResources())
-        handleResourceAdded(resource);
-
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
+    auto refreshModel = [this, handleResourceAdded]()
     {
-        m_resourcesModel->removeResource(resource);
-        auto accessibleResources = m_permissionsModel->accessibleResources();
-        if (accessibleResources.contains(resource->getId()))
+        m_resourcesModel->setResources(QnResourceList());
+        for (const QnResourcePtr& resource : qnResPool->getResources())
+            handleResourceAdded(resource);
+    };
+
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, handleResourceAdded);
+
+    if (m_filter == QnResourceAccessFilter::LayoutsFilter)
+    {
+        connect(qnResPool, &QnResourcePool::resourceAdded, this, [this, handleResourceAdded](const QnResourcePtr& resource)
         {
-            accessibleResources.remove(resource->getId());
-            m_permissionsModel->setAccessibleResources(accessibleResources);
-        }
+            if (!resource.dynamicCast<QnLayoutResource>())
+                return;
+
+            /* Looks like hack as we have no dynamic filter model and must maintain list manually.
+             * Really the only scenario we should handle is when the layout becomes remote (after it is saved). */
+            connect(resource.data(), &QnResource::flagsChanged, this, handleResourceAdded);
+        });
+    }
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this, refreshModel](const QnResourcePtr& resource)
+    {
+        disconnect(resource.data(), nullptr, this, nullptr);
+        m_resourcesModel->removeResource(resource);
+        if (resource == context()->user())
+            refreshModel();
     });
+
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this, refreshModel);
+    refreshModel();
 
     connect(m_resourcesModel.data(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
     {

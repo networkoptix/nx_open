@@ -27,16 +27,23 @@
 <div class="panel-body text-center" ng-if="stepIs('systemName')">
     <h2>Give your System a name</h2>
     <p class="master-description">
-        System name helps you identify or find your system.
+        It'll help you identify or find your system.
     </p>
     <form class="master-controls" name="forms.systemNameForm" novalidate>
         <div class="form-group" validate-field>
             <input ng-model="settings.systemName" name="systemName" type="text" class="form-control"
                    placeholder="System name" required autofocus>
         </div>
+
+        <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
+            <div class="help-block">
+                System name is required
+            </div>
+        </div>
+
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced')">Advanced system settings</a><br>
+        <a href="" ng-click="next('advanced', true)">Advanced system settings</a><br>
         <a href="" ng-click="skip()">Merge server with existing system</a>
     </p>
 </div>
@@ -77,7 +84,7 @@
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" autofocus>Create new account</button>&nbsp;&nbsp;
-        <button class="btn btn-default" ng-click="next('cloudLogin')">Use existing</button>
+        <button class="btn btn-default" ng-click="next('cloudLogin', true)">Use existing</button>
     </p>
     <p class="vertical-bottom">
         <a href="" ng-click="skip()">Skip this step for now</a>
@@ -92,14 +99,11 @@
 
     <h2>{{settings.presetCloudEmail}}</h2>
 
-    <div class="vertical-bottom">
-        <p>
-            <a href="" ng-click="next('cloudLogin')">Connect to another account</a>
-        </p>
-        <p>
-            <a href="" ng-click="skip()">Skip this step for now</a>
-        </p>
-    </div>
+    <p class="vertical-bottom">
+        <a href="" ng-click="next('cloudLogin', true)">Connect to another account</a>
+        <br>
+        <a href="" ng-click="skip()">Skip this step for now</a>
+    </p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
@@ -118,7 +122,23 @@
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
                    type="password" autocomplete="new-password" required placeholder="Password" ng-change="clearCloudError()">
         </div>
-        <div class="form-group" ng-if="settings.cloudError">
+
+        <div class="form-group has-error"
+             ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.email">
+            <div class="help-block">
+                Please, enter a valid email
+            </div>
+        </div>
+
+        <div class="form-group has-error"
+             ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.required ||
+                    forms.cloudForm.cloudPassword.$touched && forms.cloudForm.cloudPassword.$error.required">
+            <div class="help-block">
+                Email and password are required
+            </div>
+        </div>
+
+        <div class="form-group has-error" ng-if="settings.cloudError">
             <p class="help-block">
                 {{settings.cloudError}}
             </p>
@@ -134,34 +154,58 @@
                    type="text" placeholder="Login" required readonly>
         </div>
         <password-input ng-model="settings.localPassword"></password-input>
-        <div class="form-group" validate-field>
+        <div class="form-group" validate-field ng-class="{'has-error':forms.localForm.passwordInput.$valid &&
+                     forms.localForm.localPasswordConfirmation.$valid &&
+                     forms.localForm.localPasswordConfirmation.$touched &&
+                     settings.localPasswordConfirmation != settings.localPassword}">
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
                    type="password" autocomplete="new-password" placeholder="Repeat password" required>
         </div>
+
+        <div class="form-group has-error"
+             ng-if="forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
+                    forms.localForm.passwordInput.password.$touched && forms.localForm.passwordInput.$error.required ||
+                    forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
+            <div class="help-block">
+                All fields are required
+            </div>
+        </div>
+
+        <div class="form-group has-error"
+             ng-if= "forms.localForm.passwordInput.$valid &&
+                     forms.localForm.localPasswordConfirmation.$valid &&
+                     forms.localForm.localPasswordConfirmation.$touched &&
+                     settings.localPasswordConfirmation != settings.localPassword">
+            <div class="help-block">
+                Passwords do not match
+            </div>
+        </div>
+
+
     </form>
 </div>
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
     <h2>Connect server to existing system</h2>
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
-        <div class="form-group" validate-field>
-
+        <div class="form-group" validate-field >
 
             <input type="text" ng-model="settings.remoteSystem" name="remoteSystemName"
-                   typeahead="system as system.visibleName for system in Config.debugEvent.events | filter: {visibleName: $viewValue} | limitTo:8"
+                   typeahead="system as system.visibleName for system in discoveredUrls | filter: {visibleName: $viewValue} | limitTo:8"
                    typeahead-input-formatter="getSystemName($model)"
                    typeahead-focus-on-select="false"
                    typeahead-min-length="0"
                    typeahead-show-hint="true"
                    typeahead-focus-first="false"
                    typeahead-focus
+                   required
                    class="form-control">
 
             <p class="help-block text-left">
                 {{settings.remoteSystem.hint}}
             </p>
         </div>
-        <div class="form-group">
+        <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
                    placeholder="Login" required readonly>
@@ -172,6 +216,15 @@
                    ng-change="clearRemoteError(true)"
                    placeholder="Password" required>
         </div>
+        <div class="form-group has-error"
+             ng-if="forms.remoteSystemForm.remoteSystemName.$touched &&  forms.remoteSystemForm.remoteSystemName.$error.required||
+                    forms.remoteSystemForm.remoteLogin.$touched && forms.remoteSystemForm.remoteLogin.$error.required ||
+                    forms.remoteSystemForm.remotePassword.$touched && forms.remoteSystemForm.remotePassword.$error.required">
+            <div class="help-block">
+                All fields are required
+            </div>
+        </div>
+
         <div class="form-group has-error"  ng-if="settings.remoteError">
             <div class="help-block">
                 {{settings.remoteError}}
@@ -206,16 +259,16 @@
     <h2>System is ready to use</h2>
     <p>Login</p>
     <h4>{{settings.cloudEmail}}</h4>
-    <p>Sharing and account settings:</p>
+    <p>Sharing and account settings</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}" ng-click="openLink($event)">{{portalShortLink}}</a></h4>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
     <div class="master-success"><span class="glyphicon glyphicon-ok"></span></div>
     <h2>System is ready to use</h2>
-    <p>Server address:</p>
+    <p>Server address</p>
     <h4>{{serverAddress}}</h4>
-    <p>Administrator login:</p>
+    <p>Administrator login</p>
     <h4>{{settings.localLogin}}</h4>
 </div>
 
@@ -273,7 +326,7 @@
     <button class="btn btn-default" ng-if="activeStep.back"
             ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
     <button class="btn btn-primary pull-right" ng-if="activeStep.next"
-            ng-disabled="lockNextButton || cantGoNext()"
+            ng-disabled="lockNextButton"
             enter-button
             ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
     <button class="btn btn-primary pull-right" ng-if="activeStep.finish"

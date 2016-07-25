@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
 #include <QtGui/QOpenGLContext>
@@ -18,11 +20,12 @@ namespace media {
  * <pre> ...VideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution); </pre>
  *
  */
-class AbstractVideoDecoder
-:
-    public QObject
+class AbstractVideoDecoder: public QObject
 {
     Q_OBJECT
+
+public:
+    typedef std::function<QRect()> VideoGeometryAccessor;
 
 public:
     virtual ~AbstractVideoDecoder() = default;
@@ -31,7 +34,7 @@ public:
      * This function should be overridden despite static keyword. Otherwise it is a compile error.
      * @return True if the decoder is compatible with the provided parameters.
      */
-    static bool isCompatible(const CodecID codec, const QSize& resolution)
+    static bool isCompatible(const AVCodecID codec, const QSize& resolution)
     {
         QN_UNUSED(codec, resolution);
         return false;
@@ -45,7 +48,7 @@ public:
      * @return Max supported resolution for the specified codec, or Invalid if there is no limit or
      * the codec is not supported.
      */
-    static QSize maxResolution(const CodecID codec)
+    static QSize maxResolution(const AVCodecID codec)
     {
         QN_UNUSED(codec);
         return QSize();
@@ -56,21 +59,47 @@ public:
      * It's guarantee all source frames have same codec context.
      *
      * @param compressedVideoData Compressed single frame data. If null, this function must flush
-     * internal decoder buffer. If no more frames are left in the buffer, return zero value as a
-     * result, and set outDecodedFrame to null.
-     * ATTENTION: compressedVideoData->data() is guaranteed to be non-null, have dataSize() > 0 and
-     * have additional QN_BYTE_ARRAY_PADDING bytes allocated after frame->dataSize(), which is
-     * needed by e.g. ffmpeg decoders and can be zeroed by this function.
+     *     internal decoder buffer. If no more frames are left in the buffer, return zero value as
+     *     a result, and set outDecodedFrame to null.
+     *     ATTENTION: compressedVideoData->data() is guaranteed to be non-null, have dataSize() > 0
+     *     and have additional QN_BYTE_ARRAY_PADDING bytes allocated after frame->dataSize(), which
+     *     is needed by e.g. ffmpeg decoders and can be zeroed by this function.
      *
      * @param outDecodedFrame Decoded video data. If decoder still fills its internal buffer, then
-     * outDecodedFrame should be set to null, and the function should return 0.
+     *     outDecodedFrame should be set to null, and the function should return 0.
      *
      * @return Decoded frame number (value >= 0), if the frame is decoded without errors. Return a
-     * negative value on decoding error. For null input data, return positive value while the
-     * decoder is flushing its internal buffer (outDecodedFrame is not set to null).
+     *     negative value on decoding error. For null input data, return positive value while the
+     *     decoder is flushing its internal buffer (outDecodedFrame is not set to null).
      */
     virtual int decode(
-        const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* outDecodedFrame) = 0;
+        const QnConstCompressedVideoDataPtr& compressedVideoData,
+        QVideoFramePtr* outDecodedFrame) = 0;
+
+    /**
+     * Should be called before other methods. Allows to obtain video window coords for some
+     * decoders, e.g. hw-based.
+     */
+    void setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor)
+    {
+        m_videoGeometryAccessor = videoGeometryAccessor;
+    }
+
+
+protected:
+    /**
+     * Retrieve current video window position and size via VideoGeometryAccessor.
+     * @return Null QRect if VideoGeometryAccessor has not been set.
+     */
+    QRect getVideoGeometry() const
+    {
+        if (!m_videoGeometryAccessor)
+            return QRect();
+        return m_videoGeometryAccessor();
+    }
+
+private:
+    VideoGeometryAccessor m_videoGeometryAccessor;
 };
 
 } // namespace media

@@ -78,6 +78,7 @@ void QnNxStylePrivate::drawSwitch(
 
     const bool checked = option->state.testFlag(QStyle::State_On);
     const bool enabled = option->state.testFlag(QStyle::State_Enabled);
+    const bool undefined = option->state.testFlag(QStyle::State_NoChange);
     const bool standalone = !qstyleoption_cast<const QStyleOptionButton*>(option);
 
     QColor fillColorOn;     // On: background
@@ -111,17 +112,9 @@ void QnNxStylePrivate::drawSwitch(
         signColorOn = mainGreen.lighter(2);
     }
 
-    bool drawTop = true;
-    bool drawBottom = true;
-
     //TODO: Implement animation
 
-    qreal animationProgress = checked ? 1.0 : 0.0;
-
-    if (qFuzzyIsNull(animationProgress))
-        drawTop = false;
-    else if (qFuzzyEquals(animationProgress, 1.0))
-        drawBottom = false;
+    qreal animationProgress = undefined ? 0.5 : (checked ? 1.0 : 0.0);
 
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter);
@@ -130,7 +123,7 @@ void QnNxStylePrivate::drawSwitch(
     QnScopedPainterOpacityRollback opacityRollback(painter);
 
     if (!enabled)
-        painter->setOpacity(0.3);
+        painter->setOpacity(painter->opacity() * 0.3);
 
     QSize switchSize = standalone ? Metrics::kStandaloneSwitchSize : Metrics::kButtonSwitchSize;
 
@@ -149,30 +142,40 @@ void QnNxStylePrivate::drawSwitch(
     gripCircle.addEllipse(QnGeometry::dilated(gripRect, 0.5));
     painter->setClipPath(wholeRect.subtracted(gripCircle));
 
-    if (drawBottom)
-    {
-        painter->setPen(QPen(frameColorOff, 0));
-        painter->setBrush(fillColorOff);
-        painter->drawRoundedRect(rect, rect.height() / 2.0, rect.height() / 2.0);
+    const double kSideTransition = 0.3;
+    qreal oneMinusAnimationProgress = 1.0 - animationProgress;
 
+    qreal baseOpacity = painter->opacity();
+
+    /* Draw state "off", or transitional blend with it: */
+
+    painter->setPen(QPen(frameColorOff, 0));
+    painter->setBrush(fillColorOff);
+    painter->drawRoundedRect(rect, rect.height() / 2.0, rect.height() / 2.0);
+
+    if (animationProgress < kSideTransition)
+    {
         QRectF zeroRect = indicatorsRect;
         zeroRect.setLeft(indicatorsRect.right() - indicatorsRect.height());
-
+        painter->setOpacity(baseOpacity * (kSideTransition - animationProgress) / kSideTransition);
         painter->setPen(QPen(signColorOff, dp(2)));
         painter->drawRoundedRect(zeroRect, zeroRect.width() / 2, zeroRect.height() / 2);
     }
 
-    if (drawTop)
+    /* Draw state "on", or transitional blend with it: */
+
+    painter->setOpacity(baseOpacity * animationProgress);
+    painter->setPen(QPen(frameColorOn, 0));
+    painter->setBrush(fillColorOn);
+    painter->drawRoundedRect(rect, rect.height() / 2.0, rect.height() / 2.0);
+
+    if (oneMinusAnimationProgress < kSideTransition)
     {
-        painter->setPen(QPen(frameColorOn, 0));
-        painter->setBrush(fillColorOn);
-        painter->drawRoundedRect(rect, rect.height() / 2.0, rect.height() / 2.0);
-
-        painter->setPen(QPen(signColorOn, dp(2)));
-
         int x = indicatorsRect.left() + indicatorsRect.height() / 2 + dp(1);
         int h = indicatorsRect.height() - dp(3);
         int y = rect.center().y() - h / 2;
+        painter->setOpacity(baseOpacity * (kSideTransition - oneMinusAnimationProgress) / kSideTransition);
+        painter->setPen(QPen(signColorOn, dp(2)));
         painter->drawLine(x, y, x, y + h + 1);
     }
 

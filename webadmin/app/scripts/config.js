@@ -8,9 +8,8 @@ var Config = {
     newServerFlag: 'SF_NewSystem',
     publicIpFlag: 'SF_HasPublicIP',
 
-    globalEditServersPermissions: 0x00000020,
-    globalViewArchivePermission: 0x00000100,
-    globalViewLivePermission: 0x00000080,
+    globalEditServersPermissions: 'GlobalAdminPermission',
+    globalViewArchivePermission: 'GlobalViewArchivePermission',
 
     productName: 'Nx Witness',
     cloud: {
@@ -40,6 +39,8 @@ var Config = {
          target: '' // new|frame
          }*/
     ],
+    emailRegex:"^[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+(\\.[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}\\.?$", // Check only @ and . in the email
+
     passwordRequirements: {
         minLength: 8,
         minLengthMessage:L.passwordRequirements.minLengthMessage,
@@ -70,6 +71,7 @@ var Config = {
         commonMessage: L.passwordRequirements.commonMessage
     },
 
+    undefinedValue:'__qn_undefined_value__',
     settingsConfig: {
         auditTrailEnabled: {label: 'Audit trail enabled', type: 'checkbox'},
         cameraSettingsOptimization: {label: 'Allow device setting optimization', type: 'checkbox', setupWizard: true},

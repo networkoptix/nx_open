@@ -88,6 +88,7 @@
                         <File Id="client.exe" Name="$(var.clientName).exe" Source="$(var.SourceDir)/desktop_client.exe" KeyPath="yes" DiskId="14">
                             <fire:FirewallException Id="FirewallExceptionClient" Name="$(var.productName)" Scope="any" IgnoreFailure="yes"/>
                         </File>
+                        <File Id="launcherVersionFile" Name="$(var.launcherVersionFile)" Source="$(var.SourceDir)/$(var.launcherVersionFile)" DiskId="14" />
                     </Component>
 
                     <Component Id="ClientConfiguration">
@@ -117,34 +118,34 @@
 
         <ComponentGroup Id="ClientFFmpegLibraries" Directory="$(var.clientDirId)">
             <Component>
-                <File Id="avcodec.dll" Name="avcodec-54.dll" Source="$(var.SourceDir)/avcodec-54.dll" DiskId="2" />
+                <File Id="avcodec.dll" Name="avcodec-57.dll" Source="$(var.SourceDir)/avcodec-57.dll" DiskId="2" />
             </Component>
             <Component>
-                <File Id="avdevice.dll" Name="avdevice-54.dll" Source="$(var.SourceDir)/avdevice-54.dll" DiskId="2"/>
+                <File Id="avdevice.dll" Name="avdevice-57.dll" Source="$(var.SourceDir)/avdevice-57.dll" DiskId="2"/>
             </Component>
             <Component>
-                <File Id="avfilter.dll" Name="avfilter-2.dll" Source="$(var.SourceDir)/avfilter-2.dll" DiskId="2"/>
+                <File Id="avfilter.dll" Name="avfilter-6.dll" Source="$(var.SourceDir)/avfilter-6.dll" DiskId="2"/>
             </Component>
             <Component>
-                <File Id="avformat.dll" Name="avformat-54.dll" Source="$(var.SourceDir)/avformat-54.dll" DiskId="2"/>
+                <File Id="avformat.dll" Name="avformat-57.dll" Source="$(var.SourceDir)/avformat-57.dll" DiskId="2"/>
             </Component>
             <Component>
-                <File Id="avutil.dll" Name="avutil-51.dll" Source="$(var.SourceDir)/avutil-51.dll" DiskId="2"/>
+                <File Id="avutil.dll" Name="avutil-55.dll" Source="$(var.SourceDir)/avutil-55.dll" DiskId="2"/>
             </Component>
             <Component>
-                <File Id="swscale.dll" Name="swscale-2.dll" Source="$(var.SourceDir)/swscale-2.dll" DiskId="3"/>
+                <File Id="swscale.dll" Name="swscale-4.dll" Source="$(var.SourceDir)/swscale-4.dll" DiskId="3"/>
             </Component>
             <Component>
-                <File Id="libogg.dll" Name="libogg-0.dll" Source="$(var.SourceDir)/libogg-0.dll" DiskId="3"/>
+                <File Id="swresample.dll" Name="swresample-2.dll" Source="$(var.SourceDir)/swresample-2.dll" DiskId="3"/>
             </Component>
             <Component>
-                <File Id="libvorbis.dll" Name="libvorbis-0.dll" Source="$(var.SourceDir)/libvorbis-0.dll" DiskId="3"/>
+                <File Id="libogg.dll" Name="libogg.dll" Source="$(var.SourceDir)/libogg.dll" DiskId="3"/>
             </Component>
             <Component>
-                <File Id="libmp3lame.dll" Name="libmp3lame-0.dll" Source="$(var.SourceDir)/libmp3lame-0.dll" DiskId="3"/>
+                <File Id="libvorbis.dll" Name="libvorbis.dll" Source="$(var.SourceDir)/libvorbis.dll" DiskId="3"/>
             </Component>
             <Component>
-                <File Id="libvorbisenc.dll" Name="libvorbisenc-2.dll" Source="$(var.SourceDir)/libvorbisenc-2.dll" DiskId="3"/>
+                <File Id="libmp3lame.dll" Name="libmp3lame.dll" Source="$(var.SourceDir)/libmp3lame.dll" DiskId="3"/>
             </Component>
         </ComponentGroup>
         <ComponentGroup Id="ClientLibs" Directory="$(var.clientDirId)">
@@ -210,7 +211,7 @@
             <Component>
                 <File Id="Qt5OpenGL.dll" Name="Qt5OpenGL.dll" Source="$(var.QtDir)\Qt5OpenGL.dll" DiskId="10" />
             </Component>
-			<Component>
+            <Component>
                 <File Id="Qt5WebChannel.dll" Name="Qt5WebChannel.dll" Source="$(var.QtDir)\Qt5WebChannel.dll" DiskId="10"  />
             </Component>
             <Component>

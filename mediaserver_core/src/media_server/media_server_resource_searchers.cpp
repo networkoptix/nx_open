@@ -11,6 +11,7 @@
 #include <plugins/resource/axis/axis_resource_searcher.h>
 #include <plugins/resource/d-link/dlink_resource_searcher.h>
 #include <plugins/resource/flex_watch/flexwatch_resource_searcher.h>
+#include <plugins/resource/flir/flir_resource_searcher.h>
 #include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
 #include <plugins/resource/isd/isd_resource_searcher.h>
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
@@ -68,6 +69,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QObject* parent /
 
         //Onvif searcher should be the last:
     #ifdef ENABLE_ONVIF
+        m_searchers << new QnFlirResourceSearcher();
         m_searchers << new QnFlexWatchResourceSearcher();
         m_searchers << new OnvifResourceSearcher();
     #endif //ENABLE_ONVIF

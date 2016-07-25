@@ -8,6 +8,7 @@
 #include <ui/common/updatable.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+
 namespace Ui {
     class CameraScheduleWidget;
 }
@@ -21,8 +22,6 @@ class QnCameraScheduleWidget: public QWidget, public QnWorkbenchContextAware, pu
 public:
     explicit QnCameraScheduleWidget(QWidget *parent = 0);
     virtual ~QnCameraScheduleWidget();
-
-    virtual bool hasHeightForWidth() const override;
 
     void setChangesDisabled(bool);
     bool isChangesDisabled() const;
@@ -72,6 +71,7 @@ public:
     int minRecordedDays() const;
 
     static const int RecordedDaysDontChange = INT_MAX;
+
 signals:
     void archiveRangeChanged();
     void scheduleTasksChanged();

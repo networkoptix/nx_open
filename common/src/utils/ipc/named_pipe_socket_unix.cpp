@@ -1,9 +1,3 @@
-////////////////////////////////////////////////////////////
-// 14 jan 2014    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef _WIN32
-
 #include "named_pipe_socket.h"
 
 #include <unistd.h>
@@ -124,5 +118,3 @@ NamedPipeSocket::NamedPipeSocket( NamedPipeSocketImpl* implToUse )
     m_impl( implToUse )
 {
 }
-
-#endif

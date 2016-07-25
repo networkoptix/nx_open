@@ -11,13 +11,15 @@ BaseTile
     property string systemName;
     property string ownerDescription;
 
-    property var systemId;
+    property string systemId;
     property bool isFactoryTile: false;
     property bool isCloudTile: false;
 
     property string wrongVersion;
     property string wrongCustomization;
     property string compatibleVersion;
+
+    isConnecting: ((control.systemId == context.connectingToSystem) && !isFactoryTile);
 
     isAvailable:
     {
@@ -64,7 +66,7 @@ BaseTile
             else if (compatibleVersion.length)
                 return compatibleVersion;
             else if (!impl.isOnline)
-                return "OFFLINE";
+                return qsTr("OFFLINE");
 
             return "";
         }
@@ -99,16 +101,16 @@ BaseTile
         if (control.isFactoryTile)
         {
             var factorySystemHost = areaLoader.item.host;
-            console.log("Show wizard for system <", systemName
-                , ">, host <", factorySystemHost, ">");
+            console.log("Show wizard for system <", systemName,
+                ">, host <", factorySystemHost, ">");
             context.setupFactorySystem(factorySystemHost);
         }
         else if (isCloudTile)
         {
             var cloudHost = control.impl.hostsModel.firstHost;
-            console.log("Connecting to cloud system <", systemName
-                , ">, throug the host <", cloudHost, ">");
-            context.connectToCloudSystem(cloudHost);
+            console.log("Connecting to cloud system <", systemName,
+                ">, throug the host <", cloudHost, ">");
+            context.connectToCloudSystem(control.systemId, cloudHost);
         }
         else // Local system tile
         {
@@ -119,7 +121,7 @@ BaseTile
         }
     }
 
-    titleLabel.text: (isFactoryTile ? "New System" : systemName);
+    titleLabel.text: (isFactoryTile ? qsTr("New System") : systemName);
 
     menuButton
     {
@@ -166,6 +168,7 @@ BaseTile
                 currentAreaItem.recentUserConnectionsModel = control.impl.recentConnectionsModel;
                 currentAreaItem.enabled = Qt.binding( function () { return control.isAvailable; });
                 currentAreaItem.prevTabObject = Qt.binding( function() { return control.collapseButton; });
+                currentAreaItem.isConnecting = Qt.binding( function() { return control.isConnecting; });
             }
             else if (control.impl.tileType === control.impl.kFactorySystemTileType)
             {
@@ -245,12 +248,13 @@ BaseTile
                 return;
 
             var tile  = control.areaLoader.item;
-            console.log("Connecting to local system<", control.systemName
-                , "host <", tile.selectedHost, "> with credentials: "
-                , tile.selectedUser, ":", tile.selectedPassword
-                , tile.savePassword, tile.autoLogin);
+            console.log("Connecting to local system<", control.systemName,
+                "host <", tile.selectedHost, "> with credentials: ",
+                tile.selectedUser, ":", tile.selectedPassword,
+                tile.savePassword, tile.autoLogin);
 
-            context.connectToLocalSystem(tile.selectedHost,
+            context.connectToLocalSystem(
+                control.systemId, tile.selectedHost,
                 tile.selectedUser, tile.selectedPassword,
                 tile.savePassword, tile.autoLogin);
         }

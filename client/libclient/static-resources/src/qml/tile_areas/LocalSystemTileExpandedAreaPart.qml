@@ -1,5 +1,4 @@
 import QtQuick 2.6;
-import QtQuick.Controls 1.2;
 
 import ".."
 
@@ -7,6 +6,7 @@ Column
 {
     id: control;
 
+    property bool isConnecting: false;
     property bool hasRecentConnections: false;
 
     property alias loginTextField: loginTextItem;
@@ -22,22 +22,27 @@ Column
     bottomPadding: 16;
     spacing: 16;
 
+    opacity: 0;
     anchors.left: (parent ? parent.left : undefined);
     anchors.right: (parent ? parent.right : undefined);
 
     signal connectButtonClicked();
 
+
+    onOpacityChanged:
+    {
+        if (opacity < 1.0 || !visible)
+            return;
+
+        if (loginTextItem.visible)
+            loginTextItem.forceActiveFocus();
+        else
+            passwordTextItem.forceActiveFocus();
+    }
+
     Column
     {
         width: parent.width;
-
-        onVisibleChanged:
-        {
-            if (loginTextItem.visible)
-                loginTextItem.forceActiveFocus();
-            else
-                passwordTextItem.forceActiveFocus();
-        }
 
         spacing: 8;
 
@@ -58,6 +63,8 @@ Column
 
             KeyNavigation.tab: passwordTextItem;
             KeyNavigation.backtab: prevTabObject;
+
+            enabled: !control.isConnecting;
         }
 
         NxLabel
@@ -76,12 +83,16 @@ Column
 
             KeyNavigation.tab: savePasswordCheckBoxControl;
             KeyNavigation.backtab: loginTextItem;
+
+            enabled: !control.isConnecting;
         }
 
         NxCheckBox
         {
             id: savePasswordCheckBoxControl;
             text: qsTr("Save password");
+
+            enabled: !control.isConnecting;
 
             onCheckedChanged:
             {
@@ -93,7 +104,7 @@ Column
         NxCheckBox
         {
             id: autoLoginCheckBoxItem;
-            enabled: savePasswordCheckBoxControl.checked;
+            enabled: savePasswordCheckBoxControl.checked && !control.isConnecting;
             text: qsTr("Auto-login");
         }
     }
@@ -104,10 +115,27 @@ Column
         anchors.right: parent.right;
 
         isAccentButton: true;
-        text: qsTr("Connect");
 
         KeyNavigation.tab: control.nextTabObject;
 
-        onClicked: control.connectButtonClicked();
+        onClicked: { control.connectButtonClicked(); }
+
+        text: (control.isConnecting ? "" : qsTr("Connect"));
+        enableHover: !control.isConnecting;
+
+        MouseArea
+        {
+            id: cancelButtonBehaviourArea;
+            anchors.fill: parent;
+            visible: control.isConnecting;
+        }
+
+        NxDotPreloader
+        {
+            color: Style.colors.brightText;
+            visible: control.isConnecting;
+
+            anchors.centerIn: parent;
+        }
     }
 }

@@ -24,7 +24,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
     ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction FailoverPriority
-    Permission GlobalPermission
+    Permission GlobalPermission UserRole
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
     MotionTypes TimePeriodTypes
@@ -553,6 +553,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
                                                         (or to the last system) automatically next time */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                          Used in QnActions::ConnectAction. */
+        CompletionWatcherRole,                      /**< Role for guard that calls specified handler after action was processed.
+                                                         Used in QnActions::ConnectAction. */
+
         ForceRole,                                  /**< Role for 'forced' flag. Used in QnActions::DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
         CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
@@ -605,6 +608,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         ActionEmittedBy,                            /** */
 
         GlobalPermissionsRole,                      /**< Global permissions role. Value of type Qn::GlobalPermissions. */
+        UserRoleRole,                               /**< Type of user role. Value of type Qn::UserRole. */
 
         RoleCount
     };
@@ -845,12 +849,13 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RemovePermission                = 0x0008,   /**< Generic delete permission. */
         ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
         WriteNamePermission             = 0x0010,   /**< Permission to edit resource's name. */
+        ViewContentPermission           = 0x0020,   /**< Permission to view video streams, layouts and web-pages. Required to show resources in UI. */
 
         /* Layout-specific permissions. */
-        AddRemoveItemsPermission        = 0x0020,   /**< Permission to add or remove items from a layout. */
-        EditLayoutSettingsPermission    = 0x0040,   /**< Permission to setup layout background or set locked flag. */
-        ModifyLayoutPermission          = Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission, /**< Permission to modify without saving. */
-        FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | AddRemoveItemsPermission | EditLayoutSettingsPermission,
+        AddRemoveItemsPermission        = 0x0040,   /**< Permission to add or remove items from a layout. */
+        EditLayoutSettingsPermission    = 0x0080,   /**< Permission to setup layout background or set locked flag. */
+        ModifyLayoutPermission          = ReadPermission | WritePermission | AddRemoveItemsPermission | ViewContentPermission, /**< Permission to modify without saving. */
+        FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | ModifyLayoutPermission | EditLayoutSettingsPermission,
 
         /* User-specific permissions. */
         WritePasswordPermission         = 0x0200,   /**< Permission to edit associated password. */
@@ -862,10 +867,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
                                             WritePasswordPermission | WriteAccessRightsPermission,
 
         /* Media-specific permissions. */
-        ExportPermission                = 0x800,   /**< Permission to export video parts. */
+        ExportPermission                = 0x1000,   /**< Permission to export video parts. */
 
         /* Camera-specific permissions. */
-        WritePtzPermission              = 0x1000,   /**< Permission to use camera's PTZ controls. */
+        WritePtzPermission              = 0x2000,   /**< Permission to use camera's PTZ controls. */
 
         AllPermissions = 0xFFFFFFFF
     };
@@ -891,7 +896,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* Manager permissions. */
         GlobalEditCamerasPermission             = 0x00000002,   /**< Can edit camera settings. */
         GlobalControlVideoWallPermission        = 0x00000004,   /**< Can control videowalls. */
-        INTERNAL_GlobalVideoWallLayoutPermission			= 0x00000008,   // !!For internal use only!! Videowall layout access. 
+        INTERNAL_GlobalVideoWallLayoutPermission= 0x00000008,   // !!For internal use only!! Videowall layout access.
         GlobalViewLogsPermission                = 0x00000010,   /**< Can access event log and audit trail. */
 
         /* Viewer permissions. */
@@ -904,13 +909,13 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalUserInputPermission               = 0x00010000,   /**< Can change camera's PTZ state, use 2-way audio, I/O buttons. */
 
         /* Resources access permissions */
-        GlobalAccessAllCamerasPermission        = 0x01000000,   /**< Has access to all cameras. */
+        GlobalAccessAllMediaPermission          = 0x01000000,   /**< Has access to all media resources (cameras and web pages). */
 
 
         /* Shortcuts. */
 
         /* Live viewer has access to all cameras and global layouts by default. */
-        GlobalLiveViewerPermissionSet       = GlobalAccessAllCamerasPermission,
+        GlobalLiveViewerPermissionSet       = GlobalAccessAllMediaPermission,
 
         /* Viewer can additionally view archive and bookmarks and export video. */
         GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission | GlobalViewBookmarksPermission,
@@ -919,10 +924,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalManageBookmarksPermission | GlobalUserInputPermission | GlobalViewLogsPermission,
 
         /* Admin can do everything. */
-        GlobalAdminPermissionsSet           = GlobalAdminPermission | GlobalAdvancedViewerPermissionSet | GlobalControlVideoWallPermission | GlobalEditCamerasPermission,
+        GlobalAdminPermissionSet            = GlobalAdminPermission | GlobalAdvancedViewerPermissionSet | GlobalControlVideoWallPermission | GlobalEditCamerasPermission,
 
         /* PTZ here is intended - for SpaceX, see VMS-2208 */
-        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalUserInputPermission | 
+        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalUserInputPermission |
                                               GlobalControlVideoWallPermission | INTERNAL_GlobalVideoWallLayoutPermission,
 
         /* Actions in ActiveX plugin mode are limited. */
@@ -933,6 +938,20 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissions)
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(GlobalPermission)
 
+
+    /**
+    * An enumeration for user role types: predefined roles, custom groups, custom permissions.
+    */
+    enum class UserRole
+    {
+        CustomUserGroup = -2,
+        CustomPermissions = -1,
+        Owner = 0,
+        Administrator,
+        AdvancedViewer,
+        Viewer,
+        LiveViewer,
+    };
 
 
     /**
@@ -956,7 +975,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TimePeriodContent)(Qn::Corner),
+    (Qn::TimePeriodContent)(Qn::Corner)(Qn::UserRole),
     (metatype)
 )
 
@@ -986,4 +1005,3 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzDataFields)(Qn::TTHeaderFlags)(Qn::ResourceInfoLevel),
     (metatype)(numeric)
 )
-

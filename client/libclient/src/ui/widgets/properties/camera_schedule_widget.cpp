@@ -14,6 +14,7 @@
 #include <licensing/license.h>
 
 #include <ui/actions/action_manager.h>
+#include <ui/common/palette.h>
 #include <ui/common/read_only.h>
 #include <ui/common/checkbox_utils.h>
 #include <ui/dialogs/resource_selection_dialog.h>
@@ -145,9 +146,11 @@ namespace {
         bool m_hasVideo;
     };
 
-    const int defaultMinArchiveDays = 1;
-    const int dangerousMinArchiveDays = 5;
-    const int defaultMaxArchiveDays = 30;
+    const int kDefaultMinArchiveDays = 1;
+    const int kDangerousMinArchiveDays = 5;
+    const int kDefaultMaxArchiveDays = 30;
+    const int kRecordingTypeLabelFontSize = 12;
+    const int kRecordingTypeLabelFontWeight = QFont::DemiBold;
 }
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
@@ -164,6 +167,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     m_maxDualStreamingFps(0)
 {
     ui->setupUi(this);
+
+    ui->enableRecordingCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
 
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityLow), Qn::QualityLow);
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityNormal), Qn::QualityNormal);
@@ -185,6 +190,17 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QnCheckbox::autoCleanTristate(ui->checkBoxMinArchive);
     QnCheckbox::autoCleanTristate(ui->checkBoxMaxArchive);
 
+    QFont labelFont;
+    labelFont.setPixelSize(kRecordingTypeLabelFontSize);
+    labelFont.setWeight(kRecordingTypeLabelFontWeight);
+
+    for (auto label : { ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord })
+    {
+        label->setFont(labelFont);
+        label->setProperty(style::Properties::kDontPolishFontProperty, true);
+    }
+
+
     auto notifyAboutScheduleEnabledChanged = [this](int state)
     {
         if (!isUpdating())
@@ -197,11 +213,11 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
             emit archiveRangeChanged();
     };
 
-    connect(ui->recordAlwaysButton,         &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateGridParams);
-    connect(ui->recordMotionButton,         &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateGridParams);
-    connect(ui->recordMotionPlusLQButton,   &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateGridParams);
-    connect(ui->recordMotionPlusLQButton,   &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateMaxFpsValue);
-    connect(ui->noRecordButton,             &QnCheckedButton::toggled,                      this, &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->recordAlwaysButton,         &QToolButton::toggled,                          this, &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->recordMotionButton,         &QToolButton::toggled,                          this, &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->recordMotionPlusLQButton,   &QToolButton::toggled,                          this, &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->recordMotionPlusLQButton,   &QToolButton::toggled,                          this, &QnCameraScheduleWidget::updateMaxFpsValue);
+    connect(ui->noRecordButton,             &QToolButton::toggled,                          this, &QnCameraScheduleWidget::updateGridParams);
     connect(ui->qualityComboBox,            QnComboboxCurrentIndexChanged,                  this, &QnCameraScheduleWidget::updateGridParams);
     connect(ui->fpsSpinBox,                 QnSpinboxIntValueChanged,                       this, &QnCameraScheduleWidget::updateGridParams);
     connect(this,                           &QnCameraScheduleWidget::scheduleTasksChanged,  this, &QnCameraScheduleWidget::updateRecordSpinboxes);
@@ -213,9 +229,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->displayQualityCheckBox,     &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::at_displayQualiteCheckBox_stateChanged);
     connect(ui->displayFpsCheckBox,         &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::at_displayFpsCheckBox_stateChanged);
 
-    connect(ui->enableRecordingCheckBox,    &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::updateGridEnabledState);
     connect(ui->enableRecordingCheckBox,    &QCheckBox::stateChanged,                       this, &QnCameraScheduleWidget::updateLicensesLabelText);
-
     connect(ui->enableRecordingCheckBox,    &QCheckBox::stateChanged,                       this, notifyAboutScheduleEnabledChanged);
 
     connect(ui->gridWidget,                 &QnScheduleGridWidget::cellActivated,           this, &QnCameraScheduleWidget::at_gridWidget_cellActivated);
@@ -267,15 +281,23 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     retranslateUi();
 }
 
-QnCameraScheduleWidget::~QnCameraScheduleWidget() {
-    return;
+QnCameraScheduleWidget::~QnCameraScheduleWidget()
+{
 }
 
-void QnCameraScheduleWidget::retranslateUi() {
+void QnCameraScheduleWidget::retranslateUi()
+{
+    ui->retranslateUi(this);
+
     QString warnText = (qnResPool && qnResPool->containsIoModules())
-        ? tr("Warning! High minimum value could decrease other devices' recording durations.")
-        : tr("Warning! High minimum value could decrease other cameras' recording durations.");
+        ? tr("High minimum value can lead to archive length decrease on other devices.")
+        : tr("High minimum value can lead to archive length decrease on other cameras.");
+
     ui->minArchiveDaysWarningLabel->setText(warnText);
+
+    ui->scheduleGridGroupBox->setTitle(lit("%1\t(%2)").arg(
+            tr("Recording Schedule")).arg(
+            tr("based on server time")));
 }
 
 void QnCameraScheduleWidget::afterContextInitialized() {
@@ -283,13 +305,6 @@ void QnCameraScheduleWidget::afterContextInitialized() {
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnCameraScheduleWidget::updateLicensesButtonVisible);
     updatePanicLabelText();
     updateLicensesButtonVisible();
-}
-
-
-bool QnCameraScheduleWidget::hasHeightForWidth() const {
-    return false;   //TODO: #GDM temporary fix to handle string freeze
-                    // all labels with word-wrap should be replaced by QnWordWrappedLabel.
-                    // This widget has 5 of them (label_4.._8, exportWarningLabel)
 }
 
 void QnCameraScheduleWidget::connectToGridWidget()
@@ -386,7 +401,7 @@ void QnCameraScheduleWidget::updateScheduleEnabled() {
 }
 
 void QnCameraScheduleWidget::updateMinDays() {
-    auto calcMinDays = [](int d) { return d == 0 ? defaultMinArchiveDays : qAbs(d);  };
+    auto calcMinDays = [](int d) { return d == 0 ? kDefaultMinArchiveDays : qAbs(d);  };
 
     const int minDays = m_cameras.isEmpty()
         ? 0
@@ -403,7 +418,7 @@ void QnCameraScheduleWidget::updateMinDays() {
 }
 
 void QnCameraScheduleWidget::updateMaxDays() {
-    auto calcMaxDays = [](int d) { return d == 0 ? defaultMaxArchiveDays : qAbs(d);  };
+    auto calcMaxDays = [](int d) { return d == 0 ? kDefaultMaxArchiveDays : qAbs(d);  };
 
     const int maxDays = m_cameras.isEmpty()
         ? 0
@@ -584,15 +599,23 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
     else
         qWarning() << "QnCameraScheduleWidget::No record type is selected!";
 
+    for (auto label : { ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord })
+    {
+        auto button = qobject_cast<QAbstractButton*>(label->buddy());
+        QPalette::ColorRole foreground = button && button->isChecked() ? QPalette::Highlight : QPalette::WindowText;
+        label->setForegroundRole(foreground);
+    }
+
     bool enabled = !ui->noRecordButton->isChecked();
     ui->fpsSpinBox->setEnabled(enabled && m_recordingParamsAvailable);
     ui->qualityComboBox->setEnabled(enabled && m_recordingParamsAvailable);
     updateRecordSpinboxes();
 
-
-    if(!(m_readOnly && fromUserInput)) {
+    if (!(m_readOnly && fromUserInput))
+    {
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::RecordTypeParam, recordType);
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::DiffersFlagParam, false);
+
         if (ui->noRecordButton->isChecked())
         {
             ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FpsParam, QLatin1String("-"));
@@ -689,25 +712,17 @@ bool QnCameraScheduleWidget::isRecordingParamsAvailable() const
     return m_recordingParamsAvailable;
 }
 
-
-void QnCameraScheduleWidget::updateArchiveRangeEnabledState() {
-    bool isEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
-    ui->spinBoxMaxDays->setEnabled(isEnabled && ui->checkBoxMaxArchive->checkState() == Qt::Unchecked);
-    ui->spinBoxMinDays->setEnabled(isEnabled && ui->checkBoxMinArchive->checkState() == Qt::Unchecked);
+void QnCameraScheduleWidget::updateArchiveRangeEnabledState()
+{
+    ui->spinBoxMaxDays->setEnabled(ui->checkBoxMaxArchive->checkState() == Qt::Unchecked);
+    ui->spinBoxMinDays->setEnabled(ui->checkBoxMinArchive->checkState() == Qt::Unchecked);
     validateArchiveLength();
 }
 
 void QnCameraScheduleWidget::updateGridEnabledState()
 {
-    bool enabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
-
-    ui->scheduleGridGroupBox->setEnabled(enabled);
-    ui->settingsGroupBox->setEnabled(enabled);
-    ui->motionGroupBox->setEnabled(enabled && m_recordingParamsAvailable);
-    ui->gridWidget->setEnabled(enabled && !m_changesDisabled);
-
-    ui->checkBoxMinArchive->setEnabled(enabled);
-    ui->checkBoxMaxArchive->setEnabled(enabled);
+    ui->motionGroupBox->setEnabled(m_recordingParamsAvailable);
+    ui->gridWidget->setEnabled(!m_changesDisabled);
     updateArchiveRangeEnabledState();
 }
 
@@ -715,15 +730,16 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
 {
     QnCamLicenseUsageHelper helper;
 
-    switch(ui->enableRecordingCheckBox->checkState()) {
-    case Qt::Checked:
-        helper.propose(m_cameras, true);
-        break;
-    case Qt::Unchecked:
-        helper.propose(m_cameras, false);
-        break;
-    default:
-        break;
+    switch(ui->enableRecordingCheckBox->checkState())
+    {
+        case Qt::Checked:
+            helper.propose(m_cameras, true);
+            break;
+        case Qt::Unchecked:
+            helper.propose(m_cameras, false);
+            break;
+        default:
+            break;
     }
     ui->licensesUsageWidget->loadData(&helper);
 }
@@ -733,14 +749,10 @@ void QnCameraScheduleWidget::updateLicensesButtonVisible()
     ui->licensesButton->setVisible(accessController()->hasGlobalPermission(Qn::GlobalAdminPermission));
 }
 
-void QnCameraScheduleWidget::updateRecordSpinboxes(){
-    bool motionEnabled = m_motionAvailable && (
-                ui->recordMotionButton->isChecked() ||
-                ui->recordMotionPlusLQButton->isChecked() ||
-                hasMotionOnGrid()
-                );
-    ui->recordBeforeSpinBox->setEnabled(motionEnabled);
-    ui->recordAfterSpinBox->setEnabled(motionEnabled);
+void QnCameraScheduleWidget::updateRecordSpinboxes()
+{
+    ui->recordBeforeSpinBox->setEnabled(m_motionAvailable);
+    ui->recordAfterSpinBox->setEnabled(m_motionAvailable);
 }
 
 void QnCameraScheduleWidget::updateMotionButtons() {
@@ -789,12 +801,12 @@ void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled)
     ui->fpsSpinBox->setMaximum(maximum);
 }
 
-void QnCameraScheduleWidget::updateColors() {
-    ui->recordAlwaysButton->setColor(ui->gridWidget->colors().recordAlways);
-    ui->recordMotionButton->setColor(ui->gridWidget->colors().recordMotion);
-    ui->recordMotionPlusLQButton->setColor(ui->gridWidget->colors().recordMotion);
-    ui->recordMotionPlusLQButton->setInsideColor(ui->gridWidget->colors().recordAlways);
-    ui->noRecordButton->setColor(ui->gridWidget->colors().recordNever);
+void QnCameraScheduleWidget::updateColors()
+{
+    ui->recordAlwaysButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_Always));
+    ui->recordMotionButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_MotionOnly));
+    ui->recordMotionPlusLQButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_MotionAndLowQuality));
+    ui->noRecordButton->setCustomPaintFunction(ui->gridWidget->paintFunction(Qn::RT_Never));
 }
 
 // -------------------------------------------------------------------------- //
@@ -1001,5 +1013,5 @@ void QnCameraScheduleWidget::validateArchiveLength() {
         if (ui->spinBoxMaxDays->value() < ui->spinBoxMinDays->value())
             ui->spinBoxMaxDays->setValue(ui->spinBoxMinDays->value());
     }
-    ui->minArchiveDaysWarningLabel->setVisible(ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() > dangerousMinArchiveDays);
+    ui->minArchiveDaysWarningLabel->setVisible(ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() > kDangerousMinArchiveDays);
 }

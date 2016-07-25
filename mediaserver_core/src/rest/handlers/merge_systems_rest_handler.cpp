@@ -29,8 +29,9 @@
 #include "audit/audit_manager.h"
 #include "rest/server/rest_connection_processor.h"
 #include "http/custom_headers.h"
-#include "settings.h"
 
+#include <rest/helpers/permissions_helper.h>
+#include <network/authenticate_helper.h>
 
 namespace
 {
@@ -45,13 +46,8 @@ int QnMergeSystemsRestHandler::executeGet(
         const QnRestConnectionProcessor *owner)
 {
     Q_UNUSED(path)
-    if (MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt() ||
-        ec2::Settings::instance()->dbReadOnly())
-    {
-        NX_LOG(lit("QnMergeSystemsRestHandler. Can't change parameters because server is running in safe mode"), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
-        return nx_http::StatusCode::forbidden;
-    }
+    if (QnPermissionsHelper::isSafeMode())
+        return QnPermissionsHelper::safeModeError(result);
 
     QUrl url = params.value(lit("url"));
     QString password = params.value(lit("password"));
@@ -100,7 +96,8 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::internalServerError;
     }
 
-    if (!admin->checkPassword(currentPassword)) {
+    if (!qnAuthHelper->checkUserPassword(admin, currentPassword))
+    {
         NX_LOG(lit("QnMergeSystemsRestHandler. Wrong admin password"), cl_logDEBUG1);
         result.setError(QnJsonRestResult::InvalidParameter, lit("currentPassword"));
         return nx_http::StatusCode::ok;

@@ -29,7 +29,9 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_awaitJumpCounter(0),
     m_buffering(0),
     m_hurryUpToFrame(0),
-    m_noDelayState(NoDelayState::Disabled)
+    m_noDelayState(NoDelayState::Disabled),
+    m_lastFrameTimeUs(AV_NOPTS_VALUE),
+    m_lastDisplayedTimeUs(AV_NOPTS_VALUE)
 {
     connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
         this, &PlayerDataConsumer::onBeforeJump, Qt::DirectConnection);
@@ -103,7 +105,10 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
     {
         QnMutexLocker lock(&m_queueMutex);
         if (!m_videoDecoder)
+        {
             m_videoDecoder.reset(new SeamlessVideoDecoder());
+            m_videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
+        }
         if (!m_audioDecoder)
             m_audioDecoder.reset(new SeamlessAudioDecoder());
     }
@@ -226,6 +231,9 @@ QVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
     }
 
     m_queueWaitCond.wakeAll();
+
+    if (result)
+        m_lastFrameTimeUs = result->startTime() * 1000;
     return result;
 }
 
@@ -247,7 +255,7 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
     return true;
 }
 
-void PlayerDataConsumer::onBeforeJump(qint64 /*timeUsec*/)
+void PlayerDataConsumer::onBeforeJump(qint64 timeUsec)
 {
     // This function is called directly from an archiveReader thread. Should be thread safe.
     QnMutexLocker lock(&m_dataProviderMutex);
@@ -258,6 +266,7 @@ void PlayerDataConsumer::onBeforeJump(qint64 /*timeUsec*/)
     // We supposed to decode/display them at maximum speed unless the last jump command is
     // processed.
     m_noDelayState = NoDelayState::Activated;
+    m_lastDisplayedTimeUs = m_lastFrameTimeUs = timeUsec; //< force position to the new place
 }
 
 void PlayerDataConsumer::onJumpCanceled(qint64 /*timeUsec*/)
@@ -301,12 +310,43 @@ QSize PlayerDataConsumer::currentResolution() const
         return QSize();
 }
 
-CodecID PlayerDataConsumer::currentCodec() const
+AVCodecID PlayerDataConsumer::currentCodec() const
 {
     if (m_videoDecoder)
         return m_videoDecoder->currentCodec();
     else
-        return CODEC_ID_NONE;
+        return AV_CODEC_ID_NONE;
+}
+
+void PlayerDataConsumer::setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor)
+{
+    NX_ASSERT(videoGeometryAccessor);
+    m_videoGeometryAccessor = videoGeometryAccessor;
+}
+
+qint64 PlayerDataConsumer::getCurrentTime() const
+{
+    return m_lastFrameTimeUs;
+}
+
+qint64 PlayerDataConsumer::getDisplayedTime() const
+{
+    return m_lastDisplayedTimeUs;
+}
+
+void PlayerDataConsumer::setDisplayedTimeUs(qint64 value)
+{
+    m_lastDisplayedTimeUs = value;
+}
+
+qint64 PlayerDataConsumer::getNextTime() const
+{
+    return AV_NOPTS_VALUE;
+}
+
+qint64 PlayerDataConsumer::getExternalTime() const
+{
+    return m_lastDisplayedTimeUs;
 }
 
 } // namespace media

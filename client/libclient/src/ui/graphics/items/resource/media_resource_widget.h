@@ -20,7 +20,9 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 #include <core/ptz/media_dewarping_params.h>
 
 #include <client/client_globals.h>
+#include <client/client_color_types.h>
 #include <camera/resource_display.h> //< TODO: #Elric FWD!
+#include <ui/customization/customized.h>
 #include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/media/sse_helper.h>
@@ -32,9 +34,12 @@ class QnCachingCameraDataLoader;
 class QnIoModuleOverlayWidget;
 class QnCompositeTextOverlay;
 
-class QnMediaResourceWidget: public QnResourceWidget {
+class QnMediaResourceWidget: public Customized<QnResourceWidget>
+{
     Q_OBJECT
-    typedef QnResourceWidget base_type;
+    typedef Customized<QnResourceWidget> base_type;
+
+    Q_PROPERTY(QVector<QColor> motionSensitivityColors READ motionSensitivityColors WRITE setMotionSensitivityColors);
 
 public:
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
@@ -122,6 +127,9 @@ public:
     bool hasVideo() const;
 
     QnCompositeTextOverlay *compositeTextOverlay();
+
+    QVector<QColor> motionSensitivityColors() const;
+    void setMotionSensitivityColors(const QVector<QColor>& value);
 
 signals:
     void motionSelectionChanged();
@@ -278,6 +286,8 @@ private:
     QnSingleCamLicenceStatusHelperPtr m_ioLicenceStatusHelper;
 
     qint64 m_posUtcMs;
+
+    QVector<QColor> m_motionSensitivityColors;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

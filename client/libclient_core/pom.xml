@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>libclient_core</artifactId>
     <packaging>pom</packaging>
-    <name>NX Witness Client Core Library</name>
+    <name>Nx Witness Client Core Library</name>
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>
@@ -62,15 +62,6 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_vms_utils/pom.xml</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>libvms_gateway</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/nx_cloud/libvms_gateway/pom.xml</systemPath>
         </dependency>
 
         <dependency>

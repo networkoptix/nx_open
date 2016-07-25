@@ -145,8 +145,12 @@ namespace
     {
         if (qstyleoption_cast<const QStyleOptionButton*>(option))
         {
-            if (option->state.testFlag(QStyle::State_On) || option->state.testFlag(QStyle::State_Off))
+            if (option->state.testFlag(QStyle::State_On) ||
+                option->state.testFlag(QStyle::State_Off) ||
+                option->state.testFlag(QStyle::State_NoChange))
+            {
                 return true;
+            }
 
             const QAbstractButton* buttonWidget = qobject_cast<const QAbstractButton*>(option->styleObject);
             if (buttonWidget && buttonWidget->isCheckable())
@@ -154,6 +158,11 @@ namespace
         }
 
         return false;
+    }
+
+    bool isSwitchButtonCheckbox(const QWidget* widget)
+    {
+        return widget && widget->property(Properties::kCheckBoxAsButton).toBool();
     }
 
     /* Checks whether view item contains a checkbox without any text or decoration: */
@@ -1399,6 +1408,9 @@ void QnNxStyle::drawControl(
 {
     Q_D(const QnNxStyle);
 
+    if (element == CE_CheckBox && isSwitchButtonCheckbox(widget))
+        element = CE_PushButton;
+
     switch (element)
     {
         case CE_ShapedFrame:
@@ -1969,7 +1981,12 @@ void QnNxStyle::drawControl(
 
         case CE_Splitter:
         {
-            painter->fillRect(option->rect, option->palette.shadow());
+            QStyleOptionFrame frameOption;
+            frameOption.QStyleOption::operator = (*option);
+            frameOption.frameShape = option->state.testFlag(State_Horizontal) ? QFrame::VLine : QFrame::HLine;
+            frameOption.lineWidth = 1;
+            frameOption.state |= State_Sunken;
+            proxy()->drawControl(CE_ShapedFrame, &frameOption, painter, widget);
             break;
         }
 
@@ -2288,6 +2305,14 @@ QRect QnNxStyle::subElementRect(
 {
     switch (subElement)
     {
+        case SE_CheckBoxClickRect:
+        {
+            if (isSwitchButtonCheckbox(widget))
+                return option->rect;
+
+            break;
+        }
+
         case SE_LineEditContents:
         {
             if (!widget || !widget->parent() || !qobject_cast<const QAbstractItemView*>(widget->parent()->parent()))
@@ -2301,11 +2326,11 @@ QRect QnNxStyle::subElementRect(
             if (auto buttonBox = qobject_cast<const QDialogButtonBox *>(widget))
             {
                 if (qobject_cast<const QDialog*>(buttonBox->parentWidget()))
-                        {
-                            int margin = proxy()->pixelMetric(PM_DefaultTopLevelMargin);
-                            return QnGeometry::dilated(option->rect, margin);
-                        }
-                    }
+                {
+                    int margin = proxy()->pixelMetric(PM_DefaultTopLevelMargin);
+                    return QnGeometry::dilated(option->rect, margin);
+                }
+            }
             break;
         }
 
@@ -2498,6 +2523,9 @@ QSize QnNxStyle::sizeFromContents(
         const QSize &size,
         const QWidget *widget) const
 {
+    if (type == CT_CheckBox && isSwitchButtonCheckbox(widget))
+        type = CT_PushButton;
+
     switch (type)
     {
         case CT_CheckBox:
@@ -2767,7 +2795,7 @@ int QnNxStyle::pixelMetric(
             return dp(8);
 
         case PM_SplitterWidth:
-            return dp(1);
+            return dp(Metrics::kDefaultTopLevelMargin*2 + 1);
 
         case PM_TabBarTabHSpace:
         case PM_TabBarTabVSpace:

@@ -136,8 +136,7 @@ namespace ec2 {
         , number(-1)
     {}
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \
-        API_STATISTICS_DATA_TYPES, (ubjson)(xml)(json)(csv_record), \
-        _Fields, (optional, true));
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+        API_STATISTICS_DATA_TYPES, (ubjson)(xml)(json)(csv_record), _Fields)
 
-} // namespace ec2
+    } // namespace ec2

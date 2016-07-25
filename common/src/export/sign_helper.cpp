@@ -61,7 +61,8 @@ float getAvgColor(const AVFrame* frame, int plane, const QRect& rect)
 }
 
 QnSignHelper::QnSignHelper():
-    m_cachedMetric(QFont())
+    m_cachedMetric(QFont()),
+    m_outPacket(av_packet_alloc())
 {
     m_opacity = 1.0;
     m_signBackground = Qt::white;
@@ -80,6 +81,11 @@ QnSignHelper::QnSignHelper():
             break;
         }
     }
+}
+
+QnSignHelper::~QnSignHelper()
+{
+    av_packet_free(&m_outPacket);
 }
 
 void QnSignHelper::updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size)
@@ -103,9 +109,9 @@ void QnSignHelper::doUpdateDigestNoCodec(QnCryptographicHash &ctx, const quint8*
     ctx.addData((const char*) data, size);
 }
 
-void QnSignHelper::doUpdateDigest(CodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size)
+void QnSignHelper::doUpdateDigest(AVCodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size)
 {
-    if (codecId != CODEC_ID_H264)
+    if (codecId != AV_CODEC_ID_H264)
     {
         doUpdateDigestNoCodec(ctx, data, size);
         return;
@@ -180,7 +186,7 @@ QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
                 return QByteArray(); // invalid data
 
             // check colors plane
-            const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
+            const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) frame->format);
             for (int i = 0; i < descr->log2_chroma_w; ++i)
                 checkRect = QRect(checkRect.left()/2, checkRect.top(), checkRect.width()/2, checkRect.height());
             for (int i = 0; i < descr->log2_chroma_h; ++i)
@@ -346,7 +352,7 @@ void QnSignHelper::drawOnSignFrame(AVFrame* frame)
     QImage img(imgBuffer, frame->width, frame->height, frame->linesize[0]*4, QImage::Format_ARGB32);
     draw(img, true);
 
-    SwsContext* scaleContext = sws_getContext(frame->width, frame->height, PIX_FMT_BGRA, frame->width, frame->height, (PixelFormat) frame->format, SWS_POINT, NULL, NULL, NULL);
+    SwsContext* scaleContext = sws_getContext(frame->width, frame->height, AV_PIX_FMT_BGRA, frame->width, frame->height, (AVPixelFormat) frame->format, SWS_POINT, NULL, NULL, NULL);
     if (scaleContext)
     {
         quint8* srcData[4];
@@ -572,7 +578,7 @@ int QnSignHelper::runX264Process(AVFrame* frame, QString optionStr, quint8* rezB
         return -1;
     QString tempName = file.fileName();
 
-    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) frame->format);
     file.write((const char*) frame->data[0], frame->linesize[0]*frame->height);
     file.write((const char*) frame->data[1], frame->linesize[1]*frame->height/(1 << descr->log2_chroma_h));
     file.write((const char*) frame->data[2], frame->linesize[2]*frame->height/(1 << descr->log2_chroma_h));
@@ -639,7 +645,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcC
     videoCodecCtx->time_base.den = 30;
 
 
-    AVFrame* frame = avcodec_alloc_frame();
+    AVFrame* frame = av_frame_alloc();
     frame->width = videoCodecCtx->width;
     frame->height = videoCodecCtx->height;
     frame->format = videoCodecCtx->pix_fmt;
@@ -656,7 +662,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcC
     drawOnSignFrame(frame);
 
     int out_size = 0;
-    if (videoCodecCtx->codec_id == CODEC_ID_H264)
+    if (videoCodecCtx->codec_id == AV_CODEC_ID_H264)
     {
         // To avoid X.264 GPL restriction run x264 as separate process
         QString optionStr = fillH264EncoderParams(srcCodecExtraData, iFrame, videoCodecCtx); // make X264 frame compatible with existing stream
@@ -672,12 +678,24 @@ QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcC
         }
 
         // TODO: #vasilenko avoid using deprecated methods
-        out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, frame);
-        if (out_size == 0)
-            out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, 0); // flush encoder buffer
+        //out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, frame);
+
+        m_outPacket->data = videoBuf;
+        m_outPacket->size = videoBufSize;
+        int got_packet = 0;
+        avcodec_encode_video2(videoCodecCtx, m_outPacket, frame, &got_packet);
+
+        if (!got_packet)
+        {
+            m_outPacket->data = videoBuf;
+            m_outPacket->size = videoBufSize;
+            avcodec_encode_video2(videoCodecCtx, m_outPacket, frame, &got_packet);  //< flush encoder buffer
+        }
+        if (got_packet)
+            out_size = m_outPacket->size;
     }
 
-    if (videoCodecCtx->codec_id == CODEC_ID_H264)
+    if (videoCodecCtx->codec_id == AV_CODEC_ID_H264)
     {
         // skip x264 SEI message
         out_size = removeH264SeiMessage(videoBuf, out_size);

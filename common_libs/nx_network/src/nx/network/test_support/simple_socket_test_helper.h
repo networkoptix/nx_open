@@ -656,15 +656,18 @@ void socketConnectToBadAddress(
     ASSERT_TRUE(client->setNonBlockingMode(true));
     ASSERT_TRUE(client->setSendTimeout(
         std::chrono::duration_cast<std::chrono::milliseconds>(sendTimeout).count()));
+
     nx::utils::promise<SystemError::ErrorCode> connectCompletedPromise;
     client->connectAsync(
         SocketAddress("abdasdf:123"),
         [&](SystemError::ErrorCode errorCode)
         {
-            connectCompletedPromise.set_value(errorCode);
             if (deleteInIoThread)
                 client.reset();
+
+            connectCompletedPromise.set_value(errorCode);
         });
+
     const auto errorCode = connectCompletedPromise.get_future().get();
     ASSERT_NE(SystemError::noError, errorCode);
 }

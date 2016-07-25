@@ -187,7 +187,7 @@ namespace nx_hls
         if( request.requestLine.version == nx_http::http_1_1 )
         {
             if( (response.statusLine.statusCode / 100 == 2) && (response.headers.find("Transfer-Encoding") == response.headers.end()) )
-                response.headers.insert( std::make_pair( 
+                response.headers.insert( std::make_pair(
                     "Transfer-Encoding",
                     response.headers.find("Content-Length") != response.headers.end() ? "identity" : "chunked") );
             response.headers.emplace( "Connection", "close" ); //no persistent connections support
@@ -263,7 +263,7 @@ namespace nx_hls
         }
 
         QnConstCompressedVideoDataPtr lastVideoFrame = camera->getLastVideoFrame( true, 0 );
-        if( lastVideoFrame && (lastVideoFrame->compressionType != CODEC_ID_H264) && (lastVideoFrame->compressionType != CODEC_ID_NONE) )
+        if( lastVideoFrame && (lastVideoFrame->compressionType != AV_CODEC_ID_H264) && (lastVideoFrame->compressionType != AV_CODEC_ID_NONE) )
         {
             //video is not in h.264 format
             NX_LOG( lit("Error. HLS request to resource %1 with codec %2").
@@ -288,6 +288,7 @@ namespace nx_hls
             return getPlaylist(
                 request,
                 camResource,
+                userResource,
                 camera,
                 requestParams,
                 response );
@@ -391,6 +392,7 @@ namespace nx_hls
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getPlaylist(
         const nx_http::Request& request,
         const QnSecurityCamResourcePtr& camResource,
+        const QnUserResourcePtr& userResource,
         const QnVideoCameraPtr& videoCamera,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
@@ -444,6 +446,7 @@ namespace nx_hls
             }
 
             const nx_http::StatusCode::Value result = createSession(
+                userResource->getId(),
                 request.requestLine.url.path(),
                 sessionID,
                 requestParams,
@@ -839,6 +842,7 @@ namespace nx_hls
     }
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::createSession(
+        const QnUuid& authUserId,
         const QString& requestedPlaylistPath,
         const QString& sessionID,
         const std::multimap<QString, QString>& requestParams,
@@ -851,7 +855,7 @@ namespace nx_hls
         requiredQualities.reserve( 2 );
         if( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Auto )
             requiredQualities.push_back( MEDIA_Quality_High );
-        if( (streamQuality == MEDIA_Quality_Low) || 
+        if( (streamQuality == MEDIA_Quality_Low) ||
             (streamQuality == MEDIA_Quality_Auto && camResource->hasDualStreaming2()) )
         {
             requiredQualities.push_back( MEDIA_Quality_Low );
@@ -912,7 +916,7 @@ namespace nx_hls
             for( const MediaQuality quality: requiredQualities )
             {
                 //generating sliding playlist, holding not more than CHUNK_COUNT_IN_ARCHIVE_PLAYLIST archive chunks
-                nx_hls::ArchivePlaylistManagerPtr archivePlaylistManager = 
+                nx_hls::ArchivePlaylistManagerPtr archivePlaylistManager =
                     std::make_shared<ArchivePlaylistManager>(
                         camResource,
                         startTimestamp.get(),
@@ -931,11 +935,13 @@ namespace nx_hls
         }
 
         const auto& chunkAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
+            authUserId,
             HLS_PREFIX + camResource->getUniqueId(),
             QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS );
         newHlsSession->setChunkAuthenticationQueryItem( chunkAuthenticationKey );
 
         const auto& playlistAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
+            authUserId,
             requestedPlaylistPath,
             QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS );
         newHlsSession->setPlaylistAuthenticationQueryItem( playlistAuthenticationKey );

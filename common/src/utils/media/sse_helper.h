@@ -2,9 +2,6 @@
 
 #include <QtCore/QString>
 
-#include <utils/common/qt_private_headers.h>
-#include QT_CORE_PRIVATE_HEADER(qsimd_p.h)
-
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
 #include <xmmintrin.h>
 #include <emmintrin.h>
@@ -102,85 +99,10 @@ typedef struct
     #define _mm_hadd_epi16_ssse3 _mm_hadd_epi16
 #endif
 
-
-//TODO: #ak give up following Q_OS_MAC check
-//TODO/ARM: sse analog
-
-#ifdef __arm__
-
-static inline bool useSSE2()
-{
-    return false;
-}
-
-static inline bool useSSE3()
-{
-    return false;
-}
-
-static inline bool useSSSE3()
-{
-    return false;
-}
-
-static inline bool useSSE41()
-{
-    return false;
-}
-
-static inline bool useSSE42()
-{
-    return false;
-}
-
-#else
-
-static inline bool useSSE2()
-{
-#ifdef Q_OS_MAC
-    return true;
-#else
-    return qCpuHasFeature(SSE2);
-#endif
-}
-
-static inline bool useSSE3()
-{
-#ifdef Q_OS_MAC
-    return true;
-#else
-    return qCpuHasFeature(SSE3);
-#endif
-}
-
-static inline bool useSSSE3()
-{
-#ifdef Q_OS_MAC
-    return true;
-#else
-    return qCpuHasFeature(SSSE3);
-#endif
-}
-
-static inline bool useSSE41()
-{
-    //TODO: #ak we are compiling mac client with -msse4.1 - why is it forbidden here?
-#ifdef Q_OS_MAC
-    return false;
-#else
-    return qCpuHasFeature(SSE4_1);
-#endif
-}
-
-static inline bool useSSE42()
-{
-#ifdef Q_OS_MAC
-    return false;
-#else
-    return qCpuHasFeature(SSE4_2);
-#endif
-}
-
-#endif  // not arm
+bool useSSE2();
+bool useSSE3();
+bool useSSSE3();
+bool useSSE41();
+bool useSSE42();
 
 QString getCPUString();

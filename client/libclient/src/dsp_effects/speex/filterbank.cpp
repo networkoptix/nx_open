@@ -44,11 +44,11 @@
 #ifdef FIXED_POINT
 
 #define toBARK(n)   (MULT16_16(26829,spx_atan(SHR32(MULT16_16(97,n),2))) + MULT16_16(4588,spx_atan(MULT16_32_Q15(20,MULT16_16(n,n)))) + MULT16_16(3355,n))
-      
+
 #else
 #define toBARK(n)   (13.1f*atan(.00074f*(n))+2.24f*atan((n)*(n)*1.85e-8f)+1e-4f*(n))
 #endif
-       
+
 #define toMEL(n)    (2595.f*log10(1.f+(n)/700.f))
 
 FilterBank *filterbank_new(int banks, spx_word32_t sampling, int len, int type)
@@ -64,17 +64,17 @@ FilterBank *filterbank_new(int banks, spx_word32_t sampling, int len, int type)
    df = DIV32(SHL32(sampling,15),MULT16_16(2,len));
    max_mel = toBARK(EXTRACT16(sampling/2));
    mel_interval = PDIV32(max_mel,banks-1);
-   
-   bank = (FilterBank*)av_malloc(sizeof(FilterBank));
+
+   bank = (FilterBank*)av_mallocz(sizeof(FilterBank));
    bank->nb_banks = banks;
    bank->len = len;
-   bank->bank_left = (int*)av_malloc(len*sizeof(int));
-   bank->bank_right = (int*)av_malloc(len*sizeof(int));
-   bank->filter_left = (spx_word16_t*)av_malloc(len*sizeof(spx_word16_t));
-   bank->filter_right = (spx_word16_t*)av_malloc(len*sizeof(spx_word16_t));
+   bank->bank_left = (int*)av_mallocz(len*sizeof(int));
+   bank->bank_right = (int*)av_mallocz(len*sizeof(int));
+   bank->filter_left = (spx_word16_t*)av_mallocz(len*sizeof(spx_word16_t));
+   bank->filter_right = (spx_word16_t*)av_mallocz(len*sizeof(spx_word16_t));
    /* Think I can safely disable normalisation that for fixed-point (and probably float as well) */
 #ifndef FIXED_POINT
-   bank->scaling = (float*)av_malloc(banks*sizeof(float));
+   bank->scaling = (float*)av_mallocz(banks*sizeof(float));
 #endif
    for (i=0;i<len;i++)
    {
@@ -87,7 +87,7 @@ FilterBank *filterbank_new(int banks, spx_word32_t sampling, int len, int type)
          break;
 #ifdef FIXED_POINT
       id1 = DIV32(mel,mel_interval);
-#else      
+#else
       id1 = (int)(floor(mel/mel_interval));
 #endif
       if (id1>banks-2)
@@ -103,7 +103,7 @@ FilterBank *filterbank_new(int banks, spx_word32_t sampling, int len, int type)
       bank->bank_right[i] = id2;
       bank->filter_right[i] = val;
    }
-   
+
    /* Think I can safely disable normalisation for fixed-point (and probably float as well) */
 #ifndef FIXED_POINT
    for (i=0;i<bank->nb_banks;i++)

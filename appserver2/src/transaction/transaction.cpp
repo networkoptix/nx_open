@@ -39,9 +39,17 @@ namespace ec2
             .arg(persistentInfo.sequence);
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::PersistentInfo,    (json)(ubjson)(xml)(csv_record),   QnAbstractTransaction_PERSISTENT_Fields)
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,                    (json)(ubjson)(xml)(csv_record),   QnAbstractTransaction_Fields)
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiTransactionData,                    (json)(ubjson)(xml)(csv_record),   ApiTransactionDataFields)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+        QnAbstractTransaction::PersistentInfo,
+        (json)(ubjson)(xml)(csv_record),
+        QnAbstractTransaction_PERSISTENT_Fields,
+        (optional, false))
+
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+        (QnAbstractTransaction)(ApiTransactionData),
+        (json)(ubjson)(xml)(csv_record),
+        _Fields,
+        (optional, false))
 
 } // namespace ec2
 

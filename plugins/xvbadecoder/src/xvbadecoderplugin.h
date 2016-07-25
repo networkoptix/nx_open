@@ -35,12 +35,12 @@ public:
     virtual void initializeLog( QnLog* );
 
     //!Implementation of QnAbstractDecoderPlugin::supportedCodecTypes
-    virtual QList<CodecID> supportedCodecTypes() const;
+    virtual QList<AVCodecID> supportedCodecTypes() const;
     //!Implementation of QnAbstractDecoderPlugin::isHardwareAccelerated
     virtual bool isHardwareAccelerated() const;
     //!Implementation of QnAbstractDecoderPlugin::create
     virtual QnAbstractVideoDecoder* create(
-            CodecID codecID,
+            AVCodecID codecID,
             const QnCompressedVideoDataPtr& data,
             const QGLContext* const glContext ) const;
 

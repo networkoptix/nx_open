@@ -1,5 +1,4 @@
 import QtQuick 2.6;
-import QtQuick.Controls 1.2;
 
 import ".."
 
@@ -16,7 +15,7 @@ Item
     property string selectedPassword: expandedArea.passwordTextField.text;
     property bool savePassword: expandedArea.savePasswordCheckbox.checked;
     property bool autoLogin: expandedArea.autoLoginCheckBox.checked;
-
+    property bool isConnecting: false;
     property var hostsModel;
     property var recentUserConnectionsModel;
 
@@ -25,7 +24,7 @@ Item
     property QtObject activeItemSelector: SingleActiveItemSelector
     {
         variableName: "isMasked";
-        deactivateFunc: function(item ) { item.isMaskedPrivate = false; };
+        deactivateFunc: function(item) { item.isMaskedPrivate = false; };
     }
 
     signal connectRequested();
@@ -81,14 +80,14 @@ Item
 
             model: control.hostsModel;
 
-            isAvailable: enabled && control.isExpandedTile;
-
-            disabledLabelColor: Style.colors.midlight;
+            isAvailable: enabled && control.isExpandedTile && !control.isConnecting;
 
             comboBoxTextRole: "display";
             iconUrl: "qrc:/skin/welcome_page/server.png";                   // TODO: add ecosystem class for hovered icons
             hoveredIconUrl: "qrc:/skin/welcome_page/server_hover.png";
             disabledIconUrl: "qrc:/skin/welcome_page/server_disabled.png";
+            hoverExtraIconUrl: "qrc:/skin/welcome_page/edit.png";
+
             Component.onCompleted: activeItemSelector.addItem(this);
 
             KeyNavigation.tab: userChooseItem;
@@ -101,15 +100,14 @@ Item
 
             model: control.recentUserConnectionsModel;
 
-            isAvailable: enabled && control.isExpandedTile;
+            isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
             visible: control.impl.hasRecentConnections;
-
-            disabledLabelColor: Style.colors.midlight;
 
             comboBoxTextRole: "userName";
             iconUrl: "qrc:/skin/welcome_page/user.png";
             hoveredIconUrl: "qrc:/skin/welcome_page/user_hover.png";
             disabledIconUrl: "qrc:/skin/welcome_page/user_disabled.png";
+            hoverExtraIconUrl: "qrc:/skin/welcome_page/edit.png";
 
             Component.onCompleted: activeItemSelector.addItem(this);
 
@@ -133,9 +131,10 @@ Item
     {
         id: expandedArea;
 
+        isConnecting: control.isConnecting;
         anchors.top: collapsedArea.bottom;
         visible: control.isExpandedTile;
-        enabled: (control.isExpandedTile);
+        enabled: control.isExpandedTile;
         opacity: control.expandedOpacity;
         hasRecentConnections: control.impl.hasRecentConnections;
 
@@ -144,7 +143,6 @@ Item
 
         onConnectButtonClicked: { control.connectRequested(); }
     }
-
 
     property QtObject impl: QtObject
     {

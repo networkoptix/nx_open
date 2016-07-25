@@ -365,7 +365,7 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
         memcpy( alignedImgBuffer + requiredImgXStride*y, imgToLoad->constScanLine(y), imgToLoad->width()*imgToLoad->depth()/8 );
 
 #ifdef USE_YUVA420
-    m_imgAsFrame->reallocate( imgToLoad->width(), imgToLoad->height(), PIX_FMT_YUVA420P );
+    m_imgAsFrame->reallocate( imgToLoad->width(), imgToLoad->height(), AV_PIX_FMT_YUVA420P );
     bgra_to_yva12_simd_intr(
         alignedImgBuffer,
         requiredImgXStride,
@@ -380,7 +380,7 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
         imgToLoad->height(),
         false );
 #else
-    m_imgAsFrame->reallocate( imgToLoad->width(), imgToLoad->height(), PIX_FMT_YUV420P );
+    m_imgAsFrame->reallocate( imgToLoad->width(), imgToLoad->height(), AV_PIX_FMT_YUV420P );
     bgra_to_yv12_sse2_intr(
         alignedImgBuffer,
         requiredImgXStride,
@@ -446,7 +446,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     QnGlNativePainting::begin(QGLContext::currentContext(),painter);
 
-    if( m_imgAsFrame->format == PIX_FMT_YUVA420P || m_imgAsFrame->format == PIX_FMT_RGBA )
+    if( m_imgAsFrame->format == AV_PIX_FMT_YUVA420P || m_imgAsFrame->format == AV_PIX_FMT_RGBA )
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -456,7 +456,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     m_renderer->paint(QRectF(0, 0, 1, 1), targetRect);
 
-    if( m_imgAsFrame->format == PIX_FMT_YUVA420P || m_imgAsFrame->format == PIX_FMT_RGBA )
+    if( m_imgAsFrame->format == AV_PIX_FMT_YUVA420P || m_imgAsFrame->format == AV_PIX_FMT_RGBA )
         glDisable(GL_BLEND);
 
     QnGlNativePainting::end(painter);

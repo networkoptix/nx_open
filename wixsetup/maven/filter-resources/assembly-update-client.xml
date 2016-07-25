@@ -15,7 +15,9 @@
                 <include>platforms/*.dll</include>
                 <include>qml/**</include>
                 <include>av*.dll</include>
-                <include>${product.name}*.exe</include>                
+                <include>${applauncher.binary.name}</include>                
+                <include>${client.binary.name}</include>
+                <include>${minilauncher.binary.name}</include>
                 <include>lib*.dll</include>
                 <include>nx*.dll</include>
                 <include>OpenAL32.dll</include>
@@ -23,6 +25,8 @@
                 <include>sigar.dll</include>
                 <include>ssleay32.dll</include>
                 <include>swscale-2.dll</include>
+                <include>swresample-2.dll</include>
+                <include>swscale-4.dll</include>
                 <include>udt.dll</include>
                 <include>vcredist*.exe</include>
             </includes>		

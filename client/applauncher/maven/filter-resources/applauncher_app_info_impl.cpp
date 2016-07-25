@@ -2,7 +2,7 @@
 
 QString QnApplauncherAppInfo::applicationName()
 {
-    return QStringLiteral("${display.product.name}");
+    return QStringLiteral("${product.title}");
 }
 
 QString QnApplauncherAppInfo::clientBinaryName()
@@ -13,4 +13,9 @@ QString QnApplauncherAppInfo::clientBinaryName()
 QString QnApplauncherAppInfo::mirrorListUrl()
 {
     return QStringLiteral("${mirrorListUrl}");
+}
+
+QString QnApplauncherAppInfo::installationRoot()
+{
+    return QStringLiteral("${installation.root}");
 }

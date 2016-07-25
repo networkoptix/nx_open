@@ -32,7 +32,7 @@ public:
 
     virtual void beforeDestroyDataProvider(QnAbstractDataConsumer* dataProviderWrapper) = 0;
 
-    virtual QString lastErrorStr() const {return m_lastErrorStr;}
+    virtual QString lastErrorStr() const;
 
     virtual bool readyToStop() const = 0;
 

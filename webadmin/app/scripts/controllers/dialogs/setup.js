@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $log) {
+    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $timeout, $log) {
         $log.log("Initiate setup wizard (all scripts were loaded and angular started)");
         $scope.Config = Config;
 
@@ -141,6 +141,9 @@ angular.module('webadminApp')
                 $scope.settings.cloudEmail = data.cloudAccountName;
                 sendCredentialsToNativeClient();
                 $log.log("System is in cloud! go to CloudSuccess");
+                $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}", $scope.settings.cloudSystemID);
+                $scope.portalShortLink = Config.cloud.portalUrl;
+
                 $scope.next('cloudSuccess');
             },function(){
                 mediaserver.getModuleInformation(true).then(function (r) {
@@ -364,6 +367,7 @@ angular.module('webadminApp')
             if(debugMode){
                 $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
                 $scope.portalShortLink = Config.cloud.portalUrl;
+
                 $scope.next('cloudSuccess');
                 return;
             }
@@ -407,8 +411,8 @@ angular.module('webadminApp')
             $log.log("Request for id and authKey on cloud portal ...");
             //1. Request auth key from cloud_db
             cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
-                function(message){
-                    if(message.data.resultCode && message.data.resultCode !== 'ok'){
+                function(message) {
+                    if (message.data.resultCode && message.data.resultCode !== 'ok') {
                         cloudErrorHandler(message);
                         return;
                     }
@@ -416,7 +420,7 @@ angular.module('webadminApp')
                     //2. Save settings to local server
                     $log.log("Cloud portal returned success: " + JSON.stringify(message.data));
 
-                    $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}",message.data.id);
+                    $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}", message.data.id);
 
                     $log.log("Request /api/setupCloudSystem on mediaserver ...");
                     mediaserver.setupCloudSystem($scope.settings.systemName,
@@ -432,7 +436,9 @@ angular.module('webadminApp')
 
                             $log.log("Mediaserver has linked system to the cloud");
                             $log.log("Apply cloud credentials in mediaserver ... ");
-                            updateCredentials( $scope.settings.cloudEmail, $scope.settings.cloudPassword, true ).catch(errorHandler);
+                            return updateCredentials( $scope.settings.cloudEmail, $scope.settings.cloudPassword, true ).then(function(){
+                                return mediaserver.getModuleInformation(true);
+                            },errorHandler);
                         },errorHandler);
                 }, cloudErrorHandler);
         }
@@ -493,13 +499,13 @@ angular.module('webadminApp')
                 $location.path('/settings');
                 setTimeout(function(){
                     window.location.reload();
-                })
+                });
             }
         };
 
         $scope.skip = function() {
             if ($scope.activeStep.skip) {
-                $scope.next($scope.activeStep.skip);
+                $scope.next($scope.activeStep.skip, true);
             }else{
                 $scope.next();
             }
@@ -526,7 +532,7 @@ angular.module('webadminApp')
             }
         };
         $scope.back = function(){
-            $scope.next($scope.activeStep.back);
+            $scope.next($scope.activeStep.back, true);
         };
 
         function lockNext(){
@@ -535,7 +541,10 @@ angular.module('webadminApp')
         function releaseNext(){
             $scope.lockNextButton = false;
         }
-        $scope.next = function(target){
+        $scope.next = function(target, ignoreValidation){
+            if($scope.cantGoNext() && !ignoreValidation){
+                return;
+            }
             lockNext();
             if(!target && target !==0) {
                 var activeStep = $scope.activeStep || $scope.wizardFlow[0];
@@ -552,11 +561,36 @@ angular.module('webadminApp')
             releaseNext();
         };
         $scope.cantGoNext = function(){
-            if($scope.activeStep.valid){
+            if($scope.activeStep && $scope.activeStep.valid){
                 return !$scope.activeStep.valid();
             }
             return false;
         };
+
+        function touchForm(form){
+            angular.forEach(form.$error, function (field) {
+                angular.forEach(field, function(errorField){
+                    if(typeof(errorField.$touched) != 'undefined'){
+                        errorField.$setTouched();
+                    }else{
+                        touchForm(errorField); // Embedded form - go recursive
+                    }
+                })
+            });
+        }
+
+        function setFocusToInvalid(form){
+            $timeout(function() {
+                $("[name='" + form.$name + "']").find('.ng-invalid:visible:first').focus();
+            });
+        }
+
+        function checkForm(form){
+            touchForm(form);
+            //setFocusToInvalid(form);
+            return form.$valid;
+        }
+
 
         function required(val){
             return !!val && (!val.trim || val.trim() != '');
@@ -587,7 +621,7 @@ angular.module('webadminApp')
                     $scope.next(cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro');
                 },
                 valid: function(){
-                    return required($scope.settings.systemName);
+                    return checkForm($scope.forms.systemNameForm);
                 }
             },
             advanced:{
@@ -623,8 +657,7 @@ angular.module('webadminApp')
                 back: cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro',
                 next: connectToCloud,
                 valid: function(){
-                    return required($scope.settings.cloudEmail) &&
-                        required($scope.settings.cloudPassword);
+                    return checkForm($scope.forms.cloudForm);
                 }
             },
             cloudSuccess:{
@@ -642,9 +675,7 @@ angular.module('webadminApp')
                 // onShow: discoverSystems,
                 next: 'mergeProcess',
                 valid: function(){
-                    return required($scope.settings.remoteSystem) &&
-                        required($scope.settings.remoteLogin) &&
-                        required($scope.settings.remotePassword);
+                    return checkForm($scope.forms.remoteSystemForm);
                 }
             },
             mergeProcess:{
@@ -662,9 +693,7 @@ angular.module('webadminApp')
                 back: cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro',
                 next: initOfflineSystem,
                 valid: function(){
-                    return required($scope.settings.localLogin) &&
-                        required($scope.settings.localPassword) &&
-                        required($scope.settings.localPasswordConfirmation) &&
+                    return checkForm($scope.forms.localForm) &&
                         $scope.settings.localPassword === $scope.settings.localPasswordConfirmation;
                 }
             },
@@ -704,6 +733,11 @@ angular.module('webadminApp')
                     }
                     $scope.systemSettings[settingName] = systemSettings[settingName];
 
+                    if($scope.Config.settingsConfig[settingName].type === 'checkbox' &&
+                        $scope.systemSettings[settingName] === Config.undefinedValue){
+                        $scope.systemSettings[settingName] = true;
+                    }
+                    
                     if($scope.Config.settingsConfig[settingName].type === 'number'){
                         $scope.systemSettings[settingName] = parseInt($scope.systemSettings[settingName]);
                     }

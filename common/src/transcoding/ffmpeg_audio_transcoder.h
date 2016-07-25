@@ -7,12 +7,13 @@
 
 #include "transcoder.h"
 #include "utils/common/byte_array.h"
+#include <utils/media/ffmpeg_helper.h>
 
 class QnFfmpegAudioTranscoder: public QnAudioTranscoder
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegAudioTranscoder)
 public:
-    QnFfmpegAudioTranscoder(CodecID codecId);
+    QnFfmpegAudioTranscoder(AVCodecID codecId);
     ~QnFfmpegAudioTranscoder();
 
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
@@ -33,11 +34,14 @@ private:
 
     qint64 m_lastTimestamp;
     QnConstMediaContextPtr m_context;
-    
+
     bool m_downmixAudio;
     int m_frameNum;
     ReSampleContext* m_resampleCtx;
     int m_dstSampleRate;
+    AVFrame* m_outFrame;
+    std::unique_ptr<QnFfmpegAudioHelper> m_audioHelper;
+    AVFrame* m_inputFrame;
 };
 
 typedef QSharedPointer<QnFfmpegAudioTranscoder> QnFfmpegAudioTranscoderPtr;

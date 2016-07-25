@@ -11,10 +11,7 @@
 #include <api/session_manager.h>
 
 #include <common/common_module.h>
-
-#ifdef Q_OS_WIN
-#include <common/systemexcept_win32.h>
-#endif
+#include <common/systemexcept.h>
 
 #include <camera/camera_bookmarks_manager.h>
 
@@ -310,7 +307,10 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 #endif
 
     common->store<nx::cloud::gateway::VmsGatewayEmbeddable>(
-        new nx::cloud::gateway::VmsGatewayEmbeddable());
+        new nx::cloud::gateway::VmsGatewayEmbeddable(
+            // TODO: #mux Currently browsers show certificate error, so SSL is disabled
+            //  for beter user expirience
+            false));
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)

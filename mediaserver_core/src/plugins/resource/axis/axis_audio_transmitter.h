@@ -49,6 +49,7 @@ private:
         const char* buffer,
         size_t size);
 
+    std::unique_ptr<AbstractStreamSocket> takeSocket(const nx_http::AsyncHttpClientPtr& httpClient);
 private:
     mutable QnMutex m_mutex;
     QnSecurityCamResource* m_resource;

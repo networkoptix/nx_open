@@ -21,13 +21,13 @@ static QSize mediaSizeFromRawData(const QnConstCompressedVideoDataPtr& frame)
 {
     switch (frame->context->getCodecId())
     {
-        case CODEC_ID_H264:
+        case AV_CODEC_ID_H264:
         {
             QSize result;
             extractSpsPps(frame, &result, nullptr);
             return result;
         }
-        case CODEC_ID_MJPEG:
+        case AV_CODEC_ID_MJPEG:
         {
             nx_jpg::ImageInfo imgInfo;
             nx_jpg::readJpegImageInfo((const quint8*) frame->data(), frame->dataSize(), &imgInfo);
@@ -45,13 +45,13 @@ struct FrameBasicInfo
 {
     FrameBasicInfo()
     :
-        codec(CODEC_ID_NONE)
+        codec(AV_CODEC_ID_NONE)
     {
     }
 
     FrameBasicInfo(const QnConstCompressedVideoDataPtr& frame)
     :
-        codec(CODEC_ID_NONE)
+        codec(AV_CODEC_ID_NONE)
     {
         codec = frame->compressionType;
         size = QSize(frame->width, frame->height);
@@ -60,7 +60,7 @@ struct FrameBasicInfo
     }
 
     QSize size;
-    CodecID codec;
+    AVCodecID codec;
 };
 
 static QMutex mutex;
@@ -94,6 +94,8 @@ public:
 
     /** Associate extra information with output frames which corresponds to input frames. */
     std::deque<FrameMetadata> metadataQueue;
+
+    SeamlessVideoDecoder::VideoGeometryAccessor videoGeometryAccessor;
 };
 
 SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *parent)
@@ -140,8 +142,7 @@ int SeamlessVideoDecoderPrivate::decoderFrameNumToLocalNum(int value) const
 //-------------------------------------------------------------------------------------------------
 // SeamlessVideoDecoder
 
-SeamlessVideoDecoder::SeamlessVideoDecoder()
-:
+SeamlessVideoDecoder::SeamlessVideoDecoder():
     QObject(),
     d_ptr(new SeamlessVideoDecoderPrivate(this))
 {
@@ -149,6 +150,12 @@ SeamlessVideoDecoder::SeamlessVideoDecoder()
 
 SeamlessVideoDecoder::~SeamlessVideoDecoder()
 {
+}
+
+void SeamlessVideoDecoder::setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor)
+{
+    Q_D(SeamlessVideoDecoder);
+    d->videoGeometryAccessor = videoGeometryAccessor;
 }
 
 void SeamlessVideoDecoder::pleaseStop()
@@ -193,6 +200,8 @@ bool SeamlessVideoDecoder::decode(
 
         d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(
             frame->compressionType, frameInfo.size);
+        if (d->videoDecoder)
+            d->videoDecoder->setVideoGeometryAccessor(d->videoGeometryAccessor);
         d->decoderFrameOffset = d->frameNumber;
         {
             QMutexLocker lock(&mutex);
@@ -217,7 +226,10 @@ bool SeamlessVideoDecoder::decode(
     }
 
     if (d->queue.empty())
-        return decodedFrameNum >= 0; //< Return false if decoding fails and no queued frames are left.
+    {
+        // Return false if decoding fails and no queued frames are left.
+        return decodedFrameNum >= 0;
+    }
 
     *result = std::move(d->queue.front());
     d->queue.pop_front();
@@ -237,7 +249,7 @@ QSize SeamlessVideoDecoder::currentResolution() const
     return d->prevFrameInfo.size;
 }
 
-CodecID SeamlessVideoDecoder::currentCodec() const
+AVCodecID SeamlessVideoDecoder::currentCodec() const
 {
     Q_D(const SeamlessVideoDecoder);
     QMutexLocker lock(&mutex);

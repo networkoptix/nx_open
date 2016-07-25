@@ -2497,7 +2497,7 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
         [this, bookmarksViewer]()
     {
         const bool readonly =  qnCommon->isReadOnly()
-            || !accessController()->hasGlobalPermission(Qn::GlobalEditCamerasPermission);
+            || !accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission);
 
         bookmarksViewer->setReadOnly(readonly);
     };

@@ -11,8 +11,8 @@ namespace utils {
 
 QString formatFileSize(qint64 size, int precision, int prefixThreshold, MetricPrefix minPrefix, MetricPrefix maxPrefix, bool useBinaryPrefixes, const QString &pattern)
 {
-    static const std::array<QString, PrefixCount> metricSuffixes = { "B", "kB",  "MB",  "GB",  "TB",  "PB",  "EB",  "ZB",  "YB" };
-    static const std::array<QString, PrefixCount> binarySuffixes = { "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB" };
+    static const std::array<QString, PrefixCount> metricSuffixes{{"B", "kB",  "MB",  "GB",  "TB",  "PB",  "EB",  "ZB",  "YB"}};
+    static const std::array<QString, PrefixCount> binarySuffixes{{"B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"}};
 
     QString number, suffix;
     if (size == 0)
@@ -80,7 +80,6 @@ qint64 parseDateTime(const QString& dateTimeStr)
     static const qint64 SEC_PER_MIN = 60;
     static const qint64 HOUR_PER_DAY = 24;
     static const qint64 DAY_PER_NON_LEAP_YEAR = 365;
-    static const qint64 DAY_PER_LEAP_YEAR = 366;
     static const qint64 MS_PER_SEC = 1000;
     static const qint64 USEC_PER_MS = 1000;
 

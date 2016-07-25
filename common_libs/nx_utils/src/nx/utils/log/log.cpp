@@ -13,6 +13,11 @@
 static pid_t gettid(void) { return syscall(__NR_gettid); }
 #endif
 
+#ifdef Q_OS_WIN32
+    #define END_OF_LINE "\r\n"
+#else
+    #define END_OF_LINE std::endl
+#endif
 
 const char *qn_logLevelNames[] = {"UNKNOWN", "NONE", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
 const char UTF8_BOM[] = "\xEF\xBB\xBF";
@@ -46,7 +51,7 @@ public:
 		m_file.close();
 	}
 
-    bool create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) 
+    bool create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel)
     {
         m_baseName = baseName;
         m_maxFileSize = maxFileSize;
@@ -71,12 +76,12 @@ public:
         return rez;
     }
 
-    void setLogLevel(QnLogLevel logLevel) 
+    void setLogLevel(QnLogLevel logLevel)
     {
         m_logLevel = logLevel;
     }
 
-    QnLogLevel logLevel() const 
+    QnLogLevel logLevel() const
     {
         return m_logLevel;
     }
@@ -89,15 +94,16 @@ public:
         std::ostringstream ostr;
         const auto curDateTime = QDateTime::currentDateTime();
         const auto curTime = curDateTime.time();
-        ostr << curDateTime.date().toString(Qt::ISODate).toUtf8().constData()<<" "
-            <<curTime.toString(Qt::ISODate).toUtf8().constData()<<"."<<std::setw(3)<<std::setfill('0')<<curTime.msec()<<std::setfill(' ')
+        ostr << curDateTime.date().toString(Qt::ISODate).toUtf8().constData() << " "
+            << curTime.toString(Qt::ISODate).toUtf8().constData() << "." << std::setw(3) << std::setfill('0') << curTime.msec() << std::setfill(' ')
             << " " << std::setw(6) <<
 #ifdef Q_OS_LINUX
             gettid()
 #else
             QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).constData()
 #endif
-            << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << std::endl;
+            << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": "
+            << msg.toUtf8().constData() << END_OF_LINE;
 
         const std::string& str = ostr.str();
         {

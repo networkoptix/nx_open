@@ -21,6 +21,7 @@ class QnAbstractResourcePropertyAdaptor;
 
 template<class T>
 class QnResourcePropertyAdaptor;
+class QSettings;
 
 class QnGlobalSettings: public Connective<QObject>, public Singleton<QnGlobalSettings> {
     Q_OBJECT
@@ -35,6 +36,7 @@ public:
 
     void synchronizeNow();
     bool synchronizeNowSync();
+    bool takeFromSettings(QSettings* settings);
 
     QSet<QString> disabledVendorsSet() const;
     QString disabledVendors() const;
@@ -48,9 +50,6 @@ public:
 
     bool isServerAutoDiscoveryEnabled() const;
     void setServerAutoDiscoveryEnabled(bool enabled);
-
-    bool isCrossdomainXmlEnabled() const;
-    void setCrossdomainXmlEnabled(bool enabled);
 
     QnEmailSettings emailSettings() const;
     void setEmailSettings(const QnEmailSettings &settings);
@@ -75,12 +74,18 @@ public:
     QDateTime statisticsReportLastTime() const;
     void setStatisticsReportLastTime(const QDateTime& value);
 
+    QString statisticsReportLastVersion() const;
+    void setStatisticsReportLastVersion(const QString& value);
+
     int statisticsReportLastNumber() const;
     void setStatisticsReportLastNumber(int value);
 
     /** How often should we send statistics in human-readable format like '2d', '30m', etc. */
     QString statisticsReportTimeCycle() const;
     void setStatisticsReportTimeCycle(const QString& value);
+
+    QString statisticsReportUpdateDelay() const;
+    void setStatisticsReportUpdateDelay(const QString& value);
 
     static const QString kNameUpnpPortMappingEnabled;
     bool isUpnpPortMappingEnabled() const;
@@ -183,7 +188,6 @@ private:
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
-    QnResourcePropertyAdaptor<bool> *m_crossdomainXmlEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;
@@ -192,8 +196,10 @@ private:
     // set of statistics settings adaptors
     QnResourcePropertyAdaptor<QnOptionalBool> *m_statisticsAllowedAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportLastTimeAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_statisticsReportLastVersionAdaptor;
     QnResourcePropertyAdaptor<int> *m_statisticsReportLastNumberAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportTimeCycleAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_statisticsReportUpdateDelayAdaptor;
     QnResourcePropertyAdaptor<bool> *m_upnpPortMappingEnabledAdaptor;
     QnResourcePropertyAdaptor<QnUuid> *m_systemIdAdaptor;
     QnResourcePropertyAdaptor<QString> *m_systemNameForIdAdaptor;

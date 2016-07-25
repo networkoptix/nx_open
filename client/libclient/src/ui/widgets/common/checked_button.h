@@ -3,6 +3,8 @@
 
 #include <QtWidgets/QToolButton>
 
+//DEPRECATED!
+//TODO: #vkutin #common Eventually replace this with QnSelectableButton
 class QnCheckedButton: public QToolButton {
     Q_OBJECT
 
@@ -10,7 +12,7 @@ class QnCheckedButton: public QToolButton {
 
 public:
     QnCheckedButton(QWidget* parent);
-    
+
     QColor color() const;
     void setColor(const QColor& color);
 

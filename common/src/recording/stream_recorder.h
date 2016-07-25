@@ -157,7 +157,7 @@ public:
     /*
     * Transcode to specified audio codec is source codec is different
     */
-    void setAudioCodec(CodecID codec);
+    void setAudioCodec(AVCodecID codec);
 
 
     /*
@@ -194,6 +194,13 @@ protected:
     void markNeedKeyData();
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex);
+    virtual void initIoContext(
+        const QnStorageResourcePtr& storage, 
+        const QString& url,
+        AVIOContext** context);
+    virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
+    virtual bool isUtcOffsetAllowed() const { return true; }
+        
 private:
     void updateSignatureAttr(size_t i);
     qint64 findNextIFrame(qint64 baseTime);
@@ -240,8 +247,8 @@ private:
     QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
     QnFfmpegAudioTranscoder* m_audioTranscoder;
     QnFfmpegVideoTranscoder* m_videoTranscoder;
-    CodecID m_dstAudioCodec;
-    CodecID m_dstVideoCodec;
+    AVCodecID m_dstAudioCodec;
+    AVCodecID m_dstVideoCodec;
     qint64 m_serverTimeZoneMs;
 
     qint64 m_nextIFrameTime;

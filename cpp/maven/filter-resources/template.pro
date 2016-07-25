@@ -6,13 +6,18 @@ LIBTYPE = ${libtype}
 TEMPLATE = ${template}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
-unix {
-    VERSION = ${linux.release.version}
-}
 QT = ${qt.libs}
+BOX = ${box}
+
+CONFIG += unversioned_soname unversioned_libname
 
 ## GLOBAL CONFIGURATIONS
-CONFIG += precompile_header $$BUILDLIB $$LIBTYPE
+!ios|equals(TEMPLATE, app) {
+    CONFIG += precompile_header
+} else {
+    QMAKE_CXXFLAGS += -include ${project.build.sourceDirectory}/StdAfx.h
+}
+CONFIG += $$BUILDLIB $$LIBTYPE
 CONFIG -= flat
 CONFIG += no_private_qt_headers_warning
 CONFIG += c++14
@@ -51,6 +56,7 @@ CONFIG(debug, debug|release) {
     #Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
     #DEFINES += ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
   }
+  CONFIG += qml_debug
 }
 else {
   CONFIGURATION=release
@@ -220,7 +226,7 @@ unix: {
   } else {
     #QMAKE_CXXFLAGS += -std=c++1y
   }
-  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
+  QMAKE_CXXFLAGS += -w -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
 }
 
 !win32 {
@@ -234,7 +240,7 @@ unix: {
 }
 
 ## LINUX
-unix:!android:!mac {
+linux*:!android {
   !arm {
     LIBS += ${linux.oslibs}
     QMAKE_CXXFLAGS += ${compiler.arguments}
@@ -249,12 +255,15 @@ unix:!android:!mac {
   } else {
     LIBS -= -lssl
     LIBS += ${linux.arm.oslibs}
-    QMAKE_CXXFLAGS += -ggdb1 -fno-omit-frame-pointer
+    QMAKE_CXXFLAGS += -fno-omit-frame-pointer
+    CONFIG(release, debug|release)|!equals(BOX, tx1): QMAKE_CXXFLAGS += -ggdb1
   }
   QMAKE_LFLAGS += -rdynamic
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
+
+  equals(TEMPLATE, app): QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 
 ## MAC OS

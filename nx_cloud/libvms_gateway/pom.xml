@@ -1,11 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-        Example pom for delegating maven goals to msbuild so it builds the "solution"
-
-        A solution can be a group of projects, but here we only have one.
-        It should also be possible to have one maven project per solution project,
-        and have a parent pom to deletegate the build.
-    -->
 
     <parent>
         <artifactId>nx_cloud</artifactId>
@@ -19,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>libvms_gateway</artifactId>
     <packaging>pom</packaging>
-    <name>NX Cloud VMS Gateway Library</name>
+    <name>Nx Cloud VMS Gateway Library</name>
 
     <properties>
         <guid>${libvms_gateway.guid}</guid>
@@ -29,7 +22,7 @@
         <template>lib</template>
 
         <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_email -lnx_streaming</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_streaming</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
 

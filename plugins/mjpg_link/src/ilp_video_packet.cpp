@@ -108,7 +108,7 @@ unsigned int ILPVideoPacket::channelNumber() const
 //!Implementation of nxpl::MediaDataPacket::codecType
 nxcip::CompressionType ILPVideoPacket::codecType() const
 {
-    return nxcip::CODEC_ID_MJPEG;
+    return nxcip::AV_CODEC_ID_MJPEG;
 }
 
 unsigned int ILPVideoPacket::flags() const

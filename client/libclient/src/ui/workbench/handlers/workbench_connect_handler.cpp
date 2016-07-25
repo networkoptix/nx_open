@@ -27,6 +27,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <client_core/client_core_settings.h>
+#include <client/desktop_client_message_processor.h>
 
 #include <nx_ec/ec_proto_version.h>
 #include <llutil/hardware_id.h>
@@ -43,6 +44,7 @@
 
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/opengl/gl_functions.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 
 #include <ui/style/skin.h>
 
@@ -52,6 +54,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_welcome_screen.h>
+#include <ui/workbench/workbench_display.h>
 
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
@@ -66,7 +69,7 @@
 #include <network/module_finder.h>
 #include <network/router.h>
 #include <utils/reconnect_helper.h>
-
+#include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
 
 namespace
@@ -77,7 +80,7 @@ namespace
     const int maxReconnectTimeout = 10*1000;                // 10 seconds
     const int maxVideowallReconnectTimeout = 96*60*60*1000; // 4 days
 
-    void storeSystemConnection(const QString &systemName, QUrl url, 
+    void storeSystemConnection(const QString &systemName, QUrl url,
         bool storePassword, bool autoLogin, bool forceRemoveOldConnection)
     {
         auto recentConnections = qnClientCoreSettings->recentUserConnections();
@@ -92,7 +95,7 @@ namespace
         const auto itFoundConnection = std::find_if(recentConnections.begin(), recentConnections.end()
             , [systemName, userName = url.userName()](const QnUserRecentConnectionData& connection)
         {
-            return ((connection.systemName == systemName) && 
+            return ((connection.systemName == systemName) &&
                 (connection.url.userName() == userName));
         });
 
@@ -127,12 +130,15 @@ namespace
         qnSettings->setLastUsedConnection(targetConnection);
         qnClientCoreSettings->setRecentUserConnections(recentConnections);
         qnSettings->setAutoLogin(autoLogin);
+        qnSettings->save();
     }
 }
 
-QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
+QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent)
+    :
     base_type(parent),
     QnWorkbenchContextAware(parent),
+    m_processingConnectAction(false),
     m_connectingMessageBox(NULL),
     m_connectingHandle(0),
     m_readyForConnection(true)
@@ -176,8 +182,47 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
 
     connect(action(QnActions::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showLoginDialog);
     connect(action(QnActions::BeforeExitAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
-    
+
     context()->instance<QnAppServerNotificationCache>();
+
+
+    const auto resourceModeAction = action(QnActions::ResourcesModeAction);
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+
+    connect(resourceModeAction, &QAction::toggled, this,
+        [this, welcomeScreen](bool checked) { welcomeScreen->setVisible(!checked); });
+
+    connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
+        [resourceModeAction]() { resourceModeAction->setChecked(true); });
+
+    connect(qnDesktopClientMessageProcessor, &QnDesktopClientMessageProcessor::connectionStateChanged, this,
+        [this, welcomeScreen, resourceModeAction]()
+    {
+        const auto state = qnDesktopClientMessageProcessor->connectionState();
+        switch (state)
+        {
+            case QnConnectionState::Disconnected:
+            {
+                if (!m_processingConnectAction)
+                {
+                    welcomeScreen->setGlobalPreloaderVisible(false);
+                    resourceModeAction->setChecked(false);  //< Shows welcome screen
+                }
+                break;
+            }
+            case QnConnectionState::Connecting:
+            case QnConnectionState::Connected:
+                welcomeScreen->setGlobalPreloaderVisible(true);
+                resourceModeAction->setChecked(false);  //< Shows welcome screen
+                break;
+            case QnConnectionState::Ready:
+                welcomeScreen->setGlobalPreloaderVisible(false);
+                resourceModeAction->setChecked(true); //< Hides welcome screen
+                break;
+            default:
+                break;
+        }
+    });
 }
 
 QnWorkbenchConnectHandler::~QnWorkbenchConnectHandler()
@@ -238,7 +283,15 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     clearConnection();
 }
 
-void QnWorkbenchConnectHandler::at_connectAction_triggered() {
+void QnWorkbenchConnectHandler::at_connectAction_triggered()
+{
+    if (m_processingConnectAction)
+        return;
+
+    m_processingConnectAction = true;
+    auto uncheckConnectActionRaii = QnRaiiGuard::createDestructable(
+        [this]() { m_processingConnectAction = false; });
+
     // ask user if he wants to save changes
     bool force = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
     if (connected() && !disconnectFromServer(force))
@@ -249,18 +302,18 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
-
-    const auto storeSettings = StoreConnectionSettings::create(
+    const auto settings = ConnectionSettings::create(
         parameters.argument(Qn::StorePasswordRole, false),
         parameters.argument(Qn::AutoLoginRole, false),
-        parameters.argument(Qn::ForceRemoveOldConnectionRole, false));
+        parameters.argument(Qn::ForceRemoveOldConnectionRole, false),
+        parameters.argument(Qn::CompletionWatcherRole, QnRaiiGuardPtr()));
 
     if (url.isValid())
     {
         /* ActiveX plugin */
         if (qnRuntime->isActiveXMode())
         {
-            if (connectToServer(url, storeSettings, true) != ec2::ErrorCode::ok)
+            if (connectToServer(url, settings, true) != ec2::ErrorCode::ok)
             {
                 QnGraphicsMessageBox::information(tr("Could not connect to server..."), 1000 * 60 * 60 * 24);
                 menu()->trigger(QnActions::ExitAction);
@@ -269,7 +322,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         else if (qnRuntime->isVideoWallMode())  /* Videowall item */
         {
             //TODO: #GDM #High videowall should try indefinitely
-            if (connectToServer(url, storeSettings, true) != ec2::ErrorCode::ok)
+            if (connectToServer(url, settings, true) != ec2::ErrorCode::ok)
             {
                 QnGraphicsMessageBox* incompatibleMessageBox =
                     QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1...")
@@ -283,7 +336,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
             /* Login Dialog or 'Open in new window' with url */
 
             //try connect; if not - show login dialog
-            if (connectToServer(url, storeSettings, false) != ec2::ErrorCode::ok)
+            if (connectToServer(url, settings, false) != ec2::ErrorCode::ok)
                 showWelcomeScreen();
         }
     }
@@ -291,16 +344,15 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     {
         /* Try to load last used connection. */
         url = qnSettings->lastUsedConnection().url;
-        if (!url.isValid())
-            url = qnSettings->defaultConnection().url;
 
         /* Try to connect with saved password. */
         const bool autoLogin = qnSettings->autoLogin();
         if (autoLogin && url.isValid() && !url.password().isEmpty())
         {
-            const auto storeSettings = StoreConnectionSettings::create(false, true, false);
+            const auto connectionSettings = ConnectionSettings::create(
+                false, true, false, settings->completionWatcher);
 
-            if (connectToServer(url, storeSettings, false) != ec2::ErrorCode::ok)
+            if (connectToServer(url, connectionSettings, false) != ec2::ErrorCode::ok)
                 showWelcomeScreen();
         }
         else
@@ -321,7 +373,7 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered() {
         disconnectFromServer(true);
 
     // Do not store connections in case of reconnection
-    if (connectToServer(currentUrl, StoreConnectionSettingsPtr(), false) != ec2::ErrorCode::ok)
+    if (connectToServer(currentUrl, ConnectionSettingsPtr(), false) != ec2::ErrorCode::ok)
         showWelcomeScreen();
 }
 
@@ -332,27 +384,30 @@ void QnWorkbenchConnectHandler::at_disconnectAction_triggered() {
         : false;
     disconnectFromServer(force);
     qnSettings->setAutoLogin(false);
+    qnSettings->save();
 }
 
 bool QnWorkbenchConnectHandler::connected() const {
     return !qnCommon->remoteGUID().isNull();
 }
 
-QnWorkbenchConnectHandler::StoreConnectionSettingsPtr
-QnWorkbenchConnectHandler::StoreConnectionSettings::create(
+QnWorkbenchConnectHandler::ConnectionSettingsPtr
+QnWorkbenchConnectHandler::ConnectionSettings::create(
     bool storePassword,
     bool autoLogin,
-    bool forceRemoveOldConnection)
+    bool forceRemoveOldConnection,
+    const QnRaiiGuardPtr& completionWatcher)
 {
-    const StoreConnectionSettingsPtr result(new StoreConnectionSettings());
+    const ConnectionSettingsPtr result(new ConnectionSettings());
     result->storePassword = storePassword;
     result->autoLogin = autoLogin;
     result->forceRemoveOldConnection = forceRemoveOldConnection;
+    result->completionWatcher = completionWatcher;
     return result;
 }
 
 ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl
-    , const StoreConnectionSettingsPtr &storeSettings
+    , const ConnectionSettingsPtr &storeSettings
     , bool silent)
 {
     if (!silent) {
@@ -422,7 +477,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     {
         if (storeSettings && (code == ec2::ErrorCode::ok))
         {
-            storeSystemConnection(systemName, appServerUrl,storeSettings->storePassword, 
+            storeSystemConnection(systemName, appServerUrl,storeSettings->storePassword,
                 storeSettings->autoLogin, storeSettings->forceRemoveOldConnection);
         }
 
@@ -545,11 +600,9 @@ void QnWorkbenchConnectHandler::clearConnection()
     QnResourceList resourcesToRemove = qnResPool->getResourcesWithFlag(Qn::remote);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
-    foreach (const QnLayoutResourcePtr& layout, qnResPool->getResources<QnLayoutResource>())
+    for (const QnLayoutResourcePtr& layout: qnResPool->getResources<QnLayoutResource>())
     {
-        bool isLocal = snapshotManager()->isLocal(layout);
-        bool isFile = layout->isFile();
-        if (!(isLocal && isFile))  //do not remove exported layouts
+        if (layout->hasFlags(Qn::local) || !layout->isFile())  //do not remove exported layouts
             resourcesToRemove.push_back(layout);
     }
 
@@ -596,7 +649,7 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
 
         /* Here inner event loop will be started. */
         ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl()
-            , StoreConnectionSettingsPtr(), true);
+            , ConnectionSettingsPtr(), true);
 
         /* Main window can be closed in the event loop so the dialog will be freed. */
         if (!reconnectInfoDialog)

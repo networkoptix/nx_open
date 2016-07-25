@@ -34,13 +34,13 @@
 
 #include <utils/applauncher_utils.h>
 #include <utils/common/url.h>
+#include <utils/common/util.h>
 
 #include <plugins/resource/avi/avi_resource.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <plugins/resource/avi/filetypesupport.h>
 
 #include "connection_testing_dialog.h"
-
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 
 #include <utils/connection_diagnostics_helper.h>
@@ -310,7 +310,15 @@ void QnLoginDialog::resetSavedSessionsModel()
     auto recentConnections = qnClientCoreSettings->recentUserConnections();
 
     if (recentConnections.isEmpty())
-        recentConnections.append(qnSettings->defaultConnection());
+    {
+        QUrl url;
+        url.setPort(DEFAULT_APPSERVER_PORT);
+        url.setHost(QLatin1Literal(DEFAULT_APPSERVER_HOST));
+        url.setUserName(lit("admin"));
+        
+        recentConnections.append(QnUserRecentConnectionData(
+            lit("default"), QString(), url, false));
+    }
 
     m_savedSessionsItem->removeRows(0, m_savedSessionsItem->rowCount());
     for (const auto& connection: recentConnections)
@@ -451,7 +459,9 @@ QString QnLoginDialog::gatherSystemName(const QUrl& url)
         loop.quit();
     });
 
+    updateUsability();
     loop.exec();
+    updateUsability();
 
     return systemName;
 }
@@ -463,7 +473,7 @@ QStandardItem* QnLoginDialog::newConnectionItem(const QnUserRecentConnectionData
         return nullptr;
 
     const auto text = (!connection.name.isEmpty() ? connection.name
-        : tr("%1 at %2").arg(connection.url.userName(), connection.systemName));
+        : tr("%1 in %2").arg(connection.url.userName(), connection.systemName));
 
     auto result = ::newConnectionItem(text, connection.url);
     result->setData(QVariant::fromValue(connection), Qn::ConnectionInfoRole);
@@ -507,7 +517,7 @@ void QnLoginDialog::at_saveButton_clicked() {
 
     auto connections = qnClientCoreSettings->recentUserConnections();
     const auto connectionIndex = connections.getIndexByName(name);
-    if ((connectionIndex != QnUserRecentConnectionDataList::kNotFoundIndex) &&
+    if ((connectionIndex != -1) &&
         connections.at(connectionIndex).isStoredPassword)
     {
         const auto button = QnMessageBox::warning(this, tr("Connection already exists."),
@@ -533,11 +543,11 @@ void QnLoginDialog::at_saveButton_clicked() {
     const auto systemName = gatherSystemName(url);
     if (systemName.isEmpty())
     {
-        const auto button = QnMessageBox::warning(this, tr("Can not connect to the server"),
+        const auto button = QnMessageBox::warning(this, tr("Cannot connect to the server"),
             tr("Can not connect to server with specified credentials. Do you want to save this connection?"),
             QDialogButtonBox::Yes | QDialogButtonBox::No, QDialogButtonBox::No);
 
-        if (button == QDialogButtonBox::No)
+        if (button != QDialogButtonBox::Yes)
             return;
     }
 

@@ -116,7 +116,7 @@ void QnBackupScheduleDialog::initDayOfWeekCheckboxes() {
 void QnBackupScheduleDialog::updateDayOfWeekCheckboxes() {
     auto locale = QLocale::system();
 
-    for (int i = 0; i < m_dowCheckboxes.size(); ++i) {
+    for (size_t i = 0; i < m_dowCheckboxes.size(); ++i) {
         Qt::DayOfWeek day = indexToDay(i);
         QCheckBox* checkbox = m_dowCheckboxes[i];
 

@@ -18,8 +18,7 @@ class ProxyVideoDecoderPrivate;
  * which is intended not to be the part of netoptix_vms tree, and has an interface not depending on
  * ffmpeg, thus, can be compiled with a different ffmpeg version.
  */
-class ProxyVideoDecoder
-:
+class ProxyVideoDecoder:
     public AbstractVideoDecoder
 {
 public:
@@ -27,9 +26,9 @@ public:
 
     virtual ~ProxyVideoDecoder();
 
-    static bool isCompatible(const CodecID codec, const QSize& resolution);
+    static bool isCompatible(const AVCodecID codec, const QSize& resolution);
 
-    static QSize maxResolution(const CodecID codec);
+    static QSize maxResolution(const AVCodecID codec);
 
     virtual int decode(
         const QnConstCompressedVideoDataPtr& compressedVideoData,
@@ -43,4 +42,4 @@ private:
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

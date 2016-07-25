@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_streaming</artifactId>
     <packaging>pom</packaging>
-    <name>NX Streaming Library</name>
+    <name>Nx Streaming Library</name>
 
     <properties>
         <guid>${nx_streaming.guid}</guid>
@@ -104,7 +104,7 @@
                 </property>
             </activation>
             <properties>
-                <ios.defines>DISABLE_FFMPEG</ios.defines>
+                <!-- <ios.defines>DISABLE_FFMPEG</ios.defines> -->
             </properties>
         </profile>
     </profiles>

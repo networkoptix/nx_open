@@ -122,7 +122,6 @@ private:
         SystemError::ErrorCode closeReason,
         ConnectionType* connection) override;
     void onStunMessageReceived(nx::stun::Message message);
-    void onKeepAliveTimeout();
 };
 
 } // namespace udp

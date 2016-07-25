@@ -65,7 +65,7 @@ namespace QJsonDetail {
         bool operator()(T &target, const Access &access, const QnFusion::member_setter_tag &) {
             using namespace QnFusion;
 
-            return QJson::deserialize(m_ctx, m_object, access(name), &(target.*access(setter)), access(optional, false));
+            return QJson::deserialize(m_ctx, m_object, access(name), &(target.*access(setter)), access(optional, true));
         }
 
         template<class T, class Access, class Member>
@@ -74,7 +74,7 @@ namespace QJsonDetail {
 
             bool found = false;
             Member member;
-            if(!QJson::deserialize(m_ctx, m_object, access(name), &member, access(optional, false), &found))
+            if(!QJson::deserialize(m_ctx, m_object, access(name), &member, access(optional, true), &found))
                 return false;
             if(found)
                 invoke(access(setter), target, std::move(member));
@@ -89,7 +89,10 @@ namespace QJsonDetail {
 
 } // namespace QJsonDetail
 
-
+#if defined(_MSC_VER)
+/* Workaround against boost bug in variadic templates implementation, introduced in Boost 1.57. */
+#pragma warning(disable:4003)
+#endif
 QN_FUSION_REGISTER_SERIALIZATION_VISITORS(QJsonValue, QJsonDetail::SerializationVisitor, QJsonDetail::DeserializationVisitor)
 
 

@@ -201,9 +201,15 @@ public:
     CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
+    virtual void setOnvifRequestsRecieveTimeout(int timeout);
+    virtual void setOnvifRequestsSendTimeout(int timeout);
+
+    virtual int getOnvifRequestsRecieveTimeout() const;
+    virtual int getOnvifRequestsSendTimeout() const;
+
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
-    void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
+    void calcTimeDrift() const; // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl);
 
     virtual bool getParamPhysical(const QString &id, QString &value) override;
@@ -242,7 +248,9 @@ public:
     void beforeConfigureStream();
     void afterConfigureStream();
 
-    static QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
+    double getClosestAvailableFps(double desiredFps);
+
+    QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
 
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
@@ -270,6 +278,8 @@ protected:
     virtual CameraDiagnostics::Result customInitialization(const CapabilitiesResp& /*capabilitiesResponse*/) {
         return CameraDiagnostics::NoErrorResult();
     }
+
+   
 
 private:
     void setMaxFps(int f);
@@ -465,7 +475,8 @@ private:
     QString m_ptzUrl;
     QString m_ptzProfileToken;
     QString m_ptzConfigurationToken;
-    int m_timeDrift;
+    mutable int m_timeDrift;
+    mutable QElapsedTimer m_timeDriftTimer;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
@@ -488,6 +499,8 @@ private:
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
     QString m_portNamePrefixToIgnore;
+    size_t m_inputPortCount;
+    std::vector<QString> m_portAliases;
 
     void removePullPointSubscription();
     void pullMessages( quint64 timerID );
@@ -523,6 +536,8 @@ private:
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
 protected:
     QnCameraAdvancedParams m_advancedParameters;
+    int m_onvifRecieveTimeout;
+    int m_onvifSendTimeout;
 };
 
 #endif //ENABLE_ONVIF

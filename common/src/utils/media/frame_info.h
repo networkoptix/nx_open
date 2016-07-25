@@ -170,7 +170,7 @@ public:
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
     void saveToFile(const char* filename);
     void clean();
-    static bool isPixelFormatSupported(PixelFormat format);
+    static bool isPixelFormatSupported(AVPixelFormat format);
     void setUseExternalData(bool value);
     bool isExternalData() const { return m_useExternalData; }
     //void setDisplaying(bool value) {m_displaying = value; }
@@ -183,12 +183,14 @@ public:
     void copyDataFrom(const AVFrame* frame);
     CLVideoDecoderOutput* rotated(int angle);
     /** Scale frame to new size */
-    CLVideoDecoderOutput* scaled(const QSize& newSize, PixelFormat newFormat = PIX_FMT_NONE);
+    CLVideoDecoderOutput* scaled(const QSize& newSize, AVPixelFormat newFormat = AV_PIX_FMT_NONE);
 
     QSize size() const { return QSize(width, height); }
 
     /** Assign misc fields except but no video data */
     void assignMiscData(const CLVideoDecoderOutput* other);
+    void fillRightEdge();
+
 public:
     QnAbstractMediaData::MediaFlags flags;
 
@@ -203,7 +205,6 @@ public:
 private:
     static void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height);
     static bool equalPlanes(const unsigned char* plane1, const unsigned char* plane2, int width, int stride1, int stride2, int height, int max_diff);
-    void fillRightEdge();
 
 private:
     bool m_useExternalData; // pointers only copied to this frame
@@ -221,7 +222,7 @@ struct CLVideoDecoderOutput
     CLVideoDecoderOutput();
     ~CLVideoDecoderOutput();
 
-    PixelFormat out_type;
+    AVPixelFormat out_type;
 
     unsigned char* C1; // color components
     unsigned char* C2;
@@ -239,7 +240,7 @@ struct CLVideoDecoderOutput
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
     void saveToFile(const char* filename);
     void clean();
-    static bool isPixelFormatSupported(PixelFormat format);
+    static bool isPixelFormatSupported(AVPixelFormat format);
 private:
     static void downscalePlate_factor2(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height);
     static void downscalePlate_factor4(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height);
@@ -255,7 +256,7 @@ private:
 
 struct CLVideoData
 {
-    CodecID codec;
+    AVCodecID codec;
 
     //out frame info;
     //client needs only define ColorSpace out_type; decoder will setup ather variables

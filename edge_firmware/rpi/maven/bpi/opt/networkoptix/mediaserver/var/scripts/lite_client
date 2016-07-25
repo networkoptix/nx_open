@@ -1,6 +1,0 @@
-#!/bin/bash
-export CUSTOMIZATION=${deb.customization.company.name}
-killall gpm
-export LD_LIBRARY_PATH=/opt/$CUSTOMIZATION/lib:/opt/$CUSTOMIZATION/lib/ffmpeg
-LD_PRELOAD="/opt/$CUSTOMIZATION/lib/ldpreloadhook.so" /opt/$CUSTOMIZATION/lite_client/bin/mobile_client
-#/opt/$CUSTOMIZATION/lite_client/bin/mobile_client

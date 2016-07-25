@@ -133,7 +133,7 @@ QnAbstractMediaDataPtr MJPEGStreamReader::getNextData()
     if (contentLen > 2 && !(curPtr[-2] == (char)0xff && curPtr[-1] == (char)0xd9))
         videoData->m_data.finishWriting(-1);
 
-    videoData->compressionType = CODEC_ID_MJPEG;
+    videoData->compressionType = AV_CODEC_ID_MJPEG;
 
     nx_jpg::ImageInfo imgInfo;
     if( nx_jpg::readJpegImageInfo( (const quint8*)videoData->data(), videoData->dataSize(), &imgInfo ) )

@@ -55,7 +55,9 @@ void ProxyHandler::processRequest(
     //TODO #ak avoid request loop by using Via header
 
     //connecting to the target host
-    m_targetPeerSocket = SocketFactory::createStreamSocket();
+    m_targetPeerSocket = SocketFactory::createStreamSocket(
+        connection->isSsl() && m_settings.http().sslSupport);
+
     m_targetPeerSocket->bindToAioThread(connection->getAioThread());
     if (!m_targetPeerSocket->setNonBlockingMode(true) ||
         !m_targetPeerSocket->setRecvTimeout(m_settings.tcp().recvTimeout) ||
@@ -217,7 +219,7 @@ void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
         nx_http::insertOrReplaceHeader(
             &message.response->headers,
             nx_http::HttpHeader("Content-Encoding", "identity"));
-        message.response->headers.erase("Transfer-Encoding");   //no support for streaming body currently
+        message.response->headers.erase("Transfer-Encoding");   //no support for streaming body yet
 
         msgBody = std::make_unique<nx_http::BufferSource>(
             contentTypeIter->second,

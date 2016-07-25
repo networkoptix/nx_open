@@ -35,7 +35,7 @@ angular.module('webadminApp')
                     keyboard:false,
                     backdrop:'static'
                 });
-                loginDialog.result.then(function () {
+                loginDialog.result.finally(function () {
                     loginDialog = null;
                 });
             }
@@ -96,8 +96,8 @@ angular.module('webadminApp')
 
 
         return {
-            getNonce:function(){
-               return $http.get(proxy + '/web/api/getNonce');
+            getNonce:function(login){
+               return $http.get(proxy + '/web/api/getNonce?userName=' + login);
             },
             logout:function(){
                 $localStorage.$reset();
@@ -105,14 +105,10 @@ angular.module('webadminApp')
             },
             login:function(login,password){
                 login = login.toLowerCase();
-                var deferred = $q.defer();
                 var self = this;
-                function reject(error){
-                    deferred.reject(error);
-                }
 
                 function sendLogin(){
-                    self.getNonce().then(function(data){
+                    return self.getNonce(login).then(function(data){
                         var realm = data.data.reply.realm;
                         var nonce = data.data.reply.nonce;
 
@@ -132,14 +128,10 @@ angular.module('webadminApp')
                         // Check auth again - without catching errors
                         return $http.post(proxy + '/web/api/cookieLogin',{
                             auth: auth
-                        }).then(function(data){
-                            deferred.resolve(data);
-                        },reject);
-                    },reject);
+                        });
+                    });
                 }
-                sendLogin();
-                // self.logout().then(sendLogin, sendLogin);
-                return deferred.promise;
+                return sendLogin();
             },
             url:function(){
                 return proxy;
@@ -176,27 +168,26 @@ angular.module('webadminApp')
                 return proxy !=='';
             },
             getUser:function(reload){
-                var deferred = $q.defer();
                 if(this.hasProxy()){ // Proxy means read-only
+                    var deferred = $q.defer();
                     deferred.resolve(false);
+                    return deferred.promise;
                 }
-                this.getCurrentUser(reload).then(function(result){
+
+                return this.getCurrentUser(reload).then(function(result){
                     /*jshint bitwise: false*/
-                    var hasEditServerPermission = result.data.reply.permissions & Config.globalEditServersPermissions;
+                    var hasEditServerPermission = result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0;
                     /*jshint bitwise: true*/
                     var isAdmin = result.data.reply.isAdmin || hasEditServerPermission;
 
                     var isOwner = result.data.reply.isAdmin ;
 
-                    deferred.resolve({
+                    return {
                         isAdmin:isAdmin,
                         isOwner:isOwner,
                         name:result.data.reply.name
-                    });
-                },function(error){
-                    deferred.reject(error);
+                    };
                 });
-                return deferred.promise;
             },
             getScripts:function(){
                 return $http.get('/web/api/scriptList');
@@ -250,8 +241,8 @@ angular.module('webadminApp')
                 return deferred.promise;
             },
 
-            detachFromSystem:function(oldPassword){
-                return wrapPost(proxy + '/web/api/detachFromSystem',{
+            restoreFactoryDefaults:function(oldPassword){
+                return wrapPost(proxy + '/web/api/restoreState',{
                     oldPassword:oldPassword
                 });
             },
@@ -434,34 +425,22 @@ angular.module('webadminApp')
             },
             resolveNewSystemAndUser:function(){
                 var self = this;
-                var deferred = $q.defer();
 
-                this.getModuleInformation().then(function (r) {
+                return this.getModuleInformation().then(function (r) {
                     // check for safe mode and new server and redirect.
                     if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly &&
                         $location.path()!=='/advanced' && $location.path()!=='/debug'){ // Do not redirect from advanced and debug pages
                         $location.path('/setup');
-                        deferred.resolve(null);
-                        return;
+                        return null;
                     }
-                    self.getCurrentUser().then(function(data){
-                        deferred.resolve(data.data.reply);
-                    },function(error){
-                        deferred.reject(error);
-                    });
+                    return self.getUser();
                 });
-
-                return deferred.promise;
             },
             checkInternet:function(reload){
-                var deferred = $q.defer();
-                this.getModuleInformation(reload).then(function(r){
+                return this.getModuleInformation(reload).then(function(r){
                     var serverInfo = r.data.reply;
-                    deferred.resolve(serverInfo.serverFlags && serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0);
-                },function(error){
-                    deferred.resolve(false);
+                    return  (serverInfo.serverFlags && serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0);
                 });
-                return deferred.promise;
             },
             createEvent:function(params){
                 return wrapGet(proxy + '/web/api/createEvent?' +  $.param(params));

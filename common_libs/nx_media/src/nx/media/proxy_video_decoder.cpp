@@ -74,7 +74,7 @@ ProxyVideoDecoder::~ProxyVideoDecoder()
 {
 }
 
-bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
+bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
 {
     static bool calledOnce = false;
     if (!calledOnce)
@@ -84,11 +84,18 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
         conf.skipNextReload();
     }
 
+    if (conf.disable)
+    {
+        PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
+            << ") -> false: conf.disable is set";
+        return false;
+    }
+
     // Odd frame dimensions are not tested and can be unsupported due to UV having half-res.
     if (resolution.width() % 2 != 0 || resolution.height() % 2 != 0)
     {
         OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-                << ") -> false: only even width and height is supported";
+            << ") -> false: only even width and height is supported";
         return false;
     }
 
@@ -96,21 +103,15 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
     if (resolution.width() > maxRes.width() || resolution.height() > maxRes.height())
     {
         OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-               << ") -> false: only even width and height is supported";
+            << ") -> false: resolution is higher than " 
+            << maxRes.width() << " x " << maxRes.Height();
         return false;
     }
 
-    if (codec != CODEC_ID_H264)
+    if (codec != AV_CODEC_ID_H264)
     {
         OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: codec != CODEC_ID_H264";
-        return false;
-    }
-
-    if (conf.disable)
-    {
-        PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: conf.disable is set";
+            << ") -> false: codec != AV_CODEC_ID_H264";
         return false;
     }
 
@@ -125,7 +126,7 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
     return true;
 }
 
-QSize ProxyVideoDecoder::maxResolution(const CodecID codec)
+QSize ProxyVideoDecoder::maxResolution(const AVCodecID codec)
 {
     QN_UNUSED(codec);
 
@@ -143,4 +144,4 @@ int ProxyVideoDecoder::decode(
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

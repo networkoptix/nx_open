@@ -8,6 +8,7 @@
 #include <utils/media/audioformat.h>
 
 #include <utils/timer.h>
+#include <utils/common/safe_direct_connection.h>
 
 class AudioDevice;
 typedef struct ALCdevice_struct ALCdevice;
@@ -16,71 +17,69 @@ namespace nx {
 namespace audio {
 
 /**
- * This class plays audio via openAL
+ * Plays audio via openAL.
  */
-
-class Sound: public QObject
+class Sound: public QObject, public Qn::EnableSafeDirectConnection
 {
 public:
-    Sound(ALCdevice *device, const QnAudioFormat& audioFormat);
+    Sound(ALCdevice* device, const QnAudioFormat& audioFormat);
     ~Sound();
 
     bool isValid() const { return m_isValid; }
 
     /**
-     * @return volume level in range [0..1]
+     * @return Volume level in range [0..1].
      */
     float volumeLevel() const;
 
     /**
-     * Set volume level in range [0..1]
+     * Set volume level in range [0..1].
      */
     void setVolumeLevel(float volumeLevel);
 
     /**
-     * @return internal buffer duration in microseconds
+     * @return Internal buffer duration in microseconds.
      */
     qint64 playTimeElapsedUsec();
 
     /**
-     * @return True if no data in the internal buffer
+     * @return True if no data in the internal buffer.
      */
     bool isBufferUnderflow();
 
-
     /**
-     * Add data to playback buffer. Audio plays immediately If it isn't paused
+     * Add data to playback buffer. Audio plays immediately if it is not paused.
      */
     bool write(const quint8* data, uint size);
 
     /**
-     * @return audio format playing
+     * @return Audio format playing.
      */
     QnAudioFormat format() const;
 
     /**
-     * @return playback state
+     * @return Playback state.
      */
     QAudio::State state() const;
 
-    /** Pause playing */
+    /** Pause playing. */
     void suspend();
 
-    /** Resume playing */
+    /** Resume playing. */
     void resume();
 
-    /** Clear internal audio buffer */
+    /** Clear internal audio buffer. */
     void clear();
 
     /**
-     * @return True if audio format is supported
+     * @return True if audio format is supported.
      */
-    static bool isFormatSupported(const QnAudioFormat &format);
+    static bool isFormatSupported(const QnAudioFormat& format);
 
 private:
     uint bufferTime() const;
     bool setup();
-    static int getOpenAlFormat(const QnAudioFormat &audioFormat);
+    static int getOpenAlFormat(const QnAudioFormat& audioFormat);
     uint bitRate() const;
     uint sampleSize() const;
     bool playImpl();
@@ -91,10 +90,10 @@ private:
     void clearBuffers(bool clearAll);
 
     qint64 maxAudioJitterUs() const;
-    /**
-     * Device specific extra delay for played audio
-     */
+
+    /** Device specific extra delay for played audio. */
     qint64 extraAudioDelayUs() const;
+
 private:
     mutable QnMutex m_mtx;
     QnAudioFormat m_audioFormat;
@@ -108,8 +107,8 @@ private:
     uint m_bitsPerSample;
     uint m_size;
     bool m_isValid;
-    ALCdevice *m_device;
-    quint8 *m_proxyBuffer;
+    ALCdevice* m_device;
+    quint8* m_proxyBuffer;
     int m_proxyBufferLen;
     bool m_deinitialized;
     bool m_paused;
@@ -119,7 +118,7 @@ private:
 
 private:
     void internalClear();
-    static int checkOpenALError(ALCdevice *device);
+    static int checkOpenALError(ALCdevice* device);
 };
 
 } // namespace audio

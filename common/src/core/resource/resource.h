@@ -1,6 +1,4 @@
-#ifndef QN_RESOURCE_H
-#define QN_RESOURCE_H
-
+#pragma once
 #include <atomic>
 #include <QtCore/QDateTime>
 #include <QtCore/QMap>
@@ -34,7 +32,7 @@ class QnInitResPool: public QThreadPool
 public:
 };
 
-class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
+class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
     Q_FLAGS(Qn::PtzCapabilities)
@@ -179,7 +177,9 @@ public:
         Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
     */
     Qn::PtzCapabilities getPtzCapabilities() const;
-    bool hasPtzCapabilities(Qn::PtzCapabilities capabilities) const;
+
+    /** Check if camera has any of provided capabilities. */
+    bool hasAnyOfPtzCapabilities(Qn::PtzCapabilities capabilities) const;
     void setPtzCapabilities(Qn::PtzCapabilities capabilities);
     void setPtzCapability(Qn::PtzCapabilities capability, bool value);
     QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
@@ -203,13 +203,17 @@ public:
         NO_ALLOW_EMPTY      = 1 << 2,
     };
 
-    bool setProperty(const QString &key, const QString &value,
-                     PropertyOptions options = DEFAULT_OPTIONS);
+    virtual bool setProperty(
+		const QString &key, 
+		const QString &value, 
+        PropertyOptions options = DEFAULT_OPTIONS);
 
-    bool setProperty(const QString &key, const QVariant& value,
-                     PropertyOptions options = DEFAULT_OPTIONS);
+    virtual bool setProperty(
+		const QString &key,
+		const QVariant& value,
+        PropertyOptions options = DEFAULT_OPTIONS);
 
-    bool removeProperty(const QString& key);
+    virtual bool removeProperty(const QString& key);
 
     template<typename Update>
     bool updateProperty(const QString &key, const Update& update)
@@ -219,7 +223,7 @@ public:
     }
 
     //!Call this with proper field names to emit corresponding *changed signals. Signal can be defined in a derived class
-    void emitModificationSignals( const QSet<QByteArray>& modifiedFields );
+    void emitModificationSignals(const QSet<QByteArray>& modifiedFields);
 
     static QnInitResPool* initAsyncPoolInstance();
     static bool isStopping() { return m_appStopping; }
@@ -296,7 +300,7 @@ protected:
 
     virtual QnAbstractPtzController *createPtzControllerInternal(); // TODO: #Elric does not belong here
 
-    virtual CameraDiagnostics::Result initInternal() {return CameraDiagnostics::NoErrorResult();};
+    virtual CameraDiagnostics::Result initInternal() { return CameraDiagnostics::NoErrorResult(); };
     //!Called just after successful \a initInternal()
     /*!
         Inherited class implementation MUST call base class method first
@@ -349,26 +353,26 @@ private:
         bool replaceIfExists;
 
         LocalPropertyValue()
-        :
-            markDirty( false ),
-            replaceIfExists( false )
+            :
+            markDirty(false),
+            replaceIfExists(false)
         {
         }
 
         LocalPropertyValue(
             const QString& _value,
             bool _markDirty,
-            bool _replaceIfExists )
-        :
-            value( _value ),
-            markDirty( _markDirty ),
-            replaceIfExists( _replaceIfExists )
+            bool _replaceIfExists)
+            :
+            value(_value),
+            markDirty(_markDirty),
+            replaceIfExists(_replaceIfExists)
         {
         }
     };
 
     /** Resource pool this this resource belongs to. */
-    QnResourcePool *m_resourcePool;
+    QnResourcePool* m_resourcePool;
 
     /** Identifier of this resource. */
     QnUuid m_id;
@@ -397,21 +401,19 @@ private:
 };
 
 template<class Resource>
-QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
-    if(resource == NULL) {
+QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource)
+{
+    if (!resource)
         return QnSharedResourcePointer<Resource>();
-    } else {
-        return resource->toSharedPointer().template staticCast<Resource>();
-    }
+    return resource->toSharedPointer().template staticCast<Resource>();
 }
 
 template<class Resource>
-QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource) {
+QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource)
+{
     using ::toSharedPointer; /* Let ADL kick in. */
     return toSharedPointer(resource);
 }
 
 Q_DECLARE_METATYPE(QnResourcePtr);
 Q_DECLARE_METATYPE(QnResourceList);
-
-#endif // QN_RESOURCE_H

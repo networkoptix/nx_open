@@ -1,5 +1,4 @@
-#ifndef WORKBENCH_LAYOUTS_HANDLER_H
-#define WORKBENCH_LAYOUTS_HANDLER_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -9,7 +8,7 @@
 
 class QnWorkbenchStateDelegate;
 
-class QnWorkbenchLayoutsHandler : public QObject, public QnWorkbenchContextAware
+class QnWorkbenchLayoutsHandler: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
@@ -21,10 +20,10 @@ public:
     bool tryClose(bool force);
     void forcedUpdate();
 
-protected:
+private:
     ec2::AbstractECConnectionPtr connection2() const;
 
-private slots:
+    private slots:
     void at_newUserLayoutAction_triggered();
     void at_saveLayoutAction_triggered();
     void at_saveCurrentLayoutAction_triggered();
@@ -39,15 +38,37 @@ private slots:
 
     void at_workbench_layoutsChanged();
 
-
-
 private:
+
+    /** Save target file, local or remote layout. */
     void saveLayout(const QnLayoutResourcePtr &layout);
+
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
 
+    struct LayoutChange
+    {
+        QnLayoutResourcePtr layout;
+        QnResourceList added;
+        QnResourceList removed;
+    };
+
+    LayoutChange calculateLayoutChange(const QnLayoutResourcePtr& layout);
+
+    /** Ask user if layout should be saved. Actual when admin modifies shared layout
+     *  or layout belonging to user with custom access rights.
+     */
+    bool confirmLayoutChange(const LayoutChange& change);
+
+    bool confirmSharedLayoutChange(const LayoutChange& change);
+    bool confirmLayoutChangeForUser(const QnUserResourcePtr& user, const LayoutChange& change);
+    bool confirmLayoutChangeForGroup(const QnUuid& groupId, const LayoutChange& change);
+
+    /** If user has custom access rights, he must be given direct access to cameras on changed layout. */
+    void grantAccessRightsForUser(const QnUserResourcePtr& user, const LayoutChange& change);
+
     /**
-     * @brief askOverrideLayout     Show messagebox asking user if he really wants to override existsing layout.
-     * @param buttons               Messagebox buttons.
+     * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.
+     * @param buttons               Message box buttons.
      * @param defaultButton         Default button.
      * @return                      Selected button.
      */
@@ -68,5 +89,3 @@ private:
     /** Flag that we are in layouts closing process. */
     bool m_closingLayouts;
 };
-
-#endif // WORKBENCH_LAYOUTS_HANDLER_H

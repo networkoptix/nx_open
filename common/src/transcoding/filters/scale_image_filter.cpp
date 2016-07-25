@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-QnScaleImageFilter::QnScaleImageFilter(const QSize& size, PixelFormat format): m_size(size), m_format(format)
+QnScaleImageFilter::QnScaleImageFilter(const QSize& size, AVPixelFormat format): m_size(size), m_format(format)
 {
 }
 

@@ -96,6 +96,7 @@
 #include "api/model/audit/audit_record.h"
 #include "health/system_health.h"
 #include <utils/common/credentials.h>
+#include <core/dataprovider/stream_mixer.h>
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -110,6 +111,7 @@ void QnCommonMetaTypes::initialize() {
     if(qn_commonMetaTypes_initialized)
         return;
 
+    qRegisterMetaType<uintptr_t>("uintptr_t");
     qRegisterMetaType<QnUuid>();
     qRegisterMetaType<QSet<QnUuid>>("QSet<QnUuid>");
     qRegisterMetaType<QHostAddress>();
@@ -262,6 +264,11 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnLdapUser>();
     qRegisterMetaType<QnLdapUsers>();
+    qRegisterMetaType<QnChannelMapping>();
+    qRegisterMetaType<QList<QnChannelMapping>>();
+    qRegisterMetaType<QnResourceChannelMapping>();
+    qRegisterMetaType<QList<QnResourceChannelMapping>>();
+
 
     /*
      * Following code requires full-scale refactor in the classes that uses signals with such parameters.
@@ -316,6 +323,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
     qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
     qRegisterMetaType<ec2::ApiUserGroupData>("ec2::ApiUserGroupData");
+    qRegisterMetaType<ec2::ApiPredefinedRoleData>("ec2::ApiPredefinedRoleData");
     qRegisterMetaType<ec2::ApiAccessRightsData>("ec2::ApiAccessRightsData");
     qRegisterMetaType<ec2::ApiLayoutData>("ec2::ApiLayoutData");
     qRegisterMetaType<ec2::ApiLayoutItemData>("ec2::ApiLayoutItemData");
@@ -335,6 +343,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnAuditRecordList>();
 
     qRegisterMetaType<QnOptionalBool>();
+    qRegisterMetaType<QnIOPortData>();
+    qRegisterMetaType<QnIOPortDataList>();
     qRegisterMetaType<QList<QMap<QString, QString>>>();
 
     qRegisterMetaType<QList<QnCredentials>>();
@@ -349,7 +359,11 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QList<QMap<QString, QString>>>();
 
     QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();
+    QnJsonSerializer::registerSerializer<QnIOPortData>();
+    QnJsonSerializer::registerSerializer<QnIOPortDataList>();
     QnJsonSerializer::registerSerializer<QList<QnCredentials>>();
+    QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
+    QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
 
     qn_commonMetaTypes_initialized = true;
 }

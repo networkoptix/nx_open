@@ -15,13 +15,17 @@
 
 #include <utils/common/connective.h>
 
+
 class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnResourceAccessManager>
 {
     Q_OBJECT
-
     typedef Connective<QObject> base_type;
+
 public:
     QnResourceAccessManager(QObject* parent = nullptr);
+
+    /** Get a set of global permissions that will not work without the given one. */
+    static Qn::GlobalPermissions dependentPermissions(Qn::GlobalPermission value);
 
     void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList);
 
@@ -32,9 +36,12 @@ public:
     void addOrUpdateUserGroup(const ec2::ApiUserGroupData& userGroup);
     void removeUserGroup(const QnUuid& groupId);
 
-    /** List of resources ids, the given user has access to. */
-    QSet<QnUuid> accessibleResources(const QnUuid& userId) const;
-    void setAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& resources);
+    /** List of resources ids, the given user has access to (only given directly). */
+    QSet<QnUuid> accessibleResources(const QnUuid& userOrGroupId) const;
+    void setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources);
+
+    /** List of resources ids, the given user has access to (only given directly). */
+    QSet<QnUuid> accessibleResources(const QnUserResourcePtr& user) const;
 
     /**
     * \param user                      User to get global permissions for.
@@ -65,25 +72,32 @@ public:
     */
     bool hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permissions requiredPermissions) const;
 
+    enum class CanCreateResourceCode
+    {
+        Yes,
+        No,
+        NotImplemented
+    };
+
     /**
     * \param user                      User that should have permissions for resource creating.
     * \param resource                  Resource to get permissions for.
     * \returns                         Whether user can create this resource.
     */
-    bool canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
+    CanCreateResourceCode canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
 
     template <typename ApiDataType>
-    bool canCreateResource(const QnUserResourcePtr& /*user*/, const ApiDataType& /*data*/) const
+    CanCreateResourceCode canCreateResource(const QnUserResourcePtr& /*user*/, const ApiDataType& /*data*/) const
     {
         /* By default we cannot create resources manually. */
-        return false;
+        return CanCreateResourceCode::NotImplemented;
     }
 
-    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const;
-    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const;
-    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiUserData& data) const;
-    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const;
-    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const;
+    CanCreateResourceCode canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const;
+    CanCreateResourceCode canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const;
+    CanCreateResourceCode canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiUserData& data) const;
+    CanCreateResourceCode canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const;
+    CanCreateResourceCode canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const;
 
     bool canCreateStorage   (const QnUserResourcePtr& user, const QnUuid& storageParentId) const;
     bool canCreateLayout    (const QnUserResourcePtr& user, const QnUuid& layoutParentId) const;
@@ -104,15 +118,32 @@ public:
     bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,        const ec2::ApiUserData& update) const;
     bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,   const ec2::ApiVideowallData& update) const;
 
+    static const QList<Qn::UserRole>& predefinedRoles();
+
+    static QString userRoleName(Qn::UserRole userRole);
+    static QString userRoleDescription(Qn::UserRole userRole);
+    static Qn::GlobalPermissions userRolePermissions(Qn::UserRole userRole);
+
+    Qn::UserRole userRole(const QnUserResourcePtr& user) const;
+    QString userRoleName(const QnUserResourcePtr& user) const;
+
+    static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
+
 signals:
     void accessibleResourcesChanged(const QnUuid& userId);
 
     void userGroupAddedOrUpdated(const ec2::ApiUserGroupData& userGroup);
     void userGroupRemoved(const QnUuid& groupId);
 
+    /** Notify listeners that permissions possibly changed (not necessarily). */
+    void permissionsInvalidated(const QSet<QnUuid>& resourceIds);
 private:
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);
+    void invalidateResourceCacheInternal(const QnUuid& resourceId);
+    void invalidateCacheForLayoutItem(const QnLayoutResourcePtr& layout, const QnLayoutItemData& item);
+    void invalidateCacheForLayoutItems(const QnResourcePtr& resource);
+    void invalidateCacheForVideowallItem(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
 
     Qn::Permissions calculatePermissions(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
 
@@ -124,7 +155,28 @@ private:
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnLayoutResourcePtr& layout)          const;
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnUserResourcePtr& targetUser)        const;
 
+    /** Check if resource (camera, webpage or layout) is available to given user. */
     bool isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
+
+    /** Check if given desktop camera or layout is available to given user through videowall. */
+    bool isAccessibleViaVideowall(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
+
+    /** Check if camera is placed to one of shared layouts, available to given user. */
+    bool isAccessibleViaLayouts(const QSet<QnUuid>& layoutIds, const QnResourcePtr& resource, bool sharedOnly) const;
+
+    void beginUpdateCache();
+    void endUpdateCache();
+
+private:
+    class UpdateCacheGuard
+    {
+    public:
+        UpdateCacheGuard(QnResourceAccessManager* parent);
+        ~UpdateCacheGuard();
+    private:
+        QnResourceAccessManager* m_parent;
+    };
+
 private:
     mutable QnMutex m_mutex;
 
@@ -132,6 +184,12 @@ private:
     QHash<QnUuid, ec2::ApiUserGroupData> m_userGroups;
 
     mutable QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
+
+    /** Counter which is used to avoid repeating signals during one update process.  */
+    QAtomicInt m_cacheUpdateCounter;
+
+    /** Set of resources that were invalidated during current update process. */
+    QSet<QnUuid> m_invalidatedResources;
 
     struct PermissionKey
     {

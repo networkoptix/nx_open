@@ -59,7 +59,10 @@ public:
         \param periodMillis cannot be greater than \a QnAuthHelper::MAX_AUTHENTICATED_ALIAS_LIFE_TIME_MS
         \note pair<query key name, key value>. Returned key is only valid for \a path
     */
-    QPair<QString, QString> createAuthenticationQueryItemForPath( const QString& path, unsigned int periodMillis );
+    QPair<QString, QString> createAuthenticationQueryItemForPath(
+        const QnUuid& authUserId,
+        const QString& path,
+        unsigned int periodMillis);
 
     static QByteArray symmetricalEncode(const QByteArray& data);
 
@@ -75,7 +78,9 @@ public:
         const QByteArray& authRecord,
         const QByteArray& method,
         nx_http::Response& response,
-        QnUuid* authUserId) const;
+        QnUuid* authUserId = nullptr) const;
+
+    bool checkUserPassword(const QnUserResourcePtr& user, const QString& password);
 
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
@@ -91,6 +96,7 @@ private:
     public:
         nx::utils::TimerManager::TimerGuard timeGuard;
         QString path;
+        QnUuid authUserId;
 
         TempAuthenticationKeyCtx() {}
         TempAuthenticationKeyCtx( TempAuthenticationKeyCtx&& right )

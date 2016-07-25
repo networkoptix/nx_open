@@ -30,6 +30,9 @@ QnImageControlWidget::QnImageControlWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
+    setFocusPolicy(Qt::TabFocus);
+    setFocusProxy(ui->aspectRatioComboBox);
+
     setHelpTopic(ui->fisheyeComboBox, ui->fisheyeLabel,
                  Qn::CameraSettings_Dewarping_Help);
     setHelpTopic(ui->aspectRatioComboBox, ui->aspectRatioLabel,

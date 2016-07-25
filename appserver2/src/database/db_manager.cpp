@@ -16,6 +16,7 @@
 #include "nx/fusion/serialization/json.h"
 #include "core/resource/user_resource.h"
 #include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <utils/license_usage_helper.h>
 
 #include <database/migrations/business_rules_db_migration.h>
@@ -518,13 +519,16 @@ bool QnDbManager::init(const QUrl& dbUrl)
     bool updateUserResource = false;
     if( !defaultAdminPassword.isEmpty() )
     {
-        if (!userResource->checkPassword(defaultAdminPassword) || userResource->getRealm() != QnAppInfo::realm()) {
-            userResource->setPassword( defaultAdminPassword );
+        if (!userResource->checkLocalUserPassword(defaultAdminPassword) ||
+            userResource->getRealm() != QnAppInfo::realm())
+        {
+            userResource->setPassword( defaultAdminPassword);
             userResource->generateHash();
             updateUserResource = true;
         }
     }
-    if (!md5Password.isEmpty() || !digestPassword.isEmpty()) {
+    if (!md5Password.isEmpty() || !digestPassword.isEmpty())
+    {
         userResource->setHash(md5Password);
         userResource->setDigest(digestPassword);
         updateUserResource = true;
@@ -1533,7 +1537,7 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 
 ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 internalId)
 {
-    if (data.permissions & Qn::GlobalPermission::INTERNAL_GlobalVideoWallLayoutPermission) 
+    if (data.permissions & Qn::GlobalPermission::INTERNAL_GlobalVideoWallLayoutPermission)
     {
         NX_ASSERT(0, "This enum entry is only for the internal use");
         return ErrorCode::forbidden;
@@ -2386,7 +2390,7 @@ ErrorCode QnDbManager::removeParam(const ApiResourceParamWithRefData& data)
     query.prepare("DELETE FROM vms_kvpair WHERE resource_guid = :id AND name = :name");
     query.bindValue(lit(":id"), data.resourceId.toRfc4122());
     query.bindValue(lit(":name"), data.name);
-    if (!query.exec()) 
+    if (!query.exec())
     {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
@@ -3593,6 +3597,11 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserGro
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& result)
+{
+    result = QnResourceAccessManager::getPredefinedRoles();
+    return ErrorCode::ok;
+}
 
 ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
 {

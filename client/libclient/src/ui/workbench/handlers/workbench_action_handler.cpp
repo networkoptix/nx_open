@@ -26,6 +26,7 @@
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
+#include <client/desktop_client_message_processor.h>
 
 #include <common/common_module.h>
 
@@ -135,6 +136,7 @@
 #include <utils/email/email.h>
 #include <utils/math/math.h>
 #include <nx/network/http/httptypes.h>
+#include <utils/common/cpp14.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
 #include <vms_gateway_embeddable.h>
@@ -275,30 +277,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::DelayedForcedExitAction),                &QAction::triggered,    this,   [this] {  closeApplication(true);    }, Qt::QueuedConnection);
 
     connect(action(QnActions::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
-
-    const auto browseAction = action(QnActions::BrowseLocalFilesModeAction);
-    const auto setWelcomeScreenVisible = [this](bool visible)
-    {
-        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-        welcomeScreen->setVisible(visible);
-    };
-
-    const auto idChangedHandler = [setWelcomeScreenVisible, browseAction](const QnUuid & /* id */)
-    {
-        const bool connected = !qnCommon->remoteGUID().isNull();
-        browseAction->setChecked(connected);
-    };
-
-    connect(qnCommon, &QnCommonModule::remoteIdChanged, this, idChangedHandler);
-    connect(browseAction, &QAction::toggled, this, [setWelcomeScreenVisible](bool checked)
-    {
-        setWelcomeScreenVisible(!checked);
-    });
-
-    connect(display(), &QnWorkbenchDisplay::widgetAdded, this, [browseAction]()
-    {
-        browseAction->setChecked(true);
-    });
 
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
@@ -565,23 +543,21 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         return;
 
     // we should not change state when using "Open in New Window"
-    if (m_delayedDrops.isEmpty() && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode()) {
+    if (m_delayedDrops.isEmpty() && qnRuntime->isDesktopMode())
+    {
         QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
         workbench()->update(state);
-
-        /* Delete orphaned layouts. */
-        foreach(const QnLayoutResourcePtr &layout, qnResPool->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>())
-            if(snapshotManager()->isLocal(layout) && !layout->isFile())
-                qnResPool->removeResource(layout);
     }
 
     /* Sometimes we get here when 'New Layout' has already been added. But all user's layouts must be created AFTER this method.
     * Otherwise the user will see uncreated layouts in layout selection menu.
     * As temporary workaround we can just remove that layouts. */
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
-    if (user && !qnRuntime->isActiveXMode()) {
-        foreach(const QnLayoutResourcePtr &layout, qnResPool->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
-            if(snapshotManager()->isLocal(layout) && !layout->isFile())
+    if (user && !qnRuntime->isActiveXMode())
+    {
+        for (const QnLayoutResourcePtr &layout: qnResPool->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>())
+        {
+            if (layout->hasFlags(Qn::local) && !layout->isFile())
                 qnResPool->removeResource(layout);
         }
     }
@@ -1494,24 +1470,54 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     if (!context()->user())
         return;
 
-    QUrl serverUrl = server->getApiUrl();
-    const auto vmsGatewayAddress = nx::cloud::gateway::VmsGatewayEmbeddable::instance()
-        ->endpoint().toString();
+    QUrl serverUrl(server->getApiUrl());
+    serverUrl.setPath(lit("/api/getNonce"));
 
-    QUrl url(lit("http://%1/%2:%3/api/showLog")
-        .arg(vmsGatewayAddress).arg(serverUrl.host()).arg(serverUrl.port()));
+    nx_http::AsyncHttpClientPtr client = nx_http::AsyncHttpClient::create();
+    auto reply = std::make_unique<QnAsyncHttpClientReply>(client, this);
+    connect(
+        reply.get(), &QnAsyncHttpClientReply::finished,
+        this, &QnWorkbenchActionHandler::at_serverLogsAction_getNonce);
+
+    // TODO: Think of preloader in case of user complains about delay
+    m_logRequests.emplace(serverUrl, LogRequest{std::move(server), std::move(reply)});
+    client->doGet(serverUrl);
+}
+
+void QnWorkbenchActionHandler::at_serverLogsAction_getNonce(QnAsyncHttpClientReply *reply) {
+    auto it = m_logRequests.find(reply->url());
+    auto request = std::move(it->second);
+    m_logRequests.erase(it);
+
+    QnJsonRestResult result;
+    NonceReply auth;
+    if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
+    {
+        QnMessageBox::warning(mainWindow(),
+            tr("Cannot open server log"),
+            tr("Could not execute initial server query"));
+
+        return;
+    }
+
+    auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
+    QUrl url(lit("%1://%2/%3:%4/api/showLog")
+        .arg(gateway->isSslEnabled() ? lit("https") : lit("http"))
+        .arg(gateway->endpoint().toString())
+        .arg(reply->url().host()).arg(reply->url().port()));
 
     QString login = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();
+
     QUrlQuery urlQuery(url);
-    auto nonce = QByteArray::number( qnSyncTime->currentUSecsSinceEpoch(), 16 );
     urlQuery.addQueryItem(
         lit("auth"),
         QLatin1String(createHttpQueryAuthParam(
-            login, password, server->realm(), nx_http::Method::GET, nonce)));
+            login, password, auth.realm, nx_http::Method::GET, auth.nonce.toUtf8())));
+
     urlQuery.addQueryItem(lit("lines"), QLatin1String("1000"));
     url.setQuery(urlQuery);
-    url = QnNetworkProxyFactory::instance()->urlToResource(url, server);
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, request.server);
     QDesktopServices::openUrl(url);
 }
 
@@ -1757,33 +1763,41 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if(resources.isEmpty())
         return;
 
-    auto canAutoDelete = [this](const QnResourcePtr &resource) {
-        QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-        if(!layoutResource)
-            return false;
+    auto canAutoDelete = [this](const QnResourcePtr &resource)
+        {
+            QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
+            if (!layout)
+                return false;
 
-        if (qnResPool->isAutoGeneratedLayout(layoutResource))
-            return true;
+            if (qnResPool->isAutoGeneratedLayout(layout))
+                return true;
 
-        return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
-    };
+            /* Local, not changed and not being saved. */
+            return snapshotManager()->flags(layout) == Qn::ResourceSavingFlags()
+                && layout->hasFlags(Qn::local)
+                && !layout->isFile();
+        };
 
-    auto deleteResources = [this](const QnResourceList &resources) {
+    auto deleteResources = [this](const QnResourceList &resources)
+        {
 
-        QnLayoutResourceList localLayouts = resources.filtered<QnLayoutResource>([this](const QnLayoutResourcePtr &layout){
-            return snapshotManager()->isLocal(layout);
-        });
+            QnLayoutResourceList localLayouts = resources.filtered<QnLayoutResource>(
+                [this]
+                (const QnLayoutResourcePtr &layout)
+                {
+                    return layout->hasFlags(Qn::local) && !layout->isFile();
+                });
 
-        QnResourceList remoteResources = resources;
+            QnResourceList remoteResources = resources;
 
-        /* These can be simply deleted from resource pool. */
-        for (const QnLayoutResourcePtr &layout: localLayouts) {
-            remoteResources.removeOne(layout);
-            qnResPool->removeResource(layout);
-        }
+            /* These can be simply deleted from resource pool. */
+            for (const QnLayoutResourcePtr &layout: localLayouts) {
+                remoteResources.removeOne(layout);
+                qnResPool->removeResource(layout);
+            }
 
-        qnResourcesChangesManager->deleteResources(remoteResources);
-    };
+            qnResourcesChangesManager->deleteResources(remoteResources);
+        };
 
 
     /* Check if it's OK to delete something without asking. */

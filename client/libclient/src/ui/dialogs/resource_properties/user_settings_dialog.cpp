@@ -25,7 +25,7 @@ namespace
 {
     static std::map<QnResourceAccessFilter::Filter, QString> kCategoryNameByFilter
     {
-        { QnResourceAccessFilter::CamerasFilter, QnUserSettingsDialog::tr("Media Resources") },
+        { QnResourceAccessFilter::MediaFilter, QnUserSettingsDialog::tr("Media Resources") },
         { QnResourceAccessFilter::LayoutsFilter, QnUserSettingsDialog::tr("Layouts") }
     };
 
@@ -41,7 +41,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     m_profilePage(new QnUserProfileWidget(m_model, this)),
     m_settingsPage(new QnUserSettingsWidget(m_model, this)),
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
-    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::CamerasFilter, this)),
+    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::MediaFilter, this)),
     m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this)),
     m_editGroupsButton(new QPushButton(tr("Edit Roles..."), this))
 {
@@ -138,8 +138,8 @@ void QnUserSettingsDialog::permissionsChanged()
 
         std::pair<int, int> counts(0, currentUserIsAdmin ? 0 : -1);
 
-        if (filter == QnResourceAccessFilter::CamerasFilter &&
-            permissions.testFlag(Qn::GlobalAccessAllCamerasPermission))
+        if (filter == QnResourceAccessFilter::MediaFilter &&
+            permissions.testFlag(Qn::GlobalAccessAllMediaPermission))
         {
             return descriptionHtml(filter, true, counts);
         }
@@ -161,52 +161,47 @@ void QnUserSettingsDialog::permissionsChanged()
 
     if (isPageVisible(ProfilePage))
     {
-        Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
-        QnUuid groupId = m_user->userGroup();
+        Qn::UserRole roleType = qnResourceAccessManager->userRole(m_user);
+        QString permissionsText = qnResourceAccessManager->userRoleDescription(roleType);
 
-        QString permissionsText = accessController()->userRoleDescription(m_user);
-
-        if (!groupId.isNull())
+        if (roleType == Qn::UserRole::CustomUserGroup)
         {
             /* Handle custom user role: */
+            QnUuid groupId = m_user->userGroup();
             Qn::GlobalPermissions groupPermissions = qnResourceAccessManager->userGroup(groupId).permissions;
 
             permissionsText += kHtmlTableTemplate.arg(
-                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::CamerasFilter, groupId, groupPermissions, false)) +
+                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, groupId, groupPermissions, false)) +
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, groupId, groupPermissions, false)));
         }
-        else if (!m_user->isOwner() && !permissions.testFlag(Qn::GlobalAdminPermission))
+        else if (roleType == Qn::UserRole::CustomPermissions)
         {
-            switch (permissions)
-            {
-                //TODO: #vkutin #GDM Refactor all this logic; introduce standard role descriptors to check against and fetch names from
-                case Qn::GlobalAdvancedViewerPermissionSet:
-                case Qn::GlobalViewerPermissionSet:
-                case Qn::GlobalLiveViewerPermissionSet:
-                    break;
+            QnUuid userId = m_user->getId();
+            Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
 
-                default:
-                {
-                    /* Handle custom permissions: */
-                    QnUuid userId = m_user->getId();
-
-                    permissionsText += kHtmlTableTemplate.arg(
-                        kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::CamerasFilter, userId, permissions, false)) +
-                        kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, userId, permissions, false)));
-                }
-            }
+            permissionsText += kHtmlTableTemplate.arg(
+                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, userId, permissions, false)) +
+                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, userId, permissions, false)));
         }
 
         m_profilePage->updatePermissionsLabel(permissionsText);
     }
     else
     {
-        Qn::GlobalPermissions permissions = m_settingsPage->selectedPermissions();
-        QnUuid groupId = m_settingsPage->selectedUserGroup();
+        Qn::UserRole roleType = m_settingsPage->selectedRole();
+        QString permissionsText = qnResourceAccessManager->userRoleDescription(roleType);
 
-        QString permissionsText = accessController()->userRoleDescription(permissions, groupId);
+        if (roleType == Qn::UserRole::CustomUserGroup)
+        {
+            /* Handle custom user role: */
+            QnUuid groupId = m_settingsPage->selectedUserGroup();
+            Qn::GlobalPermissions groupPermissions = qnResourceAccessManager->userGroup(groupId).permissions;
 
-        if (isPageVisible(PermissionsPage))
+            permissionsText += kHtmlTableTemplate.arg(
+                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, groupId, groupPermissions, true)) +
+                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, groupId, groupPermissions, true)));
+        }
+        else if (roleType == Qn::UserRole::CustomPermissions)
         {
             /* Handle custom permissions: */
             auto descriptionFromWidget = [descriptionHtml](const QnAccessibleResourcesWidget* widget)
@@ -217,15 +212,6 @@ void QnUserSettingsDialog::permissionsChanged()
             permissionsText += kHtmlTableTemplate.arg(
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_camerasPage)) +
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_layoutsPage)));
-        }
-        else if (!groupId.isNull())
-        {
-            /* Handle custom user role: */
-            Qn::GlobalPermissions groupPermissions = qnResourceAccessManager->userGroup(groupId).permissions;
-
-            permissionsText += kHtmlTableTemplate.arg(
-                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::CamerasFilter, groupId, groupPermissions, true)) +
-                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, groupId, groupPermissions, true)));
         }
 
         m_settingsPage->updatePermissionsLabel(permissionsText);
@@ -322,7 +308,7 @@ bool QnUserSettingsDialog::hasChanges() const
 
     //}
 
-
+    //TODO: #GDM What was intended here?
 
 }
 
@@ -367,8 +353,7 @@ void QnUserSettingsDialog::updateControlsVisibility()
         || mode == QnUserSettingsModel::OtherSettings;
 
     bool customAccessRights = settingsPageVisible
-        && m_settingsPage->selectedPermissions() == Qn::NoGlobalPermissions
-        && m_settingsPage->selectedUserGroup().isNull();
+        && m_settingsPage->selectedRole() == Qn::UserRole::CustomPermissions;
 
     setPageVisible(ProfilePage,     profilePageVisible);
 

@@ -23,7 +23,7 @@
 #include "task_server_new.h"
 
 class ApplauncherProcess
-:
+    :
     public QObject,
     public QnStoppable,
     public AbstractRequestProcessor,
@@ -32,11 +32,18 @@ class ApplauncherProcess
     Q_OBJECT
 
 public:
+    enum class Mode
+    {
+        Default,
+        Background,
+        Quit
+    };
+
     ApplauncherProcess(
         QSettings* const userSettings,
         InstallationManager* const installationManager,
-        bool quitMode,
-        const QString& mirrorListUrl );
+        Mode mode,
+        const QString& mirrorListUrl);
 
     //!Implementation of \a ApplauncherProcess::pleaseStop()
     virtual void pleaseStop() override;
@@ -44,7 +51,7 @@ public:
     //!Implementation of \a AbstractRequestProcessor::processRequest()
     virtual void processRequest(
         const std::shared_ptr<applauncher::api::BaseTask>& request,
-        applauncher::api::Response** const response ) override;
+        applauncher::api::Response** const response) override;
 
     int run();
 
@@ -57,15 +64,14 @@ private:
         qint64 processID;
 
         KillProcessTask()
-        :
-            processID( 0 )
-        {
-        }
+            :
+            processID(0)
+        {}
     };
 
     bool m_terminated;
     InstallationManager* const m_installationManager;
-    const bool m_quitMode;
+    const Mode m_mode;
     const QString m_mirrorListUrl;
     TaskServerNew m_taskServer;
     QSettings* const m_settings;
@@ -80,38 +86,38 @@ private:
 
     void launchMostRecentClient();
     bool sendTaskToRunningLauncherInstance();
-    bool getVersionToLaunch( QnSoftwareVersion* const versionToLaunch, QString* const appArgs );
-    bool addTaskToThePipe( const QByteArray& serializedTask );
+    bool getVersionToLaunch(QnSoftwareVersion* const versionToLaunch);
+    bool addTaskToThePipe(const QByteArray& serializedTask);
     bool startApplication(
         const std::shared_ptr<applauncher::api::StartApplicationTask>& task,
-        applauncher::api::Response* const response );
+        applauncher::api::Response* const response);
     bool startInstallation(
         const std::shared_ptr<applauncher::api::StartInstallationTask>& task,
-        applauncher::api::StartInstallationResponse* const response );
+        applauncher::api::StartInstallationResponse* const response);
     bool installZip(
         const std::shared_ptr<applauncher::api::InstallZipTask>& request,
-        applauncher::api::Response* const response );
+        applauncher::api::Response* const response);
     bool getInstallationStatus(
         const std::shared_ptr<applauncher::api::GetInstallationStatusRequest>& request,
-        applauncher::api::InstallationStatusResponse* const response );
+        applauncher::api::InstallationStatusResponse* const response);
     bool isVersionInstalled(
         const std::shared_ptr<applauncher::api::IsVersionInstalledRequest>& request,
-        applauncher::api::IsVersionInstalledResponse* const response );
+        applauncher::api::IsVersionInstalledResponse* const response);
     bool getInstalledVersions(
         const std::shared_ptr<applauncher::api::GetInstalledVersionsRequest>& request,
-        applauncher::api::GetInstalledVersionsResponse* const response );
+        applauncher::api::GetInstalledVersionsResponse* const response);
     bool cancelInstallation(
         const std::shared_ptr<applauncher::api::CancelInstallationRequest>& request,
-        applauncher::api::CancelInstallationResponse* const response );
+        applauncher::api::CancelInstallationResponse* const response);
     bool addProcessKillTimer(
         const std::shared_ptr<applauncher::api::AddProcessKillTimerRequest>& request,
-        applauncher::api::AddProcessKillTimerResponse* const response );
-    bool blockingRestoreVersion( const QnSoftwareVersion& versionToLaunch );
+        applauncher::api::AddProcessKillTimerResponse* const response);
+    bool blockingRestoreVersion(const QnSoftwareVersion& versionToLaunch);
 
-    virtual void onTimer( const quint64& timerID ) override;
+    virtual void onTimer(const quint64& timerID) override;
 
 private slots:
-    void onInstallationDone( InstallationProcess* installationProcess );
+    void onInstallationDone(InstallationProcess* installationProcess);
 };
 
 #endif  //APPLAUNCHER_PROCESS_H

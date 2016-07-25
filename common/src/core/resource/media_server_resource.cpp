@@ -216,7 +216,6 @@ QList<SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
     for (const QUrl &url : getIgnoredUrls())
         ignored.insert(toAddress(url));
 
-    const auto port = getPort();
     for (const auto& address : getNetAddrList())
     {
         if (ignored.contains(address))
@@ -352,6 +351,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_version = localOther->m_version;
         m_systemInfo = localOther->m_systemInfo;
         m_systemName = localOther->m_systemName;
+        m_authKey = localOther->m_authKey;
 
         /*
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();

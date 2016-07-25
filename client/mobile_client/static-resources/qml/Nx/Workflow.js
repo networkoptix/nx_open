@@ -142,3 +142,17 @@ function openOldClientDownloadSuggestion()
 {
     return openDialog("Dialogs/DownloadOldClientDialog.qml")
 }
+
+function startTest(test)
+{
+    testLoader.source = "Test/" + test + ".qml"
+    if (testLoader.item)
+        testLoader.item.running = true
+}
+
+function stopTest()
+{
+    if (testLoader.item)
+        testLoader.item.running = false
+    testLoader.source = ""
+}

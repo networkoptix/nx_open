@@ -1,5 +1,7 @@
 #include "sender.h"
 
+#include <nx/utils/log/log.h>
+
 namespace pcp {
 
 Sender::Sender(const HostAddress& server)
@@ -15,14 +17,22 @@ Sender::~Sender()
 
 void Sender::send(std::shared_ptr<QByteArray> request)
 {
-    m_socket->sendAsync(*request, [request](SystemError::ErrorCode result, size_t)
-    {
-        static_cast<void>(request);
-        if (result == SystemError::noError)
-            qDebug() << "Sent:" << request->toHex();
-        else
-            qDebug() << "Error:" << SystemError::toString(result);
-    });
+    auto& buffer = *request;
+    m_socket->sendAsync(
+        buffer,
+        [this, request = std::move(request)](SystemError::ErrorCode result, size_t size)
+        {
+            if (result != SystemError::noError || size != request->size())
+            {
+                NX_LOG(lm("PCP Send (size=%1) error: %2")
+                    .arg(size).arg(SystemError::toString(result)), cl_logDEBUG1);
+            }
+            else
+            {
+                NX_LOG(lm("PCP Sent (size=%1): %2")
+                    .arg(size).arg(request->toHex()), cl_logDEBUG2);
+            }
+        });
 }
 
 } // namespace pcp

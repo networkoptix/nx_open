@@ -10,9 +10,9 @@
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>axclient</artifactId>
+    <artifactId>activex_client</artifactId>
     <packaging>pom</packaging>
-    <name>NX Witness Client ActiveX Component</name>
+    <name>Nx Witness Client ActiveX Component</name>
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>

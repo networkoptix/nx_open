@@ -5,7 +5,7 @@ Item
     id: handle
 
     property string anchor: "cursorPosition"
-    property TextInput input: parent
+    property TextInput input
 
     readonly property alias pressed: mouseArea.pressed
 

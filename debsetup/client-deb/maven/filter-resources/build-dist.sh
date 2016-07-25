@@ -71,6 +71,7 @@ mv -f usr/share/applications/icon.desktop usr/share/applications/${installer.nam
 cp -r $CLIENT_BIN_PATH/desktop_client $BINSTAGE/client-bin
 cp -r $CLIENT_BIN_PATH/applauncher $BINSTAGE/applauncher-bin
 cp -r bin/client $BINSTAGE
+cp -r $CLIENT_BIN_PATH/${launcher.version.file} $BINSTAGE
 cp -r bin/applauncher $BINSTAGE
 
 # Copy icons

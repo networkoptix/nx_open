@@ -42,10 +42,12 @@ QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *pare
 QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager()
 {}
 
-Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const {
-    if(!resource) {
+Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const
+{
+    if (!resource)
+    {
         qnNullWarning(resource);
-        return Qn::ResourceIsLocal;
+        return Qn::ResourceSavingFlags();
     }
 
     QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags>::const_iterator pos = m_flagsByLayout.find(resource);
@@ -54,7 +56,7 @@ Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutRe
         if (resource->resourcePool())
         {
             /* We didn't get the notification from resource pool yet. */
-            return defaultFlags(resource);
+            return Qn::ResourceSavingFlags();
         }
         else
         {
@@ -66,15 +68,17 @@ Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutRe
     return *pos;
 }
 
-Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(QnWorkbenchLayout *layout) const {
-    if(!layout) {
+Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(QnWorkbenchLayout *layout) const
+{
+    if (!layout)
+    {
         qnNullWarning(layout);
-        return Qn::ResourceIsLocal;
+        return Qn::ResourceSavingFlags();
     }
 
     QnLayoutResourcePtr resource = layout->resource();
-    if(!resource)
-        return Qn::ResourceIsLocal;
+    if (!resource)
+        return Qn::ResourceSavingFlags();
 
     return flags(resource);
 }
@@ -85,9 +89,12 @@ void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resou
         NX_ASSERT(accessController()->hasPermissions(resource, Qn::SavePermission), Q_FUNC_INFO, "Saving unsaveable resource");
 
     QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags>::iterator pos = m_flagsByLayout.find(resource);
-    if(pos == m_flagsByLayout.end()) {
+    if (pos == m_flagsByLayout.end())
+    {
         pos = m_flagsByLayout.insert(resource, flags);
-    } else if(*pos == flags) {
+    }
+    else if (*pos == flags)
+    {
         return;
     }
 
@@ -96,9 +103,35 @@ void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resou
     emit flagsChanged(resource);
 }
 
+bool QnWorkbenchLayoutSnapshotManager::isChanged(const QnLayoutResourcePtr &layout) const
+{
+    return flags(layout).testFlag(Qn::ResourceIsChanged);
+}
+
+bool QnWorkbenchLayoutSnapshotManager::isSaveable(const QnLayoutResourcePtr &layout) const
+{
+    Qn::ResourceSavingFlags flags = this->flags(layout);
+    if (flags.testFlag(Qn::ResourceIsBeingSaved))
+        return false;
+
+    if (layout->hasFlags(Qn::local))
+        return true;
+
+    return flags.testFlag(Qn::ResourceIsChanged);
+}
+
+bool QnWorkbenchLayoutSnapshotManager::isModified(const QnLayoutResourcePtr &resource) const
+{
+    return (flags(resource) & (Qn::ResourceIsChanged | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsChanged; /* Changed and not being saved. */
+}
+
 bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, SaveLayoutResultFunction callback)
 {
     if (qnCommon->isReadOnly())
+        return false;
+
+    NX_ASSERT(!layout->isFile());
+    if (layout->isFile())
         return false;
 
     /* Submit all changes from workbench to resource. */
@@ -107,7 +140,6 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
 
     ec2::ApiLayoutData apiLayout;
     ec2::fromResourceToApi(layout, apiLayout);
-
 
     int reqID = QnAppServerConnectionFactory::getConnection2()->getLayoutManager(Qn::kDefaultUserAccess)->save(
         apiLayout, this, [this, layout, callback](int reqID, ec2::ErrorCode errorCode)
@@ -129,7 +161,16 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
     return reqID > 0;
 }
 
-void QnWorkbenchLayoutSnapshotManager::store(const QnLayoutResourcePtr &resource) {
+QnWorkbenchLayoutSnapshot QnWorkbenchLayoutSnapshotManager::snapshot(const QnLayoutResourcePtr &layout) const
+{
+    NX_ASSERT(layout);
+    if (!layout)
+        return QnWorkbenchLayoutSnapshot();
+    return m_storage->snapshot(layout);
+}
+
+void QnWorkbenchLayoutSnapshotManager::store(const QnLayoutResourcePtr &resource)
+{
     if(!resource) {
         qnNullWarning(resource);
         return;
@@ -196,38 +237,28 @@ void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr 
     disconnect(resource, NULL, this, NULL);
 }
 
-Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::defaultFlags(const QnLayoutResourcePtr &resource) const {
-    Qn::ResourceSavingFlags result;
-
-    if(resource->flags() & Qn::local)
-        result |= Qn::ResourceIsLocal;
-
-    return result;
-}
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
+void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnResourcePtr &resource)
+{
     QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-    if(!layoutResource)
+    if (!layoutResource)
         return;
 
     /* Consider it saved by default. */
     m_storage->store(layoutResource);
 
-    Qn::ResourceSavingFlags flags = defaultFlags(layoutResource);
-    setFlags(layoutResource, flags);
-
-    layoutResource->setFlags(flags & Qn::ResourceIsLocal ? layoutResource->flags() & ~Qn::remote : layoutResource->flags() | Qn::remote); // TODO: #Elric this code does not belong here.
+    setFlags(layoutResource, Qn::ResourceSavingFlags());
 
     /* Subscribe to changes to track changed status. */
     connectTo(layoutResource);
 }
 
-void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
+void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
+{
     QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-    if(!layoutResource)
+    if (!layoutResource)
         return;
 
     m_storage->remove(layoutResource);

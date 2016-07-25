@@ -101,8 +101,7 @@ private:
             return nodeType;
 
         /* We should get here only when comparing local resources node with resources when we are not logged in. */
-        bool isLocal = resource->flags().testFlag(Qn::local);
-        if (isLocal)
+        if (resource->hasFlags(Qn::local))
             return Qn::LocalSeparatorNode + 1;
 
         /* We still can get here when comparing recorders with cameras. */

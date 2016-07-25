@@ -15,7 +15,7 @@
 
 void initTranslations()
 {
-    static const QString clientName(QnAppInfo::organizationName() + lit(" ") + QnAppInfo::productName() + lit(" Client"));
+    static const QString clientName(QnTraytoolAppInfo::clientName());
 
     Q_INIT_RESOURCE(common);
     Q_INIT_RESOURCE(traytool);
@@ -41,7 +41,7 @@ void initTranslations()
         }
     }
 
-    QSettings clientSettings(QSettings::UserScope, qApp->organizationName(), clientName);
+    QSettings clientSettings(QSettings::UserScope, QnAppInfo::organizationName(), clientName);
     QString translationPath = clientSettings.value(lit("translationPath"), defaultTranslation).toString();
     QnTranslation translation = translationManager->loadTranslation(translationPath);
     QnTranslationManager::installTranslation(translation);
@@ -51,11 +51,10 @@ int main(int argc, char *argv[])
 {
     QApplication::setOrganizationName(QnAppInfo::organizationName());
     QApplication::setApplicationName(QnTraytoolAppInfo::applicationName());
-    QApplication::setApplicationDisplayName(QnTraytoolAppInfo::applicationDisplayName());
     QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
     // Each user may have it's own traytool running.
-    QtSingleApplication app(QnAppInfo::organizationName() + QnTraytoolAppInfo::applicationName(), argc, argv);
+    QtSingleApplication app(QnTraytoolAppInfo::applicationName(), argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
 
     QDir::setCurrent(QApplication::applicationDirPath());

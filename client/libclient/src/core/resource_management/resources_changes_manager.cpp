@@ -499,8 +499,13 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr &vide
 /* Layouts block                                                        */
 /************************************************************************/
 
-void QnResourcesChangesManager::saveLayout(const QnLayoutResourcePtr &layout, LayoutChangesFunction applyChanges) {
+void QnResourcesChangesManager::saveLayout(const QnLayoutResourcePtr &layout, LayoutChangesFunction applyChanges)
+{
     if (!applyChanges)
+        return;
+
+    NX_ASSERT(!layout->isFile());
+    if (layout->isFile())
         return;
 
     auto sessionGuid = qnCommon->runningInstanceGUID();

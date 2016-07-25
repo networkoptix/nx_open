@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>common</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Common Library</name>
+    <name>Nx Witness Common Library</name>
 
     <properties>
         <guid>${common.guid}</guid>
@@ -201,6 +201,7 @@
             </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
+                <ios.defines>DISABLE_FFMPEG</ios.defines>
             </properties>
         </profile>
     </profiles>

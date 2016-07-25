@@ -18,8 +18,6 @@ public:
         DBReady         = 0x0010                    // capable of DB hosting
     };
 
-    static const int chunkLen = 60;
-
     class FileInfo
     {
         typedef std::shared_ptr<QFileInfo> QFileInfoPtr;

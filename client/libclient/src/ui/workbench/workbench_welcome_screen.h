@@ -9,8 +9,7 @@
 
 class QnCloudStatusWatcher;
 
-class QnWorkbenchWelcomeScreen : public Connective<QObject>
-    , public QnWorkbenchContextAware
+class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
@@ -22,14 +21,15 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>
 
     Q_PROPERTY(QSize pageSize READ pageSize WRITE setPageSize NOTIFY pageSizeChanged);
     Q_PROPERTY(bool visibleControls READ visibleControls WRITE setVisibleControls NOTIFY visibleControlsChanged)
-    Q_PROPERTY(bool connectingNow READ connectingNow WRITE setConnectingNow NOTIFY connectingNowChanged)
+    Q_PROPERTY(QString connectingToSystem READ connectingToSystem WRITE setConnectingToSystem NOTIFY connectingToSystemChanged)
+    Q_PROPERTY(bool globalPreloaderVisible READ globalPreloaderVisible WRITE setGlobalPreloaderVisible NOTIFY globalPreloaderVisibleChanged)
 
 public:
-    QnWorkbenchWelcomeScreen(QObject *parent);
+    QnWorkbenchWelcomeScreen(QObject* parent);
 
     virtual ~QnWorkbenchWelcomeScreen();
 
-    QWidget *widget();
+    QWidget* widget();
 
 public: // Properties
     bool isVisible() const;
@@ -42,29 +42,35 @@ public: // Properties
 
     QSize pageSize() const;
 
-    void setPageSize(const QSize &size);
+    void setPageSize(const QSize& size);
 
     bool visibleControls() const;
 
     void setVisibleControls(bool visible);
 
-    bool connectingNow() const;
+    QString connectingToSystem() const;
 
-    void setConnectingNow(bool value);
+    void setConnectingToSystem(const QString& value);
+
+    bool globalPreloaderVisible() const;
+
+    void setGlobalPreloaderVisible(bool value);
 
 public slots:
     // TODO: $ynikitenkov add multiple urls one-by-one  handling
-    void connectToLocalSystem(const QString &serverUrl
-        , const QString &userName
-        , const QString &password
-        , bool storePassword
-        , bool autoLogin);
+void connectToLocalSystem(
+    const QString& systemId,
+    const QString& serverUrl,
+    const QString& userName,
+    const QString& password,
+    bool storePassword,
+    bool autoLogin);
 
-    void connectToCloudSystem(const QString &serverUrl);
+    void connectToCloudSystem(const QString& systemId, const QString& serverUrl);
 
     void connectToAnotherSystem();
 
-    void setupFactorySystem(const QString &serverUrl);
+    void setupFactorySystem(const QString& serverUrl);
 
     void logoutFromCloud();
 
@@ -74,20 +80,14 @@ public slots:
 
     void createAccount();
 
-    void tryHideScreen();
-
 public slots:
-    QColor getPaletteColor(const QString &group
-        , int index);
+    QColor getPaletteColor(const QString& group, int index);
 
-    QColor getDarkerColor(const QColor &color
-        , int offset = 1);
+    QColor getDarkerColor(const QColor& color, int offset = 1);
 
-    QColor getLighterColor(const QColor &color
-        , int offset = 1);
+    QColor getLighterColor(const QColor& color, int offset = 1);
 
-    QColor colorWithAlpha(QColor color
-        , qreal alpha);
+    QColor colorWithAlpha(QColor color, qreal alpha);
 
 signals:
     void visibleChanged();
@@ -100,9 +100,11 @@ signals:
 
     void visibleControlsChanged();
 
-    void connectingNowChanged();
+    void connectingToSystemChanged();
 
     void resetAutoLogin();
+
+    void globalPreloaderVisibleChanged();
 
 private:
     void showScreen();
@@ -110,16 +112,16 @@ private:
     void enableScreen();
 
 private: // overrides
-    bool eventFilter(QObject *obj
-        , QEvent *event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
 
 private:
     typedef QPointer<QWidget> WidgetPtr;
     typedef QPointer<QnCloudStatusWatcher> CloudStatusWatcherPtr;
 
+    bool m_receivingResources;
     bool m_visibleControls;
     bool m_visible;
-    bool m_connectingNow;
+    QString m_connectingSystemName;
     const QnGenericPalette m_palette;
     const WidgetPtr m_widget;
     QSize m_pageSize;

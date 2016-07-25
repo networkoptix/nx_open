@@ -6,7 +6,7 @@ import "."
 
 Rectangle
 {
-    id: thisComponent;
+    id: control;
 
     width: context.pageSize.width;
     height: context.pageSize.height;
@@ -18,13 +18,13 @@ Rectangle
         id: screenHolder;
 
         anchors.fill: parent;
-        visible: context.visibleControls;
+        visible: context.visibleControls && !context.globalPreloaderVisible;
 
         CloudPanel
         {
             id: cloudPanel;
 
-            y: ((grid.y - height) / 2);
+            y: ((gridHolder.y - height) / 2);
             anchors.horizontalCenter: parent.horizontalCenter;
 
             userName: context.cloudUserName;
@@ -38,66 +38,189 @@ Rectangle
             onLogout: context.logoutFromCloud();
         }
 
-        Grid
+        NxSearchEdit
         {
-            id: grid;
+            visualParent: screenHolder;
 
-            y: Math.max((thisComponent.height - height) / 2, 232);
+            anchors.bottom: gridHolder.top;
+            anchors.bottomMargin: 8;
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            readonly property int horizontalOffset: 40;
-            readonly property int tileWidth: 280;
-            property int maxColumns: ((parent.width - 2 * horizontalOffset) / tileWidth)
-            property int desiredColumns: Math.min(itemsSource.count, 4);
+            onQueryChanged: { grid.model.setFilterWildcard(query); }
+        }
 
-            property QtObject watcher: SingleActiveItemSelector
+        Item
+        {
+            id: gridHolder;
+
+            y: Math.max((control.height - height) / 2, 212);
+            height: grid.tileHeight * 2 + grid.tileSpacing;
+            width: parent.width;
+
+            GridView
             {
-                variableName: "isExpanded";
-                deactivateFunc: function(item) { item.toggle(); };
-            }
+                id: grid;
 
-            rows: (itemsSource.count > 3 ? 2 : 1);
-            columns: Math.min(desiredColumns, maxColumns);
+                keyNavigationWraps: false;
 
-            spacing: 16;
+                readonly property int horizontalOffset: 40;
+                readonly property int tileHeight: 96;
+                readonly property int tileWidth: 280;
+                readonly property int tileSpacing: 16;
 
-
-            Connections
-            {
-                target: context;
-                onIsVisibleChanged:
+                readonly property int maxColsCount:
                 {
-                    if (!context.isVisible)
-                        grid.watcher.resetCurrentItem();
+                    return Math.max(1, Math.min(Math.floor(parent.width - 2 * horizontalOffset) / cellWidth, 4));
+                }
+                readonly property int desiredColsCount:
+                {
+                    if (grid.count < 3)
+                        return Math.max(1, grid.count);
+                    else if (grid.count < 5)
+                        return 2;
+                    else if (grid.count < 7)
+                        return 3;
+                    else
+                        return 4;
+                }
+
+                readonly property int colsCount: Math.min(maxColsCount, desiredColsCount);
+                readonly property int rowsCount: (grid.count < 3 ? 1 : 2);
+                readonly property int pagesCount: Math.ceil(grid.count / (colsCount * rowsCount));
+
+                opacity: 0;
+                snapMode: GridView.SnapOneRow;
+                cacheBuffer: tileHeight * 32;   // cache of 32 rows;
+
+                SequentialAnimation
+                {
+                    id: switchPageAnimation;
+
+                    property int pageIndex: -1;
+
+                    NumberAnimation
+                    {
+                        target: grid;
+                        property: "opacity";
+                        duration: 200;
+                        easing.type: Easing.Linear;
+                        to: 0;
+                    }
+
+                    ScriptAction
+                    {
+                        script: { grid.setPositionTo(switchPageAnimation.pageIndex); }
+                    }
+
+                    NumberAnimation
+                    {
+                        target: grid;
+                        property: "opacity";
+                        duration: 200;
+                        easing.type: Easing.Linear;
+                        to: 1;
+                    }
+                }
+
+                clip: true;
+                interactive: false;
+
+                anchors.centerIn: parent;
+                width: colsCount * cellWidth;
+                height: rowsCount * cellHeight;
+
+                cellWidth: tileWidth + tileSpacing;
+                cellHeight: tileHeight + tileSpacing;
+
+                anchors.horizontalCenter: parent.horizontalCenter;
+
+                property QtObject watcher: SingleActiveItemSelector
+                {
+                    variableName: "isExpanded";
+                    deactivateFunc: function(item) { item.toggle(); };
+                }
+
+
+                Connections
+                {
+                    target: context;
+                    onIsVisibleChanged:
+                    {
+                        if (!context.isVisible)
+                            grid.watcher.resetCurrentItem();
+                    }
+                }
+
+                model: QnQmlSortFilterProxyModel
+                {
+                    model: QnSystemsModel {}
+                    filterCaseSensitivity: Qt.CaseInsensitive;
+                    filterRole: 257;    // Search text role
+                }
+
+                delegate: Item
+                {
+                    z: tile.z;
+                    width: grid.cellWidth;
+                    height: grid.cellHeight;
+
+                    SystemTile
+                    {
+                        id: tile;
+                        visualParent: screenHolder;
+                        anchors.horizontalCenter: parent.horizontalCenter;
+                        anchors.verticalCenter: parent.verticalCenter;
+
+                        systemId: model.systemId;
+                        systemName: model.systemName;
+                        ownerDescription: model.ownerDescription
+
+                        isFactoryTile: model.isFactorySystem;
+                        isCloudTile: model.isCloudSystem;
+
+                        wrongVersion: model.wrongVersion;
+                        wrongCustomization: model.wrongCustomization;
+                        compatibleVersion: model.compatibleVersion;
+
+                        Component.onCompleted: { grid.watcher.addItem(this); }
+                    }
+                }
+
+                function setPage(index, animate)
+                {
+                    switchPageAnimation.stop();
+                    if (animate || (opacity == 0)) //< Opacity is 0 on first show
+                    {
+                        switchPageAnimation.pageIndex = index;
+                        switchPageAnimation.start();
+                    }
+                    else
+                        grid.setPositionTo(index);
+                }
+
+                function setPositionTo(index)
+                {
+                    var tilesPerPage = grid.colsCount * grid.rowsCount;
+                    var firstItemIndex = index * tilesPerPage;
+                    grid.positionViewAtIndex(firstItemIndex, GridView.Beginning);
                 }
             }
 
-            Repeater
+            NxPageSwitcher
             {
-                id: itemsSource;
+                id: pageSwitcher;
 
-                model: QnSystemsModel {}
+                visible: (pagesCount > 1);
+                anchors.horizontalCenter: gridHolder.horizontalCenter;
+                anchors.top: gridHolder.bottom;
+                anchors.topMargin: 8;
 
-                delegate: SystemTile
+                pagesCount: grid.pagesCount;
+
+                onCurrentPageChanged:
                 {
-                    visualParent: screenHolder;
-
-
-                    //
-
-                    systemId: model.systemId;
-                    systemName: model.systemName;
-                    ownerDescription: model.ownerDescription
-
-                    isFactoryTile: model.isFactorySystem;
-                    isCloudTile: model.isCloudSystem;
-
-                    wrongVersion: model.wrongVersion;
-                    wrongCustomization: model.wrongCustomization;
-                    compatibleVersion: model.compatibleVersion;
-
-                    Component.onCompleted: { grid.watcher.addItem(this); }
-
+                    if ((index >= 0) && (index < pagesCount))
+                        grid.setPage(index, byClick);
                 }
             }
         }
@@ -112,16 +235,21 @@ Rectangle
 
             onClicked: context.connectToAnotherSystem();
         }
+    }
 
-        Keys.onEscapePressed: context.tryHideScreen();
+    NxCirclesPreloader
+    {
+        visible: context.globalPreloaderVisible;
+        anchors.centerIn: parent;
+    }
+
+    MouseArea
+    {
+        id: connectingStateEventOmitter;
+
+        anchors.fill: parent;
+        hoverEnabled: true;
+
+        visible: context.connectingToSystem.length;
     }
 }
-
-
-
-
-
-
-
-
-

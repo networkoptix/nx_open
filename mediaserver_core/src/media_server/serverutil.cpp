@@ -32,6 +32,8 @@
 #include "server_connector.h"
 #include <transaction/transaction_message_bus.h>
 #include "cloud/cloud_system_name_updater.h"
+#include <core/resource_management/resource_access_manager.h>
+#include <network/authutil.h>
 
 
 namespace
@@ -80,8 +82,7 @@ QString getDataDirectory()
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (PasswordData),
     (json),
-    _Fields,
-    (optional, true));
+    _Fields)
 
 PasswordData::PasswordData(const QnRequestParams &params)
 {
@@ -131,12 +132,8 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
     if (!data.password.isEmpty())
     {
         /* check old password */
-        if (!admin->checkPassword(data.oldPassword))
-        {
-            if (errString)
-                *errString = lit("Wrong current password specified");
+        if (!validateOwnerPassword(data, errString))
             return false;
-        }
 
         /* set new password */
         updatedAdmin->setPassword(data.password);
@@ -181,6 +178,32 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
 
     HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updatedAdmin);
     return true;
+}
+
+bool validateOwnerPassword(const PasswordData& passwordData, QString* errStr)
+{
+    auto users = qnResPool->getResources<QnUserResource>().filtered(
+        [] (const QnUserResourcePtr& user)
+        {
+            return user->isOwner() && user->isEnabled();
+        });
+
+    if (users.isEmpty())
+    {
+        if (errStr)
+            *errStr = lit("Temporary unavailable. Please try later.");
+        return false;
+    }
+
+    for (const auto& user : users)
+    {
+        if (qnAuthHelper->checkUserPassword(user, passwordData.oldPassword))
+            return true;
+    }
+
+    if (errStr)
+        *errStr = lit("Wrong current password specified");
+    return false;
 }
 
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
@@ -298,7 +321,7 @@ qint64 nx::ServerSetting::getSysIdTime()
 void nx::ServerSetting::setSysIdTime(qint64 value)
 {
     auto settings = MSSettings::roSettings();
-    settings->setValue(SYSTEM_IDENTITY_TIME, QString());
+    settings->setValue(SYSTEM_IDENTITY_TIME, value);
 }
 
 QByteArray nx::ServerSetting::decodeAuthKey(const QByteArray& authKey)

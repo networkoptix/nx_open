@@ -117,14 +117,11 @@ namespace Qn
      */
     enum ResourceSavingFlag
     {
-        /** Resource is local and has never been saved to Server. */
-        ResourceIsLocal = 0x1,
-
         /** Resource is currently being saved to Server. */
-        ResourceIsBeingSaved = 0x2,
+        ResourceIsBeingSaved = 0x1,
 
         /** Unsaved changes are present in the resource. */
-        ResourceIsChanged = 0x4
+        ResourceIsChanged = 0x2
     };
     Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)
@@ -278,6 +275,20 @@ namespace Qn
         Thumbnails      /**< thumbnails pane    */
     };
 
+    /**
+     * Flags for messages that should be displayed to user only once
+     * (usually with 'Do not show anymore' checkbox).
+     */
+    enum class ShowOnceMessage
+    {
+        PtzPresetInUse          = 0x001,    /**< Delete ptz preset which is used in the tour. */
+        SharedLayoutEdit        = 0x002,    /**< Edit shared layout. */
+        UserLayoutItemsRemoved  = 0x004     /**< Items are removed from user's layout, but access still persist. */
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ShowOnceMessage)
+    Q_DECLARE_FLAGS(ShowOnceMessages, ShowOnceMessage)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(ShowOnceMessages)
+
 } // namespace Qn
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
@@ -291,7 +302,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::LightModeFlags),
+    (Qn::LightModeFlags)(Qn::ShowOnceMessages),
     (metatype)(numeric)
     )
 

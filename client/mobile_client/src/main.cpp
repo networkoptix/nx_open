@@ -37,13 +37,8 @@
 #include "config.h"
 using mobile_client::conf;
 
-// TODO mike: REMOVE
-#ifdef Q_OS_WIN
-    #include <common/systemexcept_win32.h>
-#endif
-#ifdef Q_OS_LINUX
-    #include <common/systemexcept_linux.h>
-#endif
+// TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
+#include <common/systemexcept.h>
 
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -106,7 +101,7 @@ int runUi(QGuiApplication *application) {
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
     if (mainWindow)
     {
-        if (context.liteMode())
+        if (context.liteMode() && !conf.disableFullScreen)
         {
             mainWindow->showFullScreen();
         }
@@ -151,6 +146,12 @@ int runUi(QGuiApplication *application) {
 
     nx::media::DecoderRegistrar::registerDecoders(
         allocator, maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
+
+#if defined(Q_OS_ANDROID)
+    QUrl initialIntentData = getInitialIntentData();
+    if (initialIntentData.isValid())
+        QDesktopServices::openUrl(initialIntentData);
+#endif
 
     return application->exec();
 }
@@ -223,7 +224,8 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
 
     const auto urlOption = QCommandLineOption(
         lit("url"),
-        lit("URL to be used for server connection instead of asking login/password."));
+        lit("URL to be used for server connection instead of asking login/password."),
+        lit("url"));
     parser.addOption(urlOption);
 
     const auto videowallInstanceGuidOption = QCommandLineOption(
@@ -231,7 +233,14 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
         lit("GUID which is used to check Videowall Control messages."));
     parser.addOption(videowallInstanceGuidOption);
 
-    parser.process(application);
+    auto testOption = QCommandLineOption(
+        lit("test"),
+        lit("Enable test."),
+        lit("test"));
+    testOption.setHidden(true);
+    parser.addOption(testOption);
+
+    parser.parse(application.arguments());
 
     if (parser.isSet(basePathOption))
     {
@@ -243,7 +252,7 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
             qWarning() << lit("File %1 doesn't exist. Loading from qrc...").arg(path);
     }
 
-    if (parser.isSet(liteModeOption))
+    if (parser.isSet(liteModeOption) || conf.forceLiteMode)
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
 
     if (parser.isSet(urlOption))
@@ -254,15 +263,22 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
         *outVideowallInstanceGuid = QnUuid::fromStringSafe(
             parser.value(videowallInstanceGuidOption));
     }
+
+    if (parser.isSet(testOption))
+    {
+        qnSettings->setTestMode(true);
+        qnSettings->setInitialTest(parser.value(testOption));
+    }
 }
 
 int main(int argc, char *argv[])
 {
+    // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
     #if defined(Q_OS_WIN)
         AllowSetForegroundWindow(ASFW_ANY);
         win32_exception::installGlobalUnhandledExceptionHandler();
     #endif
-    #if defined(Q_OS_LINUX)
+    #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
         linux_exception::installCrashSignalHandler();
     #endif
 

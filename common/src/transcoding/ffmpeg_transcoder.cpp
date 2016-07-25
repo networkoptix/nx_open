@@ -20,7 +20,7 @@ static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
     return 0;
 }
 
-bool QnFfmpegTranscoder::isCodecSupported(CodecID id) const
+bool QnFfmpegTranscoder::isCodecSupported(AVCodecID id) const
 {
     if (!m_formatCtx || !m_formatCtx->oformat)
         return false;
@@ -171,7 +171,7 @@ void QnFfmpegTranscoder::closeFfmpegContext()
             m_formatCtx->pb = 0;
     }
 
-    if (m_formatCtx) 
+    if (m_formatCtx)
         avformat_close_input(&m_formatCtx);
 }
 
@@ -203,7 +203,7 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
 
 int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio)
 {
-    if (video && m_videoCodec != CODEC_ID_NONE)
+    if (video && m_videoCodec != AV_CODEC_ID_NONE)
     {
         AVStream* videoStream = avformat_new_stream(m_formatCtx, nullptr);
         if (videoStream == 0)
@@ -218,7 +218,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         m_videoEncoderCodecCtx = videoStream->codec;
         m_videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         m_videoEncoderCodecCtx->codec_id = m_videoCodec;
-        m_videoEncoderCodecCtx->pix_fmt = m_videoCodec == CODEC_ID_MJPEG ? PIX_FMT_YUVJ420P : PIX_FMT_YUV420P;
+        m_videoEncoderCodecCtx->pix_fmt = m_videoCodec == AV_CODEC_ID_MJPEG ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P;
 
         if (m_vTranscoder)
         {
@@ -237,7 +237,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             }
             m_videoEncoderCodecCtx->bit_rate = m_vTranscoder->getBitrate();
         }
-        else 
+        else
         {
             int videoWidth = video->width;
             int videoHeight = video->height;
@@ -279,10 +279,10 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
 
     if (audio && m_aTranscoder && !m_aTranscoder->open(audio))
     {
-        m_audioCodec = CODEC_ID_NONE; // can't open transcoder. disable audio
+        m_audioCodec = AV_CODEC_ID_NONE; // can't open transcoder. disable audio
     }
 
-    if (audio && m_audioCodec != CODEC_ID_NONE)
+    if (audio && m_audioCodec != AV_CODEC_ID_NONE)
     {
         //NX_ASSERT(false, Q_FUNC_INFO, "Not implemented! Under construction!!!");
 
@@ -316,7 +316,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             }
             m_audioEncoderCodecCtx->bit_rate = m_aTranscoder->getBitrate();
         }
-        else 
+        else
         {
             if (audio->context)
             {
@@ -335,7 +335,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
     m_formatCtx->pb = m_ioContext = createFfmpegIOContext();
 
     int rez = avformat_write_header(m_formatCtx, 0);
-    if (rez < 0) 
+    if (rez < 0)
     {
         closeFfmpegContext();
         m_lastErrMessage = tr("Video or audio codec is incompatible with container %1.").arg(m_container);
@@ -368,9 +368,9 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
     if ((quint64)m_baseTime == AV_NOPTS_VALUE)
         m_baseTime = media->timestamp - m_startTimeOffset;
 
-    if (m_audioCodec == CODEC_ID_NONE && media->dataType == QnAbstractMediaData::AUDIO)
+    if (m_audioCodec == AV_CODEC_ID_NONE && media->dataType == QnAbstractMediaData::AUDIO)
         return 0;
-    else if (m_videoCodec == CODEC_ID_NONE && media->dataType == QnAbstractMediaData::VIDEO)
+    else if (m_videoCodec == AV_CODEC_ID_NONE && media->dataType == QnAbstractMediaData::VIDEO)
         return 0;
 
     AVRational srcRate = {1, 1000000};
@@ -381,9 +381,9 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
     AVStream* stream = m_formatCtx->streams[streamIndex];
     AVPacket packet;
     av_init_packet(&packet);
-    
+
     QnAbstractMediaDataPtr transcodedData;
-    
+
     QnCodecTranscoderPtr transcoder;
     if (dynamic_cast<const QnCompressedVideoData*>(media.get()))
         transcoder = m_vTranscoder;
@@ -402,7 +402,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
             if (errCode != 0)
                 return errCode;
             if (transcodedData) {
-                packet.data = const_cast<quint8*>((const quint8*) transcodedData->data());  //const_cast is here because av_write_frame accepts 
+                packet.data = const_cast<quint8*>((const quint8*) transcodedData->data());  //const_cast is here because av_write_frame accepts
                                                                                             //non-const pointer, but does not modifiy packet buffer
                 packet.size = static_cast<int>(transcodedData->dataSize());
                 packet.pts = av_rescale_q(transcodedData->timestamp - m_baseTime, srcRate, stream->time_base);
@@ -420,7 +420,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
         }
         packet.stream_index = streamIndex;
         packet.dts = packet.pts;
-        
+
         if (packet.size > 0)
         {
             //qDebug() << "packet.pts=" << packet.pts;
@@ -471,7 +471,7 @@ int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
                 return errCode;
             if (transcodedData)
             {
-                packet.data = const_cast<quint8*>((const quint8*)transcodedData->data());  //const_cast is here because av_write_frame accepts 
+                packet.data = const_cast<quint8*>((const quint8*)transcodedData->data());  //const_cast is here because av_write_frame accepts
                                                                                             //non-const pointer, but does not modifiy packet buffer
                 packet.size = static_cast<int>(transcodedData->dataSize());
                 packet.pts = av_rescale_q(transcodedData->timestamp - m_baseTime, srcRate, stream->time_base);
@@ -496,20 +496,20 @@ int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
     return 0;
 }
 
-AVCodecContext* QnFfmpegTranscoder::getVideoCodecContext() const 
-{ 
+AVCodecContext* QnFfmpegTranscoder::getVideoCodecContext() const
+{
     /*
     QnFfmpegVideoTranscoderPtr ffmpegVideoTranscoder = m_vTranscoder.dynamicCast<QnFfmpegVideoTranscoder>();
     if (ffmpegVideoTranscoder)
         return ffmpegVideoTranscoder->getCodecContext();
     else
     */
-        return m_videoEncoderCodecCtx; 
+        return m_videoEncoderCodecCtx;
 }
 
-AVCodecContext* QnFfmpegTranscoder::getAudioCodecContext() const 
-{ 
-    return m_audioEncoderCodecCtx; 
+AVCodecContext* QnFfmpegTranscoder::getAudioCodecContext() const
+{
+    return m_audioEncoderCodecCtx;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

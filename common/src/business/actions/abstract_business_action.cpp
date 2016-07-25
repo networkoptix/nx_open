@@ -121,6 +121,7 @@ bool allowsAggregation(ActionType actionType)
         case BookmarkAction:
         case ShowTextOverlayAction:
         case CameraOutputAction:
+        case PlaySoundAction:
             return false;
         default:
             return true;
@@ -281,4 +282,5 @@ QString QnAbstractBusinessAction::getExternalUniqKey() const
     return lit("action_") + QString::number(static_cast<int>(m_actionType)) + L'_';
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBusinessActionData, (ubjson)(json)(xml)(csv_record), QnBusinessActionData_Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnBusinessActionData), (ubjson)(json)(xml)(csv_record), _Fields)

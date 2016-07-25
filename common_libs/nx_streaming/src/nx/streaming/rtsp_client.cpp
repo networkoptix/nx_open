@@ -279,6 +279,9 @@ bool QnRtspTimeHelper::isLocalTimeChanged()
 
 bool QnRtspTimeHelper::isCameraTimeChanged(const QnRtspStatistic& statistics)
 {
+    if (statistics.isEmpty())
+        return false; //< no camera time provided yet
+
     double diff = statistics.localtime - statistics.nptTime;
     if (m_rtcpReportTimeDiff == INT_MAX)
         m_rtcpReportTimeDiff = diff;
@@ -638,6 +641,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
 
     if (m_tcpSock->isClosed())
     {
+        QnMutexLocker lock(&m_socketMutex);
         m_tcpSock = SocketFactory::createStreamSocket();
         m_additionalReadBufferSize = 0;
     }
@@ -1116,7 +1120,7 @@ bool QnRtspClient::sendSetup()
                     QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
                     if (tmpParams.size() > 1) {
                         bool ok;
-                        m_sdpTracks[i]->setSSRC(tmpParams[1].toInt(&ok, 16));
+                        m_sdpTracks[i]->setSSRC((quint32)tmpParams[1].toLongLong(&ok, 16));
                     }
                 }
                 else if (tmpList[k].startsWith(QLatin1String("interleaved"))) {

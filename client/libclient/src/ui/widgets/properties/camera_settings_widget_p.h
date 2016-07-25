@@ -15,6 +15,7 @@ public:
     void setCameras(const QnVirtualCameraResourceList &cameras);
 
     void calculateMaxFps(int *maxFps, int *maxDualStreamFps, Qn::MotionType motionTypeOverride = Qn::MT_Default);
+
 private:
     QnVirtualCameraResourceList m_cameras;
 };

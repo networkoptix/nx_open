@@ -32,7 +32,7 @@ const QMap<SystemUri::Protocol, QString> protocolToString
 {
     {SystemUri::Protocol::Http, "http"},
     {SystemUri::Protocol::Https, "https"},
-    {SystemUri::Protocol::Native, AppInfo::nativeUriProtocol()} //TODO: #GDM make customizable
+    {SystemUri::Protocol::Native, AppInfo::nativeUriProtocol()}
 };
 
 const QMap<SystemUri::ClientCommand, QString> clientCommandToString
@@ -221,6 +221,24 @@ public:
         return result;
     }
 
+    QUrl connectionUrl() const
+    {
+        if (systemId.isEmpty())
+            return QUrl();
+
+        const auto hostName = parseLocalHostname(systemId);
+
+        QUrl result;
+        result.setScheme(
+            protocol == SystemUri::Protocol::Native ? lit("http") : protocolToString[protocol]);
+        result.setHost(hostName.first);
+        result.setPort(hostName.second);
+        result.setUserName(authenticator.user);
+        result.setPassword(authenticator.password);
+
+        return result;
+    }
+
     QString toString() const
     {
         return toUrl().toDisplayString();
@@ -317,7 +335,10 @@ private:
     {
         QString host, portStr;
         splitString(hostname, ':', host, portStr);
-        int port = portStr.toInt();
+        bool ok;
+        int port = portStr.toInt(&ok);
+        if (!ok)
+            port = -1;
         return LocalHostName(host, port);
     }
 
@@ -615,6 +636,12 @@ QUrl SystemUri::toUrl() const
 {
     Q_D(const SystemUri);
     return d->toUrl();
+}
+
+QUrl SystemUri::connectionUrl() const
+{
+    Q_D(const SystemUri);
+    return d->connectionUrl();
 }
 
 bool SystemUri::operator==(const SystemUri& other) const

@@ -5,8 +5,8 @@ SideNavigationItem
 {
     id: control
 
-    property string icon: undefined
-    property string text: undefined
+    property string icon: ""
+    property string text: ""
 
     contentItem: Item
     {

@@ -217,6 +217,8 @@ data::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
         const auto peerConnetion = peerPair.second.peerConnection.lock();
         if (peerConnetion)
             peerData.endpoint = peerConnetion->getSourceAddress().toString().toUtf8();
+        for (const auto& forwardedEndpoint: peerPair.second.endpoints)
+            peerData.forwardedEndpoints.push_back(forwardedEndpoint.toString());
 
         data::ListeningPeerList& peersOfASystem = result.systems[peerPair.first.systemId];
         peersOfASystem.peers.emplace_back(std::move(peerData));

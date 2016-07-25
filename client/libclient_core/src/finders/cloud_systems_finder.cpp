@@ -12,13 +12,13 @@
 
 namespace
 {
-    enum 
+    enum
     {
         kCloudSystemsRefreshPeriodMs = 7 * 1000         // 7 seconds
         , kCloudServerOutdateTimeoutMs = 10 * 1000      // 10 seconds
     };
 
-    constexpr static const std::chrono::seconds kSystemConnectTimeout = 
+    constexpr static const std::chrono::seconds kSystemConnectTimeout =
         std::chrono::seconds(15);
 }
 
@@ -27,6 +27,7 @@ QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
     , m_updateSystemsTimer(new QTimer(this))
     , m_mutex(QnMutex::Recursive)
     , m_systems()
+    , m_factorySystems()
     , m_requestToSystem()
 {
     NX_ASSERT(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher is not ready");
@@ -52,7 +53,7 @@ QnAbstractSystemsFinder::SystemDescriptionList QnCloudSystemsFinder::systems() c
     SystemDescriptionList result;
 
     const QnMutexLocker lock(&m_mutex);
-    for (const auto& system : m_systems)
+    for (const auto& system : SystemsHash(m_systems).unite(m_factorySystems))
         result.append(system.dynamicCast<QnBaseSystemDescription>());
 
     return result;
@@ -135,7 +136,7 @@ void QnCloudSystemsFinder::onCloudError(QnCloudStatusWatcher::ErrorCode error)
 }
 
 void QnCloudSystemsFinder::updateSystemInternal(
-    const QnSystemDescription::PointerType &system)
+    const QnSystemDescription::PointerType& system)
 {
     using namespace nx::network;
     typedef std::vector<cloud::TypedAddress> AddressVector;
@@ -174,11 +175,32 @@ void QnCloudSystemsFinder::tryRemoveAlienServer(const QnModuleInformation &serve
     const auto serverId = serverInfo.id;
     for (const auto system : m_systems)
     {
-        if ((system->id() != serverInfo.cloudSystemId)
-            && system->containsServer(serverId))
-        {
+        const bool remove = ((system->id() != serverInfo.cloudSystemId)
+            || serverInfo.serverFlags.testFlag(Qn::SF_NewSystem));
+
+        if (remove && system->containsServer(serverId))
             system->removeServer(serverId);
-        }
+    }
+}
+
+void QnCloudSystemsFinder::processFactoryServer(const QnModuleInformation& serverInfo)
+{
+    const auto cloudFactorySystemId = serverInfo.id.toString();
+    const auto it = m_factorySystems.find(cloudFactorySystemId);
+    if (it == m_factorySystems.end())
+    {
+        // Add new cloud-factory system tile
+        const auto system = QnSystemDescription::createCloudSystem(cloudFactorySystemId,
+            cloudFactorySystemId, QString(), QString());
+
+        m_factorySystems.insert(cloudFactorySystemId, system);
+        emit systemDiscovered(system);
+        system->addServer(serverInfo, 0);
+    }
+    else
+    {
+        const auto systemInfo = it.value();
+        systemInfo->updateServer(serverInfo);
     }
 }
 
@@ -216,6 +238,12 @@ void QnCloudSystemsFinder::pingServerInternal(const QString &host
         // To prevent hanging on of fake online cloud servers
         // It is almost not hack.
         tryRemoveAlienServer(moduleInformation, systemId);
+        if (moduleInformation.serverFlags.testFlag(Qn::SF_NewSystem))
+        {
+            processFactoryServer(moduleInformation);
+            return;
+        }
+
         if (systemId != moduleInformation.cloudSystemId)
             return;
 
@@ -251,13 +279,21 @@ void QnCloudSystemsFinder::checkOutdatedServersInternal(
         const auto serverId = serverInfo.id;
         const auto elapsed = system->getServerLastUpdatedMs(serverId);
         if (elapsed > kCloudServerOutdateTimeoutMs)
+        {
             system->removeServer(serverId);
+
+            // Removes factory systems
+            if (system->servers().isEmpty() && m_factorySystems.remove(system->id()))
+                emit systemLost(system->id());
+        }
     }
+
 }
 
 void QnCloudSystemsFinder::updateSystems()
 {
     const QnMutexLocker lock(&m_mutex);
-    for (const auto system : m_systems.values())
+    const auto targetSystems = SystemsHash(m_systems).unite(m_factorySystems);
+    for (const auto system : targetSystems)
         updateSystemInternal(system);
 }

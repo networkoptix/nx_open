@@ -26,7 +26,7 @@ namespace {
 
 }
 
-QnSystemDescriptionAggregator::QnSystemDescriptionAggregator(const QnSystemDescriptionPtr &systemDescription)
+QnSystemDescriptionAggregator::QnSystemDescriptionAggregator(const QnSystemDescriptionPtr& systemDescription)
     : m_cloudSystem(systemDescription && systemDescription->isCloudSystem() ? 
         systemDescription : QnSystemDescriptionPtr())
     , m_localSystem(systemDescription && !systemDescription->isCloudSystem() ?
@@ -82,8 +82,7 @@ void QnSystemDescriptionAggregator::mergeSystem(const QnSystemDescriptionPtr& sy
     emitChangesSignals(wasCloudSystem, oldServers);
 }
 
-void QnSystemDescriptionAggregator::emitChangesSignals(bool wasCloudSystem
-                                                       , const ServersList& oldServers)
+void QnSystemDescriptionAggregator::emitChangesSignals(bool wasCloudSystem, const ServersList& oldServers)
 {
     if (wasCloudSystem != isCloudSystem())
     {
@@ -166,13 +165,13 @@ QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::servers() co
     return result;
 }
 
-bool QnSystemDescriptionAggregator::containsServer(const QnUuid &serverId) const
+bool QnSystemDescriptionAggregator::containsServer(const QnUuid& serverId) const
 {
     return ((m_cloudSystem && m_cloudSystem->containsServer(serverId)) || 
         (m_localSystem && m_localSystem->containsServer(serverId)));
 }
 
-QnModuleInformation QnSystemDescriptionAggregator::getServer(const QnUuid &serverId) const
+QnModuleInformation QnSystemDescriptionAggregator::getServer(const QnUuid& serverId) const
 {
     if (m_cloudSystem && m_cloudSystem->containsServer(serverId))
         return m_cloudSystem->getServer(serverId);
@@ -184,7 +183,7 @@ QnModuleInformation QnSystemDescriptionAggregator::getServer(const QnUuid &serve
     return m_localSystem->getServer(serverId);
 }
 
-QString QnSystemDescriptionAggregator::getServerHost(const QnUuid &serverId) const
+QString QnSystemDescriptionAggregator::getServerHost(const QnUuid& serverId) const
 {
     if (m_cloudSystem && m_cloudSystem->containsServer(serverId))
         return m_cloudSystem->getServerHost(serverId);
@@ -196,7 +195,7 @@ QString QnSystemDescriptionAggregator::getServerHost(const QnUuid &serverId) con
     return m_localSystem->getServerHost(serverId);
 }
 
-qint64 QnSystemDescriptionAggregator::getServerLastUpdatedMs(const QnUuid &serverId) const
+qint64 QnSystemDescriptionAggregator::getServerLastUpdatedMs(const QnUuid& serverId) const
 {
     const qint64 localMs = (m_localSystem ? m_localSystem->getServerLastUpdatedMs(serverId) : 0);
     const qint64 cloudMs = (m_cloudSystem ? m_cloudSystem->getServerLastUpdatedMs(serverId) : 0);

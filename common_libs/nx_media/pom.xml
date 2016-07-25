@@ -17,7 +17,7 @@
         <guid>${nx_media.guid}</guid>
         <product.title>${company.name} nx_media</product.title>
 
-        <qt.libs>core gui multimedia opengl multimedia-private</qt.libs>
+        <qt.libs>core gui multimedia multimedia-private</qt.libs>
         <global.libs>-lcommon</global.libs>
 
         <rdep.packages>ffmpeg</rdep.packages>
@@ -25,6 +25,17 @@
         <rdep.ios.packages>libjpeg-turbo</rdep.ios.packages>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>    
+    </dependencies>      
+    
     <profiles>
         <profile>
             <id>windows</id>
@@ -74,7 +85,7 @@
                 </property>
             </activation>
             <properties>
-                <ios.defines>DISABLE_FFMPEG</ios.defines>
+                <!-- <ios.defines>DISABLE_FFMPEG</ios.defines> -->
             </properties>
         </profile>
         <profile>

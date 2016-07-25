@@ -471,6 +471,7 @@ void QnRecordingManager::onTimer()
     for (QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.constBegin(); itrRec != m_recordMap.constEnd(); ++itrRec)
     {
         auto camera = qnCameraPool->getVideoCamera(itrRec.key());
+        NX_ASSERT((bool)qnResPool->getResourceById(itrRec.key()->getId()));
         const Recorders& recorders = itrRec.value();
 
         //if (!recorders.recorderHiRes && !recorders.recorderLowRes)
@@ -660,4 +661,39 @@ QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInt
 QnServerDataProviderFactory* QnServerDataProviderFactory::instance()
 {
     return qn_serverDataProviderFactory_instance();
+}
+
+int WriteBufferMultiplierManager::getSizeForCam(
+    QnServer::ChunksCatalog catalog, 
+    const QnUuid& resourceId)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_recToMult.find(Key(catalog, resourceId));
+    if (it == m_recToMult.cend())
+        return 0;
+    else
+        return it->second;
+}
+
+void WriteBufferMultiplierManager::setFilePtr(
+    uintptr_t filePtr,
+    QnServer::ChunksCatalog catalog,
+    const QnUuid& resourceId)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_fileToRec[filePtr] = Key(catalog, resourceId);
+}
+
+void WriteBufferMultiplierManager::at_seekDetected(uintptr_t filePtr, int size)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto recIt = m_fileToRec.find(filePtr);
+    if (recIt != m_fileToRec.cend())
+        m_recToMult[recIt->second] = size;
+}
+
+void WriteBufferMultiplierManager::at_fileClosed(uintptr_t filePtr)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_fileToRec.erase(filePtr);
 }

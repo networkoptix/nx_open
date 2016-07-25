@@ -1,5 +1,6 @@
 #include "checked_button.h"
 
+#include <array>
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
 
@@ -19,22 +20,26 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
     QPainter painter(&result);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    if (checked || hovered) {
-        QColor penColor = palette().color(isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::Highlight);
+    if (checked || hovered)
+    {
+        QColor penColor = palette().color(isEnabled() ? QPalette::Active : QPalette::Inactive, QPalette::Highlight);
         painter.setPen(QPen(penColor, lineWidth, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
         painter.drawRect(QnGeometry::eroded(QRectF(result.rect()), lineWidth / 2.0));
     }
-    
+
     QColor brushColor(color);
     if (!enabled)
         brushColor = toGrayscale(linearCombine(0.5, brushColor, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
 
-    painter.fillRect(QnGeometry::eroded(result.rect(), lineWidth * 3 / 2), brushColor);
+    QRect rect = QnGeometry::eroded(result.rect(), lineWidth * 3 / 2);
+    painter.fillRect(rect, brushColor);
 
-    if (insideColor.toRgb() != color.toRgb())  {
+    if (insideColor.toRgb() != color.toRgb())
+    {
         brushColor = insideColor;
         if (!enabled)
             brushColor = toGrayscale(linearCombine(0.5, brushColor, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
+
         painter.setBrush(brushColor);
         painter.setPen(QPen(Qt::black, 1));
 
@@ -42,15 +47,16 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
         qreal trOffset = cellSize / 6.4 + 0.5;
         qreal trSize = cellSize / 64.0 * 6.0 - 0.5;
 
-        QPointF points[6];
-        points[0] = QPointF(cellSize - trOffset - trSize, trOffset);
-        points[1] = QPointF(cellSize - trOffset, trOffset);
-        points[2] = QPointF(cellSize - trOffset, trOffset + trSize);
-        points[3] = QPointF(trOffset + trSize, cellSize - trOffset);
-        points[4] = QPointF(trOffset, cellSize - trOffset);
-        points[5] = QPointF(trOffset, cellSize - trSize - trOffset);
+        //TODO: #vkutin #common Code duplication with QnScheduleGridWidget
+        std::array<QPointF, 4> points({
+            QPointF(cellSize - trOffset - trSize, trOffset),
+            QPointF(cellSize - trOffset, trOffset + trSize),
+            QPointF(trOffset + trSize, cellSize - trOffset),
+            QPointF(trOffset, cellSize - trSize - trOffset) });
 
-        painter.drawPolygon(points, 6);
+        rect.adjust(0, 0, 1, 1);
+        painter.drawLine(rect.bottomLeft(), rect.topRight());
+        painter.drawPolygon(points.data(), static_cast<int>(points.size()));
     }
 
     painter.end();
@@ -58,7 +64,7 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
     return result;
 }
 
-QnCheckedButton::QnCheckedButton(QWidget* parent): 
+QnCheckedButton::QnCheckedButton(QWidget* parent):
     QToolButton(parent)
 {
     updateIcon();

@@ -42,5 +42,5 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
 
 private:
-    Q_DECLARE_PRIVATE(QnQuickTextInput);
+    Q_DECLARE_PRIVATE(QnQuickTextInput)
 };

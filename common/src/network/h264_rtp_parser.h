@@ -42,19 +42,29 @@ private:
 
     //QnByteArray m_videoBuffer;
     int m_videoFrameSize;
-
+    bool m_previousPacketHasMarkerBit;
+    std::vector<quint8> m_nextFrameChunksBuffer;
+    quint32 m_lastRtpTime;
 private:
     void serializeSpsPps(QnByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);
+    bool isSliceNal(quint8 nalUnitType) const;
+    bool isFirstSliceNal(const quint8 nalType, const quint8* data, int dataLen) const;
+    bool isPacketStartsNewFrame(
+        const quint8* curPtr,
+        const quint8* bufferEnd) const;
+    void backupCurrentData(quint8* rtpBufferBase);
+    bool isIFrame(const quint8* data, int dataLen) const;
 
     QnCompressedVideoDataPtr createVideoData(
         const quint8            *rtpBuffer,
         quint32                 rtpTime,
         const QnRtspStatistic     &statistics
-    );
+        );
+    bool isBufferOverflow() const;
 
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine
-    void updateNalFlags(int nalUnitType, const quint8* data, int dataLen);
+    void updateNalFlags(const quint8* data, int dataLen);
     int getSpsPpsSize() const;
 };
 

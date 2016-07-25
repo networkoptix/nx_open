@@ -1,10 +1,31 @@
 #include "intent_listener_android.h"
 
-#ifdef Q_OS_ANDROID
+#if defined(Q_OS_ANDROID)
 
 #include <QtGui/QDesktopServices>
-#include <QtAndroidExtras/QAndroidJniObject>
+#include <QtAndroidExtras/QtAndroid>
 #include <private/qjnihelpers_p.h>
+
+namespace {
+
+QUrl getUrlFromIntent(QAndroidJniObject intent)
+{
+    QAndroidJniObject uri = intent.callObjectMethod("getData", "()Landroid/net/Uri;");
+    if (!uri.isValid())
+        return QUrl();
+
+    QString uriString = uri.toString();
+    if (uriString.isEmpty())
+        return QUrl();
+
+    QUrl url(uriString);
+    if (!url.isValid())
+        return QUrl();
+
+    return url;
+}
+
+} // namespace
 
 class QnIntentListener : public QtAndroidPrivate::NewIntentListener
 {
@@ -12,25 +33,13 @@ class QnIntentListener : public QtAndroidPrivate::NewIntentListener
     {
         Q_UNUSED(env);
 
-        QAndroidJniObject intent(intentObject);
-
-        QAndroidJniObject uri = intent.callObjectMethod("getData", "()Landroid/net/Uri;");
-        if (!uri.isValid())
-            return false;
-
-        QString uriString = uri.toString();
-        if (uriString.isEmpty())
-            return false;
-
-        QUrl url(uriString);
+        QUrl url = getUrlFromIntent(intentObject);
         if (!url.isValid())
             return false;
 
-        qDebug() << "Opening URI" << uriString;
+        qDebug() << "Opening URI" << url;
 
-        //TODO: #dklychkov Uncomment when filter is implemented.
-        //return QDesktopServices::openUrl(url);
-        return true;
+        return QDesktopServices::openUrl(url);
     }
 };
 
@@ -39,4 +48,15 @@ void registerIntentListener()
     QtAndroidPrivate::registerNewIntentListener(new QnIntentListener());
 }
 
-#endif
+QUrl getInitialIntentData()
+{
+    QAndroidJniObject intent = QtAndroid::androidActivity().callObjectMethod(
+        "getIntent", "()Landroid/content/Intent;");
+
+    if (!intent.isValid())
+        return QUrl();
+
+    return getUrlFromIntent(intent);
+}
+
+#endif // defined(Q_OS_ANDROID)

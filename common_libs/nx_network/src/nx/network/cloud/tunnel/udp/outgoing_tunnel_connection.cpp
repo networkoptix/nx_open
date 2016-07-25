@@ -32,15 +32,12 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     m_pleaseStopCompleted(false)
 {
     m_controlConnection->bindToAioThread(getAioThread());
+    std::chrono::milliseconds timeout = m_timeouts.maxConnectionInactivityPeriod();
+    m_controlConnection->socket()->setRecvTimeout(timeout.count());
     m_controlConnection->setMessageHandler(
         std::bind(&OutgoingTunnelConnection::onStunMessageReceived,
             this, std::placeholders::_1));
     m_controlConnection->startReadingConnection();
-
-    //TODO #ak keep-alive timer
-    //m_controlConnection->socket()->registerTimer(
-    //    m_timeouts.maxConnectionInactivityPeriod(),
-    //    std::bind(&OutgoingTunnelConnection::onKeepAliveTimeout, this));
 
     hpm::api::UdpHolePunchingSynRequest syn;
     stun::Message message;
@@ -289,11 +286,6 @@ void OutgoingTunnelConnection::onStunMessageReceived(
 
     NX_LOGX(lm("cross-nat %1. Control connection has been verified")
         .arg(m_connectionId), cl_logDEBUG2);
-}
-
-void OutgoingTunnelConnection::onKeepAliveTimeout()
-{
-    closeConnection(SystemError::notConnected, m_controlConnection.get());
 }
 
 } // namespace udp

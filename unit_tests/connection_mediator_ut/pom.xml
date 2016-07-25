@@ -14,7 +14,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>connection_mediator_ut</artifactId>
     <packaging>pom</packaging>
-    <name>NX Cloud Connection Mediator Unit Tests</name>
+    <name>Nx Cloud Connection Mediator Unit Tests</name>
 
     <properties>
         <guid>${connection_mediator_ut.guid}</guid>

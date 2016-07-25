@@ -88,6 +88,10 @@ hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DM
 
 [ "$1" == "rwonly" ] && exit 0
 
+cd dmg-folder
+zip -y -r ../client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ./*.app
+cd ..
+
 rm -rf $TMP
 mkdir -p $TMP
 

@@ -82,52 +82,6 @@ public:
      */
     QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr& resource) const;
 
-    /**
-    * \param user                      User resource to get role name for.
-    * \returns                         Name of user's role.
-    */
-    QString userRoleName(const QnUserResourcePtr& user) const;
-
-    /**
-    * \param user                      User resource to get role description for.
-    * \returns                         Description of user's role.
-    */
-    QString userRoleDescription(const QnUserResourcePtr& user) const;
-
-    /**
-    * \param permissions               Permissions to get role description for.
-    * \param groupId                   An uuid of custom user role, if applicable.
-    * \returns                         Description of user's role.
-    */
-    QString userRoleDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId = QnUuid()) const;
-
-    /**
-    * \returns                         A set of permissions for standard (built-in) roles.
-    */
-    static const QList<Qn::GlobalPermissions>& standardRoles();
-
-    /**
-    * \param permissions               Peermission set to get role name for.
-    * \returns                         Name of role.
-    */
-    static QString standardRoleName(Qn::GlobalPermissions permissions);
-
-    /**
-    * \param permissions               Peermission set to get role description for.
-    * \returns                         Description of role.
-    */
-    static QString standardRoleDescription(Qn::GlobalPermissions permissions);
-
-    /**
-    * \returns                         Description of custom role.
-    */
-    static QString customRoleDescription();
-
-    /**
-    * \returns                         Description of custom permissions.
-    */
-    static QString customPermissionsDescription();
-
     bool canCreateStorage(const QnUuid& serverId) const;
     bool canCreateLayout(const QnUuid& layoutParentId) const;
     bool canCreateUser(Qn::GlobalPermissions targetPermissions, bool isOwner) const;
@@ -141,13 +95,14 @@ signals:
      */
     void permissionsChanged(const QnResourcePtr& resource);
 
+    /** Notify that current user's global permissions were changed. */
+    void globalPermissionsChanged();
+
 protected slots:
     void updatePermissions(const QnResourcePtr& resource);
 
     void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
-
-    void at_accessibleResourcesChanged(const QnUuid& userId);
 
 private:
     void recalculateAllPermissions();

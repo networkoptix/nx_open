@@ -34,7 +34,9 @@ QnDesktopStreamreader::QnDesktopStreamreader(const QnResourcePtr &dev):
     m_videoBuf(0),
     m_videoBufSize(0),
     m_videoCodecCtx(0),
-    m_initialized(false)
+    m_initialized(false),
+    m_frame(nullptr),
+    m_outPacket(av_packet_alloc())
 {
     QString num= dev->getUniqueId();
     int idx = num.length()-1;
@@ -49,6 +51,7 @@ QnDesktopStreamreader::QnDesktopStreamreader(const QnResourcePtr &dev):
 QnDesktopStreamreader::~QnDesktopStreamreader()
 {
     closeStream();
+	av_packet_free(&m_outPacket);
 }
 
 bool QnDesktopStreamreader::init()
@@ -56,10 +59,10 @@ bool QnDesktopStreamreader::init()
     av_log_set_callback(FffmpegLog::av_log_default_callback_impl);
 
 
-    m_videoBufSize = avpicture_get_size((PixelFormat) m_grabber->format(), m_grabber->width(), m_grabber->height());
+    m_videoBufSize = avpicture_get_size((AVPixelFormat) m_grabber->format(), m_grabber->width(), m_grabber->height());
     m_videoBuf = (quint8*) av_malloc(m_videoBufSize);
 
-    m_frame = avcodec_alloc_frame();
+    m_frame = av_frame_alloc();
     avpicture_alloc((AVPicture*) m_frame, m_grabber->format(), m_grabber->width(), m_grabber->height() );
 
     AVCodec* codec = avcodec_find_encoder_by_name(m_encoderCodecName);
@@ -69,7 +72,7 @@ bool QnDesktopStreamreader::init()
         return false;
     }
 
-    m_videoCodecCtx = avcodec_alloc_context();
+    m_videoCodecCtx = avcodec_alloc_context3(codec);
 
     m_videoCodecCtx->time_base = m_grabber->getFrameRate();
     m_videoCodecCtx->pix_fmt = m_grabber->format();
@@ -86,7 +89,7 @@ bool QnDesktopStreamreader::init()
     m_videoCodecCtx->mb_lmax = m_videoCodecCtx->lmax = m_videoCodecCtx->qmax * FF_QP2LAMBDA;
     m_videoCodecCtx->flags |= CODEC_FLAG_QSCALE;
 
-    if (avcodec_open(m_videoCodecCtx, codec) < 0)
+    if (avcodec_open2(m_videoCodecCtx, codec, nullptr) < 0)
     {
         cl_log.log(QLatin1String("Can't initialize encoder"), cl_logWARNING);
         return false;
@@ -107,21 +110,28 @@ QnAbstractMediaDataPtr QnDesktopStreamreader::getNextData()
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);
 
-        int out_size = avcodec_encode_video(m_videoCodecCtx, m_videoBuf, m_videoBufSize, m_frame);
-        if (out_size < 1)
+        m_outPacket->data = m_videoBuf;
+        m_outPacket->size = m_videoBufSize;
+        int got_packet = 0;
+        int encodeResult = avcodec_encode_video2(m_videoCodecCtx, m_outPacket, m_frame, &got_packet);
+
+        if (encodeResult < 0)
             continue;
 
-        QnWritableCompressedVideoData* videoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, out_size);
-        videoData->m_data.write((const char*) m_videoBuf, out_size);
+        if (got_packet)
+        {
+            QnWritableCompressedVideoData* videoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_outPacket->size);
+            videoData->m_data.write((const char*)m_videoBuf, m_outPacket->size);
 
-        videoData->width = m_grabber->width();
-        videoData->height = m_grabber->height();
-        videoData->channelNumber = 0;
-        if (m_videoCodecCtx->coded_frame->key_frame)
-            videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
-        videoData->compressionType = m_videoCodecCtx->codec_id;
-        videoData->timestamp = m_frame->pts * 1000;
-        return QnAbstractMediaDataPtr(videoData);
+            videoData->width = m_grabber->width();
+            videoData->height = m_grabber->height();
+            videoData->channelNumber = 0;
+            if (m_videoCodecCtx->coded_frame->key_frame)
+                videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
+            videoData->compressionType = m_videoCodecCtx->codec_id;
+            videoData->timestamp = m_frame->pts * 1000;
+            return QnAbstractMediaDataPtr(videoData);
+        }
     }
     return QnAbstractMediaDataPtr();
 }

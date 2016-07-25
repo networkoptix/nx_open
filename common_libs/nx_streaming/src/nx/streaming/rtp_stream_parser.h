@@ -85,9 +85,14 @@ protected:
 protected:
     struct Chunk
     {
-        Chunk(): bufferOffset(0), len(0), nalStart(false) {}
-        Chunk(int _bufferOffset, quint16 _len, quint8 _nalStart = false): bufferOffset(_bufferOffset), len(_len), nalStart(_nalStart) {}
+        Chunk(): bufferStart(nullptr), bufferOffset(0), len(0), nalStart(false) {}
+        Chunk(int _bufferOffset, quint16 _len, quint8 _nalStart = false): 
+            bufferStart(nullptr),
+            bufferOffset(_bufferOffset), 
+            len(_len), 
+            nalStart(_nalStart) {}
 
+        quint8* bufferStart;
         int bufferOffset;
         quint16 len;
         bool nalStart;

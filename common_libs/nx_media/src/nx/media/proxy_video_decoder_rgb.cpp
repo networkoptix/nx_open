@@ -31,7 +31,7 @@ int Impl::decode(
 
     const int alignedWidth = qPower2Ceil(
         (unsigned int) frameSize().width(), (unsigned int) kMediaAlignment);
-    const int numBytes = avpicture_get_size(PIX_FMT_BGRA, alignedWidth, frameSize().height());
+    const int numBytes = avpicture_get_size(AV_PIX_FMT_BGRA, alignedWidth, frameSize().height());
     const int argbLineSize = alignedWidth * 4;
 
     auto videoBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, argbLineSize);

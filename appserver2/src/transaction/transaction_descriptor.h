@@ -53,14 +53,12 @@
 #include "managers/misc_manager.h"
 #include "managers/resource_manager.h"
 #include "managers/stored_file_manager.h"
-#include "managers/time_manager.h"
 #include "managers/updates_manager.h"
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
 #include "managers/webpage_manager.h"
 
 #include "nx/utils/type_utils.h"
-#include "transaction/transaction_permissions.h"
 
 namespace ec2
 {
@@ -81,9 +79,31 @@ class QnUpdatesNotificationManager;
 class QnMiscNotificationManager;
 class QnDiscoveryNotificationManager;
 
+enum class RemotePeerAccess
+{
+    Allowed,
+    Forbidden,
+    Partial
+};
+
 namespace detail
 {
 struct NoneType {};
+
+template<typename ParamType>
+using CheckSavePermissionFuncType = std::function<bool(const QnUuid& userId, const ParamType&)>;
+
+template<typename ParamType>
+using CheckReadPermissionFuncType = std::function<bool(const QnUuid& userId, const ParamType&)>;
+
+template<typename ParamType>
+using FilterByReadPermissionFuncType = std::function<void(const QnUuid& userId, ParamType&)>;
+
+template<typename ParamType>
+using FilterBySavePermissionFuncType = std::function<void(const QnUuid& userId, ParamType&)>;
+
+template<typename ParamType>
+using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(const QnUuid&, const ParamType&)>;
 
 template<typename ParamType>
 using GetHashFuncType = std::function<QnUuid(ParamType const &)>;
@@ -148,6 +168,11 @@ struct TransactionDescriptor : TransactionDescriptorBase
     SaveSerializedTranFuncType<ParamType> saveSerializedFunc;
     CreateTransactionFromAbstractTransactionFuncType<ParamType> createTransactionFromAbstractTransactionFunc;
     TriggerNotificationFuncType<ParamType> triggerNotificationFunc;
+    CheckSavePermissionFuncType<ParamType> checkSavePermissionFunc;
+    CheckReadPermissionFuncType<ParamType> checkReadPermissionFunc;
+    FilterBySavePermissionFuncType<ParamType> filterBySavePermissionFunc;
+    FilterByReadPermissionFuncType<ParamType> filterByReadPermissionFunc;
+    CheckRemotePeerAccessFuncType<ParamType> checkRemotePeerAccessFunc;
 
     template<
         typename GetHashF,
@@ -158,14 +183,24 @@ struct TransactionDescriptor : TransactionDescriptorBase
     >
     TransactionDescriptor(ApiCommand::Value value, bool isPersistent, bool isSystem, const char *name,
                           GetHashF &&getHashFunc, SaveF &&saveFunc, SaveSerializedF &&saveSerializedFunc,
-                          CreateTranF &&createTransactionFromAbstractTransactionFunc, TriggerNotificationF &&triggerNotificationFunc)
+                          CreateTranF &&createTransactionFromAbstractTransactionFunc, TriggerNotificationF &&triggerNotificationFunc,
+                          const CheckSavePermissionFuncType<ParamType>& checkSavePermissionFunc,
+                          const CheckReadPermissionFuncType<ParamType>& checkReadPermissionFunc,
+                          const FilterBySavePermissionFuncType<ParamType>& filterBySavePermissionFunc,
+                          const FilterByReadPermissionFuncType<ParamType>& filterByReadPermissionFunc,
+                          const CheckRemotePeerAccessFuncType<ParamType>& checkRemotePeerAccessFunc)
         :
           TransactionDescriptorBase(value, isPersistent, isSystem, name),
           getHashFunc(std::forward<GetHashF>(getHashFunc)),
           saveFunc(std::forward<SaveF>(saveFunc)),
           saveSerializedFunc(std::forward<SaveSerializedF>(saveSerializedFunc)),
           createTransactionFromAbstractTransactionFunc(std::forward<CreateTranF>(createTransactionFromAbstractTransactionFunc)),
-          triggerNotificationFunc(std::forward<TriggerNotificationF>(triggerNotificationFunc))
+          triggerNotificationFunc(std::forward<TriggerNotificationF>(triggerNotificationFunc)),
+          checkSavePermissionFunc(checkSavePermissionFunc),
+          checkReadPermissionFunc(checkReadPermissionFunc),
+          filterBySavePermissionFunc(filterBySavePermissionFunc),
+          filterByReadPermissionFunc(filterByReadPermissionFunc),
+          checkRemotePeerAccessFunc(checkRemotePeerAccessFunc)
     {}
 };
 
@@ -196,6 +231,30 @@ extern DescriptorBaseContainer transactionDescriptors;
 
 detail::TransactionDescriptorBase *getTransactionDescriptorByValue(ApiCommand::Value v);
 detail::TransactionDescriptorBase *getTransactionDescriptorByName(const QString &s);
+
+template<typename Param>
+detail::TransactionDescriptor<Param>* getTransactionDescriptorByTransaction(const QnTransaction<Param>& tran)
+{
+    auto tdBase = ec2::getTransactionDescriptorByValue(tran.command);
+    NX_ASSERT(tdBase);
+    auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
+    NX_ASSERT(td);
+    return td;
+}
+
+template<typename Param>
+detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
+{
+    for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
+    {
+        auto tdBase = (*it).get();
+        auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
+        if (td)
+            return td;
+    }
+    NX_ASSERT(0, "Transaciton descriptor for the given param not found");
+    return nullptr;
+}
 
 } //namespace ec2
 

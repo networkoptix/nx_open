@@ -25,7 +25,7 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     m_model(new QnUserGroupSettingsModel(this)),
     m_settingsPage(new QnUserGroupSettingsWidget(m_model, this)),
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
-    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::CamerasFilter, this)),
+    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::MediaFilter, this)),
     m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this))
 {
     ui->setupUi(this);
@@ -190,13 +190,12 @@ void QnUserGroupsDialog::applyChanges()
             continue;
 
         auto replacement = m_model->replacement(group.id);
-        for (auto user : m_model->users(group.id))
+        for (auto user : m_model->users(group.id, false))
         {
             qnResourcesChangesManager->saveUser(user, [replacement](const QnUserResourcePtr &user)
             {
                 user->setUserGroup(replacement.group);
-                if (replacement.group.isNull())
-                    user->setRawPermissions(replacement.permissions);
+                user->setRawPermissions(replacement.permissions);
             });
         }
 

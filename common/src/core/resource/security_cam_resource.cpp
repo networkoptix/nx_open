@@ -115,6 +115,35 @@ void QnSecurityCamResource::resetCameraInfoSavedToDisk(const QString &storageUrl
     SAFE(m_cameraInfoSavedToDisk[storageUrl] = false);
 }
 
+void QnSecurityCamResource::resetAllCameraInfoSavedToDisk()
+{
+	SAFE(m_cameraInfoSavedToDisk.clear());
+}
+
+bool QnSecurityCamResource::setProperty(
+	const QString &key,
+	const QString &value,
+	PropertyOptions options)
+{
+	resetAllCameraInfoSavedToDisk();
+	return QnResource::setProperty(key, value, options);
+}
+
+bool QnSecurityCamResource::setProperty(
+	const QString &key,
+	const QVariant& value,
+	PropertyOptions options)
+{
+	resetAllCameraInfoSavedToDisk();
+	return QnResource::setProperty(key, value, options);
+}
+
+bool QnSecurityCamResource::removeProperty(const QString& key)
+{
+	resetAllCameraInfoSavedToDisk();
+	return QnResource::removeProperty(key);
+}
+
 bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(lit("groupplay"));
 }
@@ -175,28 +204,42 @@ int QnSecurityCamResource::reservedSecondStreamFps() const {
 }
 
 #ifdef ENABLE_DATA_PROVIDERS
-QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(Qn::ConnectionRole role) {
-    if (role == Qn::CR_LiveVideo || role == Qn::CR_Default || role == Qn::CR_SecondaryLiveVideo)
+QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(Qn::ConnectionRole role)
+{
+    if (role == Qn::CR_SecondaryLiveVideo && !hasDualStreaming2())
+        return nullptr;
+
+    switch (role)
     {
-
-        if (role == Qn::CR_SecondaryLiveVideo && !hasDualStreaming2())
-            return 0;
-
-        QnAbstractStreamDataProvider* result = createLiveDataProvider();
-        if (result)
-            result->setRole(role);
-        return result;
-
-    }
-    else if (role == Qn::CR_Archive) {
-        QnAbstractStreamDataProvider* result = createArchiveDataProvider();
-        if (result)
+        case Qn::CR_SecondaryLiveVideo:
+        case Qn::CR_Default:
+        case Qn::CR_LiveVideo:
+        {
+            QnAbstractStreamDataProvider* result = createLiveDataProvider();
+            if (result)
+                result->setRole(role);
             return result;
+        }
+        case Qn::CR_Archive:
+        {
+            if (QnAbstractStreamDataProvider* result = createArchiveDataProvider())
+                return result;
+
+            /* This is the only legal break. */
+            break;
+        }
+        default:
+            NX_ASSERT(false, "There are no other roles");
+            break;
     }
 
+    NX_ASSERT(role == Qn::CR_Archive);
+    /* The one and only QnDataProviderFactory now is the QnServerDataProviderFactory class
+     * which handles only Qn::CR_Archive role. */
     if (m_dpFactory)
         return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
-    return 0;
+
+    return nullptr;
 }
 #endif // ENABLE_DATA_PROVIDERS
 

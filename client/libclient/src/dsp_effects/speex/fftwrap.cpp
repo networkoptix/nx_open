@@ -1,23 +1,23 @@
-/* Copyright (C) 2005-2006 Jean-Marc Valin 
+/* Copyright (C) 2005-2006 Jean-Marc Valin
    File: fftwrap.c
 
-   Wrapper for various FFTs 
+   Wrapper for various FFTs
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -62,7 +62,7 @@ static int maximize_range(spx_word16_t *in, spx_word16_t *out, spx_word16_t boun
    for (i=0;i<len;i++)
    {
       out[i] = SHL16(in[i], shift);
-   }   
+   }
    return shift;
 }
 
@@ -84,7 +84,7 @@ static void renorm_range(spx_word16_t *in, spx_word16_t *out, int shift, int len
 void *spx_fft_init(int size)
 {
    struct drft_lookup *table;
-   table = (drft_lookup*) av_malloc(sizeof(struct drft_lookup));
+   table = (drft_lookup*) av_mallocz(sizeof(struct drft_lookup));
    spx_drft_init((struct drft_lookup *)table, size);
    return (void*)table;
 }
@@ -136,7 +136,7 @@ struct mkl_config {
 
 void *spx_fft_init(int size)
 {
-  struct mkl_config *table = (struct mkl_config *) av_malloc(sizeof(struct mkl_config));
+  struct mkl_config *table = (struct mkl_config *) av_mallocz(sizeof(struct mkl_config));
   table->N = size;
   DftiCreateDescriptor(&table->desc, DFTI_SINGLE, DFTI_REAL, 1, size);
   DftiSetValue(table->desc, DFTI_PACKED_FORMAT, DFTI_PACK_FORMAT);
@@ -179,7 +179,7 @@ struct fftw_config {
 
 void *spx_fft_init(int size)
 {
-  struct fftw_config *table = (struct fftw_config *) av_malloc(sizeof(struct fftw_config));
+  struct fftw_config *table = (struct fftw_config *) av_mallocz(sizeof(struct fftw_config));
   table->in = fftwf_malloc(sizeof(float) * (size+2));
   table->out = fftwf_malloc(sizeof(float) * (size+2));
 
@@ -219,7 +219,7 @@ void spx_fft(void *table, spx_word16_t *in, spx_word16_t *out)
     out[i] = optr[i+1];
 }
 
-void spx_ifft(void *table, spx_word16_t *in, spx_word16_t *out) 
+void spx_ifft(void *table, spx_word16_t *in, spx_word16_t *out)
 {
   int i;
   struct fftw_config *t = (struct fftw_config *) table;
@@ -234,7 +234,7 @@ void spx_ifft(void *table, spx_word16_t *in, spx_word16_t *out)
   iptr[N+1] = 0.0f;
 
   fftwf_execute(t->ifft);
-  
+
   for(i=0;i<N;++i)
     out[i] = optr[i];
 }
@@ -253,7 +253,7 @@ struct kiss_config {
 void *spx_fft_init(int size)
 {
    struct kiss_config *table;
-   table = (struct kiss_config*)av_malloc(sizeof(struct kiss_config));
+   table = (struct kiss_config*)av_mallocz(sizeof(struct kiss_config));
    table->forward = kiss_fftr_alloc(size,0,NULL,NULL);
    table->backward = kiss_fftr_alloc(size,1,NULL,NULL);
    table->N = size;

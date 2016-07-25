@@ -73,6 +73,7 @@
                             <condition resName="auth.accountRightsOnSystem">
                                 <set value="owner" resName="authorized" resValue="true"/>
                                 <set value="cloudAdmin" resName="authorized" resValue="true"/>
+                                <set value="localAdmin" resName="authorized" resValue="true"/>
                                 <!-- TODO should maintenance be able to view all sharings? or, maybe, just other maintenance? -->
                                 <set value="maintenance" resName="authorized" resValue="true"/>
                             </condition>
@@ -89,6 +90,7 @@
                             <condition resName="auth.accountRightsOnSystem">
                                 <set value="owner" resName="authorized" resValue="true"/>
                                 <set value="cloudAdmin" resName="authorized" resValue="true"/>
+                                <set value="localAdmin" resName="authorized" resValue="true"/>
                                 <!-- TODO should maintenance be able to view all sharings? or, maybe, just other maintenance? -->
                                 <set value="maintenance" resName="authorized" resValue="true"/>
                             </condition>
@@ -99,6 +101,13 @@
                         <condition resName="auth.accountRightsOnSystem">
                             <set value="owner" resName="authorized" resValue="true"/>
                             <sequence value="cloudAdmin">
+                                <set resName="authorized" resValue="true"/>
+                                <condition resName="systemAccessRole">
+                                    <!-- only system owner and integrator can share system to another integrator -->
+                                    <set value="maintenance" resName="authorized" resValue="false"/>
+                                </condition>
+                            </sequence>
+                            <sequence value="localAdmin">
                                 <set resName="authorized" resValue="true"/>
                                 <condition resName="systemAccessRole">
                                     <!-- only system owner and integrator can share system to another integrator -->

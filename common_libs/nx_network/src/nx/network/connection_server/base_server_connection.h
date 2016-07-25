@@ -147,6 +147,14 @@ namespace nx_api
             m_connectionCloseHandlers.push_front(std::move(handler));
         }
 
+        bool isSsl() const
+        {
+            if (auto s = dynamic_cast<AbstractEncryptedStreamSocket*>(m_streamSocket.get()))
+                return s->isEncryptionEnabled();
+
+            return false;
+        }
+
         const std::unique_ptr<AbstractCommunicatingSocket>& socket() const
         {
             return m_streamSocket;

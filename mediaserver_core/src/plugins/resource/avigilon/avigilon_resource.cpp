@@ -35,8 +35,11 @@ public:
 };
 #define QnAvigilonCheckInputPortResponse_Fields (inputs)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (QnAvigilonInputPortState)(QnAvigilonCheckInputPortResponse), (json), _Fields )
-
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnAvigilonInputPortState)(QnAvigilonCheckInputPortResponse),
+    (json),
+    _Fields,
+    (optional, false))
 
 QnAvigilonResource::QnAvigilonResource()
 :

@@ -2,6 +2,7 @@
 #include "ui_user_group_settings_widget.h"
 
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/common/indents.h>
 #include <ui/dialogs/common/message_box.h>
@@ -11,40 +12,125 @@
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 
-QnUserGroupSettingsWidget::QnUserGroupSettingsWidget(QnUserGroupSettingsModel* model, QWidget* parent /*= 0*/) :
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-    ui(new Ui::UserGroupSettingsWidget()),
-    m_model(model),
-    m_usersModel(new QStandardItemModel(this)),
-    m_replacementRoles(new QnUserRolesModel(this, true, false, false))
+
+class QnUserGroupSettingsWidgetPrivate : public Connective<QObject>
 {
-    ui->setupUi(this);
-    ui->usersListTreeView->setModel(m_usersModel);
+    using base_type = Connective<QObject>;
 
-    ui->usersListTreeView->setProperty(style::Properties::kSuppressHoverPropery, true);
-    ui->usersListTreeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents()));
-
-    connect(ui->nameLineEdit, &QLineEdit::textChanged, this, &QnUserGroupSettingsWidget::applyChanges);
-
-    connect(ui->deleteGroupButton, &QPushButton::clicked, this, [this]()
+public:
+    QnUserGroupSettingsWidgetPrivate(QnUserGroupSettingsWidget* parent, QnUserGroupSettingsModel* model) :
+        base_type(parent),
+        q_ptr(parent),
+        model(model),
+        usersModel(new QStandardItemModel(this)),
+        replacementRoles(new QnUserRolesModel(this,
+            true,  /* standardRoles */
+            false, /* userRoles (will be filled later) */
+            false  /* customRole */))
     {
+        for (const auto& user : qnResPool->getResources<QnUserResource>())
+            connectUserSignals(user);
+
+        connect(qnResPool, &QnResourcePool::resourceAdded, this,
+            [this](const QnResourcePtr& resource)
+            {
+                QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+                if (!user)
+                    return;
+
+                connectUserSignals(user);
+
+                if (user->userGroup() == this->model->selectedGroup())
+                    userAddedOrUpdated(user);
+            });
+
+        connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+            [this](const QnResourcePtr& resource)
+            {
+                QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+                if (!user)
+                    return;
+
+                disconnectUserSignals(user);
+
+                if (user->userGroup() == this->model->selectedGroup())
+                    userMaybeRemoved(user);
+            });
+    }
+
+    void connectUserSignals(const QnUserResourcePtr& user)
+    {
+        connect(user, &QnResource::nameChanged, this,
+            [this](const QnResourcePtr& resource)
+            {
+                auto user = resource.staticCast<QnUserResource>();
+                if (user->userGroup() == model->selectedGroup())
+                    userAddedOrUpdated(user);
+            });
+
+        connect(user, &QnUserResource::userGroupChanged, this,
+            [this](const QnResourcePtr& resource)
+            {
+                auto user = resource.staticCast<QnUserResource>();
+                if (user->userGroup() == model->selectedGroup())
+                    userAddedOrUpdated(user);
+                else
+                    userMaybeRemoved(user);
+            });
+    }
+
+    void disconnectUserSignals(const QnUserResourcePtr& user)
+    {
+        user->disconnect(this);
+    }
+
+    void resetUsers()
+    {
+        QnUserResourceList users = model->users(true);
+        usersModel->clear();
+        for (const auto& user : users)
+            addUser(user);
+
+        correctUsersTable();
+    }
+
+    void addUser(const QnUserResourcePtr& user)
+    {
+        auto item = new QStandardItem(qnResIconCache->icon(QnResourceIconCache::User), user->getName());
+        item->setData(QVariant::fromValue<QnResourcePtr>(user), Qn::ResourceRole);
+        usersModel->appendRow(item);
+    }
+
+    bool hasUsers() const
+    {
+        int count = usersModel->rowCount();
+        NX_ASSERT(count > 0);
+
+        if (count > 1)
+            return true;
+
+        return usersModel->data(usersModel->index(0, 0), Qn::ResourceRole).isValid();
+    }
+
+    void deleteCurrentGroup()
+    {
+        Q_Q(QnUserGroupSettingsWidget);
         QnUserGroupSettingsModel::RoleReplacement replacement(QnUuid(), Qn::GlobalLiveViewerPermissionSet);
 
-        if (!m_model->users().empty())
+        if (hasUsers())
         {
             QnMessageBox messageBox(QnMessageBox::Warning,
                 Qn::Empty_Help, //TODO: #vkutin #GDM Change to correct topic
-                ui->deleteGroupButton->text(),
+                q->ui->deleteGroupButton->text(),
                 tr("Select a new role for users"),
                 QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                window());
+                q->window());
 
-            m_replacementRoles->setUserRoles(m_model->groups());
-            m_replacementRoles->removeUserRole(m_model->selectedGroup());
+            replacementRoles->setUserRoles(model->groups());
+            replacementRoles->removeUserRole(model->selectedGroup());
 
             messageBox.setInformativeText(tr("All users that had this role will be assigned the following role:"));
-            messageBox.setComboBoxModel(m_replacementRoles);
+            messageBox.setComboBoxModel(replacementRoles);
 
             //TODO: #vkutin Find the best replacement instead of just choosing Live Viewer
             QnUuid bestReplacementId;
@@ -53,14 +139,14 @@ QnUserGroupSettingsWidget::QnUserGroupSettingsWidget(QnUserGroupSettingsModel* m
             QModelIndexList indices;
             if (bestReplacementId.isNull())
             {
-                indices = m_replacementRoles->match(m_replacementRoles->index(0, 0),
+                indices = replacementRoles->match(replacementRoles->index(0, 0),
                     Qn::GlobalPermissionsRole,
                     QVariant::fromValue(bestReplacementPermissions),
                     1, Qt::MatchExactly);
             }
             else
             {
-                indices = m_replacementRoles->match(m_replacementRoles->index(0, 0),
+                indices = replacementRoles->match(replacementRoles->index(0, 0),
                     Qn::UuidRole,
                     QVariant::fromValue(bestReplacementId),
                     1, Qt::MatchExactly);
@@ -71,7 +157,7 @@ QnUserGroupSettingsWidget::QnUserGroupSettingsWidget(QnUserGroupSettingsModel* m
             if (messageBox.exec() != QDialogButtonBox::Ok)
                 return;
 
-            QModelIndex index = m_replacementRoles->index(messageBox.currentComboBoxIndex(), 0);
+            QModelIndex index = replacementRoles->index(messageBox.currentComboBoxIndex(), 0);
             NX_ASSERT(index.isValid());
 
             replacement = QnUserGroupSettingsModel::RoleReplacement(
@@ -79,9 +165,84 @@ QnUserGroupSettingsWidget::QnUserGroupSettingsWidget(QnUserGroupSettingsModel* m
                 index.data(Qn::GlobalPermissionsRole).value<Qn::GlobalPermissions>());
         }
 
-        m_model->removeGroup(m_model->selectedGroup(), replacement);
-        emit hasChangesChanged();
-    });
+        model->removeGroup(model->selectedGroup(), replacement);
+
+        /* If selection was changed to the replacement group then we
+         *   must update its users list to include all new candidates: */
+        if (replacement.group == model->selectedGroup())
+            resetUsers();
+
+        emit q->hasChangesChanged();
+    }
+
+    // User was assigned currently selected role, or its name was updated:
+    void userAddedOrUpdated(const QnUserResourcePtr& user)
+    {
+        QModelIndex index = userIndex(user);
+        if (index.isValid())
+        {
+            usersModel->setData(index, user->getName(), Qt::DisplayRole);
+            return;
+        }
+
+        if (!hasUsers())
+            usersModel->clear();
+
+        addUser(user);
+    }
+
+    // User was possibly removed from currently selected role:
+    void userMaybeRemoved(const QnUserResourcePtr& resource)
+    {
+        QModelIndex index = userIndex(resource);
+        if (!index.isValid())
+            return;
+
+        usersModel->removeRow(index.row());
+        correctUsersTable();
+    }
+
+    QModelIndex userIndex(const QnUserResourcePtr& user)
+    {
+        auto existingUsers = usersModel->match(usersModel->index(0, 0),
+            Qn::ResourceRole,
+            QVariant::fromValue<QnResourcePtr>(user),
+            1, Qt::MatchExactly);
+
+        return existingUsers.empty() ? QModelIndex() : existingUsers[0];
+    }
+
+    void correctUsersTable()
+    {
+        if (usersModel->rowCount() == 0)
+            usersModel->appendRow(new QStandardItem(tr("No users have this role")));
+    }
+
+public:
+    QnUserGroupSettingsWidget* q_ptr;
+    Q_DECLARE_PUBLIC(QnUserGroupSettingsWidget);
+
+    QnUserGroupSettingsModel* model;
+    QStandardItemModel* usersModel;
+    QnUserRolesModel* replacementRoles;
+};
+
+QnUserGroupSettingsWidget::QnUserGroupSettingsWidget(QnUserGroupSettingsModel* model, QWidget* parent /*= 0*/) :
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
+    ui(new Ui::UserGroupSettingsWidget()),
+    d_ptr(new QnUserGroupSettingsWidgetPrivate(this, model))
+{
+    Q_D(QnUserGroupSettingsWidget);
+
+    ui->setupUi(this);
+    ui->usersListTreeView->setModel(d->usersModel);
+
+    ui->usersListTreeView->setProperty(style::Properties::kSuppressHoverPropery, true);
+    ui->usersListTreeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents()));
+
+    connect(ui->nameLineEdit, &QLineEdit::textChanged, this, &QnUserGroupSettingsWidget::applyChanges);
+    connect(ui->deleteGroupButton, &QPushButton::clicked, d, &QnUserGroupSettingsWidgetPrivate::deleteCurrentGroup);
 }
 
 QnUserGroupSettingsWidget::~QnUserGroupSettingsWidget()
@@ -95,22 +256,18 @@ bool QnUserGroupSettingsWidget::hasChanges() const
 
 void QnUserGroupSettingsWidget::loadDataToUi()
 {
+    Q_D(QnUserGroupSettingsWidget);
+
     QSignalBlocker blocker(ui->nameLineEdit);
-    ui->nameLineEdit->setText(m_model->groupName());
+    ui->nameLineEdit->setText(d->model->groupName());
 
-    QnUserResourceList users = m_model->users();
-
-    m_usersModel->clear();
-    for (const auto& user : users)
-        m_usersModel->appendRow(new QStandardItem(qnResIconCache->icon(QnResourceIconCache::User), user->getName()));
-
-    if (users.isEmpty())
-        m_usersModel->appendRow(new QStandardItem(tr("No users have this role")));
-
+    d->resetUsers();
 }
 
 void QnUserGroupSettingsWidget::applyChanges()
 {
-    m_model->setGroupName(ui->nameLineEdit->text());
+    Q_D(QnUserGroupSettingsWidget);
+
+    d->model->setGroupName(ui->nameLineEdit->text());
     emit hasChangesChanged();
 }

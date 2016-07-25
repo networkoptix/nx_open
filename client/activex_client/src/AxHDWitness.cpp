@@ -6,13 +6,12 @@
 #include <QtCore/QDir>
 #include <QtCore/QXmlStreamWriter>
 
-#include <utils/common/qt_private_headers.h>
-#include QT_CORE_PRIVATE_HEADER(qthread_p.h)
+#include <QtCore/private/qthread_p.h>
 
 #include <axclient/axclient_module.h>
 #include <axclient/axclient_window.h>
 
-#include <common/systemexcept_win32.h>
+#include <common/systemexcept.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>

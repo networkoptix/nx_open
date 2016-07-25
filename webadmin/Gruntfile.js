@@ -9,6 +9,10 @@
 
 module.exports = function (grunt) {
 
+    var proxy_server_host = '10.1.5.105';  //la_office_test - Burbank
+    //var proxy_server_host = '10.1.5.142';  //Parallels - Burbank
+    var proxy_server_port = 7001;
+
     var package_dir = 'buildenv/packages/any/server-external-3.0.0/bin';
     // Load grunt tasks automatically
     require('load-grunt-tasks')(grunt);
@@ -16,6 +20,7 @@ module.exports = function (grunt) {
 
     // Time how long tasks take. Can help when optimizing build times
     require('time-grunt')(grunt);
+
 
     grunt.loadNpmTasks('grunt-protractor-webdriver');
     grunt.loadNpmTasks('grunt-protractor-runner');
@@ -94,157 +99,21 @@ module.exports = function (grunt) {
                         'Authorization': 'Basic YWRtaW46MTIz'
                     }
                  },
-                 {
-                     context: '/',
-                     host: 'mono',
-                     port: 41000,
-                 }
                  */
 
                 //'Authorization': 'Basic YWRtaW46MTIz' //admin:123
-                //'Authorization': 'Basic dXNlcjoxMjM='//user:123
+                //'Authorization': 'Basic dXNlcjoxMjM=' //user:123
 
                 //Total proxy
                 //{context: '/',        host: '192.168.56.101',port: 7002},
 
-                //Cube
-                /*{context: '/api/',    host: '192.168.0.25', port: 7001},
-                {context: '/ec2/',      host: '192.168.0.25', port: 7001},
-                {context: '/hls/',      host: '192.168.0.25', port: 7001},
-                {context: '/media/',    host: '192.168.0.25', port: 7001},
-                {context: '/proxy/',    host: '192.168.0.25', port: 7001}/**/
+                {context: '/web/',      host: proxy_server_host, port: proxy_server_port},
+                {context: '/api/',      host: proxy_server_host, port: proxy_server_port},
+                {context: '/ec2/',      host: proxy_server_host, port: proxy_server_port},
+                {context: '/hls/',      host: proxy_server_host, port: proxy_server_port},
+                {context: '/media/',    host: proxy_server_host, port: proxy_server_port},
+                {context: '/proxy/',    host: proxy_server_host, port: proxy_server_port}
 
-                //demo.networkoptix.com
-                /*{context: '/api/',    host: 'demo.networkoptix.com', port: 7001},
-                {context: '/ec2/',      host: 'demo.networkoptix.com', port: 7001},
-                {context: '/hls/',      host: 'demo.networkoptix.com',port: 7001},
-                {context: '/media/',    host: 'demo.networkoptix.com', port: 7001},
-                {context: '/proxy/',    host: 'demo.networkoptix.com',port: 7001}/**/
-
-                //Evgeniy
-/*                {context: '/api/',    host: '192.168.56.101', port: 9000},
-                {context: '/ec2/',      host: '192.168.56.101', port: 9000},
-                {context: '/hls/',      host: '192.168.56.101',port: 9000},
-                {context: '/media/',    host: '192.168.56.101', port: 9000},
-                {context: '/proxy/',    host: '192.168.56.101',port: 9000}/**/
-
-                /*{context: '/api/',      host: '10.0.2.203', port: 7001},
-                {context: '/ec2/',      host: '10.0.2.203', port: 7001},
-                {context: '/hls/',      host: '10.0.2.203', port: 7001},
-                {context: '/media/',    host: '10.0.2.203', port: 7001},
-                {context: '/proxy/',    host: '10.0.2.203', port: 7001}/**/
-
-                // Sasha V
-                /*{context: '/api/',      host: '10.0.3.43', port: 7001},
-                {context: '/ec2/',      host: '10.0.3.43', port: 7001},
-                {context: '/hls/',      host: '10.0.3.43', port: 7001},
-                {context: '/media/',    host: '10.0.3.43', port: 7001},
-                {context: '/proxy/',    host: '10.0.3.43', port: 7001}/**/
-
-                // Gdm
-                /*{context: '/api/',      host: '10.0.2.240', port: 7001},
-                {context: '/ec2/',      host: '10.0.2.240', port: 7001},
-                {context: '/hls/',      host: '10.0.2.240', port: 7001},
-                {context: '/media/',    host: '10.0.2.240', port: 7001},
-                {context: '/proxy/',    host: '10.0.2.240', port: 7001}/**/
-
-
-                // Burbank - test
-                /*{context: '/api/',      host: '10.1.5.126', port: 7001},
-                {context: '/ec2/',      host: '10.1.5.126', port: 7001},
-                {context: '/hls/',      host: '10.1.5.126', port: 7001},
-                {context: '/media/',    host: '10.1.5.126', port: 7001},
-                {context: '/proxy/',    host: '10.1.5.126', port: 7001}/**/
-
-
-                // kds
-                /* {context: '/api/',      host: '10.0.2.137', port: 7000},
-                 {context: '/ec2/',      host: '10.0.2.137', port: 7000},
-                 {context: '/hls/',      host: '10.0.2.137', port: 7000},
-                 {context: '/media/',    host: '10.0.2.137', port: 7000},
-                 {context: '/proxy/',    host: '10.0.2.137', port: 7000}/**/
-
-                //Vitaly Kutin
-                /*{context: '/api/',      host: '10.0.3.197', port: 7001},
-                {context: '/ec2/',      host: '10.0.3.197', port: 7001},
-                {context: '/hls/',      host: '10.0.3.197', port: 7001},
-                {context: '/media/',    host: '10.0.3.197', port: 7001},
-                {context: '/proxy/',    host: '10.0.3.197', port: 7001}/**/
-
-                // Olya - external
-                /*{context: '/api/',      host: '95.31.136.2', port: 7011},
-                {context: '/ec2/',      host: '95.31.136.2', port: 7011},
-                {context: '/hls/',      host: '95.31.136.2', port: 7011},
-                {context: '/media/',    host: '95.31.136.2', port: 7011},
-                {context: '/proxy/',    host: '95.31.136.2', port: 7011}/**/
-
-                // Regress
-                /*{context: '/api/',      host: '10.0.2.169', port: 7011},
-                {context: '/ec2/',      host: '10.0.2.169', port: 7011},
-                {context: '/hls/',      host: '10.0.2.169', port: 7011},
-                {context: '/media/',    host: '10.0.2.169', port: 7011},
-                {context: '/proxy/',    host: '10.0.2.169', port: 7011}/**/
-
-                // Nx1 Cloud 3.0
-                /*{context: '/api/',      host: '10.0.3.65', port: 7001},
-                {context: '/ec2/',      host: '10.0.3.65', port: 7001},
-                {context: '/hls/',      host: '10.0.3.65', port: 7001},
-                {context: '/media/',    host: '10.0.3.65', port: 7001},
-                {context: '/proxy/',    host: '10.0.3.65', port: 7001}/**/
-
-                // Sasha
-                /*{context: '/api/',      host: '10.0.2.119', port: 7042},
-                {context: '/ec2/',      host: '10.0.2.119', port: 7042},
-                {context: '/hls/',      host: '10.0.2.119', port: 7042},
-                {context: '/media/',    host: '10.0.2.119', port: 7042},
-                {context: '/proxy/',    host: '10.0.2.119', port: 7042}/**/
-
-                // Andrey
-                /*{context: '/api/',      host: '10.0.2.95', port: 7001},
-                {context: '/ec2/',      host: '10.0.2.95', port: 7001},
-                {context: '/hls/',      host: '10.0.2.95', port: 7001},
-                {context: '/media/',    host: '10.0.2.95', port: 7001},
-                {context: '/proxy/',    host: '10.0.2.95', port: 7001}/**/
-
-                //Roman Vasilenko  port: 7003,7004,7005,2006
-                /*{context: '/api/',      host: '10.0.2.232', port: 7002},
-                {context: '/ec2/',      host: '10.0.2.232', port: 7002},
-                {context: '/hls/',      host: '10.0.2.232', port: 7002},
-                {context: '/media/',    host: '10.0.2.232', port: 7002},
-                {context: '/proxy/',    host: '10.0.2.232', port: 7002}/**/
-
-
-                //Surface
-                /*{context: '/api/',      host: '10.0.3.203', port: 7001},
-                 {context: '/ec2/',      host: '10.0.3.203', port: 7001},
-                 {context: '/hls/',      host: '10.0.3.203', port: 7001},
-                 {context: '/media/',    host: '10.0.3.203', port: 7001},
-                 {context: '/proxy/',    host: '10.0.3.203', port: 7001}/**/
-
-
-                //Dell - Burbank
-                /*{context: '/api/',      host: '10.1.5.130', port: 7001},
-                 {context: '/ec2/',      host: '10.1.5.130', port: 7001},
-                 {context: '/hls/',      host: '10.1.5.130', port: 7001},
-                 {context: '/media/',    host: '10.1.5.130', port: 7001},
-                 {context: '/proxy/',    host: '10.1.5.130', port: 7001}/**/
-
-
-                //Parallels - Burbank
-                {context: '/web/',      host: '10.1.5.108', port: 7001},
-                {context: '/api/',      host: '10.1.5.108', port: 7001},
-                {context: '/ec2/',      host: '10.1.5.108', port: 7001},
-                {context: '/hls/',      host: '10.1.5.108', port: 7001},
-                {context: '/media/',    host: '10.1.5.108', port: 7001},
-                {context: '/proxy/',    host: '10.1.5.108', port: 7001}/**/
-
-                // Parallels - Providencia
-                /*{context: '/web/',    host: '192.168.1.67', port: 7001},
-                 {context: '/api/',    host: '192.168.1.67', port: 7001},
-                 {context: '/ec2/',      host: '192.168.1.67', port: 7001},
-                 {context: '/hls/',      host: '192.168.1.67', port: 7001},
-                 {context: '/media/',    host: '192.168.1.67', port: 7001},
-                 {context: '/proxy/',    host: '192.168.1.67', port: 7001}/**/
             ],
             livereload: {
                 options: {

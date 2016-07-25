@@ -52,7 +52,8 @@ ios {
     OTHER_FILES += $${QMAKE_INFO_PLIST}
     OBJECTIVE_SOURCES += \
         ${basedir}/src/ui/window_utils_ios.mm \
-        ${basedir}/src/utils/settings_migration_ios.mm
+        ${basedir}/src/utils/settings_migration_ios.mm \
+        ${basedir}/src/utils/app_delegate.mm
 
     ios_icon.files = $$files(${basedir}/${arch}/ios/images/icon*.png)
     QMAKE_BUNDLE_DATA += ios_icon
@@ -63,7 +64,7 @@ ios {
     launch_image.files = $$files(${basedir}/${arch}/ios/Launch.xib)
     QMAKE_BUNDLE_DATA += launch_image
 
-    QMAKE_XCODE_CODE_SIGN_IDENTITY = ${ios.sign.identity}
+    QMAKE_XCODE_CODE_SIGN_IDENTITY = "${ios.sign.identity}"
     XCODEBUILD_FLAGS += PROVISIONING_PROFILE=${provisioning_profile_id}
     XCODEBUILD_FLAGS += CODE_SIGN_ENTITLEMENTS=${mobile_client_entitlements}
 }

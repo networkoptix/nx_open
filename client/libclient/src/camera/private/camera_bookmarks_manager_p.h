@@ -13,7 +13,7 @@ class QnCameraBookmarksManagerPrivate : public Connective<QObject> {
     typedef Connective<QObject> base_type;
 public:
     QnCameraBookmarksManagerPrivate(QnCameraBookmarksManager *parent);
-    
+
     virtual ~QnCameraBookmarksManagerPrivate();
 
     /* Direct API section */
@@ -103,8 +103,11 @@ private:
     /// @param query            The query for with merge operation is performed. The query specifies filters and cameras list.
     void mergeWithPendingBookmarks(const QnCameraBookmarksQueryPtr query, QnCameraBookmarkList &bookmarks);
 
-    /// @brief                  Find and discard timed-out pending bookmars.
+    /// @brief                  Find and discard timed-out pending bookmarks.
     void checkPendingBookmarks();
+
+    /// @brief                  Find and discard camera from all cached queries. Invalid queries will be discarded as well.
+    void removeCameraFromQueries(const QnResourcePtr& resource);
 
 private:
     Q_DECLARE_PUBLIC(QnCameraBookmarksManager)

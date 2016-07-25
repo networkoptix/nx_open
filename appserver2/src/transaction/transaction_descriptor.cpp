@@ -2,6 +2,8 @@
 #include "transaction_descriptor.h"
 #include "transaction_message_bus.h"
 #include "nx_ec/data/api_tran_state_data.h"
+#include "core/resource_management/user_access_data.h"
+#include "core/resource_management/resource_access_manager.h"
 
 namespace ec2
 {
@@ -123,6 +125,8 @@ namespace detail
     {
         switch( tran.command )
         {
+        case ApiCommand::removeServerUserAttributes:
+            return notificationParams.mediaServerNotificationManager->triggerNotification(tran);
         case ApiCommand::removeResource:
             return notificationParams.resourceNotificationManager->triggerNotification( tran );
         case ApiCommand::removeCamera:
@@ -159,6 +163,11 @@ namespace detail
     QnUuid createHashForApiCameraAttributesDataHelper(const ApiCameraAttributesData &params)
     {
         return QnTransactionLog::makeHash(params.cameraID.toRfc4122(), "camera_attributes");
+    }
+
+    QnUuid createHashForApiAccessRightsDataHelper(const ApiAccessRightsData& params)
+    {
+        return QnTransactionLog::makeHash(params.userId.toRfc4122(), "access_rights");
     }
 
     QnUuid createHashForApiLicenseDataHelper(const ApiLicenseData &params)
@@ -308,6 +317,339 @@ namespace detail
         }
     }
 
+    // Permission helpers
+    struct InvalidAccess
+    {
+        template<typename Param>
+        bool operator()(const QnUuid&, const Param&)
+        {
+            auto td = getTransactionDescriptorByParam<Param>();
+            auto transactionName = td->getName();
+            NX_ASSERT(0, lit("Invalid access check for this transaction (%1). We shouldn't be here.").arg(transactionName));
+            return false;
+        }
+    };
+
+    struct InvalidAccessOut
+    {
+        template<typename Param>
+        RemotePeerAccess operator()(const QnUuid&, const Param&)
+        {
+            auto td = getTransactionDescriptorByParam<Param>();
+            auto transactionName = td->getName();
+            NX_ASSERT(0, lit("Invalid outgoing transaction access check (%1). We shouldn't be here.").arg(transactionName));
+            return RemotePeerAccess::Forbidden;
+        }
+    };
+
+    bool systemSuperAccess(const QnUuid& userId)
+    {
+        return userId == Qn::kDefaultUserAccess.userId; 
+    }
+
+    struct SystemSuperUserAccessOnly
+    {
+        template<typename Param>
+        bool operator()(const QnUuid& userId, const Param&) 
+        { 
+            return systemSuperAccess(userId); 
+        }
+    };
+
+    struct SystemSuperUserAccessOnlyOut
+    {
+        template<typename Param>
+        RemotePeerAccess operator()(const QnUuid& userId, const Param&) 
+        { 
+            return systemSuperAccess(userId) ? RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden; 
+        }
+    };
+
+    struct AllowForAllAccess
+    {
+        template<typename Param>
+        bool operator()(const QnUuid&, const Param&) { return true; }
+    };
+
+    struct AllowForAllAccessOut
+    {
+        template<typename Param>
+        RemotePeerAccess operator()(const QnUuid&, const Param&) { return RemotePeerAccess::Allowed; }
+    };
+
+    bool resourceAccessHelper(const QnUuid& userId, const QnUuid& resourceId, Qn::Permission permission)
+    {
+        if (systemSuperAccess(userId))
+            return true;
+        QnResourcePtr target = qnResPool->getResourceById(resourceId);
+        auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+        if (qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission))
+            return true;
+        return qnResourceAccessManager->hasPermission(userResource, target, permission);
+    }
+
+    struct ModifyResourceAccess
+    {
+        template<typename Param>
+        bool operator()(const QnUuid& userId, const Param& param)
+        {
+            if (systemSuperAccess(userId))
+                return true;
+            auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+
+            QnResourcePtr target = qnResPool->getResourceById(param.id);
+            bool result = false;
+            if (!target)
+            {
+                auto createAccessResult = qnResourceAccessManager->canCreateResource(userResource, param);
+                if (createAccessResult == QnResourceAccessManager::CanCreateResourceCode::NotImplemented)
+                    result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+                else
+                    result = (createAccessResult == QnResourceAccessManager::CanCreateResourceCode::Yes) ? true : false;
+            }
+            else
+                result = qnResourceAccessManager->canModifyResource(userResource, target, param);
+
+            if (!result)
+                NX_LOG(lit("Modify resource access returned false for transaction %1. User resource isNull: %2. Target resource isNull %3")
+                        .arg(getTransactionDescriptorByParam<Param>()->getName())
+                        .arg(!(bool)userResource)
+                        .arg(!(bool)target),
+                       cl_logDEBUG1);
+
+            return result;
+        }
+    };
+
+    struct ReadResourceAccess
+    {
+        template<typename Param>
+        bool operator()(const QnUuid& userId, const Param& param)
+        {
+            return resourceAccessHelper(userId, param.id, Qn::Permission::ReadPermission);
+        }
+    };
+
+    struct ReadResourceAccessOut
+    {
+        template<typename Param>
+        RemotePeerAccess operator()(const QnUuid& userId, const Param& param)
+        {
+            return resourceAccessHelper(userId, param.id, Qn::Permission::ReadPermission) ? 
+                RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+        }
+    };
+
+    struct ReadResourceParamAccess
+    {
+        bool operator()(const QnUuid& userId, const ApiResourceParamWithRefData& param)
+        {
+            return resourceAccessHelper(userId, param.resourceId, Qn::Permission::ReadPermission);
+        }
+    };
+
+    struct ReadResourceParamAccessOut
+    {
+        RemotePeerAccess operator()(const QnUuid& userId, const ApiResourceParamWithRefData& param)
+        {
+            return resourceAccessHelper(userId, param.resourceId, Qn::Permission::ReadPermission) ? 
+                RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+        }
+    };
+
+    struct ModifyResourceParamAccess
+    {
+        bool operator()(const QnUuid& userId, const ApiResourceParamWithRefData& param)
+        {
+            return resourceAccessHelper(userId, param.resourceId, Qn::Permission::SavePermission);
+        }
+    };
+
+    struct ReadFootageDataAccess
+    {
+        bool operator()(const QnUuid& userId, const ApiServerFootageData& param)
+        {
+            return resourceAccessHelper(userId, param.serverGuid, Qn::Permission::ReadPermission);
+        }
+    };
+
+    struct ReadFootageDataAccessOut
+    {
+        RemotePeerAccess operator()(const QnUuid& userId, const ApiServerFootageData& param)
+        {
+            return resourceAccessHelper(userId, param.serverGuid, Qn::Permission::ReadPermission) ? 
+                RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+        }
+    };
+
+    struct ModifyFootageDataAccess
+    {
+        bool operator()(const QnUuid& userId, const ApiServerFootageData& param)
+        {
+            return resourceAccessHelper(userId, param.serverGuid, Qn::Permission::SavePermission);
+        }
+    };
+
+    struct ReadCameraAttributesAccess
+    {
+        bool operator()(const QnUuid& userId, const ApiCameraAttributesData& param)
+        {
+            return resourceAccessHelper(userId, param.cameraID, Qn::Permission::ReadPermission);
+        }
+    };
+
+    struct ReadCameraAttributesAccessOut
+    {
+        RemotePeerAccess operator()(const QnUuid& userId, const ApiCameraAttributesData& param)
+        {
+            return resourceAccessHelper(userId, param.cameraID, Qn::Permission::ReadPermission) ? 
+                RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+        }
+    };
+    struct ModifyCameraAttributesAccess
+    {
+        bool operator()(const QnUuid& userId, const ApiCameraAttributesData& param)
+        {
+            return resourceAccessHelper(userId, param.cameraID, Qn::Permission::SavePermission);
+        }
+    };
+
+    struct ReadServerAttributesAccess
+    {
+        bool operator()(const QnUuid& userId, const ApiMediaServerUserAttributesData& param)
+        {
+            return resourceAccessHelper(userId, param.serverID, Qn::Permission::ReadPermission);
+        }
+    };
+
+    struct ReadServerAttributesAccessOut
+    {
+        RemotePeerAccess operator()(const QnUuid& userId, const ApiMediaServerUserAttributesData& param)
+        {
+            return resourceAccessHelper(userId, param.serverID, Qn::Permission::ReadPermission) ? 
+                RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+        }
+    };
+
+    struct ModifyServerAttributesAccess
+    {
+        bool operator()(const QnUuid& userId, const ApiMediaServerUserAttributesData& param)
+        {
+            return resourceAccessHelper(userId, param.serverID, Qn::Permission::SavePermission);
+        }
+    };
+
+    struct AdminOnlyAccess
+    {
+        template<typename Param>
+        bool operator()(const QnUuid& userId, const Param&)
+        {
+            if (systemSuperAccess(userId))
+                return true;
+            auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+            bool result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+            return result;
+        }
+    };
+
+    struct AdminOnlyAccessOut
+    {
+        template<typename Param>
+        RemotePeerAccess operator()(const QnUuid& userId, const Param&)
+        {
+            if (systemSuperAccess(userId))
+                return RemotePeerAccess::Allowed;
+            auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+            RemotePeerAccess result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission) ? 
+                RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+            return result;
+        }
+    };
+
+    struct ControlVideowallAccess
+    {
+        bool operator()(const QnUuid& userId, const ApiVideowallControlMessageData&)
+        {
+            if (systemSuperAccess(userId))
+                return true;
+            auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+            return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalControlVideoWallPermission);
+        }
+    };
+
+    struct InvalidFilterFunc
+    {
+        template<typename ParamType>
+        void operator()(const QnUuid&, ParamType&)
+        {
+            auto td = getTransactionDescriptorByParam<ParamType>();
+            auto transactionName = td->getName();
+            NX_ASSERT(0, lit("This transaction (%1) param type doesn't support filtering").arg(transactionName));
+        }
+    };
+
+    template<typename SingleAccess >
+    struct FilterListByAccess 
+    {
+        template<typename ParamContainer>
+        void operator()(const QnUuid& userId, ParamContainer& outList)
+        {
+            outList.erase(std::remove_if(outList.begin(), outList.end(), 
+                                         [&userId] (const typename ParamContainer::value_type &param) {
+                                             return !SingleAccess()(userId, param);
+                                         }), outList.end());
+        }
+    };
+
+    template<typename SingleAccess>
+    struct ModifyListAccess
+    {
+        template<typename ParamContainer>
+        bool operator()(const QnUuid& userId, const ParamContainer& paramContainer)
+        {
+            ParamContainer tmpContainer = paramContainer;
+            FilterListByAccess<SingleAccess>()(userId, tmpContainer);
+            if (paramContainer.size() != tmpContainer.size())
+            {
+                NX_LOG(lit("Modify list access filtered out %1 entries from %2. Transaction: %3")
+                        .arg(paramContainer.size() - tmpContainer.size())
+                        .arg(paramContainer.size())
+                        .arg(getTransactionDescriptorByParam<ParamContainer>()->getName()),
+                       cl_logDEBUG1);
+                return false;
+            }
+            return true;
+        }
+    };
+
+    template<typename SingleAccess>
+    struct ReadListAccess
+    {
+        template<typename ParamContainer>
+        bool operator()(const QnUuid& userId, const ParamContainer& paramContainer)
+        {
+            ParamContainer tmpContainer = paramContainer;
+            FilterListByAccess<SingleAccess>()(userId, tmpContainer);
+            return tmpContainer.size() != paramContainer.size() && tmpContainer.empty();
+        }
+    };
+
+    template<typename SingleAccess>
+    struct ReadListAccessOut
+    {
+        template<typename ParamContainer>
+        RemotePeerAccess operator()(const QnUuid& userId, const ParamContainer& paramContainer)
+        {
+            ParamContainer tmpContainer = paramContainer;
+            FilterListByAccess<SingleAccess>()(userId, tmpContainer);
+            if (paramContainer.size() != tmpContainer.size() && tmpContainer.empty())
+                return RemotePeerAccess::Forbidden;
+            if (tmpContainer.size() == paramContainer.size())
+                return RemotePeerAccess::Allowed;
+            return RemotePeerAccess::Partial;
+        }
+    };
+
 #define TRANSACTION_DESCRIPTOR_APPLY( \
     _, \
     Key, \
@@ -315,7 +657,12 @@ namespace detail
     isPersistent, \
     isSystem, \
     getHashFunc, \
-    triggerNotificationFunc \
+    triggerNotificationFunc, \
+    checkSavePermissionFunc, \
+    checkReadPermissionFunc, \
+    filterBySavePermissionFunc, \
+    filterByReadPermissionFunc, \
+    checkRemotePeerAccessFunc \
     ) \
     std::make_shared<TransactionDescriptor<ParamType>>( \
         ApiCommand::Key, \
@@ -326,7 +673,12 @@ namespace detail
         createDefaultSaveTransactionHelper(getHashFunc), \
         createDefaultSaveSerializedTransactionHelper(getHashFunc), \
         [](const QnAbstractTransaction &tran) { return QnTransaction<ParamType>(tran); },  \
-        triggerNotificationFunc),
+        triggerNotificationFunc, \
+        checkSavePermissionFunc, \
+        checkReadPermissionFunc, \
+        filterBySavePermissionFunc, \
+        filterByReadPermissionFunc, \
+        checkRemotePeerAccessFunc),
 
 
 DescriptorBaseContainer transactionDescriptors = {

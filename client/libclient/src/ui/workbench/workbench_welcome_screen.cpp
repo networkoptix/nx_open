@@ -16,6 +16,7 @@
 #include <ui/models/systems_model.h>
 #include <ui/models/system_hosts_model.h>
 #include <ui/models/recent_user_connections_model.h>
+#include <ui/models/qml_sort_filter_proxy_model.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>
@@ -26,20 +27,44 @@ namespace
 {
     typedef QPointer<QnWorkbenchWelcomeScreen> GuardType;
 
-    QWidget *createMainView(QObject *context)
+    QWidget* createMainView(QObject* context)
     {
         static const auto kWelcomeScreenSource = lit("qrc:/src/qml/WelcomeScreen.qml");
         static const auto kContextVariableName = lit("context");
 
         qmlRegisterType<QnSystemsModel>("NetworkOptix.Qml", 1, 0, "QnSystemsModel");
         qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
+        qmlRegisterType<QnQmlSortFilterProxyModel>("NetworkOptix.Qml", 1, 0, "QnQmlSortFilterProxyModel");
         qmlRegisterType<QnRecentUserConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentUserConnectionsModel");
 
         const auto quickView = new QQuickView();
-        quickView->rootContext()->setContextProperty(
-            kContextVariableName, context);
-        quickView->setSource(kWelcomeScreenSource);
-        return QWidget::createWindowContainer(quickView);
+        auto holder = new QStackedWidget();
+        holder->addWidget(new QWidget());
+        holder->addWidget(QWidget::createWindowContainer(quickView));
+
+        const auto loadQmlData = [quickView, context, holder]()
+            {
+                const auto updateQmlViewVisibility = [holder](QQuickView::Status status)
+                    {
+                        if (status != QQuickView::Ready)
+                            return false;
+
+                        enum { kQmlViewIndex = 1 };
+                        holder->setCurrentIndex(kQmlViewIndex);
+                        return true;
+                    };
+
+                QObject::connect(quickView, &QQuickView::statusChanged,
+                    quickView, updateQmlViewVisibility);
+
+                quickView->rootContext()->setContextProperty(
+                    kContextVariableName, context);
+                quickView->setSource(kWelcomeScreenSource);
+            };
+
+        // Async load of qml data
+        executeDelayedParented(loadQmlData, 0, quickView);
+        return holder;
     }
 
     QnGenericPalette extractPalette()
@@ -52,31 +77,36 @@ namespace
     }
 }
 
-QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent) :
+QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
+    :
     base_type(parent),
     QnWorkbenchContextAware(parent),
 
+    m_receivingResources(false),
     m_visibleControls(true),
     m_visible(false),
-    m_connectingNow(false),
+    m_connectingSystemName(),
     m_palette(extractPalette()),
     m_widget(createMainView(this)),
     m_pageSize(m_widget->size())
 {
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged
-        , this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged
-        , this, &QnWorkbenchWelcomeScreen::isLoggedInToCloudChanged);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
+        this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
+        this, &QnWorkbenchWelcomeScreen::isLoggedInToCloudChanged);
 
     //
     m_widget->installEventFilter(this);
 
-    connect(action(QnActions::DisconnectAction), &QAction::triggered
-        , this, &QnWorkbenchWelcomeScreen::showScreen);
-        
+    connect(action(QnActions::DisconnectAction), &QAction::triggered,
+        this, &QnWorkbenchWelcomeScreen::showScreen);
+
     connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this, [this]()
     {
+        if (!m_visible)
+            setGlobalPreloaderVisible(false);   ///< Auto toggle off preloader
+
         context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
     });
 
@@ -92,7 +122,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent) :
 QnWorkbenchWelcomeScreen::~QnWorkbenchWelcomeScreen()
 {}
 
-QWidget *QnWorkbenchWelcomeScreen::widget()
+QWidget* QnWorkbenchWelcomeScreen::widget()
 {
     return m_widget.data();
 }
@@ -127,7 +157,7 @@ QSize QnWorkbenchWelcomeScreen::pageSize() const
     return m_pageSize;
 }
 
-void QnWorkbenchWelcomeScreen::setPageSize(const QSize &size)
+void QnWorkbenchWelcomeScreen::setPageSize(const QSize& size)
 {
     if (m_pageSize == size)
         return;
@@ -150,49 +180,71 @@ void QnWorkbenchWelcomeScreen::setVisibleControls(bool visible)
     emit visibleControlsChanged();
 }
 
-bool QnWorkbenchWelcomeScreen::connectingNow() const
+QString QnWorkbenchWelcomeScreen::connectingToSystem() const
 {
-    return m_connectingNow;
+    return m_connectingSystemName;
 }
 
-void QnWorkbenchWelcomeScreen::setConnectingNow(bool value)
+void QnWorkbenchWelcomeScreen::setConnectingToSystem(const QString& value)
 {
-    if (m_connectingNow == value)
+    if (m_connectingSystemName == value)
         return;
 
-    m_connectingNow = value;
-    emit connectingNowChanged();
+    m_connectingSystemName = value;
+    emit connectingToSystemChanged();
 }
 
-void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
-    , const QString &userName
-    , const QString &password
-    , bool storePassword
-    , bool autoLogin)
+bool QnWorkbenchWelcomeScreen::globalPreloaderVisible() const
 {
+    return m_receivingResources;
+}
+
+void QnWorkbenchWelcomeScreen::setGlobalPreloaderVisible(bool value)
+{
+    if (value == m_receivingResources)
+        return;
+
+    m_receivingResources = value;
+    emit globalPreloaderVisibleChanged();
+}
+
+void QnWorkbenchWelcomeScreen::connectToLocalSystem(
+    const QString& systemId,
+    const QString& serverUrl,
+    const QString& userName,
+    const QString& password,
+    bool storePassword,
+    bool autoLogin)
+{
+    if (!connectingToSystem().isEmpty())
+        return; //< Connection process is in progress
+
     // TODO: #ynikitenkov add look after connection process
     // and don't allow to connect to two or more servers simultaneously
-    const auto connectFunction = [this
-        , serverUrl, userName, password, storePassword, autoLogin]()
-    {
-        setConnectingNow(true);
-        const auto controlsGuard = QnRaiiGuard::createDestructable(
-            [this]() { setConnectingNow(false); });
+    const auto connectFunction =
+        [this, serverUrl, userName, password, storePassword, autoLogin, systemId]()
+        {
+            setConnectingToSystem(systemId);
 
-        QUrl url = QUrl::fromUserInput(serverUrl);
-        url.setScheme(lit("http"));
-        if (!password.isEmpty())
-            url.setPassword(password);
-        if (!userName.isEmpty())
-            url.setUserName(userName);
+            const auto completionGuard = QnRaiiGuard::createDestructable(
+                [this]() { setConnectingToSystem(QString()); });
 
-        QnActionParameters params;
-        params.setArgument(Qn::UrlRole, url);
-        params.setArgument(Qn::StorePasswordRole, storePassword);
-        params.setArgument(Qn::ForceRemoveOldConnectionRole, !storePassword);
-        params.setArgument(Qn::AutoLoginRole, autoLogin);
-        menu()->trigger(QnActions::ConnectAction, params);
-    };
+            QUrl url = QUrl::fromUserInput(serverUrl);
+            url.setScheme(lit("http"));
+            if (!password.isEmpty())
+                url.setPassword(password);
+            if (!userName.isEmpty())
+                url.setUserName(userName);
+
+            QnActionParameters params;
+            params.setArgument(Qn::UrlRole, url);
+            params.setArgument(Qn::StorePasswordRole, storePassword);
+            params.setArgument(Qn::ForceRemoveOldConnectionRole, !storePassword);
+            params.setArgument(Qn::AutoLoginRole, autoLogin);
+            params.setArgument(Qn::CompletionWatcherRole, completionGuard);
+
+            menu()->trigger(QnActions::ConnectAction, params);
+        };
 
     enum { kMinimalDelay = 1};
     // We have to use delayed execution to prevent client crash
@@ -200,13 +252,13 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
     executeDelayedParented(connectFunction, kMinimalDelay, this);
 }
 
-void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString &serverUrl)
+void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId, const QString& serverUrl)
 {
     if (!isLoggedInToCloud())
         return;
 
-    connectToLocalSystem(serverUrl, qnCloudStatusWatcher->cloudLogin()
-        , qnCloudStatusWatcher->cloudPassword(), false, false);
+    connectToLocalSystem(systemId, serverUrl, qnCloudStatusWatcher->cloudLogin(),
+        qnCloudStatusWatcher->cloudPassword(), false, false);
 }
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
@@ -217,7 +269,7 @@ void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
     dialog->exec();
 }
 
-void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
+void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 {
     setVisibleControls(false);
     const auto controlsGuard = QnRaiiGuard::createDestructable(
@@ -239,20 +291,19 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
 
         if (!dialog->localLogin().isEmpty() && !dialog->localPassword().isEmpty())
         {
-            connectToLocalSystem(serverUrl, dialog->localLogin(), dialog->localPassword(), false, false);
+            connectToLocalSystem(QString(), serverUrl, dialog->localLogin(), dialog->localPassword(), false, false);
         }
         else if (!dialog->cloudLogin().isEmpty() && !dialog->cloudPassword().isEmpty())
         {
             qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(dialog->cloudLogin(), dialog->cloudPassword(), true);
-            connectToLocalSystem(serverUrl, dialog->cloudLogin(), dialog->cloudPassword(), false, false);
+            connectToLocalSystem(QString(), serverUrl, dialog->cloudLogin(), dialog->cloudPassword(), false, false);
         }
 
     };
 
     // Use delayed handling for proper animation
     enum { kNextEventDelay = 100 };
-    executeDelayedParented(showDialogHandler
-        , kNextEventDelay, this);
+    executeDelayedParented(showDialogHandler, kNextEventDelay, this);
 }
 
 void QnWorkbenchWelcomeScreen::logoutFromCloud()
@@ -275,36 +326,26 @@ void QnWorkbenchWelcomeScreen::createAccount()
     menu()->trigger(QnActions::OpenCloudRegisterUrl);
 }
 
-void QnWorkbenchWelcomeScreen::tryHideScreen()
-{
-    if (!qnCommon->remoteGUID().isNull())
-        setVisible(false);
-}
-
 //
 
-QColor QnWorkbenchWelcomeScreen::getPaletteColor(const QString &group
-    , int index)
+QColor QnWorkbenchWelcomeScreen::getPaletteColor(const QString& group, int index)
 {
     return m_palette.color(group, index);
 }
 
-QColor QnWorkbenchWelcomeScreen::getDarkerColor(const QColor &color
-    , int offset)
+QColor QnWorkbenchWelcomeScreen::getDarkerColor(const QColor& color, int offset)
 {
     const auto paletteColor = m_palette.color(color);
     return paletteColor.darker(offset);
 }
 
-QColor QnWorkbenchWelcomeScreen::getLighterColor(const QColor &color
-    , int offset)
+QColor QnWorkbenchWelcomeScreen::getLighterColor(const QColor& color, int offset)
 {
     const auto paletteColor = m_palette.color(color);
     return paletteColor.lighter(offset);
 }
 
-QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color
-    , qreal alpha)
+QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color, qreal alpha)
 {
     color.setAlphaF(alpha);
     return color;
@@ -315,8 +356,7 @@ void QnWorkbenchWelcomeScreen::showScreen()
     setVisible(true);
 }
 
-bool QnWorkbenchWelcomeScreen::eventFilter(QObject *obj
-    , QEvent *event)
+bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)
 {
     switch(event->type())
     {

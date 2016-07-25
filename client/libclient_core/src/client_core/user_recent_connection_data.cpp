@@ -18,7 +18,8 @@ namespace
     const auto kNameTag = lit("name");
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnUserRecentConnectionData, (datastream)(eq), QnUserRecentConnectionData_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnUserRecentConnectionData), (datastream)(eq), _Fields)
 
 QnUserRecentConnectionData::QnUserRecentConnectionData() :
     name(),
@@ -79,18 +80,18 @@ int QnUserRecentConnectionDataList::getIndexByName(const QString& name) const
     {
         return (data.name == name);
     });
-    return (it == end() ? kNotFoundIndex : it - begin());
+    return (it == end() ? -1 : it - begin());
 }
 
 QnUserRecentConnectionData QnUserRecentConnectionDataList::getByName(const QString& name) const
 {
     const auto index = getIndexByName(name);
-    return (index == kNotFoundIndex ? QnUserRecentConnectionData() : at(index));
+    return (index == -1 ? QnUserRecentConnectionData() : at(index));
 }
 
 bool QnUserRecentConnectionDataList::contains(const QString& name) const
 {
-    return (getIndexByName(name) != kNotFoundIndex);
+    return (getIndexByName(name) != -1);
 }
 
 QString QnUserRecentConnectionDataList::generateUniqueName(const QString &base) const

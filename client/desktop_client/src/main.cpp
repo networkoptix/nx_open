@@ -7,13 +7,6 @@
 
 #include <qglobal.h>
 
-#ifdef Q_OS_WIN
-#include <common/systemexcept_win32.h>
-#endif
-#ifdef Q_OS_LINUX
-#include <common/systemexcept_linux.h>
-#endif
-
 #ifdef Q_OS_LINUX
 #   include <unistd.h>
 #endif
@@ -35,6 +28,8 @@
 #include <QtGui/QDesktopServices>
 #include <QtSingleApplication>
 
+#include <common/systemexcept.h>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
@@ -44,7 +39,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
 
-#include <openal/qtvaudiodevice.h>
+#include <nx/audio/audiodevice.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_handler.h>
@@ -89,14 +84,17 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     QnClientModule client(startupParams);
 
     /* Running updater after QApplication and NX_LOG are initialized. */
-    nx::vms::client::SelfUpdater updater(startupParams);
+    if (qnRuntime->isDesktopMode())
+    {
+        nx::vms::client::SelfUpdater updater(startupParams);
+    }
 
     /* Immediately exit if run in self-update mode. */
     if (startupParams.selfUpdateMode)
         return kSuccessCode;
 
     /* Initialize sound. */
-    QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());
+    nx::audio::AudioDevice::instance()->setVolume(qnSettings->audioVolume());
 
     QnHelpHandler helpHandler;
     qApp->installEventFilter(&helpHandler);
@@ -135,8 +133,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
         qApp->processEvents();
     }
 
-    const bool instantlyMaximize = !startupParams.fullScreenDisabled
-        && startupParams.videoWallGuid.isNull();
+    const bool instantlyMaximize = !startupParams.fullScreenDisabled && qnRuntime->isDesktopMode();
 
     if (instantlyMaximize)
         context->action(QnActions::EffectiveMaximizeAction)->trigger();
@@ -154,7 +151,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     int result = application->exec();
 
     /* Write out settings. */
-    qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
+    qnSettings->setAudioVolume(nx::audio::AudioDevice::instance()->volume());
     qnSettings->save();
 
     return result;

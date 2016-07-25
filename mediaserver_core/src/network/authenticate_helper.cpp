@@ -29,6 +29,7 @@
 
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_user_manager.h>
+#include <nx/network/http/auth_tools.h>
 
 
 ////////////////////////////////////////////////////////////
@@ -110,6 +111,8 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             {
                 if (usedAuthMethod)
                     *usedAuthMethod = AuthMethod::tempUrlQueryParam;
+                if (authUserId)
+                    *authUserId = it->second.authUserId;
                 return Qn::Auth_OK;
             }
         }
@@ -172,6 +175,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             ? nx_http::getHeaderValue( request.headers, "Proxy-Authorization" )
             : nx_http::getHeaderValue( request.headers, "Authorization" );
         const nx_http::StringType nxUserName = nx_http::getHeaderValue( request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME );
+        bool canUpdateRealm = request.headers.find(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME) != request.headers.end();
         if( authorization.isEmpty() )
         {
             Qn::AuthResult authResult = Qn::Auth_WrongDigest;
@@ -189,8 +193,9 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                         if (errCode != Qn::Auth_OK)
                             return errCode;
                     }
-                    if( userResource->getRealm() != desiredRealm ||
-                        userResource->getDigest().isEmpty() )   //in case of ldap digest is initially empty
+                    if(canUpdateRealm &&
+                      (userResource->getRealm() != desiredRealm ||
+                       userResource->getDigest().isEmpty()) )   //in case of ldap digest is initially empty
                     {
                         //requesting client to re-calculate digest after upgrade to 2.4
                         nx_http::insertOrReplaceHeader(
@@ -290,6 +295,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                 authResult == Qn::Auth_OK &&
                 qnResPool->getResourceById<QnMediaServerResource>(*authUserId))
             {
+                *authUserId = Qn::kDefaultUserAccess.userId;
                 auto itr = request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME);
                 if (itr != request.headers.end())
                 {
@@ -338,7 +344,10 @@ QnAuthMethodRestrictionList* QnAuthHelper::restrictionList()
     return &m_authMethodRestrictionList;
 }
 
-QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath( const QString& path, unsigned int periodMillis )
+QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath(
+    const QnUuid& authUserId,
+    const QString& path,
+    unsigned int periodMillis)
 {
     QString authKey = QnUuid::createUuid().toString();
     if( authKey.isEmpty() )
@@ -358,6 +367,7 @@ QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath( cons
     TempAuthenticationKeyCtx ctx;
     ctx.timeGuard = std::move( timerGuard );
     ctx.path = path;
+    ctx.authUserId = authUserId;
     m_authenticatedPaths.emplace( authKey, std::move( ctx ) );
 
     return QPair<QString, QString>( TEMP_AUTH_KEY_NAME, authKey );
@@ -834,4 +844,21 @@ Qn::AuthResult QnAuthHelper::checkDigestValidity(QnUserResourcePtr userResource,
         return Qn::Auth_OK;
 
     return QnLdapManager::instance()->authenticateWithDigest( userResource->getName(), QLatin1String(digest) );
+}
+
+bool QnAuthHelper::checkUserPassword(const QnUserResourcePtr& user, const QString& password)
+{
+    if (!user->isCloud())
+        return user->checkLocalUserPassword(password);
+
+    // 3. Cloud users
+    QByteArray auth = createHttpQueryAuthParam(
+        user->getName(),
+        password,
+        user->getRealm(),
+        "GET",
+        qnAuthHelper->generateNonce());
+
+    nx_http::Response response;
+    return authenticateByUrl(auth, QByteArray("GET"), response) == Qn::Auth_OK;
 }
