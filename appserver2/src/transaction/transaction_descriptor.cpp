@@ -323,7 +323,9 @@ namespace detail
         template<typename Param>
         bool operator()(const QnUuid&, const Param&)
         {
-            NX_ASSERT(0, "Invalid check for this ApiCommand. We shouldn't be here.");
+            auto td = getTransactionDescriptorByParam<Param>();
+            auto transactionName = td->getName();
+            NX_ASSERT(0, lit("Invalid access check for this transaction (%1). We shouldn't be here.").arg(transactionName));
             return false;
         }
     };
@@ -333,7 +335,9 @@ namespace detail
         template<typename Param>
         RemotePeerAccess operator()(const QnUuid&, const Param&)
         {
-            NX_ASSERT(0, "Invalid check for this ApiCommand. We shouldn't be here.");
+            auto td = getTransactionDescriptorByParam<Param>();
+            auto transactionName = td->getName();
+            NX_ASSERT(0, lit("Invalid outgoing transaction access check (%1). We shouldn't be here.").arg(transactionName));
             return RemotePeerAccess::Forbidden;
         }
     };
@@ -394,10 +398,26 @@ namespace detail
             auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
 
             QnResourcePtr target = qnResPool->getResourceById(param.id);
+            bool result = false;
             if (!target)
-                return qnResourceAccessManager->canCreateResource(userResource, param);
+            {
+                auto createAccessResult = qnResourceAccessManager->canCreateResource(userResource, param);
+                if (createAccessResult == QnResourceAccessManager::CanCreateResourceCode::NotImplemented)
+                    result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+                else
+                    result = (createAccessResult == QnResourceAccessManager::CanCreateResourceCode::Yes) ? true : false;
+            }
             else
-                return qnResourceAccessManager->canModifyResource(userResource, target, param);
+                result = qnResourceAccessManager->canModifyResource(userResource, target, param);
+
+            if (!result)
+                NX_LOG(lit("Modify resource access returned false for transaction %1. User resource isNull: %2. Target resource isNull %3")
+                        .arg(getTransactionDescriptorByParam<Param>()->getName())
+                        .arg(!(bool)userResource)
+                        .arg(!(bool)target),
+                       cl_logDEBUG1);
+
+            return result;
         }
     };
 
@@ -562,7 +582,9 @@ namespace detail
         template<typename ParamType>
         void operator()(const QnUuid&, ParamType&)
         {
-            NX_ASSERT(0, "This param type doesn't support filtering");
+            auto td = getTransactionDescriptorByParam<ParamType>();
+            auto transactionName = td->getName();
+            NX_ASSERT(0, lit("This transaction (%1) param type doesn't support filtering").arg(transactionName));
         }
     };
 
@@ -588,7 +610,14 @@ namespace detail
             ParamContainer tmpContainer = paramContainer;
             FilterListByAccess<SingleAccess>()(userId, tmpContainer);
             if (paramContainer.size() != tmpContainer.size())
+            {
+                NX_LOG(lit("Modify list access filtered out %1 entries from %2. Transaction: %3")
+                        .arg(paramContainer.size() - tmpContainer.size())
+                        .arg(paramContainer.size())
+                        .arg(getTransactionDescriptorByParam<ParamContainer>()->getName()),
+                       cl_logDEBUG1);
                 return false;
+            }
             return true;
         }
     };

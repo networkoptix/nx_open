@@ -1123,11 +1123,11 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
                        false, \
                        InvalidGetHashHelper(), \
                        InvalidTriggerNotificationHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 
 
 #define TRANSACTION_ENUM_APPLY(value, name, ...) name = value,

@@ -337,7 +337,7 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& us
 
     /* Resource is not added to pool, checking if we can create such resource. */
     if (!resource->resourcePool())
-        return canCreateResource(user, resource)
+        return canCreateResource(user, resource) == CanCreateResourceCode::Yes
             ? Qn::ReadWriteSavePermission
             : Qn::NoPermissions;
 
@@ -363,62 +363,62 @@ bool QnResourceAccessManager::hasPermission(const QnUserResourcePtr& user, const
     return (permissions(user, resource) & requiredPermissions) == requiredPermissions;
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const
+QnResourceAccessManager::CanCreateResourceCode QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const
 {
     NX_ASSERT(user);
     NX_ASSERT(target);
 
     if (!user)
-        return false;
+        return CanCreateResourceCode::No;
 
     if (qnCommon->isReadOnly())
-        return false;
+        return CanCreateResourceCode::No;
 
     /* Check new layouts creating. */
     if (QnLayoutResourcePtr layout = target.dynamicCast<QnLayoutResource>())
-        return canCreateLayout(user, layout->getParentId());
+        return canCreateLayout(user, layout->getParentId()) ? CanCreateResourceCode::Yes : CanCreateResourceCode::No;
 
     /* Check new users creating. */
     if (QnUserResourcePtr targetUser = target.dynamicCast<QnUserResource>())
-        return canCreateUser(user, targetUser->getRawPermissions(), targetUser->isOwner());
+        return canCreateUser(user, targetUser->getRawPermissions(), targetUser->isOwner()) ? CanCreateResourceCode::Yes : CanCreateResourceCode::No;
 
     if (QnStorageResourcePtr storage = target.dynamicCast<QnStorageResource>())
-        return canCreateStorage(user, storage->getParentId());
+        return canCreateStorage(user, storage->getParentId()) ? CanCreateResourceCode::Yes : CanCreateResourceCode::No;
 
     if (QnVideoWallResourcePtr videoWall = target.dynamicCast<QnVideoWallResource>())
-        return canCreateVideoWall(user);
+        return canCreateVideoWall(user) ? CanCreateResourceCode::Yes : CanCreateResourceCode::No;
 
     if (QnWebPageResourcePtr webPage = target.dynamicCast<QnWebPageResource>())
-        return canCreateWebPage(user);
+        return canCreateWebPage(user) ? CanCreateResourceCode::Yes : CanCreateResourceCode::No;
 
-    return hasGlobalPermission(user, Qn::GlobalAdminPermission);
+    return hasGlobalPermission(user, Qn::GlobalAdminPermission) ? CanCreateResourceCode::Yes : CanCreateResourceCode::No;
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const
+QnResourceAccessManager::CanCreateResourceCode QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const
 {
-    return canCreateStorage(user, data.parentId);
+    return canCreateStorage(user, data.parentId) ? CanCreateResourceCode::Yes : CanCreateResourceCode::No;
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const
+QnResourceAccessManager::CanCreateResourceCode QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const
 {
-    return canCreateLayout(user, data.parentId);
+    return canCreateLayout(user, data.parentId) ? CanCreateResourceCode::Yes : CanCreateResourceCode::No;
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiUserData& data) const
+QnResourceAccessManager::CanCreateResourceCode QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiUserData& data) const
 {
-    return canCreateUser(user, data.permissions, data.isAdmin);
+    return canCreateUser(user, data.permissions, data.isAdmin) ? CanCreateResourceCode::Yes : CanCreateResourceCode::No;
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const
-{
-    Q_UNUSED(data);
-    return canCreateVideoWall(user);
-}
-
-bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const
+QnResourceAccessManager::CanCreateResourceCode QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const
 {
     Q_UNUSED(data);
-    return canCreateWebPage(user);
+    return canCreateVideoWall(user) ? CanCreateResourceCode::Yes : CanCreateResourceCode::No;
+}
+
+QnResourceAccessManager::CanCreateResourceCode QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const
+{
+    Q_UNUSED(data);
+    return canCreateWebPage(user) ? CanCreateResourceCode::Yes : CanCreateResourceCode::No;
 }
 
 void QnResourceAccessManager::invalidateResourceCache(const QnResourcePtr& resource)
