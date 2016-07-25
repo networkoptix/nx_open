@@ -47,10 +47,11 @@ enum class AddressAttributeType
 
 enum class CloudConnectType
 {
-    kUnknown,
-    kUdtHp,      // UDT over UDP hole punching
-    kTcpHp,      // TCP hole punching
-    kProxy,      // Proxy server address
+    unknown,
+    forwardedTcpPort,   /**< E.g., Upnp */
+    udpHp,      /**< UDP hole punching */
+    tcpHp,      /**< TCP hole punching */
+    proxy,      /**< Proxy server address */
 };
 
 struct NX_NETWORK_API AddressAttribute

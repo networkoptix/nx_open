@@ -8,22 +8,34 @@
 #include "cross_nat_connector.h"
 #include "nx/network/socket_global.h"
 #include "udp/connector.h"
+#include "tcp/forwarded_endpoint_connector.h"
 
 
 namespace nx {
 namespace network {
 namespace cloud {
 
-ConnectorFactory::CloudConnectors 
-    ConnectorFactory::createAllCloudConnectors(const AddressEntry& address)
+ConnectorFactory::CloudConnectors ConnectorFactory::createCloudConnectors(
+    const AddressEntry& targetAddress,
+    const nx::String& connectSessionId,
+    const hpm::api::ConnectResponse& response,
+    std::unique_ptr<UDPSocket> udpSocket)
 {
-    NX_CRITICAL(false);
-
     CloudConnectors connectors;
-    //auto udpHolePunchingConnector = std::make_unique<udp::TunnelConnector>(address);
-    //connectors.emplace(
-    //    CloudConnectType::kUdtHp,
-    //    std::move(udpHolePunchingConnector));
+
+    connectors.emplace_back(
+        std::make_unique<udp::TunnelConnector>(
+            targetAddress,
+            connectSessionId,
+            std::move(udpSocket)));
+
+    if (!response.forwardedTcpEndpointList.empty())
+    {
+        connectors.emplace_back(
+            std::make_unique<tcp::ForwardedEndpointConnector>(
+                targetAddress, connectSessionId));
+    }
+
     return connectors;
 }
 

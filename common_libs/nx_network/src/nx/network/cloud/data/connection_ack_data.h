@@ -25,6 +25,7 @@ public:
 
     nx::String connectSessionId;
     ConnectionMethods connectionMethods;
+    std::list<SocketAddress> forwardedTcpEndpointList;
     std::list<SocketAddress> udpEndpointList;
     CloudConnectVersion cloudConnectVersion;
 
