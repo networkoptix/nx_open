@@ -127,6 +127,9 @@ angular.module('cloudApp')
             return this.accessRoles;
         };
         system.prototype.findAccessRole = function(user){
+            if(!user.isEnabled){
+                return { name: 'Disabled' }
+            }
             var self = this;
             var role = _.find(this.accessRoles,function(role){
                 if(user.isAdmin){ // Owner flag has top priority and overrides everything
@@ -154,23 +157,20 @@ angular.module('cloudApp')
         system.prototype.getUsersDataFromTheSystem = function(){
             var self = this;
             function processUsers(users, groups, predefinedRoles){
-                var groupAssoc = _.indexBy(groups,'id');
+                self.predefinedRoles = predefinedRoles;
+                _.each(self.predefinedRoles, function(role){
+                    role.isAdmin = self.isAdmin(role);
+                });
+
+                self.groups = _.sortBy(groups,function(group){return group.name;});
+                self.updateAccessRoles();
+
                 users = _.filter(users, function(user){ return user.isCloud; });
                 // var accessRightsAssoc = _.indexBy(accessRights,'userId');
 
                 _.each(users,function(user){
-                    if(!self.isEmptyGuid(user.groupId)){
-                        user.group = groupAssoc[user.groupId];
-                        //user.accessRights = accessRightsAssoc[user.groupId];
-                        user.accessRole = user.group.name;
-                    }else{
-                        //user.accessRights = accessRightsAssoc[user.id];
-                        user.permissions = normalizePermissionString(user.permissions);
-                        user.accessRole = self.findAccessRole(user).Name;
-                    }
-                    if(!user.isEnabled){
-                        user.accessRole = Config.accessRoles.disabled;
-                    }
+                    user.permissions = normalizePermissionString(user.permissions);
+                    user.accessRole = self.findAccessRole(user).name;
 
                     user.accountEmail = user.email;
 
@@ -180,13 +180,6 @@ angular.module('cloudApp')
                     }
                 });
 
-                self.predefinedRoles = predefinedRoles;
-                _.each(self.predefinedRoles, function(role){
-                    role.isAdmin = self.isAdmin(role);
-                });
-
-                self.groups = _.sortBy(groups,function(group){return group.name;});
-                self.updateAccessRoles();
                 return users;
             }
 
