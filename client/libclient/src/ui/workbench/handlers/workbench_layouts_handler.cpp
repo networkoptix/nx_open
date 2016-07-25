@@ -486,6 +486,8 @@ bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForUser(const QnUserResourceP
     if (directlyAccessible.isEmpty())
         return true;
 
+    auto mediaResources = qnResPool->getResources(directlyAccessible);
+
     QnMessageBox messageBox(
         QnMessageBox::Warning,
         Qn::Empty_Help,
@@ -496,6 +498,7 @@ bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForUser(const QnUserResourceP
     messageBox.setDefaultButton(QDialogButtonBox::Cancel);
     messageBox.setInformativeText(tr("To remove access go to User Settings."));
     messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+    messageBox.addCustomWidget(new QnResourceListView(mediaResources));
 
     auto result = messageBox.exec();
     if (messageBox.isChecked())
@@ -575,9 +578,6 @@ bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnUserResourcePt
     if (mediaResources.isEmpty())
         return true;
 
-    auto treeView = new QnResourceListView();
-    treeView->setResources(mediaResources.toList());
-
     QnMessageBox messageBox(
         QnMessageBox::Warning,
         Qn::Empty_Help,
@@ -587,7 +587,7 @@ bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnUserResourcePt
         mainWindow());
     messageBox.setDefaultButton(QDialogButtonBox::Cancel);
     messageBox.setCheckBoxText(tr("Do not show this message anymore"));
-    messageBox.addCustomWidget(treeView);
+    messageBox.addCustomWidget(new QnResourceListView(mediaResources.toList()));
     messageBox.setInformativeText(tr(
         "User will keep access to cameras, which he has on other shared layouts, or which are "
         "assigned to him directly. Access will be lost to the following %n cameras:",
