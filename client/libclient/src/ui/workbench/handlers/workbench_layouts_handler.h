@@ -32,6 +32,7 @@ private:
     void at_saveCurrentLayoutAsAction_triggered();
     void at_closeLayoutAction_triggered();
     void at_closeAllButThisLayoutAction_triggered();
+    void at_removeFromServerAction_triggered();
     void at_shareLayoutAction_triggered();
     void at_stopSharingLayoutAction_triggered();
     void at_openNewTabAction_triggered();
@@ -60,7 +61,9 @@ private:
     bool confirmLayoutChange(const LayoutChange& change);
 
     bool confirmSharedLayoutChange(const LayoutChange& change);
+    bool confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts);
     bool confirmLayoutChangeForUser(const QnUserResourcePtr& user, const LayoutChange& change);
+    bool confirmDeleteLayoutsForUser(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts);
     bool confirmLayoutChangeForGroup(const QnUuid& groupId, const LayoutChange& change);
 
     bool confirmStopSharingLayouts(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts);

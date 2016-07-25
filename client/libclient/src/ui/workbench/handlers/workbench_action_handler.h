@@ -242,6 +242,8 @@ private:
 
     qint64 getFirstBookmarkTimeMs();
 
+    bool confirmResourcesDelete(const QnResourceList& resources);
+
 private:
     QPointer<QMenu> m_mainMenu;
     QPointer<QMenu> m_currentUserLayoutsMenu;
