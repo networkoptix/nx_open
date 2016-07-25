@@ -246,39 +246,34 @@ bool QnManualCameraSearcher::run(
     QnSearchTask::SearchDoneCallback callback = 
         [this, threadPool](const QnManualCameraSearchCameraList& results, QnSearchTask* const task)
         {
+            QnMutexLocker lock(&m_mutex);
             auto queueName = task->url().toString();
+            
+            m_remainingTaskCount--;
+
+            auto& context = m_searchQueueContexts[queueName];
+
+            context.isBlocked = false;
+            context.runningTaskCount--;
+
+            if (m_cancelled)
             {
-                QnMutexLocker lock(&m_mutex);
-                m_remainingTaskCount--;
-
-                auto& context = m_searchQueueContexts[queueName];
-
-                context.isBlocked = false;
-                context.runningTaskCount--;
-
-                if (m_cancelled)
-                {
-                    m_waitCondition.wakeOne();
-                    return;
-                }
-
-                m_results.append(results);
-
-                if (task->doesInterruptTaskProcessing() && !results.isEmpty())
-                {
-                    m_remainingTaskCount -= m_urlSearchTaskQueues[queueName].size();
-                    context.isInterrupted = true;
-                }
-
+                m_waitCondition.wakeOne();
+                return;
             }
 
-            runTasks(threadPool);
+            m_results.append(results);
 
+            if (task->doesInterruptTaskProcessing() && !results.isEmpty())
             {
-                QnMutexLocker lock(&m_mutex);
-                if (m_remainingTaskCount == 0 || m_cancelled)
-                    m_waitCondition.wakeOne();
+                m_remainingTaskCount -= m_urlSearchTaskQueues[queueName].size();
+                context.isInterrupted = true;
             }
+
+            runTasksUnsafe(threadPool);
+
+            if (m_remainingTaskCount == 0 || m_cancelled)
+                m_waitCondition.wakeOne();
         };
 
     QnSearchTask::SearcherList sequentialSearchers;
@@ -334,18 +329,7 @@ bool QnManualCameraSearcher::run(
     }
 
     m_totalTaskCount = m_remainingTaskCount;
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_state = QnManualCameraSearchStatus::CheckingHost;
-        if (m_cancelled)
-        {
-            m_state = QnManualCameraSearchStatus::Aborted;
-            return true;
-        }
-    }
-
-    runTasks(threadPool);
+    int kMaxWaitTimeMs = 2000;
 
     auto hasRunningTasks = 
         [this]() -> bool
@@ -361,17 +345,21 @@ bool QnManualCameraSearcher::run(
 
             return false;
         };
-    
 
-    int kMaxWaitTime = 2000;
-
-    QnMutex localMutex;
-    QnMutexLocker localLock(&localMutex);
-    while((m_remainingTaskCount > 0 && !m_cancelled) || hasRunningTasks())
-        m_waitCondition.wait(&localMutex, kMaxWaitTime);
-
-    QnMutexLocker lock( &m_mutex );
     {
+        QnMutexLocker lock(&m_mutex);
+        m_state = QnManualCameraSearchStatus::CheckingHost;
+        if (m_cancelled)
+        {
+            m_state = QnManualCameraSearchStatus::Aborted;
+            return true;
+        }
+
+        runTasksUnsafe(threadPool);
+    
+        while((m_remainingTaskCount > 0 && !m_cancelled) || hasRunningTasks())
+            m_waitCondition.wait(&m_mutex, kMaxWaitTimeMs);
+    
         if (!m_cancelled)
             m_state = QnManualCameraSearchStatus::Finished;
     }
@@ -523,10 +511,8 @@ QStringList QnManualCameraSearcher::getOnlineHosts(
     return onlineHosts;
 }
 
-void QnManualCameraSearcher::runTasks(QThreadPool* threadPool)
+void QnManualCameraSearcher::runTasksUnsafe(QThreadPool* threadPool)
 {
-    QnMutexLocker lock(&m_mutex);
-
     if (m_cancelled)
     {
         m_state = QnManualCameraSearchStatus::Aborted;

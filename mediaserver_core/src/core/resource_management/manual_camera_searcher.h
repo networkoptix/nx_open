@@ -96,7 +96,7 @@ private:
         const QString& endAddr, 
         int port = nx_http::DEFAULT_HTTP_PORT);
 
-    void runTasks(QThreadPool* threadPool);
+    void runTasksUnsafe(QThreadPool* threadPool);
 
 private:
     mutable QnMutex m_mutex;
