@@ -129,8 +129,16 @@ class APINotFoundException(APIException):
                                                    status_code=status.HTTP_404_NOT_FOUND)
 
 
+class APIForbiddenException(APIException):
+    # 403 error - action is forbidden
+    def __init__(self, error_text, error_code=ErrorCodes.not_authorized, error_data=None):
+        super(APIForbiddenException, self).__init__(error_text, error_code,
+                                                    error_data=error_data,
+                                                    status_code=status.HTTP_403_FORBIDDEN)
+
+
 class APINotAuthorisedException(APIException):
-    # 401 error - service unavailable
+    # 401 error - user is not authorized
     def __init__(self, error_text, error_code=ErrorCodes.not_authorized, error_data=None):
         super(APINotAuthorisedException, self).__init__(error_text,
                                                         error_code,
@@ -174,7 +182,7 @@ def validate_mediaserver_response(func):
             status.HTTP_500_INTERNAL_SERVER_ERROR: APIInternalException,
             status.HTTP_503_SERVICE_UNAVAILABLE: APIServiceException,
             status.HTTP_404_NOT_FOUND: APINotFoundException,
-            # HTTP_403_FORBIDDEN
+            status.HTTP_403_FORBIDDEN: APIForbiddenException,
             status.HTTP_401_UNAUTHORIZED: APINotAuthorisedException,
             status.HTTP_400_BAD_REQUEST: APIRequestException,
         }
