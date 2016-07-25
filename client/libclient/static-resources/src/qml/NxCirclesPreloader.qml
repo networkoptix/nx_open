@@ -10,8 +10,7 @@ BusyIndicator
     property color color: Style.colors.mid;
 
     implicitWidth: 60;
-    implicitHeight: 60;
-
+    implicitHeight: implicitWidth;
     contentItem: null;
 
     Repeater
@@ -26,6 +25,12 @@ BusyIndicator
             border.width: 2;
             border.color: control.color;
             color: "transparent";
+
+            onWidthChanged:
+            {
+                if (width > control.implicitWidth)
+                    control.implicitWidth = width;
+            }
 
             SequentialAnimation
             {
