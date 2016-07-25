@@ -2,7 +2,7 @@
 #define QN_LINUX_MONITOR_H
 
 #include <QFuture>
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 #include <boost/optional.hpp>
 #include "sigar_monitor.h"
 #include <utils/common/systemerror.h>
