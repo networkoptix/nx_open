@@ -18,6 +18,7 @@
 #include "abstract_cross_nat_connector.h"
 #include "abstract_outgoing_tunnel_connection.h"
 #include "abstract_tunnel_connector.h"
+#include "connector_factory.h"
 #include "nx/network/aio/basic_pollable.h"
 #include "nx/network/cloud/address_resolver.h"
 #include "nx/network/cloud/data/connect_data.h"
@@ -63,7 +64,7 @@ protected:
 private:
     const AddressEntry m_targetPeerAddress;
     const nx::String m_connectSessionId;
-    std::map<CloudConnectType, std::unique_ptr<AbstractTunnelConnector>> m_connectors;
+    ConnectorFactory::CloudConnectors m_connectors;
     ConnectCompletionHandler m_completionHandler;
     SocketAddress m_mediatorAddress;
     std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
@@ -82,13 +83,13 @@ private:
         nx::hpm::api::ResultCode resultCode,
         nx::hpm::api::ConnectResponse response);
     void onConnectorFinished(
-        CloudConnectType connectorType,
-        nx::hpm::api::UdpHolePunchingResultCode resultCode,
+        ConnectorFactory::CloudConnectors::iterator connectorIter,
+        nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
     void onTimeout();
     void holePunchingDone(
-        nx::hpm::api::UdpHolePunchingResultCode resultCode,
+        nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode sysErrorCode);
     void connectSessionReportSent(SystemError::ErrorCode errorCode);
 

@@ -15,20 +15,20 @@ namespace api {
 using namespace stun::cc;
 
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(UdpHolePunchingResultCode,
-    (UdpHolePunchingResultCode::ok, "ok")
-    (UdpHolePunchingResultCode::noResponseFromMediator, "noResponseFromMediator")
-    (UdpHolePunchingResultCode::mediatorReportedError, "mediatorReportedError")
-    (UdpHolePunchingResultCode::targetPeerHasNoUdpAddress, "targetPeerHasNoUdpAddress")
-    (UdpHolePunchingResultCode::noSynFromTargetPeer, "noSynFromTargetPeer")
-    (UdpHolePunchingResultCode::udtConnectFailed, "udtConnectFailed")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(NatTraversalResultCode,
+    (NatTraversalResultCode::ok, "ok")
+    (NatTraversalResultCode::noResponseFromMediator, "noResponseFromMediator")
+    (NatTraversalResultCode::mediatorReportedError, "mediatorReportedError")
+    (NatTraversalResultCode::targetPeerHasNoUdpAddress, "targetPeerHasNoUdpAddress")
+    (NatTraversalResultCode::noSynFromTargetPeer, "noSynFromTargetPeer")
+    (NatTraversalResultCode::udtConnectFailed, "udtConnectFailed")
     )
 
 
 ConnectionResultRequest::ConnectionResultRequest()
 :
     StunRequestData(kMethod),
-    resultCode(UdpHolePunchingResultCode::ok),
+    resultCode(NatTraversalResultCode::ok),
     sysErrorCode(SystemError::noError)
 {
 }

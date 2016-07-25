@@ -44,16 +44,10 @@ public:
     TunnelConnector(
         AddressEntry targetHostAddress,
         nx::String connectSessionId,
-        std::unique_ptr<nx::network::UDPSocket> udpSocket,
-        SocketAddress localAddress);
+        std::unique_ptr<nx::network::UDPSocket> udpSocket);
     virtual ~TunnelConnector();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-
-    virtual aio::AbstractAioThread* getAioThread() const override;
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
-    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
+    virtual void stopWhileInAioThread() override;
 
     virtual int getPriority() const override;
     /** Only one connect can be running at a time.
@@ -91,7 +85,7 @@ private:
     void onHandshakeComplete(SystemError::ErrorCode errorCode);
     /** always called within aio thread */
     void holePunchingDone(
-        nx::hpm::api::UdpHolePunchingResultCode resultCode,
+        nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode sysErrorCode);
 };
 

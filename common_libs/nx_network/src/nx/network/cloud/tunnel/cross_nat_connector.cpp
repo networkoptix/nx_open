@@ -7,7 +7,6 @@
 
 #include <nx/fusion/serialization/lexical.h>
 
-#include "connector_factory.h"
 #include "nx/network/socket_global.h"
 #include "udp/connector.h"
 
@@ -19,18 +18,18 @@ namespace cloud {
 using namespace nx::hpm;
 
 namespace {
-api::UdpHolePunchingResultCode mediatorResultToHolePunchingResult(
+api::NatTraversalResultCode mediatorResultToHolePunchingResult(
     api::ResultCode resultCode)
 {
     switch (resultCode)
     {
         case api::ResultCode::ok:
-            return api::UdpHolePunchingResultCode::ok;
+            return api::NatTraversalResultCode::ok;
         case api::ResultCode::networkError:
         case api::ResultCode::timedOut:
-            return api::UdpHolePunchingResultCode::noResponseFromMediator;
+            return api::NatTraversalResultCode::noResponseFromMediator;
         default:
-            return api::UdpHolePunchingResultCode::mediatorReportedError;
+            return api::NatTraversalResultCode::mediatorReportedError;
     }
 }
 
@@ -162,7 +161,7 @@ void CrossNatConnector::issueConnectRequestToMediator(
     m_completionHandler = std::move(handler);
 
     m_connectResultReport.resultCode =
-        api::UdpHolePunchingResultCode::noResponseFromMediator;
+        api::NatTraversalResultCode::noResponseFromMediator;
 
     api::ConnectRequest connectRequest;
     connectRequest.originatingPeerID = QnUuid::createUuid().toByteArray();
@@ -218,30 +217,27 @@ void CrossNatConnector::onConnectResponse(
             effectiveConnectTimeout = milliseconds(1);   //zero timeout is infinity
     }
 
-    //TODO analyzing response and creating corresponding connectors
-    //m_connectors = ConnectorFactory::createAllCloudConnectors(m_targetPeerAddress);
-    m_connectors.emplace(
-        CloudConnectType::kUdtHp,
-        std::make_unique<udp::TunnelConnector>(
-            m_targetPeerAddress,
-            m_connectSessionId,
-            std::move(m_mediatorUdpClient->takeSocket()),
-            m_localAddress));
+    //creating corresponding connectors
+    m_connectors = ConnectorFactory::createCloudConnectors(
+        m_targetPeerAddress,
+        m_connectSessionId,
+        response,
+        std::move(m_mediatorUdpClient->takeSocket()));
+    //TODO #ak sorting connectors by priority
     m_mediatorUdpClient.reset();
-    for (auto& connector : m_connectors)
+    for (auto it = m_connectors.begin(); it != m_connectors.end(); ++it)
     {
-        auto connectorType = connector.first;
-        connector.second->bindToAioThread(getAioThread());
-        connector.second->connect(
+        (*it)->bindToAioThread(getAioThread());
+        (*it)->connect(
             response,
             effectiveConnectTimeout,
-            [connectorType, this](
-                api::UdpHolePunchingResultCode resultCode,
+            [it, this](
+                api::NatTraversalResultCode resultCode,
                 SystemError::ErrorCode errorCode,
                 std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
             {
                 onConnectorFinished(
-                    connectorType,
+                    it,
                     resultCode,
                     errorCode,
                     std::move(connection));
@@ -250,21 +246,18 @@ void CrossNatConnector::onConnectResponse(
 }
 
 void CrossNatConnector::onConnectorFinished(
-    CloudConnectType connectorType,
-    api::UdpHolePunchingResultCode resultCode,
+    ConnectorFactory::CloudConnectors::iterator connectorIter,
+    api::NatTraversalResultCode resultCode,
     SystemError::ErrorCode sysErrorCode,
     std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
 {
-    const auto connectorIter = m_connectors.find(connectorType);
-    if (connectorIter == m_connectors.end())
-        return; //it can happen when stopping OutgoingTunnel
-    auto connector = std::move(connectorIter->second);
+    auto connector = std::move(*connectorIter);
     m_connectors.erase(connectorIter);
 
-    if (resultCode != api::UdpHolePunchingResultCode::ok && !m_connectors.empty())
+    if (resultCode != api::NatTraversalResultCode::ok && !m_connectors.empty())
         return;     //waiting for other connectors to complete
 
-    NX_CRITICAL((resultCode != api::UdpHolePunchingResultCode::ok) || connection);
+    NX_CRITICAL((resultCode != api::NatTraversalResultCode::ok) || connection);
     m_connectors.clear();   //cancelling other connectors
     m_connection = std::move(connection);
     holePunchingDone(resultCode, sysErrorCode);
@@ -289,7 +282,7 @@ void CrossNatConnector::onTimeout()
 }
 
 void CrossNatConnector::holePunchingDone(
-    api::UdpHolePunchingResultCode resultCode,
+    api::NatTraversalResultCode resultCode,
     SystemError::ErrorCode sysErrorCode)
 {
     NX_LOGX(lm("cross-nat %1. result: %2, system result code: %3")
@@ -301,7 +294,7 @@ void CrossNatConnector::holePunchingDone(
     timer()->cancelSync();
 
     m_connectResultReport.sysErrorCode = sysErrorCode;
-    if (resultCode == api::UdpHolePunchingResultCode::noResponseFromMediator)
+    if (resultCode == api::NatTraversalResultCode::noResponseFromMediator)
     {
         //not sending report to mediator since no answer from mediator...
         return connectSessionReportSent(SystemError::noError);
@@ -338,7 +331,7 @@ void CrossNatConnector::connectSessionReportSent(
 
     //ignoring send report result code
     SystemError::ErrorCode sysErrorCodeToReport = SystemError::noError;
-    if (m_connectResultReport.resultCode != api::UdpHolePunchingResultCode::ok)
+    if (m_connectResultReport.resultCode != api::NatTraversalResultCode::ok)
     {
         sysErrorCodeToReport =
             m_connectResultReport.sysErrorCode == SystemError::noError

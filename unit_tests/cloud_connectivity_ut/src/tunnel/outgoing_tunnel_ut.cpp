@@ -43,12 +43,12 @@ public:
 
     ~DummyConnection()
     {
+        stopWhileInAioThread();
         --instanceCount;
     }
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
+    virtual void stopWhileInAioThread() override
     {
-        completionHandler();
     }
 
     virtual void establishNewConnection(

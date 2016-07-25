@@ -27,55 +27,29 @@ using namespace nx::hpm;
 TunnelConnector::TunnelConnector(
     AddressEntry targetHostAddress,
     nx::String connectSessionId,
-    std::unique_ptr<nx::network::UDPSocket> udpSocket,
-    SocketAddress localAddress)
+    std::unique_ptr<nx::network::UDPSocket> udpSocket)
 :
     m_targetHostAddress(std::move(targetHostAddress)),
     m_connectSessionId(std::move(connectSessionId)),
     m_udpSocket(std::move(udpSocket)),
-    m_localAddress(std::move(localAddress)),
     m_remotePeerCloudConnectVersion(hpm::api::kDefaultCloudConnectVersion)
 {
     NX_ASSERT(nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
+    NX_CRITICAL(m_udpSocket);
+    m_localAddress = m_udpSocket->getLocalAddress();
 }
 
 TunnelConnector::~TunnelConnector()
 {
     //it is OK if called after pleaseStop or within aio thread after connect handler has been called
+    stopWhileInAioThread();
 }
 
-void TunnelConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void TunnelConnector::stopWhileInAioThread()
 {
-    post(
-        [this, handler = std::move(handler)]() mutable
-        {
-            //m_udtConnection cannot be modified since all processing is already stopped
-            m_timer.pleaseStopSync();
-            m_rendezvousConnectors.clear();
-            m_udtConnection.reset();    //we do not use this connection so can just remove it here
-            m_chosenRendezvousConnector.reset();
-            handler();
-        });
-}
-
-aio::AbstractAioThread* TunnelConnector::getAioThread() const
-{
-    return m_timer.getAioThread();
-}
-
-void TunnelConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
-{
-    m_timer.bindToAioThread(aioThread);
-}
-
-void TunnelConnector::post(nx::utils::MoveOnlyFunc<void()> func)
-{
-    m_timer.post(std::move(func));
-}
-
-void TunnelConnector::dispatch(nx::utils::MoveOnlyFunc<void()> func)
-{
-    m_timer.dispatch(std::move(func));
+    m_rendezvousConnectors.clear();
+    m_udtConnection.reset();    //we do not use this connection so can just remove it here
+    m_chosenRendezvousConnector.reset();
 }
 
 int TunnelConnector::getPriority() const
@@ -99,7 +73,7 @@ void TunnelConnector::connect(
             .arg(m_connectSessionId).arg(m_targetHostAddress.host.toString()),
             cl_logDEBUG1);
         return holePunchingDone(
-            api::UdpHolePunchingResultCode::targetPeerHasNoUdpAddress,
+            api::NatTraversalResultCode::targetPeerHasNoUdpAddress,
             SystemError::connectionReset);
     }
 
@@ -168,7 +142,7 @@ void TunnelConnector::onUdtConnectionEstablished(
     RendezvousConnectorWithVerification* rendezvousConnectorPtr,
     SystemError::ErrorCode errorCode)
 {
-    //we are in m_timer's aio thread
+    //we are in timer's aio thread
     auto rendezvousConnectorIter = std::find_if(
         m_rendezvousConnectors.begin(),
         m_rendezvousConnectors.end(),
@@ -192,7 +166,7 @@ void TunnelConnector::onUdtConnectionEstablished(
         if (!m_rendezvousConnectors.empty())
             return; //waiting for other connectors to complete
         holePunchingDone(
-            api::UdpHolePunchingResultCode::udtConnectFailed,
+            api::NatTraversalResultCode::udtConnectFailed,
             errorCode);
         return;
     }
@@ -233,7 +207,7 @@ void TunnelConnector::onHandshakeComplete(SystemError::ErrorCode errorCode)
             cl_logDEBUG1);
 
         holePunchingDone(
-            api::UdpHolePunchingResultCode::udtConnectFailed,
+            api::NatTraversalResultCode::udtConnectFailed,
             errorCode);
         return;
     }
@@ -243,18 +217,18 @@ void TunnelConnector::onHandshakeComplete(SystemError::ErrorCode errorCode)
     rendezvousConnector.reset();
 
     //introducing delay to give server some time to call accept (work around udt bug)
-    m_timer.start(
+    timer()->start(
         std::chrono::milliseconds(200),
         [this]
         {
             holePunchingDone(
-                api::UdpHolePunchingResultCode::ok,
+                api::NatTraversalResultCode::ok,
                 SystemError::noError);
         });
 }
 
 void TunnelConnector::holePunchingDone(
-    api::UdpHolePunchingResultCode resultCode,
+    api::NatTraversalResultCode resultCode,
     SystemError::ErrorCode sysErrorCode)
 {
     NX_LOGX(lm("cross-nat %1. Udp hole punching result: %2, system result code: %3")
@@ -263,10 +237,10 @@ void TunnelConnector::holePunchingDone(
         cl_logDEBUG2);
 
     //we are in aio thread
-    m_timer.cancelSync();
+    timer()->cancelSync();
 
     std::unique_ptr<AbstractOutgoingTunnelConnection> tunnelConnection;
-    if (resultCode == api::UdpHolePunchingResultCode::ok)
+    if (resultCode == api::NatTraversalResultCode::ok)
     {
         tunnelConnection = std::make_unique<OutgoingTunnelConnection>(
             m_connectSessionId,

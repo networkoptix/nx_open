@@ -12,7 +12,7 @@
 #include <nx/utils/move_only_func.h>
 #include <utils/common/stoppable.h>
 
-#include "nx/network/aio/abstract_pollable.h"
+#include "nx/network/aio/basic_pollable.h"
 #include "abstract_outgoing_tunnel_connection.h"
 #include "nx/network/cloud/data/connect_data.h"
 #include "tunnel.h"
@@ -27,11 +27,11 @@ namespace cloud {
  */
 class NX_NETWORK_API AbstractTunnelConnector
 :
-    public aio::AbstractPollable
+    public aio::BasicPollable
 {
 public:
     typedef nx::utils::MoveOnlyFunc<void(
-        nx::hpm::api::UdpHolePunchingResultCode resultCode,
+        nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode sysErrorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection>)> ConnectCompletionHandler;
 
