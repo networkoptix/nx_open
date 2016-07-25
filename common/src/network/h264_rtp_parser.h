@@ -44,6 +44,7 @@ private:
     int m_videoFrameSize;
     bool m_previousPacketHasMarkerBit;
     std::vector<quint8> m_nextFrameChunksBuffer;
+    quint32 m_lastRtpTime;
 private:
     void serializeSpsPps(QnByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);

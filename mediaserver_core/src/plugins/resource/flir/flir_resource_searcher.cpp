@@ -1,11 +1,14 @@
-#include <QtEndian>
 #include "flir_resource_searcher.h"
+
+#ifdef ENABLE_ONVIF
+
+#include <QtEndian>
 #include "flir_eip_resource.h"
 
 QnFlirResourceSearcher::QnFlirResourceSearcher()
 {
-    m_eipFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR-AX8"));
-    m_cgiFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR_COMMON"));
+    m_eipFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR-AX8"), true);
+    m_cgiFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR_COMMON"), true);
 }
 QnFlirResourceSearcher::~QnFlirResourceSearcher()
 {
@@ -185,3 +188,4 @@ void QnFlirResourceSearcher::createResource(const FlirDeviceInfo& info, const QA
     result << resource;
 }
 
+#endif // ENABLE_ONVIF

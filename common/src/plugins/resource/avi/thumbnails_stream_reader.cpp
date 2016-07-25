@@ -1,5 +1,7 @@
 #include "thumbnails_stream_reader.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <utils/common/log.h>
 #include <utils/common/util.h>
 
@@ -17,19 +19,14 @@
 //static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 //static const qint64 LIVE_SEEK_OFFSET = 1000000ll * 10;
 
-QnThumbnailsStreamReader::QnThumbnailsStreamReader(const QnResourcePtr& dev )
+QnThumbnailsStreamReader::QnThumbnailsStreamReader(const QnResourcePtr& dev, QnAbstractArchiveDelegate* archiveDelegate)
 :
-    QnAbstractMediaStreamDataProvider(dev)
+    QnAbstractMediaStreamDataProvider(dev),
+    m_archiveDelegate(archiveDelegate),
+    m_delegate(new QnThumbnailsArchiveDelegate(QnAbstractArchiveDelegatePtr(archiveDelegate))),
+    m_cseq(0)
 {
-    QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(dev.data());
-    if (camRes)
-        m_archiveDelegate = camRes->createArchiveDelegate();
-    if (!m_archiveDelegate)
-        m_archiveDelegate = new QnServerArchiveDelegate(); // default value
-
     m_archiveDelegate->setQuality(MEDIA_Quality_Low, true);
-    m_delegate = new QnThumbnailsArchiveDelegate(QnAbstractArchiveDelegatePtr(m_archiveDelegate));
-    m_cseq = 0;
 }
 
 void QnThumbnailsStreamReader::setQuality(MediaQuality q)
@@ -63,9 +60,9 @@ QnAbstractMediaDataPtr QnThumbnailsStreamReader::createEmptyPacket()
 QnAbstractMediaDataPtr QnThumbnailsStreamReader::getNextData()
 {
     QnAbstractMediaDataPtr result = m_delegate->getNextData();
-    if (result) 
+    if (result)
         return result;
-    else 
+    else
         return createEmptyPacket();
 }
 
@@ -103,8 +100,6 @@ void QnThumbnailsStreamReader::run()
             msleep(30);
             continue;
         }
-
-        checkTime(data);
 
         QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
 
@@ -149,3 +144,5 @@ void QnThumbnailsStreamReader::setGroupId(const QByteArray& groupId)
 {
     m_delegate->setGroupId(groupId);
 }
+
+#endif

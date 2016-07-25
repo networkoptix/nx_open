@@ -1,6 +1,8 @@
 #ifndef __FLIR_ONVIF_RESOURCE_H__
 #define __FLIR_ONVIF_RESOURCE_H__
 
+#ifdef ENABLE_ONVIF
+
 #include <plugins/resource/onvif/onvif_resource.h>
 
 class QnFlirOnvifResource : public QnPlOnvifResource
@@ -23,4 +25,5 @@ public:
 
 typedef QnSharedResourcePointer<QnFlirOnvifResource> QnFlirOnvifResourcePtr;
 
+#endif //  ENABLE_FLIR
 #endif //__FLIR_ONVIF_RESOURCE_H__

@@ -67,7 +67,8 @@ bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModel
 
 QnRecordingStatsModel::QnRecordingStatsModel(bool isForecastRole, QObject *parent):
     base_type(parent),
-    m_isForecastRole(isForecastRole)
+    m_isForecastRole(isForecastRole),
+    m_isHeaderTextBlocked(false)
 { }
 
 QnRecordingStatsModel::~QnRecordingStatsModel()
@@ -273,6 +274,8 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
 
 QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
+    if (m_isHeaderTextBlocked)
+        return QVariant();
     if (orientation != Qt::Horizontal || section >= ColumnCount)
         return base_type::headerData(section, orientation, role);
 
@@ -281,7 +284,7 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
         case CameraNameColumn: return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device"), tr("Camera"));
         case BytesColumn:      return tr("Space");
         case DurationColumn:   return tr("Calendar Days");
-        case BitrateColumn:    return QVariant(); //return tr("Bitrate");
+        case BitrateColumn:    return tr("Bitrate");
         default:
             break;
         }
@@ -316,6 +319,11 @@ QnRecordingStatsColors QnRecordingStatsModel::colors() const {
 void QnRecordingStatsModel::setColors(const QnRecordingStatsColors &colors) {
     m_colors = colors;
     emit colorsChanged();
+}
+
+void QnRecordingStatsModel::setHeaderTextBlocked(bool value)
+{
+    m_isHeaderTextBlocked = value;
 }
 
 QnFooterData QnRecordingStatsModel::calculateFooter(const QnRecordingStatsReply& data) const {

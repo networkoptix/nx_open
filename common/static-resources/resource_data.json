@@ -1186,17 +1186,168 @@
             ],
             "forcedOnvifParams": {
                 "videoEncoders": [
-                    "ve0", "ve8",
-                    "ve1", "ve9",
-                    "ve2", "ve10",
-                    "ve3", "ve11",
-                    "ve4", "ve12",
-                    "ve5", "ve13",
-                    "ve6", "ve14",
-                    "ve7", "ve15"
+                    "ve0,ve8",
+                    "ve1,ve9",
+                    "ve2,ve10",
+                    "ve3,ve11",
+                    "ve4,ve12",
+                    "ve5,ve13",
+                    "ve6,ve14",
+                    "ve7,ve15"
                 ]
-            }
+            },
+			"trustToVideoSourceSize": false,
+			"useExistingOnvifProfies": true,
+			"controlFpsViaEncodingInterval": true,
+			"forcedSecondaryStreamResolution": "352x288",
+			"fpsBase": 25
         },
+		{
+			"keys": [
+				"Pelco|IMM12018",
+				"Pelco|IMM12027",
+				"Pelco|IMM12036"
+			],
+			"onvifVendorSubtype": "PelcoOptera"
+		},
+        {
+            "keys": [
+                "PelcoOptera|IMM12018",
+                "PelcoOptera|IMM12027",
+                "PelcoOptera|IMM12036"
+            ],
+            "doNotConfigureCamera": false 
+        },
+		{
+			"keys": [
+				"PelcoOptera|IMM12018","Pelco|IMM12018"
+			],
+			"multiresourceVideoChannelMapping": [
+				{
+					"resourceChannel": 2,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [2]
+						}
+					]
+				},
+				{
+					"resourceChannel": 3,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [1]
+						}
+					]
+				},
+				{
+					"resourceChannel": 4,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [0]
+						}
+					]
+				}
+			],
+			"shouldAppearAsSingleChannel": true,
+			"doNotAddVendorToDeviceName": true,
+			"videoLayout": "width=3;height=1;sensors=0,1,2"
+		},
+		{
+			"keys": [
+				"PelcoOptera|IMM12027","Pelco|IMM12027"
+			],
+			"multiresourceVideoChannelMapping": [
+				{
+					"resourceChannel": 2,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [2]
+						}
+					]
+				},
+				{
+					"resourceChannel": 3,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [1]
+						}
+					]
+				},
+				{
+					"resourceChannel": 4,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [0]
+						}
+					]
+				},
+				{
+					"resourceChannel": 5,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [3]
+						}
+					]
+				}
+			],
+			"shouldAppearAsSingleChannel": true,
+			"doNotAddVendorToDeviceName": true,
+			"videoLayout": "width=3;height=2;sensors=0,1,2,4,5,3",
+			"defaultAR":"4x3"
+		},
+		{
+			"keys": [
+				"PelcoOptera|IMM12036","Pelco|IMM12036"
+			],
+			"multiresourceVideoChannelMapping": [
+				{
+					"resourceChannel": 2,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [3]
+						}
+					]
+				},
+				{
+					"resourceChannel": 3,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [2]
+						}
+					]
+				},
+				{
+					"resourceChannel": 4,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [1]
+						}
+					]
+				},
+				{
+					"resourceChannel": 6,
+					"channelMap": [
+						{
+							"originalChannel": 0,
+							"mappedChannels": [0]
+						}
+					]
+				}
+			],
+			"shouldAppearAsSingleChannel": true,
+			"doNotAddVendorToDeviceName": true,
+			"videoLayout": "width=4;height=1;sensors=0,1,2,3"
+		},
 		{
 			"keys": [
 				"ACTI|A41", "ACTI|A81"

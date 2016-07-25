@@ -31,6 +31,20 @@ QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
     stop();
 }
 
+void QnAbstractMediaStreamDataProvider::setNeedKeyData(int channel)
+{
+    QnMutexLocker mtx( &m_mutex );
+
+    if (m_numberOfchannels == 0)
+    {
+        m_numberOfchannels = dynamic_cast<QnMediaResource*>(
+            m_mediaResource.data())->getVideoLayout(this)->channelCount();
+    }
+
+    if (m_numberOfchannels < CL_MAX_CHANNEL_NUMBER && channel < m_numberOfchannels)
+        m_gotKeyFrame[channel] = 0;
+}
+
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
     QnMutexLocker mtx( &m_mutex );
@@ -38,7 +52,7 @@ void QnAbstractMediaStreamDataProvider::setNeedKeyData()
     if (m_numberOfchannels==0)
         m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();
 
-    
+
     for (int i = 0; i < m_numberOfchannels; ++i)
         m_gotKeyFrame[i] = 0;
 }
@@ -56,7 +70,7 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
     if (m_numberOfchannels==0)
         m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();
 
-   
+
     for (int i = 0; i < m_numberOfchannels; ++i)
         if (m_gotKeyFrame[i]==0)
             return true;
@@ -211,7 +225,7 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
                     arg(timeDiff).
                     arg(m_mediaResource ? m_mediaResource->getName() : QString()).
                     arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")),
-                    cl_logDEBUG1);
+                    cl_logDEBUG2);
 
                 media->timestamp = m_lastMediaTime[channel] + MIN_FRAME_DURATION;
             }

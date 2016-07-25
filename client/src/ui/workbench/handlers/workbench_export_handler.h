@@ -44,16 +44,21 @@ private:
 
     QnMediaResourceWidget *extractMediaWidget(const QnActionParameters &parameters);
 
-    void exportTimeSelection(
-          const QnMediaResourcePtr &mediaResource
-        , const QnAbstractStreamDataProvider *dataProvider
-        , const QnLayoutItemData &itemData
-        , const QnTimePeriod &period);
+    void exportTimeSelection(const QnActionParameters& parameters, qint64 timelapseFrameStepMs = 0);
+
+    void exportTimeSelectionInternal(
+          const QnMediaResourcePtr &mediaResource,
+          const QnAbstractStreamDataProvider *dataProvider,
+          const QnLayoutItemData &itemData,
+          const QnTimePeriod &period,
+          qint64 timelapseFrameStepMs = 0
+        );
 
 private slots:
     void at_exportTimeSelectionAction_triggered();
-
     void at_exportLayoutAction_triggered();
+    void at_exportTimelapseAction_triggered();
+
     void at_layout_exportFinished(bool success, const QString &filename);
     void at_camera_exportFinished(bool success, const QString &fileName);
 

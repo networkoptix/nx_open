@@ -1,7 +1,7 @@
 .import "../main.js" as Main
 
 function makeUrl(host, port, login, password) {
-    return "http://" + login + ":" + password + "@" + host + ":" + port
+    return "http://" + encodeURIComponent(login) + ":" + encodeURIComponent(password) + "@" + host + ":" + port
 }
 
 function updateSession(sessionId, host, port, login, password, systemName, moveTop) {
