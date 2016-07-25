@@ -33,7 +33,8 @@ class HttpClientPoolTest
 public:
     HttpClientPoolTest()
     :
-        m_testHttpServer( std::make_unique<TestHttpServer>() )
+        m_testHttpServer(std::make_unique<TestHttpServer>()),
+        m_testHttpServer2(std::make_unique<TestHttpServer>())
     {
     }
 
@@ -42,8 +43,14 @@ public:
         return m_testHttpServer.get();
     }
 
+    TestHttpServer* testHttpServer2()
+    {
+        return m_testHttpServer2.get();
+    }
+
 protected:
     std::unique_ptr<TestHttpServer> m_testHttpServer;
+    std::unique_ptr<TestHttpServer> m_testHttpServer2;
 };
 
 TEST_F(HttpClientPoolTest, GeneralTest)
@@ -52,17 +59,18 @@ TEST_F(HttpClientPoolTest, GeneralTest)
         "/test",
         "SimpleTest",
         "application/text"));
-    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
+    ASSERT_TRUE(testHttpServer2()->registerStaticProcessor(
         "/test2",
         "SimpleTest2",
         "application/text"));
 
     ASSERT_TRUE(testHttpServer()->bindAndListen());
+    ASSERT_TRUE(testHttpServer2()->bindAndListen());
 
     const QUrl url(lit("http://127.0.0.1:%1/test")
         .arg(testHttpServer()->serverAddress().port));
     const QUrl url2(lit("http://127.0.0.1:%1/test2")
-        .arg(testHttpServer()->serverAddress().port));
+        .arg(testHttpServer2()->serverAddress().port));
 
 
     std::unique_ptr<nx_http::ClientPool> httpPool(new nx_http::ClientPool());
