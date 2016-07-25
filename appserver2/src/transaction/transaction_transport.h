@@ -13,7 +13,7 @@
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
-#include <transaction/transaction_permissions.h>
+#include <transaction/transaction_descriptor.h>
 
 #include "utils/common/id.h"
 #include <nx/utils/log/log.h>
@@ -128,24 +128,10 @@ signals:
     void remotePeerUnauthorized(const QnUuid& id);
     void peerIdDiscovered(const QUrl& url, const QnUuid& id);
 
-public:
+private:
     template<class T> 
-    void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header) 
+    void sendTransactionImpl(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header) 
     {
-        /* Check if peer has enough rights to receive transaction */
-        bool peerHasEnoughRights = ec2::hasPermission(m_userAccessData.userId, transaction.params, Qn::Permission::ReadPermission);
-		if (!peerHasEnoughRights)
-		{
-			NX_LOG(
-				QnLog::EC2_TRAN_LOG, 
-				lit("Permission check failed while sending transaction %1 to peer %2")
-					.arg(transaction.toString())
-					.arg(remotePeer().id.toString()),
-				cl_logDEBUG1 
-			);
-			return;
-		}
-
         QnTransactionTransportHeader header(_header);
         NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
         header.fillSequence();
@@ -180,6 +166,53 @@ public:
             addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
         }
+    }
+
+public:
+    template<class T>
+    void sendTransaction(const QnTransaction<T>& transaction, const QnTransactionTransportHeader& header)
+    {
+        auto remoteAccess = ec2::getTransactionDescriptorByTransaction(transaction)->checkRemotePeerAccessFunc(m_userAccessData.userId, transaction.params);
+        if (remoteAccess == RemotePeerAccess::Forbidden)
+        {
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Permission check failed while sending transaction %1 to peer %2") 
+                   .arg(transaction.toString()) 
+                   .arg(remotePeer().id.toString()),
+                cl_logDEBUG1);
+            return;
+        }
+        sendTransactionImpl(transaction, header);
+    }
+
+    template<template<typename, typename> class Cont, typename Param, typename A>
+    void sendTransaction(const QnTransaction<Cont<Param,A>>& transaction, const QnTransactionTransportHeader& header)
+    {
+        auto td = ec2::getTransactionDescriptorByTransaction(transaction);
+        auto remoteAccess = td->checkRemotePeerAccessFunc(m_userAccessData.userId, transaction.params);
+
+        if (remoteAccess == RemotePeerAccess::Forbidden)
+        {
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Permission check failed while sending transaction %1 to peer %2") 
+                   .arg(transaction.toString()) 
+                   .arg(remotePeer().id.toString()),
+                cl_logDEBUG1);
+            return;
+        }
+        else if (remoteAccess == RemotePeerAccess::Partial)
+        {
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Permission check PARTIALLY failed while sending transaction %1 to peer %2") 
+                   .arg(transaction.toString()) 
+                   .arg(remotePeer().id.toString()),
+                cl_logDEBUG1);
+
+            Cont<Param,A> filteredParams = transaction.params;
+            td->filterByReadPermissionFunc(m_userAccessData.userId, filteredParams);
+            auto newTransaction = transaction;
+            newTransaction.params = filteredParams;
+
+            sendTransactionImpl(newTransaction, header);
+        }
+        sendTransactionImpl(transaction, header);
     }
 
     bool sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran,
