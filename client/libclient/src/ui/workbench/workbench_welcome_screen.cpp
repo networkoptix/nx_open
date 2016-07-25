@@ -270,10 +270,7 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId, con
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 {
-    const QScopedPointer<QnLoginDialog> dialog(
-        new QnLoginDialog(context()->mainWindow()));
-
-    dialog->exec();
+    menu()->trigger(QnActions::OpenLoginDialogAction);
 }
 
 void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
@@ -286,7 +283,10 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
     {
         /* We are receiving string with port but without protocol, so we must parse it. */
         const QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindow()));
-        dialog->setUrl(QUrl::fromUserInput(serverUrl));
+
+        QUrl targetUrl = QUrl::fromUserInput(serverUrl);
+        targetUrl.setScheme(lit("http"));
+        dialog->setUrl(targetUrl);
         if (isLoggedInToCloud())
         {
             dialog->setCloudLogin(qnCloudStatusWatcher->cloudLogin());

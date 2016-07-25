@@ -8,10 +8,10 @@
 #include <nx_ec/ec_proto_version.h>
 
 
-QnConnectionInfo::QnConnectionInfo()
-:
-    allowSslConnections( false ),
-    nxClusterProtoVersion( nx_ec::INITIAL_EC2_PROTO_VERSION ),
-    ecDbReadOnly( false )
+QnConnectionInfo::QnConnectionInfo():
+    allowSslConnections(false),
+    nxClusterProtoVersion(nx_ec::INITIAL_EC2_PROTO_VERSION),
+    ecDbReadOnly(false),
+    newSystem(false)
 {
 }

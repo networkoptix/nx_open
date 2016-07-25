@@ -2,6 +2,8 @@
 
 #include <functional>
 
+#include <api/global_settings.h>
+
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/simple_http_client.h>
@@ -1408,6 +1410,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     connectionInfo->allowSslConnections = m_sslEnabled;
     connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
     connectionInfo->ecDbReadOnly = Settings::instance()->dbReadOnly();
+    connectionInfo->newSystem = qnGlobalSettings->isNewSystem();
     if (response)
     {
         connectionInfo->effectiveUserName =
