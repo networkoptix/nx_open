@@ -102,7 +102,7 @@ void QnUserResource::generateHash()
     setCryptSha512Hash(linuxCryptSha512(password.toUtf8(), generateSalt(LINUX_CRYPT_SALT_LENGTH)));
 }
 
-bool QnUserResource::checkPassword(const QString &password)
+bool QnUserResource::checkLocalUserPassword(const QString &password)
 {
     QnMutexLocker locker(&m_mutex);
 

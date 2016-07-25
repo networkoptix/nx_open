@@ -8,7 +8,7 @@ DialogBase
 {
     id: qualityDialog
 
-    property int activeQuality: QnPlayer.Low
+    property int activeQuality: QnPlayer.LowVideoQuality
     property size actualQuality
 
     implicitHeight: Math.min(parent.height, contentItem.implicitHeight)
@@ -56,7 +56,7 @@ DialogBase
                 text: {
                     if (actualQuality.width > 0 && actualQuality.height > 0)
                         return actualQuality.width + " x " + actualQuality.height
-                    if (activeQuality != QnPlayer.Low && activeQuality != QnPlayer.High)
+                    if (activeQuality != QnPlayer.LowVideoQuality && activeQuality != QnPlayer.HighVideoQuality)
                         return activeQuality + 'p'
                     return qsTr("Unknown")
                 }
@@ -68,12 +68,12 @@ DialogBase
 
             QualityItem
             {
-                quality: QnPlayer.Low
+                quality: QnPlayer.LowVideoQuality
                 text: qsTr("Highest speed")
             }
             QualityItem
             {
-                quality: QnPlayer.High
+                quality: QnPlayer.HighVideoQuality
                 text: qsTr("Best quality")
             }
 

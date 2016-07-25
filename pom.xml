@@ -116,7 +116,7 @@
         <media_db_util.name>${company.name} ${display.product.name} Media DB Utility</media_db_util.name>
 
         <product.display.title>${product.title}</product.display.title>
-        
+
         <!-- Binary Filenames and paths (defaults for linux) -->
         <client.binary.name>client-bin</client.binary.name>
         <minilauncher.binary.name>applauncher</minilauncher.binary.name>

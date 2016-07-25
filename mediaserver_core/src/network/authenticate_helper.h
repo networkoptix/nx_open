@@ -75,7 +75,9 @@ public:
         const QByteArray& authRecord,
         const QByteArray& method,
         nx_http::Response& response,
-        QnUuid* authUserId) const;
+        QnUuid* authUserId = nullptr) const;
+
+    bool checkUserPassword(const QnUserResourcePtr& user, const QString& password);
 
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);

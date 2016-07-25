@@ -125,22 +125,25 @@ void CLVideoDecoderOutput::fillRightEdge()
     if (format == -1)
         return;
     const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
-    quint8 filler = 0;
+    quint32 filler = 0;
     int w = width;
     int h = height;
     for (int i = 0; i < descr->nb_components && data[i]; ++i)
     {
         int bpp = descr->comp[i].step_minus1 + 1;
         int fillLen = linesize[i] - w*bpp;
-        if (fillLen) {
+        if (fillLen >= 4)
+        {
             quint8* dst = data[i] + w*bpp;
-            for (int y = 0; y < h; ++y) {
-                memset(dst, filler, fillLen);
+            for (int y = 0; y < h; ++y)
+            {
+                *dst = filler;
                 dst += linesize[i];
             }
         }
-        if (i == 0) {
-            filler = 0x80;
+        if (i == 0)
+        {
+            filler = 0x80808080;
             w >>= descr->log2_chroma_w;
             h >>= descr->log2_chroma_h;
         }

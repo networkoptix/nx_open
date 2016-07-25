@@ -94,5 +94,11 @@ void VideoDecoderRegistry::setTranscodingEnabled(bool transcodingEnabled)
     m_isTranscodingEnabled = transcodingEnabled;
 }
 
+void VideoDecoderRegistry::reinitialize()
+{
+    m_plugins.clear();
+    m_isTranscodingEnabled = false;
+}
+
 } // namespace media
 } // namespace nx

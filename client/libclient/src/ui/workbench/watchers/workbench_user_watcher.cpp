@@ -153,7 +153,7 @@ bool QnWorkbenchUserWatcher::isReconnectRequired(const QnUserResourcePtr &user)
         return m_userDigest != user->getDigest();
 
     // password was just changed by the user
-    if (!user->checkPassword(m_userPassword))
+    if (!user->checkLocalUserPassword(m_userPassword))
         return true;
 
     m_userDigest = user->getDigest();

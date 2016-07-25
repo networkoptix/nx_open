@@ -34,7 +34,7 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
         if (text.isEmpty())
             return Qn::ValidationResult(tr("To modify your password please enter the existing one."));
 
-        if (!context()->user()->checkPassword(text))
+        if (!context()->user()->checkLocalUserPassword(text))
             return Qn::ValidationResult(tr("Invalid current password."));
 
         return Qn::kValidResult;

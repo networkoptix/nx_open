@@ -17,6 +17,7 @@
 
 #include <nx/utils/log/log.h>
 #include "serverutil.h"
+#include <network/authenticate_helper.h>
 
 namespace
 {
@@ -80,7 +81,7 @@ void QnNewSystemServerFlagWatcher::update()
             return true;
 
         /* Check if admin's password was changed. */
-        return !owner->checkPassword(kDefaultOwnerPassword);
+        return ! qnAuthHelper->checkUserPassword(owner, kDefaultOwnerPassword);
     };
 
     if (qnGlobalSettings->isNewSystem())

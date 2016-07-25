@@ -238,7 +238,7 @@ private:
     std::unique_ptr<QOffscreenSurface> offscreenSurface;
 };
 
-QMap<CodecID, QSize> AndroidVideoDecoderPrivate::maxResolutions;
+QMap<AVCodecID, QSize> AndroidVideoDecoderPrivate::maxResolutions;
 QMutex AndroidVideoDecoderPrivate::maxResolutionsMutex;
 
 FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
