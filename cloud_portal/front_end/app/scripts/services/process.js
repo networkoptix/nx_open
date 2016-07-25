@@ -2,7 +2,7 @@
 
 
 angular.module('cloudApp')
-    .factory('process', ['$q', 'dialogs', function ($q, dialogs) {
+    .factory('process', ['$q', 'dialogs', 'cloudApi', function ($q, dialogs, cloudApi) {
 
         function formatError(error,errorCodes){
             if(!error || !error.resultCode){
@@ -87,8 +87,10 @@ angular.module('cloudApp')
                         return caller().then(function(data){
                             self.processing = false;
                             self.finished = true;
-                            if(data && data.data && data.data.resultCode && data.data.resultCode != L.errorCodes.ok){
-                                handleError(data);
+
+                            var error = false;
+                            if(error =  cloudApi.checkResponseHasError(data)){
+                                handleError(error);
                             } else {
                                 self.success = true;
 

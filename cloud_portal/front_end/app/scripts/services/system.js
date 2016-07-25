@@ -59,6 +59,12 @@ angular.module('cloudApp')
                 var deferred = $q.defer();
                 var self = this;
                 this.infoPromise = cloudApi.system(self.id).then(function(result){
+                    var error = false
+                    if (error = cloudApi.checkResponseHasError(result)){
+                        return $q.reject(error);
+                    }
+
+
                     if(self.info){
                         $.extend(true, self.info, result.data[0]); // Update
                     }else{

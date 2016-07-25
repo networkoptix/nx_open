@@ -61,6 +61,12 @@ angular.module('cloudApp')
         var getSystems = cacheGet(apiBase + '/systems');
 
         return {
+            checkResponseHasError:function(data){
+                if(data && data.data && data.data.resultCode && data.data.resultCode != L.errorCodes.ok){
+                    return data;
+                }
+                return false;
+            },
             account: cacheGet(apiBase + '/account'),
             login:function(email, password, remember){
                 return $http.post(apiBase + '/account/login',{
