@@ -138,5 +138,7 @@ QtObject
         {
             readonly property font userName: Qt.font({ pixelSize: 22, weight: Font.Light});
         }
+
+        readonly property font preloader: Qt.font({ pixelSize: 36, weight: Font.Light})
     }
 }
