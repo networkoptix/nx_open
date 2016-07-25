@@ -96,5 +96,7 @@ QnAbstractSystemsFinder::SystemDescriptionList QnSystemsFinder::systems() const
 QnSystemDescriptionPtr QnSystemsFinder::getSystem(const QString &id) const
 {
     const auto it = m_systems.find(id);
-    return (it == m_systems.end() ? QnSystemDescriptionPtr() : *it);
+    return (it == m_systems.end()
+        ? QnSystemDescriptionPtr()
+        : it->dynamicCast<QnBaseSystemDescription>());
 }
