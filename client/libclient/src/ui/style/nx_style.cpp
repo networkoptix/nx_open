@@ -1178,8 +1178,13 @@ void QnNxStyle::drawComplexControl(
                     frame.rect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxFrame, widget);
 
                     QnScopedPainterClipRegionRollback clipRollback(painter);
-                    if (!panel && labelRect.isValid())
-                        painter->setClipRegion(QRegion(option->rect).subtracted(labelRect));
+                    QRect subtractRect = labelRect.united(subControlRect(CC_GroupBox, groupBox, SC_GroupBoxCheckBox, widget));
+
+                    if (!panel && subtractRect.isValid())
+                    {
+                        painter->setClipRegion(QRegion(option->rect).subtracted(
+                            subtractRect.adjusted(-Metrics::kStandardPadding, 0, Metrics::kStandardPadding, 0)));
+                    }
 
                     drawPrimitive(PE_FrameGroupBox, &frame, painter, widget);
                 }
@@ -1225,7 +1230,7 @@ void QnNxStyle::drawComplexControl(
                     }
                     else
                     {
-                        const int kTextFlags = Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextHideMnemonic;
+                        const int kTextFlags = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextHideMnemonic;
                         drawItemText(painter, labelRect, kTextFlags, groupBox->palette,
                             groupBox->state.testFlag(QStyle::State_Enabled),
                             groupBox->text, QPalette::WindowText);
@@ -1236,7 +1241,17 @@ void QnNxStyle::drawComplexControl(
                 {
                     QStyleOption opt = *option;
                     opt.rect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxCheckBox, widget);
-                    drawSwitch(painter, &opt, widget);
+
+                    if (panel)
+                    {
+                        drawSwitch(painter, &opt, widget);
+                    }
+                    else
+                    {
+                        Q_D(const QnNxStyle);
+                        opt.palette.setBrush(QPalette::Text, opt.palette.light());
+                        d->drawCheckBox(painter, &opt, widget);
+                    }
                 }
 
                 return;
@@ -2156,6 +2171,7 @@ QRect QnNxStyle::subControlRect(
                             return QRect();
 
                         const int kTextFlags = Qt::AlignLeft | Qt::TextHideMnemonic;
+                        int left = option->rect.left();
 
                         if (panel)
                         {
@@ -2181,31 +2197,50 @@ QRect QnNxStyle::subControlRect(
                                 textWidth += Metrics::kStandardPadding + detailWidth;
                             }
 
-                            return QRect(
-                                option->rect.left(),
-                                option->rect.top(),
-                                textWidth,
-                                Metrics::kPanelHeaderHeight);
+                            if (groupBox->subControls.testFlag(SC_GroupBoxCheckBox))
+                            {
+                                left = subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget).right()
+                                    + 1 + Metrics::kSwitchMargin;
+                            }
+
+                            return QRect(left, option->rect.top(), textWidth, Metrics::kPanelHeaderHeight);
+                        }
+
+                        if (groupBox->subControls.testFlag(SC_GroupBoxCheckBox))
+                        {
+                            left = subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget).right()
+                                + 1 + proxy()->pixelMetric(PM_CheckBoxLabelSpacing, option, widget);;
+                        }
+                        else
+                        {
+                            left += Metrics::kGroupBoxContentMargins.left();
                         }
 
                         return QRect(
-                            option->rect.left() + Metrics::kGroupBoxContentMargins.left() - Metrics::kStandardPadding,
+                            left,
                             option->rect.top(),
-                            groupBox->fontMetrics.width(groupBox->text, -1, kTextFlags) + Metrics::kStandardPadding * 2,
+                            groupBox->fontMetrics.size(kTextFlags, groupBox->text).width(),
                             Metrics::kGroupBoxTopMargin * 2);
                     }
 
                     case SC_GroupBoxCheckBox:
                     {
+                        if (!groupBox->subControls.testFlag(SC_GroupBoxCheckBox))
+                            return QRect();
+
+                        QRect headerRect(option->rect);
                         if (panel)
                         {
-                            //TODO: #vkutin Rewrite calculation without calling subControlRect(SC_GroupBoxLabel)
-                            QRect boundRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
-                            boundRect.setRight(option->rect.right());
-                            rect = alignedRect(Qt::LeftToRight, Qt::AlignRight | Qt::AlignVCenter,
-                                               Metrics::kStandaloneSwitchSize + kSwitchFocusFrameMargins, boundRect);
+                            headerRect.setHeight(Metrics::kPanelHeaderHeight - 1);
+                            return alignedRect(Qt::LeftToRight, Qt::AlignLeft | Qt::AlignVCenter,
+                                Metrics::kStandaloneSwitchSize + kSwitchFocusFrameMargins + QSize(0, 1), headerRect);
                         }
-                        break;
+
+                        headerRect.setLeft(headerRect.left() + Metrics::kGroupBoxContentMargins.left());
+                        headerRect.setHeight(Metrics::kGroupBoxTopMargin * 2);
+
+                        return alignedRect(Qt::LeftToRight, Qt::AlignLeft | Qt::AlignVCenter,
+                            QSize(Metrics::kCheckIndicatorSize, Metrics::kCheckIndicatorSize), headerRect);
                     }
 
                     case SC_GroupBoxContents:

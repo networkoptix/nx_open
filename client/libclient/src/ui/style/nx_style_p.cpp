@@ -179,6 +179,8 @@ void QnNxStylePrivate::drawSwitch(
         painter->drawLine(x, y, x, y + h + 1);
     }
 
+    opacityRollback.rollback();
+
     if (standalone && option->state.testFlag(QStyle::State_HasFocus))
     {
         Q_Q(const QnNxStyle);
