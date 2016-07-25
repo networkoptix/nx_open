@@ -1135,11 +1135,10 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
 
     /* Check that we are deleting online auto-found cameras */
     auto onlineAutoDiscoveredCameras = cameras.filtered(
-        []
-    (const auto& camera)
-    {
-        return camera->getStatus() != Qn::Offline && !camera->isManuallyAdded();
-    });
+        [](const QnVirtualCameraResourcePtr& camera)
+        {
+            return camera->getStatus() != Qn::Offline && !camera->isManuallyAdded();
+        });
 
     QString question;
     if (cameras.size() == resources.size())
