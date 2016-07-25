@@ -29,6 +29,7 @@
 
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_user_manager.h>
+#include <nx/network/http/auth_tools.h>
 
 
 ////////////////////////////////////////////////////////////
@@ -172,6 +173,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             ? nx_http::getHeaderValue( request.headers, "Proxy-Authorization" )
             : nx_http::getHeaderValue( request.headers, "Authorization" );
         const nx_http::StringType nxUserName = nx_http::getHeaderValue( request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME );
+        bool canUpdateRealm = request.headers.find(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME) != request.headers.end();
         if( authorization.isEmpty() )
         {
             Qn::AuthResult authResult = Qn::Auth_WrongDigest;
@@ -189,8 +191,9 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                         if (errCode != Qn::Auth_OK)
                             return errCode;
                     }
-                    if( userResource->getRealm() != desiredRealm ||
-                        userResource->getDigest().isEmpty() )   //in case of ldap digest is initially empty
+                    if(canUpdateRealm &&
+                      (userResource->getRealm() != desiredRealm ||
+                       userResource->getDigest().isEmpty()) )   //in case of ldap digest is initially empty
                     {
                         //requesting client to re-calculate digest after upgrade to 2.4
                         nx_http::insertOrReplaceHeader(
@@ -835,4 +838,21 @@ Qn::AuthResult QnAuthHelper::checkDigestValidity(QnUserResourcePtr userResource,
         return Qn::Auth_OK;
 
     return QnLdapManager::instance()->authenticateWithDigest( userResource->getName(), QLatin1String(digest) );
+}
+
+bool QnAuthHelper::checkUserPassword(const QnUserResourcePtr& user, const QString& password)
+{
+    if (!user->isCloud())
+        return user->checkLocalUserPassword(password);
+
+    // 3. Cloud users
+    QByteArray auth = createHttpQueryAuthParam(
+        user->getName(),
+        password,
+        user->getRealm(),
+        "GET",
+        qnAuthHelper->generateNonce());
+
+    nx_http::Response response;
+    return authenticateByUrl(auth, QByteArray("GET"), response) == Qn::Auth_OK;
 }

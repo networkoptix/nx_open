@@ -17,6 +17,7 @@ namespace Qn
     static const QByteArray VIDEOWALL_GUID_HEADER_NAME = "X-NetworkOptix-VideoWall";
     static const QByteArray PROXY_TTL_HEADER_NAME = "X-proxy-ttl";
     static const QByteArray CUSTOM_USERNAME_HEADER_NAME = "X-Nx-User-Name";
+    static const QByteArray CUSTOM_CHANGE_REALM_HEADER_NAME = "X-Nx-Allow-Update-Realm";
     static const QByteArray AUTH_SESSION_HEADER_NAME = "X-Auth-Session";
     static const QByteArray USER_HOST_HEADER_NAME = "X-User-Host";
     static const QByteArray USER_AGENT_HEADER_NAME = "User-Agent";

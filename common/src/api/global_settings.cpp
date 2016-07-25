@@ -374,7 +374,8 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     if(!user)
         return;
 
-    if(!user->isOwner())
+    // todo: refactor this. Globabal settings should be moved from admin user to another place
+    if(user->getName() != lit("admin"))
         return;
 
     {
@@ -480,6 +481,20 @@ bool QnGlobalSettings::synchronizeNowSync()
     if (!m_admin)
         return false;
     return propertyDictionary->saveParams(m_admin->getId());
+}
+
+bool QnGlobalSettings::takeFromSettings(QSettings* settings)
+{
+    bool changed = false;
+
+    changed |= m_statisticsReportTimeCycleAdaptor->takeFromSettings(settings);
+    changed |= m_statisticsReportUpdateDelayAdaptor->takeFromSettings(settings);
+    changed |= m_statisticsReportServerApiAdaptor->takeFromSettings(settings);
+
+    changed |= m_cloudSystemIDAdaptor->takeFromSettings(settings);
+    changed |= m_cloudAuthKeyAdaptor->takeFromSettings(settings);
+
+    return changed ? synchronizeNowSync() : false;
 }
 
 bool QnGlobalSettings::isUpdateNotificationsEnabled() const

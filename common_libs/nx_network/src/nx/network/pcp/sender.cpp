@@ -21,18 +21,18 @@ void Sender::send(std::shared_ptr<QByteArray> request)
     m_socket->sendAsync(
         buffer,
         [this, request = std::move(request)](SystemError::ErrorCode result, size_t size)
-    {
-        if (result != SystemError::noError || size != request->size())
         {
-            NX_LOG(lm("PCP Send (size=%1) error: %2")
-                .arg(size).arg(SystemError::toString(result)), cl_logDEBUG1);
-        }
-        else
-        {
-            NX_LOG(lm("PCP Sent (size=%1): %2")
-                .arg(size).arg(request->toHex()), cl_logDEBUG2);
-        }
-    });
+            if (result != SystemError::noError || size != request->size())
+            {
+                NX_LOG(lm("PCP Send (size=%1) error: %2")
+                    .arg(size).arg(SystemError::toString(result)), cl_logDEBUG1);
+            }
+            else
+            {
+                NX_LOG(lm("PCP Sent (size=%1): %2")
+                    .arg(size).arg(request->toHex()), cl_logDEBUG2);
+            }
+        });
 }
 
 } // namespace pcp

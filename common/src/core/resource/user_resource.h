@@ -35,7 +35,8 @@ public:
     void setPassword(const QString& password);
 
     void generateHash();
-    bool checkPassword(const QString& password);
+
+    bool checkLocalUserPassword(const QString &password);
 
     QByteArray getDigest() const;
     void setDigest(const QByteArray& digest, bool isValidated = false);

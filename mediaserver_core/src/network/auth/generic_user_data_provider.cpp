@@ -10,6 +10,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <network/authenticate_helper.h>
 
 
 GenericUserDataProvider::GenericUserDataProvider()
@@ -90,7 +91,7 @@ Qn::AuthResult GenericUserDataProvider::authorize(
     {
         if (auto user = res.dynamicCast<QnUserResource>())
         {
-            if (user->checkPassword(authorizationHeader.basic->password))
+            if (qnAuthHelper->checkUserPassword(user, authorizationHeader.basic->password))
                 return Qn::Auth_OK;
         }
         else if (auto server = res.dynamicCast<QnMediaServerResource>())

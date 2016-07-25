@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <string>
+#include <map>
 
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_api.h>

@@ -69,9 +69,9 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QObject* parent /
 
         //Onvif searcher should be the last:
     #ifdef ENABLE_ONVIF
+        m_searchers << new QnFlirResourceSearcher();
         m_searchers << new QnFlexWatchResourceSearcher();
         m_searchers << new OnvifResourceSearcher();
-        m_searchers << new QnFlirResourceSearcher();
     #endif //ENABLE_ONVIF
 #endif
 

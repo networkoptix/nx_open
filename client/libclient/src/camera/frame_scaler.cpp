@@ -1,41 +1,16 @@
 #include "frame_scaler.h"
 
-#ifdef __arm__
-
-//TODO: implement?
-void QnFrameScaler::downscale(
-    const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst,
-    DownscaleFactor factor) {}
-
-void QnFrameScaler::downscalePlate_factor2(
-    unsigned char* dst, int dstStride, const unsigned char* src,
-    int src_width, int src_stride, int src_height) {}
-
-void QnFrameScaler::downscalePlate_factor4(
-    unsigned char* dst, int dstStride, const unsigned char* src,
-    int src_width, int src_stride, int src_height) {}
-
-void QnFrameScaler::downscalePlate_factor8(
-    unsigned char* dst, int dstStride, const unsigned char* src,
-    int src_width, int src_stride, int src_height) {}
-
-#else
-
-#include <cassert>
-
-#include <emmintrin.h>
-#ifdef Q_OS_MAC
-#   include <smmintrin.h>
-#endif
-
 #include "utils/media/sse_helper.h"
 #include "utils/math/math.h"
+
+#if !defined(__arm__)
 
 const __m128i  sse_00ffw_intrs = _mm_setr_epi32(0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff);
 const __m128i  sse_000000ffw_intrs = _mm_setr_epi32(0x000000ff, 0x000000ff, 0x000000ff, 0x000000ff);
 
-void downscalePlate_factor2_sse2_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
-                                      const unsigned int width, const unsigned int src_stride, unsigned int height, int fillter)
+void downscalePlate_factor2_sse2_intr(
+    unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+    const unsigned int width, const unsigned int src_stride, unsigned int height, int fillter)
 {
     NX_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/2,16) <= dst_stride);
 
@@ -87,8 +62,9 @@ void downscalePlate_factor2_sse2_intr(unsigned char * dst, const unsigned int ds
     }
 }
 
-void sse4_attribute downscalePlate_factor4_ssse3_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
-                                       const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
+void sse4_attribute downscalePlate_factor4_ssse3_intr(
+    unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+    const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
 {
     NX_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/4,8) <= dst_stride);
 
@@ -134,8 +110,9 @@ void sse4_attribute downscalePlate_factor4_ssse3_intr(unsigned char * dst, const
     }
 }
 
-void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
-                                       const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
+void downscalePlate_factor8_sse41_intr(
+    unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+    const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
 {
     NX_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/8,4) <= dst_stride);
 
@@ -187,6 +164,31 @@ void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int d
         src_line2 += src_stride*8;
     }
 }
+
+#else // !defined(__arm__)
+
+void downscalePlate_factor2_sse2_intr(
+    unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+    const unsigned int width, const unsigned int src_stride, unsigned int height, int fillter)
+{
+    NX_CRITICAL(false);
+}
+
+void downscalePlate_factor4_ssse3_intr(
+    unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+    const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
+{
+    NX_CRITICAL(false);
+}
+
+void downscalePlate_factor8_sse41_intr(
+    unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+    const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
+{
+    NX_CRITICAL(false);
+}
+
+#endif // !defined(__arm__)
 
 void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, DownscaleFactor factor)
 {
@@ -367,5 +369,3 @@ void QnFrameScaler::downscalePlate_factor8(unsigned char* dst,  int dstStride, c
         src_line2+=(src_stride<<3);
     }
 }
-
-#endif

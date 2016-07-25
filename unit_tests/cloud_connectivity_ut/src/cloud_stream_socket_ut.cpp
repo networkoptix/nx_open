@@ -19,6 +19,11 @@ namespace nx {
 namespace network {
 namespace cloud {
 
+NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
+    TEST, CloudStreamSocketTcp,
+    &std::make_unique<TCPServerSocket>,
+    &std::make_unique<CloudStreamSocket>)
+
 class CloudStreamSocketTest
 :
     public ::testing::Test

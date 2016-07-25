@@ -28,6 +28,7 @@
         <module>common_ut</module>
         <module>mediaserver_core_ut</module>
         <module>vms_utils_ut</module>
+        <module>nx_media_ut</module>
     </modules>
 
     <profiles>
@@ -50,6 +51,25 @@
             <properties>
                 <modification>ubuntu</modification>
             </properties>
+        </profile>
+
+        <profile>
+            <id>linux-arm-tx1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>tx1</value>
+                </property>
+            </activation>
+            <modules>
+                <module>client_ut</module>
+                <module>vms_gateway_ut</module>
+            </modules>
         </profile>
     </profiles>
 
