@@ -6,6 +6,12 @@ namespace {
     static const std::chrono::minutes kResponseReadTimeout(1);
     static const std::chrono::minutes kMessageBodyReadTimeout(10);
     static const int kDefaultPoolSize = 8;
+    static const int kHttpDisconnectTimeout(60 * 1000);
+
+    SocketAddress toSocketAddress(const QUrl& url)
+    {
+        return SocketAddress(url.host(), url.port(80));
+    }
 }
 
 namespace nx_http {
@@ -19,14 +25,13 @@ ClientPool::ClientPool(QObject *parent):
 
 ClientPool::~ClientPool()
 {
-    std::vector<AsyncHttpClientPtr> dataCopy;
+    std::multimap<SocketAddress, HttpConnectionPtr> dataCopy;
     {
         QnMutexLocker lock(&m_mutex);
-        m_requestInProgress.clear();
-        std::swap(dataCopy, m_clientPool);
+        std::swap(dataCopy, m_connectionPool);
     }
-    for (auto value: dataCopy)
-        value->terminate();
+    for (auto itr = dataCopy.begin(); itr != dataCopy.end(); ++itr)
+        itr->second->client->terminate();
 }
 
 void ClientPool::setPoolSize(int value)
@@ -66,12 +71,9 @@ int ClientPool::doPost(
 
 int ClientPool::sendRequest(const Request& request)
 {
-    RequestInternal requestInternal(request);
-
     QnMutexLocker lock(&m_mutex);
     int requestId = ++m_requestId;
-    requestInternal.handle = requestId;
-    m_requestInProgress.push_back(std::move(requestInternal));
+    m_awaitingRequests.emplace(requestId, request);
     sendNextRequestUnsafe();
     return requestId;
 }
@@ -79,21 +81,21 @@ int ClientPool::sendRequest(const Request& request)
 void ClientPool::terminate(int handle)
 {
     QnMutexLocker lock(&m_mutex);
-    for (auto itr = m_requestInProgress.begin(); itr != m_requestInProgress.end(); ++itr)
+    m_awaitingRequests.erase(handle);
+    for (auto itr = m_connectionPool.begin(); itr != m_connectionPool.end(); ++itr)
     {
-        auto& request = *itr;
-        if (request.handle == handle)
+        HttpConnection* connection = itr->second.get();
+        if (connection->handle == handle)
         {
-            if (request.httpClient)
-                request.httpClient->terminate();
-            m_requestInProgress.erase(itr);
+            connection->client->terminate();
+            connection->handle = 0;
             sendNextRequestUnsafe();
             break;
         }
     }
 }
 
-void ClientPool::sendRequestUnsafe(const RequestInternal& request, AsyncHttpClientPtr httpClient)
+void ClientPool::sendRequestUnsafe(const Request& request, AsyncHttpClientPtr httpClient)
 {
     httpClient->setAdditionalHeaders(request.headers);
     httpClient->setAuthType(request.authType);
@@ -105,59 +107,84 @@ void ClientPool::sendRequestUnsafe(const RequestInternal& request, AsyncHttpClie
 
 void ClientPool::sendNextRequestUnsafe()
 {
-    for (auto& request: m_requestInProgress)
+    for (auto itr = m_awaitingRequests.begin(); itr != m_awaitingRequests.end();)
     {
-        if (!request.httpClient)
+        const Request& request = itr->second;
+        if (auto connection = getUnusedConnection(request.url))
         {
-            if (auto httpClient = getHttpClientUnsafe(request.url))
-            {
-                request.httpClient = httpClient;
-                sendRequestUnsafe(request, httpClient);
-                break;
-            }
+            connection->handle = itr->first;
+            sendRequestUnsafe(request, connection->client);
+            itr = m_awaitingRequests.erase(itr);
+        }
+        else {
+            ++itr;
         }
     }
 }
 
-AsyncHttpClientPtr ClientPool::getHttpClientUnsafe(const QUrl& url)
+void ClientPool::cleanupDisconnectedUnsafe()
 {
-    AsyncHttpClientPtr result;
-
-    for (const AsyncHttpClientPtr& httpClient : m_clientPool)
+    for (auto itr = m_connectionPool.begin(); itr != m_connectionPool.end();)
     {
-        if (httpClient.use_count() > 1)
-            continue; //< object is using now
-
-        result = httpClient; //< any free client
-        QUrl clientUrl(httpClient->url());
-        if (clientUrl.host() == url.host() && clientUrl.port() == url.port())
+        HttpConnection* connection = itr->second.get();
+        if (!connection->handle &&
+            connection->idleTimeout.hasExpired(kHttpDisconnectTimeout))
         {
-            result = httpClient; //< better match. client with the same HostAddress
-            break;
+            connection->client->terminate();
+            itr = m_connectionPool.erase(itr);
+        }
+        else
+        {
+            ++itr;
+        }
+    }
+}
+
+ClientPool::HttpConnection* ClientPool::getUnusedConnection(const QUrl& url)
+{
+    cleanupDisconnectedUnsafe();
+
+    HttpConnection* result = nullptr;
+    QUrl clientUrl;
+    SocketAddress requestAddress = toSocketAddress(url);
+
+    auto range = m_connectionPool.equal_range(requestAddress);
+    int count = 0;
+    if (range.first != m_connectionPool.end() && range.first->first == requestAddress)
+    {
+        for (auto itr = range.first; itr != range.second; ++itr)
+        {
+            ++count;
+            HttpConnection* connection = itr->second.get();
+            if (!result && !connection->handle)
+            {
+                result = itr->second.get();
+                connection->idleTimeout.restart();
+            }
         }
     }
 
-    if (!result && m_clientPool.size() < m_maxPoolSize)
+    if (!result && count < m_maxPoolSize)
     {
 
-        result = nx_http::AsyncHttpClient::create();
+        result = new HttpConnection();
+        result->client = nx_http::AsyncHttpClient::create();
 
         //setting appropriate timeouts
         using namespace std::chrono;
-        result->setSendTimeoutMs(
+        result->client->setSendTimeoutMs(
             duration_cast<milliseconds>(kRequestSendTimeout).count());
-        result->setResponseReadTimeoutMs(
+        result->client->setResponseReadTimeoutMs(
             duration_cast<milliseconds>(kResponseReadTimeout).count());
-        result->setMessageBodyReadTimeoutMs(
+        result->client->setMessageBodyReadTimeoutMs(
             duration_cast<milliseconds>(kMessageBodyReadTimeout).count());
 
         connect(
-            result.get(), &nx_http::AsyncHttpClient::done,
+            result->client.get(), &nx_http::AsyncHttpClient::done,
             this, &ClientPool::at_HttpClientDone,
             Qt::DirectConnection);
 
-
-        m_clientPool.emplace_back(result);
+        m_connectionPool.emplace(requestAddress, std::move(HttpConnectionPtr(result)));
     }
 
     return result;
@@ -165,17 +192,17 @@ AsyncHttpClientPtr ClientPool::getHttpClientUnsafe(const QUrl& url)
 
 void ClientPool::at_HttpClientDone(nx_http::AsyncHttpClientPtr clientPtr)
 {
-    int requestId = -1;
+    int requestId = 0;
 
     {
         QnMutexLocker lock(&m_mutex);
-        for (auto itr = m_requestInProgress.begin(); itr != m_requestInProgress.end(); ++itr)
+        for (auto itr = m_connectionPool.begin(); itr != m_connectionPool.end(); ++itr)
         {
-            const auto& request = *itr;
-            if (request.httpClient == clientPtr)
+            HttpConnection* connection = itr->second.get();
+            if (connection->client == clientPtr)
             {
-                requestId = request.handle;
-                m_requestInProgress.erase(itr);
+                requestId = connection->handle;
+                connection->handle = 0;
                 break;
             }
         }
@@ -186,6 +213,7 @@ void ClientPool::at_HttpClientDone(nx_http::AsyncHttpClientPtr clientPtr)
 
     QnMutexLocker lock(&m_mutex);
     sendNextRequestUnsafe();
+    cleanupDisconnectedUnsafe();
 }
 
 } // namespace nx_http

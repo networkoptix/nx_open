@@ -2,6 +2,9 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 
+#include <QElapsedTimer>
+#include <nx/utils/timer_manager.h>
+
 namespace nx_http {
 
 class ClientPool : public QObject
@@ -51,6 +54,7 @@ private slots:
     void at_HttpClientDone(AsyncHttpClientPtr httpClient);
 private:
 
+    /*
     struct RequestInternal: public Request
     {
         RequestInternal(const Request& r = Request()):
@@ -59,17 +63,35 @@ private:
         {
         }
 
-        nx_http::AsyncHttpClientPtr httpClient;
+        //nx_http::AsyncHttpClientPtr httpClient;
+        int handle;
+    };
+    */
+
+    struct HttpConnection
+    {
+        HttpConnection(AsyncHttpClientPtr client = AsyncHttpClientPtr(), int handle = 0):
+            client(client),
+            handle(handle)
+        {
+            idleTimeout.restart();
+        }
+
+        AsyncHttpClientPtr client;
+        QElapsedTimer idleTimeout;
         int handle;
     };
 private:
-    AsyncHttpClientPtr getHttpClientUnsafe(const QUrl& url);
-    void sendRequestUnsafe(const RequestInternal& request, AsyncHttpClientPtr httpClient);
+    HttpConnection* getUnusedConnection(const QUrl& url);
+    void sendRequestUnsafe(const Request& request, AsyncHttpClientPtr httpClient);
     void sendNextRequestUnsafe();
+    void cleanupDisconnectedUnsafe();
 private:
     QnMutex m_mutex;
-    std::vector<AsyncHttpClientPtr> m_clientPool;
-    std::vector<RequestInternal> m_requestInProgress;
+    typedef std::unique_ptr<HttpConnection> HttpConnectionPtr;
+    std::multimap<SocketAddress, HttpConnectionPtr> m_connectionPool;
+    std::map<int, Request> m_awaitingRequests;
+    //std::map<AsyncHttpClientPtr, RequestInternal> m_requestInProgress;
     int m_maxPoolSize;
     int m_requestId;
 };
