@@ -24,7 +24,7 @@
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
+#include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -191,6 +191,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
             grantAccessRightsForUser(owner, change);
         //TODO: #GDM #access Grant access rights for groups?
 
+        //TODO: #GDM what if we've been disconnected while confirming?
         if (confirmLayoutChange(change))
             snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
         else
@@ -574,20 +575,32 @@ bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnUserResourcePt
     if (mediaResources.isEmpty())
         return true;
 
-    auto result = QnResourceListDialog::exec(
-        mainWindow(),
-        mediaResources.toList(),
-        tr("Stop Sharing Layout..."),
-        tr("By removing layout(s) //here list // from user you make %n cameras unavailable?", "", mediaResources.size()),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel
-    );
+    auto treeView = new QnResourceListView();
+    treeView->setResources(mediaResources.toList());
 
-//     if (messageBox.isChecked())
-//     {
-//         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
-//         messagesFilter |= Qn::ShowOnceMessage::StopSharingLayoutUser;
-//         qnSettings->setShowOnceMessages(messagesFilter);
-//     }
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        Qn::Empty_Help,
+        tr("Stop Sharing Layout..."),
+        tr("By deleting shared layout from user you remove access to cameras on it"),
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        mainWindow());
+    messageBox.setDefaultButton(QDialogButtonBox::Cancel);
+    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+    messageBox.addCustomWidget(treeView);
+    messageBox.setInformativeText(tr(
+        "User will keep access to cameras, which he has on other shared layouts, or which are "
+        "assigned to him directly. Access will be lost to the following %n cameras:",
+        "",
+        mediaResources.size()));
+
+    auto result = messageBox.exec();
+    if (messageBox.isChecked())
+    {
+        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+        messagesFilter |= Qn::ShowOnceMessage::StopSharingLayoutUser;
+        qnSettings->setShowOnceMessages(messagesFilter);
+    }
 
     return result == QDialogButtonBox::Ok;
 }
@@ -959,6 +972,7 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
     if (!user)
         return;
 
+    //TODO: #GDM what if we've been disconnected while confirming?
     if (!confirmStopSharingLayouts(user, layouts))
         return;
 

@@ -4,7 +4,7 @@
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QVBoxLayout>
 
-#include <ui/models/resource_list_model.h>
+#include <ui/models/resource/resource_list_model.h>
 #include <ui/help/help_topic_accessor.h>
 
 #include "ui_resource_list_dialog.h"
