@@ -518,8 +518,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     outFrame->channel = data->channelNumber;
     outFrame->flags = 0;
 
-    if (!useTmpFrame)
-        outFrame->setUseExternalData(!enableFrameQueue);
+    outFrame->setUseExternalData(!enableFrameQueue && !useTmpFrame);
 
     m_mtx.lock();
 

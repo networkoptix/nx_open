@@ -20,7 +20,7 @@ angular.module('webadminApp')
                 };
             },function(error){
                 if(error.status !== 401 && error.status !== 403) {
-                    alert('Server failure: cannot retrieve current user data');
+                    alert(L.navigaion.cannotGetUser);
                 }
             });
         });

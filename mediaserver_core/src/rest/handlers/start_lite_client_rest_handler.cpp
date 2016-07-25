@@ -16,7 +16,7 @@
 
 namespace {
 
-static const char* const kScriptName = "lite_client.sh";
+static const char* const kScriptName = "start_lite_client";
 
 } // namespace
 

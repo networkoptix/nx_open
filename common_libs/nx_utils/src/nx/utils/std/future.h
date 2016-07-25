@@ -1,8 +1,3 @@
-/**********************************************************
-* Apr 25, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <boost/optional.hpp>
@@ -13,7 +8,7 @@
 #include <mutex>
 #include <stdexcept>
 #include <system_error>
-
+#include <utils/common/cpp14.h>
 
 namespace nx {
 namespace utils {

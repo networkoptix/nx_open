@@ -121,7 +121,6 @@ public:
 
 TEST(BufferedFileWriter, AdaptiveBufferSize)
 {
-    QTemporaryDir tmpDir;
     struct FileTestData
     {
         size_t index;
@@ -154,6 +153,9 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
             QFile::remove(fileName);
         }
     };
+    nx::ut::utils::WorkDirResource workDir;
+    QnWriterPool writerPool;
+    ASSERT_TRUE((bool)workDir.getDirName());
     WriteBufferMultiplierManagerTest bufferManager;
     const size_t kFileCount = 5;
     const int kIoBlockSize = 1024 * 1024 * 4;
@@ -164,7 +166,7 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
     for (size_t i = 0; i < kFileCount; ++i)
     {
         QString fileName = lit("%1/test_file_%2.bin")
-            .arg(tmpDir.path())
+            .arg(*workDir.getDirName())
             .arg(i);
         QBufferedFile* ioDevice =
             new QBufferedFile(

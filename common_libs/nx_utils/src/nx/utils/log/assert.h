@@ -73,24 +73,24 @@ private:
 } // namespace nx
 
 #ifdef NX_CHECK_MEASURE_TIME
-    #define NX_CHECK(condition, message, action) \
-        do { \
-            auto begin = std::chrono::system_clock::now(); \
-            auto isOk = static_cast<bool>(condition); \
-            auto time = std::chrono::system_clock::now() - begin; \
-            \
-            static const auto info = nx::utils::AssertTimer::instance.info(__FILE__, __LINE__); \
-            info->add(std::chrono::duration_cast<std::chrono::microseconds>(time)); \
-            \
-            if (!isOk) \
-                nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
-        } while (0)
+    #define NX_CHECK(condition, message, action) do \
+    { \
+        auto begin = std::chrono::system_clock::now(); \
+        auto isOk = static_cast<bool>(condition); \
+        auto time = std::chrono::system_clock::now() - begin; \
+        \
+        static const auto info = nx::utils::AssertTimer::instance.info(__FILE__, __LINE__); \
+        info->add(std::chrono::duration_cast<std::chrono::microseconds>(time)); \
+        \
+        if (!isOk) \
+            nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
+    } while (0)
 #else
-    #define NX_CHECK(condition, message, action) \
-        do { \
-            if (!(condition)) \
-                nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
-        } while (0)
+    #define NX_CHECK(condition, message, action) do \
+    { \
+        if (!(condition)) \
+            nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
+    } while (0)
 #endif
 
 #define NX_CRITICAL_IMPL(condition, message) NX_CHECK(condition, message, Crash)

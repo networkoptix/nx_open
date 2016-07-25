@@ -6,6 +6,7 @@
 #include <media_server/settings.h>
 #include <server/server_globals.h>
 #include <media_server_process.h>
+#include <rest/helpers/permissions_helper.h>
 
 int QnRestoreStateRestHandler::executeGet(
     const QString& path,
@@ -35,11 +36,14 @@ int QnRestoreStateRestHandler::execute(PasswordData passwordData, const QnUuid &
 {
     QString errStr;
     if (!validatePasswordData(passwordData, &errStr) ||
-        !validateAdminPassword(passwordData, &errStr))
+        !validateOwnerPassword(passwordData, &errStr))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx_http::StatusCode::ok;
     }
+
+    if (QnPermissionsHelper::isSafeMode())
+        return QnPermissionsHelper::safeModeError(result);
 
     return nx_http::StatusCode::ok;
 }

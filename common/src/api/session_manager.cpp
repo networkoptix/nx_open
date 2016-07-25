@@ -20,6 +20,7 @@
 #include "common/common_module.h"
 #include "app_server_connection.h"
 #include <api/network_proxy_factory.h>
+#include <http/custom_headers.h>
 
 
 // -------------------------------------------------------------------------- //
@@ -261,6 +262,7 @@ int QnSessionManager::sendAsyncRequest(
     const auto msgBodyContentType =
         nx_http::getHeaderValue(headers, nx_http::header::kContentType);
     clientPtr->setAdditionalHeaders(std::move(headers));
+    clientPtr->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
 
     connect(
         clientPtr.get(), &nx_http::AsyncHttpClient::done,
