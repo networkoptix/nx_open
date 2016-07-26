@@ -227,6 +227,9 @@ QString QnInputField::text() const
 void QnInputField::setText(const QString& value)
 {
     Q_D(QnInputField);
+    if (d->input->text() == value)
+        return;
+
     d->input->setText(value);
     d->validate();
 }
