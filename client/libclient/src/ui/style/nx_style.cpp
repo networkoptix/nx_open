@@ -1672,6 +1672,18 @@ void QnNxStyle::drawControl(
                     tab->state.testFlag(QStyle::State_Enabled),
                     tab->text);
 
+                if (!tab->icon.isNull())
+                {
+                    QFontMetrics fm(painter->font());
+                    QRect rect = fm.boundingRect(textRect, textFlags, tab->text);
+
+                    QSize iconSize = tab->icon.actualSize(tab->iconSize);
+                    QRect iconRect = aligned(iconSize, textRect);
+                    iconRect.moveLeft(rect.right() + Metrics::kStandardPadding);
+
+                    painter->drawPixmap(iconRect, tab->icon.pixmap(iconSize));
+                }
+
                 if (tab->state.testFlag(State_HasFocus))
                 {
                     QStyleOptionFocusRect focusOption;
