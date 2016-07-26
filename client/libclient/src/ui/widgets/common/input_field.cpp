@@ -36,14 +36,25 @@ public:
         /* On focus make input look usual even if there is error. */
         if (watched == input && event->type() == QEvent::FocusIn)
         {
+            setHintText(QString());
             input->setPalette(parent->palette());
-            hint->setVisible(false);
-            hint->setText(QString());
             lastValidationResult.state = QValidator::Intermediate;
         }
 
         /* Always pass event further */
         return false;
+    }
+
+    void setHintText(const QString& text)
+    {
+        if (hint->text() == text)
+            return;
+
+        hint->setText(text);
+        hint->setVisible(!text.isEmpty());
+
+        for (QWidget* widget = parent; widget && widget->layout(); widget = widget->parentWidget())
+          widget->layout()->activate();
     }
 
     Qn::ValidationResult validationResult() const
@@ -66,18 +77,9 @@ public:
     void validate()
     {
         clearValidationResult();
-
         updatePasswordIndicatorVisibility();
-
         lastValidationResult = validationResult();
-
-        QString hintText = lastValidationResult.errorMessage;
-        if (hint->text() != hintText)
-        {
-            hint->setText(hintText);
-            hint->setVisible(!hintText.isEmpty());
-            parent->layout()->activate();
-        }
+        setHintText(lastValidationResult.errorMessage);
 
         QPalette palette = parent->palette();
         if (lastValidationResult.state != QValidator::Acceptable)
@@ -189,8 +191,7 @@ QString QnInputField::hint() const
 void QnInputField::setHint(const QString& value)
 {
     Q_D(QnInputField);
-    d->hint->setText(value);
-    d->hint->setVisible(!value.isEmpty());
+    d->setHintText(value);
 }
 
 QString QnInputField::text() const
@@ -311,15 +312,13 @@ void QnInputField::setValidator(Qn::TextValidateFunction validator, bool validat
 
     if (validateImmediately)
         d->validate();
-    else
-        d->clearValidationResult();
 }
 
 void QnInputField::reset()
 {
     Q_D(QnInputField);
     d->clearValidationResult();
-    setHint(QString());
+    d->setHintText(QString());
     if (d->passwordIndicator)
         d->passwordIndicator->setVisible(false);
 }
