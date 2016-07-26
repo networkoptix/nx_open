@@ -1,6 +1,7 @@
 #include "aligner.h"
 
 #include <ui/common/accessor.h>
+#include <utils/common/event_processors.h>
 
 namespace
 {
@@ -27,15 +28,20 @@ namespace
 
     };
 
+} // unnamed namespace
 
-
-}
 
 QnAligner::QnAligner(QObject* parent /*= nullptr*/):
     base_type(parent),
     m_defaultAccessor(new WidgetSizeAccessor())
 {
-
+    if (parent)
+    {
+        auto signalizer = new QnSingleEventSignalizer(this);
+        signalizer->setEventType(QEvent::LayoutRequest);
+        connect(signalizer, &QnMultiEventSignalizer::activated, this, &QnAligner::align);
+        parent->installEventFilter(signalizer);
+    }
 }
 
 QnAligner::~QnAligner()
@@ -51,8 +57,9 @@ void QnAligner::addWidget(QWidget* widget)
 
 void QnAligner::addWidgets(std::initializer_list<QWidget*> widgets)
 {
-    for (QWidget* w : widgets)
-        m_widgets << w;
+    for (auto widget : widgets)
+        m_widgets << widget;
+
     align();
 }
 
@@ -69,10 +76,12 @@ void QnAligner::align()
 
     int maxWidth = 0;
     for (auto w : m_widgets)
-        maxWidth = std::max(accessor(w)->get(w).toInt(), maxWidth);
+        if (w->isVisible())
+            maxWidth = std::max(accessor(w)->get(w).toInt(), maxWidth);
 
     for (QWidget* w : m_widgets)
-        accessor(w)->set(w, maxWidth);
+        if (w->isVisible())
+            accessor(w)->set(w, maxWidth);
 }
 
 AbstractAccessor* QnAligner::accessor(QWidget *widget) const
