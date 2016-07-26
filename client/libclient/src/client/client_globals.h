@@ -283,7 +283,11 @@ namespace Qn
     {
         PtzPresetInUse          = 0x001,    /**< Delete ptz preset which is used in the tour. */
         SharedLayoutEdit        = 0x002,    /**< Edit shared layout. */
-        UserLayoutItemsRemoved  = 0x004     /**< Items are removed from user's layout, but access still persist. */
+        UserLayoutItemsRemoved  = 0x004,    /**< Items are removed from user's layout, but access still persist. */
+        StopSharingLayoutUser   = 0x008,    /**< Delete shared layout from common/custom user. */
+        DeleteResources         = 0x010,    /**< Batch delete resources (but layouts). */
+        DeleteSharedLayouts     = 0x020,    /**< Batch delete shared layouts. */
+        DeleteUserLayouts       = 0x040     /**< Batch delete user's layouts. */
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ShowOnceMessage)
     Q_DECLARE_FLAGS(ShowOnceMessages, ShowOnceMessage)

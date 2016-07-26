@@ -40,7 +40,8 @@ QCursor QnLinuxImages::bitmapCursor(Qt::CursorShape shape) const {
     }
 
     QCursor result(
-        QPixmap::fromImage(QImage(cursorData, xImage->width, xImage->height, QImage::Format_ARGB32)),
+        QPixmap::fromImage(
+            QImage(cursorData, xImage->width, xImage->height, QImage::Format_ARGB32)).copy(),
         xImage->xhot,
         xImage->yhot
     );

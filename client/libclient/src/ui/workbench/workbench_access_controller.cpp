@@ -145,6 +145,9 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
         return calculatePermissionsInternal(layout);
 
+    if (qnRuntime->isVideoWallMode())
+        return Qn::VideoWallMediaPermissions;
+
     /* No other resources must be available while we are logged out. */
     if (!m_user)
         return Qn::NoPermissions;
@@ -196,6 +199,9 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
     /* User can do everything with local layouts except removing from server. */
     if (layout->hasFlags(Qn::local))
         return checkLocked(checkLoggedIn(checkReadOnly(static_cast<Qn::Permissions>(Qn::FullLayoutPermissions &~Qn::RemovePermission))));
+
+    if (qnRuntime->isVideoWallMode())
+        return Qn::VideoWallLayoutPermissions;
 
     /*
      * No other resources must be available while we are logged out.

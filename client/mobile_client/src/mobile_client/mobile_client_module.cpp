@@ -99,8 +99,8 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnRouter>(new QnRouter(moduleFinder));
 
     QnSystemsFinder* systemsFinder(new QnSystemsFinder());
-    systemsFinder->addSystemsFinder(new QnDirectSystemsFinder(systemsFinder));
-    systemsFinder->addSystemsFinder(new QnCloudSystemsFinder(systemsFinder));
+    systemsFinder->addSystemsFinder(new QnDirectSystemsFinder(systemsFinder), false);
+    systemsFinder->addSystemsFinder(new QnCloudSystemsFinder(systemsFinder), true);
     common->store<QnSystemsFinder>(systemsFinder);
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this, [moduleFinder](Qt::ApplicationState state) {

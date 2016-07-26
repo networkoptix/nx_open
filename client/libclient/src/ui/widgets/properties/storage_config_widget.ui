@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>794</width>
-    <height>549</height>
+    <width>812</width>
+    <height>647</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="9,9,0,0">
@@ -16,9 +16,18 @@
      <property name="title">
       <string>Main Storage Locations</string>
      </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
       <item>
        <widget class="QnTableView" name="mainStoragesTable">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>120</height>
+         </size>
+        </property>
         <property name="autoFillBackground">
          <bool>false</bool>
         </property>
@@ -27,6 +36,9 @@
         </property>
         <property name="selectionBehavior">
          <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <property name="showGrid">
+         <bool>false</bool>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
@@ -101,9 +113,18 @@
      <property name="title">
       <string>Backup Storage Locations</string>
      </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0">
       <item>
        <widget class="QnTableView" name="backupStoragesTable">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>120</height>
+         </size>
+        </property>
         <property name="autoFillBackground">
          <bool>false</bool>
         </property>
@@ -203,6 +224,9 @@
       </item>
       <item>
        <layout class="QHBoxLayout" name="settingsLayout" stretch="0,0">
+        <property name="spacing">
+         <number>24</number>
+        </property>
         <item>
          <widget class="QGroupBox" name="globalSettingsGroupBox">
           <property name="sizePolicy">
@@ -216,6 +240,9 @@
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
            <property name="horizontalSpacing">
@@ -279,6 +306,9 @@
           </property>
           <property name="title">
            <string>Server Backup Settings</string>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
            <property name="horizontalSpacing">
@@ -372,6 +402,9 @@
            <widget class="QLabel" name="backupTimeLabel">
             <property name="text">
              <string>Backup Time Label</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
             </property>
            </widget>
           </item>

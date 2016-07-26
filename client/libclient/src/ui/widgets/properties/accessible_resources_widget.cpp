@@ -16,7 +16,8 @@
 #include <ui/actions/action_manager.h>
 #include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
-#include <ui/models/resource_list_model.h>
+#include <ui/models/resource/resource_list_model.h>
+#include <ui/models/resource/resource_list_sorted_model.h>
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
@@ -34,24 +35,19 @@ const int kCameraNameFontPixelSize = 13;
 const int kCameraNameFontWeight = QFont::DemiBold;
 const int kCameraPreviewWidthPixels = 160;
 
-class QnResourcesListSortModel: public QSortFilterProxyModel
+class QnAllCheckableModel: public QnResourceListSortedModel
 {
-    typedef QSortFilterProxyModel base_type;
+    using base_type = QnResourceListSortedModel;
 
 public:
-    explicit QnResourcesListSortModel(QObject *parent = 0):
+    explicit QnAllCheckableModel(QObject *parent = 0):
         base_type(parent),
         m_allChecked(false)
     {
     }
 
-    virtual ~QnResourcesListSortModel()
+    virtual ~QnAllCheckableModel()
     {
-    }
-
-    QnResourcePtr resource(const QModelIndex &index) const
-    {
-        return index.data(Qn::ResourceRole).value<QnResourcePtr>();
     }
 
     QVariant data(const QModelIndex &index, int role) const
@@ -78,48 +74,6 @@ public:
             index(0, QnResourceListModel::CheckColumn),
             index(rowCount() - 1, QnResourceListModel::CheckColumn),
             {Qt::CheckStateRole});
-    }
-
-protected:
-    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
-    {
-        QnResourcePtr l = resource(left);
-        QnResourcePtr r = resource(right);
-
-        if (!l || !r)
-            return l < r;
-
-        if (l->getTypeId() != r->getTypeId())
-        {
-            QnVirtualCameraResourcePtr lcam = l.dynamicCast<QnVirtualCameraResource>();
-            QnVirtualCameraResourcePtr rcam = r.dynamicCast<QnVirtualCameraResource>();
-            if (!lcam || !rcam)
-                return lcam < rcam;
-        }
-
-        if (l->hasFlags(Qn::layout) && r->hasFlags(Qn::layout))
-        {
-            QnLayoutResourcePtr leftLayout = l.dynamicCast<QnLayoutResource>();
-            QnLayoutResourcePtr rightLayout = r.dynamicCast<QnLayoutResource>();
-            NX_ASSERT(leftLayout && rightLayout);
-            if (!leftLayout || !rightLayout)
-                return leftLayout < rightLayout;
-
-            if (leftLayout->isShared() != rightLayout->isShared())
-                return leftLayout->isShared();
-        }
-
-        {
-            /* Sort by name. */
-            QString leftDisplay = left.data(Qt::DisplayRole).toString();
-            QString rightDisplay = right.data(Qt::DisplayRole).toString();
-            int result = nx::utils::naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
-            if (result != 0)
-                return result < 0;
-        }
-
-        /* We want the order to be defined even for items with the same name. */
-        return l->getUniqueId() < r->getUniqueId();
     }
 
 private:
@@ -181,14 +135,11 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     initControlsModel();
     initResourcesModel();
 
-    QnResourcesListSortModel* viewModel = new QnResourcesListSortModel(this);
+    QnAllCheckableModel* viewModel = new QnAllCheckableModel(this);
     viewModel->setSourceModel(m_resourcesModel.data());
-    viewModel->setDynamicSortFilter(true);
-    viewModel->setSortRole(Qt::DisplayRole);
-    viewModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    viewModel->sort(Qn::NameColumn);
+    viewModel->sort(QnResourceListModel::NameColumn);
 
-    connect(this, &QnAccessibleResourcesWidget::controlsChanged, viewModel, &QnResourcesListSortModel::setAllChecked);
+    connect(this, &QnAccessibleResourcesWidget::controlsChanged, viewModel, &QnAllCheckableModel::setAllChecked);
 
     ui->resourcesTreeView->setModel(viewModel);
     ui->controlsTreeView->setModel(m_controlsModel.data());

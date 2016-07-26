@@ -7,6 +7,8 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 
+class QSettings;
+
 struct QnCloudSystem
 {
     QString id;
@@ -19,9 +21,14 @@ struct QnCloudSystem
     bool operator ==(const QnCloudSystem &other) const;
 
     bool fullEqual(const QnCloudSystem& other) const;
+
+    static void writeToSettings(QSettings* settings, const QnCloudSystem& data);
+
+    static QnCloudSystem fromSettings(QSettings* settings);
 };
 
 typedef QList<QnCloudSystem> QnCloudSystemList;
+Q_DECLARE_METATYPE(QnCloudSystemList);
 
 class QnCloudStatusWatcherPrivate;
 
@@ -31,6 +38,8 @@ class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatch
     Q_PROPERTY(QString cloudLogin READ cloudLogin WRITE setCloudLogin NOTIFY loginChanged)
     Q_PROPERTY(QString cloudPassword READ cloudPassword WRITE setCloudPassword NOTIFY passwordChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
+    Q_PROPERTY(ErrorCode error READ error NOTIFY errorChanged)
+    Q_PROPERTY(bool stayConnected READ stayConnected WRITE setStayConnected NOTIFY stayConnectedChanged)
 
     using base_type = QObject;
 
@@ -38,6 +47,7 @@ public:
 
     enum ErrorCode
     {
+        NoError,
         InvalidCredentials,
         UnknownError
     };
@@ -47,8 +57,8 @@ public:
     {
         LoggedOut,
         Online,
-        Offline,
-        Unauthorized
+        Offline,        //< User is logged in with "stay connected" checked
+                        // but internet connection is lost
     };
     Q_ENUM(Status)
 
@@ -61,6 +71,9 @@ public:
     QString cloudPassword() const;
     void setCloudPassword(const QString &password);
 
+    bool stayConnected() const;
+    void setStayConnected(bool value);
+
     void setCloudCredentials(const QString &login, const QString &password, bool initial = false);
 
     QString cloudEndpoint() const;
@@ -68,19 +81,23 @@ public:
 
     Status status() const;
 
+    ErrorCode error() const;
+
     void updateSystems();
 
     QnCloudSystemList cloudSystems() const;
 
-    QnCloudSystem currentSystem() const;
+    QnCloudSystemList recentCloudSystems() const;
 
 signals:
     void loginChanged();
     void passwordChanged();
     void statusChanged(Status status);
     void cloudSystemsChanged(const QnCloudSystemList &cloudSystems);
+    void recentCloudSystemsChanged();
     void currentSystemChanged(const QnCloudSystem& system);
-    void error(ErrorCode errorCode);
+    void errorChanged();
+    void stayConnectedChanged();
 
 private:
     QScopedPointer<QnCloudStatusWatcherPrivate> d_ptr;

@@ -286,6 +286,7 @@ void QnServerSettingsWidget::updateFailoverLabel()
         error = getErrorText();
 
     ui->failoverWarningLabel->setText(error);
+    ui->failoverWarningLabel->setHidden(error.isEmpty());
 }
 
 

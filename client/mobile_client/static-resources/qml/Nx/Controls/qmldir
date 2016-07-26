@@ -5,6 +5,7 @@ LinkButton 1.0 LinkButton.qml
 TextField 1.0 TextField.qml
 IconButton 1.0 IconButton.qml
 CheckBox 1.0 CheckBox.qml
+Switch 1.0 Switch.qml
 StackView 1.0 StackView.qml
 ToolBar 1.0 ToolBar.qml
 SearchToolBar 1.0 SearchToolBar.qml

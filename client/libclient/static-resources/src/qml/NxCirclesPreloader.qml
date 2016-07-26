@@ -9,9 +9,8 @@ BusyIndicator
 
     property color color: Style.colors.mid;
 
-    implicitWidth: 60;
-    implicitHeight: 60;
-
+    implicitWidth: childrenRect.width;
+    implicitHeight: childrenRect.height;
     contentItem: null;
 
     Repeater

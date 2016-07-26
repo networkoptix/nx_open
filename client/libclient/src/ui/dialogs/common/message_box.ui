@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnMessageBox</class>
- <widget class="QDialog" name="QnMessageBox">
+ <class>MessageBox</class>
+ <widget class="QDialog" name="MessageBox">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -91,9 +91,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="comboBox"/>
-       </item>
-       <item>
         <widget class="QCheckBox" name="checkBox">
          <property name="text">
           <string notr="true"/>
@@ -124,7 +121,6 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>comboBox</tabstop>
   <tabstop>checkBox</tabstop>
  </tabstops>
  <resources/>
@@ -132,7 +128,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>QnMessageBox</receiver>
+   <receiver>MessageBox</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -148,7 +144,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>QnMessageBox</receiver>
+   <receiver>MessageBox</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

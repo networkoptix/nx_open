@@ -154,7 +154,7 @@ public:
     QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
 #endif
 
-    QString getUrl() const;
+    virtual QString getUrl() const;
     virtual void setUrl(const QString &url);
 
     void addTag(const QString& tag);
