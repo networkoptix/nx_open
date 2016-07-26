@@ -23,22 +23,46 @@ public:
         input->installEventFilter(this);
         parent->setFocusProxy(input);
 
-        connect(input, &QLineEdit::textChanged,     this, &QnInputFieldPrivate::updatePasswordIndicatorVisibility);
-        connect(input, &QLineEdit::editingFinished, this, [this]()
-        {
-            const int kValidateDelayMs = 150;
-            executeDelayedParented([this]() { validate(); }, kValidateDelayMs, this);
-        });
+        connect(input, &QLineEdit::textChanged, this, &QnInputFieldPrivate::updatePasswordIndicatorVisibility);
     }
 
     virtual bool eventFilter(QObject* watched, QEvent* event)
     {
-        /* On focus make input look usual even if there is error. */
-        if (watched == input && event->type() == QEvent::FocusIn)
+        if (watched == input)
         {
-            setHintText(QString());
-            input->setPalette(parent->palette());
-            lastValidationResult.state = QValidator::Intermediate;
+            switch (event->type())
+            {
+                /* On focus gain make input look usual even if there is error. */
+                case QEvent::FocusIn:
+                {
+                    setHintText(QString());
+                    input->setPalette(parent->palette());
+                    lastValidationResult.state = QValidator::Intermediate;
+                    break;
+                }
+
+                /* On focus loss perform validate, unless it's a popup or programmable focus change. */
+                case QEvent::FocusOut:
+                {
+                    switch (static_cast<QFocusEvent*>(event)->reason())
+                    {
+                        case Qt::MenuBarFocusReason:
+                        case Qt::PopupFocusReason:
+                        case Qt::OtherFocusReason:
+                            break;
+
+                        default:
+                        {
+                            const int kValidateDelayMs = 150;
+                            executeDelayedParented([this]() { validate(); }, kValidateDelayMs, this);
+                        }
+                    }
+                    break;
+                }
+
+                default:
+                    break;
+            }
         }
 
         /* Always pass event further */
