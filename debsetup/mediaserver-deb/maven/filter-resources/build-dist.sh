@@ -52,16 +52,22 @@ mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 
 # Copy dbsync 2.2
-cp -r ${packages.dir}/${rdep.target}/appserver-2.2.1/share/dbsync-2.2 $SHARESTAGE
-cp ${libdir}/version.py $SHARESTAGE/dbsync-2.2/bin
+if [ '${arch}' != 'arm' ]
+then
+    cp -r ${packages.dir}/${rdep.target}/appserver-2.2.1/share/dbsync-2.2 $SHARESTAGE
+    cp ${libdir}/version.py $SHARESTAGE/dbsync-2.2/bin
+fi
 
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
 cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
 cp -r $SERVER_VOX_PATH $BINSTAGE
 #'libstdc++.so.6 is needed on some machines
-cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
-cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
+if [ '${arch}' != 'arm' ]
+then 
+    cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
+    cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
+fi
 
 #copying qt libs
 QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql"
@@ -76,7 +82,7 @@ done
 
 # Strip and remove rpath
 
-if [ '${build.configuration}' == 'release' ]
+if [ '${build.configuration}' == 'release' ] && [ '${arch}' != 'arm' ]
 then
   for f in `find $LIBPLUGINSTAGE -type f`
   do
@@ -92,7 +98,7 @@ fi
 find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
 find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
 chmod -R 755 $BINSTAGE
-chmod 755 $SHARESTAGE/dbsync-2.2/bin/{dbsync,certgen}
+if [ '${arch}' != 'arm' ]; then chmod 755 $SHARESTAGE/dbsync-2.2/bin/{dbsync,certgen}; fi
 
 # Copy mediaserver binary and sqldrivers
 install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
