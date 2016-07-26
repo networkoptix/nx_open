@@ -19,6 +19,8 @@ bool isActiveIOPortState(IOPortState state);
 
 IOPortState fromBoolToIOPortState(bool state);
 
+IOPortState fromDefaultPortState(Qn::IODefaultState state);
+
 }
 
 class QnAbstractIOManager
@@ -45,6 +47,10 @@ public:
     virtual QnIOPortDataList getInputPortList() const = 0;
 
     virtual QnIOStateDataList getPortStates() const = 0;
+
+    virtual nx_io_managment::IOPortState getPortDefaultState(const QString& portId) const = 0;
+
+    virtual void setPortDefaultState(const QString& portId, nx_io_managment::IOPortState state) = 0;
 
     virtual void setInputPortStateChangeCallback(InputStateChangeCallback callback) = 0;
 

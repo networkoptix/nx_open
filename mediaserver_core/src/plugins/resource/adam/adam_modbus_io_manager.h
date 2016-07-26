@@ -40,6 +40,12 @@ public:
 
     virtual QnIOStateDataList getPortStates() const override;
 
+    virtual nx_io_managment::IOPortState getPortDefaultState(const QString& portId) const override;
+
+    virtual void setPortDefaultState(
+        const QString& portId, 
+        nx_io_managment::IOPortState state) override;
+
     virtual void setInputPortStateChangeCallback(InputStateChangeCallback callback) override;
 
     virtual void terminate() override;
@@ -61,6 +67,8 @@ private:
     void handleMonitoringError();
     void scheduleMonitoringIteration();
 
+    nx_io_managment::IOPortState getPortDefaultStateUnsafe(const QString& portId) const;
+
 private:
     QnResource* m_resource;
 
@@ -79,6 +87,8 @@ private:
     nx_modbus::QnModbusAsyncClient m_client;
     nx_modbus::QnModbusClient m_outputClient;
     InputStateChangeCallback m_inputStateChangedCallback;
+
+    QMap<QString, nx_io_managment::IOPortState> m_defaultPortStates;
 
     mutable std::map<QString, DebouncedValue> m_debouncedValues;
 };

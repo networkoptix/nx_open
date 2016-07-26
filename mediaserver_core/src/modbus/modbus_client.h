@@ -31,7 +31,7 @@ public:
     // Coil is 1-bit read/write field.
     ModbusResponse readCoils(quint16 startCoilAddress, quint16 coilCount);
     ModbusResponse writeCoils(quint16 startCoilAddress, const QByteArray& data);
-    ModbusResponse writeSingleCoil(quint16 coilAddress, bool coilState);
+    ModbusResponse writeSingleCoil(quint16 coilAddress, bool coilState, bool& status);
 
     // Input register is read only word of length 2 byte.
     ModbusResponse readInputRegisters(quint16 startRegister, quint16 registerCount);
@@ -51,6 +51,7 @@ private:
 
     SocketAddress m_endpoint;
     std::shared_ptr<AbstractStreamSocket> m_socket;
+    bool m_needReinitSocket;
 };
 
 }

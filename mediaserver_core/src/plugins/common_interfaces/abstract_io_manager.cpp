@@ -12,3 +12,9 @@ IOPortState nx_io_managment::fromBoolToIOPortState(bool state)
     return state ? IOPortState::active : IOPortState::nonActive;
 }
 
+IOPortState nx_io_managment::fromDefaultPortState(Qn::IODefaultState state)
+{
+    return state == Qn::IODefaultState::IO_OpenCircuit ? 
+        IOPortState::nonActive : IOPortState::active;
+}
+

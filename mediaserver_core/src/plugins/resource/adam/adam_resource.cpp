@@ -6,9 +6,11 @@
 #include <business/business_event_rule.h>
 #include <nx_ec/dummy_handler.h>
 #include <utils/common/synctime.h>
+#include <utils/serialization/json.h>
 #include <common/common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <utils/common/model_functions.h>
 
 #include "adam_resource.h"
 #include "adam_modbus_io_manager.h"
@@ -18,7 +20,10 @@ const QString QnAdamResource::kManufacture(lit("AdvantechADAM"));
 
 QnAdamResource::QnAdamResource()
 {
-    
+    connect(
+        this, &QnResource::propertyChanged, 
+        this, &QnAdamResource::at_propertyChanged, 
+        Qt::DirectConnection );
 }
 
 QnAdamResource::~QnAdamResource()
@@ -44,10 +49,11 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
 
     m_ioManager.reset(new QnAdamModbusIOManager(this));
 
-    QnIOPortDataList allPorts = m_ioManager->getInputPortList();
-    QnIOPortDataList outputPorts = m_ioManager->getOutputPortList();
+    QnIOPortDataList allPorts = getInputPortList();
+    QnIOPortDataList outputPorts = getRelayOutputList();
     allPorts.insert(allPorts.begin(), outputPorts.begin(), outputPorts.end());
 
+    setPortDefaultStates();
     setIOPorts(allPorts);
     setCameraCapabilities(caps);
 
@@ -66,11 +72,16 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
 
     auto callback = [this](QString portId, nx_io_managment::IOPortState inputState)
     {
+        bool isDefaultPortStateActive = 
+            nx_io_managment::isActiveIOPortState(
+                m_ioManager->getPortDefaultState(portId));
+
         bool isActive = nx_io_managment::isActiveIOPortState(inputState);
+
         emit cameraInput(
             toSharedPointer(),
             portId, 
-            isActive,
+            isActive != isDefaultPortStateActive,
             qnSyncTime->currentUSecsSinceEpoch());
     };
 
@@ -92,10 +103,53 @@ bool QnAdamResource::isInputPortMonitored() const
     return false;
 }
 
+QnIOPortDataList QnAdamResource::mergeIOPortData(
+    const QnIOPortDataList& deviceIO, 
+    const QnIOPortDataList& savedIO) const
+{
+    QnIOPortDataList resultIO = deviceIO;
+    for (auto& result : resultIO)
+        for(const auto& saved : savedIO)
+            if (result.id == saved.id)
+                result = saved;
+
+    return resultIO;
+}
+
+void QnAdamResource::setPortDefaultStates()
+{
+    auto ports = QJson::deserialized<QnIOPortDataList>(
+        getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+
+    for (const auto& port: ports)
+    {
+        auto portDefaultState = port.portType == Qn::PT_Input ? 
+            port.iDefaultState : port.oDefaultState;
+
+        m_ioManager->setPortDefaultState(
+            port.id, 
+            nx_io_managment::fromDefaultPortState(portDefaultState));
+    }
+}
+
 QnIOPortDataList QnAdamResource::getRelayOutputList() const
 {
     if (m_ioManager)
-        return m_ioManager->getOutputPortList();
+    {
+        auto deviceOutputs = m_ioManager->getOutputPortList();
+        auto savedIO = QJson::deserialized<QnIOPortDataList>(
+            getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+
+        QnIOPortDataList savedOutputs;
+
+        for (const auto& ioPort: savedIO)
+        {
+            if (ioPort.portType == Qn::PT_Output)
+                savedOutputs.push_back(ioPort);
+        }
+
+        return mergeIOPortData(deviceOutputs, savedOutputs);
+    }
 
     return QnIOPortDataList();
 }
@@ -103,7 +157,21 @@ QnIOPortDataList QnAdamResource::getRelayOutputList() const
 QnIOPortDataList QnAdamResource::getInputPortList() const
 {
     if (m_ioManager)
-        return m_ioManager->getInputPortList();
+    {
+        auto deviceInputs = m_ioManager->getInputPortList();
+        auto savedIO = QJson::deserialized<QnIOPortDataList>(
+            getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+
+        QnIOPortDataList savedInputs;
+
+        for (const auto& ioPort: savedIO)
+        {
+            if (ioPort.portType == Qn::PT_Input)
+                savedInputs.push_back(ioPort);
+        }
+
+        return mergeIOPortData(deviceInputs, savedInputs);
+    }
 
     return QnIOPortDataList();
 }
@@ -126,15 +194,26 @@ bool QnAdamResource::setRelayOutputState(
     if (!m_ioManager)
         return false;
 
-    for (auto it = m_autoResetTimers.begin(); it != m_autoResetTimers.end();)
+    if (!isActive)
     {
-        if (it->second.portId == outputId)
-            it = m_autoResetTimers.erase(it);
-        else
-            ++it;
+        for (auto it = m_autoResetTimers.begin(); it != m_autoResetTimers.end();)
+        {
+            auto timerId = it->first;
+            auto portTimerEntry = it->second;
+            if (it->second.portId == outputId)
+            {
+                TimerManager::instance()->deleteTimer(timerId);
+                it = m_autoResetTimers.erase(it);
+                break;
+            }
+            else
+            {
+                ++it;
+            }
+        }
     }
 
-    if (autoResetTimeoutMs)
+    if (isActive && autoResetTimeoutMs)
     {
         auto autoResetTimer = TimerManager::instance()->addTimer(
             [this](quint64  timerId)
@@ -162,10 +241,13 @@ bool QnAdamResource::setRelayOutputState(
 
 void QnAdamResource::at_propertyChanged(const QnResourcePtr &res, const QString &key)
 {
-    qDebug() << "Resource property has changed:" << res->getName() << key;
-
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
-        qDebug() << getProperty(Qn::IO_SETTINGS_PARAM_NAME);
+    {
+        auto ports = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+        setPortDefaultStates();
+        setIOPorts(ports);
+        saveParams();
+    }
 }
 
 #endif //< ENABLE_ADVANTECH

@@ -64,8 +64,19 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
+    QnIOPortDataList mergeIOPortData(
+        const QnIOPortDataList& fromDevice, 
+        const QnIOPortDataList& saved) const;
+
+    void setPortDefaultStates();
+
+
+private:
     std::unique_ptr<QnAbstractIOManager> m_ioManager;
     std::map<quint64, PortTimerEntry> m_autoResetTimers;
+
+    
+
     mutable QnMutex m_mutex;
 
 

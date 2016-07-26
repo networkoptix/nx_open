@@ -11,13 +11,15 @@ namespace
 }
 
 QnModbusClient::QnModbusClient():
-    m_requestTransactionId(0)
+    m_requestTransactionId(0),
+    m_needReinitSocket(true)
 {
 }
 
 QnModbusClient::QnModbusClient(const SocketAddress& sockaddr) :
     m_requestTransactionId(0),
-    m_endpoint(sockaddr)
+    m_endpoint(sockaddr),
+    m_needReinitSocket(true)
 {
     initSocket();
 }
@@ -41,6 +43,8 @@ bool QnModbusClient::initSocket()
         return false;
     }
 
+    m_needReinitSocket = false;
+
     return true;
 }
 
@@ -62,17 +66,26 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, boo
 {
     ModbusResponse response;
 
-    if (!m_socket && !initSocket())
+    if (m_endpoint.isNull())
     {
         success = false;
         return response;
     }
 
-    if (!m_socket->isConnected())
+    if (!m_socket && !initSocket())
     {
+        success = false;
+        m_needReinitSocket = true;
+        return response;
+    }
+
+    if (m_needReinitSocket)
+    {
+        initSocket();
         if(!m_socket->connect(m_endpoint))
         {
             success = false;
+            m_needReinitSocket = true;
             return response;
         }
     }
@@ -92,6 +105,7 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, boo
         if (bytesSent < 1)
         {
             success = false;
+            m_needReinitSocket = true;
             return response;
         }
         totalBytesSent += bytesSent;
@@ -107,6 +121,7 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, boo
         if (bytesRead <= 0)
         {
             success = false;
+            m_needReinitSocket = true;
             return response;
         }
 
@@ -132,6 +147,8 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, boo
 
     if (success)
         response = ModbusResponse::decode(QByteArray(m_recvBuffer, bytesNeeded));
+    else
+        m_needReinitSocket = true;
 
     return response;
 }
@@ -180,7 +197,7 @@ ModbusResponse QnModbusClient::writeHoldingRegisters(quint16 startRegister, cons
     return doModbusRequest(request, status);
 }
 
-ModbusResponse QnModbusClient::writeSingleCoil(quint16 coilAddress, bool coilState)
+ModbusResponse QnModbusClient::writeSingleCoil(quint16 coilAddress, bool coilState, bool& status)
 {
     ModbusRequest request;
 
@@ -193,8 +210,6 @@ ModbusResponse QnModbusClient::writeSingleCoil(quint16 coilAddress, bool coilSta
         << (coilState ? kCoilStateOn : kCoilStateOff);
 
     request.header = buildHeader(request);
-
-    bool status;
 
     return doModbusRequest(request, status);
 }
