@@ -61,6 +61,10 @@ written by
    typedef DWORD pthread_key_t;
 #endif
 
+#ifndef _WIN32
+    int pthread_cond_init_monotonic(pthread_cond_t* cond);
+    int pthread_cond_wait_monotonic(pthread_cond_t* cond, pthread_mutex_t* mutex, uint64_t ms);
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -179,6 +183,7 @@ private:
 
    static pthread_cond_t m_EventCond;
    static pthread_mutex_t m_EventLock;
+   static int m_EventCondInit;
 
 private:
    static uint64_t s_ullCPUFrequency;	// CPU frequency : clock cycles per microsecond

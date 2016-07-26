@@ -140,11 +140,11 @@ APPLY(202, setResourceStatus, ApiResourceStatusData, \
                        false, /* system*/ \
                        CreateHashByIdRfc4122Helper(), /* getHash*/ \
                        ResourceNotificationManagerHelper(), \
-                       ModifyResourceAccess(), /* save permission checker */ \
-                       ReadResourceAccess(), /* read permission checker */ \
+                       AllowForAllAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       ReadResourceAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(204, setResourceParams, ApiResourceParamWithRefDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -227,9 +227,9 @@ APPLY(211, getStatusList, ApiResourceStatusDataList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
-                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(212, removeResources, ApiIdDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \

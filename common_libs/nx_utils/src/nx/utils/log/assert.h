@@ -10,9 +10,8 @@
 
 #include "log_message.h"
 
-// Uncomment enable NX_CHECK condition time measurements
-//#define NX_CHECK_MEASURE_TIME
-
+// Uncomment to enable NX_CHECK condition time measurements:
+// #define NX_CHECK_MEASURE_TIME
 
 namespace nx {
 namespace utils {
@@ -73,79 +72,85 @@ private:
 } // namespace nx
 
 #ifdef NX_CHECK_MEASURE_TIME
-    #define NX_CHECK(condition, message, action) do \
+    #define NX_CHECK(CONDITION, MESSAGE, ACTION) do \
     { \
         auto begin = std::chrono::system_clock::now(); \
-        auto isOk = static_cast<bool>(condition); \
+        bool isOk = static_cast<bool>(CONDITION); \
         auto time = std::chrono::system_clock::now() - begin; \
         \
         static const auto info = nx::utils::AssertTimer::instance.info(__FILE__, __LINE__); \
         info->add(std::chrono::duration_cast<std::chrono::microseconds>(time)); \
         \
         if (!isOk) \
-            nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
+            nx::utils::assert##ACTION(__FILE__, __LINE__, #CONDITION, MESSAGE); \
     } while (0)
 #else
-    #define NX_CHECK(condition, message, action) do \
+    #define NX_CHECK(CONDITION, MESSAGE, ACTION) do \
     { \
-        if (!(condition)) \
-            nx::utils::assert##action(__FILE__, __LINE__, #condition, message); \
+        if (!(CONDITION)) \
+            nx::utils::assert##ACTION(__FILE__, __LINE__, #CONDITION, MESSAGE); \
     } while (0)
 #endif
 
-#define NX_CRITICAL_IMPL(condition, message) NX_CHECK(condition, message, Crash)
+#define NX_CRITICAL_IMPL(CONDITION, MESSAGE) NX_CHECK(CONDITION, MESSAGE, Crash)
 
 #ifdef _DEBUG
-    #define NX_ASSERT_IMPL(condition, message) NX_CHECK(condition, message, Crash)
-    #define NX_EXPECT_IMPL(condition, message) NX_CHECK(condition, message, Crash)
+    #define NX_ASSERT_IMPL(CONDITION, MESSAGE) NX_CHECK(CONDITION, MESSAGE, Crash)
+    #define NX_EXPECT_IMPL(CONDITION, MESSAGE) NX_CHECK(CONDITION, MESSAGE, Crash)
 #else
-    #define NX_ASSERT_IMPL(condition, message) NX_CHECK(condition, message, Log)
-    #define NX_EXPECT_IMPL(condition, message)
+    #define NX_ASSERT_IMPL(CONDITION, MESSAGE) NX_CHECK(CONDITION, MESSAGE, Log)
+    #define NX_EXPECT_IMPL(CONDITION, MESSAGE) /* DOES NOTHING */
 #endif
 
 #define NX_MSVC_EXPAND(x) x
 #define NX_GET_4TH_ARG(a1, a2, a3, a4, ...) a4
 
+#define NX_CRITICAL1(CONDITION) \
+    NX_CRITICAL_IMPL(CONDITION, "")
 
-#define NX_CRITICAL1(condition) \
-    NX_CRITICAL_IMPL(condition, "")
+#define NX_CRITICAL2(CONDITION, MESSAGE) \
+    NX_CRITICAL_IMPL(CONDITION, MESSAGE)
 
-#define NX_CRITICAL2(condition, message) \
-    NX_CRITICAL_IMPL(condition, message)
+#define NX_CRITICAL3(CONDITION, WHERE, MESSAGE) \
+    NX_CRITICAL_IMPL(CONDITION, lm("[%1] %2").arg(WHERE).arg(MESSAGE))
 
-#define NX_CRITICAL3(condition, where, message) \
-    NX_CRITICAL_IMPL(condition, lm("[%1] %2").arg(where).arg(message))
+/**
+ * debug & release: Leads to segfault in case of failure.
+ */
+#define NX_CRITICAL(...) \
+    NX_MSVC_EXPAND(NX_GET_4TH_ARG( \
+        __VA_ARGS__, NX_CRITICAL3, NX_CRITICAL2, NX_CRITICAL1, args_reqired)(__VA_ARGS__))
 
-/** debug & release: Leads to segfault in case of failure */
-#define NX_CRITICAL(...) NX_MSVC_EXPAND( \
-    NX_GET_4TH_ARG(__VA_ARGS__, NX_CRITICAL3, NX_CRITICAL2, NX_CRITICAL1, args_reqired)(__VA_ARGS__))
+#define NX_ASSERT1(CONDITION) \
+    NX_ASSERT_IMPL(CONDITION, "")
 
+#define NX_ASSERT2(CONDITION, MESSAGE) \
+    NX_ASSERT_IMPL(CONDITION, MESSAGE)
 
-#define NX_ASSERT1(condition) \
-    NX_ASSERT_IMPL(condition, "")
+#define NX_ASSERT3(CONDITION, WHERE, MESSAGE) \
+    NX_ASSERT_IMPL(CONDITION, lm("[%1] %2").arg(WHERE).arg(MESSAGE))
 
-#define NX_ASSERT2(condition, message) \
-    NX_ASSERT_IMPL(condition, message)
+/**
+ * debug: Leads to segfault in case of failure.
+ * release: Writes NX_LOG in case of failure.
+ */
+#define NX_ASSERT(...) \
+    NX_MSVC_EXPAND(NX_GET_4TH_ARG( \
+        __VA_ARGS__, NX_ASSERT3, NX_ASSERT2, NX_ASSERT1, args_reqired)(__VA_ARGS__))
 
-#define NX_ASSERT3(condition, where, message) \
-    NX_ASSERT_IMPL(condition, lm("[%1] %2").arg(where).arg(message))
+#define NX_EXPECT1(CONDITION) \
+    NX_EXPECT_IMPL(CONDITION, "")
 
-/** debug: Leads to segfault in case of failure
- *  release: Writes NX_LOG in case of failure */
-#define NX_ASSERT(...) NX_MSVC_EXPAND( \
-    NX_GET_4TH_ARG(__VA_ARGS__, NX_ASSERT3, NX_ASSERT2, NX_ASSERT1, args_reqired)(__VA_ARGS__))
+#define NX_EXPECT2(CONDITION, MESSAGE) \
+    NX_EXPECT_IMPL(CONDITION, MESSAGE)
 
+#define NX_EXPECT3(CONDITION, WHERE, MESSAGE) \
+    NX_EXPECT_IMPL(CONDITION, lm("[%1] %2").arg(WHERE).arg(MESSAGE))
 
-#define NX_EXPECT1(condition) \
-    NX_EXPECT_IMPL(condition, "")
-
-#define NX_EXPECT2(condition, message) \
-    NX_EXPECT_IMPL(condition, message)
-
-#define NX_EXPECT3(condition, where, message) \
-    NX_EXPECT_IMPL(condition, lm("[%1] %2").arg(where).arg(message))
-
-/** debug: Leads to segfault in case of failure
- *  release: Does nothing (condition is not even evaluated) */
-#define NX_EXPECT(...) NX_MSVC_EXPAND( \
-    NX_GET_4TH_ARG(__VA_ARGS__, NX_EXPECT3, NX_EXPECT2, NX_EXPECT1, args_reqired)(__VA_ARGS__))
+/**
+ * debug: Leads to segfault in case of failure.
+ * release: Does nothing (CONDITION is not even evaluated).
+ */
+#define NX_EXPECT(...) \
+    NX_MSVC_EXPAND(NX_GET_4TH_ARG( \
+        __VA_ARGS__, NX_EXPECT3, NX_EXPECT2, NX_EXPECT1, args_reqired)(__VA_ARGS__))

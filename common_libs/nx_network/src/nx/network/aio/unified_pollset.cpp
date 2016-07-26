@@ -13,10 +13,13 @@
 #include "../udt/udt_socket.h"
 #include "../udt/udt_socket_impl.h"
 
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace network {
 namespace aio {
+
+static const int kInterruptBufferSize = 128;
 
 namespace {
 int mapAioEventToUdtEvent(aio::EventType et)
@@ -220,8 +223,11 @@ bool UnifiedPollSet::isValid() const
 
 void UnifiedPollSet::interrupt()
 {
-    static const quint8 buf[128] = { 0 };
-    m_interruptSocket.sendTo(buf, sizeof(buf), m_interruptSocket.getLocalAddress());
+    const auto address = m_interruptSocket.getLocalAddress();
+    NX_LOGX(lm("interrupt... %1").str(address), cl_logDEBUG1);
+
+    static const quint8 buffer[kInterruptBufferSize] = { 0 };
+    m_interruptSocket.sendTo(buffer, sizeof(buffer), address);
 }
 
 bool UnifiedPollSet::add(Pollable* const sock, EventType eventType, void* /*userData*/)
@@ -303,10 +309,12 @@ int UnifiedPollSet::poll(int millisToWait)
     auto it = m_readSysFds.find(m_interruptSocket.handle());
     if (it != m_readSysFds.end())
     {
+        quint8 buffer[kInterruptBufferSize];
+        m_interruptSocket.recv(buffer, sizeof(buffer), 0); // Ignoring result and data...
+
         --result;
-        quint8 buf[128];
-        m_interruptSocket.recv(buf, sizeof(buf), 0);   //ignoring result and data...
         m_readSysFds.erase(it);
+        NX_LOGX(lm("interrupted!"), cl_logDEBUG1);
     }
 
     removePhantomSockets(&m_readUdtFds);
