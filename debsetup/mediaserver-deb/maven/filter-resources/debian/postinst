@@ -223,7 +223,10 @@ case "$1" in
             cp "$OLD_DB_PATH" "$DB_PATH"
         fi
 
-        [ -n "$UPGRADING" ] && $DBSYNC
+        if [ '${arch}' != 'arm' ]
+        then 
+            [ -n "$UPGRADING" ] && $DBSYNC
+        fi    
   ;;
 
   abort-upgrade|abort-remove|abort-configure)
