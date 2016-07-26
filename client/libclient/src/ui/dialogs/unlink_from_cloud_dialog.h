@@ -21,6 +21,6 @@ public:
 
 private:
     QScopedPointer<Ui::UnlinkFromCloudDialog> ui;
-    QScopedPointer<QnUnlinkFromCloudDialogPrivate> d_ptr;
+    QnUnlinkFromCloudDialogPrivate* d_ptr;
     Q_DECLARE_PRIVATE(QnUnlinkFromCloudDialog)
 };

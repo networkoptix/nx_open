@@ -27,6 +27,13 @@ public:
         Question
     };
 
+    /* Positions of custom widgets in the message box. */
+    enum class Layout
+    {
+        Main,
+        Content
+    };
+
 public:
 
     QnMessageBox(QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
@@ -78,7 +85,7 @@ public:
     void setInformativeText(const QString &text);
 
     /** Delegate widget with custom details. QnMessageBox will take ownership. */
-    void addCustomWidget(QWidget* widget, int stretch = 0, Qt::Alignment alignment = Qt::Alignment());
+    void addCustomWidget(QWidget* widget, Layout layout = Layout::Content, int stretch = 0, Qt::Alignment alignment = Qt::Alignment());
 
     QString checkBoxText() const;
     void setCheckBoxText(const QString &text);

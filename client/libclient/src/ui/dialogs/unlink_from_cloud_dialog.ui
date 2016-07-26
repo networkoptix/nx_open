@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MessageBox</class>
- <widget class="QDialog" name="MessageBox">
+ <class>UnlinkFromCloudDialog</class>
+ <widget class="QDialog" name="UnlinkFromCloudDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -90,13 +90,6 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox">
-         <property name="text">
-          <string notr="true"/>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
     </layout>
@@ -120,15 +113,12 @@
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>checkBox</tabstop>
- </tabstops>
  <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>MessageBox</receiver>
+   <receiver>UnlinkFromCloudDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -144,7 +134,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>MessageBox</receiver>
+   <receiver>UnlinkFromCloudDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

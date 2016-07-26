@@ -54,6 +54,7 @@ void QnMessageBoxPrivate::init()
 
     q->ui->checkBox->hide();
     q->ui->informativeLabel->hide();
+    q->ui->secondaryLine->hide();
 
     QFont font = q->ui->mainLabel->font();
     font.setPixelSize(font.pixelSize() + 2);
@@ -456,15 +457,31 @@ void QnMessageBox::setInformativeText(const QString &text)
     ui->informativeLabel->setVisible(!text.isEmpty());
 }
 
-void QnMessageBox::addCustomWidget(QWidget* widget, int stretch, Qt::Alignment alignment)
+void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch, Qt::Alignment alignment)
 {
     widget->setParent(this);
-    ui->verticalLayout->insertWidget(
-        ui->verticalLayout->indexOf(ui->checkBox),
-        widget,
-        stretch,
-        alignment
-    );
+
+    switch (layout)
+    {
+        case QnMessageBox::Layout::Main:
+            ui->mainLayout->insertWidget(
+                ui->mainLayout->indexOf(ui->line),
+                widget,
+                stretch,
+                alignment
+            );
+            ui->secondaryLine->setVisible(true);
+            break;
+        case QnMessageBox::Layout::Content:
+            ui->verticalLayout->insertWidget(
+                ui->verticalLayout->indexOf(ui->checkBox),
+                widget,
+                stretch,
+                alignment
+            );
+        default:
+            break;
+    }
 }
 
 QString QnMessageBox::checkBoxText() const

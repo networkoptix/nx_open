@@ -8,19 +8,20 @@
 #include <common/common_module.h>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
+
 
 #include <client/client_settings.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/workbench/workbench_context.h>
+#include <ui/style/skin.h>
+
 
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 
-class QnUnlinkFromCloudDialogPrivate : public QObject, public QnWorkbenchContextAware
+class QnUnlinkFromCloudDialogPrivate : public QObject
 {
     QnUnlinkFromCloudDialog *q_ptr;
     Q_DECLARE_PUBLIC(QnUnlinkFromCloudDialog)
@@ -33,20 +34,17 @@ public:
     void unbindSystem();
     void showFailure(const QString &message = QString());
 
-    bool loggedAsCloudAccount() const;
-
     bool unlinkedSuccessfully;
 };
 
 QnUnlinkFromCloudDialog::QnUnlinkFromCloudDialog(QWidget *parent):
-    base_type(parent),
-    ui(new Ui::UnlinkFromCloudDialog(this)),
+    base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint),
+    ui(new Ui::UnlinkFromCloudDialog()),
     d_ptr(new QnUnlinkFromCloudDialogPrivate(this))
 {
-    ui->setupUi();
+    ui->setupUi(this);
 
     QPixmap pixmap = qnSkin->pixmap(lit("standard_icons/messagebox_question.png"));
-
     //ui->iconLabel->setVisible(!pixmap.isNull());
     ui->iconLabel->setPixmap(pixmap);
     ui->iconLabel->resize(pixmap.size());
@@ -63,17 +61,17 @@ QnUnlinkFromCloudDialog::QnUnlinkFromCloudDialog(QWidget *parent):
 
 
 
-    if (d_ptr->loggedAsCloudAccount())
-    {
-
-
-        ui->mainLabel->setText(tr("You are going to disconnect this system from cloud account you logged with."));
-        ui->informativeLabel->setText(tr("You will be disconnected from this system. To connect again, you'll have to use local admin account"));
-    }
-    else
-    {
-        ui->mainLabel->setText(tr("You are going to disconnect this system from the cloud account."));
-    }
+//     if (d_ptr->loggedAsCloudAccount())
+//     {
+//
+//
+//         ui->mainLabel->setText(tr("You are going to disconnect this system from cloud account you logged with."));
+//         ui->informativeLabel->setText(tr("You will be disconnected from this system. To connect again, you'll have to use local admin account"));
+//     }
+//     else
+//     {
+//         ui->mainLabel->setText(tr("You are going to disconnect this system from the cloud account."));
+//     }
 
     //TODO: #dklychkov set help topic
 }
@@ -92,14 +90,13 @@ void QnUnlinkFromCloudDialog::accept()
         return;
     }
 
-    if (d->loggedAsCloudAccount())
-        menu()->trigger(QnActions::DisconnectAction);
+//     if (d->loggedAsCloudAccount())
+//         menu()->trigger(QnActions::DisconnectAction);
     base_type::accept();
 }
 
 QnUnlinkFromCloudDialogPrivate::QnUnlinkFromCloudDialogPrivate(QnUnlinkFromCloudDialog *parent):
     QObject(parent),
-    QnWorkbenchContextAware(parent),
     q_ptr(parent),
     unlinkedSuccessfully(false)
 {
@@ -111,7 +108,7 @@ void QnUnlinkFromCloudDialogPrivate::lockUi(bool lock)
 
     const bool enabled = !lock;
 
-    q->button(QDialogButtonBox::Ok)->setEnabled(enabled);
+    q->buttonBox()->button(QDialogButtonBox::Ok)->setEnabled(enabled);
 }
 
 void QnUnlinkFromCloudDialogPrivate::unbindSystem()
@@ -160,9 +157,4 @@ void QnUnlinkFromCloudDialogPrivate::showFailure(const QString &message)
     messageBox.exec();
 
     lockUi(false);
-}
-
-bool QnUnlinkFromCloudDialogPrivate::loggedAsCloudAccount() const
-{
-    return context()->user() && context()->user()->isCloud();
 }
