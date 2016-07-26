@@ -48,6 +48,9 @@ public:
         bool isActive,
         unsigned int autoResetTimeoutMS ) override;
 
+public slots:
+    void at_propertyChanged(const QnResourcePtr & res, const QString & key);
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 

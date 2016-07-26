@@ -160,4 +160,12 @@ bool QnAdamResource::setRelayOutputState(
     return m_ioManager->setOutputPortState(outputId, isActive);
 }
 
+void QnAdamResource::at_propertyChanged(const QnResourcePtr &res, const QString &key)
+{
+    qDebug() << "Resource property has changed:" << res->getName() << key;
+
+    if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
+        qDebug() << getProperty(Qn::IO_SETTINGS_PARAM_NAME);
+}
+
 #endif //< ENABLE_ADVANTECH
