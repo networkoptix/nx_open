@@ -1174,7 +1174,7 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
     }
 
     int helpId = Qn::Empty_Help;
-    if (boost::algorithm::any_of(resources, [](auto res) { return res->hasFlags(Qn::live_cam); }))
+    if (boost::algorithm::any_of(resources, [](const QnResourcePtr& res) { return res->hasFlags(Qn::live_cam); }))
         helpId = Qn::DeletingCamera_Help;
 
     QnMessageBox messageBox(
