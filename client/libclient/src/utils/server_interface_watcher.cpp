@@ -21,7 +21,7 @@ void QnServerInterfaceWatcher::at_connectionChanged(const QnModuleInformation &m
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
     if (!server)
         return;
-    updatePriaryInterface(server);
+    updatePrimaryInterface(server);
 }
 
 void QnServerInterfaceWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -50,10 +50,10 @@ void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr
     if (!server)
         return;
 
-    updatePriaryInterface(server);
+    updatePrimaryInterface(server);
 }
 
-void QnServerInterfaceWatcher::updatePriaryInterface(const QnMediaServerResourcePtr &server)
+void QnServerInterfaceWatcher::updatePrimaryInterface(const QnMediaServerResourcePtr &server)
 {
     const auto newAddress = QnModuleFinder::instance()->primaryAddress(server->getId());
     if (!newAddress.isNull() && newAddress != server->getPrimaryAddress())
