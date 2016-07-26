@@ -126,9 +126,9 @@ bool QnAdamResource::setRelayOutputState(
     if (!m_ioManager)
         return false;
 
-    for (auto& it = m_autoResetTimers.begin(); it != m_autoResetTimers.end();)
+    for (auto it = m_autoResetTimers.begin(); it != m_autoResetTimers.end();)
     {
-        if (it->first.portId == outputId)
+        if (it->second.portId == outputId)
             it = m_autoResetTimers.erase(it);
         else
             ++it;
