@@ -214,8 +214,8 @@ QnManualCameraSearcher::QnManualCameraSearcher():
     m_state(QnManualCameraSearchStatus::Init),
     m_cancelled(false),
     m_hostRangeSize(0),
-    m_remainingTaskCount(0),
-    m_totalTaskCount(0)
+    m_totalTaskCount(0),
+    m_remainingTaskCount(0)
 {
 }
 
