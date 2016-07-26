@@ -33,7 +33,7 @@ angular.module('webadminApp')
                 $scope.authorizing = true;
                 mediaserver.login(login,password).then(reload,function(/*error*/){
                     $scope.authorizing = false;
-                    dialogs.alert('Login or password is incorrect');
+                    dialogs.alert(L.login.incorrectPassword);
                 });
             }
         };

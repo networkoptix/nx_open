@@ -60,8 +60,7 @@
                     </td>
                     <td>
                         <div class="input-group" ng-if="storage.isWritable"
-                             ng-class="{'has-error':!storageForm.reservedSpaceGb.$valid,
-                             'has-warning':storage.reservedSpace >= storage.freeSpace}">
+                             ng-class="{'has-error':!storageForm.reservedSpaceGb.$valid,'has-warning':storage.reservedSpace >= storage.freeSpace}">
                             <input type="number"  class="form-control input-sm"
                                    ng-model="storage.reservedSpaceGb"
                                    name="reservedSpaceGb"

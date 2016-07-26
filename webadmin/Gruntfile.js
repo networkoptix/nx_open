@@ -316,6 +316,7 @@ module.exports = function (grunt) {
                 files: {
                     src: [
                         '<%= yeoman.dist %>/scripts/{,*/}*.js',
+                        '!<%= yeoman.dist %>/scripts/{,*/}language.js',
                         '<%= yeoman.dist %>/styles/{,*/}*.css'//,
                         //'<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
                         //'<%= yeoman.dist %>/fonts/*'
@@ -431,6 +432,7 @@ module.exports = function (grunt) {
                             '*.xml',
                             '*.xsl',
                             'views/{,*/}*.html',
+                            'scripts/language.js',
                             'customization/*',
                             //'bower_components/**/*',
                             //'bower_components/videogular-themes-default/videogular.css',
@@ -501,6 +503,12 @@ module.exports = function (grunt) {
             },
             print_version:{
                 command: 'hg parent'
+            },
+            generate_translation:{
+                command: 'cd translation; python generate_ts.py; python localize.py'
+            },
+            localize:{
+                command: 'cd translation; python localize.py'
             }
         },
 
@@ -615,7 +623,9 @@ module.exports = function (grunt) {
         'rev',
         'usemin',
         'htmlmin',
-        'shell:version'
+        'shell:version',
+        'shell:generate_translation',
+        'shell:localize'
     ]);
 
     grunt.registerTask('default', [

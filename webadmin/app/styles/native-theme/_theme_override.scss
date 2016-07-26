@@ -91,14 +91,17 @@ button, select{
 
   &:hover{
     background-color: $button_l1;
+    border-color: $button_l1;
     border-bottom-color:$button_d1;
   }
 
   &:active,
   &.active {
     background-color: $button_d1;
-    border: none;
-    border-top: 1px solid $button_d3;
+    border-color: $button_d1;
+    border-top-color: $button_d3;
+    -webkit-box-shadow: none;
+    box-shadow: none;
   }
 
   &.disabled,
@@ -124,13 +127,17 @@ button, select{
 
   &:hover{
     background-color: $brand_l1;
-    border-bottom: 1px solid $brand_d2;
+    border-color: $brand_l1;
+    border-bottom-color:$brand_d2;
   }
 
   &:active,
   &.active {
     background-color: $brand_d1;
-    border-top: 1px solid $brand_d3;
+    border-color: $brand_d1;
+    border-top-color:$brand_d3;
+    -webkit-box-shadow: none;
+    box-shadow: none;
   }
 
   &.disabled,
@@ -188,11 +195,15 @@ button, select{
 }
 
 input[type="radio"], input[type="checkbox"] {
-  margin: 0;
+  margin-top: 2px;
 }
 .radio, .checkbox {
   padding-left: 22px;
+  label{
+    color: $light;
+  }
 }
-.radio input[type="radio"], .radio-inline input[type="radio"], .checkbox input[type="checkbox"], .checkbox-inline input[type="checkbox"] {
+.radio input[type="radio"], .radio-inline input[type="radio"],
+.checkbox input[type="checkbox"], .checkbox-inline input[type="checkbox"] {
    margin-left: -22px;
 }
