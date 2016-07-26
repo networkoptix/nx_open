@@ -38,8 +38,9 @@ QnAligner::QnAligner(QObject* parent /*= nullptr*/):
 {
     if (parent)
     {
-        auto signalizer = new QnSingleEventSignalizer(this);
-        signalizer->setEventType(QEvent::LayoutRequest);
+        auto signalizer = new QnMultiEventSignalizer(this);
+        signalizer->addEventType(QEvent::LayoutRequest);
+        signalizer->addEventType(QEvent::Show);
         connect(signalizer, &QnMultiEventSignalizer::activated, this, &QnAligner::align);
         parent->installEventFilter(signalizer);
     }
@@ -85,6 +86,12 @@ void QnAligner::align()
     for (QWidget* w : m_widgets)
         if (alignInvisible || w->isVisible())
             accessor(w)->set(w, maxWidth);
+
+    if (auto parentWidget = qobject_cast<QWidget*>(parent()))
+    {
+        if (parentWidget->layout())
+            parentWidget->layout()->activate();
+    }
 }
 
 AbstractAccessor* QnAligner::accessor(QWidget* widget) const
