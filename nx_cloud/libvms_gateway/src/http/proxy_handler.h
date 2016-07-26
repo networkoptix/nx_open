@@ -50,10 +50,22 @@ private:
     > m_requestCompletionHandler;
     std::unique_ptr<nx_http::AsyncMessagePipeline> m_targetHostPipeline;
 
-    nx_http::StatusCode::Value fetchTargetEndpointAndPrepareRequest(
+    struct TargetWithOptions
+    {
+        nx_http::StatusCode::Value status;
+        SocketAddress target;
+        bool isSsl;
+
+        TargetWithOptions(nx_http::StatusCode::Value status_, SocketAddress target_ = {});
+    };
+
+    TargetWithOptions cutTargetFromRequest(
         const nx_http::HttpServerConnection& connection,
-        nx_http::Request* const request,
-        SocketAddress* const targetEndpoint);
+        nx_http::Request* const request);
+
+    TargetWithOptions cutTargetFromUrl(nx_http::Request* const request);
+    TargetWithOptions cutTargetFromPath(nx_http::Request* const request);
+
     void onConnected(SystemError::ErrorCode errorCode);
     void onMessageFromTargetHost(nx_http::Message message);
 };
