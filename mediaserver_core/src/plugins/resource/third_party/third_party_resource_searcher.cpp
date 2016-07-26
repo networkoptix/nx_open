@@ -220,7 +220,7 @@ QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
     QString dafaultURL;
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if( server )
-        dafaultURL = server->getApiUrl();
+        dafaultURL = server->getApiUrl().toString();
 
     QVector<nxcip::CameraInfo> cameraInfoTempArray;
 

@@ -108,7 +108,7 @@ void QnMergeSystemsDialog::updateKnownSystems()
 
     for (const QnMediaServerResourcePtr& server: qnResPool->getAllIncompatibleResources().filtered<QnMediaServerResource>())
     {
-        QString url = server->getApiUrl();
+        QString url = server->getApiUrl().toString();
         QString label = QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
         QString systemName = server->getSystemName();
         if (!systemName.isEmpty())

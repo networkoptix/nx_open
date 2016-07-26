@@ -47,7 +47,7 @@ void QnRestUpdatePeerTask::doStart() {
         NX_ASSERT(QnMediaServerResource::isFakeServer(server), "An incompatible server resource is expected here.", Q_FUNC_INFO);
 
         NX_LOG(lit("Update: QnRestUpdatePeerTask: Request [%1, %2, %3].")
-               .arg(m_updateId).arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG2);
+               .arg(m_updateId).arg(server->getName()).arg(server->getApiUrl().toString()), cl_logDEBUG2);
 
         int handle = server->apiConnection()->installUpdate(m_updateId, true, this, SLOT(at_updateInstalled(int,QnUploadUpdateReply,int)));
         m_serverByRequest[handle] = server;
@@ -92,7 +92,7 @@ void QnRestUpdatePeerTask::finishPeer(const QnUuid &id) {
         return;
 
     NX_LOG(lit("Update: QnRestUpdatePeerTask: Installation finished [%1, %2].")
-           .arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG1);
+           .arg(server->getName()).arg(server->getApiUrl().toString()), cl_logDEBUG1);
 
     emit peerFinished(server->getId());
     emit peerUpdateFinished(server->getId(), server->getOriginalGuid());
@@ -114,7 +114,7 @@ void QnRestUpdatePeerTask::at_updateInstalled(int status, const QnUploadUpdateRe
         return;
 
     NX_LOG(lit("Update: QnRestUpdatePeerTask: Reply [%1, %2, %3].")
-           .arg(reply.offset).arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG2);
+           .arg(reply.offset).arg(server->getName()).arg(server->getApiUrl().toString()), cl_logDEBUG2);
 
     if (status != 0 || reply.offset != ec2::AbstractUpdatesManager::NoError) {
         finish(UploadError, QSet<QnUuid>() << server->getId());
