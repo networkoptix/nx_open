@@ -2189,16 +2189,16 @@ void MediaServerProcess::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(QnPlVmax480ResourceSearcher::instance());
 #endif
 
-    //Onvif searcher should be the last:
+//Onvif searcher should be the last:
 #ifdef ENABLE_ONVIF
+    QnFlirResourceSearcher flirResourceSearcher;
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&flirResourceSearcher);
+
     QnFlexWatchResourceSearcher flexWatchResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&flexWatchResourceSearcher);
 
     OnvifResourceSearcher onvifResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&onvifResourceSearcher);
-
-    QnFlirResourceSearcher flirResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&flirResourceSearcher);
 #endif //ENABLE_ONVIF
 #endif
 

@@ -7,8 +7,8 @@ QnMediaCyclicBuffer::QnMediaCyclicBuffer(size_type bufferSize, int align):
     m_offset(0),
     m_align(align)
 {
-    Q_ASSERT(bufferSize >= align);
     if (bufferSize > 0) {
+        Q_ASSERT(bufferSize >= align);
         m_buffer = (value_type*) qMallocAligned(bufferSize, align);
         Q_ASSERT_X(m_buffer, Q_FUNC_INFO, "not enough memory");
     }
@@ -16,10 +16,17 @@ QnMediaCyclicBuffer::QnMediaCyclicBuffer(size_type bufferSize, int align):
 
 bool QnMediaCyclicBuffer::resize(size_type size)
 {
-    qFreeAligned(m_buffer);
-    m_buffer = (value_type*)qMallocAligned(size, m_align);
-    Q_ASSERT_X(m_buffer, Q_FUNC_INFO, "not enough memory");
-    return m_buffer != nullptr;
+    value_type* buffer = (value_type*)qMallocAligned(size, m_align);
+    Q_ASSERT_X(buffer, Q_FUNC_INFO, "not enough memory");
+
+    if (buffer != nullptr)
+    {
+        qFreeAligned(m_buffer);
+        m_buffer = buffer;
+        m_maxSize = size;
+    }
+
+    return buffer != nullptr;
 }
 
 QnMediaCyclicBuffer::~QnMediaCyclicBuffer()

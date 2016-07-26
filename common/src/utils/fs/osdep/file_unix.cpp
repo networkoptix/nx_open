@@ -114,12 +114,9 @@ qint64 QnFile::write( const char* buffer, qint64 count )
 {
     auto printLogMessage = [](const QString& m, QnLogLevel l)
     {
-        char buf[1024];
-        strerror_r(errno, buf, 1024);
-        NX_LOG(
-            lit("QnFile::write failed. %1 Errno: %2")
+        NX_LOG(lit("QnFile::write failed. %1 Errno: %2")
                 .arg(m)
-                .arg(QString::fromLatin1(buf)),
+                .arg(errno),
             cl_logERROR);
     };
 	if( !isOpen() )

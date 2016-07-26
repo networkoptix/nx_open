@@ -328,10 +328,9 @@ bool QBufferedFile::updatePos()
 				<< " to " << fileBlockSize + newBufSize
 				<< ". Delta = " << newBufSize - m_minBufferSize;
 #endif
-			if (newBufSize < kMaxBufferSize)
-			{
+            if (newBufSize < kMaxBufferSize && m_cycleBuffer.resize(fileBlockSize + newBufSize))
+            {
 				m_minBufferSize = newBufSize;
-				m_cycleBuffer.resize(fileBlockSize + newBufSize);
 				emit seekDetected(reinterpret_cast<uintptr_t>(this), newBufSize);
 			}
 		}
