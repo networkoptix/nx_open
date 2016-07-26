@@ -1,33 +1,30 @@
 #include "unlink_from_cloud_dialog.h"
+#include "ui_unlink_from_cloud_dialog.h"
 
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <api/app_server_connection.h>
 
-#include <cdb/connection.h>
-
 #include <common/common_module.h>
+
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 
 #include <client/client_settings.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workbench/workbench_context.h>
 
+#include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 
-using namespace nx::cdb;
-
-class QnUnlinkFromCloudDialogPrivate : public QObject
+class QnUnlinkFromCloudDialogPrivate : public QObject, public QnWorkbenchContextAware
 {
     QnUnlinkFromCloudDialog *q_ptr;
     Q_DECLARE_PUBLIC(QnUnlinkFromCloudDialog)
     Q_DECLARE_TR_FUNCTIONS(QnUnlinkFromCloudDialogPrivate)
-
-    std::unique_ptr<api::ConnectionFactory, decltype(&destroyConnectionFactory)> connectionFactory;
-    std::unique_ptr<api::Connection> cloudConnection;
-    bool unlinkedSuccessfully;
 
 public:
     QnUnlinkFromCloudDialogPrivate(QnUnlinkFromCloudDialog *parent);
@@ -37,30 +34,47 @@ public:
     void showFailure(const QString &message = QString());
 
     bool loggedAsCloudAccount() const;
-private:
-    void at_unbindFinished(api::ResultCode result);
+
+    bool unlinkedSuccessfully;
 };
 
-QnUnlinkFromCloudDialog::QnUnlinkFromCloudDialog(QWidget *parent)
-    : base_type(parent)
-    , d_ptr(new QnUnlinkFromCloudDialogPrivate(this))
+QnUnlinkFromCloudDialog::QnUnlinkFromCloudDialog(QWidget *parent):
+    base_type(parent),
+    ui(new Ui::UnlinkFromCloudDialog(this)),
+    d_ptr(new QnUnlinkFromCloudDialogPrivate(this))
 {
-    setWindowTitle(tr("Unlink from cloud"));
-    setIcon(QnMessageBox::Warning);
+    ui->setupUi();
+
+    QPixmap pixmap = qnSkin->pixmap(lit("standard_icons/messagebox_question.png"));
+
+    //ui->iconLabel->setVisible(!pixmap.isNull());
+    ui->iconLabel->setPixmap(pixmap);
+    ui->iconLabel->resize(pixmap.size());
+
+    setWindowTitle(tr("Disconnect from %1").arg(QnAppInfo::cloudName()));
+
+    /*
+    1) ask cloud username and password
+    2) if logged as local - OK
+    3) else
+        3.1) if there is enabled local owner - warn, disconnect and OK
+        3.2) else - create local owner, then warn, disconnect and OK
+    */
+
+
 
     if (d_ptr->loggedAsCloudAccount())
     {
-        setText(tr("You are going to disconnect this system from cloud account you logged with."));
-        setInformativeText(tr("You will be disconnected from this system. To connect again, you'll have to use local admin account"));
+
+
+        ui->mainLabel->setText(tr("You are going to disconnect this system from cloud account you logged with."));
+        ui->informativeLabel->setText(tr("You will be disconnected from this system. To connect again, you'll have to use local admin account"));
     }
     else
     {
-        setText(tr("You are going to disconnect this system from the cloud account."));
+        ui->mainLabel->setText(tr("You are going to disconnect this system from the cloud account."));
     }
 
-
-    setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    setDefaultButton(QDialogButtonBox::Ok);
     //TODO: #dklychkov set help topic
 }
 
@@ -83,23 +97,12 @@ void QnUnlinkFromCloudDialog::accept()
     base_type::accept();
 }
 
-QnUnlinkFromCloudDialogPrivate::QnUnlinkFromCloudDialogPrivate(QnUnlinkFromCloudDialog *parent)
-    : QObject(parent)
-    , q_ptr(parent)
-    , connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
-    , unlinkedSuccessfully(false)
+QnUnlinkFromCloudDialogPrivate::QnUnlinkFromCloudDialogPrivate(QnUnlinkFromCloudDialog *parent):
+    QObject(parent),
+    QnWorkbenchContextAware(parent),
+    q_ptr(parent),
+    unlinkedSuccessfully(false)
 {
-    const auto cdbEndpoint = qnSettings->cdbEndpoint();
-    if (!cdbEndpoint.isEmpty())
-    {
-        const auto hostAndPort = cdbEndpoint.split(lit(":"));
-        if (hostAndPort.size() == 2)
-        {
-            connectionFactory->setCloudEndpoint(
-                    hostAndPort[0].toStdString(),
-                    hostAndPort[1].toInt());
-        }
-    }
 }
 
 void QnUnlinkFromCloudDialogPrivate::lockUi(bool lock)
@@ -114,60 +117,6 @@ void QnUnlinkFromCloudDialogPrivate::lockUi(bool lock)
 void QnUnlinkFromCloudDialogPrivate::unbindSystem()
 {
     lockUi(true);
-
-    std::string systemId = qnGlobalSettings->cloudSystemID().toStdString();
-
-    cloudConnection = connectionFactory->createConnection(
-            systemId,
-            qnGlobalSettings->cloudAuthKey().toStdString());
-
-    cloudConnection->systemManager()->unbindSystem(
-            systemId,
-            [this](api::ResultCode result)
-    {
-        Q_Q(QnUnlinkFromCloudDialog);
-        executeDelayed(
-                [this, result]()
-                {
-                    at_unbindFinished(result);
-                },
-                0, q->thread()
-        );
-    });
-}
-
-void QnUnlinkFromCloudDialogPrivate::showFailure(const QString &message)
-{
-    Q_Q(QnUnlinkFromCloudDialog);
-
-    QnMessageBox messageBox(QnMessageBox::NoIcon,
-                            helpTopic(q),
-                            tr("Error"),
-                            tr("Can not unlink the system from the cloud"),
-                            QDialogButtonBox::Ok,
-                            q);
-
-    if (!message.isEmpty())
-        messageBox.setInformativeText(message);
-
-    messageBox.exec();
-
-    lockUi(false);
-}
-
-bool QnUnlinkFromCloudDialogPrivate::loggedAsCloudAccount() const
-{
-    QUrl currentUrl = QnAppServerConnectionFactory::url();
-    return currentUrl.userName().contains(L'@'); //TODO: #GDM refactor when cloud users will be implemented
-}
-
-void QnUnlinkFromCloudDialogPrivate::at_unbindFinished(api::ResultCode result)
-{
-    if (result != api::ResultCode::ok)
-    {
-        showFailure();
-        return;
-    }
 
     Q_Q(QnUnlinkFromCloudDialog);
     auto handleReply = [this, q](bool success, rest::Handle handleId, const QnRestResult& reply)
@@ -192,4 +141,28 @@ void QnUnlinkFromCloudDialogPrivate::at_unbindFinished(api::ResultCode result)
         return;
 
     serverConnection->resetCloudSystemCredentials(handleReply, q->thread());
+}
+
+void QnUnlinkFromCloudDialogPrivate::showFailure(const QString &message)
+{
+    Q_Q(QnUnlinkFromCloudDialog);
+
+    QnMessageBox messageBox(QnMessageBox::NoIcon,
+                            helpTopic(q),
+                            tr("Error"),
+                            tr("Can not unlink the system from the cloud"),
+                            QDialogButtonBox::Ok,
+                            q);
+
+    if (!message.isEmpty())
+        messageBox.setInformativeText(message);
+
+    messageBox.exec();
+
+    lockUi(false);
+}
+
+bool QnUnlinkFromCloudDialogPrivate::loggedAsCloudAccount() const
+{
+    return context()->user() && context()->user()->isCloud();
 }
