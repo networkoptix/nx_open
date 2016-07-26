@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export vblank_mode=0
+export QT_QPA_PLATFORM=xcb
 
 USER_APPLAUNCHER_DIR="$HOME/.local/share/${company.name}/applauncher/${customization}"
 

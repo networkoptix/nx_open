@@ -848,6 +848,7 @@
                 <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
+                <target.arch>armhf</target.arch>
             </properties>
             <modules>
                 <!--<module>plugins/rpi_cam</module>-->
@@ -881,6 +882,7 @@
                 <liteMode>true</liteMode>
                 <gcc.version>4.8.3</gcc.version>
                 <qt.spec/>
+                <target.arch>armhf</target.arch>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -918,6 +920,7 @@
                 <rdep.target>bpi</rdep.target>
                 <gcc.version>4.8.3</gcc.version>
                 <qt.spec/>
+                <target.arch>armhf</target.arch>                
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -950,14 +953,18 @@
                 <rdep.target>tx1</rdep.target>
                 <gcc.version>4.8.4</gcc.version>
                 <qt.spec/>
+                <target.arch>armhf</target.arch>                
             </properties>
             <modules>
                 <module>client/libclient_core</module>
                 <module>client/libclient</module>
                 <module>client/desktop_client</module>
+                <module>client/applauncher</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speech_synthesizer</module>
+                <module>debsetup/client-deb</module>
+                <module>debsetup/mediaserver-deb</module>                
             </modules>
         </profile>
         <profile>
