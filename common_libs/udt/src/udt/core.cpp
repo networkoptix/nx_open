@@ -1689,9 +1689,9 @@ void CUDT::initSynch()
 {
    #ifndef _WIN32
       pthread_mutex_init(&m_SendBlockLock, NULL);
-      pthread_cond_init(&m_SendBlockCond, NULL);
+      pthread_cond_init_monotonic(&m_SendBlockCond);
       pthread_mutex_init(&m_RecvDataLock, NULL);
-      pthread_cond_init(&m_RecvDataCond, NULL);
+      pthread_cond_init_monotonic(&m_RecvDataCond);
       pthread_mutex_init(&m_SendLock, NULL);
       pthread_mutex_init(&m_RecvLock, NULL);
       pthread_mutex_init(&m_AckLock, NULL);
