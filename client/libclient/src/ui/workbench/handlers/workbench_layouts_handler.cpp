@@ -475,12 +475,12 @@ bool QnWorkbenchLayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourc
     auto allUsers = qnResPool->getResources<QnUserResource>();
     auto accessibleToCustomUsers = boost::algorithm::any_of(
         allUsers,
-        [layouts](const auto& user)
+        [layouts](const QnUserResourcePtr& user)
         {
             return !qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission)
                 && boost::algorithm::any_of(
                     layouts,
-                    [user](const auto& layout)
+                    [user](const QnLayoutResourcePtr& layout)
                     {
                         return qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission);
                     });
