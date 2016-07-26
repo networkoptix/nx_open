@@ -121,14 +121,25 @@ bool QnAdamResource::setRelayOutputState(
     bool isActive, 
     unsigned int autoResetTimeoutMs )
 {
+    QnMutexLocker lock(&m_mutex);
+
     if (!m_ioManager)
         return false;
+
+    for (auto& it = m_autoResetTimers.begin(); it != m_autoResetTimers.end();)
+    {
+        if (it->first.portId == outputId)
+            it = m_autoResetTimers.erase(it);
+        else
+            ++it;
+    }
 
     if (autoResetTimeoutMs)
     {
         auto autoResetTimer = TimerManager::instance()->addTimer(
             [this](quint64  timerId)
             {
+                QnMutexLocker lock(&m_mutex);
                 if (m_autoResetTimers.count(timerId))
                 {
                     auto timerEntry = m_autoResetTimers[timerId];

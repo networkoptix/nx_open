@@ -63,6 +63,7 @@ protected:
 private:
     std::unique_ptr<QnAbstractIOManager> m_ioManager;
     std::map<quint64, PortTimerEntry> m_autoResetTimers;
+    mutable QnMutex m_mutex;
 
 
 };
