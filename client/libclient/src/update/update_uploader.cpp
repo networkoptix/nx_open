@@ -68,7 +68,7 @@ void QnUpdateUploader::sendPreambule() {
     }
 
     for (const QnMediaServerResourcePtr &server: m_restTargets) {
-        NX_LOG(lit("Update: QnUpdateUploader: Send preambule request [%1 : %2].").arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG2);
+        NX_LOG(lit("Update: QnUpdateUploader: Send preambule request [%1 : %2].").arg(server->getName()).arg(server->getApiUrl().toString()), cl_logDEBUG2);
         int handle = server->apiConnection()->uploadUpdateChunk(m_updateId, md5.toLatin1(), -1, this, SLOT(at_restReply_finished(int,QnUploadUpdateReply,int)));
         m_restRequsts[handle] = server;
     }
@@ -145,7 +145,7 @@ void QnUpdateUploader::sendNextChunk() {
         if (!m_pendingPeers.contains(server->getId()))
             continue;
         NX_LOG(lit("Update: QnUpdateUploader: Send chunk request [%1, %2, %3, %4, %5].")
-               .arg(m_updateId).arg(offset).arg(data.size()).arg(server->getId().toString()).arg(server->getApiUrl()), cl_logDEBUG2);
+               .arg(m_updateId).arg(offset).arg(data.size()).arg(server->getId().toString()).arg(server->getApiUrl().toString()), cl_logDEBUG2);
         int handle = server->apiConnection()->uploadUpdateChunk(m_updateId, data, offset, this, SLOT(at_restReply_finished(int,QnUploadUpdateReply,int)));
         m_restRequsts[handle] = server;
     }

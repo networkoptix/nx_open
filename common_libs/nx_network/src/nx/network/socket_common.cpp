@@ -271,11 +271,28 @@ SocketAddress::SocketAddress( const char* str )
     initializeFromString(QString::fromUtf8(str));
 }
 
+SocketAddress::SocketAddress(const QUrl& url)
+    :
+    address(url.host()),
+    port(url.port(0))
+{
+}
+
 QString SocketAddress::toString() const
 {
     return
         address.toString() +
-        (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
+            (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
+}
+
+QUrl SocketAddress::toUrl(const QString& scheme)
+{
+    QUrl url;
+    url.setScheme(scheme.isEmpty() ? lit("http") : scheme);
+    url.setHost(address.toString());
+    if (port > 0)
+        url.setPort(port);
+    return url;
 }
 
 bool SocketAddress::operator==( const SocketAddress& rhs ) const

@@ -235,12 +235,39 @@ Rectangle
 
             onClicked: context.connectToAnotherSystem();
         }
+
+        NxBanner
+        {
+            visible: context.isOfflineConnection;
+
+            anchors.top: parent.top;
+            anchors.topMargin: 16;
+            anchors.horizontalCenter: parent.horizontalCenter;
+
+            textControl.text: qsTr("You have no internet access. Some cloud features could be unavailable.");
+        }
     }
 
-    NxCirclesPreloader
+    Column
     {
         visible: context.globalPreloaderVisible;
         anchors.centerIn: parent;
+        spacing: 36;
+
+        NxCirclesPreloader
+        {
+            id: preloader;
+            anchors.horizontalCenter: parent.horizontalCenter;
+        }
+
+        NxLabel
+        {
+            id: preloaderLabel;
+            text: qsTr("Loading...");
+            color: Style.colors.mid;
+            font: Style.fonts.preloader;
+            anchors.horizontalCenter: parent.horizontalCenter;
+        }
     }
 
     MouseArea
@@ -252,4 +279,5 @@ Rectangle
 
         visible: context.connectingToSystem.length;
     }
+
 }

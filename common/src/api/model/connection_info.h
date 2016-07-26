@@ -1,5 +1,4 @@
-#ifndef QN_CONNECTION_INFO_H
-#define QN_CONNECTION_INFO_H
+#pragma once
 
 #ifndef QN_NO_QT
 #include <QtCore/QMetaType>
@@ -15,8 +14,8 @@
 
 #endif
 
-
-struct QnConnectionInfo {
+struct QnConnectionInfo
+{
     /*!
         \note considering that servers with no proto version support have version nx_ec::INITIAL_EC2_PROTO_VERSION
     */
@@ -33,10 +32,12 @@ struct QnConnectionInfo {
     //!Transaction message bus protocol version (defined by \a nx_ec::EC2_PROTO_VERSION)
     int nxClusterProtoVersion;
     bool ecDbReadOnly;
+    bool newSystem;
     QString effectiveUserName;
 };
 
-#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)(box)(allowSslConnections)(nxClusterProtoVersion)(ecDbReadOnly)(effectiveUserName)
+#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)\
+    (box)(allowSslConnections)(nxClusterProtoVersion)(ecDbReadOnly)(effectiveUserName)(newSystem)
 
 #ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
@@ -44,5 +45,3 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (ubjson)(metatype)(xml)(json)(csv_record)
 )
 #endif
-
-#endif // QN_CONNECTION_INFO_H

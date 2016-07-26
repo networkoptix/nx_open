@@ -20,7 +20,7 @@ public:
 
     void mergeSystem(const QnSystemDescriptionPtr& system);
 
-    void removeSystem(const QString& id);
+    void removeSystem(const QString& id, bool isCloud);
 
 public: // overrides
     QString id() const override;

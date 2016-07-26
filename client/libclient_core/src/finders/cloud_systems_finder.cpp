@@ -36,13 +36,20 @@ QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
         , this, &QnCloudSystemsFinder::onCloudStatusChanged);
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudSystemsChanged
         , this, &QnCloudSystemsFinder::setCloudSystems);
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::error
-        , this, &QnCloudSystemsFinder::onCloudError);
+
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::recentCloudSystemsChanged, this
+        , [this]()
+        {
+            if (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Offline)
+                setCloudSystems(qnCloudStatusWatcher->recentCloudSystems());
+        });
 
     connect(m_updateSystemsTimer, &QTimer::timeout
         , this, &QnCloudSystemsFinder::updateSystems);
     m_updateSystemsTimer->setInterval(kCloudSystemsRefreshPeriodMs);
     m_updateSystemsTimer->start();
+
+    onCloudStatusChanged(qnCloudStatusWatcher->status());
 }
 
 QnCloudSystemsFinder::~QnCloudSystemsFinder()
@@ -80,14 +87,10 @@ QnSystemDescriptionPtr QnCloudSystemsFinder::getSystem(const QString &id) const
 void QnCloudSystemsFinder::onCloudStatusChanged(QnCloudStatusWatcher::Status status)
 {
     // TODO: #ynikitenkov Add handling of status changes
-    switch (status)
-    {
-    case QnCloudStatusWatcher::Online:
-    case QnCloudStatusWatcher::LoggedOut:
-    case QnCloudStatusWatcher::Unauthorized:
-    case QnCloudStatusWatcher::Offline:
-        break;
-    }
+    if (status == QnCloudStatusWatcher::LoggedOut)
+        setCloudSystems(QnCloudSystemList());
+    else if (status == QnCloudStatusWatcher::Offline)
+        setCloudSystems(qnCloudStatusWatcher->recentCloudSystems());
 }
 
 void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
@@ -113,8 +116,11 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
         const auto addedIds = IdsSet(newIds).subtract(oldIds);
 
         removedIds = IdsSet(oldIds).subtract(newIds);
+        for (const auto added : addedIds)
+            m_systems.insert(added, updatedSystems[added]);
+        for (const auto removed : removedIds)
+            m_systems.remove(removed);
 
-        std::swap(m_systems, updatedSystems);
         for (const auto system : m_systems)
         {
             if (addedIds.contains(system->id()))
@@ -127,12 +133,6 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
 
     for (const auto removedId : removedIds)
         emit systemLost(removedId);
-}
-
-void QnCloudSystemsFinder::onCloudError(QnCloudStatusWatcher::ErrorCode error)
-{
-    // TODO: #ynikitenkov handle errors. Now it is assumed that systems are reset
-    // if any error automatically
 }
 
 void QnCloudSystemsFinder::updateSystemInternal(

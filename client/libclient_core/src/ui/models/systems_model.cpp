@@ -181,62 +181,63 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
     if (!qBetween(0, row, rowCount()))
         return QVariant();
 
-    const auto systemDescription = d->internalData[row]->system;
+    const auto system = d->internalData[row]->system;
     switch(role)
     {
         case SearchRoleId:
         {
             QString hosts;
-            for (const auto& moduleInfo : systemDescription->servers())
+            for (const auto& moduleInfo : system->servers())
             {
-                hosts.append(systemDescription->getServerHost(moduleInfo.id));
+                hosts.append(system->getServerHost(moduleInfo.id));
                 hosts.append(lit(" "));
             }
 
             return QStringList({data(index, SystemNameRoleId).toString(),
                 data(index, OwnerDescriptionRoleId).toString(),
-                systemDescription->ownerAccountEmail(), hosts}
+                system->ownerAccountEmail(), hosts}
                 ).join(lit(" "));
         }
         case SystemNameRoleId:
-            return d->getDisplayName(systemDescription);
+            return d->getDisplayName(system);
         case SystemIdRoleId:
-            return systemDescription->id();
+            return system->id();
         case OwnerDescriptionRoleId:
         {
-            if (!systemDescription->isCloudSystem())
+            if (!system->isCloudSystem())
                 return QString(); // No owner for local system
 
-            if ((qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Online)
-                && (qnCloudStatusWatcher->cloudLogin() == systemDescription->ownerAccountEmail()))
+            const bool isLoggedIn =
+                (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut);
+            if (isLoggedIn && (qnCloudStatusWatcher->cloudLogin() == system->ownerAccountEmail()))
             {
                 return tr("Your system");
             }
 
-            const auto fullName = systemDescription->ownerFullName();
-            return (fullName.isEmpty() ? systemDescription->ownerAccountEmail()
+            const auto fullName = system->ownerFullName();
+            return (fullName.isEmpty() ? system->ownerAccountEmail()
                 : tr("%1's system", "%1 is a user name").arg(fullName));
         }
         case LastPasswordsModelRoleId:
             return QVariant();  // TODO
         case IsFactorySystemRoleId:
-            return d->isFactorySystem(systemDescription);
+            return d->isFactorySystem(system);
         case IsCloudSystemRoleId:
-            return systemDescription->isCloudSystem();
+            return system->isCloudSystem();
         case IsOnlineRoleId:
-            return !systemDescription->servers().isEmpty();
+            return !system->servers().isEmpty();
         case IsCompatibleRoleId:
-            return d->isCompatibleSystem(systemDescription);
+            return d->isCompatibleSystem(system);
         case IsCorrectCustomizationRoleId:
-            return d->isCorrectCustomization(systemDescription);
+            return d->isCorrectCustomization(system);
         case IsCompatibleVersionRoleId:
-            return d->isCompatibleVersion(systemDescription);
+            return d->isCompatibleVersion(system);
         case WrongVersionRoleId:
-            return d->getIncompatibleVersion(systemDescription);
+            return d->getIncompatibleVersion(system);
         case CompatibleVersionRoleId:
-            return d->getCompatibleVersion(systemDescription);
+            return d->getCompatibleVersion(system);
         case WrongCustomizationRoleId:
-            return d->getIncompatibleCustomization(systemDescription);
+            return d->getIncompatibleCustomization(system);
 
         default:
             return QVariant();

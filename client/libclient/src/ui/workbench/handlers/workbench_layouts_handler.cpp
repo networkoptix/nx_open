@@ -24,7 +24,7 @@
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
+#include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -75,8 +75,19 @@ QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUuid &p
     }
     return result;
 }
-}
 
+QSet<QnResourcePtr> layoutResources(const QnLayoutItemDataMap& items)
+{
+    QSet<QnResourcePtr> result;
+    for (const auto& item : items)
+    {
+        if (auto resource = qnResPool->getResourceByDescriptor(item.resource))
+            result << resource;
+    }
+    return result;
+};
+
+}
 
 
 QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
@@ -93,6 +104,7 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
     connect(action(QnActions::SaveCurrentLayoutAsAction),           &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
     connect(action(QnActions::CloseLayoutAction),                   &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_closeLayoutAction_triggered);
     connect(action(QnActions::CloseAllButThisLayoutAction),         &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
+    connect(action(QnActions::RemoveFromServerAction),              &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_removeFromServerAction_triggered);
     connect(action(QnActions::ShareLayoutAction),                   &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered);
     connect(action(QnActions::StopSharingLayoutAction),             &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered);
     connect(action(QnActions::OpenNewTabAction),                    &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered);
@@ -180,6 +192,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
             grantAccessRightsForUser(owner, change);
         //TODO: #GDM #access Grant access rights for groups?
 
+        //TODO: #GDM what if we've been disconnected while confirming?
         if (confirmLayoutChange(change))
             snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
         else
@@ -359,17 +372,6 @@ QnWorkbenchLayoutsHandler::LayoutChange QnWorkbenchLayoutsHandler::calculateLayo
     LayoutChange result;
     result.layout = layout;
 
-    auto layoutResources = [](const QnLayoutItemDataMap& items)
-    {
-        QSet<QnResourcePtr> result;
-        for (const auto& item : items)
-        {
-            if (auto resource = qnResPool->getResourceByDescriptor(item.resource))
-                result << resource;
-        }
-        return result;
-    };
-
     /* Share added resources. */
     auto snapshot = snapshotManager()->snapshot(layout);
     auto oldResources = layoutResources(snapshot.items);
@@ -431,13 +433,11 @@ bool QnWorkbenchLayoutsHandler::confirmSharedLayoutChange(const LayoutChange& ch
     auto allUsers = qnResPool->getResources<QnUserResource>();
     auto accessibleToCustomUsers = std::any_of(
         allUsers.cbegin(), allUsers.cend(),
-        [layout = change.layout]
-        (const QnUserResourcePtr& user)
+        [layout = change.layout](const QnUserResourcePtr& user)
         {
             return !qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission)
-                 && qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission);
-        }
-    );
+                 && qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission);
+        });
 
     /* Do not warn if there are no such users - no side effects in any case. */
     if (!accessibleToCustomUsers)
@@ -465,6 +465,55 @@ bool QnWorkbenchLayoutsHandler::confirmSharedLayoutChange(const LayoutChange& ch
     return result == QDialogButtonBox::Ok;
 }
 
+bool QnWorkbenchLayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts)
+{
+    /* Check if user have already silenced this warning. */
+    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::DeleteSharedLayouts))
+        return true;
+
+    /* Checking if custom users have access to this shared layout. */
+    auto allUsers = qnResPool->getResources<QnUserResource>();
+    auto accessibleToCustomUsers = boost::algorithm::any_of(
+        allUsers,
+        [layouts](const QnUserResourcePtr& user)
+        {
+            return !qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission)
+                && boost::algorithm::any_of(
+                    layouts,
+                    [user](const QnLayoutResourcePtr& layout)
+                    {
+                        return qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission);
+                    });
+        });
+
+    /* Do not warn if there are no such users - no side effects in any case. */
+    if (!accessibleToCustomUsers)
+        return true;
+
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        Qn::Empty_Help,
+        tr("Delete Layouts..."),
+        tr("Changes will affect many users"),
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        mainWindow());
+    messageBox.setDefaultButton(QDialogButtonBox::Cancel);
+    messageBox.setInformativeText(tr("These %n layouts are shared. "
+        "By deleting these layouts you delete them from all users who have it.", "", layouts.size()));
+    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+    messageBox.addCustomWidget(new QnResourceListView(layouts));
+
+    auto result = messageBox.exec();
+    if (messageBox.isChecked())
+    {
+        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+        messagesFilter |= Qn::ShowOnceMessage::DeleteSharedLayouts;
+        qnSettings->setShowOnceMessages(messagesFilter);
+    }
+
+    return result == QDialogButtonBox::Ok;
+}
+
 bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForUser(const QnUserResourcePtr& user, const LayoutChange& change)
 {
     /* Check if user have already silenced warning about kept access. */
@@ -485,6 +534,8 @@ bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForUser(const QnUserResourceP
     if (directlyAccessible.isEmpty())
         return true;
 
+    auto mediaResources = qnResPool->getResources(directlyAccessible);
+
     QnMessageBox messageBox(
         QnMessageBox::Warning,
         Qn::Empty_Help,
@@ -495,12 +546,75 @@ bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForUser(const QnUserResourceP
     messageBox.setDefaultButton(QDialogButtonBox::Cancel);
     messageBox.setInformativeText(tr("To remove access go to User Settings."));
     messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+    messageBox.addCustomWidget(new QnResourceListView(mediaResources));
 
     auto result = messageBox.exec();
     if (messageBox.isChecked())
     {
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
         messagesFilter |= Qn::ShowOnceMessage::UserLayoutItemsRemoved;
+        qnSettings->setShowOnceMessages(messagesFilter);
+    }
+
+    return result == QDialogButtonBox::Ok;
+}
+
+bool QnWorkbenchLayoutsHandler::confirmDeleteLayoutsForUser(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts)
+{
+    NX_ASSERT(user);
+    if (!user)
+        return true;
+
+    if (qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+        return true;
+
+    /* Never ask for own layouts. */
+    if (user == context()->user())
+        return true;
+
+    /* Check if user have already silenced warning about kept access. */
+    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::DeleteUserLayouts))
+        return true;
+
+    /* Calculate removed cameras that are still directly accessible. */
+    QSet<QnResourcePtr> removedResources;
+    for (const auto& layout : layouts)
+    {
+        auto snapshot = snapshotManager()->snapshot(layout);
+        removedResources += layoutResources(snapshot.items);
+    }
+
+    auto accessible = qnResourceAccessManager->accessibleResources(user);
+    QSet<QnUuid> directlyAccessible;
+    for (const QnResourcePtr& resource : removedResources)
+    {
+        QnUuid id = resource->getId();
+        if (accessible.contains(id))
+            directlyAccessible << id;
+    }
+
+    if (directlyAccessible.isEmpty())
+        return true;
+
+    auto mediaResources = qnResPool->getResources(directlyAccessible);
+
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        Qn::Empty_Help,
+        tr("Delete Layouts..."),
+        tr("User %1 will keep access to %n removed cameras", "", directlyAccessible.size()).arg(user->getName()),
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        mainWindow());
+    messageBox.setDefaultButton(QDialogButtonBox::Cancel);
+    messageBox.setInformativeText(tr("To remove access go to User Settings."));
+    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+    messageBox.addCustomWidget(new QnResourceListView(mediaResources));
+
+    auto result = messageBox.exec();
+    if (messageBox.isChecked())
+    {
+        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+        messagesFilter |= Qn::ShowOnceMessage::DeleteUserLayouts;
         qnSettings->setShowOnceMessages(messagesFilter);
     }
 
@@ -529,6 +643,76 @@ bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForGroup(const QnUuid& groupI
     /* Calculate added cameras, which were not available to group before, and show warning. */
     /* Calculate removed cameras and show another warning. 1 ok, second cancel, so what? */
     return true;
+}
+
+bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts)
+{
+    /* Check if user have already silenced this warning. */
+    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::StopSharingLayoutUser))
+        return true;
+
+    QnLayoutResourceList accessible = layouts.filtered(
+        [user]
+        (const QnLayoutResourcePtr& layout)
+        {
+            return qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission);
+        });
+    NX_ASSERT(accessible.size() == layouts.size(), "We are not supposed to stop sharing inaccessible layouts.");
+
+    if (qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+        return true;
+
+    /* Calculate all resources that were available through these layouts. */
+    QSet<QnResourcePtr> mediaResources;
+    for (const auto& layout: accessible)
+        mediaResources += layoutResources(layout->getItems());
+
+    /* Skip resources that still will be accessible. */
+    for (const auto& directlyAvailable: qnResPool->getResources(qnResourceAccessManager->accessibleResources(user)))
+        mediaResources -= directlyAvailable;
+
+    /* Skip resources that still will be accessible through other dialogs. */
+    for (const auto& layout : qnResPool->getResources<QnLayoutResource>().filtered(
+        [user, layouts]
+        (const QnLayoutResourcePtr& layout)
+        {
+            return layout->isShared()
+                && qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission)
+                && !layouts.contains(layout);
+        }
+        ))
+    {
+        mediaResources -= layoutResources(layout->getItems());
+    }
+
+    if (mediaResources.isEmpty())
+        return true;
+
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        Qn::Empty_Help,
+        tr("Stop Sharing Layout..."),
+        tr("By deleting shared layout from user you remove access to cameras on it"),
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        mainWindow());
+    messageBox.setDefaultButton(QDialogButtonBox::Cancel);
+    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+    messageBox.addCustomWidget(new QnResourceListView(mediaResources.toList()));
+    messageBox.setInformativeText(tr(
+        "User will keep access to cameras, which he has on other shared layouts, or which are "
+        "assigned to him directly. Access will be lost to the following %n cameras:",
+        "",
+        mediaResources.size()));
+
+    auto result = messageBox.exec();
+    if (messageBox.isChecked())
+    {
+        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+        messagesFilter |= Qn::ShowOnceMessage::StopSharingLayoutUser;
+        qnSettings->setShowOnceMessages(messagesFilter);
+    }
+
+    return result == QDialogButtonBox::Ok;
 }
 
 void QnWorkbenchLayoutsHandler::grantAccessRightsForUser(const QnUserResourcePtr& user, const LayoutChange& change)
@@ -575,9 +759,13 @@ bool QnWorkbenchLayoutsHandler::canRemoveLayouts(const QnLayoutResourceList &lay
 
 void QnWorkbenchLayoutsHandler::removeLayouts(const QnLayoutResourceList &layouts)
 {
+    if (layouts.isEmpty())
+        return;
+
     if (!canRemoveLayouts(layouts))
         return;
 
+    QnLayoutResourceList remoteResources;
     for (const QnLayoutResourcePtr &layout : layouts)
     {
         NX_ASSERT(!layout->isFile());
@@ -585,10 +773,12 @@ void QnWorkbenchLayoutsHandler::removeLayouts(const QnLayoutResourceList &layout
             continue;
 
         if (layout->hasFlags(Qn::local))
-            qnResPool->removeResource(layout); /* This one can be simply deleted from resource pool. */
+            qnResPool->removeResource(layout); /*< This one can be simply deleted from resource pool. */
         else
-            connection2()->getLayoutManager(Qn::kDefaultUserAccess)->remove(layout->getId(), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            remoteResources << layout;
     }
+
+    qnResourcesChangesManager->deleteResources(remoteResources);
 }
 
 bool QnWorkbenchLayoutsHandler::closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply, bool force)
@@ -846,6 +1036,49 @@ void QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered()
     closeLayouts(layoutsToClose);
 }
 
+void QnWorkbenchLayoutsHandler::at_removeFromServerAction_triggered()
+{
+    auto layouts = menu()->currentParameters(sender()).resources().filtered<QnLayoutResource>();
+
+    QnLayoutResourceList canAutoDelete;
+    QnLayoutResourceList shared;
+    QHash<QnUserResourcePtr, QnLayoutResourceList> common;
+    for (const auto& layout : layouts)
+    {
+        NX_ASSERT(!layout->isFile());
+        if (layout->isFile())
+            continue;
+
+        auto owner = layout->getParentResource().dynamicCast<QnUserResource>();
+        if (qnResPool->isAutoGeneratedLayout(layout) || layout->hasFlags(Qn::local))
+            canAutoDelete << layout;
+        else if (layout->isShared())
+            shared << layout;
+        else if (owner)
+            common[owner] << layout;
+    }
+    removeLayouts(canAutoDelete);
+
+    if (confirmDeleteSharedLayouts(shared))
+        removeLayouts(shared);
+
+    auto users = common.keys();
+    std::sort(
+        users.begin(), users.end(),
+        [](const QnUserResourcePtr& l, const QnUserResourcePtr &r)
+        {
+            return nx::utils::naturalStringLess(l->getName(), r->getName());
+        });
+
+    for (const auto &user : users)
+    {
+        auto userLayouts = common[user];
+        NX_ASSERT(!userLayouts.isEmpty());
+        if (confirmDeleteLayoutsForUser(user, userLayouts))
+            removeLayouts(userLayouts);
+    }
+}
+
 void QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered()
 {
     auto params = menu()->currentParameters(sender());
@@ -898,6 +1131,12 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
     if (!user)
         return;
 
+    //TODO: #GDM what if we've been disconnected while confirming?
+    if (!confirmStopSharingLayouts(user, layouts))
+        return;
+
+    //TODO: #GDM #implement stop sharing for roled user
+
     auto accessible = qnResourceAccessManager->accessibleResources(user->getId());
     for (const auto& layout : layouts)
     {
@@ -905,7 +1144,6 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
         accessible.remove(layout->getId());
     }
     qnResourcesChangesManager->saveAccessibleResources(user->getId(), accessible);
-
 }
 
 void QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered()

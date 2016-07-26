@@ -31,7 +31,7 @@ namespace CameraDiagnostics
         m_server = m_camera->getParentServer();
         if( !m_server )
             return;
-        m_serverHostAddress = QUrl(m_server->getApiUrl()).host();
+        m_serverHostAddress = m_server->getPrimaryAddress().address.toString();
     }
 
     DiagnoseTool::~DiagnoseTool()

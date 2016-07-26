@@ -64,7 +64,7 @@ void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &password)
     {
         int handle = server->apiConnection()->pingSystemAsync(url, password, this, SLOT(at_pingSystem_finished(int,QnModuleInformation,int,QString)));
         m_serverByRequestHandle[handle] = server;
-        NX_LOG(lit("QnMergeSystemsTool: ping request to %1 via %2").arg(url.toString()).arg(server->getApiUrl()), cl_logDEBUG1);
+        NX_LOG(lit("QnMergeSystemsTool: ping request to %1 via %2").arg(url.toString()).arg(server->getApiUrl().toString()), cl_logDEBUG1);
     }
 }
 
@@ -72,7 +72,7 @@ int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const
 {
     QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
     NX_ASSERT(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
-    NX_LOG(lit("QnMergeSystemsTool: merge request to %1 url=%2").arg(proxy->getApiUrl()).arg(url.toString()), cl_logDEBUG1);
+    NX_LOG(lit("QnMergeSystemsTool: merge request to %1 url=%2").arg(proxy->getApiUrl().toString()).arg(url.toString()), cl_logDEBUG1);
     return proxy->apiConnection()->mergeSystemAsync(url, password, currentPassword, ownSettings, false, false, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
 
@@ -89,7 +89,9 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
     if (!server)
         return;
 
-    NX_LOG(lit("QnMergeSystemsTool: ping response from %1 [%2 %3]").arg(server->getApiUrl()).arg(status).arg(errorString), cl_logDEBUG1);
+    NX_LOG(lit("QnMergeSystemsTool: ping response from %1 [%2 %3]")
+        .arg(server->getApiUrl().toString()).arg(status).arg(errorString),
+        cl_logDEBUG1);
 
     ErrorCode errorCode = (status == 0) ? errorStringToErrorCode(errorString) : InternalError;
 

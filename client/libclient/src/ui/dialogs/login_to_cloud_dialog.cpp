@@ -35,7 +35,7 @@ public:
     void unlockUi();
     void at_loginButton_clicked();
     void at_cloudStatusWatcher_statusChanged(QnCloudStatusWatcher::Status status);
-    void at_cloudStatusWatcher_error(QnCloudStatusWatcher::ErrorCode errorCode);
+    void at_cloudStatusWatcher_error();
 };
 
 QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget *parent)
@@ -117,14 +117,14 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
 
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged
         , this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged);
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::error
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::errorChanged
         , this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error);
     qnCloudStatusWatcher->setCloudCredentials(q->ui->loginLineEdit->text(), q->ui->passwordLineEdit->text());
 }
 
 void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudStatusWatcher::Status status)
 {
-    if (status != QnCloudStatusWatcher::Online)
+    if (status == QnCloudStatusWatcher::LoggedOut)
     {
         // waiting for error signal in this case
         return;
@@ -134,17 +134,17 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
 
     Q_Q(QnLoginToCloudDialog);
 
-    if (q->ui->stayLoggedInChackBox->isChecked())
-    {
-        qnSettings->setCloudLogin(q->ui->loginLineEdit->text());
-        qnSettings->setCloudPassword(q->ui->passwordLineEdit->text());
-    }
+    qnSettings->setCloudLogin(q->ui->loginLineEdit->text());
+    const bool stayLoggedIn = q->ui->stayLoggedInChackBox->isChecked();
+    qnSettings->setCloudPassword(stayLoggedIn
+        ? q->ui->passwordLineEdit->text() : QString());
 
     q->accept();
 }
 
-void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error(QnCloudStatusWatcher::ErrorCode errorCode)
+void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
 {
+    const auto errorCode = qnCloudStatusWatcher->error();
     disconnect(qnCloudStatusWatcher, nullptr, this, nullptr);
 
     QString message;

@@ -16,7 +16,7 @@
 #include "ui/help/help_topics.h"
 #include "ui/help/help_topic_accessor.h"
 #include <ui/common/read_only.h>
-#include "ui/models/resource_list_model.h"
+#include "ui/models/resource/resource_list_model.h"
 #include "ui/models/server_addresses_model.h"
 #include "ui/style/custom_style.h"
 #include <ui/delegates/switch_item_delegate.h>

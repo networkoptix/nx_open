@@ -40,10 +40,9 @@ public:
     /// @brief Connects to server and stores successful connection data
     /// according to specified settings. If no settings are specified no
     /// connection data will be stored.
-
-    ec2::ErrorCode connectToServer(const QUrl &appServerUrl
-        , const ConnectionSettingsPtr &storeSettings
-        , bool silent);
+    ec2::ErrorCode connectToServer(const QUrl &appServerUrl,
+        const ConnectionSettingsPtr &storeSettings,
+        bool silent);
 
     bool disconnectFromServer(bool force);
 

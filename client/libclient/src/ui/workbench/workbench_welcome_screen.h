@@ -18,6 +18,7 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchC
 
     Q_PROPERTY(QString cloudUserName READ cloudUserName NOTIFY cloudUserNameChanged);
     Q_PROPERTY(bool isLoggedInToCloud READ isLoggedInToCloud NOTIFY isLoggedInToCloudChanged)
+    Q_PROPERTY(bool isOfflineConnection READ isOfflineConnection NOTIFY isOfflineConnectionChanged)
 
     Q_PROPERTY(QSize pageSize READ pageSize WRITE setPageSize NOTIFY pageSizeChanged);
     Q_PROPERTY(bool visibleControls READ visibleControls WRITE setVisibleControls NOTIFY visibleControlsChanged)
@@ -39,6 +40,8 @@ public: // Properties
     QString cloudUserName() const;
 
     bool isLoggedInToCloud() const;
+
+    bool isOfflineConnection() const;
 
     QSize pageSize() const;
 
@@ -95,6 +98,8 @@ signals:
     void cloudUserNameChanged();
 
     void isLoggedInToCloudChanged();
+
+    void isOfflineConnectionChanged();
 
     void pageSizeChanged();
 

@@ -1,5 +1,4 @@
-#ifndef QN_RESOURCE_LIST_DIALOG_H
-#define QN_RESOURCE_LIST_DIALOG_H
+#pragma once
 
 #include <QtWidgets/QDialog>
 
@@ -50,6 +49,3 @@ private:
     QScopedPointer<Ui::ResourceListDialog> ui;
     QnResourceListModel *m_model;
 };
-
-
-#endif // QN_RESOURCE_LIST_DIALOG_H
