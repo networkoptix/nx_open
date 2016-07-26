@@ -245,6 +245,7 @@ void TunnelConnector::holePunchingDone(
         tunnelConnection = std::make_unique<OutgoingTunnelConnection>(
             m_connectSessionId,
             std::move(m_udtConnection));
+        tunnelConnection->bindToAioThread(getAioThread());
     }
 
     auto completionHandler = std::move(m_completionHandler);

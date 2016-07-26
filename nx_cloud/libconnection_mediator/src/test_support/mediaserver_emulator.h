@@ -87,6 +87,7 @@ private:
     std::unique_ptr<nx::network::UdtStreamServerSocket> m_udtStreamServerSocket;
     std::unique_ptr<stun::MessagePipeline> m_stunPipeline;
     ActionToTake m_action;
+    const int m_cloudConnectionMethodMask;
 
     void onConnectionRequested(
         nx::hpm::api::ConnectionRequestedEvent connectionRequestedData);

@@ -32,6 +32,10 @@ ForwardedTcpEndpointTunnel::~ForwardedTcpEndpointTunnel()
 void ForwardedTcpEndpointTunnel::stopWhileInAioThread()
 {
     m_tcpConnection.reset();
+    
+    auto connectionClosedHandler = std::move(m_connectionClosedHandler);
+    m_connectionClosedHandler = nullptr;
+
     auto connections = std::move(m_connections);
     for (auto& connectionContext : connections)
     {
@@ -40,6 +44,9 @@ void ForwardedTcpEndpointTunnel::stopWhileInAioThread()
             nullptr,
             false);
     }
+
+    if (connectionClosedHandler)
+        connectionClosedHandler(SystemError::interrupted);
 }
 
 void ForwardedTcpEndpointTunnel::establishNewConnection(
@@ -110,12 +117,6 @@ void ForwardedTcpEndpointTunnel::onConnectDone(
         sysErrorCode,
         std::move(connectionContextIter->tcpSocket),
         sysErrorCode == SystemError::noError);
-
-    //TODO #ak
-    //auto connectionClosedHandler = std::move(m_connectionClosedHandler);
-    //m_connectionClosedHandler = nullptr;
-    //if (sysErrorCode != SystemError::noError)
-    //    connectionClosedHandler(sysErrorCode);
 }
 
 void ForwardedTcpEndpointTunnel::reportConnectResult(
@@ -129,7 +130,18 @@ void ForwardedTcpEndpointTunnel::reportConnectResult(
         QnMutexLocker lk(&m_mutex);
         m_connections.erase(connectionContextIter);
     }
+    
+    nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
     context.handler(sysErrorCode, std::move(tcpSocket), stillValid);
+    if (watcher.objectDestroyed())
+        return;
+
+    if (!stillValid && m_connectionClosedHandler)
+    {
+        auto connectionClosedHandler = std::move(m_connectionClosedHandler);
+        m_connectionClosedHandler = nullptr;
+        connectionClosedHandler(sysErrorCode);
+    }
 }
 
 } // namespace tcp

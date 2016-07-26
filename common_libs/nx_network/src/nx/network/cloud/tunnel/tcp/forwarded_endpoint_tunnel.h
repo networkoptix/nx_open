@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <nx/utils/object_destruction_flag.h>
+
 #include "../abstract_outgoing_tunnel_connection.h"
 
 
@@ -47,6 +49,7 @@ private:
     std::list<ConnectionContext> m_connections;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectionClosedHandler;
     mutable QnMutex m_mutex;
+    nx::utils::ObjectDestructionFlag m_destructionFlag;
 
     void startConnection(
         std::list<ConnectionContext>::iterator connectionContextIter,

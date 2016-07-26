@@ -15,6 +15,8 @@ namespace nx {
 namespace network {
 namespace cloud {
 
+static int s_cloudConnectTypeMask = (int)CloudConnectType::all;
+
 ConnectorFactory::CloudConnectors ConnectorFactory::createCloudConnectors(
     const AddressEntry& targetAddress,
     const nx::String& connectSessionId,
@@ -23,13 +25,18 @@ ConnectorFactory::CloudConnectors ConnectorFactory::createCloudConnectors(
 {
     CloudConnectors connectors;
 
-    connectors.emplace_back(
-        std::make_unique<udp::TunnelConnector>(
-            targetAddress,
-            connectSessionId,
-            std::move(udpSocket)));
+    if (((s_cloudConnectTypeMask & (int)CloudConnectType::udpHp) > 0) &&
+        (udpSocket || !response.udpEndpointList.empty()))
+    {
+        connectors.emplace_back(
+            std::make_unique<udp::TunnelConnector>(
+                targetAddress,
+                connectSessionId,
+                std::move(udpSocket)));
+    }
 
-    if (!response.forwardedTcpEndpointList.empty())
+    if (((s_cloudConnectTypeMask & (int)CloudConnectType::forwardedTcpPort) > 0) &&
+        !response.forwardedTcpEndpointList.empty())
     {
         connectors.emplace_back(
             std::make_unique<tcp::ForwardedEndpointConnector>(
@@ -56,6 +63,11 @@ ConnectorFactory::FactoryFunc
     auto bak = std::move(factoryFunc);
     factoryFunc = std::move(newFactoryFunc);
     return bak;
+}
+
+void ConnectorFactory::setEnabledCloudConnectMask(int cloudConnectTypeMask)
+{
+    s_cloudConnectTypeMask = cloudConnectTypeMask;
 }
 
 } // namespace cloud

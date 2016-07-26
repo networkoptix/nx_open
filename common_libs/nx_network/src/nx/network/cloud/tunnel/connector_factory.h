@@ -34,7 +34,14 @@ public:
 
     static std::unique_ptr<AbstractCrossNatConnector>
         createCrossNatConnector(const AddressEntry& address);
+    
+    /** Replace factory. Debug only! */
     static FactoryFunc setFactoryFunc(FactoryFunc newFactoryFunc);
+    /** Enable/disable cloud connectors. Debug only!
+        @param cloudConnectTypeMask Bitset with values from \a CloudConnectType
+        By default, everything is enabled
+    */
+    static void setEnabledCloudConnectMask(int cloudConnectTypeMask);
 };
 
 } // namespace cloud

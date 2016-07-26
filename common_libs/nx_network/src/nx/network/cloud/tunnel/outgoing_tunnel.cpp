@@ -40,8 +40,8 @@ void OutgoingTunnel::bindToAioThread(aio::AbstractAioThread* aioThread)
         m_timer->bindToAioThread(aioThread);
     if (m_connector)
         m_connector->bindToAioThread(aioThread);
-    //if (m_connection)
-    //    m_connection->bindToAioThread(aioThread);
+    if (m_connection)
+        m_connection->bindToAioThread(aioThread);
 }
 
 void OutgoingTunnel::stopWhileInAioThread()
