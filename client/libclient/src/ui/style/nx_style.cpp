@@ -3128,6 +3128,17 @@ void QnNxStyle::polish(QWidget *widget)
         }
     }
 #endif
+
+    if (qobject_cast<QAbstractButton*>(widget) ||
+        qobject_cast<QAbstractSlider*>(widget) ||
+        qobject_cast<QGroupBox*>(widget) ||
+        qobject_cast<QComboBox*>(widget) ||
+        qobject_cast<QTabBar*>(widget) ||
+        qobject_cast<QLabel*>(widget))
+    {
+        if (widget->focusPolicy() != Qt::NoFocus)
+            widget->setFocusPolicy(Qt::TabFocus);
+    }
 }
 
 void QnNxStyle::unpolish(QWidget* widget)
