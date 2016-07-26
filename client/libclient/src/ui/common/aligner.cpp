@@ -33,7 +33,8 @@ namespace
 
 QnAligner::QnAligner(QObject* parent /*= nullptr*/):
     base_type(parent),
-    m_defaultAccessor(new WidgetSizeAccessor())
+    m_defaultAccessor(new WidgetSizeAccessor()),
+    m_skipInvisible(false)
 {
     if (parent)
     {
@@ -75,18 +76,20 @@ void QnAligner::align()
         return;
 
     int maxWidth = 0;
+    const bool alignInvisible = !m_skipInvisible;
+
     for (auto w : m_widgets)
-        if (w->isVisible())
+        if (alignInvisible || w->isVisible())
             maxWidth = std::max(accessor(w)->get(w).toInt(), maxWidth);
 
     for (QWidget* w : m_widgets)
-        if (w->isVisible())
+        if (alignInvisible || w->isVisible())
             accessor(w)->set(w, maxWidth);
 }
 
-AbstractAccessor* QnAligner::accessor(QWidget *widget) const
+AbstractAccessor* QnAligner::accessor(QWidget* widget) const
 {
-    const QMetaObject *metaObject = widget->metaObject();
+    const QMetaObject* metaObject = widget->metaObject();
 
     while (metaObject)
     {
@@ -96,4 +99,18 @@ AbstractAccessor* QnAligner::accessor(QWidget *widget) const
     }
 
     return m_defaultAccessor.data();
+}
+
+bool QnAligner::skipInvisible() const
+{
+    return m_skipInvisible;
+}
+
+void QnAligner::setSkipInvisible(bool value)
+{
+    if (m_skipInvisible == value)
+        return;
+
+    m_skipInvisible = value;
+    align();
 }
