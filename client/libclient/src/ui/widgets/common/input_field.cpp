@@ -3,6 +3,7 @@
 
 #include <ui/common/accessor.h>
 #include <ui/style/custom_style.h>
+#include <ui/widgets/word_wrapped_label.h>
 #include <utils/common/delayed.h>
 
 class QnInputFieldPrivate : public QObject
@@ -12,14 +13,13 @@ public:
         QObject(parent),
         parent(parent),
         title(new QLabel(parent)),
-        hint(new QLabel(parent)),
+        hint(new QnWordWrappedLabel(parent)),
         input(new QLineEdit(parent)),
         lastValidationResult(QValidator::Acceptable),
         validator(),
         passwordIndicator(nullptr),
         hidePasswordIndicatorWhenEmpty(true)
     {
-        hint->setWordWrap(true);
         input->installEventFilter(this);
         parent->setFocusProxy(input);
 
@@ -112,7 +112,7 @@ public:
 
     QWidget* parent;
     QLabel* title;
-    QLabel* hint;
+    QnWordWrappedLabel* hint;
     QLineEdit* input;
 
     Qn::ValidationResult lastValidationResult;
