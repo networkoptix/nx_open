@@ -959,9 +959,12 @@
                 <module>client/libclient_core</module>
                 <module>client/libclient</module>
                 <module>client/desktop_client</module>
+                <module>client/applauncher</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speech_synthesizer</module>
+                <module>debsetup/client-deb</module>
+                <module>debsetup/mediaserver-deb</module>                
             </modules>
         </profile>
         <profile>

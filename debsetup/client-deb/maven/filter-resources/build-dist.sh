@@ -91,13 +91,13 @@ cp -r $CLIENT_PLATFORMINPUTCONTEXTS_PATH/*.* $BINSTAGE/platforminputcontexts
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
 cp -r $CLIENT_XCBGLINTEGRATIONS_PATH $BINSTAGE
 cp -r $CLIENT_QML_PATH $BINSTAGE
-cp -r $CLIENT_AUDIO_PATH/*.* $BINSTAGE/audio
+if [ '${arch}' != 'arm' ]; then cp -r $CLIENT_AUDIO_PATH/*.* $BINSTAGE/audio; fi
 cp -r $CLIENT_VOX_PATH $BINSTAGE
 cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE
 rm -f $LIBSTAGE/*.debug
 
 #copying qt libs
-QTLIBS="Core Gui Widgets WebKit WebChannel WebKitWidgets OpenGL Multimedia Qml Quick QuickWidgets LabsTemplates X11Extras XcbQpa DBus Xml XmlPatterns Concurrent Network Sql PrintSupport"
+QTLIBS="Core Gui Widgets WebKit WebChannel WebKitWidgets OpenGL Multimedia MultimediaWidgets Qml Quick QuickWidgets LabsTemplates X11Extras XcbQpa DBus Xml XmlPatterns Concurrent Network Sql PrintSupport"
 for var in $QTLIBS
 do
     qtlib=libQt5$var.so
@@ -105,12 +105,15 @@ do
     cp -P ${qt.dir}/lib/$qtlib* $LIBSTAGE
 done
 
-cp -r /usr/lib/${arch.dir}/libXss.so.1* $LIBSTAGE
-cp -r /lib/${arch.dir}/libpng12.so* $LIBSTAGE
-cp -r /usr/lib/${arch.dir}/libopenal.so.1* $LIBSTAGE
 #'libstdc++.so.6 is needed on some machines
-cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
-cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
+if [ '${arch}' != 'arm' ]
+then 
+    cp -r /usr/lib/${arch.dir}/libXss.so.1* $LIBSTAGE
+    cp -r /lib/${arch.dir}/libpng12.so* $LIBSTAGE
+    cp -r /usr/lib/${arch.dir}/libopenal.so.1* $LIBSTAGE
+    cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
+    cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
+fi
 
 find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
 find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
