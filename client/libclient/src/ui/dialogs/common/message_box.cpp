@@ -185,8 +185,8 @@ static QDialogButtonBox::StandardButton execMessageBox(
 }
 
 
-QnMessageBox::QnMessageBox(QWidget *parent):
-    base_type(parent),
+QnMessageBox::QnMessageBox(QWidget *parent, Qt::WindowFlags flags):
+    base_type(parent, flags),
     ui(new Ui::MessageBox),
     d_ptr(new QnMessageBoxPrivate(this))
 {

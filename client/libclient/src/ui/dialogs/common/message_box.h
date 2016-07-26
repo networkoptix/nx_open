@@ -29,7 +29,7 @@ public:
 
 public:
 
-    explicit QnMessageBox(QWidget *parent = nullptr);
+    QnMessageBox(QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
     QnMessageBox(
             Icon icon,
