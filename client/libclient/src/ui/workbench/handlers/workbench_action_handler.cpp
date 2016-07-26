@@ -1833,7 +1833,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered()
     QnResourceList resources = menu()->currentParameters(sender()).resources();
 
     /* Layouts will be removed in their own handler. */
-    resources = resources.filtered([](const auto& resource) { return !resource->hasFlags(Qn::layout); });
+    resources = resources.filtered([](const QnResourcePtr& resource) { return !resource->hasFlags(Qn::layout); });
 
     if (resources.isEmpty())
         return;
