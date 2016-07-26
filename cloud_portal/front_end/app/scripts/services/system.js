@@ -121,7 +121,7 @@ angular.module('cloudApp')
             if(!this.accessRoles){
                 var groupsList = _.map(this.groups, function(group){
                     return {
-                        name: group.Name,
+                        name: group.name,
                         groupId: group.id,
                         group: group
                     }
@@ -138,22 +138,18 @@ angular.module('cloudApp')
             }
             var self = this;
             var role = _.find(this.accessRoles,function(role){
-                if(user.isAdmin){ // Owner flag has top priority and overrides everything
+
+                if(role.isOwner){ // Owner flag has top priority and overrides everything
                     return role.isOwner == user.isAdmin;
                 }
-
-                if(!self.isEmptyGuid(user.groupId)){
-                    return role.groupId == user.groupId;
-                }
                 if(!self.isEmptyGuid(role.groupId)){
-                    return false;
+                    return role.groupId == user.groupId;
                 }
 
                 // Admins has second priority
-                if(self.isAdmin(user)){
-                    return self.isAdmin(role);
+                if(self.isAdmin(role)){
+                    return self.isAdmin(user);
                 }
-
                 return role.permissions == user.permissions;
             });
 
@@ -165,6 +161,7 @@ angular.module('cloudApp')
             function processUsers(users, groups, predefinedRoles){
                 self.predefinedRoles = predefinedRoles;
                 _.each(self.predefinedRoles, function(role){
+                    role.permissions = normalizePermissionString(role.permissions);
                     role.isAdmin = self.isAdmin(role);
                 });
 
