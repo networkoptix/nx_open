@@ -124,11 +124,10 @@ angular.module('cloudApp')
                         name: group.name,
                         groupId: group.id,
                         group: group
-                    }
-                })
-
+                    };
+                });
                 this.accessRoles = _.union(this.predefinedRoles, groupsList);
-                this.accessRoles.push({ name: 'Custom' });
+                this.accessRoles.push(Config.accessRoles.customPermission);
             }
             return this.accessRoles;
         };
@@ -153,7 +152,7 @@ angular.module('cloudApp')
                 return role.permissions == user.permissions;
             });
 
-            return role || { name: 'Custom' };
+            return role || this.accessRoles[this.accessRoles.length - 1];
         };
 
         system.prototype.getUsersDataFromTheSystem = function(){
@@ -173,7 +172,8 @@ angular.module('cloudApp')
 
                 _.each(users,function(user){
                     user.permissions = normalizePermissionString(user.permissions);
-                    user.accessRole = self.findAccessRole(user).name;
+                    user.role = self.findAccessRole(user);
+                    user.accessRole = user.role.name;
 
                     user.accountEmail = user.email;
 

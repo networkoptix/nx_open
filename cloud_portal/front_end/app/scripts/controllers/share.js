@@ -31,7 +31,9 @@ angular.module('cloudApp')
                 return ! (role.isOwner || role.isAdmin && !system.isMine);
             });
 
-            $scope.user.role = system.findAccessRole($scope.user);
+            if(!$scope.user.role){
+                $scope.user.role = system.findAccessRole($scope.user);
+            }
         }
 
         processAccessRoles();

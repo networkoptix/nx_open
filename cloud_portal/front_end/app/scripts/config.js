@@ -55,6 +55,10 @@ var Config = {
         owner:   'Owner',
         editUserPermissionFlag: 'GlobalAdminPermission',
         globalAdminPermissionFlag: 'GlobalAdminPermission',
+        customPermission:{
+            name: 'Custom',
+            permissions: 'NoPermission'
+        },
 
         editUserAccessRoleFlag: 'Admin', // TODO: remove it later when cloud permissions are ready
         globalAdminAccessRoleFlag: 'Admin', // TODO: remove it later when cloud permissions are ready
