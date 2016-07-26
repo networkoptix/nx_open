@@ -1065,7 +1065,7 @@ void QnWorkbenchLayoutsHandler::at_removeFromServerAction_triggered()
     auto users = common.keys();
     std::sort(
         users.begin(), users.end(),
-        [](const auto& l, const auto &r)
+        [](const QnUserResourcePtr& l, const QnUserResourcePtr &r)
         {
             return nx::utils::naturalStringLess(l->getName(), r->getName());
         });
