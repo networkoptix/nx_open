@@ -313,7 +313,7 @@ void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddres
 
 SocketAddress QnMediaServerResource::getPrimaryAddress() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     if (!m_primaryAddress.isNull())
         return m_primaryAddress;
     return SocketAddress(QUrl(m_url));
