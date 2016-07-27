@@ -2857,6 +2857,12 @@ int QnNxStyle::pixelMetric(
         case PM_ToolBarIconSize:
             return dp(32);
 
+        case PM_SmallIconSize:
+        case PM_ListViewIconSize:
+        case PM_TabBarIconSize:
+        case PM_ButtonIconSize:
+            return Metrics::kDefaultIconSize;
+
         default:
             break;
     }
