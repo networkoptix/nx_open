@@ -390,14 +390,20 @@ namespace detail
 
     struct ModifyResourceAccess
     {
+        ModifyResourceAccess(bool isRemove) : isRemove(isRemove) {}
+
         template<typename Param>
         bool operator()(const QnUuid& userId, const Param& param)
         {
             if (systemSuperAccess(userId))
                 return true;
-            auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
 
+            auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
             QnResourcePtr target = qnResPool->getResourceById(param.id);
+
+            if (isRemove)
+                return qnResourceAccessManager->hasPermission(userResource, target, Qn::Permission::RemovePermission);
+
             bool result = false;
             if (!target)
                 result = qnResourceAccessManager->canCreateResource(userResource, param);
@@ -413,6 +419,8 @@ namespace detail
 
             return result;
         }
+
+        bool isRemove;
     };
 
     struct ReadResourceAccess
@@ -453,10 +461,18 @@ namespace detail
 
     struct ModifyResourceParamAccess
     {
+        ModifyResourceParamAccess(bool isRemove) : isRemove(isRemove) {}
+
         bool operator()(const QnUuid& userId, const ApiResourceParamWithRefData& param)
         {
+            if (isRemove)
+                return qnResourceAccessManager->hasPermission(qnResPool->getResourceById<QnUserResource>(userId),
+                                                              qnResPool->getResourceById(param.resourceId),
+                                                              Qn::Permission::RemovePermission);
             return resourceAccessHelper(userId, param.resourceId, Qn::Permission::SavePermission);
         }
+
+        bool isRemove;
     };
 
     struct ReadFootageDataAccess
@@ -567,7 +583,15 @@ namespace detail
             if (systemSuperAccess(userId))
                 return true;
             auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-            return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalControlVideoWallPermission);
+            bool result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalControlVideoWallPermission);
+            if (!result)
+            {
+                QString userName = userResource ? userResource->fullName() : lit("Unknown user");
+                NX_LOG(lit("Access check for ApiVideoWallControlMessageData failed for user %1")
+                        .arg(userName),
+                       cl_logDEBUG1);
+            }
+            return result;
         }
     };
 
@@ -593,6 +617,39 @@ namespace detail
                                              return !SingleAccess()(userId, param);
                                          }), outList.end());
         }
+    };
+
+    template<>
+    struct FilterListByAccess<ModifyResourceAccess>
+    {
+        FilterListByAccess(bool isRemove) : isRemove(isRemove) {}
+
+        template<typename ParamContainer>
+        void operator()(const QnUuid& userId, ParamContainer& outList)
+        {
+            outList.erase(std::remove_if(outList.begin(), outList.end(), 
+                                         [&userId, this] (const typename ParamContainer::value_type &param) {
+                                             return !ModifyResourceAccess(isRemove)(userId, param);
+                                         }), outList.end());
+        }
+
+        bool isRemove;
+    };
+
+    template<>
+    struct FilterListByAccess<ModifyResourceParamAccess>
+    {
+        FilterListByAccess(bool isRemove) : isRemove(isRemove) {}
+
+        void operator()(const QnUuid& userId, ApiResourceParamWithRefDataList& outList)
+        {
+            outList.erase(std::remove_if(outList.begin(), outList.end(), 
+                                         [&userId, this] (const typename ApiResourceParamWithRefData &param) {
+                                             return !ModifyResourceParamAccess(isRemove)(userId, param);
+                                         }), outList.end());
+        }
+
+        bool isRemove;
     };
 
     template<typename SingleAccess>

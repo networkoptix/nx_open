@@ -130,7 +130,7 @@ APPLY(201, removeResource, ApiIdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -152,7 +152,7 @@ APPLY(204, setResourceParams, ApiResourceParamWithRefDataList, \
                        ResourceNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceParamAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceParamAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceParamAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(203, getResourceParams, ApiResourceParamWithRefDataList, \
@@ -162,7 +162,7 @@ APPLY(203, getResourceParams, ApiResourceParamWithRefDataList, \
                        ResourceNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceParamAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceParamAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceParamAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(205, getResourceTypes, ApiResourceTypeDataList, \
@@ -195,7 +195,7 @@ APPLY(208, setResourceParam, ApiResourceParamWithRefData, \
                        false, /* system*/ \
                        CreateHashForResourceParamWithRefDataHelper(), /* getHash*/ \
                        ResourceNotificationManagerHelper(), \
-                       ModifyResourceParamAccess(), /* save permission checker */ \
+                       ModifyResourceParamAccess(false), /* save permission checker */ \
                        ReadResourceParamAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -205,7 +205,7 @@ APPLY(209, removeResourceParam, ApiResourceParamWithRefData, \
                        false, /* system*/ \
                        CreateHashForResourceParamWithRefDataHelper(), /* getHash*/ \
                        ResourceNotificationManagerHelper(), \
-                       ModifyResourceParamAccess(), /* save permission checker */ \
+                       ModifyResourceParamAccess(true), /* save permission checker */ \
                        ReadResourceParamAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -217,7 +217,7 @@ APPLY(210, removeResourceParams, ApiResourceParamWithRefDataList, \
                        ResourceNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceParamAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceParamAccess>(true), /* Filter save func */ \
                        FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(211, getStatusList, ApiResourceStatusDataList, \
@@ -237,7 +237,7 @@ APPLY(212, removeResources, ApiIdDataList, \
                        &apiIdDataListTriggerNotificationHelper, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(true), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(300, getCameras, ApiCameraDataList, \
@@ -247,7 +247,7 @@ APPLY(300, getCameras, ApiCameraDataList, \
                        CameraNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(301, saveCamera, ApiCameraData, \
@@ -255,7 +255,7 @@ APPLY(301, saveCamera, ApiCameraData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        CameraNotificationManagerHelper(), \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(false), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -270,7 +270,7 @@ APPLY(302, saveCameras, ApiCameraDataList, \
                          }, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(303, removeCamera, ApiIdData, \
@@ -278,7 +278,7 @@ APPLY(303, removeCamera, ApiIdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -350,7 +350,7 @@ APPLY(313, getCamerasEx, ApiCameraDataExList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(314, removeCameraUserAttributes, ApiIdData, \
@@ -358,7 +358,7 @@ APPLY(314, removeCameraUserAttributes, ApiIdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -370,7 +370,7 @@ APPLY(400, getMediaServers, ApiMediaServerDataList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(401, saveMediaServer, ApiMediaServerData, \
@@ -378,7 +378,7 @@ APPLY(401, saveMediaServer, ApiMediaServerData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        MediaServerNotificationManagerHelper(), \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(false), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -388,7 +388,7 @@ APPLY(402, removeMediaServer, ApiIdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -428,7 +428,7 @@ APPLY(406, removeServerUserAttributes, ApiIdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -438,7 +438,7 @@ APPLY(407, saveStorage, ApiStorageData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        MediaServerNotificationManagerHelper(), \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(false), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -450,7 +450,7 @@ APPLY(408, saveStorages, ApiStorageDataList, \
                        MediaServerNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(409, removeStorage, ApiIdData, \
@@ -458,7 +458,7 @@ APPLY(409, removeStorage, ApiIdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -470,7 +470,7 @@ APPLY(410, removeStorages, ApiIdDataList, \
                        &apiIdDataListTriggerNotificationHelper, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(true), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(411, getMediaServersEx, ApiMediaServerDataExList, \
@@ -480,7 +480,7 @@ APPLY(411, getMediaServersEx, ApiMediaServerDataExList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(412, getStorages, ApiStorageDataList, \
@@ -490,7 +490,7 @@ APPLY(412, getStorages, ApiStorageDataList, \
                        MediaServerNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(500, getUsers, ApiUserDataList, \
@@ -500,7 +500,7 @@ APPLY(500, getUsers, ApiUserDataList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(501, saveUser, ApiUserData, \
@@ -508,7 +508,7 @@ APPLY(501, saveUser, ApiUserData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        UserNotificationManagerHelper(), \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(false), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -518,7 +518,7 @@ APPLY(502, removeUser, ApiIdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -590,7 +590,7 @@ APPLY(600, getLayouts, ApiLayoutDataList, \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(601, saveLayout, ApiLayoutData, \
@@ -598,7 +598,7 @@ APPLY(601, saveLayout, ApiLayoutData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        LayoutNotificationManagerHelper(), /* trigger notification*/ \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(false), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -610,7 +610,7 @@ APPLY(602, saveLayouts, ApiLayoutDataList, \
                        LayoutNotificationManagerHelper(), /* trigger notification*/ \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(603, removeLayout, ApiIdData, \
@@ -618,7 +618,7 @@ APPLY(603, removeLayout, ApiIdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -630,7 +630,7 @@ APPLY(700, getVideowalls, ApiVideowallDataList, \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(701, saveVideowall, ApiVideowallData, \
@@ -638,7 +638,7 @@ APPLY(701, saveVideowall, ApiVideowallData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        VideowallNotificationManagerHelper(), /* trigger notification*/ \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(false), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -648,7 +648,7 @@ APPLY(702, removeVideowall, ApiIdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -924,7 +924,7 @@ APPLY(1500, getWebPages, ApiWebPageDataList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(1501, saveWebPage, ApiWebPageData, \
@@ -932,7 +932,7 @@ APPLY(1501, saveWebPage, ApiWebPageData, \
                        false, \
                        CreateHashByIdHelper(), \
                        WebPageNotificationManagerHelper(), \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(false), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -942,7 +942,7 @@ APPLY(1502, removeWebPage, ApiIdData, \
                        false, \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \

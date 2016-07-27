@@ -712,7 +712,7 @@ public:
     ErrorCode executeTransactionNoLock(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
     {
         auto outParamContainer = tran.params;
-        ec2::getTransactionDescriptorByParam<Cont<Param,A>>()->filterBySavePermissionFunc(m_userAccessData.userId, outParamContainer);
+        ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData.userId, outParamContainer);
         if (outParamContainer.size() != tran.params.size())
             return ErrorCode::forbidden;
 
@@ -731,7 +731,7 @@ public:
     ErrorCode executeTransaction(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
     {
         Cont<Param,A> paramCopy = tran.params;
-        ec2::getTransactionDescriptorByParam<Cont<Param,A>>()->filterBySavePermissionFunc(m_userAccessData.userId, paramCopy);
+        ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData.userId, paramCopy);
         if (paramCopy.size() != tran.params.size())
             return ErrorCode::forbidden;
 
