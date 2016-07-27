@@ -605,7 +605,7 @@ TEST_F(OutgoingTunnelTest, connectTimeout2)
                     targetAddress,
                     /*connectorTimeout*/ nullptr);
             connector->setConnectionInvokedPromise(&tunnelConnectionInvokedPromise);
-            return connector;
+            return std::move(connector);
         });
 
     const std::chrono::seconds connectionTimeout(3);
