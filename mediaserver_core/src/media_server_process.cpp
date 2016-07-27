@@ -291,7 +291,8 @@ bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 void addFakeVideowallUser()
 {
 	ec2::ApiUserData fakeUserData;
-	fakeUserData.permissions = Qn::GlobalPermission::GlobalVideoWallModePermissionSet;
+	fakeUserData.permissions = Qn::GlobalPermission::GlobalVideoWallModePermissionSet | 
+                               Qn::GlobalPermission::GlobalViewBookmarksPermission;
 	fakeUserData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
 	auto fakeUser = ec2::fromApiToResource(fakeUserData);
 	fakeUser->setId(Qn::kVideowallUserAccess.userId);
