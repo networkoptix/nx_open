@@ -173,7 +173,6 @@ protected slots:
     void at_currentLayoutSettingsAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverLogsAction_triggered();
-    void at_serverLogsAction_getNonce(QnAsyncHttpClientReply* client);
     void at_serverIssuesAction_triggered();
     void at_pingAction_triggered();
     void at_thumbnailsSearchAction_triggered();
@@ -244,6 +243,9 @@ private:
 
     bool confirmResourcesDelete(const QnResourceList& resources);
 
+    void sendServerRequest(const QnMediaServerResourcePtr& server, const QString& path);
+    void at_serverRequest_nonceReceived(QnAsyncHttpClientReply* client);
+
 private:
     QPointer<QMenu> m_mainMenu;
     QPointer<QMenu> m_currentUserLayoutsMenu;
@@ -279,13 +281,14 @@ private:
     };
     QMap<int, CameraMovingInfo> m_awaitingMoveCameras;
 
-    struct LogRequest
+    struct ServerRequest
     {
         QnMediaServerResourcePtr server;
-        std::unique_ptr<QnAsyncHttpClientReply> replay;
+        QString path;
+        std::unique_ptr<QnAsyncHttpClientReply> reply;
     };
 
-    std::map<QUrl, LogRequest> m_logRequests;
+    std::map<QUrl, ServerRequest> m_serverRequests;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H
