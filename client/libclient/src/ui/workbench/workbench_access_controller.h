@@ -88,6 +88,19 @@ public:
     bool canCreateVideoWall() const;
     bool canCreateWebPage() const;
 
+    /* Filter given list of resources to leave only accessible. */
+    template <class Resource>
+    QnSharedResourcePointerList<Resource> filtered(const QnSharedResourcePointerList<Resource>& source,
+        Qn::Permissions requiredPermissions) const
+    {
+        QnSharedResourcePointerList<Resource> result;
+        for (const QnSharedResourcePointer<Resource>& resource : source)
+            if (hasPermissions(resource, requiredPermissions))
+                result.push_back(resource);
+        return result;
+    }
+
+
 signals:
     /**
      * \param resource                  Resource for which permissions have changed.

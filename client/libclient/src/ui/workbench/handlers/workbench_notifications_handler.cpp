@@ -90,23 +90,17 @@ void QnWorkbenchNotificationsHandler::clear()
     emit cleared();
 }
 
-void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessActionPtr &businessAction) {
-    //TODO: #GDM #Business check if camera is visible to us
-    QnBusiness::UserGroup userGroup = businessAction->getParams().userGroup;
-    if (userGroup == QnBusiness::AdminOnly && !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-        return;
-
-
-    if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction) {
-        QnUserResourceList users = qnResPool->getResources<QnUserResource>(businessAction->getParams().additionalResources);
-        if (!users.isEmpty() && !users.contains(context()->user()))
-            return;
-    }
-
+void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessActionPtr &businessAction)
+{
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
-    if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent) {
+    if (businessAction->getParams().userGroup == QnBusiness::AdminOnly
+        && !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+        return;
+
+    if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent)
+    {
         int healthMessage = eventType - QnBusiness::SystemHealthEvent;
         addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), businessAction);
         return;
@@ -114,6 +108,15 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
 
     if (!context()->user())
         return;
+
+    if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
+    {
+        /* Skip action if it contains list of users, and we are not on the list. */
+        auto ids = businessAction->getParams().additionalResources;
+        if (!ids.empty()
+            && std::find(ids.cbegin(), ids.cend(), context()->user()->getId()) == ids.cend())
+            return;
+    }
 
     bool alwaysNotify = false;
     switch (businessAction->actionType())
