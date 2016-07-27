@@ -9,6 +9,7 @@
 #include "business/business_strings_helper.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "business/business_event_rule.h"
+#include <api/global_settings.h>
 
 namespace ec2
 {
@@ -93,11 +94,7 @@ namespace ec2
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiResourceParamWithRefData& param, const QnAuthSession& authInfo)
     {
         Q_UNUSED(command);
-        QnUserResourcePtr adminUser = qnResPool->getAdministrator();
-        if (!adminUser)
-            return;
-        QnUuid adminId = adminUser->getId();
-        if (param.resourceId == adminId)
+        if (qnGlobalSettings->isGlobalSetting(param))
             qnAuditManager->notifySettingsChanged(authInfo, param.name);
     }
 

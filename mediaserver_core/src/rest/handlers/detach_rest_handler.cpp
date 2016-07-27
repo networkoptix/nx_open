@@ -35,15 +35,10 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, const QnUu
         passwordData.password = kDefaultAdminPassword;
 
     QString errStr;
-    if (!validatePasswordData(passwordData, &errStr))
+    if (!validatePasswordData(passwordData, &errStr) ||
+        !validateOwnerPassword(passwordData, &errStr))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
-        return nx_http::StatusCode::ok;
-    }
-    const auto admin = qnResPool->getAdministrator();
-    if (!admin)
-    {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error. Can't find admin user."));
         return nx_http::StatusCode::ok;
     }
 
