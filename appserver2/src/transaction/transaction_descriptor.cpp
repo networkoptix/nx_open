@@ -400,13 +400,7 @@ namespace detail
             QnResourcePtr target = qnResPool->getResourceById(param.id);
             bool result = false;
             if (!target)
-            {
-                auto createAccessResult = qnResourceAccessManager->canCreateResource(userResource, param);
-                if (createAccessResult == QnResourceAccessManager::CanCreateResourceCode::NotImplemented)
-                    result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
-                else
-                    result = (createAccessResult == QnResourceAccessManager::CanCreateResourceCode::Yes) ? true : false;
-            }
+                result = qnResourceAccessManager->canCreateResource(userResource, param);
             else
                 result = qnResourceAccessManager->canModifyResource(userResource, target, param);
 
