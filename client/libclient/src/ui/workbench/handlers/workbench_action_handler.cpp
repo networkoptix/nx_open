@@ -1566,8 +1566,7 @@ void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
 
 void QnWorkbenchActionHandler::at_pingAction_triggered()
 {
-    QUrl url = menu()->currentParameters(sender()).argument(Qn::UrlRole).value<QUrl>();
-    QString host = url.host();
+    QString host = menu()->currentParameters(sender()).argument(Qn::TextRole).toString();
 
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
         return;

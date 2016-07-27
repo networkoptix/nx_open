@@ -187,8 +187,10 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->pingButton, &QPushButton::clicked, this,
         [this]
         {
+            /* We must always ping the same address that is displayed in the visible field. */
+            auto host = ui->ipAddressEdit->text();
             menu()->trigger(QnActions::PingAction, QnActionParameters()
-                .withArgument(Qn::UrlRole, m_camera->getUrl()));
+                .withArgument(Qn::TextRole,host));
         });
 
     connect(ui->licensingWidget, &QnLicensesProposeWidget::changed,
@@ -981,15 +983,9 @@ void QnSingleCameraSettingsWidget::updateMaxFPS()
 void QnSingleCameraSettingsWidget::updateIpAddressText()
 {
     if (m_camera)
-    {
-        QString urlString = m_camera->getUrl();
-        QUrl url = QUrl::fromUserInput(urlString);
-        ui->ipAddressEdit->setText(!url.isEmpty() && url.isValid() ? url.host() : urlString);
-    }
+        ui->ipAddressEdit->setText(QnResourceDisplayInfo(m_camera).host());
     else
-    {
         ui->ipAddressEdit->clear();
-    }
 }
 
 void QnSingleCameraSettingsWidget::updateWebPageText()

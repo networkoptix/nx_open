@@ -187,7 +187,7 @@ QString QnBusinessStringsHelper::getResoureNameFromParams(const QnBusinessEventP
 
 QString QnBusinessStringsHelper::getResoureIPFromParams(const QnBusinessEventParameters& params)
 {
-	QString result = QnResourceDisplayInfo(eventSource(params)).url();
+	QString result = QnResourceDisplayInfo(eventSource(params)).host();
 	return result.isNull() ? params.resourceName : result;
 }
 

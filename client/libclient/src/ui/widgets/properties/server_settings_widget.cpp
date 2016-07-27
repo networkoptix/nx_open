@@ -23,7 +23,6 @@
 #include <client/client_model_types.h>
 #include <client/client_settings.h>
 
-#include <nx/network/http/httptypes.h>
 #include <nx/network/socket_global.h>
 
 #include <ui/actions/action.h>
@@ -250,12 +249,12 @@ void QnServerSettingsWidget::updateUrl()
     if (!m_server)
         return;
 
-    QUrl url = m_server->getApiUrl();
-    ui->ipAddressLineEdit->setText(url.host());
-    ui->portLineEdit->setText(QString::number(url.port()));
+    auto displayInfo = QnResourceDisplayInfo(m_server);
+    ui->ipAddressLineEdit->setText(displayInfo.host());
+    ui->portLineEdit->setText(QString::number(displayInfo.port()));
 
     ui->pingButton->setVisible(
-        !nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()));
+        !nx::network::SocketGlobals::addressResolver().isCloudHostName(m_server->getApiUrl().host()));
 }
 
 // -------------------------------------------------------------------------- //
@@ -302,6 +301,7 @@ void QnServerSettingsWidget::at_pingButton_clicked()
     if (!m_server)
         return;
 
+    /* We must always ping the same address that is displayed in the visible field. */
     menu()->trigger(QnActions::PingAction, QnActionParameters()
-        .withArgument(Qn::UrlRole, m_server->getApiUrl()));
+        .withArgument(Qn::TextRole, ui->ipAddressLineEdit->text()));
 }
