@@ -57,9 +57,9 @@ struct QnAppInfo
     static QString freeLicenseKey();
     static bool    freeLicenseIsTrial();
 
-    static bool isArm() { applicationArch() == QLatin1String("arm"); }
-    static bool isBpi() { armBox() == QLatin1String("bpi"); }
-    static bool isNx1() { armBox() == QLatin1String("nx1"); }
+    static bool isArm() { return applicationArch() == QLatin1String("arm"); }
+    static bool isBpi() { return armBox() == QLatin1String("bpi"); }
+    static bool isNx1() { return armBox() == QLatin1String("nx1"); }
 
     static QString applicationFullVersion()
     {
