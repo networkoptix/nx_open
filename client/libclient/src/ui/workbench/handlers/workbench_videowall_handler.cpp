@@ -1440,15 +1440,12 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
 
     QSet<QnVideoWallResourcePtr> videoWalls;
 
-    QSet<QnUuid> layouts;
     for (const QnVideoWallItemIndex &index: items)
     {
         if (!index.isValid())
             continue;
 
         QnVideoWallItem existingItem = index.item();
-        if (!existingItem.layout.isNull())
-            layouts << existingItem.layout;
         existingItem.layout = QnUuid();
         index.videowall()->items()->updateItem(existingItem);
         videoWalls << index.videowall();
