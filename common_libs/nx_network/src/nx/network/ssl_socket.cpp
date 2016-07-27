@@ -1031,9 +1031,17 @@ public:
         SSL_load_error_strings();
 
         serverContext.reset(SSL_CTX_new(SSLv23_server_method()));
-        clientContext.reset(SSL_CTX_new(SSLv23_client_method()));
+        SSL_CTX_set_options(
+            serverContext.get(),
+            SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 |
+            SSL_OP_NO_DTLSv1 | SSL_OP_NO_DTLSv1_2 | SSL_OP_SINGLE_DH_USE);
 
-        SSL_CTX_set_options(serverContext.get(), SSL_OP_SINGLE_DH_USE);
+        clientContext.reset(SSL_CTX_new(SSLv23_client_method()));
+        SSL_CTX_set_options(
+            clientContext.get(),
+            SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 |
+            SSL_OP_NO_DTLSv1 | SSL_OP_NO_DTLSv1_2);
+
         SSL_CTX_set_session_id_context(
             serverContext.get(),
             reinterpret_cast<const unsigned char*>(kSslSessionId.data()),
