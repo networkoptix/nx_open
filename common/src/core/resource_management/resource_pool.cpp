@@ -488,7 +488,8 @@ QnUserResourcePtr QnResourcePool::getAdministrator() const
     for(const QnResourcePtr &resource: m_resources)
     {
         QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        if (user && user->isOwner()) {
+        if (user && user->isOwner() && user->isEnabled())
+        {
             m_adminResource = user;
             return user;
         }
