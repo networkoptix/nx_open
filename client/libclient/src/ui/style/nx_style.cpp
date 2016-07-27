@@ -2371,7 +2371,7 @@ QRect QnNxStyle::subElementRect(
         {
             if (auto buttonBox = qobject_cast<const QDialogButtonBox *>(widget))
             {
-                if (qobject_cast<const QDialog*>(buttonBox->parentWidget()))
+                if (qobject_cast<const QnDialog*>(buttonBox->parentWidget()))
                 {
                     int margin = proxy()->pixelMetric(PM_DefaultTopLevelMargin);
                     return QnGeometry::dilated(option->rect, margin);
@@ -2793,14 +2793,14 @@ int QnNxStyle::pixelMetric(
             if (!widget)
                 return proxy()->pixelMetric(PM_DefaultChildMargin);
 
-            if (qobject_cast<const QDialog*>(widget) ||
+            if (qobject_cast<const QnDialog*>(widget) ||
                 qobject_cast<const QDialogButtonBox*>(widget)) // button box has outer margins
             {
                 return 0;
             }
 
             if (qobject_cast<const QnAbstractPreferencesWidget*>(widget) ||
-                qobject_cast<const QDialog*>(widget->parentWidget()) ||
+                qobject_cast<const QnDialog*>(widget->parentWidget()) ||
                 widget->isWindow() /*but not dialog*/)
             {
                 return proxy()->pixelMetric(PM_DefaultTopLevelMargin);
@@ -2812,7 +2812,7 @@ int QnNxStyle::pixelMetric(
         case PM_LayoutHorizontalSpacing:
             return Metrics::kDefaultLayoutSpacing.width();
         case PM_LayoutVerticalSpacing:
-            return (qobject_cast<const QDialog*>(widget)) ? 0 : Metrics::kDefaultLayoutSpacing.height();
+            return (qobject_cast<const QnDialog*>(widget)) ? 0 : Metrics::kDefaultLayoutSpacing.height();
 
         case PM_MenuVMargin:
             return dp(2);
