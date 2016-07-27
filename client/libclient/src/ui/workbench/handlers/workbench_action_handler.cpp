@@ -50,7 +50,11 @@
 
 #include <nx_ec/dummy_handler.h>
 
+#include <nx/network/http/httptypes.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/streaming/archive_stream_reader.h>
+
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
@@ -137,7 +141,6 @@
 #include <utils/common/url.h>
 #include <utils/email/email.h>
 #include <utils/math/math.h>
-#include <nx/network/http/httptypes.h>
 #include <utils/common/cpp14.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
@@ -1089,7 +1092,22 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered()
         /* If target server is not provided, open the server we are currently connected to. */
         server = qnCommon->currentServer();
 
-    sendServerRequest(server, lit("static/index.html"));
+    if (!server)
+        return;
+
+    QUrl url(server->getApiUrl());
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+        return;
+
+    url.setUserName(QString());
+    url.setPassword(QString());
+    url.setScheme(lit("http"));
+    url.setPath(lit("/static/index.html"));
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
+    QDesktopServices::openUrl(url);
+
+    //TODO: #akolesnikov #3.1 VMS-2806
+//    sendServerRequest(server, lit("static/index.html"));
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
@@ -1546,26 +1564,23 @@ void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
                     QnActionParameters().withArgument(Qn::EventTypeRole, QnBusiness::AnyServerEvent));
 }
 
-void QnWorkbenchActionHandler::at_pingAction_triggered() {
-    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
-    if (!resource)
+void QnWorkbenchActionHandler::at_pingAction_triggered()
+{
+    QUrl url = menu()->currentParameters(sender()).argument(Qn::UrlRole).value<QUrl>();
+    QString host = url.host();
+
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
         return;
 
 #ifdef Q_OS_WIN
-    QUrl url = QUrl::fromUserInput(resource->getUrl());
-    QString host = url.host();
-    QString cmd = QLatin1String("cmd /C ping %1 -t");
-    QProcess::startDetached(cmd.arg(host));
+    QString cmd = lit("cmd /C ping %1 -t").arg(host);
+    QProcess::startDetached(cmd);
 #endif
 #ifdef Q_OS_LINUX
-    QUrl url = QUrl::fromUserInput(resource->getUrl());
-    QString host = url.host();
-    QString cmd = QLatin1String("xterm -e ping %1");
-    QProcess::startDetached(cmd.arg(host));
+    QString cmd = lit("xterm -e ping %1").arg(host);
+    QProcess::startDetached(cmd);
 #endif
 #ifdef Q_OS_MACX
-    QUrl url = QUrl::fromUserInput(resource->getUrl());
-    QString host = url.host();
     QnPingDialog *dialog = new QnPingDialog(NULL, Qt::Dialog | Qt::WindowStaysOnTopHint);
     dialog->setHostAddress(host);
     dialog->show();

@@ -23,6 +23,9 @@
 #include <client/client_model_types.h>
 #include <client/client_settings.h>
 
+#include <nx/network/http/httptypes.h>
+#include <nx/network/socket_global.h>
+
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
@@ -247,8 +250,12 @@ void QnServerSettingsWidget::updateUrl()
     if (!m_server)
         return;
 
-    ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
-    ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
+    QUrl url = m_server->getApiUrl();
+    ui->ipAddressLineEdit->setText(url.host());
+    ui->portLineEdit->setText(QString::number(url.port()));
+
+    ui->pingButton->setVisible(
+        !nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()));
 }
 
 // -------------------------------------------------------------------------- //
@@ -295,5 +302,6 @@ void QnServerSettingsWidget::at_pingButton_clicked()
     if (!m_server)
         return;
 
-    menu()->trigger(QnActions::PingAction, QnActionParameters(m_server));
+    menu()->trigger(QnActions::PingAction, QnActionParameters()
+        .withArgument(Qn::UrlRole, m_server->getApiUrl()));
 }

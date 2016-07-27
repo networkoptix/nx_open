@@ -185,7 +185,11 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
         this, &QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked);
 
     connect(ui->pingButton, &QPushButton::clicked, this,
-        [this] { menu()->trigger(QnActions::PingAction, QnActionParameters(m_camera)); });
+        [this]
+        {
+            menu()->trigger(QnActions::PingAction, QnActionParameters()
+                .withArgument(Qn::UrlRole, m_camera->getUrl()));
+        });
 
     connect(ui->licensingWidget, &QnLicensesProposeWidget::changed,
         this, &QnSingleCameraSettingsWidget::at_dbDataChanged);

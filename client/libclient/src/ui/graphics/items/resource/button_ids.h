@@ -27,17 +27,16 @@ namespace Qn
         , IoModuleButton            = 0x00800
 
         // QnServerResourceWidget
-        , PingButton                = 0x01000
-        , ShowLogButton             = 0x02000
-        , CheckIssuesButton         = 0x04000
+        , ShowLogButton             = 0x01000
+        , CheckIssuesButton         = 0x02000
 
         // Buttons for left panel
 
         // QnResourceWidget
-        , RecordingStatusIconButton = 0x08000
+        , RecordingStatusIconButton = 0x04000
 
         // QnWebResourceWidget
-        , ReloadPageButton          = 0x10000
-        , BackButton                = 0x20000
+        , ReloadPageButton          = 0x08000
+        , BackButton                = 0x10000
     };
 }

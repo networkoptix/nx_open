@@ -37,6 +37,10 @@ protected:
     virtual void retranslateUi() override;
 
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
+
+private:
+    void updateWebPageButton();
+
 private:
     Q_DISABLE_COPY(QnServerSettingsDialog)
 
