@@ -184,7 +184,9 @@ button, select{
   }
 
   &:focus{
-    border-color: $shadow_d1 !important;
+    border-color: $shadow_d3 !important;
+    background-color: $shadow_d1;
+    box-shadow: inset 0px 1px 0px 0px $shadow_d3;
   }
 
   &[readonly]
@@ -195,15 +197,32 @@ button, select{
 }
 
 input[type="radio"], input[type="checkbox"] {
-  margin-top: 2px;
+  margin-top: 3px;
 }
 .radio, .checkbox {
   padding-left: 22px;
   label{
     color: $light;
+
+    input:checked + span {
+      color: $text;
+    }
+
+    &:hover,
+    input:hover + span
+    {
+      color:$light_l2
+    }
+
+    &:hover input:checked + span,
+    input:checked:hover + span {
+      color: $brightText;
+    }
+
   }
 }
 .radio input[type="radio"], .radio-inline input[type="radio"],
 .checkbox input[type="checkbox"], .checkbox-inline input[type="checkbox"] {
    margin-left: -22px;
+
 }
