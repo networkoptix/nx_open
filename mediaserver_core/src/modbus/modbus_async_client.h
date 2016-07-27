@@ -46,7 +46,7 @@ signals:
     void error();
 
 private:
-    void initSocket();
+    bool initSocket();
     void readAsync(quint64 currentRequestSequenceNum);
     void asyncSendDone(
         AbstractSocket* sock, 
@@ -81,6 +81,7 @@ private:
     mutable QnMutex m_mutex;
     quint64 m_requestSequenceNum;
     std::shared_ptr<AbstractStreamSocket> m_socket;
+    bool m_needReinitSocket;
     bool m_terminated;
 };
 

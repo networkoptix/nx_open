@@ -20,6 +20,7 @@ QnModbusAsyncClient::QnModbusAsyncClient():
 QnModbusAsyncClient::QnModbusAsyncClient(const SocketAddress& endpoint):
     m_state(ModbusClientState::ready),
     m_requestSequenceNum(false),
+    m_needReinitSocket(true),
     m_terminated(false)
 {
     setEndpoint(endpoint);
@@ -40,7 +41,7 @@ void QnModbusAsyncClient::setEndpoint(const SocketAddress& endpoint)
     initSocket();
 }
 
-void QnModbusAsyncClient::initSocket()
+bool QnModbusAsyncClient::initSocket()
 {
     m_sendBuffer.reserve(nx_modbus::kModbusMaxMessageLength);
     m_recvBuffer.reserve(nx_modbus::kModbusMaxMessageLength);
@@ -57,7 +58,11 @@ void QnModbusAsyncClient::initSocket()
         !m_socket->setSendTimeout(kSendTimeout))
     {
         m_socket.reset();
+        return false;
     }
+
+    m_needReinitSocket = false;
+    return true;
 }
 
 void QnModbusAsyncClient::readAsync(quint64 currentRequestSequenceNum)
@@ -91,6 +96,7 @@ void QnModbusAsyncClient::asyncSendDone(
             .arg(errorCode);
 
         m_state = ModbusClientState::ready;
+        m_needReinitSocket = true;
         emit error();
         return;
     }
@@ -112,6 +118,7 @@ void QnModbusAsyncClient::onSomeBytesReadAsync(
         m_lastErrorString = lit("ModbusAsyncClient: error while reading response. %1")
             .arg(errorCode);
         m_state = ModbusClientState::ready;
+        m_needReinitSocket = true;
         emit error();
     }
 
@@ -131,6 +138,7 @@ void QnModbusAsyncClient::processState(quint64 currentRequestSequenceNum)
 
         m_state = ModbusClientState::ready;
         m_lastErrorString = logMessage;
+        m_needReinitSocket = true;
         emit error();
 
         return;
@@ -178,7 +186,7 @@ void QnModbusAsyncClient::processData(quint64 currentRequestSequenceNum)
     {
         m_lastErrorString = lit("Response message size is too big: %1 bytes")
             .arg(fullMessageLength);
-
+        m_needReinitSocket = true;
         emit error();
     }
 
@@ -200,6 +208,7 @@ void QnModbusAsyncClient::processData(quint64 currentRequestSequenceNum)
         qDebug() << logMessage;
 
         m_lastErrorString = logMessage;
+        m_needReinitSocket = true;
         emit error();
         return;
     }
@@ -217,7 +226,7 @@ void QnModbusAsyncClient::processData(quint64 currentRequestSequenceNum)
         {
             m_lastErrorString = lit("ModbusAsyncClient, got exception: %1")
                 .arg(response.getExceptionString());
-
+            m_needReinitSocket = true;
             emit error();
         }
     }
@@ -235,6 +244,14 @@ void QnModbusAsyncClient::doModbusRequestAsync(const ModbusRequest &request)
     m_state = ModbusClientState::ready;
     m_socket->cancelAsyncIO();
 
+    if (m_needReinitSocket && !initSocket())
+    {
+        m_lastErrorString = lit("Unable to reinit socket.");
+        emit error();
+        return;
+    }
+
+    m_needReinitSocket = false;
     m_sendBuffer.truncate(0);
     m_recvBuffer.truncate(0);
 
@@ -245,8 +262,9 @@ void QnModbusAsyncClient::doModbusRequestAsync(const ModbusRequest &request)
         m_lastErrorString = lit("Request size is too big: %1 bytes. Maximum request length is %2 bytes.")
             .arg(m_sendBuffer.size())
             .arg(nx_modbus::kModbusMaxMessageLength);
-
+        m_needReinitSocket = true;
         emit error();
+        return;
     }
 
     if (m_sendBuffer.isEmpty())
@@ -254,8 +272,9 @@ void QnModbusAsyncClient::doModbusRequestAsync(const ModbusRequest &request)
         m_lastErrorString = lit("Serialized request is 0 bytes length.")
             .arg(m_sendBuffer.size())
             .arg(nx_modbus::kModbusMaxMessageLength);
-
+        m_needReinitSocket = true;
         emit error();
+        return;
     }
 
 
@@ -288,6 +307,9 @@ void QnModbusAsyncClient::doModbusRequestAsync(const ModbusRequest &request)
         {
             m_lastErrorString = lit("ModbusAsyncClient, unable to connect to endpoint %1")
                 .arg(m_endpoint.toString());
+            m_needReinitSocket = true;
+            emit error();
+            return;
         }
     }
 
