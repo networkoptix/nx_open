@@ -290,6 +290,7 @@ void QnNotificationWidget::addActionButton(const QIcon& icon, const QString& too
                                          const QnActionParameters& parameters, bool defaultAction)
 {
     QnImageButtonWidget* button = new QnImageButtonWidget(this);
+    button->setAcceptHoverEvents(false);
 
     button->setIcon(icon);
     button->setToolTip(tooltip);
