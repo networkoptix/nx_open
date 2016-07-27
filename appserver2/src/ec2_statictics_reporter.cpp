@@ -208,7 +208,7 @@ namespace ec2
                     qnGlobalSettings->statisticsReportTimeCycle(),
                     std::chrono::seconds(SEND_AFTER_UPDATE_TIME)).count() / 1000;
 
-                m_plannedReportTime = now.addSecs(nx::utils::randomInt(
+                m_plannedReportTime = now.addSecs(nx::utils::random::number(
                       timeCycle * MIN_DELAY_RATIO / 100,
                       timeCycle * MAX_DELAY_RATIO / 100));
 
@@ -230,7 +230,7 @@ namespace ec2
         {
             const QDateTime lastTime = qnGlobalSettings->statisticsReportLastTime();
             m_plannedReportTime = (lastTime.isValid() ? lastTime : now).addSecs(
-                nx::utils::randomInt<uint>(minDelay, maxDelay));
+                nx::utils::random::number<uint>(minDelay, maxDelay));
 
             NX_LOGX(lm("Last report was at %1, the next planned for %2")
                .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))

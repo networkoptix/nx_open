@@ -10,6 +10,7 @@
 #include <openssl/md5.h>
 
 #include <nx/utils/uuid.h>
+#include <nx/utils/random.h>
 #include <utils/common/util.h>
 #include <nx/network/http/auth_tools.h>
 
@@ -57,10 +58,7 @@ void AuthenticationProvider::getCdbNonce(
 
     const auto md5Hash = calcNonceHash(systemID, timestamp);
 
-    QByteArray random3Bytes;
-    random3Bytes.resize(3);
-    for(auto& ch: random3Bytes)
-        ch = random('a', 'z');
+    QByteArray random3Bytes = nx::utils::random::generate(3);
     const auto nonce =
         random3Bytes +
         (QByteArray::fromRawData(reinterpret_cast<const char*>(&timestamp), sizeof(timestamp))

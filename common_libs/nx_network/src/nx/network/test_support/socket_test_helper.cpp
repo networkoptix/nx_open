@@ -48,7 +48,7 @@ TestConnection::TestConnection(
     m_accepted(true)
 {
     m_readBuffer.reserve( kReadBufferSize );
-    m_outData = nx::utils::generateRandomData( kReadBufferSize );
+    m_outData = nx::utils::random::generate( kReadBufferSize );
 
     ++TestConnection_count;
 }
@@ -74,7 +74,7 @@ TestConnection::TestConnection(
     m_accepted(false)
 {
     m_readBuffer.reserve( kReadBufferSize );
-    m_outData = nx::utils::generateRandomData( kReadBufferSize );
+    m_outData = nx::utils::random::generate( kReadBufferSize );
 
     ++TestConnection_count;
 }

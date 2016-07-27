@@ -5,6 +5,7 @@
 #include <QtCore/QtMath>
 
 #include <utils/common/util.h>
+#include <nx/utils/random.h>
 
 QnQmlTestHelper::QnQmlTestHelper(QObject* parent):
     QObject(parent)
@@ -13,7 +14,7 @@ QnQmlTestHelper::QnQmlTestHelper(QObject* parent):
 
 int QnQmlTestHelper::random(int min, int max)
 {
-    return ::random(min, max);
+    return nx::utils::random::number(min, max - 1);
 }
 
 QObject* QnQmlTestHelper::findChildObject(QObject* parent, const QString& childName)
