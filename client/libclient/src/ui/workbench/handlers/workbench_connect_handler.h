@@ -50,7 +50,6 @@ public:
 
     bool connected() const;
 
-    void hideMessageBox();
     void showLoginDialog();
     void showWelcomeScreen();
 
@@ -70,7 +69,6 @@ private:
     void at_beforeExitAction_triggered();
 private:
     bool m_processingConnectAction;
-    QnGraphicsMessageBox* m_connectingMessageBox;
     int m_connectingHandle;
 
     /** Flag that we should handle new connection. */
