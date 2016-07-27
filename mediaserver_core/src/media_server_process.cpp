@@ -1894,7 +1894,7 @@ void MediaServerProcess::run()
 #ifdef EDGE_SERVER
     serverFlags |= Qn::SF_Edge;
 #endif
-    if (QnAppInfo::armBox() == "bpi" || compatibilityMode) // check compatibilityMode here for testing purpose
+    if (QnAppInfo::isBpi() || compatibilityMode) // check compatibilityMode here for testing purpose
     {
         serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
         serverFlags |= Qn::SF_HasLiteClient;
@@ -1958,7 +1958,7 @@ void MediaServerProcess::run()
     runtimeData.platform = QnAppInfo::applicationPlatform();
 
 #ifdef __arm__
-    if (QnAppInfo::armBox() == "nx1" || QnAppInfo::armBox() == "bpi")
+    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
     {
         runtimeData.nx1mac = Nx1::getMac();
         runtimeData.nx1serial = Nx1::getSerial();

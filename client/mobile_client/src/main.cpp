@@ -132,7 +132,7 @@ int runUi(QGuiApplication *application) {
 
 #if defined(__arm__)
 
-        if (QnAppInfo::armBox() == QString::fromLatin1("bpi"))
+        if (QnAppInfo::isBpi())
             maxFfmpegResolution = QSize(1280, 720);
         else
             maxFfmpegResolution = QSize(1920, 1080);
