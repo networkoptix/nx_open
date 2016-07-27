@@ -88,6 +88,9 @@
      <property name="bottomMargin">
       <number>16</number>
      </property>
+     <property name="spacing">
+      <number>8</number>
+     </property>
      <item row="4" column="1">
       <widget class="QLabel" name="restorePasswordLabel">
        <property name="text">

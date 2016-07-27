@@ -540,6 +540,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         else
             context()->instance<QnWorkbenchUpdateWatcher>()->stop();
 	}
+    m_serverRequests.clear();
 
     if (!user)
         return;
@@ -1079,7 +1080,8 @@ void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
     businessRulesDialog()->setFilter(filter);
 }
 
-void QnWorkbenchActionHandler::at_webClientAction_triggered() {
+void QnWorkbenchActionHandler::at_webClientAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnMediaServerResourcePtr server = parameters.resource().dynamicCast<QnMediaServerResource>();
@@ -1087,16 +1089,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
         /* If target server is not provided, open the server we are currently connected to. */
         server = qnCommon->currentServer();
 
-    if (!server)
-        return;
-
-    QUrl url(server->getApiUrl());
-    url.setUserName(QString());
-    url.setPassword(QString());
-    url.setScheme(lit("http"));
-    url.setPath(lit("/static/index.html"));
-    url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
-    QDesktopServices::openUrl(url);
+    sendServerRequest(server, lit("static/index.html"));
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
@@ -1539,63 +1532,13 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
     }
 }
 
-void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
+void QnWorkbenchActionHandler::at_serverLogsAction_triggered()
+{
     QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
     if (!server)
         return;
 
-    if (!context()->user())
-        return;
-
-    QUrl serverUrl(server->getApiUrl());
-    serverUrl.setPath(lit("/api/getNonce"));
-
-    nx_http::AsyncHttpClientPtr client = nx_http::AsyncHttpClient::create();
-    auto reply = std::make_unique<QnAsyncHttpClientReply>(client, this);
-    connect(
-        reply.get(), &QnAsyncHttpClientReply::finished,
-        this, &QnWorkbenchActionHandler::at_serverLogsAction_getNonce);
-
-    // TODO: Think of preloader in case of user complains about delay
-    m_logRequests.emplace(serverUrl, LogRequest{std::move(server), std::move(reply)});
-    client->doGet(serverUrl);
-}
-
-void QnWorkbenchActionHandler::at_serverLogsAction_getNonce(QnAsyncHttpClientReply *reply) {
-    auto it = m_logRequests.find(reply->url());
-    auto request = std::move(it->second);
-    m_logRequests.erase(it);
-
-    QnJsonRestResult result;
-    NonceReply auth;
-    if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
-    {
-        QnMessageBox::warning(mainWindow(),
-            tr("Cannot open server log"),
-            tr("Could not execute initial server query"));
-
-        return;
-    }
-
-    auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-    QUrl url(lit("%1://%2/%3:%4/api/showLog")
-        .arg(gateway->isSslEnabled() ? lit("https") : lit("http"))
-        .arg(gateway->endpoint().toString())
-        .arg(reply->url().host()).arg(reply->url().port()));
-
-    QString login = QnAppServerConnectionFactory::url().userName();
-    QString password = QnAppServerConnectionFactory::url().password();
-
-    QUrlQuery urlQuery(url);
-    urlQuery.addQueryItem(
-        lit("auth"),
-        QLatin1String(createHttpQueryAuthParam(
-            login, password, auth.realm, nx_http::Method::GET, auth.nonce.toUtf8())));
-
-    urlQuery.addQueryItem(lit("lines"), QLatin1String("1000"));
-    url.setQuery(urlQuery);
-    url = QnNetworkProxyFactory::instance()->urlToResource(url, request.server);
-    QDesktopServices::openUrl(url);
+    sendServerRequest(server, lit("api/showLog?lines=1000"));
 }
 
 void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
@@ -2300,6 +2243,69 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
 void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::TimeServerSelection);
+}
+
+void QnWorkbenchActionHandler::sendServerRequest(const QnMediaServerResourcePtr& server, const QString& path)
+{
+    static const QString kNonceRequestPath(lit("/api/getNonce"));
+
+    if (!server || !context()->user())
+        return;
+
+    QUrl serverUrl(server->getApiUrl());
+    serverUrl.setPath(kNonceRequestPath);
+
+    nx_http::AsyncHttpClientPtr client = nx_http::AsyncHttpClient::create();
+    auto reply = std::make_unique<QnAsyncHttpClientReply>(client, this);
+    connect(
+        reply.get(), &QnAsyncHttpClientReply::finished,
+        this, &QnWorkbenchActionHandler::at_serverRequest_nonceReceived);
+
+    // TODO: Think of preloader in case of user complains about delay
+    m_serverRequests.emplace(serverUrl, ServerRequest{std::move(server), std::move(path), std::move(reply)});
+    client->doGet(serverUrl);
+}
+
+void QnWorkbenchActionHandler::at_serverRequest_nonceReceived(QnAsyncHttpClientReply *reply)
+{
+    auto it = m_serverRequests.find(reply->url());
+    if (it == m_serverRequests.end())
+        return;
+
+    auto request = std::move(it->second);
+    m_serverRequests.erase(it);
+
+    QnJsonRestResult result;
+    NonceReply auth;
+    if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
+    {
+        QnMessageBox::warning(mainWindow(),
+            tr("Cannot open server log"),
+            tr("Could not execute initial server query"));
+
+        return;
+    }
+
+    auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
+    QUrl url(lit("%1://%2/%3:%4/%5")
+        .arg(gateway->isSslEnabled() ? lit("https") : lit("http"))
+        .arg(gateway->endpoint().toString())
+        .arg(reply->url().host()).arg(reply->url().port())
+        .arg(request.path)
+    );
+
+    QString login = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
+
+    QUrlQuery urlQuery(url);
+    urlQuery.addQueryItem(
+        lit("auth"),
+        QLatin1String(createHttpQueryAuthParam(
+            login, password, auth.realm, nx_http::Method::GET, auth.nonce.toUtf8())));
+
+    url.setQuery(urlQuery);
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, request.server);
+    QDesktopServices::openUrl(url);
 }
 
 void QnWorkbenchActionHandler::deleteDialogs() {

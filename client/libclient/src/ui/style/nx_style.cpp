@@ -1672,6 +1672,17 @@ void QnNxStyle::drawControl(
                     tab->state.testFlag(QStyle::State_Enabled),
                     tab->text);
 
+                if (!tab->icon.isNull())
+                {
+                    QFontMetrics fm(painter->font());
+                    QRect rect = fm.boundingRect(textRect, textFlags, tab->text);
+
+                    QSize iconSize = tab->icon.actualSize(tab->iconSize);
+                    QRect iconRect = aligned(iconSize, textRect);
+                    iconRect.moveLeft(rect.right() + Metrics::kStandardPadding);
+                    tab->icon.paint(painter, iconRect);
+                }
+
                 if (tab->state.testFlag(State_HasFocus))
                 {
                     QStyleOptionFocusRect focusOption;
@@ -3117,6 +3128,17 @@ void QnNxStyle::polish(QWidget *widget)
         }
     }
 #endif
+
+    if (qobject_cast<QAbstractButton*>(widget) ||
+        qobject_cast<QAbstractSlider*>(widget) ||
+        qobject_cast<QGroupBox*>(widget) ||
+        qobject_cast<QComboBox*>(widget) ||
+        qobject_cast<QTabBar*>(widget) ||
+        qobject_cast<QLabel*>(widget))
+    {
+        if (widget->focusPolicy() != Qt::NoFocus)
+            widget->setFocusPolicy(Qt::TabFocus);
+    }
 }
 
 void QnNxStyle::unpolish(QWidget* widget)
