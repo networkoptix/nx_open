@@ -72,32 +72,24 @@ public:
     */
     bool hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permissions requiredPermissions) const;
 
-    enum class CanCreateResourceCode
-    {
-        Yes,
-        No,
-        NotImplemented
-    };
-
     /**
     * \param user                      User that should have permissions for resource creating.
     * \param resource                  Resource to get permissions for.
     * \returns                         Whether user can create this resource.
     */
-    CanCreateResourceCode canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
+    bool canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
 
     template <typename ApiDataType>
-    CanCreateResourceCode canCreateResource(const QnUserResourcePtr& /*user*/, const ApiDataType& /*data*/) const
+    bool canCreateResource(const QnUserResourcePtr& user, const ApiDataType& /*data*/) const
     {
-        /* By default we cannot create resources manually. */
-        return CanCreateResourceCode::NotImplemented;
+        return hasGlobalPermission(user, Qn::GlobalPermission::GlobalAdminPermission);
     }
 
-    CanCreateResourceCode canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const;
-    CanCreateResourceCode canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const;
-    CanCreateResourceCode canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiUserData& data) const;
-    CanCreateResourceCode canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const;
-    CanCreateResourceCode canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const;
+    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const;
+    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const;
+    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiUserData& data) const;
+    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const;
+    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const;
 
     bool canCreateStorage   (const QnUserResourcePtr& user, const QnUuid& storageParentId) const;
     bool canCreateLayout    (const QnUserResourcePtr& user, const QnUuid& layoutParentId) const;
