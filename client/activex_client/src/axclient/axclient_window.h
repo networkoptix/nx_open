@@ -52,6 +52,7 @@ private:
 private:
     QWidget *m_parentWidget;
     QScopedPointer<QnWorkbenchContext> m_context;
+    QScopedPointer<QnWorkbenchAccessController> m_accessController;
     QScopedPointer<QnMainWindow> m_mainWindow;
 };
 

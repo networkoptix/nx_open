@@ -7,7 +7,6 @@
 
 #include <client/client_globals.h>
 
-#include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 
 class QnWorkbenchContext;
@@ -31,7 +30,7 @@ private:
 /**
  * This class implements access control.
  */
-class QnWorkbenchAccessController: public Connective<QObject>, public QnWorkbenchContextAware
+class QnWorkbenchAccessController: public Connective<QObject>
 {
     Q_OBJECT
 
@@ -40,6 +39,9 @@ class QnWorkbenchAccessController: public Connective<QObject>, public QnWorkbenc
 public:
     QnWorkbenchAccessController(QObject* parent = nullptr);
     virtual ~QnWorkbenchAccessController();
+
+    QnUserResourcePtr user() const;
+    void setUser(const QnUserResourcePtr& user);
 
     /**
      * \param resource                  Resource to get permissions for.

@@ -56,19 +56,9 @@ void QnCameraMotionMaskWidget::init()
     m_view->setAutoFillBackground(true);
 
     /* Set up model & control machinery. */
-    m_context.reset(new QnWorkbenchContext(this));
+    m_context.reset(new QnWorkbenchContext(context()->accessController(), this));
 
     createWorkbenchLayout();
-
-    //TODO: #vkutin #GDM Refactor this in future versions.
-    // Either get rid or temporary workbench or use one global access controller.
-    auto updateUser = [this](const QnUserResourcePtr& newUser)
-    {
-        m_context->setUserName(newUser ? newUser->getName() : QString());
-    };
-
-    updateUser(context()->user());
-    connect(context(), &QnWorkbenchContext::userChanged, this, updateUser);
 
     QnWorkbenchDisplay *display = m_context->display();
     display->setLightMode(Qn::LightModeFull);

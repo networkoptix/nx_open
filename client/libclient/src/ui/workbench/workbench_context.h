@@ -33,18 +33,17 @@ class QnWorkbenchContext: public QObject, public QnInstanceStorage
 {
     Q_OBJECT
 public:
-    QnWorkbenchContext(QObject *parent = NULL);
+    QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject *parent = NULL);
 
     virtual ~QnWorkbenchContext();
 
     QnWorkbench* workbench() const;
     QnWorkbenchLayoutSnapshotManager* snapshotManager() const;
-    QnActionManager* menu() const
-    {
-        return m_menu.data();
-    }
+    QnActionManager* menu() const;
 
     QnWorkbenchAccessController* accessController() const;
+    void setAccessController(QnWorkbenchAccessController* value);
+
     QnWorkbenchDisplay* display() const;
     QnWorkbenchNavigator* navigator() const;
     QnControlsStatisticsModule* statisticsModule() const;
@@ -87,7 +86,6 @@ private:
     QScopedPointer<QnWorkbench> m_workbench;
     QScopedPointer<QnWorkbenchSynchronizer> m_synchronizer;
     QScopedPointer<QnWorkbenchLayoutSnapshotManager> m_snapshotManager;
-    QScopedPointer<QnWorkbenchAccessController> m_accessController;
     QScopedPointer<QnActionManager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
@@ -95,6 +93,7 @@ private:
 
     QPointer<QWidget> m_mainWindow;
 
+    QnWorkbenchAccessController* m_accessController;
     QnWorkbenchUserWatcher *m_userWatcher;
     QnWorkbenchLayoutWatcher *m_layoutWatcher;
 

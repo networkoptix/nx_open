@@ -35,9 +35,11 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
+        m_accessController.reset(new QnWorkbenchAccessController());
         m_module.reset(new QnClientModule());
         m_skin.reset(new QnSkin());
-        m_context.reset(new QnWorkbenchContext());
+        m_context.reset(new QnWorkbenchContext(m_accessController.data()));
+        QObject::connect(m_context.data(), &QnWorkbenchContext::userChanged, m_accessController.data(), &QnWorkbenchAccessController::setUser);
     }
 
     // virtual void TearDown() will be called after each test is run.
@@ -46,6 +48,7 @@ protected:
         m_context.clear();
         m_skin.clear();
         m_module.clear();
+        m_accessController.clear();
     }
 
     QnUserResourcePtr addUser(const QString &name, Qn::GlobalPermissions globalPermissions, QnUserType userType = QnUserType::Local)
@@ -116,6 +119,7 @@ protected:
     QSharedPointer<QnClientModule> m_module;
     QSharedPointer<QnSkin> m_skin;
     QSharedPointer<QnWorkbenchContext> m_context;
+    QSharedPointer<QnWorkbenchAccessController> m_accessController;
 };
 
 
