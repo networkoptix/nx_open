@@ -19,6 +19,6 @@ angular.module('webadminApp')
             });
         }
 
-        $scope.state = 'server is offline';
+        $scope.state = L.offlineDialog.serverOffline;
         setTimeout(pingServer,1000);
     });

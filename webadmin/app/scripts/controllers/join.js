@@ -44,29 +44,29 @@ angular.module('webadminApp')
         function errorHandler(errorToShow){
             switch(errorToShow){
                 case 'FAIL':
-                    errorToShow = 'System is unreachable or doesn\'t exist.';
+                    errorToShow = L.join.systemIsUnreacheble;
                     break;
                 case 'currentPassword':
-                    errorToShow = 'Incorrect current password';
+                    errorToShow = L.join.incorrectCurrentPassword;
                     break;
                 case 'UNAUTHORIZED':
                 case 'password':
-                    errorToShow = 'Wrong password.';
+                    errorToShow = L.join.incorrectRemotePassword;
                     break;
                 case 'INCOMPATIBLE':
-                    errorToShow = 'Found system has incompatible version.';
+                    errorToShow = L.join.incompatibleVersion;
                     break;
                 case 'url':
-                    errorToShow = 'Wrong url.';
+                    errorToShow = L.join.wrongUrl;
                     break;
                 case 'SAFE_MODE':
-                    errorToShow = 'Can\'t merge systems. Remote system is in safe mode.';
+                    errorToShow =  L.join.safeMode;
                     break;
                 case 'CONFIGURATION_ERROR':
-                    errorToShow = 'Can\'t merge systems. Maybe one of the systems is in safe mode.';
+                    errorToShow = L.join.configError;
                     break;
                 case 'STARTER_LICENSE_ERROR':
-                    errorToShow = 'Warning: You are about to merge Systems with START licenses. As only 1 START license is allowed per System after your merge you will only have 1 START license remaining. If you understand this and would like to proceed please click Merge to continue.';
+                    errorToShow = L.join.licenceError;
                     dialogs.alert(errorToShow);
                     return false;
             }
@@ -83,7 +83,7 @@ angular.module('webadminApp')
                 if(r.data.error!=='0'){
                     var errorToShow = errorHandler(r.data.errorString);
                     if(errorToShow){
-                        dialogs.alert('Connection failed: ' + errorToShow);
+                        dialogs.alert(L.join.connectionFailed + errorToShow);
                         return;
                     }
                 }
@@ -103,11 +103,11 @@ angular.module('webadminApp')
                 if(r.data.error!=='0') {
                     var errorToShow = errorHandler(r.data.errorString);
                     if (errorToShow) {
-                        dialogs.alert('Merge failed: ' + errorToShow);
+                        dialogs.alert(L.join.mergeFailed + errorToShow);
                         return;
                     }
                 }
-                dialogs.alert('Merge succeed.').then(function(){
+                dialogs.alert(L.join.mergeSucceed).then(function(){
                     window.location.reload();
                 });
             });
