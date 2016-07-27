@@ -1,18 +1,16 @@
 #include "ec2_statictics_reporter.h"
 
-#include "ec2_connection.h"
+#include <QtCore/QCollator>
 
 #include <api/global_settings.h>
-
-#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
-
 #include <nx/utils/random.h>
 #include <utils/common/synctime.h>
 
-#include <QCollator>
+#include "ec2_connection.h"
 
 static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */
 static const bool DEFAULT_SERVER_AUTH = true;
@@ -24,6 +22,7 @@ static const uint MAX_DELAY_RATIO = MIN_DELAY_RATIO + RND_DELAY_RATIO;
 static const uint SEND_AFTER_UPDATE_TIME = 3 * 60 * 60 * 1000; // 3h
 static const uint TIMER_CYCLE = 60 * 1000; /* msecs, update state every minute */
 static const uint TIMER_CYCLE_MAX = 24 * 60 * 60 * 1000; /* msecs, once a day at least */
+
 static const QString SERVER_API_COMMAND = lit("statserver/api/report");
 
 namespace ec2

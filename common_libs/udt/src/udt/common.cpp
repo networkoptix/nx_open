@@ -80,7 +80,8 @@ written by
         if (auto t = clock_gettime(CLOCK_MONOTONIC, &timeout))
             return t;
 
-        timeout.tv_nsec += ms * 1000000;
+        timeout.tv_sec += (ms / 1000);
+        timeout.tv_nsec += (ms % 1000) * 1000000;
         if (timeout.tv_nsec > 1000000000)
         {
             timeout.tv_sec += 1;

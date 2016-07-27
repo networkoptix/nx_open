@@ -13,7 +13,7 @@
 #include <nx/network/socket.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/udt/udt_socket.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/common/stoppable.h>
 
 #include "../cloud_data_provider.h"

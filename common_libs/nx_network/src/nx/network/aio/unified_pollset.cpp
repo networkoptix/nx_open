@@ -1,8 +1,3 @@
-/**********************************************************
-* Feb 25, 2016
-* akolesnikov
-***********************************************************/
-
 #include "unified_pollset.h"
 
 #include <iostream>
@@ -12,8 +7,6 @@
 #include "../udt/udt_common.h"
 #include "../udt/udt_socket.h"
 #include "../udt/udt_socket_impl.h"
-
-#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace network {
@@ -223,11 +216,8 @@ bool UnifiedPollSet::isValid() const
 
 void UnifiedPollSet::interrupt()
 {
-    const auto address = m_interruptSocket.getLocalAddress();
-    NX_LOGX(lm("interrupt... %1").str(address), cl_logDEBUG1);
-
     static const quint8 buffer[kInterruptBufferSize] = { 0 };
-    m_interruptSocket.sendTo(buffer, sizeof(buffer), address);
+    m_interruptSocket.sendTo(buffer, sizeof(buffer), m_interruptSocket.getLocalAddress());
 }
 
 bool UnifiedPollSet::add(Pollable* const sock, EventType eventType, void* /*userData*/)
@@ -314,7 +304,6 @@ int UnifiedPollSet::poll(int millisToWait)
 
         --result;
         m_readSysFds.erase(it);
-        NX_LOGX(lm("interrupted!"), cl_logDEBUG1);
     }
 
     removePhantomSockets(&m_readUdtFds);
