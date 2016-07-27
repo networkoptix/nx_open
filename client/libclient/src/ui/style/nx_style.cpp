@@ -1680,8 +1680,7 @@ void QnNxStyle::drawControl(
                     QSize iconSize = tab->icon.actualSize(tab->iconSize);
                     QRect iconRect = aligned(iconSize, textRect);
                     iconRect.moveLeft(rect.right() + Metrics::kStandardPadding);
-
-                    painter->drawPixmap(iconRect, tab->icon.pixmap(iconSize));
+                    tab->icon.paint(painter, iconRect);
                 }
 
                 if (tab->state.testFlag(State_HasFocus))
