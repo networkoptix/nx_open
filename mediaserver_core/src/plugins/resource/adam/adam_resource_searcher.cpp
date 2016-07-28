@@ -72,19 +72,22 @@ QByteArray QnAdamResourceSearcher::executeAsciiCommand(
     const QString& commandStr)
 {
     QnAdamAsciiCommand command(commandStr);
+    bool status = false;
 
     auto response = client.writeHoldingRegisters(
         QnAdamAsciiCommand::kStartAsciiRegister,
-        command.data);
+        command.data,
+        &status);
 
-    if (response.isException())
+    if (response.isException() || !status)
         return QByteArray();
 
     response = client.readHoldingRegisters(
         QnAdamAsciiCommand::kStartAsciiRegister,
-        QnAdamAsciiCommand::kReadAsciiRegisterCount);
+        QnAdamAsciiCommand::kReadAsciiRegisterCount,
+        &status);
 
-    if (response.isException())
+    if (response.isException() || !status)
         return QByteArray();
 
     if(response.data.indexOf("!") != 1)

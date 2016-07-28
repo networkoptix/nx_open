@@ -23,23 +23,23 @@ public:
     bool connect();
     void disconnect();
 
-    ModbusResponse doModbusRequest(const ModbusRequest&, bool& success);
+    ModbusResponse doModbusRequest(const ModbusRequest&, bool* outStatus);
 
     // Discrete input is 1-bit read only field.
     ModbusResponse readDiscreteInputs();
 
     // Coil is 1-bit read/write field.
-    ModbusResponse readCoils(quint16 startCoilAddress, quint16 coilCount);
-    ModbusResponse writeCoils(quint16 startCoilAddress, const QByteArray& data);
-    ModbusResponse writeSingleCoil(quint16 coilAddress, bool coilState, bool& status);
+    ModbusResponse readCoils(quint16 startCoilAddress, quint16 coilCount, bool* outStatus);
+    ModbusResponse writeCoils(quint16 startCoilAddress, const QByteArray& data, bool *outStatus);
+    ModbusResponse writeSingleCoil(quint16 coilAddress, bool coilState, bool* outStatus);
 
     // Input register is read only word of length 2 byte.
-    ModbusResponse readInputRegisters(quint16 startRegister, quint16 registerCount);
+    ModbusResponse readInputRegisters(quint16 startRegister, quint16 registerCount, bool* outStatus);
 
     // Holding register is read/write word of length 2 byte.
-    ModbusResponse readHoldingRegisters(quint16 startRegister, quint16 registerCount);
-    ModbusResponse writeHoldingRegisters(quint16 startRegister, const QByteArray& data);
-    ModbusResponse writeSingleHoldingRegister(quint16 registerAddres, const QByteArray& data);
+    ModbusResponse readHoldingRegisters(quint16 startRegister, quint16 registerCount, bool* outStatus);
+    ModbusResponse writeHoldingRegisters(quint16 startRegister, const QByteArray& data, bool *outStatus);
+    ModbusResponse writeSingleHoldingRegister(quint16 registerAddres, const QByteArray& data, bool* outStatus);
 
 private:
     bool initSocket();
@@ -51,7 +51,6 @@ private:
 
     SocketAddress m_endpoint;
     std::shared_ptr<AbstractStreamSocket> m_socket;
-    bool m_needReinitSocket;
 };
 
 }

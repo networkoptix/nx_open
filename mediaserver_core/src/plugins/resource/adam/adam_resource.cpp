@@ -201,7 +201,7 @@ bool QnAdamResource::setRelayOutputState(
 
     if (!isActive)
     {
-        for (auto it = m_autoResetTimers.begin(); it != m_autoResetTimers.end();)
+        for (auto it = m_autoResetTimers.begin(); it != m_autoResetTimers.end(); ++it)
         {
             auto timerId = it->first;
             auto portTimerEntry = it->second;
@@ -210,10 +210,6 @@ bool QnAdamResource::setRelayOutputState(
                 TimerManager::instance()->deleteTimer(timerId);
                 it = m_autoResetTimers.erase(it);
                 break;
-            }
-            else
-            {
-                ++it;
             }
         }
     }

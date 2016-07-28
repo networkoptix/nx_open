@@ -125,9 +125,9 @@ bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isA
         response = m_outputClient.writeSingleCoil(
             coil, 
             isActive != defaultPortStateIsActive, 
-            status);
+            &status);
 
-    if (response.isException())
+    if (response.isException() || !status)
         return false;
 
     setDebounceForPort(outputId, isActive);

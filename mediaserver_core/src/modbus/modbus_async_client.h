@@ -66,6 +66,8 @@ private:
 
     ModbusMBAPHeader buildHeader(const ModbusRequest& request);
 
+    void emitError(const QString& errorStr);
+
 private:
     quint16 m_requestTransactionId;
     quint16 m_requestFunctionCode;
@@ -81,7 +83,6 @@ private:
     mutable QnMutex m_mutex;
     quint64 m_requestSequenceNum;
     std::shared_ptr<AbstractStreamSocket> m_socket;
-    bool m_needReinitSocket;
     bool m_terminated;
 };
 
