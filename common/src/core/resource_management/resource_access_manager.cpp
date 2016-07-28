@@ -849,8 +849,8 @@ bool QnResourceAccessManager::isAccessibleViaLayouts(const QSet<QnUuid>& layoutI
 
 void QnResourceAccessManager::beginUpdateCache()
 {
-    int counter = ++m_cacheUpdateCounter;
-    TRACE("beginUpdateCache " << counter);
+    ++m_cacheUpdateCounter;
+    TRACE("beginUpdateCache");
 }
 
 void QnResourceAccessManager::endUpdateCache()
