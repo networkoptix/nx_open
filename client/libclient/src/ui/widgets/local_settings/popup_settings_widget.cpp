@@ -13,21 +13,25 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/resource_property_adaptors.h>
 #include <utils/common/scoped_value_rollback.h>
 
-QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent)
-    : base_type(parent)
-    , QnWorkbenchContextAware(parent)
-    , ui(new Ui::PopupSettingsWidget)
-    , m_businessRulesCheckBoxes()
-    , m_systemHealthCheckBoxes()
-    , m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this))
-    , m_updating(false)
+QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent) :
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
+    ui(new Ui::PopupSettingsWidget),
+    m_businessRulesCheckBoxes(),
+    m_systemHealthCheckBoxes(),
+    m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this)),
+    m_updating(false)
 {
     ui->setupUi(this);
+
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(this);
+    ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     setHelpTopic(this, Qn::SystemSettings_Notifications_Help);
 
