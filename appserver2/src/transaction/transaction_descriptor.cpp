@@ -465,6 +465,9 @@ namespace detail
 
         bool operator()(const QnUuid& userId, const ApiResourceParamWithRefData& param)
         {
+            if (systemSuperAccess(userId))
+                return true;
+
             if (isRemove)
                 return qnResourceAccessManager->hasPermission(qnResPool->getResourceById<QnUserResource>(userId),
                                                               qnResPool->getResourceById(param.resourceId),
