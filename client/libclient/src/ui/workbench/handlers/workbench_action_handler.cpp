@@ -2301,10 +2301,11 @@ void QnWorkbenchActionHandler::at_serverRequest_nonceReceived(QnAsyncHttpClientR
     }
 
     auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-    QUrl url(lit("%1://%2/%3:%4/%5")
-        .arg(gateway->isSslEnabled() ? lit("https") : lit("http"))
+    QUrl url(lit("http://%1/%2:%3:%4/%5")
         .arg(gateway->endpoint().toString())
-        .arg(reply->url().host()).arg(reply->url().port())
+        .arg(reply->url().scheme())
+        .arg(reply->url().host())
+        .arg(reply->url().port())
         .arg(request.path)
     );
 
