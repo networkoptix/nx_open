@@ -647,7 +647,7 @@ namespace detail
         void operator()(const QnUuid& userId, ApiResourceParamWithRefDataList& outList)
         {
             outList.erase(std::remove_if(outList.begin(), outList.end(), 
-                                         [&userId, this] (const typename ApiResourceParamWithRefData &param) {
+                                         [&userId, this] (const ApiResourceParamWithRefData &param) {
                                              return !ModifyResourceParamAccess(isRemove)(userId, param);
                                          }), outList.end());
         }
