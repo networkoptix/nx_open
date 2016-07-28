@@ -35,6 +35,7 @@ BusyIndicator
             height: width
             radius: width / 2
             color: control.color
+            opacity: 0.0
 
             SequentialAnimation
             {
