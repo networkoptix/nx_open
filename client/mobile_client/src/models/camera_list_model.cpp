@@ -101,6 +101,23 @@ void QnCameraListModel::setLayoutId(const QString& layoutId)
     emit layoutIdChanged();
 }
 
+int QnCameraListModel::rowByResourceId(const QString& resourceId) const
+{
+    Q_D(const QnCameraListModel);
+
+    const auto id = QnUuid::fromStringSafe(resourceId);
+    if (id.isNull())
+        return -1;
+
+    auto index = d->model->indexByResourceId(id);
+    if (!index.isValid())
+        return -1;
+
+    index = mapFromSource(index);
+
+    return index.row();
+}
+
 void QnCameraListModel::refreshThumbnail(int row)
 {
     if (!QnCameraThumbnailCache::instance())
