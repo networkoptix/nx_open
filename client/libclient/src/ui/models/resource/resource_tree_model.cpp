@@ -268,9 +268,9 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSharedLayoutNode(const QnU
     return *pos;
 }
 
-QnResourceTreeModelNodePtr QnResourceTreeModel::ensurePlaceholderNode(const QnResourceTreeModelNodePtr& parentNode, Qn::NodeType nodeType)
+QnResourceTreeModelNodePtr QnResourceTreeModel::ensurePlaceholderNode(const QnUuid& owner, Qn::NodeType nodeType)
 {
-    NodeList& placeholders = m_placeholderNodesByParent[parentNode];
+    NodeList& placeholders = m_placeholderNodesByOwner[owner];
     for (auto node : placeholders)
     {
         if (node->type() == nodeType)
@@ -278,8 +278,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensurePlaceholderNode(const QnRe
     }
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, nodeType));
-    node->setParent(parentNode);
-
     placeholders.push_back(node);
     m_allNodes.append(node);
     return node;
@@ -295,7 +293,6 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
     m_allNodes.removeOne(node);
     m_recorderHashByParent.remove(node);
     m_itemNodesByParent.remove(node);
-    m_placeholderNodesByParent.remove(node);
 
     /* Recursively remove all child nodes. */
     for (auto child : children(node))
@@ -320,18 +317,12 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
     case Qn::AllLayoutsAccessNode:
     case Qn::AccessibleResourcesNode:
     case Qn::AccessibleLayoutsNode:
-        if (node->parent())
-        {
-            NodeList& nodes = m_placeholderNodesByParent[node->parent()];
+        for (NodeList& nodes : m_placeholderNodesByOwner)
             nodes.removeOne(node);
-        }
         break;
     case Qn::SharedLayoutNode:
-        for (const QnUuid& owner: m_sharedLayoutNodesByOwner.keys())
-        {
-            ResourceHash& hash = m_sharedLayoutNodesByOwner[owner];
+        for (ResourceHash& hash: m_sharedLayoutNodesByOwner)
             hash.remove(hash.key(node));
-        }
         break;
     case Qn::SystemNode:
         m_systemNodeBySystemName.remove(m_systemNodeBySystemName.key(node));
@@ -535,7 +526,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
             auto parentNode = ensureResourceNode(owner);
             if (qnResourceAccessManager->hasGlobalPermission(owner, Qn::GlobalAccessAllMediaPermission))
                 return parentNode;
-            return ensurePlaceholderNode(parentNode, Qn::AccessibleLayoutsNode);
+            return ensurePlaceholderNode(owner->getId(), Qn::AccessibleLayoutsNode);
         }
 
         return bastardNode;
@@ -658,7 +649,10 @@ void QnResourceTreeModel::updatePlaceholderNodesForUserOrRole(const QnUuid& id)
         for (auto nodeType : placeholders)
         {
             if (visibleToUser(user, nodeType))
-                ensurePlaceholderNode(parentNode, nodeType);
+            {
+                auto node = ensurePlaceholderNode(id, nodeType);
+                node->setParent(parentNode);
+            }
         }
     }
     else
@@ -753,7 +747,7 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
         /* Real parent node - owner or 'Layouts' placeholder. */
         auto parentNode = *iter;
         if (!qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
-            parentNode = ensurePlaceholderNode(parentNode, Qn::AccessibleLayoutsNode);
+            parentNode = ensurePlaceholderNode(user->getId(), Qn::AccessibleLayoutsNode);
 
         /* Add new shared layouts and forcibly update them. */
         for (const QnLayoutResourcePtr& layout : qnResPool->getResources<QnLayoutResource>())

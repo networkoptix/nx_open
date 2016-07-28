@@ -67,7 +67,7 @@ private:
     QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode, const QString &groupId, const QString &groupName);
     QnResourceTreeModelNodePtr ensureSystemNode(const QString &systemName);
     QnResourceTreeModelNodePtr ensureSharedLayoutNode(const QnUuid& owner, const QnLayoutResourcePtr& sharedLayout);
-    QnResourceTreeModelNodePtr ensurePlaceholderNode(const QnResourceTreeModelNodePtr& parentNode, Qn::NodeType nodeType);
+    QnResourceTreeModelNodePtr ensurePlaceholderNode(const QnUuid& owner, Qn::NodeType nodeType);
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
     QnResourceTreeModelNodePtr expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node);
@@ -155,7 +155,7 @@ private:
     QHash<QString, QnResourceTreeModelNodePtr> m_systemNodeBySystemName;
 
     /** Mapping of placeholder nodes by parent user or role */
-    QHash<QnResourceTreeModelNodePtr, NodeList> m_placeholderNodesByParent;
+    QHash<QnUuid, NodeList> m_placeholderNodesByOwner;
 
     /** Mapping of shared layouts links by parent (user or role) */
     QHash<QnUuid, ResourceHash> m_sharedLayoutNodesByOwner;
