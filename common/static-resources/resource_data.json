@@ -36,6 +36,42 @@
                 }
             ]
         },
+		{
+			"keys": [
+				"Advantech|ADAM-6050"
+			],
+			"adamStartInputCoil": 0,
+			"adamInputCount": 12,
+			"adamStartOutputCoil": 16,
+			"adamOutputCount": 6
+		},
+		{
+			"keys": [
+				"Advantech|ADAM-6051"
+			],
+			"adamStartInputCoil": 0,
+			"adamInputCount": 14,
+			"adamStartOutputCoil": 16,
+			"adamOutputCount": 2
+		},
+		{
+			"keys": [
+				"Advantech|ADAM-6052"
+			],
+			"adamStartInputCoil": 0,
+			"adamInputCount": 8,
+			"adamStartOutputCoil": 16,
+			"adamOutputCount": 8
+		},
+		{
+			"keys": [
+				"Advantech|ADAM-6060","Advantech|ADAM-6066"
+			],
+			"adamStartInputCoil": 0,
+			"adamInputCount": 6,
+			"adamStartOutputCoil": 16,
+			"adamOutputCount": 6
+		},
         {
             "keys": [
                 "FLIR|AX8"

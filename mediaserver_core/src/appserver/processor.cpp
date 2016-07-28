@@ -42,6 +42,8 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 {
     for (const QnResourcePtr& resource: resources)
     {
+        qDebug() << "Processing resource" << resource->getName();
+
         QnVirtualCameraResource* cameraResource = dynamic_cast<QnVirtualCameraResource*>(resource.data());
         if (cameraResource == nullptr)
             continue;
