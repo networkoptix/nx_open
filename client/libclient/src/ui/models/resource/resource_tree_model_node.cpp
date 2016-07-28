@@ -180,7 +180,11 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, Qn::NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType)
 {
-    NX_ASSERT(nodeType == Qn::ResourceNode || nodeType == Qn::EdgeNode || nodeType == Qn::SharedLayoutNode);
+    NX_ASSERT(nodeType == Qn::ResourceNode
+        || nodeType == Qn::EdgeNode
+        || nodeType == Qn::SharedLayoutNode
+        || nodeType == Qn::AccessibleResourceNode
+    );
     m_state = Invalid;
     m_status = Qn::Offline;
     setResource(resource);
@@ -202,12 +206,12 @@ QnResourceTreeModelNode::~QnResourceTreeModelNode()
 
 void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 {
-    NX_ASSERT(
-        m_type == Qn::LayoutItemNode ||
-        m_type == Qn::ResourceNode ||
-        m_type == Qn::VideoWallItemNode ||
-        m_type == Qn::EdgeNode ||
-        m_type == Qn::SharedLayoutNode
+    NX_ASSERT(m_type == Qn::LayoutItemNode
+        || m_type == Qn::ResourceNode
+        || m_type == Qn::VideoWallItemNode
+        || m_type == Qn::EdgeNode
+        || m_type == Qn::SharedLayoutNode
+        || m_type == Qn::AccessibleResourceNode
     );
 
     if (m_resource == resource)
@@ -220,12 +224,14 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 void QnResourceTreeModelNode::update()
 {
     /* Update stored fields. */
-    if (m_type == Qn::ResourceNode ||
-        m_type == Qn::LayoutItemNode ||
-        m_type == Qn::EdgeNode ||
-        m_type == Qn::SharedLayoutNode)
+    if (m_type == Qn::ResourceNode
+        || m_type == Qn::LayoutItemNode
+        || m_type == Qn::EdgeNode
+        || m_type == Qn::SharedLayoutNode
+        || m_type == Qn::AccessibleResourceNode
+        )
     {
-        if(m_resource.isNull())
+        if (!m_resource)
         {
             m_displayName = m_name = QString();
             m_flags = 0;
@@ -428,6 +434,9 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
         /* Only admins can see shared layout links. */
         return !isAdmin;
+
+    case Qn::AccessibleResourceNode:
+        return false;
 
     case Qn::ResourceNode:
         /* Hide resource nodes without resource. */
@@ -635,6 +644,7 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
     case Qn::EdgeNode:
     case Qn::LayoutItemNode:
     case Qn::SharedLayoutNode:
+    case Qn::AccessibleResourceNode:
         if(m_flags & (Qn::media | Qn::layout | Qn::server | Qn::user | Qn::videowall | Qn::web_page))
             result |= Qt::ItemIsDragEnabled;
         break;

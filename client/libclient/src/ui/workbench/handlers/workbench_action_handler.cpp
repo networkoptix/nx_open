@@ -1702,6 +1702,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered()
         case Qn::EdgeNode:
         case Qn::RecorderNode:
         case Qn::SharedLayoutNode:
+        case Qn::AccessibleResourceNode:
             resource = parameters.resource();
             break;
         default:

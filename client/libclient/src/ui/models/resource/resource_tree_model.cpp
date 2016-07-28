@@ -127,6 +127,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
                 {
                     updatePlaceholderNodesForUserOrRole(user->getId());
                     updateSharedLayoutNodesForUser(user);
+                    updateAccessibleResourcesForUser(user);
                 }
 
                 if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
@@ -134,6 +135,8 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
                     if (layout->isShared())
                         updateSharedLayoutNodes(layout);
                 }
+
+                //TODO: #GDM updateAccessibleResourcesByResource
             }
         });
 
@@ -268,6 +271,20 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSharedLayoutNode(const QnU
     return *pos;
 }
 
+QnResourceTreeModelNodePtr QnResourceTreeModel::ensureAccessibleResourceNode(const QnUuid& owner, const QnResourcePtr& resource)
+{
+    ResourceHash& resources = m_accessibleResourceNodesByOwner[owner];
+    auto pos = resources.find(resource);
+    if (pos == resources.end())
+    {
+        QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, resource, Qn::AccessibleResourceNode));
+        pos = resources.insert(resource, node);
+        m_nodesByResource[resource].push_back(*pos);
+        m_allNodes.append(*pos);
+    }
+    return *pos;
+}
+
 QnResourceTreeModelNodePtr QnResourceTreeModel::ensurePlaceholderNode(const QnUuid& owner, Qn::NodeType nodeType)
 {
     NodeList& placeholders = m_placeholderNodesByOwner[owner];
@@ -324,6 +341,9 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
         for (ResourceHash& hash: m_sharedLayoutNodesByOwner)
             hash.remove(hash.key(node));
         break;
+    case Qn::AccessibleResourceNode:
+        for (ResourceHash& hash: m_accessibleResourceNodesByOwner)
+            hash.remove(hash.key(node));
     case Qn::SystemNode:
         m_systemNodeBySystemName.remove(m_systemNodeBySystemName.key(node));
         break;
@@ -657,7 +677,7 @@ void QnResourceTreeModel::updatePlaceholderNodesForUserOrRole(const QnUuid& id)
     }
     else
     {
-
+        //TODO: #GDM the same for role nodes
     }
 
 }
@@ -769,6 +789,67 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
 
         /* Cleanup nodes that are not available anymore. */
         for (auto existingNode : sharedLayoutNodes)
+        {
+            NX_ASSERT(existingNode && existingNode->resource());
+            if (!existingNode)
+                continue;
+
+            if (!existingNode->resource()
+                || !qnResourceAccessManager->hasPermission(user, existingNode->resource(), Qn::ViewContentPermission))
+                nodesToDelete << existingNode;
+        }
+    }
+
+    for (auto node : nodesToDelete)
+        removeNode(node);
+}
+
+void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourcePtr& user)
+{
+    TRACE("Updating accesible resources nodes for user " << user->getName());
+
+    auto iter = m_resourceNodeByResource.find(user);
+    if (iter == m_resourceNodeByResource.end())
+        return;
+
+    QList<QnResourceTreeModelNodePtr> nodesToDelete;
+
+    /* Copy of the list before all changes. */
+    auto accesible = m_accessibleResourceNodesByOwner[user->getId()].values();
+
+    /* No accessible resource nodes must exist under current user node and under users
+        with generic resources access. */
+    if (user == context()->user()
+        || qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+    {
+        nodesToDelete << accesible;
+    }
+    else
+    {
+        /* Real parent node - 'Cameras' placeholder. */
+        //TODO: #GDM What if it does not exists???
+        auto parentNode = ensurePlaceholderNode(user->getId(), Qn::AccessibleResourcesNode);
+
+        /* Add new accessibly resources and forcibly update them. */
+        for (const QnResourcePtr& resource: qnResPool->getResources())
+        {
+            if (!resource->hasFlags(Qn::live_cam) && !resource->hasFlags(Qn::web_page))
+                continue;
+
+            if (resource->hasFlags(Qn::desktop_camera))
+                continue;
+
+            TRACE("Checking node " << resource->getName() << " under user " << user->getName());
+            if (qnResourceAccessManager->hasPermission(user, resource, Qn::ViewContentPermission))
+            {
+                auto node = ensureAccessibleResourceNode(user->getId(), resource);
+                node->update();
+                node->setParent(parentNode);
+            }
+        }
+
+        /* Cleanup nodes that are not available anymore. */
+        for (auto existingNode : accesible)
         {
             NX_ASSERT(existingNode && existingNode->resource());
             if (!existingNode)
@@ -1158,6 +1239,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     {
         updatePlaceholderNodesForUserOrRole(user->getId());
         updateSharedLayoutNodesForUser(user);
+        updateAccessibleResourcesForUser(user);
     }
 }
 
@@ -1313,6 +1395,7 @@ void QnResourceTreeModel::at_accessController_permissionsChanged(const QnResourc
     {
         updatePlaceholderNodesForUserOrRole(user->getId());
         updateSharedLayoutNodesForUser(user);
+        updateAccessibleResourcesForUser(user);
     }
 }
 
