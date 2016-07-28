@@ -3,11 +3,11 @@
 * akolesnikov
 ***********************************************************/
 
-#include "forwarded_endpoint_connector.h"
+#include "direct_endpoint_connector.h"
 
 #include <nx/utils/log/log.h>
 
-#include "forwarded_endpoint_tunnel.h"
+#include "direct_endpoint_tunnel.h"
 
 
 namespace nx {

@@ -3,7 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#include "forwarded_endpoint_tunnel.h"
+#include "direct_endpoint_tunnel.h"
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>

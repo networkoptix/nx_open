@@ -8,7 +8,7 @@
 #include "cross_nat_connector.h"
 #include "nx/network/socket_global.h"
 #include "udp/connector.h"
-#include "tcp/forwarded_endpoint_connector.h"
+#include "tcp/direct_endpoint_connector.h"
 
 
 namespace nx {
