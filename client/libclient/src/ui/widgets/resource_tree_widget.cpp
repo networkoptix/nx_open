@@ -11,6 +11,7 @@
 
 #include <core/resource/camera_history.h>
 #include <core/resource/resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -130,56 +131,56 @@ protected:
         QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
         QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
 
+        if (leftResource && rightResource)
         {
-            bool leftIncompatible = leftResource && (leftResource->getStatus() == Qn::Incompatible);
-            bool rightIncompatible = rightResource && (rightResource->getStatus() == Qn::Incompatible);
+            bool leftIncompatible = (leftResource->getStatus() == Qn::Incompatible);
+            bool rightIncompatible = (rightResource->getStatus() == Qn::Incompatible);
             if (leftIncompatible ^ rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
                 return rightIncompatible;
-        }
 
-        {
-            // checking pairs of VideoWallItemNode + VideoWallMatrixNode
-            if ((leftNodeType == Qn::VideoWallItemNode || rightNodeType == Qn::VideoWallItemNode)
-                && leftNodeType != rightNodeType)
-                return rightNodeType == Qn::VideoWallItemNode;
-        }
-
-        /* Local resources should be ordered by type first */
-        if (leftNodeType == Qn::ResourceNode &&
-            rightNodeType == Qn::ResourceNode &&
-            leftResource &&
-            rightResource)
-        {
-            if (leftResource->hasFlags(Qn::local) && rightResource->hasFlags(Qn::local))
+            /* Local resources should be ordered by type first */
+            if (leftNodeType == Qn::ResourceNode)
             {
-                auto flagsOrder = [](Qn::ResourceFlags flags)
+                if (leftResource->hasFlags(Qn::local) && rightResource->hasFlags(Qn::local))
                 {
-                    if (flags.testFlag(Qn::local_image))
-                        return 2;
+                    auto flagsOrder = [](Qn::ResourceFlags flags)
+                    {
+                        if (flags.testFlag(Qn::local_image))
+                            return 2;
 
-                    if (flags.testFlag(Qn::local_video))
-                        return 1;
+                        if (flags.testFlag(Qn::local_video))
+                            return 1;
 
-                    /* Exported layouts. */
-                    return 0;
-                };
+                        /* Exported layouts. */
+                        return 0;
+                    };
 
-                int leftFlagsOrder = flagsOrder(leftResource->flags());
-                int rightFlagsOrder = flagsOrder(rightResource->flags());
-                if (leftFlagsOrder != rightFlagsOrder)
-                    return leftFlagsOrder < rightFlagsOrder;
+                    int leftFlagsOrder = flagsOrder(leftResource->flags());
+                    int rightFlagsOrder = flagsOrder(rightResource->flags());
+                    if (leftFlagsOrder != rightFlagsOrder)
+                        return leftFlagsOrder < rightFlagsOrder;
+                }
 
+                if (leftResource->hasFlags(Qn::layout) && rightResource->hasFlags(Qn::layout))
+                {
+                    auto leftLayout = leftResource.dynamicCast<QnLayoutResource>();
+                    auto rightLayout = rightResource.dynamicCast<QnLayoutResource>();
+                    NX_ASSERT(leftLayout && rightLayout);
+                    if (leftLayout && rightLayout
+                        && leftLayout->isShared() != rightLayout->isShared())
+                        return leftLayout->isShared();
+                }
             }
         }
 
-        {
-            /* Sort by name. */
-            QString leftDisplay = left.data(Qt::DisplayRole).toString();
-            QString rightDisplay = right.data(Qt::DisplayRole).toString();
-            int result = nx::utils::naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
-            if(result != 0)
-                return result < 0;
-        }
+
+        /* Sort by name. */
+        QString leftDisplay = left.data(Qt::DisplayRole).toString();
+        QString rightDisplay = right.data(Qt::DisplayRole).toString();
+        int result = nx::utils::naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
+        if (result != 0)
+            return result < 0;
+
 
         /* We want the order to be defined even for items with the same name. */
         if (leftResource && rightResource)
