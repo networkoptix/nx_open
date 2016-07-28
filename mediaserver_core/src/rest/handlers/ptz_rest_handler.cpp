@@ -9,6 +9,10 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/ptz_controller_pool.h>
+#include <nx/network/http/httptypes.h>
+#include <rest/server/rest_connection_processor.h>
+#include <core/resource_management/resource_access_manager.h>
+#include <core/resource/user_resource.h>
 
 #include <QtConcurrent/QtConcurrent>
 
@@ -17,6 +21,55 @@ static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
 QMap<QString, QnPtzRestHandler::AsyncExecInfo> QnPtzRestHandler::m_workers;
 QnMutex QnPtzRestHandler::m_asyncExecMutex;
+
+namespace
+{
+bool checkUserAccess(const QnUserResourcePtr& userResource, const QnVirtualCameraResourcePtr& camera, Qn::PtzCommand command)
+{
+    switch(command) 
+    {
+    case Qn::ContinuousMovePtzCommand:
+    case Qn::ContinuousFocusPtzCommand:
+    case Qn::AbsoluteDeviceMovePtzCommand:
+    case Qn::AbsoluteLogicalMovePtzCommand:
+    case Qn::ViewportMovePtzCommand:
+    case Qn::CreateTourPtzCommand:
+    case Qn::RemoveTourPtzCommand:
+    case Qn::ActivateTourPtzCommand:
+    case Qn::UpdateHomeObjectPtzCommand:
+    case Qn::RunAuxilaryCommandPtzCommand:
+    {
+        if (!qnResourceAccessManager->hasPermission(userResource, camera, Qn::Permission::WritePtzPermission))
+            return false;
+    }
+
+    case Qn::CreatePresetPtzCommand:
+    case Qn::UpdatePresetPtzCommand:
+    case Qn::RemovePresetPtzCommand:
+    case Qn::ActivatePresetPtzCommand:
+    {
+        if (!qnResourceAccessManager->hasPermission(userResource, camera, Qn::Permission::SavePermission) || 
+            !qnResourceAccessManager->hasPermission(userResource, camera, Qn::Permission::WritePtzPermission))
+        {
+            return false;
+        }
+    }
+
+    case Qn::GetDevicePositionPtzCommand:
+    case Qn::GetLogicalPositionPtzCommand:
+    case Qn::GetPresetsPtzCommand:
+    case Qn::GetToursPtzCommand:
+    case Qn::GetActiveObjectPtzCommand:
+    case Qn::GetHomeObjectPtzCommand:
+    case Qn::GetAuxilaryTraitsPtzCommand:
+    case Qn::GetDataPtzCommand: 
+    default: 
+        return true;
+    }
+
+    return true;
+}
+}
 
 void QnPtzRestHandler::cleanupOldSequence()
 {
@@ -77,7 +130,7 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) {
+int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* processor) {
     QString sequenceId;
     int sequenceNumber = -1;
     Qn::PtzCommand command;
@@ -112,6 +165,10 @@ int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params
 
     if(!checkSequence(sequenceId, sequenceNumber))
         return CODE_OK;
+
+    QnUserResourcePtr userResource = qnResPool->getResourceById<QnUserResource>(processor->authUserId());
+    if (!checkUserAccess(userResource, camera, command))
+        return nx_http::StatusCode::forbidden;
 
     switch(command) {
     case Qn::ContinuousMovePtzCommand:      return execCommandAsync(hash, std::bind(&QnPtzRestHandler::executeContinuousMove, this, controller, params, result));
