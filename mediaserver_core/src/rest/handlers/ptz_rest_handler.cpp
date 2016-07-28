@@ -26,6 +26,9 @@ namespace
 {
 bool checkUserAccess(const QnUserResourcePtr& userResource, const QnVirtualCameraResourcePtr& camera, Qn::PtzCommand command)
 {
+    if (!userResource)
+        return false;
+
     switch(command) 
     {
     case Qn::ContinuousMovePtzCommand:
