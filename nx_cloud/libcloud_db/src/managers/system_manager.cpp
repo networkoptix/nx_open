@@ -315,11 +315,16 @@ void SystemManager::getCloudUsersOfSystem(
 {
     api::SystemSharingExList resultData;
 
+    auto authSystemID = authzInfo.get<std::string>(attr::authSystemID);
+
     std::string accountEmail;
     if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
-        return completionHandler(api::ResultCode::notAuthorized, std::move(resultData));
+    {
+        if (!authSystemID)
+            return completionHandler(api::ResultCode::notAuthorized, std::move(resultData));
+    }
 
-    auto systemID = filter.get<std::string>(attr::authSystemID);
+    auto systemID = authSystemID;
     if (!systemID)
         systemID = filter.get<std::string>(attr::systemID);
 
