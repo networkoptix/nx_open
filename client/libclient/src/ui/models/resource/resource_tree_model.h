@@ -16,13 +16,6 @@
 #include <utils/common/id.h>
 #include <utils/common/connective.h>
 
-class QnResourceModelPrivate;
-class QnResourcePool;
-class QnVideoWallItem;
-class QnVideoWallMatrix;
-class QnWorkbenchContext;
-class QnWorkbenchLayoutSnapshotManager;
-
 class QnResourceTreeModelCustomColumnDelegate;
 
 class QnResourceTreeModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware
@@ -66,17 +59,24 @@ public:
 private:
     QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
+    /** Calculate real children as node's children() method does not return bastard nodes. */
+    QList<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node) const;
+
     QnResourceTreeModelNodePtr ensureResourceNode(const QnResourcePtr& resource);
     QnResourceTreeModelNodePtr ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType = Qn::LayoutItemNode);
     QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode, const QString &groupId, const QString &groupName);
     QnResourceTreeModelNodePtr ensureSystemNode(const QString &systemName);
     QnResourceTreeModelNodePtr ensureSharedLayoutNode(const QnResourceTreeModelNodePtr& parentNode, const QnLayoutResourcePtr& sharedLayout);
+    QnResourceTreeModelNodePtr ensurePlaceholderNode(const QnResourceTreeModelNodePtr& parentNode, Qn::NodeType nodeType);
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
     QnResourceTreeModelNodePtr expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node);
 
     void updateNodeParent(const QnResourceTreeModelNodePtr& node);
     void updateNodeResource(const QnResourceTreeModelNodePtr& node, const QnResourcePtr& resource);
+
+    /** Update 'All cameras' / 'Cameras and resources'/ etc per-user placeholder nodes. */
+    void updatePlaceholderNodesForUserOrRole(const QnUuid& id);
 
     void updateSharedLayoutNodes(const QnLayoutResourcePtr& layout);
     void updateSharedLayoutNodesForUser(const QnUserResourcePtr& user);
@@ -153,6 +153,9 @@ private:
 
     /** Mapping for system nodes, by system name. */
     QHash<QString, QnResourceTreeModelNodePtr> m_systemNodeBySystemName;
+
+    /** Mapping of placeholder nodes by parent user or role */
+    QHash<QnResourceTreeModelNodePtr, NodeList> m_placeholderNodesByParent;
 
     /** Mapping of shared layouts links by parent node (user's) */
     QHash<QnResourceTreeModelNodePtr, ResourceHash> m_sharedLayoutNodesByParent;

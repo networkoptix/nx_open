@@ -1,6 +1,6 @@
 #include "resource_tree_model_node.h"
 
-#include <common/common_meta_types.h>
+//#include <common/common_meta_types.h>
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -26,7 +26,6 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 namespace
 {
@@ -125,6 +124,22 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         break;
     case Qn::SystemNode:
         m_icon = qnResIconCache->icon(QnResourceIconCache::OtherSystem);
+        break;
+    case Qn::AllCamerasAccessNode:
+        m_displayName = tr("All Cameras && Resources");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
+        break;
+    case Qn::AllLayoutsAccessNode:
+        m_displayName = tr("All Shared Layouts");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Layouts);
+        break;
+    case Qn::AccessibleResourcesNode:
+        m_displayName = tr("Cameras && Resources");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
+        break;
+    case Qn::AccessibleLayoutsNode:
+        m_displayName = tr("Layouts");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Layouts);
         break;
     default:
         break;
@@ -369,9 +384,13 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
         return !accessController()->hasPermissions(m_resource, Qn::ViewContentPermission);
 
-    /* These will be hidden or displayed together with videowall. */
+    /* These will be hidden or displayed together with their parent. */
     case Qn::VideoWallItemNode:
     case Qn::VideoWallMatrixNode:
+    case Qn::AllCamerasAccessNode:
+    case Qn::AllLayoutsAccessNode:
+    case Qn::AccessibleResourcesNode:
+    case Qn::AccessibleLayoutsNode:
         return false;
 
     /* Always hidden. */
@@ -572,7 +591,9 @@ QModelIndex QnResourceTreeModelNode::createIndex(int col)
 
 Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
 {
-    if (Qn::isSeparatorNode(m_type))
+    if (Qn::isSeparatorNode(m_type)
+        || m_type == Qn::AllCamerasAccessNode
+        || m_type == Qn::AllLayoutsAccessNode)
     {
         /* No Editable/Selectable flags. */
         return Qt::ItemNeverHasChildren;

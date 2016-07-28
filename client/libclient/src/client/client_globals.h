@@ -11,6 +11,7 @@ namespace Qn
      */
     enum NodeType
     {
+        // Single-occurrence nodes
         RootNode,               /**< Root node for the tree (current system node). */
         CurrentSystemNode,      /**< Root node, displaying current system name. */
         SeparatorNode,          /**< Root node for spacing between header and main part of the tree. */
@@ -25,6 +26,13 @@ namespace Qn
 
         BastardNode,            /**< Root node for hidden resources. */
 
+        // Per-user placeholder nodes
+        AllCamerasAccessNode,   /**< Node that represents 'All Cameras' placeholder, displayed under users and roles with full access. */
+        AllLayoutsAccessNode,   /**< Node that represents 'All Shared Cameras' placeholder, displayed under admins. */
+        AccessibleResourcesNode,/**< Node that represents 'Cameras & Resources' node, displayed under users and roles with custom access. */
+        AccessibleLayoutsNode,  /**< Node that represents 'Layouts' node, displayed under users and roles with custom access. */
+
+        // Repeating nodes
         SharedLayoutNode,       /**< Node that represents shared layout link, displayed under user. Has only resource - shared layout. */
         RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
         ResourceNode,           /**< Node that represents a resource. Has only resource. */
