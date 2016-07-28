@@ -33,6 +33,19 @@ public:
     void setDiscoveryMode( DiscoveryMode mode );
     DiscoveryMode discoveryMode() const;
 
+    /** 
+     * Some searchers should be run first and in sequential order.
+     * It's needed because some devices just are not able to handle  
+     * many search request at the same time. If such a searcher returns 
+     * not empty list of found resources then search process stops and no searcher
+     * checks this url after that.
+     *
+     * Sequential searcher should be as fast as possible in order to not increase search
+     * iteration time very much.
+     *
+     */
+    virtual bool isSequential() const { return false; };
+
     /**
      * Searches for resources.
      * 
