@@ -1,6 +1,7 @@
 #include "aligner.h"
 
 #include <ui/common/accessor.h>
+#include <utils/common/event_processors.h>
 
 namespace
 {
@@ -27,15 +28,22 @@ namespace
 
     };
 
+} // unnamed namespace
 
-
-}
 
 QnAligner::QnAligner(QObject* parent /*= nullptr*/):
     base_type(parent),
-    m_defaultAccessor(new WidgetSizeAccessor())
+    m_defaultAccessor(new WidgetSizeAccessor()),
+    m_skipInvisible(false)
 {
-
+    if (parent)
+    {
+        auto signalizer = new QnMultiEventSignalizer(this);
+        signalizer->addEventType(QEvent::LayoutRequest);
+        signalizer->addEventType(QEvent::Show);
+        connect(signalizer, &QnMultiEventSignalizer::activated, this, &QnAligner::align);
+        parent->installEventFilter(signalizer);
+    }
 }
 
 QnAligner::~QnAligner()
@@ -51,8 +59,9 @@ void QnAligner::addWidget(QWidget* widget)
 
 void QnAligner::addWidgets(std::initializer_list<QWidget*> widgets)
 {
-    for (QWidget* w : widgets)
-        m_widgets << w;
+    for (auto widget : widgets)
+        m_widgets << widget;
+
     align();
 }
 
@@ -68,16 +77,26 @@ void QnAligner::align()
         return;
 
     int maxWidth = 0;
+    const bool alignInvisible = !m_skipInvisible;
+
     for (auto w : m_widgets)
-        maxWidth = std::max(accessor(w)->get(w).toInt(), maxWidth);
+        if (alignInvisible || w->isVisible())
+            maxWidth = std::max(accessor(w)->get(w).toInt(), maxWidth);
 
     for (QWidget* w : m_widgets)
-        accessor(w)->set(w, maxWidth);
+        if (alignInvisible || w->isVisible())
+            accessor(w)->set(w, maxWidth);
+
+    if (auto parentWidget = qobject_cast<QWidget*>(parent()))
+    {
+        if (parentWidget->layout())
+            parentWidget->layout()->activate();
+    }
 }
 
-AbstractAccessor* QnAligner::accessor(QWidget *widget) const
+AbstractAccessor* QnAligner::accessor(QWidget* widget) const
 {
-    const QMetaObject *metaObject = widget->metaObject();
+    const QMetaObject* metaObject = widget->metaObject();
 
     while (metaObject)
     {
@@ -87,4 +106,18 @@ AbstractAccessor* QnAligner::accessor(QWidget *widget) const
     }
 
     return m_defaultAccessor.data();
+}
+
+bool QnAligner::skipInvisible() const
+{
+    return m_skipInvisible;
+}
+
+void QnAligner::setSkipInvisible(bool value)
+{
+    if (m_skipInvisible == value)
+        return;
+
+    m_skipInvisible = value;
+    align();
 }

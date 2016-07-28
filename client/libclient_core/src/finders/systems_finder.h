@@ -18,8 +18,10 @@ public:
     explicit QnSystemsFinder(QObject *parent = nullptr);
 
     virtual ~QnSystemsFinder();
-    
-    void addSystemsFinder(QnAbstractSystemsFinder *finder);
+
+    // TODO: #ynikitenkov Think about finder types.
+    void addSystemsFinder(QnAbstractSystemsFinder *finder,
+        bool isCloudFinder);
 
 public: //overrides
     SystemDescriptionList systems() const override;
@@ -29,12 +31,12 @@ public: //overrides
 private:
     void onSystemDiscovered(const QnSystemDescriptionPtr& systemDescription);
 
-    void onSystemLost(const QString& systemId);
+    void onSystemLost(const QString& systemId, bool isCloudSystem);
 
 private:
     typedef QMap<QnAbstractSystemsFinder *, QnDisconnectHelperPtr> SystemsFinderList;
     typedef QSharedPointer<QnSystemDescriptionAggregator> AggregatorPtr;
-    typedef QList<AggregatorPtr> AggregatorsList;
+    typedef QHash<QString, AggregatorPtr> AggregatorsList;
 
     SystemsFinderList m_finders;
     AggregatorsList m_systems;

@@ -3,6 +3,7 @@
 #include <utils/common/property_storage.h>
 #include <nx/utils/singleton.h>
 #include <client_core/user_recent_connection_data.h>
+#include <watchers/cloud_status_watcher.h>
 
 class QSettings;
 
@@ -20,6 +21,7 @@ public:
         CdbEndpoint,
         CloudLogin,
         CloudPassword,
+        RecentCloudSystems,
 
         PropertiesCount
     };
@@ -44,18 +46,21 @@ public:
 private:
     QN_BEGIN_PROPERTY_STORAGE(PropertiesCount)
         QN_DECLARE_RW_PROPERTY(QnUserRecentConnectionDataList,
-                               recentUserConnections, setRecentUserConnections,
-                               RecentUserConnections, QnUserRecentConnectionDataList())
+            recentUserConnections, setRecentUserConnections,
+            RecentUserConnections, QnUserRecentConnectionDataList())
         QN_DECLARE_RW_PROPERTY(QString,
-                               cdbEndpoint, setCdbEndpoint,
-                               CdbEndpoint, QString())
+            cdbEndpoint, setCdbEndpoint,
+            CdbEndpoint, QString())
         QN_DECLARE_RW_PROPERTY(QString,
-                               cloudLogin, setCloudLogin,
-                               CloudLogin, QString())
+            cloudLogin, setCloudLogin,
+            CloudLogin, QString())
         QN_DECLARE_RW_PROPERTY(QString,
-                               cloudPassword, setCloudPassword,
-                               CloudPassword, QString())
-    QN_END_PROPERTY_STORAGE()
+            cloudPassword, setCloudPassword,
+            CloudPassword, QString())
+        QN_DECLARE_RW_PROPERTY(QnCloudSystemList,
+            recentCloudSystems, setRecentCloudSystems,
+            RecentCloudSystems, QnCloudSystemList())
+        QN_END_PROPERTY_STORAGE()
 
 private:
     QSettings* m_settings;

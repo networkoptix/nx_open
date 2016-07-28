@@ -30,6 +30,9 @@ public:
 
     void align();
 
+    bool skipInvisible() const;
+    void setSkipInvisible(bool value);
+
 private:
     AbstractAccessor* accessor(QWidget* widget) const;
 
@@ -37,4 +40,5 @@ private:
     QList<QWidget*> m_widgets;
     QHash<QLatin1String, AbstractAccessor *> m_accessorByClassName;
     QScopedPointer<AbstractAccessor> m_defaultAccessor;
+    bool m_skipInvisible;
 };

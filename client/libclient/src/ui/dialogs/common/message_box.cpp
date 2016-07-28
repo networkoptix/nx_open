@@ -23,7 +23,6 @@ public:
     QAbstractButton *defaultButton;
     QAbstractButton *escapeButton;
     QnMessageBox::Icon icon;
-    QStringListModel* simpleModel;
 
     QnMessageBoxPrivate(QnMessageBox *parent);
 
@@ -31,7 +30,6 @@ public:
     void detectDefaultButton();
     void detectEscapeButton();
     void stylizeButtons();
-    QStringListModel* ensureSimpleModel();
     int execReturnCode(QAbstractButton *button) const;
 };
 
@@ -42,8 +40,7 @@ QnMessageBoxPrivate::QnMessageBoxPrivate(QnMessageBox* parent) :
     clickedButton(nullptr),
     defaultButton(nullptr),
     escapeButton(nullptr),
-    icon(QnMessageBox::NoIcon),
-    simpleModel(nullptr)
+    icon(QnMessageBox::NoIcon)
 {
 }
 
@@ -55,7 +52,6 @@ void QnMessageBoxPrivate::init()
             [this](QAbstractButton *button) { clickedButton = button; }
     );
 
-    q->ui->comboBox->hide();
     q->ui->checkBox->hide();
     q->ui->informativeLabel->hide();
 
@@ -152,14 +148,6 @@ void QnMessageBoxPrivate::stylizeButtons()
         setAccentStyle(button, button == defaultButton);
 }
 
-QStringListModel* QnMessageBoxPrivate::ensureSimpleModel()
-{
-    if (!simpleModel)
-        simpleModel = new QStringListModel(this);
-
-    return simpleModel;
-}
-
 int QnMessageBoxPrivate::execReturnCode(QAbstractButton *button) const
 {
     Q_Q(const QnMessageBox);
@@ -197,10 +185,10 @@ static QDialogButtonBox::StandardButton execMessageBox(
 }
 
 
-QnMessageBox::QnMessageBox(QWidget *parent)
-    : base_type(parent),
-      ui(new Ui_QnMessageBox),
-      d_ptr(new QnMessageBoxPrivate(this))
+QnMessageBox::QnMessageBox(QWidget *parent):
+    base_type(parent),
+    ui(new Ui::MessageBox),
+    d_ptr(new QnMessageBoxPrivate(this))
 {
     Q_D(QnMessageBox);
 
@@ -209,18 +197,17 @@ QnMessageBox::QnMessageBox(QWidget *parent)
 }
 
 QnMessageBox::QnMessageBox(
-        Icon icon,
-        int helpTopicId,
-        const QString &title,
-        const QString &text,
-        QDialogButtonBox::StandardButtons buttons,
-        QWidget *parent,
-        Qt::WindowFlags flags)
-    : base_type(parent,
-                helpTopicId == Qn::Empty_Help
-                        ? flags : flags | Qt::WindowContextHelpButtonHint),
-      ui(new Ui_QnMessageBox),
-      d_ptr(new QnMessageBoxPrivate(this))
+    Icon icon,
+    int helpTopicId,
+    const QString &title,
+    const QString &text,
+    QDialogButtonBox::StandardButtons buttons,
+    QWidget *parent,
+    Qt::WindowFlags flags)
+    :
+    base_type(parent, helpTopicId == Qn::Empty_Help ? flags : flags | Qt::WindowContextHelpButtonHint),
+    ui(new Ui::MessageBox),
+    d_ptr(new QnMessageBoxPrivate(this))
 {
     Q_D(QnMessageBox);
 
@@ -469,48 +456,15 @@ void QnMessageBox::setInformativeText(const QString &text)
     ui->informativeLabel->setVisible(!text.isEmpty());
 }
 
-int QnMessageBox::currentComboBoxIndex() const
+void QnMessageBox::addCustomWidget(QWidget* widget, int stretch, Qt::Alignment alignment)
 {
-    return ui->comboBox->isHidden() ? -1 : ui->comboBox->currentIndex();
-}
-
-void QnMessageBox::setCurrentComboBoxIndex(int index)
-{
-    ui->comboBox->setCurrentIndex(index);
-}
-
-QString QnMessageBox::currentComboBoxText() const
-{
-    return ui->comboBox->isHidden() ? QString() : ui->comboBox->currentText();
-}
-
-void QnMessageBox::setComboBoxModel(QAbstractItemModel* model)
-{
-    if (model)
-    {
-        ui->comboBox->setModel(model);
-        ui->comboBox->show();
-    }
-    else if (!ui->comboBox->isHidden())
-    {
-        Q_D(QnMessageBox);
-        ui->comboBox->setModel(d->ensureSimpleModel());
-        ui->comboBox->hide();
-    }
-}
-
-void QnMessageBox::setComboBoxItems(const QStringList& items)
-{
-    if (items.empty())
-    {
-        setComboBoxModel(nullptr);
-        return;
-    }
-
-    Q_D(QnMessageBox);
-    QStringListModel* model = d->ensureSimpleModel();
-    model->setStringList(items);
-    ui->comboBox->show();
+    widget->setParent(this);
+    ui->verticalLayout->insertWidget(
+        ui->verticalLayout->indexOf(ui->checkBox),
+        widget,
+        stretch,
+        alignment
+    );
 }
 
 QString QnMessageBox::checkBoxText() const

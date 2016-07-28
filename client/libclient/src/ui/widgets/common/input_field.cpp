@@ -3,6 +3,7 @@
 
 #include <ui/common/accessor.h>
 #include <ui/style/custom_style.h>
+#include <ui/widgets/word_wrapped_label.h>
 #include <utils/common/delayed.h>
 
 class QnInputFieldPrivate : public QObject
@@ -12,38 +13,72 @@ public:
         QObject(parent),
         parent(parent),
         title(new QLabel(parent)),
-        hint(new QLabel(parent)),
+        hint(new QnWordWrappedLabel(parent)),
         input(new QLineEdit(parent)),
         lastValidationResult(QValidator::Acceptable),
         validator(),
         passwordIndicator(nullptr),
         hidePasswordIndicatorWhenEmpty(true)
     {
-        hint->setWordWrap(true);
         input->installEventFilter(this);
         parent->setFocusProxy(input);
 
-        connect(input, &QLineEdit::textChanged,     this, &QnInputFieldPrivate::updatePasswordIndicatorVisibility);
-        connect(input, &QLineEdit::editingFinished, this, [this]()
-        {
-            const int kValidateDelayMs = 150;
-            executeDelayedParented([this]() { validate(); }, kValidateDelayMs, this);
-        });
+        connect(input, &QLineEdit::textChanged, this, &QnInputFieldPrivate::updatePasswordIndicatorVisibility);
     }
 
     virtual bool eventFilter(QObject* watched, QEvent* event)
     {
-        /* On focus make input look usual even if there is error. */
-        if (watched == input && event->type() == QEvent::FocusIn)
+        if (watched == input)
         {
-            input->setPalette(parent->palette());
-            hint->setVisible(false);
-            hint->setText(QString());
-            lastValidationResult.state = QValidator::Intermediate;
+            switch (event->type())
+            {
+                /* On focus gain make input look usual even if there is error. */
+                case QEvent::FocusIn:
+                {
+                    setHintText(QString());
+                    input->setPalette(parent->palette());
+                    lastValidationResult.state = QValidator::Intermediate;
+                    break;
+                }
+
+                /* On focus loss perform validate, unless it's a popup or programmable focus change. */
+                case QEvent::FocusOut:
+                {
+                    switch (static_cast<QFocusEvent*>(event)->reason())
+                    {
+                        case Qt::MenuBarFocusReason:
+                        case Qt::PopupFocusReason:
+                        case Qt::OtherFocusReason:
+                            break;
+
+                        default:
+                        {
+                            const int kValidateDelayMs = 150;
+                            executeDelayedParented([this]() { validate(); }, kValidateDelayMs, this);
+                        }
+                    }
+                    break;
+                }
+
+                default:
+                    break;
+            }
         }
 
         /* Always pass event further */
         return false;
+    }
+
+    void setHintText(const QString& text)
+    {
+        if (hint->text() == text)
+            return;
+
+        hint->setText(text);
+        hint->setVisible(!text.isEmpty());
+
+        for (QWidget* widget = parent; widget && widget->layout(); widget = widget->parentWidget())
+          widget->layout()->activate();
     }
 
     Qn::ValidationResult validationResult() const
@@ -66,18 +101,9 @@ public:
     void validate()
     {
         clearValidationResult();
-
         updatePasswordIndicatorVisibility();
-
         lastValidationResult = validationResult();
-
-        QString hintText = lastValidationResult.errorMessage;
-        if (hint->text() != hintText)
-        {
-            hint->setText(hintText);
-            hint->setVisible(!hintText.isEmpty());
-            parent->layout()->activate();
-        }
+        setHintText(lastValidationResult.errorMessage);
 
         QPalette palette = parent->palette();
         if (lastValidationResult.state != QValidator::Acceptable)
@@ -110,7 +136,7 @@ public:
 
     QWidget* parent;
     QLabel* title;
-    QLabel* hint;
+    QnWordWrappedLabel* hint;
     QLineEdit* input;
 
     Qn::ValidationResult lastValidationResult;
@@ -189,8 +215,7 @@ QString QnInputField::hint() const
 void QnInputField::setHint(const QString& value)
 {
     Q_D(QnInputField);
-    d->hint->setText(value);
-    d->hint->setVisible(!value.isEmpty());
+    d->setHintText(value);
 }
 
 QString QnInputField::text() const
@@ -202,6 +227,9 @@ QString QnInputField::text() const
 void QnInputField::setText(const QString& value)
 {
     Q_D(QnInputField);
+    if (d->input->text() == value)
+        return;
+
     d->input->setText(value);
     d->validate();
 }
@@ -311,15 +339,13 @@ void QnInputField::setValidator(Qn::TextValidateFunction validator, bool validat
 
     if (validateImmediately)
         d->validate();
-    else
-        d->clearValidationResult();
 }
 
 void QnInputField::reset()
 {
     Q_D(QnInputField);
     d->clearValidationResult();
-    setHint(QString());
+    d->setHintText(QString());
     if (d->passwordIndicator)
         d->passwordIndicator->setVisible(false);
 }

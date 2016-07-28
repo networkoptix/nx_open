@@ -96,7 +96,7 @@ void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
         if (updateServer && !m_updateFiles.value(server->getSystemInfo())) {
             finishTask(QnCheckForUpdateResult::ServerUpdateImpossible);
             NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No update file for server [%1 : %2]")
-                   .arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG2);
+                   .arg(server->getName()).arg(server->getApiUrl().toString()), cl_logDEBUG2);
             return;
         }
         needUpdate |= updateServer;

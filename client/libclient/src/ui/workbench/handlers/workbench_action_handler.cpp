@@ -50,7 +50,11 @@
 
 #include <nx_ec/dummy_handler.h>
 
+#include <nx/network/http/httptypes.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/streaming/archive_stream_reader.h>
+
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
@@ -97,6 +101,8 @@
 
 #include <ui/style/globals.h>
 
+#include <ui/widgets/views/resource_list_view.h>
+
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_synchronizer.h>
@@ -135,7 +141,6 @@
 #include <utils/common/url.h>
 #include <utils/email/email.h>
 #include <utils/math/math.h>
-#include <nx/network/http/httptypes.h>
 #include <nx/utils/std/cpp14.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
@@ -538,6 +543,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         else
             context()->instance<QnWorkbenchUpdateWatcher>()->stop();
 	}
+    m_serverRequests.clear();
 
     if (!user)
         return;
@@ -1077,7 +1083,8 @@ void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
     businessRulesDialog()->setFilter(filter);
 }
 
-void QnWorkbenchActionHandler::at_webClientAction_triggered() {
+void QnWorkbenchActionHandler::at_webClientAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnMediaServerResourcePtr server = parameters.resource().dynamicCast<QnMediaServerResource>();
@@ -1089,12 +1096,18 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
         return;
 
     QUrl url(server->getApiUrl());
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+        return;
+
     url.setUserName(QString());
     url.setPassword(QString());
     url.setScheme(lit("http"));
     url.setPath(lit("/static/index.html"));
     url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
     QDesktopServices::openUrl(url);
+
+    //TODO: #akolesnikov #3.1 VMS-2806
+//    sendServerRequest(server, lit("static/index.html"));
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
@@ -1121,6 +1134,81 @@ qint64 QnWorkbenchActionHandler::getFirstBookmarkTimeMs()
     const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
     const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == QnWorkbenchBookmarksWatcher::kUndefinedTime);
     return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTimeMs);
+}
+
+bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& resources)
+{
+    /* Check if user have already silenced this warning. */
+    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::DeleteResources))
+        return true;
+
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+
+    /* Check that we are deleting online auto-found cameras */
+    auto onlineAutoDiscoveredCameras = cameras.filtered(
+        [](const QnVirtualCameraResourcePtr& camera)
+        {
+            return camera->getStatus() != Qn::Offline && !camera->isManuallyAdded();
+        });
+
+    QString question;
+    if (cameras.size() == resources.size())
+    {
+        question = QnDeviceDependentStrings::getNameFromSet(
+            QnCameraDeviceStringSet(
+                tr("Do you really want to delete the following %n devices?", "", cameras.size()),
+                tr("Do you really want to delete the following %n cameras?", "", cameras.size()),
+                tr("Do you really want to delete the following %n I/O modules?", "", cameras.size())
+            ),
+            cameras
+        );
+    }
+    else
+    {
+        question = tr("Do you really want to delete the following %n items?", "", resources.size());
+    }
+
+    QString information;
+    if (!onlineAutoDiscoveredCameras.isEmpty())
+    {
+        information = QnDeviceDependentStrings::getNameFromSet(
+            QnCameraDeviceStringSet(
+                tr("%n devices are auto-discovered. They may be auto-discovered again after removing.",
+                    "", onlineAutoDiscoveredCameras.size()),
+                tr("%n cameras are auto-discovered. They may be auto-discovered again after removing.",
+                    "", onlineAutoDiscoveredCameras.size()),
+                tr("%n I/O modules are auto-discovered. They may be auto-discovered again after removing.",
+                    "", onlineAutoDiscoveredCameras.size())
+            ),
+            cameras
+        );
+    }
+
+    int helpId = Qn::Empty_Help;
+    if (boost::algorithm::any_of(resources, [](const QnResourcePtr& res) { return res->hasFlags(Qn::live_cam); }))
+        helpId = Qn::DeletingCamera_Help;
+
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        helpId,
+        tr("Delete Resources..."),
+        question,
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        mainWindow());
+    messageBox.setDefaultButton(QDialogButtonBox::Cancel);
+    messageBox.setInformativeText(information);
+    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+    messageBox.addCustomWidget(new QnResourceListView(resources));
+
+    auto result = messageBox.exec();
+    if (messageBox.isChecked())
+    {
+        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+        messagesFilter |= Qn::ShowOnceMessage::DeleteResources;
+        qnSettings->setShowOnceMessages(messagesFilter);
+    }
+
+    return result == QDialogButtonBox::Ok;
 }
 
 void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
@@ -1462,26 +1550,13 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
     }
 }
 
-void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
+void QnWorkbenchActionHandler::at_serverLogsAction_triggered()
+{
     QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
     if (!server)
         return;
 
-    if (!context()->user())
-        return;
-
-    QUrl serverUrl(server->getApiUrl());
-    serverUrl.setPath(lit("/api/getNonce"));
-
-    nx_http::AsyncHttpClientPtr client = nx_http::AsyncHttpClient::create();
-    auto reply = std::make_unique<QnAsyncHttpClientReply>(client, this);
-    connect(
-        reply.get(), &QnAsyncHttpClientReply::finished,
-        this, &QnWorkbenchActionHandler::at_serverLogsAction_getNonce);
-
-    // TODO: Think of preloader in case of user complains about delay
-    m_logRequests.emplace(serverUrl, LogRequest{std::move(server), std::move(reply)});
-    client->doGet(serverUrl);
+    sendServerRequest(server, lit("api/showLog?lines=1000"));
 }
 
 void QnWorkbenchActionHandler::at_serverLogsAction_getNonce(QnAsyncHttpClientReply *reply) {
@@ -1525,26 +1600,22 @@ void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
                     QnActionParameters().withArgument(Qn::EventTypeRole, QnBusiness::AnyServerEvent));
 }
 
-void QnWorkbenchActionHandler::at_pingAction_triggered() {
-    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
-    if (!resource)
+void QnWorkbenchActionHandler::at_pingAction_triggered()
+{
+    QString host = menu()->currentParameters(sender()).argument(Qn::TextRole).toString();
+
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
         return;
 
 #ifdef Q_OS_WIN
-    QUrl url = QUrl::fromUserInput(resource->getUrl());
-    QString host = url.host();
-    QString cmd = QLatin1String("cmd /C ping %1 -t");
-    QProcess::startDetached(cmd.arg(host));
+    QString cmd = lit("cmd /C ping %1 -t").arg(host);
+    QProcess::startDetached(cmd);
 #endif
 #ifdef Q_OS_LINUX
-    QUrl url = QUrl::fromUserInput(resource->getUrl());
-    QString host = url.host();
-    QString cmd = QLatin1String("xterm -e ping %1");
-    QProcess::startDetached(cmd.arg(host));
+    QString cmd = lit("xterm -e ping %1").arg(host);
+    QProcess::startDetached(cmd);
 #endif
 #ifdef Q_OS_MACX
-    QUrl url = QUrl::fromUserInput(resource->getUrl());
-    QString host = url.host();
     QnPingDialog *dialog = new QnPingDialog(NULL, Qt::Dialog | Qt::WindowStaysOnTopHint);
     dialog->setHostAddress(host);
     dialog->show();
@@ -1750,164 +1821,20 @@ void QnWorkbenchActionHandler::at_renameAction_triggered()
     }
 }
 
-void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
+void QnWorkbenchActionHandler::at_removeFromServerAction_triggered()
+{
     QnResourceList resources = menu()->currentParameters(sender()).resources();
 
-    /* User cannot delete himself. */
-    resources.removeOne(context()->user());
+    /* Layouts will be removed in their own handler. */
+    resources = resources.filtered([](const QnResourcePtr& resource) { return !resource->hasFlags(Qn::layout); });
 
-    /* No one can delete Administrator. */
-    resources.removeOne(qnResPool->getAdministrator());
-
-    if(resources.isEmpty())
+    if (resources.isEmpty())
         return;
 
-    auto canAutoDelete = [this](const QnResourcePtr &resource)
-        {
-            QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
-            if (!layout)
-                return false;
-
-            if (qnResPool->isAutoGeneratedLayout(layout))
-                return true;
-
-            /* Local, not changed and not being saved. */
-            return snapshotManager()->flags(layout) == Qn::ResourceSavingFlags()
-                && layout->hasFlags(Qn::local)
-                && !layout->isFile();
-        };
-
-    auto deleteResources = [this](const QnResourceList &resources)
-        {
-
-            QnLayoutResourceList localLayouts = resources.filtered<QnLayoutResource>(
-                [this]
-                (const QnLayoutResourcePtr &layout)
-                {
-                    return layout->hasFlags(Qn::local) && !layout->isFile();
-                });
-
-            QnResourceList remoteResources = resources;
-
-            /* These can be simply deleted from resource pool. */
-            for (const QnLayoutResourcePtr &layout: localLayouts) {
-                remoteResources.removeOne(layout);
-                qnResPool->removeResource(layout);
-            }
-
-            qnResourcesChangesManager->deleteResources(remoteResources);
-        };
-
-
-    /* Check if it's OK to delete something without asking. */
-    QnResourceList autoDeleting;
-    QnResourceList moreResourceToDelete;
-    foreach(const QnResourcePtr &resource, resources) {
-        if(canAutoDelete(resource))
-            autoDeleting << resource;
-        else
-            moreResourceToDelete << resource;
-    }
-    if (!autoDeleting.isEmpty())
-        deleteResources(autoDeleting);
-
-    foreach (const QnResourcePtr &resource, autoDeleting)
-        resources.removeOne(resource);
-
-    if(resources.isEmpty())
-        return; /* Nothing to delete. */
-
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-
-    /* Check that we are deleting online auto-found cameras */
-    QnVirtualCameraResourceList onlineAutoDiscoveredCameras = cameras.filtered([](const QnVirtualCameraResourcePtr &camera){
-        return camera->getStatus() != Qn::Offline
-            && !camera->isManuallyAdded();
-    });
-
-    QString question;
-    /* First version of the dialog - if all resources are cameras and all of them are auto-discovered. */
-    if (resources.size() == onlineAutoDiscoveredCameras.size()) {
-        question =
-            QnDeviceDependentStrings::getNameFromSet(
-                QnCameraDeviceStringSet(
-                    tr("These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        "", onlineAutoDiscoveredCameras.size()),
-                    tr("These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        "", onlineAutoDiscoveredCameras.size()),
-                    tr("These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        "", onlineAutoDiscoveredCameras.size())
-                ),
-                onlineAutoDiscoveredCameras
-            );
-    }
-    else
-    /* Second version - some cameras are auto-discovered, some not. */
-    if (cameras.size() == resources.size() && !onlineAutoDiscoveredCameras.isEmpty()) {
-        question =
-            QnDeviceDependentStrings::getNameFromSet(
-                QnCameraDeviceStringSet(
-                    tr("%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        "", onlineAutoDiscoveredCameras.size()),
-                    tr("%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        "", onlineAutoDiscoveredCameras.size()),
-                    tr("%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        "", onlineAutoDiscoveredCameras.size())
-                ),
-                cameras
-            );
-    }
-    else
-    /* Third version - no auto-discovered cameras in the list. */
-    if (cameras.size() == resources.size()) {
-        question =
-            QnDeviceDependentStrings::getNameFromSet(
-                QnCameraDeviceStringSet(
-                    tr("Do you really want to delete the following %n devices?",
-                        "", cameras.size()),
-                    tr("Do you really want to delete the following %n cameras?",
-                        "", cameras.size()),
-                    tr("Do you really want to delete the following %n I/O modules?",
-                        "", cameras.size())
-                ),
-                cameras
-            );
-    }
-    else
-    /* Forth version - cameras and other items. */
-    {
-        question =
-            tr("Do you really want to delete the following %n items?", "", resources.size());
-    }
-
-    if (moreResourceToDelete.isEmpty())
+    if (!confirmResourcesDelete(resources))
         return;
 
-    int helpId = Qn::Empty_Help;
-    for (const QnResourcePtr &resource: resources) {
-        if (resource->hasFlags(Qn::live_cam)) {
-            helpId = Qn::DeletingCamera_Help;
-            break;
-        }
-        if (resource->hasFlags(Qn::layout)) {
-            helpId = Qn::DeletingLayout_Help;
-            /* We don't break here because camera could be in the list,
-             * and camera has a preference. */
-        }
-    }
-
-    QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-        mainWindow(),
-        resources,
-        helpId,
-        tr("Delete Resources"),
-        question,
-        QDialogButtonBox::Yes | QDialogButtonBox::No
-        );
-    if (button != QDialogButtonBox::Yes)
-        return; /* User does not want it deleted. */
-
-    deleteResources(moreResourceToDelete);
+    qnResourcesChangesManager->deleteResources(resources);
 }
 
 void QnWorkbenchActionHandler::closeApplication(bool force) {
@@ -2366,6 +2293,69 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
 void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::TimeServerSelection);
+}
+
+void QnWorkbenchActionHandler::sendServerRequest(const QnMediaServerResourcePtr& server, const QString& path)
+{
+    static const QString kNonceRequestPath(lit("/api/getNonce"));
+
+    if (!server || !context()->user())
+        return;
+
+    QUrl serverUrl(server->getApiUrl());
+    serverUrl.setPath(kNonceRequestPath);
+
+    nx_http::AsyncHttpClientPtr client = nx_http::AsyncHttpClient::create();
+    auto reply = std::make_unique<QnAsyncHttpClientReply>(client, this);
+    connect(
+        reply.get(), &QnAsyncHttpClientReply::finished,
+        this, &QnWorkbenchActionHandler::at_serverRequest_nonceReceived);
+
+    // TODO: Think of preloader in case of user complains about delay
+    m_serverRequests.emplace(serverUrl, ServerRequest{std::move(server), std::move(path), std::move(reply)});
+    client->doGet(serverUrl);
+}
+
+void QnWorkbenchActionHandler::at_serverRequest_nonceReceived(QnAsyncHttpClientReply *reply)
+{
+    auto it = m_serverRequests.find(reply->url());
+    if (it == m_serverRequests.end())
+        return;
+
+    auto request = std::move(it->second);
+    m_serverRequests.erase(it);
+
+    QnJsonRestResult result;
+    NonceReply auth;
+    if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
+    {
+        QnMessageBox::warning(mainWindow(),
+            tr("Cannot open server log"),
+            tr("Could not execute initial server query"));
+
+        return;
+    }
+
+    auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
+    QUrl url(lit("%1://%2/%3:%4/%5")
+        .arg(gateway->isSslEnabled() ? lit("https") : lit("http"))
+        .arg(gateway->endpoint().toString())
+        .arg(reply->url().host()).arg(reply->url().port())
+        .arg(request.path)
+    );
+
+    QString login = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
+
+    QUrlQuery urlQuery(url);
+    urlQuery.addQueryItem(
+        lit("auth"),
+        QLatin1String(createHttpQueryAuthParam(
+            login, password, auth.realm, nx_http::Method::GET, auth.nonce.toUtf8())));
+
+    url.setQuery(urlQuery);
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, request.server);
+    QDesktopServices::openUrl(url);
 }
 
 void QnWorkbenchActionHandler::deleteDialogs() {

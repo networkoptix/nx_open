@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
 #include <network/module_finder.h>
+#include <nx/utils/log/log.h>
 
 QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject *parent) :
     QObject(parent)
@@ -20,7 +21,7 @@ void QnServerInterfaceWatcher::at_connectionChanged(const QnModuleInformation &m
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
     if (!server)
         return;
-    updatePriaryInterface(server);
+    updatePrimaryInterface(server);
 }
 
 void QnServerInterfaceWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -31,8 +32,14 @@ void QnServerInterfaceWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
     if (resource != currentServer)
         return;
 
-    QUrl url = QnAppServerConnectionFactory::url();
-    currentServer->setPrimaryAddress(SocketAddress(url.host(), url.port()));
+    const SocketAddress address(QnAppServerConnectionFactory::url());
+    currentServer->setPrimaryAddress(address);
+    NX_LOG(
+        lit("QnServerInterfaceWatcher: Set primary address of %1 (%2) to default %3")
+            .arg(currentServer->getName())
+            .arg(currentServer->getId().toString())
+            .arg(address.toString()),
+        cl_logDEBUG1);
 }
 
 void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr &resource) {
@@ -43,11 +50,17 @@ void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr
     if (!server)
         return;
 
-    updatePriaryInterface(server);
+    updatePrimaryInterface(server);
 }
 
-void QnServerInterfaceWatcher::updatePriaryInterface(const QnMediaServerResourcePtr &server) {
-    SocketAddress newAddr = QnModuleFinder::instance()->primaryAddress(server->getId());
-    if (!newAddr.isNull() && newAddr.address.toString() != QUrl(server->getApiUrl()).host())
-        server->setPrimaryAddress(newAddr);
+void QnServerInterfaceWatcher::updatePrimaryInterface(const QnMediaServerResourcePtr &server)
+{
+    const auto newAddress = QnModuleFinder::instance()->primaryAddress(server->getId());
+    if (!newAddress.isNull() && newAddress != server->getPrimaryAddress())
+    {
+        server->setPrimaryAddress(newAddress);
+        NX_LOG(lit("QnServerInterfaceWatcher: Set primary address of %1 (%2) to %3")
+            .arg(server->getName()).arg(server->getId().toString()).arg(newAddress.toString()),
+            cl_logDEBUG1);
+    }
 }

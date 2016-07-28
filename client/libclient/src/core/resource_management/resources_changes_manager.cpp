@@ -37,7 +37,11 @@ QnResourcesChangesManager::~QnResourcesChangesManager()
 /* Generic block                                                        */
 /************************************************************************/
 
-void QnResourcesChangesManager::deleteResources(const QnResourceList &resources) {
+void QnResourcesChangesManager::deleteResources(const QnResourceList &resources)
+{
+    if (resources.isEmpty())
+        return;
+
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
         return;

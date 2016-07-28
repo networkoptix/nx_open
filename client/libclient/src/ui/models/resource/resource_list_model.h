@@ -1,5 +1,4 @@
-#ifndef QN_RESOURCE_LIST_MODEL_H
-#define QN_RESOURCE_LIST_MODEL_H
+#pragma once
 
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QStringList>
@@ -66,7 +65,3 @@ private:
     QnResourceList m_resources;
     QSet<QnUuid> m_checkedResources;
 };
-
-
-#endif // QN_RESOURCE_LIST_MODEL_H
-

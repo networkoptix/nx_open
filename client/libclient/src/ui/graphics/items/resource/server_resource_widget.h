@@ -27,7 +27,6 @@ class QnServerResourceWidget: public QnResourceWidget, public AnimationTimerList
 public:
     typedef QHash<QString, bool> HealthMonitoringButtons;
 
-#define PingButton PingButton
 #define ShowLogButton ShowLogButton
 #define CheckIssuesButton CheckIssuesButton
 
@@ -61,7 +60,6 @@ protected:
     virtual void updateHud(bool animate = true) override;
 private slots:
     void at_statistics_received();
-    void at_pingButton_clicked();
     void at_showLogButton_clicked();
     void at_checkIssuesButton_clicked();
 

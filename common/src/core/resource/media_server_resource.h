@@ -3,13 +3,12 @@
 #include <QtCore/QElapsedTimer>
 
 #include <api/media_server_connection.h>
-
 #include <utils/common/value_cache.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 #include <utils/common/safe_direct_connection.h>
-
 #include <core/resource/resource.h>
+#include <nx/network/socket_common.h>
 
 #include "api/server_rest_connection_fwd.h"
 
@@ -47,8 +46,14 @@ public:
     void setIgnoredUrls(const QList<QUrl> &urls);
     QList<QUrl> getIgnoredUrls() const;
 
+    virtual QString getUrl() const override;
     virtual void setUrl(const QString& url) override;
+    // TODO: #dklychkov remove this, use getPrimaryAddress() instead.
     quint16 getPort() const;
+    QUrl getApiUrl() const;
+
+    SocketAddress getPrimaryAddress() const;
+    void setPrimaryAddress(const SocketAddress &getPrimaryAddress);
 
     /** Get list of all available server addresses. */
     QList<SocketAddress> getAllAvailableAddresses() const;
@@ -67,8 +72,6 @@ public:
     QnStorageResourcePtr getStorageByUrl(const QString& url) const;
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
-
-    void setPrimaryAddress(const SocketAddress &primaryAddress);
 
     Qn::PanicMode getPanicMode() const;
     void setPanicMode(Qn::PanicMode panicMode);
@@ -100,8 +103,6 @@ public:
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
 
-    QString getApiUrl() const;
-
     //!Returns realm to use in HTTP authentication
     QString realm() const;
 
@@ -126,7 +127,7 @@ private slots:
     void onRemoveResource(const QnResourcePtr &resource);
     void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
-    void at_apiUrlChanged(const QnModuleInformation& module, const SocketAddress&);
+
 signals:
     void portChanged(const QnResourcePtr &resource);
     void serverFlagsChanged(const QnResourcePtr &resource);
@@ -137,8 +138,10 @@ signals:
     void redundancyChanged(const QnResourcePtr &resource);
     void backupScheduleChanged(const QnResourcePtr &resource);
     void apiUrlChanged(const QnResourcePtr& resource);
+    void primaryAddressChanged(const QnResourcePtr& resource);
 
 private:
+    SocketAddress m_primaryAddress;
     QnMediaServerConnectionPtr m_apiConnection; // deprecated
     rest::QnConnectionPtr m_restConnection; // new one
     QList<SocketAddress> m_netAddrList;

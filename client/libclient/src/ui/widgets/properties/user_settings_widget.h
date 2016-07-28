@@ -17,6 +17,7 @@ namespace Ui
 class QnUserSettingsModel;
 class QnUserRolesModel;
 class QnInputField;
+class QnAligner;
 
 class QnUserSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
@@ -37,6 +38,9 @@ public:
 
     void updatePermissionsLabel(const QString& text);
 
+signals:
+    void userTypeChanged(bool isCloud);
+
 private:
     void setupInputFields();
     QList<QnInputField*> inputFields() const;
@@ -49,4 +53,5 @@ private:
     QScopedPointer<Ui::UserSettingsWidget> ui;
     QnUserSettingsModel* const m_model;
     QnUserRolesModel* const m_rolesModel;
+    QnAligner* const m_aligner;
 };

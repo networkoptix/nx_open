@@ -253,7 +253,7 @@ void QnInstallUpdatesPeerTask::at_installUpdateResponse(int status, const QnUplo
         return;
 
     NX_LOG(lit("Update: QnInstallUpdatePeerTask: Reply [%1, %2, %3].")
-           .arg(reply.offset).arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG2);
+           .arg(reply.offset).arg(server->getName()).arg(server->getApiUrl().toString()), cl_logDEBUG2);
 
     if (status != 0 || reply.offset != ec2::AbstractUpdatesManager::NoError) {
         finish(InstallationFailed, QSet<QnUuid>() << server->getId());

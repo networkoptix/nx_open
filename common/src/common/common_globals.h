@@ -872,6 +872,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* Camera-specific permissions. */
         WritePtzPermission              = 0x2000,   /**< Permission to use camera's PTZ controls. */
 
+        /* Mode-specific permissions. */
+        VideoWallLayoutPermissions      = ModifyLayoutPermission,
+        VideoWallMediaPermissions       = ReadPermission | ViewContentPermission,
+
         AllPermissions = 0xFFFFFFFF
     };
 

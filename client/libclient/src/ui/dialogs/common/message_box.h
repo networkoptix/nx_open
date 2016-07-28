@@ -5,7 +5,11 @@
 
 #include <ui/dialogs/common/dialog.h>
 
-class Ui_QnMessageBox;
+
+namespace Ui {
+class MessageBox;
+}
+
 class QnMessageBoxPrivate;
 
 class QnMessageBox: public QnDialog
@@ -73,11 +77,8 @@ public:
     QString informativeText() const;
     void setInformativeText(const QString &text);
 
-    int currentComboBoxIndex() const;
-    void setCurrentComboBoxIndex(int index);
-    QString currentComboBoxText() const;
-    void setComboBoxModel(QAbstractItemModel* model);
-    void setComboBoxItems(const QStringList& items);
+    /** Delegate widget with custom details. QnMessageBox will take ownership. */
+    void addCustomWidget(QWidget* widget, int stretch = 0, Qt::Alignment alignment = Qt::Alignment());
 
     QString checkBoxText() const;
     void setCheckBoxText(const QString &text);
@@ -147,7 +148,7 @@ protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
 
 private:
-    QScopedPointer<Ui_QnMessageBox> ui;
+    QScopedPointer<Ui::MessageBox> ui;
 
     Q_DECLARE_PRIVATE(QnMessageBox)
     QScopedPointer<QnMessageBoxPrivate> d_ptr;

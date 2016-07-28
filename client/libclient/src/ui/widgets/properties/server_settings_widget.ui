@@ -134,6 +134,9 @@
        <number>0</number>
       </property>
       <item>
+       <widget class="QLabel" name="failoverWarningLabel"/>
+      </item>
+      <item>
        <widget class="QWidget" name="maxCamerasWidget" native="true">
         <property name="enabled">
          <bool>false</bool>
@@ -189,9 +192,6 @@
          </item>
         </layout>
        </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="failoverWarningLabel"/>
       </item>
       <item>
        <widget class="QPushButton" name="failoverPriorityButton">

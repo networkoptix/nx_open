@@ -23,6 +23,8 @@
 #include <client/client_model_types.h>
 #include <client/client_settings.h>
 
+#include <nx/network/socket_global.h>
+
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
@@ -247,8 +249,12 @@ void QnServerSettingsWidget::updateUrl()
     if (!m_server)
         return;
 
-    ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
-    ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
+    auto displayInfo = QnResourceDisplayInfo(m_server);
+    ui->ipAddressLineEdit->setText(displayInfo.host());
+    ui->portLineEdit->setText(QString::number(displayInfo.port()));
+
+    ui->pingButton->setVisible(
+        !nx::network::SocketGlobals::addressResolver().isCloudHostName(m_server->getApiUrl().host()));
 }
 
 // -------------------------------------------------------------------------- //
@@ -286,6 +292,7 @@ void QnServerSettingsWidget::updateFailoverLabel()
         error = getErrorText();
 
     ui->failoverWarningLabel->setText(error);
+    ui->failoverWarningLabel->setHidden(error.isEmpty());
 }
 
 
@@ -294,5 +301,7 @@ void QnServerSettingsWidget::at_pingButton_clicked()
     if (!m_server)
         return;
 
-    menu()->trigger(QnActions::PingAction, QnActionParameters(m_server));
+    /* We must always ping the same address that is displayed in the visible field. */
+    menu()->trigger(QnActions::PingAction, QnActionParameters()
+        .withArgument(Qn::TextRole, ui->ipAddressLineEdit->text()));
 }

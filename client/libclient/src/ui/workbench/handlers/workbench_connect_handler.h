@@ -40,10 +40,9 @@ public:
     /// @brief Connects to server and stores successful connection data
     /// according to specified settings. If no settings are specified no
     /// connection data will be stored.
-
-    ec2::ErrorCode connectToServer(const QUrl &appServerUrl
-        , const ConnectionSettingsPtr &storeSettings
-        , bool silent);
+    ec2::ErrorCode connectToServer(const QUrl &appServerUrl,
+        const ConnectionSettingsPtr &storeSettings,
+        bool silent);
 
     bool disconnectFromServer(bool force);
 
@@ -51,7 +50,6 @@ public:
 
     bool connected() const;
 
-    void hideMessageBox();
     void showLoginDialog();
     void showWelcomeScreen();
 
@@ -71,7 +69,6 @@ private:
     void at_beforeExitAction_triggered();
 private:
     bool m_processingConnectAction;
-    QnGraphicsMessageBox* m_connectingMessageBox;
     int m_connectingHandle;
 
     /** Flag that we should handle new connection. */

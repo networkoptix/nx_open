@@ -17,6 +17,7 @@
 #include <stdint.h>
 
 #include <QString>
+#include <QUrl>
 
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
@@ -127,8 +128,10 @@ public:
     SocketAddress(const QString& str);
     SocketAddress(const QByteArray& utf8Str);
     SocketAddress(const char* str);
+    SocketAddress(const QUrl& url);
 
     QString toString() const;
+    QUrl toUrl(const QString& scheme = QString());
     bool operator==(const SocketAddress& rhs) const;
     bool operator!=(const SocketAddress& rhs) const;
     bool operator<(const SocketAddress& rhs) const;
