@@ -50,6 +50,26 @@
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
 
+namespace 
+{
+    const QString kBaselineH264Profile("Baseline");
+    const QString kMainH264Profile("Main");
+    const QString kExtendedH264Profile("Extended");
+    const QString kHighH264Profile("High");
+
+    onvifXsd__H264Profile fromStringToH264Profile(const QString& str)
+    {
+        if (str == kMainH264Profile)
+            return onvifXsd__H264Profile::onvifXsd__H264Profile__Main;
+        else if (str == kExtendedH264Profile)
+            return onvifXsd__H264Profile::onvifXsd__H264Profile__Extended;
+        else if (str == kHighH264Profile)
+            return onvifXsd__H264Profile::onvifXsd__H264Profile__High;
+        else
+            return onvifXsd__H264Profile::onvifXsd__H264Profile__Baseline;
+    };
+}
+
 
 const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
 static const float MAX_EPS = 0.01f;
@@ -1541,8 +1561,14 @@ bool QnPlOnvifResource::setRelayOutputState(
 
 int QnPlOnvifResource::getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal)
 {
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+
+    auto desiredH264Profile = resData.value<QString>(Qn::DESIRED_H264_PROFILE_PARAM_NAME);
+
     if (videoOptionsLocal.h264Profiles.isEmpty())
         return -1;
+    else if (!desiredH264Profile.isEmpty())
+        return fromStringToH264Profile(desiredH264Profile);
     else
         return (int) videoOptionsLocal.h264Profiles[0];
 }
