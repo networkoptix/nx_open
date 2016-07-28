@@ -9,6 +9,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/xml/camera_advanced_param_reader.h>
+#include <plugins/resource/onvif/onvif_stream_reader.h>
 
 static const int HTTP_PORT = 80;
 

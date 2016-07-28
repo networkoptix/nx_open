@@ -45,6 +45,7 @@ namespace Qn
     static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
     static const QString VIDEO_LAYOUT_PARAM_NAME2 = lit("videoLayout"); //used in resource_data.json
     static const QString DESIRED_H264_PROFILE_PARAM_NAME = lit("desiredH264Profile");
+    static const QString FORCE_SINGLE_STREAM_PARAM_NAME = lit("forceSingleStream");
 
     static const QString SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME = lit("shouldAppearAsSingleChannel");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state

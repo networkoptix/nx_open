@@ -1974,15 +1974,36 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper
 {
     QnMutexLocker lock( &m_mutex );
 
-    bool dualStreaming = m_secondaryResolution != EMPTY_RESOLUTION_PAIR && !m_secondaryVideoEncoderId.isEmpty();
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+
+    bool forceSingleStream = resData.value<bool>(Qn::FORCE_SINGLE_STREAM_PARAM_NAME, false);
+
+    bool dualStreaming = 
+        !forceSingleStream 
+        && m_secondaryResolution != EMPTY_RESOLUTION_PAIR 
+        && !m_secondaryVideoEncoderId.isEmpty();
+
     if (dualStreaming) 
     {
-        NX_LOG(QString(lit("ONVIF debug: enable dualstreaming for camera %1")).arg(getHostAddress()), cl_logDEBUG1);
+        NX_LOG(
+            lit("ONVIF debug: enable dualstreaming for camera %1")
+                .arg(getHostAddress()), 
+            cl_logDEBUG1);
     }
     else 
     {
-        QString reason = m_secondaryResolution == EMPTY_RESOLUTION_PAIR ? QLatin1String("no secondary resolution") : QLatin1String("no secondary encoder");
-        NX_LOG(QString(lit("ONVIF debug: disable dualstreaming for camera %1 reason: %2")).arg(getHostAddress()).arg(reason), cl_logDEBUG1);
+        QString reason = 
+            forceSingleStream ? 
+                lit("single stream mode is forced by driver") : 
+            m_secondaryResolution == EMPTY_RESOLUTION_PAIR ? 
+                lit("no secondary resolution") : 
+                QLatin1String("no secondary encoder");
+
+        NX_LOG(
+            lit("ONVIF debug: disable dualstreaming for camera %1 reason: %2")
+                .arg(getHostAddress())
+                .arg(reason), 
+            cl_logDEBUG1);
     }
 
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, dualStreaming ? 1 : 0);
