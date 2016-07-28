@@ -39,7 +39,7 @@ ConnectorFactory::CloudConnectors ConnectorFactory::createCloudConnectors(
         !response.forwardedTcpEndpointList.empty())
     {
         connectors.emplace_back(
-            std::make_unique<tcp::ForwardedEndpointConnector>(
+            std::make_unique<tcp::DirectEndpointConnector>(
                 targetAddress, connectSessionId));
     }
 
