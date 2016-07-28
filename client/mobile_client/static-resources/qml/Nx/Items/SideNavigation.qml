@@ -34,7 +34,6 @@ Drawer
             header: Column
             {
                 width: layoutsList.width
-                bottomPadding: 8
 
                 CloudPanel {}
 
@@ -52,8 +51,25 @@ Drawer
                 resourceId: uuid
                 shared: shared
                 active: uiController.layoutId == resourceId
+                type: itemType
                 count: itemsCount
                 onClicked: uiController.layoutId = resourceId
+            }
+
+            section.property: "section"
+            section.labelPositioning: ViewSection.InlineLabels
+            section.delegate: Item
+            {
+                width: layoutsList.width
+                height: 32
+
+                Rectangle
+                {
+                    anchors.centerIn: parent
+                    width: parent.width - 32
+                    height: 1
+                    color: ColorTheme.base10
+                }
             }
         }
 

@@ -1,17 +1,20 @@
 import QtQuick 2.6
-import QtQuick.Layouts 1.3
 import Nx 1.0
+import com.networkoptix.qml 1.0
 
 SideNavigationItem
 {
-    property alias text: label.text
+    id: sideNavigationItem
+
+    property string text
     property string resourceId
     property bool shared: false
     property int count: 0
+    property int type: QnLayoutsModel.Layout
 
     implicitHeight: 40
 
-    RowLayout
+    Row
     {
         anchors.fill: parent
         spacing: 12
@@ -20,16 +23,19 @@ SideNavigationItem
 
         Image
         {
-            Layout.alignment: Qt.AlignVCenter
+            id: icon
+
+            anchors.verticalCenter: parent.verticalCenter
             source:
             {
                 var icon = undefined
-                if (!resourceId)
+
+                if (type == QnLayoutsModel.AllCameras)
                     icon = "all_cameras"
-                else if (shared)
-                    icon = "global_layout"
-                else
-                    icon = "layout"
+                else if (type == QnLayoutsModel.Layout)
+                    icon = shared ? "global_layout" : "layout"
+                else if (type == QnLayoutsModel.LiteClient)
+                    icon = "lite_client"
 
                 if (active)
                     icon += "_active"
@@ -38,29 +44,53 @@ SideNavigationItem
             }
         }
 
-        Text
+        Row
         {
-            id: label
+            width: parent.width - icon.width - countLabel.width - 2 * parent.spacing
+            height: parent.height
+            spacing: 4
 
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+            Text
+            {
+                id: label
 
-            verticalAlignment: Text.AlignVCenter
-            font.pixelSize: 15
-            font.weight: Font.DemiBold
-            elide: Text.ElideRight
-            color: active ? ColorTheme.windowText : ColorTheme.contrast10
+                anchors.verticalCenter: parent.verticalCenter
+                width: Math.min(implicitWidth, parent.width)
+
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 15
+                font.weight: Font.DemiBold
+                elide: Text.ElideRight
+                color: active ? ColorTheme.windowText : ColorTheme.contrast10
+
+                text: type == QnLayoutsModel.LiteClient ? "Nx1" : sideNavigationItem.text
+            }
+
+            Text
+            {
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width - label.width - parent.spacing
+
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 15
+                elide: Text.ElideRight
+                color: active ? ColorTheme.contrast10 : ColorTheme.contrast16
+
+                text: "(" + (type == QnLayoutsModel.LiteClient ? sideNavigationItem.text : "") + ")"
+                visible: type == QnLayoutsModel.LiteClient
+            }
         }
 
         Text
         {
             id: countLabel
 
-            Layout.alignment: Qt.AlignVCenter
+            anchors.verticalCenter: parent.verticalCenter
 
             text: count
             font.pixelSize: 15
             color: active ? ColorTheme.contrast16 : ColorTheme.base16
+            visible: type != QnLayoutsModel.LiteClient
         }
     }
 }
