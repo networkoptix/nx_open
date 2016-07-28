@@ -56,6 +56,9 @@ namespace nx_ms_conf
     static const QLatin1String FFMPEG_BUFFER_SIZE( "ffmpegBufferSize" );
     static const int DEFAULT_FFMPEG_BUFFER_SIZE = 1*1024*1024;
 
+    static const QLatin1String MAX_FFMPEG_BUFFER_SIZE( "maxFfmpegBufferSize" );
+    static const int DEFAULT_MAX_FFMPEG_BUFFER_SIZE = 16*1024*1024;
+
     static const QLatin1String MEDIA_FILE_DURATION_SECONDS( "mediaFileDuration" );
     static const int DEFAULT_MEDIA_FILE_DURATION_SECONDS = 60;
 

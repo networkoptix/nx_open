@@ -11,6 +11,8 @@ extern "C"
 #include "utils/common/util.h"
 #include <core/resource/storage_resource.h>
 #include "recorder/storage_manager.h"
+#include <utils/common/log.h>
+#include <media_server/settings.h>
 
 #ifdef Q_OS_WIN
 #include "windows.h"
@@ -21,7 +23,6 @@ extern "C"
 static const int SECTOR_SIZE = 32768;
 static const qint64 AVG_USAGE_AGGREGATE_TIME = 15 * 1000000ll; // aggregation time in usecs
 static const int DATA_PRIORITY_THRESHOLD = SECTOR_SIZE * 2;
-const int kMaxBufferSize = 16 * 1024 * 1024;
 const int kMkvMaxHeaderOffset = 1024;
 
 // -------------- QueueFileWriter ------------
@@ -320,15 +321,20 @@ bool QBufferedFile::updatePos()
 			int fileBlockSize = m_cycleBuffer.maxSize() - m_minBufferSize;
 			int curPow = std::log(m_minBufferSize / 1024) / std::log(2);
 			int newBufSize = (1 << (curPow + 1)) * 1024;
-#if 0
-			qWarning()
-				<< "File" << (uintptr_t)this
-				<< "Min buf size = " << m_minBufferSize << "."
-				<< "Seek detected. Enlarging from " << m_cycleBuffer.maxSize()
-				<< " to " << fileBlockSize + newBufSize
-				<< ". Delta = " << newBufSize - m_minBufferSize;
-#endif
-            if (newBufSize < kMaxBufferSize && m_cycleBuffer.resize(fileBlockSize + newBufSize))
+
+            NX_LOG(lit("Seek detected for File: %1. Current FfmpegBufSize: %2. Enlarging up to %3. Delta = %4")
+                    .arg((uintptr_t)this)
+                    .arg(m_minBufferSize)
+                    .arg(newBufSize)
+                    .arg(newBufSize - m_minBufferSize),
+                   cl_logDEBUG1);
+
+            int maxBufferSize = 
+                MSSettings::roSettings()->value(
+                    nx_ms_conf::MAX_FFMPEG_BUFFER_SIZE,
+                    nx_ms_conf::DEFAULT_MAX_FFMPEG_BUFFER_SIZE).toInt();
+
+			if (newBufSize < maxBufferSize)
             {
 				m_minBufferSize = newBufSize;
 				emit seekDetected(reinterpret_cast<uintptr_t>(this), newBufSize);
