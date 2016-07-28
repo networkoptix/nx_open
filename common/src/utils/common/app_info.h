@@ -57,19 +57,19 @@ struct QnAppInfo
     static QString freeLicenseKey();
     static bool    freeLicenseIsTrial();
 
-    // helpers:
+    static bool isArm() { return applicationArch() == QLatin1String("arm"); }
+    static bool isBpi() { return armBox() == QLatin1String("bpi"); }
+    static bool isNx1() { return armBox() == QLatin1String("nx1"); }
 
-    inline
     static QString applicationFullVersion()
     {
-        static const QString kFullVersionTemplate(QLatin1String("%1-%2-%3%4"));
+        static const QString fullVersion = QString(QLatin1String("%1-%2-%3%4"))
+            .arg(applicationVersion())
+            .arg(applicationRevision())
+            .arg(customizationName().replace(QLatin1Char(' '), QLatin1Char('_')))
+            .arg(QLatin1String(beta() ? "-beta" : ""));
 
-        // TODO: static const when VS supports c++11
-        return kFullVersionTemplate
-                .arg(applicationVersion())
-                .arg(applicationRevision())
-                .arg(customizationName().replace(QLatin1Char(' '), QLatin1Char('_')))
-                .arg(QLatin1String(beta() ? "-beta" : ""));
+        return fullVersion;
     }
 };
 

@@ -62,7 +62,7 @@ public:
     constexpr static const stun::cc::methods::Value kMethod =
         stun::cc::methods::connect;
 
-    std::list<SocketAddress> publicTcpEndpointList;
+    std::list<SocketAddress> forwardedTcpEndpointList;
     std::list<SocketAddress> udpEndpointList;
     ConnectionParameters params;
     CloudConnectVersion cloudConnectVersion;

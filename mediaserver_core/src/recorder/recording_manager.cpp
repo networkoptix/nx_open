@@ -471,6 +471,7 @@ void QnRecordingManager::onTimer()
     for (QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.constBegin(); itrRec != m_recordMap.constEnd(); ++itrRec)
     {
         auto camera = qnCameraPool->getVideoCamera(itrRec.key());
+        NX_ASSERT((bool)qnResPool->getResourceById(itrRec.key()->getId()));
         const Recorders& recorders = itrRec.value();
 
         //if (!recorders.recorderHiRes && !recorders.recorderLowRes)

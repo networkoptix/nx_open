@@ -176,7 +176,7 @@
 #include <network/router.h>
 
 #include <utils/common/command_line_parser.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
@@ -291,7 +291,7 @@ bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 void addFakeVideowallUser()
 {
 	ec2::ApiUserData fakeUserData;
-	fakeUserData.permissions = Qn::GlobalPermission::GlobalVideoWallModePermissionSet;
+    fakeUserData.permissions = Qn::GlobalPermission::GlobalVideoWallModePermissionSet;
 	fakeUserData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
 	auto fakeUser = ec2::fromApiToResource(fakeUserData);
 	fakeUser->setId(Qn::kVideowallUserAccess.userId);
@@ -1894,7 +1894,7 @@ void MediaServerProcess::run()
 #ifdef EDGE_SERVER
     serverFlags |= Qn::SF_Edge;
 #endif
-    if (QnAppInfo::armBox() == "bpi" || compatibilityMode) // check compatibilityMode here for testing purpose
+    if (QnAppInfo::isBpi() || compatibilityMode) // check compatibilityMode here for testing purpose
     {
         serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
         serverFlags |= Qn::SF_HasLiteClient;
@@ -1958,7 +1958,7 @@ void MediaServerProcess::run()
     runtimeData.platform = QnAppInfo::applicationPlatform();
 
 #ifdef __arm__
-    if (QnAppInfo::armBox() == "nx1" || QnAppInfo::armBox() == "bpi")
+    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
     {
         runtimeData.nx1mac = Nx1::getMac();
         runtimeData.nx1serial = Nx1::getSerial();

@@ -33,6 +33,11 @@ protected:
     virtual void pleaseReopenStream() override;
     virtual void pleaseStop() override;
 
+    /**
+    * A bit hack here: if open desktop camera without configuration then only audio stream is opened.
+    * Otherwise (default) video + audio is opened
+    */
+    virtual bool isCameraControlRequired() const override;
 private:
     int processTextResponse();
     QnAbstractMediaDataPtr createEmptyPacket();

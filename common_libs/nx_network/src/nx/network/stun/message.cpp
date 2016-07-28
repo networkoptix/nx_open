@@ -72,7 +72,7 @@ Header& Header::operator=(Header&& rhs)
 
 Buffer Header::makeTransactionId()
 {
-    return nx::utils::generateRandomData(TRANSACTION_ID_SIZE);
+    return nx::utils::random::generate(TRANSACTION_ID_SIZE);
 }
 
 Buffer Header::nullTransactionId(TRANSACTION_ID_SIZE, 0);
@@ -220,7 +220,7 @@ static Buffer hmacSha1( const String& key, const Message* message )
 void Message::insertIntegrity( const String& userName, const String& key )
 {
     newAttribute< attrs::UserName >( userName );
-    newAttribute< attrs::Nonce >( nx::utils::generateRandomData( 10 ).toHex() );
+    newAttribute< attrs::Nonce >( nx::utils::random::generate( 10 ).toHex() );
     newAttribute< attrs::MessageIntegrity >( nx::Buffer(
         attrs::MessageIntegrity::SIZE, 0 ) );
 

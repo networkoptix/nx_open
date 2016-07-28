@@ -346,7 +346,7 @@ void QnIfConfigRestHandler::afterExecute(const QString &path, const QnRequestPar
         return;
 
 #ifndef Q_OS_WIN
-    if( QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1" )
+    if(QnAppInfo::isBpi() || QnAppInfo::isNx1())
     {
         //network restart on nx1 sometimes fails, so rebooting
         if( system("/sbin/reboot") != 0 )

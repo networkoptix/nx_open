@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/cdb_endpoint_fetcher.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 
 
 namespace nx {
