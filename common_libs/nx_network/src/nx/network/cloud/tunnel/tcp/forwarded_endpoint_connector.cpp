@@ -15,7 +15,7 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
-ForwardedEndpointConnector::ForwardedEndpointConnector(
+DirectEndpointConnector::DirectEndpointConnector(
     AddressEntry targetHostAddress,
     nx::String connectSessionId)
 :
@@ -24,23 +24,23 @@ ForwardedEndpointConnector::ForwardedEndpointConnector(
 {
 }
 
-ForwardedEndpointConnector::~ForwardedEndpointConnector()
+DirectEndpointConnector::~DirectEndpointConnector()
 {
     stopWhileInAioThread();
 }
 
-void ForwardedEndpointConnector::stopWhileInAioThread()
+void DirectEndpointConnector::stopWhileInAioThread()
 {
     m_connections.clear();
 }
 
-int ForwardedEndpointConnector::getPriority() const
+int DirectEndpointConnector::getPriority() const
 {
     //TODO #ak
     return 0;
 }
 
-void ForwardedEndpointConnector::connect(
+void DirectEndpointConnector::connect(
     const hpm::api::ConnectResponse& response,
     std::chrono::milliseconds timeout,
     ConnectCompletionHandler handler)
@@ -83,16 +83,16 @@ void ForwardedEndpointConnector::connect(
             for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
                 it->connection->connectAsync(
                     it->endpoint,
-                    std::bind(&ForwardedEndpointConnector::onConnected, this, _1, it));
+                    std::bind(&DirectEndpointConnector::onConnected, this, _1, it));
         });
 }
 
-const AddressEntry& ForwardedEndpointConnector::targetPeerAddress() const
+const AddressEntry& DirectEndpointConnector::targetPeerAddress() const
 {
     return m_targetHostAddress;
 }
 
-void ForwardedEndpointConnector::onConnected(
+void DirectEndpointConnector::onConnected(
     SystemError::ErrorCode sysErrorCode,
     std::list<ConnectionContext>::iterator socketIter)
 {
@@ -118,7 +118,7 @@ void ForwardedEndpointConnector::onConnected(
     m_connections.clear();
 
     auto tunnel =
-        std::make_unique<ForwardedTcpEndpointTunnel>(
+        std::make_unique<DirectTcpEndpointTunnel>(
             m_connectSessionId,
             std::move(connectionContext.endpoint),
             std::move(connectionContext.connection));

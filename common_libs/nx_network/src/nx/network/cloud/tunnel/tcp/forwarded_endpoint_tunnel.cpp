@@ -14,7 +14,7 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
-ForwardedTcpEndpointTunnel::ForwardedTcpEndpointTunnel(
+DirectTcpEndpointTunnel::DirectTcpEndpointTunnel(
     nx::String connectSessionId,
     SocketAddress targetEndpoint,
     std::unique_ptr<TCPSocket> connection)
@@ -25,12 +25,12 @@ ForwardedTcpEndpointTunnel::ForwardedTcpEndpointTunnel(
 {
 }
 
-ForwardedTcpEndpointTunnel::~ForwardedTcpEndpointTunnel()
+DirectTcpEndpointTunnel::~DirectTcpEndpointTunnel()
 {
     stopWhileInAioThread();
 }
 
-void ForwardedTcpEndpointTunnel::stopWhileInAioThread()
+void DirectTcpEndpointTunnel::stopWhileInAioThread()
 {
     m_tcpConnection.reset();
     
@@ -50,7 +50,7 @@ void ForwardedTcpEndpointTunnel::stopWhileInAioThread()
         connectionClosedHandler(SystemError::interrupted);
 }
 
-void ForwardedTcpEndpointTunnel::establishNewConnection(
+void DirectTcpEndpointTunnel::establishNewConnection(
     std::chrono::milliseconds timeout,
     SocketAttributes socketAttributes,
     OnNewConnectionHandler handler)
@@ -64,16 +64,16 @@ void ForwardedTcpEndpointTunnel::establishNewConnection(
     m_connections.push_back(std::move(context));
     auto it = --m_connections.end();
 
-    post(std::bind(&ForwardedTcpEndpointTunnel::startConnection, this, it, timeout));
+    post(std::bind(&DirectTcpEndpointTunnel::startConnection, this, it, timeout));
 }
 
-void ForwardedTcpEndpointTunnel::setControlConnectionClosedHandler(
+void DirectTcpEndpointTunnel::setControlConnectionClosedHandler(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_connectionClosedHandler = std::move(handler);
 }
 
-void ForwardedTcpEndpointTunnel::startConnection(
+void DirectTcpEndpointTunnel::startConnection(
     std::list<ConnectionContext>::iterator connectionContextIter,
     std::chrono::milliseconds timeout)
 {
@@ -106,10 +106,10 @@ void ForwardedTcpEndpointTunnel::startConnection(
 
     connectionContextIter->tcpSocket->connectAsync(
         m_targetEndpoint,
-        std::bind(&ForwardedTcpEndpointTunnel::onConnectDone, this, _1, connectionContextIter));
+        std::bind(&DirectTcpEndpointTunnel::onConnectDone, this, _1, connectionContextIter));
 }
 
-void ForwardedTcpEndpointTunnel::onConnectDone(
+void DirectTcpEndpointTunnel::onConnectDone(
     SystemError::ErrorCode sysErrorCode,
     std::list<ConnectionContext>::iterator connectionContextIter)
 {
@@ -120,7 +120,7 @@ void ForwardedTcpEndpointTunnel::onConnectDone(
         sysErrorCode == SystemError::noError);
 }
 
-void ForwardedTcpEndpointTunnel::reportConnectResult(
+void DirectTcpEndpointTunnel::reportConnectResult(
     std::list<ConnectionContext>::iterator connectionContextIter,
     SystemError::ErrorCode sysErrorCode,
     std::unique_ptr<TCPSocket> tcpSocket,

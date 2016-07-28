@@ -20,15 +20,15 @@ namespace tcp {
     Currently, this class tests that tcp-connection can be established to reported endpoint.
     No remote peer validation is performed!
 */
-class NX_NETWORK_API ForwardedEndpointConnector
+class NX_NETWORK_API DirectEndpointConnector
     :
     public AbstractTunnelConnector
 {
 public:
-    ForwardedEndpointConnector(
+    DirectEndpointConnector(
         AddressEntry targetHostAddress,
         nx::String connectSessionId);
-    virtual ~ForwardedEndpointConnector();
+    virtual ~DirectEndpointConnector();
 
     virtual void stopWhileInAioThread() override;
 
