@@ -19,14 +19,12 @@ ListView
     orientation: Qt.Horizontal
 
     readonly property real cellHeight: height - topMargin - bottomMargin
-    readonly property real cellWidth: Math.floor(cellHeight * 16 / 9) + spacing
 
     currentIndex: -1
 
     delegate: CameraDisplay
     {
-        width: cellWidth
-        height: cellHeight
+        implicitHeight: cellHeight
         resourceId: model.uuid
         thumbnail: model.thumbnail
         status: model.resourceStatus

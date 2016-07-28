@@ -14,7 +14,9 @@ Item
     signal thumbnailRefreshRequested()
     signal clicked()
 
-    implicitWidth: 142
+    implicitWidth: d.thumbnailAspectRatio > 0
+        ? (implicitHeight - 6) * d.thumbnailAspectRatio + 6
+        : 142
     implicitHeight: 82
 
     QtObject
@@ -25,6 +27,17 @@ Item
                                status == QnCameraListModel.NotDefined ||
                                status == QnCameraListModel.Unauthorized
         property bool unauthorized: status == QnCameraListModel.Unauthorized
+
+        property Item thumbnailItem: (thumbnailContentLoader.sourceComponent == thumbnailComponent)
+            ? thumbnailContentLoader.item : null
+
+        property real thumbnailAspectRatio:
+        {
+            if (!thumbnailItem)
+                return -1
+            var size = thumbnailItem.sourceSize
+            return size.width / size.height
+        }
     }
 
     Rectangle
