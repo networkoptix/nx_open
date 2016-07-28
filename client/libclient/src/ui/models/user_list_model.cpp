@@ -312,8 +312,8 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
             {
                 switch (user->userType())
                 {
-                    case QnUserType::Cloud  : return qnSkin->icon("misc/user_type_cloud.png");
-                    case QnUserType::Ldap   : return qnSkin->icon("misc/user_type_ldap.png");
+                    case QnUserType::Cloud  : return qnSkin->icon("user_settings/user_type_cloud.png");
+                    case QnUserType::Ldap   : return qnSkin->icon("user_settings/user_type_ldap.png");
                     default                 : break;
                 }
             }
