@@ -98,7 +98,6 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     QSortFilterProxyModel* sortModel = new QnLicenseListSortProxyModel(this);
     sortModel->setSourceModel(m_model);
 
-    ui->gridLicenses->setIconSize(QSize(20, 20));
     ui->gridLicenses->setModel(sortModel);
     ui->gridLicenses->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->gridLicenses->header()->setSortIndicator(QnLicenseListModel::LicenseKeyColumn, Qt::AscendingOrder);

@@ -57,6 +57,7 @@ public:
         q_ptr(parent),
         standardRoles(standard ? allStandardRoles() : decltype(standardRoles)()),
         userRoles(user ? allUserRoles() : decltype(userRoles)()),
+        firstUserRoleIndex(0),
         customRoleEnabled(custom)
     {
         std::sort(userRoles.begin(), userRoles.end(), &QnUserRolesModelPrivate::lessRoleByName);
@@ -133,6 +134,8 @@ public:
         const auto resetGuard = QnRaiiGuard::create([this]() { q_ptr->beginResetModel(); }, [this]() { q_ptr->endResetModel(); });
 
         roles.clear();
+        firstUserRoleIndex = 0;
+
         if (!context()->user())
             return;
 
@@ -141,6 +144,8 @@ public:
             if (qnResourceAccessManager->canCreateUser(context()->user(), qnResourceAccessManager->userRolePermissions(role), false))
                 roles << RoleDescription(role);
         }
+
+        firstUserRoleIndex = roles.size();
 
         for (auto role : userRoles)
             roles << RoleDescription(role);
@@ -164,7 +169,7 @@ public:
             auto insertionPosition = std::upper_bound(userRoles.begin(), userRoles.end(),
                 userRole, &QnUserRolesModelPrivate::lessRoleByName);
 
-            int indexInFullList = insertionPosition - userRoles.begin() + standardRoles.size();
+            int indexInFullList = insertionPosition - userRoles.begin() + firstUserRoleIndex;
             q->beginInsertRows(QModelIndex(), indexInFullList, indexInFullList);
             userRoles.insert(insertionPosition, userRole);
             roles.insert(indexInFullList, RoleDescription(userRole));
@@ -174,7 +179,7 @@ public:
 
         /* If updated: */
         int sourceIndex = roleIterator - userRoles.begin();
-        int indexInFullList = sourceIndex + standardRoles.size();
+        int indexInFullList = sourceIndex + firstUserRoleIndex;
 
         if (roleIterator->name != userRole.name)
         {
@@ -182,7 +187,7 @@ public:
                 userRole, &QnUserRolesModelPrivate::lessRoleByName);
 
             int destinationIndex = newPosition - userRoles.begin();
-            int destinationInFullList = destinationIndex + standardRoles.size();
+            int destinationInFullList = destinationIndex + firstUserRoleIndex;
 
             /* Update row order if sorting changes: */
             if (sourceIndex != destinationIndex && sourceIndex + 1 != destinationIndex)
@@ -233,7 +238,7 @@ public:
             return false;
 
         Q_Q(QnUserRolesModel);
-        int indexInFullList = roleIterator - userRoles.begin() + standardRoles.size();
+        int indexInFullList = roleIterator - userRoles.begin() + firstUserRoleIndex;
         q->beginRemoveRows(QModelIndex(), indexInFullList, indexInFullList);
         userRoles.erase(roleIterator);
         roles.erase(roles.begin() + indexInFullList);
@@ -289,6 +294,8 @@ public:
 
     QList<Qn::UserRole> standardRoles;
     ec2::ApiUserGroupDataList userRoles;
+
+    int firstUserRoleIndex;
     bool customRoleEnabled;
 
     QMetaObject::Connection addOrUpdateRoleConnection;

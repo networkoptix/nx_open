@@ -7,7 +7,6 @@
 
 #include <client/client_globals.h>
 
-#include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 
 class QnWorkbenchContext;
@@ -31,7 +30,7 @@ private:
 /**
  * This class implements access control.
  */
-class QnWorkbenchAccessController: public Connective<QObject>, public QnWorkbenchContextAware
+class QnWorkbenchAccessController: public Connective<QObject>
 {
     Q_OBJECT
 
@@ -40,6 +39,9 @@ class QnWorkbenchAccessController: public Connective<QObject>, public QnWorkbenc
 public:
     QnWorkbenchAccessController(QObject* parent = nullptr);
     virtual ~QnWorkbenchAccessController();
+
+    QnUserResourcePtr user() const;
+    void setUser(const QnUserResourcePtr& user);
 
     /**
      * \param resource                  Resource to get permissions for.
@@ -87,6 +89,19 @@ public:
     bool canCreateUser(Qn::GlobalPermissions targetPermissions, bool isOwner) const;
     bool canCreateVideoWall() const;
     bool canCreateWebPage() const;
+
+    /* Filter given list of resources to leave only accessible. */
+    template <class Resource>
+    QnSharedResourcePointerList<Resource> filtered(const QnSharedResourcePointerList<Resource>& source,
+        Qn::Permissions requiredPermissions) const
+    {
+        QnSharedResourcePointerList<Resource> result;
+        for (const QnSharedResourcePointer<Resource>& resource : source)
+            if (hasPermissions(resource, requiredPermissions))
+                result.push_back(resource);
+        return result;
+    }
+
 
 signals:
     /**

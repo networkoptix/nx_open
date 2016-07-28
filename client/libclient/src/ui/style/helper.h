@@ -36,6 +36,7 @@ namespace style
         static const int kGroupBoxTopMargin;            /**< Group box top margin, frame excluded */
         static const QMargins kGroupBoxContentMargins;  /**< Group box content margins, frame width included */
         static const qreal kGroupBoxCornerRadius;       /**< Group box corner rounding radius */
+        static const int kDefaultIconSize;              /**< Default size of UI icon */
     };
 
     class Properties

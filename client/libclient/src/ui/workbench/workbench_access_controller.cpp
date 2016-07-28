@@ -17,8 +17,6 @@
 
 #include <utils/common/checked_cast.h>
 
-#include "workbench_context.h"
-
 QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) :
     QObject(parent)
 {
@@ -26,15 +24,12 @@ QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) 
 
 QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     m_user(),
     m_globalPermissions(Qn::NoGlobalPermissions),
     m_readOnlyMode(false)
 {
     connect(qnResPool,          &QnResourcePool::resourceAdded,                     this,   &QnWorkbenchAccessController::at_resourcePool_resourceAdded);
     connect(qnResPool,          &QnResourcePool::resourceRemoved,                   this,   &QnWorkbenchAccessController::at_resourcePool_resourceRemoved);
-
-    connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnWorkbenchAccessController::recalculateAllPermissions);
 
     connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this, [this](const QSet<QnUuid>& resourceIds)
     {
@@ -54,6 +49,19 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
 
 QnWorkbenchAccessController::~QnWorkbenchAccessController()
 {
+}
+
+QnUserResourcePtr QnWorkbenchAccessController::user() const
+{
+    return m_user;
+}
+
+void QnWorkbenchAccessController::setUser(const QnUserResourcePtr& user)
+{
+    if (m_user == user)
+        return;
+    m_user = user;
+    recalculateAllPermissions();
 }
 
 Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr& resource) const
@@ -252,7 +260,6 @@ void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr& re
 
 void QnWorkbenchAccessController::recalculateAllPermissions()
 {
-    m_user = context()->user();
     auto newGlobalPermissions = calculateGlobalPermissions();
     bool changed = newGlobalPermissions != m_globalPermissions;
     m_globalPermissions = newGlobalPermissions;

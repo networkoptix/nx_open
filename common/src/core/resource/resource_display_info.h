@@ -9,7 +9,8 @@ public:
     QnResourceDisplayInfo(const QnResourcePtr& resource);
 
     QString name() const;
-    QString url() const;
+    QString host() const;
+    int port() const;
     QString extraInfo() const;
 
     QString toString(Qn::ResourceInfoLevel detailLevel) const;
@@ -24,7 +25,7 @@ private:
     mutable Qn::ResourceInfoLevel m_detailLevel;
 
     mutable QString m_name;
-    mutable QString m_url;
+    mutable QString m_host;
+    mutable int m_port;
     mutable QString m_extraInfo;
-
 };

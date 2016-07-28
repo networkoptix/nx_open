@@ -82,10 +82,10 @@ namespace {
     static const QString tpEvent(lit("event"));
     static const QString tpSource(lit("source"));
 	static const QString tpSourceIP(lit("sourceIp"));
-	
+
 	static const QString tpCameraName(lit("name"));
 	static const QString tpCameraIP(lit("cameraIP"));
-	
+
     static const QString tpUrlInt(lit("urlint"));
     static const QString tpUrlExt(lit("urlext"));
 	static const QString tpCount(lit("count"));
@@ -558,14 +558,14 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
 //    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
     contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
 	contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
-	if (!cloudOwnerAccount.isEmpty()) 
+	if (!cloudOwnerAccount.isEmpty())
 	{
 		attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
 		contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
 		// contextMap[tpCloudOwner] = cloudOwner; // TODO: VMS-2880	Add cloud owner's name
 		contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
 	}
-	
+
 //    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
     contextMap[tpCompanyName] = QnAppInfo::organizationName();
     contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
@@ -580,7 +580,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
     contextMap[tpDescription] = action->getRuntimeParams().description;
     contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(action->getRuntimeParams(), Qn::ResourceInfoLevel::RI_NameOnly);
 	contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(action->getRuntimeParams());
-	
+
     QString messageBody;
     renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
 
@@ -702,7 +702,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
 
 					QnResourceDisplayInfo camInfo(camRes);
 					contextMap[tpCameraName] = camInfo.name();
-					contextMap[tpCameraIP] = camInfo.url();
+					contextMap[tpCameraIP] = camInfo.host();
 
                     qnCameraHistoryPool->updateCameraHistorySync(camRes);
                     camera[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, false);

@@ -58,6 +58,22 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     connect(m_camerasPage,      &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::permissionsChanged);
     connect(m_layoutsPage,      &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::permissionsChanged);
 
+    connect(m_settingsPage,     &QnUserSettingsWidget::userTypeChanged,          this, [this](bool isCloud)
+    {
+        /* Kinda hack to change user type: we have to recreate user resource: */
+        QnUserResourcePtr newUser(new QnUserResource(isCloud ? QnUserType::Cloud : QnUserType::Local));
+        newUser->setFlags(m_user->flags());
+        newUser->setId(m_user->getId());
+        newUser->setRawPermissions(m_user->getRawPermissions());
+        m_user = newUser;
+        m_model->setUser(m_user);
+
+#if false //TODO: #common Enable this if we want to change OK button caption when creating a cloud user
+        buttonBox()->button(QDialogButtonBox::Ok)->setText(
+            isCloud ? tr("Send Invite") : QCoreApplication::translate("QPlatformTheme", "OK")); // As in Qt
+#endif
+    });
+
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources)
     {
@@ -220,7 +236,7 @@ void QnUserSettingsDialog::permissionsChanged()
 
 void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
 {
-    if(m_user == user)
+    if (m_user == user)
         return;
 
     if (!tryClose(false))
@@ -281,8 +297,8 @@ void QnUserSettingsDialog::retranslateUi()
         bool readOnly = !accessController()->hasPermissions(m_user, Qn::WritePermission | Qn::SavePermission);
         setWindowTitle(readOnly
             ? tr("User Settings - %1 (readonly)").arg(m_user->getName())
-            : tr("User Settings - %1").arg(m_user->getName())
-            );
+            : tr("User Settings - %1").arg(m_user->getName()));
+
         setHelpTopic(this, Qn::UserSettings_Help);
     }
 }
@@ -334,6 +350,11 @@ void QnUserSettingsDialog::applyChanges()
 
     if (m_model->mode() == QnUserSettingsModel::NewUser)
     {
+        if (m_model->user()->isCloud())
+        {
+            //TODO: FIXME! #GDM #vkutin Send an invite!
+        }
+
         /* New User was created, clear dialog. */
         setUser(QnUserResourcePtr());
     }

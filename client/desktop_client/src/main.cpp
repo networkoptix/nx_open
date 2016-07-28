@@ -45,6 +45,7 @@
 #include <ui/help/help_handler.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #ifdef Q_OS_MAC
 #include <ui/workaround/mac_utils.h>
@@ -100,7 +101,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     qApp->installEventFilter(&helpHandler);
 
     /* Create workbench context. */
-    QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext());
+    QScopedPointer<QnWorkbenchAccessController> accessController(new QnWorkbenchAccessController());
+    QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(accessController.data()));
+    QObject::connect(context.data(), &QnWorkbenchContext::userChanged, accessController.data(), &QnWorkbenchAccessController::setUser);
 
     /* Create main window. */
     Qt::WindowFlags flags = qnRuntime->isVideoWallMode()

@@ -11,88 +11,266 @@
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
    <item>
-    <widget class="QPushButton" name="enabledButton">
+    <widget class="QStackedWidget" name="mainStackedWidget">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="text">
-      <string>Enabled</string>
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
+     <widget class="QWidget" name="localUserPage">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="leftMargin">
+        <number>16</number>
+       </property>
+       <property name="topMargin">
+        <number>16</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="bottomMargin">
+          <number>8</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="enabledButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Enabled</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QWidget" name="userTypeWidget" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QLabel" name="userTypeLabel">
+              <property name="text">
+               <string>User Type</string>
+              </property>
+              <property name="buddy">
+               <cstring>userTypeComboBox</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="userTypeComboBox"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="Line" name="line_3">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QStackedWidget" name="secondaryStackedWidget">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="newLocalUserPage">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <property name="sizeConstraint">
+              <enum>QLayout::SetDefaultConstraint</enum>
+             </property>
+             <property name="bottomMargin">
+              <number>8</number>
+             </property>
+             <item>
+              <widget class="QnInputField" name="loginInputField" native="true"/>
+             </item>
+             <item>
+              <widget class="QnInputField" name="nameInputField" native="true"/>
+             </item>
+             <item>
+              <widget class="QnInputField" name="emailInputField" native="true"/>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QnInputField" name="passwordInputField" native="true"/>
+           </item>
+           <item>
+            <widget class="QnInputField" name="confirmPasswordInputField" native="true"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="newCloudUserPage">
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QnInputField" name="cloudEmailInputField" native="true"/>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="cloudUserPage">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QnPanel" name="cloudUserTitlePanel" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <property name="leftMargin">
+           <number>16</number>
+          </property>
+          <property name="topMargin">
+           <number>16</number>
+          </property>
+          <property name="rightMargin">
+           <number>16</number>
+          </property>
+          <property name="bottomMargin">
+           <number>16</number>
+          </property>
+          <property name="spacing">
+           <number>8</number>
+          </property>
+          <item row="1" column="1">
+           <widget class="QLabel" name="cloudFullNameLabel">
+            <property name="text">
+             <string notr="true">&lt;cloud user full name&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3" rowspan="2">
+           <widget class="QPushButton" name="enabledButtonCloud">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Enabled</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="cloudEmailLabel">
+            <property name="text">
+             <string notr="true">&lt;cloud user email&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="cloudIconLabel">
+            <property name="text">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" rowspan="2">
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <property name="sizeConstraint">
-      <enum>QLayout::SetDefaultConstraint</enum>
-     </property>
-     <property name="topMargin">
-      <number>8</number>
-     </property>
-     <property name="bottomMargin">
-      <number>8</number>
-     </property>
-     <item>
-      <widget class="Line" name="line_3">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>10</height>
-        </size>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QnInputField" name="loginInputField" native="true"/>
-     </item>
-     <item>
-      <widget class="QnInputField" name="nameInputField" native="true"/>
-     </item>
-     <item>
-      <widget class="QnInputField" name="emailInputField" native="true"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QnInputField" name="passwordInputField" native="true"/>
-   </item>
-   <item>
-    <widget class="QnInputField" name="confirmPasswordInputField" native="true"/>
-   </item>
-   <item>
     <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0">
+     <property name="leftMargin">
+      <number>16</number>
+     </property>
      <property name="topMargin">
       <number>8</number>
      </property>
-     <item row="0" column="2">
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+     <property name="rightMargin">
+      <number>16</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="roleLabel">
+       <property name="text">
+        <string>Role</string>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
-      </spacer>
-     </item>
-     <item row="0" column="1">
-      <widget class="QComboBox" name="roleComboBox">
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToContents</enum>
+       <property name="buddy">
+        <cstring>roleComboBox</cstring>
        </property>
       </widget>
      </item>
@@ -111,18 +289,25 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="roleLabel">
-       <property name="text">
-        <string>Role</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="buddy">
-        <cstring>roleComboBox</cstring>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="roleComboBox">
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToContents</enum>
        </property>
       </widget>
+     </item>
+     <item row="0" column="2">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -148,7 +333,16 @@
    <header location="global">ui/widgets/common/input_field.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QnPanel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/panel.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>roleComboBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -306,12 +306,8 @@ void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const
      * If icon size is not specified in itemview, set decorationSize to something big.
      * It will be treated as maximal allowed size: */
     auto view = qobject_cast<const QAbstractItemView*>(option->widget);
-    if (!view || !view->iconSize().isValid())
-    {
-        enum { kMaxIconSize = 32 };
-        int maxSize = m_fixedHeight > 0 ? m_fixedHeight : kMaxIconSize;
-        option->decorationSize = QSize(maxSize, maxSize);
-    }
+    if ((!view || !view->iconSize().isValid()) && m_fixedHeight > 0)
+        option->decorationSize.setHeight(qMin(defaultDecorationSize.height(), m_fixedHeight));
 
     /* Call inherited implementation.
      * When it configures item icon, it sets decorationSize to actual icon size: */

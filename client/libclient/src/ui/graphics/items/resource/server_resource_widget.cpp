@@ -786,7 +786,7 @@ int QnServerResourceWidget::calculateButtonsVisibility() const
     int result = base_type::calculateButtonsVisibility();
     result &= (Qn::CloseButton | Qn::RotateButton | Qn::InfoButton);
     if (!qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode())
-        result |= (Qn::PingButton | Qn::ShowLogButton | Qn::CheckIssuesButton);
+        result |= (Qn::ShowLogButton | Qn::CheckIssuesButton);
     return result;
 }
 
@@ -857,10 +857,6 @@ void QnServerResourceWidget::at_statistics_received() {
     m_counter++;
 
     updateTitleText();
-}
-
-void QnServerResourceWidget::at_pingButton_clicked() {
-    menu()->trigger(QnActions::PingAction, QnActionParameters(m_resource));
 }
 
 void QnServerResourceWidget::at_showLogButton_clicked() {

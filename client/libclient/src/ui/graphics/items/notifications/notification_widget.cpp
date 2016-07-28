@@ -37,7 +37,6 @@ const int kColorSignMargin = 4;
 const int kHorizontalMargin = 12;
 const int kVerticalMargin = 6;
 const int kCloseButtonSize = 12;
-const QSize kIconSize(20, 20);
 
 } // anonymous namespace
 
@@ -291,12 +290,13 @@ void QnNotificationWidget::addActionButton(const QIcon& icon, const QString& too
                                          const QnActionParameters& parameters, bool defaultAction)
 {
     QnImageButtonWidget* button = new QnImageButtonWidget(this);
+    button->setAcceptHoverEvents(false);
 
     button->setIcon(icon);
     button->setToolTip(tooltip);
     button->setCached(true);
     button->setProperty(actionIndexPropertyName, m_actions.size());
-    button->setFixedSize(kIconSize);
+    button->setFixedSize(QnSkin::maximumSize(icon));
 
     if (m_defaultActionIdx < 0 || defaultAction)
         m_defaultActionIdx = m_actions.size();
