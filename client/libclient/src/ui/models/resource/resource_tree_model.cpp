@@ -37,7 +37,7 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-//#define DEBUG_RESOURCE_TREE_MODEL
+#define DEBUG_RESOURCE_TREE_MODEL
 #ifdef DEBUG_RESOURCE_TREE_MODEL
 #define TRACE(...) qDebug() << "QnResourceTreeModel: " << __VA_ARGS__;
 #else
@@ -162,13 +162,19 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::node(const QModelIndex &index) c
     return static_cast<QnResourceTreeModelNode *>(index.internalPointer())->toSharedPointer();
 }
 
-QList<QnResourceTreeModelNodePtr> QnResourceTreeModel::children(const QnResourceTreeModelNodePtr& node) const
+QList<QnResourceTreeModelNodePtr> QnResourceTreeModel::children(const QnResourceTreeModelNodePtr& node, bool recursive) const
 {
     /* Calculating children this way because bastard nodes are absent in node's childred() list. */
     QList<QnResourceTreeModelNodePtr> result;
     for (auto existing : m_allNodes)
+    {
         if (existing->parent() == node)
+        {
             result << existing;
+            if (recursive)
+                result << children(existing, recursive);
+        }
+    }
     return result;
 }
 
@@ -240,17 +246,15 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSystemNode(const QString &
     return *pos;
 }
 
-QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSharedLayoutNode(const QnResourceTreeModelNodePtr& parentNode, const QnLayoutResourcePtr& sharedLayout)
+QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSharedLayoutNode(const QnUuid& owner, const QnLayoutResourcePtr& sharedLayout)
 {
     NX_ASSERT(sharedLayout->isShared());
 
-    ResourceHash& layouts = m_sharedLayoutNodesByParent[parentNode];
+    ResourceHash& layouts = m_sharedLayoutNodesByOwner[owner];
     auto pos = layouts.find(sharedLayout);
     if (pos == layouts.end())
     {
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, sharedLayout, Qn::SharedLayoutNode));
-        node->setParent(parentNode);
-
         pos = layouts.insert(sharedLayout, node);
         m_nodesByResource[sharedLayout].push_back(*pos);
         m_allNodes.append(*pos);
@@ -291,7 +295,6 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
     m_allNodes.removeOne(node);
     m_recorderHashByParent.remove(node);
     m_itemNodesByParent.remove(node);
-    m_sharedLayoutNodesByParent.remove(node);
     m_placeholderNodesByParent.remove(node);
 
     /* Recursively remove all child nodes. */
@@ -324,9 +327,9 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
         }
         break;
     case Qn::SharedLayoutNode:
-        if (node->parent())
+        for (const QnUuid& owner: m_sharedLayoutNodesByOwner.keys())
         {
-            ResourceHash& hash = m_sharedLayoutNodesByParent[node->parent()];
+            ResourceHash& hash = m_sharedLayoutNodesByOwner[owner];
             hash.remove(hash.key(node));
         }
         break;
@@ -523,12 +526,17 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         if (layout->isShared())
             return m_rootNodes[Qn::LayoutsNode];
 
-        QnResourcePtr owner = layout->getParentResource();
+        QnUserResourcePtr owner = layout->getParentResource().dynamicCast<QnUserResource>();
         if (!owner || owner == context()->user())
             return m_rootNodes[Qn::LayoutsNode];
 
         if (isAdmin)
-            return ensureResourceNode(owner);
+        {
+            auto parentNode = ensureResourceNode(owner);
+            if (qnResourceAccessManager->hasGlobalPermission(owner, Qn::GlobalAccessAllMediaPermission))
+                return parentNode;
+            return ensurePlaceholderNode(parentNode, Qn::AccessibleLayoutsNode);
+        }
 
         return bastardNode;
     }
@@ -689,11 +697,6 @@ void QnResourceTreeModel::updateSharedLayoutNodes(const QnLayoutResourcePtr& lay
         if (!user->resourcePool())
             continue;
 
-        auto parentNode = *iter;
-
-        /* Copy of the list before all changes. */
-        auto sharedLayoutNodes = m_sharedLayoutNodesByParent[parentNode].values();
-
         /* No shared layouts nodes must exist under current user node. */
         if (user == context()->user())
         {
@@ -708,15 +711,18 @@ void QnResourceTreeModel::updateSharedLayoutNodes(const QnLayoutResourcePtr& lay
             continue;
         }
 
-        /* Check if we need to remove node */
-        for (auto childNode : sharedLayoutNodes)
+        /* Check if node must be removed from some user. */
+        for (auto node : children(*iter, true))
         {
-            if (childNode->resource() != layout)
+            if (node->type() != Qn::SharedLayoutNode)
+                continue;
+            if (node->resource() != layout)
                 continue;
 
             usersToUpdate << user;
             break;
         }
+
     }
 
     for (const auto& user : usersToUpdate)
@@ -732,10 +738,9 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
         return;
 
     QList<QnResourceTreeModelNodePtr> nodesToDelete;
-    auto parentNode = *iter;
 
     /* Copy of the list before all changes. */
-    auto sharedLayoutNodes = m_sharedLayoutNodesByParent[parentNode].values();
+    auto sharedLayoutNodes = m_sharedLayoutNodesByOwner[user->getId()].values();
 
     /* No shared layouts nodes must exist under current user node and under all admins. */
     if (user == context()->user()
@@ -745,6 +750,11 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
     }
     else
     {
+        /* Real parent node - owner or 'Layouts' placeholder. */
+        auto parentNode = *iter;
+        if (!qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+            parentNode = ensurePlaceholderNode(parentNode, Qn::AccessibleLayoutsNode);
+
         /* Add new shared layouts and forcibly update them. */
         for (const QnLayoutResourcePtr& layout : qnResPool->getResources<QnLayoutResource>())
         {
@@ -756,17 +766,22 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
 
             TRACE("Checking node " << layout->getName() << " under user " << user->getName());
             if (qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission))
-                ensureSharedLayoutNode(parentNode, layout)->update();
+            {
+                auto node = ensureSharedLayoutNode(user->getId(), layout);
+                node->update();
+                node->setParent(parentNode);
+            }
         }
 
         /* Cleanup nodes that are not available anymore. */
         for (auto existingNode : sharedLayoutNodes)
         {
             NX_ASSERT(existingNode && existingNode->resource());
-            if (!existingNode || !existingNode->resource())
+            if (!existingNode)
                 continue;
 
-            if (!qnResourceAccessManager->hasPermission(user, existingNode->resource(), Qn::ViewContentPermission))
+            if (!existingNode->resource()
+                || !qnResourceAccessManager->hasPermission(user, existingNode->resource(), Qn::ViewContentPermission))
                 nodesToDelete << existingNode;
         }
     }
