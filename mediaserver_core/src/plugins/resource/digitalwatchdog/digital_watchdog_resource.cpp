@@ -1,7 +1,6 @@
 #ifdef ENABLE_ONVIF
 
 #include "digital_watchdog_resource.h"
-#include "dw_stream_reader.h"
 #include "dw_ptz_controller.h"
 #include "newdw_ptz_controller.h"
 #include "dw_zoom_ptz_controller.h"
@@ -100,7 +99,7 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::initInternal()
 
 QnAbstractStreamDataProvider *QnDigitalWatchdogResource::createLiveDataProvider()
 {
-    return new QnDWStreamReader(toSharedPointer(this));
+    return new QnOnvifStreamReader(toSharedPointer(this));
 }
 
 
