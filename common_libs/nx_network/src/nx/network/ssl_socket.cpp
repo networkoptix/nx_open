@@ -13,6 +13,14 @@
 #include <openssl/opensslconf.h>
 #include <openssl/ssl.h>
 
+// Some dated onenssl versions do not even support them...
+#ifndef SSL_OP_NO_DTLSv1
+    #define SSL_OP_NO_DTLSv1 0
+#endif
+#ifndef SSL_OP_NO_DTLSv1_2
+    #define SSL_OP_NO_DTLSv1_2 0
+#endif
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
