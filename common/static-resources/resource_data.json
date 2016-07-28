@@ -1324,7 +1324,8 @@
 				"DW|*|A*"
 			],
 			"showUrl": true,
-			"urlLocalePath": "cgi-bin/index.cgi"
+			"urlLocalePath": "/cgi-bin/admin/setup_main.cgi",
+            "desiredH264Profile": "High"
 		}
     ]
 }
