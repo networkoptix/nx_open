@@ -1279,7 +1279,7 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
         pool = DecodedPictureToOpenGLUploaderContextPool::instance()->getPoolOfContextsSharedWith( mainContext );
     NX_ASSERT( !pool.empty() );
 
-    m_uploadThread = pool[nx::utils::random::number((size_t)0, pool.size())];    //TODO/IMPL should take
+    m_uploadThread = pool[nx::utils::random::number((size_t)0, pool.size()-1)];    //TODO/IMPL should take
 #endif
 
     //const int textureQueueSize = asyncDepth+MIN_GL_PIC_BUF_COUNT;
