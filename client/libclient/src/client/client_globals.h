@@ -33,6 +33,7 @@ namespace Qn
         AccessibleLayoutsNode,  /**< Node that represents 'Layouts' node, displayed under users and roles with custom access. */
 
         // Repeating nodes
+        RoleNode,               /**< Node that represents custom role. */
         SharedLayoutNode,       /**< Node that represents shared layout link, displayed under user. Has only resource - shared layout. */
         AccessibleResourceNode, /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
         RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */

@@ -69,6 +69,7 @@ private:
     QnResourceTreeModelNodePtr ensureSharedLayoutNode(const QnUuid& owner, const QnLayoutResourcePtr& sharedLayout);
     QnResourceTreeModelNodePtr ensureAccessibleResourceNode(const QnUuid& owner, const QnResourcePtr& resource);
     QnResourceTreeModelNodePtr ensurePlaceholderNode(const QnUuid& owner, Qn::NodeType nodeType);
+    QnResourceTreeModelNodePtr ensureRoleNode(const QnUuid& roleId);
 
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
@@ -157,13 +158,16 @@ private:
     /** Mapping for system nodes, by system name. */
     QHash<QString, QnResourceTreeModelNodePtr> m_systemNodeBySystemName;
 
-    /** Mapping of placeholder nodes by owner (user or role) */
+    /** Mapping of placeholder nodes by owner (user or role). */
     QHash<QnUuid, NodeList> m_placeholderNodesByOwner;
 
-    /** Mapping of shared layouts links by owner (user or role) */
+    /** Mapping of role nodes by id. */
+    QHash<QnUuid, QnResourceTreeModelNodePtr> m_roleNodeById;
+
+    /** Mapping of shared layouts links by owner (user or role). */
     QHash<QnUuid, ResourceHash> m_sharedLayoutNodesByOwner;
 
-    /** Mapping of accessible resources (cameras and web pages) by owner (user or role) */
+    /** Mapping of accessible resources (cameras and web pages) by owner (user or role). */
     QHash<QnUuid, ResourceHash> m_accessibleResourceNodesByOwner;
 
     /** Full list of all created nodes. */

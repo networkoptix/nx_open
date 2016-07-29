@@ -300,6 +300,20 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensurePlaceholderNode(const QnUu
     return node;
 }
 
+QnResourceTreeModelNodePtr QnResourceTreeModel::ensureRoleNode(const QnUuid& roleId)
+{
+    auto pos = m_roleNodeById.find(roleId);
+    if (pos == m_roleNodeById.end())
+    {
+        NX_ASSERT(!qnResourceAccessManager->userGroup(roleId).id.isNull());
+
+        QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, roleId, Qn::RoleNode));
+        pos = m_roleNodeById.insert(roleId, node);
+        m_allNodes.append(*pos);
+    }
+    return *pos;
+}
+
 void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
 {
     /* Node was already removed. */
