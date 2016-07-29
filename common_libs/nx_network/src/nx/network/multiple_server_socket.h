@@ -57,6 +57,7 @@ public:
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     //!Implementation of AbstractSocket::*
+    Pollable* pollable() override;
     void post(nx::utils::MoveOnlyFunc<void()> handler) override;
     void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
 

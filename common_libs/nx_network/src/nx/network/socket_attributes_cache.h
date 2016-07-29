@@ -176,23 +176,22 @@ public:
     }
     virtual AbstractSocket::SOCKET_HANDLE handle() const override
     {
-        if (!m_delegate)
-        {
-            NX_ASSERT(false, Q_FUNC_INFO, "Not supported");
-            return -1;
-        }
-
+        NX_CRITICAL(m_delegate, "Not supported");
         return m_delegate->handle();
+    }
+    virtual nx::network::Pollable* pollable() override
+    {
+        NX_CRITICAL(m_delegate, "Not supported");
+        return m_delegate->pollable();
     }
     virtual aio::AbstractAioThread* getAioThread() const override
     {
         if (!m_delegate)
         {
-            if (m_socketAttributes.aioThread)
-                return *m_socketAttributes.aioThread;
+            NX_CRITICAL(m_socketAttributes.aioThread,
+                "Notfully supported while delegate is not set");
 
-            NX_ASSERT(false, Q_FUNC_INFO,
-                       "Notfully supported while delegate is not set");
+            return *m_socketAttributes.aioThread;
         }
 
         return m_delegate->getAioThread();

@@ -22,7 +22,7 @@
 #include <nx/utils/thread/wait_condition.h>
 
 #include "settings.h"
-
+#include "run_time_options.h"
 
 class QnCommandLineParser;
 
@@ -56,6 +56,8 @@ public:
 
     const std::vector<SocketAddress>& httpEndpoints() const;
 
+    void enforceSslFor(const SocketAddress& targetAddress, bool enabled = true);
+
 #ifndef USE_QAPPLICATION
     int exec();
 #endif
@@ -69,6 +71,8 @@ protected:
 #endif
 
 private:
+    conf::RunTimeOptions m_runTimeOptions;
+
     int m_argc;
     char** m_argv;
     std::atomic<bool> m_terminated;
@@ -81,9 +85,12 @@ private:
 #endif
 
     void initializeLogging(const conf::Settings& settings);
+
     void registerApiHandlers(
         const conf::Settings& settings,
+        const conf::RunTimeOptions& runTimeOptions,
         nx_http::MessageDispatcher* const msgDispatcher);
+
     void publicAddressFetched(const QHostAddress& publicAddress);
 };
 

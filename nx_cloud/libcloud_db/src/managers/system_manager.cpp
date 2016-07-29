@@ -285,6 +285,9 @@ void SystemManager::setSystemUserList(
     data::SystemSharingList sharingDataList,
     std::function<void(api::ResultCode)> completionHandler)
 {
+    //request is disabled for now since it is not secure
+    return completionHandler(api::ResultCode::forbidden);
+
     std::string systemId;
     if (!authzInfo.get(attr::authSystemID, &systemId))
         return completionHandler(api::ResultCode::forbidden);
@@ -329,6 +332,7 @@ void SystemManager::getCloudUsersOfSystem(
         systemID = filter.get<std::string>(attr::systemID);
 
     QnMutexLocker lk(&m_mutex);
+
     if (systemID)
     {
         //selecting all sharings of system id
@@ -379,7 +383,10 @@ void SystemManager::getCloudUsersOfSystem(
         const auto account = 
             m_accountManager.findAccountByUserName(sharingEx.accountEmail);
         if (static_cast<bool>(account))
-            sharingEx.fullName = account->fullName;
+        {
+            sharingEx.accountFullName = account->fullName;
+            sharingEx.accountID = account->id;
+        }
     }
 
     completionHandler(
@@ -517,7 +524,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
     systemSharing.accountEmail = newSystem.accountEmail;
     systemSharing.systemID = systemData->id;
     systemSharing.accessRole = api::SystemAccessRole::owner;
-    auto result = insertSystemSharingToDB(connection, systemSharing);
+    auto result = updateSharingInDB(connection, systemSharing);
     if (result != nx::db::DBResult::ok)
     {
         NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
@@ -556,38 +563,38 @@ void SystemManager::systemAdded(
         std::move(systemData));
 }
 
-nx::db::DBResult SystemManager::insertSystemSharingToDB(
-    QSqlDatabase* const connection,
-    const data::SystemSharing& systemSharing)
-{
-    const auto account = m_accountManager.findAccountByUserName(systemSharing.accountEmail);
-    if (!account)
-    {
-        NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. Account not found").
-            arg(systemSharing.systemID).
-            arg(systemSharing.accountEmail), cl_logDEBUG1);
-        return db::DBResult::notFound;
-    }
-
-    QSqlQuery insertSystemToAccountBinding(*connection);
-    insertSystemToAccountBinding.prepare(
-        "INSERT INTO system_to_account( account_id, system_id, access_role_id ) "
-        " VALUES( :accountID, :systemID, :accessRole )");
-    QnSql::bind(systemSharing, &insertSystemToAccountBinding);
-    insertSystemToAccountBinding.bindValue(
-        ":accountID",
-        QnSql::serialized_field(account->id));
-    if (!insertSystemToAccountBinding.exec())
-    {
-        NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
-            arg(systemSharing.systemID).
-            arg(systemSharing.accountEmail).
-            arg(connection->lastError().text()), cl_logDEBUG1);
-        return db::DBResult::ioError;
-    }
-
-    return nx::db::DBResult::ok;
-}
+//nx::db::DBResult SystemManager::insertSystemSharingToDB(
+//    QSqlDatabase* const connection,
+//    const data::SystemSharing& systemSharing)
+//{
+//    const auto account = m_accountManager.findAccountByUserName(systemSharing.accountEmail);
+//    if (!account)
+//    {
+//        NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. Account not found").
+//            arg(systemSharing.systemID).
+//            arg(systemSharing.accountEmail), cl_logDEBUG1);
+//        return db::DBResult::notFound;
+//    }
+//
+//    QSqlQuery insertSystemToAccountBinding(*connection);
+//    insertSystemToAccountBinding.prepare(
+//        "INSERT INTO system_to_account( account_id, system_id, access_role_id ) "
+//        " VALUES( :accountID, :systemID, :accessRole )");
+//    QnSql::bind(systemSharing, &insertSystemToAccountBinding);
+//    insertSystemToAccountBinding.bindValue(
+//        ":accountID",
+//        QnSql::serialized_field(account->id));
+//    if (!insertSystemToAccountBinding.exec())
+//    {
+//        NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
+//            arg(systemSharing.systemID).
+//            arg(systemSharing.accountEmail).
+//            arg(connection->lastError().text()), cl_logDEBUG1);
+//        return db::DBResult::ioError;
+//    }
+//
+//    return nx::db::DBResult::ok;
+//}
 
 void SystemManager::systemSharingAdded(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
@@ -759,8 +766,11 @@ nx::db::DBResult SystemManager::updateSharingInDB(
             "  WHERE account_id=:accountID AND system_id=:systemID");
     else
         updateRemoveSharingQuery.prepare(
-            "REPLACE INTO system_to_account( account_id, system_id, access_role_id ) "
-            " VALUES( :accountID, :systemID, :accessRole )");
+            "REPLACE INTO system_to_account( "
+                "account_id, system_id, access_role_id, "
+                "group_id, custom_permissions, is_enabled ) "
+            "VALUES( :accountID, :systemID, :accessRole, "
+                     ":groupID, :customPermissions, :isEnabled )");
     QnSql::bind(sharing, &updateRemoveSharingQuery);
     updateRemoveSharingQuery.bindValue(
         ":accountID",
@@ -1097,7 +1107,10 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(QSqlDatabase* connect
     readSystemToAccountQuery.prepare(
         "SELECT a.email as accountEmail, "
                "sa.system_id as systemID, "
-               "sa.access_role_id as accessRole "
+               "sa.access_role_id as accessRole, "
+               "sa.group_id as groupID, "
+               "sa.custom_permissions as customPermissions, "
+               "sa.is_enabled as isEnabled "
         "FROM system_to_account sa, account a "
         "WHERE sa.account_id = a.id");
     if (!readSystemToAccountQuery.exec())

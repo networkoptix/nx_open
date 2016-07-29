@@ -107,10 +107,14 @@ public:
     std::string accountEmail;
     std::string systemID;
     SystemAccessRole accessRole;
+    std::string groupID;
+    std::string customPermissions;
+    bool isEnabled;
 
     SystemSharing()
     :
-        accessRole(SystemAccessRole::none)
+        accessRole(SystemAccessRole::none),
+        isEnabled(true)
     {
     }
 
@@ -124,7 +128,10 @@ public:
     {
         return accountEmail == rhs.accountEmail
             && systemID == rhs.systemID
-            && accessRole == rhs.accessRole;
+            && accessRole == rhs.accessRole
+            && groupID == rhs.groupID
+            && customPermissions == rhs.customPermissions
+            && isEnabled == rhs.isEnabled;
     }
 };
 
@@ -142,12 +149,15 @@ class SystemSharingEx
 public:
     SystemSharingEx() {}
 
-    std::string fullName;
+    /** unique account id */
+    std::string accountID;
+    std::string accountFullName;
 
     bool operator==(const SystemSharingEx& rhs) const
     {
         return static_cast<const SystemSharing&>(*this) == static_cast<const SystemSharing&>(rhs)
-            && fullName == rhs.fullName;
+            && accountID == rhs.accountID
+            && accountFullName == rhs.accountFullName;
     }
 };
 

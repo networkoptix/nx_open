@@ -427,6 +427,12 @@ void UdtSocket<InterfaceToImplement>::bindToAioThread(aio::AbstractAioThread* ai
 }
 
 template<typename InterfaceToImplement>
+Pollable* UdtSocket<InterfaceToImplement>::pollable()
+{
+    return this;
+}
+
+template<typename InterfaceToImplement>
 void UdtSocket<InterfaceToImplement>::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
     nx::network::SocketGlobals::aioService().post(

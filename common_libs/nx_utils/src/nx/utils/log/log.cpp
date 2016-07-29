@@ -367,10 +367,10 @@ void QnLog::applyArguments(const nx::utils::ArgumentParser& arguments)
 {
     QnLogLevel logLevel(cl_logDEBUG1);
 
-    if (const auto value = arguments.get(QLatin1String("log-file")))
+    if (const auto value = arguments.get("log-file"))
         instance()->create(*value, 1024 * 1024 * 10, 5, logLevel);
 
-    if (const auto value = arguments.get(QLatin1String("log-level")))
+    if (const auto value = arguments.get("log-level", "ll"))
     {
         logLevel = logLevelFromString(*value);
         NX_CRITICAL(logLevel != cl_logUNKNOWN);

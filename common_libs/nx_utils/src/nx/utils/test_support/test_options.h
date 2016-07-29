@@ -12,15 +12,35 @@ class NX_UTILS_API TestOptions
 public:
     static void setTimeoutMultiplier(size_t value);
     static size_t timeoutMultiplier();
+
     static void disableTimeAsserts(bool areDisabled = true);
     static bool areTimeAssertsDisabled();
+
+    enum class LoadMode { light, normal, stress };
+    static void setLoadMode(const QString& mode);
+    static LoadMode getLoadMode();
+
+    template<typename Count>
+    static void applyLoadMode(Count& count);
 
     static void applyArguments(const ArgumentParser& args);
 
 private:
     static std::atomic<size_t> s_timeoutMultiplier;
     static std::atomic<bool> s_disableTimeAsserts;
+    static std::atomic<LoadMode> s_loadMode;
 };
+
+template<typename Count>
+void TestOptions::applyLoadMode(Count& count)
+{
+    switch (s_loadMode.load())
+    {
+        case LoadMode::light: count = 1; break;
+        case LoadMode::normal: break;
+        case LoadMode::stress: count *= 100;
+    }
+}
 
 } // namespace utils
 } // namespace nx

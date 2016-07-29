@@ -98,6 +98,10 @@ public:
     api::ResultCode shareSystem(
         const std::string& email,
         const std::string& password,
+        const api::SystemSharing& sharingData);
+    api::ResultCode shareSystem(
+        const std::string& email,
+        const std::string& password,
         const std::string& systemID,
         const std::string& accountEmail,
         api::SystemAccessRole accessRole);

@@ -13,6 +13,16 @@
 #include <openssl/opensslconf.h>
 #include <openssl/ssl.h>
 
+// Some dated onenssl versions do not even support them...
+#ifndef SSL_OP_NO_DTLSv1
+    #define SSL_OP_NO_DTLSv1 0
+#endif
+#ifndef SSL_OP_NO_DTLSv1_2
+    #define SSL_OP_NO_DTLSv1_2 0
+#endif
+
+#include <QDir>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
@@ -204,6 +214,9 @@ protected:
     {
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
+        #ifdef DEBUG_SSL
+            NX_LOGX(lm("invokeUserCallback, status: %1").arg(m_errorCode), cl_logDEBUG2);
+        #endif
 
         switch(m_exitStatus) {
         case SslAsyncOperation::EXCEPTION:
@@ -256,6 +269,9 @@ protected:
     {
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
+        #ifdef DEBUG_SSL
+            NX_LOGX(lm("invokeUserCallback, status: %1").arg(m_errorCode), cl_logDEBUG2);
+        #endif
 
         switch(m_exitStatus) {
         case SslAsyncOperation::EXCEPTION:
@@ -301,6 +317,9 @@ protected:
     {
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
+        #ifdef DEBUG_SSL
+            NX_LOGX(lm("invokeUserCallback, status: %1").arg(m_errorCode), cl_logDEBUG2);
+        #endif
 
         switch(m_exitStatus) {
         case SslAsyncOperation::EXCEPTION:
@@ -1198,11 +1217,11 @@ void SslEngine::useOrCreateCertificate(
         NX_ASSERT(!certData.isEmpty());
         if (!filePath.isEmpty())
         {
+            QDir(filePath).mkpath(lit(".."));
             if (!file.open(QIODevice::WriteOnly) ||
                 file.write(certData) != certData.size())
             {
-                NX_LOG(lm("Could not write SSL certificate to file"),
-                    cl_logERROR);
+                NX_LOG(lm("Could not write SSL certificate to file"), cl_logERROR);
             }
 
             file.close();
@@ -1795,18 +1814,24 @@ void SslSocket::sendAsync(
     });
 }
 
-int SslSocket::asyncRecvInternal(void* buffer, unsigned int bufferLen) {
+int SslSocket::asyncRecvInternal(void* buffer, unsigned int bufferLen) 
+{
     // For async operation here
     Q_D(SslSocket);
     NX_ASSERT(ioMode() == ASYNC);
     NX_ASSERT(d->asyncSslHelper != NULL);
-    int ret = d->asyncSslHelper->eof() ? 0 :
-        static_cast<int>(d->asyncSslHelper->bioRead(buffer, bufferLen));
 
+    const auto bioRead = [&]()
+    {
+        int ret = static_cast<int>(d->asyncSslHelper->bioRead(buffer, bufferLen));
+        return ret == 0 ? -1 : ret;
+    };
+
+    int ret = d->asyncSslHelper->eof() ? 0 : bioRead();
     #ifdef DEBUG_SSL
         NX_LOGX(lm("BIO read %1 returned %2").arg(bufferLen).arg(ret), cl_logDEBUG2);
     #endif
-    return ret == 0 ? -1 : ret;
+    return ret;
 }
 
 int SslSocket::asyncSendInternal(
@@ -1816,8 +1841,8 @@ int SslSocket::asyncSendInternal(
     Q_D(SslSocket);
     NX_ASSERT(ioMode() == ASYNC);
     NX_ASSERT(d->asyncSslHelper != NULL);
-    auto ret = static_cast<int>(d->asyncSslHelper->bioWrite(buffer, bufferLen));
 
+    auto ret = static_cast<int>(d->asyncSslHelper->bioWrite(buffer, bufferLen));
     #ifdef DEBUG_SSL
         NX_LOGX(lm("BIO write %1 returned %2").arg(bufferLen).arg(ret), cl_logDEBUG2);
     #endif

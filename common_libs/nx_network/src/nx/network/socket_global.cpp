@@ -67,13 +67,13 @@ void SocketGlobals::verifyInitialization()
 
 void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
 {
-    if (const auto value = arguments.get(QLatin1String("enforce-mediator")))
+    if (const auto value = arguments.get("enforce-mediator", "mediator"))
         mediatorConnector().mockupAddress(*value);
 
-    if (const auto value = arguments.get(QLatin1String("enforce-socket")))
+    if (const auto value = arguments.get("enforce-socket", "socket"))
         SocketFactory::enforceStreamSocketType(*value);
 
-    if (arguments.get(QLatin1String("enforce-ssl")))
+    if (arguments.get("enforce-ssl", "ssl"))
         SocketFactory::enforceSsl();
 }
 
