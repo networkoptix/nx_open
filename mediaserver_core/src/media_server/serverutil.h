@@ -77,10 +77,9 @@ struct PasswordData
     QByteArray passwordHash;
     QByteArray passwordDigest;
     QByteArray cryptSha512Hash;
-    QString oldPassword;
 };
 
-#define PasswordData_Fields (password)(realm)(passwordHash)(passwordDigest)(cryptSha512Hash)(oldPassword)
+#define PasswordData_Fields (password)(realm)(passwordHash)(passwordDigest)(cryptSha512Hash)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (PasswordData),
@@ -89,7 +88,6 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errString = nullptr);
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
-bool validateOwnerPassword(const PasswordData& passwordData, QString* errStr);
 
 
 bool isLocalAppServer(const QString &host);

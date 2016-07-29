@@ -97,6 +97,7 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnU
 
     if (QnUserResourcePtr admin = qnResPool->getAdministrator())
     {
+        // disable local admin if we use cloud owner
         admin->setEnabled(false);
         ec2::ApiUserData apiUser;
         fromResourceToApi(admin, apiUser);

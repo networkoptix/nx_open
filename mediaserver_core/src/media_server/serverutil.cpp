@@ -87,7 +87,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 PasswordData::PasswordData(const QnRequestParams &params)
 {
     password = params.value(lit("password"));
-    oldPassword = params.value(lit("oldPassword"));
     realm = params.value(lit("realm")).toLatin1();
     passwordHash = params.value(lit("passwordHash")).toLatin1();
     passwordDigest = params.value(lit("passwordDigest")).toLatin1();
@@ -131,9 +130,6 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
 
     if (!data.password.isEmpty())
     {
-        /* check old password */
-        if (!validateOwnerPassword(data, errString))
-            return false;
 
         /* set new password */
         updatedAdmin->setPassword(data.password);
@@ -180,32 +176,6 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
     return true;
 }
 
-bool validateOwnerPassword(const PasswordData& passwordData, QString* errStr)
-{
-    auto users = qnResPool->getResources<QnUserResource>().filtered(
-        [] (const QnUserResourcePtr& user)
-        {
-            return user->isOwner() && user->isEnabled();
-        });
-
-    if (users.isEmpty())
-    {
-        if (errStr)
-            *errStr = lit("Temporary unavailable. Please try later.");
-        return false;
-    }
-
-    for (const auto& user : users)
-    {
-        if (qnAuthHelper->checkUserPassword(user, passwordData.oldPassword))
-            return true;
-    }
-
-    if (errStr)
-        *errStr = lit("Wrong current password specified");
-    return false;
-}
-
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
 {
     if (errStr)
@@ -220,15 +190,6 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
 
         if (errStr)
             *errStr = lit("All password hashes MUST be supplied all together along with realm");
-        return false;
-    }
-
-    if (!passwordData.password.isEmpty() && passwordData.oldPassword.isEmpty())
-    {
-        //these values MUST be all filled or all NOT filled
-        NX_LOG(lit("Old password MUST be provided"), cl_logDEBUG2);
-        if (errStr)
-            *errStr = lit("Old password MUST be provided");
         return false;
     }
 

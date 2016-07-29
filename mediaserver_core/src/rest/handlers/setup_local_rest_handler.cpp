@@ -58,9 +58,6 @@ int QnSetupLocalSystemRestHandler::executePost(
 
 int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUuid &userId, QnJsonRestResult &result)
 {
-    if (data.oldPassword.isEmpty())
-        data.oldPassword = kDefaultAdminPassword;
-
     if (!qnGlobalSettings->isNewSystem())
     {
         result.setError(QnJsonRestResult::Forbidden, lit("This method is allowed at initial state only. Use 'api/detachFromSystem' method first."));

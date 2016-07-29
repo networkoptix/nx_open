@@ -82,32 +82,6 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
 
-    /*
-    if (currentPassword.isEmpty()) {
-        NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"currentPassword\""), cl_logDEBUG1);
-        result.setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, lit("currentPassword")));
-        return nx_http::StatusCode::ok;
-    }
-    */
-
-    /*
-    QnUserResourcePtr ownerUser = qnResPool->getSystemOwner();
-
-    if (!ownerUser)
-    {
-        NX_LOG(lit("QnMergeSystemsRestHandler. Failed to find owner user"), cl_logDEBUG1);
-        return nx_http::StatusCode::internalServerError;
-    }
-
-    if (!qnAuthHelper->checkUserPassword(ownerUser, currentPassword))
-    {
-        NX_LOG(lit("QnMergeSystemsRestHandler. Wrong admin password"), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::InvalidParameter, lit("currentPassword"));
-        return nx_http::StatusCode::ok;
-    }
-    */
-
     /* Get module information to get system name. */
 
     QnUserResourcePtr adminUser = qnResPool->getAdministrator();
