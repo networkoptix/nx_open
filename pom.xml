@@ -490,7 +490,7 @@
                 <module>client/desktop_client</module>
                 <module>common_libs/nx_media</module>
                 <module>client/mobile_client</module>
-		<module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/libvms_gateway</module>
             </modules>
         </profile>
         <profile>
@@ -1177,12 +1177,24 @@
                     <name>linux</name>
                 </os>
                 <property>
-                    <name>test</name>
+                    <name>ut</name>
                     <value>true</value>
                 </property>
             </activation>
             <modules>
                 <module>unit_tests</module>
+                <module>unit_tests/cloud_connectivity_ut</module>
+                <module>unit_tests/nx_network_ut</module>
+                <module>unit_tests/utils_ut</module>
+                <module>unit_tests/appserver2_ut</module>
+                <module>unit_tests/common_ut</module>
+                <module>unit_tests/mediaserver_core_ut</module>
+                <module>unit_tests/vms_utils_ut</module>
+                <module>unit_tests/nx_media_ut</module>
+                <module>unit_tests/cloud_db_ut</module>
+                <module>unit_tests/connection_mediator_ut</module>
+                <module>unit_tests/client_ut</module>
+                <module>unit_tests/vms_gateway_ut</module>                  
                 <module>unit_tests_run</module>
             </modules>
         </profile>
