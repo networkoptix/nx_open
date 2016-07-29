@@ -24,6 +24,7 @@ public:
 
     bool isSslEnabled() const;
     SocketAddress endpoint() const;
+    void enforceSslFor(const SocketAddress& targetAddress, bool enabled = true);
 
 private:
     const bool m_isSslEnabled;

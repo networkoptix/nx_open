@@ -1,8 +1,3 @@
-/**********************************************************
-* May 17, 2016
-* akolesnikov
-***********************************************************/
-
 #include "proxy_handler.h"
 
 #include <nx/network/http/buffer_source.h>
@@ -12,7 +7,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "settings.h"
-
+#include "run_time_options.h"
 
 namespace nx {
 namespace cloud {
@@ -20,13 +15,12 @@ namespace gateway {
 
 constexpr const int kSocketTimeoutMs = 29*1000;
 
-ProxyHandler::ProxyHandler(const conf::Settings& settings)
+ProxyHandler::ProxyHandler(
+    const conf::Settings& settings,
+    const conf::RunTimeOptions& runTimeOptions)
 :
-    m_settings(settings)
-{
-}
-
-ProxyHandler::~ProxyHandler()
+    m_settings(settings),
+    m_runTimeOptions(runTimeOptions)
 {
 }
 
@@ -39,12 +33,15 @@ void ProxyHandler::processRequest(
         const nx_http::StatusCode::Value statusCode,
         std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)> completionHandler)
 {
-    const auto requestOptions = cutTargetFromRequest(*connection, &request);
+    auto requestOptions = cutTargetFromRequest(*connection, &request);
     if (!nx_http::StatusCode::isSuccessCode(requestOptions.status))
     {
         completionHandler(requestOptions.status, nullptr);
         return;
     }
+
+    if (!requestOptions.isSsl && m_settings.http().sslSupport)
+        requestOptions.isSsl = m_runTimeOptions.isSslEnforsed(requestOptions.target);
 
     //TODO #ak avoid request loop by using Via header
 
@@ -235,9 +232,10 @@ void ProxyHandler::onConnected(SystemError::ErrorCode errorCode)
         return;
     }
 
-    NX_LOGX(lm("Successfully established connection to %1 (path %2)")
+    NX_LOGX(lm("Successfully established connection to %1 (path %2) from %3")
         .arg(m_targetPeerSocket->getForeignAddress().toString())
-        .arg(m_request.requestLine.url.toString()),
+        .arg(m_request.requestLine.url.toString())
+        .arg(m_targetPeerSocket->getLocalAddress().toString()),
         cl_logDEBUG2);
 
     m_targetHostPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
@@ -249,7 +247,6 @@ void ProxyHandler::onConnected(SystemError::ErrorCode errorCode)
         std::bind(&ProxyHandler::onMessageFromTargetHost, this, std::placeholders::_1));
     m_targetHostPipeline->startReadingConnection();
 
-    //proxying request
     nx_http::Message requestMsg(nx_http::MessageType::request);
     *requestMsg.request = std::move(m_request);
     m_targetHostPipeline->sendMessage(std::move(requestMsg));
