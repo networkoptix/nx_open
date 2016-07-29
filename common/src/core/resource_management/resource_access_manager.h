@@ -121,6 +121,17 @@ public:
 
     static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
 
+    //TODO: #GDM think about naming
+    enum class Access
+    {
+        Forbidden,
+        Directly,
+        ViaLayout,
+        ViaVideowall
+    };
+    /** Check if resource (camera, webpage or layout) is available to given user. */
+    Access isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
+
 signals:
     void accessibleResourcesChanged(const QnUuid& userId);
 
@@ -147,8 +158,7 @@ private:
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnLayoutResourcePtr& layout)          const;
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnUserResourcePtr& targetUser)        const;
 
-    /** Check if resource (camera, webpage or layout) is available to given user. */
-    bool isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
+
 
     /** Check if given desktop camera or layout is available to given user through videowall. */
     bool isAccessibleViaVideowall(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;

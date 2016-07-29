@@ -514,7 +514,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     NX_ASSERT(camera);
     Qn::Permissions result = Qn::ReadPermission;
 
-    if (!isAccessibleResource(user, camera))
+    if (isAccessibleResource(user, camera) == Access::Forbidden)
         return result;
 
     result |= Qn::ViewContentPermission;
@@ -581,7 +581,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     NX_ASSERT(webPage);
     Qn::Permissions result = Qn::ReadPermission;
 
-    if (!isAccessibleResource(user, webPage))
+    if (isAccessibleResource(user, webPage) == Access::Forbidden)
         return result;
 
     result |= Qn::ViewContentPermission;
@@ -646,7 +646,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         /* Access to global layouts. Simple check is enough, exported layouts are checked on the client side. */
         if (layout->isShared())
         {
-            if (!isAccessibleResource(user, layout))
+            if (isAccessibleResource(user, layout) == Access::Forbidden)
                 return Qn::ReadPermission;
 
             /* Global layouts editor. */
@@ -737,20 +737,23 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     return checkReadOnly(checkUserType(result));
 }
 
-bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const
+QnResourceAccessManager::Access QnResourceAccessManager::isAccessibleResource(
+    const QnUserResourcePtr& user, const QnResourcePtr& resource) const
 {
     NX_ASSERT(resource);
 
     if (!user || !resource)
-        return false;
+        return Access::Forbidden;
 
     /* Handling desktop cameras before all other checks. */
     if (resource->hasFlags(Qn::desktop_camera))
-        return isAccessibleViaVideowall(user, resource);
+        return isAccessibleViaVideowall(user, resource)
+        ? Access::ViaVideowall
+        : Access::Forbidden;
 
     QSet<QnUuid> accessible = accessibleResources(user);
     if (accessible.contains(resource->getId()))
-        return true;
+        return Access::Directly;
 
     /* Web Pages behave totally like cameras. */
     bool isMediaResource = resource.dynamicCast<QnVirtualCameraResource>()
@@ -764,17 +767,21 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
         : Qn::GlobalAdminPermission;
 
     if (hasGlobalPermission(user, requiredPermission))
-        return true;
+        return Access::Directly;
 
     /* Here we are checking if the camera exists on one of the shared layouts, available to given user. */
     if (isMediaResource)
-        return isAccessibleViaLayouts(accessible, resource, true);
+        return isAccessibleViaLayouts(accessible, resource, true)
+        ? Access::ViaLayout
+        : Access::Forbidden;
 
     /* Check if layout belongs to videowall. */
     if (isLayout)
-        return isAccessibleViaVideowall(user, resource);
+        return isAccessibleViaVideowall(user, resource)
+        ? Access::ViaVideowall
+        : Access::Forbidden;
 
-    return false;
+    return Access::Forbidden;
 }
 
 bool QnResourceAccessManager::isAccessibleViaVideowall(const QnUserResourcePtr& user, const QnResourcePtr& resource) const
