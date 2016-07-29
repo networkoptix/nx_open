@@ -65,13 +65,8 @@ public:
     Socket& operator=(const Socket&) = delete;
     Socket(Socket&&) = delete;
     Socket& operator=(Socket&&) = delete;
-
-    /**
-     *   Close and deallocate this socket
-     */
     virtual ~Socket();
 
-    //!Implementation of Pollable::getLastError
     virtual bool getLastError(SystemError::ErrorCode* errorCode) const override;
 
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
@@ -80,42 +75,26 @@ public:
     virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
-    //!Implementation of AbstractSocket::bind
     virtual bool bind( const SocketAddress& localAddress ) override;
-    //!Implementation of AbstractSocket::getLocalAddress
     virtual SocketAddress getLocalAddress() const override;
-    //!Implementation of AbstractSocket::close
     virtual bool close() override;
-    //!Implementation of AbstractSocket::shutdown
     virtual bool shutdown() override;
 
-    //!Implementation of AbstractSocket::isClosed
     virtual bool isClosed() const override;
-    //!Implementation of AbstractSocket::setReuseAddrFlag
     virtual bool setReuseAddrFlag( bool reuseAddr ) override;
-    //!Implementation of AbstractSocket::reuseAddrFlag
     virtual bool getReuseAddrFlag( bool* val ) const override;
-    //!Implementation of AbstractSocket::setNonBlockingMode
     virtual bool setNonBlockingMode( bool val ) override;
-    //!Implementation of AbstractSocket::getNonBlockingMode
     virtual bool getNonBlockingMode( bool* val ) const override;
-    //!Implementation of AbstractSocket::getMtu
     virtual bool getMtu( unsigned int* mtuValue ) const override;
-    //!Implementation of AbstractSocket::setSendBufferSize
     virtual bool setSendBufferSize( unsigned int buffSize ) override;
-    //!Implementation of AbstractSocket::getSendBufferSize
     virtual bool getSendBufferSize( unsigned int* buffSize ) const override;
-    //!Implementation of AbstractSocket::setRecvBufferSize
     virtual bool setRecvBufferSize( unsigned int buffSize ) override;
-    //!Implementation of AbstractSocket::getRecvBufferSize
     virtual bool getRecvBufferSize( unsigned int* buffSize ) const override;
-    //!Implementation of AbstractSocket::setRecvTimeout
     virtual bool setRecvTimeout( unsigned int ms ) override;
-    //!Implementation of AbstractSocket::setSendTimeout
     virtual bool setSendTimeout( unsigned int ms ) override;
-    //!Implementation of AbstractSocket::post
+
+    virtual Pollable* pollable() override;
     virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
-    //!Implementation of AbstractSocket::dispatch
     virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
 
     /**

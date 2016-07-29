@@ -213,6 +213,12 @@ void MultipleServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         socket->pleaseStop(barrier.fork());
 }
 
+Pollable* MultipleServerSocket::pollable()
+{
+    NX_CRITICAL(false, "Not implemented");
+    return nullptr;
+}
+
 void MultipleServerSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_timerSocket.post(std::move(handler));

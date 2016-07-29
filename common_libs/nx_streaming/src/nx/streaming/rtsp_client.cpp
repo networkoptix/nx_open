@@ -1826,7 +1826,7 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
             //At least, move ioctl call to sockets, since m_tcpSock->handle() is deprecated method
             //(with nat traversal introduced, not every socket will have handle)
         int bytesAv = 0;
-        if( (ioctl( m_tcpSock->handle(), FIONREAD, &bytesAv ) != 0) ||  //socket read buffer size is unknown to us
+        if( (ioctl( m_tcpSock->handle(), FIONREAD, &bytesAv ) == 0) &&  //socket read buffer size is unknown to us
             (bytesAv == 0) )    //socket read buffer is empty
         {
             //This sleep somehow reduces CPU time spent by process in kernel space on arm platform

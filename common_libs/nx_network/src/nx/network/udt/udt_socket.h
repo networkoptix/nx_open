@@ -74,9 +74,8 @@ public:
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
     virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
-    //!Implementation of AbstractSocket::post
+    virtual Pollable* pollable() override;
     virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override;
-    //!Implementation of AbstractSocket::dispatch
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 protected:

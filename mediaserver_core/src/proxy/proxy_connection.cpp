@@ -32,6 +32,7 @@
 #include "http/custom_headers.h"
 #include "api/global_settings.h"
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/aio/pollset.h>
 
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
@@ -474,64 +475,46 @@ static const size_t READ_BUFFER_SIZE = 1024*64;
 void QnProxyConnectionProcessor::doRawProxy()
 {
     Q_D(QnProxyConnectionProcessor);
+    nx::Buffer buffer(READ_BUFFER_SIZE, Qt::Uninitialized);
 
-    //TODO #ak move away from C buffer
-    std::unique_ptr<char[]> buffer( new char[READ_BUFFER_SIZE] );
+    if (!d->socket->setNonBlockingMode(true))
+        return;
 
+    if (!d->dstSocket->setNonBlockingMode(true))
+        return;
+
+    nx::network::aio::PollSet pollSet;
+    pollSet.add(d->socket->pollable(), nx::network::aio::etRead);
+    pollSet.add(d->dstSocket->pollable(), nx::network::aio::etRead);
     while (!m_needStop)
     {
-        //TODO #ak replace poll with async socket operations here or it will not work for UDT
-
-        struct pollfd fds[2];
-        memset( fds, 0, sizeof( fds ) );
-        fds[0].fd = d->socket->handle();
-        fds[0].events = POLLIN;
-        fds[1].fd = d->dstSocket->handle();
-        fds[1].events = POLLIN;
-
-        int rez = poll( fds, sizeof( fds ) / sizeof( *fds ), IO_TIMEOUT );
+        int rez = pollSet.poll(IO_TIMEOUT);
         if( rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted )
             continue;
 
         if (rez < 1)
             return; // error or timeout
 
-        if( fds[0].revents & POLLIN) {
-            if( !doProxyData( d->socket.data(), d->dstSocket.data(), buffer.get(), READ_BUFFER_SIZE ) )
-                return;
-        }
-        else if(fds[0].revents & (POLLERR | POLLHUP | POLLNVAL))
+        for (auto it = pollSet.begin(); it != pollSet.end(); ++it)
         {
-            //connection closed
-            NX_LOG( lit("Error polling socket"), cl_logDEBUG1 );
-            return;
-        }
-
-        if( fds[1].revents & POLLIN) {
-            if( !doProxyData( d->dstSocket.data(), d->socket.data(), buffer.get(), READ_BUFFER_SIZE ) )
+            if (it.eventType() != nx::network::aio::etRead)
                 return;
-        }
-        else if(fds[1].revents & (POLLERR | POLLHUP | POLLNVAL))
-        {
-            //connection closed
-            NX_LOG( lit("Error polling socket"), cl_logDEBUG1 );
-            return;
-        }
 
-        //for( aio::PollSet::const_iterator
-        //    it = d->pollSet.begin();
-        //    it != d->pollSet.end();
-        //    ++it )
-        //{
-        //    if( it.eventType() != aio::etRead )
-        //        return;
-        //    if( it.socket() == d->socket )
-        //        if (!doProxyData(d->socket.data(), d->dstSocket.data(), buffer.get(), READ_BUFFER_SIZE))
-        //            return;
-        //    if( it.socket() == d->dstSocket )
-        //        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.get(), READ_BUFFER_SIZE))
-        //            return;
-        //}
+            if (it.socket() == d->socket->pollable())
+            {
+                if (!doProxyData(d->socket.data(), d->dstSocket.data(), buffer.data(), buffer.size()))
+                    return;
+            }
+            else if (it.socket() == d->dstSocket->pollable())
+            {
+                if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), buffer.size()))
+                    return;
+            }
+            else
+            {
+                NX_ASSERT(false);
+            }
+        }
     }
 }
 

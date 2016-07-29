@@ -331,6 +331,12 @@ bool Socket<InterfaceToImplement>::setSendTimeout( unsigned int ms )
 }
 
 template<typename InterfaceToImplement>
+Pollable* Socket<InterfaceToImplement>::pollable()
+{
+    return this;
+}
+
+template<typename InterfaceToImplement>
 void Socket<InterfaceToImplement>::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_baseAsyncHelper->post(std::move(handler));
