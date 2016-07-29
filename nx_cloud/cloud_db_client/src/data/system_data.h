@@ -82,10 +82,10 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const systemSharing);
 
-#define SystemSharing_Fields (accountEmail)(systemID)(accessRole)
+#define SystemSharing_Fields (accountEmail)(systemID)(accessRole)(groupID)(customPermissions)(isEnabled)
 #define SystemSharingList_Fields (sharing)
 
-#define SystemSharingEx_Fields SystemSharing_Fields(fullName)
+#define SystemSharingEx_Fields SystemSharing_Fields(accountID)(accountFullName)
 #define SystemSharingExList_Fields (sharing)
 
 #define SystemAccessRoleData_Fields (accessRole)

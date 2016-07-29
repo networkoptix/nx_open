@@ -79,6 +79,9 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemAccessRole,
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, systemID)
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, accountEmail)
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, accessRole)
+MAKE_FIELD_NAME_STR_CONST(SystemSharing, groupID)
+MAKE_FIELD_NAME_STR_CONST(SystemSharing, customPermissions)
+MAKE_FIELD_NAME_STR_CONST(SystemSharing, isEnabled)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing)
 {
@@ -96,6 +99,12 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemShar
         urlQuery.queryItemValue(SystemSharing_accessRole_field),
         api::SystemAccessRole::none,
         &success);
+    systemSharing->groupID =
+        urlQuery.queryItemValue(SystemSharing_groupID_field).toStdString();
+    systemSharing->customPermissions =
+        urlQuery.queryItemValue(SystemSharing_customPermissions_field).toStdString();
+    systemSharing->isEnabled =
+        urlQuery.queryItemValue(SystemSharing_isEnabled_field) == "true";
     return success;
 }
 
@@ -110,6 +119,15 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery)
     urlQuery->addQueryItem(
         SystemSharing_accessRole_field,
         QnLexical::serialized(data.accessRole));
+    urlQuery->addQueryItem(
+        SystemSharing_groupID_field,
+        QString::fromStdString(data.groupID));
+    urlQuery->addQueryItem(
+        SystemSharing_customPermissions_field,
+        QString::fromStdString(data.customPermissions));
+    urlQuery->addQueryItem(
+        SystemSharing_isEnabled_field,
+        data.isEnabled ? "true" : "false");
 }
 
 
