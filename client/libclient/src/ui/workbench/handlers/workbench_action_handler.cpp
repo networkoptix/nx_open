@@ -2328,7 +2328,7 @@ void QnWorkbenchActionHandler::at_serverRequest_nonceReceived(QnAsyncHttpClientR
         appserverUrl.userName(), appserverUrl.password(),
         auth.realm, nx_http::Method::GET, auth.nonce.toUtf8());
 
-    QUrlQuery urlQuery(url);0
+    QUrlQuery urlQuery(url);
     urlQuery.addQueryItem(lit("auth"), QLatin1String(authParam));
     url.setQuery(urlQuery);
 

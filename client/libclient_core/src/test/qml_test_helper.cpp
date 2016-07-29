@@ -4,7 +4,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QtMath>
 
-#include <utils/common/util.h>
 #include <nx/utils/random.h>
 
 QnQmlTestHelper::QnQmlTestHelper(QObject* parent):
