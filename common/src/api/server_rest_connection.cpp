@@ -123,6 +123,11 @@ Handle ServerConnection::saveCloudSystemCredentials(
         targetThread);
 }
 
+Handle ServerConnection::startLiteClient(GetCallback callback, QThread* targetThread)
+{
+    return executeGet(lit("api/startLiteClient"), QnRequestParamList(), callback, targetThread);
+}
+
 // --------------------------- private implementation -------------------------------------
 
 QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList& params) const
