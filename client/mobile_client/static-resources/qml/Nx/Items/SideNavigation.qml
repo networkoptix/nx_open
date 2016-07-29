@@ -53,7 +53,15 @@ Drawer
                 active: uiController.layoutId == resourceId
                 type: itemType
                 count: itemsCount
-                onClicked: uiController.layoutId = resourceId
+                onClicked:
+                {
+                    if (itemType == QnLayoutsModel.LiteClient)
+                        Workflow.openLiteClientControlScreen(resourceId)
+                    else
+                        Workflow.openResourcesScreen()
+
+                    uiController.layoutId = resourceId
+                }
             }
 
             section.property: "section"
