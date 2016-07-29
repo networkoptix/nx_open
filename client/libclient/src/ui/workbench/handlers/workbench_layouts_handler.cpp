@@ -76,18 +76,7 @@ QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUuid &p
     return result;
 }
 
-QSet<QnResourcePtr> layoutResources(const QnLayoutItemDataMap& items)
-{
-    QSet<QnResourcePtr> result;
-    for (const auto& item : items)
-    {
-        if (auto resource = qnResPool->getResourceByDescriptor(item.resource))
-            result << resource;
-    }
-    return result;
-};
-
-}
+} // unnamed namespace
 
 
 QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
@@ -170,15 +159,19 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
     else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
     {
         //TODO: #GDM #VW #LOW refactor common code to common place
-        if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout, [this, layout](int reqId, ec2::ErrorCode errorCode)
+        if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
+                [this, layout](int reqId, ec2::ErrorCode errorCode)
+                {
+                    Q_UNUSED(reqId);
+                    snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
+                    at_layout_saved(errorCode == ec2::ErrorCode::ok, layout);
+                    if (errorCode != ec2::ErrorCode::ok)
+                        return;
+                    snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
+                }))
         {
-            snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
-            at_layout_saved(errorCode == ec2::ErrorCode::ok, layout);
-            if (errorCode != ec2::ErrorCode::ok)
-                return;
-            snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
-        }))
             snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) | Qn::ResourceIsBeingSaved);
+        }
     }
     else
     {
@@ -374,8 +367,8 @@ QnWorkbenchLayoutsHandler::LayoutChange QnWorkbenchLayoutsHandler::calculateLayo
 
     /* Share added resources. */
     auto snapshot = snapshotManager()->snapshot(layout);
-    auto oldResources = layoutResources(snapshot.items);
-    auto newResources = layoutResources(layout->getItems());
+    auto oldResources = QnLayoutResource::layoutResources(snapshot.items);
+    auto newResources = QnLayoutResource::layoutResources(layout->getItems());
 
     result.added = (newResources - oldResources).toList();
     result.removed = (oldResources - newResources).toList();
@@ -581,7 +574,7 @@ bool QnWorkbenchLayoutsHandler::confirmDeleteLayoutsForUser(const QnUserResource
     for (const auto& layout : layouts)
     {
         auto snapshot = snapshotManager()->snapshot(layout);
-        removedResources += layoutResources(snapshot.items);
+        removedResources += QnLayoutResource::layoutResources(snapshot.items);
     }
 
     auto accessible = qnResourceAccessManager->accessibleResources(user);
@@ -623,6 +616,7 @@ bool QnWorkbenchLayoutsHandler::confirmDeleteLayoutsForUser(const QnUserResource
 
 bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForGroup(const QnUuid& groupId, const LayoutChange& change)
 {
+    Q_UNUSED(change);
     auto groupUsers = qnResPool->getResources<QnUserResource>().filtered(
         [groupId]
         (const QnUserResourcePtr& user)
@@ -665,7 +659,7 @@ bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnUserResourcePt
     /* Calculate all resources that were available through these layouts. */
     QSet<QnResourcePtr> mediaResources;
     for (const auto& layout: accessible)
-        mediaResources += layoutResources(layout->getItems());
+        mediaResources += layout->layoutResources();
 
     /* Skip resources that still will be accessible. */
     for (const auto& directlyAvailable: qnResPool->getResources(qnResourceAccessManager->accessibleResources(user)))
@@ -673,16 +667,14 @@ bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnUserResourcePt
 
     /* Skip resources that still will be accessible through other dialogs. */
     for (const auto& layout : qnResPool->getResources<QnLayoutResource>().filtered(
-        [user, layouts]
-        (const QnLayoutResourcePtr& layout)
+        [user, layouts](const QnLayoutResourcePtr& layout)
         {
             return layout->isShared()
                 && qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission)
                 && !layouts.contains(layout);
-        }
-        ))
+        }))
     {
-        mediaResources -= layoutResources(layout->getItems());
+        mediaResources -= layout->layoutResources();
     }
 
     if (mediaResources.isEmpty())
@@ -792,6 +784,7 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnWorkbenchLayoutList &layout
 
 bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resources, bool waitForReply, bool force)
 {
+    Q_UNUSED(waitForReply);
     QN_SCOPED_VALUE_ROLLBACK(&m_closingLayouts, true);
 
     if (resources.empty())
