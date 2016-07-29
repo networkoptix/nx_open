@@ -29,7 +29,7 @@ bool checkUserAccess(const QnUserResourcePtr& userResource, const QnVirtualCamer
     if (!userResource)
         return false;
 
-    switch(command) 
+    switch(command)
     {
     case Qn::ContinuousMovePtzCommand:
     case Qn::ContinuousFocusPtzCommand:
@@ -41,6 +41,7 @@ bool checkUserAccess(const QnUserResourcePtr& userResource, const QnVirtualCamer
     case Qn::ActivateTourPtzCommand:
     case Qn::UpdateHomeObjectPtzCommand:
     case Qn::RunAuxilaryCommandPtzCommand:
+    case Qn::ActivatePresetPtzCommand:
     {
         if (!qnResourceAccessManager->hasPermission(userResource, camera, Qn::Permission::WritePtzPermission))
             return false;
@@ -49,9 +50,8 @@ bool checkUserAccess(const QnUserResourcePtr& userResource, const QnVirtualCamer
     case Qn::CreatePresetPtzCommand:
     case Qn::UpdatePresetPtzCommand:
     case Qn::RemovePresetPtzCommand:
-    case Qn::ActivatePresetPtzCommand:
     {
-        if (!qnResourceAccessManager->hasPermission(userResource, camera, Qn::Permission::SavePermission) || 
+        if (!qnResourceAccessManager->hasPermission(userResource, camera, Qn::Permission::SavePermission) ||
             !qnResourceAccessManager->hasPermission(userResource, camera, Qn::Permission::WritePtzPermission))
         {
             return false;
@@ -65,8 +65,8 @@ bool checkUserAccess(const QnUserResourcePtr& userResource, const QnVirtualCamer
     case Qn::GetActiveObjectPtzCommand:
     case Qn::GetHomeObjectPtzCommand:
     case Qn::GetAuxilaryTraitsPtzCommand:
-    case Qn::GetDataPtzCommand: 
-    default: 
+    case Qn::GetDataPtzCommand:
+    default:
         return true;
     }
 
