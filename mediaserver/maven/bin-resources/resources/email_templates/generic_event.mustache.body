@@ -20,6 +20,7 @@
             {{#urlext}}
                 <p><a href="{{urlext}}">Play archive from the web</a></p>
             {{/urlext}}
+            <br>
         {{/cameras}}
     {{/hasCameras}}
 </div>
