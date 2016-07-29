@@ -15,16 +15,16 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
-class NX_NETWORK_API ForwardedTcpEndpointTunnel
+class NX_NETWORK_API DirectTcpEndpointTunnel
     :
     public AbstractOutgoingTunnelConnection
 {
 public:
-    ForwardedTcpEndpointTunnel(
+    DirectTcpEndpointTunnel(
         nx::String connectSessionId,
         SocketAddress targetEndpoint,
         std::unique_ptr<TCPSocket> connection);
-    virtual ~ForwardedTcpEndpointTunnel();
+    virtual ~DirectTcpEndpointTunnel();
 
     virtual void stopWhileInAioThread() override;
 

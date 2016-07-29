@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/tcp/forwarded_endpoint_connector.h>
+#include <nx/network/cloud/tunnel/tcp/direct_endpoint_connector.h>
 
 #include "cross_nat_connector_test.h"
 

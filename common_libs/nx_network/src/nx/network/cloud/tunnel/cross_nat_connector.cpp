@@ -47,7 +47,7 @@ SystemError::ErrorCode mediatorResultToSysErrorCode(api::ResultCode resultCode)
             return SystemError::connectionReset;
     }
 }
-}
+}   // namespace
 
 CrossNatConnector::CrossNatConnector(
     const AddressEntry& targetPeerAddress,
@@ -128,8 +128,7 @@ void CrossNatConnector::issueConnectRequestToMediator(
     ConnectCompletionHandler handler)
 {
     if (!m_mediatorUdpClient->socket()->setReuseAddrFlag(true) ||
-        !m_mediatorUdpClient->socket()->bind(
-            SocketAddress(HostAddress::anyHost, 0)))
+        !m_mediatorUdpClient->socket()->bind(SocketAddress::anyAddress))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
         NX_LOGX(lm("cross-nat %1. Failed to bind to mediator udp client to local port. %2")
@@ -348,6 +347,6 @@ void CrossNatConnector::connectSessionReportSent(
     completionHandler(sysErrorCodeToReport, std::move(tunnelConnection));
 }
 
-}   //namespace cloud
-}   //namespace network
-}   //namespace nx
+}   // namespace cloud
+}   // namespace network
+}   // namespace nx

@@ -4,14 +4,32 @@
 #include <mutex>
 #include <random>
 
+#if defined(Q_OS_MAC)
+    #include <pthread.h>
+#endif
+
 namespace nx {
 namespace utils {
 namespace random {
 
 std::random_device& device()
 {
-    static thread_local std::random_device rd;
-    return rd;
+    // There is a bug in OSX's clang and gcc, so thread_local is not supported :(
+    #if !defined(Q_OS_MAC)
+        static thread_local std::random_device rd;
+        return rd;
+    #else
+        static pthread_key_t key;
+        static auto init = pthread_key_create(&key, [](void* p){ if (p) delete p; });
+        static_cast<void>(init);
+
+        if (auto rdp = static_cast<std::random_device*>(pthread_getspecific(key)))
+            return *rdp;
+
+        const auto rdp = new std::random_device();
+        pthread_setspecific(key, rdp);
+        return *rdp;
+    #endif
 }
 
 QByteArray generate(std::size_t count, bool* isOk)
