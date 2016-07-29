@@ -107,16 +107,7 @@ int QnContext::getMaxTextureSize() const
 
 bool QnContext::liteMode() const
 {
-    switch (static_cast<LiteModeType>(qnSettings->liteMode()))
-    {
-    case LiteModeType::LiteModeEnabled:
-        return true;
-    case LiteModeType::LiteModeAuto:
-        return QnMobileClientAppInfo::defaultLiteMode();
-    default:
-        break;
-    }
-    return false;
+    return qnSettings->isLiteClientModeEnabled();
 }
 
 bool QnContext::testMode() const

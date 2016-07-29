@@ -40,6 +40,8 @@ public:
 
     bool isWritable() const;
 
+    bool isLiteClientModeEnabled() const;
+
 protected:
     virtual void updateValuesFromSettings(
             QSettings* settings, const QList<int>& ids) override;
