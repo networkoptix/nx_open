@@ -36,8 +36,6 @@ bool checkUserAccess(const QnUserResourcePtr& userResource, const QnVirtualCamer
         case Qn::AbsoluteDeviceMovePtzCommand:
         case Qn::AbsoluteLogicalMovePtzCommand:
         case Qn::ViewportMovePtzCommand:
-        case Qn::CreateTourPtzCommand:
-        case Qn::RemoveTourPtzCommand:
         case Qn::ActivateTourPtzCommand:
         case Qn::UpdateHomeObjectPtzCommand:
         case Qn::RunAuxilaryCommandPtzCommand:
@@ -47,6 +45,8 @@ bool checkUserAccess(const QnUserResourcePtr& userResource, const QnVirtualCamer
                 return false;
         }
 
+        case Qn::CreateTourPtzCommand:
+        case Qn::RemoveTourPtzCommand:
         case Qn::CreatePresetPtzCommand:
         case Qn::UpdatePresetPtzCommand:
         case Qn::RemovePresetPtzCommand:
