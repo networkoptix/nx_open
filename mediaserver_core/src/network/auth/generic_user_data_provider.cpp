@@ -61,6 +61,9 @@ Qn::AuthResult GenericUserDataProvider::authorize(
         QByteArray ha1;
         if (auto user = res.dynamicCast<QnUserResource>())
         {
+            if (!user->isEnabled())
+                return Qn::Auth_Forbidden;
+
             ha1 = user->getDigest();
         }
         else if (auto server = res.dynamicCast<QnMediaServerResource>())

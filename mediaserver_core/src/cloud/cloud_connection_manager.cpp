@@ -143,6 +143,9 @@ void CloudConnectionManager::monitorForCloudEvents()
 
 void CloudConnectionManager::stopMonitoringCloudEvents()
 {
+    if (!m_eventConnection)
+        return;
+
     m_eventConnectionRetryTimer->pleaseStopSync();
     m_eventConnectionRetryTimer.reset();
 

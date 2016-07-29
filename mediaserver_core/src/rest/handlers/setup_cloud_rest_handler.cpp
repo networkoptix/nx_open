@@ -11,6 +11,9 @@
 #include <core/resource/media_server_resource.h>
 #include "rest/server/rest_connection_processor.h"
 #include <api/resource_property_adaptor.h>
+#include <core/resource/user_resource.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <api/app_server_connection.h>
 
 namespace
 {
@@ -90,6 +93,22 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnU
     qnGlobalSettings->setNewSystem(false);
     if (qnGlobalSettings->synchronizeNowSync())
         qnCommon->updateModuleInformation();
+
+
+    if (QnUserResourcePtr admin = qnResPool->getAdministrator())
+    {
+        admin->setEnabled(false);
+        ec2::ApiUserData apiUser;
+        fromResourceToApi(admin, apiUser);
+        auto connection = QnAppServerConnectionFactory::getConnection2();
+        auto errCode = connection->getUserManager(Qn::UserAccessData(userId))->saveSync(apiUser);
+        if (errCode != ec2::ErrorCode::ok)
+        {
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("Cannot disable local admin user"));
+            return false;
+        }
+    }
+
 
     const auto& settings = QnGlobalSettings::instance()->allSettings();
     for (QnAbstractResourcePropertyAdaptor* setting : settings)

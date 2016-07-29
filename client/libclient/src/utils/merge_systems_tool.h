@@ -22,7 +22,8 @@ public:
         ForbiddenError,
         ConfigurationError,
         DependentSystemBoundToCloudError,
-        UnconfiguredSystemError
+        UnconfiguredSystemError,
+        notLocalOwner
     };
 
     explicit QnMergeSystemsTool(QObject *parent = 0);
