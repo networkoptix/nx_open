@@ -256,9 +256,8 @@ private:
     void sendDelayedAliveTran();
     void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
 
-    private slots:
+private slots:
     void at_stateChanged(QnTransactionTransport::State state);
-    void at_timer();
     void at_gotTransaction(
         Qn::SerializationFormat tranFormat,
         const QByteArray &serializedTran,

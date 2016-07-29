@@ -232,7 +232,7 @@ QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
     qRegisterMetaType<QnAbstractTransaction>("QnAbstractTransaction");
     qRegisterMetaType<QnTransaction<ApiRuntimeData> >("QnTransaction<ApiRuntimeData>");
     m_timer = new QTimer();
-    connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
+    connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::doPeriodicTasks);
     m_timer->start(500);
     m_aliveSendTimer.invalidate();
     m_currentTimeTimer.restart();
@@ -1337,11 +1337,6 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State)
         default:
             break;
     }
-}
-
-void QnTransactionMessageBus::at_timer()
-{
-    doPeriodicTasks();
 }
 
 void QnTransactionMessageBus::at_peerIdDiscovered(const QUrl& url, const QnUuid& id)
