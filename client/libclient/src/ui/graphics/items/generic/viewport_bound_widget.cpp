@@ -65,14 +65,14 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
     QTransform sceneToViewport = view->viewportTransform();
     qreal scale = 1.0 / std::sqrt(sceneToViewport.m11() * sceneToViewport.m11() + sceneToViewport.m12() * sceneToViewport.m12());
 
-    QRectF geometry = QRectF(QPointF(0, 0), m_fixedSize / scale);
+    QRectF geometry = QRectF(pos(), m_fixedSize / scale);
     setGeometry(geometry);
 
     QSizeF resultingSize = size();
     if(resultingSize.width() > geometry.width() || resultingSize.height() > geometry.height()) {
         qreal k;
         if(qFuzzyIsNull(geometry.width()) || qFuzzyIsNull(geometry.height())) {
-            k = 1.0e6; 
+            k = 1.0e6;
         } else {
             k = qMax(resultingSize.width() / geometry.width(), resultingSize.height() / geometry.height());
         }
@@ -88,7 +88,6 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
 
     emit scaleUpdated(m_lastView, scale);
 }
-
 
 // -------------------------------------------------------------------------- //
 // Handlers

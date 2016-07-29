@@ -15,18 +15,18 @@
 
     "QnGlobals": {
         "_": "Globals settings. These ones will go away in one of the future versions.",
-        
+
         "frameColor":               "custom_grey",
         "businessRuleDisabledHighlightColor": "#afafaf",
         "businessRuleInvalidBackgroundColor": "#ffbaba",
         "businessRuleInvalidColumnBackgroundColor": "#ff5757",
         "businessRuleInvalidHighlightColor": "selection"
     },
-    
+
     "QApplication": {
         "palette": {
             "_": "Main application palette. See http://qt-project.org/doc/qt-5.1/qtgui/qpalette.html#ColorRole-enum.",
-        
+
             "default": {},
             "active": {
                 "windowText":       "#000000",
@@ -93,24 +93,24 @@
             }
         }
     },
-    
+
     "QnMainWindow": {
         "palette": { "default": {
             "window": "#D0D0D0"
         }}
     },
-    
+
 
     "QnNavigationItem": {
-        "palette": { "default": { 
-            "window": "#D0D0D0" 
+        "palette": { "default": {
+            "window": "#D0D0D0"
         }}
     },
 
     "QnAuditLogModel": {
         "colors": {
 			"_": "Audit trail colors.",
-		
+
             "httpLink": "#000000",
             "unsucessLoginAction": "#666666",
             "loginAction": "#147700",
@@ -130,34 +130,34 @@
     "QnRecordingStatsModel": {
         "colors": {
             "_": "Recording statistics.",
-		
+
             "chartMainColor": "#39b2ef",
             "chartForecastColor": "#89d7ff"
         }
     },
-	
+
     "QnTimeSlider": {
         "colors": {
             "_": "Time slider colors.",
-            
+
             "tickmark": "#000000FF",
             "positionMarker": "#000000C0",
             "indicator": "QColor(128, 160, 192, 128)",
-            
+
             "selection": "selection",
             "selectionMarker": "selection.lighter",
-            
+
             "pastBackground": "QColor(255, 255, 255, 24)",
             "futureBackground": "QColor(0, 0, 0, 0)",
-            
+
             "pastRecording": "QColor(0, 128, 0, 255)",
             "futureRecording": "QColor(0, 128, 0, 192)",
-            
+
             "pastMotion": "QColor(128, 0, 0, 255)",
             "futureMotion": "QColor(128, 0, 0, 192)",
-            
+
             "separator": "#00000040",
-            
+
             "dateOverlay": "QColor(255, 255, 255, 48)",
             "dateOverlayAlternate": "selection.setAlpha(48)",
 
@@ -167,7 +167,7 @@
         },
         "palette": { "default": { "windowText": "#000000" } }
     },
-    
+
     "QnTimeScrollBar": {
         "colors": {
             "indicator": "#000000FF",
@@ -175,34 +175,34 @@
             "handle": "#00000020"
         }
     },
-    
+
     "QnControlBackgroundWidget": {
         "_": "Background for ui panels (resource tree, title bar, notifications panel).",
-        
+
         "colors": ["custom_grey.setAlpha(128)", "dark_grey.setAlpha(32)"],
         "frameColor": "#80808080",
         "frameWidth": 1.0
     },
-    
+
     "QnGraphicsView": {
         "palette": {
             "default": {
                 "_": "Scene background color.",
-            
+
                 "base": "custom_grey"
             }
         }
     },
-    
+
     "QnGradientBackgroundPainter": {
         "colors": {
             "_": "Background gradient colors.",
-            
+
             "normal": "#444444.setAlpha(76)",
             "panic": "custom_red"
         }
     },
-    
+
     "QnResourceWidget": {
         "palette": { "default": { "highlight": "selection" } },
         "frameColors": {
@@ -215,7 +215,7 @@
     "QnMediaResourceWidget": {
         "palette": { "default": { "window": "custom_grey.setAlpha(64)" } }
     },
-    
+
     "QnServerResourceWidget": {
         "colors": {
             "frame": "opaqueSelection.setAlpha(100)",
@@ -227,7 +227,7 @@
         },
         "palette": { "default": { "window": "#e6e6e6" } }
     },
-    
+
     "ZoomWindowInstrument": {
         "colors": ["#c02020", "#20c020", "#4040ff"]
     },
@@ -236,14 +236,9 @@
         "palette": { "default": {
             "window": "#ffffff80",
             "windowText": "#801010c0"
-        }},
-        "#statusOverlayButton": {
-            "windowColor": "#801010c0",
-            "frameColor": "#801010ff",
-            "textColor": "#ffffffff"
-        }
+        }}
     },
-    
+
     "QnIoModuleOverlayWidget": {
         "palette": {
             "default": {
@@ -257,9 +252,9 @@
             "buttonBackground": "#cccccc"
         }
     },
-    
+
     "QnTwoWayAudioWidget": {
-        "palette": { 
+        "palette": {
             "default": {
                 "window": "#ffffff80",
                 "windowText": "#000000"
@@ -276,11 +271,11 @@
         "frameColor": "#808080",
         "palette": { "default": { "windowText": "opaqueSelection.darker()" } }
     },
-    
+
     "QnResourceBrowserToolTipWidget": {
         "palette": { "default": { "windowText": "#000000" } }
     },
-    
+
     "QnNotificationToolTipWidget": {
         "palette": { "default": { "windowText": "#000000" } }
     },
@@ -292,7 +287,7 @@
             "disallowed": "#ff0000.setAlpha(64)"
         }
     },
-    
+
     "QnHistogramWidget": {
         "colors": {
             "background": "#ffffffff",
@@ -303,7 +298,7 @@
             "text": "#000000ff"
         }
     },
-    
+
     "QnCalendarItemDelegate": {
         "colors": {
             "selection": "selection.setAlpha(192)",
@@ -316,25 +311,25 @@
             "separator": "#808080ff"
         }
     },
-    
+
     "QnCalendarWidget": {
         "palette": { "default": {
             "highlight": "#ffffffff"
         }}
     },
-    
+
     "QnDayTimeWidget": {
         "palette": { "default": {
             "highlight": "#ffffffff"
         }}
     },
-    
+
     "QnClockLabel": {
         "palette": { "default": {
             "windowText": "opaqueSelection.darker()"
         }}
     },
-    
+
     "QnGraphicsMessageBox": {
         "colors": {
             "frame": "#2996e3ff",
@@ -346,35 +341,35 @@
     "QnFisheyeCalibrationImageWidget": {
         "lineColor": "ptz"
     },
-    
+
     "PtzArrowItem": {
         "pen": { "color": "ptz.setAlpha(192)" },
         "brush": "ptz.setAlpha(192).lighter(120)"
     },
-    
+
     "PtzImageButtonWidget": {
         "frameColor": "ptz.setAlpha(192)",
         "windowColor": "ptz.setAlpha(64).lighter(120)"
     },
-    
+
     "PtzManipulatorWidget": {
         "pen": { "color": "ptz.setAlpha(192)" },
         "brush": "ptz.setAlpha(64).lighter(120)"
     },
-    
+
     "PtzOverlayWidget": {
         "pen": { "color": "ptz.setAlpha(192)" }
     },
-    
+
     "PtzSplashItem": {
         "color": "ptz.setAlpha(128)"
     },
-    
+
     "PtzSelectionItem": {
         "pen": { "color": "ptz.setAlpha(192)" },
         "brush": "ptz.setAlpha(64).lighter(120)"
     },
-        
+
     "QnPtzManageModel": {
         "colors": {
             "title": "#a0a0a0",
@@ -382,7 +377,7 @@
             "warning": "#ffffa0"
         }
     },
-    
+
     "QnLicenseListModel": {
         "colors": {
             "normal": "#000000",
@@ -400,13 +395,13 @@
     "QnShadowItem": {
         "color": "#00000000"
     },
-    
+
     "QnServerUpdatesModel": {
         "colors": {
             "latest": "#006600",
             "target": "#FF9966",
             "error": "#CC0000"
-        }    
+        }
     },
 
     "QnScheduleGridWidget": {
@@ -429,7 +424,7 @@
             "selectionBackground": "#95bfe0"
         }
     },
-    
+
     "QnUserListModel": {
         "colors": {
             "disabledSelectedText": "#b5d7ee",
@@ -437,7 +432,7 @@
             "selectionBackground": "#95bfe0"
         }
     },
-    
+
     "QnBackupCamerasDialog": {
         "colors": {
             "disabled": "#808080",
@@ -446,7 +441,7 @@
             "both": "#b25900"
         }
     },
-    
+
     "QnFailoverPriorityDialog": {
         "colors": {
             "never": "#808080",

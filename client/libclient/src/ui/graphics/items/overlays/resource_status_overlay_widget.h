@@ -1,94 +1,77 @@
-#ifndef QN_RESOURCE_STATUS_OVERLAY_WIDGET_H
-#define QN_RESOURCE_STATUS_OVERLAY_WIDGET_H
+#pragma once
 
-#include <QtCore/QSharedPointer>
-#include <QtGui/QStaticText>
+#include <ui/graphics/items/generic/viewport_bound_widget.h>
 
-#include <client/client_globals.h>
+class QLabel;
+class QPushButton;
+class QGraphicsPixmapItem;
+class QnWordWrappedLabel;
+class QnBusyIndicatorGraphicsWidget;
 
-#include <core/resource/resource_fwd.h>
-
-#include <ui/graphics/items/standard/graphics_widget.h>
-#include <ui/common/geometry.h>
-
-#include <memory>
-#include <array>
-
-class QnPausedPainter;
-class QnLoadingProgressPainter;
-class QnTextButtonWidget;
-
-class QnStatusOverlayWidget: public GraphicsWidget, protected QnGeometry {
+class QnStatusOverlayWidget: public GraphicsWidget
+{
     Q_OBJECT
     typedef GraphicsWidget base_type;
 
 public:
-    enum ButtonType {
-        NoButton,
-        DiagnosticsButton,
-        IoEnableButton,
-        MoreLicensesButton
+    QnStatusOverlayWidget(QGraphicsWidget *parent = nullptr);
+
+    enum class Control
+    {
+        kNoControl      = 0x00,
+        kPreloader      = 0x01,
+        kImageOverlay   = 0x02,
+        kIcon           = 0x04,
+        kCaption        = 0x08,
+        kButton         = 0x10,
+        kDescription    = 0x20
     };
+    Q_DECLARE_FLAGS(Controls, Control);
 
-    QnStatusOverlayWidget(const QnResourcePtr &resource,  QGraphicsWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
-    virtual ~QnStatusOverlayWidget();
+    void setVisibleControls(Controls controls);
 
-    Qn::ResourceStatusOverlay statusOverlay() const;
-    void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay);
+    void setIconOverlayPixmap(const QPixmap& pixmap);
 
-    virtual void setGeometry(const QRectF &geometry) override;
-
-    ButtonType buttonType() const;
-    void setButtonType(ButtonType buttonType);
+    void setIcon(const QPixmap& pixmap);
+    void setErrorStyle(bool isErrorStyle);
+    void setCaption(const QString& caption);
+    void setDescription(const QString& description);
+    void setButtonText(const QString& text);
 
 signals:
-    void statusOverlayChanged();
-
-    void diagnosticsRequested();
-    void ioEnableRequested();
-    void moreLicensesRequested();
-
-protected:
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    void actionButtonClicked();
 
 private:
-    enum OverlayText {
-        NoDataText,
-        OfflineText,
-        ServerOfflineText,
-        UnauthorizedText,
-        UnauthorizedSubText,
-        LoadingText,
-        AnalogLicenseText,
-        VideowallLicenseText,
-        IoModuleDisabledText,
-        TextCount
-    };
+    void setupPreloader();
 
-    void paintFlashingText(QPainter *painter, OverlayText textId, qreal textSize, const QPointF &offset = QPointF());
-    void paintPixmap(QPainter *painter, const QPixmap &picture, qreal imageSize);
+    void setupCentralControls();
 
-    void updateLayout();
-    void updateButtonOpacity(bool animate = true);
-    void updateButtonText();
+    void setupExtrasControls();
+
+    void initializeHandlers();
+
+    void updateAreasSizes();
 
 private:
-    void setButtonVisible(bool visible
-        , bool animate);
+    Controls m_visibleControls;
+    bool m_initialized;
+    bool m_errorStyle;
 
-private:
-    const QnResourcePtr m_resource;
-    QSharedPointer<QnPausedPainter> m_pausedPainter;
-    QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
-    Qn::ResourceStatusOverlay m_statusOverlay;
+    QnViewportBoundWidget* const m_preloaderHolder;
+    QnViewportBoundWidget* const m_centralHolder;
+    QnViewportBoundWidget* const m_extrasHolder;
 
-    std::array<QString, TextCount> m_texts;
+    // Preloader
+    QnBusyIndicatorGraphicsWidget* m_preloader;
 
-    QFont m_staticFont;
+    // Icon overlay
+    QGraphicsPixmapItem m_imageItem;
 
-    ButtonType m_buttonType;
-    QnTextButtonWidget *m_button;
-    std::unique_ptr<QPixmap> m_ioSpeakerPixmap;
+    // Central area
+    QLabel* m_centralAreaImage;
+    QnWordWrappedLabel* m_caption;
+
+    // Extras
+    QPushButton* const m_button;
+    QnWordWrappedLabel* const m_description;
 };
-
-#endif // QN_RESOURCE_STATUS_OVERLAY_WIDGET_H

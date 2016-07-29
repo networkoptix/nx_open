@@ -65,3 +65,5 @@ protected:
 protected:
     QnNxStyle(QnNxStylePrivate &dd);
 };
+
+#define qnNxStyle QnNxStyle::instance()

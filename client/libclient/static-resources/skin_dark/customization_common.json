@@ -452,12 +452,7 @@
         "palette": { "default": {
             "window": "dark4.setAlpha(75)",
             "windowText": "#801010c0"
-        }},
-        "#statusOverlayButton": {
-            "windowColor": "#801010c0",
-            "frameColor": "#801010ff",
-            "textColor": "#ffffffff"
-        }
+        }}
     },
 
     "QnIoModuleOverlayWidget": {
@@ -654,7 +649,7 @@
     },
 
     "QnNotificationWidget" : {
-        "palette": { 
+        "palette": {
             "default": {
                 "dark": "dark6"
             }
