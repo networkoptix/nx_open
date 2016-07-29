@@ -30,8 +30,6 @@ inline bool operator != (const UserAccessData &lhs, const UserAccessData &rhs)
     return ! operator == (lhs, rhs);
 }
 
-QnUserResourcePtr getUserResourceByAccessData(const UserAccessData &userAccessData);
-
 /**
 * Default kDefaultUserAccess for server side is superuser.
 * For client side kDefaultUserAccess is not taken into account.
