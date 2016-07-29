@@ -86,8 +86,8 @@ private:
 
     Qn::NodeType rootNodeTypeForScope() const;
 
-    /* Remove virtual 'system' nodes that are not used anymore. */
-    void cleanupSystemNodes();
+    /* Remove group nodes that are not used anymore. */
+    void cleanupGroupNodes(Qn::NodeType nodeType);
 
     /** Cleanup all node references. */
     void removeNode(const QnResourceTreeModelNodePtr& node);

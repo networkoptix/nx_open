@@ -827,7 +827,6 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
     else
     {
         /* Real parent node - 'Cameras' placeholder. */
-        //TODO: #GDM What if it does not exists???
         auto parentNode = ensurePlaceholderNode(user->getId(), Qn::AccessibleResourcesNode);
 
         /* Add new accessibly resources and forcibly update them. */
@@ -845,6 +844,15 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
                 auto node = ensureAccessibleResourceNode(user->getId(), resource);
                 node->update();
                 node->setParent(parentNode);
+
+                /* Create recorder nodes for cameras. */
+                if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+                {
+                    QString groupId = camera->getGroupId();
+                    if (!groupId.isEmpty())
+                        node->setParent(ensureRecorderNode(parentNode, groupId, camera->getGroupName()));
+                }
+
             }
         }
 
@@ -863,6 +871,8 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
 
     for (auto node : nodesToDelete)
         removeNode(node);
+
+    cleanupGroupNodes(Qn::RecorderNode);
 }
 
 Qn::NodeType QnResourceTreeModel::rootNodeTypeForScope() const
@@ -880,12 +890,12 @@ Qn::NodeType QnResourceTreeModel::rootNodeTypeForScope() const
     }
 }
 
-void QnResourceTreeModel::cleanupSystemNodes()
+void QnResourceTreeModel::cleanupGroupNodes(Qn::NodeType nodeType)
 {
     QList<QnResourceTreeModelNodePtr> nodesToDelete;
     for (auto node : m_allNodes)
     {
-        if (node->type() != Qn::SystemNode)
+        if (node->type() != nodeType)
             continue;
 
         if (node->children().isEmpty())
@@ -1269,7 +1279,7 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     m_resourceNodeByResource.remove(resource);
 
     if (QnMediaServerResource::isFakeServer(resource))
-        cleanupSystemNodes();
+        cleanupGroupNodes(Qn::SystemNode);
 }
 
 
@@ -1535,7 +1545,7 @@ void QnResourceTreeModel::at_server_systemNameChanged(const QnResourcePtr &resou
 
     auto node = ensureResourceNode(resource);
     updateNodeParent(node);
-    cleanupSystemNodes();
+    cleanupGroupNodes(Qn::SystemNode);
 }
 
 void QnResourceTreeModel::at_server_redundancyChanged(const QnResourcePtr &resource)
