@@ -161,14 +161,16 @@ int runApplication(QGuiApplication *application, const QnUuid& videowallInstance
     srand(time(NULL));
     qsrand(time(NULL));
 
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory(Qn::PT_MobileClient)); // TODO: #dklychkov check connection type
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
+        getConnectionFactory(Qn::PT_MobileClient));
 
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.get());
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
-    runtimeData.peer.peerType = Qn::PT_MobileClient; // TODO: #dklychkov check connection type
+    runtimeData.peer.peerType = qnSettings->isLiteClientModeEnabled()
+        ? Qn::PT_LiteClient : Qn::PT_MobileClient;
     runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = QnAppInfo::productNameShort();
     if (!videowallInstanceGuid.isNull())
@@ -177,7 +179,6 @@ int runApplication(QGuiApplication *application, const QnUuid& videowallInstance
 
     int result = runUi(application);
 
-//    QnResource::stopCommandProc();
     QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr());
     QnAppServerConnectionFactory::setUrl(QUrl());
 
