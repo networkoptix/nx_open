@@ -12,7 +12,7 @@
 #include <QtCore/QUrl>
 
 #include <http/custom_headers.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/cloud/cdb_endpoint_fetcher.h>

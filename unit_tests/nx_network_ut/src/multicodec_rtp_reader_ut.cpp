@@ -25,7 +25,7 @@
 
 #include <core/resource/network_resource.h>
 #include <core/resource_management/resource_properties.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/common/synctime.h>
 #include <network/multicodec_rtp_reader.h>
 #include <nx/streaming/rtsp_client.h>

@@ -52,9 +52,9 @@ class QnGraphicsMessageBox;
 
 // TODO: #Elric split this class into several handlers, group actions by handler. E.g. screen recording should definitely be spun off.
 /**
- * This class implements logic for client actions.
- */
-class QnWorkbenchActionHandler: public QObject, public QnWorkbenchContextAware {
+* This class implements logic for client actions.
+*/
+class QnWorkbenchActionHandler : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
     QnWorkbenchActionHandler(QObject *parent = NULL);
@@ -74,7 +74,7 @@ protected:
         ImageCorrectionParams contrastParams;
         QnItemDewarpingParams dewarpingParams;
 
-        AddToLayoutParams():
+        AddToLayoutParams() :
             usePosition(false),
             position(QPointF()),
             zoomUuid(QnUuid()),
@@ -113,12 +113,12 @@ protected:
 
     QnWorkbenchNotificationsHandler* notificationsHandler() const;
 
-protected slots:
+    protected slots:
 
     void submitDelayedDrops();
     void submitInstantDrop();
 
-protected slots:
+    protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
 
     void at_workbench_cellSpacingChanged();
@@ -252,7 +252,7 @@ private:
 
     QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QPointer<QnEventLogDialog> m_businessEventsLogDialog;
-	QPointer<QnSearchBookmarksDialog> m_searchBookmarksDialog;
+    QPointer<QnSearchBookmarksDialog> m_searchBookmarksDialog;
     QPointer<QnAuditLogDialog> m_auditLogDialog;
     QPointer<QnCameraListDialog> m_cameraListDialog;
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
@@ -261,7 +261,7 @@ private:
 
     bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once
-     * the user logs in. */
+    * the user logs in. */
     QList<QnMimeData> m_delayedDrops;
     QList<QnMimeData> m_instantDrops;
 
@@ -275,7 +275,7 @@ private:
     struct CameraMovingInfo
     {
         CameraMovingInfo() {}
-        CameraMovingInfo(const QnVirtualCameraResourceList& cameras, const QnMediaServerResourcePtr& dstServer): cameras(cameras), dstServer(dstServer) {}
+        CameraMovingInfo(const QnVirtualCameraResourceList& cameras, const QnMediaServerResourcePtr& dstServer) : cameras(cameras), dstServer(dstServer) {}
         QnVirtualCameraResourceList cameras;
         QnMediaServerResourcePtr dstServer;
     };

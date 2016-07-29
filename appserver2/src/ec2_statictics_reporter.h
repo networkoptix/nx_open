@@ -1,5 +1,4 @@
-#ifndef EC2_STATICTICS_REPORTER_H
-#define EC2_STATICTICS_REPORTER_H
+#pragma once
 
 #include <QtCore/QDateTime>
 
@@ -63,5 +62,3 @@ namespace ec2
         boost::optional<qint64> m_timerId;
     };
 }
-
-#endif // EC2_STATICTICS_REPORTER_H

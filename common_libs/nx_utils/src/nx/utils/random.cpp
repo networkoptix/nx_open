@@ -1,74 +1,62 @@
-/**********************************************************
-* Apr 27, 2016
-* akolesnikov
-***********************************************************/
-
 #include "random.h"
 
 #include <algorithm>
-#include <limits>
 #include <mutex>
 #include <random>
-#include <ctime>
 
+#if defined(Q_OS_MAC)
+    #include <pthread.h>
+#endif
 
 namespace nx {
 namespace utils {
+namespace random {
 
-static bool initRand()
+std::random_device& device()
 {
-    qsrand(static_cast<uint>(time(nullptr)));
-    return true;
+    // There is a bug in OSX's clang and gcc, so thread_local is not supported :(
+    #if !defined(Q_OS_MAC)
+        static thread_local std::random_device rd;
+        return rd;
+    #else
+        static pthread_key_t key;
+        static auto init = pthread_key_create(&key, [](void* p){ if (p) delete p; });
+        static_cast<void>(init);
+
+        if (auto rdp = static_cast<std::random_device*>(pthread_getspecific(key)))
+            return *rdp;
+
+        const auto rdp = new std::random_device();
+        pthread_setspecific(key, rdp);
+        return *rdp;
+    #endif
 }
 
-int rand()
+QByteArray generate(std::size_t count, bool* isOk)
 {
-    static bool init = initRand();
-    static_cast<void>(init);
-    return qrand();
-}
-
-namespace {
-struct RandomGenerationContext
-{
-    std::mutex mutex;
-    std::random_device randomDevice;
-};
-
-RandomGenerationContext randomGenerationContext;
-}
-
-bool generateRandomData(std::int8_t* data, std::size_t count)
-{
+    QByteArray data(static_cast<int>(count), Qt::Uninitialized);
     try
     {
-        std::lock_guard<std::mutex> lk(randomGenerationContext.mutex);
         std::uniform_int_distribution<int> distribution(
             std::numeric_limits<std::int8_t>::min(),
             std::numeric_limits<std::int8_t>::max());
-        std::generate(
-            data, data + count,
-            [&distribution]
-            {
-                return distribution(randomGenerationContext.randomDevice);
-            });
-        return true;
-    }
-    catch (const std::exception& /*e*/)
-    {
-        return false;
-    }
-}
 
-QByteArray generateRandomData(std::size_t count, bool* ok)
-{
-    QByteArray data(static_cast<int>(count), Qt::Uninitialized);
-    const bool result = 
-        generateRandomData(reinterpret_cast<std::int8_t*>(data.data()), count);
-    if (ok)
-        *ok = result;
+        std::generate(
+            data.data(), data.data() + count,
+            [&distribution] { return distribution(device()); });
+
+        if (isOk)
+            *isOk = true;
+    }
+    catch (const std::exception&)
+    {
+        if (isOk)
+            *isOk = false;
+    }
+
     return data;
 }
 
-}   // namespace nx
-}   // namespace utils
+} // namespace random
+} // namespace utils
+} // namespace nx

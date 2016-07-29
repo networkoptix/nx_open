@@ -43,6 +43,7 @@ written by
    #include <cstring>
    #include <cerrno>
    #include <unistd.h>
+   #include <time.h>
    #ifdef OSX
       #include <mach/mach_time.h>
    #endif
@@ -58,11 +59,45 @@ written by
 #include "md5.h"
 #include "common.h"
 
+#ifndef _WIN32
+    int pthread_cond_init_monotonic(pthread_cond_t* cond)
+    {
+        pthread_condattr_t attr;
+        if (auto r = pthread_condattr_init(&attr))
+            return r;
+
+        if (auto r = pthread_condattr_setclock(&attr, CLOCK_MONOTONIC))
+            return r;
+
+        auto r = pthread_cond_init(cond, &attr);
+        pthread_condattr_destroy(&attr);
+        return r;
+    }
+
+    int pthread_cond_wait_monotonic(pthread_cond_t* cond, pthread_mutex_t* mutex, uint64_t ms)
+    {
+        timespec timeout;
+        if (auto t = clock_gettime(CLOCK_MONOTONIC, &timeout))
+            return t;
+
+        timeout.tv_sec += (ms / 1000);
+        timeout.tv_nsec += (ms % 1000) * 1000000;
+        if (timeout.tv_nsec > 1000000000)
+        {
+            timeout.tv_sec += 1;
+            timeout.tv_nsec -= 1000000000;
+        }
+
+        return pthread_cond_timedwait(cond, mutex, &timeout);
+    }
+#endif
+
 bool CTimer::m_bUseMicroSecond = false;
 uint64_t CTimer::s_ullCPUFrequency = CTimer::readCPUFrequency();
 #ifndef _WIN32
    pthread_mutex_t CTimer::m_EventLock = PTHREAD_MUTEX_INITIALIZER;
-   pthread_cond_t CTimer::m_EventCond = PTHREAD_COND_INITIALIZER;
+   pthread_cond_t CTimer::m_EventCond;
+   int CTimer::m_EventCondInit = pthread_cond_init_monotonic(&CTimer::m_EventCond);
 #else
    pthread_mutex_t CTimer::m_EventLock = CreateMutex(NULL, false, NULL);
    pthread_cond_t CTimer::m_EventCond = CreateEvent(NULL, false, false, NULL);
@@ -76,7 +111,7 @@ CTimer::CTimer()
 {
    #ifndef _WIN32
       pthread_mutex_init(&m_TickLock, NULL);
-      pthread_cond_init(&m_TickCond, NULL);
+      pthread_cond_init_monotonic(&m_TickCond);
    #else
       m_TickLock = CreateMutex(NULL, false, NULL);
       m_TickCond = CreateEvent(NULL, false, false, NULL);
@@ -204,21 +239,8 @@ void CTimer::sleepto(uint64_t nexttime)
          #endif
       #else
          #ifndef _WIN32
-            timeval now;
-            timespec timeout;
-            gettimeofday(&now, 0);
-            if (now.tv_usec < 990000)
-            {
-               timeout.tv_sec = now.tv_sec;
-               timeout.tv_nsec = (now.tv_usec + 10000) * 1000;
-            }
-            else
-            {
-               timeout.tv_sec = now.tv_sec + 1;
-               timeout.tv_nsec = (now.tv_usec + 10000 - 1000000) * 1000;
-            }
             pthread_mutex_lock(&m_TickLock);
-            pthread_cond_timedwait(&m_TickCond, &m_TickLock, &timeout);
+            pthread_cond_wait_monotonic(&m_TickCond, &m_TickLock, 10);
             pthread_mutex_unlock(&m_TickLock);
          #else
             WaitForSingleObject(m_TickCond, 1);
@@ -254,9 +276,9 @@ uint64_t CTimer::getTime()
    //Specific fix may be necessary if rdtsc is not available either.
 
    #ifndef _WIN32
-      timeval t;
-      gettimeofday(&t, 0);
-      return t.tv_sec * 1000000ULL + t.tv_usec;
+      timespec t;
+      clock_gettime(CLOCK_MONOTONIC, &t);
+      return t.tv_sec * 1000000 + t.tv_nsec / 1000;
    #else
       LARGE_INTEGER ccf;
       HANDLE hCurThread = ::GetCurrentThread(); 
@@ -292,21 +314,8 @@ void CTimer::triggerEvent()
 void CTimer::waitForEvent()
 {
    #ifndef _WIN32
-      timeval now;
-      timespec timeout;
-      gettimeofday(&now, 0);
-      if (now.tv_usec < 990000)
-      {
-         timeout.tv_sec = now.tv_sec;
-         timeout.tv_nsec = (now.tv_usec + 10000) * 1000;
-      }
-      else
-      {
-         timeout.tv_sec = now.tv_sec + 1;
-         timeout.tv_nsec = (now.tv_usec + 10000 - 1000000) * 1000;
-      }
       pthread_mutex_lock(&m_EventLock);
-      pthread_cond_timedwait(&m_EventCond, &m_EventLock, &timeout);
+      pthread_cond_wait_monotonic(&m_EventCond, &m_EventLock, 10);
       pthread_mutex_unlock(&m_EventLock);
    #else
       WaitForSingleObject(m_EventCond, 1);
@@ -368,7 +377,7 @@ void CGuard::releaseMutex(pthread_mutex_t& lock)
 void CGuard::createCond(pthread_cond_t& cond)
 {
    #ifndef _WIN32
-      pthread_cond_init(&cond, NULL);
+      pthread_cond_init_monotonic(&cond);
    #else
       cond = CreateEvent(NULL, false, false, NULL);
    #endif

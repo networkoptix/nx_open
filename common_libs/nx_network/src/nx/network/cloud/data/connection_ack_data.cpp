@@ -23,6 +23,8 @@ void ConnectionAckRequest::serializeAttributes(nx::stun::Message* const message)
     message->newAttribute<stun::cc::attrs::ConnectionId>(connectSessionId);
     message->newAttribute<stun::cc::attrs::ConnectionMethods>(
         nx::String::number(connectionMethods));
+    message->newAttribute< stun::cc::attrs::PublicEndpointList >(
+        std::move(forwardedTcpEndpointList));
     message->newAttribute< stun::cc::attrs::UdtHpEndpointList >(
         std::move(udpEndpointList));
     message->addAttribute(stun::cc::attrs::cloudConnectVersion, (int)cloudConnectVersion);
@@ -34,6 +36,8 @@ bool ConnectionAckRequest::parseAttributes(const nx::stun::Message& message)
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
 
     return
+        readAttributeValue<stun::cc::attrs::PublicEndpointList>(
+            message, &forwardedTcpEndpointList) &&
         readStringAttributeValue<stun::cc::attrs::ConnectionId>(message, &connectSessionId) &&
         readIntAttributeValue<stun::cc::attrs::ConnectionMethods>(message, &connectionMethods) &&
         readAttributeValue<stun::cc::attrs::UdtHpEndpointList>(message, &udpEndpointList);

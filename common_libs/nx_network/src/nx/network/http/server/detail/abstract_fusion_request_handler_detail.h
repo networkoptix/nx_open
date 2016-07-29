@@ -13,7 +13,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <common/common_globals.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 

@@ -24,6 +24,6 @@ unix:!mac {
     QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 }
 
-OTHER_FILES += ${root.dir}/client/src/ui/help/help_topics.i
+OTHER_FILES += ${root.dir}/client/libclient/src/ui/help/help_topics.i
 
 SOURCES += ${project.build.directory}/client_app_info_impl.cpp

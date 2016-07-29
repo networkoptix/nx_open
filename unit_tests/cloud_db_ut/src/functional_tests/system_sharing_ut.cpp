@@ -202,6 +202,22 @@ TEST_F(SystemSharing, getCloudUsers)
             accountAccessRoleForSystem(sharings, account2.email, system2.id),
             api::SystemAccessRole::cloudAdmin);
     }
+
+    //checking sharings of system1 from system's view
+    {
+        std::vector<api::SystemSharingEx> sharings;
+        ASSERT_EQ(
+            getSystemSharings(system1.id, system1.authKey, &sharings),
+            api::ResultCode::ok);
+        ASSERT_EQ(2, sharings.size());
+
+        ASSERT_EQ(
+            accountAccessRoleForSystem(sharings, account1.email, system1.id),
+            api::SystemAccessRole::owner);
+        ASSERT_EQ(
+            accountAccessRoleForSystem(sharings, account2.email, system1.id),
+            api::SystemAccessRole::viewer);
+    }
 }
 
 TEST_F(SystemSharing, maintenance)
