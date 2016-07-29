@@ -344,24 +344,24 @@ namespace detail
 
     bool systemSuperAccess(const QnUuid& userId)
     {
-        return userId == Qn::kDefaultUserAccess.userId; 
+        return userId == Qn::kDefaultUserAccess.userId;
     }
 
     struct SystemSuperUserAccessOnly
     {
         template<typename Param>
-        bool operator()(const QnUuid& userId, const Param&) 
-        { 
-            return systemSuperAccess(userId); 
+        bool operator()(const QnUuid& userId, const Param&)
+        {
+            return systemSuperAccess(userId);
         }
     };
 
     struct SystemSuperUserAccessOnlyOut
     {
         template<typename Param>
-        RemotePeerAccess operator()(const QnUuid& userId, const Param&) 
-        { 
-            return systemSuperAccess(userId) ? RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden; 
+        RemotePeerAccess operator()(const QnUuid& userId, const Param&)
+        {
+            return systemSuperAccess(userId) ? RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
         }
     };
 
@@ -437,7 +437,7 @@ namespace detail
         template<typename Param>
         RemotePeerAccess operator()(const QnUuid& userId, const Param& param)
         {
-            return resourceAccessHelper(userId, param.id, Qn::Permission::ReadPermission) ? 
+            return resourceAccessHelper(userId, param.id, Qn::Permission::ReadPermission) ?
                 RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
         }
     };
@@ -454,7 +454,7 @@ namespace detail
     {
         RemotePeerAccess operator()(const QnUuid& userId, const ApiResourceParamWithRefData& param)
         {
-            return resourceAccessHelper(userId, param.resourceId, Qn::Permission::ReadPermission) ? 
+            return resourceAccessHelper(userId, param.resourceId, Qn::Permission::ReadPermission) ?
                 RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
         }
     };
@@ -490,7 +490,7 @@ namespace detail
     {
         RemotePeerAccess operator()(const QnUuid& userId, const ApiServerFootageData& param)
         {
-            return resourceAccessHelper(userId, param.serverGuid, Qn::Permission::ReadPermission) ? 
+            return resourceAccessHelper(userId, param.serverGuid, Qn::Permission::ReadPermission) ?
                 RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
         }
     };
@@ -515,7 +515,7 @@ namespace detail
     {
         RemotePeerAccess operator()(const QnUuid& userId, const ApiCameraAttributesData& param)
         {
-            return resourceAccessHelper(userId, param.cameraID, Qn::Permission::ReadPermission) ? 
+            return resourceAccessHelper(userId, param.cameraID, Qn::Permission::ReadPermission) ?
                 RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
         }
     };
@@ -539,7 +539,7 @@ namespace detail
     {
         RemotePeerAccess operator()(const QnUuid& userId, const ApiMediaServerUserAttributesData& param)
         {
-            return resourceAccessHelper(userId, param.serverID, Qn::Permission::ReadPermission) ? 
+            return resourceAccessHelper(userId, param.serverID, Qn::Permission::ReadPermission) ?
                 RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
         }
     };
@@ -573,7 +573,7 @@ namespace detail
             if (systemSuperAccess(userId))
                 return RemotePeerAccess::Allowed;
             auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-            RemotePeerAccess result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission) ? 
+            RemotePeerAccess result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission) ?
                 RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
             return result;
         }
@@ -610,12 +610,12 @@ namespace detail
     };
 
     template<typename SingleAccess >
-    struct FilterListByAccess 
+    struct FilterListByAccess
     {
         template<typename ParamContainer>
         void operator()(const QnUuid& userId, ParamContainer& outList)
         {
-            outList.erase(std::remove_if(outList.begin(), outList.end(), 
+            outList.erase(std::remove_if(outList.begin(), outList.end(),
                                          [&userId] (const typename ParamContainer::value_type &param) {
                                              return !SingleAccess()(userId, param);
                                          }), outList.end());
@@ -630,7 +630,7 @@ namespace detail
         template<typename ParamContainer>
         void operator()(const QnUuid& userId, ParamContainer& outList)
         {
-            outList.erase(std::remove_if(outList.begin(), outList.end(), 
+            outList.erase(std::remove_if(outList.begin(), outList.end(),
                                          [&userId, this] (const typename ParamContainer::value_type &param) {
                                              return !ModifyResourceAccess(isRemove)(userId, param);
                                          }), outList.end());
@@ -646,7 +646,7 @@ namespace detail
 
         void operator()(const QnUuid& userId, ApiResourceParamWithRefDataList& outList)
         {
-            outList.erase(std::remove_if(outList.begin(), outList.end(), 
+            outList.erase(std::remove_if(outList.begin(), outList.end(),
                                          [&userId, this] (const ApiResourceParamWithRefData &param) {
                                              return !ModifyResourceParamAccess(isRemove)(userId, param);
                                          }), outList.end());
