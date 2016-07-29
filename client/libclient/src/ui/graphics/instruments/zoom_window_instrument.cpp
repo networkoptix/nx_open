@@ -6,7 +6,6 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/hash.h>
-#include <utils/common/util.h>
 #include <nx/utils/random.h>
 
 #include <ui/actions/action.h>

@@ -44,7 +44,9 @@ written by
    #include <cerrno>
    #include <unistd.h>
    #include <time.h>
-   #ifdef OSX
+   #ifdef __APPLE__
+      #include <mach/clock.h>
+      #include <mach/mach.h>
       #include <mach/mach_time.h>
    #endif
 #else
@@ -66,29 +68,55 @@ written by
         if (auto r = pthread_condattr_init(&attr))
             return r;
 
-        if (auto r = pthread_condattr_setclock(&attr, CLOCK_MONOTONIC))
-            return r;
+        #ifndef __APPLE__
+            if (auto r = pthread_condattr_setclock(&attr, CLOCK_MONOTONIC))
+                return r;
+        #endif
 
         auto r = pthread_cond_init(cond, &attr);
         pthread_condattr_destroy(&attr);
         return r;
     }
 
-    int pthread_cond_wait_monotonic(pthread_cond_t* cond, pthread_mutex_t* mutex, uint64_t ms)
+    int pthread_cond_wait_monotonic(pthread_cond_t* cond, pthread_mutex_t* mutex, uint64_t timeoutMks)
     {
         timespec timeout;
-        if (auto t = clock_gettime(CLOCK_MONOTONIC, &timeout))
-            return t;
+        #ifdef __APPLE__
+            timeout.tv_sec = (timeoutMks / 1000);
+            timeout.tv_nsec = (timeoutMks % 1000) * 1000000;
 
-        timeout.tv_sec += (ms / 1000);
-        timeout.tv_nsec += (ms % 1000) * 1000000;
-        if (timeout.tv_nsec > 1000000000)
-        {
-            timeout.tv_sec += 1;
-            timeout.tv_nsec -= 1000000000;
-        }
+            return pthread_cond_timedwait_relative_np(cond, mutex, &timeout);
+        #else
+            if (auto t = clock_gettime(CLOCK_MONOTONIC, &timeout))
+                return t;
 
-        return pthread_cond_timedwait(cond, mutex, &timeout);
+            timeout.tv_sec += (timeoutMks / 1000000);
+            timeout.tv_nsec += (timeoutMks % 1000000) * 1000;
+            if (timeout.tv_nsec >= 1000000000)
+            {
+                timeout.tv_sec += 1;
+                timeout.tv_nsec -= 1000000000;
+            }
+
+            return pthread_cond_timedwait(cond, mutex, &timeout);
+        #endif
+    }
+
+    int pthread_cond_wait_time_monotonic(pthread_cond_t* cond, pthread_mutex_t* mutex, uint64_t timeMks)
+    {
+        #ifdef __APPLE__
+            const auto now = CTimer::getTime();
+            if (now > timeMks)
+                return ETIMEDOUT;
+
+            return pthread_cond_wait_monotonic(cond, mutex, timeMks - now);
+        #else
+            timespec locktime;
+            locktime.tv_sec = timeMks / 1000000;
+            locktime.tv_nsec = (timeMks % 1000000) * 1000;
+
+            return pthread_cond_timedwait(cond, mutex, &locktime);
+        #endif
     }
 #endif
 
@@ -162,7 +190,7 @@ void CTimer::rdtsc(uint64_t &x)
       //SetThreadAffinityMask(hCurThread, dwOldMask);
       if (!ret)
          x = getTime() * s_ullCPUFrequency;
-   #elif defined(OSX)
+   #elif defined(__APPLE__)
       x = mach_absolute_time();
    #else
       // use system call to read time clock for other archs
@@ -190,7 +218,7 @@ uint64_t CTimer::readCPUFrequency()
       int64_t ccf;
       if (QueryPerformanceFrequency((LARGE_INTEGER *)&ccf))
          frequency = ccf / 1000000;
-   #elif defined(OSX)
+   #elif defined(__APPLE__)
       mach_timebase_info_data_t info;
       mach_timebase_info(&info);
       frequency = info.denom * 1000ULL / info.numer;
@@ -240,7 +268,7 @@ void CTimer::sleepto(uint64_t nexttime)
       #else
          #ifndef _WIN32
             pthread_mutex_lock(&m_TickLock);
-            pthread_cond_wait_monotonic(&m_TickCond, &m_TickLock, 10);
+            pthread_cond_wait_monotonic(&m_TickCond, &m_TickLock, 10 * 1000); // 10ms
             pthread_mutex_unlock(&m_TickLock);
          #else
             WaitForSingleObject(m_TickCond, 1);
@@ -276,9 +304,20 @@ uint64_t CTimer::getTime()
    //Specific fix may be necessary if rdtsc is not available either.
 
    #ifndef _WIN32
-      timespec t;
-      clock_gettime(CLOCK_MONOTONIC, &t);
-      return t.tv_sec * 1000000 + t.tv_nsec / 1000;
+      #ifdef __APPLE__
+         clock_serv_t clock;
+         host_get_clock_service(mach_host_self(), REALTIME_CLOCK, &clock);
+
+         mach_timespec_t t;
+         clock_get_time(clock, &t);
+
+         mach_port_deallocate(mach_task_self(), clock);
+      #else
+         timespec t;
+         clock_gettime(CLOCK_MONOTONIC, &t);
+      #endif
+
+      return (uint64_t)t.tv_sec * (uint64_t)1000000 + (uint64_t)(t.tv_nsec / 1000);
    #else
       LARGE_INTEGER ccf;
       HANDLE hCurThread = ::GetCurrentThread(); 
@@ -315,7 +354,7 @@ void CTimer::waitForEvent()
 {
    #ifndef _WIN32
       pthread_mutex_lock(&m_EventLock);
-      pthread_cond_wait_monotonic(&m_EventCond, &m_EventLock, 10);
+      pthread_cond_wait_monotonic(&m_EventCond, &m_EventLock, 10 * 1000); // 10ms
       pthread_mutex_unlock(&m_EventLock);
    #else
       WaitForSingleObject(m_EventCond, 1);
