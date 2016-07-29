@@ -3,6 +3,7 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/ssl_socket.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -232,11 +233,11 @@ void ProxyHandler::onConnected(SystemError::ErrorCode errorCode)
         return;
     }
 
-    NX_LOGX(lm("Successfully established connection to %1 (path %2) from %3")
-        .arg(m_targetPeerSocket->getForeignAddress().toString())
-        .arg(m_request.requestLine.url.toString())
-        .arg(m_targetPeerSocket->getLocalAddress().toString()),
-        cl_logDEBUG2);
+    NX_LOGX(lm("Successfully established connection to %1 (path %2) from %3 with SSL=%4")
+        .str(m_targetPeerSocket->getForeignAddress())
+        .str(m_request.requestLine.url)
+        .str(m_targetPeerSocket->getLocalAddress())
+        .arg(dynamic_cast<nx::network::SslSocket*>(m_targetPeerSocket.get())), cl_logDEBUG2);
 
     m_targetHostPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
         this,
@@ -257,8 +258,8 @@ void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
     if (message.type != nx_http::MessageType::response)
     {
         NX_LOGX(lm("Received unexpected request from target host %1. Closing connection...")
-            .arg(m_targetHostPipeline->socket()->getForeignAddress().toString()),
-            cl_logDEBUG1);
+            .str(m_targetHostPipeline->socket()->getForeignAddress()), cl_logDEBUG1);
+
         auto handler = std::move(m_requestCompletionHandler);
         handler(nx_http::StatusCode::serviceUnavailable, nullptr);  //TODO #ak better status code
         return;
