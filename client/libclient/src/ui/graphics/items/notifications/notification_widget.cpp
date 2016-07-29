@@ -49,9 +49,9 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem* parent) 
 {
     setClickableButtons(Qt::RightButton);
 
-    m_textLabel = new GraphicsLabel(this);
+    m_textLabel = new QnClickableProxyLabel(this);
     m_textLabel->setAlignment(Qt::AlignLeft);
-//    m_textLabel->setWordWrap(true);   // TODO: #ynikitenkov improve GraphicsWidget VMS-2805
+    m_textLabel->setWordWrap(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
     QnImageButtonWidget* closeButton = new QnImageButtonWidget(this);
@@ -184,8 +184,8 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
 
     setClickableButtons(Qt::RightButton | Qt::LeftButton);
 
-    m_textLabel = new GraphicsLabel(this);
-   // m_textLabel->setWordWrap(true); // TODO: #ynikitenkov improve GraphicsWidget VMS-2805
+    m_textLabel = new QnClickableProxyLabel(this);
+    m_textLabel->setWordWrap(true);
     m_textLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
@@ -304,7 +304,6 @@ void QnNotificationWidget::addActionButton(const QIcon& icon, const QString& too
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     layout->setSpacing(0.0);
-    layout->addStretch(1);
     layout->addItem(button);
     layout->addStretch(1);
     m_layout->insertItem(0, layout);
