@@ -29,6 +29,7 @@
 #include <watchers/user_watcher.h>
 #include <mobile_client/mobile_client_ui_controller.h>
 #include <client_core/client_core_meta_types.h>
+#include <controllers/lite_client_controller.h>
 
 void QnMobileClientMetaTypes::initialize() {
     QnClientCoreMetaTypes::initialize();
@@ -69,6 +70,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnQuickItemMouseTracker>("com.networkoptix.qml", 1, 0, "ItemMouseTracker");
     qmlRegisterType<QnQuickTextInput>("com.networkoptix.qml", 1, 0, "QnTextInput");
     qmlRegisterType<QnMobileClientUiController>("com.networkoptix.qml", 1, 0, "QnMobileClientUiController");
+    qmlRegisterType<QnLiteClientController>("com.networkoptix.qml", 1, 0, "QnLiteClientController");
 
     qmlRegisterRevision<QQuickTextInput, 6>("com.networkoptix.qml", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("com.networkoptix.qml", 1, 0);
