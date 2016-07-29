@@ -1100,7 +1100,8 @@ QMimeData *QnResourceTreeModel::mimeData(const QModelIndexList &indexes) const
     return mimeData;
 }
 
-bool QnResourceTreeModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction action, int row, int column, const QModelIndex &parent)
+bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action,
+    int row, int column, const QModelIndex& parent)
 {
     if (!mimeData)
         return false;
@@ -1110,28 +1111,59 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         return false;
 
     /* Check if the format is supported. */
-    if (!intersects(mimeData->formats(), QnWorkbenchResource::resourceMimeTypes()) && !mimeData->formats().contains(QnVideoWallItem::mimeType()))
-        return base_type::dropMimeData(mimeData, action, row, column, parent);
-
-    /* Decode. */
-    QnResourceList sourceResources = QnWorkbenchResource::deserializeResources(mimeData);
+    if (!intersects(mimeData->formats(), QnWorkbenchResource::resourceMimeTypes())
+        && !mimeData->formats().contains(QnVideoWallItem::mimeType()))
+            return base_type::dropMimeData(mimeData, action, row, column, parent);
 
     /* Check where we're dropping it. */
     auto node = this->node(parent);
+    NX_ASSERT(node);
+    if (!node)
+        return false;
 
+    auto check = [](const QnResourceTreeModelNodePtr& node, Qn::ResourceFlags flags)
+        {
+            //NX_ASSERT(node && node->resource() && node->resource()->hasFlags(flags));
+            auto result = node && node->resource() && node->resource()->hasFlags(flags);
+            TRACE("Check drop on " << node->data(Qt::DisplayRole, 0).toString() << "result " << result);
+            return result;
+        };
+
+    TRACE("Dropping on the node " << node->data(Qt::DisplayRole, 0).toString() << " type " << node->type());
+    /* Dropping into an item is the same as dropping into a layout. */
     if (node->type() == Qn::LayoutItemNode)
-        node = node->parent(); /* Dropping into an item is the same as dropping into a layout. */
+    {
+        node = node->parent();
+        if (!check(node, Qn::layout))
+            return false;
+    }
 
+    /* Dropping into accessible layouts is the same as dropping into a user. */
+    if (node->type() == Qn::AccessibleLayoutsNode)
+    {
+        node = node->parent();
+        if (!check(node, Qn::user))
+            return false;
+    }
+
+    /* Dropping into a server camera is the same as dropping into a server */
     if (node->parent() && (node->parent()->resourceFlags().testFlag(Qn::server)))
-        node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
+    {
+        node = node->parent();
+        if (!check(node, Qn::server))
+            return false;
+    }
 
+    /* Decode. */
+    QnResourceList sourceResources = QnWorkbenchResource::deserializeResources(mimeData);
 
     /* Drop on videowall is handled in videowall. */
     if (node->type() == Qn::VideoWallItemNode)
     {
         QnActionParameters parameters;
         if (mimeData->hasFormat(QnVideoWallItem::mimeType()))
-            parameters = QnActionParameters(qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData)));
+            parameters = QnActionParameters(
+                qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData)));
         else
             parameters = QnActionParameters(sourceResources);
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
