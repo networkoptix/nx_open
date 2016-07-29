@@ -180,7 +180,6 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
         QnImageButtonWidget* button = new QnImageButtonWidget(m_headerWidget);
         button->setDefaultAction(action(actionId));
         button->setFixedSize(button->defaultAction()->icon().actualSize(QSize(maxIconSize, maxIconSize)));
-        button->setCached(true);
 
         if (helpTopicId != Qn::Empty_Help)
             setHelpTopic(button, helpTopicId);

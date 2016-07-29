@@ -7,7 +7,6 @@
 #include <QtGui/QIcon>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QStyle>
-#include <QtGui/QPixmapCache>
 #include <QtOpenGL/QGLContext>
 
 #include <ui/workaround/gl_native_painting.h>
@@ -89,10 +88,8 @@ class QnImageButtonHoverProgressAccessor : public AbstractAccessor
 
 QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),
-    m_pixmapCacheValid(false),
     m_state(0),
     m_checkable(false),
-    m_cached(false),
     m_dynamic(false),
     m_skipNextHoverEvents(false),
     m_hoverProgress(0.0),
@@ -132,16 +129,7 @@ QnImageButtonWidget::~QnImageButtonWidget()
 
 const QPixmap &QnImageButtonWidget::pixmap(StateFlags flags) const
 {
-    if (!m_cached)
-    {
-        return m_pixmaps[validPixmapState(flags)];
-    }
-    else
-    {
-        ensurePixmapCache();
-
-        return m_pixmapCache[validPixmapState(flags)];
-    }
+    return m_pixmaps[validPixmapState(flags)];
 }
 
 void QnImageButtonWidget::setPixmap(StateFlags flags, const QPixmap &pixmap)
@@ -151,7 +139,6 @@ void QnImageButtonWidget::setPixmap(StateFlags flags, const QPixmap &pixmap)
 
     m_pixmaps[flags] = pixmap;
 
-    invalidatePixmapCache();
     update();
 }
 
@@ -470,8 +457,6 @@ void QnImageButtonWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void QnImageButtonWidget::resizeEvent(QGraphicsSceneResizeEvent *event)
 {
-    invalidatePixmapCache();
-
     base_type::resizeEvent(event);
 }
 
@@ -626,21 +611,6 @@ void QnImageButtonWidget::updateFromDefaultAction()
     setEnabled(m_action->isEnabled()); // TODO: #Elric do backsync?
 }
 
-bool QnImageButtonWidget::isCached() const
-{
-    return m_cached;
-}
-
-void QnImageButtonWidget::setCached(bool cached)
-{
-    if (m_cached == cached)
-        return;
-
-    m_cached = cached;
-
-    invalidatePixmapCache();
-}
-
 bool QnImageButtonWidget::isDynamic() const
 {
     return m_dynamic;
@@ -682,41 +652,6 @@ void QnImageButtonWidget::setImageMargins(const MarginsF &margins)
 
     m_imageMargins = margins;
     update();
-}
-
-void QnImageButtonWidget::ensurePixmapCache() const
-{
-    if (m_pixmapCacheValid)
-        return;
-
-    for (int i = 0; i < MaxState; i++)
-    {
-        if (m_pixmaps[i].isNull())
-        {
-            m_pixmapCache[i] = m_pixmaps[i];
-        }
-        else
-        {
-            QSize size = this->size().toSize();
-            QString key = lit("ibw_%1_%2x%3").arg(m_pixmaps[i].cacheKey()).arg(size.width()).arg(size.height());
-
-            QPixmap pixmap;
-            if (!QPixmapCache::find(key, &pixmap))
-            {
-                pixmap = QPixmap::fromImage(m_pixmaps[i].toImage().scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-                QPixmapCache::insert(key, pixmap);
-            }
-
-            m_pixmapCache[i] = pixmap;
-        }
-    }
-
-    m_pixmapCacheValid = true;
-}
-
-void QnImageButtonWidget::invalidatePixmapCache()
-{
-    m_pixmapCacheValid = false;
 }
 
 QnImageButtonWidget::StateFlags QnImageButtonWidget::validPixmapState(StateFlags flags) const

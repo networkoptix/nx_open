@@ -55,7 +55,6 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem* parent) 
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
     QnImageButtonWidget* closeButton = new QnImageButtonWidget(this);
-    closeButton->setCached(true);
     closeButton->setToolTip(lit("%1 (<b>%2</b>)").arg(tr("Close")).arg(tr("Right Click")));
     closeButton->setIcon(qnSkin->icon("titlebar/exit.png")); // TODO: #dklychkov
     closeButton->setFixedSize(kCloseButtonSize, kCloseButtonSize);
@@ -294,7 +293,6 @@ void QnNotificationWidget::addActionButton(const QIcon& icon, const QString& too
 
     button->setIcon(icon);
     button->setToolTip(tooltip);
-    button->setCached(true);
     button->setProperty(actionIndexPropertyName, m_actions.size());
     button->setFixedSize(QnSkin::maximumSize(icon));
 
