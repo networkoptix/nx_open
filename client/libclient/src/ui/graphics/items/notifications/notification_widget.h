@@ -135,9 +135,9 @@ private:
     QGraphicsLinearLayout* m_layout;
     QnClickableProxyLabel* m_textLabel;
     QnImageButtonWidget* m_closeButton;
-    QColor m_color;
     QnNotificationLevel::Value m_notificationLevel;
     QnImageProvider* m_imageProvider;
+    QColor m_color;
 
     QnNotificationToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_toolTipHoverProcessor;
