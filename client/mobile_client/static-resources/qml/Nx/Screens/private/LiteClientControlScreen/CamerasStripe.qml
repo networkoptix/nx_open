@@ -38,7 +38,7 @@ ListView
 
     header: NoCameraItem
     {
-        width: cellWidth + 16
+        width: Math.floor(cellHeight * 16 / 9) + 16
         height: cellHeight
         active: currentIndex == -1
 
