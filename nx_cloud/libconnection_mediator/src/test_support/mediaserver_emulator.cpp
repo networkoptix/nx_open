@@ -5,6 +5,7 @@
 
 #include "mediaserver_emulator.h"
 
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/cloud/data/tunnel_connection_chosen_data.h>
@@ -35,7 +36,8 @@ MediaServerEmulator::MediaServerEmulator(
         std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
             mediatorEndpoint,
             m_mediatorConnector.get())),
-    m_action(ActionToTake::proceedWithConnection)
+    m_action(ActionToTake::proceedWithConnection),
+    m_cloudConnectionMethodMask((int)network::cloud::CloudConnectType::all)
 {
     m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
 
@@ -153,7 +155,13 @@ void MediaServerEmulator::onConnectionRequested(
 
     nx::hpm::api::ConnectionAckRequest connectionAckData;
     connectionAckData.connectSessionId = connectionRequestedData.connectSessionId;
-    connectionAckData.connectionMethods = nx::hpm::api::ConnectionMethod::udpHolePunching;
+    if ((m_cloudConnectionMethodMask & (int)network::cloud::CloudConnectType::udpHp) > 0)
+        connectionAckData.connectionMethods = nx::hpm::api::ConnectionMethod::udpHolePunching;
+    if ((m_cloudConnectionMethodMask & 
+         (int)network::cloud::CloudConnectType::forwardedTcpPort) > 0)
+    {
+        connectionAckData.forwardedTcpEndpointList.push_back(m_httpServer.address());
+    }
 
     if (m_onConnectionRequestedHandler)
     {

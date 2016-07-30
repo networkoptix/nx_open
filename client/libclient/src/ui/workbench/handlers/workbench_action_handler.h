@@ -52,9 +52,9 @@ class QnGraphicsMessageBox;
 
 // TODO: #Elric split this class into several handlers, group actions by handler. E.g. screen recording should definitely be spun off.
 /**
- * This class implements logic for client actions.
- */
-class QnWorkbenchActionHandler: public QObject, public QnWorkbenchContextAware {
+* This class implements logic for client actions.
+*/
+class QnWorkbenchActionHandler : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
     QnWorkbenchActionHandler(QObject *parent = NULL);
@@ -74,7 +74,7 @@ protected:
         ImageCorrectionParams contrastParams;
         QnItemDewarpingParams dewarpingParams;
 
-        AddToLayoutParams():
+        AddToLayoutParams() :
             usePosition(false),
             position(QPointF()),
             zoomUuid(QnUuid()),
@@ -113,12 +113,12 @@ protected:
 
     QnWorkbenchNotificationsHandler* notificationsHandler() const;
 
-protected slots:
+    protected slots:
 
     void submitDelayedDrops();
     void submitInstantDrop();
 
-protected slots:
+    protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
 
     void at_workbench_cellSpacingChanged();
@@ -173,7 +173,6 @@ protected slots:
     void at_currentLayoutSettingsAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverLogsAction_triggered();
-    void at_serverLogsAction_getNonce(QnAsyncHttpClientReply* client);
     void at_serverIssuesAction_triggered();
     void at_pingAction_triggered();
     void at_thumbnailsSearchAction_triggered();
@@ -244,13 +243,16 @@ private:
 
     bool confirmResourcesDelete(const QnResourceList& resources);
 
+    void sendServerRequest(const QnMediaServerResourcePtr& server, const QString& path);
+    void at_serverRequest_nonceReceived(QnAsyncHttpClientReply* client);
+
 private:
     QPointer<QMenu> m_mainMenu;
     QPointer<QMenu> m_currentUserLayoutsMenu;
 
     QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QPointer<QnEventLogDialog> m_businessEventsLogDialog;
-	QPointer<QnSearchBookmarksDialog> m_searchBookmarksDialog;
+    QPointer<QnSearchBookmarksDialog> m_searchBookmarksDialog;
     QPointer<QnAuditLogDialog> m_auditLogDialog;
     QPointer<QnCameraListDialog> m_cameraListDialog;
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
@@ -259,7 +261,7 @@ private:
 
     bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once
-     * the user logs in. */
+    * the user logs in. */
     QList<QnMimeData> m_delayedDrops;
     QList<QnMimeData> m_instantDrops;
 
@@ -273,19 +275,20 @@ private:
     struct CameraMovingInfo
     {
         CameraMovingInfo() {}
-        CameraMovingInfo(const QnVirtualCameraResourceList& cameras, const QnMediaServerResourcePtr& dstServer): cameras(cameras), dstServer(dstServer) {}
+        CameraMovingInfo(const QnVirtualCameraResourceList& cameras, const QnMediaServerResourcePtr& dstServer) : cameras(cameras), dstServer(dstServer) {}
         QnVirtualCameraResourceList cameras;
         QnMediaServerResourcePtr dstServer;
     };
     QMap<int, CameraMovingInfo> m_awaitingMoveCameras;
 
-    struct LogRequest
+    struct ServerRequest
     {
         QnMediaServerResourcePtr server;
-        std::unique_ptr<QnAsyncHttpClientReply> replay;
+        QString path;
+        std::unique_ptr<QnAsyncHttpClientReply> reply;
     };
 
-    std::map<QUrl, LogRequest> m_logRequests;
+    std::map<QUrl, ServerRequest> m_serverRequests;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

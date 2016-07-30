@@ -282,7 +282,9 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
     if (user->flags().testFlag(Qn::local))
         return filterDependentPermissions(user->getRawPermissions());
 
-    NX_ASSERT(user->resourcePool(), Q_FUNC_INFO, "Requesting permissions for non-pool user");
+    /* User is already removed. Problems with 'on_resource_removed' connection order. */
+    if (!user->resourcePool())
+        return Qn::NoGlobalPermissions;
 
     QnUuid userId = user->getId();
 

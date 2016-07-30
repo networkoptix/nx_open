@@ -20,7 +20,7 @@
 #include <platform/process/current_process.h>
 #include <plugins/videodecoder/stree/stree_manager.h>
 #include <utils/common/app_info.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/common/guard.h>
 #include <utils/common/public_ip_discovery.h>
 #include <utils/common/systemerror.h>

@@ -49,7 +49,7 @@ TEST_F(VmsGatewayConnectTest, DISABLED_IpSpecified)
     const auto socket = connectProxySocket();
     ASSERT_TRUE(socket->waitForConnected());
 
-    QByteArray writeData(utils::generateRandomData(
+    QByteArray writeData(utils::random::generate(
         network::test::TestConnection::kReadBufferSize));
     ASSERT_EQ(socket->write(writeData), writeData.size());
 

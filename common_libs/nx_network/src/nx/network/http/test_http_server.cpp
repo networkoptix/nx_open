@@ -16,7 +16,7 @@ TestHttpServer::TestHttpServer()
         new nx_http::HttpStreamSocketServer(
             nullptr,
             &m_httpMessageDispatcher,
-            false,
+            true,
             SocketFactory::NatTraversalType::nttDisabled ) );
 }
 

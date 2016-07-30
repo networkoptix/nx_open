@@ -1,18 +1,16 @@
 #include "ec2_statictics_reporter.h"
 
-#include "ec2_connection.h"
+#include <QtCore/QCollator>
 
 #include <api/global_settings.h>
-
-#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
-
 #include <nx/utils/random.h>
 #include <utils/common/synctime.h>
 
-#include <QCollator>
+#include "ec2_connection.h"
 
 static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */
 static const bool DEFAULT_SERVER_AUTH = true;
@@ -24,6 +22,7 @@ static const uint MAX_DELAY_RATIO = MIN_DELAY_RATIO + RND_DELAY_RATIO;
 static const uint SEND_AFTER_UPDATE_TIME = 3 * 60 * 60 * 1000; // 3h
 static const uint TIMER_CYCLE = 60 * 1000; /* msecs, update state every minute */
 static const uint TIMER_CYCLE_MAX = 24 * 60 * 60 * 1000; /* msecs, once a day at least */
+
 static const QString SERVER_API_COMMAND = lit("statserver/api/report");
 
 namespace ec2
@@ -208,7 +207,7 @@ namespace ec2
                     qnGlobalSettings->statisticsReportTimeCycle(),
                     std::chrono::seconds(SEND_AFTER_UPDATE_TIME)).count() / 1000;
 
-                m_plannedReportTime = now.addSecs(nx::utils::randomInt(
+                m_plannedReportTime = now.addSecs(nx::utils::random::number(
                       timeCycle * MIN_DELAY_RATIO / 100,
                       timeCycle * MAX_DELAY_RATIO / 100));
 
@@ -230,7 +229,7 @@ namespace ec2
         {
             const QDateTime lastTime = qnGlobalSettings->statisticsReportLastTime();
             m_plannedReportTime = (lastTime.isValid() ? lastTime : now).addSecs(
-                nx::utils::randomInt<uint>(minDelay, maxDelay));
+                nx::utils::random::number<uint>(minDelay, maxDelay));
 
             NX_LOGX(lm("Last report was at %1, the next planned for %2")
                .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))

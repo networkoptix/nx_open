@@ -31,6 +31,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
 
+#include <ui/widgets/common/selectable_button.h>
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/widgets/properties/camera_settings_widget_p.h>
@@ -54,6 +55,7 @@
 namespace {
 
 const QSize kFisheyeThumbnailSize(0, 0); //unlimited size for better calibration
+const QSize kSensitivityButtonSize(34, 34);
 
 } // unnamed namespace
 
@@ -80,18 +82,17 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     ui->cameraScheduleWidget->initializeContext(this);
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
 
-    m_sensitivityButtons->addButton(ui->sensitivityButton0, 0);
-    m_sensitivityButtons->addButton(ui->sensitivityButton1, 1);
-    m_sensitivityButtons->addButton(ui->sensitivityButton2, 2);
-    m_sensitivityButtons->addButton(ui->sensitivityButton3, 3);
-    m_sensitivityButtons->addButton(ui->sensitivityButton4, 4);
-    m_sensitivityButtons->addButton(ui->sensitivityButton5, 5);
-    m_sensitivityButtons->addButton(ui->sensitivityButton6, 6);
-    m_sensitivityButtons->addButton(ui->sensitivityButton7, 7);
-    m_sensitivityButtons->addButton(ui->sensitivityButton8, 8);
-    m_sensitivityButtons->addButton(ui->sensitivityButton9, 9);
+    for (int i = 0; i < QnMotionRegion::kSensitivityLevelCount; ++i)
+    {
+        auto button = new QnSelectableButton(ui->motionSensitivityGroupBox);
+        button->setText(lit("%1").arg(i));
+        button->setFixedSize(kSensitivityButtonSize);
+        ui->motionSensitivityGroupBox->layout()->addWidget(button);
+        m_sensitivityButtons->addButton(button, i);
+    }
 
     m_sensitivityButtons->setExclusive(true);
+    m_sensitivityButtons->button(0)->setChecked(true);
 
     m_motionLayout = new QVBoxLayout(ui->motionWidget);
     m_motionLayout->setContentsMargins(0, 0, 0, 0);
@@ -184,7 +185,13 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
         this, &QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked);
 
     connect(ui->pingButton, &QPushButton::clicked, this,
-        [this] { menu()->trigger(QnActions::PingAction, QnActionParameters(m_camera)); });
+        [this]
+        {
+            /* We must always ping the same address that is displayed in the visible field. */
+            auto host = ui->ipAddressEdit->text();
+            menu()->trigger(QnActions::PingAction, QnActionParameters()
+                .withArgument(Qn::TextRole,host));
+        });
 
     connect(ui->licensingWidget, &QnLicensesProposeWidget::changed,
         this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
@@ -491,7 +498,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         ui->cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
 
         m_cameraSupportsMotion = false;
-        ui->motionSettingsGroupBox->setEnabled(false);
+        ui->motionSensitivityGroupBox->setEnabled(false);
         ui->motionControlsWidget->setVisible(false);
         ui->motionAvailableLabel->setVisible(true);
     }
@@ -797,7 +804,7 @@ void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
 void QnSingleCameraSettingsWidget::updateMotionCapabilities()
 {
     m_cameraSupportsMotion = m_camera ? m_camera->hasMotion() : false;
-    ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
+    ui->motionSensitivityGroupBox->setEnabled(m_cameraSupportsMotion);
     ui->motionControlsWidget->setVisible(m_cameraSupportsMotion);
     ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
 }
@@ -976,15 +983,9 @@ void QnSingleCameraSettingsWidget::updateMaxFPS()
 void QnSingleCameraSettingsWidget::updateIpAddressText()
 {
     if (m_camera)
-    {
-        QString urlString = m_camera->getUrl();
-        QUrl url = QUrl::fromUserInput(urlString);
-        ui->ipAddressEdit->setText(!url.isEmpty() && url.isValid() ? url.host() : urlString);
-    }
+        ui->ipAddressEdit->setText(QnResourceDisplayInfo(m_camera).host());
     else
-    {
         ui->ipAddressEdit->clear();
-    }
 }
 
 void QnSingleCameraSettingsWidget::updateWebPageText()
@@ -1065,8 +1066,6 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged()
             connectToMotionWidget();
 
             const auto& buttons = m_sensitivityButtons->buttons();
-            NX_ASSERT(buttons.size() == QnMotionRegion::kSensitivityLevelCount);
-
             for (int i = 0; i < buttons.size(); ++i)
             {
                 static_cast<QnSelectableButton*>(buttons[i])->setCustomPaintFunction(

@@ -140,7 +140,6 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent)
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_processingConnectAction(false),
-    m_connectingMessageBox(NULL),
     m_connectingHandle(0),
     m_readyForConnection(true)
 {
@@ -242,8 +241,6 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
 {
     action(QnActions::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
-
-    hideMessageBox();
 
     connect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged, this, [this](const QnPeerRuntimeInfo &info)
     {
@@ -429,9 +426,6 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
             return ec2::ErrorCode::ok;
     }
 
-    /* Hiding message box from previous connect. */
-    hideMessageBox();
-
     ec2::ApiClientInfoData clientData;
     {
         clientData.id = qnSettings->pcUuid();
@@ -457,15 +451,10 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     {
         m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
             appServerUrl, clientData, &result, &QnEc2ConnectionRequestResult::processEc2Reply);
-        if (!silent)
-            m_connectingMessageBox = QnGraphicsMessageBox::information(tr("Connecting..."), INT_MAX);
 
         //here we are going to inner event loop
         errCode = static_cast<ec2::ErrorCode>(result.exec());
         NX_LOG(lit("Connection error %1").arg((int)errCode), cl_logDEBUG2);
-
-        /* Hiding message box from current connect. */
-        hideMessageBox();
 
         /* Check if we have entered 'connect' method again while were in 'connecting...' state */
         if (m_connectingHandle != result.handle())
@@ -555,9 +544,6 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force)
         qnSettings->setLastUsedConnection(QnUserRecentConnectionData());
     }
 
-    if (context()->user())
-        hideMessageBox();
-
     //QnRouter::instance()->setEnforcedConnection(QnRoutePoint());
     QnClientMessageProcessor::instance()->init(NULL);
     QnAppServerConnectionFactory::setEc2Connection(NULL);
@@ -570,18 +556,6 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force)
 
     return true;
 }
-
-
-void QnWorkbenchConnectHandler::hideMessageBox()
-{
-    if (!m_connectingMessageBox)
-        return;
-
-    m_connectingMessageBox->disconnect(this);
-    m_connectingMessageBox->hideImmideately();
-    m_connectingMessageBox = NULL;
-}
-
 
 void QnWorkbenchConnectHandler::showLoginDialog()
 {
@@ -600,9 +574,7 @@ void QnWorkbenchConnectHandler::showWelcomeScreen()
         action(QnActions::ResourcesModeAction)->setChecked(false);
 
     m_connectingHandle = 0;
-    hideMessageBox();
 }
-
 
 void QnWorkbenchConnectHandler::clearConnection()
 {

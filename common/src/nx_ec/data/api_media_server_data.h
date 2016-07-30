@@ -147,6 +147,8 @@ namespace ec2
             storages = std::move( mediaServerData.storages );
             return *this;
         }
+
+        ApiMediaServerDataEx& operator=(const ApiMediaServerDataEx&) = default;
     };
 #define ApiMediaServerDataEx_Fields ApiMediaServerData_Fields ApiMediaServerUserAttributesData_Fields_Short (status)(addParams) (storages)
 

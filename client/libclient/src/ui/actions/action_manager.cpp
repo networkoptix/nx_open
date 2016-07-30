@@ -1564,7 +1564,7 @@ QnActionManager::QnActionManager(QObject *parent):
                       this));
 
     factory(QnActions::PingAction).
-        flags(Qn::SingleTarget | Qn::ResourceTarget).
+        flags(Qn::NoTarget).
         text(tr("Ping..."));
 
     factory(QnActions::ServerLogsAction).

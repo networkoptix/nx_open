@@ -201,7 +201,7 @@ TEST_F(HolePunchingProcessor, server_failure)
             api::ResultCode resultCode = api::ResultCode::ok;
             api::ConnectionResultRequest connectionResult;
             connectionResult.connectSessionId = connectRequest.connectSessionId;
-            connectionResult.resultCode = api::UdpHolePunchingResultCode::udtConnectFailed;
+            connectionResult.resultCode = api::NatTraversalResultCode::udtConnectFailed;
             std::tie(resultCode) =
                 makeSyncCall<api::ResultCode>(
                     std::bind(

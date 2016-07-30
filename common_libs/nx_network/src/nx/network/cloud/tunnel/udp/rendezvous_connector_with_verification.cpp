@@ -7,7 +7,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/type_utils.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h"
 #include "nx/network/cloud/data/tunnel_connection_chosen_data.h"

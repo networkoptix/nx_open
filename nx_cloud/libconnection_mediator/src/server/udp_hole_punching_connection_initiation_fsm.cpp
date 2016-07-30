@@ -133,7 +133,7 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
             if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
                 request.udpEndpointList.push_front(connection->getSourceAddress());
 
-            if (request.udpEndpointList.empty())
+            if (request.udpEndpointList.empty() && request.forwardedTcpEndpointList.empty())
             {
                 completionHandler(api::ResultCode::noSuitableConnectionMethod);
                 m_timer.post(std::bind(
@@ -148,6 +148,8 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
             api::ConnectResponse connectResponse;
             connectResponse.params = m_settings.connectionParameters();
             connectResponse.udpEndpointList = std::move(request.udpEndpointList);
+            connectResponse.forwardedTcpEndpointList =
+                std::move(request.forwardedTcpEndpointList);
             connectResponse.cloudConnectVersion = request.cloudConnectVersion;
 
             m_state = State::waitingConnectionResult;

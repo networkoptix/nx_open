@@ -932,7 +932,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /* PTZ here is intended - for SpaceX, see VMS-2208 */
         GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalUserInputPermission |
-                                              GlobalControlVideoWallPermission | INTERNAL_GlobalVideoWallLayoutPermission,
+                                              GlobalControlVideoWallPermission | INTERNAL_GlobalVideoWallLayoutPermission | GlobalViewBookmarksPermission,
 
         /* Actions in ActiveX plugin mode are limited. */
         GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalUserInputPermission,

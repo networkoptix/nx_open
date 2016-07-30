@@ -73,7 +73,7 @@ public:
         std::unique_ptr<UdtStreamSocket> udtConnection);
     ~OutgoingTunnelConnection();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    virtual void stopWhileInAioThread() override;
 
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,
@@ -101,7 +101,6 @@ private:
     const SocketAddress m_remoteHostAddress;
     nx::utils::AtomicUniquePtr<ConnectionType> m_controlConnection;
     const Timeouts m_timeouts;
-    aio::Timer m_aioTimer;
     std::map<UdtStreamSocket*, ConnectionContext> m_ongoingConnections;
     QnMutex m_mutex;
     bool m_pleaseStopHasBeenCalled;

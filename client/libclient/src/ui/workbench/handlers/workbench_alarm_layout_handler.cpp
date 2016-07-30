@@ -29,6 +29,7 @@
 #include <ui/style/skin.h>
 
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
@@ -65,55 +66,64 @@ namespace {
     const qint64 kProcessingActionTimeoutMs = 5000;
 }
 
-QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
-    : base_type(parent)
-    , QnWorkbenchContextAware(parent)
+QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
+    base_type(parent),
+    QnWorkbenchContextAware(parent)
 {
-    connect( action(QnActions::OpenInAlarmLayoutAction), &QAction::triggered, this,   [this] {
-        QnActionParameters parameters = menu()->currentParameters(sender());
-        openCamerasInAlarmLayout(parameters.resources().filtered<QnVirtualCameraResource>(), true);
-    } );
+    connect(action(QnActions::OpenInAlarmLayoutAction), &QAction::triggered, this,
+        [this]
+        {
+            QnActionParameters parameters = menu()->currentParameters(sender());
+            auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
+            cameras = accessController()->filtered(cameras, Qn::ViewContentPermission);
+            openCamerasInAlarmLayout(cameras, true);
+        });
 
     const auto messageProcessor = QnClientMessageProcessor::instance();
 
-    connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this, [this](const QnAbstractBusinessActionPtr &businessAction) {
-        if (businessAction->actionType() != QnBusiness::ShowOnAlarmLayoutAction)
-            return;
-
-        if (!context()->user())
-            return;
-
-        const auto params = businessAction->getParams();
-
-        QnUserResourceList users = qnResPool->getResources<QnUserResource>(params.additionalResources);
-        if (!users.isEmpty() && !users.contains(context()->user()))
-            return;
-
-        QnVirtualCameraResourceList targetCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
-        if (businessAction->getParams().useSource)
-            targetCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
-
-        if (targetCameras.isEmpty())
-            return;
-
-        ActionKey key(businessAction->getBusinessRuleId(), businessAction->getRuntimeParams().eventTimestampUsec);
-        if (m_processingActions.contains(key))
-            return; /* See m_processingActions comment. */
-
-        m_processingActions.append(key);
-        executeDelayedParented([this, key] {
-            m_processingActions.removeOne(key);
-        }, kProcessingActionTimeoutMs, this);
-
-        /* If forced, open layout instantly */
-        if (params.forced)
+    connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
+        [this](const QnAbstractBusinessActionPtr &businessAction)
         {
-            if (currentInstanceIsMain())
-                openCamerasInAlarmLayout(targetCameras, true);
-        }
-        else if (alarmLayoutExists())
-            openCamerasInAlarmLayout(targetCameras, false);
-    });
+            if (businessAction->actionType() != QnBusiness::ShowOnAlarmLayoutAction)
+                return;
+
+            if (!context()->user())
+                return;
+
+            const auto params = businessAction->getParams();
+
+            /* Skip action if it contains list of users, and we are not on the list. */
+            auto ids = businessAction->getParams().additionalResources;
+            if (!ids.empty()
+                && std::find(ids.cbegin(), ids.cend(), context()->user()->getId()) == ids.cend())
+                return;
+
+            auto targetCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
+            if (businessAction->getParams().useSource)
+                targetCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
+            targetCameras = accessController()->filtered(targetCameras, Qn::ViewContentPermission);
+
+            if (targetCameras.isEmpty())
+                return;
+
+            ActionKey key(businessAction->getBusinessRuleId(), businessAction->getRuntimeParams().eventTimestampUsec);
+            if (m_processingActions.contains(key))
+                return; /* See m_processingActions comment. */
+
+            m_processingActions.append(key);
+            executeDelayedParented([this, key] {
+                m_processingActions.removeOne(key);
+            }, kProcessingActionTimeoutMs, this);
+
+            /* If forced, open layout instantly */
+            if (params.forced)
+            {
+                if (currentInstanceIsMain())
+                    openCamerasInAlarmLayout(targetCameras, true);
+            }
+            else if (alarmLayoutExists())
+                openCamerasInAlarmLayout(targetCameras, false);
+        });
 
 }
 

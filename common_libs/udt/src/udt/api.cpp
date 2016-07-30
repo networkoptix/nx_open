@@ -206,7 +206,7 @@ int CUDTUnited::startup()
    m_bClosing = false;
    #ifndef _WIN32
       pthread_mutex_init(&m_GCStopLock, NULL);
-      pthread_cond_init(&m_GCStopCond, NULL);
+      pthread_cond_init_monotonic(&m_GCStopCond);
       pthread_create(&m_GCThread, NULL, garbageCollect, this);
    #else
       m_GCStopLock = CreateMutex(NULL, false, NULL);
@@ -1454,13 +1454,7 @@ void CUDTUnited::updateMux(CUDTSocket* s, const CUDTSocket* ls)
       #endif
 
       #ifndef _WIN32
-         timeval now;
-         timespec timeout;
-         gettimeofday(&now, 0);
-         timeout.tv_sec = now.tv_sec + 1;
-         timeout.tv_nsec = now.tv_usec * 1000;
-
-         pthread_cond_timedwait(&self->m_GCStopCond, &self->m_GCStopLock, &timeout);
+         pthread_cond_wait_monotonic(&self->m_GCStopCond, &self->m_GCStopLock, 1000 * 1000); // 1s
       #else
          WaitForSingleObject(self->m_GCStopCond, 1000);
       #endif

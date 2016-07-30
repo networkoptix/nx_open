@@ -25,6 +25,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
+#include <nx/utils/random.h>
 
 namespace {
     const int kUpdatePeriodMSec = 60 * 60 * 1000; /* 1 hour. */
@@ -117,7 +118,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         QDateTime releaseDate = QDateTime::fromMSecsSinceEpoch(info.releaseDateMs);
 
         /* We do not need high precision, selecting time to deliver. */
-        int timeToDeliverMinutes = random(0, info.releaseDeliveryDays * kHoursPerDay * kMinutesPerHour);
+        int timeToDeliverMinutes = nx::utils::random::number(0, info.releaseDeliveryDays * kHoursPerDay * kMinutesPerHour);
         qint64 timeToDeliverMs = timeToDeliverMinutes * kSecsPerMinute;
         qnSettings->setUpdateDeliveryDate(releaseDate.addSecs(timeToDeliverMs).toMSecsSinceEpoch());
     }

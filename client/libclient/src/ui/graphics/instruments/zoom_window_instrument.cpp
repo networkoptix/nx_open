@@ -7,6 +7,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/hash.h>
 #include <utils/common/util.h>
+#include <nx/utils/random.h>
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
@@ -361,7 +362,7 @@ QColor ZoomWindowInstrument::nextZoomWindowColor() const {
     if(m_colors.isEmpty()) {
         return Qt::white;
     } else {
-        return m_colors[random(0, m_colors.size())];
+        return m_colors[nx::utils::random::number(0, m_colors.size() - 1)];
     }
 }
 

@@ -66,7 +66,7 @@ int QnIfListRestHandler::executeGet(const QString &path, const QnRequestParams &
 
     QnNetworkAddressEntryList entryList;
 
-    const bool allInterfaces = (QnAppInfo::armBox() == "bpi");
+    const bool allInterfaces = (QnAppInfo::isBpi());
     for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces(allInterfaces)) 
     {
         static const QChar kColon = ':';

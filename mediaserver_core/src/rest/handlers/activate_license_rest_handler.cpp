@@ -32,8 +32,6 @@ namespace
     const QString kBox = lit("box");
     const QString kBrand = lit("brand");
     const QString kVersion = lit("version");
-    const QString kNx1 = lit("nx1");
-    const QString kBpi = lit("bpi");
     const QString kMac = lit("mac");
     const QString kSerial = lit("serial");
     const QString kLang = lit("lang");
@@ -59,7 +57,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     params.addQueryItem(kVersion, QnAppInfo::engineVersion()); //TODO: #GDM replace with qnCommon->engineVersion()? And what if --override-version?
 
 #ifdef Q_OS_LINUX
-    if( QnAppInfo::armBox() == kNx1 || QnAppInfo::armBox() == kBpi)
+    if(QnAppInfo::isBpi() || QnAppInfo::isNx1())
     {
         QString mac = Nx1::getMac();
         QString serial = Nx1::getSerial();

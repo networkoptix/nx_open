@@ -58,7 +58,7 @@ ConnectResponse::ConnectResponse()
 void ConnectResponse::serializeAttributes(nx::stun::Message* const message)
 {
     message->newAttribute< stun::cc::attrs::PublicEndpointList >(
-        std::move(publicTcpEndpointList));
+        std::move(forwardedTcpEndpointList));
     message->newAttribute< stun::cc::attrs::UdtHpEndpointList >(
         std::move(udpEndpointList));
     params.serializeAttributes(message);
@@ -72,7 +72,7 @@ bool ConnectResponse::parseAttributes(const nx::stun::Message& message)
 
     return 
         readAttributeValue<stun::cc::attrs::PublicEndpointList>(
-            message, &publicTcpEndpointList) &&
+            message, &forwardedTcpEndpointList) &&
         readAttributeValue<stun::cc::attrs::UdtHpEndpointList>(
             message, &udpEndpointList) &&
         params.parseAttributes(message);

@@ -1,38 +1,78 @@
-/**********************************************************
-* Apr 27, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
-#include <cstdint>
-#include <cstdlib>
-
+#include <random>
+#include <limits>
+#include <type_traits>
 #include <QByteArray>
-
 
 namespace nx {
 namespace utils {
+namespace random {
 
-/** std::rand() implementation which ensures timed seed injection */
-NX_UTILS_API int rand();
+/**
+ * Thread local random device
+ */
+NX_UTILS_API std::random_device& device();
 
-template<typename T = int>
-T randomInt() { return static_cast<T>(rand()); }
+/**
+ * Generates uniform_int_distribution random data the length of count.
+ */
+NX_UTILS_API QByteArray generate(std::size_t count, bool* isOk = nullptr);
 
-template<typename T>
-T randomInt(T min, T max) { return min + randomInt<T>() % (max - min); }
+/**
+ * Generates uniform_int_distribution random integer in [min, max]
+ */
+template<typename Type>
+Type number(
+    Type min = std::numeric_limits<Type>::min(),
+    Type max = std::numeric_limits<Type>::max(),
+    bool* isOk = nullptr,
+    typename std::enable_if<std::is_integral<Type>::value>::type* = 0)
+{
+    try
+    {
+        if (isOk)
+            *isOk = true;
 
-/** Uses uniform_int_distribution.
-    @return \a false if could not generate random data.
+        std::uniform_int_distribution<Type> distribution(min, max);
+        return distribution(device());
+    }
+    catch(const std::exception&)
+    {
+        if (isOk)
+            *isOk = false;
 
-    \note Can return \a false since it may use /dev/urandom on linux 
-        and access to device may result in error
-*/
-NX_UTILS_API bool generateRandomData(std::int8_t* data, std::size_t count);
+        return (min + max) / 2; // TODO: is it ok?
+    }
+}
 
-/** Just calls upper function */
-NX_UTILS_API QByteArray generateRandomData(std::size_t count, bool* ok = nullptr);
+/**
+ * Generates uniform_real_distribution random real in [min, max)
+ */
+template<typename Type>
+Type number(
+    Type min = std::numeric_limits<Type>::min(),
+    Type max = std::numeric_limits<Type>::max(),
+    bool* isOk = nullptr,
+    typename std::enable_if<std::is_floating_point<Type>::value>::type* = 0)
+{
+    try
+    {
+        if (isOk)
+            *isOk = true;
 
-}   // namespace nx
-}   // namespace utils
+        std::uniform_real_distribution<Type> distribution(min, max);
+        return distribution(device());
+    }
+    catch(const std::exception&)
+    {
+        if (isOk)
+            *isOk = false;
+
+        return (min + max) / 2;
+    }
+}
+
+} // namespace random
+} // namespace utils
+} // namespace nx

@@ -38,6 +38,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <health/system_health_helper.h>
@@ -281,6 +282,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     if (!camera || !camera->hasVideo(nullptr))
         return;
 
+    NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
     QnSingleThumbnailLoader* loader = new QnSingleThumbnailLoader(
         camera,
         msecSinceEpoch,
@@ -304,6 +306,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     QnMultiImageProvider::Providers providers;
     for (const auto& camera: cameraList)
     {
+        NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
         std::unique_ptr<QnImageProvider> provider(new QnSingleThumbnailLoader(
             camera,
             msecSinceEpoch,
@@ -329,26 +332,27 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QString title = QnBusinessStringsHelper::eventAtResource(params, qnSettings->extraInfoInTree());
     qint64 timestampMs = params.eventTimestampUsec / 1000;
 
-    QnVirtualCameraResourceList alarmCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
+    auto alarmCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
     if (businessAction->getParams().useSource)
         alarmCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
+    alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
 
     QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
 
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera && QnBusiness::isSourceCameraRequired(eventType))
+    if (QnBusiness::isSourceCameraRequired(eventType))
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Event has occurred without its camera");
-        NX_LOG(lit("Event %1 has occurred without its camera").arg(eventType), cl_logWARNING);
-        return;
+        NX_ASSERT(camera, Q_FUNC_INFO, "Event has occurred without its camera");
+        if (!camera || !accessController()->hasPermissions(camera, Qn::ViewContentPermission))
+            return;
     }
 
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server && QnBusiness::isSourceServerRequired(eventType))
+    if (QnBusiness::isSourceServerRequired(eventType))
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Event has occurred without its server");
-        NX_LOG(lit("Event %1 has occurred without its server").arg(eventType), cl_logWARNING);
-        return;
+        NX_ASSERT(server, Q_FUNC_INFO, "Event has occurred without its server");
+        if (!server || !accessController()->hasPermissions(server, Qn::ReadPermission))
+            return;
     }
 
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
@@ -492,7 +496,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
             case QnBusiness::UserDefinedEvent:
             {
-                QnVirtualCameraResourceList sourceCameras = qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
+                auto sourceCameras = qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
+                sourceCameras = accessController()->filtered(sourceCameras, Qn::ViewContentPermission);
                 if (!sourceCameras.isEmpty())
                 {
                     item->addActionButton(

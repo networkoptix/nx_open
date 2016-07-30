@@ -56,6 +56,11 @@ void BasicPollable::dispatch(nx::utils::MoveOnlyFunc<void()> func)
     m_timer.dispatch(std::move(func));
 }
 
+Timer* BasicPollable::timer()
+{
+    return &m_timer;
+}
+
 }   //namespace aio
 }   //namespace network
 }   //namespace nx

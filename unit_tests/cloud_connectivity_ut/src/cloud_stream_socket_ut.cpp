@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/cloud_stream_socket.h>

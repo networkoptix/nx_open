@@ -123,7 +123,7 @@ QDataStream& operator>>(QDataStream& stream, PeerMessage& data)
 QByteArray makeRandomNonce()
 {
     bool isOk;
-    auto data = nx::utils::generateRandomData(NONCE_SIZE, &isOk);
+    auto data = nx::utils::random::generate(NONCE_SIZE, &isOk);
     return isOk ? data : QByteArray();
 }
 

@@ -253,6 +253,17 @@ void QnTransactionTcpProcessor::run()
 
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
 
+        auto userAccessId = d->authUserId;
+        if (QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->authUserId))
+        {
+            // Here we substitute admin user with SuperAccess user to pass by all access checks unhurt
+            // since server-to-server order of transactions is unpredictable and access check for resource attribute
+            // may come before resource itself is added to the resource pool and this may be restricted by the access
+            // checking mechanics.
+            if (user->isOwner())
+                userAccessId = Qn::kDefaultUserAccess.userId;
+        }
+
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             connectionGuid,
             std::move(d->socket),
@@ -262,7 +273,7 @@ void QnTransactionTcpProcessor::run()
             d->request,
             contentEncoding,
             ttFinishCallback,
-            Qn::UserAccessData(d->authUserId));
+            Qn::UserAccessData(userAccessId));
 
         if (!QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid ))
             QnTransactionTransport::connectDone(remoteGuid); //< session killed. Cleanup Guid from a connected list manually

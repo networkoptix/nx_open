@@ -35,41 +35,41 @@
 //#define QN_IMAGE_BUTTON_WIDGET_DEBUG
 
 namespace {
-bool checkPixmapGroupRole(QnImageButtonWidget::StateFlags *flags)
-{
-    bool result = true;
-
-    if (*flags < 0 || *flags > QnImageButtonWidget::MaxState)
+    bool checkPixmapGroupRole(QnImageButtonWidget::StateFlags *flags)
     {
-        qnWarning("Invalid pixmap flags '%1'.", static_cast<int>(*flags));
-        *flags = 0;
-        result = false;
+        bool result = true;
+
+        if (*flags < 0 || *flags > QnImageButtonWidget::MaxState)
+        {
+            qnWarning("Invalid pixmap flags '%1'.", static_cast<int>(*flags));
+            *flags = 0;
+            result = false;
+        }
+
+        return result;
     }
 
-    return result;
-}
-
-GLuint checkedBindTexture(QGLWidget *widget, const QPixmap &pixmap, GLenum target, GLint format, QGLContext::BindOptions options)
-{
-    GLint result = widget->bindTexture(pixmap, target, format, options);
+    GLuint checkedBindTexture(QGLWidget *widget, const QPixmap &pixmap, GLenum target, GLint format, QGLContext::BindOptions options)
+    {
+        GLint result = widget->bindTexture(pixmap, target, format, options);
 #ifdef QN_IMAGE_BUTTON_WIDGET_DEBUG
-    if (!glIsTexture(result))
-        qnWarning("OpenGL texture %1 was unexpectedly released, rendering glitches may ensue.", result);
+        if (!glIsTexture(result))
+            qnWarning("OpenGL texture %1 was unexpectedly released, rendering glitches may ensue.", result);
 #endif
-    return result;
-}
+        return result;
+    }
 
-QPixmap bestPixmap(const QIcon &icon, QIcon::Mode mode, QIcon::State state)
-{
-    return icon.pixmap(QSize(1024, 1024), mode, state);
-}
+    QPixmap bestPixmap(const QIcon &icon, QIcon::Mode mode, QIcon::State state)
+    {
+        return icon.pixmap(QSize(1024, 1024), mode, state);
+    }
 
-const int VERTEX_POS_INDX = 0;
-const int VERTEX_TEXCOORD0_INDX = 1;
+    const int VERTEX_POS_INDX = 0;
+    const int VERTEX_TEXCOORD0_INDX = 1;
 
 } // anonymous namespace
 
-class QnImageButtonHoverProgressAccessor: public AbstractAccessor
+class QnImageButtonHoverProgressAccessor : public AbstractAccessor
 {
     virtual QVariant get(const QObject *object) const override
     {
@@ -87,7 +87,7 @@ class QnImageButtonHoverProgressAccessor: public AbstractAccessor
     }
 };
 
-QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),
     m_pixmapCacheValid(false),
     m_state(0),
@@ -100,6 +100,7 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags 
     m_actionIconOverridden(false),
     m_initialized(false)
 {
+    setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::LeftButton);
     setClickableButtons(Qt::LeftButton);
     setAcceptHoverEvents(true);
@@ -390,7 +391,7 @@ void QnImageButtonWidget::releasedNotify(QGraphicsSceneMouseEvent *event)
     setPressed(false);
 
     /* Next hover events that we will receive are enter and move converted from
-     * release event, skip them. */
+    * release event, skip them. */
     m_skipNextHoverEvents = 2;
     m_nextHoverEventPos = event->screenPos();
 
@@ -478,11 +479,11 @@ void QnImageButtonWidget::changeEvent(QEvent *event)
 {
     switch (event->type())
     {
-        case QEvent::StyleChange:
-            setFocusPolicy(Qt::FocusPolicy(style()->styleHint(QStyle::SH_Button_FocusPolicy)));
-            break;
-        default:
-            break;
+    case QEvent::StyleChange:
+        setFocusPolicy(Qt::FocusPolicy(style()->styleHint(QStyle::SH_Button_FocusPolicy)));
+        break;
+    default:
+        break;
     }
 
     base_type::changeEvent(event);
@@ -501,28 +502,34 @@ bool QnImageButtonWidget::event(QEvent *event)
     switch (event->type())
     {
         /* We process hover events here because they don't get forwarded to event
-         * handlers for graphics widgets without decorations. */
-        case QEvent::GraphicsSceneHoverEnter:
-            hoverEnterEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
-            return event->isAccepted();
-        case QEvent::GraphicsSceneHoverMove:
-            hoverMoveEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
-            return event->isAccepted();
-        case QEvent::GraphicsSceneHoverLeave:
-            hoverLeaveEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
-            return event->isAccepted();
-        case QEvent::ActionChanged:
-            if (actionEvent->action() == m_action)
-                updateFromDefaultAction();
-            break;
-        case QEvent::ActionAdded:
-            break;
-        case QEvent::ActionRemoved:
-            if (actionEvent->action() == m_action)
-                m_action = NULL;
-            break;
-        default:
-            break;
+        * handlers for graphics widgets without decorations. */
+    case QEvent::GraphicsSceneHoverEnter:
+        if (!acceptHoverEvents())
+            return true;
+        hoverEnterEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
+        return event->isAccepted();
+    case QEvent::GraphicsSceneHoverMove:
+        if (!acceptHoverEvents())
+            return true;
+        hoverMoveEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
+        return event->isAccepted();
+    case QEvent::GraphicsSceneHoverLeave:
+        if (!acceptHoverEvents())
+            return true;
+        hoverLeaveEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
+        return event->isAccepted();
+    case QEvent::ActionChanged:
+        if (actionEvent->action() == m_action)
+            updateFromDefaultAction();
+        break;
+    case QEvent::ActionAdded:
+        break;
+    case QEvent::ActionRemoved:
+        if (actionEvent->action() == m_action)
+            m_action = NULL;
+        break;
+    default:
+        break;
     }
 
     return base_type::event(event);
@@ -532,11 +539,11 @@ QVariant QnImageButtonWidget::itemChange(GraphicsItemChange change, const QVaria
 {
     switch (change)
     {
-        case ItemEnabledHasChanged:
-            updateState(isDisabled() ? (m_state | Disabled) : (m_state & ~Disabled));
-            break;
-        default:
-            break;
+    case ItemEnabledHasChanged:
+        updateState(isDisabled() ? (m_state | Disabled) : (m_state & ~Disabled));
+        break;
+    default:
+        break;
     }
 
     return base_type::itemChange(change, value);
@@ -560,8 +567,8 @@ void QnImageButtonWidget::updateState(StateFlags state)
 
     if ((oldState ^ m_state) & Disabled)
     { /* Disabled has changed, perform back-sync. */
-/* Disabled state change may have been propagated from parent item,
- * and in this case we shouldn't do any back-sync. */
+      /* Disabled state change may have been propagated from parent item,
+      * and in this case we shouldn't do any back-sync. */
         bool newDisabled = m_state & Disabled;
         if (newDisabled != isDisabled())
             setDisabled(newDisabled);
@@ -746,7 +753,7 @@ void QnImageButtonWidget::initializeVao(const QRectF &rect)
     const int VERTEX_POS_SIZE = 2; // x, y
     const int VERTEX_TEXCOORD0_SIZE = 2; // s and t
 
-    /* Init static VAO */
+                                         /* Init static VAO */
     {
         auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getTextureShader();
         m_verticesStatic.create();
@@ -841,7 +848,7 @@ void QnImageButtonWidget::updateVao(const QRectF &rect)
 // -------------------------------------------------------------------------- //
 // QnRotatingImageButtonWidget
 // -------------------------------------------------------------------------- //
-QnRotatingImageButtonWidget::QnRotatingImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+QnRotatingImageButtonWidget::QnRotatingImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),
     m_rotationSpeed(360.0),
     m_rotation(0.0)
@@ -874,4 +881,3 @@ void QnRotatingImageButtonWidget::tick(int deltaMSecs)
     if (state() & Checked)
         m_rotation += m_rotationSpeed * deltaMSecs / 1000.0;
 }
-

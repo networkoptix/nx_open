@@ -16,20 +16,21 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-enum class UdpHolePunchingResultCode
+enum class NatTraversalResultCode
 {
     ok,
     noResponseFromMediator,
     mediatorReportedError,
     targetPeerHasNoUdpAddress,
     noSynFromTargetPeer,
-    udtConnectFailed
+    udtConnectFailed,
+    tcpConnectFailed
 };
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(UdpHolePunchingResultCode)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(NatTraversalResultCode)
 //QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((FusionRequestErrorDetail), (lexical))
 //not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
-void NX_NETWORK_API serialize(const UdpHolePunchingResultCode&, QString*);
+void NX_NETWORK_API serialize(const NatTraversalResultCode&, QString*);
 
 class NX_NETWORK_API ConnectionResultRequest
 :
@@ -40,7 +41,7 @@ public:
         stun::cc::methods::connectionResult;
 
     nx::String connectSessionId;
-    UdpHolePunchingResultCode resultCode;
+    NatTraversalResultCode resultCode;
     SystemError::ErrorCode sysErrorCode;
 
     ConnectionResultRequest();

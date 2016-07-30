@@ -43,30 +43,23 @@ public:
     */
     TunnelConnector(
         AddressEntry targetHostAddress,
-        boost::optional<SocketAddress> mediatorAddress = boost::none);
+        nx::String connectSessionId,
+        std::unique_ptr<nx::network::UDPSocket> udpSocket);
     virtual ~TunnelConnector();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-
-    virtual aio::AbstractAioThread* getAioThread() const override;
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
-    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
+    virtual void stopWhileInAioThread() override;
 
     virtual int getPriority() const override;
     /** Only one connect can be running at a time.
         @param timeout 0 - no timeout
     */
     virtual void connect(
+        const hpm::api::ConnectResponse& response,
         std::chrono::milliseconds timeout,
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode errorCode,
-            std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler) override;
+        ConnectCompletionHandler handler) override;
     virtual const AddressEntry& targetPeerAddress() const override;
 
     SocketAddress localAddress() const;
-    /** \a hostAddress will be used by mediator instead of request source address */
-    void replaceOriginatingHostAddress(const QString& hostAddress);
 
 protected:
     virtual void messageReceived(
@@ -77,35 +70,23 @@ protected:
 private:
     const AddressEntry m_targetHostAddress;
     const nx::String m_connectSessionId;
-    std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode errorCode,
-        std::unique_ptr<AbstractOutgoingTunnelConnection>)> m_completionHandler;
+    std::unique_ptr<nx::network::UDPSocket> m_udpSocket;
+    ConnectCompletionHandler m_completionHandler;
     std::unique_ptr<UdtStreamSocket> m_udtConnection;
-    nx::hpm::api::ConnectionResultRequest m_connectResultReport;
     nx::network::aio::Timer m_timer;
-    bool m_done;
-    boost::optional<std::chrono::milliseconds> m_connectTimeout;
     std::deque<std::unique_ptr<RendezvousConnectorWithVerification>> m_rendezvousConnectors;
-    std::unique_ptr<stun::UnreliableMessagePipeline> m_connectResultReportSender;
     SocketAddress m_localAddress;
-    boost::optional<QString> m_originatingHostAddressReplacement;
     std::unique_ptr<RendezvousConnectorWithVerification> m_chosenRendezvousConnector;
     hpm::api::CloudConnectVersion m_remotePeerCloudConnectVersion;
 
-    void onConnectResponse(
-        nx::hpm::api::ResultCode resultCode,
-        nx::hpm::api::ConnectResponse response);
     void onUdtConnectionEstablished(
         RendezvousConnectorWithVerification* rendezvousConnectorPtr,
         SystemError::ErrorCode errorCode);
     void onHandshakeComplete(SystemError::ErrorCode errorCode);
-    void onTimeout();
     /** always called within aio thread */
     void holePunchingDone(
-        nx::hpm::api::UdpHolePunchingResultCode resultCode,
+        nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode sysErrorCode);
-    void connectSessionReportSent(SystemError::ErrorCode errorCode);
 };
 
 } // namespace udp
