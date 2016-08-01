@@ -15,7 +15,7 @@ public:
      * Name of the event in common, e.g. 'Motion on Camera'
      * Used primarily in lists where all event types are enumerated.
      */
-    static QString eventName(QnBusiness::EventType value);
+    static QString eventName(QnBusiness::EventType value, int count = 1);
 
     /** Event <event> occurred on the <resource> */
     static QString eventAtResource(const QnBusinessEventParameters &params, Qn::ResourceInfoLevel detailLevel);
@@ -66,7 +66,7 @@ public:
 
     static QString eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount);
 
-  
+
 	static QString getResoureNameFromParams(const QnBusinessEventParameters& params, Qn::ResourceInfoLevel detailLevel);
 	static QString getResoureIPFromParams(const QnBusinessEventParameters& params);
 };
