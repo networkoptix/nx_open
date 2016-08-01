@@ -177,3 +177,11 @@ td.number{
     padding-right:5px;
     width:0;
 }
+
+.source-name{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: inline-block;
+    white-space: nowrap;
+    max-width: 130px;
+}

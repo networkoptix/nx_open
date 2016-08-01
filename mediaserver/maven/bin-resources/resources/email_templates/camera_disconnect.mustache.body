@@ -9,7 +9,7 @@
 			</td>
             {{/sourceIcon}}
             <td >
-                <b>{{source}}</b> ({{sourceIp}})
+                <b class="source-name">{{source}}</b> ({{sourceIp}})
             </td>
             <td>
                 {{#aggregated}}
