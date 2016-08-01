@@ -231,7 +231,8 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
 
     const auto videowallInstanceGuidOption = QCommandLineOption(
         lit("videowall-instance-guid"),
-        lit("GUID which is used to check Videowall Control messages."));
+        lit("GUID which is used to check Videowall Control messages."),
+        lit("videowallInstanceGuid"));
     parser.addOption(videowallInstanceGuidOption);
 
     auto testOption = QCommandLineOption(
