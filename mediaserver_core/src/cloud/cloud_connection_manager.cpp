@@ -147,11 +147,12 @@ void CloudConnectionManager::stopMonitoringCloudEvents()
         return;
 
     m_eventConnectionRetryTimer->pleaseStopSync();
-    m_eventConnectionRetryTimer.reset();
 
     //closing event connection
     NX_ASSERT(m_eventConnection);
     m_eventConnection.reset();
+
+    m_eventConnectionRetryTimer.reset();
 }
 
 void CloudConnectionManager::onSystemAccessListUpdated(
