@@ -18,6 +18,7 @@
 #include <nx_ec/data/api_webpage_data.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/raii_guard.h>
 
 //#define DEBUG_PERMISSIONS
 #ifdef DEBUG_PERMISSIONS
@@ -26,17 +27,13 @@
 #define TRACE(...)
 #endif
 
-QnResourceAccessManager::UpdateCacheGuard::UpdateCacheGuard(QnResourceAccessManager* parent) :
-    m_parent(parent)
+class QnResourceAccessManager::UpdateCacheGuard : QnRaiiGuard
 {
-    parent->beginUpdateCache();
-}
-
-QnResourceAccessManager::UpdateCacheGuard::~UpdateCacheGuard()
-{
-    m_parent->endUpdateCache();
-}
-
+public:
+    UpdateCacheGuard(QnResourceAccessManager* parent) : QnRaiiGuard(
+        [parent]() { parent->beginUpdateCache(); },
+        [parent]() { parent->endUpdateCache(); }) {}
+};
 
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
