@@ -13,6 +13,8 @@ class QnLiteClientController : public Connective<QObject>
 
     Q_PROPERTY(QString serverId READ serverId WRITE setServerId NOTIFY serverIdChanged)
     Q_PROPERTY(bool clientOnline READ clientOnline NOTIFY clientOnlineChanged)
+    Q_PROPERTY(QnLayoutProperties::DisplayMode displayMode READ displayMode WRITE setDisplayMode NOTIFY displayModeChanged)
+    Q_ENUMS(QnLayoutProperties::DisplayMode)
 
     using base_type = Connective<QObject>;
 
@@ -39,6 +41,7 @@ public:
 signals:
     void serverIdChanged();
     void clientOnlineChanged();
+    void displayModeChanged();
 
     void clientStartError();
 

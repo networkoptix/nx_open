@@ -5,6 +5,7 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/camera_resource.h>
 #include <api/runtime_info_manager.h>
 #include <api/server_rest_connection.h>
 #include <utils/common/id.h>
@@ -26,7 +27,9 @@ public:
 
     void setClientOnline(bool online);
 
-    static QnLayoutResourcePtr createLayout();
+    QnLayoutResourcePtr createLayout() const;
+    QnLayoutResourcePtr findLayout() const;
+    bool initLayout();
 
     void at_runtimeInfoAdded(const QnPeerRuntimeInfo& data);
     void at_runtimeInfoRemoved(const QnPeerRuntimeInfo& data);
@@ -64,14 +67,27 @@ void QnLiteClientController::setServerId(const QString& serverId)
     if (d->server)
     {
         d->serverId = d->server->getId();
+
         connect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded,
             d, &QnLiteClientControllerPrivate::at_runtimeInfoAdded);
         connect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoRemoved,
-                d, &QnLiteClientControllerPrivate::at_runtimeInfoRemoved);
+            d, &QnLiteClientControllerPrivate::at_runtimeInfoRemoved);
+
+        const auto items = qnRuntimeInfoManager->items()->getItems();
+        const auto it = std::find_if(items.begin(), items.end(),
+            [d](const QnPeerRuntimeInfo& info)
+            {
+                return info.data.peer.peerType == Qn::PT_LiteClient
+                    && info.data.videoWallInstanceGuid == d->serverId;
+            });
+        d->setClientOnline(it != items.end());
+        d->initLayout();
     }
     else
     {
         disconnect(qnRuntimeInfoManager, nullptr, this, nullptr);
+
+        d->setClientOnline(false);
     }
 }
 
@@ -129,12 +145,68 @@ void QnLiteClientController::setSingleCameraId(const QString& cameraId)
 
 QString QnLiteClientController::cameraIdOnCell(int x, int y) const
 {
-    return QString();
+    Q_D(const QnLiteClientController);
+
+    if (!d->layout)
+        return QString();
+
+    const auto items = d->layout->getItems();
+    const auto it = std::find_if(items.begin(), items.end(),
+        [x, y](const QnLayoutItemData& item)
+        {
+            return item.combinedGeometry.x() == x && item.combinedGeometry.y() == y;
+        });
+
+    if (it == items.end())
+        return QString();
+
+    return it->resource.id.toString();
 }
 
 void QnLiteClientController::setCameraIdOnCell(const QString& cameraId, int x, int y)
 {
+    Q_D(QnLiteClientController);
 
+    if (!d->layout)
+        return;
+
+    const auto id = QnUuid::fromStringSafe(cameraId);
+    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+
+    auto items = d->layout->getItems();
+    auto it = std::find_if(items.begin(), items.end(),
+        [x, y](const QnLayoutItemData& item)
+        {
+            return item.combinedGeometry.x() == x && item.combinedGeometry.y() == y;
+        });
+
+    if (it == items.end())
+    {
+        if (id.isNull() || camera.isNull())
+            return;
+
+        QnLayoutItemData item;
+        item.uuid = QnUuid::createUuid();
+        item.resource.id = id;
+        item.resource.uniqueId = camera->getUniqueId();
+        item.combinedGeometry = QRectF(x, y, 1, 1);
+        d->layout->addItem(item);
+    }
+    else
+    {
+        if (id.isNull() || camera.isNull())
+        {
+            d->layout->removeItem(*it);
+        }
+        else
+        {
+            it->resource.id = id;
+            it->resource.uniqueId = camera->getUniqueId();
+            d->layout->updateItem(it->uuid, *it);
+        }
+    }
+
+    qnResourcesChangesManager->saveLayout(d->layout, [](const QnLayoutResourcePtr&){});
 }
 
 void QnLiteClientController::startLiteClient()
@@ -147,20 +219,7 @@ void QnLiteClientController::startLiteClient()
     if (!d->server)
         return;
 
-    const auto resources = qnResPool->getResourcesByParentId(d->serverId);
-    const auto it = std::find_if(resources.begin(), resources.end(),
-        [id = d->serverId](const QnResourcePtr& resource)
-        {
-            const auto layout = resource.dynamicCast<QnLayoutResource>();
-            return !layout.isNull();
-        });
-
-    if (it != resources.end())
-        d->layout = *it;
-    else
-        d->layout = d->createLayout();
-
-    if (!d->layout)
+    if (!d->initLayout())
     {
         emit clientStartError();
         return;
@@ -207,19 +266,51 @@ void QnLiteClientControllerPrivate::setClientOnline(bool online)
     emit q->clientOnlineChanged();
 }
 
-QnLayoutResourcePtr QnLiteClientControllerPrivate::createLayout()
+QnLayoutResourcePtr QnLiteClientControllerPrivate::createLayout() const
 {
     auto layout = QnLayoutResourcePtr(new QnLayoutResource());
     layout->setId(QnUuid::createUuid());
-
+    layout->setParentId(serverId);
     layout->setName(server->getName());
-    layout->addFlags(Qn::local); // TODO: #Elric #EC2
 
     qnResPool->markLayoutAutoGenerated(layout);
     qnResPool->addResource(layout);
-    qnResourcesChangesManager->saveLayout(d->layout, [](const QnLayoutResourcePtr&){});
+    qnResourcesChangesManager->saveLayout(layout, [](const QnLayoutResourcePtr&){});
 
     return layout;
+}
+
+QnLayoutResourcePtr QnLiteClientControllerPrivate::findLayout() const
+{
+    if (serverId.isNull())
+        return QnLayoutResourcePtr();
+
+    const auto resources = qnResPool->getResourcesByParentId(serverId);
+    const auto it = std::find_if(resources.begin(), resources.end(),
+        [](const QnResourcePtr& resource)
+        {
+            const auto layout = resource.dynamicCast<QnLayoutResource>();
+            return !layout.isNull();
+        });
+
+    if (it == resources.end())
+        return QnLayoutResourcePtr();
+
+    return it->staticCast<QnLayoutResource>();
+}
+
+bool QnLiteClientControllerPrivate::initLayout()
+{
+    if (!clientOnline)
+        return false;
+
+    if (!layout)
+        layout = findLayout();
+
+    if (!layout)
+        layout = createLayout();
+
+    return !layout.isNull();
 }
 
 void QnLiteClientControllerPrivate::at_runtimeInfoAdded(const QnPeerRuntimeInfo& data)
@@ -234,6 +325,7 @@ void QnLiteClientControllerPrivate::at_runtimeInfoAdded(const QnPeerRuntimeInfo&
         return;
 
     setClientOnline(true);
+    initLayout();
 }
 
 void QnLiteClientControllerPrivate::at_runtimeInfoRemoved(const QnPeerRuntimeInfo& data)
