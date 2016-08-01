@@ -239,7 +239,7 @@ void QnModbusClient::disconnect()
 }
 
 ModbusResponse QnModbusClient::writeSingleHoldingRegister(
-    quint16 registerAddres, 
+    quint16 registerAddress, 
     const QByteArray& data, 
     bool* outStatus)
 {
@@ -248,4 +248,24 @@ ModbusResponse QnModbusClient::writeSingleHoldingRegister(
     Q_ASSERT_X(false, "ModbusClient::writeSingleHoldingRegister", "Not implemented");
 
     return response;
+}
+
+ModbusResponse nx_modbus::QnModbusClient::readCoils(
+    quint16 startCoilAddress,
+    quint16 coilCount,
+    bool* outStatus)
+{
+    ModbusRequest request;
+
+    request.functionCode = FunctionCode::kReadCoils;
+    QDataStream stream(&request.data, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::BigEndian);
+
+    stream 
+        << startCoilAddress
+        << coilCount;
+
+    request.header = buildHeader(request);
+
+    return doModbusRequest(request, outStatus);
 }

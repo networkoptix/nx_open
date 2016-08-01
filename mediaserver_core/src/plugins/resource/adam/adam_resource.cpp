@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/common/model_functions.h>
 #include <business/events/network_issue_business_event.h>
+#include <modbus/modbus_client.h>
 
 #include "adam_resource.h"
 #include "adam_modbus_io_manager.h"
@@ -42,6 +43,28 @@ QString QnAdamResource::getDriverName() const
 CameraDiagnostics::Result QnAdamResource::initInternal()
 {
     QnSecurityCamResource::initInternal();
+
+    QUrl url(getUrl());
+    auto host  = url.host();
+    auto port = url.port(nx_modbus::kDefaultModbusPort);
+
+    SocketAddress endpoint(host, port);
+
+    nx_modbus::QnModbusClient testClient(endpoint);
+
+    int triesLeft = 3;
+    bool status = false;
+
+    while (!status && triesLeft--)
+        testClient.readCoils(0, 8, &status);
+
+    if (!status)
+    {
+        qDebug() << "QnAdamResource::initInternal() " << "test request has been failed";
+        return CameraDiagnostics::RequestFailedResult(
+            lit("Test request failed"),
+            lit("couldn't get valid response from device"));
+    }
 
     Qn::CameraCapabilities caps = Qn::NoCapabilities;
 

@@ -39,7 +39,7 @@ public:
     // Holding register is read/write word of length 2 byte.
     ModbusResponse readHoldingRegisters(quint16 startRegister, quint16 registerCount, bool* outStatus);
     ModbusResponse writeHoldingRegisters(quint16 startRegister, const QByteArray& data, bool *outStatus);
-    ModbusResponse writeSingleHoldingRegister(quint16 registerAddres, const QByteArray& data, bool* outStatus);
+    ModbusResponse writeSingleHoldingRegister(quint16 registerAddress, const QByteArray& data, bool* outStatus);
 
 private:
     bool initSocket();
