@@ -113,8 +113,10 @@ QnIOPortDataList QnAdamResource::mergeIOPortData(
         for(const auto& saved : savedIO)
         {
             if (result.id == saved.id)
+            {
                 result = saved;
                 break;
+            }
         }
     }
 
