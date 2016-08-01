@@ -20,8 +20,8 @@ const std::chrono::seconds kCloudConnectorTimeout(10);
 OutgoingTunnel::OutgoingTunnel(AddressEntry targetPeerAddress)
 :
     m_targetPeerAddress(std::move(targetPeerAddress)),
-    m_terminated(false),
     m_timer(std::make_unique<aio::Timer>()),
+    m_terminated(false),
     m_lastErrorCode(SystemError::noError),
     m_state(State::kInit)
 {
