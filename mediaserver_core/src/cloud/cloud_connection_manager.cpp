@@ -149,9 +149,15 @@ void CloudConnectionManager::stopMonitoringCloudEvents()
     m_eventConnectionRetryTimer->pleaseStopSync();
 
     //closing event connection
-    NX_ASSERT(m_eventConnection);
-    m_eventConnection.reset();
+    decltype(m_eventConnection) eventConnection;
+    {
+        QnMutexLocker lk(&m_mutex);
+        NX_ASSERT(m_eventConnection);
+        eventConnection = std::move(m_eventConnection);
+        m_eventConnection = nullptr;
+    }
 
+    eventConnection.reset();
     m_eventConnectionRetryTimer.reset();
 }
 
@@ -163,7 +169,11 @@ void CloudConnectionManager::onSystemAccessListUpdated(
 
 void CloudConnectionManager::startEventConnection()
 {
-    NX_ASSERT(m_eventConnection);
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (!m_eventConnection)
+            return;
+    }
 
     using namespace std::placeholders;
     nx::cdb::api::SystemEventHandlers systemEventHandlers;
