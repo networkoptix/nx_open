@@ -166,6 +166,12 @@
             ]
         },
         {
+            "keys":[
+                "FLIR Systems|FC-*", "FLIR|FC-*"
+            ],
+            "forceSingleStream": true
+        },
+        {
             "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
