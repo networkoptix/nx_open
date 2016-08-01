@@ -243,9 +243,9 @@ void TunnelConnector::holePunchingDone(
     if (resultCode == api::NatTraversalResultCode::ok)
     {
         tunnelConnection = std::make_unique<OutgoingTunnelConnection>(
+            getAioThread(),
             m_connectSessionId,
             std::move(m_udtConnection));
-        tunnelConnection->bindToAioThread(getAioThread());
     }
 
     auto completionHandler = std::move(m_completionHandler);

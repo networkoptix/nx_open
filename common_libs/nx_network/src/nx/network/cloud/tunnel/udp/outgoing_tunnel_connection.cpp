@@ -18,6 +18,7 @@ namespace cloud {
 namespace udp {
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
+    aio::AbstractAioThread* aioThread,
     nx::String connectionId,
     std::unique_ptr<UdtStreamSocket> udtConnection,
     Timeouts timeouts)
@@ -31,6 +32,8 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     m_pleaseStopHasBeenCalled(false),
     m_pleaseStopCompleted(false)
 {
+    AbstractOutgoingTunnelConnection::bindToAioThread(aioThread);
+
     m_controlConnection->bindToAioThread(getAioThread());
     std::chrono::milliseconds timeout = m_timeouts.maxConnectionInactivityPeriod();
     m_controlConnection->socket()->setRecvTimeout(timeout.count());
@@ -46,10 +49,12 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
 }
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
+    aio::AbstractAioThread* aioThread,
     nx::String connectionId,
     std::unique_ptr<UdtStreamSocket> udtConnection)
 :
     OutgoingTunnelConnection(
+        aioThread,
         std::move(connectionId),
         std::move(udtConnection),
         Timeouts())
@@ -86,6 +91,12 @@ void OutgoingTunnelConnection::stopWhileInAioThread()
     m_controlConnection.reset();
 
     m_pleaseStopCompleted = true;
+}
+
+void OutgoingTunnelConnection::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    AbstractOutgoingTunnelConnection::bindToAioThread(aioThread);
+    m_controlConnection->bindToAioThread(aioThread);
 }
 
 void OutgoingTunnelConnection::establishNewConnection(
