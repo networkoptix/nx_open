@@ -413,6 +413,8 @@ void QnAdamModbusIOManager::routeMonitoringFlow(nx_modbus::ModbusResponse respon
     if (!m_monitoringIsInProgress)
         return;
 
+    m_networkFaultsCounter = 0;
+
     processAllPortStatesResponse(response);
     scheduleMonitoringIteration();
 }
