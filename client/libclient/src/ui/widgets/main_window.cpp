@@ -75,7 +75,6 @@
 #include <ui/workbench/workbench_ui.h>
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_resource.h>
 
 #include <ui/widgets/main_window_title_bar_widget.h>
 
@@ -165,7 +164,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up properties. */
     setWindowTitle(QString());
-    setAcceptDrops(true);
 
     if (!qnRuntime->isVideoWallMode()) {
         bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
@@ -704,50 +702,6 @@ void QnMainWindow::paintEvent(QPaintEvent *event) {
         painter.setPen(QPen(QColor(255, 255, 255, 64), 1));
         painter.drawRect(rect().adjusted(0, 0, -1, -1));
     }
-}
-
-void QnMainWindow::dragEnterEvent(QDragEnterEvent *event) {
-    QnResourceList resources = QnWorkbenchResource::deserializeResources(event->mimeData());
-
-    QnResourceList media;   // = resources.filtered<QnMediaResource>();
-    QnResourceList layouts; // = resources.filtered<QnLayoutResource>();
-    QnResourceList servers; // = resources.filtered<QnMediaServerResource>();
-
-    foreach( QnResourcePtr res, resources )
-    {
-        if( dynamic_cast<QnMediaResource*>(res.data()) )
-            media.push_back( res );
-        if( res.dynamicCast<QnLayoutResource>() )
-            layouts.push_back( res );
-        if( res.dynamicCast<QnMediaServerResource>() )
-            servers.push_back( res );
-    }
-
-    m_dropResources = media;
-    m_dropResources << layouts;
-    m_dropResources << servers;
-
-    if (m_dropResources.empty())
-        return;
-
-    event->acceptProposedAction();
-}
-
-void QnMainWindow::dragMoveEvent(QDragMoveEvent *event) {
-    if(m_dropResources.empty())
-        return;
-
-    event->acceptProposedAction();
-}
-
-void QnMainWindow::dragLeaveEvent(QDragLeaveEvent *) {
-    m_dropResources = QnResourceList();
-}
-
-void QnMainWindow::dropEvent(QDropEvent *event) {
-    menu()->trigger(QnActions::DropResourcesIntoNewLayoutAction, m_dropResources);
-
-    event->acceptProposedAction();
 }
 
 void QnMainWindow::keyPressEvent(QKeyEvent *event) {
