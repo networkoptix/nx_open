@@ -163,7 +163,7 @@ int QnConfigureRestHandler::execute(
     /* set password */
     if (data.hasPassword())
     {
-        if (!changeAdminPassword(data, QnOptionalBool(), owner->authUserId()))
+        if (!changeAdminPassword(data, owner->authUserId()))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
         }

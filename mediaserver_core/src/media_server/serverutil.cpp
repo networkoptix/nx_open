@@ -101,7 +101,32 @@ bool PasswordData::hasPassword() const
         !passwordDigest.isEmpty();
 }
 
-bool changeAdminPassword(PasswordData data, QnOptionalBool isEnabled, const QnUuid &userId, QString* errString)
+bool changeAdminUserEnabled(bool value, const QnUuid &userId, QString* errString)
+{
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+    if (!admin)
+    {
+        if (errString)
+            *errString = lit("Temporary unavailable");
+        return false;
+    }
+
+    // disable local admin if we use cloud owner
+    admin->setEnabled(value);
+    ec2::ApiUserData apiUser;
+    fromResourceToApi(admin, apiUser);
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto errCode = connection->getUserManager(Qn::UserAccessData(userId))->saveSync(apiUser);
+    if (errCode != ec2::ErrorCode::ok)
+    {
+        if (errString)
+            *errString = lit("Cannot save local admin user");
+        return false;
+    }
+    return true;
+}
+
+bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errString)
 {
     //genereating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
@@ -122,15 +147,11 @@ bool changeAdminPassword(PasswordData data, QnOptionalBool isEnabled, const QnUu
     if (data.password.isEmpty() &&
         updatedAdmin->getHash() == data.passwordHash &&
         updatedAdmin->getDigest() == data.passwordDigest &&
-        updatedAdmin->getCryptSha512Hash() == data.cryptSha512Hash &&
-        (!isEnabled.isDefined() || updatedAdmin->isEnabled() == isEnabled.value()))
+        updatedAdmin->getCryptSha512Hash() == data.cryptSha512Hash)
     {
         //no need to update anything
         return true;
     }
-
-    if (isEnabled.isDefined())
-        updatedAdmin->setEnabled(isEnabled.value());
 
     if (!data.password.isEmpty())
     {
