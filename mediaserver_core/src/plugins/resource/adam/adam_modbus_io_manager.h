@@ -48,6 +48,8 @@ public:
 
     virtual void setInputPortStateChangeCallback(InputStateChangeCallback callback) override;
 
+    virtual void setNetworkIssueCallback(NetworkIssueCallback callback) override;
+
     virtual void terminate() override;
 
 private:
@@ -87,6 +89,9 @@ private:
     nx_modbus::QnModbusAsyncClient m_client;
     nx_modbus::QnModbusClient m_outputClient;
     InputStateChangeCallback m_inputStateChangedCallback;
+    NetworkIssueCallback m_networkIssueCallback;
+
+    quint8 m_networkFaultsCounter;
 
     QMap<QString, nx_io_managment::IOPortState> m_defaultPortStates;
 

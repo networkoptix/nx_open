@@ -11,13 +11,15 @@ namespace
 }
 
 QnModbusClient::QnModbusClient():
-    m_requestTransactionId(0)
+    m_requestTransactionId(0),
+    m_connected(false)
 {
 }
 
 QnModbusClient::QnModbusClient(const SocketAddress& sockaddr) :
     m_requestTransactionId(0),
-    m_endpoint(sockaddr)
+    m_endpoint(sockaddr),
+    m_connected(false)
 {
     initSocket();
 }
@@ -30,6 +32,8 @@ QnModbusClient::~QnModbusClient()
 
 bool QnModbusClient::initSocket()
 {
+    m_connected = false;
+
     if (m_socket)
         m_socket->shutdown();
 
@@ -55,7 +59,9 @@ bool QnModbusClient::connect()
     if (!m_socket && !initSocket())
         return false;
 
-    return m_socket->connect(m_endpoint, kDefaultConnectionTimeoutMs);
+    m_connected = m_socket->connect(m_endpoint, kDefaultConnectionTimeoutMs);
+
+    return m_connected;
 }
 
 ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, bool* outStatus)
@@ -74,10 +80,16 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, boo
         return response;
     }
 
-    if(!m_socket->isConnected() && !m_socket->connect(m_endpoint))
+    if (!m_connected)
     {
-        *outStatus = false;
-        return response;
+        initSocket();
+        if (!connect())
+        {
+            *outStatus = false;
+            return response;
+        }
+
+        m_connected = true;
     }
 
     *outStatus = true;

@@ -24,13 +24,15 @@ namespace
     const QString kAdamOutputCountParamName("adamOutputCount");
 
     const int kDebounceIterationCount = 4;
+    const quint8 kMaxNetworkFaultsNumber = 4;
 
     const IOPortState kPortDefaultState = IOPortState::nonActive;
 }
 
 QnAdamModbusIOManager::QnAdamModbusIOManager(QnResource* resource) :
     m_resource(resource),
-    m_ioPortInfoFetched(false)
+    m_ioPortInfoFetched(false),
+    m_networkFaultsCounter(0)
 {
     initializeIO();
 }
@@ -119,13 +121,27 @@ bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isA
 
     nx_modbus::ModbusResponse response;
     bool status = false;
-    int kTriesLeft = 3;
+    int triesLeft = 3;
 
-    while (!status && kTriesLeft--)
+    while (!status && triesLeft--)
+    {
         response = m_outputClient.writeSingleCoil(
-            coil, 
-            isActive != defaultPortStateIsActive, 
+            coil,
+            isActive != defaultPortStateIsActive,
             &status);
+
+        if (!status)
+            qDebug() << "Failed to set port state" << outputId << "tries left:" << triesLeft;
+    }
+
+    if (!status && m_networkIssueCallback)
+    {
+        m_networkIssueCallback(
+            lit("Couldn't set port %1 to %2 state")
+                .arg(outputId)
+                .arg(isActive ? lit("active") : lit("non-active")),
+            false);
+    }
 
     if (response.isException() || !status)
         return false;
@@ -170,6 +186,11 @@ void QnAdamModbusIOManager::setPortDefaultState(const QString& portId, nx_io_man
 void QnAdamModbusIOManager::setInputPortStateChangeCallback(InputStateChangeCallback callback)
 {
     m_inputStateChangedCallback = callback;
+}
+
+void QnAdamModbusIOManager::setNetworkIssueCallback(NetworkIssueCallback callback)
+{
+    m_networkIssueCallback = callback;
 }
 
 void QnAdamModbusIOManager::terminate()
@@ -401,6 +422,13 @@ void QnAdamModbusIOManager::handleMonitoringError()
     auto error = m_client.getLastErrorString();
 
     NX_LOG(error, cl_logDEBUG2);
+
+    if (++m_networkFaultsCounter >= kMaxNetworkFaultsNumber)
+    {
+        m_networkFaultsCounter = 0;
+        if (m_networkIssueCallback)
+            m_networkIssueCallback(error, true);
+    }
 
     if (m_monitoringIsInProgress)
         scheduleMonitoringIteration();

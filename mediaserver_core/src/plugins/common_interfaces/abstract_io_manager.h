@@ -32,6 +32,9 @@ public:
         QString portId, 
         nx_io_managment::IOPortState portState)> InputStateChangeCallback;
 
+    typedef std::function<void(
+        QString reason, bool isFatal)> NetworkIssueCallback;
+
     virtual ~QnAbstractIOManager() {}
 
     virtual bool startIOMonitoring() = 0;
@@ -53,6 +56,8 @@ public:
     virtual void setPortDefaultState(const QString& portId, nx_io_managment::IOPortState state) = 0;
 
     virtual void setInputPortStateChangeCallback(InputStateChangeCallback callback) = 0;
+
+    virtual void setNetworkIssueCallback(NetworkIssueCallback callback) = 0;
 
     virtual void terminate() = 0;
 };

@@ -49,6 +49,8 @@ private:
     quint16 m_requestTransactionId;
     char m_recvBuffer[kBufferSize];
 
+    bool m_connected;
+
     SocketAddress m_endpoint;
     std::shared_ptr<AbstractStreamSocket> m_socket;
 };

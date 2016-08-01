@@ -11,6 +11,7 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/common/model_functions.h>
+#include <business/events/network_issue_business_event.h>
 
 #include "adam_resource.h"
 #include "adam_modbus_io_manager.h"
@@ -85,7 +86,22 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
             qnSyncTime->currentUSecsSinceEpoch());
     };
 
+    auto networkIssueHandler = [this](QString reason, bool isFatal)
+    {
+        qDebug() << lit("Network issue on ADAM device %1: %2").arg(getUrl()).arg(reason);
+        emit networkIssue(
+            toSharedPointer(this),
+            qnSyncTime->currentUSecsSinceEpoch(),
+            QnBusiness::EventReason::NoReason,
+            QnNetworkIssueBusinessEvent::encodePacketLossSequence(0, 2));
+
+        if (isFatal)
+            setStatus(Qn::Offline);
+    };
+
     m_ioManager->setInputPortStateChangeCallback(callback);
+    m_ioManager->setNetworkIssueCallback(networkIssueHandler);
+
     return m_ioManager->startIOMonitoring();
 }
 

@@ -12,7 +12,8 @@ namespace
 QnModbusAsyncClient::QnModbusAsyncClient():
     m_state(ModbusClientState::ready),
     m_requestSequenceNum(0),
-    m_terminated(false)
+    m_terminated(false),
+    m_connected(false)
 {
     initSocket();
 }
@@ -20,7 +21,8 @@ QnModbusAsyncClient::QnModbusAsyncClient():
 QnModbusAsyncClient::QnModbusAsyncClient(const SocketAddress& endpoint):
     m_state(ModbusClientState::ready),
     m_requestSequenceNum(false),
-    m_terminated(false)
+    m_terminated(false),
+    m_connected(false)
 {
     setEndpoint(endpoint);
 }
@@ -42,6 +44,8 @@ void QnModbusAsyncClient::setEndpoint(const SocketAddress& endpoint)
 
 bool QnModbusAsyncClient::initSocket()
 {
+    m_connected = false;
+
     m_sendBuffer.reserve(nx_modbus::kModbusMaxMessageLength);
     m_recvBuffer.reserve(nx_modbus::kModbusMaxMessageLength);
 
@@ -90,6 +94,7 @@ void QnModbusAsyncClient::asyncSendDone(
 {
     if (errorCode != SystemError::noError)
     {
+        qDebug() << SystemError::getLastOSErrorText();
         emitError(lit("ModbusAsyncClient: error while sending request. %1").arg(errorCode));
         return;
     }
@@ -273,12 +278,17 @@ void QnModbusAsyncClient::doModbusRequestAsync(const ModbusRequest &request)
 
     m_state = ModbusClientState::sendingMessage;
 
-    if (!m_socket->isConnected() && !m_socket->connect(m_endpoint))
+    if (!m_connected)
     {
-        emitError(
-            lit("ModbusAsyncClient, unable to connect to endpoint %1")
-                .arg(m_endpoint.toString()));
-        return;
+        if (!(initSocket() && m_socket->connect(m_endpoint)))
+        {
+            emitError(
+                lit("ModbusAsyncClient, unable to connect to endpoint %1")
+                    .arg(m_endpoint.toString()));
+            return;
+        }
+
+        m_connected = true;
     }
 
     m_socket->sendAsync(m_sendBuffer, handler);
