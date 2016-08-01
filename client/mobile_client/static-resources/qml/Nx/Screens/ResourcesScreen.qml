@@ -46,9 +46,14 @@ Page
         onServerOfflineChanged:
         {
             if (serverOffline)
+            {
                 offlineWarningDelay.restart()
+            }
             else
+            {
                 warningVisible = false
+                offlineWarningDelay.stop()
+            }
         }
     }
 
