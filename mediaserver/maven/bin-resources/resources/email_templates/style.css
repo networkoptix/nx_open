@@ -185,3 +185,23 @@ td.number{
     white-space: nowrap;
     max-width: 130px;
 }
+
+.margin-top{
+    margin-top: 10px;
+}
+
+hr{
+    border:none;
+    border-top: 1px solid #E1E7EA;
+    margin-top:15px;
+    margin-bottom:15px;
+}
+
+.camera-block{
+    padding-bottom: 20px;
+    paddign-top:10px;
+    border-bottom: 1px solid #E1E7EA;
+}
+.camera-block .screenshot{
+    max-height: 180px;
+}
