@@ -33,7 +33,7 @@
             </div>
             {{/systemName}}
             {{^systemName}}
-            <a href="{{config.portal_url}}" style="color: #2FA2DB"><img class="logo" src="cid:logo" style="max-width: 100px;max-height: 40px" /></a>
+            <a href="{{config.portal_url}}" style="color: #2FA2DB"><img class="logo" src="cid:logo" style="max-width: 150px;max-height: 40px" /></a>
             {{/systemName}}
         </td>
         <td class="side-spacer" style="vertical-align: top;text-align: left;padding-right: 5px;padding: 20px"></td>
@@ -53,7 +53,7 @@
 			</td>
             {{/sourceIcon}}
             <td style="vertical-align: top;text-align: left;padding-right: 5px">
-                <b>{{source}}</b> ({{sourceIp}})
+                <b class="source-name" style="text-overflow: ellipsis;overflow: hidden;display: inline-block;white-space: nowrap;max-width: 130px">{{source}}</b> ({{sourceIp}})
             </td>
             <td style="vertical-align: top;text-align: left;padding-right: 5px">
                 {{#aggregated}}
@@ -72,12 +72,12 @@
     <tr>
         <td style="vertical-align: top;text-align: left;padding-right: 5px"></td>
         <td class="footer" style="vertical-align: top;text-align: left;padding-right: 5px;width: 800px;padding-top: 20px;padding-bottom: 30px">
-            <table border="0" cellspacing="0" cellpadding="0" style="color: #263137;border: none;border-spacing: 0;width: 100%">
+            <table border="0" cellspacing="0" cellpadding="0" style="color: #263137;border: none;border-spacing: 0;width: auto">
                 <tbody>
                 <tr>
                     {{#systemName}}
                     <td class="right-border" style="vertical-align: middle;text-align: left;padding-right: 20px;border-right: 1px solid #E1E7EA;font-size: 12px;line-height: 20px;color: #53707F">
-                        <a href="{{config.portal_url}}" style="color: #2FA2DB"><img class="logo" src="cid:logo" style="max-width: 100px;max-height: 40px" /></a>
+                        <a href="{{config.portal_url}}" style="color: #2FA2DB"><img class="logo" src="cid:logo" style="max-width: 150px;max-height: 40px" /></a>
                     </td>
                     <td class="left-border right-border" style="vertical-align: middle;text-align: left;padding-right: 20px;border-right: 1px solid #E1E7EA;padding-left: 20px;font-size: 12px;line-height: 20px;color: #53707F">
                         <b>Website</b><br />
