@@ -465,6 +465,7 @@ api::SystemAccessRole SystemManager::getAccountRightsForSystem(
     const std::string& accountEmail,
     const std::string& systemID) const
 {
+#if 0
     QnMutexLocker lk(&m_mutex);
     const auto& accountSystemPairIndex =
         m_accountAccessRoleForSystem.get<kSharingUniqueIndex>();
@@ -475,6 +476,41 @@ api::SystemAccessRole SystemManager::getAccountRightsForSystem(
     return it != accountSystemPairIndex.end()
         ? it->accessRole
         : api::SystemAccessRole::none;
+#else
+    //TODO #ak getSystemSharingData does returns much data not needed for this method
+    const auto sharingData = getSystemSharingData(accountEmail, systemID);
+    if (!sharingData)
+        return api::SystemAccessRole::none;
+    return sharingData->accessRole;
+#endif
+}
+
+boost::optional<api::SystemSharingEx> SystemManager::getSystemSharingData(
+    const std::string& accountEmail,
+    const std::string& systemID) const
+{
+    QnMutexLocker lk(&m_mutex);
+    const auto& accountSystemPairIndex =
+        m_accountAccessRoleForSystem.get<kSharingUniqueIndex>();
+    //TODO #ak introduce index by (accountEmail, systemID) to m_accountAccessRoleForSystem?
+    api::SystemSharing keyToFind;
+    keyToFind.accountEmail = accountEmail;
+    keyToFind.systemID = systemID;
+    const auto it = accountSystemPairIndex.find(keyToFind);
+    if (it == accountSystemPairIndex.end())
+        return boost::none;
+
+    api::SystemSharingEx resultData;
+    resultData.api::SystemSharing::operator=(*it);
+
+    const auto account =
+        m_accountManager.findAccountByUserName(accountEmail);
+    if (!static_cast<bool>(account))
+        return boost::none;
+
+    resultData.accountID = account->id;
+    resultData.accountFullName = account->fullName;
+    return resultData;
 }
 
 nx::db::DBResult SystemManager::insertSystemToDB(

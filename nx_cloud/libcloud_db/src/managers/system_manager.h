@@ -138,6 +138,9 @@ public:
     api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
         const std::string& systemID) const;
+    boost::optional<api::SystemSharingEx> getSystemSharingData(
+        const std::string& accountEmail,
+        const std::string& systemID) const;
 
     //!Create data view restricted by \a authzInfo and \a filter
     DataView<data::SystemData> createView(

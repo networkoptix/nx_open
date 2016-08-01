@@ -51,17 +51,16 @@ public:
     std::string nonce;
     //!H(ha1:nonce). H is calculated like MD5 but without appending 1 bit, zero bits and message length
     std::string intermediateResponse;
-    //!Authorized access role
-    SystemAccessRole accessRole;
     //!period, \a intermediateResponse usage should be limited to
     /*!
         This period is introduced to force vms server to verify periodically password at cloud_db
     */
     std::chrono::seconds validPeriod;
+    //!Contains user info and access rights
+    SystemSharingEx authenticatedAccountData;
 
     AuthResponse()
     :
-        accessRole(SystemAccessRole::none),
         validPeriod(0)
     {
     }

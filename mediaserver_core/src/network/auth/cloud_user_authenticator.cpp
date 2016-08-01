@@ -350,7 +350,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
     //translating cloud account to local user
     auto localUser = getMappedLocalUserForCloudCredentials(
         authorizationHeader.userid(),
-        cacheItem.data.accessRole);
+        cacheItem.data.authenticatedAccountData.accessRole);
     if (!localUser)
     {
         NX_LOG(lm("CloudUserAuthenticator. Failed to translate cloud user %1 to local user").
