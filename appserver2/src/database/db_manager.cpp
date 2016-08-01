@@ -1514,6 +1514,7 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
     *internalId = getResourceInternalId(data.id);
 
     //NX_ASSERT(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
+    NX_ASSERT(!data.id.isNull(), "Resource ID must not be null");
 
     QSqlQuery query(m_sdb);
     if (*internalId) {
