@@ -270,8 +270,7 @@ const QString SERVER_GUID = lit("serverGuid");
 const QString SERVER_GUID2 = lit("serverGuid2");
 const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
 const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode");
-const QString ADMIN_PSWD_HASH = lit("adminMd5Hash");
-const QString ADMIN_PSWD_DIGEST = lit("adminMd5Digest");
+
 const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
@@ -956,7 +955,8 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
         return;
 
     nx::ServerSetting::setSysIdTime(value);
-    if (sender != qnCommon->moduleGUID()) {
+    if (sender != qnCommon->moduleGUID())
+    {
         MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
         saveAdminPswdHash();
         restartServer(0);
@@ -1697,9 +1697,15 @@ bool MediaServerProcess::initTcpListener(
 void MediaServerProcess::saveAdminPswdHash()
 {
     QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (admin) {
-        MSSettings::roSettings()->setValue(ADMIN_PSWD_HASH, admin->getHash());
-        MSSettings::roSettings()->setValue(ADMIN_PSWD_DIGEST, admin->getDigest());
+    if (admin)
+    {
+        AdminPasswordData data;
+        data.digest = admin->getDigest();
+        data.hash = admin->getHash();
+        data.cryptSha512Hash = admin->getCryptSha512Hash();
+        data.realm = admin->getRealm().toUtf8();
+
+        data.saveToSettings(MSSettings::roSettings());
     }
 }
 
@@ -1883,7 +1889,9 @@ void MediaServerProcess::run()
     qnCommon->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
     qnCommon->setUseLowPriorityAdminPasswordHach(settings->value(LOW_PRIORITY_ADMIN_PASSWORD, false).toBool());
 
-    qnCommon->setAdminPasswordData(settings->value(ADMIN_PSWD_HASH).toByteArray(), settings->value(ADMIN_PSWD_DIGEST).toByteArray());
+    AdminPasswordData passwordData;
+    passwordData.loadFromSettings(settings);
+    qnCommon->setAdminPasswordData(passwordData);
 
     qnCommon->setModuleGUID(serverGuid());
 
@@ -2031,10 +2039,10 @@ void MediaServerProcess::run()
         abort();
         return;
     }
-    settings->remove(ADMIN_PSWD_HASH);
-    settings->remove(ADMIN_PSWD_DIGEST);
-    settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
 
+    AdminPasswordData::clearSettings(settings);
+
+    settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     auto clearEc2ConnectionGuardFunc = [](MediaServerProcess*){
