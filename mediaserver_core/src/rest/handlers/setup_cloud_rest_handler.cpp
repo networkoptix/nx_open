@@ -14,6 +14,7 @@
 #include <core/resource/user_resource.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <api/app_server_connection.h>
+#include <rest/helpers/permissions_helper.h>
 
 namespace
 {
@@ -56,6 +57,12 @@ int QnSetupCloudSystemRestHandler::executePost(const QString &path, const QnRequ
 
 int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnUuid &userId, QnJsonRestResult &result)
 {
+    if (QnPermissionsHelper::isSafeMode())
+        return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::isOwner(userId))
+        return QnPermissionsHelper::notOwnerError(result);
+
+
     if (!qnGlobalSettings->isNewSystem())
     {
         result.setError(QnJsonRestResult::Forbidden, lit("This method is allowed at initial state only. Use 'api/detachFromSystem' method first."));

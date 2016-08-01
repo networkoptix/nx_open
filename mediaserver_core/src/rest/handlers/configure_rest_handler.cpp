@@ -106,6 +106,9 @@ int QnConfigureRestHandler::execute(
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::isOwner(owner->authUserId()))
+        return QnPermissionsHelper::notOwnerError(result);
+
     QString errStr;
     if (!validatePasswordData(data, &errStr))
     {

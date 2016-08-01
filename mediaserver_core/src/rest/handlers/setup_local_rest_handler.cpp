@@ -10,6 +10,7 @@
 #include <nx/fusion/model_functions.h>
 #include "rest/server/rest_connection_processor.h"
 #include <api/resource_property_adaptor.h>
+#include <rest/helpers/permissions_helper.h>
 
 namespace
 {
@@ -58,6 +59,11 @@ int QnSetupLocalSystemRestHandler::executePost(
 
 int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUuid &userId, QnJsonRestResult &result)
 {
+    if (QnPermissionsHelper::isSafeMode())
+        return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::isOwner(userId))
+        return QnPermissionsHelper::notOwnerError(result);
+
     if (!qnGlobalSettings->isNewSystem())
     {
         result.setError(QnJsonRestResult::Forbidden, lit("This method is allowed at initial state only. Use 'api/detachFromSystem' method first."));

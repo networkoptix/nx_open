@@ -50,6 +50,8 @@ int QnMergeSystemsRestHandler::executeGet(
     Q_UNUSED(path)
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::isOwner(owner->authUserId()))
+        return QnPermissionsHelper::notOwnerError(result);
 
     QUrl url = params.value(lit("url"));
     QString remoteAdminPassword = params.value(lit("password"));

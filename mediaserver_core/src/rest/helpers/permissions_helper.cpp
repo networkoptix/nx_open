@@ -28,6 +28,20 @@ int QnPermissionsHelper::safeModeError(QnRestResult &result)
     return nx_http::StatusCode::forbidden;
 }
 
+bool QnPermissionsHelper::isOwner(const QnUuid& id)
+{
+    auto userResource = qnResPool->getResourceById<QnUserResource>(id);
+    return userResource && userResource->isOwner();
+}
+
+int QnPermissionsHelper::notOwnerError(QnRestResult &result)
+{
+    auto errorMessage = lit("Can't process rest request because authenticated user is not a system owner.");
+    NX_LOG(errorMessage, cl_logDEBUG1);
+    result.setError(QnJsonRestResult::CantProcessRequest, errorMessage);
+    return nx_http::StatusCode::forbidden;
+}
+
 int QnPermissionsHelper::safeModeError(QByteArray& result, QByteArray& contentType, Qn::SerializationFormat format /*= Qn::UnsupportedFormat*/, bool extraFormatting /*= false*/)
 {
     QnRestResult restResult;
