@@ -470,8 +470,10 @@ void QnRecordingManager::onTimer()
     bool someRecordingIsPresent = false;
     for (QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.constBegin(); itrRec != m_recordMap.constEnd(); ++itrRec)
     {
+        if (!qnResPool->getResourceById(itrRec.key()->getId()))
+            continue; //< resource just deleted. will be removed from m_recordMap soon
         auto camera = qnCameraPool->getVideoCamera(itrRec.key());
-        NX_ASSERT((bool)qnResPool->getResourceById(itrRec.key()->getId()));
+
         const Recorders& recorders = itrRec.value();
 
         //if (!recorders.recorderHiRes && !recorders.recorderLowRes)
