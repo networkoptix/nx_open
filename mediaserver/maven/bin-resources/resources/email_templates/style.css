@@ -26,6 +26,9 @@ table{
     border-spacing: 0px;
     width:100%;
 }
+.footer table{
+    width: auto;
+}
 td{
     vertical-align: top;
     text-align: left;
@@ -40,7 +43,7 @@ th{
 }
 
 .logo{
-    max-width:100px;
+    max-width:150px;
     max-height:40px;
 }
 .right-border{
