@@ -111,7 +111,7 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
     }
 
     QString errString;
-    if (!changeAdminPassword(data, userId, &errString))
+    if (!changeAdminPassword(data, QnOptionalBool(true), userId, &errString))
     {
         //changing system name back
         changeSystemName(systemNameBak, 0, 0, true, Qn::UserAccessData(userId));

@@ -6,6 +6,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <core/resource_management/user_access_data.h>
+#include <utils/common/optional.h>
 
 // TODO: #Elric this belongs together with server_settings
 
@@ -86,7 +87,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json));
 
 
-bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errString = nullptr);
+bool changeAdminPassword(PasswordData data, QnOptionalBool isEnabled, const QnUuid &userId, QString* errString = nullptr);
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
 
 

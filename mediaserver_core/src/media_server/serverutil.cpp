@@ -101,7 +101,7 @@ bool PasswordData::hasPassword() const
         !passwordDigest.isEmpty();
 }
 
-bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errString)
+bool changeAdminPassword(PasswordData data, QnOptionalBool isEnabled, const QnUuid &userId, QString* errString)
 {
     //genereating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
@@ -122,11 +122,15 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
     if (data.password.isEmpty() &&
         updatedAdmin->getHash() == data.passwordHash &&
         updatedAdmin->getDigest() == data.passwordDigest &&
-        updatedAdmin->getCryptSha512Hash() == data.cryptSha512Hash)
+        updatedAdmin->getCryptSha512Hash() == data.cryptSha512Hash &&
+        (!isEnabled.isDefined() || updatedAdmin->isEnabled() == isEnabled.value()))
     {
         //no need to update anything
         return true;
     }
+
+    if (isEnabled.isDefined())
+        updatedAdmin->setEnabled(isEnabled.value());
 
     if (!data.password.isEmpty())
     {
@@ -171,6 +175,7 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
     admin->setHash(updatedAdmin->getHash());
     admin->setDigest(updatedAdmin->getDigest());
     admin->setCryptSha512Hash(updatedAdmin->getCryptSha512Hash());
+    admin->setEnabled(updatedAdmin->isEnabled());
 
     HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updatedAdmin);
     return true;
