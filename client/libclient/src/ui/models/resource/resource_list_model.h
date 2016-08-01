@@ -4,12 +4,13 @@
 #include <QtCore/QStringList>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/scoped_model_operations.h>
 #include <utils/common/connective.h>
 
-class QnResourceListModel: public Connective<QAbstractItemModel>
+class QnResourceListModel: public ScopedModelOperations<Connective<QAbstractItemModel>>
 {
     Q_OBJECT
-    typedef Connective<QAbstractItemModel> base_type;
+    using base_type = ScopedModelOperations<Connective<QAbstractItemModel>>;
 
 public:
     enum Column
