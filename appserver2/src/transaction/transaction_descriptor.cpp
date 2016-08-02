@@ -384,10 +384,12 @@ bool resourceAccessHelper(const Qn::UserAccessData& accessData, const QnUuid& re
 {
     if (systemSuperAccess(accessData))
         return true;
+
     QnResourcePtr target = qnResPool->getResourceById(resourceId);
     auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-    if (qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission))
+    if (qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalAdminPermission))
         return true;
+
     return qnResourceAccessManager->hasPermission(userResource, target, permission);
 }
 
@@ -405,7 +407,7 @@ struct ModifyResourceAccess
         QnResourcePtr target = qnResPool->getResourceById(param.id);
 
         if (isRemove)
-            return qnResourceAccessManager->hasPermission(userResource, target, Qn::Permission::RemovePermission);
+            return qnResourceAccessManager->hasPermission(userResource, target, Qn::RemovePermission);
 
         bool result = false;
         if (!target)
@@ -431,7 +433,7 @@ struct ReadResourceAccess
     template<typename Param>
     bool operator()(const Qn::UserAccessData& accessData, const Param& param)
     {
-        return resourceAccessHelper(accessData, param.id, Qn::Permission::ReadPermission);
+        return resourceAccessHelper(accessData, param.id, Qn::ReadPermission);
     }
 };
 
@@ -440,8 +442,9 @@ struct ReadResourceAccessOut
     template<typename Param>
     RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const Param& param)
     {
-        return resourceAccessHelper(accessData, param.id, Qn::Permission::ReadPermission) ?
-            RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+        return resourceAccessHelper(accessData, param.id, Qn::ReadPermission)
+            ? RemotePeerAccess::Allowed
+            : RemotePeerAccess::Forbidden;
     }
 };
 
@@ -449,7 +452,7 @@ struct ReadResourceParamAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
     {
-        return resourceAccessHelper(accessData, param.resourceId, Qn::Permission::ReadPermission);
+        return resourceAccessHelper(accessData, param.resourceId, Qn::ReadPermission);
     }
 };
 
@@ -457,8 +460,9 @@ struct ReadResourceParamAccessOut
 {
     RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
     {
-        return resourceAccessHelper(accessData, param.resourceId, Qn::Permission::ReadPermission) ?
-            RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+        return resourceAccessHelper(accessData, param.resourceId, Qn::ReadPermission)
+            ? RemotePeerAccess::Allowed
+            : RemotePeerAccess::Forbidden;
     }
 };
 
@@ -474,8 +478,8 @@ struct ModifyResourceParamAccess
         if (isRemove)
             return qnResourceAccessManager->hasPermission(qnResPool->getResourceById<QnUserResource>(accessData.userId),
                 qnResPool->getResourceById(param.resourceId),
-                Qn::Permission::RemovePermission);
-        return resourceAccessHelper(accessData, param.resourceId, Qn::Permission::SavePermission);
+                Qn::RemovePermission);
+        return resourceAccessHelper(accessData, param.resourceId, Qn::SavePermission);
     }
 
     bool isRemove;
@@ -485,7 +489,7 @@ struct ReadFootageDataAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiServerFootageData& param)
     {
-        return resourceAccessHelper(accessData, param.serverGuid, Qn::Permission::ReadPermission);
+        return resourceAccessHelper(accessData, param.serverGuid, Qn::ReadPermission);
     }
 };
 
@@ -493,8 +497,9 @@ struct ReadFootageDataAccessOut
 {
     RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const ApiServerFootageData& param)
     {
-        return resourceAccessHelper(accessData, param.serverGuid, Qn::Permission::ReadPermission) ?
-            RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+        return resourceAccessHelper(accessData, param.serverGuid, Qn::ReadPermission)
+            ? RemotePeerAccess::Allowed
+            : RemotePeerAccess::Forbidden;
     }
 };
 
@@ -502,7 +507,7 @@ struct ModifyFootageDataAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiServerFootageData& param)
     {
-        return resourceAccessHelper(accessData, param.serverGuid, Qn::Permission::SavePermission);
+        return resourceAccessHelper(accessData, param.serverGuid, Qn::SavePermission);
     }
 };
 
@@ -510,7 +515,7 @@ struct ReadCameraAttributesAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.cameraID, Qn::Permission::ReadPermission);
+        return resourceAccessHelper(accessData, param.cameraID, Qn::ReadPermission);
     }
 };
 
@@ -518,15 +523,16 @@ struct ReadCameraAttributesAccessOut
 {
     RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.cameraID, Qn::Permission::ReadPermission) ?
-            RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+        return resourceAccessHelper(accessData, param.cameraID, Qn::ReadPermission)
+            ? RemotePeerAccess::Allowed
+            : RemotePeerAccess::Forbidden;
     }
 };
 struct ModifyCameraAttributesAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.cameraID, Qn::Permission::SavePermission);
+        return resourceAccessHelper(accessData, param.cameraID, Qn::SavePermission);
     }
 };
 
@@ -534,7 +540,7 @@ struct ReadServerAttributesAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.serverID, Qn::Permission::ReadPermission);
+        return resourceAccessHelper(accessData, param.serverID, Qn::ReadPermission);
     }
 };
 
@@ -542,8 +548,9 @@ struct ReadServerAttributesAccessOut
 {
     RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.serverID, Qn::Permission::ReadPermission) ?
-            RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+        return resourceAccessHelper(accessData, param.serverID, Qn::ReadPermission)
+            ? RemotePeerAccess::Allowed
+            : RemotePeerAccess::Forbidden;
     }
 };
 
@@ -551,7 +558,7 @@ struct ModifyServerAttributesAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.serverID, Qn::Permission::SavePermission);
+        return resourceAccessHelper(accessData, param.serverID, Qn::SavePermission);
     }
 };
 
@@ -562,8 +569,9 @@ struct AdminOnlyAccess
     {
         if (systemSuperAccess(accessData))
             return true;
+
         auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        bool result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+        bool result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalAdminPermission);
         return result;
     }
 };
@@ -575,9 +583,11 @@ struct AdminOnlyAccessOut
     {
         if (systemSuperAccess(accessData))
             return RemotePeerAccess::Allowed;
+
         auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        RemotePeerAccess result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission) ?
-            RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+        RemotePeerAccess result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalAdminPermission)
+            ? RemotePeerAccess::Allowed
+            : RemotePeerAccess::Forbidden;
         return result;
     }
 };

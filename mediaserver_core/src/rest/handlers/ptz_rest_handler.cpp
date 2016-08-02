@@ -41,7 +41,7 @@ bool checkUserAccess(const QnUserResourcePtr& userResource, const QnVirtualCamer
         case Qn::RunAuxilaryCommandPtzCommand:
         case Qn::ActivatePresetPtzCommand:
         {
-            if (!qnResourceAccessManager->hasPermission(userResource, camera, Qn::Permission::WritePtzPermission))
+            if (!qnResourceAccessManager->hasPermission(userResource, camera, Qn::WritePtzPermission))
                 return false;
         }
 
@@ -51,8 +51,8 @@ bool checkUserAccess(const QnUserResourcePtr& userResource, const QnVirtualCamer
         case Qn::UpdatePresetPtzCommand:
         case Qn::RemovePresetPtzCommand:
         {
-            if (!qnResourceAccessManager->hasPermission(userResource, camera, Qn::Permission::SavePermission) ||
-                !qnResourceAccessManager->hasPermission(userResource, camera, Qn::Permission::WritePtzPermission))
+            if (!qnResourceAccessManager->hasPermission(userResource, camera, Qn::SavePermission) ||
+                !qnResourceAccessManager->hasPermission(userResource, camera, Qn::WritePtzPermission))
             {
                 return false;
             }

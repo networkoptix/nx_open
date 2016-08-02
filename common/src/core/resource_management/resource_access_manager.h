@@ -82,7 +82,7 @@ public:
     template <typename ApiDataType>
     bool canCreateResource(const QnUserResourcePtr& user, const ApiDataType& /*data*/) const
     {
-        return hasGlobalPermission(user, Qn::GlobalPermission::GlobalAdminPermission);
+        return hasGlobalPermission(user, Qn::GlobalAdminPermission);
     }
 
     bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const;

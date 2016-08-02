@@ -798,7 +798,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                         userResource &&
                         qnResourceAccessManager->hasGlobalPermission(
                             userResource,
-                            Qn::GlobalPermission::GlobalAdminPermission
+                            Qn::GlobalAdminPermission
                         );
                     if (!userHasAdminRights)
                     {
