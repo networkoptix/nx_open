@@ -76,6 +76,7 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         {
             connect(user, &QnUserResource::permissionsChanged,  this, &QnResourceAccessManager::invalidateResourceCache);
             connect(user, &QnUserResource::userGroupChanged,    this, &QnResourceAccessManager::invalidateResourceCache);
+            connect(user, &QnUserResource::enabledChanged,      this, &QnResourceAccessManager::invalidateResourceCache);
         }
 
         /* Storage can be added (and permissions requested) before the server. */
@@ -272,7 +273,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
         return result;
     };
 
-    if (!user)
+    if (!user || !user->isEnabled())
         return Qn::NoGlobalPermissions;
 
     /* Handle just-created user situation. */
@@ -479,6 +480,8 @@ void QnResourceAccessManager::invalidateCacheForVideowallItem(const QnVideoWallR
 Qn::Permissions QnResourceAccessManager::calculatePermissions(const QnUserResourcePtr& user, const QnResourcePtr& target) const
 {
     NX_ASSERT(target);
+    if (!user->isEnabled())
+        return Qn::NoPermissions;
 
     if (QnUserResourcePtr targetUser = target.dynamicCast<QnUserResource>())
         return calculatePermissionsInternal(user, targetUser);
@@ -740,6 +743,9 @@ QnResourceAccessManager::Access QnResourceAccessManager::isAccessibleResource(
     NX_ASSERT(resource);
 
     if (!user || !resource)
+        return Access::Forbidden;
+
+    if (!user->isEnabled())
         return Access::Forbidden;
 
     /* Handling desktop cameras before all other checks. */

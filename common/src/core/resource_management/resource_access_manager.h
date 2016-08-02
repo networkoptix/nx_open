@@ -158,8 +158,6 @@ private:
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnLayoutResourcePtr& layout)          const;
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnUserResourcePtr& targetUser)        const;
 
-
-
     /** Check if given desktop camera or layout is available to given user through videowall. */
     bool isAccessibleViaVideowall(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
 
