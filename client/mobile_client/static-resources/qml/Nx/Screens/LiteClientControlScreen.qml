@@ -23,6 +23,12 @@ Page
         Switch
         {
             id: enabledSwitch
+
+            onCheckedChanged:
+            {
+                if (!checked)
+                    liteClientController.stopLiteClient()
+            }
         }
     ]
 
@@ -39,6 +45,12 @@ Page
             }
             return screenLoader.item
         }
+    }
+
+    QnLiteClientController
+    {
+        id: liteClientController
+        serverId: clientId
     }
 
     Column
@@ -154,6 +166,8 @@ Page
         State
         {
             name: "SwitchedOff"
+            when: !liteClientController.clientOnline
+
             PropertyChanges
             {
                 target: screenLoader
@@ -164,7 +178,13 @@ Page
                 target: bottomLoader
                 sourceComponent: launchButtonComponent
             }
+            PropertyChanges
+            {
+                target: enabledSwitch
+                checked: false
+            }
         },
+        /*
         State
         {
             name: "NoDisplayConnected"
@@ -179,9 +199,13 @@ Page
                 sourceComponent: undefined
             }
         },
+        */
         State
         {
             name: "SingleCamera"
+            when: liteClientController.clientOnline
+                && liteClientController.displayMode == QnLiteClientController.SingleCamera
+
             PropertyChanges
             {
                 target: screenLoader
@@ -192,10 +216,18 @@ Page
                 target: bottomLoader
                 sourceComponent: selectorComponent
             }
+            PropertyChanges
+            {
+                target: enabledSwitch
+                checked: true
+            }
         },
         State
         {
             name: "MultipleCameras"
+            when: liteClientController.clientOnline
+                && liteClientController.displayMode == QnLiteClientController.MultipleCameras
+
             PropertyChanges
             {
                 target: screenLoader
@@ -205,6 +237,11 @@ Page
             {
                 target: bottomLoader
                 sourceComponent: selectorComponent
+            }
+            PropertyChanges
+            {
+                target: enabledSwitch
+                checked: true
             }
         }
     ]

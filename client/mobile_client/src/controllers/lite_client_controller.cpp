@@ -8,6 +8,9 @@
 #include <core/resource/camera_resource.h>
 #include <api/runtime_info_manager.h>
 #include <api/server_rest_connection.h>
+#include <api/app_server_connection.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <managers/videowall_manager.h>
 #include <utils/common/id.h>
 
 class QnLiteClientControllerPrivate: public QObject
@@ -247,6 +250,14 @@ void QnLiteClientController::stopLiteClient()
 
     if (!d->server)
         return;
+
+    ec2::ApiVideowallControlMessageData message;
+    message.operation = QnVideoWallControlMessage::Exit;
+    message.videowallGuid = d->serverId;
+
+    const auto connection = QnAppServerConnectionFactory::getConnection2();
+    const auto videowallManager = connection->getVideowallManager(Qn::kDefaultUserAccess);
+    videowallManager->sendControlMessage(message, this, []{});
 }
 
 QnLiteClientControllerPrivate::QnLiteClientControllerPrivate(QnLiteClientController* parent):

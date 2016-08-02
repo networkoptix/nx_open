@@ -29,8 +29,8 @@
 #include <ui/texture_size_helper.h>
 #include <camera/camera_thumbnail_cache.h>
 #include <ui/helpers/font_loader.h>
-#include <ui/videowall_handler.h>
 #include <utils/intent_listener_android.h>
+#include <handlers/lite_client_handler.h>
 
 #include <nx/media/decoder_registrar.h>
 #include <resource_allocator.h>
@@ -62,7 +62,7 @@ int runUi(QGuiApplication *application) {
     for (const auto& scheme: uriHandler->supportedSchemes())
         QDesktopServices::setUrlHandler(scheme, uriHandler.data(), uriHandler->handlerMethodName());
 
-    qnCommon->instance<QnVideowallHandler>()->setUiController(context.uiController());
+    qnCommon->instance<QnLiteClientHandler>()->setUiController(context.uiController());
 
     QStringList selectors;
 
