@@ -136,7 +136,6 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
         return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), lit("config/rtspurl.cgi?profileid=%1").arg(m_profile.url) );
     }
 
-    res->updateSourceUrl(m_profile.url, getRole());
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(m_profile.url).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
     if (m_profile.codec.contains("264"))
     {
@@ -145,6 +144,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
             rtspUrl = getRTPurl(m_profile.number); //< DLink with old firmware. profile url contains some string, but it can't be passed to the RTSP
 
         m_rtpReader.setRequest(rtspUrl);
+        res->updateSourceUrl(m_rtpReader.getCurrentStreamUrl(), getRole());
         return m_rtpReader.openStream();
     }
     else
@@ -152,10 +152,20 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
         // mpeg4 or jpeg
         m_HttpClient.reset(new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth()));
         const CLHttpStatus status = m_HttpClient->doGET(m_profile.url);
-        if( status == CL_HTTP_SUCCESS )
-            return CameraDiagnostics::NoErrorResult();
-        else
-            return CameraDiagnostics::RequestFailedResult(m_profile.url, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
+		if (status == CL_HTTP_SUCCESS)
+		{
+			QUrl httpStreamUrl;
+			httpStreamUrl.setScheme("http");
+			httpStreamUrl.setHost(res->getHostAddress());
+			httpStreamUrl.setPort(80);
+			httpStreamUrl.setPath(m_profile.url);
+			res->updateSourceUrl(httpStreamUrl.toString(), getRole());
+			return CameraDiagnostics::NoErrorResult();
+		}
+		else
+		{
+			return CameraDiagnostics::RequestFailedResult(m_profile.url, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
+		}
     }
 }
 

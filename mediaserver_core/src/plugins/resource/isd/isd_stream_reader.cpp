@@ -153,6 +153,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
     //m_resource.dynamicCast<QnNetworkResource>()->setMediaPort(8554);
 
     m_rtpStreamParser.setRequest(url);
+	res->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
     return m_rtpStreamParser.openStream();
 }
 

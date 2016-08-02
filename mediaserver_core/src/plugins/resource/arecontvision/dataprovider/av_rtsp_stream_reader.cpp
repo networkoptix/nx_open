@@ -78,6 +78,7 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     const QString url = lit("rtsp://%1:%2/%3").arg(res->getHostAddress()).arg(nx_rtsp::DEFAULT_RTSP_PORT).arg(requestStr);
 
     m_rtpStreamParser.setRequest(url);
+	res->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
     return m_rtpStreamParser.openStream();
 }
 

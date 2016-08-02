@@ -82,6 +82,11 @@ CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraC
         return CameraDiagnostics::NoErrorResult();
     
     QString portStr = m_resource->getUrl();
+	auto virtRes = m_resource.dynamicCast<QnVirtualCameraResource>();
+
+	if (virtRes)
+		virtRes->updateSourceUrl(portStr, getRole());
+
     if (!portStr.startsWith(QLatin1String("raw://")))
         return CameraDiagnostics::UnsupportedProtocolResult(portStr, QUrl(portStr).scheme());
     portStr = portStr.mid(QString(QLatin1String("raw://")).length());
