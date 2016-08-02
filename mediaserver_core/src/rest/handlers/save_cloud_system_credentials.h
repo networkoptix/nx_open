@@ -23,10 +23,7 @@ public:
         QnJsonRestResult& result,
         const QnRestConnectionProcessor*);
 
-    int execute(
-        const CloudCredentialsData& data,
-        const QnUuid& authUserId,
-        QnJsonRestResult& result);
+    int execute(const CloudCredentialsData& data, QnJsonRestResult& result);
 };
 
 #endif  //SAVE_CLOUD_SYSTEM_CREDENTIALS_H

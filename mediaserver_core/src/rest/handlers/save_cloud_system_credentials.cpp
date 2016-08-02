@@ -14,29 +14,23 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
-#include <rest/helpers/permissions_helper.h>
-#include <rest/server/rest_connection_processor.h>
+
 
 int QnSaveCloudSystemCredentialsHandler::executePost(
     const QString& /*path*/,
     const QnRequestParams& /*params*/,
     const QByteArray& body,
     QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+    const QnRestConnectionProcessor*)
 {
     const CloudCredentialsData data = QJson::deserialized<CloudCredentialsData>(body);
-    return execute(data, owner->authUserId(), result);
+    return execute(data, result);
 }
 
 int QnSaveCloudSystemCredentialsHandler::execute(
     const CloudCredentialsData& data,
-    const QnUuid& authUserId,
     QnJsonRestResult& result)
 {
-    if (!QnPermissionsHelper::isOwner(authUserId))
-        return QnPermissionsHelper::notOwnerError(result);
-
-
     using namespace nx::cdb;
 
     NX_LOGX(lm("%1 cloud credentials").arg(data.reset ? "Resetting" : "Saving"),
@@ -51,14 +45,6 @@ int QnSaveCloudSystemCredentialsHandler::execute(
             result.setError(
                 QnJsonRestResult::CantProcessRequest,
                 lit("Failed to save cloud credentials to local DB"));
-            return nx_http::StatusCode::internalServerError;
-        }
-        QString errStr;
-        if (!changeAdminUserEnabled(true, authUserId, &errStr))
-        {
-            result.setError(
-                QnJsonRestResult::CantProcessRequest,
-                errStr);
             return nx_http::StatusCode::internalServerError;
         }
         return nx_http::StatusCode::ok;
@@ -169,15 +155,6 @@ int QnSaveCloudSystemCredentialsHandler::execute(
                 arg(QString::fromStdString(cloudConnectionFactory->toString(cdbResultCode))));
             return nx_http::StatusCode::ok;
         }
-    }
-
-    QString errStr;
-    if (!changeAdminUserEnabled(false, authUserId, &errStr))
-    {
-        result.setError(
-            QnJsonRestResult::CantProcessRequest,
-            errStr);
-        return nx_http::StatusCode::internalServerError;
     }
 
     result.setError(QnJsonRestResult::NoError);

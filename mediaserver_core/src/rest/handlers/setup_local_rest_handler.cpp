@@ -11,8 +11,6 @@
 #include "rest/server/rest_connection_processor.h"
 #include <api/resource_property_adaptor.h>
 #include <rest/helpers/permissions_helper.h>
-#include <api/model/cloud_credentials_data.h>
-#include "save_cloud_system_credentials.h"
 
 namespace
 {
@@ -84,15 +82,6 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
         return nx_http::StatusCode::ok;
     }
 
-    {
-        QnSaveCloudSystemCredentialsHandler subHandler;
-        CloudCredentialsData data;
-        data.reset = true;
-        int httpResult = subHandler.execute(data, userId, result);
-        if (result.error != QnJsonRestResult::NoError)
-            return httpResult;
-    }
-
     const auto systemNameBak = qnCommon->localSystemName();
     if (!changeSystemName(data.systemName, 0, 0, true, Qn::UserAccessData(userId)))
     {
@@ -100,6 +89,7 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
         return nx_http::StatusCode::ok;
     }
 
+    qnGlobalSettings->resetCloudParams();
     qnGlobalSettings->setNewSystem(false);
     if (!qnGlobalSettings->synchronizeNowSync())
     {
@@ -121,7 +111,7 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
     }
 
     QString errString;
-    if (!changeAdminPassword(data, userId, &errString))
+    if (!changeAdminPassword(data, QnOptionalBool(true), userId, &errString))
     {
         //changing system name back
         changeSystemName(systemNameBak, 0, 0, true, Qn::UserAccessData(userId));
