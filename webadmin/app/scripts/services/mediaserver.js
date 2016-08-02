@@ -96,12 +96,31 @@ angular.module('webadminApp')
 
 
         return {
+            checkCurrentPassword:function(password){
+                var login = $localStorage.login;
+                var realm = $localStorage.realm;
+                var nonce = $localStorage.nonce;
+                var auth = this.digest(login, password, realm, nonce);
+
+                if($localStorage.auth === auth){
+                    return $q.when(true);
+                }
+                return $q.reject();
+            },
             getNonce:function(login){
                return $http.get(proxy + '/web/api/getNonce?userName=' + login);
             },
             logout:function(){
                 $localStorage.$reset();
                 return $http.post(proxy + '/web/api/cookieLogout');
+            },
+            digest:function(login,password,realm,nonce){
+                var digest = md5(login + ':' + realm + ':' + password);
+                var method = md5('GET:');
+                var authDigest = md5(digest + ':' + nonce + ':' + method);
+                var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
+
+                return auth;
             },
             login:function(login,password){
                 login = login.toLowerCase();
@@ -112,17 +131,11 @@ angular.module('webadminApp')
                         var realm = data.data.reply.realm;
                         var nonce = data.data.reply.nonce;
 
-                        var digest = md5(login + ':' + realm + ':' + password);
-                        var method = md5('GET:');
-                        var authDigest = md5(digest + ':' + nonce + ':' + method);
-                        var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
+                        var auth = self.digest(login, password, realm, nonce);
 
-                        /*
-                         var rtspmethod = md5('PLAY:');
-                         var rtspDigest = md5(digest + ':' + nonce + ':' + rtspmethod);
-                         var authRtsp = Base64.encode(login + ':' + nonce + ':' + rtspDigest);
-                         */
-
+                        $localStorage.login = login;
+                        $localStorage.nonce = nonce;
+                        $localStorage.realm = realm;
                         $localStorage.auth = auth;
 
                         // Check auth again - without catching errors
@@ -241,10 +254,8 @@ angular.module('webadminApp')
                 return deferred.promise;
             },
 
-            restoreFactoryDefaults:function(oldPassword){
-                return wrapPost(proxy + '/web/api/restoreState',{
-                    oldPassword:oldPassword
-                });
+            restoreFactoryDefaults:function(){
+                return wrapPost(proxy + '/web/api/restoreState');
             },
             setupCloudSystem:function(systemName, systemId, authKey, cloudAccountName, systemSettings){
                 return wrapPost(proxy + '/web/api/setupCloudSystem',{
@@ -287,14 +298,13 @@ angular.module('webadminApp')
             },
 
 
-            mergeSystems: function(url, remoteLogin, remotePassword, currentPassword, keepMySystem){
+            mergeSystems: function(url, remoteLogin, remotePassword, keepMySystem){
                 if(url.indexOf('http')!=0){
                     url = 'http://' + url;
                 }
                 return wrapPost(proxy + '/web/api/mergeSystems?' + $.param({
                     login: remoteLogin,
                     password: remotePassword,
-                    currentPassword: currentPassword,
                     url: url,
                     takeRemoteSettings: !keepMySystem
                 }));
