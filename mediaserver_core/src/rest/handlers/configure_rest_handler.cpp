@@ -106,6 +106,9 @@ int QnConfigureRestHandler::execute(
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::isOwner(owner->authUserId()))
+        return QnPermissionsHelper::notOwnerError(result);
+
     QString errStr;
     if (!validatePasswordData(data, &errStr))
     {
@@ -160,7 +163,7 @@ int QnConfigureRestHandler::execute(
     /* set password */
     if (data.hasPassword())
     {
-        if (!changeAdminPassword(data, owner->authUserId()))
+        if (!updateAdminUser(data, QnOptionalBool(), owner->authUserId()))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
         }

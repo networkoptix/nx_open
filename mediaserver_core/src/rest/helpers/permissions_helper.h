@@ -7,8 +7,14 @@ struct QnPermissionsHelper
     /** Check if server is running in safe mode. */
     static bool isSafeMode();
 
+    /** Check if user is system owner. */
+    static bool isOwner(const QnUuid& userId);
+
     /** Fill result with correct values and return fixed error code. */
     static int safeModeError(QnRestResult& result);
+
+    /** Fill result with correct values and return fixed error code. */
+    static int notOwnerError(QnRestResult& result);
 
     /** Fill plain result and contentType with correct values and return fixed error code. */
     static int safeModeError(QByteArray& result, QByteArray& contentType, Qn::SerializationFormat format = Qn::UnsupportedFormat, bool extraFormatting = false);

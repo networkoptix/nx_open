@@ -281,6 +281,9 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
         case QnMergeSystemsTool::VersionError:
             message = tr("System has an incompatible version.");
             break;
+        case QnMergeSystemsTool::notLocalOwner:
+            message = tr("Taking remote settings is not allowed because system owner is cloud user.");
+            break;
         case QnMergeSystemsTool::BackupError:
             message = tr("Could not create a backup of the server database.");
             break;

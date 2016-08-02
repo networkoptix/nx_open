@@ -133,7 +133,8 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
         if (std::get<0>(authResult) == Qn::Auth_OK)
         {
             const auto authResource = std::get<1>(authResult).dynamicCast<QnUserResource>();
-            if (authResource && !authResource->isCloud())
+            bool isCloudUser = authResource && authResource->isCloud();
+            if (!isCloudUser)
                 return authResult;
         }
     }

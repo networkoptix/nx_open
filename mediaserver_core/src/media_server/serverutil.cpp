@@ -87,7 +87,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 PasswordData::PasswordData(const QnRequestParams &params)
 {
     password = params.value(lit("password"));
-    oldPassword = params.value(lit("oldPassword"));
     realm = params.value(lit("realm")).toLatin1();
     passwordHash = params.value(lit("passwordHash")).toLatin1();
     passwordDigest = params.value(lit("passwordDigest")).toLatin1();
@@ -102,7 +101,7 @@ bool PasswordData::hasPassword() const
         !passwordDigest.isEmpty();
 }
 
-bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errString)
+bool updateAdminUser(PasswordData data, QnOptionalBool isEnabled, const QnUuid &userId, QString* errString)
 {
     //genereating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
@@ -123,17 +122,18 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
     if (data.password.isEmpty() &&
         updatedAdmin->getHash() == data.passwordHash &&
         updatedAdmin->getDigest() == data.passwordDigest &&
-        updatedAdmin->getCryptSha512Hash() == data.cryptSha512Hash)
+        updatedAdmin->getCryptSha512Hash() == data.cryptSha512Hash &&
+        (!isEnabled.isDefined() || updatedAdmin->isEnabled() == isEnabled.value()))
     {
         //no need to update anything
         return true;
     }
 
+    if (isEnabled.isDefined())
+        updatedAdmin->setEnabled(isEnabled.value());
+
     if (!data.password.isEmpty())
     {
-        /* check old password */
-        if (!validateOwnerPassword(data, errString))
-            return false;
 
         /* set new password */
         updatedAdmin->setPassword(data.password);
@@ -150,7 +150,7 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
         }
         updatedAdmin->setPassword(QString());
     }
-    else
+    else if (!data.passwordHash.isEmpty())
     {
         updatedAdmin->setRealm(data.realm);
         updatedAdmin->setHash(data.passwordHash);
@@ -175,35 +175,10 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
     admin->setHash(updatedAdmin->getHash());
     admin->setDigest(updatedAdmin->getDigest());
     admin->setCryptSha512Hash(updatedAdmin->getCryptSha512Hash());
+    admin->setEnabled(updatedAdmin->isEnabled());
 
     HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updatedAdmin);
     return true;
-}
-
-bool validateOwnerPassword(const PasswordData& passwordData, QString* errStr)
-{
-    auto users = qnResPool->getResources<QnUserResource>().filtered(
-        [] (const QnUserResourcePtr& user)
-        {
-            return user->isOwner() && user->isEnabled();
-        });
-
-    if (users.isEmpty())
-    {
-        if (errStr)
-            *errStr = lit("Temporary unavailable. Please try later.");
-        return false;
-    }
-
-    for (const auto& user : users)
-    {
-        if (qnAuthHelper->checkUserPassword(user, passwordData.oldPassword))
-            return true;
-    }
-
-    if (errStr)
-        *errStr = lit("Wrong current password specified");
-    return false;
 }
 
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
@@ -220,15 +195,6 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
 
         if (errStr)
             *errStr = lit("All password hashes MUST be supplied all together along with realm");
-        return false;
-    }
-
-    if (!passwordData.password.isEmpty() && passwordData.oldPassword.isEmpty())
-    {
-        //these values MUST be all filled or all NOT filled
-        NX_LOG(lit("Old password MUST be provided"), cl_logDEBUG2);
-        if (errStr)
-            *errStr = lit("Old password MUST be provided");
         return false;
     }
 

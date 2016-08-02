@@ -64,6 +64,8 @@ namespace
     const QString kNameSystemId(lit("systemId"));
     const QString kNameSystemNameForId(lit("systemNameForId"));
     const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
+    const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
+
 
     const QString ldapUri(lit("ldapUri"));
     const QString ldapAdminDn(lit("ldapAdminDn"));
@@ -192,6 +194,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initStaticticsAdaptors()
     m_systemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(kNameSystemId, QnUuid(), this);
     m_systemNameForIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSystemNameForId, QString(), this);
     m_statisticsReportServerApiAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportServerApi, QString(), this);
+    m_clientStatisticsSettingsUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSettingsUrlParam, QString(), this);
 
     connect(m_statisticsAllowedAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnGlobalSettings::statisticsAllowedChanged, Qt::QueuedConnection);
 
@@ -206,6 +209,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initStaticticsAdaptors()
         << m_systemIdAdaptor
         << m_systemNameForIdAdaptor
         << m_statisticsReportServerApiAdaptor
+        << m_clientStatisticsSettingsUrlAdaptor
         ;
 
     return result;
@@ -483,16 +487,42 @@ bool QnGlobalSettings::synchronizeNowSync()
     return propertyDictionary->saveParams(m_admin->getId());
 }
 
-bool QnGlobalSettings::takeFromSettings(QSettings* settings)
+bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer)
 {
     bool changed = false;
 
     changed |= m_statisticsReportTimeCycleAdaptor->takeFromSettings(settings);
     changed |= m_statisticsReportUpdateDelayAdaptor->takeFromSettings(settings);
     changed |= m_statisticsReportServerApiAdaptor->takeFromSettings(settings);
+    changed |= m_clientStatisticsSettingsUrlAdaptor->takeFromSettings(settings);
 
     changed |= m_cloudSystemIDAdaptor->takeFromSettings(settings);
     changed |= m_cloudAuthKeyAdaptor->takeFromSettings(settings);
+
+    /**
+     * Fix statistics allowed flag by value, set in the installer.
+     * Note that installer value will override the existing one.
+     */
+    if (m_statisticsAllowedAdaptor->takeFromSettings(settings))
+    {
+        changed = true;
+    }
+    else
+    {
+        static const QString kStatisticsReportAllowed = lit("statisticsReportAllowed");
+        /* If user didn't make the decision in the current version, check if he made it in the previous version */
+        if (!isStatisticsAllowedDefined() && mediaServer && mediaServer->hasProperty(kStatisticsReportAllowed))
+        {
+            bool value;
+            if (QnLexical::deserialize(mediaServer->getProperty(kStatisticsReportAllowed), &value))
+            {
+                changed = true;
+                m_statisticsAllowedAdaptor->setValue(QnOptionalBool(value));
+            }
+            propertyDictionary->removeProperty(mediaServer->getId(), kStatisticsReportAllowed);
+        }
+    }
+
 
     return changed ? synchronizeNowSync() : false;
 }
@@ -624,6 +654,11 @@ QString QnGlobalSettings::systemNameForId() const
 void QnGlobalSettings::setSystemNameForId(const QString &value)
 {
     m_systemNameForIdAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::clientStatisticsSettingsUrl() const
+{
+    return m_clientStatisticsSettingsUrlAdaptor->value();
 }
 
 QString QnGlobalSettings::statisticsReportServerApi() const
@@ -772,4 +807,9 @@ bool QnGlobalSettings::takeCameraOwnershipWithoutLock() const
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const
 {
     return m_allAdaptors;
+}
+
+bool QnGlobalSettings::isGlobalSetting(const ec2::ApiResourceParamWithRefData& param) const
+{
+    return m_admin && m_admin->getId() == param.resourceId;
 }

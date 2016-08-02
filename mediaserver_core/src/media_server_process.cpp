@@ -1238,9 +1238,6 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
         for(const auto &user: users)
             messageProcessor->updateResource(user);
-
-        /* Here the admin user must exist, global settings also. */
-        updateStatisticsAllowedSettings();
     }
 
     {
@@ -1349,49 +1346,6 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         propertyDictionary->saveParams(m_mediaServer->getId());
     }
 }
-
-
-void MediaServerProcess::updateStatisticsAllowedSettings() {
-
-    {   /* Security check */
-        const auto admin = qnResPool->getAdministrator();
-        NX_ASSERT(admin, Q_FUNC_INFO, "Administrator must exist here");
-        if (!admin)
-            return;
-    }
-
-    auto setValue = [this](bool value)
-    {
-        qnGlobalSettings->setStatisticsAllowed(value);
-        qnGlobalSettings->synchronizeNow();
-    };
-
-    /* Hardcoded constant from v2.3.2 */
-    static const QString statisticsReportAllowed = lit("statisticsReportAllowed");
-
-    /* Value set by installer has the greatest priority */
-    const auto confStats = MSSettings::roSettings()->value(statisticsReportAllowed);
-    if (!confStats.isNull())
-    {
-        if (confStats.toString() != lit(""))
-        {
-            setValue(confStats.toBool());
-            /* Cleanup installer value. */
-            MSSettings::roSettings()->setValue(statisticsReportAllowed, lit(""));
-            MSSettings::roSettings()->sync();
-        }
-    }
-    else
-    /* If user didn't make the decision in the current version, check if he made it in the previous version */
-    if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(statisticsReportAllowed))
-    {
-        bool value;
-        if (QnLexical::deserialize(m_mediaServer->getProperty(statisticsReportAllowed), &value))
-            setValue(value);
-        propertyDictionary->removeProperty(m_mediaServer->getId(), statisticsReportAllowed);
-    }
-}
-
 
 void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
 {
@@ -2364,35 +2318,13 @@ void MediaServerProcess::run()
 
     auto upnpPortMapper = initializeUpnpPortMapper();
 
-    qnGlobalSettings->takeFromSettings(MSSettings::roSettings());
+    qnGlobalSettings->takeFromSettings(MSSettings::roSettings(), m_mediaServer);
     qnCommon->updateModuleInformation();
 
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
     {
-
+        //todo: root password for NX1 should be updated in case of cloud owner
         hostSystemPasswordSynchronizer->syncLocalHostRootPasswordWithAdminIfNeeded( adminUser );
-
-        bool adminParamsChanged = false;
-
-        /* List of global setting, that can be overridden in server local config (e.g. by installer) */
-        QStringList replaceableParameters {
-            QnMultiserverStatisticsRestHandler::kSettingsUrlParam};
-
-        for (const QString& key: replaceableParameters)
-        {
-            const QString value = MSSettings::roSettings()->value(key).toString();
-            // TODO: #ynikitenkov fix to use qnGlobalSettings in 2.6
-            if (adminUser->setProperty(key, value, QnResource::NO_ALLOW_EMPTY))
-            {
-                MSSettings::roSettings()->remove(key);
-                adminParamsChanged = true;
-            }
-        }
-
-        if (adminParamsChanged)
-        {
-            propertyDictionary->saveParams(adminUser->getId());
-        }
     }
     MSSettings::roSettings()->sync();
 

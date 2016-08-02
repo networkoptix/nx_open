@@ -299,13 +299,13 @@ ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, co
 
     QString user = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();
-    if (user.isEmpty() || password.isEmpty()) {
+    if (user.isEmpty() || password.isEmpty())
+    {
         if (QnUserResourcePtr admin = qnResPool->getAdministrator())
         {
-            // if auth is not known, use admin hash
-            user = admin->getName();
-            password = QString::fromUtf8(admin->getDigest());
-            request.authType = nx_http::AsyncHttpClient::authDigestWithPasswordHash;
+            // if auth is not known, use server auth key
+            user = server->getId().toString();
+            password = server->getAuthKey();
         }
     }
     request.url.setUserName(user);
