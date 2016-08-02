@@ -148,8 +148,11 @@ AbstractAioThread* AIOService::getRandomAioThread() const
 
 void AIOService::bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread)
 {
-    NX_ASSERT(!isSocketBeingWatched(sock));
     const auto desiredThread = static_cast<aio::AIOThread*>(aioThread);
+    if (sock->impl()->aioThread.load() == desiredThread)
+        return;
+
+    NX_ASSERT(!isSocketBeingWatched(sock));
 
     //socket can be bound to another aio thread, if it is not used at the moment
     sock->impl()->aioThread.exchange(static_cast<aio::AIOThread*>(desiredThread));
