@@ -112,8 +112,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
         });
 
     connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this,
-        [this]
-        (const QSet<QnUuid>& resourceIds)
+        [this](const QSet<QnUuid>& resourceIds)
         {
             for (const QnResourcePtr& resource : qnResPool->getResources(resourceIds))
             {
