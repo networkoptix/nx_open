@@ -483,7 +483,9 @@ void QnTransactionTransport::fillAuthInfo( const nx_http::AsyncHttpClientPtr& ht
     else {
         QUrl url = QnAppServerConnectionFactory::url();
         httpClient->setUserName(url.userName().toLower());
-        if (detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized()) {
+        if (detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized())
+        {
+            // try auth by admin user if allowed
             QnUserResourcePtr adminUser = qnResPool->getAdministrator();
             if (adminUser) {
                 httpClient->setUserPassword(adminUser->getDigest());

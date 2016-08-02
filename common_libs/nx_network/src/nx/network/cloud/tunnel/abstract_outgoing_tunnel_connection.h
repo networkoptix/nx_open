@@ -34,6 +34,11 @@ public:
         std::unique_ptr<AbstractStreamSocket>,
         bool stillValid)> OnNewConnectionHandler;
 
+    AbstractOutgoingTunnelConnection(aio::AbstractAioThread* aioThread = nullptr)
+    :
+        aio::BasicPollable(aioThread)
+    {
+    }
     virtual ~AbstractOutgoingTunnelConnection() {}
 
     /**

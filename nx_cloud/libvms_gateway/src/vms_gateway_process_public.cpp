@@ -40,7 +40,7 @@ int VmsGatewayProcessPublic::exec()
     return m_impl->exec();
 }
 
-const VmsGatewayProcess* VmsGatewayProcessPublic::impl() const
+VmsGatewayProcess* VmsGatewayProcessPublic::impl() const
 {
     return m_impl;
 }

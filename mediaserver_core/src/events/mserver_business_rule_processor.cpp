@@ -667,7 +667,8 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
     QVariantHash contextMap;
 
     contextMap[tpProductName] = QnAppInfo::productNameLong();
-    contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType);
+    const int deviceCount = aggregationInfo.toList().size();
+    contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType, qMax(1, deviceCount));
     contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_NameOnly);
 	contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
 

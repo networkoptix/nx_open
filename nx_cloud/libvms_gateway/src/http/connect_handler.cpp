@@ -7,6 +7,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "settings.h"
+#include "run_time_options.h"
 
 namespace nx {
 namespace cloud {
@@ -14,9 +15,12 @@ namespace gateway {
 
 static const int kDefaultBufferSize = 16 * 1024;
 
-ConnectHandler::ConnectHandler(const conf::Settings& settings)
-    : m_settings(settings)
-    , m_connection(nullptr)
+ConnectHandler::ConnectHandler(
+    const conf::Settings& settings,
+    const conf::RunTimeOptions& runTimeOptions)
+:
+    m_settings(settings),
+    m_runTimeOptions(runTimeOptions)
 {
 }
 

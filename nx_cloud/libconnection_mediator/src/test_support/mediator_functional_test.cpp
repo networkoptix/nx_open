@@ -120,7 +120,7 @@ void MediatorFunctionalTest::registerCloudDataProvider(
 AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
 {
     AbstractCloudDataProvider::System system(
-        nx::utils::generateRandomName(16),
+        QnUuid::createUuid().toSimpleString().toUtf8(),
         nx::utils::generateRandomName(16),
         true);
     m_cloudDataProvider.addSystem(
@@ -131,57 +131,50 @@ AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
 
 std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
     const AbstractCloudDataProvider::System& system,
-    nx::String name)
+    nx::String name, bool bindEndpoint)
 {
     auto server = std::make_unique<MediaServerEmulator>(
         stunEndpoint(),
         system,
         std::move(name));
-    if (!server->start() || (server->registerOnMediator() != api::ResultCode::ok))
+
+    if (!server->start())
+    {
+        NX_LOGX(lm("Failed to start server: %1").arg(server->fullName()), cl_logERROR);
         return nullptr;
+    }
+
+    if (bindEndpoint && server->bind() != nx::hpm::api::ResultCode::ok)
+    {
+        NX_LOGX(lm("Failed to bind server: %1, endpoint=%2")
+            .arg(server->fullName()).str(server->endpoint()), cl_logERROR);
+        return nullptr;
+    }
+
     return server;
 }
 
 std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addRandomServer(
-    const AbstractCloudDataProvider::System& system)
+    const AbstractCloudDataProvider::System& system, bool bindEndpoint)
 {
-    auto server = std::make_unique<MediaServerEmulator>(stunEndpoint(), system);
-    if (!server->start())
-    {
-        std::cerr<<"Failed to start server"<<std::endl;
-        return nullptr;
-    }
-    const auto resultCode = server->registerOnMediator();
-    if (resultCode != api::ResultCode::ok)
-    {
-        std::cerr<<"Failed to register server on mediator. "
-            <<QnLexical::serialized(resultCode).toStdString()<<std::endl;
-        return nullptr;
-    }
-    return server;
-}
-
-std::unique_ptr<MediaServerEmulator>
-    MediatorFunctionalTest::addRandomServerNotRegisteredOnMediator(
-        const AbstractCloudDataProvider::System& system)
-{
-    auto server = std::make_unique<MediaServerEmulator>(stunEndpoint(), system);
-    if (!server->start())
-        return nullptr;
-    return server;
+    return addServer(system, QnUuid::createUuid().toSimpleString().toUtf8(), bindEndpoint);
 }
 
 std::vector<std::unique_ptr<MediaServerEmulator>>
     MediatorFunctionalTest::addRandomServers(
         const AbstractCloudDataProvider::System& system,
-        size_t count)
+        size_t count, bool bindEndpoint)
 {
     std::vector<std::unique_ptr<MediaServerEmulator>> systemServers;
-    systemServers.push_back(std::make_unique<MediaServerEmulator>(stunEndpoint(), system));
-    systemServers.push_back(std::make_unique<MediaServerEmulator>(stunEndpoint(), system));
-    for (auto& server: systemServers)
-        if (!server->start() || (server->registerOnMediator() != api::ResultCode::ok))
-            return std::vector<std::unique_ptr<MediaServerEmulator>>();
+    for (size_t i = 0; i < count; ++i)
+    {
+        auto server = addRandomServer(system, bindEndpoint);
+        if (!server)
+            return {};
+
+        systemServers.push_back(std::move(server));
+    }
+
     return systemServers;
 }
 

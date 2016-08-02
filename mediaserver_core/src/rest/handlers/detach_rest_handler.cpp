@@ -40,12 +40,6 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, const QnUu
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx_http::StatusCode::ok;
     }
-    const auto admin = qnResPool->getAdministrator();
-    if (!admin)
-    {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error. Can't find admin user."));
-        return nx_http::StatusCode::ok;
-    }
 
     // change system name first to detatch from other servers
     nx::SystemName systemName;
@@ -57,7 +51,7 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, const QnUu
     }
 
     QString errString;
-    if (!changeAdminPassword(passwordData, userId, &errString)) {
+    if (!updateAdminUser(passwordData, QnOptionalBool(true), userId, &errString)) {
         result.setError(QnJsonRestResult::CantProcessRequest, errString);
         return nx_http::StatusCode::ok;
     }

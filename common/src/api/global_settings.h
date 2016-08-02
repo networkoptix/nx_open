@@ -16,6 +16,7 @@
 #include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
+#include <nx_ec/data/api_resource_data.h>
 
 class QnAbstractResourcePropertyAdaptor;
 
@@ -36,7 +37,7 @@ public:
 
     void synchronizeNow();
     bool synchronizeNowSync();
-    bool takeFromSettings(QSettings* settings);
+    bool takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer);
 
     QSet<QString> disabledVendorsSet() const;
     QString disabledVendors() const;
@@ -99,6 +100,8 @@ public:
     QString systemNameForId() const;
     void setSystemNameForId(const QString &value);
 
+    QString clientStatisticsSettingsUrl() const;
+
     QString statisticsReportServerApi() const;
     void setStatisticsReportServerApi(const QString &value);
 
@@ -154,6 +157,8 @@ public:
     */
     const QList<QnAbstractResourcePropertyAdaptor*>& allSettings() const;
 
+    bool isGlobalSetting(const ec2::ApiResourceParamWithRefData& param) const;
+
 signals:
     void initialized();
 
@@ -204,6 +209,7 @@ private:
     QnResourcePropertyAdaptor<QnUuid> *m_systemIdAdaptor;
     QnResourcePropertyAdaptor<QString> *m_systemNameForIdAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportServerApiAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_clientStatisticsSettingsUrlAdaptor;
 
     // set of email settings adaptors
     QnResourcePropertyAdaptor<QString> *m_serverAdaptor;

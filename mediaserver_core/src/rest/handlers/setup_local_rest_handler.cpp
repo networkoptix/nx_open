@@ -10,6 +10,7 @@
 #include <nx/fusion/model_functions.h>
 #include "rest/server/rest_connection_processor.h"
 #include <api/resource_property_adaptor.h>
+#include <rest/helpers/permissions_helper.h>
 
 namespace
 {
@@ -58,8 +59,10 @@ int QnSetupLocalSystemRestHandler::executePost(
 
 int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUuid &userId, QnJsonRestResult &result)
 {
-    if (data.oldPassword.isEmpty())
-        data.oldPassword = kDefaultAdminPassword;
+    if (QnPermissionsHelper::isSafeMode())
+        return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::isOwner(userId))
+        return QnPermissionsHelper::notOwnerError(result);
 
     if (!qnGlobalSettings->isNewSystem())
     {
@@ -108,7 +111,7 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
     }
 
     QString errString;
-    if (!changeAdminPassword(data, userId, &errString))
+    if (!updateAdminUser(data, QnOptionalBool(true), userId, &errString))
     {
         //changing system name back
         changeSystemName(systemNameBak, 0, 0, true, Qn::UserAccessData(userId));

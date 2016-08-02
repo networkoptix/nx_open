@@ -65,15 +65,18 @@ public:
         \param udtConnection already established connection to the target host
     */
     OutgoingTunnelConnection(
+        aio::AbstractAioThread* aioThread,
         nx::String connectionId,
         std::unique_ptr<UdtStreamSocket> udtConnection,
         Timeouts timeouts);
     OutgoingTunnelConnection(
+        aio::AbstractAioThread* aioThread,
         nx::String connectionId,
         std::unique_ptr<UdtStreamSocket> udtConnection);
     ~OutgoingTunnelConnection();
 
     virtual void stopWhileInAioThread() override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,

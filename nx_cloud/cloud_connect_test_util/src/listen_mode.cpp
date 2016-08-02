@@ -179,7 +179,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
 
         std::vector<String> serverIds;
         {
-            QString serverId = nx::utils::generateRandomName(7);
+            QString serverId = QnUuid::createUuid().toSimpleString().toUtf8();
             args.read("server-id", &serverId);
             serverIds.push_back(serverId.toUtf8());
 

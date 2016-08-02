@@ -449,6 +449,24 @@ api::ResultCode CdbFunctionalTest::getSystem(
 api::ResultCode CdbFunctionalTest::shareSystem(
     const std::string& email,
     const std::string& password,
+    const api::SystemSharing& systemSharing)
+{
+    auto connection = connectionFactory()->createConnection(email, password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) =
+        makeSyncCall<api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::SystemManager::shareSystem,
+                connection->systemManager(),
+                std::move(systemSharing),
+                std::placeholders::_1));
+    return resCode;
+}
+
+api::ResultCode CdbFunctionalTest::shareSystem(
+    const std::string& email,
+    const std::string& password,
     const std::string& systemID,
     const std::string& accountEmail,
     api::SystemAccessRole accessRole)
@@ -460,16 +478,7 @@ api::ResultCode CdbFunctionalTest::shareSystem(
     systemSharing.systemID = systemID;
     systemSharing.accessRole = accessRole;
 
-    api::ResultCode resCode = api::ResultCode::ok;
-    std::tie(resCode) =
-        makeSyncCall<api::ResultCode>(
-            std::bind(
-                &nx::cdb::api::SystemManager::shareSystem,
-                connection->systemManager(),
-                std::move(systemSharing),
-                std::placeholders::_1));
-
-    return resCode;
+    return shareSystem(email, password, std::move(systemSharing));
 }
 
 api::ResultCode CdbFunctionalTest::updateSystemSharing(

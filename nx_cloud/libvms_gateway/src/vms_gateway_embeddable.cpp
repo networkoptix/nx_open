@@ -46,6 +46,11 @@ SocketAddress VmsGatewayEmbeddable::endpoint() const
     return m_endpoint;
 }
 
+void VmsGatewayEmbeddable::enforceSslFor(const SocketAddress& targetAddress, bool enabled)
+{
+    moduleInstance()->impl()->enforceSslFor(targetAddress, enabled);
+}
+
 } // namespace gateway
 } // namespace cloud
 } // namespace nx

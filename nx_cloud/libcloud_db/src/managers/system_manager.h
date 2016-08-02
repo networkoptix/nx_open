@@ -138,6 +138,9 @@ public:
     api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
         const std::string& systemID) const;
+    boost::optional<api::SystemSharingEx> getSystemSharingData(
+        const std::string& accountEmail,
+        const std::string& systemID) const;
 
     //!Create data view restricted by \a authzInfo and \a filter
     DataView<data::SystemData> createView(
@@ -204,9 +207,9 @@ private:
         data::SystemData systemData,
         std::function<void(api::ResultCode, data::SystemData)> completionHandler);
 
-    nx::db::DBResult insertSystemSharingToDB(
-        QSqlDatabase* const connection,
-        const data::SystemSharing& systemSharing);
+    //nx::db::DBResult insertSystemSharingToDB(
+    //    QSqlDatabase* const connection,
+    //    const data::SystemSharing& systemSharing);
     void systemSharingAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult dbResult,

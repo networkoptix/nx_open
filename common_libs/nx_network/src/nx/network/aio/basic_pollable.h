@@ -30,6 +30,8 @@ class NX_NETWORK_API BasicPollable
     public AbstractPollable
 {
 public:
+    BasicPollable(aio::AbstractAioThread* aioThread = nullptr);
+
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler);
     virtual void pleaseStopSync();
 

@@ -6,6 +6,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <core/resource_management/user_access_data.h>
+#include <utils/common/optional.h>
 
 // TODO: #Elric this belongs together with server_settings
 
@@ -77,19 +78,17 @@ struct PasswordData
     QByteArray passwordHash;
     QByteArray passwordDigest;
     QByteArray cryptSha512Hash;
-    QString oldPassword;
 };
 
-#define PasswordData_Fields (password)(realm)(passwordHash)(passwordDigest)(cryptSha512Hash)(oldPassword)
+#define PasswordData_Fields (password)(realm)(passwordHash)(passwordDigest)(cryptSha512Hash)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (PasswordData),
     (json));
 
 
-bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errString = nullptr);
+bool updateAdminUser(PasswordData data, QnOptionalBool isEnabled, const QnUuid &userId, QString* errString = nullptr);
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
-bool validateOwnerPassword(const PasswordData& passwordData, QString* errStr);
 
 
 bool isLocalAppServer(const QString &host);

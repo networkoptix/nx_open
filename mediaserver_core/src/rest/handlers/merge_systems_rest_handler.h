@@ -17,8 +17,7 @@ public:
 private:
     bool applyCurrentSettings(
             const QUrl &remoteUrl,
-            const QString &password,
-            const QString &currentPassword,
+            const QString &remoteAdminPassword,
             const QnUserResourcePtr &admin,
             bool oneServer,
             const QnRestConnectionProcessor *owner);
@@ -26,7 +25,7 @@ private:
     bool applyRemoteSettings(
             const QUrl &remoteUrl,
             const QString &systemName,
-            const QString &password,
+            const QString &remoteAdminPassword,
             QnUserResourcePtr &admin,
             const QnRestConnectionProcessor *owner);
 };

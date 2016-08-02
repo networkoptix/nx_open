@@ -14,6 +14,22 @@
 #include "network/module_information.h"
 #include "nx_ec/data/api_runtime_data.h"
 
+class QSettings;
+struct AdminPasswordData
+{
+    void saveToSettings(QSettings* settings);
+    void loadFromSettings(const QSettings* settings);
+    bool isEmpty() const;
+
+    static void clearSettings(QSettings* settings);
+
+    QByteArray digest;
+    QByteArray hash;
+    QByteArray cryptSha512Hash;
+    QByteArray realm;
+};
+
+
 class QnResourceDataPool;
 
 /**
@@ -21,7 +37,8 @@ class QnResourceDataPool;
  *
  * All singletons and initialization/deinitialization code goes here.
  */
-class QnCommonModule: public QObject, public QnInstanceStorage, public Singleton<QnCommonModule> {
+class QnCommonModule: public QObject, public QnInstanceStorage, public Singleton<QnCommonModule>
+{
     Q_OBJECT
 public:
     QnCommonModule(QObject *parent = NULL);
@@ -81,8 +98,8 @@ public:
     void setUseLowPriorityAdminPasswordHach(bool value);
     bool useLowPriorityAdminPasswordHach() const;
 
-    void setAdminPasswordData(const QByteArray& hash, const QByteArray& digest);
-    void adminPasswordData(QByteArray* hash, QByteArray* digest) const;
+    void setAdminPasswordData(const AdminPasswordData& data);
+    AdminPasswordData adminPasswordData() const;
 
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
@@ -131,8 +148,7 @@ private:
     QSet<QnUuid> m_allowedPeers;
     qint64 m_systemIdentityTime;
 
-    QByteArray m_adminPaswdHash;
-    QByteArray m_adminPaswdDigest;
+    AdminPasswordData m_adminPasswordData;
     bool m_lowPriorityAdminPassword;
     Qn::PeerType m_localPeerType;
 };

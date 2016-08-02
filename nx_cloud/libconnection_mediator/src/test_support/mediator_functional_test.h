@@ -47,16 +47,18 @@ public:
     void registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider);
 
     AbstractCloudDataProvider::System addRandomSystem();
+
     std::unique_ptr<MediaServerEmulator> addServer(
         const AbstractCloudDataProvider::System& system,
-        nx::String name);
+        nx::String name, bool bindEndpoint = true);
+
     std::unique_ptr<MediaServerEmulator> addRandomServer(
-        const AbstractCloudDataProvider::System& system);
-    std::unique_ptr<MediaServerEmulator> addRandomServerNotRegisteredOnMediator(
-        const AbstractCloudDataProvider::System& system);
+        const AbstractCloudDataProvider::System& system,
+        bool bindEndpoint = true);
+
     std::vector<std::unique_ptr<MediaServerEmulator>> addRandomServers(
         const AbstractCloudDataProvider::System& system,
-        size_t count);
+        size_t count, bool bindEndpoint = true);
 
     std::tuple<nx_http::StatusCode::Value, data::ListeningPeersBySystem>
         getListeningPeers() const;

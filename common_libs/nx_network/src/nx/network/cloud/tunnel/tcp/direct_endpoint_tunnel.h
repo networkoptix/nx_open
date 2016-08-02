@@ -21,6 +21,7 @@ class NX_NETWORK_API DirectTcpEndpointTunnel
 {
 public:
     DirectTcpEndpointTunnel(
+        aio::AbstractAioThread* aioThread,
         nx::String connectSessionId,
         SocketAddress targetEndpoint,
         std::unique_ptr<TCPSocket> connection);

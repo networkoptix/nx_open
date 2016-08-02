@@ -270,8 +270,6 @@ const QString SERVER_GUID = lit("serverGuid");
 const QString SERVER_GUID2 = lit("serverGuid2");
 const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
 const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode");
-const QString ADMIN_PSWD_HASH = lit("adminMd5Hash");
-const QString ADMIN_PSWD_DIGEST = lit("adminMd5Digest");
 const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
@@ -956,7 +954,8 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
         return;
 
     nx::ServerSetting::setSysIdTime(value);
-    if (sender != qnCommon->moduleGUID()) {
+    if (sender != qnCommon->moduleGUID())
+    {
         MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
         saveAdminPswdHash();
         restartServer(0);
@@ -1238,9 +1237,6 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
         for(const auto &user: users)
             messageProcessor->updateResource(user);
-
-        /* Here the admin user must exist, global settings also. */
-        updateStatisticsAllowedSettings();
     }
 
     {
@@ -1349,49 +1345,6 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         propertyDictionary->saveParams(m_mediaServer->getId());
     }
 }
-
-
-void MediaServerProcess::updateStatisticsAllowedSettings() {
-
-    {   /* Security check */
-        const auto admin = qnResPool->getAdministrator();
-        NX_ASSERT(admin, Q_FUNC_INFO, "Administrator must exist here");
-        if (!admin)
-            return;
-    }
-
-    auto setValue = [this](bool value)
-    {
-        qnGlobalSettings->setStatisticsAllowed(value);
-        qnGlobalSettings->synchronizeNow();
-    };
-
-    /* Hardcoded constant from v2.3.2 */
-    static const QString statisticsReportAllowed = lit("statisticsReportAllowed");
-
-    /* Value set by installer has the greatest priority */
-    const auto confStats = MSSettings::roSettings()->value(statisticsReportAllowed);
-    if (!confStats.isNull())
-    {
-        if (confStats.toString() != lit(""))
-        {
-            setValue(confStats.toBool());
-            /* Cleanup installer value. */
-            MSSettings::roSettings()->setValue(statisticsReportAllowed, lit(""));
-            MSSettings::roSettings()->sync();
-        }
-    }
-    else
-    /* If user didn't make the decision in the current version, check if he made it in the previous version */
-    if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(statisticsReportAllowed))
-    {
-        bool value;
-        if (QnLexical::deserialize(m_mediaServer->getProperty(statisticsReportAllowed), &value))
-            setValue(value);
-        propertyDictionary->removeProperty(m_mediaServer->getId(), statisticsReportAllowed);
-    }
-}
-
 
 void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
 {
@@ -1697,9 +1650,15 @@ bool MediaServerProcess::initTcpListener(
 void MediaServerProcess::saveAdminPswdHash()
 {
     QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (admin) {
-        MSSettings::roSettings()->setValue(ADMIN_PSWD_HASH, admin->getHash());
-        MSSettings::roSettings()->setValue(ADMIN_PSWD_DIGEST, admin->getDigest());
+    if (admin)
+    {
+        AdminPasswordData data;
+        data.digest = admin->getDigest();
+        data.hash = admin->getHash();
+        data.cryptSha512Hash = admin->getCryptSha512Hash();
+        data.realm = admin->getRealm().toUtf8();
+
+        data.saveToSettings(MSSettings::roSettings());
     }
 }
 
@@ -1883,7 +1842,9 @@ void MediaServerProcess::run()
     qnCommon->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
     qnCommon->setUseLowPriorityAdminPasswordHach(settings->value(LOW_PRIORITY_ADMIN_PASSWORD, false).toBool());
 
-    qnCommon->setAdminPasswordData(settings->value(ADMIN_PSWD_HASH).toByteArray(), settings->value(ADMIN_PSWD_DIGEST).toByteArray());
+    AdminPasswordData passwordData;
+    passwordData.loadFromSettings(settings);
+    qnCommon->setAdminPasswordData(passwordData);
 
     qnCommon->setModuleGUID(serverGuid());
 
@@ -2031,10 +1992,10 @@ void MediaServerProcess::run()
         abort();
         return;
     }
-    settings->remove(ADMIN_PSWD_HASH);
-    settings->remove(ADMIN_PSWD_DIGEST);
-    settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
 
+    AdminPasswordData::clearSettings(settings);
+
+    settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     auto clearEc2ConnectionGuardFunc = [](MediaServerProcess*){
@@ -2329,10 +2290,10 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher());
 
-    nx::network::SocketGlobals::addressPublisher().setUpdateInterval(
+    nx::network::SocketGlobals::addressPublisher().setRetryInterval(
         nx::utils::parseTimerDuration(
             MSSettings::roSettings()->value(MEDIATOR_ADDRESS_UPDATE).toString(),
-            nx::network::cloud::MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL));
+            nx::network::cloud::MediatorAddressPublisher::kDefaultRetryInterval));
 
     /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
     QnMediaServerResourceSearchers searchers;
@@ -2356,35 +2317,13 @@ void MediaServerProcess::run()
 
     auto upnpPortMapper = initializeUpnpPortMapper();
 
-    qnGlobalSettings->takeFromSettings(MSSettings::roSettings());
+    qnGlobalSettings->takeFromSettings(MSSettings::roSettings(), m_mediaServer);
     qnCommon->updateModuleInformation();
 
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
     {
-
+        //todo: root password for NX1 should be updated in case of cloud owner
         hostSystemPasswordSynchronizer->syncLocalHostRootPasswordWithAdminIfNeeded( adminUser );
-
-        bool adminParamsChanged = false;
-
-        /* List of global setting, that can be overridden in server local config (e.g. by installer) */
-        QStringList replaceableParameters {
-            QnMultiserverStatisticsRestHandler::kSettingsUrlParam};
-
-        for (const QString& key: replaceableParameters)
-        {
-            const QString value = MSSettings::roSettings()->value(key).toString();
-            // TODO: #ynikitenkov fix to use qnGlobalSettings in 2.6
-            if (adminUser->setProperty(key, value, QnResource::NO_ALLOW_EMPTY))
-            {
-                MSSettings::roSettings()->remove(key);
-                adminParamsChanged = true;
-            }
-        }
-
-        if (adminParamsChanged)
-        {
-            propertyDictionary->saveParams(adminUser->getId());
-        }
     }
     MSSettings::roSettings()->sync();
 

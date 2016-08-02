@@ -58,7 +58,12 @@ void AuthenticationProvider::getCdbNonce(
 
     const auto md5Hash = calcNonceHash(systemID, timestamp);
 
-    QByteArray random3Bytes = nx::utils::random::generate(3);
+    //TODO #ak replace with proper vectors function when available
+    QByteArray random3Bytes;
+    random3Bytes.resize(3);
+    for (auto& ch : random3Bytes)
+        ch = nx::utils::random::number<int>('a', 'z');
+    
     const auto nonce =
         random3Bytes +
         (QByteArray::fromRawData(reinterpret_cast<const char*>(&timestamp), sizeof(timestamp))
@@ -111,14 +116,15 @@ void AuthenticationProvider::getAuthenticationResponse(
     if (account->statusCode != api::AccountStatus::activated)
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
 
-    const auto systemAccessRole = 
-        m_systemManager.getAccountRightsForSystem(account->email, systemID);
-    if (systemAccessRole == api::SystemAccessRole::none)
+    auto systemSharingData = 
+        m_systemManager.getSystemSharingData(account->email, systemID);
+    if (!static_cast<bool>(systemSharingData))
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
 
     api::AuthResponse response;
     response.nonce = authRequest.nonce;
-    response.accessRole = systemAccessRole;
+    response.authenticatedAccountData = std::move(*systemSharingData);
+    response.accessRole = response.authenticatedAccountData.accessRole;
     const auto intermediateResponse = nx_http::calcIntermediateResponse(
         account->passwordHa1.c_str(),
         authRequest.nonce.c_str());
