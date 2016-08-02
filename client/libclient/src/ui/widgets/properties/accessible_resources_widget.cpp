@@ -53,7 +53,7 @@ public:
     QVariant data(const QModelIndex &index, int role) const
     {
         if (m_allChecked && role == Qt::CheckStateRole &&
-            index.data(Qn::ColumnDataRole) == QnResourceListModel::CheckColumn)
+            index.column() == QnResourceListModel::CheckColumn)
         {
             return QVariant::fromValue<int>(Qt::Checked);
         }
