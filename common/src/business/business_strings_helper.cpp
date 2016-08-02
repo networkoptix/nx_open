@@ -79,18 +79,18 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value, int coun
 
     switch( value )
     {
-    case CameraMotionEvent:     return tr("Motion on Camera(s)", 0, count);
+    case CameraMotionEvent:     return tr("Motion on Camera(s)", "", count);
     case CameraInputEvent:      return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Input Signal on Device(s)", 0, count),
-                                    tr("Input Signal on Camera(s)", 0, count)
+                                    tr("Input Signal on Device(s)", "", count),
+                                    tr("Input Signal on Camera(s)", "", count)
                                 );
     case CameraDisconnectEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Device(s) Disconnected", 0, count),
-                                    tr("Camera(s) Disconnected", 0, count)
+                                    tr("Device(s) Disconnected", "", count),
+                                    tr("Camera(s) Disconnected", "", count)
                                 );
     case CameraIpConflictEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Device(s) IP Conflict", 0, count),
-                                    tr("Camera(s) IP Conflict", 0, count)
+                                    tr("Device(s) IP Conflict", "", count),
+                                    tr("Camera(s) IP Conflict", "", count)
                                 );
     case AnyCameraEvent:        return QnDeviceDependentStrings::getDefaultNameFromSet(
                                     tr("Any Device Issue"),
