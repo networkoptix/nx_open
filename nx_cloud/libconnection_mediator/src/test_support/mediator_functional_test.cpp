@@ -120,7 +120,7 @@ void MediatorFunctionalTest::registerCloudDataProvider(
 AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
 {
     AbstractCloudDataProvider::System system(
-        nx::utils::generateRandomName(16),
+        QnUuid::createUuid().toSimpleString().toUtf8(),
         nx::utils::generateRandomName(16),
         true);
     m_cloudDataProvider.addSystem(

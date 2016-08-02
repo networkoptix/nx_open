@@ -222,14 +222,17 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
                 EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
 
                 const auto entries = info.getAll();
-                ASSERT_EQ(info.getAll().size(), 2);
+                ASSERT_EQ(info.getAll().size(), kDoNotResolveOnMediator ? 1 : 2);
 
-                const AddressEntry entry1 = entries.front();
-                EXPECT_EQ(entry1.type, AddressType::direct);
-                EXPECT_EQ(entry1.host, kResult.address);
-                EXPECT_EQ(entry1.attributes.size(), 1);
-                EXPECT_EQ(entry1.attributes.front().type, AddressAttributeType::port);
-                EXPECT_EQ(entry1.attributes.front().value, kResult.port);
+                if (!kDoNotResolveOnMediator)
+                {
+                    const AddressEntry entry1 = entries.front();
+                    EXPECT_EQ(entry1.type, AddressType::direct);
+                    EXPECT_EQ(entry1.host, kResult.address);
+                    EXPECT_EQ(entry1.attributes.size(), 1);
+                    EXPECT_EQ(entry1.attributes.front().type, AddressAttributeType::port);
+                    EXPECT_EQ(entry1.attributes.front().value, kResult.port);
+                }
 
                 const AddressEntry entry2 = entries.back();
                 EXPECT_EQ(entry2.type, AddressType::cloud);
@@ -250,7 +253,7 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
                 EXPECT_EQ(entry.attributes.front().type, AddressAttributeType::port);
                 EXPECT_EQ(entry.attributes.front().value, kResult.port);
 
-                EXPECT_EQ(info.getAll().size(), 3); // still have some from mediator
+                EXPECT_EQ(info.getAll().size(), kDoNotResolveOnMediator ? 2 : 3);
                 if (!isSub)
                     EXPECT_EQ(info.dnsState(), HostAddressInfo::State::unresolved);
                 EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
@@ -268,11 +271,12 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
         resolveAndCheckStateWithSub(
             host, [&](HaInfoIterator it, bool)
             {
+                typedef HostAddressInfo::State st;
                 const HostAddressInfo& info = it->second;
                 EXPECT_EQ(info.fixedEntries.size(), 0);
-                EXPECT_EQ(info.getAll().size(), 0);
-                EXPECT_EQ(info.dnsState(), HostAddressInfo::State::resolved);
-                EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
+                EXPECT_EQ(info.getAll().size(), kDoNotResolveOnMediator ? 1 : 0);
+                EXPECT_EQ(info.dnsState(), kDoNotResolveOnMediator ? st::unresolved : st::resolved);
+                EXPECT_EQ(info.mediatorState(), st::resolved);
             });
     }
 }
@@ -296,18 +300,21 @@ TEST_F(AddressResolverTest, DnsVsMediator)
             EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
 
             const auto entries = info.getAll();
-            ASSERT_EQ(info.getAll().size(), 2);
+            ASSERT_EQ(info.getAll().size(), kDoNotResolveOnMediator ? 0 : 2);
 
-            const AddressEntry entry1 = entries.front();
-            EXPECT_EQ(entry1.type, AddressType::direct);
-            EXPECT_EQ(entry1.host, kResult.address);
-            EXPECT_EQ(entry1.attributes.size(), 1);
-            EXPECT_EQ(entry1.attributes.front().type, AddressAttributeType::port);
-            EXPECT_EQ(entry1.attributes.front().value, kResult.port);
+            if (!kDoNotResolveOnMediator)
+            {
+                const AddressEntry entry1 = entries.front();
+                EXPECT_EQ(entry1.type, AddressType::direct);
+                EXPECT_EQ(entry1.host, kResult.address);
+                EXPECT_EQ(entry1.attributes.size(), 1);
+                EXPECT_EQ(entry1.attributes.front().type, AddressAttributeType::port);
+                EXPECT_EQ(entry1.attributes.front().value, kResult.port);
 
-            const AddressEntry entry2 = entries.back();
-            EXPECT_EQ(entry2.type, AddressType::cloud);
-            EXPECT_EQ(entry2.host, kAddressGood);
+                const AddressEntry entry2 = entries.back();
+                EXPECT_EQ(entry2.type, AddressType::cloud);
+                EXPECT_EQ(entry2.host, kAddressGood);
+            }
         });
 
     resolveAndCheckState(
