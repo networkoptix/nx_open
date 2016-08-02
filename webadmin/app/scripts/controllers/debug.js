@@ -4,9 +4,9 @@ angular.module('webadminApp')
     .controller('DebugCtrl', function ($scope, mediaserver, $sessionStorage, $location, dialogs, $timeout) {
 
         mediaserver.getUser().then(function(user){
-            if(!user.isOwner){
+            /*if(!user.isOwner){
                 $location.path('/info'); //no admin rights - redirect
-            }
+            }*/
         });
 
         $scope.Config = Config;
@@ -98,8 +98,15 @@ angular.module('webadminApp')
         $scope.session.event = {};
         $scope.generateEvent = function(){
             $scope.session.event.eventResourceId = $scope.session.eventResource.id;
-            if($scope.session.event.state == ''){
+            if(!$scope.session.event.state){
                 delete $scope.session.event.state;
+            }
+            if($scope.session.event.metadata){
+                try {
+                    $scope.session.event.metadata = JSON.stringify(JSON.parse($scope.session.event.metadata));
+                }catch(a){
+                    console.error("couldn't decode json, ignoring" , $scope.session.event.metadata);
+                }
             }
             return mediaserver.createEvent($scope.session.event).then(function(success){
                 var result = "ok";

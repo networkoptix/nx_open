@@ -1075,13 +1075,8 @@ int CUDT::send(const char* data, int len)
             else
             {
                uint64_t exptime = CTimer::getTime() + m_iSndTimeOut * 1000ULL;
-               timespec locktime; 
-    
-               locktime.tv_sec = exptime / 1000000;
-               locktime.tv_nsec = (exptime % 1000000) * 1000;
-
                while (!m_bBroken && m_bConnected && !m_bClosing && (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize()) && m_bPeerHealth && (CTimer::getTime() < exptime))
-                  pthread_cond_timedwait(&m_SendBlockCond, &m_SendBlockLock, &locktime);
+                  pthread_cond_wait_time_monotonic(&m_SendBlockCond, &m_SendBlockLock, exptime);
             }
             pthread_mutex_unlock(&m_SendBlockLock);
          #else
@@ -1174,15 +1169,10 @@ int CUDT::recv(char* data, int len)
             }
             else
             {
-               uint64_t exptime = CTimer::getTime() + m_iRcvTimeOut * 1000ULL; 
-               timespec locktime; 
-    
-               locktime.tv_sec = exptime / 1000000;
-               locktime.tv_nsec = (exptime % 1000000) * 1000;
-
+               uint64_t exptime = CTimer::getTime() + m_iRcvTimeOut * 1000ULL;
                while (!m_bBroken && m_bConnected && !m_bClosing && (0 == m_pRcvBuffer->getRcvDataSize()))
                {
-                  pthread_cond_timedwait(&m_RecvDataCond, &m_RecvDataLock, &locktime); 
+                  pthread_cond_wait_time_monotonic(&m_RecvDataCond, &m_RecvDataLock, exptime);
                   if (CTimer::getTime() >= exptime)
                      break;
                }
@@ -1274,13 +1264,8 @@ int CUDT::sendmsg(const char* data, int len, int msttl, bool inorder)
             else
             {
                uint64_t exptime = CTimer::getTime() + m_iSndTimeOut * 1000ULL;
-               timespec locktime;
-
-               locktime.tv_sec = exptime / 1000000;
-               locktime.tv_nsec = (exptime % 1000000) * 1000;
-
                while (!m_bBroken && m_bConnected && !m_bClosing && ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len) && (CTimer::getTime() < exptime))
-                  pthread_cond_timedwait(&m_SendBlockCond, &m_SendBlockLock, &locktime);
+                  pthread_cond_wait_time_monotonic(&m_SendBlockCond, &m_SendBlockLock, exptime);
             }
             pthread_mutex_unlock(&m_SendBlockLock);
          #else
@@ -1388,12 +1373,7 @@ int CUDT::recvmsg(char* data, int len)
          else
          {
             uint64_t exptime = CTimer::getTime() + m_iRcvTimeOut * 1000ULL;
-            timespec locktime;
-
-            locktime.tv_sec = exptime / 1000000;
-            locktime.tv_nsec = (exptime % 1000000) * 1000;
-
-            if (pthread_cond_timedwait(&m_RecvDataCond, &m_RecvDataLock, &locktime) == ETIMEDOUT)
+            if (pthread_cond_wait_time_monotonic(&m_RecvDataCond, &m_RecvDataLock, exptime) == ETIMEDOUT)
                timeout = true;
 
             res = m_pRcvBuffer->readMsg(data, len);           
