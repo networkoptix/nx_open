@@ -52,8 +52,11 @@ public:
 
     QVariant data(const QModelIndex &index, int role) const
     {
-        if (m_allChecked && role == Qt::CheckStateRole && index.column() == QnResourceListModel::CheckColumn)
+        if (m_allChecked && role == Qt::CheckStateRole &&
+            index.data(Qn::ColumnDataRole) == QnResourceListModel::CheckColumn)
+        {
             return QVariant::fromValue<int>(Qt::Checked);
+        }
 
         return base_type::data(index, role);
     }
@@ -126,11 +129,11 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
      */
     connect(ui->namePlainText->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, this,
         [this](const QSizeF& size)
-    {
-        /* QPlainTextDocument measures height in lines, not pixels. */
-        int height = static_cast<int>(this->fontMetrics().height() * size.height());
-        ui->namePlainText->setMaximumHeight(height);
-    });
+        {
+            /* QPlainTextDocument measures height in lines, not pixels. */
+            int height = static_cast<int>(this->fontMetrics().height() * size.height());
+            ui->namePlainText->setMaximumHeight(height);
+        });
 
     initControlsModel();
     initResourcesModel();
@@ -152,19 +155,30 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     scrollBar->setUseMaximumSpace(true);
     ui->resourcesTreeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
+    if (m_controlsVisible)
+    {
+        auto keyPressSignalizer = new QnSingleEventSignalizer(this);
+        keyPressSignalizer->setEventType(QEvent::KeyPress);
+        ui->resourcesTreeView->installEventFilter(keyPressSignalizer);
+        ui->controlsTreeView->installEventFilter(keyPressSignalizer);
+        connect(keyPressSignalizer, &QnSingleEventSignalizer::activated,
+            this, &QnAccessibleResourcesWidget::at_itemViewKeyPress);
+    }
+
     auto showHideSignalizer = new QnMultiEventSignalizer(this);
     showHideSignalizer->addEventType(QEvent::Show);
     showHideSignalizer->addEventType(QEvent::Hide);
     scrollBar->installEventFilter(showHideSignalizer);
-    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this, [this, scrollBar](QObject* object, QEvent* event)
-    {
-        Q_UNUSED(object);
-        QMargins margins = ui->resourceListLayout->contentsMargins();
-        int margin = style()->pixelMetric(QStyle::PM_DefaultTopLevelMargin);
-        margins.setRight(event->type() == QEvent::Show ? margin + scrollBar->width() : margin);
-        ui->resourceListLayout->setContentsMargins(margins);
-        ui->resourceListLayout->activate();
-    });
+    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this,
+        [this, scrollBar](QObject* object, QEvent* event)
+        {
+            Q_UNUSED(object);
+            QMargins margins = ui->resourceListLayout->contentsMargins();
+            int margin = style()->pixelMetric(QStyle::PM_DefaultTopLevelMargin);
+            margins.setRight(event->type() == QEvent::Show ? margin + scrollBar->width() : margin);
+            ui->resourceListLayout->setContentsMargins(margins);
+            ui->resourceListLayout->activate();
+        });
 
     auto itemDelegate = new QnResourceItemDelegate(this);
     itemDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
@@ -480,3 +494,41 @@ void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
     }
 }
 
+void QnAccessibleResourcesWidget::at_itemViewKeyPress(QObject* watched, QEvent* event)
+{
+    NX_ASSERT(event->type() == QEvent::KeyPress);
+    auto keyEvent = static_cast<QKeyEvent*>(event);
+
+    if (watched == ui->resourcesTreeView)
+    {
+        if (ui->resourcesTreeView->currentIndex().row() != 0)
+            return;
+
+        switch (keyEvent->key())
+        {
+            case Qt::Key_Up:
+            case Qt::Key_PageUp:
+                ui->controlsTreeView->setFocus();
+                event->accept();
+                break;
+
+            default:
+                break;
+        }
+    }
+    else if (watched == ui->controlsTreeView)
+    {
+        switch (keyEvent->key())
+        {
+            case Qt::Key_Down:
+            case Qt::Key_PageDown:
+                ui->resourcesTreeView->setCurrentIndex(ui->resourcesTreeView->model()->index(0, 0));
+                ui->resourcesTreeView->setFocus();
+                event->accept();
+                break;
+
+            default:
+                break;
+        }
+    }
+}
