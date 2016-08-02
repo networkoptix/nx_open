@@ -55,7 +55,7 @@ private:
 
         //registering server in mediator
         m_system = mediator().addRandomSystem();
-        m_server = mediator().addRandomServerNotRegisteredOnMediator(m_system);
+        m_server = mediator().addRandomServer(m_system, false);
         ASSERT_NE(nullptr, m_server);
 
         SocketGlobals::mediatorConnector().setSystemCredentials(

@@ -2297,7 +2297,8 @@ void QnWorkbenchActionHandler::sendServerRequest(const QnMediaServerResourcePtr&
 
 void QnWorkbenchActionHandler::at_serverRequest_nonceReceived(QnAsyncHttpClientReply *reply)
 {
-    auto it = m_serverRequests.find(reply->url());
+    const auto serverUrl = reply->url();
+    auto it = m_serverRequests.find(serverUrl);
     if (it == m_serverRequests.end())
         return;
 
@@ -2316,23 +2317,21 @@ void QnWorkbenchActionHandler::at_serverRequest_nonceReceived(QnAsyncHttpClientR
     }
 
     auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-    QUrl url(lit("%1://%2/%3:%4/%5")
-        .arg(gateway->isSslEnabled() ? lit("https") : lit("http"))
+    QUrl url(lit("http://%1/%2:%3:%4/%5")
         .arg(gateway->endpoint().toString())
-        .arg(reply->url().host()).arg(reply->url().port())
-        .arg(request.path)
-        );
+        .arg(gateway->isSslEnabled() ? serverUrl.scheme() : lit("http"))
+        .arg(serverUrl.host()).arg(serverUrl.port())
+        .arg(request.path));
 
-    QString login = QnAppServerConnectionFactory::url().userName();
-    QString password = QnAppServerConnectionFactory::url().password();
+    const auto appserverUrl = QnAppServerConnectionFactory::url();
+    const auto authParam = createHttpQueryAuthParam(
+        appserverUrl.userName(), appserverUrl.password(),
+        auth.realm, nx_http::Method::GET, auth.nonce.toUtf8());
 
     QUrlQuery urlQuery(url);
-    urlQuery.addQueryItem(
-        lit("auth"),
-        QLatin1String(createHttpQueryAuthParam(
-            login, password, auth.realm, nx_http::Method::GET, auth.nonce.toUtf8())));
-
+    urlQuery.addQueryItem(lit("auth"), QLatin1String(authParam));
     url.setQuery(urlQuery);
+
     url = QnNetworkProxyFactory::instance()->urlToResource(url, request.server);
     QDesktopServices::openUrl(url);
 }

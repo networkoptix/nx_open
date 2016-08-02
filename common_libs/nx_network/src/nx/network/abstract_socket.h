@@ -1,10 +1,4 @@
-/**********************************************************
-* 28 aug 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef ABSTRACT_SOCKET_H
-#define ABSTRACT_SOCKET_H
+#pragma once
 
 #include <chrono>
 #include <cstdint> /* For std::uintptr_t. */
@@ -65,6 +59,7 @@ public:
     */
     virtual bool bind( const SocketAddress& localAddress ) = 0;
     bool bind( const QString& localAddress, unsigned short localPort );
+
     //!Bind to local network interface by its name
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
@@ -72,8 +67,10 @@ public:
     //virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) = 0;
     //!Get local address, socket is bound to
     virtual SocketAddress getLocalAddress() const = 0;
+
     //!Close socket
     virtual bool close() = 0;
+
     //!Returns true, if socket has been closed previously with \a AbstractSocket::close call
     virtual bool isClosed() const = 0;
 
@@ -85,48 +82,57 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool setReuseAddrFlag( bool reuseAddr ) = 0;
+
     //!Reads reuse addr flag
     /*!
         \param val Filled with flag value in case of success. In case of error undefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getReuseAddrFlag( bool* val ) const = 0;
+
     //!if \a val is \a true turns non-blocking mode on, else turns it off
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool setNonBlockingMode( bool val ) = 0;
+
     //!Reads non-blocking mode flag
     /*!
         \param val Filled with non-blocking mode flag in case of success. In case of error undefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getNonBlockingMode( bool* val ) const = 0;
+
     //!Reads MTU (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getMtu( unsigned int* mtuValue ) const = 0;
+
     //!Set socket's send buffer size (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool setSendBufferSize( unsigned int buffSize ) = 0;
+
     //!Reads socket's send buffer size (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getSendBufferSize( unsigned int* buffSize ) const = 0;
+
     //!Set socket's receive buffer (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool setRecvBufferSize( unsigned int buffSize ) = 0;
+
     //!Reads socket's read buffer size (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getRecvBufferSize( unsigned int* buffSize ) const = 0;
+
     //!Change socket's receive timeout (in millis)
     /*!
         \param ms. New timeout value. 0 - no timeout
@@ -135,12 +141,14 @@ public:
     */
     virtual bool setRecvTimeout( unsigned int millis ) = 0;
     bool setRecvTimeout( std::chrono::milliseconds m ) { return setRecvTimeout( m.count() ); }
+
     //!Get socket's receive timeout (in millis)
     /*!
         \param millis In case of error value is udefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getRecvTimeout( unsigned int* millis ) const = 0;
+
     //!Change socket's send timeout (in millis)
     /*!
         \param ms. New timeout value. 0 - no timeout
@@ -149,28 +157,36 @@ public:
     */
     virtual bool setSendTimeout( unsigned int ms ) = 0;
     bool setSendTimeout( std::chrono::milliseconds m ) { return setSendTimeout( m.count() ); }
+
     //!Get socket's send timeout (in millis)
     /*!
         \param millis In case of error value is udefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getSendTimeout( unsigned int* millis ) const = 0;
+
     //!Get socket's last error code. Needed in case of \a aio::etError
     /*!
         \return \a true if read error code successfully, \a false otherwise
     */
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const = 0;
+
     //!Returns system-specific socket handle
     /*!
         TODO: #ak remove this method after complete move to the new socket
     */
     virtual SOCKET_HANDLE handle() const = 0;
+
+    //!Returns handle for PollSet
+    virtual nx::network::Pollable* pollable() = 0;
+
     //!Call \a handler from within aio thread \a sock is bound to
     /*!
         \note Call will always be queued. I.e., if called from handler running in aio thread, it will be called after handler has returned
         \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
     virtual void post(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+
     //!Call \a handler from within aio thread \a sock is bound to
     /*!
         \note If called in aio thread, handler will be called from within this method, otherwise - queued like \a AbstractSocket::post does
@@ -588,5 +604,3 @@ public:
     virtual bool leaveGroup( const QString &multicastGroup ) = 0;
     virtual bool leaveGroup( const QString &multicastGroup, const QString& multicastIF ) = 0;
 };
-
-#endif  //ABSTRACT_SOCKET_H

@@ -12,6 +12,12 @@ namespace nx {
 namespace network {
 namespace aio {
 
+BasicPollable::BasicPollable(aio::AbstractAioThread* aioThread)
+{
+    if (aioThread)
+        m_timer.bindToAioThread(aioThread);
+}
+
 void BasicPollable::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     post(

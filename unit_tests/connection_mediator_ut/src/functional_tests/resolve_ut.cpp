@@ -87,7 +87,7 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
         client = clientConnection();
 
     const auto system1 = addRandomSystem();
-    auto server1 = addServer(system1, nx::utils::generateRandomName(16));
+    auto server1 = addServer(system1, QnUuid::createUuid().toSimpleString().toUtf8());
     auto server2 = addServer(system1, server1->serverId());
 
     //resolving, last added server is chosen
@@ -176,7 +176,7 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
     //emulating local mediaserver
     MediaServerEmulator mserverEmulator(stunEndpoint(), system1);
     ASSERT_TRUE(mserverEmulator.start());
-    ASSERT_EQ(api::ResultCode::ok, mserverEmulator.registerOnMediator());
+    ASSERT_EQ(api::ResultCode::ok, mserverEmulator.bind());
 
     //resolving 
     api::ResolvePeerResponse resolveResponse;

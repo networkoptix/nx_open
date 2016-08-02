@@ -29,7 +29,7 @@ TEST_F(Statistics, listening_peer_list)
         client = clientConnection();
 
     const auto system1 = addRandomSystem();
-    auto server1 = addServer(system1, nx::utils::generateRandomName(16));
+    auto server1 = addServer(system1, QnUuid::createUuid().toSimpleString().toUtf8());
 
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
     data::ListeningPeersBySystem listeningPeers;

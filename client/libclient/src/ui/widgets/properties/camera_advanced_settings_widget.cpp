@@ -143,37 +143,27 @@ void QnCameraAdvancedSettingsWidget::reloadData()
 
     if (m_page == Page::Web)
     {
-        // QUrl doesn't work if it isn't constructed from QString and uses credentials. It stays invalid with error code 'AuthorityPresentAndPathIsRelative' --rvasilenko, Qt 5.2.1
+        // QUrl doesn't work if it isn't constructed from QString and uses credentials.
+        // It stays invalid with error code 'AuthorityPresentAndPathIsRelative'
+        //  --rvasilenko, Qt 5.2.1
+        const auto currentServerUrl = QnAppServerConnectionFactory::url();
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
         QUrl targetUrl = QString(lit("http://%1:%2/%3"))
-            .arg(m_camera->getHostAddress())
-            .arg(m_camera->httpPort())
+            .arg(currentServerUrl.host())
+            .arg(currentServerUrl.port())
             .arg(resourceData.value<QString>(lit("urlLocalePath"), QString()));
 
         QAuthenticator auth = m_camera->getAuth();
-
         targetUrl.setUserName(auth.user());
         targetUrl.setPassword(auth.password());
 
-#define USE_VMS_GATEWAY_PROXY_FOR_WEB_VIEW
-#ifdef USE_VMS_GATEWAY_PROXY_FOR_WEB_VIEW
-        // The idea is simple:
-        // 1. webView connects to vmsGateway directly without auth
-        // 2. vmsGateway forwards http to server (server proxy auth takes place)
-        // 3. server proxies http to camera (camera http auth takes place)
-
-        const auto currentServerUrl = QnAppServerConnectionFactory::url();
-        targetUrl.setHost(currentServerUrl.host());
-        targetUrl.setPort(currentServerUrl.port());
-
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-
-        // TODO: #mux QWebView behave strange in case of HTTP, it issues
-        //  "CONNECT <host>:<port>" which can not be correctly handled right now.
-        //  Need to work around it somehow.
-        //
-        // if (gateway->isSslEnabled())
-        //     targetUrl.setScheme(lit("https"));
+        if (gateway->isSslEnabled())
+        {
+            gateway->enforceSslFor(
+                SocketAddress(currentServerUrl.host(), currentServerUrl.port()),
+                currentServerUrl.scheme() == lit("https"));
+        }
 
         const auto gatewayAddress = gateway->endpoint();
         const QNetworkProxy gatewayProxy(
@@ -181,13 +171,7 @@ void QnCameraAdvancedSettingsWidget::reloadData()
             gatewayAddress.address.toString(), gatewayAddress.port,
             currentServerUrl.userName(), currentServerUrl.password());
 
-        m_cameraAdvancedSettingsWebPage->networkAccessManager()
-            ->setProxy(gatewayProxy);
-#else
-        const auto serverProxy = QnNetworkProxyFactory::instance()->proxyToResource(m_camera);
-        m_cameraAdvancedSettingsWebPage->networkAccessManager()
-            ->setProxy(serverProxy);
-#endif
+        m_cameraAdvancedSettingsWebPage->networkAccessManager()->setProxy(gatewayProxy);
 
         ui->webView->reload();
         ui->webView->load(QNetworkRequest(targetUrl));

@@ -16,7 +16,7 @@ std::random_device& device()
 {
     // There is a bug in OSX's clang and gcc, so thread_local is not supported :(
     #if !defined(Q_OS_MAC)
-        static thread_local std::random_device rd;
+        thread_local std::random_device rd;
         return rd;
     #else
         static pthread_key_t key;

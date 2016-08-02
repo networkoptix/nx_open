@@ -119,10 +119,10 @@ void DirectEndpointConnector::onConnected(
 
     auto tunnel =
         std::make_unique<DirectTcpEndpointTunnel>(
+            getAioThread(),
             m_connectSessionId,
             std::move(connectionContext.endpoint),
             std::move(connectionContext.connection));
-    tunnel->bindToAioThread(getAioThread());
 
     auto handler = std::move(m_completionHandler);
     m_completionHandler = nullptr;

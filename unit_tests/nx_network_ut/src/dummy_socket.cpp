@@ -106,6 +106,11 @@ AbstractSocket::SOCKET_HANDLE DummySocket::handle() const
     return 0;
 }
 
+Pollable* DummySocket::pollable()
+{
+    return nullptr;
+}
+
 bool DummySocket::connect(
     const SocketAddress& remoteSocketAddress,
     unsigned int /*timeoutMillis*/ )

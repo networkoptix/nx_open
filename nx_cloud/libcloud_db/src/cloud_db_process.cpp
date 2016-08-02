@@ -539,6 +539,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentials);
     dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentialsProlongationPeriod);
     dbStructureUpdater.addUpdateScript(db::kAddCustomAndDisabledAccessRoles);
+    dbStructureUpdater.addUpdateScript(db::kAddMoreFieldsToSystemSharing);
     return dbStructureUpdater.updateStructSync();
 }
 
