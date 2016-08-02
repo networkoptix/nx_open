@@ -15,14 +15,18 @@ namespace cloud {
 namespace tcp {
 
 DirectTcpEndpointTunnel::DirectTcpEndpointTunnel(
+    aio::AbstractAioThread* aioThread,
     nx::String connectSessionId,
     SocketAddress targetEndpoint,
     std::unique_ptr<TCPSocket> connection)
     :
+    AbstractOutgoingTunnelConnection(aioThread),
     m_connectSessionId(std::move(connectSessionId)),
     m_targetEndpoint(std::move(targetEndpoint)),
     m_tcpConnection(std::move(connection))
 {
+    if (m_tcpConnection && aioThread)
+        m_tcpConnection->bindToAioThread(aioThread);
 }
 
 DirectTcpEndpointTunnel::~DirectTcpEndpointTunnel()

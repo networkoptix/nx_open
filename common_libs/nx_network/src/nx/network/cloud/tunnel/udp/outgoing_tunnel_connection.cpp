@@ -23,6 +23,7 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     std::unique_ptr<UdtStreamSocket> udtConnection,
     Timeouts timeouts)
 :
+    AbstractOutgoingTunnelConnection(aioThread),
     m_connectionId(std::move(connectionId)),
     m_localPunchedAddress(udtConnection->getLocalAddress()),
     m_remoteHostAddress(udtConnection->getForeignAddress()),
@@ -32,8 +33,6 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     m_pleaseStopHasBeenCalled(false),
     m_pleaseStopCompleted(false)
 {
-    AbstractOutgoingTunnelConnection::bindToAioThread(aioThread);
-
     m_controlConnection->bindToAioThread(getAioThread());
     std::chrono::milliseconds timeout = m_timeouts.maxConnectionInactivityPeriod();
     m_controlConnection->socket()->setRecvTimeout(timeout.count());
