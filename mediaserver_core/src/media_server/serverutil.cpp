@@ -101,7 +101,7 @@ bool PasswordData::hasPassword() const
         !passwordDigest.isEmpty();
 }
 
-bool changeAdminPassword(PasswordData data, QnOptionalBool isEnabled, const QnUuid &userId, QString* errString)
+bool updateAdminUser(PasswordData data, QnOptionalBool isEnabled, const QnUuid &userId, QString* errString)
 {
     //genereating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
@@ -150,7 +150,7 @@ bool changeAdminPassword(PasswordData data, QnOptionalBool isEnabled, const QnUu
         }
         updatedAdmin->setPassword(QString());
     }
-    else
+    else if (!data.passwordHash.isEmpty())
     {
         updatedAdmin->setRealm(data.realm);
         updatedAdmin->setHash(data.passwordHash);

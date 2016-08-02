@@ -102,21 +102,12 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnU
         qnCommon->updateModuleInformation();
 
 
-    if (QnUserResourcePtr admin = qnResPool->getAdministrator())
+    QString errString;
+    if (!updateAdminUser(PasswordData(), QnOptionalBool(false), userId, &errString))
     {
-        // disable local admin if we use cloud owner
-        admin->setEnabled(false);
-        ec2::ApiUserData apiUser;
-        fromResourceToApi(admin, apiUser);
-        auto connection = QnAppServerConnectionFactory::getConnection2();
-        auto errCode = connection->getUserManager(Qn::UserAccessData(userId))->saveSync(apiUser);
-        if (errCode != ec2::ErrorCode::ok)
-        {
-            result.setError(QnJsonRestResult::CantProcessRequest, lit("Cannot disable local admin user"));
-            return false;
-        }
+        result.setError(QnJsonRestResult::CantProcessRequest, errString);
+        return nx_http::StatusCode::ok;
     }
-
 
     const auto& settings = QnGlobalSettings::instance()->allSettings();
     for (QnAbstractResourcePropertyAdaptor* setting : settings)

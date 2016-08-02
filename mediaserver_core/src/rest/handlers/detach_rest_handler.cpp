@@ -51,7 +51,7 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, const QnUu
     }
 
     QString errString;
-    if (!changeAdminPassword(passwordData, QnOptionalBool(true), userId, &errString)) {
+    if (!updateAdminUser(passwordData, QnOptionalBool(true), userId, &errString)) {
         result.setError(QnJsonRestResult::CantProcessRequest, errString);
         return nx_http::StatusCode::ok;
     }
