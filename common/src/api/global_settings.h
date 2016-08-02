@@ -93,6 +93,10 @@ public:
     */
     const QList<QnAbstractResourcePropertyAdaptor*>& allSettings() const;
 
+
+    int maxRecorderQueueSizeBytes() const;
+    int maxRecorderQueueSizePackets() const;
+
 signals:
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
@@ -155,6 +159,9 @@ private:
     QnResourcePropertyAdaptor<bool>* m_takeCameraOwnershipWithoutLock;
 
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabled;
+
+    QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;
+    QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets;
 
     AdaptorList m_allAdaptors;
 

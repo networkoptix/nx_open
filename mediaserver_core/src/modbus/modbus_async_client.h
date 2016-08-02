@@ -84,6 +84,7 @@ private:
     quint64 m_requestSequenceNum;
     std::shared_ptr<AbstractStreamSocket> m_socket;
     bool m_terminated;
+    bool m_connected;
 };
 
 }

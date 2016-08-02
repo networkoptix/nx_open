@@ -39,7 +39,7 @@ public:
     // Holding register is read/write word of length 2 byte.
     ModbusResponse readHoldingRegisters(quint16 startRegister, quint16 registerCount, bool* outStatus);
     ModbusResponse writeHoldingRegisters(quint16 startRegister, const QByteArray& data, bool *outStatus);
-    ModbusResponse writeSingleHoldingRegister(quint16 registerAddres, const QByteArray& data, bool* outStatus);
+    ModbusResponse writeSingleHoldingRegister(quint16 registerAddress, const QByteArray& data, bool* outStatus);
 
 private:
     bool initSocket();
@@ -48,6 +48,8 @@ private:
 private:
     quint16 m_requestTransactionId;
     char m_recvBuffer[kBufferSize];
+
+    bool m_connected;
 
     SocketAddress m_endpoint;
     std::shared_ptr<AbstractStreamSocket> m_socket;

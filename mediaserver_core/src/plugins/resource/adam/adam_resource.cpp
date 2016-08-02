@@ -11,6 +11,8 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/common/model_functions.h>
+#include <business/events/network_issue_business_event.h>
+#include <modbus/modbus_client.h>
 
 #include "adam_resource.h"
 #include "adam_modbus_io_manager.h"
@@ -41,6 +43,28 @@ QString QnAdamResource::getDriverName() const
 CameraDiagnostics::Result QnAdamResource::initInternal()
 {
     QnSecurityCamResource::initInternal();
+
+    QUrl url(getUrl());
+    auto host  = url.host();
+    auto port = url.port(nx_modbus::kDefaultModbusPort);
+
+    SocketAddress endpoint(host, port);
+
+    nx_modbus::QnModbusClient testClient(endpoint);
+
+    int triesLeft = 3;
+    bool status = false;
+
+    while (!status && triesLeft--)
+        testClient.readCoils(0, 8, &status);
+
+    if (!status)
+    {
+        qDebug() << "QnAdamResource::initInternal() " << "test request has been failed";
+        return CameraDiagnostics::RequestFailedResult(
+            lit("Test request failed"),
+            lit("couldn't get valid response from device"));
+    }
 
     Qn::CameraCapabilities caps = Qn::NoCapabilities;
 
@@ -85,7 +109,22 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
             qnSyncTime->currentUSecsSinceEpoch());
     };
 
+    auto networkIssueHandler = [this](QString reason, bool isFatal)
+    {
+        qDebug() << lit("Network issue on ADAM device %1: %2").arg(getUrl()).arg(reason);
+        emit networkIssue(
+            toSharedPointer(this),
+            qnSyncTime->currentUSecsSinceEpoch(),
+            QnBusiness::EventReason::NoReason,
+            QnNetworkIssueBusinessEvent::encodePacketLossSequence(0, 2));
+
+        if (isFatal)
+            setStatus(Qn::Offline);
+    };
+
     m_ioManager->setInputPortStateChangeCallback(callback);
+    m_ioManager->setNetworkIssueCallback(networkIssueHandler);
+
     return m_ioManager->startIOMonitoring();
 }
 
