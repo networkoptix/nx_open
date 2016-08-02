@@ -253,26 +253,19 @@ void QnTransactionTcpProcessor::run()
 
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
 
-        auto userAccessId = d->authUserId;
-        if (QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->authUserId))
-        {
-            // Here we substitute admin user with SuperAccess user to pass by all access checks unhurt
-            // since server-to-server order of transactions is unpredictable and access check for resource attribute
-            // may come before resource itself is added to the resource pool and this may be restricted by the access
-            // checking mechanics.
-            if (user->isOwner())
-                userAccessId = Qn::kSystemAccess.userId;
-        }
-
-        auto accessType = Qn::UserAccessData::Access::ClientConnection;
+        auto access = Qn::UserAccessData(d->authUserId, Qn::UserAccessData::Access::ClientConnection);
         switch (remotePeer.peerType)
         {
             case Qn::PT_Server:
-                //TODO: #rvasilenko is it safe to do here?
-                //accessType = Qn::UserAccessData::Access::System;
+                // Here we substitute admin user with SuperAccess user to pass by all access checks unhurt
+                // since server-to-server order of transactions is unpredictable and access check for resource attribute
+                // may come before resource itself is added to the resource pool and this may be restricted by the access
+                // checking mechanics.
+                NX_ASSERT(qnResPool->getResourceById<QnUserResource>(d->authUserId)->isOwner());
+                access = Qn::kSystemAccess;
                 break;
             case Qn::PT_VideowallClient:
-                accessType = Qn::UserAccessData::Access::VideoWall;
+                access = Qn::kVideowallUserAccess;
                 break;
             default:
                 break;
@@ -287,7 +280,7 @@ void QnTransactionTcpProcessor::run()
             d->request,
             contentEncoding,
             ttFinishCallback,
-            Qn::UserAccessData(userAccessId, accessType));
+            access);
 
         if (!QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid ))
             QnTransactionTransport::connectDone(remoteGuid); //< session killed. Cleanup Guid from a connected list manually
