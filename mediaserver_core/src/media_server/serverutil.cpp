@@ -17,7 +17,7 @@
 
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
-#include <nx/utils/log/log.h>
+
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
 #include <network/authenticate_helper.h>
@@ -35,6 +35,8 @@
 #include <core/resource_management/resource_access_manager.h>
 #include <network/authutil.h>
 
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace
 {
@@ -141,7 +143,10 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
 
         ec2::ApiUserData apiUser;
         fromResourceToApi(updatedAdmin, apiUser);
-        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager(Qn::UserAccessData(userId))->saveSync(apiUser, data.password);
+        auto errCode = QnAppServerConnectionFactory::getConnection2()
+            ->getUserManager(Qn::UserAccessData(userId))
+            ->saveSync(apiUser, data.password);
+        NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
         if (errCode != ec2::ErrorCode::ok)
         {
             if (errString)
@@ -161,6 +166,7 @@ bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errSt
         ec2::ApiUserData apiUser;
         fromResourceToApi(updatedAdmin, apiUser);
         auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager(Qn::UserAccessData(userId))->saveSync(apiUser, data.password);
+        NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
         if (errCode != ec2::ErrorCode::ok)
         {
             if (errString)
@@ -304,7 +310,9 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
 
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
-    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(userAccessData)->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    QnAppServerConnectionFactory::getConnection2()
+        ->getMediaServerManager(userAccessData)
+        ->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     CloudSystemNameUpdater::instance()->update();
 

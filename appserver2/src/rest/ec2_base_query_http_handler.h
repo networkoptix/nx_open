@@ -25,14 +25,14 @@
 
 namespace ec2
 {
-    // TODO: #MSAPI 
+    // TODO: #MSAPI
     //
     // Think of inheriting this one from QnBasicRestHandler (ex-QnJsonRestHandler)
     // and sharing the implementation of format handling.
-    // 
-    // Btw, it would also make sense to do some renamings. This one is a 
+    //
+    // Btw, it would also make sense to do some renamings. This one is a
     // rest handler, so should be named as such. ec2::BasicRestHandler?
-    // 
+    //
     //
 
     //!Http request handler for GET requests
@@ -117,7 +117,7 @@ namespace ec2
             const QByteArray& /*body*/,
             const QByteArray& /*srcBodyContentType*/,
             QByteArray& /*result*/,
-            QByteArray&, /*contentType*/ 
+            QByteArray&, /*contentType*/
             const QnRestConnectionProcessor*) override
         {
             return nx_http::StatusCode::badRequest;
@@ -155,7 +155,8 @@ namespace ec2
             HandlerType handler,
             const QnRestConnectionProcessor* owner)
         {
-            m_queryProcessor->getAccess(Qn::UserAccessData(owner->authUserId())).template processQueryAsync<InputData, OutputData, HandlerType>(
+            m_queryProcessor->getAccess(Qn::UserAccessData(owner->authUserId()))
+                .template processQueryAsync<InputData, OutputData, HandlerType>(
                 m_cmdCode,
                 inputData,
                 handler );
@@ -173,7 +174,7 @@ namespace ec2
     :
         public BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData> >
     {
-        typedef BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData> > base_type; 
+        typedef BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData> > base_type;
 
     public:
         FlexibleQueryHttpHandler(

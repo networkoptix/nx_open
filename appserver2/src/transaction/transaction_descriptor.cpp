@@ -345,9 +345,14 @@ struct InvalidAccessOut
     }
 };
 
-bool systemSuperAccess(const Qn::UserAccessData& accessData)
+bool systemAccess(const Qn::UserAccessData& accessData)
 {
-    return accessData.userId == Qn::kDefaultUserAccess.userId;
+    if (accessData.access == Qn::UserAccessData::Access::System)
+        NX_ASSERT(accessData.userId == Qn::kSystemAccess.userId);
+    if (accessData.userId == Qn::kSystemAccess.userId)
+        NX_ASSERT(accessData.access == Qn::UserAccessData::Access::System);
+
+    return accessData.access == Qn::UserAccessData::Access::System;
 }
 
 struct SystemSuperUserAccessOnly
@@ -355,7 +360,7 @@ struct SystemSuperUserAccessOnly
     template<typename Param>
     bool operator()(const Qn::UserAccessData& accessData, const Param&)
     {
-        return systemSuperAccess(accessData);
+        return systemAccess(accessData);
     }
 };
 
@@ -364,7 +369,9 @@ struct SystemSuperUserAccessOnlyOut
     template<typename Param>
     RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const Param&)
     {
-        return systemSuperAccess(accessData) ? RemotePeerAccess::Allowed : RemotePeerAccess::Forbidden;
+        return systemAccess(accessData)
+            ? RemotePeerAccess::Allowed
+            : RemotePeerAccess::Forbidden;
     }
 };
 
@@ -382,13 +389,21 @@ struct AllowForAllAccessOut
 
 bool resourceAccessHelper(const Qn::UserAccessData& accessData, const QnUuid& resourceId, Qn::Permission permission)
 {
-    if (systemSuperAccess(accessData))
+    if (systemAccess(accessData))
         return true;
 
     QnResourcePtr target = qnResPool->getResourceById(resourceId);
     auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
     if (qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalAdminPermission))
         return true;
+
+    if (permission == Qn::ReadPermission)
+    {
+        if (accessData.access == Qn::UserAccessData::Access::VideoWall)
+            return true;
+        if (accessData.access == Qn::UserAccessData::Access::ClientConnection)
+            return true;
+    }
 
     return qnResourceAccessManager->hasPermission(userResource, target, permission);
 }
@@ -400,7 +415,7 @@ struct ModifyResourceAccess
     template<typename Param>
     bool operator()(const Qn::UserAccessData& accessData, const Param& param)
     {
-        if (systemSuperAccess(accessData))
+        if (systemAccess(accessData))
             return true;
 
         auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
@@ -472,7 +487,7 @@ struct ModifyResourceParamAccess
 
     bool operator()(const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
     {
-        if (systemSuperAccess(accessData))
+        if (systemAccess(accessData))
             return true;
 
         if (isRemove)
@@ -567,7 +582,7 @@ struct AdminOnlyAccess
     template<typename Param>
     bool operator()(const Qn::UserAccessData& accessData, const Param&)
     {
-        if (systemSuperAccess(accessData))
+        if (systemAccess(accessData))
             return true;
 
         auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
@@ -581,7 +596,7 @@ struct AdminOnlyAccessOut
     template<typename Param>
     RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const Param&)
     {
-        if (systemSuperAccess(accessData))
+        if (systemAccess(accessData))
             return RemotePeerAccess::Allowed;
 
         auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
@@ -596,7 +611,7 @@ struct ControlVideowallAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiVideowallControlMessageData&)
     {
-        if (systemSuperAccess(accessData))
+        if (systemAccess(accessData))
             return true;
         auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
         bool result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalControlVideoWallPermission);

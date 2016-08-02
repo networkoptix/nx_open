@@ -60,7 +60,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
 
             if (ownData != newData)
             {
-                QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kDefaultUserAccess)->saveSync(ownData);
+                QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->saveSync(ownData);
                 return;
             }
 
@@ -108,7 +108,7 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         this, &QnServerMessageProcessor::at_reverseConnectionRequested);
 
     connect(connection->getMiscNotificationManager().get(), &ec2::AbstractMiscNotificationManager::systemNameChangeRequested,
-            this, [this](const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) { changeSystemName(nx::SystemName(systemName), sysIdTime, tranLogTime, false, Qn::kDefaultUserAccess); });
+            this, [this](const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) { changeSystemName(nx::SystemName(systemName), sysIdTime, tranLogTime, false, Qn::kSystemAccess); });
 }
 
 void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
@@ -151,7 +151,7 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     if (resource->getId() == qnCommon->moduleGUID() && status != Qn::Online)
     {
         // it's own server. change status to online
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager(Qn::kDefaultUserAccess)->setResourceStatusLocalSync(resource->getId(), Qn::Online);
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager(Qn::kSystemAccess)->setResourceStatusLocalSync(resource->getId(), Qn::Online);
         resource->setStatus(Qn::Online, true);
     }
     else {
@@ -238,14 +238,14 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
     {
         ec2::ApiMediaServerData apiServer;
         ec2::fromResourceToApi(mServer, apiServer);
-        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kDefaultUserAccess)->saveSync(apiServer);
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager(Qn::kDefaultUserAccess)->setResourceStatusLocalSync(apiServer.id, Qn::Online);
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager(Qn::kSystemAccess)->setResourceStatusLocalSync(apiServer.id, Qn::Online);
     }
     else if (isOwnStorage && !storage->isExternal() && storage->isWritable())
     {
         ec2::ApiStorageDataList apiStorages;
         fromResourceListToApi(QnStorageResourceList() << storage, apiStorages);
-        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kDefaultUserAccess)->saveStoragesSync(apiStorages);
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages);
     }
 }
 

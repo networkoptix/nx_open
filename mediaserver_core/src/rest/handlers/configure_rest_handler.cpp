@@ -223,7 +223,9 @@ int QnConfigureRestHandler::changePort(const QnUuid &userId, int port)
     ec2::fromResourceToApi(server, apiServer);
     auto connection = QnAppServerConnectionFactory::getConnection2();
     auto manager = connection->getMediaServerManager(Qn::UserAccessData(userId));
-    if (manager->saveSync(apiServer) != ec2::ErrorCode::ok)
+    auto errCode = manager->saveSync(apiServer);
+    NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
+    if (errCode != ec2::ErrorCode::ok)
         return ResultFail;
 
     MSSettings::roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);

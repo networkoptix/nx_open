@@ -261,7 +261,7 @@ void QnTransactionTcpProcessor::run()
             // may come before resource itself is added to the resource pool and this may be restricted by the access
             // checking mechanics.
             if (user->isOwner())
-                userAccessId = Qn::kDefaultUserAccess.userId;
+                userAccessId = Qn::kSystemAccess.userId;
         }
 
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
@@ -273,7 +273,7 @@ void QnTransactionTcpProcessor::run()
             d->request,
             contentEncoding,
             ttFinishCallback,
-            Qn::UserAccessData(userAccessId));
+            Qn::UserAccessData(userAccessId, Qn::UserAccessData::Access::ClientConnection));
 
         if (!QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid ))
             QnTransactionTransport::connectDone(remoteGuid); //< session killed. Cleanup Guid from a connected list manually
