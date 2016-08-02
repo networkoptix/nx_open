@@ -176,7 +176,7 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
     //emulating local mediaserver
     MediaServerEmulator mserverEmulator(stunEndpoint(), system1);
     ASSERT_TRUE(mserverEmulator.start());
-    ASSERT_EQ(api::ResultCode::ok, mserverEmulator.registerOnMediator());
+    ASSERT_EQ(api::ResultCode::ok, mserverEmulator.bind());
 
     //resolving 
     api::ResolvePeerResponse resolveResponse;

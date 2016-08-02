@@ -270,7 +270,6 @@ const QString SERVER_GUID = lit("serverGuid");
 const QString SERVER_GUID2 = lit("serverGuid2");
 const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
 const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode");
-
 const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
@@ -2291,10 +2290,10 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher());
 
-    nx::network::SocketGlobals::addressPublisher().setUpdateInterval(
+    nx::network::SocketGlobals::addressPublisher().setRetryInterval(
         nx::utils::parseTimerDuration(
             MSSettings::roSettings()->value(MEDIATOR_ADDRESS_UPDATE).toString(),
-            nx::network::cloud::MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL));
+            nx::network::cloud::MediatorAddressPublisher::kDefaultRetryInterval));
 
     /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
     QnMediaServerResourceSearchers searchers;
