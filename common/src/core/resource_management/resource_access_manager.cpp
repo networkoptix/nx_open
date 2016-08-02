@@ -643,7 +643,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         if (layout->isShared())
         {
             if (isAccessibleResource(user, layout) == Access::Forbidden)
-                return Qn::ReadPermission;
+                return Qn::NoPermissions;
 
             /* Global layouts editor. */
             if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
@@ -667,7 +667,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
             if (!owner)
                 return hasGlobalPermission(user, Qn::GlobalAdminPermission)
                     ? Qn::FullLayoutPermissions
-                    : Qn::ReadPermission;
+                    : Qn::NoPermissions;
 
             /* We can modify layout for user if we can modify this user. */
             Qn::Permissions userPermissions = permissions(user, owner);
@@ -678,7 +678,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
             if (userPermissions.testFlag(Qn::ReadPermission))
                 return Qn::ModifyLayoutPermission;
 
-            return Qn::ReadPermission;
+            return Qn::NoPermissions;
         }
 
         /* User can do whatever he wants with own layouts. */
