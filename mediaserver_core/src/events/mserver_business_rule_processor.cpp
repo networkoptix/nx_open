@@ -702,8 +702,8 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
                     QVariantMap camera;
 
 					QnResourceDisplayInfo camInfo(camRes);
-					contextMap[tpCameraName] = camInfo.name();
-					contextMap[tpCameraIP] = camInfo.host();
+					camera[tpCameraName] = camInfo.name();
+					camera[tpCameraIP] = camInfo.host();
 
                     qnCameraHistoryPool->updateCameraHistorySync(camRes);
                     camera[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, false);
