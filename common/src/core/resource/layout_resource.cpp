@@ -369,6 +369,7 @@ bool QnLayoutResource::isShared() const
 
 QSet<QnResourcePtr> QnLayoutResource::layoutResources() const
 {
+    QnMutexLocker locker(&m_mutex);
     return layoutResources(m_itemByUuid);
 }
 
