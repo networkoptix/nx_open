@@ -637,31 +637,31 @@ public:
     ApiObjectType getObjectType(const QnUuid& objectId);
 
     template <typename T1>
-    ErrorCode doQuery(const T1 &t1, ApiFullInfoData &data)
+    ErrorCode doQuery(const T1& t1, ApiFullInfoData& data)
     {
         ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, data);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        ec2::getTransactionDescriptorByParam<ApiResourceTypeDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.resourceTypes);
-        ec2::getTransactionDescriptorByParam<ApiMediaServerDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.servers);
-        ec2::getTransactionDescriptorByParam<ApiMediaServerUserAttributesDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.serversUserAttributesList);
-        ec2::getTransactionDescriptorByParam<ApiCameraDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.cameras);
-        ec2::getTransactionDescriptorByParam<ApiCameraAttributesDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.cameraUserAttributesList);
-        ec2::getTransactionDescriptorByParam<ApiUserDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.users);
-        ec2::getTransactionDescriptorByParam<ApiUserGroupDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.userGroups);
-        ec2::getTransactionDescriptorByParam<ApiUserGroupDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.userGroups);
-        ec2::getTransactionDescriptorByParam<ApiAccessRightsDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.accessRights);
-        ec2::getTransactionDescriptorByParam<ApiLayoutDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.layouts);
-        ec2::getTransactionDescriptorByParam<ApiVideowallDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.videowalls);
-        ec2::getTransactionDescriptorByParam<ApiBusinessRuleDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.rules);
-        ec2::getTransactionDescriptorByParam<ApiServerFootageDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.cameraHistory);
-        ec2::getTransactionDescriptorByParam<ApiLicenseDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.licenses);
-        ec2::getTransactionDescriptorByParam<ApiDiscoveryDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.discoveryData);
-        ec2::getTransactionDescriptorByParam<ApiResourceParamWithRefDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.allProperties);
-        ec2::getTransactionDescriptorByParam<ApiStorageDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.storages);
-        ec2::getTransactionDescriptorByParam<ApiResourceStatusDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.resStatusList);
-        ec2::getTransactionDescriptorByParam<ApiWebPageDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.webPages);
+        readData(data.resourceTypes);
+        readData(data.servers);
+        readData(data.serversUserAttributesList);
+        readData(data.cameras);
+        readData(data.cameraUserAttributesList);
+        readData(data.users);
+        readData(data.userGroups);
+        readData(data.userGroups);
+        readData(data.accessRights);
+        readData(data.layouts);
+        readData(data.videowalls);
+        readData(data.rules);
+        readData(data.cameraHistory);
+        readData(data.licenses);
+        readData(data.discoveryData);
+        readData(data.allProperties);
+        readData(data.storages);
+        readData(data.resStatusList);
+        readData(data.webPages);
 
         return errorCode;
     }
@@ -739,6 +739,12 @@ public:
     }
 
 private:
+    template<typename T>
+    void readData(T& target)
+    {
+        ec2::getTransactionDescriptorByParam<T>()->filterByReadPermissionFunc(m_userAccessData.userId, target);
+    }
+
     Qn::UserAccessData m_userAccessData;
 };
 
