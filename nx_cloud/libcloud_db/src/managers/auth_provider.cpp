@@ -124,6 +124,7 @@ void AuthenticationProvider::getAuthenticationResponse(
     api::AuthResponse response;
     response.nonce = authRequest.nonce;
     response.authenticatedAccountData = std::move(*systemSharingData);
+    response.accessRole = response.authenticatedAccountData.accessRole;
     const auto intermediateResponse = nx_http::calcIntermediateResponse(
         account->passwordHa1.c_str(),
         authRequest.nonce.c_str());

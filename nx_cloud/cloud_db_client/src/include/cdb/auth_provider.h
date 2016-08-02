@@ -58,10 +58,13 @@ public:
     std::chrono::seconds validPeriod;
     //!Contains user info and access rights
     SystemSharingEx authenticatedAccountData;
+    //!Duplicates authenticatedAccountData.accessRole
+    api::SystemAccessRole accessRole;
 
     AuthResponse()
     :
-        validPeriod(0)
+        validPeriod(0),
+        accessRole(api::SystemAccessRole::none)
     {
     }
 };
