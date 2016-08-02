@@ -512,12 +512,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 {
     TRACE("Calculate permissions of user " << user->getName() << " to camera " << camera->getName())
     NX_ASSERT(camera);
-    Qn::Permissions result = Qn::ReadPermission;
+    Qn::Permissions result = Qn::NoPermissions;
 
     if (isAccessibleResource(user, camera) == Access::Forbidden)
         return result;
 
-    result |= Qn::ViewContentPermission;
+    result |= Qn::ReadPermission;
     if (hasGlobalPermission(user, Qn::GlobalExportPermission))
         result |= Qn::ExportPermission;
 
@@ -538,7 +538,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     NX_ASSERT(server);
     /* All users must have at least ReadPermission to send api requests
      * (recorded periods, bookmarks, etc) and view servers on shared layouts. */
-    Qn::Permissions result = Qn::ReadPermission | Qn::ViewContentPermission;
+    Qn::Permissions result = Qn::ReadPermission;
 
     if (hasGlobalPermission(user, Qn::GlobalAdminPermission) && !qnCommon->isReadOnly())
         result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
@@ -579,12 +579,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnWebPageResourcePtr& webPage) const
 {
     NX_ASSERT(webPage);
-    Qn::Permissions result = Qn::ReadPermission;
+    Qn::Permissions result = Qn::NoPermissions;
 
     if (isAccessibleResource(user, webPage) == Access::Forbidden)
         return result;
 
-    result |= Qn::ViewContentPermission;
+    result |= Qn::ReadPermission;
     if (qnCommon->isReadOnly())
         return result;
 
@@ -628,7 +628,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         });
 
         if (hasDesktopCamera)
-            return checkReadOnly(Qn::ReadPermission | Qn::ViewContentPermission | Qn::RemovePermission);
+            return checkReadOnly(Qn::ReadPermission | Qn::RemovePermission);
     }
 
 

@@ -281,7 +281,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     if (!camera || !camera->hasVideo(nullptr))
         return;
 
-    NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
+    NX_ASSERT(accessController()->hasPermissions(camera, Qn::ReadPermission));
     QnSingleThumbnailLoader* loader = new QnSingleThumbnailLoader(
         camera,
         msecSinceEpoch,
@@ -305,7 +305,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     QnMultiImageProvider::Providers providers;
     for (const auto& camera: cameraList)
     {
-        NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
+        NX_ASSERT(accessController()->hasPermissions(camera, Qn::ReadPermission));
         std::unique_ptr<QnImageProvider> provider(new QnSingleThumbnailLoader(
             camera,
             msecSinceEpoch,
@@ -334,7 +334,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     auto alarmCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
     if (businessAction->getParams().useSource)
         alarmCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
-    alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
+    alarmCameras = accessController()->filtered(alarmCameras, Qn::ReadPermission);
 
     QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
 
@@ -342,7 +342,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     if (QnBusiness::isSourceCameraRequired(eventType))
     {
         NX_ASSERT(camera, Q_FUNC_INFO, "Event has occurred without its camera");
-        if (!camera || !accessController()->hasPermissions(camera, Qn::ViewContentPermission))
+        if (!camera || !accessController()->hasPermissions(camera, Qn::ReadPermission))
             return;
     }
 
@@ -496,7 +496,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             case QnBusiness::UserDefinedEvent:
             {
                 auto sourceCameras = qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
-                sourceCameras = accessController()->filtered(sourceCameras, Qn::ViewContentPermission);
+                sourceCameras = accessController()->filtered(sourceCameras, Qn::ReadPermission);
                 if (!sourceCameras.isEmpty())
                 {
                     item->addActionButton(

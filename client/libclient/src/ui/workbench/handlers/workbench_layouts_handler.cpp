@@ -429,7 +429,7 @@ bool QnWorkbenchLayoutsHandler::confirmSharedLayoutChange(const LayoutChange& ch
         [layout = change.layout](const QnUserResourcePtr& user)
         {
             return !qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission)
-                 && qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission);
+                 && qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission);
         });
 
     /* Do not warn if there are no such users - no side effects in any case. */
@@ -475,7 +475,7 @@ bool QnWorkbenchLayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourc
                     layouts,
                     [user](const QnLayoutResourcePtr& layout)
                     {
-                        return qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission);
+                        return qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission);
                     });
         });
 
@@ -646,10 +646,9 @@ bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnUserResourcePt
         return true;
 
     QnLayoutResourceList accessible = layouts.filtered(
-        [user]
-        (const QnLayoutResourcePtr& layout)
+        [user](const QnLayoutResourcePtr& layout)
         {
-            return qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission);
+            return qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission);
         });
     NX_ASSERT(accessible.size() == layouts.size(), "We are not supposed to stop sharing inaccessible layouts.");
 
@@ -670,7 +669,7 @@ bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnUserResourcePt
         [user, layouts](const QnLayoutResourcePtr& layout)
         {
             return layout->isShared()
-                && qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission)
+                && qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission)
                 && !layouts.contains(layout);
         }))
     {
@@ -713,13 +712,13 @@ void QnWorkbenchLayoutsHandler::grantAccessRightsForUser(const QnUserResourcePtr
         return;
 
     auto inaccessible = [user](const QnResourcePtr& resource)
-    {
-        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::web_page))
-            return !qnResourceAccessManager->hasPermission(user, resource, Qn::ViewContentPermission);
+        {
+            if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::web_page))
+                return !qnResourceAccessManager->hasPermission(user, resource, Qn::ReadPermission);
 
-        /* Silently ignoring servers. */
-        return false;
-    };
+            /* Silently ignoring servers. */
+            return false;
+        };
 
     auto accessible = qnResourceAccessManager->accessibleResources(user);
     for (const auto& toShare : change.added.filtered(inaccessible))

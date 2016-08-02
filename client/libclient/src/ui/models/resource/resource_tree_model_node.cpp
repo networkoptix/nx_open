@@ -388,7 +388,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (m_parent && m_parent->type() == Qn::SharedLayoutNode)
             return !isAdmin;
 
-        return !accessController()->hasPermissions(m_resource, Qn::ViewContentPermission);
+        return !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
 
     /* These will be hidden or displayed together with their parent. */
     case Qn::VideoWallItemNode:
@@ -449,10 +449,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
         if (QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>())
         {
-            /* Layouts do require ViewContentPermission now. */
-            if (!accessController()->hasPermissions(m_resource, Qn::ViewContentPermission))
-                return true;
-
             /* Hide local layouts that are not file-based. */
             if (layout->hasFlags(Qn::local) && !layout->isFile())
                 return true;
@@ -496,13 +492,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
                 !qnResPool->getResourcesByParentId(m_resource->getId()).filtered<QnVirtualCameraResource>().isEmpty())
             {
                 return true;
-            }
-
-            //TODO: #GDM where can we put this check to be also available in QnWorkbenchDisplay?
-            if (m_flags.testFlag(Qn::media) || m_flags.testFlag(Qn::web_page))
-            {
-                if (!accessController()->hasPermissions(m_resource, Qn::ViewContentPermission))
-                    return true;
             }
         }
         return false;

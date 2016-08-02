@@ -850,12 +850,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RemovePermission                = 0x0008,   /**< Generic delete permission. */
         ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
         WriteNamePermission             = 0x0010,   /**< Permission to edit resource's name. */
-        ViewContentPermission           = 0x0020,   /**< Permission to view video streams, layouts and web-pages. Required to show resources in UI. */
 
         /* Layout-specific permissions. */
         AddRemoveItemsPermission        = 0x0040,   /**< Permission to add or remove items from a layout. */
         EditLayoutSettingsPermission    = 0x0080,   /**< Permission to setup layout background or set locked flag. */
-        ModifyLayoutPermission          = ReadPermission | WritePermission | AddRemoveItemsPermission | ViewContentPermission, /**< Permission to modify without saving. */
+        ModifyLayoutPermission          = ReadPermission | WritePermission | AddRemoveItemsPermission, /**< Permission to modify without saving. */
         FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | ModifyLayoutPermission | EditLayoutSettingsPermission,
 
         /* User-specific permissions. */
@@ -875,7 +874,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /* Mode-specific permissions. */
         VideoWallLayoutPermissions      = ModifyLayoutPermission,
-        VideoWallMediaPermissions       = ReadPermission | ViewContentPermission,
+        VideoWallMediaPermissions       = ReadPermission,
 
         AllPermissions = 0xFFFFFFFF
     };

@@ -733,7 +733,7 @@ void QnResourceTreeModel::updateSharedLayoutNodes(const QnLayoutResourcePtr& lay
         }
 
         /* Add node if required. */
-        if (qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission))
+        if (qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission))
         {
             usersToUpdate << user;
             continue;
@@ -793,7 +793,7 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
                 continue;
 
             TRACE("Checking node " << layout->getName() << " under user " << user->getName());
-            if (qnResourceAccessManager->hasPermission(user, layout, Qn::ViewContentPermission))
+            if (qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission))
             {
                 auto node = ensureSharedLayoutNode(user->getId(), layout);
                 node->update();
@@ -809,7 +809,7 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
                 continue;
 
             if (!existingNode->resource()
-                || !qnResourceAccessManager->hasPermission(user, existingNode->resource(), Qn::ViewContentPermission))
+                || !qnResourceAccessManager->hasPermission(user, existingNode->resource(), Qn::ReadPermission))
                 nodesToDelete << existingNode;
         }
     }
@@ -853,7 +853,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
                 continue;
 
             TRACE("Checking node " << resource->getName() << " under user " << user->getName());
-            if (qnResourceAccessManager->hasPermission(user, resource, Qn::ViewContentPermission))
+            if (qnResourceAccessManager->hasPermission(user, resource, Qn::ReadPermission))
             {
                 auto node = ensureAccessibleResourceNode(user->getId(), resource);
                 node->update();
@@ -878,7 +878,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
                 continue;
 
             if (!existingNode->resource()
-                || !qnResourceAccessManager->hasPermission(user, existingNode->resource(), Qn::ViewContentPermission))
+                || !qnResourceAccessManager->hasPermission(user, existingNode->resource(), Qn::ReadPermission))
                 nodesToDelete << existingNode;
         }
     }
