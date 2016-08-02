@@ -1,6 +1,7 @@
 /* Warning! Keep this file and other templates consistent between cloud_portal/cloud/notifications and nx_vms */
 
-.header,.container,table {
+.header,.container,table, p,
+h1,h2,h3,h4,h5,h6 {
     color: #263137;
 }
 

@@ -42,7 +42,7 @@
     <tr>
         <td style="vertical-align: top;text-align: left;padding-right: 5px"></td>
         <td class="content" bgcolor="white" style="vertical-align: top;text-align: left;padding-right: 5px;width: 800px;padding: 15px 0;border: 1px solid #E1E7EA;border-radius: 2px">
-            <h1 style="font-size: 20px;font-weight: normal;line-height: 30px;margin: 0;padding: 0 20px">{{event}}{{#source}} on <b>{{source}}</b>{{/source}}</h1>
+            <h1 style="color: #263137;font-size: 20px;font-weight: normal;line-height: 30px;margin: 0;padding: 0 20px">{{event}}{{#source}} on <b>{{source}}</b>{{/source}}</h1>
 
 {{#screenshot}}
     <div class="description" style="padding: 10px 20px;background-color: #F8F9FA;margin-top: 15px">
@@ -51,18 +51,18 @@
 {{/screenshot}}
 
 <div class="date" style="padding: 0 20px;padding-top: 15px;line-height: 20px;font-size: 14px">
-    <p style="font-size: 15px;line-height: 20px;margin: 0">
+    <p style="color: #263137;font-size: 15px;line-height: 20px;margin: 0">
         {{#aggregated}}
             <b>{{{timestamp}}}</b>
         {{/aggregated}}
     </p>
 
     {{#urlint}}
-        <p style="font-size: 15px;line-height: 20px;margin: 0"><a href="{{urlint}}" style="color: #2FA2DB">Play archive from the local network</a></p>
+        <p style="color: #263137;font-size: 15px;line-height: 20px;margin: 0"><a href="{{urlint}}" style="color: #2FA2DB">Play archive from the local network</a></p>
     {{/urlint}}
 
     {{#urlext}}
-        <p style="font-size: 15px;line-height: 20px;margin: 0"><a href="{{urlext}}" style="color: #2FA2DB">Play archive from the web</a></p>
+        <p style="color: #263137;font-size: 15px;line-height: 20px;margin: 0"><a href="{{urlext}}" style="color: #2FA2DB">Play archive from the web</a></p>
     {{/urlext}}
 </div>
         </td>
