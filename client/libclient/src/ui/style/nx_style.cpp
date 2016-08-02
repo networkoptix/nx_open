@@ -265,7 +265,7 @@ namespace
 
                 auto checker = static_cast<const VisibilityChecker*>(view);
 
-                for (int column = index.column() - 1; column > 0; --column)
+                for (int column = index.column() - 1; column >= 0; --column)
                 {
                     if (!checker->isIndexHidden(index.sibling(index.row(), column)))
                     {
