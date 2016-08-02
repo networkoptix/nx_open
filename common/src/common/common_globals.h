@@ -900,7 +900,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* Manager permissions. */
         GlobalEditCamerasPermission             = 0x00000002,   /**< Can edit camera settings. */
         GlobalControlVideoWallPermission        = 0x00000004,   /**< Can control videowalls. */
-        INTERNAL_GlobalVideoWallLayoutPermission= 0x00000008,   // !!For internal use only!! Videowall layout access.
+
         GlobalViewLogsPermission                = 0x00000010,   /**< Can access event log and audit trail. */
 
         /* Viewer permissions. */
@@ -932,7 +932,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /* PTZ here is intended - for SpaceX, see VMS-2208 */
         GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalUserInputPermission |
-                                              GlobalControlVideoWallPermission | INTERNAL_GlobalVideoWallLayoutPermission | GlobalViewBookmarksPermission,
+                                              GlobalControlVideoWallPermission | GlobalViewBookmarksPermission,
 
         /* Actions in ActiveX plugin mode are limited. */
         GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalUserInputPermission,

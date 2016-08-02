@@ -639,10 +639,6 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         if (user->isOwner())
             return Qn::FullLayoutPermissions;
 
-		/* 'Videowall user' should have read access to the layouts */
-		if (hasGlobalPermission(user, Qn::INTERNAL_GlobalVideoWallLayoutPermission))
-			return Qn::ReadPermission;
-
         /* Access to global layouts. Simple check is enough, exported layouts are checked on the client side. */
         if (layout->isShared())
         {

@@ -264,6 +264,20 @@ void QnTransactionTcpProcessor::run()
                 userAccessId = Qn::kSystemAccess.userId;
         }
 
+        auto accessType = Qn::UserAccessData::Access::ClientConnection;
+        switch (remotePeer.peerType)
+        {
+            case Qn::PT_Server:
+                //TODO: #rvasilenko is it safe to do here?
+                //accessType = Qn::UserAccessData::Access::System;
+                break;
+            case Qn::PT_VideowallClient:
+                accessType = Qn::UserAccessData::Access::VideoWall;
+                break;
+            default:
+                break;
+        }
+
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             connectionGuid,
             std::move(d->socket),
@@ -273,7 +287,7 @@ void QnTransactionTcpProcessor::run()
             d->request,
             contentEncoding,
             ttFinishCallback,
-            Qn::UserAccessData(userAccessId, Qn::UserAccessData::Access::ClientConnection));
+            Qn::UserAccessData(userAccessId, accessType));
 
         if (!QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid ))
             QnTransactionTransport::connectDone(remoteGuid); //< session killed. Cleanup Guid from a connected list manually
