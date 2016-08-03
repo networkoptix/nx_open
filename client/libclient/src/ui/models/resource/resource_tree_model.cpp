@@ -128,14 +128,16 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
                     updateSharedLayoutNodesForUser(user);
                     updateAccessibleResourcesForUser(user);
                 }
-
-                if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+                else if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
                 {
                     if (layout->isShared())
                         updateSharedLayoutNodes(layout);
                 }
-
-                //TODO: #GDM updateAccessibleResourcesByResource
+                else
+                {
+                    //TODO: #GDM updateAccessibleResourcesByResource
+                    updateRoleNodes();
+                }
             }
         });
 
@@ -940,7 +942,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
                 continue;
 
             TRACE("Checking node " << resource->getName() << " under user " << user->getName());
-            if (qnResourceAccessManager->hasPermission(user, resource, Qn::ReadPermission))
+            if (qnResourceAccessManager->isAccessibleResource(user, resource))
             {
                 auto node = ensureAccessibleResourceNode(user->getId(), resource);
                 node->update();
@@ -965,7 +967,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
                 continue;
 
             if (!existingNode->resource()
-                || !qnResourceAccessManager->hasPermission(user, existingNode->resource(), Qn::ReadPermission))
+                || !qnResourceAccessManager->isAccessibleResource(user, existingNode->resource()))
                 nodesToDelete << existingNode;
         }
     }
@@ -1034,8 +1036,6 @@ void QnResourceTreeModel::updateAccessibleResourcesForRole(const QnUuid& id)
     if (role.isNull())
         return;
 
-    auto resources = qnResourceAccessManager->accessibleResources(id);
-
     /* Copy of the list before all changes. */
     auto accesible = m_accessibleResourceNodesByOwner[id].values();
 
@@ -1052,7 +1052,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForRole(const QnUuid& id)
             continue;
 
         TRACE("Checking node " << resource->getName() << " under role " << role.name);
-        if (resources.contains(resource->getId()))
+        if (qnResourceAccessManager->isAccessibleResource(role, resource))
         {
             auto node = ensureAccessibleResourceNode(id, resource);
             node->update();
@@ -1076,7 +1076,8 @@ void QnResourceTreeModel::updateAccessibleResourcesForRole(const QnUuid& id)
         if (!existingNode)
             continue;
 
-        if (!existingNode->resource() || !resources.contains( existingNode->resource()->getId()))
+        if (!existingNode->resource()
+            || !qnResourceAccessManager->isAccessibleResource(role, existingNode->resource()))
             nodesToDelete << existingNode;
     }
 
@@ -1688,8 +1689,7 @@ void QnResourceTreeModel::at_accessController_permissionsChanged(const QnResourc
         if (layout->isShared())
             updateSharedLayoutNodes(layout);
     }
-
-    if (auto user = resource.dynamicCast<QnUserResource>())
+    else if (auto user = resource.dynamicCast<QnUserResource>())
     {
         updatePlaceholderNodesForUserOrRole(user->getId());
         updateSharedLayoutNodesForUser(user);

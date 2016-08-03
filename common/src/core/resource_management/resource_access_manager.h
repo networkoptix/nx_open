@@ -48,9 +48,16 @@ public:
     /**
     * \param user                      User to get global permissions for.
     * \returns                         Global permissions of the given user,
-    *                                  adjusted to take deprecation and superuser status into account.
+    *                                  adjusted to take dependencies and superuser status into account.
     */
     Qn::GlobalPermissions globalPermissions(const QnUserResourcePtr& user) const;
+
+    /**
+    * \param role                      Role to get global permissions for.
+    * \returns                         Global permissions of the given role,
+    *                                  adjusted to take dependencies and superuser status into account.
+    */
+    Qn::GlobalPermissions globalPermissions(const ec2::ApiUserGroupData& role) const;
 
     /**
     * \param user                      User to get global permissions for.
@@ -58,6 +65,13 @@ public:
     * \returns                         Whether actual global permissions include required permission.
     */
     bool hasGlobalPermission(const QnUserResourcePtr& user, Qn::GlobalPermission requiredPermission) const;
+
+    /**
+    * \param role                      Role to get global permissions for.
+    * \param requiredPermission        Global permission to check.
+    * \returns                         Whether actual global permissions include required permission.
+    */
+    bool hasGlobalPermission(const ec2::ApiUserGroupData& role, Qn::GlobalPermission requiredPermission) const;
 
     /**
     * \param user                      User that should have permissions.
@@ -131,8 +145,14 @@ public:
         ViaLayout,
         ViaVideowall
     };
+
     /** Check if resource (camera, webpage or layout) is available to given user. */
-    Access isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
+    bool isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
+    Access resourceAccess(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
+
+    /** Check if resource (camera, webpage or layout) is available to given role. */
+    bool isAccessibleResource(const ec2::ApiUserGroupData& role, const QnResourcePtr& resource) const;
+    Access resourceAccess(const ec2::ApiUserGroupData& role, const QnResourcePtr& resource) const;
 
     /** Finds which layouts are indirectly available (e.g. through videowall) to given user or group. */
     //TODO: #vkutin #GDM Refactoring is probably needed to merge this functionality with isAccessibleResource functions.
@@ -148,6 +168,17 @@ signals:
     void permissionsInvalidated(const QSet<QnUuid>& resourceIds);
 
 private:
+    struct AccessKey
+    {
+        QnUserResourcePtr user;
+        ec2::ApiUserGroupData role;
+        Qn::GlobalPermissions globalPermissions;
+        QnUuid accessibleResourcesKey;
+
+        AccessKey(const QnUserResourcePtr& user);
+        AccessKey(const ec2::ApiUserGroupData& role);
+    };
+
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);
     void invalidateResourceCacheInternal(const QnUuid& resourceId);
@@ -165,8 +196,12 @@ private:
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnLayoutResourcePtr& layout)          const;
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnUserResourcePtr& targetUser)        const;
 
-    /** Check if given desktop camera or layout is available to given user through videowall. */
-    bool isAccessibleViaVideowall(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
+    Qn::GlobalPermissions filterDependentPermissions(Qn::GlobalPermissions source) const;
+
+    Access resourceAccessInternal(const AccessKey& accessKey, const QnResourcePtr& resource) const;
+
+    /** Check if given desktop camera or layout is available to given user/role through videowall. */
+    bool isAccessibleViaVideowall(const AccessKey& accessKey, const QnResourcePtr& resource) const;
 
     /** Check if camera is placed to one of shared layouts, available to given user. */
     bool isAccessibleViaLayouts(const QSet<QnUuid>& layoutIds, const QnResourcePtr& resource, bool sharedOnly) const;

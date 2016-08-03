@@ -131,7 +131,65 @@ Qn::GlobalPermissions QnResourceAccessManager::dependentPermissions(Qn::GlobalPe
             break;
     }
     return Qn::NoGlobalPermissions;
+}
 
+Qn::GlobalPermissions QnResourceAccessManager::filterDependentPermissions(Qn::GlobalPermissions source) const
+{
+    //TODO: #GDM code duplication with ::dependentPermissions() method.
+    Qn::GlobalPermissions result = source;
+    if (!result.testFlag(Qn::GlobalViewArchivePermission))
+    {
+        result &= ~Qn::GlobalViewBookmarksPermission;
+        result &= ~Qn::GlobalExportPermission;
+    }
+
+    if (!result.testFlag(Qn::GlobalViewBookmarksPermission))
+    {
+        result &= ~Qn::GlobalManageBookmarksPermission;
+    }
+    return result;
+}
+
+QnResourceAccessManager::Access QnResourceAccessManager::resourceAccessInternal(
+    const AccessKey& accessKey, const QnResourcePtr& resource) const
+{
+    /* Handling desktop cameras before all other checks. */
+    if (resource->hasFlags(Qn::desktop_camera))
+        return isAccessibleViaVideowall(accessKey, resource)
+        ? Access::ViaVideowall
+        : Access::Forbidden;
+
+    QSet<QnUuid> accessible = accessibleResources(accessKey.accessibleResourcesKey);
+    if (accessible.contains(resource->getId()))
+        return Access::Directly;
+
+    /* Web Pages behave totally like cameras. */
+    bool isMediaResource = resource.dynamicCast<QnVirtualCameraResource>()
+        || resource.dynamicCast<QnWebPageResource>();
+
+    bool isLayout = resource->hasFlags(Qn::layout);
+    NX_ASSERT(isMediaResource || isLayout);
+
+    auto requiredPermission = isMediaResource
+        ? Qn::GlobalAccessAllMediaPermission
+        : Qn::GlobalAdminPermission;
+
+    if (accessKey.globalPermissions.testFlag(requiredPermission))
+        return Access::Directly;
+
+    /* Here we are checking if the camera exists on one of the shared layouts, available to given user. */
+    if (isMediaResource)
+        return isAccessibleViaLayouts(accessible, resource, true)
+        ? Access::ViaLayout
+        : Access::Forbidden;
+
+    /* Check if layout belongs to videowall. */
+    if (isLayout)
+        return isAccessibleViaVideowall(accessKey, resource)
+        ? Access::ViaVideowall
+        : Access::Forbidden;
+
+    return Access::Forbidden;
 }
 
 void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList)
@@ -256,23 +314,6 @@ void QnResourceAccessManager::setAccessibleResources(const QnUuid& userOrGroupId
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr& user) const
 {
-    auto filterDependentPermissions = [](Qn::GlobalPermissions value)
-    {
-        //TODO: #GDM code duplication with ::dependentPermissions() method.
-        Qn::GlobalPermissions result = value;
-        if (!result.testFlag(Qn::GlobalViewArchivePermission))
-        {
-            result &= ~Qn::GlobalViewBookmarksPermission;
-            result &= ~Qn::GlobalExportPermission;
-        }
-
-        if (!result.testFlag(Qn::GlobalViewBookmarksPermission))
-        {
-            result &= ~Qn::GlobalManageBookmarksPermission;
-        }
-        return result;
-    };
-
     if (!user || !user->isEnabled())
         return Qn::NoGlobalPermissions;
 
@@ -302,8 +343,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
     }
     else if (!groupId.isNull())
     {
-        result = userGroup(groupId).permissions;    /*< If the group does not exist, permissions will be empty. */
-        result &= ~Qn::GlobalAdminPermission;       /*< If user belongs to group, he cannot be an admin - by design. */
+        result = globalPermissions(userGroup(groupId));    /*< If the group does not exist, permissions will be empty. */
     }
     else
     {
@@ -322,12 +362,31 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
     return result;
 }
 
+Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const ec2::ApiUserGroupData& role) const
+{
+    if (role.isNull())
+        return Qn::NoGlobalPermissions;
+
+    Qn::GlobalPermissions result = role.permissions;    /*< If the group does not exist, permissions will be empty. */
+    result &= ~Qn::GlobalAdminPermission;               /*< If user belongs to group, he cannot be an admin - by design. */
+    result = filterDependentPermissions(result);
+    return result;
+}
+
 bool QnResourceAccessManager::hasGlobalPermission(const QnUserResourcePtr& user, Qn::GlobalPermission requiredPermission) const
 {
     if (requiredPermission == Qn::NoGlobalPermissions)
         return true;
 
     return globalPermissions(user).testFlag(requiredPermission);
+}
+
+bool QnResourceAccessManager::hasGlobalPermission(const ec2::ApiUserGroupData& role, Qn::GlobalPermission requiredPermission) const
+{
+    if (requiredPermission == Qn::NoGlobalPermissions)
+        return true;
+
+    return globalPermissions(role).testFlag(requiredPermission);
 }
 
 Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& user, const QnResourcePtr& resource) const
@@ -512,12 +571,11 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 {
     TRACE("Calculate permissions of user " << user->getName() << " to camera " << camera->getName())
     NX_ASSERT(camera);
-    Qn::Permissions result = Qn::NoPermissions;
 
-    if (isAccessibleResource(user, camera) == Access::Forbidden)
-        return result;
+    if (!isAccessibleResource(user, camera))
+        return Qn::NoPermissions;
 
-    result |= Qn::ReadPermission;
+    Qn::Permissions result = Qn::ReadPermission;
     if (hasGlobalPermission(user, Qn::GlobalExportPermission))
         result |= Qn::ExportPermission;
 
@@ -579,12 +637,11 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnWebPageResourcePtr& webPage) const
 {
     NX_ASSERT(webPage);
-    Qn::Permissions result = Qn::NoPermissions;
 
-    if (isAccessibleResource(user, webPage) == Access::Forbidden)
-        return result;
+    if (!isAccessibleResource(user, webPage))
+        return Qn::NoPermissions;
 
-    result |= Qn::ReadPermission;
+    Qn::Permissions result = Qn::ReadPermission;
     if (qnCommon->isReadOnly())
         return result;
 
@@ -642,7 +699,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         /* Access to global layouts. Simple check is enough, exported layouts are checked on the client side. */
         if (layout->isShared())
         {
-            if (isAccessibleResource(user, layout) == Access::Forbidden)
+            if (!isAccessibleResource(user, layout))
                 return Qn::NoPermissions;
 
             /* Global layouts editor. */
@@ -695,7 +752,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     return checkLocked(checkReadOnly(base()));
 }
 
-Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnUserResourcePtr& targetUser) const
+Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
+    const QnUserResourcePtr& user, const QnUserResourcePtr& targetUser) const
 {
     NX_ASSERT(targetUser);
 
@@ -703,7 +761,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     {
         if (!qnCommon->isReadOnly())
             return permissions;
-        return permissions &~ (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteEmailPermission);
+        return permissions &~ (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission
+            | Qn::WritePasswordPermission | Qn::WriteEmailPermission);
     };
 
     auto checkUserType = [targetUser](Qn::Permissions permissions)
@@ -723,7 +782,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     Qn::Permissions result = Qn::NoPermissions;
     if (targetUser == user)
     {
-        result |= Qn::ReadPermission | Qn::ReadWriteSavePermission | Qn::WritePasswordPermission; /* Everyone can edit own data. */
+        /* Everyone can edit own data. */
+        result |= Qn::ReadPermission | Qn::ReadWriteSavePermission | Qn::WritePasswordPermission;
     }
     else
     {
@@ -733,17 +793,21 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 
             /* Admins can only be edited by owner, other users - by all admins. */
             if (user->isOwner() || !hasGlobalPermission(targetUser, Qn::GlobalAdminPermission))
-                result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
+                result |= Qn::ReadWriteSavePermission
+                    | Qn::WriteNamePermission
+                    | Qn::WritePasswordPermission
+                    | Qn::WriteAccessRightsPermission
+                    | Qn::RemovePermission;
         }
     }
 
     return checkReadOnly(checkUserType(result));
 }
 
-QnResourceAccessManager::Access QnResourceAccessManager::isAccessibleResource(
+QnResourceAccessManager::Access QnResourceAccessManager::resourceAccess(
     const QnUserResourcePtr& user, const QnResourcePtr& resource) const
 {
-    NX_ASSERT(resource);
+    NX_ASSERT(user && resource);
 
     if (!user || !resource)
         return Access::Forbidden;
@@ -751,54 +815,40 @@ QnResourceAccessManager::Access QnResourceAccessManager::isAccessibleResource(
     if (!user->isEnabled())
         return Access::Forbidden;
 
-    /* Handling desktop cameras before all other checks. */
-    if (resource->hasFlags(Qn::desktop_camera))
-        return isAccessibleViaVideowall(user, resource)
-        ? Access::ViaVideowall
-        : Access::Forbidden;
-
-    QSet<QnUuid> accessible = accessibleResources(user);
-    if (accessible.contains(resource->getId()))
-        return Access::Directly;
-
-    /* Web Pages behave totally like cameras. */
-    bool isMediaResource = resource.dynamicCast<QnVirtualCameraResource>()
-        || resource.dynamicCast<QnWebPageResource>();
-
-    bool isLayout = resource->hasFlags(Qn::layout);
-    NX_ASSERT(isMediaResource || isLayout);
-
-    auto requiredPermission = isMediaResource
-        ? Qn::GlobalAccessAllMediaPermission
-        : Qn::GlobalAdminPermission;
-
-    if (hasGlobalPermission(user, requiredPermission))
-        return Access::Directly;
-
-    /* Here we are checking if the camera exists on one of the shared layouts, available to given user. */
-    if (isMediaResource)
-        return isAccessibleViaLayouts(accessible, resource, true)
-        ? Access::ViaLayout
-        : Access::Forbidden;
-
-    /* Check if layout belongs to videowall. */
-    if (isLayout)
-        return isAccessibleViaVideowall(user, resource)
-        ? Access::ViaVideowall
-        : Access::Forbidden;
-
-    return Access::Forbidden;
+    return resourceAccessInternal(user, resource);
 }
 
-bool QnResourceAccessManager::isAccessibleViaVideowall(const QnUserResourcePtr& user, const QnResourcePtr& resource) const
+bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const
+{
+    return resourceAccess(user, resource) != Access::Forbidden;
+}
+
+QnResourceAccessManager::Access QnResourceAccessManager::resourceAccess(
+    const ec2::ApiUserGroupData& role, const QnResourcePtr& resource) const
+{
+    NX_ASSERT(!role.isNull() && resource);
+
+    if (role.isNull() || !resource)
+        return Access::Forbidden;
+
+    return resourceAccessInternal(role, resource);
+}
+
+bool QnResourceAccessManager::isAccessibleResource(const ec2::ApiUserGroupData& role, const QnResourcePtr& resource) const
+{
+    return resourceAccess(role, resource) != Access::Forbidden;
+}
+
+bool QnResourceAccessManager::isAccessibleViaVideowall(const AccessKey& accessKey,
+    const QnResourcePtr& resource) const
 {
     NX_ASSERT(resource);
 
-    if (!user || !resource)
+    if (!resource)
         return false;
 
     /* Desktop cameras available only by videowall control permission. */
-    if (!hasGlobalPermission(user, Qn::GlobalControlVideoWallPermission))
+    if (!accessKey.globalPermissions.testFlag(Qn::GlobalControlVideoWallPermission))
         return false;
 
     auto videowalls = qnResPool->getResources<QnVideoWallResource>();
@@ -808,10 +858,12 @@ bool QnResourceAccessManager::isAccessibleViaVideowall(const QnUserResourcePtr& 
         return false;
 
     bool isLayout = resource->hasFlags(Qn::layout);
-    bool isCamera = resource->hasFlags(Qn::desktop_camera);
+    bool isDesktopCamera = resource->hasFlags(Qn::desktop_camera);
 
     /* Check if it is our desktop camera */
-    if (isCamera && (resource->getName() == user->getName()))
+    if (isDesktopCamera
+        && accessKey.user
+        && (resource->getName() == accessKey.user->getName()))
         return true;
 
     /* Check if camera is placed to videowall. */
@@ -829,7 +881,7 @@ bool QnResourceAccessManager::isAccessibleViaVideowall(const QnUserResourcePtr& 
     if (isLayout)
         return layoutIds.contains(resource->getId());
 
-    if (isCamera)
+    if (isDesktopCamera)
         return isAccessibleViaLayouts(layoutIds, resource, false);
 
     NX_ASSERT(false);
@@ -1245,3 +1297,18 @@ ec2::ApiPredefinedRoleDataList QnResourceAccessManager::getPredefinedRoles()
     return kPredefinedRoles;
 }
 
+QnResourceAccessManager::AccessKey::AccessKey(const QnUserResourcePtr& user):
+    user(user),
+    role(),
+    globalPermissions(qnResourceAccessManager->globalPermissions(user)),
+    accessibleResourcesKey(user->getId())
+{
+}
+
+QnResourceAccessManager::AccessKey::AccessKey(const ec2::ApiUserGroupData& role):
+    user(),
+    role(role),
+    globalPermissions(qnResourceAccessManager->globalPermissions(role)),
+    accessibleResourcesKey(role.id)
+{
+}
