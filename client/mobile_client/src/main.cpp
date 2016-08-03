@@ -29,8 +29,8 @@
 #include <ui/texture_size_helper.h>
 #include <camera/camera_thumbnail_cache.h>
 #include <ui/helpers/font_loader.h>
-#include <ui/videowall_handler.h>
 #include <utils/intent_listener_android.h>
+#include <handlers/lite_client_handler.h>
 
 #include <nx/media/decoder_registrar.h>
 #include <resource_allocator.h>
@@ -62,7 +62,7 @@ int runUi(QGuiApplication *application) {
     for (const auto& scheme: uriHandler->supportedSchemes())
         QDesktopServices::setUrlHandler(scheme, uriHandler.data(), uriHandler->handlerMethodName());
 
-    qnCommon->instance<QnVideowallHandler>()->setUiController(context.uiController());
+    qnCommon->instance<QnLiteClientHandler>()->setUiController(context.uiController());
 
     QStringList selectors;
 
@@ -161,14 +161,16 @@ int runApplication(QGuiApplication *application, const QnUuid& videowallInstance
     srand(time(NULL));
     qsrand(time(NULL));
 
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory(Qn::PT_MobileClient)); // TODO: #dklychkov check connection type
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
+        getConnectionFactory(Qn::PT_MobileClient));
 
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.get());
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
-    runtimeData.peer.peerType = Qn::PT_MobileClient; // TODO: #dklychkov check connection type
+    runtimeData.peer.peerType = qnSettings->isLiteClientModeEnabled()
+        ? Qn::PT_LiteClient : Qn::PT_MobileClient;
     runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = QnAppInfo::productNameShort();
     if (!videowallInstanceGuid.isNull())
@@ -177,7 +179,6 @@ int runApplication(QGuiApplication *application, const QnUuid& videowallInstance
 
     int result = runUi(application);
 
-//    QnResource::stopCommandProc();
     QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr());
     QnAppServerConnectionFactory::setUrl(QUrl());
 
@@ -230,7 +231,8 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
 
     const auto videowallInstanceGuidOption = QCommandLineOption(
         lit("videowall-instance-guid"),
-        lit("GUID which is used to check Videowall Control messages."));
+        lit("GUID which is used to check Videowall Control messages."),
+        lit("videowallInstanceGuid"));
     parser.addOption(videowallInstanceGuidOption);
 
     auto testOption = QCommandLineOption(

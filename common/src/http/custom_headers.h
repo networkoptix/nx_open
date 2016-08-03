@@ -48,6 +48,8 @@ namespace Qn
     static const QByteArray EC2_MEDIA_ROLE = "X-Media-Role";
 
     static const QByteArray DESKTOP_CAMERA_NO_VIDEO_HEADER_NAME = "X-no-video";
+
+    static const QByteArray HAVE_TRANSACTION_HEADER_HEADER_NAME = "X-have-transaction-header";
 }
 
 #endif  //CUSTOM_HEADERS_H

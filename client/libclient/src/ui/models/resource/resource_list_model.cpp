@@ -18,7 +18,8 @@ QnResourceListModel::QnResourceListModel(QObject *parent) :
     m_statusIgnored(false),
     m_resources(),
     m_checkedResources()
-{}
+{
+}
 
 QnResourceListModel::~QnResourceListModel()
 {
@@ -44,9 +45,9 @@ void QnResourceListModel::setHasCheckboxes(bool value)
 {
     if (m_hasCheckboxes == value)
         return;
-    beginResetModel();
+
+    ScopedReset resetModel(this);
     m_hasCheckboxes = value;
-    endResetModel();
 }
 
 bool QnResourceListModel::userCheckable() const
@@ -69,9 +70,8 @@ void QnResourceListModel::setStatusIgnored(bool value)
     if (m_statusIgnored == value)
         return;
 
-    beginResetModel();
+    ScopedReset resetModel(this);
     m_statusIgnored = value;
-    endResetModel();
 }
 
 const QnResourceList &QnResourceListModel::resources() const
@@ -81,7 +81,7 @@ const QnResourceList &QnResourceListModel::resources() const
 
 void QnResourceListModel::setResources(const QnResourceList &resources)
 {
-    beginResetModel();
+    ScopedReset resetModel(this);
 
     foreach(const QnResourcePtr &resource, m_resources)
         disconnect(resource, nullptr, this, nullptr);
@@ -94,23 +94,19 @@ void QnResourceListModel::setResources(const QnResourceList &resources)
         connect(resource, &QnResource::statusChanged,  this, &QnResourceListModel::at_resource_resourceChanged);
         connect(resource, &QnResource::resourceChanged,this, &QnResourceListModel::at_resource_resourceChanged);
     }
-
-    endResetModel();
 }
 
 void QnResourceListModel::addResource(const QnResourcePtr &resource)
 {
     NX_ASSERT(m_resources.indexOf(resource) < 0);
 
-    int row = m_resources.size();
-    beginInsertRows(QModelIndex(), row, row);
-
-    connect(resource, &QnResource::nameChanged,     this, &QnResourceListModel::at_resource_resourceChanged);
-    connect(resource, &QnResource::statusChanged,   this, &QnResourceListModel::at_resource_resourceChanged);
+    connect(resource, &QnResource::nameChanged, this, &QnResourceListModel::at_resource_resourceChanged);
+    connect(resource, &QnResource::statusChanged, this, &QnResourceListModel::at_resource_resourceChanged);
     connect(resource, &QnResource::resourceChanged, this, &QnResourceListModel::at_resource_resourceChanged);
-    m_resources << resource;
 
-    endInsertRows();
+    int row = m_resources.size();
+    ScopedInsertRows insertRows(this, QModelIndex(), row, row);
+    m_resources << resource;
 }
 
 void QnResourceListModel::removeResource(const QnResourcePtr &resource)
@@ -122,12 +118,10 @@ void QnResourceListModel::removeResource(const QnResourcePtr &resource)
     if (row < 0)
         return;
 
-    beginRemoveRows(QModelIndex(), row, row);
+    ScopedRemoveRows removeRows(this, QModelIndex(), row, row);
 
     m_resources[row]->disconnect(this);
     m_resources.removeAt(row);
-
-    endRemoveRows();
 }
 
 QSet<QnUuid> QnResourceListModel::checkedResources() const
@@ -140,9 +134,8 @@ void QnResourceListModel::setCheckedResources(const QSet<QnUuid>& ids)
     if (m_checkedResources == ids)
         return;
 
-    beginResetModel();
+    ScopedReset resetModel(this);
     m_checkedResources = ids;
-    endResetModel();
 }
 
 int QnResourceListModel::columnCount(const QModelIndex &parent) const
@@ -274,6 +267,7 @@ QModelIndex QnResourceListModel::index(int row, int column, const QModelIndex &p
     /* Here rowCount and columnCount are checked */
     if (!hasIndex(row, column, parent))
         return QModelIndex();
+
     return createIndex(row, column);
 }
 

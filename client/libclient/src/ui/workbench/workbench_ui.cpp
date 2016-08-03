@@ -444,10 +444,7 @@ QnImageButtonWidget* QnWorkbenchUi::newActionButton(QGraphicsItem *parent, QActi
 
     button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
     button->setDefaultAction(action);
-    button->setCached(true);
-
-    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
-    button->setFixedSize(action->icon().actualSize(QSize(maxIconSize, maxIconSize)));
+    button->setFixedSize(QnSkin::maximumSize(action->icon()));
 
     if (helpTopicId != Qn::Empty_Help)
         setHelpTopic(button, helpTopicId);
@@ -466,12 +463,9 @@ QnImageButtonWidget* QnWorkbenchUi::newShowHideButton(QGraphicsItem* parent, QAc
         button->setCheckable(true);
 
     button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
-
-    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
-    button->setFixedSize(button->icon().actualSize(QSize(maxIconSize, maxIconSize)));
+    button->setFixedSize(QnSkin::maximumSize(button->icon()));
 
     button->setProperty(Qn::NoHandScrollOver, true);
-    button->setCached(true);
 
     setHelpTopic(button, Qn::MainWindow_Pin_Help);
     return button;
@@ -492,10 +486,7 @@ QnImageButtonWidget* QnWorkbenchUi::newPinButton(QGraphicsItem* parent, QAction*
     else
         button->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
 
-    button->setCached(true);
-
-    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
-    button->setFixedSize(button->icon().actualSize(QSize(maxIconSize, maxIconSize)));
+    button->setFixedSize(QnSkin::maximumSize(button->icon()));
 
     setHelpTopic(button, Qn::MainWindow_Pin_Help);
     return button;
@@ -1744,16 +1735,13 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
     context()->statisticsModule()->registerButton(lit("notifications_collection_widget_toggle"), blinker);
 
     m_notificationsShowButton = blinker;
-    m_notificationsShowButton->setCached(true);
     m_notificationsShowButton->setCheckable(true);
     m_notificationsShowButton->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
     m_notificationsShowButton->setProperty(Qn::NoHandScrollOver, true);
     m_notificationsShowButton->setTransform(QTransform::fromScale(-1, 1));
     m_notificationsShowButton->setFocusProxy(m_notificationsItem);
     m_notificationsShowButton->stackBefore(m_notificationsItem);
-
-    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
-    m_notificationsShowButton->setFixedSize(m_notificationsShowButton->icon().actualSize(QSize(maxIconSize, maxIconSize)));
+    m_notificationsShowButton->setFixedSize(QnSkin::maximumSize(m_notificationsShowButton->icon()));
 
     setHelpTopic(m_notificationsShowButton, Qn::MainWindow_Pin_Help);
     m_notificationsItem->setBlinker(blinker);

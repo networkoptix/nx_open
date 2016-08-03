@@ -1,5 +1,9 @@
 #include "main_window_title_bar_widget.h"
 
+#include <core/resource/media_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/layout_resource.h>
+
 #include <ui/actions/actions.h>
 #include <ui/common/geometry.h>
 #include <ui/help/help_topic_accessor.h>
@@ -9,6 +13,7 @@
 #include <ui/workaround/qtbug_workaround.h>
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_resource.h>
 
 namespace
 {
@@ -78,6 +83,8 @@ public:
     QnLayoutTabBar* tabBar;
     QToolButton* newTabButton;
     QToolButton* currentLayoutsButton;
+    QnCloudStatusPanel* cloudPanel;
+    QnResourceList dropResources;
     bool skipDoubleClickFlag;
 };
 
@@ -90,6 +97,7 @@ QnMainWindowTitleBarWidgetPrivate::QnMainWindowTitleBarWidgetPrivate(
     tabBar(nullptr),
     newTabButton(nullptr),
     currentLayoutsButton(nullptr),
+    cloudPanel(nullptr),
     skipDoubleClickFlag(false)
 {
 }
@@ -112,6 +120,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     setFocusPolicy(Qt::NoFocus);
     setAutoFillBackground(true);
     setFixedHeight(kTitleBarHeight);
+    setAcceptDrops(true);
 
     d->mainMenuButton = newActionButton(
             action(QnActions::MainMenuAction),
@@ -128,9 +137,9 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
                         QnWorkbenchLayoutList() << layout);
     });
 
-    QnCloudStatusPanel* cloudPanel = new QnCloudStatusPanel(this);
-    cloudPanel->setFocusPolicy(Qt::NoFocus);
-    cloudPanel->setFixedHeight(kTitleBarHeight);
+    d->cloudPanel = new QnCloudStatusPanel(this);
+    d->cloudPanel->setFocusPolicy(Qt::NoFocus);
+    d->cloudPanel->setFixedHeight(kTitleBarHeight);
 
     /* Layout for window buttons that can be removed from the title bar. */
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -151,7 +160,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     layout->addStretch(1);
     layout->addSpacing(80);
     layout->addWidget(newVLine());
-    layout->addWidget(cloudPanel);
+    layout->addWidget(d->cloudPanel);
     layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
             action(QnActions::OpenLoginDialogAction),
@@ -226,4 +235,61 @@ void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
     action(QnActions::EffectiveMaximizeAction)->toggle();
     event->accept();
 #endif
+}
+
+void QnMainWindowTitleBarWidget::dragEnterEvent(QDragEnterEvent* event)
+{
+    Q_D(QnMainWindowTitleBarWidget);
+    QnResourceList resources = QnWorkbenchResource::deserializeResources(event->mimeData());
+
+    QnResourceList media;
+    QnResourceList layouts;
+    QnResourceList servers;
+
+    for (auto res : resources)
+    {
+        if (dynamic_cast<QnMediaResource*>(res.data()))
+            media << res;
+
+        if (res.dynamicCast<QnLayoutResource>())
+            layouts << res;
+
+        if (res.dynamicCast<QnMediaServerResource>())
+            servers << res;
+    }
+
+    d->dropResources = media;
+    d->dropResources << layouts;
+    d->dropResources << servers;
+
+    if (d->dropResources.empty())
+        return;
+
+    event->acceptProposedAction();
+}
+
+void QnMainWindowTitleBarWidget::dragMoveEvent(QDragMoveEvent* event)
+{
+    Q_D(QnMainWindowTitleBarWidget);
+    if (d->dropResources.empty())
+        return;
+
+    if (!qBetween(d->tabBar->pos().x(), event->pos().x(), d->cloudPanel->pos().x()))
+        return;
+
+    event->acceptProposedAction();
+}
+
+void QnMainWindowTitleBarWidget::dragLeaveEvent(QDragLeaveEvent* event)
+{
+    Q_UNUSED(event);
+    Q_D(QnMainWindowTitleBarWidget);
+    d->dropResources = QnResourceList();
+}
+
+void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
+{
+    Q_D(QnMainWindowTitleBarWidget);
+    menu()->trigger(QnActions::DropResourcesIntoNewLayoutAction, d->dropResources);
+    event->acceptProposedAction();
 }

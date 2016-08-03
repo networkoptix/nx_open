@@ -7,11 +7,13 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_criterion.h>
 
+#include <ui/models/resource/resource_compare_helper.h>
 
 /**
  * A resource filtering model that uses resource criteria for filtering.
  */
-class QnResourceSearchProxyModel: public QSortFilterProxyModel {
+class QnResourceSearchProxyModel: public QSortFilterProxyModel, protected QnResourceCompareHelper
+{
     Q_OBJECT
     typedef QSortFilterProxyModel base_type;
 
@@ -26,11 +28,7 @@ public:
 
     void clearCriteria();
 
-    const QnResourceCriterionGroup &criteria() {
-        return m_criterionGroup;
-    }
-
-    QnResourcePtr resource(const QModelIndex &index) const;
+    const QnResourceCriterionGroup &criteria();
 
 protected:
 
@@ -57,9 +55,9 @@ public slots:
     void invalidateFilter();
 
     /**
-     * Performs delayed invalidation of the filter. 
-     * 
-     * The filter will be invalidated only once even if this function was 
+     * Performs delayed invalidation of the filter.
+     *
+     * The filter will be invalidated only once even if this function was
      * called several times.
      */
     void invalidateFilterLater();

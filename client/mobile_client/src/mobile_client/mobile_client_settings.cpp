@@ -4,6 +4,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+#include "mobile_client_app_info.h"
+
 QnMobileClientSettings::QnMobileClientSettings(QObject* parent) :
     base_type(parent),
     m_settings(new QSettings(this)),
@@ -28,6 +30,20 @@ void QnMobileClientSettings::save()
 bool QnMobileClientSettings::isWritable() const
 {
     return m_settings->isWritable();
+}
+
+bool QnMobileClientSettings::isLiteClientModeEnabled() const
+{
+    switch (static_cast<LiteModeType>(liteMode()))
+    {
+    case LiteModeType::LiteModeEnabled:
+        return true;
+    case LiteModeType::LiteModeAuto:
+        return QnMobileClientAppInfo::defaultLiteMode();
+    default:
+        break;
+    }
+    return false;
 }
 
 void QnMobileClientSettings::updateValuesFromSettings(

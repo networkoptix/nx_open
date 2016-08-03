@@ -1,12 +1,13 @@
 #pragma once
 
+#include <array>
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <ui/common/custom_painted.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui_general_system_administration_widget.h>
-
 
 class QnGeneralSystemAdministrationWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
@@ -31,4 +32,19 @@ private:
 
 private:
     QScopedPointer<Ui::GeneralSystemAdministrationWidget> ui;
+
+    enum Buttons
+    {
+        kBusinessRulesButton,
+        kEventLogButton,
+        kCameraListButton,
+        kAuditLogButton,
+        kHealthMonitorButton,
+        kBookmarksButton,
+
+        kButtonCount
+    };
+
+    using CustomPaintedButton = CustomPainted<QPushButton>;
+    std::array<CustomPaintedButton*, kButtonCount> m_buttons;
 };

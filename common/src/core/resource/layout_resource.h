@@ -85,6 +85,9 @@ public:
     /** Check if layout is shared. */
     bool isShared() const;
 
+    QSet<QnResourcePtr> layoutResources() const;
+    static QSet<QnResourcePtr> layoutResources(const QnLayoutItemDataMap& items);
+
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);

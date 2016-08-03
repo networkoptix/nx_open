@@ -148,7 +148,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     NX_ASSERT(resource);
 
     if (QnAbstractArchiveResourcePtr archive = resource.dynamicCast<QnAbstractArchiveResource>())
-        return Qn::ReadPermission | Qn::ViewContentPermission | Qn::ExportPermission;
+        return Qn::ReadPermission | Qn::ExportPermission;
 
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
         return calculatePermissionsInternal(layout);
@@ -199,10 +199,10 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
     /* Some layouts are created with predefined permissions. */
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
     if (permissions.isValid() && permissions.canConvert<int>())
-        return checkReadOnly(static_cast<Qn::Permissions>(permissions.toInt()) | Qn::ViewContentPermission); // TODO: #Elric listen to changes
+        return checkReadOnly(static_cast<Qn::Permissions>(permissions.toInt()) | Qn::ReadPermission); // TODO: #Elric listen to changes
 
     if (layout->isFile())
-        return checkLocked(Qn::ReadWriteSavePermission | Qn::ViewContentPermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission);
+        return checkLocked(Qn::ReadWriteSavePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission);
 
     /* User can do everything with local layouts except removing from server. */
     if (layout->hasFlags(Qn::local))

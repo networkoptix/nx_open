@@ -55,9 +55,10 @@ GridView
     Connections
     {
         target: connectionManager
-        onInitialResourcesReceived:
+        onInitialResourcesReceivedChanged:
         {
-            camerasGrid.currentIndex = 0
+            if (connectionManager.initialResourcesReceived)
+                camerasGrid.currentIndex = 0
         }
     }
 

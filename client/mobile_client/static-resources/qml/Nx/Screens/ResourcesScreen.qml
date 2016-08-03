@@ -46,9 +46,14 @@ Page
         onServerOfflineChanged:
         {
             if (serverOffline)
+            {
                 offlineWarningDelay.restart()
+            }
             else
+            {
                 warningVisible = false
+                offlineWarningDelay.stop()
+            }
         }
     }
 
@@ -157,6 +162,7 @@ Page
         color: ColorTheme.windowBackground
         Behavior on opacity { NumberAnimation { duration: 200 } }
         visible: opacity > 0
+        opacity: 0.0
 
         Column
         {
@@ -211,9 +217,16 @@ Page
                     ? "" : systemName)
         }
 
-        onInitialResourcesReceived:
+        onInitialResourcesReceivedChanged:
         {
-            loadingDummy.opacity = 0
+            if (connectionManager.initialResourcesReceived)
+                loadingDummy.opacity = 0
         }
+    }
+
+    Component.onCompleted:
+    {
+        if (!connectionManager.online || !connectionManager.initialResourcesReceived)
+            loadingDummy.opacity = 1
     }
 }

@@ -407,7 +407,7 @@ void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
 {
     if (auto connection = QnAppServerConnectionFactory::getConnection2())
     {
-        auto timeManager = connection->getTimeManager(Qn::kDefaultUserAccess);
+        auto timeManager = connection->getTimeManager(Qn::kSystemAccess);
         foreach(const ec2::QnPeerTimeInfo &info, timeManager->getPeerTimeInfoList())
             m_serverOffsetCache[info.peerId] = info.time - currentSyncTime;
     }

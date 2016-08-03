@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>347</width>
-    <height>238</height>
+    <height>246</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -93,6 +93,9 @@
      </property>
      <item row="4" column="1">
       <widget class="QLabel" name="restorePasswordLabel">
+       <property name="focusPolicy">
+        <enum>Qt::TabFocus</enum>
+       </property>
        <property name="text">
         <string notr="true">_Forgot password?_</string>
        </property>
@@ -101,6 +104,9 @@
        </property>
        <property name="openExternalLinks">
         <bool>true</bool>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
        </property>
       </widget>
      </item>
@@ -126,6 +132,9 @@
      </item>
      <item row="4" column="2">
       <widget class="QLabel" name="createAccountLabel">
+       <property name="focusPolicy">
+        <enum>Qt::TabFocus</enum>
+       </property>
        <property name="text">
         <string notr="true">_Create account_</string>
        </property>
@@ -134,6 +143,9 @@
        </property>
        <property name="openExternalLinks">
         <bool>true</bool>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
        </property>
       </widget>
      </item>
@@ -182,6 +194,12 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>loginLineEdit</tabstop>
+  <tabstop>passwordLineEdit</tabstop>
+  <tabstop>stayLoggedInChackBox</tabstop>
+  <tabstop>loginButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

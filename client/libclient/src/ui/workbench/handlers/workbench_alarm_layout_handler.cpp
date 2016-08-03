@@ -75,7 +75,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
         {
             QnActionParameters parameters = menu()->currentParameters(sender());
             auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
-            cameras = accessController()->filtered(cameras, Qn::ViewContentPermission);
+            cameras = accessController()->filtered(cameras, Qn::ReadPermission);
             openCamerasInAlarmLayout(cameras, true);
         });
 
@@ -101,7 +101,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             auto targetCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
             if (businessAction->getParams().useSource)
                 targetCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
-            targetCameras = accessController()->filtered(targetCameras, Qn::ViewContentPermission);
+            targetCameras = accessController()->filtered(targetCameras, Qn::ReadPermission);
 
             if (targetCameras.isEmpty())
                 return;

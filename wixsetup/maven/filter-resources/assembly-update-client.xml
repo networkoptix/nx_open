@@ -28,7 +28,6 @@
                 <include>swresample-2.dll</include>
                 <include>swscale-4.dll</include>
                 <include>udt.dll</include>
-                <include>vcredist*.exe</include>
             </includes>		
         </fileSet>	
         <fileSet>
@@ -62,6 +61,13 @@
 			<outputDirectory>..</outputDirectory>
 			<includes>
 				<include>update.json</include>
+			</includes>		
+		</fileSet>	
+		<fileSet>
+			<directory>${Vs2015crtDir}</directory>
+			<outputDirectory>..</outputDirectory>
+			<includes>
+				<include>*.*</include>
 			</includes>		
 		</fileSet>		
 		<fileSet>

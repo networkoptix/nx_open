@@ -256,7 +256,7 @@ namespace ec2
                 outData = data;
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->getAccess(Qn::kDefaultUserAccess).template processQueryAsync<std::nullptr_t, ApiDatabaseDumpData, decltype(queryDoneHandler)> (
+        m_queryProcessor->getAccess(Qn::kSystemAccess).template processQueryAsync<std::nullptr_t, ApiDatabaseDumpData, decltype(queryDoneHandler)> (
             ApiCommand::dumpDatabase, nullptr, queryDoneHandler);
         return reqID;
     }
@@ -272,7 +272,7 @@ namespace ec2
         auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiDatabaseDumpToFileData&/*dumpFileSize*/ ) {
             handler->done( reqID, errorCode );
         };
-        m_queryProcessor->getAccess(Qn::kDefaultUserAccess).template processQueryAsync<ApiStoredFilePath, ApiDatabaseDumpToFileData, decltype(queryDoneHandler)> (
+        m_queryProcessor->getAccess(Qn::kSystemAccess).template processQueryAsync<ApiStoredFilePath, ApiDatabaseDumpToFileData, decltype(queryDoneHandler)> (
             ApiCommand::dumpDatabaseToFile, dumpFilePathData, queryDoneHandler );
 
         return reqID;
@@ -288,7 +288,7 @@ namespace ec2
         tran.params = data;
 
         using namespace std::placeholders;
-        m_queryProcessor->getAccess(Qn::kDefaultUserAccess).processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1) );
+        m_queryProcessor->getAccess(Qn::kSystemAccess).processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1) );
 
         return reqID;
     }

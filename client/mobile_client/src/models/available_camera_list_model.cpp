@@ -111,6 +111,21 @@ void QnAvailableCameraListModel::setLayout(const QnLayoutResourcePtr& layout)
     d->setLayout(layout);
 }
 
+QModelIndex QnAvailableCameraListModel::indexByResourceId(const QnUuid& resourceId) const
+{
+    Q_D(const QnAvailableCameraListModel);
+
+    const auto resource = qnResPool->getResourceById(resourceId);
+    if (!resource)
+        return QModelIndex();
+
+    const auto row = d->resources.indexOf(resource);
+    if (row < 0)
+        return QModelIndex();
+
+    return index(row);
+}
+
 bool QnAvailableCameraListModel::filterAcceptsResource(const QnResourcePtr& resource) const
 {
     if (!resource->hasFlags(Qn::live_cam))

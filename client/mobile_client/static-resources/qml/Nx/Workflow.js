@@ -119,6 +119,28 @@ function openCloudScreen()
     item.forceActiveFocus()
 }
 
+function openLiteClientControlScreen(clientId)
+{
+    var item = stackView.get(0, Controls.StackView.ForceLoad)
+    if (item && item.objectName == "liteClientControlScreen")
+    {
+        item.clientId = clientId
+        if (stackView.depth > 1)
+            stackView.pop(item)
+    }
+    else
+    {
+        item = stackView.replace(
+            null,
+            Qt.resolvedUrl("Screens/LiteClientControlScreen.qml"),
+            {
+                "clientId": clientId
+            }
+        )
+    }
+    item.forceActiveFocus()
+}
+
 function openDialog(path, properties)
 {
     var component = Qt.createComponent(path)

@@ -177,35 +177,27 @@ void CloudUserListSynchonizer::permissionsToCloudAccessRole(
     const QnUserResourcePtr& user,
     api::SystemSharing* const systemSharing)
 {
-    if (!user->isEnabled())
-    {
-        systemSharing->accessRole = nx::cdb::api::SystemAccessRole::disabled;
-        return;
-    }
+    auto convert = [user]
+        {
+            if (!user->isEnabled())
+                return nx::cdb::api::SystemAccessRole::disabled;
 
-    if (user->isOwner())
-    {
-        systemSharing->accessRole = nx::cdb::api::SystemAccessRole::owner;
-        return;
-    }
-
-    const auto permissions = qnResourceAccessManager->globalPermissions(user);
-    switch (permissions)
-    {
-        case Qn::GlobalAdminPermissionSet:
-            systemSharing->accessRole = nx::cdb::api::SystemAccessRole::localAdmin;
-            break;
-        case Qn::GlobalAdvancedViewerPermissionSet:
-            systemSharing->accessRole = nx::cdb::api::SystemAccessRole::advancedViewer;
-            break;
-        case Qn::GlobalViewerPermissionSet:
-            systemSharing->accessRole = nx::cdb::api::SystemAccessRole::viewer;
-            break;
-        case Qn::GlobalLiveViewerPermissionSet:
-            systemSharing->accessRole = nx::cdb::api::SystemAccessRole::liveViewer;
-            break;
-        default:
-            systemSharing->accessRole = nx::cdb::api::SystemAccessRole::custom;
-            break;
-    }
+            switch (qnResourceAccessManager->userRole(user))
+            {
+                case Qn::UserRole::Owner:
+                     return nx::cdb::api::SystemAccessRole::owner;
+                case Qn::UserRole::Administrator:
+                    return nx::cdb::api::SystemAccessRole::localAdmin;
+                case Qn::UserRole::AdvancedViewer:
+                    return nx::cdb::api::SystemAccessRole::advancedViewer;
+                case Qn::UserRole::Viewer:
+                    return nx::cdb::api::SystemAccessRole::viewer;
+                case Qn::UserRole::LiveViewer:
+                    return nx::cdb::api::SystemAccessRole::liveViewer;
+                default:
+                    break;
+            }
+            return nx::cdb::api::SystemAccessRole::custom;
+        };
+    systemSharing->accessRole = convert();
 }

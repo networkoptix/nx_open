@@ -287,7 +287,7 @@ void QnRtspConnectionProcessor::parseRequest()
         }
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
         auto userResource = qnResPool->getResourceById(d->authUserId).dynamicCast<QnUserResource>();
-        if (!userResource || !qnResourceAccessManager->hasPermission(userResource, resource, Qn::Permission::ReadPermission))
+        if (!userResource || !qnResourceAccessManager->hasPermission(userResource, resource, Qn::ReadPermission))
         {
             d->peerHasAccess = false;
             return;

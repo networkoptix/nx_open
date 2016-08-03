@@ -105,7 +105,7 @@ void QnRestConnectionProcessor::run()
     QnRestRequestHandlerPtr handler = QnRestProcessorPool::instance()->findHandler(url.path());
     if (handler)
     {
-        if (!m_noAuth && d->authUserId != Qn::kDefaultUserAccess.userId)
+        if (!m_noAuth && d->authUserId != Qn::kSystemAccess.userId)
         {
             QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->authUserId);
             if (!user)

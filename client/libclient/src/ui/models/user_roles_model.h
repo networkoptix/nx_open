@@ -7,12 +7,14 @@
 
 #include <nx_ec/data/api_fwd.h>
 
+#include <nx/utils/scoped_model_operations.h>
+
 
 class QnUserRolesModelPrivate;
-class QnUserRolesModel : public Connective<QAbstractItemModel>
+class QnUserRolesModel : public ScopedModelOperations<Connective<QAbstractItemModel>>
 {
     Q_OBJECT
-    using base_type = Connective<QAbstractItemModel>;
+    using base_type = ScopedModelOperations<Connective<QAbstractItemModel>>;
 
 public:
     explicit QnUserRolesModel(QObject* parent = nullptr, bool standardRoles = true, bool userRoles = true, bool customRole = true);
