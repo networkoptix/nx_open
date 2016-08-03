@@ -39,7 +39,8 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
         this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, false ); });
 
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionReceived,
-        this, static_cast<void (QnBusinessRuleProcessor::*)(const QnAbstractBusinessActionPtr&)>(&QnBusinessRuleProcessor::executeAction));
+        this, static_cast<void (QnBusinessRuleProcessor::*)(const QnAbstractBusinessActionPtr&)>(&QnBusinessRuleProcessor::executeAction),
+        Qt::QueuedConnection);
 
     connect(QnCommonMessageProcessor::instance(),       &QnCommonMessageProcessor::businessRuleChanged,
             this, &QnBusinessRuleProcessor::at_businessRuleChanged);

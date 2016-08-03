@@ -6,9 +6,26 @@
 #include "api_peer_data.h"
 #include "api_routing_data.h"
 #include "nx/utils/latin1_array.h"
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace ec2
 {
+    enum RuntimeFlag
+    {
+        RF_None = 0x000,
+        RF_MasterCloudSync = 0x0001 /**< Sync transactions with cloud */
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RuntimeFlag)
+    Q_DECLARE_FLAGS(RuntimeFlags, RuntimeFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(RuntimeFlags)
+
+    QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+        (ec2::RuntimeFlag)(ec2::RuntimeFlags)
+        ,
+        (metatype)(numeric)
+    )
+
+
     /**
     * This structure contains all runtime data per peer. Runtime data is absent in a DB.
     */
@@ -23,7 +40,9 @@ namespace ec2
             ApiDataWithVersion(),
             prematureLicenseExperationDate(0),
             serverTimePriority(0),
-            updateStarted(false)
+            updateStarted(false),
+            flags(RF_None)
+
         {}
 
         /* This operator must not be replaced with fusion implementation as is skips brand checking */
@@ -41,7 +60,8 @@ namespace ec2
                    updateStarted == other.updateStarted &&
                    nx1mac == other.nx1mac &&
                    nx1serial == other.nx1serial &&
-                   userId == other.userId;
+                   userId == other.userId &&
+                   flags == other.flags;
         }
 
         ApiPeerData peer;
@@ -70,12 +90,14 @@ namespace ec2
 
         /** Id of the user, under which peer is logged in (for client peers only) */
         QnUuid userId;
+
+        RuntimeFlags flags;
     };
 
 #define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
                                                         (videoWallInstanceGuid)(videoWallControlSession)(serverTimePriority)\
                                                         (hardwareIds)(updateStarted)(nx1mac)(nx1serial)\
-                                                        (userId)
+                                                        (userId)(flags)
 
 
 } // namespace ec2
