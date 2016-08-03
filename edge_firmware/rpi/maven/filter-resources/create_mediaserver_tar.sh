@@ -89,6 +89,7 @@ libnx_network \
 libnx_streaming \
 libnx_utils \
 libnx_vms_utils \
+libpostproc \
 libudt )
 
 #additional libs for nx1 client
