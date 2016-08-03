@@ -5,12 +5,11 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 
+#include <nx/utils/random.h>
+#include <plugins/resource/avi/filetypesupport.h>
+#include <recording/time_period_list.h>
 #include <utils/common/util.h>
 #include <utils/fs/file.h>
-
-#include <recording/time_period_list.h>
-
-#include <plugins/resource/avi/filetypesupport.h>
 
 namespace {
 
@@ -336,7 +335,9 @@ qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
 
 bool QnLayoutFileStorageResource::initOrUpdate() const
 {
-    QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp") + QString::number(qrand());
+    QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp")
+        + QString::number(nx::utils::random::number<uint>());
+
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);

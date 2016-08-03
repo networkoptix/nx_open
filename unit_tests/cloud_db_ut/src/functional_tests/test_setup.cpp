@@ -16,9 +16,10 @@
 
 #include <cdb/account_manager.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/common/sync_call.h>
 #include <utils/common/app_info.h>
+#include <utils/common/sync_call.h>
 
 #include <libcloud_db/src/managers/email_manager.h>
 #include <libcloud_db/src/cloud_db_process.h>
@@ -158,14 +159,14 @@ api::ResultCode CdbFunctionalTest::addAccount(
     if (accountData->email.empty())
     {
         std::ostringstream ss;
-        ss << "test_" << rand() << "@networkoptix.com";
+        ss << "test_" << nx::utils::random::number<unsigned int>() << "@networkoptix.com";
         accountData->email = ss.str();
     }
 
     if (password->empty())
     {
         std::ostringstream ss;
-        ss << rand();
+        ss << nx::utils::random::number(0);
         *password = ss.str();
     }
 
@@ -348,7 +349,7 @@ api::ResultCode CdbFunctionalTest::bindRandomNotActivatedSystem(
 
     api::SystemRegistrationData sysRegData;
     std::ostringstream ss;
-    ss << "test_sys_" << rand();
+    ss << "test_sys_" << nx::utils::random::number(0);
     sysRegData.name = ss.str();
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -360,6 +361,7 @@ api::ResultCode CdbFunctionalTest::bindRandomNotActivatedSystem(
                 connection->systemManager(),
                 std::move(sysRegData),
                 std::placeholders::_1));
+
     return resCode;
 }
 

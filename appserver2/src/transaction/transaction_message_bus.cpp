@@ -37,6 +37,7 @@
 #include "utils/common/warnings.h"
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/utils/random.h>
 
 
 namespace ec2
@@ -408,8 +409,12 @@ namespace ec2
                 tran.params = aliveData;
                 tran.params.isAlive = true;
                 NX_ASSERT(!aliveData.peer.instanceId.isNull());
-            int delay = aliveData.peer.id == qnCommon->moduleGUID() ? 0 : rand() % (ALIVE_RESEND_TIMEOUT_MAX - ALIVE_RESEND_TIMEOUT_MIN) + ALIVE_RESEND_TIMEOUT_MIN;
-            addDelayedAliveTran(std::move(tran), delay);
+
+                int delay = (aliveData.peer.id == qnCommon->moduleGUID())
+                    ? 0 : nx::utils::random::number(
+                        ALIVE_RESEND_TIMEOUT_MIN, ALIVE_RESEND_TIMEOUT_MAX);
+
+                addDelayedAliveTran(std::move(tran), delay);
                 return false; // ignore peer offline transaction
             }
         }
@@ -1135,7 +1140,7 @@ namespace ec2
         if (peer.id == qnCommon->moduleGUID())
             sendTransaction(tran);
         else  {
-            int delay = rand() % (ALIVE_RESEND_TIMEOUT_MAX - ALIVE_RESEND_TIMEOUT_MIN) + ALIVE_RESEND_TIMEOUT_MIN;
+            int delay = nx::utils::random::number(ALIVE_RESEND_TIMEOUT_MIN, ALIVE_RESEND_TIMEOUT_MAX);
             addDelayedAliveTran(std::move(tran), delay);
         }
             NX_LOG( QnLog::EC2_TRAN_LOG, lit("sending peerAlive info. id=%1 type=%2 isAlive=%3").arg(peer.id.toString()).arg(peer.peerType).arg(isAlive), cl_logDEBUG1);

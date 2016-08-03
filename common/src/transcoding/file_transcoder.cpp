@@ -16,6 +16,7 @@
 
 #include <core/resource/resource.h>
 #include <utils/fs/file.h>
+#include <nx/utils/random.h>
 
 
 class DummyResource
@@ -115,7 +116,8 @@ bool FileTranscoder::setTagValue(
         return false;
 
     QDir srcFileDir = QFileInfo(srcFilePath).dir();
-    const QString& tempFileName = lit("~%1%2.tmp.%3").arg(QDateTime::currentMSecsSinceEpoch()).arg(rand()).arg(QLatin1String(formatCtx->iformat->name));
+    const QString& tempFileName = lit("~%1%2.tmp.%3").arg(QDateTime::currentMSecsSinceEpoch())
+            .arg(nx::utils::random::number(0)).arg(QLatin1String(formatCtx->iformat->name));
     const QString& tempFilePath = lit("%1/%2").arg(srcFileDir.path()).arg(tempFileName);
 
     //setting audio/video codecID

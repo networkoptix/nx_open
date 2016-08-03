@@ -11,6 +11,7 @@
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/config.h>
+#include <nx/utils/random.h>
 #include <core/dataprovider/cpull_media_stream_provider.h>
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/camera_resource.h>
@@ -216,13 +217,13 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
     if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() &&
        (lastKeyTime == (qint64)AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL))
     {
-        if (m_nextMinTryTime == 0)
-            m_nextMinTryTime = usecTime + (rand()%5000 + 5000) * 1000ll; // get first screenshot after minor delay
+        if (m_nextMinTryTime == 0) // get first screenshot after minor delay
+            m_nextMinTryTime = usecTime + nx::utils::random::number(5000, 10000) * 1000ll;
 
         if (!m_activityStarted && usecTime > m_nextMinTryTime) {
             m_activityStarted = true;
             m_activityStartTime = usecTime;
-            m_nextMinTryTime = usecTime + (rand()%100 + 60*5) * 1000000ll;
+            m_nextMinTryTime = usecTime + nx::utils::random::number(100, 100 + 60*5) * 1000000ll;
             m_camera->inUse(this);
             QnLiveStreamProviderPtr provider = m_camera->getLiveReader(m_catalog);
             if (provider)

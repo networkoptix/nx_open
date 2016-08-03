@@ -59,11 +59,7 @@ void AuthenticationProvider::getCdbNonce(
     const auto md5Hash = calcNonceHash(systemID, timestamp);
 
     //TODO #ak replace with proper vectors function when available
-    QByteArray random3Bytes;
-    random3Bytes.resize(3);
-    for (auto& ch : random3Bytes)
-        ch = nx::utils::random::number<int>('a', 'z');
-    
+    QByteArray random3Bytes = nx::utils::random::generate(3, 'a', 'z');
     const auto nonce =
         random3Bytes +
         (QByteArray::fromRawData(reinterpret_cast<const char*>(&timestamp), sizeof(timestamp))

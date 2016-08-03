@@ -10,6 +10,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/random.h>
 #include <utils/common/guard.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql.h>
@@ -117,12 +118,10 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
 
 std::string TemporaryAccountPasswordManager::generateRandomPassword()
 {
-    std::string tempPassword(10 + (rand() % 10), 'c');
-    std::generate(
-        tempPassword.begin(),
-        tempPassword.end(),
-        []() {return 'a' + (rand() % ('z' - 'a')); });
-    return tempPassword;
+    const auto buffer = nx::utils::random::generate(
+            nx::utils::random::number<size_t>(10, 20), 'a', 'z');
+
+    return std::string(buffer.data(), buffer.size());
 }
 
 void TemporaryAccountPasswordManager::addRandomCredentials(

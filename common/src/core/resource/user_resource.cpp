@@ -1,10 +1,11 @@
 
 #include "user_resource.h"
 
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/network/http/auth_tools.h>
+#include <nx/utils/random.h>
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
-#include <nx/network/http/auth_tools.h>
+#include <utils/crypt/linux_passwd_crypt.h>
 
 static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
 static const int MSEC_PER_SEC = 1000;
@@ -82,7 +83,7 @@ void QnUserResource::generateHash()
     if (password.isEmpty())
         return;
 
-    QByteArray salt = QByteArray::number(rand(), 16);
+    QByteArray salt = QByteArray::number(nx::utils::random::number(0), 16);
     QCryptographicHash md5(QCryptographicHash::Md5);
     md5.addData(salt);
     md5.addData(password.toUtf8());
