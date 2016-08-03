@@ -74,23 +74,6 @@
        </widget>
       </item>
      </layout>
-     <zorder></zorder>
-     <zorder>protocolComboBox</zorder>
-     <zorder>label_3</zorder>
-     <zorder>label_2</zorder>
-     <zorder></zorder>
-     <zorder>loginLineEdit</zorder>
-     <zorder>label_4</zorder>
-     <zorder>label</zorder>
-     <zorder>passwordLineEdit</zorder>
-     <zorder>protocolComboBox</zorder>
-     <zorder>label_3</zorder>
-     <zorder>label_2</zorder>
-     <zorder></zorder>
-     <zorder>loginLineEdit</zorder>
-     <zorder>label_4</zorder>
-     <zorder>label</zorder>
-     <zorder>passwordLineEdit</zorder>
     </widget>
    </item>
    <item>

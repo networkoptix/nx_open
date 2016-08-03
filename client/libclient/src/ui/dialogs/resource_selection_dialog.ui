@@ -141,13 +141,6 @@
     </widget>
    </item>
   </layout>
-  <zorder>buttonBox</zorder>
-  <zorder></zorder>
-  <zorder>detailsWidget</zorder>
-  <zorder></zorder>
-  <zorder>detailsWidget</zorder>
-  <zorder>widget</zorder>
-  <zorder>line</zorder>
  </widget>
  <customwidgets>
   <customwidget>

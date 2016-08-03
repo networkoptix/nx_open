@@ -9,9 +9,9 @@
 #include <ui/style/globals.h>
 
 
-namespace 
+namespace
 {
-    enum FillType 
+    enum FillType
     {
         kNoFill          = 0x0,
         kRecordingFill   = 0x1,
@@ -25,7 +25,7 @@ namespace
     const QPoint kBottomOffset = QPoint(0, 1);
     const QPoint kBottomRightOffset = kRightOffset + kBottomOffset;
 
-    int fillType(const QnTimePeriod &period, const QnTimePeriodStorage &periodStorage) 
+    int fillType(const QnTimePeriod &period, const QnTimePeriodStorage &periodStorage)
     {
         return ((periodStorage.periods(Qn::MotionContent).intersects(period) ? kMotionFill : kNoFill)
             | (periodStorage.periods(Qn::RecordingContent).intersects(period) ? kRecordingFill : kNoFill));
@@ -44,7 +44,7 @@ namespace
         {
             const Qt::BrushStyle style = (isPrimary ? kPrimaryBrushStyle : kSecondaryBrushStyle);
             const QBrush brush(colors.getBackground(fillType, isPrimary), style);
-    
+
             painter.setPen(Qt::NoPen);
             painter.fillRect(rect, brush);
             return true;
@@ -59,7 +59,7 @@ QColor QnCalendarColors::getBackground(int fillType
     , bool isPrimary) const
 {
     /// Note! Bookmark priority is higher than recording
-    if (fillType & kBookmarkFill)		
+    if (fillType & kBookmarkFill)
     {
         return (isPrimary ? primaryBookmark : secondaryBookmark);
     }
@@ -76,7 +76,7 @@ QColor QnCalendarColors::getMotionBackground(bool isPrimary) const
 }
 
 QnCalendarItemDelegate::QnCalendarItemDelegate(QObject *parent):
-    base_type(parent) 
+    base_type(parent)
 {}
 
 const QnCalendarColors &QnCalendarItemDelegate::colors() const {
@@ -96,15 +96,14 @@ void QnCalendarItemDelegate::paintCell(QPainter *painter
     , const QnTimePeriod &localPeriod
     , const QnTimePeriodStorage &primaryPeriods
     , const QnTimePeriodStorage &secondaryPeriods
-    , bool isEnabled
-    , bool isSelected) const 
+    , bool isSelected) const
 {
     const QnScopedPainterBrushRollback brushRollback(painter);
     const QnScopedPainterPenRollback penRollback(painter);
 
     const int primaryFill = fillType(localPeriod, primaryPeriods);
     const int secondaryFill = fillType(localPeriod, secondaryPeriods);
-    
+
 
     /* Draws the background - could be one of the recording or bookmark fill types*/
     if (!paintBackground(primaryFill, true, rect, m_colors, *painter))
@@ -126,7 +125,7 @@ void QnCalendarItemDelegate::paintCell(QPainter *painter
     }
 
     /* Selection frame. */
-    if (isSelected) 
+    if (isSelected)
     {
         enum { kOffset = 2, kWidth = 3 };
         painter->setPen(QPen(m_colors.selection, kWidth, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));

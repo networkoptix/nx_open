@@ -54,7 +54,6 @@ void QnBufferedScreenGrabber::run()
         }
         if (needToStop())
             break;
-        AVFrame* curFrame = m_frames[m_frameIndex];
         m_frameIndex = m_frameIndex < m_frames.size()-1 ? m_frameIndex+1 : 0;
         CaptureInfoPtr info = m_grabber.captureFrame();
         if (!info || info->opaque == 0)

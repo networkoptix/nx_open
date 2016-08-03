@@ -6,7 +6,7 @@
 #include "desktop_data_provider.h"
 
 QnDesktopDataProviderWrapper::QnDesktopDataProviderWrapper(QnResourcePtr res, QnDesktopDataProvider* owner):
-    QnAbstractMediaStreamDataProvider(res), 
+    QnAbstractMediaStreamDataProvider(res),
     QnAbstractDataConsumer(100),
     m_owner(owner)
 {
@@ -39,7 +39,7 @@ void QnDesktopDataProviderWrapper::putData(const QnAbstractDataPacketPtr& data)
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
         QnAbstractDataReceptor* dp = m_dataprocessors.at(i);
-        if (dp->canAcceptData()) 
+        if (dp->canAcceptData())
         {
             if (media->dataType == QnAbstractMediaData::VIDEO)
             {
@@ -62,6 +62,7 @@ void QnDesktopDataProviderWrapper::putData(const QnAbstractDataPacketPtr& data)
 
 void QnDesktopDataProviderWrapper::start(Priority priority)
 {
+    Q_UNUSED(priority);
     m_owner->start();
 }
 

@@ -45,8 +45,8 @@ private:
 class QnDayTimeTableWidget: public QTableWidget {
     typedef QTableWidget base_type;
 public:
-    QnDayTimeTableWidget(QWidget *parent = NULL): 
-        base_type(parent) 
+    QnDayTimeTableWidget(QWidget *parent = NULL):
+        base_type(parent)
     {
         setTabKeyNavigation(false);
         setShowGrid(false);
@@ -73,7 +73,7 @@ protected:
 
     virtual QSize minimumSizeHint() const override {
         int w = 0, h = 0;
-        
+
         for(int row = 0; row < rowCount(); row++)
             h += sizeHintForRow(row);
 
@@ -95,7 +95,7 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
 {
     m_headerLabel = new QLabel(this);
     m_headerLabel->setAlignment(Qt::AlignCenter);
-    
+
     m_tableWidget = new QnDayTimeTableWidget(this);
     //setPaletteColor(m_tableWidget, QPalette::Highlight, QColor(0, 0, 0, 255));
     m_tableWidget->setRowCount(4);
@@ -125,7 +125,7 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     layout->addLayout(headerLayout, 0);
     layout->addWidget(m_tableWidget, 1);
     setLayout(layout);
-    
+
     setFocusPolicy(Qt::StrongFocus);
     setFocusProxy(m_tableWidget);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -176,7 +176,7 @@ void QnDayTimeWidget::setEnabledWindow(quint64 windowStart, quint64 windowEnd) {
     hourWindowStart.setTime(QTime(hourWindowStart.time().hour(), 0, 0, 0));
     QDateTime hourWindowEnd = QDateTime::fromMSecsSinceEpoch(windowEnd + HOUR - 1);
     hourWindowEnd.setTime(QTime(hourWindowEnd.time().hour(), 0, 0, 0));
-    
+
     qint64 start = hourWindowStart.toMSecsSinceEpoch();
     qint64 end = hourWindowEnd.toMSecsSinceEpoch();
 
@@ -199,7 +199,7 @@ void QnDayTimeWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd) 
     hourWindowStart.setTime(QTime(hourWindowStart.time().hour(), 0, 0, 0));
     QDateTime hourWindowEnd = QDateTime::fromMSecsSinceEpoch(windowEnd + HOUR - 1);
     hourWindowEnd.setTime(QTime(hourWindowEnd.time().hour(), 0, 0, 0));
-    
+
     qint64 start = hourWindowStart.toMSecsSinceEpoch();
     qint64 end = hourWindowEnd.toMSecsSinceEpoch();
 
@@ -212,7 +212,7 @@ void QnDayTimeWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd) 
 }
 
 void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTime &time) {
-    QnTimePeriod period(QDateTime(m_date, time).toMSecsSinceEpoch(), HOUR); 
+    QnTimePeriod period(QDateTime(m_date, time).toMSecsSinceEpoch(), HOUR);
     if (period.startTimeMs - m_localOffset > m_currentTime)
         period = QnTimePeriod();
 
@@ -221,7 +221,7 @@ void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTim
     const bool isSelected = m_selectedPeriod.intersects(localPeriod);
 
     m_delegate->paintCell(painter, rect, localPeriod, m_primaryPeriodStorage
-        , m_secondaryPeriodStorage, isEnabled, isSelected);
+        , m_secondaryPeriodStorage, isSelected);
     m_delegate->paintCellText(painter, palette(), rect, time.toString(m_timeFormat), isEnabled);
 }
 

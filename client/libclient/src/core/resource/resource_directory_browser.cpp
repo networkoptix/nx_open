@@ -269,7 +269,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
             {
                 NX_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
                 QnMetaDataLightVector motionData;
-                int motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
+                size_t motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
                 if (motionDataSize > 0)
                 {
                     motionData.resize(motionDataSize);

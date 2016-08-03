@@ -78,6 +78,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
 QnLdapUsersDialog::~QnLdapUsersDialog() {}
 
 void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUsers &users, int handle, const QString &errorString) {
+    Q_UNUSED(handle);
     if (!m_loading)
         return;
 
