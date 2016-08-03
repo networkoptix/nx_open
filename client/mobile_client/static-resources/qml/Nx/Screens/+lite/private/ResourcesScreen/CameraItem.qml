@@ -13,9 +13,6 @@ Control
     property alias resourceId: resourceHelper.resourceId
     property bool paused: false
 
-    onResourceIdChanged: console.log(">>> ", resourceId)
-
-
     QnMediaResourceHelper
     {
         id: resourceHelper

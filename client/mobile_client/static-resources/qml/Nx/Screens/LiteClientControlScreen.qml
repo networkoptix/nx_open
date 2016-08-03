@@ -45,6 +45,9 @@ Page
             }
             return screenLoader.item
         }
+
+        property string currentResourceId: (screenItem && screenItem.activeItem
+            ? screenItem.activeItem.resourceId : "")
     }
 
     QnLiteClientController
@@ -98,7 +101,7 @@ Page
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
 
-            text: d.screenItem ? d.screenItem.activeItem.resourceName : ""
+            text: d.screenItem && d.screenItem.activeItem ? d.screenItem.activeItem.resourceName : ""
         }
     }
 
@@ -136,15 +139,11 @@ Page
                 }
             }
 
-            Connections
+            Binding
             {
-                target: d.screenItem
-                onActiveItemChanged: selector.updateResourceId()
-            }
-            Connections
-            {
-                target: d
-                onScreenItemChanged: selector.updateResourceId()
+                target: selector
+                property: "currentResourceId"
+                value: d.currentResourceId
             }
 
             Binding
@@ -159,16 +158,6 @@ Page
                 liteClientController.layoutHelper.displayMode = (fourCamerasMode
                     ? QnLiteClientLayoutHelper.MultipleCameras
                     : QnLiteClientLayoutHelper.SingleCamera)
-            }
-
-            Component.onCompleted: updateResourceId()
-
-            function updateResourceId()
-            {
-                if (!d.screenItem || !d.screenItem.activeItem)
-                    return
-
-                selector.currentResourceId = d.screenItem.activeItem.resourceId
             }
         }
     }
@@ -212,9 +201,12 @@ Page
 
                     item.resourceId = resourceId
                 }
+                onLayoutChanged: layout.resetLayout()
             }
 
-            Component.onCompleted:
+            Component.onCompleted: resetLayout()
+
+            function resetLayout()
             {
                 for (var y = 0; y < gridHeight; ++y)
                 {

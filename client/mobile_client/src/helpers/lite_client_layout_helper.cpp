@@ -73,6 +73,9 @@ void QnLiteClientLayoutHelper::setLayout(const QnLayoutResourcePtr& layout)
             d, &QnLiteClientLayoutHelperPrivate::at_layoutItemChanged);
         connect(d->layout, &QnLayoutResource::itemRemoved,
             d, &QnLiteClientLayoutHelperPrivate::at_layoutItemRemoved);
+
+        emit displayModeChanged();
+        emit singleCameraIdChanged();
     }
 }
 
