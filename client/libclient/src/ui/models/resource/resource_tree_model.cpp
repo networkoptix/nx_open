@@ -141,6 +141,13 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
 
     connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated, this, &QnResourceTreeModel::updateRoleNodes);
     connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupRemoved, this, &QnResourceTreeModel::updateRoleNodes);
+    connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this,
+        [this](const QnUuid& id)
+        {
+            if (!qnResourceAccessManager->userGroup(id).isNull())
+                updateRoleNodes();
+        }
+    );
 
     rebuildTree();
 
@@ -985,7 +992,7 @@ void QnResourceTreeModel::updateSharedLayoutNodesForRole(const QnUuid& id)
     auto parentNode = ensurePlaceholderNode(id, Qn::AccessibleLayoutsNode);
 
     /* Add new shared layouts and forcibly update them. */
-    for (const QnLayoutResourcePtr& layout : qnResPool->getResources<QnLayoutResource>())
+    for (const auto& layout : qnResPool->getResources<QnLayoutResource>())
     {
         if (!layout->isShared())
             continue;
@@ -1019,6 +1026,67 @@ void QnResourceTreeModel::updateSharedLayoutNodesForRole(const QnUuid& id)
         removeNode(node);
 }
 
+void QnResourceTreeModel::updateAccessibleResourcesForRole(const QnUuid& id)
+{
+    auto role = qnResourceAccessManager->userGroup(id);
+    TRACE("Updating accesible resources nodes for role " << role.name);
+    NX_ASSERT(!role.isNull());
+    if (role.isNull())
+        return;
+
+    auto resources = qnResourceAccessManager->accessibleResources(id);
+
+    /* Copy of the list before all changes. */
+    auto accesible = m_accessibleResourceNodesByOwner[id].values();
+
+    /* Real parent node - 'Cameras' placeholder. */
+    auto parentNode = ensurePlaceholderNode(id, Qn::AccessibleResourcesNode);
+
+    /* Add new accessibly resources and forcibly update them. */
+    for (const auto& resource : qnResPool->getResources())
+    {
+        if (!resource->hasFlags(Qn::live_cam) && !resource->hasFlags(Qn::web_page))
+            continue;
+
+        if (resource->hasFlags(Qn::desktop_camera))
+            continue;
+
+        TRACE("Checking node " << resource->getName() << " under role " << role.name);
+        if (resources.contains(resource->getId()))
+        {
+            auto node = ensureAccessibleResourceNode(id, resource);
+            node->update();
+            node->setParent(parentNode);
+
+            /* Create recorder nodes for cameras. */
+            if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+            {
+                QString groupId = camera->getGroupId();
+                if (!groupId.isEmpty())
+                    node->setParent(ensureRecorderNode(parentNode, groupId, camera->getGroupName()));
+            }
+        }
+    }
+
+    /* Cleanup nodes that are not available anymore. */
+    QList<QnResourceTreeModelNodePtr> nodesToDelete;
+    for (auto existingNode : accesible)
+    {
+        NX_ASSERT(existingNode && existingNode->resource());
+        if (!existingNode)
+            continue;
+
+        if (!existingNode->resource() || !resources.contains( existingNode->resource()->getId()))
+            nodesToDelete << existingNode;
+    }
+
+
+    for (auto node : nodesToDelete)
+        removeNode(node);
+
+    cleanupGroupNodes(Qn::RecorderNode);
+}
+
 void QnResourceTreeModel::updateRoleNodes()
 {
     TRACE("Updating role nodes");
@@ -1048,6 +1116,7 @@ void QnResourceTreeModel::updateRoleNodes()
         ensureRoleNode(id)->update();
         updatePlaceholderNodesForUserOrRole(id);
         updateSharedLayoutNodesForRole(id);
+        updateAccessibleResourcesForRole(id);
     }
     cleanupGroupNodes(Qn::RecorderNode);
 }

@@ -85,6 +85,7 @@ private:
     void updateSharedLayoutNodesForUser(const QnUserResourcePtr& user);
     void updateAccessibleResourcesForUser(const QnUserResourcePtr& user);
     void updateSharedLayoutNodesForRole(const QnUuid& id);
+    void updateAccessibleResourcesForRole(const QnUuid& id);
     void updateRoleNodes();
 
     Qn::NodeType rootNodeTypeForScope() const;

@@ -27,27 +27,28 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-namespace
+namespace {
+
+/* Set of node types, that are require children to be visible. */
+bool nodeRequiresChildren(Qn::NodeType nodeType)
 {
-
-    /* Set of node types, that are require children to be visible. */
-    bool nodeRequiresChildren(Qn::NodeType nodeType)
-    {
-        static QSet<Qn::NodeType> result;
-        if (result.isEmpty())
-            result
-            << Qn::OtherSystemsNode
-            << Qn::WebPagesNode
-            << Qn::ServersNode
-            << Qn::UserDevicesNode
-            << Qn::RecorderNode
-            << Qn::SystemNode
-            << Qn::RoleUsersNode
-            << Qn::LayoutsNode
-            ;
-        return result.contains(nodeType);
-    }
-
+    static QSet<Qn::NodeType> result;
+    if (result.isEmpty())
+        result
+        << Qn::OtherSystemsNode
+        << Qn::WebPagesNode
+        << Qn::ServersNode
+        << Qn::UserDevicesNode
+        << Qn::RecorderNode
+        << Qn::SystemNode
+        << Qn::RoleUsersNode
+        << Qn::LayoutsNode
+        << Qn::AccessibleLayoutsNode
+        << Qn::AccessibleResourcesNode
+        << Qn::RoleUsersNode
+        ;
+    return result.contains(nodeType);
+}
 
 }
 
@@ -736,6 +737,8 @@ QVariant QnResourceTreeModelNode::data(int role, int column) const
         return QVariant::fromValue<int>(m_status);
     case Qn::NodeTypeRole:
         return qVariantFromValue(m_type);
+    case Qn::UuidRole:
+        return qVariantFromValue(m_uuid);
 
     case Qn::HelpTopicIdRole:
         if (m_type == Qn::UsersNode)

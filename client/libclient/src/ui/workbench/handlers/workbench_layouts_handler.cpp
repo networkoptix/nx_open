@@ -1107,23 +1107,26 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
     auto params = menu()->currentParameters(sender());
     auto layouts = params.resources().filtered<QnLayoutResource>();
     auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
-    NX_ASSERT(user);
-    if (!user)
+    auto roleId = params.argument<QnUuid>(Qn::UuidRole);
+    NX_ASSERT(user || !roleId.isNull());
+    if (!user && roleId.isNull())
         return;
 
-    //TODO: #GDM what if we've been disconnected while confirming?
-    if (!confirmStopSharingLayouts(user, layouts))
-        return;
+    QnUuid id = user ? user->getId() : roleId;
+    if (user)
+    {
+        //TODO: #GDM what if we've been disconnected while confirming?
+        if (!confirmStopSharingLayouts(user, layouts))
+            return;
+    }
 
-    //TODO: #GDM #implement stop sharing for roled user
-
-    auto accessible = qnResourceAccessManager->accessibleResources(user->getId());
+    auto accessible = qnResourceAccessManager->accessibleResources(id);
     for (const auto& layout : layouts)
     {
         NX_ASSERT(!layout->isFile());
         accessible.remove(layout->getId());
     }
-    qnResourcesChangesManager->saveAccessibleResources(user->getId(), accessible);
+    qnResourcesChangesManager->saveAccessibleResources(id, accessible);
 }
 
 void QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered()
