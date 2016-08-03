@@ -490,7 +490,7 @@
                 <module>client/desktop_client</module>
                 <module>common_libs/nx_media</module>
                 <module>client/mobile_client</module>
-		<module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/libvms_gateway</module>
             </modules>
         </profile>
         <profile>
@@ -1177,12 +1177,12 @@
                     <name>linux</name>
                 </os>
                 <property>
-                    <name>test</name>
+                    <name>ut</name>
                     <value>true</value>
                 </property>
             </activation>
             <modules>
-                <module>unit_tests</module>
+                <module>unit_tests</module>           
                 <module>unit_tests_run</module>
             </modules>
         </profile>

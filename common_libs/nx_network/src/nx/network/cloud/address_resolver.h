@@ -161,6 +161,13 @@ public:
 
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
+    /**
+     * Default (true): do not resolve on mediator, set cloud address in case of patter match pattern
+     *      match (DNS is not involved at all).
+     * Old-style (false): resolve on mediator to have a chanse to get direct IPs.
+     */
+    static const bool kDoNotResolveOnMediator = true;
+
 protected:
     struct NX_NETWORK_API HostAddressInfo
     {
@@ -215,6 +222,9 @@ protected:
         HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator);
 
     void mediatorResolve(
+        HaInfoIterator info, QnMutexLockerBase* lk, bool needDns);
+
+    void mediatorResolveImpl(
         HaInfoIterator info, QnMutexLockerBase* lk, bool needDns);
 
     std::vector<Guard> grabHandlers(

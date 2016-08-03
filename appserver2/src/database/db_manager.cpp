@@ -505,11 +505,11 @@ bool QnDbManager::init(const QUrl& dbUrl)
         NX_ASSERT(userResource->isOwner(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
     }
 
-    QByteArray md5Password;
-    QByteArray digestPassword;
-    qnCommon->adminPasswordData(&md5Password, &digestPassword);
+    AdminPasswordData adminPasswordData = qnCommon->adminPasswordData();
+
     QString defaultAdminPassword = qnCommon->defaultAdminPassword();
-    if( (userResource->getHash().isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty() ) {
+    if( (userResource->getHash().isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty() )
+    {
         defaultAdminPassword = lit("admin");
         if (m_dbJustCreated)
             qnCommon->setUseLowPriorityAdminPasswordHach(true);
@@ -527,10 +527,12 @@ bool QnDbManager::init(const QUrl& dbUrl)
             updateUserResource = true;
         }
     }
-    if (!md5Password.isEmpty() || !digestPassword.isEmpty())
+    if (!adminPasswordData.isEmpty())
     {
-        userResource->setHash(md5Password);
-        userResource->setDigest(digestPassword);
+        userResource->setHash(adminPasswordData.hash);
+        userResource->setDigest(adminPasswordData.digest);
+        userResource->setCryptSha512Hash(adminPasswordData.cryptSha512Hash);
+        userResource->setRealm(adminPasswordData.realm);
         updateUserResource = true;
     }
     if (updateUserResource)

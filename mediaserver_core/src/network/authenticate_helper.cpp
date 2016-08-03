@@ -226,6 +226,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             }
             else {
                 // use admin's realm by default for better compatibility with previous version
+                // in case of default realm upgrade
                 userResource = qnResPool->getAdministrator();
             }
 

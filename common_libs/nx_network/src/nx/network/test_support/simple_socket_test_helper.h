@@ -1,22 +1,17 @@
-
-#ifndef SIMPLE_SOCKET_TEST_HELPER_H
-#define SIMPLE_SOCKET_TEST_HELPER_H
+#pragma once
 
 #include <iostream>
 
 #include <boost/optional.hpp>
 
-#include <nx/utils/test_support/sync_queue.h>
-#include <utils/common/systemerror.h>
-#include <utils/common/stoppable.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
-#include <nx/utils/log/log.h>
-
-// Template multitype socket tests to ensure that every common_ut run checks
-// TCP and UDT basic functionality
-
+#include <nx/utils/test_support/sync_queue.h>
+#include <nx/utils/test_support/test_options.h>
+#include <utils/common/stoppable.h>
+#include <utils/common/systemerror.h>
 
 namespace nx {
 namespace network {
@@ -170,6 +165,7 @@ void socketSimpleSync(
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
+    nx::utils::TestOptions::applyLoadMode(clientCount);
     auto server = serverMaker();
     nx::utils::promise<SocketAddress> promise;
     nx::utils::thread serverThread(
@@ -230,6 +226,7 @@ void socketSimpleAsync(
     int clientCount,
     StopSocketFunc stopSocket)
 {
+    nx::utils::TestOptions::applyLoadMode(clientCount);
     nx::utils::TestSyncQueue< SystemError::ErrorCode > serverResults;
     nx::utils::TestSyncQueue< SystemError::ErrorCode > clientResults;
 
@@ -257,20 +254,33 @@ void socketSimpleAsync(
 
         clients.emplace_back(socket);
         auto& client = clients.back();
+        ASSERT_TRUE(server->setSendTimeout(3000));
+        ASSERT_TRUE(server->setRecvTimeout(3000));
         ASSERT_TRUE(client->setNonBlockingMode(true));
         client->readAsyncAtLeast(
             &serverBuffer, testMessage.size(),
             [&](SystemError::ErrorCode code, size_t size)
             {
-                if (code == SystemError::noError)
+                if (code != SystemError::noError)
                 {
-                    EXPECT_GT(size, (size_t)0);
-                    EXPECT_STREQ(serverBuffer.data(), testMessage.data());
-                    serverBuffer.resize(0);
+                    stopSocket(std::move(client));
+                    return serverResults.push(code);
                 }
 
-                stopSocket(std::move(client));
-                serverResults.push(code);
+                EXPECT_GT(size, (size_t)0);
+                EXPECT_STREQ(serverBuffer.data(), testMessage.data());
+                serverBuffer.resize(0);
+
+                client->sendAsync(
+                    testMessage,
+                    [&](SystemError::ErrorCode code, size_t size)
+                    {
+                        if (code == SystemError::noError)
+                            EXPECT_GT(size, (size_t)0);
+
+                        stopSocket(std::move(client));
+                        serverResults.push(code);
+                    });
             });
 
         server->acceptAsync(acceptor);
@@ -283,6 +293,7 @@ void socketSimpleAsync(
         auto testClient = clientMaker();
         ASSERT_TRUE(testClient->setNonBlockingMode(true));
         ASSERT_TRUE(testClient->setSendTimeout(3000));
+        ASSERT_TRUE(testClient->setRecvTimeout(3000));
 
         QByteArray clientBuffer;
         clientBuffer.reserve(128);
@@ -293,12 +304,34 @@ void socketSimpleAsync(
                 testMessage,
                 [&](SystemError::ErrorCode code, size_t size)
                 {
-                    clientResults.push(code);
                     if (code != SystemError::noError)
-                        return;
+                        return clientResults.push(code);
 
                     EXPECT_EQ(code, SystemError::noError);
                     EXPECT_EQ(size, (size_t)testMessage.size());
+
+                    auto buffer = std::make_shared<Buffer>();
+                    buffer->reserve(128);
+                    testClient->readAsyncAtLeast(
+                        buffer.get(), testMessage.size(),
+                        [&, buffer](SystemError::ErrorCode code, size_t size)
+                    {
+                        if (code != SystemError::noError)
+                            return clientResults.push(code);
+
+                        EXPECT_GT(size, (size_t)0);
+                        EXPECT_STREQ(buffer->data(), testMessage.data());
+
+                        buffer->resize(0);
+                        testClient->readAsyncAtLeast(
+                            buffer.get(), testMessage.size(),
+                            [&, buffer](SystemError::ErrorCode code, size_t size)
+                            {
+                                EXPECT_EQ(buffer->size(), 0);
+                                EXPECT_EQ(size, (size_t)0);
+                                clientResults.push(code);
+                            });
+                    });
                 });
         });
 
@@ -834,5 +867,3 @@ typedef nx::network::test::StopType StopType;
     NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
     NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
     NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \
-
-#endif  //SIMPLE_SOCKET_TEST_HELPER_H

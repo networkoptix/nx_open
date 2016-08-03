@@ -14,6 +14,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <statistics/abstract_statistics_settings_loader.h>
 #include <ec2_statictics_reporter.h>
+#include <api/global_settings.h>
 
 namespace
 {
@@ -135,8 +136,6 @@ namespace
         return true;
     }
 }
-
-const QString QnMultiserverStatisticsRestHandler::kSettingsUrlParam = lit("clientStatisticsSettingsUrl");
 
 class StatisticsActionHandler
 {
@@ -275,10 +274,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
         static const auto kSettingsUrl =
             ec2::Ec2StaticticsReporter::DEFAULT_SERVER_API + lit("/config/client_stats.json");
 
-        // TODO: #ynikitenkov fix to use qnGlobalSettings in 2.6
-        const auto admin = qnResPool->getAdministrator();
-        const auto localSettingsUrl = (admin ? admin->getProperty(
-            QnMultiserverStatisticsRestHandler::kSettingsUrlParam) : QString());
+        const auto localSettingsUrl = qnGlobalSettings->clientStatisticsSettingsUrl();
         return QUrl::fromUserInput(localSettingsUrl.trimmed().isEmpty()
             ? kSettingsUrl : localSettingsUrl);
     }();

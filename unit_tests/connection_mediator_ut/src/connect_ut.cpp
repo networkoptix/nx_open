@@ -101,10 +101,17 @@ TEST_F( ConnectTest, BindConnect )
                    stun::MessageClass::successResponse );
     }
 
+    const auto address = lit("http://%1.%2/test")
+        .arg(QString::fromUtf8(SERVER_ID)).arg(QString::fromUtf8(SYSTEM_ID));
+
     nx_http::HttpClient client;
+    if (nx::network::cloud::AddressResolver::kDoNotResolveOnMediator)
     {
-        ASSERT_TRUE(client.doGet(lit("http://%1.%2/test")
-            .arg(QString::fromUtf8(SERVER_ID)).arg(QString::fromUtf8(SYSTEM_ID))));
+        ASSERT_FALSE( client.doGet(address) );
+    }
+    else
+    {
+        ASSERT_TRUE( client.doGet(address) );
         ASSERT_EQ( client.response()->statusLine.statusCode, nx_http::StatusCode::ok );
         ASSERT_EQ( client.fetchMessageBodyBuffer(), "test" );
     }

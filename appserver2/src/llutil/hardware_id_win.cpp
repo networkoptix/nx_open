@@ -571,6 +571,7 @@ void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& ha
             // Temporarily enable them
             if (EnableNICSAtPaths(pSvc, paths) == S_OK)
             {
+#if 1
                 // Wait up to 10 seconds for all interfaces to be enabled
                 for (int i = 0; i < kInterfaceWaitingTries; i++)
                 {
@@ -585,6 +586,7 @@ void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& ha
                         Sleep(kInterfaceWaitingTime);
                     }
                 }
+#endif
             }
         }
     }

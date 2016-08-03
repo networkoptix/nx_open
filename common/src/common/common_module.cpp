@@ -1,5 +1,6 @@
 #include "common_module.h"
 
+#include <QSettings>
 #include <cassert>
 
 #include <QtCore/QCoreApplication>
@@ -30,7 +31,48 @@
 
 #include <nx/utils/timer_manager.h>
 
-QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
+
+namespace
+{
+    static const QString kAdminPasswordHash = lit("adminMd5Hash");
+    static const QString kAdminPasswordDigest = lit("adminMd5Digest");
+    static const QString kAdminPasswordCrypt512 = lit("adminCrypt512");
+    static const QString kAdminPasswordRealm = lit("adminRealm");
+}
+
+void AdminPasswordData::saveToSettings(QSettings* settings)
+{
+    settings->setValue(kAdminPasswordHash, hash);
+    settings->setValue(kAdminPasswordDigest, digest);
+    settings->setValue(kAdminPasswordCrypt512, cryptSha512Hash);
+    settings->setValue(kAdminPasswordRealm, realm);
+}
+
+void AdminPasswordData::loadFromSettings(const QSettings* settings)
+{
+    hash = settings->value(kAdminPasswordHash).toByteArray();
+    digest = settings->value(kAdminPasswordDigest).toByteArray();
+    cryptSha512Hash = settings->value(kAdminPasswordCrypt512).toByteArray();
+    realm = settings->value(kAdminPasswordRealm, QnAppInfo::realm()).toByteArray();
+}
+
+void AdminPasswordData::clearSettings(QSettings* settings)
+{
+    settings->remove(kAdminPasswordHash);
+    settings->remove(kAdminPasswordDigest);
+    settings->remove(kAdminPasswordCrypt512);
+    settings->remove(kAdminPasswordRealm);
+}
+
+bool AdminPasswordData::isEmpty() const
+{
+    return digest.isEmpty() && hash.isEmpty();
+}
+
+// ------------------- QnCommonModule --------------------
+
+QnCommonModule::QnCommonModule(QObject *parent): QObject(parent)
+{
     Q_INIT_RESOURCE(common);
 
     nx::network::SocketGlobals::init();
@@ -196,16 +238,14 @@ qint64 QnCommonModule::systemIdentityTime() const
     return m_systemIdentityTime;
 }
 
-void QnCommonModule::setAdminPasswordData(const QByteArray& hash, const QByteArray& digest)
+void QnCommonModule::setAdminPasswordData(const AdminPasswordData& data)
 {
-    m_adminPaswdHash = hash;
-    m_adminPaswdDigest = digest;
+    m_adminPasswordData = data;
 }
 
-void QnCommonModule::adminPasswordData(QByteArray* hash, QByteArray* digest) const
+AdminPasswordData QnCommonModule::adminPasswordData() const
 {
-    *hash = m_adminPaswdHash;
-    *digest = m_adminPaswdDigest;
+    return m_adminPasswordData;
 }
 
 void QnCommonModule::setUseLowPriorityAdminPasswordHach(bool value)

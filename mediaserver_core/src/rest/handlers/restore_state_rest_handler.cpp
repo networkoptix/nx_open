@@ -34,9 +34,13 @@ int QnRestoreStateRestHandler::executePost(
 
 int QnRestoreStateRestHandler::execute(PasswordData passwordData, const QnUuid &userId, QnJsonRestResult &result)
 {
+    if (QnPermissionsHelper::isSafeMode())
+        return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::isOwner(userId))
+        return QnPermissionsHelper::notOwnerError(result);
+
     QString errStr;
-    if (!validatePasswordData(passwordData, &errStr) ||
-        !validateOwnerPassword(passwordData, &errStr))
+    if (!validatePasswordData(passwordData, &errStr))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx_http::StatusCode::ok;

@@ -59,18 +59,23 @@ angular.module('webadminApp')
             //1. confirm detach
             var confirmation = L.settings.confirmRestoreDefault;
             dialogs.confirmWithPassword(null, L.settings.confirmRestoreDefault, L.settings.confirmRestoreDefaultTitle).then(function(oldPassword){
-                mediaserver.restoreFactoryDefaults(oldPassword).then(function(data){
-                    if(data.data.error !== '0' && data.data.error !== 0){
-                        // Some Error has happened
-                        dialogs.alert(data.data.errorString);
-                        return;
-                    }
 
-                    restartServer();
-                },function(error){
-                    dialogs.alert(L.settings.unexpectedError);
-                    $log.log('can\'t detach');
-                    $log.error(error);
+                mediaserver.checkCurrentPassword(oldPassword).then(function() {
+                    mediaserver.restoreFactoryDefaults().then(function (data) {
+                        if (data.data.error !== '0' && data.data.error !== 0) {
+                            // Some Error has happened
+                            dialogs.alert(data.data.errorString);
+                            return;
+                        }
+
+                        restartServer();
+                    }, function (error) {
+                        dialogs.alert(L.settings.unexpectedError);
+                        $log.log('can\'t detach');
+                        $log.error(error);
+                    });
+                },function(){
+                    dialogs.alert(L.settings.wrongPassword);
                 });
             });
         };

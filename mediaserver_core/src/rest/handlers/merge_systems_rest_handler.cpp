@@ -32,6 +32,8 @@
 
 #include <rest/helpers/permissions_helper.h>
 #include <network/authenticate_helper.h>
+#include <api/resource_property_adaptor.h>
+#include <api/global_settings.h>
 
 namespace
 {
@@ -48,10 +50,11 @@ int QnMergeSystemsRestHandler::executeGet(
     Q_UNUSED(path)
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::isOwner(owner->authUserId()))
+        return QnPermissionsHelper::notOwnerError(result);
 
     QUrl url = params.value(lit("url"));
-    QString password = params.value(lit("password"));
-    QString currentPassword = params.value(lit("currentPassword"));
+    QString remoteAdminPassword = params.value(lit("password"));
     bool takeRemoteSettings = params.value(lit("takeRemoteSettings"), lit("false")) != lit("false");
     bool mergeOneServer = params.value(lit("oneServer"), lit("false")) != lit("false");
     bool ignoreIncompatible = params.value(lit("ignoreIncompatible"), lit("false")) != lit("false");
@@ -74,40 +77,26 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
 
-    if (password.isEmpty()) {
+    if (remoteAdminPassword.isEmpty()) {
         NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"password\""), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("password")));
         return nx_http::StatusCode::ok;
     }
 
-    if (currentPassword.isEmpty()) {
-        NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"currentPassword\""), cl_logDEBUG1);
-        result.setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, lit("currentPassword")));
-        return nx_http::StatusCode::ok;
-    }
+    /* Get module information to get system name. */
 
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-
-    if (!admin)
+    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
+    if (!adminUser)
     {
-        NX_LOG(lit("QnMergeSystemsRestHandler. Failed to find user \"admin\""), cl_logDEBUG1);
+        NX_LOG(lit("QnMergeSystemsRestHandler. Failed to find admin user"), cl_logDEBUG1);
         return nx_http::StatusCode::internalServerError;
     }
 
-    if (!qnAuthHelper->checkUserPassword(admin, currentPassword))
-    {
-        NX_LOG(lit("QnMergeSystemsRestHandler. Wrong admin password"), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::InvalidParameter, lit("currentPassword"));
-        return nx_http::StatusCode::ok;
-    }
-
-    /* Get module information to get system name. */
 
     QAuthenticator auth;
-    auth.setUser(admin->getName());
-    auth.setPassword(password);
+    auth.setUser(adminUser->getName());
+    auth.setPassword(remoteAdminPassword);
 
     CLSimpleHTTPClient client(url, 10000, auth);
     CLHttpStatus status = client.doGET(lit("api/moduleInformationAuthenticated?showAddresses=true"));
@@ -131,7 +120,8 @@ int QnMergeSystemsRestHandler::executeGet(
     QnJsonRestResult json = QJson::deserialized<QnJsonRestResult>(data);
     QnModuleInformationWithAddresses remoteModuleInformation = json.deserialized<QnModuleInformationWithAddresses>();
 
-    if (remoteModuleInformation.systemName.isEmpty()) {
+    if (remoteModuleInformation.systemName.isEmpty())
+    {
         NX_LOG(lit("QnMergeSystemsRestHandler. Remote (%1) system name is empty")
             .arg(url.toString()), cl_logDEBUG1);
         /* Hmm there's no system name. It would be wrong system. Reject it. */
@@ -139,9 +129,16 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
 
+    if (takeRemoteSettings && qnCommon->moduleInformation().cloudSystemId.isEmpty())
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings is forbidden because system owner is cloud user")
+            .arg(takeRemoteSettings), cl_logDEBUG1);
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("NOT_LOCAL_OWNER"));
+        return nx_http::StatusCode::ok;
+    }
+
     const bool canMerge =
         (remoteModuleInformation.cloudSystemId == qnCommon->moduleInformation().cloudSystemId) ||
-        (takeRemoteSettings && qnCommon->moduleInformation().cloudSystemId.isEmpty()) ||
         (!takeRemoteSettings && remoteModuleInformation.cloudSystemId.isEmpty());
     if (!canMerge)
     {
@@ -179,14 +176,16 @@ int QnMergeSystemsRestHandler::executeGet(
 
     if (takeRemoteSettings)
     {
-        if (!backupDatabase()) {
+        if (!backupDatabase())
+        {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to backup database")
                 .arg(takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyRemoteSettings(url, remoteModuleInformation.systemName, password, admin, owner)) {
+        if (!applyRemoteSettings(url, remoteModuleInformation.systemName, remoteAdminPassword, adminUser, owner))
+        {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply remote settings")
                 .arg(takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
@@ -194,21 +193,16 @@ int QnMergeSystemsRestHandler::executeGet(
         }
     } else
     {
-        if (!admin) {
-            NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. No admin")
-                .arg(takeRemoteSettings), cl_logDEBUG1);
-            result.setError(QnJsonRestResult::CantProcessRequest, lit("INTERNAL_ERROR"));
-            return nx_http::StatusCode::ok;
-        }
-
-        if (!backupDatabase()) {
+        if (!backupDatabase())
+        {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to backup database")
                 .arg(takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyCurrentSettings(url, password, currentPassword, admin, mergeOneServer, owner)) {
+        if (!applyCurrentSettings(url, remoteAdminPassword, adminUser, mergeOneServer, owner))
+        {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply current settings")
                 .arg(takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
@@ -217,7 +211,8 @@ int QnMergeSystemsRestHandler::executeGet(
     }
 
     /* Save additional address if needed */
-    if (!remoteModuleInformation.remoteAddresses.contains(url.host())) {
+    if (!remoteModuleInformation.remoteAddresses.contains(url.host()))
+    {
         QUrl simpleUrl;
         simpleUrl.setScheme(lit("http"));
         simpleUrl.setHost(url.host());
@@ -245,24 +240,65 @@ int QnMergeSystemsRestHandler::executeGet(
 
 bool QnMergeSystemsRestHandler::applyCurrentSettings(
         const QUrl &remoteUrl,
-        const QString &password,
-        const QString &currentPassword,
+        const QString &remoteAdminPassword,
         const QnUserResourcePtr &admin,
         bool oneServer,
         const QnRestConnectionProcessor *owner)
 {
     QAuthenticator authenticator;
     authenticator.setUser(admin->getName());
-    authenticator.setPassword(password);
+    authenticator.setPassword(remoteAdminPassword);
 
-    QString systemName = QString::fromUtf8(QUrl::toPercentEncoding(qnCommon->localSystemName()));
+    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    if (!server)
+        return false;
 
-    //saving user data before /api/configure call to prevent race condition,
-    //  when we establish transaction connection to remote server and receive updated
-    //  saveUser transaction before passing admin to /ec2/saveUser call
-    {   /* Save current admin inside the remote system */
 
-        /* Change system name of the selected server */
+    /**
+     * Save current server to the foreign system.
+     * It could be only way to pass authentication if current admin user is disabled
+     */
+    {
+        CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
+
+        ec2::ApiMediaServerData serverData;
+        ec2::fromResourceToApi(server, serverData);
+        const QByteArray serializedServerData = QJson::serialized(serverData);
+        client.addHeader("Content-Type", "application/json");
+        CLHttpStatus status = client.doPOST(lit("/ec2/saveMediaServer"), serializedServerData);
+
+        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+            return false;
+    }
+
+    /**
+    * Save current system settings to the foreign system.
+    * It could be only way to pass authentication if current admin user is disabled
+    */
+    {
+        QString urlQuery;
+        const auto& settings = QnGlobalSettings::instance()->allSettings();
+        for (QnAbstractResourcePropertyAdaptor* setting: settings)
+            urlQuery += lit("&%1=%2").arg(setting->key()).arg(setting->serializedValue());
+
+        if (!urlQuery.isEmpty())
+        {
+            CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
+            CLHttpStatus status = client.doGET(lit("/api/systemSettings?%1").arg(urlQuery));
+            if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+                return false;
+        }
+    }
+
+
+
+    /** saving user data before /api/configure call to prevent race condition,
+     *  when we establish transaction connection to remote server and receive updated
+     *  saveUser transaction before passing admin to /ec2/saveUser call
+     */
+    {
+
+        // Change system name of the selected server
         CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
 
         ec2::ApiUserData userData;
@@ -275,30 +311,26 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
             return false;
     }
 
-    authenticator.setPassword(currentPassword);
+    authenticator.setUser(server->getId().toString());
+    authenticator.setPassword(server->getAuthKey());
+
     /* Change system name of the selected server */
     CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
 
+    const QString systemName = QString::fromUtf8(QUrl::toPercentEncoding(qnCommon->localSystemName()));
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     client.addHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
     QString requestStr = lit("/api/configure?systemName=%1").arg(systemName);
     requestStr += lit("&sysIdTime=%1").arg(qnCommon->systemIdentityTime());
     requestStr += lit("&tranLogTime=%1").arg(ec2Connection->getTransactionLogTime());
-    if (oneServer) {
-        CLHttpStatus status = client.doGET(requestStr);
-        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
-            return false;
-    }
+    requestStr += lit("&useRemoteAdminSettings");
 
-    /* Change system name of the remote system */
-    if (!oneServer) {
-        authenticator.setPassword(currentPassword);
-        CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
-        client.addHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
-        CLHttpStatus status = client.doGET(requestStr + lit("&wholeSystem=true"));
-        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
-            return false;
-    }
+    if (!oneServer)
+        requestStr += lit("&wholeSystem=true");
+
+    CLHttpStatus status = client.doGET(requestStr);
+    if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+        return false;
 
     return true;
 }
@@ -306,7 +338,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
 bool QnMergeSystemsRestHandler::applyRemoteSettings(
         const QUrl &remoteUrl,
         const QString &systemName,
-        const QString &password,
+        const QString &remoteAdminPassword,
         QnUserResourcePtr &admin,
         const QnRestConnectionProcessor *owner)
 {
@@ -317,7 +349,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         /* Read admin user from the remote server */
         QAuthenticator authenticator;
         authenticator.setUser(admin->getName());
-        authenticator.setPassword(password);
+        authenticator.setPassword(remoteAdminPassword);
 
         ec2::ApiUserDataList users;
         {
