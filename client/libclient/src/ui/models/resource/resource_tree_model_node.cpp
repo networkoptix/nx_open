@@ -43,7 +43,7 @@ namespace
             << Qn::RecorderNode
             << Qn::SystemNode
             << Qn::RoleUsersNode
-            << Qn::AccessibleLayoutsNode
+            << Qn::LayoutsNode
             ;
         return result.contains(nodeType);
     }
