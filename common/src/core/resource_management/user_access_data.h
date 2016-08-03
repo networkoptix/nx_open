@@ -7,14 +7,14 @@
 
 namespace Qn {
 
+/** Helper class to grant additional permissions (on the server side only). */
 struct UserAccessData
 {
     enum class Access
     {
-        Default,
-        System,
-        VideoWall,
-        ClientConnection
+        Default,            /**< Default access rights. All permissions are checked as usual. */
+        ReadAllResources,   /**< Read permission on all resources is granted additionally. */
+        System              /**< Full permissions on all transactions. */
     };
 
     QnUuid userId;
@@ -38,11 +38,7 @@ inline bool operator != (const UserAccessData &lhs, const UserAccessData &rhs)
     return ! operator == (lhs, rhs);
 }
 
-/**
-* Default kSystemAccess for server side is superuser.
-* For client side kSystemAccess is not taken into account.
-*/
 const UserAccessData kSystemAccess(QnUuid(lit("{BC292159-2BE9-4E84-A242-BC6122B315E4}")), UserAccessData::Access::System);
-const UserAccessData kVideowallUserAccess(QnUuid(lit("{1044D2A5-639D-4C49-963E-C03898D0C113}")), UserAccessData::Access::VideoWall);
+const UserAccessData kVideowallUserAccess(QnUuid(lit("{1044D2A5-639D-4C49-963E-C03898D0C113}")), UserAccessData::Access::ReadAllResources);
 
 }
