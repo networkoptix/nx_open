@@ -144,7 +144,6 @@ void QnMediaResourceHelperPrivate::at_propertyChanged(const QnResourcePtr& resou
 {
     Q_Q(QnMediaResourceHelper);
 
-    NX_ASSERT(camera == resource);
     if (camera != resource)
         return;
 
