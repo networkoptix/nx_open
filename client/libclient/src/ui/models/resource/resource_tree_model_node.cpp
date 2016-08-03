@@ -41,7 +41,10 @@ namespace
             << Qn::ServersNode
             << Qn::UserDevicesNode
             << Qn::RecorderNode
-            << Qn::SystemNode;
+            << Qn::SystemNode
+            << Qn::RoleUsersNode
+            << Qn::AccessibleLayoutsNode
+            ;
         return result.contains(nodeType);
     }
 
@@ -126,20 +129,20 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_icon = qnResIconCache->icon(QnResourceIconCache::OtherSystem);
         break;
     case Qn::AllCamerasAccessNode:
-        m_displayName = tr("All Cameras && Resources");
+        m_displayName = m_name = tr("All Cameras && Resources");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
         break;
     case Qn::AllLayoutsAccessNode:
-        m_displayName = tr("All Shared Layouts");
+        m_displayName = m_name = tr("All Shared Layouts");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Layouts);
         break;
     case Qn::AccessibleResourcesNode:
-        m_displayName = tr("Cameras && Resources");
+        m_displayName = m_name = tr("Cameras && Resources");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
         break;
-    case Qn::AccessibleLayoutsNode:
-        m_displayName = tr("Layouts");
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Layouts);
+    case Qn::RoleUsersNode:
+        m_displayName = m_name = tr("Users");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
         break;
     default:
         break;
@@ -196,9 +199,25 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType, uuid)
 {
-    NX_ASSERT(nodeType == Qn::LayoutItemNode || nodeType == Qn::VideoWallItemNode || nodeType == Qn::VideoWallMatrixNode);
+    NX_ASSERT(nodeType == Qn::LayoutItemNode
+        || nodeType == Qn::VideoWallItemNode
+        || nodeType == Qn::VideoWallMatrixNode
+        || nodeType == Qn::RoleNode);
+
     m_state = Invalid;
     m_status = Qn::Offline;
+
+    switch (nodeType)
+    {
+        case Qn::VideoWallMatrixNode:
+            m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
+            break;
+        case Qn::RoleNode:
+            m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
+            break;
+        default:
+            break;
+    }
 }
 
 QnResourceTreeModelNode::~QnResourceTreeModelNode()
@@ -224,91 +243,108 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 void QnResourceTreeModelNode::update()
 {
     /* Update stored fields. */
-    if (m_type == Qn::ResourceNode
-        || m_type == Qn::LayoutItemNode
-        || m_type == Qn::EdgeNode
-        || m_type == Qn::SharedLayoutNode
-        || m_type == Qn::AccessibleResourceNode
-        )
+    switch (m_type)
     {
-        if (!m_resource)
+        case Qn::ResourceNode:
+        case Qn::LayoutItemNode:
+        case Qn::EdgeNode:
+        case Qn::SharedLayoutNode:
+        case Qn::AccessibleResourceNode:
         {
-            m_displayName = m_name = QString();
-            m_flags = 0;
-            m_status = Qn::Online;
-            m_searchString = QString();
-            m_icon = QIcon();
-        }
-        else
-        {
-            m_name = m_resource->getName();
-            m_flags = m_resource->flags();
-            m_status = m_resource->getStatus();
-            m_searchString = m_resource->toSearchString();
-            m_icon = qnResIconCache->icon(m_resource);
-            m_displayName = QnResourceDisplayInfo(m_resource).toString(Qn::RI_NameOnly);
-        }
-    }
-    else if (m_type == Qn::VideoWallItemNode)
-    {
-        m_searchString = QString();
-        m_flags = 0;
-        m_status = Qn::Offline;
-        m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Offline);
-
-        QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
-        if (!index.isNull())
-        {
-            QnVideoWallItem item = index.item();
-
-            if (item.runtimeStatus.online)
+            if (!m_resource)
             {
-                if (item.runtimeStatus.controlledBy.isNull())
-                {
-                    m_status = Qn::Online;
-                    m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
-                }
-                else if (item.runtimeStatus.controlledBy == qnCommon->moduleGUID())
-                {
-                    m_status = Qn::Online;
-                    m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Control);
-                }
-                else
-                {
-                    m_status = Qn::Unauthorized;
-                    m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Locked);
-                }
+                m_displayName = m_name = QString();
+                m_flags = 0;
+                m_status = Qn::Online;
+                m_searchString = QString();
+                m_icon = QIcon();
             }
-
-            m_displayName = m_name = item.name;
-        }
-        else
-        {
-            m_displayName = m_name = QString();
-        }
-    }
-    else if (m_type == Qn::VideoWallMatrixNode)
-    {
-        m_status = Qn::Online;
-        m_searchString = QString();
-        m_flags = 0;
-        m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
-        for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>())
-        {
-            if (!videowall->matrices()->hasItem(m_uuid))
-                continue;
-            m_displayName = m_name = videowall->matrices()->getItem(m_uuid).name;
+            else
+            {
+                m_name = m_resource->getName();
+                m_flags = m_resource->flags();
+                m_status = m_resource->getStatus();
+                m_searchString = m_resource->toSearchString();
+                m_icon = qnResIconCache->icon(m_resource);
+                m_displayName = QnResourceDisplayInfo(m_resource).toString(Qn::RI_NameOnly);
+            }
             break;
         }
-    }
-    else if (m_type == Qn::CurrentSystemNode)
-    {
-        m_displayName = qnCommon->localSystemName();
-    }
-    else if (m_type == Qn::RecorderNode)
-    {
+        case Qn::VideoWallItemNode:
+        {
+            m_status = Qn::Offline;
+            m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Offline);
 
-        //TODO: #GDM
+            QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
+            if (!index.isNull())
+            {
+                QnVideoWallItem item = index.item();
+
+                if (item.runtimeStatus.online)
+                {
+                    if (item.runtimeStatus.controlledBy.isNull())
+                    {
+                        m_status = Qn::Online;
+                        m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
+                    }
+                    else if (item.runtimeStatus.controlledBy == qnCommon->moduleGUID())
+                    {
+                        m_status = Qn::Online;
+                        m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Control);
+                    }
+                    else
+                    {
+                        m_status = Qn::Unauthorized;
+                        m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Locked);
+                    }
+                }
+
+                m_displayName = m_name = item.name;
+            }
+            else
+            {
+                m_displayName = m_name = QString();
+            }
+            break;
+        }
+        case Qn::VideoWallMatrixNode:
+        {
+            for (const auto& videowall : qnResPool->getResources<QnVideoWallResource>())
+            {
+                if (!videowall->matrices()->hasItem(m_uuid))
+                    continue;
+                m_displayName = m_name = videowall->matrices()->getItem(m_uuid).name;
+                break;
+            }
+            break;
+        }
+        case Qn::CurrentSystemNode:
+        {
+            m_displayName = m_name = qnCommon->localSystemName();
+            break;
+        }
+        case Qn::RoleNode:
+        {
+            auto role = qnResourceAccessManager->userGroup(m_uuid);
+            m_displayName = m_name = role.name;
+            break;
+        }
+        case Qn::AccessibleLayoutsNode:
+        {
+            if (m_parent && m_parent->type() == Qn::RoleNode)
+            {
+                m_displayName = m_name = tr("Shared Layouts");
+                m_icon = qnResIconCache->icon(QnResourceIconCache::SharedLayout);
+            }
+            else
+            {
+                m_displayName = m_name = tr("Layouts");
+                m_icon = qnResIconCache->icon(QnResourceIconCache::Layouts);
+            }
+            break;
+        }
+        default:
+            break;
     }
 
     /* Update bastard state. */
@@ -322,7 +358,7 @@ void QnResourceTreeModelNode::updateRecursive()
 {
     update();
 
-    for(auto child: m_children)
+    for (auto child: m_children)
         child->updateRecursive();
 }
 
@@ -378,6 +414,22 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
     switch (m_type)
     {
+        /* Always hidden. */
+        case Qn::BastardNode:
+            return true;
+
+        /* These will be hidden or displayed together with their parent. */
+        case Qn::VideoWallItemNode:
+        case Qn::VideoWallMatrixNode:
+        case Qn::AllCamerasAccessNode:
+        case Qn::AllLayoutsAccessNode:
+        case Qn::AccessibleResourcesNode:
+        case Qn::AccessibleLayoutsNode:
+        case Qn::RoleUsersNode:
+        case Qn::AccessibleResourceNode:
+        case Qn::RoleNode:
+            return false;
+
     /* Hide non-readable resources. */
     case Qn::LayoutItemNode:
         /* Hide resource nodes without resource. */
@@ -389,19 +441,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
             return !isAdmin;
 
         return !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
-
-    /* These will be hidden or displayed together with their parent. */
-    case Qn::VideoWallItemNode:
-    case Qn::VideoWallMatrixNode:
-    case Qn::AllCamerasAccessNode:
-    case Qn::AllLayoutsAccessNode:
-    case Qn::AccessibleResourcesNode:
-    case Qn::AccessibleLayoutsNode:
-        return false;
-
-    /* Always hidden. */
-    case Qn::BastardNode:
-        return true;
 
     case Qn::OtherSystemsNode:
         return !isAdmin || !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled();
@@ -435,9 +474,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
         /* Only admins can see shared layout links. */
         return !isAdmin;
 
-    case Qn::AccessibleResourceNode:
-        return false;
-
     case Qn::ResourceNode:
         /* Hide resource nodes without resource. */
         if (!m_resource)
@@ -463,37 +499,34 @@ bool QnResourceTreeModelNode::calculateBastard() const
             return false;
         }
 
+        /* Hide disabled users. */
         if (QnUserResourcePtr user = m_resource.dynamicCast<QnUserResource>())
-        {
-            /* Hide disabled users. */
             return !user->isEnabled();
-        }
 
-        {
 #ifndef DESKTOP_CAMERA_DEBUG
-            /* Hide desktop camera resources from the tree. */
-            if (m_flags.testFlag(Qn::desktop_camera))
-                return true;
+        /* Hide desktop camera resources from the tree. */
+        if (m_flags.testFlag(Qn::desktop_camera))
+            return true;
 #endif
-            /* Hide local server resource. */
-            if (m_flags.testFlag(Qn::local_server))
-                return true;
+        /* Hide local server resource. */
+        if (m_flags.testFlag(Qn::local_server))
+            return true;
 
-            //TODO: #Elric hack hack hack VMS-1725
-            if (m_flags.testFlag(Qn::local_media) && m_resource->getUrl().startsWith(lit("layout://")))
-                return true;
+        //TODO: #Elric hack hack hack VMS-1725
+        if (m_flags.testFlag(Qn::local_media) && m_resource->getUrl().startsWith(lit("layout://")))
+            return true;
 
-            /* Hide storages. */
-            if (m_resource.dynamicCast<QnStorageResource>())
-                return true;
+        /* Hide storages. */
+        if (m_resource.dynamicCast<QnStorageResource>())
+            return true;
 
-            /* Hide edge servers, camera will be displayed instead. */
-            if (QnMediaServerResource::isHiddenServer(m_resource) &&
-                !qnResPool->getResourcesByParentId(m_resource->getId()).filtered<QnVirtualCameraResource>().isEmpty())
-            {
-                return true;
-            }
+        /* Hide edge servers, camera will be displayed instead. */
+        if (QnMediaServerResource::isHiddenServer(m_resource) &&
+            !qnResPool->getResourcesByParentId(m_resource->getId()).filtered<QnVirtualCameraResource>().isEmpty())
+        {
+            return true;
         }
+
         return false;
 
     default:
@@ -690,7 +723,9 @@ QVariant QnResourceTreeModelNode::data(int role, int column) const
             return QVariant::fromValue<QnUuid>(m_uuid);
         break;
     case Qn::ResourceSearchStringRole:
-        return m_searchString;
+        return !m_searchString.isEmpty()
+            ? m_searchString
+            : m_displayName;
     case Qn::ResourceStatusRole:
         return QVariant::fromValue<int>(m_status);
     case Qn::NodeTypeRole:

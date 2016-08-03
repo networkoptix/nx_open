@@ -139,6 +139,9 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
             }
         });
 
+    connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated, this, &QnResourceTreeModel::updateRoleNodes);
+    connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupRemoved, this, &QnResourceTreeModel::updateRoleNodes);
+
     rebuildTree();
 
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
@@ -307,8 +310,10 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureRoleNode(const QnUuid& rol
         NX_ASSERT(!qnResourceAccessManager->userGroup(roleId).id.isNull());
 
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, roleId, Qn::RoleNode));
+        node->setParent(m_rootNodes[Qn::NodeType::UsersNode]);
+        m_allNodes.append(node);
+
         pos = m_roleNodeById.insert(roleId, node);
-        m_allNodes.append(*pos);
     }
     return *pos;
 }
@@ -347,6 +352,7 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
     case Qn::AllLayoutsAccessNode:
     case Qn::AccessibleResourcesNode:
     case Qn::AccessibleLayoutsNode:
+    case Qn::RoleUsersNode:
         for (NodeList& nodes : m_placeholderNodesByOwner)
             nodes.removeOne(node);
         break;
@@ -366,6 +372,9 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
             RecorderHash& hash = m_recorderHashByParent[node->parent()];
             hash.remove(hash.key(node));
         }
+        break;
+    case Qn::RoleNode:
+        m_roleNodeById.remove(node->uuid());
         break;
     default:
         break;
@@ -490,7 +499,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
             return rootNode;
 
         if (isAdmin)
+        {
+            auto user = node->resource().dynamicCast<QnUserResource>();
+            NX_ASSERT(user);
+            if (user && qnResourceAccessManager->userRole(user) == Qn::UserRole::CustomUserGroup)
+                return ensurePlaceholderNode(user->userGroup(), Qn::RoleUsersNode);
+
             return m_rootNodes[Qn::UsersNode];
+        }
 
         /* We can get here in the process of reconnecting. */
         return bastardNode;
@@ -634,17 +650,46 @@ void QnResourceTreeModel::updatePlaceholderNodesForUserOrRole(const QnUuid& id)
             switch (nodeType)
             {
                 /* 'All Cameras and Resources' visible to users with all media access. */
-                case Qn::NodeType::AllCamerasAccessNode:
+                case Qn::AllCamerasAccessNode:
                     return qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission);
 
                 /* 'All Shared Layouts' visible to admin only. */
-                case Qn::NodeType::AllLayoutsAccessNode:
+                case Qn::AllLayoutsAccessNode:
                     return qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
 
                 /* If cameras set is limited, show 'Cameras' node and 'Layouts' node. */
-                case Qn::NodeType::AccessibleResourcesNode:
-                case Qn::NodeType::AccessibleLayoutsNode:
+                case Qn::AccessibleResourcesNode:
+                case Qn::AccessibleLayoutsNode:
                     return !qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission);
+
+                case Qn::RoleUsersNode:
+                    return false;
+                default:
+                    break;
+            }
+            NX_ASSERT(false, "Should never get here");
+            return false;
+        };
+
+    auto visibleToRole = [this](const ec2::ApiUserGroupData& role, Qn::NodeType nodeType)
+        {
+            switch (nodeType)
+            {
+                /* 'All Cameras and Resources' visible to users with all media access. */
+                case Qn::AllCamerasAccessNode:
+                    return role.permissions.testFlag(Qn::GlobalAccessAllMediaPermission);
+
+                    /* 'All Shared Layouts' visible to admin only. */
+                case Qn::AllLayoutsAccessNode:
+                    return false;
+
+                    /* If cameras set is limited, show 'Cameras' node and 'Layouts' node. */
+                case Qn::AccessibleResourcesNode:
+                case Qn::AccessibleLayoutsNode:
+                    return !role.permissions.testFlag(Qn::GlobalAccessAllMediaPermission);
+
+                case Qn::RoleUsersNode:
+                    return true;
                 default:
                     break;
             }
@@ -655,44 +700,64 @@ void QnResourceTreeModel::updatePlaceholderNodesForUserOrRole(const QnUuid& id)
 
     QList<Qn::NodeType> placeholders
     {
-        Qn::NodeType::AllCamerasAccessNode,
-        Qn::NodeType::AllLayoutsAccessNode,
-        Qn::NodeType::AccessibleResourcesNode,
-        Qn::NodeType::AccessibleLayoutsNode
+        Qn::AllCamerasAccessNode,
+        Qn::AllLayoutsAccessNode,
+        Qn::AccessibleResourcesNode,
+        Qn::AccessibleLayoutsNode,
+        Qn::RoleUsersNode
     };
 
     QnResourceTreeModelNodePtr parentNode;
+    std::function<bool(Qn::NodeType)> check;
+
     if (auto user = qnResPool->getResourceById(id).dynamicCast<QnUserResource>())
     {
         parentNode = ensureResourceNode(user);
-        for (auto node: parentNode->children())
-        {
-            Qn::NodeType nodeType = node->type();
-            if (!placeholders.contains(nodeType))
-                continue;
-
-            if (visibleToUser(user, nodeType))
-                node->update();
-            else
-                removeNode(node);
-            placeholders.removeOne(nodeType);
-        }
-
-        /* Add missing nodes if required. */
-        for (auto nodeType : placeholders)
-        {
-            if (visibleToUser(user, nodeType))
+        check = [user, visibleToUser](Qn::NodeType nodeType)
             {
-                auto node = ensurePlaceholderNode(id, nodeType);
-                node->setParent(parentNode);
-            }
-        }
+                return visibleToUser(user, nodeType);
+            };
     }
     else
     {
-        //TODO: #GDM the same for role nodes
+        auto role = qnResourceAccessManager->userGroup(id);
+        NX_ASSERT(!role.isNull());
+        if (role.isNull())
+            return;
+
+        parentNode = ensureRoleNode(id);
+        check = [role, visibleToRole](Qn::NodeType nodeType)
+            {
+                return visibleToRole(role, nodeType);
+            };
     }
 
+    if (!parentNode)
+        return;
+
+    for (auto node : parentNode->children())
+    {
+        Qn::NodeType nodeType = node->type();
+        if (!placeholders.contains(nodeType))
+            continue;
+
+        if (check(nodeType))
+            node->update();
+        else
+            removeNode(node);
+        placeholders.removeOne(nodeType);
+    }
+
+    /* Add missing nodes if required. */
+    for (auto nodeType : placeholders)
+    {
+        if (check(nodeType))
+        {
+            auto node = ensurePlaceholderNode(id, nodeType);
+            node->setParent(parentNode);
+            node->update();
+        }
+    }
 }
 
 void QnResourceTreeModel::updateSharedLayoutNodes(const QnLayoutResourcePtr& layout)
@@ -885,6 +950,38 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
     for (auto node : nodesToDelete)
         removeNode(node);
 
+    cleanupGroupNodes(Qn::RecorderNode);
+}
+
+void QnResourceTreeModel::updateRoleNodes()
+{
+    TRACE("Updating role nodes");
+
+    /* Non-admin users do not see roles. */
+    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    {
+        for (const QnUuid& key : m_roleNodeById.keys())
+            removeNode(m_roleNodeById.take(key));
+        cleanupGroupNodes(Qn::RecorderNode);
+        return;
+    }
+
+    auto roles = qnResourceAccessManager->userGroups();
+
+    QSet<QnUuid> roleIds;
+    for (const auto& role: roles)
+        roleIds << role.id;
+
+    auto existingNodes = m_roleNodeById.keys().toSet();
+    auto removedRoles = existingNodes - roleIds;
+    for (const QnUuid& key: removedRoles)
+        removeNode(m_roleNodeById.take(key));
+
+    for (const QnUuid& key: roleIds)
+    {
+        ensureRoleNode(key)->update();
+        updatePlaceholderNodesForUserOrRole(key);
+    }
     cleanupGroupNodes(Qn::RecorderNode);
 }
 
@@ -1260,6 +1357,12 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (user)
     {
         connect(user, &QnUserResource::enabledChanged, this, &QnResourceTreeModel::at_user_enabledChanged);
+        connect(user, &QnUserResource::userGroupChanged, this,
+            [this](const QnResourcePtr& resource)
+            {
+                updateRoleNodes();
+                updateNodeParent(ensureResourceNode(resource));
+            });
     }
 
     auto node = ensureResourceNode(resource);
@@ -1295,6 +1398,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         updatePlaceholderNodesForUserOrRole(user->getId());
         updateSharedLayoutNodesForUser(user);
         updateAccessibleResourcesForUser(user);
+        updateRoleNodes();
     }
 }
 
@@ -1339,6 +1443,8 @@ void QnResourceTreeModel::rebuildTree()
 
     for (auto node : m_resourceNodeByResource)
         updateNodeParent(node);
+
+    updateRoleNodes();
 }
 
 void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource, const QMimeData *mimeData)

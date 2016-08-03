@@ -31,6 +31,7 @@ namespace Qn
         AllLayoutsAccessNode,   /**< Node that represents 'All Shared Cameras' placeholder, displayed under admins. */
         AccessibleResourcesNode,/**< Node that represents 'Cameras & Resources' node, displayed under users and roles with custom access. */
         AccessibleLayoutsNode,  /**< Node that represents 'Layouts' node, displayed under users and roles with custom access. */
+        RoleUsersNode,          /**< Node that represents 'Users' node, displayed under roles. */
 
         // Repeating nodes
         RoleNode,               /**< Node that represents custom role. */
