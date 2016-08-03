@@ -216,9 +216,9 @@ Page
 
             Component.onCompleted:
             {
-                for (var y = 0; y < gridWidth; ++y)
+                for (var y = 0; y < gridHeight; ++y)
                 {
-                    for (var x = 0; x < gridHeight; ++x)
+                    for (var x = 0; x < gridWidth; ++x)
                     {
                         var item = layout.itemAt(x, y)
                         item.resourceId = liteClientController.layoutHelper.cameraIdOnCell(x, y)
