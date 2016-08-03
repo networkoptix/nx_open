@@ -120,8 +120,20 @@ Page
 
             onCurrentResourceIdChanged:
             {
-                if (d.screenItem)
-                    d.screenItem.activeItem.resourceId = currentResourceId
+                if (!d.screenItem)
+                    return
+
+                if (fourCamerasMode)
+                {
+                    liteClientController.layoutHelper.setCameraIdOnCell(
+                        d.screenItem.activeItem.layoutX,
+                        d.screenItem.activeItem.layoutY,
+                        currentResourceId)
+                }
+                else
+                {
+                    liteClientController.layoutHelper.singleCameraId = currentResourceId
+                }
             }
 
             Connections
@@ -135,15 +147,25 @@ Page
                 onScreenItemChanged: selector.updateResourceId()
             }
 
+            Binding
+            {
+                target: selector
+                property: "fourCamerasMode"
+                value: liteClientController.layoutHelper.displayMode
+            }
+
             onFourCamerasModeChanged:
             {
-                liteClientControlScreen.state =
-                    (fourCamerasMode ? "MultipleCameras" : "SingleCamera")
+                liteClientController.layoutHelper.displayMode = (fourCamerasMode
+                    ? QnLiteClientLayoutHelper.MultipleCameras
+                    : QnLiteClientLayoutHelper.SingleCamera)
             }
+
+            Component.onCompleted: updateResourceId()
 
             function updateResourceId()
             {
-                if (!d.screenItem.activeItem)
+                if (!d.screenItem || !d.screenItem.activeItem)
                     return
 
                 selector.currentResourceId = d.screenItem.activeItem.resourceId
@@ -158,6 +180,51 @@ Page
         LaunchButton
         {
 
+        }
+    }
+
+    Component
+    {
+        id: singleCameraLayoutComponent
+
+        SingleCameraLayout
+        {
+            activeItem.resourceId: liteClientController.layoutHelper.singleCameraId
+        }
+    }
+
+    Component
+    {
+        id: multipleCamerasLayoutComponent
+
+        MultipleCamerasLayout
+        {
+            id: layout
+
+            Connections
+            {
+                target: liteClientController.layoutHelper
+                onCameraIdChanged:
+                {
+                    var item = layout.itemAt(x, y)
+                    if (!item)
+                        return
+
+                    item.resourceId = resourceId
+                }
+            }
+
+            Component.onCompleted:
+            {
+                for (var y = 0; y < gridWidth; ++y)
+                {
+                    for (var x = 0; x < gridHeight; ++x)
+                    {
+                        var item = layout.itemAt(x, y)
+                        item.resourceId = liteClientController.layoutHelper.cameraIdOnCell(x, y)
+                    }
+                }
+            }
         }
     }
 
@@ -204,12 +271,12 @@ Page
         {
             name: "SingleCamera"
             when: liteClientController.clientOnline
-                && liteClientController.displayMode == QnLiteClientController.SingleCamera
+                && liteClientController.layoutHelper.displayMode == QnLiteClientLayoutHelper.SingleCamera
 
             PropertyChanges
             {
                 target: screenLoader
-                source: "private/LiteClientControlScreen/SingleCameraLayout.qml"
+                sourceComponent: singleCameraLayoutComponent
             }
             PropertyChanges
             {
@@ -226,12 +293,12 @@ Page
         {
             name: "MultipleCameras"
             when: liteClientController.clientOnline
-                && liteClientController.displayMode == QnLiteClientController.MultipleCameras
+                && liteClientController.layoutHelper.displayMode == QnLiteClientLayoutHelper.MultipleCameras
 
             PropertyChanges
             {
                 target: screenLoader
-                source: "private/LiteClientControlScreen/MultipleCamerasLayout.qml"
+                sourceComponent: multipleCamerasLayoutComponent
             }
             PropertyChanges
             {

@@ -15,6 +15,10 @@ class QnLiteClientLayoutHelperPrivate: public QObject
 public:
     QnLiteClientLayoutHelperPrivate(QnLiteClientLayoutHelper* parent);
 
+    void at_layoutPropertyChanged(const QnResourcePtr& resource, const QString& key);
+    void at_layoutItemChanged(const QnResourcePtr& resource, const QnLayoutItemData& item);
+    void at_layoutItemRemoved(const QnResourcePtr& resource, const QnLayoutItemData& item);
+
 public:
     QnLayoutResourcePtr layout;
 };
@@ -53,8 +57,23 @@ void QnLiteClientLayoutHelper::setLayout(const QnLayoutResourcePtr& layout)
     if (d->layout == layout)
         return;
 
+    if (d->layout)
+        disconnect(d->layout, nullptr, this, nullptr);
+
     d->layout = layout;
     emit layoutChanged();
+
+    if (d->layout)
+    {
+        connect(d->layout, &QnLayoutResource::propertyChanged,
+            d, &QnLiteClientLayoutHelperPrivate::at_layoutPropertyChanged);
+        connect(d->layout, &QnLayoutResource::itemAdded,
+            d, &QnLiteClientLayoutHelperPrivate::at_layoutItemChanged);
+        connect(d->layout, &QnLayoutResource::itemChanged,
+            d, &QnLiteClientLayoutHelperPrivate::at_layoutItemChanged);
+        connect(d->layout, &QnLayoutResource::itemRemoved,
+            d, &QnLiteClientLayoutHelperPrivate::at_layoutItemRemoved);
+    }
 }
 
 QnLayoutProperties::DisplayMode QnLiteClientLayoutHelper::displayMode() const
@@ -123,7 +142,7 @@ QString QnLiteClientLayoutHelper::cameraIdOnCell(int x, int y) const
     return it->resource.id.toString();
 }
 
-void QnLiteClientLayoutHelper::setCameraIdOnCell(const QString& cameraId, int x, int y)
+void QnLiteClientLayoutHelper::setCameraIdOnCell(int x, int y, const QString& cameraId)
 {
     Q_D(QnLiteClientLayoutHelper);
 
@@ -160,9 +179,10 @@ void QnLiteClientLayoutHelper::setCameraIdOnCell(const QString& cameraId, int x,
         }
         else
         {
-            it->resource.id = id;
-            it->resource.uniqueId = camera->getUniqueId();
-            d->layout->updateItem(it->uuid, *it);
+            QnLayoutItemData item = *it;
+            item.resource.id = id;
+            item.resource.uniqueId = camera->getUniqueId();
+            d->layout->updateItem(it->uuid, item);
         }
     }
 
@@ -210,4 +230,48 @@ QnLiteClientLayoutHelperPrivate::QnLiteClientLayoutHelperPrivate(QnLiteClientLay
     QObject(parent),
     q_ptr(parent)
 {
+}
+
+void QnLiteClientLayoutHelperPrivate::at_layoutPropertyChanged(
+    const QnResourcePtr& resource, const QString& key)
+{
+    NX_ASSERT(resource == layout);
+    if (resource != layout)
+        return;
+
+    Q_Q(QnLiteClientLayoutHelper);
+
+    if (key == QnLayoutProperties::kDisplayMode)
+        emit q->displayModeChanged();
+    else if (key == QnLayoutProperties::kSingleCamera)
+        emit q->singleCameraIdChanged();
+}
+
+void QnLiteClientLayoutHelperPrivate::at_layoutItemChanged(
+    const QnResourcePtr& resource, const QnLayoutItemData& item)
+{
+    NX_ASSERT(resource == layout);
+    if (resource != layout)
+        return;
+
+    Q_Q(QnLiteClientLayoutHelper);
+
+    const auto x = static_cast<int>(item.combinedGeometry.x());
+    const auto y = static_cast<int>(item.combinedGeometry.y());
+    const auto id = item.resource.id.toString();
+    emit q->cameraIdChanged(x, y, id);
+}
+
+void QnLiteClientLayoutHelperPrivate::at_layoutItemRemoved(
+    const QnResourcePtr& resource, const QnLayoutItemData& item)
+{
+    NX_ASSERT(resource == layout);
+    if (resource != layout)
+        return;
+
+    Q_Q(QnLiteClientLayoutHelper);
+
+    const auto x = static_cast<int>(item.combinedGeometry.x());
+    const auto y = static_cast<int>(item.combinedGeometry.y());
+    emit q->cameraIdChanged(x, y, QString());
 }

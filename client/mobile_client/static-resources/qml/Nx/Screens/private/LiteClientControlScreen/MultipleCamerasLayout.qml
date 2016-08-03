@@ -8,6 +8,9 @@ Item
 
     property CameraItem activeItem: null
 
+    readonly property alias gridWidth: grid.columns
+    readonly property alias gridHeight: grid.rows
+
     Grid
     {
         id: grid
@@ -19,6 +22,8 @@ Item
 
         Repeater
         {
+            id: repeater
+
             CameraItem
             {
                 id: item
@@ -59,5 +64,11 @@ Item
         border.color: ColorTheme.brand_main
         border.width: 2
         color: "transparent"
+    }
+
+    function itemAt(x, y)
+    {
+        var index = y * grid.columns + x
+        return repeater.itemAt(index)
     }
 }
