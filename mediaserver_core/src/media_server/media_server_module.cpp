@@ -40,7 +40,6 @@ QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     m_common->store<QnNewSystemServerFlagWatcher>(new QnNewSystemServerFlagWatcher());
-    m_common->store<MasterServerStatusWatcher>(new MasterServerStatusWatcher());
 }
 
 QnMediaServerModule::~QnMediaServerModule() {

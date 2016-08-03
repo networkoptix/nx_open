@@ -11,16 +11,17 @@
  * Monitor runtime flags RF_CloudSync. Only one server at once should has it
  */
 
-class MasterServerStatusWatcher: public QObject
+class QnMasterServerStatusWatcher: public QObject
 {
     Q_OBJECT
 public:
-    MasterServerStatusWatcher();
-    virtual ~MasterServerStatusWatcher() {}
+    QnMasterServerStatusWatcher();
+    virtual ~QnMasterServerStatusWatcher() {}
 private slots:
-    void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
+    void at_updateMasterFlag();
 private:
     void setMasterFlag(bool value);
+    bool localPeerCanBeMaster() const;
 private:
     QTimer m_timer;
 };

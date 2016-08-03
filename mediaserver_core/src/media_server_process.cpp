@@ -232,6 +232,7 @@
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
+#include <media_server/master_server_status_watcher.h>
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -1755,10 +1756,8 @@ void MediaServerProcess::run()
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnCameraHistoryPool> historyPool(new QnCameraHistoryPool());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
-
+    QScopedPointer<QnMasterServerStatusWatcher> masterServerWatcher(new QnMasterServerStatusWatcher());
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
-
-
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
     CloudConnectionManager cloudConnectionManager;
