@@ -428,11 +428,8 @@ QnUserResourcePtr CloudUserAuthenticator::createCloudUser(
     userData.fullName = userName;
     userData.digest = "invalid_digest";
     userData.hash = "invalid_hash";
-    // todo: temporary disabled unless branch x_vms_2423_admin_refactor is merged
-#if 0
     if (userName == qnGlobalSettings->cloudAccountName())
         userData.isAdmin = true;
-#endif
     bool result = QnAppServerConnectionFactory::getConnection2()
         ->getUserManager(Qn::kDefaultUserAccess)->save(
             userData, QnUuid::createUuid().toString(),  //using random password because cloud account password is used to authenticate request
