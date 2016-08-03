@@ -575,6 +575,11 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
             auto parentNode = ensureResourceNode(owner);
             if (qnResourceAccessManager->hasGlobalPermission(owner, Qn::GlobalAccessAllMediaPermission))
                 return parentNode;
+
+            /* Personal layouts are displayed under users if user belongs to group. */
+            if (qnResourceAccessManager->userRole(owner) == Qn::UserRole::CustomUserGroup)
+                return parentNode;
+
             return ensurePlaceholderNode(owner->getId(), Qn::AccessibleLayoutsNode);
         }
 
@@ -647,6 +652,11 @@ void QnResourceTreeModel::updatePlaceholderNodesForUserOrRole(const QnUuid& id)
         {
             if (user == context()->user())
                 return false;
+
+            /* Do not show user placeholders under groups. */
+            if (qnResourceAccessManager->userRole(user) == Qn::UserRole::CustomUserGroup)
+                return false;
+
             switch (nodeType)
             {
                 /* 'All Cameras and Resources' visible to users with all media access. */
@@ -836,7 +846,9 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
 
     /* No shared layouts nodes must exist under current user node and under all admins. */
     if (user == context()->user()
-        || qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAdminPermission))
+        || qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAdminPermission)
+        || qnResourceAccessManager->userRole(user) == Qn::UserRole::CustomUserGroup
+        )
     {
         nodesToDelete << sharedLayoutNodes;
     }
@@ -898,7 +910,9 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
     /* No accessible resource nodes must exist under current user node and under users
         with generic resources access. */
     if (user == context()->user()
-        || qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+        || qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission)
+        || qnResourceAccessManager->userRole(user) == Qn::UserRole::CustomUserGroup
+        )
     {
         nodesToDelete << accesible;
     }
