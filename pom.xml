@@ -1171,7 +1171,7 @@
         <profile>
             <id>unit-tests</id>
             <activation>
-                <activebydefault>false</activebydefault>
+                <activeByDefault>false</activeByDefault>
                 <os>
                     <family>unix</family>
                     <name>linux</name>
@@ -1189,7 +1189,7 @@
         <profile>
             <id>unit-tests-build-only</id>
             <activation>
-                <activebydefault>false</activebydefault>
+                <activeByDefault>false</activeByDefault>
                 <os>
                     <family>unix</family>
                     <name>linux</name>
