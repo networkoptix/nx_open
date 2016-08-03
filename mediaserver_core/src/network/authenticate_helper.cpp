@@ -290,10 +290,24 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
 
             authResult = doDigestAuth(
                 request.requestLine.method, authorizationHeader, response, isProxy, authUserId);
+        }
+        else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
+        {
+            if (usedAuthMethod)
+                *usedAuthMethod = AuthMethod::httpBasic;
+            authResult = doBasicAuth(request.requestLine.method, authorizationHeader, response, authUserId);
+        }
+        else {
+            if (usedAuthMethod)
+                *usedAuthMethod = AuthMethod::httpBasic;
+            authResult = Qn::Auth_Forbidden;
+        }
+
+        if( authResult  == Qn::Auth_OK)
+        {
 
             // update user information if authorization by server authKey and user-name is specified
             if (authUserId &&
-                authResult == Qn::Auth_OK &&
                 qnResPool->getResourceById<QnMediaServerResource>(*authUserId))
             {
                 *authUserId = Qn::kDefaultUserAccess.userId;
@@ -305,19 +319,8 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                         *authUserId = userRes->getId();
                 }
             }
-        }
-        else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic) {
-            if (usedAuthMethod)
-                *usedAuthMethod = AuthMethod::httpBasic;
-            authResult = doBasicAuth(request.requestLine.method, authorizationHeader, response, authUserId);
-        }
-        else {
-            if (usedAuthMethod)
-                *usedAuthMethod = AuthMethod::httpBasic;
-            authResult = Qn::Auth_Forbidden;
-        }
-        if( authResult  == Qn::Auth_OK)
-        {
+
+
             //checking whether client re-calculated ha1 digest
             if( userDigestData.empty() )
                 return authResult;
@@ -547,6 +550,11 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
                 return errCode;
             tryOnceAgain = true;
         }
+    }
+    else if (auto server = res.dynamicCast<QnMediaServerResource>())
+    {
+        if (authUserId)
+            *authUserId = server->getId();
     }
 
     if (tryOnceAgain)

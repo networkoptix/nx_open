@@ -8,7 +8,7 @@ struct QnPermissionsHelper
     static bool isSafeMode();
 
     /** Check if user is system owner. */
-    static bool isOwner(const QnUuid& userId);
+    static bool hasOwnerPermissions(const QnUuid& userId);
 
     /** Fill result with correct values and return fixed error code. */
     static int safeModeError(QnRestResult& result);

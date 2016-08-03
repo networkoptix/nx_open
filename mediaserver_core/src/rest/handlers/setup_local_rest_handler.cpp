@@ -61,7 +61,7 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::isOwner(userId))
+    if (!QnPermissionsHelper::hasOwnerPermissions(userId))
         return QnPermissionsHelper::notOwnerError(result);
 
     if (!qnGlobalSettings->isNewSystem())
