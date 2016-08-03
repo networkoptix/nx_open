@@ -26,8 +26,14 @@ Page
 
             onCheckedChanged:
             {
-                if (!checked)
+                if (checked)
+                {
+                    liteClientController.startLiteClient()
+                }
+                else
+                {
                     liteClientController.stopLiteClient()
+                }
             }
         }
     ]
@@ -168,7 +174,7 @@ Page
 
         LaunchButton
         {
-
+            onButtonClicked: liteClientController.startLiteClient()
         }
     }
 
@@ -225,7 +231,7 @@ Page
         State
         {
             name: "SwitchedOff"
-            when: !liteClientController.clientOnline
+            when: liteClientController.clientState == QnLiteClientController.Stopped
 
             PropertyChanges
             {
@@ -262,7 +268,7 @@ Page
         State
         {
             name: "SingleCamera"
-            when: liteClientController.clientOnline
+            when: liteClientController.clientState == QnLiteClientController.Started
                 && liteClientController.layoutHelper.displayMode == QnLiteClientLayoutHelper.SingleCamera
 
             PropertyChanges
@@ -284,7 +290,7 @@ Page
         State
         {
             name: "MultipleCameras"
-            when: liteClientController.clientOnline
+            when: liteClientController.clientState == QnLiteClientController.Started
                 && liteClientController.layoutHelper.displayMode == QnLiteClientLayoutHelper.MultipleCameras
 
             PropertyChanges

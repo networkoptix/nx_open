@@ -23,13 +23,13 @@ public:
     QnLiteClientLayoutHelper* layoutHelper;
     QnMediaServerResourcePtr server;
     QnUuid serverId;
-    bool clientOnline = false;
+    QnLiteClientController::State clientState = QnLiteClientController::State::Stopped;
     rest::Handle clientStartHandle = -1;
 
 public:
     QnLiteClientControllerPrivate(QnLiteClientController* parent);
 
-    void setClientOnline(bool online);
+    void setClientState(QnLiteClientController::State state);
 
     QnLayoutResourcePtr createLayout() const;
     QnLayoutResourcePtr findLayout() const;
@@ -84,21 +84,21 @@ void QnLiteClientController::setServerId(const QString& serverId)
                 return info.data.peer.peerType == Qn::PT_LiteClient
                     && info.data.videoWallInstanceGuid == d->serverId;
             });
-        d->setClientOnline(it != items.end());
+        d->setClientState(it != items.end() ? State::Started : State::Stopped);
         d->initLayout();
     }
     else
     {
         disconnect(qnRuntimeInfoManager, nullptr, this, nullptr);
 
-        d->setClientOnline(false);
+        d->setClientState(State::Stopped);
     }
 }
 
-bool QnLiteClientController::clientOnline() const
+QnLiteClientController::State QnLiteClientController::clientState() const
 {
     Q_D(const QnLiteClientController);
-    return d->clientOnline;
+    return d->clientState;
 }
 
 QnLiteClientLayoutHelper*QnLiteClientController::layoutHelper() const
@@ -111,7 +111,7 @@ void QnLiteClientController::startLiteClient()
 {
     Q_D(QnLiteClientController);
 
-    if (d->clientOnline)
+    if (d->clientState == State::Started || d->clientState == State::Starting)
         return;
 
     if (!d->server)
@@ -140,7 +140,7 @@ void QnLiteClientController::startLiteClient()
 void QnLiteClientController::stopLiteClient()
 {
     Q_D(QnLiteClientController);
-    if (!d->clientOnline)
+    if (d->clientState != State::Started)
         return;
 
     if (!d->server)
@@ -162,20 +162,20 @@ QnLiteClientControllerPrivate::QnLiteClientControllerPrivate(QnLiteClientControl
 {
 }
 
-void QnLiteClientControllerPrivate::setClientOnline(bool online)
+void QnLiteClientControllerPrivate::setClientState(QnLiteClientController::State state)
 {
-    if (clientOnline == online)
+    if (clientState == state)
         return;
 
-    clientOnline = online;
+    clientState = state;
 
     Q_Q(QnLiteClientController);
-    emit q->clientOnlineChanged();
+    emit q->clientStateChanged();
 }
 
 bool QnLiteClientControllerPrivate::initLayout()
 {
-    if (!clientOnline)
+    if (clientState != QnLiteClientController::State::Started)
         return false;
 
     if (!layoutHelper->layout())
@@ -198,7 +198,7 @@ void QnLiteClientControllerPrivate::at_runtimeInfoAdded(const QnPeerRuntimeInfo&
     if (data.data.videoWallInstanceGuid != serverId)
         return;
 
-    setClientOnline(true);
+    setClientState(QnLiteClientController::State::Started);
     initLayout();
 }
 
@@ -213,5 +213,5 @@ void QnLiteClientControllerPrivate::at_runtimeInfoRemoved(const QnPeerRuntimeInf
     if (data.data.videoWallInstanceGuid != serverId)
         return;
 
-    setClientOnline(false);
+    setClientState(QnLiteClientController::State::Stopped);
 }

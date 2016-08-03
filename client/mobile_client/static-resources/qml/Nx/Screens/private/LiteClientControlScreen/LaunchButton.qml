@@ -3,9 +3,14 @@ import Nx.Controls 1.0
 
 Item
 {
+    id: launchButtonItem
+
+    signal buttonClicked()
+
     Button
     {
         anchors.centerIn: parent
-        text: qsTr("Launch")
+        text: qsTr("Turn On")
+        onClicked: launchButtonItem.buttonClicked()
     }
 }

@@ -14,19 +14,28 @@ class QnLiteClientController : public Connective<QObject>
     Q_OBJECT
 
     Q_PROPERTY(QString serverId READ serverId WRITE setServerId NOTIFY serverIdChanged)
-    Q_PROPERTY(bool clientOnline READ clientOnline NOTIFY clientOnlineChanged)
+    Q_PROPERTY(State clientState READ clientState NOTIFY clientStateChanged)
     Q_PROPERTY(QnLiteClientLayoutHelper* layoutHelper READ layoutHelper NOTIFY nothingChanged)
 
     using base_type = Connective<QObject>;
 
 public:
+    enum class State
+    {
+        Stopped,
+        Starting,
+        Started,
+        Stopping
+    };
+    Q_ENUM(State)
+
     QnLiteClientController(QObject* parent = nullptr);
     ~QnLiteClientController();
 
     QString serverId() const;
     void setServerId(const QString& serverId);
 
-    bool clientOnline() const;
+    State clientState() const;
 
     QnLiteClientLayoutHelper* layoutHelper() const;
 
@@ -35,7 +44,7 @@ public:
 
 signals:
     void serverIdChanged();
-    void clientOnlineChanged();
+    void clientStateChanged();
     void clientStartError();
 
     // Dummy signal to make QML happy
