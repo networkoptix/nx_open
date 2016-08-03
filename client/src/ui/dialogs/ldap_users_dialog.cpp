@@ -19,6 +19,7 @@
 #include <ui/widgets/views/checkboxed_header_view.h>
 
 #include <utils/common/ldap.h>
+#include <common/common_module.h>
 
 namespace {
     //TODO: #GDM move timeout constant to more common module
@@ -54,9 +55,18 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
         break;
     }
 
-    if (!serverConnection) {
-        stopTesting(tr("None of your servers are connected to the Internet.") + lit("\n") + tr("Could not load users."));
-        return;
+	if (!serverConnection)
+    {
+        QnMediaServerResourcePtr server = qnCommon->currentServer();
+
+        Q_ASSERT(server);
+        if (!server)
+        {
+            stopTesting(tr("Could not perform a test."));
+            return;
+        }
+
+        serverConnection = server->apiConnection();
     }
 
     m_importButton = new QPushButton(this);

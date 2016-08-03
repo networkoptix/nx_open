@@ -7,6 +7,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
+#include <common/common_module.h>
+
 #include <utils/email/email.h>
 
 namespace {
@@ -78,9 +80,18 @@ bool QnSmtpTestConnectionWidget::testSettings( const QnEmailSettings &value ) {
         break;
     }
 
-    if (!serverConnection) {
-        QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test. None of your servers are connected to the Internet."));
-        return false;
+	if (!serverConnection)
+    {
+        QnMediaServerResourcePtr server = qnCommon->currentServer();
+
+        Q_ASSERT(server);
+        if (!server)
+        {
+			QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test."));
+            return false;
+        }
+
+        serverConnection = server->apiConnection();
     }
 
     ui->testServerLabel->setText(result.server);
