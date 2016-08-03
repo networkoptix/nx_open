@@ -15,6 +15,8 @@
 
 #include <utils/common/connective.h>
 
+//TODO: #vkutin #GDM Need to move it to some forward declarations header
+using QnIndirectAccessProviders = QMap<QnUuid /*accessible resource*/, QSet<QnResourcePtr> /*access providers*/>;
 
 class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnResourceAccessManager>
 {
@@ -132,6 +134,10 @@ public:
     /** Check if resource (camera, webpage or layout) is available to given user. */
     Access isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
 
+    /** Finds which layouts are indirectly available (e.g. through videowall) to given user or group. */
+    //TODO: #vkutin #GDM Refactoring is probably needed to merge this functionality with isAccessibleResource functions.
+    QnIndirectAccessProviders indirectlyAccessibleLayouts(const QnUuid& targetId) const;
+
 signals:
     void accessibleResourcesChanged(const QnUuid& userId);
 
@@ -140,6 +146,7 @@ signals:
 
     /** Notify listeners that permissions possibly changed (not necessarily). */
     void permissionsInvalidated(const QSet<QnUuid>& resourceIds);
+
 private:
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);

@@ -836,6 +836,32 @@ bool QnResourceAccessManager::isAccessibleViaVideowall(const QnUserResourcePtr& 
     return false;
 }
 
+QnIndirectAccessProviders QnResourceAccessManager::indirectlyAccessibleLayouts(
+    const QnUuid& targetId) const
+{
+    auto group = userGroup(targetId);
+    if (!group.id.isNull() && !group.permissions.testFlag(Qn::GlobalControlVideoWallPermission))
+        return QnIndirectAccessProviders();
+
+    auto user = qnResPool->getResourceById<QnUserResource>(targetId);
+    if (!hasGlobalPermission(user, Qn::GlobalControlVideoWallPermission))
+        return QnIndirectAccessProviders();
+
+    QnIndirectAccessProviders indirectlyAccessible;
+    for (const auto& videowall : qnResPool->getResources<QnVideoWallResource>())
+    {
+        for (const auto& item : videowall->items()->getItems())
+        {
+            if (item.layout.isNull())
+                continue;
+
+            indirectlyAccessible[item.layout] << videowall;
+        }
+    }
+
+    return indirectlyAccessible;
+}
+
 bool QnResourceAccessManager::isAccessibleViaLayouts(const QSet<QnUuid>& layoutIds, const QnResourcePtr& resource, bool sharedOnly) const
 {
     NX_ASSERT(resource);
