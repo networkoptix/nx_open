@@ -1398,7 +1398,8 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         updatePlaceholderNodesForUserOrRole(user->getId());
         updateSharedLayoutNodesForUser(user);
         updateAccessibleResourcesForUser(user);
-        updateRoleNodes();
+        if (qnResourceAccessManager->userRole(user) == Qn::UserRole::CustomUserGroup)
+            updateRoleNodes();
     }
 }
 

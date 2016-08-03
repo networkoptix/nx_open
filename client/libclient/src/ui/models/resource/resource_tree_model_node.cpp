@@ -124,32 +124,38 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         break;
     case Qn::RecorderNode:
         m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
+        m_state = Invalid;
         break;
     case Qn::SystemNode:
         m_icon = qnResIconCache->icon(QnResourceIconCache::OtherSystem);
+        m_state = Invalid;
         break;
     case Qn::AllCamerasAccessNode:
         m_displayName = m_name = tr("All Cameras && Resources");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
+        m_state = Invalid;
         break;
     case Qn::AllLayoutsAccessNode:
         m_displayName = m_name = tr("All Shared Layouts");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Layouts);
+        m_state = Invalid;
         break;
     case Qn::AccessibleResourcesNode:
         m_displayName = m_name = tr("Cameras && Resources");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
+        m_state = Invalid;
         break;
     case Qn::RoleUsersNode:
         m_displayName = m_name = tr("Users");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
+        m_state = Invalid;
         break;
     default:
         break;
     }
 
     /* Invisible by default until has children. */
-    m_bastard = nodeRequiresChildren(nodeType);
+    m_bastard |= nodeRequiresChildren(nodeType);
 }
 
 /**
@@ -862,6 +868,7 @@ void QnResourceTreeModelNode::setModified(bool modified)
 void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodePtr& child)
 {
     NX_ASSERT(child->parent() == this);
+    NX_ASSERT(m_children.contains(child));
 
     if (isValid() && !isBastard() && m_model)
     {
