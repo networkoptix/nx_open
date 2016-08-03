@@ -256,7 +256,7 @@ void QnLiteClientController::stopLiteClient()
     message.videowallGuid = d->serverId;
 
     const auto connection = QnAppServerConnectionFactory::getConnection2();
-    const auto videowallManager = connection->getVideowallManager(Qn::kDefaultUserAccess);
+    const auto videowallManager = connection->getVideowallManager(Qn::kSystemAccess);
     videowallManager->sendControlMessage(message, this, []{});
 }
 
