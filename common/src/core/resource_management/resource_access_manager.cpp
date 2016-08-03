@@ -663,11 +663,18 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         {
             QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(ownerId);
 
-            /* Layout of user, which we don't know of. */
             if (!owner)
+            {
+                /* Everybody can modify lite client layout. */
+                const auto server = qnResPool->getResourceById<QnMediaServerResource>(ownerId);
+                if (server)
+                    return Qn::FullLayoutPermissions;
+
+                /* Layout of user, which we don't know of. */
                 return hasGlobalPermission(user, Qn::GlobalAdminPermission)
                     ? Qn::FullLayoutPermissions
                     : Qn::NoPermissions;
+            }
 
             /* We can modify layout for user if we can modify this user. */
             Qn::Permissions userPermissions = permissions(user, owner);
@@ -905,7 +912,26 @@ bool QnResourceAccessManager::canCreateLayout(const QnUserResourcePtr& user, con
             || hasGlobalPermission(user, Qn::GlobalControlVideoWallPermission);
     }
 
-    QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(layoutParentId);
+    const auto ownerResource = qnResPool->getResourceById(layoutParentId);
+
+    /* Everybody can create layout for lite client. */
+    const auto parentServer = ownerResource.dynamicCast<QnMediaServerResource>();
+    if (parentServer)
+    {
+        if (!parentServer->getServerFlags().testFlag(Qn::SF_HasLiteClient))
+            return false;
+
+        /* There can only be one layout for each lite client. */
+        const auto existingLayouts = qnResPool->getResources<QnLayoutResource>().filtered(
+            [id = parentServer->getId()](const QnLayoutResourcePtr& layout)
+            {
+                return layout->getId() == id;
+            });
+
+        return existingLayouts.isEmpty();
+    }
+
+    const auto owner = ownerResource.dynamicCast<QnUserResource>();
     if (!owner)
         return false;
 
