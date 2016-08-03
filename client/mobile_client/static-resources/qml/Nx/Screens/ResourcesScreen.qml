@@ -72,7 +72,7 @@ Page
     SearchToolBar
     {
         id: searchToolBar
-        parent: header
+        parent: toolBar
     }
 
     CamerasGrid
