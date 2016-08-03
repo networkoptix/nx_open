@@ -920,7 +920,7 @@
                 <rdep.target>bpi</rdep.target>
                 <gcc.version>4.8.3</gcc.version>
                 <qt.spec/>
-                <target.arch>armhf</target.arch>                
+                <target.arch>armhf</target.arch>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -953,7 +953,7 @@
                 <rdep.target>tx1</rdep.target>
                 <gcc.version>4.8.4</gcc.version>
                 <qt.spec/>
-                <target.arch>armhf</target.arch>                
+                <target.arch>armhf</target.arch>
             </properties>
             <modules>
                 <module>client/libclient_core</module>
@@ -964,7 +964,7 @@
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>debsetup/client-deb</module>
-                <module>debsetup/mediaserver-deb</module>                
+                <module>debsetup/mediaserver-deb</module>
             </modules>
         </profile>
         <profile>
@@ -1171,7 +1171,7 @@
         <profile>
             <id>unit-tests</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <activebydefault>false</activebydefault>
                 <os>
                     <family>unix</family>
                     <name>linux</name>
@@ -1182,8 +1182,25 @@
                 </property>
             </activation>
             <modules>
-                <module>unit_tests</module>           
+                <module>unit_tests</module>
                 <module>unit_tests_run</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>unit-tests-build-only</id>
+            <activation>
+                <activebydefault>false</activebydefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>utb</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <modules>
+                <module>unit_tests</module>
             </modules>
         </profile>
     </profiles>
