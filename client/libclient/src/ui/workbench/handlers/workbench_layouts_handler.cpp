@@ -641,10 +641,6 @@ bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForGroup(const QnUuid& groupI
 
 bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts)
 {
-    /* Check if user have already silenced this warning. */
-    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::StopSharingLayoutUser))
-        return true;
-
     QnLayoutResourceList accessible = layouts.filtered(
         [user](const QnLayoutResourcePtr& layout)
         {
@@ -687,7 +683,6 @@ bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnUserResourcePt
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
         mainWindow());
     messageBox.setDefaultButton(QDialogButtonBox::Cancel);
-    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
     messageBox.addCustomWidget(new QnResourceListView(mediaResources.toList()));
     messageBox.setInformativeText(tr(
         "User will keep access to cameras, which he has on other shared layouts, or which are "
@@ -696,13 +691,6 @@ bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnUserResourcePt
         mediaResources.size()));
 
     auto result = messageBox.exec();
-    if (messageBox.isChecked())
-    {
-        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
-        messagesFilter |= Qn::ShowOnceMessage::StopSharingLayoutUser;
-        qnSettings->setShowOnceMessages(messagesFilter);
-    }
-
     return result == QDialogButtonBox::Ok;
 }
 
