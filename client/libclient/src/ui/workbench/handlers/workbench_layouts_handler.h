@@ -3,7 +3,8 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <nx_ec/ec_api.h>
+#include <core/resource_management/resource_access_subject.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchStateDelegate;
@@ -21,8 +22,6 @@ public:
     void forcedUpdate();
 
 private:
-    ec2::AbstractECConnectionPtr connection2() const;
-
     private slots:
     void at_newUserLayoutAction_triggered();
     void at_saveLayoutAction_triggered();
@@ -66,7 +65,7 @@ private:
     bool confirmDeleteLayoutsForUser(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts);
     bool confirmLayoutChangeForGroup(const QnUuid& groupId, const LayoutChange& change);
 
-    bool confirmStopSharingLayouts(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts);
+    bool confirmStopSharingLayouts(const QnResourceAccessSubject& subject, const QnLayoutResourceList& layouts);
 
     /** If user has custom access rights, he must be given direct access to cameras on changed layout. */
     void grantAccessRightsForUser(const QnUserResourcePtr& user, const LayoutChange& change);

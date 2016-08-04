@@ -252,7 +252,7 @@ void QnUserGroupSettingsModel::setAccessibleLayoutsPreview(const QSet<QnUuid>& v
 QnIndirectAccessProviders QnUserGroupSettingsModel::accessibleLayouts() const
 {
     auto role = qnResourceAccessManager->userGroup(m_currentGroupId);
-    auto layouts = QnResourceAccessProvider().indirectlyAccessibleLayouts(role);
+    auto layouts = QnResourceAccessProvider::indirectlyAccessibleLayouts(role);
 
     for (auto layoutPreview : m_accessibleLayoutsPreviews[m_currentGroupId])
         layouts.insert(layoutPreview, QSet<QnResourcePtr>());

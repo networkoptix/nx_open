@@ -519,7 +519,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     TRACE("Calculate permissions of user " << user->getName() << " to camera " << camera->getName())
     NX_ASSERT(camera);
 
-    if (!QnResourceAccessProvider().isAccessibleResource(user, camera))
+    if (!QnResourceAccessProvider::isAccessibleResource(user, camera))
         return Qn::NoPermissions;
 
     Qn::Permissions result = Qn::ReadPermission;
@@ -585,7 +585,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 {
     NX_ASSERT(webPage);
 
-    if (!QnResourceAccessProvider().isAccessibleResource(user, webPage))
+    if (!QnResourceAccessProvider::isAccessibleResource(user, webPage))
         return Qn::NoPermissions;
 
     Qn::Permissions result = Qn::ReadPermission;
@@ -646,7 +646,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         /* Access to global layouts. Simple check is enough, exported layouts are checked on the client side. */
         if (layout->isShared())
         {
-            if (!QnResourceAccessProvider().isAccessibleResource(user, layout))
+            if (!QnResourceAccessProvider::isAccessibleResource(user, layout))
                 return Qn::NoPermissions;
 
             /* Global layouts editor. */

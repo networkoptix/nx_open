@@ -14,12 +14,12 @@ QnResourceAccessProvider::QnResourceAccessProvider()
 {
 }
 
-bool QnResourceAccessProvider::isAccessibleResource(const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const
+bool QnResourceAccessProvider::isAccessibleResource(const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
 {
     return resourceAccess(subject, resource) != Access::Forbidden;
 }
 
-QnResourceAccessProvider::Access QnResourceAccessProvider::resourceAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const
+QnResourceAccessProvider::Access QnResourceAccessProvider::resourceAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
 {
     if (!subject.isValid() || !resource)
         return Access::Forbidden;
@@ -63,7 +63,7 @@ QnResourceAccessProvider::Access QnResourceAccessProvider::resourceAccess(const 
     return Access::Forbidden;
 }
 
-QnIndirectAccessProviders QnResourceAccessProvider::indirectlyAccessibleLayouts(const QnResourceAccessSubject& subject) const
+QnIndirectAccessProviders QnResourceAccessProvider::indirectlyAccessibleLayouts(const QnResourceAccessSubject& subject)
 {
     if (!qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
         return QnIndirectAccessProviders();
@@ -83,10 +83,10 @@ QnIndirectAccessProviders QnResourceAccessProvider::indirectlyAccessibleLayouts(
     return indirectlyAccessible;
 }
 
-QSet<QnUuid> QnResourceAccessProvider::sharedResources(const QnResourceAccessSubject& subject) const
+QnUuid QnResourceAccessProvider::sharedResourcesKey(const QnResourceAccessSubject& subject)
 {
     if (!subject.isValid())
-        return QSet<QnUuid>();
+        return QnUuid();
 
     QnUuid key = subject.role().id;
     if (subject.user())
@@ -95,10 +95,17 @@ QSet<QnUuid> QnResourceAccessProvider::sharedResources(const QnResourceAccessSub
         if (subject.user()->role() == Qn::UserRole::CustomUserGroup)
             key = subject.user()->userGroup();
     }
-    return qnResourceAccessManager->accessibleResources(key);
+    return key;
 }
 
-bool QnResourceAccessProvider::isAccessibleViaVideowall(const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const
+QSet<QnUuid> QnResourceAccessProvider::sharedResources(const QnResourceAccessSubject& subject)
+{
+    if (!subject.isValid())
+        return QSet<QnUuid>();
+    return qnResourceAccessManager->accessibleResources(sharedResourcesKey(subject));
+}
+
+bool QnResourceAccessProvider::isAccessibleViaVideowall(const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
 {
     NX_ASSERT(resource);
 
@@ -146,7 +153,7 @@ bool QnResourceAccessProvider::isAccessibleViaVideowall(const QnResourceAccessSu
     return false;
 }
 
-bool QnResourceAccessProvider::isAccessibleViaLayouts(const QSet<QnUuid>& layoutIds, const QnResourcePtr& resource, bool sharedOnly) const
+bool QnResourceAccessProvider::isAccessibleViaLayouts(const QSet<QnUuid>& layoutIds, const QnResourcePtr& resource, bool sharedOnly)
 {
     NX_ASSERT(resource);
     if (!resource)

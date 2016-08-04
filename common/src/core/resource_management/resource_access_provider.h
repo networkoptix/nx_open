@@ -24,19 +24,21 @@ public:
     };
 
     /** Check if resource (camera, webpage or layout) is available to given user or role. */
-    bool isAccessibleResource(const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const;
-    Access resourceAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const;
+    static bool isAccessibleResource(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
+    static Access resourceAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
 
     /** Finds which layouts are indirectly available (e.g. through videowall) to given user or group. */
     //TODO: #vkutin #GDM Refactoring is probably needed to merge this functionality with isAccessibleResource functions.
-    QnIndirectAccessProviders indirectlyAccessibleLayouts(const QnResourceAccessSubject& subject) const;
+    static QnIndirectAccessProviders indirectlyAccessibleLayouts(const QnResourceAccessSubject& subject);
+
+    static QnUuid sharedResourcesKey(const QnResourceAccessSubject& subject);
 
     /** List of resources ids, the given user has access to (only given directly). */
-    QSet<QnUuid> sharedResources(const QnResourceAccessSubject& subject) const;
+    static QSet<QnUuid> sharedResources(const QnResourceAccessSubject& subject);
 private:
     /** Check if given desktop camera or layout is available to given user/role through videowall. */
-    bool isAccessibleViaVideowall(const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const;
+    static bool isAccessibleViaVideowall(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
 
     /** Check if camera is placed to one of shared layouts, available to given user. */
-    bool isAccessibleViaLayouts(const QSet<QnUuid>& layoutIds, const QnResourcePtr& resource, bool sharedOnly) const;
+    static bool isAccessibleViaLayouts(const QSet<QnUuid>& layoutIds, const QnResourcePtr& resource, bool sharedOnly);
 };

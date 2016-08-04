@@ -7,14 +7,8 @@
 struct QnResourceAccessSubjectPrivate
 {
 public:
-    QnResourceAccessSubjectPrivate(const QnUserResourcePtr& user):
+    QnResourceAccessSubjectPrivate(const QnUserResourcePtr& user, const ec2::ApiUserGroupData& role):
         user(user),
-        role()
-    {
-    }
-
-    QnResourceAccessSubjectPrivate(const ec2::ApiUserGroupData& role):
-        user(),
         role(role)
     {
     }
@@ -31,12 +25,17 @@ public:
 
 
 QnResourceAccessSubject::QnResourceAccessSubject(const QnUserResourcePtr& user):
-    d_ptr(new QnResourceAccessSubjectPrivate(user))
+    d_ptr(new QnResourceAccessSubjectPrivate(user, ec2::ApiUserGroupData()))
 {
 }
 
 QnResourceAccessSubject::QnResourceAccessSubject(const ec2::ApiUserGroupData& role):
-    d_ptr(new QnResourceAccessSubjectPrivate(role))
+    d_ptr(new QnResourceAccessSubjectPrivate(QnUserResourcePtr(), role))
+{
+}
+
+QnResourceAccessSubject::QnResourceAccessSubject(const QnResourceAccessSubject& other):
+    d_ptr(new QnResourceAccessSubjectPrivate(other.user(), other.role()))
 {
 }
 

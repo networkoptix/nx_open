@@ -13,6 +13,7 @@ class QnResourceAccessSubject
 public:
     QnResourceAccessSubject(const QnUserResourcePtr& user);
     QnResourceAccessSubject(const ec2::ApiUserGroupData& role);
+    QnResourceAccessSubject(const QnResourceAccessSubject& other);
     virtual ~QnResourceAccessSubject();
 
     const QnUserResourcePtr& user() const;
