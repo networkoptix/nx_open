@@ -59,16 +59,14 @@ private:
      */
     bool confirmLayoutChange(const LayoutChange& change);
 
-    bool confirmSharedLayoutChange(const LayoutChange& change);
+    bool confirmChangeSharedLayout(const LayoutChange& change);
     bool confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts);
-    bool confirmLayoutChangeForUser(const QnUserResourcePtr& user, const LayoutChange& change);
-    bool confirmDeleteLayoutsForUser(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts);
-    bool confirmLayoutChangeForGroup(const QnUuid& groupId, const LayoutChange& change);
-
+    bool confirmChangeLocalLayout(const QnUserResourcePtr& user, const LayoutChange& change);
+    bool confirmDeleteLocalLayouts(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts);
     bool confirmStopSharingLayouts(const QnResourceAccessSubject& subject, const QnLayoutResourceList& layouts);
 
-    /** If user has custom access rights, he must be given direct access to cameras on changed layout. */
-    void grantAccessRightsForUser(const QnUserResourcePtr& user, const LayoutChange& change);
+    /** If user has custom access rights, he must be given direct access to cameras on changed local layout. */
+    void grantMissingAccessRights(const QnUserResourcePtr& user, const LayoutChange& change);
 
     /**
      * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.
