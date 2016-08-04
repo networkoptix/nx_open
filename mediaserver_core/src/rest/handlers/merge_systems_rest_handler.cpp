@@ -331,8 +331,8 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
 
     {
         QUrl requestUrl(remoteUrl);
-        requestUrl.setUserName(server->getId().toString());
-        requestUrl.setPassword(server->getAuthKey());
+        client.setUserName(server->getId().toString());
+        client.setUserPassword(server->getAuthKey());
         requestUrl.setPath(lit("/api/configure"));
 
         const QString systemName = QString::fromUtf8(QUrl::toPercentEncoding(qnCommon->localSystemName()));
