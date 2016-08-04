@@ -23,6 +23,5 @@ Rectangle
         anchors.horizontalCenter: parent.horizontalCenter
         y: parent.height * 3 / 4 - height / 2
     }
-    Component.onCompleted: console.log("offing...")
 }
 
