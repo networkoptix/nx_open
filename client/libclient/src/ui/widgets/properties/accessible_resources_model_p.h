@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtCore/QIdentityProxyModel>
+#include <QtCore/QSortFilterProxyModel>
 #include <core/resource_management/resource_access_provider.h>
 
 /*
@@ -8,9 +8,10 @@
 *  and inserts a virtual column that displays an icon of a resource through
 *  which a user gains implicit access to the resource of corresponding row.
 */
-class QnAccessibleResourcesModel : public QIdentityProxyModel
+class QnAccessibleResourcesModel : public QSortFilterProxyModel
 {
-    using base_type = QIdentityProxyModel;
+    //TODO: #vkutin Implement "QnRelayoutColumnsProxyModel" and use it as a base
+    using base_type = QSortFilterProxyModel;
 
 public:
     enum Column
@@ -32,6 +33,7 @@ public:
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
     virtual QModelIndex sibling(int row, int column, const QModelIndex& idx) const override;
+    virtual QModelIndex parent(const QModelIndex& index) const override;
 
     virtual QModelIndex mapToSource(const QModelIndex& proxyIndex) const override;
     virtual QModelIndex mapFromSource(const QModelIndex& sourceIndex) const override;

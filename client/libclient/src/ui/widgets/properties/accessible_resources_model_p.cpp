@@ -64,6 +64,12 @@ QModelIndex QnAccessibleResourcesModel::sibling(int row, int column, const QMode
     return index(row, column, idx.parent());
 }
 
+QModelIndex QnAccessibleResourcesModel::parent(const QModelIndex& index) const
+{
+    Q_UNUSED(index);
+    return QModelIndex();
+}
+
 QModelIndex QnAccessibleResourcesModel::mapToSource(const QModelIndex& proxyIndex) const
 {
     if (!proxyIndex.isValid())
@@ -167,12 +173,13 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
             switch (role)
             {
                 case Qt::DecorationRole:
-                    return indirectAccessInfo(index.data(Qn::ResourceRole).value<QnResourcePtr>()).first;
+                    return indirectAccessInfo(index.sibling(index.row(), NameColumn).
+                        data(Qn::ResourceRole).value<QnResourcePtr>()).first;
 
                 case Qt::ToolTipRole:
-                    return indirectAccessInfo(index.data(Qn::ResourceRole).value<QnResourcePtr>()).second;
+                    return indirectAccessInfo(index.sibling(index.row(), NameColumn).
+                        data(Qn::ResourceRole).value<QnResourcePtr>()).second;
 
-                case Qn::ResourceRole:
                 case Qn::DisabledRole:
                     return index.sibling(index.row(), NameColumn).data(role);
 
@@ -229,3 +236,5 @@ void QnAccessibleResourcesModel::indirectAccessChanged()
 
     emit dataChanged(index(0, IndirectAccessColumn), index(rowCount() - 1, IndirectAccessColumn));
 }
+
+

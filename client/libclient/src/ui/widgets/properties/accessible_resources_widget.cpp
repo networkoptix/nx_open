@@ -98,8 +98,8 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
 
     auto sortModel = new QnResourceListSortedModel(this);
     sortModel->setSourceModel(m_resourcesModel);
+    sortModel->sort(QnAccessibleResourcesModel::NameColumn);
     m_accessibleResourcesModel->setSourceModel(sortModel);
-    m_accessibleResourcesModel->sort(QnAccessibleResourcesModel::NameColumn);
 
     m_accessibleResourcesModel->setIndirectAccessFunction(
         [this]() -> QnIndirectAccessProviders
