@@ -1099,7 +1099,7 @@
                 <android.platform>android-16</android.platform>
                 <qt.spec/>
                 <openal.version>1.17.2</openal.version>
-                <openssl.version>1.0.2d</openssl.version>
+                <openssl.version>1.0.2g</openssl.version>
                 <rdep.target>android-${arch}</rdep.target>
             </properties>
         </profile>
