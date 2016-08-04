@@ -10,6 +10,8 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/resource_access_provider.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -907,6 +909,7 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
 
 void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourcePtr& user)
 {
+    QnResourceAccessProvider accessProvider;
     TRACE("Updating accesible resources nodes for user " << user->getName());
 
     auto iter = m_resourceNodeByResource.find(user);
@@ -942,7 +945,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
                 continue;
 
             TRACE("Checking node " << resource->getName() << " under user " << user->getName());
-            if (qnResourceAccessManager->isAccessibleResource(user, resource))
+            if (accessProvider.isAccessibleResource(user, resource))
             {
                 auto node = ensureAccessibleResourceNode(user->getId(), resource);
                 node->update();
@@ -967,7 +970,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
                 continue;
 
             if (!existingNode->resource()
-                || !qnResourceAccessManager->isAccessibleResource(user, existingNode->resource()))
+                || !accessProvider.isAccessibleResource(user, existingNode->resource()))
                 nodesToDelete << existingNode;
         }
     }
@@ -1030,6 +1033,7 @@ void QnResourceTreeModel::updateSharedLayoutNodesForRole(const QnUuid& id)
 
 void QnResourceTreeModel::updateAccessibleResourcesForRole(const QnUuid& id)
 {
+    QnResourceAccessProvider accessProvider;
     auto role = qnResourceAccessManager->userGroup(id);
     TRACE("Updating accesible resources nodes for role " << role.name);
     NX_ASSERT(!role.isNull());
@@ -1052,7 +1056,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForRole(const QnUuid& id)
             continue;
 
         TRACE("Checking node " << resource->getName() << " under role " << role.name);
-        if (qnResourceAccessManager->isAccessibleResource(role, resource))
+        if (accessProvider.isAccessibleResource(role, resource))
         {
             auto node = ensureAccessibleResourceNode(id, resource);
             node->update();
@@ -1077,7 +1081,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForRole(const QnUuid& id)
             continue;
 
         if (!existingNode->resource()
-            || !qnResourceAccessManager->isAccessibleResource(role, existingNode->resource()))
+            || !accessProvider.isAccessibleResource(role, existingNode->resource()))
             nodesToDelete << existingNode;
     }
 

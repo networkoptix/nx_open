@@ -297,7 +297,7 @@ namespace Qn
         UserLayoutItemsRemoved  = 0x004,    /**< Items are removed from user's layout, but access still persist. */
 
         DeleteResources         = 0x010,    /**< Batch delete resources (but layouts). */
-        DeleteSharedLayouts     = 0x020,    /**< Batch delete shared layouts. */
+
         DeleteUserLayouts       = 0x040     /**< Batch delete user's layouts. */
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ShowOnceMessage)

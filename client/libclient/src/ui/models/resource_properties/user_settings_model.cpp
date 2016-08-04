@@ -109,7 +109,7 @@ QnIndirectAccessProviders QnUserSettingsModel::accessibleLayouts() const
     if (!m_user)
         return QnIndirectAccessProviders();
 
-    auto layouts = qnResourceAccessManager->indirectlyAccessibleLayouts(m_user->getId());
+    auto layouts = QnResourceAccessProvider().indirectlyAccessibleLayouts(m_user);
 
     for (auto layoutPreview : m_accessibleLayoutsPreview)
         layouts.insert(layoutPreview, QSet<QnResourcePtr>());

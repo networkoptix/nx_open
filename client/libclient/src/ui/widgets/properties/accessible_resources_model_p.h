@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtCore/QIdentityProxyModel>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/resource_access_provider.h>
 
 /*
 * Proxy model that works with QnResourceListModel (or its proxy) as a source

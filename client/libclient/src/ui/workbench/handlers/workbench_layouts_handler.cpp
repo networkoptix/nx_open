@@ -460,10 +460,6 @@ bool QnWorkbenchLayoutsHandler::confirmSharedLayoutChange(const LayoutChange& ch
 
 bool QnWorkbenchLayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts)
 {
-    /* Check if user have already silenced this warning. */
-    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::DeleteSharedLayouts))
-        return true;
-
     /* Checking if custom users have access to this shared layout. */
     auto allUsers = qnResPool->getResources<QnUserResource>();
     auto accessibleToCustomUsers = boost::algorithm::any_of(
@@ -493,18 +489,8 @@ bool QnWorkbenchLayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourc
     messageBox.setDefaultButton(QDialogButtonBox::Cancel);
     messageBox.setInformativeText(tr("These %n layouts are shared. "
         "By deleting these layouts you delete them from all users who have it.", "", layouts.size()));
-    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
     messageBox.addCustomWidget(new QnResourceListView(layouts));
-
-    auto result = messageBox.exec();
-    if (messageBox.isChecked())
-    {
-        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
-        messagesFilter |= Qn::ShowOnceMessage::DeleteSharedLayouts;
-        qnSettings->setShowOnceMessages(messagesFilter);
-    }
-
-    return result == QDialogButtonBox::Ok;
+    return messageBox.exec() == QDialogButtonBox::Ok;
 }
 
 bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForUser(const QnUserResourcePtr& user, const LayoutChange& change)

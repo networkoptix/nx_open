@@ -5,6 +5,7 @@
 #include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource_management/resource_access_subject.h>
 
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/data/api_access_rights_data.h>
@@ -14,9 +15,6 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/common/connective.h>
-
-//TODO: #vkutin #GDM Need to move it to some forward declarations header
-using QnIndirectAccessProviders = QMap<QnUuid /*accessible resource*/, QSet<QnResourcePtr> /*access providers*/>;
 
 class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnResourceAccessManager>
 {
@@ -43,35 +41,21 @@ public:
     void setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources);
 
     /** List of resources ids, the given user has access to (only given directly). */
-    QSet<QnUuid> accessibleResources(const QnUserResourcePtr& user) const;
+    QSet<QnUuid> accessibleResources(const QnResourceAccessSubject& subject) const;
 
     /**
-    * \param user                      User to get global permissions for.
+    * \param user                      User or role to get global permissions for.
     * \returns                         Global permissions of the given user,
     *                                  adjusted to take dependencies and superuser status into account.
     */
-    Qn::GlobalPermissions globalPermissions(const QnUserResourcePtr& user) const;
-
-    /**
-    * \param role                      Role to get global permissions for.
-    * \returns                         Global permissions of the given role,
-    *                                  adjusted to take dependencies and superuser status into account.
-    */
-    Qn::GlobalPermissions globalPermissions(const ec2::ApiUserGroupData& role) const;
+    Qn::GlobalPermissions globalPermissions(const QnResourceAccessSubject& subject) const;
 
     /**
     * \param user                      User to get global permissions for.
     * \param requiredPermission        Global permission to check.
     * \returns                         Whether actual global permissions include required permission.
     */
-    bool hasGlobalPermission(const QnUserResourcePtr& user, Qn::GlobalPermission requiredPermission) const;
-
-    /**
-    * \param role                      Role to get global permissions for.
-    * \param requiredPermission        Global permission to check.
-    * \returns                         Whether actual global permissions include required permission.
-    */
-    bool hasGlobalPermission(const ec2::ApiUserGroupData& role, Qn::GlobalPermission requiredPermission) const;
+    bool hasGlobalPermission(const QnResourceAccessSubject& subject, Qn::GlobalPermission requiredPermission) const;
 
     /**
     * \param user                      User that should have permissions.
@@ -137,27 +121,6 @@ public:
 
     static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
 
-    //TODO: #GDM think about naming
-    enum class Access
-    {
-        Forbidden,
-        Directly,
-        ViaLayout,
-        ViaVideowall
-    };
-
-    /** Check if resource (camera, webpage or layout) is available to given user. */
-    bool isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
-    Access resourceAccess(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
-
-    /** Check if resource (camera, webpage or layout) is available to given role. */
-    bool isAccessibleResource(const ec2::ApiUserGroupData& role, const QnResourcePtr& resource) const;
-    Access resourceAccess(const ec2::ApiUserGroupData& role, const QnResourcePtr& resource) const;
-
-    /** Finds which layouts are indirectly available (e.g. through videowall) to given user or group. */
-    //TODO: #vkutin #GDM Refactoring is probably needed to merge this functionality with isAccessibleResource functions.
-    QnIndirectAccessProviders indirectlyAccessibleLayouts(const QnUuid& targetId) const;
-
 signals:
     void accessibleResourcesChanged(const QnUuid& userId);
 
@@ -168,17 +131,6 @@ signals:
     void permissionsInvalidated(const QSet<QnUuid>& resourceIds);
 
 private:
-    struct AccessKey
-    {
-        QnUserResourcePtr user;
-        ec2::ApiUserGroupData role;
-        Qn::GlobalPermissions globalPermissions;
-        QnUuid accessibleResourcesKey;
-
-        AccessKey(const QnUserResourcePtr& user);
-        AccessKey(const ec2::ApiUserGroupData& role);
-    };
-
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);
     void invalidateResourceCacheInternal(const QnUuid& resourceId);
@@ -197,14 +149,6 @@ private:
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnUserResourcePtr& targetUser)        const;
 
     Qn::GlobalPermissions filterDependentPermissions(Qn::GlobalPermissions source) const;
-
-    Access resourceAccessInternal(const AccessKey& accessKey, const QnResourcePtr& resource) const;
-
-    /** Check if given desktop camera or layout is available to given user/role through videowall. */
-    bool isAccessibleViaVideowall(const AccessKey& accessKey, const QnResourcePtr& resource) const;
-
-    /** Check if camera is placed to one of shared layouts, available to given user. */
-    bool isAccessibleViaLayouts(const QSet<QnUuid>& layoutIds, const QnResourcePtr& resource, bool sharedOnly) const;
 
     void beginUpdateCache();
     void endUpdateCache();
