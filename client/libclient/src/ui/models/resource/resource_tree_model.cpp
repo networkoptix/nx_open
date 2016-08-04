@@ -513,7 +513,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         {
             auto user = node->resource().dynamicCast<QnUserResource>();
             NX_ASSERT(user);
-            if (user && qnResourceAccessManager->userRole(user) == Qn::UserRole::CustomUserGroup)
+            if (user && user->role() == Qn::UserRole::CustomUserGroup)
                 return ensurePlaceholderNode(user->userGroup(), Qn::RoleUsersNode);
 
             return m_rootNodes[Qn::UsersNode];
@@ -588,7 +588,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
                 return parentNode;
 
             /* Personal layouts are displayed under users if user belongs to group. */
-            if (qnResourceAccessManager->userRole(owner) == Qn::UserRole::CustomUserGroup)
+            if (owner->role() == Qn::UserRole::CustomUserGroup)
                 return parentNode;
 
             return ensurePlaceholderNode(owner->getId(), Qn::AccessibleLayoutsNode);
@@ -665,7 +665,7 @@ void QnResourceTreeModel::updatePlaceholderNodesForUserOrRole(const QnUuid& id)
                 return false;
 
             /* Do not show user placeholders under groups. */
-            if (qnResourceAccessManager->userRole(user) == Qn::UserRole::CustomUserGroup)
+            if (user->role() == Qn::UserRole::CustomUserGroup)
                 return false;
 
             switch (nodeType)
@@ -860,7 +860,7 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
     /* No shared layouts nodes must exist under current user node and under all admins. */
     if (user == context()->user()
         || qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAdminPermission)
-        || qnResourceAccessManager->userRole(user) == Qn::UserRole::CustomUserGroup
+        || user->role() == Qn::UserRole::CustomUserGroup
         )
     {
         nodesToDelete << sharedLayoutNodes;
@@ -925,7 +925,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
         with generic resources access. */
     if (user == context()->user()
         || qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission)
-        || qnResourceAccessManager->userRole(user) == Qn::UserRole::CustomUserGroup
+        || user->role() == Qn::UserRole::CustomUserGroup
         )
     {
         nodesToDelete << accesible;
@@ -1539,7 +1539,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         updatePlaceholderNodesForUserOrRole(user->getId());
         updateSharedLayoutNodesForUser(user);
         updateAccessibleResourcesForUser(user);
-        if (qnResourceAccessManager->userRole(user) == Qn::UserRole::CustomUserGroup)
+        if (user->role() == Qn::UserRole::CustomUserGroup)
             updateRoleNodes();
     }
 }

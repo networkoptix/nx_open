@@ -40,9 +40,6 @@ public:
     QSet<QnUuid> accessibleResources(const QnUuid& userOrGroupId) const;
     void setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources);
 
-    /** List of resources ids, the given user has access to (only given directly). */
-    QSet<QnUuid> accessibleResources(const QnResourceAccessSubject& subject) const;
-
     /**
     * \param user                      User or role to get global permissions for.
     * \returns                         Global permissions of the given user,
@@ -116,7 +113,6 @@ public:
     static QString userRoleDescription(Qn::UserRole userRole);
     static Qn::GlobalPermissions userRolePermissions(Qn::UserRole userRole);
 
-    Qn::UserRole userRole(const QnUserResourcePtr& user) const;
     QString userRoleName(const QnUserResourcePtr& user) const;
 
     static ec2::ApiPredefinedRoleDataList getPredefinedRoles();

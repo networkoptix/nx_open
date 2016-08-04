@@ -41,6 +41,41 @@ QnUserResource::QnUserResource(const QnUserResource& right):
 {
 }
 
+Qn::UserRole QnUserResource::role() const
+{
+    if (!resourcePool())
+        return Qn::UserRole::CustomPermissions;
+
+    if (isOwner())
+        return Qn::UserRole::Owner;
+
+    QnUuid groupId = userGroup();
+    if (!groupId.isNull())
+        return Qn::UserRole::CustomUserGroup;
+
+    auto permissions = getRawPermissions();
+
+    if (permissions.testFlag(Qn::GlobalAdminPermission))
+        return Qn::UserRole::Administrator;
+
+    switch (permissions)
+    {
+        case Qn::GlobalAdvancedViewerPermissionSet:
+            return Qn::UserRole::AdvancedViewer;
+
+        case Qn::GlobalViewerPermissionSet:
+            return Qn::UserRole::Viewer;
+
+        case Qn::GlobalLiveViewerPermissionSet:
+            return Qn::UserRole::LiveViewer;
+
+        default:
+            break;
+    };
+
+    return Qn::UserRole::CustomPermissions;
+}
+
 QByteArray QnUserResource::getHash() const
 {
     QnMutexLocker locker(&m_mutex);

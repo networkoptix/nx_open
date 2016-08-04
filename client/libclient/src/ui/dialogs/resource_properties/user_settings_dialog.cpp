@@ -183,7 +183,7 @@ void QnUserSettingsDialog::permissionsChanged()
 
     if (isPageVisible(ProfilePage))
     {
-        Qn::UserRole roleType = qnResourceAccessManager->userRole(m_user);
+        Qn::UserRole roleType = m_user->role();
         QString permissionsText = qnResourceAccessManager->userRoleDescription(roleType);
 
         if (roleType == Qn::UserRole::CustomUserGroup)

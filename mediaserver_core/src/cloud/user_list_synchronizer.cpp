@@ -182,7 +182,7 @@ void CloudUserListSynchonizer::permissionsToCloudAccessRole(
             if (!user->isEnabled())
                 return nx::cdb::api::SystemAccessRole::disabled;
 
-            switch (qnResourceAccessManager->userRole(user))
+            switch (user->role())
             {
                 case Qn::UserRole::Owner:
                      return nx::cdb::api::SystemAccessRole::owner;

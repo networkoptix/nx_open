@@ -12,6 +12,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/resource_access_provider.h>
 #include <core/resource_management/resources_changes_manager.h>
 
 #include <nx_ec/dummy_handler.h>
@@ -181,7 +182,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
         auto change = calculateLayoutChange(layout);
 
         auto owner = layout->getParentResource().dynamicCast<QnUserResource>();
-        if (owner && qnResourceAccessManager->userRole(owner) == Qn::UserRole::CustomPermissions)
+        if (owner && owner->role() == Qn::UserRole::CustomPermissions)
             grantAccessRightsForUser(owner, change);
         //TODO: #GDM #access Grant access rights for groups?
 
@@ -401,7 +402,7 @@ bool QnWorkbenchLayoutsHandler::confirmLayoutChange(const LayoutChange& change)
     if (qnResourceAccessManager->hasGlobalPermission(owner, Qn::GlobalAccessAllMediaPermission))
         return true;
 
-    auto role = qnResourceAccessManager->userRole(owner);
+    auto role = owner->role();
     switch (role)
     {
         case Qn::UserRole::CustomUserGroup:
@@ -501,7 +502,7 @@ bool QnWorkbenchLayoutsHandler::confirmLayoutChangeForUser(const QnUserResourceP
 
     /* Calculate removed cameras that are still directly accessible. */
 
-    auto accessible = qnResourceAccessManager->accessibleResources(user);
+    auto accessible = QnResourceAccessProvider().sharedResources(user);
     QSet<QnUuid> directlyAccessible;
     for (const QnResourcePtr& resource : change.removed)
     {
@@ -563,7 +564,7 @@ bool QnWorkbenchLayoutsHandler::confirmDeleteLayoutsForUser(const QnUserResource
         removedResources += QnLayoutResource::layoutResources(snapshot.items);
     }
 
-    auto accessible = qnResourceAccessManager->accessibleResources(user);
+    auto accessible = QnResourceAccessProvider().sharedResources(user);
     QSet<QnUuid> directlyAccessible;
     for (const QnResourcePtr& resource : removedResources)
     {
@@ -643,7 +644,7 @@ bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnUserResourcePt
         mediaResources += layout->layoutResources();
 
     /* Skip resources that still will be accessible. */
-    for (const auto& directlyAvailable: qnResPool->getResources(qnResourceAccessManager->accessibleResources(user)))
+    for (const auto& directlyAvailable: qnResPool->getResources(QnResourceAccessProvider().sharedResources(user)))
         mediaResources -= directlyAvailable;
 
     /* Skip resources that still will be accessible through other dialogs. */
@@ -694,7 +695,7 @@ void QnWorkbenchLayoutsHandler::grantAccessRightsForUser(const QnUserResourcePtr
             return false;
         };
 
-    auto accessible = qnResourceAccessManager->accessibleResources(user);
+    auto accessible = QnResourceAccessProvider().sharedResources(user);
     for (const auto& toShare : change.added.filtered(inaccessible))
         accessible << toShare->getId();
     qnResourcesChangesManager->saveAccessibleResources(user->getId(), accessible);

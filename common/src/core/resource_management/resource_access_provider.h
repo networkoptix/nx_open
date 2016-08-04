@@ -31,6 +31,8 @@ public:
     //TODO: #vkutin #GDM Refactoring is probably needed to merge this functionality with isAccessibleResource functions.
     QnIndirectAccessProviders indirectlyAccessibleLayouts(const QnResourceAccessSubject& subject) const;
 
+    /** List of resources ids, the given user has access to (only given directly). */
+    QSet<QnUuid> sharedResources(const QnResourceAccessSubject& subject) const;
 private:
     /** Check if given desktop camera or layout is available to given user/role through videowall. */
     bool isAccessibleViaVideowall(const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const;

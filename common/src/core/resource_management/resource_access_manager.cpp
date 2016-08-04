@@ -235,20 +235,11 @@ QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userOrGr
     return m_accessibleResources[userOrGroupId];
 }
 
+/*
 QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnResourceAccessSubject& subject) const
 {
-    if (!subject.isValid())
-        return QSet<QnUuid>();
 
-    QnUuid key = subject.role().id;
-    if (subject.user())
-    {
-        QnUuid key = subject.user()->getId();
-        if (userRole(subject.user()) == Qn::UserRole::CustomUserGroup)
-            key = subject.user()->userGroup();
-    }
-    return accessibleResources(key);
-}
+}*/
 
 void QnResourceAccessManager::setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources)
 {
@@ -308,7 +299,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnResourc
                 return *iter;
         }
 
-        switch (userRole(user))
+        switch (user->role())
         {
             case Qn::UserRole::CustomUserGroup:
                 result = globalPermissions(userGroup(user->userGroup()));
@@ -1060,43 +1051,12 @@ Qn::GlobalPermissions QnResourceAccessManager::userRolePermissions(Qn::UserRole 
     return Qn::NoGlobalPermissions;
 }
 
-Qn::UserRole QnResourceAccessManager::userRole(const QnUserResourcePtr& user) const
-{
-    if (!user || !user->resourcePool())
-        return Qn::UserRole::CustomPermissions;
-
-    if (user->isOwner())
-        return Qn::UserRole::Owner;
-
-    QnUuid groupId = user->userGroup();
-    if (!groupId.isNull())
-        return Qn::UserRole::CustomUserGroup;
-
-    auto permissions = user->getRawPermissions();
-
-    if (permissions.testFlag(Qn::GlobalAdminPermission))
-        return Qn::UserRole::Administrator;
-
-    switch (permissions)
-    {
-        case Qn::GlobalAdvancedViewerPermissionSet:
-            return Qn::UserRole::AdvancedViewer;
-
-        case Qn::GlobalViewerPermissionSet:
-            return Qn::UserRole::Viewer;
-
-        case Qn::GlobalLiveViewerPermissionSet:
-            return Qn::UserRole::LiveViewer;
-
-        default:
-            break;
-    };
-    return Qn::UserRole::CustomPermissions;
-}
-
 QString QnResourceAccessManager::userRoleName(const QnUserResourcePtr& user) const
 {
-    Qn::UserRole roleType = userRole(user);
+    NX_ASSERT(user);
+    if (!user)
+        return QString();
+    Qn::UserRole roleType = user->role();
     if (roleType == Qn::UserRole::CustomUserGroup)
         return userGroup(user->userGroup()).name;
 
