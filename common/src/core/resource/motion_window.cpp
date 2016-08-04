@@ -320,25 +320,13 @@ void QnMotionRegion::updatePathCache()
 
 void parseMotionRegionList(QList<QnMotionRegion>& regions, const QByteArray& regionsString)
 {
-    QList<QByteArray> regList = regionsString.split(':');
     regions.clear();
-
-    // for compatibility with previous version. By default screen filled medium sensitivity motion window
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        regions << QnMotionRegion();
-
-    if (regList.size() > CL_MAX_CHANNELS)
+    for (const auto& serializedRegion: regionsString.split(':'))
     {
-        NX_LOG(
-            lit("Number of motion regions is more than maximum number of channels (%1/%2)")
-                .arg(regList.size())
-                .arg(CL_MAX_CHANNELS), 
-            cl_logWARNING);
-        return;
+        QnMotionRegion region;
+        parseMotionRegion(region, serializedRegion);
+        regions << region;
     }
-
-    for (int i = 0; i < regList.size(); ++i)
-        parseMotionRegion(regions[i], regList[i]);
 }
 
 void parseMotionRegion(QnMotionRegion& region, const QByteArray& regionString)
@@ -394,7 +382,7 @@ QString serializeMotionRegion(const QnMotionRegion& region)
                 rectList << QString::number(i) << QString::number(rect.left()) << QString::number(rect.top()) << QString::number(rect.width()) << QString::number(rect.height());
                 regionList << rectList.join(QLatin1String(","));
             }
-        }            
+        }
     }
 
     return regionList.join(QLatin1String(";"));
