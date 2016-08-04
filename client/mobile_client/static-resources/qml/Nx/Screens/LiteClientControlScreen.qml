@@ -60,6 +60,18 @@ Page
     {
         id: liteClientController
         serverId: clientId
+
+        onClientStartError:
+        {
+            Workflow.openInformationDialog(
+                qsTr("Cannot start client"),
+                qsTr("Please make sure that display is connected to Nx1."))
+        }
+
+        onClientStopError:
+        {
+            Workflow.openInformationDialog(qsTr("Cannot stop client"))
+        }
     }
 
     Column
@@ -226,6 +238,30 @@ Page
         }
     }
 
+    Component
+    {
+        id: switchedOffDummyComponent
+        SwitchedOffDummy {}
+    }
+
+    Component
+    {
+        id: noDisplayDummyComponent
+        NoDisplayDummy {}
+    }
+
+    Component
+    {
+        id: startingDummyComponent
+        StartingDummy {}
+    }
+
+    Component
+    {
+        id: stoppingDummyComponent
+        StoppingDummy {}
+    }
+
     state: "SwitchedOff"
     states: [
         State
@@ -236,7 +272,7 @@ Page
             PropertyChanges
             {
                 target: screenLoader
-                source: "private/LiteClientControlScreen/SwitchedOffDummy.qml"
+                sourceComponent: switchedOffDummyComponent
             }
             PropertyChanges
             {
@@ -256,7 +292,7 @@ Page
             PropertyChanges
             {
                 target: screenLoader
-                source: "private/LiteClientControlScreen/NoDisplayDummy.qml"
+                sourceComponent: noDisplayDummyComponent
             }
             PropertyChanges
             {
@@ -265,6 +301,48 @@ Page
             }
         },
         */
+        State
+        {
+            name: "Starting"
+            when: liteClientController.clientState == QnLiteClientController.Starting
+
+            PropertyChanges
+            {
+                target: screenLoader
+                sourceComponent: startingDummyComponent
+            }
+            PropertyChanges
+            {
+                target: bottomLoader
+                sourceComponent: undefined
+            }
+            PropertyChanges
+            {
+                target: enabledSwitch
+                checked: true
+            }
+        },
+        State
+        {
+            name: "Stopping"
+            when: liteClientController.clientState == QnLiteClientController.Stopping
+
+            PropertyChanges
+            {
+                target: screenLoader
+                sourceComponent: stoppingDummyComponent
+            }
+            PropertyChanges
+            {
+                target: bottomLoader
+                sourceComponent: undefined
+            }
+            PropertyChanges
+            {
+                target: enabledSwitch
+                checked: false
+            }
+        },
         State
         {
             name: "SingleCamera"

@@ -46,6 +46,7 @@ signals:
     void serverIdChanged();
     void clientStateChanged();
     void clientStartError();
+    void clientStopError();
 
     // Dummy signal to make QML happy
     void nothingChanged();

@@ -14,6 +14,12 @@
 #include <utils/common/id.h>
 #include <helpers/lite_client_layout_helper.h>
 
+namespace {
+
+    const int kStartStopTimeoutMs = 60 * 1000;
+
+} // namespace
+
 class QnLiteClientControllerPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(QnLiteClientController)
@@ -21,6 +27,7 @@ class QnLiteClientControllerPrivate: public QObject
 
 public:
     QnLiteClientLayoutHelper* layoutHelper;
+    QTimer* startStopTimer;
     QnMediaServerResourcePtr server;
     QnUuid serverId;
     QnLiteClientController::State clientState = QnLiteClientController::State::Stopped;
@@ -31,6 +38,9 @@ public:
 
     void setClientState(QnLiteClientController::State state);
 
+    void setClientStartResult(bool success);
+    void setClientStopResult(bool success);
+
     QnLayoutResourcePtr createLayout() const;
     QnLayoutResourcePtr findLayout() const;
     bool initLayout();
@@ -38,6 +48,7 @@ public:
     void at_runtimeInfoAdded(const QnPeerRuntimeInfo& data);
     void at_runtimeInfoRemoved(const QnPeerRuntimeInfo& data);
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& data);
+    void at_startStopTimer_timeout();
 };
 
 QnLiteClientController::QnLiteClientController(QObject* parent):
@@ -117,9 +128,11 @@ void QnLiteClientController::startLiteClient()
     if (!d->server)
         return;
 
+    d->setClientState(State::Starting);
+
     if (!d->initLayout())
     {
-        emit clientStartError();
+        d->setClientStartResult(false);
         return;
     }
 
@@ -131,7 +144,7 @@ void QnLiteClientController::startLiteClient()
                 return;
 
             if (!success)
-                emit clientStartError();
+                d->setClientStartResult(false);
         };
 
     d->server->restConnection()->startLiteClient(handleReply);
@@ -146,6 +159,8 @@ void QnLiteClientController::stopLiteClient()
     if (!d->server)
         return;
 
+    d->setClientState(State::Stopping);
+
     ec2::ApiVideowallControlMessageData message;
     message.operation = QnVideoWallControlMessage::Exit;
     message.videowallGuid = d->serverId;
@@ -158,8 +173,12 @@ void QnLiteClientController::stopLiteClient()
 QnLiteClientControllerPrivate::QnLiteClientControllerPrivate(QnLiteClientController* parent):
     QObject(parent),
     q_ptr(parent),
-    layoutHelper(new QnLiteClientLayoutHelper(parent))
+    layoutHelper(new QnLiteClientLayoutHelper(parent)),
+    startStopTimer(new QTimer(parent))
 {
+    startStopTimer->setInterval(kStartStopTimeoutMs);
+    connect(startStopTimer, &QTimer::timeout,
+        this, &QnLiteClientControllerPrivate::at_startStopTimer_timeout);
 }
 
 void QnLiteClientControllerPrivate::setClientState(QnLiteClientController::State state)
@@ -169,15 +188,56 @@ void QnLiteClientControllerPrivate::setClientState(QnLiteClientController::State
 
     clientState = state;
 
+    switch (state)
+    {
+        case QnLiteClientController::State::Stopped:
+        case QnLiteClientController::State::Started:
+            startStopTimer->stop();
+            break;
+        case QnLiteClientController::State::Stopping:
+        case QnLiteClientController::State::Starting:
+            startStopTimer->start();
+            break;
+    }
+
     Q_Q(QnLiteClientController);
     emit q->clientStateChanged();
 }
 
+void QnLiteClientControllerPrivate::setClientStartResult(bool success)
+{
+    Q_Q(QnLiteClientController);
+
+    clientStartHandle = -1;
+
+    if (success)
+    {
+        setClientState(QnLiteClientController::State::Started);
+    }
+    else
+    {
+        setClientState(QnLiteClientController::State::Stopped);
+        emit q->clientStartError();
+    }
+}
+
+void QnLiteClientControllerPrivate::setClientStopResult(bool success)
+{
+    Q_Q(QnLiteClientController);
+
+    if (success)
+    {
+        setClientState(QnLiteClientController::State::Stopped);
+    }
+    else
+    {
+        setClientState(QnLiteClientController::State::Started);
+        emit q->clientStopError();
+    }
+}
+
 bool QnLiteClientControllerPrivate::initLayout()
 {
-    if (clientState != QnLiteClientController::State::Started)
-        return false;
-
     if (!layoutHelper->layout())
         layoutHelper->setLayout(layoutHelper->findLayoutForServer(serverId));
 
@@ -198,8 +258,8 @@ void QnLiteClientControllerPrivate::at_runtimeInfoAdded(const QnPeerRuntimeInfo&
     if (data.data.videoWallInstanceGuid != serverId)
         return;
 
-    setClientState(QnLiteClientController::State::Started);
-    initLayout();
+    bool ok = initLayout();
+    setClientStartResult(ok);
 }
 
 void QnLiteClientControllerPrivate::at_runtimeInfoRemoved(const QnPeerRuntimeInfo& data)
@@ -213,5 +273,15 @@ void QnLiteClientControllerPrivate::at_runtimeInfoRemoved(const QnPeerRuntimeInf
     if (data.data.videoWallInstanceGuid != serverId)
         return;
 
-    setClientState(QnLiteClientController::State::Stopped);
+    setClientStopResult(true);
+}
+
+void QnLiteClientControllerPrivate::at_startStopTimer_timeout()
+{
+    Q_Q(QnLiteClientController);
+
+    if (clientState == QnLiteClientController::State::Starting)
+        setClientStartResult(false);
+    else if (clientState == QnLiteClientController::State::Stopping)
+        setClientStopResult(false);
 }
