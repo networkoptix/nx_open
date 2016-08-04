@@ -3575,15 +3575,21 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDat
 }
 
 //getUserGroups
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserGroupDataList& result)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserGroupDataList& result)
 {
+    QString filterStr;
+    if (!id.isNull())
+        filterStr = QString("WHERE id = %1").arg(guidToSqlString(id));
+
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    const QString queryStr = R"(
+    const QString queryStr = lit(R"(
         SELECT id, name, permissions
         FROM vms_user_groups
+        %1
         ORDER BY id
-    )";
+    )").arg(filterStr);
+
     if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return ErrorCode::dbError;
 
@@ -3959,14 +3965,14 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     db_load(data.cameras);
     db_load(data.cameraUserAttributesList);
     db_load(data.users);
-    db_load(data.userGroups);
+    db_load_uuid(data.userGroups);
     db_load(data.layouts);
     db_load(data.videowalls);
     db_load(data.webPages);
     db_load(data.rules);
     db_load(data.cameraHistory);
     db_load(data.licenses);
-    db_load(data.discoveryData);
+    db_load_uuid(data.discoveryData);
     db_load_uuid(data.allProperties);
     db_load_uuid(data.storages);
     db_load_uuid(data.resStatusList);
@@ -3978,10 +3984,14 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t &, ApiDiscoveryDataList &data) {
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList &data) {
     QSqlQuery query(m_sdb);
 
-    QString q = QString(lit("SELECT server_id as id, url, ignore from vms_mserver_discovery"));
+    QString filterStr;
+    if (!id.isNull())
+        filterStr = QString("WHERE server_id = %1").arg(guidToSqlString(id));
+
+    QString q = QString(lit("SELECT server_id as id, url, ignore from vms_mserver_discovery %1 ORDER BY server_id").arg(filterStr));
     query.setForwardOnly(true);
     query.prepare(q);
 

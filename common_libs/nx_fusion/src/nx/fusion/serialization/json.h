@@ -31,6 +31,11 @@ struct StorageInstance
 
 class QnJsonContext: public QnSerializationContext<QnJsonSerializer>
 {
+public:
+    bool areSomeFieldsNotFound() const { return m_someFieldsNotFound; }
+    void setSomeFieldsNotFound(bool value) { m_someFieldsNotFound = value; }
+private:
+    bool m_someFieldsNotFound{false};
 };
 
 class QnJsonSerializer:
@@ -48,6 +53,13 @@ class QnDefaultJsonSerializer: public QnDefaultContextSerializer<T, QnJsonSerial
 };
 
 namespace QJson {
+
+inline QByteArray serialize(const QJsonValue &value)
+{
+    QByteArray result;
+    QJsonDetail::serialize_json(value, &result);
+    return result;
+}
 
 /**
  * Serialize the given value into intermediate JSON representation.
@@ -215,6 +227,31 @@ bool deserialize(const QByteArray& value, T* target)
 {
     QnJsonContext ctx;
     return QJson::deserialize(&ctx, value, target);
+}
+
+/**
+* Deserialize a value from a JSON utf-8-encoded string, allowing for omitted values.
+* @param value JSON string to deserialize.
+* @param outIncompleteJsonValue Returned when some values were omitted.
+* @return Whether no deserialization errors occurred, except for possible omitted values.
+*/
+template<class T>
+bool deserializeAllowingOmittedValues(const QByteArray& value, T* target,
+    boost::optional<QJsonValue>* outIncompleteJsonValue)
+{
+    QJsonValue jsonValue;
+    if(!QJsonDetail::deserialize_json(value, &jsonValue))
+        return false;
+    QnJsonContext ctx;
+
+    bool result = QJson::deserialize(&ctx, jsonValue, target);
+
+    if (ctx.areSomeFieldsNotFound())
+        *outIncompleteJsonValue = jsonValue;
+    else
+        *outIncompleteJsonValue = boost::none;
+
+    return result;
 }
 
 /**
