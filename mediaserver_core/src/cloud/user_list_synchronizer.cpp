@@ -7,7 +7,6 @@
 
 #include <api/global_settings.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
