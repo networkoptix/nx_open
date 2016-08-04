@@ -265,6 +265,20 @@ void QnRtspConnectionProcessor::notifyMediaRangeUsed(qint64 timestampUsec)
     d->lastMediaPacketTime = timestampUsec;
 }
 
+bool QnRtspConnectionProcessor::hasAccessToResource(
+    const QnUuid& authUserId,
+    const QnResourcePtr& mediaResource,
+    Qn::Permission permissions) const
+{
+    if (authUserId == Qn::kSystemAccess.userId)
+        return true;
+
+    auto userResource = qnResPool->getResourceById(authUserId).dynamicCast<QnUserResource>();
+    if (!userResource)
+        return false;
+    return qnResourceAccessManager->hasPermission(userResource, mediaResource, Qn::ReadPermission);
+}
+
 void QnRtspConnectionProcessor::parseRequest()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -287,12 +301,10 @@ void QnRtspConnectionProcessor::parseRequest()
                 resource = qnResPool->getResourceByMacAddress(resId);
         }
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
-        auto userResource = qnResPool->getResourceById(d->authUserId).dynamicCast<QnUserResource>();
-        if (!userResource || !qnResourceAccessManager->hasPermission(userResource, resource, Qn::ReadPermission))
-        {
-            d->peerHasAccess = false;
+
+        d->peerHasAccess = hasAccessToResource(d->authUserId, resource, Qn::ReadPermission);
+        if (!d->peerHasAccess)
             return;
-        }
     }
 
     if (!nx_http::getHeaderValue(d->request.headers, Qn::EC2_INTERNAL_RTP_FORMAT).isNull())
@@ -1515,33 +1527,6 @@ void QnRtspConnectionProcessor::run()
         readRequest();
 
     parseRequest();
-    bool authOK = false;
-    if( MSSettings::roSettings()->value("authenticationEnabled").toBool() )
-    {
-        for (int i = 0; i < 3 && !m_needStop; ++i)
-        {
-            if(qnAuthHelper->authenticate(d->request, d->response) != Qn::Auth_OK)
-            {
-                sendResponse(CODE_AUTH_REQUIRED, QByteArray());
-                if (readRequest())
-                    parseRequest();
-                else {
-                    authOK = false;
-                    break;
-                }
-            }
-            else {
-                authOK = true;
-                break;
-            }
-        }
-        if (!authOK)
-            return;
-    }
-    else
-    {
-        authOK = true;
-    }
 
     if (!d->peerHasAccess)
     {
