@@ -4,8 +4,8 @@
 
 #include <QtCore/QDir>
 
-#include "utils/common/util.h"
-
+#include <nx/utils/random.h>
+#include <utils/common/util.h>
 
 QIODevice* QnQtFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
@@ -90,7 +90,9 @@ qint64 QnQtFileStorageResource::getFileSize(const QString& url) const
 
 bool QnQtFileStorageResource::initOrUpdate() const
 {
-    QString tmpDir = closeDirPath(getUrl()) + QLatin1String("tmp") + QString::number(qrand());
+    QString tmpDir = closeDirPath(getUrl()) + QLatin1String("tmp")
+        + QString::number(nx::utils::random::number<uint>());
+
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);

@@ -920,7 +920,7 @@
                 <rdep.target>bpi</rdep.target>
                 <gcc.version>4.8.3</gcc.version>
                 <qt.spec/>
-                <target.arch>armhf</target.arch>                
+                <target.arch>armhf</target.arch>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -953,7 +953,7 @@
                 <rdep.target>tx1</rdep.target>
                 <gcc.version>4.8.4</gcc.version>
                 <qt.spec/>
-                <target.arch>armhf</target.arch>                
+                <target.arch>armhf</target.arch>
             </properties>
             <modules>
                 <module>client/libclient_core</module>
@@ -964,7 +964,7 @@
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>debsetup/client-deb</module>
-                <module>debsetup/mediaserver-deb</module>                
+                <module>debsetup/mediaserver-deb</module>
             </modules>
         </profile>
         <profile>
@@ -1147,7 +1147,6 @@
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>
                 <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>
-                <ffmpeg.version>3.0.0</ffmpeg.version>
                 <compile.option1/>
                 <rdep.target>ios</rdep.target>
             </properties>
@@ -1182,8 +1181,25 @@
                 </property>
             </activation>
             <modules>
-                <module>unit_tests</module>           
+                <module>unit_tests</module>
                 <module>unit_tests_run</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>unit-tests-build-only</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>utb</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <modules>
+                <module>unit_tests</module>
             </modules>
         </profile>
     </profiles>

@@ -17,7 +17,7 @@ namespace {
     constexpr const char kMagicBytes[] = {'h', 'z'};
     constexpr const int kNonceTrailerLength =
         sizeof(kMagicBytes) + kNonceTrailingRandomByteCount;
-    constexpr const std::chrono::seconds kGetNonceRetryTimeout = std::chrono::seconds(5);
+    constexpr const std::chrono::seconds kGetNonceRetryTimeout = std::chrono::minutes(1);
 }
 
 CdbNonceFetcher::CdbNonceFetcher(

@@ -1,16 +1,11 @@
-/**********************************************************
-* Oct 16, 2015
-* akolesnikov
-***********************************************************/
-
 #include <gtest/gtest.h>
 
 #include <chrono>
 
 #include <nx/streaming/video_data_packet.h>
-#include <utils/media/media_stream_cache.h>
+#include <nx/utils/random.h>
 #include <streaming/hls/hls_live_playlist_manager.h>
-
+#include <utils/media/media_stream_cache.h>
 
 TEST(hls_LivePlaylistManager, general)
 {
@@ -29,7 +24,7 @@ TEST(hls_LivePlaylistManager, general)
     nx_hls::HLSLivePlaylistManager hlsPlaylistManager(&mediaCache, targetDuration.count());
 
     microseconds totalTimestampChange(0);
-    const microseconds startTimestamp(rand());
+    const microseconds startTimestamp(nx::utils::random::number(0));
     int curGopSize = gopSizeFrames;
 
     for (microseconds curTimestamp = startTimestamp;

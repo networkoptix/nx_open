@@ -59,7 +59,7 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnU
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::isOwner(userId))
+    if (!QnPermissionsHelper::hasOwnerPermissions(userId))
         return QnPermissionsHelper::notOwnerError(result);
 
 

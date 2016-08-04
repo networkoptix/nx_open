@@ -905,7 +905,7 @@ boost::optional<SocketAddress> AddressBinder::random(const SocketAddress& key) c
     if (it == m_map.end() || it->second.size() == 0)
         return boost::none;
 
-    return *std::next(it->second.begin(), rand() % it->second.size());
+    return nx::utils::random::choice(it->second);
 }
 
 MultipleClientSocketTester::MultipleClientSocketTester(AddressBinder* addressBinder)

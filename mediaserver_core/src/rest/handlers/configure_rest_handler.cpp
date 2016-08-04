@@ -106,7 +106,7 @@ int QnConfigureRestHandler::execute(
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::isOwner(owner->authUserId()))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->authUserId()))
         return QnPermissionsHelper::notOwnerError(result);
 
     QString errStr;

@@ -1,4 +1,5 @@
 #include "rtp_stream_provider.h"
+#include <core/resource/camera_resource.h>
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -37,6 +38,11 @@ CameraDiagnostics::Result QnRtpStreamReader::openStreamInternal(bool isCameraCon
     //m_rtpReader.setRequest("stream1");
     m_rtpReader.setRole(getRole());
     m_rtpReader.setRequest(m_request);
+
+	auto virtRes = m_resource.dynamicCast<QnVirtualCameraResource>();
+
+	if (virtRes)
+		virtRes->updateSourceUrl(m_rtpReader.getCurrentStreamUrl(), getRole());
 
     return m_rtpReader.openStream();
 }

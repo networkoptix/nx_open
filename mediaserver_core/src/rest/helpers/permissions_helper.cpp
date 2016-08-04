@@ -13,6 +13,7 @@
 
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/log/log.h>
+#include "core/resource_management/user_access_data.h"
 
 bool QnPermissionsHelper::isSafeMode()
 {
@@ -28,8 +29,11 @@ int QnPermissionsHelper::safeModeError(QnRestResult &result)
     return nx_http::StatusCode::forbidden;
 }
 
-bool QnPermissionsHelper::isOwner(const QnUuid& id)
+bool QnPermissionsHelper::hasOwnerPermissions(const QnUuid& id)
 {
+    if (id == Qn::kSystemAccess.userId)
+        return true; //< serve auth key authrozation
+
     auto userResource = qnResPool->getResourceById<QnUserResource>(id);
     return userResource && userResource->isOwner();
 }

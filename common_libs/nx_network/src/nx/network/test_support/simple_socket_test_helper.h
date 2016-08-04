@@ -6,6 +6,7 @@
 
 #include <nx/network/abstract_socket.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/sync_queue.h>
@@ -518,7 +519,7 @@ void socketShutdown(
         //if (i == 0)
         {
             //giving client thread some time to call client->recv
-            std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(nx::utils::random::number(0, 500)));
             //testing that shutdown interrupts recv call
             client->shutdown();
         }

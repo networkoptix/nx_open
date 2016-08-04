@@ -71,6 +71,7 @@ QnMulticodecRtpReader::~QnMulticodecRtpReader()
 void QnMulticodecRtpReader::setRequest(const QString& request)
 {
     m_request = request;
+    calcStreamUrl();
 }
 
 void QnMulticodecRtpReader::clearKeyData(int channelNum)
@@ -440,22 +441,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
     const QnNetworkResource* nres = dynamic_cast<QnNetworkResource*>(getResource().data());
 
-    QString url;
-    if (m_request.length() > 0)
-    {
-        if (m_request.startsWith(QLatin1String("rtsp://"))) {
-            url = m_request;
-        }
-        else 
-        {
-            QTextStream(&url) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
-            if (!m_request.startsWith(QLatin1Char('/')))
-                url += QLatin1Char('/');
-            url += m_request;;
-        }
-    }
-    else
-        QTextStream( &url ) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
+    calcStreamUrl();
 
     m_RtpSession.setAuth(nres->getAuth(), m_prefferedAuthScheme);
 
@@ -463,7 +449,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_gotKeyDataInfo.clear();
     m_gotData = false;
 
-    const CameraDiagnostics::Result result = m_RtpSession.open(url);
+    const CameraDiagnostics::Result result = m_RtpSession.open(m_currentStreamUrl);
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
 
@@ -535,7 +521,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_rtcpReportTimer.restart();
     if (!audioExist && !videoExist) {
         m_RtpSession.stop();
-        return CameraDiagnostics::NoMediaTrackResult( url );
+        return CameraDiagnostics::NoMediaTrackResult( m_currentStreamUrl );
     }
     m_rtpStarted = true;
     return CameraDiagnostics::NoErrorResult();
@@ -597,6 +583,52 @@ QnConstResourceVideoLayoutPtr QnMulticodecRtpReader::getVideoLayout() const
 void QnMulticodecRtpReader::setUserAgent(const QString& value)
 {
     m_RtpSession.setUserAgent(value);
+}
+
+QString QnMulticodecRtpReader::getCurrentStreamUrl() const
+{
+    return m_currentStreamUrl;
+}
+
+void QnMulticodecRtpReader::calcStreamUrl()
+{
+    QString url;
+    auto res = getResource();
+    QnNetworkResourcePtr nres;
+
+    m_currentStreamUrl.clear();
+
+    if (res)
+        nres = res.dynamicCast<QnNetworkResource>();
+    else
+        return;
+
+    if (!nres)
+        return;
+
+    if (m_request.length() > 0)
+    {
+        if (m_request.startsWith(QLatin1String("rtsp://")))
+        {
+            m_currentStreamUrl = m_request;
+        }
+        else 
+        {
+            QTextStream(&m_currentStreamUrl) 
+                << "rtsp://" 
+                << nres->getHostAddress() << ":" 
+                << nres->mediaPort();
+
+            if (!m_request.startsWith(QLatin1Char('/')))
+                m_currentStreamUrl += QLatin1Char('/');
+
+            m_currentStreamUrl += m_request;;
+        }
+    }
+    else
+    {
+        QTextStream(&m_currentStreamUrl) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
+    }
 }
 
 #endif // ENABLE_DATA_PROVIDERS

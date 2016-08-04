@@ -54,6 +54,7 @@ extern "C"
 #include <streaming/streaming_params.h>
 #include <media_server/settings.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 
 class QnTcpListener;
 
@@ -417,7 +418,7 @@ void QnRtspConnectionProcessor::generateSessionId()
 {
     Q_D(QnRtspConnectionProcessor);
     d->sessionId = QString::number((unsigned long) d->socket.data());
-    d->sessionId += QString::number(rand());
+    d->sessionId += QString::number(nx::utils::random::number(0));
 }
 
 

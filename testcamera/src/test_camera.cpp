@@ -3,6 +3,7 @@
 
 #include <QDebug>
 
+#include <nx/utils/random.h>
 #include "nx/streaming/media_data_packet.h"
 #include "plugins/resource/avi/avi_resource.h"
 #include "plugins/resource/avi/avi_archive_delegate.h"
@@ -80,7 +81,6 @@ QnTestCamera::QnTestCamera(quint32 num): m_num(num)
     m_isEnabled = true;
     m_offlineDuration = 0;
     m_checkTimer.restart();
-    srand(QDateTime::currentMSecsSinceEpoch());
 }
 
 QByteArray QnTestCamera::getMac() const
@@ -226,11 +226,11 @@ void QnTestCamera::makeOfflineFlood()
         }
     }
 
-    if (m_isEnabled && (rand() % 100 < m_offlineFreq))
+    if (m_isEnabled && (nx::utils::random::number(0, 99) < m_offlineFreq))
     {
         m_isEnabled = false;
         m_offlineTimer.restart();
-        m_offlineDuration = 2000 + (rand() % 2000);
+        m_offlineDuration = nx::utils::random::number(2000, 4000);
     }
 
 }

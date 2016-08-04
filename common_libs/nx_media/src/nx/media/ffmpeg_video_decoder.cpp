@@ -267,6 +267,7 @@ int FfmpegVideoDecoder::decode(
     QSize frameSize(d->frame->width, d->frame->height);
     AVPixelFormat pixelFormat = (AVPixelFormat) d->frame->format;
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
+    int frameNum = d->frame->coded_picture_number;
 
     auto qtPixelFormat = toQtPixelFormat(pixelFormat);
     if (qtPixelFormat == QVideoFrame::Format_Invalid)
@@ -278,7 +279,7 @@ int FfmpegVideoDecoder::decode(
     videoFrame->setStartTime(startTimeMs);
 
     outDecodedFrame->reset(videoFrame);
-    return d->frame->coded_picture_number;
+    return frameNum;
 }
 
 void FfmpegVideoDecoder::setMaxResolution(const QSize& maxResolution)
