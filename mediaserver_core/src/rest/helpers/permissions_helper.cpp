@@ -31,7 +31,7 @@ int QnPermissionsHelper::safeModeError(QnRestResult &result)
 
 bool QnPermissionsHelper::hasOwnerPermissions(const QnUuid& id)
 {
-    if (id == Qn::kDefaultUserAccess.userId)
+    if (id == Qn::kSystemAccess.userId)
         return true; //< serve auth key authrozation
 
     auto userResource = qnResPool->getResourceById<QnUserResource>(id);
