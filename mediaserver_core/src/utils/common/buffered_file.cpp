@@ -41,16 +41,15 @@ QueueFileWriter::~QueueFileWriter()
 
 qint64 QueueFileWriter::writeRanges(QBufferedFile* file, std::vector<QnMediaCyclicBuffer::Range> ranges)
 {
-    if (m_needStop)
-        return -1;
-
     FileBlockInfo fb(file);
     fb.ranges = std::move(ranges);
 
 #if 1
     QnMutexLocker lock(&fb.mutex);
-    putData(&fb);
-    fb.condition.wait(&fb.mutex);
+    if (putData(&fb))
+        fb.condition.wait(&fb.mutex);
+    else
+        return -1;
 #else
     // use native NCQ
     for (const auto& range: fb.ranges) {
@@ -73,11 +72,15 @@ void QueueFileWriter::removeOldWritingStatistics(qint64 currentTime)
     }
 }
 
-void QueueFileWriter::putData(FileBlockInfo* fb)
+bool QueueFileWriter::putData(FileBlockInfo* fb)
 {
     QnMutexLocker lock(&m_dataMutex);
+    if (m_needStop)
+        return false;
+
     m_dataQueue.push_back(fb);
     m_dataWaitCond.wakeAll();
+    return true;
 }
 
 QueueFileWriter::FileBlockInfo* QueueFileWriter::popData()
