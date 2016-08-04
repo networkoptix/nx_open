@@ -185,9 +185,9 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     {
         QnTreeView* tree = static_cast<QnTreeView*>(sender());
         QAbstractItemModel* model = tree->model();
-        int column = tree == ui->controlsTreeView
-            ? QnResourceListModel::CheckColumn
-            : QnAccessibleResourcesModel::CheckColumn;
+        int column = (tree == ui->controlsTreeView)
+            ? static_cast<int>(QnResourceListModel::CheckColumn)
+            : static_cast<int>(QnAccessibleResourcesModel::CheckColumn);
         QModelIndex checkboxIdx = index.sibling(index.row(), column);
         int newCheckValue = checkboxIdx.data(Qt::CheckStateRole).toInt() != Qt::Checked ? Qt::Checked : Qt::Unchecked;
         model->setData(checkboxIdx, newCheckValue, Qt::CheckStateRole);
@@ -200,9 +200,9 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     {
         QnTreeView* tree = static_cast<QnTreeView*>(sender());
         QAbstractItemModel* model = tree->model();
-        int column = tree == ui->controlsTreeView
-            ? QnResourceListModel::CheckColumn
-            : QnAccessibleResourcesModel::CheckColumn;
+        int column = (tree == ui->controlsTreeView)
+            ? static_cast<int>(QnResourceListModel::CheckColumn)
+            : static_cast<int>(QnAccessibleResourcesModel::CheckColumn);
         QModelIndex checkboxIdx = index.sibling(index.row(), column);
         QModelIndexList selectedRows = tree->selectionModel()->selectedRows(column);
         selectedRows << checkboxIdx;
