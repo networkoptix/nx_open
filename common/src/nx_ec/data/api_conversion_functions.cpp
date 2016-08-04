@@ -166,15 +166,15 @@ void fromApiToResource(const ApiCameraData& src, QnVirtualCameraResourcePtr& dst
 
     dst->setVendor(src.vendor);
 
-    /* Validate camera unique id */
-    const auto dId = dst->getId();
-    const auto dUid = dst->getUniqueId();
-    const auto uidToId = QnVirtualCameraResource::uniqueIdToId(dUid);
-    if (dId == uidToId)
+    // Validate camera unique id
+    const auto dstId = dst->getId();
+    const auto dstUid = dst->getUniqueId();
+    const auto uidToId = QnVirtualCameraResource::uniqueIdToId(dstUid);
+    if (dstId == uidToId)
         return;
 
-    QString message = lit("Camera id != unique id: id = %1;uniqueId = %2;uniqueIdToId = %3;")
-        .arg(dId.toString()).arg(dUid).arg(uidToId.toString());
+    QString message = lit("Malformed camera id: id = %1; uniqueId = %2; uniqueIdToId = %3")
+        .arg(dstId.toString()).arg(dstUid).arg(uidToId.toString());
     NX_ASSERT(false, "fromApiToResource()", message);
 }
 

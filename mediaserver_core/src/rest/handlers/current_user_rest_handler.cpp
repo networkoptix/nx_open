@@ -22,15 +22,15 @@ int QnCurrentUserRestHandler::executeGet(const QString &, const QnRequestParams&
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     ec2::ApiUserDataList users;
-    ec2::ErrorCode ecode = 
+    ec2::ErrorCode errCode =
         ec2Connection->getUserManager(Qn::UserAccessData(userId))
                      ->getUsersSync(&users);
-    if (ecode !=  ec2::ErrorCode::ok)
+    if (errCode !=  ec2::ErrorCode::ok)
     {
-        if (ecode == ec2::ErrorCode::forbidden)
+        if (errCode == ec2::ErrorCode::forbidden)
         {
             result.setError(
-                QnJsonRestResult::Forbidden, 
+                QnJsonRestResult::Forbidden,
                 lit("Forbidden"));
             return nx_http::StatusCode::forbidden;
         }

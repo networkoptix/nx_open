@@ -120,7 +120,7 @@ void QnTransactionTransport::default_initializer()
     m_tcpKeepAliveTimeout = QnGlobalSettings::instance()->connectionKeepAliveTimeout();
     m_keepAliveProbeCount = QnGlobalSettings::instance()->keepAliveProbeCount();
     m_idleConnectionTimeout = m_tcpKeepAliveTimeout * m_keepAliveProbeCount;
-    m_userAccessData = Qn::kDefaultUserAccess;
+    m_userAccessData = Qn::kSystemAccess;
 }
 
 QnTransactionTransport::QnTransactionTransport(const QnUuid& connectionGuid,
@@ -1450,7 +1450,7 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
         return false;
 
     /* Check if remote peer has rights to receive transaction */
-	if (m_userAccessData.userId != Qn::kDefaultUserAccess.userId)
+	if (m_userAccessData.userId != Qn::kSystemAccess.userId)
 	{
 		NX_LOG(
 			QnLog::EC2_TRAN_LOG,

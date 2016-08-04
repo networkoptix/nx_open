@@ -1,19 +1,27 @@
-#ifndef __USER_ACCESS_DATA_H__
-#define __USER_ACCESS_DATA_H__
+#pragma once
 
 #include <nx/utils/uuid.h>
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/literal.h>
 
-namespace Qn
-{
+namespace Qn {
+
+/** Helper class to grant additional permissions (on the server side only). */
 struct UserAccessData
 {
-    QnUuid userId;
+    enum class Access
+    {
+        Default,            /**< Default access rights. All permissions are checked as usual. */
+        ReadAllResources,   /**< Read permission on all resources is granted additionally. */
+        System              /**< Full permissions on all transactions. */
+    };
 
-    UserAccessData() {}
-    explicit UserAccessData(const QnUuid &userId) : userId(userId) {}
+    QnUuid userId;
+    Access access;
+
+    UserAccessData();
+    explicit UserAccessData(const QnUuid& userId, Access access = Access::Default);
 
     UserAccessData(const UserAccessData &other) = default;
 
@@ -22,7 +30,7 @@ struct UserAccessData
 
 inline bool operator == (const UserAccessData &lhs, const UserAccessData &rhs)
 {
-    return lhs.userId == rhs.userId;
+    return lhs.userId == rhs.userId && lhs.access == rhs.access;
 }
 
 inline bool operator != (const UserAccessData &lhs, const UserAccessData &rhs)
@@ -30,14 +38,7 @@ inline bool operator != (const UserAccessData &lhs, const UserAccessData &rhs)
     return ! operator == (lhs, rhs);
 }
 
-QnUserResourcePtr getUserResourceByAccessData(const UserAccessData &userAccessData);
+const UserAccessData kSystemAccess(QnUuid(lit("{BC292159-2BE9-4E84-A242-BC6122B315E4}")), UserAccessData::Access::System);
+const UserAccessData kVideowallUserAccess(QnUuid(lit("{1044D2A5-639D-4C49-963E-C03898D0C113}")), UserAccessData::Access::ReadAllResources);
 
-/**
-* Default kDefaultUserAccess for server side is superuser.
-* For client side kDefaultUserAccess is not taken into account.
-*/
-const UserAccessData kDefaultUserAccess(QnUuid(lit("{BC292159-2BE9-4E84-A242-BC6122B315E4}")));
-const UserAccessData kVideowallUserAccess(QnUuid(lit("{1044D2A5-639D-4C49-963E-C03898D0C113}")));
 }
-
-#endif // __USER_ACCESS_DATA_H__

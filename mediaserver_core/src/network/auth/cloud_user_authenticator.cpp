@@ -431,7 +431,7 @@ QnUserResourcePtr CloudUserAuthenticator::createCloudUser(
     if (userName == qnGlobalSettings->cloudAccountName())
         userData.isAdmin = true;
     bool result = QnAppServerConnectionFactory::getConnection2()
-        ->getUserManager(Qn::kDefaultUserAccess)->save(
+        ->getUserManager(Qn::kSystemAccess)->save(
             userData, QnUuid::createUuid().toString(),  //using random password because cloud account password is used to authenticate request
             ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     auto resource = ec2::fromApiToResource(userData);

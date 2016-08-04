@@ -25,7 +25,7 @@ QnStoredFileDataProvider::QnStoredFileDataProvider(const QString &filePath, int 
         this, &QnStoredFileDataProvider::fileLoaded,
         this, &QnStoredFileDataProvider::at_fileLoaded);
 
-    connection->getStoredFileManager(Qn::kDefaultUserAccess)->getStoredFile(
+    connection->getStoredFileManager(Qn::kSystemAccess)->getStoredFile(
         m_filePath,
         this,
         [this](int handle, ec2::ErrorCode errorCode, const QByteArray& fileData)

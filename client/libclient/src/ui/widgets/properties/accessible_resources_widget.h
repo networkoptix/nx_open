@@ -40,6 +40,8 @@ private:
     void initControlsModel();
     void initResourcesModel();
 
+    void at_itemViewKeyPress(QObject* watched, QEvent* event);
+
     void updateThumbnail(const QModelIndex& index = QModelIndex());
 
 signals:

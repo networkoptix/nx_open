@@ -16,13 +16,6 @@
 #include <utils/common/id.h>
 #include <utils/common/connective.h>
 
-class QnResourceModelPrivate;
-class QnResourcePool;
-class QnVideoWallItem;
-class QnVideoWallMatrix;
-class QnWorkbenchContext;
-class QnWorkbenchLayoutSnapshotManager;
-
 class QnResourceTreeModelCustomColumnDelegate;
 
 class QnResourceTreeModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware
@@ -66,11 +59,18 @@ public:
 private:
     QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
+    /** Calculate real children as node's children() method does not return bastard nodes. */
+    QList<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node, bool recursive = false) const;
+
     QnResourceTreeModelNodePtr ensureResourceNode(const QnResourcePtr& resource);
     QnResourceTreeModelNodePtr ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType = Qn::LayoutItemNode);
     QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode, const QString &groupId, const QString &groupName);
     QnResourceTreeModelNodePtr ensureSystemNode(const QString &systemName);
-    QnResourceTreeModelNodePtr ensureSharedLayoutNode(const QnResourceTreeModelNodePtr& parentNode, const QnLayoutResourcePtr& sharedLayout);
+    QnResourceTreeModelNodePtr ensureSharedLayoutNode(const QnUuid& owner, const QnLayoutResourcePtr& sharedLayout);
+    QnResourceTreeModelNodePtr ensureAccessibleResourceNode(const QnUuid& owner, const QnResourcePtr& resource);
+    QnResourceTreeModelNodePtr ensurePlaceholderNode(const QnUuid& owner, Qn::NodeType nodeType);
+    QnResourceTreeModelNodePtr ensureRoleNode(const QnUuid& roleId);
+
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
     QnResourceTreeModelNodePtr expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node);
@@ -78,13 +78,17 @@ private:
     void updateNodeParent(const QnResourceTreeModelNodePtr& node);
     void updateNodeResource(const QnResourceTreeModelNodePtr& node, const QnResourcePtr& resource);
 
+    /** Update 'All cameras' / 'Cameras and resources'/ etc per-user placeholder nodes. */
+    void updatePlaceholderNodesForUserOrRole(const QnUuid& id);
+
     void updateSharedLayoutNodes(const QnLayoutResourcePtr& layout);
     void updateSharedLayoutNodesForUser(const QnUserResourcePtr& user);
+    void updateAccessibleResourcesForUser(const QnUserResourcePtr& user);
 
     Qn::NodeType rootNodeTypeForScope() const;
 
-    /* Remove virtual 'system' nodes that are not used anymore. */
-    void cleanupSystemNodes();
+    /* Remove group nodes that are not used anymore. */
+    void cleanupGroupNodes(Qn::NodeType nodeType);
 
     /** Cleanup all node references. */
     void removeNode(const QnResourceTreeModelNodePtr& node);
@@ -154,8 +158,17 @@ private:
     /** Mapping for system nodes, by system name. */
     QHash<QString, QnResourceTreeModelNodePtr> m_systemNodeBySystemName;
 
-    /** Mapping of shared layouts links by parent node (user's) */
-    QHash<QnResourceTreeModelNodePtr, ResourceHash> m_sharedLayoutNodesByParent;
+    /** Mapping of placeholder nodes by owner (user or role). */
+    QHash<QnUuid, NodeList> m_placeholderNodesByOwner;
+
+    /** Mapping of role nodes by id. */
+    QHash<QnUuid, QnResourceTreeModelNodePtr> m_roleNodeById;
+
+    /** Mapping of shared layouts links by owner (user or role). */
+    QHash<QnUuid, ResourceHash> m_sharedLayoutNodesByOwner;
+
+    /** Mapping of accessible resources (cameras and web pages) by owner (user or role). */
+    QHash<QnUuid, ResourceHash> m_accessibleResourceNodesByOwner;
 
     /** Full list of all created nodes. */
     QList<QnResourceTreeModelNodePtr> m_allNodes;

@@ -298,7 +298,7 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
     , errorCode(QnCloudStatusWatcher::NoError)
     , updateTimer(new QTimer(this))
     , connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
-    , status(QnCloudStatusWatcher::Offline)
+    , status(QnCloudStatusWatcher::LoggedOut)
     , cloudSystems()
     , recentCloudSystems(qnClientCoreSettings->recentCloudSystems())
 {

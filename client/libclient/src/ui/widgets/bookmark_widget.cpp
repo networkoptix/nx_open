@@ -4,6 +4,7 @@
 #include <core/resource/camera_bookmark.h>
 
 #include <ui/style/custom_style.h>
+#include <ui/utils/validators.h>
 
 namespace {
     const int defaultTimeoutIdx = 0;
@@ -11,7 +12,8 @@ namespace {
 
 QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
     QWidget(parent),
-    ui(new Ui::BookmarkWidget)
+    ui(new Ui::BookmarkWidget),
+    m_isValid(false)
 {
     ui->setupUi(this);
 
@@ -33,15 +35,15 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
         updateTagsList();
     });
 
-    connect(ui->nameLineEdit, &QLineEdit::textEdited, this, [this](const QString& text)
-    {
-        Q_UNUSED(text);
+    ui->nameInputField->setValidator(Qn::defaultNonEmptyValidator(tr("Name cannot be empty.")));
 
-        QPalette palette = this->palette();
-        if (!isValid())
-            setWarningStyle(&palette);
-        ui->nameLabel->setPalette(palette);
-        emit validChanged();
+    connect(ui->nameInputField, &QnInputField::textChanged, this, [this]()
+    {
+        bool wasValid = m_isValid;
+        m_isValid = ui->nameInputField->isValid();
+
+        if (wasValid != m_isValid)
+            emit validChanged();
     });
 
     // TODO: #3.0 #rvasilenko Remove when bookmark timeout will be implemented.
@@ -62,7 +64,7 @@ void QnBookmarkWidget::setTags(const QnCameraBookmarkTagList &tags) {
 }
 
 void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark) {
-    ui->nameLineEdit->setText(bookmark.name);
+    ui->nameInputField->setText(bookmark.name);
     ui->descriptionTextEdit->setPlainText(bookmark.description);
 
     QDateTime start = QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs);
@@ -83,7 +85,7 @@ void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark) {
 }
 
 void QnBookmarkWidget::submitData(QnCameraBookmark &bookmark) const {
-    bookmark.name = ui->nameLineEdit->text().trimmed();
+    bookmark.name = ui->nameInputField->text().trimmed();
     bookmark.description = ui->descriptionTextEdit->toPlainText().trimmed();
     bookmark.timeout = ui->timeoutComboBox->currentData().toLongLong();
     bookmark.tags = m_selectedTags;
@@ -91,7 +93,7 @@ void QnBookmarkWidget::submitData(QnCameraBookmark &bookmark) const {
 
 bool QnBookmarkWidget::isValid() const
 {
-    return !ui->nameLineEdit->text().trimmed().isEmpty();
+    return ui->nameInputField->isValid();
 }
 
 void QnBookmarkWidget::updateTagsList() {

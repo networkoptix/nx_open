@@ -310,7 +310,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             if (authUserId &&
                 qnResPool->getResourceById<QnMediaServerResource>(*authUserId))
             {
-                *authUserId = Qn::kDefaultUserAccess.userId;
+                *authUserId = Qn::kSystemAccess.userId;
                 auto itr = request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME);
                 if (itr != request.headers.end())
                 {
@@ -818,7 +818,7 @@ void QnAuthHelper::applyClientCalculatedPasswordHashToResource(
     fromResourceToApi(userResource, userData);
 
 
-    QnAppServerConnectionFactory::getConnection2()->getUserManager(Qn::kDefaultUserAccess)->save(
+    QnAppServerConnectionFactory::getConnection2()->getUserManager(Qn::kSystemAccess)->save(
         userData,
         QString(),
         ec2::DummyHandler::instance(),

@@ -151,6 +151,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
     QnLicenseList licenses;
     licenses << license;
     const ec2::ErrorCode errorCode = connect->getLicenseManager(Qn::UserAccessData(owner->authUserId()))->addLicensesSync(licenses);
+    NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if( errorCode != ec2::ErrorCode::ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error: %1").arg(ec2::toString(errorCode)));

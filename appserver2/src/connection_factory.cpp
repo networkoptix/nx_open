@@ -1421,7 +1421,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
         clientInfo.parentId = qnCommon->moduleGUID();
 
         ApiClientInfoDataList infos;
-        auto result = dbManager(Qn::kDefaultUserAccess).doQuery(clientInfo.id, infos);
+        auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infos);
         if (result != ErrorCode::ok)
             return result;
 
@@ -1433,7 +1433,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
         }
 
         QnTransaction<ApiClientInfoData> transaction(ApiCommand::saveClientInfo, clientInfo);
-        m_serverQueryProcessor.getAccess(Qn::kDefaultUserAccess).processUpdateAsync(
+        m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
             transaction,
             [&](ErrorCode result)
             {
@@ -1503,7 +1503,7 @@ ErrorCode Ec2DirectConnectionFactory::getSettings(
 {
     if(!detail::QnDbManager::instance())
         return ErrorCode::ioError;
-    return dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, *outData);
+    return dbManager(Qn::kSystemAccess).doQuery(nullptr, *outData);
 }
 
 template<class InputDataType>

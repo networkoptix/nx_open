@@ -47,7 +47,7 @@ public:
     explicit QnDrawEditLinkDelegate(QnItemViewHoverTracker* hoverTracker, QObject* parent = nullptr) :
         base_type(parent),
         m_hoverTracker(hoverTracker),
-        m_editIcon(qnSkin->icon("misc/user_edit.png"))
+        m_editIcon(qnSkin->icon("user_settings/user_edit.png"))
     {
         NX_ASSERT(m_hoverTracker);
     }

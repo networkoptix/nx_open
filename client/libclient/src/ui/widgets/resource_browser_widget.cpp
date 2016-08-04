@@ -409,6 +409,7 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const
             break;
             case Qn::ResourceNode:
             case Qn::SharedLayoutNode:
+            case Qn::AccessibleResourceNode:
             case Qn::EdgeNode:
             {
                 QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
@@ -583,11 +584,22 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
         Qn::NodeType parentNodeType = parentIndex.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
         /* We can select several layouts and some other resources in any part of tree - in this case just do not set anything. */
-        QnUserResourcePtr user = parentNodeType == Qn::ResourceNode
-            ? parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>()
-            : parentNodeType == Qn::LayoutsNode
-            ? context()->user()
-            : QnUserResourcePtr();
+        QnUserResourcePtr user;
+        switch (parentNodeType)
+        {
+            case Qn::LayoutsNode:
+                user = context()->user();
+                break;
+            case Qn::AccessibleResourcesNode:
+            case Qn::AccessibleLayoutsNode:
+                user = parentIndex.parent().data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+                break;
+            case Qn::ResourceNode:
+                user = parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+                break;
+            default:
+                break;
+        }
 
         result.setArgument(Qn::UserResourceRole, user);
         return result;

@@ -14,6 +14,7 @@
 #include <transaction/transaction.h>
 #include <rest/server/json_rest_result.h>
 #include <rest/server/rest_connection_processor.h>
+#include <http/custom_headers.h>
 #include <audit/audit_manager.h>
 
 #include "server_query_processor.h"
@@ -65,18 +66,30 @@ public:
         bool success = false;
         QByteArray srcFormat = srcBodyContentType.split(';')[0];
         Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(srcFormat);
+        const bool haveTransactionHeader =
+            (params.value(Qn::HAVE_TRANSACTION_HEADER_HEADER_NAME) == "true");
+
         switch (format)
         {
             case Qn::JsonFormat:
             {
                 contentType = "application/json";
-                tran.params = QJson::deserialized<RequestDataType>(
-                    body, RequestDataType(), &success);
-                QStringList tmp = path.split('/');
-                while (!tmp.isEmpty() && tmp.last().isEmpty())
-                    tmp.pop_back();
-                if (!tmp.isEmpty())
-                    tran.command = ApiCommand::fromString(tmp.last());
+
+                if (haveTransactionHeader)
+                {
+                    tran = QJson::deserialized<QnTransaction<RequestDataType>>(
+                        body, QnTransaction<RequestDataType>(), &success);
+                }
+                else
+                {
+                    tran.params = QJson::deserialized<RequestDataType>(
+                        body, RequestDataType(), &success);
+                    QStringList tmp = path.split('/');
+                    while (!tmp.isEmpty() && tmp.last().isEmpty())
+                        tmp.pop_back();
+                    if (!tmp.isEmpty())
+                        tran.command = ApiCommand::fromString(tmp.last());
+                }
                 break;
             }
             case Qn::UbjsonFormat:
@@ -128,7 +141,8 @@ public:
                 m_cond.wakeAll();
             };
         m_connection->queryProcessor()->getAccess(
-            Qn::UserAccessData(owner->authUserId())).processUpdateAsync(tran, queryDoneHandler);
+            Qn::UserAccessData(owner->authUserId())
+            ).processUpdateAsync(tran, queryDoneHandler);
 
         {
             QnMutexLocker lk(&m_mutex);
