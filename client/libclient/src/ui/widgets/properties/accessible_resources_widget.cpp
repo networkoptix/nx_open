@@ -35,6 +35,7 @@ const int kNoDataFontWeight = QFont::Light;
 const int kCameraNameFontPixelSize = 13;
 const int kCameraNameFontWeight = QFont::DemiBold;
 const int kCameraPreviewWidthPixels = 160;
+const int kCameraPreviewHeightPixels = 240;
 const QString kDummyResourceId(lit("dummy_resource"));
 
 } // anonymous namespace
@@ -67,6 +68,8 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     font.setWeight(kNoDataFontWeight);
     ui->previewWidget->setFont(font);
     ui->previewWidget->setThumbnailSize(QSize(kCameraPreviewWidthPixels, 0));
+    /* We cannot pass height to thumbnail manager as it will lose AR. */
+    ui->previewWidget->setMaximumHeight(kCameraPreviewHeightPixels);
     ui->previewWidget->hide();
 
     font.setPixelSize(kCameraNameFontPixelSize);
