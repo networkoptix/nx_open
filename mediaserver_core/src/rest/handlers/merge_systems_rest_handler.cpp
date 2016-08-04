@@ -39,6 +39,11 @@ namespace
 {
     const int requestTimeout = 60000;
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
+
+    bool isResponseOK(const nx_http::HttpClient& client)
+    {
+        return client.response()->statusLine.statusCode == nx_http::StatusCode::ok;
+    }
 }
 
 int QnMergeSystemsRestHandler::executeGet(
@@ -108,7 +113,7 @@ int QnMergeSystemsRestHandler::executeGet(
         requestUrl.setPath(lit("/api/moduleInformationAuthenticated"));
         requestUrl.setQuery(lit("showAddresses=true"));
 
-        if (!client.doGet(requestUrl))
+        if (!client.doGet(requestUrl) || !isResponseOK(client))
         {
             auto status = client.response()->statusLine.statusCode;
             NX_LOG(lit("QnMergeSystemsRestHandler. Error requesting url %1: %2")
@@ -273,8 +278,11 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
         ec2::ApiMediaServerData serverData;
         ec2::fromResourceToApi(server, serverData);
         const QByteArray serializedServerData = QJson::serialized(serverData);
-        if (!client.doPost(requestUrl, "application/json", serializedServerData))
+        if (!client.doPost(requestUrl, "application/json", serializedServerData) ||
+            !isResponseOK(client))
+        {
             return false;
+        }
     }
 
     /**
@@ -295,7 +303,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
             requestUrl.setPath(lit("/api/systemSettings"));
             requestUrl.setQuery(urlQuery);
 
-            if (!client.doGet(requestUrl))
+            if (!client.doGet(requestUrl) || !isResponseOK(client))
                 return false;
         }
     }
@@ -317,7 +325,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
         ec2::ApiUserData userData;
         ec2::fromResourceToApi(admin, userData);
         const QByteArray saveUserData = QJson::serialized(userData);
-        if (!client.doPost(requestUrl, "application/json", saveUserData))
+        if (!client.doPost(requestUrl, "application/json", saveUserData) || !isResponseOK(client))
             return false;
     }
 
@@ -337,7 +345,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
             urlQuery += lit("&wholeSystem=true");
         requestUrl.setQuery(urlQuery);
 
-        if (!client.doGet(requestUrl))
+        if (!client.doGet(requestUrl) || !isResponseOK(client))
             return false;
     }
 
@@ -366,7 +374,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
             requestUrl.setUserName(admin->getName());
             requestUrl.setPassword(remoteAdminPassword);
             requestUrl.setPath(lit("/ec2/getUsers"));
-            if (!client.doGet(requestUrl))
+            if (!client.doGet(requestUrl) || !isResponseOK(client))
             {
                 auto status = client.response()->statusLine.statusCode;
                 NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to invoke /ec2/getUsers: %1")
@@ -383,7 +391,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
             requestUrl.setPassword(remoteAdminPassword);
             requestUrl.setPath(lit("/api/ping"));
 
-            if (!client.doGet(requestUrl))
+            if (!client.doGet(requestUrl) || !isResponseOK(client))
             {
                 auto status = client.response()->statusLine.statusCode;
                 NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to invoke /api/ping: %1")
@@ -407,7 +415,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
             requestUrl.setPassword(remoteAdminPassword);
             requestUrl.setPath(lit("/api/backupDatabase"));
 
-            if (!client.doGet(requestUrl))
+            if (!client.doGet(requestUrl) || !isResponseOK(client))
             {
                 auto status = client.response()->statusLine.statusCode;
                 NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to invoke /api/backupDatabase: %1")
