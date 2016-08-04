@@ -123,6 +123,9 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     //crash can result in unsynchronized unrecoverable state: there
     //is some system in cloud, but system does not know its credentials
     //and there is no way to find them out
+    typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
+        (std::function<void(api::ResultCode, api::NonceData)>);
+
     auto cloudConnection = m_cloudConnectionManager.getCloudConnection(
         data.cloudSystemID, data.cloudAuthKey);
     api::ResultCode cdbResultCode = api::ResultCode::ok;
@@ -130,7 +133,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     std::tie(cdbResultCode, nonceData) =
         makeSyncCall<api::ResultCode, api::NonceData>(
             std::bind(
-                &api::AuthProvider::getCdbNonce,
+                static_cast<GetCdbNonceType>(&api::AuthProvider::getCdbNonce),
                 cloudConnection->authProvider(),
                 std::placeholders::_1));
 

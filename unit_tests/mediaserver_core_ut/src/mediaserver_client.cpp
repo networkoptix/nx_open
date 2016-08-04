@@ -24,6 +24,9 @@ void MediaServerClient::saveCloudSystemCredentials(
     const CloudCredentialsData& inputData,
     std::function<void(QnJsonRestResult)> completionHandler)
 {
+    //TODO #ak save client to container and remove in destructor
+    //TODO #ak create common code for adding more methods
+
     QUrl url(lit("http://%1/api/saveCloudSystemCredentials")
         .arg(m_mediaServerEndpoint.toString()));
     url.setUserName(m_userName);

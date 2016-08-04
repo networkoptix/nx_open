@@ -576,10 +576,10 @@ api::ResultCode CdbLauncher::getSystemSharings(
     const std::string& systemID,
     std::vector<api::SystemSharingEx>* const sharings)
 {
-    auto connection = connectionFactory()->createConnection(email, password);
-
     typedef void(nx::cdb::api::SystemManager::*GetCloudUsersOfSystemType)
         (const std::string&, std::function<void(api::ResultCode, api::SystemSharingExList)>);
+
+    auto connection = connectionFactory()->createConnection(email, password);
 
     api::ResultCode resCode = api::ResultCode::ok;
     api::SystemSharingExList data;
@@ -601,13 +601,16 @@ api::ResultCode CdbLauncher::getCdbNonce(
     const std::string& authKey,
     api::NonceData* const nonceData)
 {
+    typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
+        (std::function<void(api::ResultCode, api::NonceData)>);
+
     auto connection = connectionFactory()->createConnection(systemID, authKey);
 
     api::ResultCode resCode = api::ResultCode::ok;
     std::tie(resCode, *nonceData) =
         makeSyncCall<api::ResultCode, api::NonceData>(
             std::bind(
-                &nx::cdb::api::AuthProvider::getCdbNonce,
+                static_cast<GetCdbNonceType>(&nx::cdb::api::AuthProvider::getCdbNonce),
                 connection->authProvider(),
                 std::placeholders::_1));
     return resCode;

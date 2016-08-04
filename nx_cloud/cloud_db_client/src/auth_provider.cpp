@@ -7,6 +7,7 @@
 
 #include "cdb_request_path.h"
 #include "data/auth_data.h"
+#include "data/system_data.h"
 
 
 namespace nx {
@@ -24,6 +25,17 @@ void AuthProvider::getCdbNonce(
 {
     executeRequest(
         kAuthGetNoncePath,
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::NonceData()));
+}
+
+void AuthProvider::getCdbNonce(
+    const std::string& systemId,
+    std::function<void(api::ResultCode, api::NonceData)> completionHandler)
+{
+    executeRequest(
+        kAuthGetNoncePath,
+        api::SystemID(systemId),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::NonceData()));
 }
