@@ -14,7 +14,15 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
+#include <cloud/cloud_connection_manager.h>
 
+
+QnSaveCloudSystemCredentialsHandler::QnSaveCloudSystemCredentialsHandler(
+    const CloudConnectionManager& cloudConnectionManager)
+:
+    m_cloudConnectionManager(cloudConnectionManager)
+{
+}
 
 int QnSaveCloudSystemCredentialsHandler::executePost(
     const QString& /*path*/,
@@ -115,13 +123,8 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     //crash can result in unsynchronized unrecoverable state: there
     //is some system in cloud, but system does not know its credentials
     //and there is no way to find them out
-    std::unique_ptr<
-        api::ConnectionFactory,
-        decltype(&destroyConnectionFactory)
-    > cloudConnectionFactory(createConnectionFactory(), &destroyConnectionFactory);
-    auto cloudConnection = cloudConnectionFactory->createConnection(
-        data.cloudSystemID.toStdString(),
-        data.cloudAuthKey.toStdString());
+    auto cloudConnection = m_cloudConnectionManager.getCloudConnection(
+        data.cloudSystemID, data.cloudAuthKey);
     api::ResultCode cdbResultCode = api::ResultCode::ok;
     api::NonceData nonceData;
     std::tie(cdbResultCode, nonceData) =
@@ -152,7 +155,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
             result.setError(
                 QnJsonRestResult::CantProcessRequest,
                 tr("Could not connect to cloud: %1").
-                arg(QString::fromStdString(cloudConnectionFactory->toString(cdbResultCode))));
+                    arg(QString::fromStdString(nx::cdb::api::toString(cdbResultCode))));
             return nx_http::StatusCode::ok;
         }
     }

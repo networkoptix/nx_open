@@ -32,7 +32,7 @@ boost::optional<QString> createRandomDir();
 class WorkDirResource
 {
 public:
-    WorkDirResource();
+    WorkDirResource(const QString& path = QString());
     ~WorkDirResource();
     boost::optional<QString> getDirName() const;
 private:
