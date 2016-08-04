@@ -17,6 +17,4 @@ BOX_IP = {
 UT_BOX_IP = '192.168.97.2'
 
 #SKIP_ALL = set(('nx_network_ut', 'cloud_db_ut', 'mediaserver_core_ut',))
-SKIP_ALL = set()
-
 
