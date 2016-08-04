@@ -902,6 +902,7 @@ void Player::stop()
 
     d->dataConsumer.reset();
     d->archiveReader.reset();
+    d->videoFrameToRender.reset();
     d->setState(State::Stopped);
 }
 
@@ -913,6 +914,8 @@ void Player::setSource(const QUrl& url)
 
     if (newUrl != d->url)
     {
+        const auto currentState = d->state;
+
         stop();
         d->url = newUrl;
 
@@ -931,6 +934,9 @@ void Player::setSource(const QUrl& url)
         {
             d->resource = qnResPool->getResourceById(QnUuid(path));
         }
+
+        if (d->resource && currentState == State::Playing)
+            play();
     }
 }
 
