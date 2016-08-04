@@ -50,8 +50,6 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(Qn::PeerType peerType):
     // order.
     m_timeSynchronizationManager->start();
 
-    srand(::time(NULL));
-
     // TODO: #Elric #EC2 register in a proper place!
     // Registering ec2 types with Qt meta-type system.
     qRegisterMetaType<QnTransactionTransportHeader>("QnTransactionTransportHeader");

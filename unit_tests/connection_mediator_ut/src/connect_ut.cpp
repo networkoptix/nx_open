@@ -36,7 +36,6 @@ protected:
     {
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
-        m_address = SocketAddress(HostAddress::localhost, 10001 + (qrand() % 50000));
         listeningPeerRegistrator = std::make_unique<PeerRegistrator>(
             &cloud,
             &stunMessageDispatcher,
@@ -46,8 +45,11 @@ protected:
             false,
             SocketFactory::NatTraversalType::nttDisabled);
 
-        EXPECT_TRUE(server->bind(std::list< SocketAddress >(1, m_address)));
+        EXPECT_TRUE(server->bind(std::vector<SocketAddress>{SocketAddress::anyAddress}));
         EXPECT_TRUE(server->listen());
+
+        EXPECT_TRUE(server->endpoints().size());
+        m_address = server->endpoints().front();
         network::SocketGlobals::mediatorConnector().mockupAddress(m_address);
     }
 
@@ -105,15 +107,15 @@ TEST_F( ConnectTest, BindConnect )
         .arg(QString::fromUtf8(SERVER_ID)).arg(QString::fromUtf8(SYSTEM_ID));
 
     nx_http::HttpClient client;
-    if (nx::network::cloud::AddressResolver::kDoNotResolveOnMediator)
-    {
-        ASSERT_FALSE( client.doGet(address) );
-    }
-    else
+    if( nx::network::cloud::AddressResolver::kResolveOnMediator )
     {
         ASSERT_TRUE( client.doGet(address) );
         ASSERT_EQ( client.response()->statusLine.statusCode, nx_http::StatusCode::ok );
         ASSERT_EQ( client.fetchMessageBodyBuffer(), "test" );
+    }
+    else
+    {
+        ASSERT_FALSE( client.doGet(address) );
     }
 }
 

@@ -162,11 +162,12 @@ public:
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     /**
-     * Default (true): do not resolve on mediator, set cloud address in case of patter match pattern
-     *      match (DNS is not involved at all).
-     * Old-style (false): resolve on mediator to have a chanse to get direct IPs.
+     * true: resolve on mediator to have a chanse to get direct IPs, DNS is used in case if
+     *      mediator returned nothing.
+     * false: do not resolve on mediator, set cloud address in case of patter match pattern match,
+     *      DNS is involved only if pattern does not match.
      */
-    static const bool kDoNotResolveOnMediator = true;
+    static const bool kResolveOnMediator = false;
 
 protected:
     struct NX_NETWORK_API HostAddressInfo

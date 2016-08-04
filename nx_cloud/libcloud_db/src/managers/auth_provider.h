@@ -14,6 +14,7 @@
 
 #include "access_control/auth_types.h"
 #include "data/auth_data.h"
+#include "data/data_filter.h"
 
 
 namespace nx {
@@ -41,6 +42,7 @@ public:
     //!Returns nonce to be used by mediaserver
     void getCdbNonce(
         const AuthorizationInfo& authzInfo,
+        const data::DataFilter& filter,
         std::function<void(api::ResultCode, api::NonceData)> completionHandler);
     //!Returns intermediate HTTP Digest response that can be used to calculate HTTP Digest response with only ha2 known
     /*!
@@ -55,15 +57,6 @@ private:
     const conf::Settings& m_settings;
     const AccountManager& m_accountManager;
     const SystemManager& m_systemManager;
-
-    bool parseNonce(
-        const std::string& nonce,
-        QByteArray* const random3Bytes,
-        uint32_t* const timestamp,
-        QByteArray* const nonceHash) const;
-    QByteArray calcNonceHash(
-        const std::string& systemID,
-        uint32_t timestamp) const;
 };
 
 }   //cdb

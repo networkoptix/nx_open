@@ -222,9 +222,9 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
                 EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
 
                 const auto entries = info.getAll();
-                ASSERT_EQ(info.getAll().size(), kDoNotResolveOnMediator ? 1 : 2);
+                ASSERT_EQ(info.getAll().size(), kResolveOnMediator ? 2 : 1);
 
-                if (!kDoNotResolveOnMediator)
+                if (kResolveOnMediator)
                 {
                     const AddressEntry entry1 = entries.front();
                     EXPECT_EQ(entry1.type, AddressType::direct);
@@ -253,7 +253,7 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
                 EXPECT_EQ(entry.attributes.front().type, AddressAttributeType::port);
                 EXPECT_EQ(entry.attributes.front().value, kResult.port);
 
-                EXPECT_EQ(info.getAll().size(), kDoNotResolveOnMediator ? 2 : 3);
+                EXPECT_EQ(info.getAll().size(), kResolveOnMediator ? 3 : 2);
                 if (!isSub)
                     EXPECT_EQ(info.dnsState(), HostAddressInfo::State::unresolved);
                 EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
@@ -274,8 +274,8 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
                 typedef HostAddressInfo::State st;
                 const HostAddressInfo& info = it->second;
                 EXPECT_EQ(info.fixedEntries.size(), 0);
-                EXPECT_EQ(info.getAll().size(), kDoNotResolveOnMediator ? 1 : 0);
-                EXPECT_EQ(info.dnsState(), kDoNotResolveOnMediator ? st::unresolved : st::resolved);
+                EXPECT_EQ(info.getAll().size(), kResolveOnMediator ? 0 : 1);
+                EXPECT_EQ(info.dnsState(), kResolveOnMediator ? st::resolved : st::unresolved);
                 EXPECT_EQ(info.mediatorState(), st::resolved);
             });
     }
@@ -300,9 +300,9 @@ TEST_F(AddressResolverTest, DnsVsMediator)
             EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
 
             const auto entries = info.getAll();
-            ASSERT_EQ(info.getAll().size(), kDoNotResolveOnMediator ? 0 : 2);
+            ASSERT_EQ(info.getAll().size(), kResolveOnMediator ? 2 : 0);
 
-            if (!kDoNotResolveOnMediator)
+            if (kResolveOnMediator)
             {
                 const AddressEntry entry1 = entries.front();
                 EXPECT_EQ(entry1.type, AddressType::direct);

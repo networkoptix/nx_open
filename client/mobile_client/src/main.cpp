@@ -157,10 +157,6 @@ int runUi(QGuiApplication *application) {
 }
 
 int runApplication(QGuiApplication *application, const QnUuid& videowallInstanceGuid) {
-    // these functions should be called in every thread that wants to use rand() and qrand()
-    srand(time(NULL));
-    qsrand(time(NULL));
-
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
         getConnectionFactory(Qn::PT_MobileClient));
 

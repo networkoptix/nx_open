@@ -23,7 +23,6 @@ namespace boost {
     struct ptr_multimap {};
 }
 
-
 /* Prevent the usage of Qt Java-style iterators. */
 #include <QtCore/QListIterator>
 #include <QtCore/QLinkedListIterator>

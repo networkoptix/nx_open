@@ -711,7 +711,10 @@ bool PlayerPrivate::createArchiveReader()
     if (!resource)
         return false;
 
+#ifdef ENABLE_ARCHIVE
     archiveReader.reset(new QnArchiveStreamReader(resource));
+#endif
+
     QnAbstractArchiveDelegate* archiveDelegate;
     if (isLocalFile)
     {

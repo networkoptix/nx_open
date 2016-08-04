@@ -14,6 +14,7 @@
 #include <utils/common/util.h>
 #include <nx_speech_synthesizer/text_to_wav.h>
 #include <camera/audio_stream_display.h>
+#include <nx/utils/random.h>
 
 
 class LocalAudioFileResource
@@ -298,7 +299,7 @@ void AudioPlayer::closeNonSafe()
 
 bool AudioPlayer::openNonSafe( QIODevice* dataSource )
 {
-    const QString& temporaryFilePath = QString::number(rand());
+    const QString& temporaryFilePath = QString::number(nx::utils::random::number(0));
     const QString& temporaryResUrl = lit("%1://%2").arg(lit("qiodev")).arg(temporaryFilePath);
     m_storage->registerResourceData( temporaryFilePath, dataSource );
 

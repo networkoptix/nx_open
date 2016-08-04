@@ -341,7 +341,7 @@ void AddressResolver::HostAddressInfo::checkExpirations()
         m_dnsEntries.clear();
     }
 
-    if (kDoNotResolveOnMediator)
+    if (!kResolveOnMediator)
         return; // just a short cut
 
     if (m_mediatorState == State::resolved &&
@@ -465,7 +465,7 @@ void AddressResolver::mediatorResolve(
             break; // continue
     }
 
-    if (!kDoNotResolveOnMediator)
+    if (kResolveOnMediator)
         return mediatorResolveImpl(info, lk, needDns);
 
     if (info->second.isLikelyCloudAddress)
