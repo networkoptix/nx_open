@@ -42,7 +42,17 @@ namespace
 
     bool isResponseOK(const nx_http::HttpClient& client)
     {
+        if (!client.response())
+            return false;
         return client.response()->statusLine.statusCode == nx_http::StatusCode::ok;
+    }
+
+    nx_http::StatusCode::Value getClientResponse(const nx_http::HttpClient& client)
+    {
+        if (client.response())
+            return (nx_http::StatusCode::Value) client.response()->statusLine.statusCode;
+        else
+            return nx_http::StatusCode::undefined;
     }
 }
 
@@ -98,15 +108,13 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::internalServerError;
     }
 
-
-    QAuthenticator auth;
-    auth.setUser(adminUser->getName());
-    auth.setPassword(remoteAdminPassword);
-
     QByteArray moduleInformationData;
     {
         nx_http::HttpClient client;
-        client.setResponseReadTimeoutMs(10000);
+        client.setResponseReadTimeoutMs(requestTimeout);
+        client.setSendTimeoutMs(requestTimeout);
+        client.setMessageBodyReadTimeoutMs(requestTimeout);
+
         QUrl requestUrl(url);
         requestUrl.setUserName(adminUser->getName());
         requestUrl.setPassword(remoteAdminPassword);
@@ -115,7 +123,7 @@ int QnMergeSystemsRestHandler::executeGet(
 
         if (!client.doGet(requestUrl) || !isResponseOK(client))
         {
-            auto status = client.response()->statusLine.statusCode;
+            auto status = getClientResponse(client);
             NX_LOG(lit("QnMergeSystemsRestHandler. Error requesting url %1: %2")
                 .arg(url.toString()).arg(QLatin1String(nx_http::StatusCode::toString(status))),
                 cl_logDEBUG1);
@@ -263,6 +271,8 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
 
     nx_http::HttpClient client;
     client.setResponseReadTimeoutMs(requestTimeout);
+    client.setSendTimeoutMs(requestTimeout);
+    client.setMessageBodyReadTimeoutMs(requestTimeout);
     client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
 
     /**
@@ -364,6 +374,9 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
 
     nx_http::HttpClient client;
     client.setResponseReadTimeoutMs(requestTimeout);
+    client.setSendTimeoutMs(requestTimeout);
+    client.setMessageBodyReadTimeoutMs(requestTimeout);
+
     client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
 
     {
@@ -376,7 +389,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
             requestUrl.setPath(lit("/ec2/getUsers"));
             if (!client.doGet(requestUrl) || !isResponseOK(client))
             {
-                auto status = client.response()->statusLine.statusCode;
+                auto status = getClientResponse(client);
                 NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to invoke /ec2/getUsers: %1")
                     .arg(QLatin1String(nx_http::StatusCode::toString(status))), cl_logDEBUG1);
                 return false;
@@ -393,7 +406,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
 
             if (!client.doGet(requestUrl) || !isResponseOK(client))
             {
-                auto status = client.response()->statusLine.statusCode;
+                auto status = getClientResponse(client);
                 NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to invoke /api/ping: %1")
                     .arg(QLatin1String(nx_http::StatusCode::toString(status))), cl_logDEBUG1);
                 return false;
@@ -417,7 +430,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
 
             if (!client.doGet(requestUrl) || !isResponseOK(client))
             {
-                auto status = client.response()->statusLine.statusCode;
+                auto status = getClientResponse(client);
                 NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to invoke /api/backupDatabase: %1")
                     .arg(QLatin1String(nx_http::StatusCode::toString(status))), cl_logDEBUG1);
                 return false;
