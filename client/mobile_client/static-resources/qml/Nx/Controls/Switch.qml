@@ -22,7 +22,7 @@ Switch
     implicitHeight: 20 + topPadding + bottomPadding
 
     layer.enabled: !control.enabled
-    opacity: control.enabled ? 1.0 : 0.7
+    opacity: control.enabled ? 1.0 : 0.3
 
     background: null
 
