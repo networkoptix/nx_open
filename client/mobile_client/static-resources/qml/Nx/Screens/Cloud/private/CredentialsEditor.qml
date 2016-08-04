@@ -97,11 +97,14 @@ Item
     {
         target: cloudStatusWatcher
 
-        onError:
+        onErrorChanged:
         {
+            if (cloudStatusWatcher.error == QnCloudStatusWatcher.NoError)
+                return
+
             setCloudCredentials(d.initialLogin, "")
             d.connecting = false
-            if (errorCode == QnCloudStatusWatcher.InvalidCredentials)
+            if (cloudStatusWatcher.error == QnCloudStatusWatcher.InvalidCredentials)
             {
                 d.invalidCredentials = true
                 showWarning(qsTr("Invalid e-mail or password"))
