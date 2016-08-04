@@ -59,10 +59,10 @@ QtDevice& qtDevice()
         static auto init = pthread_key_create(&key, [](void* p){ if (p) delete p; });
         static_cast<void>(init);
 
-        if (auto rdp = static_cast<std::random_device*>(pthread_getspecific(key)))
+        if (auto rdp = static_cast<QtDevice*>(pthread_getspecific(key)))
             return *rdp;
 
-        const auto rdp = new std::QtDevice();
+        const auto rdp = new QtDevice();
         pthread_setspecific(key, rdp);
         return *rdp;
     #endif

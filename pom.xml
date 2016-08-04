@@ -1147,7 +1147,6 @@
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>
                 <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>
-                <ffmpeg.version>3.0.0</ffmpeg.version>
                 <compile.option1/>
                 <rdep.target>ios</rdep.target>
             </properties>
