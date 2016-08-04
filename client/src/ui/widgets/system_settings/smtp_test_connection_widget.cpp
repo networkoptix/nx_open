@@ -80,14 +80,14 @@ bool QnSmtpTestConnectionWidget::testSettings( const QnEmailSettings &value ) {
         break;
     }
 
-	if (!serverConnection)
+    if (!serverConnection)
     {
         QnMediaServerResourcePtr server = qnCommon->currentServer();
 
         Q_ASSERT(server);
         if (!server)
         {
-			QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test."));
+            QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test."));
             return false;
         }
 
