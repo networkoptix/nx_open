@@ -478,8 +478,12 @@ void AddressResolver::mediatorResolve(
         info->second.setMediatorEntries();
     }
 
-    NX_CRITICAL(info->second.isResolved(true));
-    const auto guards = grabHandlers(SystemError::noError, info);
+    const auto sysErrorCode =
+        info->second.isResolved(true)
+        ? SystemError::noError
+        : SystemError::hostNotFound;
+
+    const auto guards = grabHandlers(sysErrorCode, info);
     lk->unlock(); //< fire guards away from mutex scope
 }
 
