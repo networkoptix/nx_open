@@ -85,10 +85,6 @@ namespace ec2
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
 
-            QUrlQuery query(requestUrl);
-            query.addQueryItem(Qn::HAVE_TRANSACTION_HEADER_HEADER_NAME, "true");
-            requestUrl.setQuery(query);
-
             QByteArray tranBuffer;
             Qn::SerializationFormat format = serializationFormatFromUrl(ecBaseUrl);
             if( format == Qn::JsonFormat )
@@ -146,7 +142,6 @@ namespace ec2
             Qn::SerializationFormat format = serializationFormatFromUrl(ecBaseUrl);
 
             query.addQueryItem("format", QnLexical::serialized(format));
-            query.addQueryItem(Qn::HAVE_TRANSACTION_HEADER_HEADER_NAME, "true");
             requestUrl.setQuery(query);
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
