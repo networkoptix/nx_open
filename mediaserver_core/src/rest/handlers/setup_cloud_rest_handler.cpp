@@ -15,6 +15,8 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <api/app_server_connection.h>
 #include <rest/helpers/permissions_helper.h>
+#include <cloud/cloud_connection_manager.h>
+
 
 namespace
 {
@@ -41,6 +43,13 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SetupRemoveSystemData),
     (json),
     _Fields)
+
+QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
+    const CloudConnectionManager& cloudConnectionManager)
+:
+    m_cloudConnectionManager(cloudConnectionManager)
+{
+}
 
 int QnSetupCloudSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
@@ -89,7 +98,7 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnU
         return nx_http::StatusCode::ok;
     }
 
-    QnSaveCloudSystemCredentialsHandler subHandler;
+    QnSaveCloudSystemCredentialsHandler subHandler(m_cloudConnectionManager);
     int httpResult = subHandler.execute(data, result);
     if (result.error != QnJsonRestResult::NoError)
     {

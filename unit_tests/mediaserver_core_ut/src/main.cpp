@@ -6,19 +6,20 @@
 
 nx::ut::cfg::Config config;
 
-static void fillConfig(QCoreApplication &app)
+static void fillConfig(const QStringList& arguments)
 {
     QCommandLineParser parser;
     parser.addOptions({{{"t", "tmp"}, "Temporary working directory path. Default: 'tmp'", "tmp"},
                        {"ftp-storage-url", "Ftp storage url"},
                        {"smb-storage-url", "Smb storage url"} });
     parser.addHelpOption();
-    parser.parse(app.arguments());
+    parser.parse(arguments);
 
     if (parser.isSet("help"))
     {
         parser.showHelp();
         QCoreApplication::exit(0);
+        return;
     }
 
     if (parser.isSet("tmp") && nx::ut::utils::validateAndOrCreatePath(parser.value("tmp")))
@@ -33,9 +34,21 @@ static void fillConfig(QCoreApplication &app)
 
 }
 
+static void fillConfig(QCoreApplication& app)
+{
+    fillConfig(app.arguments());
+}
+
 int main(int argc, char **argv)
 {
+#ifndef ENABLE_CLOUD_TEST
     QCoreApplication app(argc, argv);
     fillConfig(app);
+#else
+    QStringList arguments;
+    for (int i = 0; i < argc; ++i)
+        arguments.push_back(QString::fromUtf8(argv[i]));
+    fillConfig(arguments);
+#endif
     return nx::utils::runTest(argc, argv);
 }

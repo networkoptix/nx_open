@@ -150,7 +150,7 @@ void StreamingChunkTranscoderThread::run()
         if( transcodeIter == m_transcodeContext.end() || !transcodeIter->second->dataAvailable )
         {
             //nothing to do
-            m_cond.wait( lk.mutex(), EMPTY_DATA_SOURCE_REREAD_TIMEOUT_MS ); //TODO #ak this timeout is not correct, have to find min timeout to 
+            m_cond.wait( lk.mutex(), EMPTY_DATA_SOURCE_REREAD_TIMEOUT_MS ); //TODO #ak this timeout is not correct, have to find min timeout to
             continue;
         }
 
@@ -186,10 +186,12 @@ void StreamingChunkTranscoderThread::run()
 
         QnByteArray resultStream(1, RESERVED_TRANSCODED_PACKET_SIZE);
 
-        //TODO #ak support opened ending (when transcodeParams.endTimestamp() is known only after transcoding is done), 
-        //that required for minimizing hls live delay 
-        if (srcMediaData->timestamp >= transcodeIter->second->transcodeParams.endTimestamp())
-            //|| transcodeIter->second->msTranscoded * USEC_IN_MSEC >= transcodeIter->second->transcodeParams.duration() )
+        //TODO #ak support opened ending (when transcodeParams.endTimestamp() is known only after transcoding is done),
+        //that required for minimizing hls live delay
+        if ((quint64) srcMediaData->timestamp
+            >= transcodeIter->second->transcodeParams.endTimestamp())
+            //|| transcodeIter->second->msTranscoded * USEC_IN_MSEC
+                //>= transcodeIter->second->transcodeParams.duration())
         {
             //returning media packet to the media stream because this packet belongs to the next chunk
             transcodeIter->second->dataSourceCtx->mediaDataProvider->put(std::move(srcPacket));

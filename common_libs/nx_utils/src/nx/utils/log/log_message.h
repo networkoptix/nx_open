@@ -165,7 +165,7 @@ public:
         return arg(a);
     }
 
-    operator QString() const; 
+    operator QString() const;
 
     std::string toStdString() const { return m_str.toStdString(); }
 

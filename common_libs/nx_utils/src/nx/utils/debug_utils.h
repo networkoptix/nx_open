@@ -5,6 +5,7 @@
 // #define OUTPUT_PREFIX "..."
 // bool conf.enableTime;
 // bool conf.enableFps;
+// bool conf.enableOutput;
 
 #include <memory>
 #include <cstdint>
@@ -25,7 +26,9 @@ namespace utils {
 
 namespace {
 
-/** @return Part of a source code filename which is a path relative to "nx_vms..." folder. */
+/**
+ * @return Part of a source code filename which is a path relative to "nx_vms..." folder.
+ */
 static inline const char* relative_src_filename(const char* s)
 {
     /*unused*/ (void) &relative_src_filename;
@@ -40,9 +43,9 @@ static inline const char* relative_src_filename(const char* s)
 #if defined(QT_CORE_LIB)
 
     // TODO: Rewrite using log.h
-    #define PRINT qWarning().nospace() << OUTPUT_PREFIX
+    #define PRINT qWarning().nospace().noquote() << OUTPUT_PREFIX
 
-    #define LL qDebug().nospace() << "####### line " << __LINE__ \
+    #define LL qDebug().nospace().noquote() << "####### line " << __LINE__ \
         << ", thread " << QThread::currentThreadId() \
         << " [" << nx::utils::relative_src_filename(__FILE__) << "]";
 
