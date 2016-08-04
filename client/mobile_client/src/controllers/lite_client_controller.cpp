@@ -30,6 +30,7 @@ public:
     QTimer* startStopTimer;
     QnMediaServerResourcePtr server;
     QnUuid serverId;
+    bool serverOnline = false;
     QnLiteClientController::State clientState = QnLiteClientController::State::Stopped;
     rest::Handle clientStartHandle = -1;
 
@@ -40,6 +41,8 @@ public:
 
     void setClientStartResult(bool success);
     void setClientStopResult(bool success);
+
+    void updateServerStatus();
 
     QnLayoutResourcePtr createLayout() const;
     QnLayoutResourcePtr findLayout() const;
@@ -88,6 +91,9 @@ void QnLiteClientController::setServerId(const QString& serverId)
         connect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoRemoved,
             d, &QnLiteClientControllerPrivate::at_runtimeInfoRemoved);
 
+        connect(d->server, &QnMediaServerResource::statusChanged,
+            d, &QnLiteClientControllerPrivate::updateServerStatus);
+
         const auto items = qnRuntimeInfoManager->items()->getItems();
         const auto it = std::find_if(items.begin(), items.end(),
             [d](const QnPeerRuntimeInfo& info)
@@ -101,15 +107,22 @@ void QnLiteClientController::setServerId(const QString& serverId)
     else
     {
         disconnect(qnRuntimeInfoManager, nullptr, this, nullptr);
-
         d->setClientState(State::Stopped);
     }
+
+    d->updateServerStatus();
 }
 
 QnLiteClientController::State QnLiteClientController::clientState() const
 {
     Q_D(const QnLiteClientController);
     return d->clientState;
+}
+
+bool QnLiteClientController::isServerOnline() const
+{
+    Q_D(const QnLiteClientController);
+    return d->serverOnline;
 }
 
 QnLiteClientLayoutHelper*QnLiteClientController::layoutHelper() const
@@ -234,6 +247,19 @@ void QnLiteClientControllerPrivate::setClientStopResult(bool success)
         setClientState(QnLiteClientController::State::Started);
         emit q->clientStopError();
     }
+}
+
+void QnLiteClientControllerPrivate::updateServerStatus()
+{
+    const bool online = (server && server->getStatus() == Qn::Online);
+
+    if (serverOnline == online)
+        return;
+
+    serverOnline = online;
+
+    Q_Q(QnLiteClientController);
+    emit q->serverOnlineChanged();
 }
 
 bool QnLiteClientControllerPrivate::initLayout()

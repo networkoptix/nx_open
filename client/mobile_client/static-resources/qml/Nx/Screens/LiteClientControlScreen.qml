@@ -98,6 +98,7 @@ Page
                 id: screenDecoration
                 anchors.fill: parent
                 z: -1
+                visible: liteClientController.serverOnline
             }
         }
 
@@ -240,6 +241,12 @@ Page
 
     Component
     {
+        id: serverOfflineDummyComponent
+        ServerOfflineDummy {}
+    }
+
+    Component
+    {
         id: switchedOffDummyComponent
         SwitchedOffDummy {}
     }
@@ -266,8 +273,31 @@ Page
     states: [
         State
         {
+            name: "Offline"
+            when: !liteClientController.serverOnline
+
+            PropertyChanges
+            {
+                target: screenLoader
+                sourceComponent: serverOfflineDummyComponent
+            }
+            PropertyChanges
+            {
+                target: bottomLoader
+                sourceComponent: undefined
+            }
+            PropertyChanges
+            {
+                target: enabledSwitch
+                checked: false
+                enabled: false
+            }
+        },
+        State
+        {
             name: "SwitchedOff"
-            when: liteClientController.clientState == QnLiteClientController.Stopped
+            when: liteClientController.serverOnline
+                && liteClientController.clientState == QnLiteClientController.Stopped
 
             PropertyChanges
             {
@@ -283,6 +313,7 @@ Page
             {
                 target: enabledSwitch
                 checked: false
+                enabled: true
             }
         },
         /*
@@ -304,7 +335,8 @@ Page
         State
         {
             name: "Starting"
-            when: liteClientController.clientState == QnLiteClientController.Starting
+            when: liteClientController.serverOnline
+                && liteClientController.clientState == QnLiteClientController.Starting
 
             PropertyChanges
             {
@@ -320,12 +352,14 @@ Page
             {
                 target: enabledSwitch
                 checked: true
+                enabled: false
             }
         },
         State
         {
             name: "Stopping"
-            when: liteClientController.clientState == QnLiteClientController.Stopping
+            when: liteClientController.serverOnline
+                && liteClientController.clientState == QnLiteClientController.Stopping
 
             PropertyChanges
             {
@@ -341,12 +375,14 @@ Page
             {
                 target: enabledSwitch
                 checked: false
+                enabled: false
             }
         },
         State
         {
             name: "SingleCamera"
-            when: liteClientController.clientState == QnLiteClientController.Started
+            when: liteClientController.serverOnline
+                && liteClientController.clientState == QnLiteClientController.Started
                 && liteClientController.layoutHelper.displayMode == QnLiteClientLayoutHelper.SingleCamera
 
             PropertyChanges
@@ -363,12 +399,14 @@ Page
             {
                 target: enabledSwitch
                 checked: true
+                enabled: true
             }
         },
         State
         {
             name: "MultipleCameras"
-            when: liteClientController.clientState == QnLiteClientController.Started
+            when: liteClientController.serverOnline
+                && liteClientController.clientState == QnLiteClientController.Started
                 && liteClientController.layoutHelper.displayMode == QnLiteClientLayoutHelper.MultipleCameras
 
             PropertyChanges
@@ -385,6 +423,7 @@ Page
             {
                 target: enabledSwitch
                 checked: true
+                enabled: true
             }
         }
     ]

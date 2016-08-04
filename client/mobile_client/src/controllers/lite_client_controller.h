@@ -15,6 +15,7 @@ class QnLiteClientController : public Connective<QObject>
 
     Q_PROPERTY(QString serverId READ serverId WRITE setServerId NOTIFY serverIdChanged)
     Q_PROPERTY(State clientState READ clientState NOTIFY clientStateChanged)
+    Q_PROPERTY(bool serverOnline READ isServerOnline NOTIFY serverOnlineChanged)
     Q_PROPERTY(QnLiteClientLayoutHelper* layoutHelper READ layoutHelper NOTIFY nothingChanged)
 
     using base_type = Connective<QObject>;
@@ -37,6 +38,8 @@ public:
 
     State clientState() const;
 
+    bool isServerOnline() const;
+
     QnLiteClientLayoutHelper* layoutHelper() const;
 
     Q_INVOKABLE void startLiteClient();
@@ -44,6 +47,7 @@ public:
 
 signals:
     void serverIdChanged();
+    void serverOnlineChanged();
     void clientStateChanged();
     void clientStartError();
     void clientStopError();
