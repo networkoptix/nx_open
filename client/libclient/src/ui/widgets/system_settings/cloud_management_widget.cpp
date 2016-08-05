@@ -95,7 +95,10 @@ bool QnCloudManagementWidget::hasChanges() const
 
 void QnCloudManagementWidget::unlinkFromCloud()
 {
-    if (!context()->user() && !context()->user()->isOwner())
+    auto isOwner = context()->user() && context()->user()->role() == Qn::UserRole::Owner;
+    NX_ASSERT(isOwner, "Button must be unavailable for non-owner");
+
+    if (!isOwner)
         return;
 
     QWidget* authorizeWidget = new QWidget();
