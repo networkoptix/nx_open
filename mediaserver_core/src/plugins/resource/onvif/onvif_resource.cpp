@@ -488,9 +488,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 	auto deviceOnvifUrl = getDeviceOnvifUrl();
 
     if (deviceOnvifUrl.isEmpty()) {
-
+#ifdef PL_ONVIF_DEBUG
         qCritical() << "QnPlOnvifResource::initInternal: Can't do anything: ONVIF device url is absent. Id: " << getPhysicalId();
-
+#endif
         return m_prevOnvifResultCode.errorCode != CameraDiagnostics::ErrorCode::noError
             ? m_prevOnvifResultCode
             : CameraDiagnostics::RequestFailedResult(lit("getDeviceOnvifUrl"), QString());
