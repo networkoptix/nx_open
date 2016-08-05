@@ -3,7 +3,6 @@ import QtQuick 2.6
 Item
 {
     property alias currentResourceId: camerasStripe.currentResourceId
-    property alias currentThumbnail: camerasStripe.currentThumbnail
     property alias fourCamerasMode: fourCamerasModeButton.checked
 
     CamerasStripe
