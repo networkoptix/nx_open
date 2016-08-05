@@ -82,8 +82,12 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
         return nx_http::StatusCode::ok;
     }
 
+    ConfigureSystemData configSystemData;
+    configSystemData.systemName = data.systemName;
+    configSystemData.wholeSystem = false;
+
     const auto systemNameBak = qnCommon->localSystemName();
-    if (!changeSystemName(data.systemName, 0, 0, true, Qn::UserAccessData(userId)))
+    if (!changeSystemName(configSystemData))
     {
         result.setError(QnRestResult::CantProcessRequest, lit("Internal server error. Can't change system name."));
         return nx_http::StatusCode::ok;
@@ -91,10 +95,12 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
 
     qnGlobalSettings->resetCloudParams();
     qnGlobalSettings->setNewSystem(false);
+
+    configSystemData.systemName = systemNameBak;
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         //changing system name back
-        changeSystemName(systemNameBak, 0, 0, true, Qn::UserAccessData(userId));
+        changeSystemName(configSystemData);
         result.setError(
             QnJsonRestResult::CantProcessRequest,
             lit("Internal server error."));
@@ -105,7 +111,7 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
     if (data.systemName.isEmpty())
     {
         //changing system name back
-        changeSystemName(systemNameBak, 0, 0, true, Qn::UserAccessData(userId));
+        changeSystemName(configSystemData);
         result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'systemName' must be provided."));
         return nx_http::StatusCode::ok;
     }
@@ -114,7 +120,7 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
     if (!updateAdminUser(data, QnOptionalBool(true), userId, &errString))
     {
         //changing system name back
-        changeSystemName(systemNameBak, 0, 0, true, Qn::UserAccessData(userId));
+        changeSystemName(configSystemData);
         result.setError(QnJsonRestResult::CantProcessRequest, errString);
         return nx_http::StatusCode::ok;
     }
