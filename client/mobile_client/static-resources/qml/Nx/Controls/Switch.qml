@@ -97,4 +97,13 @@ Switch
     }
 
     contentItem: null
+
+    onCheckedChanged:
+    {
+        /* Workaroud for a Qt bug.
+           When the switch is disabled during onCheckedChanged handler setting checked to false
+           its check state will be returned to true. */
+        if (!checked)
+            position = 0
+    }
 }

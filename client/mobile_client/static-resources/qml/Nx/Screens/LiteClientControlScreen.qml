@@ -27,13 +27,9 @@ Page
             onCheckedChanged:
             {
                 if (checked)
-                {
                     liteClientController.startLiteClient()
-                }
                 else
-                {
                     liteClientController.stopLiteClient()
-                }
             }
         }
     ]
