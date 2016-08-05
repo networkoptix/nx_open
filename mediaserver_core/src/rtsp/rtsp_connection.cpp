@@ -429,7 +429,7 @@ void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
 void QnRtspConnectionProcessor::generateSessionId()
 {
     Q_D(QnRtspConnectionProcessor);
-    d->sessionId = QString::number(reinterpret_cast<quint32>(d->socket.data()));
+    d->sessionId = QString::number(reinterpret_cast<uintptr_t>(d->socket.data()));
     d->sessionId += QString::number(nx::utils::random::number(0));
 }
 
