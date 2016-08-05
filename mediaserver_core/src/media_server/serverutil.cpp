@@ -37,6 +37,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <api/resource_property_adaptor.h>
 
 namespace
 {
@@ -82,7 +83,7 @@ QString getDataDirectory()
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (PasswordData),
+    (PasswordData)(ConfigureSystemData),
     (json),
     _Fields)
 
@@ -238,9 +239,9 @@ void resetTransactionTransportConnections()
         QnServerConnector::instance()->start();
 }
 
-
-bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, bool resetConnections, const Qn::UserAccessData &userAccessData)
+bool changeSystemName(const ConfigureSystemData& data)
 {
+    nx::SystemName systemName(data.systemName);
     if (qnCommon->localSystemName() == systemName.value())
         return true;
 
@@ -250,17 +251,49 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
         return false;
     }
 
+    if (!data.wholeSystem)
+        resetTransactionTransportConnections();
+
+    const auto systemNameBak = qnCommon->localSystemName();
     if (!systemName.saveToConfig())
     {
         NX_LOG("Failed to save new system name to config", cl_logWARNING);
         return false;
     }
-    qnCommon->setLocalSystemName(systemName.value());
-    if (resetConnections)
-        resetTransactionTransportConnections();
 
-    server->setSystemName(systemName.value());
-    qnCommon->setSystemIdentityTime(sysIdTime, qnCommon->moduleGUID());
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+
+    // add foreign user
+    if (!data.foreignUser.id.isNull())
+    {
+        if (connection->getUserManager(Qn::kSystemAccess)->saveSync(data.foreignUser) != ec2::ErrorCode::ok)
+        {
+            systemName = nx::SystemName(systemNameBak);
+            if (!systemName.saveToConfig())
+                NX_LOG("Failed to to revert state after error while configuring system", cl_logWARNING);
+
+            return false;
+        }
+    }
+
+    // apply remove settings
+    const auto& settings = QnGlobalSettings::instance()->allSettings();
+    for(const auto& foreignSetting: data.foreignSettings)
+    {
+        for(QnAbstractResourcePropertyAdaptor* setting: settings)
+        {
+            if (setting->key() == foreignSetting.name)
+            {
+                setting->setSerializedValue(foreignSetting.value);
+                break;
+            }
+        }
+    }
+
+    qnCommon->setLocalSystemName(data.systemName);
+
+    server->setSystemName(data.systemName);
+    qnCommon->setSystemIdentityTime(data.sysIdTime, qnCommon->moduleGUID());
 
     if (systemName.isDefault())
         qnGlobalSettings->resetCloudParams();
@@ -268,17 +301,26 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
     if (qnGlobalSettings->synchronizeNowSync())
         qnCommon->updateModuleInformation();
 
-    QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(tranLogTime);
+    QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(data.tranLogTime);
 
-    // update auth key if system name changed
+    // update auth key if system name is changed
     server->setAuthKey(QnUuid::createUuid().toString());
     nx::ServerSetting::setAuthKey(server->getAuthKey().toLatin1());
-
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
-    QnAppServerConnectionFactory::getConnection2()
-        ->getMediaServerManager(userAccessData)
-        ->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    if (connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer) != ec2::ErrorCode::ok)
+    {
+        NX_LOG("Failed to update server auth key while configuring system", cl_logWARNING);
+    }
+
+    if (!data.foreignServer.id.isNull())
+    {
+        // add foreign server to pass auth if admin user is disabled
+        if (connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(data.foreignServer) != ec2::ErrorCode::ok)
+        {
+            NX_LOG("Failed to add foreign server while configuring system", cl_logWARNING);
+        }
+    }
 
     CloudSystemNameUpdater::instance()->update();
 

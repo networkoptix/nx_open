@@ -35,19 +35,7 @@ enum MediaQuality {
     MEDIA_Quality_None
 };
 
-static const char* mediaQualityToString(MediaQuality value)
-{
-    switch (value)
-    {
-        case MEDIA_Quality_High: return "MEDIA_Quality_High";
-        case MEDIA_Quality_Low: return "MEDIA_Quality_Low";
-        case MEDIA_Quality_ForceHigh: return "MEDIA_Quality_ForceHigh";
-        case MEDIA_Quality_Auto: return "MEDIA_Quality_Auto";
-        case MEDIA_Quality_CustomResolution: return "MEDIA_Quality_CustomResolution";
-        case MEDIA_Quality_None: return "MEDIA_Quality_None";
-        default: return "(INTERNAL ERROR) MediaQuality UNKNOWN";
-    }
-}
+const char* mediaQualityToString(MediaQuality value);
 
 struct QnAbstractMediaData : public QnAbstractDataPacket
 {
