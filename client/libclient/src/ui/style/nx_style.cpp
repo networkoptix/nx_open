@@ -2924,18 +2924,15 @@ int QnNxStyle::styleHint(
     return base_type::styleHint(sh, option, widget, shret);
 }
 
-QPixmap QnNxStyle::standardPixmap(StandardPixmap iconId, const QStyleOption* option, const QWidget* widget) const
+QIcon QnNxStyle::standardIcon(StandardPixmap iconId, const QStyleOption* option, const QWidget* widget) const
 {
     switch (iconId)
     {
         case SP_LineEditClearButton:
-        {
-            const int kQLineEditButtonSize = 16;
-            return qnSkin->icon("theme/input_clear.png").pixmap(kQLineEditButtonSize, kQLineEditButtonSize);
-        }
+            return qnSkin->icon("theme/input_clear.png");
 
         default:
-            return base_type::standardPixmap(iconId, option, widget);
+            return base_type::standardIcon(iconId, option, widget);
     }
 }
 

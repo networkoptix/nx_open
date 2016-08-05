@@ -53,7 +53,7 @@ public:
     virtual QSize sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const override;
     virtual int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const override;
     virtual int styleHint(StyleHint sh, const QStyleOption *option = nullptr, const QWidget *widget = nullptr, QStyleHintReturn *shret = nullptr) const override;
-    virtual QPixmap standardPixmap(StandardPixmap iconId, const QStyleOption* option, const QWidget* widget) const override;
+    virtual QIcon standardIcon(StandardPixmap iconId, const QStyleOption* option, const QWidget* widget) const override;
     virtual void polish(QWidget *widget) override;
     virtual void unpolish(QWidget *widget) override;
 
