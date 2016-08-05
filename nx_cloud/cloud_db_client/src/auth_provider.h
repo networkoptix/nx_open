@@ -29,6 +29,9 @@ public:
 
     virtual void getCdbNonce(
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) override;
+    virtual void getCdbNonce(
+        const std::string& systemId,
+        std::function<void(api::ResultCode, api::NonceData)> completionHandler) override;
     virtual void getAuthenticationResponse(
         const api::AuthRequest& authRequest,
         std::function<void(api::ResultCode, api::AuthResponse)> completionHandler) override;

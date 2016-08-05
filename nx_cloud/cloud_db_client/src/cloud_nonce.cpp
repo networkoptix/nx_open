@@ -95,6 +95,18 @@ bool parseCloudNonceBase(
     return true;
 }
 
+bool isValidCloudNonceBase(
+    const std::string& suggestedNonceBase,
+    const std::string& systemId)
+{
+    uint32_t timestamp = 0;
+    std::string nonceHash;
+    if (!parseCloudNonceBase(suggestedNonceBase, &timestamp, &nonceHash))
+        return false;
+
+    return nonceHash == calcNonceHash(systemId, timestamp);
+} 
+
 std::string generateNonce(const std::string& cloudNonce)
 {
     //if request is authenticated with account permissions, returning full nonce
