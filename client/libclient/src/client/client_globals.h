@@ -28,7 +28,7 @@ namespace Qn
 
         // Per-user placeholder nodes
         AllCamerasAccessNode,   /**< Node that represents 'All Cameras' placeholder, displayed under users and roles with full access. */
-        AllLayoutsAccessNode,   /**< Node that represents 'All Shared Cameras' placeholder, displayed under admins. */
+        AllLayoutsAccessNode,   /**< Node that represents 'All Shared Layouts' placeholder, displayed under admins. */
         AccessibleResourcesNode,/**< Node that represents 'Cameras & Resources' node, displayed under users and roles with custom access. */
         AccessibleLayoutsNode,  /**< Node that represents 'Layouts' node, displayed under users and roles with custom access. */
         RoleUsersNode,          /**< Node that represents 'Users' node, displayed under roles. */
