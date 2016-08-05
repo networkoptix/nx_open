@@ -248,7 +248,8 @@ void QBufferedFile::flushBuffer()
         else if (toWrite > m_cycleBuffer.size()) {
             std::vector<char> fillerData;
             fillerData.resize(toWrite - m_cycleBuffer.size());
-            m_cycleBuffer.push_back(fillerData.data(), fillerData.size());
+            m_cycleBuffer.push_back(fillerData.data(),
+                (QnMediaCyclicBuffer::size_type) fillerData.size());
         }
     }
     qint64 writed = writeBuffer(toWrite);
@@ -394,7 +395,8 @@ bool QBufferedFile::prepareBuffer(int bufferSize)
         if (m_cycleBuffer.size() < bufferSize) {
             std::vector<char> fillerData;
             fillerData.resize(bufferSize - m_cycleBuffer.size());
-            m_cycleBuffer.push_back(fillerData.data(), fillerData.size());
+            m_cycleBuffer.push_back(fillerData.data(),
+                (QnMediaCyclicBuffer::size_type) fillerData.size());
         }
         m_fileEngine->seek(m_filePos);
     }

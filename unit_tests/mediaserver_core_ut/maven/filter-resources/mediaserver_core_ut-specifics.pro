@@ -1,9 +1,12 @@
 CONFIG += console
 
 win32 {
-	DEFINES += NOMINMAX
+    DEFINES += NOMINMAX
 }
 INCLUDEPATH += ${root.dir}/mediaserver_core/src
+INCLUDEPATH += ${root.dir}/nx_cloud/libcloud_db/src
+INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include/
+INCLUDEPATH += ${root.dir}/nx_cloud/
 
 LIBS += $$FESTIVAL_LIB
 
