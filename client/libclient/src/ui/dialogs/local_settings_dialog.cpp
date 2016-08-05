@@ -14,6 +14,7 @@
 #include <ui/widgets/local_settings/look_and_feel_preferences_widget.h>
 #include <ui/widgets/local_settings/recording_settings_widget.h>
 #include <ui/widgets/local_settings/popup_settings_widget.h>
+#include <ui/widgets/local_settings/advanced_settings_widget.h>
 
 #include <ui/workbench/workbench_context.h>
 
@@ -21,12 +22,13 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::LocalSettingsDialog()),
-    m_generalWidget(new QnGeneralPreferencesWidget(this)),
-    m_lookAndFeelWidget(new QnLookAndFeelPreferencesWidget(this))
+    m_advancedSettingsWidget(new QnAdvancedSettingsWidget(this)),
+    m_lookAndFeelWidget(new QnLookAndFeelPreferencesWidget(this)),
+    m_restartLabel(nullptr)
 {
     ui->setupUi(this);
 
-    addPage(GeneralPage, m_generalWidget , tr("General"));
+    addPage(GeneralPage, new QnGeneralPreferencesWidget(this), tr("General"));
     addPage(LookAndFeelPage, m_lookAndFeelWidget, tr("Look and Feel"));
 
     auto recordingSettingsWidget = new QnRecordingSettingsWidget(this);
@@ -38,6 +40,7 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
 
 
     addPage(NotificationsPage, new QnPopupSettingsWidget(this), tr("Notifications"));
+    addPage(AdvancedPage, m_advancedSettingsWidget, tr("Advanced"));
 
     setWarningStyle(ui->readOnlyWarningLabel);
     ui->readOnlyWarningLabel->setVisible(!qnSettings->isWritable());
@@ -48,6 +51,7 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
         tr("Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.")
 #endif
     );
+    addRestartLabel();
 
     loadDataToUi();
 }
@@ -58,9 +62,7 @@ void QnLocalSettingsDialog::applyChanges()
 {
     bool restartQueued = false;
 
-    // TODO: #dklychkov remove this define if the way to restart the app will be found
-#ifndef Q_OS_MACX
-    if (m_generalWidget->isRestartRequired() || m_lookAndFeelWidget->isRestartRequired())
+    if (isRestartRequired())
     {
         QDialogButtonBox::StandardButton result = QnMessageBox::information(
             this,
@@ -79,7 +81,6 @@ void QnLocalSettingsDialog::applyChanges()
             break;
         }
     }
-#endif
 
     base_type::applyChanges();
     if (qnSettings->isWritable())
@@ -87,5 +88,30 @@ void QnLocalSettingsDialog::applyChanges()
 
     if (restartQueued)
         menu()->trigger(QnActions::QueueAppRestartAction);
+}
+
+void QnLocalSettingsDialog::updateButtonBox()
+{
+    base_type::updateButtonBox();
+    m_restartLabel->setVisible(isRestartRequired());
+}
+
+bool QnLocalSettingsDialog::isRestartRequired() const
+{
+    return m_advancedSettingsWidget->isRestartRequired() || m_lookAndFeelWidget->isRestartRequired();
+}
+
+void QnLocalSettingsDialog::addRestartLabel()
+{
+    QHBoxLayout* layout = qobject_cast<QHBoxLayout*>(ui->buttonBox->layout());
+    NX_ASSERT(layout, Q_FUNC_INFO, "Layout must already exist here.");
+    if (!layout)
+        return;
+
+    m_restartLabel = new QLabel(tr("Restart required"), ui->buttonBox);
+    setWarningStyle(m_restartLabel);
+    m_restartLabel->setVisible(false);
+
+    layout->insertWidget(0, m_restartLabel);
 }
 
