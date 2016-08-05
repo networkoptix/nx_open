@@ -68,7 +68,7 @@ written by
         if (auto r = pthread_condattr_init(&attr))
             return r;
 
-        #if !defined(__APPLE__) && !defined(__ANDROID__)
+        #ifndef __APPLE__
             if (auto r = pthread_condattr_setclock(&attr, CLOCK_MONOTONIC))
                 return r;
         #endif
