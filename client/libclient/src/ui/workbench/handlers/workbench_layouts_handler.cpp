@@ -570,7 +570,7 @@ void QnWorkbenchLayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr
     auto accessible = QnResourceAccessProvider::sharedResources(user);
     for (const auto& toShare : change.added.filtered(inaccessible))
         accessible << toShare->getId();
-    qnResourcesChangesManager->saveAccessibleResources(QnResourceAccessProvider::sharedResourcesKey(user), accessible);
+    qnResourcesChangesManager->saveAccessibleResources(user, accessible);
 }
 
 QDialogButtonBox::StandardButton QnWorkbenchLayoutsHandler::askOverrideLayout(QDialogButtonBox::StandardButtons buttons,
@@ -923,10 +923,14 @@ void QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered()
     auto params = menu()->currentParameters(sender());
     auto layout = params.resource().dynamicCast<QnLayoutResource>();
     auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
+    auto roleId = params.argument<QnUuid>(Qn::UuidRole);
 
-    NX_ASSERT(layout);
-    NX_ASSERT(user);
-    if (!layout || !user)
+    QnResourceAccessSubject subject = user
+        ? QnResourceAccessSubject(user)
+        : QnResourceAccessSubject(qnResourceAccessManager->userGroup(roleId));
+
+    NX_ASSERT(layout && subject.isValid());
+    if (!layout || !subject.isValid())
         return;
 
     NX_ASSERT(!layout->isFile());
@@ -950,15 +954,15 @@ void QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered()
 
 
     /* Admins anyway have all shared layouts. */
-    if (qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAdminPermission))
+    if (qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
         return;
 
-    auto accessible = qnResourceAccessManager->accessibleResources(user->getId());
+    auto accessible = qnResourceAccessManager->accessibleResources(subject.sharedResourcesKey());
     if (accessible.contains(layout->getId()))
         return;
 
     accessible << layout->getId();
-    qnResourcesChangesManager->saveAccessibleResources(user->getId(), accessible);
+    qnResourcesChangesManager->saveAccessibleResources(subject, accessible);
 }
 
 void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
@@ -981,14 +985,13 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
     if (!confirmStopSharingLayouts(subject, layouts))
         return;
 
-    auto key = QnResourceAccessProvider::sharedResourcesKey(subject);
-    auto accessible = qnResourceAccessManager->accessibleResources(key);
+    auto accessible = qnResourceAccessManager->accessibleResources(subject.sharedResourcesKey());
     for (const auto& layout : layouts)
     {
         NX_ASSERT(!layout->isFile());
         accessible.remove(layout->getId());
     }
-    qnResourcesChangesManager->saveAccessibleResources(key, accessible);
+    qnResourcesChangesManager->saveAccessibleResources(subject, accessible);
 }
 
 void QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered()

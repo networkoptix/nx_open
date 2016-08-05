@@ -31,8 +31,6 @@ public:
     //TODO: #vkutin #GDM Refactoring is probably needed to merge this functionality with isAccessibleResource functions.
     static QnIndirectAccessProviders indirectlyAccessibleLayouts(const QnResourceAccessSubject& subject);
 
-    static QnUuid sharedResourcesKey(const QnResourceAccessSubject& subject);
-
     /** List of resources ids, the given user has access to (only given directly). */
     static QSet<QnUuid> sharedResources(const QnResourceAccessSubject& subject);
 private:

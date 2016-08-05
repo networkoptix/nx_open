@@ -18,6 +18,21 @@ public:
         return user || !role.isNull();
     }
 
+    QnUuid sharedResourcesKey() const
+    {
+        if (!isValid())
+            return QnUuid();
+
+        QnUuid key = role.id;
+        if (user)
+        {
+            key = user->getId();
+            if (user->role() == Qn::UserRole::CustomUserGroup)
+                key = user->userGroup();
+        }
+        return key;
+    }
+
     QnUserResourcePtr user;
     ec2::ApiUserGroupData role;
 };
@@ -56,4 +71,9 @@ const ec2::ApiUserGroupData& QnResourceAccessSubject::role() const
 bool QnResourceAccessSubject::isValid() const
 {
     return d_ptr->isValid();
+}
+
+QnUuid QnResourceAccessSubject::sharedResourcesKey() const
+{
+    return d_ptr->sharedResourcesKey();
 }

@@ -1393,7 +1393,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
     if (node->type() == Qn::AccessibleLayoutsNode)
     {
         node = node->parent();
-        if (!check(node, Qn::user))
+        if (node->type() != Qn::RoleNode && !check(node, Qn::user))
             return false;
     }
 
@@ -1419,6 +1419,25 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             parameters = QnActionParameters(sourceResources);
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
         menu()->trigger(QnActions::DropOnVideoWallItemAction, parameters);
+    }
+    else if (node->type() == Qn::RoleNode)
+    {
+        auto layoutsToShare = sourceResources.filtered<QnLayoutResource>(
+            [](const QnLayoutResourcePtr& layout)
+            {
+                return !layout->isFile();
+            });
+        QnUuid roleId = node->uuid();
+        for (const auto& layout : layoutsToShare)
+        {
+            TRACE("Sharing layout " << layout->getName() << " with role "
+                << node->m_displayName);
+            menu()->trigger(
+                QnActions::ShareLayoutAction,
+                QnActionParameters(layout).
+                withArgument(Qn::UuidRole, roleId)
+            );
+        }
     }
     else
     {

@@ -21,6 +21,10 @@ public:
 
     bool isValid() const;
 
+    //TODO: #GDM logical dependency hack. Change ResourceAccessManager interface to work with subj.
+    /** Key value in the shared resources map. */
+    QnUuid sharedResourcesKey() const;
+
 private:
     QScopedPointer<QnResourceAccessSubjectPrivate> d_ptr;
 };

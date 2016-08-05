@@ -83,26 +83,11 @@ QnIndirectAccessProviders QnResourceAccessProvider::indirectlyAccessibleLayouts(
     return indirectlyAccessible;
 }
 
-QnUuid QnResourceAccessProvider::sharedResourcesKey(const QnResourceAccessSubject& subject)
-{
-    if (!subject.isValid())
-        return QnUuid();
-
-    QnUuid key = subject.role().id;
-    if (subject.user())
-    {
-        key = subject.user()->getId();
-        if (subject.user()->role() == Qn::UserRole::CustomUserGroup)
-            key = subject.user()->userGroup();
-    }
-    return key;
-}
-
 QSet<QnUuid> QnResourceAccessProvider::sharedResources(const QnResourceAccessSubject& subject)
 {
     if (!subject.isValid())
         return QSet<QnUuid>();
-    return qnResourceAccessManager->accessibleResources(sharedResourcesKey(subject));
+    return qnResourceAccessManager->accessibleResources(subject.sharedResourcesKey());
 }
 
 bool QnResourceAccessProvider::isAccessibleViaVideowall(const QnResourceAccessSubject& subject, const QnResourcePtr& resource)

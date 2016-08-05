@@ -199,7 +199,7 @@ void QnUserGroupsDialog::applyChanges()
         if (existing != group)
             qnResourcesChangesManager->saveUserGroup(group);
 
-        qnResourcesChangesManager->saveAccessibleResources(group.id, m_model->accessibleResources(group.id));
+        qnResourcesChangesManager->saveAccessibleResources(group, m_model->accessibleResources(group.id));
     }
 
     for (const auto& group : qnResourceAccessManager->userGroups())
