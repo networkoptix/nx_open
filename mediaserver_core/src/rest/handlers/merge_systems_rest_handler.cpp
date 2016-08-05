@@ -270,17 +270,6 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     if (!server)
         return false;
 
-    nx_http::HttpClient client;
-    client.setResponseReadTimeoutMs(requestTimeout);
-    client.setSendTimeoutMs(requestTimeout);
-    client.setMessageBodyReadTimeoutMs(requestTimeout);
-    client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
-
-    QUrl requestUrl(remoteUrl);
-    client.setUserName(server->getId().toString());
-    client.setUserPassword(server->getAuthKey());
-    requestUrl.setPath(lit("/api/configure"));
-
     ConfigureSystemData data;
     data.systemName = qnCommon->localSystemName();
     data.sysIdTime = qnCommon->systemIdentityTime();
@@ -310,6 +299,18 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     }
 
     QByteArray serializedData = QJson::serialized(data);
+
+    nx_http::HttpClient client;
+    client.setResponseReadTimeoutMs(requestTimeout);
+    client.setSendTimeoutMs(requestTimeout);
+    client.setMessageBodyReadTimeoutMs(requestTimeout);
+    client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
+
+    QUrl requestUrl(remoteUrl);
+    client.setUserName(admin->getName());
+    client.setUserPassword(remoteAdminPassword);
+    requestUrl.setPath(lit("/api/configure"));
+
     if (!client.doPost(requestUrl, "application/json", serializedData) ||
         !isResponseOK(client))
     {
