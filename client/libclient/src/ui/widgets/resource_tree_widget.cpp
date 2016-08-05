@@ -451,15 +451,11 @@ void QnResourceTreeWidget::updateColumns()
     if (!model())
         return;
 
-    const int checkBoxSize = 16;
     ui->resourcesTreeView->header()->setStretchLastSection(false);
 
     ui->resourcesTreeView->setColumnHidden(Qn::CheckColumn, !m_checkboxesVisible);
     if (m_checkboxesVisible)
-    {
-        ui->resourcesTreeView->header()->setSectionResizeMode(Qn::CheckColumn, QHeaderView::Fixed);
-        ui->resourcesTreeView->setColumnWidth(Qn::CheckColumn, checkBoxSize);
-    }
+        ui->resourcesTreeView->header()->setSectionResizeMode(Qn::CheckColumn, QHeaderView::ResizeToContents);
 
     bool customColumnVisible = (customColumnDelegate() != nullptr);
 
