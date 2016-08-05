@@ -569,6 +569,14 @@ QList<QnResourceTreeModelNodePtr> QnResourceTreeModelNode::children() const
     return m_children;
 }
 
+QList<QnResourceTreeModelNodePtr> QnResourceTreeModelNode::childrenRecursive() const
+{
+    QList<QnResourceTreeModelNodePtr> result(m_children);
+    for (auto child: m_children)
+        result << child->childrenRecursive();
+    return result;
+}
+
 QnResourceTreeModelNodePtr QnResourceTreeModelNode::child(int index)
 {
     return m_children[index];

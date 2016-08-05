@@ -60,7 +60,7 @@ private:
     QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
     /** Calculate real children as node's children() method does not return bastard nodes. */
-    QList<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node, bool recursive = false) const;
+    QList<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node) const;
 
     QnResourceTreeModelNodePtr ensureResourceNode(const QnResourcePtr& resource);
     QnResourceTreeModelNodePtr ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType = Qn::LayoutItemNode);

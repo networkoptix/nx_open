@@ -178,18 +178,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::node(const QModelIndex &index) c
     return static_cast<QnResourceTreeModelNode *>(index.internalPointer())->toSharedPointer();
 }
 
-QList<QnResourceTreeModelNodePtr> QnResourceTreeModel::children(const QnResourceTreeModelNodePtr& node, bool recursive) const
+QList<QnResourceTreeModelNodePtr> QnResourceTreeModel::children(const QnResourceTreeModelNodePtr& node) const
 {
     /* Calculating children this way because bastard nodes are absent in node's childred() list. */
     QList<QnResourceTreeModelNodePtr> result;
     for (auto existing : m_allNodes)
     {
         if (existing->parent() == node)
-        {
             result << existing;
-            if (recursive)
-                result << children(existing, recursive);
-        }
     }
     return result;
 }
@@ -826,7 +822,7 @@ void QnResourceTreeModel::updateSharedLayoutNodes(const QnLayoutResourcePtr& lay
         }
 
         /* Check if node must be removed from some user. */
-        for (auto node : children(*iter, true))
+        for (auto node : (*iter)->childrenRecursive())
         {
             if (node->type() != Qn::SharedLayoutNode)
                 continue;
