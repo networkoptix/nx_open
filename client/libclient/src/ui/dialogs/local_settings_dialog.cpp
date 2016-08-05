@@ -22,8 +22,8 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::LocalSettingsDialog()),
-    m_advancedSettingsWidget(new QnAdvancedSettingsWidget(this)),
     m_lookAndFeelWidget(new QnLookAndFeelPreferencesWidget(this)),
+    m_advancedSettingsWidget(new QnAdvancedSettingsWidget(this)),
     m_restartLabel(nullptr)
 {
     ui->setupUi(this);
