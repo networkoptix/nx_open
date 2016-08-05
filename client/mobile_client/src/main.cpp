@@ -62,7 +62,12 @@ int runUi(QGuiApplication *application) {
     for (const auto& scheme: uriHandler->supportedSchemes())
         QDesktopServices::setUrlHandler(scheme, uriHandler.data(), uriHandler->handlerMethodName());
 
-    qnCommon->instance<QnLiteClientHandler>()->setUiController(context.uiController());
+    if (qnSettings->isLiteClientModeEnabled())
+    {
+        auto liteClientHandler = new QnLiteClientHandler();
+        liteClientHandler->setUiController(context.uiController());
+        qnCommon->store<QnLiteClientHandler>(liteClientHandler);
+    }
 
     QStringList selectors;
 
