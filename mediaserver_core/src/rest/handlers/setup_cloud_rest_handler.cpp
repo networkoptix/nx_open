@@ -111,9 +111,9 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnU
         //changing system name back
         configSystemData.systemName = systemNameBak;
         changeSystemName(configSystemData);
+        qnGlobalSettings->setNewSystem(true); //< revert
         return httpResult;
     }
-    qnGlobalSettings->setNewSystem(false);
     if (qnGlobalSettings->synchronizeNowSync())
         qnCommon->updateModuleInformation();
 
