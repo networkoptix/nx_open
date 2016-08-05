@@ -39,7 +39,7 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#define DEBUG_RESOURCE_TREE_MODEL
+//#define DEBUG_RESOURCE_TREE_MODEL
 #ifdef DEBUG_RESOURCE_TREE_MODEL
 #define TRACE(...) qDebug() << "QnResourceTreeModel: " << __VA_ARGS__;
 #else
