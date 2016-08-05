@@ -446,7 +446,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     data.tranLogTime = remoteTranLogTime;
     data.wholeSystem = true;
 
-    if (!changeSystemName(data, Qn::UserAccessData(owner->authUserId())))
+    if (!changeSystemName(data))
     {
         NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to change system name"), cl_logDEBUG1);
         return false;

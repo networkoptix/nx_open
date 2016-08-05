@@ -261,14 +261,12 @@ void QnTransactionTcpProcessor::run()
             // since server-to-server order of transactions is unpredictable and access check for resource attribute
             // may come before resource itself is added to the resource pool and this may be restricted by the access
             // checking mechanics.
-            if (access != Qn::kSystemAccess)
-            {
-                auto user = qnResPool->getResourceById<QnUserResource>(d->authUserId);
-                bool authAsOwner = qnResourceAccessManager->userRole(user) == Qn::UserRole::Owner;
-                NX_ASSERT(authAsOwner, "Server must always be authorised as owner");
-                if (authAsOwner)
-                    access = Qn::kSystemAccess;
-            }
+            auto user = qnResPool->getResourceById<QnUserResource>(d->authUserId);
+            bool authAsOwner = qnResourceAccessManager->userRole(user) == Qn::UserRole::Owner ||
+                               access.userId == Qn::kSystemAccess.userId;
+            NX_ASSERT(authAsOwner, "Server must always be authorised as owner");
+            if (authAsOwner)
+                access = Qn::kSystemAccess;
         }
 
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(

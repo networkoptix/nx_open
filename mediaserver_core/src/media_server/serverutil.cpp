@@ -239,7 +239,7 @@ void resetTransactionTransportConnections()
         QnServerConnector::instance()->start();
 }
 
-bool changeSystemName(const ConfigureSystemData& data, const Qn::UserAccessData& userAccessData)
+bool changeSystemName(const ConfigureSystemData& data)
 {
     nx::SystemName systemName(data.systemName);
     if (qnCommon->localSystemName() == systemName.value())
@@ -266,7 +266,7 @@ bool changeSystemName(const ConfigureSystemData& data, const Qn::UserAccessData&
     // add foreign user
     if (!data.foreignUser.id.isNull())
     {
-        if (connection->getUserManager(userAccessData)->saveSync(data.foreignUser) != ec2::ErrorCode::ok)
+        if (connection->getUserManager(Qn::kSystemAccess)->saveSync(data.foreignUser) != ec2::ErrorCode::ok)
         {
             systemName = nx::SystemName(systemNameBak);
             if (!systemName.saveToConfig())
@@ -308,7 +308,7 @@ bool changeSystemName(const ConfigureSystemData& data, const Qn::UserAccessData&
     nx::ServerSetting::setAuthKey(server->getAuthKey().toLatin1());
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
-    if (connection->getMediaServerManager(userAccessData)->saveSync(apiServer) != ec2::ErrorCode::ok)
+    if (connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer) != ec2::ErrorCode::ok)
     {
         NX_LOG("Failed to update server auth key while configuring system", cl_logWARNING);
     }
@@ -316,7 +316,7 @@ bool changeSystemName(const ConfigureSystemData& data, const Qn::UserAccessData&
     if (!data.foreignServer.id.isNull())
     {
         // add foreign server to pass auth if admin user is disabled
-        if (connection->getMediaServerManager(userAccessData)->saveSync(data.foreignServer) != ec2::ErrorCode::ok)
+        if (connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(data.foreignServer) != ec2::ErrorCode::ok)
         {
             NX_LOG("Failed to add foreign server while configuring system", cl_logWARNING);
         }

@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include "rest/server/rest_connection_processor.h"
+#include <rest/helpers/permissions_helper.h>
 
 namespace {
     static const QString kDefaultAdminPassword = "admin";
@@ -31,6 +32,12 @@ int QnDetachFromSystemRestHandler::executePost(const QString &path, const QnRequ
 
 int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, const QnUuid &userId, QnJsonRestResult &result)
 {
+    if (QnPermissionsHelper::isSafeMode())
+        return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::hasOwnerPermissions(userId))
+        return QnPermissionsHelper::notOwnerError(result);
+
+
     if (!passwordData.hasPassword())
         passwordData.password = kDefaultAdminPassword;
 
@@ -49,7 +56,7 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, const QnUu
     data.systemName = systemName.value();
     data.wholeSystem = false;
 
-    if (!changeSystemName(data, Qn::UserAccessData(userId)))
+    if (!changeSystemName(data))
     {
         result.setError(QnRestResult::CantProcessRequest, lit("Internal server error.  Can't change system name."));
         return nx_http::StatusCode::internalServerError;

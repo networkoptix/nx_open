@@ -126,7 +126,7 @@ struct ConfigureSystemData : public PasswordData
 * @param sysIdTime - database recovery time (last back time)
 * @param tranLogTime - move transaction time to position at least tranLogTime
 */
-bool changeSystemName(const ConfigureSystemData& data, const Qn::UserAccessData& userAccessData);
+bool changeSystemName(const ConfigureSystemData& data);
 
 
 #define ConfigureSystemData_Fields PasswordData_Fields (systemName)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUser)(foreignSettings)

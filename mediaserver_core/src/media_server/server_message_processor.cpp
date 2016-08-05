@@ -115,7 +115,7 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
                       configSystemData.sysIdTime = sysIdTime;
                       configSystemData.tranLogTime = tranLogTime;
                       configSystemData.wholeSystem = true;
-                      changeSystemName(configSystemData, Qn::kSystemAccess);
+                      changeSystemName(configSystemData);
                   });
 }
 

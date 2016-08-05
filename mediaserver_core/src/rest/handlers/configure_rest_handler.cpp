@@ -90,7 +90,7 @@ int QnConfigureRestHandler::execute(
             return CODE_OK;
         }
 
-        if (!changeSystemName(data, Qn::UserAccessData(owner->authUserId())))
+        if (!changeSystemName(data))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             return CODE_OK;

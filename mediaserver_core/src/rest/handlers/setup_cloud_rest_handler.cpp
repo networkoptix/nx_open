@@ -97,7 +97,7 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnU
     configSystemData.systemName = newSystemName;
     configSystemData.wholeSystem = false;
 
-    if (!changeSystemName(configSystemData, Qn::UserAccessData(userId)))
+    if (!changeSystemName(configSystemData))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Cannot change system name"));
         return nx_http::StatusCode::ok;
@@ -110,7 +110,7 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnU
     {
         //changing system name back
         configSystemData.systemName = systemNameBak;
-        changeSystemName(configSystemData, Qn::UserAccessData(userId));
+        changeSystemName(configSystemData);
         return httpResult;
     }
     qnGlobalSettings->setNewSystem(false);
