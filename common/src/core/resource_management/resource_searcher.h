@@ -1,6 +1,8 @@
 #ifndef QN_RESOURCE_SEARCHER_H
 #define QN_RESOURCE_SEARCHER_H
 
+#include <atomic>
+
 #include <utils/thread/mutex.h>
 #include <QtCore/QStringList>
 
@@ -100,7 +102,7 @@ protected:
 private:
     DiscoveryMode m_discoveryMode;
     bool m_localResources;
-    volatile bool m_shouldStop;
+    std::atomic<bool> m_shouldStop;
 };
 
 

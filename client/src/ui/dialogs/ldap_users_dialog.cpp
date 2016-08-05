@@ -55,14 +55,14 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
         break;
     }
 
-	if (!serverConnection)
+    if (!serverConnection)
     {
         QnMediaServerResourcePtr server = qnCommon->currentServer();
 
         Q_ASSERT(server);
         if (!server)
         {
-            stopTesting(tr("Could not perform a test."));
+            stopTesting(tr("Could not load users."));
             return;
         }
 

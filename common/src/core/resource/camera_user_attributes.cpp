@@ -20,8 +20,6 @@ QnCameraUserAttributes::QnCameraUserAttributes()
     failoverPriority(Qn::FP_Medium),
     backupQualities(Qn::CameraBackup_Default)
 {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        motionRegions << QnMotionRegion();
 }
 
 void QnCameraUserAttributes::assign( const QnCameraUserAttributes& right, QSet<QByteArray>* const modifiedFields )

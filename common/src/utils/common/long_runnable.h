@@ -1,6 +1,8 @@
 #ifndef QN_LONG_RUNNABLE_H
 #define QN_LONG_RUNNABLE_H
 
+#include <atomic>
+
 #include <common/config.h>
 
 #include <QtCore/QThread>
@@ -58,8 +60,8 @@ private slots:
     void at_finished();
 
 protected:
-    volatile bool m_needStop;
-    volatile bool m_onPause;
+    std::atomic<bool> m_needStop;
+    std::atomic<bool> m_onPause;
     QnSemaphore m_semaphore;
     std::uintptr_t m_systemThreadId;
     QSharedPointer<QnLongRunnablePoolPrivate> m_pool;
