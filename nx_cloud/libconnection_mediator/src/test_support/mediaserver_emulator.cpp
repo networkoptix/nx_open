@@ -5,6 +5,7 @@
 
 #include "mediaserver_emulator.h"
 
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/cloud/data/tunnel_connection_chosen_data.h>
@@ -30,12 +31,14 @@ MediaServerEmulator::MediaServerEmulator(
         false,
         SocketFactory::NatTraversalType::nttDisabled),
     m_systemData(std::move(systemData)),
-    m_serverId(serverName.isEmpty() ? nx::utils::generateRandomName(16) : std::move(serverName)),
+    m_serverId(serverName.isEmpty() ? QnUuid::createUuid().toSimpleString().toUtf8() : std::move(serverName)),
     m_mediatorUdpClient(
         std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
             mediatorEndpoint,
             m_mediatorConnector.get())),
-    m_action(ActionToTake::proceedWithConnection)
+    m_action(ActionToTake::proceedWithConnection),
+    m_cloudConnectionMethodMask((int)network::cloud::CloudConnectType::all)
+
 {
     m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
 
@@ -73,22 +76,13 @@ bool MediaServerEmulator::start()
     m_serverClient->bindToAioThread(m_timer.getAioThread());
     m_serverClient->setOnConnectionRequestedHandler(
         std::bind(&MediaServerEmulator::onConnectionRequested, this, _1));
+
+    auto client = m_mediatorConnector->systemConnection();
+    client->bindToAioThread(m_timer.getAioThread());
+    m_mediatorAddressPublisher = std::make_unique<network::cloud::MediatorAddressPublisher>(
+        std::move(client));
+
     return true;
-}
-
-nx::hpm::api::ResultCode MediaServerEmulator::registerOnMediator()
-{
-    std::list<SocketAddress> localAddresses;
-    localAddresses.push_back(m_httpServer.address());
-
-    nx::hpm::api::ResultCode resultCode = nx::hpm::api::ResultCode::ok;
-    std::tie(resultCode) = makeSyncCall<nx::hpm::api::ResultCode>(
-        std::bind(
-            &nx::hpm::api::MediatorServerTcpConnection::bind,
-            m_serverClient.get(),
-            std::move(localAddresses),
-            std::placeholders::_1));
-    return resultCode;
 }
 
 nx::String MediaServerEmulator::serverId() const
@@ -104,6 +98,11 @@ nx::String MediaServerEmulator::fullName() const
 SocketAddress MediaServerEmulator::endpoint() const
 {
     return m_httpServer.address();
+}
+
+nx::hpm::api::ResultCode MediaServerEmulator::bind()
+{
+    return updateTcpAddresses({endpoint()});
 }
 
 nx::hpm::api::ResultCode MediaServerEmulator::listen() const
@@ -144,6 +143,16 @@ void MediaServerEmulator::setConnectionAckResponseHandler(
     m_connectionAckResponseHandler = std::move(handler);
 }
 
+nx::hpm::api::ResultCode MediaServerEmulator::updateTcpAddresses(std::list<SocketAddress> addresses)
+{
+    utils::promise<nx::hpm::api::ResultCode> promise;
+    m_mediatorAddressPublisher->updateAddresses(
+        std::move(addresses),
+        [&promise](nx::hpm::api::ResultCode success) { promise.set_value(success); });
+
+    return promise.get_future().get();
+}
+
 void MediaServerEmulator::onConnectionRequested(
     nx::hpm::api::ConnectionRequestedEvent connectionRequestedData)
 {
@@ -153,7 +162,8 @@ void MediaServerEmulator::onConnectionRequested(
 
     nx::hpm::api::ConnectionAckRequest connectionAckData;
     connectionAckData.connectSessionId = connectionRequestedData.connectSessionId;
-    connectionAckData.connectionMethods = nx::hpm::api::ConnectionMethod::udpHolePunching;
+    if ((m_cloudConnectionMethodMask & (int)network::cloud::CloudConnectType::udpHp) > 0)
+        connectionAckData.connectionMethods = nx::hpm::api::ConnectionMethod::udpHolePunching;
 
     if (m_onConnectionRequestedHandler)
     {
@@ -167,6 +177,7 @@ void MediaServerEmulator::onConnectionRequested(
                 return;
             case ActionToTake::closeConnectionToMediator:
                 m_serverClient.reset();
+                m_mediatorAddressPublisher.reset();
                 m_mediatorConnector.reset();
                 return;
             default:
@@ -308,6 +319,7 @@ void MediaServerEmulator::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionH
         {
             m_mediatorUdpClient.reset();
             m_serverClient.reset();
+            m_mediatorAddressPublisher.reset();
             m_stunPipeline.reset();
             m_udtStreamSocket.reset();
             m_udtStreamServerSocket.reset();

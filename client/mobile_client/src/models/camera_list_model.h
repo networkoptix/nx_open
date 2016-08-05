@@ -24,6 +24,8 @@ public:
     QString layoutId() const;
     void setLayoutId(const QString& layoutId);
 
+    Q_INVOKABLE int rowByResourceId(const QString& resourceId) const;
+
 public slots:
     void refreshThumbnail(int row);
     void refreshThumbnails(int from, int to);

@@ -101,6 +101,23 @@ void QnCameraListModel::setLayoutId(const QString& layoutId)
     emit layoutIdChanged();
 }
 
+int QnCameraListModel::rowByResourceId(const QString& resourceId) const
+{
+    Q_D(const QnCameraListModel);
+
+    const auto id = QnUuid::fromStringSafe(resourceId);
+    if (id.isNull())
+        return -1;
+
+    auto index = d->model->indexByResourceId(id);
+    if (!index.isValid())
+        return -1;
+
+    index = mapFromSource(index);
+
+    return index.row();
+}
+
 void QnCameraListModel::refreshThumbnail(int row)
 {
     if (!QnCameraThumbnailCache::instance())
@@ -170,15 +187,10 @@ QnCameraListModelPrivate::QnCameraListModelPrivate() :
 {
 }
 
-void QnCameraListModelPrivate::at_thumbnailUpdated(const QnUuid& resourceId, const QString& thumbnailId)
+void QnCameraListModelPrivate::at_thumbnailUpdated(
+    const QnUuid& resourceId, const QString& thumbnailId)
 {
-    model->refreshResource(qnResPool->getResourceById(resourceId), Qn::ThumbnailRole);
+    Q_UNUSED(thumbnailId);
 
-    const auto thumbnail = QnCameraThumbnailCache::instance()->getThumbnail(thumbnailId);
-    if (!thumbnail.isNull())
-    {
-        QnAspectRatioHash aspectRatios = qnSettings->camerasAspectRatios();
-        aspectRatios[resourceId] = static_cast<qreal>(thumbnail.width()) / thumbnail.height();
-        qnSettings->setCamerasAspectRatios(aspectRatios);
-    }
+    model->refreshResource(qnResPool->getResourceById(resourceId), Qn::ThumbnailRole);
 }

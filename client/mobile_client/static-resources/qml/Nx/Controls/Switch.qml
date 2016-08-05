@@ -2,7 +2,7 @@ import QtQuick 2.6
 import Qt.labs.controls 1.0
 import Nx 1.0
 
-Button
+Switch
 {
     id: control
 
@@ -14,8 +14,6 @@ Button
 
     property int animationDuration: 150
 
-    checkable: true
-
     padding: 6
     leftPadding: 8
     rightPadding: 8
@@ -24,11 +22,11 @@ Button
     implicitHeight: 20 + topPadding + bottomPadding
 
     layer.enabled: !control.enabled
-    opacity: control.enabled ? 1.0 : 0.7
+    opacity: control.enabled ? 1.0 : 0.3
 
     background: null
 
-    label: Rectangle
+    indicator: Rectangle
     {
         id: uncheckedLayer
 
@@ -96,5 +94,16 @@ Button
             x: control.checked ? parent.width - width - 2 : 2
             Behavior on x { NumberAnimation { duration: control.animationDuration } }
         }
+    }
+
+    contentItem: null
+
+    onCheckedChanged:
+    {
+        /* Workaroud for a Qt bug.
+           When the switch is disabled during onCheckedChanged handler setting checked to false
+           its check state will be returned to true. */
+        if (!checked)
+            position = 0
     }
 }

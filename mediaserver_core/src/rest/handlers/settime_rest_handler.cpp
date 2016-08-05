@@ -37,7 +37,7 @@ bool setDateTime(qint64 value)
     if (settimeofday(&tv, 0) != 0)
         return false;
 
-    if (QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1")
+    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
     {
         //on nx1 have to execute hwclock -w to save time. But this command sometimes failes
         for (int i = 0; i < 3; ++i)

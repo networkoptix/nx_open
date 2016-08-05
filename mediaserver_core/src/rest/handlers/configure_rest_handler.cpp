@@ -106,6 +106,9 @@ int QnConfigureRestHandler::execute(
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->authUserId()))
+        return QnPermissionsHelper::notOwnerError(result);
+
     QString errStr;
     if (!validatePasswordData(data, &errStr))
     {
@@ -160,7 +163,7 @@ int QnConfigureRestHandler::execute(
     /* set password */
     if (data.hasPassword())
     {
-        if (!changeAdminPassword(data, owner->authUserId()))
+        if (!updateAdminUser(data, QnOptionalBool(), owner->authUserId()))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
         }
@@ -223,7 +226,9 @@ int QnConfigureRestHandler::changePort(const QnUuid &userId, int port)
     ec2::fromResourceToApi(server, apiServer);
     auto connection = QnAppServerConnectionFactory::getConnection2();
     auto manager = connection->getMediaServerManager(Qn::UserAccessData(userId));
-    if (manager->saveSync(apiServer) != ec2::ErrorCode::ok)
+    auto errCode = manager->saveSync(apiServer);
+    NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
+    if (errCode != ec2::ErrorCode::ok)
         return ResultFail;
 
     MSSettings::roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);

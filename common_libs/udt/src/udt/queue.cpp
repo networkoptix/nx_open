@@ -453,7 +453,7 @@ m_bClosing(false),
 m_ExitCond()
 {
    #ifndef _WIN32
-      pthread_cond_init(&m_WindowCond, NULL);
+      pthread_cond_init_monotonic(&m_WindowCond);
       pthread_mutex_init(&m_WindowLock, NULL);
    #else
       m_WindowLock = CreateMutex(NULL, false, NULL);
@@ -886,7 +886,7 @@ m_PassCond()
 {
    #ifndef _WIN32
       pthread_mutex_init(&m_PassLock, NULL);
-      pthread_cond_init(&m_PassCond, NULL);
+      pthread_cond_init_monotonic(&m_PassCond);
       pthread_mutex_init(&m_LSLock, NULL);
       pthread_mutex_init(&m_IDLock, NULL);
    #else
@@ -1119,13 +1119,7 @@ int CRcvQueue::recvfrom(int32_t id, CPacket& packet)
    if (i == m_mBuffer.end())
    {
       #ifndef _WIN32
-         uint64_t now = CTimer::getTime();
-         timespec timeout;
-
-         timeout.tv_sec = now / 1000000 + 1;
-         timeout.tv_nsec = (now % 1000000) * 1000;
-
-         pthread_cond_timedwait(&m_PassCond, &m_PassLock, &timeout);
+         pthread_cond_wait_monotonic_timeout(&m_PassCond, &m_PassLock, 1000 * 1000); // 1 s
       #else
          ReleaseMutex(m_PassLock);
          WaitForSingleObject(m_PassCond, 1000);

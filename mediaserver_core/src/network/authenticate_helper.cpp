@@ -4,7 +4,7 @@
 #include <QtCore/QCryptographicHash>
 
 #include <utils/common/app_info.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
@@ -111,6 +111,8 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             {
                 if (usedAuthMethod)
                     *usedAuthMethod = AuthMethod::tempUrlQueryParam;
+                if (authUserId)
+                    *authUserId = it->second.authUserId;
                 return Qn::Auth_OK;
             }
         }
@@ -224,6 +226,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             }
             else {
                 // use admin's realm by default for better compatibility with previous version
+                // in case of default realm upgrade
                 userResource = qnResPool->getAdministrator();
             }
 
@@ -287,23 +290,9 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
 
             authResult = doDigestAuth(
                 request.requestLine.method, authorizationHeader, response, isProxy, authUserId);
-
-            // update user information if authorization by server authKey and user-name is specified
-            if (authUserId &&
-                authResult == Qn::Auth_OK &&
-                qnResPool->getResourceById<QnMediaServerResource>(*authUserId))
-            {
-                *authUserId = Qn::kDefaultUserAccess.userId;
-                auto itr = request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME);
-                if (itr != request.headers.end())
-                {
-                    auto userRes = findUserByName(itr->second);
-                    if (userRes)
-                        *authUserId = userRes->getId();
-                }
-            }
         }
-        else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic) {
+        else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
+        {
             if (usedAuthMethod)
                 *usedAuthMethod = AuthMethod::httpBasic;
             authResult = doBasicAuth(request.requestLine.method, authorizationHeader, response, authUserId);
@@ -313,8 +302,25 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                 *usedAuthMethod = AuthMethod::httpBasic;
             authResult = Qn::Auth_Forbidden;
         }
+
         if( authResult  == Qn::Auth_OK)
         {
+
+            // update user information if authorization by server authKey and user-name is specified
+            if (authUserId &&
+                qnResPool->getResourceById<QnMediaServerResource>(*authUserId))
+            {
+                *authUserId = Qn::kSystemAccess.userId;
+                auto itr = request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME);
+                if (itr != request.headers.end())
+                {
+                    auto userRes = findUserByName(itr->second);
+                    if (userRes)
+                        *authUserId = userRes->getId();
+                }
+            }
+
+
             //checking whether client re-calculated ha1 digest
             if( userDigestData.empty() )
                 return authResult;
@@ -342,7 +348,10 @@ QnAuthMethodRestrictionList* QnAuthHelper::restrictionList()
     return &m_authMethodRestrictionList;
 }
 
-QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath( const QString& path, unsigned int periodMillis )
+QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath(
+    const QnUuid& authUserId,
+    const QString& path,
+    unsigned int periodMillis)
 {
     QString authKey = QnUuid::createUuid().toString();
     if( authKey.isEmpty() )
@@ -362,6 +371,7 @@ QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath( cons
     TempAuthenticationKeyCtx ctx;
     ctx.timeGuard = std::move( timerGuard );
     ctx.path = path;
+    ctx.authUserId = authUserId;
     m_authenticatedPaths.emplace( authKey, std::move( ctx ) );
 
     return QPair<QString, QString>( TEMP_AUTH_KEY_NAME, authKey );
@@ -540,6 +550,11 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
                 return errCode;
             tryOnceAgain = true;
         }
+    }
+    else if (auto server = res.dynamicCast<QnMediaServerResource>())
+    {
+        if (authUserId)
+            *authUserId = server->getId();
     }
 
     if (tryOnceAgain)
@@ -803,7 +818,7 @@ void QnAuthHelper::applyClientCalculatedPasswordHashToResource(
     fromResourceToApi(userResource, userData);
 
 
-    QnAppServerConnectionFactory::getConnection2()->getUserManager(Qn::kDefaultUserAccess)->save(
+    QnAppServerConnectionFactory::getConnection2()->getUserManager(Qn::kSystemAccess)->save(
         userData,
         QString(),
         ec2::DummyHandler::instance(),

@@ -201,7 +201,7 @@
             </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
-                <ios.defines>DISABLE_FFMPEG</ios.defines>
+                <!-- <ios.defines>DISABLE_FFMPEG</ios.defines> -->
             </properties>
         </profile>
     </profiles>

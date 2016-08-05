@@ -47,10 +47,12 @@ enum class AddressAttributeType
 
 enum class CloudConnectType
 {
-    kUnknown,
-    kUdtHp,      // UDT over UDP hole punching
-    kTcpHp,      // TCP hole punching
-    kProxy,      // Proxy server address
+    unknown = 0,
+    forwardedTcpPort = 0x01,   /**< E.g., Upnp */
+    udpHp = 0x02,      /**< UDP hole punching */
+    tcpHp = 0x04,      /**< TCP hole punching */
+    proxy = 0x08,      /**< Proxy server address */
+    all = forwardedTcpPort | udpHp | tcpHp | proxy,
 };
 
 struct NX_NETWORK_API AddressAttribute
@@ -159,6 +161,14 @@ public:
 
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
+    /**
+     * true: resolve on mediator to have a chanse to get direct IPs, DNS is used in case if
+     *      mediator returned nothing.
+     * false: do not resolve on mediator, set cloud address in case of patter match pattern match,
+     *      DNS is involved only if pattern does not match.
+     */
+    static const bool kResolveOnMediator = false;
+
 protected:
     struct NX_NETWORK_API HostAddressInfo
     {
@@ -213,6 +223,9 @@ protected:
         HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator);
 
     void mediatorResolve(
+        HaInfoIterator info, QnMutexLockerBase* lk, bool needDns);
+
+    void mediatorResolveImpl(
         HaInfoIterator info, QnMutexLockerBase* lk, bool needDns);
 
     std::vector<Guard> grabHandlers(

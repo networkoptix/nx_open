@@ -9,7 +9,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 
 
 namespace nx {
@@ -18,10 +18,12 @@ namespace cloud {
 namespace udp {
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
+    aio::AbstractAioThread* aioThread,
     nx::String connectionId,
     std::unique_ptr<UdtStreamSocket> udtConnection,
     Timeouts timeouts)
 :
+    AbstractOutgoingTunnelConnection(aioThread),
     m_connectionId(std::move(connectionId)),
     m_localPunchedAddress(udtConnection->getLocalAddress()),
     m_remoteHostAddress(udtConnection->getForeignAddress()),
@@ -31,12 +33,12 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     m_pleaseStopHasBeenCalled(false),
     m_pleaseStopCompleted(false)
 {
+    m_controlConnection->bindToAioThread(getAioThread());
     std::chrono::milliseconds timeout = m_timeouts.maxConnectionInactivityPeriod();
     m_controlConnection->socket()->setRecvTimeout(timeout.count());
     m_controlConnection->setMessageHandler(
         std::bind(&OutgoingTunnelConnection::onStunMessageReceived,
             this, std::placeholders::_1));
-    m_aioTimer.bindToAioThread(m_controlConnection->getAioThread());
     m_controlConnection->startReadingConnection();
 
     hpm::api::UdpHolePunchingSynRequest syn;
@@ -46,10 +48,12 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
 }
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
+    aio::AbstractAioThread* aioThread,
     nx::String connectionId,
     std::unique_ptr<UdtStreamSocket> udtConnection)
 :
     OutgoingTunnelConnection(
+        aioThread,
         std::move(connectionId),
         std::move(udtConnection),
         Timeouts())
@@ -60,43 +64,38 @@ OutgoingTunnelConnection::~OutgoingTunnelConnection()
 {
     //all internal sockets live in same aio thread, 
         //so it is allowed to free OutgoingTunnelConnection while in aio thread
+    stopWhileInAioThread();
 }
 
-void OutgoingTunnelConnection::pleaseStop(
-    nx::utils::MoveOnlyFunc<void()> userCompletionHandler)
+void OutgoingTunnelConnection::stopWhileInAioThread()
 {
     //caller MUST guarantee that no calls to establishNewConnection can follow 
-        //and establishNewConnection has returned
+    //and establishNewConnection has returned
     m_pleaseStopHasBeenCalled = true;
-    auto completionHandler = 
-        [this, userCompletionHandler = std::move(userCompletionHandler)]()
-        {
-            m_pleaseStopCompleted = true;
-            userCompletionHandler();
-        };
 
-    m_aioTimer.post(
-        [this, completionHandler = std::move(completionHandler)]() mutable
-        {
-            //cancelling ongoing connects
-            QnMutexLocker lk(&m_mutex);
-            std::map<UdtStreamSocket*, ConnectionContext> ongoingConnections;
-            ongoingConnections.swap(m_ongoingConnections);
-            lk.unlock();
+    //cancelling ongoing connects
+    QnMutexLocker lk(&m_mutex);
+    std::map<UdtStreamSocket*, ConnectionContext> ongoingConnections;
+    ongoingConnections.swap(m_ongoingConnections);
+    lk.unlock();
 
-            for (auto& connectionContext: ongoingConnections)
-            {
-                connectionContext.second.completionHandler(
-                    SystemError::interrupted,
-                    nullptr,
-                    true);
-            }
-            ongoingConnections.clear();
-            m_controlConnection.reset();
-            m_aioTimer.pleaseStopSync();
+    for (auto& connectionContext : ongoingConnections)
+    {
+        connectionContext.second.completionHandler(
+            SystemError::interrupted,
+            nullptr,
+            true);
+    }
+    ongoingConnections.clear();
+    m_controlConnection.reset();
 
-            completionHandler();
-        });
+    m_pleaseStopCompleted = true;
+}
+
+void OutgoingTunnelConnection::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    AbstractOutgoingTunnelConnection::bindToAioThread(aioThread);
+    m_controlConnection->bindToAioThread(aioThread);
 }
 
 void OutgoingTunnelConnection::establishNewConnection(
@@ -118,7 +117,7 @@ void OutgoingTunnelConnection::establishNewConnection(
         NX_ASSERT(errorCode != SystemError::noError);
         NX_LOGX(lm("cross-nat %1. Failed to apply socket options to new connection. %2")
             .arg(m_connectionId).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
-        m_aioTimer.post(
+        post(
             [this, handler = move(handler), errorCode]() mutable
             {
                 handler(errorCode, nullptr, m_controlConnection != nullptr);
@@ -127,7 +126,7 @@ void OutgoingTunnelConnection::establishNewConnection(
     }
 
     //temporariliy binding new socket to the same aio thread to simplify code here
-    newConnection->bindToAioThread(m_aioTimer.getAioThread());
+    newConnection->bindToAioThread(getAioThread());
 
     QnMutexLocker lk(&m_mutex);
 
@@ -224,7 +223,7 @@ void OutgoingTunnelConnection::reportConnectResult(
         .arg(m_connectionId).arg(SystemError::toString(errorCode)),
         cl_logDEBUG2);
 
-    //we are in m_aioTimer's thread
+    //we are in object's thread
 
     QnMutexLocker lk(&m_mutex);
     auto connectionIter = m_ongoingConnections.find(connectionPtr);

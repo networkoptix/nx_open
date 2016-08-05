@@ -14,7 +14,7 @@
 #include <qglobal.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/thread/mutex.h>
+#include <nx/utils/random.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "pollable.h"
@@ -114,7 +114,7 @@ void AIOService::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
     QnMutexLocker lk(&m_mutex);
     //if sock is not still bound to aio thread, binding it
-    auto& threadToUse = m_systemSocketAIO.aioThreadPool[rand() % m_systemSocketAIO.aioThreadPool.size()];
+    auto& threadToUse = nx::utils::random::choice(m_systemSocketAIO.aioThreadPool);
     NX_ASSERT(threadToUse);
     lk.unlock();
     threadToUse->post(nullptr, std::move(handler));
@@ -142,14 +142,16 @@ aio::AIOThread* AIOService::getSocketAioThread(Pollable* sock)
 AbstractAioThread* AIOService::getRandomAioThread() const
 {
     QnMutexLocker lk(&m_mutex);
-    const size_t index = rand() % m_systemSocketAIO.aioThreadPool.size();
-    return m_systemSocketAIO.aioThreadPool[index].get();
+    return nx::utils::random::choice(m_systemSocketAIO.aioThreadPool).get();
 }
 
 void AIOService::bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread)
 {
-    NX_ASSERT(!isSocketBeingWatched(sock));
     const auto desiredThread = static_cast<aio::AIOThread*>(aioThread);
+    if (sock->impl()->aioThread.load() == desiredThread)
+        return;
+
+    NX_ASSERT(!isSocketBeingWatched(sock));
 
     //socket can be bound to another aio thread, if it is not used at the moment
     sock->impl()->aioThread.exchange(static_cast<aio::AIOThread*>(desiredThread));

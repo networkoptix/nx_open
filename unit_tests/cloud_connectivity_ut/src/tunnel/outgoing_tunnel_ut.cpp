@@ -12,10 +12,10 @@
 #include <nx/network/cloud/tunnel/outgoing_tunnel.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/system_socket.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/test_options.h>
 #include <utils/common/guard.h>
-
 
 namespace nx {
 namespace network {
@@ -43,12 +43,12 @@ public:
 
     ~DummyConnection()
     {
+        stopWhileInAioThread();
         --instanceCount;
     }
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
+    virtual void stopWhileInAioThread() override
     {
-        completionHandler();
     }
 
     virtual void establishNewConnection(
@@ -95,7 +95,7 @@ std::atomic<size_t> DummyConnection::instanceCount(0);
 
 class DummyConnector
 :
-    public AbstractTunnelConnector
+    public AbstractCrossNatConnector
 {
 public:
     static std::atomic<size_t> instanceCount;
@@ -166,47 +166,21 @@ public:
 
     ~DummyConnector()
     {
+        stopWhileInAioThread();
         --instanceCount;
     }
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
+    virtual void stopWhileInAioThread() override
     {
-        m_aioThreadBinder.pleaseStop(std::move(completionHandler));
     }
 
-    virtual aio::AbstractAioThread* getAioThread() const override
-    {
-        return m_aioThreadBinder.getAioThread();
-    }
-    
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
-    {
-        m_aioThreadBinder.bindToAioThread(aioThread);
-    }
-    
-    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override
-    {
-        m_aioThreadBinder.post(std::move(func));
-    }
-    
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override
-    {
-        m_aioThreadBinder.dispatch(std::move(func));
-    }
-
-    virtual int getPriority() const override
-    {
-        return 0;
-    }
     virtual void connect(
         std::chrono::milliseconds /*timeout*/,
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode errorCode,
-            std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler) override
+        ConnectCompletionHandler handler) override
     {
         if (m_connectTimeout)
         {
-            m_aioThreadBinder.registerTimer(
+            timer()->start(
                 *m_connectTimeout,
                 [this, handler = std::move(handler)]() mutable
                 {
@@ -218,10 +192,10 @@ public:
             connectInternal(std::move(handler));
         }
     }
-    virtual const AddressEntry& targetPeerAddress() const override
-    {
-        return m_targetPeerAddress;
-    }
+    //virtual const AddressEntry& targetPeerAddress() const override
+    //{
+    //    return m_targetPeerAddress;
+    //}
 
     void setConnectionInvokedPromise(
         nx::utils::promise<std::chrono::milliseconds>* const tunnelConnectionInvokedPromise)
@@ -231,7 +205,6 @@ public:
 
 private:
     AddressEntry m_targetPeerAddress;
-    UDPSocket m_aioThreadBinder;
     const bool m_connectSuccessfully;
     const bool m_connectionShouldWorkFine;
     const bool m_singleShotConnection;
@@ -240,11 +213,9 @@ private:
     nx::utils::promise<std::chrono::milliseconds>* m_tunnelConnectionInvokedPromise;
 
     void connectInternal(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode errorCode,
-            std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler)
+        ConnectCompletionHandler handler)
     {
-        m_aioThreadBinder.post(
+        post(
             [this, handler = move(handler)]()
             {
                 if (m_canSucceedEvent)
@@ -316,27 +287,23 @@ TEST_F(OutgoingTunnelTest, general)
 {
     for (int i = 0; i < 100; ++i)
     {
-        const bool connectorWillSucceed = (rand() % 7) > 0;
-        const bool connectionWillSucceed = (rand() % 5) > 0;
-        const int connectionsToCreate = (rand() % 10) + 1;
-        const bool singleShotConnection = rand() & 1;
+        const bool connectorWillSucceed = nx::utils::random::number(0, 6) > 0;
+        const bool connectionWillSucceed = nx::utils::random::number(0, 4) > 0;
+        const int connectionsToCreate = nx::utils::random::number(1, 10);
+        const bool singleShotConnection = (bool)nx::utils::random::number(0, 1);
 
         AddressEntry addressEntry("nx_test.com:12345");
         OutgoingTunnel tunnel(std::move(addressEntry));
 
         setConnectorFactoryFunc(
             [connectorWillSucceed, connectionWillSucceed, singleShotConnection](
-                const AddressEntry& targetAddress) -> ConnectorFactory::CloudConnectors
+                const AddressEntry& targetAddress) -> std::unique_ptr<AbstractCrossNatConnector>
             {
-                ConnectorFactory::CloudConnectors connectors;
-                connectors.emplace(
-                    CloudConnectType::kUdtHp,
-                    std::make_unique<DummyConnector>(
-                        targetAddress,
-                        connectorWillSucceed,
-                        connectionWillSucceed,
-                        singleShotConnection));
-                return connectors;
+                return std::make_unique<DummyConnector>(
+                    targetAddress,
+                    connectorWillSucceed,
+                    connectionWillSucceed,
+                    singleShotConnection);
             });
     
         for (int i = 0; i < connectionsToCreate; ++i)
@@ -382,7 +349,7 @@ TEST_F(OutgoingTunnelTest, general)
             if (result.first != SystemError::noError)
             {
                 //tunnel should be closed by now, checking it has called "closed" handler
-                if (rand() & 1)
+                if (utils::random::number(0, 1))
                     break;
             }
         }
@@ -402,17 +369,14 @@ TEST_F(OutgoingTunnelTest, singleShotConnection)
 
     setConnectorFactoryFunc(
         [connectorWillSucceed, connectionWillSucceed, singleShotConnection](
-            const AddressEntry& targetAddress) -> ConnectorFactory::CloudConnectors
+            const AddressEntry& targetAddress)
+                -> std::unique_ptr<AbstractCrossNatConnector>
         {
-            ConnectorFactory::CloudConnectors connectors;
-            connectors.emplace(
-                CloudConnectType::kUdtHp,
-                std::make_unique<DummyConnector>(
-                    targetAddress,
-                    connectorWillSucceed,
-                    connectionWillSucceed,
-                    singleShotConnection));
-            return connectors;
+            return std::make_unique<DummyConnector>(
+                targetAddress,
+                connectorWillSucceed,
+                connectionWillSucceed,
+                singleShotConnection);
         });
 
     for (int j = 0; j < 1000; ++j)
@@ -452,15 +416,12 @@ TEST_F(OutgoingTunnelTest, handlersQueueingWhileInConnectingState)
 
     setConnectorFactoryFunc(
         [&doConnectEvent](
-            const AddressEntry& targetAddress) -> ConnectorFactory::CloudConnectors
+            const AddressEntry& targetAddress)
+                -> std::unique_ptr<AbstractCrossNatConnector>
         {
-            ConnectorFactory::CloudConnectors connectors;
-            connectors.emplace(
-                CloudConnectType::kUdtHp,
-                std::make_unique<DummyConnector>(
-                    targetAddress,
-                    &doConnectEvent));
-            return connectors;
+            return std::make_unique<DummyConnector>(
+                targetAddress,
+                &doConnectEvent);
         });
 
     std::vector<ConnectionCompletedPromise> promises(connectionsToCreate);
@@ -508,17 +469,14 @@ TEST_F(OutgoingTunnelTest, cancellation)
 
             setConnectorFactoryFunc(
                 [connectorWillSucceed, connectionWillSucceed, singleShotConnection](
-                    const AddressEntry& targetAddress) -> ConnectorFactory::CloudConnectors
+                    const AddressEntry& targetAddress)
+                        -> std::unique_ptr<AbstractCrossNatConnector>
                 {
-                    ConnectorFactory::CloudConnectors connectors;
-                    connectors.emplace(
-                        CloudConnectType::kUdtHp,
-                        std::make_unique<DummyConnector>(
-                            targetAddress,
-                            connectorWillSucceed,
-                            connectionWillSucceed,
-                            singleShotConnection));
-                    return connectors;
+                    return std::make_unique<DummyConnector>(
+                        targetAddress,
+                        connectorWillSucceed,
+                        connectionWillSucceed,
+                        singleShotConnection);
                 });
 
             ConnectionCompletedPromise connectedPromise;
@@ -562,20 +520,16 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
             nx::utils::promise<void> doConnectEvent;
 
             setConnectorFactoryFunc(
-                [connectorTimeout, &doConnectEvent](const AddressEntry& targetAddress) ->
-                    ConnectorFactory::CloudConnectors
+                [connectorTimeout, &doConnectEvent](const AddressEntry& targetAddress)
+                    -> std::unique_ptr<AbstractCrossNatConnector>
                 {
-                    ConnectorFactory::CloudConnectors connectors;
-                    connectors.emplace(
-                        CloudConnectType::kUdtHp,
-                        std::make_unique<DummyConnector>(
-                            targetAddress,
-                            connectorTimeout,
-                            (rand() & 1) ? &doConnectEvent : nullptr));
-                    return connectors;
+                    return std::make_unique<DummyConnector>(
+                        targetAddress,
+                        connectorTimeout,
+                        utils::random::number(0, 1) ? &doConnectEvent : nullptr);
                 });
 
-            const std::chrono::milliseconds timeout(1 + (rand() % 2000));
+            const std::chrono::milliseconds timeout(utils::random::number(1, 2000));
             const std::chrono::milliseconds minTimeoutCorrection(500);
             const std::chrono::milliseconds timeoutCorrection =
                 (timeout / 5) > minTimeoutCorrection
@@ -591,7 +545,7 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
 
             for (auto& connectionContext: connectedPromises)
             {
-                std::this_thread::sleep_for(std::chrono::microseconds(rand() & 0xffff));
+                std::this_thread::sleep_for(std::chrono::microseconds(utils::random::number(0, 0xFFFF)));
                 connectionContext.startTime = std::chrono::steady_clock::now();
                 tunnel.establishNewConnection(
                     timeout,
@@ -644,24 +598,19 @@ TEST_F(OutgoingTunnelTest, connectTimeout2)
 
     setConnectorFactoryFunc(
         [/*connectorTimeout,*/ &tunnelConnectionInvokedPromise](
-            const AddressEntry& targetAddress) -> ConnectorFactory::CloudConnectors
+            const AddressEntry& targetAddress) -> std::unique_ptr<AbstractCrossNatConnector>
         {
-            ConnectorFactory::CloudConnectors connectors;
             auto connector = 
                 std::make_unique<DummyConnector>(
                     targetAddress,
                     /*connectorTimeout*/ nullptr);
             connector->setConnectionInvokedPromise(&tunnelConnectionInvokedPromise);
-            connectors.emplace(
-                CloudConnectType::kUdtHp,
-                std::move(connector));
-            return connectors;
+            return std::move(connector);
         });
 
     const std::chrono::seconds connectionTimeout(3);
 
     ConnectionContext connectionContext;
-    //std::this_thread::sleep_for(std::chrono::microseconds(rand() & 0xffff));
     connectionContext.startTime = std::chrono::steady_clock::now();
     tunnel.establishNewConnection(
         connectionTimeout,
@@ -703,17 +652,13 @@ TEST_F(OutgoingTunnelTest, pool)
 
     setConnectorFactoryFunc(
         [/*connectorTimeout,*/ &tunnelConnectionInvokedPromise](
-            const AddressEntry& targetAddress) -> ConnectorFactory::CloudConnectors
+            const AddressEntry& targetAddress) -> std::unique_ptr<AbstractCrossNatConnector>
         {
-            ConnectorFactory::CloudConnectors connectors;
-            connectors.emplace(
-                CloudConnectType::kUdtHp,
-                std::make_unique<DummyConnector>(
-                    targetAddress,
-                    false,
-                    false,
-                    false));
-            return connectors;
+            return std::make_unique<DummyConnector>(
+                targetAddress,
+                false,
+                false,
+                false);
         });
 
     const size_t connectionCount = 1000;

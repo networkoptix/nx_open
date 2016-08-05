@@ -11,6 +11,12 @@
 #include <core/resource/media_server_resource.h>
 #include "rest/server/rest_connection_processor.h"
 #include <api/resource_property_adaptor.h>
+#include <core/resource/user_resource.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <api/app_server_connection.h>
+#include <rest/helpers/permissions_helper.h>
+#include <cloud/cloud_connection_manager.h>
+
 
 namespace
 {
@@ -38,6 +44,13 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
+QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
+    const CloudConnectionManager& cloudConnectionManager)
+:
+    m_cloudConnectionManager(cloudConnectionManager)
+{
+}
+
 int QnSetupCloudSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
@@ -53,6 +66,12 @@ int QnSetupCloudSystemRestHandler::executePost(const QString &path, const QnRequ
 
 int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnUuid &userId, QnJsonRestResult &result)
 {
+    if (QnPermissionsHelper::isSafeMode())
+        return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::hasOwnerPermissions(userId))
+        return QnPermissionsHelper::notOwnerError(result);
+
+
     if (!qnGlobalSettings->isNewSystem())
     {
         result.setError(QnJsonRestResult::Forbidden, lit("This method is allowed at initial state only. Use 'api/detachFromSystem' method first."));
@@ -79,7 +98,7 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnU
         return nx_http::StatusCode::ok;
     }
 
-    QnSaveCloudSystemCredentialsHandler subHandler;
+    QnSaveCloudSystemCredentialsHandler subHandler(m_cloudConnectionManager);
     int httpResult = subHandler.execute(data, result);
     if (result.error != QnJsonRestResult::NoError)
     {
@@ -90,6 +109,14 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnU
     qnGlobalSettings->setNewSystem(false);
     if (qnGlobalSettings->synchronizeNowSync())
         qnCommon->updateModuleInformation();
+
+
+    QString errString;
+    if (!updateAdminUser(PasswordData(), QnOptionalBool(false), userId, &errString))
+    {
+        result.setError(QnJsonRestResult::CantProcessRequest, errString);
+        return nx_http::StatusCode::ok;
+    }
 
     const auto& settings = QnGlobalSettings::instance()->allSettings();
     for (QnAbstractResourcePropertyAdaptor* setting : settings)

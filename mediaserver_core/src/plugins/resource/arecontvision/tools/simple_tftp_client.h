@@ -26,6 +26,9 @@ class CLSimpleTFTPClient
     //2) more friendly with wireless network ( it hates acks).
 
 public:
+
+	static const int kDefaultTFTPPort = 69;
+
     CLSimpleTFTPClient(const QString& host, unsigned int timeout, unsigned int retry);
     ~CLSimpleTFTPClient(){};
 

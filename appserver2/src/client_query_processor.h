@@ -88,7 +88,7 @@ namespace ec2
             QByteArray tranBuffer;
             Qn::SerializationFormat format = serializationFormatFromUrl(ecBaseUrl);
             if( format == Qn::JsonFormat )
-                tranBuffer = QJson::serialized(tran);
+                tranBuffer = QJson::serialized(tran.params);
             //else if( format == Qn::BnsFormat )
             //    tranBuffer = QnBinary::serialized(tran);
             else if( format == Qn::UbjsonFormat )

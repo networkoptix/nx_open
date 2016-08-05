@@ -47,7 +47,6 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     setTabsClosable(true);
     setElideMode(Qt::ElideRight);
     setTabShape(this, style::TabShape::Rectangular);
-    setIconSize(QSize(20, 20)); //TODO: #vkutin I think we need a single place to store this size
 
     connect(this, SIGNAL(currentChanged(int)),      this, SLOT(at_currentChanged(int)));
     connect(this, SIGNAL(tabCloseRequested(int)),   this, SLOT(at_tabCloseRequested(int)));

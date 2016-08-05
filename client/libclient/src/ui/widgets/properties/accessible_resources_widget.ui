@@ -191,6 +191,12 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>400</height>
+         </size>
+        </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
@@ -241,15 +247,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnTreeView</class>
-   <extends>QTreeView</extends>
-   <header location="global">ui/widgets/common/tree_view.h</header>
-  </customwidget>
-  <customwidget>
    <class>QnPanel</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/common/panel.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnTreeView</class>
+   <extends>QTreeView</extends>
+   <header location="global">ui/widgets/common/tree_view.h</header>
   </customwidget>
   <customwidget>
    <class>QnResourcePreviewWidget</class>

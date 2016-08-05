@@ -57,6 +57,7 @@ public:
         q_ptr(parent),
         standardRoles(standard ? allStandardRoles() : decltype(standardRoles)()),
         userRoles(user ? allUserRoles() : decltype(userRoles)()),
+        firstUserRoleIndex(0),
         customRoleEnabled(custom)
     {
         std::sort(userRoles.begin(), userRoles.end(), &QnUserRolesModelPrivate::lessRoleByName);
@@ -74,10 +75,9 @@ public:
             return;
 
         Q_Q(QnUserRolesModel);
-        q->beginResetModel();
+        QnUserRolesModel::ScopedReset reset(q);
         standardRoles = roles;
         updateRoles();
-        q->endResetModel();
     }
 
     void setStandardRoles(bool enabled)
@@ -97,10 +97,9 @@ public:
             return;
 
         Q_Q(QnUserRolesModel);
-        q->beginResetModel();
+        QnUserRolesModel::ScopedReset reset(q);
         userRoles = roles;
         updateRoles();
-        q->endResetModel();
     }
 
     void setUserRoles(bool enabled)
@@ -117,22 +116,23 @@ public:
             return;
 
         Q_Q(QnUserRolesModel);
-        q->beginResetModel();
+        QnUserRolesModel::ScopedReset reset(q);
 
         customRoleEnabled = enable;
         if (customRoleEnabled)
             roles << RoleDescription(Qn::UserRole::CustomPermissions);
         else
             roles.pop_back();
-
-        q->endResetModel();
     }
 
     void updateRoles()
     {
-        const auto resetGuard = QnRaiiGuard::create([this]() { q_ptr->beginResetModel(); }, [this]() { q_ptr->endResetModel(); });
+        Q_Q(QnUserRolesModel);
+        QnUserRolesModel::ScopedReset reset(q);
 
         roles.clear();
+        firstUserRoleIndex = 0;
+
         if (!context()->user())
             return;
 
@@ -141,6 +141,8 @@ public:
             if (qnResourceAccessManager->canCreateUser(context()->user(), qnResourceAccessManager->userRolePermissions(role), false))
                 roles << RoleDescription(role);
         }
+
+        firstUserRoleIndex = roles.size();
 
         for (auto role : userRoles)
             roles << RoleDescription(role);
@@ -164,17 +166,17 @@ public:
             auto insertionPosition = std::upper_bound(userRoles.begin(), userRoles.end(),
                 userRole, &QnUserRolesModelPrivate::lessRoleByName);
 
-            int indexInFullList = insertionPosition - userRoles.begin() + standardRoles.size();
-            q->beginInsertRows(QModelIndex(), indexInFullList, indexInFullList);
+            int indexInFullList = insertionPosition - userRoles.begin() + firstUserRoleIndex;
+
+            QnUserRolesModel::ScopedInsertRows insertRows(q, QModelIndex(), indexInFullList, indexInFullList);
             userRoles.insert(insertionPosition, userRole);
             roles.insert(indexInFullList, RoleDescription(userRole));
-            q->endInsertRows();
             return true;
         }
 
         /* If updated: */
         int sourceIndex = roleIterator - userRoles.begin();
-        int indexInFullList = sourceIndex + standardRoles.size();
+        int indexInFullList = sourceIndex + firstUserRoleIndex;
 
         if (roleIterator->name != userRole.name)
         {
@@ -182,12 +184,13 @@ public:
                 userRole, &QnUserRolesModelPrivate::lessRoleByName);
 
             int destinationIndex = newPosition - userRoles.begin();
-            int destinationInFullList = destinationIndex + standardRoles.size();
+            int destinationInFullList = destinationIndex + firstUserRoleIndex;
 
             /* Update row order if sorting changes: */
             if (sourceIndex != destinationIndex && sourceIndex + 1 != destinationIndex)
             {
-                q->beginMoveRows(QModelIndex(), indexInFullList, indexInFullList,
+                QnUserRolesModel::ScopedMoveRows moveRows(q,
+                    QModelIndex(), indexInFullList, indexInFullList,
                     QModelIndex(), destinationInFullList);
 
                 if (destinationIndex > sourceIndex)
@@ -205,7 +208,6 @@ public:
                 }
 
                 updateRoles();
-                q->endMoveRows();
 
                 /* Prepare new position for data change: */
                 roleIterator = newPosition;
@@ -233,11 +235,11 @@ public:
             return false;
 
         Q_Q(QnUserRolesModel);
-        int indexInFullList = roleIterator - userRoles.begin() + standardRoles.size();
-        q->beginRemoveRows(QModelIndex(), indexInFullList, indexInFullList);
+        int indexInFullList = roleIterator - userRoles.begin() + firstUserRoleIndex;
+
+        QnUserRolesModel::ScopedRemoveRows removeRows(q, QModelIndex(), indexInFullList, indexInFullList);
         userRoles.erase(roleIterator);
         roles.erase(roles.begin() + indexInFullList);
-        q->endRemoveRows();
         return true;
     }
 
@@ -289,6 +291,8 @@ public:
 
     QList<Qn::UserRole> standardRoles;
     ec2::ApiUserGroupDataList userRoles;
+
+    int firstUserRoleIndex;
     bool customRoleEnabled;
 
     QMetaObject::Connection addOrUpdateRoleConnection;

@@ -2,20 +2,21 @@
 #define QN_PROXY_LABEL_H
 
 #include <QtCore/QScopedPointer>
-#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <utils/common/connective.h>
+
+#include "masked_proxy_widget.h"
 
 class QLabel;
 
 /**
  * A <tt>QLabel</tt> wrapped in <tt>QGraphicsProxyWidget</tt>. Presents an
- * interface similar to that of <tt>QLabel</tt> and fixes some problems of 
+ * interface similar to that of <tt>QLabel</tt> and fixes some problems of
  * <tt>QGraphicsProxyWidget</tt>.
- * 
+ *
  * See https://bugreports.qt-project.org/browse/QTBUG-14622.
  */
-class QnProxyLabel: public Connective<QGraphicsProxyWidget> {
+class QnProxyLabel: public Connective<QnMaskedProxyWidget> {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText)
     Q_PROPERTY(Qt::TextFormat textFormat READ textFormat WRITE setTextFormat)
@@ -27,8 +28,8 @@ class QnProxyLabel: public Connective<QGraphicsProxyWidget> {
     Q_PROPERTY(Qt::TextInteractionFlags textInteractionFlags READ textInteractionFlags WRITE setTextInteractionFlags)
     Q_PROPERTY(bool hasSelectedText READ hasSelectedText)
     Q_PROPERTY(QString selectedText READ selectedText)
-    
-    typedef Connective<QGraphicsProxyWidget> base_type;
+
+    typedef Connective<QnMaskedProxyWidget> base_type;
 
 public:
     explicit QnProxyLabel(const QString &text, QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);

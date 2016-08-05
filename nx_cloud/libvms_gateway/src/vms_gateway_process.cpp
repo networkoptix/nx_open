@@ -20,7 +20,7 @@
 #include <platform/process/current_process.h>
 #include <plugins/videodecoder/stree/stree_manager.h>
 #include <utils/common/app_info.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/common/guard.h>
 #include <utils/common/public_ip_discovery.h>
 #include <utils/common/systemerror.h>
@@ -82,6 +82,11 @@ void VmsGatewayProcess::setOnStartedEventHandler(
 const std::vector<SocketAddress>& VmsGatewayProcess::httpEndpoints() const
 {
     return m_httpEndpoints;
+}
+
+void VmsGatewayProcess::enforceSslFor(const SocketAddress& targetAddress, bool enabled)
+{
+    m_runTimeOptions.enforceSsl(targetAddress, enabled);
 }
 
 #ifdef USE_QAPPLICATION
@@ -159,9 +164,7 @@ int VmsGatewayProcess::exec()
             streeManager);
 
         //registering HTTP handlers
-        registerApiHandlers(
-            settings,
-            &httpMessageDispatcher);
+        registerApiHandlers(settings, m_runTimeOptions, &httpMessageDispatcher);
 
         if (settings.http().sslSupport)
         {
@@ -279,22 +282,23 @@ void VmsGatewayProcess::initializeLogging(const conf::Settings& settings)
 
 void VmsGatewayProcess::registerApiHandlers(
     const conf::Settings& settings,
+    const conf::RunTimeOptions& runTimeOptions,
     nx_http::MessageDispatcher* const msgDispatcher)
 {
     msgDispatcher->setDefaultProcessor<ProxyHandler>(
-        [&settings]() -> std::unique_ptr<ProxyHandler> {
-            return std::make_unique<ProxyHandler>(settings);
+        [&settings, &runTimeOptions]() -> std::unique_ptr<ProxyHandler> {
+            return std::make_unique<ProxyHandler>(settings, runTimeOptions);
         });
 
     if (settings.http().connectSupport)
     {
-        NX_CRITICAL(false, "Currently ConnectHandler has so issues:"
+        NX_CRITICAL(false, "Currently ConnectHandler has some issues:"
             "please see implementation TODOs");
 
         msgDispatcher->registerRequestProcessor<ConnectHandler>(
             nx_http::kAnyPath,
-            [&settings]() -> std::unique_ptr<ConnectHandler> {
-                return std::make_unique<ConnectHandler>(settings);
+            [&settings, &runTimeOptions]() -> std::unique_ptr<ConnectHandler> {
+                return std::make_unique<ConnectHandler>(settings, runTimeOptions);
             },
             nx_http::StringType("CONNECT"));
     }

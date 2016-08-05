@@ -441,6 +441,14 @@ UPDATE access_role SET description='maintenance' WHERE id=8;                \
 UPDATE access_role SET description='owner' WHERE id=9;                      \
 ";
 
+//#CLOUD-468. Adding more fields to system_to_account
+static const char kAddMoreFieldsToSystemSharing[] =
+"                                                                           \
+ALTER TABLE system_to_account ADD COLUMN group_id VARCHAR(64) NULL;         \
+ALTER TABLE system_to_account ADD COLUMN custom_permissions VARCHAR(1024) NULL;   \
+ALTER TABLE system_to_account ADD COLUMN is_enabled INTEGER NULL;            \
+";
+
 }   //db
 }   //cdb
 }   //nx

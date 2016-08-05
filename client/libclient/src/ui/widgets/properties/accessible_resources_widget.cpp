@@ -1,4 +1,5 @@
 #include "accessible_resources_widget.h"
+#include "accessible_resources_model_p.h"
 #include "ui_accessible_resources_widget.h"
 
 #include <client/client_globals.h>
@@ -27,61 +28,18 @@
 
 #include <nx/utils/string.h>
 
-
 namespace {
+
 const int kNoDataFontPixelSize = 24;
 const int kNoDataFontWeight = QFont::Light;
 const int kCameraNameFontPixelSize = 13;
 const int kCameraNameFontWeight = QFont::DemiBold;
 const int kCameraPreviewWidthPixels = 160;
-
-class QnAllCheckableModel: public QnResourceListSortedModel
-{
-    using base_type = QnResourceListSortedModel;
-
-public:
-    explicit QnAllCheckableModel(QObject *parent = 0):
-        base_type(parent),
-        m_allChecked(false)
-    {
-    }
-
-    virtual ~QnAllCheckableModel()
-    {
-    }
-
-    QVariant data(const QModelIndex &index, int role) const
-    {
-        if (m_allChecked && role == Qt::CheckStateRole && index.column() == QnResourceListModel::CheckColumn)
-            return QVariant::fromValue<int>(Qt::Checked);
-
-        return base_type::data(index, role);
-    }
-
-    bool allChecked() const
-    {
-        return m_allChecked;
-    }
-
-    void setAllChecked(bool value)
-    {
-        if (m_allChecked == value)
-            return;
-
-        m_allChecked = value;
-
-        emit dataChanged(
-            index(0, QnResourceListModel::CheckColumn),
-            index(rowCount() - 1, QnResourceListModel::CheckColumn),
-            {Qt::CheckStateRole});
-    }
-
-private:
-    bool m_allChecked;
-};
-
+const int kCameraPreviewHeightPixels = 240;
 const QString kDummyResourceId(lit("dummy_resource"));
-}
+
+} // anonymous namespace
+
 
 QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsModel* permissionsModel, QnResourceAccessFilter::Filter filter, QWidget* parent /*= 0*/):
     base_type(parent),
@@ -90,8 +48,9 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     m_permissionsModel(permissionsModel),
     m_filter(filter),
     m_controlsVisible(filter == QnResourceAccessFilter::MediaFilter), /*< Show 'All' checkbox only for cameras. */
-    m_resourcesModel(new QnResourceListModel()),
-    m_controlsModel(new QnResourceListModel())
+    m_resourcesModel(new QnResourceListModel(this)),
+    m_controlsModel(new QnResourceListModel(this)),
+    m_accessibleResourcesModel(new QnAccessibleResourcesModel(this))
 {
     ui->setupUi(this);
 
@@ -109,6 +68,8 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     font.setWeight(kNoDataFontWeight);
     ui->previewWidget->setFont(font);
     ui->previewWidget->setThumbnailSize(QSize(kCameraPreviewWidthPixels, 0));
+    /* We cannot pass height to thumbnail manager as it will lose AR. */
+    ui->previewWidget->setMaximumHeight(kCameraPreviewHeightPixels);
     ui->previewWidget->hide();
 
     font.setPixelSize(kCameraNameFontPixelSize);
@@ -126,23 +87,49 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
      */
     connect(ui->namePlainText->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, this,
         [this](const QSizeF& size)
-    {
-        /* QPlainTextDocument measures height in lines, not pixels. */
-        int height = static_cast<int>(this->fontMetrics().height() * size.height());
-        ui->namePlainText->setMaximumHeight(height);
-    });
+        {
+            /* QPlainTextDocument measures height in lines, not pixels. */
+            int height = static_cast<int>(this->fontMetrics().height() * size.height());
+            ui->namePlainText->setMaximumHeight(height);
+        });
 
     initControlsModel();
     initResourcesModel();
 
-    QnAllCheckableModel* viewModel = new QnAllCheckableModel(this);
-    viewModel->setSourceModel(m_resourcesModel.data());
-    viewModel->sort(QnResourceListModel::NameColumn);
+    auto sortModel = new QnResourceListSortedModel(this);
+    sortModel->setSourceModel(m_resourcesModel);
+    sortModel->sort(QnAccessibleResourcesModel::NameColumn);
+    m_accessibleResourcesModel->setSourceModel(sortModel);
 
-    connect(this, &QnAccessibleResourcesWidget::controlsChanged, viewModel, &QnAllCheckableModel::setAllChecked);
+    m_accessibleResourcesModel->setIndirectAccessFunction(
+        [this]() -> QnIndirectAccessProviders
+        {
+            auto layouts = m_permissionsModel->accessibleLayouts();
 
-    ui->resourcesTreeView->setModel(viewModel);
-    ui->controlsTreeView->setModel(m_controlsModel.data());
+            if (m_filter == QnResourceAccessFilter::LayoutsFilter)
+                return layouts;
+
+            NX_ASSERT(m_filter == QnResourceAccessFilter::MediaFilter);
+            QnIndirectAccessProviders cameraAccessProviders;
+
+            for (auto layoutInfo = layouts.begin(); layoutInfo != layouts.end(); ++layoutInfo)
+            {
+                auto layout = qnResPool->getResourceById<QnLayoutResource>(layoutInfo.key());
+                if (!layout)
+                    continue;
+
+                for (const auto& item : layout->getItems())
+                    cameraAccessProviders[item.resource.id] << layout;
+            }
+
+            return cameraAccessProviders;
+        });
+
+    connect(this, &QnAccessibleResourcesWidget::controlsChanged,
+        m_accessibleResourcesModel, &QnAccessibleResourcesModel::setAllChecked);
+
+    ui->resourcesTreeView->setModel(m_accessibleResourcesModel);
+    ui->controlsTreeView->setModel(m_controlsModel);
     ui->controlsTreeView->setVisible(m_controlsVisible);
     ui->controlsTreeView->setEnabled(m_controlsVisible);
     ui->line->setVisible(m_controlsVisible);
@@ -152,19 +139,30 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     scrollBar->setUseMaximumSpace(true);
     ui->resourcesTreeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
+    if (m_controlsVisible)
+    {
+        auto keyPressSignalizer = new QnSingleEventSignalizer(this);
+        keyPressSignalizer->setEventType(QEvent::KeyPress);
+        ui->resourcesTreeView->installEventFilter(keyPressSignalizer);
+        ui->controlsTreeView->installEventFilter(keyPressSignalizer);
+        connect(keyPressSignalizer, &QnSingleEventSignalizer::activated,
+            this, &QnAccessibleResourcesWidget::at_itemViewKeyPress);
+    }
+
     auto showHideSignalizer = new QnMultiEventSignalizer(this);
     showHideSignalizer->addEventType(QEvent::Show);
     showHideSignalizer->addEventType(QEvent::Hide);
     scrollBar->installEventFilter(showHideSignalizer);
-    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this, [this, scrollBar](QObject* object, QEvent* event)
-    {
-        Q_UNUSED(object);
-        QMargins margins = ui->resourceListLayout->contentsMargins();
-        int margin = style()->pixelMetric(QStyle::PM_DefaultTopLevelMargin);
-        margins.setRight(event->type() == QEvent::Show ? margin + scrollBar->width() : margin);
-        ui->resourceListLayout->setContentsMargins(margins);
-        ui->resourceListLayout->activate();
-    });
+    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this,
+        [this, scrollBar](QObject* object, QEvent* event)
+        {
+            Q_UNUSED(object);
+            QMargins margins = ui->resourceListLayout->contentsMargins();
+            int margin = style()->pixelMetric(QStyle::PM_DefaultTopLevelMargin);
+            margins.setRight(event->type() == QEvent::Show ? margin + scrollBar->width() : margin);
+            ui->resourceListLayout->setContentsMargins(margins);
+            ui->resourceListLayout->activate();
+        });
 
     auto itemDelegate = new QnResourceItemDelegate(this);
     itemDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
@@ -175,7 +173,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
         treeView->setItemDelegate(itemDelegate);
         treeView->header()->setStretchLastSection(false);
         treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-        treeView->header()->setSectionResizeMode(QnResourceListModel::NameColumn, QHeaderView::Stretch);
+        treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
         treeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(kIndents));
     };
     setupTreeView(ui->resourcesTreeView);
@@ -185,8 +183,12 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
 
     auto toggleCheckbox = [this](const QModelIndex& index)
     {
-        QAbstractItemModel* model = static_cast<QnTreeView*>(sender())->model();
-        QModelIndex checkboxIdx = index.sibling(index.row(), QnResourceListModel::CheckColumn);
+        QnTreeView* tree = static_cast<QnTreeView*>(sender());
+        QAbstractItemModel* model = tree->model();
+        int column = (tree == ui->controlsTreeView)
+            ? static_cast<int>(QnResourceListModel::CheckColumn)
+            : static_cast<int>(QnAccessibleResourcesModel::CheckColumn);
+        QModelIndex checkboxIdx = index.sibling(index.row(), column);
         int newCheckValue = checkboxIdx.data(Qt::CheckStateRole).toInt() != Qt::Checked ? Qt::Checked : Qt::Unchecked;
         model->setData(checkboxIdx, newCheckValue, Qt::CheckStateRole);
     };
@@ -196,9 +198,13 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
 
     auto batchToggleCheckboxes = [this](const QModelIndex& index)
     {
-        QAbstractItemModel* model = static_cast<QnTreeView*>(sender())->model();
-        QModelIndex checkboxIdx = index.sibling(index.row(), QnResourceListModel::CheckColumn);
-        QModelIndexList selectedRows = ui->resourcesTreeView->selectionModel()->selectedRows(QnResourceListModel::CheckColumn);
+        QnTreeView* tree = static_cast<QnTreeView*>(sender());
+        QAbstractItemModel* model = tree->model();
+        int column = (tree == ui->controlsTreeView)
+            ? static_cast<int>(QnResourceListModel::CheckColumn)
+            : static_cast<int>(QnAccessibleResourcesModel::CheckColumn);
+        QModelIndex checkboxIdx = index.sibling(index.row(), column);
+        QModelIndexList selectedRows = tree->selectionModel()->selectedRows(column);
         selectedRows << checkboxIdx;
 
         /* If any of selected rows were unchecked check all, otherwise uncheck all: */
@@ -214,10 +220,15 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     };
 
     connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, batchToggleCheckboxes);
-    connect(ui->controlsTreeView, &QnTreeView::spacePressed, this, batchToggleCheckboxes);
+    connect(ui->controlsTreeView,  &QnTreeView::spacePressed, this, batchToggleCheckboxes);
 
     connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, &QnAccessibleResourcesWidget::updateThumbnail);
     updateThumbnail();
+}
+
+void QnAccessibleResourcesWidget::indirectAccessChanged()
+{
+    m_accessibleResourcesModel->indirectAccessChanged();
 }
 
 QnAccessibleResourcesWidget::~QnAccessibleResourcesWidget()
@@ -264,6 +275,11 @@ QnResourceAccessFilter::Filter QnAccessibleResourcesWidget::filter() const
     return m_filter;
 }
 
+QSet<QnUuid> QnAccessibleResourcesWidget::checkedResources() const
+{
+    return m_resourcesModel->checkedResources();
+}
+
 void QnAccessibleResourcesWidget::applyChanges()
 {
     auto accessibleResources = m_permissionsModel->accessibleResources();
@@ -272,11 +288,12 @@ void QnAccessibleResourcesWidget::applyChanges()
 
     if (m_filter == QnResourceAccessFilter::LayoutsFilter)
     {
-        QnLayoutResourceList layoutsToShare = qnResPool->getResources(newFiltered)
-            .filtered<QnLayoutResource>([](const QnLayoutResourcePtr& layout)
+        QnLayoutResourceList layoutsToShare = qnResPool->getResources(newFiltered).
+            filtered<QnLayoutResource>([](const QnLayoutResourcePtr& layout)
         {
             return !layout->isShared();
         });
+
         for (const auto& layout : layoutsToShare)
         {
             layout->setParentId(QnUuid());
@@ -294,6 +311,7 @@ void QnAccessibleResourcesWidget::applyChanges()
         if (!qnResPool->getResourceById(id))
             unavailable << id;
     }
+
     accessibleResources.subtract(unavailable);
 
     m_permissionsModel->setAccessibleResources(accessibleResources);
@@ -337,8 +355,8 @@ void QnAccessibleResourcesWidget::initControlsModel()
         emit hasChangesChanged();
     };
 
-    connect(m_controlsModel.data(), &QnResourceListModel::dataChanged, this, modelUpdated);
-    connect(m_controlsModel.data(), &QnResourceListModel::modelReset, this, modelUpdated);
+    connect(m_controlsModel, &QnResourceListModel::dataChanged, this, modelUpdated);
+    connect(m_controlsModel, &QnResourceListModel::modelReset,  this, modelUpdated);
 }
 
 bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resource) const
@@ -439,7 +457,7 @@ void QnAccessibleResourcesWidget::initResourcesModel()
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this, refreshModel);
     refreshModel();
 
-    connect(m_resourcesModel.data(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+    connect(m_resourcesModel, &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
     {
         if (roles.contains(Qt::CheckStateRole)
             && topLeft.column() <= QnResourceListModel::CheckColumn
@@ -459,9 +477,7 @@ void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
         return;
     }
 
-    QModelIndex baseIndex = index.column() == QnResourceListModel::NameColumn
-        ? index
-        : index.sibling(index.row(), QnResourceListModel::NameColumn);
+    QModelIndex baseIndex = index.sibling(index.row(), QnAccessibleResourcesModel::NameColumn);
 
     QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
     ui->namePlainText->setPlainText(toolTip);
@@ -480,3 +496,41 @@ void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
     }
 }
 
+void QnAccessibleResourcesWidget::at_itemViewKeyPress(QObject* watched, QEvent* event)
+{
+    NX_ASSERT(event->type() == QEvent::KeyPress);
+    auto keyEvent = static_cast<QKeyEvent*>(event);
+
+    if (watched == ui->resourcesTreeView)
+    {
+        if (ui->resourcesTreeView->currentIndex().row() != 0)
+            return;
+
+        switch (keyEvent->key())
+        {
+            case Qt::Key_Up:
+            case Qt::Key_PageUp:
+                ui->controlsTreeView->setFocus();
+                event->accept();
+                break;
+
+            default:
+                break;
+        }
+    }
+    else if (watched == ui->controlsTreeView)
+    {
+        switch (keyEvent->key())
+        {
+            case Qt::Key_Down:
+            case Qt::Key_PageDown:
+                ui->resourcesTreeView->setCurrentIndex(ui->resourcesTreeView->model()->index(0, 0));
+                ui->resourcesTreeView->setFocus();
+                event->accept();
+                break;
+
+            default:
+                break;
+        }
+    }
+}

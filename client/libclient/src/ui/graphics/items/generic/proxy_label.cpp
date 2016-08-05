@@ -33,8 +33,6 @@ void QnProxyLabel::init() {
 
     connect(m_label, SIGNAL(linkActivated(const QString &)), this, SIGNAL(linkActivated(const QString &)));
     connect(m_label, SIGNAL(linkHovered(const QString &)), this, SIGNAL(linkHovered(const QString &)));
-
-    setCacheMode(ItemCoordinateCache);
 }
 
 QnProxyLabel::~QnProxyLabel()

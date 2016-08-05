@@ -42,14 +42,17 @@ public:
         Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio,
         Qt::TransformationMode mode = Qt::FastTransformation);
 
-    QPixmap pixmap(const QString& name, 
-        const QSize& size = QSize(), 
-        Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, 
+    QPixmap pixmap(const QString& name,
+        const QSize& size = QSize(),
+        Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio,
         Qt::TransformationMode mode = Qt::FastTransformation);
 
 
     QMovie* newMovie(const QString& name, QObject* parent = nullptr);
     QMovie* newMovie(const char* name, QObject* parent = nullptr);
+
+    static QSize maximumSize(const QIcon& icon, QWindow* window = nullptr,
+        QIcon::Mode mode = QIcon::Normal, QIcon::State state = QIcon::Off);
 
     static QStyle* newStyle(const QnGenericPalette& genericPalette);
 

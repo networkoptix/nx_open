@@ -27,7 +27,13 @@ namespace {
     const int kCloudUserFontSizePixels = 18;
     const int kCloudUserFontWeight = QFont::Light;
 
-} // unnamed namespacee
+    enum
+    {
+        kLocalIndex,
+        kCloudIndex
+    };
+
+} // unnamed namespace
 
 
 QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* parent /*= 0*/) :
@@ -40,10 +46,10 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 {
     ui->setupUi(this);
 
-    ui->userTypeComboBox->addItem(tr("Local"));
-    ui->userTypeComboBox->addItem(tr("Cloud"));
+    ui->userTypeComboBox->insertItem(kLocalIndex, tr("Local"));
+    ui->userTypeComboBox->insertItem(kCloudIndex, tr("Cloud"));
 
-    ui->cloudIconLabel->setPixmap(qnSkin->pixmap("misc/cloud_user_icon.png"));
+    ui->cloudIconLabel->setPixmap(qnSkin->pixmap("user_settings/cloud_user_icon.png"));
 
     QFont font;
     font.setPixelSize(kCloudUserFontSizePixels);
@@ -204,7 +210,7 @@ void QnUserSettingsWidget::loadDataToUi()
         bool localSystem = qnGlobalSettings->cloudSystemID().isEmpty();
         ui->userTypeWidget->setHidden(localSystem);
         ui->mainStackedWidget->setCurrentWidget(ui->localUserPage);
-        ui->userTypeComboBox->setCurrentIndex(localSystem ? 0 : 1);
+        ui->userTypeComboBox->setCurrentIndex(localSystem ? kLocalIndex : kCloudIndex);
     }
     else if (m_model->mode() == QnUserSettingsModel::OtherSettings)
     {

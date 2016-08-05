@@ -265,6 +265,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
         m_ioModuleOverlayWidget->setCamera(m_camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(0);
+        m_ioModuleOverlayWidget->setInputEnabled(accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission));
         addOverlayWidget(m_ioModuleOverlayWidget
             , detail::OverlayParams(Visible, true, true));
 

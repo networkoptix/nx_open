@@ -19,9 +19,9 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/test_options.h>
-
 
 namespace nx {
 namespace network {
@@ -250,7 +250,7 @@ TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
         if( m_connections.size() > 1 && (canCancelIndex < m_startedConnectionsCount) )
         {
             auto connectionToCancelIter = m_connections.begin();
-            size_t index = rand() % m_connections.size();
+            size_t index = nx::utils::random::number<size_t>(0, m_connections.size() - 1);
             std::advance( connectionToCancelIter, index );
             connectionToCancel = std::move(*connectionToCancelIter);
             m_connections.erase( connectionToCancelIter );

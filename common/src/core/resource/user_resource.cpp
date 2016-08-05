@@ -1,10 +1,11 @@
 
 #include "user_resource.h"
 
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/network/http/auth_tools.h>
+#include <nx/utils/random.h>
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
-#include <nx/network/http/auth_tools.h>
+#include <utils/crypt/linux_passwd_crypt.h>
 
 static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
 static const int MSEC_PER_SEC = 1000;
@@ -39,6 +40,41 @@ QnUserResource::QnUserResource(const QnUserResource& right):
     m_fullName(right.m_fullName),
     m_passwordExpirationTimestamp(right.m_passwordExpirationTimestamp)
 {
+}
+
+Qn::UserRole QnUserResource::role() const
+{
+    if (!resourcePool())
+        return Qn::UserRole::CustomPermissions;
+
+    if (isOwner())
+        return Qn::UserRole::Owner;
+
+    QnUuid groupId = userGroup();
+    if (!groupId.isNull())
+        return Qn::UserRole::CustomUserGroup;
+
+    auto permissions = getRawPermissions();
+
+    if (permissions.testFlag(Qn::GlobalAdminPermission))
+        return Qn::UserRole::Administrator;
+
+    switch (permissions)
+    {
+        case Qn::GlobalAdvancedViewerPermissionSet:
+            return Qn::UserRole::AdvancedViewer;
+
+        case Qn::GlobalViewerPermissionSet:
+            return Qn::UserRole::Viewer;
+
+        case Qn::GlobalLiveViewerPermissionSet:
+            return Qn::UserRole::LiveViewer;
+
+        default:
+            break;
+    };
+
+    return Qn::UserRole::CustomPermissions;
 }
 
 QByteArray QnUserResource::getHash() const
@@ -82,7 +118,7 @@ void QnUserResource::generateHash()
     if (password.isEmpty())
         return;
 
-    QByteArray salt = QByteArray::number(rand(), 16);
+    QByteArray salt = QByteArray::number(nx::utils::random::number(0), 16);
     QCryptographicHash md5(QCryptographicHash::Md5);
     md5.addData(salt);
     md5.addData(password.toUtf8());

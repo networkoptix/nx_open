@@ -104,8 +104,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
             QFile::remove(crash.absoluteFilePath());
     }
 
-    const auto admin = qnResPool->getAdministrator();
-    if (!admin)
+    if (!qnGlobalSettings->isInitialized())
         return false;
 
     if (!qnGlobalSettings->isStatisticsAllowed()

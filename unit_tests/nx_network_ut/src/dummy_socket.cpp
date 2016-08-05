@@ -4,6 +4,7 @@
 ***********************************************************/
 
 #include "dummy_socket.h"
+#include <nx/utils/random.h>
 
 
 namespace nx {
@@ -11,7 +12,7 @@ namespace network {
 
 DummySocket::DummySocket()
 :
-    m_localAddress( HostAddress::localhost, rand() )
+    m_localAddress( HostAddress::localhost, nx::utils::random::number<quint16>(5000, 50000) )
 {
 }
 
@@ -104,6 +105,11 @@ bool DummySocket::getLastError( SystemError::ErrorCode* /*errorCode*/ ) const
 AbstractSocket::SOCKET_HANDLE DummySocket::handle() const
 {
     return 0;
+}
+
+Pollable* DummySocket::pollable()
+{
+    return nullptr;
 }
 
 bool DummySocket::connect(

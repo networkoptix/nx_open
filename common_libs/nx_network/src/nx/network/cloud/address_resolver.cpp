@@ -341,6 +341,9 @@ void AddressResolver::HostAddressInfo::checkExpirations()
         m_dnsEntries.clear();
     }
 
+    if (!kResolveOnMediator)
+        return; // just a short cut
+
     if (m_mediatorState == State::resolved &&
         m_mediatorResolveTime + kMediatorCacheTimeout < std::chrono::system_clock::now())
     {
@@ -462,6 +465,31 @@ void AddressResolver::mediatorResolve(
             break; // continue
     }
 
+    if (kResolveOnMediator)
+        return mediatorResolveImpl(info, lk, needDns);
+
+    if (info->second.isLikelyCloudAddress
+        && static_cast<bool>(nx::network::SocketGlobals::mediatorConnector().mediatorAddress()))
+    {
+        info->second.setMediatorEntries({AddressEntry(AddressType::cloud, info->first)});
+    }
+    else
+    {
+        info->second.setMediatorEntries();
+    }
+
+    const auto sysErrorCode =
+        info->second.isResolved(true)
+        ? SystemError::noError
+        : SystemError::hostNotFound;
+
+    const auto guards = grabHandlers(sysErrorCode, info);
+    lk->unlock(); //< fire guards away from mutex scope
+}
+
+void AddressResolver::mediatorResolveImpl(
+    HaInfoIterator info, QnMutexLockerBase* lk, bool needDns)
+{
     info->second.mediatorProgress();
     lk->unlock();
     m_mediatorConnection->resolvePeer(

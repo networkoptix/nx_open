@@ -104,7 +104,7 @@ bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolut
     {
         OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
             << ") -> false: resolution is higher than " 
-            << maxRes.width() << " x " << maxRes.Height();
+            << maxRes.width() << " x " << maxRes.height();
         return false;
     }
 

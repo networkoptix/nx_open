@@ -7,13 +7,14 @@
 #define MEDIASERVER_EMULATOR_H
 
 #include <nx/network/aio/timer.h>
+#include <nx/network/cloud/mediator_address_publisher.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/socket.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/udt/udt_socket.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/common/stoppable.h>
 
 #include "../cloud_data_provider.h"
@@ -50,13 +51,13 @@ public:
 
     /** Attaches to a local port and */
     bool start();
-    nx::hpm::api::ResultCode registerOnMediator();
     nx::String serverId() const;
     /** returns serverId.systemId */
     nx::String fullName() const;
     /** Server endpoint */
     SocketAddress endpoint() const;
 
+    nx::hpm::api::ResultCode bind();
     nx::hpm::api::ResultCode listen() const;
 
     /** Address of connection to mediator */
@@ -69,6 +70,8 @@ public:
         std::function<ActionToTake(api::ConnectionRequestedEvent)> handler);
     void setConnectionAckResponseHandler(
         std::function<ActionToTake(api::ResultCode)> handler);
+
+    nx::hpm::api::ResultCode updateTcpAddresses(std::list<SocketAddress> addresses);
 
 private:
     nx::network::aio::Timer m_timer;
@@ -87,6 +90,8 @@ private:
     std::unique_ptr<nx::network::UdtStreamServerSocket> m_udtStreamServerSocket;
     std::unique_ptr<stun::MessagePipeline> m_stunPipeline;
     ActionToTake m_action;
+    const int m_cloudConnectionMethodMask;
+    std::unique_ptr<network::cloud::MediatorAddressPublisher> m_mediatorAddressPublisher;
 
     void onConnectionRequested(
         nx::hpm::api::ConnectionRequestedEvent connectionRequestedData);

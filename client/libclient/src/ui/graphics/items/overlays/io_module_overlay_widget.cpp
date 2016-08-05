@@ -106,6 +106,7 @@ public:
     QPixmap indicatorOnPixmap;
     QPixmap indicatorOffPixmap;
     QnIoModuleColors colors;
+    bool inputEnabled;
 
     struct ModelData {
         ModelData() : indicator(nullptr) {}
@@ -147,17 +148,18 @@ private:
 
 };
 
-QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget *widget)
-    : base_type(widget)
-    , q_ptr(widget)
-    , connectionOpened(false)
-    , indicatorOnPixmap(qnSkin->pixmap("item/io_indicator_on.png"))
-    , indicatorOffPixmap(qnSkin->pixmap("item/io_indicator_off.png"))
-    , timer(new QTimer(this))
-
-    , controlsLayout(createGridLayout())
-    , m_inputsCount(0)
-    , m_outputsCount(0)
+QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget *widget):
+    base_type(widget),
+    q_ptr(widget),
+    connectionOpened(false),
+    indicatorOnPixmap(qnSkin->pixmap("item/io_indicator_on.png")),
+    indicatorOffPixmap(qnSkin->pixmap("item/io_indicator_off.png")),
+    colors(),
+    inputEnabled(false),
+    timer(new QTimer(this)),
+    controlsLayout(createGridLayout()),
+    m_inputsCount(0),
+    m_outputsCount(0)
 {
     widget->setAutoFillBackground(true);
 
@@ -226,7 +228,9 @@ QGraphicsLayoutItem *QnIoModuleOverlayWidgetPrivate::createButton(QnIoModuleOver
     button->setProperty(ioPortPropertyName, data->ioConfigData.id);
     button->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     button->setAutoDefault(false);
-    QObject::connect(button, &QPushButton::clicked, this, &QnIoModuleOverlayWidgetPrivate::at_buttonClicked);
+    button->setEnabled(inputEnabled);
+    if (inputEnabled)
+        QObject::connect(button, &QPushButton::clicked, this, &QnIoModuleOverlayWidgetPrivate::at_buttonClicked);
 
     Q_Q(QnIoModuleOverlayWidget);
     QGraphicsProxyWidget *buttonProxy = new QnMaskedProxyWidget(q);
@@ -279,12 +283,11 @@ void QnIoModuleOverlayWidgetPrivate::addIoItem(QnIoModuleOverlayWidgetPrivate::M
 
     enum
     {
-        kInputsStartColumn = 0
-        , kOutputsStartColumn = 4
-        , kSpacerColumn = 3
-
-        , kIndicatorColumnOffset = 1
-        , kCaptionColumnOffset = 2
+        kInputsStartColumn = 0,
+        kIndicatorColumnOffset = 1,
+        kCaptionColumnOffset = 2,
+        kSpacerColumn = 3,
+        kOutputsStartColumn = 4
     };
 
     const int startColumn = (isOutput ? kOutputsStartColumn : kInputsStartColumn);
@@ -378,7 +381,12 @@ void QnIoModuleOverlayWidgetPrivate::at_ioStateChanged(const QnIOStateData &valu
     it->ioState = value;
 }
 
-void QnIoModuleOverlayWidgetPrivate::at_buttonClicked() {
+void QnIoModuleOverlayWidgetPrivate::at_buttonClicked()
+{
+    NX_ASSERT(inputEnabled);
+    if (!inputEnabled)
+        return;
+
     QString port = sender()->property(ioPortPropertyName).toString();
     if (port.isEmpty())
         return;
@@ -402,7 +410,7 @@ void QnIoModuleOverlayWidgetPrivate::at_buttonClicked() {
     ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
     // we are not interested in client->server transport error code because of real port checking by timer
     if (connection)
-        connection->getBusinessEventManager(Qn::kDefaultUserAccess)->sendBusinessAction(action, camera->getParentId(), this, []{});
+        connection->getBusinessEventManager(Qn::kSystemAccess)->sendBusinessAction(action, camera->getParentId(), this, []{});
 
     if (it->indicator)
         it->indicator->setOn(!it->ioState.isActive);
@@ -449,5 +457,18 @@ const QnIoModuleColors &QnIoModuleOverlayWidget::colors() const {
 void QnIoModuleOverlayWidget::setColors(const QnIoModuleColors &colors) {
     Q_D(QnIoModuleOverlayWidget);
     d->colors = colors;
+    d->updateControls();
+}
+
+bool QnIoModuleOverlayWidget::inputEnabled() const
+{
+    Q_D(const QnIoModuleOverlayWidget);
+    return d->inputEnabled;
+}
+
+void QnIoModuleOverlayWidget::setInputEnabled(bool value)
+{
+    Q_D(QnIoModuleOverlayWidget);
+    d->inputEnabled = value;
     d->updateControls();
 }

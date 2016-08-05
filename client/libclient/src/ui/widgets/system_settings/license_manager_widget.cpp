@@ -98,7 +98,6 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     QSortFilterProxyModel* sortModel = new QnLicenseListSortProxyModel(this);
     sortModel->setSourceModel(m_model);
 
-    ui->gridLicenses->setIconSize(QSize(20, 20));
     ui->gridLicenses->setModel(sortModel);
     ui->gridLicenses->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->gridLicenses->header()->setSortIndicator(QnLicenseListModel::LicenseKeyColumn, Qt::AscendingOrder);
@@ -396,7 +395,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
             Q_UNUSED(reqID);
             at_licensesReceived(licenseKey, errorCode, licensesToUpdate);
         };
-        int handle = QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kDefaultUserAccess)->addLicenses(
+        QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kSystemAccess)->addLicenses(
             licensesToUpdate, this, addLisencesHandler);
     }
 
@@ -461,7 +460,7 @@ void QnLicenseManagerWidget::removeSelectedLicenses()
             at_licenseRemoved(reqID, errorCode, license);
         };
 
-        QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kDefaultUserAccess)->removeLicense(license, this, removeLisencesHandler);
+        QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kSystemAccess)->removeLicense(license, this, removeLisencesHandler);
     }
 }
 

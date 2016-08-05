@@ -30,7 +30,8 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     m_connectionID(std::move(connectionID)),
     m_onFsmFinishedEventHandler(std::move(onFsmFinishedEventHandler)),
     m_settings(settings),
-    m_serverConnectionWeakRef(serverPeerDataLocker.value().peerConnection)
+    m_serverConnectionWeakRef(serverPeerDataLocker.value().peerConnection),
+    m_directTcpAddresses(serverPeerDataLocker.value().endpoints)
 {
     auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
     if (!serverConnectionStrongRef)
@@ -133,7 +134,7 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
             if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
                 request.udpEndpointList.push_front(connection->getSourceAddress());
 
-            if (request.udpEndpointList.empty())
+            if (request.udpEndpointList.empty() && request.forwardedTcpEndpointList.empty())
             {
                 completionHandler(api::ResultCode::noSuitableConnectionMethod);
                 m_timer.post(std::bind(
@@ -145,9 +146,14 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
 
             auto connectResponseSender = std::move(m_connectResponseSender);
 
+            auto tcpEndpoints = std::move(request.forwardedTcpEndpointList);
+            tcpEndpoints.insert(
+                tcpEndpoints.begin(), m_directTcpAddresses.begin(), m_directTcpAddresses.end());
+
             api::ConnectResponse connectResponse;
             connectResponse.params = m_settings.connectionParameters();
             connectResponse.udpEndpointList = std::move(request.udpEndpointList);
+            connectResponse.forwardedTcpEndpointList = std::move(tcpEndpoints);
             connectResponse.cloudConnectVersion = request.cloudConnectVersion;
 
             m_state = State::waitingConnectionResult;

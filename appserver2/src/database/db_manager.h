@@ -19,7 +19,6 @@
 #include "core/resource_management/user_access_data.h"
 #include "core/resource_management/resource_access_manager.h"
 #include "core/resource/user_resource.h"
-#include "transaction/transaction_permissions.h"
 
 
 namespace ec2
@@ -637,58 +636,33 @@ public:
     QnDbManagerAccess(const Qn::UserAccessData &userAccessData);
     ApiObjectType getObjectType(const QnUuid& objectId);
 
-    template <typename T1, typename T2>
-    ErrorCode doQuery(const T1 &t1, T2 &t2)
-    {
-        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, t2);
-        if (errorCode != ErrorCode::ok)
-            return errorCode;
-        if (!hasPermission(t2, Qn::Permission::ReadPermission))
-        {
-            errorCode = ErrorCode::forbidden;
-            t2 = T2();
-        }
-        return errorCode;
-    }
-
     template <typename T1>
-    ErrorCode doQuery(const T1 &t1, ApiFullInfoData &data)
+    ErrorCode doQuery(const T1& t1, ApiFullInfoData& data)
     {
         ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, data);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        filterByPermission(m_userAccessData.userId, data.accessRights, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.allProperties, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.cameraHistory, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.cameras, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.cameraUserAttributesList, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.discoveryData, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.layouts, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.licenses, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.resourceTypes, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.resStatusList, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.rules, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.servers, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.serversUserAttributesList, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.storages, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.userGroups, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.users, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.videowalls, Qn::Permission::ReadPermission);
-        filterByPermission(m_userAccessData.userId, data.webPages, Qn::Permission::ReadPermission);
+        readData(data.resourceTypes);
+        readData(data.servers);
+        readData(data.serversUserAttributesList);
+        readData(data.cameras);
+        readData(data.cameraUserAttributesList);
+        readData(data.users);
+        readData(data.userGroups);
+        readData(data.userGroups);
+        readData(data.accessRights);
+        readData(data.layouts);
+        readData(data.videowalls);
+        readData(data.rules);
+        readData(data.cameraHistory);
+        readData(data.licenses);
+        readData(data.discoveryData);
+        readData(data.allProperties);
+        readData(data.storages);
+        readData(data.resStatusList);
+        readData(data.webPages);
 
-        return errorCode;
-    }
-
-    template<typename T1, template<typename> class Container, typename Param>
-    ErrorCode doQuery(const T1 &inParam, Container<Param> &outParamContainer)
-    {
-        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(inParam, outParamContainer);
-        if (errorCode != ErrorCode::ok)
-            return errorCode;
-        ec2::filterByPermission(m_userAccessData.userId, outParamContainer, Qn::Permission::ReadPermission);
-        if (outParamContainer.size() == 0)
-            return ErrorCode::forbidden;
         return errorCode;
     }
 
@@ -698,73 +672,80 @@ public:
     ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
     void getResourceParamsNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& resourceParams);
 
+    template <typename T1, typename T2>
+    ErrorCode doQuery(const T1 &t1, T2 &t2)
+    {
+        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, t2);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+
+        if (!ec2::getTransactionDescriptorByParam<T2>()->checkReadPermissionFunc(m_userAccessData, t2))
+        {
+            errorCode = ErrorCode::forbidden;
+            t2 = T2();
+        }
+        return errorCode;
+    }
+
+    template<typename T1, template<typename, typename> class Cont, typename T2, typename A>
+    ErrorCode doQuery(const T1 &inParam, Cont<T2,A>& outParam)
+    {
+        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(inParam, outParam);
+        auto outParamOriginalSize = outParam.size();
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+
+        ec2::getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_userAccessData, outParam);
+        if (outParam.size() != outParamOriginalSize && outParam.size() == 0)
+            return ErrorCode::forbidden;
+        return errorCode;
+    }
+
     template <typename Param, typename SerializedTransaction>
     ErrorCode executeTransactionNoLock(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
     {
-        if (!hasPermission(tran.params, Qn::Permission::SavePermission))
+        if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
+            return ErrorCode::forbidden;
+        return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
+    }
+
+    template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
+    ErrorCode executeTransactionNoLock(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
+    {
+        auto outParamContainer = tran.params;
+        ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, outParamContainer);
+        if (outParamContainer.size() != tran.params.size())
             return ErrorCode::forbidden;
 
         return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
-    template <template<typename> class Container, typename Param, typename SerializedTransaction>
-    ErrorCode executeTransactionNoLock(const QnTransaction<Container<Param>> &tran, SerializedTransaction &&serializedTran)
-    {
-        bool userHasNotPermissionForAllResources = std::any_of(tran.params.cbegin(), tran.params.cend(),
-                                                               [this](const Param& param)
-                                                               {
-                                                                   return !hasPermission(param, Qn::Permission::SavePermission);
-                                                               });
-        if (userHasNotPermissionForAllResources)
-            return ErrorCode::forbidden;
-
-        return detail::QnDbManager::instance()->executeTransactionNoLock(
-                    tran,
-                    std::forward<SerializedTransaction>(serializedTran));
-    }
-
     template <class Param, class SerializedTransaction>
     ErrorCode executeTransaction(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
     {
-        if (!hasPermission(tran.params, Qn::Permission::SavePermission))
+        if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
             return ErrorCode::forbidden;
-
-        return detail::QnDbManager::instance()->executeTransaction(
-                    tran,
-                    std::forward<SerializedTransaction>(serializedTran));
+        return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
-    template <template<typename> class Container, typename Param, typename SerializedTransaction>
-    ErrorCode executeTransaction(const QnTransaction<Container<Param>> &tran, SerializedTransaction &&serializedTran)
+    template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
+    ErrorCode executeTransaction(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
     {
-        bool userHasNotPermissionForAllResources = std::any_of(tran.params.cbegin(), tran.params.cend(),
-                                                               [this](const Param& param)
-                                                               {
-                                                                   return !hasPermission(param, Qn::Permission::SavePermission);
-                                                               });
-        if (userHasNotPermissionForAllResources)
+        Cont<Param,A> paramCopy = tran.params;
+        ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, paramCopy);
+        if (paramCopy.size() != tran.params.size())
             return ErrorCode::forbidden;
 
-        return detail::QnDbManager::instance()->executeTransaction(
-                    tran,
-                    std::forward<SerializedTransaction>(serializedTran));
+        return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
 private:
-    template<typename Param>
-    bool hasPermission(const Param &param, Qn::Permission permission)
+    template<typename T>
+    void readData(T& target)
     {
-        switch (permission)
-        {
-        case Qn::Permission::SavePermission:
-            return ec2::hasModifyPermission(m_userAccessData.userId, param);
-        default:
-            return ec2::hasPermission(m_userAccessData.userId, param, permission);
-        }
-        return false;
+        ec2::getTransactionDescriptorByParam<T>()->filterByReadPermissionFunc(m_userAccessData, target);
     }
 
-private:
     Qn::UserAccessData m_userAccessData;
 };
 

@@ -14,7 +14,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlError>
 
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/common/threadqueue.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/std/thread.h>

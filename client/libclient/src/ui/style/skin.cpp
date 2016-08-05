@@ -112,14 +112,14 @@ QPixmap QnSkin::pixmap(const char* name,
     return pixmap(QString::fromLatin1(name), size, aspectMode, mode);
 }
 
-QPixmap QnSkin::pixmap(const QString& name, 
-    const QSize& size, 
-    Qt::AspectRatioMode aspectMode, 
+QPixmap QnSkin::pixmap(const QString& name,
+    const QSize& size,
+    Qt::AspectRatioMode aspectMode,
     Qt::TransformationMode mode)
 {
     static const auto kHiDpiSuffix = lit("@2x");
     static const bool kIsHiDpi = (QApplication::desktop()->devicePixelRatio() > 1);
-    
+
     if (kIsHiDpi)
     {
         // Try to load 2x icons if it is hidpi mode
@@ -175,4 +175,11 @@ QMovie* QnSkin::newMovie(const QString& name, QObject* parent)
 QMovie* QnSkin::newMovie(const char* name, QObject* parent)
 {
     return newMovie(QLatin1String(name), parent);
+}
+
+QSize QnSkin::maximumSize(const QIcon& icon, QWindow* window, QIcon::Mode mode, QIcon::State state)
+{
+    static const QSize huge(32768, 32768);
+    qreal pixelRatio = window ? window->devicePixelRatio() : qApp->devicePixelRatio();
+    return icon.actualSize(huge, mode, state) / pixelRatio;
 }

@@ -98,18 +98,23 @@ angular.module('webadminApp')
                 return;
             }*/
 
-            mediaserver.mergeSystems($scope.settings.url,Config.defaultLogin,$scope.settings.password,
-                $scope.settings.currentPassword,$scope.settings.keepMySystem).then(function(r){
-                if(r.data.error!=='0') {
-                    var errorToShow = errorHandler(r.data.errorString);
-                    if (errorToShow) {
-                        dialogs.alert(L.join.mergeFailed + errorToShow);
-                        return;
-                    }
-                }
-                dialogs.alert(L.join.mergeSucceed).then(function(){
-                    window.location.reload();
-                });
+            // TODO: $scope.settings.currentPassword here
+            mediaserver.checkCurrentPassword($scope.settings.currentPassword).then(function() {
+                mediaserver.mergeSystems($scope.settings.url, Config.defaultLogin, $scope.settings.password,
+                    $scope.settings.keepMySystem).then(function (r) {
+                        if (r.data.error !== '0') {
+                            var errorToShow = errorHandler(r.data.errorString);
+                            if (errorToShow) {
+                                dialogs.alert(L.join.mergeFailed + errorToShow);
+                                return;
+                            }
+                        }
+                        dialogs.alert(L.join.mergeSucceed).then(function () {
+                            window.location.reload();
+                        });
+                    });
+            },function(){
+                dialogs.alert(L.settings.wrongPassword);
             });
         };
 

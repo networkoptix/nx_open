@@ -69,6 +69,7 @@
                     </condition>
                     <condition value="/cdb/system/get_cloud_users" resName="systemID" matchType="presence">
                         <sequence value="true">
+                            <!-- user list is allowed for account -->
                             <set resName="authorized" resValue="false"/>
                             <condition resName="auth.accountRightsOnSystem">
                                 <set value="owner" resName="authorized" resValue="true"/>
@@ -78,7 +79,9 @@
                                 <set value="maintenance" resName="authorized" resValue="true"/>
                             </condition>
                         </sequence>
-                        <!-- request is allowed for account only -->
+                        <condition value="false" resName="auth.systemID" matchType="presence">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
                     </condition>
                     <condition value="/cdb/system/get_access_role_list" resName="systemID" matchType="presence">
                         <sequence value="false">
@@ -179,6 +182,11 @@
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.systemID" matchType="presence">
                             <set value="true" resName="authorized" resValue="true"/>
+                            <condition value="false" resName="auth.accountEmail" matchType="presence">
+                                <condition value="true" resName="systemID" matchType="presence">
+                                    <set value="true" resName="authorized" resValue="true"/>
+                                </condition>
+                            </condition>
                         </condition>
                     </sequence>
                     <!-- only systems can receive events at the moment -->

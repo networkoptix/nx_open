@@ -83,19 +83,6 @@ int currentTimeZone(); // TODO: #Elric move to time.h
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
 
 /**
- * Returns random integer number between min and max parameters. Thread-safe.
- * Correctness of parameters is responsibility of the callee.
- *
- * \returns                             Random number in range [min, max).
- */
-int random(int min, int max);
-
-/**
- * \returns                             Random floating point number in range [0.0, 1.0).
- */
-qreal frandom();
-
-/**
  * \returns                             has of string. Added for compatibility with QT4 code
  */
 uint qt4Hash(const QString& key);

@@ -35,6 +35,23 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     addPage(CamerasPage, m_camerasPage, tr("Media Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
 
+    connect(m_layoutsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this,
+        [this]()
+        {
+            m_model->setAccessibleLayoutsPreview(m_layoutsPage->checkedResources());
+            m_camerasPage->indirectAccessChanged();
+        });
+
+    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this,
+        [this](const QSet<QnUuid>& resourceIds)
+        {
+            if (resourceIds.contains(m_model->selectedGroup()))
+            {
+                m_camerasPage->indirectAccessChanged();
+                m_layoutsPage->indirectAccessChanged();
+            }
+        });
+
     for (auto page : allPages())
     {
         /* Changes are locally stored in model. */
@@ -82,10 +99,11 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
         if (m_model->selectedGroup() == groupId)
             return;
 
-//         for (auto page : allPages())
-//             page.widget->applyChanges();
         m_model->selectGroup(groupId);
         loadDataToUi();
+
+        m_camerasPage->indirectAccessChanged();
+        m_layoutsPage->indirectAccessChanged();
     });
 
     connect(ui->newGroupButton, &QPushButton::clicked, this, [this]
@@ -181,7 +199,7 @@ void QnUserGroupsDialog::applyChanges()
         if (existing != group)
             qnResourcesChangesManager->saveUserGroup(group);
 
-        qnResourcesChangesManager->saveAccessibleResources(group.id, m_model->accessibleResources(group.id));
+        qnResourcesChangesManager->saveAccessibleResources(group, m_model->accessibleResources(group.id));
     }
 
     for (const auto& group : qnResourceAccessManager->userGroups())

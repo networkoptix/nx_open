@@ -1287,14 +1287,14 @@ QnActionManager::QnActionManager(QObject *parent):
             mode(QnActionTypes::DesktopMode).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Save Current Position...")).
-            requiredTargetPermissions(Qn::WritePtzPermission).
+            requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission).
             condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, true, this));
 
         factory(QnActions::PtzManageAction).
             mode(QnActionTypes::DesktopMode).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Manage...")).
-            requiredTargetPermissions(Qn::WritePtzPermission).
+            requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission).
             condition(new QnPtzActionCondition(Qn::ToursPtzCapability, false, this));
 
     } factory.endSubMenu();
@@ -1564,7 +1564,7 @@ QnActionManager::QnActionManager(QObject *parent):
                       this));
 
     factory(QnActions::PingAction).
-        flags(Qn::SingleTarget | Qn::ResourceTarget).
+        flags(Qn::NoTarget).
         text(tr("Ping..."));
 
     factory(QnActions::ServerLogsAction).

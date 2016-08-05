@@ -142,6 +142,49 @@ TEST_F(VmsGatewayProxyTest, IpSpecified)
         nx_http::StatusCode::notFound);
 }
 
+TEST_F(VmsGatewayProxyTest, SslEnabled)
+{
+    addArg("-http/sslSupport", "true");
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    testProxyUrl(QUrl(lit("http://%1/http:%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    testProxyUrl(QUrl(lit("http://%1/ssl:%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    testProxyUrl(QUrl(lit("http://%1/https:%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+}
+
+TEST_F(VmsGatewayProxyTest, SslForbidden)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    testProxyUrl(QUrl(lit("http://%1/http:%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    testProxyUrl(QUrl(lit("http://%1/ssl:%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)),
+        nx_http::StatusCode::forbidden);
+
+    testProxyUrl(QUrl(lit("http://%1/https:%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)),
+        nx_http::StatusCode::forbidden);
+}
+
 TEST_F(VmsGatewayProxyTest, IpForbidden)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(false, false, false));

@@ -69,14 +69,23 @@ bool CloudConnectionManager::boundToCloud() const
     return boundToCloud(&lk);
 }
 
+std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnection(
+    const QString& cloudSystemID,
+    const QString& cloudAuthKey) const
+{
+    return m_cdbConnectionFactory->createConnection(
+        cloudSystemID.toStdString(),
+        cloudAuthKey.toStdString());
+}
+
 std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnection()
 {
     QnMutexLocker lk(&m_mutex);
     if (!boundToCloud(&lk))
         return nullptr;
-    return m_cdbConnectionFactory->createConnection(
-        m_cloudSystemID.toStdString(),
-        m_cloudAuthKey.toStdString());
+    return getCloudConnection(
+        m_cloudSystemID,
+        m_cloudAuthKey);
 }
 
 const nx::cdb::api::ConnectionFactory& CloudConnectionManager::connectionFactory() const
@@ -143,12 +152,22 @@ void CloudConnectionManager::monitorForCloudEvents()
 
 void CloudConnectionManager::stopMonitoringCloudEvents()
 {
+    if (!m_eventConnection)
+        return;
+
     m_eventConnectionRetryTimer->pleaseStopSync();
-    m_eventConnectionRetryTimer.reset();
 
     //closing event connection
-    NX_ASSERT(m_eventConnection);
-    m_eventConnection.reset();
+    decltype(m_eventConnection) eventConnection;
+    {
+        QnMutexLocker lk(&m_mutex);
+        NX_ASSERT(m_eventConnection);
+        eventConnection = std::move(m_eventConnection);
+        m_eventConnection = nullptr;
+    }
+
+    eventConnection.reset();
+    m_eventConnectionRetryTimer.reset();
 }
 
 void CloudConnectionManager::onSystemAccessListUpdated(
@@ -159,7 +178,11 @@ void CloudConnectionManager::onSystemAccessListUpdated(
 
 void CloudConnectionManager::startEventConnection()
 {
-    NX_ASSERT(m_eventConnection);
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (!m_eventConnection)
+            return;
+    }
 
     using namespace std::placeholders;
     nx::cdb::api::SystemEventHandlers systemEventHandlers;

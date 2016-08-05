@@ -7,8 +7,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/device_dependent_strings.h>
+#include <core/resource_management/resource_access_manager.h>
 
 #include <nx/network/socket_common.h>
+#include <nx/network/socket_global.h>
 
 namespace {
 
@@ -28,49 +30,39 @@ QString extractHost(const QString& url)
     return url.mid(startPos, endPos - startPos);
 }
 
-QString getServerUrl(const QnResourcePtr& resource)
+bool hostIsValid(const SocketAddress& address)
+{
+    QString host = address.address.toString();
+
+    /* Check local host. */
+    if (host == lit("localhost") || host == lit("127.0.0.1"))
+        return false;
+
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
+        return false;
+
+    return true;
+};
+
+SocketAddress getServerUrl(const QnMediaServerResourcePtr& server)
 {
     /* We should not display localhost or cloud addresses to user. */
-    auto hostIsValid = [](const QString& host)
-    {
-        /* Check local host. */
-        if (host == lit("localhost") || host == lit("127.0.0.1"))
-            return false;
-
-        /* Check cloud host - short notation (looks just like <uuid>). */
-        if (!QnUuid::fromStringSafe(host).isNull())
-            return false;
-
-        /* Check cloud host - long notation (looks like <uuid>.<uuid>). */
-        int splitterIdx = host.indexOf(L'.');
-        if (splitterIdx > 0)
-        {
-            /* Will not check right part. */
-            if (!QnUuid::fromStringSafe(host.left(splitterIdx)).isNull())
-                return false;
-        }
-
-        return true;
-    };
-
-    QString baseUrl = extractHost(resource->getUrl());
-    if (hostIsValid(baseUrl))
-        return baseUrl;
-
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     NX_ASSERT(server);
     if (!server)
-        return baseUrl;
+        return QString();
+
+    auto primaryUrl = server->getPrimaryAddress();
+    if (hostIsValid(primaryUrl))
+        return primaryUrl;
 
     auto allAddresses = server->getAllAvailableAddresses();
     for (auto address : allAddresses)
     {
-        QString host = address.address.toString();
-        if (hostIsValid(host))
-            return host;
+        if (hostIsValid(address))
+            return address;
     }
 
-    return QString();
+    return SocketAddress();
 }
 
 const QString kFormatTemplate = lit("%1 (%2)");
@@ -83,7 +75,8 @@ QnResourceDisplayInfo::QnResourceDisplayInfo(const QnResourcePtr& resource) :
     m_resource(resource),
     m_detailLevel(Qn::RI_Invalid),
     m_name(),
-    m_url(),
+    m_host(),
+    m_port(0),
     m_extraInfo()
 {}
 
@@ -93,10 +86,16 @@ QString QnResourceDisplayInfo::name() const
     return m_name;
 }
 
-QString QnResourceDisplayInfo::url() const
+QString QnResourceDisplayInfo::host() const
 {
     ensureConstructed(Qn::RI_WithUrl);
-    return m_url;
+    return m_host;
+}
+
+int QnResourceDisplayInfo::port() const
+{
+    ensureConstructed(Qn::RI_WithUrl);
+    return m_port;
 }
 
 QString QnResourceDisplayInfo::extraInfo() const
@@ -114,9 +113,9 @@ QString QnResourceDisplayInfo::toString(Qn::ResourceInfoLevel detailLevel) const
             return m_name;
         case Qn::RI_WithUrl:
         {
-            if (m_url.isEmpty())
+            if (m_host.isEmpty())
                 return m_name;
-            return kFormatTemplate.arg(m_name, m_url);
+            return kFormatTemplate.arg(m_name, m_host);
         }
         case Qn::RI_FullInfo:
         {
@@ -156,12 +155,18 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
     if (detailLevel == Qn::RI_NameOnly)
         return;
 
-    if (m_url.isEmpty())
+    if (m_host.isEmpty())
     {
         if (flags.testFlag(Qn::remote_server))
-            m_url = getServerUrl(m_resource);
+        {
+            auto url = getServerUrl(m_resource.dynamicCast<QnMediaServerResource>());
+            m_host = url.address.toString();
+            m_port = url.port;
+        }
         else if (flags.testFlag(Qn::network))
-            m_url = extractHost(m_resource->getUrl());
+        {
+            m_host = extractHost(m_resource->getUrl());
+        }
     }
 
     if (detailLevel == Qn::RI_WithUrl)
@@ -170,11 +175,11 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
     if (flags.testFlag(Qn::user))
     {
         if (const QnUserResourcePtr& user = m_resource.dynamicCast<QnUserResource>())
-            m_extraInfo = user->fullName();
+            m_extraInfo = qnResourceAccessManager->userRoleName(user);
     }
     else
     {
-        m_extraInfo = m_url;
+        m_extraInfo = m_host;
     }
 }
 

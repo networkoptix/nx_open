@@ -279,7 +279,9 @@ namespace QnSerializationDetail {
     {};
 
     template<class Context, class T, class D>
-    void serialize_internal(Context *ctx, const T &value, D *target, typename std::enable_if<is_metatype_defined<T>::value>::type * = NULL) {
+    void serialize_internal(Context *ctx, const T &value, D *target,
+        typename std::enable_if<is_metatype_defined<T>::value>::type * = NULL) {
+
         typename Context::serializer_type *serializer = ctx->serializer(qMetaTypeId<T>());
         if(serializer) {
             serializer->serialize(ctx, static_cast<const void *>(&value), target);
@@ -289,12 +291,16 @@ namespace QnSerializationDetail {
     }
 
     template<class Context, class T, class D>
-    void serialize_internal(Context *ctx, const T &value, D *target, typename std::enable_if<!is_metatype_defined<T>::value>::type * = NULL) {
+    void serialize_internal(Context *ctx, const T &value, D *target,
+        typename std::enable_if<!is_metatype_defined<T>::value>::type * = NULL) {
+
         serialize_direct(ctx, value, target);
     }
 
     template<class Context, class T, class D>
-    bool deserialize_internal(Context *ctx, const D &value, T *target, typename std::enable_if<is_metatype_defined<T>::value>::type * = NULL) {
+    bool deserialize_internal(Context *ctx, const D &value, T *target,
+        typename std::enable_if<is_metatype_defined<T>::value>::type * = NULL) {
+
         typename Context::serializer_type *serializer = ctx->serializer(qMetaTypeId<T>());
         if(serializer) {
             return serializer->deserialize(ctx, value, static_cast<void *>(target));
@@ -304,7 +310,9 @@ namespace QnSerializationDetail {
     }
 
     template<class Context, class T, class D>
-    bool deserialize_internal(Context *ctx, const D &value, T *target, typename std::enable_if<!is_metatype_defined<T>::value>::type * = NULL) {
+    bool deserialize_internal(Context *ctx, const D &value, T *target,
+        typename std::enable_if<!is_metatype_defined<T>::value>::type * = NULL) {
+
         return deserialize_direct(ctx, value, target);
     }
 

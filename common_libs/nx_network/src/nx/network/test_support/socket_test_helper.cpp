@@ -11,7 +11,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 
 
@@ -48,7 +48,7 @@ TestConnection::TestConnection(
     m_accepted(true)
 {
     m_readBuffer.reserve( kReadBufferSize );
-    m_outData = nx::utils::generateRandomData( kReadBufferSize );
+    m_outData = nx::utils::random::generate( kReadBufferSize );
 
     ++TestConnection_count;
 }
@@ -74,7 +74,7 @@ TestConnection::TestConnection(
     m_accepted(false)
 {
     m_readBuffer.reserve( kReadBufferSize );
-    m_outData = nx::utils::generateRandomData( kReadBufferSize );
+    m_outData = nx::utils::random::generate( kReadBufferSize );
 
     ++TestConnection_count;
 }
@@ -905,7 +905,7 @@ boost::optional<SocketAddress> AddressBinder::random(const SocketAddress& key) c
     if (it == m_map.end() || it->second.size() == 0)
         return boost::none;
 
-    return *std::next(it->second.begin(), rand() % it->second.size());
+    return nx::utils::random::choice(it->second);
 }
 
 MultipleClientSocketTester::MultipleClientSocketTester(AddressBinder* addressBinder)

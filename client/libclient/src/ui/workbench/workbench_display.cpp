@@ -130,14 +130,6 @@ namespace {
         *deltaEnd = newEnd - end;
     }
 
-    Qn::Permission requiredPermission(const QnResourcePtr& resource)
-    {
-        if (resource->hasFlags(Qn::web_page) || resource->hasFlags(Qn::media))
-            return Qn::ViewContentPermission;
-        return Qn::ReadPermission;
-    }
-
-
     /** Size multiplier for raised widgets. */
     const qreal focusExpansion = 100.0;
 
@@ -927,7 +919,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     }
 
     QnResourcePtr resource = qnResPool->getResourceByUniqueId(item->resourceUid());
-    if (!resource || !accessController()->hasPermissions(resource, requiredPermission(resource)))
+    if (!resource || !accessController()->hasPermissions(resource, Qn::ReadPermission))
     {
         qnDeleteLater(item);
         return false;
@@ -2059,7 +2051,7 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
         }
     }
 
-    if (accessController()->hasPermissions(resource, requiredPermission(resource)))
+    if (accessController()->hasPermissions(resource, Qn::ReadPermission))
         return;
 
     /* Here aboutToBeDestroyed will be called with corresponding handling. */

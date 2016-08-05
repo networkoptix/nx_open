@@ -39,21 +39,16 @@
 
 #include <watchers/cloud_status_watcher.h>
 
-QnWorkbenchContext::QnWorkbenchContext(QObject *parent):
+QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject *parent):
     QObject(parent),
-    m_userWatcher(NULL),
-    m_layoutWatcher(NULL),
+    m_accessController(accessController),
+    m_userWatcher(nullptr),
+    m_layoutWatcher(nullptr),
     m_closingDown(false)
 {
     /* Layout watcher should be instantiated before snapshot manager because it can modify layout on adding. */
     m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
     m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
-
-    /*
-     * Access controller should be initialized early because a lot of other modules use it.
-     * It depends on snapshotManager only,
-     */
-    m_accessController.reset(new QnWorkbenchAccessController(this));
 
     m_workbench.reset(new QnWorkbench(this));
 
@@ -106,15 +101,16 @@ QnWorkbenchContext::~QnWorkbenchContext() {
 
     /* Destroy typed subobjects in reverse order to how they were constructed. */
     QnInstanceStorage::clear();
-    m_userWatcher = NULL;
-    m_layoutWatcher = NULL;
+
+    m_userWatcher = nullptr;
+    m_layoutWatcher = nullptr;
+    m_accessController = nullptr;
 
     /* Destruction order of these objects is important. */
     m_statisticsModule.reset();
     m_navigator.reset();
     m_display.reset();
     m_menu.reset();
-    m_accessController.reset();
     m_snapshotManager.reset();
     m_synchronizer.reset();
     m_workbench.reset();
@@ -130,9 +126,19 @@ QnWorkbenchLayoutSnapshotManager* QnWorkbenchContext::snapshotManager() const
     return m_snapshotManager.data();
 }
 
+QnActionManager* QnWorkbenchContext::menu() const
+{
+    return m_menu.data();
+}
+
 QnWorkbenchAccessController* QnWorkbenchContext::accessController() const
 {
-    return m_accessController.data();
+    return m_accessController;
+}
+
+void QnWorkbenchContext::setAccessController(QnWorkbenchAccessController* value)
+{
+    m_accessController = value;
 }
 
 QnWorkbenchDisplay* QnWorkbenchContext::display() const

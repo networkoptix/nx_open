@@ -1,5 +1,4 @@
-<h1>{{event}}: <b>{{source}}</b></h1>
-
+<h1>Server {{#source}}<b>"{{source}}"</b> {{/source}}failed</h1>
 
 <table class="description">
     <thead>

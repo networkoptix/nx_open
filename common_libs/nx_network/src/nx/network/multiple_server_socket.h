@@ -3,7 +3,7 @@
 
 #include <queue>
 
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "nx/network/aio/timer.h"
 #include "system_socket.h"
@@ -57,6 +57,7 @@ public:
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     //!Implementation of AbstractSocket::*
+    Pollable* pollable() override;
     void post(nx::utils::MoveOnlyFunc<void()> handler) override;
     void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
 

@@ -62,14 +62,19 @@ TEST_F(SystemSharing, getCloudUsers)
         bindRandomSystem(account2.email, account2Password, &system3));
 
     //sharing system1 with account2 as viewer
+    api::SystemSharing system1ToAccount2SharingData;
+    system1ToAccount2SharingData.systemID = system1.id;
+    system1ToAccount2SharingData.accountEmail = account2.email;
+    system1ToAccount2SharingData.accessRole = api::SystemAccessRole::viewer;
+    system1ToAccount2SharingData.groupID = "customGroupID";
+    system1ToAccount2SharingData.customPermissions = "customPermissions123123";
+    system1ToAccount2SharingData.isEnabled = false;
     ASSERT_EQ(
         api::ResultCode::ok,
         shareSystem(
             account1.email,
             account1Password,
-            system1.id,
-            account2.email,
-            api::SystemAccessRole::viewer));
+            std::move(system1ToAccount2SharingData)));
 
     //sharing system2 with account2 as cloudAdmin
     ASSERT_EQ(
@@ -87,7 +92,7 @@ TEST_F(SystemSharing, getCloudUsers)
     {
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-        ASSERT_EQ(systems.size(), 2);
+        ASSERT_EQ(2, systems.size());
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system2) != systems.end());
 
@@ -138,28 +143,42 @@ TEST_F(SystemSharing, getCloudUsers)
             api::SystemAccessRole::owner);
         ASSERT_EQ(
             account1.fullName,
-            findSharing(sharings, account1.email, system1.id).fullName);
+            findSharing(sharings, account1.email, system1.id).accountFullName);
 
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account1.email, system2.id),
             api::SystemAccessRole::owner);
         ASSERT_EQ(
             account1.fullName,
-            findSharing(sharings, account1.email, system2.id).fullName);
+            findSharing(sharings, account1.email, system2.id).accountFullName);
 
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account2.email, system1.id),
             api::SystemAccessRole::viewer);
         ASSERT_EQ(
             account2.fullName,
-            findSharing(sharings, account2.email, system1.id).fullName);
+            findSharing(sharings, account2.email, system1.id).accountFullName);
 
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account2.email, system2.id),
             api::SystemAccessRole::cloudAdmin);
         ASSERT_EQ(
             account2.fullName,
-            findSharing(sharings, account2.email, system2.id).fullName);
+            findSharing(sharings, account2.email, system2.id).accountFullName);
+
+        bool found = false;
+        for (const auto& sharingData : sharings)
+        {
+            if (sharingData.systemID == system1ToAccount2SharingData.systemID &&
+                sharingData.accountEmail == system1ToAccount2SharingData.accountEmail)
+            {
+                found = true;
+                ASSERT_TRUE((const api::SystemSharing&)sharingData == system1ToAccount2SharingData);
+                ASSERT_EQ(account2.fullName, sharingData.accountFullName);
+                ASSERT_EQ(account2.id, sharingData.accountID);
+            }
+        }
+        ASSERT_TRUE(found);
     }
 
     //checking sharings from account2 view
@@ -201,6 +220,22 @@ TEST_F(SystemSharing, getCloudUsers)
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account2.email, system2.id),
             api::SystemAccessRole::cloudAdmin);
+    }
+
+    //checking sharings of system1 from system's view
+    {
+        std::vector<api::SystemSharingEx> sharings;
+        ASSERT_EQ(
+            getSystemSharings(system1.id, system1.authKey, &sharings),
+            api::ResultCode::ok);
+        ASSERT_EQ(2, sharings.size());
+
+        ASSERT_EQ(
+            accountAccessRoleForSystem(sharings, account1.email, system1.id),
+            api::SystemAccessRole::owner);
+        ASSERT_EQ(
+            accountAccessRoleForSystem(sharings, account2.email, system1.id),
+            api::SystemAccessRole::viewer);
     }
 }
 
@@ -1018,7 +1053,7 @@ TEST_F(SystemSharing, DISABLED_remove_sharing_unknown_system)
             api::SystemAccessRole::none));
 }
 
-TEST_F(SystemSharing, setSystemUserList)
+TEST_F(SystemSharing, DISABLED_setSystemUserList)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());

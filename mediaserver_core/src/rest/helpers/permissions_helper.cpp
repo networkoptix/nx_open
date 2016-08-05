@@ -13,6 +13,7 @@
 
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/log/log.h>
+#include "core/resource_management/user_access_data.h"
 
 bool QnPermissionsHelper::isSafeMode()
 {
@@ -23,6 +24,23 @@ bool QnPermissionsHelper::isSafeMode()
 int QnPermissionsHelper::safeModeError(QnRestResult &result)
 {
     auto errorMessage = lit("Can't process rest request because server is running in safe mode.");
+    NX_LOG(errorMessage, cl_logDEBUG1);
+    result.setError(QnJsonRestResult::CantProcessRequest, errorMessage);
+    return nx_http::StatusCode::forbidden;
+}
+
+bool QnPermissionsHelper::hasOwnerPermissions(const QnUuid& id)
+{
+    if (id == Qn::kSystemAccess.userId)
+        return true; //< serve auth key authrozation
+
+    auto userResource = qnResPool->getResourceById<QnUserResource>(id);
+    return userResource && userResource->isOwner();
+}
+
+int QnPermissionsHelper::notOwnerError(QnRestResult &result)
+{
+    auto errorMessage = lit("Can't process rest request because authenticated user is not a system owner.");
     NX_LOG(errorMessage, cl_logDEBUG1);
     result.setError(QnJsonRestResult::CantProcessRequest, errorMessage);
     return nx_http::StatusCode::forbidden;

@@ -18,6 +18,7 @@ class QnConnectionManager : public QObject, public QnContextAware {
     Q_PROPERTY(QString currentHost READ currentHost NOTIFY currentHostChanged)
     Q_PROPERTY(QString currentLogin READ currentLogin NOTIFY currentLoginChanged)
     Q_PROPERTY(QString currentPassword READ currentPassword NOTIFY currentPasswordChanged)
+    Q_PROPERTY(bool initialResourcesReceived READ initialResourcesReceived NOTIFY initialResourcesReceivedChanged)
 
 public:
     enum ConnectionStatus {
@@ -54,6 +55,8 @@ public:
     bool isOnline() const;
     ConnectionType connectionType() const;
 
+    bool initialResourcesReceived() const;
+
     Q_INVOKABLE int defaultServerPort() const;
 
     QUrl currentUrl() const;
@@ -66,7 +69,7 @@ public:
 signals:
     void connectionFailed(ConnectionStatus status, const QVariant &infoParameter);
     void systemNameChanged(const QString &systemName);
-    void initialResourcesReceived();
+    void initialResourcesReceivedChanged();
     void connectionStateChanged();
     void isOnlineChanged();
 

@@ -1,6 +1,7 @@
 /* Warning! Keep this file and other templates consistent between cloud_portal/cloud/notifications and nx_vms */
 
-.header,.container,table {
+.header,.container,table, p,
+h1,h2,h3,h4,h5,h6 {
     color: #263137;
 }
 
@@ -26,6 +27,9 @@ table{
     border-spacing: 0px;
     width:100%;
 }
+.footer table{
+    width: auto;
+}
 td{
     vertical-align: top;
     text-align: left;
@@ -40,7 +44,7 @@ th{
 }
 
 .logo{
-    max-width:100px;
+    max-width:150px;
     max-height:40px;
 }
 .right-border{
@@ -173,4 +177,32 @@ td.number{
     white-space:nowrap;
     padding-right:5px;
     width:0;
+}
+
+.source-name{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: inline-block;
+    white-space: nowrap;
+    max-width: 130px;
+}
+
+.margin-top{
+    margin-top: 10px;
+}
+
+hr{
+    border:none;
+    border-top: 1px solid #E1E7EA;
+    margin-top:15px;
+    margin-bottom:15px;
+}
+
+.camera-block{
+    padding-bottom: 20px;
+    paddign-top:10px;
+    border-bottom: 1px solid #E1E7EA;
+}
+.camera-block .screenshot{
+    max-height: 180px;
 }

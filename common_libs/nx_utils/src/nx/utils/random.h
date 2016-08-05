@@ -1,38 +1,107 @@
-/**********************************************************
-* Apr 27, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
-#include <cstdint>
-#include <cstdlib>
-
+#include <random>
+#include <limits>
+#include <type_traits>
 #include <QByteArray>
-
 
 namespace nx {
 namespace utils {
+namespace random {
 
-/** std::rand() implementation which ensures timed seed injection */
-NX_UTILS_API int rand();
+/**
+ * Exception free, qrand based random device.
+ */
+class NX_UTILS_API QtDevice
+{
+public:
+    typedef int result_type;
+    QtDevice();
 
-template<typename T = int>
-T randomInt() { return static_cast<T>(rand()); }
+    result_type operator()();
+    double entropy() const;
 
-template<typename T>
-T randomInt(T min, T max) { return min + randomInt<T>() % (max - min); }
+    static constexpr result_type min() { return 0; }
+    static constexpr result_type max() { return RAND_MAX; }
+};
 
-/** Uses uniform_int_distribution.
-    @return \a false if could not generate random data.
+/** Thread local std::random_device. */
+NX_UTILS_API std::random_device& device();
 
-    \note Can return \a false since it may use /dev/urandom on linux 
-        and access to device may result in error
-*/
-NX_UTILS_API bool generateRandomData(std::int8_t* data, std::size_t count);
+/** Thread local QtDevice. */
+NX_UTILS_API QtDevice& qtDevice();
 
-/** Just calls upper function */
-NX_UTILS_API QByteArray generateRandomData(std::size_t count, bool* ok = nullptr);
+/**
+ * Generates uniform_int_distribution random data the length of count.
+ */
+NX_UTILS_API QByteArray generate(
+    std::size_t count,
+    char min = std::numeric_limits<char>::min(),
+    char max = std::numeric_limits<char>::max());
 
-}   // namespace nx
-}   // namespace utils
+/**
+ * Generates uniform_int_distribution random integer in [min, max]
+ */
+template<typename Type = int>
+Type number(
+    Type min = std::numeric_limits<Type>::min(),
+    Type max = std::numeric_limits<Type>::max(),
+    typename std::enable_if<std::is_integral<Type>::value>::type* = 0)
+{
+    std::uniform_int_distribution<Type> distribution(min, max);
+    try
+    {
+        return distribution(device());
+    }
+    catch(const std::exception&)
+    {
+        return distribution(qtDevice());
+    }
+}
+
+/**
+ * Generates uniform_real_distribution random real in [min, max)
+ */
+template<typename Type>
+Type number(
+    Type min = std::numeric_limits<Type>::min(),
+    Type max = std::numeric_limits<Type>::max(),
+    typename std::enable_if<std::is_floating_point<Type>::value>::type* = 0)
+{
+    std::uniform_real_distribution<Type> distribution(min, max);
+    try
+    {
+        return distribution(device());
+    }
+    catch(const std::exception&)
+    {
+        return distribution(qtDevice());
+    }
+}
+
+/**
+ * Generates uniform random number in [base - delta, base + delta]
+ */
+template<typename Type>
+Type numberDelta(Type base, Type delta) { return number(base - delta, base + delta); }
+
+/**
+ * Returns ref on random element in container.
+ */
+template<typename Container>
+typename Container::value_type& choice(Container& container)
+{
+    auto position = number<typename Container::size_type>(0, container.size() - 1);
+    return *std::next(container.begin(), position);
+}
+
+template<typename Container>
+const typename Container::value_type& choice(const Container& container)
+{
+    auto position = number<typename Container::size_type>(0, container.size() - 1);
+    return *std::next(container.begin(), position);
+}
+
+} // namespace random
+} // namespace utils
+} // namespace nx

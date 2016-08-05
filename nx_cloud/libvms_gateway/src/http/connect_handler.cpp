@@ -4,9 +4,10 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/utils/log/log.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "settings.h"
+#include "run_time_options.h"
 
 namespace nx {
 namespace cloud {
@@ -14,9 +15,12 @@ namespace gateway {
 
 static const int kDefaultBufferSize = 16 * 1024;
 
-ConnectHandler::ConnectHandler(const conf::Settings& settings)
-    : m_settings(settings)
-    , m_connection(nullptr)
+ConnectHandler::ConnectHandler(
+    const conf::Settings& settings,
+    const conf::RunTimeOptions& runTimeOptions)
+:
+    m_settings(settings),
+    m_runTimeOptions(runTimeOptions)
 {
 }
 

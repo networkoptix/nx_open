@@ -1,13 +1,7 @@
-/**********************************************************
-* May 17, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
-
 
 namespace nx {
 namespace cloud {
@@ -15,7 +9,8 @@ namespace gateway {
 
 namespace conf {
 class Settings;
-}
+class RunTimeOptions;
+} // namespace conf
 
 class ProxyHandler
 :
@@ -23,8 +18,9 @@ class ProxyHandler
     public StreamConnectionHolder<nx_http::AsyncMessagePipeline>
 {
 public:
-    ProxyHandler(const conf::Settings& settings);
-    virtual ~ProxyHandler();
+    ProxyHandler(
+        const conf::Settings& settings,
+        const conf::RunTimeOptions& runTimeOptions);
 
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
@@ -42,6 +38,8 @@ public:
 
 private:
     const conf::Settings& m_settings;
+    const conf::RunTimeOptions& m_runTimeOptions;
+
     std::unique_ptr<AbstractStreamSocket> m_targetPeerSocket;
     nx_http::Request m_request;
     std::function<void(
@@ -50,10 +48,22 @@ private:
     > m_requestCompletionHandler;
     std::unique_ptr<nx_http::AsyncMessagePipeline> m_targetHostPipeline;
 
-    nx_http::StatusCode::Value fetchTargetEndpointAndPrepareRequest(
+    struct TargetWithOptions
+    {
+        nx_http::StatusCode::Value status;
+        SocketAddress target;
+        bool isSsl;
+
+        TargetWithOptions(nx_http::StatusCode::Value status_, SocketAddress target_ = {});
+    };
+
+    TargetWithOptions cutTargetFromRequest(
         const nx_http::HttpServerConnection& connection,
-        nx_http::Request* const request,
-        SocketAddress* const targetEndpoint);
+        nx_http::Request* const request);
+
+    TargetWithOptions cutTargetFromUrl(nx_http::Request* const request);
+    TargetWithOptions cutTargetFromPath(nx_http::Request* const request);
+
     void onConnected(SystemError::ErrorCode errorCode);
     void onMessageFromTargetHost(nx_http::Message message);
 };

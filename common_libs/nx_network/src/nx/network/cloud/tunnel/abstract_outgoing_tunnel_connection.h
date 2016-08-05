@@ -9,7 +9,8 @@
 
 #include <utils/common/stoppable.h>
 
-#include <nx/network/socket_attributes_cache.h>
+#include "nx/network/aio/basic_pollable.h"
+#include "nx/network/socket_attributes_cache.h"
 
 
 namespace nx {
@@ -21,7 +22,7 @@ namespace cloud {
  */
 class AbstractOutgoingTunnelConnection
 :
-    public QnStoppableAsync
+    public aio::BasicPollable
 {
 public:
     /**
@@ -33,6 +34,11 @@ public:
         std::unique_ptr<AbstractStreamSocket>,
         bool stillValid)> OnNewConnectionHandler;
 
+    AbstractOutgoingTunnelConnection(aio::AbstractAioThread* aioThread = nullptr)
+    :
+        aio::BasicPollable(aioThread)
+    {
+    }
     virtual ~AbstractOutgoingTunnelConnection() {}
 
     /**

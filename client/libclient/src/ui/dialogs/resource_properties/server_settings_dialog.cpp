@@ -3,6 +3,9 @@
 
 #include <core/resource/media_server_resource.h>
 
+#include <nx/network/http/httptypes.h>
+#include <nx/network/socket_global.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -91,15 +94,13 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr &server) {
 
     m_server = server;
 
-    m_webPageButton->setEnabled(server && server->getStatus() == Qn::Online);
 
-    if (m_server) {
-        connect(m_server, &QnResource::statusChanged, this, [this] {
-            m_webPageButton->setEnabled(m_server->getStatus() == Qn::Online);
-        });
-    }
+
+    if (m_server)
+        connect(m_server, &QnResource::statusChanged, this, &QnServerSettingsDialog::updateWebPageButton);
 
     loadDataToUi();
+    updateWebPageButton();
 }
 
 void QnServerSettingsDialog::retranslateUi() {
@@ -128,4 +129,14 @@ QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog(
             : QString()),
         QDialogButtonBox::Yes | QDialogButtonBox::No,
         QDialogButtonBox::Yes);
+}
+
+void QnServerSettingsDialog::updateWebPageButton()
+{
+    bool allowed = m_server
+        && !nx::network::SocketGlobals::addressResolver()
+            .isCloudHostName(m_server->getApiUrl().host());
+
+    m_webPageButton->setVisible(allowed);
+    m_webPageButton->setEnabled(allowed && m_server->getStatus() == Qn::Online);
 }

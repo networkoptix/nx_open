@@ -21,13 +21,13 @@
 
 namespace
 {
-    const int kAccountFontPixelSize = 24;
+const int kAccountFontPixelSize = 24;
 }
 
-QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent)
-    : base_type(parent)
-    , QnWorkbenchContextAware(parent)
-    , ui(new Ui::CloudManagementWidget)
+QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
+    ui(new Ui::CloudManagementWidget)
 {
     ui->setupUi(this);
 
@@ -78,6 +78,10 @@ void QnCloudManagementWidget::loadDataToUi()
     {
         ui->stackedWidget->setCurrentWidget(ui->notLinkedPage);
     }
+
+    auto isOwner = context()->user() && context()->user()->role() == Qn::UserRole::Owner;
+    ui->linkButton->setVisible(isOwner);
+    ui->unlinkButton->setVisible(isOwner);
 }
 
 void QnCloudManagementWidget::applyChanges()

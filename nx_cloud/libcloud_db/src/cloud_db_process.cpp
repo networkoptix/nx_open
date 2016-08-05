@@ -19,7 +19,7 @@
 #include <platform/process/current_process.h>
 #include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/type_utils.h>
 #include <utils/common/systemerror.h>
@@ -539,6 +539,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentials);
     dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentialsProlongationPeriod);
     dbStructureUpdater.addUpdateScript(db::kAddCustomAndDisabledAccessRoles);
+    dbStructureUpdater.addUpdateScript(db::kAddMoreFieldsToSystemSharing);
     return dbStructureUpdater.updateStructSync();
 }
 

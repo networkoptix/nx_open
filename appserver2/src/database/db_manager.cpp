@@ -505,11 +505,11 @@ bool QnDbManager::init(const QUrl& dbUrl)
         NX_ASSERT(userResource->isOwner(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
     }
 
-    QByteArray md5Password;
-    QByteArray digestPassword;
-    qnCommon->adminPasswordData(&md5Password, &digestPassword);
+    AdminPasswordData adminPasswordData = qnCommon->adminPasswordData();
+
     QString defaultAdminPassword = qnCommon->defaultAdminPassword();
-    if( (userResource->getHash().isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty() ) {
+    if( (userResource->getHash().isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty() )
+    {
         defaultAdminPassword = lit("admin");
         if (m_dbJustCreated)
             qnCommon->setUseLowPriorityAdminPasswordHach(true);
@@ -527,10 +527,12 @@ bool QnDbManager::init(const QUrl& dbUrl)
             updateUserResource = true;
         }
     }
-    if (!md5Password.isEmpty() || !digestPassword.isEmpty())
+    if (!adminPasswordData.isEmpty())
     {
-        userResource->setHash(md5Password);
-        userResource->setDigest(digestPassword);
+        userResource->setHash(adminPasswordData.hash);
+        userResource->setDigest(adminPasswordData.digest);
+        userResource->setCryptSha512Hash(adminPasswordData.cryptSha512Hash);
+        userResource->setRealm(adminPasswordData.realm);
         updateUserResource = true;
     }
     if (updateUserResource)
@@ -1514,6 +1516,9 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
     *internalId = getResourceInternalId(data.id);
 
     //NX_ASSERT(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
+    NX_ASSERT(!data.id.isNull(), "Resource ID must not be null");
+    if (data.id.isNull())
+        return ErrorCode::dbError;
 
     QSqlQuery query(m_sdb);
     if (*internalId) {
@@ -1537,12 +1542,6 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 
 ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 internalId)
 {
-    if (data.permissions & Qn::GlobalPermission::INTERNAL_GlobalVideoWallLayoutPermission)
-    {
-        NX_ASSERT(0, "This enum entry is only for the internal use");
-        return ErrorCode::forbidden;
-    }
-
     {
         const QString authQueryStr = data.hash.isEmpty()
             ? "UPDATE auth_user SET is_superuser=:isAdmin, email=:email where username=:name"

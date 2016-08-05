@@ -279,17 +279,6 @@ int currentTimeZone()
     return res;
 }
 
-int random(int min, int max)
-{
-    return min + qrand() % (max - min);
-}
-
-qreal frandom()
-{
-    return qrand() / (RAND_MAX + 1.0);
-}
-
-
 static uint hash(const QChar *p, int n)
 {
     uint h = 0;

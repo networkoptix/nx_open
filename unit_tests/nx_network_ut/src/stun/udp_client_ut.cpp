@@ -7,11 +7,12 @@
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/udp_client.h>
 #include <nx/network/stun/udp_server.h>
+#include <nx/utils/random.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <utils/common/cpp14.h>
 #include <utils/common/sync_call.h>
 
 namespace nx {
@@ -58,7 +59,7 @@ public:
     {
         return SocketAddress(
             HostAddress::localhost,
-            m_udpServers[rand() % m_udpServers.size()]->address().port);
+            nx::utils::random::choice(m_udpServers)->address().port);
     }
 
     std::vector<SocketAddress> allServersEndpoints() const
@@ -368,7 +369,7 @@ TEST_F(StunUDP, client_response_injection)
     const int kPacketsToInject = 20;
     for (int i = 0; i < kPacketsToInject; ++i)
     {
-        if ((i == 0) || (rand() % 5 == 0))
+        if ((i == 0) || (nx::utils::random::number(0, 4) == 0))
         {
             nx::stun::Message injectedResponseMessage(
                 stun::Header(
@@ -382,7 +383,7 @@ TEST_F(StunUDP, client_response_injection)
         }
         else
         {
-            const auto buf = nx::utils::generateRandomName(100 + (rand() % 300));
+            const auto buf = nx::utils::generateRandomName(nx::utils::random::number(100, 400));
             ASSERT_EQ(buf.size(), udpSocket->send(buf))
                 << SystemError::getLastOSErrorText().toStdString();
         }

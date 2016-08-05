@@ -1,6 +1,7 @@
 #include <cstdio>
 #include "file_deletor.h"
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 #include "utils/common/util.h"
 #include "storage_manager.h"
 #include "utils/common/systemerror.h"
@@ -34,7 +35,6 @@ QnFileDeletor* QnFileDeletor::instance()
 void QnFileDeletor::run()
 {
     initSystemThreadId();
-    srand(time(0));
     while (!m_needStop)
     {
         if (m_postponeTimer.elapsed() > POSTPONE_FILES_INTERVAL) {
@@ -42,8 +42,8 @@ void QnFileDeletor::run()
             m_postponeTimer.restart();
         }
         
-        static const int RAND_RANGE = 5; // in range [-5..+5] seconds
-        int thresholdSecs = (SPACE_CLEARANCE_INTERVAL - RAND_RANGE) + rand() % (RAND_RANGE*2 + 1);
+        static const int DELTA = 5; // in range [-5..+5] seconds
+        int thresholdSecs = nx::utils::random::numberDelta<int>(SPACE_CLEARANCE_INTERVAL, DELTA);
         if (qnBackupStorageMan && qnNormalStorageMan && m_storagesTimer.elapsed() > thresholdSecs * 1000)
         {
             qnNormalStorageMan->clearSpace();

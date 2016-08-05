@@ -67,21 +67,23 @@ void QnMediaResourceHelper::setResourceId(const QString& id)
     d->camera = camera;
     d->aspectRatio = 0.0;
 
-    if (!d->camera)
-        return;
-
-    connect(d->camera,  &QnResource::nameChanged,
-            this,       &QnMediaResourceHelper::resourceNameChanged);
-    connect(d->camera,  &QnResource::statusChanged,
-            this,       &QnMediaResourceHelper::resourceStatusChanged);
-    connect(d->camera,  &QnResource::propertyChanged,
-            d,          &QnMediaResourceHelperPrivate::at_propertyChanged);
+    if (d->camera)
+    {
+        connect(d->camera,  &QnResource::nameChanged,
+                this,       &QnMediaResourceHelper::resourceNameChanged);
+        connect(d->camera,  &QnResource::statusChanged,
+                this,       &QnMediaResourceHelper::resourceStatusChanged);
+        connect(d->camera,  &QnResource::propertyChanged,
+                d,          &QnMediaResourceHelperPrivate::at_propertyChanged);
+    }
 
     emit resourceIdChanged();
     emit resourceNameChanged();
     emit rotationChanged();
     emit resourceStatusChanged();
-    d->updateAspectRatio();
+
+    if (d->camera)
+        d->updateAspectRatio();
 }
 
 Qn::ResourceStatus QnMediaResourceHelper::resourceStatus() const
@@ -142,7 +144,6 @@ void QnMediaResourceHelperPrivate::at_propertyChanged(const QnResourcePtr& resou
 {
     Q_Q(QnMediaResourceHelper);
 
-    NX_ASSERT(camera == resource);
     if (camera != resource)
         return;
 

@@ -120,7 +120,7 @@ void QnTransactionTransport::default_initializer()
     m_tcpKeepAliveTimeout = QnGlobalSettings::instance()->connectionKeepAliveTimeout();
     m_keepAliveProbeCount = QnGlobalSettings::instance()->keepAliveProbeCount();
     m_idleConnectionTimeout = m_tcpKeepAliveTimeout * m_keepAliveProbeCount;
-    m_userAccessData = Qn::kDefaultUserAccess;
+    m_userAccessData = Qn::kSystemAccess;
 }
 
 QnTransactionTransport::QnTransactionTransport(const QnUuid& connectionGuid,
@@ -483,7 +483,9 @@ void QnTransactionTransport::fillAuthInfo( const nx_http::AsyncHttpClientPtr& ht
     else {
         QUrl url = QnAppServerConnectionFactory::url();
         httpClient->setUserName(url.userName().toLower());
-        if (detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized()) {
+        if (detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized())
+        {
+            // try auth by admin user if allowed
             QnUserResourcePtr adminUser = qnResPool->getAdministrator();
             if (adminUser) {
                 httpClient->setUserPassword(adminUser->getDigest());
@@ -717,7 +719,7 @@ void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstR
         case Qn::JsonFormat:
             if( !QnJsonTransactionSerializer::deserializeTran(
                     reinterpret_cast<const quint8*>(tranData.constData()),
-                    tranData.size(),
+                    static_cast<int>(tranData.size()),
                     transportHeader,
                     serializedTran ) )
             {
@@ -732,7 +734,7 @@ void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstR
         case Qn::UbjsonFormat:
             if( !QnUbjsonTransactionSerializer::deserializeTran(
                     reinterpret_cast<const quint8*>(tranData.constData()),
-                    tranData.size(),
+                    static_cast<int>(tranData.size()),
                     transportHeader,
                     serializedTran ) )
             {
@@ -1448,7 +1450,7 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
         return false;
 
     /* Check if remote peer has rights to receive transaction */
-	if (!ec2::hasOwnerAccess(m_userAccessData.userId))
+	if (m_userAccessData.userId != Qn::kSystemAccess.userId)
 	{
 		NX_LOG(
 			QnLog::EC2_TRAN_LOG,

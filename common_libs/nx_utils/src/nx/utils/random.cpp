@@ -1,74 +1,93 @@
-/**********************************************************
-* Apr 27, 2016
-* akolesnikov
-***********************************************************/
-
 #include "random.h"
 
 #include <algorithm>
-#include <limits>
 #include <mutex>
 #include <random>
-#include <ctime>
+#include <time.h>
 
+#if defined(Q_OS_MAC)
+    #include <pthread.h>
+#endif
 
 namespace nx {
 namespace utils {
+namespace random {
 
-static bool initRand()
+QtDevice::QtDevice()
 {
-    qsrand(static_cast<uint>(time(nullptr)));
-    return true;
+    ::qsrand(::time(NULL));
 }
 
-int rand()
+QtDevice::result_type QtDevice::operator()()
 {
-    static bool init = initRand();
-    static_cast<void>(init);
-    return qrand();
+    return ::qrand();
 }
 
-namespace {
-struct RandomGenerationContext
+double QtDevice::entropy() const
 {
-    std::mutex mutex;
-    std::random_device randomDevice;
-};
-
-RandomGenerationContext randomGenerationContext;
+    return 0;
 }
 
-bool generateRandomData(std::int8_t* data, std::size_t count)
+std::random_device& device()
 {
-    try
-    {
-        std::lock_guard<std::mutex> lk(randomGenerationContext.mutex);
-        std::uniform_int_distribution<int> distribution(
-            std::numeric_limits<std::int8_t>::min(),
-            std::numeric_limits<std::int8_t>::max());
-        std::generate(
-            data, data + count,
-            [&distribution]
-            {
-                return distribution(randomGenerationContext.randomDevice);
-            });
-        return true;
-    }
-    catch (const std::exception& /*e*/)
-    {
-        return false;
-    }
+    // There is a bug in OSX's clang and gcc, so thread_local is not supported :(
+    #if !defined(Q_OS_MAC)
+        thread_local std::random_device rd;
+        return rd;
+    #else
+        static pthread_key_t key;
+        static auto init = pthread_key_create(&key, [](void* p){ if (p) delete p; });
+        static_cast<void>(init);
+
+        if (auto rdp = static_cast<std::random_device*>(pthread_getspecific(key)))
+            return *rdp;
+
+        const auto rdp = new std::random_device();
+        pthread_setspecific(key, rdp);
+        return *rdp;
+    #endif
 }
 
-QByteArray generateRandomData(std::size_t count, bool* ok)
+QtDevice& qtDevice()
+{
+    // There is a bug in OSX's clang and gcc, so thread_local is not supported :(
+    #if !defined(Q_OS_MAC)
+        thread_local QtDevice rd;
+        return rd;
+    #else
+        static pthread_key_t key;
+        static auto init = pthread_key_create(&key, [](void* p){ if (p) delete p; });
+        static_cast<void>(init);
+
+        if (auto rdp = static_cast<QtDevice*>(pthread_getspecific(key)))
+            return *rdp;
+
+        const auto rdp = new QtDevice();
+        pthread_setspecific(key, rdp);
+        return *rdp;
+    #endif
+}
+
+QByteArray generate(std::size_t count, char min, char max)
 {
     QByteArray data(static_cast<int>(count), Qt::Uninitialized);
-    const bool result = 
-        generateRandomData(reinterpret_cast<std::int8_t*>(data.data()), count);
-    if (ok)
-        *ok = result;
+    std::uniform_int_distribution<int> distribution(min, max);
+    try
+    {
+        std::generate(
+            data.begin(), data.end(),
+            [&distribution] { return distribution(device()); });
+    }
+    catch (const std::exception&)
+    {
+        std::generate(
+            data.begin(), data.end(),
+            [&distribution] { return distribution(qtDevice()); });
+    }
+
     return data;
 }
 
-}   // namespace nx
-}   // namespace utils
+} // namespace random
+} // namespace utils
+} // namespace nx

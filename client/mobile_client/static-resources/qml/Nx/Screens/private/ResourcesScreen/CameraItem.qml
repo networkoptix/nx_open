@@ -118,9 +118,10 @@ Control
 
         Column
         {
-            width: parent ? parent.width : 0
+            width: thumbnailContainer.width
             leftPadding: 8
             rightPadding: 8
+            property real availableWidth: width - leftPadding - rightPadding
 
             Image
             {
@@ -131,12 +132,11 @@ Control
             Text
             {
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width - parent.leftPadding - parent.rightPadding
-                height: 32
+                width: parent.availableWidth - 32
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                text: d.unauthorized ? qsTr("Authentication\nrequired") : qsTr("Offline")
+                text: d.unauthorized ? qsTr("Authentication required") : qsTr("Offline")
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 font.pixelSize: 14

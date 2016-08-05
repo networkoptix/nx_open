@@ -17,6 +17,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
 #include <utils/common/delayed.h>
@@ -217,7 +218,9 @@ void QnAxClientWindow::slidePanelsOut() {
 void QnAxClientWindow::createMainWindow() {
     NX_ASSERT(m_mainWindow == NULL, Q_FUNC_INFO, "Double initialization");
 
-    m_context.reset(new QnWorkbenchContext());
+    m_accessController.reset(new QnWorkbenchAccessController());
+    m_context.reset(new QnWorkbenchContext(m_accessController.data()));
+    QObject::connect(m_context.data(), &QnWorkbenchContext::userChanged, m_accessController.data(), &QnWorkbenchAccessController::setUser);
 
     //TODO: #GDM is it really needed here?
     QnActions::IDType effectiveMaximizeActionId = QnActions::FullscreenAction;

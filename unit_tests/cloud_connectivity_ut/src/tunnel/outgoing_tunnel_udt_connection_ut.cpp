@@ -1,13 +1,13 @@
-
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/udp/outgoing_tunnel_connection.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/utils/random.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/test_options.h>
-#include <utils/common/cpp14.h>
 #include <utils/common/guard.h>
-
 
 namespace nx {
 namespace network {
@@ -91,7 +91,7 @@ protected:
             if (minTimeoutMillis && maxTimeoutMillis)
             {
                 connectContext.timeout = std::chrono::milliseconds(
-                    *minTimeoutMillis + rand() % (*maxTimeoutMillis - *minTimeoutMillis));
+                    nx::utils::random::number(*minTimeoutMillis, *maxTimeoutMillis));
                 connectContext.startTime = std::chrono::steady_clock::now();
             }
 
@@ -174,6 +174,7 @@ TEST_F(OutgoingTunnelConnectionTest, common)
     const auto localAddress = udtConnection->getLocalAddress();
 
     OutgoingTunnelConnection tunnelConnection(
+        nx::network::SocketGlobals::aioService().getRandomAioThread(),
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection));
 
@@ -214,6 +215,7 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
     ASSERT_TRUE(udtConnection->connect(serverEndpoint()));
 
     OutgoingTunnelConnection tunnelConnection(
+        nx::network::SocketGlobals::aioService().getRandomAioThread(),
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection));
 
@@ -268,6 +270,7 @@ TEST_F(OutgoingTunnelConnectionTest, cancellation)
             << SystemError::getLastOSErrorText().toStdString();
 
         OutgoingTunnelConnection tunnelConnection(
+            nx::network::SocketGlobals::aioService().getRandomAioThread(),
             QnUuid::createUuid().toByteArray(),
             std::move(udtConnection));
 
@@ -308,6 +311,7 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
     Timeouts udpTunnelKeepAlive;
     udpTunnelKeepAlive.keepAlivePeriod = std::chrono::seconds(1);
     OutgoingTunnelConnection tunnelConnection(
+        nx::network::SocketGlobals::aioService().getRandomAioThread(),
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection),
         udpTunnelKeepAlive);

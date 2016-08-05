@@ -28,6 +28,8 @@ namespace {
             return QnMergeSystemsTool::VersionError;
         else if (str == lit("UNAUTHORIZED"))
             return QnMergeSystemsTool::AuthentificationError;
+        else if (str == lit("NOT_LOCAL_OWNER"))
+            return QnMergeSystemsTool::notLocalOwner;
         else if (str == lit("BACKUP_ERROR"))
             return QnMergeSystemsTool::BackupError;
         else if (str == lit("STARTER_LICENSE_ERROR"))

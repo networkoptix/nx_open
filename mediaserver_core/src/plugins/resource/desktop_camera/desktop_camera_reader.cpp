@@ -201,4 +201,9 @@ QnConstResourceAudioLayoutPtr QnDesktopCameraStreamReader::getDPAudioLayout() co
     return m_audioLayout;
 }
 
+bool QnDesktopCameraStreamReader::isCameraControlRequired() const
+{
+    return needConfigureProvider();
+}
+
 #endif  //ENABLE_DESKTOP_CAMERA

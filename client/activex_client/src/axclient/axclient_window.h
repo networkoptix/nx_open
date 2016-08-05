@@ -5,6 +5,7 @@
 
 class QnMainWindow;
 class QnWorkbenchContext;
+class QnWorkbenchAccessController;
 
 class QnAxClientWindow: public QObject, public Singleton<QnAxClientWindow> {
     Q_OBJECT
@@ -52,6 +53,7 @@ private:
 private:
     QWidget *m_parentWidget;
     QScopedPointer<QnWorkbenchContext> m_context;
+    QScopedPointer<QnWorkbenchAccessController> m_accessController;
     QScopedPointer<QnMainWindow> m_mainWindow;
 };
 

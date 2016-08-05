@@ -6,7 +6,7 @@
 #include "outgoing_tunnel_pool.h"
 
 #include <nx/utils/log/log.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 
 
 namespace nx {
@@ -70,9 +70,9 @@ const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(
 
     auto tunnel = std::make_unique<OutgoingTunnel>(targetHostAddress);
     tunnel->setStateHandler(
-        [this, tunnelPtr = tunnel.get()](Tunnel::State state)
+        [this, tunnelPtr = tunnel.get()](OutgoingTunnel::State state)
         {
-            if (state != Tunnel::State::kClosed)
+            if (state != OutgoingTunnel::State::kClosed)
                 return;
             //tunnel supports deleting in "tunnel closed" handler
             onTunnelClosed(tunnelPtr);

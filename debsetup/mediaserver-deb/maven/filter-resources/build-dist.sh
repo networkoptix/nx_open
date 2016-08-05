@@ -64,7 +64,7 @@ cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
 cp -r $SERVER_VOX_PATH $BINSTAGE
 #'libstdc++.so.6 is needed on some machines
 if [ '${arch}' != 'arm' ]
-then 
+then
     cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
     cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
 fi
@@ -104,6 +104,7 @@ if [ '${arch}' != 'arm' ]; then chmod 755 $SHARESTAGE/dbsync-2.2/bin/{dbsync,cer
 install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
 install -m 755 $SERVER_BIN_PATH/external.dat $BINSTAGE
 install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
+install -m 755 $SCRIPTS_PATH/shell_utils.sh $BINSTAGE
 
 # Copy mediaserver startup script
 install -m 755 bin/mediaserver $BINSTAGE

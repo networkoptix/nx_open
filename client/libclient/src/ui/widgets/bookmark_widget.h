@@ -35,6 +35,7 @@ private:
     QScopedPointer<Ui::BookmarkWidget> ui;
     QnCameraBookmarkTagList m_allTags;
     QnCameraBookmarkTags m_selectedTags;
+    bool m_isValid;
 };
 
 #endif // BOOKMARK_WIDGET_H

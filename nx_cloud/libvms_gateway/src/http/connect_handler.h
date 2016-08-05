@@ -3,14 +3,14 @@
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
 
-
 namespace nx {
 namespace cloud {
 namespace gateway {
 
 namespace conf {
 class Settings;
-}
+class RunTimeOptions;
+} // namespace conf
 
 class ConnectHandler
 :
@@ -20,7 +20,9 @@ class ConnectHandler
     typedef StreamConnectionHolder<nx_http::AsyncMessagePipeline> super;
 
 public:
-    ConnectHandler(const conf::Settings& settings);
+    ConnectHandler(
+        const conf::Settings& settings,
+        const conf::RunTimeOptions& runTimeOptions);
 
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
@@ -43,6 +45,7 @@ private:
     void stream(Socket* source, Socket* target, Buffer* buffer);
 
     const conf::Settings& m_settings;
+    const conf::RunTimeOptions& m_runTimeOptions;
 
     nx_http::Request m_request;
     nx_http::HttpServerConnection* m_connection;

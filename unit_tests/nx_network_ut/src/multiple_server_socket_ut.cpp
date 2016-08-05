@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 
-#include <nx/utils/log/log.h>
 #include <nx/network/multiple_server_socket.h>
 #include <nx/network/system_socket.h>
-#include <nx/network/udt/udt_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
-
+#include <nx/network/udt/udt_socket.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 
 namespace nx {
 namespace network {
@@ -89,7 +89,7 @@ TEST_F(MultipleServerSocketTest, add_remove)
             {udtServerSocket->getLocalAddress()});
 
         sock.addSocket(std::move(udtServerSocket));
-        std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(nx::utils::random::number(0, 100)));
         sock.removeSocket(1);
     }
 

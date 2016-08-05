@@ -11,6 +11,7 @@ namespace Qn
      */
     enum NodeType
     {
+        // Single-occurrence nodes
         RootNode,               /**< Root node for the tree (current system node). */
         CurrentSystemNode,      /**< Root node, displaying current system name. */
         SeparatorNode,          /**< Root node for spacing between header and main part of the tree. */
@@ -25,7 +26,17 @@ namespace Qn
 
         BastardNode,            /**< Root node for hidden resources. */
 
+        // Per-user placeholder nodes
+        AllCamerasAccessNode,   /**< Node that represents 'All Cameras' placeholder, displayed under users and roles with full access. */
+        AllLayoutsAccessNode,   /**< Node that represents 'All Shared Layouts' placeholder, displayed under admins. */
+        AccessibleResourcesNode,/**< Node that represents 'Cameras & Resources' node, displayed under users and roles with custom access. */
+        AccessibleLayoutsNode,  /**< Node that represents 'Layouts' node, displayed under users and roles with custom access. */
+        RoleUsersNode,          /**< Node that represents 'Users' node, displayed under roles. */
+
+        // Repeating nodes
+        RoleNode,               /**< Node that represents custom role. */
         SharedLayoutNode,       /**< Node that represents shared layout link, displayed under user. Has only resource - shared layout. */
+        AccessibleResourceNode, /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
         RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
         ResourceNode,           /**< Node that represents a resource. Has only resource. */
         LayoutItemNode,         /**< Node that represents a layout item. Has both guid and resource. */
@@ -281,13 +292,13 @@ namespace Qn
      */
     enum class ShowOnceMessage
     {
-        PtzPresetInUse          = 0x001,    /**< Delete ptz preset which is used in the tour. */
-        SharedLayoutEdit        = 0x002,    /**< Edit shared layout. */
-        UserLayoutItemsRemoved  = 0x004,    /**< Items are removed from user's layout, but access still persist. */
-        StopSharingLayoutUser   = 0x008,    /**< Delete shared layout from common/custom user. */
-        DeleteResources         = 0x010,    /**< Batch delete resources (but layouts). */
-        DeleteSharedLayouts     = 0x020,    /**< Batch delete shared layouts. */
-        DeleteUserLayouts       = 0x040     /**< Batch delete user's layouts. */
+        PtzPresetInUse              = 0x001,    /**< Delete ptz preset which is used in the tour. */
+        SharedLayoutEdit            = 0x002,    /**< Edit shared layout. */
+        ChangeUserLocalLayout       = 0x004,    /**< Items are removed from user's layout, but access still persist. */
+        AddToRoleLocalLayout        = 0x008,    /**< Items are added to roled user's layout. */
+        RemoveFromRoleLocalLayout   = 0x010,    /**< Items are removed from roled user's layout, but access still persist. */
+        DeleteResources             = 0x020,    /**< Batch delete resources (but layouts). */
+        DeleteLocalLayouts          = 0x040     /**< Batch delete user's or group's local layouts. */
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ShowOnceMessage)
     Q_DECLARE_FLAGS(ShowOnceMessages, ShowOnceMessage)

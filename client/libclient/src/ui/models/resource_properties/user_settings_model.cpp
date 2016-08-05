@@ -3,6 +3,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource_management/resource_access_filter.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 
 #include <ui/workbench/workbench_context.h>
@@ -20,7 +21,6 @@ QnUserSettingsModel::QnUserSettingsModel(QObject* parent /*= nullptr*/) :
     m_mode(Invalid),
     m_user()
 {
-
 }
 
 QnUserSettingsModel::~QnUserSettingsModel()
@@ -97,4 +97,22 @@ void QnUserSettingsModel::setAccessibleResources(const QSet<QnUuid>& value)
         return;
 
     qnResourceAccessManager->setAccessibleResources(m_user->getId(), value);
+}
+
+void QnUserSettingsModel::setAccessibleLayoutsPreview(const QSet<QnUuid>& value)
+{
+    m_accessibleLayoutsPreview = value;
+}
+
+QnIndirectAccessProviders QnUserSettingsModel::accessibleLayouts() const
+{
+    if (!m_user)
+        return QnIndirectAccessProviders();
+
+    auto layouts = QnResourceAccessProvider::indirectlyAccessibleLayouts(m_user);
+
+    for (auto layoutPreview : m_accessibleLayoutsPreview)
+        layouts.insert(layoutPreview, QSet<QnResourcePtr>());
+
+    return layouts;
 }
