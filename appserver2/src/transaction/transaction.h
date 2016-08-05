@@ -718,7 +718,7 @@ APPLY(805, execBusinessAction, ApiBusinessActionData, \
                        false, \
                        InvalidGetHashHelper(), \
                        BusinessEventNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       UserInputAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
