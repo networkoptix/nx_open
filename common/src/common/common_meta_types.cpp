@@ -1,7 +1,5 @@
 #include "common_meta_types.h"
 
-#include <atomic>
-
 #include <QtCore/QMetaType>
 
 #include <utils/network/mac_address.h>
@@ -88,7 +86,7 @@
 #include <core/dataprovider/stream_mixer.h>
 
 namespace {
-    std::atomic<bool> qn_commonMetaTypes_initialized = false;
+    bool qn_commonMetaTypes_initialized = false;
 }
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::Corner)
