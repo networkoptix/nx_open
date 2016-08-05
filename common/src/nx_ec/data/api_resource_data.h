@@ -14,7 +14,6 @@ struct ApiResourceParamData: ApiData
     QString name;
 };
 #define ApiResourceParamData_Fields (value)(name)
-Q_DECLARE_METATYPE(ApiResourceParamData)
 
 struct ApiResourceParamWithRefData: ApiResourceParamData
 {
@@ -30,7 +29,6 @@ struct ApiResourceParamWithRefData: ApiResourceParamData
     QnUuid resourceId;
 };
 #define ApiResourceParamWithRefData_Fields ApiResourceParamData_Fields (resourceId)
-Q_DECLARE_METATYPE(ApiResourceParamWithRefData)
 
 struct ApiResourceData: ApiData
 {
@@ -54,3 +52,6 @@ struct ApiResourceStatusData: ApiData
 #define ApiResourceStatusData_Fields (id)(status)
 
 } // namespace ec2
+
+Q_DECLARE_METATYPE(ec2::ApiResourceParamData)
+Q_DECLARE_METATYPE(ec2::ApiResourceParamWithRefData)
