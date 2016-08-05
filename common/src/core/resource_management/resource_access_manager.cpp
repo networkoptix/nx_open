@@ -556,9 +556,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     NX_ASSERT(storage);
     auto server = storage->getParentServer();
     if (!server)
-        return Qn::ReadPermission;  /*< Server is not added to resource pool. Really we shouldn't request storage permissions in that case. */
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission;  /*< Server is already deleted. Storage can be removed. */
 
     auto serverPermissions = permissions(user, server);
+    if (serverPermissions.testFlag(Qn::RemovePermission))
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission;
+
     if (serverPermissions.testFlag(Qn::SavePermission))
         return Qn::ReadWriteSavePermission;
 
