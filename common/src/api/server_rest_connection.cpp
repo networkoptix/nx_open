@@ -125,7 +125,7 @@ Handle ServerConnection::saveCloudSystemCredentials(
 
 Handle ServerConnection::startLiteClient(GetCallback callback, QThread* targetThread)
 {
-    return executeGet(lit("api/startLiteClient"), QnRequestParamList(), callback, targetThread);
+    return executeGet(lit("/api/startLiteClient"), QnRequestParamList(), callback, targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------

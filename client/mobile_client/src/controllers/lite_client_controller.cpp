@@ -156,11 +156,13 @@ void QnLiteClientController::startLiteClient()
             if (d->clientStartHandle != handle)
                 return;
 
-            if (!success)
+            if (!success || result.error != QnJsonRestResult::NoError)
                 d->setClientStartResult(false);
         };
 
-    d->server->restConnection()->startLiteClient(handleReply);
+    d->clientStartHandle = d->server->restConnection()->startLiteClient(handleReply);
+    if (d->clientStartHandle <= 0)
+        d->setClientStartResult(false);
 }
 
 void QnLiteClientController::stopLiteClient()
