@@ -162,7 +162,6 @@ bool handleTransaction(
     if (tranFormat == Qn::UbjsonFormat)
     {
         QnAbstractTransaction transaction;
-        transaction.deliveryInfo.originatorType = QnTranDeliveryInformation::remoteServer;
         QnUbjsonReader<QByteArray> stream(&serializedTransaction);
         if (!QnUbjson::deserialize(&stream, &transaction))
         {
@@ -180,7 +179,6 @@ bool handleTransaction(
     else if (tranFormat == Qn::JsonFormat)
     {
         QnAbstractTransaction transaction;
-        transaction.deliveryInfo.originatorType = QnTranDeliveryInformation::remoteServer;
         QJsonObject tranObject;
         //TODO #ak take tranObject from cache
         if (!QJson::deserialize(serializedTransaction, &tranObject))
