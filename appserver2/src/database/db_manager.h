@@ -82,9 +82,6 @@ namespace detail
         template <class T>
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
-            if (!isTranAllowed(tran))
-                return ErrorCode::forbidden;
-
             NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             if (!tran.isLocal) {
                 QnTransactionLog::ContainsReason isContains = transactionLog->contains(tran);
@@ -103,18 +100,12 @@ namespace detail
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& /*serializedTran*/)
         {
-            if (!isTranAllowed(tran))
-                return ErrorCode::forbidden;
-
             return executeTransactionInternal(tran);
         }
 
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
-            if (!isTranAllowed(tran.command))
-                return ErrorCode::forbidden;
-
             NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             QnDbTransactionLocker lock(getTransaction());
             ErrorCode result = executeTransactionNoLock(tran, serializedTran);
@@ -593,7 +584,6 @@ namespace detail
         bool migrateServerGUID(const QString& table, const QString& field);
         bool removeWrongSupportedMotionTypeForONVIF();
         bool fixBusinessRules();
-        bool isTranAllowed(const QnAbstractTransaction& tran) const;
         bool syncLicensesBetweenDB();
         ErrorCode getLicenses(ec2::ApiLicenseDataList& data, QSqlDatabase& database);
     private:
