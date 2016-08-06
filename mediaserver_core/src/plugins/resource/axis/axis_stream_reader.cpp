@@ -7,6 +7,7 @@
 #include <QtCore/QTextStream>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/media/nalUnits.h>
@@ -137,7 +138,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
             http.readAll(body);
             if (body.isEmpty())
             {
-                msleep(rand() % 50);
+                msleep(nx::utils::random::number(0, 50));
                 continue; // sometime axis returns empty profiles list
             }
 

@@ -2,7 +2,7 @@ import QtQuick 2.6
 import Qt.labs.controls 1.0
 import Nx 1.0
 
-Button
+Switch
 {
     id: control
 
@@ -13,8 +13,6 @@ Button
     property color handleColor: ColorTheme.base5
 
     property int animationDuration: 150
-
-    checkable: true
 
     padding: 6
     leftPadding: 8
@@ -28,7 +26,7 @@ Button
 
     background: null
 
-    label: Rectangle
+    indicator: Rectangle
     {
         id: uncheckedLayer
 
@@ -97,4 +95,6 @@ Button
             Behavior on x { NumberAnimation { duration: control.animationDuration } }
         }
     }
+
+    contentItem: null
 }

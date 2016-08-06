@@ -225,7 +225,10 @@ void QnLongRunnable::stop() {
 
 void QnLongRunnable::at_started() {
     initSystemThreadId();
+
+    // Just in case
     srand(::time(NULL));
+    qsrand(::time(NULL));
 
 #ifdef _WIN32
     win32_exception::installThreadSpecificUnhandledExceptionHandler();

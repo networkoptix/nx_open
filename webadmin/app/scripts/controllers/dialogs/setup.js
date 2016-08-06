@@ -318,7 +318,6 @@ angular.module('webadminApp')
                 systemUrl,
                 $scope.settings.remoteLogin,
                 $scope.settings.remotePassword,
-                Config.defaultPassword,
                 false
             ).then(function(r){
                 if(r.data.error !== 0 && r.data.error !=='0') {

@@ -159,7 +159,9 @@ const auto createClientSocketFunc =
 TEST_F(CloudStreamSocketTest, simple_socket_test)
 {
     const char* tempHostName = "bla.bla";
-    SocketAddress serverAddress(HostAddress::localhost, 20000 + (rand()%32000));
+    SocketAddress serverAddress(
+        HostAddress::localhost,
+        nx::utils::random::number<quint16>(20000, 50000));
 
     nx::network::SocketGlobals::addressResolver().addFixedAddress(
         tempHostName,
@@ -197,7 +199,9 @@ TEST_F(CloudStreamSocketTest, simple_socket_test)
 TEST_F(CloudStreamSocketTest, Shutdown)
 {
     const char* tempHostName = "bla.bla";
-    SocketAddress serverAddress(HostAddress::localhost, 20000 + (rand() % 32000));
+    SocketAddress serverAddress(
+        HostAddress::localhost,
+        nx::utils::random::number<quint16>(20000, 50000));
 
     nx::network::SocketGlobals::addressResolver().addFixedAddress(
         tempHostName,
@@ -218,7 +222,9 @@ TEST_F(CloudStreamSocketTest, Shutdown)
 TEST_F(CloudStreamSocketTest, ShutdownAfterAsync)
 {
     const char* tempHostName = "bla.bla";
-    SocketAddress serverAddress(HostAddress::localhost, 20000 + (rand() % 32000));
+    SocketAddress serverAddress(
+        HostAddress::localhost,
+        nx::utils::random::number<quint16>(20000, 50000));
 
     nx::network::SocketGlobals::addressResolver().addFixedAddress(
         tempHostName,

@@ -126,9 +126,8 @@ private:
     if (level > cl_log.logLevel()) {} else                      \
 
 
-#define NX_LOG_MSVC_EXPAND(x) x
 #define GET_NX_LOG_MACRO(_1, _2, _3, NAME, ...) NAME
-#define NX_LOG(...) NX_LOG_MSVC_EXPAND(GET_NX_LOG_MACRO(__VA_ARGS__, NX_LOG_3, NX_LOG_2)(__VA_ARGS__))
+#define NX_LOG(...) NX_MSVC_EXPAND(GET_NX_LOG_MACRO(__VA_ARGS__, NX_LOG_3, NX_LOG_2)(__VA_ARGS__))
 
 #define NX_LOG_2(msg, level)                    \
     if( auto _nx_logs = QnLog::logs() )         \
@@ -148,7 +147,7 @@ private:
 
 #define NX_CLASS_NAME QString::fromStdString(boost::core::demangle(typeid(*this).name()))
 #define NX_OBJECT_MESSAGE lm("%1(%2) %3").arg(NX_CLASS_NAME).arg(this)
-#define NX_LOGX(...) NX_LOG_MSVC_EXPAND(GET_NX_LOG_MACRO(__VA_ARGS__, NX_LOGX_3, NX_LOGX_2)(__VA_ARGS__))
+#define NX_LOGX(...) NX_MSVC_EXPAND(GET_NX_LOG_MACRO(__VA_ARGS__, NX_LOGX_3, NX_LOGX_2)(__VA_ARGS__))
 
 #define NX_LOGX_2(msg, level) NX_LOG_2( NX_OBJECT_MESSAGE.arg(msg), level )
 #define NX_LOGX_3(logID, msg, level) NX_LOG_3( logID, NX_OBJECT_MESSAGE.arg(msg), level )

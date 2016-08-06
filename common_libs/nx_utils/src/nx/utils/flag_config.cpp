@@ -363,8 +363,7 @@ std::string FlagConfig::Impl::StringParam::defaultValueStr() const
 //-------------------------------------------------------------------------------------------------
 // Impl
 
-FlagConfig::Impl::Impl(const char* moduleName)
-    :
+FlagConfig::Impl::Impl(const char* moduleName):
     m_moduleName(moduleName)
 {
     // Get temp directory path.
@@ -560,11 +559,8 @@ void FlagConfig::skipNextReload()
     d->skipNextReload();
 }
 
-} // namespace utils
-} // namespace nx
-
 //-------------------------------------------------------------------------------------------------
-#else // ANDROID || __ANDROID__
+#else // !(defined(ANDROID) || defined(__ANDROID__))
 
 // Stub implementation which never changes hard-coded defaults.
 // NOTE: Android NDK does not support std::to_string
@@ -625,7 +621,7 @@ void FlagConfig::skipNextReload()
 {
 }
 
+#endif // !(defined(ANDROID) || defined(__ANDROID__))
+
 } // namespace utils
 } // namespace nx
-
-#endif // ANDROID || __ANDROID__

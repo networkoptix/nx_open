@@ -128,11 +128,15 @@ void HttpClient::setUserAgent(const QString& userAgent)
 void HttpClient::setUserName(const QString& userName)
 {
     m_userName = userName;
+    if (m_asyncHttpClient)
+        m_asyncHttpClient->setUserName(userName);
 }
 
 void HttpClient::setUserPassword(const QString& userPassword)
 {
     m_userPassword = userPassword;
+    if (m_asyncHttpClient)
+        m_asyncHttpClient->setUserPassword(userPassword);
 }
 
 void HttpClient::setProxyVia(const SocketAddress& proxyEndpoint)

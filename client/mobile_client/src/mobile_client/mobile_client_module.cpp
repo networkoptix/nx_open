@@ -5,6 +5,7 @@
 
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/mobile_client_camera_factory.h>
 #include <client_core/client_core_settings.h>
 #include <api/app_server_connection.h>
@@ -25,8 +26,7 @@
 #include <finders/direct_systems_finder.h>
 #include <client/client_recent_connections_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
-
-#include "ui/videowall_handler.h"
+#include <handlers/lite_client_handler.h>
 
 #include "mobile_client_message_processor.h"
 #include "mobile_client_meta_types.h"
@@ -71,7 +71,10 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnMobileClientCameraFactory>(new QnMobileClientCameraFactory());
     common->store<QnClientRecentConnectionsManager>(new QnClientRecentConnectionsManager());
 
-    common->store<QnVideowallHandler>(new QnVideowallHandler());
+    common->store<QnResourcesChangesManager>(new QnResourcesChangesManager());
+
+    if (qnSettings->isLiteClientModeEnabled())
+        common->store<QnLiteClientHandler>(new QnLiteClientHandler());
 
     QnUserWatcher *userWatcher = new QnUserWatcher();
     common->store<QnUserWatcher>(userWatcher);

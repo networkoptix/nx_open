@@ -103,7 +103,6 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_role(Role_ServerRecording),
     m_gen(m_rd())
 {
-    srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
 }

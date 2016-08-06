@@ -155,7 +155,7 @@ TEST_F(SocketUdt, cancelConnect)
             });
         sock.pleaseStopSync();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(nx::utils::random::number(0, 50)));
     }
 
     serverSocket.pleaseStopSync();

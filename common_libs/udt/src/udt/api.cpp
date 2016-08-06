@@ -1454,7 +1454,7 @@ void CUDTUnited::updateMux(CUDTSocket* s, const CUDTSocket* ls)
       #endif
 
       #ifndef _WIN32
-         pthread_cond_wait_monotonic(&self->m_GCStopCond, &self->m_GCStopLock, 1000 * 1000); // 1s
+         pthread_cond_wait_monotonic_timeout(&self->m_GCStopCond, &self->m_GCStopLock, 1000 * 1000); // 1s
       #else
          WaitForSingleObject(self->m_GCStopCond, 1000);
       #endif

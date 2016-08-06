@@ -1,16 +1,17 @@
 #include "user_access_data.h"
-#include <core/resource_management/resource_pool.h>
-#include "core/resource/user_resource.h"
 
-namespace Qn
-{
+namespace Qn {
 
-QnUserResourcePtr getUserResourceByAccessData(const UserAccessData &userAccessData)
+UserAccessData::UserAccessData():
+    userId(),
+    access(Access::Default)
 {
-    auto resource = qnResPool->getResourceById(userAccessData.userId);
-    if (!resource)
-        return QnUserResourcePtr();
-    return resource.dynamicCast<QnUserResource>();
 }
 
+UserAccessData::UserAccessData(const QnUuid& userId, Access access):
+    userId(userId),
+    access(access)
+{
 }
+
+} //namespace Qn

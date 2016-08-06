@@ -12,10 +12,10 @@
 #include <nx/network/cloud/tunnel/outgoing_tunnel.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/system_socket.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/test_options.h>
 #include <utils/common/guard.h>
-
 
 namespace nx {
 namespace network {
@@ -287,10 +287,10 @@ TEST_F(OutgoingTunnelTest, general)
 {
     for (int i = 0; i < 100; ++i)
     {
-        const bool connectorWillSucceed = (rand() % 7) > 0;
-        const bool connectionWillSucceed = (rand() % 5) > 0;
-        const int connectionsToCreate = (rand() % 10) + 1;
-        const bool singleShotConnection = rand() & 1;
+        const bool connectorWillSucceed = nx::utils::random::number(0, 6) > 0;
+        const bool connectionWillSucceed = nx::utils::random::number(0, 4) > 0;
+        const int connectionsToCreate = nx::utils::random::number(1, 10);
+        const bool singleShotConnection = (bool)nx::utils::random::number(0, 1);
 
         AddressEntry addressEntry("nx_test.com:12345");
         OutgoingTunnel tunnel(std::move(addressEntry));
@@ -349,7 +349,7 @@ TEST_F(OutgoingTunnelTest, general)
             if (result.first != SystemError::noError)
             {
                 //tunnel should be closed by now, checking it has called "closed" handler
-                if (rand() & 1)
+                if (utils::random::number(0, 1))
                     break;
             }
         }
@@ -526,10 +526,10 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
                     return std::make_unique<DummyConnector>(
                         targetAddress,
                         connectorTimeout,
-                        (rand() & 1) ? &doConnectEvent : nullptr);
+                        utils::random::number(0, 1) ? &doConnectEvent : nullptr);
                 });
 
-            const std::chrono::milliseconds timeout(1 + (rand() % 2000));
+            const std::chrono::milliseconds timeout(utils::random::number(1, 2000));
             const std::chrono::milliseconds minTimeoutCorrection(500);
             const std::chrono::milliseconds timeoutCorrection =
                 (timeout / 5) > minTimeoutCorrection
@@ -545,7 +545,7 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
 
             for (auto& connectionContext: connectedPromises)
             {
-                std::this_thread::sleep_for(std::chrono::microseconds(rand() & 0xffff));
+                std::this_thread::sleep_for(std::chrono::microseconds(utils::random::number(0, 0xFFFF)));
                 connectionContext.startTime = std::chrono::steady_clock::now();
                 tunnel.establishNewConnection(
                     timeout,
@@ -611,7 +611,6 @@ TEST_F(OutgoingTunnelTest, connectTimeout2)
     const std::chrono::seconds connectionTimeout(3);
 
     ConnectionContext connectionContext;
-    //std::this_thread::sleep_for(std::chrono::microseconds(rand() & 0xffff));
     connectionContext.startTime = std::chrono::steady_clock::now();
     tunnel.establishNewConnection(
         connectionTimeout,

@@ -494,7 +494,7 @@ int QnVirtualCameraResource::saveAsync()
     fromResourceToApi(toSharedPointer(this), apiCamera);
 
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    return conn->getCameraManager(Qn::kDefaultUserAccess)->addCamera(apiCamera, this, []{});
+    return conn->getCameraManager(Qn::kSystemAccess)->addCamera(apiCamera, this, []{});
 }
 
 void QnVirtualCameraResource::issueOccured() {

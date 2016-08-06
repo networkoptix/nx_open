@@ -366,3 +366,20 @@ bool QnLayoutResource::isShared() const
 {
     return getParentId().isNull() && !isFile();
 }
+
+QSet<QnResourcePtr> QnLayoutResource::layoutResources() const
+{
+    QnMutexLocker locker(&m_mutex);
+    return layoutResources(m_itemByUuid);
+}
+
+QSet<QnResourcePtr> QnLayoutResource::layoutResources(const QnLayoutItemDataMap& items)
+{
+    QSet<QnResourcePtr> result;
+    for (const auto& item : items)
+    {
+        if (auto resource = qnResPool->getResourceByDescriptor(item.resource))
+            result << resource;
+    }
+    return result;
+};

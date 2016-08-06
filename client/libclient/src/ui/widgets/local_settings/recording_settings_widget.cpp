@@ -13,6 +13,7 @@
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/dwm.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -42,6 +43,9 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     m_screenRecordingSupported(QnScreenRecorder::isSupported())
 {
     ui->setupUi(this);
+
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(this);
+    ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     ui->additionalGroupBox->setVisible(m_screenRecordingSupported);
     ui->recordingFolderGroupBox->setVisible(m_screenRecordingSupported);

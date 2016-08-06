@@ -49,6 +49,7 @@ BINS_DIR=$BUILD_OUTPUT_DIR/bin/${build.configuration}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/${build.configuration}
 DEBS_DIR=$BUILD_OUTPUT_DIR/deb
 UBOOT_DIR=$BUILD_OUTPUT_DIR/root
+USR_DIR=$BUILD_OUTPUT_DIR/usr
 VOX_SOURCE_DIR=${ClientVoxSourceDir}
 
 STRIP=
@@ -195,7 +196,10 @@ if [[ "${box}" == "bpi" ]]; then
   #copying debs and uboot
   cp -Rfv $DEBS_DIR $BUILD_DIR/opt
   cp -Rfv $UBOOT_DIR $BUILD_DIR/root
-
+  
+  #copying additional binaries
+  cp -Rfv $USR_DIR $BUILD_DIR/usr
+  
   #additional platform specific files
   mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
   cp -Rf ${qt.dir}/lib/fonts $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
@@ -241,7 +245,7 @@ chmod -R 755 $BUILD_DIR/etc/init.d
 
 pushd $BUILD_DIR
     if [[ "${box}" == "bpi" ]]; then
-        tar czf $PACKAGE_NAME ./opt ./etc ./root
+        tar czf $PACKAGE_NAME ./opt ./etc ./root ./usr
     else
         tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc
     fi

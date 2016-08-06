@@ -1086,7 +1086,7 @@ String SslEngine::makeCertificateAndKey(
     const String& common, const String& country, const String& company)
 {
     SslStaticData::instance();
-    const int serialNumber = nx::utils::random::number<int>();
+    const int serialNumber = nx::utils::random::number();
 
     auto number = utils::wrapUnique(BN_new(), &BN_free);
     if (!number || !BN_set_word(number.get(), RSA_F4))

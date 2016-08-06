@@ -424,21 +424,22 @@
                     </result>
                 </function>
               <function>
-                <name>detachFromSystem</name>
-                <description>Detach media server from a system. Change its system name and admin password to default value.</description>
-                <method>GET</method>
-                <params>
-                  <param>
-                    <name>oldPassword</name>
+                    <name>detachFromCloud</name>
                     <description>
-                      Current password for admin user
-                    </description>
-                    <optional>false</optional>
-                  </param>
-                </params>
-                <result>
-                  <caption>Json result with error code</caption>
-                </result>
+                        Detach media server from cloud. Local admin user is enabled, admin password is changed to new value (if specified), all cloud users are disabled. Cloud link is removed.
+					              Function can be called either via GET or POST method. POST data should be a json object.
+					          </description>
+                    <method>GET, POST</method>
+                    <params>
+                        <param>
+                            <name>password</name>
+                            <description>Set new admin password after detach.</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Json result with error code</caption>
+                    </result>
               </function>
               <function>
                 <name>setupLocalSystem</name>

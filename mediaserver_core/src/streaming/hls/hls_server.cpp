@@ -243,7 +243,7 @@ namespace nx_hls
         }
 
         auto userResource = qnResPool->getResourceById(d_ptr->authUserId).dynamicCast<QnUserResource>();
-        if (!userResource || !qnResourceAccessManager->hasPermission(userResource, resource, Qn::Permission::ReadPermission))
+        if (!userResource || !qnResourceAccessManager->hasPermission(userResource, resource, Qn::ReadPermission))
             return nx_http::StatusCode::forbidden;
 
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();

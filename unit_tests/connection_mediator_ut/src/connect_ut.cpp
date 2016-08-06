@@ -36,7 +36,6 @@ protected:
     {
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
-        m_address = SocketAddress(HostAddress::localhost, 10001 + (qrand() % 50000));
         listeningPeerRegistrator = std::make_unique<PeerRegistrator>(
             &cloud,
             &stunMessageDispatcher,
@@ -46,8 +45,11 @@ protected:
             false,
             SocketFactory::NatTraversalType::nttDisabled);
 
-        EXPECT_TRUE(server->bind(std::list< SocketAddress >(1, m_address)));
+        EXPECT_TRUE(server->bind(std::vector<SocketAddress>{SocketAddress::anyAddress}));
         EXPECT_TRUE(server->listen());
+
+        EXPECT_TRUE(server->endpoints().size());
+        m_address = server->endpoints().front();
         network::SocketGlobals::mediatorConnector().mockupAddress(m_address);
     }
 

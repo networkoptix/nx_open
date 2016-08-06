@@ -1,6 +1,6 @@
 #include "resource_tree_model_node.h"
 
-#include <common/common_meta_types.h>
+//#include <common/common_meta_types.h>
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -26,7 +26,6 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 namespace
 {
@@ -126,6 +125,22 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     case Qn::SystemNode:
         m_icon = qnResIconCache->icon(QnResourceIconCache::OtherSystem);
         break;
+    case Qn::AllCamerasAccessNode:
+        m_displayName = tr("All Cameras && Resources");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
+        break;
+    case Qn::AllLayoutsAccessNode:
+        m_displayName = tr("All Shared Layouts");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Layouts);
+        break;
+    case Qn::AccessibleResourcesNode:
+        m_displayName = tr("Cameras && Resources");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
+        break;
+    case Qn::AccessibleLayoutsNode:
+        m_displayName = tr("Layouts");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Layouts);
+        break;
     default:
         break;
     }
@@ -165,7 +180,11 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, Qn::NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType)
 {
-    NX_ASSERT(nodeType == Qn::ResourceNode || nodeType == Qn::EdgeNode || nodeType == Qn::SharedLayoutNode);
+    NX_ASSERT(nodeType == Qn::ResourceNode
+        || nodeType == Qn::EdgeNode
+        || nodeType == Qn::SharedLayoutNode
+        || nodeType == Qn::AccessibleResourceNode
+    );
     m_state = Invalid;
     m_status = Qn::Offline;
     setResource(resource);
@@ -187,12 +206,12 @@ QnResourceTreeModelNode::~QnResourceTreeModelNode()
 
 void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 {
-    NX_ASSERT(
-        m_type == Qn::LayoutItemNode ||
-        m_type == Qn::ResourceNode ||
-        m_type == Qn::VideoWallItemNode ||
-        m_type == Qn::EdgeNode ||
-        m_type == Qn::SharedLayoutNode
+    NX_ASSERT(m_type == Qn::LayoutItemNode
+        || m_type == Qn::ResourceNode
+        || m_type == Qn::VideoWallItemNode
+        || m_type == Qn::EdgeNode
+        || m_type == Qn::SharedLayoutNode
+        || m_type == Qn::AccessibleResourceNode
     );
 
     if (m_resource == resource)
@@ -205,12 +224,14 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 void QnResourceTreeModelNode::update()
 {
     /* Update stored fields. */
-    if (m_type == Qn::ResourceNode ||
-        m_type == Qn::LayoutItemNode ||
-        m_type == Qn::EdgeNode ||
-        m_type == Qn::SharedLayoutNode)
+    if (m_type == Qn::ResourceNode
+        || m_type == Qn::LayoutItemNode
+        || m_type == Qn::EdgeNode
+        || m_type == Qn::SharedLayoutNode
+        || m_type == Qn::AccessibleResourceNode
+        )
     {
-        if(m_resource.isNull())
+        if (!m_resource)
         {
             m_displayName = m_name = QString();
             m_flags = 0;
@@ -367,11 +388,15 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (m_parent && m_parent->type() == Qn::SharedLayoutNode)
             return !isAdmin;
 
-        return !accessController()->hasPermissions(m_resource, Qn::ViewContentPermission);
+        return !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
 
-    /* These will be hidden or displayed together with videowall. */
+    /* These will be hidden or displayed together with their parent. */
     case Qn::VideoWallItemNode:
     case Qn::VideoWallMatrixNode:
+    case Qn::AllCamerasAccessNode:
+    case Qn::AllLayoutsAccessNode:
+    case Qn::AccessibleResourcesNode:
+    case Qn::AccessibleLayoutsNode:
         return false;
 
     /* Always hidden. */
@@ -410,6 +435,9 @@ bool QnResourceTreeModelNode::calculateBastard() const
         /* Only admins can see shared layout links. */
         return !isAdmin;
 
+    case Qn::AccessibleResourceNode:
+        return false;
+
     case Qn::ResourceNode:
         /* Hide resource nodes without resource. */
         if (!m_resource)
@@ -421,10 +449,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
         if (QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>())
         {
-            /* Layouts do require ViewContentPermission now. */
-            if (!accessController()->hasPermissions(m_resource, Qn::ViewContentPermission))
-                return true;
-
             /* Hide local layouts that are not file-based. */
             if (layout->hasFlags(Qn::local) && !layout->isFile())
                 return true;
@@ -468,13 +492,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
                 !qnResPool->getResourcesByParentId(m_resource->getId()).filtered<QnVirtualCameraResource>().isEmpty())
             {
                 return true;
-            }
-
-            //TODO: #GDM where can we put this check to be also available in QnWorkbenchDisplay?
-            if (m_flags.testFlag(Qn::media) || m_flags.testFlag(Qn::web_page))
-            {
-                if (!accessController()->hasPermissions(m_resource, Qn::ViewContentPermission))
-                    return true;
             }
         }
         return false;
@@ -572,7 +589,9 @@ QModelIndex QnResourceTreeModelNode::createIndex(int col)
 
 Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
 {
-    if (Qn::isSeparatorNode(m_type))
+    if (Qn::isSeparatorNode(m_type)
+        || m_type == Qn::AllCamerasAccessNode
+        || m_type == Qn::AllLayoutsAccessNode)
     {
         /* No Editable/Selectable flags. */
         return Qt::ItemNeverHasChildren;
@@ -614,6 +633,7 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
     case Qn::EdgeNode:
     case Qn::LayoutItemNode:
     case Qn::SharedLayoutNode:
+    case Qn::AccessibleResourceNode:
         if(m_flags & (Qn::media | Qn::layout | Qn::server | Qn::user | Qn::videowall | Qn::web_page))
             result |= Qt::ItemIsDragEnabled;
         break;

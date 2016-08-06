@@ -11,7 +11,7 @@
 #include "log_message.h"
 
 // Uncomment to enable NX_CHECK condition time measurements:
-// #define NX_CHECK_MEASURE_TIME
+//#define NX_CHECK_MEASURE_TIME
 
 namespace nx {
 namespace utils {
@@ -75,7 +75,7 @@ private:
     #define NX_CHECK(CONDITION, MESSAGE, ACTION) do \
     { \
         auto begin = std::chrono::system_clock::now(); \
-        bool isOk = static_cast<bool>(CONDITION); \
+        bool isOk = static_cast<bool>(condition); \
         auto time = std::chrono::system_clock::now() - begin; \
         \
         static const auto info = nx::utils::AssertTimer::instance.info(__FILE__, __LINE__); \
@@ -102,7 +102,15 @@ private:
     #define NX_EXPECT_IMPL(CONDITION, MESSAGE) /* DOES NOTHING */
 #endif
 
+/**
+ * Needed as a workaround for an MSVC issue: if __VA_ARGS__ is used as an argument to another
+ * macro, it forms a single macro argument even if contains commas.
+ */
 #define NX_MSVC_EXPAND(x) x
+
+/** Useful to convert a single macro arg which has form (A, B, ...) to arg list: A, B, ... */
+#define NX_REMOVE_PARENTHESES(...) __VA_ARGS__
+
 #define NX_GET_4TH_ARG(a1, a2, a3, a4, ...) a4
 
 #define NX_CRITICAL1(CONDITION) \
@@ -115,7 +123,7 @@ private:
     NX_CRITICAL_IMPL(CONDITION, lm("[%1] %2").arg(WHERE).arg(MESSAGE))
 
 /**
- * debug & release: Leads to segfault in case of failure.
+ * Debug and Release: Cause segfault in case of failure.
  */
 #define NX_CRITICAL(...) \
     NX_MSVC_EXPAND(NX_GET_4TH_ARG( \
@@ -131,8 +139,8 @@ private:
     NX_ASSERT_IMPL(CONDITION, lm("[%1] %2").arg(WHERE).arg(MESSAGE))
 
 /**
- * debug: Leads to segfault in case of failure.
- * release: Writes NX_LOG in case of failure.
+ * Debug: Cause segfault in case of failure.
+ * Release: Write NX_LOG in case of failure.
  */
 #define NX_ASSERT(...) \
     NX_MSVC_EXPAND(NX_GET_4TH_ARG( \
@@ -148,8 +156,8 @@ private:
     NX_EXPECT_IMPL(CONDITION, lm("[%1] %2").arg(WHERE).arg(MESSAGE))
 
 /**
- * debug: Leads to segfault in case of failure.
- * release: Does nothing (CONDITION is not even evaluated).
+ * Debug: Leads to segfault in case of failure.
+ * Release: Does nothing (condition is not even evaluated).
  */
 #define NX_EXPECT(...) \
     NX_MSVC_EXPAND(NX_GET_4TH_ARG( \

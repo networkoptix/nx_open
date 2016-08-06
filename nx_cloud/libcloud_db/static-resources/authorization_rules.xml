@@ -182,6 +182,11 @@
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.systemID" matchType="presence">
                             <set value="true" resName="authorized" resValue="true"/>
+                            <condition value="false" resName="auth.accountEmail" matchType="presence">
+                                <condition value="true" resName="systemID" matchType="presence">
+                                    <set value="true" resName="authorized" resValue="true"/>
+                                </condition>
+                            </condition>
                         </condition>
                     </sequence>
                     <!-- only systems can receive events at the moment -->

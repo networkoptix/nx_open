@@ -8,6 +8,8 @@
 #include <QtCore/QHash>
 
 #include <nx/network/mac_address.h>
+#include <nx/fusion/model_functions_fwd.h>
+
 
 /**
  * Interface for monitoring performance in a platform-independent way.

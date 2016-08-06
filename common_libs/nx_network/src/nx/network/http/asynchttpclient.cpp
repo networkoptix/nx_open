@@ -677,6 +677,8 @@ namespace nx_http
             m_awaitedMessageNumber = 0;
         }
 
+        m_state = sInit;
+
         dispatch(
             [this, canUseExistingConnection]()
             {

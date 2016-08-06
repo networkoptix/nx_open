@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
+#include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
-#include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/test_options.h>
@@ -457,7 +458,7 @@ protected:
         else
         {
             socket->registerTimer(
-                rand() % delay,
+                nx::utils::random::number<int>(1, delay),
                 [=]()
                 {
                     if (auto address = m_addressBinder.random(peer))

@@ -69,14 +69,23 @@ bool CloudConnectionManager::boundToCloud() const
     return boundToCloud(&lk);
 }
 
+std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnection(
+    const QString& cloudSystemID,
+    const QString& cloudAuthKey) const
+{
+    return m_cdbConnectionFactory->createConnection(
+        cloudSystemID.toStdString(),
+        cloudAuthKey.toStdString());
+}
+
 std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnection()
 {
     QnMutexLocker lk(&m_mutex);
     if (!boundToCloud(&lk))
         return nullptr;
-    return m_cdbConnectionFactory->createConnection(
-        m_cloudSystemID.toStdString(),
-        m_cloudAuthKey.toStdString());
+    return getCloudConnection(
+        m_cloudSystemID,
+        m_cloudAuthKey);
 }
 
 const nx::cdb::api::ConnectionFactory& CloudConnectionManager::connectionFactory() const

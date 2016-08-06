@@ -326,7 +326,7 @@ bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
 Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnActionParameters &parameters)
 {
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
-    if (nodeType == Qn::SharedLayoutNode)
+    if (nodeType == Qn::SharedLayoutNode || nodeType == Qn::AccessibleResourceNode)
         return Qn::InvisibleAction;
 
     QnUserResourcePtr owner = parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole);
@@ -377,35 +377,36 @@ Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParame
 
     switch (nodeType)
     {
-    case Qn::ResourceNode:
-    case Qn::SharedLayoutNode:
-    {
-        if (parameters.resources().size() != 1)
-            return Qn::InvisibleAction;
+        case Qn::ResourceNode:
+        case Qn::SharedLayoutNode:
+        case Qn::AccessibleResourceNode:
+        {
+            if (parameters.resources().size() != 1)
+                return Qn::InvisibleAction;
 
-        QnResourcePtr target = parameters.resource();
-        if (!target)
-            return Qn::InvisibleAction;
+            QnResourcePtr target = parameters.resource();
+            if (!target)
+                return Qn::InvisibleAction;
 
-        /* Renaming users directly from resource tree is disabled due do digest re-generation need. */
-        if (target->hasFlags(Qn::user))
-            return Qn::InvisibleAction;
+            /* Renaming users directly from resource tree is disabled due do digest re-generation need. */
+            if (target->hasFlags(Qn::user))
+                return Qn::InvisibleAction;
 
-        /* Edge servers renaming is forbidden. */
-        if (QnMediaServerResource::isEdgeServer(target))
-            return Qn::InvisibleAction;
+            /* Edge servers renaming is forbidden. */
+            if (QnMediaServerResource::isEdgeServer(target))
+                return Qn::InvisibleAction;
 
-        /* Incompatible resources cannot be renamed */
-        if (QnMediaServerResource::isFakeServer(target))
-            return Qn::InvisibleAction;
+            /* Incompatible resources cannot be renamed */
+            if (QnMediaServerResource::isFakeServer(target))
+                return Qn::InvisibleAction;
 
-        return Qn::EnabledAction;
-    }
-    case Qn::EdgeNode:
-    case Qn::RecorderNode:
-        return Qn::EnabledAction;
-    default:
-        break;
+            return Qn::EnabledAction;
+        }
+        case Qn::EdgeNode:
+        case Qn::RecorderNode:
+            return Qn::EnabledAction;
+        default:
+            break;
     }
 
     return Qn::InvisibleAction;

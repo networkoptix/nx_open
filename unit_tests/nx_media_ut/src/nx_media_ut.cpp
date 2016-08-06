@@ -1,16 +1,12 @@
 #include <gtest/gtest.h>
 
 #include <common/common_globals.h>
-#include <nx/utils/test_support/sync_queue.h>
 
-#include <nx/utils/log/log.h>
-#include <nx/utils/string.h>
 #include <nx/media/abstract_video_decoder.h>
 #include <nx/media/video_decoder_registry.h>
 #include <nx/media/media_player.h>
 
 #include <nx/streaming/archive_stream_reader.h>
-#include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
 
 #include <core/resource/media_server_resource.h>
@@ -19,8 +15,14 @@
 #include <utils/media/ffmpeg_initializer.h>
 #include <core/resource_management/resource_pool.h>
 
-#define OUTPUT_PREFIX "[TEST] "
-#include <nx/utils/debug_utils.h>
+// Config for debugging the tests.
+static const struct
+{
+    const bool enableHangOnFinish = false;
+    const bool forceLog = false;
+    const bool logMockCameraStreams = true;
+} conf;
+#include <nx/utils/test_support/test_utils.h>
 
 namespace nx {
 namespace media {
@@ -28,47 +30,11 @@ namespace test {
 
 namespace {
 
-// Config for debugging the tests.
-const struct
-{
-    const bool printTestLine = true; //< std::cout parameter line (source code line) for each test.
-    const bool enableOutput = false; //< Enable LOG().
-    const bool logStreams = false; //< Log mock camera streams.
-    const bool enableHang = false;
-} conf;
-
-#define LOG(ARG) do { OUTPUT << (ARG); } while (0)
-
-#define ASSERT(ARG) NX_CRITICAL((ARG), "TEST INTERNAL ERROR")
-
-using namespace std::placeholders;
-using nx::utils::stringFormat;
-
-static std::string sizeToString(const QSize& size)
-{
-    return stringFormat("%d x %d", size.width(), size.height());
-}
-
-static void finishTest(bool hasFailure)
-{
-    if (!conf.enableHang)
-        return;
-
-    if (hasFailure)
-        std::cout << "\nTest FAILED; hanging...";
-    else
-        std::cout << "\nTest PASSED; hanging...";
-
-    for (;;) //< hang
-    {
-    }
-}
+//-------------------------------------------------------------------------------------------------
+// Test/mock classes.
 
 static const QSize kExpectedQualityLow{-1, MEDIA_Quality_Low};
 static const QSize kExpectedQualityHigh{-1, MEDIA_Quality_High};
-
-//-------------------------------------------------------------------------------------------------
-// Test/mock classes.
 
 class TestPlayer: public Player
 {
@@ -206,9 +172,9 @@ public:
             ASSERT(false);
         }
 
-        if (conf.logStreams)
+        if (conf.logMockCameraStreams)
         {
-            LOG(lit("Camera streams JSON: ") + json);
+            LOG(lit("Camera streams JSON: %1").arg(json));
             debugLogStreams();
         }
     }
@@ -305,11 +271,7 @@ public:
         QSize expectedQuality)
     {
         LOG(lit("=============================================================================="));
-        if (conf.printTestLine)
-        {
-            qWarning().nospace() <<
-                lit("[TEST] line %1: %2\n").arg(sourceCodeLineNumber).arg(sourceCodeLineString);
-        }
+        LOG(lit("line %1: %2\n").arg(sourceCodeLineNumber).arg(sourceCodeLineString));
 
         VideoDecoderRegistry::instance()->setTranscodingEnabled(clientSupportsTranscoding);
         m_server->setSupportsTranscoding(serverSupportsTranscoding);
@@ -354,8 +316,8 @@ private:
         if (expectedResolution != m_actualResolution)
         {
             ADD_FAILURE() << "Resolution: "
-                << "expected " << sizeToString(expectedResolution)
-                << ", actual " << sizeToString(m_actualResolution);
+                << "expected " << qSizeToString(expectedResolution)
+                << ", actual " << qSizeToString(m_actualResolution);
         }
     }
 
@@ -481,6 +443,6 @@ TEST_F(NxMediaPlayerTest, SetQuality)
     finishTest(HasFailure());
 }
 
-} // namespace text
+} // namespace test
 } // namespace media
 } // namespace nx
