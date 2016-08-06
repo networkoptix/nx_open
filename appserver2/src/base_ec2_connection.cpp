@@ -329,7 +329,7 @@ int BaseEc2Connection<QueryProcessorType>::restoreDatabaseAsync(
     const int reqID = generateRequestID();
 
     QnTransaction<ApiDatabaseDumpData> tran(ApiCommand::restoreDatabase);
-    tran.isLocal = true;
+    tran.transactionType = TransactionType::Local;
     tran.params = data;
 
     using namespace std::placeholders;

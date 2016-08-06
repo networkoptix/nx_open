@@ -26,7 +26,7 @@ struct SendTransactionFunction
     void operator()(const QnTransaction<T>& tran) const
     {
         // Local transactions (such as setStatus for servers) should only be sent to clients.
-        if (tran.isLocal)
+        if (tran.isLocal())
         {
             QnPeerSet clients = qnTransactionBus->aliveClientPeers().keys().toSet();
             // Important check. Empty target means "send to all peers".
@@ -380,7 +380,7 @@ private:
                 RUN_AND_CHECK_ERROR(
                     processMultiUpdateSync(
                         ApiCommand::removeResource,
-                        tran.isLocal,
+                        tran.transactionType,
                         dbManager(m_userAccessData)
                             .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
                             .toIdList(),
@@ -417,7 +417,7 @@ private:
     {
         ErrorCode errorCode = processMultiUpdateSync(
             ApiCommand::removeBusinessRule,
-            tran.isLocal,
+            tran.transactionType,
             dbManager(m_userAccessData).getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
             transactionsToSend);
         if(errorCode != ErrorCode::ok)
@@ -425,7 +425,7 @@ private:
 
         return processMultiUpdateSync(
             ApiCommand::saveBusinessRule,
-            tran.isLocal,
+            tran.transactionType,
             tran.params.defaultRules,
             transactionsToSend);
     }
@@ -511,14 +511,14 @@ private:
     template<class SubDataType>
     ErrorCode processMultiUpdateSync(
         ApiCommand::Value command,
-        bool isLocal,
+        TransactionType::Value transactionType,
         const std::vector<SubDataType>& nestedList,
         std::list<std::function<void()>>* const transactionsToSend)
     {
         for(const SubDataType& data: nestedList)
         {
             QnTransaction<SubDataType> subTran(command, data);
-            subTran.isLocal = isLocal;
+            subTran.transactionType = transactionType;
             ErrorCode errorCode = processUpdateSync(subTran, transactionsToSend);
             if (errorCode != ErrorCode::ok)
                 return errorCode;
@@ -542,7 +542,7 @@ private:
                 std::list<std::function<void()>>* const transactionsToSend) -> ErrorCode
             {
                 return processMultiUpdateSync(
-                    subCommand, multiTran.isLocal, multiTran.params,
+                    subCommand, multiTran.transactionType, multiTran.params,
                     transactionsToSend);
             });
     }

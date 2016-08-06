@@ -680,6 +680,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PT_VideowallClient = 2,
         PT_MobileClient = 3,
         PT_LiteClient = 4,
+        PT_CloudServer = 5,
         PT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)

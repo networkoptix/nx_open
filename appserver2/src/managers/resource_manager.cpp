@@ -56,7 +56,7 @@ namespace ec2
 
         //performing request
         auto tran = prepareTransaction( ApiCommand::setResourceStatus, resourceId, status );
-        tran.isLocal = true;
+        tran.transactionType = TransactionType::Local;
         using namespace std::placeholders;
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SetResourceStatusHandler::done ), handler, reqID, _1, resourceId));
         return reqID;

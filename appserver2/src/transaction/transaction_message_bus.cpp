@@ -600,7 +600,7 @@ void QnTransactionMessageBus::onGotTransactionSyncDone(QnTransactionTransport* s
 template <class T>
 void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader)
 {
-    NX_ASSERT(!tran.isLocal);
+    NX_ASSERT(!tran.isLocal());
     transport->sendTransaction(tran, transportHeader);
 }
 
@@ -739,7 +739,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         return;
     }
 
-    if (tran.isLocal && ApiPeerData::isServer(m_localPeerType))
+    if (tran.isLocal() && ApiPeerData::isServer(m_localPeerType))
     {
         NX_LOG(QnLog::EC2_TRAN_LOG, printTransaction("reject local transaction", tran, transportHeader, sender), cl_logDEBUG1);
         return;
@@ -948,6 +948,7 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(
     QList<QByteArray> serializedTransactions;
     const ErrorCode errorCode = transactionLog->getTransactionsAfter(
         tran.params.persistentState,
+        sender->remotePeer().peerType == Qn::PeerType::PT_CloudServer,
         serializedTransactions);
 
     if (errorCode == ErrorCode::ok)
@@ -1232,7 +1233,7 @@ QnTransaction<ApiDiscoveredServerDataList> QnTransactionMessageBus::prepareModul
         transaction.params.push_back(std::move(serverData));
     }
     transaction.peerID = qnCommon->moduleGUID();
-    transaction.isLocal = true;
+    transaction.transactionType = TransactionType::Local;
     return transaction;
 }
 

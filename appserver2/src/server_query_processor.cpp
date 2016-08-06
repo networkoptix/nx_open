@@ -33,7 +33,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
 
     ErrorCode errorCode = processMultiUpdateSync(
         ApiCommand::removeResourceParam,
-        tran.isLocal,
+        tran.transactionType,
         resourceParams,
         transactionsToSend);
 

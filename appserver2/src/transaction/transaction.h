@@ -1155,14 +1155,24 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
 
         /** Check if transaction should be written to data base. */
         bool isPersistent( Value val );
+    }
 
+    namespace TransactionType
+    {
+        enum Value
+        {
+            Regular,
+            Local, //< do not propagate transactions to other server peers or cloud
+            Cloud  //< sync transaction to cloud
+        };
+        QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
     }
 
     class QnAbstractTransaction
     {
     public:
-        QnAbstractTransaction(): command(ApiCommand::NotDefined), isLocal(false) { peerID = qnCommon->moduleGUID(); }
-        QnAbstractTransaction(ApiCommand::Value value): command(value), isLocal(false) { peerID = qnCommon->moduleGUID(); }
+        QnAbstractTransaction(): command(ApiCommand::NotDefined), transactionType(TransactionType::Regular) { peerID = qnCommon->moduleGUID(); }
+        QnAbstractTransaction(ApiCommand::Value value): command(value), transactionType(TransactionType::Regular) { peerID = qnCommon->moduleGUID(); }
 
         struct PersistentInfo
         {
@@ -1188,16 +1198,18 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         QnUuid peerID;
         PersistentInfo persistentInfo;
 
-        bool isLocal; /* do not propagate transactions to other server peers*/
+        TransactionType::Value transactionType;
 
         QString toString() const;
+        bool isLocal() const { return transactionType == TransactionType::Local; }
+        bool isCloud() const { return transactionType == TransactionType::Cloud; }
     };
 
 
     typedef std::vector<ec2::QnAbstractTransaction> QnAbstractTransactionList;
     typedef QnAbstractTransaction::PersistentInfo QnAbstractTransaction_PERSISTENT;
 #define QnAbstractTransaction_PERSISTENT_Fields (dbID)(sequence)(timestamp)
-#define QnAbstractTransaction_Fields (command)(peerID)(persistentInfo)(isLocal)
+#define QnAbstractTransaction_Fields (command)(peerID)(persistentInfo)(transactionType)
 
     template <class T>
     class QnTransaction: public QnAbstractTransaction
@@ -1282,7 +1294,7 @@ QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))
     int generateRequestID();
 } /* namespace ec2*/
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (metatype)(numeric))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value)(ec2::TransactionType::Value), (metatype)(numeric))
 
 #ifndef QN_NO_QT
 Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)

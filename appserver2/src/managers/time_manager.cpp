@@ -93,8 +93,8 @@ namespace ec2
             ApiMiscData(USED_TIME_PRIORITY_KEY_PARAM_NAME,
                 QByteArray::number(syncTimeKey.toUInt64())));
 
-        deltaTran.isLocal = true;
-        priorityTran.isLocal = true;
+        deltaTran.transactionType = TransactionType::Local;
+        priorityTran.transactionType = TransactionType::Local;
 
         transactionLog->fillPersistentInfo(deltaTran);
         transactionLog->fillPersistentInfo(priorityTran);
@@ -1324,7 +1324,7 @@ namespace ec2
                     ec2::ApiMiscData(LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
                         QByteArray::number(m_localTimePriorityKey.toUInt64())));
 
-                localTimeTran.isLocal = true;
+                localTimeTran.transactionType = TransactionType::Local;
                 transactionLog->fillPersistentInfo(localTimeTran);
                 detail::QnDbManager::instance()->executeTransaction(localTimeTran, QByteArray());
             }));

@@ -60,6 +60,22 @@ namespace ec2
 namespace detail
 {
 
+struct QnAbstractTransactionV1
+{
+    ApiCommand::Value command;
+    QnUuid peerID;
+    QnAbstractTransaction::PersistentInfo persistentInfo;
+    bool isLocal;
+};
+#define QnAbstractTransactionV1_Fields (command)(peerID)(persistentInfo)(isLocal)
+QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransactionV1, (ubjson))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnAbstractTransactionV1),
+    (ubjson),
+    _Fields,
+    (optional, false))
+
+
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
@@ -1169,6 +1185,57 @@ bool QnDbManager::fixBusinessRules()
     return true;
 }
 
+bool QnDbManager::upgradeSerializedTransactions()
+{
+    // migrate transaction log
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(QString("SELECT tran_guid, tran_data from transaction_log"));
+    if (!query.exec())
+    {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return false;
+    }
+
+    QSqlQuery updQuery(m_sdb);
+    updQuery.prepare(QString("UPDATE transaction_log SET tran_data = ?, tran_type = ? WHERE tran_guid = ?"));
+
+    while (query.next())
+    {
+        QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
+        QByteArray srcData = query.value(1).toByteArray();
+        QnUbjsonReader<QByteArray> stream(&srcData);
+
+        QnAbstractTransactionV1 abstractTranV1;
+        const int srcDataSize  = QnUbjson::serialized(abstractTranV1).size();
+        if (!QnUbjson::deserialize(&stream, &abstractTranV1))
+        {
+            qWarning() << Q_FUNC_INFO << "Can' deserialize transaction from transaction log";
+            return false;
+        }
+
+        QnAbstractTransaction updatedTran;
+        updatedTran.command = abstractTranV1.command;
+        updatedTran.peerID = abstractTranV1.peerID;
+        updatedTran.persistentInfo = abstractTranV1.persistentInfo;
+        if (abstractTranV1.isLocal)
+            updatedTran.transactionType = TransactionType::Local;
+
+        QByteArray dstData = QnUbjson::serialized(updatedTran);
+        dstData.append(srcData.mid(srcDataSize));
+
+        updQuery.addBindValue(dstData);
+        updQuery.addBindValue(updatedTran.transactionType);
+        updQuery.addBindValue(QnSql::serialized_field(tranGuid));
+        if (!updQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << query.lastError().text();
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
     if (updateName == lit(":/updates/07_videowall.sql"))
@@ -1324,6 +1391,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/52_fix_onvif_mt.sql"))
     {
         return removeWrongSupportedMotionTypeForONVIF(); //TODO: #rvasilenko consistency break
+    }
+    else if (updateName == lit(":/updates/68_add_transaction_type.sql"))
+    {
+        return upgradeSerializedTransactions();
     }
 
     return true;

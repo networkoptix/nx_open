@@ -68,7 +68,7 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
     QnTransaction<ApiLicenseOverflowData> transaction(ApiCommand::markLicenseOverflow);
     transaction.params.value = value;
     transaction.params.time = time;
-    transaction.isLocal = true;
+    transaction.transactionType = TransactionType::Local;
 
     using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,

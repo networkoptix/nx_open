@@ -29,7 +29,17 @@ namespace ec2
 
         static QnTransactionLog* instance();
 
-        ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
+        /**
+         * Return transactions from the log
+         * @param state return transactions with sequence bigger then state
+         * @param output result
+         * @param onlyCloudData if false returns all transactions otherwise filter
+         *        result and keep only cloud related transactions.
+         */
+        ErrorCode getTransactionsAfter(
+            const QnTranState& state,
+            bool onlyCloudData,
+            QList<QByteArray>& result);
         QnTranState getTransactionsState();
 
         bool contains(const QnTranState& state) const;
