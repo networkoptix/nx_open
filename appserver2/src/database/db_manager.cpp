@@ -536,10 +536,12 @@ bool QnDbManager::init(const QUrl& dbUrl)
     if( !defaultAdminPassword.isEmpty() )
     {
         if (!userResource->checkLocalUserPassword(defaultAdminPassword) ||
-            userResource->getRealm() != QnAppInfo::realm())
+            userResource->getRealm() != QnAppInfo::realm() ||
+            !userResource->isEnabled())
         {
             userResource->setPassword( defaultAdminPassword);
             userResource->generateHash();
+            userResource->setEnabled(true);
             updateUserResource = true;
         }
     }
@@ -1085,7 +1087,7 @@ bool QnDbManager::removeOldCameraHistory()
     updQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
 
     while (query.next()) {
-        QnAbstractTransaction abstractTran;
+        QnAbstractTransactionV1 abstractTran;
         QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
         QByteArray srcData = query.value(1).toByteArray();
         QnUbjsonReader<QByteArray> stream(&srcData);
@@ -1120,7 +1122,7 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
     updQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
 
     while (query.next()) {
-        QnAbstractTransaction abstractTran;
+        QnAbstractTransactionV1 abstractTran;
         QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
         QByteArray srcData = query.value(1).toByteArray();
         QnUbjsonReader<QByteArray> stream(&srcData);
@@ -1163,7 +1165,7 @@ bool QnDbManager::fixBusinessRules()
     delQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
 
     while (query.next()) {
-        QnAbstractTransaction abstractTran;
+        QnAbstractTransactionV1 abstractTran;
         QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
         QByteArray srcData = query.value(1).toByteArray();
         QnUbjsonReader<QByteArray> stream(&srcData);
