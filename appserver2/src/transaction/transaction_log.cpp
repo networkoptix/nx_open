@@ -348,7 +348,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
 {
     QString extraFilter;
     if (onlyCloudData)
-        extraFilter = lit("AND transaction_type = %1").arg(TransactionType::Cloud);
+        extraFilter = lit("AND tran_type = %1").arg(TransactionType::Cloud);
 
     QnReadLocker lock(&m_dbManager->getMutex());
     QMap <QnTranStateKey, int> tranLogSequence;
