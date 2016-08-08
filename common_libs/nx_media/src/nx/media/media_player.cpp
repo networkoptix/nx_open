@@ -390,7 +390,10 @@ void PlayerPrivate::presentNextFrame()
     {
         videoSurface->present(*scaleFrame(videoFrameToRender));
         if (dataConsumer)
-            dataConsumer->setDisplayedTimeUs(videoFrameToRender->startTime() * 1000);
+        {
+            qint64 timeUs = liveMode ? DATETIME_NOW : videoFrameToRender->startTime() * 1000;
+            dataConsumer->setDisplayedTimeUs(timeUs);
+        }
     }
 
     setPosition(videoFrameToRender->startTime());
