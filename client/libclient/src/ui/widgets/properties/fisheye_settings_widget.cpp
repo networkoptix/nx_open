@@ -6,6 +6,9 @@
 #include <core/resource/resource.h>
 #include <core/resource/media_resource.h>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 #include <ui/style/skin.h>
 #include <ui/widgets/fisheye/fisheye_calibration_widget.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -16,6 +19,8 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
     ui(new Ui::FisheyeSettingsWidget)
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::CameraSettings_Dewarping_Help);
 
     ui->sizeIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/circle_small.png")));
     ui->sizeIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/circle_big.png")));

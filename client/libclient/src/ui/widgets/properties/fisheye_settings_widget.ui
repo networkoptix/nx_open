@@ -53,7 +53,6 @@
    </item>
    <item>
     <widget class="QnFisheyeCalibrationWidget" name="calibrateWidget" native="true">
-     <zorder>widget</zorder>
     </widget>
    </item>
    <item>
