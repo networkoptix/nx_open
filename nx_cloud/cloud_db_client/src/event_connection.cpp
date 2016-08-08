@@ -25,7 +25,9 @@ EventConnection::EventConnection(
     std::string login,
     std::string password)
 :
-    m_cdbEndPointFetcher(endPointFetcher),
+    m_cdbEndPointFetcher(
+        std::make_unique<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>(
+            endPointFetcher)),
     m_login(std::move(login)),
     m_password(std::move(password)),
     m_reconnectTimer(network::RetryPolicy(
@@ -40,6 +42,7 @@ EventConnection::EventConnection(
 EventConnection::~EventConnection()
 {
     //TODO #ak cancel m_cdbEndPointFetcher->get
+    m_cdbEndPointFetcher.reset();
 
     if (m_httpClient)
     {

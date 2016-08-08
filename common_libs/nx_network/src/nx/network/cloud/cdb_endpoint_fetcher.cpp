@@ -50,7 +50,7 @@ void CloudModuleEndPointFetcher::setEndpoint(SocketAddress endpoint)
 
 //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
 void CloudModuleEndPointFetcher::get(
-    std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler)
+    nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, SocketAddress)> handler)
 {
     //if requested endpoint is known, providing it to the output
     QnMutexLocker lk(&m_mutex);
@@ -176,6 +176,31 @@ void CloudModuleEndPointFetcher::endpointSelected(
     NX_ASSERT(!m_endpoint);
     m_endpoint = selectedEndpoint;
     signalWaitingHandlers(&lk, result, selectedEndpoint);
+}
+
+
+CloudModuleEndPointFetcher::ScopedOperation::ScopedOperation(
+    CloudModuleEndPointFetcher* const fetcher)
+:
+    m_fetcher(fetcher)
+{
+}
+
+CloudModuleEndPointFetcher::ScopedOperation::~ScopedOperation()
+{
+}
+
+void CloudModuleEndPointFetcher::ScopedOperation::get(
+    nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, SocketAddress)> handler)
+{
+    auto sharedGuard = m_guard.sharedGuard();
+    m_fetcher->get(
+        [sharedGuard = std::move(sharedGuard), handler = std::move(handler)](
+            nx_http::StatusCode::Value statusCode, SocketAddress result) mutable
+        {
+            if (auto lock = sharedGuard->lock())
+                handler(statusCode, result);
+        });
 }
 
 } // namespace cloud
