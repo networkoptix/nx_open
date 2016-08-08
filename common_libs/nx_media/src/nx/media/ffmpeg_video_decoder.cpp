@@ -301,7 +301,6 @@ int FfmpegVideoDecoder::decode(
         avpkt.size = 0;
     }
 
-    d->frame->coded_picture_number = -1;
     int gotPicture = 0;
     int res = avcodec_decode_video2(d->codecContext, d->frame, &gotPicture, &avpkt);
     if (res <= 0 || !gotPicture)
