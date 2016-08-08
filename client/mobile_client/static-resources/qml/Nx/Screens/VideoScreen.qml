@@ -215,8 +215,8 @@ PageBase
 
         source: player
         screenshotSource: initialScreenshot
-        aspectRatio: screenshotSource == initialScreenshot ? resourceHelper.rotatedAspectRatio : resourceHelper.aspectRatio
-        videoRotation: screenshotSource == initialScreenshot ? 0 : resourceHelper.rotation
+        customAspectRatio: resourceHelper.customAspectRatio
+        videoRotation: resourceHelper.customRotation
 
         onClicked:
         {

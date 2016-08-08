@@ -101,25 +101,31 @@ Control
             width: thumbnailContainer.width
             height: thumbnailContainer.height
 
-            Video
+            VideoPositioner
             {
-                id: videoOutput
-
                 anchors.fill: parent
-                source: player
-                aspectRatio: resourceHelper.aspectRatio
-                videoRotation: resourceHelper.rotation
+                customAspectRatio: resourceHelper.customAspectRatio
+                videoRotation: resourceHelper.customRotation
+                sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
 
-                QnScenePositionListener
+                item: VideoOutput
                 {
-                    item: videoOutput
-                    onScenePosChanged:
+                    id: videoOutput
+
+                    source: player
+                    fillMode: VideoOutput.Stretch
+
+                    QnScenePositionListener
                     {
-                        player.videoGeometry = Qt.rect(
-                            scenePos.x,
-                            scenePos.y,
-                            videoOutput.width,
-                            videoOutput.height)
+                        item: parent
+                        onScenePosChanged:
+                        {
+                            player.videoGeometry = Qt.rect(
+                                scenePos.x,
+                                scenePos.y,
+                                parent.width,
+                                parent.height)
+                        }
                     }
                 }
             }
