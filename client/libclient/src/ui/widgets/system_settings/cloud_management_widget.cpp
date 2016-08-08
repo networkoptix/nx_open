@@ -7,13 +7,12 @@
 
 #include <helpers/cloud_url_helper.h>
 
-#include <ui/common/aligner.h>
 #include <ui/dialogs/link_to_cloud_dialog.h>
 #include <ui/dialogs/unlink_from_cloud_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/common/palette.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/input_field.h>
+
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/app_info.h>
@@ -101,42 +100,9 @@ void QnCloudManagementWidget::unlinkFromCloud()
     if (!isOwner)
         return;
 
-    QWidget* authorizeWidget = new QWidget();
-    auto* layout = new QVBoxLayout(authorizeWidget);
-
-    auto loginField = new QnInputField();
-    loginField->setReadOnly(true);
-    loginField->setTitle(tr("Login"));
-    loginField->setText(qnGlobalSettings->cloudAccountName());
-    layout->addWidget(loginField);
-
-    auto passwordField = new QnInputField();
-    passwordField->setTitle(tr("Password"));
-    passwordField->setEchoMode(QLineEdit::Password);
-    layout->addWidget(passwordField);
-
-    QnAligner* aligner = new QnAligner(authorizeWidget);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
-    aligner->addWidget(loginField);
-    aligner->addWidget(passwordField);
-
     //bool loggedAsCloud = context()->user()->isCloud();
 
-    QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox> > messageBox(
-        new QnWorkbenchStateDependentDialog<QnMessageBox>(this));
-    messageBox->setIcon(QnMessageBox::Question);
-    messageBox->setWindowTitle(tr("Disconnect from %1").arg(QnAppInfo::cloudName()));
-    messageBox->setText(tr("Disconnect system from %1").arg(QnAppInfo::cloudName()));
-//        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-//        mainWindow());
-/*    messageBox.setDefaultButton(QDialogButtonBox::Ok);*/
-    messageBox->setInformativeText(tr("All cloud users and features will be disabled. "
-        "Enter password to continue.")); //TODO: #GDM #tr make sure it will be translated fully
-    messageBox->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main);
+    QScopedPointer<QnUnlinkFromCloudDialog> messageBox(new QnUnlinkFromCloudDialog(this));
     messageBox->exec();
-
-//     QScopedPointer<QnLinkToCloudDialog> dialog(new QnLinkToCloudDialog(this));
-//     dialog->exec();
-
 }
 
