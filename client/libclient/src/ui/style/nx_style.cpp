@@ -226,6 +226,12 @@ namespace
         return true;
     }
 
+    bool isNonEditableComboBox(const QWidget* widget)
+    {
+        auto comboBox = qobject_cast<const QComboBox*>(widget);
+        return comboBox && !comboBox->isEditable();
+    }
+
     QnIndents itemViewItemIndents(const QStyleOptionViewItem* item)
     {
         static const QnIndents kDefaultIndents(Metrics::kStandardPadding, Metrics::kStandardPadding);
@@ -3135,9 +3141,9 @@ void QnNxStyle::polish(QWidget *widget)
     if (qobject_cast<QAbstractButton*>(widget) ||
         qobject_cast<QAbstractSlider*>(widget) ||
         qobject_cast<QGroupBox*>(widget) ||
-        qobject_cast<QComboBox*>(widget) ||
         qobject_cast<QTabBar*>(widget) ||
-        qobject_cast<QLabel*>(widget))
+        qobject_cast<QLabel*>(widget) ||
+        isNonEditableComboBox(widget))
     {
         if (widget->focusPolicy() != Qt::NoFocus)
             widget->setFocusPolicy(Qt::TabFocus);
