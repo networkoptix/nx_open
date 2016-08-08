@@ -123,6 +123,7 @@ void setupCaptionLabel(QnWordWrappedLabel& label, bool isErrorStyle)
 QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent)
     :
     base_type(parent),
+
     m_visibleControls(Control::kNoControl),
     m_initialized(false),
     m_errorStyle(false),
@@ -140,8 +141,8 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent)
     m_centralAreaImage(new QLabel()),
     m_caption(new QnWordWrappedLabel()),
 
-    m_description(new QnWordWrappedLabel()),
-    m_button(new QPushButton())
+    m_button(new QPushButton()),
+    m_description(new QnWordWrappedLabel())
 {
     setOpacity(kBaseOpacity);
     setAcceptedMouseButtons(Qt::NoButton);
