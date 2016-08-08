@@ -868,3 +868,4 @@ typedef nx::network::test::StopType StopType;
     NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
     NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
     NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \
+
