@@ -26,19 +26,15 @@ public:
     void updateFromResources(const QnVirtualCameraResourceList &cameras);
     void submitToResources(const QnVirtualCameraResourceList &cameras);
 
-    bool isFisheye() const;
-
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
 private:
     void updateAspectRatioFromResources(const QnVirtualCameraResourceList &cameras);
     void updateRotationFromResources(const QnVirtualCameraResourceList &cameras);
-    void updateFisheyeFromResources(const QnVirtualCameraResourceList &cameras);
 
 signals:
     void changed();
-    void fisheyeChanged();
 
 private:
     QScopedPointer<Ui::ImageControlWidget> ui;

@@ -207,8 +207,6 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->fisheyeSettingsWidget, &QnFisheyeSettingsWidget::dataChanged,
         this, &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
 
-    connect(ui->imageControlWidget, &QnImageControlWidget::fisheyeChanged,
-        this, &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
     connect(ui->imageControlWidget, &QnImageControlWidget::changed,
         this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
@@ -446,7 +444,6 @@ void QnSingleCameraSettingsWidget::submitToResource()
 
         QnMediaDewarpingParams dewarpingParams = m_camera->getDewarpingParams();
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
-        dewarpingParams.enabled = ui->imageControlWidget->isFisheye(); //this step is really not needed as 'enabled' flag was set by imageControlWidget
         m_camera->setDewarpingParams(dewarpingParams);
 
         setHasDbChanges(false);
@@ -585,7 +582,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         }
     }
 
-    setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, ui->imageControlWidget->isFisheye());
+    setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, true);
 
     updateMotionWidgetFromResource();
     updateMotionAvailability();
@@ -1121,7 +1118,6 @@ void QnSingleCameraSettingsWidget::at_dbDataChanged()
     if (m_updating)
         return;
 
-    setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, ui->imageControlWidget->isFisheye());
     setHasDbChanges(true);
 }
 
@@ -1173,7 +1169,6 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged()
     {
         QnMediaDewarpingParams dewarpingParams = mediaWidget->dewarpingParams();
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
-        dewarpingParams.enabled = ui->imageControlWidget->isFisheye();
         mediaWidget->setDewarpingParams(dewarpingParams);
 
         QnWorkbenchItem *item = mediaWidget->item();

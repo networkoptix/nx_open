@@ -1,40 +1,97 @@
 #include "fisheye_settings_widget.h"
 #include "ui_fisheye_settings_widget.h"
 
+#include <QtCore/QSignalBlocker>
+
 #include <core/resource/resource.h>
 #include <core/resource/media_resource.h>
 
+#include <ui/style/skin.h>
 #include <ui/widgets/fisheye/fisheye_calibration_widget.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
-#include <utils/common/scoped_value_rollback.h>
 
 QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
     base_type(parent),
-    ui(new Ui::FisheyeSettingsWidget),
-    m_updating(false)
+    ui(new Ui::FisheyeSettingsWidget)
 {
     ui->setupUi(this);
 
-    connect(ui->angleSpinBox,           SIGNAL(valueChanged(double)),   this, SLOT(updateSliderFromSpinbox(double)));
-    connect(ui->horizontalSlider,       SIGNAL(valueChanged(int)),      this, SLOT(updateSpinboxFromSlider(int)));
+    ui->sizeIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/circle_small.png")));
+    ui->sizeIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/circle_big.png")));
+    ui->xOffsetIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_left.png")));
+    ui->xOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_right.png")));
+    ui->yOffsetIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_down.png")));
+    ui->yOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_up.png")));
+    ui->ellipticityIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_horizontal.png")));
+    ui->ellipticityIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_vertical.png")));
 
-    connect(ui->angleSpinBox,           SIGNAL(valueChanged(double)),   this, SLOT(at_dataChanged()));
-    connect(ui->horizontalSlider,       SIGNAL(valueChanged(int)),      this, SLOT(at_dataChanged()));
+    connect(ui->angleSpinBox, QnDoubleSpinBoxValueChanged, this, &QnFisheyeSettingsWidget::dataChanged);
+    connect(ui->calibrateWidget, &QnFisheyeCalibrationWidget::dataChanged, this, &QnFisheyeSettingsWidget::dataChanged);
 
-    connect(ui->horizontalRadioButton,  SIGNAL(clicked(bool)),          this, SLOT(at_dataChanged()));
-    connect(ui->viewDownButton,         SIGNAL(clicked(bool)),          this, SLOT(at_dataChanged()));
-    connect(ui->viewUpButton,           SIGNAL(clicked(bool)),          this, SLOT(at_dataChanged()));
+    connect(ui->fisheyeEnabledButton,  &QPushButton::toggled, this, &QnFisheyeSettingsWidget::dataChanged);
+    connect(ui->horizontalRadioButton, &QPushButton::clicked, this, &QnFisheyeSettingsWidget::dataChanged);
+    connect(ui->viewDownButton,        &QPushButton::clicked, this, &QnFisheyeSettingsWidget::dataChanged);
+    connect(ui->viewUpButton,          &QPushButton::clicked, this, &QnFisheyeSettingsWidget::dataChanged);
 
-    connect(ui->calibrateWidget,        &QnFisheyeCalibrationWidget::dataChanged,   this, &QnFisheyeSettingsWidget::at_dataChanged);
+    connect(ui->sizeSlider, &QSlider::sliderMoved, this,
+        [this](int value)
+        {
+            ui->calibrateWidget->setRadius(value * 0.01);
+        });
+
+    connect(ui->xOffsetSlider, &QSlider::sliderMoved, this,
+        [this](int value)
+        {
+            ui->calibrateWidget->setCenter(QPointF(value * 0.01, ui->calibrateWidget->center().y()));
+        });
+
+    connect(ui->yOffsetSlider, &QSlider::sliderMoved, this,
+        [this](int value)
+        {
+            ui->calibrateWidget->setCenter(QPointF(ui->calibrateWidget->center().x(), 1.0 - value * 0.01));
+        });
+
+    connect(ui->ellipticitySlider, &QSlider::sliderMoved, this,
+        [this](int value)
+        {
+            ui->calibrateWidget->setHorizontalStretch(value / 50.0);
+        });
+
+    connect(ui->calibrateWidget, &QnFisheyeCalibrationWidget::dataChanged, this,
+        [this]()
+        {
+            ui->sizeSlider->setValue(static_cast<int>(ui->calibrateWidget->radius() * 100.0));
+            ui->ellipticitySlider->setValue(static_cast<int>(ui->calibrateWidget->horizontalStretch() * 50.0));
+            ui->xOffsetSlider->setValue(static_cast<int>(ui->calibrateWidget->center().x() * 100.0));
+            ui->yOffsetSlider->setValue(static_cast<int>((1.0 - ui->calibrateWidget->center().y()) * 100.0));
+            emit dataChanged();
+        });
+
+    connect(ui->autoCalibrationButton, &QPushButton::clicked, this,
+        [this]()
+        {
+            ui->autoCalibrationButton->setEnabled(false);
+            ui->calibrateWidget->autoCalibrate();
+        });
+
+    connect(ui->calibrateWidget, &QnFisheyeCalibrationWidget::autoCalibrationFinished, this,
+        [this]()
+        {
+            ui->autoCalibrationButton->setEnabled(true);
+        });
 }
 
-QnFisheyeSettingsWidget::~QnFisheyeSettingsWidget() {
+QnFisheyeSettingsWidget::~QnFisheyeSettingsWidget()
+{
 }
 
-void QnFisheyeSettingsWidget::updateFromParams(const QnMediaDewarpingParams &params, QnImageProvider *imageProvider) {
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+void QnFisheyeSettingsWidget::updateFromParams(const QnMediaDewarpingParams& params, QnImageProvider* imageProvider)
+{
+    QSignalBlocker updateBlock(this);
 
-    switch (params.viewMode) {
+    switch (params.viewMode)
+    {
         case QnMediaDewarpingParams::Horizontal:
             ui->horizontalRadioButton->setChecked(true);
             break;
@@ -48,53 +105,40 @@ void QnFisheyeSettingsWidget::updateFromParams(const QnMediaDewarpingParams &par
             NX_ASSERT( __LINE__, Q_FUNC_INFO, "Unsupported value");
     }
 
+    ui->fisheyeEnabledButton->setChecked(params.enabled);
+
     ui->angleSpinBox->setValue(params.fovRot);
-    ui->horizontalSlider->setValue(params.fovRot * 10);
 
     if (ui->calibrateWidget->imageProvider() != imageProvider)
     {
         ui->calibrateWidget->init();
         ui->calibrateWidget->setImageProvider(imageProvider);
     }
+
     ui->calibrateWidget->setRadius(params.radius);
     ui->calibrateWidget->setHorizontalStretch(params.hStretch);
     ui->calibrateWidget->setCenter(QPointF(params.xCenter, params.yCenter));
 }
 
-void QnFisheyeSettingsWidget::submitToParams(QnMediaDewarpingParams &params) {
-    params.fovRot = ui->horizontalSlider->value() / 10.0;
+void QnFisheyeSettingsWidget::submitToParams(QnMediaDewarpingParams& params)
+{
+    params.enabled = ui->fisheyeEnabledButton->isChecked();
+    params.fovRot = ui->angleSpinBox->value();
+
     if (ui->horizontalRadioButton->isChecked())
         params.viewMode = QnMediaDewarpingParams::Horizontal;
     else if (ui->viewDownButton->isChecked())
         params.viewMode = QnMediaDewarpingParams::VerticalDown;
     else
         params.viewMode = QnMediaDewarpingParams::VerticalUp;
+
     params.xCenter = ui->calibrateWidget->center().x();
     params.yCenter = ui->calibrateWidget->center().y();
     params.radius = ui->calibrateWidget->radius();
     params.hStretch = ui->calibrateWidget->horizontalStretch();
 }
 
-void QnFisheyeSettingsWidget::updateSliderFromSpinbox(double value) {
-    int newValue = 10 * value;
-    if (ui->horizontalSlider->value() == newValue)
-        return;
-    ui->horizontalSlider->setValue(newValue);
-}
-
-void QnFisheyeSettingsWidget::updateSpinboxFromSlider(int value) {
-    int newValue = 0.1 * value;
-    if (qFuzzyCompare(ui->angleSpinBox->value(), newValue))
-        return;
-    ui->angleSpinBox->setValue(newValue);
-}
-
-void QnFisheyeSettingsWidget::at_dataChanged() {
-    if (m_updating)
-        return;
-    emit dataChanged();
-}
-
-void QnFisheyeSettingsWidget::loadPreview() {
+void QnFisheyeSettingsWidget::loadPreview()
+{
     ui->calibrateWidget->updateImage();
 }
