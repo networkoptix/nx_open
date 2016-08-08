@@ -104,87 +104,65 @@ bool PasswordData::hasPassword() const
         !passwordDigest.isEmpty();
 }
 
-bool updateAdminUser(PasswordData data, QnOptionalBool isEnabled, const QnUuid &userId, QString* errString)
+bool updateUserCredentials(PasswordData data, QnOptionalBool isEnabled, const QnUserResourcePtr& userRes, QString* errString)
 {
-    //genereating cryptSha512Hash
-    if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
-        data.cryptSha512Hash = linuxCryptSha512(data.password.toUtf8(), generateSalt(LINUX_CRYPT_SALT_LENGTH));
-
-
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (!admin)
+    if (!userRes)
     {
         if (errString)
             *errString = lit("Temporary unavailable. Please try later.");
         return false;
     }
 
+    //genereating cryptSha512Hash
+    if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
+        data.cryptSha512Hash = linuxCryptSha512(data.password.toUtf8(), generateSalt(LINUX_CRYPT_SALT_LENGTH));
+
     //making copy of admin user to be able to rollback local changed on DB update failure
-    QnUserResourcePtr updatedAdmin = QnUserResourcePtr(new QnUserResource(*admin));
+    QnUserResourcePtr updatedUser = QnUserResourcePtr(new QnUserResource(*userRes));
 
     if (data.password.isEmpty() &&
-        updatedAdmin->getHash() == data.passwordHash &&
-        updatedAdmin->getDigest() == data.passwordDigest &&
-        updatedAdmin->getCryptSha512Hash() == data.cryptSha512Hash &&
-        (!isEnabled.isDefined() || updatedAdmin->isEnabled() == isEnabled.value()))
+        updatedUser->getHash() == data.passwordHash &&
+        updatedUser->getDigest() == data.passwordDigest &&
+        updatedUser->getCryptSha512Hash() == data.cryptSha512Hash &&
+        (!isEnabled.isDefined() || updatedUser->isEnabled() == isEnabled.value()))
     {
         //no need to update anything
         return true;
     }
 
     if (isEnabled.isDefined())
-        updatedAdmin->setEnabled(isEnabled.value());
+        updatedUser->setEnabled(isEnabled.value());
 
     if (!data.password.isEmpty())
     {
-
         /* set new password */
-        updatedAdmin->setPassword(data.password);
-        updatedAdmin->generateHash();
-
-        ec2::ApiUserData apiUser;
-        fromResourceToApi(updatedAdmin, apiUser);
-        auto errCode = QnAppServerConnectionFactory::getConnection2()
-            ->getUserManager(Qn::UserAccessData(userId))
-            ->saveSync(apiUser, data.password);
-        NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
-        if (errCode != ec2::ErrorCode::ok)
-        {
-            if (errString)
-                *errString = lit("Internal server database error: %1").arg(toString(errCode));
-            return false;
-        }
-        updatedAdmin->setPassword(QString());
+        updatedUser->setPassword(data.password);
+        updatedUser->generateHash();
     }
     else if (!data.passwordHash.isEmpty())
     {
-        updatedAdmin->setRealm(data.realm);
-        updatedAdmin->setHash(data.passwordHash);
-        updatedAdmin->setDigest(data.passwordDigest);
+        updatedUser->setRealm(data.realm);
+        updatedUser->setHash(data.passwordHash);
+        updatedUser->setDigest(data.passwordDigest);
         if (!data.cryptSha512Hash.isEmpty())
-            updatedAdmin->setCryptSha512Hash(data.cryptSha512Hash);
-
-        ec2::ApiUserData apiUser;
-        fromResourceToApi(updatedAdmin, apiUser);
-        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager(Qn::UserAccessData(userId))->saveSync(apiUser, data.password);
-        NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
-        if (errCode != ec2::ErrorCode::ok)
-        {
-            if (errString)
-                *errString = lit("Internal server database error: %1").arg(toString(errCode));
-            return false;
-        }
+            updatedUser->setCryptSha512Hash(data.cryptSha512Hash);
     }
 
-    //applying changes to local resource
-    //TODO #ak following changes are done non-atomically
-    admin->setRealm(updatedAdmin->getRealm());
-    admin->setHash(updatedAdmin->getHash());
-    admin->setDigest(updatedAdmin->getDigest());
-    admin->setCryptSha512Hash(updatedAdmin->getCryptSha512Hash());
-    admin->setEnabled(updatedAdmin->isEnabled());
+    ec2::ApiUserData apiUser;
+    fromResourceToApi(updatedUser, apiUser);
+    auto errCode = QnAppServerConnectionFactory::getConnection2()
+        ->getUserManager(Qn::kSystemAccess)
+        ->saveSync(apiUser, data.password);
+    NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
+    if (errCode != ec2::ErrorCode::ok)
+    {
+        if (errString)
+            *errString = lit("Internal server database error: %1").arg(toString(errCode));
+        return false;
+    }
+    updatedUser->setPassword(QString());
 
-    HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updatedAdmin);
+    HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updatedUser);
     return true;
 }
 

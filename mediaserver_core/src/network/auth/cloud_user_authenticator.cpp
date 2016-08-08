@@ -244,7 +244,9 @@ QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
     if (res)
         return res.staticCast<QnUserResource>();
 
-    return createCloudUser(userNameQString, cloudAccessRole);
+    //cloud user is created by cloud portal during sharing process
+    return QnUserResourcePtr();
+    //return createCloudUser(userNameQString, cloudAccessRole);
 }
 
 void CloudUserAuthenticator::fetchAuthorizationFromCloud(

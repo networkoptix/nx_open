@@ -11,6 +11,7 @@
 #include "rest/server/rest_connection_processor.h"
 #include <api/resource_property_adaptor.h>
 #include <rest/helpers/permissions_helper.h>
+#include <core/resource_management/resource_pool.h>
 
 namespace
 {
@@ -116,12 +117,11 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
         return nx_http::StatusCode::ok;
     }
 
-    QString errString;
-    if (!updateAdminUser(data, QnOptionalBool(true), userId, &errString))
+    if (!updateUserCredentials(data, QnOptionalBool(true), qnResPool->getAdministrator(), &errStr))
     {
         //changing system name back
         changeSystemName(configSystemData);
-        result.setError(QnJsonRestResult::CantProcessRequest, errString);
+        result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx_http::StatusCode::ok;
     }
 

@@ -23,9 +23,9 @@ namespace
     static const QString kSystemNameParamName(QLatin1String("systemName"));
 }
 
-struct SetupRemoveSystemData : public CloudCredentialsData
+struct SetupRemoveSystemData: public CloudCredentialsData
 {
-    SetupRemoveSystemData() : CloudCredentialsData() {}
+    SetupRemoveSystemData(): CloudCredentialsData() {}
 
     SetupRemoveSystemData(const QnRequestParams& params) :
         CloudCredentialsData(params),
@@ -46,7 +46,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
     const CloudConnectionManager& cloudConnectionManager)
-:
+    :
     m_cloudConnectionManager(cloudConnectionManager)
 {
 }
@@ -118,10 +118,14 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnU
         qnCommon->updateModuleInformation();
 
 
-    QString errString;
-    if (!updateAdminUser(PasswordData(), QnOptionalBool(false), userId, &errString))
+    QString errStr;
+    if (!updateUserCredentials(
+        PasswordData(),
+        QnOptionalBool(false),
+        qnResPool->getAdministrator(),
+        &errStr))
     {
-        result.setError(QnJsonRestResult::CantProcessRequest, errString);
+        result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx_http::StatusCode::ok;
     }
 
