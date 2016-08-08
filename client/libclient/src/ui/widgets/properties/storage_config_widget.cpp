@@ -44,16 +44,20 @@ namespace
     static const int kColumnSpacing = 8;
     static const int kMinColWidth = 60;
 
-    class StoragesPoolFilterModel: public QSortFilterProxyModel {
+    class StoragesPoolFilterModel: public QSortFilterProxyModel
+    {
     public:
-        StoragesPoolFilterModel(bool isMainPool, QObject *parent = nullptr)
-            : QSortFilterProxyModel(parent)
-            , m_isMainPool(isMainPool)
-        {}
+        StoragesPoolFilterModel(bool isMainPool, QObject* parent = nullptr) :
+            QSortFilterProxyModel(parent),
+            m_isMainPool(isMainPool)
+        {
+        }
+
     protected:
-        virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override {
+        virtual bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override
+        {
             QModelIndex index = sourceModel()->index(source_row, 0, source_parent);
-            if(!index.isValid())
+            if (!index.isValid())
                 return true;
 
             QnStorageModelInfo storage = index.data(Qn::StorageInfoDataRole).value<QnStorageModelInfo>();
@@ -69,9 +73,9 @@ namespace
         typedef QStyledItemDelegate base_type;
 
     public:
-        explicit StorageTableItemDelegate(QObject *parent = NULL): base_type(parent) {}
+        explicit StorageTableItemDelegate(QObject* parent = nullptr): base_type(parent) {}
 
-        virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override
+        virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override
         {
             QSize result = base_type::sizeHint(option, index);
             result.setWidth(result.width() + kMinColWidth);
@@ -79,20 +83,19 @@ namespace
         }
     };
 
-    Qn::CameraBackupQualities extractQuality(QComboBox *comboBox)
+    Qn::CameraBackupQualities extractQuality(QComboBox* comboBox)
     {
         return static_cast<Qn::CameraBackupQualities>(comboBox->currentData().toInt());
     }
 
-    int findQualityIndex(QComboBox *comboBox
-        , Qn::CameraBackupQualities quality)
+    int findQualityIndex(QComboBox* comboBox, Qn::CameraBackupQualities quality)
     {
         return comboBox->findData(static_cast<int>(quality));
     }
 
     QnVirtualCameraResourceList getCurrentSelectedCameras()
     {
-        const auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr &camera)
+        const auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr& camera)
         {
             return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
         };
@@ -107,32 +110,32 @@ namespace
 
 } // anonymous namespace
 
- using boost::algorithm::any_of;
+using boost::algorithm::any_of;
 
-QnStorageConfigWidget::StoragePool::StoragePool()
-    : rebuildCancelled(false)
-{}
+QnStorageConfigWidget::StoragePool::StoragePool() :
+    rebuildCancelled(false)
+{
+}
 
-
-QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
-    : base_type(parent)
-    , QnWorkbenchContextAware(parent)
-    , ui(new Ui::StorageConfigWidget())
-    , m_server()
-    , m_model(new QnStorageListModel())
-    , m_updateStatusTimer(new QTimer(this))
-    , m_mainPool()
-    , m_backupPool()
-    , m_backupSchedule()
-    , m_backupCancelled(false)
-    , m_updating(false)
-    , m_quality(qnGlobalSettings->backupQualities())
-    , m_camerasToBackup()
+QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
+    ui(new Ui::StorageConfigWidget()),
+    m_server(),
+    m_model(new QnStorageListModel()),
+    m_updateStatusTimer(new QTimer(this)),
+    m_mainPool(),
+    m_backupPool(),
+    m_backupSchedule(),
+    m_backupCancelled(false),
+    m_updating(false),
+    m_quality(qnGlobalSettings->backupQualities()),
+    m_camerasToBackup()
 {
     ui->setupUi(this);
 
     ui->comboBoxBackupType->addItem(tr("By Schedule"), Qn::Backup_Schedule);
-    ui->comboBoxBackupType->addItem(tr("Real-Time"), Qn::Backup_RealTime);
+    ui->comboBoxBackupType->addItem(tr("Real-Time"),   Qn::Backup_RealTime);
     ui->comboBoxBackupType->addItem(tr("On Demand"),   Qn::Backup_Manual);
 
     setWarningStyle(ui->storagesWarningLabel);
@@ -170,59 +173,76 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
 
         updateCamerasForBackup(dialog->selectedResources().filtered<QnVirtualCameraResource>());
     };
+
     connect(ui->backupResourcesButton, &QPushButton::clicked, this, chooseCamerasToBackup);
 
-    connect(ui->backupStartButton,          &QPushButton::clicked, this, &QnStorageConfigWidget::startBackup);
-    connect(ui->backupStopButton,           &QPushButton::clicked, this, &QnStorageConfigWidget::cancelBackup);
+    connect(ui->backupStartButton,     &QPushButton::clicked, this, &QnStorageConfigWidget::startBackup);
+    connect(ui->backupStopButton,      &QPushButton::clicked, this, &QnStorageConfigWidget::cancelBackup);
 
-    connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildStatusChanged,    this, &QnStorageConfigWidget::at_serverRebuildStatusChanged);
-    connect(qnServerStorageManager, &QnServerStorageManager::serverBackupStatusChanged,     this, &QnStorageConfigWidget::at_serverBackupStatusChanged);
-    connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished,  this, &QnStorageConfigWidget::at_serverRebuildArchiveFinished);
-    connect(qnServerStorageManager, &QnServerStorageManager::serverBackupFinished,          this, &QnStorageConfigWidget::at_serverBackupFinished);
+    connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildStatusChanged,
+        this, &QnStorageConfigWidget::at_serverRebuildStatusChanged);
+    connect(qnServerStorageManager, &QnServerStorageManager::serverBackupStatusChanged,
+        this, &QnStorageConfigWidget::at_serverBackupStatusChanged);
+    connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished,
+        this, &QnStorageConfigWidget::at_serverRebuildArchiveFinished);
+    connect(qnServerStorageManager, &QnServerStorageManager::serverBackupFinished,
+        this, &QnStorageConfigWidget::at_serverBackupFinished);
 
-    connect(qnServerStorageManager, &QnServerStorageManager::storageAdded,                  this, [this](const QnStorageResourcePtr &storage) {
-        if (m_server && storage->getParentServer() == m_server) {
-            m_model->addStorage(QnStorageModelInfo(storage));
+    connect(qnServerStorageManager, &QnServerStorageManager::storageAdded, this,
+        [this](const QnStorageResourcePtr& storage)
+        {
+            if (m_server && storage->getParentServer() == m_server)
+            {
+                m_model->addStorage(QnStorageModelInfo(storage));
+                emit hasChangesChanged();
+            }
+        });
+
+    connect(qnServerStorageManager, &QnServerStorageManager::storageChanged, this,
+        [this](const QnStorageResourcePtr& storage)
+        {
+            m_model->updateStorage(QnStorageModelInfo(storage));
             emit hasChangesChanged();
-        }
-    });
+        });
 
-    connect(qnServerStorageManager, &QnServerStorageManager::storageChanged,                this, [this](const QnStorageResourcePtr &storage) {
-        m_model->updateStorage(QnStorageModelInfo(storage));
-        emit hasChangesChanged();
-    });
+    connect(qnServerStorageManager, &QnServerStorageManager::storageRemoved, this,
+        [this](const QnStorageResourcePtr& storage)
+        {
+            m_model->removeStorage(QnStorageModelInfo(storage));
+            emit hasChangesChanged();
+        });
 
-    connect(qnServerStorageManager, &QnServerStorageManager::storageRemoved,                this, [this](const QnStorageResourcePtr &storage) {
-        m_model->removeStorage(QnStorageModelInfo(storage));
-        emit hasChangesChanged();
-    });
+    connect(this, &QnAbstractPreferencesWidget::hasChangesChanged, this,
+        [this]()
+        {
+            if (m_updating)
+                return;
 
-
-    connect(this, &QnAbstractPreferencesWidget::hasChangesChanged, this, [this]() {
-        if (m_updating)
-            return;
-
-        updateBackupInfo();
-        updateRebuildInfo();
-        updateBackupWidgetsVisibility();
-    });
+            updateBackupInfo();
+            updateRebuildInfo();
+            updateBackupWidgetsVisibility();
+        });
 
     m_updateStatusTimer->setInterval(updateStatusTimeoutMs);
-    connect(m_updateStatusTimer, &QTimer::timeout, this, [this] {
-        if (isVisible())
-            qnServerStorageManager->checkStoragesStatus(m_server);
-    });
+    connect(m_updateStatusTimer, &QTimer::timeout, this,
+        [this]
+        {
+            if (isVisible())
+                qnServerStorageManager->checkStoragesStatus(m_server);
+        });
 
     at_backupTypeComboBoxChange(ui->comboBoxBackupType->currentIndex());
 
-    QnResourceChangesListener *cameraBackupTypeListener = new QnResourceChangesListener(this);
-    cameraBackupTypeListener->connectToResources<QnVirtualCameraResource>(&QnVirtualCameraResource::backupQualitiesChanged, this, &QnStorageConfigWidget::updateBackupInfo);
+    QnResourceChangesListener* cameraBackupTypeListener = new QnResourceChangesListener(this);
+    cameraBackupTypeListener->connectToResources<QnVirtualCameraResource>(
+        &QnVirtualCameraResource::backupQualitiesChanged, this, &QnStorageConfigWidget::updateBackupInfo);
 
     initQualitiesCombo();
 }
 
 QnStorageConfigWidget::~QnStorageConfigWidget()
-{}
+{
+}
 
 void QnStorageConfigWidget::restoreCamerasToBackup()
 {
@@ -243,15 +263,15 @@ void QnStorageConfigWidget::initQualitiesCombo()
     {
         switch (qualities)
         {
-        case Qn::CameraBackup_LowQuality:
-            return tr("Low-Res Streams", "Cameras Backup");
-        case Qn::CameraBackup_HighQuality:
-            return tr("Hi-Res Streams", "Cameras Backup");
-        case Qn::CameraBackup_Both:
-            return tr("All streams", "Cameras Backup");
-        default:
-            NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
-            break;
+            case Qn::CameraBackup_LowQuality:
+                return tr("Low-Res Streams", "Cameras Backup");
+            case Qn::CameraBackup_HighQuality:
+                return tr("Hi-Res Streams", "Cameras Backup");
+            case Qn::CameraBackup_Both:
+                return tr("All streams", "Cameras Backup");
+            default:
+                NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
+                break;
         }
 
         return QString();
@@ -275,18 +295,21 @@ void QnStorageConfigWidget::initQualitiesCombo()
     });
 }
 
-void QnStorageConfigWidget::setReadOnlyInternal( bool readOnly ) {
+void QnStorageConfigWidget::setReadOnlyInternal(bool readOnly)
+{
     m_model->setReadOnly(readOnly);
     //TODO: #GDM #Safe Mode
 }
 
-void QnStorageConfigWidget::showEvent( QShowEvent *event ) {
+void QnStorageConfigWidget::showEvent(QShowEvent* event)
+{
     base_type::showEvent(event);
     m_updateStatusTimer->start();
     qnServerStorageManager->checkStoragesStatus(m_server);
 }
 
-void QnStorageConfigWidget::hideEvent( QHideEvent *event ) {
+void QnStorageConfigWidget::hideEvent(QHideEvent* event)
+{
     base_type::hideEvent(event);
 
     resetQualities();
@@ -295,7 +318,8 @@ void QnStorageConfigWidget::hideEvent( QHideEvent *event ) {
     m_updateStatusTimer->stop();
 }
 
-bool QnStorageConfigWidget::hasChanges() const {
+bool QnStorageConfigWidget::hasChanges() const
+{
     if (isReadOnly())
         return false;
 
@@ -312,19 +336,20 @@ bool QnStorageConfigWidget::hasChanges() const {
     return (m_server->getBackupSchedule() != m_backupSchedule);
 }
 
-void QnStorageConfigWidget::at_addExtStorage(bool addToMain) {
+void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
+{
     if (!m_server || isReadOnly())
         return;
 
     QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, this));
     dialog->setProtocols(qnServerStorageManager->protocols(m_server));
     dialog->setCurrentServerStorages(m_model->storages());
-    if(!dialog->exec())
+    if (!dialog->exec())
         return;
 
     QnStorageModelInfo item = dialog->storage();
     /* Check if somebody have added this storage right now */
-    if(item.id.isNull())
+    if (item.id.isNull())
     {
         item.id = QnStorageResource::fillID(m_server->getId(), item.url);
         item.isBackup = !addToMain;
@@ -353,7 +378,7 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, bool isMainPool)
     tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     tableView->horizontalHeader()->setSectionResizeMode(QnStorageListModel::UrlColumn, QHeaderView::Stretch);
 
-    connect(tableView,         &QTableView::clicked,               this,   &QnStorageConfigWidget::at_eventsGrid_clicked);
+    connect(tableView, &QTableView::clicked, this, &QnStorageConfigWidget::at_eventsGrid_clicked);
 
     tableView->setMouseTracking(true);
 }
@@ -367,7 +392,8 @@ void QnStorageConfigWidget::at_backupTypeComboBoxChange(int index)
     emit hasChangesChanged();
 }
 
-void QnStorageConfigWidget::loadDataToUi() {
+void QnStorageConfigWidget::loadDataToUi()
+{
     if (!m_server)
         return;
 
@@ -386,11 +412,12 @@ void QnStorageConfigWidget::loadDataToUi() {
     ui->backupStoragesAbsentLabel->hide();
 }
 
-void QnStorageConfigWidget::loadStoragesFromResources() {
+void QnStorageConfigWidget::loadStoragesFromResources()
+{
     NX_ASSERT(m_server, Q_FUNC_INFO, "Server must exist here");
 
     QnStorageModelInfoList storages;
-    for (const QnStorageResourcePtr &storage: m_server->getStorages())
+    for (const QnStorageResourcePtr& storage: m_server->getStorages())
         storages.append(QnStorageModelInfo(storage));
     m_model->setStorages(storages);
 
@@ -405,7 +432,7 @@ void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
 
     auto showWarningLabelIfNeeded = [this]
     {
-        bool backupStoragesExist = any_of(m_model->storages(), [] (const QnStorageModelInfo &info)
+        bool backupStoragesExist = any_of(m_model->storages(), [] (const QnStorageModelInfo& info)
         {
             return info.isBackup;
         });
@@ -512,7 +539,7 @@ int QnStorageConfigWidget::getColWidth(int col)
     return result;
 }
 
-void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr &server)
+void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
 {
     if (m_server == server)
         return;
@@ -525,30 +552,38 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr &server)
     restoreCamerasToBackup();
 
     if (m_server)
-        connect(m_server, &QnMediaServerResource::backupScheduleChanged, this, [this]() {
-            /* Current changes may be lost, it's OK. */
-            m_backupSchedule = m_server->getBackupSchedule();
-            emit hasChangesChanged();
-        });
+    {
+        connect(m_server, &QnMediaServerResource::backupScheduleChanged, this,
+            [this]()
+            {
+                /* Current changes may be lost, it's OK. */
+                m_backupSchedule = m_server->getBackupSchedule();
+                emit hasChangesChanged();
+            });
+    }
 }
 
-void QnStorageConfigWidget::updateRebuildInfo() {
-    for (int i = 0; i < static_cast<int>(QnServerStoragesPool::Count); ++i) {
+void QnStorageConfigWidget::updateRebuildInfo()
+{
+    for (int i = 0; i < static_cast<int>(QnServerStoragesPool::Count); ++i)
+    {
         QnServerStoragesPool pool = static_cast<QnServerStoragesPool>(i);
         updateRebuildUi(pool, qnServerStorageManager->rebuildStatus(m_server, pool));
     }
 }
 
-void QnStorageConfigWidget::updateBackupInfo() {
-    updateBackupUi(qnServerStorageManager->backupStatus(m_server)
-        , m_camerasToBackup.size());
+void QnStorageConfigWidget::updateBackupInfo()
+{
+    updateBackupUi(qnServerStorageManager->backupStatus(m_server), m_camerasToBackup.size());
 }
 
-void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, const QnStorageModelInfoList &storages) const {
-    for(const auto& storageData: storages)
+void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, const QnStorageModelInfoList& storages) const
+{
+    for (const auto& storageData: storages)
     {
         QnStorageResourcePtr storage = m_server->getStorageByUrl(storageData.url);
-        if (storage) {
+        if (storage)
+        {
             if (storageData.isUsed != storage->isUsedForWriting() || storageData.isBackup != storage->isBackup())
             {
                 storage->setUsedForWriting(storageData.isUsed);
@@ -556,7 +591,8 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
                 result << storage;
             }
         }
-        else {
+        else
+        {
             QnClientStorageResourcePtr storage = QnClientStorageResource::newStorage(m_server, storageData.url);
             NX_ASSERT(storage->getId() == storageData.id, Q_FUNC_INFO, "Id's must be equal");
 
@@ -571,11 +607,13 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
     }
 }
 
-bool QnStorageConfigWidget::hasStoragesChanges( const QnStorageModelInfoList &storages) const {
+bool QnStorageConfigWidget::hasStoragesChanges(const QnStorageModelInfoList& storages) const
+{
     if (!m_server)
         return false;
 
-    for(const auto& storageData: storages) {
+    for (const auto& storageData: storages)
+    {
         /* New storage was added. */
         QnStorageResourcePtr storage = qnResPool->getResourceById<QnStorageResource>(storageData.id);
         if (!storage || storage->getParentId() != m_server->getId())
@@ -607,8 +645,10 @@ void QnStorageConfigWidget::applyChanges()
     for (const auto& storageData: m_model->storages())
         newIdList << storageData.id;
 
-    for (const auto& storage: m_server->getStorages()) {
-        if (!newIdList.contains(storage->getId())) {
+    for (const auto& storage: m_server->getStorages())
+    {
+        if (!newIdList.contains(storage->getId()))
+        {
             storagesToRemove.push_back(storage->getId());
             qnResPool->removeResource(storage);
         }
@@ -622,7 +662,7 @@ void QnStorageConfigWidget::applyChanges()
         qnServerStorageManager->deleteStorages(storagesToRemove);
 
     /* Make sure scheduled backup will stop in no backup storages left after 'Apply' button. */
-    bool backupStoragesExist = any_of(m_model->storages(), [](const QnStorageModelInfo &info)
+    bool backupStoragesExist = any_of(m_model->storages(), [](const QnStorageModelInfo& info)
     {
         return info.isBackup;
     });
@@ -635,9 +675,8 @@ void QnStorageConfigWidget::applyChanges()
 
     if (m_backupSchedule != m_server->getBackupSchedule())
     {
-        qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server) {
-            server->setBackupSchedule(m_backupSchedule);
-        });
+        qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr& server)
+            { server->setBackupSchedule(m_backupSchedule); });
     }
 
     ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageSpacer);
@@ -645,7 +684,8 @@ void QnStorageConfigWidget::applyChanges()
     emit hasChangesChanged();
 }
 
-void QnStorageConfigWidget::startRebuid(bool isMain) {
+void QnStorageConfigWidget::startRebuid(bool isMain)
+{
     if (!m_server)
         return;
 
@@ -656,8 +696,8 @@ void QnStorageConfigWidget::startRebuid(bool isMain) {
         + tr("ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.") + L'\n'
         + tr("This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.") + L'\n'
         + tr("Are you sure you want to continue?"),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel
-    );
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+
     if (warnResult != QDialogButtonBox::Ok)
         return;
 
@@ -669,12 +709,12 @@ void QnStorageConfigWidget::startRebuid(bool isMain) {
     else
         ui->rebuildBackupButton->setEnabled(false);
 
-
     StoragePool& storagePool = (isMain ? m_mainPool : m_backupPool);
     storagePool.rebuildCancelled = false;
 }
 
-void QnStorageConfigWidget::cancelRebuild(bool isMain) {
+void QnStorageConfigWidget::cancelRebuild(bool isMain)
+{
     if (!qnServerStorageManager->cancelServerStoragesRebuild(m_server, isMain ? QnServerStoragesPool::Main : QnServerStoragesPool::Backup))
         return;
 
@@ -682,27 +722,32 @@ void QnStorageConfigWidget::cancelRebuild(bool isMain) {
     storagePool.rebuildCancelled = true;
 }
 
-void QnStorageConfigWidget::startBackup() {
+void QnStorageConfigWidget::startBackup()
+{
     if (!m_server)
         return;
 
-    if (qnServerStorageManager->backupServerStorages(m_server)) {
+    if (qnServerStorageManager->backupServerStorages(m_server))
+    {
         ui->backupStartButton->setEnabled(false);
         m_backupCancelled = false;
     }
 }
 
-void QnStorageConfigWidget::cancelBackup() {
+void QnStorageConfigWidget::cancelBackup()
+{
     if (!m_server)
         return;
 
-    if (qnServerStorageManager->cancelBackupServerStorages(m_server)) {
+    if (qnServerStorageManager->cancelBackupServerStorages(m_server))
+    {
         ui->backupStopButton->setEnabled(false);
         m_backupCancelled = true;
     }
 }
 
-void QnStorageConfigWidget::at_openBackupSchedule_clicked() {
+void QnStorageConfigWidget::at_openBackupSchedule_clicked()
+{
     auto scheduleDialog = new QnBackupScheduleDialog(this);
     scheduleDialog->updateFromSettings(m_backupSchedule);
     if (!scheduleDialog->exec() || isReadOnly())
@@ -712,11 +757,10 @@ void QnStorageConfigWidget::at_openBackupSchedule_clicked() {
     emit hasChangesChanged();
 }
 
-bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data
-    , int selectedCamerasCount
-    , QString *info)
+bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
+    int selectedCamerasCount, QString* info)
 {
-    auto error = [info](const QString &error) -> bool
+    auto error = [info](const QString& error) -> bool
     {
         if (info)
             *info = error;
@@ -726,7 +770,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data
     if (data.state != Qn::BackupState_None)
         return error(tr("Backup is already in progress."));
 
-    const auto isCorrectStorage = [](const QnStorageModelInfo &storage)
+    const auto isCorrectStorage = [](const QnStorageModelInfo& storage)
     {
         return storage.isWritable && storage.isUsed && storage.isBackup;
     };
@@ -768,13 +812,14 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data
     return true;
 }
 
-QString QnStorageConfigWidget::backupPositionToString( qint64 backupTimeMs ) {
-
+QString QnStorageConfigWidget::backupPositionToString(qint64 backupTimeMs)
+{
     const QDateTime backupDateTime = QDateTime::fromMSecsSinceEpoch(backupTimeMs);
     QString result = lit("%1 %2").arg(backupDateTime.date().toString()).arg(backupDateTime.time().toString(Qt::SystemLocaleLongDate));
 
     qint64 deltaMs = qnSyncTime->currentDateTime().toMSecsSinceEpoch() - backupTimeMs;
-    if (deltaMs > minDeltaForMessageMs) {
+    if (deltaMs > minDeltaForMessageMs)
+    {
         QTimeSpan span(deltaMs);
         span.normalize();
         QString deltaStr = tr("(%1 before now)").arg(span.toApproximateString());
@@ -784,14 +829,17 @@ QString QnStorageConfigWidget::backupPositionToString( qint64 backupTimeMs ) {
     return result;
 }
 
-void QnStorageConfigWidget::updateBackupWidgetsVisibility() {
-    bool backupStoragesExist = any_of(m_model->storages(), [](const QnStorageModelInfo &info) {
-        return info.isBackup;
-    });
+void QnStorageConfigWidget::updateBackupWidgetsVisibility()
+{
+    bool backupStoragesExist = any_of(m_model->storages(),
+        [](const QnStorageModelInfo& info)
+        {
+            return info.isBackup;
+        });
 
     /* Notify about backup possibility if there are less than two valid storages in the system. */
 
-    const auto writableDevices = boost::count_if(m_model->storages(), [this](const QnStorageModelInfo &info)
+    const auto writableDevices = boost::count_if (m_model->storages(), [this](const QnStorageModelInfo& info)
     {
         return info.isWritable;
     });
@@ -810,8 +858,7 @@ void QnStorageConfigWidget::updateBackupWidgetsVisibility() {
     ui->backupOptionLabel->setVisible(showWarning);
 }
 
-void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply
-    , int overallSelectedCameras)
+void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int overallSelectedCameras)
 {
     QString status;
 
@@ -853,8 +900,8 @@ void QnStorageConfigWidget::updateSelectedCamerasCaption(int selectedCamerasCoun
     const auto getNumberedCaption = [this, selectedCamerasCount]() -> QString
     {
         return QnDeviceDependentStrings::getDefaultNameFromSet(
-              tr("%n Camera(s)", "", selectedCamerasCount)
-            , tr("%n Device(s)", "", selectedCamerasCount));
+            tr("%n Camera(s)", "", selectedCamerasCount),
+            tr("%n Device(s)", "", selectedCamerasCount));
     };
 
     const auto getSimpleCaption = []()
@@ -872,15 +919,15 @@ void QnStorageConfigWidget::updateSelectedCamerasCaption(int selectedCamerasCoun
         setWarningStyle(&newPalette);
 
     const auto icon = qnResIconCache->icon(
-        numberedCaption ? QnResourceIconCache::Camera : QnResourceIconCache::Offline
-        , numberedCaption ? false : true);
+        numberedCaption ? QnResourceIconCache::Camera : QnResourceIconCache::Offline,
+        numberedCaption ? false : true);
 
     ui->backupResourcesButton->setIcon(icon);
     ui->backupResourcesButton->setPalette(newPalette);
     ui->backupResourcesButton->setText(caption);
 }
 
-void QnStorageConfigWidget::updateCamerasForBackup(const QnVirtualCameraResourceList &cameras)
+void QnStorageConfigWidget::updateCamerasForBackup(const QnVirtualCameraResourceList& cameras)
 {
     if (m_camerasToBackup.toSet() == cameras.toSet())
         return;
@@ -891,19 +938,19 @@ void QnStorageConfigWidget::updateCamerasForBackup(const QnVirtualCameraResource
     emit hasChangesChanged();
 }
 
-void QnStorageConfigWidget::applyCamerasToBackup(const QnVirtualCameraResourceList &cameras
-    , Qn::CameraBackupQualities quality)
+void QnStorageConfigWidget::applyCamerasToBackup(const QnVirtualCameraResourceList& cameras,
+    Qn::CameraBackupQualities quality)
 {
     qnGlobalSettings->setBackupQualities(quality);
     qnGlobalSettings->synchronizeNow();
 
-    const auto qualityForCamera = [cameras, quality](const QnVirtualCameraResourcePtr &camera)
+    const auto qualityForCamera = [cameras, quality](const QnVirtualCameraResourcePtr& camera)
     {
         return (cameras.contains(camera) ? quality : Qn::CameraBackup_Disabled);
     };
 
     /* Update all default cameras and all cameras that we have changed. */
-    const auto modifiedFilter = [qualityForCamera](const QnVirtualCameraResourcePtr &camera)
+    const auto modifiedFilter = [qualityForCamera](const QnVirtualCameraResourcePtr& camera)
     {
         return camera->getBackupQualities() != qualityForCamera(camera);
     };
@@ -913,11 +960,11 @@ void QnStorageConfigWidget::applyCamerasToBackup(const QnVirtualCameraResourceLi
     if (modified.isEmpty())
         return;
 
-    qnResourcesChangesManager->saveCameras(modified
-        , [qualityForCamera](const QnVirtualCameraResourcePtr &camera)
-    {
-        camera->setBackupQualities(qualityForCamera(camera));
-    });
+    qnResourcesChangesManager->saveCameras(modified,
+        [qualityForCamera](const QnVirtualCameraResourcePtr& camera)
+        {
+            camera->setBackupQualities(qualityForCamera(camera));
+        });
 }
 
 void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply)
@@ -937,28 +984,31 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
             m_server
         &&  reply.state == Qn::RebuildState_None
         &&  !hasChanges()
-        &&  any_of(m_model->storages(), [this, isMainPool](const QnStorageModelInfo &info) {
+        &&  any_of(m_model->storages(), [this, isMainPool](const QnStorageModelInfo& info) {
                 return info.isWritable
                     && info.isBackup != isMainPool
                     && info.isOnline
                     && m_model->storageIsActive(info);   /* Ignoring newly added external storages until Apply pressed. */
             })
-        && !backupIsInProgress
-    ;
+        && !backupIsInProgress;
 
-    if (isMainPool) {
+    if (isMainPool)
+    {
         ui->rebuildMainWidget->loadData(reply);
         ui->rebuildMainButton->setEnabled(canStartRebuild);
         ui->rebuildMainButton->setVisible(reply.state == Qn::RebuildState_None);
     }
-    else {
+    else
+    {
         ui->rebuildBackupWidget->loadData(reply);
         ui->rebuildBackupButton->setEnabled(canStartRebuild);
         ui->rebuildBackupButton->setVisible(reply.state == Qn::RebuildState_None);
     }
 }
 
-void QnStorageConfigWidget::at_serverRebuildStatusChanged( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageScanData &status ) {
+void QnStorageConfigWidget::at_serverRebuildStatusChanged(const QnMediaServerResourcePtr& server,
+    QnServerStoragesPool pool, const QnStorageScanData& status)
+{
     if (server != m_server)
         return;
 
@@ -966,7 +1016,9 @@ void QnStorageConfigWidget::at_serverRebuildStatusChanged( const QnMediaServerRe
     updateBackupInfo();
 }
 
-void QnStorageConfigWidget::at_serverBackupStatusChanged( const QnMediaServerResourcePtr &server, const QnBackupStatusData &status ) {
+void QnStorageConfigWidget::at_serverBackupStatusChanged(const QnMediaServerResourcePtr& server,
+    const QnBackupStatusData& status)
+{
     if (server != m_server)
         return;
 
@@ -974,7 +1026,9 @@ void QnStorageConfigWidget::at_serverBackupStatusChanged( const QnMediaServerRes
     updateRebuildInfo();
 }
 
-void QnStorageConfigWidget::at_serverRebuildArchiveFinished( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool ) {
+void QnStorageConfigWidget::at_serverRebuildArchiveFinished(const QnMediaServerResourcePtr& server,
+    QnServerStoragesPool pool)
+{
     if (server != m_server)
         return;
 
@@ -987,10 +1041,12 @@ void QnStorageConfigWidget::at_serverRebuildArchiveFinished( const QnMediaServer
         QnMessageBox::information(this,
             tr("Finished"),
             tr("Rebuilding archive index is completed."));
+
     storagePool.rebuildCancelled = false;
 }
 
-void QnStorageConfigWidget::at_serverBackupFinished( const QnMediaServerResourcePtr &server ) {
+void QnStorageConfigWidget::at_serverBackupFinished(const QnMediaServerResourcePtr& server)
+{
     if (server != m_server)
         return;
 
@@ -1001,5 +1057,6 @@ void QnStorageConfigWidget::at_serverBackupFinished( const QnMediaServerResource
         QnMessageBox::information(this,
             tr("Finished"),
             tr("Backup is finished"));
+
     m_backupCancelled = false;
 }
