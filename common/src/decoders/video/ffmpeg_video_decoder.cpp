@@ -28,6 +28,7 @@
 #include "utils/media/frame_type_extractor.h"
 
 #include <nx/streaming/av_codec_media_context.h>
+#include <utils/media/utils.h>
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;
@@ -645,30 +646,15 @@ double QnFfmpegVideoDecoder::getSampleAspectRatio() const
         return m_prevSampleAspectRatio;
 
     double result = av_q2d(m_context->sample_aspect_ratio);
-
-    if (qAbs(result)< 1e-7)
+    if (qAbs(result) >= 1e-7)
     {
-        result = 1.0;
-        if (m_context->width == 720) { // TODO: #vasilenko add a table!
-            if (m_context->height == 480)
-                result = (4.0/3.0) / (720.0/480.0);
-            else if (m_context->height == 576)
-                result = (4.0/3.0) / (720.0/576.0);
-            else if (m_context->height == 240)
-                result = (4.0/3.0) / (720.0/240.0);
-        } else if(m_context->width == 704) {
-            if (m_context->height == 480)
-                result = (4.0/3.0) / (704.0/480.0);
-            else if (m_context->height == 576)
-                result = (4.0/3.0) / (704.0/576.0);
-            else if (m_context->height == 240)
-                result = (4.0/3.0) / (704.0/240.0);
-        }
+        m_prevSampleAspectRatio = result;
+        return result;
     }
 
-    m_prevSampleAspectRatio = result;
-
-    return result;
+    QSize srcSize(m_context->width, m_context->height);
+    m_prevSampleAspectRatio = nx::media::getDefaultSampleAspectRatio(srcSize);
+    return m_prevSampleAspectRatio;
 }
 
 AVPixelFormat QnFfmpegVideoDecoder::GetPixelFormat() const
