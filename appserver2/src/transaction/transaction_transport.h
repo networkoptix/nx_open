@@ -15,7 +15,6 @@
 #include <transaction/transaction_transport_header.h>
 #include <transaction/transaction_descriptor.h>
 
-#include "utils/common/id.h"
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 #include <nx/network/abstract_socket.h>
@@ -27,6 +26,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
+#include <utils/common/id.h>
 #ifdef _DEBUG
 #include <common/common_module.h>
 #endif

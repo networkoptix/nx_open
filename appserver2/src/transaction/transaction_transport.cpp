@@ -9,27 +9,22 @@
 #include <api/global_settings.h>
 
 #include <nx_ec/ec_proto_version.h>
-#include <utils/bsf/sized_data_decoder.h>
+#include <nx/network/http/base64_decoder_filter.h>
+#include <nx/network/socket_factory.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/log/log.h>
+#include <utils/bsf/sized_data_decoder.h>
 #include <utils/gzip/gzip_compressor.h>
 #include <utils/gzip/gzip_uncompressor.h>
 #include <utils/media/custom_output_stream.h>
-#include <nx/network/http/base64_decoder_filter.h>
+#include <utils/common/util.h>
+#include <utils/common/systemerror.h>
+#include <http/custom_headers.h>
 
-#include "transaction_message_bus.h"
-#include <nx/utils/log/log.h>
-#include "utils/common/util.h"
-#include "utils/common/systemerror.h"
-#include <nx/network/socket_factory.h>
-#include "transaction_log.h"
-#include "common/common_module.h"
-#include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "api/app_server_connection.h"
-#include "core/resource/user_resource.h"
 #include "database/db_manager.h"
-#include "http/custom_headers.h"
-#include "settings.h"
+
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
