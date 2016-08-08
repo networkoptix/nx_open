@@ -6,9 +6,11 @@
 #include <core/resource_management/resource_searcher.h>
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <plugins/resource/mdns/mdns_listener.h>
+#include <nx/network/upnp/upnp_device_searcher.h>
 
-class QnPlISDResourceSearcher :
-    public QnUpnpResourceSearcherAsync
+class QnPlISDResourceSearcher : 
+	public QnAbstractNetworkResourceSearcher,
+	public nx_upnp::SearchHandler
 {
 
 public:
@@ -28,15 +30,12 @@ public:
         const QAuthenticator& auth,
         bool doMultichannelCheck) override;
 
-protected:
-
     //Upnp resource searcher
-    virtual void processPacket(
+    virtual bool processPacket(
         const QHostAddress& discoveryAddr,
         const SocketAddress& deviceEndpoint,
         const nx_upnp::DeviceInfo& devInfo,
-        const QByteArray& xmlDevInfo,
-        QnResourceList& result) override;
+        const QByteArray& xmlDevInfo) override;
 
 private:
 
@@ -61,6 +60,11 @@ private:
     QnResourcePtr processMdnsResponse (
         const QnMdnsListener::ConsumerData& mdnsResponse,
         const QnResourceList& alreadyFoundResources);
+
+private:
+	QnResourceList m_foundUpnpResources;
+	std::set<QString> m_alreadFoundMacAddresses;
+	mutable QnMutex m_mutex;
 };
 
 #endif // #ifdef ENABLE_ISD
