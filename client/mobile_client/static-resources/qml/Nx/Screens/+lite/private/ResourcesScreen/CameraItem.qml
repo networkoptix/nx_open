@@ -101,12 +101,14 @@ Control
             width: thumbnailContainer.width
             height: thumbnailContainer.height
 
-            VideoOutput
+            Video
             {
                 id: videoOutput
 
                 anchors.fill: parent
                 source: player
+                aspectRatio: resourceHelper.aspectRatio
+                videoRotation: resourceHelper.rotation
 
                 QnScenePositionListener
                 {

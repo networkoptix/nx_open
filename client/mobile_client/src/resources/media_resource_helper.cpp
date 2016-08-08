@@ -149,6 +149,8 @@ void QnMediaResourceHelperPrivate::at_propertyChanged(const QnResourcePtr& resou
 
     if (key == Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
         updateAspectRatio();
+    else if (key == QnMediaResource::customAspectRatioKey())
+        updateAspectRatio();
     else if (key == QnMediaResource::rotationKey())
         emit q->rotationChanged();
 }
@@ -157,6 +159,15 @@ void QnMediaResourceHelperPrivate::updateAspectRatio()
 {
     if (!camera)
         return;
+
+    const auto customAspectRatio = camera->customAspectRatio();
+    if (!qFuzzyIsNull(customAspectRatio))
+    {
+        Q_Q(QnMediaResourceHelper);
+        aspectRatio = customAspectRatio;
+        emit q->aspectRatioChanged();
+        return;
+    }
 
     const auto streamsString = camera->getProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME).toLatin1();
     auto supportedStreams = QJson::deserialized<CameraMediaStreams>(streamsString);
