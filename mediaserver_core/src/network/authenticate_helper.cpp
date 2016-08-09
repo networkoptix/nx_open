@@ -85,10 +85,15 @@ QnAuthHelper::~QnAuthHelper()
 #endif
 }
 
-Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy, QnUuid* authUserId, AuthMethod::Value* usedAuthMethod)
+Qn::AuthResult QnAuthHelper::authenticate(
+    const nx_http::Request& request,
+    nx_http::Response& response,
+    bool isProxy,
+    Qn::UserAccessData* accessRights,
+    AuthMethod::Value* usedAuthMethod)
 {
-    if (authUserId)
-        *authUserId = QnUuid();
+    if (accessRights)
+        *accessRights = Qn::UserAccessData();
     if (usedAuthMethod)
         *usedAuthMethod = AuthMethod::noAuth;
 
@@ -111,8 +116,8 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             {
                 if (usedAuthMethod)
                     *usedAuthMethod = AuthMethod::tempUrlQueryParam;
-                if (authUserId)
-                    *authUserId = it->second.authUserId;
+                if (accessRights)
+                    *accessRights = it->second.accessRights;
                 return Qn::Auth_OK;
             }
         }
@@ -128,8 +133,8 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                 return Qn::Auth_Forbidden;
 			else
 			{
-				if (authUserId)
-					*authUserId = Qn::kVideowallUserAccess.userId;
+				if (accessRights)
+					*accessRights = Qn::kVideowallUserAccess;
 				return Qn::Auth_OK;
 			}
         }
@@ -148,7 +153,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                                 //which request underlying player will issue first
                     : request.requestLine.method,
                 response,
-                authUserId);
+                accessRights);
             if(authResult == Qn::Auth_OK)
             {
                 if (usedAuthMethod)
@@ -165,7 +170,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
         if (customAuthInfoPos >= 0) {
             if (usedAuthMethod)
                 *usedAuthMethod = AuthMethod::cookie;
-            return doCookieAuthorization("GET", cookie.toUtf8(), response, authUserId);
+            return doCookieAuthorization("GET", cookie.toUtf8(), response, accessRights);
         }
     }
 
@@ -289,13 +294,13 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                 *usedAuthMethod = AuthMethod::httpDigest;
 
             authResult = doDigestAuth(
-                request.requestLine.method, authorizationHeader, response, isProxy, authUserId);
+                request.requestLine.method, authorizationHeader, response, isProxy, accessRights);
         }
         else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
         {
             if (usedAuthMethod)
                 *usedAuthMethod = AuthMethod::httpBasic;
-            authResult = doBasicAuth(request.requestLine.method, authorizationHeader, response, authUserId);
+            authResult = doBasicAuth(request.requestLine.method, authorizationHeader, response, accessRights);
         }
         else {
             if (usedAuthMethod)
@@ -307,16 +312,16 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
         {
 
             // update user information if authorization by server authKey and user-name is specified
-            if (authUserId &&
-                qnResPool->getResourceById<QnMediaServerResource>(*authUserId))
+            if (accessRights &&
+                qnResPool->getResourceById<QnMediaServerResource>(accessRights->userId))
             {
-                *authUserId = Qn::kSystemAccess.userId;
+                *accessRights = Qn::kSystemAccess;
                 auto itr = request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME);
                 if (itr != request.headers.end())
                 {
                     auto userRes = findUserByName(itr->second);
                     if (userRes)
-                        *authUserId = userRes->getId();
+                        *accessRights = Qn::UserAccessData(userRes->getId());
                 }
             }
 
@@ -349,7 +354,7 @@ QnAuthMethodRestrictionList* QnAuthHelper::restrictionList()
 }
 
 QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath(
-    const QnUuid& authUserId,
+    const Qn::UserAccessData& accessRights,
     const QString& path,
     unsigned int periodMillis)
 {
@@ -371,7 +376,7 @@ QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath(
     TempAuthenticationKeyCtx ctx;
     ctx.timeGuard = std::move( timerGuard );
     ctx.path = path;
-    ctx.authUserId = authUserId;
+    ctx.accessRights = accessRights;
     m_authenticatedPaths.emplace( authKey, std::move( ctx ) );
 
     return QPair<QString, QString>( TEMP_AUTH_KEY_NAME, authKey );
@@ -388,7 +393,7 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
     const nx_http::header::Authorization& authorization,
     nx_http::Response& responseHeaders,
     bool isProxy,
-    QnUuid* authUserId)
+    Qn::UserAccessData* accessRights)
 {
     const QByteArray userName = authorization.digest->userid;
     const QByteArray response = authorization.digest->params["response"];
@@ -420,8 +425,8 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
             authorization,
             &responseHeaders.headers);
 
-        if (res && authUserId)
-            *authUserId = res->getId();
+        if (res && accessRights)
+            *accessRights = Qn::UserAccessData(res->getId());
 
         bool tryOnceAgain = false;
         if (userResource = res.dynamicCast<QnUserResource>())
@@ -525,7 +530,7 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
     const QByteArray& method,
     const nx_http::header::Authorization& authorization,
     nx_http::Response& response,
-    QnUuid* authUserId)
+    Qn::UserAccessData* accessRights)
 {
     NX_ASSERT(authorization.authScheme == nx_http::header::AuthScheme::basic);
 
@@ -540,8 +545,8 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
     bool tryOnceAgain = false;
     if (auto user = res.dynamicCast<QnUserResource>())
     {
-        if (authUserId)
-            *authUserId = user->getId();
+        if (accessRights)
+            *accessRights = Qn::UserAccessData(user->getId());
         if (user->passwordExpired())
         {
             //user password has expired, validating password
@@ -553,8 +558,8 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
     }
     else if (auto server = res.dynamicCast<QnMediaServerResource>())
     {
-        if (authUserId)
-            *authUserId = server->getId();
+        if (accessRights)
+            *accessRights = Qn::UserAccessData(server->getId());
     }
 
     if (tryOnceAgain)
@@ -616,7 +621,10 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
 }
 
 Qn::AuthResult QnAuthHelper::doCookieAuthorization(
-    const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId)
+    const QByteArray& method,
+    const QByteArray& authData,
+    nx_http::Response& responseHeaders,
+    Qn::UserAccessData* accessRights)
 {
     nx_http::Response tmpHeaders;
 
@@ -627,21 +635,18 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     if( params.contains( URL_QUERY_AUTH_KEY_NAME ) )
     {
         //authenticating
-        QnUuid userID;
         authResult = authenticateByUrl(
             QUrl::fromPercentEncoding(params.value(URL_QUERY_AUTH_KEY_NAME)).toUtf8(),
             method,
             responseHeaders,
-            &userID);
-        if( authUserId )
-            *authUserId = userID;
+            accessRights);
     }
     else
     {
         nx_http::header::Authorization authorization(nx_http::header::AuthScheme::digest);
         authorization.digest->parse(authData, ';');
         authResult = doDigestAuth(
-            method, authorization, tmpHeaders, false, authUserId);
+            method, authorization, tmpHeaders, false, accessRights);
     }
     if( authResult != Qn::Auth_OK)
     {
@@ -720,7 +725,7 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
     const QByteArray& authRecordBase64,
     const QByteArray& method,
     nx_http::Response& response,
-    QnUuid* authUserId) const
+    Qn::UserAccessData* accessRights) const
 {
     auto authRecord = QByteArray::fromBase64( authRecordBase64 );
     auto authFields = authRecord.split( ':' );
@@ -749,8 +754,8 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
 
     if (auto user = res.dynamicCast<QnUserResource>())
     {
-        if (authUserId)
-            *authUserId = user->getId();
+        if (accessRights)
+            *accessRights = Qn::UserAccessData(user->getId());
     }
 
     return errCode;

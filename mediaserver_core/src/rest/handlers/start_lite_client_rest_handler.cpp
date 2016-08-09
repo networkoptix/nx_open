@@ -40,7 +40,7 @@ int QnStartLiteClientRestHandler::executeGet(
 
     const int port = connectionProcessor->owner()->getPort();
 
-    auto user = qnResPool->getResourceById<QnUserResource>(connectionProcessor->authUserId());
+    auto user = qnResPool->getResourceById<QnUserResource>(connectionProcessor->accessRights().userId);
     if (!user)
     {
         NX_ASSERT(false);

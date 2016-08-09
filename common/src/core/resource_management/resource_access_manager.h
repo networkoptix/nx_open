@@ -14,7 +14,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/common/connective.h>
-
+#include "user_access_data.h"
 
 class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnResourceAccessManager>
 {
@@ -58,6 +58,13 @@ public:
     bool hasGlobalPermission(const QnUserResourcePtr& user, Qn::GlobalPermission requiredPermission) const;
 
     /**
+    * \param accessRights              Access rights descriptor
+    * \param requiredPermission        Global permission to check.
+    * \returns                         Whether actual global permissions include required permission.
+    */
+    bool hasGlobalPermission(const Qn::UserAccessData& accessRights, Qn::GlobalPermission requiredPermission) const;
+
+    /**
     * \param user                      User that should have permissions.
     * \param resource                  Resource to get permissions for.
     * \returns                         Permissions that user have for the given resource.
@@ -70,7 +77,22 @@ public:
     * \param requiredPermission        Permission to check.
     * \returns                         Whether actual permissions include required permission.
     */
-    bool hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permissions requiredPermissions) const;
+    bool hasPermission(
+        const QnUserResourcePtr& user,
+        const QnResourcePtr& resource,
+        Qn::Permissions requiredPermissions) const;
+
+    /**
+    * \param accessRights              access rights descriptor.
+    * \param resource                  Resource to get permissions for.
+    * \param requiredPermission        Permission to check.
+    * \returns                         Whether actual permissions include required permission.
+    */
+    bool hasPermission(
+        const Qn::UserAccessData& accessRights,
+        const QnResourcePtr& mediaResource,
+        Qn::Permission permissions) const;
+
 
     /**
     * \param user                      User that should have permissions for resource creating.

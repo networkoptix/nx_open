@@ -242,8 +242,7 @@ namespace nx_hls
             return nx_http::StatusCode::notFound;
         }
 
-        auto userResource = qnResPool->getResourceById(d_ptr->authUserId).dynamicCast<QnUserResource>();
-        if (!userResource || !qnResourceAccessManager->hasPermission(userResource, resource, Qn::ReadPermission))
+        if (!qnResourceAccessManager->hasPermission(d_ptr->accessRights, resource, Qn::ReadPermission))
             return nx_http::StatusCode::forbidden;
 
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
@@ -288,7 +287,7 @@ namespace nx_hls
             return getPlaylist(
                 request,
                 camResource,
-                userResource,
+                d_ptr->accessRights,
                 camera,
                 requestParams,
                 response );
@@ -392,7 +391,7 @@ namespace nx_hls
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getPlaylist(
         const nx_http::Request& request,
         const QnSecurityCamResourcePtr& camResource,
-        const QnUserResourcePtr& userResource,
+        const Qn::UserAccessData& accessRights,
         const QnVideoCameraPtr& videoCamera,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
@@ -446,7 +445,7 @@ namespace nx_hls
             }
 
             const nx_http::StatusCode::Value result = createSession(
-                userResource->getId(),
+                accessRights,
                 request.requestLine.url.path(),
                 sessionID,
                 requestParams,
@@ -842,7 +841,7 @@ namespace nx_hls
     }
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::createSession(
-        const QnUuid& authUserId,
+        const Qn::UserAccessData& accessRights,
         const QString& requestedPlaylistPath,
         const QString& sessionID,
         const std::multimap<QString, QString>& requestParams,
@@ -935,13 +934,13 @@ namespace nx_hls
         }
 
         const auto& chunkAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
-            authUserId,
+            accessRights,
             HLS_PREFIX + camResource->getUniqueId(),
             QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS );
         newHlsSession->setChunkAuthenticationQueryItem( chunkAuthenticationKey );
 
         const auto& playlistAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
-            authUserId,
+            accessRights,
             requestedPlaylistPath,
             QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS );
         newHlsSession->setPlaylistAuthenticationQueryItem( playlistAuthenticationKey );

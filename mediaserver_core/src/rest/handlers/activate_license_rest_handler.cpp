@@ -150,7 +150,8 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
     QnLicenseList licenses;
     licenses << license;
-    const ec2::ErrorCode errorCode = connect->getLicenseManager(Qn::UserAccessData(owner->authUserId()))->addLicensesSync(licenses);
+    auto licenseManager = connect->getLicenseManager(owner->accessRights());
+    const ec2::ErrorCode errorCode = licenseManager->addLicensesSync(licenses);
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if( errorCode != ec2::ErrorCode::ok)
     {

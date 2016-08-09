@@ -105,9 +105,9 @@ void QnRestConnectionProcessor::run()
     QnRestRequestHandlerPtr handler = QnRestProcessorPool::instance()->findHandler(url.path());
     if (handler)
     {
-        if (!m_noAuth && d->authUserId != Qn::kSystemAccess.userId)
+        if (!m_noAuth && d->accessRights != Qn::kSystemAccess)
         {
-            QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->authUserId);
+            QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->accessRights.userId);
             if (!user)
             {
                 sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
@@ -154,21 +154,21 @@ void QnRestConnectionProcessor::run()
         handler->afterExecute(url.path(), params, uncompressedResponse, this);
 }
 
-QnUuid QnRestConnectionProcessor::authUserId() const
+Qn::UserAccessData QnRestConnectionProcessor::accessRights() const
 {
     Q_D(const QnRestConnectionProcessor);
-    return d->authUserId;
+    return d->accessRights;
+}
+
+void QnRestConnectionProcessor::setAccessRights(const Qn::UserAccessData& accessRights)
+{
+    Q_D(QnRestConnectionProcessor);
+    d->accessRights = accessRights;
 }
 
 void QnRestConnectionProcessor::setAuthNotRequired(bool noAuth)
 {
     m_noAuth = noAuth;
-}
-
-void QnRestConnectionProcessor::setAuthUserId(const QnUuid& authUserId)
-{
-    Q_D(QnRestConnectionProcessor);
-    d->authUserId = authUserId;
 }
 
 const nx_http::Request& QnRestConnectionProcessor::request() const

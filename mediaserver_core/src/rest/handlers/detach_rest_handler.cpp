@@ -56,7 +56,7 @@ int QnDetachFromCloudRestHandler::executeGet(
     const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
-    return execute(std::move(DetachFromCloudData(params)), owner->authUserId(), result);
+    return execute(std::move(DetachFromCloudData(params)), owner->accessRights(), result);
 }
 
 int QnDetachFromCloudRestHandler::executePost(
@@ -70,14 +70,14 @@ int QnDetachFromCloudRestHandler::executePost(
     Q_UNUSED(params);
 
     DetachFromCloudData passwordData = QJson::deserialized<DetachFromCloudData>(body);
-    return execute(std::move(passwordData), owner->authUserId(), result);
+    return execute(std::move(passwordData), owner->accessRights(), result);
 }
 
-int QnDetachFromCloudRestHandler::execute(DetachFromCloudData data, const QnUuid &userId, QnJsonRestResult &result)
+int QnDetachFromCloudRestHandler::execute(DetachFromCloudData data, const Qn::UserAccessData& accessRights, QnJsonRestResult &result)
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(userId))
+    if (!QnPermissionsHelper::hasOwnerPermissions(accessRights))
         return QnPermissionsHelper::notOwnerError(result);
 
     QString errStr;

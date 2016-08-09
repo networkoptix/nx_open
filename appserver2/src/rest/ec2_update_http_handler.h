@@ -139,9 +139,8 @@ public:
                 finished = true;
                 m_cond.wakeAll();
             };
-        m_connection->queryProcessor()->getAccess(
-            Qn::UserAccessData(owner->authUserId())
-            ).processUpdateAsync(tran, queryDoneHandler);
+        m_connection->queryProcessor()->getAccess(owner->accessRights()).
+            processUpdateAsync(tran, queryDoneHandler);
 
         {
             QnMutexLocker lk(&m_mutex);

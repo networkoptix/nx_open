@@ -681,13 +681,10 @@ public:
     ErrorCode doQuery(const T1 &inParam, Cont<T2,A>& outParam)
     {
         ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(inParam, outParam);
-        auto outParamOriginalSize = outParam.size();
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
         ec2::getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_userAccessData, outParam);
-        if (outParam.size() != outParamOriginalSize && outParam.size() == 0)
-            return ErrorCode::forbidden;
         return errorCode;
     }
 
