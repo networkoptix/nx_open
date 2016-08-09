@@ -47,14 +47,15 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     if (data.reset)
     {
         api::ResultCode cdbResultCode = api::ResultCode::ok;
+        auto systemId = qnGlobalSettings->cloudSystemID();
+        auto authKey = qnGlobalSettings->cloudAuthKey();
+        auto cloudConnection = m_cloudConnectionManager.getCloudConnection(systemId, authKey);
         std::tie(cdbResultCode) = makeSyncCall<api::ResultCode>(
-            [this](std::function<void(api::ResultCode)> callback)
-            {
-                auto systemId = qnGlobalSettings->cloudSystemID();
-                auto authKey = qnGlobalSettings->cloudAuthKey();
-                auto cloudConnection = m_cloudConnectionManager.getCloudConnection(systemId, authKey);
-                cloudConnection->systemManager()->unbindSystem(systemId.toStdString(), callback);
-            });
+            std::bind(
+                &nx::cdb::api::SystemManager::unbindSystem,
+                cloudConnection->systemManager(),
+                systemId.toStdString(),
+                std::placeholders::_1));
 
         if (cdbResultCode != api::ResultCode::ok)
         {
