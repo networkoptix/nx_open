@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.3
+import Nx 1.0
 import Nx.Controls 1.0
 
 ToolBarBase
@@ -61,5 +62,11 @@ ToolBarBase
         clear()
         opacity = 1.0
         searchField.forceActiveFocus()
+    }
+
+    Keys.onPressed:
+    {
+        if (Utils.keyIsBack(event.key))
+            close()
     }
 }

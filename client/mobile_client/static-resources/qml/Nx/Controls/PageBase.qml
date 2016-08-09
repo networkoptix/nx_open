@@ -23,7 +23,10 @@ Page
     {
         if (Utils.keyIsBack(event.key))
         {
-            Workflow.popCurrentScreen()
+            if (sideNavigation.opened)
+                sideNavigation.close()
+            else
+                Workflow.popCurrentScreen()
         }
         else if (event.key == Qt.Key_F2)
         {
