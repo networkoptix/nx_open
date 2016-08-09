@@ -20,7 +20,9 @@ QString QnApplauncherAppInfo::installationRoot()
     return QStringLiteral("${installation.root}");
 }
 
+#if defined(Q_MAC_OSX)
 QString QnApplauncherAppInfo::applicationFolderName()
 {
     return QStringLiteral("${display.product.name}");
 }
+#endif
