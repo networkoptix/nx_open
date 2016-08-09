@@ -441,21 +441,29 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     const QnNetworkResource* nres = dynamic_cast<QnNetworkResource*>(getResource().data());
 
     QString url;
+    auto host = nres->getHostAddress();
+    if (host.contains(lit(":")))
+        host = lit("[%1]").arg(host); // IPv6
+
     if (m_request.length() > 0)
     {
-        if (m_request.startsWith(QLatin1String("rtsp://"))) {
+        if (m_request.startsWith(QLatin1String("rtsp://")))
+        {
             url = m_request;
         }
         else 
         {
-            QTextStream(&url) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
+            QTextStream(&url) << "rtsp://" << host << ":" << nres->mediaPort();
             if (!m_request.startsWith(QLatin1Char('/')))
                 url += QLatin1Char('/');
-            url += m_request;;
+            url += m_request;
         }
     }
     else
-        QTextStream( &url ) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
+    {
+        QTextStream( &url ) << "rtsp://" << host << ":" << nres->mediaPort();
+    }
+
     m_RtpSession.setAuth(nres->getAuth(), m_prefferedAuthScheme);
     m_tracks.clear();
     m_gotKeyDataInfo.clear();

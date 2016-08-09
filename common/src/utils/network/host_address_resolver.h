@@ -50,6 +50,9 @@ public:
         \note This method is re-enterable
     */
     bool resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress );
+
+    bool resolveAddressSync(const HostAddress& host);
+
     //!Returns \a true if address \a addr is resolved
     bool isAddressResolved( const HostAddress& addr ) const;
     /*!

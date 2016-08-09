@@ -38,18 +38,22 @@ public:
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
         int type,
         int protocol,
+        int ipVersion, /**< 0 means default */
         PollableSystemSocketImpl* impl = nullptr );
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
         int sockDesc,
+        int ipVersion,
         PollableSystemSocketImpl* impl = nullptr );
     //TODO #ak remove following two constructors
     Socket(
         int type,
         int protocol,
+        int ipVersion,
         PollableSystemSocketImpl* impl = nullptr );
     Socket(
         int sockDesc,
+        int ipVersion,
         PollableSystemSocketImpl* impl = nullptr );
 
     /**
@@ -100,19 +104,6 @@ public:
     //!Implementation of AbstractSocket::dispatchImpl
     void dispatchImpl( std::function<void()>&& handler );
 
-    /**
-     *   Get the local port
-     *   @return local port of socket
-     */
-    unsigned short getLocalPort() const;
-
-    /**
-     *   Set the local port to the specified port and the local address
-     *   to any interface
-     *   @param localPort local port
-     */
-    bool setLocalPort(unsigned short localPort) ;
-
     //!Returns socket write/connect timeout in millis
     unsigned int getWriteTimeOut() const;
 
@@ -141,14 +132,40 @@ public:
 
     bool failed() const;
 
-    bool fillAddr( const SocketAddress& socketAddress, sockaddr_in &addr );
+    struct SockAddrPtr
+    {
+        std::unique_ptr<sockaddr> ptr;
+        socklen_t size;
+
+        SockAddrPtr():
+            ptr(nullptr),
+            size(0)
+        {
+        }
+
+        template<typename T>
+        SockAddrPtr(T* addr):
+            ptr((sockaddr*)addr),
+            size(sizeof(T))
+        {
+            memset(addr, 0, size);
+        }
+    };
+
+    SockAddrPtr makeAddr(const SocketAddress& socketAddress);
     bool createSocket( int type, int protocol );
+
+    static void setDefaultIpVersion(int version);
+    static void setDefaultIpVersion(const QString& version);
 
 protected:
     std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> m_baseAsyncHelper;
+    const int m_ipVersion;
 
 private:
     bool m_nonBlockingMode;
+
+    static std::atomic<int> s_defaultIpVersion;
 
     // Prevent the user from trying to use value semantics on this object
     Socket(const Socket &sock);
@@ -165,8 +182,15 @@ class CommunicatingSocket
     public Socket
 {
 public:
-    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int type, int protocol, PollableSystemSocketImpl* sockImpl = nullptr );
-    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, PollableSystemSocketImpl* sockImpl = nullptr );
+    CommunicatingSocket(
+        AbstractCommunicatingSocket* abstractSocketPtr,
+        int type, int protocol, int ipVersion,
+        PollableSystemSocketImpl* sockImpl = nullptr );
+
+    CommunicatingSocket(
+        AbstractCommunicatingSocket* abstractSocketPtr,
+        int newConnSD, int ipVersion,
+        PollableSystemSocketImpl* sockImpl = nullptr );
 
     virtual ~CommunicatingSocket();
 
@@ -235,10 +259,24 @@ public:
     {
     }
 
+    template<class Param1Type, class Param2Type, class Param3Type, class Param4Type>
+    SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2, const Param3Type& param3, const Param4Type& param4 )
+    :
+        m_implDelegate( param1, param2, param3, param4 )
+    {
+    }
+
     template<class Param1Type, class Param2Type, class Param3Type>
     SocketImplementationDelegate( AbstractCommunicatingSocket* abstractSocketPtr, const Param1Type& param1, const Param2Type& param2, const Param3Type& param3 )
     :
         m_implDelegate( abstractSocketPtr, param1, param2, param3 )
+    {
+    }
+
+    template<class Param1Type, class Param2Type, class Param3Type, class Param4Type>
+    SocketImplementationDelegate( AbstractCommunicatingSocket* abstractSocketPtr, const Param1Type& param1, const Param2Type& param2, const Param3Type& param3, const Param4Type& param4 )
+    :
+        m_implDelegate( abstractSocketPtr, param1, param2, param3, param4 )
     {
     }
 
@@ -392,10 +430,10 @@ public:
     /**
      *   Construct a TCP socket with no connection
      */
-    TCPSocket() ;
+    TCPSocket( int ipVersion = 0 );
 
     //!User by \a TCPServerSocket class
-    TCPSocket( int newConnSD );
+    TCPSocket( int newConnSD, int ipVersion );
     virtual ~TCPSocket();
 
 
@@ -429,7 +467,7 @@ class TCPServerSocket
     typedef SocketImplementationDelegate<AbstractStreamServerSocket, Socket> base_type;
 
 public:
-    TCPServerSocket();
+    TCPServerSocket(int ipVersion = 0);
 
     /**
      *   Blocks until a new connection is established on this socket or error
@@ -468,9 +506,7 @@ public:
     /**
      *   Construct a UDP socket
      */
-    UDPSocket() ;
-
-    void setDestPort(unsigned short foreignPort);
+    UDPSocket(int ipVersion = 0);
 
     /**
      *   Unset foreign address and port
@@ -536,7 +572,7 @@ public:
     virtual bool setMulticastIF( const QString& multicastIF ) override;
 
 private:
-    sockaddr_in m_destAddr;
+    Socket::SockAddrPtr m_destAddr;
     SocketAddress m_prevDatagramAddress;
 
     void setBroadcast();

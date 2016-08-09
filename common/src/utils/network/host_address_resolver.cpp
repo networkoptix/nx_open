@@ -85,22 +85,16 @@ bool HostAddressResolver::resolveAddressSync( const QString& hostName, HostAddre
 
     addrinfo hints;
     memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_INET;    /* Allow only IPv4 */
-    hints.ai_socktype = 0; /* Any socket */
     hints.ai_flags = AI_ALL;    /* For wildcard IP address */
-    hints.ai_protocol = 0;          /* Any protocol */
-    hints.ai_canonname = NULL;
-    hints.ai_addr = NULL;
-    hints.ai_next = NULL;
 
-    addrinfo* resolvedAddressInfo = nullptr;
-    int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &resolvedAddressInfo);
+    addrinfo* addressInfo = nullptr;
+    int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &addressInfo);
 
     if (status == EAI_BADFLAGS)
     {
         // if the lookup failed with AI_ALL, try again without it
         hints.ai_flags = 0;
-        status = getaddrinfo(hostName.toLatin1(), 0, &hints, &resolvedAddressInfo);
+        status = getaddrinfo(hostName.toLatin1(), 0, &hints, &addressInfo);
     }
 
     if (status != 0)
@@ -109,17 +103,39 @@ bool HostAddressResolver::resolveAddressSync( const QString& hostName, HostAddre
         return false;
     }
 
-    resolvedAddress->m_sinAddr = ((struct sockaddr_in*)(resolvedAddressInfo->ai_addr))->sin_addr;
-    resolvedAddress->m_addrStr = hostName;
-    resolvedAddress->m_addressResolved = true;
+    // TODO: support multi-address
+    for (addrinfo* info = addressInfo; info; info = addressInfo->ai_next)
+    {
+        if (addressInfo->ai_family = AF_INET)
+        {
+            resolvedAddress->m_ipV4 = ((struct sockaddr_in*)(addressInfo->ai_addr))->sin_addr;
+            freeaddrinfo(addressInfo);
+            return true;
+        }
 
-    freeaddrinfo(resolvedAddressInfo);
+        if (addressInfo->ai_family = AF_INET6)
+        {
+            resolvedAddress->m_ipV6 = ((struct sockaddr_in6*)(addressInfo->ai_addr))->sin6_addr;
+            freeaddrinfo(addressInfo);
+            return true;
+        }
+    }
+
+    SystemError::setLastErrorCode( SystemError::hostNotFound );
     return true;
+}
+
+bool HostAddressResolver::resolveAddressSync(const HostAddress& host)
+{
+    if (isAddressResolved(host))
+        return true;
+
+    return resolveAddressSync(host.toString(), const_cast<HostAddress*>(&host));
 }
 
 bool HostAddressResolver::isAddressResolved( const HostAddress& addr ) const
 {
-    return addr.m_addressResolved;
+    return addr.ipV4() || addr.ipV6();
 }
 
 void HostAddressResolver::cancel( RequestID reqID, bool waitForRunningHandlerCompletion )

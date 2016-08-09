@@ -151,7 +151,9 @@ QString urlPath(const QString& url)
 {
     if (url.indexOf(lit("://")) > 0) {
         QUrl u(url);
-        return u.host() + (u.port() != -1 ? lit(":").arg(u.port()) : lit(""))  + u.path();
+        // IPv6 format check
+        const auto host = u.host().contains(lit(":")) ? lit("[%1]").arg(u.host()) : u.host();
+        return host + (u.port() != -1 ? lit(":").arg(u.port()) : lit(""))  + u.path();
     }
     else {
         return url;

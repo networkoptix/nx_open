@@ -20,7 +20,6 @@
 
 #include <QString>
 
-
 //!Represents ipv4 address. Supports conversion to QString and to uint32
 /*!
     \note Not using QHostAddress because QHostAddress can trigger dns name lookup which depends on Qt sockets which we do not want to use
@@ -28,21 +27,14 @@
 class HostAddress
 {
 public:
-    //!Creates 0.0.0.0 address
-    HostAddress();
     HostAddress( const HostAddress& rhs );
     HostAddress( HostAddress&& rhs );
-    HostAddress( const struct in_addr& sinAddr );
-    /*!
-        \param _ipv4 ipv4 address in local byte order
-    */
-    HostAddress( uint32_t _ipv4 );
+
+    HostAddress( const in_addr& addr );
+    HostAddress( const in6_addr& addr = in6addr_any );
+
     HostAddress( const QString& addrStr );
     HostAddress( const char* addrStr );
-
-    //!Returns ip in local byte order
-    uint32_t ipv4() const;
-    QString toString() const;
 
     HostAddress& operator=( const HostAddress& rhs );
     HostAddress& operator=( HostAddress&& rhs );
@@ -50,16 +42,30 @@ public:
     bool operator==( const HostAddress& right ) const;
     bool operator<( const HostAddress& right ) const;
 
-    struct in_addr inAddr(bool* ok = nullptr) const;
+    /** Domain name or IP v4 (if can be converted) or IP v6 */
+    QString toString() const;
+
+    /** IP v4 if address is v4 or v6 which can be converted to v4 */
+    boost::optional<in_addr> ipV4() const;
+
+    /** IP v6 if address is v6 or v4 converted to v6 */
+    boost::optional<in6_addr> ipV6() const;
+
+    bool isLocal() const;
 
     static const HostAddress localhost;
     static const HostAddress anyHost;
 
+    static boost::optional<QString> ipToString(const in_addr& addr);
+    static boost::optional<QString> ipToString(const in6_addr& addr);
+
+    static boost::optional<in_addr> ipV4from(const QString& ip);
+    static boost::optional<in6_addr> ipV6from(const QString& ip);
+
 private:
-    mutable boost::optional<QString> m_addrStr;
-    struct in_addr m_sinAddr;
-    //!if \a true \a m_sinAddr contains ip address corresponding to \a m_addrStr
-    bool m_addressResolved;
+    mutable boost::optional<QString> m_string;
+    mutable boost::optional<in_addr> m_ipV4;
+    mutable boost::optional<in6_addr> m_ipV6;
 
     friend class HostAddressResolver;
 };
@@ -71,42 +77,14 @@ public:
     HostAddress address;
     int port;
 
-    SocketAddress( const HostAddress& _address = HostAddress(), unsigned short _port = 0 )
-    :
-        address( _address ),
-        port( _port )
-    {
-    }
+    SocketAddress( const HostAddress& _address = HostAddress(), unsigned short _port = 0 );
+    SocketAddress( const QString& str );
 
-    SocketAddress( const QString& str )
-    :
-        port( 0 )
-    {
-        int sepPos = str.indexOf(QLatin1Char(':'));
-        if( sepPos == -1 )
-        {
-            address = HostAddress(str);
-        }
-        else
-        {
-            address = HostAddress(str.mid( 0, sepPos ));
-            port = str.mid( sepPos+1 ).toInt();
-        }
-    }
+    QString toString() const;
+    bool operator==( const SocketAddress& rhs ) const;
+    bool isNull() const;
 
-    QString toString() const
-    {
-        return
-            address.toString() +
-            (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
-    }
-
-    bool operator==( const SocketAddress& rhs ) const
-    {
-        return address == rhs.address && port == rhs.port;
-    }
-
-    bool isNull() const { return address == HostAddress() && port == 0; }
+    static QString trimIpV6(const QString& ip);
 };
 
 inline uint qHash(const SocketAddress &address) {

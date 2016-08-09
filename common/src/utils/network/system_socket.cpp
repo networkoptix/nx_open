@@ -11,6 +11,7 @@
 #include <utils/network/ssl_socket.h>
 #include <utils/thread/mutex.h>
 #include <utils/thread/wait_condition.h>
+#include <common/common_globals.h>
 
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
@@ -68,7 +69,6 @@ int getSystemErrCode()
 #define SOCKET_ERROR (-1)
 #endif
 
-
 //////////////////////////////////////////////////////////
 // Socket implementation
 //////////////////////////////////////////////////////////
@@ -81,12 +81,11 @@ Socket::~Socket() {
 //!Implementation of AbstractSocket::bind
 bool Socket::bind( const SocketAddress& localAddress )
 {
-    // Get the address of the requested host
-    sockaddr_in localAddr;
-    if (!fillAddr(localAddress, localAddr))
+    const auto addr = makeAddr(localAddress);
+    if (!addr.ptr)
         return false;
 
-    return ::bind(m_fd, (sockaddr *) &localAddr, sizeof(localAddr)) == 0;
+    return ::bind(m_fd, addr.ptr.get(), addr.size) == 0;
 }
 
 ////!Implementation of AbstractSocket::bindToInterface
@@ -107,13 +106,26 @@ bool Socket::bind( const SocketAddress& localAddress )
 //!Implementation of AbstractSocket::getLocalAddress
 SocketAddress Socket::getLocalAddress() const
 {
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
+    if (m_ipVersion == AF_INET)
+    {
+        sockaddr_in addr;
+        socklen_t addrLen = sizeof(addr);
+        if (::getsockname(m_fd, (sockaddr*)&addr, &addrLen) < 0)
+            return SocketAddress();
 
-    if (getsockname(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-        return SocketAddress();
+        return SocketAddress(addr.sin_addr, ntohs(addr.sin_port));
+    }
+    else if (m_ipVersion == AF_INET6)
+    {
+        sockaddr_in6 addr;
+        socklen_t addrLen = sizeof(addr);
+        if (::getsockname(m_fd, (sockaddr*)&addr, &addrLen) < 0)
+            return SocketAddress();
 
-    return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
+        return SocketAddress(addr.sin6_addr, ntohs(addr.sin6_port));
+    }
+
+    return SocketAddress();
 }
 
 void Socket::shutdown()
@@ -313,30 +325,6 @@ void Socket::dispatchImpl( std::function<void()>&& handler )
     m_baseAsyncHelper->dispatch( std::move(handler) );
 }
 
-unsigned short Socket::getLocalPort() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getsockname(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-    {
-        return 0;
-    }
-
-    return ntohs(addr.sin_port);
-}
-
-bool Socket::setLocalPort(unsigned short localPort)  {
-    // Bind the socket to its port
-    sockaddr_in localAddr;
-    memset(&localAddr, 0, sizeof(localAddr));
-    localAddr.sin_family = AF_INET;
-    localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    localAddr.sin_port = htons(localPort);
-
-    return ::bind(m_fd, (sockaddr *) &localAddr, sizeof(sockaddr_in)) == 0;
-}
-
 void Socket::cleanUp()  {
 #ifdef _WIN32
     WSACleanup();
@@ -357,12 +345,14 @@ Socket::Socket(
     std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
     int type,
     int protocol,
+    int ipVersion,
     PollableSystemSocketImpl* impl )
 :
     Pollable(
         INVALID_SOCKET,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
     m_baseAsyncHelper( std::move(asyncHelper) ),
+    m_ipVersion( ipVersion ? ipVersion : s_defaultIpVersion.load() ),
     m_nonBlockingMode( false )
 {
     createSocket( type, protocol );
@@ -371,12 +361,14 @@ Socket::Socket(
 Socket::Socket(
     std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
     int _sockDesc,
+    int ipVersion,
     PollableSystemSocketImpl* impl )
 :
     Pollable(
         _sockDesc,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
     m_baseAsyncHelper( std::move(asyncHelper) ),
+    m_ipVersion( ipVersion ? ipVersion : s_defaultIpVersion.load() ),
     m_nonBlockingMode( false )
 {
 }
@@ -384,12 +376,14 @@ Socket::Socket(
 Socket::Socket(
     int type,
     int protocol,
+    int ipVersion,
     PollableSystemSocketImpl* impl )
 :
     Pollable(
         INVALID_SOCKET,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
     m_baseAsyncHelper( new BaseAsyncSocketImplHelper<Pollable>(this) ),
+    m_ipVersion( ipVersion ? ipVersion : s_defaultIpVersion.load() ),
     m_nonBlockingMode( false )
 {
     createSocket( type, protocol );
@@ -397,45 +391,54 @@ Socket::Socket(
 
 Socket::Socket(
     int _sockDesc,
+    int ipVersion,
     PollableSystemSocketImpl* impl )
 :
     Pollable(
         _sockDesc,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
     m_baseAsyncHelper( new BaseAsyncSocketImplHelper<Pollable>(this) ),
+    m_ipVersion( ipVersion ? ipVersion : s_defaultIpVersion.load() ),
     m_nonBlockingMode( false )
 {
 }
 
 // Function to fill in address structure given an address and port
-bool Socket::fillAddr(
-    const SocketAddress& socketAddress,
-    sockaddr_in &addr )
+Socket::SockAddrPtr Socket::makeAddr(const SocketAddress& socketAddress)
 {
-    memset(&addr, 0, sizeof(addr));  // Zero out address structure
-    addr.sin_family = AF_INET;       // Internet address
+    // NOTE: blocking dns name resolve may happen here
+    if (!HostAddressResolver::instance()->resolveAddressSync(socketAddress.address))
+        return SockAddrPtr();
 
-    addrinfo hints;
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_INET;    /* Allow only IPv4 */
-    hints.ai_socktype = 0; /* Any socket */
-#ifndef ANDROID
-    hints.ai_flags = AI_ALL;    /* For wildcard IP address */
-#else
-    hints.ai_flags = AI_ADDRCONFIG;    /* AI_ALL isn't supported in getaddrinfo in adnroid */
-#endif
-    hints.ai_protocol = 0;          /* Any protocol */
-    hints.ai_canonname = NULL;
-    hints.ai_addr = NULL;
-    hints.ai_next = NULL;
+    if (m_ipVersion == AF_INET)
+    {
+        if (const auto ip = socketAddress.address.ipV4())
+        {
+            const auto addr = new sockaddr_in;
+            SockAddrPtr addrHolder(addr);
 
-    bool ok = false;
-    addr.sin_addr = socketAddress.address.inAddr(&ok);     // NOTE: blocking dns name resolve can happen here
-    if( !ok )
-        return false;
-    addr.sin_port = htons( socketAddress.port );        // Assign port in network byte order
+            addr->sin_family = AF_INET;
+            addr->sin_addr = *ip;
+            addr->sin_port = htons(socketAddress.port);
+            return addrHolder;
+        }
+    }
+    else if (m_ipVersion == AF_INET6)
+    {
+        if (const auto ip = socketAddress.address.ipV6())
+        {
+            const auto addr = new sockaddr_in6;
+            SockAddrPtr addrHolder(addr);
 
-    return true;
+            addr->sin6_family = AF_INET6;
+            addr->sin6_addr = *ip;
+            addr->sin6_port = htons(socketAddress.port);
+            return addrHolder;
+        }
+    }
+
+    SystemError::setLastErrorCode(SystemError::hostNotFound);
+    return SockAddrPtr();
 }
 
 bool Socket::createSocket(int type, int protocol)
@@ -452,10 +455,16 @@ bool Socket::createSocket(int type, int protocol)
     }
 #endif
 
-    // Make a new socket
-    m_fd = socket(PF_INET, type, protocol);
+    m_fd = ::socket(m_ipVersion, type, protocol);
     if( m_fd < 0 )
         return false;
+
+    if( m_ipVersion == AF_INET6 )
+    {
+        int off = 0;
+        if( ::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, &off, sizeof(off)) )
+            return false;
+    }
 
 #ifdef SO_NOSIGPIPE
     int set = 1;
@@ -464,6 +473,32 @@ bool Socket::createSocket(int type, int protocol)
     return true;
 }
 
+void Socket::setDefaultIpVersion(int version)
+{
+    s_defaultIpVersion = version;
+    NX_LOG(QString(QLatin1String("Socket::setDefaultIpVersion( %1 )")).arg(version), cl_logALWAYS);
+}
+
+void Socket::setDefaultIpVersion(const QString& version)
+{
+    if (version.isEmpty())
+        return;
+
+    if (version.endsWith(lit("4"))) //< e.g. 4, ip4, IPv4
+        return setDefaultIpVersion(AF_INET);
+
+    if (version.endsWith(lit("6"))) //< e.g. 6, ip6, IPv6
+        return setDefaultIpVersion(AF_INET6);
+
+    std::cerr << "Unsupported IP version: " << version.toStdString() << std::endl;
+    ::abort();
+}
+
+#if defined(__APPLE__) && defined(TARGET_OS_IPHONE)
+    std::atomic<int> Socket::s_defaultIpVersion(AF_INET6);
+#else
+    std::atomic<int> Socket::s_defaultIpVersion(AF_INET);
+#endif
 
 //////////////////////////////////////////////////////////
 ///////// class CommunicatingSocket
@@ -522,6 +557,7 @@ CommunicatingSocket::CommunicatingSocket(
     AbstractCommunicatingSocket* abstractSocketPtr,
     int type,
     int protocol,
+    int ipVersion,
     PollableSystemSocketImpl* sockImpl )
 :
     Socket(
@@ -529,6 +565,7 @@ CommunicatingSocket::CommunicatingSocket(
             new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr ) ),
         type,
         protocol,
+        ipVersion,
         sockImpl ),
     m_aioHelper( nullptr ),
     m_connected( false )
@@ -539,12 +576,14 @@ CommunicatingSocket::CommunicatingSocket(
 CommunicatingSocket::CommunicatingSocket(
     AbstractCommunicatingSocket* abstractSocketPtr,
     int newConnSD,
+    int ipVersion,
     PollableSystemSocketImpl* sockImpl )
 :
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
             new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr ) ),
         newConnSD,
+        ipVersion,
         sockImpl ),
     m_aioHelper( nullptr ),
     m_connected( true )   //this constructor is used is server socket
@@ -569,8 +608,8 @@ bool CommunicatingSocket::connect( const SocketAddress& remoteAddress, unsigned 
     // Get the address of the requested host
     m_connected = false;
 
-    sockaddr_in destAddr;
-    if (!fillAddr(remoteAddress, destAddr))
+    const auto addr = makeAddr(remoteAddress);
+    if (!addr.ptr)
         return false;
 
     //switching to non-blocking mode to connect with timeout
@@ -580,7 +619,7 @@ bool CommunicatingSocket::connect( const SocketAddress& remoteAddress, unsigned 
     if( !isNonBlockingModeBak && !setNonBlockingMode( true ) )
         return false;
 
-    int connectResult = ::connect(m_fd, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
+    int connectResult = ::connect(m_fd, addr.ptr.get(), addr.size);
 
     if( connectResult != 0 )
     {
@@ -728,14 +767,26 @@ int CommunicatingSocket::send( const void* buffer, unsigned int bufferLen )
 //!Implementation of AbstractCommunicatingSocket::getForeignAddress
 SocketAddress CommunicatingSocket::getForeignAddress() const
 {
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
+    if (m_ipVersion == AF_INET)
+    {
+        sockaddr_in addr;
+        socklen_t addrLen = sizeof(addr);
+        if (::getpeername(m_fd, (sockaddr*)&addr, &addrLen) < 0)
+            return SocketAddress();
 
-    if (getpeername(m_fd, (sockaddr *) &addr,(socklen_t *) &addr_len) < 0) {
-        qnWarning("Fetch of foreign address failed (getpeername()).");
-        return SocketAddress();
+        return SocketAddress(addr.sin_addr, ntohs(addr.sin_port));
     }
-    return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
+    else if (m_ipVersion == AF_INET6)
+    {
+        sockaddr_in6 addr;
+        socklen_t addrLen = sizeof(addr);
+        if (::getpeername(m_fd, (sockaddr*)&addr, &addrLen) < 0)
+            return SocketAddress();
+
+        return SocketAddress(addr.sin6_addr, ntohs(addr.sin6_port));
+    }
+
+    return SocketAddress();
 }
 
 //!Implementation of AbstractCommunicatingSocket::isConnected
@@ -806,11 +857,12 @@ public:
 };
 #endif
 
-TCPSocket::TCPSocket()
+TCPSocket::TCPSocket(int ipVersion)
 :
     base_type(
         SOCK_STREAM,
-        IPPROTO_TCP
+        IPPROTO_TCP,
+        ipVersion
 #ifdef _WIN32
         , new Win32TcpSocketImpl()
 #endif
@@ -818,10 +870,11 @@ TCPSocket::TCPSocket()
 {
 }
 
-TCPSocket::TCPSocket(int newConnSD)
+TCPSocket::TCPSocket(int newConnSD, int ipVersion)
 :
     base_type(
-        newConnSD
+        newConnSD,
+        ipVersion
 #ifdef _WIN32
         , new Win32TcpSocketImpl()
 #endif
@@ -1038,11 +1091,13 @@ class TCPServerSocketPrivate
 public:
     std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> acceptHandler;
     int socketHandle;
+    const int ipVersion;
     std::atomic<int> acceptAsyncCallCount;
 
-    TCPServerSocketPrivate( TCPServerSocket* _sock )
+    TCPServerSocketPrivate( TCPServerSocket* _sock, int _ipVersion )
     :
         socketHandle( -1 ),
+        ipVersion( _ipVersion ),
         acceptAsyncCallCount( 0 ),
         m_sock( _sock )
     {
@@ -1096,7 +1151,7 @@ public:
         int newConnSD = acceptWithTimeout( socketHandle, recvTimeoutMs );
         if( newConnSD >= 0 )
         {
-            return new TCPSocket(newConnSD);
+            return new TCPSocket(newConnSD, ipVersion);
         }
         else if( newConnSD == -2 )
         {
@@ -1119,12 +1174,13 @@ private:
     TCPServerSocket* m_sock;
 };
 
-TCPServerSocket::TCPServerSocket()
+TCPServerSocket::TCPServerSocket(int ipVersion)
 :
     base_type(
         SOCK_STREAM,
         IPPROTO_TCP,
-        new TCPServerSocketPrivate( this ) )
+        ipVersion,
+        new TCPServerSocketPrivate( this, ipVersion ) )
 {
     static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl())->socketHandle = m_implDelegate.handle();
     setRecvTimeout( DEFAULT_ACCEPT_TIMEOUT_MSEC );
@@ -1220,11 +1276,11 @@ bool TCPServerSocket::setListen(int queueLen)
 
 // UDPSocket Code
 
-UDPSocket::UDPSocket()
+UDPSocket::UDPSocket(int ipVersion)
 :
-    base_type(SOCK_DGRAM, IPPROTO_UDP)
+    base_type(SOCK_DGRAM, IPPROTO_UDP, ipVersion),
+    m_destAddr()
 {
-    memset( &m_destAddr, 0, sizeof(m_destAddr) );
     setBroadcast();
     int buff_size = 1024*512;
     if( ::setsockopt( m_implDelegate.handle(), SOL_SOCKET, SO_RCVBUF, (const char*)&buff_size, sizeof( buff_size ) )<0 )
@@ -1241,34 +1297,30 @@ void UDPSocket::setBroadcast() {
                (raw_type *) &broadcastPermission, sizeof(broadcastPermission));
 }
 
-void UDPSocket::setDestPort(unsigned short foreignPort)
-{
-    m_destAddr.sin_port = htons(foreignPort);
-}
-
-
 bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 {
     // Write out the whole buffer as a single message.
+    #ifdef _WIN32
+        return sendto(
+            m_implDelegate.handle(), (raw_type *)buffer, bufferLen, 0,
+            m_destAddr.ptr.get(), m_destAddr.size) == bufferLen;
+    #else
+        unsigned int sendTimeout = 0;
+        if (!getSendTimeout(&sendTimeout))
+            return -1;
 
-#ifdef _WIN32
-    return sendto( m_implDelegate.handle(), (raw_type *)buffer, bufferLen, 0,
-               (sockaddr *) &m_destAddr, sizeof(m_destAddr)) == bufferLen;
-#else
-    unsigned int sendTimeout = 0;
-    if( !getSendTimeout( &sendTimeout ) )
-        return -1;
+        #ifdef __linux__
+            int flags = MSG_NOSIGNAL;
+        #else
+            int flags = 0;
+        #endif
 
-    return doInterruptableSystemCallWithTimeout<>(
-        std::bind(&::sendto, m_implDelegate.handle(), (const void*)buffer, (size_t)bufferLen,
-#ifdef __linux__
-            MSG_NOSIGNAL,
-#else
-            0,
-#endif
-            (const sockaddr *) &m_destAddr, (socklen_t)sizeof(m_destAddr)),
-        sendTimeout ) == bufferLen;
-#endif
+        return doInterruptableSystemCallWithTimeout<>(
+            std::bind(
+                &::sendto, m_implDelegate.handle(), (const void*)buffer, (size_t)bufferLen, flags,
+                m_destAddr.ptr.get(), m_destAddr.size),
+            sendTimeout) == bufferLen;
+    #endif
 }
 
 bool UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {
@@ -1350,24 +1402,29 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup, const QString& multica
 
 int UDPSocket::send( const void* buffer, unsigned int bufferLen )
 {
-#ifdef _WIN32
-    return sendto( m_implDelegate.handle(), (raw_type *)buffer, bufferLen, 0,
-               (sockaddr *) &m_destAddr, sizeof(m_destAddr));
-#else
-    unsigned int sendTimeout = 0;
-    if( !getSendTimeout( &sendTimeout ) )
-        return -1;
+    #ifdef _WIN32
+        return sendto(
+            m_implDelegate.handle(), (raw_type *)buffer, bufferLen, 0,
+            m_destAddr.ptr.get(), m_destAddr.size);
+    #else
+        unsigned int sendTimeout = 0;
+        if (!getSendTimeout(&sendTimeout))
+            return -1;
 
-    return doInterruptableSystemCallWithTimeout<>(
-        std::bind(&::sendto, m_implDelegate.handle(), (const void*)buffer, (size_t)bufferLen, 0, (const sockaddr *) &m_destAddr, (socklen_t)sizeof(m_destAddr)),
-        sendTimeout );
-#endif
+        return doInterruptableSystemCallWithTimeout<>(
+            std::bind(
+                &::sendto, m_implDelegate.handle(),
+                (const void*)buffer, (size_t)bufferLen, 0,
+                m_destAddr.ptr.get(), m_destAddr.size),
+            sendTimeout);
+    #endif
 }
 
 //!Implementation of AbstractDatagramSocket::setDestAddr
 bool UDPSocket::setDestAddr( const SocketAddress& foreignEndpoint )
 {
-    return m_implDelegate.fillAddr( foreignEndpoint, m_destAddr );
+    m_destAddr = m_implDelegate.makeAddr(foreignEndpoint);
+    return (bool)m_destAddr.ptr;
 }
 
 //!Implementation of AbstractDatagramSocket::sendTo
