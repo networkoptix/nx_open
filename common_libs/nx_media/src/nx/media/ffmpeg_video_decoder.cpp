@@ -1,5 +1,4 @@
 #include "ffmpeg_video_decoder.h"
-#if !defined(DISABLE_FFMPEG)
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -348,5 +347,3 @@ void FfmpegVideoDecoder::setMaxResolution(const QSize& maxResolution)
 
 } // namespace media
 } // namespace nx
-
-#endif // !DISABLE_FFMPEG

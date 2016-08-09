@@ -94,19 +94,6 @@
             </properties>
         </profile>
 
-        <profile>
-            <id>mobile-ios</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>box</name>
-                    <value>ios</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- <ios.defines>DISABLE_FFMPEG</ios.defines> -->
-            </properties>
-        </profile>
     </profiles>
 
 </project>

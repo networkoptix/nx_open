@@ -3,10 +3,8 @@
 #include "video_decoder_registry.h"
 #include "audio_decoder_registry.h"
 
-#if !defined(DISABLE_FFMPEG)
-    #include "ffmpeg_video_decoder.h"
-    #include "ffmpeg_audio_decoder.h"
-#endif // !DISABLE_FFMPEG
+#include "ffmpeg_video_decoder.h"
+#include "ffmpeg_audio_decoder.h"
 
 #if defined(ENABLE_PROXY_DECODER)
     #include "proxy_video_decoder.h"
@@ -62,14 +60,12 @@ void DecoderRegistrar::registerDecoders(
     }
     #endif // ENABLE_PROXY_DECODER
 
-    #if !defined(DISABLE_FFMPEG)
     {
         FfmpegVideoDecoder::setMaxResolution(maxFfmpegResolution);
 
         VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
         AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();
     }
-    #endif // !DISABLE_FFMPEG
 
     VideoDecoderRegistry::instance()->addPlugin<JpegDecoder>();
 }
