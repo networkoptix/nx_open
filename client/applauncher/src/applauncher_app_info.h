@@ -8,4 +8,5 @@ struct QnApplauncherAppInfo
 
     /** Directory where all software is installed by default. */
     static QString installationRoot();
+    static QString applicationFolderName();
 };

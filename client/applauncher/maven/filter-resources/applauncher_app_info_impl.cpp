@@ -19,3 +19,8 @@ QString QnApplauncherAppInfo::installationRoot()
 {
     return QStringLiteral("${installation.root}");
 }
+
+QString QnApplauncherAppInfo::applicationFolderName()
+{
+    return QStringLiteral("${display.product.name}");
+}
