@@ -10,6 +10,8 @@
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 
+#include <helpers/cloud_url_helper.h>
+
 #include <ui/common/read_only.h>
 #include <ui/common/aligner.h>
 #include <ui/dialogs/resource_properties/change_user_password_dialog.h>
@@ -22,6 +24,7 @@
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 
 #include <utils/email/email.h>
+#include <utils/common/html.h>
 #include <utils/common/url.h>
 
 QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* parent /*= 0*/):
@@ -42,6 +45,8 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
 
     ui->emailInputField->setTitle(tr("Email"));
     ui->emailInputField->setValidator(Qn::defaultEmailValidator());
+
+    ui->manageAccountLabel->setText(makeHref(tr("Manage account..."), QnCloudUrlHelper::accountManagementUrl()));
 
     connect(ui->emailInputField, &QnInputField::textChanged, this, &QnUserProfileWidget::hasChangesChanged);
 
@@ -112,6 +117,9 @@ void QnUserProfileWidget::loadDataToUi()
     ui->groupInputField->setText(qnResourceAccessManager->userRoleName(m_model->user()));
     ui->emailInputField->setText(m_model->user()->getEmail());
     m_newPassword.clear();
+
+    ui->manageAccountLabel->setVisible(m_model->mode() == QnUserSettingsModel::OwnProfile
+        && m_model->user()->isCloud());
 }
 
 void QnUserProfileWidget::updatePermissionsLabel(const QString& text)
