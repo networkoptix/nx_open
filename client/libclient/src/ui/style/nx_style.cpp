@@ -2116,8 +2116,10 @@ QRect QnNxStyle::subControlRect(
                 {
                     case SC_ComboBoxArrow:
                     {
-                        rect = QRect(comboBox->rect.right() - comboBox->rect.height(), 0,
-                                     comboBox->rect.height(), comboBox->rect.height());
+                        rect = QRect(comboBox->rect.right() - comboBox->rect.height(),
+                                     comboBox->rect.top(),
+                                     comboBox->rect.height(),
+                                     comboBox->rect.height());
                         rect.adjust(1, 1, 0, -1);
                         break;
                     }
