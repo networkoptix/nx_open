@@ -340,6 +340,18 @@ int FfmpegVideoDecoder::decode(
     return frameNum;
 }
 
+double FfmpegVideoDecoder::getSampleAspectRatio() const
+{
+    Q_D(const FfmpegVideoDecoder);
+    if (d->codecContext && d->codecContext->width > 8 && d->codecContext->height > 8)
+    {
+        double result = av_q2d(d->codecContext->sample_aspect_ratio);
+        if (result > 1e-7)
+            return result;
+    }
+    return 1.0;
+}
+
 void FfmpegVideoDecoder::setMaxResolution(const QSize& maxResolution)
 {
     s_maxResolution = maxResolution;

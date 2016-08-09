@@ -1169,34 +1169,6 @@ bool QnDbManager::fixBusinessRules()
     return true;
 }
 
-bool QnDbManager::isTranAllowed(const QnAbstractTransaction& tran) const
-{
-    if( !m_dbReadOnly )
-        return true;
-
-    switch( tran.command )
-    {
-        case ApiCommand::addLicense:
-        case ApiCommand::addLicenses:
-        case ApiCommand::removeLicense:
-            return true;
-
-        case ApiCommand::saveMediaServer:
-        case ApiCommand::saveStorage:
-        case ApiCommand::saveStorages:
-        case ApiCommand::saveServerUserAttributes:
-        case ApiCommand::saveServerUserAttributesList:
-        case ApiCommand::setResourceStatus:
-        case ApiCommand::setResourceParam:
-        case ApiCommand::setResourceParams:
-            //allowing minimum set of transactions required for local server to function properly
-            return tran.deliveryInfo.originatorType == QnTranDeliveryInformation::localServer;
-
-        default:
-            return false;
-    }
-}
-
 bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
     if (updateName == lit(":/updates/07_videowall.sql"))

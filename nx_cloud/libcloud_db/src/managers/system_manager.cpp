@@ -286,7 +286,7 @@ void SystemManager::setSystemUserList(
     std::function<void(api::ResultCode)> completionHandler)
 {
     //request is disabled for now since it is not secure
-    return completionHandler(api::ResultCode::forbidden);
+    //return completionHandler(api::ResultCode::forbidden);
 
     std::string systemId;
     if (!authzInfo.get(attr::authSystemID, &systemId))

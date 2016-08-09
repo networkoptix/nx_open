@@ -557,6 +557,7 @@ int QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMa
     int added = 0;
     for (QnManualCameraInfoMap::const_iterator itr = cameras.constBegin(); itr != cameras.constEnd(); ++itr)
     {
+		bool resourceHasBeenAdded = false;
         for (QnAbstractResourceSearcher* searcher: m_searchersList)
         {
             if (!searcher->isResourceTypeSupported(itr.value().resType->getId()))
@@ -564,9 +565,11 @@ int QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMa
 
             QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(itr.key(), itr.value());
             inserted.value().searcher = searcher;
-            ++added;
-            break;
+			resourceHasBeenAdded = true;
         }
+
+		if (resourceHasBeenAdded)
+			++added;
     }
 
     return added;

@@ -1568,7 +1568,7 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/detachFromSystem", new QnDetachFromSystemRestHandler(), Qn::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloudConnectionManager), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/restoreState", new QnRestoreStateRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(cloudConnectionManager), Qn::GlobalAdminPermission);

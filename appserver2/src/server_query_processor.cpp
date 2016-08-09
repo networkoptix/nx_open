@@ -6,8 +6,8 @@ namespace ec2
 QnMutex detail::ServerQueryProcessor::m_updateDataMutex;
 
 ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
-    const QnUuid& id, 
-    ApiCommand::Value command, 
+    const QnUuid& id,
+    ApiCommand::Value command,
     const AbstractECConnectionPtr& connection,
     std::list<std::function<void()>>* const transactionsToSend)
 {
@@ -22,7 +22,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
 
     return ErrorCode::ok;
 }
-        
+
 ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     const QnTransaction<ApiIdData>& tran,
     const AbstractECConnectionPtr& connection,
@@ -34,7 +34,6 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     ErrorCode errorCode = processMultiUpdateSync(
         ApiCommand::removeResourceParam,
         tran.isLocal,
-        tran.deliveryInfo,
         resourceParams,
         transactionsToSend);
 

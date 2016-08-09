@@ -40,42 +40,6 @@ namespace
 
 }
 
-struct ConfigureSystemData: public PasswordData
-{
-    ConfigureSystemData():
-        PasswordData(),
-        wholeSystem(false),
-        sysIdTime(0),
-        tranLogTime(0),
-        port(0)
-    {
-    }
-
-    ConfigureSystemData(const QnRequestParams& params):
-        PasswordData(params),
-        systemName(params.value(lit("systemName"))),
-        wholeSystem(params.value(lit("wholeSystem"), lit("false")) != lit("false")),
-        sysIdTime(params.value(lit("sysIdTime")).toLongLong()),
-        tranLogTime(params.value(lit("tranLogTime")).toLongLong()),
-        port(params.value(lit("port")).toInt())
-    {
-    }
-
-    QString systemName;
-    bool wholeSystem;
-    qint64 sysIdTime;
-    qint64 tranLogTime;
-    int port;
-};
-
-#define ConfigureSystemData_Fields PasswordData_Fields (systemName)(wholeSystem)(sysIdTime)(tranLogTime)(port)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ConfigureSystemData),
-    (json),
-    _Fields,
-    (optional, true));
-
 int QnConfigureRestHandler::executeGet(
     const QString &path,
     const QnRequestParams &params,
@@ -126,12 +90,7 @@ int QnConfigureRestHandler::execute(
             return CODE_OK;
         }
 
-        if (!changeSystemName(
-            data.systemName,
-            data.sysIdTime,
-            data.tranLogTime,
-            !data.wholeSystem,
-            Qn::UserAccessData(owner->authUserId())))
+        if (!changeSystemName(data))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             return CODE_OK;
@@ -163,7 +122,7 @@ int QnConfigureRestHandler::execute(
     /* set password */
     if (data.hasPassword())
     {
-        if (!updateAdminUser(data, QnOptionalBool(), owner->authUserId()))
+        if (!updateUserCredentials(data, QnOptionalBool(), qnResPool->getAdministrator()))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
         }

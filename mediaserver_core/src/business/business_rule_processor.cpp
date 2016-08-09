@@ -34,12 +34,15 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDeliveryFail, this, &QnBusinessRuleProcessor::at_actionDeliveryFailed);
 
     connect(qnResPool, &QnResourcePool::resourceAdded,
-        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, true ); });
+        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, true ); },
+		Qt::QueuedConnection);
     connect(qnResPool, &QnResourcePool::resourceRemoved,
-        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, false ); });
+        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, false ); },
+		Qt::QueuedConnection);
 
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionReceived,
-        this, static_cast<void (QnBusinessRuleProcessor::*)(const QnAbstractBusinessActionPtr&)>(&QnBusinessRuleProcessor::executeAction));
+        this, static_cast<void (QnBusinessRuleProcessor::*)(const QnAbstractBusinessActionPtr&)>(&QnBusinessRuleProcessor::executeAction),
+		Qt::QueuedConnection);
 
     connect(QnCommonMessageProcessor::instance(),       &QnCommonMessageProcessor::businessRuleChanged,
             this, &QnBusinessRuleProcessor::at_businessRuleChanged);
@@ -48,7 +51,7 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(QnCommonMessageProcessor::instance(),       &QnCommonMessageProcessor::businessRuleReset,
             this, &QnBusinessRuleProcessor::at_businessRuleReset);
 
-    connect(&m_timer, &QTimer::timeout, this, &QnBusinessRuleProcessor::at_timer);
+    connect(&m_timer, &QTimer::timeout, this, &QnBusinessRuleProcessor::at_timer, Qt::QueuedConnection);
     m_timer.start(1000);
     start();
 }

@@ -11,6 +11,7 @@
 #include "rest/server/rest_connection_processor.h"
 #include <api/resource_property_adaptor.h>
 #include <rest/helpers/permissions_helper.h>
+#include <core/resource_management/resource_pool.h>
 
 namespace
 {
@@ -82,8 +83,12 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
         return nx_http::StatusCode::ok;
     }
 
+    ConfigureSystemData configSystemData;
+    configSystemData.systemName = data.systemName;
+    configSystemData.wholeSystem = false;
+
     const auto systemNameBak = qnCommon->localSystemName();
-    if (!changeSystemName(data.systemName, 0, 0, true, Qn::UserAccessData(userId)))
+    if (!changeSystemName(configSystemData))
     {
         result.setError(QnRestResult::CantProcessRequest, lit("Internal server error. Can't change system name."));
         return nx_http::StatusCode::ok;
@@ -91,10 +96,12 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
 
     qnGlobalSettings->resetCloudParams();
     qnGlobalSettings->setNewSystem(false);
+
+    configSystemData.systemName = systemNameBak;
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         //changing system name back
-        changeSystemName(systemNameBak, 0, 0, true, Qn::UserAccessData(userId));
+        changeSystemName(configSystemData);
         result.setError(
             QnJsonRestResult::CantProcessRequest,
             lit("Internal server error."));
@@ -105,17 +112,16 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
     if (data.systemName.isEmpty())
     {
         //changing system name back
-        changeSystemName(systemNameBak, 0, 0, true, Qn::UserAccessData(userId));
+        changeSystemName(configSystemData);
         result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'systemName' must be provided."));
         return nx_http::StatusCode::ok;
     }
 
-    QString errString;
-    if (!updateAdminUser(data, QnOptionalBool(true), userId, &errString))
+    if (!updateUserCredentials(data, QnOptionalBool(true), qnResPool->getAdministrator(), &errStr))
     {
         //changing system name back
-        changeSystemName(systemNameBak, 0, 0, true, Qn::UserAccessData(userId));
-        result.setError(QnJsonRestResult::CantProcessRequest, errString);
+        changeSystemName(configSystemData);
+        result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx_http::StatusCode::ok;
     }
 

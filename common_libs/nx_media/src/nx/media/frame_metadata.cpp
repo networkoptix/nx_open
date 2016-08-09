@@ -11,16 +11,15 @@ static const int kNotInitialized = -1; //< Metadata is not initialized.
 
 } // namespace
 
-FrameMetadata::FrameMetadata()
-:
+FrameMetadata::FrameMetadata():
     flags(QnAbstractMediaData::MediaFlags_None),
     noDelay(false),
-    frameNum(kNotInitialized)
+    frameNum(kNotInitialized),
+    sar(1.0)
 {
 }
 
-FrameMetadata::FrameMetadata(const QnConstCompressedVideoDataPtr& frame)
-:
+FrameMetadata::FrameMetadata(const QnConstCompressedVideoDataPtr& frame):
     FrameMetadata()
 {
     flags = frame->flags;

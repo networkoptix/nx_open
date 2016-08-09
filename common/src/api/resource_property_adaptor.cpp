@@ -15,7 +15,8 @@ QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(
     m_key(key),
     m_defaultValue(defaultValue),
     m_handler(handler),
-    m_pendingSave(0)
+    m_pendingSave(0),
+    m_value(defaultValue)
 {
     connect(this, &QnAbstractResourcePropertyAdaptor::saveRequestQueued, this, &QnAbstractResourcePropertyAdaptor::processSaveRequests, Qt::QueuedConnection);
 }
