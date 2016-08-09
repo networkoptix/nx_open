@@ -104,7 +104,10 @@ void QnUnlinkFromCloudDialog::accept()
             if (d->unlinkedSuccessfully)
                 base_type::accept();
             else if (!d->validateAuth())
-                d->showFailure(tr("Invalid user credentials."));
+            {
+                button(QDialogButtonBox::Ok)->setFocus(Qt::OtherFocusReason);
+                return;
+            }
             else
                 d->unbindSystem();
             break;
@@ -269,26 +272,7 @@ void QnUnlinkFromCloudDialogPrivate::setupUi()
 bool QnUnlinkFromCloudDialogPrivate::validateAuth()
 {
     NX_ASSERT(authorizePasswordField);
-    auto user = context()->user();
-    NX_ASSERT(user);
-    switch (scenario)
-    {
-        case Scenario::LocalOwner:
-        {
-            NX_ASSERT(user->isLocal());
-            return user->checkLocalUserPassword(authorizePasswordField->text());
-        }
-        case Scenario::CloudOwner:
-        case Scenario::CloudOwnerOnly:
-        {
-            NX_ASSERT(user->isCloud());
-            return true; //TODO: #GDM #high validate cloud password
-        }
-        default:
-            break;
-    }
-    NX_ASSERT(false, "Should never get here");
-    return false;
+    return authorizePasswordField->validate();
 }
 
 QString QnUnlinkFromCloudDialogPrivate::allUsersDisabledMessage() const
@@ -309,11 +293,9 @@ QString QnUnlinkFromCloudDialogPrivate::disconnectWarnMessage() const
 void QnUnlinkFromCloudDialogPrivate::setupResetPasswordPage()
 {
     NX_ASSERT(scenario == Scenario::CloudOwnerOnly);
+    nextButton->setFocus(Qt::OtherFocusReason);
     if (!validateAuth())
-    {
-        showFailure(tr("Invalid user credentials."));
         return;
-    }
 
     Q_Q(QnUnlinkFromCloudDialog);
 
@@ -380,6 +362,33 @@ void QnUnlinkFromCloudDialogPrivate::createAuthorizeWidget()
     authorizePasswordField = new QnInputField();
     authorizePasswordField->setTitle(tr("Password"));
     authorizePasswordField->setEchoMode(QLineEdit::Password);
+    authorizePasswordField->setValidator(
+        [this](const QString& password)
+        {
+            auto user = context()->user();
+            NX_ASSERT(user);
+            switch (scenario)
+            {
+                case Scenario::LocalOwner:
+                {
+                    NX_ASSERT(user->isLocal());
+                    return user->checkLocalUserPassword(password)
+                        ? Qn::kValidResult
+                        : Qn::ValidationResult(tr("Wrong Password"));
+                }
+                case Scenario::CloudOwner:
+                case Scenario::CloudOwnerOnly:
+                {
+                    NX_ASSERT(user->isCloud());
+                    return Qn::kValidResult; //TODO: #GDM #high validate cloud password
+                }
+                default:
+                    break;
+            }
+            NX_ASSERT(false, "Should never get here");
+            return Qn::ValidationResult(tr("Internal Error"));
+        });
+
     layout->addWidget(authorizePasswordField);
 
     QnAligner* aligner = new QnAligner(authorizeWidget);
