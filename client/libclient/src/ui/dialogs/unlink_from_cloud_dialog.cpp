@@ -387,7 +387,7 @@ void QnUnlinkFromCloudDialogPrivate::createAuthorizeWidget()
 
                     //temporary hack solution --gdm
                     return password == actualPassword
-                        ? Qn::kValidResult //TODO: #GDM #high validate cloud password
+                        ? Qn::kValidResult
                         : Qn::ValidationResult(tr("Wrong Password"));
                 }
                 default:
