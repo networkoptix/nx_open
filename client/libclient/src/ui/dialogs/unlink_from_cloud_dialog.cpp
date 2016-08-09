@@ -153,13 +153,17 @@ void QnUnlinkFromCloudDialogPrivate::unbindSystem()
 {
     Q_Q(QnUnlinkFromCloudDialog);
 
-    auto handleReply = [this, q](bool success, rest::Handle handleId, const QnRestResult& reply)
+    auto guard = QPointer<QnUnlinkFromCloudDialog>(q);
+    auto handleReply = [this, guard](bool success, rest::Handle handleId, const QnRestResult& reply)
     {
+        if (!guard)
+            return;
+
         Q_UNUSED(handleId);
         if (success && reply.error == QnRestResult::NoError)
         {
             unlinkedSuccessfully = true;
-            q->accept();
+            guard->accept();
         }
         else
         {
@@ -175,7 +179,12 @@ void QnUnlinkFromCloudDialogPrivate::unbindSystem()
         return;
 
     lockUi(true);
-    serverConnection->resetCloudSystemCredentials(handleReply, q->thread());
+
+    QString updatedPassword = scenario == Scenario::CloudOwnerOnly
+        ? resetPasswordField->text()
+        : QString();
+
+    serverConnection->detachSystemFromCloud(updatedPassword, handleReply, q->thread());
 }
 
 void QnUnlinkFromCloudDialogPrivate::showFailure(const QString &message)
@@ -326,6 +335,19 @@ void QnUnlinkFromCloudDialogPrivate::setupResetPasswordPage()
 
 void QnUnlinkFromCloudDialogPrivate::setupConfirmationPage()
 {
+    nextButton->setFocus(Qt::OtherFocusReason);
+    if (!resetPasswordField->isValid())
+    {
+        resetPasswordField->validate();
+        return;
+    }
+
+    if (!confirmPasswordField->isValid())
+    {
+        confirmPasswordField->validate();
+        return;
+    }
+
     NX_ASSERT(scenario == Scenario::CloudOwnerOnly);
     Q_Q(QnUnlinkFromCloudDialog);
 

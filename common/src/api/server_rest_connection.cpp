@@ -88,10 +88,19 @@ Handle ServerConnection::sendStatisticsAsync(const QnSendStatisticsRequestData &
 }
 
 Handle ServerConnection::detachSystemFromCloud(
+    const QString& resetAdminPassword,
     Result<QnRestResult>::type callback,
     QThread* targetThread)
 {
     PasswordData data;
+    if (!resetAdminPassword.isEmpty())
+    {
+        auto admin = qnResPool->getAdministrator();
+        NX_ASSERT(admin);
+        if (!admin)
+            return Handle();
+        data = PasswordData::calculateHashes(admin->getName(), resetAdminPassword);
+    }
 
     return executePost(
         lit("/api/detachFromCloud"),

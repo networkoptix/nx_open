@@ -7,6 +7,13 @@ DetachFromCloudData::DetachFromCloudData():
 {
 }
 
+
+DetachFromCloudData::DetachFromCloudData(const PasswordData& source):
+    PasswordData(source)
+{
+}
+
+
 DetachFromCloudData::DetachFromCloudData(const QnRequestParams& params):
     PasswordData(params)
 {

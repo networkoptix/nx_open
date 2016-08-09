@@ -7,6 +7,7 @@
 struct DetachFromCloudData: public PasswordData
 {
     DetachFromCloudData();
+    DetachFromCloudData(const PasswordData& source);
     DetachFromCloudData(const QnRequestParams& params);
 };
 
