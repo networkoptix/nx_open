@@ -56,9 +56,9 @@ namespace rest
             , QThread *targetThread = nullptr);
 
         /**
-        * Reset the cloud credentials.
+        * Detach the system from cloud. Admin password will be changed to provided (if provided).
         */
-        Handle resetCloudSystemCredentials(Result<QnRestResult>::type callback, QThread *targetThread = nullptr);
+        Handle detachSystemFromCloud(Result<QnRestResult>::type callback, QThread *targetThread = nullptr);
 
         /**
          * Save the credentials returned by cloud to the database.

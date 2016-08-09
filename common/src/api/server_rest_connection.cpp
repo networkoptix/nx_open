@@ -1,6 +1,7 @@
 #include <atomic>
 #include "server_rest_connection.h"
 
+#include <api/model/password_data.h>
 #include <api/model/cloud_credentials_data.h>
 #include <api/app_server_connection.h>
 #include <api/helpers/empty_request_data.h>
@@ -86,15 +87,14 @@ Handle ServerConnection::sendStatisticsAsync(const QnSendStatisticsRequestData &
         , kJsonContentType, data, callback, targetThread);
 }
 
-Handle ServerConnection::resetCloudSystemCredentials(
+Handle ServerConnection::detachSystemFromCloud(
     Result<QnRestResult>::type callback,
     QThread* targetThread)
 {
-    CloudCredentialsData data;
-    data.reset = true;
+    PasswordData data;
 
     return executePost(
-        lit("/api/saveCloudSystemCredentials"),
+        lit("/api/detachFromCloud"),
         QnRequestParamList(),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         QJson::serialized(std::move(data)),

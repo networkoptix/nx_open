@@ -13,32 +13,11 @@
 #include <rest/helpers/permissions_helper.h>
 #include "save_cloud_system_credentials.h"
 #include <api/model/cloud_credentials_data.h>
+#include <api/model/detach_from_cloud_data.h>
 
 namespace {
     static const QString kDefaultAdminPassword = "admin";
 }
-
-struct DetachFromCloudData: public PasswordData
-{
-    DetachFromCloudData():
-        PasswordData()
-    {
-    }
-
-    DetachFromCloudData(const QnRequestParams& params):
-        PasswordData(params)
-    {
-    }
-
-    bool newSystem;
-};
-
-#define DetachFromCloudData_Fields PasswordData_Fields
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (DetachFromCloudData),
-    (json),
-    _Fields)
 
 QnDetachFromCloudRestHandler::QnDetachFromCloudRestHandler(
     const CloudConnectionManager& cloudConnectionManager)
