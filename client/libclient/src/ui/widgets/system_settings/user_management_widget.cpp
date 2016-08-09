@@ -58,8 +58,7 @@ public:
         if (!QnUserListModel::isInteractiveColumn(index.column()) &&
             index.sibling(index.row(), QnUserListModel::EnabledColumn).data(Qt::CheckStateRole).toInt() != Qt::Checked)
         {
-            static const qreal kDisabledUsersOpacity = 0.3;
-            painter->setOpacity(kDisabledUsersOpacity);
+            painter->setOpacity(painter->opacity() * style::Metrics::kDisabledItemOpacity);
         }
 
         /* Determine if link should be drawn: */
