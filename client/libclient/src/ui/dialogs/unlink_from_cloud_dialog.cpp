@@ -24,7 +24,13 @@
 #include <utils/common/delayed.h>
 
 namespace {
+
+/** Setup width manually to correctly handle word-wrapped labels. */
 const int kDialogWidth = 400;
+
+const int kWidgetSpacing = 8;
+const QMargins kWidgetMargins(8, 8, 8, 8);
+
 }
 
 class QnUnlinkFromCloudDialogPrivate : public QObject, public QnWorkbenchContextAware
@@ -53,12 +59,19 @@ public:
 private:
     Scenario calculateScenario() const;
     QWidget* createAuthorizeWidget() const;
+    QWidget* createResetPasswordWidget() const;
 
     QString allUsersDisabledMessage() const;
     QString enterPasswordMessage() const;
     QString disconnectWarnMessage() const;
+
+    void setupResetPasswordPage();
+    void setupConfirmationPage();
 public:
     const Scenario scenario;
+    QWidget* authorizeWidget;
+    QWidget* resetPasswordWidget;
+    QPushButton* nextButton;
     bool unlinkedSuccessfully;
 };
 
@@ -105,6 +118,9 @@ QnUnlinkFromCloudDialogPrivate::QnUnlinkFromCloudDialogPrivate(QnUnlinkFromCloud
     QnWorkbenchContextAware(parent),
     q_ptr(parent),
     scenario(calculateScenario()),
+    authorizeWidget(createAuthorizeWidget()),
+    resetPasswordWidget(createResetPasswordWidget()),
+    nextButton(nullptr),
     unlinkedSuccessfully(false)
 {
 
@@ -123,9 +139,12 @@ void QnUnlinkFromCloudDialogPrivate::lockUi(bool lock)
 
 void QnUnlinkFromCloudDialogPrivate::unbindSystem()
 {
+    Q_Q(QnUnlinkFromCloudDialog);
+    q->accept();
+    return;
+
     lockUi(true);
 
-    Q_Q(QnUnlinkFromCloudDialog);
     auto handleReply = [this, q](bool success, rest::Handle handleId, const QnRestResult& reply)
     {
         Q_UNUSED(handleId);
@@ -173,6 +192,7 @@ void QnUnlinkFromCloudDialogPrivate::setupUi()
 {
     Q_Q(QnUnlinkFromCloudDialog);
     q->setWindowTitle(tr("Disconnect from %1").arg(QnAppInfo::cloudName()));
+    q->setMinimumWidth(kDialogWidth);
     q->setMaximumWidth(kDialogWidth);
 
     switch (scenario)
@@ -182,9 +202,10 @@ void QnUnlinkFromCloudDialogPrivate::setupUi()
             q->setIcon(QnMessageBox::Question);
             q->setText(tr("Disconnect system from %1").arg(QnAppInfo::cloudName()));
             q->setInformativeText(allUsersDisabledMessage()
-                + L'\n' + L'\n'
-                + enterPasswordMessage());
-            q->addCustomWidget(createAuthorizeWidget(), QnMessageBox::Layout::Main);
+                + L'\n'
+                + enterPasswordMessage(),
+                false);
+            q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main);
             q->setDefaultButton(QDialogButtonBox::Ok);
             break;
         }
@@ -193,16 +214,27 @@ void QnUnlinkFromCloudDialogPrivate::setupUi()
             q->setIcon(QnMessageBox::Question);
             q->setText(tr("Disconnect system from %1").arg(QnAppInfo::cloudName()));
             q->setInformativeText(allUsersDisabledMessage()
-                + L'\n' + L'\n'
+                + L'\n'
                 + disconnectWarnMessage()
-                + L'\n' + L'\n'
+                + L'\n'
                 + enterPasswordMessage());
-            q->addCustomWidget(createAuthorizeWidget(), QnMessageBox::Layout::Main);
+            q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main);
             q->setDefaultButton(QDialogButtonBox::Ok);
             break;
         }
         case Scenario::CloudOwnerOnly:
         {
+            q->setText(enterPasswordMessage());
+            q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main);
+            q->setStandardButtons(QDialogButtonBox::NoButton);
+            auto cancelButton = q->addButton(QDialogButtonBox::tr("Cancel"), QDialogButtonBox::HelpRole);
+            QObject::connect(cancelButton, &QPushButton::clicked, q, &QnMessageBox::reject);
+            if (!nextButton)
+                nextButton = q->addButton(tr("Next"), QDialogButtonBox::ActionRole);
+            disconnect(nextButton, nullptr, this, nullptr);
+            connect(nextButton, &QPushButton::clicked, this,
+                &QnUnlinkFromCloudDialogPrivate::setupResetPasswordPage);
+            q->setDefaultButton(nextButton);
             break;
         }
         default:
@@ -231,10 +263,51 @@ QString QnUnlinkFromCloudDialogPrivate::disconnectWarnMessage() const
     return tr("You will be disconnected from this system and able to login again through local network with local account");
 }
 
+void QnUnlinkFromCloudDialogPrivate::setupResetPasswordPage()
+{
+    NX_ASSERT(scenario == Scenario::CloudOwnerOnly);
+    Q_Q(QnUnlinkFromCloudDialog);
+
+    q->setText(tr("Reset admin password"));
+    q->setInformativeText(
+        tr("You wont be able to connect to this system with your cloud account after you disconnect this system from %1.")
+            .arg(QnAppInfo::cloudName())
+        + L'\n'
+        + tr("Enter new password for the local administrator.")
+    );
+
+    authorizeWidget->hide(); /*< we are still parent of this widget to make sure it won't leak */
+    q->removeCustomWidget(authorizeWidget);
+    q->addCustomWidget(resetPasswordWidget, QnMessageBox::Layout::Main);
+    disconnect(nextButton, nullptr, this, nullptr);
+    connect(nextButton, &QPushButton::clicked, this,
+        &QnUnlinkFromCloudDialogPrivate::setupConfirmationPage);
+}
+
+void QnUnlinkFromCloudDialogPrivate::setupConfirmationPage()
+{
+    NX_ASSERT(scenario == Scenario::CloudOwnerOnly);
+    Q_Q(QnUnlinkFromCloudDialog);
+
+    q->setIcon(QnMessageBox::Question);
+    q->setText(tr("Disconnect system from %1").arg(QnAppInfo::cloudName()));
+    q->setInformativeText(allUsersDisabledMessage()
+        + L'\n'
+        + disconnectWarnMessage());
+    q->removeCustomWidget(resetPasswordWidget);
+    resetPasswordWidget->hide(); /*< we are still parent of this widget to make sure it won't leak */
+    delete nextButton;
+    nextButton = nullptr;
+    q->setStandardButtons(QDialogButtonBox::Ok);
+    q->setDefaultButton(QDialogButtonBox::Ok);
+}
+
 QWidget* QnUnlinkFromCloudDialogPrivate::createAuthorizeWidget() const
 {
-    QWidget* authorizeWidget = new QWidget();
-    auto* layout = new QVBoxLayout(authorizeWidget);
+    QWidget* result = new QWidget();
+    auto* layout = new QVBoxLayout(result);
+    layout->setSpacing(kWidgetSpacing);
+    layout->setContentsMargins(kWidgetMargins);
 
     auto loginField = new QnInputField();
     loginField->setReadOnly(true);
@@ -247,12 +320,37 @@ QWidget* QnUnlinkFromCloudDialogPrivate::createAuthorizeWidget() const
     passwordField->setEchoMode(QLineEdit::Password);
     layout->addWidget(passwordField);
 
-    QnAligner* aligner = new QnAligner(authorizeWidget);
+    QnAligner* aligner = new QnAligner(result);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
     aligner->addWidget(loginField);
     aligner->addWidget(passwordField);
 
-    return authorizeWidget;
+    return result;
+}
+
+QWidget* QnUnlinkFromCloudDialogPrivate::createResetPasswordWidget() const
+{
+    QWidget* result = new QWidget();
+    auto* layout = new QVBoxLayout(result);
+    layout->setSpacing(kWidgetSpacing);
+    layout->setContentsMargins(kWidgetMargins);
+
+    auto passwordField = new QnInputField();
+    passwordField->setTitle(tr("Password"));
+    passwordField->setEchoMode(QLineEdit::Password);
+    layout->addWidget(passwordField);
+
+    auto confirmPasswordField = new QnInputField();
+    confirmPasswordField->setTitle(tr("Confirm Password"));
+    confirmPasswordField->setEchoMode(QLineEdit::Password);
+    layout->addWidget(confirmPasswordField);
+
+    QnAligner* aligner = new QnAligner(result);
+    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->addWidget(passwordField);
+    aligner->addWidget(confirmPasswordField);
+
+    return result;
 }
 
 QnUnlinkFromCloudDialogPrivate::Scenario QnUnlinkFromCloudDialogPrivate::calculateScenario() const

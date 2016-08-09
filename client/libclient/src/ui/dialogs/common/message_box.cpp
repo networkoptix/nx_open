@@ -22,6 +22,8 @@ public:
     QList<QAbstractButton *> customButtons;
     QAbstractButton *defaultButton;
     QAbstractButton *escapeButton;
+    QList<QLabel*> informativeLabels;
+    QList<QWidget*> customWidgets;
     QnMessageBox::Icon icon;
 
     QnMessageBoxPrivate(QnMessageBox *parent);
@@ -53,8 +55,8 @@ void QnMessageBoxPrivate::init()
     );
 
     q->ui->checkBox->hide();
-    q->ui->informativeLabel->hide();
     q->ui->secondaryLine->hide();
+    q->ui->iconLabel->hide();
 
     QFont font = q->ui->mainLabel->font();
     font.setPixelSize(font.pixelSize() + 2);
@@ -344,7 +346,7 @@ void QnMessageBox::setDefaultButton(QAbstractButton *button)
     button->setFocus();
 
     Q_D(QnMessageBox);
-
+    d->defaultButton = button;
     d->stylizeButtons();
 }
 
@@ -448,17 +450,43 @@ void QnMessageBox::setTextFormat(Qt::TextFormat format)
 
 QString QnMessageBox::informativeText() const
 {
-    return ui->informativeLabel->text();
+    Q_D(const QnMessageBox);
+    QStringList lines;
+    for (QLabel* label: d->informativeLabels)
+        lines << label->text();
+
+    return lines.join(L'\n');
 }
 
-void QnMessageBox::setInformativeText(const QString &text)
+void QnMessageBox::setInformativeText(const QString &text, bool split)
 {
-    ui->informativeLabel->setText(text);
-    ui->informativeLabel->setVisible(!text.isEmpty());
+    Q_D(QnMessageBox);
+    QStringList lines = split
+        ? text.split(L'\n', QString::SkipEmptyParts)
+        : QStringList() << text;
+
+    for (QLabel* label: d->informativeLabels)
+        delete label;
+    d->informativeLabels.clear();
+
+    int index = ui->verticalLayout->indexOf(ui->mainLabel) + 1;
+    for (const QString& line: lines)
+    {
+        QLabel* label = new QLabel(this);
+        label->setWordWrap(true);
+        label->setText(line);
+        ui->verticalLayout->insertWidget(index, label);
+        d->informativeLabels.append(label);
+        ++index;
+    }
 }
 
 void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch, Qt::Alignment alignment)
 {
+    Q_D(QnMessageBox);
+    NX_ASSERT(!d->customWidgets.contains(widget));
+    d->customWidgets << widget;
+
     widget->setParent(this);
 
     switch (layout)
@@ -482,6 +510,23 @@ void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch, 
         default:
             break;
     }
+}
+
+void QnMessageBox::removeCustomWidget(QWidget* widget)
+{
+    Q_D(QnMessageBox);
+    NX_ASSERT(d->customWidgets.contains(widget));
+    d->customWidgets.removeOne(widget);
+
+    bool showSecondaryLine = std::any_of(
+        d->customWidgets.cbegin(), d->customWidgets.cend(),
+        [this](QWidget* w)
+        {
+            return ui->mainLayout->indexOf(w) >= 0;
+        });
+    ui->secondaryLine->setVisible(showSecondaryLine);
+    ui->mainLayout->removeWidget(widget);
+    ui->verticalLayout->removeWidget(widget);
 }
 
 QString QnMessageBox::checkBoxText() const
@@ -705,8 +750,9 @@ void QnMessageBox::keyPressEvent(QKeyEvent *event)
         textToCopy += windowTitle() + separator; // title
         textToCopy += ui->mainLabel->text() + separator; // text
 
-        if (!ui->informativeLabel->text().isEmpty())
-            textToCopy += ui->informativeLabel->text() + separator;
+        auto info = informativeText();
+        if (!info.isEmpty())
+            textToCopy += info + separator;
 
         QString buttonTexts;
         QList<QAbstractButton *> buttons = ui->buttonBox->buttons();

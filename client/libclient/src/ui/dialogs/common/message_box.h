@@ -82,10 +82,13 @@ public:
     void setTextFormat(Qt::TextFormat format);
 
     QString informativeText() const;
-    void setInformativeText(const QString &text);
+
+    /** Informative text, that will be split by \n to several paragraphs */
+    void setInformativeText(const QString &text, bool split = true);
 
     /** Delegate widget with custom details. QnMessageBox will take ownership. */
     void addCustomWidget(QWidget* widget, Layout layout = Layout::Content, int stretch = 0, Qt::Alignment alignment = Qt::Alignment());
+    void removeCustomWidget(QWidget* widget);
 
     QString checkBoxText() const;
     void setCheckBoxText(const QString &text);
