@@ -30,7 +30,7 @@ DialogBase
         contentWidth: width
         contentHeight: column.height
 
-        topMargin: 16
+        topMargin: 16 + getStatusBarHeight()
         bottomMargin: 16
         contentY: 0
 
