@@ -48,8 +48,8 @@ Q_DECLARE_METATYPE(QnPtzPresetRecordHash)
 // -------------------------------------------------------------------------- //
 QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzPresetRecordHash>()),
-    m_virtResource(resource().dynamicCast<QnVirtualCameraResource>())
+    m_virtResource(resource().dynamicCast<QnVirtualCameraResource>()),
+    m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzPresetRecordHash>())
 {
     NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 }
