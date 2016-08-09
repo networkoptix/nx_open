@@ -44,41 +44,6 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     NX_LOGX(lm("%1 cloud credentials").arg(data.reset ? "Resetting" : "Saving"),
         cl_logDEBUG1);
 
-    if (data.reset)
-    {
-        api::ResultCode cdbResultCode = api::ResultCode::ok;
-        auto systemId = qnGlobalSettings->cloudSystemID();
-        auto authKey = qnGlobalSettings->cloudAuthKey();
-        auto cloudConnection = m_cloudConnectionManager.getCloudConnection(systemId, authKey);
-        std::tie(cdbResultCode) = makeSyncCall<api::ResultCode>(
-            std::bind(
-                &nx::cdb::api::SystemManager::unbindSystem,
-                cloudConnection->systemManager(),
-                systemId.toStdString(),
-                std::placeholders::_1));
-
-        if (cdbResultCode != api::ResultCode::ok)
-        {
-            NX_LOGX(lm("Received error response from cloud: %1").arg(api::toString(cdbResultCode)), cl_logWARNING);
-            result.setError(
-                QnJsonRestResult::CantProcessRequest,
-                tr("Could not connect to cloud: %1").
-                arg(QString::fromStdString(nx::cdb::api::toString(cdbResultCode))));
-            return nx_http::StatusCode::ok;
-        }
-
-        qnGlobalSettings->resetCloudParams();
-        if (!qnGlobalSettings->synchronizeNowSync())
-        {
-            NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
-            result.setError(
-                QnJsonRestResult::CantProcessRequest,
-                lit("Failed to save cloud credentials to local DB"));
-            return nx_http::StatusCode::internalServerError;
-        }
-        return nx_http::StatusCode::ok;
-    }
-
     if (data.cloudSystemID.isEmpty())
     {
         NX_LOGX(lit("Missing required parameter CloudSystemID"), cl_logDEBUG1);
