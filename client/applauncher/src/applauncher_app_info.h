@@ -10,7 +10,7 @@ struct QnApplauncherAppInfo
     static QString installationRoot();
 
 #if defined(Q_OS_MACX)
-    static QString produictName();
+    static QString productName();
 #endif
 
 };
