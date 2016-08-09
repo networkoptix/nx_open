@@ -143,7 +143,7 @@ bool QnLayoutsHandlerMessages::stopSharingLayouts(QWidget* parent,
         QnMessageBox::Warning,
         Qn::Empty_Help,
         tr("Stop Sharing Layout..."),
-        tr("If stop layout sharing some cameras will become unaccessible"),
+        tr("If sharing layout is stopped some cameras will become inaccessible"),
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
         parent);
     messageBox.setDefaultButton(QDialogButtonBox::Cancel);
