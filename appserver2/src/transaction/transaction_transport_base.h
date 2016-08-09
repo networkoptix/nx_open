@@ -115,56 +115,6 @@ public:
     std::chrono::milliseconds connectionKeepAliveTimeout() const;
     int keepAliveProbeCount() const;
 
-signals:
-    void gotTransaction(
-        Qn::SerializationFormat tranFormat,
-        const QByteArray &data,
-        const QnTransactionTransportHeader &transportHeader);
-    void stateChanged(State state);
-    void remotePeerUnauthorized(const QnUuid& id);
-    void peerIdDiscovered(const QUrl& url, const QnUuid& id);
-
-private:
-    template<class T>
-    void sendTransactionImpl(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header)
-    {
-        QnTransactionTransportHeader header(_header);
-        NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
-        header.fillSequence();
-#ifdef _DEBUG
-
-        for (const QnUuid& peer: header.dstPeers) {
-            NX_ASSERT(!peer.isNull());
-            //NX_ASSERT(peer != qnCommon->moduleGUID());
-        }
-#endif
-        NX_ASSERT(!transaction.isLocal() || m_remotePeer.isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
-        NX_LOG( QnLog::EC2_TRAN_LOG, lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1 );
-
-        if (m_remotePeer.peerType == Qn::PT_MobileClient && skipTransactionForMobileClient(transaction.command))
-            return;
-
-        switch (m_remotePeer.dataFormat) {
-        case Qn::JsonFormat:
-            if( m_remotePeer.peerType == Qn::PT_MobileClient )
-                addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction, header) + QByteArray("\r\n"));
-            else
-                addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-            break;
-        //case Qn::BnsFormat:
-        //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-        //    break;
-        case Qn::UbjsonFormat:
-            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-            break;
-        default:
-            qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
-            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-            break;
-        }
-    }
-
-public:
     template<class T>
     void sendTransaction(const QnTransaction<T>& transaction, const QnTransactionTransportHeader& header)
     {
@@ -293,7 +243,57 @@ public:
 protected:
     virtual void fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey) = 0;
 
+signals:
+    void gotTransaction(
+        Qn::SerializationFormat tranFormat,
+        const QByteArray &data,
+        const QnTransactionTransportHeader &transportHeader);
+    void stateChanged(State state);
+    void remotePeerUnauthorized(const QnUuid& id);
+    void peerIdDiscovered(const QUrl& url, const QnUuid& id);
+
 private:
+    template<class T>
+    void sendTransactionImpl(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header)
+    {
+        QnTransactionTransportHeader header(_header);
+        NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
+        header.fillSequence();
+#ifdef _DEBUG
+
+        for (const QnUuid& peer : header.dstPeers)
+        {
+            NX_ASSERT(!peer.isNull());
+            //NX_ASSERT(peer != qnCommon->moduleGUID());
+        }
+#endif
+        NX_ASSERT(!transaction.isLocal() || m_remotePeer.isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1);
+
+        if (m_remotePeer.peerType == Qn::PT_MobileClient && skipTransactionForMobileClient(transaction.command))
+            return;
+
+        switch (m_remotePeer.dataFormat)
+        {
+            case Qn::JsonFormat:
+                if (m_remotePeer.peerType == Qn::PT_MobileClient)
+                    addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction, header) + QByteArray("\r\n"));
+                else
+                    addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+                break;
+                //case Qn::BnsFormat:
+                //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+                //    break;
+            case Qn::UbjsonFormat:
+                addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+                break;
+            default:
+                qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
+                addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+                break;
+        }
+    }
+
     struct DataToSend
     {
         QByteArray sourceData;

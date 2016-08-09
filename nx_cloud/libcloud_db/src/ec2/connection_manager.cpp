@@ -11,10 +11,8 @@
 #include <http/custom_headers.h>
 
 #include "access_control/authorization_manager.h"
-#include "http_handlers.h"
 #include "stree/cdb_ns.h"
 #include "transaction_transport.h"
-#include <cloud_db_client/src/cdb_request_path.h>
 
 
 
@@ -52,6 +50,7 @@ void ConnectionManager::createTransactionConnection(
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
         return completionHandler(nx_http::StatusCode::badRequest, nullptr);
+    const auto connectionId = connectionIdIter->second;
 
     QUrlQuery query = QUrlQuery(request.requestLine.url.query());
     const bool isClient = query.hasQueryItem("isClient");
@@ -85,7 +84,7 @@ void ConnectionManager::createTransactionConnection(
     ::ec2::ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
 
     auto newTransport = std::make_unique<TransactionTransport>(
-        connectionIdIter->second,
+        connectionId,
         remotePeer,
         QSharedPointer<AbstractCommunicatingSocket>(connection->takeSocket().release()),
         request,
@@ -94,20 +93,36 @@ void ConnectionManager::createTransactionConnection(
     //TODO #ak take socket after sending response message
 
     QnMutexLocker lk(&m_mutex);
-    const auto connectionInsertResult = m_connections.emplace(
-        std::make_pair(QString::fromStdString(systemId), remoteGuid),
-        nullptr);
-    if (!connectionInsertResult.second)
+
+    ConnectionContext context{
+        std::move(newTransport),
+        connectionId,
+        std::make_pair(nx::String(systemId.c_str()), remoteGuid.toByteArray()) };
+
+    auto& connectionBySystemIdAndPeerIdIndex =
+        m_connections.get<kConnectionBySystemIdAndPeerIdIndex>();
+    auto existingConnectionIter = 
+        connectionBySystemIdAndPeerIdIndex.find(context.systemIdAndPeerId);
+    if (existingConnectionIter != connectionBySystemIdAndPeerIdIndex.end())
     {
-        TransactionTransport* connectionPtr = connectionInsertResult.first->second.get();
+        //removing existing connection
+        std::unique_ptr<TransactionTransport> existingConnection;
+        connectionBySystemIdAndPeerIdIndex.modify(
+            existingConnectionIter,
+            [&existingConnection](ConnectionContext& data)
+            {
+                existingConnection = std::move(data.connection);
+            });
+        TransactionTransport* connectionPtr = existingConnection.get();
         m_connectionsToRemove.emplace(
             connectionPtr,
-            std::move(connectionInsertResult.first->second));
-        connectionInsertResult.first->second->post(
+            std::move(existingConnection));
+        connectionPtr->post(
             std::bind(&ConnectionManager::removeConnection, this, connectionPtr));
+        connectionBySystemIdAndPeerIdIndex.erase(existingConnectionIter);
     }
-    connectionInsertResult.first->second = std::move(newTransport);
-    lk.unlock();
+
+    m_connections.insert(std::move(context));
 }
 
 void ConnectionManager::pushTransaction(
@@ -120,7 +135,12 @@ void ConnectionManager::pushTransaction(
         std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)
     > completionHandler)
 {
-    //TODO #ak
+    auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
+    if (connectionIdIter == request.headers.end())
+        return completionHandler(nx_http::StatusCode::badRequest, nullptr);
+
+    QnMutexLocker lk(&m_mutex);
+    //TODO reporting received transaction(s) to the corresponding connection 
 }
 
 void ConnectionManager::removeConnection(TransactionTransport* transport)

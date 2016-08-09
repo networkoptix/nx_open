@@ -9,6 +9,11 @@
 #include <map>
 #include <memory>
 
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/identity.hpp>
+#include <boost/multi_index/member.hpp>
+
 #include <cdb/result_code.h>
 #include <nx/network/http/abstract_msg_body_source.h>
 #include <nx/utils/move_only_func.h>
@@ -41,10 +46,6 @@ public:
     ConnectionManager(const conf::Settings& settings);
     virtual ~ConnectionManager();
 
-    void registerHttpHandlers(
-        const AuthorizationManager& authorizationManager,
-        nx_http::MessageDispatcher* const httpMessageDispatcher);
-
     /** mediaserver calls this method to open 2-way transaction exchange channel */
     void createTransactionConnection(
         nx_http::HttpServerConnection* const connection,
@@ -67,9 +68,35 @@ public:
         > completionHandler);
 
 private:
+    struct ConnectionContext
+    {
+        std::unique_ptr<TransactionTransport> connection;
+        nx::String connectionId;
+        //TODO #ak get rid of pair and find out how build multipart inde correctly
+        std::pair<nx::String, nx::String> systemIdAndPeerId;
+    };
+
+    typedef boost::multi_index::multi_index_container<
+        ConnectionContext,
+        boost::multi_index::indexed_by<
+            //indexing by connectionId
+            boost::multi_index::ordered_unique<boost::multi_index::member<
+                ConnectionContext,
+                nx::String,
+                &ConnectionContext::connectionId>>,
+            //indexing by (systemId, peerId)
+            boost::multi_index::ordered_unique<boost::multi_index::member<
+                ConnectionContext,
+                std::pair<nx::String, nx::String>,
+                &ConnectionContext::systemIdAndPeerId>>
+        >
+    > ConnectionDict;
+
+    constexpr static const int kConnectionByIdIndex = 0;
+    constexpr static const int kConnectionBySystemIdAndPeerIdIndex = 1;
+
     const conf::Settings& m_settings;
-    // map<pair<systemid, peer id>, connection>
-    std::map<std::pair<QString, QnUuid>, std::unique_ptr<TransactionTransport>> m_connections;
+    ConnectionDict m_connections;
     std::map<TransactionTransport*, std::unique_ptr<TransactionTransport>> m_connectionsToRemove;
     QnMutex m_mutex;
 
