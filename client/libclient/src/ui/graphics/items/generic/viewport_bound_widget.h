@@ -10,8 +10,8 @@ class Instrument;
 /**
  * Graphics widget with a coordinate system that has the same scale as the
  * viewport, regardless of its size.
- * 
- * Items added to this widget will not be scaled when viewport's transformation 
+ *
+ * Items added to this widget will not be scaled when viewport's transformation
  * changes.
  */
 class QnViewportBoundWidget: public GraphicsWidget {
@@ -24,12 +24,12 @@ public:
     virtual ~QnViewportBoundWidget();
 
     /**
-     * \returns                         Fixed size of this graphics widget, in parent coordinates. 
+     * \returns                         Fixed size of this graphics widget, in parent coordinates.
      */
     const QSizeF &fixedSize();
 
     /**
-     * \param desiredSize               Fixed size of this graphics widget, in parent coordinates. 
+     * \param desiredSize               Fixed size of this graphics widget, in parent coordinates.
      */
     void setFixedSize(const QSizeF &fixedSize);
 
@@ -46,6 +46,7 @@ public slots:
 
 private:
     QSizeF m_fixedSize;
+
     bool m_inUpdateScale;
     QPointer<QGraphicsView> m_lastView;
     QPointer<Instrument> m_instrument;

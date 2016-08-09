@@ -23,7 +23,7 @@ class VariantAnimator;
 class HoverFocusProcessor;
 
 class QnVideowallScreenWidget;
-class QnStatusOverlayWidget;
+class QnStatusOverlayController;
 class QnImageButtonWidget;
 class QnViewportBoundWidget;
 
@@ -73,11 +73,10 @@ private:
     void updateLayout();
     void updateView();
     void updateInfo();
-    void updateStatusOverlay(Qn::ResourceStatusOverlay overlay);
 
     /** \returns false if item image is still loading */
     bool paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data);
-    
+
 private:
     friend class QnVideowallScreenWidget;
     friend class QnVideowallItemWidgetHoverProgressAccessor;
@@ -114,7 +113,7 @@ private:
     qreal m_hoverProgress;
 
     /** Status overlay. */
-    QnStatusOverlayWidget* m_statusOverlayWidget;
+    QnStatusOverlayController* m_statusOverlayController;
 
     /** Info overlay */
     bool m_infoVisible;

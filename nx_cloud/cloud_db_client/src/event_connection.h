@@ -9,6 +9,7 @@
 
 #include <QtCore/QObject>
 
+#include <nx/network/cloud/cdb_endpoint_fetcher.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/retry_timer.h>
@@ -54,7 +55,8 @@ private:
         failed
     };
 
-    network::cloud::CloudModuleEndPointFetcher* const m_cdbEndPointFetcher;
+    std::unique_ptr<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>
+        m_cdbEndPointFetcher;
     const std::string m_login;
     const std::string m_password;
     nx_http::AsyncHttpClientPtr m_httpClient;

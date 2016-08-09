@@ -30,12 +30,6 @@
 
 namespace {
 
-const int kNoDataFontPixelSize = 24;
-const int kNoDataFontWeight = QFont::Light;
-const int kCameraNameFontPixelSize = 13;
-const int kCameraNameFontWeight = QFont::DemiBold;
-const int kCameraPreviewWidthPixels = 160;
-const int kCameraPreviewHeightPixels = 240;
 const QString kDummyResourceId(lit("dummy_resource"));
 
 } // anonymous namespace
@@ -57,41 +51,11 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     switch (m_filter)
     {
         case QnResourceAccessFilter::LayoutsFilter:
-            ui->descriptionLabel->setText(tr("Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts."));
+            ui->detailsWidget->setDescription(tr("Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts."));
             break;
         default:
             break;
     }
-
-    QFont font;
-    font.setPixelSize(kNoDataFontPixelSize);
-    font.setWeight(kNoDataFontWeight);
-    ui->previewWidget->setFont(font);
-    ui->previewWidget->setThumbnailSize(QSize(kCameraPreviewWidthPixels, 0));
-    /* We cannot pass height to thumbnail manager as it will lose AR. */
-    ui->previewWidget->setMaximumHeight(kCameraPreviewHeightPixels);
-    ui->previewWidget->hide();
-
-    font.setPixelSize(kCameraNameFontPixelSize);
-    font.setWeight(kCameraNameFontWeight);
-    ui->namePlainText->setFont(font);
-    ui->namePlainText->setProperty(style::Properties::kDontPolishFontProperty, true);
-    ui->namePlainText->setFocusPolicy(Qt::NoFocus);
-    ui->namePlainText->viewport()->unsetCursor();
-    ui->namePlainText->document()->setDocumentMargin(0.0);
-    ui->namePlainText->hide();
-
-    /*
-     * We use QPlainTextEdit instead of QLabel because we want the label wrapped at any place, not just word boundary.
-     *  But it doesn't have precise vertical size hint, therefore we have to adjust maximum vertical size.
-     */
-    connect(ui->namePlainText->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, this,
-        [this](const QSizeF& size)
-        {
-            /* QPlainTextDocument measures height in lines, not pixels. */
-            int height = static_cast<int>(this->fontMetrics().height() * size.height());
-            ui->namePlainText->setMaximumHeight(height);
-        });
 
     initControlsModel();
     initResourcesModel();
@@ -472,28 +436,20 @@ void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
 {
     if (!index.isValid())
     {
-        ui->namePlainText->hide();
-        ui->previewWidget->hide();
+        ui->detailsWidget->setName(QString());
+        ui->detailsWidget->setTargetResource(QnUuid());
         return;
     }
 
     QModelIndex baseIndex = index.sibling(index.row(), QnAccessibleResourcesModel::NameColumn);
 
     QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
-    ui->namePlainText->setPlainText(toolTip);
-    ui->namePlainText->show();
+    ui->detailsWidget->setName(toolTip);
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
-    {
-        ui->previewWidget->setTargetResource(camera->getId());
-        ui->previewWidget->show();
-        ui->verticalLayout->activate();
-    }
-    else
-    {
-        ui->previewWidget->hide();
-    }
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    ui->detailsWidget->setTargetResource(camera ? camera->getId() : QnUuid());
+    ui->detailsWidget->layout()->activate();
 }
 
 void QnAccessibleResourcesWidget::at_itemViewKeyPress(QObject* watched, QEvent* event)

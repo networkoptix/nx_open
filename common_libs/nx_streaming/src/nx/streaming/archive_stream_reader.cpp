@@ -1,7 +1,5 @@
 #include "archive_stream_reader.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include <stdint.h>
 
 #include <core/resource/resource.h>
@@ -1332,5 +1330,3 @@ bool QnArchiveStreamReader::isRealTimeSource() const
 {
     return m_delegate && m_delegate->isRealTimeSource() && (m_requiredJumpTime == (qint64)AV_NOPTS_VALUE || m_requiredJumpTime == DATETIME_NOW);
 }
-
-#endif // ENABLE_ARCHIVE

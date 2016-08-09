@@ -10,9 +10,8 @@ class QnMediaResourceHelper : public Connective<QObject>
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(Qn::ResourceStatus resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
-    Q_PROPERTY(qreal aspectRatio READ aspectRatio NOTIFY aspectRatioChanged)
-    Q_PROPERTY(qreal rotatedAspectRatio READ rotatedAspectRatio NOTIFY rotatedAspectRatioChanged)
-    Q_PROPERTY(int rotation READ rotation NOTIFY rotationChanged)
+    Q_PROPERTY(qreal customAspectRatio READ customAspectRatio NOTIFY customAspectRatioChanged)
+    Q_PROPERTY(int customRotation READ customRotation NOTIFY customRotationChanged)
 
     Q_ENUMS(Qn::ResourceStatus)
 
@@ -27,18 +26,15 @@ public:
 
     Qn::ResourceStatus resourceStatus() const;
     QString resourceName() const;
-    qreal aspectRatio() const;
-    qreal sensorAspectRatio() const;
-    qreal rotatedAspectRatio() const;
-    int rotation() const;
+    qreal customAspectRatio() const;
+    int customRotation() const;
 
 signals:
     void resourceIdChanged();
     void resourceStatusChanged();
     void resourceNameChanged();
-    void aspectRatioChanged();
-    void rotatedAspectRatioChanged();
-    void rotationChanged();
+    void customAspectRatioChanged();
+    void customRotationChanged();
 
 private:
     QScopedPointer<QnMediaResourceHelperPrivate> d_ptr;

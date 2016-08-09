@@ -45,9 +45,7 @@ QnCachingCameraDataLoader::~QnCachingCameraDataLoader() {
 
 bool QnCachingCameraDataLoader::supportedResource(const QnMediaResourcePtr &resource) {
     bool result = !resource.dynamicCast<QnVirtualCameraResource>().isNull();
-#ifdef ENABLE_ARCHIVE
     result |= !resource.dynamicCast<QnAviResource>().isNull();
-#endif
     return result;
 }
 
@@ -60,9 +58,7 @@ void QnCachingCameraDataLoader::init() {
 
 void QnCachingCameraDataLoader::initLoaders() {
     QnVirtualCameraResourcePtr camera = m_resource.dynamicCast<QnVirtualCameraResource>();
-#ifdef ENABLE_ARCHIVE
     QnAviResourcePtr aviFile = m_resource.dynamicCast<QnAviResource>();
-#endif
 
     for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
         Qn::TimePeriodContent dataType = static_cast<Qn::TimePeriodContent>(i);
@@ -70,10 +66,8 @@ void QnCachingCameraDataLoader::initLoaders() {
 
         if (camera)
             loader = new QnFlatCameraDataLoader(camera, dataType);
-#ifdef ENABLE_ARCHIVE
         else if (aviFile)
             loader = new QnLayoutFileCameraDataLoader(aviFile, dataType);
-#endif
 
         m_loaders[i].reset(loader);
 

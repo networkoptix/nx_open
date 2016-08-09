@@ -191,9 +191,10 @@ private slots:
     void at_histogramButton_toggled(bool checked);
     void at_ioModuleButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
-    void at_statusOverlayWidget_diagnosticsRequested();
-    void at_statusOverlayWidget_ioEnableRequested();
-    void at_statusOverlayWidget_moreLicensesRequested();
+    void processSettingsRequest();
+    void processDiagnosticsRequest();
+    void processIoEnableRequest();
+    void processMoreLicensesRequest();
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
@@ -212,7 +213,7 @@ private:
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
     Q_SLOT void updateIoModuleVisibility(bool animate);
-    Q_SLOT void updateOverlayButton();
+    Q_SLOT void updateOverlayButton(Qn::ResourceStatusOverlay statusOverlay);
 
     void updateCompositeOverlayMode();
 
@@ -288,6 +289,7 @@ private:
     qint64 m_posUtcMs;
 
     QVector<QColor> m_motionSensitivityColors;
+    const QColor m_backgroundColor;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

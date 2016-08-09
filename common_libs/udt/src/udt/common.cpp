@@ -85,8 +85,8 @@ written by
     {
         timespec timeout;
         #ifdef __APPLE__
-            timeout.tv_sec = (timeoutMks / 1000);
-            timeout.tv_nsec = (timeoutMks % 1000) * 1000000;
+            timeout.tv_sec = (timeoutMks / 1000000);
+            timeout.tv_nsec = (timeoutMks % 1000000) * 1000;
 
             return pthread_cond_timedwait_relative_np(condition, mutex, &timeout);
         #else
@@ -196,8 +196,8 @@ void CTimer::rdtsc(uint64_t &x)
       x = hval;
       x = (x << 32) | lval;
    #elif defined(_WIN32)
-      //HANDLE hCurThread = ::GetCurrentThread(); 
-      //DWORD_PTR dwOldMask = ::SetThreadAffinityMask(hCurThread, 1); 
+      //HANDLE hCurThread = ::GetCurrentThread();
+      //DWORD_PTR dwOldMask = ::SetThreadAffinityMask(hCurThread, 1);
       BOOL ret = QueryPerformanceCounter((LARGE_INTEGER *)&x);
       //SetThreadAffinityMask(hCurThread, dwOldMask);
       if (!ret)
@@ -332,7 +332,7 @@ uint64_t CTimer::getTime()
       return (uint64_t)t.tv_sec * (uint64_t)1000000 + (uint64_t)(t.tv_nsec / 1000);
    #else
       LARGE_INTEGER ccf;
-      HANDLE hCurThread = ::GetCurrentThread(); 
+      HANDLE hCurThread = ::GetCurrentThread();
       //DWORD_PTR dwOldMask = 0;
       //if (m_winVersion.dwMajorVersion < 6)
       //  dwOldMask = ::SetThreadAffinityMask(hCurThread, 1);
@@ -592,7 +592,7 @@ const char* CUDTException::getErrorMessage()
 
       case 5:
         m_strMsg = "Operation not supported";
- 
+
         switch (m_iMinor)
         {
         case 1:

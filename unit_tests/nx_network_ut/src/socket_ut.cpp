@@ -112,7 +112,7 @@ TEST( Socket, AsyncOperationCancellation )
     static const std::chrono::milliseconds TEST_DURATION(
         300 * nx::utils::TestOptions::timeoutMultiplier());
 
-    static const int TEST_RUNS = 5;
+    static const int kTestRuns = 5;
     static const int THREADS = 3;
 
     std::vector<nx::utils::thread> threads(THREADS);
@@ -120,7 +120,7 @@ TEST( Socket, AsyncOperationCancellation )
     {
         threads[i] = nx::utils::thread(
             [](){
-                for (int j = 0; j < TEST_RUNS; ++j)
+                for (int j = 0; j < kTestRuns; ++j)
                 {
                     static const int MAX_SIMULTANEOUS_CONNECTIONS = 25;
                     static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1 * 1024;
@@ -162,9 +162,9 @@ TEST( Socket, AsyncOperationCancellation )
 
 TEST( Socket, ServerSocketSyncCancellation )
 {
-    static const int TEST_RUNS = 7;
+    static const int kTestRuns = 7;
 
-    for( int i = 0; i < TEST_RUNS; ++i )
+    for( int i = 0; i < kTestRuns; ++i )
     {
         std::unique_ptr<AbstractStreamServerSocket> serverSocket( SocketFactory::createStreamServerSocket() );
         ASSERT_TRUE( serverSocket->setNonBlockingMode(true) );
@@ -180,9 +180,9 @@ TEST( Socket, ServerSocketSyncCancellation )
 
 TEST( Socket, ServerSocketAsyncCancellation )
 {
-    static const int TEST_RUNS = 7;
+    static const int kTestRuns = 7;
 
-    for( int i = 0; i < TEST_RUNS; ++i )
+    for( int i = 0; i < kTestRuns; ++i )
     {
         std::unique_ptr<AbstractStreamServerSocket> serverSocket( SocketFactory::createStreamServerSocket() );
         ASSERT_TRUE( serverSocket->setNonBlockingMode(true) );
@@ -295,9 +295,9 @@ TEST( Socket, HostNameResolve3 )
 
 TEST( Socket, HostNameResolveCancellation )
 {
-    static const int TEST_RUNS = 100;
+    static const int kTestRuns = 100;
 
-    for( int i = 0; i < TEST_RUNS; ++i )
+    for( int i = 0; i < kTestRuns; ++i )
     {
         std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
         SystemError::ErrorCode connectErrorCode = SystemError::noError;
@@ -323,8 +323,8 @@ TEST( Socket, HostNameResolveCancellation )
 
 TEST( Socket, BadHostNameResolve )
 {
-    static const int TEST_RUNS = 1000;
-    for( int i = 0; i < TEST_RUNS; ++i )
+    static const int kTestRuns = 1000;
+    for( int i = 0; i < kTestRuns; ++i )
     {
         std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
         int iBak = i;
@@ -341,7 +341,9 @@ TEST( Socket, BadHostNameResolve )
 
 TEST(Socket, postCancellation)
 {
-    static const int TEST_RUNS = 10;
+    constexpr static const int kTestRuns = 10;
+    constexpr static const int kTestThreadCount = 10;
+    constexpr static const int kTestSocketCount = 25;
 
     std::atomic<size_t> postCalls(0);
 
@@ -349,11 +351,11 @@ TEST(Socket, postCancellation)
     {
         std::atomic<size_t> counter(0);
 
-        for (int i = 0; i < TEST_RUNS; ++i)
+        for (int i = 0; i < kTestRuns; ++i)
         {
             size_t curCounterVal = ++counter;
 
-            std::vector<std::unique_ptr<AbstractStreamSocket>> sockets(50);
+            std::vector<std::unique_ptr<AbstractStreamSocket>> sockets(kTestSocketCount);
             std::for_each(
                 sockets.begin(),
                 sockets.end(),
@@ -361,11 +363,13 @@ TEST(Socket, postCancellation)
             //std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
 
             for (const auto& sock : sockets)
-                sock->post([curCounterVal, &counter, &postCalls]() {
-                ASSERT_EQ(curCounterVal, (size_t)counter);
-                ++postCalls;
-                QThread::usleep(10);
-            });
+                sock->post(
+                    [curCounterVal, &counter, &postCalls]()
+                    {
+                        ASSERT_EQ(curCounterVal, (size_t)counter);
+                        ++postCalls;
+                        QThread::usleep(10);
+                    });
 
             for (const auto& sock : sockets)
                 sock->pleaseStopSync();
@@ -375,7 +379,7 @@ TEST(Socket, postCancellation)
     };
 
     std::vector<nx::utils::thread> testThreads;
-    for (int i = 0; i < 25; ++i)
+    for (int i = 0; i < kTestThreadCount; ++i)
         testThreads.emplace_back(nx::utils::thread(testFunctor));
 
     for (auto& testThread : testThreads)

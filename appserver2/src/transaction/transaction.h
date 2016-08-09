@@ -1158,27 +1158,6 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
 
     }
 
-
-    /*!Contains information on how transaction has been delivered*/
-    class QnTranDeliveryInformation
-    {
-    public:
-        enum TranOriginatorType
-        {
-            localServer,
-            remoteServer,
-            client
-        };
-
-        TranOriginatorType originatorType;
-
-        QnTranDeliveryInformation()
-        :
-            originatorType( TranOriginatorType::localServer )
-        {
-        }
-    };
-
     class QnAbstractTransaction
     {
     public:
@@ -1208,7 +1187,6 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         ApiCommand::Value command;
         QnUuid peerID;
         PersistentInfo persistentInfo;
-        QnTranDeliveryInformation deliveryInfo;
 
         bool isLocal; /* do not propagate transactions to other server peers*/
 

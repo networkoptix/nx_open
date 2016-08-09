@@ -381,7 +381,6 @@ private:
                     processMultiUpdateSync(
                         ApiCommand::removeResource,
                         tran.isLocal,
-                        tran.deliveryInfo,
                         dbManager(m_userAccessData)
                             .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
                             .toIdList(),
@@ -419,7 +418,6 @@ private:
         ErrorCode errorCode = processMultiUpdateSync(
             ApiCommand::removeBusinessRule,
             tran.isLocal,
-            tran.deliveryInfo,
             dbManager(m_userAccessData).getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
             transactionsToSend);
         if(errorCode != ErrorCode::ok)
@@ -428,7 +426,6 @@ private:
         return processMultiUpdateSync(
             ApiCommand::saveBusinessRule,
             tran.isLocal,
-            tran.deliveryInfo,
             tran.params.defaultRules,
             transactionsToSend);
     }
@@ -515,7 +512,6 @@ private:
     ErrorCode processMultiUpdateSync(
         ApiCommand::Value command,
         bool isLocal,
-        const QnTranDeliveryInformation& tranDeliverInfo,
         const std::vector<SubDataType>& nestedList,
         std::list<std::function<void()>>* const transactionsToSend)
     {
@@ -523,7 +519,6 @@ private:
         {
             QnTransaction<SubDataType> subTran(command, data);
             subTran.isLocal = isLocal;
-            subTran.deliveryInfo = tranDeliverInfo;
             ErrorCode errorCode = processUpdateSync(subTran, transactionsToSend);
             if (errorCode != ErrorCode::ok)
                 return errorCode;
@@ -547,7 +542,7 @@ private:
                 std::list<std::function<void()>>* const transactionsToSend) -> ErrorCode
             {
                 return processMultiUpdateSync(
-                    subCommand, multiTran.isLocal, multiTran.deliveryInfo, multiTran.params,
+                    subCommand, multiTran.isLocal, multiTran.params,
                     transactionsToSend);
             });
     }

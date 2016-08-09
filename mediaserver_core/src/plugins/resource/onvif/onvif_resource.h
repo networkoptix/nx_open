@@ -63,6 +63,18 @@ struct OnvifResExtInfo
     QString mac;
 };
 
+struct QnOnvifServiceUrls
+{
+	QString deviceServiceUrl;
+	QString mediaServiceUrl;
+	QString ptzServiceUrl;
+	QString imagingServiceUrl;
+	QString anlyticsServiceUrl;
+	QString eventsServiceUrl;
+	QString thermalServiceUrl;
+
+};
+
 class QnPlOnvifResource
 :
     public QnPhysicalCameraResource
@@ -534,6 +546,8 @@ private:
     std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;
     QElapsedTimer m_advSettingsLastUpdated;
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
+	mutable QnOnvifServiceUrls m_serviceUrls;
+
 protected:
     QnCameraAdvancedParams m_advancedParameters;
     int m_onvifRecieveTimeout;

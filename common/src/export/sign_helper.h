@@ -1,8 +1,6 @@
 #ifndef __SIGN_FRAME_HELPER__
 #define __SIGN_FRAME_HELPER__
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <QtCore/QByteArray>
 #include <QtCore/QCoreApplication>
 #include <QtGui/QPainter>
@@ -84,7 +82,5 @@ private:
     QString m_licensedToStr;
     AVPacket* m_outPacket;
 };
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __SIGN_FRAME_HELPER__

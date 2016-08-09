@@ -257,14 +257,29 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
 
     if (parser.isSet(liteModeOption) || conf.forceLiteMode)
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
+    if (conf.forceNonLiteMode)
+        qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeDisabled));
 
     if (parser.isSet(urlOption))
+    {
+        NX_LOG(lit("--url: %1").arg(parser.value(urlOption)), cl_logDEBUG1);
         qnSettings->setLastUsedUrl(parser.value(urlOption));
+    }
+    else
+    {
+        NX_LOG(lit("--url not set"), cl_logDEBUG1);
+    }
 
     if (parser.isSet(videowallInstanceGuidOption) && outVideowallInstanceGuid)
     {
+        NX_LOG(lit("--videowall-instance-guid: %1").arg(parser.value(videowallInstanceGuidOption)),
+            cl_logDEBUG1);
         *outVideowallInstanceGuid = QnUuid::fromStringSafe(
             parser.value(videowallInstanceGuidOption));
+    }
+    else
+    {
+        NX_LOG(lit("--videowall-instance-guid not set"), cl_logDEBUG1);
     }
 
     if (parser.isSet(testOption))

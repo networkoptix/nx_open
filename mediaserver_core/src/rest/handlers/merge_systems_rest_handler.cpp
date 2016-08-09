@@ -173,7 +173,8 @@ int QnMergeSystemsRestHandler::executeGet(
                            QnModuleFinder::instance()->isCompatibilityMode();
     bool compatible = remoteModuleInformation.hasCompatibleVersion();
 
-    if ((!ignoreIncompatible && !compatible) || !customizationOK) {
+    if ((!ignoreIncompatible && !compatible) || !customizationOK)
+    {
         NX_LOG(lit("QnMergeSystemsRestHandler. Incompatible systems. Local customization %1, remote customization %2")
             .arg(QnAppInfo::customizationName()).arg(remoteModuleInformation.customization),
             cl_logDEBUG1);
@@ -269,94 +270,51 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     if (!server)
         return false;
 
+    ConfigureSystemData data;
+    data.systemName = qnCommon->localSystemName();
+    data.sysIdTime = qnCommon->systemIdentityTime();
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    data.tranLogTime = ec2Connection->getTransactionLogTime();
+    data.wholeSystem = !oneServer;
+
+    /**
+     * Save current server to the foreign system.
+     * It could be only way to pass authentication if current admin user is disabled
+     */
+    fromResourceToApi(server, data.foreignServer);
+
+    /**
+    * Save current user to the foreign system
+    */
+    fromResourceToApi(admin, data.foreignUser);
+
+    /**
+     * Save current system settings to the foreign system.
+     */
+    const auto& settings = QnGlobalSettings::instance()->allSettings();
+    for (QnAbstractResourcePropertyAdaptor* setting : settings)
+    {
+        ec2::ApiResourceParamData param(setting->key(), setting->serializedValue());
+        data.foreignSettings.push_back(param);
+    }
+
+    QByteArray serializedData = QJson::serialized(data);
+
     nx_http::HttpClient client;
     client.setResponseReadTimeoutMs(requestTimeout);
     client.setSendTimeoutMs(requestTimeout);
     client.setMessageBodyReadTimeoutMs(requestTimeout);
     client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
 
-    /**
-     * Save current server to the foreign system.
-     * It could be only way to pass authentication if current admin user is disabled
-     */
+    QUrl requestUrl(remoteUrl);
+    client.setUserName(admin->getName());
+    client.setUserPassword(remoteAdminPassword);
+    requestUrl.setPath(lit("/api/configure"));
+
+    if (!client.doPost(requestUrl, "application/json", serializedData) ||
+        !isResponseOK(client))
     {
-        QUrl requestUrl(remoteUrl);
-        requestUrl.setUserName(admin->getName());
-        requestUrl.setPassword(remoteAdminPassword);
-        requestUrl.setPath(lit("/ec2/saveMediaServer"));
-
-        ec2::ApiMediaServerData serverData;
-        ec2::fromResourceToApi(server, serverData);
-        const QByteArray serializedServerData = QJson::serialized(serverData);
-        if (!client.doPost(requestUrl, "application/json", serializedServerData) ||
-            !isResponseOK(client))
-        {
-            return false;
-        }
-    }
-
-    /**
-    * Save current system settings to the foreign system.
-    * It could be only way to pass authentication if current admin user is disabled
-    */
-    {
-        QString urlQuery;
-        const auto& settings = QnGlobalSettings::instance()->allSettings();
-        for (QnAbstractResourcePropertyAdaptor* setting: settings)
-            urlQuery += lit("&%1=%2").arg(setting->key()).arg(setting->serializedValue());
-
-        if (!urlQuery.isEmpty())
-        {
-            QUrl requestUrl(remoteUrl);
-            requestUrl.setUserName(admin->getName());
-            requestUrl.setPassword(remoteAdminPassword);
-            requestUrl.setPath(lit("/api/systemSettings"));
-            requestUrl.setQuery(urlQuery);
-
-            if (!client.doGet(requestUrl) || !isResponseOK(client))
-                return false;
-        }
-    }
-
-
-
-    /** saving user data before /api/configure call to prevent race condition,
-     *  when we establish transaction connection to remote server and receive updated
-     *  saveUser transaction before passing admin to /ec2/saveUser call
-     */
-    {
-
-        QUrl requestUrl(remoteUrl);
-        requestUrl.setUserName(admin->getName());
-        requestUrl.setPassword(remoteAdminPassword);
-        requestUrl.setPath(lit("/ec2/saveUser"));
-
-        // Change system name of the selected server
-        ec2::ApiUserData userData;
-        ec2::fromResourceToApi(admin, userData);
-        const QByteArray saveUserData = QJson::serialized(userData);
-        if (!client.doPost(requestUrl, "application/json", saveUserData) || !isResponseOK(client))
-            return false;
-    }
-
-    {
-        QUrl requestUrl(remoteUrl);
-        client.setUserName(server->getId().toString());
-        client.setUserPassword(server->getAuthKey());
-        requestUrl.setPath(lit("/api/configure"));
-
-        const QString systemName = QString::fromUtf8(QUrl::toPercentEncoding(qnCommon->localSystemName()));
-        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-        QString urlQuery = lit("systemName=%1").arg(systemName);
-        urlQuery += lit("&sysIdTime=%1").arg(qnCommon->systemIdentityTime());
-        urlQuery += lit("&tranLogTime=%1").arg(ec2Connection->getTransactionLogTime());
-        urlQuery += lit("&useRemoteAdminSettings");
-        if (!oneServer)
-            urlQuery += lit("&wholeSystem=true");
-        requestUrl.setQuery(urlQuery);
-
-        if (!client.doGet(requestUrl) || !isResponseOK(client))
-            return false;
+        return false;
     }
 
     return true;
@@ -372,15 +330,15 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     qint64 remoteSysTime = 0;
     qint64 remoteTranLogTime = 0;
 
-    nx_http::HttpClient client;
-    client.setResponseReadTimeoutMs(requestTimeout);
-    client.setSendTimeoutMs(requestTimeout);
-    client.setMessageBodyReadTimeoutMs(requestTimeout);
-
-    client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
-
     {
         /* Read admin user from the remote server */
+
+        nx_http::HttpClient client;
+        client.setResponseReadTimeoutMs(requestTimeout);
+        client.setSendTimeoutMs(requestTimeout);
+        client.setMessageBodyReadTimeoutMs(requestTimeout);
+        client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
+
         ec2::ApiUserDataList users;
         {
             QUrl requestUrl(remoteUrl);
@@ -398,7 +356,16 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
             QByteArray usersResponse = client.fetchMessageBodyBuffer();
             QJson::deserialize(usersResponse, &users);
         }
+
         {
+            // ping remote system to take sysid time
+
+            nx_http::HttpClient client;
+            client.setResponseReadTimeoutMs(requestTimeout);
+            client.setSendTimeoutMs(requestTimeout);
+            client.setMessageBodyReadTimeoutMs(requestTimeout);
+            client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
+
             QUrl requestUrl(remoteUrl);
             requestUrl.setUserName(admin->getName());
             requestUrl.setPassword(remoteAdminPassword);
@@ -422,7 +389,15 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
                 remoteTranLogTime = reply.tranLogTime;
             }
         }
+
         {
+            // Backup database
+            nx_http::HttpClient client;
+            client.setResponseReadTimeoutMs(requestTimeout);
+            client.setSendTimeoutMs(requestTimeout);
+            client.setMessageBodyReadTimeoutMs(requestTimeout);
+            client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
+
             QUrl requestUrl(remoteUrl);
             requestUrl.setUserName(admin->getName());
             requestUrl.setPassword(remoteAdminPassword);
@@ -465,7 +440,13 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
     }
 
-    if (!changeSystemName(systemName, remoteSysTime, remoteTranLogTime, false, Qn::UserAccessData(owner->authUserId())))
+    ConfigureSystemData data;
+    data.systemName = systemName;
+    data.sysIdTime = remoteSysTime;
+    data.tranLogTime = remoteTranLogTime;
+    data.wholeSystem = true;
+
+    if (!changeSystemName(data))
     {
         NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to change system name"), cl_logDEBUG1);
         return false;

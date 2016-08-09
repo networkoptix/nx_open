@@ -1,7 +1,5 @@
 #include "filetypesupport.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QFile>
 extern "C"
 {
@@ -61,5 +59,3 @@ bool FileTypeSupport::isFileSupported(const QString &filename)
 {
     return isImageFileExt(filename) || isMovieFileExt(filename) || isLayoutFileExt(filename);
 }
-
-#endif // ENABLE_ARCHIVE
