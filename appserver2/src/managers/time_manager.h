@@ -293,17 +293,17 @@ namespace ec2
         TimeSyncInfo getTimeSyncInfoNonSafe() const;
         void syncTimeWithAllKnownServers(QnMutexLockerBase* const lock);
         void onBeforeSendingTransaction(
-            QnTransactionTransport* transport,
+            QnTransactionTransportBase* transport,
             nx_http::HttpHeaders* const headers);
         void onTransactionReceived(
-            QnTransactionTransport* transport,
+            QnTransactionTransportBase* transport,
             const nx_http::HttpHeaders& headers);
         void forgetSynchronizedTimeNonSafe(QnMutexLockerBase* const lock);
         void checkSystemTimeForChange();
         void handleLocalTimePriorityKeyChange(QnMutexLockerBase* const lk);
 
     private slots:
-        void onNewConnectionEstablished(QnTransactionTransport* transport );
+        void onNewConnectionEstablished(QnTransactionTransportBase* transport );
         void onPeerLost( ApiPeerAliveData data );
         void onDbManagerInitialized();
     };

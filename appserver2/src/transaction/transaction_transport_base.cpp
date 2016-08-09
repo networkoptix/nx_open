@@ -1,10 +1,11 @@
 
-#include "transaction_transport.h"
+#include "transaction_transport_base.h"
 
 #include <atomic>
 
-#include <QtCore/QUrlQuery>
+#include <QtCore/QDateTime>
 #include <QtCore/QTimer>
+#include <QtCore/QUrlQuery>
 
 #include <api/global_settings.h>
 
@@ -20,10 +21,6 @@
 #include <utils/common/util.h>
 #include <utils/common/systemerror.h>
 #include <http/custom_headers.h>
-
-#include "core/resource/media_server_resource.h"
-#include "api/app_server_connection.h"
-#include "database/db_manager.h"
 
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
@@ -81,14 +78,14 @@ static const int SOCKET_TIMEOUT = 1000 * 1000;
 //following value is for VERY slow networks and VERY large transactions (e.g., some large image)
     //Connection keep-alive timeout is not influenced by this value
 static const std::chrono::minutes kSocketSendTimeout(23);
-const char* QnTransactionTransport::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary";
-const char* QnTransactionTransport::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
+const char* QnTransactionTransportBase::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary";
+const char* QnTransactionTransportBase::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
 
-QSet<QnUuid> QnTransactionTransport::m_existConn;
-QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingConn;
-QnMutex QnTransactionTransport::m_staticMutex;
+QSet<QnUuid> QnTransactionTransportBase::m_existConn;
+QnTransactionTransportBase::ConnectingInfoMap QnTransactionTransportBase::m_connectingConn;
+QnMutex QnTransactionTransportBase::m_staticMutex;
 
-void QnTransactionTransport::default_initializer()
+void QnTransactionTransportBase::default_initializer()
 {
     //TODO #ak make a default constructor of it after move to msvc2013
     m_lastConnectTime = 0;
@@ -118,7 +115,7 @@ void QnTransactionTransport::default_initializer()
     m_userAccessData = Qn::kSystemAccess;
 }
 
-QnTransactionTransport::QnTransactionTransport(const QnUuid& connectionGuid,
+QnTransactionTransportBase::QnTransactionTransportBase(const QnUuid& connectionGuid,
     const ApiPeerData& localPeer,
     const ApiPeerData& remotePeer,
     QSharedPointer<AbstractStreamSocket> socket,
@@ -169,7 +166,7 @@ QnTransactionTransport::QnTransactionTransport(const QnUuid& connectionGuid,
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
 
     using namespace std::placeholders;
     if( m_contentEncoding == "gzip" )
@@ -190,7 +187,7 @@ QnTransactionTransport::QnTransactionTransport(const QnUuid& connectionGuid,
 
     extensionHeadersProcessor->setNextFilter( makeCustomOutputStream(
         std::bind(
-            &QnTransactionTransport::receivedTransactionNonSafe,
+            &QnTransactionTransportBase::receivedTransactionNonSafe,
             this,
             std::placeholders::_1 ) ) );
 
@@ -204,10 +201,10 @@ QnTransactionTransport::QnTransactionTransport(const QnUuid& connectionGuid,
     m_dummyReadBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_outgoingDataSocket->readSomeAsync(
         &m_dummyReadBuffer,
-        std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) );
+        std::bind(&QnTransactionTransportBase::monitorConnectionForClosure, this, _1, _2) );
 }
 
-QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
+QnTransactionTransportBase::QnTransactionTransportBase( const ApiPeerData &localPeer )
 {
     //TODO #ak msvc2013 delegate constructor
     default_initializer();
@@ -229,7 +226,7 @@ QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
 
     //creating parser sequence: multipart_parser -> ext_headers_processor -> transaction handler
     m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
@@ -241,7 +238,7 @@ QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
         } );
     extensionHeadersProcessor->setNextFilter( makeCustomOutputStream(
         std::bind(
-            &QnTransactionTransport::receivedTransactionNonSafe,
+            &QnTransactionTransportBase::receivedTransactionNonSafe,
             this,
             std::placeholders::_1 ) ) );
     m_multipartContentParser->setNextFilter( std::move(extensionHeadersProcessor) );
@@ -249,9 +246,9 @@ QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
     m_incomingTransactionStreamParser = m_multipartContentParser;
 }
 
-QnTransactionTransport::~QnTransactionTransport()
+QnTransactionTransportBase::~QnTransactionTransportBase()
 {
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
 
     quint64 sendKeepAliveTaskLocal = 0;
     {
@@ -282,7 +279,7 @@ QnTransactionTransport::~QnTransactionTransport()
             m_cond.wait( lk.mutex() );
     }
     closeSocket();
-    //not calling QnTransactionTransport::close since it will emit stateChanged,
+    //not calling QnTransactionTransportBase::close since it will emit stateChanged,
         //which can potentially lead to some trouble
 
     if (m_connected)
@@ -292,17 +289,17 @@ QnTransactionTransport::~QnTransactionTransport()
         m_ttFinishCallback();
 }
 
-std::chrono::milliseconds QnTransactionTransport::connectionKeepAliveTimeout() const
+std::chrono::milliseconds QnTransactionTransportBase::connectionKeepAliveTimeout() const
 {
     return m_tcpKeepAliveTimeout;
 }
 
-int QnTransactionTransport::keepAliveProbeCount() const
+int QnTransactionTransportBase::keepAliveProbeCount() const
 {
     return m_keepAliveProbeCount;
 }
 
-void QnTransactionTransport::addData(QByteArray data)
+void QnTransactionTransportBase::addData(QByteArray data)
 {
     QnMutexLocker lock( &m_mutex );
     if( m_base64EncodeOutgoingTransactions )
@@ -328,7 +325,7 @@ void QnTransactionTransport::addData(QByteArray data)
         serializeAndSendNextDataBuffer();
 }
 
-void QnTransactionTransport::closeSocket()
+void QnTransactionTransportBase::closeSocket()
 {
     if( m_outgoingDataSocket )
     {
@@ -347,13 +344,13 @@ void QnTransactionTransport::closeSocket()
     m_incomingDataSocket.reset();
 }
 
-void QnTransactionTransport::setState(State state)
+void QnTransactionTransportBase::setState(State state)
 {
     QnMutexLocker lock( &m_mutex );
     setStateNoLock(state);
 }
 
-void QnTransactionTransport::processExtraData()
+void QnTransactionTransportBase::processExtraData()
 {
     QnMutexLocker lock( &m_mutex );
     if( !m_extraData.isEmpty() )
@@ -363,13 +360,13 @@ void QnTransactionTransport::processExtraData()
     }
 }
 
-void QnTransactionTransport::startListening()
+void QnTransactionTransportBase::startListening()
 {
     QnMutexLocker lock( &m_mutex );
     startListeningNonSafe();
 }
 
-void QnTransactionTransport::setStateNoLock(State state)
+void QnTransactionTransportBase::setStateNoLock(State state)
 {
     if (state == Connected)
         m_connected = true;
@@ -390,7 +387,7 @@ void QnTransactionTransport::setStateNoLock(State state)
     m_cond.wakeAll();
 }
 
-QUrl QnTransactionTransport::remoteAddr() const
+QUrl QnTransactionTransportBase::remoteAddr() const
 {
     QnMutexLocker lock(&m_mutex);
     // Emulating deep copy here
@@ -399,7 +396,7 @@ QUrl QnTransactionTransport::remoteAddr() const
     return tmpUrl;
 }
 
-SocketAddress QnTransactionTransport::remoteSocketAddr() const
+SocketAddress QnTransactionTransportBase::remoteSocketAddr() const
 {
     QnMutexLocker lock(&m_mutex);
     SocketAddress addr = SocketAddress(
@@ -410,45 +407,45 @@ SocketAddress QnTransactionTransport::remoteSocketAddr() const
     return addr;
 }
 
-nx_http::AuthInfoCache::AuthorizationCacheItem QnTransactionTransport::authData() const
+nx_http::AuthInfoCache::AuthorizationCacheItem QnTransactionTransportBase::authData() const
 {
     QnMutexLocker lock( &m_mutex );
     return m_httpAuthCacheItem;
 }
 
-QnTransactionTransport::State QnTransactionTransport::getState() const
+QnTransactionTransportBase::State QnTransactionTransportBase::getState() const
 {
     QnMutexLocker lock( &m_mutex );
     return m_state;
 }
 
-bool QnTransactionTransport::isIncoming() const {
+bool QnTransactionTransportBase::isIncoming() const {
     QnMutexLocker lock(&m_mutex);
     return m_peerRole == prAccepting;
 }
 
-int QnTransactionTransport::setHttpChunkExtensonHandler( HttpChunkExtensonHandler eventHandler )
+int QnTransactionTransportBase::setHttpChunkExtensonHandler( HttpChunkExtensonHandler eventHandler )
 {
     QnMutexLocker lk( &m_mutex );
     m_httpChunkExtensonHandlers.emplace( ++m_prevGivenHandlerID, std::move(eventHandler) );
     return m_prevGivenHandlerID;
 }
 
-int QnTransactionTransport::setBeforeSendingChunkHandler( BeforeSendingChunkHandler eventHandler )
+int QnTransactionTransportBase::setBeforeSendingChunkHandler( BeforeSendingChunkHandler eventHandler )
 {
     QnMutexLocker lk( &m_mutex );
     m_beforeSendingChunkHandlers.emplace( ++m_prevGivenHandlerID, std::move(eventHandler) );
     return m_prevGivenHandlerID;
 }
 
-void QnTransactionTransport::removeEventHandler( int eventHandlerID )
+void QnTransactionTransportBase::removeEventHandler( int eventHandlerID )
 {
     QnMutexLocker lk( &m_mutex );
     m_httpChunkExtensonHandlers.erase( eventHandlerID );
     m_beforeSendingChunkHandlers.erase( eventHandlerID );
 }
 
-void QnTransactionTransport::close()
+void QnTransactionTransportBase::close()
 {
     setState(State::Closed);    //changing state before freeing socket so that everyone
                                 //stop using socket before it is actually freed
@@ -462,40 +459,9 @@ void QnTransactionTransport::close()
     }
 }
 
-void QnTransactionTransport::fillAuthInfo( const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey )
+void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
 {
-    if (!QnAppServerConnectionFactory::videowallGuid().isNull()) {
-        httpClient->addAdditionalHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
-        return;
-    }
-
-    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-    if (ownServer && authByKey)
-    {
-        httpClient->setUserName(ownServer->getId().toString().toLower());
-        httpClient->setUserPassword(ownServer->getAuthKey());
-    }
-    else {
-        QUrl url = QnAppServerConnectionFactory::url();
-        httpClient->setUserName(url.userName().toLower());
-        if (detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized())
-        {
-            // try auth by admin user if allowed
-            QnUserResourcePtr adminUser = qnResPool->getAdministrator();
-            if (adminUser) {
-                httpClient->setUserPassword(adminUser->getDigest());
-                httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
-            }
-        }
-        else {
-            httpClient->setUserPassword(url.password());
-        }
-    }
-}
-
-void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
-{
-    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::doOutgoingConnect. remotePeerUrl = %1").
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::doOutgoingConnect. remotePeerUrl = %1").
         arg(remotePeerUrl.toString()), cl_logDEBUG2 );
 
     setState(ConnectingStage1);
@@ -505,11 +471,11 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     m_httpClient->setResponseReadTimeoutMs(m_idleConnectionTimeout.count());
     connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
-        this, &QnTransactionTransport::at_responseReceived,
+        this, &QnTransactionTransportBase::at_responseReceived,
         Qt::DirectConnection);
     connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::done,
-        this, &QnTransactionTransport::at_httpClientDone,
+        this, &QnTransactionTransportBase::at_httpClientDone,
         Qt::DirectConnection);
 
     fillAuthInfo( m_httpClient, m_authByKey );
@@ -580,7 +546,7 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     m_httpClient->doGet(url);
 }
 
-bool QnTransactionTransport::tryAcquireConnecting(const QnUuid& remoteGuid, bool isOriginator)
+bool QnTransactionTransportBase::tryAcquireConnecting(const QnUuid& remoteGuid, bool isOriginator)
 {
     QnMutexLocker lock( &m_staticMutex );
 
@@ -599,13 +565,13 @@ bool QnTransactionTransport::tryAcquireConnecting(const QnUuid& remoteGuid, bool
     return !fail;
 }
 
-void QnTransactionTransport::connectingCanceled(const QnUuid& remoteGuid, bool isOriginator)
+void QnTransactionTransportBase::connectingCanceled(const QnUuid& remoteGuid, bool isOriginator)
 {
     QnMutexLocker lock( &m_staticMutex );
     connectingCanceledNoLock(remoteGuid, isOriginator);
 }
 
-void QnTransactionTransport::connectingCanceledNoLock(const QnUuid& remoteGuid, bool isOriginator)
+void QnTransactionTransportBase::connectingCanceledNoLock(const QnUuid& remoteGuid, bool isOriginator)
 {
     ConnectingInfoMap::iterator itr = m_connectingConn.find(remoteGuid);
     if (itr != m_connectingConn.end()) {
@@ -618,7 +584,7 @@ void QnTransactionTransport::connectingCanceledNoLock(const QnUuid& remoteGuid, 
     }
 }
 
-bool QnTransactionTransport::tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator)
+bool QnTransactionTransportBase::tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator)
 {
     QnMutexLocker lock( &m_staticMutex );
     bool isExist = m_existConn.contains(remoteGuid);
@@ -631,13 +597,13 @@ bool QnTransactionTransport::tryAcquireConnected(const QnUuid& remoteGuid, bool 
     return !fail;
 }
 
-void QnTransactionTransport::connectDone(const QnUuid& id)
+void QnTransactionTransportBase::connectDone(const QnUuid& id)
 {
     QnMutexLocker lock( &m_staticMutex );
     m_existConn.remove(id);
 }
 
-void QnTransactionTransport::repeatDoGet()
+void QnTransactionTransportBase::repeatDoGet()
 {
     m_httpClient->removeAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME );
     m_httpClient->addAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
@@ -647,10 +613,10 @@ void QnTransactionTransport::repeatDoGet()
     m_httpClient->doGet(url);
 }
 
-void QnTransactionTransport::cancelConnecting()
+void QnTransactionTransportBase::cancelConnecting()
 {
     if (getState() == ConnectingStage2)
-        QnTransactionTransport::connectingCanceled(m_remotePeer.id, true);
+        QnTransactionTransportBase::connectingCanceled(m_remotePeer.id, true);
     NX_LOG(QnLog::EC2_TRAN_LOG,
         lit("%1 Connection to peer %2 canceled from state %3").
         arg(Q_FUNC_INFO).arg(m_remotePeer.id.toString()).arg(toString(getState())),
@@ -658,9 +624,9 @@ void QnTransactionTransport::cancelConnecting()
     setState(Error);
 }
 
-void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
+void QnTransactionTransportBase::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
 {
-    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::onSomeBytesRead. errorCode = %1, bytesRead = %2").
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::onSomeBytesRead. errorCode = %1, bytesRead = %2").
         arg((int)errorCode).arg(bytesRead), cl_logDEBUG2 );
 
     QnMutexLocker lock( &m_mutex );
@@ -677,7 +643,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
         return setStateNoLock( State::Error );
     }
 
-    if (m_state >= QnTransactionTransport::Closed)
+    if (m_state >= QnTransactionTransportBase::Closed)
         return;
 
     NX_ASSERT( m_state == ReadyForStreaming );
@@ -699,7 +665,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     scheduleAsyncRead();
 }
 
-void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstRef& tranDataWithHeader )
+void QnTransactionTransportBase::receivedTransactionNonSafe( const QnByteArrayConstRef& tranDataWithHeader )
 {
     if( tranDataWithHeader.isEmpty() )
         return; //it happens in case of keep-alive message
@@ -749,19 +715,19 @@ void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstR
     }
 
     NX_ASSERT( !transportHeader.processedPeers.empty() );
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::receivedTransactionNonSafe. Got transaction with seq %1 from %2").
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::receivedTransactionNonSafe. Got transaction with seq %1 from %2").
         arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
     emit gotTransaction( m_remotePeer.dataFormat, serializedTran, transportHeader);
     ++m_postedTranCount;
 }
 
-bool QnTransactionTransport::hasUnsendData() const
+bool QnTransactionTransportBase::hasUnsendData() const
 {
     QnMutexLocker lock(&m_mutex);
     return !m_dataToSend.empty();
 }
 
-void QnTransactionTransport::receivedTransaction(
+void QnTransactionTransportBase::receivedTransaction(
     const nx_http::HttpHeaders& headers,
     const QnByteArrayConstRef& tranData )
 {
@@ -780,7 +746,7 @@ void QnTransactionTransport::receivedTransaction(
             m_sizedDecoder = std::make_shared<nx_bsf::SizedDataDecodingFilter>();
             m_sizedDecoder->setNextFilter( makeCustomOutputStream(
                 std::bind(
-                    &QnTransactionTransport::receivedTransactionNonSafe,
+                    &QnTransactionTransportBase::receivedTransactionNonSafe,
                     this,
                     std::placeholders::_1 ) ) );
         }
@@ -797,7 +763,7 @@ void QnTransactionTransport::receivedTransaction(
     }
 }
 
-void QnTransactionTransport::transactionProcessed()
+void QnTransactionTransportBase::transactionProcessed()
 {
     QnMutexLocker lock( &m_mutex );
 
@@ -817,12 +783,12 @@ void QnTransactionTransport::transactionProcessed()
     scheduleAsyncRead();
 }
 
-QnUuid QnTransactionTransport::connectionGuid() const
+QnUuid QnTransactionTransportBase::connectionGuid() const
 {
     return m_connectionGuid;
 }
 
-void QnTransactionTransport::setIncomingTransactionChannelSocket(
+void QnTransactionTransportBase::setIncomingTransactionChannelSocket(
     QSharedPointer<AbstractStreamSocket> socket,
     const nx_http::Request& /*request*/,
     const QByteArray& requestBuf )
@@ -845,20 +811,20 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
     startListeningNonSafe();
 }
 
-void QnTransactionTransport::lock()
+void QnTransactionTransportBase::lock()
 {
     QnMutexLocker lk(&m_mutex);
     ++m_waiterCount;
 }
 
-void QnTransactionTransport::unlock()
+void QnTransactionTransportBase::unlock()
 {
     QnMutexLocker lk(&m_mutex);
     --m_waiterCount;
     m_cond.wakeAll();    //signalling that we are not waiting anymore
 }
 
-void QnTransactionTransport::waitForNewTransactionsReady()
+void QnTransactionTransportBase::waitForNewTransactionsReady()
 {
     QnMutexLocker lk( &m_mutex );
 
@@ -873,14 +839,14 @@ void QnTransactionTransport::waitForNewTransactionsReady()
     }
 }
 
-void QnTransactionTransport::connectionFailure()
+void QnTransactionTransportBase::connectionFailure()
 {
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("Connection to peer %1 failure. Disconnecting...").
         arg(m_remotePeer.id.toString()), cl_logWARNING);
     setState( Error );
 }
 
-void QnTransactionTransport::sendHttpKeepAlive( quint64 taskID )
+void QnTransactionTransportBase::sendHttpKeepAlive( quint64 taskID )
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -896,7 +862,7 @@ void QnTransactionTransport::sendHttpKeepAlive( quint64 taskID )
     startSendKeepAliveTimerNonSafe();
 }
 
-void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
+void QnTransactionTransportBase::startSendKeepAliveTimerNonSafe()
 {
     if( !m_remotePeer.isServer() )
         return; //not sending keep-alive to a client
@@ -906,18 +872,18 @@ void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
         NX_ASSERT( m_outgoingDataSocket );
         m_outgoingDataSocket->registerTimer(
             m_tcpKeepAliveTimeout.count(),
-            std::bind(&QnTransactionTransport::sendHttpKeepAlive, this, 0) );
+            std::bind(&QnTransactionTransportBase::sendHttpKeepAlive, this, 0) );
     }
     else
     {
         //we using http client to send transactions
         m_sendKeepAliveTask = nx::utils::TimerManager::instance()->addTimer(
-            std::bind(&QnTransactionTransport::sendHttpKeepAlive, this, std::placeholders::_1),
+            std::bind(&QnTransactionTransportBase::sendHttpKeepAlive, this, std::placeholders::_1),
             m_tcpKeepAliveTimeout);
     }
 }
 
-void QnTransactionTransport::monitorConnectionForClosure(
+void QnTransactionTransportBase::monitorConnectionForClosure(
     SystemError::ErrorCode errorCode,
     size_t bytesRead)
 {
@@ -948,10 +914,10 @@ void QnTransactionTransport::monitorConnectionForClosure(
     m_dummyReadBuffer.resize( 0 );
     m_outgoingDataSocket->readSomeAsync(
         &m_dummyReadBuffer,
-        std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) );
+        std::bind(&QnTransactionTransportBase::monitorConnectionForClosure, this, _1, _2) );
 }
 
-QUrl QnTransactionTransport::generatePostTranUrl()
+QUrl QnTransactionTransportBase::generatePostTranUrl()
 {
     //return m_postTranBaseUrl;
     QUrl postTranUrl = m_postTranBaseUrl;
@@ -959,7 +925,7 @@ QUrl QnTransactionTransport::generatePostTranUrl()
     return postTranUrl;
 }
 
-void QnTransactionTransport::aggregateOutgoingTransactionsNonSafe()
+void QnTransactionTransportBase::aggregateOutgoingTransactionsNonSafe()
 {
     static const int MAX_AGGREGATED_TRAN_SIZE_BYTES = 128*1024;
     //std::deque<DataToSend> m_dataToSend;
@@ -987,14 +953,14 @@ void QnTransactionTransport::aggregateOutgoingTransactionsNonSafe()
     m_dataToSend.erase( std::next(saveToIter), it );
 }
 
-bool QnTransactionTransport::isHttpKeepAliveTimeout() const
+bool QnTransactionTransportBase::isHttpKeepAliveTimeout() const
 {
     QnMutexLocker lock( &m_mutex );
     return (m_lastReceiveTimer.isValid() &&  //if not valid we still have not begun receiving transactions
          (m_lastReceiveTimer.elapsed() > m_idleConnectionTimeout.count()));
 }
 
-void QnTransactionTransport::serializeAndSendNextDataBuffer()
+void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
 {
     NX_ASSERT( !m_dataToSend.empty() );
 
@@ -1079,7 +1045,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
     {
         m_outgoingDataSocket->sendAsync(
             dataCtx.encodedSourceData,
-            std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) );
+            std::bind( &QnTransactionTransportBase::onDataSent, this, _1, _2 ) );
     }
     else  //m_peerRole == prOriginating
     {
@@ -1105,7 +1071,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
                     "true" );
             connect(
                 m_outgoingTranClient.get(), &nx_http::AsyncHttpClient::done,
-                this, &QnTransactionTransport::postTransactionDone,
+                this, &QnTransactionTransportBase::postTransactionDone,
                 Qt::DirectConnection );
             fillAuthInfo( m_outgoingTranClient, true );
 
@@ -1132,7 +1098,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
     }
 }
 
-void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent )
+void QnTransactionTransportBase::onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent )
 {
     QnMutexLocker lk( &m_mutex );
 
@@ -1152,11 +1118,11 @@ void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_
     serializeAndSendNextDataBuffer();
 }
 
-void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientPtr& client)
+void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpClientPtr& client)
 {
     const int statusCode = client->response()->statusLine.statusCode;
 
-    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::at_responseReceived. statusCode = %1").
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::at_responseReceived. statusCode = %1").
         arg(statusCode), cl_logDEBUG2 );
 
     if (statusCode == nx_http::StatusCode::unauthorized)
@@ -1238,7 +1204,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         return;
     }
 
-    if (getState() == QnTransactionTransport::Error || getState() == QnTransactionTransport::Closed) {
+    if (getState() == QnTransactionTransportBase::Error || getState() == QnTransactionTransportBase::Closed) {
         return;
     }
 
@@ -1280,7 +1246,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
 
     if (getState() == ConnectingStage1) {
-        bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);
+        bool lockOK = QnTransactionTransportBase::tryAcquireConnecting(m_remotePeer.id, true);
         if (lockOK) {
             setState(ConnectingStage2);
             NX_ASSERT( data.isEmpty() );
@@ -1336,10 +1302,10 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         }
 
         m_httpClient.reset();
-        if (QnTransactionTransport::tryAcquireConnected(m_remotePeer.id, true)) {
+        if (QnTransactionTransportBase::tryAcquireConnected(m_remotePeer.id, true)) {
             setExtraDataBuffer(data);
             m_peerRole = prOriginating;
-            setState(QnTransactionTransport::Connected);
+            setState(QnTransactionTransportBase::Connected);
         }
         else {
             cancelConnecting();
@@ -1347,9 +1313,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     }
 }
 
-void QnTransactionTransport::at_httpClientDone( const nx_http::AsyncHttpClientPtr& client )
+void QnTransactionTransportBase::at_httpClientDone( const nx_http::AsyncHttpClientPtr& client )
 {
-    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::at_httpClientDone. state = %1").
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
         arg((int)client->state()), cl_logDEBUG2 );
 
     nx_http::AsyncHttpClient::State state = client->state();
@@ -1358,7 +1324,7 @@ void QnTransactionTransport::at_httpClientDone( const nx_http::AsyncHttpClientPt
     }
 }
 
-void QnTransactionTransport::processTransactionData(const QByteArray& data)
+void QnTransactionTransportBase::processTransactionData(const QByteArray& data)
 {
     NX_ASSERT( m_peerRole == prOriginating );
     if( !m_incomingTransactionStreamParser->processData( data ) )
@@ -1369,7 +1335,7 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
     }
 }
 
-bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
+bool QnTransactionTransportBase::isReadyToSend(ApiCommand::Value command) const
 {
     if (m_state == ReadyForStreaming) {
         // allow to send system command immediately, without tranSyncRequest
@@ -1380,7 +1346,7 @@ bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
     }
 }
 
-bool QnTransactionTransport::isReadSync(ApiCommand::Value command) const
+bool QnTransactionTransportBase::isReadSync(ApiCommand::Value command) const
 {
     if (m_state == ReadyForStreaming) {
         // allow to read system command immediately, without tranSyncRequest
@@ -1391,7 +1357,7 @@ bool QnTransactionTransport::isReadSync(ApiCommand::Value command) const
     }
 }
 
-QString QnTransactionTransport::toString( State state )
+QString QnTransactionTransportBase::toString( State state )
 {
     switch( state )
     {
@@ -1416,13 +1382,13 @@ QString QnTransactionTransport::toString( State state )
     }
 }
 
-void QnTransactionTransport::addHttpChunkExtensions( nx_http::HttpHeaders* const headers )
+void QnTransactionTransportBase::addHttpChunkExtensions( nx_http::HttpHeaders* const headers )
 {
     for( auto val: m_beforeSendingChunkHandlers )
         val.second( this, headers );
 }
 
-void QnTransactionTransport::processChunkExtensions( const nx_http::HttpHeaders& headers )
+void QnTransactionTransportBase::processChunkExtensions( const nx_http::HttpHeaders& headers )
 {
     if( headers.empty() )
         return;
@@ -1431,14 +1397,14 @@ void QnTransactionTransport::processChunkExtensions( const nx_http::HttpHeaders&
         val.second( this, headers );
 }
 
-void QnTransactionTransport::setExtraDataBuffer(const QByteArray& data)
+void QnTransactionTransportBase::setExtraDataBuffer(const QByteArray& data)
 {
     QnMutexLocker lk( &m_mutex );
     NX_ASSERT(m_extraData.isEmpty());
     m_extraData = data;
 }
 
-bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran,
+bool QnTransactionTransportBase::sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran,
                                                        const QnTransactionTransportHeader& _header)
 {
     if (srcFormat != m_remotePeer.dataFormat)
@@ -1487,17 +1453,17 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
     return true;
 }
 
-void QnTransactionTransport::setRemoteIdentityTime(qint64 time)
+void QnTransactionTransportBase::setRemoteIdentityTime(qint64 time)
 {
     m_remoteIdentityTime = time;
 }
 
-qint64 QnTransactionTransport::remoteIdentityTime() const
+qint64 QnTransactionTransportBase::remoteIdentityTime() const
 {
     return m_remoteIdentityTime;
 }
 
-bool QnTransactionTransport::skipTransactionForMobileClient(ApiCommand::Value command) {
+bool QnTransactionTransportBase::skipTransactionForMobileClient(ApiCommand::Value command) {
     switch (command) {
     case ApiCommand::getMediaServersEx:
     case ApiCommand::saveCameras:
@@ -1528,7 +1494,7 @@ bool QnTransactionTransport::skipTransactionForMobileClient(ApiCommand::Value co
     return true;
 }
 
-void QnTransactionTransport::scheduleAsyncRead()
+void QnTransactionTransportBase::scheduleAsyncRead()
 {
     if( !m_incomingDataSocket )
         return;
@@ -1536,12 +1502,12 @@ void QnTransactionTransport::scheduleAsyncRead()
     using namespace std::placeholders;
     m_incomingDataSocket->readSomeAsync(
         &m_readBuffer,
-        std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
+        std::bind( &QnTransactionTransportBase::onSomeBytesRead, this, _1, _2 ) );
     m_asyncReadScheduled = true;
     m_lastReceiveTimer.restart();
 }
 
-void QnTransactionTransport::startListeningNonSafe()
+void QnTransactionTransportBase::startListeningNonSafe()
 {
     NX_ASSERT( m_incomingDataSocket || m_outgoingDataSocket );
     m_httpStreamReader.resetState();
@@ -1558,11 +1524,11 @@ void QnTransactionTransport::startListeningNonSafe()
         m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
         m_incomingDataSocket->readSomeAsync(
             &m_readBuffer,
-            std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
+            std::bind( &QnTransactionTransportBase::onSomeBytesRead, this, _1, _2 ) );
     }
 }
 
-void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClientPtr& client )
+void QnTransactionTransportBase::postTransactionDone( const nx_http::AsyncHttpClientPtr& client )
 {
     QnMutexLocker lk( &m_mutex );
 
@@ -1648,7 +1614,7 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
     m_dummyReadBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_outgoingDataSocket->readSomeAsync(
         &m_dummyReadBuffer,
-        std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) );
+        std::bind(&QnTransactionTransportBase::monitorConnectionForClosure, this, _1, _2) );
     //----------------------------------------------------------------------------------------
 #endif //PIPELINE_POST_REQUESTS
 
@@ -1659,7 +1625,7 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
     serializeAndSendNextDataBuffer();
 }
 
-void QnTransactionTransport::setBeforeDestroyCallback(std::function<void ()> ttFinishCallback)
+void QnTransactionTransportBase::setBeforeDestroyCallback(std::function<void ()> ttFinishCallback)
 {
     m_ttFinishCallback = ttFinishCallback;
 }
