@@ -46,6 +46,26 @@ int QnSaveCloudSystemCredentialsHandler::execute(
 
     if (data.reset)
     {
+        api::ResultCode cdbResultCode = api::ResultCode::ok;
+        std::tie(cdbResultCode) = makeSyncCall<api::ResultCode>(
+            [this](std::function<void(api::ResultCode)> callback)
+            {
+                auto systemId = qnGlobalSettings->cloudSystemID();
+                auto authKey = qnGlobalSettings->cloudAuthKey();
+                auto cloudConnection = m_cloudConnectionManager.getCloudConnection(systemId, authKey);
+                cloudConnection->systemManager()->unbindSystem(systemId.toStdString(), callback);
+            });
+
+        if (cdbResultCode != api::ResultCode::ok)
+        {
+            NX_LOGX(lm("Received error response from cloud: %1").arg(api::toString(cdbResultCode)), cl_logWARNING);
+            result.setError(
+                QnJsonRestResult::CantProcessRequest,
+                tr("Could not connect to cloud: %1").
+                arg(QString::fromStdString(nx::cdb::api::toString(cdbResultCode))));
+            return nx_http::StatusCode::ok;
+        }
+
         qnGlobalSettings->resetCloudParams();
         if (!qnGlobalSettings->synchronizeNowSync())
         {

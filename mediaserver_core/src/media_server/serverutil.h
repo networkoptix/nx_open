@@ -4,11 +4,12 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/fusion/fusion/fusion_fwd.h>
+//#include <nx/fusion/fusion/fusion_fwd.h>
 #include <core/resource_management/user_access_data.h>
 #include <utils/common/optional.h>
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_user_data.h>
+#include <api/model/password_data.h>
 
 // TODO: #Elric this belongs together with server_settings
 
@@ -60,27 +61,6 @@ namespace nx
 
 
 void resetTransactionTransportConnections();
-
-
-struct PasswordData
-{
-    PasswordData() {}
-    PasswordData(const QnRequestParams& params);
-
-    bool hasPassword() const;
-
-    QString password;
-    QByteArray realm;
-    QByteArray passwordHash;
-    QByteArray passwordDigest;
-    QByteArray cryptSha512Hash;
-};
-
-#define PasswordData_Fields (password)(realm)(passwordHash)(passwordDigest)(cryptSha512Hash)
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (PasswordData),
-    (json));
 
 bool updateUserCredentials(PasswordData data, QnOptionalBool isEnabled, const QnUserResourcePtr& userRes, QString* errString = nullptr);
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr);

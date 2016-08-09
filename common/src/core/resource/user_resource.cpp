@@ -1,11 +1,8 @@
-
 #include "user_resource.h"
 
-#include <nx/network/http/auth_tools.h>
-#include <nx/utils/random.h>
-#include <utils/common/app_info.h>
+#include <api/model/password_data.h>
+
 #include <utils/common/synctime.h>
-#include <utils/crypt/linux_passwd_crypt.h>
 
 static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
 static const int MSEC_PER_SEC = 1000;
@@ -118,48 +115,33 @@ void QnUserResource::generateHash()
     if (password.isEmpty())
         return;
 
-    QByteArray salt = QByteArray::number(nx::utils::random::number(0), 16);
-    QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(salt);
-    md5.addData(password.toUtf8());
-    QByteArray hash = "md5$";
-    hash.append(salt);
-    hash.append("$");
-    hash.append(md5.result().toHex());
+    auto hashes = PasswordData::calculateHashes(getName(), password);
 
-    QByteArray digest = nx_http::calcHa1(
-        getName().toLower(),
-        QnAppInfo::realm(),
-        password);
-
-    setRealm(QnAppInfo::realm());
-    setHash(hash);
-    setDigest(digest);
-    setCryptSha512Hash(linuxCryptSha512(password.toUtf8(), generateSalt(LINUX_CRYPT_SALT_LENGTH)));
+    setRealm(hashes.realm);
+    setHash(hashes.passwordHash);
+    setDigest(hashes.passwordDigest);
+    setCryptSha512Hash(hashes.cryptSha512Hash);
 }
 
 bool QnUserResource::checkLocalUserPassword(const QString &password)
 {
     QnMutexLocker locker(&m_mutex);
+    auto hashes = PasswordData::calculateHashes(m_name, password);
 
     if (!m_digest.isEmpty())
-    {
-        return nx_http::calcHa1(m_name.toLower(), m_realm, password) == m_digest;
-    }
-    else
-    {
-        //hash is obsolete. Cannot remove it to maintain update from version < 2.3
-        //  hash becomes empty after changing user's realm
-        QList<QByteArray> values = m_hash.split(L'$');
-        if (values.size() != 3)
-            return false;
+        return hashes.passwordDigest == m_digest;
 
-        QByteArray salt = values[1];
-        QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(salt);
-        md5.addData(password.toUtf8());
-        return md5.result().toHex() == values[2];
-    }
+    //hash is obsolete. Cannot remove it to maintain update from version < 2.3
+    //hash becomes empty after changing user's realm
+    QList<QByteArray> values = m_hash.split(L'$');
+    if (values.size() != 3)
+        return false;
+
+    QByteArray salt = values[1];
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(salt);
+    md5.addData(password.toUtf8());
+    return md5.result().toHex() == values[2];
 }
 
 void QnUserResource::setDigest(const QByteArray& digest, bool isValidated)

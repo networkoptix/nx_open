@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MessageBox</class>
- <widget class="QDialog" name="MessageBox">
+ <class>UnlinkFromCloudDialog</class>
+ <widget class="QDialog" name="UnlinkFromCloudDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -81,35 +81,18 @@
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>8</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QLabel" name="informativeLabel">
          <property name="text">
           <string notr="true"/>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
       </layout>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="Line" name="secondaryLine">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -130,15 +113,12 @@
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>checkBox</tabstop>
- </tabstops>
  <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>MessageBox</receiver>
+   <receiver>UnlinkFromCloudDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -154,7 +134,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>MessageBox</receiver>
+   <receiver>UnlinkFromCloudDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
