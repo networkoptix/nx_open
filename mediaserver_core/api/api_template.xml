@@ -1458,6 +1458,25 @@
                     </result>
                 </function>
                 <function>
+                    <name>aggregator</name>
+                    <description>This function allows to execute several requests with json content type and returns result as a single Json object</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>exec_cmd</name>
+                            <description>
+                              HTTP url path to execute. This parameter could be repeated several times to execute several nested methods.
+							                All additions parameters after current 'exec_cmd' and before next 'exec_cmd' are passed as parameters
+							                to the nested method.
+							              </description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Merged JSON data from nested methods.</caption>
+                    </result>
+                </function>
+                <function>
                     <name>systemSettings</name>
                     <description>Get or set global system settings. If called with no arguments, just returns list of all system settings with their values</description>
                     <method>GET</method>
