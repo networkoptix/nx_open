@@ -132,6 +132,7 @@ void QnContext::removeSavedConnection(const QString& systemName)
                           lastConnections.end());
 
     qnClientCoreSettings->setRecentUserConnections(lastConnections);
+    qnClientCoreSettings->save();
 }
 
 void QnContext::setLastUsedConnection(const QString& systemId, const QUrl& url)
