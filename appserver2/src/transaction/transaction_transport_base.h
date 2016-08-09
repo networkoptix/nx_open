@@ -101,7 +101,7 @@ public:
         const QnUuid& connectionGuid,
         const ApiPeerData& localPeer,
         const ApiPeerData& remotePeer,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<AbstractCommunicatingSocket> socket,
         ConnectionType::Type connectionType,
         const nx_http::Request& request,
         const QByteArray& contentEncoding,
@@ -281,7 +281,7 @@ public:
 
     QnUuid connectionGuid() const;
     void setIncomingTransactionChannelSocket(
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<AbstractCommunicatingSocket> socket,
         const nx_http::Request& request,
         const QByteArray& requestBuf );
     //!Transport level logic should use this method to report connection problem
@@ -323,8 +323,8 @@ private:
     bool m_needResync; // sync request should be send int the future as soon as possible
 
     mutable QnMutex m_mutex;
-    QSharedPointer<AbstractStreamSocket> m_incomingDataSocket;
-    QSharedPointer<AbstractStreamSocket> m_outgoingDataSocket;
+    QSharedPointer<AbstractCommunicatingSocket> m_incomingDataSocket;
+    QSharedPointer<AbstractCommunicatingSocket> m_outgoingDataSocket;
     nx_http::AsyncHttpClientPtr m_httpClient;
     State m_state;
     nx::Buffer m_readBuffer;

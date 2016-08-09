@@ -118,7 +118,7 @@ void QnTransactionTransportBase::default_initializer()
 QnTransactionTransportBase::QnTransactionTransportBase(const QnUuid& connectionGuid,
     const ApiPeerData& localPeer,
     const ApiPeerData& remotePeer,
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<AbstractCommunicatingSocket> socket,
     ConnectionType::Type connectionType,
     const nx_http::Request& request,
     const QByteArray& contentEncoding,
@@ -789,7 +789,7 @@ QnUuid QnTransactionTransportBase::connectionGuid() const
 }
 
 void QnTransactionTransportBase::setIncomingTransactionChannelSocket(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<AbstractCommunicatingSocket> socket,
     const nx_http::Request& /*request*/,
     const QByteArray& requestBuf )
 {
@@ -1288,7 +1288,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
                     keepAliveHeader.timeout);
         }
 
-        m_incomingDataSocket = QSharedPointer<AbstractStreamSocket>(m_httpClient->takeSocket().release());
+        m_incomingDataSocket = QSharedPointer<AbstractCommunicatingSocket>(m_httpClient->takeSocket().release());
         if( m_connectionType == ConnectionType::bidirectional )
         {
             m_outgoingDataSocket = m_incomingDataSocket;

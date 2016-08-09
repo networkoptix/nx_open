@@ -65,7 +65,7 @@ protected:
 private:
     struct SendEmailTask
     {
-        ec2::ApiEmailData email;
+        ::ec2::ApiEmailData email;
         std::function<void( bool )> completionHandler;
     };
     

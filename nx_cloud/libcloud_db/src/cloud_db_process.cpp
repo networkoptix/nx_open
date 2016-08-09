@@ -24,6 +24,7 @@
 #include <nx/utils/type_utils.h>
 #include <utils/common/systemerror.h>
 #include <utils/db/db_structure_updater.h>
+#include <utils/common/app_info.h>
 #include <utils/common/guard.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
@@ -32,7 +33,9 @@
 
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
+#include "ec2/connection_manager.h"
 #include "http_handlers/ping.h"
+#include "libcloud_db_app_info.h"
 #include "managers/account_manager.h"
 #include "managers/auth_provider.h"
 #include "managers/email_manager.h"
@@ -41,13 +44,10 @@
 #include "managers/temporary_account_password_manager.h"
 #include "stree/stree_manager.h"
 
-#include <libcloud_db_app_info.h>
-#include <utils/common/app_info.h>
-
 
 static int registerQtResources()
 {
-    Q_INIT_RESOURCE( libcloud_db );
+    Q_INIT_RESOURCE(libcloud_db);
     return 0;
 }
 
@@ -56,8 +56,8 @@ namespace cdb {
 
 static const int DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC = 5;
 
-CloudDBProcess::CloudDBProcess( int argc, char **argv )
-:
+CloudDBProcess::CloudDBProcess(int argc, char **argv)
+    :
 #ifdef USE_QAPPLICATION
     QtService<QtSingleCoreApplication>(argc, argv, QnLibCloudDbAppInfo::applicationName()),
 #endif
@@ -187,6 +187,8 @@ int CloudDBProcess::exec()
         EventManager eventManager(settings);
         m_eventManager = &eventManager;
 
+        ec2::ConnectionManager ec2ConnectionManager(settings);
+
         SystemManager systemManager(
             settings,
             &timerManager,
@@ -230,7 +232,8 @@ int CloudDBProcess::exec()
             &accountManager,
             &systemManager,
             &authProvider,
-            &eventManager);
+            &eventManager,
+            &ec2ConnectionManager);
         //TODO #ak remove eventManager.registerHttpHandlers and register in registerApiHandlers
         eventManager.registerHttpHandlers(
             authorizationManager,
@@ -242,13 +245,13 @@ int CloudDBProcess::exec()
             false,  //TODO #ak enable ssl when it works properly
             SocketFactory::NatTraversalType::nttDisabled );
 
-        if( !multiAddressHttpServer.bind(httpAddrToListenList) )
+        if (!multiAddressHttpServer.bind(httpAddrToListenList))
             return 3;
 
         // process privilege reduction
-        CurrentProcess::changeUser( settings.changeUser() );
+        CurrentProcess::changeUser(settings.changeUser());
 
-        if( !multiAddressHttpServer.listen() )
+        if (!multiAddressHttpServer.listen())
             return 5;
         m_httpEndpoints = multiAddressHttpServer.endpoints();
 
@@ -278,9 +281,9 @@ int CloudDBProcess::exec()
         return 0;
 #endif
     }
-    catch( const std::exception& e )
+    catch (const std::exception& e)
     {
-        NX_LOG( lit("Failed to start application. %1").arg(e.what()), cl_logALWAYS );
+        NX_LOG(lit("Failed to start application. %1").arg(e.what()), cl_logALWAYS);
         return 3;
     }
 }
@@ -290,9 +293,9 @@ void CloudDBProcess::start()
 {
     QtSingleCoreApplication* application = this->application();
 
-    if( application->isRunning() )
+    if (application->isRunning())
     {
-        NX_LOG( "Server already started", cl_logERROR );
+        NX_LOG("Server already started", cl_logERROR);
         application->quit();
         return;
     }
@@ -318,17 +321,17 @@ bool CloudDBProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
 }
 #endif
 
-void CloudDBProcess::initializeLogging( const conf::Settings& settings )
+void CloudDBProcess::initializeLogging(const conf::Settings& settings)
 {
     //logging
-    if( settings.logging().logLevel != QString::fromLatin1("none") )
+    if (settings.logging().logLevel != QString::fromLatin1("none"))
     {
         const QString& logDir = settings.logging().logDir;
 
         QDir().mkpath(logDir);
         const QString& logFileName = logDir + lit("/log_file");
-        if( cl_log.create(logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1) )
-            QnLog::initLog( settings.logging().logLevel );
+        if (cl_log.create(logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1))
+            QnLog::initLog(settings.logging().logLevel);
         else
             std::wcerr << L"Failed to create log file " << logFileName.toStdWString() << std::endl;
         NX_LOG(lit("================================================================================="), cl_logALWAYS);
@@ -344,7 +347,8 @@ void CloudDBProcess::registerApiHandlers(
     AccountManager* const accountManager,
     SystemManager* const systemManager,
     AuthenticationProvider* const authProvider,
-    EventManager* const /*eventManager*/)
+    EventManager* const /*eventManager*/,
+    ec2::ConnectionManager* const ec2ConnectionManager)
 {
     msgDispatcher->registerRequestProcessor<PingHandler>(
         PingHandler::kHandlerPath,
@@ -440,6 +444,17 @@ void CloudDBProcess::registerApiHandlers(
         kAuthGetAuthenticationPath,
         &AuthenticationProvider::getAuthenticationResponse, authProvider,
         EntityType::account, DataActionType::fetch);
+
+    //transaction connection
+    registerHttpHandler(
+        kEstablishEc2TransactionConnectionPath,
+        &ec2::ConnectionManager::createTransactionConnection,
+        ec2ConnectionManager);
+
+    registerHttpHandler(
+        kPushEc2TransactionPath,
+        &ec2::ConnectionManager::pushTransaction,
+        ec2ConnectionManager);
 }
 
 bool CloudDBProcess::initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManager )
@@ -604,6 +619,22 @@ void CloudDBProcess::registerHttpHandler(
                 dataActionType,
                 *m_authorizationManager,
                 std::bind(managerFunc, manager, _1, _2));
+        });
+}
+
+template<typename ManagerType>
+void CloudDBProcess::registerHttpHandler(
+    const char* handlerPath,
+    typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
+    ManagerType* manager)
+{
+    typedef typename CustomHttpHandler<ManagerType> RequestHandlerType;
+
+    m_httpMessageDispatcher->registerRequestProcessor<RequestHandlerType>(
+        handlerPath,
+        [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
+        {
+            return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
         });
 }
 

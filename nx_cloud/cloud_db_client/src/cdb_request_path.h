@@ -34,6 +34,9 @@ extern const char* kSubscribeToSystemEventsPath;
 
 extern const char* kPingPath;
 
+extern const char* kEstablishEc2TransactionConnectionPath;
+extern const char* kPushEc2TransactionPath;
+
 }   //cdb
 }   //nx
 
