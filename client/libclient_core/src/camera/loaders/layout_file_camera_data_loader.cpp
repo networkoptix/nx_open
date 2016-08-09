@@ -1,7 +1,5 @@
 #include "layout_file_camera_data_loader.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include <camera/data/abstract_camera_data.h>
 #include <camera/data/time_period_camera_data.h>
 
@@ -103,5 +101,3 @@ int QnLayoutFileCameraDataLoader::load(const QString &filter, const qint64 resol
         return 0;
     }
 }
-
-#endif
