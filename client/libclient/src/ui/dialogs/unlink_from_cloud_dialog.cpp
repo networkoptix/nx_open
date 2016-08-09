@@ -20,8 +20,6 @@
 #include <ui/widgets/common/input_field.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <watchers/cloud_status_watcher.h>
-
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 
@@ -385,8 +383,10 @@ void QnUnlinkFromCloudDialogPrivate::createAuthorizeWidget()
                 case Scenario::CloudOwnerOnly:
                 {
                     NX_ASSERT(user->isCloud());
+                    auto actualPassword = QnAppServerConnectionFactory::url().password();
+
                     //temporary hack solution --gdm
-                    return password == qnCloudStatusWatcher->cloudPassword()
+                    return password == actualPassword
                         ? Qn::kValidResult //TODO: #GDM #high validate cloud password
                         : Qn::ValidationResult(tr("Wrong Password"));
                 }
