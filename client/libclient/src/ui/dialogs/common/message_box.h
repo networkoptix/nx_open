@@ -88,6 +88,11 @@ public:
 
     /** Delegate widget with custom details. QnMessageBox will take ownership. */
     void addCustomWidget(QWidget* widget, Layout layout = Layout::Content, int stretch = 0, Qt::Alignment alignment = Qt::Alignment());
+
+    /**
+     * Widget will be removed from layout, but you should manually hide and delete it if required.
+     * Dialog will still retain ownership.
+     */
     void removeCustomWidget(QWidget* widget);
 
     QString checkBoxText() const;

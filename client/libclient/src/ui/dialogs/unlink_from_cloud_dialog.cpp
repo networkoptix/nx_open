@@ -55,11 +55,11 @@ public:
     void showFailure(const QString &message = QString());
 
     void setupUi();
-
+    bool validateAuth();
 private:
     Scenario calculateScenario() const;
-    QWidget* createAuthorizeWidget() const;
-    QWidget* createResetPasswordWidget() const;
+    void createAuthorizeWidget();
+    void createResetPasswordWidget();
 
     QString allUsersDisabledMessage() const;
     QString enterPasswordMessage() const;
@@ -70,7 +70,10 @@ private:
 public:
     const Scenario scenario;
     QWidget* authorizeWidget;
+    QnInputField* authorizePasswordField;
     QWidget* resetPasswordWidget;
+    QnInputField* resetPasswordField;
+    QnInputField* confirmPasswordField;
     QPushButton* nextButton;
     bool unlinkedSuccessfully;
 };
@@ -80,17 +83,6 @@ QnUnlinkFromCloudDialog::QnUnlinkFromCloudDialog(QWidget *parent):
     d_ptr(new QnUnlinkFromCloudDialogPrivate(this))
 {
     d_ptr->setupUi();
-
-
-
-    /*
-    1) ask cloud username and password
-    2) if logged as local - OK
-    3) else
-        3.1) if there is enabled local owner - warn, disconnect and OK
-        3.2) else - create local owner, then warn, disconnect and OK
-    */
-
 }
 
 QnUnlinkFromCloudDialog::~QnUnlinkFromCloudDialog()
@@ -101,16 +93,33 @@ void QnUnlinkFromCloudDialog::accept()
 {
     Q_D(QnUnlinkFromCloudDialog);
 
-    if (d->scenario != QnUnlinkFromCloudDialogPrivate::Scenario::Invalid
-        && !d->unlinkedSuccessfully)
+    switch (d->scenario)
     {
-        d->unbindSystem();
-        return;
+        case QnUnlinkFromCloudDialogPrivate::Scenario::Invalid:
+            base_type::accept();
+            break;
+        case QnUnlinkFromCloudDialogPrivate::Scenario::LocalOwner:
+        case QnUnlinkFromCloudDialogPrivate::Scenario::CloudOwner:
+        {
+            if (d->unlinkedSuccessfully)
+                base_type::accept();
+            else if (!d->validateAuth())
+                d->showFailure(tr("Invalid user credentials."));
+            else
+                d->unbindSystem();
+            break;
+        }
+        case QnUnlinkFromCloudDialogPrivate::Scenario::CloudOwnerOnly:
+        {
+            if (d->unlinkedSuccessfully)
+                base_type::accept();
+            else
+                d->unbindSystem();
+            break;
+        }
+        default:
+            break;
     }
-
-//     if (d->loggedAsCloudAccount())
-//         menu()->trigger(QnActions::DisconnectAction);
-    base_type::accept();
 }
 
 QnUnlinkFromCloudDialogPrivate::QnUnlinkFromCloudDialogPrivate(QnUnlinkFromCloudDialog *parent):
@@ -118,13 +127,16 @@ QnUnlinkFromCloudDialogPrivate::QnUnlinkFromCloudDialogPrivate(QnUnlinkFromCloud
     QnWorkbenchContextAware(parent),
     q_ptr(parent),
     scenario(calculateScenario()),
-    authorizeWidget(createAuthorizeWidget()),
-    resetPasswordWidget(createResetPasswordWidget()),
+    authorizeWidget(nullptr),
+    authorizePasswordField(nullptr),
+    resetPasswordWidget(nullptr),
+    resetPasswordField(nullptr),
+    confirmPasswordField(nullptr),
     nextButton(nullptr),
     unlinkedSuccessfully(false)
 {
-
-
+    createAuthorizeWidget();
+    createResetPasswordWidget();
 }
 
 void QnUnlinkFromCloudDialogPrivate::lockUi(bool lock)
@@ -133,17 +145,13 @@ void QnUnlinkFromCloudDialogPrivate::lockUi(bool lock)
 
     const bool enabled = !lock;
 
-    for (auto button: q->buttons())
-        button->setEnabled(enabled);
+    auto okButton = q->defaultButton();
+    okButton->setEnabled(enabled);
 }
 
 void QnUnlinkFromCloudDialogPrivate::unbindSystem()
 {
     Q_Q(QnUnlinkFromCloudDialog);
-    q->accept();
-    return;
-
-    lockUi(true);
 
     auto handleReply = [this, q](bool success, rest::Handle handleId, const QnRestResult& reply)
     {
@@ -166,6 +174,7 @@ void QnUnlinkFromCloudDialogPrivate::unbindSystem()
     if (!serverConnection)
         return;
 
+    lockUi(true);
     serverConnection->resetCloudSystemCredentials(handleReply, q->thread());
 }
 
@@ -248,6 +257,31 @@ void QnUnlinkFromCloudDialogPrivate::setupUi()
 
 }
 
+bool QnUnlinkFromCloudDialogPrivate::validateAuth()
+{
+    NX_ASSERT(authorizePasswordField);
+    auto user = context()->user();
+    NX_ASSERT(user);
+    switch (scenario)
+    {
+        case Scenario::LocalOwner:
+        {
+            NX_ASSERT(user->isLocal());
+            return user->checkLocalUserPassword(authorizePasswordField->text());
+        }
+        case Scenario::CloudOwner:
+        case Scenario::CloudOwnerOnly:
+        {
+            NX_ASSERT(user->isCloud());
+            return true; //TODO: #GDM #high validate cloud password
+        }
+        default:
+            break;
+    }
+    NX_ASSERT(false, "Should never get here");
+    return false;
+}
+
 QString QnUnlinkFromCloudDialogPrivate::allUsersDisabledMessage() const
 {
     return tr("All cloud users and features will be disabled.");
@@ -266,6 +300,12 @@ QString QnUnlinkFromCloudDialogPrivate::disconnectWarnMessage() const
 void QnUnlinkFromCloudDialogPrivate::setupResetPasswordPage()
 {
     NX_ASSERT(scenario == Scenario::CloudOwnerOnly);
+    if (!validateAuth())
+    {
+        showFailure(tr("Invalid user credentials."));
+        return;
+    }
+
     Q_Q(QnUnlinkFromCloudDialog);
 
     q->setText(tr("Reset admin password"));
@@ -302,55 +342,65 @@ void QnUnlinkFromCloudDialogPrivate::setupConfirmationPage()
     q->setDefaultButton(QDialogButtonBox::Ok);
 }
 
-QWidget* QnUnlinkFromCloudDialogPrivate::createAuthorizeWidget() const
+void QnUnlinkFromCloudDialogPrivate::createAuthorizeWidget()
 {
-    QWidget* result = new QWidget();
-    auto* layout = new QVBoxLayout(result);
+    authorizeWidget = new QWidget();
+    auto* layout = new QVBoxLayout(authorizeWidget);
     layout->setSpacing(kWidgetSpacing);
     layout->setContentsMargins(kWidgetMargins);
 
     auto loginField = new QnInputField();
     loginField->setReadOnly(true);
     loginField->setTitle(tr("Login"));
-    loginField->setText(qnGlobalSettings->cloudAccountName());
+    loginField->setText(context()->user()->getName());
     layout->addWidget(loginField);
 
-    auto passwordField = new QnInputField();
-    passwordField->setTitle(tr("Password"));
-    passwordField->setEchoMode(QLineEdit::Password);
-    layout->addWidget(passwordField);
+    authorizePasswordField = new QnInputField();
+    authorizePasswordField->setTitle(tr("Password"));
+    authorizePasswordField->setEchoMode(QLineEdit::Password);
+    layout->addWidget(authorizePasswordField);
 
-    QnAligner* aligner = new QnAligner(result);
+    QnAligner* aligner = new QnAligner(authorizeWidget);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
     aligner->addWidget(loginField);
-    aligner->addWidget(passwordField);
-
-    return result;
+    aligner->addWidget(authorizePasswordField);
 }
 
-QWidget* QnUnlinkFromCloudDialogPrivate::createResetPasswordWidget() const
+void QnUnlinkFromCloudDialogPrivate::createResetPasswordWidget()
 {
-    QWidget* result = new QWidget();
-    auto* layout = new QVBoxLayout(result);
+    resetPasswordWidget = new QWidget();
+    auto* layout = new QVBoxLayout(resetPasswordWidget);
     layout->setSpacing(kWidgetSpacing);
     layout->setContentsMargins(kWidgetMargins);
 
-    auto passwordField = new QnInputField();
-    passwordField->setTitle(tr("Password"));
-    passwordField->setEchoMode(QLineEdit::Password);
-    layout->addWidget(passwordField);
+    resetPasswordField = new QnInputField();
+    resetPasswordField->setTitle(tr("Password"));
+    resetPasswordField->setEchoMode(QLineEdit::Password);
+    resetPasswordField->setPasswordIndicatorEnabled(true);
+    resetPasswordField->setValidator(Qn::defaultPasswordValidator(false));
+    layout->addWidget(resetPasswordField);
 
-    auto confirmPasswordField = new QnInputField();
+    confirmPasswordField = new QnInputField();
     confirmPasswordField->setTitle(tr("Confirm Password"));
     confirmPasswordField->setEchoMode(QLineEdit::Password);
+    confirmPasswordField->setValidator(Qn::defaultConfirmationValidator(
+        [this]() { return resetPasswordField->text(); },
+        tr("Passwords do not match.")));
     layout->addWidget(confirmPasswordField);
 
-    QnAligner* aligner = new QnAligner(result);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
-    aligner->addWidget(passwordField);
-    aligner->addWidget(confirmPasswordField);
+    connect(resetPasswordField, &QnInputField::textChanged, this, [this]()
+    {
+        if (!confirmPasswordField->text().isEmpty())
+            confirmPasswordField->validate();
+    });
 
-    return result;
+    connect(resetPasswordField, &QnInputField::editingFinished,
+        confirmPasswordField, &QnInputField::validate);
+
+    QnAligner* aligner = new QnAligner(resetPasswordWidget);
+    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->addWidget(resetPasswordField);
+    aligner->addWidget(confirmPasswordField);
 }
 
 QnUnlinkFromCloudDialogPrivate::Scenario QnUnlinkFromCloudDialogPrivate::calculateScenario() const
