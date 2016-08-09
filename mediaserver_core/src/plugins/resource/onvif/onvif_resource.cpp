@@ -2428,9 +2428,15 @@ QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)
     request.ProfileToken = NULL;
 
     VideoSrcOptionsResp response;
+    bool isValid = response.Options 
+        && response.Options->BoundsRange 
+        && response.Options->BoundsRange->XRange 
+        && response.Options->BoundsRange->YRange 
+        && response.Options->BoundsRange->WidthRange 
+        && response.Options->BoundsRange->HeightRange;
 
     int soapRes = soapWrapper.getVideoSourceConfigurationOptions(request, response);
-    if (soapRes != SOAP_OK || !response.Options) {
+    if (soapRes != SOAP_OK || !isValid) {
 #ifdef PL_ONVIF_DEBUG
         qWarning() << "QnPlOnvifResource::fetchAndSetVideoSourceOptions: can't receive data from camera (or data is empty) (URL: "
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
