@@ -24,7 +24,7 @@ QnThumbnailCacheAccessor::QnThumbnailCacheAccessor(QObject* parent) :
 
     const auto thumbnailCache = QnCameraThumbnailCache::instance();
     connect(thumbnailCache, &QnCameraThumbnailCache::thumbnailUpdated,
-        [d](const QnUuid &resourceId, const QString &thumbnailId)
+        this, [d](const QnUuid &resourceId, const QString &thumbnailId)
         {
             if (resourceId == d->resourceId)
                 d->setThumbnailId(thumbnailId);
