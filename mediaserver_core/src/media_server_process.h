@@ -85,7 +85,7 @@ private:
     void updateAllowCameraCHangesIfNeed();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
-    bool initTcpListener(const CloudConnectionManager& cloudConnectionManager);
+    bool initTcpListener(CloudConnectionManager* const cloudConnectionManager);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     QHostAddress getPublicAddress();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);

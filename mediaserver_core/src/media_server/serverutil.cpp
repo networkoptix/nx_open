@@ -83,26 +83,9 @@ QString getDataDirectory()
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (PasswordData)(ConfigureSystemData),
+    (ConfigureSystemData),
     (json),
     _Fields)
-
-PasswordData::PasswordData(const QnRequestParams &params)
-{
-    password = params.value(lit("password"));
-    realm = params.value(lit("realm")).toLatin1();
-    passwordHash = params.value(lit("passwordHash")).toLatin1();
-    passwordDigest = params.value(lit("passwordDigest")).toLatin1();
-    cryptSha512Hash = params.value(lit("cryptSha512Hash")).toLatin1();
-}
-
-bool PasswordData::hasPassword() const
-{
-    return
-        !password.isEmpty() ||
-        !passwordHash.isEmpty() ||
-        !passwordDigest.isEmpty();
-}
 
 bool updateUserCredentials(PasswordData data, QnOptionalBool isEnabled, const QnUserResourcePtr& userRes, QString* errString)
 {
@@ -113,7 +96,7 @@ bool updateUserCredentials(PasswordData data, QnOptionalBool isEnabled, const Qn
         return false;
     }
 
-    //genereating cryptSha512Hash
+    //generating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
         data.cryptSha512Hash = linuxCryptSha512(data.password.toUtf8(), generateSalt(LINUX_CRYPT_SALT_LENGTH));
 

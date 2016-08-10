@@ -235,6 +235,9 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
     case QnMergeSystemsTool::VersionError:
         updateErrorLabel(tr("The discovered system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
         break;
+    case QnMergeSystemsTool::notLocalOwner:
+        updateErrorLabel(tr("Can't connect to the other system because current system is already attached to the cloud."));
+        break;
     case QnMergeSystemsTool::SafeModeError:
         updateErrorLabel(tr("The discovered system %1 is in safe mode.").arg(moduleInformation.systemName));
         break;

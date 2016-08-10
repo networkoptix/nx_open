@@ -65,7 +65,7 @@ int QnMergeSystemsRestHandler::executeGet(
     Q_UNUSED(path)
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(owner->authUserId()))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
 
     QUrl url = params.value(lit("url"));
@@ -239,10 +239,12 @@ int QnMergeSystemsRestHandler::executeGet(
         simpleUrl.setHost(url.host());
         if (url.port() != remoteModuleInformation.port)
             simpleUrl.setPort(url.port());
-        ec2Connection()->getDiscoveryManager(Qn::UserAccessData(owner->authUserId()))->addDiscoveryInformation(remoteModuleInformation.id,
-                                                                                                               simpleUrl, false,
-                                                                                                               ec2::DummyHandler::instance(),
-                                                                                                               &ec2::DummyHandler::onRequestDone);
+        auto discoveryManager = ec2Connection()->getDiscoveryManager(owner->accessRights());
+        discoveryManager->addDiscoveryInformation(
+            remoteModuleInformation.id,
+            simpleUrl, false,
+            ec2::DummyHandler::instance(),
+            &ec2::DummyHandler::onRequestDone);
     }
     QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
 
@@ -431,7 +433,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
 
     ec2::ApiUserData userData;
     fromResourceToApi(admin, userData);
-    errorCode = ec2Connection()->getUserManager(Qn::UserAccessData(owner->authUserId()))->saveSync(userData);
+    errorCode = ec2Connection()->getUserManager(owner->accessRights())->saveSync(userData);
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errorCode != ec2::ErrorCode::ok)
     {
@@ -452,7 +454,8 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
     }
 
-    errorCode = ec2Connection()->getMiscManager(Qn::UserAccessData(owner->authUserId()))->changeSystemNameSync(systemName, remoteSysTime, remoteTranLogTime);
+    auto miscManager = ec2Connection()->getMiscManager(owner->accessRights());
+    errorCode = miscManager->changeSystemNameSync(systemName, remoteSysTime, remoteTranLogTime);
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errorCode != ec2::ErrorCode::ok)
     {

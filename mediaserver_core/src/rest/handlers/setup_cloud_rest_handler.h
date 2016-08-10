@@ -1,11 +1,12 @@
 #pragma once
 
 #include <rest/server/json_rest_handler.h>
+#include <core/resource_management/user_access_data.h>
 
 class CloudConnectionManager;
 struct SetupRemoveSystemData;
 
-class QnSetupCloudSystemRestHandler: public QnJsonRestHandler 
+class QnSetupCloudSystemRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
 public:
@@ -16,5 +17,5 @@ public:
 private:
     const CloudConnectionManager& m_cloudConnectionManager;
 
-    int execute(SetupRemoveSystemData data, const QnUuid &userId, QnJsonRestResult &result);
+    int execute(SetupRemoveSystemData data, const Qn::UserAccessData& accessRights, QnJsonRestResult &result);
 };

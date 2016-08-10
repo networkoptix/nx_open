@@ -34,6 +34,7 @@ namespace style
     const QMargins Metrics::kGroupBoxContentMargins(dp(16), dp(16), dp(16), dp(16));
     const qreal Metrics::kGroupBoxCornerRadius = dp(2.0);
     const int Metrics::kDefaultIconSize = 20;
+    const qreal Metrics::kDisabledItemOpacity = 0.3;
 
     const char* Properties::kHoveredRowProperty = "_qn_hoveredRow";
     const char* Properties::kHoveredIndexProperty = "_qn_hoveredIndex";

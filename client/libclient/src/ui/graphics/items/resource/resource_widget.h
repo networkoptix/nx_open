@@ -28,7 +28,7 @@ class QGraphicsLinearLayout;
 class QnViewportBoundWidget;
 class QnResourceVideoLayout;
 class QnWorkbenchItem;
-class QnStatusOverlayWidget;
+class QnStatusOverlayController;
 class QnImageButtonWidget;
 class QnImageButtonBar;
 class QnProxyLabel;
@@ -299,8 +299,6 @@ protected:
 
     virtual bool isHovered() const;
 
-    Qn::ResourceStatusOverlay statusOverlay() const;
-    void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay, bool animate = true);
     Qn::ResourceStatusOverlay calculateStatusOverlay(int resourceStatus, bool hasVideo) const;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const;
     Q_SLOT void updateStatusOverlay();
@@ -319,7 +317,7 @@ protected:
     virtual QCursor calculateCursor() const;
     Q_SLOT void updateCursor();
 
-    QnStatusOverlayWidget *statusOverlayWidget() const;
+    QnStatusOverlayController *statusOverlayController() const;
 
     virtual int calculateButtonsVisibility() const;
     Q_SLOT void updateButtonsVisibility();
@@ -420,7 +418,7 @@ private:
 
     /* Widgets for overlaid stuff. */
 
-    QnStatusOverlayWidget *m_statusOverlayWidget;
+    QnStatusOverlayController* m_statusController;
 
     QScopedPointer<OverlayWidgets> m_overlayWidgets;
 
@@ -433,8 +431,6 @@ private:
     QRectF m_zoomRect;
 
     /** Current overlay. */
-    Qn::ResourceStatusOverlay m_statusOverlay;
-
     Qn::RenderStatus m_renderStatus;
 
     qint64 m_lastNewFrameTimeMSec;

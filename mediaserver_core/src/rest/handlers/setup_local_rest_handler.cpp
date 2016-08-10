@@ -43,7 +43,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 int QnSetupLocalSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
-    return execute(std::move(SetupLocalSystemData(params)), owner->authUserId(), result);
+    return execute(std::move(SetupLocalSystemData(params)), owner->accessRights(), result);
 }
 
 int QnSetupLocalSystemRestHandler::executePost(
@@ -55,14 +55,17 @@ int QnSetupLocalSystemRestHandler::executePost(
 {
     Q_UNUSED(path);
     SetupLocalSystemData data = QJson::deserialized<SetupLocalSystemData>(body);
-    return execute(std::move(data), owner->authUserId(), result);
+    return execute(std::move(data), owner->accessRights(), result);
 }
 
-int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUuid &userId, QnJsonRestResult &result)
+int QnSetupLocalSystemRestHandler::execute(
+    SetupLocalSystemData data,
+    const Qn::UserAccessData& accessRights,
+    QnJsonRestResult &result)
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(userId))
+    if (!QnPermissionsHelper::hasOwnerPermissions(accessRights))
         return QnPermissionsHelper::notOwnerError(result);
 
     if (!qnGlobalSettings->isNewSystem())

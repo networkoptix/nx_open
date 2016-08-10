@@ -7,10 +7,8 @@ Button
 {
     id: control
 
-    property bool selected: false
-
     property alias image: normalImage.source
-    property alias selectedImage: selectedImage.source
+    property alias checkedImage: checkedImage.source
 
     property real mouseX: mouseTracker.mouseX
     property real mouseY: mouseTracker.mouseY
@@ -34,12 +32,12 @@ Button
         Image
         {
             id: normalImage
-            opacity: control.selected ? 0.0 : 1.0
+            opacity: control.checked ? 0.0 : 1.0
             Behavior on opacity { NumberAnimation { duration: 200 } }
         }
         Image
         {
-            id: selectedImage
+            id: checkedImage
             opacity: 1.0 - normalImage.opacity
         }
     }

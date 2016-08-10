@@ -315,7 +315,7 @@ void QnLoginDialog::resetSavedSessionsModel()
         url.setPort(DEFAULT_APPSERVER_PORT);
         url.setHost(QLatin1Literal(DEFAULT_APPSERVER_HOST));
         url.setUserName(lit("admin"));
-        
+
         recentConnections.append(QnUserRecentConnectionData(
             lit("default"), QString(), url, false));
     }
@@ -452,6 +452,7 @@ QString QnLoginDialog::gatherSystemName(const QUrl& url)
         [this, &loop, &systemName, url]
     (int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
     {
+        Q_UNUSED(errorCode);
         systemName = connectionInfo.systemName;
         if (m_requestHandle == handle)
             m_requestHandle = -1;

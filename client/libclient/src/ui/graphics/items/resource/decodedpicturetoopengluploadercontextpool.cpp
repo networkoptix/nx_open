@@ -131,7 +131,7 @@ bool DecodedPictureToOpenGLUploaderContextPool::ensureThereAreContextsSharedWith
     if( pool.uploaders.empty() )
     {
         if( poolSizeIncrement < 0 )
-            poolSizeIncrement = m_optimalGLContextPoolSize;
+            poolSizeIncrement = static_cast<int>(m_optimalGLContextPoolSize);
         for( int i = 0; i < poolSizeIncrement; ++i )
         {
 //#if !(defined(GL_COPY_AGGREGATION) && defined(UPLOAD_TO_GL_IN_GUI_THREAD))

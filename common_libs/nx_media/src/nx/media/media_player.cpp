@@ -93,6 +93,9 @@ public:
     // Either media is on live or archive position. Holds QT property value.
     bool liveMode;
 
+    // Video aspect ratio
+    double aspectRatio;
+
     // Auto reconnect if network error
     bool reconnectOnPlay;
 
@@ -183,6 +186,7 @@ private:
     void setState(Player::State state);
     void setMediaStatus(Player::MediaStatus status);
     void setLiveMode(bool value);
+    void setAspectRatio(double value);
     void setPosition(qint64 value);
 
     void resetLiveBufferState();
@@ -205,6 +209,7 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     state(Player::State::Stopped),
     mediaStatus(Player::MediaStatus::NoMedia),
     liveMode(true),
+    aspectRatio(1.0),
     reconnectOnPlay(false),
     positionMs(0),
     videoSurface(0),
@@ -252,6 +257,16 @@ void PlayerPrivate::setLiveMode(bool value)
     liveMode = value;
     Q_Q(Player);
     emit q->liveModeChanged();
+}
+
+void PlayerPrivate::setAspectRatio(double value)
+{
+    if (qFuzzyCompare(aspectRatio, value))
+        return;
+
+    aspectRatio = value;
+    Q_Q(Player);
+    emit q->aspectRatioChanged();
 }
 
 void PlayerPrivate::setPosition(qint64 value)
@@ -400,6 +415,7 @@ void PlayerPrivate::presentNextFrame()
 
     auto metadata = FrameMetadata::deserialize(videoFrameToRender);
     setLiveMode(metadata.flags & QnAbstractMediaData::MediaFlags_LIVE);
+    setAspectRatio(videoFrameToRender->width() * metadata.sar / videoFrameToRender->height());
 
     videoFrameToRender.reset();
 
@@ -714,21 +730,13 @@ bool PlayerPrivate::createArchiveReader()
     if (!resource)
         return false;
 
-#ifdef ENABLE_ARCHIVE
     archiveReader.reset(new QnArchiveStreamReader(resource));
-#endif
 
     QnAbstractArchiveDelegate* archiveDelegate;
     if (isLocalFile)
-    {
-#ifdef ENABLE_ARCHIVE
         archiveDelegate = new QnAviArchiveDelegate();
-#endif
-    }
     else
-    {
         archiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
-    }
 
     archiveReader->setArchiveDelegate(archiveDelegate);
     return true;
@@ -794,7 +802,7 @@ bool PlayerPrivate::isTranscodingSupported(const QnVirtualCameraResourcePtr& cam
     if (!VideoDecoderRegistry::instance()->isTranscodingEnabled())
         return false;
 
-    QnMediaServerResourcePtr server = liveMode 
+    QnMediaServerResourcePtr server = liveMode
         ? camera->getParentServer()
         : qnCameraHistoryPool->getMediaServerOnTime(camera, positionMs);
 
@@ -908,6 +916,7 @@ void Player::stop()
 
     d->dataConsumer.reset();
     d->archiveReader.reset();
+    d->videoFrameToRender.reset();
     d->setState(State::Stopped);
 }
 
@@ -919,6 +928,8 @@ void Player::setSource(const QUrl& url)
 
     if (newUrl != d->url)
     {
+        const auto currentState = d->state;
+
         stop();
         d->url = newUrl;
 
@@ -926,17 +937,16 @@ void Player::setSource(const QUrl& url)
         d->isLocalFile = d->url.scheme() == lit("file");
         if (d->isLocalFile)
         {
-#ifdef ENABLE_ARCHIVE
             d->resource.reset(new QnAviResource(path));
             d->resource->setStatus(Qn::Online);
-#else
-            d->resource.reset();
-#endif
         }
         else
         {
             d->resource = qnResPool->getResourceById(QnUuid(path));
         }
+
+        if (d->resource && currentState == State::Playing)
+            play();
     }
 }
 
@@ -956,6 +966,12 @@ bool Player::liveMode() const
 {
     Q_D(const Player);
     return d->liveMode;
+}
+
+double Player::aspectRatio() const
+{
+    Q_D(const Player);
+    return d->aspectRatio;
 }
 
 bool Player::reconnectOnPlay() const

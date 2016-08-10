@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 
 class QnUnlinkFromCloudDialogPrivate;
@@ -7,7 +8,7 @@ class QnUnlinkFromCloudDialogPrivate;
 class QnUnlinkFromCloudDialog : public QnWorkbenchStateDependentDialog<QnMessageBox>
 {
     Q_OBJECT
-    typedef QnWorkbenchStateDependentDialog<QnMessageBox> base_type;
+    using base_type = QnWorkbenchStateDependentDialog<QnMessageBox>;
 
 public:
     explicit QnUnlinkFromCloudDialog(QWidget *parent = 0);
@@ -16,6 +17,6 @@ public:
     virtual void accept() override;
 
 private:
-    QScopedPointer<QnUnlinkFromCloudDialogPrivate> d_ptr;
+    QnUnlinkFromCloudDialogPrivate* d_ptr;
     Q_DECLARE_PRIVATE(QnUnlinkFromCloudDialog)
 };

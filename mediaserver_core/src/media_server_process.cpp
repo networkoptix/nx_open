@@ -289,12 +289,13 @@ bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 
 void addFakeVideowallUser()
 {
-	ec2::ApiUserData fakeUserData;
+    ec2::ApiUserData fakeUserData;
     fakeUserData.permissions = Qn::GlobalVideoWallModePermissionSet;
-	fakeUserData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
-	auto fakeUser = ec2::fromApiToResource(fakeUserData);
-	fakeUser->setId(Qn::kVideowallUserAccess.userId);
-	qnResPool->addResource(fakeUser);
+    fakeUserData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
+    auto fakeUser = ec2::fromApiToResource(fakeUserData);
+    fakeUser->setId(Qn::kVideowallUserAccess.userId);
+    fakeUser->setName(lit("Video wall"));
+    qnResPool->addResource(fakeUser);
 }
 
 }
@@ -1517,7 +1518,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 
 
 bool MediaServerProcess::initTcpListener(
-    const CloudConnectionManager& cloudConnectionManager)
+    CloudConnectionManager* const cloudConnectionManager)
 {
     m_httpModManager.reset( new nx_http::HttpModManager() );
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder() );
@@ -1572,7 +1573,7 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloudConnectionManager), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/restoreState", new QnRestoreStateRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(cloudConnectionManager), Qn::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(*cloudConnectionManager), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
@@ -1595,7 +1596,7 @@ bool MediaServerProcess::initTcpListener(
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
 #endif
-    QnRestProcessorPool::instance()->registerHandler("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudConnectionManager));
+    QnRestProcessorPool::instance()->registerHandler("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(*cloudConnectionManager));
 
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/dev-mode-key", new QnCrashServerHandler());
@@ -1605,7 +1606,7 @@ bool MediaServerProcess::initTcpListener(
 #endif
 
     m_universalTcpListener = new QnUniversalTcpListener(
-        cloudConnectionManager,
+        *cloudConnectionManager,
         QHostAddress::Any,
         rtspPort,
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,
@@ -2066,7 +2067,7 @@ void MediaServerProcess::run()
         new StreamingChunkTranscoder( StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
-    if (!initTcpListener(cloudConnectionManager))
+    if (!initTcpListener(&cloudConnectionManager))
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();

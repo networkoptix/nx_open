@@ -36,7 +36,6 @@ android {
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libavcodec.so \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libavformat.so \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libavdevice.so \
-        $$OUTPUT_PATH/lib/$$CONFIGURATION/libpostproc.so \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libswscale.so \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libswresample.so \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libavfilter.so

@@ -120,12 +120,10 @@ public:
 
 protected:
     virtual bool eventFilter(QObject *obj, QEvent *event) override;
-    virtual void resizeEvent(QResizeEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
 
 signals:
     void activated(const QnResourcePtr &resource);
-    void viewportSizeChanged();
 
     /**
      * This signal is emitted when the tree prepares to start a recursive operation

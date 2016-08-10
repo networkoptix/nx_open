@@ -12,6 +12,7 @@
 #include <nx/network/system_socket.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/concurrent.h>
 
 #include <QDateTime>
 
@@ -89,6 +90,7 @@ void DeviceSearcher::pleaseStop()
         it->first->terminate();     //this method blocks till event handler returns
     }
     m_httpClients.clear();
+    m_concurentGuard.reset();
 }
 
 void DeviceSearcher::registerHandler( SearchHandler* handler, const QString& deviceType )
@@ -395,7 +397,7 @@ void DeviceSearcher::processDeviceXml(
 
     QMutexLocker lk( &m_mutex );
     m_discoveredDevices.emplace( devInfo.deviceAddress, devInfoFull );
-    updateItemInCache( devInfoFull );
+    updateItemInCache( std::move(devInfoFull) );
 }
 
 QHostAddress DeviceSearcher::findBestIface( const HostAddress& host )
@@ -438,18 +440,28 @@ const DeviceSearcher::UPNPDescriptionCacheItem* DeviceSearcher::findDevDescripti
     return &it->second;
 }
 
-void DeviceSearcher::updateItemInCache( const DiscoveredDeviceInfo& devInfo )
+void DeviceSearcher::updateItemInCache( DiscoveredDeviceInfo devInfo )
 {
     UPNPDescriptionCacheItem& cacheItem = m_upnpDescCache[devInfo.uuid];
     cacheItem.devInfo = devInfo.devInfo;
     cacheItem.xmlDevInfo = devInfo.xmlDevInfo;
     cacheItem.creationTimestamp = m_cacheTimer.elapsed();
 
-    const auto url = devInfo.descriptionUrl;
-    processPacket(devInfo.localInterfaceAddress, SocketAddress(url.host(), url.port()),
-                  devInfo.devInfo, devInfo.xmlDevInfo);
+    QnConcurrent::run(
+        QThreadPool::globalInstance(),
+        [ this, devInfo = std::move(devInfo), guard = m_concurentGuard.sharedGuard() ]()
+        {
+            if (const auto lock = m_concurentGuard->lock())
+            {
+                QMutexLocker lk( &m_mutex );
+                const auto url = devInfo.descriptionUrl;
+                processPacket(
+                    devInfo.localInterfaceAddress,
+                    SocketAddress( url.host(), url.port() ),
+                    devInfo.devInfo, devInfo.xmlDevInfo );
+            }
+        });
 }
-
 
 bool DeviceSearcher::processPacket( const QHostAddress& localInterfaceAddress,
                                         const SocketAddress& discoveredDevAddress,

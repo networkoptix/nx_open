@@ -5,6 +5,7 @@
 #include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource_management/resource_access_subject.h>
 
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/data/api_access_rights_data.h>
@@ -14,7 +15,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/common/connective.h>
-
+#include "user_access_data.h"
 
 class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnResourceAccessManager>
 {
@@ -40,22 +41,26 @@ public:
     QSet<QnUuid> accessibleResources(const QnUuid& userOrGroupId) const;
     void setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources);
 
-    /** List of resources ids, the given user has access to (only given directly). */
-    QSet<QnUuid> accessibleResources(const QnUserResourcePtr& user) const;
-
     /**
-    * \param user                      User to get global permissions for.
+    * \param user                      User or role to get global permissions for.
     * \returns                         Global permissions of the given user,
-    *                                  adjusted to take deprecation and superuser status into account.
+    *                                  adjusted to take dependencies and superuser status into account.
     */
-    Qn::GlobalPermissions globalPermissions(const QnUserResourcePtr& user) const;
+    Qn::GlobalPermissions globalPermissions(const QnResourceAccessSubject& subject) const;
 
     /**
     * \param user                      User to get global permissions for.
     * \param requiredPermission        Global permission to check.
     * \returns                         Whether actual global permissions include required permission.
     */
-    bool hasGlobalPermission(const QnUserResourcePtr& user, Qn::GlobalPermission requiredPermission) const;
+    bool hasGlobalPermission(const QnResourceAccessSubject& subject, Qn::GlobalPermission requiredPermission) const;
+
+    /**
+    * \param accessRights              Access rights descriptor
+    * \param requiredPermission        Global permission to check.
+    * \returns                         Whether actual global permissions include required permission.
+    */
+    bool hasGlobalPermission(const Qn::UserAccessData& accessRights, Qn::GlobalPermission requiredPermission) const;
 
     /**
     * \param user                      User that should have permissions.
@@ -70,7 +75,22 @@ public:
     * \param requiredPermission        Permission to check.
     * \returns                         Whether actual permissions include required permission.
     */
-    bool hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permissions requiredPermissions) const;
+    bool hasPermission(
+        const QnUserResourcePtr& user,
+        const QnResourcePtr& resource,
+        Qn::Permissions requiredPermissions) const;
+
+    /**
+    * \param accessRights              access rights descriptor.
+    * \param resource                  Resource to get permissions for.
+    * \param requiredPermission        Permission to check.
+    * \returns                         Whether actual permissions include required permission.
+    */
+    bool hasPermission(
+        const Qn::UserAccessData& accessRights,
+        const QnResourcePtr& mediaResource,
+        Qn::Permission permissions) const;
+
 
     /**
     * \param user                      User that should have permissions for resource creating.
@@ -116,21 +136,9 @@ public:
     static QString userRoleDescription(Qn::UserRole userRole);
     static Qn::GlobalPermissions userRolePermissions(Qn::UserRole userRole);
 
-    Qn::UserRole userRole(const QnUserResourcePtr& user) const;
     QString userRoleName(const QnUserResourcePtr& user) const;
 
     static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
-
-    //TODO: #GDM think about naming
-    enum class Access
-    {
-        Forbidden,
-        Directly,
-        ViaLayout,
-        ViaVideowall
-    };
-    /** Check if resource (camera, webpage or layout) is available to given user. */
-    Access isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
 
 signals:
     void accessibleResourcesChanged(const QnUuid& userId);
@@ -140,6 +148,7 @@ signals:
 
     /** Notify listeners that permissions possibly changed (not necessarily). */
     void permissionsInvalidated(const QSet<QnUuid>& resourceIds);
+
 private:
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);
@@ -158,11 +167,7 @@ private:
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnLayoutResourcePtr& layout)          const;
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnUserResourcePtr& targetUser)        const;
 
-    /** Check if given desktop camera or layout is available to given user through videowall. */
-    bool isAccessibleViaVideowall(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
-
-    /** Check if camera is placed to one of shared layouts, available to given user. */
-    bool isAccessibleViaLayouts(const QSet<QnUuid>& layoutIds, const QnResourcePtr& resource, bool sharedOnly) const;
+    Qn::GlobalPermissions filterDependentPermissions(Qn::GlobalPermissions source) const;
 
     void beginUpdateCache();
     void endUpdateCache();

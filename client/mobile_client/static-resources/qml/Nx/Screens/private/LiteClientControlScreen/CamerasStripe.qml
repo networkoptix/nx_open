@@ -9,7 +9,6 @@ ListView
     id: camerasStripe
 
     property string currentResourceId: ""
-    property string currentThumbnail: ""
 
     implicitHeight: 88
     topMargin: 1
@@ -29,11 +28,8 @@ ListView
         thumbnail: model.thumbnail
         status: model.resourceStatus
 
-        onClicked:
-        {
-            currentResourceId = model.uuid
-            currentThumbnail = model.thumbnail
-        }
+        onClicked: currentResourceId = model.uuid
+        onThumbnailRefreshRequested: camerasStripe.model.refreshThumbnail(index)
     }
 
     header: NoCameraItem
@@ -42,11 +38,7 @@ ListView
         height: cellHeight
         active: currentIndex == -1
 
-        onClicked:
-        {
-            currentResourceId = ""
-            currentThumbnail = ""
-        }
+        onClicked: currentResourceId = ""
     }
 
     highlightFollowsCurrentItem: false

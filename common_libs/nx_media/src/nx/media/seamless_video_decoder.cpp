@@ -11,6 +11,7 @@
 #include "abstract_video_decoder.h"
 #include "video_decoder_registry.h"
 #include "frame_metadata.h"
+#include <utils/media/utils.h>
 
 namespace nx {
 namespace media {
@@ -82,7 +83,6 @@ public:
     const FrameMetadata findMetadata(int frameNum);
     void clearMetadata();
     int decoderFrameNumToLocalNum(int value) const;
-
 public:
     std::deque<QVideoFramePtr> queue; /**< Temporary  buffer for decoded data. */
     VideoDecoderPtr videoDecoder;
@@ -181,6 +181,7 @@ bool SeamlessVideoDecoder::decode(
     {
         if (d->videoDecoder)
         {
+            double sar = d->videoDecoder->getSampleAspectRatio();
             for (;;)
             {
                 QVideoFramePtr decodedFrame;
@@ -188,8 +189,12 @@ bool SeamlessVideoDecoder::decode(
                     QnConstCompressedVideoDataPtr(), &decodedFrame);
                 if (!decodedFrame)
                     break; //< decoder's buffer is flushed
-                const FrameMetadata metadata = d->findMetadata(
+                FrameMetadata metadata = d->findMetadata(
                     d->decoderFrameNumToLocalNum(decodedFrameNum));
+                // some decoders doesn't fill sar in spite of it isn't 1.0
+                metadata.sar = qFuzzyCompare(sar, 1.0)
+                    ? nx::media::getDefaultSampleAspectRatio(decodedFrame->size())
+                    : sar;
                 metadata.serialize(decodedFrame);
                 d->queue.push_back(std::move(decodedFrame));
             }
@@ -218,8 +223,12 @@ bool SeamlessVideoDecoder::decode(
         decodedFrameNum = d->videoDecoder->decode(frame, &decodedFrame);
         if (decodedFrame)
         {
-            const FrameMetadata metadata = d->findMetadata(
+            FrameMetadata metadata = d->findMetadata(
                 d->decoderFrameNumToLocalNum(decodedFrameNum));
+            double sar = d->videoDecoder->getSampleAspectRatio();
+            metadata.sar = qFuzzyCompare(sar, 1.0)
+                ? nx::media::getDefaultSampleAspectRatio(decodedFrame->size())
+                : sar;
             metadata.serialize(decodedFrame);
             d->queue.push_back(std::move(decodedFrame));
         }

@@ -34,6 +34,9 @@ td{
     vertical-align: top;
     text-align: left;
     padding-right:5px;
+
+    padding-top:3px;
+    padding-bottom:3px;
 }
 th{
     line-height: 30px;
@@ -179,7 +182,7 @@ td.number{
     width:0;
 }
 
-.source-name{
+.ellipsis{
     text-overflow: ellipsis;
     overflow: hidden;
     display: inline-block;

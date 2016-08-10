@@ -22,7 +22,7 @@ Switch
     implicitHeight: 20 + topPadding + bottomPadding
 
     layer.enabled: !control.enabled
-    opacity: control.enabled ? 1.0 : 0.7
+    opacity: control.enabled ? 1.0 : 0.3
 
     background: null
 
@@ -97,4 +97,13 @@ Switch
     }
 
     contentItem: null
+
+    onCheckedChanged:
+    {
+        /* Workaroud for a Qt bug.
+           When the switch is disabled during onCheckedChanged handler setting checked to false
+           its check state will be returned to true. */
+        if (!checked)
+            position = 0
+    }
 }

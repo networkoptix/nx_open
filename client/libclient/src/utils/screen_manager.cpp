@@ -8,31 +8,35 @@
 
 namespace {
 
-    const int dataVersion = 0;
-    const QString key = QnAppInfo::customizationName() + QLatin1String("/QnScreenManager/") + QString::number(dataVersion);
-    const int maxClients = 64;
-    const int checkDeadsInterval = 60 * 1000;
-    const int refreshDelay = 1000;
+const int dataVersion = 0;
+const QString key = QnAppInfo::customizationName() + QLatin1String("/QnScreenManager/") + QString::number(dataVersion);
+const int maxClients = 64;
+const int checkDeadsInterval = 60 * 1000;
+const int refreshDelay = 1000;
 
-    struct ScreenUsageData {
-        quint64 pid;
-        quint64 screens;
+struct ScreenUsageData
+{
+    quint64 pid;
+    quint64 screens;
 
-        void setScreens(const QSet<int> &screens) {
-            this->screens = 0;
-            for (int screen: screens)
-                this->screens |= 1 << screen;
+    void setScreens(const QSet<int> &screens)
+    {
+        this->screens = 0;
+        for (int screen : screens)
+            this->screens |= 1ull << screen;
+    }
+
+    QSet<int> getScreens() const
+    {
+        QSet<int> screens;
+        for (int i = 0; i < static_cast<int>(sizeof(this->screens)); i++)
+        {
+            if (this->screens & (1ull << i))
+                screens.insert(i);
         }
-
-        QSet<int> getScreens() const {
-            QSet<int> screens;
-            for (int i = 0; i < static_cast<int>(sizeof(this->screens)); i++) {
-                if (this->screens & (1ull << i))
-                    screens.insert(i);
-            }
-            return screens;
-        }
-    };
+        return screens;
+    }
+};
 
 } // anonymous namespace
 

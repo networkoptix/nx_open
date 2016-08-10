@@ -1,8 +1,6 @@
 #ifndef __AVI_ARCHIVE_DELEGATE_H
 #define __AVI_ARCHIVE_DELEGATE_H
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QSharedPointer>
 
 #include "nx/streaming/audio_data_packet.h"
@@ -114,7 +112,5 @@ private:
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;
-
-#endif // ENABLE_ARCHIVE
 
 #endif

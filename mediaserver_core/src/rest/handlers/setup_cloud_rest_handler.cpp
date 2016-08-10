@@ -54,21 +54,21 @@ QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
 int QnSetupCloudSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
-    return execute(std::move(SetupRemoveSystemData(params)), owner->authUserId(), result);
+    return execute(std::move(SetupRemoveSystemData(params)), owner->accessRights(), result);
 }
 
 int QnSetupCloudSystemRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     QN_UNUSED(path, params);
     const SetupRemoveSystemData data = QJson::deserialized<SetupRemoveSystemData>(body);
-    return execute(std::move(data), owner->authUserId(), result);
+    return execute(std::move(data), owner->accessRights(), result);
 }
 
-int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnUuid &userId, QnJsonRestResult &result)
+int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const Qn::UserAccessData& accessRights, QnJsonRestResult &result)
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(userId))
+    if (!QnPermissionsHelper::hasOwnerPermissions(accessRights))
         return QnPermissionsHelper::notOwnerError(result);
 
 

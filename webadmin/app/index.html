@@ -152,11 +152,7 @@
         <div class="modal-body" class="col-sm-12">
             <p>Server can't handle requests now. Trying to reach it again.</p>
             <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
-            <p>If nothing happens for a while - you could check server condition manually</p>
-        </div>
-
-        <div class="modal-footer">
-            <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Refresh page</button>
+            <p>If nothing happens for a while - you could check server condition manually or refresh the page</p>
         </div>
     </form>
 </script>

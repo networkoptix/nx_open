@@ -337,6 +337,7 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
 
     const auto serverAction = [this, systemDescription](const QnUuid& id)
     {
+        Q_UNUSED(id);
         emitDataChanged(systemDescription, QVector<int>() << SearchRoleId);
     };
 

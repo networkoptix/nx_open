@@ -104,7 +104,7 @@ bool QnExecPtzPresetPolicy::isResourceValid(const QnVirtualCameraResourcePtr &ca
 }
 
 QString QnExecPtzPresetPolicy::getText(const QnResourceList &resources, const bool detailed) {
-
+    Q_UNUSED(detailed);
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     if (cameras.size() != 1)
         return tr("Select exactly one camera");

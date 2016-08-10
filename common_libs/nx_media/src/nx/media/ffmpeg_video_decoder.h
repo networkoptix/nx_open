@@ -1,5 +1,4 @@
 #pragma once
-#if !defined(DISABLE_FFMPEG)
 
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
@@ -32,6 +31,7 @@ public:
     virtual int decode(
         const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 
+    virtual double getSampleAspectRatio() const override;
 private:
     static QSize s_maxResolution;
 
@@ -41,5 +41,3 @@ private:
 
 } // namespace media
 } // namespace nx
-
-#endif // !DISABLE_FFMPEG
