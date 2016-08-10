@@ -22,6 +22,7 @@ public:
     bool saveLocalLayout(const QnLayoutResourcePtr &layout, bool readOnly, bool cancellable, QObject *target = NULL, const char *slot = NULL);
 
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, const QnLayoutResourcePtr &layout, Qn::LayoutExportMode mode);
+
 private:
     QString binaryFilterName() const;
 
@@ -58,10 +59,7 @@ private:
     bool exeFileIsTooBig(const QnLayoutResourcePtr& layout, const QnTimePeriod& period) const;
 
     /** Check if exe file will be greater than 4 Gb. */
-    bool exeFileIsTooBig(
-        const QnMediaResourcePtr& mediaResource,
-        const QnAbstractStreamDataProvider* dataProvider,
-        const QnTimePeriod& period) const;
+    bool exeFileIsTooBig(const QnMediaResourcePtr& mediaResource, const QnTimePeriod& period) const;
 
     bool confirmExportTooBigExeFile() const;
 

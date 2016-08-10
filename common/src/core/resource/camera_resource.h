@@ -181,9 +181,9 @@ public:
     int encoderIndex;
     QString timestamp;
 
-    float rawSuggestedBitrate;
-    float suggestedBitrate;
-    float actualBitrate;
+    float rawSuggestedBitrate;  //< Megabits per second
+    float suggestedBitrate;     //< Megabits per second
+    float actualBitrate;        //< Megabits per second
 
     Qn::BitratePerGopType bitratePerGop;
     float bitrateFactor;

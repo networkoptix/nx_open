@@ -18,6 +18,8 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/streaming/archive_stream_reader.h>
+#include <nx/fusion/model_functions.h>
+
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
@@ -46,6 +48,7 @@
 #include <ui/help/help_topic_accessor.h>
 
 #include <utils/common/event_processors.h>
+
 #include <nx/utils/string.h>
 
 #include <utils/common/app_info.h>
@@ -56,6 +59,42 @@ namespace {
 static const qint64 maxRecordingDurationMsec = 1000 * 60 * 30;
 
 static const QString filterSeparator(QLatin1String(";;"));
+
+/** Default bitrate for exported file size estimate in megabytes per second. */
+static const qreal kDefaultBitrateMbps = 0.5;
+
+/** Exe files greater than 4 Gb are not working. */
+static const qint64 kMaximimumExeFileSizeMb = 4096;
+
+/** Reserving 200 Mb for client binaries. */
+static const qint64 kReservedClientSizeMb = 200;
+
+static const int msPerSecond = 1000;
+
+static const int mbitsPerMb = 8;
+
+/** Calculate estimated video size in megabytes. */
+qint64 estimatedExportVideoSizeMb(const QnMediaResourcePtr& mediaResource, qint64 lengthMs)
+{
+    qreal maxBitrate = kDefaultBitrateMbps;
+
+    if (QnVirtualCameraResourcePtr camera = mediaResource.dynamicCast<QnVirtualCameraResource>())
+    {
+        auto bitrateInfos = QJson::deserialized<CameraBitrates>(
+            camera->getProperty(Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME).toUtf8());
+        if (!bitrateInfos.streams.empty())
+            maxBitrate = std::max_element(
+                bitrateInfos.streams.cbegin(), bitrateInfos.streams.cend(),
+                [](const CameraBitrateInfo& l, const CameraBitrateInfo &r)
+        {
+            return l.actualBitrate < r.actualBitrate;
+        })->actualBitrate;
+    }
+
+    return maxBitrate * lengthMs / (msPerSecond * mbitsPerMb);
+}
+
+
 }
 
 // -------------------------------------------------------------------------- //
@@ -114,8 +153,7 @@ bool QnWorkbenchExportHandler::lockFile(const QString &filename)
         QnMessageBox::critical(
             mainWindow(),
             tr("File is in use."),
-            tr("File '%1' is used for recording already. Please enter another name.").arg(QFileInfo(filename).completeBaseName()),
-            QDialogButtonBox::Ok
+            tr("File '%1' is used for recording already. Please enter another name.").arg(QFileInfo(filename).completeBaseName())
         );
         return false;
     }
@@ -125,8 +163,7 @@ bool QnWorkbenchExportHandler::lockFile(const QString &filename)
         QnMessageBox::critical(
             mainWindow(),
             tr("Could not overwrite file"),
-            tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(filename).completeBaseName()),
-            QDialogButtonBox::Ok
+            tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(filename).completeBaseName())
         );
         return false;
     }
@@ -362,7 +399,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
         if (binaryExport)
         {
-            if (exeFileIsTooBig(mediaResource, dataProvider, period)
+            if (exeFileIsTooBig(mediaResource, period)
                 && !confirmExportTooBigExeFile())
                     continue;
 
@@ -393,7 +430,8 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
                         tr("AVI format is not recommended"),
                         tr("AVI format is not recommended for export of non-continuous recording when audio track is present."
                             "Do you want to continue?"),
-                        QDialogButtonBox::Yes | QDialogButtonBox::No
+                        QDialogButtonBox::Yes | QDialogButtonBox::No,
+                        QDialogButtonBox::No
                     );
                     if (result != QDialogButtonBox::Yes)
                         continue;
@@ -434,7 +472,8 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
                             tr("Selected format is not recommended for this camera due to video downscaling. "
                                 "We recommend to export selected video either to the '.nov' or '.exe' format. "
                                 "Do you want to continue?"),
-                            QDialogButtonBox::Yes | QDialogButtonBox::No
+                            QDialogButtonBox::Yes | QDialogButtonBox::No,
+                            QDialogButtonBox::No
                         );
                         if (result != QDialogButtonBox::Yes)
                             return;
@@ -477,7 +516,8 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
                     mainWindow(),
                     tr("Save As"),
                     tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).completeBaseName()),
-                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
+                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+                    QDialogButtonBox::No
                 );
                 if (button == QDialogButtonBox::Cancel)
                     return;
@@ -550,17 +590,23 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
 bool QnWorkbenchExportHandler::exeFileIsTooBig(
     const QnMediaResourcePtr& mediaResource,
-    const QnAbstractStreamDataProvider* dataProvider,
     const QnTimePeriod& period) const
 {
-    return true;
+    qint64 videoSizeMb = estimatedExportVideoSizeMb(mediaResource, period.durationMs);
+    return (videoSizeMb + kReservedClientSizeMb > kMaximimumExeFileSizeMb);
 }
 
 bool QnWorkbenchExportHandler::exeFileIsTooBig(
     const QnLayoutResourcePtr& layout,
     const QnTimePeriod& period) const
 {
-    return true;
+    qint64 videoSizeMb = 0;
+    for (const auto& resource: layout->layoutResources())
+    {
+        if (const QnMediaResourcePtr& media = resource.dynamicCast<QnMediaResource>())
+            videoSizeMb += estimatedExportVideoSizeMb(media, period.durationMs);
+    }
+    return (videoSizeMb + kReservedClientSizeMb > kMaximimumExeFileSizeMb);
 }
 
 bool QnWorkbenchExportHandler::confirmExportTooBigExeFile() const
@@ -647,12 +693,12 @@ void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QStr
     {
         if (tool->mode() == Qn::LayoutExport)
         {
-            QnMessageBox::information(mainWindow(), tr("Export Complete"), tr("Export Successful"), QDialogButtonBox::Ok);
+            QnMessageBox::information(mainWindow(), tr("Export Complete"), tr("Export Successful"));
         }
     }
     else if (!tool->errorMessage().isEmpty())
     {
-        QnMessageBox::warning(mainWindow(), tr("Unable to export layout."), tool->errorMessage(), QDialogButtonBox::Ok);
+        QnMessageBox::warning(mainWindow(), tr("Unable to export layout."), tool->errorMessage());
     }
 }
 
@@ -680,8 +726,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         QnMessageBox::critical(
             mainWindow(),
             tr("Unable to save layout."),
-            tr("Current layout contains image files. Images are not allowed for Multi-Video export."),
-            QDialogButtonBox::Ok
+            tr("Current layout contains image files. Images are not allowed for Multi-Video export.")
         );
         return false;
     }
@@ -694,8 +739,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         QnMessageBox::critical(
             mainWindow(),
             tr("Unable to save layout."),
-            tr("Current layout contains local files. Local files are not allowed for Multi-Video export."),
-            QDialogButtonBox::Ok
+            tr("Current layout contains local files. Local files are not allowed for Multi-Video export.")
         );
         return false;
     }
@@ -806,7 +850,8 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
                     mainWindow(),
                     tr("Save As"),
                     tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).completeBaseName()),
-                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
+                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+                    QDialogButtonBox::No
                 );
                 if (button == QDialogButtonBox::Cancel)
                     return false;
@@ -864,7 +909,8 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
             tr("You are about to export several videos with a total length exceeding 30 minutes.") + L'\n'
             + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n'
             + tr("Do you want to continue?"),
-            QDialogButtonBox::Yes | QDialogButtonBox::No
+            QDialogButtonBox::Yes | QDialogButtonBox::No,
+            QDialogButtonBox::No
         );
         if (button == QDialogButtonBox::No)
             return;
@@ -934,10 +980,10 @@ void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QStr
         file->setStatus(Qn::Online);
         qnResPool->addResource(file);
 
-        QnMessageBox::information(mainWindow(), tr("Export Complete"), tr("Export Successful."), QDialogButtonBox::Ok);
+        QnMessageBox::information(mainWindow(), tr("Export Complete"), tr("Export Successful."));
     }
     else if (tool->status() != QnClientVideoCamera::NoError)
     {
-        QnMessageBox::warning(mainWindow(), tr("Unable to export video."), QnClientVideoCamera::errorString(tool->status()), QDialogButtonBox::Ok);
+        QnMessageBox::warning(mainWindow(), tr("Unable to export video."), QnClientVideoCamera::errorString(tool->status()));
     }
 }
