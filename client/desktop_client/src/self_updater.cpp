@@ -83,7 +83,7 @@ QString backupPostfix()
 QString applauncherPostfix()
 {
 #if defined(Q_OS_MACX)
-    return lit("/Contents/MacOs")
+    return lit("/Contents/MacOs");
 #endif
     return QString();
 }
