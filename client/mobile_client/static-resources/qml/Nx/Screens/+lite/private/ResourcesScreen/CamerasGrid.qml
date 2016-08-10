@@ -108,6 +108,12 @@ Item
                 gridLayoutHelper.setCameraIdOnCell(
                     layoutX, layoutY, camerasModel.previousResourceId(resourceId))
             }
+
+            onActivityDetected:
+            {
+                if (grid.currentItem)
+                    grid.currentItem.showControls()
+            }
         }
     }
 

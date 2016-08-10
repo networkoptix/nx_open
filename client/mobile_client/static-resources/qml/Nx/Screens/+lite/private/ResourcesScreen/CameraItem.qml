@@ -19,6 +19,7 @@ Control
     property bool active: false
 
     signal clicked()
+    signal activityDetected()
     signal nextCameraRequested()
     signal previousCameraRequested()
 
@@ -72,7 +73,7 @@ Control
 
             anchors.fill: parent
 
-            opacity: active ? 1.0 : 0.0
+            opacity: 0.0
             Behavior on opacity { NumberAnimation { duration: 200 } }
             z: 5
 
@@ -89,7 +90,7 @@ Control
                 {
                     width: parent.width
                     height: 24
-                    color: ColorTheme.transparent(ColorTheme.base5, 0.4)
+                    color: ColorTheme.transparent(ColorTheme.base5, 0.6)
                     visible: resourceId
 
                     Text
@@ -248,14 +249,19 @@ Control
         id: mouseArea
         anchors.fill: parent
         onClicked: cameraItem.clicked()
+        hoverEnabled: true
 
         onWheel:
         {
+            activityDetected()
             if (wheel.angleDelta.y > 0)
                 previousCameraRequested()
             else
                 nextCameraRequested()
         }
+
+        onMouseXChanged: activityDetected()
+        onMouseYChanged: activityDetected()
     }
 
     MaterialEffect
@@ -264,6 +270,16 @@ Control
         anchors.fill: parent
         mouseArea: mouseArea
         rippleSize: width * 2
+    }
+
+    Timer
+    {
+        id: fadeOutTimer
+        interval: 3000
+        onTriggered:
+        {
+            controls.opacity = 0.0
+        }
     }
 
     Connections
@@ -279,6 +295,21 @@ Control
 
     onLayoutHelperChanged: updateResourceId()
     Component.onCompleted: updateResourceId()
+    onResourceIdChanged: activityDetected()
+    onActiveChanged:
+    {
+        if (active)
+            showControls()
+        else
+            controls.opacity = 0
+    }
+
+    function showControls()
+    {
+        if (active)
+            controls.opacity = 1.0
+        fadeOutTimer.restart()
+    }
 
     function updateResourceId()
     {
@@ -290,6 +321,8 @@ Control
 
     Keys.onPressed:
     {
+        activityDetected()
+
         if (event.modifiers == Qt.ControlModifier)
         {
             if (event.key == Qt.Key_Left)
