@@ -61,8 +61,8 @@ bool SelfUpdater::registerUriHandler()
     return nx::utils::registerSystemUriProtocolHandler(
         nx::vms::utils::AppInfo::nativeUriProtocol(),
         binaryPath,
-        QnClientAppInfo::macOsBundleName(),
         QnAppInfo::productNameLong(),
+        QnClientAppInfo::macOsBundleName(),
         nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
         QnAppInfo::customizationName(),
         m_clientVersion);
@@ -83,7 +83,7 @@ QString backupPostfix()
 QString applauncherPostfix()
 {
 #if defined(Q_OS_MACX)
-    return lit("/Contents/MacOs")
+    return lit("/Contents/MacOs");
 #endif
     return QString();
 }

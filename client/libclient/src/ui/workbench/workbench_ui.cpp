@@ -437,6 +437,15 @@ void QnWorkbenchUi::storeSettings()
     qnSettings->setPaneSettings(settings);
 }
 
+void QnWorkbenchUi::updateCursor()
+{
+#ifndef Q_OS_MACX
+    bool curtained = m_inactive;
+    if (display()->view())
+        display()->view()->viewport()->setCursor(QCursor(curtained ? Qt::BlankCursor : Qt::ArrowCursor));
+#endif
+}
+
 QnImageButtonWidget* QnWorkbenchUi::newActionButton(QGraphicsItem *parent, QAction* action, int helpTopicId)
 {
     QnImageButtonWidget* button = new QnImageButtonWidget(parent);
@@ -786,6 +795,7 @@ void QnWorkbenchUi::at_activityStopped()
         if (!(widget->options() & QnResourceWidget::DisplayInfo))
             widget->setOverlayVisible(false);
     }
+    updateCursor();
 }
 
 void QnWorkbenchUi::at_activityStarted()
@@ -800,6 +810,7 @@ void QnWorkbenchUi::at_activityStarted()
         if (widget->isInfoVisible()) // TODO: #Elric wrong place?
             widget->setOverlayVisible(true);
     }
+    updateCursor();
 }
 
 void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)

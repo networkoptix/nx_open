@@ -341,11 +341,15 @@ void QnMessageBox::setDefaultButton(QAbstractButton *button)
     if (!ui->buttonBox->buttons().contains(button))
         return;
 
-    if (QPushButton *pushButton = qobject_cast<QPushButton*>(button))
-        pushButton->setAutoDefault(true);
+    Q_D(QnMessageBox);
+    if (button == d->defaultButton)
+        return;
+
+    if (QPushButton* pushButton = qobject_cast<QPushButton*>(button))
+        pushButton->setDefault(true);
+
     button->setFocus();
 
-    Q_D(QnMessageBox);
     d->defaultButton = button;
     d->stylizeButtons();
 }
@@ -787,4 +791,22 @@ void QnMessageBox::keyPressEvent(QKeyEvent *event)
     }
 
     QDialog::keyPressEvent(event);
+}
+
+bool QnMessageBox::event(QEvent* event)
+{
+    bool res = QDialog::event(event);
+
+    if (event->type() != QEvent::LayoutRequest)
+        return res;
+
+    if (hasHeightForWidth())
+    {
+        setFixedHeight(heightForWidth(width()));
+        return res;
+    }
+
+    /* This dialog must have height-for-width, but just in case handle otherwise: */
+    setFixedHeight(sizeHint().height());
+    return res;
 }
