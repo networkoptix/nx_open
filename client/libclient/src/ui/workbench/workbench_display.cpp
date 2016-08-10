@@ -225,8 +225,10 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(fitInView()), Qt::QueuedConnection);
 
     connect(m_beforePaintInstrument,        SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(updateFrameWidths()));
-    connect(m_curtainActivityInstrument,    SIGNAL(activityStopped()),                                  this,                   SLOT(at_curtainActivityInstrument_activityStopped()));
-    connect(m_curtainActivityInstrument,    SIGNAL(activityResumed()),                                  this,                   SLOT(at_curtainActivityInstrument_activityStarted()));
+    connect(m_curtainActivityInstrument,    &ActivityListenerInstrument::activityStopped,  this,
+        &QnWorkbenchDisplay::updateCurtainedCursor);
+    connect(m_curtainActivityInstrument, &ActivityListenerInstrument::activityResumed, this,
+        &QnWorkbenchDisplay::updateCurtainedCursor);
     connect(m_widgetActivityInstrument,     SIGNAL(activityStopped()),                                  this,                   SLOT(at_widgetActivityInstrument_activityStopped()));
     connect(m_widgetActivityInstrument,     SIGNAL(activityResumed()),                                  this,                   SLOT(at_widgetActivityInstrument_activityStarted()));
 
@@ -699,9 +701,12 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
             synchronize(newWidget, true);
 
             m_viewportAnimator->moveTo(itemGeometry(newWidget->item()));
+            m_curtainAnimator->curtain(newWidget);
         } else {
             m_viewportAnimator->moveTo(fitInViewGeometry());
+            m_curtainAnimator->uncurtain();
         }
+        updateCurtainedCursor();
 
         /* Sync scene geometry. */
         synchronizeSceneBounds();
@@ -743,10 +748,6 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
 
         /* Update margin flags. */
         updateCurrentMarginFlags();
-
-        /* Update curtain. */
-        if(m_curtainAnimator->isCurtained())
-            updateCurtainedCursor();
 
         break;
     }
@@ -1636,13 +1637,12 @@ void QnWorkbenchDisplay::updateFrameWidths() {
             : qnGlobals->defaultFrameWidth());
 }
 
-void QnWorkbenchDisplay::updateCurtainedCursor() {
-#ifdef Q_OS_MACX
-    if(m_view != NULL)
-        m_view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
-#else
-    bool curtained = m_curtainAnimator->isCurtained();
-    if(m_view != NULL)
+void QnWorkbenchDisplay::updateCurtainedCursor()
+{
+#ifndef Q_OS_MACX
+    bool curtained = m_curtainAnimator->isCurtained()
+        && !m_curtainActivityInstrument->isActive();
+    if (m_view)
         m_view->viewport()->setCursor(QCursor(curtained ? Qt::BlankCursor : Qt::ArrowCursor));
 #endif
 }
@@ -1951,14 +1951,6 @@ void QnWorkbenchDisplay::at_item_flagChanged(Qn::ItemFlag flag, bool value) {
         qnWarning("Invalid item flag '%1'.", static_cast<int>(flag));
         break;
     }
-}
-
-void QnWorkbenchDisplay::at_curtainActivityInstrument_activityStopped() {
-    m_curtainAnimator->curtain(m_widgetByRole[Qn::ZoomedRole]);
-}
-
-void QnWorkbenchDisplay::at_curtainActivityInstrument_activityStarted() {
-    m_curtainAnimator->uncurtain();
 }
 
 void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStopped() {

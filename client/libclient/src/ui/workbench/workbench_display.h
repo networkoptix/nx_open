@@ -421,8 +421,6 @@ protected slots:
     void at_item_dataChanged(int role);
     void at_item_flagChanged(Qn::ItemFlag flag, bool value);
 
-    void at_curtainActivityInstrument_activityStopped();
-    void at_curtainActivityInstrument_activityStarted();
     void at_widgetActivityInstrument_activityStopped();
     void at_widgetActivityInstrument_activityStarted();
 
