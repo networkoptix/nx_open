@@ -104,7 +104,7 @@ Control
             VideoPositioner
             {
                 anchors.fill: parent
-                customAspectRatio: resourceHelper.customAspectRatio
+                customAspectRatio: resourceHelper.customAspectRatio || player.aspectRatio
                 videoRotation: resourceHelper.customRotation
                 sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
 
