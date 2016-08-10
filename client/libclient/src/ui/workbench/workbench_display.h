@@ -47,9 +47,6 @@ class QnCurtainAnimator;
 class QnCurtainItem;
 class QnGridItem;
 class QnGridBackgroundItem;
-class QnWorkbenchContext;
-class QnWorkbenchStreamSynchronizer;
-class QnToggle;
 class QnThumbnailsLoader;
 class QnThumbnail;
 
@@ -96,63 +93,30 @@ public:
     /**
      * \returns                         Instrument manager owned by this workbench display.
      */
-    InstrumentManager *instrumentManager() const
-    {
-        return m_instrumentManager;
-    }
+    InstrumentManager* instrumentManager() const;
 
     /**
      * \returns                         Bounding instrument used by this workbench display.
      */
-    BoundingInstrument *boundingInstrument() const
-    {
-        return m_boundingInstrument;
-    }
+    BoundingInstrument* boundingInstrument() const;
 
     /**
      * \returns                         Transformation listener instrument used by this workbench display.
      */
-    TransformListenerInstrument *transformationListenerInstrument() const
-    {
-        return m_transformListenerInstrument;
-    }
+    TransformListenerInstrument* transformationListenerInstrument() const;
 
-    /**
-     * \returns                         Activity listener instrument used by this workbench display to
-     *                                  implement automatic curtaining.
-     */
-    ActivityListenerInstrument *activityListenerInstrument() const
-    {
-        return m_curtainActivityInstrument;
-    }
-
-    FocusListenerInstrument *focusListenerInstrument() const
-    {
-        return m_focusListenerInstrument;
-    }
+    FocusListenerInstrument* focusListenerInstrument() const;
 
     /**
      * \returns                         Paint forwarding instrument used by this workbench display.
      */
-    ForwardingInstrument *paintForwardingInstrument() const
-    {
-        return m_paintForwardingInstrument;
-    }
+    ForwardingInstrument* paintForwardingInstrument() const;
 
-    SelectionOverlayHackInstrument *selectionOverlayHackInstrument() const
-    {
-        return m_selectionOverlayHackInstrument;
-    }
+    SelectionOverlayHackInstrument* selectionOverlayHackInstrument() const;
 
-    SignalingInstrument *beforePaintInstrument() const
-    {
-        return m_beforePaintInstrument;
-    }
+    SignalingInstrument* beforePaintInstrument() const;
 
-    SignalingInstrument *afterPaintInstrument() const
-    {
-        return m_afterPaintInstrument;
-    }
+    SignalingInstrument* afterPaintInstrument() const;
 
 
     /**
@@ -172,21 +136,18 @@ public:
      *                                  If NULL is supplied, an empty scene
      *                                  owned by this workbench display is used.
      */
-    void setScene(QGraphicsScene *scene);
+    void setScene(QGraphicsScene* scene);
 
     /**
      * \returns                         Current graphics view of this workbench display.
      *                                  May be NULL.
      */
-    QnGraphicsView *view() const
-    {
-        return m_view;
-    }
+    QnGraphicsView* view() const;
 
     /**
      * \param view                      New view for this workbench display.
      */
-    void setView(QnGraphicsView *view);
+    void setView(QnGraphicsView* view);
 
     /**
      * \returns                         Grid item.
@@ -332,7 +293,7 @@ public:
     QSet<QnWorkbenchItem*> draggedItems() const;
     void setDraggedItems(const QSet<QnWorkbenchItem*>& value);
 
-    public slots:
+public slots:
     void fitInView(bool animate = true);
 
 signals:
@@ -390,12 +351,11 @@ protected:
 
     void setWidget(Qn::ItemRole role, QnResourceWidget *widget);
 
-    protected slots:
+protected slots:
     void synchronizeSceneBoundsExtension();
     void synchronizeRaisedGeometry();
     void updateFrameWidths();
 
-    void updateCurtainedCursor();
     void updateBackground(const QnLayoutResourcePtr &layout);
 
     /** Mark item on the scene selected as it was selected in the tree. */
@@ -457,11 +417,7 @@ private:
     /** Set of flags to simplify and speed up painting. */
     Qn::LightModeFlags m_lightMode;
 
-    /** Zoomed state toggle. */
-    QnToggle *m_zoomedToggle;
-
     /* Internal state. */
-
     QList<QnResourceWidget *> m_widgets;
 
     /** Item to widget mapping. */
@@ -506,9 +462,6 @@ private:
 
     /** Transformation listener instrument. */
     TransformListenerInstrument *m_transformListenerInstrument;
-
-    /** Activity listener instrument for curtain item. */
-    ActivityListenerInstrument *m_curtainActivityInstrument;
 
     /** Activity listener instrument for resource widgets. */
     ActivityListenerInstrument *m_widgetActivityInstrument;

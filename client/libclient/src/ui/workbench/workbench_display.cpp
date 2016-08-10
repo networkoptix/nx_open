@@ -183,7 +183,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_afterPaintInstrument = new SignalingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
-    m_curtainActivityInstrument = new ActivityListenerInstrument(true, 1000, this);
     m_widgetActivityInstrument = new ActivityListenerInstrument(true, 1000 * 10, this);
     m_focusListenerInstrument = new FocusListenerInstrument(this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::Viewport, paintEventTypes, this);
@@ -198,12 +197,9 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_instrumentManager->installInstrument(m_focusListenerInstrument);
     m_instrumentManager->installInstrument(resizeSignalingInstrument);
     m_instrumentManager->installInstrument(m_boundingInstrument);
-    m_instrumentManager->installInstrument(m_curtainActivityInstrument);
     m_instrumentManager->installInstrument(m_widgetActivityInstrument);
     m_instrumentManager->installInstrument(m_selectionOverlayHackInstrument);
     m_instrumentManager->installInstrument(new ToolTipInstrument(this));
-
-    m_curtainActivityInstrument->recursiveDisable();
 
     connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)), this, SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(synchronizeRaisedGeometry()));
@@ -213,10 +209,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(fitInView()), Qt::QueuedConnection);
 
     connect(m_beforePaintInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(updateFrameWidths()));
-    connect(m_curtainActivityInstrument, &ActivityListenerInstrument::activityStopped, this,
-        &QnWorkbenchDisplay::updateCurtainedCursor);
-    connect(m_curtainActivityInstrument, &ActivityListenerInstrument::activityResumed, this,
-        &QnWorkbenchDisplay::updateCurtainedCursor);
     connect(m_widgetActivityInstrument, SIGNAL(activityStopped()), this, SLOT(at_widgetActivityInstrument_activityStopped()));
     connect(m_widgetActivityInstrument, SIGNAL(activityResumed()), this, SLOT(at_widgetActivityInstrument_activityStarted()));
 
@@ -238,17 +230,10 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
         action(QnActions::StopSharingLayoutAction)->setEnabled(!isWebView);
     });
 
-    /* Create zoomed toggle. */
-    m_zoomedToggle = new QnToggle(false, this);
-    connect(m_zoomedToggle, SIGNAL(activated()), m_curtainActivityInstrument, SLOT(recursiveEnable()));
-    connect(m_zoomedToggle, SIGNAL(deactivated()), m_curtainActivityInstrument, SLOT(recursiveDisable()));
-
     /* Create curtain animator. */
     m_curtainAnimator = new QnCurtainAnimator(this);
     m_curtainAnimator->setSpeed(1.0); /* (255, 0, 0) -> (0, 0, 0) in 1 second. */
     m_curtainAnimator->setTimer(animationTimer);
-    connect(m_curtainAnimator, SIGNAL(curtained()), this, SLOT(updateCurtainedCursor()));
-    connect(m_curtainAnimator, SIGNAL(uncurtained()), this, SLOT(updateCurtainedCursor()));
 
     /* Create viewport animator. */
     m_viewportAnimator = new ViewportAnimator(this); // ANIMATION: viewport.
@@ -307,6 +292,46 @@ void QnWorkbenchDisplay::setLightMode(Qn::LightModeFlags mode)
         initSceneView();
 }
 
+InstrumentManager* QnWorkbenchDisplay::instrumentManager() const
+{
+    return m_instrumentManager;
+}
+
+BoundingInstrument* QnWorkbenchDisplay::boundingInstrument() const
+{
+    return m_boundingInstrument;
+}
+
+TransformListenerInstrument* QnWorkbenchDisplay::transformationListenerInstrument() const
+{
+    return m_transformListenerInstrument;
+}
+
+FocusListenerInstrument* QnWorkbenchDisplay::focusListenerInstrument() const
+{
+    return m_focusListenerInstrument;
+}
+
+ForwardingInstrument* QnWorkbenchDisplay::paintForwardingInstrument() const
+{
+    return m_paintForwardingInstrument;
+}
+
+SelectionOverlayHackInstrument* QnWorkbenchDisplay::selectionOverlayHackInstrument() const
+{
+    return m_selectionOverlayHackInstrument;
+}
+
+SignalingInstrument* QnWorkbenchDisplay::beforePaintInstrument() const
+{
+    return m_beforePaintInstrument;
+}
+
+SignalingInstrument* QnWorkbenchDisplay::afterPaintInstrument() const
+{
+    return m_afterPaintInstrument;
+}
+
 void QnWorkbenchDisplay::setScene(QGraphicsScene *scene)
 {
     if (m_scene == scene)
@@ -319,6 +344,11 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene)
 
     if (m_scene && m_view)
         initSceneView();
+}
+
+QnGraphicsView* QnWorkbenchDisplay::view() const
+{
+    return m_view;
 }
 
 void QnWorkbenchDisplay::setView(QnGraphicsView *view)
@@ -710,8 +740,6 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
         }
         case Qn::ZoomedRole:
         {
-            m_zoomedToggle->setActive(newWidget != NULL);
-
             /* Sync new & old items. */
             if (oldWidget != NULL)
                 synchronize(oldWidget, true);
@@ -729,7 +757,6 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
                 m_viewportAnimator->moveTo(fitInViewGeometry());
                 m_curtainAnimator->uncurtain();
             }
-            updateCurtainedCursor();
 
             /* Sync scene geometry. */
             synchronizeSceneBounds();
@@ -1805,17 +1832,6 @@ void QnWorkbenchDisplay::updateFrameWidths()
             ? qnGlobals->selectedFrameWidth()
             : qnGlobals->defaultFrameWidth());
 }
-
-void QnWorkbenchDisplay::updateCurtainedCursor()
-{
-#ifndef Q_OS_MACX
-    bool curtained = m_curtainAnimator->isCurtained()
-        && !m_curtainActivityInstrument->isActive();
-    if (m_view)
-        m_view->viewport()->setCursor(QCursor(curtained ? Qt::BlankCursor : Qt::ArrowCursor));
-#endif
-}
-
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: handlers
