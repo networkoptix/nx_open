@@ -82,9 +82,6 @@ namespace detail
         template <class T>
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
-            if (!isTranAllowed(tran))
-                return ErrorCode::forbidden;
-
             NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             if (!tran.isLocal) {
                 QnTransactionLog::ContainsReason isContains = transactionLog->contains(tran);
@@ -103,18 +100,12 @@ namespace detail
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& /*serializedTran*/)
         {
-            if (!isTranAllowed(tran))
-                return ErrorCode::forbidden;
-
             return executeTransactionInternal(tran);
         }
 
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
-            if (!isTranAllowed(tran.command))
-                return ErrorCode::forbidden;
-
             NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             QnDbTransactionLocker lock(getTransaction());
             ErrorCode result = executeTransactionNoLock(tran, serializedTran);
@@ -593,7 +584,6 @@ namespace detail
         bool migrateServerGUID(const QString& table, const QString& field);
         bool removeWrongSupportedMotionTypeForONVIF();
         bool fixBusinessRules();
-        bool isTranAllowed(const QnAbstractTransaction& tran) const;
         bool syncLicensesBetweenDB();
         ErrorCode getLicenses(ec2::ApiLicenseDataList& data, QSqlDatabase& database);
     private:
@@ -637,31 +627,31 @@ public:
     ApiObjectType getObjectType(const QnUuid& objectId);
 
     template <typename T1>
-    ErrorCode doQuery(const T1 &t1, ApiFullInfoData &data)
+    ErrorCode doQuery(const T1& t1, ApiFullInfoData& data)
     {
         ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, data);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        ec2::getTransactionDescriptorByParam<ApiResourceTypeDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.resourceTypes);
-        ec2::getTransactionDescriptorByParam<ApiMediaServerDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.servers);
-        ec2::getTransactionDescriptorByParam<ApiMediaServerUserAttributesDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.serversUserAttributesList);
-        ec2::getTransactionDescriptorByParam<ApiCameraDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.cameras);
-        ec2::getTransactionDescriptorByParam<ApiCameraAttributesDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.cameraUserAttributesList);
-        ec2::getTransactionDescriptorByParam<ApiUserDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.users);
-        ec2::getTransactionDescriptorByParam<ApiUserGroupDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.userGroups);
-        ec2::getTransactionDescriptorByParam<ApiUserGroupDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.userGroups);
-        ec2::getTransactionDescriptorByParam<ApiAccessRightsDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.accessRights);
-        ec2::getTransactionDescriptorByParam<ApiLayoutDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.layouts);
-        ec2::getTransactionDescriptorByParam<ApiVideowallDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.videowalls);
-        ec2::getTransactionDescriptorByParam<ApiBusinessRuleDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.rules);
-        ec2::getTransactionDescriptorByParam<ApiServerFootageDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.cameraHistory);
-        ec2::getTransactionDescriptorByParam<ApiLicenseDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.licenses);
-        ec2::getTransactionDescriptorByParam<ApiDiscoveryDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.discoveryData);
-        ec2::getTransactionDescriptorByParam<ApiResourceParamWithRefDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.allProperties);
-        ec2::getTransactionDescriptorByParam<ApiStorageDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.storages);
-        ec2::getTransactionDescriptorByParam<ApiResourceStatusDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.resStatusList);
-        ec2::getTransactionDescriptorByParam<ApiWebPageDataList>()->filterByReadPermissionFunc(m_userAccessData.userId, data.webPages);
+        readData(data.resourceTypes);
+        readData(data.servers);
+        readData(data.serversUserAttributesList);
+        readData(data.cameras);
+        readData(data.cameraUserAttributesList);
+        readData(data.users);
+        readData(data.userGroups);
+        readData(data.userGroups);
+        readData(data.accessRights);
+        readData(data.layouts);
+        readData(data.videowalls);
+        readData(data.rules);
+        readData(data.cameraHistory);
+        readData(data.licenses);
+        readData(data.discoveryData);
+        readData(data.allProperties);
+        readData(data.storages);
+        readData(data.resStatusList);
+        readData(data.webPages);
 
         return errorCode;
     }
@@ -678,7 +668,8 @@ public:
         ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, t2);
         if (errorCode != ErrorCode::ok)
             return errorCode;
-        if (!ec2::getTransactionDescriptorByParam<T2>()->checkReadPermissionFunc(m_userAccessData.userId, t2))
+
+        if (!ec2::getTransactionDescriptorByParam<T2>()->checkReadPermissionFunc(m_userAccessData, t2))
         {
             errorCode = ErrorCode::forbidden;
             t2 = T2();
@@ -694,7 +685,7 @@ public:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        ec2::getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_userAccessData.userId, outParam);
+        ec2::getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_userAccessData, outParam);
         if (outParam.size() != outParamOriginalSize && outParam.size() == 0)
             return ErrorCode::forbidden;
         return errorCode;
@@ -703,7 +694,7 @@ public:
     template <typename Param, typename SerializedTransaction>
     ErrorCode executeTransactionNoLock(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
     {
-        if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData.userId, tran.params))
+        if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
             return ErrorCode::forbidden;
         return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
     }
@@ -712,7 +703,7 @@ public:
     ErrorCode executeTransactionNoLock(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
     {
         auto outParamContainer = tran.params;
-        ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData.userId, outParamContainer);
+        ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, outParamContainer);
         if (outParamContainer.size() != tran.params.size())
             return ErrorCode::forbidden;
 
@@ -722,7 +713,7 @@ public:
     template <class Param, class SerializedTransaction>
     ErrorCode executeTransaction(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
     {
-        if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData.userId, tran.params))
+        if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
             return ErrorCode::forbidden;
         return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
     }
@@ -731,7 +722,7 @@ public:
     ErrorCode executeTransaction(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
     {
         Cont<Param,A> paramCopy = tran.params;
-        ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData.userId, paramCopy);
+        ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, paramCopy);
         if (paramCopy.size() != tran.params.size())
             return ErrorCode::forbidden;
 
@@ -739,6 +730,12 @@ public:
     }
 
 private:
+    template<typename T>
+    void readData(T& target)
+    {
+        ec2::getTransactionDescriptorByParam<T>()->filterByReadPermissionFunc(m_userAccessData, target);
+    }
+
     Qn::UserAccessData m_userAccessData;
 };
 

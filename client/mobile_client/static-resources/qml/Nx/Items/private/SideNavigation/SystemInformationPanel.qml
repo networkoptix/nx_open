@@ -13,17 +13,7 @@ Pane
     implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
     padding: 0
 
-    background: Item
-    {
-        Rectangle
-        {
-            width: parent.width - 32
-            height: 1
-            x: 16
-            anchors.bottom: parent.bottom
-            color: ColorTheme.base10
-        }
-    }
+    background: null
 
     QnCloudSystemInformationWatcher
     {
@@ -33,7 +23,7 @@ Pane
     contentItem: SystemInformationBlock
     {
         topPadding: 16
-        bottomPadding: 16
+        bottomPadding: 0
         systemName: connectionManager.systemName
         address: connectionManager.currentHost
         user: userWatcher.userName

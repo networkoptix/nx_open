@@ -668,7 +668,6 @@ QnImageButtonWidget *QnNavigationItem::newActionButton(QnActions::IDType id)
     const auto statAlias = lit("%1_%2").arg(lit("navigation_item"), QnLexical::serialized(id));
     QnImageButtonWidget *button = new QnImageButtonWidget();
     button->setDefaultAction(action(id));
-    button->setCached(true);
     context()->statisticsModule()->registerButton(statAlias, button);
     return button;
 }

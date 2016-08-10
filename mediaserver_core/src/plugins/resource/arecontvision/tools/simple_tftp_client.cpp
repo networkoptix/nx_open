@@ -8,8 +8,6 @@
 #include <utils/common/systemerror.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 
-static const int SERVER_TFTP_PORT = 69;
-
 using namespace std;
 
 CLSimpleTFTPClient::CLSimpleTFTPClient(const QString& host, unsigned int timeout, unsigned int retry):
@@ -23,7 +21,7 @@ CLSimpleTFTPClient::CLSimpleTFTPClient(const QString& host, unsigned int timeout
     //m_wish_blk_size = double_blk_size;
     m_wish_blk_size  = blk_size;
     m_sock->setRecvTimeout(max(m_timeout,1000)); // minimum timeout is 1000 ms
-    if (!m_sock->setDestAddr(m_resolvedAddress, SERVER_TFTP_PORT))
+    if (!m_sock->setDestAddr(m_resolvedAddress, kDefaultTFTPPort))
     {
         qWarning() << "CLSimpleTFTPClient::CLSimpleTFTPClient: setDestAddr() failed: " << SystemError::getLastOSErrorText();
     }
@@ -39,7 +37,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
         int len_recv;
         int i, len = 0;
 
-        m_sock->setDestAddr( m_resolvedAddress, SERVER_TFTP_PORT );
+        m_sock->setDestAddr( m_resolvedAddress, kDefaultTFTPPort );
 
         len_send = form_read_request(fn, buff_send);
 

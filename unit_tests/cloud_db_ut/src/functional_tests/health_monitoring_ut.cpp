@@ -1,15 +1,10 @@
-/**********************************************************
-* May 11, 2016
-* akolesnikov
-***********************************************************/
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <utils/common/sync_call.h>
+#include <nx/utils/random.h>
 
 #include "test_setup.h"
-
 
 namespace nx {
 namespace cdb {
@@ -119,7 +114,8 @@ TEST_F(HealthMonitoring, reconnect)
     ASSERT_EQ(api::ResultCode::ok, result);
 
     const auto t1 = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() - t1 < std::chrono::seconds(8 + (rand() % 3)))
+    while (std::chrono::steady_clock::now() - t1
+        < std::chrono::seconds(utils::random::number(8, 10)))
     {
         //checking that cdb considers system as online
         api::SystemDataEx systemData;

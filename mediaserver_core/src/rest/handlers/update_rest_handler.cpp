@@ -30,7 +30,7 @@ int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParams 
     {
         auto userResource = resource.dynamicCast<QnUserResource>();
         if (userResource)
-            remotePeerHasAdminRights = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
+            remotePeerHasAdminRights = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalAdminPermission);
     }
 
     if (!remotePeerHasAdminRights)

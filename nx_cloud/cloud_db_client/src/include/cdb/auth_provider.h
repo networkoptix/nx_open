@@ -81,6 +81,9 @@ public:
     //!Returns nonce to be used by mediaserver
     virtual void getCdbNonce(
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) = 0;
+    virtual void getCdbNonce(
+        const std::string& systemId,
+        std::function<void(api::ResultCode, api::NonceData)> completionHandler) = 0;
     //!Returns light_MD5(ha1:nonce). Real digest response can be calculated using this hash
     /*!
         \a light_MD5(ha1:nonce) is calculated by copying A,B,C,D members of MD5_CTX before calling MD5_Final

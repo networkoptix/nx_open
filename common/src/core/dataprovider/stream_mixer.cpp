@@ -258,7 +258,7 @@ void QnStreamMixer::handlePacket(QnAbstractMediaDataPtr& data)
     uintptr_t provider = reinterpret_cast<uintptr_t>(data->dataProvider);
     auto originalChannel = data->channelNumber;
 
-    if (m_sourceMap.contains(provider));
+    if (m_sourceMap.contains(provider))
     {
         decltype(QnProviderChannelInfo::videoChannelMap)* channelMap;
 

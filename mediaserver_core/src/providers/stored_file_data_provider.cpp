@@ -1,9 +1,11 @@
 #include "stored_file_data_provider.h"
-#include <core/resource/resource.h>
+
 #include <api/app_server_connection.h>
+#include <core/resource/local_audio_file_resource.h>
+#include <core/resource/resource.h>
+#include <nx/utils/random.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <utils/common/sleep.h>
-#include <core/resource/local_audio_file_resource.h>
 
 namespace {
     const QString kNotificationsPathPrefix("notifications/");
@@ -23,7 +25,7 @@ QnStoredFileDataProvider::QnStoredFileDataProvider(const QString &filePath, int 
         this, &QnStoredFileDataProvider::fileLoaded,
         this, &QnStoredFileDataProvider::at_fileLoaded);
 
-    connection->getStoredFileManager(Qn::kDefaultUserAccess)->getStoredFile(
+    connection->getStoredFileManager(Qn::kSystemAccess)->getStoredFile(
         m_filePath,
         this,
         [this](int handle, ec2::ErrorCode errorCode, const QByteArray& fileData)
@@ -40,7 +42,7 @@ void QnStoredFileDataProvider::setCyclesCount(int cyclesCount)
 
 void QnStoredFileDataProvider::prepareIODevice()
 {
-    const QString temporaryFilePath = QString::number(rand());
+    const QString temporaryFilePath = QString::number(nx::utils::random::number(0));
 
     QBuffer* buffer = new QBuffer();
     buffer->setBuffer(&m_fileData);

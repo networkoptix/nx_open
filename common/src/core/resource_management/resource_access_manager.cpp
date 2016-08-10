@@ -18,6 +18,7 @@
 #include <nx_ec/data/api_webpage_data.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/raii_guard.h>
 
 //#define DEBUG_PERMISSIONS
 #ifdef DEBUG_PERMISSIONS
@@ -26,17 +27,13 @@
 #define TRACE(...)
 #endif
 
-QnResourceAccessManager::UpdateCacheGuard::UpdateCacheGuard(QnResourceAccessManager* parent) :
-    m_parent(parent)
+class QnResourceAccessManager::UpdateCacheGuard : QnRaiiGuard
 {
-    parent->beginUpdateCache();
-}
-
-QnResourceAccessManager::UpdateCacheGuard::~UpdateCacheGuard()
-{
-    m_parent->endUpdateCache();
-}
-
+public:
+    UpdateCacheGuard(QnResourceAccessManager* parent) : QnRaiiGuard(
+        [parent]() { parent->beginUpdateCache(); },
+        [parent]() { parent->endUpdateCache(); }) {}
+};
 
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
@@ -79,6 +76,7 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         {
             connect(user, &QnUserResource::permissionsChanged,  this, &QnResourceAccessManager::invalidateResourceCache);
             connect(user, &QnUserResource::userGroupChanged,    this, &QnResourceAccessManager::invalidateResourceCache);
+            connect(user, &QnUserResource::enabledChanged,      this, &QnResourceAccessManager::invalidateResourceCache);
         }
 
         /* Storage can be added (and permissions requested) before the server. */
@@ -275,7 +273,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
         return result;
     };
 
-    if (!user)
+    if (!user || !user->isEnabled())
         return Qn::NoGlobalPermissions;
 
     /* Handle just-created user situation. */
@@ -482,6 +480,8 @@ void QnResourceAccessManager::invalidateCacheForVideowallItem(const QnVideoWallR
 Qn::Permissions QnResourceAccessManager::calculatePermissions(const QnUserResourcePtr& user, const QnResourcePtr& target) const
 {
     NX_ASSERT(target);
+    if (!user->isEnabled())
+        return Qn::NoPermissions;
 
     if (QnUserResourcePtr targetUser = target.dynamicCast<QnUserResource>())
         return calculatePermissionsInternal(user, targetUser);
@@ -512,12 +512,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 {
     TRACE("Calculate permissions of user " << user->getName() << " to camera " << camera->getName())
     NX_ASSERT(camera);
-    Qn::Permissions result = Qn::ReadPermission;
+    Qn::Permissions result = Qn::NoPermissions;
 
-    if (!isAccessibleResource(user, camera))
+    if (isAccessibleResource(user, camera) == Access::Forbidden)
         return result;
 
-    result |= Qn::ViewContentPermission;
+    result |= Qn::ReadPermission;
     if (hasGlobalPermission(user, Qn::GlobalExportPermission))
         result |= Qn::ExportPermission;
 
@@ -538,7 +538,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     NX_ASSERT(server);
     /* All users must have at least ReadPermission to send api requests
      * (recorded periods, bookmarks, etc) and view servers on shared layouts. */
-    Qn::Permissions result = Qn::ReadPermission | Qn::ViewContentPermission;
+    Qn::Permissions result = Qn::ReadPermission;
 
     if (hasGlobalPermission(user, Qn::GlobalAdminPermission) && !qnCommon->isReadOnly())
         result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
@@ -579,12 +579,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnWebPageResourcePtr& webPage) const
 {
     NX_ASSERT(webPage);
-    Qn::Permissions result = Qn::ReadPermission;
+    Qn::Permissions result = Qn::NoPermissions;
 
-    if (!isAccessibleResource(user, webPage))
+    if (isAccessibleResource(user, webPage) == Access::Forbidden)
         return result;
 
-    result |= Qn::ViewContentPermission;
+    result |= Qn::ReadPermission;
     if (qnCommon->isReadOnly())
         return result;
 
@@ -628,7 +628,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         });
 
         if (hasDesktopCamera)
-            return checkReadOnly(Qn::ReadPermission | Qn::ViewContentPermission | Qn::RemovePermission);
+            return checkReadOnly(Qn::ReadPermission | Qn::RemovePermission);
     }
 
 
@@ -639,15 +639,11 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         if (user->isOwner())
             return Qn::FullLayoutPermissions;
 
-		/* 'Videowall user' should have read access to the layouts */
-		if (hasGlobalPermission(user, Qn::GlobalPermission::INTERNAL_GlobalVideoWallLayoutPermission))
-			return Qn::ReadPermission;
-
         /* Access to global layouts. Simple check is enough, exported layouts are checked on the client side. */
         if (layout->isShared())
         {
-            if (!isAccessibleResource(user, layout))
-                return Qn::ReadPermission;
+            if (isAccessibleResource(user, layout) == Access::Forbidden)
+                return Qn::NoPermissions;
 
             /* Global layouts editor. */
             if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
@@ -671,7 +667,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
             if (!owner)
                 return hasGlobalPermission(user, Qn::GlobalAdminPermission)
                     ? Qn::FullLayoutPermissions
-                    : Qn::ReadPermission;
+                    : Qn::NoPermissions;
 
             /* We can modify layout for user if we can modify this user. */
             Qn::Permissions userPermissions = permissions(user, owner);
@@ -682,7 +678,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
             if (userPermissions.testFlag(Qn::ReadPermission))
                 return Qn::ModifyLayoutPermission;
 
-            return Qn::ReadPermission;
+            return Qn::NoPermissions;
         }
 
         /* User can do whatever he wants with own layouts. */
@@ -737,20 +733,26 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     return checkReadOnly(checkUserType(result));
 }
 
-bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const
+QnResourceAccessManager::Access QnResourceAccessManager::isAccessibleResource(
+    const QnUserResourcePtr& user, const QnResourcePtr& resource) const
 {
     NX_ASSERT(resource);
 
     if (!user || !resource)
-        return false;
+        return Access::Forbidden;
+
+    if (!user->isEnabled())
+        return Access::Forbidden;
 
     /* Handling desktop cameras before all other checks. */
     if (resource->hasFlags(Qn::desktop_camera))
-        return isAccessibleViaVideowall(user, resource);
+        return isAccessibleViaVideowall(user, resource)
+        ? Access::ViaVideowall
+        : Access::Forbidden;
 
     QSet<QnUuid> accessible = accessibleResources(user);
     if (accessible.contains(resource->getId()))
-        return true;
+        return Access::Directly;
 
     /* Web Pages behave totally like cameras. */
     bool isMediaResource = resource.dynamicCast<QnVirtualCameraResource>()
@@ -764,17 +766,21 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
         : Qn::GlobalAdminPermission;
 
     if (hasGlobalPermission(user, requiredPermission))
-        return true;
+        return Access::Directly;
 
     /* Here we are checking if the camera exists on one of the shared layouts, available to given user. */
     if (isMediaResource)
-        return isAccessibleViaLayouts(accessible, resource, true);
+        return isAccessibleViaLayouts(accessible, resource, true)
+        ? Access::ViaLayout
+        : Access::Forbidden;
 
     /* Check if layout belongs to videowall. */
     if (isLayout)
-        return isAccessibleViaVideowall(user, resource);
+        return isAccessibleViaVideowall(user, resource)
+        ? Access::ViaVideowall
+        : Access::Forbidden;
 
-    return false;
+    return Access::Forbidden;
 }
 
 bool QnResourceAccessManager::isAccessibleViaVideowall(const QnUserResourcePtr& user, const QnResourcePtr& resource) const
@@ -849,8 +855,8 @@ bool QnResourceAccessManager::isAccessibleViaLayouts(const QSet<QnUuid>& layoutI
 
 void QnResourceAccessManager::beginUpdateCache()
 {
-    int counter = ++m_cacheUpdateCounter;
-    TRACE("beginUpdateCache " << counter);
+    ++m_cacheUpdateCounter;
+    TRACE("beginUpdateCache");
 }
 
 void QnResourceAccessManager::endUpdateCache()

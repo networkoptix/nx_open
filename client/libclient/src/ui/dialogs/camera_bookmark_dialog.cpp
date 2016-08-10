@@ -12,6 +12,8 @@ QnCameraBookmarkDialog::QnCameraBookmarkDialog(QWidget *parent) :
     setHelpTopic(this, Qn::Bookmarks_Editing_Help);
 
     connect(ui->bookmarkWidget, &QnBookmarkWidget::validChanged, this, [this] {
+        if (!buttonBox())
+            return;
         auto okButton = buttonBox()->button(QDialogButtonBox::Ok);
         if (!okButton)
             return;

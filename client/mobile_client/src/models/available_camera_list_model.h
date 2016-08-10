@@ -4,6 +4,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
+#include <utils/common/id.h>
 
 class QnAvailableCameraListModelPrivate;
 class QnAvailableCameraListModel : public Connective<QAbstractListModel>
@@ -24,6 +25,8 @@ public:
 
     QnLayoutResourcePtr layout() const;
     void setLayout(const QnLayoutResourcePtr& layout);
+
+    QModelIndex indexByResourceId(const QnUuid& resourceId) const;
 
 protected:
     virtual bool filterAcceptsResource(const QnResourcePtr& resource) const;

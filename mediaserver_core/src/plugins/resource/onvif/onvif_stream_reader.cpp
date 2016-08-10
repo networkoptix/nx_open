@@ -91,6 +91,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraC
 
     m_multiCodec.setRole(getRole());
     m_multiCodec.setRequest(streamUrl);
+
+	m_onvifRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
+
     result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED && canChangeStatus())
         m_resource->setStatus(Qn::Unauthorized);
@@ -207,9 +210,12 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
 
-    m_onvifRes->updateSourceUrl(*streamUrl, getRole());
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3")
-        .arg(*streamUrl).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
+        .arg(*streamUrl)
+        .arg(m_resource->getUrl())
+        .arg(getRole()),
+        cl_logINFO);
+
     return result;
 }
 

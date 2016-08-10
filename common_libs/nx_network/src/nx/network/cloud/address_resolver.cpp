@@ -341,7 +341,7 @@ void AddressResolver::HostAddressInfo::checkExpirations()
         m_dnsEntries.clear();
     }
 
-    if (kDoNotResolveOnMediator)
+    if (!kResolveOnMediator)
         return; // just a short cut
 
     if (m_mediatorState == State::resolved &&
@@ -465,16 +465,25 @@ void AddressResolver::mediatorResolve(
             break; // continue
     }
 
-    if (!kDoNotResolveOnMediator)
+    if (kResolveOnMediator)
         return mediatorResolveImpl(info, lk, needDns);
 
-    if (info->second.isLikelyCloudAddress)
+    if (info->second.isLikelyCloudAddress
+        && static_cast<bool>(nx::network::SocketGlobals::mediatorConnector().mediatorAddress()))
+    {
         info->second.setMediatorEntries({AddressEntry(AddressType::cloud, info->first)});
+    }
     else
+    {
         info->second.setMediatorEntries();
+    }
 
-    NX_CRITICAL(info->second.isResolved(true));
-    const auto guards = grabHandlers(SystemError::noError, info);
+    const auto sysErrorCode =
+        info->second.isResolved(true)
+        ? SystemError::noError
+        : SystemError::hostNotFound;
+
+    const auto guards = grabHandlers(sysErrorCode, info);
     lk->unlock(); //< fire guards away from mutex scope
 }
 

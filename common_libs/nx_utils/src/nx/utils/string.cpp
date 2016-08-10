@@ -5,6 +5,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/datetime.h>
+#include <nx/utils/random.h>
 
 namespace nx {
 namespace utils {
@@ -439,9 +440,9 @@ QByteArray generateRandomName(int length)
 
     QByteArray str;
     str.resize(length);
-    str[0] = kAlphaAndDigits[rand() % (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - kDigitsCount - 1)];
+    str[0] = kAlphaAndDigits[nx::utils::random::number(0) % (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - kDigitsCount - 1)];
     for (int i = 1; i < length; ++i)
-        str[i] = kAlphaAndDigits[rand() % (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - 1)];
+        str[i] = kAlphaAndDigits[nx::utils::random::number(0) % (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - 1)];
 
     return str;
 }

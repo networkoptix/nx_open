@@ -60,7 +60,7 @@ void QnResourcesChangesManager::deleteResources(const QnResourceList &resources)
         idToDelete << resource->getId();
     }
 
-    connection->getResourceManager(Qn::kDefaultUserAccess)->remove( idToDelete, this, [this, resources, sessionGuid](int reqID, ec2::ErrorCode errorCode) {
+    connection->getResourceManager(Qn::kSystemAccess)->remove( idToDelete, this, [this, resources, sessionGuid](int reqID, ec2::ErrorCode errorCode) {
         Q_UNUSED(reqID);
 
         /* Check if all OK */
@@ -125,7 +125,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
     ec2::ApiCameraAttributesDataList apiAttributes;
     fromResourceListToApi(changes, apiAttributes);
 
-    connection->getCameraManager(Qn::kDefaultUserAccess)->saveUserAttributes(apiAttributes, this,
+    connection->getCameraManager(Qn::kSystemAccess)->saveUserAttributes(apiAttributes, this,
         [this, cameras, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode )
     {
         Q_UNUSED(reqID);
@@ -177,7 +177,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
      ec2::ApiCameraDataList apiCameras;
      ec2::fromResourceListToApi(cameras, apiCameras);
 
-     connection->getCameraManager(Qn::kDefaultUserAccess)->save(apiCameras, this, [this, cameras, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+     connection->getCameraManager(Qn::kSystemAccess)->save(apiCameras, this, [this, cameras, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
          Q_UNUSED(reqID);
 
          /* Check if all OK */
@@ -247,7 +247,7 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
     ec2::ApiMediaServerUserAttributesDataList attributes;
     fromResourceListToApi(changes, attributes);
 
-    connection->getMediaServerManager(Qn::kDefaultUserAccess)->saveUserAttributes(attributes, this,
+    connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributes(attributes, this,
         [this, servers, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode )
     {
         Q_UNUSED(reqID);
@@ -317,7 +317,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
     ec2::ApiUserData apiUser;
     fromResourceToApi(user, apiUser);
 
-    connection->getUserManager(Qn::kDefaultUserAccess)->save(apiUser, user->getPassword(), this,
+    connection->getUserManager(Qn::kSystemAccess)->save(apiUser, user->getPassword(), this,
         [this, user, userId, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode )
     {
         Q_UNUSED(reqID);
@@ -344,7 +344,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
     for (const auto &id : accessibleResources)
         accessRights.resourceIds.push_back(id);
 
-    connection->getUserManager(Qn::kDefaultUserAccess)->setAccessRights(accessRights, this,
+    connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
         [this, user, sessionGuid, accessibleResourcesBackup](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
@@ -380,7 +380,7 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnUuid& userId, co
     accessRights.userId = userId;
     for (const auto &id : accessibleResources)
         accessRights.resourceIds.push_back(id);
-    connection->getUserManager(Qn::kDefaultUserAccess)->setAccessRights(accessRights, this,
+    connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
         [this,userId, sessionGuid, accessibleResourcesBackup](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
@@ -408,7 +408,7 @@ void QnResourcesChangesManager::saveUserGroup(const ec2::ApiUserGroupData& userG
     auto backup = qnResourceAccessManager->userGroup(userGroup.id);
     qnResourceAccessManager->addOrUpdateUserGroup(userGroup);
 
-    connection->getUserManager(Qn::kDefaultUserAccess)->saveUserGroup(userGroup, this,
+    connection->getUserManager(Qn::kSystemAccess)->saveUserGroup(userGroup, this,
         [backup, userGroup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
@@ -439,7 +439,7 @@ void QnResourcesChangesManager::removeUserGroup(const QnUuid& groupId)
     auto backup = qnResourceAccessManager->userGroup(groupId);
     qnResourceAccessManager->removeUserGroup(groupId);
 
-    connection->getUserManager(Qn::kDefaultUserAccess)->removeUserGroup(groupId, this,
+    connection->getUserManager(Qn::kSystemAccess)->removeUserGroup(groupId, this,
         [backup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
@@ -478,7 +478,7 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr &vide
 
     ec2::ApiVideowallData apiVideowall;
     ec2::fromResourceToApi(videoWall, apiVideowall);
-    connection->getVideowallManager(Qn::kDefaultUserAccess)->save(apiVideowall, this, [this, videoWall, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode )
+    connection->getVideowallManager(Qn::kSystemAccess)->save(apiVideowall, this, [this, videoWall, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode )
     {
         Q_UNUSED(reqID);
 
@@ -526,7 +526,7 @@ void QnResourcesChangesManager::saveLayout(const QnLayoutResourcePtr &layout, La
     ec2::ApiLayoutData apiLayout;
     ec2::fromResourceToApi(layout, apiLayout);
 
-    connection->getLayoutManager(Qn::kDefaultUserAccess)->save(apiLayout, this, [this, layout, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+    connection->getLayoutManager(Qn::kSystemAccess)->save(apiLayout, this, [this, layout, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
         Q_UNUSED(reqID);
 
         /* Check if all OK */
@@ -569,7 +569,7 @@ void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr &webPage,
     ec2::ApiWebPageData apiWebpage;
     ec2::fromResourceToApi(webPage, apiWebpage);
 
-    connection->getWebPageManager(Qn::kDefaultUserAccess)->save(apiWebpage, this, [this, webPage, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+    connection->getWebPageManager(Qn::kSystemAccess)->save(apiWebpage, this, [this, webPage, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
         Q_UNUSED(reqID);
 
         /* Check if all OK */

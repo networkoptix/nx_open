@@ -106,7 +106,7 @@ private:
     mutable QnMutex m_mutex;
 
     void beforeMsgBodySourceDestruction(
-        MediaServerConnectionContainer::iterator serverConnectionIter);
+        nx_http::HttpServerConnection* connection);
     void onConnectionToPeerLost(
         MediaServerConnectionContainer::iterator serverConnectionIter);
     void onMediaServerIdlePeriodExpired(

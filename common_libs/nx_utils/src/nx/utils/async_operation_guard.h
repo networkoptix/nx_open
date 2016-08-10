@@ -10,9 +10,9 @@ namespace utils {
 
 /** Async Operation Guard helps to syncronize async opertions
  *  \code
- *      const auto sharedGuard = m_asyncOperationGuard.guard();
+ *      const auto sharedGuard = m_asyncOperationGuard.sharedGuard();
  *      doAsyncOperation([sharedGuard]() {
- *          if (auto lock = sharedGuard()) {
+ *          if (auto lock = sharedGuard->lock()) {
  *              // do stuff with object holding m_asyncOperationGuard safe
  *          }
  *      });

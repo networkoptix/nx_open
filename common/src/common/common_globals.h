@@ -679,6 +679,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PT_DesktopClient = 1,
         PT_VideowallClient = 2,
         PT_MobileClient = 3,
+        PT_LiteClient = 4,
         PT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
@@ -849,12 +850,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RemovePermission                = 0x0008,   /**< Generic delete permission. */
         ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
         WriteNamePermission             = 0x0010,   /**< Permission to edit resource's name. */
-        ViewContentPermission           = 0x0020,   /**< Permission to view video streams, layouts and web-pages. Required to show resources in UI. */
 
         /* Layout-specific permissions. */
         AddRemoveItemsPermission        = 0x0040,   /**< Permission to add or remove items from a layout. */
         EditLayoutSettingsPermission    = 0x0080,   /**< Permission to setup layout background or set locked flag. */
-        ModifyLayoutPermission          = ReadPermission | WritePermission | AddRemoveItemsPermission | ViewContentPermission, /**< Permission to modify without saving. */
+        ModifyLayoutPermission          = ReadPermission | WritePermission | AddRemoveItemsPermission, /**< Permission to modify without saving. */
         FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | ModifyLayoutPermission | EditLayoutSettingsPermission,
 
         /* User-specific permissions. */
@@ -874,7 +874,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /* Mode-specific permissions. */
         VideoWallLayoutPermissions      = ModifyLayoutPermission,
-        VideoWallMediaPermissions       = ReadPermission | ViewContentPermission,
+        VideoWallMediaPermissions       = ReadPermission,
 
         AllPermissions = 0xFFFFFFFF
     };
@@ -900,7 +900,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* Manager permissions. */
         GlobalEditCamerasPermission             = 0x00000002,   /**< Can edit camera settings. */
         GlobalControlVideoWallPermission        = 0x00000004,   /**< Can control videowalls. */
-        INTERNAL_GlobalVideoWallLayoutPermission= 0x00000008,   // !!For internal use only!! Videowall layout access.
+
         GlobalViewLogsPermission                = 0x00000010,   /**< Can access event log and audit trail. */
 
         /* Viewer permissions. */
@@ -932,7 +932,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /* PTZ here is intended - for SpaceX, see VMS-2208 */
         GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalUserInputPermission |
-                                              GlobalControlVideoWallPermission | INTERNAL_GlobalVideoWallLayoutPermission | GlobalViewBookmarksPermission,
+                                              GlobalControlVideoWallPermission | GlobalViewBookmarksPermission,
 
         /* Actions in ActiveX plugin mode are limited. */
         GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalUserInputPermission,

@@ -1169,34 +1169,6 @@ bool QnDbManager::fixBusinessRules()
     return true;
 }
 
-bool QnDbManager::isTranAllowed(const QnAbstractTransaction& tran) const
-{
-    if( !m_dbReadOnly )
-        return true;
-
-    switch( tran.command )
-    {
-        case ApiCommand::addLicense:
-        case ApiCommand::addLicenses:
-        case ApiCommand::removeLicense:
-            return true;
-
-        case ApiCommand::saveMediaServer:
-        case ApiCommand::saveStorage:
-        case ApiCommand::saveStorages:
-        case ApiCommand::saveServerUserAttributes:
-        case ApiCommand::saveServerUserAttributesList:
-        case ApiCommand::setResourceStatus:
-        case ApiCommand::setResourceParam:
-        case ApiCommand::setResourceParams:
-            //allowing minimum set of transactions required for local server to function properly
-            return tran.deliveryInfo.originatorType == QnTranDeliveryInformation::localServer;
-
-        default:
-            return false;
-    }
-}
-
 bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
     if (updateName == lit(":/updates/07_videowall.sql"))
@@ -1516,6 +1488,7 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
     *internalId = getResourceInternalId(data.id);
 
     //NX_ASSERT(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
+    NX_ASSERT(!data.id.isNull(), "Resource ID must not be null");
 
     QSqlQuery query(m_sdb);
     if (*internalId) {
@@ -1539,12 +1512,6 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 
 ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 internalId)
 {
-    if (data.permissions & Qn::GlobalPermission::INTERNAL_GlobalVideoWallLayoutPermission)
-    {
-        NX_ASSERT(0, "This enum entry is only for the internal use");
-        return ErrorCode::forbidden;
-    }
-
     {
         const QString authQueryStr = data.hash.isEmpty()
             ? "UPDATE auth_user SET is_superuser=:isAdmin, email=:email where username=:name"

@@ -107,6 +107,11 @@ private:
     QSharedPointer<QnArchiveStreamReader> getArchiveDP();
     void notifyMediaRangeUsed(qint64 timestampUsec);
     QnRtspFfmpegEncoder* createRtspFfmpegEncoder(bool isVideo);
+
+    bool hasAccessToResource(
+        const QnUuid& authUserId,
+        const QnResourcePtr& mediaResource,
+        Qn::Permission permissions) const;
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

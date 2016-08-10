@@ -1711,16 +1711,17 @@ void QnWorkbenchActionHandler::at_renameAction_triggered()
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
     switch (nodeType)
     {
-    case Qn::ResourceNode:
-    case Qn::EdgeNode:
-    case Qn::RecorderNode:
-    case Qn::SharedLayoutNode:
-        resource = parameters.resource();
-        break;
-    default:
-        break;
+        case Qn::ResourceNode:
+        case Qn::EdgeNode:
+        case Qn::RecorderNode:
+        case Qn::SharedLayoutNode:
+        case Qn::AccessibleResourceNode:
+            resource = parameters.resource();
+            break;
+        default:
+            break;
     }
-    if (!resource)
+    if(!resource)
         return;
 
     QnVirtualCameraResourcePtr camera;
@@ -2291,7 +2292,7 @@ void QnWorkbenchActionHandler::sendServerRequest(const QnMediaServerResourcePtr&
         this, &QnWorkbenchActionHandler::at_serverRequest_nonceReceived);
 
     // TODO: Think of preloader in case of user complains about delay
-    m_serverRequests.emplace(serverUrl, ServerRequest{ std::move(server), std::move(path), std::move(reply) });
+    m_serverRequests.emplace(serverUrl, ServerRequest { server, path, std::move(reply) });
     client->doGet(serverUrl);
 }
 
@@ -2319,9 +2320,11 @@ void QnWorkbenchActionHandler::at_serverRequest_nonceReceived(QnAsyncHttpClientR
     auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
     QUrl url(lit("http://%1/%2:%3:%4/%5")
         .arg(gateway->endpoint().toString())
-        .arg(gateway->isSslEnabled() ? serverUrl.scheme() : lit("http"))
-        .arg(serverUrl.host()).arg(serverUrl.port())
-        .arg(request.path));
+        .arg(reply->url().scheme())
+        .arg(reply->url().host())
+        .arg(reply->url().port())
+        .arg(request.path)
+    );
 
     const auto appserverUrl = QnAppServerConnectionFactory::url();
     const auto authParam = createHttpQueryAuthParam(

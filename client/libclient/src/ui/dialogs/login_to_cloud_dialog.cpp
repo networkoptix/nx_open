@@ -65,6 +65,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget *parent)
     const QColor nxColor(qApp->palette().color(QPalette::Normal, QPalette::BrightText));
     setPaletteColor(ui->cloudWelcomeLabel, QPalette::WindowText, nxColor);
 
+    ui->loginLineEdit->setFocus();
     d->updateUi();
 }
 

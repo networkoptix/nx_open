@@ -59,12 +59,8 @@ bool CloudStreamSocket::close()
 {
     shutdown();
     if (m_socketDelegate)
-    {
-        const auto result = m_socketDelegate->close();
-        setDelegate(nullptr);
-        m_socketDelegate.reset();
-        return result;
-    }
+        return m_socketDelegate->close();
+
     return true;
 }
 

@@ -4,6 +4,7 @@
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavutil/pixdesc.h>
+#include <libswscale/swscale.h>
 };
 
 
@@ -26,9 +27,6 @@ namespace {
         case AV_PIX_FMT_YUV420P:
         case AV_PIX_FMT_YUVJ420P:
             return QVideoFrame::Format_YUV420P;
-        case AV_PIX_FMT_YUV422P:
-        case AV_PIX_FMT_YUVJ422P:
-            return QVideoFrame::Format_YV12;
         case AV_PIX_FMT_BGRA:
             return QVideoFrame::Format_BGRA32;
         case AV_PIX_FMT_NV12:
@@ -133,7 +131,8 @@ public:
     :
         codecContext(nullptr),
         frame(av_frame_alloc()),
-        lastPts(AV_NOPTS_VALUE)
+        lastPts(AV_NOPTS_VALUE),
+        scaleContext(nullptr)
     {
     }
 
@@ -141,14 +140,19 @@ public:
     {
         closeCodecContext();
         av_free(frame);
+        sws_freeContext(scaleContext);
     }
 
     void initContext(const QnConstCompressedVideoDataPtr& frame);
     void closeCodecContext();
 
+    // convert color space if QT doesn't support it
+    AVFrame* convertPixelFormat(const AVFrame* srcFrame);
+
     AVCodecContext* codecContext;
     AVFrame* frame;
     qint64 lastPts;
+    SwsContext* scaleContext;
 };
 
 void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
@@ -175,8 +179,46 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
 void FfmpegVideoDecoderPrivate::closeCodecContext()
 {
     QnFfmpegHelper::deleteAvCodecContext(codecContext);
-    codecContext = 0;
+    codecContext = nullptr;
 }
+
+AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
+{
+    static const AVPixelFormat dstAvFormat = AV_PIX_FMT_YUV420P;
+
+    if (!scaleContext)
+    {
+        scaleContext = sws_getContext(
+            srcFrame->width, srcFrame->height, (AVPixelFormat) srcFrame->format,
+            srcFrame->width, srcFrame->height, dstAvFormat,
+            SWS_BICUBIC, NULL, NULL, NULL);
+    }
+
+    AVFrame* dstFrame = av_frame_alloc();
+    int numBytes = avpicture_get_size(dstAvFormat, srcFrame->linesize[0], srcFrame->height);
+    if (numBytes <= 0)
+        return nullptr; //< can't allocate frame
+    numBytes += FF_INPUT_BUFFER_PADDING_SIZE; //< extra alloc space due to ffmpeg doc
+    dstFrame->buf[0] = av_buffer_alloc(numBytes);
+    avpicture_fill(
+        (AVPicture*) dstFrame,
+        dstFrame->buf[0]->data,
+        dstAvFormat,
+        srcFrame->linesize[0],
+        srcFrame->height);
+    dstFrame->width = srcFrame->width;
+    dstFrame->height = srcFrame->height;
+    dstFrame->format = dstAvFormat;
+
+    sws_scale(
+        scaleContext,
+        srcFrame->data, srcFrame->linesize,
+        0, srcFrame->height,
+        dstFrame->data, dstFrame->linesize);
+
+    return dstFrame;
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoder
@@ -265,20 +307,44 @@ int FfmpegVideoDecoder::decode(
         return res; //< Negative value means error, zero means buffering.
 
     QSize frameSize(d->frame->width, d->frame->height);
-    AVPixelFormat pixelFormat = (AVPixelFormat) d->frame->format;
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
+    int frameNum = d->frame->coded_picture_number;
 
-    auto qtPixelFormat = toQtPixelFormat(pixelFormat);
-    if (qtPixelFormat == QVideoFrame::Format_Invalid)
-        return -1; //< report error
+    auto qtPixelFormat = toQtPixelFormat((AVPixelFormat) d->frame->format);
 
-    QAbstractVideoBuffer* buffer = new AvFrameMemoryBuffer(d->frame); //< frame is moved here. null object after the call
-    d->frame = av_frame_alloc();
+    // Frame moved to the buffer. buffer keeps reference to a frame.
+    QAbstractVideoBuffer* buffer;
+    if (qtPixelFormat != QVideoFrame::Format_Invalid)
+    {
+        buffer = new AvFrameMemoryBuffer(d->frame);
+        d->frame = av_frame_alloc();
+    }
+    else
+    {
+        AVFrame* newFrame = d->convertPixelFormat(d->frame);
+        if (!newFrame)
+            return -1; //< can't convert pixel format
+        qtPixelFormat = toQtPixelFormat((AVPixelFormat) newFrame->format);
+        buffer = new AvFrameMemoryBuffer(newFrame);
+    }
+
     QVideoFrame* videoFrame = new QVideoFrame(buffer, frameSize, qtPixelFormat);
     videoFrame->setStartTime(startTimeMs);
 
     outDecodedFrame->reset(videoFrame);
-    return d->frame->coded_picture_number;
+    return frameNum;
+}
+
+double FfmpegVideoDecoder::getSampleAspectRatio() const
+{
+    Q_D(const FfmpegVideoDecoder);
+    if (d->codecContext && d->codecContext->width > 8 && d->codecContext->height > 8)
+    {
+        double result = av_q2d(d->codecContext->sample_aspect_ratio);
+        if (result > 1e-7)
+            return result;
+    }
+    return 1.0;
 }
 
 void FfmpegVideoDecoder::setMaxResolution(const QSize& maxResolution)

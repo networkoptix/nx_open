@@ -1119,7 +1119,7 @@ int CRcvQueue::recvfrom(int32_t id, CPacket& packet)
    if (i == m_mBuffer.end())
    {
       #ifndef _WIN32
-         pthread_cond_wait_monotonic(&m_PassCond, &m_PassLock, 1000 * 1000); // 1 s
+         pthread_cond_wait_monotonic_timeout(&m_PassCond, &m_PassLock, 1000 * 1000); // 1 s
       #else
          ReleaseMutex(m_PassLock);
          WaitForSingleObject(m_PassCond, 1000);

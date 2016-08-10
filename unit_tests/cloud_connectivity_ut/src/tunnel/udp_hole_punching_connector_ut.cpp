@@ -1,8 +1,3 @@
-/**********************************************************
-* Feb 3, 2016
-* akolesnikov
-***********************************************************/
-
 #include <boost/optional.hpp>
 #include <gtest/gtest.h>
 
@@ -10,6 +5,7 @@
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/network/cloud/tunnel/udp/connector.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/random.h>
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 
 #include "cross_nat_connector_test.h"
@@ -99,7 +95,7 @@ TEST_F(UdpTunnelConnector, timeout)
     //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
-    const std::chrono::milliseconds connectTimeout(1000 + (rand() % 3000));
+    const std::chrono::milliseconds connectTimeout(utils::random::number(1000, 4000));
 
     //timing out udt connection...
     boost::optional<SocketAddress> mediatorAddressForConnector;

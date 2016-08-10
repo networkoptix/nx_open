@@ -75,10 +75,9 @@ public:
             return;
 
         Q_Q(QnUserRolesModel);
-        q->beginResetModel();
+        QnUserRolesModel::ScopedReset reset(q);
         standardRoles = roles;
         updateRoles();
-        q->endResetModel();
     }
 
     void setStandardRoles(bool enabled)
@@ -98,10 +97,9 @@ public:
             return;
 
         Q_Q(QnUserRolesModel);
-        q->beginResetModel();
+        QnUserRolesModel::ScopedReset reset(q);
         userRoles = roles;
         updateRoles();
-        q->endResetModel();
     }
 
     void setUserRoles(bool enabled)
@@ -118,20 +116,19 @@ public:
             return;
 
         Q_Q(QnUserRolesModel);
-        q->beginResetModel();
+        QnUserRolesModel::ScopedReset reset(q);
 
         customRoleEnabled = enable;
         if (customRoleEnabled)
             roles << RoleDescription(Qn::UserRole::CustomPermissions);
         else
             roles.pop_back();
-
-        q->endResetModel();
     }
 
     void updateRoles()
     {
-        const auto resetGuard = QnRaiiGuard::create([this]() { q_ptr->beginResetModel(); }, [this]() { q_ptr->endResetModel(); });
+        Q_Q(QnUserRolesModel);
+        QnUserRolesModel::ScopedReset reset(q);
 
         roles.clear();
         firstUserRoleIndex = 0;
@@ -170,10 +167,10 @@ public:
                 userRole, &QnUserRolesModelPrivate::lessRoleByName);
 
             int indexInFullList = insertionPosition - userRoles.begin() + firstUserRoleIndex;
-            q->beginInsertRows(QModelIndex(), indexInFullList, indexInFullList);
+
+            QnUserRolesModel::ScopedInsertRows insertRows(q, QModelIndex(), indexInFullList, indexInFullList);
             userRoles.insert(insertionPosition, userRole);
             roles.insert(indexInFullList, RoleDescription(userRole));
-            q->endInsertRows();
             return true;
         }
 
@@ -192,7 +189,8 @@ public:
             /* Update row order if sorting changes: */
             if (sourceIndex != destinationIndex && sourceIndex + 1 != destinationIndex)
             {
-                q->beginMoveRows(QModelIndex(), indexInFullList, indexInFullList,
+                QnUserRolesModel::ScopedMoveRows moveRows(q,
+                    QModelIndex(), indexInFullList, indexInFullList,
                     QModelIndex(), destinationInFullList);
 
                 if (destinationIndex > sourceIndex)
@@ -210,7 +208,6 @@ public:
                 }
 
                 updateRoles();
-                q->endMoveRows();
 
                 /* Prepare new position for data change: */
                 roleIterator = newPosition;
@@ -239,10 +236,10 @@ public:
 
         Q_Q(QnUserRolesModel);
         int indexInFullList = roleIterator - userRoles.begin() + firstUserRoleIndex;
-        q->beginRemoveRows(QModelIndex(), indexInFullList, indexInFullList);
+
+        QnUserRolesModel::ScopedRemoveRows removeRows(q, QModelIndex(), indexInFullList, indexInFullList);
         userRoles.erase(roleIterator);
         roles.erase(roles.begin() + indexInFullList);
-        q->endRemoveRows();
         return true;
     }
 

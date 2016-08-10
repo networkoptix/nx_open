@@ -275,7 +275,7 @@ const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 {
 	QList<QnResourceTypePtr> resourceTypeList;
-	const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kDefaultUserAccess)->getResourceTypesSync(&resourceTypeList);
+	const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
 	if (errorCode != ec2::ErrorCode::ok)
 	{
 		NX_LOG(QString::fromLatin1("Failed to load resource types. %1").arg(ec2::toString(errorCode)), cl_logERROR);
@@ -289,7 +289,7 @@ bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 void addFakeVideowallUser()
 {
 	ec2::ApiUserData fakeUserData;
-    fakeUserData.permissions = Qn::GlobalPermission::GlobalVideoWallModePermissionSet;
+    fakeUserData.permissions = Qn::GlobalVideoWallModePermissionSet;
 	fakeUserData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
 	auto fakeUser = ec2::fromApiToResource(fakeUserData);
 	fakeUser->setId(Qn::kVideowallUserAccess.userId);
@@ -652,7 +652,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         ec2::ErrorCode rez;
         ec2::ApiStorageDataList storages;
 
-        while ((rez = ec2Connection->getMediaServerManager(Qn::kDefaultUserAccess)->getStoragesSync(QnUuid(), &storages)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getStoragesSync(QnUuid(), &storages)) != ec2::ErrorCode::ok)
         {
             NX_LOG( lit("QnMain::run(): Can't get storage list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -668,7 +668,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             ec2::ApiIdDataList idList;
             for (const auto& value: storagesToRemove)
                 idList.push_back(value->getId());
-            if (ec2Connection->getMediaServerManager(Qn::kDefaultUserAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)
+            if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)
                 qWarning() << "Failed to remove deprecated storage on startup. Postpone removing to the next start...";
             qnResPool->removeResources(storagesToRemove);
         }
@@ -702,7 +702,7 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
 
     while (servers.empty() && !needToStop())
     {
-        ec2::ErrorCode rez = ec2Connection->getMediaServerManager(Qn::kDefaultUserAccess)->getServersSync(&servers);
+        ec2::ErrorCode rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&servers);
         if( rez == ec2::ErrorCode::ok )
             break;
 
@@ -730,7 +730,7 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
 
-    ec2::ErrorCode rez = ec2Connection->getMediaServerManager(Qn::kDefaultUserAccess)->saveSync(apiServer);
+    ec2::ErrorCode rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
     if (rez != ec2::ErrorCode::ok)
     {
         qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
@@ -753,7 +753,7 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
 
     ec2::ApiMediaServerUserAttributesDataList attrsList;
     attrsList.push_back(userAttrsData);
-    rez =  QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kDefaultUserAccess)->saveUserAttributesSync(attrsList);
+    rez =  QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
     if (rez != ec2::ErrorCode::ok)
     {
         qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
@@ -769,7 +769,7 @@ void MediaServerProcess::saveStorages(ec2::AbstractECConnectionPtr ec2Connection
     fromResourceListToApi(storages, apiStorages);
 
     ec2::ErrorCode rez;
-    while((rez = ec2Connection->getMediaServerManager(Qn::kDefaultUserAccess)->saveStoragesSync(apiStorages)) != ec2::ErrorCode::ok && !needToStop())
+    while((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages)) != ec2::ErrorCode::ok && !needToStop())
     {
         qWarning() << "updateStorages(): Call to change server's storages failed. Reason: " << ec2::toString(rez);
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1080,7 +1080,7 @@ void MediaServerProcess::updateAddressesList()
 
     ec2::ApiMediaServerData server;
     fromResourceToApi(m_mediaServer, server);
-    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kDefaultUserAccess)->save(server, this, &MediaServerProcess::at_serverSaved);
+    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->save(server, this, &MediaServerProcess::at_serverSaved);
 
     nx::network::SocketGlobals::addressPublisher().updateAddresses(std::list<SocketAddress>(
         serverAddresses.begin(), serverAddresses.end()));
@@ -1095,7 +1095,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     {
         //reading servers list
         ec2::ApiMediaServerDataList mediaServerList;
-        while( ec2Connection->getMediaServerManager(Qn::kDefaultUserAccess)->getServersSync(&mediaServerList) != ec2::ErrorCode::ok )
+        while( ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList) != ec2::ErrorCode::ok )
         {
             NX_LOG( lit("QnMain::run(). Can't get servers."), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1104,7 +1104,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         ec2::ApiDiscoveryDataList discoveryDataList;
-        while( ec2Connection->getDiscoveryManager(Qn::kDefaultUserAccess)->getDiscoveryDataSync(&discoveryDataList) != ec2::ErrorCode::ok )
+        while( ec2Connection->getDiscoveryManager(Qn::kSystemAccess)->getDiscoveryDataSync(&discoveryDataList) != ec2::ErrorCode::ok )
         {
             NX_LOG( lit("QnMain::run(). Can't get discovery data."), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1141,7 +1141,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
         // read resource status
         ec2::ApiResourceStatusDataList statusList;
-        while ((rez = ec2Connection->getResourceManager(Qn::kDefaultUserAccess)->getStatusListSync(QnUuid(), &statusList)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getStatusListSync(QnUuid(), &statusList)) != ec2::ErrorCode::ok)
         {
             NX_LOG( lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1152,7 +1152,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
         //reading server attributes
         ec2::ApiMediaServerUserAttributesDataList mediaServerUserAttributesList;
-        while ((rez = ec2Connection->getMediaServerManager(Qn::kDefaultUserAccess)->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
         {
             NX_LOG( lit("QnMain::run(): Can't get server user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1167,7 +1167,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     {
         // read camera list
         ec2::ApiCameraDataList cameras;
-        while ((rez = ec2Connection->getCameraManager(Qn::kDefaultUserAccess)->getCamerasSync(&cameras)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameras)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get cameras. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1177,7 +1177,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
         //reading camera attributes
         ec2::ApiCameraAttributesDataList cameraUserAttributesList;
-        while ((rez = ec2Connection->getCameraManager(Qn::kDefaultUserAccess)->getUserAttributesSync(&cameraUserAttributesList)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getUserAttributesSync(&cameraUserAttributesList)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1188,7 +1188,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
         // read properties dictionary
         ec2::ApiResourceParamWithRefDataList kvPairs;
-        while ((rez = ec2Connection->getResourceManager(Qn::kDefaultUserAccess)->getKvPairsSync(QnUuid(), &kvPairs)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getKvPairsSync(QnUuid(), &kvPairs)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1214,7 +1214,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
     {
         ec2::ApiServerFootageDataList serverFootageData;
-        while (( rez = ec2Connection->getCameraManager(Qn::kDefaultUserAccess)->getServerFootageDataSync(&serverFootageData)) != ec2::ErrorCode::ok)
+        while (( rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getServerFootageDataSync(&serverFootageData)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1227,7 +1227,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     {
         //loading users
         ec2::ApiUserDataList users;
-        while(( rez = ec2Connection->getUserManager(Qn::kDefaultUserAccess)->getUsersSync(&users))  != ec2::ErrorCode::ok)
+        while(( rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users))  != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1242,7 +1242,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     {
         //loading videowalls
         ec2::ApiVideowallDataList videowalls;
-        while(( rez = ec2Connection->getVideowallManager(Qn::kDefaultUserAccess)->getVideowallsSync(&videowalls))  != ec2::ErrorCode::ok)
+        while(( rez = ec2Connection->getVideowallManager(Qn::kSystemAccess)->getVideowallsSync(&videowalls))  != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get videowalls. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1257,7 +1257,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     {
         //loading layouts
         ec2::ApiLayoutDataList layouts;
-        while(( rez = ec2Connection->getLayoutManager(Qn::kDefaultUserAccess)->getLayoutsSync(&layouts))  != ec2::ErrorCode::ok)
+        while(( rez = ec2Connection->getLayoutManager(Qn::kSystemAccess)->getLayoutsSync(&layouts))  != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get layouts. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1272,7 +1272,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     {
         //loading webpages
         ec2::ApiWebPageDataList webpages;
-        while ((rez = ec2Connection->getWebPageManager(Qn::kDefaultUserAccess)->getWebPagesSync(&webpages)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getWebPageManager(Qn::kSystemAccess)->getWebPagesSync(&webpages)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get webpages. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1287,7 +1287,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     {
         //loading accessible resources
         ec2::ApiAccessRightsDataList accessRights;
-        while ((rez = ec2Connection->getUserManager(Qn::kDefaultUserAccess)->getAccessRightsSync(&accessRights)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getAccessRightsSync(&accessRights)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get accessRights. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1300,7 +1300,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     {
         //loading user roles
         ec2::ApiUserGroupDataList roles;
-        while ((rez = ec2Connection->getUserManager(Qn::kDefaultUserAccess)->getUserGroupsSync(&roles)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUserGroupsSync(&roles)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get roles. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1313,7 +1313,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     {
         //loading business rules
         QnBusinessEventRuleList rules;
-        while( (rez = ec2Connection->getBusinessEventManager(Qn::kDefaultUserAccess)->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
+        while( (rez = ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
         {
             qDebug() << "QnMain::run(): Can't get business rules. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1328,7 +1328,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     {
         // load licenses
         QnLicenseList licenses;
-        while( (rez = ec2Connection->getLicenseManager(Qn::kDefaultUserAccess)->getLicensesSync(&licenses)) != ec2::ErrorCode::ok )
+        while( (rez = ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses)) != ec2::ErrorCode::ok )
         {
             qDebug() << "QnMain::run(): Can't get license list. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1373,7 +1373,7 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
 
             ec2::ApiMediaServerData apiServer;
             fromResourceToApi(server, apiServer);
-            ec2Connection->getMediaServerManager(Qn::kDefaultUserAccess)->save(apiServer, this, [] {});
+            ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
 
         if (server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString(), QnResource::NO_ALLOW_EMPTY))
@@ -1548,36 +1548,36 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/testLdapSettings", new QnTestLdapSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/recStats", new QnRecordingStatsRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/backupControl", new QnBackupControlRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler(), Qn::GlobalPermission::GlobalAdvancedViewerPermissionSet); // deprecated
-    QnRestProcessorPool::instance()->registerHandler("api/businessEvents", new QnBusinessLog2RestHandler(), Qn::GlobalPermission::GlobalAdvancedViewerPermissionSet); // new version
+    QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler(), Qn::GlobalAdvancedViewerPermissionSet); // deprecated
+    QnRestProcessorPool::instance()->registerHandler("api/businessEvents", new QnBusinessLog2RestHandler(), Qn::GlobalAdvancedViewerPermissionSet); // new version
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/getSystemName", new QnGetSystemNameRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/iflist", new QnIfListRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/aggregator", new QnJsonAggregatorRestHandler() );
-    QnRestProcessorPool::instance()->registerHandler("api/ifconfig", new QnIfConfigRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/ifconfig", new QnIfConfigRestHandler(), Qn::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
-    QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/detachFromSystem", new QnDetachFromSystemRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/restoreState", new QnRestoreStateRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler(), Qn::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloudConnectionManager), Qn::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/restoreState", new QnRestoreStateRestHandler(), Qn::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), Qn::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(cloudConnectionManager), Qn::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/execute", new QnExecScript(), Qn::GlobalPermission::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), Qn::GlobalPermission::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler(), Qn::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/execute", new QnExecScript(), Qn::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler());
 
     QnRestProcessorPool::instance()->registerHandler("api/transmitAudio", new QnAudioTransmissionRestHandler());
@@ -1594,7 +1594,7 @@ bool MediaServerProcess::initTcpListener(
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
 #endif
-    QnRestProcessorPool::instance()->registerHandler("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudConnectionManager));
 
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/dev-mode-key", new QnCrashServerHandler());
@@ -2230,7 +2230,7 @@ void MediaServerProcess::run()
     do {
         if (needToStop())
             return;
-    } while (ec2Connection->getResourceManager(Qn::kDefaultUserAccess)->setResourceStatusLocalSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
+    } while (ec2Connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusLocalSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
 
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
@@ -2522,7 +2522,7 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
 
         QnUuid userId = user->getId();
         m_updateUserRequests << userId;
-        appServerConnection->getUserManager(Qn::kDefaultUserAccess)->save(userData, password, this, [this, userId]( int reqID, ec2::ErrorCode errorCode )
+        appServerConnection->getUserManager(Qn::kSystemAccess)->save(userData, password, this, [this, userId]( int reqID, ec2::ErrorCode errorCode )
         {
             QN_UNUSED(reqID, errorCode);
             m_updateUserRequests.remove(userId);

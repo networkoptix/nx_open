@@ -3,8 +3,6 @@
 
 #include "ubjson_fwd.h"
 
-// TODO: #mshevchenko Remove non-standard "u" type marker and use "I" for quint16 the same way as
-// signed "L" is used for quint64.
 namespace QnUbjson {
     enum Marker {
         NullMarker          = 'Z',
@@ -12,7 +10,6 @@ namespace QnUbjson {
         FalseMarker         = 'F',
         UInt8Marker         = 'U',
         Int8Marker          = 'i',
-        UInt16Marker        = 'u', //< Nx extension to Ubjson.
         Int16Marker         = 'I',
         Int32Marker         = 'l',
         Int64Marker         = 'L',
@@ -44,7 +41,6 @@ namespace QnUbjson {
         case FalseMarker:
         case UInt8Marker:
         case Int8Marker:
-        case UInt16Marker:
         case Int16Marker:
         case Int32Marker:
         case Int64Marker:
@@ -77,7 +73,6 @@ namespace QnUbjson {
         case FalseMarker:
         case UInt8Marker:
         case Int8Marker:
-        case UInt16Marker:
         case Int16Marker:
         case Int32Marker:
         case Int64Marker:

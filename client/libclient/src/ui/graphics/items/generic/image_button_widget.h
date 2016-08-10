@@ -29,7 +29,6 @@ class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> > {
     Q_FLAGS(StateFlags StateFlag)
     Q_PROPERTY(bool checkable READ isCheckable WRITE setCheckable)
     Q_PROPERTY(bool checked READ isChecked WRITE setChecked NOTIFY toggled USER true)
-    Q_PROPERTY(bool cached READ isCached WRITE setCached)
     Q_PROPERTY(qreal animationSpeed READ animationSpeed WRITE setAnimationSpeed)
     Q_PROPERTY(QIcon icon READ icon WRITE setIcon NOTIFY iconChanged)
 
@@ -72,9 +71,6 @@ public:
 
     void setDefaultAction(QAction *action);
     QAction *defaultAction() const;
-
-    bool isCached() const;
-    void setCached(bool cached);
 
     void setFixedSize(qreal size);
     void setFixedSize(qreal width, qreal height);
@@ -124,8 +120,6 @@ protected:
     void updateState(StateFlags state);
     void updateFromDefaultAction();
 
-    void ensurePixmapCache() const;
-    void invalidatePixmapCache();
     StateFlags validPixmapState(StateFlags flags) const;
 
     void initializeVao(const QRectF &rect);
@@ -143,12 +137,9 @@ private:
     friend class QnImageButtonHoverProgressAccessor;
 
     boost::array<QPixmap, MaxState + 1> m_pixmaps;
-    mutable boost::array<QPixmap, MaxState + 1> m_pixmapCache;
-    mutable bool m_pixmapCacheValid;
 
     StateFlags m_state;
     bool m_checkable;
-    bool m_cached;
     bool m_dynamic;
     int m_skipNextHoverEvents;
     QPoint m_nextHoverEventPos;

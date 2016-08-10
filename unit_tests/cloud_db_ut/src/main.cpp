@@ -12,8 +12,6 @@
 int main(int argc, char **argv)
 {
     Q_INIT_RESOURCE(cloud_db_ut);
-    srand(::time(NULL));
-
     return nx::utils::runTest(
         argc, argv,
         [](const nx::utils::ArgumentParser& args)

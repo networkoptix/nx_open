@@ -6,7 +6,7 @@
 #include "cross_nat_connector_test.h"
 
 #include <nx/network/cloud/tunnel/cross_nat_connector.h>
-
+#include <nx/utils/random.h>
 
 namespace nx {
 namespace network {
@@ -116,8 +116,8 @@ void TunnelConnector::cancellationTest()
         });
 
         //implying random delay
-        std::this_thread::sleep_for(std::chrono::microseconds(rand() & 0xffff) * 10);
-
+        std::this_thread::sleep_for(std::chrono::microseconds(
+            nx::utils::random::number(0, 0xFFFF) * 10));
         connector.pleaseStopSync();
     }
 }
@@ -184,7 +184,7 @@ TEST_F(CrossNatConnector, timeout)
     //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
-    const std::chrono::milliseconds connectTimeout(1000 + (rand() % 3000));
+    const std::chrono::milliseconds connectTimeout(nx::utils::random::number(1000, 4000));
 
     //timing out mediator response by providing incorrect mediator address to connector
     const auto connectResult = doSimpleConnectTest(

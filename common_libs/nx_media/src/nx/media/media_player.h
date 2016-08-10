@@ -62,6 +62,11 @@ class Player: public QObject
      */
     Q_PROPERTY(bool liveMode READ liveMode NOTIFY liveModeChanged)
 
+    /**
+     * Video aspect ratio. In some cases it may differs from frame width / height
+     */
+    Q_PROPERTY(double aspectRatio READ aspectRatio NOTIFY aspectRatioChanged)
+
     Q_PROPERTY(int maxTextureSize READ maxTextureSize WRITE setMaxTextureSize)
 
     /**
@@ -128,6 +133,7 @@ public:
     void setReconnectOnPlay(bool reconnectOnPlay);
 
     bool liveMode() const;
+    double aspectRatio() const;
 
     int videoQuality() const;
     void setVideoQuality(int videoQuality);
@@ -151,6 +157,7 @@ signals:
     void mediaStatusChanged();
     void reconnectOnPlayChanged();
     void liveModeChanged();
+    void aspectRatioChanged();
     void videoQualityChanged();
     void videoGeometryChanged();
 

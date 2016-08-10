@@ -267,13 +267,14 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
             rtspStreamReader->setPrefferedAuthScheme(nx_http::header::AuthScheme::automatic);
+			m_thirdPartyRes->updateSourceUrl(rtspStreamReader->getCurrentStreamUrl(), getRole());
             m_builtinStreamReader.reset( rtspStreamReader );
         }
         else if( mediaUrl.scheme().toLower() == lit("http") )
         {
-            m_builtinStreamReader.reset( new MJPEGStreamReader(
+            m_builtinStreamReader.reset(new MJPEGStreamReader(
                 m_resource,
-                mediaUrl.path() + (!mediaUrl.query().isEmpty() ? lit("?") + mediaUrl.query() : QString()) ) );
+                mediaUrl.path() + (!mediaUrl.query().isEmpty() ? lit("?") + mediaUrl.query() : QString())));
         }
         return m_builtinStreamReader->openStream();
     }

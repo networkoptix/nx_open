@@ -34,7 +34,8 @@ boost::optional<QString> createRandomDir()
     return fullPath;
 }
 
-WorkDirResource::WorkDirResource() : m_workDir(createRandomDir()) {}
+WorkDirResource::WorkDirResource(const QString& path)
+    : m_workDir(path.isEmpty() ? createRandomDir() : path) {}
 WorkDirResource::~WorkDirResource()
 {
     if (m_workDir)

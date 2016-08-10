@@ -303,6 +303,7 @@ int IOSVideoDecoder::decode(
 
     QSize frameSize(d->frame->width, d->frame->height);
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
+    int frameNum = d->frame->coded_picture_number;
 
     CVPixelBufferRef pixBuf = (CVPixelBufferRef)d->frame->data[3];
     auto qtPixelFormat = toQtPixelFormat(CVPixelBufferGetPixelFormatType(pixBuf));
@@ -315,7 +316,7 @@ int IOSVideoDecoder::decode(
     videoFrame->setStartTime(startTimeMs);
 
     outDecodedFrame->reset(videoFrame);
-    return d->frame->coded_picture_number;
+    return frameNum;
 }
 
 

@@ -485,7 +485,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     setCodec(H264, true);
     setCodec(H264, false);
 
-    if (getDeviceOnvifUrl().isEmpty()) {
+	auto deviceOnvifUrl = getDeviceOnvifUrl();
+
+    if (deviceOnvifUrl.isEmpty()) {
 #ifdef PL_ONVIF_DEBUG
         qCritical() << "QnPlOnvifResource::initInternal: Can't do anything: ONVIF device url is absent. Id: " << getPhysicalId();
 #endif
@@ -501,7 +503,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     QAuthenticator auth = getAuth();
 
-    DeviceSoapWrapper deviceSoapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
+    DeviceSoapWrapper deviceSoapWrapper(deviceOnvifUrl.toStdString(), auth.user(), auth.password(), m_timeDrift);
     CapabilitiesResp capabilitiesResponse;
     auto result = fetchOnvifCapabilities( &deviceSoapWrapper, &capabilitiesResponse );
     if( !result )
@@ -854,11 +856,17 @@ const QString QnPlOnvifResource::getAudioSourceId() const
 
 QString QnPlOnvifResource::getDeviceOnvifUrl() const
 {
-    return getProperty(ONVIF_URL_PARAM_NAME);
+	QnMutexLocker lock(&m_mutex);
+	if (m_serviceUrls.deviceServiceUrl.isEmpty())
+		m_serviceUrls.deviceServiceUrl = getProperty(ONVIF_URL_PARAM_NAME);
+	
+	return m_serviceUrls.deviceServiceUrl;
 }
 
 void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src)
 {
+	QnMutexLocker lock(&m_mutex);
+	m_serviceUrls.deviceServiceUrl = src;
     setProperty(ONVIF_URL_PARAM_NAME, src);
 }
 QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort)
@@ -1329,24 +1337,30 @@ int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl)
 
 QString QnPlOnvifResource::getMediaUrl() const
 {
-    return getProperty(MEDIA_URL_PARAM_NAME);
+	QnMutexLocker lock(&m_mutex);
+	return m_serviceUrls.mediaServiceUrl;
+
+    //return getProperty(MEDIA_URL_PARAM_NAME);
 }
 
 void QnPlOnvifResource::setMediaUrl(const QString& src)
 {
-    setProperty(MEDIA_URL_PARAM_NAME, src);
+	QnMutexLocker lock(&m_mutex);
+	m_serviceUrls.mediaServiceUrl = src;
+
+    //setProperty(MEDIA_URL_PARAM_NAME, src);
 }
 
 QString QnPlOnvifResource::getImagingUrl() const
 {
     QnMutexLocker lock( &m_mutex );
-    return m_imagingUrl;
+    return m_serviceUrls.imagingServiceUrl;
 }
 
 void QnPlOnvifResource::setImagingUrl(const QString& src)
 {
     QnMutexLocker lock( &m_mutex );
-    m_imagingUrl = src;
+    m_serviceUrls.imagingServiceUrl = src;
 }
 
 QString QnPlOnvifResource::getVideoSourceToken() const {
@@ -1362,13 +1376,13 @@ void QnPlOnvifResource::setVideoSourceToken(const QString &src) {
 QString QnPlOnvifResource::getPtzUrl() const
 {
     QnMutexLocker lock( &m_mutex );
-    return m_ptzUrl;
+    return m_serviceUrls.ptzServiceUrl;
 }
 
 void QnPlOnvifResource::setPtzUrl(const QString& src)
 {
     QnMutexLocker lock( &m_mutex );
-    m_ptzUrl = src;
+    m_serviceUrls.ptzServiceUrl = src;
 }
 
 QString QnPlOnvifResource::getPtzConfigurationToken() const {
@@ -1519,7 +1533,8 @@ bool QnPlOnvifResource::fetchRelayInputInfo( const CapabilitiesResp& capabilitie
 }
 
 bool QnPlOnvifResource::fetchPtzInfo() {
-    if(m_ptzUrl.isEmpty())
+
+    if(getPtzUrl().isEmpty())
         return false;
 
     QAuthenticator auth = getAuth();
