@@ -40,7 +40,7 @@ ListView
         height: cellHeight
         active: currentIndex == -1
 
-        onClicked: currentResourceId = ""
+        onClicked: cameraClicked("")
     }
 
     highlightFollowsCurrentItem: false
