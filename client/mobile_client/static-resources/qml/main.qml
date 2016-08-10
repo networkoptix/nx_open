@@ -34,7 +34,7 @@ ApplicationWindow
         function restoreActiveFocus()
         {
             if (activeFocusItem == Window.contentItem)
-                stackView.currentItem.forceActiveFocus()
+                Workflow.focusCurrentScreen()
         }
     }
 

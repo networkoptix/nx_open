@@ -25,13 +25,19 @@ Page
         {
             if (sideNavigation.opened)
                 sideNavigation.close()
-            else
+            else if (stackView.depth > 1)
                 Workflow.popCurrentScreen()
+            else
+                quitApplication()
+
+            event.accepted = true
         }
         else if (event.key == Qt.Key_F2)
         {
             if (sideNavigationEnabled)
                 sideNavigation.open()
+
+            event.accepted = true
         }
     }
 

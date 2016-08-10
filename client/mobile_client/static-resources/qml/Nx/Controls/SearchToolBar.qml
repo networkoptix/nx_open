@@ -12,6 +12,7 @@ ToolBarBase
     opacity: 0.0
     Behavior on opacity { NumberAnimation { duration: 200 } }
     visible: opacity > 0
+    enabled: visible
 
     RowLayout
     {
@@ -67,6 +68,9 @@ ToolBarBase
     Keys.onPressed:
     {
         if (Utils.keyIsBack(event.key))
+        {
             close()
+            event.accepted = true
+        }
     }
 }

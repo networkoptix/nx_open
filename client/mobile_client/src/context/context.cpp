@@ -66,6 +66,11 @@ QnUserWatcher* QnContext::userWatcher() const
     return qnCommon->instance<QnUserWatcher>();
 }
 
+void QnContext::quitApplication()
+{
+    qApp->quit();
+}
+
 void QnContext::exitFullscreen() {
     showSystemUi();
 }
