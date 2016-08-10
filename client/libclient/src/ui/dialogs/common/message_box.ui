@@ -31,9 +31,6 @@
      <property name="spacing">
       <number>16</number>
      </property>
-     <property name="sizeConstraint">
-      <enum>QLayout::SetMinAndMaxSize</enum>
-     </property>
      <property name="leftMargin">
       <number>16</number>
      </property>
