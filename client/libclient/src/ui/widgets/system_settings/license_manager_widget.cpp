@@ -100,6 +100,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 
     ui->gridLicenses->setModel(sortModel);
     ui->gridLicenses->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->gridLicenses->header()->setSectionResizeMode(QnLicenseListModel::LicenseStatusColumn, QHeaderView::Interactive);
     ui->gridLicenses->header()->setSortIndicator(QnLicenseListModel::LicenseKeyColumn, Qt::AscendingOrder);
 
     /* By [Delete] key remove licenses. */
