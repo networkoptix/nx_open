@@ -6,28 +6,14 @@ Item
 {
     id: camerasGrid
 
-    property alias layoutId: layoutHelper.layoutId
+    property alias layoutId: gridLayoutHelper.layoutId
 
     QnLiteClientLayoutHelper
     {
-        id: layoutHelper
+        id: gridLayoutHelper
 
-        onLayoutChanged:
-        {
-            resetLayout()
-            switchMode()
-        }
-
+        onLayoutChanged: switchMode()
         onDisplayModeChanged: switchMode()
-
-        onCameraIdChanged:
-        {
-            var item = grid.itemAt(x, y)
-            if (!item)
-                return
-
-            item.resourceId = resourceId
-        }
 
         onSingleCameraIdChanged:
         {
@@ -52,37 +38,76 @@ Item
         }
     }
 
-    Grid
+    QnCameraListModel
+    {
+        id: camerasModel
+
+        function nextResourceId(resourceId)
+        {
+            if (count == 0)
+                return ""
+
+            if (resourceId == "")
+                return resourceIdByRow(0)
+
+            var index = rowByResourceId(resourceId)
+            if (index == count - 1)
+                return ""
+
+            return resourceIdByRow(index + 1)
+        }
+        function previousResourceId(resourceId)
+        {
+            if (count == 0)
+                return ""
+
+            if (resourceId == "")
+                return resourceIdByRow(count - 1)
+
+            var index = rowByResourceId(resourceId)
+            if (index == 0)
+                return ""
+
+            return resourceIdByRow(index - 1)
+        }
+    }
+
+    GridView
     {
         id: grid
 
         anchors.fill: parent
+        boundsBehavior: Flickable.StopAtBounds
 
-        columns: 2
-        rows: 2
+        property int columns: 2
+        property int rows: 2
+        model: rows * columns
+        cellWidth: width / columns
+        cellHeight: height / rows
 
-        Repeater
+        currentIndex: 0
+
+        delegate: CameraItem
         {
-            id: repeater
+            width: grid.cellWidth
+            height: grid.cellHeight
+            paused: !resourcesScreen.activePage
+            active: GridView.isCurrentItem
+            layoutHelper: gridLayoutHelper
+            layoutX: index % grid.columns
+            layoutY: Math.floor(index / grid.columns)
 
-            model: grid.columns * grid.rows
-
-            CameraItem
+            onClicked: gridLayoutHelper.displayCell = Qt.point(layoutX, layoutY)
+            onNextCameraRequested:
             {
-                width: grid.width / grid.columns
-                height: grid.height / grid.rows
-                paused: !resourcesScreen.activePage
-
-                property int layoutX: index % grid.columns
-                property int layoutY: Math.floor(index / grid.columns)
-
-                onClicked: layoutHelper.displayCell = Qt.point(layoutX, layoutY)
+                gridLayoutHelper.setCameraIdOnCell(
+                    layoutX, layoutY, camerasModel.nextResourceId(resourceId))
             }
-        }
-
-        function itemAt(x, y)
-        {
-            return repeater.itemAt(y * columns + x)
+            onPreviousCameraRequested:
+            {
+                gridLayoutHelper.setCameraIdOnCell(
+                    layoutX, layoutY, camerasModel.previousResourceId(resourceId))
+            }
         }
     }
 
@@ -92,25 +117,9 @@ Item
         onActivePageChanged:
         {
             if (resourcesScreen.activePage)
-                layoutHelper.displayCell = Qt.point(-1, -1)
+                gridLayoutHelper.displayCell = Qt.point(-1, -1)
         }
     }
 
-    Component.onCompleted:
-    {
-        resetLayout()
-        forceActiveFocus()
-    }
-
-    function resetLayout()
-    {
-        for (var y = 0; y < grid.rows; ++y)
-        {
-            for (var x = 0; x < grid.columns; ++x)
-            {
-                var item = grid.itemAt(x, y)
-                item.resourceId = layoutHelper.cameraIdOnCell(x, y)
-            }
-        }
-    }
+    Component.onCompleted: grid.forceActiveFocus()
 }
