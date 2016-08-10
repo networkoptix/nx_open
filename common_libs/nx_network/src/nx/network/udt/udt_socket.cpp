@@ -190,8 +190,11 @@ bool UdtSocket<InterfaceToImplement>::close()
 
     //TODO #ak linger MUST be optional
     //  set UDT_LINGER to 1 if socket is in blocking mode?
-    int val = 7;   //TODO #ak why 7?
-    UDT::setsockopt(m_impl->udtHandle, 0, UDT_LINGER, &val, sizeof(val));
+    struct linger lingerVal;
+    memset(&lingerVal, 0, sizeof(lingerVal));
+    lingerVal.l_onoff = 1;
+    lingerVal.l_linger = 7; //TODO #ak why 7?
+    UDT::setsockopt(m_impl->udtHandle, 0, UDT_LINGER, &lingerVal, sizeof(lingerVal));
 
 #ifdef TRACE_UDT_SOCKET
     NX_LOG(lit("closing UDT socket %1").arg(udtHandle), cl_logDEBUG2);
