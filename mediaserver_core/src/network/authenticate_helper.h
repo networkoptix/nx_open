@@ -103,13 +103,15 @@ private:
         TempAuthenticationKeyCtx( TempAuthenticationKeyCtx&& right )
         :
             timeGuard( std::move( right.timeGuard ) ),
-            path( std::move( right.path ) )
+            path( std::move( right.path ) ),
+            accessRights(right.accessRights)
         {
         }
         TempAuthenticationKeyCtx& operator=( TempAuthenticationKeyCtx&& right )
         {
             timeGuard = std::move( right.timeGuard );
             path = std::move( right.path );
+            accessRights = right.accessRights;
             return *this;
         }
 
