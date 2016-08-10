@@ -14,6 +14,7 @@ namespace Ui
 }
 
 class QnResourceListModel;
+class QnAccessibleResourcesModel;
 
 /** Widget for displaying filtered set of accessible resources, for user or user group. */
 class QnAccessibleResourcesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
@@ -33,8 +34,13 @@ public:
     std::pair<int, int> selected() const;
     QnResourceAccessFilter::Filter filter() const;
 
+    QSet<QnUuid> checkedResources() const;
+
     bool resourcePassFilter(const QnResourcePtr& resource) const;
     static bool resourcePassFilter(const QnResourcePtr& resource, const QnUserResourcePtr& currentUser, QnResourceAccessFilter::Filter filter);
+
+public slots:
+    void indirectAccessChanged();
 
 private:
     void initControlsModel();
@@ -53,6 +59,8 @@ private:
     const QnResourceAccessFilter::Filter m_filter;
     const bool m_controlsVisible;   /*< Should the controls widget be visible and active. */
 
-    QScopedPointer<QnResourceListModel> m_resourcesModel;
-    QScopedPointer<QnResourceListModel> m_controlsModel;    /*< Workaround to make controls checkboxes look totally like elements in list. */
+    QnResourceListModel* m_resourcesModel;
+    QnResourceListModel* m_controlsModel;    /*< Workaround to make controls checkboxes look totally like elements in list. */
+
+    QnAccessibleResourcesModel* m_accessibleResourcesModel;
 };

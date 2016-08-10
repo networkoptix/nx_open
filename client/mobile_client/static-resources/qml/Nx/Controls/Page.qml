@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.6
 import Nx.Controls 1.0
 
 PageBase
@@ -17,20 +17,28 @@ PageBase
 
     header: Item
     {
-        implicitWidth: parent.width
-        implicitHeight: toolBar.height + toolBar.statusBarHeight + warningPanel.height
+        width: parent.width
 
-        ToolBar
-        {
-            id: toolBar
-            leftButtonIcon: lp("/images/arrow_back.png")
-            onLeftButtonClicked: page.leftButtonClicked()
-        }
+        implicitWidth: column.implicitWidth
+        implicitHeight: column.implicitHeight
 
-        WarningPanel
+        Column
         {
-            id: warningPanel
-            anchors.top: toolBar.bottom
+            id: column
+            width: parent.width
+            topPadding: toolBar.statusBarHeight
+
+            ToolBar
+            {
+                id: toolBar
+                leftButtonIcon: lp("/images/arrow_back.png")
+                onLeftButtonClicked: page.leftButtonClicked()
+            }
+
+            WarningPanel
+            {
+                id: warningPanel
+            }
         }
     }
 }

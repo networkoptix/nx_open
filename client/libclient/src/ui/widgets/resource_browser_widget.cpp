@@ -585,6 +585,7 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
 
         /* We can select several layouts and some other resources in any part of tree - in this case just do not set anything. */
         QnUserResourcePtr user;
+        QnUuid roleId;
         switch (parentNodeType)
         {
             case Qn::LayoutsNode:
@@ -593,6 +594,7 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
             case Qn::AccessibleResourcesNode:
             case Qn::AccessibleLayoutsNode:
                 user = parentIndex.parent().data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+                roleId = parentIndex.parent().data(Qn::UuidRole).value<QnUuid>();
                 break;
             case Qn::ResourceNode:
                 user = parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
@@ -602,6 +604,7 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
         }
 
         result.setArgument(Qn::UserResourceRole, user);
+        result.setArgument(Qn::UuidRole, roleId);
         return result;
     };
 

@@ -33,8 +33,6 @@ QnImageControlWidget::QnImageControlWidget(QWidget *parent)
     setFocusPolicy(Qt::TabFocus);
     setFocusProxy(ui->aspectRatioComboBox);
 
-    setHelpTopic(ui->fisheyeComboBox, ui->fisheyeLabel,
-                 Qn::CameraSettings_Dewarping_Help);
     setHelpTopic(ui->aspectRatioComboBox, ui->aspectRatioLabel,
                  Qn::CameraSettings_AspectRatio_Help);
     setHelpTopic(ui->rotationComboBox, ui->rotationLabel,
@@ -46,21 +44,10 @@ QnImageControlWidget::QnImageControlWidget(QWidget *parent)
             emit changed();
     };
 
-    auto notifyAboutFisheyeChanges = [this]
-    {
-        if (!isUpdating())
-            emit fisheyeChanged();
-    };
-
     connect(ui->aspectRatioComboBox, QnComboboxCurrentIndexChanged,
             this, notifyAboutChanges);
     connect(ui->rotationComboBox, QnComboboxCurrentIndexChanged,
             this, notifyAboutChanges);
-
-    connect(ui->fisheyeComboBox, QnComboboxCurrentIndexChanged,
-            this, notifyAboutChanges);
-    connect(ui->fisheyeComboBox, QnComboboxCurrentIndexChanged,
-            this, notifyAboutFisheyeChanges);
 }
 
 QnImageControlWidget::~QnImageControlWidget()
@@ -82,7 +69,6 @@ void QnImageControlWidget::updateFromResources(
 
     updateAspectRatioFromResources(cameras);
     updateRotationFromResources(cameras);
-    updateFisheyeFromResources(cameras);
 }
 
 void QnImageControlWidget::submitToResources(
@@ -105,17 +91,9 @@ void QnImageControlWidget::submitToResources(
     bool overrideRotation = !ui->rotationComboBox->currentData().isNull();
     int rotation = ui->rotationComboBox->currentData().toInt();
     QString rotationString = rotation >= 0 ? QString::number(rotation) : QString();
-    bool overrideFisheye = !ui->fisheyeComboBox->currentData().isNull();
 
     for (const QnVirtualCameraResourcePtr &camera: cameras)
     {
-        if (overrideFisheye)
-        {
-            auto params = camera->getDewarpingParams();
-            params.enabled = ui->fisheyeComboBox->currentData().toBool();
-            camera->setDewarpingParams(params);
-        }
-
         if (overrideAspectRatio)
         {
             if (aspectRatio.isValid())
@@ -129,12 +107,6 @@ void QnImageControlWidget::submitToResources(
     }
 }
 
-bool QnImageControlWidget::isFisheye() const
-{
-    QVariant data = ui->fisheyeComboBox->currentData();
-    return !data.isNull() && data.toBool();
-}
-
 bool QnImageControlWidget::isReadOnly() const
 {
     return m_readOnly;
@@ -146,7 +118,6 @@ void QnImageControlWidget::setReadOnly(bool readOnly)
         return;
 
     using ::setReadOnly;
-    setReadOnly(ui->fisheyeComboBox, readOnly);
     setReadOnly(ui->aspectRatioComboBox, readOnly);
     setReadOnly(ui->rotationComboBox, readOnly);
 
@@ -237,33 +208,5 @@ void QnImageControlWidget::updateRotationFromResources(
     {
         ui->rotationComboBox->insertItem(0, tr("<multiple values>"));
         ui->rotationComboBox->setCurrentIndex(0);
-    }
-}
-
-void QnImageControlWidget::updateFisheyeFromResources(
-        const QnVirtualCameraResourceList &cameras)
-{
-    bool fisheye = !cameras.empty() &&
-                   cameras.first()->getDewarpingParams().enabled;
-
-    bool sameFisheye = std::all_of(cameras.cbegin(), cameras.cend(),
-        [fisheye](const QnVirtualCameraResourcePtr &camera)
-        {
-            return fisheye == camera->getDewarpingParams().enabled;
-        }
-    );
-
-    ui->fisheyeComboBox->clear();
-    ui->fisheyeComboBox->addItem(tr("No"), false);
-    ui->fisheyeComboBox->addItem(tr("Yes"), true);
-
-    if (sameFisheye)
-    {
-        ui->fisheyeComboBox->setCurrentIndex(fisheye ? 1 : 0);
-    }
-    else
-    {
-        ui->fisheyeComboBox->insertItem(0, tr("<multiple values>"));
-        ui->fisheyeComboBox->setCurrentIndex(0);
     }
 }

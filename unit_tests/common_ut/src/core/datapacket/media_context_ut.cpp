@@ -84,7 +84,7 @@ void expectMemsAreDeepCopies(
 {
     const QByteArray captionString = ("Mem field: " + QString::fromLatin1(fieldName)).toLatin1();
     const char* const caption = captionString.constData();
-  
+
     if (size == 0)
     {
         if (expected == nullptr || actual == nullptr)

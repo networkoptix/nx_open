@@ -707,7 +707,7 @@ namespace nx_http
 
     void AsyncHttpClient::initiateTcpConnection()
     {
-        const SocketAddress remoteAddress = 
+        const SocketAddress remoteAddress =
             m_proxyEndpoint
             ? m_proxyEndpoint.get()
             : SocketAddress(m_url.host(), m_url.port(nx_http::DEFAULT_HTTP_PORT));
@@ -825,7 +825,8 @@ namespace nx_http
 
         //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
         //TODO #ak remove it after 2.3 support is over
-        if (!m_userName.isEmpty())
+        if (!m_userName.isEmpty() &&
+            m_request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME) == m_request.headers.end())
         {
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,

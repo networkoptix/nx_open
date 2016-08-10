@@ -15,7 +15,7 @@ class QnArchiveStreamReader;
 
 struct RtspServerTrackInfo
 {
-    RtspServerTrackInfo(): clientPort(-1), clientRtcpPort(0), sequence(0), firstRtpTime(-1), mediaSocket(0), rtcpSocket(0) 
+    RtspServerTrackInfo(): clientPort(-1), clientRtcpPort(0), sequence(0), firstRtpTime(-1), mediaSocket(0), rtcpSocket(0)
     {
 
     }
@@ -107,11 +107,6 @@ private:
     QSharedPointer<QnArchiveStreamReader> getArchiveDP();
     void notifyMediaRangeUsed(qint64 timestampUsec);
     QnRtspFfmpegEncoder* createRtspFfmpegEncoder(bool isVideo);
-
-    bool hasAccessToResource(
-        const QnUuid& authUserId,
-        const QnResourcePtr& mediaResource,
-        Qn::Permission permissions) const;
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

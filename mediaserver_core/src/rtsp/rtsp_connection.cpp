@@ -265,20 +265,6 @@ void QnRtspConnectionProcessor::notifyMediaRangeUsed(qint64 timestampUsec)
     d->lastMediaPacketTime = timestampUsec;
 }
 
-bool QnRtspConnectionProcessor::hasAccessToResource(
-    const QnUuid& authUserId,
-    const QnResourcePtr& mediaResource,
-    Qn::Permission permissions) const
-{
-    if (authUserId == Qn::kSystemAccess.userId)
-        return true;
-
-    auto userResource = qnResPool->getResourceById(authUserId).dynamicCast<QnUserResource>();
-    if (!userResource)
-        return false;
-    return qnResourceAccessManager->hasPermission(userResource, mediaResource, Qn::ReadPermission);
-}
-
 void QnRtspConnectionProcessor::parseRequest()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -302,7 +288,7 @@ void QnRtspConnectionProcessor::parseRequest()
         }
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
 
-        d->peerHasAccess = hasAccessToResource(d->authUserId, resource, Qn::ReadPermission);
+        d->peerHasAccess = qnResourceAccessManager->hasPermission(d->accessRights, resource, Qn::ReadPermission);
         if (!d->peerHasAccess)
             return;
     }

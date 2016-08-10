@@ -16,6 +16,8 @@
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
+
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/network/aio/aioeventhandler.h>
 #include <nx/network/http/httptypes.h>
@@ -100,6 +102,7 @@ public:
 
     static DeviceSearcher* instance();
     static int cacheTimeout();
+
 private:
     class DiscoveredDeviceInfo
     {
@@ -152,6 +155,7 @@ private:
     std::map<QByteArray, UPNPDescriptionCacheItem> m_upnpDescCache;
     bool m_terminated;
     QElapsedTimer m_cacheTimer;
+    nx::utils::AsyncOperationGuard m_concurentGuard;
 
     //!Implementation of \a TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
@@ -177,7 +181,7 @@ private:
     /*!
         \note MUST be called with \a m_mutex locked
     */
-    void updateItemInCache( const DiscoveredDeviceInfo& devInfo );
+    void updateItemInCache( DiscoveredDeviceInfo devInfo );
     bool processPacket( const QHostAddress& localInterfaceAddress,
                         const SocketAddress& discoveredDevAddress,
                         const DeviceInfo& devInfo,

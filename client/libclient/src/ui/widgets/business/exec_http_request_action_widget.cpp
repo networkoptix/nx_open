@@ -30,6 +30,7 @@ void QnExecHttpRequestActionWidget::updateTabOrder(QWidget *before, QWidget *aft
 
 void QnExecHttpRequestActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
 {
+    Q_UNUSED(fields);
     if (!model() || m_updating)
         return;
 

@@ -336,8 +336,14 @@ void QnBusyIndicatorPainter::tick(int deltaMs)
 * QnBusyIndicatorWidget
 */
 
-QnBusyIndicatorWidget::QnBusyIndicatorWidget(QWidget* parent) :
-    QWidget(parent)
+QnBusyIndicatorWidget::QnBusyIndicatorWidget(
+    QWidget* parent,
+    const QColor& indicatorColor,
+    const QColor& borderColor)
+    :
+    QWidget(parent),
+    m_indicatorColor(indicatorColor),
+    m_borderColor(borderColor)
 {
     setFocusPolicy(Qt::NoFocus);
 
@@ -364,8 +370,8 @@ void QnBusyIndicatorWidget::paintEvent(QPaintEvent* event)
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.setBrush(palette().color(foregroundRole()));
-    painter.setPen(Qt::NoPen);
+    painter.setBrush(m_indicatorColor);
+    painter.setPen(m_borderColor);
 
     paintIndicator(&painter, indicatorRect().topLeft());
 }
@@ -389,8 +395,14 @@ QRect QnBusyIndicatorWidget::indicatorRect() const
 * QnBusyIndicatorGraphicsWidget
 */
 
-QnBusyIndicatorGraphicsWidget::QnBusyIndicatorGraphicsWidget(QGraphicsItem* parent, Qt::WindowFlags windowFlags) :
-    base_type(parent, windowFlags)
+QnBusyIndicatorGraphicsWidget::QnBusyIndicatorGraphicsWidget(QGraphicsItem* parent,
+    Qt::WindowFlags windowFlags,
+    const QColor& indicatorColor,
+    const QColor& borderColor)
+    :
+    base_type(parent, windowFlags),
+    m_indicatorColor(indicatorColor),
+    m_borderColor(borderColor)
 {
     setFocusPolicy(Qt::NoFocus);
 
@@ -404,8 +416,8 @@ void QnBusyIndicatorGraphicsWidget::paint(QPainter* painter, const QStyleOptionG
     Q_UNUSED(widget);
 
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-    QnScopedPainterBrushRollback brushRollback(painter, palette().color(QPalette::WindowText));
-    QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
+    QnScopedPainterBrushRollback brushRollback(painter, m_indicatorColor);
+    QnScopedPainterPenRollback penRollback(painter, QPen(m_borderColor));
 
     paintIndicator(painter, indicatorRect().topLeft());
 }

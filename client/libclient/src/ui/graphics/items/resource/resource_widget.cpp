@@ -40,6 +40,7 @@
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/overlays/buttons_overlay.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
+#include <ui/graphics/items/overlays/status_overlay_controller.h>
 #include <ui/graphics/items/overlays/scrollable_overlay_widget.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/workbench.h>
@@ -134,7 +135,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_overlayWidgets(new OverlayWidgets()),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
-    m_statusOverlay(Qn::EmptyOverlay),
     m_renderStatus(Qn::NothingRendered),
     m_lastNewFrameTimeMSec(0)
 {
@@ -164,10 +164,18 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
 
     /* Status overlay. */
-    m_statusOverlayWidget = new QnStatusOverlayWidget(m_resource, this);
-    addOverlayWidget(m_statusOverlayWidget
-                     , detail::OverlayParams(UserVisible, true, false, StatusLayer));
+    const auto overlay = new QnStatusOverlayWidget(this);
+    m_statusController = new QnStatusOverlayController(m_resource, overlay);
 
+    connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
+        [this, overlay, controller = m_statusController]()
+        {
+            const bool isEmptyOverlay = (m_statusController->statusOverlay() == Qn::EmptyOverlay);
+            setOverlayWidgetVisible(overlay, !isEmptyOverlay, false);
+        });
+
+    addOverlayWidget(overlay, detail::OverlayParams(UserVisible, true, false, StatusLayer));
+    setOverlayWidgetVisible(overlay, false, false);
 
     /* Initialize resource. */
     m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
@@ -240,8 +248,6 @@ void QnResourceWidget::addInfoOverlay()
 //TODO: #ynikitenkov #high emplace back headerLayout->setContentsMargins(0, 0, 0, 1);
 void QnResourceWidget::addMainOverlay()
 {
-    m_overlayWidgets->buttonsOverlay = new QnButtonsOverlay(this);
-
     m_overlayWidgets->buttonsOverlay = new QnButtonsOverlay(this);
     addOverlayWidget(m_overlayWidgets->buttonsOverlay
                      , detail::OverlayParams(UserVisible, true, true, InfoLayer));
@@ -519,9 +525,9 @@ void QnResourceWidget::updateCursor()
         setCursor(newCursor);
 }
 
-QnStatusOverlayWidget * QnResourceWidget::statusOverlayWidget() const
+QnStatusOverlayController *QnResourceWidget::statusOverlayController() const
 {
-    return m_statusOverlayWidget;
+    return m_statusController;
 }
 
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const
@@ -764,29 +770,6 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate)
     updateHud(animate);
 }
 
-Qn::ResourceStatusOverlay QnResourceWidget::statusOverlay() const
-{
-    return m_statusOverlay;
-}
-
-void QnResourceWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay, bool animate)
-{
-    if (m_statusOverlay == statusOverlay)
-        return;
-
-    m_statusOverlay = statusOverlay;
-    m_statusOverlayWidget->setStatusOverlay(statusOverlay);
-
-    qreal opacity = statusOverlay == Qn::EmptyOverlay
-        ? 0.0
-        : 1.0;
-
-    if (animate)
-        opacityAnimator(m_statusOverlayWidget)->animateTo(opacity);
-    else
-        m_statusOverlayWidget->setOpacity(opacity);
-}
-
 Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceStatus, bool hasVideo) const
 {
     if (resourceStatus == Qn::Offline)
@@ -828,7 +811,7 @@ Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay() const
 
 void QnResourceWidget::updateStatusOverlay()
 {
-    setStatusOverlay(calculateStatusOverlay());
+    m_statusController->setStatusOverlay(calculateStatusOverlay());
 }
 
 void QnResourceWidget::setChannelLayout(QnConstResourceVideoLayoutPtr channelLayout)

@@ -13,19 +13,19 @@
       </Component>
 
       <Component Id="cmp3E8A91F11BA0CC36AA4DD87F303B6E32">
-        <File Id="fil0D2098C0235320AF051D84C2A8E46EE0" KeyPath="yes" Source="$(var.AxSourceDir)\avcodec-54.dll" />
+        <File Id="fil0D2098C0235320AF051D84C2A8E46EE0" KeyPath="yes" Source="$(var.AxSourceDir)\avcodec-57.dll" />
       </Component>
       <Component Id="cmp1EC586C67603C547D26471D8FCA5AFBE">
-        <File Id="fil1CE816542F65C224B5D27FBD99CF6C90" KeyPath="yes" Source="$(var.AxSourceDir)\avdevice-54.dll" />
+        <File Id="fil1CE816542F65C224B5D27FBD99CF6C90" KeyPath="yes" Source="$(var.AxSourceDir)\avdevice-57.dll" />
       </Component>
       <Component Id="cmp20AC17A5BAEA316D29CD40EFD564EA3E">
-        <File Id="filE6FF39F2939984B168F40511773B39F6" KeyPath="yes" Source="$(var.AxSourceDir)\avfilter-2.dll" />
+        <File Id="filE6FF39F2939984B168F40511773B39F6" KeyPath="yes" Source="$(var.AxSourceDir)\avfilter-6.dll" />
       </Component>
       <Component Id="cmpB6A04294DD5CF49CAD73844279A74C1B">
-        <File Id="fil454DA5DDEA251786DEA14BF4D46CD862" KeyPath="yes" Source="$(var.AxSourceDir)\avformat-54.dll" />
+        <File Id="fil454DA5DDEA251786DEA14BF4D46CD862" KeyPath="yes" Source="$(var.AxSourceDir)\avformat-57.dll" />
       </Component>
       <Component Id="cmp0AE06F75ED907C59C0BB6F24B5CCE30F">
-        <File Id="filC90922A08D770646675BE1C2530CC94F" KeyPath="yes" Source="$(var.AxSourceDir)\avutil-51.dll" />
+        <File Id="filC90922A08D770646675BE1C2530CC94F" KeyPath="yes" Source="$(var.AxSourceDir)\avutil-55.dll" />
       </Component>
       <Component Id="cmp3E75C8C546EE33C88133ACEE3708447D">
         <File Id="filC26B2049C5CAB0FACDB72A6218A10F71" KeyPath="yes" Source="${qt.dir}/bin/icudt53.dll" />
@@ -40,17 +40,18 @@
         <File Id="filC7D0434DC8A22E54158D9499BABF351F" KeyPath="yes" Source="$(var.AxSourceDir)\libeay32.dll" />
       </Component>
       <Component Id="cmpD7CC49ADDCDE41C2AD4C70E1A4ED9A4B">
-        <File Id="fil102DC58765E19A8793DE90546CAD17C7" KeyPath="yes" Source="$(var.AxSourceDir)\libmp3lame-0.dll" />
+        <File Id="fil102DC58765E19A8793DE90546CAD17C7" KeyPath="yes" Source="$(var.AxSourceDir)\libmp3lame.dll" />
       </Component>
       <Component Id="cmp0FA0DA54FBB8B6733E83E57B2324AD68">
-        <File Id="fil1FB7986829E31384553DFF15253611C2" KeyPath="yes" Source="$(var.AxSourceDir)\libogg-0.dll" />
+        <File Id="fil1FB7986829E31384553DFF15253611C2" KeyPath="yes" Source="$(var.AxSourceDir)\libogg.dll" />
       </Component>
       <Component Id="cmp6041C02418D36BA6066C5E15EDE56DC2">
-        <File Id="filF7C9DE9C27C871D42267A15C2375B399" KeyPath="yes" Source="$(var.AxSourceDir)\libvorbis-0.dll" />
+        <File Id="filF7C9DE9C27C871D42267A15C2375B399" KeyPath="yes" Source="$(var.AxSourceDir)\libvorbis.dll" />
       </Component>
       <Component Id="cmp32197FA6F3FF41A9E0BE245F58D3F480">
-        <File Id="fil6A5BD73D4C6217CD554B601AC7B73CF7" KeyPath="yes" Source="$(var.AxSourceDir)\libvorbisenc-2.dll" />
+        <File Id="fil6A5BD73D4C6217CD554B601AC7B73CF7" KeyPath="yes" Source="$(var.AxSourceDir)\swresample-2.dll" />
       </Component>
+
       <Component Id="cmp829CE0622888FA7A500C2E9E1A118D85">
         <File Id="filCA24EFE3151FF316E2ED28C88D67CDA1" KeyPath="yes" Source="$(var.AxSourceDir)\OpenAL32.dll" />
       </Component>
@@ -112,7 +113,7 @@
         <File Id="fil5CFF8275424D7E4DF192B4430C8B8600" KeyPath="yes" Source="$(var.AxSourceDir)\ssleay32.dll" />
       </Component>
       <Component Id="cmpC1102E56F9C36DCAC27979F5C82FA156">
-        <File Id="fil476BCE7D25707F67787B7E21A8855261" KeyPath="yes" Source="$(var.AxSourceDir)\swscale-2.dll" />
+        <File Id="fil476BCE7D25707F67787B7E21A8855261" KeyPath="yes" Source="$(var.AxSourceDir)\swscale-4.dll" />
       </Component>
       <Directory Id="dirAC1018FAFBD12AB1F52C7FFED327C154" Name="imageformats">
         <Component Id="cmpB3390B82888592C4DA8719158B9B8F55">

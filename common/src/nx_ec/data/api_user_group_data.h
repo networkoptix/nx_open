@@ -12,6 +12,8 @@ struct ApiUserGroupData: ApiIdData
 
     QString name;
     Qn::GlobalPermissions permissions;
+
+    bool isNull() const;
 };
 #define ApiUserGroupData_Fields ApiIdData_Fields (name)(permissions)
 

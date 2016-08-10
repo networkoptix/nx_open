@@ -226,6 +226,12 @@ namespace
         return true;
     }
 
+    bool isNonEditableComboBox(const QWidget* widget)
+    {
+        auto comboBox = qobject_cast<const QComboBox*>(widget);
+        return comboBox && !comboBox->isEditable();
+    }
+
     QnIndents itemViewItemIndents(const QStyleOptionViewItem* item)
     {
         static const QnIndents kDefaultIndents(Metrics::kStandardPadding, Metrics::kStandardPadding);
@@ -265,7 +271,7 @@ namespace
 
                 auto checker = static_cast<const VisibilityChecker*>(view);
 
-                for (int column = index.column() - 1; column > 0; --column)
+                for (int column = index.column() - 1; column >= 0; --column)
                 {
                     if (!checker->isIndexHidden(index.sibling(index.row(), column)))
                     {
@@ -2110,8 +2116,10 @@ QRect QnNxStyle::subControlRect(
                 {
                     case SC_ComboBoxArrow:
                     {
-                        rect = QRect(comboBox->rect.right() - comboBox->rect.height(), 0,
-                                     comboBox->rect.height(), comboBox->rect.height());
+                        rect = QRect(comboBox->rect.right() - comboBox->rect.height(),
+                                     comboBox->rect.top(),
+                                     comboBox->rect.height(),
+                                     comboBox->rect.height());
                         rect.adjust(1, 1, 0, -1);
                         break;
                     }
@@ -2924,18 +2932,15 @@ int QnNxStyle::styleHint(
     return base_type::styleHint(sh, option, widget, shret);
 }
 
-QPixmap QnNxStyle::standardPixmap(StandardPixmap iconId, const QStyleOption* option, const QWidget* widget) const
+QIcon QnNxStyle::standardIcon(StandardPixmap iconId, const QStyleOption* option, const QWidget* widget) const
 {
     switch (iconId)
     {
         case SP_LineEditClearButton:
-        {
-            const int kQLineEditButtonSize = 16;
-            return qnSkin->icon("theme/input_clear.png").pixmap(kQLineEditButtonSize, kQLineEditButtonSize);
-        }
+            return qnSkin->icon("theme/input_clear.png");
 
         default:
-            return base_type::standardPixmap(iconId, option, widget);
+            return base_type::standardIcon(iconId, option, widget);
     }
 }
 
@@ -3138,9 +3143,9 @@ void QnNxStyle::polish(QWidget *widget)
     if (qobject_cast<QAbstractButton*>(widget) ||
         qobject_cast<QAbstractSlider*>(widget) ||
         qobject_cast<QGroupBox*>(widget) ||
-        qobject_cast<QComboBox*>(widget) ||
         qobject_cast<QTabBar*>(widget) ||
-        qobject_cast<QLabel*>(widget))
+        qobject_cast<QLabel*>(widget) ||
+        isNonEditableComboBox(widget))
     {
         if (widget->focusPolicy() != Qt::NoFocus)
             widget->setFocusPolicy(Qt::TabFocus);

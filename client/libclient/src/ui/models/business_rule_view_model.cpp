@@ -83,6 +83,7 @@ namespace QnBusiness {
      */
     QnBusinessActionParameters filterActionParams(QnBusiness::ActionType actionType, const QnBusinessActionParameters &params)
     {
+        Q_UNUSED(actionType);
         return params;
     }
 }

@@ -113,21 +113,20 @@ void QnBackupScheduleDialog::initDayOfWeekCheckboxes() {
     updateDayOfWeekCheckboxes();
 }
 
-void QnBackupScheduleDialog::updateDayOfWeekCheckboxes() {
+void QnBackupScheduleDialog::updateDayOfWeekCheckboxes()
+{
     auto locale = QLocale::system();
 
-    for (size_t i = 0; i < m_dowCheckboxes.size(); ++i) {
-        Qt::DayOfWeek day = indexToDay(i);
+    for (size_t i = 0; i < m_dowCheckboxes.size(); ++i)
+    {
+        Qt::DayOfWeek day = indexToDay(static_cast<int>(i));
         QCheckBox* checkbox = m_dowCheckboxes[i];
 
-        checkbox->setText( locale.dayName(day) );
+        checkbox->setText(locale.dayName(day));
         if (!locale.weekdays().contains(day))
             setPaletteColor(checkbox, QPalette::Foreground, m_colors.weekEnd);
-
     }
 }
-
-
 
 void QnBackupScheduleDialog::setNearestValue(QComboBox* combobox, int time)
 {

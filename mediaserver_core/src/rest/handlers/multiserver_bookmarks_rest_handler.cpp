@@ -8,6 +8,7 @@
 
 #include <rest/helpers/permissions_helper.h>
 #include <rest/handlers/private/multiserver_bookmarks_rest_handler_p.h>
+#include <core/resource_management/resource_access_manager.h>
 
 namespace {
 
@@ -54,7 +55,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(
                 return QnPermissionsHelper::safeModeError(result, contentType, request.format, request.extraFormatting);
             requiredPermission = Qn::GlobalManageBookmarksPermission;
         }
-        if (!QnPermissionsHelper::hasGlobalPermission(processor->authUserId(), requiredPermission))
+        if (!qnResourceAccessManager->hasGlobalPermission(processor->accessRights(), requiredPermission))
             return QnPermissionsHelper::permissionsError(result, contentType, request.format, request.extraFormatting);
     }
 

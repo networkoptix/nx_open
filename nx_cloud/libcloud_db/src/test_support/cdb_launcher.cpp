@@ -616,6 +616,28 @@ api::ResultCode CdbLauncher::getCdbNonce(
     return resCode;
 }
 
+api::ResultCode CdbLauncher::getCdbNonce(
+    const std::string& accountEmail,
+    const std::string& accountPassword,
+    const std::string& systemID,
+    api::NonceData* const nonceData)
+{
+    typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
+        (const std::string&, std::function<void(api::ResultCode, api::NonceData)>);
+
+    auto connection = connectionFactory()->createConnection(accountEmail, accountPassword);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode, *nonceData) =
+        makeSyncCall<api::ResultCode, api::NonceData>(
+            std::bind(
+                static_cast<GetCdbNonceType>(&nx::cdb::api::AuthProvider::getCdbNonce),
+                connection->authProvider(),
+                systemID,
+                std::placeholders::_1));
+    return resCode;
+}
+
 api::ResultCode CdbLauncher::ping(
     const std::string& systemID,
     const std::string& authKey)

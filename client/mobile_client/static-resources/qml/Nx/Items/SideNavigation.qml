@@ -154,10 +154,17 @@ Drawer
 
     onOpenedChanged:
     {
-        if (opened && liteMode)
+        if (opened)
         {
-            // TODO: #dklychkov Implement proper focus control
-            disconnectButton.forceActiveFocus()
+            if (liteMode)
+            {
+                // TODO: #dklychkov Implement proper focus control
+                disconnectButton.forceActiveFocus()
+            }
+            else
+            {
+                forceActiveFocus()
+            }
         }
     }
 
@@ -167,6 +174,7 @@ Drawer
         {
             close()
             Workflow.focusCurrentScreen()
+            event.accepted = true
         }
     }
 }

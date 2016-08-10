@@ -2,7 +2,7 @@ import QtQuick 2.6
 
 Item
 {
-    property CameraItem activeItem: cameraItem
+    property alias activeItem: cameraItem
 
     CameraItem
     {

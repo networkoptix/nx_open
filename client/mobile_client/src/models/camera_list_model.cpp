@@ -187,15 +187,10 @@ QnCameraListModelPrivate::QnCameraListModelPrivate() :
 {
 }
 
-void QnCameraListModelPrivate::at_thumbnailUpdated(const QnUuid& resourceId, const QString& thumbnailId)
+void QnCameraListModelPrivate::at_thumbnailUpdated(
+    const QnUuid& resourceId, const QString& thumbnailId)
 {
-    model->refreshResource(qnResPool->getResourceById(resourceId), Qn::ThumbnailRole);
+    Q_UNUSED(thumbnailId);
 
-    const auto thumbnail = QnCameraThumbnailCache::instance()->getThumbnail(thumbnailId);
-    if (!thumbnail.isNull())
-    {
-        QnAspectRatioHash aspectRatios = qnSettings->camerasAspectRatios();
-        aspectRatios[resourceId] = static_cast<qreal>(thumbnail.width()) / thumbnail.height();
-        qnSettings->setCamerasAspectRatios(aspectRatios);
-    }
+    model->refreshResource(qnResPool->getResourceById(resourceId), Qn::ThumbnailRole);
 }

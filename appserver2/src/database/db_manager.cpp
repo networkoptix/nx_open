@@ -1562,6 +1562,8 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 
     //NX_ASSERT(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
     NX_ASSERT(!data.id.isNull(), "Resource ID must not be null");
+    if (data.id.isNull())
+        return ErrorCode::dbError;
 
     QSqlQuery query(m_sdb);
     if (*internalId) {
@@ -4550,4 +4552,33 @@ void QnDbManagerAccess::getResourceParamsNoLock(const QnUuid& resourceId, ApiRes
 {
     detail::QnDbManager::instance()->doQueryNoLock(resourceId, resourceParams);
 }
+
+bool QnDbManagerAccess::isTranAllowed(const QnAbstractTransaction& tran) const
+{
+    if (!detail::QnDbManager::instance()->isReadOnly())
+        return true;
+
+    switch (tran.command)
+    {
+    case ApiCommand::addLicense:
+    case ApiCommand::addLicenses:
+    case ApiCommand::removeLicense:
+        return true;
+
+    case ApiCommand::saveMediaServer:
+    case ApiCommand::saveStorage:
+    case ApiCommand::saveStorages:
+    case ApiCommand::saveServerUserAttributes:
+    case ApiCommand::saveServerUserAttributesList:
+    case ApiCommand::setResourceStatus:
+    case ApiCommand::setResourceParam:
+    case ApiCommand::setResourceParams:
+        //allowing minimum set of transactions required for local server to function properly
+        return m_userAccessData == Qn::kSystemAccess;
+
+    default:
+        return false;
+    }
+}
+
 } // namespace ec2

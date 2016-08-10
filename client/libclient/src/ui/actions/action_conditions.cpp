@@ -120,6 +120,7 @@ Qn::ActionVisibility QnForbiddenInSafeModeCondition::check(const QnActionParamet
 
 Qn::ActionVisibility QnRequiresOwnerCondition::check(const QnActionParameters &parameters)
 {
+    Q_UNUSED(parameters);
     if (context()->user() && context()->user()->isOwner())
         return Qn::EnabledAction;
     return Qn::InvisibleAction;
@@ -654,6 +655,7 @@ Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resou
 
 Qn::ActionVisibility QnTimelineVisibleActionCondition::check(const QnActionParameters &parameters)
 {
+    Q_UNUSED(parameters);
     return context()->navigator()->isPlayingSupported()
         ? Qn::EnabledAction
         : Qn::InvisibleAction;
@@ -863,6 +865,7 @@ QnBrowseLocalFilesCondition::QnBrowseLocalFilesCondition(QObject* parent) :
 
 Qn::ActionVisibility QnBrowseLocalFilesCondition::check(const QnActionParameters& parameters)
 {
+    Q_UNUSED(parameters);
     const bool connected = !qnCommon->remoteGUID().isNull();
     return (connected ? Qn::InvisibleAction : Qn::EnabledAction);
 }

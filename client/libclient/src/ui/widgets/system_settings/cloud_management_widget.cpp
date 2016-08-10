@@ -3,27 +3,30 @@
 
 #include <api/global_settings.h>
 
+#include <core/resource/user_resource.h>
+
 #include <helpers/cloud_url_helper.h>
 
 #include <ui/dialogs/link_to_cloud_dialog.h>
 #include <ui/dialogs/unlink_from_cloud_dialog.h>
+#include <ui/help/help_topics.h>
 #include <ui/common/palette.h>
-
 #include <ui/style/skin.h>
 
-#include <utils/common/app_info.h>
+#include <ui/workbench/workbench_context.h>
 
+#include <utils/common/app_info.h>
 #include <utils/common/html.h>
 
 namespace
 {
-    const int kAccountFontPixelSize = 24;
+const int kAccountFontPixelSize = 24;
 }
 
-QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent)
-    : base_type(parent)
-    , QnWorkbenchContextAware(parent)
-    , ui(new Ui::CloudManagementWidget)
+QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
+    ui(new Ui::CloudManagementWidget)
 {
     ui->setupUi(this);
 
@@ -43,23 +46,15 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent)
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about %1").arg(QnAppInfo::cloudName()),
                                          QnCloudUrlHelper::aboutUrl()));
 
-    connect(ui->goToCloudButton,    &QPushButton::clicked,  action(QnActions::OpenCloudMainUrl),   &QAction::trigger);
+    connect(ui->goToCloudButton,     &QPushButton::clicked, action(QnActions::OpenCloudMainUrl),   &QAction::trigger);
     connect(ui->createAccountButton, &QPushButton::clicked, action(QnActions::OpenCloudRegisterUrl),   &QAction::trigger);
-
-    connect(ui->linkButton, &QPushButton::clicked, this, [this]()
-    {
-        QScopedPointer<QnLinkToCloudDialog> dialog(new QnLinkToCloudDialog(this));
-        dialog->exec();
-    }
-    );
-
-
-    connect(ui->unlinkButton, &QPushButton::clicked, this, [this]()
-    {
-        QScopedPointer<QnUnlinkFromCloudDialog> dialog(new QnUnlinkFromCloudDialog(this));
-        dialog->exec();
-    }
-    );
+    connect(ui->unlinkButton, &QPushButton::clicked, this, &QnCloudManagementWidget::unlinkFromCloud);
+    connect(ui->linkButton, &QPushButton::clicked, this,
+        [this]()
+        {
+            QScopedPointer<QnLinkToCloudDialog> dialog(new QnLinkToCloudDialog(this));
+            dialog->exec();
+        });
 
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &QnCloudManagementWidget::loadDataToUi);
 }
@@ -82,6 +77,10 @@ void QnCloudManagementWidget::loadDataToUi()
     {
         ui->stackedWidget->setCurrentWidget(ui->notLinkedPage);
     }
+
+    auto isOwner = context()->user() && context()->user()->role() == Qn::UserRole::Owner;
+    ui->linkButton->setVisible(isOwner);
+    ui->unlinkButton->setVisible(isOwner);
 }
 
 void QnCloudManagementWidget::applyChanges()
@@ -91,5 +90,19 @@ void QnCloudManagementWidget::applyChanges()
 bool QnCloudManagementWidget::hasChanges() const
 {
     return false;
+}
+
+void QnCloudManagementWidget::unlinkFromCloud()
+{
+    auto isOwner = context()->user() && context()->user()->role() == Qn::UserRole::Owner;
+    NX_ASSERT(isOwner, "Button must be unavailable for non-owner");
+
+    if (!isOwner)
+        return;
+
+    //bool loggedAsCloud = context()->user()->isCloud();
+
+    QScopedPointer<QnUnlinkFromCloudDialog> messageBox(new QnUnlinkFromCloudDialog(this));
+    messageBox->exec();
 }
 

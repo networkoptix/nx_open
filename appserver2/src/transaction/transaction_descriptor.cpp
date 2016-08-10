@@ -568,6 +568,20 @@ struct ModifyServerAttributesAccess
     }
 };
 
+struct UserInputAccess
+{
+    template<typename Param>
+    bool operator()(const Qn::UserAccessData& accessData, const Param&)
+    {
+        if (hasSystemAccess(accessData))
+            return true;
+
+        auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+        bool result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalUserInputPermission);
+        return result;
+    }
+};
+
 struct AdminOnlyAccess
 {
     template<typename Param>

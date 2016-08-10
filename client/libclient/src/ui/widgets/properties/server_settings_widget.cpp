@@ -131,6 +131,7 @@ void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server)
 
         connect(m_server, &QnResource::urlChanged, this, [this](const QnResourcePtr &resource)
         {
+            Q_UNUSED(resource);
             updateUrl();
         });
     }

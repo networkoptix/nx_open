@@ -149,6 +149,8 @@ bool CloudServerSocket::listen(int queueLen)
 
 AbstractStreamSocket* CloudServerSocket::accept()
 {
+    NX_CRITICAL(!SocketGlobals::aioService().isInAnyAioThread());
+
     if (m_socketAttributes.nonBlockingMode && *m_socketAttributes.nonBlockingMode)
     {
         if (auto socket = m_tunnelPool->getNextSocketIfAny())

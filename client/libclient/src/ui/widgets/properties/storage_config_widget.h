@@ -18,32 +18,34 @@
 
 #include <utils/common/connective.h>
 
-namespace Ui {
+namespace Ui
+{
     class StorageConfigWidget;
-}
+
+} // namespace Ui
+
 
 class QnStorageListModel;
 class QnStorageConfigWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
+    using base_type = Connective<QnAbstractPreferencesWidget>;
 
-    typedef Connective<QnAbstractPreferencesWidget> base_type;
 public:
-    QnStorageConfigWidget(QWidget* parent = 0);
+    QnStorageConfigWidget(QWidget* parent = nullptr);
     virtual ~QnStorageConfigWidget();
 
     virtual void loadDataToUi() override;
 
-    void setServer(const QnMediaServerResourcePtr &server);
+    void setServer(const QnMediaServerResourcePtr& server);
     virtual void applyChanges() override;
 
     virtual bool hasChanges() const override;
 
 protected:
-
     virtual void setReadOnlyInternal(bool readOnly) override;
-    virtual void showEvent(QShowEvent *event) override;
-    virtual void hideEvent(QHideEvent *event) override;
+    virtual void showEvent(QShowEvent* event) override;
+    virtual void hideEvent(QHideEvent* event) override;
 
 private:
     void initQualitiesCombo();
@@ -59,13 +61,12 @@ private:
     void updateBackupInfo();
     void at_eventsGrid_clicked(const QModelIndex& index);
 
-    void applyCamerasToBackup(const QnVirtualCameraResourceList &cameras
-        , Qn::CameraBackupQualities quality);
+    void applyCamerasToBackup(const QnVirtualCameraResourceList& cameras,
+        Qn::CameraBackupQualities quality);
 
-    void updateCamerasForBackup(const QnVirtualCameraResourceList &cameras);
+    void updateCamerasForBackup(const QnVirtualCameraResourceList& cameras);
     void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
-    void updateBackupUi(const QnBackupStatusData& reply
-        , int overallSelectedCameras);
+    void updateBackupUi(const QnBackupStatusData& reply, int overallSelectedCameras);
     void updateSelectedCamerasCaption(int selectedCamerasCount);
 
     void updateColumnWidth();
@@ -78,19 +79,20 @@ private:
     void cancelBackup();
 
     /** Check if backup can be started right now - and show additional info if not. */
-    bool canStartBackup(const QnBackupStatusData& data
-        , int selectedCamerasCount
-        , QString *info);
+    bool canStartBackup(const QnBackupStatusData& data, int selectedCamerasCount, QString* info);
 
     QString backupPositionToString(qint64 backupTimeMs);
 
 private slots:
 
-    void at_serverRebuildStatusChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageScanData &status);
-    void at_serverBackupStatusChanged(const QnMediaServerResourcePtr &server, const QnBackupStatusData &status);
+    void at_serverRebuildStatusChanged(const QnMediaServerResourcePtr& server,
+        QnServerStoragesPool pool, const QnStorageScanData& status);
+    void at_serverBackupStatusChanged(const QnMediaServerResourcePtr& server,
+        const QnBackupStatusData& status);
 
-    void at_serverRebuildArchiveFinished(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool);
-    void at_serverBackupFinished(const QnMediaServerResourcePtr &server);
+    void at_serverRebuildArchiveFinished(const QnMediaServerResourcePtr& server,
+        QnServerStoragesPool pool);
+    void at_serverBackupFinished(const QnMediaServerResourcePtr& server);
 
     void at_addExtStorage(bool addToMain);
 
@@ -122,7 +124,8 @@ private:
 
 private:
     void setupGrid(QTableView* tableView, bool isMainPool);
-    void applyStoragesChanges(QnStorageResourceList& result, const QnStorageModelInfoList &storages) const;
-    bool hasStoragesChanges(const QnStorageModelInfoList &storages) const;
+    void applyStoragesChanges(QnStorageResourceList& result,
+        const QnStorageModelInfoList& storages) const;
+    bool hasStoragesChanges(const QnStorageModelInfoList& storages) const;
     void updateBackupWidgetsVisibility();
 };

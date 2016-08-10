@@ -1,7 +1,5 @@
 #include "thumbnails_archive_delegate.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include "utils/common/util.h"
 #include <core/resource/media_resource.h>
 
@@ -158,5 +156,3 @@ QnAbstractArchiveDelegate::ArchiveChunkInfo QnThumbnailsArchiveDelegate::getLast
 {
     return m_baseDelegate->getLastUsedChunkInfo();
 }
-
-#endif // ENABLE_ARCHIVE

@@ -55,6 +55,8 @@ void QnUserGroupSettingsModel::setGroups(const ec2::ApiUserGroupDataList& value)
 
     m_replacements.clear();
 
+    m_accessibleLayoutsPreviews.clear();
+
     endResetModel();
 }
 
@@ -242,3 +244,18 @@ QnUserGroupSettingsModel::RoleReplacement QnUserGroupSettingsModel::directReplac
     return m_replacements[source];
 }
 
+void QnUserGroupSettingsModel::setAccessibleLayoutsPreview(const QSet<QnUuid>& value)
+{
+    m_accessibleLayoutsPreviews[m_currentGroupId] = value;
+}
+
+QnIndirectAccessProviders QnUserGroupSettingsModel::accessibleLayouts() const
+{
+    auto role = qnResourceAccessManager->userGroup(m_currentGroupId);
+    auto layouts = QnResourceAccessProvider::indirectlyAccessibleLayouts(role);
+
+    for (auto layoutPreview : m_accessibleLayoutsPreviews[m_currentGroupId])
+        layouts.insert(layoutPreview, QSet<QnResourcePtr>());
+
+    return layouts;
+}

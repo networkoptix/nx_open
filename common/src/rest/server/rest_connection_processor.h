@@ -7,6 +7,7 @@
 
 #include "network/tcp_connection_processor.h"
 #include "request_handler.h"
+#include <core/resource_management/user_access_data.h>
 
 class QnRestProcessorPool
 :
@@ -36,8 +37,8 @@ public:
     virtual ~QnRestConnectionProcessor();
     void setAuthNotRequired(bool noAuth);
 
-    QnUuid authUserId() const;
-    void setAuthUserId(const QnUuid& authUserId);
+    Qn::UserAccessData accessRights() const;
+    void setAccessRights(const Qn::UserAccessData& accessRights);
 
     //!Rest handler can use following methods to access http request/response directly
     const nx_http::Request& request() const;

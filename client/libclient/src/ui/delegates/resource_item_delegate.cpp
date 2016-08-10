@@ -165,7 +165,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     /* Set opacity if disabled: */
     QnScopedPainterOpacityRollback opacityRollback(painter);
     if (!option.state.testFlag(QStyle::State_Enabled))
-        painter->setOpacity(painter->opacity() * 0.3);
+        painter->setOpacity(painter->opacity() * style::Metrics::kDisabledItemOpacity);
 
     /* Draw icon: */
     if (option.features.testFlag(QStyleOptionViewItem::HasDecoration))

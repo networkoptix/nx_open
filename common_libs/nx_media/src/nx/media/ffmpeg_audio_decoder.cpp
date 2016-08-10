@@ -1,5 +1,3 @@
-#ifndef DISABLE_FFMPEG
-
 #include "ffmpeg_audio_decoder.h"
 
 extern "C" {
@@ -154,5 +152,3 @@ bool FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame, Audi
 
 } // namespace media
 } // namespace nx
-
-#endif // DISABLE_FFMPEG

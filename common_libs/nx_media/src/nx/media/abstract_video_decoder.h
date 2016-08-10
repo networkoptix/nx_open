@@ -85,6 +85,11 @@ public:
         m_videoGeometryAccessor = videoGeometryAccessor;
     }
 
+    /**
+     * Returns square(pixel) aspect ratio (sar) for the last decoded frame
+     * or 1.0 if context isn't initialized yet.
+     */
+    virtual double getSampleAspectRatio() const { return 1.0; }
 
 protected:
     /**

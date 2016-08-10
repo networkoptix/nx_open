@@ -7,6 +7,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/device_dependent_strings.h>
+#include <core/resource_management/resource_access_manager.h>
 
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
@@ -174,7 +175,7 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
     if (flags.testFlag(Qn::user))
     {
         if (const QnUserResourcePtr& user = m_resource.dynamicCast<QnUserResource>())
-            m_extraInfo = user->fullName();
+            m_extraInfo = qnResourceAccessManager->userRoleName(user);
     }
     else
     {

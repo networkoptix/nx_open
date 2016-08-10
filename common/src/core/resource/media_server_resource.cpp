@@ -265,7 +265,7 @@ rest::QnConnectionPtr QnMediaServerResource::restConnection()
     return m_restConnection;
 }
 
-void QnMediaServerResource::setUrl(const QString& url) 
+void QnMediaServerResource::setUrl(const QString& url)
 {
     QnResource::setUrl(url);
 
@@ -283,6 +283,7 @@ void QnMediaServerResource::setUrl(const QString& url)
 
 QUrl QnMediaServerResource::getApiUrl() const
 {
+    //TODO: #GDM calculate scheme dependent on server side ssl support
     return getPrimaryAddress().toUrl(kApiUrlScheme);
 }
 

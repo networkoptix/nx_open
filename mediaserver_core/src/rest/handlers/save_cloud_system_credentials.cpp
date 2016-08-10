@@ -44,20 +44,6 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     NX_LOGX(lm("%1 cloud credentials").arg(data.reset ? "Resetting" : "Saving"),
         cl_logDEBUG1);
 
-    if (data.reset)
-    {
-        qnGlobalSettings->resetCloudParams();
-        if (!qnGlobalSettings->synchronizeNowSync())
-        {
-            NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
-            result.setError(
-                QnJsonRestResult::CantProcessRequest,
-                lit("Failed to save cloud credentials to local DB"));
-            return nx_http::StatusCode::internalServerError;
-        }
-        return nx_http::StatusCode::ok;
-    }
-
     if (data.cloudSystemID.isEmpty())
     {
         NX_LOGX(lit("Missing required parameter CloudSystemID"), cl_logDEBUG1);

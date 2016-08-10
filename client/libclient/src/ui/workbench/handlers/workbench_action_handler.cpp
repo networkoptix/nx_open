@@ -2292,7 +2292,7 @@ void QnWorkbenchActionHandler::sendServerRequest(const QnMediaServerResourcePtr&
         this, &QnWorkbenchActionHandler::at_serverRequest_nonceReceived);
 
     // TODO: Think of preloader in case of user complains about delay
-    m_serverRequests.emplace(serverUrl, ServerRequest { server, path, std::move(reply) });
+    m_serverRequests.emplace(serverUrl, ServerRequest{server, path, std::move(reply)});
     client->doGet(serverUrl);
 }
 
