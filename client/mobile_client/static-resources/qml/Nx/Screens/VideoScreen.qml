@@ -216,7 +216,7 @@ PageBase
 
         source: player
         screenshotSource: initialScreenshot
-        customAspectRatio: resourceHelper.customAspectRatio
+        customAspectRatio: resourceHelper.customAspectRatio || player.aspectRatio
         videoRotation: resourceHelper.customRotation
 
         onClicked:

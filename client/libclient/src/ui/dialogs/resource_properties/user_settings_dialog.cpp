@@ -26,7 +26,7 @@ namespace
     static std::map<QnResourceAccessFilter::Filter, QString> kCategoryNameByFilter
     {
         { QnResourceAccessFilter::MediaFilter, QnUserSettingsDialog::tr("Media Resources") },
-        { QnResourceAccessFilter::LayoutsFilter, QnUserSettingsDialog::tr("Layouts") }
+        { QnResourceAccessFilter::LayoutsFilter, QnUserSettingsDialog::tr("Shared Layouts") }
     };
 
     static const QString kHtmlTableTemplate(lit("<table>%1</table>"));
