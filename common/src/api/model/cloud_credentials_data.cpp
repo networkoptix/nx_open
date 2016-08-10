@@ -4,10 +4,15 @@
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions.h>
 
+
+CloudCredentialsData::CloudCredentialsData()
+{
+}
+
 CloudCredentialsData::CloudCredentialsData(const QnRequestParams& params):
-    reset(params.contains(lit("reset"))),
     cloudSystemID(params.value(lit("cloudSystemID"))),
-    cloudAuthKey(params.value(lit("cloudAuthKey")))
+    cloudAuthKey(params.value(lit("cloudAuthKey"))),
+    cloudAccountName(params.value(lit("cloudAccountName")))
 {
 }
 
