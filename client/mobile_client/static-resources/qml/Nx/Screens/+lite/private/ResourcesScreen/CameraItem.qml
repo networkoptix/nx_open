@@ -13,6 +13,8 @@ Control
     property alias resourceId: resourceHelper.resourceId
     property bool paused: false
 
+    signal clicked()
+
     QnMediaResourceHelper
     {
         id: resourceHelper
@@ -155,7 +157,7 @@ Control
             {
                 id: mouseArea
                 anchors.fill: parent
-                onClicked: Workflow.openVideoScreen(resourceId)
+                onClicked: cameraItem.clicked()
             }
 
             MaterialEffect
@@ -168,5 +170,5 @@ Control
         }
     }
 
-    Keys.onReturnPressed: mouseArea.clicked()
+    Keys.onReturnPressed: cameraItem.clicked()
 }

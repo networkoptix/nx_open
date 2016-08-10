@@ -9,6 +9,7 @@ import "private/VideoScreen"
 PageBase
 {
     id: videoScreen
+    objectName: "videoScreen"
 
     property string resourceId
     property string initialScreenshot

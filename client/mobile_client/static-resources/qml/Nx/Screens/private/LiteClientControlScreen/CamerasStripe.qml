@@ -10,6 +10,8 @@ ListView
 
     property string currentResourceId: ""
 
+    signal cameraClicked(string resourceId)
+
     implicitHeight: 88
     topMargin: 1
     bottomMargin: 1
@@ -28,7 +30,7 @@ ListView
         thumbnail: model.thumbnail
         status: model.resourceStatus
 
-        onClicked: currentResourceId = model.uuid
+        onClicked: camerasStripe.cameraClicked(model.uuid)
         onThumbnailRefreshRequested: camerasStripe.model.refreshThumbnail(index)
     }
 

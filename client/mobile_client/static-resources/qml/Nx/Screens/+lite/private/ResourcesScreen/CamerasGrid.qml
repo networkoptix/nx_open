@@ -15,18 +15,10 @@ Item
         onLayoutChanged:
         {
             resetLayout()
-
-            if (displayMode == QnLiteClientLayoutHelper.SingleCamera)
-                Workflow.openVideoScreen(Qt.binding(function() { return singleCameraId }))
+            switchMode()
         }
 
-        onDisplayModeChanged:
-        {
-            if (displayMode == QnLiteClientLayoutHelper.SingleCamera)
-                Workflow.openVideoScreen(Qt.binding(function() { return singleCameraId }))
-            else
-                Workflow.openResourcesScreen()
-        }
+        onDisplayModeChanged: switchMode()
 
         onCameraIdChanged:
         {
@@ -35,6 +27,28 @@ Item
                 return
 
             item.resourceId = resourceId
+        }
+
+        onSingleCameraIdChanged:
+        {
+            var item = stackView.currentItem
+            if (item.objectName != "videoScreen")
+                return
+
+            item.resourceId = singleCameraId
+        }
+
+        function switchMode()
+        {
+            if (displayMode == QnLiteClientLayoutHelper.SingleCamera)
+            {
+                if (stackView.currentItem.objectName != "videoScreen")
+                    Workflow.openVideoScreen(singleCameraId)
+            }
+            else
+            {
+                Workflow.openResourcesScreen()
+            }
         }
     }
 
@@ -58,12 +72,27 @@ Item
                 width: grid.width / grid.columns
                 height: grid.height / grid.rows
                 paused: !resourcesScreen.activePage
+
+                property int layoutX: index % grid.columns
+                property int layoutY: Math.floor(index / grid.columns)
+
+                onClicked: layoutHelper.displayCell = Qt.point(layoutX, layoutY)
             }
         }
 
         function itemAt(x, y)
         {
             return repeater.itemAt(y * columns + x)
+        }
+    }
+
+    Connections
+    {
+        target: resourcesScreen
+        onActivePageChanged:
+        {
+            if (resourcesScreen.activePage)
+                layoutHelper.displayCell = Qt.point(-1, -1)
         }
     }
 

@@ -7,6 +7,27 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
 
+namespace {
+
+    const QString kDisplayCellProperty(lit("liteClientDisplayCell"));
+    const QPoint kInvalidPoint(-1, -1);
+
+    QString pointToString(const QPoint& point)
+    {
+        return lit("%1,%2").arg(point.x()).arg(point.y());
+    }
+
+    QPoint pointFromString(const QString& str)
+    {
+        const auto components = str.split(L',');
+        if (components.size() != 2)
+            return kInvalidPoint;
+
+        return QPoint(components.first().toInt(), components.last().toInt());
+    }
+
+} // namespace
+
 class QnLiteClientLayoutHelperPrivate: public QObject
 {
     QnLiteClientLayoutHelper* q_ptr;
@@ -41,7 +62,6 @@ QString QnLiteClientLayoutHelper::layoutId() const
 
 void QnLiteClientLayoutHelper::setLayoutId(const QString& layoutId)
 {
-    Q_D(QnLiteClientLayoutHelper);
     setLayout(qnResPool->getResourceById<QnLayoutResource>(QnUuid::fromStringSafe(layoutId)));
 }
 
@@ -74,33 +94,37 @@ void QnLiteClientLayoutHelper::setLayout(const QnLayoutResourcePtr& layout)
         connect(d->layout, &QnLayoutResource::itemRemoved,
             d, &QnLiteClientLayoutHelperPrivate::at_layoutItemRemoved);
 
-        emit displayModeChanged();
+        emit displayCellChanged();
         emit singleCameraIdChanged();
     }
 }
 
-QnLayoutProperties::DisplayMode QnLiteClientLayoutHelper::displayMode() const
+QPoint QnLiteClientLayoutHelper::displayCell() const
 {
     Q_D(const QnLiteClientLayoutHelper);
 
     if (!d->layout)
-        return QnLayoutProperties::DisplayMode::SingleCamera;
+        return kInvalidPoint;
 
-    return static_cast<QnLayoutProperties::DisplayMode>(
-        d->layout->getProperty(QnLayoutProperties::kDisplayMode).toInt());
+    return pointFromString(d->layout->getProperty(kDisplayCellProperty));
 }
 
-void QnLiteClientLayoutHelper::setDisplayMode(QnLayoutProperties::DisplayMode displayMode)
+void QnLiteClientLayoutHelper::setDisplayCell(const QPoint& cell)
 {
     Q_D(QnLiteClientLayoutHelper);
 
     if (!d->layout)
         return;
 
-    d->layout->setProperty(
-        QnLayoutProperties::kDisplayMode, QString::number(static_cast<int>(displayMode)));
+    d->layout->setProperty(kDisplayCellProperty, pointToString(cell));
 
     propertyDictionary->saveParams(d->layout->getId());
+}
+
+QnLiteClientLayoutHelper::DisplayMode QnLiteClientLayoutHelper::displayMode() const
+{
+    return displayCell() == kInvalidPoint
+        ? DisplayMode::MultipleCameras : DisplayMode::SingleCamera;
 }
 
 QString QnLiteClientLayoutHelper::singleCameraId() const
@@ -110,7 +134,11 @@ QString QnLiteClientLayoutHelper::singleCameraId() const
     if (!d->layout)
         return QString();
 
-    return d->layout->getProperty(QnLayoutProperties::kSingleCamera);
+    const auto cell = displayCell();
+    if (cell == kInvalidPoint)
+        return QString();
+
+    return cameraIdOnCell(cell.x(), cell.y());
 }
 
 void QnLiteClientLayoutHelper::setSingleCameraId(const QString& cameraId)
@@ -120,9 +148,11 @@ void QnLiteClientLayoutHelper::setSingleCameraId(const QString& cameraId)
     if (!d->layout)
         return;
 
-    d->layout->setProperty(QnLayoutProperties::kSingleCamera, cameraId);
+    const auto cell = displayCell();
+    if (cell == kInvalidPoint)
+        return;
 
-    propertyDictionary->saveParams(d->layout->getId());
+    setCameraIdOnCell(cell.x(), cell.y(), cameraId);
 }
 
 QString QnLiteClientLayoutHelper::cameraIdOnCell(int x, int y) const
@@ -182,6 +212,9 @@ void QnLiteClientLayoutHelper::setCameraIdOnCell(int x, int y, const QString& ca
         }
         else
         {
+            if (it->resource.id == id)
+                return;
+
             QnLayoutItemData item = *it;
             item.resource.id = id;
             item.resource.uniqueId = camera->getUniqueId();
@@ -244,10 +277,11 @@ void QnLiteClientLayoutHelperPrivate::at_layoutPropertyChanged(
 
     Q_Q(QnLiteClientLayoutHelper);
 
-    if (key == QnLayoutProperties::kDisplayMode)
-        emit q->displayModeChanged();
-    else if (key == QnLayoutProperties::kSingleCamera)
+    if (key == kDisplayCellProperty)
+    {
+        emit q->displayCellChanged();
         emit q->singleCameraIdChanged();
+    }
 }
 
 void QnLiteClientLayoutHelperPrivate::at_layoutItemChanged(
@@ -263,6 +297,9 @@ void QnLiteClientLayoutHelperPrivate::at_layoutItemChanged(
     const auto y = static_cast<int>(item.combinedGeometry.y());
     const auto id = item.resource.id.toString();
     emit q->cameraIdChanged(x, y, id);
+
+    if (QPoint(x, y) == q->displayCell())
+        emit q->singleCameraIdChanged();
 }
 
 void QnLiteClientLayoutHelperPrivate::at_layoutItemRemoved(
@@ -277,4 +314,7 @@ void QnLiteClientLayoutHelperPrivate::at_layoutItemRemoved(
     const auto x = static_cast<int>(item.combinedGeometry.x());
     const auto y = static_cast<int>(item.combinedGeometry.y());
     emit q->cameraIdChanged(x, y, QString());
+
+    if (QPoint(x, y) == q->displayCell())
+        emit q->singleCameraIdChanged();
 }
