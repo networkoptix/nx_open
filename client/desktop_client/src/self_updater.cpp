@@ -71,12 +71,57 @@ bool SelfUpdater::registerUriHandler()
 #endif
 }
 
+QString backupPostfix()
+{
+#if defined(Q_OS_MACX)
+    return lit("../../backup");
+#else
+    return lit("/backup");
+#endif
+}
+
+QString applauncherPostfix()
+{
+#if defined(Q_OS_MACX)
+    return lit("/Contents/MacOs")
+#endif
+    return QString();
+}
+
+typedef QSharedPointer<QnBaseDirectoryBackup> QnDirectoryBackupPtr;
+QnDirectoryBackupPtr copyApplauncherInstance(const QString& from, const QString& to)
+{
+    const QStringList kTargetFileFilters =
+    {
+        QLatin1String("*.dll"),
+        QnClientAppInfo::launcherVersionFile(),
+        QnClientAppInfo::applauncherBinaryName()
+    };
+
+#if defined(Q_OS_MACX)
+    static const auto kFrameworkPostfix = lit("/../Frameworks");
+    const auto target = to + applauncherPostfix();
+    const auto filesBackup = QnDirectoryBackupPtr(new QnDirectoryBackup(from, target));
+    const auto frameworkBackup = QnDirectoryBackupPtr(new QnDirectoryRecursiveBackup(
+        from + kFrameworkPostfix, target + kFrameworkPostfix));
+
+    QnMultipleDirectoriesBackup multipleBackup;
+    multipleBackup.addDirectoryBackup(filesBackup);
+    multipleBackup.addDirectoryBackup(frameworkBackup);
+    return frameworkBackup;
+#else
+    /* Move installed applaucher to backup folder. */
+    return QnDirectoryBackupPtr(new QnDirectoryBackup(from, kTargetFileFilters, to));
+#endif
+}
+
 bool SelfUpdater::updateApplauncher()
 {
     /* Check if applauncher binary exists in our installation. */
 
     QString applauncherDirPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation)
         + lit("/../applauncher/")
+        + applauncherPostfix()
         + QnAppInfo::customizationName();
 
     const QDir applauncherDir(applauncherDirPath);
@@ -118,29 +163,23 @@ bool SelfUpdater::updateApplauncher()
         return false;
     }
 
-    const QStringList kTargetFileFilters =
+    const auto backupPath = applauncherDirPath + backupPostfix();
+    const auto backup = copyApplauncherInstance(applauncherDirPath, backupPath);
+    if (!backup->backup(QnDirectoryBackupBehavior::Move))
     {
-        QLatin1String("*.dll"),
-        QnClientAppInfo::launcherVersionFile(),
-        QnClientAppInfo::applauncherBinaryName()
-    };
-
-    /* Move installed applaucher to backup folder. */
-    const QString backupDirPath = applauncherDirPath + lit("/backup");
-    QnDirectoryBackup backup(applauncherDirPath, kTargetFileFilters, backupDirPath);
-    if (!backup.backup(QnDirectoryBackup::Behavior::Move))
-    {
-        NX_LOG(lit("Could not backup to %1.").arg(backupDirPath), cl_logERROR);
+        NX_LOG(lit("Could not backup to %1").arg(applauncherDirPath), cl_logERROR);
         return false;
     }
 
     /* Copy our applauncher with all libs to destination folder. */
-    QnDirectoryBackup updatedSource(qApp->applicationDirPath(), kTargetFileFilters, applauncherDirPath);
-    const bool updateSuccess = updatedSource.backup(); //TODO: #GDM may be rename class and its methods to something else?
+    auto updatedSource = copyApplauncherInstance(qApp->applicationDirPath(), applauncherDirPath);
+
+    //TODO: #GDM may be rename class and its methods to something else?
+    const bool updateSuccess = updatedSource->backup(QnDirectoryBackupBehavior::Copy);
     if (!updateSuccess)
     {
         NX_LOG(lit("Failed to update Applauncher."), cl_logERROR);
-        backup.restore();
+        backup->restore(QnDirectoryBackupBehavior::Copy);
     }
 
     /* Run newest applauncher via our own minilauncher. */
