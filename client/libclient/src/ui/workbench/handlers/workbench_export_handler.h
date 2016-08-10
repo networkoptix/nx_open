@@ -54,6 +54,17 @@ private:
         qint64 timelapseFrameStepMs = 0
     );
 
+    /** Check if exe file will be greater than 4 Gb. */
+    bool exeFileIsTooBig(const QnLayoutResourcePtr& layout, const QnTimePeriod& period) const;
+
+    /** Check if exe file will be greater than 4 Gb. */
+    bool exeFileIsTooBig(
+        const QnMediaResourcePtr& mediaResource,
+        const QnAbstractStreamDataProvider* dataProvider,
+        const QnTimePeriod& period) const;
+
+    bool confirmExportTooBigExeFile() const;
+
     private slots:
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();

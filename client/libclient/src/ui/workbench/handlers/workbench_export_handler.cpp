@@ -362,6 +362,10 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
         if (binaryExport)
         {
+            if (exeFileIsTooBig(mediaResource, dataProvider, period)
+                && !confirmExportTooBigExeFile())
+                    continue;
+
             transcodeCheckbox = false;
             timestampPos = Qn::NoCorner;
         }
@@ -542,6 +546,35 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
         tool->start();
         exportProgressDialog->show();
     }
+}
+
+bool QnWorkbenchExportHandler::exeFileIsTooBig(
+    const QnMediaResourcePtr& mediaResource,
+    const QnAbstractStreamDataProvider* dataProvider,
+    const QnTimePeriod& period) const
+{
+    return true;
+}
+
+bool QnWorkbenchExportHandler::exeFileIsTooBig(
+    const QnLayoutResourcePtr& layout,
+    const QnTimePeriod& period) const
+{
+    return true;
+}
+
+bool QnWorkbenchExportHandler::confirmExportTooBigExeFile() const
+{
+    auto result = QnMessageBox::warning(
+        mainWindow(),
+        tr("Executable format is not recommended"),
+        tr("Exported executable file over 4 Gb can't be opened by double click in Windows Explorer. "
+            "It's a Windows limitation. "
+            "Do you want to continue?"),
+        QDialogButtonBox::Yes | QDialogButtonBox::No,
+        QDialogButtonBox::No
+    );
+    return result == QDialogButtonBox::Yes;
 }
 
 void QnWorkbenchExportHandler::exportTimeSelection(const QnActionParameters& parameters, qint64 timelapseFrameStepMs)
@@ -753,6 +786,15 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
             return false;
 
         QString selectedExtension = dialog->selectedExtension();
+        bool binaryExport = isBinaryExportSupported()
+            ? selectedExtension.contains(lit(".exe"))
+            : false;
+
+        if (binaryExport
+            && exeFileIsTooBig(layout, exportPeriod)
+            && !confirmExportTooBigExeFile())
+                continue;
+
         if (!fileName.toLower().endsWith(selectedExtension))
         {
             fileName += selectedExtension;
