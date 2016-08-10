@@ -10,14 +10,14 @@ namespace Ui
     class LocalSettingsDialog;
 }
 
-class QnGeneralPreferencesWidget;
+class QnAdvancedSettingsWidget;
 class QnLookAndFeelPreferencesWidget;
 
 class QnLocalSettingsDialog : public QnGenericTabbedDialog, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    typedef QnGenericTabbedDialog base_type;
+    using base_type = QnGenericTabbedDialog;
 public:
     enum DialogPage
     {
@@ -25,6 +25,7 @@ public:
         LookAndFeelPage,
         RecordingPage,
         NotificationsPage,
+        AdvancedPage,
 
         PageCount
     };
@@ -34,11 +35,18 @@ public:
 
 protected:
     virtual void applyChanges() override;
+    virtual void updateButtonBox() override;
+
+private:
+    bool isRestartRequired() const;
+
+    void addRestartLabel();
 
 private:
     Q_DISABLE_COPY(QnLocalSettingsDialog)
 
     QScopedPointer<Ui::LocalSettingsDialog> ui;
-    QnGeneralPreferencesWidget* m_generalWidget;
     QnLookAndFeelPreferencesWidget* m_lookAndFeelWidget;
+    QnAdvancedSettingsWidget* m_advancedSettingsWidget;
+    QLabel* m_restartLabel;
 };

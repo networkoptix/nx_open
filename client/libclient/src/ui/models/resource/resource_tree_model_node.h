@@ -59,6 +59,7 @@ public:
     Qn::ResourceFlags resourceFlags() const;
 
     QList<QnResourceTreeModelNodePtr> children() const;
+    QList<QnResourceTreeModelNodePtr> childrenRecursive() const;
 
     QnResourceTreeModelNodePtr child(int index) ;
 

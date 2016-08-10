@@ -27,7 +27,8 @@ QnWorkbenchAutoStarter::~QnWorkbenchAutoStarter() {
     return;
 }
 
-bool QnWorkbenchAutoStarter::isSupported() const {
+bool QnWorkbenchAutoStarter::isSupported()
+{
 #ifdef Q_OS_WIN
     return true;
 #else
@@ -41,7 +42,7 @@ bool QnWorkbenchAutoStarter::isAutoStartEnabled() {
 
     QString realPath = autoStartPath();
     QString registryPath = settings.value(autoStartKey()).toString();
-    
+
     return realPath == registryPath;
 #else
     return false;

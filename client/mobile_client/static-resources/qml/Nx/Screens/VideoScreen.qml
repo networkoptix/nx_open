@@ -142,6 +142,7 @@ PageBase
     {
         id: toolBar
 
+        y: statusBarHeight
         title: resourceHelper.resourceName
         leftButtonIcon: lp("/images/arrow_back.png")
         onLeftButtonClicked: Workflow.popCurrentScreen()
@@ -174,7 +175,7 @@ PageBase
 
         parent: videoScreen
         x: parent.width - width - 8
-        y: 8
+        y: header.y + 8
 
         MenuItem
         {
@@ -215,8 +216,8 @@ PageBase
 
         source: player
         screenshotSource: initialScreenshot
-        aspectRatio: screenshotSource == initialScreenshot ? resourceHelper.rotatedAspectRatio : resourceHelper.aspectRatio
-        videoRotation: screenshotSource == initialScreenshot ? 0 : resourceHelper.rotation
+        customAspectRatio: resourceHelper.customAspectRatio
+        videoRotation: resourceHelper.customRotation
 
         onClicked:
         {

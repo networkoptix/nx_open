@@ -37,6 +37,7 @@ public:
 protected:
     virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md) override
     {
+        Q_UNUSED(md);
         qint64 result = m_currentTimeUsec;
         m_currentTimeUsec += kOutputDeltaUsec;
         return result;

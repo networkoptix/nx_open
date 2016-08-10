@@ -187,50 +187,52 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
     if(!resource)
         return QVariant();
 
-    switch(role) {
-    case Qt::DisplayRole:
-    case Qt::ToolTipRole:
-    case Qt::StatusTipRole:
-    case Qt::WhatsThisRole:
-    case Qt::AccessibleTextRole:
-    case Qt::AccessibleDescriptionRole:
-        if (column == NameColumn)
-            return QnResourceDisplayInfo(resource).toString(Qn::RI_NameOnly);
-        break;
+    switch(role)
+    {
+        case Qt::DisplayRole:
+        case Qt::ToolTipRole:
+        case Qt::StatusTipRole:
+        case Qt::WhatsThisRole:
+        case Qt::AccessibleTextRole:
+        case Qt::AccessibleDescriptionRole:
+            if (column == NameColumn)
+                return QnResourceDisplayInfo(resource).toString(Qn::RI_NameOnly);
+            break;
 
-    case Qt::EditRole:
-        if (column == NameColumn)
-            return QnResourceDisplayInfo(resource).toString(Qn::RI_NameOnly);
-        break;
+        case Qt::EditRole:
+            if (column == NameColumn)
+                return QnResourceDisplayInfo(resource).toString(Qn::RI_NameOnly);
+            break;
 
-    case Qt::DecorationRole:
-        if (index.column() == NameColumn)
-            return resourceIcon(resource);
-        break;
+        case Qt::DecorationRole:
+            if (column == NameColumn)
+                return resourceIcon(resource);
+            break;
 
-    case Qt::CheckStateRole:
-        if (index.column() == CheckColumn)
+        case Qt::CheckStateRole:
+            if (column == CheckColumn)
+                return m_checkedResources.contains(resource->getId())
+                    ? Qt::Checked
+                    : Qt::Unchecked;
+            break;
+
+        //TODO: #vkutin #GDM #common Refactor/replace this role
+        case Qn::DisabledRole:
             return m_checkedResources.contains(resource->getId())
-                ? Qt::Checked
-                : Qt::Unchecked;
-        break;
+                ? false
+                : true;
 
-    //TODO: #vkutin #GDM #common Refactor/replace this role
-    case Qn::DisabledRole:
-        return m_checkedResources.contains(resource->getId())
-            ? false
-            : true;
+        case Qn::ResourceRole:
+            return QVariant::fromValue<QnResourcePtr>(resource);
+        case Qn::ResourceFlagsRole:
+            return static_cast<int>(resource->flags());
+        case Qn::ResourceSearchStringRole:
+            return resource->toSearchString();
+        case Qn::ResourceStatusRole:
+            return static_cast<int>(resource->getStatus());
 
-    case Qn::ResourceRole:
-        return QVariant::fromValue<QnResourcePtr>(resource);
-    case Qn::ResourceFlagsRole:
-        return static_cast<int>(resource->flags());
-    case Qn::ResourceSearchStringRole:
-        return resource->toSearchString();
-    case Qn::ResourceStatusRole:
-        return static_cast<int>(resource->getStatus());
-    default:
-        break;
+        default:
+            break;
     }
 
     return QVariant();

@@ -730,21 +730,13 @@ bool PlayerPrivate::createArchiveReader()
     if (!resource)
         return false;
 
-#ifdef ENABLE_ARCHIVE
     archiveReader.reset(new QnArchiveStreamReader(resource));
-#endif
 
     QnAbstractArchiveDelegate* archiveDelegate;
     if (isLocalFile)
-    {
-#ifdef ENABLE_ARCHIVE
         archiveDelegate = new QnAviArchiveDelegate();
-#endif
-    }
     else
-    {
         archiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
-    }
 
     archiveReader->setArchiveDelegate(archiveDelegate);
     return true;
@@ -924,6 +916,7 @@ void Player::stop()
 
     d->dataConsumer.reset();
     d->archiveReader.reset();
+    d->videoFrameToRender.reset();
     d->setState(State::Stopped);
 }
 
@@ -935,6 +928,8 @@ void Player::setSource(const QUrl& url)
 
     if (newUrl != d->url)
     {
+        const auto currentState = d->state;
+
         stop();
         d->url = newUrl;
 
@@ -942,17 +937,16 @@ void Player::setSource(const QUrl& url)
         d->isLocalFile = d->url.scheme() == lit("file");
         if (d->isLocalFile)
         {
-#ifdef ENABLE_ARCHIVE
             d->resource.reset(new QnAviResource(path));
             d->resource->setStatus(Qn::Online);
-#else
-            d->resource.reset();
-#endif
         }
         else
         {
             d->resource = qnResPool->getResourceById(QnUuid(path));
         }
+
+        if (d->resource && currentState == State::Playing)
+            play();
     }
 }
 

@@ -18,53 +18,47 @@ class QnImageProvider;
 class QnFisheyeCalibrationWidget : public Connective<QWidget>
 {
     Q_OBJECT
+    using base_type = Connective<QWidget>;
 
-    typedef Connective<QWidget> base_type;
 public:
-    explicit QnFisheyeCalibrationWidget(QWidget *parent = 0);
-    ~QnFisheyeCalibrationWidget();
+    explicit QnFisheyeCalibrationWidget(QWidget* parent = nullptr);
+    virtual ~QnFisheyeCalibrationWidget();
 
     QPointF center() const;
+    void setCenter(const QPointF& center);
+
     qreal radius() const;
+    void setRadius(qreal radius);
 
-    void init();
+    void setHorizontalStretch(const qreal& value);
+    qreal horizontalStretch() const;
 
-    void updatePage();
-    void updateImage();
-signals:
-    void dataChanged();
-
-public slots:
     void setImageProvider(QnImageProvider *provider);
     QnImageProvider* imageProvider() const;
 
-    void setCenter(const QPointF &center);
-    void setRadius(qreal radius);
-    void setHorizontalStretch(const qreal &value);
-    qreal horizontalStretch() const;
-private slots:
+    void init();
+
+    void autoCalibrate();
+
+    void updatePage();
+    void updateImage();
+
+signals:
+    void autoCalibrationFinished();
+    void dataChanged();
+
+private:
     void at_calibrator_finished(int errorCode);
-    void at_autoButton_clicked();
     void at_image_animationFinished();
 
-    void at_xCenterSlider_valueChanged(int value);
-    void at_stretchSlider_valueChanged(int value);
-    void at_yCenterSlider_valueChanged(int value);
-    void at_radiusSlider_valueChanged(int value);
-
-    void at_calibrator_centerChanged(const QPointF &center);
-    void at_calibrator_radiusChanged(qreal radius);
-    void at_calibrator_stretchChanged(qreal radius);
 private:
     QScopedPointer<Ui::QnFisheyeCalibrationWidget> ui;
     QScopedPointer<QnFisheyeCalibrator> m_calibrator;
     QnImageProvider* m_imageProvider;
     QTimer* m_updateTimer;
 
-    bool m_updating;
     int m_lastError;
     bool m_inLoading;
-
 };
 
 #endif // FISHEYE_CALIBRATION_WIDGET_H

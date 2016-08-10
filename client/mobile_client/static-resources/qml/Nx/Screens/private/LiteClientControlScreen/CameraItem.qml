@@ -116,4 +116,16 @@ Rectangle
             wrapMode: Text.WordWrap
         }
     }
+
+    Timer
+    {
+        id: refreshTimer
+
+        interval: 60 * 1000
+        repeat: true
+        running: connectionManager.connectionState == QnConnectionManager.Connected
+        triggeredOnStart: true
+
+        onTriggered: thumbnailCacheAccessor.refreshThumbnail()
+    }
 }

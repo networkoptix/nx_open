@@ -403,10 +403,7 @@ Qt::ItemFlags QnUserListModel::flags(const QModelIndex& index) const
     if (!user)
         return flags;
 
-    flags |= Qt::ItemIsSelectable;
-
-    if (isInteractiveColumn(index.column()) || user->isEnabled())
-        flags |= Qt::ItemIsEnabled;
+    flags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
     if (index.column() == CheckBoxColumn)
         flags |= Qt::ItemIsUserCheckable;

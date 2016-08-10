@@ -1,5 +1,4 @@
 #include "ffmpeg_video_decoder.h"
-#if !defined(DISABLE_FFMPEG)
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -309,6 +308,12 @@ int FfmpegVideoDecoder::decode(
     QSize frameSize(d->frame->width, d->frame->height);
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
     int frameNum = d->frame->coded_picture_number;
+    if (d->codecContext->codec_id == AV_CODEC_ID_MJPEG)
+    {
+        // Workaround for MJPEG decoder bug: it always sets coded_picture_number to 0, and
+        // need monotonic frame number to associate decoder's input and output frames.
+        frameNum = qMax(0, d->codecContext->frame_number -1);
+    }
 
     auto qtPixelFormat = toQtPixelFormat((AVPixelFormat) d->frame->format);
 
@@ -354,5 +359,3 @@ void FfmpegVideoDecoder::setMaxResolution(const QSize& maxResolution)
 
 } // namespace media
 } // namespace nx
-
-#endif // !DISABLE_FFMPEG

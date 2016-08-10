@@ -66,6 +66,11 @@ QnUserWatcher* QnContext::userWatcher() const
     return qnCommon->instance<QnUserWatcher>();
 }
 
+void QnContext::quitApplication()
+{
+    qApp->quit();
+}
+
 void QnContext::exitFullscreen() {
     showSystemUi();
 }
@@ -132,6 +137,7 @@ void QnContext::removeSavedConnection(const QString& systemName)
                           lastConnections.end());
 
     qnClientCoreSettings->setRecentUserConnections(lastConnections);
+    qnClientCoreSettings->save();
 }
 
 void QnContext::setLastUsedConnection(const QString& systemId, const QUrl& url)

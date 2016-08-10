@@ -11,6 +11,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx/utils/scoped_model_operations.h>
+
 #include <server/server_storage_manager_fwd.h>
 
 #include <ui/customization/customized.h>
@@ -18,9 +20,10 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 
-class QnStorageListModel : public Customized<QAbstractListModel> {
+class QnStorageListModel : public ScopedModelOperations<Customized<QAbstractListModel>>
+{
     Q_OBJECT
-    typedef Customized<QAbstractListModel> base_type;
+    using base_type = ScopedModelOperations<Customized<QAbstractListModel>>;
 
 public:
     enum Columns {
@@ -34,8 +37,8 @@ public:
         ColumnCount
     };
 
-    QnStorageListModel(QObject *parent = 0);
-    ~QnStorageListModel();
+    QnStorageListModel(QObject* parent = nullptr);
+    virtual ~QnStorageListModel();
 
     void setStorages(const QnStorageModelInfoList& storages);
     void addStorage(const QnStorageModelInfo& storage);
@@ -45,16 +48,16 @@ public:
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr& server);
 
-    QnStorageModelInfo storage(const QModelIndex &index) const;
+    QnStorageModelInfo storage(const QModelIndex& index) const;
     QnStorageModelInfoList storages() const;
 
-    void updateRebuildInfo(QnServerStoragesPool pool, const QnStorageScanData &rebuildStatus);
+    void updateRebuildInfo(QnServerStoragesPool pool, const QnStorageScanData& rebuildStatus);
 
     /** Check if the storage can be moved from this model to another. */
     bool canMoveStorage(const QnStorageModelInfo& data) const;
 
     /** Check if storage can be removed from the system. */
-    bool canRemoveStorage(const QnStorageModelInfo &data) const;
+    bool canRemoveStorage(const QnStorageModelInfo& data) const;
 
     /**
      *  Check if storage is active on the server.
@@ -62,25 +65,25 @@ public:
      *      - newly added remote storages, until changes are applied
      *      - auto-found server-side partitions without storage
      */
-    bool storageIsActive(const QnStorageModelInfo &data) const;
+    bool storageIsActive(const QnStorageModelInfo& data) const;
 
-    virtual int rowCount(const QModelIndex &parent) const override;
-    virtual int columnCount(const QModelIndex &parent) const override;
-    virtual QVariant data(const QModelIndex &index, int role) const override;
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+    virtual int rowCount(const QModelIndex& parent) const override;
+    virtual int columnCount(const QModelIndex& parent) const override;
+    virtual QVariant data(const QModelIndex& index, int role) const override;
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
 protected:
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
 private:
-    QString displayData(const QModelIndex &index, bool forcedText) const;
-    QVariant fontData(const QModelIndex &index) const;
-    QVariant foregroundData(const QModelIndex &index) const;
-    QVariant mouseCursorData(const QModelIndex &index) const;
-    QVariant checkstateData(const QModelIndex &index) const;
+    QString displayData(const QModelIndex& index, bool forcedText) const;
+    QVariant fontData(const QModelIndex& index) const;
+    QVariant foregroundData(const QModelIndex& index) const;
+    QVariant mouseCursorData(const QModelIndex& index) const;
+    QVariant checkstateData(const QModelIndex& index) const;
 
     void sortStorages();
 

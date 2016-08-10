@@ -4,7 +4,7 @@
 #include "nx/streaming/archive_stream_reader.h"
 #include "plugins/resource/avi/avi_archive_delegate.h"
 
-QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource): 
+QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource):
     QnCamDisplay(resource, 0),
     m_mdctx(EXPORT_SIGN_METHOD)
 {
@@ -31,12 +31,12 @@ void QnSignDialogDisplay::finilizeSign()
     QnSignHelper signHelper;
     signFromPicture = signHelper.getSign(lastFrame.data(), calculatedSign.size());
 #else
-    if (m_reader) 
+    if (m_reader)
     {
         QnAviArchiveDelegate* aviFile = dynamic_cast<QnAviArchiveDelegate*> (m_reader->getArchiveDelegate());
         if (aviFile) {
             const char* signPattern = aviFile->getTagValue(QnAviArchiveDelegate::SignatureTag);
-            if (signPattern) 
+            if (signPattern)
             {
                 QByteArray baPattern = QByteArray(signPattern).trimmed();
                 QByteArray magic = QnSignHelper::getSignMagic();
@@ -69,11 +69,11 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
         m_reader = reader;
 
     QnEmptyMediaDataPtr eofPacket = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
-    
+
     QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     QnCompressedAudioDataPtr audio = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
-    if (m_prevSpeed != m_speed) 
+    if (m_prevSpeed != m_speed)
     {
         processNewSpeed(m_speed);
         m_prevSpeed = m_speed;
@@ -102,7 +102,7 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
         // update digest from current frame
         if (media && media->dataSize() > 4) {
             const quint8* data = (const quint8*) media->data();
-            QnSignHelper::updateDigest(media->context, m_mdctx, data, media->dataSize());
+            QnSignHelper::updateDigest(media->context, m_mdctx, data, static_cast<int>(media->dataSize()));
         }
 #else
         // update digest from previous frames because of last frame it is sign frame itself
@@ -111,7 +111,7 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
             QnSignHelper::updateDigest(m_prevFrame->context, m_mdctx, data, m_prevFrame->data.size());
         }
 #endif
-        if (video) 
+        if (video)
         {
             video->channelNumber = 0; // ignore layout info
             if (!m_firstFrameDisplayed || ((video->flags & AV_PKT_FLAG_KEY) && qnSyncTime->currentMSecsSinceEpoch() - m_lastDisplayTime > 100)) // max display rate 10 fps
@@ -150,7 +150,7 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
     return true;
 }
 
-bool QnSignDialogDisplay::canAcceptData() const 
+bool QnSignDialogDisplay::canAcceptData() const
 {
     return QnAbstractDataConsumer::canAcceptData();
 }

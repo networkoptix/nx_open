@@ -69,7 +69,8 @@ def prepare(binary, sbindir, tlibdir):
 
     shutil.copytree(join(sbindir, 'vox'), join(tresdir, 'vox'))
     shutil.copytree(join(sbindir, 'qml'), join(tcontentsdir, 'qml'))
-
+    shutil.copyfile(join(sbindir, 'applauncher'), join(tbindir, 'applauncher'))
+    os.chmod(join(tbindir, 'applauncher'), 0755)
 
 def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
     libs = fnmatch.filter(os.listdir(libdir), 'lib*dylib*')

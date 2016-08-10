@@ -1,4 +1,3 @@
-#ifndef DISABLE_FFMPEG
 #if defined (Q_OS_IOS)
 
 #include "ios_video_decoder.h"
@@ -324,4 +323,3 @@ int IOSVideoDecoder::decode(
 } // namespace nx
 
 #endif // (Q_OS_IOS)
-#endif // DISABLE_FFMPEG

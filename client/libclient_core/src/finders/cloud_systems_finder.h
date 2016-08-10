@@ -45,8 +45,7 @@ private:
 
     void updateSystems();
 
-    void tryRemoveAlienServer(const QnModuleInformation &serverInfo
-        , const QString &supposedSystemId);
+    void tryRemoveAlienServer(const QnModuleInformation &serverInfo);
 
 private:
     typedef QScopedPointer<QTimer> QTimerPtr;

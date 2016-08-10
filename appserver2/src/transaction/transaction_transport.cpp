@@ -719,7 +719,7 @@ void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstR
         case Qn::JsonFormat:
             if( !QnJsonTransactionSerializer::deserializeTran(
                     reinterpret_cast<const quint8*>(tranData.constData()),
-                    (int) tranData.size(),
+                    static_cast<int>(tranData.size()),
                     transportHeader,
                     serializedTran ) )
             {
@@ -734,7 +734,7 @@ void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstR
         case Qn::UbjsonFormat:
             if( !QnUbjsonTransactionSerializer::deserializeTran(
                     reinterpret_cast<const quint8*>(tranData.constData()),
-                    (int) tranData.size(),
+                    static_cast<int>(tranData.size()),
                     transportHeader,
                     serializedTran ) )
             {

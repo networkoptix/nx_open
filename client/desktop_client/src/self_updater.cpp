@@ -121,7 +121,7 @@ bool SelfUpdater::updateApplauncher()
     const QStringList kTargetFileFilters =
     {
         QLatin1String("*.dll"),
-        QLatin1String("version"),
+        QnClientAppInfo::launcherVersionFile(),
         QnClientAppInfo::applauncherBinaryName()
     };
 

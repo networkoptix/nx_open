@@ -15,12 +15,15 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 
+#include <ui/common/indents.h>
+
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource/resource_compare_helper.h>
 
 #include <ui/style/noptix_style.h>
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 
 #include <ui/workbench/workbench.h>
@@ -188,12 +191,15 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     m_simpleSelectionEnabled(false)
 {
     ui->setupUi(this);
-    ui->filterFrame->setVisible(false);
-    ui->selectFilterButton->setVisible(false);
+
+    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
+    ui->filterLineEdit->setClearButtonEnabled(true);
+    ui->filter->setVisible(false);
 
     m_itemDelegate = new QnResourceItemDelegate(this);
     m_itemDelegate->setFixedHeight(0); // automatic height
     ui->resourcesTreeView->setItemDelegate(m_itemDelegate);
+    ui->resourcesTreeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents(0, 0)));
 
     connect(ui->resourcesTreeView, SIGNAL(enterPressed(QModelIndex)), this, SLOT(at_treeView_enterPressed(QModelIndex)));
     connect(ui->resourcesTreeView, SIGNAL(spacePressed(QModelIndex)), this, SLOT(at_treeView_spacePressed(QModelIndex)));
@@ -203,10 +209,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateFilter()));
     connect(ui->filterLineEdit, SIGNAL(editingFinished()), this, SLOT(updateFilter()));
 
-    connect(ui->clearFilterButton, SIGNAL(clicked()), ui->filterLineEdit, SLOT(clear()));
-
     ui->resourcesTreeView->installEventFilter(this);
-    ui->resourcesTreeView->verticalScrollBar()->installEventFilter(this);
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget()
@@ -257,8 +260,6 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
     {
         ui->resourcesTreeView->setModel(NULL);
     }
-
-    emit viewportSizeChanged();
 }
 
 const QnResourceCriterion &QnResourceTreeWidget::criterion() const
@@ -333,7 +334,6 @@ QnResourceTreeModelCustomColumnDelegate* QnResourceTreeWidget::customColumnDeleg
     if (QnResourceTreeModel* resourceModel = qobject_cast<QnResourceTreeModel*>(sourceModel))
         return resourceModel->customColumnDelegate();
 
-
     return nullptr;
 }
 
@@ -380,12 +380,12 @@ void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags)
 
 void QnResourceTreeWidget::setFilterVisible(bool visible)
 {
-    ui->filterFrame->setVisible(visible);
+    ui->filter->setVisible(visible);
 }
 
 bool QnResourceTreeWidget::isFilterVisible() const
 {
-    return ui->filterFrame->isVisible();
+    return ui->filter->isVisible();
 }
 
 void QnResourceTreeWidget::setEditingEnabled(bool enabled)
@@ -451,15 +451,11 @@ void QnResourceTreeWidget::updateColumns()
     if (!model())
         return;
 
-    const int checkBoxSize = 16;
     ui->resourcesTreeView->header()->setStretchLastSection(false);
 
     ui->resourcesTreeView->setColumnHidden(Qn::CheckColumn, !m_checkboxesVisible);
     if (m_checkboxesVisible)
-    {
-        ui->resourcesTreeView->header()->setSectionResizeMode(Qn::CheckColumn, QHeaderView::Fixed);
-        ui->resourcesTreeView->setColumnWidth(Qn::CheckColumn, checkBoxSize);
-    }
+        ui->resourcesTreeView->header()->setSectionResizeMode(Qn::CheckColumn, QHeaderView::ResizeToContents);
 
     bool customColumnVisible = (customColumnDelegate() != nullptr);
 
@@ -481,8 +477,6 @@ void QnResourceTreeWidget::updateFilter()
         return;
     }
 
-    ui->clearFilterButton->setVisible(!filter.isEmpty());
-
     m_resourceProxyModel->clearCriteria();
     m_resourceProxyModel->addCriterion(QnResourceCriterionGroup(filter));
     m_resourceProxyModel->addCriterion(m_criterion);
@@ -501,12 +495,6 @@ bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event)
 {
     switch (event->type())
     {
-        case QEvent::Show:
-        case QEvent::Hide:
-            if (obj == ui->resourcesTreeView->verticalScrollBar())
-                emit viewportSizeChanged();
-            break;
-
         case QEvent::ContextMenu:
             if (obj == ui->resourcesTreeView)
             {
@@ -525,12 +513,6 @@ bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event)
     }
 
     return base_type::eventFilter(obj, event);
-}
-
-void QnResourceTreeWidget::resizeEvent(QResizeEvent *event)
-{
-    emit viewportSizeChanged();
-    base_type::resizeEvent(event);
 }
 
 void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event)
