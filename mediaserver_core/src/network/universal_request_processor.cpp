@@ -166,7 +166,7 @@ void QnUniversalRequestProcessor::run()
             parseRequest();
 
             auto handler = d->owner->findHandler(d->protocol, d->request);
-            bool noAuth;
+            bool noAuth = false;
             if (handler && !authenticate(&d->accessRights, &noAuth))
                 return;
 
