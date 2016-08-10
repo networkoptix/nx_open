@@ -27,7 +27,13 @@ var L = {
         confirmHardwareRestart: 'Do you want to restart server\'s operation system?',
         confirmRestoreSettings: 'Do you want to restore all server\'s settings? Archive will be saved, but network settings will be reset.',
         confirmRestoreSettingsNotNetwork: 'Do you want to restart all server\'s settings? Archive and network settings will be saved.',
-        unavailable: 'Unavailable'
+        unavailable: 'Unavailable',
+
+        confirmDisconnectFromCloud:'Disconnect system from the Nx Cloud',
+        confirmDisconnectFromCloudTitle:'Do you want to disconnect your system? It will be unreachable from the internet then.',
+        confirmDisconnectFromCloudAction: 'Disconnect',
+        createLocalOwner:null,
+        createLocalOwnerTitle:'Create local administrator'
     },
     join:{
         systemIsUnreacheble: 'System is unreachable or doesn\'t exist.',

@@ -253,7 +253,14 @@ angular.module('webadminApp')
                 });
                 return deferred.promise;
             },
+            disconnectFromCloud:function(ownerLogin,ownerPassword){
+                var params = ownerPassword ? {
+                    password: ownerPassword,
+                    login: ownerLogin
+                }: null;
+                return wrapPost(proxy + '/web/api/detachFromCloud',params);
 
+            },
             restoreFactoryDefaults:function(){
                 return wrapPost(proxy + '/web/api/restoreState');
             },
@@ -328,6 +335,7 @@ angular.module('webadminApp')
             getResourceTypes:function(){return wrapGet(proxy + '/web/ec2/getResourceTypes'); },
 
             getLayouts:function(){return wrapGet(proxy + '/web/ec2/getLayouts'); },
+            getUsers:function(){return wrapGet(proxy + '/web/ec2/getUsers'); },
 
             getCameras:function(id){
                 if(typeof(id)!=='undefined'){
@@ -379,11 +387,14 @@ angular.module('webadminApp')
                     cloudAccountName: cloudAccountName
                 });
             },
+            /*
+            // This method is not used anymore
             clearCloudSystemCredentials: function(){
                 return wrapPost(proxy + '/web/api/saveCloudSystemCredentials',{
                     reset: true
                 });
             },
+            */
             getRecords:function(serverUrl, physicalId, startTime, endTime, detail, limit, label, periodsType){
 
                 //console.log('getRecords',serverUrl,physicalId,startTime,endTime,detail,periodsType);

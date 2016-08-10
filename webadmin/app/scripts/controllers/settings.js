@@ -292,7 +292,52 @@ angular.module('webadminApp')
         }
         $scope.disconnectFromCloud = function() { // Disconnect from Cloud
             //Open Disconnect Dialog
-            openCloudDialog(false);
+
+            function doDisconnect(localLogin,localPassword){
+                // 2. Send request to the system only
+                return mediaserver.disconnectFromCloud(localLogin, localPassword).then(function(){
+                    window.location.reload();
+                }, function(error){
+                    console.error(error);
+                    dialogs.alert(L.settings.unexpectedError);
+                });
+
+                /*
+
+                 // Old code: request to cloud and to the system
+
+                 cloudAPI.disconnect(cloudSystemID, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
+                 function () {
+                 //2. Save settings to local server
+                 mediaserver.clearCloudSystemCredentials().then(successHandler, errorHandler);
+                 }, cloudErrorHandler);
+                 */
+            }
+            dialogs.confirmWithPassword(
+                L.settings.confirmDisconnectFromCloudTitle,
+                L.settings.confirmDisconnectFromCloud,
+                L.settings.confirmDisconnectFromCloudAction,
+                'danger').then(function (oldPassword) {
+                //1. Check password
+                return mediaserver.checkCurrentPassword(oldPassword).then(function() {
+                    // 1. Check for another enabled owner. If there is one - request login and password for him - open dialog
+                    mediaserver.getUsers().then(function(result){
+                        var localAdmin = _.find(result.data,function(user){
+                            return user.isAdmin && user.isEnabled && !user.isCloud;
+                        });
+                        if(!localAdmin){
+                            // Request for login and password
+                            dialogs.createUser(L.settings.createLocalOwner, L.settings.createLocalOwnerTitle).then(function(data){
+                                doDisconnect(data.login,data.password);
+                            })
+                        }else{
+                            doDisconnect();
+                        }
+                    });
+                },function(){
+                    dialogs.alert(L.settings.wrongPassword);
+                });
+            });
         };
 
         $scope.connectToCloud = function() { // Connect to Cloud
