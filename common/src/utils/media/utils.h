@@ -9,5 +9,5 @@ namespace media {
 
 double getDefaultSampleAspectRatio(const QSize& srcSize);
 
-}
-}
+} // namespace media
+} // namespace nx
