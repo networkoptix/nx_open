@@ -543,8 +543,7 @@ void QnProgressiveDownloadingConsumer::run()
             return;
         }
 
-        auto userResource = qnResPool->getResourceById(d->authUserId).dynamicCast<QnUserResource>();
-        if (!userResource || !qnResourceAccessManager->hasPermission(userResource, resource, Qn::ReadPermission))
+        if (!qnResourceAccessManager->hasPermission(d->accessRights, resource, Qn::ReadPermission))
         {
             sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
             return;
