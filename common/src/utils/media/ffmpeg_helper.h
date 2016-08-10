@@ -1,7 +1,5 @@
 #pragma once
 
-#if !defined(DISABLE_FFMPEG)
-
 #include "core/resource/resource_fwd.h"
 
 extern "C"
@@ -115,5 +113,3 @@ public:
 private:
     SwrContext* m_swr;
 };
-
-#endif // !defined(DISABLE_FFMPEG)

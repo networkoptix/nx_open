@@ -17,6 +17,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
 #include <utils/common/delayed.h>

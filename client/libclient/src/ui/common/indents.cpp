@@ -28,7 +28,7 @@ void QnIndents::setLeft(int value)
 
 int QnIndents::right() const
 {
-    return m_left;
+    return m_right;
 }
 
 void QnIndents::setRight(int value)

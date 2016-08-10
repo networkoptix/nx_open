@@ -26,7 +26,7 @@ namespace
     static std::map<QnResourceAccessFilter::Filter, QString> kCategoryNameByFilter
     {
         { QnResourceAccessFilter::MediaFilter, QnUserSettingsDialog::tr("Media Resources") },
-        { QnResourceAccessFilter::LayoutsFilter, QnUserSettingsDialog::tr("Layouts") }
+        { QnResourceAccessFilter::LayoutsFilter, QnUserSettingsDialog::tr("Shared Layouts") }
     };
 
     static const QString kHtmlTableTemplate(lit("<table>%1</table>"));
@@ -52,6 +52,12 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
     addPage(CamerasPage, m_camerasPage, tr("Media Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
+
+    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this, [this](const QSet<QnUuid>& resourceIds)
+    {
+        if (m_user && resourceIds.contains(m_user->getId()))
+            permissionsChanged();
+    });
 
     connect(m_settingsPage,     &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::permissionsChanged);
     connect(m_permissionsPage,  &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::permissionsChanged);
@@ -177,7 +183,7 @@ void QnUserSettingsDialog::permissionsChanged()
 
     if (isPageVisible(ProfilePage))
     {
-        Qn::UserRole roleType = qnResourceAccessManager->userRole(m_user);
+        Qn::UserRole roleType = m_user->role();
         QString permissionsText = qnResourceAccessManager->userRoleDescription(roleType);
 
         if (roleType == Qn::UserRole::CustomUserGroup)
@@ -228,6 +234,11 @@ void QnUserSettingsDialog::permissionsChanged()
             permissionsText += kHtmlTableTemplate.arg(
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_camerasPage)) +
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_layoutsPage)));
+
+            m_model->setAccessibleLayoutsPreview(m_layoutsPage->checkedResources());
+
+            m_layoutsPage->indirectAccessChanged();
+            m_camerasPage->indirectAccessChanged();
         }
 
         m_settingsPage->updatePermissionsLabel(permissionsText);

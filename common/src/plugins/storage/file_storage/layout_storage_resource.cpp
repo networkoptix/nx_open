@@ -1,7 +1,5 @@
 #include "layout_storage_resource.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 
@@ -543,5 +541,3 @@ QString QnLayoutFileStorageResource::getPath() const
     Q_ASSERT(!QUrl(getUrl()).scheme().isEmpty());
     return removeProtocolPrefix(getUrl());
 }
-
-#endif // ENABLE_ARCHIVE

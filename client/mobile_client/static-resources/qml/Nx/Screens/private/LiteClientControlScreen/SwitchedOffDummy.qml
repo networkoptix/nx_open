@@ -9,7 +9,6 @@ Rectangle
     Image
     {
         anchors.centerIn: parent
-        // TODO: #dklychkov use a proper icon
-        source: lp("images/camera_offline_1.png")
+        source: lp("images/lite_client_off.png")
     }
 }

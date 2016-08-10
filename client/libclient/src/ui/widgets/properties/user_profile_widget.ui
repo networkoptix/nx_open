@@ -68,6 +68,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QLabel" name="manageAccountLabel">
+     <property name="text">
+      <string notr="true">&lt;Manage Account...&gt;</string>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="Line" name="line">
      <property name="minimumSize">
       <size>

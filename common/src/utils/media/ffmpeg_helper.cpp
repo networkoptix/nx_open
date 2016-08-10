@@ -1,7 +1,5 @@
 #include "ffmpeg_helper.h"
 
-#if !defined(DISABLE_FFMPEG)
-
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
 
@@ -432,5 +430,3 @@ void QnFfmpegAudioHelper::copyAudioSamples(quint8* dst, const AVFrame* src)
         tmpData, src->nb_samples,
         (const quint8**) src->data, src->nb_samples);
 }
-
-#endif // !defined(DISABLE_FFMPEG)

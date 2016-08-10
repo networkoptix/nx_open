@@ -29,7 +29,8 @@ angular.module('webadminApp')
                             actionLabel: settings.actionLabel || L.dialogs.okButton,
                             closable: settings.closable || settings.cancellable,
                             buttonClass: settings.buttonType? 'btn-'+ settings.buttonType : 'btn-primary',
-                            needOldPassword:settings.needOldPassword
+                            needOldPassword:settings.needOldPassword,
+                            createLoginAndPassword:settings.createLoginAndPassword
                         };
                     },
                     params:function(){
@@ -99,17 +100,40 @@ angular.module('webadminApp')
                     actionLabel:actionLabel,
                     actionType:actionType
                 }).result;
+            },
+            createUser:function(message, title, actionLabel, actionType){
+                return openDialog({
+                    title:title,
+                    content:message,
+                    hasFooter:true,
+                    cancellable:false,
+                    closable:false,
+                    createLoginAndPassword: true,
+                    actionLabel:actionLabel,
+                    actionType:actionType
+                }).result;
             }
         };
-    }).controller("DialogCtrl",function($scope, $modalInstance,settings){
+    }).controller("DialogCtrl",function($scope, $modalInstance, settings){
         $scope.settings = settings;
-
+        $scope.settings.localLogin = $scope.settings.localLogin || Config.defaultLogin;
+        $scope.forms = {};
         $scope.close = function(){
             $modalInstance.dismiss('close');
         };
 
         $scope.ok = function(){
-            $modalInstance.close( $scope.settings.oldPassword || 'ok');
+            if($scope.settings.createLoginAndPassword){
+                $modalInstance.close( {
+                    login: $scope.settings.localLogin,
+                    password: $scope.settings.localPassword
+                });
+            }
+            if($scope.settings.needOldPassword){
+                $modalInstance.close( $scope.settings.oldPassword);
+            }
+
+            $modalInstance.close('ok');
         };
 
         $scope.cancel = function(){

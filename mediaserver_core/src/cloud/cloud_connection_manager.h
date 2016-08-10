@@ -50,6 +50,8 @@ public:
     void unsubscribeFromSystemAccessListUpdatedEvent(
         nx::utils::SubscriptionId subscriptionId);
 
+    bool cleanupCloudDataInLocalDB();
+
 signals:
     void cloudBindingStatusChanged(bool boundToCloud);
     void connectedToCloud();

@@ -169,8 +169,7 @@ void QnCloudSystemsFinder::updateSystemInternal(
     checkOutdatedServersInternal(system);
 }
 
-void QnCloudSystemsFinder::tryRemoveAlienServer(const QnModuleInformation &serverInfo
-    , const QString &supposedSystemId)
+void QnCloudSystemsFinder::tryRemoveAlienServer(const QnModuleInformation &serverInfo)
 {
     const auto serverId = serverInfo.id;
     for (const auto system : m_systems)
@@ -237,7 +236,7 @@ void QnCloudSystemsFinder::pingServerInternal(const QString &host
 
         // To prevent hanging on of fake online cloud servers
         // It is almost not hack.
-        tryRemoveAlienServer(moduleInformation, systemId);
+        tryRemoveAlienServer(moduleInformation);
         if (moduleInformation.serverFlags.testFlag(Qn::SF_NewSystem))
         {
             processFactoryServer(moduleInformation);

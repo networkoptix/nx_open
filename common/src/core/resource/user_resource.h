@@ -28,6 +28,8 @@ public:
     bool isCloud() const { return userType() == QnUserType::Cloud; }
     bool isLocal() const { return userType() == QnUserType::Local; }
 
+    Qn::UserRole role() const;
+
     QByteArray getHash() const;
     void setHash(const QByteArray& hash);
 

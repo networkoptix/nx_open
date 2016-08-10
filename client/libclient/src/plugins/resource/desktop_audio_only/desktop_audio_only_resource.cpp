@@ -18,11 +18,13 @@ bool QnDesktopAudioOnlyResource::isRendererSlow() const
 
 QnConstResourceAudioLayoutPtr QnDesktopAudioOnlyResource::getAudioLayout(const QnAbstractStreamDataProvider *dataProvider) const
 {
+    Q_UNUSED(dataProvider);
     QnConstResourceAudioLayoutPtr ptr(nullptr);
     return ptr;
 }
 
 QnAbstractStreamDataProvider* QnDesktopAudioOnlyResource::createDataProviderInternal(Qn::ConnectionRole role)
 {
+    Q_UNUSED(role);
     return new QnDesktopAudioOnlyDataProvider(toSharedPointer());
 }

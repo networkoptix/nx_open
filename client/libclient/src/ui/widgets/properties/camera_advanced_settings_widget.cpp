@@ -201,6 +201,7 @@ void QnCameraAdvancedSettingsWidget::submitToResource()
 
 void QnCameraAdvancedSettingsWidget::hideEvent(QHideEvent *event)
 {
+    Q_UNUSED(event);
     if (m_page != Page::Web)
         return;
 

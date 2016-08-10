@@ -20,6 +20,9 @@
    <string>Audit Trail</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <property name="spacing">
+    <number>8</number>
+   </property>
    <property name="leftMargin">
     <number>16</number>
    </property>
@@ -35,7 +38,7 @@
    <item>
     <layout class="QGridLayout" name="mainGridLayout">
      <property name="horizontalSpacing">
-      <number>4</number>
+      <number>16</number>
      </property>
      <item row="0" column="0">
       <layout class="QGridLayout" name="filterLayout">
@@ -130,6 +133,9 @@
    </item>
    <item>
     <layout class="QGridLayout" name="checkboxesLayout">
+     <property name="spacing">
+      <number>8</number>
+     </property>
      <item row="1" column="0">
       <widget class="QCheckBox" name="checkBoxUsers">
        <property name="sizePolicy">

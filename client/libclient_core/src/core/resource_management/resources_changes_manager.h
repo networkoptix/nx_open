@@ -1,5 +1,6 @@
 #pragma once
 
+#include <core/resource_management/resource_access_subject.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 #include <nx_ec/data/api_fwd.h>
@@ -54,12 +55,11 @@ public:
     /** Apply changes to the given list of servers. */
     void saveServersBatch(const QnMediaServerResourceList &servers, BatchChangesFunction applyChanges, RollbackFunction rollback = []{});
 
-
     /** Apply changes to the given user. */
     void saveUser(const QnUserResourcePtr &user, UserChangesFunction applyChanges);
 
     /** Save accessible resources for the given user */
-    void saveAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& accessibleResources);
+    void saveAccessibleResources(const QnResourceAccessSubject& subject, const QSet<QnUuid>& accessibleResources);
 
     void saveUserGroup(const ec2::ApiUserGroupData& userGroup);
     void removeUserGroup(const QnUuid& groupId);

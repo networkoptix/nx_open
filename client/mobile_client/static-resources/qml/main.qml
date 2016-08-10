@@ -30,6 +30,12 @@ ApplicationWindow
         anchors.rightMargin: mainWindow.rightPadding
         anchors.bottomMargin: mainWindow.bottomPadding
         onCurrentItemChanged: sideNavigation.close()
+
+        function restoreActiveFocus()
+        {
+            if (activeFocusItem == Window.contentItem)
+                Workflow.focusCurrentScreen()
+        }
     }
 
     UiController {}
@@ -98,6 +104,8 @@ ApplicationWindow
     }
 
     Screen.onPrimaryOrientationChanged: updateNavigationBarPadding()
+
+    onActiveFocusItemChanged: stackView.restoreActiveFocus()
 
     function lockScreenOrientation()
     {

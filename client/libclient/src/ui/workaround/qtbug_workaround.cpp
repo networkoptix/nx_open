@@ -15,7 +15,7 @@ public:
     bool ignoreNextPostedEventsMessage;
 };
 
-QnQtbugWorkaround::QnQtbugWorkaround(QObject *parent): 
+QnQtbugWorkaround::QnQtbugWorkaround(QObject *parent):
     QObject(parent),
     d_ptr(new QnQtbugWorkaroundPrivate())
 {
@@ -27,6 +27,7 @@ QnQtbugWorkaround::~QnQtbugWorkaround() {
 }
 
 bool QnQtbugWorkaround::nativeEventFilter(const QByteArray &, void *message, long *result) {
+    Q_UNUSED(result);
     Q_D(QnQtbugWorkaround);
 
     MSG *msg = static_cast<MSG *>(message);
@@ -75,7 +76,7 @@ bool QnQtbugWorkaround::nativeEventFilter(const QByteArray &, void *message, lon
 class QnQtbugWorkaroundPrivate {};
 
 QnQtbugWorkaround::QnQtbugWorkaround(QObject *parent):
-    QObject(parent) 
+    QObject(parent)
 {}
 
 QnQtbugWorkaround::~QnQtbugWorkaround() {

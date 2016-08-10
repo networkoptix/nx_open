@@ -699,8 +699,8 @@
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
                 <client.binary.name>${display.product.name}</client.binary.name>
-                <minilauncher.binary.name>${display.product.name} Launcher</minilauncher.binary.name>
-                <applauncher.binary.name>applauncher</applauncher.binary.name>
+                <minilauncher.binary.name>applauncher</minilauncher.binary.name>
+                <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
@@ -1099,7 +1099,7 @@
                 <android.platform>android-16</android.platform>
                 <qt.spec/>
                 <openal.version>1.17.2</openal.version>
-                <openssl.version>1.0.2d</openssl.version>
+                <openssl.version>1.0.2g</openssl.version>
                 <rdep.target>android-${arch}</rdep.target>
             </properties>
         </profile>

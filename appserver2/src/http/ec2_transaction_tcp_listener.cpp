@@ -264,7 +264,7 @@ void QnTransactionTcpProcessor::run()
             if (access != Qn::kSystemAccess)
             {
                 auto user = qnResPool->getResourceById<QnUserResource>(d->accessRights.userId);
-                bool authAsOwner = qnResourceAccessManager->userRole(user) == Qn::UserRole::Owner;
+                bool authAsOwner = (user && user->role() == Qn::UserRole::Owner);
                 NX_ASSERT(authAsOwner, "Server must always be authorised as owner");
                 if (authAsOwner)
                     access = Qn::kSystemAccess;

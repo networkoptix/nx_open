@@ -441,6 +441,7 @@ void QnConnectionManagerPrivate::storeConnection(
     lastConnections.prepend(connectionInfo);
 
     qnClientCoreSettings->setRecentUserConnections(lastConnections);
+    qnClientCoreSettings->save();
 }
 
 void QnConnectionManagerPrivate::setInitialResourcesReceived(bool received)

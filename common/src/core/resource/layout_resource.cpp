@@ -103,7 +103,6 @@ void QnLayoutResource::setUrl(const QString& value)
     QnResource::setUrl(value);
     QString newValue = removeProtocolPrefix(getUrl());
 
-#ifdef ENABLE_ARCHIVE
     if (!oldValue.isEmpty() && oldValue != newValue)
     {
         // Local layout renamed
@@ -113,7 +112,6 @@ void QnLayoutResource::setUrl(const QString& value)
             item.resource.uniqueId = QnLayoutFileStorageResource::updateNovParent(value, item.resource.uniqueId);
         }
     }
-#endif
 }
 
 QnLayoutItemData QnLayoutResource::getItem(const QnUuid &itemUuid) const {

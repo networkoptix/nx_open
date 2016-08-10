@@ -1,8 +1,6 @@
 #ifndef AV_CODEC_MEDIA_CONTEXT
 #define AV_CODEC_MEDIA_CONTEXT
 
-#ifndef DISABLE_FFMPEG
-
 #include "media_context.h"
 #include <nx/streaming/media_context_serializable_data.h>
 
@@ -69,7 +67,5 @@ private:
 
     AVCodecContext* m_context;
 };
-
-#endif // DISABLE_FFMPEG
 
 #endif // AV_CODEC_MEDIA_CONTEXT
