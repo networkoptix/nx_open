@@ -175,7 +175,7 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
     QVBoxLayout* contentLayout = new QVBoxLayout();
     contentLayout->addLayout(hlayout);
     contentLayout->addWidget(bar);
-    contentLayout->setContentsMargins(style::Metrics::kGroupBoxContentMargins);
+    contentLayout->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
 
     layout = new QVBoxLayout();
     layout->addLayout(contentLayout);
