@@ -410,6 +410,15 @@ QStringList SelfUpdater::getClientInstallRoots() const
 #if defined(Q_OS_LINUX)
         clientRoot = clientRoot + lit("/bin");
 #endif
+
+        QString clientBinary = clientRoot + L'/' + QnClientAppInfo::clientBinaryName();
+        if (!QFileInfo::exists(clientBinary))
+        {
+            NX_LOG(lit("Could not find client binary: %1").arg(clientBinary), cl_logINFO);
+            NX_LOG(lit("Skip client root: %1").arg(clientRoot), cl_logINFO);
+            continue;
+        }
+
         result << clientRoot;
     }
 
