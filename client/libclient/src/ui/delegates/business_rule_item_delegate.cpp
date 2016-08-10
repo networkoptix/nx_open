@@ -7,6 +7,7 @@
 #include <business/business_action_parameters.h>
 #include <business/business_strings_helper.h>
 #include <business/business_resource_validation.h>
+#include <business/business_types_comparator.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -89,7 +90,8 @@ void QnSelectResourcesDialogButton::paintEvent(QPaintEvent *event) {
 ///////////////////////////////////////////////////////////////////////////////////////
 QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_lexComparator(new QnBusinessTypesComparator())
 {
 }
 
@@ -208,19 +210,37 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     }
     case QnBusiness::EventColumn:
     {
+        using namespace QnBusiness;
+
         QComboBox* comboBox = new QComboBox(parent);
         comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-        for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
+
+        auto events = allEvents();
+        std::sort(events.begin(), events.end(),
+            [this](EventType l, EventType r)
+            {
+                return m_lexComparator->lexicographicalLessThan(l, r);
+            });
+        for (QnBusiness::EventType eventType: events)
             comboBox->addItem(QnBusinessStringsHelper::eventName(eventType), eventType);
-        }
         return comboBox;
     }
     case QnBusiness::ActionColumn:
     {
-        bool instantOnly = !QnBusiness::hasToggleState(index.data(Qn::EventTypeRole).value<QnBusiness::EventType>());
+        using namespace QnBusiness;
+
+        bool instantOnly = !hasToggleState(index.data(Qn::EventTypeRole).value<EventType>());
         QComboBox* comboBox = new QComboBox(parent);
         comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-        for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {
+
+        auto actions = allActions();
+        std::sort(actions.begin(), actions.end(),
+            [this](ActionType l, ActionType r)
+            {
+                return m_lexComparator->lexicographicalLessThan(l, r);
+            });
+        for (ActionType actionType: actions)
+        {
             if (instantOnly && !QnBusiness::canBeInstant(actionType))
                 continue;
             comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);
