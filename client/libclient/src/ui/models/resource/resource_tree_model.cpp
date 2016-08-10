@@ -1603,7 +1603,10 @@ void QnResourceTreeModel::rebuildTree()
     }
 
     for (auto node : m_resourceNodeByResource)
+    {
         updateNodeParent(node);
+        node->update();
+    }
 
     updateRoleNodes();
 }
