@@ -79,12 +79,13 @@ std::string generateCloudNonceBase(const std::string& systemID)
 
     //TODO #ak timestamp byte order
 
-    QByteArray nonce =
-        QByteArray(randomBytes)
-        + (QByteArray::fromRawData(
+    const auto timestampInNetworkByteOrderBuf = 
+        QByteArray::fromRawData(
             reinterpret_cast<const char*>(&timestampInNetworkByteOrder),
-            sizeof(timestampInNetworkByteOrder))
-        + md5Hash).toBase64();
+            sizeof(timestampInNetworkByteOrder));
+    QByteArray nonce = 
+        QByteArray(randomBytes)
+        + (timestampInNetworkByteOrderBuf + md5Hash).toBase64();
 
     return nonce.constData();
 }
