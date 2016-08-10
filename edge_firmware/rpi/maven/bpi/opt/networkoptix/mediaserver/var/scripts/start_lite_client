@@ -19,5 +19,5 @@ killall gpm
 /opt/$CUSTOMIZATION/mediaserver/var/scripts/stop_lite_client
 export LD_LIBRARY_PATH=/opt/$CUSTOMIZATION/lib:/opt/$CUSTOMIZATION/lib/ffmpeg
 mkdir -p /opt/$CUSTOMIZATION/lite_client/log
-LD_PRELOAD="/opt/$CUSTOMIZATION/lib/ldpreloadhook.so" nohup /opt/$CUSTOMIZATION/lite_client/bin/mobile_client > /opt/$CUSTOMIZATION/lite_client/log/mobile_client.log 2>&1 &
-echo $! >/tmp/nx1mobile_client.pid
+/opt/$CUSTOMIZATION/lite_client/bin/mobile_client $*
+echo 1 > /sys/class/graphics/fb0/blank
