@@ -341,11 +341,15 @@ void QnMessageBox::setDefaultButton(QAbstractButton *button)
     if (!ui->buttonBox->buttons().contains(button))
         return;
 
-    if (QPushButton *pushButton = qobject_cast<QPushButton*>(button))
-        pushButton->setAutoDefault(true);
+    Q_D(QnMessageBox);
+    if (button == d->defaultButton)
+        return;
+
+    if (QPushButton* pushButton = qobject_cast<QPushButton*>(button))
+        pushButton->setDefault(true);
+
     button->setFocus();
 
-    Q_D(QnMessageBox);
     d->defaultButton = button;
     d->stylizeButtons();
 }
