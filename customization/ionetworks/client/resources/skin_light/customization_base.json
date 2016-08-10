@@ -1,1 +1,9 @@
-{}
+{
+    "QnGradientBackgroundPainter": {
+        "colors": {
+            "_": "Background gradient colors.",
+            
+            "normal": "#6464ff.setAlpha(48)"
+        }
+    }
+}
