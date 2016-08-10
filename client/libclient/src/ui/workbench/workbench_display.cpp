@@ -281,7 +281,11 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_frameOpacityAnimator->setTimeLimit(500);
 
     /* Connect to context. */
-    connect(accessController(),             SIGNAL(permissionsChanged(const QnResourcePtr &)),          this,                   SLOT(at_context_permissionsChanged(const QnResourcePtr &)));
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+        &QnWorkbenchDisplay::at_context_permissionsChanged);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        &QnWorkbenchDisplay::at_resourcePool_resourceRemoved);
+
     connect(context()->instance<QnWorkbenchNotificationsHandler>(), &QnWorkbenchNotificationsHandler::notificationAdded,
         this, &QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded);
 
@@ -2053,6 +2057,22 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
 
     if (accessController()->hasPermissions(resource, Qn::ReadPermission))
         return;
+
+    /* Here aboutToBeDestroyed will be called with corresponding handling. */
+    for (auto widget : m_widgetsByResource[resource])
+    {
+        widget->hide();
+        qnDeleteLater(widget);
+    }
+}
+
+void QnWorkbenchDisplay::at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
+{
+    if (QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>())
+    {
+        if (QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource))
+            workbench()->removeLayout(layout);
+    }
 
     /* Here aboutToBeDestroyed will be called with corresponding handling. */
     for (auto widget : m_widgetsByResource[resource])
