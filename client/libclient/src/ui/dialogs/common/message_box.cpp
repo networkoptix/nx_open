@@ -414,7 +414,7 @@ void QnMessageBox::setIcon(QnMessageBox::Icon icon)
     switch (icon)
     {
     case Information:
-        pixmapFile = lit("standard_icons/messagebox_information.png");
+        pixmapFile = lit("standard_icons/messagebox_info.png");
         break;
     case Warning:
         pixmapFile = lit("standard_icons/messagebox_warning.png");
