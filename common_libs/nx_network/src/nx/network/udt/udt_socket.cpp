@@ -188,9 +188,9 @@ bool UdtSocket<InterfaceToImplement>::close()
     if (m_impl->udtHandle == UDT::INVALID_SOCK)
         return true;    //already closed
 
-                        //TODO #ak linger MUST be optional
-                        //set UDT_LINGER to 1 if socket is in blocking mode?
-    int val = 0;
+    //TODO #ak linger MUST be optional
+    //  set UDT_LINGER to 1 if socket is in blocking mode?
+    int val = 7;   //TODO #ak why 7?
     UDT::setsockopt(m_impl->udtHandle, 0, UDT_LINGER, &val, sizeof(val));
 
 #ifdef TRACE_UDT_SOCKET
