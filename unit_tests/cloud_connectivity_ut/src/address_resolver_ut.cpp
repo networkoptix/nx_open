@@ -17,6 +17,9 @@ class AddressResolverTest
 public:
     static void SetUpTestCase()
     {
+        // TODO: Test 2 cases: with and without mediator address
+        SocketGlobals::mediatorConnector().mockupAddress(SocketAddress::anyAddress);
+
         s_stunClient = std::make_shared<stun::test::AsyncClientMock>();
         s_stunClient->emulateRequestHandler(
             stun::cc::methods::resolvePeer,

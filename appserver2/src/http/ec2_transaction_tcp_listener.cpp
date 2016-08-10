@@ -254,19 +254,25 @@ void QnTransactionTcpProcessor::run()
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
 
         // By default all peers have read permissions on all resources
-        auto access = Qn::UserAccessData(d->authUserId, Qn::UserAccessData::Access::ReadAllResources);
+        auto access = Qn::UserAccessData(d->accessRights);
         if (remotePeer.peerType == Qn::PT_Server)
         {
             // Here we substitute admin user with SuperAccess user to pass by all access checks unhurt
             // since server-to-server order of transactions is unpredictable and access check for resource attribute
             // may come before resource itself is added to the resource pool and this may be restricted by the access
             // checking mechanics.
-            auto user = qnResPool->getResourceById<QnUserResource>(d->authUserId);
-            bool authAsOwner = (user && user->role() == Qn::UserRole::Owner) ||
-                               access.userId == Qn::kSystemAccess.userId;
-            NX_ASSERT(authAsOwner, "Server must always be authorised as owner");
-            if (authAsOwner)
-                access = Qn::kSystemAccess;
+            if (access != Qn::kSystemAccess)
+            {
+                auto user = qnResPool->getResourceById<QnUserResource>(d->accessRights.userId);
+                bool authAsOwner = (user && user->role() == Qn::UserRole::Owner);
+                NX_ASSERT(authAsOwner, "Server must always be authorised as owner");
+                if (authAsOwner)
+                    access = Qn::kSystemAccess;
+            }
+        }
+        else
+        {
+            access.access = Qn::UserAccessData::Access::ReadAllResources;
         }
 
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(

@@ -101,11 +101,17 @@ public:
         while(!finished)
             m_cond.wait(lk.mutex());
 
-        return errorCode == ErrorCode::ok
-            ? nx_http::StatusCode::ok
-            : (errorCode == ErrorCode::unauthorized
-                ? nx_http::StatusCode::unauthorized
-                : nx_http::StatusCode::internalServerError);
+        switch (errorCode)
+        {
+            case ErrorCode::ok:
+                return nx_http::StatusCode::ok;
+            case ErrorCode::unauthorized:
+                return nx_http::StatusCode::unauthorized;
+            case ErrorCode::forbidden:
+                return nx_http::StatusCode::forbidden;
+            default:
+                return nx_http::StatusCode::internalServerError;
+        }
     }
 
     /**
@@ -158,7 +164,7 @@ public:
         HandlerType handler,
         const QnRestConnectionProcessor* owner)
     {
-        m_queryProcessor->getAccess(Qn::UserAccessData(owner->authUserId()))
+        m_queryProcessor->getAccess(owner->accessRights())
             .template processQueryAsync<InputData, OutputData, HandlerType>(
                 m_cmdCode,
                 inputData,

@@ -35,7 +35,7 @@ int QnMergeLdapUsersRestHandler::executePost(const QString &path, const QnReques
         return nx_http::StatusCode::ok;
     }
 
-    ec2::AbstractUserManagerPtr userManager = ec2Connection()->getUserManager(Qn::UserAccessData(owner->authUserId()));
+    ec2::AbstractUserManagerPtr userManager = ec2Connection()->getUserManager(owner->accessRights());
 
     ec2::ApiUserDataList dbUsers;
     userManager->getUsersSync(&dbUsers);

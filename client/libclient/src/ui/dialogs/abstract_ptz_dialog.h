@@ -14,6 +14,7 @@
 
 class QnAbstractPtzHotkeyDelegate {
 public:
+    virtual ~QnAbstractPtzHotkeyDelegate() {}
     virtual QnPtzHotkeyHash hotkeys() const = 0;
     virtual void updateHotkeys(const QnPtzHotkeyHash &value) = 0;
 };

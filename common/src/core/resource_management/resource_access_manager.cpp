@@ -328,7 +328,21 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnResourc
     return result;
 }
 
-bool QnResourceAccessManager::hasGlobalPermission(const QnResourceAccessSubject& subject, Qn::GlobalPermission requiredPermission) const
+bool QnResourceAccessManager::hasGlobalPermission(
+    const Qn::UserAccessData& accessRights,
+    Qn::GlobalPermission requiredPermission) const
+{
+    if (accessRights == Qn::kSystemAccess)
+        return true;
+    auto user = qnResPool->getResourceById<QnUserResource>(accessRights.userId);
+    if (!user)
+        return false;
+    return hasGlobalPermission(user, requiredPermission);
+}
+
+bool QnResourceAccessManager::hasGlobalPermission(
+    const QnResourceAccessSubject& subject, 
+    Qn::GlobalPermission requiredPermission) const
 {
     if (requiredPermission == Qn::NoGlobalPermissions)
         return true;
@@ -364,9 +378,26 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& us
     return result;
 }
 
-bool QnResourceAccessManager::hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permissions requiredPermissions) const
+bool QnResourceAccessManager::hasPermission(
+    const QnUserResourcePtr& user,
+    const QnResourcePtr& resource,
+    Qn::Permissions requiredPermissions) const
 {
     return (permissions(user, resource) & requiredPermissions) == requiredPermissions;
+}
+
+bool QnResourceAccessManager::hasPermission(
+    const Qn::UserAccessData& accessRights,
+    const QnResourcePtr& mediaResource,
+    Qn::Permission permissions) const
+{
+    if (accessRights == Qn::kSystemAccess)
+        return true;
+
+    auto userResource = qnResPool->getResourceById(accessRights.userId).dynamicCast<QnUserResource>();
+    if (!userResource)
+        return false;
+    return hasPermission(userResource, mediaResource, permissions);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const

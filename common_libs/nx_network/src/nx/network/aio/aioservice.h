@@ -112,6 +112,7 @@ public:
     QnMutex* mutex() const;
     aio::AIOThread* getSocketAioThread(Pollable* sock);
     AbstractAioThread* getRandomAioThread() const;
+    bool isInAnyAioThread() const;
     void bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread);
 
     //!Same as \a AIOService::watchSocket, but does not lock mutex. Calling entity MUST lock \a AIOService::mutex() before calling this method

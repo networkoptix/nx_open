@@ -42,5 +42,5 @@ double getDefaultSampleAspectRatio(const QSize& srcSize)
     return 1.0;
 }
 
-} // namespace nx
 } // namespace media
+} // namespace nx

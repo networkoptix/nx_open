@@ -2490,7 +2490,7 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
         bookmarksViewer->setReadOnly(readonly);
     };
 
-    connect(context()->accessController(), &QnWorkbenchAccessController::permissionsChanged
+    connect(context()->accessController(), &QnWorkbenchAccessController::globalPermissionsChanged
         , this, [updateBookmarkActionsAvailability]()
     {
         updateBookmarkActionsAvailability();

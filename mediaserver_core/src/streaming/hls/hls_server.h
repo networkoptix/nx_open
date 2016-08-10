@@ -16,6 +16,7 @@
 #include "camera/video_camera.h"
 #include "hls_playlist_manager.h"
 #include "../streaming_chunk.h"
+#include <core/resource_management/user_access_data.h>
 
 
 namespace nx_hls
@@ -80,7 +81,7 @@ namespace nx_hls
         nx_http::StatusCode::Value getPlaylist(
             const nx_http::Request& request,
             const QnSecurityCamResourcePtr& camResource,
-            const QnUserResourcePtr& userResource,
+            const Qn::UserAccessData& accessRights,
             const QnVideoCameraPtr& videoCamera,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
@@ -107,7 +108,7 @@ namespace nx_hls
             nx_http::Response* const response );
 
         nx_http::StatusCode::Value createSession(
-            const QnUuid& authUserId,
+            const Qn::UserAccessData& accessRight,
             const QString& requestedPlaylistPath,
             const QString& sessionID,
             const std::multimap<QString, QString>& requestParams,

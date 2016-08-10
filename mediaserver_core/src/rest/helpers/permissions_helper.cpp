@@ -29,12 +29,12 @@ int QnPermissionsHelper::safeModeError(QnRestResult &result)
     return nx_http::StatusCode::forbidden;
 }
 
-bool QnPermissionsHelper::hasOwnerPermissions(const QnUuid& id)
+bool QnPermissionsHelper::hasOwnerPermissions(const Qn::UserAccessData& accessRights)
 {
-    if (id == Qn::kSystemAccess.userId)
+    if (accessRights == Qn::kSystemAccess)
         return true; //< serve auth key authrozation
 
-    auto userResource = qnResPool->getResourceById<QnUserResource>(id);
+    auto userResource = qnResPool->getResourceById<QnUserResource>(accessRights.userId);
     return userResource && userResource->isOwner();
 }
 
@@ -52,15 +52,6 @@ int QnPermissionsHelper::safeModeError(QByteArray& result, QByteArray& contentTy
     int errCode = QnPermissionsHelper::safeModeError(restResult);
     QnFusionRestHandlerDetail::serialize(restResult, result, contentType, format, extraFormatting);
     return errCode;
-}
-
-bool QnPermissionsHelper::hasGlobalPermission(const QnUuid& userId, Qn::GlobalPermission required)
-{
-    QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(userId);
-    if (!user)
-        return false;
-
-    return qnResourceAccessManager->hasGlobalPermission(user, required);
 }
 
 int QnPermissionsHelper::permissionsError(QnRestResult& result)
