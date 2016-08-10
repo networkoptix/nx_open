@@ -540,6 +540,8 @@ namespace detail
         qint32 getResourceInternalId( const QnUuid& guid );
         QnUuid getResourceGuid(const qint32 &internalId);
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
+
+        bool isReadOnly() const { return m_dbReadOnly; }
     private:
         class QnDbTransactionExt: public QnDbTransaction
         {
@@ -688,9 +690,13 @@ public:
         return errorCode;
     }
 
+    bool isTranAllowed(const QnAbstractTransaction& tran) const;
+
     template <typename Param, typename SerializedTransaction>
     ErrorCode executeTransactionNoLock(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
     {
+        if (!isTranAllowed(tran))
+            return ErrorCode::forbidden;
         if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
             return ErrorCode::forbidden;
         return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
@@ -699,6 +705,8 @@ public:
     template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
     ErrorCode executeTransactionNoLock(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
     {
+        if (!isTranAllowed(tran))
+            return ErrorCode::forbidden;
         auto outParamContainer = tran.params;
         ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, outParamContainer);
         if (outParamContainer.size() != tran.params.size())
@@ -710,6 +718,8 @@ public:
     template <class Param, class SerializedTransaction>
     ErrorCode executeTransaction(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
     {
+        if (!isTranAllowed(tran))
+            return ErrorCode::forbidden;
         if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
             return ErrorCode::forbidden;
         return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
@@ -718,6 +728,8 @@ public:
     template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
     ErrorCode executeTransaction(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
     {
+        if (!isTranAllowed(tran))
+            return ErrorCode::forbidden;
         Cont<Param,A> paramCopy = tran.params;
         ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, paramCopy);
         if (paramCopy.size() != tran.params.size())
