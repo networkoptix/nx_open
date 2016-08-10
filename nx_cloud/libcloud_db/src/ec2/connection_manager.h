@@ -100,6 +100,7 @@ private:
     std::map<TransactionTransport*, std::unique_ptr<TransactionTransport>> m_connectionsToRemove;
     QnMutex m_mutex;
 
+    void addNewConnection(ConnectionContext connectionContext);
     void removeConnection(TransactionTransport* transport);
 };
 

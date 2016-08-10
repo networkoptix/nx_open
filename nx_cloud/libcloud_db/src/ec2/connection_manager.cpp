@@ -90,39 +90,12 @@ void ConnectionManager::createTransactionConnection(
         request,
         contentEncoding);
 
-    //TODO #ak take socket after sending response message
-
-    QnMutexLocker lk(&m_mutex);
-
     ConnectionContext context{
         std::move(newTransport),
         connectionId,
-        std::make_pair(nx::String(systemId.c_str()), remoteGuid.toByteArray()) };
+        std::make_pair(nx::String(systemId.c_str()), remotePeer.id.toByteArray()) };
 
-    auto& connectionBySystemIdAndPeerIdIndex =
-        m_connections.get<kConnectionBySystemIdAndPeerIdIndex>();
-    auto existingConnectionIter = 
-        connectionBySystemIdAndPeerIdIndex.find(context.systemIdAndPeerId);
-    if (existingConnectionIter != connectionBySystemIdAndPeerIdIndex.end())
-    {
-        //removing existing connection
-        std::unique_ptr<TransactionTransport> existingConnection;
-        connectionBySystemIdAndPeerIdIndex.modify(
-            existingConnectionIter,
-            [&existingConnection](ConnectionContext& data)
-            {
-                existingConnection = std::move(data.connection);
-            });
-        TransactionTransport* connectionPtr = existingConnection.get();
-        m_connectionsToRemove.emplace(
-            connectionPtr,
-            std::move(existingConnection));
-        connectionPtr->post(
-            std::bind(&ConnectionManager::removeConnection, this, connectionPtr));
-        connectionBySystemIdAndPeerIdIndex.erase(existingConnectionIter);
-    }
-
-    m_connections.insert(std::move(context));
+    addNewConnection(std::move(context));
 }
 
 void ConnectionManager::pushTransaction(
@@ -138,9 +111,56 @@ void ConnectionManager::pushTransaction(
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
         return completionHandler(nx_http::StatusCode::badRequest, nullptr);
+    const auto connectionId = connectionIdIter->second;
 
     QnMutexLocker lk(&m_mutex);
-    //TODO reporting received transaction(s) to the corresponding connection 
+    //reporting received transaction(s) to the corresponding connection 
+    const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
+    auto connectionIter = connectionByIdIndex.find(connectionId);
+    if (connectionIter == connectionByIdIndex.end())
+        return completionHandler(nx_http::StatusCode::notFound, nullptr);
+
+    connectionIter->connection->post(
+        [connectionPtr = connectionIter->connection.get(),
+            request = std::move(request)]() mutable
+        {
+            connectionPtr->receivedTransaction(
+                std::move(request.headers),
+                request.messageBody);
+        });
+}
+
+void ConnectionManager::addNewConnection(ConnectionContext context)
+{
+    QnMutexLocker lk(&m_mutex);
+
+    auto& connectionBySystemIdAndPeerIdIndex =
+        m_connections.get<kConnectionBySystemIdAndPeerIdIndex>();
+    auto existingConnectionIter =
+        connectionBySystemIdAndPeerIdIndex.find(context.systemIdAndPeerId);
+    if (existingConnectionIter != connectionBySystemIdAndPeerIdIndex.end())
+    {
+        //removing existing connection
+        std::unique_ptr<TransactionTransport> existingConnection;
+        connectionBySystemIdAndPeerIdIndex.modify(
+            existingConnectionIter,
+            [&existingConnection](ConnectionContext& data)
+        {
+            existingConnection = std::move(data.connection);
+        });
+        TransactionTransport* connectionPtr = existingConnection.get();
+        m_connectionsToRemove.emplace(
+            connectionPtr,
+            std::move(existingConnection));
+        connectionPtr->post(
+            std::bind(&ConnectionManager::removeConnection, this, connectionPtr));
+        connectionBySystemIdAndPeerIdIndex.erase(existingConnectionIter);
+    }
+
+    context.connection->setOnConnectionClosed(
+        std::bind(&ConnectionManager::removeConnection, this, context.connection.get()));
+
+    m_connections.insert(std::move(context));
 }
 
 void ConnectionManager::removeConnection(TransactionTransport* transport)

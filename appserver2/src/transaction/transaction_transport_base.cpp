@@ -30,7 +30,6 @@
 #define ENCODE_TO_BASE64
 #endif
 #define AGGREGATE_TRANSACTIONS_BEFORE_SEND
-//#define PIPELINE_POST_REQUESTS
 
 
 /*!
@@ -115,14 +114,15 @@ void QnTransactionTransportBase::default_initializer()
     m_userAccessData = Qn::kSystemAccess;
 }
 
-QnTransactionTransportBase::QnTransactionTransportBase(const QnUuid& connectionGuid,
+QnTransactionTransportBase::QnTransactionTransportBase(
+    const QnUuid& connectionGuid,
     const ApiPeerData& localPeer,
     const ApiPeerData& remotePeer,
     QSharedPointer<AbstractCommunicatingSocket> socket,
     ConnectionType::Type connectionType,
     const nx_http::Request& request,
     const QByteArray& contentEncoding,
-    const Qn::UserAccessData &userAccessData)
+    const Qn::UserAccessData& userAccessData)
 {
     default_initializer();
 
@@ -1002,39 +1002,8 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
         }
         else    //m_peerRole == prOriginating
         {
-            if( m_outgoingDataSocket )
-            {
-                //sending transactions as a POST request
-                nx_http::Request request;
-                request.requestLine.method = nx_http::Method::POST;
-                const auto fullUrl = generatePostTranUrl();
-                request.requestLine.url = fullUrl.path() + (fullUrl.hasQuery() ? (QLatin1String("?") + fullUrl.query()) : QString());;
-                request.requestLine.version = nx_http::http_1_1;
-
-                for( const auto& header: m_outgoingClientHeaders )
-                    request.headers.emplace( header );
-
-                //adding authorizationUrl
-                if( !nx_http::AuthInfoCache::addAuthorizationHeader(
-                        fullUrl,
-                        &request,
-                        m_httpAuthCacheItem ) )
-                {
-                    NX_ASSERT( false );
-                }
-
-                request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
-                addHttpChunkExtensions( &request.headers );
-                request.headers.emplace(
-                    "Content-Length",
-                    nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
-                request.messageBody = dataCtx.sourceData;
-                dataCtx.encodedSourceData = request.serialized();
-            }
-            else
-            {
-                dataCtx.encodedSourceData = dataCtx.sourceData;
-            }
+            NX_ASSERT(!m_outgoingDataSocket);
+            dataCtx.encodedSourceData = dataCtx.sourceData;
         }
     }
     using namespace std::placeholders;
@@ -1574,49 +1543,6 @@ void QnTransactionTransportBase::postTransactionDone( const nx_http::AsyncHttpCl
         m_outgoingTranClient.reset();
         return;
     }
-
-#ifdef PIPELINE_POST_REQUESTS
-    //----------------------------------------------------------------------------------------
-    //TODO #ak since http client does not support http pipelining we have to send
-        //POST requests directly from this class.
-        //This block does it
-    m_outgoingClientHeaders.clear();
-    m_outgoingClientHeaders.emplace_back(
-        "User-Agent",
-        nx_http::userAgentString() );
-    m_outgoingClientHeaders.emplace_back(
-        "Content-Type",
-        m_base64EncodeOutgoingTransactions
-            ? "application/text"
-            : Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
-    m_outgoingClientHeaders.emplace_back( "Host", m_remoteAddr.host().toLatin1() );
-    m_outgoingClientHeaders.emplace_back(
-        Qn::EC2_CONNECTION_GUID_HEADER_NAME,
-        m_connectionGuid.toByteArray() );
-    m_outgoingClientHeaders.emplace_back(
-        Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME,
-        ConnectionType::toString(ConnectionType::outgoing) );
-    if( m_base64EncodeOutgoingTransactions )    //informing server that transaction is encoded
-        m_outgoingClientHeaders.emplace_back(
-            Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
-            "true" );
-    m_httpAuthCacheItem = client->authCacheItem();
-    auto nxUsernameHeaderIter = client->request().headers.find( "X-Nx-User-Name" );
-    if( nxUsernameHeaderIter != client->request().headers.end() )
-        m_outgoingClientHeaders.emplace_back( *nxUsernameHeaderIter );
-
-    NX_ASSERT( !m_outgoingDataSocket );
-    m_outgoingDataSocket = client->takeSocket();
-    m_outgoingTranClient.reset();
-
-    using namespace std::placeholders;
-    //monitoring m_outgoingDataSocket for connection close
-    m_dummyReadBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
-    m_outgoingDataSocket->readSomeAsync(
-        &m_dummyReadBuffer,
-        std::bind(&QnTransactionTransportBase::monitorConnectionForClosure, this, _1, _2) );
-    //----------------------------------------------------------------------------------------
-#endif //PIPELINE_POST_REQUESTS
 
     m_dataToSend.pop_front();
     if( m_dataToSend.empty() )

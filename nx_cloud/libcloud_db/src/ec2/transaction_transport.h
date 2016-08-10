@@ -2,6 +2,7 @@
 #pragma once
 
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/utils/move_only_func.h>
 
 #include <transaction/transaction_transport_base.h>
 
@@ -26,6 +27,9 @@ public:
     virtual ~TransactionTransport();
 
     virtual void stopWhileInAioThread() override;
+
+    /** Set handler to be executed when tcp connection is closed */
+    void setOnConnectionClosed(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
 protected:
     virtual void fillAuthInfo(

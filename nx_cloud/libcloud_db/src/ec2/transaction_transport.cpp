@@ -20,11 +20,18 @@ TransactionTransport::TransactionTransport(
         ::ec2::ApiPeerData(kCdbGuid, QnUuid::createUuid(), Qn::PT_CloudServer, Qn::JsonFormat),
         remotePeer,
         std::move(socket),
-        ::ec2::ConnectionType::outgoing,
+        ::ec2::ConnectionType::incoming,
         request,
         contentEncoding,
         Qn::kSystemAccess)
 {
+    //TODO #ak first of all, sending response via \a socket
+}
+
+void TransactionTransport::setOnConnectionClosed(
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    //TODO
 }
 
 TransactionTransport::~TransactionTransport()
