@@ -294,8 +294,6 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
 void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
 {
     disconnect(resource, NULL, this, NULL);
-
-    setPermissionsInternal(resource, Qn::NoPermissions); /* So that the signal is emitted. */
     m_dataByResource.remove(resource);
 }
 

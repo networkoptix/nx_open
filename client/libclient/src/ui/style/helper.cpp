@@ -25,16 +25,30 @@ namespace style
     const int Metrics::kSwitchMargin = dp(4);
     const QSize Metrics::kSeparatorSize(dp(10), dp(8));
     const qreal Metrics::kCheckboxCornerRadius = dp(0.2); // for lightly antialiased corners
+
     const int Metrics::kDefaultTopLevelMargin = dp(16);
+    const QMargins Metrics::kDefaultTopLevelMargins(
+        Metrics::kDefaultTopLevelMargin,
+        Metrics::kDefaultTopLevelMargin,
+        Metrics::kDefaultTopLevelMargin,
+        Metrics::kDefaultTopLevelMargin);
+
     const int Metrics::kDefaultChildMargin = 0;
+    const QMargins Metrics::kDefaultChildMargins(
+        Metrics::kDefaultChildMargin,
+        Metrics::kDefaultChildMargin,
+        Metrics::kDefaultChildMargin,
+        Metrics::kDefaultChildMargin);
+
     const QSize Metrics::kDefaultLayoutSpacing(dp(8), dp(8));
     const int Metrics::kPanelHeaderHeight = dp(24);
     const QMargins Metrics::kPanelContentMargins(0, dp(12), 0, 0);
     const int Metrics::kGroupBoxTopMargin = dp(8);
-    const QMargins Metrics::kGroupBoxContentMargins(dp(16), dp(16), dp(16), dp(16));
+    const QMargins Metrics::kGroupBoxContentMargins(Metrics::kDefaultTopLevelMargins);
     const qreal Metrics::kGroupBoxCornerRadius = dp(2.0);
     const int Metrics::kDefaultIconSize = 20;
-    const qreal Metrics::kDisabledItemOpacity = 0.3;
+
+    const qreal Hints::kDisabledItemOpacity = 0.3;
 
     const char* Properties::kHoveredRowProperty = "_qn_hoveredRow";
     const char* Properties::kHoveredIndexProperty = "_qn_hoveredIndex";

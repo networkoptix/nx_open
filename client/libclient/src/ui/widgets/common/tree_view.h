@@ -24,6 +24,8 @@ public:
 
     virtual QSize viewportSizeHint() const override;
 
+    using QTreeView::edit;
+
 signals:
     /**
      * This signal is emitted whenever the user presses enter on one of the
@@ -40,6 +42,7 @@ signals:
      * \param index                     Index of the item. Is guaranteed to be valid.
      */
     void spacePressed(const QModelIndex &index);
+
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void dragMoveEvent(QDragMoveEvent *event) override;

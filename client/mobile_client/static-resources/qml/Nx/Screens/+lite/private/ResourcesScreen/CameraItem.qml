@@ -12,6 +12,16 @@ Control
 
     property alias resourceId: resourceHelper.resourceId
     property bool paused: false
+    property QnLiteClientLayoutHelper layoutHelper: null
+    property int layoutX: -1
+    property int layoutY: -1
+
+    property bool active: false
+
+    signal clicked()
+    signal activityDetected()
+    signal nextCameraRequested()
+    signal previousCameraRequested()
 
     QnMediaResourceHelper
     {
@@ -49,11 +59,92 @@ Control
             sourceComponent:
             {
                 if (!resourceId)
-                    return undefined
+                    return noCameraComponent
                 if (d.offline || d.unauthorized)
                     return dummyComponent
                 else
                     return videoComponent
+            }
+        }
+
+        Rectangle
+        {
+            id: controls
+
+            anchors.fill: parent
+
+            opacity: 0.0
+            Behavior on opacity { NumberAnimation { duration: 200 } }
+            z: 5
+
+            border.color: ColorTheme.brand_main
+            border.width: 2
+            color: "transparent"
+
+            Item
+            {
+                anchors.fill: parent
+                anchors.margins: parent.border.width
+
+                Rectangle
+                {
+                    width: parent.width
+                    height: 24
+                    color: ColorTheme.transparent(ColorTheme.base5, 0.6)
+                    visible: resourceId
+
+                    Text
+                    {
+                        anchors.fill: parent
+                        anchors.leftMargin: 6
+                        anchors.rightMargin: 6
+                        text: resourceHelper.resourceName
+                        verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignLeft
+                        elide: Text.ElideRight
+                        color: ColorTheme.windowText
+                        font.pixelSize: 13
+                        font.weight: Font.DemiBold
+                    }
+                }
+            }
+        }
+    }
+
+    Component
+    {
+        id: noCameraComponent
+
+        Rectangle
+        {
+            width: cameraItem.width
+            height: cameraItem.height
+
+            color: ColorTheme.base3
+
+            Column
+            {
+                width: parent.width
+                anchors.centerIn: parent
+
+                Text
+                {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: qsTr("Select camera")
+                    color: ColorTheme.base13
+                    font.pixelSize: 24
+                    font.capitalization: Font.AllUppercase
+                    wrapMode: Text.WordWrap
+                }
+
+                Text
+                {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: qsTr("Press Ctrl + Arrow or use mouse wheel")
+                    color: ColorTheme.base13
+                    font.pixelSize: 11
+                    wrapMode: Text.WordWrap
+                }
             }
         }
     }
@@ -150,23 +241,105 @@ Control
                         player.play()
                 }
             }
-
-            MouseArea
-            {
-                id: mouseArea
-                anchors.fill: parent
-                onClicked: Workflow.openVideoScreen(resourceId)
-            }
-
-            MaterialEffect
-            {
-                clip: true
-                anchors.fill: parent
-                mouseArea: mouseArea
-                rippleSize: width * 2
-            }
         }
     }
 
-    Keys.onReturnPressed: mouseArea.clicked()
+    MouseArea
+    {
+        id: mouseArea
+        anchors.fill: parent
+        onClicked: cameraItem.clicked()
+        hoverEnabled: true
+
+        onWheel:
+        {
+            activityDetected()
+            if (wheel.angleDelta.y > 0)
+                previousCameraRequested()
+            else
+                nextCameraRequested()
+        }
+
+        onMouseXChanged: activityDetected()
+        onMouseYChanged: activityDetected()
+    }
+
+    MaterialEffect
+    {
+        clip: true
+        anchors.fill: parent
+        mouseArea: mouseArea
+        rippleSize: width * 2
+    }
+
+    Timer
+    {
+        id: fadeOutTimer
+        interval: 3000
+        onTriggered:
+        {
+            controls.opacity = 0.0
+        }
+    }
+
+    Connections
+    {
+        target: layoutHelper
+        onCameraIdChanged:
+        {
+            if (layoutX == x && layoutY == y)
+                cameraItem.resourceId = resourceId
+        }
+        onLayoutChanged: updateResourceId()
+    }
+
+    onLayoutHelperChanged: updateResourceId()
+    Component.onCompleted: updateResourceId()
+    onResourceIdChanged: activityDetected()
+    onActiveChanged:
+    {
+        if (active)
+            showControls()
+        else
+            controls.opacity = 0
+    }
+
+    function showControls()
+    {
+        if (active)
+            controls.opacity = 1.0
+        fadeOutTimer.restart()
+    }
+
+    function updateResourceId()
+    {
+        if (layoutX < 0 || layoutY < 0 || !layoutHelper)
+            return
+
+        resourceId = layoutHelper.cameraIdOnCell(layoutX, layoutY)
+    }
+
+    Keys.onPressed:
+    {
+        activityDetected()
+
+        if (event.modifiers == Qt.ControlModifier)
+        {
+            if (event.key == Qt.Key_Left)
+            {
+                nextCameraRequested()
+                event.accepted = true
+            }
+            else if (event.key == Qt.Key_Right)
+            {
+                previousCameraRequested()
+                event.accepted = true
+            }
+        }
+        else if (event.key == Qt.Key_Return || event.key == Qt.Key_Enter)
+        {
+            clicked()
+            event.accepted = true
+        }
+    }
 }

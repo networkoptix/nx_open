@@ -41,8 +41,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
 {
     using namespace nx::cdb;
 
-    NX_LOGX(lm("%1 cloud credentials").arg(data.reset ? "Resetting" : "Saving"),
-        cl_logDEBUG1);
+    NX_LOGX(lm("Saving cloud credentials"), cl_logDEBUG1);
 
     if (data.cloudSystemID.isEmpty())
     {

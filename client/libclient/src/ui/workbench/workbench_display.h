@@ -412,6 +412,7 @@ protected slots:
     void at_layout_boundingRectChanged(const QRect &oldRect, const QRect &newRect);
 
     void at_context_permissionsChanged(const QnResourcePtr &resource);
+    void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();

@@ -38,6 +38,8 @@ Page
     {
         id: d
 
+        property int activeItemIndex: 0
+
         property Item screenItem:
         {
             if (liteClientControlScreen.state != "SingleCamera"
@@ -68,6 +70,7 @@ Page
         {
             Workflow.openInformationDialog(qsTr("Cannot stop client"))
         }
+
     }
 
     Column
@@ -136,9 +139,24 @@ Page
         {
             id: selector
 
-            onCurrentResourceIdChanged:
+            currentResourceId: d.currentResourceId
+            fourCamerasMode: (liteClientController.layoutHelper.displayMode
+               == QnLiteClientLayoutHelper.MultipleCameras)
+
+            onSingleCameraModeClicked:
             {
-                if (!d.screenItem)
+                liteClientController.layoutHelper.displayCell =
+                    Qt.point(d.screenItem.activeItem.layoutX, d.screenItem.activeItem.layoutY)
+            }
+
+            onMultipleCmaerasModeClicked:
+            {
+                liteClientController.layoutHelper.displayCell = Qt.point(-1, -1)
+            }
+
+            onCameraClicked:
+            {
+                if (!d.screenItem || !d.screenItem.activeItem)
                     return
 
                 if (fourCamerasMode)
@@ -146,33 +164,12 @@ Page
                     liteClientController.layoutHelper.setCameraIdOnCell(
                         d.screenItem.activeItem.layoutX,
                         d.screenItem.activeItem.layoutY,
-                        currentResourceId)
+                        resourceId)
                 }
                 else
                 {
-                    liteClientController.layoutHelper.singleCameraId = currentResourceId
+                    liteClientController.layoutHelper.singleCameraId = resourceId
                 }
-            }
-
-            Binding
-            {
-                target: selector
-                property: "currentResourceId"
-                value: d.currentResourceId
-            }
-
-            Binding
-            {
-                target: selector
-                property: "fourCamerasMode"
-                value: liteClientController.layoutHelper.displayMode
-            }
-
-            onFourCamerasModeChanged:
-            {
-                liteClientController.layoutHelper.displayMode = (fourCamerasMode
-                    ? QnLiteClientLayoutHelper.MultipleCameras
-                    : QnLiteClientLayoutHelper.SingleCamera)
             }
         }
     }
@@ -193,7 +190,7 @@ Page
 
         SingleCameraLayout
         {
-            activeItem.resourceId: liteClientController.layoutHelper.singleCameraId
+            activeItem.layoutHelper: liteClientController.layoutHelper
         }
     }
 
@@ -203,35 +200,9 @@ Page
 
         MultipleCamerasLayout
         {
-            id: layout
-
-            Connections
-            {
-                target: liteClientController.layoutHelper
-                onCameraIdChanged:
-                {
-                    var item = layout.itemAt(x, y)
-                    if (!item)
-                        return
-
-                    item.resourceId = resourceId
-                }
-                onLayoutChanged: layout.resetLayout()
-            }
-
-            Component.onCompleted: resetLayout()
-
-            function resetLayout()
-            {
-                for (var y = 0; y < gridHeight; ++y)
-                {
-                    for (var x = 0; x < gridWidth; ++x)
-                    {
-                        var item = layout.itemAt(x, y)
-                        item.resourceId = liteClientController.layoutHelper.cameraIdOnCell(x, y)
-                    }
-                }
-            }
+            layoutHelper: liteClientController.layoutHelper
+            Component.onCompleted: activeItemIndex = d.activeItemIndex
+            onActiveItemIndexChanged: d.activeItemIndex = activeItemIndex
         }
     }
 

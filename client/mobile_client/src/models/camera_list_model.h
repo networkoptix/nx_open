@@ -9,6 +9,7 @@ class QnCameraListModel : public QSortFilterProxyModel
     Q_OBJECT
 
     Q_PROPERTY(QString layoutId READ layoutId WRITE setLayoutId NOTIFY layoutIdChanged)
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
 
     Q_ENUMS(Qn::ResourceStatus)
 
@@ -24,7 +25,10 @@ public:
     QString layoutId() const;
     void setLayoutId(const QString& layoutId);
 
+    int count() const;
+
     Q_INVOKABLE int rowByResourceId(const QString& resourceId) const;
+    Q_INVOKABLE QString resourceIdByRow(int row) const;
 
 public slots:
     void refreshThumbnail(int row);
@@ -32,6 +36,7 @@ public slots:
 
 signals:
     void layoutIdChanged();
+    void countChanged();
 
 protected:
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;

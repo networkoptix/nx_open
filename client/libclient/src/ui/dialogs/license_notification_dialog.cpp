@@ -16,9 +16,9 @@ QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget *parent, Qt::Wi
     ui->treeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     m_model = new QnLicenseListModel(this);
+    ui->treeView->setModel(m_model);
     ui->treeView->setColumnHidden(QnLicenseListModel::ExpirationDateColumn, true);
     ui->treeView->setColumnHidden(QnLicenseListModel::ServerColumn, true);
-    ui->treeView->setModel(m_model);
 }
 
 QnLicenseNotificationDialog::~QnLicenseNotificationDialog()

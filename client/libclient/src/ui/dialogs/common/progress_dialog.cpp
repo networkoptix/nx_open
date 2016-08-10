@@ -63,6 +63,8 @@
 #include <QtGui/qdesktopwidget.h>
 #endif
 
+#include <ui/style/helper.h>
+
 #include <ui/widgets/common/elided_label.h>
 #include <ui/widgets/common/dialog_button_box.h>
 #include <ui/widgets/common/progress_widget.h>
@@ -116,7 +118,7 @@ public:
     QPushButton *cancel;
     QProgressBar *bar;
     QnProgressWidget *infiniteProgress;
-    QnDialogButtonBox *buttonBox;
+    QDialogButtonBox *buttonBox;
     QVBoxLayout *layout;
 
     QTimer *forceTimer;
@@ -160,15 +162,24 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
 
     infiniteProgress = new QnProgressWidget(q);
 
-    buttonBox = new QnDialogButtonBox(QDialogButtonBox::NoButton, Qt::Horizontal, q);
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::NoButton, Qt::Horizontal, q);
 
     QHBoxLayout *hlayout = new QHBoxLayout();
     hlayout->addWidget(infiniteProgress);
     hlayout->addWidget(label, 1);
 
+    QFrame* line = new QFrame(q);
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+
+    QVBoxLayout* contentLayout = new QVBoxLayout();
+    contentLayout->addLayout(hlayout);
+    contentLayout->addWidget(bar);
+    contentLayout->setContentsMargins(style::Metrics::kGroupBoxContentMargins);
+
     layout = new QVBoxLayout();
-    layout->addLayout(hlayout);
-    layout->addWidget(bar);
+    layout->addLayout(contentLayout);
+    layout->addWidget(line);
     layout->addWidget(buttonBox);
     layout->setSizeConstraint(QLayout::SetFixedSize);
     q->setLayout(layout);
