@@ -8,6 +8,8 @@
 
 #ifdef _WIN32
 #   include <winsock2.h>
+#   include <in6addr.h>
+#   include <ws2ipdef.h>
 #else
 #   include <sys/socket.h>
 #   include <netinet/in.h>

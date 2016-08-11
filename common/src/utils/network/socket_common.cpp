@@ -201,7 +201,7 @@ bool HostAddress::isLocal() const
 boost::optional<QString> HostAddress::ipToString(const in_addr& addr)
 {
     char buffer[1024];
-    if (inet_ntop(AF_INET, &addr, buffer, sizeof(buffer)))
+    if (inet_ntop(AF_INET, (void*)&addr, buffer, sizeof(buffer)))
         return QString(QLatin1String(buffer));
 
     return boost::none;
@@ -212,7 +212,7 @@ boost::optional<QString> HostAddress::ipToString(const in_addr& addr)
 boost::optional<QString> HostAddress::ipToString(const in6_addr& addr)
 {
     char buffer[1024];
-    if (inet_ntop(AF_INET6, &addr, buffer, sizeof(buffer)))
+    if (inet_ntop(AF_INET6, (void*)&addr, buffer, sizeof(buffer)))
         return QString(QLatin1String(buffer));
 
     return boost::none;

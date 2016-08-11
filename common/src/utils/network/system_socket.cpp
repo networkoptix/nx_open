@@ -462,7 +462,7 @@ bool Socket::createSocket(int type, int protocol)
     if( m_ipVersion == AF_INET6 )
     {
         int off = 0;
-        if( ::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, &off, sizeof(off)) )
+        if( ::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&off, sizeof(off)) )
             return false;
     }
 
@@ -512,8 +512,8 @@ namespace
                 //memset( &waitStopTime, 0, sizeof(waitStopTime) );
                 //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
                 //    continue;   //not updating timeout value
-                //const int millisAlreadySlept = 
-                //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
+                //const int millisAlreadySlept =
+                //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) -
                 //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
                 //if( (unsigned int)millisAlreadySlept < timeout )
                 if( et.elapsed() < timeout )
@@ -618,7 +618,7 @@ bool CommunicatingSocket::connect( const SocketAddress& remoteAddress, unsigned 
     iSelRet = ::select(
         m_fd + 1,
         NULL,
-        &wrtFDS, 
+        &wrtFDS,
         NULL,
         timeoutMs >= 0 ? &timeVal : NULL );
 #else
@@ -660,7 +660,7 @@ bool CommunicatingSocket::connect( const SocketAddress& remoteAddress, unsigned 
             //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
             //    continue;   //not updating timeout value
             const int millisAlreadySlept = et.elapsed();
-            //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
+            //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) -
             //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
             if( millisAlreadySlept >= (int)timeoutMs )
                 break;
@@ -983,7 +983,7 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
 // TCPServerSocket Code
 
 static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
-/*! 
+/*!
     \return fd (>=0) on success, <0 on error (-2 if timed out)
 */
 static int acceptWithTimeout( int m_fd, int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC )
@@ -1139,7 +1139,7 @@ public:
         else
         {
             return nullptr;
-        
+
         }
     }
 
@@ -1199,7 +1199,7 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
                     static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
                 aio::AIOService::instance()->removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
-                
+
                 QnMutexLocker lk(&mtx);
                 cancelled = true;
                 cond.wakeAll();
