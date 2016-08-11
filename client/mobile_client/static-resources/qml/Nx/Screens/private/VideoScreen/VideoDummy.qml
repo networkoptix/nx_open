@@ -16,6 +16,10 @@ Item
 
         width: parent.width
         height: parent.height
+        leftPadding: 32
+        rightPadding: 32
+
+        property real availableWidth: width - leftPadding - rightPadding
 
         Image
         {
@@ -29,7 +33,7 @@ Item
         {
             id: text
 
-            width: parent.width
+            width: parent.availableWidth
             height: 96
             anchors.horizontalCenter: parent.horizontalCenter
 

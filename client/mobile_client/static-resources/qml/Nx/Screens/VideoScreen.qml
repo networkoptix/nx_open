@@ -254,6 +254,7 @@ PageBase
 
         VideoDummy
         {
+            width: videoScreen.width
             state:
             {
                 if (d.serverOffline)
