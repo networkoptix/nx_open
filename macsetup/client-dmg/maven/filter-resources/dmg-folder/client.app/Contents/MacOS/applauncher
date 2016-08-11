@@ -1,7 +1,6 @@
 #!/bin/bash
 
 export vblank_mode=0
-export QT_QPA_PLATFORM=xcb
 
 USER_APPLAUNCHER_DIR="$HOME/Library/Application Support/${company.name}/applauncher/${customization}/Contents/MacOS"
 
@@ -17,4 +16,6 @@ else
     fi
 fi
 
+export DYLD_LIBRARY_PATH="$APPLAUNCHER_DIR/../Frameworks"
+export DYLD_FRAMEWORK_PATH="$APPLAUNCHER_DIR/../Frameworks"
 "$APPLAUNCHER_DIR/applauncher-bin" $@
