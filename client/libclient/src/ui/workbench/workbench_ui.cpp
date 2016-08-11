@@ -107,6 +107,7 @@
 
 
 namespace {
+
 const qreal kDefaultSizeMultiplier = 1.0;
 const int kDefaultHelpTopicId = -1;
 
@@ -124,12 +125,12 @@ Qn::PaneState makePaneState(bool opened, bool pinned = true)
     return pinned ? (opened ? Qn::PaneState::Opened : Qn::PaneState::Closed) : Qn::PaneState::Unpinned;
 }
 
-class QnResizerWidget: public GraphicsWidget
+class ResizerWidget: public GraphicsWidget
 {
     typedef GraphicsWidget base_type;
 
 public:
-    QnResizerWidget(Qt::Orientation orientation, QGraphicsItem *parent = nullptr, Qt::WindowFlags wFlags = 0):
+    ResizerWidget(Qt::Orientation orientation, QGraphicsItem *parent = nullptr, Qt::WindowFlags wFlags = 0):
         base_type(parent, wFlags),
         m_orientation(orientation)
     {
@@ -151,37 +152,6 @@ public:
 
 private:
     Qt::Orientation m_orientation;
-};
-
-class QnTabBarGraphicsProxyWidget: public QGraphicsProxyWidget
-{
-    typedef QGraphicsProxyWidget base_type;
-
-public:
-    QnTabBarGraphicsProxyWidget(QGraphicsItem *parent = nullptr, Qt::WindowFlags windowFlags = 0): base_type(parent, windowFlags) {}
-
-protected:
-    virtual bool eventFilter(QObject *object, QEvent *event) override
-    {
-        if (object == widget())
-        {
-            if (event->type() == QEvent::Move)
-                return false; /* Don't propagate moves. */
-
-            if (event->type() == QEvent::UpdateRequest && isVisible())
-                widget()->setAttribute(Qt::WA_Mapped); /* This one gets cleared for no reason in some cases. We just hack it around. */
-        }
-
-        return base_type::eventFilter(object, event);
-    }
-
-    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override
-    {
-        if (change == ItemPositionChange || change == ItemPositionHasChanged)
-            return value; /* Don't propagate moves. */
-
-        return base_type::itemChange(change, value);
-    }
 };
 
 const qreal kOpaque = 1.0;
@@ -1065,7 +1035,7 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate)
         m_treeItem->setX(newX);
     }
 
-    static_cast<QnResizerWidget*>(m_treeResizerWidget)->setEnabled(opened);
+    static_cast<ResizerWidget*>(m_treeResizerWidget)->setEnabled(opened);
 }
 
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry)
@@ -1290,7 +1260,7 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     m_treeShowButton = newShowHideButton(m_controlsWidget, toggleTreeAction);
     m_treeShowButton->setFocusProxy(m_treeItem);
 
-    m_treeResizerWidget = new QnResizerWidget(Qt::Horizontal, m_controlsWidget);
+    m_treeResizerWidget = new ResizerWidget(Qt::Horizontal, m_controlsWidget);
     m_treeResizerWidget->setProperty(Qn::NoHandScrollOver, true);
     m_treeResizerWidget->stackBefore(m_treeShowButton);
     m_treeItem->stackBefore(m_treeResizerWidget);
@@ -2235,7 +2205,7 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate)
 
     updateCalendarVisibility(animate);
 
-    static_cast<QnResizerWidget*>(m_timeline.resizerWidget)->setEnabled(opened);
+    static_cast<ResizerWidget*>(m_timeline.resizerWidget)->setEnabled(opened);
 }
 
 void QnWorkbenchUi::setSliderVisible(bool visible, bool animate)
@@ -2433,7 +2403,7 @@ void QnWorkbenchUi::at_sliderResizerWidget_geometryChanged()
 
 void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
 {
-    m_timeline.resizerWidget = new QnResizerWidget(Qt::Vertical, m_controlsWidget);
+    m_timeline.resizerWidget = new ResizerWidget(Qt::Vertical, m_controlsWidget);
     m_timeline.resizerWidget->setProperty(Qn::NoHandScrollOver, true);
 
     m_timeline.item = new QnNavigationItem(m_controlsWidget);
