@@ -222,6 +222,8 @@ QnMessageBox::QnMessageBox(
     setText(text);
     setStandardButtons(buttons);
     setIcon(icon);
+
+    setResizeToContentsMode(Qt::Vertical);
 }
 
 QnMessageBox::~QnMessageBox()
@@ -791,22 +793,4 @@ void QnMessageBox::keyPressEvent(QKeyEvent *event)
     }
 
     QDialog::keyPressEvent(event);
-}
-
-bool QnMessageBox::event(QEvent* event)
-{
-    bool res = QDialog::event(event);
-
-    if (event->type() != QEvent::LayoutRequest)
-        return res;
-
-    if (hasHeightForWidth())
-    {
-        setFixedHeight(heightForWidth(width()));
-        return res;
-    }
-
-    /* This dialog must have height-for-width, but just in case handle otherwise: */
-    setFixedHeight(sizeHint().height());
-    return res;
 }

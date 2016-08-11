@@ -8,6 +8,7 @@
 class QnDialog : public QDialog
 {
     Q_OBJECT
+    Q_PROPERTY(Qt::Orientations resizeToContentsMode READ resizeToContentsMode WRITE setResizeToContentsMode)
     using base_type = QDialog;
 
 public:
@@ -21,4 +22,14 @@ public:
     void show();
 
     int exec();
+
+    Qt::Orientations resizeToContentsMode() const;
+    void setResizeToContentsMode(Qt::Orientations mode);
+
+protected:
+    virtual bool event(QEvent* event) override;
+    virtual void afterLayout();
+
+private:
+    Qt::Orientations m_resizeToContentsMode;
 };

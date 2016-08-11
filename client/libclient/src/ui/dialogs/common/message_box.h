@@ -162,8 +162,6 @@ protected:
     virtual void closeEvent(QCloseEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
 
-    virtual bool event(QEvent* event) override;
-
 private:
     QScopedPointer<Ui::MessageBox> ui;
 
