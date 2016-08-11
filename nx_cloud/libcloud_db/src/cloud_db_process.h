@@ -112,10 +112,7 @@ private:
             stree::ResourceContainer authInfo,
             nx_http::Request request,
             nx_http::Response* const response,
-            std::function<void(
-                const nx_http::StatusCode::Value statusCode,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBodyDataSource)
-            > completionHandler);
+            nx_http::HttpRequestProcessedHandler completionHandler);
 
         CustomHttpHandler(
             ManagerType* manager,
@@ -132,10 +129,7 @@ private:
             stree::ResourceContainer authInfo,
             nx_http::Request request,
             nx_http::Response* const response,
-            std::function<void(
-                const nx_http::StatusCode::Value statusCode,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)
-            > completionHandler) override
+            nx_http::HttpRequestProcessedHandler completionHandler) override
         {
             (m_manager->*m_managerFuncPtr)(
                 connection,

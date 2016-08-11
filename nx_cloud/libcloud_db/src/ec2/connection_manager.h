@@ -16,8 +16,10 @@
 
 #include <cdb/result_code.h>
 #include <nx/network/http/abstract_msg_body_source.h>
+#include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx_ec/data/api_peer_data.h>
 
 #include "access_control/auth_types.h"
 
@@ -52,20 +54,14 @@ public:
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)
-        > completionHandler);
+        nx_http::HttpRequestProcessedHandler completionHandler);
     /** mediaserver uses this method to push transactions */
     void pushTransaction(
         nx_http::HttpServerConnection* const connection,
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBodyDataSource)
-        > completionHandler);
+        nx_http::HttpRequestProcessedHandler completionHandler);
 
 private:
     struct ConnectionContext
@@ -96,6 +92,7 @@ private:
     constexpr static const int kConnectionBySystemIdAndPeerIdIndex = 1;
 
     const conf::Settings& m_settings;
+    const ::ec2::ApiPeerData m_localPeerData;
     ConnectionDict m_connections;
     std::map<TransactionTransport*, std::unique_ptr<TransactionTransport>> m_connectionsToRemove;
     QnMutex m_mutex;

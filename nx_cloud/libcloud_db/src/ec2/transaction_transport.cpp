@@ -6,10 +6,12 @@ namespace nx {
 namespace cdb {
 namespace ec2 {
 
-static const QnUuid kCdbGuid("{A1D368E4-3D01-4B18-8642-898272D7CDA9}");
+constexpr static const std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
+constexpr static const int kKeepAliveProbeCount = 3;
 
 TransactionTransport::TransactionTransport(
     const nx::String& connectionId,
+    const ::ec2::ApiPeerData& localPeer,
     const ::ec2::ApiPeerData& remotePeer,
     QSharedPointer<AbstractCommunicatingSocket> socket,
     const nx_http::Request& request,
@@ -17,13 +19,15 @@ TransactionTransport::TransactionTransport(
 :
     ::ec2::QnTransactionTransportBase(
         QnUuid::fromStringSafe(connectionId),
-        ::ec2::ApiPeerData(kCdbGuid, QnUuid::createUuid(), Qn::PT_CloudServer, Qn::JsonFormat),
+        localPeer,
         remotePeer,
         std::move(socket),
         ::ec2::ConnectionType::incoming,
         request,
         contentEncoding,
-        Qn::kSystemAccess)
+        Qn::kSystemAccess,
+        kTcpKeepAliveTimeout,
+        kKeepAliveProbeCount)
 {
     //TODO #ak first of all, sending response via \a socket
 }

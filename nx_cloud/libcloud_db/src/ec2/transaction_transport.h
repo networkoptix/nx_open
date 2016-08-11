@@ -20,6 +20,7 @@ public:
     //!Initializer for incoming connection
     TransactionTransport(
         const nx::String& connectionId,
+        const ::ec2::ApiPeerData& localPeer,
         const ::ec2::ApiPeerData& remotePeer,
         QSharedPointer<AbstractCommunicatingSocket> socket,
         const nx_http::Request& request,

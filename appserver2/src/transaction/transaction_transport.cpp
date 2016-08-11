@@ -1,8 +1,10 @@
 
 #include "transaction_transport.h"
 
-#include "core/resource/media_server_resource.h"
-#include "api/app_server_connection.h"
+#include <api/app_server_connection.h>
+#include <api/global_settings.h>
+#include <core/resource/media_server_resource.h>
+
 #include "database/db_manager.h"
 #include <core/resource_management/resource_pool.h>
 
@@ -27,13 +29,18 @@ QnTransactionTransport::QnTransactionTransport(
         connectionType,
         request,
         contentEncoding,
-        userAccessData)
+        userAccessData,
+        QnGlobalSettings::instance()->connectionKeepAliveTimeout(),
+        QnGlobalSettings::instance()->keepAliveProbeCount())
 {
 }
 
 QnTransactionTransport::QnTransactionTransport(const ApiPeerData& localPeer)
 :
-    QnTransactionTransportBase(localPeer)
+    QnTransactionTransportBase(
+        localPeer,
+        QnGlobalSettings::instance()->connectionKeepAliveTimeout(),
+        QnGlobalSettings::instance()->keepAliveProbeCount())
 {
 }
 
@@ -48,7 +55,7 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
     }
 
     QnMediaServerResourcePtr ownServer = 
-        qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        qnResPool->getResourceById<QnMediaServerResource>(localPeer().id);
     if (ownServer && authByKey)
     {
         httpClient->setUserName(ownServer->getId().toString().toLower());

@@ -25,7 +25,9 @@ public:
     QnTransactionTransport(const ApiPeerData& localPeer);
 
 protected:
-    virtual void fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey) override;
+    virtual void fillAuthInfo(
+        const nx_http::AsyncHttpClientPtr& httpClient,
+        bool authByKey) override;
 };
 
 }   // namespace ec2

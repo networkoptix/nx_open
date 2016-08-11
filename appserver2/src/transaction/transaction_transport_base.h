@@ -105,9 +105,14 @@ public:
         ConnectionType::Type connectionType,
         const nx_http::Request& request,
         const QByteArray& contentEncoding,
-        const Qn::UserAccessData &userAccessData);
+        const Qn::UserAccessData &userAccessData,
+        std::chrono::milliseconds tcpKeepAliveTimeout,
+        int keepAliveProbeCount);
     //!Initializer for outgoing connection
-    QnTransactionTransportBase( const ApiPeerData& localPeer );
+    QnTransactionTransportBase(
+        const ApiPeerData& localPeer,
+        std::chrono::milliseconds tcpKeepAliveTimeout,
+        int keepAliveProbeCount);
     ~QnTransactionTransportBase();
 
     void setBeforeDestroyCallback(std::function<void ()> ttFinishCallback);
@@ -184,6 +189,7 @@ public:
     bool isNeedResync() const { return m_needResync; }
     void setNeedResync(bool value)  {m_needResync = value;} // synchronization process in progress
 
+    const ec2::ApiPeerData& localPeer() const;
     QUrl remoteAddr() const;
     SocketAddress remoteSocketAddr() const;
 
@@ -264,7 +270,7 @@ private:
         for (const QnUuid& peer : header.dstPeers)
         {
             NX_ASSERT(!peer.isNull());
-            //NX_ASSERT(peer != qnCommon->moduleGUID());
+            //NX_ASSERT(peer != m_localPeer.id);
         }
 #endif
         NX_ASSERT(!transaction.isLocal() || m_remotePeer.isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
@@ -311,7 +317,7 @@ private:
         prAccepting
     };
 
-    ApiPeerData m_localPeer;
+    const ApiPeerData m_localPeer;
     ApiPeerData m_remotePeer;
 
     qint64 m_lastConnectTime;
@@ -351,7 +357,7 @@ private:
     nx_http::HttpStreamReader m_httpStreamReader;
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
     ConnectionType::Type m_connectionType;
-    PeerRole m_peerRole;
+    const PeerRole m_peerRole;
     QByteArray m_contentEncoding;
     std::shared_ptr<AbstractByteStreamFilter> m_incomingTransactionStreamParser;
     std::shared_ptr<AbstractByteStreamFilter> m_sizedDecoder;
@@ -376,7 +382,12 @@ private:
     Qn::UserAccessData m_userAccessData;
 
 private:
-    void default_initializer();
+    QnTransactionTransportBase(
+        const ApiPeerData& localPeer,
+        PeerRole peerRole,
+        std::chrono::milliseconds tcpKeepAliveTimeout,
+        int keepAliveProbeCount);
+
     void sendHttpKeepAlive( quint64 taskID );
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();

@@ -28,6 +28,10 @@
 namespace nx {
 namespace cdb {
 
+namespace conf {
+class Settings;
+}   // namespace conf
+
 class AbstractEmailManager
 {
 public:

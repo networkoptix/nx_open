@@ -7,8 +7,6 @@
 #include <QtCore/QTimer>
 #include <QtCore/QUrlQuery>
 
-#include <api/global_settings.h>
-
 #include <nx_ec/ec_proto_version.h>
 #include <nx/network/http/base64_decoder_filter.h>
 #include <nx/network/socket_factory.h>
@@ -84,9 +82,18 @@ QSet<QnUuid> QnTransactionTransportBase::m_existConn;
 QnTransactionTransportBase::ConnectingInfoMap QnTransactionTransportBase::m_connectingConn;
 QnMutex QnTransactionTransportBase::m_staticMutex;
 
-void QnTransactionTransportBase::default_initializer()
+QnTransactionTransportBase::QnTransactionTransportBase(
+    const ApiPeerData& localPeer,
+    PeerRole peerRole,
+    std::chrono::milliseconds tcpKeepAliveTimeout,
+    int keepAliveProbeCount)
+:
+    m_localPeer(localPeer),
+    m_peerRole(peerRole),
+    m_tcpKeepAliveTimeout(tcpKeepAliveTimeout),
+    m_keepAliveProbeCount(keepAliveProbeCount),
+    m_idleConnectionTimeout(tcpKeepAliveTimeout * keepAliveProbeCount)
 {
-    //TODO #ak make a default constructor of it after move to msvc2013
     m_lastConnectTime = 0;
     m_readSync = false;
     m_writeSync = false;
@@ -101,16 +108,12 @@ void QnTransactionTransportBase::default_initializer()
     m_asyncReadScheduled = false;
     m_remoteIdentityTime = 0;
     m_connectionType = ConnectionType::none;
-    m_peerRole = prOriginating;
     m_compressResponseMsgBody = false;
     m_authOutgoingConnectionByServerKey = true;
     m_sendKeepAliveTask = 0;
     m_base64EncodeOutgoingTransactions = false;
     m_sentTranSequence = 0;
     m_waiterCount = 0;
-    m_tcpKeepAliveTimeout = QnGlobalSettings::instance()->connectionKeepAliveTimeout();
-    m_keepAliveProbeCount = QnGlobalSettings::instance()->keepAliveProbeCount();
-    m_idleConnectionTimeout = m_tcpKeepAliveTimeout * m_keepAliveProbeCount;
     m_userAccessData = Qn::kSystemAccess;
 }
 
@@ -122,15 +125,19 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     ConnectionType::Type connectionType,
     const nx_http::Request& request,
     const QByteArray& contentEncoding,
-    const Qn::UserAccessData& userAccessData)
+    const Qn::UserAccessData& userAccessData,
+    std::chrono::milliseconds tcpKeepAliveTimeout,
+    int keepAliveProbeCount)
+:
+    QnTransactionTransportBase(
+        localPeer,
+        prAccepting,
+        tcpKeepAliveTimeout,
+        keepAliveProbeCount)
 {
-    default_initializer();
-
-    m_localPeer = localPeer;
     m_remotePeer = remotePeer;
     m_outgoingDataSocket = std::move(socket);
     m_connectionType = connectionType;
-    m_peerRole = prAccepting;
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
     m_userAccessData = userAccessData;
@@ -204,12 +211,17 @@ QnTransactionTransportBase::QnTransactionTransportBase(
         std::bind(&QnTransactionTransportBase::monitorConnectionForClosure, this, _1, _2) );
 }
 
-QnTransactionTransportBase::QnTransactionTransportBase( const ApiPeerData &localPeer )
+QnTransactionTransportBase::QnTransactionTransportBase(
+    const ApiPeerData& localPeer,
+    std::chrono::milliseconds tcpKeepAliveTimeout,
+    int keepAliveProbeCount)
+:
+    QnTransactionTransportBase(
+        localPeer,
+        prOriginating,
+        tcpKeepAliveTimeout,
+        keepAliveProbeCount)
 {
-    //TODO #ak msvc2013 delegate constructor
-    default_initializer();
-
-    m_localPeer = localPeer;
     m_connectionType =
 #ifdef USE_SINGLE_TWO_WAY_CONNECTION
         ConnectionType::bidirectional
@@ -217,7 +229,6 @@ QnTransactionTransportBase::QnTransactionTransportBase( const ApiPeerData &local
         ConnectionType::incoming
 #endif
         ;
-    m_peerRole = prOriginating;
     m_connectionGuid = QnUuid::createUuid();
 #ifdef ENCODE_TO_BASE64
     m_base64EncodeOutgoingTransactions = true;
@@ -387,6 +398,11 @@ void QnTransactionTransportBase::setStateNoLock(State state)
     m_cond.wakeAll();
 }
 
+const ec2::ApiPeerData& QnTransactionTransportBase::localPeer() const
+{
+    return m_localPeer;
+}
+
 QUrl QnTransactionTransportBase::remoteAddr() const
 {
     QnMutexLocker lock(&m_mutex);
@@ -479,14 +495,14 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
         Qt::DirectConnection);
 
     fillAuthInfo( m_httpClient, m_authByKey );
-    if( m_localPeer.isServer() )
+    if (m_localPeer.isServer() && QnCommonModule::instance())
         m_httpClient->addAdditionalHeader(
             Qn::EC2_SYSTEM_NAME_HEADER_NAME,
-            QnCommonModule::instance()->localSystemName().toUtf8() );
-    if( m_base64EncodeOutgoingTransactions )    //requesting server to encode transactions
+            QnCommonModule::instance()->localSystemName().toUtf8());
+    if (m_base64EncodeOutgoingTransactions)    //requesting server to encode transactions
         m_httpClient->addAdditionalHeader(
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
-            "true" );
+            "true");
     m_httpClient->addAdditionalHeader(
         Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
         nx_http::header::KeepAlive(
@@ -519,7 +535,7 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
         ConnectionType::toString(m_connectionType) );   //incoming means this peer wants to receive data via this connection
     m_httpClient->addAdditionalHeader(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        qnCommon->runningInstanceGUID().toByteArray() );
+        m_localPeer.instanceId.toByteArray() );
 
 
     // Client reconnects to the server
@@ -1180,7 +1196,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
     nx_http::HttpHeaders::const_iterator contentTypeIter = client->response()->headers.find("Content-Type");
     if( contentTypeIter == client->response()->headers.end() )
     {
-        NX_LOG( lit("Remote transaction server (%1) did not specify Content-Type in response. Aborting connecion...")
+        NX_LOG( lit("Remote transaction server (%1) did not specify Content-Type in response. Aborting connection...")
             .arg(client->url().toString()), cl_logWARNING );
         cancelConnecting();
         return;
@@ -1211,6 +1227,10 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
             //TODO #ak unsupported Content-Encoding ?
         }
     }
+
+    auto isCloudIter = client->response()->headers.find("X-Nx-Cloud");
+    if (isCloudIter != client->response()->headers.end())
+        setState(ConnectingStage2);
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
 
@@ -1273,7 +1293,6 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         m_httpClient.reset();
         if (QnTransactionTransportBase::tryAcquireConnected(m_remotePeer.id, true)) {
             setExtraDataBuffer(data);
-            m_peerRole = prOriginating;
             setState(QnTransactionTransportBase::Connected);
         }
         else {
