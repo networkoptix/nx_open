@@ -29,10 +29,7 @@ public:
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)
-        > completionHandler) override;
+        nx_http::HttpRequestProcessedHandler completionHandler) override;
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
@@ -49,10 +46,7 @@ private:
 
     nx_http::Request m_request;
     nx_http::HttpServerConnection* m_connection;
-    std::function<void(
-        const nx_http::StatusCode::Value statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)
-    > m_completionHandler;
+    nx_http::HttpRequestProcessedHandler m_completionHandler;
 
     Buffer m_connectionBuffer;
     std::unique_ptr<AbstractCommunicatingSocket> m_connectionSocket;
