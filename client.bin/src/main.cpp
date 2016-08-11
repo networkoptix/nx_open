@@ -267,7 +267,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
-    Socket::setDefaultIpVersion( startupParams.ipVersion );
+
+    SocketFactory::setIpVersion(startupParams.ipVersion);
 
     QnClientModule client(startupParams);
 

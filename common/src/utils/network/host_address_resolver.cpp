@@ -103,20 +103,20 @@ bool HostAddressResolver::resolveAddressSync( const QString& hostName, HostAddre
         return false;
     }
 
+    std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> addressInfoGuard(addressInfo, &freeaddrinfo);
+
     // TODO: support multi-address
     for (addrinfo* info = addressInfo; info; info = addressInfo->ai_next)
     {
-        if (addressInfo->ai_family = AF_INET)
+        if (info->ai_family == AF_INET)
         {
-            resolvedAddress->m_ipV4 = ((struct sockaddr_in*)(addressInfo->ai_addr))->sin_addr;
-            freeaddrinfo(addressInfo);
+            resolvedAddress->m_ipV4 = ((sockaddr_in*)(info->ai_addr))->sin_addr;
             return true;
         }
 
-        if (addressInfo->ai_family = AF_INET6)
+        if (info->ai_family == AF_INET6)
         {
-            resolvedAddress->m_ipV6 = ((struct sockaddr_in6*)(addressInfo->ai_addr))->sin6_addr;
-            freeaddrinfo(addressInfo);
+            resolvedAddress->m_ipV6 = ((sockaddr_in6*)(info->ai_addr))->sin6_addr;
             return true;
         }
     }

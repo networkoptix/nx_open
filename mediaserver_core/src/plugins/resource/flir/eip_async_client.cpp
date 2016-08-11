@@ -43,7 +43,7 @@ void EIPAsyncClient::terminate()
 
 void EIPAsyncClient::initSocket()
 {
-    m_socket = std::make_shared<TCPSocket>();
+    m_socket.reset(SocketFactory::createStreamSocket());
     if(!(m_socket->connect(m_hostAddress.toString(), static_cast<unsigned short>(m_port))))
         NX_LOG(lit("Async Ethernet/IP client failed to connect to host: %1:%2")
             .arg(m_hostAddress.toString())

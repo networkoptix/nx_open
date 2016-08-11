@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <utils/common/collection.h>
+#include <utils/network/socket_common.h>
 
 namespace {
     const qreal BYTES_IN_GB = 1000000000.0;
@@ -149,15 +150,11 @@ int QnStorageListModel::columnCount(const QModelIndex &parent) const {
 
 QString urlPath(const QString& url)
 {
-    if (url.indexOf(lit("://")) > 0) {
-        QUrl u(url);
-        // IPv6 format check
-        const auto host = u.host().contains(lit(":")) ? lit("[%1]").arg(u.host()) : u.host();
-        return host + (u.port() != -1 ? lit(":").arg(u.port()) : lit(""))  + u.path();
-    }
-    else {
+    if (url.indexOf(lit("://")) <= 0)
         return url;
-    }
+
+    const QUrl u(url);
+    return SocketAddress(u.host(), u.port(0)).toString() + u.path();
 }
 
 QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedText) const

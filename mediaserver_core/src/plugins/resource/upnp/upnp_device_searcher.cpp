@@ -323,7 +323,7 @@ void UPNPDeviceSearcher::updateReceiveSocket()
     if(m_receiveSocket)
         m_receiveSocket->cancelAsyncIO(aio::etNone);
 
-    auto udpSock = make_shared<UDPSocket>();
+    auto udpSock = make_shared<UDPSocket>(AF_INET);
     udpSock->setReuseAddrFlag(true);
     udpSock->setRecvBufferSize(MAX_UPNP_RESPONSE_PACKET_SIZE);
     udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
@@ -360,7 +360,7 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
         return p.first->second.sock;
 
     //creating new socket
-    std::shared_ptr<UDPSocket> sock( new UDPSocket() );
+    std::shared_ptr<UDPSocket> sock( new UDPSocket(AF_INET) );
 
     p.first->second.sock = sock;
     p.first->second.buf.reserve( READ_BUF_CAPACITY );

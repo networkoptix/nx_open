@@ -352,7 +352,7 @@ Socket::Socket(
         INVALID_SOCKET,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
     m_baseAsyncHelper( std::move(asyncHelper) ),
-    m_ipVersion( ipVersion ? ipVersion : s_defaultIpVersion.load() ),
+    m_ipVersion( ipVersion ),
     m_nonBlockingMode( false )
 {
     createSocket( type, protocol );
@@ -368,7 +368,7 @@ Socket::Socket(
         _sockDesc,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
     m_baseAsyncHelper( std::move(asyncHelper) ),
-    m_ipVersion( ipVersion ? ipVersion : s_defaultIpVersion.load() ),
+    m_ipVersion( ipVersion ),
     m_nonBlockingMode( false )
 {
 }
@@ -383,7 +383,7 @@ Socket::Socket(
         INVALID_SOCKET,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
     m_baseAsyncHelper( new BaseAsyncSocketImplHelper<Pollable>(this) ),
-    m_ipVersion( ipVersion ? ipVersion : s_defaultIpVersion.load() ),
+    m_ipVersion( ipVersion ),
     m_nonBlockingMode( false )
 {
     createSocket( type, protocol );
@@ -398,7 +398,7 @@ Socket::Socket(
         _sockDesc,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
     m_baseAsyncHelper( new BaseAsyncSocketImplHelper<Pollable>(this) ),
-    m_ipVersion( ipVersion ? ipVersion : s_defaultIpVersion.load() ),
+    m_ipVersion( ipVersion ),
     m_nonBlockingMode( false )
 {
 }
@@ -472,33 +472,6 @@ bool Socket::createSocket(int type, int protocol)
 #endif
     return true;
 }
-
-void Socket::setDefaultIpVersion(int version)
-{
-    s_defaultIpVersion = version;
-    NX_LOG(QString(QLatin1String("Socket::setDefaultIpVersion( %1 )")).arg(version), cl_logALWAYS);
-}
-
-void Socket::setDefaultIpVersion(const QString& version)
-{
-    if (version.isEmpty())
-        return;
-
-    if (version.endsWith(lit("4"))) //< e.g. 4, ip4, IPv4
-        return setDefaultIpVersion(AF_INET);
-
-    if (version.endsWith(lit("6"))) //< e.g. 6, ip6, IPv6
-        return setDefaultIpVersion(AF_INET6);
-
-    std::cerr << "Unsupported IP version: " << version.toStdString() << std::endl;
-    ::abort();
-}
-
-#if defined(__APPLE__) && defined(TARGET_OS_IPHONE)
-    std::atomic<int> Socket::s_defaultIpVersion(AF_INET6);
-#else
-    std::atomic<int> Socket::s_defaultIpVersion(AF_INET);
-#endif
 
 //////////////////////////////////////////////////////////
 ///////// class CommunicatingSocket

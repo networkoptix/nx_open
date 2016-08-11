@@ -38,7 +38,7 @@ public:
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
         int type,
         int protocol,
-        int ipVersion, /**< 0 means default */
+        int ipVersion,
         PollableSystemSocketImpl* impl = nullptr );
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
@@ -155,17 +155,12 @@ public:
     SockAddrPtr makeAddr(const SocketAddress& socketAddress);
     bool createSocket( int type, int protocol );
 
-    static void setDefaultIpVersion(int version);
-    static void setDefaultIpVersion(const QString& version);
-
 protected:
     std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> m_baseAsyncHelper;
     const int m_ipVersion;
 
 private:
     bool m_nonBlockingMode;
-
-    static std::atomic<int> s_defaultIpVersion;
 
     // Prevent the user from trying to use value semantics on this object
     Socket(const Socket &sock);
@@ -430,7 +425,7 @@ public:
     /**
      *   Construct a TCP socket with no connection
      */
-    TCPSocket( int ipVersion = 0 );
+    TCPSocket( int ipVersion );
 
     //!User by \a TCPServerSocket class
     TCPSocket( int newConnSD, int ipVersion );
@@ -467,7 +462,7 @@ class TCPServerSocket
     typedef SocketImplementationDelegate<AbstractStreamServerSocket, Socket> base_type;
 
 public:
-    TCPServerSocket(int ipVersion = 0);
+    TCPServerSocket(int ipVersion);
 
     /**
      *   Blocks until a new connection is established on this socket or error
@@ -506,7 +501,7 @@ public:
     /**
      *   Construct a UDP socket
      */
-    UDPSocket(int ipVersion = 0);
+    UDPSocket(int ipVersion);
 
     /**
      *   Unset foreign address and port

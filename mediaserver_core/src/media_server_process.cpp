@@ -2870,8 +2870,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     if( ipVersion.isEmpty() )
         ipVersion = MSSettings::roSettings()->value(QLatin1String("ipVersion")).toString();
 
-    Socket::setDefaultIpVersion( ipVersion );
-
+    SocketFactory::setIpVersion( ipVersion );
     QnVideoService service( argc, argv );
 
     if (!engineVersion.isEmpty()) {
