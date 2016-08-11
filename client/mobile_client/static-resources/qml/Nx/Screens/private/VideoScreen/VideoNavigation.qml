@@ -44,7 +44,7 @@ Item
 
     QnCameraChunkProvider
     {
-        id: chunkProvider
+        id: cameraChunkProvider
         resourceId: player.resourceId
     }
 
@@ -54,7 +54,7 @@ Item
         triggeredOnStart: true
         running: true
         repeat: true
-        onTriggered: chunkProvider.update()
+        onTriggered: cameraChunkProvider.update()
     }
 
     Item
@@ -145,8 +145,8 @@ Item
                 chunkBarHeight: 32
                 textY: height - chunkBarHeight - 16 - 24
 
-                chunkProvider: chunkProvider
-                startBound: chunkProvider.bottomBound
+                chunkProvider: cameraChunkProvider
+                startBound: cameraChunkProvider.bottomBound
 
                 onMoveFinished:
                 {
@@ -260,8 +260,9 @@ Item
                     enabled: d.hasArchive
                     onClicked:
                     {
-                        calendarPanel.date = timeline.positionDate
-                        calendarPanel.open()
+                        calendarPanelLoader.active = true
+                        calendarPanelLoader.item.date = timeline.positionDate
+                        calendarPanelLoader.item.open()
                     }
                 }
 
@@ -429,16 +430,27 @@ Item
         height: navigationPanel.height
     }
 
-    CalendarPanel
+    Component
     {
-        id: calendarPanel
+        id: calendarPanelComponent
 
-        chunkProvider: chunkProvider
-        onDatePicked:
+        CalendarPanel
         {
-            close()
-            mediaPlayer.position = date.getTime()
+            chunkProvider: cameraChunkProvider
+            onDatePicked:
+            {
+                close()
+                mediaPlayer.position = date.getTime()
+            }
         }
+    }
+
+    Loader
+    {
+        id: calendarPanelLoader
+        sourceComponent: calendarPanelComponent
+        active: false
+        y: parent.height - height
     }
 
     Component.onCompleted: d.updateNavigatorPosition()

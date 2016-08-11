@@ -16,10 +16,8 @@ Popup
     closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
     modal: true
 
-    width: contentItem.implicitWidth
-    height: contentItem.implicitHeight
-    x: 0
-    y: parent.height - contentItem.implicitHeight
+    implicitWidth: contentItem.implicitWidth
+    implicitHeight: contentItem.implicitHeight
     padding: 0
 
     background: null
