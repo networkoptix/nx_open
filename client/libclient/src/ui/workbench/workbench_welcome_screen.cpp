@@ -234,11 +234,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
             setConnectingToSystem(systemId);
 
             const auto completionGuard = QnRaiiGuard::createDestructable(
-                [this]()
-            {
-                setConnectingToSystem(QString());
-                widget()->activateWindow();
-            });
+                [this]() { setConnectingToSystem(QString()); });
 
             QUrl url = QUrl::fromUserInput(serverUrl);
             url.setScheme(lit("http"));
