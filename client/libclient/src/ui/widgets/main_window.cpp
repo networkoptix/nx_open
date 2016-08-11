@@ -597,7 +597,7 @@ void QnMainWindow::updateDwmState() {
         /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
          * Looks like Qt bug: https://bugreports.qt.io/browse/QTBUG-7556 */
 #ifdef Q_OS_WIN
-        setContentsMargins(0, 1, 0, 0);
+        setContentsMargins(1, 0, 0, 0);
 #else
         setContentsMargins(0, 0, 0, 0);
 #endif
