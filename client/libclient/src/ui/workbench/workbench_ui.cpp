@@ -191,8 +191,10 @@ namespace
     const int kShowControlsTimeoutMs = 250;
     const int kHideControlsTimeoutMs = 2000;
     const int kCloseControlsTimeoutMs = 2000;
+    const int kShowTimelineTimeoutMs = 100;
+    const int kCloseTimelineTimeoutMs = 250;
 
-    const int kSliderAutoHideTimeoutMs = 10000;
+    const int kVideoWallTimelineAutoHideTimeoutMs = 10000;
 
     const int kButtonInactivityTimeoutMs = 300;
 
@@ -248,6 +250,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderOpacityProcessor(nullptr),
     m_sliderYAnimator(nullptr),
     m_sliderShowButton(nullptr),
+    m_sliderShowWidget(nullptr),
+    m_sliderShowingProcessor(nullptr),
+    m_sliderHidingProcessor(nullptr),
     m_sliderOpacityAnimatorGroup(nullptr),
     m_sliderAutoHideTimer(nullptr),
 
@@ -826,10 +831,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
     {
         updateActivityInstrumentState();
         updateViewportMargins();
-    }
 
-    if (role == Qn::ZoomedRole)
-    {
         if (newWidget)
         {
             if (!alreadyZoomed)
@@ -845,6 +847,8 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
             /* Viewport margins have changed, force fit-in-view. */
             display()->fitInView();
         }
+
+        m_sliderShowWidget->setVisible(newWidget);
     }
 
     if (qnRuntime->isVideoWallMode())
@@ -1288,61 +1292,30 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeShowButton));
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treePinButton));
 
-    {
-        /* Do not auto-hide tree if we have opened context menu. */
-        auto connectTreeHidingProcessor = [this]
+    connect(m_treeHidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
+        [this]
         {
-            connect(m_treeHidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this, [this]()
-            {
-                if (!isTreePinned())
-                    setTreeOpened(false);
-            });
-        };
-
-        QnSingleEventSignalizer *treeMenuSignalizer = new QnSingleEventSignalizer(this);
-        treeMenuSignalizer->setEventType(QEvent::GraphicsSceneContextMenu);
-        m_treeItem->installEventFilter(treeMenuSignalizer);
-        connect(treeMenuSignalizer,         &QnAbstractEventSignalizer::activated,  this,   [this, connectTreeHidingProcessor]
-        {
-            if (isTreePinned() || !isTreeOpened())
-                return;
-
-            disconnect(m_treeHidingProcessor,  &HoverFocusProcessor::hoverFocusLeft, this, nullptr);
-
-            QnCounter* counter = new QnCounter(1, this);
-            connect(menu(), &QnActionManager::menuAboutToShow, counter, &QnCounter::increment);
-            connect(menu(), &QnActionManager::menuAboutToHide, counter, &QnCounter::decrement);
-            connect(counter, &QnCounter::reachedZero, this, [this, connectTreeHidingProcessor]
-            {
-                connectTreeHidingProcessor();
-                m_treeHidingProcessor->forceFocusLeave();
-            });
-            connect(counter, &QnCounter::reachedZero, counter, &QObject::deleteLater);
-
-            /* Make sure counter will be triggered even if no menu created. */
-            QTimer* nullMenuTimer = new QTimer(this);
-            nullMenuTimer->setSingleShot(true);
-            nullMenuTimer->setInterval(500);
-            connect(nullMenuTimer, &QTimer::timeout, counter, &QnCounter::decrement);
-            connect(nullMenuTimer, &QTimer::timeout, nullMenuTimer, &QObject::deleteLater);
-            nullMenuTimer->start();
+            /* Do not auto-hide tree if we have opened context menu. */
+            if (!isTreePinned() && isTreeOpened() && !menu()->isMenuVisible())
+                setTreeOpened(false);
         });
-        connectTreeHidingProcessor();
-    }
+
+    connect(menu(), &QnActionManager::menuAboutToHide, m_treeHidingProcessor,
+        &HoverFocusProcessor::forceFocusLeave);
 
     connect(m_treeWidget,               &QnResourceBrowserWidget::selectionChanged, action(QnActions::SelectionChangeAction),  &QAction::trigger);
-    connect(m_treeWidget,               &QnResourceBrowserWidget::activated,        this,                               &QnWorkbenchUi::at_treeWidget_activated);
-    connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverLeft,            this,                               &QnWorkbenchUi::updateTreeOpacityAnimated);
-    connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverEntered,         this,                               &QnWorkbenchUi::updateTreeOpacityAnimated);
-    connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverEntered,         this,                               &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverLeft,            this,                               &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_treeShowingProcessor,     &HoverFocusProcessor::hoverEntered,         this,                               &QnWorkbenchUi::at_treeShowingProcessor_hoverEntered);
-    connect(m_treeItem,                 &QnMaskedProxyWidget::paintRectChanged,     this,                               &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
-    connect(m_treeItem,                 &QGraphicsWidget::geometryChanged,          this,                               &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
-    connect(m_treeResizerWidget,        &QGraphicsWidget::geometryChanged,          this,                               &QnWorkbenchUi::at_treeResizerWidget_geometryChanged, Qt::QueuedConnection);
-    connect(toggleTreeAction,           &QAction::toggled,                          this,                               [this](bool checked){ if (!m_ignoreClickEvent) setTreeOpened(checked);});
-    connect(pinTreeAction,              &QAction::toggled,                          this,                               &QnWorkbenchUi::at_pinTreeAction_toggled);
-    connect(action(QnActions::PinNotificationsAction), &QAction::toggled,           this,                               &QnWorkbenchUi::at_pinNotificationsAction_toggled);
+    connect(m_treeWidget,               &QnResourceBrowserWidget::activated,        this,  &QnWorkbenchUi::at_treeWidget_activated);
+    connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverLeft,            this,  &QnWorkbenchUi::updateTreeOpacityAnimated);
+    connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverEntered,         this,  &QnWorkbenchUi::updateTreeOpacityAnimated);
+    connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverEntered,         this,  &QnWorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverLeft,            this,  &QnWorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_treeShowingProcessor,     &HoverFocusProcessor::hoverEntered,         this,  &QnWorkbenchUi::at_treeShowingProcessor_hoverEntered);
+    connect(m_treeItem,                 &QnMaskedProxyWidget::paintRectChanged,     this,  &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
+    connect(m_treeItem,                 &QGraphicsWidget::geometryChanged,          this,  &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
+    connect(m_treeResizerWidget,        &QGraphicsWidget::geometryChanged,          this,  &QnWorkbenchUi::at_treeResizerWidget_geometryChanged, Qt::QueuedConnection);
+    connect(toggleTreeAction,           &QAction::toggled,                          this,  [this](bool checked){ if (!m_ignoreClickEvent) setTreeOpened(checked);});
+    connect(pinTreeAction,              &QAction::toggled,                          this,  &QnWorkbenchUi::at_pinTreeAction_toggled);
+    connect(action(QnActions::PinNotificationsAction), &QAction::toggled,           this,  &QnWorkbenchUi::at_pinNotificationsAction_toggled);
 }
 
 #pragma endregion Tree widget methods
@@ -2109,6 +2082,11 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
 
 #pragma region SliderWidget
 
+void QnWorkbenchUi::setSliderShowButtonUsed(bool used)
+{
+    m_sliderShowButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
+}
+
 bool QnWorkbenchUi::isThumbnailsVisible() const
 {
     qreal height = m_sliderItem->geometry().height();
@@ -2136,6 +2114,12 @@ bool QnWorkbenchUi::isSliderOpened() const
     return action(QnActions::ToggleSliderAction)->isChecked();
 }
 
+bool QnWorkbenchUi::isSliderPinned() const
+{
+    /* Auto-hide slider when some item is zoomed, otherwise - don't. */
+    return m_widgetByRole[Qn::ZoomedRole] == nullptr;
+}
+
 void QnWorkbenchUi::setSliderOpened(bool opened, bool animate)
 {
     if (qnRuntime->isVideoWallMode())
@@ -2148,7 +2132,8 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate)
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
     action(QnActions::ToggleSliderAction)->setChecked(opened);
 
-    qreal newY = m_controlsWidgetRect.bottom() + (opened ? -m_sliderItem->size().height() : 48.0 /* So that tooltips are not opened. */);
+    qreal newY = m_controlsWidgetRect.bottom()
+        + (opened ? -m_sliderItem->size().height() : 64.0 /* So that tooltips are not opened. */);
     if (animate)
     {
         m_sliderYAnimator->animateTo(newY);
@@ -2174,7 +2159,7 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate)
     if (qnRuntime->isVideoWallMode())
     {
         if (visible)
-            m_sliderAutoHideTimer->start(kSliderAutoHideTimeoutMs);
+            m_sliderAutoHideTimer->start(kVideoWallTimelineAutoHideTimeoutMs);
         else
             m_sliderAutoHideTimer->stop();
     }
@@ -2257,6 +2242,7 @@ void QnWorkbenchUi::updateSliderResizerGeometry()
         /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
         m_sliderResizerWidget->setPos(sliderResizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
     }
+
 }
 
 void QnWorkbenchUi::updateSliderZoomButtonsGeometry()
@@ -2289,9 +2275,24 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged()
     updateDayTimeWidgetGeometry();
 
     QRectF geometry = m_sliderItem->geometry();
-    m_sliderShowButton->setPos(QPointF(
-        (geometry.left() + geometry.right() - (m_titleShowButton ? m_titleShowButton->size().height() : 0)) / 2,
-        qMin(m_controlsWidgetRect.bottom(), geometry.top())));
+
+    /* Button is painted rotated, so we taking into account its height, not width. */
+    QPointF showButtonPos(
+        (geometry.left() + geometry.right() - m_sliderShowButton->geometry().height()) / 2,
+        qMin(m_controlsWidgetRect.bottom(), geometry.top()));
+    m_sliderShowButton->setPos(showButtonPos);
+
+    static const int kShowWidgetHeight = 50;
+    static const int kShowWidgetHiddenHeight = 12;
+
+    const int showWidgetShowOffset = geometry.top() <= m_controlsWidgetRect.bottom()
+        ? kShowWidgetHeight
+        : kShowWidgetHiddenHeight;
+
+    QRectF showWidgetGeometry(geometry);
+    showWidgetGeometry.setTop(showButtonPos.y() - showWidgetShowOffset);
+    showWidgetGeometry.setHeight(kShowWidgetHeight);
+    m_sliderShowWidget->setGeometry(showWidgetGeometry);
 
     if (isThumbnailsVisible())
     {
@@ -2369,6 +2370,24 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     }
     m_sliderShowButton->setFocusProxy(m_sliderItem);
 
+    m_sliderShowWidget = new GraphicsWidget(m_controlsWidget);
+    m_sliderShowWidget->setProperty(Qn::NoHandScrollOver, true);
+    m_sliderShowWidget->setFlag(QGraphicsItem::ItemHasNoContents, true);
+    m_sliderShowWidget->setVisible(false);
+
+    m_sliderShowingProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_sliderShowingProcessor->addTargetItem(m_sliderShowButton);
+    m_sliderShowingProcessor->addTargetItem(m_sliderShowWidget);
+    m_sliderShowingProcessor->setHoverEnterDelay(kShowTimelineTimeoutMs);
+
+    m_sliderHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_sliderHidingProcessor->addTargetItem(m_sliderItem);
+    m_sliderHidingProcessor->addTargetItem(m_sliderShowButton);
+    m_sliderHidingProcessor->addTargetItem(m_sliderResizerWidget);
+    m_sliderHidingProcessor->addTargetItem(m_sliderShowWidget);
+    m_sliderHidingProcessor->setHoverLeaveDelay(kCloseTimelineTimeoutMs);
+    m_sliderHidingProcessor->setFocusLeaveDelay(kCloseTimelineTimeoutMs);
+
     if (qnRuntime->isVideoWallMode())
     {
         m_sliderShowButton->setVisible(false);
@@ -2407,7 +2426,8 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     m_sliderShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
     m_sliderResizerWidget->stackBefore(m_sliderShowButton);
     m_sliderResizerWidget->stackBefore(m_sliderZoomButtonsWidget);
-    m_sliderItem->stackBefore(m_sliderResizerWidget);
+    m_sliderShowWidget->stackBefore(m_sliderResizerWidget);
+    m_sliderItem->stackBefore(m_sliderShowWidget);
     m_sliderItem->timeSlider()->toolTipItem()->stackBefore(m_sliderItem->timeSlider()->bookmarksViewer());
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
@@ -2454,6 +2474,33 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     connect(m_sliderOpacityProcessor,   &HoverFocusProcessor::hoverLeft,            this,           &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(m_sliderItem,               &QGraphicsWidget::geometryChanged,          this,           &QnWorkbenchUi::at_sliderItem_geometryChanged);
     connect(m_sliderResizerWidget,      &QGraphicsWidget::geometryChanged,          this,           &QnWorkbenchUi::at_sliderResizerWidget_geometryChanged);
+
+    connect(m_sliderShowingProcessor, &HoverFocusProcessor::hoverEntered, this,
+        [this]
+        {
+            if (!isSliderPinned() && !isSliderOpened())
+            {
+                setSliderOpened(true);
+
+                /* So that the click that may follow won't hide it. */
+                setSliderShowButtonUsed(false);
+                QTimer::singleShot(kButtonInactivityTimeoutMs, this, [this]() { setSliderShowButtonUsed(true); });
+            }
+
+            m_sliderHidingProcessor->forceHoverEnter();
+        });
+
+    connect(m_sliderHidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
+        [this]
+        {
+            /* Do not auto-hide slider if we have opened context menu. */
+            if (!isSliderPinned() && isSliderOpened() && !menu()->isMenuVisible())
+                setSliderOpened(false);
+        });
+
+    connect(menu(), &QnActionManager::menuAboutToHide, m_sliderHidingProcessor,
+        &HoverFocusProcessor::forceFocusLeave);
+
     connect(navigator(),                &QnWorkbenchNavigator::currentWidgetChanged,this,           &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
     if (qnRuntime->isVideoWallMode())

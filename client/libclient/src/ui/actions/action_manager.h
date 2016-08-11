@@ -145,6 +145,8 @@ public:
      */
     void redirectAction(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction);
 
+    /** Check if any menu is visible right now */
+    bool isMenuVisible() const;
 signals:
     void menuAboutToShow(QMenu* menu);
     void menuAboutToHide(QMenu* menu);

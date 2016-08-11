@@ -2306,18 +2306,24 @@ QnActionParameters QnActionManager::currentParameters(QnAction *action) const
 QnActionParameters QnActionManager::currentParameters(QObject *sender) const
 {
     if (QnAction *action = checkSender(sender))
-    {
         return currentParameters(action);
-    }
-    else
-    {
-        return QnActionParameters();
-    }
+    return QnActionParameters();
 }
 
 void QnActionManager::redirectAction(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction)
 {
     redirectActionRecursive(menu, sourceId, targetAction);
+}
+
+bool QnActionManager::isMenuVisible() const
+{
+    for (auto menuObject : m_parametersByMenu.keys())
+    {
+        if (!menuObject)
+            continue;
+        return true;
+    }
+    return false;
 }
 
 bool QnActionManager::redirectActionRecursive(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction)

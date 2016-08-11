@@ -103,6 +103,8 @@ public:
     /** Whether navigation slider is opened. */
     bool isSliderOpened() const;
 
+    bool isSliderPinned() const;
+
     /** Whether title bar is opened. */
     bool isTitleOpened() const;
 
@@ -222,6 +224,7 @@ private slots:
     void updateCalendarVisibilityAnimated() { updateCalendarVisibility(true); }
     void updateControlsVisibilityAnimated() { updateControlsVisibility(true); }
 
+    void setSliderShowButtonUsed(bool used);
     void setTreeShowButtonUsed(bool used);
     void setNotificationsShowButtonUsed(bool used);
     void setCalendarShowButtonUsed(bool used);
@@ -306,7 +309,6 @@ private:
 
     Panels m_unzoomedOpenedPanels;
 
-
     /* Slider-related state. */
 
     /** Navigation item. */
@@ -331,6 +333,15 @@ private:
     VariantAnimator *m_sliderYAnimator;
 
     QnImageButtonWidget *m_sliderShowButton;
+
+    /** Special widget to show slider by hover. */
+    QGraphicsWidget* m_sliderShowWidget;
+
+    /** Hover processor that is used to show the slider when the mouse hovers over it. */
+    HoverFocusProcessor *m_sliderShowingProcessor;
+
+    /** Hover processor that is used to hide the slider when the mouse leaves it. */
+    HoverFocusProcessor *m_sliderHidingProcessor;
 
     AnimatorGroup *m_sliderOpacityAnimatorGroup;
 
