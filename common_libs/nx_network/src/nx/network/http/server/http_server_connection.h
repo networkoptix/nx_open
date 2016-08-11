@@ -24,7 +24,41 @@ namespace stree
 namespace nx_http
 {
     class AbstractAuthenticationManager;
+    class NX_NETWORK_API HttpServerConnection;
     class MessageDispatcher;
+
+    /** Used to install handlers on some events on HTTP connection.
+        \warning There is no way to remove installed event handler.
+            Event handler implementation MUST ensure it does not crash
+    */
+    class ConnectionEvents
+    {
+    public:
+        nx::utils::MoveOnlyFunc<void(HttpServerConnection*)> onResponseHasBeenSent;
+    };
+
+    struct ResponseMessageContext
+    {
+        nx_http::Message msg;
+        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody;
+        ConnectionEvents connectionEvents;
+
+        ResponseMessageContext(
+            nx_http::Message msg,
+            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+            ConnectionEvents connectionEvents)
+        :
+            msg(std::move(msg)),
+            responseMsgBody(std::move(responseMsgBody)),
+            connectionEvents(std::move(connectionEvents))
+        {
+        }
+    };
+
+    typedef nx::utils::MoveOnlyFunc<void(
+        nx_http::Message,
+        std::unique_ptr<nx_http::AbstractMsgBodySource>,
+        ConnectionEvents)> ResponseIsReadyHandler;
 
     template<typename ConnectionType> using BaseConnection = 
         nx_api::BaseStreamProtocolConnection<
@@ -59,26 +93,11 @@ namespace nx_http
         void processMessage(nx_http::Message&& request);
 
     private:
-        struct ResponseContext
-        {
-            nx_http::Message msg;
-            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody;
-
-            ResponseContext(
-                nx_http::Message _msg,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> _responseMsgBody)
-            :
-                msg(std::move(_msg)),
-                responseMsgBody(std::move(_responseMsgBody))
-            {
-            }
-        };
-
         nx_http::AbstractAuthenticationManager* const m_authenticationManager;
         nx_http::MessageDispatcher* const m_httpMessageDispatcher;
         std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
         bool m_isPersistent;
-        std::deque<ResponseContext> m_responseQueue;
+        std::deque<ResponseMessageContext> m_responseQueue;
 
         void onAuthenticationDone(
             bool authenticationResult,
@@ -95,7 +114,8 @@ namespace nx_http
         void prepareAndSendResponse(
             nx_http::MimeProtoVersion version,
             nx_http::Message&& response,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody );
+            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+            ConnectionEvents connectionEvents = ConnectionEvents());
         void sendNextResponse();
         void responseSent();
         void someMsgBodyRead( SystemError::ErrorCode, BufferType buf );

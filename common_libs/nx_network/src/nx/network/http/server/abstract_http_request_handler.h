@@ -18,6 +18,11 @@
 
 namespace nx_http
 {
+    typedef nx::utils::MoveOnlyFunc<void(
+        const nx_http::StatusCode::Value statusCode,
+        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource,
+        ConnectionEvents connectionEvents)> HttpRequestProcessedHandler;
+
     //!Base class for all HTTP request processors
     /*!
         \note Class methods are not thread-safe
@@ -38,9 +43,7 @@ namespace nx_http
             nx_http::HttpServerConnection* const connection,
             nx_http::Message&& request,
             stree::ResourceContainer&& authInfo,
-            std::function<void(
-                nx_http::Message&&,
-                std::unique_ptr<nx_http::AbstractMsgBodySource>)> completionHandler );
+            ResponseIsReadyHandler completionHandler);
 
     protected:
         //!Implement this method to handle request
@@ -53,22 +56,19 @@ namespace nx_http
             stree::ResourceContainer authInfo,
             nx_http::Request request,
             nx_http::Response* const response,
-            std::function<void(
-                const nx_http::StatusCode::Value statusCode,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler ) = 0;
+            nx_http::HttpRequestProcessedHandler completionHandler ) = 0;
 
         nx_http::Response* response();
 
     private:
         nx_http::Message m_responseMsg;
-        std::function<void(
-            nx_http::Message&&,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> )> m_completionHandler;
+        ResponseIsReadyHandler m_completionHandler;
 
         void requestDone(
             //size_t reqID,
             nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource );
+            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource,
+            ConnectionEvents connectionEvents);
     };
 }
 

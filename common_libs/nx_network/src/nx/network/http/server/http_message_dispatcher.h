@@ -8,20 +8,16 @@
 
 #include <memory>
 
+#include <nx/network/connection_server/message_dispatcher.h>
+#include <nx/utils/std/cpp14.h>
+
 #include "abstract_http_request_handler.h"
 #include "http_server_connection.h"
-#include <nx/network/connection_server/message_dispatcher.h>
-#include "nx/utils/std/cpp14.h"
 
 
 namespace nx_http
 {
     //TODO #ak this class MUST search processor by max string prefix
-
-    typedef std::function<void(
-            nx_http::Message&&,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> )
-        > HttpRequestCompletionFunc;
 
     static const nx_http::StringType kAnyMethod;
     static const QString kAnyPath;
@@ -127,10 +123,14 @@ namespace nx_http
             return requestProcessorPtr->processRequest(
                 conn, std::move(message), std::move(authInfo),
                 [completionFunc, requestProcessorPtr](
-                    nx_http::Message&& responseMsg,
-                    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody) mutable
+                    nx_http::Message responseMsg,
+                    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+                    ConnectionEvents connectionEvents) mutable
                 {
-                    completionFunc(std::move(responseMsg), std::move(responseMsgBody));
+                    completionFunc(
+                        std::move(responseMsg),
+                        std::move(responseMsgBody),
+                        std::move(connectionEvents));
                     delete requestProcessorPtr;
                 });
         }

@@ -55,9 +55,7 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request request,
         nx_http::Response* const /*response*/,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
+        nx_http::HttpRequestProcessedHandler completionHandler )
     {
         m_timer.start(
             std::chrono::seconds(5),
@@ -65,7 +63,8 @@ public:
             {
                 completionHandler(
                     nx_http::StatusCode::ok,
-                    std::unique_ptr<nx_http::AbstractMsgBodySource>());
+                    std::unique_ptr<nx_http::AbstractMsgBodySource>(),
+                    nx_http::ConnectionEvents());
             });
     }
 
@@ -121,16 +120,15 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request request,
         nx_http::Response* const response,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
+        nx_http::HttpRequestProcessedHandler completionHandler )
     {
         response->headers.emplace(
             "Seq",
             nx_http::getHeaderValue( request.headers, "Seq" ) );
         completionHandler(
             nx_http::StatusCode::ok,
-            std::make_unique<nx_http::BufferSource>("text/plain", "bla-bla-bla"));
+            std::make_unique<nx_http::BufferSource>("text/plain", "bla-bla-bla"),
+            nx_http::ConnectionEvents());
     }
 };
 

@@ -83,8 +83,14 @@ namespace nx_http
                     std::unique_ptr<AbstractMsgBodySource> msgBody) mutable
             {
                 auto strongThis = weakThis.lock();
-                if (!strongThis || !socket())
-                    return; //connection has been removed while request authentication in progress
+                if (!strongThis)
+                    return;
+
+                if (!socket())  //< connection has been removed while request authentication in progress
+                {
+                    closeConnection(SystemError::noError);
+                    return;
+                }
 
                 strongThis->post(
                     [this,
@@ -128,25 +134,35 @@ namespace nx_http
         std::weak_ptr<HttpServerConnection> weakThis = strongRef;
 
         auto protoVersion = requestMessage.request->requestLine.version;
-        auto sendResponseFunc = [this, weakThis, protoVersion](
-            nx_http::Message&& response,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody) mutable
-        {
-            auto strongThis = weakThis.lock();
-            if (!strongThis || !socket())
-                return; //connection has been removed while request has been processed
-            strongThis->post(
-                [this, strongThis = std::move(strongThis),
-                protoVersion = std::move(protoVersion),
-                response = std::move(response),
-                responseMsgBody = std::move(responseMsgBody)]() mutable
+        auto sendResponseFunc =
+            [this, weakThis, protoVersion](
+                nx_http::Message response,
+                std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+                ConnectionEvents connectionEvents) mutable
             {
-                prepareAndSendResponse(
-                    std::move(protoVersion),
-                    std::move(response),
-                    std::move(responseMsgBody));
-            });
-        };
+                auto strongThis = weakThis.lock();
+                if (!strongThis)
+                    return;
+                if (!socket())  //< connection has been removed while request has been processed
+                {
+                    closeConnection(SystemError::noError);
+                    return;
+                }
+
+                strongThis->post(
+                    [this, strongThis = std::move(strongThis),
+                        protoVersion = std::move(protoVersion),
+                        response = std::move(response),
+                        responseMsgBody = std::move(responseMsgBody),
+                        connectionEvents = std::move(connectionEvents)]() mutable
+                    {
+                        prepareAndSendResponse(
+                            std::move(protoVersion),
+                            std::move(response),
+                            std::move(responseMsgBody),
+                            std::move(connectionEvents));
+                    });
+            };
 
         if (!m_httpMessageDispatcher ||
             !m_httpMessageDispatcher->dispatchRequest(
@@ -192,7 +208,8 @@ namespace nx_http
     void HttpServerConnection::prepareAndSendResponse(
         nx_http::MimeProtoVersion version,
         nx_http::Message&& msg,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
+        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+        ConnectionEvents connectionEvents)
     {
         msg.response->statusLine.version = std::move( version );
         msg.response->statusLine.reasonPhrase =
@@ -236,7 +253,8 @@ namespace nx_http
         //posting request to the queue 
         m_responseQueue.emplace_back(
             std::move(msg),
-            std::move(responseMsgBody));
+            std::move(responseMsgBody),
+            std::move(connectionEvents));
         if (m_responseQueue.size() == 1)
             sendNextResponse();
     }
@@ -298,11 +316,19 @@ namespace nx_http
     void HttpServerConnection::fullMessageHasBeenSent()
     {
         NX_ASSERT(!m_responseQueue.empty());
+        if (m_responseQueue.front().connectionEvents.onResponseHasBeenSent)
+        {
+            auto handler = 
+                std::move(m_responseQueue.front().connectionEvents.onResponseHasBeenSent);
+            handler(this);
+        }
         m_responseQueue.pop_front();
 
         //if connection is NOT persistent then closing it
         m_currentMsgBody.reset();
-        if (!m_isPersistent)
+
+        if (!socket() ||           //< socket could be taken by event handler
+            !m_isPersistent)
         {
             closeConnection(SystemError::noError);
             return;
