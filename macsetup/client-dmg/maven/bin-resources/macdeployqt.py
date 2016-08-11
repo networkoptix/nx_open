@@ -150,7 +150,10 @@ def main(app_path, bindir, libdir, helpdir, qtdir, qtver):
     for binary in prepare(client_binary, bindir, tlibdir):
         fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver)
 
-    shutil.copytree(helpdir, "{app_path}/Contents/Resources/help".format(app_path=app_path))
+    resources_dir = "{app_path}/Contents/Resources".format(app_path=app_path)
+    help_dir = "{}/help".format(resources_dir)
+    shutil.copytree(helpdir, help_dir)
+    shutil.copy(join(bindir, 'launcher.version'), resources_dir)
 
 if __name__ == '__main__':
     _, appdir, bindir, libdir, helpdir, qtdir, qtver = sys.argv
