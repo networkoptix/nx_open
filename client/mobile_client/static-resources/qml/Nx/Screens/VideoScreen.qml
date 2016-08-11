@@ -252,60 +252,20 @@ PageBase
     {
         id: dummyComponent
 
-        Column
+        VideoDummy
         {
-            id: videoDummy
-
-            Image
+            state:
             {
-                width: 136
-                height: 136
-
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                source:
-                {
-                    if (d.serverOffline)
-                        return lp("/images/server_offline_1.png")
-                    else if (d.cameraUnauthorized)
-                        return lp("/images/camera_locked_1.png")
-                    else if (d.cameraOffline)
-                        return lp("/images/camera_offline_1.png")
-                    else if (d.failed)
-                        return lp("/images/camera_warning_1.png")
-                    else
-                        return ""
-                }
-            }
-
-            Text
-            {
-                height: 96
-                color: ColorTheme.base13
-
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: 32
-                font.weight: Font.Normal
-
-                wrapMode: Text.WordWrap
-                width: videoScreen.width
-
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                text:
-                {
-                    if (d.serverOffline)
-                        return qsTr("Server offline")
-                    else if (d.cameraUnauthorized)
-                        return qsTr("Authentication\nrequired")
-                    else if (d.cameraOffline)
-                        return qsTr("Camera offline")
-                    else if (d.failed)
-                        return qsTr("Can't load video")
-                    else
-                        return ""
-                }
+                if (d.serverOffline)
+                    return "serverOffline"
+                else if (d.cameraUnauthorized)
+                    return "cameraUnauthorized"
+                else if (d.cameraOffline)
+                    return "cameraOffline"
+                else if (d.failed)
+                    return "videoLoadingFailed"
+                else
+                    return ""
             }
         }
     }
