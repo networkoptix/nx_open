@@ -29,7 +29,11 @@ Item
             if (displayMode == QnLiteClientLayoutHelper.SingleCamera)
             {
                 if (stackView.currentItem.objectName != "videoScreen")
-                    Workflow.openVideoScreen(singleCameraId)
+                {
+                    var item = Workflow.openVideoScreen(singleCameraId)
+                    item.layoutHelper = gridLayoutHelper
+                    item.camerasModel = camerasModel
+                }
             }
             else
             {
@@ -41,35 +45,6 @@ Item
     QnCameraListModel
     {
         id: camerasModel
-
-        function nextResourceId(resourceId)
-        {
-            if (count == 0)
-                return ""
-
-            if (resourceId == "")
-                return resourceIdByRow(0)
-
-            var index = rowByResourceId(resourceId)
-            if (index == count - 1)
-                return ""
-
-            return resourceIdByRow(index + 1)
-        }
-        function previousResourceId(resourceId)
-        {
-            if (count == 0)
-                return ""
-
-            if (resourceId == "")
-                return resourceIdByRow(count - 1)
-
-            var index = rowByResourceId(resourceId)
-            if (index == 0)
-                return ""
-
-            return resourceIdByRow(index - 1)
-        }
     }
 
     GridView

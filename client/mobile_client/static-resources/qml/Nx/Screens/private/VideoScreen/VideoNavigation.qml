@@ -45,7 +45,7 @@ Item
     QnCameraChunkProvider
     {
         id: cameraChunkProvider
-        resourceId: player.resourceId
+        resourceId: mediaPlayer.resourceId
     }
 
     Timer

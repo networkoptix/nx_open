@@ -99,6 +99,7 @@ function openVideoScreen(resourceId, screenshotUrl, xHint, yHint)
             }
     )
     item.forceActiveFocus()
+    return item
 }
 
 function openSettingsScreen(systemName)

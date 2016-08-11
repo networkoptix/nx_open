@@ -133,6 +133,36 @@ QString QnCameraListModel::resourceIdByRow(int row) const
     return data(index(row, 0), Qn::UuidRole).toString();
 }
 
+QString QnCameraListModel::nextResourceId(const QString& resourceId) const
+{
+    if (rowCount() == 0)
+        return QString();
+
+    if (resourceId.isEmpty())
+        return resourceIdByRow(0);
+
+    int row = rowByResourceId(resourceId);
+    if (row == rowCount() - 1)
+        return QString();
+
+    return resourceIdByRow(row + 1);
+}
+
+QString QnCameraListModel::previousResourceId(const QString& resourceId) const
+{
+    if (rowCount() == 0)
+        return QString();
+
+    if (resourceId.isEmpty())
+        return resourceIdByRow(rowCount() - 1);
+
+    int row = rowByResourceId(resourceId);
+    if (row == 0)
+        return QString();
+
+    return resourceIdByRow(row - 1);
+}
+
 void QnCameraListModel::refreshThumbnail(int row)
 {
     if (!QnCameraThumbnailCache::instance())
