@@ -169,9 +169,8 @@ const int kButtonInactivityTimeoutMs = 300;
 
 } // anonymous namespace
 
+#ifdef QN_DEBUG_WIDGET
 static QtMessageHandler previousMsgHandler = 0;
-
-#ifdef _DEBUG
 static QnDebugProxyLabel* debugLabel = 0;
 
 static void uiMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
@@ -363,7 +362,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 QnWorkbenchUi::~QnWorkbenchUi()
 {
+#ifdef QN_DEBUG_WIDGET
     debugLabel = 0;
+#endif // QN_DEBUG_WIDGET
+
     /* The disconnect call is needed so that our methods don't get triggered while
      * the ui machinery is shutting down. */
     disconnectAll();
@@ -2709,7 +2711,7 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
 
 #pragma region DebugWidget
 
-#ifdef _DEBUG
+#ifdef QN_DEBUG_WIDGET
 void QnWorkbenchUi::createDebugWidget()
 {
     m_debugOverlayLabel = new QnDebugProxyLabel(m_controlsWidget);
