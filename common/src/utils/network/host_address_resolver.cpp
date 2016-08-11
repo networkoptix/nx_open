@@ -125,15 +125,7 @@ bool HostAddressResolver::resolveAddressSync( const QString& hostName, HostAddre
     return true;
 }
 
-bool HostAddressResolver::resolveAddressSync(const HostAddress& host)
-{
-    if (isAddressResolved(host))
-        return true;
-
-    return resolveAddressSync(host.toString(), const_cast<HostAddress*>(&host));
-}
-
-bool HostAddressResolver::isAddressResolved( const HostAddress& addr ) const
+bool HostAddressResolver::isAddressResolved( const HostAddress& addr )
 {
     return addr.ipV4() || addr.ipV6();
 }

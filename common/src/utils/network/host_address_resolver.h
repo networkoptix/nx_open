@@ -51,10 +51,8 @@ public:
     */
     bool resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress );
 
-    bool resolveAddressSync(const HostAddress& host);
-
     //!Returns \a true if address \a addr is resolved
-    bool isAddressResolved( const HostAddress& addr ) const;
+    static bool isAddressResolved( const HostAddress& addr );
     /*!
         \param waitForRunningHandlerCompletion if \a true, this method blocks until running completion handler (if any) has returned
     */

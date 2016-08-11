@@ -407,8 +407,13 @@ Socket::Socket(
 Socket::SockAddrPtr Socket::makeAddr(const SocketAddress& socketAddress)
 {
     // NOTE: blocking dns name resolve may happen here
-    if (!HostAddressResolver::instance()->resolveAddressSync(socketAddress.address))
+    if (!HostAddressResolver::isAddressResolved(socketAddress.address) &&
+        !HostAddressResolver::instance()->resolveAddressSync(
+            socketAddress.address.toString(),
+            const_cast<HostAddress*>(&socketAddress.address)))
+    {
         return SockAddrPtr();
+    }
 
     if (m_ipVersion == AF_INET)
     {
