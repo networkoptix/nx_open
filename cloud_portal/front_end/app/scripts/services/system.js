@@ -186,7 +186,7 @@ angular.module('cloudApp')
                 return users;
             }
 
-            return mediaserver.getAggreatedUsersData(self.id).then(function(result){
+            return mediaserver.getAggregatedUsersData(self.id).then(function(result){
                 var usersList = result.data.reply['ec2/getUsers'];
                 var userGroups = result.data.reply['ec2/getUserGroups'];
                 var predefinedRoles = result.data.reply['ec2/getPredefinedRoles'];
