@@ -206,7 +206,7 @@ void QnStreamRecorder::flushPrebuffer()
 {
     while (!m_prebuffer.isEmpty())
     {
-        QnConstAbstractMediaDataPtr d;
+        QnAbstractMediaDataPtr d;
         m_prebuffer.pop(d);
         if (needSaveData(d))
             saveData(d);
@@ -235,7 +235,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         close();
     }
 
-    QnConstAbstractMediaDataPtr md = std::dynamic_pointer_cast<const QnAbstractMediaData>(nonConstData);
+    QnAbstractMediaDataPtr md = std::dynamic_pointer_cast<QnAbstractMediaData>(nonConstData);
     if (!md)
         return true; // skip unknown data
 
@@ -273,7 +273,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
             m_nextIFrameTime = AV_NOPTS_VALUE;
             while (!m_prebuffer.isEmpty())
             {
-                QnConstAbstractMediaDataPtr d;
+                QnAbstractMediaDataPtr d;
                 m_prebuffer.pop(d);
                 if (needSaveData(d))
                     saveData(d);
@@ -291,7 +291,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
             {
                 while (!m_prebuffer.isEmpty() && m_prebuffer.front()->timestamp < m_nextIFrameTime)
                 {
-                    QnConstAbstractMediaDataPtr d;
+                    QnAbstractMediaDataPtr d;
                     m_prebuffer.pop(d);
                     if (needSaveData(d))
                         saveData(d);
@@ -334,7 +334,7 @@ void QnStreamRecorder::cleanFfmpegContexts()
     }
 }
 
-bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
+bool QnStreamRecorder::saveData(const QnAbstractMediaDataPtr& md)
 {
     if (md->dataType == QnAbstractMediaData::META_V1)
         return saveMotion(std::dynamic_pointer_cast<const QnMetaDataV1>(md));
@@ -424,6 +424,8 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 
     m_endDateTime = md->timestamp;
 
+    remapPacketTimeUsec(md);
+
     if (md->dataType == QnAbstractMediaData::AUDIO && m_audioTranscoder)
     {
         QnAbstractMediaDataPtr result;
@@ -449,9 +451,12 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     return true;
 }
 
-qint64 QnStreamRecorder::getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md)
+void QnStreamRecorder::remapPacketTimeUsec(const QnAbstractMediaDataPtr& md)
 {
-    return md->timestamp - m_startDateTime;
+    md->timestamp -= m_startDateTime;
+    QnCompressedVideoData* video = dynamic_cast<QnCompressedVideoData*>(md.get());
+    if (video && (quint64)video->pts != AV_NOPTS_VALUE)
+        video->pts -= m_startDateTime;
 }
 
 void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex)
@@ -472,14 +477,14 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         AVPacket avPkt;
         av_init_packet(&avPkt);
 
-        qint64 dts = av_rescale_q(getPacketTimeUsec(md), srcRate, stream->time_base);
+        qint64 dts = av_rescale_q(md->timestamp, srcRate, stream->time_base);
         if (stream->cur_dts > 0)
             avPkt.dts = qMax((qint64)stream->cur_dts+1, dts);
         else
             avPkt.dts = dts;
         const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.get());
         if (video && (quint64)video->pts != AV_NOPTS_VALUE)
-            avPkt.pts = av_rescale_q(video->pts-m_startDateTime, srcRate, stream->time_base) + (avPkt.dts-dts);
+            avPkt.pts = av_rescale_q(video->pts, srcRate, stream->time_base) + (avPkt.dts-dts);
         else
             avPkt.pts = avPkt.dts;
 
@@ -884,13 +889,13 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 }
 
 void QnStreamRecorder::initIoContext(
-    const QnStorageResourcePtr& storage, 
+    const QnStorageResourcePtr& storage,
     const QString& url,
     AVIOContext** context)
 {
     *context = QnFfmpegHelper::createFfmpegIOContext(
-        storage, 
-        url, 
+        storage,
+        url,
         QIODevice::WriteOnly);
 }
 
@@ -953,7 +958,7 @@ int QnStreamRecorder::getPrebufferingUsec() const
 }
 
 
-bool QnStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)
+bool QnStreamRecorder::needSaveData(const QnAbstractMediaDataPtr& media)
 {
     Q_UNUSED(media)
     return true;
