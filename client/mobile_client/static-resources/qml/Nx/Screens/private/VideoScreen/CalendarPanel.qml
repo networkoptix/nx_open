@@ -11,6 +11,9 @@ Popup
 
     signal datePicked(date date)
 
+    signal opened()
+    signal closed()
+
     readonly property int _animationDuration: 200
 
     closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
@@ -77,4 +80,14 @@ Popup
             }
         }
     }
+
+    onVisibleChanged:
+    {
+        if (visible)
+            opened()
+        else
+            closed()
+    }
+
+    onOpened: contentItem.forceActiveFocus()
 }
