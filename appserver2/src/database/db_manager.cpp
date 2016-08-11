@@ -2006,22 +2006,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraA
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraAttributesDataList>& tran)
 {
     QnCamLicenseUsageHelper licenseUsageHelper;
-    QnVirtualCameraResourceList cameras;
-
-    for (const auto &param : tran.params)
-    {
-        auto camera = qnResPool->getResourceById(param.cameraID).dynamicCast<QnVirtualCameraResource>();
-        if (!camera)
-            return ErrorCode::serverError;
-        cameras.push_back(camera);
-        licenseUsageHelper.propose(camera, param.scheduleEnabled);
-    }
-
-    for (const auto &camera : cameras)
-    {
-        if (licenseUsageHelper.isOverflowForCamera(camera))
-            return ErrorCode::forbidden;
-    }
 
     for(const ApiCameraAttributesData& attrs: tran.params)
     {

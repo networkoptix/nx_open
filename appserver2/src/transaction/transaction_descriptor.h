@@ -46,20 +46,6 @@
 #include "nx_ec/data/api_lock_data.h"
 #include "core/resource/user_resource.h"
 
-#include "managers/business_event_manager.h"
-#include "managers/camera_manager.h"
-#include "managers/discovery_manager.h"
-#include "managers/layout_manager.h"
-#include "managers/license_manager.h"
-#include "managers/media_server_manager.h"
-#include "managers/misc_manager.h"
-#include "managers/resource_manager.h"
-#include "managers/stored_file_manager.h"
-#include "managers/updates_manager.h"
-#include "managers/user_manager.h"
-#include "managers/videowall_manager.h"
-#include "managers/webpage_manager.h"
-
 #include "nx/utils/type_utils.h"
 
 namespace ec2 {
