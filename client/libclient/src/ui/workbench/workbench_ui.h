@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 
@@ -47,14 +49,20 @@ class QnNotificationsCollectionWidget;
 class QnDayTimeWidget;
 struct QnPaneSettings;
 
-class QnWorkbenchUi: public Disconnective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
+class QnWorkbenchUi:
+    public Disconnective<QObject>,
+    public QnWorkbenchContextAware,
+    public QnActionTargetProvider,
+    public AnimationTimerListener,
+    protected QnGeometry
+{
     Q_OBJECT
     Q_ENUMS(Flags Flag)
 
-    typedef Disconnective<QObject> base_type;
-
+    using base_type = Disconnective<QObject>;
 public:
-    enum Flag {
+    enum Flag
+    {
         /** Whether controls should be hidden after a period without activity in zoomed mode. */
         HideWhenZoomed = 0x1,
 
@@ -66,7 +74,8 @@ public:
     };
     Q_DECLARE_FLAGS(Flags, Flag)
 
-    enum Panel {
+    enum Panel
+    {
         NoPanel = 0x0,
         TreePanel = 0x1,
         TitlePanel = 0x2,
@@ -82,15 +91,11 @@ public:
     virtual Qn::ActionScope currentScope() const override;
     virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
 
-    Flags flags() const {
-        return m_flags;
-    }
+    Flags flags() const;
 
     void setFlags(Flags flags);
 
-    bool isTitleUsed() const {
-        return m_titleUsed;
-    }
+    bool isTitleUsed() const;
 
     bool isFpsVisible() const;
 
@@ -120,13 +125,13 @@ public:
     /** Whether the calendar is opened */
     bool isCalendarOpened() const;
 
-    bool isTreeVisible() const          { return m_treeVisible; }
-    bool isSliderVisible() const        { return m_sliderVisible; }
-    bool isTitleVisible() const         { return m_titleVisible; }
+    bool isTreeVisible() const { return m_treeVisible; }
+    bool isSliderVisible() const { return m_sliderVisible; }
+    bool isTitleVisible() const { return m_titleVisible; }
     bool isNotificationsVisible() const { return m_notificationsVisible; }
-    bool isCalendarVisible() const      { return m_calendarVisible; }
+    bool isCalendarVisible() const { return m_calendarVisible; }
 
-public slots:
+    public slots:
     void setProxyUpdatesEnabled(bool updatesEnabled);
     void enableProxyUpdates() { setProxyUpdatesEnabled(true); }
     void disableProxyUpdates() { setProxyUpdatesEnabled(false); }
@@ -188,7 +193,10 @@ private:
     void createNotificationsWidget(const QnPaneSettings& settings);
     void createCalendarWidget(const QnPaneSettings& settings);
     void createSliderWidget(const QnPaneSettings& settings);
+
+#ifdef _DEBUG
     void createDebugWidget();
+#endif
 
     Panels openedPanels() const;
     void setOpenedPanels(Panels panels, bool animate = true);
@@ -275,7 +283,7 @@ private:
     Flags m_flags;
 
     /** Widgets by role. */
-    QnResourceWidget *m_widgetByRole[Qn::ItemRoleCount];
+    std::array<QnResourceWidget*, Qn::ItemRoleCount> m_widgetByRole;
 
     /** Widget that ui controls are placed on. */
     QGraphicsWidget *m_controlsWidget;
