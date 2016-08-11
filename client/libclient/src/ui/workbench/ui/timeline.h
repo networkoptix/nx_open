@@ -12,6 +12,8 @@ struct QnWorkbenchUiTimeline
     QnWorkbenchUiTimeline();
 
     bool visible;
+    bool pinned;
+    bool opened;
 
     QnNavigationItem* item;
     QGraphicsWidget* resizerWidget;

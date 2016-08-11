@@ -346,7 +346,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     setTreeOpened(settings[Qn::WorkbenchPane::Tree].state == Qn::PaneState::Opened, false);
     setTitleOpened(settings[Qn::WorkbenchPane::Title].state == Qn::PaneState::Opened, false);
-    setSliderOpened(settings[Qn::WorkbenchPane::Navigation].state == Qn::PaneState::Opened, false);
+    setSliderOpened(settings[Qn::WorkbenchPane::Navigation].state != Qn::PaneState::Closed, false);
     setNotificationsOpened(settings[Qn::WorkbenchPane::Notifications].state == Qn::PaneState::Opened, false);
     setCalendarOpened(settings[Qn::WorkbenchPane::Calendar].state == Qn::PaneState::Opened, false);
 
@@ -385,7 +385,11 @@ void QnWorkbenchUi::storeSettings()
     notifications.state = makePaneState(isNotificationsOpened(), isNotificationsPinned());
 
     QnPaneSettings& navigation = settings[Qn::WorkbenchPane::Navigation];
-    navigation.state = makePaneState(isSliderOpened());
+    navigation.state = m_timeline.pinned
+        ? Qn::PaneState::Opened
+        : m_timeline.opened
+        ? Qn::PaneState::Unpinned
+        : Qn::PaneState::Closed;
 
     QnPaneSettings& calendar = settings[Qn::WorkbenchPane::Calendar];
     calendar.state = makePaneState(isCalendarOpened(), isCalendarPinned());
@@ -819,7 +823,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
         {
             /* User may have opened some panels while zoomed,
              * we want to leave them opened even if they were closed before. */
-            setOpenedPanels(m_unzoomedOpenedPanels | openedPanels(), true);
+            setOpenedPanels(m_unzoomedOpenedPanels | openedPanels() | SliderPanel, true);
 
             /* Viewport margins have changed, force fit-in-view. */
             display()->fitInView();
@@ -2170,13 +2174,14 @@ void QnWorkbenchUi::setThumbnailsVisible(bool visible)
 
 bool QnWorkbenchUi::isSliderOpened() const
 {
-    return action(QnActions::ToggleSliderAction)->isChecked();
+    return m_timeline.opened;
 }
 
 bool QnWorkbenchUi::isSliderPinned() const
 {
     /* Auto-hide slider when some item is zoomed, otherwise - don't. */
-    return m_widgetByRole[Qn::ZoomedRole] == nullptr;
+    return m_timeline.pinned ||
+        m_widgetByRole[Qn::ZoomedRole] == nullptr;
 }
 
 void QnWorkbenchUi::setSliderOpened(bool opened, bool animate)
@@ -2184,17 +2189,24 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate)
     if (qnRuntime->isVideoWallMode())
         opened = true;
 
+    /* Do not hide pinned timeline. */
+    if (m_timeline.pinned && !opened)
+        return;
+
+    m_timeline.opened = opened;
+
     ensureAnimationAllowed(animate);
 
     m_inFreespace &= !opened;
-
-    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(QnActions::ToggleSliderAction)->setChecked(opened);
 
     qreal newY = m_controlsWidgetRect.bottom()
         + (opened ? -m_timeline.item->size().height() : 64.0 /* So that tooltips are not opened. */);
     if (animate)
     {
+        /* Skip off-screen part. */
+        if (m_timeline.item->y() > m_controlsWidgetRect.bottom())
+            m_timeline.item->setY(m_controlsWidgetRect.bottom());
+
         m_timeline.yAnimator->animateTo(newY);
     }
     else
@@ -2210,6 +2222,9 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate)
 
 void QnWorkbenchUi::setSliderVisible(bool visible, bool animate)
 {
+    if (m_timeline.pinned && !visible)
+        return;
+
     ensureAnimationAllowed(animate);
 
     bool changed = m_timeline.visible != visible;
@@ -2344,12 +2359,12 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged()
     static const int kShowWidgetHeight = 50;
     static const int kShowWidgetHiddenHeight = 12;
 
-    const int showWidgetShowOffset = geometry.top() <= m_controlsWidgetRect.bottom()
-        ? kShowWidgetHeight
-        : kShowWidgetHiddenHeight;
+    const int showWidgetY = m_timeline.opened
+        ? geometry.top() - kShowWidgetHeight
+        : m_controlsWidgetRect.bottom() - kShowWidgetHiddenHeight;
 
     QRectF showWidgetGeometry(geometry);
-    showWidgetGeometry.setTop(showButtonPos.y() - showWidgetShowOffset);
+    showWidgetGeometry.setTop(showWidgetY);
     showWidgetGeometry.setHeight(kShowWidgetHeight);
     m_timeline.showWidget->setGeometry(showWidgetGeometry);
 
@@ -2437,6 +2452,7 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     m_timeline.showingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_timeline.showingProcessor->addTargetItem(m_timeline.showButton);
     m_timeline.showingProcessor->addTargetItem(m_timeline.showWidget);
+    m_timeline.showingProcessor->addTargetItem(m_timeline.resizerWidget);
     m_timeline.showingProcessor->setHoverEnterDelay(kShowTimelineTimeoutMs);
 
     m_timeline.hidingProcessor = new HoverFocusProcessor(m_controlsWidget);
@@ -2486,12 +2502,14 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
         });
 
     /* There is no stackAfter function, so we have to resort to ugly copypasta. */
-    m_timeline.showButton->stackBefore(m_timeline.item->timeSlider()->toolTipItem());
+    auto tooltip = m_timeline.item->timeSlider()->toolTipItem();
+    m_timeline.showButton->stackBefore(tooltip);
+    m_timeline.showWidget->stackBefore(m_timeline.showButton);
     m_timeline.resizerWidget->stackBefore(m_timeline.showButton);
     m_timeline.resizerWidget->stackBefore(m_timeline.zoomButtonsWidget);
-    m_timeline.showWidget->stackBefore(m_timeline.resizerWidget);
+    m_timeline.resizerWidget->stackBefore(m_timeline.showWidget);
     m_timeline.item->stackBefore(m_timeline.showWidget);
-    m_timeline.item->timeSlider()->toolTipItem()->stackBefore(m_timeline.item->timeSlider()->bookmarksViewer());
+    tooltip->stackBefore(m_timeline.item->timeSlider()->bookmarksViewer());
 
     m_timeline.opacityProcessor = new HoverFocusProcessor(m_controlsWidget);
 
@@ -2502,6 +2520,7 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     m_timeline.opacityProcessor->addTargetItem(m_timeline.item->timeSlider()->toolTipItem());
     m_timeline.opacityProcessor->addTargetItem(m_timeline.showButton);
     m_timeline.opacityProcessor->addTargetItem(m_timeline.resizerWidget);
+    m_timeline.opacityProcessor->addTargetItem(m_timeline.showWidget);
     m_timeline.opacityProcessor->addTargetItem(m_timeline.zoomButtonsWidget);
 
     m_timeline.yAnimator = new VariantAnimator(this);
@@ -2599,26 +2618,30 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
             &QnWorkbenchUi::updateCalendarVisibilityAnimated);
     }
 
-    connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this, [this](bool toggled)
-    {
-        /// If tour mode is going to be turned on, focus should be forced to main window
-        /// because otherwise we can't cancel tour mode by clicking any key (in some cases)
-        if (toggled)
-            mainWindow()->setFocus();
-    });
+    connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this,
+        [this](bool toggled)
+        {
+            /// If tour mode is going to be turned on, focus should be forced to main window
+            /// because otherwise we can't cancel tour mode by clicking any key (in some cases)
+            if (toggled)
+                mainWindow()->setFocus();
+        });
 
     connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(action(QnActions::ToggleThumbnailsAction), &QAction::toggled, this, [this](bool checked)
-    {
-        setThumbnailsVisible(checked);
-    });
+    connect(action(QnActions::ToggleThumbnailsAction), &QAction::toggled, this,
+        [this](bool checked)
+        {
+            setThumbnailsVisible(checked);
+        });
 
-    connect(action(QnActions::ToggleSliderAction), &QAction::toggled, this, [this](bool checked)
-    {
-        if (!m_ignoreClickEvent) setSliderOpened(checked);
-    });
+    connect(action(QnActions::ToggleSliderAction), &QAction::toggled, this,
+        [this](bool checked)
+        {
+            m_timeline.pinned = checked;
+            setSliderOpened(checked);
+        });
 
     const auto getActionParamsFunc =
         [this](const QnCameraBookmark &bookmark) -> QnActionParameters

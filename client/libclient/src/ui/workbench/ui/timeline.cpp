@@ -8,6 +8,8 @@ static const int kDefaultThumbnailsHeight = 48;
 
 QnWorkbenchUiTimeline::QnWorkbenchUiTimeline():
     visible(false),
+    pinned(false),
+    opened(false),
     item(nullptr),
     resizerWidget(nullptr),
     ignoreResizerGeometryChanges(false),
