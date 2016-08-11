@@ -754,7 +754,7 @@ struct ReadListAccessOut
     }
 };
 
-struct regularTransactionType
+struct RegularTransactionType
 {
     template<typename Param>
     ec2::TransactionType::Value operator()(const Param&)
@@ -763,7 +763,7 @@ struct regularTransactionType
     }
 };
 
-struct localTransactionType
+struct LocalTransactionType
 {
     template<typename Param>
     ec2::TransactionType::Value operator()(const Param&)
@@ -772,7 +772,7 @@ struct localTransactionType
     }
 };
 
-struct setStatusTransactionType
+struct SetStatusTransactionType
 {
     ec2::TransactionType::Value operator()(const ApiResourceStatusData& params)
     {
@@ -783,6 +783,25 @@ struct setStatusTransactionType
             return TransactionType::Local;
         else
             return TransactionType::Regular;
+    }
+};
+
+struct SaveUserTransactionType
+{
+    ec2::TransactionType::Value operator()(const ApiUserData& params)
+    {
+        return params.isCloud ? TransactionType::Cloud : TransactionType::Regular;
+    }
+};
+
+struct RemoveUserTransactionType
+{
+    ec2::TransactionType::Value operator()(const ApiIdData& params)
+    {
+        auto user = qnResPool->getResourceById<QnUserResource>(params.id);
+        if (!user)
+            return TransactionType::Unknown;
+        return user->isCloud() ? TransactionType::Cloud : TransactionType::Regular;
     }
 };
 

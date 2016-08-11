@@ -445,8 +445,7 @@ private:
     {
         NX_ASSERT(ApiCommand::isPersistent(tran.command));
 
-        tran.peerID = qnCommon->moduleGUID();
-        tran.transactionType = getTransactionDescriptorByParam<QueryDataType>()->getTransactionTypeFunc(tran.params);
+        tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(tran.params);
         if (tran.transactionType == TransactionType::Unknown)
             return ErrorCode::forbidden;
         transactionLog->fillPersistentInfo(tran);
