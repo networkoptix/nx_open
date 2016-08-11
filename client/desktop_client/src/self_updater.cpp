@@ -74,7 +74,7 @@ bool SelfUpdater::registerUriHandler()
 QString backupPostfix()
 {
 #if defined(Q_OS_MACX)
-    return lit("../../backup");
+    return lit("/../../backup");
 #else
     return lit("/backup");
 #endif
@@ -83,7 +83,7 @@ QString backupPostfix()
 QString applauncherPostfix()
 {
 #if defined(Q_OS_MACX)
-    return lit("/Contents/MacOs");
+    return lit("/Contents/MacOS/");
 #endif
     return QString();
 }
@@ -99,16 +99,17 @@ QnDirectoryBackupPtr copyApplauncherInstance(const QString& from, const QString&
     };
 
 #if defined(Q_OS_MACX)
-    static const auto kFrameworkPostfix = lit("/../Frameworks");
-    const auto target = to + applauncherPostfix();
-    const auto filesBackup = QnDirectoryBackupPtr(new QnDirectoryBackup(from, target));
+    static const auto kFrameworkPostfix = lit("/../Frameworks/");
+    const auto filesBackup = QnDirectoryBackupPtr(
+        new QnDirectoryBackup(from, kTargetFileFilters, to));
     const auto frameworkBackup = QnDirectoryBackupPtr(new QnDirectoryRecursiveBackup(
-        from + kFrameworkPostfix, target + kFrameworkPostfix));
+        from + kFrameworkPostfix, to + kFrameworkPostfix));
 
-    QnMultipleDirectoriesBackup multipleBackup;
-    multipleBackup.addDirectoryBackup(filesBackup);
-    multipleBackup.addDirectoryBackup(frameworkBackup);
-    return frameworkBackup;
+    const auto multipleBackup = new QnMultipleDirectoriesBackup();
+    const auto result = QnDirectoryBackupPtr(multipleBackup);
+    multipleBackup->addDirectoryBackup(filesBackup);
+    multipleBackup->addDirectoryBackup(frameworkBackup);
+    return result;
 #else
     /* Move installed applaucher to backup folder. */
     return QnDirectoryBackupPtr(new QnDirectoryBackup(from, kTargetFileFilters, to));
@@ -121,8 +122,8 @@ bool SelfUpdater::updateApplauncher()
 
     QString applauncherDirPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation)
         + lit("/../applauncher/")
-        + applauncherPostfix()
-        + QnAppInfo::customizationName();
+        + QnAppInfo::customizationName()
+        + applauncherPostfix();
 
     const QDir applauncherDir(applauncherDirPath);
     if (!QDir().mkpath(applauncherDirPath))
@@ -163,7 +164,7 @@ bool SelfUpdater::updateApplauncher()
         return false;
     }
 
-    const auto backupPath = applauncherDirPath + backupPostfix();
+    const auto backupPath = applauncherDirPath + backupPostfix() + applauncherPostfix();
     const auto backup = copyApplauncherInstance(applauncherDirPath, backupPath);
     if (!backup->backup(QnDirectoryBackupBehavior::Move))
     {
