@@ -135,7 +135,8 @@ namespace ec2
         qint64 getSyncTime() const;
         ApiTimeData getTimeInfo() const;
         //!Called when primary time server has been changed by user
-        void primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran );
+        void onGotPrimariTimeServerTran(const QnTransaction<ApiIdData>& tran);
+        void primaryTimeServerChanged(const ApiIdData& serverId);
         void peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran );
         void knownPeersSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeDataList>& tran );
         //!Returns synchronized time with time priority key (not local, but the one used)

@@ -768,7 +768,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             onGotServerAliveInfo(tran, sender, transportHeader);
             return; // do not proxy. this call contains built in proxy
         case ApiCommand::forcePrimaryTimeServer:
-            TimeSynchronizationManager::instance()->primaryTimeServerChanged(tran);
+            TimeSynchronizationManager::instance()->onGotPrimariTimeServerTran(tran);
             break;
         case ApiCommand::broadcastPeerSystemTime:
             TimeSynchronizationManager::instance()->peerSystemTimeReceived(tran);

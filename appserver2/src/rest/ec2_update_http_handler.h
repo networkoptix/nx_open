@@ -28,7 +28,7 @@ class UpdateHttpHandler:
     public QnRestRequestHandler
 {
 public:
-    typedef std::function<void(const QnTransaction<RequestDataType>&)> CustomActionFuncType;
+    typedef std::function<void(const RequestDataType&)> CustomActionFuncType;
 
     UpdateHttpHandler(
         const Ec2DirectConnectionPtr& connection,
@@ -61,7 +61,7 @@ public:
     {
         QN_UNUSED(params);
 
-        QnTransaction<RequestDataType> tran;
+        RequestDataType data;
 
         bool success = false;
         QByteArray srcFormat = srcBodyContentType.split(';')[0];
@@ -71,12 +71,12 @@ public:
             case Qn::JsonFormat:
             {
                 contentType = "application/json";
-                tran.params = QJson::deserialized<RequestDataType>(
+                data = QJson::deserialized<RequestDataType>(
                     body, RequestDataType(), &success);
                 break;
             }
             case Qn::UbjsonFormat:
-                tran.params = QnUbjson::deserialized<RequestDataType>(
+                data = QnUbjson::deserialized<RequestDataType>(
                     body, RequestDataType(), &success);
                 break;
             case Qn::UnsupportedFormat:
@@ -94,11 +94,8 @@ public:
                 return nx_http::StatusCode::notAcceptable;
         }
 
-        QStringList tmp = path.split('/');
-        while (!tmp.isEmpty() && tmp.last().isEmpty())
-            tmp.pop_back();
-        if (!tmp.isEmpty())
-            tran.command = ApiCommand::fromString(tmp.last());
+        QString commandStr = path.split('/', QString::SkipEmptyParts).last();
+        auto command = ApiCommand::fromString(commandStr);
 
         if (!success)
         {
@@ -113,24 +110,6 @@ public:
             return nx_http::StatusCode::forbidden;
         }
 
-        tran.transactionType = getTransactionDescriptorByParam<RequestDataType>()->getTransactionTypeFunc(tran.params);
-        if (tran.transactionType == TransactionType::Unknown)
-        {
-            if (format == Qn::JsonFormat)
-            {
-                QnJsonRestResult jsonResult;
-                jsonResult.setError(QnJsonRestResult::InvalidParameter,
-                    "Can't process request because object is not known.");
-                resultBody = QJson::serialized(jsonResult);
-                return nx_http::StatusCode::ok;
-            }
-            return nx_http::StatusCode::forbidden;
-        }
-
-
-        // Replace client GUID to own GUID (take transaction ownership).
-        tran.peerID = qnCommon->moduleGUID();
-
         ErrorCode errorCode = ErrorCode::ok;
         bool finished = false;
 
@@ -143,7 +122,7 @@ public:
                 m_cond.wakeAll();
             };
         m_connection->queryProcessor()->getAccess(owner->accessRights()).
-            processUpdateAsync(tran, queryDoneHandler);
+            processUpdateAsync(command, data, queryDoneHandler);
 
         {
             QnMutexLocker lk(&m_mutex);
@@ -152,15 +131,15 @@ public:
         }
 
         if (m_customAction)
-            m_customAction(tran);
+            m_customAction(data);
 
         // Update local data.
         if (errorCode == ErrorCode::ok)
         {
             // Add audit record before notification to ensure removed resource is still alive.
             m_connection->auditManager()->addAuditRecord(
-                tran.command,
-                tran.params,
+                command,
+                data,
                 owner->authSession());
         }
 

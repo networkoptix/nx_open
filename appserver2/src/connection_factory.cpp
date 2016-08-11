@@ -1061,6 +1061,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     registerGetFuncHandler<nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
 
     //AbstractTimeManager::forcePrimaryTimeServer
+
     registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::forcePrimaryTimeServer,
         std::bind(&TimeSynchronizationManager::primaryTimeServerChanged,
             m_timeSynchronizationManager.get(), _1));
@@ -1430,9 +1431,8 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
             return ErrorCode::ok;
         }
 
-        QnTransaction<ApiClientInfoData> transaction(ApiCommand::saveClientInfo, clientInfo);
         m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
-            transaction,
+            ApiCommand::saveClientInfo, clientInfo,
             [&](ErrorCode result)
             {
                 if (result == ErrorCode::ok)

@@ -51,6 +51,13 @@ public:
     {
     }
 
+    template<class InputData, class HandlerType>
+    void processUpdateAsync(
+        ApiCommand::Value cmdCode, InputData input, HandlerType handler)
+    {
+        processUpdateAsync(QnTransaction<InputData>(cmdCode, input), handler);
+    }
+
     /**
      * Execute transaction.
      * Transaction executed locally and broadcast through the whole cluster.
@@ -438,6 +445,10 @@ private:
     {
         NX_ASSERT(ApiCommand::isPersistent(tran.command));
 
+        tran.peerID = qnCommon->moduleGUID();
+        tran.transactionType = getTransactionDescriptorByParam<QueryDataType>()->getTransactionTypeFunc(tran.params);
+        if (tran.transactionType == TransactionType::Unknown)
+            return ErrorCode::forbidden;
         transactionLog->fillPersistentInfo(tran);
         QByteArray serializedTran =
             QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);

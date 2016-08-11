@@ -466,7 +466,12 @@ namespace ec2
         return result;
     }
 
-    void TimeSynchronizationManager::primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran )
+    void TimeSynchronizationManager::onGotPrimariTimeServerTran(const QnTransaction<ApiIdData>& tran)
+    {
+        primaryTimeServerChanged(tran.params.id);
+    }
+
+    void TimeSynchronizationManager::primaryTimeServerChanged(const ApiIdData& serverId)
     {
         quint64 localTimePriorityBak = 0;
         quint64 newLocalTimePriority = 0;
@@ -476,9 +481,9 @@ namespace ec2
             localTimePriorityBak = m_localTimePriorityKey.toUInt64();
 
             NX_LOGX( lit("Received primary time server change transaction. new peer %1, local peer %2").
-                arg( tran.params.id.toString() ).arg( qnCommon->moduleGUID().toString() ), cl_logDEBUG1 );
+                arg(serverId.id.toString() ).arg( qnCommon->moduleGUID().toString() ), cl_logDEBUG1 );
 
-            if( tran.params.id == qnCommon->moduleGUID() )
+            if(serverId.id == qnCommon->moduleGUID() )
             {
                 //local peer is selected by user as primary time server
                 const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;

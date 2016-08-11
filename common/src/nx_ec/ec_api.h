@@ -114,18 +114,9 @@ class ECConnectionNotificationManager;
         int setResourceStatus( const QnUuid& resourceId, Qn::ResourceStatus status, TargetType* target, HandlerType handler ) {
             return setResourceStatus(resourceId, status, std::static_pointer_cast<impl::SetResourceStatusHandler>(std::make_shared<impl::CustomSetResourceStatusHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        template<class TargetType, class HandlerType>
-        int setResourceStatusLocal( const QnUuid& resourceId, Qn::ResourceStatus status, TargetType* target, HandlerType handler ) {
-            return setResourceStatusLocal(resourceId, status, std::static_pointer_cast<impl::SetResourceStatusHandler>(std::make_shared<impl::CustomSetResourceStatusHandler<TargetType, HandlerType>>(target, handler)) );
-        }
         ErrorCode setResourceStatusSync( const QnUuid& id, Qn::ResourceStatus status) {
             QnUuid rezId;
             int(AbstractResourceManager::*fn)(const QnUuid&, Qn::ResourceStatus, impl::SetResourceStatusHandlerPtr) = &AbstractResourceManager::setResourceStatus;
-            return impl::doSyncCall<impl::SetResourceStatusHandler>( std::bind(fn, this, id, status, std::placeholders::_1), &rezId );
-        }
-        ErrorCode setResourceStatusLocalSync( const QnUuid& id, Qn::ResourceStatus status) {
-            QnUuid rezId;
-            int(AbstractResourceManager::*fn)(const QnUuid&, Qn::ResourceStatus, impl::SetResourceStatusHandlerPtr) = &AbstractResourceManager::setResourceStatusLocal;
             return impl::doSyncCall<impl::SetResourceStatusHandler>( std::bind(fn, this, id, status, std::placeholders::_1), &rezId );
         }
 
@@ -198,7 +189,6 @@ class ECConnectionNotificationManager;
     protected:
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
         virtual int setResourceStatus( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) = 0;
-        virtual int setResourceStatusLocal( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
         virtual int getStatusList( const QnUuid &resourceId, impl::GetStatusListHandlerPtr handler ) = 0;
         virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
@@ -680,10 +670,10 @@ class ECConnectionNotificationManager;
         virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() = 0;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
-        virtual ECConnectionNotificationManager* notificationManager() 
-        { 
+        virtual ECConnectionNotificationManager* notificationManager()
+        {
             NX_ASSERT(0);
-            return nullptr; 
+            return nullptr;
         }
 
         /*!

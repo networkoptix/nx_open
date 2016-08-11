@@ -32,10 +32,16 @@ int QnMiscManager<QueryProcessorType>::changeSystemName(
         impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(systemName, sysIdTime, tranLogTime);
+
+
+    ApiSystemNameData params;
+    params.systemName = systemName;
+    params.sysIdTime = sysIdTime;
+    params.tranLogTime = tranLogTime;
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::changeSystemName, params,
         [handler, reqId](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
@@ -46,32 +52,19 @@ int QnMiscManager<QueryProcessorType>::changeSystemName(
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiSystemNameData> QnMiscManager<QueryProcessorType>::prepareTransaction(
-        const QString &systemName,
-        qint64 sysIdTime,
-        qint64 tranLogTime) const
-{
-    QnTransaction<ApiSystemNameData> transaction(ApiCommand::changeSystemName);
-    transaction.params.systemName = systemName;
-    transaction.params.sysIdTime = sysIdTime;
-    transaction.params.tranLogTime = tranLogTime;
-    return transaction;
-}
-
-template<class QueryProcessorType>
 int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
         bool value,
         qint64 time,
         impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    QnTransaction<ApiLicenseOverflowData> transaction(ApiCommand::markLicenseOverflow);
-    transaction.params.value = value;
-    transaction.params.time = time;
-    transaction.transactionType = TransactionType::Local;
+    ApiLicenseOverflowData params;
+    params.value = value;
+    params.time = time;
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::markLicenseOverflow, params,
         [handler, reqId](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);

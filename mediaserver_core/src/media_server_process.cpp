@@ -1140,6 +1140,11 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             qnServerAdditionalAddressesDictionary->setIgnoredUrls(mediaServer.id, ignoredAddressesById.values(mediaServer.id));
             messageProcessor->updateResource(mediaServer);
         }
+        do {
+            if (needToStop())
+                return;
+        } while (ec2Connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
+
 
         // read resource status
         ec2::ApiResourceStatusDataList statusList;
@@ -2226,12 +2231,6 @@ void MediaServerProcess::run()
         stopObjects();
         return;
     }
-
-    do {
-        if (needToStop())
-            return;
-    } while (ec2Connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusLocalSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
-
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     qnResPool->addResource(m_mediaServer);

@@ -53,7 +53,7 @@ namespace ec2
     {
         return TimeSynchronizationManager::instance()->getPeerTimeInfoList();
     }
-    
+
     template<class QueryProcessorType>
     int QnTimeManager<QueryProcessorType>::getCurrentTimeImpl( impl::CurrentTimeHandlerPtr handler )
     {
@@ -63,17 +63,17 @@ namespace ec2
             std::bind( &impl::CurrentTimeHandler::done, handler, reqID, ec2::ErrorCode::ok, TimeSynchronizationManager::instance()->getSyncTime() ) );
         return reqID;
     }
-    
+
     template<class QueryProcessorType>
     int QnTimeManager<QueryProcessorType>::forcePrimaryTimeServerImpl( const QnUuid& serverGuid, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
-        QnTransaction<ApiIdData> tran( ApiCommand::forcePrimaryTimeServer );
-        tran.params.id = serverGuid;
-
         using namespace std::placeholders;
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::forcePrimaryTimeServer,
+            ApiIdData(serverGuid),
+            std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
 
         return reqID;
     }

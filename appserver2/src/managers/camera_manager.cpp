@@ -36,7 +36,7 @@ namespace ec2
 
     void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran)
     {
-        NX_ASSERT(tran.command == ApiCommand::removeCamera || 
+        NX_ASSERT(tran.command == ApiCommand::removeCamera ||
                   tran.command == ApiCommand::removeCameraUserAttributes);
         switch (tran.command)
         {
@@ -85,8 +85,7 @@ namespace ec2
     int QnCameraManager<QueryProcessorType>::addCamera( const ec2::ApiCameraData& camera, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        QnTransaction<ApiCameraData> tran(ApiCommand::saveCamera, camera);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(ApiCommand::saveCamera, camera, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -106,8 +105,7 @@ namespace ec2
         }
 
         const int reqID = generateRequestID();
-        QnTransaction<ApiCameraDataList> tran(ApiCommand::saveCameras, cameras);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(ApiCommand::saveCameras, cameras, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -118,8 +116,7 @@ namespace ec2
     int QnCameraManager<QueryProcessorType>::remove(const QnUuid& id, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        QnTransaction<ApiIdData> tran(ApiCommand::removeCamera, id);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(ApiCommand::removeCamera, id, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -131,8 +128,7 @@ namespace ec2
     {
         ApiServerFootageData data(serverGuid, cameras);
         const int reqID = generateRequestID();
-        QnTransaction<ApiServerFootageData> tran(ApiCommand::addCameraHistoryItem, data);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(ApiCommand::addCameraHistoryItem, data, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -158,8 +154,7 @@ namespace ec2
     int QnCameraManager<QueryProcessorType>::saveUserAttributes(const ec2::ApiCameraAttributesDataList& cameraAttributes, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        QnTransaction<ApiCameraAttributesDataList> tran(ApiCommand::saveCameraUserAttributesList, cameraAttributes);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(ApiCommand::saveCameraUserAttributesList, cameraAttributes, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
