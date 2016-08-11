@@ -2083,7 +2083,13 @@ QMenu *QnActionManager::newMenu(QnActions::IDType rootId, Qn::ActionScope scope,
     return result;
 }
 
-void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignals) {
+QnActionTargetProvider * QnActionManager::targetProvider() const
+{
+    return m_targetProviderGuard ? m_targetProvider : NULL;
+}
+
+void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignals)
+{
     dst->setText(src->text());
     dst->setIcon(src->icon());
     dst->setShortcuts(src->shortcuts());
