@@ -374,9 +374,11 @@ bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)
             if (auto resizeEvent = dynamic_cast<QResizeEvent *>(event))
                 setPageSize(resizeEvent->size());
             break;
+#if defined(Q_OS_MACX)
         case QEvent::WindowActivate:
             m_widget->activateWindow(); //< QTBUG-34414 workaround
             break;
+#endif
     }
 
     return base_type::eventFilter(obj, event);
