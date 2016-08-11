@@ -92,7 +92,7 @@ namespace ec2
             //else if( format == Qn::BnsFormat )
             //    tranBuffer = QnBinary::serialized(tran);
             else if( format == Qn::UbjsonFormat )
-                tranBuffer = QnUbjson::serialized(tran);
+                tranBuffer = QnUbjson::serialized(tran.params);
             //else if( format == Qn::CsvFormat )
             //    tranBuffer = QnCsv::serialized(tran);
             //else if( format == Qn::XmlFormat )

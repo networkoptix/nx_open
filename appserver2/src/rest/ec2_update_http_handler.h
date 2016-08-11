@@ -62,6 +62,7 @@ public:
         QN_UNUSED(params);
 
         QnTransaction<RequestDataType> tran;
+
         bool success = false;
         QByteArray srcFormat = srcBodyContentType.split(';')[0];
         Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(srcFormat);
@@ -72,20 +73,14 @@ public:
                 contentType = "application/json";
                 tran.params = QJson::deserialized<RequestDataType>(
                     body, RequestDataType(), &success);
-                QStringList tmp = path.split('/');
-                while (!tmp.isEmpty() && tmp.last().isEmpty())
-                    tmp.pop_back();
-                if (!tmp.isEmpty())
-                    tran.command = ApiCommand::fromString(tmp.last());
                 break;
             }
             case Qn::UbjsonFormat:
-                tran = QnUbjson::deserialized<QnTransaction<RequestDataType>>(
-                    body, QnTransaction<RequestDataType>(), &success);
+                tran.params = QnUbjson::deserialized<RequestDataType>(
+                    body, RequestDataType(), &success);
                 break;
             case Qn::UnsupportedFormat:
                 return nx_http::StatusCode::internalServerError;
-
 #if 0 // Deserialization for these formats is not implemented yet.
             case Qn::CsvFormat:
                 tran = QnCsv::deserialized<QnTransaction<RequestDataType>>(body);
@@ -98,6 +93,13 @@ public:
             default:
                 return nx_http::StatusCode::notAcceptable;
         }
+
+        QStringList tmp = path.split('/');
+        while (!tmp.isEmpty() && tmp.last().isEmpty())
+            tmp.pop_back();
+        if (!tmp.isEmpty())
+            tran.command = ApiCommand::fromString(tmp.last());
+
         if (!success)
         {
             if (format == Qn::JsonFormat)
@@ -108,9 +110,23 @@ public:
                 resultBody = QJson::serialized(jsonResult);
                 return nx_http::StatusCode::ok;
             }
-
-            return nx_http::StatusCode::internalServerError;
+            return nx_http::StatusCode::forbidden;
         }
+
+        tran.transactionType = getTransactionDescriptorByParam<RequestDataType>()->getTransactionTypeFunc(tran.params);
+        if (tran.transactionType == TransactionType::Unknown)
+        {
+            if (format == Qn::JsonFormat)
+            {
+                QnJsonRestResult jsonResult;
+                jsonResult.setError(QnJsonRestResult::InvalidParameter,
+                    "Can't process request because object is not known.");
+                resultBody = QJson::serialized(jsonResult);
+                return nx_http::StatusCode::ok;
+            }
+            return nx_http::StatusCode::forbidden;
+        }
+
 
         // Replace client GUID to own GUID (take transaction ownership).
         tran.peerID = qnCommon->moduleGUID();

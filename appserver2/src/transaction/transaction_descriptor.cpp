@@ -7,7 +7,7 @@
 #include <core/resource_management/resource_access_manager.h>
 
 #include <nx_ec/data/api_tran_state_data.h>
-
+#include <core/resource/media_server_resource.h>
 
 namespace ec2 {
 namespace detail {
@@ -740,6 +740,38 @@ struct ReadListAccessOut
     }
 };
 
+struct regularTransactionType
+{
+    template<typename Param>
+    ec2::TransactionType::Value operator()(const Param&)
+    {
+        return TransactionType::Regular;
+    }
+};
+
+struct localTransactionType
+{
+    template<typename Param>
+    ec2::TransactionType::Value operator()(const Param&)
+    {
+        return TransactionType::Local;
+    }
+};
+
+struct setStatusTransactionType
+{
+    ec2::TransactionType::Value operator()(const ApiResourceStatusData& params)
+    {
+        QnResourcePtr resource = qnResPool->getResourceById<QnResource>(params.id);
+        if (!resource)
+            return TransactionType::Unknown;
+        if(resource.dynamicCast<QnMediaServerResource>())
+            return TransactionType::Local;
+        else
+            return TransactionType::Regular;
+    }
+};
+
 #define TRANSACTION_DESCRIPTOR_APPLY( \
     _, \
     Key, \
@@ -752,7 +784,8 @@ struct ReadListAccessOut
     checkReadPermissionFunc, \
     filterBySavePermissionFunc, \
     filterByReadPermissionFunc, \
-    checkRemotePeerAccessFunc \
+    checkRemotePeerAccessFunc, \
+	getTransactionTypeFunc \
     ) \
     std::make_shared<TransactionDescriptor<ParamType>>( \
         ApiCommand::Key, \
@@ -768,8 +801,8 @@ struct ReadListAccessOut
         checkReadPermissionFunc, \
         filterBySavePermissionFunc, \
         filterByReadPermissionFunc, \
-        checkRemotePeerAccessFunc),
-
+        checkRemotePeerAccessFunc, \
+        getTransactionTypeFunc),
 
 DescriptorBaseContainer transactionDescriptors = {
     TRANSACTION_DESCRIPTOR_LIST(TRANSACTION_DESCRIPTOR_APPLY)

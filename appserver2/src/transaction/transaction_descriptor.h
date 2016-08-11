@@ -108,6 +108,9 @@ template<typename ParamType>
 using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(const Qn::UserAccessData& accessData, const ParamType&)>;
 
 template<typename ParamType>
+using GetTransactionTypeFuncType = std::function<ec2::TransactionType::Value(const ParamType&)>;
+
+template<typename ParamType>
 using GetHashFuncType = std::function<QnUuid(ParamType const &)>;
 
 template<typename ParamType>
@@ -175,6 +178,7 @@ struct TransactionDescriptor : TransactionDescriptorBase
     FilterBySavePermissionFuncType<ParamType> filterBySavePermissionFunc;
     FilterByReadPermissionFuncType<ParamType> filterByReadPermissionFunc;
     CheckRemotePeerAccessFuncType<ParamType> checkRemotePeerAccessFunc;
+    GetTransactionTypeFuncType<ParamType> getTransactionTypeFunc;
 
     template<typename GetHashF, typename SaveF, typename SaveSerializedF, typename CreateTranF, typename TriggerNotificationF>
     TransactionDescriptor(ApiCommand::Value value,
@@ -190,7 +194,8 @@ struct TransactionDescriptor : TransactionDescriptorBase
         CheckReadPermissionFuncType<ParamType> checkReadPermissionFunc,
         FilterBySavePermissionFuncType<ParamType> filterBySavePermissionFunc,
         FilterByReadPermissionFuncType<ParamType> filterByReadPermissionFunc,
-        CheckRemotePeerAccessFuncType<ParamType> checkRemotePeerAccessFunc)
+        CheckRemotePeerAccessFuncType<ParamType> checkRemotePeerAccessFunc,
+        GetTransactionTypeFuncType<ParamType> getTransactionTypeFunc)
         :
         TransactionDescriptorBase(value, isPersistent, isSystem, name),
         getHashFunc(std::forward<GetHashF>(getHashFunc)),
@@ -202,7 +207,8 @@ struct TransactionDescriptor : TransactionDescriptorBase
         checkReadPermissionFunc(checkReadPermissionFunc),
         filterBySavePermissionFunc(filterBySavePermissionFunc),
         filterByReadPermissionFunc(filterByReadPermissionFunc),
-        checkRemotePeerAccessFunc(checkRemotePeerAccessFunc)
+        checkRemotePeerAccessFunc(checkRemotePeerAccessFunc),
+        getTransactionTypeFunc(getTransactionTypeFunc)
     {
     }
 };
