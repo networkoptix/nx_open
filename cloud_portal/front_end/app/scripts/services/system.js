@@ -186,25 +186,40 @@ angular.module('cloudApp')
                 return users;
             }
 
-            var deferred = $q.defer();
-            function errorHandler(error){
-                $log.error(error);
-                deferred.reject(error);
-            }
-            mediaserver.getUsers(self.id).then(function(result){
-                var usersList = result.data;
-                mediaserver.getUserGroups(self.id).then(function(result){
-                    var userGroups = result.data;
-                    mediaserver.getPredefinedRoles(self.id).then(function(result){
-                        var predefinedRoles = result.data;
-                        deferred.resolve(processUsers(usersList, userGroups, predefinedRoles));
-                        self.isAvailable = true;
-                        self.updateSystemState();
+            return mediaserver.getAggreatedUsersData(self.id).then(function(result){
+                var usersList = result.data.reply['ec2/getUsers'];
+                var userGroups = result.data.reply['ec2/getUserGroups'];
+                var predefinedRoles = result.data.reply['ec2/getPredefinedRoles'];
+                self.isAvailable = true;
+                self.updateSystemState();
+                return processUsers(usersList, userGroups, predefinedRoles)
+            });
+
+            /*
+
+                // TODO: remove later
+
+                var deferred = $q.defer();
+                function errorHandler(error){
+                    $log.error(error);
+                    deferred.reject(error);
+                }
+                mediaserver.getUsers(self.id).then(function(result){
+                    var usersList = result.data;
+                    mediaserver.getUserGroups(self.id).then(function(result){
+                        var userGroups = result.data;
+                        mediaserver.getPredefinedRoles(self.id).then(function(result){
+                            var predefinedRoles = result.data;
+                            deferred.resolve(processUsers(usersList, userGroups, predefinedRoles));
+                            self.isAvailable = true;
+                            self.updateSystemState();
+                        },errorHandler);
                     },errorHandler);
                 },errorHandler);
-            },errorHandler);
+                return deferred.promise;
+            */
 
-            return deferred.promise;
+
         }
 
         system.prototype.getUsers = function(system){

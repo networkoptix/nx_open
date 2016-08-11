@@ -84,6 +84,11 @@ def proxy(request, system_id, system_url):
     email = None
     password = None
 
+    full_url = request.get_full_path()
+    position = full_url.find('?')
+    if position > -1:
+        system_url += full_url[position:]
+
     if request.user.is_authenticated():
         email = request.user.email
         password = request.session['password']

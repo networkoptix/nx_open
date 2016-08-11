@@ -16,6 +16,9 @@ angular.module('cloudApp')
             getCurrentUser: function(systemId){
                 return $http.get(gateway(systemId) + '/ec2/getCurrentUser');
             },
+            getAggreatedUsersData(systemId){
+                return $http.get(gateway(systemId) + '/api/aggregator?exec_cmd=ec2/getUsers&exec_cmd=ec2/getPredefinedRoles&exec_cmd=ec2/getUserGroups');
+            },
             getUsers: function(systemId){
                 return $http.get(gateway(systemId) + '/ec2/getUsers');
             },
