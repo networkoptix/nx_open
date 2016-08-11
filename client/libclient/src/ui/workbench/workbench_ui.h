@@ -12,6 +12,7 @@
 #include <ui/common/geometry.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
+#include <ui/workbench/ui/timeline.h>
 
 #include <client/client_globals.h>
 
@@ -28,7 +29,6 @@ class VariantAnimator;
 class AnimatorGroup;
 class HoverFocusProcessor;
 
-class QnNavigationItem;
 class QnResourceBrowserWidget;
 class QnProxyLabel;
 class QnDebugProxyLabel;
@@ -125,16 +125,16 @@ public:
     /** Whether the calendar is opened */
     bool isCalendarOpened() const;
 
-    bool isTreeVisible() const { return m_treeVisible; }
-    bool isSliderVisible() const { return m_sliderVisible; }
-    bool isTitleVisible() const { return m_titleVisible; }
-    bool isNotificationsVisible() const { return m_notificationsVisible; }
-    bool isCalendarVisible() const { return m_calendarVisible; }
+    bool isTreeVisible() const;
+    bool isSliderVisible() const;
+    bool isTitleVisible() const;
+    bool isNotificationsVisible() const;
+    bool isCalendarVisible() const;
 
-    public slots:
+public slots:
     void setProxyUpdatesEnabled(bool updatesEnabled);
-    void enableProxyUpdates() { setProxyUpdatesEnabled(true); }
-    void disableProxyUpdates() { setProxyUpdatesEnabled(false); }
+    void enableProxyUpdates();
+    void disableProxyUpdates();
 
     void setTitleUsed(bool titleUsed = true);
     void setFpsVisible(bool fpsVisible = true);
@@ -297,8 +297,6 @@ private:
 
     bool m_titleVisible;
 
-    bool m_sliderVisible;
-
     bool m_notificationsVisible;
 
     bool m_calendarVisible;
@@ -320,49 +318,15 @@ private:
     /* Slider-related state. */
 
     /** Navigation item. */
-    QnNavigationItem *m_sliderItem;
-
-    QGraphicsWidget *m_sliderResizerWidget;
-
-    bool m_ignoreSliderResizerGeometryChanges;
-    bool m_ignoreSliderResizerGeometryLater;
-
-    bool m_ignoreTreeResizerGeometryChanges;
-    bool m_updateTreeResizerGeometryLater;
-
-    bool m_sliderZoomingIn, m_sliderZoomingOut;
-
-    QGraphicsWidget *m_sliderZoomButtonsWidget;
-
-    /** Hover processor that is used to change slider opacity when mouse is hovered over it. */
-    HoverFocusProcessor *m_sliderOpacityProcessor;
-
-    /** Animator for slider position. */
-    VariantAnimator *m_sliderYAnimator;
-
-    QnImageButtonWidget *m_sliderShowButton;
-
-    /** Special widget to show slider by hover. */
-    QGraphicsWidget* m_sliderShowWidget;
-
-    /** Hover processor that is used to show the slider when the mouse hovers over it. */
-    HoverFocusProcessor *m_sliderShowingProcessor;
-
-    /** Hover processor that is used to hide the slider when the mouse leaves it. */
-    HoverFocusProcessor *m_sliderHidingProcessor;
-
-    AnimatorGroup *m_sliderOpacityAnimatorGroup;
-
-    QTimer* m_sliderAutoHideTimer;
-
-    qreal m_lastThumbnailsHeight;
-
+    QnWorkbenchUiTimeline m_timeline;
 
     /* Tree-related state. */
 
     /** Navigation tree widget. */
     QnResourceBrowserWidget *m_treeWidget;
     QGraphicsWidget *m_treeResizerWidget;
+    bool m_ignoreTreeResizerGeometryChanges;
+    bool m_updateTreeResizerGeometryLater;
 
     /** Proxy widget for navigation tree widget. */
     QnMaskedProxyWidget *m_treeItem;
