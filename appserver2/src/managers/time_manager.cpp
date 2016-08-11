@@ -745,7 +745,7 @@ namespace ec2
         syncTimeWithAllKnownServers(lock);
     }
 
-    void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransport* transport )
+    void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransportBase* transport )
     {
         using namespace std::placeholders;
 
@@ -1243,7 +1243,7 @@ namespace ec2
     }
 
     void TimeSynchronizationManager::onBeforeSendingTransaction(
-        QnTransactionTransport* /*transport*/,
+        QnTransactionTransportBase* /*transport*/,
         nx_http::HttpHeaders* const headers)
     {
         headers->emplace(
@@ -1252,7 +1252,7 @@ namespace ec2
     }
 
     void TimeSynchronizationManager::onTransactionReceived(
-        QnTransactionTransport* /*transport*/,
+        QnTransactionTransportBase* /*transport*/,
         const nx_http::HttpHeaders& headers)
     {
         for (auto header : headers)

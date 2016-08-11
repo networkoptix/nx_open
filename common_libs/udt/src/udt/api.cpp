@@ -1435,6 +1435,8 @@ void CUDTUnited::updateMux(CUDTSocket* s, const CUDTSocket* ls)
    }
 }
 
+static const int kGarbageCollectTickPeriodMs = 100;
+
 #ifndef _WIN32
    void* CUDTUnited::garbageCollect(void* p)
 #else
@@ -1454,9 +1456,9 @@ void CUDTUnited::updateMux(CUDTSocket* s, const CUDTSocket* ls)
       #endif
 
       #ifndef _WIN32
-         pthread_cond_wait_monotonic_timeout(&self->m_GCStopCond, &self->m_GCStopLock, 1000 * 1000); // 1s
+         pthread_cond_wait_monotonic_timeout(&self->m_GCStopCond, &self->m_GCStopLock, kGarbageCollectTickPeriodMs * 1000);
       #else
-         WaitForSingleObject(self->m_GCStopCond, 1000);
+         WaitForSingleObject(self->m_GCStopCond, kGarbageCollectTickPeriodMs);
       #endif
    }
 
