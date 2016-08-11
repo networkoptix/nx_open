@@ -124,10 +124,7 @@ public:
      *
      * \returns                         Current scene of this workbench display.
      */
-    QGraphicsScene *scene() const
-    {
-        return m_scene;
-    }
+    QGraphicsScene* scene() const;
 
     /**
      * Note that workbench manager does not take ownership of the supplied scene.

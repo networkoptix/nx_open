@@ -332,6 +332,11 @@ SignalingInstrument* QnWorkbenchDisplay::afterPaintInstrument() const
     return m_afterPaintInstrument;
 }
 
+QGraphicsScene* QnWorkbenchDisplay::scene() const
+{
+    return m_scene;
+}
+
 void QnWorkbenchDisplay::setScene(QGraphicsScene *scene)
 {
     if (m_scene == scene)
