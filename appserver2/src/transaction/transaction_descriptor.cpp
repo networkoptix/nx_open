@@ -5,6 +5,8 @@
 
 #include <core/resource_management/user_access_data.h>
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource/camera_resource.h>
+#include <utils/license_usage_helper.h>
 
 #include <nx_ec/data/api_tran_state_data.h>
 
@@ -538,7 +540,24 @@ struct ModifyCameraAttributesAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.cameraID, Qn::SavePermission);
+        if (accessData == Qn::kSystemAccess)
+            return true;
+
+        if (!resourceAccessHelper(accessData, param.cameraID, Qn::SavePermission))
+            return false;
+
+        QnCamLicenseUsageHelper licenseUsageHelper;
+        QnVirtualCameraResourceList cameras;
+
+        auto camera = qnResPool->getResourceById(param.cameraID).dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            return false;
+
+        licenseUsageHelper.propose(camera, param.scheduleEnabled);
+        if (licenseUsageHelper.isOverflowForCamera(camera))
+            return false;
+
+        return true;
     }
 };
 
