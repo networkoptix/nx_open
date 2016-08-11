@@ -63,7 +63,7 @@ angular.module('cloudApp')
             if(L.accessRoles[$scope.user.role.name]){
                 return L.accessRoles[$scope.user.role.name].description;
             }
-            return L.accessRoles.custom.description;
+            return L.accessRoles.customRole.description;
         }
 
         $scope.sharing = process.init(function(){
