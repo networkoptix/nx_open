@@ -1,19 +1,20 @@
-
 #include "system_hosts_model.h"
 
 #include <utils/math/math.h>
 #include <finders/systems_finder.h>
-#include <nx/utils/raii_guard.h>
 #include <nx/utils/disconnect_helper.h>
 
-QnSystemHostsModel::QnSystemHostsModel(QObject *parent)
-    : base_type(parent)
-    , m_disconnectHelper()
-    , m_systemId()
-    , m_hosts()
+QnSystemHostsModel::QnSystemHostsModel(QObject* parent):
+    base_type(parent),
+    m_disconnectHelper(),
+    m_systemId(),
+    m_hosts()
 {
-    connect(this, &QnSystemHostsModel::systemIdChanged
-        , this, &QnSystemHostsModel::reloadHosts);
+    connect(this, &QnSystemHostsModel::systemIdChanged, this, &QnSystemHostsModel::reloadHosts);
+
+    connect(this, &QnSystemHostsModel::modelReset, this, &QnSystemHostsModel::countChanged);
+    connect(this, &QnSystemHostsModel::rowsInserted, this, &QnSystemHostsModel::countChanged);
+    connect(this, &QnSystemHostsModel::rowsRemoved, this, &QnSystemHostsModel::countChanged);
 }
 
 QnSystemHostsModel::~QnSystemHostsModel()
@@ -43,6 +44,11 @@ bool QnSystemHostsModel::isEmpty() const
     return m_hosts.empty();
 }
 
+int QnSystemHostsModel::count() const
+{
+    return m_hosts.size();
+}
+
 int QnSystemHostsModel::rowCount(const QModelIndex &parent) const
 {
     return (parent.isValid() ? 0 : m_hosts.size());
@@ -65,11 +71,9 @@ void QnSystemHostsModel::reloadHosts()
 {
     if (!m_hosts.isEmpty())
     {
-        const auto removeGuard = QnRaiiGuard::create(
-            [this]() { beginRemoveRows(QModelIndex(), 0, m_hosts.size() - 1); }
-            , [this]() { endRemoveRows(); });
-
+        beginResetModel();
         m_hosts.clear();
+        endResetModel();
     }
 
     m_disconnectHelper.reset(new QnDisconnectHelper());
