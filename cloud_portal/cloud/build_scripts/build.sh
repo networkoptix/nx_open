@@ -1,10 +1,16 @@
 #!/bin/bash
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+cd $DIR
+
+. ../../env/bin/activate
+
 echo "Set customization (pass customization name as a single parameter for this script)"
 
 if  [ -z $CLOUD_PORTAL_CONF_DIR ]; then
     echo "Set CLOUD_PORTAL_CONF_DIR"
-    export CLOUD_PORTAL_CONF_DIR=$HOME/networkoptix/develop/cloud_portal/etc
+    export CLOUD_PORTAL_CONF_DIR=../../etc
 fi
 
 CUSTOMIZATION=default
