@@ -3,9 +3,13 @@
 #include <api/model/password_data.h>
 
 #include <utils/common/synctime.h>
+#include <core/resource_management/resource_properties.h>
 
-static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
-static const int MSEC_PER_SEC = 1000;
+namespace {
+    static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
+    static const int MSEC_PER_SEC = 1000;
+    static const QString kFullUserName(lit("FullUserName"));
+}
 
 
 QnUserResource::QnUserResource(QnUserType userType):
@@ -78,6 +82,12 @@ QByteArray QnUserResource::getHash() const
 {
     QnMutexLocker locker(&m_mutex);
     return m_hash;
+}
+
+QString QnUserResource::getName() const
+{
+    QString result = propertyDictionary->value(getId(), kFullUserName);
+    return result.isNull() ? QnResource::getName() : result;
 }
 
 void QnUserResource::setHash(const QByteArray& hash)

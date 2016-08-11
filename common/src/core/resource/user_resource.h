@@ -78,6 +78,7 @@ public:
     static const qint64 PasswordProlongationAuto = -1;
     void prolongatePassword(qint64 value = PasswordProlongationAuto);
 
+    QString getName() const;
 signals:
     void hashChanged(const QnResourcePtr& user);
     void passwordChanged(const QnResourcePtr& user);
