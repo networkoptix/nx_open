@@ -19,7 +19,7 @@ def ping(request):
 @permission_classes((AllowAny, ))
 def cloud_modules(request):
     r = requests.get('http://172.17.0.1:8500/v1/catalog/service/connection_mediator-3345')
-    connection_mediator_hosts = [service['Address'] for service in r.json() if 'udp' in service['ServiceTags']]
+    connection_mediator_hosts = [service['ServiceAddress'] for service in r.json() if service['ServiceTags'] is not None and 'udp' in service['ServiceTags']]
 
     cloud_db_host = os.getenv('CLOUD_DB_HOST', '')
     cloud_portal_host = os.getenv('CLOUD_PORTAL_HOST', '')
