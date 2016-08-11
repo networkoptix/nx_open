@@ -810,12 +810,38 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
         if (infoFile->atEnd())
             break;
         line = QString(infoFile->readLine()).trimmed();
-        if (line.isEmpty() || !line.contains("="))
-            continue;
+
+        auto parseLine = [](const QString& line, std::pair<QString, QString>& keyValue)
+        {
+            thread_local QRegExp keyValueRegExp("^\"(.*)\"=\"(.*)\"$");
+            int reIndex = keyValueRegExp.indexIn(line);
+            if (reIndex == -1)
+            {
+                NX_LOG(lit("%1: Couldn't parse info.txt entry. Line is %2")
+                           .arg(Q_FUNC_INFO)
+                           .arg(line),
+                       cl_logDEBUG1);
+                return false;
+            }
+            NX_ASSERT(keyValueRegExp.captureCount() == 2);
+            if (keyValueRegExp.captureCount() != 2)
+            {
+                NX_LOG(lit("%1: Expected capture count is 2. Got: %2. Line is %3")
+                           .arg(Q_FUNC_INFO)
+                           .arg(keyValueRegExp.captureCount())
+                           .arg(line),
+                       cl_logDEBUG1);
+                return false;
+            }
+            auto captureList = keyValueRegExp.capturedTexts();
+            keyValue.first = captureList[1];
+            keyValue.second = captureList[2];
+            return true;
+        };
 
         std::pair<QString, QString> keyValue;
-        keyValue.first = line.section(lit("="), 0, 0);
-        keyValue.second = line.section(lit("="), 1);
+        if (!parseLine(line, keyValue))
+            continue;
 
         if (keyValue.first.contains(kArchiveCameraNameKey))
             newCamera.coreData.name = keyValue.second;
@@ -1998,18 +2024,21 @@ void QnStorageManager::writeCameraInfoFiles()
                 }
 
                 auto path = basePath + cameraUniqueId + separator + lit("info.txt");
+                storage->removeFile(path);
                 auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly));
                 if (!outFile)
                     continue;
 
+                auto makeQuotedString = [](const QString& s) { return lit("\"") + s + lit("\""); };
+
                 QTextStream outStream(outFile.get());
-                outStream << kArchiveCameraNameKey << "=" << camResource->getUserDefinedName() << endl;
-                outStream << kArchiveCameraModelKey << "=" << camResource->getModel() << endl;
-                outStream << kArchiveCameraGroupIdKey << "=" << camResource->getGroupId() << endl;
-                outStream << kArchiveCameraGroupNameKey << "=" << camResource->getGroupName() << endl;
+                outStream << makeQuotedString(kArchiveCameraNameKey) << "=" << makeQuotedString(camResource->getUserDefinedName()) << endl;
+                outStream << makeQuotedString(kArchiveCameraModelKey) << "=" << makeQuotedString(camResource->getModel()) << endl;
+                outStream << makeQuotedString(kArchiveCameraGroupIdKey) << "=" << makeQuotedString(camResource->getGroupId()) << endl;
+                outStream << makeQuotedString(kArchiveCameraGroupNameKey) << "=" << makeQuotedString(camResource->getGroupName()) << endl;
 
                 for (const auto &prop : camResource->getAllProperties())
-                    outStream << prop.name << "=" << prop.value << endl;
+                    outStream << makeQuotedString(prop.name) << "=" << makeQuotedString(prop.value) << endl;
 
                 *currentWriteFailed = false;
             }
