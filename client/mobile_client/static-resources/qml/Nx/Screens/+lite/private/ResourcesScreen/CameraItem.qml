@@ -173,7 +173,7 @@ Control
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                text: d.unauthorized ? qsTr("Authentication\nrequired") : qsTr("Offline")
+                text: d.unauthorized ? qsTr("Authentication required") : qsTr("Offline")
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 font.pixelSize: 14

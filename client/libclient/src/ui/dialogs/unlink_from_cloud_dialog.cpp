@@ -17,6 +17,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
+#include <ui/style/helper.h>
 #include <ui/widgets/common/input_field.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -27,9 +28,6 @@ namespace {
 
 /** Setup width manually to correctly handle word-wrapped labels. */
 const int kDialogWidth = 400;
-
-const int kWidgetSpacing = 8;
-const QMargins kWidgetMargins(8, 8, 8, 8);
 
 }
 
@@ -213,8 +211,7 @@ void QnUnlinkFromCloudDialogPrivate::setupUi()
 {
     Q_Q(QnUnlinkFromCloudDialog);
     q->setWindowTitle(tr("Disconnect from %1").arg(QnAppInfo::cloudName()));
-    q->setMinimumWidth(kDialogWidth);
-    q->setMaximumWidth(kDialogWidth);
+    q->setFixedWidth(kDialogWidth);
 
     switch (scenario)
     {
@@ -350,8 +347,8 @@ void QnUnlinkFromCloudDialogPrivate::createAuthorizeWidget()
 {
     authorizeWidget = new QWidget();
     auto* layout = new QVBoxLayout(authorizeWidget);
-    layout->setSpacing(kWidgetSpacing);
-    layout->setContentsMargins(kWidgetMargins);
+    layout->setSpacing(style::Metrics::kDefaultLayoutSpacing.height());
+    layout->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
 
     auto loginField = new QnInputField();
     loginField->setReadOnly(true);
@@ -409,8 +406,8 @@ void QnUnlinkFromCloudDialogPrivate::createResetPasswordWidget()
 {
     resetPasswordWidget = new QWidget();
     auto* layout = new QVBoxLayout(resetPasswordWidget);
-    layout->setSpacing(kWidgetSpacing);
-    layout->setContentsMargins(kWidgetMargins);
+    layout->setSpacing(style::Metrics::kDefaultLayoutSpacing.height());
+    layout->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
 
     resetPasswordField = new QnInputField();
     resetPasswordField->setTitle(tr("Password"));

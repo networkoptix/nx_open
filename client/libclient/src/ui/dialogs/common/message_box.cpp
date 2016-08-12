@@ -222,6 +222,8 @@ QnMessageBox::QnMessageBox(
     setText(text);
     setStandardButtons(buttons);
     setIcon(icon);
+
+    setResizeToContentsMode(Qt::Vertical);
 }
 
 QnMessageBox::~QnMessageBox()

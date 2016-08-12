@@ -11,55 +11,18 @@ PageBase
     id: videoScreen
     objectName: "videoScreen"
 
-    property string resourceId
+    property alias resourceId: videoScreenController.resourceId
     property string initialScreenshot
 
-    QnMediaResourceHelper
+    VideoScreenController
     {
-        id: resourceHelper
-        resourceId: videoScreen.resourceId
-    }
+        id: videoScreenController
 
-    QnCameraAccessRightsHelper
-    {
-        id: accessRightsHelper
-        resourceId: videoScreen.resourceId
-    }
-
-    MediaPlayer
-    {
-        id: player
-
-        resourceId: videoScreen.resourceId
-
-        onPlayingChanged:
+        mediaPlayer.onPlayingChanged:
         {
-            if (playing)
+            if (mediaPlayer.playing)
                 video.screenshotSource = ""
-
-            setKeepScreenOn(playing)
         }
-
-        maxTextureSize: getMaxTextureSize()
-    }
-
-    Object
-    {
-        id: d
-
-        property var videoNavigation: navigationLoader.item
-        readonly property bool serverOffline: connectionManager.connectionState == QnConnectionManager.Connecting ||
-                                              connectionManager.connectionState == QnConnectionManager.Disconnected
-        readonly property bool cameraOffline: player.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
-        readonly property bool cameraUnauthorized: player.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
-        readonly property bool failed: player.failed
-        readonly property bool offline: serverOffline || cameraOffline
-
-        property bool showOfflineStatus: false
-        property bool cameraWarningVisible: (showOfflineStatus || cameraUnauthorized || d.failed) && !player.playing
-
-        property bool resumeOnActivate: false
-        property bool resumeAtLive: false
 
         onOfflineChanged:
         {
@@ -70,41 +33,43 @@ PageBase
             else
             {
                 offlineStatusDelay.stop()
-                showOfflineStatus = false
+                d.showOfflineStatus = false
             }
         }
+    }
+
+    Object
+    {
+        id: d
+
+        property var videoNavigation: navigationLoader.item
+
+        property bool showOfflineStatus: false
+        property bool cameraWarningVisible:
+            (showOfflineStatus
+                || videoScreenController.cameraUnauthorized
+                || videoScreenController.failed)
+            && !videoScreenController.mediaPlayer.playing
 
         Timer
         {
             id: offlineStatusDelay
-
-            interval: 20 * 1000
-            repeat: false
-            running: false
-
+            interval: 2000
             onTriggered: d.showOfflineStatus = true
         }
 
-        onShowOfflineStatusChanged: updateOfflineDisplay()
-
-        onFailedChanged:
-        {
-            if (failed)
-                player.stop()
-        }
-
-        function updateOfflineDisplay()
+        onShowOfflineStatusChanged:
         {
             if (cameraWarningVisible)
             {
-                if (serverOffline)
+                if (videoScreenController.serverOffline)
                 {
                     exitFullscreen()
                     navigationLoader.opacity = 0.0
                     navigationBarTint.opacity = 0.0
                     toolBar.opacity = 1.0
                 }
-                else if (cameraOffline)
+                else if (videoScreenController.cameraOffline)
                 {
                     showUi()
                 }
@@ -115,28 +80,6 @@ PageBase
                 navigationBarTint.opacity = 1.0
             }
         }
-
-        Connections
-        {
-            target: Qt.application
-            onStateChanged:
-            {
-                if (!Utils.isMobile())
-                    return
-
-                if (Qt.application.state != Qt.ApplicationActive)
-                {
-                    d.resumeOnActivate = player.playing
-                    player.pause()
-                    showUi()
-                }
-                else if (Qt.application.state == Qt.ApplicationActive)
-                {
-                    if (d.resumeOnActivate)
-                        player.play()
-                }
-            }
-        }
     }
 
     header: ToolBar
@@ -144,7 +87,7 @@ PageBase
         id: toolBar
 
         y: statusBarHeight
-        title: resourceHelper.resourceName
+        title: videoScreenController.resourceHelper.resourceName
         leftButtonIcon: lp("/images/arrow_back.png")
         onLeftButtonClicked: Workflow.popCurrentScreen()
         background: Image
@@ -154,7 +97,6 @@ PageBase
             source: lp("/images/toolbar_gradient.png")
         }
 
-        opacity: liteMode ? 0.0 : 1.0
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
 
         controls:
@@ -186,15 +128,15 @@ PageBase
                 var dialog = Workflow.openDialog(
                     "Screens/private/VideoScreen/QualityDialog.qml",
                     {
-                        "actualQuality": player.currentResolution,
-                        "activeQuality": player.videoQuality
+                        "actualQuality": videoScreenController.mediaPlayer.currentResolution,
+                        "activeQuality": videoScreenController.mediaPlayer.videoQuality
                     }
                 )
 
                 dialog.onActiveQualityChanged.connect(
                     function()
                     {
-                        player.videoQuality = dialog.activeQuality
+                        videoScreenController.mediaPlayer.videoQuality = dialog.activeQuality
                     }
                 )
             }
@@ -215,10 +157,11 @@ PageBase
 
         visible: dummyLoader.status != Loader.Ready
 
-        source: player
+        source: videoScreenController.mediaPlayer
         screenshotSource: initialScreenshot
-        customAspectRatio: resourceHelper.customAspectRatio || player.aspectRatio
-        videoRotation: resourceHelper.customRotation
+        customAspectRatio: (videoScreenController.resourceHelper.customAspectRatio
+            || videoScreenController.mediaPlayer.aspectRatio)
+        videoRotation: videoScreenController.resourceHelper.customRotation
 
         onClicked:
         {
@@ -252,61 +195,10 @@ PageBase
     {
         id: dummyComponent
 
-        Column
+        VideoDummy
         {
-            id: videoDummy
-
-            Image
-            {
-                width: 136
-                height: 136
-
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                source:
-                {
-                    if (d.serverOffline)
-                        return lp("/images/server_offline_1.png")
-                    else if (d.cameraUnauthorized)
-                        return lp("/images/camera_locked_1.png")
-                    else if (d.cameraOffline)
-                        return lp("/images/camera_offline_1.png")
-                    else if (d.failed)
-                        return lp("/images/camera_warning_1.png")
-                    else
-                        return ""
-                }
-            }
-
-            Text
-            {
-                height: 96
-                color: ColorTheme.base13
-
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: 32
-                font.weight: Font.Normal
-
-                wrapMode: Text.WordWrap
-                width: videoScreen.width
-
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                text:
-                {
-                    if (d.serverOffline)
-                        return qsTr("Server offline")
-                    else if (d.cameraUnauthorized)
-                        return qsTr("Authentication\nrequired")
-                    else if (d.cameraOffline)
-                        return qsTr("Camera offline")
-                    else if (d.failed)
-                        return qsTr("Can't load video")
-                    else
-                        return ""
-                }
-            }
+            width: videoScreen.width
+            state: videoScreenController.dummyState
         }
     }
 
@@ -318,17 +210,10 @@ PageBase
         width: parent.width
 
         visible: opacity > 0
-        opacity: liteMode ? 0.0 : 1.0
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
 
-        Component.onCompleted:
-        {
-            if (!liteMode)
-            {
-                sourceComponent = accessRightsHelper.canViewArchive
-                    ? navigationComponent : liveNavigationComponent
-            }
-        }
+        sourceComponent: (videoScreenController.accessRightsHelper.canViewArchive
+            ? navigationComponent : liveNavigationComponent)
     }
 
     Component
@@ -337,7 +222,7 @@ PageBase
 
         VideoNavigation
         {
-            mediaPlayer: player
+            mediaPlayer: videoScreenController.mediaPlayer
         }
     }
 
@@ -347,7 +232,7 @@ PageBase
 
         LiveVideoNavigation
         {
-            mediaPlayer: player
+            mediaPlayer: videoScreenController.mediaPlayer
         }
     }
 
@@ -360,7 +245,6 @@ PageBase
         height: video.height
         anchors.left: parent.right
         anchors.top: video.top
-        opacity: liteMode ? 0.0 : 1.0
 
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
     }
@@ -381,33 +265,5 @@ PageBase
         navigationLoader.opacity = 1.0
         toolBar.opacity = 1.0
         navigationBarTint.opacity = 1.0
-    }
-
-    Keys.onReturnPressed:
-    {
-        if (!liteMode)
-            return
-
-        Workflow.popCurrentScreen()
-    }
-
-    Keys.onSpacePressed:
-    {
-        if (navigationLoader.visible)
-            hideUi()
-        else
-            showUi()
-    }
-
-    Component.onCompleted:
-    {
-        player.playLive()
-        if (liteMode)
-            hideUi()
-    }
-
-    Component.onDestruction:
-    {
-        setKeepScreenOn(false)
     }
 }

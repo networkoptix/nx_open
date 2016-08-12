@@ -30,6 +30,9 @@ public:
     Q_INVOKABLE int rowByResourceId(const QString& resourceId) const;
     Q_INVOKABLE QString resourceIdByRow(int row) const;
 
+    Q_INVOKABLE QString nextResourceId(const QString& resourceId) const;
+    Q_INVOKABLE QString previousResourceId(const QString& resourceId) const;
+
 public slots:
     void refreshThumbnail(int row);
     void refreshThumbnails(int from, int to);

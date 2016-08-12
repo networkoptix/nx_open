@@ -51,11 +51,10 @@ StackView
 
         SequentialAnimation
         {
-            NumberAnimation
+            PropertyAction
             {
                 property: "opacity"
-                to: 0
-                duration: 0
+                value: 0
             }
             PauseAnimation
             {
@@ -127,17 +126,15 @@ StackView
     {
         id: justShowTransition
 
-        NumberAnimation
+        PropertyAction
         {
             property: "opacity"
-            to: 1
-            duration: 0
+            value: 1
         }
-        NumberAnimation
+        PropertyAction
         {
             property: "x"
-            to: 0
-            duration: 0
+            value: 0
         }
     }
 

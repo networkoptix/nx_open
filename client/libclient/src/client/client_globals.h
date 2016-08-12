@@ -268,9 +268,9 @@ namespace Qn
     */
     enum class PaneState
     {
-        Unpinned,       /**< pane is unpinned           */
-        Opened,         /**< pane is pinned and opened  */
-        Closed          /**< pane is pinned and closed  */
+        Unpinned,       /**< pane is unpinned and closed. Timeline is unpinned and opened. */
+        Opened,         /**< pane is pinned and opened. */
+        Closed          /**< pane is pinned and closed. Timeline is unpinned and closed.  */
     };
 
     /**

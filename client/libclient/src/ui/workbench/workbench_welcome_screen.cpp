@@ -100,7 +100,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
 
     //
     m_widget->installEventFilter(this);
-
+    qApp->installEventFilter(this); //< QTBUG-34414 workaround
     connect(action(QnActions::DisconnectAction), &QAction::triggered,
         this, &QnWorkbenchWelcomeScreen::showScreen);
 
@@ -365,14 +365,21 @@ void QnWorkbenchWelcomeScreen::showScreen()
 
 bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)
 {
+    if (obj != m_widget)
+        return base_type::eventFilter(obj, event);
+
     switch(event->type())
     {
-    case QEvent::Resize:
-        if (auto resizeEvent = dynamic_cast<QResizeEvent *>(event))
-            setPageSize(resizeEvent->size());
-        break;
+        case QEvent::Resize:
+            if (auto resizeEvent = dynamic_cast<QResizeEvent *>(event))
+                setPageSize(resizeEvent->size());
+            break;
+#if defined(Q_OS_MACX)
+        case QEvent::WindowActivate:
+            m_widget->activateWindow(); //< QTBUG-34414 workaround
+            break;
+#endif
     }
-
 
     return base_type::eventFilter(obj, event);
 }
