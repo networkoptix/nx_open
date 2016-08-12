@@ -6,82 +6,101 @@ Item
 {
     id: camerasGrid
 
-    property alias layoutId: layoutHelper.layoutId
+    property alias layoutId: gridLayoutHelper.layoutId
 
     QnLiteClientLayoutHelper
     {
-        id: layoutHelper
+        id: gridLayoutHelper
 
-        onLayoutChanged:
+        onLayoutChanged: switchMode()
+        onDisplayModeChanged: switchMode()
+
+        onSingleCameraIdChanged:
         {
-            resetLayout()
-
-            if (displayMode == QnLiteClientLayoutHelper.SingleCamera)
-                Workflow.openVideoScreen(Qt.binding(function() { return singleCameraId }))
-        }
-
-        onDisplayModeChanged:
-        {
-            if (displayMode == QnLiteClientLayoutHelper.SingleCamera)
-                Workflow.openVideoScreen(Qt.binding(function() { return singleCameraId }))
-            else
-                Workflow.openResourcesScreen()
-        }
-
-        onCameraIdChanged:
-        {
-            var item = grid.itemAt(x, y)
-            if (!item)
+            var item = stackView.currentItem
+            if (item.objectName != "videoScreen")
                 return
 
-            item.resourceId = resourceId
+            item.resourceId = singleCameraId
+        }
+
+        function switchMode()
+        {
+            if (displayMode == QnLiteClientLayoutHelper.SingleCamera)
+            {
+                if (stackView.currentItem.objectName != "videoScreen")
+                {
+                    var item = Workflow.openVideoScreen(singleCameraId)
+                    item.layoutHelper = gridLayoutHelper
+                    item.camerasModel = camerasModel
+                }
+            }
+            else
+            {
+                Workflow.openResourcesScreen()
+            }
         }
     }
 
-    Grid
+    QnCameraListModel
+    {
+        id: camerasModel
+    }
+
+    GridView
     {
         id: grid
 
         anchors.fill: parent
+        boundsBehavior: Flickable.StopAtBounds
 
-        columns: 2
-        rows: 2
+        property int columns: 2
+        property int rows: 2
+        model: rows * columns
+        cellWidth: width / columns
+        cellHeight: height / rows
 
-        Repeater
+        currentIndex: 0
+
+        delegate: CameraItem
         {
-            id: repeater
+            width: grid.cellWidth
+            height: grid.cellHeight
+            paused: !resourcesScreen.activePage
+            active: GridView.isCurrentItem
+            layoutHelper: gridLayoutHelper
+            layoutX: index % grid.columns
+            layoutY: Math.floor(index / grid.columns)
 
-            model: grid.columns * grid.rows
-
-            CameraItem
+            onClicked: gridLayoutHelper.displayCell = Qt.point(layoutX, layoutY)
+            onNextCameraRequested:
             {
-                width: grid.width / grid.columns
-                height: grid.height / grid.rows
-                paused: !resourcesScreen.activePage
+                gridLayoutHelper.setCameraIdOnCell(
+                    layoutX, layoutY, camerasModel.nextResourceId(resourceId))
+            }
+            onPreviousCameraRequested:
+            {
+                gridLayoutHelper.setCameraIdOnCell(
+                    layoutX, layoutY, camerasModel.previousResourceId(resourceId))
+            }
+
+            onActivityDetected:
+            {
+                if (grid.currentItem)
+                    grid.currentItem.showControls()
             }
         }
+    }
 
-        function itemAt(x, y)
+    Connections
+    {
+        target: resourcesScreen
+        onActivePageChanged:
         {
-            return repeater.itemAt(y * columns + x)
+            if (resourcesScreen.activePage)
+                gridLayoutHelper.displayCell = Qt.point(-1, -1)
         }
     }
 
-    Component.onCompleted:
-    {
-        resetLayout()
-        forceActiveFocus()
-    }
-
-    function resetLayout()
-    {
-        for (var y = 0; y < grid.rows; ++y)
-        {
-            for (var x = 0; x < grid.columns; ++x)
-            {
-                var item = grid.itemAt(x, y)
-                item.resourceId = layoutHelper.cameraIdOnCell(x, y)
-            }
-        }
-    }
+    Component.onCompleted: grid.forceActiveFocus()
 }

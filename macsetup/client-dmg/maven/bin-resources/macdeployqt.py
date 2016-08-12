@@ -42,9 +42,9 @@ def set_permissions(path):
 	
 def prepare(binary, sbindir, tlibdir):
     tbindir = os.path.dirname(binary)
-    if os.path.exists(tbindir):
-        shutil.rmtree(tbindir)
-    os.mkdir(tbindir)
+#    if os.path.exists(tbindir):
+#        shutil.rmtree(tbindir)
+#    os.mkdir(tbindir)
 
     if os.path.exists(tlibdir):
         shutil.rmtree(tlibdir)
@@ -69,7 +69,8 @@ def prepare(binary, sbindir, tlibdir):
 
     shutil.copytree(join(sbindir, 'vox'), join(tresdir, 'vox'))
     shutil.copytree(join(sbindir, 'qml'), join(tcontentsdir, 'qml'))
-    shutil.copyfile(join(sbindir, 'applauncher'), join(tbindir, 'applauncher'))
+    shutil.copyfile(join(sbindir, 'applauncher'), join(tbindir, 'applauncher-bin'))
+    os.chmod(join(tbindir, 'applauncher-bin'), 0755)
     os.chmod(join(tbindir, 'applauncher'), 0755)
 
 def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):

@@ -82,7 +82,7 @@
         "timeline_bg":      "#223925",
 
         "opaqueSelection":  "blue10",
-        "ptz":              "opaqueSelection",
+        "ptz":              "blue10",
         "selection":        "opaqueSelection.setAlpha(110)"
     },
 

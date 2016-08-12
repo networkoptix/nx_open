@@ -582,8 +582,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         }
     }
 
-    setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, true);
-
     updateMotionWidgetFromResource();
     updateMotionAvailability();
     updateIpAddressText();

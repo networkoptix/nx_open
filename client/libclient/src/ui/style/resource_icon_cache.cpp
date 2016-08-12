@@ -7,6 +7,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 
 #include <ui/style/skin.h>
@@ -201,7 +202,10 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             break;
 
         case Qn::Incompatible:
-            status = Incompatible;
+            if (key == Server && QnMediaServerResource::isFakeServer(resource))
+                status = Online;
+            else
+                status = Incompatible;
             break;
 
         default:

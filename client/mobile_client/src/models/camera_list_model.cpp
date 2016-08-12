@@ -44,6 +44,8 @@ QnCameraListModel::QnCameraListModel(QObject* parent) :
 
 QnCameraListModel::~QnCameraListModel()
 {
+    connect(this, &QnCameraListModel::rowsInserted, this, &QnCameraListModel::countChanged);
+    connect(this, &QnCameraListModel::rowsRemoved, this, &QnCameraListModel::countChanged);
 }
 
 QHash<int, QByteArray> QnCameraListModel::roleNames() const
@@ -101,6 +103,11 @@ void QnCameraListModel::setLayoutId(const QString& layoutId)
     emit layoutIdChanged();
 }
 
+int QnCameraListModel::count() const
+{
+    return rowCount();
+}
+
 int QnCameraListModel::rowByResourceId(const QString& resourceId) const
 {
     Q_D(const QnCameraListModel);
@@ -116,6 +123,44 @@ int QnCameraListModel::rowByResourceId(const QString& resourceId) const
     index = mapFromSource(index);
 
     return index.row();
+}
+
+QString QnCameraListModel::resourceIdByRow(int row) const
+{
+    if (!hasIndex(row, 0))
+        return QString();
+
+    return data(index(row, 0), Qn::UuidRole).toString();
+}
+
+QString QnCameraListModel::nextResourceId(const QString& resourceId) const
+{
+    if (rowCount() == 0)
+        return QString();
+
+    if (resourceId.isEmpty())
+        return resourceIdByRow(0);
+
+    int row = rowByResourceId(resourceId);
+    if (row == rowCount() - 1)
+        return QString();
+
+    return resourceIdByRow(row + 1);
+}
+
+QString QnCameraListModel::previousResourceId(const QString& resourceId) const
+{
+    if (rowCount() == 0)
+        return QString();
+
+    if (resourceId.isEmpty())
+        return resourceIdByRow(rowCount() - 1);
+
+    int row = rowByResourceId(resourceId);
+    if (row == 0)
+        return QString();
+
+    return resourceIdByRow(row - 1);
 }
 
 void QnCameraListModel::refreshThumbnail(int row)

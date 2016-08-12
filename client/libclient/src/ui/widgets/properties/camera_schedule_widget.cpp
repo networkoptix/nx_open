@@ -262,7 +262,6 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui->gridWidget->installEventFilter(gridMouseReleaseSignalizer);
 
     setWarningStyle(ui->minArchiveDaysWarningLabel);
-    ui->minArchiveDaysWarningLabel->setVisible(false);
 
     connectToGridWidget();
 
@@ -1013,5 +1012,7 @@ void QnCameraScheduleWidget::validateArchiveLength() {
         if (ui->spinBoxMaxDays->value() < ui->spinBoxMinDays->value())
             ui->spinBoxMaxDays->setValue(ui->spinBoxMinDays->value());
     }
-    ui->minArchiveDaysWarningLabel->setVisible(ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() > kDangerousMinArchiveDays);
+
+    bool warningVisible = ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() > kDangerousMinArchiveDays;
+    ui->warningStackedWidget->setCurrentWidget(warningVisible ? ui->warningPage : ui->noWarningPage);
 }

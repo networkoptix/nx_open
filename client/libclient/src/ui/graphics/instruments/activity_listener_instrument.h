@@ -7,7 +7,7 @@
 
 /**
  * This instrument makes it possible to listen to user activity.
- * 
+ *
  * If the user didn't use the mouse or keyboard for the given amount of time,
  * <tt>activityStopped()</tt> signal is emitted. When the user starts using
  * mouse or keyboard again, <tt>activityResumed()</tt> signal is emitted.
@@ -18,9 +18,9 @@ public:
     ActivityListenerInstrument(bool focusedOnly, int activityTimeoutMSec, QObject *parent = NULL);
     virtual ~ActivityListenerInstrument();
 
-    int activityTimeoutMSec() const {
-        return m_activityTimeoutMSec;
-    }
+    int activityTimeoutMSec() const;
+
+    bool isActive() const;
 
 signals:
     void activityStopped();

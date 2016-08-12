@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 
@@ -10,6 +12,7 @@
 #include <ui/common/geometry.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
+#include <ui/workbench/ui/timeline.h>
 
 #include <client/client_globals.h>
 
@@ -26,7 +29,6 @@ class VariantAnimator;
 class AnimatorGroup;
 class HoverFocusProcessor;
 
-class QnNavigationItem;
 class QnResourceBrowserWidget;
 class QnProxyLabel;
 class QnDebugProxyLabel;
@@ -47,14 +49,20 @@ class QnNotificationsCollectionWidget;
 class QnDayTimeWidget;
 struct QnPaneSettings;
 
-class QnWorkbenchUi: public Disconnective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
+class QnWorkbenchUi:
+    public Disconnective<QObject>,
+    public QnWorkbenchContextAware,
+    public QnActionTargetProvider,
+    public AnimationTimerListener,
+    protected QnGeometry
+{
     Q_OBJECT
     Q_ENUMS(Flags Flag)
 
-    typedef Disconnective<QObject> base_type;
-
+    using base_type = Disconnective<QObject>;
 public:
-    enum Flag {
+    enum Flag
+    {
         /** Whether controls should be hidden after a period without activity in zoomed mode. */
         HideWhenZoomed = 0x1,
 
@@ -66,7 +74,8 @@ public:
     };
     Q_DECLARE_FLAGS(Flags, Flag)
 
-    enum Panel {
+    enum Panel
+    {
         NoPanel = 0x0,
         TreePanel = 0x1,
         TitlePanel = 0x2,
@@ -82,15 +91,11 @@ public:
     virtual Qn::ActionScope currentScope() const override;
     virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
 
-    Flags flags() const {
-        return m_flags;
-    }
+    Flags flags() const;
 
     void setFlags(Flags flags);
 
-    bool isTitleUsed() const {
-        return m_titleUsed;
-    }
+    bool isTitleUsed() const;
 
     bool isFpsVisible() const;
 
@@ -102,6 +107,8 @@ public:
 
     /** Whether navigation slider is opened. */
     bool isSliderOpened() const;
+
+    bool isSliderPinned() const;
 
     /** Whether title bar is opened. */
     bool isTitleOpened() const;
@@ -118,16 +125,16 @@ public:
     /** Whether the calendar is opened */
     bool isCalendarOpened() const;
 
-    bool isTreeVisible() const          { return m_treeVisible; }
-    bool isSliderVisible() const        { return m_sliderVisible; }
-    bool isTitleVisible() const         { return m_titleVisible; }
-    bool isNotificationsVisible() const { return m_notificationsVisible; }
-    bool isCalendarVisible() const      { return m_calendarVisible; }
+    bool isTreeVisible() const;
+    bool isSliderVisible() const;
+    bool isTitleVisible() const;
+    bool isNotificationsVisible() const;
+    bool isCalendarVisible() const;
 
 public slots:
     void setProxyUpdatesEnabled(bool updatesEnabled);
-    void enableProxyUpdates() { setProxyUpdatesEnabled(true); }
-    void disableProxyUpdates() { setProxyUpdatesEnabled(false); }
+    void enableProxyUpdates();
+    void disableProxyUpdates();
 
     void setTitleUsed(bool titleUsed = true);
     void setFpsVisible(bool fpsVisible = true);
@@ -186,7 +193,10 @@ private:
     void createNotificationsWidget(const QnPaneSettings& settings);
     void createCalendarWidget(const QnPaneSettings& settings);
     void createSliderWidget(const QnPaneSettings& settings);
+
+#ifdef _DEBUG
     void createDebugWidget();
+#endif
 
     Panels openedPanels() const;
     void setOpenedPanels(Panels panels, bool animate = true);
@@ -197,6 +207,8 @@ private:
     void ensureAnimationAllowed(bool &animate);
 
     void storeSettings();
+
+    void updateCursor();
 
     QnImageButtonWidget* newActionButton(QGraphicsItem *parent, QAction* action, int helpTopicId);
     QnImageButtonWidget* newShowHideButton(QGraphicsItem* parent, QAction* action);
@@ -220,6 +232,7 @@ private slots:
     void updateCalendarVisibilityAnimated() { updateCalendarVisibility(true); }
     void updateControlsVisibilityAnimated() { updateControlsVisibility(true); }
 
+    void setSliderShowButtonUsed(bool used);
     void setTreeShowButtonUsed(bool used);
     void setNotificationsShowButtonUsed(bool used);
     void setCalendarShowButtonUsed(bool used);
@@ -270,7 +283,7 @@ private:
     Flags m_flags;
 
     /** Widgets by role. */
-    QnResourceWidget *m_widgetByRole[Qn::ItemRoleCount];
+    std::array<QnResourceWidget*, Qn::ItemRoleCount> m_widgetByRole;
 
     /** Widget that ui controls are placed on. */
     QGraphicsWidget *m_controlsWidget;
@@ -283,8 +296,6 @@ private:
     bool m_titleUsed;
 
     bool m_titleVisible;
-
-    bool m_sliderVisible;
 
     bool m_notificationsVisible;
 
@@ -304,44 +315,18 @@ private:
 
     Panels m_unzoomedOpenedPanels;
 
-
     /* Slider-related state. */
 
     /** Navigation item. */
-    QnNavigationItem *m_sliderItem;
-
-    QGraphicsWidget *m_sliderResizerWidget;
-
-    bool m_ignoreSliderResizerGeometryChanges;
-    bool m_ignoreSliderResizerGeometryLater;
-
-    bool m_ignoreTreeResizerGeometryChanges;
-    bool m_updateTreeResizerGeometryLater;
-
-    bool m_sliderZoomingIn, m_sliderZoomingOut;
-
-    QGraphicsWidget *m_sliderZoomButtonsWidget;
-
-    /** Hover processor that is used to change slider opacity when mouse is hovered over it. */
-    HoverFocusProcessor *m_sliderOpacityProcessor;
-
-    /** Animator for slider position. */
-    VariantAnimator *m_sliderYAnimator;
-
-    QnImageButtonWidget *m_sliderShowButton;
-
-    AnimatorGroup *m_sliderOpacityAnimatorGroup;
-
-    QTimer* m_sliderAutoHideTimer;
-
-    qreal m_lastThumbnailsHeight;
-
+    QnWorkbenchUiTimeline m_timeline;
 
     /* Tree-related state. */
 
     /** Navigation tree widget. */
     QnResourceBrowserWidget *m_treeWidget;
     QGraphicsWidget *m_treeResizerWidget;
+    bool m_ignoreTreeResizerGeometryChanges;
+    bool m_updateTreeResizerGeometryLater;
 
     /** Proxy widget for navigation tree widget. */
     QnMaskedProxyWidget *m_treeItem;

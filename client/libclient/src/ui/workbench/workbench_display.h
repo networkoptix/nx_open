@@ -1,24 +1,26 @@
-#ifndef QN_WORKBENCH_MANAGER_H
-#define QN_WORKBENCH_MANAGER_H
+#pragma once
+
+#include <array>
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
-#include <nx/utils/uuid.h>
 #include <QtOpenGL/QGLWidget>
 
-#include <utils/common/connective.h>
+#include <business/business_fwd.h>
+
+#include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>
-#include <business/business_fwd.h>
 
 #include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/graphics/view/graphics_view.h>
+#include <ui/workbench/workbench_context_aware.h>
 
-#include <client/client_globals.h>
+#include <nx/utils/uuid.h>
 
-#include "workbench_context_aware.h"
+#include <utils/common/connective.h>
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -31,8 +33,6 @@ class ForwardingInstrument;
 class SignalingInstrument;
 class SelectionOverlayHackInstrument;
 class FocusListenerInstrument;
-
-class QnAbstractRenderer;
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -47,9 +47,6 @@ class QnCurtainAnimator;
 class QnCurtainItem;
 class QnGridItem;
 class QnGridBackgroundItem;
-class QnWorkbenchContext;
-class QnWorkbenchStreamSynchronizer;
-class QnToggle;
 class QnThumbnailsLoader;
 class QnThumbnail;
 
@@ -61,11 +58,12 @@ class QnCamDisplay;
  *
  * It presents some low-level functions for viewport and item manipulation.
  */
-class QnWorkbenchDisplay: public Connective<QObject>, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations {
+class QnWorkbenchDisplay: public Connective<QObject>, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations
+{
     Q_OBJECT
     Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity)
 
-    typedef Connective<QObject> base_type;
+    using base_type = Connective<QObject>;
 
 public:
     /**
@@ -80,69 +78,45 @@ public:
      */
     virtual ~QnWorkbenchDisplay();
 
-     /**
-     * \returns                         Light mode of this workbench display.
-     */
+    /**
+    * \returns                         Light mode of this workbench display.
+    */
     Qn::LightModeFlags lightMode() const;
 
-     /**
-     * \param mode                      Light mode for the current display.
-     *                                  Enables or disables certain visualization features
-     *                                  to simplify and speed up painting.
-     */
+    /**
+    * \param mode                      Light mode for the current display.
+    *                                  Enables or disables certain visualization features
+    *                                  to simplify and speed up painting.
+    */
     void setLightMode(Qn::LightModeFlags mode);
 
     /**
      * \returns                         Instrument manager owned by this workbench display.
      */
-    InstrumentManager *instrumentManager() const {
-        return m_instrumentManager;
-    }
+    InstrumentManager* instrumentManager() const;
 
     /**
      * \returns                         Bounding instrument used by this workbench display.
      */
-    BoundingInstrument *boundingInstrument() const {
-        return m_boundingInstrument;
-    }
+    BoundingInstrument* boundingInstrument() const;
 
     /**
      * \returns                         Transformation listener instrument used by this workbench display.
      */
-    TransformListenerInstrument *transformationListenerInstrument() const {
-        return m_transformListenerInstrument;
-    }
+    TransformListenerInstrument* transformationListenerInstrument() const;
 
-    /**
-     * \returns                         Activity listener instrument used by this workbench display to
-     *                                  implement automatic curtaining.
-     */
-    ActivityListenerInstrument *activityListenerInstrument() const {
-        return m_curtainActivityInstrument;
-    }
-
-    FocusListenerInstrument *focusListenerInstrument() const {
-        return m_focusListenerInstrument;
-    }
+    FocusListenerInstrument* focusListenerInstrument() const;
 
     /**
      * \returns                         Paint forwarding instrument used by this workbench display.
      */
-    ForwardingInstrument *paintForwardingInstrument() const {
-        return m_paintForwardingInstrument;
-    }
+    ForwardingInstrument* paintForwardingInstrument() const;
 
-    SelectionOverlayHackInstrument *selectionOverlayHackInstrument() const {
-        return m_selectionOverlayHackInstrument;
-    }
+    SelectionOverlayHackInstrument* selectionOverlayHackInstrument() const;
 
-    SignalingInstrument *beforePaintInstrument() const {
-        return m_beforePaintInstrument;
-    }
+    SignalingInstrument* beforePaintInstrument() const;
 
-    SignalingInstrument *afterPaintInstrument() const {
-        return m_afterPaintInstrument;
-    }
+    SignalingInstrument* afterPaintInstrument() const;
 
 
     /**
@@ -150,9 +124,7 @@ public:
      *
      * \returns                         Current scene of this workbench display.
      */
-    QGraphicsScene *scene() const {
-        return m_scene;
-    }
+    QGraphicsScene* scene() const;
 
     /**
      * Note that workbench manager does not take ownership of the supplied scene.
@@ -161,20 +133,18 @@ public:
      *                                  If NULL is supplied, an empty scene
      *                                  owned by this workbench display is used.
      */
-    void setScene(QGraphicsScene *scene);
+    void setScene(QGraphicsScene* scene);
 
     /**
      * \returns                         Current graphics view of this workbench display.
      *                                  May be NULL.
      */
-    QnGraphicsView *view() const {
-        return m_view;
-    }
+    QnGraphicsView* view() const;
 
     /**
      * \param view                      New view for this workbench display.
      */
-    void setView(QnGraphicsView *view);
+    void setView(QnGraphicsView* view);
 
     /**
      * \returns                         Grid item.
@@ -201,12 +171,6 @@ public:
      * \returns                         Widget for the given item.
      */
     QnResourceWidget *widget(QnWorkbenchItem *item) const;
-
-    /**
-     * \param renderer                  Renderer to get widget for.
-     * \returns                         Widget for the given renderer.
-     */
-    QnResourceWidget *widget(QnAbstractRenderer *renderer) const;
 
     QnResourceWidget *widget(Qn::ItemRole role) const;
 
@@ -389,7 +353,6 @@ protected slots:
     void synchronizeRaisedGeometry();
     void updateFrameWidths();
 
-    void updateCurtainedCursor();
     void updateBackground(const QnLayoutResourcePtr &layout);
 
     /** Mark item on the scene selected as it was selected in the tree. */
@@ -412,6 +375,7 @@ protected slots:
     void at_layout_boundingRectChanged(const QRect &oldRect, const QRect &newRect);
 
     void at_context_permissionsChanged(const QnResourcePtr &resource);
+    void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
@@ -420,8 +384,6 @@ protected slots:
     void at_item_dataChanged(int role);
     void at_item_flagChanged(Qn::ItemFlag flag, bool value);
 
-    void at_curtainActivityInstrument_activityStopped();
-    void at_curtainActivityInstrument_activityStarted();
     void at_widgetActivityInstrument_activityStopped();
     void at_widgetActivityInstrument_activityStarted();
 
@@ -452,18 +414,11 @@ private:
     /** Set of flags to simplify and speed up painting. */
     Qn::LightModeFlags m_lightMode;
 
-    /** Zoomed state toggle. */
-    QnToggle *m_zoomedToggle;
-
     /* Internal state. */
-
     QList<QnResourceWidget *> m_widgets;
 
     /** Item to widget mapping. */
     QHash<QnWorkbenchItem *, QnResourceWidget *> m_widgetByItem;
-
-    /** Renderer to widget mapping. */
-    QHash<QnAbstractRenderer *, QnResourceWidget *> m_widgetByRenderer; // TODO: #Elric not used anymore?
 
     /** Resource to widget mapping. */
     QHash<QnResourcePtr, QList<QnResourceWidget *> > m_widgetsByResource;
@@ -475,7 +430,7 @@ private:
     qreal m_frontZ;
 
     /** Current items by role. */
-    QnResourceWidget *m_widgetByRole[Qn::ItemRoleCount];
+    std::array<QnResourceWidget*, Qn::ItemRoleCount> m_widgetByRole;
 
     /** Grid item. */
     QPointer<QnGridItem> m_gridItem;
@@ -504,9 +459,6 @@ private:
 
     /** Transformation listener instrument. */
     TransformListenerInstrument *m_transformListenerInstrument;
-
-    /** Activity listener instrument for curtain item. */
-    ActivityListenerInstrument *m_curtainActivityInstrument;
 
     /** Activity listener instrument for resource widgets. */
     ActivityListenerInstrument *m_widgetActivityInstrument;
@@ -544,5 +496,3 @@ private:
 
     QnThumbnailsLoader *m_loader;
 };
-
-#endif // QN_WORKBENCH_MANAGER_H

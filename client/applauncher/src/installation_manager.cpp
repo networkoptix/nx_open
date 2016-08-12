@@ -20,7 +20,7 @@
 namespace {
     QRegExp versionDirRegExp("\\d+\\.\\d+(?:\\.\\d+\\.\\d+){0,1}");
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
     QString installationPathPrefix = ".local/share";
 #else
     QString installationPathPrefix = "AppData/Local";

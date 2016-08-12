@@ -772,6 +772,10 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         {
             result |= Qn::ReadPermission;
 
+            /* Nobody can do something with owner. */
+            if (targetUser->isOwner())
+                return result;
+
             /* Admins can only be edited by owner, other users - by all admins. */
             if (user->isOwner() || !hasGlobalPermission(targetUser, Qn::GlobalAdminPermission))
                 result |= Qn::ReadWriteSavePermission

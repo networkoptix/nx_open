@@ -40,11 +40,12 @@ function openNewSessionScreen()
     item.focusHostField()
 }
 
-function openDiscoveredSession(systemName, address)
+function openDiscoveredSession(systemId, systemName, address)
 {
     var item = stackView.push(
             Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
             {
+                "systemId": systemId,
                 "systemName": systemName,
                 "address": address
             }
@@ -52,11 +53,12 @@ function openDiscoveredSession(systemName, address)
     item.focusLoginField()
 }
 
-function openSavedSession(systemName, address, login, password)
+function openSavedSession(systemId, systemName, address, login, password)
 {
     var item = stackView.push(
             Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
             {
+                "systemId": systemId,
                 "systemName": systemName,
                 "address": address,
                 "login": login,
@@ -99,6 +101,7 @@ function openVideoScreen(resourceId, screenshotUrl, xHint, yHint)
             }
     )
     item.forceActiveFocus()
+    return item
 }
 
 function openSettingsScreen(systemName)

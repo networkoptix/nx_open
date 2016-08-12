@@ -54,3 +54,25 @@ int QnBusinessTypesComparator::toLexActionType( QnBusiness::ActionType actionTyp
     return m_actionTypeToLexOrder[actionType];
 }
 
+QList<QnBusiness::EventType> QnBusinessTypesComparator::lexSortedEvents() const
+{
+    auto events = QnBusiness::allEvents();
+    std::sort(events.begin(), events.end(),
+        [this](QnBusiness::EventType l, QnBusiness::EventType r)
+        {
+            return lexicographicalLessThan(l, r);
+        });
+    return events;
+}
+
+QList<QnBusiness::ActionType> QnBusinessTypesComparator::lexSortedActions() const
+{
+    auto actions = QnBusiness::allActions();
+    std::sort(actions.begin(), actions.end(),
+        [this](QnBusiness::ActionType l, QnBusiness::ActionType r)
+        {
+            return lexicographicalLessThan(l, r);
+        });
+    return actions;
+}
+

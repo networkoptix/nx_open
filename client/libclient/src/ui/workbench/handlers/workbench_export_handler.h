@@ -15,13 +15,14 @@ class QnWorkbenchExportHandler: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    typedef QObject base_type;
+    using base_type = QObject;
 public:
     QnWorkbenchExportHandler(QObject *parent = NULL);
 
     bool saveLocalLayout(const QnLayoutResourcePtr &layout, bool readOnly, bool cancellable, QObject *target = NULL, const char *slot = NULL);
 
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, const QnLayoutResourcePtr &layout, Qn::LayoutExportMode mode);
+
 private:
     QString binaryFilterName() const;
 
@@ -29,13 +30,13 @@ private:
     void removeLayoutFromPool(const QnLayoutResourcePtr &existingLayout);
 
     bool saveLayoutToLocalFile(const QnLayoutResourcePtr &layout,
-                               const QnTimePeriod& exportPeriod,
-                               const QString& layoutFileName,
-                               Qn::LayoutExportMode mode,
-                               bool readOnly,
-                               bool cancellable,
-                               QObject *target = NULL,
-                               const char *slot = NULL);
+        const QnTimePeriod& exportPeriod,
+        const QString& layoutFileName,
+        Qn::LayoutExportMode mode,
+        bool readOnly,
+        bool cancellable,
+        QObject *target = NULL,
+        const char *slot = NULL);
 
     bool lockFile(const QString &filename);
     void unlockFile(const QString &filename);
@@ -47,14 +48,22 @@ private:
     void exportTimeSelection(const QnActionParameters& parameters, qint64 timelapseFrameStepMs = 0);
 
     void exportTimeSelectionInternal(
-          const QnMediaResourcePtr &mediaResource,
-          const QnAbstractStreamDataProvider *dataProvider,
-          const QnLayoutItemData &itemData,
-          const QnTimePeriod &period,
-          qint64 timelapseFrameStepMs = 0
-        );
+        const QnMediaResourcePtr &mediaResource,
+        const QnAbstractStreamDataProvider *dataProvider,
+        const QnLayoutItemData &itemData,
+        const QnTimePeriod &period,
+        qint64 timelapseFrameStepMs = 0
+    );
 
-private slots:
+    /** Check if exe file will be greater than 4 Gb. */
+    bool exeFileIsTooBig(const QnLayoutResourcePtr& layout, const QnTimePeriod& period) const;
+
+    /** Check if exe file will be greater than 4 Gb. */
+    bool exeFileIsTooBig(const QnMediaResourcePtr& mediaResource, const QnTimePeriod& period) const;
+
+    bool confirmExportTooBigExeFile() const;
+
+    private slots:
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
     void at_exportTimelapseAction_triggered();
