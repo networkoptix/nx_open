@@ -14,6 +14,8 @@
 #include <utils/common/stoppable.h>
 #include <utils/common/systemerror.h>
 
+//#define SIMPLE_SOCKET_TEST_HELPER_DEBUG_OUTPUT
+
 namespace nx {
 namespace network {
 namespace test {
@@ -243,25 +245,50 @@ void socketSimpleAsync(
     if (endpointToConnectTo == kAnyPrivateAddress)
         endpointToConnectTo = std::move(serverAddress);
 
+#ifdef SIMPLE_SOCKET_TEST_HELPER_DEBUG_OUTPUT
+    static const auto t0 = std::chrono::steady_clock::now();
+    static std::mutex mtx;
+#endif
+
     QByteArray serverBuffer;
     serverBuffer.reserve(128);
     std::vector<std::unique_ptr<AbstractStreamSocket>> clients;
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> acceptor
         = [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
     {
+#ifdef SIMPLE_SOCKET_TEST_HELPER_DEBUG_OUTPUT
+        {
+            std::lock_guard<std::mutex> lk(mtx);
+            std::cout
+                <<std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count()
+                <<". accept "<<(int)code
+                <<std::endl;
+        }
+#endif
+
         serverResults.push(code);
         if (code != SystemError::noError)
             return;
 
         clients.emplace_back(socket);
         auto& client = clients.back();
-        ASSERT_TRUE(server->setSendTimeout(3000));
-        ASSERT_TRUE(server->setRecvTimeout(3000));
+        ASSERT_TRUE(client->setSendTimeout(3000));
+        ASSERT_TRUE(client->setRecvTimeout(3000));
         ASSERT_TRUE(client->setNonBlockingMode(true));
         client->readAsyncAtLeast(
             &serverBuffer, testMessage.size(),
             [&](SystemError::ErrorCode code, size_t size)
             {
+#ifdef SIMPLE_SOCKET_TEST_HELPER_DEBUG_OUTPUT
+                {
+                    std::lock_guard<std::mutex> lk(mtx);
+                    std::cout
+                        << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count()
+                        << ". server-client. read " << (int)size
+                        << std::endl;
+                }
+#endif
+
                 if (code != SystemError::noError)
                 {
                     stopSocket(std::move(client));
@@ -276,10 +303,31 @@ void socketSimpleAsync(
                     testMessage,
                     [&](SystemError::ErrorCode code, size_t size)
                     {
+#ifdef SIMPLE_SOCKET_TEST_HELPER_DEBUG_OUTPUT
+                        {
+                            std::lock_guard<std::mutex> lk(mtx);
+                            std::cout
+                                << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count()
+                                << ". server-client. sent " << (int)size
+                                << std::endl;
+                        }
+#endif
+
                         if (code == SystemError::noError)
                             EXPECT_GT(size, (size_t)0);
 
                         stopSocket(std::move(client));
+
+#ifdef SIMPLE_SOCKET_TEST_HELPER_DEBUG_OUTPUT
+                        {
+                            std::lock_guard<std::mutex> lk(mtx);
+                            std::cout
+                                << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count()
+                                << ". server-client. stopped socket "
+                                << std::endl;
+                        }
+#endif
+
                         serverResults.push(code);
                     });
             });
@@ -298,13 +346,42 @@ void socketSimpleAsync(
 
         QByteArray clientBuffer;
         clientBuffer.reserve(128);
+#ifdef SIMPLE_SOCKET_TEST_HELPER_DEBUG_OUTPUT
+        {
+            std::lock_guard<std::mutex> lk(mtx);
+            std::cout
+                << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count()
+                << ". connecting "
+                << std::endl;
+        }
+#endif
         testClient->connectAsync(endpointToConnectTo, [&](SystemError::ErrorCode code)
         {
+#ifdef SIMPLE_SOCKET_TEST_HELPER_DEBUG_OUTPUT
+            {
+                std::lock_guard<std::mutex> lk(mtx);
+                std::cout
+                    << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count()
+                    << ". connected "<<(int)code
+                    << std::endl;
+            }
+#endif
+
             ASSERT_EQ(code, SystemError::noError);
             testClient->sendAsync(
                 testMessage,
                 [&](SystemError::ErrorCode code, size_t size)
                 {
+#ifdef SIMPLE_SOCKET_TEST_HELPER_DEBUG_OUTPUT
+                    {
+                        std::lock_guard<std::mutex> lk(mtx);
+                        std::cout
+                            << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count()
+                            << ". client-client. sent " << (int)size
+                            << std::endl;
+                    }
+#endif
+
                     if (code != SystemError::noError)
                         return clientResults.push(code);
 
@@ -317,6 +394,16 @@ void socketSimpleAsync(
                         buffer.get(), testMessage.size(),
                         [&, buffer](SystemError::ErrorCode code, size_t size)
                     {
+#ifdef SIMPLE_SOCKET_TEST_HELPER_DEBUG_OUTPUT
+                        {
+                            std::lock_guard<std::mutex> lk(mtx);
+                            std::cout
+                                << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count()
+                                << ". client-client. read " << (int)size
+                                << std::endl;
+                        }
+#endif
+
                         if (code != SystemError::noError)
                             return clientResults.push(code);
 
@@ -328,6 +415,16 @@ void socketSimpleAsync(
                             buffer.get(), testMessage.size(),
                             [&, buffer](SystemError::ErrorCode code, size_t size)
                             {
+#ifdef SIMPLE_SOCKET_TEST_HELPER_DEBUG_OUTPUT
+                                {
+                                    std::lock_guard<std::mutex> lk(mtx);
+                                    std::cout
+                                        << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count()
+                                        << ". client-client22. read " << (int)size
+                                        << std::endl;
+                                }
+#endif
+
                                 EXPECT_EQ(buffer->size(), 0);
                                 EXPECT_EQ(size, (size_t)0);
                                 clientResults.push(code);

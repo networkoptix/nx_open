@@ -299,7 +299,7 @@ void AudioPlayer::closeNonSafe()
 
 bool AudioPlayer::openNonSafe( QIODevice* dataSource )
 {
-    const QString& temporaryFilePath = QString::number(nx::utils::random::number(0));
+    const QString& temporaryFilePath = QString::number(nx::utils::random::number());
     const QString& temporaryResUrl = lit("%1://%2").arg(lit("qiodev")).arg(temporaryFilePath);
     m_storage->registerResourceData( temporaryFilePath, dataSource );
 

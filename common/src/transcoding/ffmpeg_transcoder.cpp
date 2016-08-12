@@ -229,7 +229,9 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             QnFfmpegVideoTranscoderPtr ffmpegVideoTranscoder = m_vTranscoder.dynamicCast<QnFfmpegVideoTranscoder>();
             if (ffmpegVideoTranscoder->getCodecContext()) {
                 avcodec_copy_context(m_videoEncoderCodecCtx, ffmpegVideoTranscoder->getCodecContext());
-                m_videoEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
+                m_videoEncoderCodecCtx->stats_out = nullptr;   //to avoid double free since avcodec_copy_context does not copy this field
+                m_videoEncoderCodecCtx->coded_side_data = nullptr;
+                m_videoEncoderCodecCtx->nb_coded_side_data = 0;
             }
             else {
                 m_videoEncoderCodecCtx->width = m_vTranscoder->getResolution().width();
@@ -313,6 +315,8 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             {
                 avcodec_copy_context(m_audioEncoderCodecCtx, ffmpegAudioTranscoder->getCodecContext());
                 m_audioEncoderCodecCtx->stats_out = nullptr; //< To avoid double free since avcodec_copy_context does not copy this field.
+                m_audioEncoderCodecCtx->coded_side_data = nullptr;
+                m_audioEncoderCodecCtx->nb_coded_side_data = 0;
             }
             m_audioEncoderCodecCtx->bit_rate = m_aTranscoder->getBitrate();
         }

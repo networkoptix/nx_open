@@ -28,7 +28,7 @@ PasswordData PasswordData::calculateHashes(const QString& username, const QStrin
     PasswordData result;
     result.realm = QnAppInfo::realm();
 
-    QByteArray salt = QByteArray::number(nx::utils::random::number(0), 16);
+    QByteArray salt = QByteArray::number(nx::utils::random::number(), 16);
     QCryptographicHash md5(QCryptographicHash::Md5);
     md5.addData(salt);
     md5.addData(password.toUtf8());

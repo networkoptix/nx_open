@@ -40,6 +40,7 @@ bool checkUserAccess(const Qn::UserAccessData& accessRights, const QnVirtualCame
         {
             if (!qnResourceAccessManager->hasPermission(accessRights, camera, Qn::WritePtzPermission))
                 return false;
+            return true;
         }
 
         case Qn::CreateTourPtzCommand:
@@ -53,6 +54,7 @@ bool checkUserAccess(const Qn::UserAccessData& accessRights, const QnVirtualCame
             {
                 return false;
             }
+            return true;
         }
 
         case Qn::GetDevicePositionPtzCommand:
