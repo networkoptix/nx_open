@@ -1723,9 +1723,9 @@ bool QnMixedSSLSocket::registerTimerImpl( unsigned int timeoutMs, std::function<
 ////////////// class TCPSslServerSocket
 //////////////////////////////////////////////////////////
 
-TCPSslServerSocket::TCPSslServerSocket(bool allowNonSecureConnect)
+TCPSslServerSocket::TCPSslServerSocket(int ipVersion, bool allowNonSecureConnect)
 :
-    TCPServerSocket(),
+    TCPServerSocket(ipVersion),
     m_allowNonSecureConnect(allowNonSecureConnect)
 {
     initOpenSSLGlobalLock();

@@ -120,6 +120,7 @@ extern "C"
 #include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
+#include <utils/network/system_socket.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
@@ -266,6 +267,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
+
+    SocketFactory::setIpVersion(startupParams.ipVersion);
 
     QnClientModule client(startupParams);
 

@@ -721,7 +721,7 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl( EndpointInfoHash& result, con
     std::pair<std::map<QString, UDPSocket*>::iterator, bool> p = m_ifaceToSock.insert( std::make_pair( iface.address.toString(), (UDPSocket*)NULL ) );
     if( p.second )
     {
-        p.first->second. = new UDPSocket();
+        p.first->second. = new UDPSocket(AF_INET);
         if( !p.first->second->bindToInterface(iface) || !p.first->second->setNonBlockingMode( true ) )
         {
             delete p.first->second;

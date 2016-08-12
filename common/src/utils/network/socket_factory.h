@@ -6,8 +6,9 @@
 #ifndef SOCKET_FACTORY_H
 #define SOCKET_FACTORY_H
 
-#include "abstract_socket.h"
+#include <atomic>
 
+#include "abstract_socket.h"
 
 //!Contains factory methods for creating sockets
 /*!
@@ -32,12 +33,18 @@ public:
     static AbstractStreamSocket* createStreamSocket( bool sslRequired = false, NatTraversalType natTraversalRequired = nttAuto );
     static AbstractStreamServerSocket* createStreamServerSocket( bool sslRequired = false, NatTraversalType natTraversalRequired = nttAuto );
 
+    static void setIpVersion( const QString& ipVersion );
+
 private:
     SocketFactory();
     SocketFactory( const SocketFactory& );
     SocketFactory& operator=( const SocketFactory& );
 
     ~SocketFactory();
+
+    static std::atomic<int> s_udpIpVersion;
+    static std::atomic<int> s_tcpClientIpVersion;
+    static std::atomic<int> s_tcpServerIpVersion;
 };
 
 #endif  //SOCKET_FACTORY_H

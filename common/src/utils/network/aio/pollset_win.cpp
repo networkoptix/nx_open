@@ -38,7 +38,7 @@ namespace aio
             FD_ZERO( &writefds );
             FD_ZERO( &exceptfds );
 
-            dummySocket.reset( new UDPSocket() );
+            dummySocket.reset( new UDPSocket(AF_INET) );
         }
 
         void fillFDSet( fd_set* const dest, const PolledSockets& src )

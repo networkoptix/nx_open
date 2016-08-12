@@ -227,6 +227,7 @@
 #include "rest/handlers/script_list_rest_handler.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
+#include <utils/network/system_socket.h>
 
 #if !defined(EDGE_SERVER)
 #include <nx_speach_synthesizer/text_to_wav.h>
@@ -2804,6 +2805,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     bool disableCrashHandler = false;
 #endif
     QString engineVersion;
+    QString ipVersion;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL,
@@ -2831,6 +2833,8 @@ int MediaServerProcess::main(int argc, char* argv[])
     commandLineParser.addParameter(&showHelp, "--help", NULL,
         lit("This help message"), true);
     commandLineParser.addParameter(&engineVersion, "--override-version", NULL,
+        lit("Force the other engine version"), QString());
+    commandLineParser.addParameter(&ipVersion, "--ip-version", NULL,
         lit("Force the other engine version"), QString());
 
     #ifdef __linux__
@@ -2863,6 +2867,10 @@ int MediaServerProcess::main(int argc, char* argv[])
     if( !rwConfigFilePath.isEmpty() )
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
 
+    if( ipVersion.isEmpty() )
+        ipVersion = MSSettings::roSettings()->value(QLatin1String("ipVersion")).toString();
+
+    SocketFactory::setIpVersion( ipVersion );
     QnVideoService service( argc, argv );
 
     if (!engineVersion.isEmpty()) {

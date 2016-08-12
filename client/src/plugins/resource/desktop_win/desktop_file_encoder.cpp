@@ -738,6 +738,7 @@ int QnDesktopFileEncoder::processData(bool flush)
         m_audioFramesCount++;
 
         AVPacket audioPacket;
+        av_init_packet(&audioPacket);
         QnWritableCompressedAudioDataPtr mediaData;
         ai->m_audioQueue.pop(mediaData);
 

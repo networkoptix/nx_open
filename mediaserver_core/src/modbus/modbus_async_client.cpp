@@ -55,7 +55,7 @@ bool QnModbusAsyncClient::initSocket()
         m_socket->shutdown();
     }
 
-    m_socket = std::make_shared<TCPSocket>();
+    m_socket.reset(SocketFactory::createStreamSocket());
 
     if (!m_socket->setRecvTimeout(kRecvTimeout) ||
         !m_socket->setSendTimeout(kSendTimeout))
