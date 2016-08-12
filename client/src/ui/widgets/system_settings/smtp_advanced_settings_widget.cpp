@@ -70,11 +70,8 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget( QWidget* parent /*= 
 
     ui->supportLinkLineEdit->setPlaceholderText(QnAppInfo::supportLink());
 
-
     declareMandatoryField(ui->emailLabel);
     declareMandatoryField(ui->serverLabel);
-    declareMandatoryField(ui->userLabel);
-    declareMandatoryField(ui->passwordLabel);
 
     auto listenTo = [this](QLineEdit *lineEdit) {
         connect(lineEdit, &QLineEdit::textChanged, this, &QnSmtpAdvancedSettingsWidget::settingsChanged);

@@ -58,12 +58,9 @@ int QnEmailSettings::defaultPort(QnEmail::ConnectionType connectionType) {
     }
 }
 
-bool QnEmailSettings::isValid() const {
-    return 
-        !email.isEmpty() && 
-        !server.isEmpty() && 
-        !user.isEmpty() && 
-        !password.isEmpty();
+bool QnEmailSettings::isValid() const
+{
+    return !email.isEmpty() && !server.isEmpty();
 }
 
 bool QnEmailSettings::equals(const QnEmailSettings &other, bool compareView /* = false*/) const {

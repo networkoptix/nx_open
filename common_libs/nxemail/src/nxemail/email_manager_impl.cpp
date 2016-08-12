@@ -34,9 +34,12 @@ bool EmailManagerImpl::testConnection(const QnEmailSettings &settings) {
     SmtpClient::ConnectionType connectionType = smtpConnectionType(settings.connectionType);
     SmtpClient smtp(settings.server, port, connectionType);
 
-    if (!smtp.connectToHost()) return false;
-    bool result = smtp.login(settings.user, settings.password);
+    if (!smtp.connectToHost())
+        return false;
+
+    bool result = settings.user.isEmpty() || smtp.login(settings.user, settings.password);
     smtp.quit();
+
     return result;
 }
 
@@ -61,7 +64,7 @@ bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
     for (const QString &recipient: data.to) {
         message.addRecipient(EmailAddress(recipient));
     }
-    
+
     message.setSubject(data.subject);
     message.addPart(new MimeHtml(data.body));
 
@@ -81,7 +84,7 @@ bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
             .arg(SmtpClient::toString(connectionType)).arg(SystemError::toString(errorCode)), cl_logWARNING );
         return false;
     }
-    if( !smtp.login(settings.user, settings.password) )
+    if (!settings.user.isEmpty() && !smtp.login(settings.user, settings.password) )
     {
         NX_LOG( lit("SMTP. Failed to login to %1:%2").arg(settings.server).arg(port), cl_logWARNING );
         smtp.quit();
