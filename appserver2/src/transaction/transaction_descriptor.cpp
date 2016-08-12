@@ -561,6 +561,37 @@ struct ModifyCameraAttributesAccess
     }
 };
 
+struct ModifyCameraAttributesListAccess
+{
+    bool operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesDataList& param)
+    {
+        if (accessData == Qn::kSystemAccess)
+            return true;
+
+        for (const auto& p: param)
+            if (!resourceAccessHelper(accessData, p.cameraID, Qn::SavePermission))
+                return false;
+
+        QnCamLicenseUsageHelper licenseUsageHelper;
+        QnVirtualCameraResourceList cameras;
+
+        for (const auto& p: param)
+        {
+            auto camera = qnResPool->getResourceById(p.cameraID).dynamicCast<QnVirtualCameraResource>();
+            if (!camera)
+                return false;
+            cameras.push_back(camera);
+            licenseUsageHelper.propose(camera, p.scheduleEnabled);
+        }
+
+        for (const auto& camera: cameras)
+            if (licenseUsageHelper.isOverflowForCamera(camera))
+                return false;
+
+        return true;
+    }
+};
+
 struct ReadServerAttributesAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
