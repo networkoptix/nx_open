@@ -100,7 +100,7 @@ private:
     int addMotionWindow();
     bool updateMotionWindow(int wndNum, int sensitivity, const QRect& rect);
     int toAxisMotionSensitivity(int sensitivity);
-    void asyncUpdateIOSettings(const QString & key);
+    void asyncUpdateIOSettings();
     bool readCurrentIOStateAsync();
 private:
     QList<AxisResolution> m_resolutionList;

@@ -11,7 +11,8 @@
 #include <utils/common/synctime.h>
 #include <utils/common/log.h>
 
-#include "../onvif/dataprovider/onvif_mjpeg.h"
+#include <plugins/resource/onvif/dataprovider/onvif_mjpeg.h>
+#include <core/resource_management/resource_pool.h>
 
 #include "axis_stream_reader.h"
 #include "axis_ptz_controller.h"
@@ -1331,10 +1332,8 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
     return true;
 }
 
-void QnPlAxisResource::asyncUpdateIOSettings(const QString & key)
+void QnPlAxisResource::asyncUpdateIOSettings()
 {
-    QN_UNUSED(key);
-
     const auto newValue = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
     QnIOPortDataList prevValue;
     {
@@ -1360,7 +1359,16 @@ void QnPlAxisResource::asyncUpdateIOSettings(const QString & key)
 void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QString & key)
 {
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
-        QnConcurrent::run(QThreadPool::globalInstance(), std::bind(&QnPlAxisResource::asyncUpdateIOSettings, this, key));
+    {
+        QnUuid id = res->getId();
+        QnConcurrent::run(
+            QThreadPool::globalInstance(),
+            [id]()
+            {
+                if (auto res = qnResPool->getResourceById<QnPlAxisResource>(id))
+                    res->asyncUpdateIOSettings();
+            });
+    }
 }
 
 QnAudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()

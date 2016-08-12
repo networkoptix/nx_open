@@ -190,7 +190,7 @@ QnResourceList QnAdamResourceSearcher::findResources()
         if (shouldStop())
             return result;
 
-        auto socket = std::make_shared<UDPSocket>();
+        auto socket = std::make_shared<UDPSocket>(AF_INET);
         socket->setReuseAddrFlag(true);
 
         SocketAddress localAddress(iface.address.toString(), 0);    
