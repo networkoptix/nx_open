@@ -350,7 +350,7 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
     emit motionDetected(getResource(), m_lastMotionState, timestamp, metaData);
 }
 
-bool QnServerStreamRecorder::needSaveData(const QnAbstractMediaDataPtr& media)
+bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)
 {
     qint64 afterThreshold = 5 * 1000000ll;
     Qn::RecordingType recType = m_currentScheduleTask.getRecordingType();
@@ -752,14 +752,14 @@ void QnServerStreamRecorder::writeRecentlyMotion(qint64 writeAfterTime)
     m_recentlyMotion.clear();
 }
 
-void QnServerStreamRecorder::keepRecentlyMotion(const QnAbstractMediaDataPtr& md)
+void QnServerStreamRecorder::keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md)
 {
     if (m_recentlyMotion.size() == MOTION_PREBUFFER_SIZE)
         m_recentlyMotion.dequeue();
     m_recentlyMotion.enqueue(md);
 }
 
-bool QnServerStreamRecorder::saveData(const QnAbstractMediaDataPtr& md)
+bool QnServerStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 {
     writeRecentlyMotion(md->timestamp);
     return QnStreamRecorder::saveData(md);

@@ -35,13 +35,11 @@ public:
     }
 
 protected:
-    virtual void remapPacketTimeUsec(const QnAbstractMediaDataPtr& md) override
+    virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md) override
     {
-        md->timestamp = m_currentTimeUsec;
-        QnCompressedVideoData* video = dynamic_cast<QnCompressedVideoData*>(md.get());
-        if (video && (quint64)video->pts != AV_NOPTS_VALUE)
-            video->pts = md->timestamp;
+        qint64 result = m_currentTimeUsec;
         m_currentTimeUsec += kOutputDeltaUsec;
+        return result;
     }
 
     virtual bool isUtcOffsetAllowed() const override { return false; }

@@ -174,7 +174,7 @@ protected:
     void setPrebufferingUsec(int value);
     void flushPrebuffer();
     int getPrebufferingUsec() const;
-    virtual bool needSaveData(const QnAbstractMediaDataPtr& media);
+    virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media);
 
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& media);
 
@@ -188,15 +188,15 @@ protected:
 
     bool addSignatureFrame();
     void markNeedKeyData();
-    virtual bool saveData(const QnAbstractMediaDataPtr& md);
+    virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex);
     virtual void initIoContext(
-        const QnStorageResourcePtr& storage,
+        const QnStorageResourcePtr& storage, 
         const QString& url,
         AVIOContext** context);
-    virtual void remapPacketTimeUsec(const QnAbstractMediaDataPtr& md);
+    virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
     virtual bool isUtcOffsetAllowed() const { return true; }
-
+        
 private:
     void updateSignatureAttr(size_t i);
     qint64 findNextIFrame(qint64 baseTime);
@@ -223,7 +223,7 @@ private:
 
     qint64 m_startOffset;
     int m_prebufferingUsec;
-    QnUnsafeQueue<QnAbstractMediaDataPtr> m_prebuffer;
+    QnUnsafeQueue<QnConstAbstractMediaDataPtr> m_prebuffer;
 
     qint64 m_EofDateTime;
     bool m_endOfData;

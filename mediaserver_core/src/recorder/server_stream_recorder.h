@@ -20,8 +20,8 @@ class QnServerStreamRecorder: public QnStreamRecorder
     Q_OBJECT
 public:
     QnServerStreamRecorder(
-        const QnResourcePtr                 &dev,
-        QnServer::ChunksCatalog             catalog,
+        const QnResourcePtr                 &dev, 
+        QnServer::ChunksCatalog             catalog, 
         QnAbstractMediaStreamDataProvider*  mediaProvider
     );
 
@@ -35,7 +35,7 @@ public:
     QnDualStreamingHelperPtr getDualStreamingHelper() const;
 
     /*
-    * Ignore current schedule task param and start (or restart) recording with specified params.
+    * Ignore current schedule task param and start (or restart) recording with specified params. 
     * Both primary and secondary streams are recorded.
     * Panic mode recording has higher priority (fps may be increased if panic mode activated)
     */
@@ -58,7 +58,7 @@ signals:
 protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
-    virtual bool needSaveData(const QnAbstractMediaDataPtr& media) override;
+    virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media) override;
     void beforeProcessData(const QnConstAbstractMediaDataPtr& media);
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& motion) override;
 
@@ -69,7 +69,7 @@ protected:
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
     virtual void endOfRun() override;
-    virtual bool saveData(const QnAbstractMediaDataPtr& md) override;
+    virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override;
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex) override;
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
@@ -79,13 +79,13 @@ private:
     void setSpecialRecordingMode(QnScheduleTask& task);
     int getFpsForValue(int fps);
     void writeRecentlyMotion(qint64 writeAfterTime);
-    void keepRecentlyMotion(const QnAbstractMediaDataPtr& md);
+    void keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md);
     bool isPanicMode() const;
     bool isRedundantSyncOn() const;
     void fileCreated(uintptr_t filePtr) const;
     int getBufferSize() const;
     virtual void initIoContext(
-        const QnStorageResourcePtr& storage,
+        const QnStorageResourcePtr& storage, 
         const QString& url,
         AVIOContext** context) override;
 private slots:
@@ -118,7 +118,7 @@ private:
     size_t m_queuedSize;
     QnMutex m_queueSizeMutex;
     qint64 m_lastMediaTime;
-    QQueue<QnAbstractMediaDataPtr> m_recentlyMotion;
+    QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;
     bool m_diskErrorWarned;
     bool m_rebuildBlocked;
     bool m_usePrimaryRecorder;
