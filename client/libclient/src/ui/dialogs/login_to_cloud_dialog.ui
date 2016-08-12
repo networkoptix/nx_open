@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>347</width>
-    <height>246</height>
+    <height>206</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
     <widget class="QnPanel" name="logoPanel" native="true">
      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
       <property name="leftMargin">
-       <number>38</number>
+       <number>16</number>
       </property>
       <property name="topMargin">
        <number>16</number>
@@ -75,9 +75,9 @@
     </widget>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,1">
+    <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0">
      <property name="leftMargin">
-      <number>38</number>
+      <number>16</number>
      </property>
      <property name="topMargin">
       <number>16</number>
@@ -91,6 +91,19 @@
      <property name="spacing">
       <number>8</number>
      </property>
+     <item row="3" column="1" colspan="2">
+      <widget class="QPushButton" name="loginButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Login</string>
+       </property>
+      </widget>
+     </item>
      <item row="4" column="1">
       <widget class="QLabel" name="restorePasswordLabel">
        <property name="focusPolicy">
@@ -107,26 +120,6 @@
        </property>
        <property name="textInteractionFlags">
         <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="passwordLabel">
-       <property name="text">
-        <string>Password</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="loginLabel">
-       <property name="text">
-        <string>Login</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
@@ -159,28 +152,14 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1" colspan="2">
-      <widget class="QLineEdit" name="passwordLineEdit">
-       <property name="echoMode">
-        <enum>QLineEdit::Password</enum>
-       </property>
-      </widget>
+     <item row="2" column="0">
+      <widget class="QWidget" name="spacer" native="true"/>
      </item>
-     <item row="0" column="1" colspan="2">
-      <widget class="QLineEdit" name="loginLineEdit"/>
+     <item row="0" column="0" colspan="3">
+      <widget class="QnInputField" name="loginInputField" native="true"/>
      </item>
-     <item row="3" column="1" colspan="2">
-      <widget class="QPushButton" name="loginButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Login</string>
-       </property>
-      </widget>
+     <item row="1" column="0" colspan="3">
+      <widget class="QnInputField" name="passwordInputField" native="true"/>
      </item>
     </layout>
    </item>
@@ -193,10 +172,14 @@
    <header location="global">ui/widgets/common/panel.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QnInputField</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/input_field.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>loginLineEdit</tabstop>
-  <tabstop>passwordLineEdit</tabstop>
   <tabstop>stayLoggedInChackBox</tabstop>
   <tabstop>loginButton</tabstop>
  </tabstops>

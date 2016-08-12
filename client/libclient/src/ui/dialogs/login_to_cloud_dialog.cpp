@@ -5,10 +5,12 @@
 
 #include <helpers/cloud_url_helper.h>
 
+#include <ui/common/aligner.h>
 #include <ui/common/palette.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
+#include <ui/widgets/common/input_field.h>
 
 #include <watchers/cloud_status_watcher.h>
 
@@ -23,12 +25,12 @@ namespace
 
 class QnLoginToCloudDialogPrivate : public QObject
 {
-    QnLoginToCloudDialog *q_ptr;
+    QnLoginToCloudDialog* q_ptr;
     Q_DECLARE_PUBLIC(QnLoginToCloudDialog)
     Q_DECLARE_TR_FUNCTIONS(QnLinkToCloudDialogPrivate)
 
 public:
-    QnLoginToCloudDialogPrivate(QnLoginToCloudDialog *parent);
+    QnLoginToCloudDialogPrivate(QnLoginToCloudDialog* parent);
 
     void updateUi();
     void lockUi(bool locked = true);
@@ -38,18 +40,25 @@ public:
     void at_cloudStatusWatcher_error();
 };
 
-QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget *parent)
-    : base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint)
-    , ui(new Ui::QnLoginToCloudDialog)
-    , d_ptr(new QnLoginToCloudDialogPrivate(this))
+QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
+    base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint),
+    ui(new Ui::QnLoginToCloudDialog),
+    d_ptr(new QnLoginToCloudDialogPrivate(this))
 {
     ui->setupUi(this);
 
     Q_D(QnLoginToCloudDialog);
 
-    connect(ui->loginButton,        &QPushButton::clicked,      d,  &QnLoginToCloudDialogPrivate::at_loginButton_clicked);
-    connect(ui->loginLineEdit,      &QLineEdit::textChanged,    d,  &QnLoginToCloudDialogPrivate::updateUi);
-    connect(ui->passwordLineEdit,   &QLineEdit::textChanged,    d,  &QnLoginToCloudDialogPrivate::updateUi);
+    ui->loginInputField->setTitle(tr("Email"));
+    ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
+
+    ui->passwordInputField->setTitle(tr("Password"));
+    ui->passwordInputField->setEchoMode(QLineEdit::Password);
+    ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(false));
+
+    connect(ui->loginButton,        &QPushButton::clicked,      d, &QnLoginToCloudDialogPrivate::at_loginButton_clicked);
+    connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
+    connect(ui->passwordInputField, &QnInputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
 
     ui->createAccountLabel->setText(makeHref(tr("Create account"), QnCloudUrlHelper::createAccountUrl()));
     ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), QnCloudUrlHelper::restorePasswordUrl()));
@@ -65,23 +74,28 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget *parent)
     const QColor nxColor(qApp->palette().color(QPalette::Normal, QPalette::BrightText));
     setPaletteColor(ui->cloudWelcomeLabel, QPalette::WindowText, nxColor);
 
-    ui->loginLineEdit->setFocus();
+    auto aligner = new QnAligner(this);
+    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->addWidgets({ ui->loginInputField, ui->passwordInputField, ui->spacer });
+
+    ui->loginInputField->setFocus();
     d->updateUi();
+
+    setResizeToContentsMode(Qt::Vertical);
 }
 
 QnLoginToCloudDialog::~QnLoginToCloudDialog()
 {
 }
 
-void QnLoginToCloudDialog::setLogin(const QString &login)
+void QnLoginToCloudDialog::setLogin(const QString& login)
 {
-    ui->loginLineEdit->setText(login);
-    ui->loginLineEdit->selectAll();
+    ui->loginInputField->setText(login);
 }
 
-QnLoginToCloudDialogPrivate::QnLoginToCloudDialogPrivate(QnLoginToCloudDialog *parent)
-    : QObject(parent)
-    , q_ptr(parent)
+QnLoginToCloudDialogPrivate::QnLoginToCloudDialogPrivate(QnLoginToCloudDialog* parent) :
+    QObject(parent),
+    q_ptr(parent)
 {
 }
 
@@ -89,16 +103,16 @@ void QnLoginToCloudDialogPrivate::updateUi()
 {
     Q_Q(QnLoginToCloudDialog);
     q->ui->loginButton->setEnabled(
-                !q->ui->loginLineEdit->text().isEmpty() &&
-                !q->ui->passwordLineEdit->text().isEmpty());
+        q->ui->loginInputField->isValid() &&
+        q->ui->passwordInputField->isValid());
 }
 
 void QnLoginToCloudDialogPrivate::lockUi(bool locked)
 {
     Q_Q(QnLoginToCloudDialog);
 
-    q->ui->loginLineEdit->setReadOnly(locked);
-    q->ui->passwordLineEdit->setReadOnly(locked);
+    q->ui->loginInputField->setReadOnly(locked);
+    q->ui->passwordInputField->setReadOnly(locked);
     q->ui->stayLoggedInChackBox->setEnabled(!locked);
     q->ui->loginButton->setEnabled(!locked);
 }
@@ -116,11 +130,12 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
 
     qnCloudStatusWatcher->setCloudCredentials(QString(), QString());
 
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged
-        , this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged);
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::errorChanged
-        , this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error);
-    qnCloudStatusWatcher->setCloudCredentials(q->ui->loginLineEdit->text(), q->ui->passwordLineEdit->text());
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
+        this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::errorChanged,
+        this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error);
+    qnCloudStatusWatcher->setCloudCredentials(q->ui->loginInputField->text().trimmed(),
+        q->ui->passwordInputField->text().trimmed());
 }
 
 void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudStatusWatcher::Status status)
@@ -131,14 +146,15 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
         return;
     }
 
-    disconnect(qnCloudStatusWatcher, nullptr, this, nullptr);
+    qnCloudStatusWatcher->disconnect(this);
 
     Q_Q(QnLoginToCloudDialog);
 
-    qnSettings->setCloudLogin(q->ui->loginLineEdit->text());
+    qnSettings->setCloudLogin(q->ui->loginInputField->text().trimmed());
     const bool stayLoggedIn = q->ui->stayLoggedInChackBox->isChecked();
     qnSettings->setCloudPassword(stayLoggedIn
-        ? q->ui->passwordLineEdit->text() : QString());
+        ? q->ui->passwordInputField->text().trimmed()
+        : QString());
 
     q->accept();
 }
@@ -146,28 +162,26 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
 void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
 {
     const auto errorCode = qnCloudStatusWatcher->error();
-    disconnect(qnCloudStatusWatcher, nullptr, this, nullptr);
+    qnCloudStatusWatcher->disconnect(this);
 
     QString message;
-
     switch (errorCode)
     {
-    case QnCloudStatusWatcher::InvalidCredentials:
-        message = tr("Login or password is invalid");
-        break;
-    case QnCloudStatusWatcher::UnknownError:
-        message = tr("Can not login to cloud");
-        break;
+        case QnCloudStatusWatcher::InvalidCredentials:
+            message = tr("Login or password is invalid");
+            break;
+        case QnCloudStatusWatcher::UnknownError:
+            message = tr("Can not login to cloud");
+            break;
     }
 
     Q_Q(QnLoginToCloudDialog);
 
-    QnMessageBox messageBox(QnMessageBox::NoIcon,
-                            helpTopic(q),
-                            tr("Error"),
-                            message,
-                            QDialogButtonBox::Ok,
-                            q);
+    QnMessageBox::critical(q,
+        helpTopic(q),
+        tr("Error"),
+        message,
+        QDialogButtonBox::Ok);
 
     unlockUi();
 }
