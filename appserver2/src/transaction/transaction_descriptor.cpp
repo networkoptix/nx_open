@@ -662,6 +662,21 @@ struct AdminOnlyAccessOut
     }
 };
 
+struct RemoveUserGroupAccess
+{
+    bool operator()(const Qn::UserAccessData& accessData, const ApiIdData& param)
+    {
+        if (!AdminOnlyAccess()(accessData, param))
+            return false;
+
+        for (const auto& user: qnResPool->getResources<QnUserResource>())
+            if (user->userGroup() == param.id)
+                return false;
+
+        return true;
+    }
+};
+
 struct ControlVideowallAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiVideowallControlMessageData&)
