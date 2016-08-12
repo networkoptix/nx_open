@@ -416,7 +416,7 @@ void QnRtspConnectionProcessor::generateSessionId()
 {
     Q_D(QnRtspConnectionProcessor);
     d->sessionId = QString::number(reinterpret_cast<uintptr_t>(d->socket.data()));
-    d->sessionId += QString::number(nx::utils::random::number(0));
+    d->sessionId += QString::number(nx::utils::random::number());
 }
 
 
