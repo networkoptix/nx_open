@@ -1692,7 +1692,10 @@ void QnStorageManager::deleteRecordsToTime(DeviceFileCatalogPtr catalog, qint64 
     if (idx != -1) {
         QVector<DeviceFileCatalog::Chunk> deletedChunks = catalog->deleteRecordsBefore(idx);
         for(const DeviceFileCatalog::Chunk& chunk: deletedChunks)
+		{
             clearDbByChunk(catalog, chunk);
+			subtractOccupiedSpaceInfoValue(chunk.storageIndex, chunk.getFileSize());
+		}
     }
 }
 
@@ -2475,6 +2478,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     QString quality;
     QString cameraUniqueId;
     QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, cameraUniqueId, quality);
+	addOccupiedSpaceInfoValue(storageIndex, fileSize);
     if (!storage)
         return false;
 
