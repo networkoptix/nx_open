@@ -2,7 +2,38 @@
 
 #ifdef Q_OS_WIN
 
-static const int MAX_JITTER = 60;
+namespace {
+
+#ifndef DWM_EC_DISABLECOMPOSITION
+#  define DWM_EC_DISABLECOMPOSITION 0
+#endif
+#ifndef DWM_EC_ENABLECOMPOSITION
+#  define DWM_EC_ENABLECOMPOSITION 1
+#endif
+
+    typedef DECLSPEC_IMPORT HRESULT (STDAPICALLTYPE *fn_DwmEnableComposition) (UINT uCompositionAction);
+    static fn_DwmEnableComposition DwmEnableComposition = 0;
+    static const int LOGO_CORNER_OFFSET = 8;
+
+    static void toggleAero(bool enable)
+    {
+        static bool resolved = false;
+        if (!resolved) {
+            QLibrary lib(QLatin1String("Dwmapi"));
+            if (lib.load())
+                DwmEnableComposition = (fn_DwmEnableComposition)lib.resolve("DwmEnableComposition");
+            resolved = true;
+        }
+
+        if (DwmEnableComposition)
+            DwmEnableComposition(enable ? DWM_EC_ENABLECOMPOSITION : DWM_EC_DISABLECOMPOSITION);
+    }
+
+    static const int MAX_JITTER = 60;
+}
+
+QnMutex QnBufferedScreenGrabber::m_instanceMutex;
+int QnBufferedScreenGrabber::m_aeroInstanceCounter;
 
 QnBufferedScreenGrabber::QnBufferedScreenGrabber(int displayNumber,
                                                  int queueSize,
@@ -43,6 +74,13 @@ void QnBufferedScreenGrabber::pleaseStop()
 
 void QnBufferedScreenGrabber::run()
 {
+    if (m_grabber.getMode() == Qn::FullScreenNoAeroMode || 1)
+    {
+        QnMutexLocker locker( &m_instanceMutex );
+        if (++m_aeroInstanceCounter == 1)
+            toggleAero(false);
+    }
+
     m_grabber.restartTimer();
     //m_timer.start();
     while (!needToStop())
@@ -71,6 +109,13 @@ void QnBufferedScreenGrabber::run()
         {
             m_currentFrameNum = currentTime() * m_frameRate / 1000.0;
         }
+    }
+
+    if (m_grabber.getMode() == Qn::FullScreenNoAeroMode || 1)
+    {
+        QnMutexLocker locker( &m_instanceMutex );
+        if (--m_aeroInstanceCounter == 0)
+            toggleAero(true);
     }
 }
 
