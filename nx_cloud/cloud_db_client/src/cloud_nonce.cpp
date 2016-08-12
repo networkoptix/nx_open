@@ -1,10 +1,17 @@
 
 #include "include/cdb/cloud_nonce.h"
 
+#ifdef _WIN32
+#include <WinSock2.h>
+#else
+#include <arpa/inet.h>
+#endif
+
 #include <chrono>
 
 #include <openssl/md5.h>
 
+#include <nx/utils/log/assert.h>
 #include <nx/utils/random.h>
 
 
@@ -29,11 +36,13 @@ void calcNonceHash(
     uint32_t timestamp,
     char* md5HashBuf)
 {
+    const uint32_t timestampInNetworkByteOrder = htonl(timestamp);
+
     MD5_CTX md5Ctx;
     MD5_Init(&md5Ctx);
     MD5_Update(&md5Ctx, systemID.c_str(), systemID.size());
     MD5_Update(&md5Ctx, ":", 1);
-    MD5_Update(&md5Ctx, &timestamp, sizeof(timestamp));
+    MD5_Update(&md5Ctx, &timestampInNetworkByteOrder, sizeof(timestampInNetworkByteOrder));
     MD5_Update(&md5Ctx, ":", 1);
     MD5_Update(&md5Ctx, kSecretNonceKey, strlen(kSecretNonceKey));
     MD5_Final(reinterpret_cast<unsigned char*>(md5HashBuf), &md5Ctx);
@@ -56,6 +65,7 @@ std::string generateCloudNonceBase(const std::string& systemID)
 
     const uint32_t timestamp = std::chrono::duration_cast<std::chrono::seconds>
         (std::chrono::system_clock::now().time_since_epoch()).count();
+    const uint32_t timestampInNetworkByteOrder = htonl(timestamp);
 
     //TODO #ak replace with proper vectors function when available
     char randomBytes[kRandomBytesCount+1];
@@ -69,10 +79,13 @@ std::string generateCloudNonceBase(const std::string& systemID)
 
     //TODO #ak timestamp byte order
 
-    QByteArray nonce =
-        QByteArray(randomBytes) +
-        (QByteArray::fromRawData(reinterpret_cast<const char*>(&timestamp), sizeof(timestamp))
-            + md5Hash).toBase64();
+    const auto timestampInNetworkByteOrderBuf = 
+        QByteArray::fromRawData(
+            reinterpret_cast<const char*>(&timestampInNetworkByteOrder),
+            sizeof(timestampInNetworkByteOrder));
+    QByteArray nonce = 
+        QByteArray(randomBytes)
+        + (timestampInNetworkByteOrderBuf + md5Hash).toBase64();
 
     return nonce.constData();
 }
@@ -91,7 +104,14 @@ bool parseCloudNonceBase(
             nonceBase.size() - kRandomBytesCount));
     //TODO #ak timestamp byte order
     memcpy(timestamp, timestampAndHash.constData(), sizeof(*timestamp));
-    *nonceHash = timestampAndHash.constData() + sizeof(*timestamp);
+    //converting timestamp to local byte order
+    *timestamp = ntohl(*timestamp);
+    NX_ASSERT(timestampAndHash.size() - sizeof(*timestamp) == MD5_DIGEST_LENGTH);
+    nonceHash->resize(MD5_DIGEST_LENGTH);
+    memcpy(
+        &nonceHash->at(0),
+        timestampAndHash.constData() + sizeof(*timestamp),
+        MD5_DIGEST_LENGTH);
     return true;
 }
 

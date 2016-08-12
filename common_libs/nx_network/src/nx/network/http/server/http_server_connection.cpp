@@ -22,7 +22,8 @@ namespace nx_http
         BaseType( socketServer, std::move(sock) ),
         m_authenticationManager( authenticationManager ),
         m_httpMessageDispatcher( httpMessageDispatcher ),
-        m_isPersistent( false )
+        m_isPersistent( false ),
+        m_forceConnectionClose(false)
     {
     }
 
@@ -74,7 +75,7 @@ namespace nx_http
         m_authenticationManager->authenticate(
             *this,
             request,
-            [this, weakThis = std::move(weakThis), 
+            [this, weakThis = std::move(weakThis),
                 requestMessage = std::move(requestMessage)](
                     bool authenticationResult,
                     stree::ResourceContainer authInfo,
@@ -250,7 +251,7 @@ namespace nx_http
         if (responseMsgBody)
             responseMsgBody->bindToAioThread(getAioThread());
 
-        //posting request to the queue 
+        //posting request to the queue
         m_responseQueue.emplace_back(
             std::move(msg),
             std::move(responseMsgBody),
@@ -345,11 +346,19 @@ namespace nx_http
 
         const auto& request = *msg.request;
 
-        if( request.requestLine.version == nx_http::http_1_1 )
-            m_isPersistent = nx_http::getHeaderValue( request.headers, "Connection" ).toLower() != "close";
-        else if( request.requestLine.version == nx_http::http_1_0 )
-            m_isPersistent = nx_http::getHeaderValue( request.headers, "Connection" ).toLower() == "keep-alive";
-        else    //e.g., RTSP
-            m_isPersistent = false;
+        m_isPersistent = false;
+        if (!m_forceConnectionClose)
+        {
+            if (request.requestLine.version == nx_http::http_1_1)
+                m_isPersistent = nx_http::getHeaderValue(request.headers, "Connection").toLower() != "close";
+            else if (request.requestLine.version == nx_http::http_1_0)
+                m_isPersistent = nx_http::getHeaderValue(request.headers, "Connection").toLower() == "keep-alive";
+        }
     }
+
+    void HttpServerConnection::setForceConnectionClose(bool value)
+    {
+        m_forceConnectionClose = value;
+    }
+
 }

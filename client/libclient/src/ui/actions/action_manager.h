@@ -1,5 +1,4 @@
-#ifndef QN_ACTION_MANAGER_H
-#define QN_ACTION_MANAGER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QHash>
@@ -29,7 +28,8 @@ class QnActionManager: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT;
 public:
-    enum CreationOption {
+    enum CreationOption
+    {
         DontReuseActions = 0x1
     };
     Q_DECLARE_FLAGS(CreationOptions, CreationOption)
@@ -106,15 +106,13 @@ public:
      */
     QMenu *newMenu(Qn::ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
 
-    QMenu *newMenu(QnActions::IDType rootId, Qn::ActionScope scope, QWidget *parent  = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
+    QMenu *newMenu(QnActions::IDType rootId, Qn::ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
 
     /**
      * \returns                         Action target provider that is assigned to this
      *                                  action manager.
      */
-    QnActionTargetProvider *targetProvider() const {
-        return m_targetProviderGuard ? m_targetProvider : NULL;
-    }
+    QnActionTargetProvider *targetProvider() const;
 
     /**
      * \param targetProvider            New target provider for this action manager.
@@ -147,6 +145,8 @@ public:
      */
     void redirectAction(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction);
 
+    /** Check if any menu is visible right now */
+    bool isMenuVisible() const;
 signals:
     void menuAboutToShow(QMenu* menu);
     void menuAboutToHide(QMenu* menu);
@@ -169,6 +169,7 @@ protected:
 
     /** Hide all menus that are currently opened. */
     void hideAllMenus();
+
 private slots:
     void at_menu_destroyed(QObject *menu);
 
@@ -200,6 +201,3 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnActionManager::CreationOptions)
-
-
-#endif // QN_ACTION_MANAGER_H

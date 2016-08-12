@@ -1100,22 +1100,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered()
         /* If target server is not provided, open the server we are currently connected to. */
         server = qnCommon->currentServer();
 
-    if (!server)
-        return;
-
-    QUrl url(server->getApiUrl());
-    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
-        return;
-
-    url.setUserName(QString());
-    url.setPassword(QString());
-    url.setScheme(lit("http"));
-    url.setPath(lit("/static/index.html"));
-    url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
-    QDesktopServices::openUrl(url);
-
-    //TODO: #akolesnikov #3.1 VMS-2806
-    //    sendServerRequest(server, lit("static/index.html"));
+    openInBrowser(server, lit("/static/index.html"));
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
@@ -1568,7 +1553,7 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered()
     if (!server)
         return;
 
-    sendServerRequest(server, lit("api/showLog?lines=1000"));
+    openInBrowser(server, lit("/api/showLog?lines=1000"));
 }
 
 void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
@@ -2275,68 +2260,79 @@ void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::TimeServerSelection);
 }
 
-void QnWorkbenchActionHandler::sendServerRequest(const QnMediaServerResourcePtr& server, const QString& path)
+void QnWorkbenchActionHandler::openInBrowser(
+    const QnMediaServerResourcePtr& server,
+    const QString& webPage)
 {
-    static const QString kNonceRequestPath(lit("/api/getNonce"));
-
     if (!server || !context()->user())
         return;
 
-    QUrl serverUrl(server->getApiUrl());
-    serverUrl.setPath(kNonceRequestPath);
+    QUrl serverUrl(server->getApiUrl().toString() + webPage);
+    QUrl proxyUrl = QnNetworkProxyFactory::instance()->urlToResource(serverUrl, server);
+    proxyUrl.setPath(lit("/api/getNonce"));
 
-    nx_http::AsyncHttpClientPtr client = nx_http::AsyncHttpClient::create();
-    auto reply = std::make_unique<QnAsyncHttpClientReply>(client, this);
-    connect(
-        reply.get(), &QnAsyncHttpClientReply::finished,
-        this, &QnWorkbenchActionHandler::at_serverRequest_nonceReceived);
+    if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
+    {
+        // No other requests to this proxy, so we have to get nonce by ourself.
+        auto reply = new QnAsyncHttpClientReply(nx_http::AsyncHttpClient::create(), this);
+        connect(
+            reply, &QnAsyncHttpClientReply::finished,
+            this, &QnWorkbenchActionHandler::at_nonceReceived);
 
-    // TODO: Think of preloader in case of user complains about delay
-    m_serverRequests.emplace(serverUrl, ServerRequest{server, path, std::move(reply)});
-    client->doGet(serverUrl);
+        // TODO: Think of preloader in case of user complains about delay.
+        reply->asyncHttpClient()->doGet(proxyUrl);
+    }
+
+    m_serverRequests.emplace(proxyUrl, ServerRequest{server, serverUrl});
 }
 
-void QnWorkbenchActionHandler::at_serverRequest_nonceReceived(QnAsyncHttpClientReply *reply)
+void QnWorkbenchActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
 {
-    const auto serverUrl = reply->url();
-    auto it = m_serverRequests.find(serverUrl);
-    if (it == m_serverRequests.end())
+    std::unique_ptr<QnAsyncHttpClientReply> replyGuard(reply);
+    const auto nonceUrl = reply->url();
+    auto range = m_serverRequests.equal_range(nonceUrl);
+    if (range.first == range.second)
         return;
 
-    auto request = std::move(it->second);
-    m_serverRequests.erase(it);
+    std::vector<ServerRequest> requests;
+    for (auto it = range.first; it != range.second; ++it)
+        requests.push_back(std::move(it->second));
+
+    m_serverRequests.erase(range.first, range.second);
 
     QnJsonRestResult result;
     NonceReply auth;
     if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
     {
         QnMessageBox::warning(mainWindow(),
-            tr("Cannot open server log"),
+            tr("Cannot open server web page"),
             tr("Could not execute initial server query"));
 
         return;
     }
 
-    auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-    QUrl url(lit("http://%1/%2:%3:%4/%5")
-        .arg(gateway->endpoint().toString())
-        .arg(reply->url().scheme())
-        .arg(reply->url().host())
-        .arg(reply->url().port())
-        .arg(request.path)
-    );
+    for (const auto& request: requests)
+    {
+        const auto appserverUrl = QnAppServerConnectionFactory::url();
+        const auto authParam = createHttpQueryAuthParam(
+            appserverUrl.userName(), appserverUrl.password(),
+            auth.realm, nx_http::Method::GET, auth.nonce.toUtf8());
 
-    const auto appserverUrl = QnAppServerConnectionFactory::url();
-    const auto authParam = createHttpQueryAuthParam(
-        appserverUrl.userName(), appserverUrl.password(),
-        auth.realm, nx_http::Method::GET, auth.nonce.toUtf8());
+        QUrl targetUrl(request.url);
+        QUrlQuery urlQuery(targetUrl);
+        urlQuery.addQueryItem(lit("auth"), QLatin1String(authParam));
+        targetUrl.setQuery(urlQuery);
 
-    QUrlQuery urlQuery(url);
-    urlQuery.addQueryItem(lit("auth"), QLatin1String(authParam));
-    url.setQuery(urlQuery);
+        targetUrl = QnNetworkProxyFactory::instance()->urlToResource(targetUrl, request.server);
 
-    url = QnNetworkProxyFactory::instance()->urlToResource(url, request.server);
-    QDesktopServices::openUrl(url);
+        auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
+        targetUrl = QUrl(lit("http://%1/%2:%3:%4%5?%6")
+            .arg(gateway->endpoint().toString()).arg(targetUrl.scheme())
+            .arg(targetUrl.host()).arg(targetUrl.port())
+            .arg(targetUrl.path()).arg(targetUrl.query()));
+
+        QDesktopServices::openUrl(targetUrl);
+    }
 }
 
 void QnWorkbenchActionHandler::deleteDialogs() {

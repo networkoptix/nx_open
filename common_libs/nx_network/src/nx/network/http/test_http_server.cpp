@@ -65,6 +65,11 @@ private:
     const QByteArray m_response;
 };
 
+void TestHttpServer::setForceConnectionClose(bool value)
+{
+    m_httpServer->setForceConnectionClose(value);
+}
+
 bool TestHttpServer::registerStaticProcessor(
     const QString& path,
     QByteArray msgBody,

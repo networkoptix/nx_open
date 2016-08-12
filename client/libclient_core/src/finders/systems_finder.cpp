@@ -56,13 +56,12 @@ void QnSystemsFinder::onSystemDiscovered(const QnSystemDescriptionPtr& systemDes
     const AggregatorPtr target(new QnSystemDescriptionAggregator(systemDescription));
     m_systems.insert(target->id(), target);
 
-    QSharedPointer<QString> lastIdHolder(new QString(target->id()));
     connect(target, &QnSystemDescriptionAggregator::idChanged, target,
-        [this, lastIdHolder, target]()
+        [this, lastId = target->id(), target]() mutable
         {
-            m_systems.remove(*lastIdHolder);
+            m_systems.remove(lastId);
             m_systems.insert(target->id(), target);
-            *lastIdHolder = target->id();
+            lastId = target->id();
         });
     emit systemDiscovered(target.dynamicCast<QnBaseSystemDescription>());
 }

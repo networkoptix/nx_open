@@ -7,6 +7,7 @@
 #include <business/business_action_parameters.h>
 #include <business/business_strings_helper.h>
 #include <business/business_resource_validation.h>
+#include <business/business_types_comparator.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -89,7 +90,8 @@ void QnSelectResourcesDialogButton::paintEvent(QPaintEvent *event) {
 ///////////////////////////////////////////////////////////////////////////////////////
 QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_lexComparator(new QnBusinessTypesComparator())
 {
 }
 
@@ -210,9 +212,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     {
         QComboBox* comboBox = new QComboBox(parent);
         comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-        for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
+        for (QnBusiness::EventType eventType: m_lexComparator->lexSortedEvents())
             comboBox->addItem(QnBusinessStringsHelper::eventName(eventType), eventType);
-        }
         return comboBox;
     }
     case QnBusiness::ActionColumn:
@@ -220,7 +221,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         bool instantOnly = !QnBusiness::hasToggleState(index.data(Qn::EventTypeRole).value<QnBusiness::EventType>());
         QComboBox* comboBox = new QComboBox(parent);
         comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-        for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {
+        for (QnBusiness::ActionType actionType: m_lexComparator->lexSortedActions())
+        {
             if (instantOnly && !QnBusiness::canBeInstant(actionType))
                 continue;
             comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);

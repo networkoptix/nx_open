@@ -91,12 +91,15 @@ namespace nx_http
             nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
         void processMessage(nx_http::Message&& request);
-
+		
+        // used for test purpose
+        void setForceConnectionClose(bool value);
     private:
         nx_http::AbstractAuthenticationManager* const m_authenticationManager;
         nx_http::MessageDispatcher* const m_httpMessageDispatcher;
         std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
         bool m_isPersistent;
+        bool m_forceConnectionClose;
         std::deque<ResponseMessageContext> m_responseQueue;
 
         void onAuthenticationDone(

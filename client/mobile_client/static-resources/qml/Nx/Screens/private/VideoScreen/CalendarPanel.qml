@@ -11,15 +11,16 @@ Popup
 
     signal datePicked(date date)
 
+    signal opened()
+    signal closed()
+
     readonly property int _animationDuration: 200
 
     closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
     modal: true
 
-    width: contentItem.implicitWidth
-    height: contentItem.implicitHeight
-    x: 0
-    y: parent.height - contentItem.implicitHeight
+    implicitWidth: contentItem.implicitWidth
+    implicitHeight: contentItem.implicitHeight
     padding: 0
 
     background: null
@@ -79,4 +80,14 @@ Popup
             }
         }
     }
+
+    onVisibleChanged:
+    {
+        if (visible)
+            opened()
+        else
+            closed()
+    }
+
+    onOpened: contentItem.forceActiveFocus()
 }

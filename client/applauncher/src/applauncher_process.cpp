@@ -20,7 +20,11 @@ namespace {
 
 /*! Since 3.0 client-bin uses relative rpath to specify its libs location.
     Thus we don't have to put it into LD_LIBRARY_PATH. */
-const QnSoftwareVersion rpathIncludedVersion(3, 0);
+const QnSoftwareVersion kRpathIncludedVersion(3, 0);
+
+#if defined(Q_OS_LINUX)
+const QString kLdLibraryPathVariable = "LD_LIBRARY_PATH";
+#endif
 
 } // namespace
 
@@ -372,26 +376,25 @@ bool ApplauncherProcess::startApplication(
 
     QStringList environment = QProcess::systemEnvironment();
 #ifdef Q_OS_LINUX
-    if (installation->version() < rpathIncludedVersion)
+    if (installation->version() < kRpathIncludedVersion)
     {
-        QString variableValue = installation->libraryPath();
-        if (!variableValue.isEmpty() && QFile::exists(variableValue))
+        QString ldLibraryPath = installation->libraryPath();
+        if (!ldLibraryPath.isEmpty() && QFile::exists(ldLibraryPath))
         {
-            const QString variableName = "LD_LIBRARY_PATH";
-
-            QRegExp varRegExp(QString("%1=(.+)").arg(variableName));
+            QRegExp varRegExp(QString("%1=(.+)").arg(kLdLibraryPathVariable));
 
             auto it = environment.begin();
             for (; it != environment.end(); ++it)
             {
                 if (varRegExp.exactMatch(*it))
                 {
-                    *it = QString("%1=%2:%3").arg(variableName, variableValue, varRegExp.cap(1));
+                    *it = QString("%1=%2:%3").arg(
+                        kLdLibraryPathVariable, ldLibraryPath, varRegExp.cap(1));
                     break;
                 }
             }
             if (it == environment.end())
-                environment.append(QString("%1=%2").arg(variableName, variableValue));
+                environment.append(QString("%1=%2").arg(kLdLibraryPathVariable, ldLibraryPath));
         }
     }
 #endif

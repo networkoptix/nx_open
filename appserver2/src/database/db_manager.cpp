@@ -17,7 +17,6 @@
 #include "core/resource/user_resource.h"
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_access_manager.h>
-#include <utils/license_usage_helper.h>
 
 #include <database/migrations/business_rules_db_migration.h>
 #include <database/migrations/user_permissions_db_migration.h>
@@ -2005,8 +2004,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraA
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraAttributesDataList>& tran)
 {
-    QnCamLicenseUsageHelper licenseUsageHelper;
-
     for(const ApiCameraAttributesData& attrs: tran.params)
     {
         const ErrorCode result = saveCameraUserAttributes(attrs);

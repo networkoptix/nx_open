@@ -44,6 +44,7 @@ void QnMobileClientUiController::setLayoutId(const QString& layoutId)
 void QnMobileClientUiController::disconnectFromSystem()
 {
     emit disconnectRequested();
+    setLayoutId(QString());
 }
 
 void QnMobileClientUiController::connectToSystem(const QUrl& url)

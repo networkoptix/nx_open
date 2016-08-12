@@ -68,7 +68,7 @@ PtsToClockMapper::PtsToClockMapper(
     m_ptsDeltaInCaseOfDiscontinuity( ptsFrequency * DEFAULT_FRAME_DURATION_MS / MSEC_IN_SEC ),
     m_ptsOverflowCount( 0 ),
     m_timeSynchro( timeSynchro ),
-    m_sourceID( sourceID == -1 ? nx::utils::random::number(0) : sourceID ),
+    m_sourceID( sourceID == -1 ? nx::utils::random::number() : sourceID ),
     m_prevPts( 0 ),
     m_baseClock( 0 ),
     m_baseClockOnSource( 0 ),

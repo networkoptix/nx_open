@@ -401,7 +401,11 @@ void PlayerPrivate::presentNextFrame()
         }
     }
 
-    if (videoSurface && videoSurface->isActive())
+    auto metadata = FrameMetadata::deserialize(videoFrameToRender);
+    bool isLivePacket = metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE);
+    bool isPacketOK = (isLivePacket == liveMode);
+
+    if (videoSurface && videoSurface->isActive() && isPacketOK)
     {
         videoSurface->present(*scaleFrame(videoFrameToRender));
         if (dataConsumer)
@@ -409,14 +413,9 @@ void PlayerPrivate::presentNextFrame()
             qint64 timeUs = liveMode ? DATETIME_NOW : videoFrameToRender->startTime() * 1000;
             dataConsumer->setDisplayedTimeUs(timeUs);
         }
+        setPosition(videoFrameToRender->startTime());
+        setAspectRatio(videoFrameToRender->width() * metadata.sar / videoFrameToRender->height());
     }
-
-    setPosition(videoFrameToRender->startTime());
-
-    auto metadata = FrameMetadata::deserialize(videoFrameToRender);
-    setLiveMode(metadata.flags & QnAbstractMediaData::MediaFlags_LIVE);
-    setAspectRatio(videoFrameToRender->width() * metadata.sar / videoFrameToRender->height());
-
     videoFrameToRender.reset();
 
     // Calculate next time to render.
@@ -913,6 +912,11 @@ void Player::stop()
 
     if (d->archiveReader && d->dataConsumer)
         d->archiveReader->removeDataProcessor(d->dataConsumer.get());
+
+    if (d->dataConsumer)
+	    d->dataConsumer->pleaseStop();
+    if (d->archiveReader)
+	    d->archiveReader->pleaseStop();
 
     d->dataConsumer.reset();
     d->archiveReader.reset();

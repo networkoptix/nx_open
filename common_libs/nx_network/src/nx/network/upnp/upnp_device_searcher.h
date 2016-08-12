@@ -144,6 +144,7 @@ private:
     const unsigned int m_discoverTryTimeoutMS;
     mutable QMutex m_mutex;
     quint64 m_timerID;
+    nx::utils::AsyncOperationGuard m_handlerGuard;
     std::map< QString, std::map< SearchHandler*, uint > > m_handlers;
     //map<local interface ip, socket>
     std::map<QString, SocketReadCtx> m_socketList;
@@ -155,7 +156,6 @@ private:
     std::map<QByteArray, UPNPDescriptionCacheItem> m_upnpDescCache;
     bool m_terminated;
     QElapsedTimer m_cacheTimer;
-    nx::utils::AsyncOperationGuard m_concurentGuard;
 
     //!Implementation of \a TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
@@ -182,10 +182,6 @@ private:
         \note MUST be called with \a m_mutex locked
     */
     void updateItemInCache( DiscoveredDeviceInfo devInfo );
-    bool processPacket( const QHostAddress& localInterfaceAddress,
-                        const SocketAddress& discoveredDevAddress,
-                        const DeviceInfo& devInfo,
-                        const QByteArray& xmlDevInfo );
 
 private slots:
     void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient );

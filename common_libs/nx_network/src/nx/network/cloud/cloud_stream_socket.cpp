@@ -178,7 +178,19 @@ int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     NX_CRITICAL(!SocketGlobals::aioService().isInAnyAioThread());
 
     if (m_socketDelegate)
+    {
+        {
+            QnMutexLocker lk(&m_mutex);
+            if (m_terminated)
+            {
+                SystemError::setLastErrorCode(SystemError::interrupted);
+                return 0;
+            }
+        }
+
         return m_socketDelegate->recv(buffer, bufferLen, flags);
+    }
+
 
     SystemError::setLastErrorCode(SystemError::notConnected);
     return -1;

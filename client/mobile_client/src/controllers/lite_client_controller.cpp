@@ -306,8 +306,6 @@ void QnLiteClientControllerPrivate::at_runtimeInfoRemoved(const QnPeerRuntimeInf
 
 void QnLiteClientControllerPrivate::at_startStopTimer_timeout()
 {
-    Q_Q(QnLiteClientController);
-
     if (clientState == QnLiteClientController::State::Starting)
         setClientStartResult(false);
     else if (clientState == QnLiteClientController::State::Stopping)

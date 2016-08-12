@@ -1,13 +1,12 @@
 #!/bin/bash
 
 export vblank_mode=0
-export QT_QPA_PLATFORM=xcb
 
-USER_APPLAUNCHER_DIR="$HOME/Library/Application Support/${company.name}/applauncher/${customization}"
+USER_APPLAUNCHER_DIR="$HOME/Library/Application Support/${company.name}/applauncher/${customization}/Contents/MacOS"
 
-if [ -x "$USER_APPLAUNCHER_DIR/bin/applauncher-bin" ]
+if [ -x "$USER_APPLAUNCHER_DIR/applauncher-bin" ]
 then
-    APPLAUNCHER_DIR="$USER_APPLAUNCHER_DIR/bin"
+    APPLAUNCHER_DIR="$USER_APPLAUNCHER_DIR/"
 else
     APPLAUNCHER_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
     if [ ! -x "$APPLAUNCHER_DIR/applauncher-bin" ]
@@ -17,4 +16,6 @@ else
     fi
 fi
 
+export DYLD_LIBRARY_PATH="$APPLAUNCHER_DIR/../Frameworks"
+export DYLD_FRAMEWORK_PATH="$APPLAUNCHER_DIR/../Frameworks"
 "$APPLAUNCHER_DIR/applauncher-bin" $@

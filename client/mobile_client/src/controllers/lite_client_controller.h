@@ -3,7 +3,6 @@
 #include <QtCore/QObject>
 
 #include <utils/common/connective.h>
-#include <resources/layout_properties.h>
 
 class QnLiteClientLayoutHelper;
 

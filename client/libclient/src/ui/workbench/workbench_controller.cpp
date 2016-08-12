@@ -468,7 +468,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         connect(m_screenRecorder,       SIGNAL(error(QString)),                                                                     this,                           SLOT(at_screenRecorder_error(QString)));
     }
 
-    connect(accessController(), SIGNAL(permissionsChanged(const QnResourcePtr &)),                                                  this,                           SLOT(at_accessController_permissionsChanged(const QnResourcePtr &)));
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+        &QnWorkbenchController::at_accessController_permissionsChanged);
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
@@ -1533,7 +1534,8 @@ void QnWorkbenchController::at_workbench_currentLayoutChanged() {
     updateLayoutInstruments(layout->resource());
 }
 
-void QnWorkbenchController::at_accessController_permissionsChanged(const QnResourcePtr &resource) {
+void QnWorkbenchController::at_accessController_permissionsChanged(const QnResourcePtr &resource)
+{
     QnWorkbenchLayout *layout = workbench()->currentLayout();
     if (!layout || !layout->resource() || layout->resource() != resource)
         return;

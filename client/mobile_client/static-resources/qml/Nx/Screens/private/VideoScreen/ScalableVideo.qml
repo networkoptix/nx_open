@@ -61,6 +61,8 @@ ZoomableFlickable
             fillMode: Image.PreserveAspectFit
             visible: source != ""
         }
+
+        onSourceSizeChanged: fitToBounds()
     }
 
     onWidthChanged: fitToBounds()
@@ -68,6 +70,13 @@ ZoomableFlickable
 
     function fitToBounds()
     {
-        resizeContent(width, height)
+        if (content.sourceSize.width <= 0 || content.sourceSize.height <= 0)
+        {
+            resizeContent(width, height, false, true)
+            return
+        }
+
+        var size = content.boundedSize(width, height)
+        resizeContent(size.width, size.height, false, true)
     }
 }

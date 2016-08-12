@@ -12,7 +12,8 @@ extern "C"
 #include <libavcodec/avcodec.h>
 }
 
-namespace {
+namespace
+{
     const auto kStereoChannelCount = 2;
     const auto kBitsInByte = 8;
     const auto kDefaultSampleRate = 44100;
@@ -20,7 +21,7 @@ namespace {
     const auto kDefaultChannelCount = 1;
     const auto kDefaultCodec = lit("audio/pcm");
     const auto kEncoderCodecName = lit("mp2"); // libmp3lame
-
+    const auto kSingleChannelBitrate = 64000;
 }
 
 QnDesktopAudioOnlyDataProvider::QnDesktopAudioOnlyDataProvider(QnResourcePtr ptr) :
@@ -154,7 +155,6 @@ bool QnDesktopAudioOnlyDataProvider::initAudioEncoder()
         return false;
     }
 
-
     auto encoderCtx = avcodec_alloc_context3(audioCodec);
     const auto format = m_audioSourcesInfo.at(0)->format;
 
@@ -174,13 +174,10 @@ bool QnDesktopAudioOnlyDataProvider::initAudioEncoder()
         timeBase.den = encoderCtx->sample_rate;
 
     encoderCtx->time_base = timeBase;
-    encoderCtx->bit_rate =
-        encoderCtx->sample_rate *
-        encoderCtx->channels *
-        format.sampleSize() / kBitsInByte;
+    encoderCtx->bit_rate = kSingleChannelBitrate * encoderCtx->channels;
 
     m_encoderCtxPtr.reset(new QnAvCodecMediaContext(encoderCtx));
-    if ( avcodec_open2(encoderCtx, audioCodec, nullptr) < 0)
+    if (avcodec_open2(m_encoderCtxPtr->getAvCodecContext(), audioCodec, nullptr) < 0)
     {
         m_lastErrorStr = tr("Could not initialize audio encoder.");
         return false;

@@ -146,8 +146,10 @@ namespace nx_http
         */
         BufferType fetchMessageBodyBuffer();
         const QUrl& url() const;
-        //!Number of total bytes read (including http request line and headers)
-        quint64 totalBytesRead() const;
+        /** Number of bytes read (including http request line and headers)
+         *  via single HTTP request
+         */
+        quint64 bytesRead() const;
 
         //!By default, entity compression is on
         void setUseCompression(bool toggleUseEntityEncoding);
@@ -252,7 +254,8 @@ namespace nx_http
         bool m_proxyAuthorizationTried;
         bool m_ha1RecalcTried;
         bool m_terminated;
-        quint64 m_totalBytesRead;
+        quint64 m_bytesRead; //< total read bytes per request
+        int m_totalRequests; //< total sent requests via single connection
         bool m_contentEncodingUsed;
         unsigned int m_sendTimeoutMs;
         unsigned int m_responseReadTimeoutMs;
@@ -371,6 +374,11 @@ namespace nx_http
             if (m_obj.use_count() == 1)
                 m_obj->terminate();
             m_obj.reset();
+        }
+
+        long use_count() const
+        {
+            return m_obj.use_count();
         }
 
         void swap(AsyncHttpClientPtr& right)
