@@ -349,6 +349,7 @@ void QnRtspClientArchiveDelegate::beforeClose()
     QnMutexLocker lock(&m_rtpDataMutex);
     if (m_rtpData)
         m_rtpData->shutdown();
+    m_rtspSession->shutdown();
 }
 
 void QnRtspClientArchiveDelegate::close()
@@ -411,7 +412,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
     }
 
     QnAbstractMediaDataPtr result = getNextDataInternal();
-    if (!result && !m_blockReopening)
+    if (!result && !m_blockReopening && !m_closing)
         result = getNextDataInternal(); // try again in case of RTSP reconnect
 
     if (m_serverTimePeriod.isNull() || !m_isMultiserverAllowed)
