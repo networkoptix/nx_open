@@ -29,7 +29,6 @@ TransactionTransport::TransactionTransport(
         kTcpKeepAliveTimeout,
         kKeepAliveProbeCount)
 {
-    //TODO #ak first of all, sending response via \a socket
 }
 
 void TransactionTransport::setOnConnectionClosed(

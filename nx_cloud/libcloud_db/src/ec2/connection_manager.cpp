@@ -80,7 +80,8 @@ void ConnectionManager::createTransactionConnection(
     nx::String contentEncoding;
     if (acceptEncodingHeaderIter != request.headers.end())
     {
-        nx_http::header::AcceptEncodingHeader acceptEncodingHeader(acceptEncodingHeaderIter->second);
+        nx_http::header::AcceptEncodingHeader acceptEncodingHeader(
+            acceptEncodingHeaderIter->second);
         if (acceptEncodingHeader.encodingIsAllowed("identity"))
             contentEncoding = "identity";
         else if (acceptEncodingHeader.encodingIsAllowed("gzip"))
@@ -184,24 +185,37 @@ void ConnectionManager::addNewConnection(ConnectionContext context)
             existingConnection = std::move(data.connection);
         });
         TransactionTransport* connectionPtr = existingConnection.get();
-        m_connectionsToRemove.emplace(
-            connectionPtr,
-            std::move(existingConnection));
-        connectionPtr->post(
-            std::bind(&ConnectionManager::removeConnection, this, connectionPtr));
+        connectionPtr->pleaseStop(
+            [existingConnection = std::move(existingConnection)]() mutable
+            {
+                existingConnection.reset();
+            });
         connectionBySystemIdAndPeerIdIndex.erase(existingConnectionIter);
     }
 
     context.connection->setOnConnectionClosed(
-        std::bind(&ConnectionManager::removeConnection, this, context.connection.get()));
+        std::bind(&ConnectionManager::removeConnection, this, context.connectionId));
 
     m_connections.insert(std::move(context));
 }
 
-void ConnectionManager::removeConnection(TransactionTransport* transport)
+void ConnectionManager::removeConnection(const nx::String& connectionId)
 {
     //always called within transport's aio thread
-    //TODO #ak
+
+    QnMutexLocker lk(&m_mutex);
+    auto& index = m_connections.get<kConnectionByIdIndex>();
+    auto iter = index.find(connectionId);
+    if (iter == index.end())
+        return; //assert?
+    ConnectionContext connectionContext;
+    index.modify(
+        iter,
+        [&connectionContext](ConnectionContext& value){ connectionContext = std::move(value); });
+    index.erase(iter);
+    lk.unlock();
+
+    connectionContext.connection.reset();   //< freeing connection with no mutex locker
 }
 
 }   // namespace ec2

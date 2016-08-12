@@ -98,7 +98,7 @@ private:
     QnMutex m_mutex;
 
     void addNewConnection(ConnectionContext connectionContext);
-    void removeConnection(TransactionTransport* transport);
+    void removeConnection(const nx::String& connectionId);
 };
 
 }   // namespace ec2
