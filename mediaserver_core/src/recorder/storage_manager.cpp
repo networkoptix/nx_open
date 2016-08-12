@@ -476,6 +476,11 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
+	connect(this, &QnStorageManager::rebuildFinished, [this] (QnSystemHealth::MessageType message) {
+		if (message == QnSystemHealth::ArchiveFastScanFinished || message == QnSystemHealth::ArchiveRebuildFinished)
+			calculateOccupiedSpace();
+	});
+
     if (m_role == QnServer::StoragePool::Backup) {
         m_scheduleSync.reset(new QnScheduleSync());
         connect(m_scheduleSync.get(), &QnScheduleSync::backupFinished, this, &QnStorageManager::backupFinished, Qt::DirectConnection);
@@ -518,6 +523,66 @@ void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archive
     }
 
     updateCameraHistory();
+}
+
+void QnStorageManager::calculateOccupiedSpace()
+{
+	StorageToOccupiedSpaceMap tmpSpaceInfo;
+	auto calcOccupiedSpaceInfoForCatalogs = [this, &tmpSpaceInfo] (const QMap<QString, DeviceFileCatalogPtr>& catalogMap)
+	{
+		for (auto catalogMapIt = catalogMap.cbegin(); catalogMapIt != catalogMap.cend(); ++catalogMapIt)
+			for (auto catalogIt = catalogMapIt.value()->getChunks().cbegin(); catalogIt != catalogMapIt.value()->getChunks().cend(); ++catalogIt)
+				tmpSpaceInfo[catalogIt->storageIndex] += catalogIt->getFileSize();
+	};
+
+	{
+		QnMutexLocker lock(&m_mutexCatalog);
+		calcOccupiedSpaceInfoForCatalogs(m_devFileCatalog[QnServer::LowQualityCatalog]);
+		calcOccupiedSpaceInfoForCatalogs(m_devFileCatalog[QnServer::HiQualityCatalog]);
+	}
+
+	{
+		QnMutexLocker lock(&m_occupiedSpaceInfoMutex);
+		m_occupiedSpaceInfo = std::move(tmpSpaceInfo);
+	}
+	NX_LOG(lit("%1: Done").arg(Q_FUNC_INFO), cl_logDEBUG1);
+}
+
+template<typename F>
+void QnStorageManager::findOccupiedSpaceEntryByStorageIndexAction(int storageIndex, F action)
+{
+	QnMutexLocker lock(&m_occupiedSpaceInfoMutex);
+	auto it = m_occupiedSpaceInfo.find(storageIndex);
+	NX_ASSERT(it != m_occupiedSpaceInfo.cend());
+	if (it == m_occupiedSpaceInfo.cend())
+	{
+		NX_LOG(lit("%1: no storage for this index %2").arg(Q_FUNC_INFO).arg(storageIndex), cl_logWARNING);
+		return;
+	}
+	action(static_cast<StorageToOccupiedSpaceMap::iterator>(it));
+}
+
+void QnStorageManager::addOccupiedSpaceInfoValue(int storageIndex, qint64 value)
+{
+	findOccupiedSpaceEntryByStorageIndexAction(storageIndex, [value] (StorageToOccupiedSpaceMap::iterator it) {
+		it->second += value;
+	});
+}
+
+void QnStorageManager::subtractOccupiedSpaceInfoValue(int storageIndex, qint64 value)
+{
+	findOccupiedSpaceEntryByStorageIndexAction(storageIndex, [value] (StorageToOccupiedSpaceMap::iterator it) {
+		it->second -= value;
+	});
+}
+
+qint64 QnStorageManager::getOccupiedSpaceInfoForStorage(int storageIndex) 
+{
+	qint64 result = 0;
+	findOccupiedSpaceEntryByStorageIndexAction(storageIndex, [&result] (StorageToOccupiedSpaceMap::iterator it) {
+		result = it->second;
+	});
+	return result;
 }
 
 void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter)

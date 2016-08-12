@@ -23,6 +23,7 @@
 #include "storage_db.h"
 #include <nx/utils/uuid.h>
 #include <set>
+#include <unordered_map>
 #include "api/model/rebuild_archive_reply.h"
 #include "api/model/recording_stats_reply.h"
 #include <nx_ec/managers/abstract_camera_manager.h>
@@ -59,6 +60,7 @@ public:
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;   /* Map by camera unique id. */
     typedef QMap<QString, QSet<QDate>> UsedMonthsMap; /* Map by camera unique id. */
+	typedef std::unordered_map<int, qint64> StorageToOccupiedSpaceMap;
 
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
@@ -217,6 +219,14 @@ private:
     bool getMinTimes(QMap<QString, qint64>& lastTime);
     void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);
 
+	void calculateOccupiedSpace();
+	void addOccupiedSpaceInfoValue(int storageIndex, qint64 value);
+	void subtractOccupiedSpaceInfoValue(int storageIndex, qint64 value);
+	qint64 getOccupiedSpaceInfoForStorage(int storageIndex);
+
+	template<typename F>
+	void findOccupiedSpaceEntryByStorageIndexAction(int storageIndex, F action);
+
     void writeCameraInfoFiles();
     static bool renameFileWithDuration(
         const QString               &oldName,
@@ -272,6 +282,9 @@ private:
 
     std::random_device m_rd;
     std::mt19937 m_gen;
+
+	mutable QnMutex m_occupiedSpaceInfoMutex;
+	StorageToOccupiedSpaceMap m_occupiedSpaceInfo;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()
