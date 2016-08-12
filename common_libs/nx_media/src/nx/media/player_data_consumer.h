@@ -76,6 +76,8 @@ public:
      */
     virtual qint64 getExternalTime() const override;
 
+    /** Ask thread to stop. It's a non-blocking call. Thread will be stopped later. */
+    virtual void pleaseStop() override;
 signals:
     /** Hint to render to display current data with no delay due to seek operation in progress. */
     void hurryUp();
@@ -95,9 +97,6 @@ protected:
     virtual bool canAcceptData() const override;
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
-
-    /** Ask thread to stop. It's a non-blocking call. Thread will be stopped later. */
-    virtual void pleaseStop() override;
 
     virtual void endOfRun() override;
 
@@ -119,6 +118,7 @@ private:
     QnWaitCondition m_queueWaitCond;
     QnMutex m_queueMutex; //< sync with player thread
     QnMutex m_dataProviderMutex; //< sync with dataProvider thread
+    QnMutex m_decoderMutex; //< sync with create/destroy decoder
 
     int m_awaitJumpCounter; //< how many jump requests are queued
     int m_buffering; //< reserved for future use for panoramic cameras

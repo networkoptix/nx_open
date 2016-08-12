@@ -913,6 +913,11 @@ void Player::stop()
     if (d->archiveReader && d->dataConsumer)
         d->archiveReader->removeDataProcessor(d->dataConsumer.get());
 
+    if (d->dataConsumer)
+	    d->dataConsumer->pleaseStop();
+    if (d->archiveReader)
+	    d->archiveReader->pleaseStop();
+
     d->dataConsumer.reset();
     d->archiveReader.reset();
     d->videoFrameToRender.reset();

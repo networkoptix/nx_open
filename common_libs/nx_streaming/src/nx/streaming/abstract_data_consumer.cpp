@@ -30,6 +30,12 @@ void QnAbstractDataConsumer::endOfRun()
     clearUnprocessedData();
 }
 
+void QnAbstractDataConsumer::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+    m_dataQueue.wakeAll();
+}
+
 void QnAbstractDataConsumer::run()
 {
 //    const int timeoutMs = 100;
