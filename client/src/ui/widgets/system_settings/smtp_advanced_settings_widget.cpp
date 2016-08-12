@@ -12,7 +12,7 @@
 
 namespace {
     QList<QnEmail::ConnectionType> connectionTypesAllowed() {
-        return QList<QnEmail::ConnectionType>() 
+        return QList<QnEmail::ConnectionType>()
             << QnEmail::Unsecure
             << QnEmail::Ssl
             << QnEmail::Tls;
@@ -183,7 +183,7 @@ void QnSmtpAdvancedSettingsWidget::validateEmail() {
     const QString targetEmail = ui->emailLineEdit->text();
 
     if (!targetEmail.isEmpty()) {
-        QnEmailAddress email(targetEmail); 
+        QnEmailAddress email(targetEmail);
         if (!email.isValid())
             errorText = tr("E-Mail is not valid");
     }
