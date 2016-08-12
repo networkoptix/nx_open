@@ -12,6 +12,9 @@ Item
     property int videoRotation: 0
     property size sourceSize
 
+    property real visibleVideoWidth: Utils.isRotated90(videoRotation) ? item.height : item.width
+    property real visibleVideoHeight: Utils.isRotated90(videoRotation) ? item.width : item.height
+
     readonly property real horizontalPadding:
     {
         return (Utils.isRotated90(videoRotation)
@@ -33,37 +36,16 @@ Item
 
     function updateSize()
     {
-        var rotated90 = Utils.isRotated90(videoRotation)
-        var positionerAr = videoPositioner.width / videoPositioner.height
-        var videoAr = (customAspectRatio == 0
-            ? sourceSize.width / sourceSize.height
-            : customAspectRatio)
-        if (rotated90)
-            videoAr = 1 / videoAr
-
-        var w
-        var h
-
-        if (positionerAr > videoAr)
+        var size = boundedSize(width, height)
+        if (Utils.isRotated90(videoRotation))
         {
-            h = videoPositioner.height
-            w = h * videoAr
+            item.width = size.height
+            item.height = size.width
         }
         else
         {
-            w = videoPositioner.width
-            h = w / videoAr
-        }
-
-        if (rotated90)
-        {
-            item.width = h
-            item.height = w
-        }
-        else
-        {
-            item.width = w
-            item.height = h
+            item.width = size.width
+            item.height = size.height
         }
     }
 
@@ -75,5 +57,32 @@ Item
         item.parent = videoPositioner
         item.anchors.centerIn = videoPositioner
         item.rotation = Qt.binding(function() { return videoRotation })
+    }
+
+    function boundedSize(width, height)
+    {
+        var rotated90 = Utils.isRotated90(videoRotation)
+        var boundAr = width / height
+        var videoAr = (customAspectRatio == 0
+            ? sourceSize.width / sourceSize.height
+            : customAspectRatio)
+        if (rotated90)
+            videoAr = 1 / videoAr
+
+        var w
+        var h
+
+        if (boundAr > videoAr)
+        {
+            h = height
+            w = h * videoAr
+        }
+        else
+        {
+            w = width
+            h = w / videoAr
+        }
+
+        return Qt.size(w, h)
     }
 }
