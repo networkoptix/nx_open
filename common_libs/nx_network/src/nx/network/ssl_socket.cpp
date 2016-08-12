@@ -1538,7 +1538,10 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(SslSocket);
     if (d->shutdown)
-        return SystemError::setLastErrorCode(SystemError::notConnected), -1;
+    {
+        SystemError::setLastErrorCode(SystemError::notConnected);
+        return -1;
+    }
 
     if (d->emulateBlockingMode)
     {
@@ -1586,7 +1589,10 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
 {
     Q_D(SslSocket);
     if (d->shutdown)
-        return SystemError::setLastErrorCode(SystemError::notConnected), -1;
+    {
+        SystemError::setLastErrorCode(SystemError::notConnected);
+        return -1;
+    }
 
     if (d->emulateBlockingMode)
     {
