@@ -643,13 +643,16 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false);
 
     factory(QnActions::DisconnectAction).
-        flags(Qn::Main).
+        flags(Qn::Main | Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Logout")).
         autoRepeat(false).
+        shortcut(lit("Ctrl+Shift+D")).
         condition(new QnLoggedInCondition(this));
 
     factory(QnActions::ResourcesModeAction).
         flags(Qn::Main).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Browse Local Files")).
         toggledText(tr("Show Welcome Screen")).
         condition(new QnBrowseLocalFilesCondition(this));
