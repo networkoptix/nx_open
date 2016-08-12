@@ -26,7 +26,7 @@ namespace nx_http
     class AbstractAuthenticationManager;
     class MessageDispatcher;
 
-    template<typename ConnectionType> using BaseConnection = 
+    template<typename ConnectionType> using BaseConnection =
         nx_api::BaseStreamProtocolConnection<
             ConnectionType,
             nx_http::Message,
@@ -57,7 +57,9 @@ namespace nx_http
             nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
         void processMessage(nx_http::Message&& request);
-
+		
+        // used for test purpose
+        void setForceConnectionClose(bool value);
     private:
         struct ResponseContext
         {
@@ -78,6 +80,7 @@ namespace nx_http
         nx_http::MessageDispatcher* const m_httpMessageDispatcher;
         std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
         bool m_isPersistent;
+        bool m_forceConnectionClose;
         std::deque<ResponseContext> m_responseQueue;
 
         void onAuthenticationDone(
