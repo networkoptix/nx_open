@@ -34,8 +34,8 @@ QnEmailSmtpServerPreset::QnEmailSmtpServerPreset():
 
 QnEmailSmtpServerPreset::QnEmailSmtpServerPreset(const QString &server, QnEmail::ConnectionType connectionType /* = Tls*/, int port /* = 0*/):
     server(server),
-    connectionType(connectionType), 
-    port(port) 
+    connectionType(connectionType),
+    port(port)
 {}
 
 QnEmailSettings::QnEmailSettings():
@@ -76,7 +76,7 @@ bool QnEmailSettings::equals(const QnEmailSettings &other, bool compareView /* =
     if (connectionType != other.connectionType) return false;
     if (port != other.port)                     return false;
     if (timeout != other.timeout)               return false;
-    
+
     return !compareView || (simple == other.simple);
 }
 
