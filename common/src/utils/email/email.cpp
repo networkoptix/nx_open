@@ -13,7 +13,8 @@
 namespace {
     typedef QHash<QString, QnEmailSmtpServerPreset> QnSmtpPresets;
 
-    const QLatin1String emailPattern("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b");
+    /* Top-level domains can already be up to 30 symbols length for now, so do not limiting them. */
+    const QLatin1String emailPattern("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,255}\\b");
 
     const int tlsPort = 587;
     const int sslPort = 465;
