@@ -29,8 +29,6 @@ void QnConnectToCloudWatcher::at_updateConnection()
         return;
     }
 
-    cloudUrl.setPath("/ec2/events");
-
     if (cloudUrl != m_lastCloudUrl)
     {
         if (!m_lastCloudUrl.isEmpty())
