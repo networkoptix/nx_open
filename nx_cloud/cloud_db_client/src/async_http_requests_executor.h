@@ -30,7 +30,7 @@ namespace cl {
 
 /** Executes HTTP requests asynchronously.
     On object destruction all not yet completed requests are cancelled
-*/ 
+*/
 class AsyncRequestsExecutor
 {
 public:
@@ -191,7 +191,7 @@ private:
             nx_http::FusionDataHttpClient<void, void>>(std::move(url)),
             std::move(completionHandler));
     }
-    
+
     template<typename HttpClientType, typename ... OutputData>
     void execute(
         std::unique_ptr<HttpClientType> client,
@@ -226,7 +226,7 @@ private:
                         OutputData()...);
 
                 api::ResultCode resultCode = api::ResultCode::ok;
-                const auto resultCodeStrIter = 
+                const auto resultCodeStrIter =
                     response->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
                 if (resultCodeStrIter != response->headers.end())
                 {

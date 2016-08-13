@@ -29,12 +29,16 @@
 #endif
 #define AGGREGATE_TRANSACTIONS_BEFORE_SEND
 
+namespace {
 
 /*!
     Real number of transactions posted to the QnTransactionMessageBus can be greater
     (all transactions that read with single read from socket)
 */
 static const int MAX_TRANS_TO_POST_AT_A_TIME = 16;
+static const QnUuid kCloudPeerId(lit("674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB"));
+
+}
 
 namespace ec2
 {
@@ -1171,7 +1175,10 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         m_remotePeer.instanceId = QnUuid(itrRuntimeGuid->second);
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
-    m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server peers only
+    if (m_remotePeer.id == kCloudPeerId)
+        m_remotePeer.peerType = Qn::PT_CloudServer;
+    else
+        m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server or cloud peers only
     #ifdef USE_JSON
         m_remotePeer.dataFormat = Qn::JsonFormat;
     #else

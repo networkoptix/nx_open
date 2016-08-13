@@ -82,7 +82,7 @@ struct SendTransactionToTransportFastFuction
         const QnTransactionTransportHeader &transportHeader) const
     {
         Q_UNUSED(bus)
-            return sender->sendSerializedTransaction(srcFormat, serializedTran, transportHeader);
+        return sender->sendSerializedTransaction(srcFormat, serializedTran, transportHeader);
     }
 };
 
@@ -504,6 +504,9 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAl
     NX_ASSERT(tran.peerID != qnCommon->moduleGUID());
     if (!gotAliveData(tran.params, transport, &ttHeader))
         return; // ignore offline alive tran and resend online tran instead
+
+    if (transport->remotePeer().peerType == Qn::PT_CloudServer)
+        return; //< do not propagate cloud peer alive to other peers. It isn't used yet
 
     QnTransaction<ApiPeerAliveData> modifiedTran(tran);
     NX_ASSERT(!modifiedTran.params.peer.instanceId.isNull());

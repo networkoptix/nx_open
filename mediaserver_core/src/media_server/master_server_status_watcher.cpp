@@ -45,12 +45,13 @@ void QnMasterServerStatusWatcher::at_updateMasterFlag()
 
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
     bool isLocalMaster = localInfo.data.flags.testFlag(ec2::RF_MasterCloudSync);
-    if ((!localPeerCanBeMaster() || hasBetterMaster) && isLocalMaster)
+    bool canBeMaster = localPeerCanBeMaster() && !hasBetterMaster;
+    if (!canBeMaster && isLocalMaster)
     {
         m_timer.stop();
         setMasterFlag(false);
     }
-    else if (!hasBetterMaster && !isLocalMaster)
+    else if (canBeMaster && !isLocalMaster)
     {
         if (!m_timer.isActive())
             m_timer.start(); //< set master flag with delay

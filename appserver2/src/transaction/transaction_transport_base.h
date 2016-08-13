@@ -123,6 +123,12 @@ public:
     template<class T>
     void sendTransaction(const QnTransaction<T>& transaction, const QnTransactionTransportHeader& header)
     {
+        if (remotePeer().peerType == Qn::PT_CloudServer &&
+            transaction.transactionType != TransactionType::Cloud)
+        {
+            return;
+        }
+
         auto remoteAccess = ec2::getTransactionDescriptorByTransaction(transaction)->checkRemotePeerAccessFunc(m_userAccessData, transaction.params);
         if (remoteAccess == RemotePeerAccess::Forbidden)
         {
@@ -138,6 +144,12 @@ public:
     template<template<typename, typename> class Cont, typename Param, typename A>
     void sendTransaction(const QnTransaction<Cont<Param,A>>& transaction, const QnTransactionTransportHeader& header)
     {
+        if (remotePeer().peerType == Qn::PT_CloudServer &&
+            transaction.transactionType != TransactionType::Cloud)
+        {
+            return;
+        }
+
         auto td = ec2::getTransactionDescriptorByTransaction(transaction);
         auto remoteAccess = td->checkRemotePeerAccessFunc(m_userAccessData, transaction.params);
 
