@@ -1100,7 +1100,25 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered()
         /* If target server is not provided, open the server we are currently connected to. */
         server = qnCommon->currentServer();
 
-    openInBrowser(server, lit("/static/index.html"));
+    // TODO: #akolesnikov #3.1 VMS-2806
+    #ifdef WEB_CLIENT_SUPPORTS_PROXY
+        openInBrowser(server, lit("/static/index.html"));
+    #else
+        QUrl url(server->getApiUrl());
+        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+            return;
+
+        url.setUserName(QString());
+        url.setPassword(QString());
+        url.setScheme(lit("http"));
+        url.setPath(lit("/static/index.html"));
+
+        url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
+        if (url.host() != server->getApiUrl().host())
+            return;
+
+        QDesktopServices::openUrl(url);
+    #endif
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
