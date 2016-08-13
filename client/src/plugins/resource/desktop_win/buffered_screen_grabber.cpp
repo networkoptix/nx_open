@@ -74,7 +74,7 @@ void QnBufferedScreenGrabber::pleaseStop()
 
 void QnBufferedScreenGrabber::run()
 {
-    if (m_grabber.getMode() == Qn::FullScreenNoAeroMode || 1)
+    if (m_grabber.getMode() == Qn::FullScreenNoAeroMode)
     {
         QnMutexLocker locker( &m_instanceMutex );
         if (++m_aeroInstanceCounter == 1)
@@ -111,7 +111,7 @@ void QnBufferedScreenGrabber::run()
         }
     }
 
-    if (m_grabber.getMode() == Qn::FullScreenNoAeroMode || 1)
+    if (m_grabber.getMode() == Qn::FullScreenNoAeroMode)
     {
         QnMutexLocker locker( &m_instanceMutex );
         if (--m_aeroInstanceCounter == 0)
