@@ -41,7 +41,7 @@ def set_permissions(path):
         os.chmod(path, 0644)
 
 	
-def prepare(binary, sbindir, tlibdir):
+def prepare(binary, applauncher_binary, sbindir, tlibdir):
     tbindir = os.path.dirname(binary)
 #    if os.path.exists(tbindir):
 #        shutil.rmtree(tbindir)
@@ -56,8 +56,12 @@ def prepare(binary, sbindir, tlibdir):
     tresdir = join(tcontentsdir, 'Resources')
 
     shutil.copyfile(join(sbindir, 'desktop_client'), binary)
+    shutil.copyfile(join(sbindir, 'applauncher'), applauncher_binary)
+
     os.chmod(binary, 0755)
+    os.chmod(applauncher_binary, 0755)
     yield binary
+    yield applauncher_binary
 
     ignore = shutil.ignore_patterns('*debug*', '.*')
     for subfolder in 'platforms', 'imageformats', 'audio':
@@ -70,9 +74,6 @@ def prepare(binary, sbindir, tlibdir):
 
     shutil.copytree(join(sbindir, 'vox'), join(tresdir, 'vox'))
     shutil.copytree(join(sbindir, 'qml'), join(tcontentsdir, 'qml'))
-    shutil.copyfile(join(sbindir, 'applauncher'), join(tbindir, 'applauncher-bin'))
-    os.chmod(join(tbindir, 'applauncher-bin'), 0755)
-    os.chmod(join(tbindir, 'applauncher'), 0755)
 
 def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
     libs = fnmatch.filter(os.listdir(libdir), 'lib*dylib*')
@@ -150,7 +151,7 @@ def main(app_path, bindir, libdir, helpdir, qtdir, qtver):
     applauncher_binary = "{app_path}/Contents/MacOS/applauncher-bin".format(app_path=app_path)
     tlibdir = "{app_path}/Contents/Frameworks".format(app_path=app_path)
 
-    for binary in chain(prepare(client_binary, bindir, tlibdir), prepare(applauncher_binary, bindir, tlibdir)):
+    for binary in prepare(client_binary, applauncher_binary, bindir, tlibdir):
         fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver)
 
     shutil.copytree(helpdir, "{app_path}/Contents/Resources/help".format(app_path=app_path))
