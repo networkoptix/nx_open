@@ -47,6 +47,7 @@ namespace ec2
         QList<QnTransportConnectionInfo> connectionsInfo() const;
         void gotConnectionFromRemotePeer(
             const QnUuid& connectionGuid,
+            ConnectionLockGuard connectionLockGuard,
             QSharedPointer<AbstractStreamSocket> socket,
             ConnectionType::Type connectionType,
             const ApiPeerData& remotePeer,

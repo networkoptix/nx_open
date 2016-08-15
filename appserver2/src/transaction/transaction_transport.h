@@ -102,6 +102,7 @@ public:
     //!Initializer for incoming connection
     QnTransactionTransport(
         const QnUuid& connectionGuid,
+        ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
         const ApiPeerData& remotePeer,
         QSharedPointer<AbstractStreamSocket> socket,
@@ -217,7 +218,7 @@ public:
     QSharedPointer<AbstractStreamSocket> getSocket() const;
 
     static bool tryAcquireConnecting(const QnUuid& remoteGuid, bool isOriginator);
-    static bool tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator);
+    static ConnectionLockGuard tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator);
     static void connectingCanceled(const QnUuid& id, bool isOriginator);
     static void connectDone(const QnUuid& id);
 
@@ -307,6 +308,7 @@ private:
     std::shared_ptr<AbstractByteStreamFilter> m_sizedDecoder;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
+    ConnectionLockGuard m_connectionLockGuard;
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
     QUrl m_postTranBaseUrl;
