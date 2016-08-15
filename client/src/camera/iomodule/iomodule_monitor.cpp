@@ -130,13 +130,12 @@ void QnIOModuleMonitor::at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClient
 
 void QnIOModuleMonitor::at_MonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient )
 {
-    nx_http::AsyncHttpClientPtr httpClient;
     {
         QnMutexLocker lk(&m_mutex);
         if (httpClient != m_httpClient)
             return;
 
-        std::swap(httpClient, m_httpClient);
+        m_httpClient.reset();
     }
 
     emit connectionClosed();
