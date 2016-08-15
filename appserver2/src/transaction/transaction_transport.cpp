@@ -686,11 +686,12 @@ ConnectionLockGuard QnTransactionTransport::tryAcquireConnected(
     bool isExist = m_existConn.contains(remoteGuid);
     bool isTowardConnecting = isOriginator ?  m_connectingConn.value(remoteGuid).second : m_connectingConn.value(remoteGuid).first;
     bool fail = isExist || (isTowardConnecting && remoteGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
-    if (!fail) {
-        m_existConn << remoteGuid;
-        connectingCanceledNoLock(remoteGuid, isOriginator);
-    }
-    return !fail ? ConnectionLockGuard(remoteGuid) : ConnectionLockGuard();
+    if (fail)
+        return ConnectionLockGuard();
+    
+    m_existConn << remoteGuid;
+    connectingCanceledNoLock(remoteGuid, isOriginator);
+    return ConnectionLockGuard(remoteGuid);
 }
 
 void QnTransactionTransport::connectDone(const QnUuid& id)

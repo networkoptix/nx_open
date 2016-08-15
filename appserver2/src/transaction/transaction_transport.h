@@ -49,6 +49,29 @@ namespace ConnectionType
     Type fromString( const QnByteArrayConstRef& str );
 }
 
+/** While this object is alive peer with guid \a peerGuid is considered 
+    connected and cannot establish another transaction connection.
+    Calls \a QnTransactionTransport::connectDone(m_peerGuid) in destructor
+*/
+class ConnectionLockGuard
+{
+public:
+    ConnectionLockGuard();
+    ConnectionLockGuard(const QnUuid& peerGuid);
+    ConnectionLockGuard(ConnectionLockGuard&&);
+    ConnectionLockGuard& operator=(ConnectionLockGuard&&);
+    ~ConnectionLockGuard();
+
+    /** \a true if peer connection lock has been acquired */
+    bool acquired() const;
+
+private:
+    QnUuid m_peerGuid;
+
+    ConnectionLockGuard(const ConnectionLockGuard&);
+    ConnectionLockGuard& operator=(const ConnectionLockGuard&);
+};
+
 
 class QnTransactionTransport
 :
