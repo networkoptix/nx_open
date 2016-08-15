@@ -34,6 +34,9 @@
 #include <api/resource_property_adaptor.h>
 #include <api/global_settings.h>
 #include <nx/network/http/httpclient.h>
+#include "system_settings_handler.h"
+#include <rest/server/json_rest_result.h>
+#include <api/model/system_settings_reply.h>
 
 namespace
 {
@@ -69,7 +72,13 @@ int QnMergeSystemsRestHandler::executeGet(
         return QnPermissionsHelper::notOwnerError(result);
 
     QUrl url = params.value(lit("url"));
-    QString remoteAdminPassword = params.value(lit("password"));
+
+    QAuthenticator auth;
+    auth.setPassword(params.value(lit("password")));
+    auth.setUser(params.value(lit("user")));
+    if (auth.user().isEmpty())
+        auth.setUser("admin");
+
     bool takeRemoteSettings = params.value(lit("takeRemoteSettings"), lit("false")) != lit("false");
     bool mergeOneServer = params.value(lit("oneServer"), lit("false")) != lit("false");
     bool ignoreIncompatible = params.value(lit("ignoreIncompatible"), lit("false")) != lit("false");
@@ -92,7 +101,8 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
 
-    if (remoteAdminPassword.isEmpty()) {
+    if (auth.password().isEmpty())
+    {
         NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"password\""), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("password")));
@@ -116,8 +126,8 @@ int QnMergeSystemsRestHandler::executeGet(
         client.setMessageBodyReadTimeoutMs(requestTimeout);
 
         QUrl requestUrl(url);
-        requestUrl.setUserName(adminUser->getName());
-        requestUrl.setPassword(remoteAdminPassword);
+        requestUrl.setUserName(auth.user());
+        requestUrl.setPassword(auth.password());
         requestUrl.setPath(lit("/api/moduleInformationAuthenticated"));
         requestUrl.setQuery(lit("showAddresses=true"));
 
@@ -205,7 +215,7 @@ int QnMergeSystemsRestHandler::executeGet(
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyRemoteSettings(url, remoteModuleInformation.systemName, remoteAdminPassword, adminUser, owner))
+        if (!applyRemoteSettings(url, remoteModuleInformation.systemName, auth, owner))
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply remote settings")
                 .arg(takeRemoteSettings), cl_logDEBUG1);
@@ -222,7 +232,7 @@ int QnMergeSystemsRestHandler::executeGet(
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyCurrentSettings(url, remoteAdminPassword, adminUser, mergeOneServer, owner))
+        if (!applyCurrentSettings(url, auth, mergeOneServer, owner))
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply current settings")
                 .arg(takeRemoteSettings), cl_logDEBUG1);
@@ -263,14 +273,17 @@ int QnMergeSystemsRestHandler::executeGet(
 
 bool QnMergeSystemsRestHandler::applyCurrentSettings(
         const QUrl &remoteUrl,
-        const QString &remoteAdminPassword,
-        const QnUserResourcePtr &admin,
+        const QAuthenticator& auth,
         bool oneServer,
         const QnRestConnectionProcessor *owner)
 {
     auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server)
         return false;
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+    if (!admin)
+        return false;
+
 
     ConfigureSystemData data;
     data.systemName = qnCommon->localSystemName();
@@ -309,8 +322,8 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
 
     QUrl requestUrl(remoteUrl);
-    client.setUserName(admin->getName());
-    client.setUserPassword(remoteAdminPassword);
+    client.setUserName(auth.user());
+    client.setUserPassword(auth.password());
     requestUrl.setPath(lit("/api/configure"));
 
     if (!client.doPost(requestUrl, "application/json", serializedData) ||
@@ -322,118 +335,102 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     return true;
 }
 
+template <class ResultDataType>
+bool executeRequest(
+    const QUrl &remoteUrl,
+    const QAuthenticator& auth,
+    ResultDataType& result,
+    const QString& path)
+{
+    nx_http::HttpClient client;
+    client.setResponseReadTimeoutMs(requestTimeout);
+    client.setSendTimeoutMs(requestTimeout);
+    client.setMessageBodyReadTimeoutMs(requestTimeout);
+
+    client.setUserName(auth.user());
+    client.setUserPassword(auth.password());
+
+    QUrl requestUrl(remoteUrl);
+    requestUrl.setPath(path);
+    if (!client.doGet(requestUrl) || !isResponseOK(client))
+    {
+        auto status = getClientResponse(client);
+        NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to invoke %1: %2")
+            .arg(path)
+            .arg(QLatin1String(nx_http::StatusCode::toString(status))), cl_logDEBUG1);
+        return false;
+    }
+
+    QByteArray response = client.fetchMessageBodyBuffer();
+    return QJson::deserialize(response, &result);
+}
+
 bool QnMergeSystemsRestHandler::applyRemoteSettings(
         const QUrl &remoteUrl,
         const QString &systemName,
-        const QString &remoteAdminPassword,
-        QnUserResourcePtr &admin,
+        const QAuthenticator& auth,
         const QnRestConnectionProcessor *owner)
 {
-    qint64 remoteSysTime = 0;
-    qint64 remoteTranLogTime = 0;
 
+    /* Read admin user from the remote server */
+
+    ec2::ApiUserDataList users;
+    if (!executeRequest(remoteUrl, auth, users, lit("/ec2/getUsers")))
+        return false;
+
+    ec2::ApiMediaServerDataList servers;
+    if (!executeRequest(remoteUrl, auth, servers, lit("/ec2/getMediaServers")))
+        return false;
+
+    QnJsonRestResult settingsRestResult;
+    if (!executeRequest(remoteUrl, auth, settingsRestResult, lit("/api/systemSettings")))
+        return false;
+
+    QnSystemSettingsReply settings;
+    if (!QJson::deserialize(settingsRestResult.reply, &settings))
+        return false;
+
+    QnJsonRestResult pingRestResult;
+    if (!executeRequest(remoteUrl, auth, settingsRestResult, lit("/api/ping")))
+        return false;
+
+    QnPingReply pingReply;
+    if (!QJson::deserialize(pingRestResult.reply, &pingReply))
+        return false;
+
+    QnJsonRestResult backupDBRestResult;
+    if (!executeRequest(remoteUrl, auth, backupDBRestResult, lit("/api/backupDatabase")))
+        return false;
+
+    ec2::ApiUserData adminUserData;
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+    if (!admin)
+        return false;
+    for (const auto& user: users)
     {
-        /* Read admin user from the remote server */
-
-        nx_http::HttpClient client;
-        client.setResponseReadTimeoutMs(requestTimeout);
-        client.setSendTimeoutMs(requestTimeout);
-        client.setMessageBodyReadTimeoutMs(requestTimeout);
-        client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
-
-        ec2::ApiUserDataList users;
+        if (user.id == admin->getId())
         {
-            QUrl requestUrl(remoteUrl);
-            requestUrl.setUserName(admin->getName());
-            requestUrl.setPassword(remoteAdminPassword);
-            requestUrl.setPath(lit("/ec2/getUsers"));
-            if (!client.doGet(requestUrl) || !isResponseOK(client))
-            {
-                auto status = getClientResponse(client);
-                NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to invoke /ec2/getUsers: %1")
-                    .arg(QLatin1String(nx_http::StatusCode::toString(status))), cl_logDEBUG1);
-                return false;
-            }
-
-            QByteArray usersResponse = client.fetchMessageBodyBuffer();
-            QJson::deserialize(usersResponse, &users);
+            adminUserData = user;
+            break;
         }
-
-        {
-            // ping remote system to take sysid time
-
-            nx_http::HttpClient client;
-            client.setResponseReadTimeoutMs(requestTimeout);
-            client.setSendTimeoutMs(requestTimeout);
-            client.setMessageBodyReadTimeoutMs(requestTimeout);
-            client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
-
-            QUrl requestUrl(remoteUrl);
-            requestUrl.setUserName(admin->getName());
-            requestUrl.setPassword(remoteAdminPassword);
-            requestUrl.setPath(lit("/api/ping"));
-
-            if (!client.doGet(requestUrl) || !isResponseOK(client))
-            {
-                auto status = getClientResponse(client);
-                NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to invoke /api/ping: %1")
-                    .arg(QLatin1String(nx_http::StatusCode::toString(status))), cl_logDEBUG1);
-                return false;
-            }
-
-            QByteArray pingResponse = client.fetchMessageBodyBuffer();
-
-            QnJsonRestResult result;
-            QnPingReply reply;
-            if (QJson::deserialize(pingResponse, &result) && QJson::deserialize(result.reply, &reply))
-            {
-                remoteSysTime = reply.sysIdTime;
-                remoteTranLogTime = reply.tranLogTime;
-            }
-        }
-
-        {
-            // Backup database
-            nx_http::HttpClient client;
-            client.setResponseReadTimeoutMs(requestTimeout);
-            client.setSendTimeoutMs(requestTimeout);
-            client.setMessageBodyReadTimeoutMs(requestTimeout);
-            client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
-
-            QUrl requestUrl(remoteUrl);
-            requestUrl.setUserName(admin->getName());
-            requestUrl.setPassword(remoteAdminPassword);
-            requestUrl.setPath(lit("/api/backupDatabase"));
-
-            if (!client.doGet(requestUrl) || !isResponseOK(client))
-            {
-                auto status = getClientResponse(client);
-                NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to invoke /api/backupDatabase: %1")
-                    .arg(QLatin1String(nx_http::StatusCode::toString(status))), cl_logDEBUG1);
-                return false;
-            }
-        }
-
-        QnUserResourcePtr userResource;
-        for (const ec2::ApiUserData &userData: users)
-        {
-            if (userData.id == admin->getId())
-            {
-                userResource = ec2::fromApiToResource(userData);
-                break;
-            }
-        }
-        if (userResource.isNull())
-            return false;
-
-        admin->update(userResource);
     }
+    if (adminUserData.id.isNull())
+        return false; //< not admin user in remote data
 
-    ec2::ErrorCode errorCode;
+    ec2::ApiMediaServerData mediaServerData;
+    for (const auto& server: servers)
+    {
+        if (server.id == pingReply.moduleGuid)
+        {
+            mediaServerData = server;
+            break;
+        }
+    }
+    if (mediaServerData.id.isNull())
+        return false; //< no own media server in remote data
 
-    ec2::ApiUserData userData;
-    fromResourceToApi(admin, userData);
-    errorCode = ec2Connection()->getUserManager(owner->accessRights())->saveSync(userData);
+    auto userManager = ec2Connection()->getUserManager(owner->accessRights());
+    ec2::ErrorCode errorCode = userManager->saveSync(adminUserData);
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errorCode != ec2::ErrorCode::ok)
     {
@@ -442,10 +439,30 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
     }
 
+    auto serverManager = ec2Connection()->getMediaServerManager(owner->accessRights());
+    errorCode = serverManager->saveSync(mediaServerData);
+    NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
+    if (errorCode != ec2::ErrorCode::ok)
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save media server: %1")
+            .arg(ec2::toString(errorCode)), cl_logDEBUG1);
+        return false;
+    }
+
+    QnSystemSettingsHandler settingsSubHandler;
+    const QnRequestParams settingsParams;
+    QnJsonRestResult restSubResult;
+    settingsSubHandler.executeGet(
+        QString() /*path*/,
+        settings.settings,
+        restSubResult,
+        owner);
+
+
     ConfigureSystemData data;
     data.systemName = systemName;
-    data.sysIdTime = remoteSysTime;
-    data.tranLogTime = remoteTranLogTime;
+    data.sysIdTime = pingReply.sysIdTime;
+    data.tranLogTime = pingReply.tranLogTime;
     data.wholeSystem = true;
 
     if (!changeSystemName(data))
@@ -455,7 +472,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     }
 
     auto miscManager = ec2Connection()->getMiscManager(owner->accessRights());
-    errorCode = miscManager->changeSystemNameSync(systemName, remoteSysTime, remoteTranLogTime);
+    errorCode = miscManager->changeSystemNameSync(systemName, pingReply.sysIdTime, pingReply.tranLogTime);
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errorCode != ec2::ErrorCode::ok)
     {

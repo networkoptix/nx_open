@@ -10,6 +10,7 @@
 #include "connection_info.h"
 #include "test_email_settings_reply.h"
 #include "ping_reply.h"
+#include "system_settings_reply.h"
 #include "recording_stats_reply.h"
 #include "camera_list_reply.h"
 #include "configure_reply.h"
@@ -34,6 +35,7 @@
     (QnTestEmailSettingsReply)\
     (QnCompatibilityItem)\
     (QnPingReply)\
+    (QnSystemSettingsReply)\
     (QnCameraListReply)\
     (QnConfigureReply) \
     (QnUploadUpdateReply)\

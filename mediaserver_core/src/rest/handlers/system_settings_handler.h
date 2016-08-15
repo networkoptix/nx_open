@@ -8,7 +8,6 @@
 
 #include <rest/server/json_rest_handler.h>
 
-
 /*!
     If no parameters are specified then just returns list of settings.
     If setting(s) to set is specified, then new values are returned
