@@ -37,7 +37,7 @@ AbstractStreamServerSocket* SocketFactory::createStreamServerSocket( bool sslReq
     else
         return new TCPServerSocket( s_tcpServerIpVersion.load() );
 #else
-    return new TCPServerSocket();
+    return new TCPServerSocket(s_tcpServerIpVersion.load());
 #endif // ENABLE_SSL
 }
 
