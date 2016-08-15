@@ -40,16 +40,60 @@ QnIOModuleMonitor::QnIOModuleMonitor(const QnSecurityCamResourcePtr &camera):
 
 bool QnIOModuleMonitor::open()
 {
-    if (m_httpClient)
-        m_httpClient->socket()->post([this](){ openImpl(); });
-    else
-        openImpl();
+    {
+        nx_http::AsyncHttpClientPtr httpClient;
+        QnMutexLocker lk(&m_mutex);
+        std::swap(httpClient, m_httpClient);
+    }
+
+    auto m_httpClient = nx_http::AsyncHttpClient::create();
+    m_httpClient->setMessageBodyReadTimeoutMs(HTTP_READ_TIMEOUT);
+
+    connect(
+        m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+        this, &QnIOModuleMonitor::at_MonitorResponseReceived, Qt::DirectConnection);
+    connect(
+        m_httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
+        this, &QnIOModuleMonitor::at_MonitorMessageBodyAvailable, Qt::DirectConnection);
+    connect(
+        m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+        this, &QnIOModuleMonitor::at_MonitorConnectionClosed, Qt::DirectConnection);
+
+    m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
+    m_multipartContentParser->setNextFilter(std::make_shared<QnMessageBodyParser>(this));
+
+    QnMediaServerResourcePtr server = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return false;
+    if (m_camera->getStatus() < Qn::Online)
+        return false;
+
+    m_httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
+    QUrl requestUrl(server->getApiUrl());
+    requestUrl.setPath(lit("/api/iomonitor"));
+    QUrlQuery query;
+    query.addQueryItem(lit("physicalId"), m_camera->getUniqueId());
+    requestUrl.setQuery(query);
+
+    QnRoute route = QnRouter::instance()->routeTo(server->getId());
+    if (!route.gatewayId.isNull()) {
+        Q_ASSERT(!route.addr.isNull());
+        requestUrl.setHost(route.addr.address.toString());
+        requestUrl.setPort(route.addr.port);
+    }
+
+    m_httpClient->setUserName( QnAppServerConnectionFactory::url().userName().toLower() );
+    m_httpClient->setUserPassword( QnAppServerConnectionFactory::url().password() );
+
+    if (!m_httpClient->doGet( requestUrl ))
+        return false;
 
     return true;
 }
 
 void QnIOModuleMonitor::at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
 {
+    QnMutexLocker lk( &m_mutex );
     if (httpClient != m_httpClient)
         return;
 
@@ -69,11 +113,14 @@ void QnIOModuleMonitor::at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr 
             arg(m_camera->getUrl()).arg(QLatin1String(httpClient->contentType())).arg(QLatin1String(multipartContentType)), cl_logWARNING );
         return;
     }
+
+    lk.unlock();
     emit connectionOpened();
 }
 
 void QnIOModuleMonitor::at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
 {
+    QnMutexLocker lk(&m_mutex);
     if (httpClient == m_httpClient)
     {
         const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
@@ -83,51 +130,14 @@ void QnIOModuleMonitor::at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClient
 
 void QnIOModuleMonitor::at_MonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient )
 {
-    if (httpClient == m_httpClient)
+    nx_http::AsyncHttpClientPtr httpClient;
     {
-        m_httpClient.reset();
-        emit connectionClosed();
-    }
-}
+        QnMutexLocker lk(&m_mutex);
+        if (httpClient != m_httpClient)
+            return;
 
-void QnIOModuleMonitor::openImpl()
-{
-    auto httpClient = nx_http::AsyncHttpClient::create();
-    httpClient->setMessageBodyReadTimeoutMs(HTTP_READ_TIMEOUT);
-    connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
-        this, &QnIOModuleMonitor::at_MonitorResponseReceived, Qt::DirectConnection);
-    connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
-        this, &QnIOModuleMonitor::at_MonitorMessageBodyAvailable, Qt::DirectConnection);
-    connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::done,
-        this, &QnIOModuleMonitor::at_MonitorConnectionClosed, Qt::DirectConnection);
-
-    m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
-    m_multipartContentParser->setNextFilter(std::make_shared<QnMessageBodyParser>(this));
-
-    QnMediaServerResourcePtr server = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
-    if (!server || m_camera->getStatus() < Qn::Online)
-        return;
-
-    httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
-    QUrl requestUrl(server->getApiUrl());
-    requestUrl.setPath(lit("/api/iomonitor"));
-    QUrlQuery query;
-    query.addQueryItem(lit("physicalId"), m_camera->getUniqueId());
-    requestUrl.setQuery(query);
-
-    QnRoute route = QnRouter::instance()->routeTo(server->getId());
-    if (!route.gatewayId.isNull()) {
-        Q_ASSERT(!route.addr.isNull());
-        requestUrl.setHost(route.addr.address.toString());
-        requestUrl.setPort(route.addr.port);
+        std::swap(httpClient, m_httpClient);
     }
 
-    httpClient->setUserName( QnAppServerConnectionFactory::url().userName().toLower() );
-    httpClient->setUserPassword( QnAppServerConnectionFactory::url().password() );
-
-    if (httpClient->doGet( requestUrl ))
-        m_httpClient = std::move( httpClient );
+    emit connectionClosed();
 }

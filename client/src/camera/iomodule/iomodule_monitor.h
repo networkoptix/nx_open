@@ -25,7 +25,7 @@ private slots:
     void at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
     void at_MonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
 private:
-    void openImpl();
+    mutable QnMutex m_mutex;
     QnSecurityCamResourcePtr m_camera;
     nx_http::AsyncHttpClientPtr m_httpClient;
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
