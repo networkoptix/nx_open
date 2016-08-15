@@ -19,6 +19,7 @@ Control
     property bool active: false
 
     signal clicked()
+    signal doubleClicked()
     signal activityDetected()
     signal nextCameraRequested()
     signal previousCameraRequested()
@@ -255,6 +256,7 @@ Control
         id: mouseArea
         anchors.fill: parent
         onClicked: cameraItem.clicked()
+        onDoubleClicked: cameraItem.doubleClicked()
         hoverEnabled: true
 
         onWheel:
@@ -347,7 +349,7 @@ Control
         }
         else if (event.key == Qt.Key_Return || event.key == Qt.Key_Enter)
         {
-            clicked()
+            doubleClicked()
             event.accepted = true
         }
     }
