@@ -688,13 +688,14 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
 void setServerNameAndUrls(
     QnMediaServerResourcePtr server,
-    const QString& myAddress, int port, bool isSslAllowed)
+    const SocketAddress& address,
+    bool sslAllowed)
 {
     if (server->getName().isEmpty())
         server->setName(QString("Server ") + getMacFromPrimaryIF());
 
-    const auto apiSheme = isSslAllowed ? QString("https") : QString("https");
-    server->setUrl(QString("rtsp://%1:%2").arg(myAddress).arg(port));
+    server->setSslAllowed(sslAllowed);
+    server->setPrimaryAddress(address);
 }
 
 QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectionPtr ec2Connection)
@@ -1074,9 +1075,7 @@ void MediaServerProcess::updateAddressesList()
         if (!serverAddresses.isEmpty())
             newAddress = serverAddresses.front();
 
-        setServerNameAndUrls(
-            m_mediaServer, newAddress.address.toString(), newAddress.port,
-            qnCommon->moduleInformation().sslAllowed);
+        setServerNameAndUrls(m_mediaServer, newAddress, qnCommon->moduleInformation().sslAllowed);
     }
 
     ec2::ApiMediaServerData server;
@@ -2116,8 +2115,8 @@ void MediaServerProcess::run()
             isModified = true;
 
         setServerNameAndUrls(
-            server, defaultLocalAddress(appserverHost),
-            m_universalTcpListener->getPort(),
+            server,
+            SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()),
             qnCommon->moduleInformation().sslAllowed);
 
         QList<SocketAddress> serverAddresses;

@@ -131,7 +131,7 @@ public:
     SocketAddress(const QUrl& url);
 
     QString toString() const;
-    QUrl toUrl(const QString& scheme = QString());
+    QUrl toUrl(const QString& scheme = QString()) const;
     bool operator==(const SocketAddress& rhs) const;
     bool operator!=(const SocketAddress& rhs) const;
     bool operator<(const SocketAddress& rhs) const;
