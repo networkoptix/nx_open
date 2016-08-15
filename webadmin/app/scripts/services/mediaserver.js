@@ -309,12 +309,12 @@ angular.module('webadminApp')
                 if(url.indexOf('http')!=0){
                     url = 'http://' + url;
                 }
-                return wrapPost(proxy + '/web/api/mergeSystems?' + $.param({
+                return wrapPost(proxy + '/web/api/mergeSystems?',{
                     login: remoteLogin,
                     password: remotePassword,
                     url: url,
                     takeRemoteSettings: !keepMySystem
-                }));
+                });
             },
             pingSystem: function(url,login,password){
                 if(url.indexOf('http')!=0){
