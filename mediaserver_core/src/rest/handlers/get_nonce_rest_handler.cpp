@@ -10,10 +10,11 @@
 #include <utils/common/util.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <api/model/getnonce_reply.h>
 
 int QnGetNonceRestHandler::executeGet(const QString &, const QnRequestParams & params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
-    NonceReply reply;
+    QnGetNonceReply reply;
     reply.nonce = QnAuthHelper::instance()->generateNonce();
     reply.realm = QnAppInfo::realm();
 

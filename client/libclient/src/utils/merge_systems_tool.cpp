@@ -16,6 +16,7 @@
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"
 #include "ui/actions/action.h"
+#include <network/authutil.h>
 
 namespace {
 
@@ -70,19 +71,59 @@ void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &password)
     }
 }
 
-int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &password, bool ownSettings)
+int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QAuthenticator& userAuth, bool ownSettings)
 {
-    QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
-    NX_ASSERT(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
     NX_LOG(lit("QnMergeSystemsTool: merge request to %1 url=%2").arg(proxy->getApiUrl().toString()).arg(url.toString()), cl_logDEBUG1);
-    return proxy->apiConnection()->mergeSystemAsync(url, password, currentPassword, ownSettings, false, false, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
+
+    MergeSystemCtx ctx;
+    ctx.proxy = proxy;
+    ctx.url = url;
+    ctx.auth = userAuth;
+    ctx.ownSettings = ownSettings;
+
+    ctx.nonceRequestHandle = proxy->apiConnection()->getNonceAsync(url, this, SLOT(at_getNonceForMergeFinished(int, QnGetNonceReply, int, QString)));
+    m_mergeSystemRequests[ctx.nonceRequestHandle] = ctx;
+    return ctx.nonceRequestHandle;
 }
 
-int QnMergeSystemsTool::configureIncompatibleServer(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &password)
+void QnMergeSystemsTool::at_getNonceForMergeFinished(
+    int status,
+    const QnGetNonceReply& nonceReply,
+    int handle,
+    const QString& errorString)
 {
-    QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
-    NX_ASSERT(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
-    return proxy->apiConnection()->mergeSystemAsync(url, password, currentPassword, true, true, true, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
+    MergeSystemCtx ctx = m_mergeSystemRequests.value(handle);
+
+    QByteArray remoteAuthKey = createHttpQueryAuthParam(
+        ctx.auth.user(),
+        ctx.auth.password(),
+        nonceReply.realm,
+        "GET",
+        nonceReply.nonce.toUtf8());
+
+    ctx.mergeRequestHandle = ctx.proxy->apiConnection()->mergeSystemAsync(
+        ctx.url,
+        QString::fromLatin1(remoteAuthKey),
+        ctx.ownSettings,
+        ctx.oneServer,
+        ctx.ignoreIncompatible,
+        this,
+        SLOT(at_mergeSystem_finished(int, QnModuleInformation, int, QString)));
+}
+
+int QnMergeSystemsTool::configureIncompatibleServer(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QAuthenticator& userAuth)
+{
+    MergeSystemCtx ctx;
+    ctx.proxy = proxy;
+    ctx.url = url;
+    ctx.auth = userAuth;
+    ctx.ownSettings = true;
+    ctx.oneServer = true;
+    ctx.ignoreIncompatible = true;
+
+    int handle = proxy->apiConnection()->getNonceAsync(url, this, SLOT(at_getNonceForMergeFinished(int, QnGetNonceReply, int, QString)));
+    m_mergeSystemRequests[handle] = ctx;
+    return handle;
 }
 
 void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString)
@@ -121,6 +162,20 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
 
 void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString)
 {
+    bool ctxFound = false;
+    for (const auto& ctx : m_mergeSystemRequests)
+    {
+        if (ctx.mergeRequestHandle == handle)
+        {
+            handle = ctx.nonceRequestHandle;
+            m_mergeSystemRequests.remove(handle);
+            ctxFound = true;
+            break;
+        }
+    }
+    if (!ctxFound)
+        return;
+
     NX_LOG(lit("QnMergeSystemsTool: merge reply id=%1 error=%2").arg(moduleInformation.id.toString()).arg(errorString), cl_logDEBUG1);
 
     QnMergeSystemsTool::ErrorCode errCode = InternalError;

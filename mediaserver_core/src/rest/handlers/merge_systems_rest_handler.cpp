@@ -58,6 +58,13 @@ namespace
         else
             return nx_http::StatusCode::undefined;
     }
+
+    void addAuthToRequest(QUrl& request, const QString& remoteAuthKey)
+    {
+        QUrlQuery query(request.query());
+        query.addQueryItem(lit("authKey"), remoteAuthKey);
+        request.setQuery(query);
+    }
 }
 
 int QnMergeSystemsRestHandler::executeGet(
@@ -66,8 +73,6 @@ int QnMergeSystemsRestHandler::executeGet(
         QnJsonRestResult &result,
         const QnRestConnectionProcessor *owner)
 {
-    PasswordData passwordData(params);
-
     Q_UNUSED(path)
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
@@ -76,11 +81,7 @@ int QnMergeSystemsRestHandler::executeGet(
 
     QUrl url = params.value(lit("url"));
 
-    QAuthenticator auth;
-    auth.setPassword(passwordData.password);
-    auth.setUser(params.value(lit("username")));
-    if (auth.user().isEmpty())
-        auth.setUser("admin");
+    QString remoteAuthKey(params.value(lit("authKey")));
 
     bool takeRemoteSettings = params.value(lit("takeRemoteSettings"), lit("false")) != lit("false");
     bool mergeOneServer = params.value(lit("oneServer"), lit("false")) != lit("false");
@@ -104,9 +105,9 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
 
-    if (auth.password().isEmpty())
+    if (remoteAuthKey.isEmpty())
     {
-        NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"password\""), cl_logDEBUG1);
+        NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"authKey\""), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("password")));
         return nx_http::StatusCode::ok;
@@ -129,10 +130,9 @@ int QnMergeSystemsRestHandler::executeGet(
         client.setMessageBodyReadTimeoutMs(requestTimeout);
 
         QUrl requestUrl(url);
-        requestUrl.setUserName(auth.user());
-        requestUrl.setPassword(auth.password());
         requestUrl.setPath(lit("/api/moduleInformationAuthenticated"));
         requestUrl.setQuery(lit("showAddresses=true"));
+        addAuthToRequest(requestUrl, remoteAuthKey);
 
         if (!client.doGet(requestUrl) || !isResponseOK(client))
         {
@@ -218,7 +218,7 @@ int QnMergeSystemsRestHandler::executeGet(
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyRemoteSettings(url, remoteModuleInformation.systemName, auth, owner))
+        if (!applyRemoteSettings(url, remoteModuleInformation.systemName, remoteAuthKey, owner))
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply remote settings")
                 .arg(takeRemoteSettings), cl_logDEBUG1);
@@ -235,7 +235,7 @@ int QnMergeSystemsRestHandler::executeGet(
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyCurrentSettings(url, auth, mergeOneServer, owner))
+        if (!applyCurrentSettings(url, remoteAuthKey, mergeOneServer, owner))
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply current settings")
                 .arg(takeRemoteSettings), cl_logDEBUG1);
@@ -276,7 +276,7 @@ int QnMergeSystemsRestHandler::executeGet(
 
 bool QnMergeSystemsRestHandler::applyCurrentSettings(
         const QUrl &remoteUrl,
-        const QAuthenticator& auth,
+        const QString& remoteAuthKey,
         bool oneServer,
         const QnRestConnectionProcessor *owner)
 {
@@ -325,9 +325,8 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
 
     QUrl requestUrl(remoteUrl);
-    client.setUserName(auth.user());
-    client.setUserPassword(auth.password());
     requestUrl.setPath(lit("/api/configure"));
+    addAuthToRequest(requestUrl, remoteAuthKey);
 
     if (!client.doPost(requestUrl, "application/json", serializedData) ||
         !isResponseOK(client))
@@ -341,7 +340,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
 template <class ResultDataType>
 bool executeRequest(
     const QUrl &remoteUrl,
-    const QAuthenticator& auth,
+    const QString& remoteAuthKey,
     ResultDataType& result,
     const QString& path)
 {
@@ -350,11 +349,10 @@ bool executeRequest(
     client.setSendTimeoutMs(requestTimeout);
     client.setMessageBodyReadTimeoutMs(requestTimeout);
 
-    client.setUserName(auth.user());
-    client.setUserPassword(auth.password());
 
     QUrl requestUrl(remoteUrl);
     requestUrl.setPath(path);
+    addAuthToRequest(requestUrl, remoteAuthKey);
     if (!client.doGet(requestUrl) || !isResponseOK(client))
     {
         auto status = getClientResponse(client);
@@ -369,24 +367,24 @@ bool executeRequest(
 }
 
 bool QnMergeSystemsRestHandler::applyRemoteSettings(
-        const QUrl &remoteUrl,
-        const QString &systemName,
-        const QAuthenticator& auth,
-        const QnRestConnectionProcessor *owner)
+        const QUrl& remoteUrl,
+        const QString& systemName,
+        const QString& remoteAuthKey,
+        const QnRestConnectionProcessor* owner)
 {
 
     /* Read admin user from the remote server */
 
     ec2::ApiUserDataList users;
-    if (!executeRequest(remoteUrl, auth, users, lit("/ec2/getUsers")))
+    if (!executeRequest(remoteUrl, remoteAuthKey, users, lit("/ec2/getUsers")))
         return false;
 
     ec2::ApiMediaServerDataList servers;
-    if (!executeRequest(remoteUrl, auth, servers, lit("/ec2/getMediaServers")))
+    if (!executeRequest(remoteUrl, remoteAuthKey, servers, lit("/ec2/getMediaServers")))
         return false;
 
     QnJsonRestResult settingsRestResult;
-    if (!executeRequest(remoteUrl, auth, settingsRestResult, lit("/api/systemSettings")))
+    if (!executeRequest(remoteUrl, remoteAuthKey, settingsRestResult, lit("/api/systemSettings")))
         return false;
 
     QnSystemSettingsReply settings;
@@ -394,7 +392,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
 
     QnJsonRestResult pingRestResult;
-    if (!executeRequest(remoteUrl, auth, pingRestResult, lit("/api/ping")))
+    if (!executeRequest(remoteUrl, remoteAuthKey, pingRestResult, lit("/api/ping")))
         return false;
 
     QnPingReply pingReply;
@@ -402,7 +400,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
 
     QnJsonRestResult backupDBRestResult;
-    if (!executeRequest(remoteUrl, auth, backupDBRestResult, lit("/api/backupDatabase")))
+    if (!executeRequest(remoteUrl, remoteAuthKey, backupDBRestResult, lit("/api/backupDatabase")))
         return false;
 
     ec2::ApiUserData adminUserData;

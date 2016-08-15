@@ -17,13 +17,13 @@ public:
 private:
     bool applyCurrentSettings(
             const QUrl &remoteUrl,
-            const QAuthenticator& auth,
+            const QString& remoteAuthKey,
             bool oneServer,
             const QnRestConnectionProcessor *owner);
 
     bool applyRemoteSettings(
             const QUrl &remoteUrl,
             const QString &systemName,
-            const QAuthenticator& auth,
+            const QString& remoteAuthKey,
             const QnRestConnectionProcessor *owner);
 };

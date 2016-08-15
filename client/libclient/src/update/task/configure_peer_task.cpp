@@ -46,7 +46,10 @@ void QnConfigurePeerTask::doStart()
             continue;
         }
 
-        int handle = m_mergeTool->configureIncompatibleServer(ecServer, server->getApiUrl(), m_adminPassword);
+        QAuthenticator auth;
+        auth.setUser(lit("admin")); //< todo: update UI
+        auth.setPassword(m_adminPassword);
+        int handle = m_mergeTool->configureIncompatibleServer(ecServer, server->getApiUrl(), auth);
         m_pendingPeers.insert(id);
         m_peerIdByHandle[handle] = id;
     }

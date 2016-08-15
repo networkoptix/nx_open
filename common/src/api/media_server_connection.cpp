@@ -47,6 +47,7 @@
 #include "model/upload_update_reply.h"
 #include "http/custom_headers.h"
 #include "model/recording_stats_reply.h"
+#include <api/model/getnonce_reply.h>
 #include "common/common_module.h"
 
 namespace {
@@ -96,6 +97,7 @@ namespace {
         (Restart,                  "restart")
         (ConfigureObject,          "configure")
         (PingSystemObject,         "pingSystem")
+        (GetNonceObject,           "getNonce")
         (RecordingStatsObject,     "recStats")
         (AuditLogObject,           "auditLog")
         (MergeSystemsObject,       "mergeSystems")
@@ -269,6 +271,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply<QList<QnModuleInformation>>(this, response, handle);
         break;
     case PingSystemObject:
+        processJsonReply<QnModuleInformation>(this, response, handle);
+        break;
+    case GetNonceObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
         break;
     case RecordingStatsObject:
@@ -823,6 +828,14 @@ int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString &pas
     return sendAsyncGetRequest(PingSystemObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
 }
 
+int QnMediaServerConnection::getNonceAsync(const QUrl &url, QObject *target, const char *slot)
+{
+    QnRequestParamList params;
+    params << QnRequestParam("url", url.toString());
+
+    return sendAsyncGetRequest(GetNonceObject, params, QN_STRINGIZE_TYPE(QnGetNonceReply), target, slot);
+}
+
 int QnMediaServerConnection::getRecordingStatisticsAsync(qint64 bitrateAnalizePeriodMs, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("bitrateAnalizePeriodMs", bitrateAnalizePeriodMs);
@@ -837,11 +850,10 @@ int QnMediaServerConnection::getAuditLogAsync(qint64 startTimeMs, qint64 endTime
     return sendAsyncGetRequest(AuditLogObject, params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
 }
 
-int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot) {
+int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &remoteAuthKey, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("url", url.toString());
-    params << QnRequestParam("password", password);
-    params << QnRequestParam("currentPassword", currentPassword);
+    params << QnRequestParam("authKey", remoteAuthKey);
     params << QnRequestParam("takeRemoteSettings", !ownSettings ? lit("true") : lit("false"));
     params << QnRequestParam("oneServer", oneServer ? lit("true") : lit("false"));
     params << QnRequestParam("ignoreIncompatible", ignoreIncompatible ? lit("true") : lit("false"));

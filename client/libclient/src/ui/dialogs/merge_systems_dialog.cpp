@@ -196,7 +196,10 @@ void QnMergeSystemsDialog::at_mergeButton_clicked() {
     if (!ownSettings)
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(false);
 
-    m_mergeTool->mergeSystem(m_discoverer, m_url, m_adminPassword, ownSettings);
+    QAuthenticator auth;
+    auth.setUser(lit("admin")); //< todo: update UI
+    auth.setPassword(m_adminPassword);
+    m_mergeTool->mergeSystem(m_discoverer, m_url, auth, ownSettings);
     ui->buttonBox->showProgress(tr("Merging Systems..."));
 }
 
