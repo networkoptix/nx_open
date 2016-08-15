@@ -183,6 +183,7 @@ void QnTransactionTcpProcessor::run()
             (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_NAME_HEADER_NAME)) != 
                 QnCommonModule::instance()->localSystemName()) )
         {
+            QnTransactionTransport::connectingCanceled(remoteGuid, false);
             sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
             return;
         }
