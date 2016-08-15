@@ -280,4 +280,18 @@ Rectangle
         visible: context.connectingToSystem.length;
     }
 
+    DropArea
+    {
+        anchors.fill: parent;
+        onDropped:
+        {
+            context.makeDrop(drop.urls);
+        }
+
+        onEntered:
+        {
+            drag.accepted = context.isAcceptableDrag(drag.urls);
+        }
+    }
+
 }
