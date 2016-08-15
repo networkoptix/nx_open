@@ -47,6 +47,7 @@ PageBase
         property bool showOfflineStatus: false
         property bool cameraWarningVisible:
             (showOfflineStatus
+                || videoScreenController.cameraOffline
                 || videoScreenController.cameraUnauthorized
                 || videoScreenController.failed)
             && !videoScreenController.mediaPlayer.playing
@@ -176,9 +177,12 @@ PageBase
     {
         id: dummyLoader
 
-        visible: d.cameraWarningVisible
-
-        sourceComponent: visible ? dummyComponent : undefined
+        visible: active
+        sourceComponent: dummyComponent
+        active:
+        {
+            d.cameraWarningVisible
+        }
 
         y:
         {
