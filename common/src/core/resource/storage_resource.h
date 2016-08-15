@@ -67,12 +67,6 @@ public:
     void setBackup(bool value);
     bool isBackup() const;
 
-    void addWrited(qint64 value);
-    void resetWrited();
-    void setWritedCoeff(double value);
-    double getWritedCoeff() const;
-    double calcUsageCoeff() const;
-
     bool isWritable() const;
 signals:
     /*
@@ -92,9 +86,7 @@ private:
     QString m_storageType;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QnMutex m_bitrateMtx;
-    bool    m_isBackup;
-    double  m_writed;
-    double  m_writedCoeff;
+    bool m_isBackup;
 };
 
 Q_DECLARE_METATYPE(QnStorageResourcePtr);

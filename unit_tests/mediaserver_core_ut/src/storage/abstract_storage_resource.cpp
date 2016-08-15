@@ -4,6 +4,7 @@
 #include <cstring>
 #include <string>
 #include <random>
+#include <unordered_map>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/writer_pool.h>
@@ -364,6 +365,10 @@ TEST_F(AbstractStorageResourceTest, IODevice)
 
 class AbstractMockStorageResource : public QnStorageResource {
 public:
+	qint64 freeSpace;
+
+	AbstractMockStorageResource(qint64 freeSpace) : freeSpace(freeSpace) {}
+
     virtual QIODevice* open(const QString&, QIODevice::OpenMode) override {
         return nullptr;
     }
@@ -435,22 +440,40 @@ private:
 
 class MockStorageResource1 : public AbstractMockStorageResource {
 public:
+	MockStorageResource1() : AbstractMockStorageResource((qint64)10 * 1024 * 1024 * 1024) {}
+
     virtual qint64 getTotalSpace() override {
         return (qint64)10 * 1024 * 1024 * 1024;
+    }
+
+    virtual qint64 getFreeSpace() override {
+        return freeSpace;
     }
 };
 
 class MockStorageResource2 : public AbstractMockStorageResource {
 public:
+	MockStorageResource2() : AbstractMockStorageResource((qint64)20 * 1024 * 1024 * 1024) {} 
+
     virtual qint64 getTotalSpace() override {
         return (qint64)20 * 1024 * 1024 * 1024;
+    }
+
+    virtual qint64 getFreeSpace() override {
+        return freeSpace;
     }
 };
 
 class MockStorageResource3 : public AbstractMockStorageResource {
 public:
+	MockStorageResource3() : AbstractMockStorageResource((qint64)30 * 1024 * 1024 * 1024) {}
+
     virtual qint64 getTotalSpace() override {
         return (qint64)30 * 1024 * 1024 * 1024;
+    }
+
+    virtual qint64 getFreeSpace() override {
+		return freeSpace;
     }
 };
 
@@ -486,7 +509,7 @@ TEST(Storage_load_balancing_algorithm_test, Main)
         dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
     }
 
-    QnStorageResourcePtr storage1 = QnStorageResourcePtr(new MockStorageResource1); 
+    auto storage1 = QnStorageResourcePtr(new MockStorageResource1); 
     storage1->setUrl("url1");
     storage1->setId(QnUuid("{45FF0AD9-649B-4EDC-B032-13603EA37077}"));
     storage1->setUsedForWriting(true);
@@ -509,11 +532,7 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     storage2->setStatus(Qn::Online, true);
     storage3->setStatus(Qn::Online, true);
 
-    storage1->setWritedCoeff(0.3);
-    storage1->setWritedCoeff(0.3);
-    storage1->setWritedCoeff(0.4);
-
-    const int writeCount = 1000 * 1000 * 1;
+    const int writeCount = 1000 * 100;
     QnUuid currentStorageId;
 
     int currentStorageUseCount = 0;
@@ -521,12 +540,15 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 
     const int kMaxStorageUseInARow = 15;
     const int kMaxUseInARowOverflowCount = 5;
+	const int writtenBlock = 10 * 1024;
     const double kMaxUsageDelta = 50;
 
     for (int i = 0; i < writeCount; ++i) 
     {
         auto storage = qnNormalStorageMan->getOptimalStorageRoot(nullptr);
-        ASSERT_TRUE(storage);
+		storage.dynamicCast<AbstractMockStorageResource>()->freeSpace -= writtenBlock;
+		//qnNormalStorageMan->addOccupiedSpaceInfoValue(qnStorageDbPool->getStorageIndex(storage), writtenBlock);
+
         if (currentStorageId != storage->getId()) 
         {
             currentStorageId = storage->getId();
@@ -538,7 +560,6 @@ TEST(Storage_load_balancing_algorithm_test, Main)
         {
             ++currentStorageUseCount;
         }
-        storage->addWrited(1000.0);
     }
     /*  Actually, due to probabilistic nature of selecting storage algorithm
     *   some storage may be selected more than kMaxStorageUseIARow times.
@@ -546,12 +567,4 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     *   kMaxUseInARowOverflowCount peak breaches on 1 * 1000 * 1000 selections seem fair enough.
     */
     ASSERT_TRUE(useInARowOverflowCount < kMaxUseInARowOverflowCount);
-
-    double storage1UsageCoeff = storage1->calcUsageCoeff();
-    double storage2UsageCoeff = storage2->calcUsageCoeff();
-    double storage3UsageCoeff = storage3->calcUsageCoeff();
-
-    ASSERT_TRUE(qAbs(storage1UsageCoeff - storage2UsageCoeff) < kMaxUsageDelta);
-    ASSERT_TRUE(qAbs(storage1UsageCoeff - storage3UsageCoeff) < kMaxUsageDelta);
-    ASSERT_TRUE(qAbs(storage3UsageCoeff - storage2UsageCoeff) < kMaxUsageDelta);
 }

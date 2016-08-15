@@ -446,7 +446,6 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_role(role),
     m_mutexStorages(QnMutex::Recursive),
     m_mutexCatalog(QnMutex::Recursive),
-    m_storagesStatisticsReady(false),
     m_warnSended(false),
     m_isWritableStorageAvail(false),
     m_rebuildCancelled(false),
@@ -527,12 +526,12 @@ void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archive
 
 void QnStorageManager::calculateOccupiedSpace()
 {
-	StorageToOccupiedSpaceMap tmpSpaceInfo;
+	StorageSpaceInfoMap tmpSpaceInfo;
 	auto calcOccupiedSpaceInfoForCatalogs = [this, &tmpSpaceInfo] (const QMap<QString, DeviceFileCatalogPtr>& catalogMap)
 	{
 		for (auto catalogMapIt = catalogMap.cbegin(); catalogMapIt != catalogMap.cend(); ++catalogMapIt)
 			for (auto catalogIt = catalogMapIt.value()->getChunks().cbegin(); catalogIt != catalogMapIt.value()->getChunks().cend(); ++catalogIt)
-				tmpSpaceInfo[catalogIt->storageIndex] += catalogIt->getFileSize();
+				tmpSpaceInfo[catalogIt->storageIndex].occupiedSpace += catalogIt->getFileSize();
 	};
 
 	{
@@ -549,38 +548,53 @@ void QnStorageManager::calculateOccupiedSpace()
 }
 
 template<typename F>
-void QnStorageManager::findOccupiedSpaceEntryByStorageIndexAction(int storageIndex, F action)
+void QnStorageManager::applySpaceInfoAction(int storageIndex, F action)
 {
 	QnMutexLocker lock(&m_occupiedSpaceInfoMutex);
 	auto it = m_occupiedSpaceInfo.find(storageIndex);
-	NX_ASSERT(it != m_occupiedSpaceInfo.cend());
 	if (it == m_occupiedSpaceInfo.cend())
 	{
 		NX_LOG(lit("%1: no storage for this index %2").arg(Q_FUNC_INFO).arg(storageIndex), cl_logWARNING);
 		return;
 	}
-	action(static_cast<StorageToOccupiedSpaceMap::iterator>(it));
+	action(static_cast<StorageSpaceInfoMap::iterator>(it));
 }
 
-void QnStorageManager::addOccupiedSpaceInfoValue(int storageIndex, qint64 value)
+void QnStorageManager::setSpaceInfoUsageCoeff(int storageIndex, double coeff)
 {
-	findOccupiedSpaceEntryByStorageIndexAction(storageIndex, [value] (StorageToOccupiedSpaceMap::iterator it) {
-		it->second += value;
+	applySpaceInfoAction(storageIndex, [coeff] (StorageSpaceInfoMap::iterator it) {
+		it->second.usageCoeff += coeff;
 	});
 }
 
-void QnStorageManager::subtractOccupiedSpaceInfoValue(int storageIndex, qint64 value)
+double QnStorageManager::getSpaceInfoUsageCoeff(int storageIndex)
 {
-	findOccupiedSpaceEntryByStorageIndexAction(storageIndex, [value] (StorageToOccupiedSpaceMap::iterator it) {
-		it->second -= value;
+	double result = 0.0;
+	applySpaceInfoAction(storageIndex, [&result] (StorageSpaceInfoMap::iterator it) {
+		result = it->second.usageCoeff;
+	});
+	return result;
+}
+
+void QnStorageManager::addSpaceInfoOccupiedValue(int storageIndex, qint64 value)
+{
+	applySpaceInfoAction(storageIndex, [value] (StorageSpaceInfoMap::iterator it) {
+		it->second.occupiedSpace += value;
 	});
 }
 
-qint64 QnStorageManager::getOccupiedSpaceInfoForStorage(int storageIndex) 
+void QnStorageManager::subtractSpaceInfoOccupiedValue(int storageIndex, qint64 value)
+{
+	applySpaceInfoAction(storageIndex, [value] (StorageSpaceInfoMap::iterator it) {
+		it->second.occupiedSpace -= value;
+	});
+}
+
+qint64 QnStorageManager::getSpaceInfoOccupiedValue(int storageIndex) 
 {
 	qint64 result = 0;
-	findOccupiedSpaceEntryByStorageIndexAction(storageIndex, [&result] (StorageToOccupiedSpaceMap::iterator it) {
-		result = it->second;
+	applySpaceInfoAction(storageIndex, [&result] (StorageSpaceInfoMap::iterator it) {
+		result = it->second.occupiedSpace;
 	});
 	return result;
 }
@@ -1015,17 +1029,9 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     {
         int storageIndex = qnStorageDbPool->getStorageIndex(storage);
-        {
-            QnMutexLocker lock(&m_mutexStorages);
-            m_storagesStatisticsReady = false;
-        }
-
         NX_LOG(QString("Adding storage. Path: %1").arg(storage->getUrl()), cl_logINFO);
 
         removeStorage(storage); // remove existing storage record if exists
-        //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
-        //if (oldStorage)
-        //    storage->addWritedSpace(oldStorage->getWritedSpace());
         storage->setStatus(Qn::Offline); // we will check status after
         {
             QnMutexLocker lk(&m_mutexStorages);
@@ -1035,7 +1041,6 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
                 this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
         qnStorageDbPool->getSDB(storage);
     }
-    updateStorageStatistics();
 }
 
 bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) const
@@ -1053,6 +1058,7 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == qnCommon->moduleGUID())
     {
+		m_warnSended = false;
         connect(resource.data(), &QnResource::resourceChanged, this, &QnStorageManager::at_storageChanged);
         if (checkIfMyStorage(storage))
             addStorage(storage);
@@ -1063,9 +1069,9 @@ void QnStorageManager::onDelResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == qnCommon->moduleGUID() && checkIfMyStorage(storage)) {
+		m_warnSended = false;
         removeStorage(storage);
         qnStorageDbPool->removeSDB(storage);
-        updateStorageStatistics();
     }
 }
 
@@ -1090,8 +1096,6 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
     int storageIndex = -1;
     {
         QnMutexLocker lock( &m_mutexStorages );
-        m_storagesStatisticsReady = false;
-
         // remove existing storage record if exists
         for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end();)
         {
@@ -1131,12 +1135,6 @@ void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
         if (hasStorage(storage))
             removeStorage(storage);
     }
-
-    {
-        QnMutexLocker lock( &m_mutexStorages );
-        m_storagesStatisticsReady = false;
-    }
-    updateStorageStatistics();
 }
 
 bool QnStorageManager::existsStorageWithID(const QnStorageResourceList& storages, const QnUuid &id) const
@@ -1694,7 +1692,7 @@ void QnStorageManager::deleteRecordsToTime(DeviceFileCatalogPtr catalog, qint64 
         for(const DeviceFileCatalog::Chunk& chunk: deletedChunks)
 		{
             clearDbByChunk(catalog, chunk);
-			subtractOccupiedSpaceInfoValue(chunk.storageIndex, chunk.getFileSize());
+			subtractSpaceInfoOccupiedValue(chunk.storageIndex, chunk.getFileSize());
 		}
     }
 }
@@ -2134,7 +2132,6 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
     fileStorage->setStatus(status);
     if (status == Qn::Offline)
         emit storageFailure(fileStorage, QnBusiness::StorageIoErrorReason);
-    m_storagesStatisticsReady = false;
 }
 
 void QnStorageManager::testOfflineStorages()
@@ -2165,12 +2162,6 @@ void QnStorageManager::stopAsyncTasks()
 
 void QnStorageManager::updateStorageStatistics()
 {
-    {
-        QnMutexLocker lock(&m_mutexStorages);
-        if (m_storagesStatisticsReady)
-            return;
-    }
-
     QSet<QnStorageResourcePtr> storages = getWritableStorages();
     int64_t totalSpace = 0;
 
@@ -2181,32 +2172,27 @@ void QnStorageManager::updateStorageStatistics()
         QnStorageResourcePtr fileStorage =
             qSharedPointerDynamicCast<QnStorageResource> (*itr);
 
-        int64_t storageSpace = std::max(int64_t(1),
-                                        static_cast<int64_t>(fileStorage->getTotalSpace() -
-                                                             fileStorage->getSpaceLimit()));
+        qint64 storageSpace = std::max(
+			qint64(1), 
+			static_cast<qint64>(
+				fileStorage->getFreeSpace() + 
+				getSpaceInfoOccupiedValue(qnStorageDbPool->getStorageIndex(fileStorage))) -
+				fileStorage->getSpaceLimit());
         totalSpace += storageSpace;
     }
 
     for (auto itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
-        QnStorageResourcePtr fileStorage =
-            qSharedPointerDynamicCast<QnStorageResource> (*itr);
-
-        int64_t storageSpace = std::max(
-            int64_t(1),
-            static_cast<int64_t>(
-                fileStorage->getTotalSpace() -
-                fileStorage->getSpaceLimit()
-            )
-        );
-        fileStorage->resetWrited();
-        fileStorage->setWritedCoeff((double)storageSpace / totalSpace);
-    }
-
-    {
-        QnMutexLocker lk(&m_mutexStorages);
-        m_storagesStatisticsReady = true;
-        m_warnSended = false;
+        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
+		int storageIndex = qnStorageDbPool->getStorageIndex(fileStorage);
+		
+        qint64 storageSpace = std::max(
+            qint64(1),
+            static_cast<qint64>(
+				fileStorage->getFreeSpace() + 
+				getSpaceInfoOccupiedValue(storageIndex) -
+				fileStorage->getSpaceLimit()));
+		setSpaceInfoUsageCoeff(storageIndex, (double)storageSpace / totalSpace);
     }
 }
 
@@ -2220,31 +2206,64 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 
     QSet<QnStorageResourcePtr> storages;
     for (const auto& storage: getWritableStorages())
-    {
         if (pred(storage))
-        {
             storages << storage;
-#if 0
-            qWarning() << lit("Storage %1 usage coeff: %2")
-                .arg(storage->getUrl())
-                .arg(storage->calcUsageCoeff());
-#endif
-        }
-    }
+
+	auto getOptimalStorageRootFallback = [&storages, this]
+	{
+		std::vector<QnStorageResourcePtr> storagesVec;
+		storagesVec.assign(storages.cbegin(), storages.cend());
+		std::uniform_int_distribution<size_t> rndDis(0, storagesVec.size() - 1);
+		try {
+			return storagesVec[rndDis(m_gen)];
+		} catch (...) {
+			NX_LOG(lit("%1 random engine exception").arg(Q_FUNC_INFO), cl_logDEBUG1);
+			return storagesVec[0];
+		}
+	};
 
     if (!storages.empty())
     {
-        double writedCoeffSum = 0.0;
+        double usageCoeffSum = 0.0;
+		bool useRandomAlgorithm = false;
         for (const auto &storage : storages)
-            writedCoeffSum += storage->getWritedCoeff();
+		{
+			int storageIndex = qnStorageDbPool->getStorageIndex(storage);
+			double storageUsagecoeff = getSpaceInfoUsageCoeff(storageIndex);
+			if (storageUsagecoeff < std::numeric_limits<double>::epsilon())
+			{
+				useRandomAlgorithm = true;
+				break;
+			}
+            usageCoeffSum += getSpaceInfoUsageCoeff(storageIndex);
+		}
 
-        std::uniform_real_distribution<> writedDis(0, writedCoeffSum);
-        double selectedStorageCoeff = writedDis(m_gen);
+		if (useRandomAlgorithm)
+		{
+			NX_LOG(lit("Selecting storage for recording. \
+					    Can't get usage coefficient for one of the storages. \
+					    Falling back to random algorithm."), cl_logDEBUG1);
+			return getOptimalStorageRootFallback();
+		}
+
+        std::uniform_real_distribution<> usageDis(0, usageCoeffSum);
+        double selectedStorageCoeff = usageCoeffSum / 2;
+		try {
+			selectedStorageCoeff = usageDis(m_gen);
+		} catch (const std::exception& e) {
+			NX_LOG(lit("%1 random engine exception").arg(Q_FUNC_INFO), cl_logDEBUG1);
+		}
 
         double writedCoeffPartialSum = 0.0;
         for (const auto &storage : storages)
         {
-            writedCoeffPartialSum += storage->getWritedCoeff();
+			int storageIndex = qnStorageDbPool->getStorageIndex(storage);
+			NX_LOG(lit("Selecting storage for recording. Candidate: %1. Usage likeness coeff: %2")
+					   .arg(storage->getUrl())
+					   .arg(getSpaceInfoUsageCoeff(storageIndex)), 
+				   cl_logDEBUG2);
+
+            writedCoeffPartialSum += getSpaceInfoUsageCoeff(storageIndex);
             if (writedCoeffPartialSum >= selectedStorageCoeff)
             {
                 result = storage;
@@ -2254,9 +2273,9 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
         // just in case some rounding double issue we will return any storage
         if (!result)
             result = *storages.begin();
-#if 0
-        qWarning() << lit("Selected storage %1\n").arg(result->getUrl());
-#endif
+
+        NX_LOG(lit("Selecting storage for recording. Selected storage %1")
+			   .arg(result->getUrl()), cl_logDEBUG2);
         return result;
     }
 
@@ -2478,9 +2497,10 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     QString quality;
     QString cameraUniqueId;
     QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, cameraUniqueId, quality);
-	addOccupiedSpaceInfoValue(storageIndex, fileSize);
     if (!storage)
         return false;
+
+	addSpaceInfoOccupiedValue(storageIndex, fileSize);
 
     QString newName;
     bool renameOK = renameFileWithDuration(fileName, newName, durationMs, storage);

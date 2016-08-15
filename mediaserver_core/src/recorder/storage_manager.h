@@ -60,7 +60,17 @@ public:
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;   /* Map by camera unique id. */
     typedef QMap<QString, QSet<QDate>> UsedMonthsMap; /* Map by camera unique id. */
-	typedef std::unordered_map<int, qint64> StorageToOccupiedSpaceMap;
+
+	struct StorageSpaceInfo
+	{
+		qint64 occupiedSpace;
+		double usageCoeff;
+		StorageSpaceInfo() 
+			: occupiedSpace(0),
+			  usageCoeff(0.0)
+		{}
+	};
+	typedef std::unordered_map<int, StorageSpaceInfo> StorageSpaceInfoMap;
 
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
@@ -220,12 +230,14 @@ private:
     void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);
 
 	void calculateOccupiedSpace();
-	void addOccupiedSpaceInfoValue(int storageIndex, qint64 value);
-	void subtractOccupiedSpaceInfoValue(int storageIndex, qint64 value);
-	qint64 getOccupiedSpaceInfoForStorage(int storageIndex);
+	void addSpaceInfoOccupiedValue(int storageIndex, qint64 value);
+	void subtractSpaceInfoOccupiedValue(int storageIndex, qint64 value);
+	qint64 getSpaceInfoOccupiedValue(int storageIndex);
+	void setSpaceInfoUsageCoeff(int storageIndex, double coeff);
+	double getSpaceInfoUsageCoeff(int storageIndex);
 
 	template<typename F>
-	void findOccupiedSpaceEntryByStorageIndexAction(int storageIndex, F action);
+	void applySpaceInfoAction(int storageIndex, F action);
 
     void writeCameraInfoFiles();
     static bool renameFileWithDuration(
@@ -249,18 +261,14 @@ private:
     mutable QnMutex m_testStorageThreadMutex;
     QnMutex m_clearSpaceMutex;
 
-    bool m_storagesStatisticsReady;
     QTimer m_timer;
 
-    bool m_warnSended;
+    std::atomic<bool> m_warnSended;
     mutable bool m_isWritableStorageAvail;
     QElapsedTimer m_storageWarnTimer;
     TestStorageThread* m_testStorageThread;
     QMap<QnUuid, bool> m_diskFullWarned;
 
-    //RebuildState m_rebuildState;
-    //QnStorageResourcePtr m_rebuildStorage;
-    //double m_rebuildProgress;
     QnStorageScanData m_archiveRebuildInfo;
     bool m_rebuildCancelled;
 
@@ -284,7 +292,7 @@ private:
     std::mt19937 m_gen;
 
 	mutable QnMutex m_occupiedSpaceInfoMutex;
-	StorageToOccupiedSpaceMap m_occupiedSpaceInfo;
+	StorageSpaceInfoMap m_occupiedSpaceInfo;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()
