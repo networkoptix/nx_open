@@ -150,12 +150,6 @@ QnPage {
                 color: QnTheme.loadingText
             }
         }
-
-        onVisibleChanged:
-        {
-            if (!visible)
-                mainWindow.unlockScreenOrientation()
-        }
     }
 
     Rectangle {
