@@ -397,10 +397,13 @@ int QnFfmpegHelper::copyAvCodecContex(AVCodecContext* dst, const AVCodecContext*
 
     int result = avcodec_copy_context(dst, src);
 
-    // To avoid double free since avcodec_copy_context does not copy these fields.
-    dst->stats_out = nullptr;   
-    dst->coded_side_data = nullptr;
-    dst->nb_coded_side_data = 0;
+    if (!result)
+    {
+        // To avoid double free since avcodec_copy_context does not copy these fields.
+        dst->stats_out = nullptr;   
+        dst->coded_side_data = nullptr;
+        dst->nb_coded_side_data = 0;
+    }
 
     return result;
 }
