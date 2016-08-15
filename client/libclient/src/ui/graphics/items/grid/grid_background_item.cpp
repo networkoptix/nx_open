@@ -431,7 +431,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     if( !m_imgAsFrame )
         return;
 
-    if( !m_imgUploader.get() )
+    if(!m_imgUploader)
     {
         m_imgUploader.reset( new DecodedPictureToOpenGLUploader(QGLContext::currentContext()) );
         m_renderer.reset( new QnGLRenderer(QGLContext::currentContext(), *m_imgUploader) );
