@@ -92,18 +92,26 @@ void QnMergeSystemsTool::at_getNonceForMergeFinished(
     int handle,
     const QString& errorString)
 {
-    MergeSystemCtx ctx = m_mergeSystemRequests.value(handle);
+    MergeSystemCtx& ctx = m_mergeSystemRequests[handle];
 
-    QByteArray remoteAuthKey = createHttpQueryAuthParam(
+    QByteArray getKey = createHttpQueryAuthParam(
         ctx.auth.user(),
         ctx.auth.password(),
         nonceReply.realm,
         "GET",
         nonceReply.nonce.toUtf8());
 
+    QByteArray postKey = createHttpQueryAuthParam(
+        ctx.auth.user(),
+        ctx.auth.password(),
+        nonceReply.realm,
+        "POST",
+        nonceReply.nonce.toUtf8());
+
     ctx.mergeRequestHandle = ctx.proxy->apiConnection()->mergeSystemAsync(
         ctx.url,
-        QString::fromLatin1(remoteAuthKey),
+        QString::fromLatin1(getKey),
+        QString::fromLatin1(postKey),
         ctx.ownSettings,
         ctx.oneServer,
         ctx.ignoreIncompatible,

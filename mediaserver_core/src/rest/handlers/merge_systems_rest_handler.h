@@ -16,14 +16,16 @@ public:
 
 private:
     bool applyCurrentSettings(
-            const QUrl &remoteUrl,
-            const QString& remoteAuthKey,
-            bool oneServer,
-            const QnRestConnectionProcessor *owner);
+        const QUrl &remoteUrl,
+        const QString& getKey,
+        const QString& postKey,
+        bool oneServer,
+        const QnRestConnectionProcessor *owner);
 
     bool applyRemoteSettings(
-            const QUrl &remoteUrl,
-            const QString &systemName,
-            const QString& remoteAuthKey,
-            const QnRestConnectionProcessor *owner);
+        const QUrl &remoteUrl,
+        const QString &systemName,
+        const QString& getKey,
+        const QString& postKey,
+        const QnRestConnectionProcessor *owner);
 };

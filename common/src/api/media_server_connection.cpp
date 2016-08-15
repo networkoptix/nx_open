@@ -274,7 +274,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply<QnModuleInformation>(this, response, handle);
         break;
     case GetNonceObject:
-        processJsonReply<QnModuleInformation>(this, response, handle);
+        processJsonReply<QnGetNonceReply>(this, response, handle);
         break;
     case RecordingStatsObject:
         processJsonReply<QnRecordingStatsReply>(this, response, handle);
@@ -850,10 +850,11 @@ int QnMediaServerConnection::getAuditLogAsync(qint64 startTimeMs, qint64 endTime
     return sendAsyncGetRequest(AuditLogObject, params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
 }
 
-int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &remoteAuthKey, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot) {
+int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &getKey, const QString& postKey, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("url", url.toString());
-    params << QnRequestParam("authKey", remoteAuthKey);
+    params << QnRequestParam("getKey", getKey);
+    params << QnRequestParam("postKey", postKey);
     params << QnRequestParam("takeRemoteSettings", !ownSettings ? lit("true") : lit("false"));
     params << QnRequestParam("oneServer", oneServer ? lit("true") : lit("false"));
     params << QnRequestParam("ignoreIncompatible", ignoreIncompatible ? lit("true") : lit("false"));

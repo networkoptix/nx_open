@@ -209,7 +209,7 @@ public:
     int getNonceAsync(const QUrl &url, QObject *target, const char *slot);
     int getRecordingStatisticsAsync(qint64 bitrateAnalizePeriodMs, QObject *target, const char *slot);
     int getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject *target, const char *slot);
-    int mergeSystemAsync(const QUrl &url, const QString &remoteAuthKey, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot);
+    int mergeSystemAsync(const QUrl &url, const QString &getKey, const QString &postKey, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot);
 
     int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);
     int testLdapSettingsAsync(const QnLdapSettings &settings, QObject *target, const char *slot);

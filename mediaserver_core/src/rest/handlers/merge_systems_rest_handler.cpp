@@ -62,7 +62,7 @@ namespace
     void addAuthToRequest(QUrl& request, const QString& remoteAuthKey)
     {
         QUrlQuery query(request.query());
-        query.addQueryItem(lit("authKey"), remoteAuthKey);
+        query.addQueryItem(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME), remoteAuthKey);
         request.setQuery(query);
     }
 }
@@ -81,7 +81,8 @@ int QnMergeSystemsRestHandler::executeGet(
 
     QUrl url = params.value(lit("url"));
 
-    QString remoteAuthKey(params.value(lit("authKey")));
+    const QString getKey(params.value(lit("getKey")));
+    const QString postKey(params.value(lit("postKey")));
 
     bool takeRemoteSettings = params.value(lit("takeRemoteSettings"), lit("false")) != lit("false");
     bool mergeOneServer = params.value(lit("oneServer"), lit("false")) != lit("false");
@@ -105,9 +106,9 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
 
-    if (remoteAuthKey.isEmpty())
+    if (getKey.isEmpty())
     {
-        NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"authKey\""), cl_logDEBUG1);
+        NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"getKey\""), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("password")));
         return nx_http::StatusCode::ok;
@@ -132,7 +133,7 @@ int QnMergeSystemsRestHandler::executeGet(
         QUrl requestUrl(url);
         requestUrl.setPath(lit("/api/moduleInformationAuthenticated"));
         requestUrl.setQuery(lit("showAddresses=true"));
-        addAuthToRequest(requestUrl, remoteAuthKey);
+        addAuthToRequest(requestUrl, getKey);
 
         if (!client.doGet(requestUrl) || !isResponseOK(client))
         {
@@ -218,7 +219,7 @@ int QnMergeSystemsRestHandler::executeGet(
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyRemoteSettings(url, remoteModuleInformation.systemName, remoteAuthKey, owner))
+        if (!applyRemoteSettings(url, remoteModuleInformation.systemName, getKey, postKey, owner))
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply remote settings")
                 .arg(takeRemoteSettings), cl_logDEBUG1);
@@ -235,7 +236,7 @@ int QnMergeSystemsRestHandler::executeGet(
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyCurrentSettings(url, remoteAuthKey, mergeOneServer, owner))
+        if (!applyCurrentSettings(url, getKey, postKey, mergeOneServer, owner))
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply current settings")
                 .arg(takeRemoteSettings), cl_logDEBUG1);
@@ -275,10 +276,11 @@ int QnMergeSystemsRestHandler::executeGet(
 }
 
 bool QnMergeSystemsRestHandler::applyCurrentSettings(
-        const QUrl &remoteUrl,
-        const QString& remoteAuthKey,
-        bool oneServer,
-        const QnRestConnectionProcessor *owner)
+    const QUrl &remoteUrl,
+    const QString& getKey,
+    const QString& postKey,
+    bool oneServer,
+    const QnRestConnectionProcessor *owner)
 {
     auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server)
@@ -326,8 +328,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
 
     QUrl requestUrl(remoteUrl);
     requestUrl.setPath(lit("/api/configure"));
-    addAuthToRequest(requestUrl, remoteAuthKey);
-
+    addAuthToRequest(requestUrl, postKey);
     if (!client.doPost(requestUrl, "application/json", serializedData) ||
         !isResponseOK(client))
     {
@@ -340,7 +341,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
 template <class ResultDataType>
 bool executeRequest(
     const QUrl &remoteUrl,
-    const QString& remoteAuthKey,
+    const QString& getKey,
     ResultDataType& result,
     const QString& path)
 {
@@ -352,7 +353,7 @@ bool executeRequest(
 
     QUrl requestUrl(remoteUrl);
     requestUrl.setPath(path);
-    addAuthToRequest(requestUrl, remoteAuthKey);
+    addAuthToRequest(requestUrl, getKey);
     if (!client.doGet(requestUrl) || !isResponseOK(client))
     {
         auto status = getClientResponse(client);
@@ -367,24 +368,25 @@ bool executeRequest(
 }
 
 bool QnMergeSystemsRestHandler::applyRemoteSettings(
-        const QUrl& remoteUrl,
-        const QString& systemName,
-        const QString& remoteAuthKey,
-        const QnRestConnectionProcessor* owner)
+    const QUrl& remoteUrl,
+    const QString& systemName,
+    const QString& getKey,
+    const QString& postKey,
+    const QnRestConnectionProcessor* owner)
 {
 
     /* Read admin user from the remote server */
 
     ec2::ApiUserDataList users;
-    if (!executeRequest(remoteUrl, remoteAuthKey, users, lit("/ec2/getUsers")))
+    if (!executeRequest(remoteUrl, getKey, users, lit("/ec2/getUsers")))
         return false;
 
     ec2::ApiMediaServerDataList servers;
-    if (!executeRequest(remoteUrl, remoteAuthKey, servers, lit("/ec2/getMediaServers")))
+    if (!executeRequest(remoteUrl, getKey, servers, lit("/ec2/getMediaServers")))
         return false;
 
     QnJsonRestResult settingsRestResult;
-    if (!executeRequest(remoteUrl, remoteAuthKey, settingsRestResult, lit("/api/systemSettings")))
+    if (!executeRequest(remoteUrl, getKey, settingsRestResult, lit("/api/systemSettings")))
         return false;
 
     QnSystemSettingsReply settings;
@@ -392,7 +394,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
 
     QnJsonRestResult pingRestResult;
-    if (!executeRequest(remoteUrl, remoteAuthKey, pingRestResult, lit("/api/ping")))
+    if (!executeRequest(remoteUrl, getKey, pingRestResult, lit("/api/ping")))
         return false;
 
     QnPingReply pingReply;
@@ -400,7 +402,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
 
     QnJsonRestResult backupDBRestResult;
-    if (!executeRequest(remoteUrl, remoteAuthKey, backupDBRestResult, lit("/api/backupDatabase")))
+    if (!executeRequest(remoteUrl, getKey, backupDBRestResult, lit("/api/backupDatabase")))
         return false;
 
     ec2::ApiUserData adminUserData;
