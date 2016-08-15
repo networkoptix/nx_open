@@ -7,6 +7,7 @@ import shutil
 import sys
 import plistlib
 
+from itertools import chain
 from os.path import join
 
 
@@ -146,9 +147,10 @@ def main(app_path, bindir, libdir, helpdir, qtdir, qtver):
     appdir = os.path.basename(app_path)
     app, _ = os.path.splitext(appdir)
     client_binary = "{app_path}/Contents/MacOS/{app}".format(app_path=app_path, app=app)
+    applauncher_binary = "{app_path}/Contents/MacOS/applauncher-bin".format(app_path=app_path)
     tlibdir = "{app_path}/Contents/Frameworks".format(app_path=app_path)
 
-    for binary in prepare(client_binary, bindir, tlibdir):
+    for binary in chain(prepare(client_binary, bindir, tlibdir), prepare(applauncher_binary, bindir, tlibdir)):
         fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver)
 
     shutil.copytree(helpdir, "{app_path}/Contents/Resources/help".format(app_path=app_path))
