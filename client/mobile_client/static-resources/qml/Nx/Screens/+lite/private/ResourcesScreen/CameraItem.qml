@@ -74,7 +74,13 @@ Control
             anchors.fill: parent
 
             opacity: 0.0
-            Behavior on opacity { NumberAnimation { duration: 200 } }
+            NumberAnimation on opacity
+            {
+                id: controlsFadeOutAnimation
+                duration: 1000
+                to: 0.0
+            }
+
             z: 5
 
             border.color: ColorTheme.brand_main
@@ -278,7 +284,7 @@ Control
         interval: 3000
         onTriggered:
         {
-            controls.opacity = 0.0
+            controlsFadeOutAnimation.start()
         }
     }
 
@@ -307,7 +313,10 @@ Control
     function showControls()
     {
         if (active)
+        {
+            controlsFadeOutAnimation.stop()
             controls.opacity = 1.0
+        }
         fadeOutTimer.restart()
     }
 
