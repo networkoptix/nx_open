@@ -701,6 +701,8 @@
                 <client.binary.name>${display.product.name}</client.binary.name>
                 <minilauncher.binary.name>applauncher</minilauncher.binary.name>
                 <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
+                <installation.root>/Applications/</installation.root>
+
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
