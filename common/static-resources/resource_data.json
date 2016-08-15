@@ -288,7 +288,16 @@
                 "DW|*"
             ],
             "bitratePerGOP": true,
-            "defaultCredentials" : "admin:admin"
+            "possibleDefaultCredentials": [
+                {
+                    "user": "admin",
+                    "password": "admin"
+                },
+                {
+                    "user": "root",
+                    "password": "admin"
+                }
+            ]
         },
 
         {
@@ -1410,7 +1419,12 @@
 				"ACTI|A41", "ACTI|A81"
 			],
 			"forceONVIF": true,
-			"defaultCredentials" : "admin:123456"
+            "possibleDefaultCredentials": [
+                {
+                    "user": "admin",
+                    "password": "123456"
+                }
+            ]
 		},
 		{
 			"keys": [

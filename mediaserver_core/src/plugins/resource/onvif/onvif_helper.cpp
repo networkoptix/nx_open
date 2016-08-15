@@ -94,9 +94,9 @@ bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
     QString info;
 
     if (faultInfo->SOAP_ENV__Code && faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode) {
-        info = QString::fromLatin1(faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value);
+        info = QString::fromLatin1(faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value).toLower();
     } else if (faultInfo->faultstring) {
-        info = QString::fromLatin1(faultInfo->faultstring);
+        info = QString::fromLatin1(faultInfo->faultstring).toLower();
     }
 
     info = info.toLower();
@@ -105,6 +105,7 @@ bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
 #endif
 
     return info.indexOf(QLatin1String("notauthorized")) != -1 ||
+        info.indexOf(QLatin1String("not authorized")) != -1 ||
         info.indexOf(QLatin1String("not permitted")) != -1 ||
         info.indexOf(QLatin1String("failedauthentication")) != -1 ||
         info.indexOf(QLatin1String("operationprohibited")) != -1 ||
