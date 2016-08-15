@@ -17,8 +17,59 @@
     
     "version": "1.0",
     "data": [
-
-
+        {
+            "keys": [
+                "Sony|SNC-VM772R"
+            ],
+            "forcedOnvifParams": 
+            {
+                "videoEncoders": [
+                    "video_encoder_config1,video_encoder_config3"
+                ]
+            },
+            "preStreamConfigureRequests": [
+                {
+                    "templateString": "/command/camera.cgi?ImageCodec2=off",
+                    "method": "GET",
+                    "isAllowedToFail": true,
+                    "body":""
+                },
+                {
+                    "templateString": "/command/camera.cgi?ImageCodec3=h264",
+                    "method": "GET",
+                    "isAllowedToFail": false,
+                    "body": ""
+                }
+            ],
+            "highStreamAvailableBitrates": ["16000"],
+            "lowStreamAvailableBitrates": ["2000"]
+        },
+        {
+            "keys": [
+                "Dlink|DCS-7010L"
+            ],
+            "highStreamBitrateBounds": {
+                "min": 4096,
+                "max": 16384
+            },
+            "lowStreamBitrateBounds": {
+                "min": 4096,
+                "max": 16384
+            }
+        },
+        {
+            "keys": [
+                "Dlink|DCS-6010L"
+            ],
+            "highStreamBitrateBounds": {
+                "min": 0,
+                "max": 2048
+            },
+            "lowStreamBitrateBounds": {
+                "min": 0,
+                "max": 2048
+            }
+        },
         {
             "keys": [
                 "ActiveCam|*"
