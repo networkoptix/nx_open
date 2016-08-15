@@ -6,6 +6,7 @@
 #include <QtCore/QQueue>
 #include <QtCore/QVariant>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/semaphore.h>
 
 
@@ -354,7 +355,6 @@ public:
 
     void setMaxSize(int value)
     {
-        QnMutexLocker lock(&m_mutex);
         m_maxSize = value;
         reallocateBufferUnsafe(qMax(m_maxSize, (int) m_buffer.size()));
     }
