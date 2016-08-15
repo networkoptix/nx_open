@@ -134,7 +134,11 @@ void ClientPool::cleanupDisconnectedUnsafe()
         if (!connection->handle &&
             connection->idleTimeout.hasExpired(kHttpDisconnectTimeout))
         {
-            connection->client->terminate();
+            connection->client->post(
+                [connection = std::move(itr->second)]() mutable
+                {
+                    connection.reset();
+                });
             itr = m_connectionPool.erase(itr);
         }
         else
