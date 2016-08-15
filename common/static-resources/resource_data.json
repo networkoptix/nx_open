@@ -299,7 +299,21 @@
                 }
             ]
         },
-
+        {
+            "keys": [
+                "Axis|*"
+            ],
+            "possibleDefaultCredentials": [
+                {
+                    "user": "root",
+                    "password": "root"
+                },
+                {
+                    "user": "root",
+                    "password": "pass"
+                }
+            ]
+        },
         {
             "keys": [
                 "VISTA|VK2-ENCODER",
