@@ -28,7 +28,7 @@ public:
 
     //virtual qint64 getDisplayedTime() const { return 0; }
     virtual bool isRealTimeSource() const { return false; }
-
+    virtual void pleaseStop() override;
 protected:
 
     friend class QnArchiveStreamReader;

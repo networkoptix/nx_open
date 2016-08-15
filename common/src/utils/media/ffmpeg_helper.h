@@ -51,6 +51,13 @@ public:
     static AVCodecContext* createAvCodecContext(const AVCodecContext* context);
 
     /**
+    * Copy the settings of the source AVCodecContext into the destination AVCodecContext.
+    * The resulting destination codec context will be unopened.
+    * @return AVERROR() on error (e.g. memory allocation error), 0 on success
+    */
+    static int copyAvCodecContex(AVCodecContext* dst, const AVCodecContext* src);
+
+    /**
      * Close and deep-deallocate the context.
      * @param context If null, do nothing.
      */

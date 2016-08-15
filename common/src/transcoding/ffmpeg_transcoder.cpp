@@ -228,10 +228,10 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
 
             QnFfmpegVideoTranscoderPtr ffmpegVideoTranscoder = m_vTranscoder.dynamicCast<QnFfmpegVideoTranscoder>();
             if (ffmpegVideoTranscoder->getCodecContext()) {
-                avcodec_copy_context(m_videoEncoderCodecCtx, ffmpegVideoTranscoder->getCodecContext());
-                m_videoEncoderCodecCtx->stats_out = nullptr;   //to avoid double free since avcodec_copy_context does not copy this field
-                m_videoEncoderCodecCtx->coded_side_data = nullptr;
-                m_videoEncoderCodecCtx->nb_coded_side_data = 0;
+
+                QnFfmpegHelper::copyAvCodecContex(
+                    m_videoEncoderCodecCtx,
+                    ffmpegVideoTranscoder->getCodecContext());
             }
             else {
                 m_videoEncoderCodecCtx->width = m_vTranscoder->getResolution().width();
@@ -259,10 +259,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             }
 
             if (video->context)
-            {
                 QnFfmpegHelper::mediaContextToAvCodecContext(m_videoEncoderCodecCtx, video->context);
-                m_videoEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
-            }
 
             m_videoEncoderCodecCtx->width = videoWidth;
             m_videoEncoderCodecCtx->height = videoHeight;
@@ -312,21 +309,15 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         {
             QnFfmpegAudioTranscoderPtr ffmpegAudioTranscoder = m_aTranscoder.dynamicCast<QnFfmpegAudioTranscoder>();
             if (ffmpegAudioTranscoder->getCodecContext())
-            {
-                avcodec_copy_context(m_audioEncoderCodecCtx, ffmpegAudioTranscoder->getCodecContext());
-                m_audioEncoderCodecCtx->stats_out = nullptr; //< To avoid double free since avcodec_copy_context does not copy this field.
-                m_audioEncoderCodecCtx->coded_side_data = nullptr;
-                m_audioEncoderCodecCtx->nb_coded_side_data = 0;
-            }
+                QnFfmpegHelper::copyAvCodecContex(m_audioEncoderCodecCtx, ffmpegAudioTranscoder->getCodecContext());
+                
             m_audioEncoderCodecCtx->bit_rate = m_aTranscoder->getBitrate();
         }
         else
         {
             if (audio->context)
-            {
                 QnFfmpegHelper::mediaContextToAvCodecContext(m_audioEncoderCodecCtx, audio->context);
-                m_audioEncoderCodecCtx->stats_out = nullptr; //< To avoid double free since avcodec_copy_context does not copy this field.
-            }
+
             //m_audioEncoderCodecCtx->bit_rate = 1024 * 96;
         }
         m_audioEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
