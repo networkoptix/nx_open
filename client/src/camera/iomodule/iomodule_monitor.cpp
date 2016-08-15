@@ -46,7 +46,7 @@ bool QnIOModuleMonitor::open()
         std::swap(httpClient, m_httpClient);
     }
 
-    auto m_httpClient = nx_http::AsyncHttpClient::create();
+    m_httpClient = nx_http::AsyncHttpClient::create();
     m_httpClient->setMessageBodyReadTimeoutMs(HTTP_READ_TIMEOUT);
 
     connect(
