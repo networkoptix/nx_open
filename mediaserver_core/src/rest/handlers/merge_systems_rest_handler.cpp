@@ -37,6 +37,7 @@
 #include "system_settings_handler.h"
 #include <rest/server/json_rest_result.h>
 #include <api/model/system_settings_reply.h>
+#include "api/model/password_data.h"
 
 namespace
 {
@@ -65,6 +66,8 @@ int QnMergeSystemsRestHandler::executeGet(
         QnJsonRestResult &result,
         const QnRestConnectionProcessor *owner)
 {
+    PasswordData passwordData(params);
+
     Q_UNUSED(path)
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
@@ -74,8 +77,8 @@ int QnMergeSystemsRestHandler::executeGet(
     QUrl url = params.value(lit("url"));
 
     QAuthenticator auth;
-    auth.setPassword(params.value(lit("password")));
-    auth.setUser(params.value(lit("user")));
+    auth.setPassword(passwordData.password);
+    auth.setUser(params.value(lit("username")));
     if (auth.user().isEmpty())
         auth.setUser("admin");
 
@@ -391,7 +394,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
 
     QnJsonRestResult pingRestResult;
-    if (!executeRequest(remoteUrl, auth, settingsRestResult, lit("/api/ping")))
+    if (!executeRequest(remoteUrl, auth, pingRestResult, lit("/api/ping")))
         return false;
 
     QnPingReply pingReply;
