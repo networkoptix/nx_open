@@ -10,6 +10,7 @@
 
 #include <common/common_globals.h>
 #include <utils/common/log.h>
+#include <iostream>
 
 
 AbstractDatagramSocket* SocketFactory::createDatagramSocket()
@@ -84,7 +85,7 @@ void SocketFactory::setIpVersion( const QString& ipVersion )
 }
 
 #if defined(__APPLE__) && defined(TARGET_OS_IPHONE)
-    std::atomic<int> SocketFactory::m_tcpServerIpVersion(AF_INET6);
+    std::atomic<int> SocketFactory::s_tcpServerIpVersion(AF_INET6);
     std::atomic<int> SocketFactory::s_tcpClientIpVersion(AF_INET6);
     std::atomic<int> SocketFactory::s_udpIpVersion(AF_INET6);
 #else
