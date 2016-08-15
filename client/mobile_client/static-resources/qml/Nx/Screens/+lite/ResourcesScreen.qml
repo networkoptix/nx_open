@@ -61,6 +61,13 @@ Page
         layoutId: uiController.layoutId
     }
 
+    HelpPopup
+    {
+        id: helpPopup
+        width: parent.width
+        height: parent.height
+    }
+
     Rectangle
     {
         id: offlineDimmer
@@ -147,5 +154,18 @@ Page
     {
         if (!connectionManager.online || !connectionManager.initialResourcesReceived)
             loadingDummy.opacity = 1
+    }
+
+    Keys.onPressed:
+    {
+        if (loadingDummy.visible)
+            return
+
+        if (event.key == Qt.Key_F1)
+        {
+            helpPopup.open()
+            helpPopup.contentItem.forceActiveFocus()
+            event.accepted = true
+        }
     }
 }
