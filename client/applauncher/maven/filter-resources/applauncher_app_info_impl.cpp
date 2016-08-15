@@ -25,4 +25,9 @@ QString QnApplauncherAppInfo::productName()
 {
     return QStringLiteral("${display.product.name}");
 }
+
+QString QnApplauncherAppInfo::bundleName()
+{
+    return productName() + QStringLiteral(".app");
+}
 #endif
