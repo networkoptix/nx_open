@@ -19,6 +19,7 @@ angular.module('cloudApp')
             this.accessRole = '';
             
             this.currentUserEmail = currentUserEmail;
+            this.mediaserver = mediaserver(systemId);
             this.updateSystemState();
         }
 
@@ -186,7 +187,7 @@ angular.module('cloudApp')
                 return users;
             }
 
-            return mediaserver.getAggregatedUsersData(self.id).then(function(result){
+            return self.mediaserver.getAggregatedUsersData().then(function(result){
                 var usersList = result.data.reply['ec2/getUsers'];
                 var userGroups = result.data.reply['ec2/getUserGroups'];
                 var predefinedRoles = result.data.reply['ec2/getPredefinedRoles'];
@@ -194,32 +195,6 @@ angular.module('cloudApp')
                 self.updateSystemState();
                 return processUsers(usersList, userGroups, predefinedRoles)
             });
-
-            /*
-
-                // TODO: remove later
-
-                var deferred = $q.defer();
-                function errorHandler(error){
-                    $log.error(error);
-                    deferred.reject(error);
-                }
-                mediaserver.getUsers(self.id).then(function(result){
-                    var usersList = result.data;
-                    mediaserver.getUserGroups(self.id).then(function(result){
-                        var userGroups = result.data;
-                        mediaserver.getPredefinedRoles(self.id).then(function(result){
-                            var predefinedRoles = result.data;
-                            deferred.resolve(processUsers(usersList, userGroups, predefinedRoles));
-                            self.isAvailable = true;
-                            self.updateSystemState();
-                        },errorHandler);
-                    },errorHandler);
-                },errorHandler);
-                return deferred.promise;
-            */
-
-
         }
 
         system.prototype.getUsers = function(system){
@@ -273,7 +248,7 @@ angular.module('cloudApp')
                     return user.accountEmail == u.email;
                 });
                 if(!existingUser){ // user not found - create a new one
-                    existingUser = mediaserver.userObject(user.fullName, user.accountEmail);
+                    existingUser = this.mediaserver.userObject(user.fullName, user.accountEmail);
                     this.users.push(existingUser);
                 }
                 user = existingUser;
@@ -291,7 +266,7 @@ angular.module('cloudApp')
             // TODO: remove later
             //cloudApi.share(this.id, user.email, accessRole);
 
-            return mediaserver.saveUser(this.id, user).then(function(result){
+            return this.mediaserver.saveUser(user).then(function(result){
                 user.accessRole = accessRole;
             });
         }
@@ -302,7 +277,7 @@ angular.module('cloudApp')
             // TODO: remove later
             //cloudApi.unshare(self.id, user.accountEmail);
 
-            return mediaserver.deleteUser(self.id, user.id).then(function(){
+            return this.mediaserver.deleteUser(user.id).then(function(){
                 self.users = _.without(self.users, user);
             });
         }
@@ -311,7 +286,7 @@ angular.module('cloudApp')
             var self = this;
 
             if(self.currentUserRecord && self.isAvailable){
-                mediaserver.deleteUser(self.id, self.currentUserRecord.id); // Try to remove me from the system directly
+                this.mediaserver.deleteUser(self.currentUserRecord.id); // Try to remove me from the system directly
             }
             return cloudApi.unshare(self.id, self.currentUserEmail).then(function(){
                 delete systems[self.id]

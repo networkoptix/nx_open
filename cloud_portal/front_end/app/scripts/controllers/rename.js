@@ -22,7 +22,7 @@ angular.module('cloudApp')
         }
 
         $scope.renaming = process.init(function(){
-            return mediaserver.changeSystemName(systemId, $scope.model.systemName);
+            return mediaserver(systemId).changeSystemName($scope.model.systemName);
         },{
             successMessage: L.system.successRename
         }).then(function(){
