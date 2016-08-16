@@ -43,6 +43,14 @@ def sharing(request, system_id):
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
+def get_nonce(request, system_id):
+    data = cloud_api.System.get_nonce(request.user.email, request.session['password'], system_id)
+    return api_success(data)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated, ))
+@handle_exceptions
 def access_roles(request, system_id):
     data = cloud_api.System.access_roles(request.user.email, request.session['password'], system_id)
     return api_success(data['accessRoles'])

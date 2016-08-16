@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^systems/disconnect',                     systems.disconnect),
     url(r'^systems/connect',                        systems.connect),
     url(r'^systems/(?P<system_id>.+?)/accessRoles', systems.access_roles),
+    url(r'^systems/(?P<system_id>.+?)/nonce',       systems.get_nonce),
     url(r'^systems/(?P<system_id>.+?)/users',       systems.sharing),
     url(r'^systems/(?P<system_id>.+?)/proxy/(?P<system_url>.+?)$',         systems.proxy),
     url(r'^systems/(?P<system_id>.+?)/?$',          systems.system),

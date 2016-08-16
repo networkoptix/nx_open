@@ -65,6 +65,17 @@ class System(object):
     @staticmethod
     @validate_response
     @lower_case_email
+    def get_nonce(email, password, system_id):
+        # TODO: create wrappers
+        request = CLOUD_DB_URL + '/auth/get_nonce'
+        params = {
+            'systemID': system_id
+        }
+        return requests.get(request, params=params, auth=HTTPDigestAuth(email, password))
+
+    @staticmethod
+    @validate_response
+    @lower_case_email
     def access_roles(email, password, system_id):
         request = CLOUD_DB_URL + "/system/get_access_role_list"
         params = {
