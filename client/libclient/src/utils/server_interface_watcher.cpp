@@ -55,7 +55,13 @@ void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr
 
 void QnServerInterfaceWatcher::updatePrimaryInterface(const QnMediaServerResourcePtr &server)
 {
-    const auto newAddress = QnModuleFinder::instance()->primaryAddress(server->getId());
+    const auto serverId = server->getId();
+    const auto newAddress = QnModuleFinder::instance()->primaryAddress(serverId);
+    const bool sslAllowed = QnModuleFinder::instance()->moduleInformation(serverId).sslAllowed;
+
+    if (sslAllowed != server->isSslAllowed())
+        server->setSslAllowed(sslAllowed);
+
     if (!newAddress.isNull() && newAddress != server->getPrimaryAddress())
     {
         server->setPrimaryAddress(newAddress);

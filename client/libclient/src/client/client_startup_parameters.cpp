@@ -72,6 +72,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.skipMediaFolderScan,  "--skip-media-folder-scan");
     addParserParam(commandLineParser, &result.engineVersion,        "--override-version");
     addParserParam(commandLineParser, &result.showFullInfo,         "--show-full-info");
+    addParserParam(commandLineParser, &result.exportedMode,         "--exported");
     addParserParam(commandLineParser, &result.selfUpdateMode,       kSelfUpdateKey);
 
     /* Persistent settings override. */
@@ -109,31 +110,32 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     return result;
 }
 
-QnStartupParameters::QnStartupParameters()
-    : screen(kInvalidScreen)
+QnStartupParameters::QnStartupParameters():
+    screen(kInvalidScreen),
 
-    , allowMultipleClientInstances(false)
-    , skipMediaFolderScan(false)
-    , ignoreVersionMismatch(false)
-    , vsyncDisabled(false)
-    , clientUpdateDisabled(false)
-    , softwareYuv(false)
-    , forceLocalSettings(false)
-    , fullScreenDisabled(kDefaultNoFullScreen)
-    , showFullInfo(false)
-    , selfUpdateMode(false)
+    allowMultipleClientInstances(false),
+    skipMediaFolderScan(false),
+    ignoreVersionMismatch(false),
+    vsyncDisabled(false),
+    clientUpdateDisabled(false),
+    softwareYuv(false),
+    forceLocalSettings(false),
+    fullScreenDisabled(kDefaultNoFullScreen),
+    showFullInfo(false),
+    exportedMode(false),
+    selfUpdateMode(false),
 
-    , devModeKey()
-    , authenticationString()
-    , delayedDrop()
-    , instantDrop()
-    , logLevel()
-    , ec2TranLogLevel()
-    , dynamicTranslationPath()
-    , lightMode()
-    , videoWallGuid()
-    , videoWallItemGuid()
-    , engineVersion()
-    , dynamicCustomizationPath()
+    devModeKey(),
+    authenticationString(),
+    delayedDrop(),
+    instantDrop(),
+    logLevel(),
+    ec2TranLogLevel(),
+    dynamicTranslationPath(),
+    lightMode(),
+    videoWallGuid(),
+    videoWallItemGuid(),
+    engineVersion(),
+    dynamicCustomizationPath()
 {
 }

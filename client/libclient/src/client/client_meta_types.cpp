@@ -30,7 +30,6 @@ namespace {
 }
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
-QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientSkin)
 
 void QnClientMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK,
@@ -62,14 +61,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnServerStorageKey>();
     qRegisterMetaType<Qn::TimeMode>();
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
-    qRegisterMetaType<Qn::ClientSkin>();
-    qRegisterMetaTypeStreamOperators<Qn::ClientSkin>();
-    qRegisterMetaType<Qn::BackgroundAnimationMode>();
-    qRegisterMetaTypeStreamOperators<Qn::BackgroundAnimationMode>();
-    qRegisterMetaType<QnClientBackground>();
-    qRegisterMetaTypeStreamOperators<QnClientBackground>();
+    qRegisterMetaType<QnBackgroundImage>();
     qRegisterMetaType<Qn::ImageBehaviour>();
-    qRegisterMetaTypeStreamOperators<Qn::ImageBehaviour>();
     qRegisterMetaType<ImageCorrectionParams>();
     qRegisterMetaType<QnActions::IDType>();
     qRegisterMetaType<QnActionParameters>();
@@ -147,9 +140,8 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnResourceItemColors>();
     QnJsonSerializer::registerSerializer<QnPasswordStrengthColors>();
 
-    QnJsonSerializer::registerSerializer<Qn::ClientSkin>();
-    QnJsonSerializer::registerSerializer<Qn::BackgroundAnimationMode>();
     QnJsonSerializer::registerSerializer<Qn::ImageBehaviour>();
+    QnJsonSerializer::registerSerializer<QnBackgroundImage>();
     QnJsonSerializer::registerSerializer<QnPaletteData>();
     QnJsonSerializer::registerSerializer<QnPenData>();
     QnJsonSerializer::registerSerializer<QVector<QColor> >(); // TODO: #Elric integrate with QVariant iteration?

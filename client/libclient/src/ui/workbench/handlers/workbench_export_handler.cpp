@@ -61,7 +61,7 @@ static const qint64 maxRecordingDurationMsec = 1000 * 60 * 30;
 static const QString filterSeparator(QLatin1String(";;"));
 
 /** Default bitrate for exported file size estimate in megabytes per second. */
-static const qreal kDefaultBitrateMbps = 0.5;
+static const qreal kDefaultBitrateMBps = 0.5;
 
 /** Exe files greater than 4 Gb are not working. */
 static const qint64 kMaximimumExeFileSizeMb = 4096;
@@ -69,21 +69,21 @@ static const qint64 kMaximimumExeFileSizeMb = 4096;
 /** Reserving 200 Mb for client binaries. */
 static const qint64 kReservedClientSizeMb = 200;
 
-static const int msPerSecond = 1000;
+static const int kMsPerSecond = 1000;
 
-static const int mbitsPerMb = 8;
+static const int kBitsPerByte = 8;
 
 /** Calculate estimated video size in megabytes. */
 qint64 estimatedExportVideoSizeMb(const QnMediaResourcePtr& mediaResource, qint64 lengthMs)
 {
-    qreal maxBitrate = kDefaultBitrateMbps;
+    qreal maxBitrateMBps = kDefaultBitrateMBps;
 
     if (QnVirtualCameraResourcePtr camera = mediaResource.dynamicCast<QnVirtualCameraResource>())
     {
         auto bitrateInfos = QJson::deserialized<CameraBitrates>(
             camera->getProperty(Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME).toUtf8());
         if (!bitrateInfos.streams.empty())
-            maxBitrate = std::max_element(
+            maxBitrateMBps = std::max_element(
                 bitrateInfos.streams.cbegin(), bitrateInfos.streams.cend(),
                 [](const CameraBitrateInfo& l, const CameraBitrateInfo &r)
         {
@@ -91,7 +91,7 @@ qint64 estimatedExportVideoSizeMb(const QnMediaResourcePtr& mediaResource, qint6
         })->actualBitrate;
     }
 
-    return maxBitrate * lengthMs / (msPerSecond * mbitsPerMb);
+    return maxBitrateMBps * lengthMs / (kMsPerSecond * kBitsPerByte);
 }
 
 

@@ -113,7 +113,7 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
     bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
     ui->imageGroupBox->setEnabled(backgroundAllowed);
 
-    QnClientBackground background = qnSettings->background();
+    QnBackgroundImage background = qnSettings->backgroundImage();
     m_oldBackground = background;
 
     if (!backgroundAllowed)
@@ -122,10 +122,10 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
     }
     else
     {
-        ui->imageGroupBox->setChecked(background.imageEnabled);
-        ui->imageNameLineEdit->setText(background.imageOriginalName);
-        ui->imageModeComboBox->setCurrentIndex(ui->imageModeComboBox->findData(qVariantFromValue(background.imageMode)));
-        ui->imageOpacitySpinBox->setValue(qRound(background.imageOpacity * 100));
+        ui->imageGroupBox->setChecked(background.enabled);
+        ui->imageNameLineEdit->setText(background.originalName);
+        ui->imageModeComboBox->setCurrentIndex(ui->imageModeComboBox->findData(qVariantFromValue(background.mode)));
+        ui->imageOpacitySpinBox->setValue(qRound(background.opacity * 100));
     }
 }
 
@@ -147,7 +147,7 @@ bool QnLookAndFeelPreferencesWidget::canDiscardChanges() const
     //TODO: #GDM restoring changes does not belongs here
     bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
     if (backgroundAllowed)
-        qnSettings->setBackground(m_oldBackground);
+        qnSettings->setBackgroundImage(m_oldBackground);
     return true;
 }
 
@@ -161,13 +161,18 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
     }
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
 
+    const QString previousName = qnSettings->backgroundImage().name;
+    QString folder = QFileInfo(previousName).absolutePath();
+    if (folder.isEmpty())
+        folder = qnSettings->backgroundsFolder();
+
     QScopedPointer<QnCustomFileDialog> dialog(
-        new QnCustomFileDialog (
-        this, tr("Select File..."),
-        qnSettings->backgroundsFolder(),
-        tr("Pictures %1").arg(nameFilter)
+        new QnCustomFileDialog(
+            this, tr("Select File..."),
+            folder,
+            tr("Pictures %1").arg(nameFilter)
         )
-        );
+    );
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     if(!dialog->exec())
@@ -180,7 +185,9 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
     qnSettings->setBackgroundsFolder(QFileInfo(originalFileName).absolutePath());
 
     QString cachedName = QnAppServerImageCache::cachedImageFilename(originalFileName);
-    if (qnSettings->background().imageName == cachedName)
+    if (previousName == cachedName ||
+        QDir::toNativeSeparators(previousName).toLower() ==
+        QDir::toNativeSeparators(originalFileName).toLower())
         return;
 
     QnProgressDialog* progressDialog = new QnProgressDialog(this);
@@ -192,11 +199,11 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
     QnLocalFileCache* imgCache = new QnLocalFileCache(this);
     connect(imgCache, &QnAppServerFileCache::fileUploaded, this, [this, imgCache, progressDialog, originalFileName](const QString &storedFileName) {
         if (!progressDialog->wasCanceled()) {
-            QnClientBackground background = qnSettings->background();
-            background.imageName = storedFileName;
-            background.imageOriginalName = QFileInfo(originalFileName).fileName();
-            qnSettings->setBackground(background);
-            ui->imageNameLineEdit->setText( background.imageOriginalName);
+            QnBackgroundImage background = qnSettings->backgroundImage();
+            background.name = storedFileName;
+            background.originalName = QFileInfo(originalFileName).fileName();
+            qnSettings->setBackgroundImage(background);
+            ui->imageNameLineEdit->setText( background.originalName);
         }
         imgCache->deleteLater();
         progressDialog->hide();
@@ -236,17 +243,17 @@ void QnLookAndFeelPreferencesWidget::setupTimeModeUi()
 
 void QnLookAndFeelPreferencesWidget::setupBackgroundUi()
 {
-    ui->imageModeComboBox->addItem(tr("Stretch"), qVariantFromValue(Qn::StretchImage));
-    ui->imageModeComboBox->addItem(tr("Fit"),     qVariantFromValue(Qn::FitImage));
-    ui->imageModeComboBox->addItem(tr("Crop"),    qVariantFromValue(Qn::CropImage));
+    ui->imageModeComboBox->addItem(tr("Stretch"), qVariantFromValue(Qn::ImageBehaviour::Stretch));
+    ui->imageModeComboBox->addItem(tr("Fit"),     qVariantFromValue(Qn::ImageBehaviour::Fit));
+    ui->imageModeComboBox->addItem(tr("Crop"),    qVariantFromValue(Qn::ImageBehaviour::Crop));
 
     connect(ui->imageGroupBox, &QGroupBox::toggled, this, [this] (bool checked) {
         if (m_updating)
             return;
 
-        QnClientBackground background = qnSettings->background();
-        background.imageEnabled = checked;
-        qnSettings->setBackground(background);
+        QnBackgroundImage background = qnSettings->backgroundImage();
+        background.enabled = checked;
+        qnSettings->setBackgroundImage(background);
     });
 
     connect(ui->imageSelectButton,        &QPushButton::clicked,    this,   &QnLookAndFeelPreferencesWidget::selectBackgroundImage);
@@ -255,9 +262,9 @@ void QnLookAndFeelPreferencesWidget::setupBackgroundUi()
         if (m_updating)
             return;
 
-        QnClientBackground background = qnSettings->background();
-        background.imageMode = ui->imageModeComboBox->currentData().value<Qn::ImageBehaviour>();
-        qnSettings->setBackground(background);
+        QnBackgroundImage background = qnSettings->backgroundImage();
+        background.mode = ui->imageModeComboBox->currentData().value<Qn::ImageBehaviour>();
+        qnSettings->setBackgroundImage(background);
     });
 
     connect(ui->imageOpacitySpinBox,      QnSpinboxIntValueChanged, this,   [this](int value)
@@ -265,8 +272,8 @@ void QnLookAndFeelPreferencesWidget::setupBackgroundUi()
         if (m_updating)
             return;
 
-        QnClientBackground background = qnSettings->background();
-        background.imageOpacity = 0.01 * value;
-        qnSettings->setBackground(background);
+        QnBackgroundImage background = qnSettings->backgroundImage();
+        background.opacity = 0.01 * value;
+        qnSettings->setBackgroundImage(background);
     });
 }

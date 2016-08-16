@@ -27,7 +27,7 @@ Page
                 sideNavigation.close()
             else if (stackView.depth > 1)
                 Workflow.popCurrentScreen()
-            else
+            else if (event.key != Qt.Key_Escape)
                 quitApplication()
 
             event.accepted = true

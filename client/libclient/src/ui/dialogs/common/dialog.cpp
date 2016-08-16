@@ -64,14 +64,24 @@ bool QnDialog::event(QEvent* event)
 
 void QnDialog::afterLayout()
 {
+    QSize preferred;
     if (m_resizeToContentsMode.testFlag(Qt::Horizontal))
-        setFixedWidth(minimumWidth());
+    {
+        preferred = sizeHint();
+        setFixedWidth(preferred.width());
+    }
 
     if (m_resizeToContentsMode.testFlag(Qt::Vertical))
     {
         if (hasHeightForWidth())
+        {
             setFixedHeight(heightForWidth(width()));
+        }
         else
-            setFixedHeight(minimumHeight());
+        {
+            if (!preferred.isValid())
+                preferred = sizeHint();
+            setFixedHeight(preferred.height());
+        }
     }
 }

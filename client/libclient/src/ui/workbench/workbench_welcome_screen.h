@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <QtCore/QUrl>
+#include <QtCore/QList>
 #include <QtCore/QObject>
 
 #include <utils/common/connective.h>
@@ -8,6 +10,7 @@
 #include <ui/style/generic_palette.h>
 
 class QnCloudStatusWatcher;
+typedef QList<QUrl> UrlsList;
 
 class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchContextAware
 {
@@ -24,6 +27,8 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchC
     Q_PROPERTY(bool visibleControls READ visibleControls WRITE setVisibleControls NOTIFY visibleControlsChanged)
     Q_PROPERTY(QString connectingToSystem READ connectingToSystem WRITE setConnectingToSystem NOTIFY connectingToSystemChanged)
     Q_PROPERTY(bool globalPreloaderVisible READ globalPreloaderVisible WRITE setGlobalPreloaderVisible NOTIFY globalPreloaderVisibleChanged)
+
+    Q_PROPERTY(QString softwareVersion READ softwareVersion)
 
 public:
     QnWorkbenchWelcomeScreen(QObject* parent);
@@ -59,15 +64,21 @@ public: // Properties
 
     void setGlobalPreloaderVisible(bool value);
 
+    QString softwareVersion() const;
+
 public slots:
+    bool isAcceptableDrag(const UrlsList& urls);
+
+    void makeDrop(const UrlsList& urls);
+
     // TODO: $ynikitenkov add multiple urls one-by-one  handling
-void connectToLocalSystem(
-    const QString& systemId,
-    const QString& serverUrl,
-    const QString& userName,
-    const QString& password,
-    bool storePassword,
-    bool autoLogin);
+    void connectToLocalSystem(
+        const QString& systemId,
+        const QString& serverUrl,
+        const QString& userName,
+        const QString& password,
+        bool storePassword,
+        bool autoLogin);
 
     void connectToCloudSystem(const QString& systemId, const QString& serverUrl);
 

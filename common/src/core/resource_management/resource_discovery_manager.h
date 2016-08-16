@@ -159,7 +159,7 @@ private:
 
     QVector<QnAbstractDTSSearcher*> m_dstList;
 
-    std::auto_ptr<QTimer> m_timer;
+    QScopedPointer<QTimer> m_timer;
     State m_state;
     QSet<QString> m_recentlyDeleted;
 

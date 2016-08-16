@@ -10,7 +10,8 @@
 
 QnTreeView::QnTreeView(QWidget *parent):
     base_type(parent),
-    m_editorOpen(false)
+    m_editorOpen(false),
+    m_ignoreDefaultSpace(false)
 {}
 
 QnTreeView::~QnTreeView() {
@@ -21,20 +22,30 @@ int QnTreeView::rowHeight(const QModelIndex &index) const {
     return base_type::rowHeight(index);
 }
 
-void QnTreeView::keyPressEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+void QnTreeView::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+    {
         bool canActivate = !m_editorOpen && (state() != EditingState || hasFocus());
-        if (canActivate) {
+        if (canActivate)
+        {
+            event->ignore();
             if (currentIndex().isValid())
                 emit enterPressed(currentIndex());
-            event->ignore();
         }
     }
-    if(event->key() == Qt::Key_Space) {
-        if (state() != EditingState || hasFocus()) {
-            if (currentIndex().isValid())
-                emit spacePressed(currentIndex());
+
+    if (event->key() == Qt::Key_Space)
+    {
+        if (state() != EditingState || hasFocus())
+        {
             event->ignore();
+            if (currentIndex().isValid())
+            {
+                emit spacePressed(currentIndex());
+                if (m_ignoreDefaultSpace)
+                    return;
+            }
         }
     }
 
@@ -93,4 +104,14 @@ QSize QnTreeView::viewportSizeHint() const
 #error Check if this workaround is required in current Qt version
 #endif
     return base_type::viewportSizeHint() + QSize(horizontalOffset(), verticalOffset());
+}
+
+bool QnTreeView::ignoreDefaultSpace() const
+{
+    return m_ignoreDefaultSpace;
+}
+
+void QnTreeView::setIgnoreDefaultSpace(bool value)
+{
+    m_ignoreDefaultSpace = value;
 }

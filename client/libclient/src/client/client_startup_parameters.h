@@ -10,8 +10,7 @@ struct QnStartupParameters
 
     QnStartupParameters();
 
-    static QnStartupParameters fromCommandLineArg(int argc
-        , char **argv);
+    static QnStartupParameters fromCommandLineArg(int argc, char **argv);
 
     int screen;
     const static QString kScreenKey;
@@ -27,6 +26,7 @@ struct QnStartupParameters
     bool forceLocalSettings;
     bool fullScreenDisabled;
     bool showFullInfo;
+    bool exportedMode;  /*< Client was run from an exported video exe-file. */
 
     bool selfUpdateMode;
     const static QString kSelfUpdateKey;

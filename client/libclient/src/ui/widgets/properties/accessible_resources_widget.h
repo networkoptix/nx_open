@@ -14,6 +14,7 @@ namespace Ui
 }
 
 class QnResourceListModel;
+class QnResourceListSortedModel;
 class QnAccessibleResourcesModel;
 
 /** Widget for displaying filtered set of accessible resources, for user or user group. */
@@ -45,6 +46,7 @@ public slots:
 private:
     void initControlsModel();
     void initResourcesModel();
+    void initSortFilterModel();
 
     void at_itemViewKeyPress(QObject* watched, QEvent* event);
 
@@ -61,6 +63,7 @@ private:
 
     QnResourceListModel* m_resourcesModel;
     QnResourceListModel* m_controlsModel;    /*< Workaround to make controls checkboxes look totally like elements in list. */
+    QnResourceListSortedModel* m_sortFilterModel;
 
     QnAccessibleResourcesModel* m_accessibleResourcesModel;
 };

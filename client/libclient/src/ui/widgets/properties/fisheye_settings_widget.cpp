@@ -28,8 +28,8 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
     ui->xOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_right.png")));
     ui->yOffsetIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_down.png")));
     ui->yOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_up.png")));
-    ui->ellipticityIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_horizontal.png")));
-    ui->ellipticityIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_vertical.png")));
+    ui->ellipticityIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_vertical.png")));
+    ui->ellipticityIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_horizontal.png")));
 
     connect(ui->angleSpinBox, QnDoubleSpinBoxValueChanged, this, &QnFisheyeSettingsWidget::dataChanged);
     connect(ui->calibrateWidget, &QnFisheyeCalibrationWidget::dataChanged, this, &QnFisheyeSettingsWidget::dataChanged);

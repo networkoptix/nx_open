@@ -55,6 +55,9 @@ public:
     SocketAddress getPrimaryAddress() const;
     void setPrimaryAddress(const SocketAddress &getPrimaryAddress);
 
+    bool isSslAllowed() const;
+    void setSslAllowed(bool sslAllowed);
+
     /** Get list of all available server addresses. */
     QList<SocketAddress> getAllAvailableAddresses() const;
 
@@ -139,6 +142,7 @@ signals:
     void backupScheduleChanged(const QnResourcePtr &resource);
     void apiUrlChanged(const QnResourcePtr& resource);
     void primaryAddressChanged(const QnResourcePtr& resource);
+    void sslAllowedChanged(const QnResourcePtr& resource);
 
 private:
     SocketAddress m_primaryAddress;
@@ -147,6 +151,7 @@ private:
     QList<SocketAddress> m_netAddrList;
     QList<QUrl> m_additionalUrls;
     QList<QUrl> m_ignoredUrls;
+    bool m_sslAllowed = false;
     Qn::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
@@ -164,5 +169,5 @@ private:
     Qn::PanicMode calculatePanicMode() const;
 };
 
-Q_DECLARE_METATYPE(QnMediaServerResourcePtr);
-Q_DECLARE_METATYPE(QnMediaServerResourceList);
+Q_DECLARE_METATYPE(QnMediaServerResourcePtr)
+Q_DECLARE_METATYPE(QnMediaServerResourceList)

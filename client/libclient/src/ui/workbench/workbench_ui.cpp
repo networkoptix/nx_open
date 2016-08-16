@@ -2224,9 +2224,6 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate)
 
 void QnWorkbenchUi::setSliderVisible(bool visible, bool animate)
 {
-    if (m_timeline.pinned && !visible)
-        return;
-
     ensureAnimationAllowed(animate);
 
     bool changed = m_timeline.visible != visible;
