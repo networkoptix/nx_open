@@ -232,17 +232,4 @@ private:
     bool m_enableOfflineRequests;
 };
 
-class QnForeignServerConnection: public QnMediaServerConnection
-{
-    Q_OBJECT
-public:
-    QnForeignServerConnection():
-        QnMediaServerConnection(QnMediaServerResourcePtr())
-    {
-    }
-    virtual ~QnForeignServerConnection() {}
-protected:
-    virtual bool isReady() const { return true;  }
-};
-
 #endif // __VIDEO_SERVER_CONNECTION_H_

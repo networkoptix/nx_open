@@ -43,20 +43,16 @@ private slots:
     void at_getNonceForMergeFinished(int status, const QnGetNonceReply& nonce, int handle, const QString& errorString);
     void at_getNonceForPingFinished(int status, const QnGetNonceReply& nonceReply, int handle, const QString& errorString);
 private:
-    QHash<int, QnMediaServerResourcePtr> m_serverByRequestHandle;
-
-    struct MergeSystemCtx
+    struct TwoStepRequestCtx
     {
-        MergeSystemCtx():
+        TwoStepRequestCtx():
             ownSettings(false),
             oneServer(false),
             ignoreIncompatible(false),
             nonceRequestHandle(-1),
-            mergeRequestHandle(-1)
+            mainRequestHandle(-1)
         {
         }
-
-        QnForeignServerConnectionPtr remoteConnection;
 
         QnMediaServerResourcePtr proxy;
         QUrl url;
@@ -66,19 +62,9 @@ private:
         bool ignoreIncompatible;
 
         int nonceRequestHandle;
-        int mergeRequestHandle;
+        int mainRequestHandle;
     };
 
-    struct PingSystemCtx
-    {
-        PingSystemCtx() {}
-
-        QnForeignServerConnectionPtr remoteConnection;
-        QUrl url;
-        QAuthenticator auth;
-    };
-
-    QHash<int, MergeSystemCtx> m_mergeSystemRequests;
-    QHash<int, PingSystemCtx> m_pingSystemRequests;
+    QHash<int, TwoStepRequestCtx> m_twoStepRequests; //< getnonce/ping, getnonce/merge
     QPair<ErrorCode, QnModuleInformation> m_foundModule;
 };

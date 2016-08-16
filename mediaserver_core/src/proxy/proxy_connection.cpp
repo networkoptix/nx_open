@@ -535,8 +535,10 @@ void QnProxyConnectionProcessor::doSmartProxy()
     nx::network::aio::PollSet pollSet;
     pollSet.add(d->socket->pollable(), nx::network::aio::etRead);
     pollSet.add(d->dstSocket->pollable(), nx::network::aio::etRead);
+
     while (!m_needStop)
     {
+
         int rez = pollSet.poll(IO_TIMEOUT);
         if( rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted )
             continue;
