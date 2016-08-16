@@ -4,16 +4,6 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QStandardPaths>
 
-namespace {
-
-bool isAbsolutePath(const QString& filename)
-{
-    return filename.contains(L'/') || filename.contains(L':');
-}
-
-}
-
-
 QnLocalFileCache::QnLocalFileCache(QObject *parent) :
     base_type(parent)
 {
@@ -26,7 +16,7 @@ QnLocalFileCache::~QnLocalFileCache() {
 QString QnLocalFileCache::getFullPath(const QString &filename) const
 {
     QString cachedName = filename;
-    if (isAbsolutePath(filename))
+    if (QDir::isAbsolutePath(filename))
         cachedName = QnAppServerImageCache::cachedImageFilename(filename);
 
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
@@ -69,7 +59,7 @@ void QnLocalFileCache::downloadFile(const QString &filename)
     QString cachedName = filename;
 
     /* Full image path. */
-    if (isAbsolutePath(filename))
+    if (QDir::isAbsolutePath(filename))
     {
         QImage source(filename);
         if (source.isNull())
