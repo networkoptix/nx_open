@@ -26,13 +26,14 @@ class QnStorageListModel : public ScopedModelOperations<Customized<QAbstractList
     using base_type = ScopedModelOperations<Customized<QAbstractListModel>>;
 
 public:
-    enum Columns {
-        CheckBoxColumn,
+    enum Columns
+    {
         UrlColumn,
+        StoragePoolColumn,
         TypeColumn,
         TotalSpaceColumn,
         RemoveActionColumn,
-        ChangeGroupActionColumn,
+        CheckBoxColumn,
 
         ColumnCount
     };
@@ -42,7 +43,7 @@ public:
 
     void setStorages(const QnStorageModelInfoList& storages);
     void addStorage(const QnStorageModelInfo& storage);
-    void updateStorage(const QnStorageModelInfo& storage);
+    bool updateStorage(const QnStorageModelInfo& storage);
     void removeStorage(const QnStorageModelInfo& storage);
 
     QnMediaServerResourcePtr server() const;
@@ -54,7 +55,7 @@ public:
     void updateRebuildInfo(QnServerStoragesPool pool, const QnStorageScanData& rebuildStatus);
 
     /** Check if the storage can be moved from this model to another. */
-    bool canMoveStorage(const QnStorageModelInfo& data) const;
+    bool canChangeStoragePool(const QnStorageModelInfo& data) const;
 
     /** Check if storage can be removed from the system. */
     bool canRemoveStorage(const QnStorageModelInfo& data) const;
@@ -80,12 +81,9 @@ protected:
 
 private:
     QString displayData(const QModelIndex& index, bool forcedText) const;
-    QVariant fontData(const QModelIndex& index) const;
     QVariant foregroundData(const QModelIndex& index) const;
     QVariant mouseCursorData(const QModelIndex& index) const;
     QVariant checkstateData(const QModelIndex& index) const;
-
-    void sortStorages();
 
     /* Check if the whole section is in rebuild. */
     bool isStoragePoolInRebuild(const QnStorageModelInfo& storage) const;
@@ -96,9 +94,9 @@ private:
 private:
     QnMediaServerResourcePtr m_server;
     QnStorageModelInfoList m_storages;
+    QSet<QnUuid> m_checkedStorages;
     std::array<QnStorageScanData, static_cast<int>(QnServerStoragesPool::Count)> m_rebuildStatus;
 
     bool m_readOnly;
     QBrush m_linkBrush;
-    QFont m_linkFont;
 };
