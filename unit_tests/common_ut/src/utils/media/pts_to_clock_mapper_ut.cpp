@@ -65,7 +65,7 @@ TEST( PtsToClockMapper, general )
             pts_type prevEffectivePts = 0;
             pts_type ptsDelta = 0;
 
-            ptsToClockMapper.updateTimeMapping( MIN_PTS, nx::utils::random::number(0) );
+            ptsToClockMapper.updateTimeMapping( MIN_PTS, nx::utils::random::number() );
 
             //for( pts_type pts = MIN_PTS; pts < MAX_PTS; pts += STEP_VALUE )
             for( int i = 0; i < STEPS; ++i )

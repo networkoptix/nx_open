@@ -66,7 +66,7 @@ bool StreamingChunk::tryRead( SequentialReadingContext* const ctx, nx::Buffer* c
 
 #ifdef DUMP_CHUNK_TO_FILE
 static std::atomic<int> fileNumber = 1;
-static QString filePathBase( lit("c:\\tmp\\chunks\\%1_%2.ts").arg(nx::utils::random::number(0)) );
+static QString filePathBase( lit("c:\\tmp\\chunks\\%1_%2.ts").arg(nx::utils::random::number()) );
 #endif
 
 //!Only one thread is allowed to modify chunk data at a time

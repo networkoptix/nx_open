@@ -42,7 +42,7 @@ void QnStoredFileDataProvider::setCyclesCount(int cyclesCount)
 
 void QnStoredFileDataProvider::prepareIODevice()
 {
-    const QString temporaryFilePath = QString::number(nx::utils::random::number(0));
+    const QString temporaryFilePath = QString::number(nx::utils::random::number());
 
     QBuffer* buffer = new QBuffer();
     buffer->setBuffer(&m_fileData);
