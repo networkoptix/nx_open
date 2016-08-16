@@ -19,12 +19,6 @@ namespace ec2
     Q_DECLARE_FLAGS(RuntimeFlags, RuntimeFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(RuntimeFlags)
 
-    QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-        (ec2::RuntimeFlag)(ec2::RuntimeFlags)
-        ,
-        (metatype)(numeric)
-    )
-
 
     /**
     * This structure contains all runtime data per peer. Runtime data is absent in a DB.
@@ -103,5 +97,10 @@ namespace ec2
 } // namespace ec2
 
 Q_DECLARE_METATYPE(ec2::ApiRuntimeData);
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (ec2::RuntimeFlag)(ec2::RuntimeFlags),
+    (metatype)(numeric)
+)
 
 #endif // __API_RUNTIME_DATA_H_
