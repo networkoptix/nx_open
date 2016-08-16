@@ -327,7 +327,7 @@ angular.module('webadminApp')
 
                 $log.log("Mediaserver connected system to another");
                 $log.log("Apply new credentials ... ");
-                updateCredentials( $scope.settings.remoteLogin, $scope.settings.remotePassword).catch(remoteErrorHandler);
+                updateCredentials($scope.settings.remoteLogin, $scope.settings.remotePassword, false).catch(remoteErrorHandler);
             },remoteErrorHandler);
         }
 
