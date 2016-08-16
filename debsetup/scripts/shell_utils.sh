@@ -2,11 +2,11 @@
 
 function crash_gdb_bt() {
     BIN_PATH=$1
-
-    if [! $1 ]; then
+    if [ ! "$BIN_PATH" ]; then
         echo "Usage: craqsh_gdb_bt BINARY_PATH" > 2
         return 2
     fi
+
     if [ ! $(which gdb) ]; then
         return 0 # no gdb on the host
     fi
@@ -29,11 +29,11 @@ function crash_gdb_bt() {
     fi
 }
 
-if [! $1]; then
+COMMAND=$1
+if [ ! "$COMMAND" ]; then
     echo "Usage: shell_utils COMMAND [ARGS ...]" >2
     exit 1;
 fi
 
-COMMAND=$1
 shift
 $COMMAND $@
