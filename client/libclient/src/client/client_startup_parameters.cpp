@@ -101,8 +101,9 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
 
     if (!strCustomUri.isEmpty())
     {
-        result.customUri = nx::vms::utils::SystemUri(strCustomUri);
-        result.customUri.setProtocol(nx::vms::utils::SystemUri::Protocol::Native);     /*< Restore protocol part that was cut out. */
+        /* Restore protocol part that was cut out. */
+        QString fixedUri = lit("%1://%2").arg(nx::vms::utils::AppInfo::nativeUriProtocol()).arg(strCustomUri);
+        result.customUri = nx::vms::utils::SystemUri(fixedUri);
     }
     result.videoWallGuid = QnUuid(strVideoWallGuid);
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
