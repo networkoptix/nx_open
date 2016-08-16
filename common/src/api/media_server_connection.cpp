@@ -320,19 +320,23 @@ QnMediaServerConnection::QnMediaServerConnection(const QnMediaServerResourcePtr&
     m_proxyPort(0),
     m_enableOfflineRequests(enableOfflineRequests)
 {
-    setUrl(mserver->getApiUrl());
     setSerializer(QnLexical::newEnumSerializer<RequestObject, int>());
-
-    QnUuid guid = mserver->getOriginalGuid();
-
-    QnRequestParamList queryParameters;
-	queryParameters.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), mserver->getId().toString());
-    setExtraQueryParameters(std::move(queryParameters));
-
     nx_http::HttpHeaders extraHeaders;
-	extraHeaders.emplace(
-        Qn::SERVER_GUID_HEADER_NAME,
-        guid.isNull() ? mserver->getId().toByteArray() : guid.toByteArray());
+
+    if (mserver)
+    {
+        setUrl(mserver->getApiUrl());
+
+        QnUuid guid = mserver->getOriginalGuid();
+
+        QnRequestParamList queryParameters;
+        queryParameters.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), mserver->getId().toString());
+        setExtraQueryParameters(std::move(queryParameters));
+
+        extraHeaders.emplace(
+            Qn::SERVER_GUID_HEADER_NAME,
+            guid.isNull() ? mserver->getId().toByteArray() : guid.toByteArray());
+    }
 
     if (!videowallGuid.isNull())
         extraHeaders.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videowallGuid.toByteArray());

@@ -48,6 +48,9 @@ typedef QList<QnCameraAdvancedParamValue> QnCameraAdvancedParamValueList;
 class QnMediaServerConnection;
 typedef QSharedPointer<QnMediaServerConnection> QnMediaServerConnectionPtr;
 
+class QnForeignServerConnection;
+typedef QSharedPointer<QnForeignServerConnection> QnForeignServerConnectionPtr;
+
 // -->
 
 

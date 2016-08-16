@@ -55,6 +55,8 @@ private:
         {
         }
 
+        QnForeignServerConnectionPtr remoteConnection;
+
         QnMediaServerResourcePtr proxy;
         QUrl url;
         QAuthenticator auth;

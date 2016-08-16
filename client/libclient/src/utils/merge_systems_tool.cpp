@@ -81,7 +81,10 @@ int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const
     ctx.auth = userAuth;
     ctx.ownSettings = ownSettings;
 
-    ctx.nonceRequestHandle = proxy->apiConnection()->getNonceAsync(url, this, SLOT(at_getNonceForMergeFinished(int, QnGetNonceReply, int, QString)));
+    QnForeignServerConnectionPtr remoteConnection(new QnForeignServerConnection());
+    remoteConnection->setUrl(url);
+    ctx.remoteConnection = remoteConnection;
+    ctx.nonceRequestHandle = remoteConnection->getNonceAsync(url, this, SLOT(at_getNonceForMergeFinished(int, QnGetNonceReply, int, QString)));
     m_mergeSystemRequests[ctx.nonceRequestHandle] = ctx;
     return ctx.nonceRequestHandle;
 }
@@ -93,6 +96,7 @@ void QnMergeSystemsTool::at_getNonceForMergeFinished(
     const QString& errorString)
 {
     MergeSystemCtx& ctx = m_mergeSystemRequests[handle];
+    ctx.remoteConnection.clear();
 
     QByteArray getKey = createHttpQueryAuthParam(
         ctx.auth.user(),
