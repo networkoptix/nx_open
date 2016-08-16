@@ -624,9 +624,9 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     */
     ASSERT_TRUE(useInARowOverflowCount < kMaxUseInARowOverflowCount);
 
-	/*	Storages are 10, 20, and 30 gb size accordingly.
+	/*	Storages are of 10, 20, and 30 gb size accordingly.
 	*	So we should've recorded on the second storage twice as much as on the first
-	*	and on the third - roughly the same as first + second. Below are the corresponding checks.
+	*	and on the third - roughly the same amount as the first + the second. 
 	*
 	*	As for deltas.
 	*	Total recorded size is 100'000 * 10240 bytes ~= 980 mb.
@@ -634,7 +634,7 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 	*		- 1st - 170mb
 	*		- 2nd - 340mb
 	*		- 3rd - 500mb
-	*	Hence fair delta amount would be around dozen(s) of megabytes. 
+	*	Hence, a fair delta amount would be around dozen(s) of megabytes. 
 	*	Let it be 10mb in the first check and 20mb in the second check.
 	*/
 	ASSERT_TRUE(std::abs(storagesUsageData[0].written*2 - storagesUsageData[1].written) <= 10 * 1024 * 1024);
