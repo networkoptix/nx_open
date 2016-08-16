@@ -10,6 +10,7 @@
 #include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/busy_indicator.h>
 #include <ui/widgets/common/input_field.h>
@@ -72,7 +73,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), QnCloudUrlHelper::aboutUrl()));
     ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
-    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_3.png"));
+    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("welcome_page/cloud_account_logged.png"));
 
     QFont welcomeFont(ui->cloudWelcomeLabel->font());
     welcomeFont.setPixelSize(kWelcomeFontPixelSize);
@@ -88,6 +89,8 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     ui->loginInputField->setFocus();
     d->updateUi();
     d->lockUi(false);
+
+    ui->loginButton->setProperty(style::Properties::kAccentStyleProperty, true);
 
     setResizeToContentsMode(Qt::Vertical);
 }
