@@ -365,7 +365,7 @@ TEST_F(AbstractStorageResourceTest, IODevice)
 
 class AbstractMockStorageResource : public QnStorageResource {
 public:
-	qint64 freeSpace;
+	std::atomic<qint64> freeSpace;
 
 	AbstractMockStorageResource(qint64 freeSpace) : freeSpace(freeSpace) {}
 
@@ -477,6 +477,34 @@ public:
     }
 };
 
+struct OccupiedSpaceAccess
+{
+	static void addSpaceInfoOccupiedValue(QnStorageManager* storageManager, int storageIndex, qint64 value)
+	{
+		storageManager->addSpaceInfoOccupiedValue(storageIndex, value);
+	}
+
+	static void subtractSpaceInfoOccupiedValue(QnStorageManager* storageManager, int storageIndex, qint64 value)
+	{
+		storageManager->subtractSpaceInfoOccupiedValue(storageIndex, value);
+	}
+
+	static qint64 getSpaceInfoOccupiedValue(QnStorageManager* storageManager, int storageIndex)
+	{
+		return storageManager->getSpaceInfoOccupiedValue(storageIndex);
+	}
+
+	static void setSpaceInfoUsageCoeff(QnStorageManager* storageManager, int storageIndex, double coeff)
+	{
+		storageManager->setSpaceInfoUsageCoeff(storageIndex, coeff);
+	}
+	
+	static double getSpaceInfoUsageCoeff(QnStorageManager* storageManager, int storageIndex)
+	{
+		return storageManager->getSpaceInfoUsageCoeff(storageIndex);
+	}
+};
+
 TEST(Storage_load_balancing_algorithm_test, Main) 
 {
     std::unique_ptr<QnCommonModule> commonModule;
@@ -532,39 +560,85 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     storage2->setStatus(Qn::Online, true);
     storage3->setStatus(Qn::Online, true);
 
-    const int writeCount = 1000 * 100;
     QnUuid currentStorageId;
-
-    int currentStorageUseCount = 0;
-    int useInARowOverflowCount = 0;
 
     const int kMaxStorageUseInARow = 15;
     const int kMaxUseInARowOverflowCount = 5;
-	const int writtenBlock = 10 * 1024;
+    const int kWriteCount = 1000 * 10;
+	const int kWrittenBlock = 10 * 1024;
+	const size_t kRecordersCount = 10;
     const double kMaxUsageDelta = 50;
 
-    for (int i = 0; i < writeCount; ++i) 
-    {
-        auto storage = qnNormalStorageMan->getOptimalStorageRoot(nullptr);
-		storage.dynamicCast<AbstractMockStorageResource>()->freeSpace -= writtenBlock;
-		//qnNormalStorageMan->addOccupiedSpaceInfoValue(qnStorageDbPool->getStorageIndex(storage), writtenBlock);
+	struct StorageUseStats
+	{
+		int selected;
+		qint64 written;
+		StorageUseStats() : selected(0), written(0) {}
+	};
 
-        if (currentStorageId != storage->getId()) 
-        {
-            currentStorageId = storage->getId();
-            if (currentStorageUseCount > kMaxStorageUseInARow)
-                ++useInARowOverflowCount;
-            currentStorageUseCount = 0;
-        }
-        else 
-        {
-            ++currentStorageUseCount;
-        }
-    }
+    int currentStorageUseCount = 0;
+    int useInARowOverflowCount = 0;
+	std::unordered_map<int, StorageUseStats> storagesUsageData;
+	std::mutex testMutex;
+	std::vector<std::thread> recorders;
+
+	for (size_t i = 0; i < kRecordersCount; ++i)
+	{
+		recorders.emplace_back(std::thread(
+		[&]
+		{
+			for (int i = 0; i < kWriteCount; ++i) 
+			{
+				auto storage = qnNormalStorageMan->getOptimalStorageRoot(nullptr);
+				storage.dynamicCast<AbstractMockStorageResource>()->freeSpace -= kWrittenBlock;
+				int storageIndex = qnStorageDbPool->getStorageIndex(storage);
+				OccupiedSpaceAccess::addSpaceInfoOccupiedValue(qnNormalStorageMan, storageIndex, kWrittenBlock);
+
+				std::lock_guard<std::mutex> lock(testMutex);
+				++storagesUsageData[storageIndex].selected;
+				storagesUsageData[storageIndex].written += kWrittenBlock;
+
+				if (currentStorageId != storage->getId()) 
+				{
+					currentStorageId = storage->getId();
+					if (currentStorageUseCount > kMaxStorageUseInARow)
+						++useInARowOverflowCount;
+					currentStorageUseCount = 0;
+				}
+				else 
+				{
+					++currentStorageUseCount;
+				}
+			}
+		}));
+	}
+
+	for (auto& t: recorders)
+		if (t.joinable())
+			t.join();
+
     /*  Actually, due to probabilistic nature of selecting storage algorithm
     *   some storage may be selected more than kMaxStorageUseIARow times.
     *   Let's at least check that such peaks are not too often.
-    *   kMaxUseInARowOverflowCount peak breaches on 1 * 1000 * 1000 selections seem fair enough.
+    *   kMaxUseInARowOverflowCount peak breaches on 1 * 1000 * 100 selections seem fair enough.
     */
     ASSERT_TRUE(useInARowOverflowCount < kMaxUseInARowOverflowCount);
+
+	/*	Storages are 10, 20, and 30 gb size accordingly.
+	*	So we should've recorded on the second storage twice as much as on the first
+	*	and on the third - roughly the same as first + second. Below are the corresponding checks.
+	*
+	*	As for deltas.
+	*	Total recorded size is 100'000 * 10240 bytes ~= 980 mb.
+	*	Hence roughly we should have in the end:
+	*		- 1st - 170mb
+	*		- 2nd - 340mb
+	*		- 3rd - 500mb
+	*	Hence fair delta amount would be around dozen(s) of megabytes. 
+	*	Let it be 10mb in the first check and 20mb in the second check.
+	*/
+	ASSERT_TRUE(std::abs(storagesUsageData[0].written*2 - storagesUsageData[1].written) <= 10 * 1024 * 1024);
+	ASSERT_TRUE(std::abs(storagesUsageData[0].written + 
+						 storagesUsageData[1].written -
+						 storagesUsageData[2].written) <= 20 * 1024 * 1024);
 }

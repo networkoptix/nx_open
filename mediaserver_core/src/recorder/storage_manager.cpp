@@ -554,8 +554,14 @@ void QnStorageManager::applySpaceInfoAction(int storageIndex, F action)
 	auto it = m_occupiedSpaceInfo.find(storageIndex);
 	if (it == m_occupiedSpaceInfo.cend())
 	{
-		NX_LOG(lit("%1: no storage for this index %2").arg(Q_FUNC_INFO).arg(storageIndex), cl_logWARNING);
-		return;
+		NX_LOG(lit("%1: no storage for this index %2").arg(Q_FUNC_INFO).arg(storageIndex), cl_logDEBUG1);
+		bool success = false;
+		std::tie(it, success) = m_occupiedSpaceInfo.emplace(storageIndex, StorageSpaceInfo());
+		if (!success)
+		{
+			NX_LOG(lit("%1: storageSpaceInfo insertion failed").arg(Q_FUNC_INFO), cl_logWARNING);
+			return;
+		}
 	}
 	action(static_cast<StorageSpaceInfoMap::iterator>(it));
 }
@@ -563,7 +569,7 @@ void QnStorageManager::applySpaceInfoAction(int storageIndex, F action)
 void QnStorageManager::setSpaceInfoUsageCoeff(int storageIndex, double coeff)
 {
 	applySpaceInfoAction(storageIndex, [coeff] (StorageSpaceInfoMap::iterator it) {
-		it->second.usageCoeff += coeff;
+		it->second.usageCoeff = coeff;
 	});
 }
 

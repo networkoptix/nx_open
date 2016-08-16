@@ -229,6 +229,8 @@ private:
     bool getMinTimes(QMap<QString, qint64>& lastTime);
     void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);
 
+	friend struct OccupiedSpaceAccess; // for unit tests
+
 	void calculateOccupiedSpace();
 	void addSpaceInfoOccupiedValue(int storageIndex, qint64 value);
 	void subtractSpaceInfoOccupiedValue(int storageIndex, qint64 value);
