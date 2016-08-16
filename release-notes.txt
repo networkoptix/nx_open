@@ -3,14 +3,14 @@ NEW FEATURES
 * 2-way audio integrated for Axis cameras and I/O devices with firmware version 5.x
 * 2-way audio as an action (for actions "Speak", "Play sound" and "Repeat Sound" Axis camera or I/O device can be selected as a target)
 * HTTP Request-as an-Action
-* Export Rapid Review - Allows to export long period of archive with specified rapid review speed
+* Rapid Review (export and review 1 day of video in 1 minute)
 * [NOT IN BETA]IPv6 support
 
 NEW DEVICE SUPPORT
 * FLIR AX8 and FC-series cameras integrated via ONVIF
-* Advantech ADAM-6052 module
+* Advantech I/O module integration (tested with Advantech 6052)
 * Pelco NET5516 Encoder
-* Pelco Optera IMM12018, IMM12027, IMM12036 cameras
+* Pelco Optera Series Cameras (180, 270, and 360 - no motion detection support)
 * ACTi A41, A81, E925, E924, E12a cameras
 * ACTi PTZ Dome I98
 * New Arecont Vision(G5) and new Axis cameras support
@@ -23,12 +23,14 @@ IMPROVEMENTS
 * Sony SNC-EP550 audio is now supported
 * Improved PTZ for Uniview and Vivotek cameras
 * Added playback speed controls for VMAX
-* [NOT IN BETA]Added an ability to control IR LED on Hikvision cameras from camera advanced settings in Client
+* DW CPRO-manufactured cameras now use H264-High profile
+* DW Panzilla optimizations
+* [NOT IN BETA]Added IR controls for Hikvision DS-2CD2032-I to the "Advanced" tab of camera settings in Client
 * Improved default password autofill during auto-discovery for DW cameras
 * RTSP workflow improvement reduces glitches for cameras that experience short-time RTSP-stream frequent stops
-* Minimal resolution threshold for motion detection were increased from 720x576 to 1024x768
+* Software Motion Detection stream resolution threshold increased to 1024x768. Works also for single-stream cameras with resolution of that value and below
 * Storage Database management optimizations
-* Implemented automatically adaptive recording buffer size settings to prevent "Not enough HDD/SSD speed for recording" error
+* Write to storage function optimisations for high-bitrate cameras. Drastically decreases "HDD Slow" errors.
 * [NOT IN BETA]SMTP servers without authentication are supported now for sending emails
 * Added more useful warnings to LDAP "Test" results
 * Incremental expansion of Server API documentation
@@ -38,13 +40,13 @@ BUG FIXES
 * Inputs were not properly recognised from camera VK2-1080XVRDPTZf. Fixed.
 * [NOT IN BETA]There was no video in Client from camera Sony SNC-VM772R. Fixed.
 * Acti V32 didn't accept Analog Encoder licenses. Fixed.
-* Motion detection stopped working at DW-MV421 onvif camera. Fixed.
+* Motion detection stopped working at DW-MV421 Onvif camera. Fixed.
 * [NOT IN BETA]Canon VB-S30D lost PTZ capabilities after some time after the initialization. Fixed.
 * Server pasted default http port :80 for Axis cameras instead of parsing mutlicast reply. Fixed.
+* Desktop Client crashed while viewing archive recordings from some cameras with g726 coded audio. Noticed at Axis fw 6.x. Fixed.
 * [NOT IN BETA]Couldn't add camera manually if there was other offline device with the same IP in the Resources Tree. Fixed.
 * Sometimes camera went to unauthorized state after moving between servers. Fixed.
 * Video noise appeared on specific frames of DW-CP16. Fixed.
-* Panzilla panoramic camera integration issues. Fixed.
 * Server crashed if advanced settings for DWC-PF5MTIR had been changed. Fixed.
 * Sometimes Server locked after effort to restart it. Fixed.
 * Windows Error Report about Server crash might appear right after update because of improper Server restart. Fixed.
@@ -64,8 +66,12 @@ BUG FIXES
 * Chinese input didn't work in Client on Ubuntu. Fixed.
 * Mobile Client didn't allow connection in login or password contained the specific symbols like '@', '#' etc. Fixed.
 * System names in "Saved Connections" in Mobile Client could change after connect to Server in case of specific network configuration. Fixed.
-* [NOT IN BETA]Mobile Client may not to switch its orientation to portrait/landscape mode after switching between the application. Fixed.
+* [NOT IN BETA]iOS Client may not to switch its orientation to portrait/landscape mode after switching between the applications. Fixed.
 * [NOT IN BETA]Sometimes Mobile Client refused to display video in 1080p. Fixed. 
+
+KNOWN ISSUES
+* There's sound at the live view but no sound in the archived recordings. Noticed at some Axis cameras fw 6.x. Planned to fix in 3.0
+* Spontaneous server crashes due to a lot of network issues at some cameras. Noticed at systems with Hikvision models installed: DS-2CD2112F-I, DS-2CD2312-I, DS-2CD2332-I, DS-2CD6412FWD-20, DS-2CD2632F-I, DS-2CD2732F-I, DS-2CD2532F-I. Planned to fix in 3.0
 
 
 -----------------------------------------------2.5.0.xxxx-----------------------------------------
