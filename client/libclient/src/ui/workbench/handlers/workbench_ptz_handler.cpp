@@ -40,7 +40,7 @@ class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, publ
 public:
     QnSingleCameraPtzHotkeysDelegate(const QnResourcePtr &resource, QnWorkbenchContext *context):
         QnWorkbenchContextAware(context),
-        m_virtRes(resource.dynamicCast<QnVirtualCameraResource>()),
+        m_camera(resource.dynamicCast<QnVirtualCameraResource>()),
         m_resourceId(resource->getId()),
         m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzHotkeyHash>())
     {
@@ -52,13 +52,13 @@ public:
     {
         QnPtzHotkeyHash result;
 
-        if (!m_virtRes)
+        if (!m_camera)
             return result;
 
         {
             QnMutexLocker lock(&m_mutex);
             m_propertyHandler->deserialize(
-                m_virtRes->getProperty(kPtzHotkeysPropertyName),
+                m_camera->getProperty(kPtzHotkeysPropertyName),
                 &result);
         }
 
@@ -67,7 +67,7 @@ public:
 
     virtual void updateHotkeys(const QnPtzHotkeyHash &value) override
     {
-        if (!m_virtRes)
+        if (!m_camera)
             return;
 
         {
@@ -75,14 +75,14 @@ public:
             QString serialized;
             m_propertyHandler->serialize(value, &serialized);
 
-            m_virtRes->setProperty(kPtzHotkeysPropertyName, serialized);
+            m_camera->setProperty(kPtzHotkeysPropertyName, serialized);
 
-            m_virtRes->saveParamsAsync();
+            m_camera->saveParamsAsync();
         }
     }
 
 private:
-    QnVirtualCameraResourcePtr m_virtRes;
+    QnVirtualCameraResourcePtr m_camera;
     QnUuid m_resourceId;
     std::unique_ptr<QnJsonResourcePropertyHandler<QnPtzHotkeyHash>> m_propertyHandler;
     mutable QnMutex m_mutex;

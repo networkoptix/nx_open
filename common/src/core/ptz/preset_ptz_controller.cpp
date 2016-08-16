@@ -3,6 +3,7 @@
 #include <nx/fusion/model_functions.h>
 #include <api/app_server_connection.h>
 #include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
 
 #include "ptz_preset.h"
 
@@ -48,7 +49,7 @@ Q_DECLARE_METATYPE(QnPtzPresetRecordHash)
 // -------------------------------------------------------------------------- //
 QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_virtResource(resource().dynamicCast<QnVirtualCameraResource>()),
+    m_camera(resource().dynamicCast<QnVirtualCameraResource>()),
     m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzPresetRecordHash>())
 {
     NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
@@ -99,7 +100,7 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset)
     {
         QnMutexLocker locker(&m_mutex);
         if (status = doPresetsAction(createPresetActionFunc, preset))
-            m_virtResource->saveParamsAsync();
+            m_camera->saveParamsAsync();
     }
 
     if (status)
@@ -128,7 +129,10 @@ bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset)
     {
         QnMutexLocker locker(&m_mutex);
         if (status = doPresetsAction(updatePresetActionFunc, preset))
-            m_virtResource->saveParamsAsync();
+        {
+            NX_ASSERT(m_camera, Q_FUNC_INFO, "Cannot update preset since corresponding resource does not exist.");
+            m_camera->saveParamsAsync();
+        }
     }
 
     if (status)
@@ -139,7 +143,6 @@ bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset)
 
 bool QnPresetPtzController::removePreset(const QString &presetId)
 {
-
     auto removePresetActionFunc = [this](QnPtzPresetRecordHash& records, QnPtzPreset preset)
     {
         if (records.remove(preset.id) == 0)
@@ -152,7 +155,10 @@ bool QnPresetPtzController::removePreset(const QString &presetId)
     {
         QnMutexLocker locker(&m_mutex);
         if (status = doPresetsAction(removePresetActionFunc, QnPtzPreset(presetId, QString())))
-            m_virtResource->saveParamsAsync();
+        {
+            NX_ASSERT(m_camera, Q_FUNC_INFO, "Cannot remove preset since correspondent resource does not exist.");
+            m_camera->saveParamsAsync();
+        }
     }
 
     if (status)
@@ -163,7 +169,6 @@ bool QnPresetPtzController::removePreset(const QString &presetId)
 
 bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
 {
-
     auto activatePresetActionFunc = [this, speed](QnPtzPresetRecordHash& records, QnPtzPreset preset)
     {
         if (!records.contains(preset.id))
@@ -216,17 +221,17 @@ QnPtzPresetRecordHash QnPresetPtzController::deserializePresets(const QString& p
 
 bool QnPresetPtzController::doPresetsAction(PresetsActionFunc actionFunc, QnPtzPreset preset)
 {
-    if (!m_virtResource)
+    if (!m_camera)
         return false;
 
-    auto serialized = m_virtResource->getProperty(kPresetsPropertyKey);
+    auto serialized = m_camera->getProperty(kPresetsPropertyKey);
     auto deserialized = deserializePresets(serialized);
 
     if (!actionFunc(deserialized, preset))
         return false;
 
     serialized = serializePresets(deserialized);
-    m_virtResource->setProperty(kPresetsPropertyKey, serialized);
+    m_camera->setProperty(kPresetsPropertyKey, serialized);
 
     return true;
 }
