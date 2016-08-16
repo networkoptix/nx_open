@@ -586,6 +586,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
                     else
                     {
                         // new server
+                        pollSet.remove(d->dstSocket->pollable(), nx::network::aio::etRead);
                         d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
                         if (d->lastConnectedUrl.isEmpty())
                         {
@@ -600,6 +601,9 @@ void QnProxyConnectionProcessor::doSmartProxy()
                             doRawProxy(); // switch to binary mode
                             return;
                         }
+                        pollSet.add(d->dstSocket->pollable(), nx::network::aio::etRead);
+                        d->clientRequest.clear();
+                        break;
                     }
                     d->clientRequest.clear();
                 }
