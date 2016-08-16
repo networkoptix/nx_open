@@ -37,6 +37,8 @@ TransactionTransport::TransactionTransport(
     m_connectionOriginatorEndpoint(socket->getForeignAddress())
 {
     bindToAioThread(socket->getAioThread());
+    setState(Connected);
+    //ignoring "state changed to Connected" signal
 
     QObject::connect(
         this, &::ec2::QnTransactionTransportBase::gotTransaction,
