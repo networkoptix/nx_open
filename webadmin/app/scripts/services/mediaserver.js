@@ -120,9 +120,9 @@ angular.module('webadminApp')
                 $localStorage.$reset();
                 return $http.post(proxy + '/web/api/cookieLogout');
             },
-            digest:function(login,password,realm,nonce){
+            digest:function(login,password,realm,nonce,post){
                 var digest = md5(login + ':' + realm + ':' + password);
-                var method = md5('GET:');
+                var method = md5(post?'POST:':'GET:');
                 var authDigest = md5(digest + ':' + nonce + ':' + method);
                 var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
 
@@ -319,14 +319,16 @@ angular.module('webadminApp')
                     // 2. calculate digest
                     var realm = data.data.reply.realm;
                     var nonce = data.data.reply.nonce;
-                    var auth = self.digest(remoteLogin, remotePassword, realm, nonce);
+                    var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, false);
+                    var postKey = self.digest(remoteLogin, remotePassword, realm, nonce, true);
 
                     // 3. pass it to merge request
                     if(url.indexOf('http')!=0){
                         url = 'https://' + url;
                     }
                     return wrapPost(proxy + '/web/api/mergeSystems?',{
-                        auth: auth,
+                        getKey: getKey,
+                        postKey: postKey,
                         url: url,
                         takeRemoteSettings: !keepMySystem
                     });
